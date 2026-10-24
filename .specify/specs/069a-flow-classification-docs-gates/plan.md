@@ -209,7 +209,7 @@ Phase 1 产物与边界（判据正文在各自 owner，本计划不复述）：
 | 层 | 命令 | 基线 |
 |----|------|------|
 | 采集面 | `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest --collect-only -q tests` | `5361 tests collected`（exit 0） |
-| 契约面 | `pytest tests/contract -q --tb=no` | `4154 passed, 31 failed, 5 skipped`（201.9 s）；失败名单冻结在 `notes/test-baseline-contract.txt` |
+| 契约面 | `pytest tests/contract -q --tb=no` | `4154 passed, 31 failed, 5 skipped`（201.9 s，**T003 重采前的口径**；重采后基线为 `33 failed / 4177 passed`。失败**计数与名单的唯一所有者**是 `notes/test-baseline-contract.txt`，本行只作冻结前记录） |
 | 静态交叉核对 | AST 统计 `test_*.py` | 文件 307 / 顶层 `test_*` 函数 2915；`tests/contract/` 189 文件 / 1974 函数（参数化使 collected 大于函数数，两数并存防用错分母） |
 | 镜像面 | `python3 scripts/python/sync-mirrors.py --check` | 六对 `ok` + 命令副本 `OK`（exit 0） |
 | 结构面 | `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .` | exit 0，`violations=3`（`broken-link` 2 + `note-frontmatter` 1）——**非零基线** |
@@ -217,7 +217,7 @@ Phase 1 产物与边界（判据正文在各自 owner，本计划不复述）：
 
 **判据（全部写成名字级差值，不写绝对绿）**
 - 新增测试必须先在既有代码上**红**（引擎/owner/接线尚不存在），再随实现转绿。
-- 契约与单元套件：与 `notes/test-baseline-contract.txt` 比对，**零新增失败名字**；既有 31 红不因本切片修复或掩盖（属他特性的登记债）。
+- 契约与单元套件：与 `notes/test-baseline-contract.txt` 比对，**零新增失败名字**；既有红（**计数与名单只在该文件内维护**，本文件不重述数字）不因本切片修复或掩盖（属他特性的登记债）。
 - 结构面：`violations` **零新增**（计数与 kind 集合都不得增长）。
 - 镜像面：`--check` 零新增差异；命令副本在 `regen-command-copies.py` 重生成后 `--check` 为 `OK`，且副本正文含接线（防「只改模板、未重生成」假绿）。
 

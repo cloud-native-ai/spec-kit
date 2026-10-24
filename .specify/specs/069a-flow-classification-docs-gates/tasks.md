@@ -18,7 +18,7 @@
 - DoD-1: 全部任务行行为 `[X]`；若有 `[~]`，理由逐条记录在 `.specify/specs/069a-flow-classification-docs-gates/verification.md` 的 `deferred_tasks=`。
 - DoD-2: 两份 owner 文档与两个引擎按契约交付——`shared/definitions/flow-class-definitions.md`（判据/两取值/边界例/78 行台账/类中立封闭清单/命名空间/变更记录）、`shared/workflow/expression-gates.md`（六面 + 8 阶段算子表 + 调用点表 + 阻断级别 + 证据语法 + 三项基线协议）、`scripts/python/flow-class-check.py`（check/lookup）、`scripts/python/doc-consistency-check.py`（verify 四面）。
 - DoD-3: 四份契约共 50 条款（flow-class-ledger C-1…C-15、expression-gate-operators C-1…C-15、doc-consistency-checker C-1…C-10、compatibility-distribution C-1…C-10）每条恰被一个任务行 `[green:]` 认领，`account-clause-coverage.py` 报告 claimed = 50。
-- DoD-4: 8 支新测试（`test_flow_class_ledger` / `test_flow_class_correctness` / `test_expression_gates_doc` / `test_doc_consistency_checker` / `test_expression_gate_wiring` / `test_expression_compatibility` / `test_flow_class_check` / `test_doc_consistency_rules`）全绿；相对 `notes/test-baseline-contract.txt` 零**新增**失败 nodeid（既有 31 红不修、不掩盖）。
+- DoD-4: 8 支新测试（`test_flow_class_ledger` / `test_flow_class_correctness` / `test_expression_gates_doc` / `test_doc_consistency_checker` / `test_expression_gate_wiring` / `test_expression_compatibility` / `test_flow_class_check` / `test_doc_consistency_rules`）全绿；相对 `notes/test-baseline-contract.txt` 零**新增**失败 nodeid（既有红不修、不掩盖；**计数与名单的唯一所有者是该文件**，本行不重述数字）。
 - DoD-5: plan.md § Mirror Obligations 逐行落地：7 个源文件与其 `.specify/` 镜像同字节，8 个每工具命令副本由 `regen-command-copies.py` 重生成，`sync-mirrors.py --check` 相对改前基线零新增差异；零手改镜像、零手写副本。
 - DoD-6: 接线封闭且不越界：除 W1/W2 两个命令模板、W3/W4 两个技能与 `shared/workflow/feedback-step.md` 的一行指针外，其余 25 个模板与 49 个技能内容哈希不变；062 / 067 / 068 的 `requirements.md` 字节不变；结构面 `violations` 相对基线（`broken-link` 2 + `note-frontmatter` 1）零新增。
 - DoD-7: 零新增 `/speckit.*` 命令、零新增项目侧存储或读取点；未刷新项目无调用点，刷新后接线与载荷同包到位（兼容分发的两种稳定状态成立）。
@@ -304,6 +304,6 @@ MVP 覆盖 **US1 + US2 两个 P1 故事**：分类若无读取点就只是文档
 - 所有「相对基线零新增」判据的分母都在 § Measured Premises 与 T001 落盘的 `notes/pre-change-measurements.md`；任务行只引用，不复述基线值。
 - 接线文本（两个模板与两个技能）MUST NOT 出现类别字面量、类别归属断言、判据或算子表副本——类别只能由 `flow-class-check.py --action lookup` 的运行结果给出；这是 A4 断言与 FR-015 的同一件事。
 - 结构面判据是「零**新增**违规」（基线已有 `broken-link` 2 + `note-frontmatter` 1）；写成「全绿」会与既有债冲突，本切片不修也不掩盖他特性的登记债。
-- 契约套件判据是「零**新增**失败 nodeid」（基线 31 红）；`pytest` 只存在于 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`，不得假设 `python3 -m pytest` 可用。
+- 契约套件判据是「零**新增**失败 nodeid」（基线红名单 = `notes/test-baseline-contract.txt`，计数以该文件为准）；`pytest` 只存在于 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`，不得假设 `python3 -m pytest` 可用。
 - 062 / 067 / 068 只被引用不被改写；`069b` 的同构映射、迁移机制与度量仪器不在本切片，任何任务行都不得把它们预置进调用点表。
 - 提交纪律：只提交本特性产物（显式路径），不夹带运行期记录与他命令的未提交工件；本 tasks 阶段不 push。

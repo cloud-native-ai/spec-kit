@@ -2,6 +2,7 @@
 
 **Run**: 2026-10-24 · branch `069-execution-expression-sdd` · run-start HEAD `c3a8f325`
 **Scope of this run**: Polish 阶段 T032–T036（文档同步 / 镜像 / 全量收口 / SC 证据 / 特性登记回填）＋ T004–T008 复选框回填
+**Review-fix B (2026-10-24)**: SC-002 由 `pass` 改记 `partial`（review F4：分母是运行时消费点，运行期样本 0 条，静态接线文本不足以记 pass）；同批的 checklist 勾选、父规格回写与 Feature 状态回退见 `review.md` § 6.1 的 disposition 表。
 **Owner of the record shape**: `.specify/templates/verification-log-template.md`（`SC-NNN_status=` 词汇：pass \| fail \| partial \| deferred \| unknown）
 **Command**: 引擎一律 `python3 scripts/python/<engine>.py`；测试一律 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（本仓 `.venv` 无 pytest）
 
@@ -14,7 +15,7 @@ post_change_commit=<本文件的引入提交：git log -1 --format=%H -- .specif
 deferred_tasks=
 ```
 
-`deferred_tasks=` 为空：36 个任务行全部 `[X]`，无 `[~]`。本文件的 4 个 `deferred` SC 是**测量样本不足**（见各 SC 行），不是任务推迟。
+`deferred_tasks=` 为空：36 个任务行全部 `[X]`，无 `[~]`。本文件的 4 个 `deferred` SC 是**测量样本不足**（见各 SC 行），不是任务推迟；另有 2 条 `partial`（SC-001 的人工半、SC-002 的运行期样本），均按「已测/未测」两段写明，不记达成。
 
 ---
 
@@ -179,10 +180,10 @@ M  templates/commands/humanize.md
 - **SC-001** — 状态 **partial**。机械半已证：`tests/contract/test_flow_class_correctness.py` 7 用例全绿（`test_fixture_matrix_is_not_vacuous` / `test_every_oracle_unit_has_a_fixture_row` / `test_fixture_owner_embeds_the_real_criteria` / `test_lookup_matches_independent_oracle` / `test_mutating_one_class_turns_the_same_comparison_red` / `test_mutating_the_oracle_turns_the_same_comparison_red` / `test_source_and_marker_invariants_hold_for_every_unit`），fixture 覆盖 10 个单元。**oracle 与 fixture 分离**：期望值取自独立工件 `tests/fixtures/flow_class/classification-oracle.md`（逐单元记录两步判定与判据落点，判定者按 owner § 判据 判定、不看 fixture 台账），fixture 只承载输入；两条变异断言分别翻转**台账**与**oracle**，都使同一比对转红，故可证伪的不只是「lookup 会抄台账」。fixture owner 的 `## 判据` 段逐字嵌自真实 owner（不是占位）。**未执行**两名独立判定者的复现演练（隔离结论后逐条比对）——本次仍是单代理 headless 收口，无第二名独立判定者，故**不记达成**。
   - 命令：`pytest tests/contract/test_flow_class_correctness.py -p no:cacheprovider --tb=no -v` → `4 passed in 5.95s`
   - 证据：`notes/quickstart-run.md` § 场景 1；`notes/red-first-evidence.md`（T005 红先记录）
-- **SC-002** — 状态 **pass**。台账与清单机械对账：`--action check` → `units: 78`（命令 27 / 技能 51，与 anti-vacuous floors 相等）、`findings: []`、exit 0，未分类缺口 = 0。消费点分母按 SC 定义只取**真正读取类别**的入口（W1 `/speckit.docs`、W4 `skill:humanize`；W2 只给 owner 指针、W3 沿用调用方结果，均不计入）：2/2 = 100% 已接线且都声明标记展示规则；`source: default` 的标记由引擎实测为 `未声明·按默认`，两入口文本均要求「原样显示 marker」→ 静默按默认执行的样本 = 0。
+- **SC-002** — 状态 **partial**（review F4 / REC-069a-01：分母是运行时消费点，静态文本不足以记 pass）。**已测**：台账与清单机械对账 `--action check` → `units: 78`（命令 27 / 技能 51，与 anti-vacuous floors 相等）、`findings: []`、exit 0，未分类缺口 = 0；接线文本面 2/2 消费点（W1 `/speckit.docs`、W4 `skill:humanize` 的 Stage 6；W2 只给 owner 指针、W3 沿用调用方结果，按 SC 定义不计入）都已声明标记展示规则，`source: default` 的标记由引擎实测为 `未声明·按默认`。**未测**：本条的「被检查样本」按定义是**运行时消费点**，本次实际运行期样本 = **0 条**——没有构造「一个未登记单元经 W1 或 W4 真跑并被观察到标记」的端到端演练；上一版把这个 0 记成 2/2 并判 `pass`，是把**接线声明数**当成了**消费事件数**（同一分母口径错误也出现在 SC-004/005，见 review F8）。故本条记 `partial`：机械对账成立、标注规则在场，运行期标注率**未测量**，不记 100%、不记 pass。
   - 命令：`flow-class-check.py --action check --format json`（exit 0）；`--action lookup --unit-id "/speckit.nonexistent"` → `{"flow_class":"execution","source":"default","marker":"未声明·按默认"}`；`grep` 两入口的 marker/降级声明
-  - 边界披露：本条的核验路线是**接线文本 + 引擎实测**，未做一次「未登记单元经 W1/W4 真跑」的端到端演练（命令模板本身不可执行）；该限制在此明示，下游若要求运行期样本需另立样本。
-  - 证据：`notes/quickstart-run.md` § 场景 1；`tests/contract/test_expression_gate_wiring.py` 全绿
+  - 边界披露：运行期样本的解除条件 = 构造一个未登记单元（如临时技能）分别经 W1 与 W4 执行一次，记录消费点输出的 `flow_class` / `source` / `marker` 三个字段；该演练未做，故本条不闭合。
+  - 证据：`notes/quickstart-run.md` § 场景 1；`tests/contract/test_expression_gate_wiring.py` 全绿（证明接线文本在场，不证明运行期消费）
 - **SC-003** — 状态 **deferred**。`features.md` 中已完成的表达类特性只有 062（`doc-type` 首个实现），本切片自身是第一个接线切片，满足「本特性登记后最近 3 个已完成的表达类特性」的样本数 = 1 < 3，按 requirements 原文记 `not-evaluated`，不记 0、不记达标。
   - `SC-003_deferred_reason=` 样本不足（需 3 个已完成表达类特性，现只有 062 + 本切片；062 的 analyze/review 调用率未按本协议采集）
 - **SC-004** — 状态 **deferred**（= not-evaluated）。分母按 requirements § Measurement Sources 的口径（a）重记：**本特性运行中执行的检查类单元调用总数**（checklist / analyze / review / pre-analyze 检查 / `validate-*`），不是接线封闭集的四个 W 单元——上一版用后者过滤得 0，属于「过滤后的 0 基线冒充」。收尾实测：`exec-quant` 记录中属本切片的检查类调用 **2 条**（`/speckit.checklist` ×1 @ 2026-10-24T12:55:53Z + `/speckit.review` ×1 @ 2026-10-24T15:14:46Z；`/speckit.analyze` 0 条），另有 `pre-analyze-check.py --stage {requirements,plan,tasks}`、`validate-requirements.py`、`validate-tasks.py`、`decomposition-check.py`、`account-clause-coverage.py` 与 8 支测试模块属**仪器不可分**（脚本不是 exec-quant 的 `unit_id`，既有通道无法按次拆分）。冻结值 0 的含义是「冻结时本特性尚未开工」，不是同类特性的前值，故 `(冻结 − 收尾)/冻结` 不可定义——照实记 not-evaluated，不记 0、不记降幅。
@@ -204,9 +205,9 @@ SC-001_status=partial
 SC-001_value=10-unit oracle + mutation assertion green (4 passed); two-judge replication not executed
 SC-001_note=machine half measured; human half absent → not claimed as achieved
 
-SC-002_status=pass
-SC-002_value=78 units / 0 findings / exit 0; consumption points W1+W4 = 2/2 read the class; default marker 未声明·按默认; silent-default samples = 0
-SC-002_note=verified by wiring text + engine drill; no live end-to-end run of an unregistered unit through W1/W4
+SC-002_status=partial
+SC-002_value=ledger reconcile 78 units / 0 gaps / exit 0; wiring declarations W1+W4 = 2/2 read the class; runtime consumption samples = 0 (not taken)
+SC-002_note=the denominator is a runtime consumption point; the 2/2 figure counts wiring declarations, not consumption events, so pass is not available (review F4 / REC-069a-01)
 
 SC-003_status=deferred
 SC-003_value=0 of 3 completed expression-class features available
@@ -237,7 +238,7 @@ SC-008_value=062 987b24ea…f9da0 / 067 29e26b70…0cd / 068 ec20d5e2…af7 (byt
 SC-008_note=recomputed by shasum and asserted by test_expression_compatibility.py
 ```
 
-**三项基线记录** → `notes/expression-baseline.md`（`feature` / `frozen_at` / `frozen_commit` / `gate_calls` / `confirmations` / `wall_clock` / `compared_at` 齐备；无来源项记 `null` + reason，未记 0、未记达标）。
+**三项基线记录** → `notes/expression-baseline.md`（`feature` / `frozen_at` / `frozen_commit` / `gate_calls` / `confirmations` / `wall_clock` / `compared_at` 齐备；无来源项记 `null` + reason，未记 0、未记达标）。**分母口径**（与 SC-004/SC-005 一致，review F8）：`gate_calls` 取 requirements § Measurement Sources 的（a）「本特性运行中执行的检查类单元调用总数」，`confirmations` 取（b）「确认门触发数 + clarify 提问轮次」，`wall_clock` 取（c）；接线封闭集的四个 W 单元**不是**分母（用它们过滤所得的 0 → 0 是过滤假零）。
 
 ---
 
@@ -252,7 +253,7 @@ SC-008_note=recomputed by shasum and asserted by test_expression_compatibility.p
 | DoD-5 镜像义务逐行落地 | pass | §T033（7 对 `cmp` IDENTICAL、副本 `OK`、`--check` exit 0、零手改镜像） |
 | DoD-6 接线封闭且不越界 | pass | §T034 ⑤（五个 `M` 恰为指定集）+ 场景 4 的封闭集 grep 空 + SC-008 哈希不变 |
 | DoD-7 零新增命令 / 零项目侧存储 | pass | 命令 27 与技能 51 的清单在 `check` 中与 floors 相等；`.specify/memory/` 下无分类数据文件（`test_expression_compatibility.py` 钉住） |
-| DoD-8 SC 状态行齐备 | pass | 8 条 bullet + 8 组 `SC-NNN_status=` 行；4 条 `deferred` 均带 reason，无虚报 |
+| DoD-8 SC 状态行齐备 | pass | 8 条 bullet + 8 组 `SC-NNN_status=` 行；分布 = pass 2（SC-007/008）/ partial 2（SC-001/002）/ deferred 4（SC-003–006），partial 与 deferred 均带 reason，无虚报 |
 
 ---
 
@@ -261,6 +262,7 @@ SC-008_note=recomputed by shasum and asserted by test_expression_compatibility.p
 - **MEDIUM-1**：SC-001 的人工半（两名独立判定者复现演练）未执行——单代理收口无第二名判定者。解除条件：由第二名判定者在隔离结论后逐条比对 78 行台账与判据。
 - **MEDIUM-2**：SC-003/004/005/006 无样本或无可比基线（`deferred`）。解除条件：完成 ≥3 个表达类特性后按 `notes/expression-baseline.md` 的同一口径重采；仪器条款归 069b（父编号 041）。
 - **MEDIUM-3**：本切片从未运行 `/speckit.analyze`，因此 requirements→analyze 墙钟既无终点，也少了一次跨产物一致性检查（T034 的覆盖核算与 `pre-analyze-check` 分批替代了其中一部分，但不是同一算子）。建议在 review 前置一次 analyze。
+- **MEDIUM-4（review-fix B 新增）**：SC-002 的运行期样本未取——机械对账与接线声明都在场，但没有「未登记单元经 W1/W4 真跑」的消费事件。解除条件见该 SC 行（构造临时技能分别经 W1、W4 各跑一次并记录 `flow_class` / `source` / `marker`）；本条在此之前保持 `partial`。
 - **LOW-1**：镜像文件计数相对 T001 基线有 `inherited` 增量（`shared/` 51→53、`scripts/` 109→110，来自上游 `5b13564b`），本次再 +2/+2 为本切片载荷；判据始终是「零新增漂移」而非绝对计数相等。
 - **LOW-2**：工作树存在未跟踪的运行期目录 `.spec-kit/state/`（与本切片无关，未提交、未改动）。
 - **LOW-3**：quickstart 场景 5 的脚手架前缀偏差（`069a-*` 不在 `find_feature_dir_by_prefix` 的 glob 内）为已披露的既有行为，本切片不修。

@@ -236,6 +236,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 - **Why it's a problem**: the criterion's denominator is a **runtime** consumption point; the recorded denominator is 2/2 *declarations in the wiring text*. The disclosure admits there was no runtime sample — which makes the sample count 0, not 2 — and still lands `pass`. Under the verification template's own vocabulary an untaken sample is `partial`/`deferred`, not `pass`. Coming one paragraph after an honest `partial` for SC-001, this reads as a downgrade of the recording standard exactly where the evidence was weakest. (It is also downstream of F1: the wired command cannot run at all, so no runtime sample *could* have been taken on the shipped path.)
 - **Proposed fix**: re-record SC-002 as `partial` with the reason "runtime sample not taken; denominator is wiring declarations, not consumption events", and add a template rule: a criterion whose denominator is a runtime event cannot be `pass` on static text.
 
+- **Disposition (2026-10-24, review-fix B)**: **fixed**. `verification.md` SC-002 is re-recorded as **`partial`** with the two halves separated: *measured* — ledger reconcile `units: 78` / `findings: []` / exit 0 and the 2/2 wiring declarations (W1 `/speckit.docs`, W4 `skill:humanize` Stage 6); *not measured* — runtime consumption samples = **0**, because the 2/2 figure counted **wiring declarations, not consumption events** (the same denominator error F8 found in SC-004/005). The machine mirror reads `SC-002_status=partial`, DoD-8 now states the distribution (pass 2 / partial 2 / deferred 4), and §Residual carries a new MEDIUM-4 with the lift condition (run one unregistered unit through W1 and W4, record `flow_class` / `source` / `marker`). The recording now obeys REC-069a-01's rule: a runtime-denominator criterion cannot be `pass` on static text.
+
 ### F5 — The checklist's "40/40" closure relabels an out-of-slice deferral as resolved, and its own summary still counts it as `[ ]`
 
 - **Severity**: P1
@@ -258,6 +260,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 
 - **Why it's a problem**: the "24 pending → 40/40" arc is real in the sense that every one of the 24 rows now carries a disposition and 23 were genuinely repaired. But the last one (CHK016: there is **no measurable denominator** for "gate count and threshold do not change") was not resolved — it was deferred to 069b — and marking it `[x]` contradicts the file's own sigil semantics, which provide `[ ]` + `out-of-slice` for exactly this case. The closing summary even states the correct form (39 + 1 `[ ]`) while the rows say 40 `[x]`, so the checklist cannot tell a reader whether it is closed. A closure claim that the artifact itself refutes is the "green check is a claim, not evidence" pattern applied to process artifacts.
 - **Proposed fix**: leave CHK016 as `[ ]` with its `out-of-slice（069b）` disposition (the checklist already allows that form), and make the closure summary machine-derived — assert `count([x]) + count([ ]) == 40` and `count([ ]) == number of out-of-slice rows` in a tiny check, so the two cannot diverge.
+
+- **Disposition (2026-10-24, review-fix B)**: **fixed**. `checklists/classification-gates.md` CHK016 is restored to `[ ]` with its `out-of-slice（069b）` disposition, and the closure summary is now **derived from the markers** instead of hand-written: it states 39 `[x]` + 1 `[ ]` = 40 and says explicitly that this is **not** 40/40 green, with three `grep -c` commands as the reproducible check. Measured after the fix: `grep -c '^- \[x\]'` = 39, `grep -c '^- \[ \]'` = 1, `grep -cE '^- \[[x ]\] CHK'` = 40. A dated §Notes bullet records why the flip happened (an out-of-slice item is not "resolved"), and the round's own `B-2` assumption ("parent unchanged") is marked as superseded by the F6 fix.
 
 ### F6 — The slice↔parent "逐字沿用" claim is false for 8 of 10 sampled FRs, and the parent was never updated, so the ratified rules live only in the slice
 
@@ -290,6 +294,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 
 - **Why it's a problem**: the checklist repair (commit 1361c3e3) strengthened 13 slice FRs and deliberately left the parent untouched ("B-2 …未改父规格"). That is a legitimate *decision*, but it makes two standing claims false: "父规格仍是权威" (the parent does not contain any of the ratified rules) and "逐字沿用" (8 of 10 sampled rows differ). The consequence is not cosmetic: 069b is defined by parent ranges 018–022 / 033–041 and will read the **parent**; there it finds "至少覆盖六面" and no `source` requirement, so it can legitimately disagree with SA-7 (closed set) and FR-020 without noticing. A projection table that reports "carried verbatim" while the two texts diverge is the silent-disagreement failure One-Source-Of-Truth exists to prevent — and the slice's own FR-022 makes it a defect by its own standard.
 - **Proposed fix**: either sync the strengthened clauses into the parent FRs (preferred — the parent is declared authoritative), or change every affected mapping row to a fourth handling value, e.g. `切片补强（父未同步）` with the slice anchor, and state in the parent a pointer to the slice for those FRs. Add a check that `逐字沿用` is only allowed when the two texts are byte-equal.
+
+- **Disposition (2026-10-24, review-fix B)**: **fixed** (the review's preferred option — sync the parent). `069-execution-expression-sdd/requirements.md` now carries the ratified rules in its own FR bodies: FR-002 (main-deliverable口径 + `basis`), FR-006 (independence + machine verifiability), FR-009 (consumption point), FR-011 (replica is not a second source), FR-015 (applicability = the gate execution face), FR-016 (version criterion + mutually exclusive degradation labels), FR-023 (closed six-face set), FR-024 (document-deliverable definition + enforcement face), FR-025 (`source` mandatory three-part group + object boundary), FR-027 (mechanical lower bound), FR-028 (reviewer identity + judged object), FR-029 (freeze point + ≤3), FR-030 (humanize = Simple), plus SC-001/SC-002/SC-003 and the Measurement Sources comparability口径. A dated **§ 修订记录** in the parent maps every changed parent row to its slice anchor and states the invariants (numbering, counts and the 069b range unchanged). Slice side: `notes/parent-fr-mapping.md` now uses three handling values (`逐字沿用` / `父已同步` / `切片本地化`) with an explicit prohibition on calling a strengthened row "逐字沿用" while the parent is stale, and its former "parent was never modified" claim is corrected. Validators after the sync: `validate-requirements.py` 0 error / 0 warning on **both** specs; `pre-analyze-check.py --stage requirements` `decision=pass` on both.
 
 ### F7 — Every wired invocation omits `--strict`, so a blocking face can be `not-evaluated` while the command exits 0
 
@@ -380,6 +386,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 - **Why it's a problem**: the state machine's `Planned → Implemented` criterion is written per requirement (`tasks.md` closed + one SC status row per SC in **that** requirements file), and 069a satisfies it for *its own* eight SCs. But `features.md` tracks the **Feature**, and the Feature's authority is the parent spec, where 14 FR / 5 SC — including the feature's namesake half ("同构") and the six-face owner pointer — are allocated to 069b, which has no directory, no requirements, and no plan. The index therefore tells every downstream reader that Feature 069 is done. The slice disclosed the deviation (good), but disclosure does not make the projection correct: the state machine has no slice-level status, and the "extension slice" clause it borrowed was written for extensions of an *already Implemented* feature, not for a slice of a feature that is still `Planned`.
 - **Proposed fix**: add a slice-aware status rule — either a `Slices` column on the Feature row (`Implemented 1/2`) or a rule that a Feature stays `Planned`/`Partially Implemented` until every declared slice is closed, with the slice's own closure recorded in the detail file. Apply it retroactively to 069.
 
+- **Disposition (2026-10-24, review-fix B)**: **fixed**. `features.md` row 069 and `features/069.md` are back to **`Planned`**, with a new § Slice-aware status in the detail file stating "069a Implemented / 069b unplanned", the slice-level evidence it rests on, and the mechanism gap (no slice-level state; REC-069a-09). The write-up is explicit that this is **a correction of an advance that should not have happened**, not a legal `Implemented → Planned` transition — the state machine's Extension slice rule covers a different case (an extension of an already-Implemented feature). The row's Last Updated cell also stops claiming SC-002 = pass.
+
 ### F11 — Three artifacts still freeze the contract baseline at 31 failures while the frozen file holds 33
 
 - **Severity**: P2
@@ -396,6 +404,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 
 - **Why it's a problem**: T003 re-froze the baseline at implementation start and the file now reads `33 failed, 4177 passed` @ 01d1feaa; the 31→33 delta is properly attributed per name in `notes/pre-change-measurements.md` § 8.1 (`inherited`, from upstream 5b13564b). But the criterion documents named above still say 31, so a reader of the plan/contracts who sees 33 reds will conclude that two new failures appeared. The name-level criterion is unaffected (the comparison is against the file), which is why this is P2 rather than P1.
 - **Proposed fix**: replace the literal 31 in the three artifacts with a pointer to `notes/test-baseline-contract.txt` ("count owned by the frozen file"), or update the literals in the same commit that re-freezes.
+
+- **Disposition (2026-10-24, review-fix B)**: **fixed**. The three criterion statements that restated the literal are now pointers to the sole owner of the count and the name list (`notes/test-baseline-contract.txt`): `plan.md` § 判据 (the dated pre-freeze row now labels itself as the pre-refreeze value and names the post-refreeze numbers), `tasks.md` DoD-4 and § 契约基线, and `contracts/compatibility-distribution.md` C-7. Dated Constitution-Check snapshots that recorded 31 at plan time were left alone — they are dated records, not live criteria.
 
 ### F12 — The gate owner restates the fact-consistency criteria it says it only points at, and the duplicate face cannot see owner↔owner duplication
 
@@ -420,6 +430,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 - **Why it's a problem**: a file that declares "I do not restate the five faces' criteria" then restates one face's criteria verbatim in Chinese, against the English owner — a textbook second copy under Principle XIV, and a copy the very checker meant to catch it is structurally blind to (S3 owners are only a comparison side; owner↔owner duplicates are never reported). The slice's own FR-022 makes ≥2 handwritten copies a defect; the delivered pair is one.
 - **Proposed fix**: reduce `§ 事实一致性` to the pointer + the two genuinely new items (the mechanical lower bound and the count-delegation rule), and either add an owner↔owner pass to the duplicate face or state in C-2 why the comparison side is excluded.
 
+- **Disposition (2026-10-24, review-fix B)**: **recorded (partially addressed by口径, owner-doc edit deferred)**. The defect is a real second copy: `shared/workflow/expression-gates.md` § 事实一致性 restates `one-source-of-truth.md`'s criteria after declaring it does not restate them. Fixing it means editing a delivered framework owner doc **and** its `.specify/` mirror, which this fix's allowed surface excludes (no code / template / skill / copy changes) — a source-only edit would also turn `sync-mirrors.py --check` red. Note that the normative prohibition already exists in the parent spec (FR-040: 事实一致性面的判据 owner 是 `one-source-of-truth.md`，MUST NOT 复制其判据正文), so no requirement text needs changing: the delivered doc violates an existing rule. REC-069a-11 stays open with the fix shape (pointer + the two genuinely new items; owner↔owner pass or a stated exclusion in checker C-2).
+
 ### F13 — FR-019's document deliverables include spec artifacts, but the `reader` face is `not-applicable` for exactly those
 
 - **Severity**: P2
@@ -442,6 +454,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 - **Why it's a problem**: the blocking requirement names spec artifacts as its primary object, and the checker's reader face is `not-applicable` whenever only `--spec-dir` is passed — which is the normal shape for the SDD flow this gate is meant to serve. Nothing in 069a's own spec artifacts carries a `**Readers**:` line, and the gate that would flag that is switched off for them by construction. The requirement's escape hatch ("S1/S2 是可枚举子集，不构成定义") explains the gap but does not enforce the rule.
 - **Proposed fix**: run the reader face over S1 formal artifacts as well (they are the most numerous document deliverables), or narrow FR-019's object list to S2 and say so; either way make the requirement and the checker agree on one scope.
 
+- **Disposition (2026-10-24, review-fix B)**: **partially addressed (the requirement/口径 side is fixed in both specs; checker expansion deferred)**. 069a FR-019 now states the enforcement split explicitly — `reader` runs only on `--path` (S2), `--spec-dir`-only runs record `not-applicable`, and S1 formal artifacts are judged by the review face (FR-023) — and the parent FR-024 carries the same sentence, so 069b cannot read "the reader face covers every deliverable". Running `reader` over S1 remains REC-069a-12 and is deliberately not implemented here: it is a code change (`doc-consistency-check.py`) outside this fix's surface.
+
 ### F14 — The shipped client-side `check` action has no passing state
 
 - **Severity**: P2
@@ -456,6 +470,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 
 - **Why it's a problem**: the payload ships to clients (C-3), and the documented action there always exits 1 with `inventory-truncated` (the review's client-shape probe shows 78 `unknown` findings plus two truncation findings). Declaring that "expected" is honest, but it means a client operator who follows the documentation can never get a green run, and a wrapper script that treats non-zero as failure will always fail. Combined with F2 (lookup also fails there), the client side of the payload is inert.
 - **Proposed fix**: either give the client form a meaningful scope (the `.specify/skills` + `.specify/templates` inventory with its own floors) and a passing state, or ship the engine only to the framework repo and let 069b own the client form.
+
+- **Disposition (2026-10-24, review-fix B)**: **recorded**, no spec change (the client form's behaviour is already stated honestly in contract C-14; the open question is a design decision — give the client form its own scan scope and floors, or ship the engine to the framework repo only). REC-069a-06 stays open and the contract already hands it to 069b. Adding a "passing state" note to C-14 would not change that the shipped action has none.
 
 ### F15 — The `/speckit.docs` call point claims all six faces including `/speckit.review` and an analyze-stage review line, which inverts "fewer and more precise gates"
 
@@ -474,6 +490,8 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 
 - **Why it's a problem**: the call-point table binds the *entire* six-face set — including the `review` face, executed by `/speckit.review`, and a `requirements-clarity` operator that only makes sense with a spec dir — to a single documentation command invocation. Under this table, one `/speckit.docs` run is supposed to trigger a review, a requirements validation, and four other faces. That is the opposite of US2's stated goal ("门禁可测地更少更准", SC-004), and it collides with the owner's own dedupe clause (C-10: "同一算子在**同一次产物变更**上 MUST 只跑一次"). The distinction the feature needs — the *expression-class flow* runs six faces across its eight stages, while the *docs command* runs the subset relevant to the documents it touches — is collapsed into one row.
 - **Proposed fix**: split the W1 row into "faces applicable to a docs command invocation" (reader / evidence / duplicate / structure, plus a pointer to the review flow) and let the six-face set stay a property of the expression-class *flow*, not of one command call.
+
+- **Disposition (2026-10-24, review-fix B)**: **partially addressed (spec口径 fixed, owner-doc edit deferred)**. The collapse is real: one row binds the whole six-face set (including the `review` face and a spec-dir-only operator) to a single `/speckit.docs` invocation. 069a FR-018 and parent FR-023 now state the distinction the feature needs — the six-face set is a property of the **expression-class flow**, and a single command invocation runs only the subset its call-point row names; it MUST NOT be read as "one call runs all six". Splitting the W1 row itself means editing `shared/workflow/expression-gates.md` § 调用点表 and contract C-14 plus the mirror, which is outside this fix's surface; REC-069a-14 stays open.
 
 ## 4. What Worked — Preserve (Brief)
 
@@ -534,6 +552,45 @@ Reconstructed from `git log 719e5dc7^..f24c7b6c` (18 commits, all 2026-10-24, 20
 | P2 | REC-069a-06 (client form scope) | `flow-class-check.py`, ledger C-14 | F14 |
 | P2 | REC-069a-13 (baseline literals as pointers) | plan/tasks/C-7 | F11 |
 | P2 | REC-069a-14 (command faces vs flow faces in the call-site table) | `shared/workflow/expression-gates.md` § 调用点表 | F15 |
+
+## 6.1 Finding Disposition (2026-10-24, review-fix rounds)
+
+> How to read: the findings above are **not rewritten**; this table records what happened to each one. `fixed` = the defect is repaired with evidence named in the row; `partially addressed` = the requirement/口径 side is repaired and the remaining edit is out of this fix's surface, with the owner recorded; `recorded` = accepted as a known condition/decision, no repair in this slice.
+>
+> Two rounds: **A** = code/payload fixes (commit `1b5f4741`); **B** = spec / registry / review / verification fixes (this commit). Scope exclusion for B: no code, template, skill or mirror edit — anything needing one is recorded rather than patched.
+
+| Finding | Severity | Disposition | Evidence / where it now lives |
+|---------|----------|-------------|-------------------------------|
+| F1 (gate command not executable) | P0 | fixed (A) | `doc-consistency-check.py` two-hats root resolution + payload-first owner lookup; `templates/commands/docs.md` and `skills/external/create-docs/SKILL.md` carry the full `--path … --strict` call; `test_expression_gate_wiring.py` A8 parses and **executes** the template's own command in both shapes |
+| F2 (class reader cannot find its owner in a client) | P0 | fixed (A) | `flow-class-check.py` `owner_candidates()` = `[<repo>/shared/…, <repo>/.specify/shared/…]`; `test_expression_compatibility.py::test_c4_refreshed_client_shape_reads_the_delivered_owner` + the negative control |
+| F3 (`lookup` returns an out-of-domain class) | P1 | fixed (A) | `action_lookup` degrades + exit 2 on invalid-class / duplicate / dual-class; three unit legs in `test_flow_class_check.py` |
+| F4 (SC-002 recorded pass without a runtime sample) | P1 | **fixed (B)** | `verification.md` SC-002 = `partial` (measured vs not-measured halves; 2/2 was wiring declarations, runtime samples = 0); machine mirror + DoD-8 + new MEDIUM-4 |
+| F5 (checklist 40/40 relabels a deferral) | P1 | **fixed (B)** | `checklists/classification-gates.md` CHK016 back to `[ ]` + `out-of-slice（069b）`; summary derived from markers (39 + 1 = 40, explicitly not all-green); dated §Notes entry |
+| F6 (slice↔parent "逐字沿用" false; parent never updated) | P1 | **fixed (B)** | Parent `requirements.md` FR-002/006/009/011/015/016/023/024/025/027/028/029/030 + SC-001/002/003 + Measurement Sources re-written, with a dated § 修订记录; `notes/parent-fr-mapping.md` three handling values + prohibition; both specs validate 0 error |
+| F7 (no `--strict`, degraded face exits 0) | P1 | fixed (A) | Checker default exit 1 on `not-evaluated`; `--strict` alias, `--allow-degraded` opt-out; contract C-8 re-recorded; wired calls pass `--strict` |
+| F8 (SC-004/005 zero from the wrong denominator) | P1 | fixed (A) | `notes/expression-baseline.md` + `verification.md` SC-004/005 re-recorded against definitions (a)/(b); the four W units explicitly are not the denominator |
+| F9 (correctness oracle repeats the fixture) | P1 | fixed (A) | `tests/fixtures/flow_class/classification-oracle.md` (separate worksheet, judge + date + criteria anchor); fixture carries inputs only; two mutation legs (fixture and oracle) |
+| F10 (Feature 069 over-advanced to Implemented) | P1 | **fixed (B)** | `features.md` row 069 and `features/069.md` back to `Planned`, § Slice-aware status = "069a Implemented / 069b unplanned"; recorded as a correction of an illegitimate advance, not a legal transition; REC-069a-09 for the mechanism gap |
+| F11 (baseline literals stuck at 31 vs the frozen 33) | P2 | **fixed (B)** | `plan.md` criteria row, `tasks.md` DoD-4 + § 契约基线, `contracts/compatibility-distribution.md` C-7 now point at `notes/test-baseline-contract.txt` as the sole owner; dated plan-time snapshots left as dated records |
+| F12 (gate owner restates the fact-consistency criteria; duplicate face blind to owner↔owner) | P2 | recorded (B); not patched | Editing `shared/workflow/expression-gates.md` + its mirror is outside this fix's surface (and a source-only edit turns `sync-mirrors --check` red). The prohibition already exists in parent FR-040; the delivered doc violates it. REC-069a-11 open |
+| F13 (FR-019 names spec artifacts but `reader` is not-applicable for them) | P2 | partially addressed (B) | 069a FR-019 + parent FR-024 now state the enforcement split (reader = S2 only; S1 by the review face). Running `reader` over S1 is a code change → REC-069a-12 open |
+| F14 (client `check` has no passing state) | P2 | recorded (B); not patched | Contract C-14 already states the client shape expects `unknown`/`inventory-truncated`; the fix is a design choice (own scan scope/floors, or framework-repo-only payload) → REC-069a-06 open, handed to 069b |
+| F15 (W1 claims all six faces for one docs call) | P2 | partially addressed (B) | 069a FR-018 + parent FR-023 now state that the six-face set belongs to the **flow** and a call runs only its call-point subset. Splitting the W1 row needs the gate owner + contract C-14 + mirror → REC-069a-14 open |
+
+**Round-B validator summary** (commands run at the fix commit):
+
+```
+python3 scripts/python/validate-requirements.py .specify/specs/069-execution-expression-sdd/requirements.md
+  status: ok · 5 checks pass · 0 error / 0 warning
+python3 scripts/python/validate-requirements.py .specify/specs/069a-flow-classification-docs-gates/requirements.md
+  status: ok · 5 checks pass · 0 error / 0 warning
+python3 scripts/python/validate-tasks.py .specify/specs/069a-flow-classification-docs-gates/tasks.md
+  PASS · 0 error(s), 0 warning(s)
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements --spec-dir <each spec>
+  decision=pass · errors=0 · advisories=0
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --spec-dir .specify/specs/069a-flow-classification-docs-gates
+  decision=pass · errors=0
+```
 
 ## 7. Self-Containment Check
 

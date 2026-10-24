@@ -84,7 +84,7 @@
 | `python3 scripts/python/regen-command-copies.py --check` | 在**重生成之后** MUST 为 `OK`；判据是「生成物 = 源模板」，不是「模板未改动」 |
 | 生成副本内容 | `.claude/commands`、`.github/prompts`、`.opencode/command`、`.qoder/commands` 下 8 个副本 MUST 含接线，证明重生成真的发生：docs 副本含 lookup 与 owner 指针；humanize 副本含 owner 指针（无 lookup / 无脚本调用，与其源模板一致） |
 | `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .` | `violations` 计数与 kind 集合 MUST 零新增（基线 3：`broken-link` 2 + `note-frontmatter` 1） |
-| `pytest tests/contract -q` | 与 `notes/test-baseline-contract.txt` 比较，MUST 零新增失败名字（既有 31 失败不修、不掩盖） |
+| `pytest tests/contract -q` | 与 `notes/test-baseline-contract.txt` 比较，MUST 零新增失败名字（既有失败不修、不掩盖；**计数与名单的唯一所有者是该文件**，本行不重述数字） |
 
 - **C-8** 效率度量复用既有通道
 
