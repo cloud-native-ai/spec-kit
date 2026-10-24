@@ -396,3 +396,29 @@ def test_driver_u4_capability_fallback_is_recorded():
     )
     assert integration["conflict"] is False
     assert integration["stage_gate"] == "pass"
+
+
+def _team_snapshot(root) -> list:
+    teams = root / ".specify" / "teams"
+    if not teams.exists():
+        return []
+    return sorted(str(path.relative_to(teams)) for path in teams.rglob("*"))
+
+
+def test_no_team_directory_is_created(tmp_path):
+    """ST-09 / Scenario G: no team directory or team.md is persisted."""
+    project = tmp_path / "project"
+    project.mkdir()
+    before_repo = _team_snapshot(REPO_ROOT)
+    before_project = _team_snapshot(project)
+
+    plan = _parallel_reads(count=2)
+    projection = wp_driver_sim.adapt_stage_team(plan)
+    run = wp_driver_sim.run_stage(plan)
+
+    assert projection["team_directory"] is None
+    assert run["integration"]["stage_gate"] == "pass"
+    assert _team_snapshot(REPO_ROOT) == before_repo
+    assert _team_snapshot(project) == before_project
+    assert not (project / ".specify" / "teams").exists()
+    assert not list(project.rglob("team.md"))

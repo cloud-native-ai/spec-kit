@@ -302,3 +302,24 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   → `28 passed, 55 deselected in 1.03s`; `2 passed, 10 deselected in 0.03s`. The no-delta, split-admission, third-attempt-`retry-exhausted`, and child-exhaustion assertions all pass; the dependency-block and stage-gate-fail dry runs pass.
 - **Quickstart Scenario F (opt out and single-package fallback) — recorded reason**: no assertion exists in the US3 files, by design. Decision resolution and the single-package/fallback runs are owned by FN-01…FN-08 with their green-point rows T034/T035 (US5), which are outside this segment's T020–T023 scope. No VI clause depends on the decision resolver; `driver-u4` is a verifier-capability fallback, not the decomposition fallback, and Scenario F remains open for T035.
 - **E3 stage-status row**: appended to `test-evidence/implement-stage-status.jsonl` (`substage=impl-s4-us3-verification`, command above, rc 0, 79 passed, E2 baseline pointer).
+
+## T024 — stage-team preset contract and no-team dry run (red)
+
+- **Date**: 2026-10-25T00:00Z (segment impl-s5)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths (test-only)**:
+  - `tests/contract/test_sdd_loop_driver_wp_preset.py` (new; ST-01…ST-12)
+  - `tests/integration/test_wp_coordination_dry_runs.py` (`test_no_team_directory_is_created`, Scenario G's `no_team_directory` selector)
+- **Command 1**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py
+  ```
+- **Real output**: `13 failed, 1 passed in 0.14s`; exit code `1`.
+- **Failing group (real)**: every ST behavior test fails because `templates/stage-team-preset.md` does not exist (`AssertionError: missing stage-team preset`) and `wp_driver_sim.adapt_stage_team` does not exist; the two text pins on the runtime owner also fail because the adapter section is absent. The single passing case is `test_st_10_create_team_and_run_team_are_not_modified`, an anti-drift pin that holds before the change (disclosed; it is not cited as new-behavior evidence).
+- **Command 2**:
+  ```sh
+  python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "no_team_directory"
+  ```
+- **Real output**: `1 failed, 12 deselected in 0.06s`; exit code `1`.
+- **Failing group (real)**: `AttributeError: module 'fixtures.wp_driver_sim' has no attribute 'adapt_stage_team'` — the run-scoped adapter projection does not exist yet.
+- **Red-first claim**: the preset existence/frontmatter/body/seat/pattern/adapter/no-team assertions and the no-team dry run are red before T025, with no assertion skipped or weakened.
