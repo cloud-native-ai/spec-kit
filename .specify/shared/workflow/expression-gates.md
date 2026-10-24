@@ -100,9 +100,9 @@
 | --- | --- |
 | 门禁调用次数 | `exec-quant.py --action list-records --since <ISO> --format json`，按声明的门禁单元集过滤计数 |
 | 人工确认次数 | 门控观察记录（`feedback-utils.py --action record --lifecycle-point gate-*` → `--action list`）+ clarify 提问轮次 |
-| requirements→analyze 墙钟 | `git log -1 --format=%cs -- <requirements.md>` 的首次提交 author date → `/speckit.analyze` 的运行判定记录时间戳 |
+| requirements→analyze 墙钟 | `git log --diff-filter=A --format='%h %as' -- <requirements.md>` 的首次提交 author date → `/speckit.analyze` 的运行判定记录时间戳 |
 
-- 冻结点：开工前 = `requirements.md` 的首次提交。
+- 冻结点：开工前 = `requirements.md` 的首次提交。起点 MUST 用 `--diff-filter=A` 取该文件的**新增提交**；MUST NOT 用 `git log -1`（取最近一次触及，不是首次提交，且不输出提交哈希）。仪器口径与 `not-evaluated` 降级归 069b 契约 C-1。
 - 任一量无来源时记 `null` + `reason`，MUST NOT 记 0、MUST NOT 记达成。
 - 单阶段确认 ≤ 3 次；超出即回看阶段产物，而不是继续追加确认。
 - 三项值 MUST 来自上表的既有通道，MUST NOT 新增采集器。

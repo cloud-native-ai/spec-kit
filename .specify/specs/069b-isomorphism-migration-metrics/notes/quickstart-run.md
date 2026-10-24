@@ -327,3 +327,48 @@ owner 内 `同构映射（8 阶段 × 3 面）` 命中 2（开篇 owns 项 + 章
   `CWS_LIB_PYTHON_HOME` 指向本机 `cws-lib-python` 且 PYTHONPATH 只取 `src`（不取 `lib`）时才能启动；
   这是套件通道的环境事实，不改冻结样本、不记 `not-evaluated`，也不以人工拷贝冒充刷新。
   SC-002 的机器侧结论因此是 **3 个 measured（`comm -13` 均为空）**。
+
+---
+
+## 场景 7 — 三项基线只用既有仪器（route a）
+
+本场景的**值与仪器归 `notes/expression-baseline.md`**（三行表 + 四条来源命令 + 「不可计部分」都在该文件，本节不复述数值，只留指针与完成状态）：四条通道命令全部 exit 0 可重跑；`gate_calls` / `confirmations`（门控观察 + clarify 轮次两个分项）/ `wall_clock` 均按 `contracts/measurement-instruments.md` C-6 记 `not-evaluated` + reason——不记 0、不记达成。起点仪器为 `git log --diff-filter=A --format='%h %as' -- requirements.md`（`f0df3d0b 2026-10-24`）。
+
+---
+
+## docs-sync — 文档同步评估与结构面复核（T025）
+
+评估程序按 `.specify/shared/workflow/docs-step.md` § Evaluation procedure 逐步执行；本节记录判定与两段真实输出。
+
+### 本切片产生了什么（Assess）
+
+- owner 文档 `shared/definitions/flow-class-definitions.md` 新增 `## 同构映射（8 阶段 × 3 面）`、`## 不可同构边界` 与 `## 逐流程台账` 的 `**台账版本**` 声明；
+- 引擎 `scripts/python/flow-class-check.py` 新增 `isomorphism` / `delegation` / `faces` 三个只读动作，`check` 扩展 `coverage` / `red_kind` / 两个新 kind；
+- 三个客户快照的迁移证据与本切片自身的度量基线（`notes/expression-baseline.md`）。
+
+### 逐篇判定（Conclude）
+
+| 页面 | 是否失真 | 判定 |
+|------|----------|------|
+| `docs/reference/commands/docs.md` | 否 | 该页第 56 行的指针（069a 落盘）只声明「命令在阶段 1 之前做一次类别读取并执行文档型门禁算子」，并把台账与算子集的 owner 指到 `flow-class-definitions.md` / `expression-gates.md`；069b 改的是这两个 owner 的内部结构（映射、边界、台账版本、引擎动作），指针仍解析、未复述任何判据 → 无需改动 |
+| `docs/reference/commands/humanize.md` | 否 | 069b 未改命令模板与技能接线（`templates/commands/`、`skills/` 零改动，`regen-command-copies.py --check` 仍 `OK`），该页描述的行为契约不变 → 无需改动 |
+| `docs/concepts/*` | 否 | 该目录无流程分类 / 门禁主题页（全目录检索 `flow.class|flow_class|类别|expression-gates|文档型|执行类|表达类` 仅命中 `overview.md` 的一张文件计数表，与分类无关）→ 无需改动 |
+| `docs/reference/{agents,cli,skills,teams}` | 否 | 无 `flow-class-check.py` 的引擎参考面（`grep -rn 'flow-class-check' docs/` 零命中）；三个新动作与 069a 的 `lookup` / `check` 一样不进入项目文档面 → 无需改动（不为此新建文档面） |
+
+**结论**：`无需记录` —— 本切片不新增用户可见命令、不改变任何命令的对外行为、不新增门禁面；映射与边界是框架治理结构，其唯一载体已是 owner 文档，项目文档只保留指针（069a 已落）。按 docs-step 的红线，不为「看起来有产出」而制造文档改动。
+
+### 结构面复核（`violations` 计数与 kind 集合相对 T001 基线零新增）
+
+```bash
+$ python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .
+exit 0
+{
+  "violations": [
+    { "kind": "broken-link", "path": "docs/concepts/overview.md", "detail": "../../tests/unit/test_qoder_support_matrix.py" },
+    { "kind": "broken-link", "path": "docs/concepts/overview.md", "detail": "../../tests/integration/test_qoder_refresh.py" },
+    { "kind": "note-frontmatter", "path": "docs/notes/type-follows-stage-misclassification.md", "detail": "missing: " }
+  ]
+}
+```
+
+与 `notes/pre-change-measurements.md` § 2 基线（`violations = 3`：`broken-link` 2 + `note-frontmatter` 1）**同计数、同 kind 集合、同路径**。判据是「零新增」，不是「转绿」：三条既有违规原样保留，未顺手修复。
