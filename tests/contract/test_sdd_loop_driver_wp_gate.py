@@ -4,6 +4,26 @@ The behavioural checks live in tests/unit/test_wp_gate.py. This file pins the
 script location, the stdlib-only constraint, the CLI grammar, the input
 precedence, the JSON envelope, the exit-code taxonomy, deterministic finding
 order, and the never-writes-the-spine guarantee.
+
+Plan-check clause coverage (T010 unit cases, green at T011):
+
+- WG-06 schema: `test_schema_missing_for_absent_required_field`,
+  `test_schema_failures_skip_the_hash_check`
+- WG-07 graph: `test_dup_wp_id_rejects`, `test_dangling_dep_rejects`,
+  `test_dependency_cycle_rejects`
+- WG-08 output coverage: `test_orphan_required_output_rejects`,
+  `test_non_required_output_orphans`,
+  `test_unconsumed_intermediate_output_rejects`,
+  `test_duplicate_required_output_rejects`,
+  `test_package_claiming_integrator_output_rejects`,
+  `test_integrator_output_not_in_required_outputs_is_schema_missing`
+- WG-09 boundedness: `test_bounded_by_caps`
+- WG-10 kind: `test_kind_mismatch_cases`
+- WG-11 pattern: `test_pattern_compatibility`
+- WG-12 hash: `test_plan_hash_mismatch_is_a_reject`
+- WG-13 benefit: `test_not_beneficial_returns_single_package_with_advisory`,
+  `test_benefit_branch_b_admits_a_forked_graph`,
+  `test_benefit_branch_c_admits_a_bounded_iteration`
 """
 from __future__ import annotations
 
