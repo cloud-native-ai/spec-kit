@@ -113,6 +113,11 @@ def _render_owner(
         "",
         "## 逐流程台账",
         "",
+        # A-1 (069b tasks.md): the 069b checker reports a missing declaration as
+        # `ledger-version-missing`, so this fixture builder supplies the input the
+        # new criterion requires. No assertion or criterion is changed here.
+        "**台账版本**: 1（2026-10-25）",
+        "",
     ]
     if include_table:
         lines.append("| " + " | ".join(columns) + " |")

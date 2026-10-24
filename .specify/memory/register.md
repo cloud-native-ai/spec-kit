@@ -73,3 +73,15 @@
 | REC-069a-12 | reader 面覆盖 FR-019 所称对象类（S1 形式产物），或收窄 FR-019 的对象清单 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-12（F13） | open |
 | REC-069a-13 | 冻结基线的数字只留指针：plan/tasks/C-7 不重述失败计数，计数归 `notes/test-baseline-contract.txt` | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.5 REC-069a-13（F11） | open |
 | REC-069a-14 | 调用点表区分「命令执行的面」与「流程执行的面」：六面归表达类流程，W1 行只登记命令可执行的四面 + 评审指针 | `.specify/specs/069a-flow-classification-docs-gates/review.md` § 5.4 REC-069a-14（F15） | open |
+| REC-069b-01 | Success Criteria 必须带 falsifier（必须变红的变异），不能只有 measurement source | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.1 REC-069b-01（F1） | open |
+| REC-069b-02 | 验证记录的值域须机器可解析：`*_commit=` 只接受 SHA 或 `null` + reason | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.1 REC-069b-02（F7） | open |
+| REC-069b-03 | Feature 索引 `Last Updated` 只作指针（日期 + 切片状态 + 详情链接），不追加叙事 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.1 REC-069b-03（F11） | open |
+| REC-069b-04 | 需独立判定者的 SC 必须在 plan 阶段就有执行载体（任务行或带 owner 的 deferred） | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.1 REC-069b-04（F10） | open |
+| REC-069b-05 | 提交门须 diff 校验 tasks/plan 声明的禁改面，未登记的范围扩张必须补任务行 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.2 REC-069b-05（F2） | open |
+| REC-069b-06 | SC 与其契约的测量主体集必须一致；收窄须同批改 SC 文本 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.2 REC-069b-06（F4） | open |
+| REC-069b-07 | 状态推进按 owner 协议执行；任务行不得写「状态翻转归别的 owner」 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.2 REC-069b-07（F3） | open |
+| REC-069b-08 | 仪器-对象适配在 plan 期校验：通道看不到对象即不得入基线表；`/speckit.analyze` 须写运行判定记录 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.3 REC-069b-08（F6） | open |
+| REC-069b-09 | 迁移快照须至少一个刷新后执行 `.specify` 载荷的冒烟，并记录样本代表性 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-09（F5/F12） | open |
+| REC-069b-10 | 冻结样本时同时冻结运行环境契约（解释器/PYTHONPATH/变量/node 集），冻结时先冒烟 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-10（F8） | open |
+| REC-069b-11 | implement 收口须对账 checklist 的 `verify-in-implementation` 开放项（关闭或转交） | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-11（F9） | open |
+| OI-069b-01 | 客户侧分类副本的「漂移检查」没有 owner 与仪器（FR-008 只覆盖框架源 ↔ 镜像）；069b 的 CHK025 因此判 `out-of-slice` 并保持 `[ ]`，不冒充完成 | `.specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` CHK025 + 同切片 `verification.md` § Checklist 收口对账 | open（owner = 后续修订 FR-008 的特性，尚未立项；解除条件 = 为该检查指定 owner 与仪器，或明确豁免） |

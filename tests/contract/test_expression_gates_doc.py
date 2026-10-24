@@ -484,8 +484,9 @@ def test_c09_three_baselines_have_sources_and_null_rule():
     assert "墙钟" in joined, "baseline quantity 'requirements→analyze wall clock' missing"
     assert "exec-quant.py" in joined, "gate-call baseline must name its existing source command"
     assert "feedback-utils.py" in joined, "confirmation baseline must name its existing source"
-    assert "git log -1 --format=%cs" in joined, (
-        "wall-clock baseline must derive from the requirements first-commit date"
+    assert "--diff-filter=A" in joined and "git log" in joined, (
+        "wall-clock baseline must derive from the requirements first-commit date "
+        "(069b contract C-1 owns the instrument: git log --diff-filter=A, never git log -1)"
     )
     assert re.search(r"首个提交|首次提交", text), (
         "owner must pin the freeze point as the first requirements commit"

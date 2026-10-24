@@ -68,3 +68,41 @@ Success Criteria measured on the same artifact: 13 条（`^- \*\*SC-\d{3}\*\*:` 
 ## Re-run
 
 切片交付前按片重跑本门：`decomposition-check.py --mode plan --requirements .specify/specs/<slice>/requirements.md` 必须返回 `proceed`；切片规格的 FR 行数实测为 069a = 27、069b = 14。
+
+## Slice status（2026-10-24，069b 启动）
+
+**069a 已交付并合并**：切片 `069a-flow-classification-docs-gates` 的 requirements / plan / tasks / verification / review 齐备，`/speckit.implement` 后经 review-fix A/B 收敛，已由 `b852f2eb`（`docs(069a): merge the execution/expression classification and document-form gates slice`）合入 master。父 Feature 069 的 `features.md` 行与 `features/069.md` 报告 `Planned`（069a Implemented / 069b 进行中），父不被单切片闭合推进。
+
+**069b 已启动**：分支 `069b-isomorphism-migration-metrics`，HEAD 起点 `b852f2eb`；本次只落 requirements 与父映射，不进入 plan / tasks / implement。
+
+**范围复核（与上表 `proposed_slices` 一致，未改范围）**：
+
+| 项 | 值 | 依据 |
+|----|-----|------|
+| 069b 父 FR 范围 | 编号 018–022、033–035、036–041 | 本记录 § Proposed slices |
+| 069b FR 定义数 | **14** | `decomposition-check.py --mode plan --requirements .specify/specs/069b-isomorphism-migration-metrics/requirements.md` → `{"fr_count": 14, "fr_ceiling": 30}, "decision": "proceed"`（2026-10-24 实跑） |
+| 069b SC 定义数 | **5**（父编号 007、009、011、012、013） | 切片 requirements § Success Criteria 的定义行，与 § Scope consequences 第 1 条一致 |
+| 069a 侧对称数 | 27 FR / 8 SC | 069a requirements 实测 |
+
+**切片编号规则（与 069a 相同，本条适用于 069b）**：
+
+- 切片内**连续本地编号**——069b = FR-001–FR-014、SC-001–SC-005；父编号区间在切片内必留缺口，`validate-requirements.py` 的 `id-contiguous` 会把缺口判为「行被删除」，故不沿用父编号。
+- **父映射表**：`.specify/specs/069b-isomorphism-migration-metrics/notes/parent-fr-mapping.md` 逐条记录「切片 ID → 父 ID → 主题 → 处理值（逐字沿用 / 切片本地化 / 父内派生）」；父编号只出现在该表与切片的来源说明中，切片正文的交叉引用一律用本地 ID。
+- **父仍是权威**：父 41 条 FR / 13 条 SC 的编号与语义不变；编号变化不构成删除、合并或重排。
+- **跨切片指针**：父条文中指向 069a 的四处（编号 010、023、029、032）在 069b 正文改成文字指针，不重定义。
+
+**门禁实测（2026-10-24，069b requirements 落盘后）**：
+
+```text
+validate-requirements.py .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+  → status: ok；五项检查全 pass；284 lines / 19 definition rows / 3 shared strings；0 error / 0 warning
+
+pre-analyze-check.py --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage requirements --repo .
+  → decision=pass；errors=0；advisories=0；fr=14；sc=5
+
+decomposition-check.py --mode plan --requirements .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+  → decision=proceed；fr_count=14（≤30）
+```
+
+**取代关系**：§ Scope consequences 第 4 条「069b 规格未创建」已被本次落盘取代（该条是 069a 阶段的 dated 记录，保留原文以维持审计链）；第 1–3 条不变。
+
