@@ -48,8 +48,11 @@ MAP_HEADER = (
     "流程（阶段与门禁角色）",
     "逻辑（证据 / 契约 / 验收 / 版本 / 所有权）",
     "强制门禁",
+    "强制门禁引用",
     "强制状态",
 )
+GATE_ID_COLUMN = "算子 id"
+GATE_REF_PREFIX = "gate:"
 BOUNDARY_HEADER = ("边界", "不可互换的判定面", "为什么不能互换", "门禁处理")
 ENFORCED = "已强制"
 DECLARED_UNENFORCED = "已声明未强制"
@@ -120,6 +123,11 @@ def _roster_source(stages: list[str]) -> str:
     )
 
 
+def gate_id(stage: str, face: str) -> str:
+    """The fixture gate-operator id, derived the same way for gates and map rows."""
+    return "G-%s-%s" % (stage, face)
+
+
 def _gates_source(stages: list[str], operator_rows: list[tuple[str, str, str]]) -> str:
     lines = [
         "# Expression Gates (unit-test fixture)",
@@ -136,26 +144,39 @@ def _gates_source(stages: list[str], operator_rows: list[tuple[str, str, str]]) 
             "",
             "## 阶段算子表",
             "",
-            "| 阶段 | 执行算子 | 对应面 | 阻断级别 |",
-            "| --- | --- | --- | --- |",
+            "| 阶段 | %s | 执行算子 | 对应面 | 阻断级别 |" % GATE_ID_COLUMN,
+            "| --- | --- | --- | --- | --- |",
         ]
     )
     for stage, face, level in operator_rows:
-        lines.append("| %s | `fixture-check-%s` | %s | %s |" % (stage, stage, face, level))
+        lines.append(
+            "| %s | `%s` | `fixture-check-%s` | %s | %s |"
+            % (stage, gate_id(stage, face), stage, face, level)
+        )
     lines.extend(["", "## 读者声明", "", "fixture.", ""])
     return "\n".join(lines)
 
 
-def _map_row(stage: str, faces: list[str] | None, status: str, cells=None) -> str:
+def _map_row(
+    stage: str,
+    faces: list[str] | None,
+    status: str,
+    cells=None,
+    refs: list[str] | None = None,
+) -> str:
     if cells is None:
         cells = [_pair(stage), _pair(stage), _pair(stage)]
     gate_cell = "、".join("`%s`" % face for face in faces) if faces else "—"
-    return "| %s | %s | %s | %s | %s | %s |" % (
+    if refs is None:
+        refs = [gate_id(stage, face) for face in faces] if faces else []
+    ref_cell = "、".join("`%s%s`" % (GATE_REF_PREFIX, ref) for ref in refs) if refs else "—"
+    return "| %s | %s | %s | %s | %s | %s | %s |" % (
         stage,
         cells[0],
         cells[1],
         cells[2],
         gate_cell,
+        ref_cell,
         status,
     )
 
@@ -387,6 +408,133 @@ def test_advisory_only_stage_may_be_declared_unenforced(tmp_path):
     assert proc.returncode == 0
     assert "annotation-false-unenforced" not in _kinds_for(record, "delta"), (
         "an advisory-only stage is truthfully '已声明未强制'; got %r"
+        % (record["findings"],)
+    )
+
+
+def test_stage_without_any_operator_row_is_reachable_as_declared_unenforced(tmp_path):
+    """The 已声明未强制 annotation is a reachable state, not a dead branch.
+
+    A stage with no blocking operator row at all (here: no operator row) is the
+    truthful case for the annotation, so the fixture must be green. This is the
+    counterweight to F1: a per-stage "any blocking operator exists" proxy would
+    make the annotation unreachable on a full roster.
+    """
+    operator_rows = [
+        ("alpha", "requirements-clarity", "blocking"),
+        ("beta", "reader-purpose", "blocking"),
+        ("gamma", "fact-consistency", "blocking"),
+    ]
+    rows = [
+        _map_row("alpha", ["requirements-clarity"], ENFORCED),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row("delta", None, DECLARED_UNENFORCED),
+    ]
+    _build_repo(tmp_path, operator_rows=operator_rows, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 0, (
+        "a stage with no operator row may be declared '已声明未强制'; findings=%r"
+        % (record["findings"],)
+    )
+    assert not [
+        kind for kind in _kinds_for(record, "delta") if kind.startswith("gate-ref")
+    ], "an unenforced row must not be asked for a gate reference: %r" % record["findings"]
+
+
+# --------------------------------------------------------------------------- #
+# C-5 at reference granularity: gate:<算子 id> must resolve and block
+# --------------------------------------------------------------------------- #
+def test_missing_gate_reference_is_gate_ref_missing(tmp_path):
+    rows = [
+        _map_row("alpha", ["requirements-clarity"], ENFORCED, refs=[]),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row("delta", None, DECLARED_UNENFORCED),
+    ]
+    _build_repo(tmp_path, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-missing" in _kinds_for(record, "alpha"), (
+        "an enforced row without a gate:<id> reference must be reported: %r"
+        % (record["findings"],)
+    )
+
+
+def test_unknown_gate_id_is_gate_ref_unknown(tmp_path):
+    rows = [
+        _map_row("alpha", ["requirements-clarity"], ENFORCED, refs=["G-no-such-gate"]),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row("delta", None, DECLARED_UNENFORCED),
+    ]
+    _build_repo(tmp_path, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-unknown" in _kinds_for(record, "alpha")
+    assert "gate-ref-missing" in _kinds_for(record, "alpha")
+
+
+def test_gate_id_from_another_stage_is_gate_ref_mismatch(tmp_path):
+    rows = [
+        _map_row("alpha", ["requirements-clarity"], ENFORCED, refs=[gate_id("beta", "reader-purpose")]),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row("delta", None, DECLARED_UNENFORCED),
+    ]
+    _build_repo(tmp_path, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-mismatch" in _kinds_for(record, "alpha"), (
+        "a reference resolving to another stage must be reported: %r" % (record["findings"],)
+    )
+
+
+def test_gate_id_for_an_advisory_row_is_gate_ref_not_blocking(tmp_path):
+    rows = [
+        _map_row("alpha", ["requirements-clarity"], ENFORCED),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row(
+            "delta",
+            ["structure-links-build"],
+            ENFORCED,
+            refs=[gate_id("delta", "structure-links-build")],
+        ),
+    ]
+    _build_repo(tmp_path, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-not-blocking" in _kinds_for(record, "delta"), (
+        "a gate reference to an advisory operator must be reported: %r"
+        % (record["findings"],)
+    )
+
+
+def test_gate_reference_for_an_unclaimed_face_is_gate_ref_mismatch(tmp_path):
+    operator_rows = [
+        ("alpha", "requirements-clarity", "blocking"),
+        ("alpha", "review", "blocking"),
+        ("beta", "reader-purpose", "blocking"),
+        ("gamma", "fact-consistency", "blocking"),
+        ("delta", "structure-links-build", "advisory"),
+    ]
+    rows = [
+        _map_row(
+            "alpha",
+            ["requirements-clarity"],
+            ENFORCED,
+            refs=[gate_id("alpha", "requirements-clarity"), gate_id("alpha", "review")],
+        ),
+        _map_row("beta", ["reader-purpose"], ENFORCED),
+        _map_row("gamma", ["fact-consistency"], ENFORCED),
+        _map_row("delta", None, DECLARED_UNENFORCED),
+    ]
+    _build_repo(tmp_path, operator_rows=operator_rows, rows=rows)
+    proc, record = _iso(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-mismatch" in _kinds_for(record, "alpha"), (
+        "a reference for a face the row did not claim must be reported: %r"
         % (record["findings"],)
     )
 

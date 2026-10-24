@@ -13,7 +13,7 @@
 
 - **C-2** 刷新后原子到位
 
-刷新（`specify init` 的覆盖式合并复制；框架无独立 refresh 子命令）MUST 一次带来四类载荷：分类所有者（含映射与边界章节）、门禁 owner（069a 已交付，本切片不改）、
+刷新（`specify init` 的覆盖式合并复制；框架无独立 refresh 子命令）MUST 一次带来四类载荷：分类所有者（含映射与边界章节）、门禁 owner（069a 已交付；2026-10-25 review-fix 为其 § 阶段算子表新增 `算子 id` 列，供映射的 `gate:<算子 id>` 引用解析）、
 引擎（`scripts/python/flow-class-check.py` 新动作）、命令副本（内容不变，因为本切片不改模板）。
 四类载荷 MUST 出自**同一个发行包**；「有新引擎但没有新 owner」与「有新 owner 但没有新引擎」
 都不是受支持的状态，出现时按 `owner-unavailable` 降级（`lookup`）或 `framework-source-required`（框架源动作）显式报出。
@@ -94,8 +94,12 @@ MUST NOT 被当作 SC-002 的客户项目基线；两者对象不同，不得互
 
 - **C-10** 镜像与命令副本判据
 
-本切片触碰的镜像对只有两对：`shared/definitions/flow-class-definitions.md` → `.specify/shared/definitions/flow-class-definitions.md`，
-`scripts/python/flow-class-check.py` → `.specify/scripts/python/flow-class-check.py`。判据是「**零新增差异**」：
+本切片（含 2026-10-25 review-fix 的 F1/F4）触碰的镜像对是五对：
+`shared/definitions/flow-class-definitions.md` → `.specify/shared/definitions/flow-class-definitions.md`，
+`shared/workflow/expression-gates.md` → `.specify/shared/workflow/expression-gates.md`（F1 新增 `算子 id` 列），
+`scripts/python/flow-class-check.py` → `.specify/scripts/python/flow-class-check.py`，
+`scripts/python/doc-consistency-check.py` → `.specify/scripts/python/doc-consistency-check.py`（F4 新增 `--owner-path` 与目录 `--path`）。
+（后两对由 2026-10-25 review-fix 引入：F1 的 `算子 id` 列与 F4 的 duplicate 面作用域选项。）判据是「**零新增差异**」：
 `python3 scripts/python/sync-mirrors.py --check` 在编辑前实测六对全绿 + 命令副本 `OK`（exit 0），
 编辑后 MUST 重新投影并复跑 `--check`，MUST NOT 出现新的不一致。
 命令副本 MUST 保持零改动（本切片不改 `templates/commands/`）；`regen-command-copies.py --check` MUST 继续 `OK`。
@@ -108,3 +112,21 @@ MUST NOT 被当作 SC-002 的客户项目基线；两者对象不同，不得互
 MUST NOT 新增门禁面（六面封闭集不变），MUST NOT 改阶段集合、门禁数量或 P0/P1 定义。
 
 （FR-006、FR-008）
+
+- **C-12** 刷新载荷冒烟（不只是文件在场）
+
+每个快照除「刷新前后各跑一次产品套件」外，MUST 在刷新后的临时副本内**执行安装后的载荷入口**并把结果写进同一张记录表：
+至少 2 个轻量断言 + 至少 1 个真实快照。
+轻量断言（在快照根执行，`--repo` 指向快照根）：
+1. `.specify/scripts/python/flow-class-check.py --action lookup --unit-id /speckit.docs --repo . --format json`
+   MUST exit 0 且 `flow_class = expression`、`basis = reader-oracle`、`source = ledger`——证明 owner 在载荷内可解析、
+   引擎是可执行的安装副本，而不是只有文件在场；
+2. 同一入口对 `/speckit.implement` 的 lookup MUST exit 0 且 `flow_class = execution`、`basis = mixed-oracle`
+   （第二个独立单元，避免单点巧合）；
+3. 框架源专属动作在客户载荷根 MUST 按 C-14 具名失败：`--action check --repo .` 与 `--action isomorphism --repo .`
+   MUST exit 2 且 `error.label = framework-source-required`，MUST NOT exit 0（证明作用域守卫在客户侧真的生效）。
+产品套件命令与「刷新载荷冒烟」是两条独立证据：前者证明「加文件不破坏既有行为」，后者证明「新增载荷真的能跑」，
+MUST NOT 用其一顶替另一。记录落 `notes/migration-samples.md` 与 `notes/quickstart-run.md` § 6.3，并由
+`tests/contract/test_migration_distribution.py` 断言三快照各有一组结果行。
+
+（FR-006、FR-008；SC-002）

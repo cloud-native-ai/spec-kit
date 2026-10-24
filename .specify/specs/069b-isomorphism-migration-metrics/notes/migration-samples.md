@@ -83,3 +83,43 @@ comm -13 before.txt after.txt   # MUST be empty
    nodeid 名集」在 pytest 上的超集实现，仍按**名字**而非条数比对。
 4. **判读**：套件在刷新前后给出同一 12 个 nodeid、`comm -13` 为空 → `xuanji-function` 的结论是 measured 的
    「零新增失败」，不是 `not-evaluated`；本更正不得被读成重选样本或替换套件命令。
+
+## 2026-10-25 刷新载荷冒烟（review-fix F5，不改上面的样本冻结值）
+
+**问题**：上面三个快照只跑了**产品套件**（`pytest` / `go test`），命令不加载 `specify` 也不触碰 `.specify/`。
+「零新增失败」因此只证明「加文件不破坏既有行为」；刷新后的载荷（分类 owner、门禁 owner、引擎）从未被执行过，
+迁移承诺「升级后既有项目行为不变，且分类数据随既有分发路径到达」的数据面没有被验证。
+
+**补测程序**（在快照内执行安装后的载荷入口；原始项目只读，零修改）：
+
+```bash
+# 1) 发行包由本切片源码构建（同 C-5；含 F1/F4 的算子 id 列、gate 引用与 --owner-path）
+python3 -m pip wheel . --no-deps -w ~/tmp/069b-rf-wheel --trusted-host yum.tbsite.net
+python3 -m pip install --target ~/tmp/069b-rf-pkg --no-deps --upgrade ~/tmp/069b-rf-wheel/specify_cli-*.whl
+# 2) 快照与刷新（每个样本：git archive <HEAD> → specify init）
+mkdir -p ~/tmp/069b-rf-snap-<n> && git -C <project> archive <HEAD> | tar -x -C ~/tmp/069b-rf-snap-<n>
+cd ~/tmp/069b-rf-snap-<n> && PYTHONPATH=~/tmp/069b-rf-pkg \
+  /Users/liuqiming.lqm/project/profiles/.venv/bin/specify init . --here --force --ai qoder --no-git --ignore-agent-tools
+# 3) 载荷冒烟（在快照根；--repo 指向快照根）
+python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id /speckit.docs --repo . --format json
+python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id /speckit.implement --repo . --format json
+python3 .specify/scripts/python/flow-class-check.py --action check --repo . --format json          # 期望 exit 2
+python3 .specify/scripts/python/flow-class-check.py --action isomorphism --repo . --format json    # 期望 exit 2
+```
+
+**实测结果**（三个快照同形；`checked_at` 2026-10-24T18:40Z 系 UTC 记录时间）：
+
+| # | 项目 | 快照 HEAD | 载荷在位 | lookup `/speckit.docs` | lookup `/speckit.implement` | `check`（客户根） | `isomorphism`（客户根） |
+|---|------|-----------|----------|------------------------|------------------------------|-------------------|--------------------------|
+| 1 | xuanji-agent | `3f68b62` | 引擎 + owner + 门禁 owner 均在 | exit 0 · `expression` / `reader-oracle` / `source=ledger` | exit 0 · `execution` / `mixed-oracle` / `source=ledger` | exit 2 · `framework-source-required` | exit 2 · `framework-source-required` |
+| 2 | xuanji-cli | `a0c476d` | 同在 | exit 0 · `expression` / `reader-oracle` / `source=ledger` | exit 0 · `execution` / `mixed-oracle` / `source=ledger` | exit 2 · `framework-source-required` | exit 2 · `framework-source-required` |
+| 3 | xuanji-function | `a2fad18` | 同在 | exit 0 · `expression` / `reader-oracle` / `source=ledger` | exit 0 · `execution` / `mixed-oracle` / `source=ledger` | exit 2 · `framework-source-required` | exit 2 · `framework-source-required` |
+
+**判读**：
+
+1. `lookup` 在客户载荷根两次 exit 0 且 `source=ledger`——owner 在 `.specify/shared/definitions/` 内可解析，
+   引擎是**可执行的安装副本**（不是只有文件在场）；两个单元取值不同（expression / execution），排除单点巧合。
+2. 框架源专属动作在客户根 exit 2 + `framework-source-required`——作用域守卫在真实载荷上生效，MUST NOT 被读成绿。
+3. 原始项目零修改：刷新前后 `xuanji-agent 195` / `xuanji-cli 548` / `xuanji-function 28` 个脏文件，HEAD 未变。
+4. 与产品套件是两条独立证据：产品套件证明「加文件不破坏既有行为」；本节证明「新增载荷真的能跑」。
+   任一缺失时 SC-002 不得记 pass（契约 C-12）。

@@ -585,7 +585,15 @@ def _pair(left, right):
     return first, second
 
 
-def check_duplicates(subject, owners):
+def check_duplicates(subject, owners, subject_pairs=True):
+    """Report hand-written copies.
+
+    ``subject_pairs=False`` is the *owner-scoped* measurement (``--owner-path``):
+    the question is "is this owner's text copied anywhere in the subject set", so
+    subject↔subject pairs are out of scope and the near-copy pool is the owners
+    only. The default (``True``) keeps the S3 069a semantics: subjects are also
+    compared against each other.
+    """
     findings = []
     consumed = set()
 
@@ -599,14 +607,27 @@ def check_duplicates(subject, owners):
             continue
         if not any(record["pool"] == "subject" for record in group):
             continue  # S3 is the comparison side only (C-2)
-        first = min(
-            (record for record in group if record["display"] == displays[0]),
-            key=lambda record: record["line"],
-        )
-        second = min(
-            (record for record in group if record["display"] == displays[1]),
-            key=lambda record: record["line"],
-        )
+        if not subject_pairs:
+            # Owner-scoped: the pair must actually involve a comparison-side owner.
+            if not any(record["pool"] == "owner" for record in group):
+                continue
+            first = min(
+                (record for record in group if record["pool"] == "owner"),
+                key=lambda record: (record["display"], record["line"]),
+            )
+            second = min(
+                (record for record in group if record["pool"] == "subject"),
+                key=lambda record: (record["display"], record["line"]),
+            )
+        else:
+            first = min(
+                (record for record in group if record["display"] == displays[0]),
+                key=lambda record: record["line"],
+            )
+            second = min(
+                (record for record in group if record["display"] == displays[1]),
+                key=lambda record: record["line"],
+            )
         findings.append(
             finding(
                 "duplicate",
@@ -624,7 +645,9 @@ def check_duplicates(subject, owners):
 
     # Near copies (ratio >= 0.90, both lines >= 40 chars).
     candidates = [record for record in subject if id(record) not in consumed]
-    pool = [record for record in owners] + [record for record in subject]
+    pool = [record for record in owners]
+    if subject_pairs:
+        pool = pool + [record for record in subject]
     for record in candidates:
         if id(record) in consumed:
             continue
@@ -778,13 +801,24 @@ def parse_faces(raw):
     return ordered
 
 
-def verify(spec_dir, paths, faces, root, roots=None):
+def verify(spec_dir, paths, faces, root, roots=None, owner_paths=None):
+    """Run the requested faces.
+
+    ``owner_paths`` (resolved Paths) narrows the duplicate face's comparison side
+    to the given owner file(s) and switches it to the owner-scoped measurement
+    (``subject_pairs=False``): "is this owner's text copied into the subject set".
+    The default keeps the nine-path S3 comparison side and its 069a semantics.
+    """
     roots = roots or [root]
     findings = []
     degradations = []
     statuses = {}
+    owner_labels = list(OWNER_PATHS)
 
     subjects = subject_files(spec_dir, paths)
+    if owner_paths:
+        comparison = {path.resolve() for path in owner_paths}
+        subjects = [path for path in subjects if path.resolve() not in comparison]
 
     if "reader" in faces:
         if paths:
@@ -807,32 +841,42 @@ def verify(spec_dir, paths, faces, root, roots=None):
 
     if "duplicate" in faces:
         subject_records = collect_records(subjects, root, "subject")
-        owner_paths = []
-        missing_owners = []
-        for rel in OWNER_PATHS:
-            resolved = resolve_payload(roots, rel)
-            if resolved is None:
-                missing_owners.append(rel)
-            else:
-                owner_paths.append(resolved)
-        if missing_owners:
-            raise InputError(
-                "owner path not resolvable (tried %s, then the %s mirror): %s"
-                % (
-                    roots[0],
-                    MIRROR_DIR_NAME,
-                    ", ".join(missing_owners),
+        owner_rels = list(OWNER_PATHS)
+        if owner_paths:
+            owner_records_paths = list(owner_paths)
+            owner_labels = [display_path(path, root) for path in owner_records_paths]
+        else:
+            owner_records_paths = []
+            missing_owners = []
+            for rel in owner_rels:
+                resolved = resolve_payload(roots, rel)
+                if resolved is None:
+                    missing_owners.append(rel)
+                else:
+                    owner_records_paths.append(resolved)
+            if missing_owners:
+                raise InputError(
+                    "owner path not resolvable (tried %s, then the %s mirror): %s"
+                    % (
+                        roots[0],
+                        MIRROR_DIR_NAME,
+                        ", ".join(missing_owners),
+                    )
                 )
-            )
+            owner_labels = list(OWNER_PATHS)
         # The owner set is an explicit closed list, so a mirror-resolved owner is
         # still a legitimate comparison side (see ``collect_records``).
-        owner_records = collect_records(owner_paths, root, "owner", allow_mirror=True)
+        owner_records = collect_records(
+            owner_records_paths, root, "owner", allow_mirror=True
+        )
         if not owner_records:
             raise InputError(
                 "owner set resolved but yielded no comparable lines: %s"
-                % ", ".join(OWNER_PATHS)
+                % ", ".join(owner_labels)
             )
-        duplicate_findings = check_duplicates(subject_records, owner_records)
+        duplicate_findings = check_duplicates(
+            subject_records, owner_records, subject_pairs=not owner_paths
+        )
         findings.extend(duplicate_findings)
         statuses["duplicate"] = "fail" if duplicate_findings else "pass"
 
@@ -845,11 +889,11 @@ def verify(spec_dir, paths, faces, root, roots=None):
         else:
             statuses["count"] = "not-evaluated"
 
-    return findings, statuses, count_check, degradations, subjects
+    return findings, statuses, count_check, degradations, subjects, owner_labels
 
 
 def report_payload(spec_dir, paths, files_scanned, faces, findings, count_check,
-                   degradations):
+                   degradations, owners=None):
     return {
         "action": "verify",
         "checked_at": utc_now(),
@@ -857,6 +901,7 @@ def report_payload(spec_dir, paths, files_scanned, faces, findings, count_check,
             "spec_dir": str(spec_dir) if spec_dir is not None else None,
             "paths": [str(path) for path in paths],
             "files_scanned": files_scanned,
+            "owners": list(owners or ()),
         },
         "faces": faces,
         "findings": findings,
@@ -906,7 +951,20 @@ def main(argv=None):
     )
     parser.add_argument("--action", default="verify", choices=("verify",))
     parser.add_argument("--spec-dir", default="")
-    parser.add_argument("--path", action="append", default=[])
+    parser.add_argument(
+        "--path",
+        action="append",
+        default=[],
+        help="a Markdown file, or a directory (all *.md recursively)",
+    )
+    parser.add_argument(
+        "--owner-path",
+        action="append",
+        default=[],
+        help="narrow the duplicate face's comparison side to this repo-relative owner "
+             "path (repeatable); the owners are then excluded from the subject set and "
+             "the measurement asks only whether their text is copied",
+    )
     parser.add_argument("--faces", default="")
     parser.add_argument(
         "--strict",
@@ -926,19 +984,38 @@ def main(argv=None):
     try:
         faces = parse_faces(args.faces)
         spec_dir = Path(args.spec_dir).resolve() if args.spec_dir else None
-        paths = [Path(item).resolve() for item in args.path]
+        paths = []
+        for item in args.path:
+            path = Path(item).resolve()
+            if path.is_dir():
+                paths.extend(sorted(path.rglob("*.md")))
+            elif path.is_file():
+                paths.append(path)
+            else:
+                raise InputError("--path does not exist: %s" % path)
         if spec_dir is None and not paths:
             raise InputError("nothing to check: give --spec-dir and/or --path")
         if spec_dir is not None and not spec_dir.is_dir():
             raise InputError("--spec-dir is not a directory: %s" % spec_dir)
-        for path in paths:
-            if not path.is_file():
-                raise InputError("--path is not a readable file: %s" % path)
 
         roots = root_candidates(Path(__file__))
         root = roots[0]
-        findings, statuses, count_check, degradations, subjects = verify(
-            spec_dir, paths, faces, root, roots
+        owner_paths = []
+        if args.owner_path:
+            missing = []
+            for rel in args.owner_path:
+                resolved = resolve_payload(roots, rel)
+                if resolved is None:
+                    missing.append(rel)
+                else:
+                    owner_paths.append(resolved)
+            if missing:
+                raise InputError(
+                    "owner path not resolvable (tried %s, then the %s mirror): %s"
+                    % (roots[0], MIRROR_DIR_NAME, ", ".join(missing))
+                )
+        findings, statuses, count_check, degradations, subjects, owner_labels = verify(
+            spec_dir, paths, faces, root, roots, owner_paths
         )
     except InputError as exc:
         print("doc-consistency-check: input error: %s" % exc, file=sys.stderr)
@@ -946,7 +1023,14 @@ def main(argv=None):
 
     findings.sort(key=lambda item: (item["path"], item["line"], item["rule"]))
     payload = report_payload(
-        spec_dir, paths, len(subjects), statuses, findings, count_check, degradations
+        spec_dir,
+        paths,
+        len(subjects),
+        statuses,
+        findings,
+        count_check,
+        degradations,
+        owner_labels,
     )
 
     if args.json_out:

@@ -63,15 +63,20 @@ MAP_HEADER = (
     "流程（阶段与门禁角色）",
     "逻辑（证据 / 契约 / 验收 / 版本 / 所有权）",
     "强制门禁",
+    "强制门禁引用",
     "强制状态",
 )
 FACE_COLUMNS = MAP_HEADER[1:4]
 BOUNDARY_HEADER = ("边界", "不可互换的判定面", "为什么不能互换", "门禁处理")
 
-# Contract C-4: the closed two-value set.
+# Contract C-4 / C-5: the closed two-value set and the reference prefix. An
+# enforced row must cite concrete gate-operator ids; the citation is what the
+# checker can falsify (free-text semantics stay with the review face).
 ENFORCED = "已强制"
 DECLARED_UNENFORCED = "已声明未强制"
 STATUS_VALUES = (ENFORCED, DECLARED_UNENFORCED)
+GATE_REF_PREFIX = "gate:"
+GATE_ID_COLUMN = "算子 id"
 
 # Contract C-11 / C-12: the closed phrase sets.
 CODE_OPERATORS = ("pytest", "--cov", "coverage", "go test", "mvn test", "npm test", "jest")
@@ -202,7 +207,11 @@ def _roster_stages() -> list[str]:
 
 
 def _gate_owner():
-    """Return ``(face_ids, operator_rows)``; operator rows are (stage, face, level, op)."""
+    """Return ``(face_ids, operator_rows)``.
+
+    Operator rows are ``(gate_id, stage, face, level, op)``; the gate id is the
+    stable citation key the map's ``强制门禁引用`` column must resolve against.
+    """
     text = _read(GATES, "gate owner")
     lines = text.splitlines()
     face_body = _section_body(lines, "六面（封闭集）")
@@ -219,7 +228,7 @@ def _gate_owner():
     operator_table = _first_table(operator_body)
     assert operator_table is not None, "gate owner § 阶段算子表 has no table"
     op_header, op_rows = operator_table
-    required = ("阶段", "执行算子", "对应面", "阻断级别")
+    required = ("阶段", GATE_ID_COLUMN, "执行算子", "对应面", "阻断级别")
     assert all(column in op_header for column in required), (
         "operator table header changed: %r" % (op_header,)
     )
@@ -228,6 +237,7 @@ def _gate_owner():
         record = {column: row[op_header.index(column)] for column in required if column in op_header}
         rows_out.append(
             (
+                record.get(GATE_ID_COLUMN, "").strip("` "),
                 record.get("阶段", "").strip("` "),
                 record.get("对应面", "").strip("` "),
                 record.get("阻断级别", "").strip("` "),
@@ -401,9 +411,9 @@ def test_map_header_is_verbatim_and_has_eight_data_rows():
     )
     assert len(rows) == 8, "the map must have exactly 8 data rows; got %d" % len(rows)
     for line_no, row in rows:
-        assert len(row) == 6, (
-            "map row on line %d has %d cell(s), expected 6 (no blank row): %r"
-            % (line_no, len(row), row)
+        assert len(row) == len(MAP_HEADER), (
+            "map row on line %d has %d cell(s), expected %d (no blank row): %r"
+            % (line_no, len(row), len(MAP_HEADER), row)
         )
         assert any(cell for cell in row), "map line %d is a blank row" % line_no
 
@@ -458,22 +468,37 @@ def test_face_legend_is_declared_once_before_the_table():
 # C-4 … C-7 enforcement truthfulness on the real tree
 # --------------------------------------------------------------------------- #
 def test_enforcement_status_is_closed_and_truthful():
+    """Independent oracle for C-4…C-7 at reference granularity.
+
+    ``已强制`` is true only when every claimed face has a ``gate:<算子 id>``
+    citation that resolves to a ``blocking`` operator row *at that same*
+    ``(stage, face)``. The check deliberately stops at the reference: whether the
+    free-text cell means what it cites is the review face's call (C-10).
+    """
     faces, operators = _gate_owner()
+    by_id = {gate_id: (stage, face, level) for gate_id, stage, face, level, _op in operators}
     blocking_pairs = {
-        (stage, face) for stage, face, level, _op in operators if level == "blocking"
+        (stage, face) for _gid, stage, face, level, _op in operators if level == "blocking"
     }
-    blocking_stages = {stage for stage, _face, level, _op in operators if level == "blocking"}
+    blocking_stages = {stage for _gid, stage, _face, level, _op in operators if level == "blocking"}
     header, rows = _map_rows()
     problems = []
     for line_no, row in rows:
         stage = row[0].strip("` ")
         status = row[header.index("强制状态")].strip("` ")
         gate_cell = row[header.index("强制门禁")]
+        ref_cell = row[header.index("强制门禁引用")]
         named = _face_ids_in(gate_cell, faces)
-        unknown = [
-            token
+        tokens = [
+            token.strip("`")
             for token in re.split(r"[、,，/\s]+", gate_cell.strip("` "))
-            if token and token not in ("—", "-") and token.strip("`") not in faces
+            if token.strip("`") and token.strip("`") not in ("—", "-")
+        ]
+        unknown = [token for token in tokens if token not in faces]
+        refs = [
+            token.strip("`")
+            for token in re.split(r"[、,，/\s]+", ref_cell.strip("` "))
+            if token.strip("`") and token.strip("`") not in ("—", "-")
         ]
         if status not in STATUS_VALUES:
             problems.append((stage, "status %r outside the closed set" % status))
@@ -488,9 +513,36 @@ def test_enforcement_status_is_closed_and_truthful():
                     )
             if unknown:
                 problems.append((stage, "unknown face id(s) %r" % (unknown,)))
+            if not refs:
+                problems.append((stage, "已强制 without a 强制门禁引用"))
+            covered = set()
+            for ref in refs:
+                if not ref.startswith(GATE_REF_PREFIX):
+                    problems.append((stage, "%r lacks the gate: prefix" % ref))
+                    continue
+                target = by_id.get(ref[len(GATE_REF_PREFIX):])
+                if target is None:
+                    problems.append((stage, "%r names no declared operator id" % ref))
+                    continue
+                ref_stage, ref_face, ref_level = target
+                if ref_stage != stage:
+                    problems.append((stage, "%r resolves to stage %r" % (ref, ref_stage)))
+                    continue
+                if ref_level != "blocking":
+                    problems.append((stage, "%r resolves to a non-blocking row" % ref))
+                    continue
+                if ref_face not in named:
+                    problems.append((stage, "%r resolves to unclaimed face %r" % (ref, ref_face)))
+                    continue
+                covered.add(ref_face)
+            for face in named:
+                if face not in covered:
+                    problems.append((stage, "%s has no resolving gate: reference" % face))
         else:
-            if named or unknown:
-                problems.append((stage, "已声明未强制 must leave 强制门禁 empty"))
+            if named or unknown or refs:
+                problems.append(
+                    (stage, "已声明未强制 must leave 强制门禁 / 强制门禁引用 empty")
+                )
             if stage in blocking_stages:
                 problems.append((stage, "stage has blocking operators but is declared unenforced"))
     assert not problems, "enforcement annotations are not true (C-4…C-7): %r" % (problems,)
@@ -558,7 +610,7 @@ def test_no_doc_is_code_licence_sentence_without_owner_pointer():
 def test_gate_operator_column_carries_no_code_type_operator():
     _faces, operators = _gate_owner()
     hits = []
-    for stage, _face, _level, operator in operators:
+    for _gid, stage, _face, _level, operator in operators:
         lowered = operator.lower()
         for token in CODE_OPERATORS:
             if token in lowered:
@@ -849,7 +901,8 @@ def test_injected_medium_axis_phrase_turns_red(tmp_path):
 def test_injected_code_operator_turns_red(tmp_path):
     def mutate(text: str) -> str:
         return _append_operator_row(
-            text, "| requirements | `pytest -q tests/` | requirements-clarity | advisory |"
+            text,
+            "| requirements | `G-injected` | `pytest -q tests/` | requirements-clarity | advisory |"
         )
 
     _fixture(tmp_path, mutate_gates=mutate)
@@ -857,4 +910,90 @@ def test_injected_code_operator_turns_red(tmp_path):
     assert proc.returncode == 1
     assert "code-operator-in-expression-gates" in [f["kind"] for f in record["findings"]], (
         "a code-type operator in the gate owner must be reported: %r" % (record["findings"],)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-5 at reference granularity: the gate citation itself must be falsifiable
+# --------------------------------------------------------------------------- #
+def test_injected_missing_gate_reference_turns_red(tmp_path):
+    header, _rows = _map_rows()
+
+    def mutate(text: str) -> str:
+        return _rewrite_rows(
+            text, "同构映射", "tasks", {header.index("强制门禁引用"): ""}
+        )
+
+    _fixture(tmp_path, mutate_owner=mutate)
+    proc, record = _engine(tmp_path)
+    assert proc.returncode == 1
+    kinds = [f["kind"] for f in record["findings"]]
+    assert "gate-ref-missing" in kinds, (
+        "an enforced row with no gate reference must be reported: %r" % record["findings"]
+    )
+
+
+def test_injected_wrong_gate_reference_turns_red(tmp_path):
+    header, _rows = _map_rows()
+
+    def mutate(text: str) -> str:
+        return _rewrite_rows(
+            text,
+            "同构映射",
+            "requirements",
+            {header.index("强制门禁引用"): "`gate:G-clarify-reader`"},
+        )
+
+    _fixture(tmp_path, mutate_owner=mutate)
+    proc, record = _engine(tmp_path)
+    assert proc.returncode == 1
+    kinds = [f["kind"] for f in record["findings"]]
+    assert "gate-ref-mismatch" in kinds, (
+        "a reference resolving to another stage/face must be reported: %r"
+        % record["findings"]
+    )
+    assert "gate-ref-missing" in kinds, (
+        "the two claimed faces lose their coverage when the reference moves: %r"
+        % record["findings"]
+    )
+
+
+def test_injected_unknown_gate_id_turns_red(tmp_path):
+    header, _rows = _map_rows()
+
+    def mutate(text: str) -> str:
+        return _rewrite_rows(
+            text,
+            "同构映射",
+            "plan",
+            {header.index("强制门禁引用"): "`gate:G-no-such-operator`"},
+        )
+
+    _fixture(tmp_path, mutate_owner=mutate)
+    proc, record = _engine(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-unknown" in [f["kind"] for f in record["findings"]], (
+        "a reference to an undeclared operator id must be reported: %r"
+        % record["findings"]
+    )
+
+
+def test_injected_advisory_gate_reference_turns_red(tmp_path):
+    header, _rows = _map_rows()
+
+    def mutate(text: str) -> str:
+        # implement's reader-purpose operator is advisory only.
+        return _rewrite_rows(
+            text,
+            "同构映射",
+            "implement",
+            {header.index("强制门禁引用"): "`gate:G-implement-reader`"},
+        )
+
+    _fixture(tmp_path, mutate_owner=mutate)
+    proc, record = _engine(tmp_path)
+    assert proc.returncode == 1
+    assert "gate-ref-not-blocking" in [f["kind"] for f in record["findings"]], (
+        "a reference resolving to an advisory operator must be reported: %r"
+        % record["findings"]
     )

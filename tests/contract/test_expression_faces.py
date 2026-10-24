@@ -14,11 +14,15 @@ C-11…C-13 that ``tasks.md`` T016 names:
 * C-12 no file outside the six-face table pairs ≥3 face ids with owner paths
   (a second binding table) — ``faces-second-table``.
 * C-13 the criterion-text copy count is measured by the existing
-  ``doc-consistency-check.py --faces duplicate`` over the closed subject set
-  (this owner document + this spec's formal artifacts) and must be ``[]``. The
-  S3 owner set is the comparison side: nine owner paths, six binding cells, and
-  ``shared/workflow/expression-gates.md`` belongs to it — it MUST NOT be a
-  subject.
+  ``doc-consistency-check.py --faces duplicate`` with the comparison side
+  narrowed to the classification owner (``--owner-path``) over the declared
+  subject surface — ``shared/`` + ``templates/commands/`` + ``skills/`` +
+  ``docs/`` + this spec's formal artifacts — and must be ``[]``. Copies in a
+  command template, a skill or the docs tree turn it red (injected below); the
+  earlier "owner + spec artifacts only" scope could not see them. The default
+  S3 owner set (nine owner paths, six binding cells) stays the comparison side
+  for every other consumer, and ``shared/workflow/expression-gates.md`` belongs
+  to it — it MUST NOT become the classification owner's subject.
 
 Injection fixtures live in ``tmp_path`` (delete a row, duplicate a row, an
 unresolvable path, an empty pointer cell, a mismatched anchor, a second table).
@@ -264,33 +268,92 @@ def test_faces_action_reports_six_faces_and_zero_findings():
 # --------------------------------------------------------------------------- #
 # C-13: the duplicate face over the closed subject set
 # --------------------------------------------------------------------------- #
-def test_duplicate_face_is_clean_over_the_closed_subject_set():
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(DOC_CHECK),
-            "--action",
-            "verify",
-            "--faces",
-            "duplicate",
-            "--path",
-            str(OWNER),
-            "--spec-dir",
-            str(SPEC_DIR),
-            "--format",
-            "json",
-        ],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
+# C-13: the declared subject surface. A copy in a command template, a skill or
+# the docs tree is exactly what the criterion must be able to see — the earlier
+# "owner + spec artifacts" scope could not (review F4).
+DECLARED_SUBJECT_ROOTS = ("shared", "templates/commands", "skills", "docs")
+
+
+def _run_duplicate(*paths: str) -> tuple[subprocess.CompletedProcess, dict]:
+    args = [
+        sys.executable,
+        str(DOC_CHECK),
+        "--action",
+        "verify",
+        "--faces",
+        "duplicate",
+        "--owner-path",
+        OWNER_REL.as_posix(),
+    ]
+    for path in paths:
+        args.extend(["--path", path])
+    args.extend(["--spec-dir", str(SPEC_DIR), "--format", "json"])
+    proc = subprocess.run(args, cwd=str(REPO_ROOT), capture_output=True, text=True)
+    assert proc.stdout.strip(), (
+        "doc-consistency-check must print JSON; stderr=%r" % proc.stderr
     )
-    assert proc.stdout.strip(), "doc-consistency-check must print JSON; stderr=%r" % proc.stderr
-    record = json.loads(proc.stdout)
+    return proc, json.loads(proc.stdout)
+
+
+def _longest_owner_line(min_length: int = 48) -> str:
+    """A distinctive criterion line that the duplicate face can compare."""
+    best = ""
+    for raw in OWNER.read_text(encoding="utf-8").splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("|") or stripped.startswith("#"):
+            continue
+        if len(re.sub(r"\s+", " ", stripped)) < min_length:
+            continue
+        if len(stripped) > len(best):
+            best = stripped
+    assert best, "the owner must carry at least one long prose line"
+    return best
+
+
+def test_duplicate_face_is_clean_over_the_declared_wide_scope():
+    proc, record = _run_duplicate(*DECLARED_SUBJECT_ROOTS)
     assert record.get("findings") == [], (
-        "the criterion-text copy count must be zero over the closed subject set "
-        "(C-13); got %r" % record.get("findings")
+        "the criterion-text copy count must be zero over the declared subject "
+        "surface (C-13: shared/ + templates/commands/ + skills/ + docs/ + this "
+        "spec); got %r" % record.get("findings")
     )
     assert proc.returncode == 0
+    scanned = record.get("scope", {}).get("files_scanned", 0)
+    assert scanned > 100, (
+        "the declared scope must actually scan the command/skill/docs surfaces; "
+        "only %d files were scanned" % scanned
+    )
+    assert record["scope"].get("owners") == [OWNER_REL.as_posix()], (
+        "the comparison side must be the classification owner itself; got %r"
+        % record["scope"].get("owners")
+    )
+
+
+def test_a_copied_criterion_line_in_each_surface_turns_red(tmp_path):
+    """A copy placed in templates/commands, skills or docs must not stay green."""
+    line = _longest_owner_line()
+    surfaces = {
+        "templates/commands": tmp_path / "templates" / "commands" / "copy.md",
+        "skills": tmp_path / "skills" / "external" / "copy" / "SKILL.md",
+        "docs": tmp_path / "docs" / "copy.md",
+    }
+    for label, path in surfaces.items():
+        _write(path, "# copied criterion\n\n%s\n" % line)
+        proc, record = _run_duplicate(str(path.parent))
+        assert proc.returncode == 1, (
+            "a criterion copy under %s must turn the duplicate face red; got "
+            "findings=%r" % (label, record.get("findings"))
+        )
+        hits = [
+            finding
+            for finding in record.get("findings", [])
+            if finding.get("path", "").endswith(path.name)
+            or (finding.get("counterpart") or "").startswith(str(path))
+        ]
+        assert hits, (
+            "the finding must point at the copy under %s; got %r"
+            % (label, record.get("findings"))
+        )
 
 
 def test_s3_owner_set_is_the_comparison_side_not_a_subject():

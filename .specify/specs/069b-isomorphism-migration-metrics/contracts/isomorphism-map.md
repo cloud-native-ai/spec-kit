@@ -15,8 +15,9 @@
 - **C-2** 表形与行集
 
 映射表 MUST 是 Markdown 表，表头逐字为
-`| 阶段 | 结构（实体 / 关系 / 边界） | 流程（阶段与门禁角色） | 逻辑（证据 / 契约 / 验收 / 版本 / 所有权） | 强制门禁 | 强制状态 |`，
-恰好 8 个数据行、零空行。行首格（阶段名）集合 MUST 等于阶段名册 owner 的阶段集合：从
+`| 阶段 | 结构（实体 / 关系 / 边界） | 流程（阶段与门禁角色） | 逻辑（证据 / 契约 / 验收 / 版本 / 所有权） | 强制门禁 | 强制门禁引用 | 强制状态 |`，
+恰好 8 个数据行、零空行。`强制门禁` 写 face id；`强制门禁引用` 写 `gate:<算子 id>`，算子 id 取自门禁 owner
+§ 阶段算子表的 `算子 id` 列（该列是全表唯一的稳定标识，2026-10-25 review-fix 为把强制声明做成可证伪而新增）。行首格（阶段名）集合 MUST 等于阶段名册 owner 的阶段集合：从
 `skills/external/sdd-loop-driver/scripts/loop-state.py` 的 `STAGE_ARTIFACTS` 字典顶层键解析（离线、确定性），
 期望集合为 `requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement` / `review`。
 名册不可解析时检查 MUST 以 `roster-unavailable` 退出码 2 结束，MUST NOT 用一张内置列表冒充名册。
@@ -39,16 +40,22 @@ MUST 在表前用一段 legend 声明一次，MUST NOT 在 24 个格里重复。
 `强制状态` 格 MUST 取 `已强制` 或 `已声明未强制` 之一，其他取值 → `status-invalid`。
 `已强制` 行的 `强制门禁` 格 MUST 写出 ≥1 个 face id，face id MUST 存在于门禁 owner
 `shared/workflow/expression-gates.md` § 六面 的封闭六面表；出现未知 face id → `gate-unknown`。
-`已声明未强制` 行的 `强制门禁` 格 MUST 为空（或仅一个 `—`），出现 face id → `status-invalid`。
+同行的 `强制门禁引用` 格 MUST 写出 ≥1 个 `gate:<算子 id>` 引用；无引用 → `gate-ref-missing`，
+非 `gate:` 前缀 → `gate-ref-malformed`，`<算子 id>` 不在 § 阶段算子表 → `gate-ref-unknown`。
+`已声明未强制` 行的 `强制门禁` 与 `强制门禁引用` 两格 MUST 为空（或各仅一个 `—`），出现任一 → `status-invalid`。
 
 （FR-002）
 
 - **C-5** `已强制` 必须为真
 
 一行标 `已强制` 时，其 `强制门禁` 格点名的每个 `(阶段, face)` 对 MUST 在门禁 owner § 阶段算子表中
-存在一行 `阻断级别 = blocking` 的算子行。任一被点名的 face 在该阶段只有 advisory 算子、或没有算子行
-→ `annotation-false-enforced`，该行按**标注失真的口号行**处理（与未标注行同等缺陷）。
-检查 MUST NOT 接受「该 face 在别的阶段有 blocking 算子」作为替代。
+存在一行 `阻断级别 = blocking` 的算子行，**且** `强制门禁引用` 中 MUST 有一个引用解析到该
+`(阶段, face)` 的那一行。任一被点名的 face 在该阶段只有 advisory 算子、或没有算子行
+→ `annotation-false-enforced`；引用解析到别的 stage / 未被本行点名的 face → `gate-ref-mismatch`；
+引用解析到 advisory 算子 → `gate-ref-not-blocking`；被点名的 face 没有覆盖它的引用 → `gate-ref-missing`。
+检查 MUST NOT 接受「该 face 在别的阶段有 blocking 算子」作为替代，也 MUST NOT 接受「该阶段有任一 blocking 算子」作为行的替代。
+可证伪粒度是**引用级**：引用可解析、指向 blocking、且与 `(阶段, face)` 一致即为通过；24 格自由文本是否真的在描述那个门禁
+归评审面（C-10），检查器 MUST NOT 声称能判定语义真实性。
 
 （FR-002）
 
@@ -116,8 +123,9 @@ MUST NOT 用「至少有一个 face 被强制」来给未强制的面背书。
 - **C-13** 检查器行为与作用域
 
 映射检查 MUST 由 `scripts/python/flow-class-check.py --action isomorphism` 执行：只读、零写入、
-退出码 `0` = 零 finding / `1` = 有 finding / `2` = 输入错误（owner 缺失、名册不可解析、门禁 owner 不可解析）。
-JSON MUST 含 `action`、`checked_at`、`stages`（行数）、`gates`（六面数）、`findings[]`（每项含 `kind` / `stage` / `message`）。
+退出码 `0` = 零 finding / `1` = 有 finding / `2` = 输入错误（owner 缺失、名册不可解析、门禁 owner 不可解析、
+算子 id 缺失或重复）。JSON MUST 含 `action`、`checked_at`、`stages`（行数）、`gates`（六面数）、
+`findings[]`（每项含 `kind` / `stage` / `message`）。
 该动作只在**框架源仓**运行（存在 `templates/commands/` 或可解析的 `skills/{external,internal}/`）；
 载荷根（客户项目 `.specify/` 形态）MUST 以 `framework-source-required` 退出码 2 结束，MUST NOT 产出 findings、MUST NOT 判绿。
 

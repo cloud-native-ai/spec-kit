@@ -920,6 +920,7 @@ MAP_HEADER = (
     "流程（阶段与门禁角色）",
     "逻辑（证据 / 契约 / 验收 / 版本 / 所有权）",
     "强制门禁",
+    "强制门禁引用",
     "强制状态",
 )
 BOUNDARY_HEADER = ("边界", "不可互换的判定面", "为什么不能互换", "门禁处理")
@@ -928,6 +929,15 @@ BOUNDARY_HEADER = ("边界", "不可互换的判定面", "为什么不能互换"
 ENFORCED = "已强制"
 DECLARED_UNENFORCED = "已声明未强制"
 STATUS_VALUES = (ENFORCED, DECLARED_UNENFORCED)
+
+# Contract C-5: an enforced row cites concrete gate-operator ids from the gate
+# owner's `算子 id` column. The citation is the falsifiable unit: a missing,
+# unknown, non-blocking or stage/face-mismatched reference is a finding. Free-text
+# semantics stay with the review face (C-10) — the checker never claims to judge
+# whether the 24 cells *mean* what they cite.
+GATE_ID_COLUMN = "算子 id"
+GATE_REF_PREFIX = "gate:"
+GATE_REF_COLUMN = "强制门禁引用"
 
 # Contract C-11 / C-12: the closed phrase sets (case-insensitive).
 CODE_OPERATORS = ("pytest", "--cov", "coverage", "go test", "mvn test", "npm test", "jest")
@@ -989,7 +999,7 @@ def parse_roster(repo: Path) -> list[str]:
 class GateOwner:
     def __init__(self, faces, operators):
         self.faces = faces          # list[str] in table order
-        self.operators = operators  # list[dict] with stage / face / blocking / operator
+        self.operators = operators  # list[dict] with id / stage / face / blocking / operator
 
     @property
     def blocking_pairs(self):
@@ -1000,6 +1010,10 @@ class GateOwner:
     @property
     def blocking_stages(self):
         return {row["stage"] for row in self.operators if row["blocking"]}
+
+    @property
+    def operators_by_id(self):
+        return {row["id"]: row for row in self.operators}
 
 
 def parse_gate_owner(repo: Path) -> GateOwner:
@@ -1036,7 +1050,7 @@ def parse_gate_owner(repo: Path) -> GateOwner:
     if operator_table is None:
         raise GateOwnerError("gate owner § 阶段算子表 has no parseable table")
     op_header, op_rows = operator_table
-    required = ("阶段", "执行算子", "对应面", "阻断级别")
+    required = ("阶段", GATE_ID_COLUMN, "执行算子", "对应面", "阻断级别")
     missing = [column for column in required if column not in op_header]
     if missing:
         raise GateOwnerError(
@@ -1044,12 +1058,25 @@ def parse_gate_owner(repo: Path) -> GateOwner:
             % (", ".join(missing), op_header)
         )
     operators = []
-    for _line, row in op_rows:
+    seen_ids: set[str] = set()
+    for line_no, row in op_rows:
         if len(row) != len(op_header):
             continue
         record = {column: row[op_header.index(column)] for column in required}
+        gate_id = record[GATE_ID_COLUMN].strip("` ")
+        if not gate_id:
+            raise GateOwnerError(
+                "operator row on line %d has an empty %r cell" % (line_no, GATE_ID_COLUMN)
+            )
+        if gate_id in seen_ids:
+            raise GateOwnerError(
+                "operator id %r appears more than once; a gate reference cannot resolve "
+                "deterministically" % gate_id
+            )
+        seen_ids.add(gate_id)
         operators.append(
             {
+                "id": gate_id,
                 "stage": record["阶段"].strip("` "),
                 "face": record["对应面"].strip("` "),
                 "blocking": record["阻断级别"].strip("` ").lower() == "blocking",
@@ -1140,6 +1167,40 @@ def medium_hits(cell: str) -> list[str]:
     ]
 
 
+def gate_refs(cell: str, gates: GateOwner):
+    """Return ``(resolved, problems)`` for one ``强制门禁引用`` cell.
+
+    ``resolved`` is ``[(token, operator_row)]``; ``problems`` is
+    ``[(kind, detail)]`` for tokens that are malformed or name no declared id.
+    A reference resolves against the gate owner only — the single oracle that can
+    say which ``(stage, face)`` an id belongs to and whether it blocks.
+    """
+    resolved = []
+    problems = []
+    operators_by_id = gates.operators_by_id
+    for token in gate_tokens(cell):
+        if not token.startswith(GATE_REF_PREFIX):
+            problems.append(
+                (
+                    "gate-ref-malformed",
+                    "%r is not a %r reference" % (token, GATE_REF_PREFIX + "<算子 id>"),
+                )
+            )
+            continue
+        gate_id = token[len(GATE_REF_PREFIX):]
+        operator = operators_by_id.get(gate_id)
+        if operator is None:
+            problems.append(
+                (
+                    "gate-ref-unknown",
+                    "%r names no operator id in the gate owner § 阶段算子表" % token,
+                )
+            )
+            continue
+        resolved.append((token, operator))
+    return resolved, problems
+
+
 def check_map(rows, roster: list[str], gates: GateOwner) -> list[dict]:
     findings: list[dict] = []
     face_columns = MAP_HEADER[1:4]
@@ -1175,8 +1236,10 @@ def check_map(rows, roster: list[str], gates: GateOwner) -> list[dict]:
 
         status = row[MAP_HEADER.index("强制状态")].strip("` ")
         gate_cell = row[MAP_HEADER.index("强制门禁")]
+        ref_cell = row[MAP_HEADER.index(GATE_REF_COLUMN)]
         named = face_ids_in(gate_cell, gates.faces)
         candidates = gate_tokens(gate_cell)
+        ref_candidates = gate_tokens(ref_cell)
         unknown = [token for token in candidates if token not in gates.faces]
 
         if status == ENFORCED:
@@ -1206,13 +1269,67 @@ def check_map(rows, roster: list[str], gates: GateOwner) -> list[dict]:
                             % (face, stage),
                         )
                     )
+            if not ref_candidates:
+                findings.append(
+                    iso_finding(
+                        "gate-ref-missing",
+                        stage,
+                        "row claims enforcement but carries no %r reference"
+                        % (GATE_REF_PREFIX + "<算子 id>"),
+                    )
+                )
+            resolved, problems = gate_refs(ref_cell, gates)
+            for kind, detail in problems:
+                findings.append(iso_finding(kind, stage, detail))
+            covered: set[str] = set()
+            for token, operator in resolved:
+                if operator["stage"] != stage:
+                    findings.append(
+                        iso_finding(
+                            "gate-ref-mismatch",
+                            stage,
+                            "%r resolves to stage %r, not this row's stage %r"
+                            % (token, operator["stage"], stage),
+                        )
+                    )
+                    continue
+                if not operator["blocking"]:
+                    findings.append(
+                        iso_finding(
+                            "gate-ref-not-blocking",
+                            stage,
+                            "%r resolves to an advisory operator at %r" % (token, stage),
+                        )
+                    )
+                    continue
+                if operator["face"] not in named:
+                    findings.append(
+                        iso_finding(
+                            "gate-ref-mismatch",
+                            stage,
+                            "%r resolves to face %r, which this row does not claim"
+                            % (token, operator["face"]),
+                        )
+                    )
+                covered.add(operator["face"])
+            for face in named:
+                if face not in covered:
+                    findings.append(
+                        iso_finding(
+                            "gate-ref-missing",
+                            stage,
+                            "%r has no resolving blocking %r reference"
+                            % (face, GATE_REF_PREFIX + "<算子 id>"),
+                        )
+                    )
         elif status == DECLARED_UNENFORCED:
-            if candidates:
+            if candidates or ref_candidates:
                 findings.append(
                     iso_finding(
                         "status-invalid",
                         stage,
-                        "已声明未强制 must leave 强制门禁 empty, found %r" % (candidates,),
+                        "已声明未强制 must leave 强制门禁 / 强制门禁引用 empty, found %r"
+                        % (candidates + ref_candidates,),
                     )
                 )
             if stage in blocking_stages:

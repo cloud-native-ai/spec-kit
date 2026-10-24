@@ -2,6 +2,7 @@
 
 **Run**: 2026-10-25 · branch `069b-isomorphism-migration-metrics` · run-start HEAD `5d5331b9`
 **Scope of this run**: Polish 阶段 T024–T029（镜像与命令副本、文档同步评估、全量回归、SC 证据、特性登记、终局门禁）＋ T014–T018 复选框回填（产物已存在且 78 支全绿，只补状态位）＋ 一处跨切片一致性修正（墙钟起点仪器，见 §跨切片一致性修正）
+**Review-fix (2026-10-25, F1/F4/F5)**: 映射强制声明改为引用级可证伪（`gate:<算子 id>`）、SC-005 测量面从 13 文件恢复到「四棵树 + 本轮 owner」、「刷新载荷冒烟」补入 SC-002。逐项证据见 §Review-fix F1/F4/F5。
 **Owner of the record shape**: `.specify/templates/verification-log-template.md`（`SC-NNN_status=` 词表：pass \| fail \| partial \| deferred \| unknown）
 **Owner of the failing-test names and count**: `notes/test-baseline-contract.txt`（本文件只记 `comm -13` 的结果，不复述数字为「当前实测」）
 
@@ -185,21 +186,21 @@ $ wc -l < ~/tmp/069b-baseline-names.txt
 
 映射按 `tasks.md` § Requirement Coverage Map（SC-001 ← T006/T007/T009/T027；SC-002 ← T012/T013；SC-003 ← T019/T023；SC-004 ← T019/T027；SC-005 ← T021/T023）。状态取值只从 owner 模板的封闭集取；未测量的量显式降级，不记 0、不记达成。
 
-- **SC-001** — 状态 **pass**。真实树 `--action isomorphism --repo . --format json` 返回 `stages = 8`、`gates = 6`、`findings = []`、exit 0；逐行核对记录（8 行 × `强制状态` 真实性，每行点名的 `(stage, face)` 都在 `shared/workflow/expression-gates.md` § 阶段算子表有 `blocking` 行）见 `notes/quickstart-run.md` § 场景 1；四类不可同构边界 a–d 各一次且 `门禁处理` 各绑 ≥1 个封闭 face id（契约测试覆盖）。失真可机械发现：8 种注入（`annotation-false-enforced` / `annotation-false-unenforced` / `slogan-row` / `boundary-missing` / `boundary-unbound` / `boundary-malformed` / `medium-axis-in-map` / `code-operator-in-expression-gates`）各自转红、退出码 1（`notes/quickstart-run.md` § 场景 2，`-k injected` → `8 passed`）。未标注行 = 0、标注失真的行 = 0。
-- **SC-002** — 状态 **pass**。三个事先冻结的客户快照（`notes/migration-samples.md`）各跑刷新前后两遍，失败 nodeid 名集 `comm -13` **均为空**：xuanji-agent（`3f68b62`，before ∅ / after ∅，250 passed）、xuanji-cli（`a0c476d`，before = after = 2 nodeid，`go test -json`）、xuanji-function（`a2fad18`，before = after = 12 nodeid）。原始项目与其工作树零修改（`git archive` 只读）；刷新由本切片源码 wheel + `specify init` 完成，未用人工拷贝。逐项记录见 `notes/quickstart-run.md` § 6.3。
+- **SC-001** — 状态 **pass**（**引用级**）。真实树 `--action isomorphism --repo . --format json` 返回 `stages = 8`、`gates = 6`、`findings = []`、exit 0；8 个 `已强制` 行各带解析到该 `(stage, face)` 的 blocking `gate:<算子 id>` 引用（引用取自门禁 owner § 阶段算子表的 `算子 id` 列），逐行核对记录见 `notes/quickstart-run.md` § 场景 1；四类不可同构边界 a–d 各一次且 `门禁处理` 各绑 ≥1 个封闭 face id（契约测试覆盖）。失真可机械发现：引用级 5 种（`gate-ref-missing` / `gate-ref-unknown` / `gate-ref-malformed` / `gate-ref-not-blocking` / `gate-ref-mismatch`）＋ 行级/边界级 8 种（`annotation-false-enforced` / `annotation-false-unenforced` / `slogan-row` / `boundary-missing` / `boundary-unbound` / `boundary-malformed` / `medium-axis-in-map` / `code-operator-in-expression-gates`）各自转红、退出码 1。**不声称**：24 格自由文本的语义真实性（那一层归评审面 C-10）。未标注行 = 0、引用级失真行 = 0。
+- **SC-002** — 状态 **pass**。三个事先冻结的客户快照（`notes/migration-samples.md`）各跑刷新前后两遍，失败 nodeid 名集 `comm -13` **均为空**：xuanji-agent（`3f68b62`，before ∅ / after ∅，250 passed）、xuanji-cli（`a0c476d`，before = after = 2 nodeid，`go test -json`）、xuanji-function（`a2fad18`，before = after = 12 nodeid）。**刷新载荷冒烟**（review-fix F5）在同三个快照上补测：安装后的 `.specify/scripts/python/flow-class-check.py --action lookup` 对 `/speckit.docs`（expression / reader-oracle）与 `/speckit.implement`（execution / mixed-oracle）均 exit 0 且 `source=ledger`；`--action check` / `--action isomorphism` 在客户根均 exit 2 + `framework-source-required`——载荷可执行、作用域守卫生效，不是只有文件在场。原始项目与其工作树零修改（`git archive` 只读，刷新前后脏文件数 195/548/28 不变）；刷新由本切片源码 wheel + `specify init` 完成，未用人工拷贝。逐项记录见 `notes/quickstart-run.md` § 6.3 / § 6.3b 与 `notes/migration-samples.md` § 刷新载荷冒烟。
 - **SC-003** — 状态 **pass**。对台账做两种注入（临时副本，不改仓库）：A 删一行（`/speckit.agents`）→ `red_kind = gap`、exit 1、`ledger_rows=77 gaps=1 parse_errors=0`；B 破坏表形（表头保留、数据行全删）→ `red_kind = parse-failure`、exit 1、`ledger_rows=0 parse_errors=1` + `ledger-truncated`。两红**可区分**（`gap` ≠ `parse-failure`），静默绿样本数 = 0（真实树 `red_kind = clean`、exit 0 是唯一绿样本）。另在复制根上验证 `LEDGER_FLOOR = 39` 的反空真：77 行仍判 `gap`、MUST NOT 触发 `ledger-truncated`。逐项记录见 `notes/quickstart-run.md` § 场景 3。
 - **SC-004** — 状态 **unknown**。**机器侧已测**：台账 `basis = mixed-oracle` 行 **8 行全部 `flow_class = execution`**（命令侧 `/speckit.constitution`、`/speckit.implement`、`/speckit.instructions`、`/speckit.interview`；技能侧 `skill:implement-feature`、`skill:manage-constitution`、`skill:manage-instructions`、`skill:run-interview`），`mixed-oracle-class` 反例注入（`basis = mixed-oracle` 且 `flow_class = expression`）转红（`tests/contract/test_ledger_reconciliation.py::test_mixed_oracle_expression_row_is_rejected`），择优样本数 = 0。**未测**：两名判定者（不同的人 / 不同的会话 / 判定时互不可见、结论分别落盘后比对）的独立归类演练**本次未执行**——本 run 是单代理 headless 收口，无第二名独立判定者，一致率无可测量的分母，故不记 100%、不记达成。
   - 样本清单与两类覆盖：**「既被人读又被脚本解析」**类取 `/speckit.instructions`（指令文本由读者判、符号链接由脚本判）与 `skill:manage-instructions`（同源技能）；**「须生成并编译」**类取 `/speckit.implement` 与 `skill:implement-feature`（台账 notes 原文为「代码须运行、规格回填须读者核」——执行侧 oracle 落在运行生成的产物上；owner 文档里字面的「须生成并编译 SDK 的 OpenAPI 契约」是边界例，不是台账单元）。机器侧落类分布 = 8/8 `execution`，0 条 `expression`。
-- **SC-005** — 状态 **pass**。`--action faces --repo . --format json` 返回 `faces = 6`、`findings = []`、exit 0——六面表恰好 6 行、face id 唯一、每行一个 `owner_pointer` 格（`+` 连接仍算一个绑定）、9 条真实指针路径在源码根或 `.specify/` 镜像可解析、`§` 锚均有匹配标题（`notes/quickstart-run.md` § 场景 5）。判据正文不搬家：`doc-consistency-check.py --action verify --faces duplicate --path shared/definitions/flow-class-definitions.md --spec-dir .specify/specs/069b-isomorphism-migration-metrics` 在封闭主体集（13 个文件）上 `faces.duplicate = pass`、`findings = []`、`degradations = []`；`shared/workflow/expression-gates.md`（判据 owner 本体）刻意排除在比较集外。
+- **SC-005** — 状态 **pass**（测量面已按 review-fix F4 恢复）。`--action faces --repo . --format json` 返回 `faces = 6`、`findings = []`、exit 0——六面表恰好 6 行、face id 唯一、每行一个 `owner_pointer` 格（`+` 连接仍算一个绑定）、9 条真实指针路径在源码根或 `.specify/` 镜像可解析、`§` 锚均有匹配标题（`notes/quickstart-run.md` § 场景 5）。判据正文不搬家：`doc-consistency-check.py --action verify --faces duplicate --owner-path shared/definitions/flow-class-definitions.md --path shared --path templates/commands --path skills --path docs --spec-dir .specify/specs/069b-isomorphism-migration-metrics` 在**声明主体面（533 个文件）**上 `faces.duplicate = pass`、`findings = []`；比较侧是分类 owner 单文件（`scope.owners` 自证）。命令模板 / 技能 / 文档树里的副本注入各一条均转红（`tests/contract/test_expression_faces.py`）。旧口径「owner + spec artifacts 13 文件」已废弃——它看不见模板、技能与文档里的副本。
 
 ```text
 SC-001_status=pass
-SC-001_value=stages=8 gates=6 findings=0 exit=0; 8/8 rows enforced-and-truthful; 4/4 boundaries bound to face ids; 8 injected distortions each turn red (exit 1)
-SC-001_note=map is machine-checkable row by row; distortion detection proven by mutation, not by self-report
+SC-001_value=stages=8 gates=6 findings=0 exit=0; 8/8 rows cite a resolving blocking gate:<算子 id> at their own (stage, face) (reference-level); 4/4 boundaries bound to face ids; 5 reference-level + 8 row/boundary-level injections each turn red (exit 1)
+SC-001_note=the falsifiable unit is the gate citation, not the free-text semantics — whether a cell *means* its gate stays with the review face (C-10); distortion detection proven by mutation, not by self-report
 
 SC-002_status=pass
-SC-002_value=3 pre-frozen snapshots (xuanji-agent 3f68b62 / xuanji-cli a0c476d / xuanji-function a2fad18); comm -13 empty for all three; originals untouched (git archive)
-SC-002_note=refreshed with this slice's wheel + specify init, never by manual copy; name-level, not count-level
+SC-002_value=3 pre-frozen snapshots (xuanji-agent 3f68b62 / xuanji-cli a0c476d / xuanji-function a2fad18); comm -13 empty for all three; refreshed-payload smoke on all three: lookup /speckit.docs + /speckit.implement exit 0 with source=ledger, check/isomorphism exit 2 framework-source-required; originals untouched (git archive)
+SC-002_note=refreshed with this slice's wheel + specify init, never by manual copy; name-level, not count-level; the payload smoke is a second, independent evidence line (product suite never loads specify)
 
 SC-003_status=pass
 SC-003_value=injection A -> red_kind=gap exit 1 (rows=77 gaps=1); injection B -> red_kind=parse-failure exit 1 (rows=0 parse_errors=1); silent-green samples=0
@@ -210,8 +211,8 @@ SC-004_value=8 ledger rows with basis=mixed-oracle, 8/8 flow_class=execution, 0 
 SC-004_note=machine half measured; the 100% inter-judge agreement is not-evaluated because this run is a single agent (no second, mutually-blind judge), so achievement is not claimed; the status is unknown, not deferred (the sample exists, the second judge does not)
 
 SC-005_status=pass
-SC-005_value=faces=6 findings=0 exit=0; duplicate face pass with findings=0 over 13 files; 9 owner paths resolve; certificate-body copies in the closed body set = 0
-SC-005_note=criterion text stays in its owner; expression-gates.md is the owner body itself and stays outside the S3 comparison set
+SC-005_value=faces=6 findings=0 exit=0; duplicate face pass with findings=0 over 533 files (shared/ + templates/commands/ + skills/ + docs/ + spec) against the classification owner as the sole comparison side; 9 owner paths resolve; copies injected into templates/commands, skills and docs each turn red
+SC-005_note=criterion text stays in its owner; the old 13-file scope (owner + spec artifacts) is retired — it could not see template/skill/docs copies; expression-gates.md is no longer the comparison side but remains a subject
 ```
 
 ### quickstart 七场景完成情况（`notes/quickstart-run.md`）

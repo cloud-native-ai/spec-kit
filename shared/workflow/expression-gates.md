@@ -24,26 +24,27 @@
 
 ## 阶段算子表
 
-八个阶段各至少一行：阶段、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。任一阶段无算子即失败；算子行不得是空表头行。
+八个阶段各至少一行：阶段、算子 id、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。任一阶段无算子即失败；算子行不得是空表头行。
+`算子 id` 是稳定标识（`G-…`，全表唯一），供分类 owner 映射表的 `强制门禁引用` 列以 `gate:<算子 id>` 引用；id 变更即引用失效，两者 MUST 同步修订。
 
-| 阶段 | 执行算子 | 对应面 | 阻断级别 |
-| --- | --- | --- | --- |
-| requirements | `validate-requirements.py --spec-dir <spec dir>`（五项结构检查）+ `pre-analyze-check.py --stage requirements` | requirements-clarity | blocking |
-| requirements | 证据三件套语法预检（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
-| clarify | `pre-analyze-check.py --stage requirements`（仅在需求变更后重跑一次） | requirements-clarity | blocking |
-| clarify | 读者声明与阅读场景补齐（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
-| plan | `pre-analyze-check.py --stage plan`（事实唯一性与悬空引用一次比对） | fact-consistency | blocking |
-| plan | 结构面复核（`docs-utils.py --action validate`，判据为零新增违规） | structure-links-build | blocking |
-| tasks | `pre-analyze-check.py --stage tasks`（计数判定，委派） | fact-consistency | blocking |
-| tasks | 证据等级与 as-of 复核（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
-| checklist | 读者声明复核（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
-| checklist | 跨文件手写副本（`doc-consistency-check.py --faces duplicate`） | fact-consistency | blocking |
-| analyze | `/speckit.analyze`（调用率 100%） | fact-consistency | blocking |
-| analyze | 评审基线确认（`/speckit.review`，按读者基准判定） | review | blocking |
-| implement | 结构/链接/构建（`docs-utils.py --action validate`，零新增） | structure-links-build | blocking |
-| implement | 自然度与读者适配抽样（人工或受委托的评审代理） | reader-purpose | advisory |
-| review | `/speckit.review`（调用率 100%，按读者基准判定） | review | blocking |
-| review | 事实一致性复核（`doc-consistency-check.py --action verify`） | fact-consistency | blocking |
+| 阶段 | 算子 id | 执行算子 | 对应面 | 阻断级别 |
+| --- | --- | --- | --- | --- |
+| requirements | `G-req-clarity` | `validate-requirements.py --spec-dir <spec dir>`（五项结构检查）+ `pre-analyze-check.py --stage requirements` | requirements-clarity | blocking |
+| requirements | `G-req-evidence` | 证据三件套语法预检（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
+| clarify | `G-clarify-clarity` | `pre-analyze-check.py --stage requirements`（仅在需求变更后重跑一次） | requirements-clarity | blocking |
+| clarify | `G-clarify-reader` | 读者声明与阅读场景补齐（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
+| plan | `G-plan-fact` | `pre-analyze-check.py --stage plan`（事实唯一性与悬空引用一次比对） | fact-consistency | blocking |
+| plan | `G-plan-structure` | 结构面复核（`docs-utils.py --action validate`，判据为零新增违规） | structure-links-build | blocking |
+| tasks | `G-tasks-fact` | `pre-analyze-check.py --stage tasks`（计数判定，委派） | fact-consistency | blocking |
+| tasks | `G-tasks-evidence` | 证据等级与 as-of 复核（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
+| checklist | `G-checklist-reader` | 读者声明复核（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
+| checklist | `G-checklist-duplicate` | 跨文件手写副本（`doc-consistency-check.py --faces duplicate`） | fact-consistency | blocking |
+| analyze | `G-analyze-fact` | `/speckit.analyze`（调用率 100%） | fact-consistency | blocking |
+| analyze | `G-analyze-review` | 评审基线确认（`/speckit.review`，按读者基准判定） | review | blocking |
+| implement | `G-implement-structure` | 结构/链接/构建（`docs-utils.py --action validate`，零新增） | structure-links-build | blocking |
+| implement | `G-implement-reader` | 自然度与读者适配抽样（人工或受委托的评审代理） | reader-purpose | advisory |
+| review | `G-review-review` | `/speckit.review`（调用率 100%，按读者基准判定） | review | blocking |
+| review | `G-review-fact` | 事实一致性复核（`doc-consistency-check.py --action verify`） | fact-consistency | blocking |
 
 ## 阻断级别
 

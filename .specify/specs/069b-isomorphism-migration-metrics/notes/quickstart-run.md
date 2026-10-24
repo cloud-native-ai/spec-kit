@@ -3,6 +3,7 @@
 **Owner**: T009（场景 1 / 场景 2）；场景 3–6 与 docs-sync 由各自任务行（T013 / T023 / T025）按同一形态追加。
 **Run date**: 2026-10-25 · **Tree**: 场景 1 / 2 的工作树基于 `c38b44cc`，场景 3 / 4 / 5 基于 `ed713ede` 加 US3 改动，场景 6 基于 `efe63551` 加 US2 改动（`069b-isomorphism-migration-metrics`），各节输出均在提交前实跑取得。
 **Interpreter**: pytest 仅 `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest` 可用；引擎用系统 `python3`。
+**Review-fix (2026-10-25)**: 场景 1 的核对表与场景 2 的注入表已按 F1 升级为**引用级**（`gate:<算子 id>`，新增 4 支引用注入）；场景 6 增加 § 6.3b 刷新载荷冒烟（F5）。
 
 ---
 
@@ -30,20 +31,22 @@ flow-class isomorphism: 8 stage row(s), 6 gate face(s), 0 finding(s)
 EXIT=0
 ```
 
-**逐行核对记录**（8 行 × `强制状态` 真实性；blocking 行取自 `shared/workflow/expression-gates.md` § 阶段算子表，16 行 / 6 面）：
+**逐行核对记录**（review-fix F1 后：8 行 × `强制状态` 真实性，**引用级**；`gate:<算子 id>` 取自 `shared/workflow/expression-gates.md` § 阶段算子表，16 行 / 6 面）：
 
-| 阶段 | 强制状态 | 强制门禁 | 该阶段存在的 blocking 算子行（对应面） |
-| --- | --- | --- | --- |
-| requirements | 已强制 | `requirements-clarity`、`evidence-asof` | requirements-clarity、evidence-asof |
-| clarify | 已强制 | `requirements-clarity`、`reader-purpose` | requirements-clarity、reader-purpose |
-| plan | 已强制 | `fact-consistency`、`structure-links-build` | fact-consistency、structure-links-build |
-| tasks | 已强制 | `fact-consistency`、`evidence-asof` | fact-consistency、evidence-asof |
-| checklist | 已强制 | `reader-purpose`、`fact-consistency` | reader-purpose、fact-consistency |
-| analyze | 已强制 | `fact-consistency`、`review` | fact-consistency、review |
-| implement | 已强制 | `structure-links-build` | structure-links-build（`reader-purpose` 在本阶段只有 advisory，未被点名） |
-| review | 已强制 | `review`、`fact-consistency` | review、fact-consistency |
+| 阶段 | 强制状态 | 强制门禁（face id） | 强制门禁引用（`gate:<算子 id>`） | 引用解析到的 (阶段, face) / 阻断级别 |
+| --- | --- | --- | --- | --- |
+| requirements | 已强制 | `requirements-clarity`、`evidence-asof` | `gate:G-req-clarity`、`gate:G-req-evidence` | requirements-clarity / blocking、evidence-asof / blocking |
+| clarify | 已强制 | `requirements-clarity`、`reader-purpose` | `gate:G-clarify-clarity`、`gate:G-clarify-reader` | requirements-clarity / blocking、reader-purpose / blocking |
+| plan | 已强制 | `fact-consistency`、`structure-links-build` | `gate:G-plan-fact`、`gate:G-plan-structure` | fact-consistency / blocking、structure-links-build / blocking |
+| tasks | 已强制 | `fact-consistency`、`evidence-asof` | `gate:G-tasks-fact`、`gate:G-tasks-evidence` | fact-consistency / blocking、evidence-asof / blocking |
+| checklist | 已强制 | `reader-purpose`、`fact-consistency` | `gate:G-checklist-reader`、`gate:G-checklist-duplicate` | reader-purpose / blocking、fact-consistency / blocking |
+| analyze | 已强制 | `fact-consistency`、`review` | `gate:G-analyze-fact`、`gate:G-analyze-review` | fact-consistency / blocking、review / blocking |
+| implement | 已强制 | `structure-links-build` | `gate:G-implement-structure` | structure-links-build / blocking（`reader-purpose` 在本阶段只有 advisory `G-implement-reader`，未被点名、未被引用） |
+| review | 已强制 | `review`、`fact-consistency` | `gate:G-review-review`、`gate:G-review-fact` | review / blocking、fact-consistency / blocking |
 
-核对结论：8 行全部 `已强制`，每行点名的每个 `(阶段, face)` 在该阶段都有一行 `阻断级别 = blocking` 的算子行；未出现「借别阶段 blocking 背书」的行；`已声明未强制` 在本版不出现（8 个阶段都有 blocking 算子，标成未强制反而是失真）。
+核对结论：8 行全部 `已强制`，每行点名的每个 `(阶段, face)` 都有一个 `gate:<算子 id>` 引用解析到**该** `(阶段, face)` 的 blocking 算子行；未出现「借别阶段 blocking 背书」的行，也未出现「该阶段有任一 blocking 算子就给整行背书」的情况（后者是 review F1 的缺陷，已退役）。`已声明未强制` 在本版不出现（8 个阶段都有 blocking 算子，标成未强制反而是失真）；该状态在夹具中可达（无任何 blocking 算子的阶段 → 绿，见 `tests/unit/test_isomorphism_checker.py::test_stage_without_any_operator_row_is_reachable_as_declared_unenforced`）。
+
+**证据边界**：本表证明的是**引用级**——引用存在、解析到正确的 `(阶段, face)`、且该算子 blocking。24 格自由文本是否真的在描述那个门禁不由此表证明（归评审面 C-10）。
 
 ---
 
@@ -54,7 +57,7 @@ EXIT=0
 ```
 $ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract/test_isomorphism_map.py \
     -q -p no:cacheprovider -k injected
-8 passed, 15 deselected
+12 passed, 15 deselected
 EXIT=0
 ```
 
@@ -63,6 +66,10 @@ EXIT=0
 | `implement` 行 `强制门禁 = reader-purpose`（该阶段只有 advisory） | `annotation-false-enforced` | `test_injected_false_enforced_turns_red` | passed |
 | `requirements` 行改 `已声明未强制`（该阶段有 blocking） | `annotation-false-unenforced` | `test_injected_false_unenforced_turns_red` | passed |
 | `plan` 行同时清空 `强制门禁` 与 `强制状态` | `slogan-row` | `test_injected_slogan_row_turns_red` | passed |
+| `tasks` 行 `强制门禁引用` 置空 | `gate-ref-missing` | `test_injected_missing_gate_reference_turns_red` | passed |
+| `requirements` 行引用改成 `gate:G-clarify-reader`（别的阶段） | `gate-ref-mismatch` + `gate-ref-missing` | `test_injected_wrong_gate_reference_turns_red` | passed |
+| `plan` 行引用改成未声明的 `gate:G-no-such-operator` | `gate-ref-unknown` | `test_injected_unknown_gate_id_turns_red` | passed |
+| `implement` 行引用改成 advisory 的 `gate:G-implement-reader` | `gate-ref-not-blocking` | `test_injected_advisory_gate_reference_turns_red` | passed |
 | 删掉边界 (c) | `boundary-missing` | `test_injected_boundary_missing_turns_red` | passed |
 | 边界 (c) `门禁处理` 不写 face id | `boundary-unbound` | `test_injected_boundary_unbound_turns_red` | passed |
 | 边界 (b) `为什么不能互换` 置空 | `boundary-malformed` | `test_injected_boundary_malformed_turns_red` | passed |
@@ -316,6 +323,21 @@ EXIT=0
 刷新后三快照的 `.specify/shared/definitions/flow-class-definitions.md` 与
 `.specify/scripts/python/flow-class-check.py` 均在位（`test -f` 均退出 0）；
 owner 内 `同构映射（8 阶段 × 3 面）` 命中 2（开篇 owns 项 + 章节标题），`069b 承接` 命中 0。
+
+### 6.3b 刷新载荷冒烟（review-fix F5：证明新增载荷真的能跑）
+
+产品套件不加载 `specify`、不触碰 `.specify/`，所以「零新增失败」只是文件级证据。刷新后在同一批快照里执行
+**安装后的载荷入口**（原始项目仍零修改；程序与逐项结果见 `notes/migration-samples.md` § 2026-10-25 刷新载荷冒烟）：
+
+| 快照 | `lookup /speckit.docs` | `lookup /speckit.implement` | `check` | `isomorphism` |
+|------|------------------------|------------------------------|---------|----------------|
+| xuanji-agent `3f68b62` | exit 0 · expression / reader-oracle / ledger | exit 0 · execution / mixed-oracle / ledger | exit 2 · framework-source-required | exit 2 · framework-source-required |
+| xuanji-cli `a0c476d` | exit 0 · expression / reader-oracle / ledger | exit 0 · execution / mixed-oracle / ledger | exit 2 · framework-source-required | exit 2 · framework-source-required |
+| xuanji-function `a2fad18` | exit 0 · expression / reader-oracle / ledger | exit 0 · execution / mixed-oracle / ledger | exit 2 · framework-source-required | exit 2 · framework-source-required |
+
+判读：`lookup` exit 0 且 `source=ledger` = owner 在 `.specify/shared/definitions/` 内可解析、引擎是可执行安装副本；
+两个独立单元取值不同排除单点巧合；`check` / `isomorphism` 在客户根 exit 2 + 具名标签 = 作用域守卫真的生效，
+不是「客户项目里也能跑绿」。产品套件与载荷冒烟是两条独立证据，任一缺失 SC-002 不得记 pass（契约 C-12）。
 
 ### 6.4 本阶段的裁定与假设（均按 tasks 原文裁决）
 

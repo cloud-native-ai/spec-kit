@@ -233,19 +233,19 @@
 
 本切片声明 5 条（切片编号 SC-001–SC-005；对应父编号 007、009、011、012、013）；父编号 001–006、008、010 归 069a，见 § Slice Scope 的「Success Criteria 归属」表。
 
-- **SC-001**: 同构映射每一行都有强制门禁或「已声明未强制」标注，未标注行 = 0 且标注失真的行 = 0（`annotation-false-enforced` / `annotation-false-unenforced`）；不可同构边界四类齐全，且每条都能在至少一处门禁设计中指出对应处理。
+- **SC-001**: 同构映射每一行都有强制门禁或「已声明未强制」标注；未标注行 = 0，且 `已强制` 行的每个 `(阶段, face)` 都有一个可解析的 `gate:<算子 id>` 引用指向门禁 owner 在该 `(阶段, face)` 的 blocking 算子行——引用缺失 / 未知 / 指向 advisory / 指向别的 `(阶段, face)` 均计为标注失真，失真行 = 0。可证伪粒度是**引用级**：本 SC 不声称 24 格自由文本的语义真实性已被证明（那一层归评审面）。不可同构边界四类齐全，且每条都能在至少一处门禁设计中指出对应处理。
 - **SC-002**: 在 3 个既有客户项目快照上运行刷新后的命令套件，名字级基线新增失败 = 0（按失败 nodeid 集合比对，不按条数）。样本（项目与提交 / 刷新前状态）MUST 在跑测前落盘（SA-12）。
 - **SC-003**: 对台账做两种注入——删除一行、破坏表形（使解析出 0 行而清单非空）——对账检查 MUST 各自变红，且两种红 MUST 可区分（缺口 vs 解析失败）；静默绿样本数 = 0。
 - **SC-004**: 抽取混合 oracle 单元样本（至少覆盖「既被人读又被脚本解析」与「须生成并编译」两类），两名判定者独立归类一致率 = 100%（独立 = 不同的人 / 不同的会话 / 判定时互不可见，结论分别落盘后比对），且全部落 `execution` 并叠加表达类门禁；择优样本数 = 0。
-- **SC-005**: 六面文档型门禁每面各有 1 个 owner 指针（6/6 齐全），其判据正文在 owner 之外的出现次数 = 0。
+- **SC-005**: 六面文档型门禁每面各有 1 个 owner 指针（6/6 齐全）；分类 owner 的判据正文在声明主体集内出现次数 = 0。声明主体集（封闭）= `shared/**/*.md` + `templates/commands/**/*.md` + `skills/**/*.md` + `docs/**/*.md` + 本切片 formal artifacts（分类 owner 自身除外，它是比较侧）；比较侧 = 分类 owner 单文件，9 条 S3 owner 路径不再充当比较侧、作为主体仍受本测量约束。命令模板、技能与文档树里的副本 MUST 能被该测量转红，MUST NOT 以一纸只覆盖 owner 与 spec 的窄集合代替。
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 同构映射表逐行核对记录（每行的强制门禁 ID 或「未强制」标注），逐行落在本切片的核对记录里；边界四类各一条指认记录（边界 → 至少一处门禁设计）。
+- **SC-001 Source**: 同构映射表逐行核对记录（每行的 `gate:<算子 id>` 引用或「未强制」标注），逐行落在本切片的核对记录里；引用解析 = `flow-class-check.py --action isomorphism`（`gate-ref-missing` / `gate-ref-unknown` / `gate-ref-malformed` / `gate-ref-not-blocking` / `gate-ref-mismatch` 任一出现即失真）。边界四类各一条指认记录（边界 → 至少一处门禁设计）。
 - **SC-002 Source**: 刷新前后各跑一次该样本声明的既有套件，按其原生失败输出采集失败 nodeid 名集（pytest 取 `FAILED <nodeid>`；Go 取 `go test -json` 的 fail 事件 `<package>::<Test>`；框架仓自身的 `run-tests.sh --names-out` 只是框架仓基线通道，不是客户套件的通道），`comm -13` 断言为空；三个客户项目快照的选取与提交在跑测前写入本切片 notes。**口径提醒**：069a 的框架仓契约基线（其 `notes/test-baseline-contract.txt`）不是本条的替身——本条的对象是客户项目快照，两者不可互相顶替。
 - **SC-003 Source**: 对台账执行两次注入（删一行 / 破坏表形）后各跑一次对账检查，记录退出码与报错形态；两形态互不相同即判「可区分」。注入在临时副本上进行，MUST NOT 以「把仓库改坏再改回」的方式执行。
 - **SC-004 Source**: 混合单元样本清单 + 两份互不可见的独立判定记录，逐条比对并统计一致率与落类分布。
-- **SC-005 Source**: 六面门禁 owner 指针表（6 行）+ 对判据正文的 grep 计数，排除集 = 门禁 owner 已声明的 S3 比较集（9 条 owner 路径：6 个绑定格，其中 `requirements-clarity` / `structure-links-build` / `review` 三面各含主机制 + 执行件两条路径）。
+- **SC-005 Source**: 六面门禁 owner 指针表（6 行）+ `doc-consistency-check.py --action verify --faces duplicate --owner-path shared/definitions/flow-class-definitions.md --path shared --path templates/commands --path skills --path docs --spec-dir .specify/specs/069b-isomorphism-migration-metrics` 的副本计数（`findings = []`）。9 条 S3 owner 路径退出比较侧（6 个绑定格，其中 `requirements-clarity` / `structure-links-build` / `review` 三面各含主机制 + 执行件两条路径），比较侧收窄为分类 owner 单文件；副本的注入证明落在 `tests/contract/test_expression_faces.py`（命令模板 / 技能 / 文档树三面各一条）。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 

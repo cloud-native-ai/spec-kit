@@ -23,7 +23,11 @@ that ``tasks.md`` T010 names:
 * C-7/C-8 the name-level outcome of each snapshot is recorded in
   ``notes/quickstart-run.md`` § 场景 6 as either zero new failing node ids
   (``comm -13`` empty) or ``not-evaluated`` with a reason — never as a failure
-  *count*.
+  *count*;
+* C-12 the refreshed payload is actually executed, not merely present: each
+  snapshot records the installed engine's ``lookup`` for two units (exit 0,
+  ``source=ledger``) and the framework-only actions' named refusal
+  (``framework-source-required``, exit 2) — file presence alone is not evidence.
 
 The owner-document pointer convergence (P1 / P3 / P4) is asserted here too: T011
 removes every ``069b 承接`` handoff pointer, makes the literal registry name the
@@ -171,11 +175,21 @@ def _table_after(text: str, header_first_cell: str) -> tuple[list[str], list[lis
 
 
 def _section(text: str, heading_prefix: str) -> str | None:
-    """Return the body of the first heading whose text starts with ``heading_prefix``."""
+    """Return the body of the first heading whose text starts with ``heading_prefix``.
+
+    Headings inside fenced code blocks are not headings — a ``# comment`` in a
+    bash snippet must not truncate the section.
+    """
     lines = text.splitlines()
     start = None
     level = None
+    in_fence = False
     for index, line in enumerate(lines):
+        if line.strip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         match = HEADING_RE.match(line)
         if match and match.group(2).startswith(heading_prefix):
             start = index + 1
@@ -184,8 +198,13 @@ def _section(text: str, heading_prefix: str) -> str | None:
     if start is None:
         return None
     body: list[str] = []
+    in_fence = False
     for line in lines[start:]:
-        match = HEADING_RE.match(line)
+        if line.strip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+            body.append(line)
+            continue
+        match = None if in_fence else HEADING_RE.match(line)
         if match and len(match.group(1)) <= (level or 0):
             break
         body.append(line)
@@ -476,6 +495,49 @@ def test_quickstart_records_name_level_snapshot_outcomes() -> None:
                 f"node ids), never a failure count: {line}"
             )
 
+
+# --------------------------------------------------------------------------- #
+# C-12 — the refreshed payload is executed, not merely present
+# --------------------------------------------------------------------------- #
+def test_migration_samples_record_the_payload_smoke() -> None:
+    text = _read(SAMPLES, "notes/migration-samples.md")
+    section = _section(text, "2026-10-25 刷新载荷冒烟")
+    assert section, (
+        "notes/migration-samples.md must record the post-refresh payload smoke "
+        "(C-12); file presence alone is not evidence"
+    )
+    for project in ("xuanji-agent", "xuanji-cli", "xuanji-function"):
+        rows = [
+            line
+            for line in section.splitlines()
+            if line.strip().startswith("|") and project in line
+        ]
+        assert rows, f"the payload-smoke table must carry a {project} row: {section}"
+        row = rows[0]
+        assert "exit 0" in row, f"{project} must record the lookup exit code: {row}"
+        assert "framework-source-required" in row, (
+            f"{project} must record the framework-only actions' named refusal: {row}"
+        )
+        assert "reader-oracle" in section or "mixed-oracle" in section, (
+            "the lookup assertions must record the resolved class/basis, not just exit 0"
+        )
+
+
+def test_quickstart_records_the_payload_smoke_for_every_snapshot() -> None:
+    text = _read(QUICKSTART, "notes/quickstart-run.md")
+    section = _section(text, "6.3b")
+    assert section, (
+        "notes/quickstart-run.md § 场景 6 must carry 6.3b (payload smoke) — the "
+        "product suite never loads specify or .specify/"
+    )
+    for project in ("xuanji-agent", "xuanji-cli", "xuanji-function"):
+        assert project in section, f"6.3b must record the {project} payload smoke"
+    assert "framework-source-required" in section, (
+        "6.3b must record that the framework-only actions exit 2 with a named label"
+    )
+    assert "source=ledger" in section, (
+        "6.3b must record that lookup resolved the class from the installed owner"
+    )
 
 if __name__ == "__main__":  # pragma: no cover - manual red/green runs
     raise SystemExit(pytest.main([__file__, "-q", "-p", "no:cacheprovider"]))

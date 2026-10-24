@@ -138,13 +138,21 @@ JSON 顶层 MUST 含 `commands_scanned`（被扫描模板数）。
 
 （FR-013；SC-005）
 
-- **C-13** 判据正文副本计数：复用既有 duplicate 面，主体集封闭
+- **C-13** 判据正文副本计数：复用既有 duplicate 面，主体面封闭为四棵树
 
 SC-005 的「判据正文在 owner 之外出现 0 次」MUST 由既有
-`scripts/python/doc-consistency-check.py --faces duplicate` 测量，比较侧沿用该引擎已声明的 S3 六面 owner 集；
-主体集 MUST 封闭为 `shared/definitions/flow-class-definitions.md` 与本 spec 的 formal artifacts。
-要求 `findings = 0`。`shared/workflow/expression-gates.md` 是 S3 owner（`evidence-asof` 面），MUST NOT 进入主体集——
-它是 S3 比较集（9 条 owner 路径；6 个绑定格，其中三面各含主机制 + 执行件两条路径）之一，按 SC-005 的排除集本就在比较侧。该口径 MUST NOT 被读成全仓 grep 等价物。
+`scripts/python/doc-consistency-check.py --faces duplicate` 测量，比较侧 MUST 收窄为分类 owner 单文件
+（`--owner-path shared/definitions/flow-class-definitions.md`；该选项同时把 owners 从主体集中排除，
+并把测量语义定为「这些 owner 的文本是否被复制」，主体↔主体副本不属本测量）。
+主体集 MUST 封闭为 `shared/`、`templates/commands/`、`skills/`、`docs/` 四棵树（`--path` 传目录，递归 `*.md`）
+加上本 spec 的 formal artifacts。要求 `findings = 0`。
+
+命令模板、技能与文档树 MUST 在扫描面内——这正是 069a F12「owner↔owner 盲区」的下一步：
+窄到「分类 owner + spec artifacts」的主体集会让模板/技能/文档里的副本不可见，MUST NOT 再用。
+`shared/workflow/expression-gates.md` 不再充当比较侧（它是另一个 fact 的 owner），但作为主体仍受本测量约束。
+该口径 MUST NOT 被读成全仓 grep 等价物（`.specify/` 镜像、`notes/` dated 记录与构建产物不在主体面内）。
+副本注入的转红证明落在 `tests/contract/test_expression_faces.py`
+（`templates/commands`、`skills`、`docs` 三面各一条）。
 
 （FR-013；SC-005）
 
