@@ -4,10 +4,15 @@
 
 - **C-1** 反空真下限：解析出的行数低于下限即失败
 
-`--action check` MUST 在解析出的台账行数低于 `LEDGER_FLOOR = 78`（2026-10-24 实测常量：
-命令 27 + 技能 51）时产出 finding `ledger-truncated`，MUST NOT 让「解析出 0 行」以零 finding 结束。
+`--action check` MUST 在解析出的台账行数低于**解析侧反空真下限**时产出 finding `ledger-truncated`，
+MUST NOT 让「解析出 0 行」以零 finding 结束。该下限 MUST 由清单侧常量推导：
+`LEDGER_FLOOR = ⌊(FLOOR_COMMANDS + FLOOR_SKILLS) / 2⌋`（27 + 51 → **39**；2026-10-25 按 `flow-class-check.py`
+输出的 `inventory.floors` 实测），MUST NOT 取自被检查的台账自身（即 MUST NOT 用「当前解析出的行数」当分母），
+MUST NOT 引入第三份手写单元计数。
 下限是**解析侧**的下限：它与 069a 既有 `inventory-truncated`（清单侧下限）同时存在，任一单独满足都不够。
-下限常量 MUST NOT 从被检查的台账自身推导（即 MUST NOT 用「当前解析出的行数」当分母）。
+它是**材料性 / 反空真**阈值，不是完整性判据——完整性由 C-2 的 `matched == inventory_units ∧ gaps == 0` 承担。
+因此删掉一行台账（78 → 77 行）MUST 仍判 `gap`（SC-003 注入 A），只有表被解析成不足一半（含 0 行）才是 `parse-failure`；
+把下限设成期望行数 78 会让「删一行」同时触发 `ledger-truncated`，两红不可区分，且会破 069a 的 77 行夹具（见 C-4）。
 
 （FR-010；SC-003）
 
@@ -16,7 +21,8 @@
 `--action check` 的 JSON MUST 含 `coverage` 块：
 `{"ledger_rows": <int>, "inventory_units": <int>, "matched": <int>, "gaps": <int>, "parse_errors": <int>, "floor": <int>}`。
 `clean` 判定 MUST 同时满足 `matched == inventory_units`、`gaps == 0`、`parse_errors == 0`、`ledger_rows >= floor`。
-`gaps` MUST 等于 `missing` + `unknown` finding 数；`parse_errors` MUST 等于 `row-malformed` + `ledger-truncated` finding 数。
+`gaps` MUST 等于 `missing` + `unknown` finding 数；`parse_errors` MUST 等于 `row-malformed` + `ledger-truncated` finding 数
+（`parse_errors` 只计**台账解析侧**；`inventory-truncated` 属清单侧，按 C-3 落 `parse-failure` 桶但不计入本计数）。
 文本输出 MUST 在空集旁边同时打印 `matched` 与 `inventory_units` 两个数（反空真伴生量），MUST NOT 只打印「0 findings」。
 
 （FR-010；SC-003）
@@ -28,10 +34,14 @@
 判定规则：
 - `owner-unavailable`：owner 文档缺失或不可解析（退出码 2，不产出 findings）；
 - `framework-source-required`：仓库形态为载荷根（见 C-14，退出码 2，不产出 findings）；
-- `parse-failure`：存在 `row-malformed` / `ledger-truncated` finding（退出码 1）；
-- `gap`：无解析类 finding 但存在 `missing` / `unknown` / `duplicate` / `dual-class` / `invalid-class` /
-  `neutral-unlisted` / `mixed-oracle-class` / `ledger-version-missing` 之一（退出码 1）；
+- `parse-failure`：存在 **`gap` 桶之外**的任何 finding（当前 = `row-malformed` / `ledger-truncated` /
+  `inventory-truncated`；退出码 1）；
+- `gap`：存在 finding 且**全部**落在这个封闭集合内——`missing` / `unknown` / `duplicate` / `dual-class` /
+  `invalid-class` / `neutral-unlisted` / `mixed-oracle-class` / `ledger-version-missing`（退出码 1）；
 - `clean`：零 finding（退出码 0）。
+两个桶 MUST 构成对 `check` 全部 kind 的**穷尽划分**（`gap` 集合之外一律 `parse-failure`），因此
+`red_kind = clean` ⟺ `findings == []` MUST 恒成立——`inventory-truncated` 单独出现时也 MUST 落 `parse-failure`，
+MUST NOT 落到 `clean`。新增 kind 时 MUST 同时落进其中一个桶，MUST NOT 留空档。
 「缺口」与「解析失败」两种红 MUST 在 `red_kind` 上不同；仅靠 finding 数量相同不算可区分。
 SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-unavailable`），且两值不同。
 
@@ -46,6 +56,9 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 `neutral-unlisted` / `inventory-truncated`）的语义、触发条件与退出码 MUST 保持不变；
 `--action lookup` 的输出字段、降级标签与退出码 MUST 保持不变（含 `owner-unavailable` 与默认标记的互斥）。
 在 78 行完整台账的树上，`check` MUST 继续返回 `units = 78` 与零 finding。
+C-1 的解析侧下限 MUST 定在 77 行以下，使 069a 的 77 行夹具（`test_missing_ledger_row_reports_missing`、
+`test_inventory_truncated_below_*` 的 `commands=26` / `skills=50` 两种）MUST NOT 新增 `ledger-truncated`
+——它们的 `kinds ⊆ EIGHT_KINDS` 断言是本切片 MUST NOT 改写的既有断言（唯一例外见 tasks A-1）。
 
 （FR-010；SC-003）
 
@@ -80,8 +93,12 @@ SC-003 的两次注入 MUST 分别落到 `gap` 与 `parse-failure`（或 `owner-
 
 `--action delegation` MUST 从命令模板文本解析委托边，语法为
 `(?:\.specify/)?skills/(?:external/|internal/)?<name>/SKILL.md` → `skill:<name>`；同一模板内重复出现的同名技能 MUST 去重。
-每条边 MUST 产出 `{command, skill, command_class, skill_class, verdict, source_line}`，`verdict` ∈
-`same-class` / `neutral-exempt` / `mismatch` / `unknown-skill`。JSON 顶层 MUST 含 `commands_scanned`（被扫描模板数）。
+捕获出的 `<name>` MUST 满足台账单元 id 语法 `skill:[a-z0-9][a-z0-9-]*`：占位 / 模板形态（如
+`skills/<name>/SKILL.md`——2026-10-25 实测出现在 `templates/commands/skills.md`）MUST NOT 构成委托边，也 MUST NOT 因此产出 finding。
+每条边 MUST 产出 `{command, skill, command_class, skill_class, verdict, source_line}`，`verdict` 的裁决顺序 MUST 固定为：
+技能不在台账 → `unknown-skill`；技能在所有者 § 类中立清单 → `neutral-exempt`（**不论两侧类别是否相同**——清单成员一律按豁免记录，
+2026-10-25 实测 6 条边命中，其中仅 `docs → memory-record` 两侧类别不同）；否则类别相同 → `same-class`、不同 → `mismatch`。
+JSON 顶层 MUST 含 `commands_scanned`（被扫描模板数）。
 `mismatch` → finding `delegation-mismatch`；台账中不存在的技能 → `delegation-unknown-skill`。
 模板未声明任何技能路径时不构成委托边，MUST NOT 产出 finding。
 

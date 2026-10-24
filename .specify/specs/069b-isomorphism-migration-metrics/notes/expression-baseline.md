@@ -13,7 +13,7 @@
 | `gate_calls` | `0` | 2026-10-25 | `f0df3d0b` | exec-quant 运行记录（068 通道）；过滤集合 = 6 个检查类单元；归属 = `run_id` 含 `069b` | `python3 scripts/python/exec-quant.py --action list-records --since 2026-10-24 --format json` 后按集合与归属过滤 | `not-evaluated` |
 | `confirmations`（门控观察） | `0` | 2026-10-25 | `f0df3d0b` | feedback 条目 frontmatter；归属 = `run_id` 含 `069b`；再查 `lifecycle_point: gate-*` | `python3 scripts/python/feedback-utils.py --action list --since 2026-10-24 --format json` + `grep -rl 'lifecycle_point: gate-' .specify/memory/feedback/` | `not-evaluated` |
 | `confirmations`（clarify 轮次） | `0` | 2026-10-25 | `f0df3d0b` | 本切片无 `/speckit.clarify` 运行记录（切片 requirements 自裁决，preamble 明写「未向用户发起访谈」） | `python3 scripts/python/exec-quant.py --action list-records --since 2026-10-24 --format json`（无 `run_id` 含 `069b` 的 clarify 记录） | `not-evaluated` |
-| `wall_clock` | `null` | 2026-10-25 | `f0df3d0b` | 起点 = `git log -1 --format=%as -- requirements.md`（`2026-10-24`）；终点 = `/speckit.analyze` 运行判定记录 `determined_at` | `python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` | `not-evaluated` |
+| `wall_clock` | `null` | 2026-10-25 | `f0df3d0b` | 起点 = `git log --diff-filter=A --format='%h %as' -- requirements.md`（首次提交 → `f0df3d0b 2026-10-24`；`git log -1 --format=%as` 取最近一次触及，2026-10-25 实测返回 `2026-10-25`，不可用）；终点 = `/speckit.analyze` 运行判定记录 `determined_at` | `python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` | `not-evaluated` |
 
 ## 实测明细（可复算）
 

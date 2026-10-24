@@ -83,7 +83,10 @@ checklist 2 / analyze 2 / implement 1 / review 2。**8 个阶段全部存在 blo
 ## R7 — 对账器扩展：floor + coverage + red_kind，且不破 069a 测试
 
 **决策**: `scripts/python/flow-class-check.py --action check` 增量扩展：
-1. 新增 finding kind `ledger-truncated`：解析出的台账行数 < `LEDGER_FLOOR = 78`（实测常量，不复算）；
+1. 新增 finding kind `ledger-truncated`：解析出的台账行数低于**解析侧反空真下限**
+   `LEDGER_FLOOR = ⌊(FLOOR_COMMANDS + FLOOR_SKILLS) / 2⌋ = 39`（由清单侧 floor 推导，不取自被解析台账）；
+   它是材料性阈值，完整性由 `coverage.matched == inventory_units` 承担——把下限设成期望行数 78 会让「删一行」
+   同时触发截断，使 SC-003 的两种红不可区分并破 069a 的 77 行夹具；
 2. JSON 增加 `coverage` 块（`ledger_rows` / `inventory_units` / `matched` / `gaps` / `parse_errors` / `floor`）；
 3. JSON 增加 `red_kind`：`clean` / `gap` / `parse-failure` / `owner-unavailable` / `framework-source-required`，
    优先级 `owner-unavailable > framework-source-required > parse-failure > gap > clean`；
@@ -91,7 +94,7 @@ checklist 2 / analyze 2 / implement 1 / review 2。**8 个阶段全部存在 blo
 
 **兼容性实测**: `tests/unit/test_flow_class_check.py` 的行级夹具在注入坏行时仍保留 78 条可解析行
 （`_build_repo` 建 78 行，再 `append` 坏行），因此 `ledger-truncated` 不会在那些用例上额外触发；
-`test_inventory_truncated_below_*` 建的是 `templates/commands` **存在但数量不足**的树，仍走 `inventory-truncated`。
+`test_inventory_truncated_below_*` 建的是 `templates/commands` **存在但数量不足**的树（77 行 ≥ 39，不新增 `ledger-truncated`），仍走 `inventory-truncated`。
 
 **被否方案**: 把 `inventory-truncated` 直接换成作用域标签——会破 069a 的 4 条 floor 用例（见 R11）。
 
@@ -156,7 +159,8 @@ S3 六面 owner 集；要求 `findings = 0`。`shared/workflow/expression-gates.
 - `wall_clock` = `null`（本切片尚无 `/speckit.analyze` 运行判定记录）：`not-evaluated`。
 
 **仪器（全部既有）**: `exec-quant.py --action list-records`、`feedback-utils.py --action list`、
-`run-determination.py --action history`、`git log -1 --format=%cs -- <requirements.md>`。无新采集器（FR-014）。
+`run-determination.py --action history`、`git log --diff-filter=A --format='%h %as' -- <requirements.md>`
+（取**首次提交**；`git log -1 --format=%as` 取的是最近一次触及 → 2026-10-25，不是冻结点）。无新采集器（FR-014）。
 
 **披露**: 069a 的 `notes/expression-baseline.md` 已在同口径下记过同类 `not-evaluated`；本切片不把它的值当本片前值
 （两者样本不同），也不据此声称任何降幅。

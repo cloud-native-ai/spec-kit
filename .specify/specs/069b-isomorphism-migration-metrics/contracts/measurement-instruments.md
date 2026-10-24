@@ -6,7 +6,8 @@
 
 三项基线 MUST 是：`gate_calls`（门禁调用次数）、`confirmations`（人工确认次数）、`wall_clock`（requirements→analyze 墙钟）。
 冻结点 MUST 是本切片 `requirements.md` 的**首次提交**（`frozen_commit = f0df3d0b`，author date `2026-10-24`，实测
-`git log -1 --format=%as -- .specify/specs/069b-isomorphism-migration-metrics/requirements.md`）。
+`git log --diff-filter=A --format='%h %as' -- .specify/specs/069b-isomorphism-migration-metrics/requirements.md`
+→ `f0df3d0b 2026-10-24`；MUST NOT 用 `git log -1 --format=%as`——它取最近一次触及，2026-10-25 实测已返回 `2026-10-25`，且不输出提交哈希）。
 三项 MUST 共用同一起点，MUST NOT 各取各的起点。
 
 （FR-014）
@@ -21,7 +22,7 @@
 | `confirmations`（门控观察） | feedback 条目 frontmatter | `python3 scripts/python/feedback-utils.py --action list --since 2026-10-24 --format json`，逐条查其文件是否带 `lifecycle_point: gate-*` |
 | `confirmations`（clarify 轮次） | 本切片 `requirements.md` § Clarifications | 仅当存在本切片的 `/speckit.clarify` 运行记录时：`grep -c '^- Q:' <requirements.md>`；无记录或自裁决 Q/A 记 0（C-4） |
 | `wall_clock`（终点） | 运行判定记录 | `python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` |
-| `wall_clock`（起点） | git 提交 author date | `git log -1 --format=%as -- <requirements.md>` |
+| `wall_clock`（起点） | git 首次提交的 author date | `git log --diff-filter=A --format='%h %as' -- <requirements.md>` |
 
 068 通道的 owner 是 `.specify/specs/068-exec-quant-feedback-channel/`；本契约只引用，不重定义其记录语义。
 

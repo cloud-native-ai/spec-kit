@@ -151,7 +151,7 @@ xuanji-function owner=no engine=no
 python3 scripts/python/exec-quant.py --action list-records --since 2026-10-24 --format json
 python3 scripts/python/feedback-utils.py --action list --since 2026-10-24 --format json
 python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json
-git log -1 --format=%as -- .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+git log --diff-filter=A --format='%h %as' -- .specify/specs/069b-isomorphism-migration-metrics/requirements.md
 ```
 
 本阶段实测结果：
@@ -160,7 +160,7 @@ git log -1 --format=%as -- .specify/specs/069b-isomorphism-migration-metrics/req
 |----|------|----------|
 | `gate_calls` | 窗口内 6 条记录，其中检查类 2 条都属 069a（`run_id` 不含 `069b`）→ 本切片冻结值 `0` | `not-evaluated`（分母 0） |
 | `confirmations` | `lifecycle_point: gate-` 命中 0；无 069b clarify 记录 → `0 + 0` | `not-evaluated`（分母 0） |
-| `wall_clock` 起点 | `2026-10-24`（`f0df3d0b` author date） | — |
+| `wall_clock` 起点 | `f0df3d0b 2026-10-24`（首次提交；`git log -1 --format=%as` 2026-10-25 实测返回 `2026-10-25`，故用 `--diff-filter=A`） | — |
 | `wall_clock` 终点 | 无 `/speckit.analyze` 的 069b 记录 → `null` | `not-evaluated` |
 
 **禁止**：把 `0` 记成「下降 100%」、把绝对量记成「达成」、把 `not-evaluated` 写进 `verification.md` 的 SC 状态位。

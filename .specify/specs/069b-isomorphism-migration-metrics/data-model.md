@@ -74,7 +74,7 @@
 | `coverage.matched` | int | 台账 ∩ 清单 | C-2 |
 | `coverage.gaps` | int | `missing + unknown` finding 数 | C-2 |
 | `coverage.parse_errors` | int | `row-malformed + ledger-truncated` finding 数 | C-2 |
-| `coverage.floor` | int | `78`（实测常量） | C-1 |
+| `coverage.floor` | int | `39` = ⌊(27 + 51) / 2⌋：解析侧**反空真**下限，由清单侧 floor 推导 | C-1 |
 | `red_kind` | enum | `clean` \| `gap` \| `parse-failure` \| `owner-unavailable` \| `framework-source-required` | C-3 |
 | `findings[]` | list[Finding] | `kind` / `unit_id` / `message` / `line?` | 069a + 本切片 |
 
@@ -141,7 +141,7 @@
 | `branch` | text | 实际分支 | C-6 |
 | `dirty_files` | int | 工作树脏文件数（快照排除，仅记录） | C-6 |
 | `payload_state` | enum | `unrefreshed` \| `refreshed` | FR-006 |
-| `suite_command` | text | 原样可执行 | C-7 |
+| `suite_command` | text | 项目自身命令，原样记录；快照侧适配（原项目解释器绝对路径 / `PYTHONPATH` / cwd）由 `notes/migration-samples.md` § 2026-10-25 更正 与「跑测前提」承载 | C-6 / C-7 |
 | `names_before` / `names_after` | path | 失败名集产物（按套件原生失败输出提取；C-7） | C-7 |
 | `delta` | set | `comm -13` 结果，MUST 为空或 `not-evaluated` | SC-002 |
 
@@ -171,7 +171,7 @@ E10 Migration Sample ──reads──▶ (client repos + E5's name-level suite 
 | 强制标注真实性 | `(stage, face)` blocking 存在性 | C-5 / C-6 |
 | 四类边界齐全且绑面 | `a`–`d` 各一次，`门禁处理` 含 face id | C-8 / C-9 |
 | 零缺口 vs 解析失败 | `red_kind` 不同 | C-3 |
-| 反空真 | `ledger_rows ≥ 78` 且 `matched == inventory_units` | C-1 / C-2 |
+| 反空真 | `ledger_rows ≥ floor(39)` 且 `matched == inventory_units`；删一行仍判 `gap` | C-1 / C-2 |
 | 混合 oracle | `basis = mixed-oracle ⟹ flow_class = execution` | C-7 |
 | 委托同类 | `verdict ∈ {same-class, neutral-exempt}` | C-8 |
 | 六面绑定 | 6 行、1 格/行、指针可解析 | C-11 |

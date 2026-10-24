@@ -48,7 +48,7 @@
 | tasks | `python3 .specify/scripts/python/validate-tasks.py <slice>/tasks.md` | PASS；0 error / 0 warning |
 | pre-analyze | `pre-analyze-check.py --spec-dir <slice> --stage requirements\|plan\|tasks --repo .` | 三阶段均 `decision=pass`、errors=0、advisories=27（18 处未创建测试文件引用：8 个文件在 tasks/feature-ref 的 10 + 8 处；5 处 plan/tasks/research 的被否决备选路径；本清单自身的 4 处同类引用：1 个客户测试路径 + 3 处被否决路径）、waived=0 |
 | decomposition | `decomposition-check.py --mode plan\|tasks` | 两次 `proceed`：fr_count=14；task_count=29 ≤ 40 |
-| 条款覆盖 | `account-clause-coverage.py <slice>` | claimed=51；FR 14/14 cited、0 uncovered；`status: baseline-missing`（`coverage-baseline.txt` 是 T002 的交付物，尚未冻结，属预期） |
+| 条款覆盖 | `account-clause-coverage.py <slice>` | claimed=51；FR 14/14 cited、0 uncovered；`status: ok`（基线于 2026-10-25 analyze 轮冻结：495 条基线内 / 0 beyond-baseline；此前一轮记 `baseline-missing` 时基线的冻结义务在 tasks 阶段，已补齐） |
 | 进程观察 | `bash scripts/bash/check-prerequisites.sh --json` | 因分支前缀 `069` 解析到父规格 `069-execution-expression-sdd`（切片共用数字前缀），本清单直接使用绝对路径 `.specify/specs/069b-isomorphism-migration-metrics`；属框架工具对切片分支的既有局限，不是 069b 需求缺陷 |
 
 ## 本清单运行所做的必要规格修正（不实现代码）
@@ -95,13 +95,13 @@
 ## E. 台账形态与生效版本
 
 - [x] CHK012 台账是否是所有者内的一份声明式行集，列按表头名解析，且禁止用命令模板元数据或技能 frontmatter 等分散载体承载类别？[Completeness, Req §FR-010; C-6] → 已核: 实测 78 行（27 命令 + 51 技能）；表头含机器键 `flow_class`；C-6 沿用 069a 的按表头解析、不新增必选列；FR-010 明写分散载体即第二副本。
-- [x] CHK013 反空真下限是否是**解析侧**下限、与被检查台账自身无关、且与 069a 的**清单侧**下限并存；下限的维护规则是否写明？[Clarity, Req §FR-010; C-1] → 已核: C-1 定 `LEDGER_FLOOR = 78`（27 + 51 实测），与 `inventory-truncated` 同时存在；常量与 069a 的 27 / 51 同源——新增流程单元须同步更新两处 floor，这是既有维护面，不是本切片缺陷；T018 断言 floor 是独立常量、不取自被检查台账。
+- [x] CHK013 反空真下限是否是**解析侧**下限、与被检查台账自身无关、且与 069a 的**清单侧**下限并存；下限的维护规则是否写明？[Clarity, Req §FR-010; C-1] → 已处置: 2026-10-25 analyze 轮把 C-1 的下限从「期望行数 78」改为由清单侧 floor 推导的 `LEDGER_FLOOR = ⌊(27+51)/2⌋ = 39`——78 会让「删一行」同时触发 `ledger-truncated`，使 SC-003 两种注入都落 `parse-failure`（两红不可区分），并破 069a 的 `test_missing_ledger_row_reports_missing`（77 行、断言 `kinds ⊆ EIGHT_KINDS`，本切片不得改写）；下限仍不取自被检查台账、仍与 `inventory-truncated` 并存，完整性由 C-2 的 `matched == inventory_units` 承担；T014 / T018 / T019 与 data-model E5 已同步。
 - [x] CHK014 生效版本是否只在所有者内声明一次，且与 069a 的「表头 / 列集合与解析器期望不符 = 版本不兼容」判据兼容——没有行级版本列、`version` 字段或第三个版本信号？[Consistency, Req §FR-010; C-5] → 已核: C-5 固定 `**台账版本**: <整数>（<YYYY-MM-DD>）` + 既有 `## 变更记录`；T019 落一次；plan R6 记被否的行级 `effective_version` 列；C-5 明禁 `version` 字段 / 行级列 / 第三信号。
 
 ## F. 对账红、覆盖率与混合 oracle
 
 - [x] CHK015 「缺口」与「解析失败」是否被定义为两种不同的红，带优先级与退出码，且「静默绿」在构造上不可能？[Measurability, Req §SC-003; C-2 / C-3] → 已核: C-3 五值优先级 `owner-unavailable > framework-source-required > parse-failure > gap > clean` 与退出码；C-2 的 `clean` 充要条件（`matched == inventory_units`、`gaps == 0`、`parse_errors == 0`、`ledger_rows ≥ floor`）；T014 双注入。
-- [x] CHK016 每个 finding kind 是否恰好落进一个红桶，使 `clean` 不可能与 findings 共存——包括「重复的版本声明」？[Consistency, Req §FR-010; C-2 / C-3 / C-4] → 已处置: C-5 的重复版本声明改为复用 `row-malformed`（不新增第六个 check kind，计入 `parse_errors`），使 C-4 的「恰好五个新 kind」、C-2 的 `parse_errors` 与 data-model E5 的 `clean` 不变量闭合；T014 同步为「声明重复（按 `row-malformed`）」。
+- [x] CHK016 每个 finding kind 是否恰好落进一个红桶，使 `clean` 不可能与 findings 共存——包括「重复的版本声明」？[Consistency, Req §FR-010; C-2 / C-3 / C-4] → 已处置: C-5 的重复版本声明改为复用 `row-malformed`（不新增第六个 check kind，计入 `parse_errors`），使 C-4 的「恰好五个新 kind」、C-2 的 `parse_errors` 与 data-model E5 的 `clean` 不变量闭合；T014 同步为「声明重复（按 `row-malformed`）」。2026-10-25 analyze 轮补齐此前漏掉的一个 kind：`inventory-truncated` 原不在任何桶内（在「台账与清单同时截断」的夹具上会算出 `red_kind = clean` 而 findings 非空），C-3 已改为「`gap` 集合之外一律 `parse-failure`」的穷尽划分，并写明新增 kind 必须落桶。
 - [x] CHK017 混合 oracle 的规范正文是否在本切片（不是只留指针），并同时定义台账一致性（`basis: mixed-oracle ⟹ flow_class: execution`）、只按消费方与失败可见性判定、以及两名判定者的「独立」含义？[Completeness / Measurability, Req §FR-011 / §SC-004; C-7] → 已核: FR-011 是本片规范正文；C-7 定台账一致性且不看数量比例 / 文件类型；实测 8 行 `mixed-oracle` 全部 `execution`；SC-004 增「独立 = 不同的人 / 不同的会话 / 判定时互不可见，结论分别落盘后比对」。
 
 ## G. 委托核验与类中立

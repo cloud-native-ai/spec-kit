@@ -63,7 +63,7 @@ quickstart 7 个场景；无新增命令、无新增门禁面
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Task Understanding（映射可逐行核对、边界可指认）、Change Validation（标注失真与解析失败各自转红）、Reliable Delivery（未刷新零变化、刷新单包原子）；不新增评分/成熟度报告 |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 映射与边界进分类 owner；六面绑定仍归门禁 owner；引擎不复制判据/算子表（只读三元组与指针）；计数由制品导出；`[[STR-NNN]]` 引用沿用，字面量唯一表仍在父规格 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 契约与 quickstart 对 `red_kind` / `not-evaluated` / `framework-source-required` 首现即释义；引擎 text 输出给功能语义与可行动路径；`not-evaluated` 与 SC 状态词的差异在两处契约中写明 |
-| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 已披露的既有异常：`expression-gates.md § 事实一致性` 的 owner↔owner 重复（REC-069a-11，本切片只把它排除出主体集并写明理由）；owner 文档三处指针偏差（P1–P4）登记为实现期动作；`--action check` 在载荷根必然红的既有缺陷（REC-069a-06）以具名作用域收敛 |
+| XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 已披露的既有异常：`expression-gates.md § 事实一致性` 的 owner↔owner 重复（REC-069a-11，本切片只把它排除出主体集并写明理由）；owner 文档四处指针偏差（P1–P4，四行）登记为实现期动作；`--action check` 在载荷根必然红的既有缺陷（REC-069a-06）以具名作用域收敛 |
 
 **Gates Status**: ✅ 16 条原则全部 Pass，零 Fail / 零 Partial——无 Complexity Tracking 违例项。
 
@@ -146,7 +146,7 @@ tests/unit/test_reconciler_extensions.py       # 新增：red_kind 优先级/cov
 - **对账扩展**：`ledger-truncated` + `coverage` + `red_kind`；既有 8 个 kind 与退出码阶梯不变（R7）。
 - **委托核验**：模板路径解析 → `skill:<name>`；类中立豁免取封闭清单（实测 26/27 模板有边、0 类不一致、6 条豁免）（R8）。
 - **六面绑定**：一个 `owner_pointer` 格可含主机制 + 执行件（`+` 连接），仍算一个绑定（R9）。
-- **判据副本**：复用 duplicate 面，主体集封闭（不含六个 owner），要求 findings = 0（R10）。
+- **判据副本**：复用 duplicate 面，主体集封闭（不含 S3 比较集——6 个绑定格的 9 条 owner 路径），要求 findings = 0（R10）。
 - **作用域**：新动作 + `check` 只在框架源仓运行；载荷根给 `framework-source-required`（R11）。
 - **基线**：`gate_calls = 0` / `confirmations = 0 + 0` / `wall_clock = null` → 三项 `not-evaluated`（R12）。
 - **快照**：三个未刷新客户项目 + archive 临时副本 + 原生失败 nodeid 名集（R13）。
@@ -202,7 +202,7 @@ tests/unit/test_reconciler_extensions.py       # 新增：red_kind 优先级/cov
 |----|------------------|------------|----------|----------------------|
 | `gate_calls` | exec-quant 运行记录（068 通道） | `python3 scripts/python/exec-quant.py --action list-records --since 2026-10-24 --format json`，按冻结的 6 个检查类 `unit_id` 过滤，并按 `run_id` 含 `069b` 归属 | 记录对象：`unit_id` / `unit_type` / `run_id` / `collected_at` / `schema_version` | `0` → `not-evaluated`（分母 0） |
 | `confirmations` | feedback 条目 frontmatter | `python3 scripts/python/feedback-utils.py --action list --since 2026-10-24 --format json` + 逐条查 `lifecycle_point: gate-*`；clarify 轮次 = 该切片是否有 clarify 运行记录，无则 0 | 条目对象：`id` / `unit_id` / `run_id` / `created`（+ 文件内 `lifecycle_point`） | `0 + 0` → `not-evaluated` |
-| `wall_clock` | git author date → 运行判定记录 | `git log -1 --format=%as -- <requirements.md>`；`python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` | 起点 `YYYY-MM-DD`；终点记录含 `determined_at` / `run_id` | 起点 `2026-10-24`，终点 `null` → `not-evaluated` |
+| `wall_clock` | git author date → 运行判定记录 | `git log --diff-filter=A --format='%h %as' -- <requirements.md>`（首次提交；`git log -1` 取最近一次触及，不可用）；`python3 scripts/python/run-determination.py --action history --target /speckit.analyze --json` | 起点 `YYYY-MM-DD`；终点记录含 `determined_at` / `run_id` | 起点 `2026-10-24`，终点 `null` → `not-evaluated` |
 
 - **无新采集器**：四项命令全部既有；脚本级检查（`pre-analyze-check` / `validate-*` / 测试）不可按次计数——写入「不可计部分」，不记 0（契约 C-2/C-3）。
 - **语汇边界**：`not-evaluated` 是判据取值；`verification.md` 的 SC 状态仍取 `pass/fail/partial/deferred/unknown`（契约 C-7）。
@@ -229,7 +229,8 @@ FR-009–013 → 契约二；FR-014 → 契约四）；5 条 SC 也都在引用�
 |----------|---------------------------|
 | `tests/unit/test_flow_class_check.py` 的「8 个 kind」集合与 `set(kinds) == {"row-malformed"}` | 行级夹具在注入坏行时仍保留 78 条可解析行，`ledger-truncated` 不触发 |
 | 同文件 `_render_owner` 夹具无 `**台账版本**` 声明 | 新增 `ledger-version-missing` 会让 `kinds <= set(EIGHT_KINDS)` 与 `set(kinds) == {"row-malformed"}` 变红；T019 只给夹具构建器补一行版本声明（tasks A-1），不改其断言与判据语义 |
-| 同文件 `test_inventory_truncated_below_*` | 这些夹具的 `templates/commands/` **存在但数量不足**，仍走 `inventory-truncated`；`framework-source-required` 只在两棵源树都缺席时触发 |
+| 同文件 `test_missing_ledger_row_reports_missing`（删一行 → 77 行） | 解析侧下限是 `⌊(27+51)/2⌋ = 39`，77 行不触发 `ledger-truncated`；该用例仍判 `missing`、`kinds ⊆ EIGHT_KINDS` 成立（若把下限设成 78，该既有断言会红） |
+| 同文件 `test_inventory_truncated_below_*` | 这些夹具的 `templates/commands/` **存在但数量不足**（77 行 ≥ 39，不新增 `ledger-truncated`），仍走 `inventory-truncated`；`framework-source-required` 只在两棵源树都缺席时触发 |
 | `tests/contract/test_flow_class_ledger.py` 的「78 units / 零 findings / 载体唯一」 | 新增章节不产生第二份台账行；表头与列集合不变 |
 | `tests/unit/test_flow_class_check.py` 的退出码阶梯（0/1/2） | 新字段是增量；`owner-unavailable` 仍是唯一「无 findings 的退出 2」分支，新增的 `framework-source-required` 只在载荷根触发 |
 
@@ -250,7 +251,7 @@ FR-009–013 → 契约二；FR-014 → 契约四）；5 条 SC 也都在引用�
 
 | 层 | 命令 | 基线 |
 |----|------|------|
-| 采集/契约面 | `SPECKIT_PYTHON=<external venv python> bash scripts/bash/run-tests.sh --names-out <file> tests/contract -q --tb=no -p no:cacheprovider` | 失败 nodeid 名单冻结在 `notes/test-baseline-contract.txt`（**计数与名单的唯一所有者**；本文件不重述数字） |
+| 采集/契约面 | `SPECKIT_PYTHON=<external venv python> bash scripts/bash/run-tests.sh --names-out <file> tests/contract tests/unit -q --tb=no -p no:cacheprovider` | 失败 nodeid 名单冻结在 `notes/test-baseline-contract.txt`（**计数与名单的唯一所有者**；本文件不重述数字）。该文件的首次采集只跑 `tests/contract`；比对范围（GATE-4 / T026）是 `tests/contract tests/unit`，2026-10-25 analyze 实测 unit 侧 0 失败（814 passed），T003 的重采命令已扩到两侧 |
 | 台账面 | `python3 scripts/python/flow-class-check.py --action check --format json` | `units = 78`、`findings = []`、exit 0（实测） |
 | 镜像面 | `python3 scripts/python/sync-mirrors.py --check` | 六对 `ok` + 命令副本 `OK`（exit 0，实测） |
 | 结构面 | `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .` | exit 0，`violations = 3`（非零基线，判据为「零新增」） |
@@ -288,8 +289,12 @@ $ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode 
  "fr_ceiling": 30, "task_ceiling": 40}, "reasons": []}
 ```
 
-10 条 advisory 全部是 `missing-path`：8 条指向本切片**尚未创建**的测试文件（`tests/**` 在 plan 阶段不存在），
-另 2 条是本文件与 research.md 里提到的**被否决备选路径** `shared/definitions/isomorphism-map.md`；`errors = 0`。`decomposition-check` 的 `proceed` 与 requirements 阶段的 `fr_count = 14` 一致。
+该次运行的 advisory 全部是 `missing-path`：8 条指向本切片**尚未创建**的测试文件（`tests/**` 在 plan 阶段不存在），
+另 2 条是本文件与 research.md 里提到的**被否决备选路径** `shared/definitions/isomorphism-map.md`；`errors = 0`。
+**粘贴行与正文的条数差（`advisories=9` vs 正文 10）是该次转录留下的**（改动见 commit `385a05b1` 与本段），
+判据只看 `errors = 0`；tasks § Generation-time premise corrections 已披露该差值。2026-10-25 analyze 轮在 tasks / checklist
+落盘后重跑 requirements / plan / tasks 三阶段均为 `advisories=27`（新增项同属 `missing-path`：对 8 个尚未创建的测试文件
+与被否决备选路径的引用），`errors` 仍为 0。`decomposition-check` 的 `proceed` 与 requirements 阶段的 `fr_count = 14` 一致。
 契约引用组覆盖（`account-clause-coverage.py` 的 FR lane）：`FR universe: 14 / FR claimed: 14 / FR uncovered: 0`。
 
 ## Phase 1: Design Artifacts Summary
