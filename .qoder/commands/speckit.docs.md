@@ -23,6 +23,12 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 **Delegation (mandatory)**: load both owning skills and execute per their workflows. Do NOT inline or re-implement their baseline, scope table, gates, reconcile loop, authoring rules, or content-improvement rules here. Use the owners' existing confirmation tiers — this orchestration does not introduce another gate. The tier assignment is a governance keep this command still declares at dispatch: safe local writes remain 自动执行; move/archive/restructure actions remain **stop-and-confirm**; the formal zone remains 只归档不删除.
 
+### 类别读取与文档型门禁(判定前一次,本命令不复制判据)
+
+- **先读数、后判定**：在任何门禁判定之前执行一次 `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs"`。取值、判据与逐流程台账的唯一所有者是 `.specify/shared/definitions/flow-class-definitions.md`；本模板只调用，不复述。
+- **按门禁 owner 的调用点行执行算子**：算子集、阶段映射与阻断级别的唯一所有者是 `.specify/shared/workflow/expression-gates.md`；本命令只执行其 `/speckit.docs` 调用点行登记的文档型算子——读者/目的/边界、证据/as-of 与事实一致性三面由 `python3 .specify/scripts/python/doc-consistency-check.py --action verify` 承担(计数面委派既有检查器)，结构/链接/构建沿用既有 `docs-utils.py --action validate`(判据为零新增违规)，评审沿用既有 `/speckit.review`。本模板不复制该表。
+- **降级可见、既有门禁不变**：`source: default` 时原样显示其 `marker`(未登记·按默认)；所有者不可解析或引擎缺席(退出码 2)时显示 `owner-unavailable` 且 `marker` 为 null(两标签互斥)。降级**不中断**本命令、**不静默切换**门禁集，也**不得**被当作通过。
+
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 
 - Resolved reconcile scope; the persistent declaration `docs/.speckit/target-structure.md` (bootstrap template: `.specify/skills/create-docs/assets/docs-target-structure-template.md`; managed region bounded by `<!-- DOCS_TARGET_STRUCTURE_START -->` and `<!-- DOCS_TARGET_STRUCTURE_END -->`). The declaration lifecycle below is **command-owned** — `create-docs` consumes the confirmed managed block without rewriting the declaration.

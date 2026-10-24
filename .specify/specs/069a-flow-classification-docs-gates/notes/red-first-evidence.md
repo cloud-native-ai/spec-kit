@@ -508,3 +508,168 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 
 本段唯一提交含：检查器（新）、契约测试的一件 helper 修正、契约 C-6/C-7 两处补全、`tasks.md` 的
 T020/T021 勾选与本文件。commit 见 `git log -1 --format=%H`（分支 `069-execution-expression-sdd`）。
+
+---
+
+# Red-first evidence — 069a US2 接线段（T022–T027）
+
+**Scope**: W1–W4 最小接线、8 个命令副本重生成、US2 定向转绿与两条降级面实测。**不进入 US3（T028+）**。
+**Branch**: `069-execution-expression-sdd` | **起点 HEAD**: `550539d9`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+**Captured**: 2026-10-24（+0800）
+
+## 25. 接线落地（T022–T025）
+
+| # | 文件 | 位置 | 行 | 增补内容 | 负向约束（实测） |
+|---|------|------|----|----------|------------------|
+| W1 | `templates/commands/docs.md` | `## Outline` 内、`### 技能输入` 之前（第 32 行起，`### 技能输入` 现在第 38 行） | L32–L37 | ① `flow-class-check.py --action lookup --unit-id "/speckit.docs"`；② 两个 owner 指针 + 按 `/speckit.docs` 调用点行执行文档型算子（含 `doc-consistency-check.py --action verify`，三面；计数面委派；结构/链接/构建沿用 `docs-utils.py --action validate`；评审沿用 `/speckit.review`）；③ 降级可见（`source: default` 原样显示 `marker`；退出码 2 显示 `owner-unavailable` 且 `marker` 为 null，两标签互斥；不中断、不静默切换门禁集） | `## ` 顶级序列仍为 User Input / Glossary / Outline / Wrap-up / Handoffs（`test_a1_docs_template_keeps_its_top_level_sections` 绿）；无类别字面量、无归属断言、无判据/算子表副本 |
+| W3 | `skills/external/create-docs/SKILL.md` | `### Reconcile Loop` R6 verify（L85）与 `### Authoring Flow` R6 验证（L114），两处同一句 | L85 / L114 | 门禁 owner 指针 + 「当调用方已解析为文档型算子集时，对受触文档执行 `doc-consistency-check.py --action verify`（复用调用方同一次执行的输出）；owner 或引擎缺席时显式跳过」+ 分类 owner 指针（类别由调用方读取，本技能不新增读取） | `### Desired-State Baseline` 零改动；checker 非无条件硬依赖（前置条件 + 缺席显式跳过）；无类别归属断言 |
+| W2 | `templates/commands/humanize.md` | `## Outline` 内、委派段之前（`### 门禁归口` L24–L28；`### 委派（强制）` L30 承载原 Delegation 段） | L24–L28 | **仅**两个 owner 指针 + 「类别读取与最小算子集执行由委派技能在其 Stage 6 承担」 | 接线小节路径集合**恰等于**两个 owner 路径（`test_a2_...pointers_only` 绿）；零脚本调用、零 `flow-class-check.py` / `--action lookup` / `--unit-id` / `doc-consistency-check.py` / `feedback-utils.py` / `probe-utils.py`；全文 `SKILL.md` 仍 1 次、无 `## Wrap-up`；非表格行 40 → **48**（≤ 120） |
+| W4 | `skills/external/humanize/SKILL.md` | `### Stage 6 — 保真自检（交付前）` 段首（L81） | L81 | ① 该流程唯一一次 lookup（`--unit-id "/speckit.humanize"`）；② 一句 owner 指针（humanize 调用点行 = 最小集，不按六面登记；执行细则仍归本文件 Non-negotiables 与 Stage 6）；③ 缺席时 `owner-unavailable` 且 `marker` 为 null，未登记单元显示其 `marker`（两标签互斥），均不中断改写 | Stage 6 标题与 `diff_protected.py` 引用保留；lookup 落在 Stage 6 与 Stage 7 之间（`test_a4_...keeps_stage6_and_fidelity` 绿）；不回指命令模板路径；062 默认输出/报告契约零改动（`test_humanize_command_surface.py` 10 passed） |
+
+**一处实现裁定（记录以便复核）**：W2 要求「委派段之前」，而 A2 把「接线小节」的边界取到下一个 `###` 标题；两者叠加时委派段（含 `.specify/skills/humanize/SKILL.md`）会被并入接线小节，路径集合断言必然失败。裁定：给委派段补一个 `### 委派（强制）` 标题使其自成小节，接线小节位置与「只含两个 owner 路径」两条均成立；委派段文字逐字未改。
+
+## 26. 副本重生成（T026）
+
+```bash
+python3 scripts/python/regen-command-copies.py
+# Regenerated command copies for 4 tools.
+# Fixed drift: .github/prompts/speckit.{docs,humanize}.prompt.md
+#              .claude/commands/speckit.{docs,humanize}.md
+#              .opencode/command/speckit.{docs,humanize}.md
+#              .qoder/commands/speckit.{docs,humanize}.md   （8 个）
+python3 scripts/python/regen-command-copies.py --check
+# OK: all per-tool command copies match the source templates.   （exit 0）
+```
+
+逐副本实测（`grep -c`）：
+
+| 副本 | `flow-class-check.py` | `--action lookup` | `expression-gates.md` | `doc-consistency-check.py` | `flow-class-definitions.md` |
+|------|----------------------|-------------------|----------------------|---------------------------|----------------------------|
+| `.claude/commands/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.github/prompts/speckit.docs.prompt.md` | 1 | 1 | 1 | 1 | — |
+| `.opencode/command/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.qoder/commands/speckit.docs.md` | 1 | 1 | 1 | 1 | — |
+| `.claude/commands/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+| `.github/prompts/speckit.humanize.prompt.md` | **0** | 0 | 1 | 0 | 1 |
+| `.opencode/command/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+| `.qoder/commands/speckit.humanize.md` | **0** | 0 | 1 | 0 | 1 |
+
+副本全部由生成器写出（MUST NOT 手写），无一被手工编辑。
+
+## 27. US2 定向转绿（T027）
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gate_wiring.py \
+  tests/contract/test_expression_gates_doc.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py -q
+# 71 passed in 4.46s   （exit 0）
+```
+
+| 文件 | 收集 | 结果 |
+|------|------|------|
+| `tests/contract/test_expression_gate_wiring.py` | 14 | 全绿（接线前 8 红 → 0） |
+| `tests/contract/test_expression_gates_doc.py` | 18 | 全绿（保持） |
+| `tests/contract/test_doc_consistency_checker.py` | 25 | 全绿（保持） |
+| `tests/unit/test_doc_consistency_rules.py` | 14 | 全绿（保持） |
+
+相邻回归（接线改变的是既有表面，扩大一次核对面）：
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  <上列 4 支> tests/unit/test_flow_class_check.py tests/contract/test_flow_class_ledger.py \
+  tests/contract/test_docs_command_template.py tests/contract/test_humanize_command_surface.py -q
+# 138 passed in 11.54s   （exit 0）
+```
+
+## 28. 两条降级面实测（T027，真实输出）
+
+**A. 空树（无 `skills/`、无 owner）跑 `--action check`** —— 报缺口、非零退出：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069a-t027-empty
+owner-unavailable: owner document unreadable: .../069a-t027-empty/shared/definitions/flow-class-definitions.md
+  ([Errno 2] No such file or directory: ...)
+# exit code: 2
+```
+
+**B. owner 在位但树内无 `templates/` + `skills/`** —— 缺口逐条报出、退出码 1：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action check --repo ~/tmp/069a-t027-noskills
+flow-class check: 0 unit(s) scanned, 80 finding(s)
+  [unknown] /speckit.agents — ledger unit is absent from the inventory
+  [unknown] /speckit.analyze — ledger unit is absent from the inventory
+  ...（逐单元，共 80 条）
+# exit code: 1
+```
+
+**C. owner 在位但无台账段 → `--action lookup`** —— 默认类语义 + `marker` 为 null + `owner-unavailable`：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs" --repo ~/tmp/069a-t027-noledger
+owner-unavailable: owner document has no '逐流程台账' section
+unit_id: /speckit.docs
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+# exit code: 2
+```
+
+**对照（另一降级标签）** —— 所有者可解析、单元未登记：
+
+```text
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.undeclared-probe"
+unit_id: /speckit.undeclared-probe
+flow_class: execution
+source: default
+marker: 未声明·按默认
+basis: null
+neutral: false
+# exit code: 0
+```
+
+两标签互斥得到实测：`marker = 未声明·按默认`（exit 0）与 `marker = null` + `owner-unavailable`（exit 2）
+从不同时出现；两条路径都保留默认类语义、都不中断流程。
+
+## 29. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract -q
+# 40 failed, 4246 passed, 5 skipped, 1 warning in 213.79s
+# 基线（HEAD 01d1feaa）：33 failed, 4177 passed, 5 skipped
+```
+
+新增失败 **7 条**，全部同源 = US1/US2-前半新增的 4 个文件尚未生成 `.specify/` 镜像（`.specify/scripts/python/`、
+`.specify/shared/`），与接线无关：
+
+```text
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/doc-consistency-check.py -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/flow-class-check.py -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/flow-class-definitions.md -> .specify/...]
+test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/workflow/expression-gates.md -> .specify/...]
+test_scripts_distribution_parity.py::test_repo_has_no_orphan_or_drifted_scripts
+test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+（末条同因：`sync-mirrors.py --check` 在传播链第 3 步因同一批缺失镜像返回 2）
+```
+
+`tests/unit` 全量：**811 passed**（76.68s），零新增失败。
+
+## 30. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `.specify/scripts/python/{flow-class-check,doc-consistency-check}.py` 与 `.specify/shared/{definitions/flow-class-definitions,workflow/expression-gates}.md` 镜像缺失 | 缺 4 个镜像；由此派生 7 条契约红（见 §29） | T033（镜像同步先于 T034 全量核验） |
+| 其余 6 条历史红 | 与基线一致的既有失败，本段零触碰 | 非本切片 |
+| W2 的「委派段之前」与 A2 段落边界的张力 | 已按「给委派段补 `###` 标题」裁定，见 §25 的实现裁定 | 若评审另有裁定，回退只需删除该标题并与 A2 同步 |
+
+## 31. 本段提交
+
+本段唯一提交含：W1–W4 四个接线文件（2 个命令模板 + 2 个技能源）、两个技能源对应的 `.specify/skills/` 镜像、
+8 个重生成的命令副本、`tasks.md` 的 T022–T027 勾选与本文件。commit 见 `git log -1 --format=%H`
+（分支 `069-execution-expression-sdd`）。
