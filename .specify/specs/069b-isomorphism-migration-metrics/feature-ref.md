@@ -75,6 +75,11 @@ SC-004 的两名判定者是**人工并列证据**：未执行时记 `not-evalua
 - **登记更新**：`.specify/memory/features/069.md` § Related Specifications 追加本切片 plan 产物清单；
   § Status Tracking 追加「069b plan landed · 2026-10-25」一行。`features.md` 的 069 行只更新 Last Updated 单元格（不改状态列）。
 - **分类一致性**：069 为 functional / 框架治理类（与既有登记一致），本切片不改变分类。
+- **Tasks 阶段复核（2026-10-25，`/speckit.tasks`）**：零新增 Feature、零废弃/合并；父状态仍 `Planned`（`069a = Implemented` /
+  `069b = tasks 已落盘、implement 待启`）。任务行合计 29（Setup 3 / US1 6 / US2 4 / US3 10 / Polish 6），MVP = US1；
+  8 支红先测试与 51 条款一一对应（每个契约内认领顺序单调递增）；三条门禁机器绿（`validate-tasks.py` 0 error / 0 warning、
+  `pre-analyze-check.py --stage tasks` errors=0、`decomposition-check.py --mode tasks` `proceed`）。登记只追加
+  § Status Tracking 的 tasks 行与 Last Updated，不推进状态列。
 
 ## 6. 与父规格的关系
 
