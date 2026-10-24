@@ -41,6 +41,8 @@ python3 scripts/python/validate-requirements.py .specify/specs/069a-flow-classif
 python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
   --spec-dir .specify/specs/069a-flow-classification-docs-gates --stage requirements
 #   → decision=pass errors=0 advisories=0 (fr=27 sc=8)
+#     注：advisories=0 是 requirements 阶段（设计产物落盘前）的值；设计产物落盘后同命令复测为
+#     79 条 missing-path advisory（全部指向尚待创建的新文件），decision 仍为 pass（2026-10-24 checklist 阶段复测）
 
 /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest --collect-only -q tests
 #   → 5361 tests collected in 1.52s (exit 0)
@@ -157,7 +159,7 @@ python3 scripts/python/regen-command-copies.py --check
 #   判据：OK（判的是「生成物 = 源模板」，不是「模板未改」）
 
 # (b) 镜像：源与镜像同字节（含两个技能的新增行）
-python3 scripts/python/sync-mirrors.py --write --only shared,scripts,skills
+python3 scripts/python/sync-mirrors.py --write --only shared --only scripts --only skills
 python3 scripts/python/sync-mirrors.py --check
 
 # (b) 接线本身（由 tests/contract/test_expression_gate_wiring.py 钉住；此处给人工复核形态）
@@ -183,7 +185,7 @@ grep -rn "flow-class-check.py\|expression-gates.md\|doc-consistency-check.py" \
 | 异常态（只拷了模板/只拷了脚本） | 调用点存在但目标缺失 | lookup 失败 → 默认类 + 固定标记（或 `owner-unavailable`），保持既有门禁、不中断、不静默切门禁集 |
 
 **前提**：① 三个哈希是**当前**值，`tests/contract/test_expression_compatibility.py` 以同样方式重算并比对；
-② `sync-mirrors.py --only` 接受逗号分隔前缀（`pair_subprefixes` 实测语义）；③ `.specify/` 侧不得手改；
+② `sync-mirrors.py --only` 是**可重复旗标**（`action="append"`，实测 `--only shared,scripts,skills` 作为单个前缀返回 exit 2 `--only prefix matches no mirror pair or regen surface`）；③ `.specify/` 侧不得手改；
 ④ 每工具命令副本是生成物——只改模板不重生成 = 假绿，由 `test_expression_gate_wiring.py` 的副本内容断言兜住。
 
 ---

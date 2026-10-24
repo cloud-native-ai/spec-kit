@@ -147,7 +147,7 @@ tests/unit/test_doc_consistency_rules.py       # 新增：归一化、排除项�
 - **首批成员**：`/speckit.docs` 与 `/speckit.humanize` 登记进台账并做**最小接线**（各在命令模板加一个 lookup + owner 指针小节，各在其技能加一条 owner/checker 指针）。062 的表面断言与「不削弱既有行为」同时被保住：humanize 只引用门禁 owner，保真细则仍归 062 技能（见 § Minimal Designated Wiring）。
 - **兼容与分发**：两份 owner 文档与两个引擎随 `shared/` + `scripts/` 经 `specify init` 到达；不新增项目侧存储。未刷新项目只有旧命令副本与旧技能（无 lookup、无 owner、无引擎）→ **没有调用点、行为不变**；刷新时命令副本与 `shared/` + `scripts/` 由同一发行包一次到位，接线生效；投影/刷新不完整时 lookup 失败即按默认类 + 标记降级并显式报告（不中断、不静默切门禁集）。
 
-**No standalone requirement leftovers**: `requirements.md` 无 `[NEEDS CLARIFICATION]`；`pre-analyze-check.py --stage requirements` 实测 `decision=pass`（errors=0 / advisories=0 / fr=27 / sc=8）。
+**No standalone requirement leftovers**: `requirements.md` 无 `[NEEDS CLARIFICATION]`；`pre-analyze-check.py --stage requirements` 实测 `decision=pass`（errors=0 / advisories=0 / fr=27 / sc=8）。advisories 一行是 requirements 阶段（设计产物落盘前）的值；设计产物落盘后同命令复测为 79 条 `missing-path` advisory（全部指向尚待创建的新文件），`decision` 仍为 `pass`（2026-10-24 checklist 阶段复测）。
 
 ## Phase 1: Design & Contracts
 
@@ -186,7 +186,7 @@ Phase 1 产物与边界（判据正文在各自 owner，本计划不复述）：
 |------|----------------------|
 | `docs.md` 的 `## ` 顶级章节序列不得变（接线只能用 `###`） | `tests/contract/test_docs_command_template.py::test_c3_section_order` |
 | `humanize.md` 中 `SKILL.md` 只可出现一次（接线文字不得再提技能路径） | `tests/contract/test_humanize_command_surface.py::test_c02_single_skill_delegation` |
-| `humanize.md` 非表格行 ≤ 120 且不得含行为细则关键词（`rubric` / `评审记录` / `评分表` / `盲评`） | 同上 `test_c01_thin_entry_shape` |
+| `humanize.md` 非表格行数 ≤ 120（`test_c01` 断言的是**非表格行条数**，当前 40 条）且不得含行为细则关键词（`rubric` / `评审记录` / `评分表` / `盲评`） | 同上 `test_c01_thin_entry_shape` |
 | `humanize.md` 不得出现 `## Wrap-up` / `feedback-utils.py` / `probe-utils.py`（Simple 形态） | 同上 `test_c01_thin_entry_shape` |
 | `create-docs`/`humanize` 的技能源与 `.specify/skills/` 镜像必须同字节 | `tests/contract/test_docs_command_template.py::test_c12_skill_source_mirror_byte_identity` |
 | `scripts/**` 的 `.py` 不得出现 `humanize` 字样（含注释与示例；`conftest.py` 例外） | `tests/contract/test_humanize_command_surface.py::test_c08_no_runtime_surface` |

@@ -15,7 +15,7 @@
 **Evidence**:
 - 目录惯例：`shared/definitions/` 现有 10 份 `<域>-definitions.md`（`ls shared/definitions/` 实测：agent / contract-clause / derivation / dogfooding / framework-map / goal / probe / self-improvement / subagent / tool）。
 - 落点已由 clarify 裁定并写入 `.specify/memory/features/069.md` § Implementation Notes；
-  `.specify/memory/glossary.md` 的两行（`流程分类 (Flow Class)` / `执行类流程`）已把该路径登记为 owner。
+  `.specify/memory/glossary.md` 的 `流程分类 (Flow Class)` 行（第 177 行）已把该路径登记为 owner，同批另有 `执行类流程` / `表达类流程` / `文档型门禁` 三行命名概念但不登记路径。
 - `shared/definitions/framework-map.md` 只按**目录**描述 `.specify/shared/`（第 21 行），不逐文件登记，故新增定义文件不需要改该 map。
 
 **Rejected**: 放进 `shared/workflow/`。理由：workflow 目录拥有的是可执行步骤（如 `evidence-step.md`），分类是**定义性事实**，与 `tool-definitions.md` 同类。
@@ -63,7 +63,7 @@
 **Revision（2026-10-24，接线修订）**: 原稿「模板零改动」使分类与门禁**没有任何读取点**——引擎与 owner 只是文档与脚本，不构成可门禁能力，也与 FR-015「门禁在判定之前从唯一所有者读取类别」不符。修订为**最小指定接线**：
 两个命令模板各加一个 `###` 小节，只含 lookup 调用与 owner 指针；`create-docs` 技能另加一句 checker 调用要求，`humanize` 技能加一句 owner 指针。
 类别字面量仍被禁止（被禁的是副本，不是读取）；算子表仍只在门禁 owner（模板不复述）。
-既有表面约束由既有测试继续钉住：`docs.md` 的 `## ` 顶级章节序列（`test_c3_section_order`）、`humanize.md` 的唯一一处 `SKILL.md` 与无 `## Wrap-up` 及非表格行 ≤ 120（`test_c01`/`test_c02`）。
+既有表面约束由既有测试继续钉住：`docs.md` 的 `## ` 顶级章节序列（`test_c3_section_order`）、`humanize.md` 的唯一一处 `SKILL.md` 与无 `## Wrap-up` 及非表格行数 ≤ 120（`test_c01`/`test_c02`）。
 
 ---
 

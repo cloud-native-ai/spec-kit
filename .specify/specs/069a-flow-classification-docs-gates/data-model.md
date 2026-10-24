@@ -120,7 +120,7 @@ E8 是每特性一份的 Markdown 记录（随规格入库）。
 | Field | Type | Notes |
 |-------|------|-------|
 | `face` | enum | `reader` \| `evidence` \| `duplicate` \| `count` |
-| `rule` | string | `reader-declaration-missing` \| `as-of-malformed` \| `as-of-stale` \| `grade-asof-unpaired` \| `duplicate-fact` \| `count-mismatch` |
+| `rule` | string | `reader-declaration-missing` \| `as-of-malformed` \| `as-of-stale` \| `grade-asof-unpaired` \| `grade-invalid` \| `duplicate-fact` \| `count-mismatch`（取值集合与 `contracts/doc-consistency-checker.md` C-3/C-4/C-5/C-6 一一对应） |
 | `path` | string | 仓库相对路径 |
 | `line` | int | 起始行（1 基） |
 | `snippet` | string | ≤ 120 字符的定位片段 |
