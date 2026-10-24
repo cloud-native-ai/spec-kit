@@ -256,3 +256,29 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Real output**: `6 failed, 6 deselected in 0.08s`; exit code `1`.
 - **Failing group (real)**: every case fails with `AttributeError: module 'fixtures.wp_driver_sim' has no attribute 'results_from_schedule'` (or `run_stage`/`verify`/`integrate`); the verification/integration dry-run path is unimplemented.
 - **Red-first claim**: all six scenario assertions are red before T022 and none is skipped or weakened.
+
+## T022 — verification/integration simulator and runtime-owner sections (green)
+
+- **Date**: 2026-10-24T17:55Z
+- **Host**: Linux x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths (implementation)**:
+  - `tests/fixtures/wp_driver_sim.py` (`results_from_schedule`, `verify` VI-01…VI-06, `integrate` VI-06…VI-14, `run_stage`)
+  - `skills/external/sdd-loop-driver/references/decomposition-model.md` (§15 independent verification, §16 integration and stage close; the former §15 non-regression becomes §17)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `79 passed in 0.24s`; exit code `0` (67 contract: 34 SD + 33 VI; 12 dry runs: 6 SD + 6 verification/integration).
+- **Red-to-green**: T020 `18 failed, 15 passed` + T021 `6 failed` → `79 passed`.
+- **Per-file split**: coordination `67 passed in 0.19s`; dry runs `12 passed in 0.07s`.
+- **Adjacent green**:
+  - `python3 -m pytest -q tests/unit/test_wp_gate.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py` → `151 passed in 4.83s`.
+  - Existing driver targeted suite (`test_decomposition_check.py`, `test_pre_analyze_check.py`, `test_overlap_check.py`, `test_sdd_loop_driver_gates.py`, `test_sdd_loop_driver_skill.py`) → `65 passed in 18.03s`, identical to the pre-change baseline.
+- **Simulator interpretations (disclosed)**:
+  - Verification is a separate step over settled E5 results (`verify()`); `schedule()` remains the dispatch model. `run_stage()` composes schedule → verify → integrate for the dry runs.
+  - A verifier starts at the package's settle tick and ends one logical tick later; the integrator starts one tick after the last verdict and ends one tick later; stage U4 is one tick after the integrator. All assertions are interval/order relations, not wall-clock.
+  - A contradiction is two sources (verified packages and/or the integrator) claiming one output path with different content; both evidence pointers are reported. An output outside `required_outputs` is a coverage conflict because VI-06 requires exact coverage.
+  - For a verified package with no result record, `integrate()` uses its declared outputs (dry-run convenience, documented in the function docstring); a real run reads the E5 result.
+  - `driver-u4` is produced only under `host_can_spawn=False`; `execution_id` remains distinct from the executor and the fallback is recorded on the verdict event.
+  - `implement` part commits are read from E5 `commits`; a non-implement result carrying commits is `package-commit-forbidden`. The closing commit is a deterministic simulator token; the live stage performs the actual git commit under VI-09/VI-10.
+- **Mirror note**: `skills/external/sdd-loop-driver/` is the source of truth; `.specify/skills/sdd-loop-driver/` is generated and remains unsynced until T037 (existing drift from S2/S3 is unchanged by this row).

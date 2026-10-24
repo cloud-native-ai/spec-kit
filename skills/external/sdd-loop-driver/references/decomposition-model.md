@@ -1,7 +1,7 @@
-# Decomposition Model — Runtime Owner (Parts 1–2)
+# Decomposition Model — Runtime Owner (Parts 1–3)
 
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
-**Status**: runtime-owner projection, parts 1–2: the Work Package model and the scheduler/retry procedure. The verification/integration (T022), preset-adapter (T025), and observability (T029) sections land with their owning task rows; this file does not pre-empt them.
+**Status**: runtime-owner projection, parts 1–3: the Work Package model, the scheduler/retry procedure, and independent verification/integration. The preset-adapter (T025) and observability (T029) sections land with their owning task rows; this file does not pre-empt them.
 
 **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/contracts/` and `.specify/specs/070-subagent-task-teams/data-model.md`. This document owns *how the driver applies* those clauses at runtime. Where a field name, check code, path pattern, or event field is fixed, the contract clause is authoritative; this file points to it instead of restating its table.
 
@@ -205,6 +205,46 @@ A package failing twice, or a split child failing at all, records `wp_failed` wi
 
 `tests/fixtures/wp_driver_sim.py` is a **test-only** deterministic model of the algorithm above. It proves the mechanical rules (readiness, ordering, slot cap, write-alone, collection, isolation, re-entry), not an LLM's adherence to the prompt; live claims require spine evidence (research.md R4, plan.md R-12).
 
-## 15. Non-regression boundaries
+## 15. Independent verification (VI-01…VI-06)
+
+Every settled package is verified by exactly one fresh-context **stage-verifier** execution that is not the package's executor (VI-01). The verifier is read-only with respect to repository content: it may run the package's declared targeted tests, including the existing `targeted-set-v1` selection, but never a full suite (VI-02; the two-slot test budget is unchanged). A native topology uses one host subagent; a detached topology uses `stage-runner.sh` labeled `<stage>-<wp_id>-verify`; when the host cannot spawn a subagent, the driver itself verifies as `driver-u4`, records `host-no-subagent`, and remains structurally independent of the executor.
+
+The verdict is written to `<state-dir>/wp/<line>-<stage>-<wp_id>-a<N>w<M>.verdict.json` and carries the E6 fields: `schema_version`, identity, `verdict`, `checks[]` covering every acceptance criterion, `evidence_refs[]`, the verifier's `execution_id`, and `verified_at` (VI-03; the schema is owned by `data-model.md` E6). The driver appends a `verdict` ledger event `{wp_id, verdict, verifier_execution, evidence_ptr, at}` after reading the file; a package without that event is not verified (VI-05).
+
+A missing, unreadable, malformed, or ambiguous verdict counts as `fail` (VI-04). Success is never inferred from a package self-report, a missing file, or a package sentinel. A dependent unlocks only on the resulting `verdict=pass` plus its evidence pointer (SD-02, SD-12).
+
+### 15.1 Verdict failure handling
+
+| Verdict artifact | Ledger event | Package state |
+|---|---|---|
+| valid `pass` | `verdict=pass` | verified; dependents may unlock |
+| valid `fail` | `verdict=fail` | unverified; dependents stay blocked |
+| missing / unreadable / malformed / ambiguous | `verdict=fail` with the expected path as `evidence_ptr` | unverified; dependents stay blocked |
+
+The attempt-scoped path is owned by WP-11. Verifier executions do not consume the slot cap and are excluded from package durations and parallelism efficiency (`data-model.md` E7, V-EXE.3/V-EXE.4).
+
+## 16. Integration and stage close (VI-07…VI-14)
+
+After every dispatchable package settles, the driver aggregates the verified verdict set (VI-06). Coverage is checked against `required_outputs` minus `integrator_outputs`: package outputs must cover the former exactly, while every `integrator_outputs` entry is expected from the single integrator seat. Missing or contradictory outputs are surfaced with both evidence pointers; a contradiction is two sources claiming one output path with different content.
+
+Verified outputs are integrated in topological layers, each layer sorted by `wp_id` lexicographic (VI-07). The order is declared by the plan and recorded in the `integrate` event; it is not the dispatch order. An integration conflict or a missing output stops integration, fails the stage gate, and leaves no partial commit presented as a complete stage deliverable (VI-08).
+
+For `decision=decomposed`, one `stage-integrator` execution per stage attempt receives the plan, the verified outputs, and the stage authority artifacts (VI-11). It aggregates in the declared order, produces the plan's `integrator_outputs`, makes the single closing commit, and emits `<STAGE>-DONE` as its last non-empty line. `integrator_outputs` belong to this seat, are excluded from package coverage (WG-08), and are verified by the stage U4. The integrator never dispatches a package, never re-plans, and never loads the driver.
+
+Package sentinels are never promoted: only the integrator's `<STAGE>-DONE` satisfies the stage requirement, while a `WP-…-DONE` package sentinel never satisfies it (VI-12). The single-package path is the stage execution itself, so its sentinel is the stage sentinel.
+
+### 16.1 Commit discipline (VI-09, VI-10)
+
+For stages without a part-commit discipline (`plan`, `review`, `analyze`, `clarify`), package executors do not commit; the integrator makes the single closing commit after integration (VI-09). For `implement`, the 067 part-commit discipline is preserved: part commits stay as they are, and the closing commit covers the remaining integrated deliverable without rewriting, squashing, or bypassing them (VI-10).
+
+### 16.2 Unchanged stage U4 and closure (VI-13, VI-14)
+
+After integration the driver runs the unchanged stage U4: the stage sentinel is necessary, artifact verification is required, and discipline checks are required; package verdicts are inputs and never substitutes (VI-13). A failed package or a failed U4 fails the stage gate.
+
+Closure and merge stay driver-owned under 058 and 064: this layer does not push, force-merge, or auto-merge, and preserves the existing confirmation gates (VI-14). The `integrate` event, the stage U4, `wp-report.py`, and the `stage-close` event follow in that order (OR-03, OR-11).
+
+The deterministic simulator in `tests/fixtures/wp_driver_sim.py` models this part as `verify()` plus `integrate()`; like section 14.1 it proves the mechanical rules, not an LLM's adherence.
+
+## 17. Non-regression boundaries
 
 This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, stall handling, the fast lane, the two-slot test budget, the plan minor-fix constraint, Feature 064's registry/ownership/worktree/integration semantics, Feature 067's part brief and test economics, or Feature 068's feedback channel. Preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated.

@@ -263,7 +263,7 @@ The task breakdown introduces no new Feature, merge, or split: the 39 task rows 
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Write the verification and integration sections of `decomposition-model.md` (verifier seat, verdict schema, aggregation, integration order, conflict stop, integrator `integrator_outputs` ownership, closing commit, unchanged U4), extend `tests/fixtures/wp_driver_sim.py` with independent verdicts and integration order, and turn the T020/T021 US3 cases green. Test anchor: the US3 test files; evidence: `notes/red-first-evidence.md`. [blockedBy: T020,T021]
+- [x] T022 [US3] Write the verification and integration sections of `decomposition-model.md` (verifier seat, verdict schema, aggregation, integration order, conflict stop, integrator `integrator_outputs` ownership, closing commit, unchanged U4), extend `tests/fixtures/wp_driver_sim.py` with independent verdicts and integration order, and turn the T020/T021 US3 cases green. Test anchor: the US3 test files; evidence: `notes/red-first-evidence.md`. [blockedBy: T020,T021]
 - [ ] T023 [US3] Verify US3: run the VI contract cases and the verification/integration dry runs, record the red-to-green evidence, append a targeted stage-status row, and confirm quickstart Scenarios D and F have passing assertions or recorded reasons. Test anchor: the US3 test files; evidence: `notes/red-first-evidence.md` and `test-evidence/implement-stage-status.jsonl`. [blockedBy: T022]
 
 **Checkpoint**: US3 is independently testable: a missing or contradictory output stops integration, a clean set is integrated in graph order, and the stage U4 remains the final authority.
