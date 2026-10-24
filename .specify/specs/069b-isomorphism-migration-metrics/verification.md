@@ -14,8 +14,8 @@ baseline_commit=4710676297dcdbcaabb72f6dc7882abfae906006
 baseline_date=2026-10-25
 baseline_branch=069b-isomorphism-migration-metrics
 implementation_date=2026-10-25
-post_change_commit=<pin: 本文件落地提交的 SHA，由紧随的仅改本行的 pin 提交回填>
-post_change_commit_pin=single-line follow-up commit; this run's log is landed by the commit named in post_change_commit
+post_change_commit=3ccf8ce41fe49aba57f2cc302cd156155285dd24
+post_change_commit_pin=that commit lands this log; the single-line follow-up commit that substitutes this value changes nothing else
 deferred_tasks=
 ```
 
