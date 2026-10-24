@@ -255,3 +255,153 @@ owner-unavailable: owner document unreadable: <TMPD>/shared/definitions/flow-cla
 
 commit: 见 `git log -1 --format=%H` 于 `069-execution-expression-sdd`（本文件与引擎、三支测试、
 契约 C-7、data-model E9、feature-ref FR-016、tasks T006/T009–T012 同一提交）。
+
+---
+
+# Red-first evidence — 069a US2 前半（T013 / T014 / T015）与门禁 owner 转绿（T016–T019）
+
+**Feature**: 069a-flow-classification-docs-gates（父 069） | **Scope**: US2 的三支红先测试 + `shared/workflow/expression-gates.md`
+**Branch**: `069-execution-expression-sdd` | **HEAD（本段开始）**: `6c519ae173548e7dffd0004695eb41c15b5e2111`
+**Interpreter**: `/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest`（pytest 9.1.1）
+**Captured**: 2026-10-24T14:05:44Z
+
+## 13. 红跑：三支 US2 测试（owner 落盘前）
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py \
+  tests/contract/test_doc_consistency_checker.py \
+  tests/unit/test_doc_consistency_rules.py \
+  tests/contract/test_expression_gate_wiring.py \
+  -q --tb=line -p no:cacheprovider
+# exit code: 1
+# 64 failed, 6 passed in 0.73s   （捕获时 70 支；T014 随后补入 1 支 S3 对照侧测试，
+#                                  同属 engine-missing 族，故当前为 71 支 / 65 failed）
+```
+
+采集面自检（同一解释器、同一树）：
+
+```text
+pytest <四文件> --collect-only -q  →  70 tests collected (exit 0)
+python -m py_compile <四文件>       →  COMPILE-OK (exit 0)
+```
+
+红的原因（三族，均为「目标产物缺失」，无 collection / import / 语法错误）：
+
+| 断言族 | 触发点 | 失败数 | 交付行 |
+|--------|--------|--------|--------|
+| owner missing | `_read_owner()` → `shared/workflow/expression-gates.md` 不存在 | 18 | T016 / T017 / T018 / T019 |
+| engine missing | `_run()` → `scripts/python/doc-consistency-check.py` 不存在 | 38（契约 24 + 单元 14；补入 1 支后为 39） | T020 / T021 |
+| wiring missing | `_outline_wiring_section()` / 技能 token 段 / 命令副本 | 8 | T022 / T023 / T024 / T025 |
+| **合计** | | **64** | 与 `64 failed` 一致 |
+
+逐字输出（三族各取首条）：
+
+```text
+E   AssertionError: expression-gate owner missing: shared/workflow/expression-gates.md — expected at
+    T016/T017/T018/T019 (069a). Red is the intended pre-implementation state for T013.
+E   AssertionError: doc-consistency checker missing: scripts/python/doc-consistency-check.py — expected
+    at T020/T021 (069a). Red is the intended pre-implementation state for T014.
+E   AssertionError: wiring subsection missing in docs.md — expected a `###` block under `## Outline`
+    naming shared/workflow/expression-gates.md or the engines (T022/T025, 069a). Red is the pre-wiring state.
+```
+
+### 13.1 实现前即通过的 6 支（负向守卫，不是「已实现」）
+
+| 测试 | 现在为何通过 | 实现后仍须保持 |
+|------|--------------|----------------|
+| `test_expression_gate_wiring.py::test_a1_docs_template_keeps_its_top_level_sections` | docs 模板顶级章节未动 | 接线只新增 `###` 小节，不改 `## ` 序列 |
+| `…::test_a2_humanize_template_stays_simple` | 现模板 1 处 `SKILL.md`、无 `## Wrap-up`、非表格行 ≤ 120 | W2 只加 owner 指针，保持 Simple |
+| `…::test_a5_no_class_key_assignment_or_ledger_row` | 四个接线文件零类别键赋值、零台账样式行 | 接线只写 lookup 与指针 |
+| `…::test_a6_wiring_set_is_closed` | 其余 25 模板 / 49 技能零引擎与 owner 引用 | 接线封闭集只有 W1–W4 |
+| `…::test_a6_wiring_inventory_matches_the_frozen_denominator` | 实测 27 模板 + 51 技能 | 分母不变 |
+| `…::test_pre_completion_specs_stay_byte_identical` | 062 / 067 / 068 `requirements.md` sha256 与冻结值一致 | SC-008 |
+
+## 14. 绿跑：T016–T019 门禁 owner
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+  tests/contract/test_expression_gates_doc.py -q -p no:cacheprovider
+# exit code: 0
+# 18 passed in 0.33s
+```
+
+owner 落地后同一批四文件的逐文件状态（红仍是「实现缺失」，不是测试缺陷）：
+
+```text
+tests/contract/test_expression_gates_doc.py      18 passed                      （T013 转绿）
+tests/contract/test_doc_consistency_checker.py   25 failed                      （T020/T021 交付前保持红；含事后补入的
+                                                                                  `test_c05_s3_owner_set_is_the_reference_side_only`，
+                                                                                  同属 engine-missing 族）
+tests/unit/test_doc_consistency_rules.py         14 failed                      （T020/T021 交付前保持红）
+tests/contract/test_expression_gate_wiring.py     6 passed / 8 failed           （8 支全部等 T022–T025 接线）
+```
+
+8 支红全部依赖接线本体：A1/A2 取 `## Outline` 内的接线小节，A3/A4 取技能内的 owner/引擎 token 段，
+A5 依赖 `_wiring_texts()`（接线出现前无从取样），A7 依赖重生成后的 8 个命令副本。故它们与接线同批转绿
+（归属 T022–T025），不属 T016–T019 的绿义务。
+
+## 15. 本段落地物与判据
+
+| 交付行 | 落点 | 该行绿义务 |
+|--------|------|-----------|
+| T013 | `tests/contract/test_expression_gates_doc.py`（18 支） | 自身为红先测试；T016–T019 落地后 18/18 转绿 |
+| T014 | `tests/contract/test_doc_consistency_checker.py`（24 支）+ `tests/unit/test_doc_consistency_rules.py`（14 支） | 交付 T020/T021 后转绿 |
+| T015 | `tests/contract/test_expression_gate_wiring.py`（14 支，A1–A7 + 两条守卫 + SC-008） | 交付 T022–T025 后 8 支转绿 + 6 支守卫保持绿 |
+| T016 | `shared/workflow/expression-gates.md` § 六面（封闭集） | C-1 |
+| T017 | 同上 § 阶段算子表 / § 阻断级别 | C-2 / C-3 |
+| T018 | 同上 § 读者声明 / § 证据分级与 as-of / § 结构… / § 事实一致性 / § 评审 / § 三项基线 / § 算子去重 | C-4…C-10 |
+| T019 | 同上 § 阶段不变量 / § 与复杂度轴正交 / § 调用点表 / § 调用时机与降级 / § 与首批成员的关系 | C-11…C-15 |
+
+## 16. 本段自行裁决的三处实现接口（测试即规格，记录以便 T020+ 复用）
+
+1. **证据标注的行语法**：一行只有出现标记 `证据：` 才被视为带标注的断言行；等级取标记后第一个 token，
+   `as-of <YYYY-MM-DD>`，`source: <文本>` 必填。理由：若以裸 `实测 / 推断 / 引用` 判定，规格产物里
+   大量「实测」叙述会被误判为标注行。语法已写入门禁 owner § 证据分级与 as-of（判据 owner 是本文件，
+   故语法不属第二来源）。
+2. **「接线小节」的定位方式**：命令模板按内容锚定——`## Outline` 内第一个提到 owner 路径或引擎的
+   `###` 小节；技能按 token 所在 `###` 块提取。这样 W1/W2 的小节标题由实现者自选，位置与内容仍被钉住。
+3. **`--faces` 缺省 = 四面**、`--path` 缺省时 `reader` 面为 `not-applicable`、无 `--spec-dir` 时 `count`
+   为 `not-run`（带 reason）：三项均取自契约 C-1 / C-4 / C-6 的既有措辞，未新增语义。
+
+## 17. 未关闭项（本段不修，按任务归属登记）
+
+| 项 | 现状 | 归属 |
+|----|------|------|
+| `doc-consistency-check.py` | 不存在；38 支测试保持红属预期 | T020 / T021 |
+| W1–W4 接线与 8 个命令副本 | 未动；8 支接线测试保持红属预期 | T022–T025 |
+| 镜像漂移 | `shared/workflow/expression-gates.md` 尚无 `.specify/shared/` 镜像（与既有两对同类） | T033 |
+| `shared/workflow/feedback-step.md` 一行指针 | 未加：本段只声明正交契约（C-13）；指针行本体与 `shared/` 镜像同批落地，避免制造第二处未镜像漂移 | T033 |
+
+## 18. 全量契约套件对照（相对 `notes/test-baseline-contract.txt`）
+
+命令（排除本段三支新契约测试，避免把「红先」计成回归）：
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/pytest tests/contract -q --tb=no -p no:cacheprovider \
+  --ignore=tests/contract/test_expression_gates_doc.py \
+  --ignore=tests/contract/test_doc_consistency_checker.py \
+  --ignore=tests/contract/test_expression_gate_wiring.py
+# 39 failed, 4189 passed, 5 skipped, 1 warning in 225.69s
+```
+
+冻结基线是 33 条 node id。差值 6 条，**全部由缺少 `.specify/` 镜像引起**（归属 T033，本段按任务边界不写镜像）：
+
+| 新增失败 node id | 直接原因 | provenance |
+|------------------|----------|-----------|
+| `test_mirror_parity_suite…[scripts/python/flow-class-check.py->…]` | 引擎无镜像 | US1（本段之前已红） |
+| `test_mirror_parity_suite…[shared/definitions/flow-class-definitions.md->…]` | 分类 owner 无镜像 | US1（本段之前已红） |
+| `test_mirror_parity_suite…[shared/workflow/expression-gates.md->…]` | 门禁 owner 无镜像 | 本段新增文件 |
+| `test_trigger_engine.py::test_c2_sync_mirrors_check_clean` | `sync-mirrors --check` exit 2 | 同上（三处 MISS） |
+| `test_scripts_distribution_parity.py::…test_repo_has_no_orphan_or_drifted_scripts` | 同上 | 同上 |
+| `test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order` | 同上（第 3 步 sync --check） | 同上 |
+
+一处**本段引入并已当场修复**的回归（属 Fast Fail 的 in-passing 修复，披露于此）：
+
+- `test_one_source_of_truth.py::test_c6_single_source_sweep` 曾因门禁 owner 的 `owner_pointer` 写成
+  「`one-source-of-truth.md` § Declare the owner」而转红——该测试把 `Declare the owner` 视为只允许
+  出现在纪律文档里的章节名。修复：事实一致性面的指针改为「整文件即判据，无单章节锚」（该 owner 的
+  T016 原文本来也只给路径），修复后 `test_one_source_of_truth.py` 33 passed。
+
+结论：除上述 6 条镜像类（T033 义务）外，**零新增失败**；既有 33 红按纪律不修、不掩盖。
