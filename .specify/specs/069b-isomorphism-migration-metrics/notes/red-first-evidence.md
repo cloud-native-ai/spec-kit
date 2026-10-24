@@ -203,3 +203,154 @@ EXIT=0
 
 判读：R4 的 5 条红全部转绿，其余 11 条保持绿；零 skip、零 xfail。
 场景 6 的真实输出（未刷新零调用点、四类载荷、三快照 `comm -13`）见 `notes/quickstart-run.md` § 6。
+
+---
+
+## R5 — T014 红跑：`tests/contract/test_ledger_reconciliation.py`
+
+**HEAD at red run**: `7be06a08`（2026-10-25，工作树含本文件；引擎为 069a 交付态）。
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_ledger_reconciliation.py -q -p no:cacheprovider
+```
+
+真实输出（代表行）：
+
+```
+E   AssertionError: § 逐流程台账 MUST declare `**台账版本**: <int>（<YYYY-MM-DD>）` exactly once (C-5); found 0: []
+E   AssertionError: check JSON must carry a `coverage` block (contract C-2); got None
+E   AssertionError: check JSON must carry `red_kind` (C-3); keys=['action', 'checked_at', 'error', 'findings', 'inventory', 'repo', 'units']
+E   AssertionError: zero parsed rows over a non-empty inventory MUST report `ledger-truncated` (C-1); got ['missing', … ×78]
+E   AssertionError: basis=mixed-oracle + flow_class=expression MUST be `mixed-oracle-class` (C-7); got []
+E   AssertionError: a missing `**台账版本**` declaration MUST be `ledger-version-missing` (C-5); got []
+E   AssertionError: a duplicated declaration MUST reuse `row-malformed` (C-5); got []
+E   AssertionError: text output MUST print `matched` beside the empty set (C-2); got 'flow-class check: 78 unit(s) scanned, 0 finding(s)\n'
+E   AssertionError: check on a payload root MUST exit 2 (C-14); got 1 (findings=[unknown ×4, inventory-truncated ×2])
+
+21 failed, 1 passed in 1.81s
+EXIT=1
+```
+
+红形态判读：21 条红全部是「字段 / 声明 / 动作缺失」——`coverage` 块、`red_kind`、
+`ledger-truncated` / `ledger-version-missing` / `mixed-oracle-class` 三个新 kind、§ 逐流程台账 内的
+`**台账版本**` 声明、文本面的伴生量、payload-root 具名状态，069a 引擎与 owner 都没有。
+零 collection error（78 条中的 22 条被收集并执行）。唯一在红跑即绿的是
+`test_mixed_oracle_execution_row_is_accepted`：它断言「合法行不得误报」，实现前后都必须绿，
+绿本身不构成实现已存在。
+
+---
+
+## R6 — T015 红跑：`tests/contract/test_delegation_classes.py`
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_delegation_classes.py -q -p no:cacheprovider
+```
+
+真实输出（代表行）：
+
+```
+E   AssertionError: delegation on the real tree must be green; findings=None stderr="usage: flow-class-check.py [-h] --action {check,lookup,isomorphism}
+    … flow-class-check.py: error: argument --action: invalid choice: 'delegation' (choose from 'check', 'lookup', 'isomorphism')"
+E   AssertionError: a command delegating to the opposite class must exit 1; findings=None
+E   AssertionError: a class-neutral edge must stay green even across classes (C-8); findings=None
+E   AssertionError: a skill absent from the ledger must be `delegation-unknown-skill` (C-8); got []
+E   AssertionError: a ≥3-row command→skill table outside the templates must be `delegation-hand-list` (C-9)
+E   AssertionError: same-template same-skill MUST de-duplicate (C-8); got []
+
+10 failed, 2 passed in 0.93s
+EXIT=1
+```
+
+红形态判读：`--action delegation` 不在 argparse 的 `choices` 内 → 退出码 2、零 stdout；
+其余断言随后在「无动作」上失败。这是「动作缺失」，不是 import / collection error。
+红跑即绿的两条是「不应出现」类断言：`test_placeholder_skill_paths_are_not_edges`（占位路径
+`skills/<name>/SKILL.md` 不能被 C-8 语法的名字类匹配）与 `test_delegation_is_read_only`
+（动作缺失时天然零写入），不构成实现已存在。
+
+---
+
+## R7 — T016 红跑：`tests/contract/test_expression_faces.py`
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_expression_faces.py -q -p no:cacheprovider
+```
+
+真实输出（代表行）：
+
+```
+E   AssertionError: faces on the real tree must exit 0; findings=None stderr="usage: flow-class-check.py [-h] --action {check,lookup,isomorphism}
+    … flow-class-check.py: error: argument --action: invalid choice: 'faces' (choose from 'check', 'lookup', 'isomorphism')"
+E   AssertionError: a well-formed six-row fixture must exit 0; findings=None
+E   AssertionError: a five-row face table must exit 1
+E   AssertionError: a repeated face id MUST be `faces-duplicate` (C-11); got []
+E   AssertionError: a nonexistent pointer path MUST be `faces-unresolvable` (C-11); got []
+E   AssertionError: a ≥3-row face/path table outside § 六面 MUST be `faces-second-table` (C-12); got []
+
+9 failed, 5 passed in 1.15s
+EXIT=1
+```
+
+红形态判读：`--action faces` 同为「动作缺失」（argparse 退出 2、零 stdout）。红跑即绿的五条
+断言的是**当前已成立的不变量**：§ 六面 恰好 6 行 / face id 唯一 / 每行一个 owner_pointer 格、
+9 条真实指针路径与锚可解析、`doc-consistency-check.py --faces duplicate` 在封闭主体集上
+`findings = []`、S3 比较集为 9 条 owner 路径且不含分类 owner、以及 read-only。
+它们必须保持绿，红跑绿不构成 `--action faces` 已存在。
+
+---
+
+## R8 — T017 红跑：`tests/contract/test_measurement_instruments.py`
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_measurement_instruments.py -q -p no:cacheprovider
+```
+
+真实输出：
+
+```
+E   AssertionError: C-3 freezes the gate_calls filter set as the closed six-unit list; the record never names
+    ['skill:create-checklist', 'skill:analyze-artifacts', 'skill:review-sdd-process'] — a re-measurement at
+    wrap-up would have to re-pick the set
+    assert not ['skill:create-checklist', 'skill:analyze-artifacts', 'skill:review-sdd-process']
+
+1 failed, 12 passed in 0.37s
+EXIT=1
+```
+
+红形态判读：本文件的红是**记录内容缺失**——`notes/expression-baseline.md` 只写了「6 个检查类单元」，
+没有把 C-3 的封闭单元 id 列表落到冻结点，收尾复测将不得不重新回选集合。其余 12 条实测通过：
+七字段齐备、两个 `confirmations` 分项、三项共用 `f0df3d0b`、`verdict` 两值、不可计部分已声明、
+四个通道命令实跑 exit 0、SC 词表五值、单一基线记录、记录内引用的脚本都在盘。红跑绿的是
+「必须保持」的事实，不是 T022 已完成。
+
+---
+
+## R9 — T018 红跑：`tests/unit/test_reconciler_extensions.py`
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/unit/test_reconciler_extensions.py -q -p no:cacheprovider
+```
+
+真实输出（代表行）：
+
+```
+E   AssertionError: check JSON must carry `coverage` (C-2); got None
+E   AssertionError: check JSON must carry `red_kind` (C-3); keys=['action', 'checked_at', 'error', 'findings', 'inventory', 'repo', 'units']
+E   AssertionError: LEDGER_FLOOR MUST be ⌊(27 + 51) / 2⌋ = 39 (C-1); got None
+E   AssertionError: 38 parsed rows are below the floor of 39; got ['missing', … ×40]
+E   AssertionError: usage: flow-class-check.py … argument --action: invalid choice: 'delegation'
+E   AssertionError: usage: flow-class-check.py … argument --action: invalid choice: 'faces'
+
+17 failed in 1.48s
+EXIT=1
+```
+
+红形态判读：17 条红全部落在「字段 / 动作缺失」——`coverage` / `red_kind` / `LEDGER_FLOOR`
+在 069a 引擎里不存在，`delegation` / `faces` 两个动作不在 argparse 的 `choices` 内。
+零 collection error（17 条全部被收集并执行）。本文件不复述 T014–T016 的整仓断言，
+只钉边界（38 / 39 / 40、100 行台账不动 floor、四条件与 `clean` 的必要非充分关系、
+语法与去重、`+` 绑定与 `§` 锚）——这些边界同样必须在 T019–T021 落地后转绿。
