@@ -264,16 +264,32 @@ FR-009–013 → 契约二；FR-014 → 契约四）；5 条 SC 也都在引用�
 - 镜像面：`--check` 零新增差异；命令副本继续 `OK`（证明模板未被改）。
 - 台账面：`check` 在本仓继续 78 units / 零 finding；`lookup` 的四个降级分支行为不变。
 
-**门禁实跑（本阶段）**
+**门禁实跑（本阶段，2026-10-25）**
 
 ```text
-python3 scripts/python/validate-requirements.py .specify/specs/069b-isomorphism-migration-metrics/requirements.md
-  → status: ok；五项 pass；0 error / 0 warning
+$ python3 scripts/python/validate-requirements.py .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 284 lines, 19 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
 
-python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
-  --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage plan --repo .
-  → 见「Phase 1 Artifacts Summary」后的实跑记录（errors=0）
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/069b-isomorphism-migration-metrics --stage plan --repo .
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=9 waived=0
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan \
+    --requirements .specify/specs/069b-isomorphism-migration-metrics/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 14, "task_count": null,
+ "fr_ceiling": 30, "task_ceiling": 40}, "reasons": []}
 ```
+
+9 条 advisory 全部是 `missing-path`：8 条指向本切片**尚未创建**的测试文件（`tests/**` 在 plan 阶段不存在），
+1 条指向 research.md 里被否决的备选路径 `shared/definitions/isomorphism-map.md`；`errors = 0`。`decomposition-check` 的 `proceed` 与 requirements 阶段的 `fr_count = 14` 一致。
+契约引用组覆盖（`account-clause-coverage.py` 的 FR lane）：`FR universe: 14 / FR claimed: 14 / FR uncovered: 0`。
 
 ## Phase 1: Design Artifacts Summary
 
