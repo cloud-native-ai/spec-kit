@@ -1,6 +1,16 @@
 # Verification — 070-subagent-task-teams
 
-**Status**: partial (segments S1–S4; T001–T023). The SC-001…SC-008 matrix, the closure full suite, the mirror check, and the final task audit are completed by the final implement segment (T039). This file exists early only to record residual interpretations and in-segment verification facts the dispatch requires.
+**Status**: partial (segments S1–S5; T001–T030). The SC-001…SC-008 matrix, the closure full suite, the mirror check, and the final task audit are completed by the final implement segment (T039). This file exists early only to record residual interpretations and in-segment verification facts the dispatch requires.
+
+## US4 verification (impl-s5; T024–T026)
+
+- **Scope**: stage-team preset, seat mapping, graph-derived pattern, run-scoped adapter, and no persisted team (ST-01…ST-12).
+- **Command**: `python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py tests/integration/test_wp_coordination_dry_runs.py` → `27 passed in 0.12s`, rc 0 (14 preset contract + 13 dry runs).
+- **Red-to-green**: T024 preset `13 failed, 1 passed` (the pass is the anti-drift ST-10 pin) and the no-team dry run `1 failed` (missing `adapt_stage_team`); T025 implementation → 14 preset cases green; T026 combined run green.
+- **Scenario G (no-team half)**: `python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "nested_driver or no_team_directory"` → `2 passed`.
+- **No-team evidence**: `test_no_team_directory_is_created` compares the repository `.specify/teams/` tree and a temporary project root before and after the adapter projection plus a simulated stage; both are unchanged and no `team.md` appears.
+- **Interpretation**: the adapter is a pure projection in the test-only simulator (`stage_team_pattern`, `adapt_stage_team`); the live adapter writes the same fields into the plan fence as driver prompt logic. `parallel` requires at least two independent packages with every package read-only; any `repair_loop` selects `iteration`; `continuous` is unrepresentable.
+- **Evidence**: `notes/red-first-evidence.md` §T024–§T026; `test-evidence/implement-stage-status.jsonl` row `impl-s5-us4-preset`.
 
 ## US3 verification (impl-s4; T020–T023)
 
