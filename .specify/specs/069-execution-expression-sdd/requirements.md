@@ -7,10 +7,10 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification  
-**Feature Name**: Need clarification
+**Feature ID**: 069  
+**Feature Name**: 执行/表达二元分类与文档型 SDD 同构（Execution/Expression Classes & Document-Form SDD）
 
-> **Binding timing**: 本仓 requirements 阶段不创建、不绑定 Feature（`.specify/skills/internal/create-requirements/SKILL.md` § Feature Integration；`.specify/shared/workflow/feature-integration.md` § Feature Binding Rules）。绑定在 `/speckit.clarify` Mode A 完成，本文件保持默认值即为该流程的预期状态。
+> **Binding**: 2026-10-24 由 `/speckit.clarify` Mode A 绑定——新建 Feature 069（判据与集成责任见 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules）。requirements 阶段保持默认值是该流程此前的预期状态，现由本行取代。
 
 ## Overview
 
@@ -32,10 +32,10 @@
 
 - **流程单元规模**：命令模板 `templates/commands/*.md` 共 27 个（`ls | wc -l`）；技能目录 `skills/external` 14 个 + `skills/internal` 37 个（同法实测）。台账全覆盖的对象即这两类单元；计数以运行时探测为准，不在本文件固定。
 - **概念所有者检索**：`shared/definitions/` 现有 10 份定义文档（agent / contract-clause / derivation / dogfooding / framework-map / goal / probe / self-improvement / subagent / tool），其中**没有**「执行/表达」与「同构」条目。按 `create-requirements` § 5.5，二者属**新概念**：本文件固定其必需语义与验收，真正的所有者须由实现阶段新建并声明（本文件不是所有者）。
-- **保留标识符检索**：字面 `expression` 与 `flow_class` 在全仓零占用；字面 `execution` 无枚举取值占用（仅作为 `.specify/agents/execution/` 目录名与 `execution-config.py` 文件名出现）。但 `execution` **语义上**与既有 **Agent Execution**（Agent 三层分类法第三层，见 `.specify/memory/glossary.md` 与 `shared/definitions/agent-definitions.md`）同词异义——按 glossary § 3 属同词异义冲突，MUST 在所有者条目与词汇表中显式消歧，机器侧以带命名空间的键承载（键名由 plan 定，消歧义务不由 plan 决定）。
+- **保留标识符检索**：字面 `expression` 与 `flow_class` 在全仓零占用；字面 `execution` 无枚举取值占用（仅作为 `.specify/agents/execution/` 目录名与 `execution-config.py` 文件名出现）。但 `execution` **语义上**与既有 **Agent Execution**（Agent 三层分类法第三层，见 `.specify/memory/glossary.md` 与 `shared/definitions/agent-definitions.md`）同词异义——按 glossary § 3 属同词异义冲突，MUST 在所有者条目与词汇表中显式消歧，机器侧以带命名空间的键承载——clarify 已定键名为 `flow_class`（FR-036）；消歧义务本就归本特性，不由 plan 决定。
 - **门禁读取点差异**：`humanize` 无 wrap-up 面，说明表达类流程的类别读取不能只挂在 wrap-up 上；读取点必须在命令主干流程内也可达（据此提出 FR-015）。
-- **既有前序规格**：062（humanize，表达类首个实现）、067（循环效率加固）、068（执行量化反馈通道）均已注册；本文件只引用，不改写。
-- **文档型特性的实测样本（kangaroo-xuanji Feature 001，as-of 2026-10-24 评审报告）**：14 篇架构文档、5 张 PlantUML 图、75 个组件行、51 条交互边、3 条旅程、6 类存储、58 条数据流；review 结论 P0=0 / P1=10 / P2=5。评审时间线（`.specify/specs/001-arch-redesign/review.md` § 1）显示 requirements 15:41 → analyze 18:38（约 177 分钟墙钟）、P0–P6 实现 20:10 → 21:18（约 68 分钟，P7 在次日）。输入侧简报给出的 187 / 78 分钟与此有约 10 分钟的口径差（提交时间戳与阶段边界取法不同）；本文件**只采用评审时间线**，并只把「门禁链在有效计算中占比很高」作为定性动机（输入侧估计约 70%，本次未复测），不引用其绝对值作为基线。
+- **既有前序规格**：062（humanize，表达类首个实现）与 068（执行量化反馈通道）已在 `features.md` 注册；067（循环效率加固）的规格在 `.specify/specs/067-loop-efficiency-hardening/` 实存，但 `features.md` 无其登记行、`features/067.md` 也不存在——这是既有的登记缺口，不在本特性修复范围内（本特性不借机回填他特性的注册）。三者本文件只引用，不改写。
+- **文档型特性的实测样本（kangaroo-xuanji Feature 001，as-of 2026-10-24 评审报告）**：14 篇架构文档、5 张 PlantUML 图、75 个组件行、51 条交互边、3 条旅程、6 类存储、58 条数据流；review 结论 P0=0 / P1=10 / P2=5。评审时间线（该项目（kangaroo-xuanji）规格目录内的 `specs/001-arch-redesign/review.md` § 1）显示 requirements 15:41 → analyze 18:38（约 177 分钟墙钟）、P0–P6 实现 20:10 → 21:18（约 68 分钟，P7 在次日）。输入侧简报给出的 187 / 78 分钟与此有约 10 分钟的口径差（提交时间戳与阶段边界取法不同）；本文件**只采用评审时间线**，并只把「门禁链在有效计算中占比很高」作为定性动机（输入侧估计约 70%，本次未复测），不引用其绝对值作为基线。
 
 ### 与既有特性的关系（引用而非重写）
 
@@ -47,6 +47,8 @@
 | **既有复杂度轴（feedback-step.md）** | 决定 wrap-up 面有无 | 仅声明正交（§ 与既有分类轴的关系），不修改该轴判据 |
 
 ### Assumptions（本阶段裁决记录；clarify 可推翻）
+
+**clarify 复核（2026-10-24）**：A1–A8 逐条复核，**无推翻项**。A6、A7 各补一条可核验条款（委托关系的机械核验 → FR-039；分发路径 → FR-035）；A1/A2/A3/A4/A5/A8 原文成立。复核结论落 § Clarifications Session 2026-10-24，本条不复述其内容。
 
 - **A1 判据取验收 oracle，不取介质。** 依据：用户把「代码/文档」表述为同一物的两种写法，若按介质分类则同构命题自相矛盾；按 oracle 分类才能同时解释「文档属表达」与「可编译契约属执行」。
 - **A2 未声明默认 = `execution`。** 依据：默认必须选**不削弱门禁**的一侧；默认表达会静默减少门禁，默认执行只会多付成本并产生「该归类而未归类」的可见压力。默认必须在消费点标注（FR-009），否则默认变成静默兜底。
@@ -125,7 +127,7 @@
 
 ### Edge Cases
 
-- **一份交付物同时有两种读者**（架构文档既被人读，又被脚本解析生成图或代码）：按其主要验收 oracle 归类；若两种 oracle 都是必需的，则该流程 MUST 两类门禁**叠加**而非择优，且叠加后不得减少任一侧门禁。
+- **一份交付物同时有两种读者**（架构文档既被人读，又被脚本解析生成图或代码）：按其主要验收 oracle 归类；若两种 oracle 都是必需的，则该流程 MUST 两类门禁**叠加**而非择优，且叠加后不得减少任一侧门禁。**类别 MUST 取 `execution`**——这是唯一确定性取法，避免同一单元因判定者不同而落到两侧（FR-038、SC-012）。
 - **一个流程同时产出代码与文档**（如 implement）：按主交付物与失败不可逆性归类；其文档产物仍按文档型门禁检查，不因流程类别为执行而降级。
 - **契约文件既可读又可编译**（OpenAPI 生成 SDK）：判为执行；其文档可读性要求仍以表达类门禁的读者面补强。
 - **同一流程在 A 项目属表达、在 B 项目被当作执行**：框架拥有的流程类别不可被项目覆盖；项目只能为自己新增的流程声明类别。
@@ -150,22 +152,22 @@
 - **FR-006**: 判定 MUST 可复现：给定判据与流程描述，两名独立判定者 MUST 得到同一结论（一致率 100%）；不一致 MUST 判为判据缺陷并修正判据，MUST NOT 逐案裁定。
 - **FR-007**: 框架内全部流程单元（命令模板与技能）MUST 恰好归入两类之一；未分类数 MUST 为 0，缺口 MUST 由对照流程单元清单的确定性检查报出，MUST NOT 依赖人工阅读清点。
 - **FR-008**: 每个流程单元 MUST 恰好属于一类；同时命中两类或两类皆不命中 MUST 判为缺陷。
-- **FR-009**: 未声明类别的流程单元（含旧项目自建技能）MUST 按 `execution`（[[STR-001]]）处理，且 MUST 在消费点标注为「未声明·按默认」，MUST NOT 呈现为已判定。
+- **FR-009**: 未声明类别的流程单元（含旧项目自建技能）MUST 按 `execution`（[[STR-001]]）处理，且 MUST 在消费点标注为「未声明·按默认」（[[STR-004]]），MUST NOT 呈现为已判定。
 - **FR-010**: 命令与其委托技能 MUST 同类；例外仅限显式登记的**类中立**共享技能（记忆、反馈、度量等载体），该清单 MUST 封闭，且类中立 MUST NOT 免除任何门禁。
 - **FR-011**: 分类所有权 MUST 归框架；客户项目 MUST NOT 覆盖框架流程的类别，MAY 为自己新增流程按同一判据声明类别。
 
 #### B. 分类与阶段、门禁的关系（US1 / US4）
 
-- **FR-012**: 分类 MUST NOT 改变 SDD 阶段集合：两类流程都 MUST 走 requirements → clarify → plan → tasks → checklist → analyze → implement → review；无待澄清项时跳过 clarify 属既有规则，不因分类而变。
+- **FR-012**: 分类 MUST NOT 改变 SDD 阶段集合：两类流程都 MUST 走 requirements → clarify → plan → tasks → checklist → analyze → implement → review（阶段名册的 owner 与引用方式见 FR-018）；无待澄清项时跳过 clarify 属既有规则，不因分类而变。
 - **FR-013**: 分类 MUST 只选择**门禁算子集**（用哪种检查证明同一不变量），MUST NOT 减少门禁数量、降低 P0/P1 定义或改变判定阈值。
-- **FR-014**: 任何分类 MUST NOT 被用作跳过 analyze 或 review 的开关；两类流程的 analyze 与 review 调用率 MUST 均为 100%。
+- **FR-014**: 任何分类 MUST NOT 被用作跳过 analyze 或 review 的开关；两类流程的 analyze 与 review 调用率 MUST 均为 100%。**阶段完整性判定 MUST NOT 读取类别**——「这一阶段是否发生」由既有阶段记录判定，与类别无关；任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝。
 - **FR-015**: 门禁 MUST 在判定之前从唯一所有者读取类别；MUST NOT 依赖命令模板内嵌的标签副本。类别 MUST 在无 wrap-up 面的流程（如 humanize）中同样可读。
 - **FR-016**: 类别缺失、损坏或版本不兼容时 MUST 降级为默认类并在消费点标注，MUST NOT 中断流程，MUST NOT 静默切换门禁集。
 - **FR-017**: 类别变更 MUST 留可审计记录（流程、时间、依据判据、变更前后），且 MUST NOT 静默改变已发布流程的行为；行为改变 MUST 显式写入变更说明。
 
 #### C. 同构与其边界（US3）
 
-- **FR-018**: 框架 MUST 声明一份**同构映射**：对八个 SDD 阶段各给出一行「代码型产物 ↔ 文档型产物」的对应，并覆盖结构、流程、逻辑三个面（结构 = 实体/关系/边界；流程 = 阶段与门禁角色；逻辑 = 证据/契约/验收/版本/所有权）。
+- **FR-018**: 框架 MUST 声明一份**同构映射**：对八个 SDD 阶段各给出一行「代码型产物 ↔ 文档型产物」的对应（8 行 × 3 面列 = 24 格），并覆盖结构、流程、逻辑三个面（结构 = 实体/关系/边界；流程 = 阶段与门禁角色；逻辑 = 证据/契约/验收/版本/所有权）。阶段名册 MUST 引用既有阶段映射 owner（八阶段产物映射，由 `sdd-loop-driver` 的 `loop-state.py` 与同名 reference 章节共同承载，声明见 `.specify/specs/066-loop-state-awareness-a/requirements.md` FR-006），MUST NOT 新建第二份名册；名册变更时映射跟名册走，不另立版本。
 - **FR-019**: 同构映射的每一行 MUST 标注它由哪条门禁强制执行，或被显式标注「已声明未强制」；既无强制又无标注的行 MUST 判为缺陷（口号行）。
 - **FR-020**: 同构声明 MUST 附带**不可同构边界清单**，至少覆盖四类：(a) 验收 oracle（执行行为 vs 阅读理解）；(b) 验证算子（测试 vs 构建/链接/一致性检查）；(c) 失败可见性（运行期偏差 vs 构建通过而事实陈旧的静默失败）；(d) 语义 oracle 缺失（文档无编译器，意义只能由人判定）。
 - **FR-021**: MUST NOT 以「文档即代码」为由把代码型门禁整套移植到文档型流程；跨类复用 MUST 指名所复用的不变量（契约、证据、所有权、版本等），MUST NOT 复用其判定算子本身。
@@ -191,7 +193,16 @@
 
 - **FR-033**: 未刷新的既有项目 MUST 维持原有行为；刷新指令后 MUST 自动获得分类定义与默认行为，MUST NOT 要求手工修改任何文件或数据。
 - **FR-034**: 分类引入后，既有命令与技能的既有门禁、wrap-up 与既有测试 MUST 零新增失败，判据为名字级基线比对（不是失败条数比对）。
-- **FR-035**: 分类定义与台账 MUST 随框架分发到客户项目；客户项目 MUST NOT 需要复制、维护或对齐第二份分类数据，副本只能由生成/刷新产生并带漂移检查。
+- **FR-035**: 分类定义与台账 MUST 随框架分发到客户项目；客户项目 MUST NOT 需要复制、维护或对齐第二份分类数据，副本只能由生成/刷新产生并带漂移检查。分发 MUST 走既有路径（`shared/` 框架源随包 + `specify init` 的复制步骤，实测见 `pyproject.toml` 的 `force-include` 与 `src/specify_cli/__init__.py` 的 shared 复制段），MUST NOT 新增分发机制；本特性 MUST NOT 新增客户项目侧的类别存储或读取点——项目自建流程按默认类运行，项目若在自己的知识空间记录其类别，框架不读取、不影响门禁。
+
+#### G. 分类落地与度量口径（US1 / US2 / US4；clarify 2026-10-24 裁定）
+
+- **FR-036**: 分类所有者 MUST 是 `shared/definitions/` 下按既有 `<域>-definitions.md` 命名惯例新建的一份定义文档（clarify 裁定：`flow-class-definitions.md`），并在开篇声明自己拥有判据、两个取值、边界例、逐流程台账、类中立清单、同构映射与不可同构边界。机器可读的类别键 MUST 取带命名空间的 `flow_class`（[[STR-003]]），MUST NOT 以裸 `execution` 充当键名；与 Agent Execution 的同词异义 MUST 在所有者条目与 `.specify/memory/glossary.md` 两处显式消歧。
+- **FR-037**: 台账 MUST 是所有者文档内的一份声明式行集（每流程单元一行：单元标识、类别、依据判据、生效版本），MUST NOT 采用逐单元分散载体（命令模板元数据、技能 frontmatter）承载类别——分散载体即第二份副本。对账检查 MUST 解析该行集并与流程单元清单（命令模板与技能目录）比对，且 MUST 同时具备**反空真下限**（解析出的行数低于下限即判失败）与**覆盖率断言**（「零缺口因为表完整」MUST 可区分于「零缺口因为一行都没解析出来」）。
+- **FR-038**: 同一流程的两种 oracle 都必需时，其类别 MUST 取 `execution`（[[STR-001]]）并**叠加**表达类门禁，MUST NOT 择优、MUST NOT 取 `expression`（[[STR-002]]）后省略执行侧门禁；该判定 MUST 只依据主交付物的消费方与失败可见性（失败是否只有人读才能发现），MUST NOT 依据交付物数量比例或文件类型占比。
+- **FR-039**: FR-010 的「命令与其委托技能同类」MUST 由确定性检查核验：从命令模板中声明的委派技能路径解析出委托关系，再比对该技能在台账中的类别；MUST NOT 依赖人工维护的委托清单。类中立清单 MUST 封闭，其成员判据 MUST 是「交付物被两类流程共同消费且无类特定验收」；类中立 MUST NOT 免除任何门禁。
+- **FR-040**: 六面文档型门禁的每一面 MUST 指向一个单一 owner 机制（读者面 → `user-facing-comprehension.md` 的基准读者；结构面 → `create-docs` 的确定性引擎；评审面 → 既有评审流程；需求清晰度面 → requirements 校验器与质量清单；事实一致性面的**判据** → `one-source-of-truth.md`）；本特性 MUST NOT 复制这些机制的判据正文，也 MUST NOT 因其已有 owner 而重复定义判据。事实一致性面本特性只新增**确定性检查器**、不新增判据；证据分级与 as-of 面属新增，MUST 在所有者文档内声明其与既有证据机制的**对象差异**（`evidence-step.md` 的证据状态词汇描述机制是否存在/被使用，本面描述事实断言的等级与时效；`single-run-evidence.md` 管一次昂贵执行的记录留存），MUST NOT 重定义或收窄它们的取值域。
+- **FR-041**: FR-029 的三项基线 MUST 以同口径、同仪器在开工前落盘，仪器 MUST 限于既有提交时间戳、既有运行/反馈记录与 exec-quant 通道（FR-032），MUST NOT 新增采集器；前瞻可用运行不足 3 次时，未取得样本的判据 MUST 记为未评估（not-evaluated），MUST NOT 记为达成。
 
 ### 显式排除项（Out of Scope）
 
@@ -214,7 +225,7 @@
 | R-06 两轴混淆 | 用复杂度轴推导类别，或用类别推导 wrap-up 面 | FR-004 |
 | R-07 登记成本外溢 | 每加一个流程都要人工登记，遗漏即静默 | FR-007 机械对账 + FR-009 默认可见 |
 
-评审报告（`.specify/specs/001-arch-redesign/review.md`，P0=0 / P1=10 / P2=5）的框架级建议分流如下。**口径更正**：输入侧简报称「10 条 P1 是 REC-T1…REC-D1」，与报告实测不符——10 是 **P1 findings** 数；§ 5.1–5.5 的建议共 **12 条**，其中 9 条 P1（REC-T1、T2、T3、C1、C2、A1、A2、A3、W1）、3 条 P2（REC-C3、W2、D1）。下表按报告原文口径分流。
+评审报告（该项目（kangaroo-xuanji）规格目录内的 `specs/001-arch-redesign/review.md`，P0=0 / P1=10 / P2=5）的框架级建议分流如下。**口径更正**：输入侧简报称「10 条 P1 是 REC-T1…REC-D1」，与报告实测不符——10 是 **P1 findings** 数；§ 5.1–5.5 的建议共 **12 条**，其中 9 条 P1（REC-T1、T2、T3、C1、C2、A1、A2、A3、W1）、3 条 P2（REC-C3、W2、D1）。下表按报告原文口径分流。
 
 | 建议 | 归属 | 理由 |
 |------|------|------|
@@ -235,7 +246,7 @@
 
 - **Flow Unit（流程单元）**：被分类的最小对象，取值为命令模板或技能；属性含标识、类别、是否默认、依据判据、生效版本。
 - **Class Assignment（分类登记）**：一条「流程单元 → 类别」的判定记录；带是否默认、判定理由与审计信息（何时、依据哪条判据）。
-- **Classification Owner（分类所有者）**：唯一声明判据、取值、边界例与台账的文档；本文件不是它，实现阶段新建。
+- **Classification Owner（分类所有者）**：唯一声明判据、取值、边界例与台账的文档；本文件不是它。clarify 裁定其落点为 `shared/definitions/flow-class-definitions.md`（遵循同目录 `<域>-definitions.md` 命名惯例），并且同构映射与其不可同构边界清单也归它——边界例即映射「为何到此为止」的理由，拆开必然各自漂移（FR-036 / FR-018）。
 - **Gate Operator Set（门禁算子集）**：某一类别在某阶段用来证明同一不变量的检查算子集合；数量与严重级不随类别变化。
 - **Isomorphism Row（同构映射行）**：一个 SDD 阶段的「代码型产物 ↔ 文档型产物」对应，附强制门禁或「已声明未强制」标注。
 - **Non-Isomorphism Boundary（不可同构边界）**：四类不可互换的判定面（验收 oracle、验证算子、失败可见性、语义 oracle），每条须指出至少一处门禁处理。
@@ -249,7 +260,7 @@
 ### Measurable Outcomes
 
 - **SC-001**: 取全部流程单元，由两名独立判定者按所有者判据分类，一致率 = 100%，且台账中两类皆属/皆不属的单元数 = 0。
-- **SC-002**: 分类台账与流程单元清单机械对账，未分类缺口 = 0；被检查样本中「未声明·按默认」的消费点标注率 = 100%，静默按默认执行的样本 = 0。
+- **SC-002**: 分类台账与流程单元清单机械对账，未分类缺口 = 0；被检查样本中 [[STR-004]] 的消费点标注率 = 100%，静默按默认执行的样本 = 0。
 - **SC-003**: 在 3 个真实文档型特性上，analyze 与 review 的调用率 = 100%，因「属表达类」而跳过任一阶段的事件 = 0，review 阶段 P0 逃逸数 = 0。
 - **SC-004**: 相对开工前冻结基线，文档型特性的门禁调用次数下降 ≥30%，且 review 的 P0/P1 数不高于基线。
 - **SC-005**: 相对开工前冻结基线，文档型特性的人工确认次数下降 ≥30%，且单阶段人工确认 ≤3 次。
@@ -258,25 +269,33 @@
 - **SC-008**: 注入式演练（把一处引用改为手写副本、把一处 as-of 改旧、把一处计数改为手打）中，文档型一致性检查在 1 次运行内报出并定位全部注入点，漏报 = 0。
 - **SC-009**: 在 3 个既有客户项目快照上运行刷新后的命令套件，名字级基线新增失败 = 0（按失败 nodeid 集合比对，不按条数）。
 - **SC-010**: 对 062 / 067 / 068 的 `requirements.md` 做字节比对，改动 = 0。
+- **SC-011**: 对台账做两种注入——删除一行、破坏表形（使解析出 0 行而清单非空）——对账检查 MUST 各自变红，且两种红 MUST 可区分（缺口 vs 解析失败）；静默绿样本数 = 0。
+- **SC-012**: 抽取混合 oracle 单元样本（至少覆盖「既被人读又被脚本解析」与「须生成并编译」两类），两名判定者独立归类一致率 = 100%，且全部落 `execution` 并叠加表达类门禁；择优样本数 = 0。
+- **SC-013**: 六面文档型门禁每面各有 1 个 owner 指针（6/6 齐全），其判据正文在 owner 之外的出现次数 = 0。
 
 ### Measurement Sources & Collection Methods
 
 - **SC-001 / SC-002 Source**: 所有者台账与 `templates/commands/*.md`、`skills/` 目录清单的机械对账；两名判定者结论分别落盘后逐条比对（判定时不得看到对方结果）。
 - **SC-003 Source**: 3 个文档型特性的 `verification.md` 阶段记录与 review 报告；跳过事件以状态脊/阶段记录中缺失对应阶段为判据。
-- **SC-004 / SC-005 / SC-006 Source**: 开工前冻结的基线文件（门禁调用计数、人工确认计数、阶段起止时间戳）与收尾同口径复测；计数取既有 exec-quant / 运行判定记录（068 通道），不新增采集器。
+- **SC-004 / SC-005 / SC-006 Source**: 开工前冻结的基线文件（门禁调用计数、人工确认计数、阶段起止时间戳）与收尾同口径复测；计数取既有 exec-quant / 运行判定记录（068 通道），不新增采集器。**仪器与样本规则见 FR-041**：基线 = 该特性开工前落盘的 dated 记录，三项口径为（a）门禁调用次数 = 本特性运行中执行的检查类单元调用总数（checklist / analyze / review / pre-analyze 检查 / `validate-*`），取阶段记录或运行记录计数；（b）人工确认次数 = 本特性运行中触发确认门的次数 + clarify 提问轮次；（c）requirements→analyze 墙钟 = requirements.md 首次提交到 analyze 完成记录的时间差（同一时钟源，取提交的 author date）。前瞻可用运行不足 3 次时逐项记 not-evaluated。
 - **SC-007 Source**: 同构映射表逐行核对记录（每行的强制门禁 ID 或「未强制」标注）。
 - **SC-008 Source**: 演练脚本的注入清单与检查输出的差集；演练前后各跑一次，记录漏报集合。
 - **SC-009 Source**: 刷新前后各跑一次既有契约套件，`--names-out` 产出失败 nodeid 列表，`comm -13` 断言为空。
 - **SC-010 Source**: `git diff --stat` 对三个前序规格路径的字节比对。
+- **SC-011 Source**: 对台账执行两次注入（删一行 / 破坏表形）后各跑一次对账检查，记录退出码与报错形态；两形态互不相同即判「可区分」。
+- **SC-012 Source**: 混合单元样本清单 + 两份互不可见的独立判定记录，逐条比对并统计一致率与落类分布。
+- **SC-013 Source**: 六面门禁 owner 指针表（6 行）+ 对判据正文的 grep 计数，排除集 = 六个 owner 路径本身。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
 
 | String ID | Value (verbatim) | Consumed by |
 |-----------|------------------|-------------|
-| `STR-001` | "execution" | FR-001, FR-002, FR-009；分类台账取值、门禁读取点与契约测试断言 |
-| `STR-002` | "expression" | FR-001, FR-002；分类台账取值、门禁读取点与契约测试断言 |
+| `STR-001` | "execution" | FR-001, FR-002, FR-009, FR-038；分类台账取值、门禁读取点与契约测试断言 |
+| `STR-002` | "expression" | FR-001, FR-002, FR-038；分类台账取值、门禁读取点与契约测试断言 |
+| `STR-003` | "flow_class" | FR-036；类别键（命名空间前缀），台账列头与对账检查的解析键 |
+| `STR-004` | "未声明·按默认" | FR-009, SC-002；消费点默认标注的固定标记 |
 
-**Citation convention**: 引用处写 `[[STR-001]]` / `[[STR-002]]`，不复制字面量；字面量只在本表维护。
+**Citation convention**: 引用处写 `[[STR-NNN]]`（本表当前为 STR-001…STR-004），不复制字面量；字面量只在本表维护。
 
 ## Clarifications
 
@@ -285,4 +304,17 @@
   Format: - Q: <question> → A: <answer>
 -->
 
-本阶段未发起问答：输入中的边界问题（默认类、分类是否换算子、读者基准来源、旧项目迁移方式）均已在 § Assumptions A1–A8 中裁决并标注依据；无 [NEEDS CLARIFICATION] 标记。若 clarify 阶段推翻任一假设，须同步修订对应 FR 与 SC，而不是只改假设段。
+本阶段已执行 clarify（Mode A，目标 `requirements.md`）。**未向用户提问**：0 个问题抛给用户，下列 10 项均由仓内证据自裁决。**自同作者门不触发**——本文件由上一会话产出，本 run 首次通读，`.specify/shared/workflow/objective-analysis-gate.md` 的「同一 agent、同一会话」条件不成立；独立性由换会话阅读提供。
+
+### Session 2026-10-24
+
+- Q: 执行/表达轴的定义、台账与边界例应归哪个唯一所有者，机器可读的类别键如何与既有 Agent Execution 消歧？ → A: 新建 `shared/definitions/flow-class-definitions.md`，遵循同目录 `<域>-definitions.md` 命名惯例（该目录现有 10 份文档实测无此主题，属 `create-requirements` § 5.5 的新概念）；该文档同时拥有判据、两个取值、边界例、逐流程台账与类中立清单。类别键取带命名空间的 `flow_class`（[[STR-003]]；全仓零占用实测），不以裸 `execution` 作键；同词异义在所有者条目与 `.specify/memory/glossary.md` 两处显式消歧。落 FR-036 与 STR-003。
+- Q: 逐流程台账是手写、生成还是二者结合，如何同时满足「唯一 owner + 无第二副本」与「未分类缺口机械可报」？ → A: 所有者文档内的**手写声明式行集**为唯一载体；对账检查解析它并与 `templates/commands/*.md` + `skills/{internal,external}/*/` 清单比对，类别 MUST NOT 分散进命令模板元数据或技能 frontmatter（那等于每个单元一份副本，与 FR-015 的读点约束相抵）。检查 MUST 带反空真下限与覆盖率断言——形态照既有先例：`027` 的 `contracts/command-classification.md` 契约表 + `tests/contract/test_feedback_command_classification.py` 的 `MIN_COMMANDS` 下限与「表完整」vs「没解析出行」区分。登记成本由该检查变红兜底，不靠人工巡检。落 FR-037、SC-011。
+- Q: 同一流程两种验收 oracle 都必需时归哪一类？ → A: 归 `execution`（[[STR-001]]）并**叠加**表达类门禁，不择优、不得取 `expression`（[[STR-002]]）后省略执行侧门禁；判定只看主交付物的消费方与失败可见性。这是唯一确定性取法，否则同一单元会因判定者不同落到两侧（违反 FR-006 的可复现）。同步修订 Edge Cases 首条。落 FR-038、SC-012。
+- Q: 「命令与其委托技能同类」如何机械核验，类中立清单的成员判据是什么？ → A: 从命令模板声明的委派技能路径（`.specify/skills/<layer>/<name>/SKILL.md`）解析委托关系再比对台账类别，MUST NOT 依赖人工委托清单；类中立清单封闭，成员判据 = 交付物被两类流程共同消费且无类特定验收，且类中立不免除任何门禁。落 FR-039。
+- Q: 如何防止「本流程属表达类」被用作跳过 analyze / review 的开关？ → A: 增加一条不变量——**阶段完整性判定 MUST NOT 读取类别**；「阶段是否发生」由既有阶段记录判定，与类别无关；以类别为由跳过、缩短或改判阶段的请求一律拒绝。落 FR-014 增补（对应 US4 与 SC-003）。
+- Q: 六面文档型门禁分别复用哪些既有机制，哪些是新增？ → A: 读者面复用 `user-facing-comprehension.md` 的基准读者（不建第二套读者定义）；结构/链接/构建面复用 `create-docs` 的确定性引擎（`docs-utils.py --action validate` 管结构、`fix-links` 管链接、站点脚手架存在时跑构建），并保留「构建通过只是必要条件」；需求清晰度面复用 requirements 校验器与质量清单；评审面复用既有评审流程；事实一致性面的判据 owner 是 `one-source-of-truth.md`（本特性只新增确定性检查器）；证据分级与 as-of 面为新增，须在 owner 内声明与 `evidence-step.md` 七态词汇、`single-run-evidence.md` 的对象差异，不得重定义或收窄其取值域。落 FR-040、SC-013。
+- Q: 开工前冻结的三项基线具体怎么量、记在哪，样本不足怎么办？ → A: 三项口径固定为门禁调用次数（检查类单元调用总数）、人工确认次数（确认门触发数 + clarify 提问轮次）、requirements→analyze 墙钟（requirements.md 首次提交到 analyze 完成记录，同一时钟源取 author date）；仪器限既有提交时间戳、运行/反馈记录与 exec-quant 通道，不新增采集器；基线落特性 notes 的 dated 记录并在收尾同口径复测。前瞻可用运行不足 3 次时逐项记 not-evaluated，不记达成。落 FR-041、SC-004/005/006 Source。
+- Q: 同构映射的 owner 与粒度是什么，不可同构边界如何避免沦为口号？ → A: 映射与边界清单与分类所有者同文档——边界例就是「映射到此为止」的理由，拆开会各自漂移；粒度为 8 行（一阶段一行）× 3 面列 = 24 格，**行级**标注强制门禁或「已声明未强制」；阶段名册引用既有八阶段产物映射 owner（`.specify/specs/066-loop-state-awareness-a/requirements.md` FR-006 声明的 loop-state 映射），不新建名册；四类边界每条必须在至少一处门禁设计里被指认处理。落 FR-018 增补、FR-020 不变。
+- Q: 类别由谁承载、如何分发，旧项目与项目自建流程怎么办？ → A: 类别只在所有者台账承载，命令与技能不带副本；分发走既有 `shared/` 框架源随包与 `specify init` 复制步骤（实测 `pyproject.toml` 的 `force-include` 与 `src/specify_cli/__init__.py` 的 shared 复制段），不新增分发机制；本特性不新增客户项目侧的类别存储或读取点——项目自建流程按默认类运行，FR-011 的 MAY 是「允许声明」而非「框架会读」，声明在 v1 不影响门禁（FR-011 与 FR-035 在不同适用面上同时成立，不互相替换）。未刷新项目行为不变。落 FR-035 增补。
+- Q: 与 062 / 067 / 068 的边界如何守，输入所述「三者均已注册」是否成立？ → A: 只引用不改写，SC-010 以字节比对守三者 requirements 不变；067 的测试经济学与 068 的通道条款不复制，068 通道仅按 FR-032 作度量复用。**一处前提更正（实测）**：067 的规格在 `.specify/specs/067-loop-efficiency-hardening/` 实存，但 `features.md` 无其行、`features/067.md` 不存在——「均已注册」不成立；该缺口属既有登记债，不在本特性范围，本特性也不得借机回填。落 § 现状锚点更正、FR-031。

@@ -174,3 +174,4 @@
 | 表达类流程 | 表达类, expression class, expression flow | 主交付物由「人阅读后的理解与外部事实相符」验收的流程,/speckit.docs 与 /speckit.humanize 为首批成员(需求 069);保留 SDD 全阶段,只换门禁算子集 | auto | proposed |
 | 同构 | isomorphism, 同构映射, 代码文档同构 | 代码与文档在结构(实体/关系/边界)、流程(SDD 八阶段)、逻辑(证据/契约/验收/版本/所有权)三面上的可核对对应;每行须有强制门禁或「已声明未强制」标注,并附不可同构边界清单(验收 oracle/验证算子/失败可见性/语义 oracle 不可互换)(需求 069) | auto | proposed |
 | 文档型门禁 | document-form gate, 文档门禁, 文档型质量门禁 | 表达类流程使用的六面质量门禁:需求清晰度、读者/目的/边界、证据分级与 as-of、结构/链接/构建、事实一致性、评审;构建通过只是必要条件,人工评审不可省(需求 069) | auto | proposed |
+| 流程分类 (Flow Class) | flow class, 执行/表达分类, execution/expression class axis, 流程类别 | 贯穿全部流程的一等分类轴:取值 `execution`(执行类,未声明时的默认)与 `expression`(表达类),判据是**主交付物的验收 oracle**(由机器执行后的行为判定,还是由人阅读后的理解与外部事实相符判定)而非介质;唯一 owner = `shared/definitions/flow-class-definitions.md`(判据/取值/边界例/逐流程台账/类中立清单/同构映射),机器键 `flow_class`;与复杂度轴(复杂/简单命令,决定 wrap-up 面有无)正交,两轴不互相推导;与 Agent Execution(Agent 三层分类法第三层)同名不同义(需求 069) | auto | proposed |
