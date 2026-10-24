@@ -182,7 +182,10 @@ def test_c01_requires_a_scope_and_rejects_unknown_faces(tmp_path):
 def test_c01_default_faces_are_the_four_registered_faces(tmp_path):
     doc = _write(tmp_path / "doc.md", CLEAN_DOC)
     spec = _spec_dir(tmp_path)
-    proc, payload = _verify("--spec-dir", str(spec), "--path", str(doc))
+    # ``--allow-degraded``: outside git the as-of freshness rule is not evaluable,
+    # and a degraded blocking face now exits 1 by default (C-8). This leg asserts
+    # the face set, not the exit code.
+    proc, payload = _verify("--spec-dir", str(spec), "--path", str(doc), "--allow-degraded")
     assert proc.returncode == 0, "clean fixture must exit 0 (stderr: %r)" % proc.stderr
     assert set(payload["faces"]) == {"reader", "evidence", "duplicate", "count"}, (
         "the default face set must be reader,evidence,duplicate,count; got %r"
@@ -197,7 +200,8 @@ def test_c02_clean_fixture_passes_with_no_findings(tmp_path):
     doc = _write(tmp_path / "doc.md", CLEAN_DOC)
     spec = _spec_dir(tmp_path)
     proc, payload = _verify(
-        "--spec-dir", str(spec), "--path", str(doc), "--faces", "reader,evidence,count"
+        "--spec-dir", str(spec), "--path", str(doc), "--faces", "reader,evidence,count",
+        "--allow-degraded",
     )
     assert proc.returncode == 0, (
         "clean fixture must exit 0, got %d (stdout: %r / stderr: %r)"
@@ -212,7 +216,7 @@ def test_c02_clean_fixture_passes_with_no_findings(tmp_path):
 def test_c07_json_shape(tmp_path):
     doc = _write(tmp_path / "doc.md", CLEAN_DOC)
     spec = _spec_dir(tmp_path)
-    proc, payload = _verify("--spec-dir", str(spec), "--path", str(doc))
+    proc, payload = _verify("--spec-dir", str(spec), "--path", str(doc), "--allow-degraded")
     assert proc.returncode == 0, "clean fixture must exit 0"
     assert payload["action"] == "verify"
     assert ISO_Z_RE.match(payload["checked_at"]), (
@@ -379,12 +383,19 @@ def test_c04_evidence_asof_stale_not_evaluated_outside_git(tmp_path):
     assert _facet(payload, "evidence") == "not-evaluated", (
         "outside git the evidence face must be explicitly not-evaluated, never pass"
     )
-    assert proc.returncode == 0, "non-strict not-evaluated does not change the exit code"
+    assert proc.returncode == 1, (
+        "a degraded blocking face must fail by default — 'not evaluated' is not "
+        "'passed' (C-8)"
+    )
+    lenient, _ = _verify("--path", str(doc), "--faces", "evidence", "--allow-degraded")
+    assert lenient.returncode == 0, (
+        "--allow-degraded is the single explicit opt-out from the degraded-face failure"
+    )
     strict = _run(
         "--action", "verify", "--format", "json",
         "--path", str(doc), "--faces", "evidence", "--strict",
     )
-    assert strict.returncode == 1, "--strict must upgrade a not-evaluated evidence face to exit 1"
+    assert strict.returncode == 1, "--strict stays accepted as an alias for the same semantics"
 
 
 def test_c04_evidence_clean_annotation_passes(tmp_path):
@@ -477,17 +488,22 @@ def test_c06_unavailable_delegation_is_explicit_not_run(tmp_path):
     spec = tmp_path / "specs" / "001-incomplete"
     _write(spec / "requirements.md", "# Requirements\n\n- **FR-001**: only one.\n")
     proc, payload = _verify("--spec-dir", str(spec), "--faces", "count")
-    assert proc.returncode == 0, "non-strict not-run does not change the exit code"
+    assert proc.returncode == 1, (
+        "an unavailable count face is not-evaluated, and a degraded blocking face "
+        "fails by default (C-8)"
+    )
     count_check = payload["count_check"]
     assert count_check["status"] == "not-run", (
         "an unavailable delegation must be explicitly not-run, got %r" % count_check
     )
     assert count_check.get("reason"), "not-run must carry a reason"
+    lenient, _ = _verify("--spec-dir", str(spec), "--faces", "count", "--allow-degraded")
+    assert lenient.returncode == 0, "--allow-degraded is the documented opt-out"
     strict = _run(
         "--action", "verify", "--format", "json",
         "--spec-dir", str(spec), "--faces", "count", "--strict",
     )
-    assert strict.returncode == 1, "--strict must treat an unavailable count face as a failure"
+    assert strict.returncode == 1, "--strict stays an alias for the same failure"
 
 
 # --------------------------------------------------------------------------- #
@@ -498,6 +514,30 @@ def test_c08_exit_zero_never_carries_a_finding(tmp_path):
     proc, payload = _verify("--path", str(doc), "--faces", "reader")
     assert _findings(payload), "fixture must produce at least one finding"
     assert proc.returncode == 1, "findings must never exit 0"
+
+
+def test_c08_not_evaluated_is_never_a_pass(tmp_path):
+    """A degraded face and an evaluated one: only the degradation decides the exit."""
+    doc = _evidence_doc(
+        tmp_path, "实测，as-of 2026-10-24，source: `pytest -q` exit 0"
+    )
+    proc, payload = _verify("--path", str(doc), "--faces", "reader,evidence")
+    assert _facet(payload, "reader") == "pass", "the reader face is fully evaluated"
+    assert _facet(payload, "evidence") == "not-evaluated", (
+        "outside git the evidence face cannot be evaluated"
+    )
+    assert _findings(payload) == [], "no finding is involved in this leg"
+    assert proc.returncode == 1, (
+        "a green face must not launder a degraded blocking face into exit 0 (C-8)"
+    )
+    assert payload["degradations"], "the degradation must be visible in the payload"
+    lenient, lenient_payload = _verify(
+        "--path", str(doc), "--faces", "reader,evidence", "--allow-degraded"
+    )
+    assert lenient.returncode == 0
+    assert _facet(lenient_payload, "evidence") == "not-evaluated", (
+        "--allow-degraded changes the exit code only, never the reported face status"
+    )
 
 
 def test_c02_unreadable_path_is_an_input_error(tmp_path):
@@ -515,3 +555,122 @@ def test_c02_checker_is_read_only(tmp_path):
     after = hashlib.sha256(doc.read_bytes()).hexdigest()
     assert before == after, "the checker must never modify the checked document"
     assert not (tmp_path / "doc.md.json").exists()
+
+
+# --------------------------------------------------------------------------- #
+# Two-hats root resolution — the delivered (client) shape must still run
+# --------------------------------------------------------------------------- #
+def _checker_module():
+    """Import the dash-named checker so its constants are read, never copied."""
+    import importlib.util
+
+    assert CHECKER.is_file(), "doc-consistency checker missing: %s" % CHECKER_REL
+    spec = importlib.util.spec_from_file_location("doc_consistency_check", CHECKER)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def _mirror_rel(module, rel: str) -> str:
+    """The delivered path of a source-relative path (external skills flatten)."""
+    return module.payload_forms(rel)[-1]
+
+
+def _client_tree(tmp_path: Path) -> Path:
+    """Materialise the client shape: only ``.specify/`` exists, no source tree.
+
+    Every S3 owner, the delegation target and the checker itself are copied to
+    their *delivered* paths — exactly what ``specify init`` + the payload produce.
+    """
+    module = _checker_module()
+    client = tmp_path / "client"
+    roots = [REPO_ROOT, REPO_ROOT / ".specify"]
+    targets = list(module.OWNER_PATHS) + list(module.DELEGATE_PATHS)
+    for rel in targets:
+        source = module.resolve_payload(roots, rel)
+        assert source is not None, "fixture precondition: %s not resolvable here" % rel
+        destination = client / ".specify" / _mirror_rel(module, rel)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+    checker_copy = client / ".specify" / "scripts" / "python" / CHECKER.name
+    checker_copy.parent.mkdir(parents=True, exist_ok=True)
+    checker_copy.write_bytes(CHECKER.read_bytes())
+    return client
+
+
+def test_client_shape_resolves_every_owner_from_the_mirror(tmp_path):
+    """A project that only received ``.specify/`` must not exit 2 on owner lookup.
+
+    Reproduces the shipped failure: the mirror copy resolved its root to
+    ``.specify/`` and then looked for ``skills/external/…`` inside it.
+    """
+    client = _client_tree(tmp_path)
+    doc = _write(
+        client / "docs" / "note.md",
+        "# Note\n\n**Readers**: 迁移评审者。\n**Reading scenario**: 合并前核对。\n",
+    )
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(client / ".specify" / "scripts" / "python" / CHECKER.name),
+            "--action", "verify", "--format", "json",
+            "--path", str(doc), "--faces", "reader,duplicate",
+        ],
+        cwd=str(client),
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 0, (
+        "the delivered shape must resolve its own payload root (exit 2 here means the "
+        "two-hats trap is back); stderr=%r" % proc.stderr
+    )
+    payload = json.loads(proc.stdout)
+    assert payload["faces"]["reader"] == "pass"
+    assert payload["faces"]["duplicate"] == "pass", (
+        "the duplicate face must run against a resolved owner set, not an empty one"
+    )
+
+
+def test_client_shape_duplicate_face_compares_against_mirror_owners(tmp_path):
+    """The S3 owner set must not be dropped just because it lives in ``.specify/``."""
+    module = _checker_module()
+    client = _client_tree(tmp_path)
+    owner_rel = "shared/guidelines/one-source-of-truth.md"
+    owner_file = client / ".specify" / _mirror_rel(module, owner_rel)
+    copied = next(
+        line.strip()
+        for line in owner_file.read_text(encoding="utf-8").splitlines()
+        if len(line.strip()) >= 80
+        and not line.strip().startswith("#")
+        and not line.strip().startswith("|")
+    )
+    doc = _write(
+        client / "docs" / "copy.md",
+        "# Copy\n\n**Readers**: 迁移评审者。\n**Reading scenario**: 合并前核对。\n\n"
+        + copied + "\n",
+    )
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(client / ".specify" / "scripts" / "python" / CHECKER.name),
+            "--action", "verify", "--format", "json",
+            "--path", str(doc), "--faces", "duplicate",
+        ],
+        cwd=str(client),
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 1, (
+        "a copied owner sentence must still be caught in the delivered shape; "
+        "stdout=%r stderr=%r" % (proc.stdout[:400], proc.stderr)
+    )
+    payload = json.loads(proc.stdout)
+    findings = [f for f in payload["findings"] if f["rule"] == "duplicate-fact"]
+    assert findings, "expected duplicate-fact, got %r" % payload["findings"]
+    sides = "%s -> %s" % (
+        findings[0].get("path"), findings[0].get("counterpart")
+    )
+    assert ".specify/" in sides, (
+        "one side of the finding must be the mirror-resolved owner: %r" % findings[0]
+    )

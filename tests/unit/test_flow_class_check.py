@@ -602,6 +602,68 @@ def test_lookup_owner_without_ledger_table_keeps_default_semantics(tmp_path):
     assert "owner-unavailable" in proc.stderr
 
 
+# --------------------------------------------------------------------------- #
+# lookup must not hand back a corrupted or ambiguous value as decided (FR-016)
+# --------------------------------------------------------------------------- #
+def test_lookup_out_of_domain_class_degrades_with_a_visible_label(tmp_path):
+    rows, neutral_rows = _build_repo(tmp_path)
+    rows[0][STR_003] = "hybrid"          # outside the closed two-value domain
+    _write_owner(tmp_path, rows, neutral_rows)
+    proc = _lookup(tmp_path, rows[0]["unit_id"])
+    assert proc.returncode == 2, (
+        "an out-of-domain class must degrade (exit 2), never exit 0 as a decided value"
+    )
+    record = _json(proc)
+    assert record.get(STR_003) == STR_001, (
+        "a corrupted value must fall back to the default class; got %r"
+        % record.get(STR_003)
+    )
+    assert record.get("source") == "default", (
+        "source must not be 'ledger' when the ledger value is out of domain; got %r"
+        % record.get("source")
+    )
+    assert record.get("marker") is None, (
+        "the fixed undeclared marker is reserved for 'not registered' (C-7)"
+    )
+    assert "owner-unavailable" in proc.stderr, (
+        "the degradation must carry the closed owner-degradation label"
+    )
+    assert "invalid-class" in proc.stderr, (
+        "the stderr detail must name the defect (invalid-class), stderr=%r" % proc.stderr
+    )
+
+
+def test_lookup_duplicate_rows_never_silently_pick_the_first(tmp_path):
+    rows, neutral_rows = _build_repo(tmp_path)
+    rows.append(dict(rows[0]))           # same unit, same value
+    _write_owner(tmp_path, rows, neutral_rows)
+    proc = _lookup(tmp_path, rows[0]["unit_id"])
+    assert proc.returncode == 2, "a duplicated ledger row is not a decided class"
+    record = _json(proc)
+    assert record.get("source") == "default"
+    assert record.get(STR_003) == STR_001
+    assert record.get("marker") is None
+    assert "duplicate" in proc.stderr, (
+        "the detail must name the duplicate defect, stderr=%r" % proc.stderr
+    )
+
+
+def test_lookup_conflicting_rows_report_dual_class(tmp_path):
+    rows, neutral_rows = _build_repo(tmp_path)
+    twin = dict(rows[0])
+    twin[STR_003] = STR_002 if rows[0][STR_003] == STR_001 else STR_001
+    rows.append(twin)
+    _write_owner(tmp_path, rows, neutral_rows)
+    proc = _lookup(tmp_path, rows[0]["unit_id"])
+    assert proc.returncode == 2
+    record = _json(proc)
+    assert record.get("source") == "default"
+    assert record.get(STR_003) == STR_001
+    assert "dual-class" in proc.stderr, (
+        "two rows that disagree must be reported as dual-class, stderr=%r" % proc.stderr
+    )
+
+
 def test_default_marker_and_owner_degradation_label_are_mutually_exclusive(tmp_path):
     parsed_owner = tmp_path / "parsed"
     _build_repo(parsed_owner)

@@ -63,6 +63,7 @@ FLOOR_COMMANDS = 27
 FLOOR_SKILLS = 51
 
 OWNER_REL = Path("shared") / "definitions" / "flow-class-definitions.md"
+MIRROR_DIR_NAME = ".specify"
 COMMANDS_REL = Path("templates") / "commands"
 SKILLS_REL = Path("skills")
 SKILL_LAYERS = ("external", "internal")
@@ -99,12 +100,33 @@ def find_repo_root() -> Path:
     The canonical copy lives at ``<root>/scripts/python/flow-class-check.py`` and
     its runtime mirror at ``<root>/.specify/scripts/python/flow-class-check.py``;
     walking up to the nearest ancestor that contains ``.specify/`` (skipping a
-    parent that *is* ``.specify``) resolves both to the same root.
+    parent that *is* ``.specify``) resolves both to the same root. A directory
+    named ``.specify`` is never the project root — it is the payload mirror.
     """
-    for parent in Path(__file__).resolve().parents:
-        if parent.name != ".specify" and (parent / ".specify").is_dir():
+    here = Path(__file__).resolve()
+    parents = list(here.parents)
+    for parent in parents:
+        if parent.name != MIRROR_DIR_NAME and (parent / MIRROR_DIR_NAME).is_dir():
             return parent
-    return Path(__file__).resolve().parents[2]
+    for parent in parents:
+        if parent.name == MIRROR_DIR_NAME:
+            return parent.parent
+    return parents[2] if len(parents) > 2 else here.parent
+
+
+def owner_candidates(repo: Path) -> list[Path]:
+    """Every place the owner document may live, in resolution order.
+
+    Two hats: the framework source keeps the owner at ``<root>/shared/…``, while a
+    client project receives the same payload at ``<proj>/.specify/shared/…``
+    (distribution contract C-3 row 1). ``--repo`` may name either the source root
+    or the payload root itself, so both shapes are tried and the first hit wins;
+    only when neither exists is the owner genuinely unavailable.
+    """
+    roots = [repo]
+    if repo.name != MIRROR_DIR_NAME:
+        roots.append(repo / MIRROR_DIR_NAME)
+    return [root / OWNER_REL for root in roots]
 
 
 def checked_at() -> str:
@@ -215,7 +237,13 @@ def parse_neutral_list(lines: list[str]) -> set[str]:
 
 
 def parse_owner(repo: Path) -> OwnerLedger:
-    owner_path = repo / OWNER_REL
+    candidates = owner_candidates(repo)
+    owner_path = next((path for path in candidates if path.is_file()), None)
+    if owner_path is None:
+        raise OwnerError(
+            "owner document unreadable: none of %s exists"
+            % ", ".join(str(path) for path in candidates)
+        )
     try:
         text = owner_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
@@ -523,6 +551,23 @@ def emit_lookup(record: dict, output_format: str) -> None:
         print(render_lookup_text(record))
 
 
+def owner_degradation(unit_id: str, stamp: str, detail: str, output_format: str) -> int:
+    """Degrade to the default class with the one closed label, exit 2.
+
+    Used when the owner parses but cannot yield a *decided* class for this unit: a
+    value outside ``CLASS_VALUES``, a duplicated row, or two rows that disagree.
+    The payload therefore never presents a corrupted or ambiguous value as
+    ``source: ledger``; ``marker`` stays null because the fixed undeclared marker
+    is reserved for "owner parsed, unit simply not registered" (C-7), and the two
+    degradation labels stay mutually exclusive.
+    """
+    record = default_lookup_record(unit_id, stamp)
+    record["error"] = {"label": DEGRADATION_LABEL, "detail": detail}
+    print("%s: %s" % (DEGRADATION_LABEL, detail), file=sys.stderr)
+    emit_lookup(record, output_format)
+    return 2
+
+
 def default_lookup_record(unit_id: str, stamp: str) -> dict:
     return {
         "action": "lookup",
@@ -568,7 +613,29 @@ def action_lookup(repo: Path, unit_id: str, output_format: str) -> int:
         emit_lookup(record, output_format)
         return 0
 
+    if len(matches) > 1:
+        values = {row[CLASS_KEY] for row in matches}
+        kind = "dual-class" if len(values) > 1 else "duplicate"
+        return owner_degradation(
+            unit_id,
+            stamp,
+            "%s: unit %r has %d ledger rows (lines %r, values %r) — a decided class "
+            "is unavailable"
+            % (kind, unit_id, len(matches), [row["_line"] for row in matches],
+               sorted(values)),
+            output_format,
+        )
+
     row = matches[0]
+    if row[CLASS_KEY] not in CLASS_VALUES:
+        return owner_degradation(
+            unit_id,
+            stamp,
+            "invalid-class: unit %r carries %r, outside the closed set %r"
+            % (unit_id, row[CLASS_KEY], CLASS_VALUES),
+            output_format,
+        )
+
     record = {
         "action": "lookup",
         "checked_at": stamp,

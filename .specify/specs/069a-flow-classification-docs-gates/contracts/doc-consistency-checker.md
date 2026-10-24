@@ -89,12 +89,12 @@ python3 scripts/python/doc-consistency-check.py --action verify \
 
 | 码 | 含义 |
 |----|------|
-| 0 | 零 finding；`not-evaluated` 条目允许存在但必须出现在输出里 |
-| 1 | 至少一条 finding；或 `--strict` 且存在任一 `not-evaluated`（含 `count_check.status = not-run`） |
+| 0 | 零 finding，且所有被请求的面都已评估（`not-applicable` 不算未评估）；或显式传入 `--allow-degraded` 放宽 |
+| 1 | 至少一条 finding；或存在任一 `not-evaluated` 的面（含 `count_check.status = not-run`）——降级默认为失败 |
 | 2 | 输入或解析错误（无范围、未知面、owner 路径不可解析、无法读取文件） |
 
 MUST NOT 以 0 退出同时携带 finding。
-`not-evaluated` 的语义是「本项没有被评估」，不是「本项通过」：非 strict 下它不改变退出码，但 MUST 以独立字段出现（`as-of-stale` 见 C-3，`count` 见 C-6）；strict 下它一律升级为退出码 1。
+`not-evaluated` 的语义是「本项没有被评估」，不是「本项通过」：它 **默认** 把退出码升为 1（`--strict` 保留为同义别名），唯一的放宽开关是显式 `--allow-degraded`，且该开关 MUST NOT 出现在任何 blocking 调用点；`not-evaluated` 的原因 MUST 以独立字段出现（`as-of-stale` 见 C-3，`count` 见 C-6）。
 
 - **C-9** 自检样例（route a，本阶段已执行）
 
@@ -114,10 +114,11 @@ MUST NOT 以 0 退出同时携带 finding。
 
 | 调用点 | 时点 | 调用形态 |
 |--------|------|----------|
-| `/speckit.docs`（W1） | 分派前解析类别之后、收敛/写作判定之前 | `--path <每个受触文档>`；规格面存在时另加 `--spec-dir <spec dir>` |
+| `/speckit.docs`（W1） | 分派前解析类别之后、收敛/写作判定之前 | `--action verify --path <每个受触文档> [--spec-dir <spec dir>] --strict` |
 | `skill:create-docs`（W3） | Reconcile Loop R6 verify 与 Authoring Flow R6 验证 | 同一形态；命令侧已执行时复用其输出，不重复执行 |
 
 规则：
 - 检查器 MUST NOT 读取流程类别；「要不要跑」由调用点按类别决定，检查器只负责执行被点名面。
+- 两个调用点都 MUST 带 `--path`（逐个列出受触文档）与 `--strict`：不带范围的 `--action verify` 是退出码 2 的输入错误，不带 `--strict` 会让一个 `not-evaluated` 的 blocking 面看起来正常。
 - 其他命令模板与技能 MUST NOT 调用本检查器（接线封闭）。
-- 调用点缺席（引擎或 owner 未刷新）时，调用方 MUST 显式跳过并标注，MUST NOT 以「没跑 = 通过」呈现。
+- 调用点缺席（引擎或 owner 未刷新）时，调用方 MUST 显式呈现为**门禁未通过**并阻止「收敛完成」结论，MUST NOT 以「没跑 = 通过」或静默跳过呈现。

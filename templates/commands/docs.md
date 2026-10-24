@@ -32,8 +32,8 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 ### 类别读取与文档型门禁(判定前一次,本命令不复制判据)
 
 - **先读数、后判定**：在任何门禁判定之前执行一次 `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "/speckit.docs"`。取值、判据与逐流程台账的唯一所有者是 `shared/definitions/flow-class-definitions.md`；本模板只调用，不复述。
-- **按门禁 owner 的调用点行执行算子**：算子集、阶段映射与阻断级别的唯一所有者是 `shared/workflow/expression-gates.md`；本命令只执行其 `/speckit.docs` 调用点行登记的文档型算子——读者/目的/边界、证据/as-of 与事实一致性三面由 `python3 .specify/scripts/python/doc-consistency-check.py --action verify` 承担(计数面委派既有检查器)，结构/链接/构建沿用既有 `docs-utils.py --action validate`(判据为零新增违规)，评审沿用既有 `/speckit.review`。本模板不复制该表。
-- **降级可见、既有门禁不变**：`source: default` 时原样显示其 `marker`(未登记·按默认)；所有者不可解析或引擎缺席(退出码 2)时显示 `owner-unavailable` 且 `marker` 为 null(两标签互斥)。降级**不中断**本命令、**不静默切换**门禁集，也**不得**被当作通过。
+- **按门禁 owner 的调用点行执行算子**：算子集、阶段映射与阻断级别的唯一所有者是 `shared/workflow/expression-gates.md`；本命令只执行其 `/speckit.docs` 调用点行登记的文档型算子——读者/目的/边界、证据/as-of 与事实一致性三面由 `python3 .specify/scripts/python/doc-consistency-check.py --action verify --path <每个受触文档> [--spec-dir <spec-dir>] --strict` 承担（`--path` 逐个列出本轮受触文档、规格面存在时另加 `--spec-dir`，`--strict` 使任一 blocking 面的 `not-evaluated` 计为失败；计数面委派既有检查器），结构/链接/构建沿用既有 `docs-utils.py --action validate`（判据为零新增违规），评审沿用既有 `/speckit.review`。本模板不复制该表。
+- **降级可见、门禁不因此转绿**：`source: default` 时原样显示其 `marker`（未登记·按默认）；所有者不可解析或引擎缺席（退出码 2）时显示 `owner-unavailable` 且 `marker` 为 null（两标签互斥）。文档型门禁的阻断级别归 `shared/workflow/expression-gates.md`：检查器退出码 1/2、或任一 blocking 面为 `not-evaluated` 时，本轮 MUST 报为门禁未通过并阻止「收敛完成」结论。MUST NOT 以 `owner-unavailable` 静默跳过门禁，MUST NOT 把降级当作通过，也 MUST NOT 因降级而静默切换门禁集。
 
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 

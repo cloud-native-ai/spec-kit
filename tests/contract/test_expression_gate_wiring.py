@@ -23,7 +23,11 @@ C-15 and ``contracts/expression-gate-operators.md`` C-12/C-14/C-15 that
 * **A6** closed wiring — the other 25 templates and 49 skills reference neither
   engine nor the gate owner;
 * **A7** the eight generated command copies carry the same wiring (docs: lookup +
-  owner pointer; humanize: the two owner pointers and no engine call).
+  owner pointer; humanize: the two owner pointers and no engine call);
+* **A8** the wired checker command is **executed**, not grepped: the exact string
+  the docs template names is parsed, its placeholders are filled, and it runs in
+  both distribution shapes (delivered ``.specify/…`` copy and source copy) — a
+  scope-less call (exit 2) or an unexecutable wiring turns this leg red.
 
 A further leg pins the frozen ``requirements.md`` hashes of 062 / 067 / 068
 (SC-008). Red-first (Constitution IV): the wiring is deliberately absent until
@@ -33,7 +37,11 @@ message rather than an index error.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+import shlex
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -373,6 +381,158 @@ def test_a7_humanize_copies_carry_pointers_only():
             assert owner in text, "%s lacks the owner pointer %s" % (path.name, owner)
         assert "flow-class-check.py" not in text, (
             "%s must not call the engine (Simple command)" % path.name
+        )
+
+
+# --------------------------------------------------------------------------- #
+# A8 — execute the exact command the wiring names
+# --------------------------------------------------------------------------- #
+CHECKER_INVOCATION_RE = re.compile(
+    r"python3\s+(?P<tail>\S*scripts/python/doc-consistency-check\.py[^\n`]*)"
+)
+PATH_PLACEHOLDER_RE = re.compile(r"--path\s+<[^>\s]+>")
+SPEC_PLACEHOLDER_RE = re.compile(r"\[--spec-dir\s+<[^>\s]+>\]")
+WIRED_FIXTURE_DOC = """# Wired gate fixture
+
+**Readers**: 迁移评审者，需要在合并前判断这份文档是否可用。
+**Reading scenario**: 合并前核对读者声明与事实标注。
+
+该切片把两个引擎放在框架源里（证据：实测，as-of {as_of}，source: `python3 scripts/python/flow-class-check.py --action check` exit 0）。
+"""
+
+
+def _wired_checker_command() -> str:
+    """The literal invocation the docs template tells the operator to run."""
+    heading, body = _outline_wiring_section(_read(DOCS_TEMPLATE), DOCS_TEMPLATE)
+    match = CHECKER_INVOCATION_RE.search(body)
+    assert match, (
+        "the W1 wiring block (%r) names no `python3 …/doc-consistency-check.py` "
+        "invocation; A8 has nothing to execute" % heading
+    )
+    return match.group(0)
+
+
+def _wired_argv(command: str, doc: Path, spec: Path) -> list[str]:
+    """Fill the template's placeholders and split the result into argv."""
+    tail, path_hits = PATH_PLACEHOLDER_RE.subn("--path %s" % doc, command, count=1)
+    assert path_hits == 1, (
+        "the wired invocation must name `--path <每个受触文档>` — the checker rejects "
+        "a scope-less run with exit 2; got %r" % command
+    )
+    tail, spec_hits = SPEC_PLACEHOLDER_RE.subn("--spec-dir %s" % spec, tail, count=1)
+    assert spec_hits == 1, (
+        "the wired invocation must offer `[--spec-dir <spec-dir>]` for the spec side; "
+        "got %r" % command
+    )
+    assert "--strict" in tail, (
+        "the wired invocation must carry --strict so a not-evaluated blocking face "
+        "cannot exit 0; got %r" % command
+    )
+    argv = shlex.split(tail[len("python3 "):])
+    # The wiring keeps the human-readable default; the harness appends only the
+    # payload-shape flag so the same run can be asserted field by field.
+    if "--format" not in argv:
+        argv += ["--format", "json"]
+    return argv
+
+
+def _wired_fixture(root: Path) -> tuple[Path, Path]:
+    """A git-backed clean spec + document, committed with a matching as-of."""
+    repo = root / "repo"
+    repo.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "init", "-q"], cwd=str(repo), check=True)
+    spec = repo / "specs" / "001-wired"
+    spec.mkdir(parents=True)
+    (spec / "requirements.md").write_text(
+        "# Requirements\n\n"
+        "- **FR-001**: first requirement.\n"
+        "- **SC-001**: first criterion.\n",
+        encoding="utf-8",
+    )
+    (spec / "plan.md").write_text("# Plan\n\nNo count claim here.\n", encoding="utf-8")
+    (spec / "tasks.md").write_text(
+        "# Tasks\n\n- [ ] T001 first task\n", encoding="utf-8"
+    )
+    doc = repo / "docs" / "note.md"
+    doc.parent.mkdir(parents=True)
+    doc.write_text(WIRED_FIXTURE_DOC.format(as_of="2000-01-01"), encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=str(repo), check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "fixture"],
+        cwd=str(repo),
+        check=True,
+    )
+    commit_date = subprocess.run(
+        ["git", "log", "-1", "--format=%cs", "--", "docs/note.md"],
+        cwd=str(repo), check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", commit_date), (
+        "fixture precondition: the document must have a commit date, got %r" % commit_date
+    )
+    doc.write_text(WIRED_FIXTURE_DOC.format(as_of=commit_date), encoding="utf-8")
+    return doc, spec
+
+
+def _run_wired(argv: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, *argv],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+
+
+def _wired_shapes(argv: list[str]) -> dict[str, list[str]]:
+    """The delivered (mirror) invocation and the same command from the source tree."""
+    assert argv and argv[0].endswith("doc-consistency-check.py"), argv
+    return {
+        "delivered": list(argv),
+        "source": ["scripts/python/doc-consistency-check.py", *argv[1:]],
+    }
+
+
+def test_a8_the_wired_command_executes_in_both_shapes(tmp_path):
+    """Parse → execute: the exact wired command must run, not merely be mentioned."""
+    command = _wired_checker_command()
+    doc, spec = _wired_fixture(tmp_path)
+    shapes = _wired_shapes(_wired_argv(command, doc, spec))
+    for shape, argv in shapes.items():
+        proc = _run_wired(argv)
+        assert proc.returncode in (0, 1), (
+            "%s shape: the wired command must produce a verdict, not an input error; "
+            "exit=%d stdout=%r stderr=%r"
+            % (shape, proc.returncode, proc.stdout[:400], proc.stderr)
+        )
+        payload = json.loads(proc.stdout)
+        assert payload["action"] == "verify", payload
+        assert payload["scope"]["files_scanned"] >= 1, payload["scope"]
+        assert proc.returncode == 0, (
+            "%s shape: a clean, fully evaluated fixture must pass; findings=%r "
+            "degradations=%r" % (shape, payload["findings"], payload["degradations"])
+        )
+        assert set(payload["faces"]) >= {"reader", "evidence", "duplicate", "count"}, (
+            "%s shape: the wired run must evaluate the four faces, got %r"
+            % (shape, payload["faces"])
+        )
+
+
+def test_a8_the_wired_command_goes_red_on_a_broken_document(tmp_path):
+    """The executed command can fail — otherwise the green above proves nothing."""
+    command = _wired_checker_command()
+    doc, spec = _wired_fixture(tmp_path)
+    doc.write_text("# Broken\n\n没有任何读者声明。\n", encoding="utf-8")
+    shapes = _wired_shapes(_wired_argv(command, doc, spec))
+    for shape, argv in shapes.items():
+        proc = _run_wired(argv)
+        assert proc.returncode == 1, (
+            "%s shape: a document without a reader declaration must fail the blocking "
+            "gate; exit=%d stderr=%r" % (shape, proc.returncode, proc.stderr)
+        )
+        payload = json.loads(proc.stdout)
+        assert "reader-declaration-missing" in {
+            item["rule"] for item in payload["findings"]
+        }, "%s shape: expected reader-declaration-missing, got %r" % (
+            shape, payload["findings"]
         )
 
 

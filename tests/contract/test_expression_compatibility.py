@@ -50,8 +50,11 @@ clause, never a bare assertion.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -524,6 +527,76 @@ def test_c7_mirrors_are_byte_identical():
         "(absence is tolerated only for the four new payloads until T033):\n- "
         + "\n- ".join(problems)
     )
+
+
+# --------------------------------------------------------------------------- #
+# C-4 — the refreshed client shape resolves the owner it ships
+# --------------------------------------------------------------------------- #
+def _client_shape(tmp_path: Path) -> Path:
+    """Materialise what ``specify init`` + the payload produce in a client project.
+
+    Only ``.specify/`` exists: the engine at ``.specify/scripts/python/``, the
+    owner at ``.specify/shared/definitions/`` and the skill at the flattened
+    ``.specify/skills/create-docs/``. No source tree, no ``templates/``, no
+    top-level ``skills/``.
+    """
+    client = tmp_path / "client"
+    engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
+    engine.parent.mkdir(parents=True)
+    shutil.copy2(REPO_ROOT / "scripts" / "python" / "flow-class-check.py", engine)
+    owner = client / ".specify" / CLASS_OWNER
+    owner.parent.mkdir(parents=True)
+    shutil.copy2(REPO_ROOT / CLASS_OWNER, owner)
+    skill = client / ".specify" / "skills" / "create-docs" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    shutil.copy2(
+        REPO_ROOT / "skills" / "external" / "create-docs" / "SKILL.md", skill
+    )
+    return client
+
+
+def _lookup(engine: Path, *args: str, cwd: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(engine), "--action", "lookup", *args, "--format", "json"],
+        cwd=str(cwd),
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_c4_refreshed_client_shape_reads_the_delivered_owner(tmp_path):
+    """C-4's refreshed state: the class must resolve from ``.specify/shared/…``.
+
+    The shipped defect looked one directory too high (``<proj>/shared/…``), so
+    every client call degraded to ``owner-unavailable`` + the default class.
+    """
+    client = _client_shape(tmp_path)
+    engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
+
+    for extra in ([], ["--repo", str(client)]):
+        proc = _lookup(engine, "--unit-id", "/speckit.docs", *extra, cwd=client)
+        assert proc.returncode == 0, (
+            "a refreshed client project must resolve its owner (args=%r); "
+            "stderr=%r" % (extra, proc.stderr)
+        )
+        record = json.loads(proc.stdout)
+        assert record.get("flow_class") == "expression", (
+            "the ledger row must be read, not the default class: %r" % record
+        )
+        assert record.get("source") == "ledger", (
+            "a registered unit in the delivered shape is ledger-sourced: %r" % record
+        )
+        assert "owner-unavailable" not in proc.stderr
+
+
+def test_c4_client_shape_still_degrades_when_the_owner_is_absent(tmp_path):
+    """Negative control: the fix must not turn a missing owner into a green read."""
+    client = _client_shape(tmp_path)
+    (client / ".specify" / CLASS_OWNER).unlink()
+    engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
+    proc = _lookup(engine, "--unit-id", "/speckit.docs", cwd=client)
+    assert proc.returncode == 2, "a genuinely absent owner is still exit 2"
+    assert "owner-unavailable" in proc.stderr
 
 
 # --------------------------------------------------------------------------- #

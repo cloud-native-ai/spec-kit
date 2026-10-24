@@ -118,7 +118,7 @@ $ comm -13 <baseline-failures.txt> <current-failures.txt>   # 零 NEW → 空输
 $ comm -23 <baseline-failures.txt> <current-failures.txt>   # 零 GONE → 空输出
 ```
 
-结果：当前失败 33 条与 `notes/test-baseline-contract.txt` 冻结的 33 条**逐名相同**（零 NEW、零 GONE）；基线 `33 failed / 4177 passed / 5 skipped`（HEAD `01d1feaa`）→ 本次 `33 failed / 4267 passed / 5 skipped`。pass 数 +90 的构成已核到名字级：6 支新增契约测试 86 用例 + `test_mirror_parity_suite.py` 按文件参数化的 4 条新 id；2 支新增单元测试（38 用例）不在该收集面，单独实跑 `38 passed`。8 支新测试模块合计 `124 passed`（13.11s）。
+结果：当前失败 33 条与 `notes/test-baseline-contract.txt` 冻结的 33 条**逐名相同**（零 NEW、零 GONE）；基线 `33 failed / 4177 passed / 5 skipped`（HEAD `01d1feaa`）。**2026-10-24 review-fix 后重测**：契约套件 `33 failed / 4277 passed / 5 skipped`（254.26s），失败 node id 与冻结的 33 条 `comm` 逐名相同，**NEW = ∅ / GONE = ∅**；较 review 时点的 4267 passed 增加 10 条，全部来自 4 支改造后的契约模块新增用例（correctness +3、doc-consistency-checker +4、gate-wiring +2、compatibility +2），退出语义改写属同一批用例的就地修正、不新增或删除收集项。8 支新测试模块合计 `137 passed`（含 3 支单元模块新增的 3 条 lookup 降级用例）。
 
 **② 条款覆盖**
 
@@ -176,7 +176,7 @@ M  templates/commands/humanize.md
 
 映射按 `tasks.md` § Requirement Coverage Map（SC-001 ← T005/T008/T009/T035；SC-002 ← T006/T007/T035；SC-003 ← T031/T035；SC-004/005/006 ← T018/T035；SC-007 ← T014/T021/T027/T034；SC-008 ← T028/T030/T034/T035）。状态取值只从 owner 模板的封闭集取；未测量量显式降级，不记 0、不记达成。
 
-- **SC-001** — 状态 **partial**。机械半已证：`tests/contract/test_flow_class_correctness.py` 4 用例全绿（`test_fixture_matrix_is_not_vacuous` / `test_lookup_matches_independent_oracle` / `test_mutating_one_class_turns_the_same_comparison_red` / `test_source_and_marker_invariants_hold_for_every_unit`），fixture 覆盖 10 个单元、oracle 表在测试内独立书写、变异断言证明比对可证伪。**未执行**两名独立判定者的复现演练（隔离结论后逐条比对）——本次是单代理 headless 收口，无第二名独立判定者，故**不记达成**。
+- **SC-001** — 状态 **partial**。机械半已证：`tests/contract/test_flow_class_correctness.py` 7 用例全绿（`test_fixture_matrix_is_not_vacuous` / `test_every_oracle_unit_has_a_fixture_row` / `test_fixture_owner_embeds_the_real_criteria` / `test_lookup_matches_independent_oracle` / `test_mutating_one_class_turns_the_same_comparison_red` / `test_mutating_the_oracle_turns_the_same_comparison_red` / `test_source_and_marker_invariants_hold_for_every_unit`），fixture 覆盖 10 个单元。**oracle 与 fixture 分离**：期望值取自独立工件 `tests/fixtures/flow_class/classification-oracle.md`（逐单元记录两步判定与判据落点，判定者按 owner § 判据 判定、不看 fixture 台账），fixture 只承载输入；两条变异断言分别翻转**台账**与**oracle**，都使同一比对转红，故可证伪的不只是「lookup 会抄台账」。fixture owner 的 `## 判据` 段逐字嵌自真实 owner（不是占位）。**未执行**两名独立判定者的复现演练（隔离结论后逐条比对）——本次仍是单代理 headless 收口，无第二名独立判定者，故**不记达成**。
   - 命令：`pytest tests/contract/test_flow_class_correctness.py -p no:cacheprovider --tb=no -v` → `4 passed in 5.95s`
   - 证据：`notes/quickstart-run.md` § 场景 1；`notes/red-first-evidence.md`（T005 红先记录）
 - **SC-002** — 状态 **pass**。台账与清单机械对账：`--action check` → `units: 78`（命令 27 / 技能 51，与 anti-vacuous floors 相等）、`findings: []`、exit 0，未分类缺口 = 0。消费点分母按 SC 定义只取**真正读取类别**的入口（W1 `/speckit.docs`、W4 `skill:humanize`；W2 只给 owner 指针、W3 沿用调用方结果，均不计入）：2/2 = 100% 已接线且都声明标记展示规则；`source: default` 的标记由引擎实测为 `未声明·按默认`，两入口文本均要求「原样显示 marker」→ 静默按默认执行的样本 = 0。
@@ -185,10 +185,10 @@ M  templates/commands/humanize.md
   - 证据：`notes/quickstart-run.md` § 场景 1；`tests/contract/test_expression_gate_wiring.py` 全绿
 - **SC-003** — 状态 **deferred**。`features.md` 中已完成的表达类特性只有 062（`doc-type` 首个实现），本切片自身是第一个接线切片，满足「本特性登记后最近 3 个已完成的表达类特性」的样本数 = 1 < 3，按 requirements 原文记 `not-evaluated`，不记 0、不记达标。
   - `SC-003_deferred_reason=` 样本不足（需 3 个已完成表达类特性，现只有 062 + 本切片；062 的 analyze/review 调用率未按本协议采集）
-- **SC-004** — 状态 **deferred**。门禁调用次数冻结值 0（`exec-quant` 26 条记录中命中声明门禁单元集 = 0），收尾值同为 0；0 → 0 使「下降 ≥30%」在算术上不可定义，且无同类文档型特性的前后对照样本，故不记达标。
-  - `SC-004_deferred_reason=` 基线为 0，无可比降幅；需在后续表达类特性上按同一协议重采（仪器口径归 069b）
-- **SC-005** — 状态 **deferred**。人工确认次数冻结值 0（无 `lifecycle_point: gate-*` 记录；clarify 自裁决 0 个问题），收尾值同为 0；「下降 ≥30%」同样不可定义。「单阶段人工确认 ≤3」在本切片为 0（满足），但该子项不足以支撑整条 SC 达标。
-  - `SC-005_deferred_reason=` 基线 0 → 无可比降幅；单阶段 ≤3 子项实测 0 次
+- **SC-004** — 状态 **deferred**（= not-evaluated）。分母按 requirements § Measurement Sources 的口径（a）重记：**本特性运行中执行的检查类单元调用总数**（checklist / analyze / review / pre-analyze 检查 / `validate-*`），不是接线封闭集的四个 W 单元——上一版用后者过滤得 0，属于「过滤后的 0 基线冒充」。收尾实测：`exec-quant` 记录中属本切片的检查类调用 **2 条**（`/speckit.checklist` ×1 @ 2026-10-24T12:55:53Z + `/speckit.review` ×1 @ 2026-10-24T15:14:46Z；`/speckit.analyze` 0 条），另有 `pre-analyze-check.py --stage {requirements,plan,tasks}`、`validate-requirements.py`、`validate-tasks.py`、`decomposition-check.py`、`account-clause-coverage.py` 与 8 支测试模块属**仪器不可分**（脚本不是 exec-quant 的 `unit_id`，既有通道无法按次拆分）。冻结值 0 的含义是「冻结时本特性尚未开工」，不是同类特性的前值，故 `(冻结 − 收尾)/冻结` 不可定义——照实记 not-evaluated，不记 0、不记降幅。
+  - `SC-004_deferred_reason=` 冻结值是开工前的零且无同类前值样本；既有仪器不能把脚本级检查拆成每次调用 → 先把仪器口径做出来（069b，父编号 041），再在下一个同类表达类特性上按口径（a）冻前值、收尾复测
+- **SC-005** — 状态 **deferred**（= not-evaluated）。分母按口径（b）重记：**本特性运行中触发确认门的次数 + clarify 提问轮次**。收尾实测 0（`feedback-utils.py --action list --lifecycle-point gate-` 命中 0 条；本切片 6 条反馈条目均无 `lifecycle_point`；clarify 自裁决、0 个用户问题），冻结值同样为 0（冻结时尚未开工）。「单阶段人工确认 ≤3」在该 0 上成立，但 0 → 0 使「下降 ≥30%」不可定义，且无同类前值样本——记 not-evaluated，不记达标。
+  - `SC-005_deferred_reason=` 绝对值为 0 但缺少可比前值；`≤3` 子项成立不等于整条达标；需在后续表达类特性上按口径（b）冻前值后复测
 - **SC-006** — 状态 **deferred**。requirements→analyze 墙钟的起点存在（`requirements.md` 首次提交 `0f650749`，2026-10-24），终点缺失——`run-determination.py --action history --target /speckit.analyze` 的 5 条记录全属其他特性，本切片从未运行 `/speckit.analyze`；按 E8 记 `value: null` + reason。
   - `SC-006_deferred_reason=` 无本切片 `/speckit.analyze` 完成记录，终点时间戳缺失
 - **SC-007** — 状态 **pass**。三类注入各命中一次、漏报 0：① owner 原文副本 → `duplicate-fact`（两侧定位 `dup-a.md:3` ↔ `dup-b.md:3`，`fix_direction` 齐备）② as-of 改旧 → `as-of-stale` ③ 派生计数手打 → `count-mismatch`（经 `pre-analyze-check.py` 委派）。命中集合 = {duplicate-fact, as-of-stale, count-mismatch}，漏报集合 = ∅。
@@ -214,14 +214,14 @@ SC-003_note=only 062 exists as a completed expression member; recorded not-evalu
 SC-003_deferred_reason=needs 3 completed expression-class features registered after this feature
 
 SC-004_status=deferred
-SC-004_value=baseline 0 gate calls → post 0; reduction undefined
-SC-004_note=no like-for-like doc-type sample; instrumentation clause owned by 069b
-SC-004_deferred_reason=zero baseline admits no ≥30% reduction; re-measure on later expression features
+SC-004_value=denominator = checks executed (definition a); post = 2 instrument-visible check-class calls (/speckit.checklist x1, /speckit.review x1) + a non-instrumented set (pre-analyze-check x3 stages, validate-requirements, validate-tasks, decomposition-check, account-clause-coverage); frozen = 0 because the feature had not started
+SC-004_note=the four W wiring units are NOT the denominator (that filter is what produced the bogus 0 -> 0); the instrument cannot split script-level checks per call
+SC-004_deferred_reason=pre-feature zero is not a comparable prior value and the instrument cannot separate per-check calls; fix the instrument (069b) then re-freeze on the next expression feature
 
 SC-005_status=deferred
-SC-005_value=baseline 0 confirmations → post 0; per-stage ≤3 holds at 0
-SC-005_note=reduction undefined on a zero baseline
-SC-005_deferred_reason=zero baseline admits no ≥30% reduction
+SC-005_value=denominator = gate confirmations + clarify rounds (definition b); frozen 0 (pre-feature) -> post 0 (0 gate-probe records, clarify self-adjudicated with 0 questions); per-stage ≤3 holds at 0
+SC-005_note=absolute values recorded; no comparable prior sample exists
+SC-005_deferred_reason=0 -> 0 admits no ≥30% reduction; re-measure on later expression features under the same protocol
 
 SC-006_status=deferred
 SC-006_value=null (start 2026-10-24 via 0f650749; no /speckit.analyze record for this slice)
@@ -248,7 +248,7 @@ SC-008_note=recomputed by shasum and asserted by test_expression_compatibility.p
 | DoD-1 任务行全 `[X]` 或 `[~]` 有理由 | pass | 36/36 `[X]`；`deferred_tasks=` 空（T004–T008 的复选框在本次回填，产物早于本次已在盘且回归通过） |
 | DoD-2 两份 owner + 两个引擎按契约交付 | pass | §T033 的 7 对同字节表；`flow-class-check.py` check/lookup 与 `doc-consistency-check.py` verify 四面均在本次实跑 |
 | DoD-3 50 条款各被一行认领 | pass | §T034 ② `claimed = 50`；`validate-tasks.py` 的 green 检查在 T031 收口时已过，本次未改 `[green:]` 归属 |
-| DoD-4 8 支新测试全绿 + 零新增失败 | pass | `124 passed`（8 支模块）；§T034 ① 零 NEW / 零 GONE |
+| DoD-4 8 支新测试全绿 + 零新增失败 | pass | `137 passed`（8 支模块，review-fix 后重测）；§T034 ① 零 NEW / 零 GONE |
 | DoD-5 镜像义务逐行落地 | pass | §T033（7 对 `cmp` IDENTICAL、副本 `OK`、`--check` exit 0、零手改镜像） |
 | DoD-6 接线封闭且不越界 | pass | §T034 ⑤（五个 `M` 恰为指定集）+ 场景 4 的封闭集 grep 空 + SC-008 哈希不变 |
 | DoD-7 零新增命令 / 零项目侧存储 | pass | 命令 27 与技能 51 的清单在 `check` 中与 floors 相等；`.specify/memory/` 下无分类数据文件（`test_expression_compatibility.py` 钉住） |

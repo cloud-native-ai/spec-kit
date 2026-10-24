@@ -19,8 +19,10 @@ implements the mechanical faces only — it never re-defines a value domain:
 Read-only by construction: the only file this process may write is the one
 named by ``--json-out`` (C-1).
 
-Exit codes (C-8): 0 = zero findings, 1 = at least one finding (or a strict run
-with a ``not-evaluated`` face), 2 = input / parse error.
+Exit codes (C-8): 0 = zero findings and every requested face evaluated, 1 = at
+least one finding **or** a blocking face left ``not-evaluated`` (a degraded face
+is never a pass — ``--allow-degraded`` is the only opt-out), 2 = input / parse
+error.
 
 Standard library only, Python >= 3.8.
 """
@@ -107,10 +109,12 @@ DUPLICATE_EXACT_MIN = 24
 DUPLICATE_FUZZY_MIN = 40
 DUPLICATE_FUZZY_RATIO = 0.90
 
-# C-6 — delegation target (source tree first, then its .specify mirror).
+# C-6 — delegation target. Source-relative only: the payload-root resolution in
+# ``resolve_payload`` also tries the flattened ``.specify/skills/...`` form, so a
+# client project (where only the mirror exists) finds its copy without a second
+# hard-coded path.
 DELEGATE_PATHS = (
     "skills/external/sdd-loop-driver/scripts/pre-analyze-check.py",
-    ".specify/skills/external/sdd-loop-driver/scripts/pre-analyze-check.py",
 )
 
 
@@ -126,18 +130,78 @@ def utc_now():
 
 
 def find_repo_root(script_path):
-    """The ancestor holding both ``shared/`` and ``skills/``.
+    """The project root that owns this checkout — never ``.specify`` itself.
+
+    Two hats, one tree: the canonical copy lives at ``<root>/scripts/python/`` and
+    the delivered copy at ``<root>/.specify/scripts/python/``; both MUST resolve
+    to ``<root>``. Walking up to the nearest ancestor holding ``shared/`` and
+    ``skills/`` is not enough — inside a client project (and inside this framework
+    repo's own runtime mirror) ``.specify/`` itself holds both, which is the
+    two-hats path-resolution trap: the mirror copy then resolves owner paths
+    against a flattened tree where ``skills/external/…`` does not exist. A
+    directory named ``.specify`` is therefore never a repository root.
 
     Anchored on the script location, never on the caller's cwd: the checker must
     behave the same from any working directory (the evidence face runs with the
     cwd of the document under test).
     """
     here = script_path.resolve()
-    for parent in [here.parent] + list(here.parents):
+    parents = list(here.parents)
+    # 1. The source root: the nearest non-`.specify` ancestor carrying the payload.
+    for parent in parents:
+        if parent.name == MIRROR_DIR_NAME:
+            continue
         if (parent / "shared").is_dir() and (parent / "skills").is_dir():
             return parent
-    parents = list(here.parents)
+    # 2. Two-hats fallback: the root is the parent of the `.specify/` we live under.
+    for parent in parents:
+        if parent.name == MIRROR_DIR_NAME:
+            return parent.parent
     return parents[2] if len(parents) > 2 else here.parent
+
+
+def root_candidates(script_path=None):
+    """Payload roots to resolve framework-relative paths against, in order.
+
+    Source root first, its ``.specify/`` mirror second: a framework checkout
+    resolves everything from the source tree, while a client project — which only
+    receives ``.specify/`` — resolves the same paths from the mirror. Both shapes
+    are load-bearing: the wired call sites name the delivered copy.
+    """
+    root = find_repo_root(Path(__file__) if script_path is None else script_path)
+    roots = [root]
+    mirror = root / MIRROR_DIR_NAME
+    if mirror.is_dir() and mirror.resolve() != root.resolve():
+        roots.append(mirror)
+    return roots
+
+
+def payload_forms(rel):
+    """Both distribution shapes of a source-relative framework path.
+
+    ``skills/external/<name>/…`` mirrors flat into ``.specify/skills/<name>/…``
+    (the host-discovery surface); ``skills/internal/<name>/…`` mirrors nested.
+    """
+    forms = [rel]
+    parts = Path(rel).parts
+    if len(parts) > 2 and parts[0] == "skills" and parts[1] == "external":
+        forms.append(Path(parts[0], *parts[2:]).as_posix())
+    return forms
+
+
+def resolve_payload(roots, rel):
+    """Resolve one framework-relative path against every root/shape pair.
+
+    Returns ``None`` only when neither the source root nor the mirror root carries
+    the path in any shape — the single condition that makes an owner genuinely
+    unavailable.
+    """
+    for root in roots:
+        for form in payload_forms(rel):
+            candidate = root / form
+            if candidate.is_file():
+                return candidate
+    return None
 
 
 def display_path(path, root):
@@ -462,10 +526,18 @@ def subject_files(spec_dir, paths):
     return unique
 
 
-def collect_records(paths, root, pool):
+def collect_records(paths, root, pool, allow_mirror=False):
+    """Collect comparable lines from *paths*.
+
+    ``allow_mirror`` is for the S3 owner set only. Mirror-side files are excluded
+    from the scanned sets (C-2), but the owners are an explicit, closed path list —
+    in a client project every one of them resolves inside ``.specify/``, and
+    dropping them there would leave the duplicate face comparing against an empty
+    comparison side, i.e. a silent pass.
+    """
     records = []
     for path in paths:
-        if is_excluded_path(path, root):
+        if not allow_mirror and is_excluded_path(path, root):
             continue
         display = display_path(path, root)
         for number, raw, in_fence in iter_lines(path):
@@ -596,22 +668,23 @@ def check_duplicates(subject, owners):
 # --------------------------------------------------------------------------- #
 # C-6 — count face (delegated, never re-implemented)
 # --------------------------------------------------------------------------- #
-def find_delegate(root):
+def find_delegate(roots):
     for rel in DELEGATE_PATHS:
-        candidate = root / rel
-        if candidate.is_file():
+        candidate = resolve_payload(roots, rel)
+        if candidate is not None:
             return candidate
     return None
 
 
-def delegate_count(spec_dir, root):
+def delegate_count(spec_dir, roots, root=None):
     """Return ``(findings, count_check)``; every degradation is explicit."""
+    root = root if root is not None else roots[0]
     if spec_dir is None:
         return [], {
             "status": "not-run",
             "reason": "no --spec-dir; the count face needs a spec dir to delegate",
         }
-    delegate = find_delegate(root)
+    delegate = find_delegate(roots)
     if delegate is None:
         return [], {
             "status": "not-run",
@@ -705,7 +778,8 @@ def parse_faces(raw):
     return ordered
 
 
-def verify(spec_dir, paths, faces, root):
+def verify(spec_dir, paths, faces, root, roots=None):
+    roots = roots or [root]
     findings = []
     degradations = []
     statuses = {}
@@ -733,15 +807,30 @@ def verify(spec_dir, paths, faces, root):
 
     if "duplicate" in faces:
         subject_records = collect_records(subjects, root, "subject")
-        owner_records = collect_records(
-            [root / rel for rel in OWNER_PATHS if (root / rel).is_file()],
-            root,
-            "owner",
-        )
-        missing_owners = [rel for rel in OWNER_PATHS if not (root / rel).is_file()]
+        owner_paths = []
+        missing_owners = []
+        for rel in OWNER_PATHS:
+            resolved = resolve_payload(roots, rel)
+            if resolved is None:
+                missing_owners.append(rel)
+            else:
+                owner_paths.append(resolved)
         if missing_owners:
             raise InputError(
-                "owner path not resolvable: %s" % ", ".join(missing_owners)
+                "owner path not resolvable (tried %s, then the %s mirror): %s"
+                % (
+                    roots[0],
+                    MIRROR_DIR_NAME,
+                    ", ".join(missing_owners),
+                )
+            )
+        # The owner set is an explicit closed list, so a mirror-resolved owner is
+        # still a legitimate comparison side (see ``collect_records``).
+        owner_records = collect_records(owner_paths, root, "owner", allow_mirror=True)
+        if not owner_records:
+            raise InputError(
+                "owner set resolved but yielded no comparable lines: %s"
+                % ", ".join(OWNER_PATHS)
             )
         duplicate_findings = check_duplicates(subject_records, owner_records)
         findings.extend(duplicate_findings)
@@ -749,7 +838,7 @@ def verify(spec_dir, paths, faces, root):
 
     count_check = {"status": "not-run", "reason": "count face not requested"}
     if "count" in faces:
-        count_findings, count_check = delegate_count(spec_dir, root)
+        count_findings, count_check = delegate_count(spec_dir, roots, root)
         findings.extend(count_findings)
         if count_check["status"] == "delegated":
             statuses["count"] = "fail" if count_findings else "pass"
@@ -819,7 +908,17 @@ def main(argv=None):
     parser.add_argument("--spec-dir", default="")
     parser.add_argument("--path", action="append", default=[])
     parser.add_argument("--faces", default="")
-    parser.add_argument("--strict", action="store_true")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="deprecated alias — a not-evaluated blocking face already exits 1 by default",
+    )
+    parser.add_argument(
+        "--allow-degraded",
+        action="store_true",
+        help="let a not-evaluated blocking face exit 0 (the face and its reason still "
+             "appear in the payload; never use this at a blocking call site)",
+    )
     parser.add_argument("--format", choices=("text", "json"), default="text")
     parser.add_argument("--json-out", default="")
     args = parser.parse_args(argv)
@@ -836,9 +935,10 @@ def main(argv=None):
             if not path.is_file():
                 raise InputError("--path is not a readable file: %s" % path)
 
-        root = find_repo_root(Path(__file__))
+        roots = root_candidates(Path(__file__))
+        root = roots[0]
         findings, statuses, count_check, degradations, subjects = verify(
-            spec_dir, paths, faces, root
+            spec_dir, paths, faces, root, roots
         )
     except InputError as exc:
         print("doc-consistency-check: input error: %s" % exc, file=sys.stderr)
@@ -867,12 +967,14 @@ def main(argv=None):
 
     if findings:
         return 1
-    if args.strict:
-        degraded = any(status == "not-evaluated" for status in statuses.values())
-        if "count" in faces and count_check.get("status") == "not-run":
-            degraded = True
-        if degraded:
-            return 1
+    # A degraded blocking face is a failure by default: "not evaluated" is not
+    # "passed" (C-8). ``--allow-degraded`` is the single explicit opt-out, and
+    # ``--strict`` stays accepted as an alias for the same semantics.
+    degraded = any(status == "not-evaluated" for status in statuses.values())
+    if "count" in faces and count_check.get("status") == "not-run":
+        degraded = True
+    if degraded and not args.allow_degraded:
+        return 1
     return 0
 
 

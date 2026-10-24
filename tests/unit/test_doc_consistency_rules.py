@@ -239,12 +239,16 @@ def test_asof_staleness_outside_git_is_not_evaluated_with_reason(tmp_path):
         _header("a") + "断言（证据：实测，as-of 2000-01-01，source: `pytest -q` exit 0）。\n",
     )
     proc, payload = _verify("--path", str(doc), "--faces", "evidence")
-    assert proc.returncode == 0
+    assert proc.returncode == 1, (
+        "a degraded blocking face fails by default — not-evaluated is not passed (C-8)"
+    )
     assert payload["faces"]["evidence"] == "not-evaluated", (
         "outside git the staleness rule is not-evaluated, never pass: %r" % payload["faces"]
     )
     reasons = json.dumps(payload, ensure_ascii=False)
     assert re.search(r"reason", reasons), "the not-evaluated state must carry a reason"
+    lenient, _ = _verify("--path", str(doc), "--faces", "evidence", "--allow-degraded")
+    assert lenient.returncode == 0, "--allow-degraded is the only opt-out"
 
 
 # --------------------------------------------------------------------------- #
@@ -303,7 +307,10 @@ def test_count_delegation_degradation_is_explicit(tmp_path):
     spec = tmp_path / "specs" / "001-incomplete"
     _write(spec / "requirements.md", "# Requirements\n\n- **FR-001**: only one.\n")
     proc, payload = _verify("--spec-dir", str(spec), "--faces", "count")
-    assert proc.returncode == 0
+    assert proc.returncode == 1, (
+        "an unavailable count face is not-evaluated, and a degraded blocking face "
+        "fails by default (C-8)"
+    )
     assert payload["count_check"]["status"] == "not-run"
     reason = payload["count_check"].get("reason")
     assert reason, "not-run must carry a non-empty reason"
