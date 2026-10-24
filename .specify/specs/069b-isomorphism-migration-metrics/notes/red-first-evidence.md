@@ -143,3 +143,63 @@ EXIT=1
 判读：红因是「源已改、镜像未投影」，不是映射或引擎缺陷；T024 是 T026 全量回归的显式前置（tasks § Dependencies）。
 同批唯一的另一处新红（`test_stage_skip_claims_only_appear_as_rejection`）已于本阶段修掉：owner 说明句改用 `不构成…` 的否定形态（与 069a 的 `NEGATION_MARKERS` 相容），
 复跑 `pytest tests/contract/test_expression_compatibility.py -k "not c7_mirrors"` → `15 passed, 1 deselected`。
+
+---
+
+## R4 — T010 红跑：`tests/contract/test_migration_distribution.py`
+
+红跑在**改前 HEAD 的临时 worktree** 上进行（当前工作树尚无本测试文件；worktree 保证红的是提交态 owner，而不是被本阶段改动覆盖后的树）：
+
+```
+$ git worktree add --detach ~/tmp/069b-redtree HEAD
+$ cp tests/contract/test_migration_distribution.py ~/tmp/069b-redtree/tests/contract/
+$ cd ~/tmp/069b-redtree && /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_migration_distribution.py -q -p no:cacheprovider
+```
+
+真实输出（5 条失败的代表行）：
+
+```
+E   AssertionError: the owner must not keep a '069b 承接' handoff pointer once 069b has landed;
+                    point at the landed mapping / boundary / gate owners instead
+E   AssertionError: the literal registry (§ opening block) must declare the parent spec as the
+                    semantic owner with the 069a/069b tables as projections;
+                    missing ['父规格', '语义 owner', '同源投影']
+E   AssertionError: § 所有权 must state that a project MAY record the class in its own knowledge
+                    space while the framework never reads it; missing ['自己的知识空间', '不读取']
+E   AssertionError: the owner must point at the landed mixed-oracle contract
+                    (contracts/ledger-reconciler.md) instead of the 069b handoff
+E   AssertionError: notes/quickstart-run.md must carry § 场景 6 (migration & distribution)
+FAILED ...::test_owner_drops_every_069b_handoff_pointer
+FAILED ...::test_owner_literal_registry_names_the_parent_spec_as_semantic_owner
+FAILED ...::test_owner_ownership_section_never_reads_a_project_record
+FAILED ...::test_mixed_oracle_rows_point_at_the_landed_contract
+FAILED ...::test_quickstart_records_name_level_snapshot_outcomes
+5 failed, 11 passed in 0.18s
+EXIT=1
+```
+
+红形态判读：5 条红全部是「owner 仍保留交接指针 / 字面量登记处未收敛 / § 所有权未收敛 / 台账未指向已落盘条款 /
+场景 6 未落盘」——**不是** import 或 collection error；测试文件本身可被收集（16 条用例全部执行）。
+另外 11 条（零调用点、冻结文件名集合、四类载荷、零项目侧存储、样本字段）在改前即以绿通过，
+因为它们断言的是「不应出现 / 应保持」的形态，绿本身不构成实现已存在。
+
+worktree 在取证后移除（`git worktree remove --force`），不修改主工作树。
+
+---
+
+## G5 — T013 转绿：US2 定向套件
+
+T011（owner 指针收敛）与 T012（三快照 + 场景 6 落盘）完成后，重跑与 R4 相同的测试文件（主工作树）：
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/pytest \
+    tests/contract/test_migration_distribution.py -q -p no:cacheprovider
+
+................                                                         [100%]
+16 passed in 0.33s
+EXIT=0
+```
+
+判读：R4 的 5 条红全部转绿，其余 11 条保持绿；零 skip、零 xfail。
+场景 6 的真实输出（未刷新零调用点、四类载荷、三快照 `comm -13`）见 `notes/quickstart-run.md` § 6。
