@@ -3,30 +3,6 @@
   "decision": "pass",
   "findings": [
     {
-      "check": "count-claim",
-      "severity": "error",
-      "path": "requirements.md",
-      "line": 46,
-      "message": "claims 8 tasks but the artifacts define 39",
-      "waived": true
-    },
-    {
-      "check": "count-claim",
-      "severity": "error",
-      "path": "requirements.md",
-      "line": 195,
-      "message": "claims 8 tasks but the artifacts define 39",
-      "waived": true
-    },
-    {
-      "check": "count-claim",
-      "severity": "error",
-      "path": "data-model.md",
-      "line": 371,
-      "message": "claims 8 tasks but the artifacts define 39",
-      "waived": true
-    },
-    {
       "check": "missing-path",
       "severity": "advisory",
       "path": "plan.md",
@@ -912,12 +888,12 @@
   "summary": {
     "errors": 0,
     "advisories": 126,
-    "waived": 3,
+    "waived": 0,
     "fr": 30,
     "sc": 8,
     "tasks": 39,
     "clauses": 110,
     "files": 15
   },
-  "checked_at": "2026-10-24T16:04:20Z"
+  "checked_at": "2026-10-24T16:06:53Z"
 }

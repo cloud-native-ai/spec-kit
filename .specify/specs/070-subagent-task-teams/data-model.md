@@ -368,7 +368,7 @@ The `stage-close` ledger event (OR-03). Fields are fixed by E4 and D7.1.
 | Rule id | Stage | Package derivation | Required-output inventory |
 |---------|-------|--------------------|---------------------------|
 | `decompose-plan-v1` | plan | design artifacts, research, registry update, verification | plan.md, research.md, data-model.md, contracts/ (≥1 file), quickstart.md, feature-ref.md, feature registry row, feature detail update |
-| `decompose-implement-v1` | implement | task groups (≤8 tasks), verification | task-owned paths, verification.md, baseline/closure evidence |
+| `decompose-implement-v1` | implement | task groups (ceiling of 8 tasks per group), verification | task-owned paths, verification.md, baseline/closure evidence |
 | `decompose-review-v1` | review | review dimensions (read-only), finding repair (write, bounded iteration) | review.md, review evidence |
 | `decompose-investigation-v1` | analyze, clarify | read-only investigation | findings report/evidence; for clarify the integrator performs the write-back |
 
