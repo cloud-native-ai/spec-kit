@@ -110,8 +110,15 @@ def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
         "prompt": stage_root / f"prompt-{line}-plan.md",
     }
     paths["prompt"].write_text("plan stage\n", encoding="utf-8")
+    release = stage_root / "release-cli"
     cli = stage_root / "cli.sh"
-    cli.write_text("#!/usr/bin/env bash\nsleep 8\nprintf 'PLAN-DONE\\n'\nexit 0\n", encoding="utf-8")
+    cli.write_text(
+        "#!/usr/bin/env bash\n"
+        f"while [ ! -f '{release}' ]; do sleep 0.2; done\n"
+        "printf 'PLAN-DONE\\n'\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
     cli.chmod(0o755)
     runner_log = stage_root / "runner.log"
 
@@ -188,6 +195,7 @@ def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
         assert attach["action"] == "attach", "reattach must not launch a second stage"
         assert not paths["status"].exists() or "exit=" not in paths["status"].read_text()
 
+        release.write_text("go", encoding="utf-8")
         assert wait_until(lambda: "exit=" in snapshot(paths["status"]), timeout=20)
         done = _watch(ctx)
         assert done.returncode == 0 and "verdict=DONE" in done.stdout, done.stdout
