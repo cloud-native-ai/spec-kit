@@ -1202,3 +1202,515 @@ def test_vi_14_closure_and_merge_stay_driver_owned():
     text = _model_text()
     for token in ("does not push", "force-merge", "driver-owned"):
         assert token in text, token
+
+
+# ---------------------------------------------------------------------------
+# FN-01…FN-16: opt-out, fallback, and non-regression (Feature 070)
+# Clause text owner: contracts/fallback-and-nonregression.md.
+# Runtime projection: decomposition-model.md §20–§21; behaviour: the
+# deterministic decision procedure in tests/fixtures/wp_driver_sim.py.
+# ---------------------------------------------------------------------------
+
+FN_CONTRACT = CONTRACTS / "fallback-and-nonregression.md"
+RED_FIRST_NOTES = (
+    REPO_ROOT
+    / ".specify"
+    / "specs"
+    / "070-subagent-task-teams"
+    / "notes"
+    / "red-first-evidence.md"
+)
+
+FN_CONTRACT_PINS = {
+    "FN-01": (
+        "decomposition: auto|off",
+        "decomposition_stages: <stage>=auto|on|off",
+        "decomposition_slot_cap: <int>` (default 2)",
+        "decomposition_override: auto|on|off",
+        "spine fields, not new command arguments",
+    ),
+    "FN-02": (
+        "hard opt-out",
+        "no stage override can re-enable it",
+        "stage-attempt override wins over the per-stage map",
+        "which wins over the built-in defaults",
+    ),
+    "FN-03": (
+        "`plan`, `implement`, and `review` are `auto`",
+        "`analyze` and `clarify` are `off`",
+        "`requirements`, `tasks`, and `checklist` are `off`",
+    ),
+    "FN-04": (
+        "`auto` resolves to `decomposed`",
+        "at least two packages",
+        "WG-13 benefit test",
+        "`single-package` with `reason=not-beneficial`",
+    ),
+    "FN-05": (
+        "run the standard single-subagent stage path",
+        "unchanged stage prompt",
+        "No new argument, field, or service",
+        "FR-025 keeps that discipline in force",
+    ),
+    "FN-06": (
+        "`decision=fallback`",
+        "`gate-reject`",
+        "`decomposition-unavailable`",
+        "`not-beneficial`",
+        "A fallback always names its cause",
+    ),
+    "FN-07": (
+        "never continues with a partial package set",
+        "records the failure reason and the fallback in the spine",
+        "or stops if the single-package path is unavailable",
+    ),
+    "FN-08": (
+        "Every stage writes one decomposition decision",
+        "the literal `no-gate-run`",
+        "The plan fence is the canonical decision record",
+        "A silent run is a gate failure",
+    ),
+    "FN-09": ("Feature 070 adds pre-U4 steps only",),
+    "FN-10": (
+        "fast lane",
+        "two-slot test budget",
+        "plan minor-fix constraint",
+        "targeted-set-v1",
+    ),
+    "FN-11": ("reused read-only", "creates no second registry"),
+    "FN-12": (
+        "extended, never replaced",
+        "ledger dispatch event carries the 067 fields",
+    ),
+    "FN-13": (
+        "exec-quant feedback channel is unchanged",
+        "no new runtime record type",
+    ),
+    "FN-14": (
+        "Contract tests pin",
+        "Unit tests cover the two scripts",
+        "Fixture dry runs prove",
+        "A non-regression file proves",
+        "Mutation drills prove",
+    ),
+    "FN-15": (
+        "New behavior is red before implementation",
+        "command, exit code, pass/fail counts, changed paths, and an evidence pointer",
+        "would not turn red",
+    ),
+    "FN-16": (
+        "Delivery is confined to",
+        "No runtime service",
+        "persisted team directory is added",
+    ),
+}
+
+
+@pytest.mark.parametrize("clause", sorted(FN_CONTRACT_PINS))
+def test_fn_contract_clause_keeps_its_normative_content(clause):
+    """One pin per FN clause; the contract file owns the clause text."""
+    text = FN_CONTRACT.read_text(encoding="utf-8")
+    for fragment in FN_CONTRACT_PINS[clause]:
+        assert fragment in text, "%s lost its normative content: %s" % (
+            clause,
+            fragment,
+        )
+
+
+def test_fn_contract_file_covers_the_closed_clause_set():
+    text = FN_CONTRACT.read_text(encoding="utf-8")
+    ids = re.findall(r"^- \*\*(FN-\d{2})\b", text, re.MULTILINE)
+    assert ids == ["FN-%02d" % index for index in range(1, 17)], (
+        "the FN contract must carry FN-01…FN-16 once, in order; got %r" % ids
+    )
+
+
+def test_fn_model_doc_carries_the_runtime_projection():
+    """T035: the runtime owner names the opt-out, fallback, and preserved rules."""
+    text = _model_text()
+    for token in (
+        "## 20. Opt-out and fallback (FN-01…FN-08)",
+        "## 21. Preserved behaviors, test matrix, and delivery surface (FN-09…FN-16)",
+        "decomposition_stages",
+        "decomposition_override",
+        "decomposition_slot_cap",
+        "hard opt-out",
+        "`gate-reject`",
+        "`decomposition-unavailable`",
+        "`not-beneficial`",
+        "`no-gate-run`",
+        "canonical decision record",
+        "partial package set",
+        "adds pre-U4 steps only",
+        "FN-09…FN-16",
+        "mutation drills",
+        "T036",
+    ):
+        assert token in text, "runtime projection missing: %s" % token
+
+
+# ---------------------------------------------------------------- FN-01…FN-03
+
+
+def test_fn_01_declaration_fields_carry_documented_defaults():
+    resolved = wp_driver_sim.normalize_entry_declaration()
+    assert resolved["decomposition"] == "auto"
+    assert resolved["decomposition_slot_cap"] == 2
+    assert resolved["decomposition_stages"] == {
+        "plan": "auto",
+        "implement": "auto",
+        "review": "auto",
+        "analyze": "off",
+        "clarify": "off",
+        "requirements": "off",
+        "tasks": "off",
+        "checklist": "off",
+    }
+
+    explicit = wp_driver_sim.normalize_entry_declaration(
+        {
+            "decomposition": "off",
+            "decomposition_stages": {"plan": "on", "analyze": "off"},
+            "decomposition_slot_cap": 3,
+        }
+    )
+    assert explicit["decomposition"] == "off"
+    assert explicit["decomposition_slot_cap"] == 3
+    assert explicit["decomposition_stages"]["plan"] == "on"
+    assert explicit["decomposition_stages"]["analyze"] == "off"
+
+
+@pytest.mark.parametrize(
+    "entry,override,stage,expected_mode,expected_source",
+    [
+        ({"decomposition": "off"}, "on", "plan", "off", "feature-off"),
+        ({"decomposition": "off"}, None, "implement", "off", "feature-off"),
+        (None, "off", "plan", "off", "stage-override"),
+        (None, "on", "analyze", "on", "stage-override"),
+        ({"decomposition_stages": {"implement": "on"}}, None, "implement", "on", "stage-map"),
+        ({"decomposition_stages": {"clarify": "off"}}, "auto", "clarify", "auto", "stage-override"),
+        ({}, None, "review", "auto", "builtin-default"),
+        ({}, None, "tasks", "off", "builtin-default"),
+    ],
+)
+def test_fn_02_precedence_is_feature_off_then_override_then_map_then_default(
+    entry, override, stage, expected_mode, expected_source
+):
+    resolved = wp_driver_sim.resolve_decomposition_mode(
+        stage, entry=entry, override=override
+    )
+    assert resolved == {"mode": expected_mode, "source": expected_source}
+
+
+@pytest.mark.parametrize(
+    "stage,expected",
+    [
+        ("plan", "auto"),
+        ("implement", "auto"),
+        ("review", "auto"),
+        ("analyze", "off"),
+        ("clarify", "off"),
+        ("requirements", "off"),
+        ("tasks", "off"),
+        ("checklist", "off"),
+    ],
+)
+def test_fn_03_builtin_defaults_are_the_closed_map(stage, expected):
+    assert wp_driver_sim.BUILTIN_DECOMPOSITION_DEFAULTS[stage] == expected
+
+
+# ---------------------------------------------------------------- FN-04…FN-08
+
+
+def test_fn_04_auto_requires_admit_two_packages_and_the_benefit_test():
+    two = wp_fixtures.make_two_package_plan()
+    one = wp_fixtures.make_single_package_plan()
+
+    admitted = wp_driver_sim.decide_stage_decomposition(
+        two, gate_verdict="admit", beneficial=True
+    )
+    assert admitted["decision"] == "decomposed"
+    assert admitted["gate_verdict"] == "admit"
+
+    no_benefit = wp_driver_sim.decide_stage_decomposition(
+        two, gate_verdict="admit", beneficial=False
+    )
+    assert no_benefit["decision"] == "single-package"
+    assert no_benefit["reason"] == "not-beneficial"
+    assert no_benefit["gate_verdict"] == "single-package"
+
+    one_package = wp_driver_sim.decide_stage_decomposition(
+        one, gate_verdict="admit", beneficial=True
+    )
+    assert one_package["decision"] == "single-package"
+    assert one_package["reason"] == "not-beneficial"
+
+    gate_single = wp_driver_sim.decide_stage_decomposition(
+        two, gate_verdict="single-package", beneficial=True
+    )
+    assert gate_single["decision"] == "single-package"
+    assert gate_single["gate_verdict"] == "single-package"
+
+    # An explicit stage `on` is not gated by the auto benefit test (FN-02 wins).
+    explicit_on = wp_driver_sim.decide_stage_decomposition(
+        two, override="on", gate_verdict="admit", beneficial=False
+    )
+    assert explicit_on["decision"] == "decomposed"
+    assert explicit_on["mode_source"] == "stage-override"
+
+
+def test_fn_05_non_decomposed_decisions_run_the_standard_stage_path():
+    plan = wp_fixtures.make_single_package_plan()
+    cases = [
+        ({"decomposition": "off"}, "admit", "disabled", "no-gate-run"),
+        (None, "single-package", "single-package", "single-package"),
+        (None, "admit", "single-package", "single-package"),
+    ]
+    for entry, verdict, expected_decision, expected_verdict in cases:
+        outcome = wp_driver_sim.run_stage_attempt(
+            plan, entry=entry, gate_verdict=verdict
+        )
+        record = outcome["decision"]
+        assert record["decision"] == expected_decision
+        assert record["gate_verdict"] == expected_verdict
+        assert outcome["dispatch"] is None
+        standard = outcome["standard_path"]
+        assert standard["prompt"] == "unchanged"
+        assert standard["dispatch"] == "runner-native"
+        assert standard["sentinel"] == "PLAN-DONE"
+        assert standard["u4"] == "unchanged"
+        assert standard["integrator"] is False
+        assert standard["packages_dispatched"] == []
+
+    implement = wp_fixtures.make_single_package_plan(stage="implement")
+    outcome = wp_driver_sim.run_stage_attempt(
+        implement, entry={"decomposition": "off"}, gate_verdict="admit"
+    )
+    assert outcome["standard_path"]["sentinel"] == "IMPLEMENT-DONE"
+    assert outcome["standard_path"]["part_discipline"] == "067-preserved"
+
+
+def test_fn_06_fallback_causes_are_the_closed_named_set():
+    plan = wp_fixtures.make_two_package_plan()
+
+    unavailable = wp_driver_sim.decide_stage_decomposition(
+        plan, gate_error="decomposition-unavailable"
+    )
+    assert unavailable["decision"] == "fallback"
+    assert unavailable["reason"] == "decomposition-unavailable"
+    assert unavailable["gate_verdict"] == "no-gate-run"
+    assert unavailable["fallback"] is True
+
+    rejected = wp_driver_sim.decide_stage_decomposition(
+        plan, gate_verdict="reject"
+    )
+    assert rejected["decision"] == "fallback"
+    assert rejected["reason"] == "gate-reject"
+    assert rejected["gate_verdict"] == "no-gate-run"
+
+    repaired = wp_driver_sim.decide_stage_decomposition(
+        plan,
+        gate_verdict="reject",
+        repair=lambda candidate: {
+            "verdict": "reject",
+            "findings": [{"code": "cycle"}],
+        },
+    )
+    assert repaired["repaired"] is True
+    assert repaired["reason"] == "gate-reject"
+    assert repaired["findings"] == [{"code": "cycle"}]
+
+    repaired_ok = wp_driver_sim.decide_stage_decomposition(
+        plan,
+        gate_verdict="reject",
+        repair=lambda candidate: {"verdict": "admit"},
+        beneficial=True,
+    )
+    assert repaired_ok["repaired"] is True
+    assert repaired_ok["decision"] == "decomposed"
+
+    unrepresentable = wp_driver_sim.decide_stage_decomposition(
+        plan, gate_verdict="admit", beneficial=True, representable=False
+    )
+    assert unrepresentable["decision"] == "fallback"
+    assert unrepresentable["reason"] == "not-beneficial"
+    assert unrepresentable["gate_verdict"] == "no-gate-run"
+
+    reasons = {
+        unavailable["reason"],
+        rejected["reason"],
+        repaired["reason"],
+        unrepresentable["reason"],
+    }
+    assert reasons <= {
+        "gate-reject",
+        "decomposition-unavailable",
+        "not-beneficial",
+    }
+
+
+def test_fn_07_fallback_never_runs_a_partial_package_set():
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan,
+        gate_verdict="reject",
+        repair=lambda candidate: {"verdict": "reject"},
+    )
+    record = outcome["decision"]
+    assert record["decision"] == "fallback"
+    assert record["attempted_packages"] == ["plan-wp01", "plan-wp02"]
+    assert record["dispatched_packages"] == []
+    assert record["dispatch_packages"] == []
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["packages_dispatched"] == []
+    assert outcome["standard_path"]["sentinel"] == "PLAN-DONE"
+
+    stopped = wp_driver_sim.decide_stage_decomposition(
+        plan, gate_verdict="reject", single_package_available=False
+    )
+    assert stopped["decision"] == "fallback"
+    assert stopped["stopped"] is True
+    assert stopped["single_package_available"] is False
+
+
+def test_fn_08_every_stage_records_one_decision_with_the_mapped_verdict():
+    two = wp_fixtures.make_two_package_plan()
+    two["plan_hash"] = wp_fixtures.canonical_hash_of(two)
+    one = wp_fixtures.make_single_package_plan()
+    one["plan_hash"] = wp_fixtures.canonical_hash_of(one)
+
+    cases = [
+        (
+            two,
+            {"gate_verdict": "admit", "beneficial": True},
+            "decomposed",
+            "admit",
+        ),
+        (one, {"gate_verdict": "single-package"}, "single-package", "single-package"),
+        (one, {"entry": {"decomposition": "off"}}, "disabled", "no-gate-run"),
+        (two, {"gate_verdict": "reject"}, "fallback", "no-gate-run"),
+    ]
+    for plan, kwargs, expected_decision, expected_verdict in cases:
+        record = wp_driver_sim.decide_stage_decomposition(plan, **kwargs)
+        assert record["decision"] == expected_decision
+        assert record["gate_verdict"] == expected_verdict
+        assert record["reason"]
+        fence = record["plan_fence"]
+        assert fence["decision"] == expected_decision
+        assert fence["gate_verdict"] == expected_verdict
+        assert fence["reason"] == record["reason"]
+        assert fence["plan_hash"] == plan["plan_hash"]
+        event = record["ledger_plan_event"]
+        assert event["event"] == "plan"
+        assert event["plan_hash"] == plan["plan_hash"]
+        assert event["decision"] == expected_decision
+        assert event["verdict"] == expected_verdict
+
+
+# ---------------------------------------------------------------- FN-09…FN-16
+
+
+def test_fn_09_to_fn_13_preserved_behaviors_are_cited_not_redefined():
+    text = _model_text()
+    for token in (
+        "FN-09",
+        "FN-10",
+        "FN-11",
+        "FN-12",
+        "FN-13",
+        "stage sentinel",
+        "U4",
+        "stage chain",
+        "fast lane",
+        "two-slot test budget",
+        "plan minor-fix constraint",
+        "Feature 064",
+        "Feature 067",
+        "Feature 068",
+    ):
+        assert token in text, "preserved-behavior citation missing: %s" % token
+
+    record = wp_driver_sim.decide_stage_decomposition(
+        wp_fixtures.make_two_package_plan(), gate_verdict="admit", beneficial=True
+    )
+    assert record["adds_pre_u4_steps_only"] is True
+
+
+def test_fn_14_the_declared_test_matrix_exists():
+    matrix = [
+        REPO_ROOT / "tests/contract/test_sdd_loop_driver_wp_model.py",
+        REPO_ROOT / "tests/contract/test_sdd_loop_driver_wp_gate.py",
+        REPO_ROOT / "tests/contract/test_sdd_loop_driver_wp_coordination.py",
+        REPO_ROOT / "tests/contract/test_sdd_loop_driver_wp_preset.py",
+        REPO_ROOT / "tests/unit/test_wp_gate.py",
+        REPO_ROOT / "tests/unit/test_wp_report.py",
+        REPO_ROOT / "tests/integration/test_wp_coordination_dry_runs.py",
+        REPO_ROOT / "tests/contract/test_non_regression_070.py",
+    ]
+    for path in matrix:
+        assert path.is_file(), "declared test surface missing: %s" % path
+
+    dry_runs = (
+        REPO_ROOT / "tests/integration/test_wp_coordination_dry_runs.py"
+    ).read_text(encoding="utf-8")
+    for name in (
+        "test_concurrent_read_only_dispatch_overlaps_intervals",
+        "test_ownership_path_rejection_blocks_dispatch",
+        "test_fallback_never_dispatches_a_partial_package_set",
+        "test_single_package_decision_runs_the_standard_stage_path",
+        "test_nested_driver_prompt_is_blocked_and_not_dispatched",
+        "test_no_team_directory_is_created",
+    ):
+        assert name in dry_runs, "dry-run matrix entry missing: %s" % name
+
+    tasks = (
+        REPO_ROOT
+        / ".specify"
+        / "specs"
+        / "070-subagent-task-teams"
+        / "tasks.md"
+    ).read_text(encoding="utf-8")
+    assert "tests/contract/test_wp_mutation_drills.py" in tasks, (
+        "the mutation-drill obligation (T036) must remain in the task file"
+    )
+    assert "mutation drills" in _model_text()
+
+
+def test_fn_15_red_first_evidence_records_the_required_fields():
+    notes = RED_FIRST_NOTES.read_text(encoding="utf-8")
+    assert "## T034" in notes, "T034 has no red-first evidence section"
+    section = notes.split("## T034", 1)[1]
+    for token in ("Command", "Real output", "Exit code", "Changed paths"):
+        assert token in section, "T034 red-first record missing: %s" % token
+    assert re.search(r"Exit code `[1-9]\d*`", section), (
+        "the T034 record must carry a non-zero exit code"
+    )
+
+
+def test_fn_16_delivery_surface_adds_no_runtime_or_duplicate_surface():
+    assert sorted(path.name for path in DRIVER_ROOT.iterdir()) == [
+        "SKILL.md",
+        "references",
+        "scripts",
+        "templates",
+    ]
+    assert not (DRIVER_ROOT / "teams").exists()
+    assert (DRIVER_ROOT / "templates" / "stage-team-preset.md").is_file()
+    assert not (
+        REPO_ROOT
+        / "skills"
+        / "internal"
+        / "create-team"
+        / "templates"
+        / "teams"
+        / "sdd-stage-team.md"
+    ).exists(), "the stage-team preset must not enter the create-team catalog"
+
+    text = _model_text()
+    for token in (
+        "Delivery is confined to",
+        "no runtime service",
+        "second registry",
+        "persisted team",
+    ):
+        assert token in text, "delivery boundary missing: %s" % token

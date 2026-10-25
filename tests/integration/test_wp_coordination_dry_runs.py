@@ -422,3 +422,116 @@ def test_no_team_directory_is_created(tmp_path):
     assert _team_snapshot(project) == before_project
     assert not (project / ".specify" / "teams").exists()
     assert not list(project.rglob("team.md"))
+
+    # FN-05/FN-07: the single-package and fallback paths persist no team either.
+    fallback = wp_driver_sim.run_stage_attempt(
+        plan, gate_verdict="reject"
+    )
+    assert fallback["decision"]["decision"] == "fallback"
+    single = wp_driver_sim.run_stage_attempt(
+        wp_fixtures.make_single_package_plan(), gate_verdict="single-package"
+    )
+    assert single["decision"]["decision"] == "single-package"
+    assert _team_snapshot(REPO_ROOT) == before_repo
+    assert _team_snapshot(project) == before_project
+    assert not (project / ".specify" / "teams").exists()
+    assert not list(project.rglob("team.md"))
+
+
+# ---------------------------------------------------------------------------
+# FN-01…FN-08: opt-out, single-package, and fallback dry runs (T034)
+# ---------------------------------------------------------------------------
+
+
+def test_single_package_decision_runs_the_standard_stage_path():
+    """FN-04/FN-05: a non-decomposed stage keeps the unchanged single path."""
+    plan = wp_fixtures.make_single_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan, entry={"decomposition": "auto"}, gate_verdict="single-package"
+    )
+    assert outcome["decision"]["decision"] == "single-package"
+    assert outcome["decision"]["gate_verdict"] == "single-package"
+    assert outcome["decision"]["reason"] == "not-beneficial"
+    assert outcome["dispatch"] is None
+    standard = outcome["standard_path"]
+    assert standard["sentinel"] == "PLAN-DONE"
+    assert standard["prompt"] == "unchanged"
+    assert standard["u4"] == "unchanged"
+    assert standard["integrator"] is False
+    assert standard["packages_dispatched"] == []
+    assert len(plan["packages"]) == 1
+    assert plan["packages"][0]["sentinel"] == "PLAN-DONE"
+
+
+def test_disabled_stage_runs_the_standard_path_with_no_gate_run():
+    """FN-02/FN-05/FN-08: feature-level off is a hard opt-out."""
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan, entry={"decomposition": "off"}, gate_verdict="admit"
+    )
+    assert outcome["decision"]["decision"] == "disabled"
+    assert outcome["decision"]["gate_verdict"] == "no-gate-run"
+    assert outcome["decision"]["mode_source"] == "feature-off"
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["packages_dispatched"] == []
+
+
+def test_fallback_never_dispatches_a_partial_package_set():
+    """FN-06/FN-07: a reject after the one repair falls back, dispatching nothing."""
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan,
+        gate_verdict="reject",
+        repair=lambda candidate: {
+            "verdict": "reject",
+            "findings": [{"code": "cycle"}],
+        },
+    )
+    record = outcome["decision"]
+    assert record["decision"] == "fallback"
+    assert record["reason"] == "gate-reject"
+    assert record["gate_verdict"] == "no-gate-run"
+    assert record["repaired"] is True
+    assert record["attempted_packages"] == ["plan-wp01", "plan-wp02"]
+    assert record["dispatched_packages"] == []
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["sentinel"] == "PLAN-DONE"
+    assert outcome["standard_path"]["packages_dispatched"] == []
+
+
+def test_unrepresentable_contract_falls_back_without_dispatch():
+    """FN-06: an unrepresentable stage contract is a named fallback."""
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan,
+        gate_verdict="admit",
+        beneficial=True,
+        representable=False,
+    )
+    assert outcome["decision"]["decision"] == "fallback"
+    assert outcome["decision"]["reason"] == "not-beneficial"
+    assert outcome["decision"]["gate_verdict"] == "no-gate-run"
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["packages_dispatched"] == []
+
+
+def test_unavailable_layer_falls_back_without_dispatch():
+    """FN-06: exit-2/unavailable maps to decomposition-unavailable."""
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(
+        plan, gate_error="decomposition-unavailable"
+    )
+    assert outcome["decision"]["decision"] == "fallback"
+    assert outcome["decision"]["reason"] == "decomposition-unavailable"
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["packages_dispatched"] == []
+
+
+def test_fallback_dispatches_no_package_or_nested_driver_prompt():
+    """FN-07 / Scenario G: a fallback never emits a package or driver prompt."""
+    plan = wp_fixtures.make_two_package_plan()
+    outcome = wp_driver_sim.run_stage_attempt(plan, gate_verdict="reject")
+    assert outcome["decision"]["decision"] == "fallback"
+    assert outcome["dispatch"] is None
+    assert outcome["standard_path"]["packages_dispatched"] == []
+    assert outcome["standard_path"]["dispatch"] == "runner-native"

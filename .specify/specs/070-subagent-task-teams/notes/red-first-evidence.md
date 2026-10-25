@@ -459,3 +459,42 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Disclosed**: the source/mirror byte pair for `SKILL.md` is intentionally
   out of sync until T037 runs `sync-mirrors.py --write`; no mirror file was
   hand-edited, and the mirror check is not claimed here.
+
+## T034 — FN-01…FN-16 opt-out, fallback, and preserved-behavior cases (red)
+
+- **Date**: 2026-10-25T03:40Z (segment impl-s6)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed paths**:
+  - `tests/contract/test_sdd_loop_driver_wp_coordination.py` (FN-01…FN-16
+    clause pins and behaviour cases; FN_CONTRACT_PINS, the closed clause set,
+    the runtime-projection check, precedence/defaults/auto-benefit/
+    single-package/fallback/no-partial/decision-record/preserved/test-matrix/
+    red-first/delivery-surface cases)
+  - `tests/integration/test_wp_coordination_dry_runs.py` (single-package,
+    disabled, fallback, unrepresentable, unavailable-layer, and
+    no-nested-driver dry runs; the no-team-directory dry run now also covers
+    the fallback and single-package paths)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py -k "fn_ or single_package or fallback or disabled_stage or unavailable_layer or unrepresentable or no_team_directory"
+  ```
+- **Real output (tail)**:
+  ```text
+  FAILED tests/contract/test_sdd_loop_driver_wp_coordination.py::test_fn_model_doc_carries_the_runtime_projection
+  FAILED tests/contract/test_sdd_loop_driver_wp_coordination.py::test_fn_01_declaration_fields_carry_documented_defaults
+  ...
+  FAILED tests/integration/test_wp_coordination_dry_runs.py::test_fallback_dispatches_no_package_or_nested_driver_prompt
+  34 failed, 19 passed, 77 deselected in 0.55s
+  ```
+- **Exit code**: `1`
+- **Red causes**: the simulator has no
+  `normalize_entry_declaration` / `resolve_decomposition_mode` /
+  `decide_stage_decomposition` / `run_stage_attempt` / `BUILTIN_DECOMPOSITION_DEFAULTS`,
+  and `decomposition-model.md` has no §20/§21. `test_fn_15` is red because this
+  record did not exist when the run was made.
+- **Disclosed anti-drift passes (19)**: the 16 FN clause pins, the closed
+  clause-set check, and two pre-existing cases selected by the `fallback`
+  keyword (`test_sd_07_local_native_topology_and_serial_fallback`,
+  `test_driver_u4_capability_fallback_is_recorded`). They assert unchanged
+  contract text or already-implemented behaviour and are not proof of the new
+  070 opt-out/fallback behaviour.
