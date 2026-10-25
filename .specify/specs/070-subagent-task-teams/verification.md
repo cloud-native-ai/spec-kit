@@ -1,6 +1,26 @@
 # Verification — 070-subagent-task-teams
 
-**Status**: partial (segments S1–S5; T001–T030). The SC-001…SC-008 matrix, the closure full suite, the mirror check, and the final task audit are completed by the final implement segment (T039). This file exists early only to record residual interpretations and in-segment verification facts the dispatch requires.
+**Status**: partial (segments S1–S6; T001–T035). The SC-001…SC-008 matrix, the closure full suite, the mirror check, and the final task audit are completed by the final implement segment (T039). This file exists early only to record residual interpretations and in-segment verification facts the dispatch requires.
+
+## Entry surface and opt-out/fallback verification (impl-s6; T031–T035)
+
+- **Scope**: the intentional SKILL H2 pin update and entry section, the pointer-only docs section, the 058/063/064/067/068 non-regression net, the FN-01…FN-16 opt-out/fallback cases, and the runtime-owner §20/§21 sections plus the simulator decision procedure.
+- **Commands and results**:
+  - `python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py -k "not c18"` → `24 passed, 1 deselected in 14.97s`, rc 0.
+  - `python3 -m pytest -q tests/contract/test_non_regression_070.py` → `10 passed in 0.04s`, rc 0.
+  - `python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py` → `130 passed in 0.34s`, rc 0 (44 FN + 34 SD + 33 VI contract cases, 19 dry runs).
+  - Full 070-targeted audit (eight files) → `324 passed in 5.98s`, rc 0.
+- **Red-to-green**: T031 `1 failed, 24 deselected` (missing H2); T034 `34 failed, 19 passed, 77 deselected` (missing decision procedure and §20/§21; the 16 clause pins and 3 pre-existing fallback cases are disclosed anti-drift passes); T035 → all green.
+- **Non-regression evidence**: `test-evidence/non-regression-070.txt` records the 10-case green run and the owner-agreement result (5 mirror rows only in plan.md, 4 inventory rows only in data-model.md, additive-only section sets).
+- **Pre-T037 disposition**: `SKILL.md` was edited in T032, so `test_c18_mirror_pair_no_drift` fails on the source/mirror byte pair until T037 runs `sync-mirrors.py --write`. No mirror file was hand-edited. This is the only deselected/failing pre-existing surface in this segment and is not a name-level regression against the E2 baseline.
+
+### Interpretations (flagged for review)
+
+- **Explicit `on` versus `auto` benefit**: FN-04's benefit test is scoped to `auto` by WG-13. An explicit stage `on` bypasses that test but still requires a gate `admit` and at least two packages (V-PLAN.2); a one-package `on` stage resolves to `single-package` with `reason=not-beneficial`. The simulator encodes this in `decide_stage_decomposition`.
+- **Unrepresentable contract reason**: FN-06 names three fallback causes and the model (§8, E13) forces the single-package fallback when a required inventory item cannot be represented. That path records `decision=fallback` with `reason=not-beneficial` and the finding `unrepresentable-contract`; it is not a gate reject.
+- **No-partial representation**: a non-decomposed decision keeps `attempted_packages` for evidence and `dispatched_packages=[]`. WP-13's sole package is the stage execution itself, so the standard path reports `packages_dispatched=[]` (no *package* dispatch) while running one unchanged stage execution.
+- **Declaration validation**: the test-only resolver rejects unknown stages, modes outside `auto|on|off`, and a non-positive/non-integer slot cap rather than coercing them. This is boundary validation inside the simulator, not a new command argument; the live driver records the same fields in the spine.
+- **R2-03 residual**: the `disabled` resolution follows V-DEC.5 / FN-03 / FN-08 (feature-level `off`), not the narrower state-table trigger projection; no plan-owned artifact was changed.
 
 ## US4 verification (impl-s5; T024–T026)
 

@@ -534,3 +534,23 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   `SKILL.md` changed in T032); `test_c18_mirror_pair_no_drift` is the only
   skill-file failure and is excluded from this segment's green claim. No
   mirror file was hand-edited.
+
+## Segment impl-s6 targeted audit
+
+- **Date**: 2026-10-25T04:05Z
+- **Command (all Feature 070 files)**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_070.py tests/unit/test_wp_gate.py tests/unit/test_wp_report.py tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `324 passed in 5.98s`; exit code `0`.
+- **Skill surface**: `python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py -k "not c18"` →
+  `24 passed, 1 deselected in 14.97s`, rc 0. `test_c18_mirror_pair_no_drift`
+  fails on `SKILL.md` only because the source/mirror write is T037 (outside the
+  segment scope); no mirror file was hand-edited.
+- **Quickstart Scenario F**: the resolution/precedence and single-package/
+  fallback selector reports `16 passed, 114 deselected`. **Scenario G**:
+  `nested_driver or no_team_directory` reports `3 passed, 16 deselected`.
+- **Structural check**: `python3 scripts/python/validate-tasks.py .specify/specs/070-subagent-task-teams/tasks.md`
+  → `PASS — 0 error(s), 0 warning(s)`, rc 0 (after T031–T035 were marked `[x]`).
+- **Budget note**: targeted only; no full suite; the E2 slot remains T002 and the
+  closure slot remains T039. No plan-owned artifact was touched.
