@@ -1,0 +1,1 @@
+PASS: .specify/specs/070-subagent-task-teams/tasks.md — 0 error(s), 0 warning(s)

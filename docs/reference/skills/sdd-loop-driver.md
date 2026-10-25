@@ -80,6 +80,17 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 **日志形态变化（已披露）**：stream 模式新增 `raw-<line>-<stage>.jsonl` 与派生 `log-<line>-<stage>.log`；CLI 不支持该输出模式或派生失败时降级为既有缓冲模式，并在 status 记录 `progress=degraded` 与原因。完成判定不变：哨兵仍只认 live log 最后非空行，watcher 判定与退出码、确认门、独立校验与卡死处置均未改变。
 
+## 任务拆解与配合（070-subagent-task-teams 切片）
+
+阶段级任务拆解层：把一个阶段拆成有界 Work Package，确定性门裁决后按图调度，独立校验、确定性集成；阶段哨兵与 U4 不变。本页只给入口与指针（运行时 owner：skill 手册 `references/decomposition-model.md`，本节不复述规则）：
+
+- **门**：`scripts/wp-gate.py --check plan|preflight|retry`——确定性、stdlib-only、不派发、不写脊；拒绝码与退出码以 `references/decomposition-model.md` §12 与 070 契约为准。
+- **默认启用**：`plan` / `implement` / `review` = `auto`（门通过、至少两个包且收益成立才拆解）；`analyze` / `clarify` 仅在显式 `on` 时启用；其余阶段保持单子代理。
+- **退出与回退**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`；阶段 attempt 可带 `decomposition_override`。`disabled` / `single-package` / `fallback` 都走原有单子代理路径（提示词、派发、哨兵、U4 不变）；fallback 必须具名原因，且绝不运行部分包集。
+- **团队形状**：`templates/stage-team-preset.md` 是运行域 preset——不写入 `.specify/teams/`，不改 `create-team` / `run-team`。
+- **报表**：`scripts/wp-report.py` 从状态脊派生协调报告；缺失来源记 `not_evaluated`。
+- **边界**：只新增 U4 之前的步骤；哨兵、U4、阶段链、两槽位测试预算、plan 小修约束，以及 064/067/068 语义均不变。
+
 ## 并发归属与生命周期
 
 - **Line Registry**：环境级线路登记（`scripts/line-registry.py`，stdlib-only）；每个事件携带 `(line_id, run_id)` 归属信封，`foreign`/`stale-run`/`unattributed` 不改变当前线路状态；无标识消息经确定性入口判定（恰好一次澄清，禁止进程扫描推断）。规则真源：`skills/external/sdd-loop-driver/references/stage-prompts.md` 的 Line Registration/Envelope/Ingress 节。

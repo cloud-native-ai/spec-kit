@@ -1,0 +1,8 @@
+# command: python3 /home/agent/sdd-070/tools/pre-analyze-check.py --spec-dir .specify/specs/070-subagent-task-teams --stage plan --repo .
+# date: 2026-10-24
+# exit: 0
+# summary: decision=pass errors=0 advisories=66 waived=0 fr=30 sc=8 tasks=0 clauses=110 files=14
+# finding classes: missing-path=66
+# note: every advisory is a missing-path for a planned new deliverable (scripts, owner reference, template, tests);
+#       no error, no duplicate-id, no dangling reference, no count-claim drift. The paths are created at implementation.
+#       Clause definitions measured: 110; FR definitions: 30; SC definitions: 8.

@@ -1,0 +1,22 @@
+# Review targeted run — Feature 070
+# Date: 2026-10-25T09:41:46Z
+# Host: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+
+$ python3 -m pytest -q tests/unit/test_wp_gate.py tests/unit/test_wp_report.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_070.py tests/contract/test_wp_mutation_drills.py tests/integration/test_wp_coordination_dry_runs.py
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+........................................                                 [100%]
+328 passed in 10.04s
+rc=0
+
+$ python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py
+.........................                                                [100%]
+25 passed in 16.99s
+rc=0
+
+$ python3 -m pytest -q tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_overlap_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py
+.................................................................        [100%]
+65 passed in 17.02s
+rc=0

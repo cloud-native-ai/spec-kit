@@ -1,0 +1,12 @@
+# command: python3 /home/agent/sdd-070/tools/overlap-check.py --spec-dir .specify/specs/070-subagent-task-teams --repo .
+# date: 2026-10-24
+# exit: 1
+# decision: overlap
+# overlaps: 21
+# checked_specs: 61
+# current_paths: docs/reference/skills/sdd-loop-driver.md, skills/external/sdd-loop-driver/SKILL.md, skills/external/sdd-loop-driver/references/decomposition-model.md, skills/external/sdd-loop-driver/scripts/wp-gate.py, skills/external/sdd-loop-driver/scripts/wp-report.py, skills/external/sdd-loop-driver/templates/stage-team-preset.md
+# relations: nested-path=6, same-path=15
+# by other spec: 056-probe-handler-system=1, 058-sdd-loop-driver=2, 059-exec-quant-recording=1, 060-decompose-subagent-dispatch=2, 062-humanize-command=1, 063-review-p1-governance=1, 063-sdd-loop-efficiency=2, 064-subagent-concurrency=2, 065-loop-interruption-recovery=2, 066-loop-state-awareness-a=2, 067-loop-efficiency-hardening=5
+# adjudication: notes/overlap-adjudication-plan.md
+# outcome: overlap-adjudicated; every other spec is merged in the base history; no live writer; no ownership transfer;
+#          no second registry/ownership model/integration queue/ledger. Implementation must re-run after the first driver-source edit.

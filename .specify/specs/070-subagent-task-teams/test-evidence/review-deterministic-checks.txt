@@ -1,0 +1,60 @@
+# Review deterministic checks — Feature 070
+# Date: 2026-10-25T09:42:39Z
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver
+scope --only: skills/external/sdd-loop-driver
+ok    skills/external/ == .specify/skills/ (32 files)
+rc=0
+
+$ cmp pairs
+IDENTICAL SKILL.md
+IDENTICAL references/decomposition-model.md
+IDENTICAL templates/stage-team-preset.md
+IDENTICAL scripts/wp-gate.py
+IDENTICAL scripts/wp-report.py
+
+$ clause coverage loop (missing initialized to 0)
+checked=110 missing=0
+
+$ python3 scripts/python/validate-tasks.py ...
+PASS: .specify/specs/070-subagent-task-teams/tasks.md — 0 error(s), 0 warning(s)
+rc=0
+
+$ python3 scripts/python/validate-requirements.py ... --json
+    },
+    {
+      "label": "marker-count",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "dup-id",
+      "status": "pass",
+      "count": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 320,
+    "definition_rows": 38,
+    "shared_strings": 0
+  }
+}
+rc=0
+
+$ python3 /home/agent/sdd-070/tools/pre-analyze-check.py --stage tasks
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 30, "sc": 8, "tasks": 39, "clauses": 110, "files": 16}, "checked_at": "2026-10-25T09:42:39Z"}
+rc=0
+
+$ decomposition-check.py --mode tasks
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 39, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-25T09:42:39Z"}
+rc=0
+
+$ unfinished rows
+0
+rc=1
+
+$ SC row count
+8

@@ -1,0 +1,861 @@
+# test runner: python3 -m pytest 
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /tmp/sdd-worktrees/spec-kit/070-subagent-task-teams
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5361 items
+
+tests/contract/test_agent_chain_guards.py ....                           [  0%]
+tests/contract/test_agent_dispatch_mechanism.py ........................ [  0%]
+........                                                                 [  0%]
+tests/contract/test_agent_env_config_contract.py ...........             [  0%]
+tests/contract/test_agent_render.py ...............                      [  1%]
+tests/contract/test_agent_render_migration.py .......                    [  1%]
+tests/contract/test_agent_skill_enablement.py .......................... [  1%]
+..........                                                               [  1%]
+tests/contract/test_agent_specific_config_skills.py ..................   [  2%]
+tests/contract/test_agent_surface_docs.py .....                          [  2%]
+tests/contract/test_ask_record_repeat.py .................               [  2%]
+tests/contract/test_baseline_preflight_contract.py .........             [  2%]
+tests/contract/test_build_hook.py ......                                 [  2%]
+tests/contract/test_capability_matrix_contract.py .....                  [  3%]
+tests/contract/test_checker_form.py .................................... [  3%]
+.                                                                        [  3%]
+tests/contract/test_clarify_semantic_completeness.py .............       [  4%]
+tests/contract/test_clause_coverage.py ................................. [  4%]
+...........                                                              [  4%]
+tests/contract/test_clause_forms.py .......F...........................  [  5%]
+tests/contract/test_cleanup_obsolete_assets.py ......                    [  5%]
+tests/contract/test_codex_compatibility_contract.py ..                   [  5%]
+tests/contract/test_codex_init_contract.py ..........                    [  5%]
+tests/contract/test_codex_support_surfaces_contract.py .                 [  5%]
+tests/contract/test_compile_embeds.py ....                               [  5%]
+tests/contract/test_compile_propagation_order.py ..                      [  5%]
+tests/contract/test_compile_reconcile_guards.py ........                 [  6%]
+tests/contract/test_confirmation_gates_sweep.py .F...................... [  6%]
+......................                                                   [  6%]
+tests/contract/test_constitution_double_landing.py ...................   [  7%]
+tests/contract/test_create_new_tools_find.py .                           [  7%]
+tests/contract/test_criterion_subject.py ...................             [  7%]
+tests/contract/test_derivation_definitions.py .......................... [  8%]
+...                                                                      [  8%]
+tests/contract/test_derive_command_surface.py ..................         [  8%]
+tests/contract/test_derive_engine_contract.py .......................... [  9%]
+...                                                                      [  9%]
+tests/contract/test_docs_command_template.py ......................      [  9%]
+tests/contract/test_docs_step_injection.py ............................. [ 10%]
+.                                                                        [ 10%]
+tests/contract/test_docs_target_structure_declaration.py ......          [ 10%]
+tests/contract/test_docs_utils_cli.py ...........                        [ 10%]
+tests/contract/test_dogfooding_practice.py ...................           [ 10%]
+tests/contract/test_engine_face_contract.py ..................           [ 11%]
+tests/contract/test_evidence_binding_contract.py ...................     [ 11%]
+tests/contract/test_evidence_findings_schema.py ...............          [ 11%]
+tests/contract/test_evidence_step_conformance.py ....................... [ 12%]
+.                                                                        [ 12%]
+tests/contract/test_evidence_utils_cli.py .....................          [ 12%]
+tests/contract/test_exec_quant_aggregate.py .........................    [ 13%]
+tests/contract/test_exec_quant_channel_boundary.py ...........           [ 13%]
+tests/contract/test_exec_quant_channel_compat.py .s....                  [ 13%]
+tests/contract/test_exec_quant_dispatch.py ............................. [ 13%]
+.........                                                                [ 14%]
+tests/contract/test_exec_quant_engine.py ............................... [ 14%]
+...................                                                      [ 14%]
+tests/contract/test_execution_config_engine.py ......................... [ 15%]
+........................................................F.               [ 16%]
+tests/contract/test_export_skill_rework.py ............................. [ 17%]
+..                                                                       [ 17%]
+tests/contract/test_fast_fail_discipline.py ............................ [ 17%]
+...................................................................F.... [ 18%]
+....                                                                     [ 19%]
+tests/contract/test_feedback_command_classification.py ................. [ 19%]
+..............                                                           [ 19%]
+tests/contract/test_feedback_command_template.py ......                  [ 19%]
+tests/contract/test_feedback_entry_schema.py .......                     [ 19%]
+tests/contract/test_feedback_exec_quant_payload.py .................     [ 20%]
+tests/contract/test_feedback_intake_exec_quant.py ....................   [ 20%]
+tests/contract/test_feedback_introspection_engine.py ...............     [ 20%]
+tests/contract/test_feedback_introspection_report.py ................    [ 21%]
+tests/contract/test_feedback_mechanism_boundary.py ....                  [ 21%]
+tests/contract/test_feedback_probe_cli.py .......................        [ 21%]
+tests/contract/test_feedback_probe_entry_schema.py .........             [ 21%]
+tests/contract/test_feedback_probe_registry.py .................         [ 22%]
+tests/contract/test_feedback_skill_conformance.py ...                    [ 22%]
+tests/contract/test_feedback_step_reference_form.py .................... [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+.....................................................................    [ 26%]
+tests/contract/test_feedback_two_path_routing.py ....................... [ 26%]
+..........                                                               [ 27%]
+tests/contract/test_feedback_utils_cli.py ...........                    [ 27%]
+tests/contract/test_flat_internal_skill_migration.py ......              [ 27%]
+tests/contract/test_focus_target_resolution.py ................          [ 27%]
+tests/contract/test_git_workflow_instructions_block.py ........          [ 27%]
+tests/contract/test_glossary_mechanism.py ............                   [ 28%]
+tests/contract/test_goal_definition.py ...........................       [ 28%]
+tests/contract/test_goal_migration.py ..................                 [ 28%]
+tests/contract/test_goal_targets_check.py ..................             [ 29%]
+tests/contract/test_goal_targets_engine.py ............................. [ 29%]
+............                                                             [ 30%]
+tests/contract/test_goal_writeset.py ............                        [ 30%]
+tests/contract/test_green_point_claim.py ............................... [ 30%]
+.                                                                        [ 30%]
+tests/contract/test_handler_registry.py .........                        [ 31%]
+tests/contract/test_handoff_chain.py ..........................          [ 31%]
+tests/contract/test_hermes_init_contract.py .......                      [ 31%]
+tests/contract/test_hidden_edge_two_cycle.py ......                      [ 31%]
+tests/contract/test_hugo_scaffold_contract.py ...................        [ 32%]
+tests/contract/test_humanize_command_surface.py ..........               [ 32%]
+tests/contract/test_improve_team_presence.py ...                         [ 32%]
+tests/contract/test_install_script.py .................                  [ 32%]
+tests/contract/test_instructions_section_propagation.py ..               [ 32%]
+tests/contract/test_instructions_size_budget.py ............             [ 32%]
+tests/contract/test_legacy_removal.py ........                           [ 33%]
+tests/contract/test_lifecycle_detach_reattach.py ......F..F.......       [ 33%]
+tests/contract/test_line_envelope_contract.py ..................         [ 33%]
+tests/contract/test_line_registry_contract.py .............              [ 34%]
+tests/contract/test_loop_state_contract.py ............................. [ 34%]
+                                                                         [ 34%]
+tests/contract/test_merge_provenance_gate.py ........................    [ 34%]
+tests/contract/test_mirror_parity_suite.py ............................. [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+..............................................                           [ 48%]
+tests/contract/test_mirror_root_guard.py ....                            [ 48%]
+tests/contract/test_neutral_metadata_schema.py ......................... [ 49%]
+....                                                                     [ 49%]
+tests/contract/test_neutral_vocabulary_scan.py .....                     [ 49%]
+tests/contract/test_neutrality_budget.py .....F..............            [ 49%]
+tests/contract/test_no_nested_skills.py ...                              [ 49%]
+tests/contract/test_no_organize_agents_refs.py ..                        [ 49%]
+tests/contract/test_no_retired_draw_skill_refs.py ....                   [ 49%]
+tests/contract/test_non_regression_064.py .........                      [ 49%]
+tests/contract/test_objective_analysis_gate.py ......................... [ 50%]
+............................                                             [ 50%]
+tests/contract/test_one_source_of_truth.py ...............               [ 51%]
+tests/contract/test_overlap_verdicts.py ...............                  [ 51%]
+tests/contract/test_phase2_bindings.py .....                             [ 51%]
+tests/contract/test_portable_skill_creation.py .........                 [ 51%]
+tests/contract/test_premise_carrier_contract.py ...........              [ 51%]
+tests/contract/test_proactive_trigger_section.py ...........F........... [ 52%]
+                                                                         [ 52%]
+tests/contract/test_probe_engine_action_sets.py ......                   [ 52%]
+tests/contract/test_probe_nonentity_catalog.py .....                     [ 52%]
+tests/contract/test_probe_registry_umbrella.py ..............            [ 52%]
+tests/contract/test_progress_reporting.py .......                        [ 52%]
+tests/contract/test_project_custom_template.py .......                   [ 53%]
+tests/contract/test_qoder_command_frontmatter.py ....                    [ 53%]
+tests/contract/test_registry_completeness.py ...                         [ 53%]
+tests/contract/test_render_evidence_geometry.py ..........               [ 53%]
+tests/contract/test_render_trigger_cli.py .........                      [ 53%]
+tests/contract/test_reproduction_fidelity_readback.py .......            [ 53%]
+tests/contract/test_requirements_checker.py ............................ [ 54%]
+.                                                                        [ 54%]
+tests/contract/test_requirements_convention_entry_points.py ........     [ 54%]
+tests/contract/test_resource_id_generation.py ..                         [ 54%]
+tests/contract/test_resource_id_resolution.py ...                        [ 54%]
+tests/contract/test_review_p1_checklist_governance.py .....              [ 54%]
+tests/contract/test_review_p1_recheck_waiver.py .........                [ 54%]
+tests/contract/test_review_p1_review_loop.py ..........                  [ 54%]
+tests/contract/test_role_templates.py .................................. [ 55%]
+.                                                                        [ 55%]
+tests/contract/test_run_checks.py .................................      [ 56%]
+tests/contract/test_run_determination_engine.py ........................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+.........................                                                [ 59%]
+tests/contract/test_run_determination_passive_wiring.py ................ [ 60%]
+...................................                                      [ 60%]
+tests/contract/test_run_skills_wiring.py ..........                      [ 60%]
+tests/contract/test_runtime_mode_gate.py ......                          [ 61%]
+tests/contract/test_sanitize_engine_contract.py ..................       [ 61%]
+tests/contract/test_sanitize_template.py .............                   [ 61%]
+tests/contract/test_scan_confirmation_gates.py .......                   [ 61%]
+tests/contract/test_scripts_distribution_parity.py ....                  [ 61%]
+tests/contract/test_sdd_loop_driver_cli_profiles.py ..................   [ 62%]
+tests/contract/test_sdd_loop_driver_efficiency.py ...................... [ 62%]
+.............................                                            [ 63%]
+tests/contract/test_sdd_loop_driver_gates.py .......                     [ 63%]
+tests/contract/test_sdd_loop_driver_skill.py .........................   [ 63%]
+tests/contract/test_sdd_project_setup_skill.py ....................      [ 64%]
+tests/contract/test_sdd_workflow_removed.py ....                         [ 64%]
+tests/contract/test_search_todo_contract.py ......................       [ 64%]
+tests/contract/test_seat_instantiation_flow.py ......                    [ 64%]
+tests/contract/test_self_improvement_conformance.py .........            [ 64%]
+tests/contract/test_session_command_surface.py ...............           [ 65%]
+tests/contract/test_shared_reference_directory.py ...                    [ 65%]
+tests/contract/test_shared_reference_rewrite.py ......                   [ 65%]
+tests/contract/test_shipped_agent_presets.py .....                       [ 65%]
+tests/contract/test_shipped_surface_client_neutrality.py F               [ 65%]
+tests/contract/test_single_agent_purity.py ....                          [ 65%]
+tests/contract/test_single_conceptual_model.py ...                       [ 65%]
+tests/contract/test_skill_install_layout_contract.py .                   [ 65%]
+tests/contract/test_skill_layer_visibility_guards.py ....                [ 65%]
+tests/contract/test_skill_verification_discriminability.py ......        [ 65%]
+tests/contract/test_skills_symlink_regression.py ......                  [ 65%]
+tests/contract/test_source_stamp.py ...................                  [ 66%]
+tests/contract/test_spec_feature_binding_integrity.py ..                 [ 66%]
+tests/contract/test_specify_gitignore_template.py ..                     [ 66%]
+tests/contract/test_specify_script_paths.py .......                      [ 66%]
+tests/contract/test_store_state_protocol.py .............                [ 66%]
+tests/contract/test_summarize_project_prompt_assets.py ................. [ 66%]
+....................................                                     [ 67%]
+tests/contract/test_summary_form_generator.py ...............            [ 67%]
+tests/contract/test_summary_trigger.py ................................. [ 68%]
+..                                                                       [ 68%]
+tests/contract/test_summary_writeset.py ................................ [ 69%]
+....                                                                     [ 69%]
+tests/contract/test_sync_mirrors_only.py ...                             [ 69%]
+tests/contract/test_task_complexity_rubric.py .............              [ 69%]
+tests/contract/test_teaching_surfaces.py ...........                     [ 69%]
+tests/contract/test_team_command_routing.py ............................ [ 70%]
+....                                                                     [ 70%]
+tests/contract/test_team_item_ledger.py .............                    [ 70%]
+tests/contract/test_team_territory.py ......                             [ 70%]
+tests/contract/test_territory_containment.py ....                        [ 70%]
+tests/contract/test_todo_in_context_wiring.py ........                   [ 70%]
+tests/contract/test_token_efficiency_discipline.py .........F            [ 71%]
+tests/contract/test_token_efficiency_feedback.py ..........              [ 71%]
+tests/contract/test_token_efficiency_gates.py ...........                [ 71%]
+tests/contract/test_tool_mapping.py .........                            [ 71%]
+tests/contract/test_tools_command_routing.py ........................... [ 72%]
+...........                                                              [ 72%]
+tests/contract/test_tools_cross_source.py .                              [ 72%]
+tests/contract/test_tools_define.py .............                        [ 72%]
+tests/contract/test_tools_inventory_ownership.py .........               [ 72%]
+tests/contract/test_tools_invoke.py ...                                  [ 72%]
+tests/contract/test_tools_view.py ......                                 [ 72%]
+tests/contract/test_trigger_engine.py .................................. [ 73%]
+........................................................................ [ 74%]
+.......................................                                  [ 75%]
+tests/contract/test_trigger_seed_derivation.py .....................     [ 76%]
+tests/contract/test_upgrade_end_state.py .                               [ 76%]
+tests/contract/test_user_facing_comprehension_doc.py ................... [ 76%]
+...                                                                      [ 76%]
+tests/contract/test_user_facing_comprehension_pointers.py .............  [ 76%]
+tests/contract/test_user_facing_comprehension_section.py ...........     [ 76%]
+tests/contract/test_validate_tasks_parallel_safety.py ................   [ 77%]
+tests/contract/test_workspace_isolation_contract.py .................... [ 77%]
+..........................                                               [ 78%]
+tests/contract/test_wrap_up_line_budget.py .                             [ 78%]
+tests/contract/test_wrap_up_wording_gate_safe.py ..                      [ 78%]
+tests/integration/test_agent_env_apply.py .....                          [ 78%]
+tests/integration/test_agent_env_targeting.py .....                      [ 78%]
+tests/integration/test_agent_env_validate.py ......                      [ 78%]
+tests/integration/test_agents_creation.py .......                        [ 78%]
+tests/integration/test_ai_tools_init_all_assistants.py ...               [ 78%]
+tests/integration/test_ai_tools_instruction_preservation.py ....         [ 78%]
+tests/integration/test_ai_tools_multi_assistant_coexistence.py .         [ 78%]
+tests/integration/test_ai_tools_partial_core_repair.py ....              [ 78%]
+tests/integration/test_ai_tools_refresh_isolation.py .....               [ 78%]
+tests/integration/test_ai_tools_repeat_run_idempotence.py ..             [ 78%]
+tests/integration/test_ai_tools_validation_summary.py ....               [ 79%]
+tests/integration/test_claude_refresh.py ..                              [ 79%]
+tests/integration/test_claude_validation.py ..                           [ 79%]
+tests/integration/test_codex_core_preservation.py .                      [ 79%]
+tests/integration/test_coordination_round.py .....                       [ 79%]
+tests/integration/test_derive_us1.py ........                            [ 79%]
+tests/integration/test_derive_us2.py ......                              [ 79%]
+tests/integration/test_derive_us3.py .......                             [ 79%]
+tests/integration/test_docs_command_scenarios.py ...                     [ 79%]
+tests/integration/test_docs_notes_lifecycle.py ....                      [ 79%]
+tests/integration/test_evidence_compare_verdict.py .....                 [ 79%]
+tests/integration/test_evidence_python_lanes.py ........                 [ 79%]
+tests/integration/test_feedback_command_record.py ...                    [ 80%]
+tests/integration/test_feedback_dedup.py ..                              [ 80%]
+tests/integration/test_feedback_exec_quant_channel.py ......             [ 80%]
+tests/integration/test_feedback_partial.py ...                           [ 80%]
+tests/integration/test_feedback_selective_triggering.py ...              [ 80%]
+tests/integration/test_feedback_skill_record.py ..                       [ 80%]
+tests/integration/test_feedback_threshold.py ...                         [ 80%]
+tests/integration/test_goal_aggregation.py ..............                [ 80%]
+tests/integration/test_goal_concurrent_refresh.py .......                [ 80%]
+tests/integration/test_goal_definition_sourcing.py .....                 [ 80%]
+tests/integration/test_goal_migration_path.py ......                     [ 80%]
+tests/integration/test_goal_progress_state.py ...                        [ 81%]
+tests/integration/test_goal_reference.py ......                          [ 81%]
+tests/integration/test_goal_roster.py .....                              [ 81%]
+tests/integration/test_hermes_init.py ....                               [ 81%]
+tests/integration/test_hugo_scaffold_scenarios.py ...................... [ 81%]
+                                                                         [ 81%]
+tests/integration/test_init_agents.py .........                          [ 81%]
+tests/integration/test_init_execution_config.py ......                   [ 81%]
+tests/integration/test_init_source_stamp.py .....                        [ 82%]
+tests/integration/test_persistent_agent_lifecycle.py ......              [ 82%]
+tests/integration/test_resource_id_resolution.py .....                   [ 82%]
+tests/integration/test_run_target_validation.py ...........              [ 82%]
+tests/integration/test_sanitize_us1.py ..                                [ 82%]
+tests/integration/test_sanitize_us2.py .....                             [ 82%]
+tests/integration/test_sanitize_us3.py ..                                [ 82%]
+tests/integration/test_sdd_loop_efficiency_regression.py .               [ 82%]
+tests/integration/test_sdd_loop_efficiency_runner.py ........            [ 82%]
+tests/integration/test_session_description.py .....                      [ 82%]
+tests/integration/test_session_kill_reattach.py ......                   [ 83%]
+tests/integration/test_shared_dir_install.py ..                          [ 83%]
+tests/integration/test_skill_install_layout_integration.py .....         [ 83%]
+tests/integration/test_skills_resource_ids.py ..                         [ 83%]
+tests/integration/test_specify_gitignore_install.py ..                   [ 83%]
+tests/integration/test_summary_accumulation.py ............              [ 83%]
+tests/integration/test_summary_four_patterns.py .........                [ 83%]
+tests/integration/test_summary_legacy_backfill.py ..............         [ 83%]
+tests/integration/test_target_fold.py .......                            [ 84%]
+tests/integration/test_target_milestones.py .....                        [ 84%]
+tests/integration/test_tools_aliasing.py ..                              [ 84%]
+tests/integration/test_tools_definition_flow.py ....                     [ 84%]
+tests/integration/test_tools_invoke_flow.py .                            [ 84%]
+tests/integration/test_tools_modify_flow.py .                            [ 84%]
+tests/integration/test_tools_record_creation.py .                        [ 84%]
+tests/integration/test_tools_source_handling.py .                        [ 84%]
+tests/integration/test_trigger_promotion.py .....................        [ 84%]
+tests/integration/test_trigger_telemetry.py .............                [ 84%]
+tests/integration/test_trigger_tuning.py .................               [ 85%]
+tests/integration/test_two_line_isolation.py ......                      [ 85%]
+tests/integration/test_worktree_integration_queue.py .........           [ 85%]
+tests/integration/test_zero_sdd_workflow_references.py ..                [ 85%]
+tests/unit/test_admission_check.py .........................             [ 86%]
+tests/unit/test_agent_env_helpers.py .........                           [ 86%]
+tests/unit/test_ai_tools_support_matrix.py ...........                   [ 86%]
+tests/unit/test_audit_plan_changes.py ........                           [ 86%]
+tests/unit/test_audit_test_budget.py .........................           [ 87%]
+tests/unit/test_claude_command_generation.py ..                          [ 87%]
+tests/unit/test_claude_ignore_policy.py ..                               [ 87%]
+tests/unit/test_codex_command_generation.py ..                           [ 87%]
+tests/unit/test_copilot_layout.py ....                                   [ 87%]
+tests/unit/test_core_workspace_asset_preservation.py ............        [ 87%]
+tests/unit/test_decomposition_check.py .........                         [ 87%]
+tests/unit/test_derive_live_log.py ........                              [ 87%]
+tests/unit/test_derive_moves.py ........................................ [ 88%]
+.............                                                            [ 88%]
+tests/unit/test_derive_validate.py ..................................... [ 89%]
+...................................................                      [ 90%]
+tests/unit/test_ensure_symlink.py .......                                [ 90%]
+tests/unit/test_feedback_exec_quant_payload.py ....................      [ 90%]
+tests/unit/test_feedback_intake_exec_quant.py .................          [ 91%]
+tests/unit/test_feedback_package.py .............                        [ 91%]
+tests/unit/test_feedback_utils.py .........                              [ 91%]
+tests/unit/test_glossary_utils.py ..........                             [ 91%]
+tests/unit/test_goal_utils.py .......................................... [ 92%]
+............................................                             [ 93%]
+tests/unit/test_init_summary_tiers.py ...                                [ 93%]
+tests/unit/test_initialization_result_summary.py ...........             [ 93%]
+tests/unit/test_interview_utils.py ..................................... [ 94%]
+..                                                                       [ 94%]
+tests/unit/test_line_registry_engine.py ......................           [ 94%]
+tests/unit/test_loop_state_engine.py ...FFF..........F.................. [ 95%]
+..FFFF...........F.....                                                  [ 95%]
+tests/unit/test_memory_utils.py ...............                          [ 96%]
+tests/unit/test_overlap_check.py .........                               [ 96%]
+tests/unit/test_pre_analyze_check.py ...............                     [ 96%]
+tests/unit/test_qoder_bootstrap.py ....                                  [ 96%]
+tests/unit/test_resource_id_helpers.py ....                              [ 96%]
+tests/unit/test_rewrite_paths_shared.py ....                             [ 96%]
+tests/unit/test_rewrite_paths_skill_layers.py .................          [ 97%]
+tests/unit/test_sanitize_checks_index.py ...............                 [ 97%]
+tests/unit/test_sanitize_checks_migration.py ..............              [ 97%]
+tests/unit/test_sanitize_checks_mirror.py .............                  [ 97%]
+tests/unit/test_sanitize_checks_refs.py ...........                      [ 98%]
+tests/unit/test_sanitize_semantic.py .........                           [ 98%]
+tests/unit/test_sanitize_store.py ......................                 [ 98%]
+tests/unit/test_skills_utils_layout.py ...                               [ 98%]
+tests/unit/test_sync_mirrors_resilience.py ...                           [ 98%]
+tests/unit/test_tier_classification.py ...                               [ 98%]
+tests/unit/test_tool_record.py ...                                       [ 98%]
+tests/unit/test_trigger_utils_units.py ................................. [ 99%]
+.....                                                                    [ 99%]
+tests/unit/test_two_layer_skills_copy.py ...                             [ 99%]
+tests/unit/test_workspace_root_resolution.py ...............             [100%]
+
+=================================== FAILURES ===================================
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+________ TestErrorsAndWarnings.test_warning_surface_is_json_and_stderr _________
+
+self = <contract.test_execution_config_engine.TestErrorsAndWarnings object at 0x7f9e89268a50>
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_warning_surface_is_json_a0')
+
+    def test_warning_surface_is_json_and_stderr(self, tmp_path):
+        ws = make_ws(tmp_path, defaults_extra="mode: external\n",
+                     agent_yaml="cli: claude\n")
+        result = run_engine(ws)
+>       data = payload(result)
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_execution_config_engine.py:680: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/scripts/python/e...guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n")
+
+    def payload(result: subprocess.CompletedProcess) -> dict:
+>       assert result.returncode == 0, f"engine failed: {result.stderr}\n{result.stdout}"
+E       AssertionError: engine failed: usage: execution-config.py --action {resolve,validate,list-configs} --agent SLUG [--mode MODE] [--cli CLI] [--model MODEL] [--reasoning-effort EFFORT] [--context-window N] [--extra-flags FLAGS] [--log-dir DIR] [--quantification-method METHOD] [--host-cli CLI] [--workspace-root PATH] [--format text|json]
+E         execution-config: configuration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)
+E         
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/scripts/python/e...guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n").returncode
+
+tests/contract/test_execution_config_engine.py:76: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1846: AssertionError
+_____________________ test_lc_07_identity_ok_mismatch_dead _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_lc_07_identity_ok_mismatc0')
+
+    def test_lc_07_identity_ok_mismatch_dead(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        entry = _register(reg, project)
+        four = four_piece(tmp_path / "rt", entry["line_id"], entry["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", entry["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        ok = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
+>       assert ok["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:241: AssertionError
+______________________ test_lc_10_11_12_snapshot_branches ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_lc_10_11_12_snapshot_bran0')
+
+    def test_lc_10_11_12_snapshot_branches(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        line = _register(reg, project)
+        four = four_piece(tmp_path / "rt", line["line_id"], line["run_id"], stage="plan", sentinel=True)
+        engine_json(
+            "update", "--line-id", line["line_id"], "--stage", "plan",
+            "--runner-pid", "999999", "--runner-start-token", "0",
+            "--cli-pid", "999999", "--cli-start-token", "0",
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        done = engine_json("verify-identity", "--line-id", line["line_id"], reg=reg)
+        assert done["branch_hint"] == "done"
+    
+        running_line = _register(reg, project)
+        four2 = four_piece(tmp_path / "rt2", running_line["line_id"], running_line["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", running_line["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four2["prompt_meta"]), "--status-path", str(four2["status"]),
+            "--log-path", str(four2["log"]), "--heartbeat-path", str(four2["heartbeat"]), reg=reg,
+        )
+        running = engine_json("verify-identity", "--line-id", running_line["line_id"], reg=reg)
+>       assert running["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:315: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+___________ test_shipped_surface_has_no_framework_runtime_references ___________
+
+    @pytest.mark.contract
+    def test_shipped_surface_has_no_framework_runtime_references():
+        violations = []
+        for root_name in SHIPPED_ROOTS:
+            for path in (REPO_ROOT / root_name).rglob("*"):
+                if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".yaml", ".yml", ".json"}:
+                    continue
+                rel = path.relative_to(REPO_ROOT).as_posix()
+                text = path.read_text(encoding="utf-8", errors="replace")
+                for pattern in BANNED_PATTERNS:
+                    for m in pattern.finditer(text):
+                        line = text[: m.start()].count("\n") + 1
+                        snippet = text.splitlines()[line - 1].strip()[:90]
+                        violations.append(f"{rel}:{line}: {snippet}")
+        fresh = [v for v in violations
+                 if v.split(":")[0] not in KNOWN_DEBT]
+>       assert not fresh, (
+            "shipped (client-visible) files reference the framework project's own "
+            "runtime artifacts; rewrite from the client-project perspective:\n"
+            + "\n".join(fresh[:15])
+        )
+E       AssertionError: shipped (client-visible) files reference the framework project's own runtime artifacts; rewrite from the client-project perspective:
+E         skills/external/sdd-loop-driver/scripts/loop-state.py:3: """loop-state.py — read-only loop state snapshot engine (Feature 065 / Slice 065a).
+E         skills/external/sdd-loop-driver/scripts/loop-state.py:2871: description="Read-only loop state snapshot engine (Feature 065 / slice "
+E       assert not ['skills/external/sdd-loop-driver/scripts/loop-state.py:3: """loop-state.py — read-only loop state snapshot engine (Fe.../sdd-loop-driver/scripts/loop-state.py:2871: description="Read-only loop state snapshot engine (Feature 065 / slice "']
+
+tests/contract/test_shipped_surface_client_neutrality.py:62: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/shared/guidelines/single-run-evidence.md:## 判定边界', '/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/shared/guidelines/progress-reporting.md:## 判定边界']
+E       assert not ['/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/shared/guidelines/single-run-evidence.md:## 判定边界', '/tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/shared/guidelines/progress-reporting.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+_________________ test_state_dir_falls_back_to_runtime_dir_env _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_state_dir_falls_back_to_r0')
+
+    def test_state_dir_falls_back_to_runtime_dir_env(tmp_path):
+        """R-02 level 3: with no --state-dir and no Registry `status_path`, the
+        `SPECIFY_LINE_RUNTIME_DIR` convention the runner writes to is used, so the
+        four-piece evidence is still found instead of leaving `state_dir` null."""
+        ws = Workspace(tmp_path)  # no registry entry -> level 2 cannot fire
+        ws.write_spine(state="running")
+        pid = ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws, state_dir=False)  # --spine stays explicit
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["paths"]["state_dir"] == str(ws.state_dir)
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:408: AssertionError
+_________ test_state_dir_falls_back_to_home_when_runtime_env_is_absent _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_state_dir_falls_back_to_h0')
+
+    def test_state_dir_falls_back_to_home_when_runtime_env_is_absent(tmp_path):
+        """R-02 level 4: with no --state-dir, no Registry and no
+        `SPECIFY_LINE_RUNTIME_DIR`, `$HOME` is the last resort. The fixture points
+        HOME at a temp dir, so the real home is neither read nor written."""
+        ws = Workspace(tmp_path)  # no registry entry
+        ws.write_spine(state="running")
+        home_pid = ws.home / ("pid-%s-%s" % (ws.line, ws.stage))
+        home_pid.write_text(
+            "pid=%d start=424242 at=%d line=%s stage=%s event=pid\n"
+            % (os.getpid(), NOW, ws.line, ws.stage), encoding="utf-8")
+        (ws.home / ("heartbeat-%s-%s.log" % (ws.line, ws.stage))).write_text(
+            "at=%d line=%s stage=%s event=heartbeat\n" % (NOW, ws.line, ws.stage),
+            encoding="utf-8")
+    
+        env = _snap_json(ws, state_dir=False, unset=["SPECIFY_LINE_RUNTIME_DIR"])
+    
+        assert env["paths"]["state_dir"] == str(ws.home)
+        assert env["paths"]["state_dir"] != str(Path.home()), "real home must stay out"
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(home_pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:431: AssertionError
+__________________ test_missing_registry_continues_evaluation __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_missing_registry_continue0')
+
+    def test_missing_registry_continues_evaluation(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine(state="running")
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["registry"]["stage"] is None
+        assert env["spine"]["status"] == "present"
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:445: AssertionError
+_________________ test_sentinel_must_be_the_last_nonempty_line _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_sentinel_must_be_the_last0')
+
+    def test_sentinel_must_be_the_last_nonempty_line(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine()
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "", "still working"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:632: AssertionError
+___________________ test_derived_dead_no_signal_and_running ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_derived_dead_no_signal_an0')
+
+    def test_derived_dead_no_signal_and_running(tmp_path):
+        """FR-004 rules (4), (6), (7)."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert env["loop_state_reason"] == "dead-no-exit-record"
+        assert env["recovery_action"] == "retry"
+    
+        (ws.state_dir / ("pid-%s-%s" % (ws.line, ws.stage))).unlink()
+        env = _snap_json(ws)
+        assert env["loop_state"] == "NO_SIGNAL"
+        assert env["loop_state_reason"] == "no-signal"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1073: AssertionError
+_______ test_derived_deadline_overrun_with_live_process_is_timeout_watch _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_derived_deadline_overrun_0')
+
+    def test_derived_deadline_overrun_with_live_process_is_timeout_watch(tmp_path):
+        """FR-004 rule (5) + IA-17: a live TIMEOUT is watched, never killed."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 900, deadline=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+>       assert env["loop_state"] == "TIMEOUT"
+E       AssertionError: assert 'DEAD' == 'TIMEOUT'
+E         
+E         - TIMEOUT
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1086: AssertionError
+____________ test_unwatched_detector_positive_expired_and_negative _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_unwatched_detector_positi0')
+
+    def test_unwatched_detector_positive_expired_and_negative(tmp_path):
+        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
+        # cases anchor to call time instead of module-import NOW. NOW binds at
+        # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
+        # marker already sits past its own 300 s window and the "fresh" branch becomes
+        # unreachable. Assertions and branch coverage are unchanged.
+        now = int(time.time())
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=now - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1114: AssertionError
+____________________ test_dead_no_exit_record_is_never_done ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_dead_no_exit_record_is_ne0')
+
+    def test_dead_no_exit_record_is_never_done(tmp_path):
+        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert _find(env, "dead-no-exit-record")
+        assert env["recovery_action"] != "verify"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert _find(env, "dead-no-exit-record") == [], (
+            "a live process must not be reported as dead-no-exit-record"
+        )
+E       AssertionError: a live process must not be reported as dead-no-exit-record
+E       assert [{'detail': '...exit-record'}] == []
+E         
+E         Left contains one more item: {'detail': 'pid record exists, the process is gone and no exit record was written', 'detector': '065a', 'evidence': [{...ead_no_exit_record_is_ne0/state/demo-line/status-demo-line-tasks', 'signal': 'status'}], 'form': 'dead-no-exit-record'}
+E         Use -v to get more diff
+
+tests/unit/test_loop_state_engine.py:1146: AssertionError
+________ test_trailing_anomaly_line_with_live_process_is_watch_not_done ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-1772/test_trailing_anomaly_line_wit0')
+
+    def test_trailing_anomaly_line_with_live_process_is_watch_not_done(tmp_path):
+        """FR-004 sentinel rule: an earlier sentinel followed by ANOMALY: is not DONE."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "ANOMALY: subagent returned malformed tasks"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+        assert env["evidence"]["log"]["anomaly"] is True
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'ANOMALY' == 'RUNNING'
+E         
+E         - RUNNING
+E         + ANOMALY
+
+tests/unit/test_loop_state_engine.py:1445: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /tmp/sdd-worktrees/spec-kit/070-subagent-task-teams/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_execution_config_engine.py::TestErrorsAndWarnings::test_warning_surface_is_json_and_stderr
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+FAILED tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+FAILED tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+FAILED tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+FAILED tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+FAILED tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+FAILED tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+FAILED tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+====== 19 failed, 5341 passed, 1 skipped, 3 warnings in 277.95s (0:04:37) ======
+# failed-name list written: .specify/specs/070-subagent-task-teams/baseline-failed.txt (19 entries)
+RC=1
