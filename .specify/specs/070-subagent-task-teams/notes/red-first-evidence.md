@@ -443,3 +443,19 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   ```
   Exit code `1`. The actual H2 list has 13 entries; the pin expects 14 because
   the SKILL.md section does not exist yet.
+
+## T032 — SKILL.md decomposition H2 and docs entry (green)
+
+- **Date**: 2026-10-25T03:12Z (segment impl-s6)
+- **Changed paths**: `skills/external/sdd-loop-driver/SKILL.md` (new H2 between
+  the efficiency summary and References), `docs/reference/skills/sdd-loop-driver.md`
+  (user-facing section with pointers only).
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py -k "c3_skill_md_section_set or c14_docs_page or c15_docs_page or c11_self_containment"
+  ```
+- **Real output**: `4 passed, 21 deselected in 0.04s`; exit code `0`.
+- **Red-to-green**: T031 red `1 failed, 24 deselected` (missing H2) → T032 green.
+- **Disclosed**: the source/mirror byte pair for `SKILL.md` is intentionally
+  out of sync until T037 runs `sync-mirrors.py --write`; no mirror file was
+  hand-edited, and the mirror check is not claimed here.
