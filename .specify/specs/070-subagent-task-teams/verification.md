@@ -1,6 +1,6 @@
 # Verification — 070-subagent-task-teams
 
-**Status**: implementation complete (T001–T039). The SC-001…SC-008 matrix and the closure disposition are recorded under § Closure verification (T039). SC-001 and SC-002 are `not_evaluated` and no user waiver is recorded, so the closure gate is **blocked** (no feature closure, no handoff). The full-suite closure slot is deferred to the driver's post-review slot by the impl-s7 mandatory test-budget instruction; every other T039 check ran and is green.
+**Status**: implementation complete (T001–T039); a **user waiver for SC-001/SC-002 is recorded** (`notes/waiver-070.md`, 2026-10-25), so the closure gate is no longer blocked. The post-review closure full suite reports **18 failed / 5674 passed / 1 skipped with 0 new name-level failures** against the 19-failure / 5341-passed baseline, and the test-budget audit reports `status=ok`. The feature is merged at `ca8040f5` (fast-forward; no push; worktree retained). SC-001 and SC-002 remain `not_evaluated` and are waived, not met; SC-006 remains `not_evaluated`. See § Closure outcome (post-review).
 
 ## Entry surface and opt-out/fallback verification (impl-s6; T031–T035)
 
@@ -153,22 +153,28 @@ open.
 
 ### SC-001…SC-008 evidence matrix
 
-- **SC-001**: **Status = `not_evaluated` (closure-blocking).** Criterion: stage
+- **SC-001**: **Status = `waived` (user, 2026-10-25).** Criterion: stage
   wall-clock ≤ 80% of the dated anchor, median over at least three comparable
   samples. Metric/command: `notes/benchmark-070.md` (no comparable driver run
   exists, so no median is computable). Output: 0 samples,
-  `median=not_evaluated`, no waiver recorded.
-- **SC-002**: **Status = `not_evaluated` (closure-blocking).** Criterion: stage
+  `median=not_evaluated`. Waived by the user via `notes/waiver-070.md` because
+  the mechanism, functional behaviour, and all quality gates are verified
+  while a comparable benchmark is deferred; the criterion is **not** claimed
+  met.
+- **SC-002**: **Status = `waived` (user, 2026-10-25).** Criterion: stage
   executions per canonical stage ≤ 1.5 and ≥40% below 2.6×. Metric/command:
   `notes/benchmark-070.md` (no run-level `(stage, stage_attempt)` chain exists).
   Output: `not_evaluated`; Scenario E's fixture `0.125` is a derivation test,
-  not a benchmark; no waiver recorded.
-- **SC-003**: **Status = `partial`.** All targeted new and existing-driver
-  suites are green; the full-suite name-level comparison is deferred to the
-  driver slot. Command: the 070 suite (`328 passed`), the existing driver
-  targeted suite (`65 passed`, identical to T001), the skill contract
-  (`25 passed`), the mirror check (`ok`, 32 files), and the non-regression net
-  (`10 passed`). Output: zero targeted failures; full-suite comparison pending.
+  not a benchmark. Waived by the user via `notes/waiver-070.md` (same reason);
+  the criterion is **not** claimed met.
+- **SC-003**: **Status = `met` (closure 18 failed / 0 new; gate suites green).**
+  All targeted new and existing-driver suites are green, and the post-review
+  closure full suite reports `18 failed / 5674 passed / 1 skipped` against the
+  19-failure / 5341-passed baseline with zero name-level additions
+  (`comm -13` empty). Command: the 070 suite (`328 passed`), the existing
+  driver targeted suite (`65 passed`, identical to T001), the skill contract
+  (`25 passed`), the mirror check (`ok`, 32 files), the non-regression net
+  (`10 passed`), and the closure full suite. Output: zero new failures.
 - **SC-004**: **Status = `met` (targeted).** Criterion: every required output
   is owned; zero orphan or cross-territory outputs/writes. Command:
   `python3 -m pytest -q tests/unit/test_wp_gate.py -k "orphan or duplicate_output or integrator_output or write_write or read_write"`.
@@ -217,3 +223,33 @@ open.
 `contracts/`, `quickstart.md`, `research.md`, `feature-ref.md`) was touched in
 impl-s7. The six analyze residuals remain non-blocking and none is used by a
 new code path in T036–T039.
+
+## Closure outcome (post-review)
+
+- **User waiver**: SC-001 and SC-002 are waived by the user on 2026-10-25
+  (`notes/waiver-070.md`) because the mechanism, functional behaviour, and all
+  quality gates are verified while a comparable benchmark is deferred. Both
+  remain `not_evaluated` and are **not** claimed met; SC-003…SC-008 remain in
+  force, and SC-006 remains `not_evaluated`.
+- **User ratification**: the analyze-repair semantic plan revision is approved
+  under the 063 §3.5(b) branch-(b) user decision
+  (`notes/plan-revision-ratification-070.md`);
+  `approved_baseline_commit = 0df504b9`.
+- **Closure full suite**: `bash scripts/bash/run-tests.sh tests --names-out
+  .specify/specs/070-subagent-task-teams/final-failed.txt` → `18 failed, 5674
+  passed, 1 skipped in 256.75s`, rc 1;
+  `comm -13 baseline-failed.txt final-failed.txt` → 0 lines, i.e. zero new
+  name-level failures against the baseline (`19 failed / 5341 passed`).
+  Evidence: `final-failed.txt` and the driver log
+  `/home/agent/sdd-070/closure-full.log`.
+- **Test-budget audit**: `audit-test-budget.py --stage-check closure` →
+  `slots=baseline:1 closure:1 reruns=3 exceptions=0 unknown=0
+  environment_failures=0`, `stages=6 complete=6`, `status=ok`, rc 0.
+- **Review disposition**: P0 = 0; P1 F1 (semantic plan revision) resolved by
+  the user ratification above, P1 F2 (analyze-rerun evidence) resolved by
+  commit `c9fef843`; P2 F3 backfilled, P2 F4/F5 recorded as framework
+  follow-ups.
+- **Merge**: master `ca8040f5`, fast-forward from `4f73c21d` after rebasing
+  the four post-review commits (`c947c029`, `ff3fbdec`, `c35d83d6`,
+  `ca8040f5`); no push (`gitlab/master` remains 4 commits behind); the
+  worktree is retained.
