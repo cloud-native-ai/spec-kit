@@ -370,3 +370,21 @@ watch/score another agent's work") rather than to modify a specific Skill, this 
 wrong entry point: editing a SKILL.md conflicts with monitoring red lines (zero writes to the
 monitored target). Route to a `continuous` monitoring team (`create-team` / `improve-team`) and
 tell the user why, instead of forcing target-Skill resolution.
+
+## Lessons from the external feedback batch (2026-09-14)
+
+- **Capability-level coverage, not name-level.** A product can expose multiple coexisting
+  versions (v1/v2 APIs, split doc trees); a name-level entry that covers only one version
+  silently overstates the skill's reach. Grade by the capability actually probed.
+- **Provenance discipline.** Every factual claim added to a skill (pitfalls, parameter
+  statements, behavior claims) must be anchored to ground truth — CLI `--help`, an
+  official-doc cache, or a real run. When reviewing, sweep specifically for **untested
+  behavior assertions** (error handling, fallback outcomes, empty-result semantics never
+  executed): delete or reword them into sourced facts.
+- **Drift-reconciliation becomes a deterministic subcommand.** When a run had to compare a
+  doc's parameter table/counts against the live `--help` or inventory by hand, add a
+  `--counts`/`--verify` command to the tool that owns the data. When parsing CLI help,
+  match both long and short option forms (`-o` and `--output`) in one pass.
+- **Cross-skill stale-reference scan after deletion/rename.** Grep the whole skills tree
+  (and any generator emitting the removed path) for the old name; restructure large
+  documents losslessly before deleting the source; run a full-tree link check.

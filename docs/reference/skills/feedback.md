@@ -96,7 +96,7 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `dispose` | Mark one entry's disposition (`--id` + `--to processed|ignored`; optional `--reason`/`--ref` provenance); index and entry frontmatter both updated, body never rewritten. |
 | `mark-submitted` | Reset `count_since_submission` to 0 and stamp `submitted_at` (written to `state/submitted-at.json`; entries are kept). Local bookkeeping only — NOT an upload. |
 | `reindex` | Explicit reconciliation and migration entry point (req 055): derives entries from the entry files, materializes store scalars into `state/`, retires a legacy `index.json`, and reports `migrated`. Idempotent. |
-| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
+| `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. Only framework-owned units are packaged (`/speckit.*` commands; skills bundled with Spec Kit) — entries about user-project skills are excluded and stay local. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
 | `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
 | `ingest-exec-quant` | Receiving side of the exec-quant channel (068): unpack an inbound bundle's `exec-quant/` payload into the aggregated layer (`.specify/memory/exec-quant/aggregated/<source-slug>/records/`) with package-level identity attribution; `--package <zip>` required. Idempotent via identity-key dedup (`duplicates_skipped`); never touches the feedback store; degradations (unreadable manifest/records, `unknown-project` identity, conflicts) exit 0 with counters, while a call that cannot run (missing/non-zip package, unwritable store) exits 2. |
 | `probes` / `map` / `probe-inject` | Migrated to the shared probe engine (056): run them on `probe-utils.py` — see [probe.md](probe.md) for the probe-family CLI, the Handler/HandlerBinding model, and the read-only host boundary. |
@@ -198,6 +198,15 @@ python3 .specify/scripts/python/feedback-utils.py --action package
   full store) into `.specify/memory/feedback/packages/feedback-<ts>.zip`, plus a
   `MANIFEST.md` (entry list, time range, spec-kit version, install source). **Source
   entry files are never modified.**
+- **Framework-scope filter**: a package is feedback *to the Spec Kit developers*, so
+  only framework-owned units are included — every `/speckit.*` command entry, plus
+  `skill:<name>` entries whose skill ships in the Spec Kit bundle (resolved from the
+  installed `specify-cli` package, or from `skills/` in a framework-repo checkout).
+  Entries about user-project skills (e.g. a project's own `skill:aliyun-*`) are
+  excluded from the zip, listed in the MANIFEST's `Excluded` line and the output's
+  `excluded` field, and remain in the local store for their local workaround value.
+  Recording stays inclusive — the filter applies only at packaging time. If the bundle
+  cannot be resolved, only `/speckit.*` entries are packaged and the output says so.
 - Prints the detected **upstream repo** and manual-send guidance. Detection priority:
   the user-configured `upstream_repo` in `state/upstream-repo.json` > PEP 610 install metadata
   (`direct_url.json`, i.e. the git URL this custom spec-kit build was installed from) >

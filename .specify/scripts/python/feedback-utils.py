@@ -1035,6 +1035,57 @@ def _speckit_version() -> str:
         return "unknown"
 
 
+
+def _skill_names_in(skills_dir: Path) -> set:
+    if not skills_dir.is_dir():
+        return set()
+    return {p.name for p in skills_dir.iterdir()
+            if p.is_dir() and (p / "SKILL.md").is_file()}
+
+
+def framework_skill_names(workspace_root: Path) -> Tuple[Optional[set], str]:
+    """Resolve the skill names bundled with the Spec Kit framework itself.
+
+    Returns ``(names, source)``; ``names`` is None when the bundle cannot be
+    resolved at all. Sources, in priority order:
+
+    1. the installed spec-kit package (``<pkg>/skills/<name>/SKILL.md``) —
+       the wheel ships only framework skills, so this set excludes any
+       user-authored skills a downstream project installed alongside them;
+    2. a framework-repo checkout (``<workspace_root>/skills/`` next to
+       ``src/specify_cli/``).
+    """
+    try:
+        import importlib.util
+        spec = importlib.util.find_spec("specify_cli")
+        if spec is not None and getattr(spec, "origin", None):
+            names = _skill_names_in(Path(spec.origin).resolve().parent / "skills")
+            if names:
+                return names, "installed-package"
+    except Exception:
+        pass
+    if (workspace_root / "src" / "specify_cli").is_dir():
+        names = _skill_names_in(workspace_root / "skills")
+        if names:
+            return names, "framework-repo"
+    return None, "unresolved"
+
+
+def is_framework_unit(unit_id: str, framework_skills: Optional[set]) -> bool:
+    """Whether a feedback unit targets the Spec Kit framework itself.
+
+    ``/speckit.*`` commands are framework units by definition; a ``skill:``
+    unit is a framework unit only when the skill ships in the framework
+    bundle. Feedback about user-project skills stays local (it has local
+    workaround value) but is never packaged for upstream delivery.
+    """
+    if unit_id.startswith("/speckit."):
+        return True
+    if unit_id.startswith("skill:"):
+        return framework_skills is not None and unit_id[len("skill:"):] in framework_skills
+    return False
+
+
 def detect_upstream(index: Dict[str, Any]) -> Dict[str, Any]:
     """Resolve the upstream repo URL for manual feedback delivery.
 
@@ -1652,6 +1703,7 @@ def write_package(
     notes: Optional[str] = None,
     include_introspection: bool = False,
     payload: Optional[Dict[str, Any]] = None,
+    excluded: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Zip ``selected`` entries into ``packages/``; source files are never touched.
 
@@ -1676,6 +1728,8 @@ def write_package(
                   "upstream": upstream,
                   "note": "No feedback entries or exec-quant payload records "
                           "to package."}
+        if excluded:
+            result["excluded"] = sorted({str(e.get("unit_id", "?")) for e in excluded})
         if payload is not None:
             result["exec_quant_payload"] = _payload_report(payload)
         return result
@@ -1707,6 +1761,15 @@ def write_package(
         f"- **spec-kit version**: {_speckit_version()}",
         f"- **Install source**: {upstream.get('url') or 'unknown'}"
         + (f" @ {upstream['commit']}" if upstream.get("commit") else ""),
+    ]
+    if excluded:
+        excluded_units = sorted({str(e.get("unit_id", "?")) for e in excluded})
+        manifest_lines.append(
+            f"- **Excluded (non-framework, kept local)**: {len(excluded)} "
+            f"entr{'y' if len(excluded) == 1 else 'ies'} — "
+            + ", ".join(excluded_units)
+        )
+    manifest_lines += [
         "",
         "| Created | Unit | Partial | Probe | Slice | Summary |",
         "|---------|------|---------|-------|-------|---------|",
@@ -1776,6 +1839,7 @@ def write_package(
 
     rel_zip = zip_path.relative_to(workspace_root).as_posix()
     result = {"packaged": len(packaged), "zip": rel_zip, "missing": missing,
+              "excluded": sorted({str(e.get("unit_id", "?")) for e in (excluded or [])}),
               "upstream": upstream}
     if payload is not None:
         result["exec_quant_payload"] = _payload_report(payload)
@@ -1807,18 +1871,38 @@ def action_package(args: argparse.Namespace) -> Dict[str, Any]:
     excluded_external = sum(1 for e in selected if e.get("kind") == "external")
     selected = [e for e in selected if e.get("kind") != "external"]
 
+    # Framework-scope filter: only feedback about the Spec Kit framework itself
+    # is packaged for upstream delivery. User-project skill feedback stays local.
+    framework_skills, bundle_source = framework_skill_names(workspace_root)
+    excluded_framework = [
+        e for e in selected
+        if not is_framework_unit(str(e.get("unit_id", "")), framework_skills)
+    ]
+    included = [e for e in selected if e not in excluded_framework]
+    excluded_units = sorted({str(e.get("unit_id", "?")) for e in excluded_framework})
+
     payload = _collect_exec_quant_payload(workspace_root)  # C-9: never raises
     result = write_package(workspace_root, {
         "upstream_repo": state["upstream_repo"],
         "introspections": state["introspections"],
-    }, selected,
+    }, included,
                            include_introspection=bool(
                                getattr(args, "include_introspection", False)),
-                           payload=payload)
+                           payload=payload, excluded=excluded_framework)
     result["excluded_external"] = excluded_external
+    if excluded_units:
+        result["excluded"] = excluded_units
     if not result.get("zip"):
         result["upstream"] = detect_upstream(
             {"upstream_repo": state["upstream_repo"]})
+        if excluded_framework:
+            note = ("All pending entries target non-framework units "
+                    "(user-project skills); they stay local and are not "
+                    "packaged for upstream delivery.")
+            if bundle_source == "unresolved":
+                note += (" The framework skill bundle could not be resolved, so "
+                         "only /speckit.* command entries would be packaged.")
+            result["note"] = note
         return result
     result["next_steps"] = _send_guidance(result["upstream"]) + [
         "After you have dealt with the batch (sent or deliberately ignored), "
@@ -2095,6 +2179,9 @@ def render_text(action: str, payload: Dict[str, Any]) -> str:
         ]
         if payload.get("missing"):
             lines.append(f"  missing entry files skipped: {payload['missing']}")
+        if payload.get("excluded"):
+            lines.append("  excluded non-framework units (kept local): "
+                         + ", ".join(payload["excluded"]))
         rep = payload.get("exec_quant_payload")
         if rep:  # 068 C-7: payload inclusion visible on the text face too
             if rep.get("record_count"):
