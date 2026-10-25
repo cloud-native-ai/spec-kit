@@ -1,0 +1,9 @@
+$ python3 -m pytest -q tests/contract/test_clause_coverage.py::test_c5_gate_budget_is_unchanged_by_the_owner_document tests/contract/test_criterion_subject.py::test_c19_the_gate_budget_survives_the_new_section tests/contract/test_neutrality_budget.py::test_c4_budget_total_and_violations_after_the_feature_landed tests/contract/test_user_facing_comprehension_doc.py::test_gn_c2_gate_scan_total_unchanged tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+.....                                                                    [100%]
+5 passed in 1.05s
+budget_tests_rc=0
+
+$ python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py
+.........................                                                [100%]
+25 passed in 17.00s
+mirror_tests_rc=0
