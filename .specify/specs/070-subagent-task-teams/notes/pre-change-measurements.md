@@ -90,3 +90,65 @@ Cause: the extractor recognizes only the closed `C-\d+` clause form; Feature 070
 - **T037** compares `sync-mirrors.py --check` against the 28-file baseline above.
 - **T039** compares closure drift against the same 28-file baseline and the full-suite name list captured at T002 (`baseline-failed.txt`).
 - No value in this note was inferred; each row is the recorded output of the command shown.
+
+## T037 result — mirror sync (2026-10-25T07:52Z, segment impl-s7)
+
+Write mode:
+
+```sh
+python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver
+```
+
+Real output (rc 0):
+
+```text
+scope --only: skills/external/sdd-loop-driver
+MISS  .specify/skills/sdd-loop-driver/references/decomposition-model.md
+MISS  .specify/skills/sdd-loop-driver/scripts/wp-gate.py
+MISS  .specify/skills/sdd-loop-driver/scripts/wp-report.py
+MISS  .specify/skills/sdd-loop-driver/templates/stage-team-preset.md
+DIFF  .specify/skills/sdd-loop-driver/SKILL.md
+sync  skills/external/ -> .specify/skills/ (5 files)
+```
+
+Check mode against the T001 clean baseline:
+
+```sh
+python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver
+```
+
+Real output (rc 0):
+
+```text
+scope --only: skills/external/sdd-loop-driver
+ok    skills/external/ == .specify/skills/ (32 files)
+```
+
+`32 files = the 28-file T001 baseline + the four planned new source files`
+(`references/decomposition-model.md`, `templates/stage-team-preset.md`,
+`scripts/wp-gate.py`, `scripts/wp-report.py`). There is **zero NEW drift**:
+the check reports `ok`, and the four additions plus the `SKILL.md` update are
+the declared Feature 070 source changes, not unplanned divergence.
+
+Five source/mirror byte comparisons:
+
+```sh
+for f in SKILL.md references/decomposition-model.md templates/stage-team-preset.md \
+         scripts/wp-gate.py scripts/wp-report.py; do
+  cmp -s "skills/external/sdd-loop-driver/$f" ".specify/skills/sdd-loop-driver/$f" \
+    && echo "IDENTICAL $f" || echo "DIFF $f"
+done
+```
+
+Real output (rc 0):
+
+```text
+IDENTICAL SKILL.md
+IDENTICAL references/decomposition-model.md
+IDENTICAL templates/stage-team-preset.md
+IDENTICAL scripts/wp-gate.py
+IDENTICAL scripts/wp-report.py
+```
+
+No file under `.specify/skills/sdd-loop-driver/` was hand-edited; the entire
+mirror tree is the generator's output.
