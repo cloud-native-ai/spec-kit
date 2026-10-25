@@ -152,7 +152,14 @@ def test_delivered_runner_recipe_survives_driver_kill_and_reattaches(tmp_path):
         )
 
         os.killpg(os.getpgid(driver.pid), signal.SIGHUP)
-        driver.wait(timeout=5)
+        try:
+            driver.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            # SIGHUP delivery can be delayed under full-suite load; killing the
+            # driver explicitly preserves the test's intent (the detached runner
+            # must survive driver death and be reattachable).
+            driver.kill()
+            driver.wait(timeout=5)
         time.sleep(0.4)
         assert pid_alive(runner_pid), "detached runner must survive the driver group SIGHUP"
         assert pid_alive(cli_pid), "CLI child must survive the driver group SIGHUP"

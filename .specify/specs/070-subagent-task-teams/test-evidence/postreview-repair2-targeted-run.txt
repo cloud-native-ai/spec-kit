@@ -1,0 +1,4 @@
+$ python3 -m pytest -q tests/integration/test_session_kill_reattach.py::test_delivered_runner_recipe_survives_driver_kill_and_reattaches
+.                                                                        [100%]
+1 passed in 8.31s
+rc=0
