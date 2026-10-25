@@ -554,3 +554,37 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   → `PASS — 0 error(s), 0 warning(s)`, rc 0 (after T031–T035 were marked `[x]`).
 - **Budget note**: targeted only; no full suite; the E2 slot remains T002 and the
   closure slot remains T039. No plan-owned artifact was touched.
+
+## T036 — mutation drills for the cycle, write-alone, missing-verdict, and not_evaluated guards (regression net)
+
+- **Date**: 2026-10-25T07:49Z (segment impl-s7)
+- **Changed path**: `tests/contract/test_wp_mutation_drills.py` (new).
+- **Nature**: T036 is a mutation/regression net over behaviour that already
+  exists, so it makes no red-first claim for new production behaviour. Each
+  drill proves the guard turns a real contract/unit test red when the guard is
+  removed; every drill also runs a control pass against an unmutated copy so a
+  redirection failure cannot produce a vacuous green.
+- **Command**:
+  ```sh
+  python3 -m pytest -q -s tests/contract/test_wp_mutation_drills.py
+  ```
+- **Real output**: `4 passed in 4.09s`; exit code `0`.
+- **Drill mechanics**: the source artifact is copied into `tmp_path`, one
+  exact-text mutation is applied (the anchor MUST occur exactly once), and a
+  generated pytest plugin redirects the collected test module's artifact handle
+  (`SCRIPT` for `wp-gate.py`/`wp-report.py`, `wp_driver_sim` for the simulator)
+  to the mutant copy. Controls run the same redirection against an unmutated
+  copy.
+
+| Drill | Mutation | Selected test | Control | Mutant | Failing assertion |
+|---|---|---|---|---|---|
+| cycle-check-removed | the cycle branch records and returns instead of detecting; the mutant appends the unresolved nodes to the order (`order.extend(remaining)`) | `tests/unit/test_wp_gate.py::test_dependency_cycle_rejects` | rc 0, `1 passed` | rc 1, `1 failed` | `test_wp_gate.py:306: AssertionError` — the cyclic plan becomes `verdict=single-package` instead of exiting 1 with `cycle` |
+| write-concurrency-allowed | the `writes` dispatch block is emptied, so writes enter the ordinary read slot loop | `tests/contract/test_sdd_loop_driver_wp_coordination.py::test_sd_06_a_ready_write_is_not_starved_by_new_reads` | rc 0, `1 passed` | rc 1, `1 failed` | `test_sdd_loop_driver_wp_coordination.py:424: AssertionError: assert ['plan-wp01',..., 'plan-wp03'] == ['plan-wp01',..., 'plan-wp04']` |
+| missing-verdict-treated-as-pass | `verify()` skips the failure branch for `missing` and maps it to `pass` | `...::test_vi_04_an_unusable_verdict_counts_as_fail[missing-verdict-missing]` | rc 0, `1 passed` | rc 1, `1 failed` | `test_sdd_loop_driver_wp_coordination.py:945: AssertionError: assert 'plan-wp01' in []` |
+| not-evaluated-replaced-by-zero | `NOT_EVALUATED = "not_evaluated"` becomes `NOT_EVALUATED = 0` | `tests/unit/test_wp_report.py::test_report_missing_timestamps_are_not_evaluated_not_zero` | rc 0, `1 passed` | rc 1, `1 failed` | `test_wp_report.py:479: AssertionError: assert 0 == 'not_evaluated'` |
+
+- **Check-that-can-go-red evidence**: the control halves prove the plugin
+  redirection works; if the anchor drifts, `_write_copy` fails the drill before
+  any mutant run. A green drill therefore means the selected test executed the
+  mutant artifact, not the pristine one.
+- **Budget note**: targeted only; no full suite; no plan-owned artifact touched.
