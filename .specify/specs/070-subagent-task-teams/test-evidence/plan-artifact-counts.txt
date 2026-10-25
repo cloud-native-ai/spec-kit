@@ -1,0 +1,13 @@
+# Plan artifact counts (measured from the files, 2026-10-24)
+entities=13
+validation_rules=91
+contracts=7
+clauses_total=110
+  fallback-and-nonregression.md=16
+  observability-and-retry.md=16
+  scheduler-and-dispatch.md=16
+  stage-team-adapter.md=12
+  verification-and-integration.md=14
+  work-package-model.md=18
+  wp-gate.md=18
+quickstart_scenarios=7

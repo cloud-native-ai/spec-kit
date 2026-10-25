@@ -1,0 +1,6 @@
+# pre-analyze-check.py
+# command: python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/070-subagent-task-teams --stage requirements --repo <repo>
+# run_at: 2026-10-24T15:25:16Z
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 30, "sc": 8, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-10-24T15:25:16Z"}
+exit_code=0

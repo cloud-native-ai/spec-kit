@@ -1,0 +1,6 @@
+# command: python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver
+# date: 2026-10-24T15:51:01Z
+# host: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11
+# exit: 0
+scope --only: skills/external/sdd-loop-driver
+ok    skills/external/ == .specify/skills/ (28 files)

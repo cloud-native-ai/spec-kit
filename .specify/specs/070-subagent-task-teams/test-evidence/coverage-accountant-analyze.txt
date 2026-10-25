@@ -1,0 +1,29 @@
+# Clause coverage accounting — Feature 070 analyze stage (2026-10-25)
+
+command: python3 scripts/python/account-clause-coverage.py --spec .specify/specs/070-subagent-task-teams
+rc: 2
+
+claimed clauses (this feature): 0
+baseline: .specify/specs/070-subagent-task-teams/coverage-baseline.txt (0 names, MISSING)
+
+[clause-uncovered] fail (495) — 495 uncovered, 495 beyond the frozen baseline
+[fr-uncovered] fail (30) — 0 of 30 FRs cited from citation groups
+[clause-unparsable] warn (94) — 94 files yield no clause id under the owner's forms; 0 of them declare a positive form
+[coverage-baseline-delta] fail (495) — baseline holds 0 names; 0 uncovered items are baseline-internal and do not block
+
+status: baseline-missing
+
+ERROR frozen baseline not found: .specify/specs/070-subagent-task-teams/coverage-baseline.txt — an absent baseline is NOT an empty exemption list, so this run cannot judge the delta; freeze it with `account-clause-coverage.py .specify/specs/070-subagent-task-teams --freeze > .specify/specs/070-subagent-task-teams/coverage-baseline.txt`
+
+## Stage remedy (owned by /speckit.tasks, not analyze)
+
+1. Re-run `/speckit.tasks` to freeze `coverage-baseline.txt`; analyze only consumes the baseline.
+2. The freeze alone cannot create FR/clause claims for 070: `clause_extract.py` classifies all seven 070 contracts as `form=md-none`, 0 clauses, because the extractor recognizes only the closed `C-\d+` form while 070 uses domain-prefixed ids (WP/WG/SD/VI/ST/OR/FN). tasks.md § Clause Coverage Model maps the 110 ids manually and T039 checks id presence only. A tasks-side repair must either express the domain-prefixed clauses in an extractor-recognized form or replace T039's `grep -q` with a behavior-level assertion.
+
+## Companion deterministic checks (same analyze run)
+
+- validate-requirements.py: rc 0, 0 errors / 0 warnings, 320 lines / 38 definition rows.
+- validate-tasks.py: rc 0, 0 errors / 0 warnings.
+- decomposition-check.py --mode tasks: rc 0, decision=proceed, fr_count=30, task_count=39, fr_ceiling=30, task_ceiling=40.
+- clause_extract.py over contracts/*.md: form=md-none, clauses=0 for all seven files.
+- sync-mirrors.py --check --only skills/external/sdd-loop-driver: rc 0, ok (28 files).

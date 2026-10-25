@@ -1,0 +1,2 @@
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 30, "sc": 8, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-10-24T15:34:55Z"}

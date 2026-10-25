@@ -1,0 +1,2 @@
+overlap-check: current=070-subagent-task-teams checked=1 overlaps=0 decision=clear
+{"decision": "clear", "current_spec": "070-subagent-task-teams", "checked_specs": ["070-subagent-task-teams"], "overlaps": [], "note": "current feature has no declaration artifact", "checked_at": "2026-10-24T15:34:55Z"}

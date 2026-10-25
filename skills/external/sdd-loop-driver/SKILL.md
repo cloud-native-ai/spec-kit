@@ -111,6 +111,21 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 新增脚本与领域细则见 `references/efficiency-model.md` §5–§7 与 References。
 
+## Task Decomposition & Team Coordination（任务拆解与配合）
+
+驱动者在 `plan` / `implement` / `review` 阶段缺省进入**任务拆解层**：从阶段权威产物派生有界 Work Package，先过确定性门，再按图调度（只读并发、写包独占）、独立校验、确定性集成；阶段哨兵与 U4 不变。运行时 owner 是 `references/decomposition-model.md`（§1–§21）；设计权威是 070 的 contracts 与 data-model，本节只给入口与指针，不复述规则。
+
+- **入口**：每阶段的决策写入 plan fence（状态脊）——`decomposed` / `single-package` / `disabled` / `fallback`；plan fence 是唯一决策记录，ledger `plan` 事件按 `plan_hash` 引用它。
+- **何时拆解**：`auto` 仅在门返回 `admit`、至少两个包且 WG-13 收益测试成立时拆解；否则 `single-package`（`reason=not-beneficial`）。不可表示、门在唯一一次修复后仍拒绝、或拆解层不可用（exit 2）→ `fallback`，具名原因，且绝不运行部分包集。
+- **门**：`scripts/wp-gate.py --check plan|preflight|retry`——确定性、stdlib-only、不派发、不写脊；拒绝码与退出码以 §12 和 `contracts/wp-gate.md` 为准。
+- **调度**：§13——依赖验证后才就绪、写包独占、只读并发受 `slot_cap` 限制、失败隔离、重入不重派。
+- **独立校验**：§15——每包一个全新上下文 verifier；verdict 缺失/不可读/歧义即 fail；包 verdict 永远不替代阶段 U4。
+- **集成与收尾**：§16——按声明顺序确定性集成，冲突或缺失输出即停，单一 closing commit，阶段哨兵由 integrator 发出；U4 在集成后原样运行。
+- **团队形状**：`templates/stage-team-preset.md` + 运行域 adapter（§17）；每 stage / attempt / run 都不持久化 `team.md`，`create-team` / `run-team` 不变。
+- **报表**：`scripts/wp-report.py`（§18）；缺失来源一律 `not_evaluated`，绝不以 0 或估计替代。
+- **退出开关**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`（缺省 2）；阶段 attempt 可带 `decomposition_override`。优先级：feature `off`（硬退出）> 阶段 override > 阶段表 > 内置缺省（`plan`/`implement`/`review`=auto，其余 off）。
+- **边界**：只新增 U4 之前的步骤；不改阶段命令内部、哨兵字面量、U4、阶段链、watcher 判定/退出码、卡死处置、快车道、两槽位测试预算、plan 小修约束，以及 064 的 registry/ownership/worktree/integration 语义、067 的 part brief/test economics、068 的反馈通道。包执行者绝不派发、绝不写脊、绝不加载本手册；不新增服务/守护进程或第二个 registry、ownership 模型、integration queue、ledger。
+
 ## References
 
 - `references/dispatch-recipes.md` — 五大执行机制、阶段链与哨兵、hook/SSH 窗口、线路登记。
