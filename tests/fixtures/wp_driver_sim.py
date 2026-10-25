@@ -6,7 +6,10 @@ order, collection, verifier dispatch, failure isolation, re-entry) with a
 logical clock. ``verify`` models VI-01…VI-06 (independent verifiers, verdict
 records, fail-closed handling) and ``integrate`` models VI-06…VI-14
 (aggregation, declared integration order, conflict stop, closing commit,
-integrator seat, unchanged stage U4, driver-owned closure).
+integrator seat, unchanged stage U4, driver-owned closure). The entry
+declaration resolver and ``run_stage_attempt`` model FN-01…FN-08 (precedence,
+built-in defaults, auto/benefit, single-package, and fallback with no partial
+package dispatch).
 """
 from __future__ import annotations
 
@@ -44,6 +47,34 @@ LOOP_LOGIC = re.compile(
     r"dispatch\s+the\s+next)\b",
     re.IGNORECASE,
 )
+
+# FN-03 built-in per-stage defaults (the closed map; no stage is added here).
+BUILTIN_DECOMPOSITION_DEFAULTS = {
+    "plan": "auto",
+    "implement": "auto",
+    "review": "auto",
+    "analyze": "off",
+    "clarify": "off",
+    "requirements": "off",
+    "tasks": "off",
+    "checklist": "off",
+}
+
+# FN-08 decision-to-gate-verdict mapping (owned by the contract; projected here).
+DECISION_GATE_VERDICTS = {
+    "decomposed": "admit",
+    "single-package": "single-package",
+    "disabled": "no-gate-run",
+    "fallback": "no-gate-run",
+}
+
+# FN-06 closed fallback-cause set.
+FALLBACK_REASONS = (
+    "gate-reject",
+    "decomposition-unavailable",
+    "not-beneficial",
+)
+
 
 
 def sim_packages() -> list:
@@ -195,6 +226,158 @@ def adapt_stage_team(plan: dict) -> dict:
         "topology": topology,
         "seats": seats,
         "team_directory": None,
+    }
+
+
+def normalize_entry_declaration(entry: dict | None = None) -> dict:
+    """FN-01/FN-03: normalize the U0 entry declaration and record defaults.
+
+    The three fields are spine fields, not command arguments. Invalid values
+    are rejected here rather than guessed downstream.
+    """
+    entry = dict(entry or {})
+    feature = entry.get("decomposition", "auto")
+    if feature not in ("auto", "off"):
+        raise ValueError("decomposition must be auto|off")
+    stages = dict(BUILTIN_DECOMPOSITION_DEFAULTS)
+    for stage, mode in (entry.get("decomposition_stages") or {}).items():
+        if stage not in BUILTIN_DECOMPOSITION_DEFAULTS:
+            raise ValueError("unknown decomposition stage: %s" % stage)
+        if mode not in ("auto", "on", "off"):
+            raise ValueError(
+                "decomposition_stages[%s] must be auto|on|off" % stage
+            )
+        stages[stage] = mode
+    slot_cap = entry.get("decomposition_slot_cap", 2)
+    if isinstance(slot_cap, bool) or not isinstance(slot_cap, int) or slot_cap < 1:
+        raise ValueError("decomposition_slot_cap must be a positive integer")
+    return {
+        "decomposition": feature,
+        "decomposition_stages": stages,
+        "decomposition_slot_cap": slot_cap,
+    }
+
+
+def resolve_decomposition_mode(
+    stage: str, entry: dict | None = None, override: str | None = None
+) -> dict:
+    """FN-02: feature-off > stage override > stage map > built-in defaults."""
+    normalized = normalize_entry_declaration(entry)
+    if normalized["decomposition"] == "off":
+        return {"mode": "off", "source": "feature-off"}
+    if override is not None:
+        if override not in ("auto", "on", "off"):
+            raise ValueError("decomposition_override must be auto|on|off")
+        return {"mode": override, "source": "stage-override"}
+    raw_stages = (entry or {}).get("decomposition_stages") or {}
+    if stage in raw_stages:
+        return {"mode": raw_stages[stage], "source": "stage-map"}
+    return {
+        "mode": BUILTIN_DECOMPOSITION_DEFAULTS.get(stage, "off"),
+        "source": "builtin-default",
+    }
+
+
+def decide_stage_decomposition(
+    plan: dict,
+    *,
+    entry: dict | None = None,
+    override: str | None = None,
+    gate_verdict: str = "admit",
+    gate_error: str | None = None,
+    repair=None,
+    beneficial: bool = False,
+    representable: bool = True,
+    single_package_available: bool = True,
+) -> dict:
+    """FN-01…FN-08 decision procedure for one stage attempt.
+
+    ``gate_error`` models the gate's exit 2 / an unavailable layer. ``repair``
+    is the one allowed repair callback and returns the re-run gate record
+    (``{"verdict": ..., "findings": [...]}``). The procedure never dispatches:
+    a fallback leaves ``dispatched_packages`` empty so a caller cannot mistake
+    it for a partial package run.
+    """
+    resolved = resolve_decomposition_mode(
+        plan["stage"], entry=entry, override=override
+    )
+    mode = resolved["mode"]
+    packages = list(plan.get("packages") or [])
+    attempted = [package["wp_id"] for package in packages]
+    findings = []
+    repaired = False
+    fallback = False
+    decision = "single-package"
+    reason = "not-beneficial"
+
+    if mode == "off":
+        decision, reason = "disabled", "disabled"
+    elif gate_error is not None:
+        fallback = True
+        decision, reason = "fallback", "decomposition-unavailable"
+        findings = [{"code": "decomposition-unavailable"}]
+    elif not representable:
+        fallback = True
+        decision, reason = "fallback", "not-beneficial"
+        findings = [{"code": "unrepresentable-contract"}]
+    else:
+        verdict = gate_verdict
+        if verdict == "reject" and repair is not None:
+            repaired = True
+            outcome = repair(plan)
+            if isinstance(outcome, dict):
+                verdict = outcome.get("verdict", "reject")
+                findings = list(outcome.get("findings") or [])
+            else:
+                verdict = "reject"
+        if verdict == "reject":
+            fallback = True
+            decision, reason = "fallback", "gate-reject"
+        elif (
+            verdict == "admit"
+            and len(packages) >= 2
+            and (mode == "on" or beneficial)
+        ):
+            decision, reason = "decomposed", "beneficial"
+        else:
+            decision, reason = "single-package", "not-beneficial"
+
+    projected = DECISION_GATE_VERDICTS[decision]
+    plan_hash = plan.get("plan_hash")
+    return {
+        "stage": plan["stage"],
+        "mode": mode,
+        "mode_source": resolved["source"],
+        "decision": decision,
+        "reason": reason,
+        "gate_verdict": projected,
+        "fallback": fallback,
+        "repaired": repaired,
+        "findings": findings,
+        "attempted_packages": attempted,
+        "dispatched_packages": [],
+        "dispatch_packages": attempted if decision == "decomposed" else [],
+        "single_subagent": decision != "decomposed",
+        "integrator": decision == "decomposed",
+        "single_package_available": bool(single_package_available),
+        "stopped": decision != "decomposed" and not single_package_available,
+        "adds_pre_u4_steps_only": True,
+        "plan_fence": {
+            "stage": plan["stage"],
+            "stage_attempt": plan.get("stage_attempt", 1),
+            "decision": decision,
+            "reason": reason,
+            "gate_verdict": projected,
+            "plan_hash": plan_hash,
+        },
+        "ledger_plan_event": {
+            "event": "plan",
+            "stage": plan["stage"],
+            "stage_attempt": plan.get("stage_attempt", 1),
+            "plan_hash": plan_hash,
+            "decision": decision,
+            "verdict": projected,
+        },
     }
 
 
@@ -1193,4 +1376,65 @@ def run_stage(
         "results": results,
         "verification": verification,
         "integration": integration,
+    }
+
+
+def run_stage_attempt(
+    plan: dict,
+    *,
+    entry: dict | None = None,
+    override: str | None = None,
+    gate_verdict: str = "admit",
+    gate_error: str | None = None,
+    repair=None,
+    beneficial: bool = False,
+    representable: bool = True,
+    single_package_available: bool = True,
+    **stage_kwargs,
+) -> dict:
+    """Decide one stage attempt and run only the path the decision selects.
+
+    A ``decomposed`` decision runs the package scheduler/verifier/integrator.
+    Every non-decomposed decision returns the unchanged single-subagent stage
+    path with no package dispatch; ``standard_path`` is ``None`` when that path
+    is unavailable and the driver stops (FN-07).
+    """
+    decision = decide_stage_decomposition(
+        plan,
+        entry=entry,
+        override=override,
+        gate_verdict=gate_verdict,
+        gate_error=gate_error,
+        repair=repair,
+        beneficial=beneficial,
+        representable=representable,
+        single_package_available=single_package_available,
+    )
+    if decision["decision"] == "decomposed":
+        outcome = run_stage(plan, **stage_kwargs)
+        outcome["decision"] = decision
+        outcome["standard_path"] = None
+        return outcome
+
+    standard_path = None
+    if single_package_available:
+        standard_path = {
+            "stage": plan["stage"],
+            "prompt": "unchanged",
+            "dispatch": "runner-native",
+            "sentinel": "%s-DONE" % plan["stage"].upper(),
+            "u4": "unchanged",
+            "part_discipline": (
+                "067-preserved" if plan["stage"] == "implement" else None
+            ),
+            "integrator": False,
+            "packages_dispatched": [],
+        }
+    return {
+        "decision": decision,
+        "dispatch": None,
+        "results": {},
+        "verification": None,
+        "integration": None,
+        "standard_path": standard_path,
     }

@@ -1,7 +1,7 @@
 # Decomposition Model — Runtime Owner (Parts 1–5)
 
 **Feature**: 070 — Task Decomposition & Team Coordination for Subagent-Driven SDD
-**Status**: runtime-owner projection, parts 1–5: the Work Package model, the scheduler/retry procedure, independent verification/integration, the stage-team preset/adapter, and observability/metrics. The design authority remains the contracts and `data-model.md`.
+**Status**: runtime-owner projection, parts 1–6: the Work Package model, the scheduler/retry procedure, independent verification/integration, the stage-team preset/adapter, observability/metrics, and opt-out/fallback with its preserved-behavior boundaries. The design authority remains the contracts and `data-model.md`.
 
 **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/contracts/` and `.specify/specs/070-subagent-task-teams/data-model.md`. This document owns *how the driver applies* those clauses at runtime. Where a field name, check code, path pattern, or event field is fixed, the contract clause is authoritative; this file points to it instead of restating its table.
 
@@ -309,3 +309,46 @@ An all-`not_evaluated` benchmark must not close the feature. Closure is blocked 
 ## 19. Non-regression boundaries
 
 This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, stall handling, the fast lane, the two-slot test budget, the plan minor-fix constraint, Feature 064's registry/ownership/worktree/integration semantics, Feature 067's part brief and test economics, or Feature 068's feedback channel. Preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated.
+
+## 20. Opt-out and fallback (FN-01…FN-08)
+
+The opt-out and fallback semantics are owned by `contracts/fallback-and-nonregression.md` FN-01…FN-08; this section records how the driver applies them. They add no CLI argument and no service: every value lives in the spine.
+
+### 20.1 U0 declaration and precedence (FN-01…FN-03)
+
+The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages` (one `auto|on|off` per stage, with the built-in defaults recorded), and `decomposition_slot_cap` (default 2). A stage attempt may carry `decomposition_override: auto|on|off`. All of these are spine fields, not new command arguments.
+
+Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable it in the same run; otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults. Built-in defaults: `plan`, `implement`, and `review` are `auto`; `analyze` and `clarify` are `off`; `requirements`, `tasks`, and `checklist` are `off`.
+
+### 20.2 Auto, benefit, and the single-package path (FN-04, FN-05)
+
+`auto` resolves to `decomposed` only when the gate verdict is `admit`, the plan has at least two packages, and the WG-13 benefit test holds; otherwise it resolves to `single-package` with `reason=not-beneficial`. A stage with one artifact and no separable work is single-package by construction. An explicit stage `on` is not gated by the auto benefit test, but still requires `admit` and at least two packages.
+
+`disabled`, `single-package`, and `fallback` all run the standard single-subagent stage path: the unchanged stage prompt, the unchanged runner/native dispatch, the unchanged stage sentinel, and the unchanged U4. No package is dispatched on that path. For `implement`, this 070-layer boundary does not remove the pre-existing 067 part discipline; a large implement stage keeps its part brief and dispatch log (FR-025).
+
+### 20.3 Fallback causes and the no-partial rule (FN-06, FN-07)
+
+A fallback resolves with `decision=fallback` and `reason` exactly one of `gate-reject`, `decomposition-unavailable`, or `not-beneficial`:
+
+- `gate-reject` — the gate rejected the plan and still rejects after the one allowed repair (split, serialize, or reduce to one package); the reject evidence is referenced.
+- `decomposition-unavailable` — the gate exited 2, or the layer is unavailable or corrupt; this is a gate error, not a plan rejection.
+- `not-beneficial` — a required stage-contract output cannot be represented by a package or the integrator seat.
+
+A fallback **never continues with a partial package set**. The driver records the failure reason and the fallback in the spine and runs the standard single-package path; if that path is unavailable it stops instead. The decision record keeps `attempted_packages` for evidence and `dispatched_packages=[]`, so a fallback can never be read as a partial run.
+
+### 20.4 Every stage records one decision (FN-08)
+
+Every stage writes exactly one decomposition decision into the plan fence — `decomposed`, `single-package`, `disabled`, or `fallback` — with its reason and gate verdict. The decision-to-gate-verdict mapping is owned by FN-08: `admit` for `decomposed`, `single-package` for `single-package`, and the literal `no-gate-run` for `disabled` and `fallback`. The plan fence is the canonical decision record; the ledger `plan` event references it by `plan_hash` rather than repeating the decision. A silent run is a gate failure.
+
+## 21. Preserved behaviors, test matrix, and delivery surface (FN-09…FN-16)
+
+This layer **adds pre-U4 steps only**. The preserved-behavior obligations are owned by `contracts/fallback-and-nonregression.md` FN-09…FN-16 and are cited here, not restated:
+
+- **FN-09 (058)** — stage sentinel literals, the stage chain, U4 independent verification, watcher verdicts/exit codes, and stall handling are unchanged.
+- **FN-10 (063)** — the fast lane, the two-slot test budget, the plan minor-fix constraint, stream-json progress, and detach behavior are unchanged; a verifier's targeted tests use `targeted-set-v1`.
+- **FN-11 (064)** — Feature 064's line registry, envelopes, worktree-per-write-line, Ownership Manifest, integration queue, and CLI profiles are reused read-only; no second registry, ownership model, worktree model, or integration queue is created.
+- **FN-12 (067)** — Feature 067's part brief, bounded part size, dispatch log, and test economics are extended, never replaced; the implement `dispatch` event carries the 067 fields (section 7).
+- **FN-13 (068)** — Feature 068's exec-quant feedback channel is unchanged; no transmission surface and no new runtime record type are added.
+- **FN-14 (test matrix)** — contract tests pin the WP schema, gate outcomes, pattern selection, preset-to-seat mapping, ownership/slot preflight, retry policy, opt-out precedence, and the single-package fallback; unit tests cover `wp-gate.py` and `wp-report.py`; fixture dry runs prove concurrent read-only dispatch, write serialization, ownership-violation rejection, deterministic integration, failure isolation, fallback, and no nested driver; `tests/contract/test_non_regression_070.py` guards 058/063/064/067/068; mutation drills (T036) prove each guard turns at least one test red.
+- **FN-15 (red-first evidence)** — new behavior is red before implementation; each verification record carries the command, exit code, pass/fail counts, changed paths, and an evidence pointer. A green check that would not turn red when its subject breaks is not cited.
+- **FN-16 (delivery surface)** — Delivery is confined to the driver skill source (`SKILL.md`, this reference, the template, `wp-gate.py`, `wp-report.py`), the driver documentation page, the canonical test suites, the generated mirror, and this feature's specification and evidence. No runtime service, daemon, external dependency, model API, second registry, second ownership model, second integration queue, second brief format, second ledger, or persisted team directory is added. The stage-team preset stays a driver template and is never written into `.specify/teams/`.

@@ -498,3 +498,39 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   `test_driver_u4_capability_fallback_is_recorded`). They assert unchanged
   contract text or already-implemented behaviour and are not proof of the new
   070 opt-out/fallback behaviour.
+
+## T035 — opt-out/fallback runtime sections and simulator procedure (green)
+
+- **Date**: 2026-10-25T03:55Z (segment impl-s6)
+- **Changed paths**:
+  - `skills/external/sdd-loop-driver/references/decomposition-model.md` (§20
+    opt-out/fallback FN-01…FN-08, §21 preserved behaviors/test matrix/delivery
+    surface FN-09…FN-16; header parts 1–6)
+  - `tests/fixtures/wp_driver_sim.py`
+    (`BUILTIN_DECOMPOSITION_DEFAULTS`, `DECISION_GATE_VERDICTS`,
+    `FALLBACK_REASONS`, `normalize_entry_declaration`,
+    `resolve_decomposition_mode`, `decide_stage_decomposition`,
+    `run_stage_attempt`)
+  - `tests/contract/test_sdd_loop_driver_wp_coordination.py` (two literal
+    corrections to match the owner text: FN-16's `No runtime service`
+    capitalization, and the T034 evidence regex now accepts the recorded
+    `- **Exit code**: \`1\`` shape while still requiring a non-zero code)
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py
+  ```
+- **Real output**: `130 passed in 0.34s`; exit code `0`.
+- **Red-to-green**: T034 red `34 failed, 19 passed, 77 deselected` →
+  T035 green `130 passed` (67 SD/VI + 44 FN contract cases, 19 dry runs).
+- **Behaviour implemented**: feature-off > stage-override > stage-map >
+  built-in defaults; `auto` requires `admit` + ≥2 packages + WG-13 benefit;
+  an explicit `on` still requires `admit` + ≥2 packages; `disabled` /
+  `single-package` / `fallback` run the unchanged single-subagent path;
+  fallback reasons are exactly `gate-reject`, `decomposition-unavailable`, or
+  `not-beneficial`; a fallback dispatches no package and stops when the
+  single-package path is unavailable; the plan fence/ledger event carry the
+  FN-08 decision→verdict mapping.
+- **Disclosed**: the mirror is intentionally stale until T037 (source
+  `SKILL.md` changed in T032); `test_c18_mirror_pair_no_drift` is the only
+  skill-file failure and is excluded from this segment's green claim. No
+  mirror file was hand-edited.

@@ -1682,7 +1682,7 @@ def test_fn_15_red_first_evidence_records_the_required_fields():
     section = notes.split("## T034", 1)[1]
     for token in ("Command", "Real output", "Exit code", "Changed paths"):
         assert token in section, "T034 red-first record missing: %s" % token
-    assert re.search(r"Exit code `[1-9]\d*`", section), (
+    assert re.search(r"Exit code[^\n]*`[1-9]\d*`", section), (
         "the T034 record must carry a non-zero exit code"
     )
 
@@ -1709,7 +1709,7 @@ def test_fn_16_delivery_surface_adds_no_runtime_or_duplicate_surface():
     text = _model_text()
     for token in (
         "Delivery is confined to",
-        "no runtime service",
+        "No runtime service",
         "second registry",
         "persisted team",
     ):
