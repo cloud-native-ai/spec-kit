@@ -101,7 +101,7 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
   --log /home/<run-user>/log-<line>-<stage>.log \
   --sentinel <STAGE>-DONE --heartbeat /home/<run-user>/heartbeat-<line>-<stage>.log \
   --deadline-epoch <stage_deadline_epoch> --window 200 --interval 3 \
-  --deadline-grace 120'"
+  --deadline-grace 120 --iter <run_id>-w<NN>'"
 ```
 
 要点：
@@ -110,11 +110,26 @@ ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/watch-target.sh \
 - **外层三重重定向必须**：`nohup` 任务本体之外再带 `< /dev/null` 并把 ssh 通道的 stdout/stderr 重定向（`> /dev/null 2>&1`）——缺省时后台任务继承 ssh 通道的 stdio，本地 ssh 挂起直到超时（实测 2026-10-16：每次派发白烧一次 2 分钟本地超时，进程虽照常启动但驱动者节拍被打断）。runner 自身的 stdout/stderr 在 `su -c` 内层落 `runner-log`，保证归属 run-user 可读。
 - **监听机制阶梯（`watch-model.md` §4）**：长轮询窗口缺省 → 宿主原生通知仅作补充（且不得结束驱动者会话）→ 间隔轮询回退；**禁止**独立 `sleep N` 回合空等。
 - **窗口到期 ≠ 阶段超时**：watcher 返回 `RUNNING`（退出码 10）时立即发起下一窗口，不做 agent 侧等待；只有 `TIMEOUT`（阶段 deadline）进入 U5。这条把「监视器零匹配/窗口到期误判超时」与真正的阶段超时分开（2026-10 实测缺陷：`pgrep -c` 零匹配先输出 0 再被 `|| echo 0` 追加第二个 0，导致 clarify 已完成仍被误判超时）。
+- **监听签名唯一（宿主重复调用保护）**：每个监听窗口 MUST 在命令文本中携带字面量 `--iter <run_id>-w<NN>`，`NN` 逐窗口递增；连续两次监听命令不得字节相同。令牌不能用 `$(date +%s)`/`$$`/`$RANDOM` 之类运行时展开——宿主在命令执行前比较字面签名，展开不改变签名。规则 owner：`watch-model.md` §3.2。
 - **TIMEOUT 不是终止命令**：watcher 在 deadline 后继续采样 `--deadline-grace` 秒（缺省 120s），晚完成会重判 `DONE`/`FAILED`。收到 `TIMEOUT` 后驱动者 MUST 先做 `--once` 最终快照；`pid=alive` + `heartbeat=fresh` 时不得仅凭 TIMEOUT 停线/杀进程；停线须用户显式决定并保留 worktree/status/log。
 - **正证据优先**：每轮一次读取退出记录 → PID 存活 → 日志尾行 → 心跳 mtime；进程消失、日志静默、`pgrep` 零匹配都**不是**完成。心跳只证明 runner 外壳活着，与 PID 一起看。
 - **多线批查**：一个窗口一次 ssh 检查多条线（`--manifest` 模式），任一线终止即返回全部线快照，**判定仍逐线独立做**；输出只保留判定行与必要证据，哨兵未现且进程存活时无需更多输出。
 - **观察面纪律（底稿注解：External Dispatch Visibility Contract，`subagent-definitions.md`）**：禁止**缓冲至退出**式派发——`qodercli -p "<prompt>" > agent.log 2>&1 &` 这种「输出缓冲到进程退出才落盘」的形态让运行期零可见性，是明令禁止的反模式。`stage-runner.sh` 缺省用 `--output-format stream-json`：raw 落盘、live log 增量增长，退出记录与窗口监听仍以哨兵/退出记录为准；CLI 不支持时降级 buffered 并记 `progress=degraded`（efficiency-model §4）。
 - 终止判定 `DONE` / `INCOMPLETE` → 独立校验（见 stage-prompts.md）；其余终止判定 → U5；通过则派发下一阶段（回到 Recipe 1/2/3）。
+
+### 回退轮询（一次性状态快照）
+
+无法起阻塞窗口时才用；每条快照命令 MUST 以字面量迭代令牌开头并在输出中回显，连续两次不得字节相同（规则 owner `watch-model.md` §3.2）：
+
+```bash
+POLL_ITER='<run_id>-p<NN>'
+ssh -o BatchMode=yes <alias> \
+  "echo POLL iter=$POLL_ITER at=\$(date -u +%FT%TZ); date; \
+   echo ---status---; cat /home/<run-user>/status-<line>-<stage>; \
+   echo ---git---; su - <run-user> -c 'git -C <project-dir> log -1 --oneline'"
+```
+
+禁止形态：`sleep N; ssh …` 原样连发（2026-10-25 宿主判重的直接来源）；需要跨多个窗口等待时改用 `watch-target.sh --window` 并逐窗口递增 `--iter`。
 
 ### Hook + SSH 远程窗口（推荐补充）
 
@@ -126,7 +141,7 @@ ssh -o BatchMode=yes <alias> \
   "su - <run-user> -c 'bash --noprofile --norc -c \
     \"bash /home/<run-user>/watch-hook.sh <stage> <window> <deadline> \
       /home/<run-user>/hook-done-<stage>.fifo \
-      /home/<run-user>/hook-event-<stage>.json\"'"
+      /home/<run-user>/hook-event-<stage>.json <run_id>-w<NN>\"'"
 # 事件或 HOOK_TIMEOUT 返回后，再跑一次远端 watch-target.sh --once 取权威判定
 ```
 
@@ -227,7 +242,7 @@ python3 <skill-dir>/scripts/line-registry.py --action register \
 
 ```bash
 ... watch-target.sh ... --line-id <line> --run-id <run> --registry <registry> --meta <meta> \
-  --lease-ttl 600 --window 200 \
+  --lease-ttl 600 --window 200 --iter <run_id>-w<NN> \
   --lease-renew-cmd "python3 <skill-dir>/scripts/line-registry.py --action lease-renew --line-id <line> --session <session>" \
   --lease-renew-interval 60
 ```

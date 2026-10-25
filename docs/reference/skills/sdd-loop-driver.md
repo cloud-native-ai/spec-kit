@@ -42,6 +42,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 - **信号**：退出记录、完成哨兵、PID（含 start ticks/PID 复用校验）、心跳、日志尾行；完成必须有正证据——进程消失、日志静默、`pgrep` 零匹配都不是完成。
 - **机制阶梯**：长轮询窗口（一次调用内等待，事件发生即返回）→ 宿主原生通知（仅作补充，不得结束驱动者会话）→ 间隔轮询回退；禁止独立 `sleep` 回合空等。
+- **监听签名唯一**：每个窗口 MUST 携带字面量 `--iter <run_id>-w<NN>`（`NN` 递增）；同参数连续调用会被宿主判为重复并误报卡死，令牌不能用 `$(date)`/`$$` 等运行时展开（owner：`references/watch-model.md` §3.2）。
 - **窗口 ≠ 超时**：单窗口到期只返回 `RUNNING` 并立即重入；只有阶段 deadline 产生 `TIMEOUT`。
 - **Deadline grace / TIMEOUT 不是可杀信号**：watcher 在 deadline 后继续采样 `--deadline-grace`（缺省 120s），晚完成重判 `DONE`/`FAILED`；收到 `TIMEOUT` 先 `--once` 最终快照，`pid=alive` + `heartbeat=fresh` 时优先延长/继续，停线须用户显式决定并保留 worktree/status/log。
 - **多线批量**：manifest 模式一次连接检查多条线，任一线终止即返回全部快照。

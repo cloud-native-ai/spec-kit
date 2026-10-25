@@ -59,7 +59,7 @@ classification: external
 U0 ENTRY     一遍性入口：目标、线、断点（或"探测"）、终态权威文档
 U1 PROBE     每线：断点探测（git 分支 + 近期提交 + specs 目录 + 终态文档）判定续跑阶段
 U2 DISPATCH  本地：原生子代理逐阶段派发（同步返回）；远端：写 prompt + runner 后台派发（配方见 references/dispatch-recipes.md）
-U3 WATCH     远端统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；窗口到期只返回 RUNNING 并立即重入，只有阶段 deadline 产生 TIMEOUT（本地原生调用即等待，不轮询；见 references/watch-model.md）
+U3 WATCH     远端统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；窗口到期只返回 RUNNING 并立即以递增 --iter 重入，只有阶段 deadline 产生 TIMEOUT（本地原生调用即等待，不轮询；见 references/watch-model.md）
 U4 VERIFY    独立校验：哨兵（必要）+ 产物核验 + 纪律抽查（充分）→ 通过才续环
 U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出上送件（绝不静默等待）
 U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
@@ -91,6 +91,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；本地拓扑用宿主原生子代理（MUST NOT 启动 qodercli），远端才用外部 CLI；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
 7. **流程不可替换**：U0/U1 与阶段计划写出前禁止直接编辑目标仓库；禁止用 improve-skills/create-skills 等维护路径替代 SDD 阶段链（目标为本仓库时同样适用）。唯一例外：入口显式声明「只做技能维护、不走 SDD」。
 8. **快照只读**：`scripts/loop-state.py` 的 snapshot 只读——MUST NOT 写状态脊、四件套、Registry 或工作树（唯一写路径是显式 `--out`，且落在 state dir / repo 内一律拒绝），MUST NOT 杀进程、删证据或移除 worktree；`stop` 在 065a 只是建议。字段面与检测读法 owner 是 `references/state-awareness.md`。
+9. **监听签名唯一**：每个监听窗口的 Shell 调用 MUST 在命令文本中携带字面量迭代标识——watcher 用 `--iter "<run_id>-w<NN>"`，hook 长读传第 6 个参数——`NN` 逐窗口递增，连续两次监听命令不得字节相同。令牌必须写成字面量，不能用 `$(date +%s)`/`$$`/`$RANDOM` 之类运行时展开：宿主（Qoder）在执行前比较签名，同参数连续调用会被判为重复并误报卡死。规则 owner 与重入续号：`references/watch-model.md` §3.2。
 
 ## Discipline Defaults
 
@@ -117,7 +118,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - `references/state-awareness.md` — 状态感知快照 owner：入口与调用形态、六类检测与两类保留形态、§Derived Mapping（镜像 FR-004）、§Stage Artifact Map、probe 契约、动作建议与 watchbeat 读法；本手册与其它 references 只引用其章节，不复述整表。
 - `references/stage-prompts.md` — 三段骨架、独立校验、Line/Envelope/Ingress、重接线、变体、并发隔离、卡死处置。
 - `scripts/loop-state.py` — 只读快照引擎（`snapshot` / `--probe` / `--self-test`；`recover`、`check-spine` 返回结构化拒绝），字段面与退出码契约见 `references/state-awareness.md`。
-- `scripts/watch-target.sh` — 长轮询 watcher 参考实现（快照、归属过滤、hook、lease）。
+- `scripts/watch-target.sh` — 长轮询 watcher 参考实现（快照、归属过滤、hook、lease、逐窗口 `--iter` 迭代标识）。
 - `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
 - `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。
 - `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门（owner：efficiency-model §5–§7）。

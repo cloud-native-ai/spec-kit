@@ -46,7 +46,7 @@
 
 监听规则本体见 `watch-model.md`；本段只规定驱动者的行为。**本地原生调用是一次同步阻塞调用，返回即终止判定；下列窗口/轮询/重入规则仅用于外部 CLI 派发。**
 
-- **合法等待**：在有界长轮询窗口内等待（一次工具调用跑 `watch-target.sh --window N`），终止判定或窗口到期即返回；`RUNNING` → 立即重入下一窗口，**不在 agent 侧 sleep、不按固定 cadence 空转**。
+- **合法等待**：在有界长轮询窗口内等待（一次工具调用跑 `watch-target.sh --window N`），终止判定或窗口到期即返回；`RUNNING` → 立即重入下一窗口，**不在 agent 侧 sleep、不按固定 cadence 空转**。每个窗口携带字面量 `--iter <run_id>-w<NN>`（`NN` 递增），避免宿主把同参数连续调用判成重复/卡死（owner：`watch-model.md` §3.2）。
 - **非法等待**：独立 `sleep N` 回合；挂起监视器后结束驱动者会话「等待通知/恢复」——在会话式宿主（subagent 结束即停摆）中这意味着循环静默死亡，直接违反 Hard Requirement 1 与 5。唯一例外：宿主已被探针证明通知会自动恢复**同一运行**（`watch-model.md` §6）；此时原生通知只能作唤醒补充，每次唤醒仍做一次快照判定。
 - **终止判定去向**：`DONE` / `INCOMPLETE` → U4；`ANOMALY` / `FAILED` / `DEAD` / `TIMEOUT` / `NO_SIGNAL` → U5；`RUNNING` → 重入。
 - **窗口到期 ≠ 阶段超时**：只有状态脊中的 `stage_deadline_epoch` 触发 `TIMEOUT`；单窗口到期只产生 `RUNNING`。watcher 不杀进程，处置属 U5。

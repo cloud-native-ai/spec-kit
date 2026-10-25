@@ -357,6 +357,17 @@ def test_c1_skill_inventory_is_frozen():
 # --------------------------------------------------------------------------- #
 # C-5 — non-wiring sources keep their frozen bytes; framework paths untouched
 # --------------------------------------------------------------------------- #
+# 2026-10-25: a later fix legitimately edits one non-wiring source — the loop
+# driver gained the per-window iteration token (Qoder duplicate-call guard).
+# The historical pre-change hash stays untouched; this allowlist names every
+# post-baseline drift with its reason and re-asserts the intended content.
+ALLOWED_POST_BASELINE_CHANGES = {
+    "skills/external/sdd-loop-driver/SKILL.md": (
+        "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)"
+    ),
+}
+
+
 def test_c5_non_wiring_files_keep_their_frozen_hashes():
     manifest = _hash_manifest()
     templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
@@ -379,6 +390,8 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
             missing.append(rel)
             continue
         if _sha256(path) != expected:
+            if rel in ALLOWED_POST_BASELINE_CHANGES:
+                continue
             drifted.append(rel)
     assert not missing, (
         "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
@@ -387,6 +400,12 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
         "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
         "feedback-step pointer). drifted: %r" % drifted
     )
+    for rel, reason in ALLOWED_POST_BASELINE_CHANGES.items():
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        assert "监听签名唯一" in text and "--iter" in text, (
+            "allowed post-baseline change must carry its intended content: %s (%s)"
+            % (rel, reason)
+        )
 
 
 def test_c5_untouchable_framework_paths_are_unchanged():
