@@ -420,3 +420,26 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
 - **Structural check**: `python3 scripts/python/validate-tasks.py .specify/specs/070-subagent-task-teams/tasks.md` → `PASS — 0 error(s), 0 warning(s)`, rc 0.
 - **Existing driver non-regression**: `python3 -m pytest -q tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_overlap_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py` → `65 passed in 17.01s`, rc 0, identical to the T001 pre-change baseline.
 - **Budget note**: no full suite was run; the E2 slot remains consumed by T002 and the closure slot remains T039.
+
+## T031 — intentional H2 pin update for the 070 decomposition section (red)
+
+- **Date**: 2026-10-25T03:05Z (segment impl-s6)
+- **Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 / Python 3.11.11 / pytest 8.4.2
+- **Changed path (test-only)**: `tests/contract/test_sdd_loop_driver_skill.py`
+- **Pin change**: `PINNED_H2_SECTIONS` gains one entry,
+  `Task Decomposition & Team Coordination（任务拆解与配合）`, between
+  `Efficiency Optimizations（运行效率优化）` and `References`. The twelve
+  predecessor pins are unchanged (R-14: a pin change for new content, not a
+  weakening).
+- **Command**:
+  ```sh
+  python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py -k "c3_skill_md_section_set"
+  ```
+- **Real output**:
+  ```text
+  F                                                                        [100%]
+  FAILED tests/contract/test_sdd_loop_driver_skill.py::test_c3_skill_md_section_set
+  1 failed, 24 deselected in 0.08s
+  ```
+  Exit code `1`. The actual H2 list has 13 entries; the pin expects 14 because
+  the SKILL.md section does not exist yet.

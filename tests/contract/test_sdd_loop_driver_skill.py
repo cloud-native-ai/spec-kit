@@ -32,6 +32,11 @@ PINNED_H2_SECTIONS = [
     # optimizations summary + owner pointer. The 064-owned
     # "CLI Capability Profiles" section below is unchanged and not copied.
     "Efficiency Optimizations（运行效率优化）",
+    # 070 intentional pin update (2026-10-25, R-14): the new decomposition
+    # layer adds one H2 between the efficiency summary and References. Every
+    # predecessor pin above and below stays unchanged; this is a pin update
+    # for new content, not a weakening.
+    "Task Decomposition & Team Coordination（任务拆解与配合）",
     "References",
     "Boundary",
     "Subagent Create & Dispatch Delegation（子代理创建与派发委派）",  # 060 C-29: delegation section
