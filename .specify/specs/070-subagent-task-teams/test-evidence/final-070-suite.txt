@@ -1,0 +1,8 @@
+$ python3 -m pytest -q tests/unit/test_wp_gate.py tests/unit/test_wp_report.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_070.py tests/contract/test_wp_mutation_drills.py tests/integration/test_wp_coordination_dry_runs.py
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+........................................                                 [100%]
+328 passed in 10.04s
+rc=0

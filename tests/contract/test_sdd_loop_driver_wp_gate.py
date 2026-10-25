@@ -24,6 +24,46 @@ Plan-check clause coverage (T010 unit cases, green at T011):
 - WG-13 benefit: `test_not_beneficial_returns_single_package_with_advisory`,
   `test_benefit_branch_b_admits_a_forked_graph`,
   `test_benefit_branch_c_admits_a_bounded_iteration`
+
+Foundational clause coverage (T005 cases, green at T007):
+
+- WG-01 path and responsibility: `test_script_path_and_stdlib_only`,
+  `test_gate_never_writes_spine_or_plan`
+- WG-02 CLI grammar: `test_cli_grammar_and_defaults`,
+  `test_stage_attempt_defaults_to_highest_in_spine`,
+  `test_retry_check_requires_wp_arguments`
+- WG-03 input precedence: `test_plan_json_takes_precedence_over_spine`,
+  `test_preflight_requires_manifest_when_owned_paths_exist`
+- WG-04 JSON output: `test_json_envelope_shape`,
+  `test_evidence_ptr_is_null_without_json_out`,
+  `test_finding_order_is_stable_and_sorted`
+- WG-05 exit codes: `test_exit_codes_cover_zero_one_two`
+
+Preflight, retry, and fallback clause coverage (T016 cases, green at T017;
+WG-18's fallback layer is green at T035):
+
+- WG-14 manifest coverage: `test_preflight_manifest_uncovered_path_rejects`,
+  `test_preflight_manifest_forbidden_read_path_rejects`,
+  `test_preflight_normalizes_paths_before_coverage`
+- WG-15 concurrency territories: `test_preflight_write_write_overlap_rejects`,
+  `test_preflight_read_write_overlap_rejects`,
+  `test_preflight_ordered_read_write_is_allowed`
+- WG-16 slot cap and isolation: `test_preflight_slot_cap_above_ceiling_rejects`,
+  `test_preflight_slot_cap_below_one_rejects`,
+  `test_preflight_isolation_missing_rejects`,
+  `test_preflight_shared_readonly_satisfies_isolation`
+- WG-17 retry checks: `test_retry_attempt_one_is_admitted_without_a_delta`,
+  `test_retry_second_attempt_without_a_delta_is_unchanged`,
+  `test_retry_valid_budget_increase_is_admitted`,
+  `test_retry_third_attempt_is_exhausted`
+- WG-18 determinism, repair, and fallback: CLI-envelope layer
+  `test_json_envelope_shape`, `test_finding_order_is_stable_and_sorted`,
+  `test_exit_codes_cover_zero_one_two`; fallback/preflight layer
+  `test_fn_06_fallback_causes_are_the_closed_named_set`,
+  `test_fn_07_fallback_never_runs_a_partial_package_set`,
+  `test_fn_08_every_stage_records_one_decision_with_the_mapped_verdict`
+  (coordination contract) and `test_fallback_never_dispatches_a_partial_package_set`
+  (integration dry run)
 """
 from __future__ import annotations
 

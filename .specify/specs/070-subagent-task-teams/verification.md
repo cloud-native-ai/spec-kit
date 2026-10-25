@@ -1,6 +1,6 @@
 # Verification — 070-subagent-task-teams
 
-**Status**: partial (segments S1–S6; T001–T035). The SC-001…SC-008 matrix, the closure full suite, the mirror check, and the final task audit are completed by the final implement segment (T039). This file exists early only to record residual interpretations and in-segment verification facts the dispatch requires.
+**Status**: implementation complete (T001–T039). The SC-001…SC-008 matrix and the closure disposition are recorded under § Closure verification (T039). SC-001 and SC-002 are `not_evaluated` and no user waiver is recorded, so the closure gate is **blocked** (no feature closure, no handoff). The full-suite closure slot is deferred to the driver's post-review slot by the impl-s7 mandatory test-budget instruction; every other T039 check ran and is green.
 
 ## Entry surface and opt-out/fallback verification (impl-s6; T031–T035)
 
@@ -92,3 +92,128 @@
 - **Review at**: T039 closure (R2-04 is non-blocking under the analyze-rerun gate).
 
 No other analyze residual (R2-01, R2-02, R2-03, R2-05, R2-06) is relied on by an implementation path in T014–T023; the normative clauses are followed directly. US3 follows VI-06 and WG-08 for the integrator carve-out, so the stale `V-WP.6` projection (R2-01) is not used.
+
+## T036–T038 verification (impl-s7)
+
+- **T036 mutation drills**: `python3 -m pytest -q -s tests/contract/test_wp_mutation_drills.py` → `4 passed in 4.09s`, rc 0. Each drill runs a control (unmutated copy, `1 passed`) and a mutant (cycle check removed, write-alone removed, missing verdict treated as pass, `not_evaluated` replaced by zero), each of which turns the selected contract/unit test red on an assertion. Details: `notes/red-first-evidence.md` §T036.
+- **T037 mirror sync**: `sync-mirrors.py --write` synced five files; `--check` → `ok skills/external/ == .specify/skills/ (32 files)`, rc 0; all five `cmp` pairs identical. `32 = 28-file baseline + 4 planned new files`, zero NEW drift. `test_sdd_loop_driver_skill.py -k c18` → `1 passed`. Details: `notes/pre-change-measurements.md` §T037.
+- **T038 quickstart**: Scenarios A–G all ran with the recorded rc; A `admit` rc 0, B `reject` rc 1 with `cycle`/`orphan-output`/`path-overlap`, C `2 passed`, D `retry-unchanged` rc 1 → split `admit` rc 0 → `retry-exhausted` rc 1, E metrics and both `not_evaluated` variants rc 0, F `19 passed`, G `3 passed`; fixture workspace removed (`TEARDOWN_OK`). Details: `notes/quickstart-run.md`.
+- **T038 benchmark**: `not_evaluated` — zero comparable samples, no run record for driver sessions or manual interventions. SC-001/SC-002 must not be marked met. Details: `notes/benchmark-070.md`.
+
+## Closure verification (T039)
+
+- **Segment**: impl-s7, 2026-10-25T07:57Z.
+- **Budget disposition**: the impl-s7 mandatory test budget authorises all new
+  unit/contract/integration suites plus `validate-tasks`, and explicitly defers
+  the full-suite closure slot to the driver after review. The E2 baseline
+  (`baseline-failed.txt`, T002) is unchanged and is not re-run here.
+
+### Checks run
+
+| Check | Command | Real output | rc |
+|---|---|---|---|
+| All new 070 suites | `python3 -m pytest -q tests/unit/test_wp_gate.py tests/unit/test_wp_report.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_gate.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_070.py tests/contract/test_wp_mutation_drills.py tests/integration/test_wp_coordination_dry_runs.py` | `328 passed in 10.04s` | 0 |
+| Skill contract incl. the 070 H2 pin and mirror pair | `python3 -m pytest -q tests/contract/test_sdd_loop_driver_skill.py` | `25 passed in 15.98s` | 0 |
+| Existing driver targeted regression (same set as the T001 baseline) | `python3 -m pytest -q tests/unit/test_decomposition_check.py tests/unit/test_pre_analyze_check.py tests/unit/test_overlap_check.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py` | `65 passed in 18.04s` (identical to the T001 `65 passed`) | 0 |
+| Task file validity | `python3 scripts/python/validate-tasks.py .specify/specs/070-subagent-task-teams/tasks.md` | `PASS — 0 error(s), 0 warning(s)` | 0 |
+| Clause coverage (110 ids) | corrected loop over non-comment inventory lines against the four contract test files (`test-evidence/final-clause-coverage.txt`) | `checked=110 missing=0` | 0 |
+| Mirror pair | `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` | `ok skills/external/ == .specify/skills/ (32 files)` | 0 |
+| Cross-artifact consistency | `python3 /home/agent/sdd-070/tools/pre-analyze-check.py --spec-dir .specify/specs/070-subagent-task-teams --stage tasks --repo .` | `decision=pass errors=0 advisories=0 waived=0`; fr 30 / sc 8 / tasks 39 / clauses 110 | 0 |
+| Decomposition size gate | `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/070-subagent-task-teams/requirements.md --tasks .specify/specs/070-subagent-task-teams/tasks.md` | `decision=proceed`, `task_count=39` (ceiling 40) | 0 |
+| Unfinished rows | `grep -cE '^- \[[ >]\]' .specify/specs/070-subagent-task-teams/tasks.md` | `0` after T039 is marked | 0 |
+
+**Clause-coverage repair (in-scope, test-documentation only)**: the first
+corrected T039 loop found seven ids whose literals were absent from the four
+contract test files (`WG-02`, `WG-03`, `WG-04`, `WG-14`, `WG-15`, `WG-17`,
+`WG-18`). Their behavioural pins already existed in
+`tests/unit/test_wp_gate.py` and `tests/contract/test_sdd_loop_driver_wp_coordination.py`;
+T039 added a clause-to-test mapping block to the
+`tests/contract/test_sdd_loop_driver_wp_gate.py` docstring (the same pattern
+used for WG-06…WG-13 at T011). No assertion, behaviour, or contract text
+changed. After the repair the loop reports `checked=110 missing=0`.
+
+**Inventory-form disclosure**: the literal `for id in $(cat ...)` form in the
+T039 row still fails on the inventory's `#` header (it stops at the header word
+`frozen`). The T001/T003 disclosure already requires T039 to read non-comment
+lines, which the command above does; the 110 id rows themselves are unchanged.
+
+### Deferred closure slot (driver, after review)
+
+Not run in impl-s7 by the mandatory test-budget instruction:
+
+```sh
+bash scripts/bash/run-tests.sh --names-out .specify/specs/070-subagent-task-teams/final-failed.txt
+comm -13 .specify/specs/070-subagent-task-teams/baseline-failed.txt \
+  .specify/specs/070-subagent-task-teams/final-failed.txt
+```
+
+The closure gate requires the second command to return empty (zero NEW
+name-level failures) before any closure handoff. Until it runs, DoD-7 remains
+open.
+
+### SC-001…SC-008 evidence matrix
+
+- **SC-001**: **Status = `not_evaluated` (closure-blocking).** Criterion: stage
+  wall-clock ≤ 80% of the dated anchor, median over at least three comparable
+  samples. Metric/command: `notes/benchmark-070.md` (no comparable driver run
+  exists, so no median is computable). Output: 0 samples,
+  `median=not_evaluated`, no waiver recorded.
+- **SC-002**: **Status = `not_evaluated` (closure-blocking).** Criterion: stage
+  executions per canonical stage ≤ 1.5 and ≥40% below 2.6×. Metric/command:
+  `notes/benchmark-070.md` (no run-level `(stage, stage_attempt)` chain exists).
+  Output: `not_evaluated`; Scenario E's fixture `0.125` is a derivation test,
+  not a benchmark; no waiver recorded.
+- **SC-003**: **Status = `partial`.** All targeted new and existing-driver
+  suites are green; the full-suite name-level comparison is deferred to the
+  driver slot. Command: the 070 suite (`328 passed`), the existing driver
+  targeted suite (`65 passed`, identical to T001), the skill contract
+  (`25 passed`), the mirror check (`ok`, 32 files), and the non-regression net
+  (`10 passed`). Output: zero targeted failures; full-suite comparison pending.
+- **SC-004**: **Status = `met` (targeted).** Criterion: every required output
+  is owned; zero orphan or cross-territory outputs/writes. Command:
+  `python3 -m pytest -q tests/unit/test_wp_gate.py -k "orphan or duplicate_output or integrator_output or write_write or read_write"`.
+  Output: `7 passed, 76 deselected`; also covered by the 328-test run.
+- **SC-005**: **Status = `met` (targeted).** Criterion: every stage records a
+  decision with its gate verdict and reason. Command:
+  `python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_coordination.py tests/integration/test_wp_coordination_dry_runs.py -k "fn_05 or fn_08 or single_package or disabled_stage"`;
+  Scenario F. Output: `4 passed, 126 deselected`; Scenario F `19 passed`.
+- **SC-006**: **Status = `not_evaluated`.** Criterion: manual interventions per
+  session ≤ 30/29. Metric/command: `notes/benchmark-070.md` (no run record
+  supplies either input). Output: `manual_interventions=not_evaluated`,
+  `sessions=not_evaluated`.
+- **SC-007**: **Status = `met` (targeted).** Criterion: the report records
+  critical path, wall-clock, efficiency, and retries; a parallel claim needs
+  overlapping intervals. Command:
+  `python3 -m pytest -q tests/unit/test_wp_report.py -k "critical_path or parallelism_efficiency or max_concurrent or overlap or retry"`;
+  Scenario E. Output: `4 passed, 15 deselected`; Scenario E
+  `critical_path=130`, `wall=200`, `efficiency=0.575`, `max_concurrent=2`,
+  `overlap=true`.
+- **SC-008**: **Status = `met` (targeted).** Criterion: fixture dry runs pass
+  every enumerated scenario and the driver suite reports zero new failures.
+  Command: Scenario C (`2 passed`), Scenario G (`3 passed`), Scenario F
+  (`19 passed`), existing driver targeted suite (`65 passed`). Output: zero
+  failures in the enumerated fixture scenarios and the driver's own suite.
+
+### Closure gate disposition
+
+- `SC-001` and `SC-002` are `not_evaluated`, and **no written user waiver**
+  naming either criterion exists in the workspace at 2026-10-25T07:52Z.
+- FR-023 and T039 are explicit: an all-`not_evaluated` benchmark MUST NOT
+  close the feature, and the closure gate fails (no handoff) when neither met
+  evidence nor a recorded waiver exists. **The closure gate is blocked; no
+  handoff is issued; the feature remains Planned.**
+- To close, the user must either (a) record an explicit waiver naming SC-001
+  and/or SC-002 with its reason, or (b) run a comparable benchmark (at least
+  three samples per measured stage, same host class and topology, FR-022
+  interval). Then run the deferred full-suite slot and the name-level
+  comparison above and re-evaluate.
+- T039 is marked `[x]` because the closure gate was executed and its blocking
+  outcome is recorded here. That mark does not assert feature closure and does
+  not promote SC-001 or SC-002.
+
+### Plan constraint
+
+**PLAN-EDIT: none.** No plan-owned artifact (`plan.md`, `data-model.md`,
+`contracts/`, `quickstart.md`, `research.md`, `feature-ref.md`) was touched in
+impl-s7. The six analyze residuals remain non-blocking and none is used by a
+new code path in T036–T039.
