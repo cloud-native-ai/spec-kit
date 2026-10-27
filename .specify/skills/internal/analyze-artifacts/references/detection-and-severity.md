@@ -59,6 +59,12 @@ overflow summary.
 - Terminology drift across files.
 - Data entities present in `plan.md` but absent in the spec (or vice versa).
 - Task-ordering contradictions.
+- **Stability / containment claims**: a requirement, success criterion, DoD item, or task that
+  asserts a machine-produced surface changes only within an enumerated set, or that anything
+  "unaffected" stays identical, is checked against `.specify/shared/guidelines/closed-set-claims.md`
+  — read that owner; do not restate its criteria. Report a claim that lacks the baseline referent,
+  the comparison unit, or a mechanically derivable allowed-delta set, and report a derivation that
+  omits the fan-out of the edited shared sources onto generated artifacts.
 
 ### G. Feature relevance & accuracy
 - Missing feature binding when the requirement implies feature capability.
@@ -100,6 +106,11 @@ literal `none` when nothing downstream inherits it. Severity is **derived from t
 not chosen independently — owner: `.specify/shared/workflow/objective-analysis-gate.md`
 rule 3. A row whose surface is `none` is capped at MEDIUM.
 
+**Containment claims.** Severity follows the artifact that depends on the claim: a claim backing
+a success criterion, DoD item, or verification gate is an untestable acceptance criterion → **HIGH**
+(its propagation surface is that criterion, so the `none` cap does not apply); a narrative-only
+claim is capped at MEDIUM by the same rule.
+
 ## DO-NOT-FLAG list (noise control — do not report these at any severity)
 
 - Style/wording preferences already consistent within the project's own conventions.
@@ -112,3 +123,6 @@ rule 3. A row whose surface is `none` is capped at MEDIUM.
   without that citation — treat it as a coverage question and let the evidence file decide.
 - Cross-references into `.specify/` mirrors that duplicate canonical paths by design.
 - Pre-existing baseline test failures already recorded in the feature's baseline file.
+- A class-level allowed-delta set pinned by a drift-guard test, or a containment claim that names
+  its baseline referent and per-class comparison unit — legitimate forms under
+  `.specify/shared/guidelines/closed-set-claims.md`, not findings.

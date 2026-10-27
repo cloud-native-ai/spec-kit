@@ -59,6 +59,10 @@ Every fact — a concept's meaning, a normative rule, a threshold, an enumerated
 
 Owner-selection order, the duplicate conditions, the counts/enumerations rules, and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
 
+## Closed-Set Claims (封闭清单声明)
+
+A requirement, success criterion, DoD item, or verification task that asserts a machine-produced surface "changes only within …" or that anything "unaffected" stays identical is a **containment claim**, and MUST be decidable. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/closed-set-claims.md` (do NOT copy its rules; reference the file) — which owns the claim taxonomy (determinism vs containment), the required elements, the void conditions, and the repair procedure. Applies to every stability or containment assertion over generated or machine-produced surfaces.
+
 ## Concurrent Development Safety (并发开发安全)
 
 Parallel branches and agent flows share one git history, so any machine-managed file that several flows rewrite is a merge-conflict hotspot. Storage design MUST assume concurrent writers:
