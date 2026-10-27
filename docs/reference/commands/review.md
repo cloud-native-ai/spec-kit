@@ -12,10 +12,12 @@ Critically review the SDD process for the current feature **and** the code delta
 ## Syntax
 
 ```text
-/speckit.review [review criteria or focus areas]
+/speckit.review [review criteria or focus areas] [--client-unit custom:<owner>/<name>]
 ```
 
 `[review criteria or focus areas]` is optional — specify quality dimensions or reporting preferences. It guides focus; it never selects one segment over the other.
+
+`--client-unit custom:<owner>/<name>` is optional and only affects the code segment's client capture step (below): it names the owning client unit when the run's repository is a client project with more than one external probe object, and adds no command surface of its own. A malformed value (anything not matching `custom:<owner>/<name>`) yields one named skip line naming the expected syntax, zero entries, and does not block or alter the review.
 
 ## Composition — two segments, one fixed order
 
@@ -91,6 +93,14 @@ The transition is judged **once**, after both segments have finished and both ar
 ## Coverage receipt — the only evidence of "the whole diff was read"
 
 The code segment's "I read the whole delta" claim is evidence-bearing only through the coverage receipt: a delimited block inside `code-review.md` whose file set equals the delta's changed-file set, with a per-file verdict. The exit alphabet is closed at three — `0` when every file carries a verdict, `1` on a gap, `2` on a state it cannot evaluate — and a non-zero gap or skip count is surfaced outside the block as well. The receipt counts reviewed files; it is never test or compile coverage.
+
+## Client capture — the optional fifth step
+
+When the triage value is `run` and the run's repository is judged a client project (by the existing hat criterion in `.specify/shared/definitions/dogfooding-definitions.md` § 2.1 — a root-level `feedback/` directory does not participate), the code segment's non-interactive path ends with a **fifth deterministic step** after the coverage receipt: `capture --review-file <record> --triage run [--unit <custom:owner/name>]` of the skill's script. It posts exactly one pointer-shaped entry to the client project's own feedback channel — the record path, the applicability value, the six per-severity counts copied verbatim from `report --summary --format json`, the run identifier, and the owning unit — never review-comment bodies, per-file verdict lists, or file counts.
+
+Capture is observation, not verdict: a merge-gate denial does not suppress it, capture failure never blocks the run or changes any verdict, and capture never edits the record, the receipt block, or triggers any transmission. A second capture of the same record is answered by the feedback engine's existing `(unit, run)` duplicate result — no second entry, not an error.
+
+The run's human-facing conclusion carries **exactly one capture outcome line**, whose state token is drawn from the closed five-value set — `client-channel-armed` / `client-channel-unarmed` / `client-unit-ambiguous` / `no-capture-object` / `counts-unavailable` — followed by the specific detail (the recorded unit and entry id, or the named reason with one-time guidance: probe injection when the channel is unarmed, re-initializing/upgrading `.specify/` when the probe registry is unavailable, an explicit `--client-unit` when multiple external probe objects make the unit ambiguous), visible together with the triage value. Every non-capture case adds **zero entries** to the store — no empty entry, no zero-filled entry, no "no findings this run" phrasing. In a framework-hat repository (including a client repository that vendored the framework sources) capture does not run and the conclusion names the hat verdict as its basis instead — never one of the five tokens. The report's code subsection (`### 2.1`) gains no capture field: the disclosure is presentation, not a carrier.
 
 ## Feedback boundary — friction only
 

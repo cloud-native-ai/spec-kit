@@ -27,10 +27,11 @@
 
 ### G2 — test_client_armed_state.py (T009)
 
-- 命令行: _pending — 红运行后回填_
-- 真实输出: _pending_
-- 退出码: _pending_
-- 失败计数: _pending_
+- 命令行: `python3 -m pytest -q tests/contract/test_client_armed_state.py tests/contract/test_dogfooding_practice.py`
+- 真实输出: `11 failed, 30 passed in 4.40s`（失败名见下；普遍形态 = 显式单元无探针/注册表不可用/畸形 `--unit` 三类情形当前落到 `counts-unavailable` 或写出 legacy 条目而非 `client-channel-unarmed`/`skipped` 行；Loop B 配方仍为 `skill:<scenario-name>`；docs/reference/commands/review.md 尚无 `--client-unit`/第五步/披露）
+- 退出码: `1`
+- 失败计数: `11`
+- 失败名（2026-10-27 未改动树 @ 5db467dd，US1 已落地后）: test_c3_explicit_unit_without_probe_is_unarmed_with_probe_inject_guidance · test_c4_registry_unavailable_is_unarmed_never_records_no_legacy_entry[True] · test_c6_malformed_unit_value_yields_named_skip_line[banana] · test_c6_malformed_unit_value_yields_named_skip_line[custom:owner] · test_c6_malformed_unit_value_yields_named_skip_line[custom:/name] · test_c6_malformed_unit_value_yields_named_skip_line[custom:owner/] · test_c7_framework_unit_families_never_reach_the_client_channel[/speckit.review] · test_c7_framework_unit_families_never_reach_the_client_channel[skill:code-review] · test_t012_review_docs_and_template_aligned_on_capture · test_loop_b_recipe_uses_custom_unit_form（test_dogfooding_practice.py 净增断言）· test_loop_b_recipe_states_the_reason（test_dogfooding_practice.py 净增断言）。红运行前对测试自身的 C-8 frontmatter 解析做过一处修正（值是 JSON 编码，改用 json.loads；ENTRY_KEY_SET 对齐 dump_frontmatter 既有键序），修正后重跑即为上面这版 11 败记录；其余 30 项（C-1 双向帽子、C-2 闭集与解析顺序、C-4 无显式单元支路、C-5 歧义、C-9 等）红运行前已成立，不作红声称。
 
 ### G3 — test_client_package_exclusion.py (T013)
 

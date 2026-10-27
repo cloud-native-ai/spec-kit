@@ -64,14 +64,23 @@ classification: internal
 2. **归档报告**：`.specify/review/<branch>-<ts>.md` 为 Markdown，可直接粘贴到 PR 描述/评论区或随仓库提交。
 3. **知识沉淀**：同一问题被提出超过 2 次 → 转化为 Linter 规则或 Checklist 条目，而非依赖人每次发现（沉淀形式见 `references/review-workflow.md` §5.2）。
 
-### 非交互路径（Agent / CI：四步，不是三步）
+### 非交互路径（Agent / CI：五步，不是四步）
 
-代码段有一条完全非交互的路径，四步各由一个确定性子命令承担，均不需要终端、不需要应答任何提示：
+代码段有一条完全非交互的路径，五步各由一个确定性子命令承担，均不需要终端、不需要应答任何提示：
 
 1. `base --spec <feature-dir>` — 解析评审区间（`base=` / `head=` / `base_source=`）；无档可解时记 `not-evaluated` 并退出 2，绝不猜基准。
 2. `start --spec <feature-dir>` — 创建代码段记录，并先把上一份记录归档为 `code-review-<YYYYMMDDTHHMMSSZ>.md`；第二次运行起这是必经一步，省掉它就是把记录交给 agent 手写。
 3. `note -s <severity> -f <file> [-l <line>] -c <comment> --review-file <record>` — 逐条落盘意见。
 4. `receipt --review-file <record>` — 写出覆盖率回执与段裁决；随后用 `report --summary --file <record>` 取合入门禁判决。
+5. `capture --review-file <record> --triage <value> [--unit <custom:owner/name>]` — 客户采集：把本次评审的**发现指针**落进客户项目自己的反馈通道（Feature 072 的唯一授权修订，见下）。
+
+> **修订记录（四步 → 五步，C-10）**：理由 —— 采集所需的全部输入（记录路径、适用性取值、按严重度计数）只在第 4 步之后才齐备，且采集挂在同一条确定性路径里，「发现进入客户通道」才是机械可核对的事实；代价 —— 前序特性的一处闭合枚举（本节步骤枚举）被改写一次，其余闭合面一字不动。
+
+**采集触发条件（合取，二者同时成立）**：① 本次运行所在仓经帽子判据判为客户项目（判据 owner：`.specify/shared/definitions/dogfooding-definitions.md` § 2.1；框架帽（含 vendored 框架源的客户仓）不采集，以 `skipped` 行披露帽子依据，不混入五值闭集）；② 代码段适用性为 `run`。一次合格运行恰好采集一次、至多一条条目，绝不按意见、按文件或按严重度各写一条。
+
+**条目形态（指针）**：一条客户条目只含封闭字段集 —— 代码段记录路径、本次适用性取值、六项按严重度计数（逐项抄自 `report --summary --format json`，含零值）、本次运行标识（记录头日期戳，经 `REVIEW_RUN_TIMESTAMP` 可确定性覆写）、所属客户单元。条目 MUST NOT 含意见正文、逐文件清单或文件计数。
+
+**披露闭集与零条目规则**：每次运行恰好一行采集结论，状态符取自五值闭集 `client-channel-armed` / `client-channel-unarmed` / `client-unit-ambiguous` / `no-capture-object` / `counts-unavailable`，后接具体细节，并与本次适用性取值同屏可见。未采集的任何情形存储零条目 —— 不写空条目、不以 0 填充、不以「本次无发现」替代具名原因。三条不变量：幂等（`(unit, run)` 键交给反馈引擎答重复，非错误）、非阻断（采集失败恒不阻断评审，本步恒退出 0）、不越权（不改记录、不改回执字段块、不触发任何传输）。
 
 适用性由 `triage` 判定，取值封闭为 `run` / `not-applicable` / `not-evaluated`：空 delta 在回执之前就答为 `not-applicable`，绝不会被一块 0/0/0 的回执报成一次干净的评审。
 

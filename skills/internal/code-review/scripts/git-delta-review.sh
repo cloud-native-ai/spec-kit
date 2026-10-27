@@ -1205,11 +1205,22 @@ cmd_receipt() {
 # 三条不变量 (C-19): 幂等 ((unit, run) 键交给引擎答重复)、非阻断 (本步恒
 # 退出 0)、不越权 (不改记录、不改回执块、不触发传输)。非采集情形零条目
 # (C-23), 不以"本次无发现"替代具名原因。
+#
+# 武装态解析 (本特性唯一解析器, C-9/C-62): 只从探针引擎机读输出解析一次,
+# 全程复用 (C-2)。解析顺序: 调用方显式单元 > 唯一外部探针 > 其余 (C-2);
+# 显式单元只消解歧义, 不豁免探针存在性检查 (C-3)。零探针 / 显式单元无探针 /
+# 注册表不可用三情形归未武装且完全不发起 record 调用 (C-3/C-4); 多探针未
+# 指定归歧义, 不猜不轮流不取最近使用 (C-5)。畸形 --unit 值产出一条具名
+# skip 行 (指名期望语法) 后照常评审, 零条目 (C-6); /speckit.* 与 skill:
+# 词族同样在该语法门被拒, 永不到达引擎 (C-7)。
 # ══════════════════════════════════════════════════════════════
 
 FRAMEWORK_HAT_DIRS=(templates skills shared scripts src/specify_cli)
 HAT_OWNER=".specify/shared/definitions/dogfooding-definitions.md § 2.1"
 CAPTURE_POINT="pointer payload assembled from 'report --summary --format json'; no review bodies, per-file verdict lists, or file counts (C-15)"
+
+#: 客户单元值语法, 与反馈/探针引擎的 _CUSTOM_UNIT_RE 同源闭合 (C-6/C-7)。
+CUSTOM_UNIT_GRAMMAR="custom:<owner>/<name>"
 
 repo_root_dir() {
     git rev-parse --show-toplevel 2>/dev/null || pwd -P
@@ -1293,6 +1304,56 @@ cmd_capture() {
         return 0
     fi
 
+    # C-6/C-7: 值语法闭合于 custom:<owner>/<name> (与引擎 _CUSTOM_UNIT_RE 同源
+    # 的字符集, owner/name 均非空)。畸形值与 /speckit.*、skill: 词族产出
+    # 一条具名 skip 行, 零条目, 不阻断评审。
+    if [[ -n "$unit" ]]; then
+        if [[ ! "$unit" =~ ^custom:[a-z0-9._-]+/[a-z0-9._-]+$ ]]; then
+            echo "capture: skipped unit='${unit}' reason=malformed client unit — expected grammar '${CUSTOM_UNIT_GRAMMAR}' (C-6); /speckit.<command> and skill:<name> families are rejected for client findings (C-7); triage=${triage_value}; zero entries"
+            return 0
+        fi
+    fi
+
+    # C-9/C-2: 武装态唯一解析器 — 探针机读输出只解析一次, 全程复用。
+    local -a facts=()
+    mapfile -t facts < <(probe_facts "$root")
+    local registry_state="${facts[0]:-unavailable}"
+    local ext_count=0
+    [[ "$registry_state" != "unavailable" ]] && ext_count="$registry_state"
+
+    local unit_source=""
+    if [[ -n "$unit" ]]; then
+        # C-2/C-3: 显式单元优先, 但只消解歧义、不豁免探针存在性检查。
+        unit_source="explicit"
+        if [[ "$registry_state" == "unavailable" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} unit=${unit} reason=probe registry unavailable (un-upgraded .specify/ runtime); guidance=re-initialize/upgrade .specify/ (C-4); zero entries"
+            return 0
+        fi
+        local probe_unit matched=false
+        for probe_unit in "${facts[@]:1}"; do
+            [[ "$probe_unit" == "$unit" ]] && matched=true
+        done
+        if [[ "$matched" != "true" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} unit=${unit} reason=specified unit has no external probe object in this client project; guidance=arm the channel via 'probe-utils.py --action probe-inject --unit ${unit}' for that unit (C-3); zero entries"
+            return 0
+        fi
+    else
+        if [[ "$registry_state" == "unavailable" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} reason=probe registry unavailable (un-upgraded .specify/ runtime); guidance=re-initialize/upgrade .specify/ (C-4); zero entries"
+            return 0
+        fi
+        if [[ "$ext_count" == "0" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} reason=no external probe object in this client project; guidance=arm the channel via 'probe-utils.py --action probe-inject --unit ${CUSTOM_UNIT_GRAMMAR}'; zero entries"
+            return 0
+        fi
+        if [[ "$ext_count" != "1" ]]; then
+            echo "capture: client-unit-ambiguous triage=${triage_value} reason=${ext_count} external probe objects and no explicit --unit — no guessing, no rotation, no most-recently-used (C-5); zero entries"
+            return 0
+        fi
+        unit="${facts[1]}"
+        unit_source="auto:unique-external-probe"
+    fi
+
     # C-17/C-21: 计数只从汇总命令的机读形态取; 退出 2 = 输入不可解析。
     local summary_json summary_rc=0
     summary_json=$("$0" report --summary --file "$review_file" --format json 2>/dev/null) || summary_rc=$?
@@ -1317,29 +1378,6 @@ print("\n".join(f"{k}={c[k]}" for k in order))
 
     # C-18: 运行标识 = 记录头日期戳。
     local run_id; run_id=$(run_id_from_record "$review_file")
-
-    # 武装态解析 (解析顺序与三值闭集的完整分支归 T010 的唯一解析器;
-    # 此处实现显式单元与唯一外部探针自动命中两条主路径)。
-    local unit_source="explicit"
-    if [[ -z "$unit" ]]; then
-        local -a facts=()
-        mapfile -t facts < <(probe_facts "$root")
-        if [[ "${facts[0]:-unavailable}" == "unavailable" ]]; then
-            echo "capture: client-channel-unarmed triage=${triage_value} reason=probe registry unavailable (un-upgraded .specify/ runtime); guidance=re-initialize/upgrade .specify/ (C-4); zero entries"
-            return 0
-        fi
-        local ext_count="${facts[0]}"
-        if [[ "$ext_count" == "0" ]]; then
-            echo "capture: client-channel-unarmed triage=${triage_value} reason=no external probe object in this client project; guidance=arm the channel via 'probe-utils.py --action probe-inject --unit custom:<owner>/<name>'; zero entries"
-            return 0
-        fi
-        if [[ "$ext_count" != "1" ]]; then
-            echo "capture: client-unit-ambiguous triage=${triage_value} reason=${ext_count} external probe objects and no explicit --unit — no guessing, no rotation, no most-recently-used (C-5); zero entries"
-            return 0
-        fi
-        unit="${facts[1]}"
-        unit_source="auto:unique-external-probe"
-    fi
 
     # C-11/C-15: 单条指针条目, 字段集封闭; 引擎的 (unit, run) 键答重复 (C-18)。
     local futils="$root/.specify/scripts/python/feedback-utils.py"

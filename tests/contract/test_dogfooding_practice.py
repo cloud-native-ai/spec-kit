@@ -207,6 +207,37 @@ def test_c2_loop_b_capability_mapping():
         assert cap in low, f"Loop B capability mapping missing {cap!r}"
 
 
+# --- C-7 (072): the Loop B recipe uses the custom: unit form with its reason ---
+
+def test_loop_b_recipe_uses_custom_unit_form():
+    """Feature 072 C-7: `skill:<scenario-name>` is rejected for client findings
+    (in a client project it either matches no probe object — the engine refuses
+    the record — or resolves as a framework-internal unit routed upstream), so
+    the Loop B recipe MUST name the `custom:<owner>/<name>` form instead."""
+    body = read(DOC)
+    loop_b = body.split("## Loop B", 1)[1].split("## ", 1)[0]
+    assert "custom:<owner>/<name>" in loop_b, (
+        "the Loop B recipe MUST name the custom:<owner>/<name> unit form (072 C-7)"
+    )
+    assert '--unit-id "skill:' not in loop_b, (
+        "the Loop B recipe MUST NOT instruct recording with a skill: unit (072 C-7) — "
+        "the rejected family may be named in the reason, never in the instruction"
+    )
+
+
+def test_loop_b_recipe_states_the_reason():
+    loop_b = read(DOC).split("## Loop B", 1)[1].split("## ", 1)[0]
+    assert re.search(r"reason|because|why", loop_b, re.IGNORECASE), (
+        "the Loop B recipe MUST state why the custom: form replaces skill: (072 C-7)"
+    )
+    assert re.search(r"probe object|框架内部|upstream|上送", loop_b), (
+        "the stated reason MUST name the probe-object / framework-unit failure mode (072 C-7)"
+    )
+    # The rest of Loop B is unchanged: the capability table rows all survive.
+    for cap in ("Feedback engine", "Memory", "History", "Review", "Task records"):
+        assert cap in loop_b, f"Loop B capability row {cap!r} must survive the recipe rewrite"
+
+
 def test_c2_anti_patterns_and_adoption():
     body = read(DOC).lower()
     for ap in ANTI_PATTERNS:

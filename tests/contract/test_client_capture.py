@@ -384,9 +384,18 @@ def test_c21_summary_exit_2_discloses_counts_unavailable():
 
 def test_c21_engine_refusal_discloses_counts_unavailable_and_never_blocks():
     with make_client_project() as project:
-        # No probe injected for the unit → the engine refuses the write.
+        # Genuine engine refusal: the probe exists (the channel is armed) but
+        # the store refuses the write. (An explicit unit with NO probe object is
+        # no longer a refusal case — contracts/client-identity-and-armed-state.md
+        # C-3 resolves it to `client-channel-unarmed` before any record call;
+        # that branch is pinned by tests/contract/test_client_armed_state.py.)
+        project.arm(UNIT)
         qualified_run(project)
-        run = armed_capture(project, "--unit", UNIT)
+        project.feedback_dir.chmod(0o555)      # store refuses the write
+        try:
+            run = armed_capture(project, "--unit", UNIT)
+        finally:
+            project.feedback_dir.chmod(0o755)
         assert run.returncode == 0, (
             f"capture failure MUST NOT block the run (exit 0); got {run.returncode}: {run.describe()}"
         )

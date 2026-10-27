@@ -407,7 +407,7 @@ cmd_note() {
 # 它自标 implicit 且组合路径一律不使用 — 同一特性目录里 `review.md` 与
 # `code-review.md` 并存, 隐式选取会把过程报告读成代码段记录并给出假通过。
 cmd_report() {
-    local action="list" target="" target_explicit=false
+    local action="list" target="" target_explicit=false format="text"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -415,9 +415,12 @@ cmd_report() {
             --summary)    action="summary"; shift ;;
             --cat)        action="cat"; target="$2"; target_explicit=true; shift 2 ;;
             --file|-f)    target="$2"; target_explicit=true; shift 2 ;;
+            --format)     format="$2"; shift 2 ;;
             *)            shift ;;
         esac
     done
+    [[ "$format" == "text" || "$format" == "json" ]] || \
+        die2 "无效 --format: $format (可选: text | json)"
 
     if [[ "$action" == "summary" ]]; then
         local record=""
@@ -433,30 +436,50 @@ cmd_report() {
             warn "implicit selection: ${record} (legacy newest-file mode; the composed path always passes --file)"
         fi
 
-        echo -e "${BLD}━━━ Review 汇总: ${record} ━━━${RST}"
-        echo ""
         local sev count blocking_count=0 important_count=0
+        local -A sev_count=()
         for sev in "${SEVERITY_LEVELS[@]}"; do
             count=$(grep -c "^### .* \[${sev^^}\]" "$record" 2>/dev/null || true)
             count=${count:-0}
-            printf "  %s %-12s %s\n" "$(severity_icon "$sev")" "[$sev]" "$count"
+            sev_count[$sev]="$count"
             [[ "$sev" == "blocking" ]]  && blocking_count="$count"
             [[ "$sev" == "important" ]] && important_count="$count"
         done
-        echo ""
-        echo "record=$record"
-        echo "blocking_entries=${blocking_count}"
+
+        # C-17 (072): opt-in machine-readable form — record path, the six counts
+        # (zeros included), the blocking count and the gate verdict. The text
+        # form below and the 0/1/2 exit alphabet are untouched by this branch.
+        if [[ "$format" == "json" ]]; then
+            printf '{"record":"%s","counts":{"blocking":%s,"important":%s,"suggestion":%s,"nitpick":%s,"question":%s,"praise":%s},"blocking_entries":%s,"gate":"%s"}\n' \
+                "$record" \
+                "${sev_count[blocking]}" "${sev_count[important]}" "${sev_count[suggestion]}" \
+                "${sev_count[nitpick]}" "${sev_count[question]}" "${sev_count[praise]}" \
+                "$blocking_count" \
+                "$([[ "$blocking_count" -gt 0 ]] && printf 'deny' || printf 'allow')"
+        else
+            echo -e "${BLD}━━━ Review 汇总: ${record} ━━━${RST}"
+            echo ""
+            for sev in "${SEVERITY_LEVELS[@]}"; do
+                printf "  %s %-12s %s\n" "$(severity_icon "$sev")" "[$sev]" "${sev_count[$sev]}"
+            done
+            echo ""
+            echo "record=$record"
+            echo "blocking_entries=${blocking_count}"
+        fi
         if [[ "$blocking_count" -gt 0 ]]; then
-            echo "gate=deny"
-            echo -e "  ${RED}✗ 合入门禁: 存在 ${blocking_count} 条 [blocking] — 必须解决后方可合入${RST}"
+            [[ "$format" != "json" ]] && echo "gate=deny"
+            [[ "$format" != "json" ]] && \
+                echo -e "  ${RED}✗ 合入门禁: 存在 ${blocking_count} 条 [blocking] — 必须解决后方可合入${RST}"
             exit 1
         elif [[ "$important_count" -gt 0 ]]; then
-            echo "gate=allow"
-            echo -e "  ${YEL}⚠ 合入门禁: 存在 ${important_count} 条 [important] — 需逐条回应 (同意/不同意+理由) 后方可合入${RST}"
+            [[ "$format" != "json" ]] && echo "gate=allow"
+            [[ "$format" != "json" ]] && \
+                echo -e "  ${YEL}⚠ 合入门禁: 存在 ${important_count} 条 [important] — 需逐条回应 (同意/不同意+理由) 后方可合入${RST}"
             return 0
         else
-            echo "gate=allow"
-            echo -e "  ${GRN}✓ 合入门禁: 无未决 blocking/important — 满足收敛条件${RST}"
+            [[ "$format" != "json" ]] && echo "gate=allow"
+            [[ "$format" != "json" ]] && \
+                echo -e "  ${GRN}✓ 合入门禁: 无未决 blocking/important — 满足收敛条件${RST}"
             return 0
         fi
     fi
@@ -1172,6 +1195,213 @@ cmd_receipt() {
 }
 
 
+# ══════════════════════════════════════════════════════════════
+# capture: 客户采集 (非交互路径第 5 步, Feature 072 C-11…C-24)
+#
+# 触发是合取 (C-12): 帽子判据判本仓为客户项目 (owner 判据只读, C-13), 且
+# 适用性取值为 run。每一情形恰好一行结论 (C-22), 状态符取自五值闭集
+# (client-channel-armed / client-channel-unarmed / client-unit-ambiguous /
+# no-capture-object / counts-unavailable); 框架帽走 skipped 行, 不混五值。
+# 三条不变量 (C-19): 幂等 ((unit, run) 键交给引擎答重复)、非阻断 (本步恒
+# 退出 0)、不越权 (不改记录、不改回执块、不触发传输)。非采集情形零条目
+# (C-23), 不以"本次无发现"替代具名原因。
+#
+# 武装态解析 (本特性唯一解析器, C-9/C-62): 只从探针引擎机读输出解析一次,
+# 全程复用 (C-2)。解析顺序: 调用方显式单元 > 唯一外部探针 > 其余 (C-2);
+# 显式单元只消解歧义, 不豁免探针存在性检查 (C-3)。零探针 / 显式单元无探针 /
+# 注册表不可用三情形归未武装且完全不发起 record 调用 (C-3/C-4); 多探针未
+# 指定归歧义, 不猜不轮流不取最近使用 (C-5)。畸形 --unit 值产出一条具名
+# skip 行 (指名期望语法) 后照常评审, 零条目 (C-6); /speckit.* 与 skill:
+# 词族同样在该语法门被拒, 永不到达引擎 (C-7)。
+# ══════════════════════════════════════════════════════════════
+
+FRAMEWORK_HAT_DIRS=(templates skills shared scripts src/specify_cli)
+HAT_OWNER=".specify/shared/definitions/dogfooding-definitions.md § 2.1"
+CAPTURE_POINT="pointer payload assembled from 'report --summary --format json'; no review bodies, per-file verdict lists, or file counts (C-15)"
+
+#: 客户单元值语法, 与反馈/探针引擎的 _CUSTOM_UNIT_RE 同源闭合 (C-6/C-7)。
+CUSTOM_UNIT_GRAMMAR="custom:<owner>/<name>"
+
+repo_root_dir() {
+    git rev-parse --show-toplevel 2>/dev/null || pwd -P
+}
+
+# 帽子判定: 只读 owner 判据 (dogfooding-definitions § 2.1 的五个框架源目录,
+# feedback/ 不参与)。客户仓 vendored 框架源同样判 framework (C-13)。
+hat_of_root() {
+    local root="$1" d
+    for d in "${FRAMEWORK_HAT_DIRS[@]}"; do
+        [[ -d "$root/$d" ]] && { printf 'framework'; return 0; }
+    done
+    printf 'client'
+}
+
+# 运行标识: 记录头日期戳 (ISO-8601 UTC 秒级, 与归档名同源的 stamp);
+# 头部缺行时退回本脚本既有的 REVIEW_RUN_TIMESTAMP 环境变量覆写 (C-18)。
+run_id_from_record() {
+    local file="$1" stamp
+    stamp=$(sed -n 's/^| \*\*日期\*\* | `\([^`]*\)` |$/\1/p' "$file" 2>/dev/null | head -1)
+    printf '%s' "${stamp:-$(run_timestamp)}"
+}
+
+# 外部探针事实: 只从探针引擎机读输出解析 (C-9)。输出三态首行:
+#   unavailable            — 注册表不可用 (引擎缺失或 available=false)
+#   0                      — 注册表可用, 零外部探针
+#   <n> + 后续行 = 单元名  — n 个外部探针对象及其单元
+probe_facts() {
+    local root="$1" putils="$root/.specify/scripts/python/probe-utils.py"
+    [[ -f "$putils" ]] || { echo "unavailable"; return 0; }
+    python3 "$putils" --action probes --format json 2>/dev/null | python3 -c '
+import json, sys
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    print("unavailable"); raise SystemExit(0)
+if not d.get("available"):
+    print("unavailable"); raise SystemExit(0)
+units = sorted(str(o.get("unit", "")) for o in d.get("objects", [])
+               if str(o.get("object_id", "")).startswith("ext-"))
+print(len(units))
+for u in units:
+    print(u)
+' || echo "unavailable"
+}
+
+capture_payload() {
+    local record="$1" triage_value="$2" run_id="$3" unit="$4"
+    shift 4
+    printf 'record=%s\ntriage=%s\n%s\nrun=%s\nunit=%s' \
+        "$record" "$triage_value" "$1" "$run_id" "$unit"
+}
+
+cmd_capture() {
+    local review_file="" triage_value="" unit=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --review-file) review_file="$2"; shift 2 ;;
+            --triage)      triage_value="$2"; shift 2 ;;
+            --unit)        unit="$2"; shift 2 ;;
+            *)             die2 "未知选项: $1" ;;
+        esac
+    done
+    if [[ -z "$review_file" || -z "$triage_value" ]]; then
+        die2 "capture 需要 --review-file <code-review.md> --triage <run|not-applicable|not-evaluated> [--unit <custom:owner/name>]"
+    fi
+
+    local root; root=$(repo_root_dir)
+
+    # C-13: 框架帽不采集, 披露不混入五值闭集。
+    local hat; hat=$(hat_of_root "$root")
+    if [[ "$hat" == "framework" ]]; then
+        echo "capture: skipped hat=framework basis=root owns framework source directories (templates/skills/shared/scripts/src/specify_cli); owner=${HAT_OWNER}; triage=${triage_value}"
+        return 0
+    fi
+
+    # C-14/C-23: 非 run 适用性没有记录可指向 — 具名披露, 零条目。
+    if [[ "$triage_value" != "run" ]]; then
+        echo "capture: no-capture-object triage=${triage_value} reason=no record exists for applicability '${triage_value}' — nothing to point at (C-14); zero entries"
+        return 0
+    fi
+
+    # C-6/C-7: 值语法闭合于 custom:<owner>/<name> (与引擎 _CUSTOM_UNIT_RE 同源
+    # 的字符集, owner/name 均非空)。畸形值与 /speckit.*、skill: 词族产出
+    # 一条具名 skip 行, 零条目, 不阻断评审。
+    if [[ -n "$unit" ]]; then
+        if [[ ! "$unit" =~ ^custom:[a-z0-9._-]+/[a-z0-9._-]+$ ]]; then
+            echo "capture: skipped unit='${unit}' reason=malformed client unit — expected grammar '${CUSTOM_UNIT_GRAMMAR}' (C-6); /speckit.<command> and skill:<name> families are rejected for client findings (C-7); triage=${triage_value}; zero entries"
+            return 0
+        fi
+    fi
+
+    # C-9/C-2: 武装态唯一解析器 — 探针机读输出只解析一次, 全程复用。
+    local -a facts=()
+    mapfile -t facts < <(probe_facts "$root")
+    local registry_state="${facts[0]:-unavailable}"
+    local ext_count=0
+    [[ "$registry_state" != "unavailable" ]] && ext_count="$registry_state"
+
+    local unit_source=""
+    if [[ -n "$unit" ]]; then
+        # C-2/C-3: 显式单元优先, 但只消解歧义、不豁免探针存在性检查。
+        unit_source="explicit"
+        if [[ "$registry_state" == "unavailable" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} unit=${unit} reason=probe registry unavailable (un-upgraded .specify/ runtime); guidance=re-initialize/upgrade .specify/ (C-4); zero entries"
+            return 0
+        fi
+        local probe_unit matched=false
+        for probe_unit in "${facts[@]:1}"; do
+            [[ "$probe_unit" == "$unit" ]] && matched=true
+        done
+        if [[ "$matched" != "true" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} unit=${unit} reason=specified unit has no external probe object in this client project; guidance=arm the channel via 'probe-utils.py --action probe-inject --unit ${unit}' for that unit (C-3); zero entries"
+            return 0
+        fi
+    else
+        if [[ "$registry_state" == "unavailable" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} reason=probe registry unavailable (un-upgraded .specify/ runtime); guidance=re-initialize/upgrade .specify/ (C-4); zero entries"
+            return 0
+        fi
+        if [[ "$ext_count" == "0" ]]; then
+            echo "capture: client-channel-unarmed triage=${triage_value} reason=no external probe object in this client project; guidance=arm the channel via 'probe-utils.py --action probe-inject --unit ${CUSTOM_UNIT_GRAMMAR}'; zero entries"
+            return 0
+        fi
+        if [[ "$ext_count" != "1" ]]; then
+            echo "capture: client-unit-ambiguous triage=${triage_value} reason=${ext_count} external probe objects and no explicit --unit — no guessing, no rotation, no most-recently-used (C-5); zero entries"
+            return 0
+        fi
+        unit="${facts[1]}"
+        unit_source="auto:unique-external-probe"
+    fi
+
+    # C-17/C-21: 计数只从汇总命令的机读形态取; 退出 2 = 输入不可解析。
+    local summary_json summary_rc=0
+    summary_json=$("$0" report --summary --file "$review_file" --format json 2>/dev/null) || summary_rc=$?
+    if [[ "$summary_rc" -eq 2 || -z "$summary_json" ]]; then
+        echo "capture: counts-unavailable triage=${triage_value} reason=summary exited ${summary_rc} for ${review_file} (input unparseable — counts never zero-filled, C-21); zero entries"
+        return 0
+    fi
+
+    # C-16: 六项计数逐项抄录, 含零值, 不重算不估算。
+    local counts
+    counts=$(printf '%s\n' "$summary_json" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+c = d["counts"]
+order = ("blocking", "important", "suggestion", "nitpick", "question", "praise")
+print("\n".join(f"{k}={c[k]}" for k in order))
+' 2>/dev/null) || counts=""
+    if [[ -z "$counts" ]]; then
+        echo "capture: counts-unavailable triage=${triage_value} reason=summary JSON not machine-readable for ${review_file} (C-21); zero entries"
+        return 0
+    fi
+
+    # C-18: 运行标识 = 记录头日期戳。
+    local run_id; run_id=$(run_id_from_record "$review_file")
+
+    # C-11/C-15: 单条指针条目, 字段集封闭; 引擎的 (unit, run) 键答重复 (C-18)。
+    local futils="$root/.specify/scripts/python/feedback-utils.py"
+    if [[ ! -f "$futils" ]]; then
+        echo "capture: counts-unavailable triage=${triage_value} reason=feedback engine not installed at $futils; zero entries"
+        return 0
+    fi
+    local payload record_out record_rc=0 entry_id
+    payload=$(capture_payload "$review_file" "$triage_value" "$run_id" "$unit" "$counts")
+    record_out=$(python3 "$futils" --action record \
+        --unit-id "$unit" --unit-type custom-unit --run-id "$run_id" \
+        --review "$payload" --points "$CAPTURE_POINT" --format json 2>/dev/null) || record_rc=$?
+    if [[ "$record_rc" -ne 0 || -z "$record_out" ]]; then
+        echo "capture: counts-unavailable triage=${triage_value} reason=feedback engine refused the write (rc=${record_rc}) — review run not blocked, the optionality red line outranks capture (C-21); zero entries"
+        return 0
+    fi
+    entry_id=$(printf '%s\n' "$record_out" | python3 -c \
+        'import json, sys; print(json.load(sys.stdin).get("id", ""))' 2>/dev/null || true)
+
+    echo "capture: client-channel-armed triage=${triage_value} unit=${unit} run=${run_id} entry=${entry_id} unit_source=${unit_source}"
+    return 0
+}
+
+
 usage() {
     cat << 'EOF'
 
@@ -1252,6 +1482,7 @@ main() {
         triage)  cmd_triage "$@" ;;
         start)   cmd_start "$@" ;;
         receipt) cmd_receipt "$@" ;;
+        capture) cmd_capture "$@" ;;
         help|-h|--help) usage ;;
         *)       die "未知命令: $cmd (使用 --help 查看用法)" ;;
     esac
