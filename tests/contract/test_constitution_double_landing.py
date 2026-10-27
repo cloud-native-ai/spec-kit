@@ -13,7 +13,7 @@ first tested sample of the guard that should have caught it.
 Two deliberate design constraints:
 
 * **No roman numerals are pinned** (C-8). The template roster and the live constitution roster
-  are different sizes (13 vs 15) and either can grow; a matcher keyed to `### XIV.` would
+  are different sizes (17 vs 18) and either can grow; a matcher keyed to `### XIV.` would
   misfire the day a principle is inserted above it. Titles are matched by name, and the
   matcher's numeral-agnosticism is itself asserted.
 * **Set membership, never substring containment** (C-7). `Code as the Single Source of Truth`
@@ -52,6 +52,8 @@ DOUBLE_LANDING_WATCHLIST = (
     "User-Facing Comprehension (No Jargon, With Context)",
     "One Source of Truth (Authority & Reference Discipline)",
     "Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)",
+    "Directory Governance (Named, Documented, Ignored When Temporary)",
+    "Grounded Naming",
 )
 
 # C-8: numeral-agnostic matchers. `[IVXLC0-9]+` accepts roman or arabic; nothing pins a value.
@@ -66,10 +68,10 @@ LIVE_TITLE_RE = TEMPLATE_TITLE_RE
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
-TEMPLATE_COUNT = 15     # stale-pin update (067 T025, 2026-10-22): 14 -> 15 (XV Single-Run
-                        # Evidence joined the preset template, f1f6e96a 2026-10-16, pre-067)
-LIVE_COUNT = 16         # 14 pre-existing + 1 (XIV already carries STR-006) + 1 (XVI landed here)
-COMMAND_COUNT = 8       # 5 pre-existing + 2 (Feature 051) + 1 landed here (Feature 052)
+TEMPLATE_COUNT = 17     # stale-pin update (2026-10-27): 16 -> 17 (XVII Grounded Naming);
+                        # previously 15 -> 16 (XVI Directory Governance, 067 T025)
+LIVE_COUNT = 18         # stale-pin update (2026-10-27): 17 -> 18 (XVIII Grounded Naming)
+COMMAND_COUNT = 10      # stale-pin update (2026-10-27): 9 -> 10 (Grounded Naming entry)
 MIN_VERSION = (1, 13)   # floor semantics, never an equality pin
 
 
@@ -459,8 +461,11 @@ def test_c12_live_constitution_version_and_sync_impact_report():
         "the Sync Impact Report must be prepended as an HTML comment at the top of the file"
     )
     assert re.search(r"Version change:.*→", head), "the report must state the version change"
-    assert STR003_TITLE.split(" (")[0] in head, (
-        "the report must name the principle this amendment added"
+    # The report history is append-only, so the 051 block now sits below the 40-line
+    # window; its presence is checked against the whole file, while the head-based
+    # check below stays pointed at the CURRENT amendment.
+    assert STR003_TITLE.split(" (")[0] in text, (
+        "the 051 Sync Impact Report must stay in the file's report history"
     )
     # The assertion above is pinned to Feature 051's title, so on its own it stays green for any
     # later amendment that never names its own principle -- a check whose output is not about the

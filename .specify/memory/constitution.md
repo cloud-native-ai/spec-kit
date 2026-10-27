@@ -1,5 +1,39 @@
 <!--
 Sync Impact Report
+- Version change: 1.14.0 → 1.15.0 (MINOR; new Principle XVIII added, 2026-10-27)
+- Added principles: XVIII. Grounded Naming — a name links an entity into the project's knowledge network and MUST NOT be improvised; the first available source decides, in order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name; a mandated rename lands in every reference in the same change
+- Modified principles: VI. Continuous Quality & Observability — two bullets added: symptom suppression is not a fix (judge success at the whole-run level), and version control is the backup (no `.bak` / `.backup` / `.orig` copies)
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — X. Non-Destructive Remediation gains the two new bullets; new XVII. Grounded Naming; principles 16 → 17
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 9 → 10 entries
+  ✅ templates/instructions-template.md (+ mirror + .specify/instructions.md) — two ambient sections: `## Root-Cause Problem Solving` and `## Grounded Naming`
+  ✅ tests/contract/test_constitution_double_landing.py — template 17 / live 18 / skill 10; watchlist 4 → 5
+  ✅ tests/contract/test_fast_fail_discipline.py — version 1.15.0, counts, watchlist length, rendered rows, and the stale section-count pins
+- Follow-up TODOs: none
+- Preserved by design: `templates/plan-template.md` renders the principle roster dynamically, so the new row needs no edit; the rules are short enough to live in the constitution itself, so no new `shared/` guideline is introduced; the live roster keeps its own numbering (Grounded Naming is XVIII here, XVII in the template)
+-->
+
+<!--
+Sync Impact Report
+- Version change: 1.13.0 → 1.14.0 (MINOR; new Principle XVII added, 2026-10-27)
+- Added principles: XVII. Directory Governance (Named, Documented, Ignored When Temporary) — every directory MUST exist for a documented reason, under a documented lowercase kebab-case name, and be registered in its area's directory map in the same change that creates it; a temporary directory MUST use a sanctioned root and be matched by `.gitignore` before its first write
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XVI. Directory Governance; principles 15 → 16
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 8 → 9 entries
+  ✅ shared/guidelines/directory-governance.md (+ .specify mirror) — NEW owner: naming rules, registration obligation, area-owner index, temporary-directory routing
+  ✅ templates/instructions-template.md (+ mirror + .specify/instructions.md) — the `## Temporary Directory Discipline` section gains the directory-governance pointer; section count unchanged
+  ✅ tests/contract/test_constitution_double_landing.py — counts raised (template 16 / live 17 / skill 9); watchlist 3 → 4
+  ✅ tests/contract/test_fast_fail_discipline.py — stale pins raised in the same batch (version 1.14.0, counts, watchlist length)
+  ✅ tests/contract/test_directory_governance.py (NEW) — guards owner declaration, naming/registration rules, temp-dir routing, and the ambient pointer
+- Follow-up TODOs: (a) a repo-root `tmp/` directory (git-ignored, holds `eval-baseline/`) predates this principle and is not a sanctioned root — relocating it vs. registering it is a user decision, so it is left untouched; (b) the template carries XV. Single-Run Evidence while the live roster does not — an independent downstream numbering choice, not caused by this amendment
+- Preserved by design: `templates/plan-template.md` is untouched (it enumerates principles dynamically); requirements/tasks templates carry no principle-number reference this amendment changes; `scripts/` and `src/specify_cli/` are untouched
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.12.0 → 1.13.0 (MINOR; new Principle XVI added, 2026-09-23)
 - Added principles: XVI. Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) — an anomaly found mid-run MUST be triaged before it is acted on, by one binary and decidable question: does resolving it need correction (exactly one reading consistent with the recorded intent, local and reversible, no downstream premise falsified, blast radius inside the declared scope) or decision (a choice between readings, or intent no artifact records)? Correction is repaired in passing and disclosed at wrap-up; decision halts at the anomaly point and hands the user a surface report
 - Modified principles: None
@@ -99,6 +133,8 @@ All components MUST be observable, versioned, and maintainable:
 - Linting, formatting, and basic tests MUST pass in CI
 - New behavior MUST be reflected in specs/plan/tasks/docs where applicable
 - Root-cause over "good enough": when results fall short of the stated bar, locate and fix the root cause rather than settling near the threshold
+- **Symptom suppression is not a fix**: commenting out the code that fails to compile, skipping or muting a failing command, or excluding a failing check MUST NOT count as solving a problem; whether a problem is solved MUST be judged at the whole-run level, never by one step turning green
+- **Version control is the backup**: under version control, a `.bak` / `.backup` / `.orig` copy MUST NOT be created to preserve a file; delete what should go — history is an unambiguous backup and a random copy is not
 
 Rationale: Makes systems debuggable, upgradable, maintainable, and ensures consistent quality.
 
@@ -251,6 +287,49 @@ halts, two-strike stagnation escalation) without ever defining it, so the same o
 restated in scattered places and had drifted between them; naming the owner is what makes it
 enforceable, exactly as Principle XV did for prose aimed at humans.
 
+### XVII. Directory Governance (Named, Documented, Ignored When Temporary)
+Every directory in this repository MUST exist for a documented reason, under a documented
+name, with a documented meaning:
+- The rules — naming, the registration obligation, the index of owner documents, and the
+  temporary-directory requirement — are defined once in
+  `.specify/shared/guidelines/directory-governance.md`; consumers MUST reference it, do not
+  restate it.
+- A new top-level directory, or the first of a new kind under an existing tree, MUST be
+  registered in its area's directory map in the same change that creates it; a directory
+  whose meaning is documented nowhere MUST NOT be created.
+- Directory names MUST be lowercase kebab-case and read as the concept they hold, following
+  the path-is-semantic rule of Principle X; tool/framework-mandated names MUST NOT be
+  renamed.
+- A temporary or scratch directory MUST use a sanctioned root and MUST already be matched by
+  `.gitignore` before its first write inside the repository; roots, cleanup, and exceptions
+  are owned by `.specify/shared/guidelines/temp-directory-discipline.md`.
+- This principle adds a naming and registration obligation, not machinery: it MUST NOT
+  justify a directory scanner, a registry generator, or any new tracking system.
+
+Rationale: an unowned directory is a silent claim on the repository's structure — it appears
+with no stated purpose, survives by inertia, and later readers cannot tell a deliberate
+layout from leftover scratch. Documenting name and meaning at creation is one sentence of
+work that keeps the tree legible; the temporary-directory rule extends the same discipline to
+data that must not outlive its work item.
+
+### XVIII. Grounded Naming
+A name is load-bearing information that links an entity into the project's knowledge network,
+so naming MUST NOT be improvised; when a name must be chosen, the first available source in
+this order decides:
+- User instruction — a name the user stated MUST be used verbatim.
+- Project convention — an established naming rule (style guide, directory convention,
+  glossary term) MUST win over personal preference.
+- Sibling imitation — with no rule, the name MUST follow the closest same-kind siblings
+  already in the codebase.
+- Own choice — only when none of the above applies MAY a new name be invented, and it MUST
+  describe what the entity is or does, not where it happened to be used.
+- A rename that a higher-priority source mandates MUST be carried through every reference
+  in the same change.
+
+Rationale: a name is how every later reader, search, and agent finds an entity and connects
+it to related concepts. An improvised name silently breaks those links, so the cheapest
+correct decision is always the one an existing authority already made.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -301,4 +380,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.13.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-09-23
+**Version**: 1.15.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-10-27

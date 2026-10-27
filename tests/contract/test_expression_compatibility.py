@@ -361,9 +361,30 @@ def test_c1_skill_inventory_is_frozen():
 # driver gained the per-window iteration token (Qoder duplicate-call guard).
 # The historical pre-change hash stays untouched; this allowlist names every
 # post-baseline drift with its reason and re-asserts the intended content.
+# 2026-10-27: the Directory Governance amendment edits two more non-wiring
+# skills (the generator's MUST-include list and the setup skill's Hard
+# Requirements); each entry now carries the needles its change must contain.
 ALLOWED_POST_BASELINE_CHANGES = {
     "skills/external/sdd-loop-driver/SKILL.md": (
-        "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)"
+        "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)",
+        ("监听签名唯一", "--iter"),
+    ),
+    "skills/external/sdd-project-setup/SKILL.md": (
+        "2026-10-27 Directory Governance (Hard Requirements 10-11)",
+        ("目标项目治理优先", "目录创建限于规范落点"),
+    ),
+    "skills/internal/manage-constitution/SKILL.md": (
+        "2026-10-27 Directory Governance MUST-include entry (Principle XVII)",
+        ("Directory Governance (Named, Documented, Ignored When Temporary)",),
+    ),
+}
+
+# The historical baseline stays; a later amendment that legitimately edits an
+# untouchable path records itself here with the content it must carry.
+ALLOWED_POST_BASELINE_PATHS = {
+    ".specify/instructions.md": (
+        "2026-10-27 Directory Governance pointer in the Temporary Directory Discipline section",
+        ("directory-governance.md",),
     ),
 }
 
@@ -400,11 +421,12 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
         "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
         "feedback-step pointer). drifted: %r" % drifted
     )
-    for rel, reason in ALLOWED_POST_BASELINE_CHANGES.items():
+    for rel, (reason, needles) in ALLOWED_POST_BASELINE_CHANGES.items():
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
-        assert "监听签名唯一" in text and "--iter" in text, (
-            "allowed post-baseline change must carry its intended content: %s (%s)"
-            % (rel, reason)
+        missing = [needle for needle in needles if needle not in text]
+        assert not missing, (
+            "allowed post-baseline change must carry its intended content: %s (%s); "
+            "missing %r" % (rel, reason, missing)
         )
 
 
@@ -421,11 +443,21 @@ def test_c5_untouchable_framework_paths_are_unchanged():
         ".specify/instructions.md",
     )
     assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
-    changed = [line for line in proc.stdout.splitlines() if line.strip()]
+    changed = [
+        line.strip() for line in proc.stdout.splitlines()
+        if line.strip() and line.strip() not in ALLOWED_POST_BASELINE_PATHS
+    ]
     assert not changed, (
         "paths the slice must not touch changed relative to %s: %r"
         % (PRE_CHANGE_HEAD[:8], changed)
     )
+    for rel, (reason, needles) in ALLOWED_POST_BASELINE_PATHS.items():
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        missing = [needle for needle in needles if needle not in text]
+        assert not missing, (
+            "allowed post-baseline path change must carry its intended content: %s (%s); "
+            "missing %r" % (rel, reason, missing)
+        )
 
 
 # --------------------------------------------------------------------------- #

@@ -81,6 +81,8 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 7. **运行时与 CLI 就绪先于 init**：S2 执行 specify init 前 MUST 完成 S2 的 CLI 层——python 解析阶梯三级全缺 → **报错退出，绝不自动安装 Python**；CLI 安装链三源全败 → 报告缺口并停止；两者都不得静默跳过 init 或手工伪造 `.specify/`。
 8. **指令体积预算收敛**：S3 的 `/speckit.instructions` 之后 MUST 读取生成器的 `BUDGET` 报告；`over` 时 MUST 先走 owner 的 R1/R2，仍超且存在可迁移 project-filled 章节时 MUST 按 `references/setup-recipes.md` § S3.4 执行 R3 回退；未回到预算内且无可迁移章节时 MUST 作为 pending 上报（上调预算/拆分章节），不得静默转述告警或删除项目内容。当**模板全量注入**（而非项目自有章节）是把预算推过界的来源时，MUST 按 § S3.4 的 pointer-first 分支只注入短指针节并登记省略清单。
 9. **本地拓扑原生承载**：入口未给环境信息（无 host/ssh 别名且无项目路径）时，目标项目缺省为当前项目、拓扑为本地（S0 缺省表）；此情形下治理命令由编排者亲自执行，或交给当前宿主 agent 的**原生子代理**——MUST NOT 以 `qodercli` / `claude -p` 等外部 agent CLI 启动子代理。外部 CLI 仅用于远端拓扑（治理命令为交互短任务，不满足外部模式的隔离/并行/长跑刚需；native-first 依据：`.specify/shared/definitions/subagent-definitions.md` § mode selection）。
+10. **目标项目治理优先（本地与远端同规）**：调协任何目标项目之前，MUST 先读取目标项目既有的宪法（`.specify/memory/constitution.md`）与指令（`.specify/instructions.md` 及其兼容符号链接），并在全部动作中遵守其原则、目录规范、命名规则与临时目录纪律；调协 MUST NOT 覆盖、绕过或删改这些治理内容。目标项目尚无治理文档时，按框架模板生成（constitution / instructions），MUST NOT 凭空自造规则。经 ssh 的远端目标同规——远端目录创建同样受目标项目治理约束。
+11. **目录创建限于规范落点**：调协过程的目录创建 MUST 限于框架既有落点（`specify init` 产物、`.specify/.tmp/`、目标项目治理文档声明的目录）；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根；需要临时数据时按目标项目的纪律（无则框架 `temp-directory-discipline`）落位，并在首次写入前确认 `.gitignore` 覆盖。
 
 ## Discipline Defaults
 

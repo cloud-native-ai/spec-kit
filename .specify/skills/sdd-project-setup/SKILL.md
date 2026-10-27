@@ -1,6 +1,6 @@
 ---
 name: sdd-project-setup
-description: SDD 项目框架调协手册（可独立运行）——把目标项目（本地或远端）以调协模式推进到 spec-kit 框架预期的最佳状态：机制盘点（确定性脚本分级 absent/degraded/partial/complete）、specify CLI 安装（python 解析阶梯 + 三源 pip 回退；Python 全缺绝不自动安装、报错退出）、specify init / instructions 刷新、调协序列（constitution → sanitize → feature → instructions → docs，按需逐项）、强化序列（history → docs → research → feature → goal——会话历史蒸馏补料、深度调研、特性列表生成、定义 3–5 个项目目标）、五族前置检查与兼容符号链接验证，最后产出候选工作清单（未完成 feature / 大改进 feedback / TODO 事项——建议而非强制地供 sdd-loop-driver 等下游选用；两技能互不强依赖）。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册。
+description: SDD 项目框架调协手册（可独立运行）——把目标项目（本地或远端）以调协模式推进到 spec-kit 框架预期的最佳状态：机制盘点（确定性脚本分级 absent/degraded/partial/complete）、specify CLI 安装（python 解析阶梯 + 三源 pip 回退；Python 全缺绝不自动安装、报错退出）、specify init / instructions 刷新、调协序列（constitution → sanitize → feature → instructions → docs，按需逐项）、强化序列（history → docs → research → feature → goal → 按需 agent/team——会话历史蒸馏补料、深度调研、特性列表生成、定义 3–5 个项目目标）、**逻辑框架就绪矩阵**（instructions/feature/goal/docs 必选、agent/team 按需）、五族前置检查与兼容符号链接验证，最后产出候选工作清单（未完成 feature / 大改进 feedback / TODO 事项——建议而非强制地供 sdd-loop-driver 等下游选用；两技能互不强依赖）。当用户说「初始化 spec-kit」「项目接入 SDD」「框架就绪检查」「调协项目框架」「sdd-project-setup」，或 sdd-loop-driver 的 preflight 发现目标项目无 .specify/ 或机制退化时加载本手册。
 skill_id: "<SKILL:.specify/skills/sdd-project-setup/SKILL.md>"
 classification: external
 ---
@@ -10,6 +10,8 @@ classification: external
 ## What This Skill Does
 
 spec-kit 本地 fork（master）在上游 SDD 之上扩充了大量机制——feature 注册表（37/41 真实项目采用）、feedback 库、memory-as-files、glossary、ID register、evidence、probe 体系等。这些机制只有被正确安装、激活、验证后才能兑现价值。本手册把「让一个项目达到 spec-kit 框架预期的最佳状态」固化为**调协模式**五步程序：先盘点定缺口，再按需调协，最终验证；调协完成后产出候选工作清单供下一步 SDD 开发选用（可选 handoff sdd-loop-driver，非强制）。
+
+调协对象是**双层框架**：**物理机制**（`.specify/` 目录/脚本/链接）与**逻辑框架**（instructions / feature / goal / docs 为必选层，agent / team 为按需层）——只把目录铺齐而逻辑资产缺位，不算就绪。两层各有确定性盘点：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py`。
 
 调协分两层：**基础调协**（机制盘点/安装/修复/验证，S1–S4）让框架就绪；**强化序列**（机制就绪后的增值建设，S3+，按需逐项）用框架内容类命令把项目从「机制可用」推进到「知识与规划在位」——history 蒸馏会话历史为文档与知识库补料、research 深度调研、feature 生成特性列表、goal 定义 3–5 个项目目标。
 
@@ -35,8 +37,9 @@ spec-kit 本地 fork（master）在上游 SDD 之上扩充了大量机制——f
 
 ```text
 S0 ENTRY     一遍性入口：目标、模式、目标工具
-S1 ASSESS    机制盘点：scripts/mechanism-inventory.py 扫描 .specify/ → 状态分级
-             （absent / partial / degraded / complete）+ 框架版本 provenance
+S1 ASSESS    双盘点：scripts/mechanism-inventory.py 扫物理机制 → absent/partial/
+             degraded/complete + provenance；scripts/logical-framework.py 扫逻辑
+             框架 → required/recommended/conditional 三层判定
 S2 INSTALL   （全部在执行侧=目标项目所在环境运行；编排侧本地宿主无需
              speckit，不误触发安装链——拓扑真源见
              .specify/shared/workflow/execution-topology.md）
@@ -51,11 +54,12 @@ S3 RECONCILE 基础调协（按 S1 缺口按需逐项，惯常次序）：
 S3+ STRENGTHEN 强化序列（机制就绪后的增值建设，按需逐项，细则见
              setup-recipes.md）：/speckit.history → /speckit.docs 深化 →
              /speckit.research → /speckit.feature 特性生成 →
-             /speckit.goal（定义 3–5 个项目目标）
+             /speckit.goal（定义 3–5 个项目目标）→ /speckit.agents 与
+             /speckit.team（**按需**：项目使用多 agent/团队时才配置）
 S4 VERIFY    五族前置检查（SSH/运行用户/CLI/LLM 配置/spec-kit 可用性；
              本地拓扑仅 ④ LLM 配置/⑤ spec-kit 可用性，①–③ 不适用）+
              宿主 hook 体检（scripts/hook-health.py：同步 hook 阻塞/超时风险；
-             vendor 自愈遥测 hook 只报告）+ 机制完备度矩阵复扫 +
+             vendor 自愈遥测 hook 只报告）+ 物理/逻辑矩阵复扫 +
              兼容符号链接核验 → 全绿才算调协完成
 S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature / 大规模改进
              feedback / speckit TODO 事项）→ 建议（非强制）下一步可用
@@ -64,19 +68,21 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 
 **Dispatch carrier（承载选择）**：本地拓扑（缺省）→ 编排者直执或宿主**原生子代理**（native subagent）；远端拓扑 → 外部 agent CLI（`qodercli` 等）经 run-agent 以拓扑声明派发。MUST NOT 在本地启动 `qodercli` 作为子代理——细则见「Subagent Delegation」。
 
-**Instruction-chain budget gate**: `/speckit.instructions` 的 `BUDGET` 报告是 S3 的收敛条件之一；超预算处理见 `references/setup-recipes.md` § S3.4（先走 owner 的 R1/R2，仍超则执行 R3 project-filled 章节外迁；无法收敛列 pending）。
+**Instruction-chain budget gate**: `/speckit.instructions` 的 `BUDGET` 报告是 S3 的收敛条件之一；超预算处理见 `references/setup-recipes.md` § S3.4（先走 owner 的 R1/R2，仍超则执行 R3 project-filled 章节外迁；**模板全量注入本身就会超预算时走 pointer-first 分支**——只加短指针节，缺省章节记 pending，不得整段跳过或静默省略）。
 
 ## Hard Requirements
 
-1. **盘点先于处置**：S2/S3 的任何动作之前必须先跑 S1 脚本盘点——禁止凭印象判定项目状态（archive-not-delete；本仓 fleet 实测中 4/41 为退化安装、2/41 缺特性注册表，肉眼不可判）。
-2. **就绪是三态判定而非二态**：`.specify/` 存在 ≠ 就绪；S4 三条件（五族前置检查全 ok + 机制矩阵达 complete 或缺口已声明 + 符号链接完好）同时成立才判调协完成。
+1. **盘点先于处置**：S2/S3 的任何动作之前必须先跑 S1 的**两个**盘点脚本（物理机制 + 逻辑框架）——禁止凭印象判定项目状态（archive-not-delete；本仓 fleet 实测中 4/41 为退化安装、2/41 缺特性注册表，肉眼不可判）。
+2. **就绪是三态判定而非二态**：`.specify/` 存在 ≠ 就绪；S4 三条件（五族前置检查全 ok + 物理矩阵 complete **且逻辑矩阵 required 层无未声明缺口** + 符号链接完好）同时成立才判调协完成；recommended/conditional 层缺口按声明式纪律登记，不自动算 fail。
 3. **调协按需、不整建**：S3 只执行 S1 判定缺失的项，每项一个治理命令，命中即停；不存在的机制不预建（tools/register 等低频机制按项目需要，缺≠错）。
 4. **声明式缺口**：S3 调协的每一项在产出中登记（执行/已存在/跳过+理由）；未被处理的项必须出现在「未处理清单」——静默省略视为违规。
 5. **建议而非强制**：S5 的候选工作清单是提示（有哪些可做的事），不携带任何「必须调用 sdd-loop-driver」的语义；调用与否由用户或上游流程决定。
 6. **幂等收敛**：S2/S3/S3+ 的每一动作 MUST 幂等——同一稳定态上重复执行不产生新的写动作；每项动作执行前 MUST 以本次 S1 盘点结果为缺口凭据，禁止凭上次执行的记忆跳过或重做（幂等与重入语义见 setup-recipes.md）。
 7. **运行时与 CLI 就绪先于 init**：S2 执行 specify init 前 MUST 完成 S2 的 CLI 层——python 解析阶梯三级全缺 → **报错退出，绝不自动安装 Python**；CLI 安装链三源全败 → 报告缺口并停止；两者都不得静默跳过 init 或手工伪造 `.specify/`。
-8. **指令体积预算收敛**：S3 的 `/speckit.instructions` 之后 MUST 读取生成器的 `BUDGET` 报告；`over` 时 MUST 先走 owner 的 R1/R2，仍超且存在可迁移 project-filled 章节时 MUST 按 `references/setup-recipes.md` § S3.4 执行 R3 回退；未回到预算内且无可迁移章节时 MUST 作为 pending 上报（上调预算/拆分章节），不得静默转述告警或删除项目内容。
+8. **指令体积预算收敛**：S3 的 `/speckit.instructions` 之后 MUST 读取生成器的 `BUDGET` 报告；`over` 时 MUST 先走 owner 的 R1/R2，仍超且存在可迁移 project-filled 章节时 MUST 按 `references/setup-recipes.md` § S3.4 执行 R3 回退；未回到预算内且无可迁移章节时 MUST 作为 pending 上报（上调预算/拆分章节），不得静默转述告警或删除项目内容。当**模板全量注入**（而非项目自有章节）是把预算推过界的来源时，MUST 按 § S3.4 的 pointer-first 分支只注入短指针节并登记省略清单。
 9. **本地拓扑原生承载**：入口未给环境信息（无 host/ssh 别名且无项目路径）时，目标项目缺省为当前项目、拓扑为本地（S0 缺省表）；此情形下治理命令由编排者亲自执行，或交给当前宿主 agent 的**原生子代理**——MUST NOT 以 `qodercli` / `claude -p` 等外部 agent CLI 启动子代理。外部 CLI 仅用于远端拓扑（治理命令为交互短任务，不满足外部模式的隔离/并行/长跑刚需；native-first 依据：`.specify/shared/definitions/subagent-definitions.md` § mode selection）。
+10. **目标项目治理优先（本地与远端同规）**：调协任何目标项目之前，MUST 先读取目标项目既有的宪法（`.specify/memory/constitution.md`）与指令（`.specify/instructions.md` 及其兼容符号链接），并在全部动作中遵守其原则、目录规范、命名规则与临时目录纪律；调协 MUST NOT 覆盖、绕过或删改这些治理内容。目标项目尚无治理文档时，按框架模板生成（constitution / instructions），MUST NOT 凭空自造规则。经 ssh 的远端目标同规——远端目录创建同样受目标项目治理约束。
+11. **目录创建限于规范落点**：调协过程的目录创建 MUST 限于框架既有落点（`specify init` 产物、`.specify/.tmp/`、目标项目治理文档声明的目录）；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根；需要临时数据时按目标项目的纪律（无则框架 `temp-directory-discipline`）落位，并在首次写入前确认 `.gitignore` 覆盖。
 
 ## Discipline Defaults
 
@@ -88,13 +94,14 @@ S5 SUGGEST   产出候选工作清单（三个内部来源：未完成 feature /
 ## References
 
 - `.specify/shared/workflow/execution-topology.md` — 执行拓扑真源：编排侧/执行侧两侧角色划分、speckit 安装归属（只在执行侧）、本地退化形态、误读反模式清单。
-- `references/setup-recipes.md` — 五步执行细则：机制矩阵维度定义、状态分级判据、CLI 安装链（python 解析阶梯 / 三源 pip 回退 / specify check 验证）、init/refresh 命令形态（本地与远端，含 `--ai all` 全 agent 一次性 init）、S3 调协序列触发条件、五族前置检查引用（权威落点 run-agent dispatch-preflight.md）、符号链接核验、S5 候选工作清单 schema 与三个内部来源、与 sdd-loop-driver 的软协同契约。
+- `scripts/logical-framework.py` — 逻辑框架确定性盘点（instructions/feature/docs 必选、goal/glossary/register/knowledge 推荐、team/agent 条件层；`--json` / `--strict`；exit 0 ready / 1 必选缺口 / 2 非 Spec Kit），S1 与 S4 各跑一次。
+- `references/setup-recipes.md` — 五步执行细则：机制矩阵维度定义、**逻辑框架就绪矩阵**（S1 并列盘点）、状态分级判据、CLI 安装链（python 解析阶梯 / 三源 pip 回退 / specify check 验证）、init/refresh 命令形态（本地与远端，含 `--ai all` 全 agent 一次性 init）、S3 调协序列触发条件、五族前置检查引用（权威落点 run-agent dispatch-preflight.md）、符号链接核验、S5 候选工作清单 schema 与三个内部来源、与 sdd-loop-driver 的软协同契约。
 
 ## Subagent Delegation（子代理委派说明——2026-10-16 裁定）
 
 本手册是**编排者**：调协动作的执行主体按**执行拓扑**选择承载形态（承接技能可选——本技能独立运行时不强制）：
 
-- **盘点与验证的执行**：`scripts/mechanism-inventory.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
+- **盘点与验证的执行**：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行（占位约定同 `.specify/shared/workflow/external-dispatch-recipes.md`）。
 - **本地拓扑（默认：入口未给 host+path）**：`specify init` / `/speckit.*` 治理命令由编排者**亲自执行**，或交给**当前宿主 agent 的原生子代理**（native subagent，如 Claude Code `Agent`/`Task` 工具、Qoder CLI 原生 subagent）——MUST NOT 启动 `qodercli` / `claude -p` 等外部 agent CLI 作为子代理。本地无进程隔离、长跑或跨模型需求，原生是共享默认（`.specify/shared/definitions/subagent-definitions.md` § mode selection）。
 - **远端拓扑（入口给全 ssh 别名 + 运行用户 + 项目目录）**：治理命令经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发外部子代理（agent CLI，如 `qodercli`），`ssh + su` 进入执行侧——前置检查与失败处置链随其 `references/dispatch-preflight.md`。
 - **职责切分线**：框架调协（install/reconcile/strengthen/verify/候选清单）= 本技能；SDD 完整阶段循环 = sdd-loop-driver；创建/派发/修正 = create-agent / run-agent / improve-agent（见 `.specify/shared/definitions/agent-definitions.md` § Driving Subagents via the Three Layers）。

@@ -74,6 +74,10 @@ Owner-selection order, the duplicate conditions, the counts/enumerations rules, 
 
 A requirement, success criterion, DoD item, or verification task that asserts a machine-produced surface "changes only within …" or that anything "unaffected" stays identical is a **containment claim**, and MUST be decidable. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/closed-set-claims.md` (do NOT copy its rules; reference the file) — which owns the claim taxonomy (determinism vs containment), the required elements, the void conditions, and the repair procedure. Applies to every stability or containment assertion over generated or machine-produced surfaces.
 
+## Grounded Naming
+
+A name is key information: it links the entity into the project's knowledge network, and every later reader, search, and agent reaches the entity through it. Naming MUST NOT be improvised — when a name must be chosen, the first available source decides, in this order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name. A name mandated by a higher-priority source MUST be carried through every reference in the same change. Owner: the project constitution's Grounded Naming principle.
+
 ## Concurrent Development Safety (并发开发安全)
 
 Parallel branches and agent flows share one git history, so any machine-managed file that several flows rewrite is a merge-conflict hotspot. Storage design MUST assume concurrent writers:
@@ -87,7 +91,7 @@ Before creating or changing a machine-managed store, ask: **what happens if two 
 
 ## Temporary Directory Discipline
 
-Agent-created scratch MUST use a sanctioned temp root and MUST already be matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup, and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`.
+Agent-created scratch MUST use a sanctioned temp root and MUST already be matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup, and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows the naming and registration rules in `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
 
 ## Task Complexity Rubric
 
@@ -142,6 +146,10 @@ Every user-facing output has to be readable by someone who did not take part in 
 - **Governed surfaces are a closed set (受约束的界面类为封闭集)**: which kinds of user-facing output the discipline governs is enumerated in the owner, and that list grows only by revising it — never per command template.
 
 Should the owner document be missing from a project, it ships with the framework: refresh the project instructions to restore it together with its mirror copy. Do not reconstruct the rules from memory or act on a summary of them.
+
+## Root-Cause Problem Solving
+
+A problem is solved only when the whole run is correct, never because one step turned green. Symptom suppression MUST NOT be used as a fix: commenting out the code that fails to compile, skipping or muting a failing command, or excluding a failing check all make a step look green while leaving the problem in place — repair the root cause or report the problem. Under version control, a file that should go MUST be deleted rather than kept as `.bak` / `.backup` / `.orig`: history is an unambiguous backup and a random copy is not. Owner: the project constitution's quality and remediation principles.
 
 ## Fast Fail Discipline
 
