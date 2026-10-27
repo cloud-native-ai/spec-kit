@@ -1,0 +1,17 @@
+=== per-file counts (six new + five neighbouring) ===
+tests/contract/test_review_code_composition.py                 -> 31 passed in 0.09s
+tests/contract/test_code_review_skill_contract.py              -> 39 passed in 2.00s
+tests/contract/test_coverage_receipt.py                        -> 20 passed in 2.60s
+tests/contract/test_status_gate_owner.py                       -> 32 passed in 0.18s
+tests/contract/test_review_feedback_boundary.py                -> 30 passed in 0.59s
+tests/contract/test_review_docs_isomorphism.py                 -> 9 passed in 0.06s
+tests/contract/test_expression_compatibility.py                -> 16 passed in 0.23s
+tests/contract/test_run_skills_wiring.py                       -> 10 passed in 0.24s
+tests/contract/test_migration_distribution.py                  -> 18 passed in 0.10s
+tests/contract/test_flat_internal_skill_migration.py           -> 6 passed in 0.10s
+tests/contract/test_review_p1_review_loop.py                   -> 10 passed in 0.05s
+
+=== name-level comparison against baseline-failed.txt ===
+baseline entries: 26
+failing names in this closure run: 0
+comm -13 (names in current run but not in baseline) -> (empty)

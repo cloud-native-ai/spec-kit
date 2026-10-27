@@ -1,0 +1,4 @@
+$ python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py
+.........                                                                [100%]
+9 passed in 0.06s
+exit=0

@@ -1,0 +1,6 @@
+=== evidence-binding check: sha256 of each recorded pass sample ===
+OK   SC-002_gap_drill  .specify/specs/071-review-code-integration/test-evidence/quickstart-E-gap.txt  bytes=14755
+OK   SC-003_renderer_absent  .specify/specs/071-review-code-integration/test-evidence/quickstart-D-no-renderer.txt  bytes=14822
+OK   SC-004_gate_deny  .specify/specs/071-review-code-integration/test-evidence/quickstart-G-deny.txt  bytes=421
+OK   SC-005_no_record_for_non_run_triage  .specify/specs/071-review-code-integration/test-evidence/quickstart-C-no-record.txt  bytes=115
+OK   SC-007_feedback_classification  .specify/specs/071-review-code-integration/test-evidence/t036-closure-run.txt  bytes=340

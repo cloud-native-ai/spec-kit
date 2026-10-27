@@ -1,0 +1,3 @@
+refused: triage=not-applicable
+no record is created for a triage value other than run (C-11 / data-model V29)
+rc=2

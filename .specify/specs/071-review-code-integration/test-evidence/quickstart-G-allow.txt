@@ -1,0 +1,14 @@
+[1m━━━ Review 汇总: .specify/specs/071-review-code-integration/code-review.md ━━━[0m
+
+  🔴 [blocking]   0
+  🟠 [important]  0
+  🟢 [suggestion] 0
+  ⚪ [nitpick]    0
+  ❓ [question]   0
+  👍 [praise]     0
+
+record=.specify/specs/071-review-code-integration/code-review.md
+blocking_entries=0
+gate=allow
+  [0;32m✓ 合入门禁: 无未决 blocking/important — 满足收敛条件[0m
+exit=0

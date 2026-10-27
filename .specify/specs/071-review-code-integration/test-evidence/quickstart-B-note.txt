@@ -1,0 +1,4 @@
+[0;32m✓ 已追加: [suggestion] templates/commands/review.md[0m
+rc=0
+[0;32m✓ 已追加: [important] skills/internal/code-review/scripts/git-delta-review.sh:700[0m
+rc=0

@@ -1,0 +1,120 @@
+=== added files in feature range (whole repo) ===
+A	.specify/memory/exec-quant/records/20261027T062012806015Z-6a45767f.json
+A	.specify/memory/exec-quant/records/20261027T062558979526Z-671517ad.json
+A	.specify/memory/exec-quant/records/20261027T062614328509Z-1bfbc283.json
+A	.specify/memory/exec-quant/records/20261027T063831182687Z-13de340b.json
+A	.specify/memory/exec-quant/records/20261027T063834551204Z-8a50297f.json
+A	.specify/memory/exec-quant/records/20261027T065615532716Z-2ee11746.json
+A	.specify/memory/exec-quant/records/20261027T070317586599Z-c364fe74.json
+A	.specify/memory/exec-quant/records/20261027T070337079267Z-c35ed2e8.json
+A	.specify/memory/features/071.md
+A	.specify/memory/feedback/20261027T062017Z-speckit-requirements.md
+A	.specify/memory/feedback/20261027T062611Z-speckit-clarify.md
+A	.specify/memory/feedback/20261027T062617Z-skill-clarify-artifact.md
+A	.specify/memory/feedback/20261027T063846Z-speckit-plan.md
+A	.specify/memory/feedback/20261027T063850Z-skill-create-plan.md
+A	.specify/memory/feedback/20261027T065620Z-speckit-checklist.md
+A	.specify/memory/feedback/20261027T070324Z-speckit-analyze.md
+A	.specify/memory/feedback/20261027T070344Z-skill-analyze-artifacts.md
+A	.specify/memory/session/20261027T062008Z-run-determination-speckit-requirements-r20261027t061144z-a3e.md
+A	.specify/memory/session/20261027T062601Z-run-determination-speckit-clarify-r20261027t061144z-a3ec.md
+A	.specify/memory/session/20261027T062614Z-run-determination-skill-clarify-artifact-r20261027t061144z-a.md
+A	.specify/memory/session/20261027T063828Z-run-determination-speckit-plan-r20261027t061144z-a3ec.md
+A	.specify/memory/session/20261027T063834Z-run-determination-skill-create-plan-r20261027t061144z-a3ec.md
+A	.specify/memory/session/20261027T065612Z-run-determination-speckit-checklist-r20261027t061144z-a3ec.md
+A	.specify/memory/session/20261027T070314Z-run-determination-speckit-analyze-r20261027t061144z-a3ec.md
+A	.specify/memory/session/20261027T070336Z-run-determination-skill-analyze-artifacts-r20261027t061144z.md
+A	.specify/specs/071-review-code-integration/baseline-failed.txt
+A	.specify/specs/071-review-code-integration/checklists/requirements.md
+A	.specify/specs/071-review-code-integration/checklists/review-composition.md
+A	.specify/specs/071-review-code-integration/contracts/code-review-skill.md
+A	.specify/specs/071-review-code-integration/contracts/command-orchestration.md
+A	.specify/specs/071-review-code-integration/contracts/coverage-receipt.md
+A	.specify/specs/071-review-code-integration/contracts/feedback-and-boundaries.md
+A	.specify/specs/071-review-code-integration/contracts/status-gate-ownership.md
+A	.specify/specs/071-review-code-integration/contracts/tests-and-docs-sync.md
+A	.specify/specs/071-review-code-integration/coverage-baseline.txt
+A	.specify/specs/071-review-code-integration/data-model.md
+A	.specify/specs/071-review-code-integration/feature-ref.md
+A	.specify/specs/071-review-code-integration/notes/plan-remediation-round-1.md
+A	.specify/specs/071-review-code-integration/notes/plan-stage-checks.md
+A	.specify/specs/071-review-code-integration/notes/pre-change-measurements.md
+A	.specify/specs/071-review-code-integration/notes/red-first-evidence.md
+A	.specify/specs/071-review-code-integration/notes/remediation-round-1.md
+A	.specify/specs/071-review-code-integration/plan.md
+A	.specify/specs/071-review-code-integration/quickstart.md
+A	.specify/specs/071-review-code-integration/requirements.md
+A	.specify/specs/071-review-code-integration/research.md
+A	.specify/specs/071-review-code-integration/tasks.md
+A	.specify/specs/071-review-code-integration/test-evidence/analyze-report.md
+A	.specify/specs/071-review-code-integration/test-evidence/analyze-rerun-report.md
+A	.specify/specs/071-review-code-integration/test-evidence/analyze.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/checklist.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/clarify.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/clause-coverage-tasks.txt
+A	.specify/specs/071-review-code-integration/test-evidence/clause-coverage.txt
+A	.specify/specs/071-review-code-integration/test-evidence/clause-extraction.txt
+A	.specify/specs/071-review-code-integration/test-evidence/decomposition-check.json
+A	.specify/specs/071-review-code-integration/test-evidence/decomposition-check.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/decomposition-check.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/decomposition-tasks.json
+A	.specify/specs/071-review-code-integration/test-evidence/decomposition-tasks.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/implement-stage-status.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/overlap-check.json
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation-clause-coverage.txt
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation-clause-extraction.txt
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation-pre-analyze.json
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation-pre-analyze.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation-pre-analyze.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/plan-remediation.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/plan.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check-plan.exit
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check-plan.json
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check-plan.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check-plan.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check.json
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-check.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-tasks.json
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-tasks.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/pre-analyze-tasks.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/probe-handlers-check.txt
+A	.specify/specs/071-review-code-integration/test-evidence/regression-baseline.txt
+A	.specify/specs/071-review-code-integration/test-evidence/requirements-remediation-decomposition.json
+A	.specify/specs/071-review-code-integration/test-evidence/requirements-remediation-pre-analyze.json
+A	.specify/specs/071-review-code-integration/test-evidence/requirements-remediation-pre-analyze.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/requirements-remediation-validate.txt
+A	.specify/specs/071-review-code-integration/test-evidence/requirements-remediation.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-clause-coverage.txt
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-clause-extraction.txt
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-decomposition.json
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-pre-analyze.json
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-pre-analyze.stderr
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-pre-analyze.stdout
+A	.specify/specs/071-review-code-integration/test-evidence/tasks-remediation-validate.txt
+A	.specify/specs/071-review-code-integration/test-evidence/tasks.jsonl
+A	.specify/specs/071-review-code-integration/test-evidence/validate-checklist.txt
+A	.specify/specs/071-review-code-integration/test-evidence/validate-requirements.txt
+A	.specify/specs/071-review-code-integration/test-evidence/validate-tasks.txt
+A	tests/contract/test_code_review_skill_contract.py
+A	tests/contract/test_coverage_receipt.py
+A	tests/contract/test_review_code_composition.py
+A	tests/contract/test_review_docs_isomorphism.py
+A	tests/contract/test_review_feedback_boundary.py
+A	tests/contract/test_status_gate_owner.py
+A	tests/fixtures/review_git_repo.py
+
+=== scripts in the code-review skill dir ===
+git-delta-review.sh
+
+=== network / resident-process tokens in the touched script ===
+45:        "delta not found. Install: https://github.com/dandavison/delta (安装与配置见 references/delta-setup.md)"
+
+=== script dependency surface (external binaries invoked) ===
+      6 awk
+     42 delta
+     61 git
+      6 grep
+      2 mktemp
+      2 sed
+      1 sort

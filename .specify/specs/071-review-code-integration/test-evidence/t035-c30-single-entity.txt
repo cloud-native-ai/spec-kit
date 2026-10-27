@@ -1,0 +1,33 @@
+=== C-30: every new capability is a subcommand or option of the one script ===
+--- subcommand dispatch (main) ---
+        diff)    cmd_diff "$@" ;;
+        review)  cmd_review "$@" ;;
+        note)    cmd_note "$@" ;;
+        report)  cmd_report "$@" ;;
+        base)    cmd_base "$@" ;;
+        triage)  cmd_triage "$@" ;;
+        start)   cmd_start "$@" ;;
+        receipt) cmd_receipt "$@" ;;
+--- option parsers for the new options ---
+191:            --files|-f)        mode="files"; shift ;;
+377:            --file|-f)     filepath="$2"; shift 2 ;;
+380:            --review-file) rfile="$2"; shift 2 ;;
+405:# `--summary --file <code-review.md>` 的退出码字母表关闭于 0 允许 / 1 拒绝
+406:# (当前记录的 blocking 计数) / 2 输入错误。省略 `--file` 是历史模式,
+417:            --file|-f)    target="$2"; target_explicit=true; shift 2 ;;
+431:                "无可汇总的 Review 记录 (目录: $REVIEW_DIR); 用 --file <path> 指定记录"
+433:            warn "implicit selection: ${record} (legacy newest-file mode; the composed path always passes --file)"
+501:CODE_PATHS_OVERRIDE=()  # --code-paths <glob[,glob...]>
+509:# "什么算代码路径" 由本集合判定; 调用方可用 --code-paths 整体覆盖。
+673:            --code-paths)
+796:            --triage)   triage_value="$2"; shift 2 ;;
+--- count of executable script files under the skill ---
+1
+references/delta-setup.md
+references/review-workflow.md
+scripts/git-delta-review.sh
+SKILL.md
+--- no second engine: files added under scripts/ or src/ in range ---
+none added
+--- pyproject / dependency surface unchanged ---
+(empty = unchanged)

@@ -1,0 +1,2 @@
+[0;32m✓ 已追加: [blocking] skills/internal/code-review/scripts/git-delta-review.sh:1011[0m
+rc=0

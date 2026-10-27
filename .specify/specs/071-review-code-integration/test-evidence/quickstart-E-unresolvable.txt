@@ -1,0 +1,4 @@
+base_source=not-evaluated
+reason=显式基准不可解析: deadbeefdeadbeef
+resolve_command=git log --diff-filter=A --format=%H -- <spec-dir>/requirements.md ; git rev-parse HEAD ; git merge-base <trunk> HEAD
+rc=2

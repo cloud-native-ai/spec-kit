@@ -1,0 +1,3 @@
+$ sha256sum skills/internal/code-review/scripts/git-delta-review.sh .specify/skills/internal/code-review/scripts/git-delta-review.sh
+ec0e0f49736fc31714a40f1f34dcb094170eb1bae4c409fe4d8f85015c3c92fa  skills/internal/code-review/scripts/git-delta-review.sh
+ec0e0f49736fc31714a40f1f34dcb094170eb1bae4c409fe4d8f85015c3c92fa  .specify/skills/internal/code-review/scripts/git-delta-review.sh

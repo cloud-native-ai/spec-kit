@@ -1,0 +1,3 @@
+decision= pass errors= 0 advisories= 0 waived= None
+summary= {'errors': 0, 'advisories': 0, 'waived': 0, 'fr': 28, 'sc': 7, 'tasks': 36, 'clauses': 0, 'files': 15}
+advisory kinds: Counter()

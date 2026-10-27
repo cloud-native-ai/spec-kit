@@ -1,0 +1,8 @@
+[0;32m✓ 代码段记录已创建: .specify/specs/071-review-code-integration/code-review.md[0m
+record=.specify/specs/071-review-code-integration/code-review.md
+archive=none
+base=e57052efa1c16871da4e24a56eabf7402b6fd87e
+head=f02d9a0b887418753f4f05127519cebfe96fbf58
+base_source=feature-first-commit
+renderer=text
+rc=0

@@ -1,0 +1,15 @@
+$ sync-mirrors --check --only templates
+scope --only: templates
+ok    templates/ == .specify/templates/ (22 files)
+exit=0
+$ sync-mirrors --check --only skills/internal
+scope --only: skills/internal
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+exit=0
+$ sync-mirrors --check --only shared
+scope --only: shared
+ok    shared/ == .specify/shared/ (55 files)
+exit=0
+$ regen-command-copies --check
+OK: all per-tool command copies match the source templates.
+exit=0

@@ -1,0 +1,2 @@
+✗ 记录不存在: .specify/.tmp/quickstart-071/missing.md (先跑 start 创建/轮转记录)
+rc=2
