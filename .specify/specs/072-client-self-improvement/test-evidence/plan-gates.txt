@@ -1,0 +1,31 @@
+=== pre-analyze-check --stage plan (2026-10-27) ===
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=23 waived=0
+=== clause_extract (2026-10-27) ===
+cadence-and-metrics.md	form=md-bold-closed	clauses=11
+capture-step.md	form=md-bold-closed	clauses=15
+client-identity-and-armed-state.md	form=md-bold-closed	clauses=9
+client-improvement-loop.md	form=md-bold-closed	clauses=7
+digest-and-carriers.md	form=md-bold-closed	clauses=8
+red-lines-and-surfaces.md	form=md-bold-closed	clauses=12
+=== account-clause-coverage after freeze (2026-10-27) ===
+FR universe: 29
+FR claimed: 29
+FR uncovered: 0
+companion (must be non-empty on a green run): claimed clauses 0, scanned files 203, clause universe 1171, FR universe 29
+  [clause-uncovered] fail (557) — 557 uncovered, 62 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 29 of 29 FRs cited from citation groups
+  [coverage-baseline-delta] fail (62) — baseline holds 495 names; 495 uncovered items are baseline-internal and do not block
+status: uncovered
+=== plan integrity gate (2026-10-27) ===
+1
+0
+0 placeholder tokens
+1
+=== mirror baselines (2026-10-27) ===
+OK: all per-tool command copies match the source templates.
+DIFF  .specify/skills/improve-skills/references/loop-playbook.md
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+OK: all per-tool command copies match the source templates.
+=== guard suites (2026-10-27) ===
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+1 failed, 124 passed in 14.95s
