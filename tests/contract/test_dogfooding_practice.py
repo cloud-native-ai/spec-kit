@@ -113,7 +113,14 @@ SECTION_HEADING = "## Dogfooding Practice"
 # the compile-embeds renderer consumes). Closed-set pin updated same-batch.
 # 068 C-10 (2026-10-22, same-batch amendment): the receive leg adds the explicit
 # `ingest-exec-quant` engine action; the closed-set pin follows the action set.
-FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest", "ingest-exec-quant"}
+# 072 C-62 (2026-10-27, same-batch amendment): the client self-improvement loop
+# adds exactly one read-only action, `client-metrics` (contracts/
+# red-lines-and-surfaces.md C-62 — the sole authorized engine face besides the
+# review script's capture/--format json). Compatibility plan + non-precedential
+# declaration: .specify/specs/072-client-self-improvement/notes/
+# compatibility-plan-c61.md and .specify/memory/features/072.md. The pin still
+# fails on any OTHER unannounced action.
+FEEDBACK_ENGINE_ACTIONS = {"record", "status", "list", "dispose", "mark-submitted", "reindex", "package", "upstream", "cleanup", "migrate-legacy", "introspect-register", "args-manifest", "ingest-exec-quant", "client-metrics"}
 PROBE_ENGINE_ACTIONS = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
 ENGINE_ACTIONS = FEEDBACK_ENGINE_ACTIONS | PROBE_ENGINE_ACTIONS
 # Project identifiers that MUST NOT leak into a project-neutral shared section.

@@ -25,7 +25,7 @@ The framework's shipped capabilities are enough to run a Dogfooding loop for **y
 | Review | Periodic retrospective checkpoint where findings are revisited |
 | Task records (tasks/verification) | Trace each finding to the iteration that addressed it |
 
-> **Recipe note — why `custom:` (Feature 072):** client findings are recorded only against a `custom:<owner>/<name>` unit. In a client project, a `skill:<scenario-name>` unit either matches no probe object — the engine refuses the record — or resolves as a framework-internal unit, which would route the entry upstream instead of keeping it host-project-local. The `custom:` form is the only unit family client findings accept; arm the channel first with `probe-utils.py --action probe-inject --unit custom:<owner>/<name>`.
+> **Recipe note — why `custom:` (client self-improvement):** client findings are recorded only against a `custom:<owner>/<name>` unit. In a client project, a `skill:<scenario-name>` unit either matches no probe object — the engine refuses the record — or resolves as a framework-internal unit, which would route the entry upstream instead of keeping it host-project-local. The `custom:` form is the only unit family client findings accept; arm the channel first with `probe-utils.py --action probe-inject --unit custom:<owner>/<name>`.
 
 ## Adoption advice (advisory — never a gate)
 

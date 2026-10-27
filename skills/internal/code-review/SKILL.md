@@ -72,7 +72,7 @@ classification: internal
 2. `start --spec <feature-dir>` — 创建代码段记录，并先把上一份记录归档为 `code-review-<YYYYMMDDTHHMMSSZ>.md`；第二次运行起这是必经一步，省掉它就是把记录交给 agent 手写。
 3. `note -s <severity> -f <file> [-l <line>] -c <comment> --review-file <record>` — 逐条落盘意见。
 4. `receipt --review-file <record>` — 写出覆盖率回执与段裁决；随后用 `report --summary --file <record>` 取合入门禁判决。
-5. `capture --review-file <record> --triage <value> [--unit <custom:owner/name>]` — 客户采集：把本次评审的**发现指针**落进客户项目自己的反馈通道（Feature 072 的唯一授权修订，见下）。
+5. `capture --review-file <record> --triage <value> [--unit <custom:owner/name>]` — 客户采集：把本次评审的**发现指针**落进客户项目自己的反馈通道（本特性对前序闭合面的唯一授权修订，见下）。
 
 > **修订记录（四步 → 五步，C-10）**：理由 —— 采集所需的全部输入（记录路径、适用性取值、按严重度计数）只在第 4 步之后才齐备，且采集挂在同一条确定性路径里，「发现进入客户通道」才是机械可核对的事实；代价 —— 前序特性的一处闭合枚举（本节步骤枚举）被改写一次，其余闭合面一字不动。
 

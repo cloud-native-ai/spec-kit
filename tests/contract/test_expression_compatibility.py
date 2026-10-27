@@ -408,6 +408,50 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "markers": ("judgment object", "fixed order"),
     },
+    # 2026-10-27 (Feature 072, client self-improvement): four more non-wiring
+    # sources gain their declared 072 segments — the two command templates and
+    # two skill bodies named in C-56's edit surface. Compatibility plan +
+    # non-precedential declaration: .specify/specs/072-client-self-improvement/
+    # notes/compatibility-plan-c61.md and .specify/memory/features/072.md. Each
+    # drift is pinned by a Feature 072 contract suite, cited per entry; this
+    # records the drift, it does not authorize any other.
+    "templates/commands/feedback.md": {
+        "reason": (
+            "2026-10-27 Feature 072 extends the Path A reference bullet with the "
+            "client carrier-assignment closure (exactly three carriers, one per "
+            "entry, undecided reported) and the read-only client-metrics pointer "
+            "(FR-021/FR-026), pinned by "
+            "tests/contract/test_client_package_exclusion.py"
+        ),
+        "markers": ("载体指派闭集恰三", "client-metrics"),
+    },
+    "templates/commands/improve.md": {
+        "reason": (
+            "2026-10-27 Feature 072 adds the custom-subject why segment (observation "
+            "source and fail-closed run-determination disclosure) to the target "
+            "section (FR-016/FR-017), pinned by "
+            "tests/contract/test_client_improve_loop.py"
+        ),
+        "markers": ("Custom-subject why segment", "运行判定历史未评估"),
+    },
+    "skills/internal/manage-feedback/SKILL.md": {
+        "reason": (
+            "2026-10-27 Feature 072 adds A4's carrier assignment for digested client "
+            "entries and the one-per-entry client carrier rule (contracts "
+            "digest-and-carriers.md C-26/C-27), pinned by "
+            "tests/contract/test_client_package_exclusion.py"
+        ),
+        "markers": ("Client carriers are one-per-entry", "exactly one"),
+    },
+    "skills/internal/self-improvement/SKILL.md": {
+        "reason": (
+            "2026-10-27 Feature 072 adds the custom-subject observation-source "
+            "bullet (the engine's source contract fail-closes for custom units, so "
+            "the why segment discloses 运行判定历史未评估), pinned by "
+            "tests/contract/test_client_improve_loop.py"
+        ),
+        "markers": ("Custom-subject observation source", "运行判定历史未评估"),
+    },
 }
 
 
