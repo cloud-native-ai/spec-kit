@@ -14,7 +14,7 @@ classification: internal
 
 分工边界：
 
-- **脚本（确定性）**：`diff` 渲染、`review` 逐文件流程、`note` 意见落盘、`report` 汇总与合入门禁判定 — 全部封装在 `${SKILL_HOME}/scripts/git-delta-review.sh`。
+- **脚本（确定性）**：`diff` 渲染、`review` 逐文件流程、`note` 意见落盘、`report` 汇总与合入门禁判定、`base` 基准解析、`triage` 适用性判定、`start` 记录创建与轮转、`receipt` 覆盖率回执与段裁决 — 全部封装在 `${SKILL_HOME}/scripts/git-delta-review.sh`。
 - **Reviewer（判断性）**：按 P0–P6 维度读代码、写意见、做合入决策 — 方法论见 [`${SKILL_HOME}/references/review-workflow.md`](./references/review-workflow.md)。
 
 ## Workflow
@@ -25,7 +25,7 @@ classification: internal
 
 1. 确认角色：**Author**（提交前自检，走 Phase 1）还是 **Reviewer**（审查执行，走 Phase 2–4）。两者都要时按顺序执行。
 2. 确认对比基准：默认 `main..HEAD`，可用 `--since/--head` 或 `GIT_BASE/GIT_HEAD` 环境变量覆盖。
-3. 确认 delta 可用：`command -v delta`。缺失时**报错并给出安装命令后停止**（见 `references/delta-setup.md`），不自动安装。仅 `note`/`report` 子命令可在无 delta 环境运行（CI/Agent 场景）。
+3. 确认渲染模式（一条规则、两个条件）：**渲染器可用 且 stdout 是交互终端（TTY）** → 渲染模式，记录标注 `renderer: delta`；其余一切情形（含渲染器存在但由 agent / 非交互 / 重定向输出调用）→ 文本模式，记录标注 `renderer: text`。渲染器缺失不阻断代码段：模式标注加上覆盖率回执就是证据，安装指引见 `references/delta-setup.md`（本技能不自动安装渲染器）。`base` / `triage` / `start` / `note` / `receipt` / `report` 在无渲染器的环境里都能运行。
 
 ### Phase 1 — 提交前准备（Author）
 
@@ -63,13 +63,30 @@ classification: internal
 2. **归档报告**：`.specify/review/<branch>-<ts>.md` 为 Markdown，可直接粘贴到 PR 描述/评论区或随仓库提交。
 3. **知识沉淀**：同一问题被提出超过 2 次 → 转化为 Linter 规则或 Checklist 条目，而非依赖人每次发现（沉淀形式见 `references/review-workflow.md` §5.2）。
 
+### 非交互路径（Agent / CI：四步，不是三步）
+
+代码段有一条完全非交互的路径，四步各由一个确定性子命令承担，均不需要终端、不需要应答任何提示：
+
+1. `base --spec <feature-dir>` — 解析评审区间（`base=` / `head=` / `base_source=`）；无档可解时记 `not-evaluated` 并退出 2，绝不猜基准。
+2. `start --spec <feature-dir>` — 创建代码段记录，并先把上一份记录归档为 `code-review-<YYYYMMDDTHHMMSSZ>.md`；第二次运行起这是必经一步，省掉它就是把记录交给 agent 手写。
+3. `note -s <severity> -f <file> [-l <line>] -c <comment> --review-file <record>` — 逐条落盘意见。
+4. `receipt --review-file <record>` — 写出覆盖率回执与段裁决；随后用 `report --summary --file <record>` 取合入门禁判决。
+
+适用性由 `triage` 判定，取值封闭为 `run` / `not-applicable` / `not-evaluated`：空 delta 在回执之前就答为 `not-applicable`，绝不会被一块 0/0/0 的回执报成一次干净的评审。
+
 ## Strict Requirements
 
 - **级别词汇表固定**：只允许 `blocking/important/suggestion/nitpick/question/praise`，脚本会拒绝其他值——不要发明新级别。
 - **意见必须落到具体位置**：`-f <file> -l <line>`，全局性意见才允许省略 `-f`（记为 `(global)`）。
-- **不绕过门禁**：`report --summary` 显示 blocking 未清零时，不得给出"可以合入"的结论。
-- **大变更不硬审**：size guard 触发 >800 行警告时，先建议拆分，再逐模块 `--focus` 审查。
-- **环境缺失即停**：delta 缺失时报错 + 安装指引，停止执行；不自动安装、不降级为 `git diff` 裸输出冒充已审查。
+- **不绕过门禁**：合入门禁的唯一判决来源是脚本的 `report --summary --file <code-review.md>`——当前记录含 `blocking` 条目时它以退出码 1 拒绝，此时不得给出"可以合入"的结论；省略 `--file` 的"目录内最新文件"选取只是历史模式（会自标 implicit），组合路径一律显式给记录路径。
+- **大变更不硬审**：size guard 触发 >800 行警告时，先建议拆分，再逐模块 `--focus` 审查；未聚焦到的文件在回执里记为带理由跳过，跳过合法但不计为覆盖信用。
+- **渲染模式是一条两条件规则**：渲染器可用 **且** stdout 是交互终端（TTY）→ 渲染模式，记录标注 `renderer: delta`；其余一切情形（含渲染器存在但由 agent / 非交互 / 重定向输出调用）→ 文本模式，记录标注 `renderer: text`。选择只看这两个条件，不看渲染器是否存在本身。
+
+- **渲染器缺失条款已被替代（替代并说明理由）**：原「渲染器缺失即停」条款已由本特性**替代**：替代的证据形态是覆盖率回执（`receipt` 子命令与记录内的回执块），替代理由是真正的底线是"不冒充已读"，而不是"必须存在某个渲染器"——回执把"读全"变成可机械核对的断言（文件集相等 + 逐文件裁决 + 缺口非零退出）。渲染器仍不自动安装：缺失时按 `references/delta-setup.md` 的安装表给出指引，代码段照常以文本模式完成。
+
+- **禁止声称未做的事（封闭四短语）**：文本模式运行时，记录与任何结论中禁止出现下列任一表述：`已完成可视化评审`、`rendered review complete`、`visual review performed`、`side-by-side review done`。该清单由 `requirements.md` SC-003 拥有且是闭合的：新增一类表述须先改该条。
+
+- **回执是「已读全 diff」的唯一证据形态**：覆盖率回执是唯一证据；diff 概览、读过变更文件列表、变更行数不大、工具输出存在本身都不得替代它，也不得单独被引作"这次评审做完了"的证据。
 
 ## Resource ID
 
@@ -87,7 +104,7 @@ This Skill follows the canonical `${SKILL_HOME}` / `${SKILL_WORKDIR}` path conve
 ## Resources
 
 ### Scripts (`${SKILL_HOME}/scripts/`)
-- `git-delta-review.sh` — 四子命令闭环工具：`diff`（delta 渲染 + size guard；`--worktree` 支持未提交改动）、`review`（交互式逐文件，测试优先，同支持 `--worktree`）、`note`（非交互意见落盘，无需 delta）、`report`（列表/最新/按级汇总 + 合入门禁）。
+- `git-delta-review.sh` — 单脚本、多子命令的确定性实体：`diff`（delta 渲染 + size guard；`--worktree` 支持未提交改动）、`review`（交互式逐文件，测试优先，同支持 `--worktree`）、`note`（非交互意见落盘，无需 delta）、`report`（列表/最新/按级汇总 + 合入门禁判决，`--summary --file <record>` 退出 0 允许 / 1 拒绝 / 2 输入错误）、`base`（评审区间解析）、`triage`（适用性三值判定）、`start`（记录创建与轮转）、`receipt`（覆盖率回执与段裁决，退出 0 完整 / 1 覆盖缺口 / 2 不可评估）。
 
 ### References (`${SKILL_HOME}/references/`)
 - `review-workflow.md` — 四阶段方法论全本：提交粒度规则、PR 描述模板、自检清单、P0–P6 审查维度、审查顺序、反馈分级与表达原则、迭代收敛规则、合入策略、知识沉淀、度量指标、角色矩阵、反模式对策。

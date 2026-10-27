@@ -248,12 +248,160 @@ Scenario C's `not-applicable` path:
 
 ## Group 4 — `tests/contract/test_coverage_receipt.py`
 
-- Red run (T014): pending
-- Command line: pending
-- Real output: pending
-- Exit code: pending
-- Failing count: pending
-- Red → green (T018): pending
+- Red run (T014): **2026-10-27** at implement part 4, HEAD `7a0a5a920750e99f034812a55318475e7176eecd`
+  (clean tree), before any edit of `skills/internal/code-review/scripts/git-delta-review.sh`,
+  `skills/internal/code-review/SKILL.md` or `skills/internal/code-review/references/delta-setup.md`.
+- Command line: `python3 -m pytest -q tests/contract/test_coverage_receipt.py`
+- Real output (tail): `19 failed, 1 passed in 1.68s`
+- Failing tests (19, by name): `test_c31_the_receipt_is_one_delimited_block_inside_the_record`,
+  `test_c32_the_block_name_set_is_closed`,
+  `test_c33_the_rows_are_sorted_and_zero_padded_and_a_rerun_is_byte_identical`,
+  `test_c42_the_grammar_needs_no_heuristic`,
+  `test_the_exit_alphabet_is_closed_at_three_with_one_meaning_each`,
+  `test_c35_exit_2_writes_no_block_and_names_its_reason`,
+  `test_c36_a_legal_skip_is_disclosed_and_earns_no_coverage`,
+  `test_c36_the_five_value_reason_set_is_read_from_its_owner`,
+  `test_c36_an_unrecognised_skip_reason_is_a_gap_not_a_legal_skip`,
+  `test_c37_c38_the_verdict_is_the_conjunction_of_the_three_signals`,
+  `test_c38_the_blocking_signal_is_a_presence_test_not_a_resolved_state`,
+  `test_c38_an_empty_delta_never_reaches_the_receipt`,
+  `test_c40_the_block_renderer_equals_the_record_header_marker`,
+  `test_c41_the_line_counts_are_measured_from_numstat`,
+  `test_sc002_the_gap_drill_deletes_one_entry_and_the_rerun_goes_red`,
+  `test_c74_the_four_counts_agree_three_ways`,
+  `test_c43_a_non_zero_gap_or_skip_count_is_surfaced_outside_the_block`,
+  `test_c44_a_dirty_tree_is_disclosed_on_both_carriers_without_a_conclusion`,
+  `test_t018_an_illegal_skip_reason_exits_1_and_an_unresolvable_range_exits_2`
+- Exit code: `1`
+- Failing count: **19 of 20**. The one that passes is
+  `test_t018_the_interactive_walk_and_the_six_level_validation_are_intact` — the group's
+  regression half (C-28): it drives `review --yes` and the six-level `note` validation, both of
+  which already exist, so it is green on both sides of the change by construction and is **not**
+  evidence of coverage.
+- Reading: every failing case reds on a real invocation of the missing subcommand, not on a missing
+  file — the script answered `✗ 未知命令: receipt (使用 --help 查看用法)` at red time, so the
+  carrier, the alphabet and the derivation were all unimplemented obligations rather than typos.
+- Red → green (T018): **green on 2026-10-27** after T015 (`receipt`), T016 (the renderer-absence
+  rewrite) and T017 (`report --file`).
+  - Command line: `python3 -m pytest -q tests/contract/test_coverage_receipt.py`
+  - Real output: `20 passed in 2.58s`
+  - Exit code: `0`
+  - Failing count: `0` (was 19). Two assertions were corrected between the red and the green run
+    and neither relaxes an obligation: the zero-padding case now checks
+    `ordinal_token == str(ordinal).zfill(width)` (its first form demanded a leading `0` from every
+    token, which would have failed a correctly padded `10`), and the exit-alphabet case now passes
+    an explicit `--since/--head` (its first form ran the default range, which resolves to an empty
+    delta and would have measured the `2` branch while believing it measured the gap branch). Both
+    were in the recorded failing list and fail there for the unimplemented-subcommand reason.
+
+### T018 — US3 verification
+
+- Targeted set, final state:
+
+  | Suite | Command | Result |
+  |---|---|---|
+  | this group | `python3 -m pytest -q tests/contract/test_coverage_receipt.py` | `20 passed`, exit `0` |
+  | the sibling group's US3 bands | `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py -k "c22 or c23 or c24 or c25 or c26 or c27"` | `6 passed, 33 deselected`, exit `0` |
+  | the sibling group whole-file | `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py` | `38 passed, 1 failed`, exit `1` |
+  | composed-command guard | `python3 -m pytest -q tests/contract/test_review_code_composition.py` | `31 passed`, equal to the part-2 measurement |
+  | neighbouring pins | `python3 -m pytest -q tests/contract/test_review_p1_review_loop.py` | `10 passed`, equal to T001's count |
+
+  The single red in the whole-file run is `test_c29_*` (T031's row, the sibling-boundary wording),
+  exactly as part 3 declared. `test_expression_compatibility.py` carries one red that is **not**
+  this part's (see the anomaly section at the end of this file).
+
+- **Quickstart Scenario D, live** (disposable repository from the T003 fixture; the command lines are
+  the ones below with `<spec>` = `.specify/specs/071-fixture-demo`):
+
+  ```text
+  DELTA_BIN=/tmp/review-git-repo-*/\.delta-missing bash .../git-delta-review.sh receipt \
+    --review-file <spec>/code-review.md --renderer text --since <seed> --head <feature>
+  → rc=0  renderer=text changed_files=2 judged_files=2 skipped_files=0 gap_files=0 verdict=pass
+  → record header: | **渲染模式** | `renderer: text` |
+  → forbidden four-phrase list present in the record: none
+  ```
+
+  **The no-TTY case (the one that actually happens)** — the host *does* have the renderer
+  (`/home/agent/.cargo/bin/delta`) and the call is made through pipes:
+
+  ```text
+  bash .../git-delta-review.sh receipt --review-file <spec>/code-review.md --since <seed> --head <feature>
+  → rc=0  renderer=text   (never `renderer: delta`)
+  → record header: | **渲染模式** | `renderer: text` |
+  ```
+
+  A renderer present on `PATH` therefore does not by itself earn the rendered marker: the second
+  condition (an interactive terminal) is what the mode keys on. Pinned by
+  `test_c40_the_block_renderer_equals_the_record_header_marker`.
+
+- **Quickstart Scenario E, live** (the gap drill, in order):
+
+  | Step | Command | rc | changed / judged / skipped / gap | verdict |
+  |---|---|---|---|---|
+  | 3 — write the receipt | `receipt --review-file <record> --since <seed> --head <feature>` | `0` | 2 / 2 / 0 / 0 | `pass` |
+  | 4 — delete one `file.02.*` entry group, re-run step 3 | same | `1` | 2 / 1 / 0 / 1 | `not-evaluated` |
+  | restore the entry, re-run step 3 | same | `0` | 2 / 2 / 0 / 0 | `pass` |
+
+  The rewritten block carries `gap_files` equal to the number of unjudged files, so the shortfall is
+  mechanical rather than editorial — which is why the per-file verdicts are **carried forward** from
+  the block already in the record instead of being re-derived on every run. Had a re-run re-derived
+  the judged set, deleting an entry would have been silently repaired and `SC-002`'s drill could not
+  go red at all.
+
+- **Quickstart Scenario F, live**: `receipt --review-file <record> --skip-with-reason "src/*"
+  --reason size-guard-focus-not-reviewed` → rc `0`, `skipped_files=1`, `judged_files=1`,
+  `gap_files=0`, verdict `not-evaluated` (no `blocking` entry in the record), and the per-file row
+  reads `file.02.path=src/fixture_demo.py`, `file.02.verdict=skipped`,
+  `file.02.reason=size-guard-focus-not-reviewed`. A skip is legal (exit `0`) and still forbids
+  `pass` (C-37).
+
+- **The two cases the closed alphabets require** (both now in this group, driven live):
+  a skip reason outside the five legal values → rc `1`, `gap_files=1`, `skipped_files=0`
+  (`test_t018_an_illegal_skip_reason_exits_1_and_an_unresolvable_range_exits_2`), and an
+  unresolvable range → rc `2` with the record left byte-identical and no block written
+  (`test_c35_exit_2_writes_no_block_and_names_its_reason`).
+
+- **The interactive per-file walk and its six-level validation**, driven end to end against the
+  disposable repository rather than read off the script: `review --yes --since <seed> --head <feature>`
+  → rc `0`, one report written under `REVIEW_DIR`, every changed file rendered and the statistics
+  table present; then `note -s <level>` accepted for all six of
+  `blocking / important / suggestion / nitpick / question / praise` and rejected for `critical`.
+  Pinned by `test_t018_the_interactive_walk_and_the_six_level_validation_are_intact`.
+
+- **A non-zero gap or skip count outside the block, on both carriers** (C-43): with
+  `skipped_files=1` the command itself reports `skipped_files=1` as a field (the value the process
+  report copies), and the report's `### 2.1` rendered from `templates/review-template.md` carries
+  `2 / 1 / 1 / 0` in its own row — outside the block, copied field by field, equal to the block's
+  fields (`test_c43_*`, `test_c74_the_four_counts_agree_three_ways`).
+
+  **What C-74's three-way agreement is measured against**: the block comes from the real script, the
+  report subsection comes from the real `templates/review-template.md` § 2.1, and the feature-detail
+  entry is rendered by the same field-by-field copy act the command performs (that carrier is
+  free prose — `[FEATURE_LATEST_REVIEW_SUMMARY]` — so no run-time instance of it exists in this
+  fixture). One reconciliation function reads all three, and it is then run against a **tampered**
+  copy which it must reject; a check that stayed green there would prove nothing, so the negative
+  control is part of the case.
+
+- **The dirty tree** (C-44): with two uncommitted paths, `changed_files` stays `2` (the committed
+  delta — the uncommitted scope is never folded in), the record carries exactly one
+  `> **未提交范围（未评审）**` line naming the excluded paths with no conclusion over them, the
+  command reports `uncommitted_scope=2` for the report carrier, and a clean tree leaves no stale
+  disclosure behind. Pinned by
+  `test_c44_a_dirty_tree_is_disclosed_on_both_carriers_without_a_conclusion`.
+
+- **Implementation decisions this part had to fix** (recorded because the plan names the obligations
+  but not these mechanisms):
+  1. *The judged set is the block's per-file entries* (carried forward), with the first write —
+     a record that carries no block yet — treating its own invocation as the caller's assertion that
+     the delta was read. This is what makes the gap drill able to go red (see Scenario E above) and
+     what keeps two runs over one repository state byte-identical (C-33). A new commit after a
+     receipt therefore goes through `start` again, which is exactly the four-step path's step 2.
+  2. *`receipt` rewrites the record's renderer marker* to the mode it actually used, so the marker
+     and the block cannot disagree (C-40) — measured by starting the record with `--renderer delta`
+     and watching a piped `receipt` move both forms to `text` together.
+  3. *`receipt` writes the uncommitted-scope disclosure* into the record and reports it as a field,
+     because it is the step that resolves the range and is therefore the only place that knows what
+     the committed delta excluded.
 
 ## Group 5 — `tests/contract/test_status_gate_owner.py`
 
@@ -283,4 +431,40 @@ These exercise behaviour that already exists or fully lands before they run, so 
 
 ## Fast-fail findings on the red-first obligation (T029 collects these)
 
-None recorded yet. A group whose red run is missing, or that could not be made to go red, is recorded **here** rather than cited as coverage.
+None recorded. Every group either has its red run recorded above or is still `pending` by its own
+row's schedule; no group was counted as covered while red.
+
+## Neighbouring pin reddened by the feature's own edits — handed up, not repaired (part 4)
+
+**Measured** (fast-fail, decision-class): `tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`
+freezes the sha256 of 74 non-wiring sources, and two of them are files this feature must edit —
+`templates/commands/review.md` and `skills/internal/code-review/SKILL.md`. Reading the manifest in
+`.specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` against
+`git show HEAD:<path>`:
+
+| File | Manifest hash | HEAD `7a0a5a92` blob | State |
+|---|---|---|---|
+| `templates/commands/review.md` | `30ed9f12…` | `ddb3c8f2…` | **drifted at HEAD, i.e. already red before part 4** (part 2's T006/T008 edit) |
+| `skills/internal/code-review/SKILL.md` | `c0d0a6af…` | `c0d0a6af…` | not drifted at HEAD; part 4's T016 edit makes it the second drifted file |
+
+Consequence: the assertion reports `drifted: ['skills/internal/code-review/SKILL.md',
+'templates/commands/review.md']`, and it is **not** in `baseline-failed.txt`, so by SC-006's
+name-level comparison it is a NEW failure — one this part widens rather than causes.
+
+**Why this was not repaired in place.** The test ships its own declared mechanism
+(`ALLOWED_POST_BASELINE_CHANGES`, "names every post-baseline drift with its reason"), so a repair is
+mechanically available. It is still not a correction: `requirements.md` FR-027 authorizes **exactly
+one** existing-assertion change (`test_review_p1_review_loop.py::test_c15`) and states in the same
+breath that the authorization is a closed single-point exception which "MUST NOT be cited as a
+basis by analogy". Allowlisting two frozen hashes is a governance-visible exception that no
+artifact of this feature records, and the choice between *allowlist them*, *leave the pin red and
+carry it into T035/T036's closure comparison*, and *treat the C-5 manifest as one of the mirrors
+C-67 already schedules* is a choice between readings the artifacts do not decide. Per
+`shared/guidelines/fast-fail.md` that is decision-class: the anomaly stops here and goes back to the
+orchestrator with this measurement, rather than being flattened into the tree.
+
+**Also measured, for the same closure comparison** (both pre-existing, both named in
+`baseline-failed.txt`, therefore no NEW failure):
+`tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts`
+reports the four per-tool `speckit.review` copies plus five mirror `DIFF` lines — the expected
+"mirrors last" state that T032/T033 close.

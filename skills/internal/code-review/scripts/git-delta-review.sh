@@ -400,17 +400,66 @@ cmd_note() {
 }
 
 # ─── report: 查看/汇总 Review 报告 ──────────────────────────
+#
+# 合入门禁判决的唯一来源 (C-26 / FR-023)。判决以显式记录文件为输入:
+# `--summary --file <code-review.md>` 的退出码字母表关闭于 0 允许 / 1 拒绝
+# (当前记录的 blocking 计数) / 2 输入错误。省略 `--file` 是历史模式,
+# 它自标 implicit 且组合路径一律不使用 — 同一特性目录里 `review.md` 与
+# `code-review.md` 并存, 隐式选取会把过程报告读成代码段记录并给出假通过。
 cmd_report() {
-    local action="list" target=""
+    local action="list" target="" target_explicit=false
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --latest)  action="latest"; shift ;;
-            --summary) action="summary"; shift ;;
-            --cat)     action="cat"; target="$2"; shift 2 ;;
-            *)         shift ;;
+            --latest)     action="latest"; shift ;;
+            --summary)    action="summary"; shift ;;
+            --cat)        action="cat"; target="$2"; target_explicit=true; shift 2 ;;
+            --file|-f)    target="$2"; target_explicit=true; shift 2 ;;
+            *)            shift ;;
         esac
     done
+
+    if [[ "$action" == "summary" ]]; then
+        local record=""
+        if [[ "$target_explicit" == "true" ]]; then
+            [[ -f "$target" ]] || die2 "记录不存在: $target (判决要显式记录路径, C-27)"
+            record="$target"
+        else
+            local -a candidates=()
+            mapfile -t candidates < <(ls -t "$REVIEW_DIR"/*.md 2>/dev/null || true)
+            [[ ${#candidates[@]} -eq 0 ]] && die2 \
+                "无可汇总的 Review 记录 (目录: $REVIEW_DIR); 用 --file <path> 指定记录"
+            record="${candidates[0]}"
+            warn "implicit selection: ${record} (legacy newest-file mode; the composed path always passes --file)"
+        fi
+
+        echo -e "${BLD}━━━ Review 汇总: ${record} ━━━${RST}"
+        echo ""
+        local sev count blocking_count=0 important_count=0
+        for sev in "${SEVERITY_LEVELS[@]}"; do
+            count=$(grep -c "^### .* \[${sev^^}\]" "$record" 2>/dev/null || true)
+            count=${count:-0}
+            printf "  %s %-12s %s\n" "$(severity_icon "$sev")" "[$sev]" "$count"
+            [[ "$sev" == "blocking" ]]  && blocking_count="$count"
+            [[ "$sev" == "important" ]] && important_count="$count"
+        done
+        echo ""
+        echo "record=$record"
+        echo "blocking_entries=${blocking_count}"
+        if [[ "$blocking_count" -gt 0 ]]; then
+            echo "gate=deny"
+            echo -e "  ${RED}✗ 合入门禁: 存在 ${blocking_count} 条 [blocking] — 必须解决后方可合入${RST}"
+            exit 1
+        elif [[ "$important_count" -gt 0 ]]; then
+            echo "gate=allow"
+            echo -e "  ${YEL}⚠ 合入门禁: 存在 ${important_count} 条 [important] — 需逐条回应 (同意/不同意+理由) 后方可合入${RST}"
+            return 0
+        else
+            echo "gate=allow"
+            echo -e "  ${GRN}✓ 合入门禁: 无未决 blocking/important — 满足收敛条件${RST}"
+            return 0
+        fi
+    fi
 
     local -a files=()
     mapfile -t files < <(ls -t "$REVIEW_DIR"/*.md 2>/dev/null || true)
@@ -433,29 +482,8 @@ cmd_report() {
             [[ -f "$target" ]] || die "文件不存在: $target"
             cat "$target"
             ;;
-        summary)
-            # 按级别汇总 + 合入门禁判定 (Phase 3 收敛条件 / Phase 4 合入前检查)
-            local f="${files[0]}"
-            [[ -n "$target" ]] && f="$target"
-            echo -e "${BLD}━━━ Review 汇总: ${f} ━━━${RST}"
-            echo ""
-            local sev count blocking_count=0 important_count=0
-            for sev in "${SEVERITY_LEVELS[@]}"; do
-                count=$(grep -c "^### .* \[${sev^^}\]" "$f" 2>/dev/null || true)
-                printf "  %s %-12s %s\n" "$(severity_icon "$sev")" "[$sev]" "$count"
-                [[ "$sev" == "blocking" ]]  && blocking_count="$count"
-                [[ "$sev" == "important" ]] && important_count="$count"
-            done
-            echo ""
-            if [[ "$blocking_count" -gt 0 ]]; then
-                echo -e "  ${RED}✗ 合入门禁: 存在 ${blocking_count} 条 [blocking] — 必须解决后方可合入${RST}"
-            elif [[ "$important_count" -gt 0 ]]; then
-                echo -e "  ${YEL}⚠ 合入门禁: 存在 ${important_count} 条 [important] — 需回应 (同意/不同意+理由) 后方可合入${RST}"
-            else
-                echo -e "  ${GRN}✓ 合入门禁: 无未决 blocking/important — 满足收敛条件${RST}"
-            fi
-            ;;
     esac
+    return 0
 }
 
 # ══════════════════════════════════════════════════════════════
@@ -813,6 +841,337 @@ cmd_start() {
     echo "renderer=${marker#renderer: }"
 }
 
+# ══════════════════════════════════════════════════════════════
+# receipt: 覆盖率回执与段裁决 (非交互路径第 4 步)
+#
+# 回执是"已读全 diff"的唯一证据形态 (FR-015 / C-25), 也是四项计数
+# (changed / judged / skipped / gap) 的唯一来源 (C-74): 过程报告的代码段
+# 小节与特性详情评审记录条目逐字段抄它, 不重算、不再聚合。
+#
+# 退出码字母表在 0/1/2 处封闭 (FR-014 / C-34 / C-35), 每个码只有一个含义:
+#   0 = 完整 (文件集相等且逐文件都有裁决, 含带理由跳过)
+#   1 = 覆盖缺口 (有文件缺裁决、两文件集不等, 或跳过了不被识别的理由)
+#   2 = 不可评估 (base/head 不可解析、记录缺失、仓库状态不可用) — 不写块
+# 1 与 2 MUST NOT 互换: 前者是"评审有缺口", 后者是"这次没法评"。
+# ══════════════════════════════════════════════════════════════
+
+RECEIPT_BEGIN_LITERAL='<!-- coverage-receipt:begin -->'
+RECEIPT_END_LITERAL='<!-- coverage-receipt:end -->'
+RECEIPT_VERSION=1
+
+# 闭合法定跳过理由集 — 唯一 owner: requirements.md FR-014。
+# 本脚本是执行者; 契约测试从 owner 逐值读取并驱动本脚本, 因此两份清单
+# 的漂移会在测试里变红, 而不是在评审里静默放行 (C-36)。
+SKIP_REASONS_LEGAL=(
+    non-code-file
+    generated
+    binary
+    out-of-scope-per-explicit-user-ruling
+    size-guard-focus-not-reviewed
+)
+
+is_legal_skip_reason() {
+    local candidate
+    for candidate in "${SKIP_REASONS_LEGAL[@]}"; do
+        [[ "$1" == "$candidate" ]] && return 0
+    done
+    return 1
+}
+
+# 读回记录里已有回执块携带的逐文件裁决 (verdict<TAB>path<TAB>reason)。
+# 逐文件裁决是"携带"而非"重算": 已有块里的条目就是已评审集, 因此删掉一条
+# 再跑, 该文件就是缺口 (SC-002 的 gap drill); 而首次写入前没有块, 本次调用
+# 本身即"已读"的断言, 变更集整体成为已评审集。
+read_carried_entries() {
+    local file="$1"
+    [[ -f "$file" ]] || return 0
+    awk -v begin="$RECEIPT_BEGIN_LITERAL" -v end="$RECEIPT_END_LITERAL" '
+        $0 == begin { inb = 1; next }
+        $0 == end   { inb = 0; next }
+        inb && /^file\.[0-9]+\.path=/ {
+            v = $0; sub(/^file\.[0-9]+\.path=/, "", v)
+            split($0, parts, ".")
+            path[parts[2]] = v; next
+        }
+        inb && /^file\.[0-9]+\.verdict=/ {
+            v = $0; sub(/^file\.[0-9]+\.verdict=/, "", v)
+            split($0, parts, "."); verdict[parts[2]] = v; next
+        }
+        inb && /^file\.[0-9]+\.reason=/ {
+            v = $0; sub(/^file\.[0-9]+\.reason=/, "", v)
+            split($0, parts, "."); reason[parts[2]] = v; next
+        }
+        END {
+            for (key in path) printf "%s\t%s\t%s\n", verdict[key], path[key], reason[key]
+        }
+    ' "$file"
+}
+
+# 把记录头部的渲染模式标记改成本次运行实际使用的模式 (C-40 / V15):
+# 标记与块由同一次调用写出, 两者不可能漂成不一致。
+set_record_renderer() {
+    local file="$1" mode="$2" tmp
+    [[ -f "$file" ]] || return 0
+    tmp="$(mktemp "${file}.renderer.XXXXXX")"
+    awk -v marker="renderer: $mode" '
+        done == 0 && ($0 ~ /渲染模式/ || $0 ~ /[Rr]enderer mode/) {
+            n = split($0, cells, "|")
+            if (n >= 4) {
+                $0 = cells[1] "|" cells[2] "| `" marker "` |"
+                done = 1
+            }
+        }
+        { print }
+    ' "$file" > "$tmp"
+    mv "$tmp" "$file"
+}
+
+# 用新块替换旧块 (旧块整段删除, 新块追加在末尾), 并同时替换未提交范围披露行。
+# 同一仓库状态跑两次得到同一个块 — 定界与逐文件行都是确定性的 (C-33)。
+write_receipt_block() {
+    local file="$1" block="$2" disclosure="${3:-}" tmp
+    tmp="$(mktemp "${file}.receipt.XXXXXX")"
+    awk -v begin="$RECEIPT_BEGIN_LITERAL" -v end="$RECEIPT_END_LITERAL" '
+        $0 == begin { inb = 1; next }
+        $0 == end   { inb = 0; next }
+        inb { next }
+        /^> \*\*未提交范围/ { next }
+        { print }
+    ' "$file" > "$tmp"
+    if [[ -n "$disclosure" ]]; then
+        printf '\n%s\n' "$disclosure" >> "$tmp"
+    fi
+    printf '\n%s\n' "$block" >> "$tmp"
+    mv "$tmp" "$file"
+}
+
+# 未提交范围: 运行自身的产物不算评审对象, 因此排除本流程写出的记录/归档与
+# `.specify/review/`; 其余一切未提交改动都要披露 (C-44 / FR-005)。
+uncommitted_scope() {
+    git status --porcelain 2>/dev/null \
+        | grep -vE '^\?\? \.specify/review/|code-review(-[0-9]{8}T[0-9]{6}Z)?\.md$' \
+        || true
+}
+
+cmd_receipt() {
+    local review_file="" renderer_override="" block=""
+    local -a skip_globs=() skip_reasons=() rest=()
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --review-file)      review_file="$2"; shift 2 ;;
+            --renderer)         renderer_override="$2"; shift 2 ;;
+            --skip-with-reason) skip_globs+=("$2"); skip_reasons+=(""); shift 2 ;;
+            --reason)
+                [[ ${#skip_globs[@]} -gt 0 ]] || \
+                    die2 "--reason 必须跟在它的 --skip-with-reason 选择器之后"
+                skip_reasons[$(( ${#skip_globs[@]} - 1 ))]="$2"
+                shift 2
+                ;;
+            *) rest+=("$1"); shift ;;
+        esac
+    done
+    [[ ${#rest[@]} -gt 0 ]] && parse_common_opts "${rest[@]}"
+
+    if [[ -n "$renderer_override" ]]; then
+        case "$renderer_override" in
+            delta|rendered|text|plain) ;;
+            *) die2 "无效 renderer: $renderer_override (可选: delta | text)" ;;
+        esac
+    fi
+
+    need_git
+    [[ -n "$review_file" ]] || \
+        die2 "receipt 需要 --review-file <code-review.md>: 不按目录内最新文件隐式选取 (C-27 / FR-023)"
+    [[ -f "$review_file" ]] || \
+        die2 "记录不存在: $review_file (先跑 start 创建/轮转记录)"
+
+    local rc=0
+    resolve_range || rc=$?
+    [[ "$rc" -ne 0 ]] && print_unresolved          # 退出 2, 不写块
+
+    local -a changed=()
+    mapfile -t changed < <(changed_files_between "$RESOLVED_BASE" "$RESOLVED_HEAD")
+
+    # 空 delta 在回执之前就由 triage 答为 not-applicable (FR-003 / V30 / C-38):
+    # 一块 0/0/0 的回执永远不是"干净的评审"。
+    if [[ ${#changed[@]} -eq 0 ]]; then
+        echo "receipt=refused" >&2
+        echo "empty delta: base 与 head 指向同一提交、零变更文件 — 适用性在回执之前判为 not-applicable (STR-001), 回执不写块 (FR-003 / V30)" >&2
+        exit 2
+    fi
+
+    mapfile -t changed < <(printf '%s\n' "${changed[@]}" | LC_ALL=C sort)
+
+    # 行数是量测值: 测不出来就不写块, 绝不写 0 也不估算 (C-41 / V16)
+    local lines_added=0 lines_deleted=0 stat_a stat_d stat_rest
+    while IFS=$'\t' read -r stat_a stat_d stat_rest; do
+        [[ -z "${stat_a:-}" ]] && continue
+        if [[ "$stat_a" == "-" || "$stat_d" == "-" ]]; then
+            echo "行数无法测量 (binary): ${stat_rest:-?}" >&2
+            echo "不可量测的数字字段意味着不写块 (C-41 / V16)" >&2
+            exit 2
+        fi
+        lines_added=$(( lines_added + stat_a ))
+        lines_deleted=$(( lines_deleted + stat_d ))
+    done < <(git diff --numstat "${RESOLVED_BASE}..${RESOLVED_HEAD}")
+
+    local has_block=false
+    if grep -qxF "$RECEIPT_BEGIN_LITERAL" "$review_file" 2>/dev/null; then
+        has_block=true
+    fi
+
+    local -A carried_verdict=() carried_reason=()
+    if [[ "$has_block" == "true" ]]; then
+        local carried_v carried_p carried_r
+        while IFS=$'\t' read -r carried_v carried_p carried_r; do
+            [[ -z "$carried_p" ]] && continue
+            carried_verdict["$carried_p"]="$carried_v"
+            carried_reason["$carried_p"]="$carried_r"
+        done < <(read_carried_entries "$review_file")
+    fi
+
+    local -a row_path=() row_verdict=() row_reason=()
+    local path index selector verdict reason selected
+    for path in "${changed[@]}"; do
+        verdict=""; reason=""; selected=false
+        for index in "${!skip_globs[@]}"; do
+            selector="${skip_globs[$index]}"
+            [[ -z "$selector" ]] && continue
+            # shellcheck disable=SC2053  # 选择器是调用方给的 glob, 故意不加引号
+            if [[ "$path" == $selector ]]; then
+                selected=true
+                reason="${skip_reasons[$index]}"
+                # 未识别的理由不是合法跳过, 而是覆盖缺口 (FR-014 / C-36 / V34)
+                if is_legal_skip_reason "$reason"; then
+                    verdict="skipped"
+                fi
+                break
+            fi
+        done
+        if [[ "$selected" != "true" ]]; then
+            if [[ -n "${carried_verdict[$path]:-}" ]]; then
+                if [[ "${carried_verdict[$path]}" == "skipped" ]]; then
+                    if is_legal_skip_reason "${carried_reason[$path]:-}"; then
+                        verdict="skipped"
+                        reason="${carried_reason[$path]}"
+                    fi
+                else
+                    verdict="reviewed"
+                fi
+            elif [[ "$has_block" == "false" ]]; then
+                verdict="reviewed"      # 首次写入: 本次调用即"已读"的断言
+            fi
+        fi
+        if [[ -n "$verdict" ]]; then
+            row_path+=("$path")
+            row_verdict+=("$verdict")
+            row_reason+=("$reason")
+        fi
+    done
+
+    local changed_files=${#changed[@]} judged_files=0 skipped_files=0 gap_files
+    for index in "${!row_path[@]}"; do
+        case "${row_verdict[$index]}" in
+            reviewed) judged_files=$(( judged_files + 1 )) ;;
+            skipped)  skipped_files=$(( skipped_files + 1 )) ;;
+        esac
+    done
+    gap_files=$(( changed_files - judged_files - skipped_files ))
+
+    # 渲染模式: 两条件规则 (渲染器可用 且 stdout 是交互终端), 否则文本模式 (C-22)
+    local marker mode
+    marker=$(renderer_marker "$renderer_override")
+    mode="${marker#renderer: }"
+    set_record_renderer "$review_file" "$mode"
+
+    # 第三个信号是存在性判定: 只读当前记录里的 blocking 标题, 没有"已清除"状态 (C-38 / V35)
+    local blocking_entries
+    blocking_entries=$(grep -cE '^### .*\[BLOCKING\]' "$review_file" 2>/dev/null || true)
+    blocking_entries=${blocking_entries:-0}
+
+    local segment_verdict
+    if [[ "$gap_files" -gt 0 ]]; then
+        segment_verdict="not-evaluated"          # 缺口不是结论 (E9)
+    elif [[ "$blocking_entries" -gt 0 ]]; then
+        segment_verdict="blocked"
+    elif [[ "$skipped_files" -gt 0 ]]; then
+        segment_verdict="not-evaluated"          # 跳过不计覆盖信用 (C-37)
+    else
+        segment_verdict="pass"
+    fi
+
+    local -a dirty=()
+    mapfile -t dirty < <(uncommitted_scope)
+    local dirty_count=${#dirty[@]}
+    local disclosure=""
+    if [[ "$dirty_count" -gt 0 ]]; then
+        local dirty_list="" entry
+        for entry in "${dirty[@]}"; do
+            [[ -z "$entry" ]] && continue
+            if [[ -n "$dirty_list" ]]; then dirty_list+=", "; fi
+            dirty_list+="${entry:3}"
+        done
+        disclosure="> **未提交范围（未评审）**: ${dirty_count} 个未提交路径未计入本次评审对象（${dirty_list}）；本回执不对该范围给出任何结论。"
+    fi
+
+    local width=${#row_path[@]}
+    width=${#width}
+    if [[ "$width" -lt 2 ]]; then width=2; fi
+
+    block=$(
+        echo "$RECEIPT_BEGIN_LITERAL"
+        echo "receipt_version=${RECEIPT_VERSION}"
+        echo "base=${RESOLVED_BASE}"
+        echo "head=${RESOLVED_HEAD}"
+        echo "base_source=${RESOLVED_BASE_SOURCE}"
+        echo "renderer=${mode}"
+        echo "changed_files=${changed_files}"
+        echo "judged_files=${judged_files}"
+        echo "skipped_files=${skipped_files}"
+        echo "gap_files=${gap_files}"
+        echo "lines_added=${lines_added}"
+        echo "lines_deleted=${lines_deleted}"
+        local index ordinal token
+        for index in "${!row_path[@]}"; do
+            ordinal=$(( index + 1 ))
+            token=$(printf "%0${width}d" "$ordinal")
+            echo "file.${token}.path=${row_path[$index]}"
+            echo "file.${token}.verdict=${row_verdict[$index]}"
+            if [[ "${row_verdict[$index]}" == "skipped" ]]; then
+                echo "file.${token}.reason=${row_reason[$index]}"
+            fi
+        done
+        echo "$RECEIPT_END_LITERAL"
+    )
+
+    write_receipt_block "$review_file" "$block" "$disclosure"
+
+    ok "覆盖率回执已写入: $review_file"
+    echo "base=$RESOLVED_BASE"
+    echo "head=$RESOLVED_HEAD"
+    echo "base_source=$RESOLVED_BASE_SOURCE"
+    echo "renderer=$mode"
+    echo "changed_files=$changed_files"
+    echo "judged_files=$judged_files"
+    echo "skipped_files=$skipped_files"
+    echo "gap_files=$gap_files"
+    echo "lines_added=$lines_added"
+    echo "lines_deleted=$lines_deleted"
+    echo "blocking_entries=$blocking_entries"
+    echo "verdict=$segment_verdict"
+    [[ "$dirty_count" -gt 0 ]] && echo "uncommitted_scope=$dirty_count"
+    echo "record=$review_file"
+    echo ""
+    printf '%s\n' "$block"
+
+    if [[ "$gap_files" -gt 0 ]]; then
+        exit 1
+    fi
+    return 0
+}
+
+
 usage() {
     cat << 'EOF'
 
@@ -831,7 +1190,10 @@ usage() {
               -s <severity> -f <file> [-l <line>] -c <comment> [--review-file <path>]
               severity: blocking | important | suggestion | nitpick | question | praise
     report    查看/汇总 Review 报告
-              --list (默认) | --latest | --summary (按级别汇总 + 合入门禁判定) | --cat <file>
+              --list (默认) | --latest | --summary | --cat <file> | --file <record>
+              --summary --file <code-review.md>: 合入门禁判决的唯一来源
+              退出码关闭于 0/1/2: 0 允许, 1 拒绝 (当前记录的 blocking 计数), 2 输入错误
+              省略 --file 是历史模式: 自标 implicit, 组合路径一律显式给路径
     base      解析评审基准 (非交互路径第 1 步)
               --spec <dir> | --since/--base <ref> | --trunk <ref> | --head <ref> | --json
               输出 base= head= base_source=; 无档可解时 base_source=not-evaluated 并退出 2
@@ -841,6 +1203,12 @@ usage() {
     start     创建代码段记录, 并把上一次记录轮转归档 (非交互路径第 2 步)
               --spec <dir> | --since <ref> | --head <ref> | --trunk <ref> | --renderer <delta|text>
               --triage <value>: 非 run 的适用性拒绝创建记录; 归档名 code-review-<YYYYMMDDTHHMMSSZ>.md
+    receipt   覆盖率回执与段裁决 (非交互路径第 4 步)
+              --review-file <code-review.md> (必需, 不做目录内最新文件隐式选取)
+              --spec <dir> | --since <ref> | --head <ref> | --trunk <ref> | --renderer <delta|text>
+              --skip-with-reason <glob> --reason <reason>  (可重复; 理由取自法定五值)
+              写出记录内定界的 name=value 块并打印同一块; 四项计数只由它产出
+              退出码关闭于 0/1/2: 0 完整, 1 覆盖缺口, 2 不可评估 (不写块)
 
   NON-INTERACTIVE PATH (four steps, in this order — four, never three):
     1. base      resolve the range: base= head= base_source=
@@ -883,6 +1251,7 @@ main() {
         base)    cmd_base "$@" ;;
         triage)  cmd_triage "$@" ;;
         start)   cmd_start "$@" ;;
+        receipt) cmd_receipt "$@" ;;
         help|-h|--help) usage ;;
         *)       die "未知命令: $cmd (使用 --help 查看用法)" ;;
     esac
