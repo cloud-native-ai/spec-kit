@@ -69,6 +69,14 @@ python3 .specify/scripts/python/feedback-utils.py --action dispose --id <entry-i
   [--reason "<provenance text>"] [--ref "introspection-<ts>#F-<nn>"]
 ```
 
+**Client entries — carriers and the digest report** (client hat only; contracts: `.specify/specs/072-client-self-improvement/contracts/digest-and-carriers.md`). A digested client entry (`kind: external`) receives **exactly one follow-up carrier** from a closed set of three existing mechanisms — no fourth carrier, never two carriers per entry:
+
+1. **todo Park mode** — the named default for free-floating improvement ideas (owner: `shared/guidelines/todo-in-context.md`);
+2. **a new requirements specification** — when the finding constrains what this project's own source must implement (owner: `templates/commands/requirements.md`);
+3. **one subject loop of the improvement command** — when the finding lands on a client artifact meeting the Execution Subject criteria (owner: `shared/workflow/self-improvement-workflow.md`).
+
+Each digested external entry writes exactly one row in `.specify/memory/feedback/backlog.md` naming its unique carrier, and the row is listed in the digest report; an entry whose carrier cannot be decided is reported `undecided` and kept for the next digest, never silently dropped. The digest report carries three facts: this run's hat and armed state plus how the armed state was resolved; the entry count and disposition of each side (with every refinement move named); and the readings of the four loop metrics from the read-only engine action `feedback-utils.py --action client-metrics` — advisory context only, never a gate. When a client unit vanishes from the probe registry, its entries stay readable (never rewritten, deleted, or re-attributed) and the resolution failure is reported as a named finding. Packaging and introspection above are unchanged: the engine still excludes `external` entries from the zip, reported only as the `excluded_external` count.
+
 ## Path B — Package For The Framework Upstream
 
 Reached automatically only from a **client project**. In the framework project the router never selects this path — there is no upstream to deliver to — and it runs only on an explicit `package` request.

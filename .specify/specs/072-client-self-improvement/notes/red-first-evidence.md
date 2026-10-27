@@ -35,10 +35,11 @@
 
 ### G3 — test_client_package_exclusion.py (T013)
 
-- 命令行: _pending — 红运行后回填_
-- 真实输出: _pending_
-- 退出码: _pending_
-- 失败计数: _pending_
+- 命令行: `python3 -m pytest -q tests/contract/test_client_package_exclusion.py`
+- 真实输出: `8 failed, 6 passed in 1.59s`（失败名见下；普遍形态 = path-a-digest.md 尚无载体指派闭集三/undecided/backlog 行/消失单元/呈报三事实文本，feedback 命令模板与 docs 页尚无 client-metrics/载体/undecided 指针；行为面（打包无条件排除并报告 excluded_external、cleanup 不触碰外部条目、无绕过开关、双侧 kind 分离、同会话双侧）红运行前已成立——钉的是既有引擎面，不作红声称）
+- 退出码: `1`
+- 失败计数: `8`
+- 失败名（2026-10-27 未改动树 @ f4409d20，US2 已落地后）: test_c26_carrier_closed_set_is_exactly_three_with_park_default · test_c26_no_entry_assigned_two_carriers_and_undecided_is_reported · test_c27_carrier_sections_cite_owners_without_restatement · test_c28_two_side_closure_and_refinement_direction_preserved · test_c29_digest_report_carries_the_three_facts · test_c30_routing_backlog_one_named_carrier_row_per_entry · test_c31_vanished_client_unit_entries_stay_readable · test_t015_feedback_command_surfaces_carry_client_digest_pointers
 
 ### G4 — test_client_improve_loop.py (T016)
 
