@@ -155,7 +155,7 @@
 
 **Purpose**: 五个测试组共用的模拟客户项目夹具；没有它，客户侧行为无法在框架仓自测走到的另一分支上被执行（FR-029 点名这是最易被"全绿自测"欺骗处）。
 
-- [ ] T003 新建 `tests/fixtures/client_project.py`：`make_client_project(tmp_path)` 返回临时 git 仓 + 最小安装 `.specify/` 运行时（既有引擎可按绝对路径调用、探针定义就位、`.specify/memory/feedback/` 存储目录存在），根级无 `templates`/`skills`/`shared`/`scripts`/`src/specify_cli` 五框架源目录；`make_framework_hat_twin(tmp_path)` 五目录齐备；两个工厂都暴露帽子判定入口，帽子谓词双向可证。Test anchor: 夹具两头分别得出 client / framework 帽判定（probe 注册表在夹具内可用、外部探针计数为零）；evidence: `tests/fixtures/client_project.py` + T009/T025 的引用。
+- [X] T003 新建 `tests/fixtures/client_project.py`：`make_client_project(tmp_path)` 返回临时 git 仓 + 最小安装 `.specify/` 运行时（既有引擎可按绝对路径调用、探针定义就位、`.specify/memory/feedback/` 存储目录存在），根级无 `templates`/`skills`/`shared`/`scripts`/`src/specify_cli` 五框架源目录；`make_framework_hat_twin(tmp_path)` 五目录齐备；两个工厂都暴露帽子判定入口，帽子谓词双向可证。Test anchor: 夹具两头分别得出 client / framework 帽判定（probe 注册表在夹具内可用、外部探针计数为零）；evidence: `tests/fixtures/client_project.py` + T009/T025 的引用。
 
 **Checkpoint**: 夹具就绪——T004/T009/T013/T016/T020 全部依赖它，US1–US6 的实现才能开始。
 

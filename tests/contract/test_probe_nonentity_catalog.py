@@ -11,6 +11,7 @@ The catalog chapter collects code-internal micro-probes as pure pointers
 from __future__ import annotations
 
 import re
+import shutil
 from pathlib import Path
 
 from tests.script_api import ROOT, probe_utils
@@ -97,3 +98,52 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     assert internal == 116, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
+
+
+def test_catalog_reachable_in_framework_layout() -> None:
+    """Framework-hat layout: catalog pointers resolve at the workspace root
+    (framework-source face), registry loads errors-free."""
+    registry = probe_utils.load_probe_registry(ROOT)
+    assert registry["available"] is True
+    assert registry["errors"] == [], f"registry structural errors: {registry['errors']}"
+
+
+def _install_client_runtime(target: Path) -> None:
+    """A minimal client runtime: only the .specify/ face of the catalog pointers."""
+    defs_target = target / ".specify" / "shared" / "definitions"
+    defs_target.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(
+        ROOT / ".specify" / "shared" / "definitions" / "probe-definitions.md",
+        defs_target / "probe-definitions.md",
+    )
+    for rel in EXPECTED_ENTRIES:
+        source = ROOT / ".specify" / rel
+        dest = target / ".specify" / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, dest)
+
+
+def test_catalog_reachable_via_specify_face_in_client_layout(tmp_path) -> None:
+    """Client-hat layout: no root-level framework source directories — every
+    catalog pointer MUST still resolve through the .specify/ runtime face
+    (same two-face doctrine as the engine-script lookup), registry errors-free."""
+    _install_client_runtime(tmp_path)
+    registry = probe_utils.load_probe_registry(tmp_path)
+    assert registry["available"] is True
+    assert registry["errors"] == [], (
+        f"client-layout registry errors (catalog pointers must fall back to "
+        f"the .specify/ face): {registry['errors']}"
+    )
+
+
+def test_catalog_unreachable_when_both_faces_missing(tmp_path) -> None:
+    """Negative: neither the root face nor the .specify/ face holds a pointer
+    target -> the reachability error MUST still fire for that entry."""
+    _install_client_runtime(tmp_path)
+    victim = sorted(EXPECTED_ENTRIES)[0]
+    (tmp_path / ".specify" / victim).unlink()
+    registry = probe_utils.load_probe_registry(tmp_path)
+    assert any(
+        err == f"non-entity catalog entry unreachable: {victim}"
+        for err in registry["errors"]
+    ), f"expected unreachable-entry error for {victim}, got: {registry['errors']}"
