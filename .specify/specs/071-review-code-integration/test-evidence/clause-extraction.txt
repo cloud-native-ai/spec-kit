@@ -1,0 +1,9 @@
+file=code-review-skill.md form=md-bold-closed clauses=14 ids=C-17..C-30 no_citation=[]
+file=command-orchestration.md form=md-bold-closed clauses=16 ids=C-1..C-16 no_citation=[]
+file=coverage-receipt.md form=md-bold-closed clauses=14 ids=C-31..C-44 no_citation=[]
+file=feedback-and-boundaries.md form=md-bold-closed clauses=10 ids=C-55..C-64 no_citation=[]
+file=status-gate-ownership.md form=md-bold-closed clauses=10 ids=C-45..C-54 no_citation=[]
+file=tests-and-docs-sync.md form=md-bold-closed clauses=9 ids=C-65..C-73 no_citation=[]
+total_clauses=73 unique=73
+distinct_FRs_cited=28
+missing_FRs=[]

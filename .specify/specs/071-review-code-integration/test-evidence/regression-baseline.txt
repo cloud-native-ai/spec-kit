@@ -1,0 +1,19 @@
+### contract suites (pre-change baseline measurements run at plan preparation, 2026-10-27, base 884e7a86)
+..................                                                       [100%]
+18 passed in 0.06s
+exit=0
+............................................................             [100%]
+60 passed in 0.61s
+---
+### mirror baselines
+scope --only: templates
+ok    templates/ == .specify/templates/ (22 files)
+scope --only: skills/internal
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+scope --only: shared
+ok    shared/ == .specify/shared/ (55 files)
+OK: all per-tool command copies match the source templates.
+### environment
+git version 2.43.5
+Python 3.11.11
+/home/agent/.cargo/bin/delta
