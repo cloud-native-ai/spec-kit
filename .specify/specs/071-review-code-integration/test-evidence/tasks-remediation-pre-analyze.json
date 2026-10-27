@@ -1,0 +1,318 @@
+{
+    "stage": "tasks",
+    "decision": "pass",
+    "findings": [
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 31,
+            "message": "path does not exist under the repo: tests/fixtures/review_git_repo.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 161,
+            "message": "path does not exist under the repo: tests/fixtures/review_git_repo.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 162,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 163,
+            "message": "path does not exist under the repo: tests/contract/test_review_docs_isomorphism.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 164,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 165,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 166,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 167,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 193,
+            "message": "path does not exist under the repo: tests/fixtures/review_git_repo.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 209,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 210,
+            "message": "path does not exist under the repo: tests/contract/test_review_docs_isomorphism.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 217,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 233,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 239,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 239,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 255,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 262,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 278,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 285,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 301,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 308,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "tasks.md",
+            "line": 323,
+            "message": "path does not exist under the repo: tests/contract/test_review_docs_isomorphism.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 43,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 52,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 68,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 81,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 93,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 112,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 125,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 138,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 149,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 35,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 36,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 37,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 38,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 39,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "feature-ref.md",
+            "line": 40,
+            "message": "path does not exist under the repo: tests/contract/test_review_docs_isomorphism.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/code-review-skill.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_code_review_skill_contract.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/command-orchestration.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_review_code_composition.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/coverage-receipt.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_coverage_receipt.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/feedback-and-boundaries.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_review_feedback_boundary.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/status-gate-ownership.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_status_gate_owner.py"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/tests-and-docs-sync.md",
+            "line": 5,
+            "message": "path does not exist under the repo: tests/contract/test_review_docs_isomorphism.py"
+        }
+    ],
+    "summary": {
+        "errors": 0,
+        "advisories": 43,
+        "waived": 0,
+        "fr": 28,
+        "sc": 7,
+        "tasks": 36,
+        "clauses": 0,
+        "files": 15
+    },
+    "checked_at": "2026-10-27T07:33:12Z"
+}
