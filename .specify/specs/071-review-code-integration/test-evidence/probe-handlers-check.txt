@@ -1,0 +1,1 @@
+Handler binding valid: 9 handlers, 53 bindings
