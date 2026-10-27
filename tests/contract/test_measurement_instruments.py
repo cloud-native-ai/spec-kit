@@ -112,10 +112,12 @@ def _run(*args: str) -> subprocess.CompletedProcess:
 
 
 def _git_first_commit() -> tuple[str, str]:
+    # 固定 8 位缩写，避免仓库增长导致 %h 长度漂移（record frozen at 8）。
     proc = _run(
         "git",
         "log",
         "--diff-filter=A",
+        "--abbrev=8",
         "--format=%h %as",
         "--",
         str(REQUIREMENTS.relative_to(REPO_ROOT)),

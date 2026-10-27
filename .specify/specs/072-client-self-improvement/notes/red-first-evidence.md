@@ -62,6 +62,7 @@
 
 ## 纪律备注
 
+- **part 8d 纠正披露（2026-10-27, driver 裁决）**: closure rerun 的唯一 NEW 失败名是 `test_measurement_instruments.py::test_git_start_channel_is_the_first_commit_not_the_last_touch`。根因 = `_git_first_commit()` 用 `git log --format=%h` 取缩写，随仓库对象增长 `%h` 从 8 位漂为 9 位（`f0df3d0b0`），而 069b 冻结记录是 8 位 `f0df3d0b`，`sha in text` 失配；测试语义（首次提交仪器）未被破坏，是缩写长度漂移。纠正 = 仪器侧固定缩写：`git log --abbrev=8 --format=%h %as`，与冻结记录对齐（record frozen at 8）；不改记录、不改断言语义。证据： `test-evidence/part8d-instruments-correction.txt`（13 passed, RC=0）、`test-evidence/part8d-six-suites.txt`（六新套件 104 passed / 0 failed = 零 NEW 失败名）；本纠正落地同期发现 root 于 21:33 向对象库写入同一 notes blob（孤立树链、未动 refs，无活动并发进程），属环境权限噪声，非内容分歧。
 - 红运行 MUST 在未改动树(实现编辑前)上执行；失败计数 = 该文件 pytest 报告的 failed 数。
 - 守护性复跑(071 六套件、`test_expression_compatibility.py` C-5、`test_review_p1_review_loop.py`、feedback/probe 族)是迁移/回归例外，**不作红先行声称**，不进本文件。
 - 实现完成后同命令全绿即为该组转绿证据(GATE-5)。
