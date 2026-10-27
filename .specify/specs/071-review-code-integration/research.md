@@ -20,7 +20,7 @@
 
 ## R2 — Review object and base resolution, with the failure mode measured on this repo
 
-**Decision**: the code segment's object is this feature slice's committed delta. Resolution order: explicit caller value > parent of the first commit that added this feature's `requirements.md` > merge base with the repository default trunk. The rule is implemented in the skill's script and is parameter-overridable.
+**Decision**: the code segment's object is this feature slice's committed delta, reviewed as the range `base..head`. Base resolution order: explicit caller value > parent of the first commit that added this feature's `requirements.md` > merge base with the repository default trunk. Head is an explicit `--head` value, else `HEAD` resolved once at run start and fixed for the whole run. The rule is implemented in the skill's script and is parameter-overridable.
 
 **Measured on this repository** (the three facts that make the order non-arbitrary):
 
@@ -49,6 +49,10 @@ Three readings follow from that output:
 2. The first-commit instrument already exists in this repository's governance and is the one 069b contract C-1 pins for the requirements first commit (`git log --diff-filter=A`, never `git log -1`). Reusing it means the code segment and the wall-clock baseline measure the same freeze point.
 3. The script's own default is the wrong default for this job: `git-delta-review.sh` sets `GIT_BASE="${GIT_BASE:-main}"` (line 22), so the composed path must pass the resolved base explicitly instead of relying on it (FR-004 in the requirements forbids the built-in default).
 
+**Trunk identification is a closed order, because this clone shows why an open one fails.** The order is explicit `--trunk` > a resolvable `refs/remotes/origin/HEAD` > an existing `main` > an existing `master` > [[STR-002]]. Measured above: tier 2 is unresolvable here and tier 3 (`main`) resolves to the upstream mirror, so a resolver without the order could pick either and each would claim "the default trunk" while producing different bases — the determinism FR-022 requires would be unimplementable. On this repository the trunk tier never decides the default base anyway, because the feature-first-commit tier sits above it and resolves (`e57052ef`); the order matters for the failure case (no feature commit) and for cross-repository behaviour.
+
+**Head is fixed at run start, and the range may be wider than the slice.** Head = explicit `--head`, else `HEAD` read once when the run starts and never re-read, so a commit landing mid-run cannot change what was reviewed (measured risk, not hypothetical: an unattended loop commits between stages, including the remediation commit this document rides on). The consequence is stated rather than hidden: `base..head` MAY contain commits unrelated to this feature, and a caller who needs a strict slice passes the feature's last commit as `--head`. Head deliberately carries no source tier — two forms, no ordered search — while the base keeps its three tiers because it really is searched; the data model records that decision explicitly (V31) so the asymmetry is not read as an omission.
+
 **Alternatives rejected**: `HEAD~N` (N is unknowable); "the whole branch" (`main..HEAD` on this repo spans the upstream mirror); working-tree diff (excluded by FR-005 and by the fact that the review's object must be reproducible from commits).
 
 ## R3 — Renderer absence: replace the stop clause, keep the anti-pretense rule
@@ -67,6 +71,8 @@ Three readings follow from that output:
 
 **Why not keep "stop"**: in an unattended run the segment must still produce a judgement; stopping yields no conclusion at all, which is worse than a labelled text-mode conclusion — provided nothing claims a rendered review happened. The anti-pretense rule is what the constraint was protecting, and it survives verbatim in the new clause.
 
+**Mode selection is two-conditioned, and that changes this host's behaviour.** The rule is: renderer available **and** stdout is an interactive terminal ⇒ rendered mode with the marker [[STR-008]]; every other case ⇒ text mode with the marker [[STR-003]]. Measured here: `command -v delta` resolves (`/home/agent/.cargo/bin/delta`), yet every call this feature composes is made by an agent through a non-TTY pipe — so the primary call shape on a host *with* the renderer is text mode. A rule keyed on availability alone would stamp [[STR-008]] on that run and produce exactly the claim C-23 forbids: a rendered-mode marker with no visual review behind it. The TTY condition is therefore not a refinement of the old clause; it is what makes the marker truthful.
+
 ## R4 — Coverage receipt: carrier, closed field set, exit codes
 
 **Decision**: the receipt is one delimited block inside `code-review.md`, `name=value` per line, written by a new subcommand of the existing script. Exit codes: `0` = file sets equal and every changed file judged (reasoned skips included), `1` = gap, `2` = input/base error.
@@ -75,7 +81,9 @@ Three readings follow from that output:
 
 **Why exit `1` for a gap and `2` for input error**: this repository's deterministic gates already use that pair (`skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` documents `0 = pass, 1 = fail, 2 = input or parse error`). Reusing the convention means a caller can branch without reading a new vocabulary.
 
-**Gap vs skip, measured consequence**: a "skip everything except one file" run would otherwise exit 0 and could be presented as a pass while 49 changed files were never read. The decision therefore splits the two: a skip is not a gap (exit still 0) but it is not coverage credit either, so a non-zero skip count forbids a `pass` verdict (FR-014, clarified 2026-10-27).
+**Gap vs skip, measured consequence**: a "skip everything except one file" run would otherwise exit 0 and could be presented as a pass while 49 changed files were never read. The decision therefore splits the two: a skip is not a gap (exit still 0) but it is not coverage credit either, so a non-zero skip count forbids a [[STR-006]] verdict (FR-014, clarified 2026-10-27). "Reasoned" is only meaningful if the reasons are finite, so the grounds are a closed set owned by `requirements.md` FR-014; a reason outside it is routed to the gap exit rather than silently accepted, which is what keeps the qualifier testable at all.
+
+**Exit code meanings are closed at three**: `0` = complete (sets equal, every file judged), `1` = coverage gap (missing verdict, set mismatch, or an unrecognised skip reason), `2` = cannot evaluate (base/head unresolvable, record missing, repository unusable). The repository convention this reuses (`pre-analyze-check.py`) also carries a `2` for input/parse error, so the pairing is not invented here — but the meanings are now stated per code, because a caller that conflates `1` and `2` reports "your review has gaps" for a state where no review was possible.
 
 **Design refinement DR1 (disclosed)**: two literals describe the same mode — the record's marker must be the requirements' Shared String `renderer: text` (STR-003), while the receipt block's field must be `renderer=text` to keep the block uniformly `name=value`. Rather than let two hand-written copies drift, both are written by the same subcommand in one write pass and a contract test asserts equality. This is a machine-regenerated projection (Constitution XIV, second legitimate duplicate class), not a second owner.
 
@@ -104,7 +112,7 @@ Converging the row to a reference removes both literals, so that test goes red. 
 
 1. **Keep the literals and add a pointer.** Rejected: leaves the second criteria wording in place, which the requirement forbids and which is exactly the drift the two copies already show.
 2. **Delete the test.** Rejected: deleting an existing assertion is the weakening the requirements forbid (FR-027).
-3. **Update the pin to the reference form and add a negative assertion.** Adopted. The test keeps its subject (the `/speckit.review` row exists and the command owns that transition), stops asserting the duplicated wording, and gains an assertion of the owner's path plus an assertion that the duplicated wording is *gone* — so the drift that motivated the requirement now turns the test red. Net assertion count goes up, not down. This is the one intentional pin change of the feature and it is disclosed here, in `plan.md` § Risks (R-03), and in `feature-ref.md`.
+3. **Update the pin to the reference form and add a negative assertion.** Adopted. The test keeps its subject (the `/speckit.review` row exists and the command owns that transition), stops asserting the duplicated wording, and gains an assertion of the owner's path plus an assertion that the duplicated wording is *gone* — so the drift that motivated the requirement now turns the test red. Net assertion count goes up, not down. This is the one intentional pin change of the feature: `requirements.md` FR-027 authorizes it explicitly as a single non-precedential exception, the rationale MUST be declared in the feature detail's `## Latest Review` review-record entry, and no other assertion may follow it. It is disclosed here, in `plan.md` § Risks (R-03), and in `feature-ref.md` § 5.
 
 **Why the checklist row is in scope**: `shared/workflow/feature-integration.md` gives `/speckit.checklist` the same `Implemented → Ready for Review` transition. Because the requirement places the criterion on the transition rather than on one command, both initiators cite the same owner row (FR-008, clarified 2026-10-27). The existing annotation "applies only when the checklist runs after implement" stays (a contract test pins it).
 
@@ -114,11 +122,13 @@ Converging the row to a reference removes both literals, so that test goes red. 
 
 **Measured conflict this resolves**: the requirements fix the filename literal (Shared Strings) *and* demand that a re-run not overwrite the previous record. Both are satisfiable only with the stable name plus an archive step; a pure timestamp name would break the literal reference that contracts and tests use, and a pure overwrite would lose history.
 
-**Collision consequence measured**: the archive suffix uses the run timestamp `YYYYMMDD-HHMMSS`, the form the script already uses for `review_file_path()` (line 99–103 of `git-delta-review.sh`). Two runs launched inside the same second would collide; the archive step therefore refuses to overwrite an existing archive and exits 2 instead of silently losing a record.
+**Collision consequence measured**: the archive suffix is the run timestamp in the form `requirements.md` FR-010 fixes — `YYYYMMDDTHHMMSSZ`, UTC at second resolution. That is **not** the form the script already uses elsewhere: `review_file_path()` builds `${branch}-$(date +%Y%m%d-%H%M%S).md` (local time, dash form, lines 99–103 of `git-delta-review.sh`). The two forms must not be confused: the requirement's form governs the archive name (UTC, sortable, free of colons and dashes that would make the name ambiguous against the branch segment), while the interactive helper's local dash form is a different surface and MUST NOT be reused to produce an archive name — reusing it would silently violate the pinned form. Two runs launched inside the same second would still collide on the archive path; the rotation therefore either waits for the next second or refuses with exit `2` and a reason, and never overwrites an existing archive. A first run has nothing to rotate, and the report records [[STR-009]] for that archive path instead of leaving the field empty.
 
 ## R7 — Non-interactive path, and what "non-interactive" costs
 
-**Decision**: a fully non-interactive path exists as script subcommands — record creation/rotation, opinion capture (`note`), coverage receipt (`receipt`), verdict (`report --summary --file`). The interactive `review` subcommand stays as the human path, rendered when `delta` is present.
+**Decision**: a fully non-interactive path exists as exactly four script steps — base resolution (`base`), record creation and rotation (`start`), opinion capture (`note`), and the coverage receipt with its verdict (`receipt`, `report --summary --file`). The interactive `review` subcommand stays as the human path, rendered when the renderer is present and stdout is a TTY.
+
+**Why the enumeration is four and not three**: rotation is not an implementation detail of creation, it is the step that makes the second run work. If a caller takes "creation" as satisfied by writing a file, the second run either overwrites history or has an agent hand-write the record — and the unattended premise (A4) fails exactly where it matters most, on the re-run after a fix.
 
 **Measured state**: `review --yes` already suppresses prompts (`INTERACTIVE=false`), but `cmd_review` calls `need_delta` unconditionally, so the "non-interactive" flag is unusable in a delta-less environment. Separately, `note` already runs without delta, and `report` already runs without delta. The gap is therefore narrow: the record must be creatable and the receipt computable without delta and without a TTY.
 
@@ -130,13 +140,15 @@ Converging the row to a reference removes both literals, so that test goes red. 
 
 **Measured reason**: `tests/contract/test_review_p1_review_loop.py` parses `templates/review-template.md` by section numbers (`_section(body, r"## 5\.", r"## 6\.")` for the recommendations and roadmap sections). Inserting a new top-level numbered section renumbers § 5 and § 6 and turns that test red for a reason unrelated to its subject. A subsection keeps every existing section number stable, so the existing pin keeps meaning what it meant, and the new content is still in the report a reader opens first.
 
-**Content limit**: base/head ids and base source, renderer mode, receipt counts (changed / judged / skipped / gap), segment verdict, gate verdict, `not-applicable`/`not-evaluated` reason, the record path, and this run's archive path. Opinion bodies are not copied (FR-011) — the subsection is a pointer with a verdict, which is the same shape the review report already uses for external targets.
+**Content limit**: base/head ids and base source, renderer mode, receipt counts (changed / judged / skipped / gap) copied from the receipt block, segment verdict, gate verdict and its named refusal literal, [[STR-001]]/[[STR-002]] reason, the uncommitted-scope disclosure when the working tree is dirty, the record path, and this run's archive path ([[STR-009]] when there is none). Opinion bodies are not copied (FR-011) — the subsection is a pointer with a verdict, which is the same shape the review report already uses for external targets. The uncommitted disclosure belongs here *and* in the record by design (one fact, two carriers): FR-005 requires the report to disclose it, so a closed content list without it would have mandated two opposite acts.
 
-## R9 — Feedback boundary: two units, one key, no new store
+## R9 — Feedback boundary: three units, one key, no new store
 
-**Decision**: the nested run records two entries — command unit `/speckit.review` and skill unit `skill:code-review` — each at its own wrap-up, keyed by `(unit_id, run_id)`. Only framework friction is posted; code defects stay in the record.
+**Decision**: the nested run records three entries — the command unit `/speckit.review`, the process-skill unit `skill:review-sdd-process`, and the code-skill unit `skill:code-review` — each at its own wrap-up, keyed by `(unit_id, run_id)`. Only framework friction is posted; code defects stay in the record.
 
-**Measured state**: both units are already registered in the probe registry (`shared/definitions/probe-definitions.md` lines 78 and 87: `speckit-review-wrapup` and `skill-code-review-wrapup`), so the closing faces exist and this feature adds no step (FR-016). `shared/workflow/feedback-step.md` § Mechanism boundary already draws the SDD-flow vs framework-feedback line, and § Dedup guard keys on `(unit_id, run_id)`, so two units in one run do not collide and neither has to be suppressed (FR-018).
+**Measured state**: all three units are already registered in the probe registry (`shared/definitions/probe-definitions.md` lines 78, 87 and 174: `speckit-review-wrapup`, `skill-code-review-wrapup`, `skill-review-sdd-process-wrapup`), so the closing faces exist and this feature adds no step (FR-016). `shared/workflow/feedback-step.md` § Mechanism boundary already draws the SDD-flow vs framework-feedback line, and § Dedup guard keys on `(unit_id, run_id)`, so three units in one run do not collide and none needs suppressing (FR-018).
+
+**Why the census is three and not two**: the process skill writes its own closing record today (`run-determination.py --unit-id "skill:review-sdd-process"` appears in its own `## Wrap-up`), so a two-unit description would drop a record that already exists. The command side adds exactly its own entry and must neither suppress nor back-fill the other two.
 
 **Why the classification duty must be written down rather than assumed**: before this feature, the review command had no path that produced a *code* finding, so "a defect found during review is framework friction" was economically true. After composition the same run produces both kinds, and the cheapest wrong move — posting the code defect to the feedback store — becomes the default. The requirement's FR-017 turns that into a written rule in two surfaces (command template and skill text), which is what makes SC-007's sample detectable.
 
@@ -167,7 +179,7 @@ OK: all per-tool command copies match the source templates.
 | `shared/workflow/feature-integration.md` | `.specify/shared/workflow/…` | `sync-mirrors.py` |
 | `docs/`, `tests/` | none | — |
 
-**Probe registry**: unchanged. The two wrap-up faces this feature relies on are already registered (see R9); no registry edit, therefore no `compile-embeds` run and no risk of hand-editing a compiled face.
+**Probe registry**: unchanged. The three wrap-up faces this feature relies on are already registered (see R9); no registry edit, therefore no `compile-embeds` run and no risk of hand-editing a compiled face.
 
 ## R11 — Test strategy, including the one disclosed pin change
 
@@ -192,7 +204,7 @@ The fifth file is included deliberately: it holds the pin this feature changes, 
 - `test_expression_compatibility.py` freezes 51 layer-qualified skill units and `test_migration_distribution.py` freezes 27 commands / 51 skills. This feature adds neither a command nor a skill; both baselines stay untouched.
 - `test_flat_internal_skill_migration.py` and `test_run_skills_wiring.py` pin the nested-skill layout and the wiring surface; the new subcommands live inside the existing script entity, so no new wiring site exists for them to miss.
 
-**Red-first**: each new test is written against the not-yet-changed surfaces and recorded failing before the edit; a test whose subject can break without it going red is not counted as coverage.
+**Red-first**: each of the six groups is written against the not-yet-changed surfaces and recorded failing before the edit — command line, exit code, failing count, one record per group, reviewable rather than asserted. The obligation is stated at requirement level (`requirements.md` FR-028), and a test whose subject can break without it going red is reported as a fast-fail finding rather than counted as coverage.
 
 ## R12 — Same-author analysis gate: unavailability, disclosed
 

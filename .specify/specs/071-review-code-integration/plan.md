@@ -8,9 +8,11 @@
 
 Feature 071 composes an existing, currently unreferenced capability into a command that needs it. `/speckit.review` today delegates only to `review-sdd-process` and explicitly refuses to judge code; the `code-review` skill is a complete code-review loop that no command calls. After this feature, one `/speckit.review` invocation runs two segments in a fixed order — the process segment first and unconditionally, the code segment second and applicability-triaged — writes two artifacts into the feature directory, and reports both conclusions while keeping the two severity vocabularies apart.
 
-The technical approach is deliberately thin. The command template only orchestrates and points. The code segment's determinism (which commits are reviewed, which files were judged, whether the merge gate allows) moves into subcommands of the skill's existing script, so an unattended run can finish without a terminal, without a renderer, and without improvising a diff base from a branch name. The "was the whole diff read" question stops being a matter of trust and becomes a coverage receipt whose file set must equal the changed-file set and whose gap exits non-zero. The renderer's absence stops being a stop condition and becomes a labelled text mode, with the anti-pretense rule kept verbatim in the rewritten clause.
+The technical approach is deliberately thin. The command template only orchestrates and points. The code segment's determinism (which commits are reviewed, which files were judged, whether the merge gate allows) moves into subcommands of the skill's existing script, so an unattended run can finish without a terminal, without a renderer, and without improvising a diff base from a branch name. The "was the whole diff read" question stops being a matter of trust and becomes a coverage receipt whose file set must equal the changed-file set and whose gap exits `1`. The renderer's absence stops being a stop condition and becomes a labelled text mode, with the anti-pretense rule kept verbatim in the rewritten clause.
 
-One governance convergence rides along because the composition forces it: the `Implemented → Ready for Review` criteria exist twice and disagree, so the state-machine owner keeps them and the integration protocol's summary row becomes a reference. That single edit is why one existing pin changes; the change is disclosed, and it gains assertions rather than losing them.
+One governance convergence rides along because the composition forces it: the `Implemented → Ready for Review` criteria exist twice and disagree, so the state-machine owner keeps them and the integration protocol's summary row becomes a reference. That single edit is why one existing pin changes; the change is authorized as a single non-precedential exception, disclosed, and it gains assertions rather than losing them.
+
+**Remediation round 1 (2026-10-27, after the analyze gate).** `/speckit.analyze` returned `GATE: CRITICAL=0 HIGH=6`; the driver authorized the only permitted upstream repair round, and the requirements layer absorbed all 32 findings. This stage carried the plan-owned half — the worklist in `notes/remediation-round-1.md` — into the six contracts, the data model, research, quickstart, `feature-ref.md` and this file. Six decisions changed the design's shape rather than its wording, and each is recorded where it lives: the closing summary stops being a verifiable carrier (two carriers: the report's code subsection and the feature detail's `## Latest Review` entry); "what counts as a code path" belongs to one deterministic owner in the skill script with a `--code-paths` override; head is fixed at run start while base keeps three tiers plus a closed trunk-identification order; the gate is an existence test over the current record (no "cleared" state exists); the receipt's exit alphabet is closed at `0`/`1`/`2` with a closed skip-reason set; and the per-run unit census is three. Clause ids were preserved and one clause (C-74) appended, so the frozen ids every task row already cites still resolve.
 
 **Run input classification** (the planning skill's step 2): the dispatch brief arrived as run parameters — background facts, scope boundaries, and the non-negotiables already adjudicated in the requirements — not as a new requirement set. No mid-run addendum arrived, so `requirements.md` was not restructured and no upstream gate needed re-running.
 
@@ -55,7 +57,9 @@ One governance convergence rides along because the composition forces it: the `I
 
 **Gates Status**: ✅ All gates pass. No ❌ and no ⚠ row, so Complexity Tracking is N/A. The one intentional pin change is a design decision recorded in `research.md` § R5, not a gate violation.
 
-**Re-check after Phase 1** (2026-10-27, after the artifacts landed): the same sixteen rows remain ✅ Pass. New evidence: `data-model.md` (13 entities, 28 validation rules), six contract files with 73 clauses, `quickstart.md` with eight scenarios each carrying an execution status, and the executed programme checks in `test-evidence/`. No new violation; no Complexity Tracking row.
+**Re-check after Phase 1** (2026-10-27, after the artifacts landed): the same sixteen rows remain ✅ Pass. New evidence: `data-model.md` (13 entities, 35 validation rules), six contract files with 74 clauses, `quickstart.md` with eight scenarios each carrying an execution status, and the executed programme checks in `test-evidence/`. No new violation; no Complexity Tracking row.
+
+**Re-check after remediation round 1** (2026-10-27, substantive revision at the driver's explicit authorization): all sixteen rows remain ✅ Pass, with three rows re-examined rather than re-asserted because the remediation moved what they rest on. XIV (One Source of Truth) is stronger than before — the counts now have one declared source with an equality assertion (C-74), the code-path predicate has one owner instead of a silent gap, and the two severity vocabularies are cited rather than restated. XVI (Fast Fail) is exercised rather than claimed: each amended clause names its finding id in the contract file's amendment log, and the one new clause is appended instead of inserted so no existing citation breaks. IX (Framework Scope Discipline) is unchanged in outcome — the round edited specification documents only; no engine, dependency, command, skill, template, test or task row was added. The two program checks re-ran after the edits: `pre-analyze-check.py --stage plan` → `decision=pass`, `errors=0`; `account-clause-coverage.py` → FR lane 28/28, with the one appended clause (C-74) reported beyond the frozen baseline because no `tasks.md` row claims it yet (pending-claim list in `notes/plan-remediation-round-1.md`).
 
 ## Project Structure
 
@@ -65,8 +69,8 @@ One governance convergence rides along because the composition forces it: the `I
 .specify/specs/071-review-code-integration/
 ├── plan.md                 # This file
 ├── research.md             # Phase 0 decisions R1–R14 (standalone: >50 lines, external-source evaluation)
-├── data-model.md           # Phase 1: entities E1–E13 + validation rules V1–V28
-├── contracts/              # Phase 1: six contract files, clauses C-1…C-73
+├── data-model.md           # Phase 1: entities E1–E13 + validation rules V1–V35
+├── contracts/              # Phase 1: six contract files, clauses C-1…C-74 (C-74 appended in remediation round 1)
 │   ├── command-orchestration.md
 │   ├── code-review-skill.md
 │   ├── coverage-receipt.md
@@ -135,6 +139,8 @@ tests/contract/
 
 `docs/` and `tests/` have no mirror. The probe registry is not edited, so no compiled closing face is regenerated. Write direction is source → projection through the generator, always; a hand-edited projection is a violation (C-69).
 
+**Remediation round 1 leaves this table unchanged**: the round edited only artifacts under `.specify/specs/071-review-code-integration/` plus the feature registry, so no source file above was touched and the measured baselines (22 / 136 / 55 / per-tool copies) still describe the pre-edit tree. The table and its criterion are therefore carried forward, not re-measured — re-measuring a tree that has not changed would be a run whose only product is a restated number.
+
 ## Complexity Tracking
 
 N/A — no Constitution Check violation requires justification.
@@ -166,35 +172,35 @@ Which sources feed each section: the composition rules come from `contracts/comm
 
 ### 2. Applicability triage: three values, no silent fourth
 
-Before the code segment starts, the command resolves `run` / `not-applicable` / `not-evaluated`. `not-applicable` must carry a basis (no code deliverable, or no committed code delta); `not-evaluated` must carry a reason (unresolvable base, unusable repository). Both non-`run` values are disclosed in three places: the report's code subsection, the closing summary, and the feature detail's review-record row. For an expression-class feature this is what keeps the code segment additive rather than substitutive (C-6, C-7, C-52, C-62).
+Before the code segment starts, the command resolves `run` / `not-applicable` / `not-evaluated` (as `[[STR-005]]` / `[[STR-001]]` / `[[STR-002]]`). `not-applicable` must carry a basis (no code deliverable, or no committed code delta); `not-evaluated` must carry a reason (unresolvable base, unusable repository). Whether a changed path is a *code* path is not decided here: the `code-review` skill's script owns one closed default path set and accepts `--code-paths`, because a second list in the command template would drift and a drift flips the triage value for one repository state. An empty delta (base and head at the same commit) is triaged before the receipt runs, so a 0/0/0 receipt can never report a clean review of nothing. Both non-`run` values are disclosed on the two carriers — the report's code subsection and the feature detail's `## Latest Review` entry — and only `run` writes a record file. For an expression-class feature this is what keeps the code segment additive rather than substitutive (C-6, C-7, C-11, C-52, C-62).
 
 ### 3. The code segment's deterministic core
 
 All of it lands on `skills/internal/code-review/scripts/git-delta-review.sh`:
 
-- `base` — three tiers, `--spec` / `--since`, prints `base=`, `head=`, `base_source=`; exits `2` when nothing resolves.
-- `start` — creates the record header, rotates a previous record to its archive name, refuses to overwrite an existing archive.
+- `base` — base resolution in three tiers plus the closed trunk order (`--trunk`), and head (`--head`, else run-start `HEAD` fixed for the run); prints `base=`, `head=`, `base_source=`; exits `2` when nothing resolves.
+- `start` — creates the record header, rotates a previous record to its `YYYYMMDDTHHMMSSZ` archive name, refuses to overwrite an existing archive (wait a second or exit `2`).
 - `note` — unchanged behavior, now always called with an explicit `--review-file` by the composed path.
-- `receipt` — computes the changed-file set from the resolved range, compares it with the judged set, writes the delimited block, exits `0`/`1`/`2`, and derives the segment verdict from the three signals.
-- `report --summary --file` — the single gate verdict source; `0` allow, `1` deny, `2` input error; an omitted `--file` stays as a labelled legacy mode.
+- `receipt` — computes the changed-file set from the resolved range, compares it with the judged set, honours the closed skip-reason set, writes the delimited block, exits `0`/`1`/`2` with one meaning each, and derives the segment verdict from the three signals.
+- `report --summary --file` — the single gate verdict source; `0` allow, `1` deny (a `blocking` entry is present), `2` input error; an omitted `--file` stays as a labelled legacy mode.
 
-`review` (the interactive per-file walk) keeps its rendered default, its tests-first ordering, its focus option, and its six-level validation. The rewrite of the renderer clause reaches the skill body's `Strict Requirements`, its Phase 0 step, and the `references/` wording in one pass (C-17…C-30, C-31…C-41).
+`review` (the interactive per-file walk) keeps its tests-first ordering, its focus option, and its six-level validation; its rendered default follows FR-013's single mode rule — renderer **and** TTY — so an agent call takes text mode even on a host where `delta` is installed. The rewrite of the renderer clause reaches the skill body's `Strict Requirements`, its Phase 0 step, and the `references/` wording in one pass (C-17…C-30).
 
 ### 4. The receipt: what makes "read the whole diff" checkable
 
-The block's name set is closed and its counting identity is asserted (`judged + skipped + gap = changed`). Exit `1` means at least one changed file has no verdict or the sets differ; exit `0` with a non-zero skip count is still legal but forbids a `pass` verdict, because a skip is disclosure, not coverage. One write produces both the header marker and the block's `renderer` field, and a test asserts their equality — the disclosed projection that keeps one owner for one fact (C-31…C-42, `research.md` § R4).
+The block's name set is closed and its counting identity is asserted (`judged + skipped + gap = changed`). Exit `1` means at least one changed file has no verdict, the sets differ, or a skip carries a reason outside the closed set; exit `0` with a non-zero skip count is still legal but forbids a `pass` verdict, because a skip is disclosure, not coverage. The four counts have exactly one source — this block — and the two disclosures copy it, with a contract test asserting the three agree. One write produces both the header marker and the block's `renderer` field, and a test asserts their equality — the disclosed projection that keeps one owner for one fact (C-31…C-42, C-74, `research.md` § R4).
 
 ### 5. The gate: one owner, two initiators, no mapping
 
-`templates/feature-details-template.md` § Canonical Status State Machine keeps the criterion and gains the third condition (no unresolved `blocking` in the code segment), judged by reading the six-level vocabulary directly. `shared/workflow/feature-integration.md`'s `/speckit.review` row and `/speckit.checklist` row become references to that section. A waiver is only a user ruling, recorded in the report and the feature detail; the agent never downgrades a `blocking` item. The transition is judged once, after both artifacts exist (C-45…C-54).
+`templates/feature-details-template.md` § Canonical Status State Machine keeps the criterion and gains the third condition — the current code-segment record contains no `blocking` entry, judged by reading the six-level vocabulary directly. That condition is an existence test: there is no clearing action and no cleared state, so a later run that writes a record with zero `blocking` entries is the whole mechanism. `shared/workflow/feature-integration.md`'s `/speckit.review` row becomes a reference to that section and its `/speckit.checklist` row becomes a conditional reference (the checklist initiates the transition only when it runs after implement). A waiver is only a user ruling — a driver's confirmation is not — recorded on both carriers; without one the unattended disposition is halt-and-report with `blocking-unresolved` as the named refusal literal. The transition is judged once, after both artifacts exist (C-45…C-54).
 
-### 6. Feedback: two units, framework friction only, zero transmission
+### 6. Feedback: three units, framework friction only, zero transmission
 
-The command unit and the skill unit each close themselves; the key is `(unit_id, run_id)`, so neither suppresses the other. The classification duty is written into the command template and the skill text: framework friction in, code defects out. The predecessor invariants — same-commit recommendation registration, introspection as the legal global entry, `scope: local`, zero automatic transmission, no new intake — stay in force (C-55…C-61).
+The command unit and both delegated skill units (`skill:review-sdd-process`, `skill:code-review`) each close themselves; the key is `(unit_id, run_id)`, so none suppresses another. The classification duty is written into the command template and the skill text: framework friction in, code defects out. The predecessor invariants — same-commit recommendation registration, introspection as the legal global entry, `scope: local`, zero automatic transmission, no new intake — stay in force (C-55…C-61).
 
 ### 7. Documentation and tests
 
-The docs page, both skills' boundary wording, and the state-machine owner move in one change. Six contract groups land red-first; the one intentional pin change keeps its subject and gains a negative assertion. The neighbouring suites and the mirror checks are re-run against the measured baselines and judged by "no NEW failure, no NEW drift" (C-64…C-73).
+The docs page, both skills' boundary wording, and the state-machine owner move in one change. Six contract groups land red-first — each with a recorded failing run (command, exit code, failing count) — and the one intentional pin change keeps its subject, adds the owner path, and adds a negative assertion. The neighbouring suites and the mirror checks are re-run against the measured baselines and judged by "no NEW failure, no NEW drift" (C-64…C-73).
 
 ### 8. What is deliberately not built
 
@@ -216,22 +222,28 @@ The work fits one slice. Estimate: 30 steps against the 40-step ceiling.
 
 If the tasks stage needs more steps it may split a row, but the total must stay at or below the ceiling; no requirement may be dropped to fit.
 
+**Remediation round 1 does not move this budget.** The round's added obligations — `--code-paths`, `--trunk` / `--head`, the TTY condition, the closed skip-reason check, the count-equality assertion — are absorbed into rows that already exist (the script subcommands row, the three test-and-fixture rows, the template/skill body rows). No new phase, no new test file and no new delivery file was introduced, so the estimate stays at 30 steps and the six-group test plan of FR-028 stays six.
+
 ## Risks and Assumptions
 
 | # | Risk / assumption | Impact | Mitigation | Evidence / owner |
 |---|-------------------|--------|------------|------------------|
 | R-01 | The composed path inherits the "newest file in the directory" selection from the skill's `note`/`report` defaults. | A false allow: the process report is read as the code record and has no `blocking` heading. | The composed path always passes `--review-file` / `--file`; the legacy mode labels itself; a test asserts the explicit path is used. | C-27; `research.md` § R7 |
 | R-02 | A branch-name default silently reviews the wrong slice. | The whole code judgement is about the wrong commits. | Three ordered tiers; measured proof that `origin/HEAD` is absent and `main`'s merge base is far behind; no branch literal anywhere. | C-18…C-20; `research.md` § R2 |
-| R-03 | The one pin change is read as a weakening. | A silent loss of an existing guarantee. | Disclosed in `research.md` § R5 and `feature-ref.md` § 5; the replacement pin adds the owner path and a negative assertion; net assertions increase. | C-64, C-67 |
-| R-04 | Skipped files are treated as judged, so a focused pass reports `pass`. | A review that read 2 of 50 files goes green. | Skip is not coverage credit; a non-zero skip count forbids `pass`; the count is a receipt field and is surfaced outside the block. | C-36…C-38, C-43 |
+| R-03 | The one pin change is read as a weakening — or as a permission. | A silent loss of an existing guarantee; or a second pin edit justified by the first. | Authorized as a **single non-precedential exception** by FR-027 (C-64, C-67): the rationale must be declared in the feature detail's review-record entry, the replacement adds the owner path and a negative assertion, net assertions increase, and the authorization may not be cited as precedent. Disclosed in `research.md` § R5 and `feature-ref.md` § 5. | C-64, C-67; FR-027 |
+| R-04 | Skipped files are treated as judged, so a focused pass reports `pass`. | A review that read 2 of 50 files goes green. | Skip is not coverage credit; a non-zero skip count forbids `pass`; the count is a receipt field surfaced on both carriers. | C-36…C-38, C-43 |
 | R-05 | The receipt's two renderer literals drift apart. | A record claims a mode the block contradicts. | One write produces both; a test asserts equality. | C-40; DR1 |
-| R-06 | Two feedback units collide or one suppresses the other. | A missing or duplicated entry per run. | The `(unit_id, run_id)` key already distinguishes them; both are probe-registered so no closing-face edit is needed. | C-58, C-59; `research.md` § R9 |
+| R-06 | Two feedback units collide or one suppresses the other. | A missing or duplicated entry per run. | Three units, keyed `(unit_id, run_id)`; all three are probe-registered so no closing-face edit is needed. | C-58, C-59; `research.md` § R9 |
 | R-07 | A code defect is posted as framework feedback. | The feedback store fills with feature defects and loses its meaning. | The classification duty is written in two surfaces; the contract test builds both samples. | C-56, C-57 |
 | R-08 | Mirrors are missed while editing skills and templates. | Client-runtime drift, the highest-frequency rework source in this repo. | Measured baselines (22 / 136 / 55 files, per-tool copies) and the "no NEW drift" criterion per pair. | C-69, C-70 |
 | R-09 | The report template's new subsection renumbers top-level sections. | An unrelated pin (`§ 5` / `§ 6`) goes red for the wrong reason. | The content lands as `### 2.1`, keeping every existing number. | C-9; `research.md` § R8 |
-| R-10 | The text-mode path cannot be exercised on this host (`delta` is installed at `/home/agent/.cargo/bin/delta`). | The mode's behaviour stays unproven. | Drive the script with `DELTA_BIN` pointed at a non-existent binary — a substitution the script already supports. | C-22; `quickstart.md` scenario D |
-| R-11 | Same-author detection could not be delegated in this environment. | The Constitution Check is weaker evidence than the gate intends. | Row-level markers, a named disclosure, and program-derivable checks actually executed. | `research.md` § R12 |
-| R-12 | The requirements' 28-FR budget leaves no room for scope growth. | A mid-flight requirement forces a split or a dropped obligation. | No new requirement is introduced; the plan maps every requirement to a clause; the 30-step estimate sits under the ceiling. | `feature-ref.md` § 3; Task Budget |
+| R-10 | The text-mode path cannot be exercised on this host (`delta` is installed at `/home/agent/.cargo/bin/delta`). | The mode's behaviour stays unproven. | Two deterministic substitutions: `DELTA_BIN` pointed at a non-existent binary, and a non-TTY run with the renderer present (the shape an agent actually gets). | C-22; `quickstart.md` scenario D |
+| R-11 | Same-author detection could not be delegated in this environment. | The Constitution Check is weaker evidence than the gate intends. | Row-level markers, a named disclosure, and program-derivable checks actually executed — including a re-run after the remediation. | `research.md` § R12 |
+| R-12 | The requirements' 28-FR budget leaves no room for scope growth. | A mid-flight requirement forces a split or a dropped obligation. | No new requirement is introduced; the plan maps every requirement to a clause; the 30-step estimate sits under the ceiling and the remediation added no step. | `feature-ref.md` § 3; Task Budget |
+| R-13 | Two code-path lists appear (command template and script) and drift. | One repository state triaged `run` by one reader and `not-applicable` by another; SC-005 becomes untestable. | The predicate has exactly one owner — the skill script with `--code-paths`; C-7 and the command template cite it and carry no list. | C-7, C-30; FR-003 |
+| R-14 | An empty delta reaches the receipt and the 0/0/0 conjunction returns `pass`. | A review of nothing reported as clean. | Triage runs before the receipt; C-38's conjunction is scoped to `run` with a non-empty changed set; V30 keeps the two apart. | C-7, C-38; V20, V30 |
+| R-15 | Two runs inside one second collide on the archive path. | A record overwritten, or the run unable to write at all. | The rotation waits for the next second or exits `2` with a reason; an existing archive is never overwritten. | C-12; V12, V24 |
+| R-16 | The four receipt counts drift across the block and its two disclosures. | The number a reader trusts is not the number the receipt produced. | One declared source plus an equality assertion in the receipt test (the same guard C-40 uses for the renderer literal). | C-74; V33 |
 
 ## Dependencies and Sequencing
 
@@ -255,9 +267,33 @@ Backfilled after the Phase 1 artifacts landed on disk; every count below was tak
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Research decisions | [`research.md`] | 14 sections (R1–R14) plus one disclosed design refinement (DR1: the renderer literal projection) |
-| Data model | [`data-model.md`] | 13 entities (E1–E13), 28 validation rules (V1–V28) |
-| Contracts | [`contracts/`] | 6 files, 73 clauses: `command-orchestration.md` (C-1…C-16), `code-review-skill.md` (C-17…C-30), `coverage-receipt.md` (C-31…C-44), `status-gate-ownership.md` (C-45…C-54), `feedback-and-boundaries.md` (C-55…C-64), `tests-and-docs-sync.md` (C-65…C-73) |
-| Quickstart | [`quickstart.md`] | 8 scenarios (A–H): in A the two git-instrument blocks are `EXECUTED` against the real repository and its scripted `base` example is `PINNED`; B–H are `PINNED` with premises listed per example; the regression block is `EXECUTED` with its measured counts |
-| Feature reference | [`feature-ref.md`] | Binding, delivery surface (16 files), requirement coverage, one disclosed pin change, mirror-obligation pointer (owner: this file § Mirror Obligations) |
+| Data model | [`data-model.md`] | 13 entities (E1–E13), 35 validation rules (V1–V35); the seven rules added in remediation round 1 are V29–V35, appended so no existing rule number moves |
+| Contracts | [`contracts/`] | 6 files, 74 clauses: `command-orchestration.md` (C-1…C-16), `code-review-skill.md` (C-17…C-30), `coverage-receipt.md` (C-31…C-44 plus the appended C-74), `status-gate-ownership.md` (C-45…C-54), `feedback-and-boundaries.md` (C-55…C-64), `tests-and-docs-sync.md` (C-65…C-73) |
+| Quickstart | [`quickstart.md`] | 8 scenarios (A–H): in A the two git-instrument blocks are `EXECUTED` against the real repository and its scripted `base` example is `PINNED`; B–H are `PINNED` with premises listed per example, D now carrying the no-TTY case alongside the missing-renderer one; the regression block is `EXECUTED` with its measured counts |
+| Feature reference | [`feature-ref.md`] | Binding, delivery surface (16 files), requirement coverage, one disclosed pin change (authorized by FR-027), mirror-obligation pointer (owner: this file § Mirror Obligations) |
 
-**Drift from the Phase 0 expectation**: none in scope. The clause count (73) is above the pre-filling estimate of roughly 60 because the receipt grammar and the pin disclosure each needed their own clauses; no requirement was added to accommodate them, and every clause cites an existing requirement. The contract-clause form is the canonical `md-bold-closed` form declared by `shared/definitions/contract-clause-definitions.md` § 3, so the clause extraction lane reads them without a legacy fallback.
+**Drift from the Phase 0 expectation**: none in scope. The clause count (73 at Phase 1, 74 after remediation round 1) is above the pre-filling estimate of roughly 60 because the receipt grammar and the pin disclosure each needed their own clauses, and the round appended exactly one more (C-74: the counts' single source with its equality assertion); no requirement was added to accommodate them, and every clause cites an existing requirement. The contract-clause form is the canonical `md-bold-closed` form declared by `shared/definitions/contract-clause-definitions.md` § 3, so the clause extraction lane reads them without a legacy fallback.
+
+## Plan Change Log
+
+### Remediation round 1 — 2026-10-27 (substantive revision, driver-authorized)
+
+**Trigger**: `.specify/specs/071-review-code-integration/test-evidence/analyze-report.md` → `GATE: CRITICAL=0 HIGH=6` (32 findings: HIGH 6 / MEDIUM 22 / LOW 4). The requirements layer absorbed all of them in commit `14a1c6ec`; the plan-owned half was handed over as `notes/remediation-round-1.md`. This round is the only permitted upstream repair round, and the driver authorized substantive edits to plan-owned artifacts (a plain `PLAN-EDIT` declaration per file follows, and the same list is returned in the stage's report).
+
+| Artifact | What changed | Findings |
+|----------|--------------|----------|
+| `contracts/command-orchestration.md` | C-5 (minimal report on abort), C-6 ([[STR-005]]), C-7 (code-path owner + empty delta), C-9 (disclosure + counts copied), C-11 (record existence follows triage), C-12 (timestamp/collision/first-run), C-13 (`## Latest Review` carrier), C-14 (two carriers) | A-01, A-02, A-04, A-07, A-08, A-09, A-11, A-21, A-22, A-29, A-33 |
+| `contracts/code-review-skill.md` | C-17 (four steps), C-18 (head + trunk order), C-21 (head in header), C-22 (renderer ∧ TTY, [[STR-008]]), C-23 (SC-003 owns the phrase list), C-28 (cites FR-013), C-30 (`--code-paths` on the script entity) | A-02, A-03, A-10, A-15, A-16, A-26, A-32 |
+| `contracts/coverage-receipt.md` | C-34/C-35 (closed `0/1/2` alphabet), C-36 (skip reasons owned by FR-014), C-37/C-38 (presence; scoped conjunction), C-39 ([[STR-006]]/[[STR-007]]), C-43 (two carriers), C-44 (dual-carrier disclosure), **C-74 appended** (counts' single source + equality assertion) | A-01, A-04, A-05, A-11, A-12, A-13, A-14, A-29 |
+| `contracts/status-gate-ownership.md` | C-46 (existence), C-48 (conditional checklist initiator), C-51 (halt-and-report, [[STR-010]]), C-52/C-53 (two carriers, named failing condition) | A-01, A-05, A-18, A-19 |
+| `contracts/feedback-and-boundaries.md` | C-58/C-59 (three units), C-63 (coverage disambiguation both ways), C-64 (single non-precedential authorization + declaration duty) | A-06, A-17, A-20 |
+| `contracts/tests-and-docs-sync.md` | C-66 (red-first per group), C-67 (pin tied to C-64), C-70 (criterion vs. table owner) | A-06, A-23, A-25 |
+| `data-model.md` | E1/E3/E4/E5/E6/E7/E8/E9/E10/E11/E12/E13 aligned; V6/V9/V12/V20/V22/V24/V25 amended; V29–V35 appended | A-03, A-04, A-05, A-08, A-11, A-12, A-13, A-14, A-16, A-20, A-21, A-22, A-29 |
+| `research.md` | R2 (head rule + trunk order, measured), R3 (renderer ∧ TTY), R4 (exit meanings, skip grounds), R5 (authorized pin), R6 (`YYYYMMDDTHHMMSSZ` vs. the script's legacy form), R7 (four steps), R8 (content list), R9 (three units), R11 (per-group red-first) | A-03, A-10, A-13, A-16, A-20, A-22, A-26 |
+| `quickstart.md` | A (head/trunk premises), B (two carriers, counts copied), C (predicate basis, no record for non-`run`), D (no-TTY case), E (exit alphabet + unrecognised reason), F (legal skip reason literal), G (existence gate, [[STR-010]]), H (three units) | A-01, A-02, A-03, A-05, A-12, A-13, A-16, A-19, A-20, A-21 |
+| `feature-ref.md` | delivery-surface rows, FR/SC clause map (incl. C-74), § 5 pin authorization + this round disclosed, artifact counts | A-06, A-29 |
+| `plan.md` | Summary, Design Overview §2–§7, Task Budget, Risks (R-03 rewritten, R-13…R-16 added), Constitution re-check, Mirror note, Phase 1 counts, this change log | all |
+
+**Clause-ID discipline**: C-1…C-73 keep their ids and their meaning; every wording change is listed per file in that contract's `## Amendment log — remediation round 1` with the finding id that forced it; the single new obligation was **appended** as C-74 rather than inserted, so no existing citation in `tasks.md` breaks and no clause id is reused. Each amended and appended clause still ends with its FR/SC citation group, which is what keeps `clause_extract.py` and `account-clause-coverage.py` able to read the set.
+
+**Pending claim**: C-74 is unclaimed by any `tasks.md` row (this stage does not edit `tasks.md`), so it reports as one item beyond the frozen clause baseline. The tasks stage claims it; the exact command output and the pending list are in `notes/plan-remediation-round-1.md`.

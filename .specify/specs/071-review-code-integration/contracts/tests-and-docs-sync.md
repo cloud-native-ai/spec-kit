@@ -5,17 +5,17 @@
 **Pinned by**: `tests/contract/test_review_docs_isomorphism.py`
 **Measures**: SC-006
 
-**C-65**: New behavior lands with deterministic contract coverage of six things, one test group each: (a) the command template's two segments and their fixed order; (b) the three applicability values; (c) the state-machine gate conditions; (d) the receipt's non-zero exit on a gap; (e) the base-resolution rule; (f) documentation/template isomorphism. A group that would stay green when its subject breaks is not coverage (FR-028, SC-006).
+**C-65**: New behavior lands with deterministic contract coverage of six things, one test group each: (a) the command template's two segments and their fixed order; (b) the three applicability values; (c) the state-machine gate conditions; (d) the receipt's exit `1` on a gap and exit `2` on a state it cannot evaluate; (e) the base-resolution rule; (f) documentation/template isomorphism. A group that would stay green when its subject breaks is not coverage (FR-028, SC-006).
 
-**C-66**: Each new test is run before the mechanism it pins exists and is recorded as failing, with the command, the exit code, and the failing count. A green check is a claim, not evidence: a test that cannot go red is reported as a fast-fail finding rather than cited as proof (FR-028, SC-006).
+**C-66**: Red-first is an obligation of each of the six groups, not of the suite as a whole: each group is run before the mechanism it pins exists and its failing run is recorded — command line, exit code, failing count — and that record MUST be reviewable rather than asserted. The same duty is stated at requirement level (`requirements.md` FR-028), so a group without a recorded failing run does not satisfy the requirement either. A green check is a claim, not evidence: a test that cannot go red when its subject breaks is reported as a fast-fail finding and MUST NOT be counted as coverage (FR-028, SC-006).
 
-**C-67**: The one changed pin keeps its subject and grows: the `/speckit.review` row assertion in `tests/contract/test_review_p1_review_loop.py` still requires the row to exist and still requires the command to own that transition, stops requiring the duplicated criteria wording, and adds (i) an assertion that the row cites `templates/feature-details-template.md` § Canonical Status State Machine and (ii) a negative assertion that the duplicated wording is gone. The net assertion count rises; nothing is dropped without a replacement assertion naming the same obligation (FR-027, FR-028).
+**C-67**: The one changed pin keeps its subject and grows: the `/speckit.review` row assertion in `tests/contract/test_review_p1_review_loop.py` still requires the row to exist and still requires the command to own that transition, stops requiring the duplicated criteria wording, and adds (i) an assertion that the row cites `templates/feature-details-template.md` § Canonical Status State Machine and (ii) a negative assertion that the duplicated wording is gone. The net assertion count rises; nothing is dropped without a replacement assertion naming the same obligation. This is the single authorized assertion change of C-64 and it is non-precedential: no other pin may follow it (FR-027, FR-028).
 
 **C-68**: The documentation-sync surface covers three places in the same change: the command reference page `docs/reference/commands/review.md`, the boundary wording of both review skills, and the state-machine owner's gate row. A page that still describes a process-only review is a defect, not a stale nicety (FR-028).
 
 **C-69**: Framework sources are the only edit surface — `templates/`, `skills/`, `shared/`, `scripts/` where a shared asset is touched, `docs/`, `tests/`. Every runtime projection is produced by the existing generators and MUST NOT be hand-edited: the per-tool command copies by the command-copy regenerator, the `.specify/` template/skill/shared copies by the mirror synchronizer (FR-028).
 
-**C-70**: Each edited source lands its projected copies and the acceptance criterion is "no NEW drift" against the baselines measured before this plan: templates 22 files, skills/internal 136 files, shared 55 files, and per-tool command copies matching their templates. An absolute "all green" criterion is unpassable whenever unrelated drift predates the change, so the criterion is stated relative to that measurement. The per-pair table is owned by `plan.md` § Mirror Obligations (FR-028, SC-006).
+**C-70**: Each edited source lands its projected copies and the acceptance criterion is "no NEW drift" against the baselines measured before this plan: templates 22 files, skills/internal 136 files, shared 55 files, and per-tool command copies matching their templates. An absolute "all green" criterion is unpassable whenever unrelated drift predates the change, so the criterion is stated relative to that measurement. The per-pair table and the generator attribution are owned by `plan.md` § Mirror Obligations; FR-028 points there instead of restating the table (FR-028, SC-006).
 
 **C-71**: The command reference page describes the same surface as the template: two segments, two artifacts, two severity vocabularies not mapped to each other, and the three applicability values. The isomorphism test compares the declared surface — the named segments, artifacts, and values — rather than prose, so a cosmetic reword does not red it and a deleted segment does (FR-028, SC-006).
 
@@ -36,3 +36,13 @@
 | C-71 | FR-028 | SC-006 | docs ↔ template |
 | C-72 | FR-026 | — | dependency/command sweep |
 | C-73 | FR-026 | — | roster pins |
+
+## Amendment log — remediation round 1 (2026-10-27)
+
+Trigger: `test-evidence/analyze-report.md` (`GATE: CRITICAL=0 HIGH=6`) and `notes/remediation-round-1.md`. Clause ids are unchanged; no obligation was dropped.
+
+| Clause | Change | Why (finding) |
+|--------|--------|---------------|
+| C-66 | red-first becomes a per-group obligation matching FR-028, with the recorded failing run required | A-23 |
+| C-67 | the pin change is tied to C-64's single authorization and marked non-precedential | A-06 |
+| C-70 | the criterion and its owner are separated explicitly: the plan owns the table, this clause owns the criterion | A-25 |

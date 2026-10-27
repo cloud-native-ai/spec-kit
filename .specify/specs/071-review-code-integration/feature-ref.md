@@ -24,11 +24,11 @@ Framework sources only. Every projected copy is produced by an existing generato
 | File | Change |
 |------|--------|
 | `templates/commands/review.md` | the two segments, the applicability triage, the failure-propagation rule, the severity non-collapse rule, and pointers to both skills; no methodology inlined; closing face and handoffs untouched |
-| `templates/review-template.md` | a `### 2.1` code-segment subsection (verdict plus pointers only) and the matching placeholder-glossary rows; existing section numbers unchanged |
-| `templates/feature-details-template.md` | the `Implemented → Ready for Review` row gains its third condition and the direct six-level read; this file stays the normative owner |
-| `shared/workflow/feature-integration.md` | the `/speckit.review` row and the `/speckit.checklist` row become references to that owner |
-| `skills/internal/code-review/SKILL.md` | non-interactive path, base resolution, record header and rotation, the rewritten renderer clause, the receipt as sole evidence, the sibling-boundary declaration, the feedback classification duty |
-| `skills/internal/code-review/scripts/git-delta-review.sh` | new subcommands: base resolution, record creation/rotation, coverage receipt with exit codes, explicit-input verdict |
+| `templates/review-template.md` | a `### 2.1` code-segment subsection (verdict plus pointers only, including the uncommitted-scope disclosure) and the matching placeholder-glossary rows; existing section numbers unchanged |
+| `templates/feature-details-template.md` | the `Implemented → Ready for Review` row gains its third condition (an existence test over the current code record) and the direct six-level read; this file stays the normative owner |
+| `shared/workflow/feature-integration.md` | the `/speckit.review` row becomes a reference to that owner; the `/speckit.checklist` row becomes a conditional reference |
+| `skills/internal/code-review/SKILL.md` | non-interactive path (four steps), base and head resolution, record header and rotation, the rewritten renderer clause with the TTY condition, the receipt as sole evidence, the sibling-boundary declaration, the feedback classification duty |
+| `skills/internal/code-review/scripts/git-delta-review.sh` | new subcommands: base resolution (`--trunk` / `--head`), record creation/rotation with the `YYYYMMDDTHHMMSSZ` archive name, coverage receipt with the closed `0/1/2` exits, explicit-input verdict; the code-path predicate with `--code-paths` |
 | `skills/internal/code-review/references/delta-setup.md` | renderer-absence wording aligned with the rewritten clause (no "stop when missing" assertion survives) |
 | `skills/internal/review-sdd-process/SKILL.md` | `description` and `## Boundaries` rewritten to "distinct judgment objects, composed by the command"; the process judgement itself unchanged |
 | `docs/reference/commands/review.md` | the composed surface: two segments, two artifacts, two vocabularies, three applicability values, the transition pointer |
@@ -50,29 +50,29 @@ Every functional requirement is cited from at least one contract clause's citati
 |----|-----------|----|-----------|
 | FR-001 | C-1, C-2 | FR-015 | C-25 |
 | FR-002 | C-3, C-4, C-5 | FR-016 | C-16, C-55 |
-| FR-003 | C-6, C-7, C-39 | FR-017 | C-56, C-57 |
-| FR-004 | C-8, C-18, C-19, C-20 | FR-018 | C-58, C-59 |
-| FR-005 | C-8, C-43, C-44 | FR-019 | C-14, C-52 |
+| FR-003 | C-6, C-7, C-30, C-39 | FR-017 | C-56, C-57 |
+| FR-004 | C-8, C-18, C-19, C-20, C-21 | FR-018 | C-58, C-59 |
+| FR-005 | C-8, C-9, C-43, C-44 | FR-019 | C-14, C-52 |
 | FR-006 | C-20, C-35 | FR-020 | C-15, C-60, C-61 |
 | FR-007 | C-2, C-50 | FR-021 | C-17 |
 | FR-008 | C-45 … C-49, C-52, C-53, C-54 | FR-022 | C-18, C-19, C-21 |
 | FR-009 | C-51 | FR-023 | C-26, C-27 |
 | FR-010 | C-11, C-12 | FR-024 | C-28 |
-| FR-011 | C-9, C-10, C-39 | FR-025 | C-29 |
+| FR-011 | C-9, C-10, C-39, C-74 | FR-025 | C-29 |
 | FR-012 | C-13 | FR-026 | C-30, C-72, C-73 |
-| FR-013 | C-22, C-23, C-24, C-40 | FR-027 | C-62, C-63, C-64 |
-| FR-014 | C-31 … C-43 | FR-028 | C-42, C-65 … C-71 |
+| FR-013 | C-22, C-23, C-24, C-40 | FR-027 | C-62, C-63, C-64, C-67 |
+| FR-014 | C-31 … C-43, C-63 | FR-028 | C-42, C-65 … C-71 |
 
 Success criteria:
 
 | SC | Clause(s) / evidence |
 |----|---------------------|
-| SC-001 | C-9, C-14 — one file carries both conclusions |
-| SC-002 | C-33, C-34, C-37, C-42 — set equality, non-zero gap exit, skip semantics, gap drill |
-| SC-003 | C-22, C-23, C-24, C-40 — text mode marker, no rendered claim |
-| SC-004 | C-46, C-49 — gate denies on unresolved `blocking`, allows with `important` only |
-| SC-005 | C-6, C-62 — `not-applicable` for a code-less feature; expression assertions untouched |
-| SC-006 | C-65, C-66, C-67, C-70, C-71 — six test groups, red-first, one pin update, no new drift |
+| SC-001 | C-9, C-14, C-74 — the report subsection and the feature detail entry carry both conclusions, and the counts are copied from one block |
+| SC-002 | C-33, C-34, C-36, C-37, C-42, C-74 — set equality, the closed `1` = gap exit, skip semantics with a closed reason set, gap drill, count equality |
+| SC-003 | C-22, C-23, C-24, C-40 — text mode marker (renderer **and** TTY for the rendered one), no rendered claim, forbidden phrases owned by SC-003 |
+| SC-004 | C-46, C-49 — the gate denies on a `blocking` entry in the current record (presence) and allows with `important` only |
+| SC-005 | C-6, C-7, C-62 — `not-applicable` for a code-less feature, decided by the code-path predicate; expression assertions untouched |
+| SC-006 | C-65, C-66, C-67, C-70, C-71 — six test groups, red-first per group, one pin update, no new drift |
 | SC-007 | C-56, C-57 — the classification duty is written, so a defect-as-feedback sample is detectable |
 
 ## 4. Overlap
@@ -85,9 +85,10 @@ Success criteria:
 
 1. **Feature binding at the requirements stage** (not clarify) — carried from the requirements' Assumptions A2; the Feature row exists, so this stage only advances status.
 2. **No branch creation or switch** — the plan setup script resolved the spec directory by numeric prefix on the current branch and copied the template; no branch operation was performed by this stage (requirements Assumption A1, `research.md` § R13).
-3. **One pin updated** — `tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition` asserts two literals (`review.md committed`, `deferred item resolved or waived`) inside the feature-integration status table. Clause C-47 removes that duplicated wording, so the pin follows the fact's new location instead of preserving the copy: the test keeps its subject, adds an assertion of the owner path, and adds a negative assertion that the duplicated wording is gone. Net assertions increase; the reason and the rejected alternatives are recorded in `research.md` § R5.
+3. **One pin updated** — `tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition` asserts two literals (`review.md committed`, `deferred item resolved or waived`) inside the feature-integration status table. Clause C-47 removes that duplicated wording, so the pin follows the fact's new location instead of preserving the copy: the test keeps its subject, adds an assertion of the owner path, and adds a negative assertion that the duplicated wording is gone. Net assertions increase. The change is **authorized as a single non-precedential exception by `requirements.md` FR-027** (not an unqualified permission): its rationale MUST be declared in the feature detail's `## Latest Review` review-record entry, no other assertion may be deleted or weakened, and the authorization may not be cited as precedent for one. The reason and the rejected alternatives are recorded in `research.md` § R5 (C-64, C-67).
 4. **Same-author analysis gate not delegated** — this environment exposes no subagent dispatch. Every Constitution Check row carries `(direct read, subagent unavailable)` and `research.md` § R12 records the weaker evidence path; the program-derivable checks were actually run instead.
 5. **Expression gate document deliberately untouched** — its existing contract test is re-run as evidence rather than reworded (`research.md` § R14).
+6. **Substantive revision after the analyze gate failure (remediation round 1)** — `test-evidence/analyze-report.md` returned `GATE: CRITICAL=0 HIGH=6`, and the driver authorized exactly one upstream repair round. The requirements layer landed all 32 findings; this stage carried the plan-owned half of the worklist in `notes/remediation-round-1.md` into `contracts/`, `data-model.md`, `research.md`, `quickstart.md`, this file and `plan.md`. Clause ids were preserved and one clause (C-74) was appended rather than inserted; the per-clause change and its finding id are recorded in each contract file's amendment log and in `plan.md` § Plan Change Log. No source, template, skill, test or task file was edited by this round — so the mirror table and its measured baselines are unchanged.
 
 ## 6. Mirror and projection obligations
 
@@ -99,8 +100,8 @@ The authoritative per-pair table is `plan.md` § Mirror Obligations. Summary of 
 |----------|-------|
 | `plan.md` (filled in place, one top-level heading, the Requirement → Feature stamp) | this stage |
 | `research.md` (decisions R1–R14 with measured evidence) | this stage |
-| `data-model.md` (entities E1–E13, validation rules V1–V28) | this stage |
-| `contracts/` (6 files, clauses C-1 … C-73) | this stage |
+| `data-model.md` (entities E1–E13, validation rules V1–V35) | this stage |
+| `contracts/` (6 files, clauses C-1 … C-73 plus the appended C-74) | this stage |
 | `quickstart.md` (scenarios A–H plus the regression block, each with execution status and premises) | this stage |
 | `feature-ref.md` (this file) | this stage |
 | `tasks.md` | `/speckit.tasks` (later stage) |

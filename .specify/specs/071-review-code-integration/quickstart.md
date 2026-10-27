@@ -41,7 +41,7 @@ bash skills/internal/code-review/scripts/git-delta-review.sh base \
 ```
 
 **Execution status**: PINNED by `tests/contract/test_coverage_receipt.py` (the subcommand does not exist yet at plan time).
-**Premises**: the subcommand is `base`; it accepts `--spec <dir>`, `--since <ref>`, `--json`; it prints `base=<sha>`, `head=<sha>`, `base_source=<tier>`; exit `0` on success and `2` when no tier resolves. Expected value for this repository after implementation: `base_source=feature-first-commit`, `base=e57052ef…`.
+**Premises**: the subcommand is `base`; it accepts `--spec <dir>`, `--since <ref>`, `--trunk <ref>`, `--head <ref>`, `--json`; it prints `base=<sha>`, `head=<sha>`, `base_source=<tier>`; exit `0` on success and `2` when no tier resolves. Expected value for this repository after implementation: `base_source=feature-first-commit`, `base=e57052ef…`, `head=` the `HEAD` read once at run start. Trunk order, used only when the feature-first-commit tier fails: explicit `--trunk` > a resolvable `refs/remotes/origin/HEAD` > an existing `main` > an existing `master` > `not-evaluated`. Head carries no source tier: it is the explicit `--head` or the run-start `HEAD`, fixed for the run, and the range MAY contain commits unrelated to this feature (a strict slice passes the feature's last commit as `--head`).
 
 ## Scenario B — A run that produces both conclusions
 
@@ -50,25 +50,25 @@ bash skills/internal/code-review/scripts/git-delta-review.sh base \
 ```
 
 **Execution status**: PINNED by `tests/contract/test_review_code_composition.py` (template-level assertions; the command itself is a prompt, so the test pins the text, not a live run).
-**Premises**: the feature has at least one commit after its `requirements.md` first commit touching non-spec files; the repository has a resolvable default trunk for the third base tier.
+**Premises**: the feature has at least one commit after its `requirements.md` first commit touching a path the code-path predicate counts as code (the predicate's closed default set lives in the skill script; `--code-paths` overrides it); the repository has a resolvable default trunk for the third base tier.
 
 Expected observable result, in order:
 
 1. `review.md` is written first (process segment), then `code-review.md` (code segment).
-2. `review.md` § 2.1 lists base/head ids, base source, renderer mode, receipt counts, segment verdict, gate verdict, record path, archive path (`none` on a first run).
-3. The closing summary prints both segments' conclusions.
+2. `review.md` § 2.1 carries the closed content list: base and head ids with the base source, renderer mode, the four receipt counts **copied from the receipt block** (changed / judged / skipped / gap), the segment verdict, the gate verdict, the uncommitted-scope disclosure when the tree is dirty, and the record path with this run's archive path ([[STR-009]] on a first run).
+3. The two verifiable carriers are that subsection and the bound feature detail's `## Latest Review` review-record entry — the entry gains a line, not a new structured field. The closing summary MAY restate both; it is a presentation and is not a third verifiable artifact.
 4. The code severity words (`blocking` … `praise`) appear only in `code-review.md`; the process report shows `P0`/`P1`/`P2` only.
 
-## Scenario C — A feature with no code delta
+## Scenario C — A feature with no code paths in its delta
 
 ```text
 /speckit.review
 ```
 
 **Execution status**: PINNED by `tests/contract/test_review_code_composition.py`.
-**Premises**: the feature's delta contains no file outside `.specify/specs/<key>/`, or the feature has produced no commit since its requirements first commit.
+**Premises**: the feature's committed delta contains no file the code-path predicate counts as code (spec, docs and memory paths are expressly not code paths), **or** the delta is empty (base and head at the same commit, zero changed files — triaged before the receipt runs, so no 0/0/0 receipt can report a clean review of nothing).
 
-Expected: the code segment is recorded as `not-applicable` with a basis, no `code-review.md` is written, `review.md` § 2.1 still lists the reason and the verdict, and the process segment's reader-baseline conclusion is unchanged.
+Expected: the code segment is recorded as `not-applicable` with the predicate's basis, **no `code-review.md` is created at all** (no empty record either), `review.md` § 2.1 still carries the reason and the verdict, the feature detail entry repeats it, and the process segment's reader-baseline conclusion is unchanged. A `not-evaluated` outcome (unresolvable base, unusable repository) behaves the same way: no record file, reason in the report subsection and the feature detail entry.
 
 ## Scenario D — No renderer on the host
 
@@ -81,7 +81,17 @@ DELTA_BIN=/nonexistent-delta bash skills/internal/code-review/scripts/git-delta-
 **Execution status**: PINNED by `tests/contract/test_coverage_receipt.py`, which drives the script with `DELTA_BIN` pointed at a non-existent binary — the substitution the script already supports through its `DELTA_BIN` variable.
 **Premises**: `receipt` accepts `--review-file`, `--renderer`, `--since`; the environment has no `delta` on `PATH` in the test process; the record already exists (created by `start`).
 
-Expected: exit `0` when the file sets match, the receipt block written with `renderer=text`, the record's marker reading `renderer: text`, and no sentence anywhere in the record claiming a rendered review.
+Expected: exit `0` when the file sets match, the receipt block written with the text marker, the record's header marker reading [[STR-003]], and no sentence anywhere in the record claiming a rendered review.
+
+**No-TTY case (the one that actually happens)**: the same rule keys on the terminal, not only on the binary. On this host `delta` *is* installed (`/home/agent/.cargo/bin/delta`) and every composed call is made by an agent through a pipe, so:
+
+```bash
+bash skills/internal/code-review/scripts/git-delta-review.sh receipt \
+  --review-file .specify/specs/071-review-code-integration/code-review.md
+```
+
+**Execution status**: PINNED by `tests/contract/test_code_review_skill_contract.py` (the TTY branch does not exist yet, same reason as the block below).
+**Premises**: stdout of the test process is not a TTY; `delta` may be present on `PATH`. Expected: the record carries [[STR-003]] and never [[STR-008]] — the rendered marker requires renderer **and** TTY, so an available renderer must not by itself produce a rendered-mode claim.
 
 ## Scenario E — Gap drill (red first, then green)
 
@@ -102,20 +112,20 @@ bash skills/internal/code-review/scripts/git-delta-review.sh receipt \
 **Execution status**: PINNED by `tests/contract/test_coverage_receipt.py`, which performs the remove-one-entry step in a temporary git repository.
 **Premises**: the temporary repository has two commits and a resolvable base; `start` writes the header and (on a second run) archives the previous record; `receipt` exits `0`/`1`/`2` per `contracts/coverage-receipt.md`; the `note` subcommand already exists and keeps its six-level validation.
 
-Expected: step 3 exits `0` with `gap_files=0`; after deleting one `file.<NN>.*` line, step 3 exits `1` and the block is rewritten with `gap_files` equal to the number of unjudged files; restoring the entry returns exit `0`.
+Expected: step 3 exits `0` with `gap_files=0`; after deleting one `file.<NN>.*` line, step 3 exits `1` (coverage gap) and the block is rewritten with `gap_files` equal to the number of unjudged files; restoring the entry returns exit `0`. Two further cases belong to the same drill: replacing a legal skip reason with a value outside the closed set owned by `requirements.md` FR-014 also exits `1` (an unrecognised reason is a gap, not a skip), and an unresolvable base or a missing record exits `2` (cannot evaluate) with no block written — the alphabet is `0` / `1` / `2` with one meaning each, never a fourth code and never `1` for `2`.
 
 ## Scenario F — Focused review of an oversized diff
 
 ```bash
 bash skills/internal/code-review/scripts/git-delta-review.sh receipt \
   --review-file .specify/specs/071-review-code-integration/code-review.md \
-  --skip-with-reason "src/legacy/**" --reason "size guard: focused pass"
+  --skip-with-reason "src/legacy/**" --reason size-guard-focus-not-reviewed
 ```
 
 **Execution status**: PINNED by `tests/contract/test_coverage_receipt.py`.
-**Premises**: `receipt` accepts a repeatable skip selector plus its required reason; a skipped entry is legal (exit `0`) and counted in `skipped_files`.
+**Premises**: `receipt` accepts a repeatable skip selector plus its required reason, and the reason MUST be one of the five values of the closed set owned by `requirements.md` FR-014 (`size-guard-focus-not-reviewed` is the focus case; free text is not accepted and would make the run a gap); a skipped entry is legal (exit `0`) and counted in `skipped_files`.
 
-Expected: exit `0`, `skipped_files > 0`, and the segment verdict **not** `pass` — `blocked` when unresolved `blocking` items exist, otherwise `not-evaluated`.
+Expected: exit `0`, `skipped_files > 0`, and the segment verdict **not** [[STR-006]] — [[STR-007]] when the current record contains `blocking` entries, otherwise [[STR-002]].
 
 ## Scenario G — The gate verdict, from the explicit record only
 
@@ -126,9 +136,9 @@ echo "exit=$?"
 ```
 
 **Execution status**: PINNED by `tests/contract/test_status_gate_owner.py`.
-**Premises**: `report --summary` keeps its current display, gains `--file`, and returns `0` = allow, `1` = an unresolved `blocking` item exists, `2` = input error. Omitting `--file` keeps the legacy newest-file selection and labels it as implicit.
+**Premises**: `report --summary` keeps its current display, gains `--file`, and returns `0` = allow, `1` = the current record contains at least one `blocking` entry, `2` = input error. Omitting `--file` keeps the legacy newest-file selection and labels it as implicit.
 
-Expected: with one `blocking` entry present, exit `1` and the printed reason naming the count; after the entry is resolved (or explicitly waived by the user and recorded), exit `0`.
+Expected: with one `blocking` entry present, exit `1` and the printed reason naming the count. The condition is an existence test over the current record only — there is no "cleared" state — so re-running the code segment and producing a record with zero `blocking` entries makes the same command exit `0`; nothing is "resolved" in place. A waiver is legal only as an explicit user ruling (a user-authored artifact or the user's own ruling, never a driver's confirmation), and without one the unattended disposition is halt-and-report with [[STR-010]] as the named refusal literal.
 
 ## Scenario H — Where a finding may and may not go
 
@@ -137,9 +147,9 @@ Expected: with one `blocking` entry present, exit `1` and the printed reason nam
 ```
 
 **Execution status**: PINNED by `tests/contract/test_review_feedback_boundary.py`.
-**Premises**: the feedback store is the project-local `.specify/memory/feedback/`; the engine's entry key is `(unit_id, run_id)`; both units (`/speckit.review` and `skill:code-review`) are already registered in the probe registry, so no wrap-up recompilation is needed.
+**Premises**: the feedback store is the project-local `.specify/memory/feedback/`; the engine's entry key is `(unit_id, run_id)`; all three units (`/speckit.review`, `skill:review-sdd-process`, `skill:code-review`) are already registered in the probe registry, so no wrap-up recompilation is needed.
 
-Expected: a framework friction item (a receipt gap, a missing renderer) is a legal entry; a code defect copied out of `code-review.md` is a violation of the written classification duty; the review command's closing step list is unchanged; nothing is transmitted automatically.
+Expected: a framework friction item (a receipt gap, a missing renderer) is a legal entry; a code defect copied out of `code-review.md` is a violation of the written classification duty; the review command's closing step list is unchanged; nothing is transmitted automatically; and the run leaves three unit records rather than one merged or two truncated ones.
 
 ## Regression commands (run before and after the change)
 
