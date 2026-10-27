@@ -65,3 +65,4 @@
 - 红运行 MUST 在未改动树(实现编辑前)上执行；失败计数 = 该文件 pytest 报告的 failed 数。
 - 守护性复跑(071 六套件、`test_expression_compatibility.py` C-5、`test_review_p1_review_loop.py`、feedback/probe 族)是迁移/回归例外，**不作红先行声称**，不进本文件。
 - 实现完成后同命令全绿即为该组转绿证据(GATE-5)。
+- **part 8b 纠正披露（2026-10-27, driver 裁决）**: `test_client_guard_sweep.py::test_c56_changed_paths_stay_on_the_declared_edit_surface` 的 `allowed_prefixes` 原只白名单 `.specify/skills/internal/`，漏了同一 `sync-mirrors.py` 生成器产出的其它 skill 镜子；part 8 的 `sync-mirrors.py --write` 合法消解 T001 既录的 `loop-playbook.md` 漂移后，再生镜像 `.specify/skills/improve-skills/references/loop-playbook.md` 被误报为 offender。C-56 意图是"运行时投影由生成器产出、绝不手改"，故白名单扩为 `.specify/skills/`（全部 skill 镜子），断言语义不变（无断言弱化、无测试增删，文件维持 25 测试）。证据： `test-evidence/part8b-guard-sweep-correction.txt`（guard sweep 25 通过；六套件 104 通过 0 失败；对 `baseline-failed.txt` 的 comm -13 为空 = 零 NEW）。

@@ -1,0 +1,25 @@
+# part 8b — guard sweep whitelist correction (C-56 mirror surface), 2026-10-27
+# Correction: tests/contract/test_client_guard_sweep.py allowed_prefixes:
+#   .specify/skills/internal/  ->  .specify/skills/
+# Driver ruling: all skill mirrors under .specify/skills/ are sync-mirrors.py
+# generator output (never hand-edited); T001's pre-existing loop-playbook.md drift
+# was lawfully resolved by part 8 'sync-mirrors.py --write'. The whitelist omission
+# of non-internal skill mirrors was the defect; assertion semantics unchanged.
+
+== run 1: guard sweep suite alone ==
+.........................                                                [100%]
+25 passed in 1.36s
+GUARD_SWEEP_RC=0
+
+== run 2: the six client suites ==
+........................................................................ [ 69%]
+................................                                         [100%]
+104 passed in 22.15s
+SIX_SUITES_RC=0
+
+== zero-NEW comparison vs baseline-failed.txt (26 frozen names) ==
+failed_name_count=0
+comm -13 (baseline minus run) NEW names — output below, empty = zero NEW:
+NEW_NAMES_RC=0
+guard_sweep_count=25 passed (file total unchanged: 25 tests since part 7; this correction only widens the C-56 whitelist inside test_c56_changed_paths_stay_on_the_declared_edit_surface, no test added/removed)
+six_suites_count=104 passed, 0 failed

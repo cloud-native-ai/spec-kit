@@ -463,7 +463,8 @@ def test_c56_changed_paths_stay_on_the_declared_edit_surface():
         "tests/contract/", "tests/fixtures/",      # contract tests are the declared surface
         ".claude/commands/", ".github/prompts/",
         ".opencode/command/", ".qoder/commands/",  # per-tool copies (regenerated)
-        ".specify/scripts/", ".specify/shared/", ".specify/skills/internal/",  # mirrors
+        ".specify/scripts/", ".specify/shared/",  # mirrors
+        ".specify/skills/",  # all skill mirrors are produced by sync-mirrors (generated, never hand-edited)
     )
     offenders = []
     for rel in status:
