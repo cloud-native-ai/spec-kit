@@ -85,3 +85,11 @@
 | REC-069b-10 | 冻结样本时同时冻结运行环境契约（解释器/PYTHONPATH/变量/node 集），冻结时先冒烟 | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-10（F8） | open |
 | REC-069b-11 | implement 收口须对账 checklist 的 `verify-in-implementation` 开放项（关闭或转交） | `.specify/specs/069b-isomorphism-migration-metrics/review.md` § 5.4 REC-069b-11（F9） | open |
 | OI-069b-01 | 客户侧分类副本的「漂移检查」没有 owner 与仪器（FR-008 只覆盖框架源 ↔ 镜像）；069b 的 CHK025 因此判 `out-of-slice` 并保持 `[ ]`，不冒充完成 | `.specify/specs/069b-isomorphism-migration-metrics/checklists/isomorphism-migration-metrics.md` CHK025 + 同切片 `verification.md` § Checklist 收口对账 | open（owner = 后续修订 FR-008 的特性，尚未立项；解除条件 = 为该检查指定 owner 与仪器，或明确豁免） |
+| REC-071-01 | `receipt` 从它拿到的那份记录头部继承 `base`/`head`，不再自解析区间；文档化四步在此之前必须带 `--spec <feature-dir>`，并以一条契约测试同时钉住文档行与头部字符串 | `.specify/specs/071-review-code-integration/review.md` § 5.3 REC-071-01（F1） | open |
+| REC-071-02 | trunk 档从真正包含 `HEAD` 的远端解析（或本地默认分支），不再无条件信任 `refs/remotes/origin/HEAD`——本仓 `origin` 是上游 fork，该档解析到落后 1180 提交的上游 merge commit；同批修 FR-004 第二档并加 decoy-origin 夹具测试 | `.specify/specs/071-review-code-integration/review.md` § 5.3 REC-071-02（F2） | open |
+| REC-071-03 | 阶段收口的状态一致性检查：`features.md` 状态 vs `tasks.md` 开放行 / `verification.md` SC 行 / 最新评审记录，不一致即失败；由 implement 收口步骤调用 | `.specify/specs/071-review-code-integration/review.md` § 5.4 REC-071-03（F4） | open |
+| REC-071-04 | `test-evidence/implement-stage-status.jsonl` 要么给它一个读者（一段一行，缺行即红），要么退役；无读者的存储只会静默积洞 | `.specify/specs/071-review-code-integration/review.md` § 5.3 REC-071-04（F6） | open |
+| REC-071-05 | 覆盖率回执须区分「不是代码」与「没评审」：收窄为代码路径子集 + 非代码余量单列披露，或新增 `not-code` 逐文件裁决（既不计覆盖信用也不作废通过）；保持 C-74 单一计数来源不变 | `.specify/specs/071-review-code-integration/review.md` § 5.4 REC-071-05（F3） | open |
+| REC-071-06 | 每条 Success Criterion 标注评估它的阶段：SC-001 拆为 implement 可判定的两载体相等性 + review 阶段的可组合运行观测；验证日志模板增一列 | `.specify/specs/071-review-code-integration/review.md` § 5.4 REC-071-06（F7） | open |
+| REC-071-07 | quickstart 的字面选择器必须在写入时对仓库校验（F 的 `src/legacy/**` 在本仓匹配为空，字面命令给出与预期相反的 `verdict=pass`） | `.specify/specs/071-review-code-integration/review.md` § 5.5 REC-071-07（F5） | open |
+| REC-071-08 | 技能正文不重述脚本强制的阈值：`>400` / `>800` 只留在 `size_guard`，`SKILL.md` 改为指路 | `.specify/specs/071-review-code-integration/review.md` § 5.5 REC-071-08（F8） | open |

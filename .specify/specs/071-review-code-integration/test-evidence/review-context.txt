@@ -1,0 +1,17 @@
+branch=master
+head=9b45a1b25159c1ff5d92cea8e8e1d3549e8887d5
+short=9b45a1b2
+root=/storage/project/cloud-native-ai/spec-kit
+date=2026-10-27
+--- remotes ---
+gitee	git@gitee.com:cloud-native-ai/spec-kit.git (fetch)
+gitee	git@gitee.com:cloud-native-ai/spec-kit.git (push)
+github	git@github.com:cloud-native-ai/spec-kit.git (fetch)
+github	git@github.com:cloud-native-ai/spec-kit.git (push)
+gitlab	git@gitlab.alibaba-inc.com:cloud-native-ai/spec-kit.git (fetch)
+gitlab	git@gitlab.alibaba-inc.com:cloud-native-ai/spec-kit.git (push)
+origin	git@github.com:github/spec-kit.git (fetch)
+origin	git@github.com:github/spec-kit.git (push)
+--- branch -r --contains HEAD ---
+--- spec dir log ---
+20

@@ -1,0 +1,35 @@
+### Scratch probes for Feature 071 code review (temp repo, git-initialised, 3 commits)
+
+CMD A: receipt --review-file .specify/specs/071-demo/code-review.md --spec .specify/specs/071-demo   (no notes, no skip selectors)
+OBS: changed_files=4 judged_files=4 skipped_files=0 gap_files=0 -> verdict=pass, exit 0
+
+CMD B: same + --code-paths 'src/**'
+OBS: changed_files=4 judged_files=4 (code-path predicate does NOT filter the receipt's changed set)
+
+CMD C: same + --skip-with-reason '*.md' --reason non-code-file
+OBS: changed_files=4 judged_files=1 skipped_files=3 gap_files=0 -> verdict=not-evaluated, exit 0
+
+STATIC D: review --yes (legacy interactive) could not run here (delta absent, exit 1). Header shapes compared by source read:
+  init_review_file:     cat > "$file" << EOF
+  init_review_file: # Code Review Report
+  init_review_file: 
+  init_review_file: | 属性 | 值 |
+  init_review_file: |------|-----|
+  init_review_file: | **分支** | $(current_branch) |
+  init_review_file: | **基准** | \`$GIT_BASE\` ($(git rev-parse --short "$GIT_BASE" 2>/dev/null || echo 'N/A')) |
+  init_review_file: | **目标** | \`$GIT_HEAD\` ($(git rev-parse --short "$GIT_HEAD" 2>/dev/null || echo 'N/A')) |
+  init_review_file: | **Reviewer** | $(git config user.name 2>/dev/null || echo 'unknown') |
+  init_review_file: | **日期** | $(date '+%Y-%m-%d %H:%M') |
+  init_review_file: 
+  write_code_segment_record:     cat > "$record" << EOF
+  write_code_segment_record: # Code Review Report — 代码段 (code segment)
+  write_code_segment_record: 
+  write_code_segment_record: | 属性 | 值 |
+  write_code_segment_record: |------|-----|
+  write_code_segment_record: | **分支** | \`${branch}\` |
+  write_code_segment_record: | **基准** | \`${RESOLVED_BASE}\` (\`${base_short}\`) |
+  write_code_segment_record: | **目标** | \`${RESOLVED_HEAD}\` (\`${head_short}\`) |
+  write_code_segment_record: | **基准来源** | \`${RESOLVED_BASE_SOURCE}\` |
+  write_code_segment_record: | **渲染模式** | \`${marker}\` |
+  write_code_segment_record: | **Reviewer** | \`${reviewer}\` |
+  write_code_segment_record: | **日期** | \`${run_date}\` |
