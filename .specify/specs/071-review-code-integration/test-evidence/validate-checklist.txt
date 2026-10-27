@@ -1,0 +1,14 @@
+COMMAND: python3 - (structural requirements-quality checklist check, inline; no product behavior executed)
+AT: 2026-10-27T06:55:04Z
+FILE: .specify/specs/071-review-code-integration/checklists/review-composition.md
+---
+items=40 pass=13 fail=27
+numbering_contiguous=True range=1..40 unique=True
+traceable=40/40 (100.0%) floor=80%
+fr_covered=28/28 missing=[]
+sc_covered=7/7 missing=[]
+verdict_blocks=40 evidence_blocks=40 disposition_blocks=27 (fail=27)
+degraded-detection-markers_on_fail_verdicts=27/27
+soft_cap_40_ok=True
+RESULT=PASS
+RC=0
