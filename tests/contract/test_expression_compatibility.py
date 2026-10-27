@@ -398,6 +398,16 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "markers": ("renderer: text", "receipt --review-file"),
     },
+    "skills/internal/review-sdd-process/SKILL.md": {
+        "reason": (
+            "2026-10-27 Feature 071 rewrites the sibling-skill boundary wording: "
+            "\"the two are unrelated, keep them separate\" is false once "
+            "`/speckit.review` composes both, so the skill declares its own judgment "
+            "object and the command's fixed order instead (FR-025 / C-29), pinned by "
+            "tests/contract/test_code_review_skill_contract.py"
+        ),
+        "markers": ("judgment object", "fixed order"),
+    },
 }
 
 

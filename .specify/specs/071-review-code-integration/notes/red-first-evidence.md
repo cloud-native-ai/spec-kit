@@ -109,14 +109,26 @@ Scenario C's `not-applicable` path:
   `test_the_comparison_detects_a_deleted_segment`) pass, which is the group's own proof that it
   reds on a deletion and not on a reword (C-65's "would stay green when its subject breaks"
   test).
-- Red → green (T034): pending — stays red by design until T031 rewrites the docs page.
-  Intermediate state measured after part 2 (T006/T007/T008 landed, page not yet rewritten):
-  `python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py` → `5 failed, 4 passed
-  in 0.08s`, exit `1`. The four per-axis failures plus `test_the_declared_surfaces_are_equal`
-  are all the page's side now — the template declares `{process segment, code segment}`,
-  `{review.md, code-review.md}`, the three triage values and `{blocking, praise}`, and the page
-  declares none of them. The group therefore still reds for its own reason and not because a
-  template sentence changed.
+- Red → green (T031 lands the page; T034 re-runs it and drives the scenarios): **green on
+  2026-10-27 at part 7a** after `docs/reference/commands/review.md` was rewritten to the
+  composed surface.
+  - Command line: `python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py`
+  - Real output: `9 passed in 0.06s`
+  - Exit code: `0`
+  - Failing count: `0` (was 5 of 9 at the intermediate part-5 measurement, 4 of 9 at red
+    time). The flip came from the page only: no assertion in this file was added, dropped
+    or relaxed, and the page was the sole edit.
+  - The red at red time was 4 of 9 because the two self-checks
+    (`test_the_comparison_tolerates_a_cosmetic_reword`, `test_the_comparison_detects_a_deleted_segment`)
+    pass by construction; they are this group's own proof that it reds on a deletion and
+    not on a reword (C-65's "would stay green when its subject breaks" test), so their
+    greenness on both sides is the correct state and not coverage of the page.
+  - Intermediate state measured after part 2 (T006/T007/T008 landed, page not yet rewritten):
+    `5 failed, 4 passed`, exit `1`. The four per-axis failures plus
+    `test_the_declared_surfaces_are_equal` were all the page's side by then — the template
+    declared `{process segment, code segment}`, `{review.md, code-review.md}`, the three
+    triage values and the code severity family, and the page declared none of them. The
+    group therefore red for its own reason and not because a template sentence changed.
 
 
 ## Group 3 — `tests/contract/test_code_review_skill_contract.py`
@@ -662,18 +674,82 @@ Scenario C's `not-applicable` path:
 These exercise behaviour that already exists or fully lands before they run, so they carry `[blockedBy:]` instead of a red-first claim (the create-tasks migration/regression exception).
 
 - T027 — `python3 -m pytest -q tests/contract/test_expression_gates_doc.py` against the plan-stage pre-change count of **18 passed** (re-measured at implement start in `notes/pre-change-measurements.md` § PM-6): **done at part 6 (T027)** — `18 passed`, exit `0`, equal to the frozen count. The expression-class review face is untouched by this feature: the process segment still judges against the declared reader baseline and still may not reuse the code-review object, which is why the code segment could be added as an *additional* segment without editing that face.
-- T030 — the one intentional pin `tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition` under FR-027's single authorization: pending
-- T033 / T036 — mirror verification and final closure comparison against the T001 measurements and the T002 baseline: pending
+- T030 — the one intentional pin `tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition` under FR-027's single authorization: **done at part 7a (T030)** — the pin now reads `10 passed` (was `1 failed, 9 passed`); see § T030 — the one authorized pin change below.
+- T033 / T036 — mirror verification and final closure comparison against the T001 measurements and the T002 baseline: T033 **done at part 7a** (see § T033 — mirror verification); T036 pending.
 
-## Fast-fail findings on the red-first obligation (T029 collects these)
+## T030 — the one authorized pin change (part 7a)
 
-None recorded. Every group either has its red run recorded above or is still `pending` by its own
-row's schedule; no group was counted as covered while red.
+`tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition`
+is the single existing assertion change FR-027 authorizes (C-64 / C-67), and this is
+it — the authorization is non-precedential and was not applied anywhere else.
+
+| Property | Before | After |
+|---|---|---|
+| Subject | the `/speckit.review` row exists; the command owns the transition | **unchanged** (same two assertions, plus a uniqueness assertion on the row) |
+| The removed criteria copy | required `review.md committed` and `deferred item resolved or waived` **to be present** | requires both to be **absent** (the negative assertion C-47/C-67 asks for) |
+| Owner citation | — | the row MUST cite `templates/feature-details-template.md` **and** the section `Canonical Status State Machine` |
+| Assertion count | 3 | 7 (net +4; nothing dropped without a replacement naming the same obligation) |
+
+- Command line: `python3 -m pytest -q tests/contract/test_review_p1_review_loop.py`
+- Before: `1 failed, 9 passed in 0.08s`, exit `1` — the red is `assert "review.md committed" in table`
+  against the row T021 rewrote into a reference. **After**: `10 passed`, exit `0`.
+- Why the negative form is stronger than the copy it replaces: the old assertions could
+  only fail if the second wording disappeared (which is what C-47 *requires*), so they had
+  become a tripwire pointing the wrong way. The new pair fails if the copy **returns** and
+  fails if the owner citation is dropped, so the obligation "the row is a reference to a
+  real owner, not a second copy" is now pinned in the direction the feature resolved.
+- Rationale declaration (C-64's second half): the entry is in
+  `.specify/memory/features/071.md` § `## Latest Review` — "2026-10-27 `/speckit.review`
+  part 7a …/ 一处有意变更既有 pin".
+
+## T029 — confirmation of the six red-first records, one group at a time (part 7a)
+
+C-66 makes red-first a per-group obligation of four recorded fields, so T029 confirms it
+per group rather than per suite. The extraction below was run mechanically over this file
+(each group section was parsed for its `- Command line:` / `- Real output (tail):` /
+`- Exit code:` / `- Failing count:` fields), and each group's *current* state was
+re-measured in the same pass so the record and the tree are compared, not assumed.
+
+| # | Group | Red run recorded | Command line | Exit code | Failing count | Current |
+|---|---|---|---|---|---|---|
+| 1 | `test_review_code_composition.py` | 2026-10-27, HEAD `b7f0cadc`, pre-edit | `python3 -m pytest -q tests/contract/test_review_code_composition.py` | `1` | 26 of 31 | `31 passed`, exit `0` |
+| 2 | `test_review_docs_isomorphism.py` | 2026-10-27, HEAD `b7f0cadc`, pre-edit | `python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py` | `1` | 4 of 9 (5 of 9 after part 2) | `9 passed`, exit `0` — flipped **in this part** by T031 |
+| 3 | `test_code_review_skill_contract.py` | 2026-10-27, HEAD `a6625f32`, pre-edit | `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py` | `1` | 38 of 39 | `39 passed`, exit `0` — the last band (`test_c29_*`) flipped **in this part** by T031 |
+| 4 | `test_coverage_receipt.py` | 2026-10-27, HEAD `7a0a5a92`, pre-edit | `python3 -m pytest -q tests/contract/test_coverage_receipt.py` | `1` | 19 of 20 | `20 passed`, exit `0` |
+| 5 | `test_status_gate_owner.py` | 2026-10-27, HEAD `60f2b915`, pre-edit | `python3 -m pytest -q tests/contract/test_status_gate_owner.py` | `1` | 24 of 32 | `32 passed`, exit `0` |
+| 6 | `test_review_feedback_boundary.py` | 2026-10-27, HEAD `f7f8156e`, pre-edit | `python3 -m pytest -q tests/contract/test_review_feedback_boundary.py` | `1` | 19 of 30 | `30 passed`, exit `0` |
+
+**24 of 24 fields present** (6 groups × command line, real output, exit code, failing
+count). Each group's real output tail is recorded beside its count, so the number is read
+off a run rather than asserted.
+
+**Could each group actually go red?** — checked against C-65's demotion rule ("a group
+that would stay green when its subject breaks is not coverage"), one group at a time:
+
+| # | What proves the group reds on breakage | The half that was green at red time |
+|---|---|---|
+| 1 | the 26 failures are the template's absent composed surface; the group carries its own negative/unchanged-surface cases | 5 negative / unchanged-surface assertions, green on both sides by construction |
+| 2 | the group grades itself: `test_the_comparison_detects_a_deleted_segment` applies the extractor to a page with the segment removed and requires the surface to change | 2 self-checks, green on both sides by construction |
+| 3 | the failures are real invocations of subcommands that did not exist (`✗ 未知命令`) plus text measurably present today, not missing files | 1 regression case pinning the pre-existing closed loop |
+| 4 | every failing case drove the missing `receipt` subcommand through the real script | 1 regression case (the interactive walk and six-level validation) |
+| 5 | the four obligations no surface carried — owner row conditions, the second criteria wording, the transition section, the waiver rule | 8 cases of three kinds (driven gate, negative sweeps, a "the cited owner exists" case) |
+| 6 | the failures are the two surfaces' unwritten duties, plus two constructed samples judged oppositely by a rule parsed out of those surfaces | 11 unchanged-surface cases (compiled faces, unit-id ownership, predecessor sweeps) |
+
+**Fast-fail findings: none.** No group's red run is missing, no group was counted as covered
+while red, and no group was found unable to red. Two of the six (groups 2 and 3) were still
+red when this part opened and flipped **inside** it — group 2 by the docs rewrite (T031) and
+group 3's last band by the sibling-boundary rewrite (T031) — which is the strongest form of
+the evidence: their red state was observed on this very tree, one part before the mechanism
+they pin landed.
+
+### Prior fast-fail items on other obligations
 
 The one fast-fail item this file has carried — the C-5 hash freeze that part 4 handed up as
 decision-class — was resolved at part 5 as a **correction** under the orchestrator's ruling; the
 change, its two negative controls, and why it preserves the guard are recorded in § In-passing
-correction (driver-ruled) at the end of this file. Nothing else was repaired in passing.
+correction (driver-ruled) at the end of this file. Part 7a extended the same declared mechanism
+by one entry, disclosed in § In-passing correction — the C-5 allowlist's third entry (part 7a).
+Nothing else was repaired in passing.
 
 ## Neighbouring pin reddened by the feature's own edits — handed up, not repaired (part 4)
 
@@ -751,3 +827,104 @@ declared maintenance mechanism, so resolving it has exactly one reading.
 - **Evidence**: `python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c5` →
   `3 passed, 13 deselected`, exit `0` (before the correction: `1 failed, 2 passed`, with
   `drifted: ['skills/internal/code-review/SKILL.md', 'templates/commands/review.md']`).
+
+## T031 — the documentation-sync surface: page, both skills, and one new C-5 drift record (part 7a)
+
+C-68 names three places that must move in the same change: the command reference page
+`docs/reference/commands/review.md`, the boundary wording of **both** review skills, and (via
+C-47, already landed by T021) the state-machine owner. All three landed here; the page and the
+skills are framework sources, the owner row was part 5's work and is cited, not rewritten.
+
+| Edit | Surface | What it now says | Pinned by |
+|---|---|---|---|
+| 1 | `docs/reference/commands/review.md` (full rewrite) | the composed surface: two segments in a fixed order, the two artifacts and their existence rules, the three applicability values, the two severity vocabularies with no mapping, the coverage receipt, the feedback boundary, and a pointer to the transition owner | `tests/contract/test_review_docs_isomorphism.py` |
+| 2 | `skills/internal/review-sdd-process/SKILL.md` — `description` + `## Boundaries` | its own judgment object (the SDD process), the sibling's (a committed code delta), and "`/speckit.review` composes both in a fixed order — process segment first, code segment second" | `tests/contract/test_code_review_skill_contract.py::test_c29_*` |
+| 3 | `skills/internal/code-review/SKILL.md` — the `## Overview` boundary paragraph | the same relation from the code side: distinct judgment objects, composed by the command in a fixed order, neither vocabulary converted into the other | the same case |
+
+- The forbidden pre-composition wording is gone from both bodies: `grep -rn 'No overlap\|互不相关\|keep the two separate' skills/ templates/ shared/`
+  exits `1` (no match), and it returned `skills/internal/review-sdd-process/SKILL.md:167` before
+  the edit, with the same file's `description` carrying "no overlap" in lower case (a
+  case-insensitive sweep of the two skill bodies is also clean: exit `1`). Three hits for
+  "No overlap" remain in the tree and none is a live review surface: two are about worker
+  territory rather than these skills (`docs/reference/teams/orchestration.md` and its built HTML),
+  and one is an **untracked, git-ignored** run copy under `.specify/teams/.work/` (`.specify/.gitignore`
+  line 9 excludes `teams/.work/`), which is neither a mirror pair nor part of the shipped
+  framework — it is a superseded working snapshot, not a second wording that survives.
+- Red → green, both groups flipped in this part:
+  - `python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py` → `9 passed`, exit `0`
+    (before: `5 failed, 4 passed`, exit `1`).
+  - `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py` → `39 passed`, exit `0`
+    (before: `1 failed, 38 passed` — the one red was `test_c29_*`).
+- Nothing in either test file changed for these two flips: the page and the two skill bodies are
+  the whole diff, which is what makes the flip attributable.
+
+### In-passing correction — the C-5 allowlist's third entry (part 7a)
+
+**Measured**: editing `skills/internal/review-sdd-process/SKILL.md` (edit 2 above, mandated by
+T031 / C-29 / FR-025) drifts the sha256 freeze in
+`tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`.
+That file **is** a manifest entry (`.specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt`
+line 66, `dd08d5ba…`) and was **not** allowlisted, so the guard went red:
+`drifted: ['skills/internal/review-sdd-process/SKILL.md']`, exit `1` — a NEW failure by name
+(the test is not in `baseline-failed.txt` and was green before this part).
+
+**Classification: correction, not decision.** The reading is single. T031 orders the edit; the
+guard ships its own declared maintenance mechanism (`ALLOWED_POST_BASELINE_CHANGES`, "names every
+post-baseline drift with its reason") which part 5 already extended twice for exactly this
+feature's declared surfaces and which now forces each entry to carry its own content markers.
+Leaving it red has no reading that satisfies GATE-5 ("no NEW failure by name"), and deleting or
+weakening the guard is forbidden. So the repair is the mechanism's own form, applied locally.
+
+**What was added** (`tests/contract/test_expression_compatibility.py`): one entry —
+`skills/internal/review-sdd-process/SKILL.md`, reason naming FR-025 / C-29 and the two cases that
+pin it, markers `("judgment object", "fixed order")`. No existing entry was edited, no assertion
+was changed, and the frozen manifest was **not** re-frozen.
+
+**Two negative controls** (the guard still bites, measured against the real assertion loop):
+
+| Control | Manipulation | Result |
+|---|---|---|
+| baseline | the third entry as committed | `-k c5` → `3 passed`, exit `0` |
+| 1a | drop the `fixed order` marker from the skill body (in memory) | the marker assertion would FAIL (`missing markers: ['fixed order']`) |
+| 1b | drop the `judgment object` marker from the skill body (in memory) | the marker assertion would FAIL (`missing markers: ['judgment object']`) |
+| 2 | remove the entry (run before it was added) | `1 failed, 2 passed`: `drifted: ['skills/internal/review-sdd-process/SKILL.md']` |
+
+**What this is not.** It is not FR-027's pin change (that remains the single authorized
+assertion change of C-64/C-67, recorded in § T030), it is not an assertion change at all, and it
+names a file a *declared surface* of this feature must edit rather than a file the feature merely
+happened to touch.
+
+## T033 — mirror verification: four checks against the T001 baseline (part 7a)
+
+T032 produced the projections with the two existing generators (no hand edit of any `.specify/`
+copy or per-tool copy). T033 then measured the four checks against
+`notes/pre-change-measurements.md` § PM-2 / § PM-3, whose frozen counts are **22 / 136 / 55 files**.
+
+| Check | Command | Result | T001 baseline | Verdict |
+|---|---|---|---|---|
+| templates | `python3 scripts/python/sync-mirrors.py --check --only templates` | `ok    templates/ == .specify/templates/ (22 files)`, exit `0` | ok, 22 files | no NEW drift |
+| skills/internal | `python3 scripts/python/sync-mirrors.py --check --only skills/internal` | `ok    skills/internal/ == .specify/skills/internal/ (136 files)`, exit `0` | ok, 136 files | no NEW drift |
+| shared | `python3 scripts/python/sync-mirrors.py --check --only shared` | `ok    shared/ == .specify/shared/ (55 files)`, exit `0` | ok, 55 files | no NEW drift |
+| per-tool copies | `python3 scripts/python/regen-command-copies.py --check` | `OK: all per-tool command copies match the source templates.`, exit `0` | matching | no NEW drift |
+
+- **What T032 had to close** (`--check` immediately before the write): templates 2 files
+  (`feature-details-template.md`, `review-template.md`), skills/internal 4 files
+  (`code-review/SKILL.md`, `code-review/references/delta-setup.md`,
+  `code-review/scripts/git-delta-review.sh`, `review-sdd-process/SKILL.md`), shared 1 file
+  (`workflow/feature-integration.md`), and the four per-tool `speckit.review` copies. That is the
+  declared "mirrors last" state carried from parts 2–6 plus this part's own skill edit, and
+  `--write` closed all of it (`sync … (2 files)` / `(4 files)` / `(1 files)`, `Regenerated command
+  copies for 4 tools`, exit `0`).
+- **The one remaining drift in the whole tree is not this feature's**:
+  `python3 scripts/python/sync-mirrors.py --check` over all scopes still reports
+  `DIFF  .specify/skills/improve-skills/references/loop-playbook.md` — an unrelated
+  `skills/external/` pair nobody in this feature edits. It is the residue of the pre-existing
+  failure `tests/contract/test_scripts_distribution_parity.py::…::test_repo_has_no_orphan_or_drifted_scripts`,
+  which is named in `baseline-failed.txt` line 13 (so: no NEW failure), and it was deliberately
+  **not** absorbed into this change (a feature-scoped sync must not drag unrelated drift into the
+  surface). Re-measured after the write: that suite is `1 failed, 77 passed`, the one red being
+  that baseline entry, whose reported drift list is now that single unrelated file instead of the
+  four per-tool copies plus five mirror lines it reported at baseline.
+- Verdict, in the only form C-70 allows: **no NEW drift against the T001 measurement**, not an
+  absolute "all green" (which the unrelated pair makes unattainable and which would turn this
+  check into a claim rather than evidence).

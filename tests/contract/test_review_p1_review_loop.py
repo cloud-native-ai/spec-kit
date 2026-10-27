@@ -175,12 +175,46 @@ def _status_table() -> str:
 
 
 def test_c15_review_owns_the_ready_for_review_transition():
+    """C-15's subject, kept; the criteria *copy* it used to require is gone.
+
+    Feature 071 FR-027 / C-64 / C-67 authorize exactly one existing-assertion
+    change and this is it: C-47 removes the second criteria wording from
+    `feature-integration.md` and turns the row into a reference, so the two
+    assertions that quoted that wording must stop requiring it. What survives is
+    the subject — the row exists and the command owns the transition — and what
+    replaces the copy is stronger than what it replaces: the row must name the
+    criteria owner, and the duplicated wording must be provably absent. The
+    authorization is non-precedential: no other assertion may follow it.
+    """
     table = _status_table()
     assert "| `/speckit.review` | `Implemented → Ready for Review` |" in table, (
         "the review transition row MUST be present"
     )
-    assert "review.md committed" in table
-    assert re.search(r"deferred item resolved or waived", table)
+    review_rows = [
+        line for line in table.splitlines() if line.startswith("| `/speckit.review`")
+    ]
+    assert len(review_rows) == 1, (
+        f"the review command MUST own exactly one transition row; found {review_rows!r}"
+    )
+    row = review_rows[0]
+    assert "Implemented → Ready for Review" in row, (
+        "the review row MUST still carry the transition it owns"
+    )
+    assert "templates/feature-details-template.md" in row, (
+        "the row MUST cite the criteria owner's path (C-47: it is a reference, "
+        "not a second copy)"
+    )
+    assert "Canonical Status State Machine" in row, (
+        "the row MUST cite the owner's section, not merely its file"
+    )
+    assert "review.md committed" not in table, (
+        "the duplicated criteria wording C-47 removed MUST NOT return to the "
+        "transition table"
+    )
+    assert not re.search(r"deferred item resolved or waived", table), (
+        "the second criteria wording C-47 removed MUST NOT return to the "
+        "transition table"
+    )
 
 
 def test_c15_checklist_row_is_annotated_and_keeps_one_transition_per_command():

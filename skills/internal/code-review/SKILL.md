@@ -16,6 +16,7 @@ classification: internal
 
 - **脚本（确定性）**：`diff` 渲染、`review` 逐文件流程、`note` 意见落盘、`report` 汇总与合入门禁判定、`base` 基准解析、`triage` 适用性判定、`start` 记录创建与轮转、`receipt` 覆盖率回执与段裁决 — 全部封装在 `${SKILL_HOME}/scripts/git-delta-review.sh`。
 - **Reviewer（判断性）**：按 P0–P6 维度读代码、写意见、做合入决策 — 方法论见 [`${SKILL_HOME}/references/review-workflow.md`](./references/review-workflow.md)。
+- **与 `review-sdd-process` 的关系（不同判定对象，由命令组合）**：本技能判定一次**已提交代码 delta** 的可核验缺陷；`review-sdd-process` 判定产出该特性的 **SDD 过程**。`/speckit.review` 按**固定顺序**组合两者——过程段先、代码段后——两段各自保留自己的严重度词汇，既不互相折算，也不互相冒充；本技能不因组合而改变自己的判定对象、方法论或记录形态。
 
 ## Workflow
 
