@@ -10,7 +10,7 @@
 
 **Evidence measured**:
 
-- `templates/commands/review.md` (54 lines) delegates only to `review-sdd-process`; its `## Delegation` paragraph says the report reviews "the SDD process that produced the feature …, never the code it produced".
+- `templates/commands/review.md` (53 lines) delegates only to `review-sdd-process`; its `## Delegation` paragraph says the report reviews "the SDD process that produced the feature …, never the code it produced".
 - `skills/internal/review-sdd-process/SKILL.md` `description` states "This skill has no overlap with the code-review skill, which reviews code diffs/PRs"; `## Boundaries` repeats "No overlap — keep the two separate even though both say \"review\"".
 - `grep -rn "code-review" templates/ docs/reference/commands/` returns nothing: no command template references the skill today.
 
@@ -47,7 +47,7 @@ Three readings follow from that output:
 
 1. `refs/remotes/origin/HEAD` does not exist here, and in this clone `origin` is the UPSTREAM project. A rule that starts from `origin/HEAD` finds nothing; a rule that falls back to a local branch named `main` resolves to `2dd1ca4f` whose merge base with HEAD is `926836e0` — a base far behind the feature slice, which would fold months of unrelated history into every review. The base therefore cannot default to a branch name.
 2. The first-commit instrument already exists in this repository's governance and is the one 069b contract C-1 pins for the requirements first commit (`git log --diff-filter=A`, never `git log -1`). Reusing it means the code segment and the wall-clock baseline measure the same freeze point.
-3. The script's own default is the wrong default for this job: `git-delta-review.sh` sets `GIT_BASE="${GIT_BASE:-main}"` (line 22), so the composed path must pass the resolved base explicitly instead of relying on it (FR-020 in the requirements forbids the built-in default).
+3. The script's own default is the wrong default for this job: `git-delta-review.sh` sets `GIT_BASE="${GIT_BASE:-main}"` (line 22), so the composed path must pass the resolved base explicitly instead of relying on it (FR-004 in the requirements forbids the built-in default).
 
 **Alternatives rejected**: `HEAD~N` (N is unknowable); "the whole branch" (`main..HEAD` on this repo spans the upstream mirror); working-tree diff (excluded by FR-005 and by the fact that the review's object must be reproducible from commits).
 

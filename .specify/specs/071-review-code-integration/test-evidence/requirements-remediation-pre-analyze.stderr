@@ -1,0 +1,1 @@
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=42 waived=0
