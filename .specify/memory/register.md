@@ -93,3 +93,7 @@
 | REC-071-06 | 每条 Success Criterion 标注评估它的阶段：SC-001 拆为 implement 可判定的两载体相等性 + review 阶段的可组合运行观测；验证日志模板增一列 | `.specify/specs/071-review-code-integration/review.md` § 5.4 REC-071-06（F7） | open |
 | REC-071-07 | quickstart 的字面选择器必须在写入时对仓库校验（F 的 `src/legacy/**` 在本仓匹配为空，字面命令给出与预期相反的 `verdict=pass`） | `.specify/specs/071-review-code-integration/review.md` § 5.5 REC-071-07（F5） | open |
 | REC-071-08 | 技能正文不重述脚本强制的阈值：`>400` / `>800` 只留在 `size_guard`，`SKILL.md` 改为指路 | `.specify/specs/071-review-code-integration/review.md` § 5.5 REC-071-08（F8） | open |
+| REC-072-01 | 冻结守护断言（引擎动作闭集 pin、C-5 冻结哈希）为计划授权漂移开一个机制化申报通道：declared-drift 登记件由两个守护测试读取，同一批编辑先申报后落地，兼容计划退回为工作流叙事而非一次性逃逸条款 | `.specify/specs/072-client-self-improvement/review.md` § 5.3/5.2 REC-072-01（F1） | open |
+| REC-072-02 | C-56 编辑面白名单的镜像部分改由 `sync-mirrors.py` MIRROR_PAIRS 测试时推导，不再硬编码 `.specify/skills/internal/` 子树——合法生成器写入不再能制造守护违规 | `.specify/specs/072-client-self-improvement/review.md` § 5.3 REC-072-02（F2） | open |
+| REC-072-03 | `templates/commands/feedback.md` Path A 委派 bullet 收敛回指针形态（载体闭集与呈报三项事实归 `references/path-a-digest.md` § A4a/A4b 独有），消除第三处内容型重复 | `.specify/specs/072-client-self-improvement/review.md` § 5.1 REC-072-03（F3） | open |
+| REC-072-04 | plan 约束激活期间的规格头状态簿记对账（或把头状态字段退役给登记表）：避免 plan-owned 冻结把 `requirements.md` 头状态滞留在 `Draft` | `.specify/specs/072-client-self-improvement/review.md` § 5.4 REC-072-04（F4） | open |
