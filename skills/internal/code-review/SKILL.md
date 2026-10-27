@@ -88,6 +88,32 @@ classification: internal
 
 - **回执是「已读全 diff」的唯一证据形态**：覆盖率回执是唯一证据；diff 概览、读过变更文件列表、变更行数不大、工具输出存在本身都不得替代它，也不得单独被引作"这次评审做完了"的证据。
 
+## Feedback boundary（反馈边界：只记框架摩擦）
+
+代码段的结论与反馈条目是两件事，判断对象不同、落点也不同：
+
+- **只有框架自身的摩擦可以投递为反馈条目**：渲染器缺失、基准歧义、回执缺口、非交互路径不足，都属于在使用 Spec Kit 自身的模板、命令、技能、脚本时受阻——这才是 feedback entry 的合法内容。
+- **代码缺陷 MUST NOT 作为反馈条目投递**：代码段的 `blocking` / `important` / `suggestion` / `nitpick` / `question` / `praise` 意见说的是**本特性代码**的缺陷，它留在记录文件 `<feature-dir>/code-review.md` 里，那里才有它的级别、文件与行号。把它抄进反馈库是违反本条分类义务的行为，不是可以商量的口味问题。反馈机制本身（红线、存储、引擎、阈值协议）仍由 `.specify/shared/workflow/feedback-step.md` 拥有，本条只规定这条边界。
+- 同一条分类义务写在两个表面——`templates/commands/review.md` 与本技能正文——因此「把代码缺陷当反馈投递」是可被检出的违规，而不是口味问题。
+
+### 本技能自己的收尾记录（嵌套执行时的单元普查）
+
+`/speckit.review` 组合运行时，一次运行的单元普查为**三个单元**：命令单元 `/speckit.review`、被委派的过程技能单元 `skill:review-sdd-process`、被委派的代码技能单元 `skill:code-review`。三者共享同一个 run id、各自 `unit_id` 不同，这正是反馈引擎既有的 `(unit_id, run_id)` 键：没有任何一个单元去重、合并或截断另一个，因此三条记录并存是设计结果，不是重复。
+
+本技能的义务说全：本技能在 `## Wrap-up` 里以 `skill:code-review` 作为自己的单元身份、以本次运行的 shared run id 完成**自己的收尾记录**；命令侧 MUST NOT 抑制本技能的收尾，MUST NOT 代写本技能运行判定，也 MUST NOT 事后补记；本技能同样不替另一个单元记录，不对另一个单元的条目做修改。
+
+## Expression face protection（表达面保护，以及回执与覆盖率的区分）
+
+表达类交付物的评审面仍按声明的读者基准判定；该面及其判据由表达类评审面的 owner 声明（本技能不复述、也不另开一条 wiring 引用）。代码段是**附加段**（additional segment）：它回答的是"这段已提交的代码 delta 里有没有可验证的缺陷"，判的是另一个对象。本特性没有代码 delta 时，代码段按 `triage` 记为 `not-applicable` 并写明依据——它不替代、也不短路读者基准判定，读者的过程评审结论照旧成立。
+
+覆盖率回执的计数对象必须说清楚，因为两个不同的问题共用了"coverage"这个词：
+
+- 回执统计的是**已评审文件**（reviewed files）：变更文件集里带裁决的那一份占比，连同带理由跳过的数量与缺口数量。它从来不是测试覆盖率（never test coverage），也从来不是编译覆盖率（never compile coverage），更不是行覆盖率。
+- 回执不得被引作读者基准判定的证据（never evidence for the reader-baseline judgement）：读者基准问的是"表达能否被目标读者读懂"，回执问的是"这份 delta 有没有被逐文件看过"——不是同一个问题的两个度量，谁也不能为另一方作证。
+- 反向同样成立：FR-027 禁止的是把编译/测试/覆盖率结果当作表达类评审面的判定对象，它禁止的是**那个对象**，因此 never forbids the receipt——本回执由 FR-014 要求，是"不冒充已读"的证据形态。两个方向都写下来，是为了让任何一方都不能被引作另一方的依据。
+
+不变量保持不变，本特性不做新增：反馈条目仍是一条一件地落在 `.specify/memory/feedback/`（`scope: local`，一条只属于一个单元的一次运行），零自动传输，反馈目标仍是框架本身；本特性不新增 intake 存储、不新增第二套反馈聚合目录、不新增反馈 id 族，也没有任何上传路径。
+
 ## Resource ID
 
 - Canonical ID: `<SKILL:.specify/skills/internal/code-review/SKILL.md>`

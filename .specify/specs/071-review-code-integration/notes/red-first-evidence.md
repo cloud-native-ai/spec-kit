@@ -550,18 +550,118 @@ Scenario C's `not-applicable` path:
 
 ## Group 6 — `tests/contract/test_review_feedback_boundary.py`
 
-- Red run (T024): pending
-- Command line: pending
-- Real output: pending
-- Exit code: pending
-- Failing count: pending
-- Red → green (T028): pending
+- Red run (T024): **2026-10-27** at implement part 6, HEAD `f7f8156e` (clean tree), before any
+  edit of `templates/commands/review.md` or `skills/internal/code-review/SKILL.md` in this part.
+- Command line: `python3 -m pytest -q tests/contract/test_review_feedback_boundary.py`
+- Real output (tail): `19 failed, 11 passed in 0.67s`
+- Exit code: `1`
+- Failing count: **19 of 30**
+- Failing tests (19, by name): `test_c55_the_command_states_the_set_is_unchanged_and_adds_no_channel`,
+  `test_c56_the_command_limits_the_payload_to_framework_friction`,
+  `test_c56_a_code_defect_stays_in_the_record`,
+  `test_c57_the_duty_is_written_on_two_surfaces`,
+  `test_c57_the_framework_friction_sample_is_judged_legal`,
+  `test_c57_the_code_defect_sample_is_judged_a_violation`,
+  `test_c57_the_two_samples_are_judged_oppositely`,
+  `test_c57_the_store_itself_cannot_enforce_the_duty`,
+  `test_c58_the_command_names_the_three_units`,
+  `test_c58_the_command_forbids_suppression_backfill_and_substitution`,
+  `test_c58_the_code_skill_completes_its_own_closing_record`,
+  `test_c59_the_census_is_three_not_two`,
+  `test_c62_the_code_segment_is_an_additional_segment`,
+  `test_c62_a_no_delta_feature_records_not_applicable_without_short_circuiting`,
+  `test_c63_the_receipt_counts_reviewed_files`,
+  `test_c63_the_receipt_is_never_test_or_compile_coverage`,
+  `test_c63_the_receipt_is_not_evidence_for_the_reader_baseline_judgement`,
+  `test_c63_fr027_targets_the_other_object_and_never_forbids_the_receipt`,
+  `test_c63_the_two_directions_are_stated_together`.
+
+- **What the 11 green tests are, at red time** — the unchanged-surface half, not coverage of the new
+  behaviour: the two compiled closing faces' step tuples (`test_c55_the_command_closing_step_set_is_the_published_six`,
+  `test_c55_both_delegated_skill_faces_keep_their_five_step_set`), the "rule text sits outside the
+  compiled face" guard, the per-face unit-id ownership
+  (`test_c58_each_unit_owns_exactly_one_compiled_closing_face`), the three directly driven
+  (unit_id, run_id) cases, and the three C-60/C-61 predecessor sweeps. They are supposed to be green
+  before the edit — they measure what must NOT move — and the flip therefore has to come from the two
+  surfaces, which is what the red list is made of.
+
+- **The two constructed samples and how they are judged (SC-007).** Both live in the test. The judge
+  is *parameterised by the written rule*: `_duty()` parses the legal class (framework friction) and
+  the forbidden class (a code defect posted as a feedback entry) out of both surfaces and fails when
+  either class is missing, so the sample verdicts cannot survive the deletion of the surface that
+  states the rule. A sample carrying a code location plus one of the six code severities is a code
+  defect; a sample naming framework mechanisms is friction. Legal side is also driven against the real
+  store (one entry, `unit_id` as called, `scope: local`); the violation side is judged from the written
+  rule, because the engine deliberately cannot classify — which is the reason C-57 requires the rule in
+  words.
+
+- Red → green (T028): **2026-10-27** at implement part 6, HEAD `f7f8156e` plus this part's edit.
+  `python3 -m pytest -q tests/contract/test_review_feedback_boundary.py` →
+  `30 passed in 0.59s`, exit `0` (red: `19 failed, 11 passed`, exit `1`). The flip came from the two
+  surfaces — `templates/commands/review.md` (T025) and `skills/internal/code-review/SKILL.md`
+  (T026/T027) — not from an assertion change: no test name was added, dropped or weakened between
+  the red run and the green run, and the 11 tests green at red time are still green.
+
+### T028 — US5 verification
+
+- Targeted set, final state:
+
+  | Suite | Command | Result |
+  |---|---|---|
+  | this group | `python3 -m pytest -q tests/contract/test_review_feedback_boundary.py` | `30 passed`, exit `0` |
+  | neighbouring groups over the edited surfaces | `python3 -m pytest -q tests/contract/test_review_code_composition.py tests/contract/test_status_gate_owner.py tests/contract/test_coverage_receipt.py tests/contract/test_code_review_skill_contract.py` | `1 failed, 121 passed`, exit `1` |
+  | the expression face's own gate (T027's control) | `python3 -m pytest -q tests/contract/test_expression_gates_doc.py` | `18 passed`, exit `0` — **equal to the plan-stage pre-change count** |
+  | the pin under FR-027's single authorization | `python3 -m pytest -q tests/contract/test_review_p1_review_loop.py` | `1 failed, 9 passed` — the red is `test_c15_review_owns_the_ready_for_review_transition`, T030's scheduled rewrite |
+  | the docs↔template isomorphism page | `python3 -m pytest -q tests/contract/test_review_docs_isomorphism.py` | `5 failed, 4 passed` — unchanged from part 5, red by design until T031 |
+  | the compiled-face guards | `python3 -m pytest -q tests/contract/test_compile_embeds.py tests/contract/test_compile_propagation_order.py` | `1 failed, 5 passed` — the red is `test_propagation_chain_is_green_in_canonical_order`, named in `baseline-failed.txt` |
+  | the C-5 hash freeze | `python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c5` | `3 passed`, exit `0` — equal to part 5 |
+
+- **Quickstart Scenario H's two samples, judged as stated** (the samples and the judgement live in the
+  test, per SC-007's source line): a framework-friction item ("the receipt step has no non-interactive
+  path on a host without the renderer, and the workflow leaves the base ambiguous…") → **legal**, and
+  it is additionally *driven* through `feedback-utils.py --action record`, producing one entry whose
+  `unit_id` is as called and whose `scope` is `local`. A code defect copied out of the record
+  ("`src/specify_cli/__init__.py:412 — blocking: …`") → **violation** of the written classification
+  duty. The verdicts are opposite by construction, so a judge that answered one way for both would
+  fail. Nothing is transmitted automatically, and the closing step list is unchanged.
+
+- **The closing step set, enumerated from the compiled faces and compared with the pre-change file**
+  (`git show f7f8156e:<path>` parsed the same way):
+
+  | Face | Pre-change steps | Now | Equal |
+  |---|---|---|---|
+  | `templates/commands/review.md` | Run Determination, Exec Quant, Feedback Record, Threshold Notice, Token Reflection, Docs Sync Eval | identical, n=6 | yes |
+  | `skills/internal/review-sdd-process/SKILL.md` | the first five of the same list | identical, n=5 | yes |
+  | `skills/internal/code-review/SKILL.md` | the first five of the same list | identical, n=5 | yes |
+
+  The compiled marker fingerprint is `7877db82c58c` in all three files, before and after: the
+  generated faces were not edited, and the new rule text sits in hand-written sections outside them.
+
+- **The run's units, enumerated**: each face names exactly one unit id —
+  `/speckit.review` in the command template, `skill:review-sdd-process` in the process skill,
+  `skill:code-review` in the code skill — and no face names another's. The census is therefore
+  **three**, and it is measured behaviourally as well: three `run-determination.py` invocations
+  sharing one run id leave three session records (one `source` per unit), and three
+  `feedback-utils.py --action record` invocations sharing one run id leave **three** entries keyed
+  `(unit_id, run_id)`; a repeated call for one unit leaves three, not four.
+
+- **In-passing correction (disclosed) — the C-62 owner citation.** The first green attempt at
+  `test_c62_the_code_segment_is_an_additional_segment` required the code-review skill to cite
+  `shared/definitions/flow-class-definitions.md` by path. That turned
+  `tests/contract/test_expression_compatibility.py::test_c5_wiring_surface_is_closed` red:
+  `skills/internal/code-review/SKILL.md -> flow-class-definitions.md`, a **wiring reference outside
+  the closed W1–W4 surface** that 067 froze. The resolution has exactly one reading — the
+  expression-class owner declares the review face in its own ledger, so the skill states the boundary
+  by description and the record walks the other way — and it is local and reversible: the assertion
+  now pins the opposite property (the skill MUST NOT acquire a wiring token) and the skill says the
+  face is declared by its owner without naming the file. `-k c5` is back to `3 passed`, equal to the
+  part-5 measurement. No plan-owned artifact was touched, and no other assertion moved.
 
 ## Neighbouring-suite re-runs (regression nets, not red-first)
 
 These exercise behaviour that already exists or fully lands before they run, so they carry `[blockedBy:]` instead of a red-first claim (the create-tasks migration/regression exception).
 
-- T027 — `python3 -m pytest -q tests/contract/test_expression_gates_doc.py` against the plan-stage pre-change count of **18 passed** (re-measured at implement start in `notes/pre-change-measurements.md` § PM-6): pending
+- T027 — `python3 -m pytest -q tests/contract/test_expression_gates_doc.py` against the plan-stage pre-change count of **18 passed** (re-measured at implement start in `notes/pre-change-measurements.md` § PM-6): **done at part 6 (T027)** — `18 passed`, exit `0`, equal to the frozen count. The expression-class review face is untouched by this feature: the process segment still judges against the declared reader baseline and still may not reuse the code-review object, which is why the code segment could be added as an *additional* segment without editing that face.
 - T030 — the one intentional pin `tests/contract/test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition` under FR-027's single authorization: pending
 - T033 / T036 — mirror verification and final closure comparison against the T001 measurements and the T002 baseline: pending
 
