@@ -121,12 +121,130 @@ Scenario C's `not-applicable` path:
 
 ## Group 3 — `tests/contract/test_code_review_skill_contract.py`
 
-- Red run (T010): pending
-- Command line: pending
-- Real output: pending
-- Exit code: pending
-- Failing count: pending
-- Red → green (T013 for C-17…C-21; T016/T017 for the US3 bands): pending
+- Red run (T010): **2026-10-27** at implement part 3, HEAD `a6625f32` (clean tree),
+  before any edit of `skills/internal/code-review/scripts/git-delta-review.sh` or of
+  `skills/internal/code-review/SKILL.md`.
+- Command line: `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py`
+- Real output (tail): `38 failed, 1 passed in 1.81s`
+- Failing tests (38, by name): `test_us2_base_source_vocabulary_is_closed_and_reachable`,
+  `test_us2_an_explicit_base_wins_the_first_tier`,
+  `test_us2_the_feature_tier_uses_the_first_add_and_not_the_latest_commit`,
+  `test_us2_the_same_repository_state_resolves_the_same_base_twice`,
+  `test_us2_the_feature_tier_never_consults_the_scripts_builtin_default`,
+  `test_us2_the_trunk_tier_is_reached_only_after_the_feature_tier`,
+  `test_us2_no_tier_resolves_to_not_evaluated_with_the_failing_command`,
+  `test_us2_a_trunk_shaped_branch_participates_only_when_explicitly_named`,
+  `test_us2_trunk_order_ignores_the_remote_origin_happens_to_point_at`,
+  `test_us2_trunk_order_ignores_the_most_recently_active_branch`,
+  `test_us2_trunk_order_prefers_a_resolvable_origin_head_over_a_local_main`,
+  `test_us2_an_explicit_trunk_beats_a_resolvable_origin_head`,
+  `test_us2_head_is_the_explicit_value_when_given`,
+  `test_us2_head_is_read_once_and_fixed_for_the_whole_run`,
+  `test_us2_base_offers_a_machine_readable_form`,
+  `test_us2_the_feature_tier_never_derives_from_the_latest_commit_over_the_spec`,
+  `test_us2_the_non_interactive_path_is_four_steps_read_as_four`,
+  `test_us2_base_start_and_note_complete_without_a_prompt_or_a_tty`,
+  `test_us2_the_record_header_has_one_form_in_a_fixed_field_order`,
+  `test_us2_start_reports_the_range_the_base_step_resolved`,
+  `test_us2_a_first_run_creates_the_record_and_reports_no_archive`,
+  `test_us2_a_rerun_rotates_the_previous_record_under_the_utc_second_form`,
+  `test_us2_a_same_second_rerun_never_overwrites_an_archive`,
+  `test_us2_a_triage_value_other_than_run_creates_no_record`,
+  `test_us2_triage_runs_when_the_delta_contains_a_code_path`,
+  `test_us2_triage_is_not_applicable_for_a_spec_only_delta`,
+  `test_us2_triage_answers_an_empty_delta_before_any_receipt_runs`,
+  `test_us2_the_default_code_path_set_treats_docs_and_memory_as_non_code`,
+  `test_us2_the_code_paths_override_narrows_the_predicate`,
+  `test_us2_the_code_paths_override_widens_the_predicate`,
+  `test_us2_triage_reports_not_evaluated_when_the_range_cannot_resolve`,
+  `test_c22_the_rendered_marker_needs_the_renderer_and_a_terminal`,
+  `test_c23_the_four_forbidden_phrases_are_quoted_verbatim_as_a_prohibition`,
+  `test_c24_the_renderer_absence_clause_is_rewritten_not_deleted`,
+  `test_c25_the_receipt_is_the_only_evidence_form_for_reading_the_whole_diff`,
+  `test_c26_the_verdict_keeps_the_script_as_its_only_source`,
+  `test_c27_an_omitted_record_path_labels_its_selection_as_implicit`,
+  `test_c29_both_skills_declare_distinct_judgment_objects_composed_by_the_command`
+- Exit code: `1`
+- Failing count: **38 of 39** (the one that passes is
+  `test_us2_additional_subcommands_do_not_break_the_existing_closed_loop` — the
+  group's regression half: it pins `diff`/`review`/`note`/`report` staying
+  documented and `diff --stat` staying drivable, so it is green on both sides of
+  the change by construction and is not evidence of coverage)
+- Reading: the failures are the obligations the script does not carry yet — the
+  `base`/`triage`/`start` subcommands do not exist (the script answers `未知命令`),
+  so every behavioural case reds on a real invocation rather than on a missing
+  file; the skill body still says "环境缺失即停" and "No overlap — keep the two
+  separate", so the C-23/C-24/C-25/C-29 bands red on text that is measurably
+  present today.
+- Disclosed transient (T012 lands `start`, T015 lands `receipt`): the four-step
+  enumeration is asserted from the usage block, so `receipt` is declared as step 4
+  one part before its implementation arrives. The declaration is the plan's
+  four-step path (FR-021, research § R7); the subcommand's non-interactive
+  behaviour is pinned by group 4 (`test_coverage_receipt.py`, T014/T018), and its
+  reachability is asserted there, not here.
+- Red → green (T013 for C-17…C-21; T016/T017 for the US3 bands, T031 for C-29):
+  **the US2 band is green on 2026-10-27** after T011 (`base` + `triage`) and T012
+  (`start`) added the three subcommands to the existing script entity.
+  - Command line: `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py -k us2`
+  - Real output: `32 passed, 7 deselected in 1.74s`
+  - Exit code: `0`
+  - Failing count: `0` (was 31 of the 32 in the red run's US2 half — the one US2 case
+    that was green at red time, `test_us2_additional_subcommands_do_not_break_the_existing_closed_loop`,
+    is the regression half and stayed green). Three edits were made to this file between
+    the red run and the green run, and none of them relaxes an obligation: (1) the
+    `git log -1` search now skips comment lines, so a comment may name the forbidden
+    instrument while its use still reds; (2) the C-17 enumeration no longer demands a
+    `COMMANDS` entry for `receipt` one part before that subcommand exists (its behaviour
+    is group 4's obligation); (3) the two origin-HEAD tests were given a history in which
+    tier 2 and tier 3 measurably disagree (`develop` branches off the seed while `main`
+    moves on), so "origin/HEAD beats local main" is a discriminating assertion instead of
+    an accidental equality. Both restructured cases were in the recorded red run's failing
+    list and fail for the same reason there (the subcommand did not exist).
+  - Whole-group state after this part:
+    `python3 -m pytest -q tests/contract/test_code_review_skill_contract.py` →
+    `7 failed, 32 passed in 1.98s`, exit `1`. The seven are exactly the sibling bands
+    authored in this same file and claimed by later rows — `test_c22_*`, `test_c23_*`,
+    `test_c24_*`, `test_c25_*` (T016), `test_c26_*`, `test_c27_*` (T017), `test_c29_*`
+    (T031). They are red on the surfaces those rows own (the skill body still says
+    "环境缺失即停" and "No overlap — keep the two separate"; `report --summary` has no
+    `--file` and always exits 0), not on anything this part was asked to deliver.
+
+### T013 — US2 verification (quickstart Scenario A, determinism, the three triage answers)
+
+- Scenario A, live on this repository (no test substitute):
+  `git log --diff-filter=A --format='%H %ad %s' --date=short -- .specify/specs/071-review-code-integration/requirements.md`
+  → `8d18265b… 2026-10-27 docs(071-review-code-integration): land the review × code-review
+  composition requirements`; then
+  `bash skills/internal/code-review/scripts/git-delta-review.sh base --spec .specify/specs/071-review-code-integration`
+  → `base=e57052efa1c16871da4e24a56eabf7402b6fd87e`, `head=a6625f32ead981a6064db166dc3e1ce175a21fb2`,
+  `base_source=feature-first-commit`, exit `0` — which is exactly what `quickstart.md`
+  Scenario A declares (`base_source=feature-first-commit`, base `e57052ef…`, head = the
+  `HEAD` read once at run start). The base equals the parent of the requirements first-add
+  commit, i.e. the feature freeze point, not a branch-tip.
+- Same repository state, two resolutions: the same command run twice printed the identical
+  `base` / `head` / `base_source` triple (FR-022). The assertion form of the same property
+  is `test_us2_the_same_repository_state_resolves_the_same_base_twice`.
+- The three triage answers, live in a disposable repository built by the T003 fixture:
+
+  | delta shape | `changed_files` | `triage` | `basis` |
+  |---|---|---|---|
+  | code (`src/fixture_demo.py` + a spec artifact) | 2 | `run` | `code path in the committed delta: src/fixture_demo.py` |
+  | spec-only (`plan.md` only) | 1 | `not-applicable` | `no code deliverable: the committed delta contains no code path` |
+  | empty (`base` == `head`) | 0 | `not-applicable` | `no committed code delta` |
+
+  No record file was created by any of the three invocations
+  (`record created by triage? False`), which is the `V29` half of the same rule. The same
+  three shapes are asserted by `test_us2_triage_runs_when_the_delta_contains_a_code_path`,
+  `test_us2_triage_is_not_applicable_for_a_spec_only_delta` and
+  `test_us2_triage_answers_an_empty_delta_before_any_receipt_runs`; the override directions
+  and the unresolvable-range exit `2` are asserted by
+  `test_us2_the_code_paths_override_narrows_the_predicate`,
+  `test_us2_the_code_paths_override_widens_the_predicate` and
+  `test_us2_triage_reports_not_evaluated_when_the_range_cannot_resolve`.
+- Live on this repository the triage answers `run` over `103` changed files with three code
+  paths named — the framework repo's own feature slice really does contain code, so the
+  predicate is not vacuous here either.
+
 
 ## Group 4 — `tests/contract/test_coverage_receipt.py`
 

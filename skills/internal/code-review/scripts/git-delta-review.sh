@@ -458,6 +458,361 @@ cmd_report() {
     esac
 }
 
+# ══════════════════════════════════════════════════════════════
+# 代码段确定性内核: base / triage / start
+#
+# 三个子命令落在本脚本这一既有实体上 (contracts/code-review-skill.md C-30),
+# 不引入新引擎、常驻进程或依赖。它们构成非交互评审路径的前三步
+# (第四步 receipt 与汇总裁决由覆盖率回执承担), 见 --help 的 FOUR-STEP 段。
+# ══════════════════════════════════════════════════════════════
+
+SPEC_DIR=""             # --spec <feature-dir>
+BASE_EXPLICIT=""        # --since / --base
+HEAD_EXPLICIT=""        # --head
+GIT_TRUNK=""            # --trunk
+CODE_PATHS_OVERRIDE=()  # --code-paths <glob[,glob...]>
+
+RESOLVED_BASE=""
+RESOLVED_HEAD=""
+RESOLVED_BASE_SOURCE=""
+RESOLVE_FAIL_REASON=""
+
+# 闭合的默认代码路径集 — 唯一 owner (命令模板只引用, 不复制)。
+# "什么算代码路径" 由本集合判定; 调用方可用 --code-paths 整体覆盖。
+CODE_PATH_PATTERNS=(
+    '*.py' '*.pyi' '*.sh' '*.bash' '*.zsh' '*.js' '*.mjs' '*.cjs' '*.jsx' '*.ts' '*.tsx'
+    '*.go' '*.rs' '*.java' '*.kt' '*.kts' '*.rb' '*.php' '*.c' '*.h' '*.cc' '*.cpp' '*.hpp'
+    '*.cs' '*.swift' '*.m' '*.mm' '*.scala' '*.ex' '*.exs' '*.lua' '*.pl' '*.sql' '*.proto'
+    '*.vue' '*.svelte' '*.dart' '*.zig' '*.nim' '*.hs' '*.ml' '*.clj' '*.cljs'
+    'Dockerfile' 'Makefile' 'CMakeLists.txt' '*.cmake' '*.gradle' '*.tf' '*.toml'
+)
+
+# 明确不算代码的路径: 规格、文档、记忆与评审产出
+NON_CODE_PATH_PATTERNS=(
+    '*.md' '*.markdown' '*.txt' '*.rst' '*.adoc'
+    'docs/*' '.specify/specs/*' '.specify/memory/*' '.specify/history/*'
+    '.specify/templates/*' '.specify/review/*' '.specify/feedback/*'
+)
+
+die2() { echo "✗ $*" >&2; exit 2; }
+
+# 运行时间戳: UTC 秒级, 形式 YYYYMMDDTHHMMSSZ (FR-010)。REVIEW_RUN_TIMESTAMP
+# 可固定时间戳以确定性驱动 "同秒冲突" 分支 (与 DELTA_BIN 同样是只读替换)。
+run_timestamp() { printf '%s' "${REVIEW_RUN_TIMESTAMP:-$(date -u +%Y%m%dT%H%M%SZ)}"; }
+
+git_has_ref() { git rev-parse --verify --quiet "$1" >/dev/null 2>&1; }
+
+# 渲染模式: 两条件规则 (FR-013 / C-22) — 渲染器可用 且 stdout 是交互终端。
+# 其余一切情形 (agent / 非交互 / 重定向输出) 取文本模式, 即使渲染器存在。
+renderer_marker() {
+    local override="${1:-}"
+    if [[ -n "$override" ]]; then
+        case "$override" in
+            delta|rendered)  echo "renderer: delta" ;;
+            text|plain)      echo "renderer: text" ;;
+            *)               die "无效 renderer: $override (可选: delta | text)" ;;
+        esac
+        return 0
+    fi
+    if command -v "$DELTA_BIN" >/dev/null 2>&1 && [[ -t 1 ]]; then
+        echo "renderer: delta"
+    else
+        echo "renderer: text"
+    fi
+}
+
+# 主干识别: 一条闭合顺序 (FR-004 / C-18), 顺序之外不做猜测。
+resolve_trunk() {
+    if [[ -n "$GIT_TRUNK" ]]; then
+        git_has_ref "$GIT_TRUNK" && { printf '%s' "$GIT_TRUNK"; return 0; }
+        return 1
+    fi
+    if git_has_ref refs/remotes/origin/HEAD; then
+        printf '%s' "refs/remotes/origin/HEAD"; return 0
+    fi
+    local branch
+    for branch in main master; do
+        git_has_ref "refs/heads/$branch" && { printf '%s' "$branch"; return 0; }
+    done
+    return 1
+}
+
+# 特性切片档的仪器: 首次提交 (C-19) — git log --diff-filter=A -- <spec>/requirements.md,
+# 绝不使用 git log -1 over the directory。
+resolve_feature_commit() {
+    local spec="${1:-}" found
+    [[ -n "$spec" ]] || return 1
+    found=$(git log --diff-filter=A --format=%H -- "${spec%/}/requirements.md" 2>/dev/null | tail -1)
+    [[ -n "$found" ]] || return 1
+    printf '%s' "$found"
+}
+
+# 解析评审区间并写入 RESOLVED_* ; 无档可解时返回 2 (not-evaluated), 绝不退回猜测。
+resolve_range() {
+    RESOLVED_BASE=""; RESOLVED_HEAD=""; RESOLVED_BASE_SOURCE=""; RESOLVE_FAIL_REASON=""
+
+    local head
+    head=$(resolve_head) || { RESOLVE_FAIL_REASON="head 不可解析 (仓库无提交或 --head 无效)"; return 2; }
+    RESOLVED_HEAD="$head"
+
+    if [[ -n "$BASE_EXPLICIT" ]]; then
+        if git_has_ref "$BASE_EXPLICIT"; then
+            RESOLVED_BASE=$(git rev-parse "$BASE_EXPLICIT")
+            RESOLVED_BASE_SOURCE="explicit"
+            return 0
+        fi
+        RESOLVE_FAIL_REASON="显式基准不可解析: $BASE_EXPLICIT"
+        RESOLVED_BASE_SOURCE="not-evaluated"
+        return 2
+    fi
+
+    local feature
+    if feature=$(resolve_feature_commit "$SPEC_DIR"); then
+        if git_has_ref "${feature}^"; then
+            RESOLVED_BASE=$(git rev-parse "${feature}^")
+            RESOLVED_BASE_SOURCE="feature-first-commit"
+            return 0
+        fi
+    fi
+
+    local trunk merge
+    if trunk=$(resolve_trunk); then
+        merge=$(git merge-base "$trunk" "$RESOLVED_HEAD" 2>/dev/null || true)
+        if [[ -n "$merge" ]]; then
+            RESOLVED_BASE="$merge"
+            RESOLVED_BASE_SOURCE="trunk-merge-base"
+            return 0
+        fi
+    fi
+
+    RESOLVED_BASE_SOURCE="not-evaluated"
+    RESOLVE_FAIL_REASON="no base tier resolved: no explicit --since, no first-add commit for ${SPEC_DIR:-<spec>}/requirements.md, and no trunk (--trunk / refs/remotes/origin/HEAD / main / master)"
+    return 2
+}
+
+# head: 显式 --head, 否则运行开始时读一次的 HEAD — 该值在整次运行内不再变 (C-18)。
+resolve_head() {
+    if [[ -n "$HEAD_EXPLICIT" ]]; then
+        git_has_ref "$HEAD_EXPLICIT" || return 1
+        git rev-parse "$HEAD_EXPLICIT"
+        return 0
+    fi
+    git rev-parse HEAD 2>/dev/null
+}
+
+resolve_command_line() {
+    echo "git log --diff-filter=A --format=%H -- ${SPEC_DIR:-<spec-dir>}/requirements.md ; git rev-parse ${HEAD_EXPLICIT:-HEAD} ; git merge-base <trunk> ${HEAD_EXPLICIT:-HEAD}"
+}
+
+print_unresolved() {
+    echo "base_source=not-evaluated"
+    echo "reason=${RESOLVE_FAIL_REASON:-base unresolvable}"
+    echo "resolve_command=$(resolve_command_line)"
+    exit 2
+}
+
+is_code_path() {
+    local path="$1" pattern
+    if [[ ${#CODE_PATHS_OVERRIDE[@]} -gt 0 ]]; then
+        for pattern in "${CODE_PATHS_OVERRIDE[@]}"; do
+            [[ "$path" == $pattern ]] && return 0
+        done
+        return 1
+    fi
+    for pattern in "${NON_CODE_PATH_PATTERNS[@]}"; do
+        [[ "$path" == $pattern ]] && return 1
+    done
+    for pattern in "${CODE_PATH_PATTERNS[@]}"; do
+        [[ "$path" == $pattern ]] && return 0
+    done
+    return 1
+}
+
+changed_files_between() {
+    local base="$1" head="$2"
+    git diff --name-only "${base}..${head}" 2>/dev/null | while read -r line; do
+        [[ -n "$line" ]] && echo "$line"
+    done
+}
+
+parse_common_opts() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --spec)         SPEC_DIR="$2"; shift 2 ;;
+            --since|--base) BASE_EXPLICIT="$2"; shift 2 ;;
+            --trunk)        GIT_TRUNK="$2"; shift 2 ;;
+            --head)         HEAD_EXPLICIT="$2"; shift 2 ;;
+            --code-paths)
+                local list="${2//,/ }"
+                read -r -a CODE_PATHS_OVERRIDE <<< "$list"
+                shift 2
+                ;;
+            *) die2 "未知选项: $1" ;;
+        esac
+    done
+}
+
+# ─── base: 解析 base / head / base_source ───────────────────
+cmd_base() {
+    local json=false
+    local -a rest=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --json) json=true; shift ;;
+            *) rest+=("$1"); shift ;;
+        esac
+    done
+    [[ ${#rest[@]} -gt 0 ]] && parse_common_opts "${rest[@]}"
+
+    need_git
+    local rc=0
+    resolve_range || rc=$?
+    [[ "$rc" -ne 0 ]] && print_unresolved
+
+    if [[ "$json" == "true" ]]; then
+        printf '{"base":"%s","head":"%s","base_source":"%s"}\n' \
+            "$RESOLVED_BASE" "$RESOLVED_HEAD" "$RESOLVED_BASE_SOURCE"
+    else
+        echo "base=$RESOLVED_BASE"
+        echo "head=$RESOLVED_HEAD"
+        echo "base_source=$RESOLVED_BASE_SOURCE"
+    fi
+}
+
+# ─── triage: 代码段适用性 (三值封闭, 空 delta 先答) ──────────
+cmd_triage() {
+    parse_common_opts "$@"
+    need_git
+
+    local rc=0
+    resolve_range || rc=$?
+    if [[ "$rc" -ne 0 ]]; then
+        echo "triage=not-evaluated"
+        echo "reason=${RESOLVE_FAIL_REASON:-base unresolvable}"
+        echo "resolve_command=$(resolve_command_line)"
+        exit 2
+    fi
+
+    local -a files=()
+    mapfile -t files < <(changed_files_between "$RESOLVED_BASE" "$RESOLVED_HEAD")
+
+    echo "base=$RESOLVED_BASE"
+    echo "head=$RESOLVED_HEAD"
+    echo "base_source=$RESOLVED_BASE_SOURCE"
+    echo "changed_files=${#files[@]}"
+
+    # 空 delta 在回执运行之前就答 (V30): 0/0/0 的回执永远不是干净评审
+    if [[ ${#files[@]} -eq 0 ]]; then
+        echo "triage=not-applicable"
+        echo "basis=no committed code delta"
+        return 0
+    fi
+
+    local -a code=()
+    local file
+    for file in "${files[@]}"; do
+        is_code_path "$file" && code+=("$file")
+    done
+
+    if [[ ${#code[@]} -eq 0 ]]; then
+        echo "triage=not-applicable"
+        echo "basis=no code deliverable: the committed delta contains no code path"
+        return 0
+    fi
+
+    echo "triage=run"
+    echo "basis=code path in the committed delta: ${code[*]}"
+}
+
+# ─── start: 记录创建与轮转 (单一表头形态) ────────────────────
+write_code_segment_record() {
+    local record="$1" marker="$2" stamp="$3"
+    local base_short head_short reviewer branch run_date
+    base_short=$(git rev-parse --short "$RESOLVED_BASE" 2>/dev/null || echo 'N/A')
+    head_short=$(git rev-parse --short "$RESOLVED_HEAD" 2>/dev/null || echo 'N/A')
+    reviewer=$(git config user.name 2>/dev/null || echo 'unknown')
+    branch=$(current_branch)
+    run_date="${stamp:0:4}-${stamp:4:2}-${stamp:6:2}T${stamp:9:2}:${stamp:11:2}:${stamp:13:2}Z"
+
+    cat > "$record" << EOF
+# Code Review Report — 代码段 (code segment)
+
+| 属性 | 值 |
+|------|-----|
+| **分支** | \`${branch}\` |
+| **基准** | \`${RESOLVED_BASE}\` (\`${base_short}\`) |
+| **目标** | \`${RESOLVED_HEAD}\` (\`${head_short}\`) |
+| **基准来源** | \`${RESOLVED_BASE_SOURCE}\` |
+| **渲染模式** | \`${marker}\` |
+| **Reviewer** | \`${reviewer}\` |
+| **日期** | \`${run_date}\` |
+
+## 变更概览
+
+\`\`\`
+$(git diff --stat "${RESOLVED_BASE}..${RESOLVED_HEAD}" 2>/dev/null || echo '(range unusable)')
+\`\`\`
+
+---
+
+## Review 意见
+
+EOF
+}
+
+cmd_start() {
+    local triage_value="run" renderer_override=""
+    local -a rest=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --triage)   triage_value="$2"; shift 2 ;;
+            --renderer) renderer_override="$2"; shift 2 ;;
+            *) rest+=("$1"); shift ;;
+        esac
+    done
+    [[ ${#rest[@]} -gt 0 ]] && parse_common_opts "${rest[@]}"
+
+    need_git
+    [[ -n "$SPEC_DIR" ]] || die "start 需要 --spec <feature-dir>"
+
+    # 记录存在性按适用性分工 (C-11 / V29): 只有 run 写记录
+    if [[ "$triage_value" != "run" ]]; then
+        echo "refused: triage=$triage_value" >&2
+        echo "no record is created for a triage value other than run (C-11 / data-model V29)" >&2
+        exit 2
+    fi
+
+    local rc=0
+    resolve_range || rc=$?
+    [[ "$rc" -ne 0 ]] && print_unresolved
+
+    local marker stamp record archive="none" archive_target
+    marker=$(renderer_marker "$renderer_override")
+    stamp=$(run_timestamp)
+    record="${SPEC_DIR%/}/code-review.md"
+    mkdir -p "${SPEC_DIR%/}"
+
+    if [[ -f "$record" ]]; then
+        archive_target="${SPEC_DIR%/}/code-review-${stamp}.md"
+        if [[ -e "$archive_target" ]]; then
+            echo "refused: archive collision at $archive_target" >&2
+            echo "an existing archive is never overwritten; wait for the next second or re-run (V12)" >&2
+            exit 2
+        fi
+        mv "$record" "$archive_target"
+        archive="$archive_target"
+    fi
+
+    write_code_segment_record "$record" "$marker" "$stamp"
+    ok "代码段记录已创建: $record"
+    echo "record=$record"
+    echo "archive=$archive"
+    echo "base=$RESOLVED_BASE"
+    echo "head=$RESOLVED_HEAD"
+    echo "base_source=$RESOLVED_BASE_SOURCE"
+    echo "renderer=${marker#renderer: }"
+}
+
 usage() {
     cat << 'EOF'
 
@@ -477,6 +832,23 @@ usage() {
               severity: blocking | important | suggestion | nitpick | question | praise
     report    查看/汇总 Review 报告
               --list (默认) | --latest | --summary (按级别汇总 + 合入门禁判定) | --cat <file>
+    base      解析评审基准 (非交互路径第 1 步)
+              --spec <dir> | --since/--base <ref> | --trunk <ref> | --head <ref> | --json
+              输出 base= head= base_source=; 无档可解时 base_source=not-evaluated 并退出 2
+    triage    判定代码段适用性 (run | not-applicable | not-evaluated)
+              --spec <dir> | --since <ref> | --head <ref> | --trunk <ref> | --code-paths <glob[,glob]>
+              输出 triage= basis= changed_files=; 空 delta 在任何回执之前判定
+    start     创建代码段记录, 并把上一次记录轮转归档 (非交互路径第 2 步)
+              --spec <dir> | --since <ref> | --head <ref> | --trunk <ref> | --renderer <delta|text>
+              --triage <value>: 非 run 的适用性拒绝创建记录; 归档名 code-review-<YYYYMMDDTHHMMSSZ>.md
+
+  NON-INTERACTIVE PATH (four steps, in this order — four, never three):
+    1. base      resolve the range: base= head= base_source=
+    2. start     record creation and rotation (required from the second run on)
+    3. note      append opinions (repeatable, one call per opinion)
+    4. receipt   coverage receipt and the summary verdict
+  No step prompts; no step needs a terminal. Step 2 is a step of its own: skipping
+  it turns the unattended path into an agent hand-writing the record.
 
   EXAMPLES:
     git-delta-review.sh diff --stat --since main          # Phase 1: 提交粒度自检
@@ -485,12 +857,16 @@ usage() {
     git-delta-review.sh review --since main               # Phase 2: 结构化审查
     git-delta-review.sh note -s blocking -f src/a.rs -l 45 -c "空指针风险"
     git-delta-review.sh report --summary                  # Phase 3/4: 收敛判定
+    git-delta-review.sh base --spec .specify/specs/<key>  # 代码段: 解析本次评审区间
+    git-delta-review.sh triage --spec .specify/specs/<key>  # 代码段: 适用性判定
+    git-delta-review.sh start --spec .specify/specs/<key>   # 代码段: 创建/轮转记录
 
   ENVIRONMENT:
     REVIEW_DIR    Review 文件存储目录 (默认: ${SKILL_WORKDIR}/.specify/review)
-    GIT_BASE      默认对比基准 (默认: main)
+    GIT_BASE      默认对比基准 (默认: main; base/triage/start 不使用该默认)
     GIT_HEAD      默认对比目标 (默认: HEAD)
     DELTA_BIN     delta 二进制路径 (默认: delta)
+    REVIEW_RUN_TIMESTAMP  固定运行时间戳 YYYYMMDDTHHMMSSZ (默认: 当前 UTC 时间)
 
 EOF
 }
@@ -504,6 +880,9 @@ main() {
         review)  cmd_review "$@" ;;
         note)    cmd_note "$@" ;;
         report)  cmd_report "$@" ;;
+        base)    cmd_base "$@" ;;
+        triage)  cmd_triage "$@" ;;
+        start)   cmd_start "$@" ;;
         help|-h|--help) usage ;;
         *)       die "未知命令: $cmd (使用 --help 查看用法)" ;;
     esac
