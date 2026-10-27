@@ -37,7 +37,6 @@ Thumbs.db
 *.log
 .env*
 *.lock
-tmp/
 output/
 
 # Spec Kit-specific files
@@ -64,3 +63,5 @@ input/
 src/specify_cli/_source_commit.json
 
 **/*.egg-info/
+.specify/tools/*.json
+.specify/instructions.md-*

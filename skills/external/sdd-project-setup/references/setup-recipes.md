@@ -36,6 +36,27 @@
 
 `<path>` 缺省为当前项目根——解析规则见 SKILL.md § When to Load / S0 入口缺省解析。
 
+## 逻辑框架就绪矩阵（S1，与物理矩阵并列）
+
+`mechanism-inventory.py` 回答「`.specify/` 目录装没装」；`scripts/logical-framework.py` 回答「逻辑框架配没配」——一个项目可以物理 `complete` 而逻辑资产全空（无 goal、无 instructions 框架章节、无 docs 树），只看目录会把它误判为就绪。两层都盘点才算 S1 完成。
+
+```bash
+python3 <skill>/scripts/logical-framework.py --project <path> [--json] [--strict]
+```
+
+| 层 | 资产 | owner 路径 | 判定 | 缺口处置 |
+|----|------|-----------|------|----------|
+| required | instructions | `.specify/instructions.md` + compat 链接完好 | 文件在位、链接不悬空 | `/speckit.instructions`（§ S3.4） |
+| required | features | `.specify/memory/features.md` + `features/` | 行数>0、Total 标记一致、详情文件齐 | `/speckit.feature` |
+| required | docs | `docs/` 且有 markdown | 目录+正文在位（有 README/index 入口更好） | `/speckit.docs` |
+| recommended | goals | `.specify/goal/<slug>/goal.md`（引擎所有） | ≥1 个目标；3–5 为推荐区间 | `/speckit.goal` |
+| recommended | glossary / register / knowledge | `.specify/memory/{glossary.md,register.md,knowledge/}` | 存在即 ok；缺≠错 | 按项目语境补建 |
+| conditional | agents | `.specify/agents/{templates,instances}/*.agent.md` | 未配置合法（`not-configured`） | 项目使用子代理时 `/speckit.agents` |
+| conditional | teams | `.specify/teams/*/` | 未配置合法（`not-configured`） | 项目使用多 agent 团队时 `/speckit.team` |
+
+退出码：`0` required 层全 ok（recommended 缺口只报告）；`1` required 缺口；`2` 非 Spec Kit 项目。`--strict` 把 recommended 缺口也计为失败（用于"要求 goal 必须到位"的验收场景）。**三层语义**：required 缺口必须处置或声明；recommended 缺口按项目语境判定；conditional 的 `not-configured` 不是缺陷（Hard Requirement 3 的"缺≠错"）。
+
+
 ## S2 INSTALL
 
 S2 分两层，**CLI 层先于项目层**：S2-0 python 运行时解析 → S2-1 specify CLI ensure/安装 → S2-2 项目 init / 刷新。
@@ -99,6 +120,8 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 
 `/speckit.instructions` 的生成器报告（`BUDGET: <size> <budget> over`）是**收敛触发**，不是转述给用户的装饰性告警。处理顺序：
 
+0. **模板注入分支（先判定预算过界来源）**：当 reconcile 需要注入模板中缺失的框架章节、而**模板全量注入本身**就会把总量推过界（模板体积接近或超过预算）时，不走全量注入——改为 **pointer-first**：只写入短的纪律指针节（一句话规则 + `管理文件` 指针，指向 `.specify/shared/guidelines/<owner>.md` 或项目 guideline），把未内联的模板章节按名字登记为 pending（附触发条件：预算上调或章节外迁后再补）。**禁止**整段跳过 reconcile 只在报告里口头说明，也禁止为过预算而删除项目内容。
+
 1. **先走 owner 的 R1/R2**：`/speckit.instructions` 已内置 `manage-instructions` Action 5 的 R1（模板拥有章节压缩）与 R2（project-owned 章节 >4 KB 外迁）；若报告回到 `within`，本步结束，登记 `converged(R1/R2)`。不要在 setup 侧重实现 R1/R2。
 2. **R3 回退（project-filled 大章节外迁）**：仅当 R1/R2 无合法候选、报告仍 `over` 时执行。读取生成器的 section table，按 `live B` 降序选择 `placeholder=yes` 且 `delta > 0` 的 project-filled 章节（排除纯指针/纯汇总章节，如 `## Documentation Map` 本身）：
    - 先找该章节已声明的 owner 文档；没有则在 `docs/` 下新建 owner 文档（复用 `create-docs` 的目录约定），把章节正文**机械迁移**过去；
@@ -120,7 +143,9 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 | 2 | `/speckit.docs` | 有待挂载的新素材（history 产物）或文档空间待深化 | 文档建设深化：吸收 history 蒸馏的素材为文档与知识库添加资料（委托 create-docs 引擎收敛） |
 | 3 | `/speckit.research` | 项目尚无深度调研结论（spec 侧无 research 产物/知识库无调研记录） | 对项目做深度调研与分析（技术栈/架构/依赖/风险），结论落 spec 侧，供 feature 与 goal 消费 |
 | 4 | `/speckit.feature` | 特性注册表空/稀疏，或调研结论揭示特性缺口 | 基于调研结论生成合适的特性列表（对既有代码 reconcile 出注册表条目） |
-| 5 | `/speckit.goal` | 项目无 goal 定义 | 分析项目最佳演进方向与终态（吸收调研结论），定义 **3–5 个**项目级目标——数量下界保证有牵引，上界防目标稀释 |
+| 5 | `/speckit.goal` | 逻辑矩阵 goals 层缺（`.specify/goal/*/goal.md` 为空） | 分析项目最佳演进方向与终态（吸收调研结论），定义 **3–5 个**项目级目标——数量下界保证有牵引，上界防目标稀释；档案落在引擎所有的 `.specify/goal/<slug>/goal.md` |
+| 6 | `/speckit.agents` | **按需**：项目使用原生子代理/custom agent（`.specify/agents/**` 已在用或计划启用） | 创建/精化单代理定义（模板或实例），并刷新指令发现性；未使用的项目保持 `not-configured`，不得预建 |
+| 7 | `/speckit.team` | **按需**：项目使用多 agent 协作（`.specify/teams/**` 已在用或计划启用） | 组织团队（并行/串行/循环）并落团队定义与运行报告；单 agent 项目保持 `not-configured` |
 
 衔接要点：
 
@@ -149,6 +174,9 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 | `/speckit.history`（S3+） | **增量式**——重跑只蒸馏新会话，既有主题聚合不重建 | 增量幂等 |
 | `/speckit.research`（S3+） | 调研结论在位且未过期 → 跳过；过期/缺失 → 补调研 | 按需 |
 | `/speckit.goal`（S3+） | goal 定义在位（3–5 个）→ 跳过；不重复定义 | 内容不覆盖 |
+| `logical-framework.py`（S1/S4） | 只读盘点，每次执行都跑；稳定态输出不变、零写动作 | 无副作用 |
+| `/speckit.agents`（S3+） | 按需项：未使用 → 跳过（`not-configured` 合法）；已使用 → 增量精化 | 不预建 |
+| `/speckit.team`（S3+） | 按需项：未使用 → 跳过；已使用 → 增量维护 | 不预建 |
 
 **稳定态快路径**：S1 判 complete 且 S3+ 触发条件全不命中 → 直接 S4 复核 → S5 候选清单刷新，**零写动作**（候选清单刷新是唯一输出）。
 
@@ -156,7 +184,7 @@ ssh <alias> "su - <run-user> -c 'cd <project-dir> && specify init . --ai <tool> 
 
 **五族前置检查**（2026-10-16 上收——权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`，本节引用不复写；结论每项 ≤3 行摘要写入凭证。本技能处置后仍缺 = ⑤ fail 语义）。**本地拓扑只适用 ④ LLM 配置与 ⑤ spec-kit 可用性**——① SSH、② 运行用户、③ 子代理 CLI 无远端/外部 CLI 可查，逐项记 `n/a`（不构成 fail）；远端拓扑五族全查。
 
-加上：机制矩阵复扫达 complete（或 partial 且缺口已声明）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
+加上：物理矩阵复扫达 complete（或 partial 且缺口已声明）、**逻辑矩阵复扫 required 层无未声明缺口**（recommended/conditional 缺口按声明纪律登记）、compat 链接核验 `find <project-dir> -maxdepth 2 -type l ! -exec test -e {} \; -print` 为空。三者齐备才进 S5。
 
 ### S4-H Host hook health check（宿主 hook 体检）
 

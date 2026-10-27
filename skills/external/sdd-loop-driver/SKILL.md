@@ -92,6 +92,8 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 7. **流程不可替换**：U0/U1 与阶段计划写出前禁止直接编辑目标仓库；禁止用 improve-skills/create-skills 等维护路径替代 SDD 阶段链（目标为本仓库时同样适用）。唯一例外：入口显式声明「只做技能维护、不走 SDD」。
 8. **快照只读**：`scripts/loop-state.py` 的 snapshot 只读——MUST NOT 写状态脊、四件套、Registry 或工作树（唯一写路径是显式 `--out`，且落在 state dir / repo 内一律拒绝），MUST NOT 杀进程、删证据或移除 worktree；`stop` 在 065a 只是建议。字段面与检测读法 owner 是 `references/state-awareness.md`。
 9. **监听签名唯一**：每个监听窗口的 Shell 调用 MUST 在命令文本中携带字面量迭代标识——watcher 用 `--iter "<run_id>-w<NN>"`，hook 长读传第 6 个参数——`NN` 逐窗口递增，连续两次监听命令不得字节相同。令牌必须写成字面量，不能用 `$(date +%s)`/`$$`/`$RANDOM` 之类运行时展开：宿主（Qoder）在执行前比较签名，同参数连续调用会被判为重复并误报卡死。规则 owner 与重入续号：`references/watch-model.md` §3.2。
+10. **目标项目治理优先（本地与远端同规）**：对目标仓库的任何写动作或目录创建之前，MUST 先读取并遵守目标项目的治理文档——宪法（constitution）与指令（instructions），包括其中的原则、目录规范、命名规则与临时目录纪律；与目标项目既有文档冲突时以目标项目为准。经 ssh 的远端目标同规——远端目录创建同样受目标项目治理约束。目标项目尚无治理框架时委托 sdd-project-setup，不得以本技能的缺省形态替代目标治理。文件清单与兼容符号链接见 References。
+11. **运行期目录唯一**：目标仓 `.specify/` 命名空间是本技能唯一合法落点。临时数据（worktree、cache、tmp）走 `<repo>/.specify/.tmp/sdd-loop/{worktrees,cache,tmp}/<line_id>`，由 `.specify/.gitignore` 的 `.tmp/` 规则覆盖、工作项结束时清理；长期状态（状态脊）走 `<repo>/.specify/state/<line_id>.md`，按 line 一文一件、不随工作项清理（入口显式 `--state-dir` 时以入口为准）。布局 owner：`scripts/line-registry.py` 与 `references/dispatch-recipes.md`；Line Registry 仍缺省在 `$XDG_STATE_HOME/spec-kit/lines/` 或 `~/.local/state/spec-kit/lines/`（环境级，仓库外）。这两类落点由本技能独占；MUST NOT 使用 `.spec-kit/` 或任何其它仓库内 ad-hoc 目录（`tmp/`、`scratch/`、`state/`、`work/` 等）。首次写入前必须完成忽略状态确认（`git check-ignore -q .specify/.tmp`；缺失则先补规则）；目标项目自己的目录治理文档存在时，以目标项目为准。
 
 ## Discipline Defaults
 
@@ -137,6 +139,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - `scripts/hook-stop.sh` / `watch-hook.sh` — Stop hook 模板与远端同身份长读。
 - `scripts/line-registry.py` — 环境级 Registry、原子写/同线锁、信封分类、消息入口、集成队列。
 - `scripts/decomposition-check.py` / `pre-analyze-check.py` / `overlap-check.py` — 三个确定性门（owner：efficiency-model §5–§7）。
+- **目标项目治理文档**（运行时读取，经 ssh 同样适用）：目标项目的 `constitution`（`.specify/memory/constitution.md`）与 `instructions`（`.specify/instructions.md`，含 `AGENTS.md` / `QODER.md` / `CLAUDE.md` 兼容符号链接）；两者不随本技能分发，缺失时按 Hard Requirement 10 处置。
 
 ## Boundary
 

@@ -452,6 +452,26 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "markers": ("Custom-subject observation source", "运行判定历史未评估"),
     },
+    # 2026-10-27 Directory Governance amendment (trunk): two non-wiring skills
+    # legitimately gained their Directory Governance segments; each entry carries
+    # the needles its change must contain.
+    "skills/external/sdd-project-setup/SKILL.md": {
+        "reason": "2026-10-27 Directory Governance (Hard Requirements 10-11)",
+        "markers": ("目标项目治理优先", "目录创建限于规范落点"),
+    },
+    "skills/internal/manage-constitution/SKILL.md": {
+        "reason": "2026-10-27 Directory Governance MUST-include entry (Principle XVII)",
+        "markers": ("Directory Governance (Named, Documented, Ignored When Temporary)",),
+    },
+}
+
+# The historical baseline stays; a later amendment that legitimately edits an
+# untouchable path records itself here with the content it must carry.
+ALLOWED_POST_BASELINE_PATHS = {
+    ".specify/instructions.md": (
+        "2026-10-27 Directory Governance pointer in the Temporary Directory Discipline section",
+        ("directory-governance.md",),
+    ),
 }
 
 
@@ -513,11 +533,21 @@ def test_c5_untouchable_framework_paths_are_unchanged():
         ".specify/instructions.md",
     )
     assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
-    changed = [line for line in proc.stdout.splitlines() if line.strip()]
+    changed = [
+        line.strip() for line in proc.stdout.splitlines()
+        if line.strip() and line.strip() not in ALLOWED_POST_BASELINE_PATHS
+    ]
     assert not changed, (
         "paths the slice must not touch changed relative to %s: %r"
         % (PRE_CHANGE_HEAD[:8], changed)
     )
+    for rel, (reason, needles) in ALLOWED_POST_BASELINE_PATHS.items():
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        missing = [needle for needle in needles if needle not in text]
+        assert not missing, (
+            "allowed post-baseline path change must carry its intended content: %s (%s); "
+            "missing %r" % (rel, reason, missing)
+        )
 
 
 # --------------------------------------------------------------------------- #

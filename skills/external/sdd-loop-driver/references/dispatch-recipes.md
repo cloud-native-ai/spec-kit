@@ -276,7 +276,7 @@ git -C <repo> worktree add -b line/<line> <worktree_path> <base_sha>
 ```
 
 - 每条写线一个独立 worktree + 专用分支 `line/<line>`；`worktree_path` / `branch` / `base_sha` 登记进 Registry。
-- 缺省 `worktree_path=<repo_parent>/.spec-kit/worktrees/<repo-basename>/<line_id>`；目标已存在或跨文件系统 → 显式失败，不得复用/删除其他 line 的 worktree。
+- 缺省 `worktree_path=<repo>/.specify/.tmp/sdd-loop/worktrees/<line_id>`（`.specify/.gitignore` 的 `.tmp/` 规则覆盖；与仓库同盘，天然满足同文件系统要求）；目标已存在或跨文件系统 → 显式失败，不得复用/删除其他 line 的 worktree。
 - 一个 worktree 同时只有一个写 line；阶段子代理只在该 worktree 内提交，**不得切换分支、创建/删除 worktree、改写其他 line 的 worktree**。
 - 运行时记录（feedback / session / knowledge / exec-quant）写在各自 worktree 内；**阶段提交不提交运行时记录**（路径集合以 `data-model.md` § E8 为唯一枚举；`evidence/`、`history/`、`trigger/` 明确排除）。
 

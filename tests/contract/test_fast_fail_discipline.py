@@ -713,14 +713,14 @@ def test_a6_not_inside_three_section_window():
 
 
 def test_a7_section_counts_20_to_21_and_21_to_22():
-    """C-7: top-level counts -- template 24, live 25. Stale-pin update (067 T025,
-    2026-10-22): owner facts moved 21/22 -> 24/25 via pre-067 instructions-section
-    additions (Single-Run Evidence + progress reporting ambient sections,
-    f1f6e96a/410c68c4, plus 063 storage guidance aadcaf6b). Equality pins unchanged."""
+    """C-7: top-level counts -- template 29, live 30. Stale-pin update (2026-10-27):
+    the Closed-Set Claims amendment adds one ambient section (on top of the
+    Grounded Naming amendment's two); the pin had already drifted to 28/29 via
+    pre-067 instructions-section additions."""
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
-    assert tpl == 24, f"C-7: template has {tpl} top-level sections; expected 24 (21 pinned before)"
-    assert live == 25, f"C-7: live file has {live} top-level sections; expected 25 (22 pinned before)"
+    assert tpl == 29, f"C-7: template has {tpl} top-level sections; expected 29"
+    assert live == 30, f"C-7: live file has {live} top-level sections; expected 30"
     tpl_set = {l for l in _lines(INSTR) if l.startswith("## ")}
     live_set = {l for l in _lines(INSTR_LIVE) if l.startswith("## ")}
     assert tpl_set <= live_set, f"C-7: template sections missing from live: {sorted(tpl_set - live_set)}"
@@ -992,11 +992,12 @@ def test_x4_live_constitution_principle_xvi():
 
 
 def test_x5_live_version_minor_bump():
-    """C-5: the live version took the MINOR bump to 1.13.0."""
+    """C-5: the live version took the MINOR bump to 1.13.0 (raised to 1.15.0 on 2026-10-27
+    by the Grounded Naming amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.13.0", f"C-5: live version is {m.group(1)}; expected 1.13.0"
+    assert m.group(1) == "1.15.0", f"C-5: live version is {m.group(1)}; expected 1.15.0"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
@@ -1097,23 +1098,22 @@ def test_x12_principle_block_project_neutral():
 
 def test_x13_double_landing_three_count_pins():
     """C-13: the three count pins were raised in the same batch. Stale-pin update
-    (067 T025, 2026-10-22): the template's principle roster moved 14 -> 15 (XV
-    Single-Run Evidence, f1f6e96a 2026-10-16, pre-067); live (16) and command (8)
-    facts still hold."""
+    (2026-10-27): the Directory Governance amendment moved template 15 -> 16, live
+    16 -> 17, and command 8 -> 9 in one landing."""
     src = _text(DOUBLE_LANDING_TEST)
-    for name, want in (("TEMPLATE_COUNT", 15), ("LIVE_COUNT", 16), ("COMMAND_COUNT", 8)):
+    for name, want in (("TEMPLATE_COUNT", 17), ("LIVE_COUNT", 18), ("COMMAND_COUNT", 10)):
         m = re.search(rf"^{name} = (\d+)", src, re.M)
         assert m, f"C-13: {name} not found in the guard"
         assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
     # and the counts are true of the artifacts, not just of the pins
-    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 15, "C-13: the template does not actually hold 15"
-    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 16, "C-13: the live constitution does not hold 16"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 17, "C-13: the template does not actually hold 17"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 18, "C-13: the live constitution does not hold 18"
     # S3 re-point: the command list became the generator skill's MUST-include
     # sub-entry block (same block extraction the double-landing guard uses).
     m = re.search(r"^- \*\*MUST include\*\*.*?(?=^- )", _text(CONST_SKILL), re.M | re.S)
     assert m, "C-13: the skill lost its `- **MUST include**` mandatory-principles block"
     entries = re.findall(r"^  - \*\*(.+?)\*\* —", m.group(0), re.M)
-    assert len(entries) == 8, "C-13: the skill's MUST-include list does not actually hold 8 entries"
+    assert len(entries) == 10, "C-13: the skill's MUST-include list does not actually hold 10 entries"
 
 
 def test_x14_min_version_floor_semantics():
@@ -1130,13 +1130,14 @@ def test_x14_min_version_floor_semantics():
 
 
 def test_x15_watchlist_gains_principle_title():
-    """C-15: the double-landing watchlist gained this title (2 -> 3)."""
+    """C-15: the double-landing watchlist gained this title (2 -> 3); the Directory
+    Governance and Grounded Naming amendments extended it to 5."""
     src = _text(DOUBLE_LANDING_TEST)
     m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
     assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
     entries = re.findall(r'"([^"]+)"', m.group(1))
     assert PRINCIPLE_TITLE in entries, f"C-15: the watchlist lacks {PRINCIPLE_TITLE!r}"
-    assert len(entries) == 3, f"C-15: the watchlist holds {len(entries)} entries; expected 3"
+    assert len(entries) == 5, f"C-15: the watchlist holds {len(entries)} entries; expected 5"
 
 
 def test_x16_plan_template_zero_change():
@@ -1170,17 +1171,21 @@ def test_x17_plan_template_enumeration_sentinel():
 
 
 def test_x18_downstream_gate_rows_15_to_16():
-    """C-18: rendering the enumeration logic gives 16 rows, up from 15."""
+    """C-18: rendering the enumeration logic gives 16 rows, up from 15. Stale-pin
+    update (2026-10-27): the Directory Governance amendment added one row (17 / 16)."""
     live = _text(CONST_LIVE)
     rows = PRINCIPLE_RE.findall(live)
-    assert len(rows) == 16, f"C-18: the enumeration yields {len(rows)} gate rows; expected 16"
-    # the 15 side is measured, not asserted from memory: drop this principle's block
+    assert len(rows) == 18, f"C-18: the enumeration yields {len(rows)} gate rows; expected 18"
+    # the 15 side is measured, not asserted from memory: drop this principle's block.
+    # The boundary is the next principle OR the next H2 -- keying on H2 alone would
+    # swallow any principle appended after this one (Directory Governance, 2026-10-27).
     lines = live.splitlines()
     i = lines.index(LIVE_HEADING)
-    j = next(k for k in range(i + 1, len(lines)) if lines[k].startswith("## "))
+    j = next(k for k in range(i + 1, len(lines))
+             if lines[k].startswith("### ") or lines[k].startswith("## "))
     sample = "\n".join(lines[:i] + lines[j:])
     before = PRINCIPLE_RE.findall(sample)
-    assert len(before) == 15, f"C-18: without this principle the enumeration yields {len(before)}; expected 15"
+    assert len(before) == 17, f"C-18: without this principle the enumeration yields {len(before)}; expected 17"
     # sentinel: the enumeration is not returning 16 for a trivial reason
     assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
     assert not any(title == PRINCIPLE_TITLE for _n, title in before), (
