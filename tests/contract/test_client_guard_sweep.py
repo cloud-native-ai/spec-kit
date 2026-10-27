@@ -452,6 +452,10 @@ def test_c56_changed_paths_stay_on_the_declared_edit_surface():
         "templates/commands/feedback.md",
         "templates/commands/improve.md",
         "templates/commands/review.md",
+        # ID register is updated by review's REC-registration duty (071/063
+        # obligations) — a legitimate project record, not a hand edit of
+        # framework sources. Narrow exact entry; do NOT widen .specify/memory/.
+        ".specify/memory/register.md",
     }
     allowed_prefixes = (
         "docs/reference/commands/",   # command reference docs (C-56)
