@@ -144,8 +144,8 @@
 
 **Purpose**: 建立证据槽并把实现期每个"红先行 / 无新增失败"声称所对照的日期化控制冻结下来。
 
-- [ ] T001 [P] 创建 `.specify/specs/072-client-self-improvement/notes/` 证据槽：`notes/red-first-evidence.md`（头部点名五个新契约测试文件，每条红先行记录四字段——命令行、真实输出、退出码、失败计数）与 `notes/pre-change-measurements.md`（日期化：python 3.11.11 / pytest 8.4.2 / bash 4.4.20 / git 2.43.5、`git rev-parse HEAD` = 646e1bfe、`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 结果、覆盖基线正文 comm delta = 0、守护套件 def 计数 161/16/10/18）。Test anchor: 两份 notes 存在且字段齐备；evidence: `notes/pre-change-measurements.md`。
-- [ ] T002 [P] 实现期开始时按 `templates/commands/implement.md` step 6 `**Test runs**` bullet 的捕获命令与名级比较形式，恰好一次捕获失败名基线到 `.specify/specs/072-client-self-improvement/baseline-failed.txt`（E2 槽）；本文件其它行不得重捕获或刷新（重捕获会把回归网变成移动靶）。Test anchor: 基线文件存在且名级比较锚定它；evidence: `baseline-failed.txt`。
+- [X] T001 [P] 创建 `.specify/specs/072-client-self-improvement/notes/` 证据槽：`notes/red-first-evidence.md`（头部点名五个新契约测试文件，每条红先行记录四字段——命令行、真实输出、退出码、失败计数）与 `notes/pre-change-measurements.md`（日期化：python 3.11.11 / pytest 8.4.2 / bash 4.4.20 / git 2.43.5、`git rev-parse HEAD` = 646e1bfe、`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 结果、覆盖基线正文 comm delta = 0、守护套件 def 计数 161/16/10/18）。Test anchor: 两份 notes 存在且字段齐备；evidence: `notes/pre-change-measurements.md`。
+- [X] T002 [P] 实现期开始时按 `templates/commands/implement.md` step 6 `**Test runs**` bullet 的捕获命令与名级比较形式，恰好一次捕获失败名基线到 `.specify/specs/072-client-self-improvement/baseline-failed.txt`（E2 槽）；本文件其它行不得重捕获或刷新（重捕获会把回归网变成移动靶）。Test anchor: 基线文件存在且名级比较锚定它；evidence: `baseline-failed.txt`。
 
 **Checkpoint**: 两个日期化控制就位——实现期每个红/绿与无新增失败声称都有可复算的参照。
 
