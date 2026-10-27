@@ -277,9 +277,9 @@
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T027 [P] [blockedBy: T007,T011,T014,T017,T018,T021] 镜像收尾：`python3 scripts/python/sync-mirrors.py --write` 后 `--check`，判词 = 相对 T001 测量无**新增**漂移（loop-playbook.md 既录除外）；`python3 scripts/python/regen-command-copies.py --write` 后 `--check` 报告 OK；确认探针注册面未被触碰（否则先 compile → regen → sync 并把偏离记为异常）。 Test anchor: 两条 check 输出留档 `test-evidence/`；evidence: `test-evidence/` 实现期镜像输出。
-- [ ] T028 [blockedBy: T025] 在客户夹具内实跑 quickstart S3–S8，把真实输出（含拆卸步骤）贴入 `.specify/specs/072-client-self-improvement/notes/quickstart-run.md`（固定落点）；**不**改写 plan 属主的 `quickstart.md`——若实现期认定必须更新其"未实现"豁免措辞，先行声明 `PLAN-EDIT: .specify/specs/072-client-self-improvement/quickstart.md — <reason>；分类=minor`，substantive 一律停止回传。 Test anchor: notes/quickstart-run.md 六场Scenario输出齐备；evidence: `notes/quickstart-run.md`。
-- [ ] T029 [blockedBy: T026,T027,T028] 更新 `.specify/memory/features/072.md`（实现运行留痕；状态保持 `Planned` 直到 implement 零 `[ ]` 为止，不得提前推进）并复核 `.specify/memory/features.md` 072 行无需变更（本阶段未发现新特性、无行失效）。 Test anchor: 详情 Latest Review 增实现期记录、登记表 Total Features 不变；evidence: `.specify/memory/features/072.md`。
+- [X] T027 [P] [blockedBy: T007,T011,T014,T017,T018,T021] 镜像收尾：`python3 scripts/python/sync-mirrors.py --write` 后 `--check`，判词 = 相对 T001 测量无**新增**漂移（loop-playbook.md 既录除外）；`python3 scripts/python/regen-command-copies.py --write` 后 `--check` 报告 OK；确认探针注册面未被触碰（否则先 compile → regen → sync 并把偏离记为异常）。 Test anchor: 两条 check 输出留档 `test-evidence/`；evidence: `test-evidence/` 实现期镜像输出。
+- [X] T028 [blockedBy: T025] 在客户夹具内实跑 quickstart S3–S8，把真实输出（含拆卸步骤）贴入 `.specify/specs/072-client-self-improvement/notes/quickstart-run.md`（固定落点）；**不**改写 plan 属主的 `quickstart.md`——若实现期认定必须更新其"未实现"豁免措辞，先行声明 `PLAN-EDIT: .specify/specs/072-client-self-improvement/quickstart.md — <reason>；分类=minor`，substantive 一律停止回传。 Test anchor: notes/quickstart-run.md 六场Scenario输出齐备；evidence: `notes/quickstart-run.md`。
+- [X] T029 [blockedBy: T026,T027,T028] 更新 `.specify/memory/features/072.md`（实现运行留痕；状态保持 `Planned` 直到 implement 零 `[ ]` 为止，不得提前推进）并复核 `.specify/memory/features.md` 072 行无需变更（本阶段未发现新特性、无行失效）。 Test anchor: 详情 Latest Review 增实现期记录、登记表 Total Features 不变；evidence: `.specify/memory/features/072.md`。
 
 **Checkpoint**: 全部行 `[X]`、DoD 可翻绿、实现期证据各就其槽。
 

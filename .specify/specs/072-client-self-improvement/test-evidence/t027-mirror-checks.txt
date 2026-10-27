@@ -1,0 +1,25 @@
+=== sync-mirrors.py --check (T027) ===
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (400 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (112 files)
+ok    shared/ == .specify/shared/ (55 files)
+rc=0
+
+=== regen-command-copies.py --write (T027) ===
+usage: regen-command-copies.py [-h] [--check]
+regen-command-copies.py: error: unrecognized arguments: --write
+rc=2
+
+=== regen-command-copies.py --check (T027) ===
+OK: all per-tool command copies match the source templates.
+rc=0
+=== regen-command-copies.py (regen, no args) ===
+Regenerated command copies for 4 tools.
+rc=0
+
+=== regen-command-copies.py --check ===
+OK: all per-tool command copies match the source templates.
+rc=0

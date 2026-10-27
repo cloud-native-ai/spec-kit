@@ -1,0 +1,9 @@
+=== sync-mirrors.py --write (T027) ===
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (400 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (112 files)
+ok    shared/ == .specify/shared/ (55 files)
+rc=0

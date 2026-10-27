@@ -1,0 +1,75 @@
+........................................................................ [ 12%]
+.....................................................................F.. [ 24%]
+...F.................................................................... [ 36%]
+........................................................................ [ 48%]
+........................................................................ [ 61%]
+........................................................................ [ 73%]
+........................................................................ [ 85%]
+........................................................................ [ 97%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+___________ test_shipped_surface_has_no_framework_runtime_references ___________
+
+    @pytest.mark.contract
+    def test_shipped_surface_has_no_framework_runtime_references():
+        violations = []
+        for root_name in SHIPPED_ROOTS:
+            for path in (REPO_ROOT / root_name).rglob("*"):
+                if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".yaml", ".yml", ".json"}:
+                    continue
+                rel = path.relative_to(REPO_ROOT).as_posix()
+                text = path.read_text(encoding="utf-8", errors="replace")
+                for pattern in BANNED_PATTERNS:
+                    for m in pattern.finditer(text):
+                        line = text[: m.start()].count("\n") + 1
+                        snippet = text.splitlines()[line - 1].strip()[:90]
+                        violations.append(f"{rel}:{line}: {snippet}")
+        fresh = [v for v in violations
+                 if v.split(":")[0] not in KNOWN_DEBT]
+>       assert not fresh, (
+            "shipped (client-visible) files reference the framework project's own "
+            "runtime artifacts; rewrite from the client-project perspective:\n"
+            + "\n".join(fresh[:15])
+        )
+E       AssertionError: shipped (client-visible) files reference the framework project's own runtime artifacts; rewrite from the client-project perspective:
+E         shared/definitions/flow-class-definitions.md:86: 一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`skills/external/sdd-loop-driver
+E         skills/external/sdd-loop-driver/templates/stage-team-preset.md:49: slot_cap_ceiling: "min(4, the line's remaining concurrency allowance owned by Feature 064)
+E         skills/external/sdd-loop-driver/templates/stage-team-preset.md:54: provenance: Feature 070 clarify 2026-10-24; shape derived from the measured baseline in th
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:23: Ownership and read access are projections inside the line's existing Ownership Manifest (F
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:95: The ledger `dispatch` event for an implement package carries the 067 fields in addition to
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:275: The preset's provenance records that its shape derives from the Feature 070 measured basel
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:349: - **FN-11 (064)** — Feature 064's line registry, envelopes, worktree-per-write-line, Owner
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:350: - **FN-12 (067)** — Feature 067's part brief, bounded part size, dispatch log, and test ec
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:351: - **FN-13 (068)** — Feature 068's exec-quant feedback channel is unchanged; no transmissio
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:6: **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/co
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:6: **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/co
+E         skills/external/sdd-loop-driver/scripts/wp-report.py:2: """Coordination report and metrics for Feature 070 Work Packages.
+E       assert not ['shared/definitions/flow-class-definitions.md:86: 一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`skills/e...osition-model.md:275: The preset's provenance records that its shape derives from the Feature 070 measured basel", ...]
+
+tests/contract/test_shipped_surface_client_neutrality.py:62: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+2 failed, 588 passed in 48.52s
+PYTEST_RC=1
