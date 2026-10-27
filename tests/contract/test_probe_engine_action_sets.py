@@ -40,6 +40,9 @@ FEEDBACK_ALLOWED = {
     # 068 intake-contract C-10 (same-batch amendment, landed in 4b): the
     # receive leg's explicit engine action joins the closed set.
     "ingest-exec-quant",
+    # 072 cadence-and-metrics C-47: the read-only client loop metrics action
+    # joins the closed set (Feature 072's second bounded engine face).
+    "client-metrics",
 }
 PROBE_ALLOWED = {"probes", "map", "probe-inject", "handlers", "compile-embeds"}
 # 063 C-22: the wrap-up engine's ACTIONS closure, exact-pinned both ways.

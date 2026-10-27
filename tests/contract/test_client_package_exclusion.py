@@ -436,3 +436,35 @@ def test_t015_feedback_command_surfaces_carry_client_digest_pointers():
     assert "introspection" in template.lower() and "introspection" in docs.lower(), (
         "T015: the introspection path stays documented on both surfaces"
     )
+
+
+# --------------------------------------------------------------------------- #
+# T022 — the digest presents the four metric readings as read-only context:
+#        never merged into cleanup, never a gate / status transition /
+#        threshold input
+# --------------------------------------------------------------------------- #
+
+def test_t022_digest_surfaces_present_metrics_as_read_only_non_gate():
+    template = FEEDBACK_TEMPLATE.read_text(encoding="utf-8")
+    docs = DOCS_FEEDBACK.read_text(encoding="utf-8")
+    for name, text in (("template", template), ("docs page", docs)):
+        assert "client-metrics" in text, (
+            f"T022: the feedback command {name} MUST keep pointing at the "
+            "read-only client-metrics action for the metric readings"
+        )
+    # Template (Chinese surface): the readings are read-only presentation.
+    assert "不并入清理" in template, (
+        "T022: the feedback command template MUST state that metric readings "
+        "are never merged into the cleanup action"
+    )
+    assert "门禁" in template and "阈值" in template, (
+        "T022: the feedback command template MUST state that the readings are "
+        "not a gate and not a threshold input"
+    )
+    # Docs page (English surface): the full non-influence statement.
+    for phrase in ("never merged into cleanup", "never a gate",
+                   "status-transition", "threshold input"):
+        assert phrase in docs, (
+            f"T022: the feedback command docs page MUST carry {phrase!r} — "
+            "the readings influence nothing"
+        )

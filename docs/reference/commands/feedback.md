@@ -77,6 +77,29 @@ python3 .specify/scripts/python/feedback-utils.py --action dispose --id <entry-i
 
 Each digested external entry writes exactly one row in `.specify/memory/feedback/backlog.md` naming its unique carrier, and the row is listed in the digest report; an entry whose carrier cannot be decided is reported `undecided` and kept for the next digest, never silently dropped. The digest report carries three facts: this run's hat and armed state plus how the armed state was resolved; the entry count and disposition of each side (with every refinement move named); and the readings of the four loop metrics from the read-only engine action `feedback-utils.py --action client-metrics` — advisory context only, never a gate. When a client unit vanishes from the probe registry, its entries stay readable (never rewritten, deleted, or re-attributed) and the resolution failure is reported as a named finding. Packaging and introspection above are unchanged: the engine still excludes `external` entries from the zip, reported only as the `excluded_external` count.
 
+**Client loop metrics** (client hat only; contracts: `.specify/specs/072-client-self-improvement/contracts/cadence-and-metrics.md`; owner for the four metrics' definitions). The digest report presents the readings of the four loop metrics and recomputes nothing itself — the engine's read-only action is the sole derivation (program-first):
+
+```bash
+python3 .specify/scripts/python/feedback-utils.py --action client-metrics [--unit custom:<owner>/<name>] --format json
+```
+
+- **"Continuous" is defined, not scheduled**: capture on every qualifying run plus the existing non-blocking threshold notice plus explicit user triggering of the digest and improvement loops. There is no scheduler, resident process, timer, or self-starting periodic task anywhere in this feature.
+- **Coverage boundary**: the metrics cover only runs from the channel's arming onward — the boundary is the creation stamp of the unit's first external entry (of all external entries without `--unit`). Earlier code-segment records are excluded by rule, the exclusion is disclosed in the output, and they are **never backfilled**.
+- **Threshold protocol unchanged**: the existing combination rule of the threshold protocol and run determination still holds — the notice appears only when **both hold** (the count reached the threshold **and** the run-determination verdict calls for submission); it stays **non-blocking** (no response reads as skipped, no repeated urging, no wrap-up blocking). The metric readings never feed its trigger condition, its placement, or its blocking behavior.
+- **The four metrics** (each with explicit numerator, denominator, and source, all derived from existing records — the store, the routing backlog, and the code-segment records):
+
+  | Metric | Numerator | Denominator |
+  |---|---|---|
+  | capture coverage | record run stamps with a corresponding external entry | record run stamps at/after the arming boundary |
+  | into-loop ratio | entries with a `carried-by-*` backlog row | total client entries |
+  | closure ratio | entries whose backlog row names an owner file that exists and changed (mtime) after the entry's `created` | total client entries |
+  | repeat-finding rate | entries repeating any (file, severity) pair of an earlier same-unit entry's record | total client entries minus unreadable-record exclusions |
+
+- **Closure is evidence, not routing**: a `carried-by-*` backlog row means carried, not completed; the engine's `dispose` processed/ignored values are local metadata and are never closure evidence; an `open-unverified` row must be re-measured before anyone acts on it. An entry counts as closed only on owner-file change evidence — routing is not completion.
+- **Repeat-finding rate is a coarse proxy**: pairs are extracted deterministically from the pointed-to record's note headings; the reading is labeled a **coarse proxy** and is **never a defect recurrence rate**. An entry whose pointed-to record is unreadable is excluded from the numerator and denominator together, with the exclusion counted and reasoned in the output; the other three metrics are unaffected.
+- **Honesty rules**: any zero or missing denominator renders that metric `not-evaluated` with its reason — never `0`, never `100%`, and the row is never omitted. No scoring, weights, total, or cross-metric conversion exists; the four metrics never compose into a single number.
+- **The readings influence nothing**: they are read-only presentation for the digest report — never merged into cleanup, **never a gate**, **never a status-transition condition**, and **never a threshold input**.
+
 ## Path B — Package For The Framework Upstream
 
 Reached automatically only from a **client project**. In the framework project the router never selects this path — there is no upstream to deliver to — and it runs only on an explicit `package` request.

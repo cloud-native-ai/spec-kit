@@ -51,10 +51,14 @@
 
 ### G5 — test_client_metrics.py (T020)
 
-- 命令行: _pending — 红运行后回填_
-- 真实输出: _pending_
-- 退出码: _pending_
-- 失败计数: _pending_
+- 命令行: `python3 -m pytest -q tests/contract/test_client_metrics.py`
+- 真实输出: `15 failed, 1 passed in 11.22s`（失败名见下；普遍形态 = `--action client-metrics` 尚不在引擎 `--action` 选择闭集内（usage 报错 / exit 2），`docs/reference/commands/feedback.md` 尚无 C-40/C-41/C-42/C-44/C-45 的口径文本；argparse 报 `--unit` 与 `--unit-id`/`--unit-type` 前缀歧义——R7 钉死的选项形态 `--unit` 需注册为精确选项）
+- 退出码: `1`
+- 失败计数: `15`
+- 失败名（2026-10-27 未改动树 @ 20649139，US4 已落地后）: test_c40_no_scheduler_resident_timer_in_any_feature_surface · test_c41_records_before_arming_are_excluded_never_backfilled · test_c42_threshold_combination_rule_unchanged_and_metrics_never_feed_it · test_c43_four_metrics_with_explicit_numerator_denominator_and_values · test_c43_metric_sources_are_existing_records_only · test_c44_closure_counts_only_owner_file_change_evidence · test_c44_carried_row_with_missing_or_unchanged_owner_file_is_not_closed · test_c45_repeat_finding_rate_is_a_proxy_labeled_coarse · test_c46_readings_identical_across_reports_and_store_tree_unchanged · test_c46_action_has_no_write_point_even_against_a_read_only_store · test_c47_engine_action_is_the_machine_readable_derivation · test_c48_zero_denominators_report_not_evaluated_with_reason · test_c48_capture_coverage_not_evaluated_when_no_record_qualifies · test_c49_boundary_is_first_external_entry_and_exclusion_is_disclosed · test_c50_unreadable_record_excluded_from_repeat_rate_only（唯一通过项 test_c40_capture_happens_per_qualifying_run_via_existing_fifth_step 钉的是 US1 已落地的每运行采集行为面，红运行前即成立，不作红声称）
+- 实现期裁决（记录假设）：路由台账行 ↔ 条目的挂接约定 = 行文本含条目 id（`entry <id>` 落于 Source 格）；承接类行 = 任一单元格去 markdown 加粗后以 `carried-by-` 起始（E8 行语义）；owner 文件 = 行内反引号路径（支持 `**` glob），闭环证据 = 文件存在且 mtime 晚于条目 `created`（V28 mtime 口径）；(文件,严重度) 对从记录正文 `### <icon> [<SEVERITY>] <file>` 标题行确定性抽取；`--unit` 注册为精确选项以消解与 `--unit-id`/`--unit-type` 的前缀歧义。以上均为计划/契约未钉死处的实现裁决，判据归 contracts/cadence-and-metrics.md C-43…C-50 与 data-model.md E8/E9。
+- T022 补充红运行（实现行断言，非新组）：`python3 -m pytest -q tests/contract/test_client_package_exclusion.py` → `1 failed, 14 passed in 1.59s`，退出码 `1`，失败计数 `1`（test_t022_digest_surfaces_present_metrics_as_read_only_non_gate；未改动树 @ 20649139，US4 已落地后；14 项先行通过项均属 G3 已转绿面，不作红声称）。失败四字段同式记录在案，因 G3 槽位已按"每组一条"闭合，此条为其下补充记录。
+- 纠正性披露（绿跑期，本 part）：(1) `_RECORD_RUN_STAMP_RE` 末段 `|` 未转义成 `\|`，被正则当成交替分支致空匹配——就地修复并重跑；(2) test_c47 的 `project` 在 `with` 块关闭后仍被使用（FileNotFoundError）——断言移入块内；(3) 捕获覆盖率两例（test_c41/test_c43）的记录运行戳与条目 `created`（秒级精度）存在亚秒竞态，武装后记录戳改为 +5/+6 分钟边距后双跑稳定（556 passed ×2）。均为测试/新码侧修正，未触碰任何守护断言的语义。
 
 ## 纪律备注
 
