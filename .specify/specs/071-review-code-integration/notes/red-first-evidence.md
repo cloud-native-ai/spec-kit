@@ -405,12 +405,148 @@ Scenario C's `not-applicable` path:
 
 ## Group 5 — `tests/contract/test_status_gate_owner.py`
 
-- Red run (T019): pending
-- Command line: pending
-- Real output: pending
-- Exit code: pending
-- Failing count: pending
-- Red → green (T023): pending
+- Red run (T019): **2026-10-27** at implement part 5, HEAD `60f2b915` (clean tree), before any
+  edit of `templates/feature-details-template.md`, `shared/workflow/feature-integration.md`,
+  `templates/commands/review.md` or `templates/commands/checklist.md`.
+- Command line: `python3 -m pytest -q tests/contract/test_status_gate_owner.py`
+- Real output (tail): `24 failed, 8 passed in 0.37s`
+- Failing tests (24, by name): `test_c45_the_owner_section_declares_itself_the_authority_for_the_transition`,
+  `test_c45_no_second_criteria_wording_survives_on_another_surface`,
+  `test_c46_the_owner_row_carries_the_three_conjunctive_conditions`,
+  `test_c46_the_third_condition_is_an_existence_test_over_the_current_record`,
+  `test_c46_no_clearing_action_and_no_cleared_state_are_defined`,
+  `test_c46_the_six_level_vocabulary_is_read_directly_not_relabelled`,
+  `test_c47_the_review_row_is_a_reference_to_the_owner`,
+  `test_c47_the_duplicated_criteria_wording_is_removed_not_reworded`,
+  `test_c48_the_checklist_row_is_a_conditional_initiator`,
+  `test_c48_the_checklist_row_is_a_reference_to_the_same_owner`,
+  `test_c48_no_initiating_row_carries_its_own_copy_of_the_conditions`,
+  `test_c49_important_allows_the_transition_but_must_be_answered`,
+  `test_c49_the_four_lower_levels_never_block`,
+  `test_c50_no_conversion_matrix_or_unified_score_exists`,
+  `test_c51_a_waiver_requires_an_explicit_user_ruling`,
+  `test_c51_the_agent_never_downgrades_merges_or_excludes_a_blocking_entry`,
+  `test_c51_the_unattended_disposition_is_halt_and_report_with_the_named_literal`,
+  `test_c52_not_applicable_and_not_evaluated_are_disclosed_on_both_carriers`,
+  `test_c52_the_closing_summary_carries_no_obligation_of_its_own`,
+  `test_c53_a_refusal_names_the_failed_condition`,
+  `test_c53_the_refused_transition_leaves_the_status_at_implemented`,
+  `test_c54_the_transition_is_judged_once_after_both_segments`,
+  `test_c54_both_artifacts_are_on_disk_before_the_judgement`,
+  `test_c54_the_command_states_no_criterion_of_its_own`
+- Exit code: `1`
+- Failing count: **24 of 32**. The eight that pass are of three kinds, none of them evidence of
+  coverage:
+  1. the **driven gate cases** — `test_c46_one_blocking_entry_blocks_and_a_fresh_record_allows`,
+     `test_c46_an_archived_record_never_keeps_blocking`,
+     `test_c46_the_archive_does_not_dilute_a_blocking_current_record`,
+     `test_c49_important_only_allows_the_driven_gate` — measure the `report --summary --file`
+     mechanism T017 landed in part 4, so they are the group's **regression half**: they pin that
+     the existence semantics the owner row must *describe* really hold in the executable gate, and
+     they were green before and after by construction;
+  2. the **negative sweeps** — `test_c48_the_checklist_command_keeps_its_pointer_and_gains_no_criteria`
+     and `test_c51_the_refusal_literal_has_one_spelling` (no variant spelling of the literal exists
+     yet) and `test_c50_no_artifact_of_this_feature_stores_a_mapping` (the command template's
+     "never merged … mapping table or a conversion" sentence predates this part). A negative guard
+     that holds on the pre-change tree is the correct state; it is the tripwire for the edit, not
+     a claim about it;
+  3. `test_c47_the_owner_the_row_names_really_holds_the_criteria` — the owner path and section
+     already exist; this case pins that the rows about to cite them cite something real, and it is
+     therefore green on both sides by design (its discriminating partner is
+     `test_c47_the_review_row_is_a_reference_to_the_owner`, which is red).
+- Reading: the failures are the four obligations no surface carries today — the owner row states
+  two conditions and no record existence test, the integration protocol carries a **second**
+  criteria wording (`review.md committed AND every deferred item resolved or waived`) and names no
+  owner, the command template has no transition section at all, and no surface names a waiver rule,
+  the `blocking-unresolved` literal, or a single checkpoint. `templates/commands/checklist.md`
+  line 36 already reads as a pointer, which is why its case is green and must stay green.
+- Red → green (T023): **green on 2026-10-27** after T020 (`templates/feature-details-template.md`
+  row + the gate block), T021 (the two initiating rows in
+  `shared/workflow/feature-integration.md`) and T022 (`templates/commands/review.md`
+  `## Status Transition`).
+  - Command line: `python3 -m pytest -q tests/contract/test_status_gate_owner.py`
+  - Real output: `32 passed in 0.21s`
+  - Exit code: `0`
+  - Failing count: `0` (was 24). No assertion was relaxed, renamed away or deleted between the
+    two runs; the only test-side change was correcting one assertion of my own that asserted the
+    wrong subject (`test_c45_…_declares_itself_the_authority…` first demanded that the owner file
+    name its own repo path — the owner is the file, so what it must say is the *shape* of the
+    reference the other surfaces take, `by reference` + `no second wording`). That assertion was
+    in the recorded failing list and fails there for the same reason as its replacement.
+  - The eight cases that were green at red time stayed green, so the group's regression half (the
+    driven gate) and its negative sweeps did not move while its wording half flipped.
+
+### T023 — US4 verification
+
+- Targeted set, final state:
+
+  | Suite | Command | Result |
+  |---|---|---|
+  | this group | `python3 -m pytest -q tests/contract/test_status_gate_owner.py` | `32 passed`, exit `0` |
+  | neighbouring pins over the edited surfaces | `python3 -m pytest -q tests/contract/test_review_p1_review_loop.py tests/contract/test_review_code_composition.py tests/contract/test_coverage_receipt.py` | `1 failed, 60 passed`, exit `1` |
+  | the C-5 hash freeze, after the in-passing correction below | `python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c5` | `3 passed`, exit `0` |
+
+  The single red in the neighbouring set is
+  `test_review_p1_review_loop.py::test_c15_review_owns_the_ready_for_review_transition`, and it is
+  **T030's row, by design**: T030 is `[blockedBy: T021]` and rewrites that pin (it keeps the subject
+  "the row exists and the command owns the transition", stops requiring the duplicated criteria
+  wording T021 removed, and gains the owner citation plus a negative assertion that the duplicated
+  wording is gone). It is an intermediate state of this part, not a regression: the pin reds on
+  exactly the sentence T021 was told to remove. `test_c15_checklist_row_is_annotated_and_keeps_one_transition_per_command`
+  — the pin T021 had to preserve — stayed green.
+
+- **Quickstart Scenario G, live** (the two runs, on the disposable repository from the T003
+  fixture; the command line is Scenario G's own, with `<record>` = the record the run points at):
+
+  ```text
+  bash skills/internal/code-review/scripts/git-delta-review.sh report --summary \
+    --file <record>            → rc=1
+    [blocking] 1 … blocking_entries=1 … gate=deny
+    "✗ 合入门禁: 存在 1 条 [blocking] — 必须解决后方可合入"
+
+  # the rerun writes a fresh record; the blocking entry survives only in the archive
+  same command, same path      → rc=0
+    [blocking] 0, [suggestion] 1 … blocking_entries=0 … gate=allow
+  archive present during run 2: True (code-review-20260101T000000Z.md)
+  current record has no `blocking` heading: True
+  ```
+
+  Reading: the refusal names the **count** (SC-004's first half), the allow run is the same
+  command over a rewritten record (SC-004's second half), and nothing was "cleared" between them —
+  the blocking heading was never edited, it simply is not in the record the run points at. That is
+  also the "reads only the record the run itself points at" measurement: the archive holding the
+  blocking entry was **present** during the allowing run and did not keep it blocked.
+
+- **The four driven cases in the group** (SC-004 and its two neighbours, asserted rather than read
+  off prose): `test_c46_one_blocking_entry_blocks_and_a_fresh_record_allows` (deny with the count →
+  allow after the rerun), `test_c46_an_archived_record_never_keeps_blocking` (archive holding
+  `blocking`, current clean → allow), `test_c46_the_archive_does_not_dilute_a_blocking_current_record`
+  (mirror direction: a clean archive cannot offset a blocking current record), and
+  `test_c49_important_only_allows_the_driven_gate` (`important`-only → allow, US4 scenario 2).
+
+- **The transition is judged once, after both artifacts exist.** This is a rule about the command's
+  execution order and the command is a prompt, so it is pinned as the text that orders it
+  (`test_c54_the_transition_is_judged_once_after_both_segments`,
+  `test_c54_both_artifacts_are_on_disk_before_the_judgement`) and it now appears on both surfaces
+  that must agree: the owner block's item 9 and the command template's `## Status Transition`
+  ("judged once, after the process segment and the code segment have both finished and both
+  artifacts — `review.md`, and `code-review.md` when the triage value is `run` — are on disk; the
+  status MUST NOT flip before that segment completes"). There is no second judgement site anywhere
+  in the feature: the merge gate the command calls is a per-record presence test, which is why the
+  ordering rule lives in the prompt and the count lives in the script.
+
+- **One measured premise of `tasks.md` refined, not contradicted** (`tasks.md` § Transition
+  surfaces, taken from `grep -rn 'Implemented → Ready for Review' templates shared`): that grep is
+  scoped to `templates/` + `shared/`, so its three hits are complete for those two layers. Grepping
+  the whole framework tree adds one more mention — `skills/internal/create-checklist/SKILL.md`
+  `## Feature Integration` — and it is a **pointer**, not a criteria copy: it says "Apply the
+  Feature Integration Protocol (`.specify/shared/workflow/feature-integration.md`). This capability
+  transitions feature status `Implemented → Ready for Review` when applicable." It carries none of
+  the condition phrases, so C-45/C-48 hold across it, and the conditional-initiator semantics it
+  defers to are now written on the row it points at. No edit was made there: it is not in this
+  row's scope and it violates nothing. (`templates/review-template.md` § 2.1 and
+  `skills/internal/summarize-project/references/consistency-rules.md` mention the transition as a
+  verdict field and a status-list respectively — neither states criteria.)
 
 ## Group 6 — `tests/contract/test_review_feedback_boundary.py`
 
@@ -433,6 +569,11 @@ These exercise behaviour that already exists or fully lands before they run, so 
 
 None recorded. Every group either has its red run recorded above or is still `pending` by its own
 row's schedule; no group was counted as covered while red.
+
+The one fast-fail item this file has carried — the C-5 hash freeze that part 4 handed up as
+decision-class — was resolved at part 5 as a **correction** under the orchestrator's ruling; the
+change, its two negative controls, and why it preserves the guard are recorded in § In-passing
+correction (driver-ruled) at the end of this file. Nothing else was repaired in passing.
 
 ## Neighbouring pin reddened by the feature's own edits — handed up, not repaired (part 4)
 
@@ -468,3 +609,45 @@ orchestrator with this measurement, rather than being flattened into the tree.
 `tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts`
 reports the four per-tool `speckit.review` copies plus five mirror `DIFF` lines — the expected
 "mirrors last" state that T032/T033 close.
+
+### In-passing correction (driver-ruled) — the C-5 post-baseline allowlist (part 5, T019–T023 batch)
+
+The measurement above stands as recorded; the disposition changed at part 5 on the orchestrator's
+explicit ruling, which converts it from decision-class to **correction**: the test ships its own
+declared maintenance mechanism, so resolving it has exactly one reading.
+
+- **What was changed** (`tests/contract/test_expression_compatibility.py`):
+  1. `ALLOWED_POST_BASELINE_CHANGES` entries became `{reason, markers}` records instead of bare
+     reason strings. The pre-existing entry
+     `skills/external/sdd-loop-driver/SKILL.md` keeps its reason verbatim and gains its own markers
+     `("监听签名唯一", "--iter")` — the content it was allowlisted for in 2026-10-25.
+  2. Two entries added, each named as this feature's own declared drift:
+     `templates/commands/review.md` with markers `("## Composition", "## Applicability triage")`
+     (FR-001/FR-003/FR-008's composed surface), and `skills/internal/code-review/SKILL.md` with
+     markers `("renderer: text", "receipt --review-file")` (FR-013's rewritten renderer-absence
+     clause and FR-023's explicit-record path). Both reasons name Feature 071 as the source and the
+     groups that pin them.
+  3. The re-assertion loop stopped asserting the one hard-coded pair of literals against every
+     entry; it now iterates each entry's own `markers`, so one file's content can no longer vouch
+     for another's. One assertion was **added** rather than relaxed: an allowlisted path must also
+     be a manifest entry, otherwise the allowance is vacuous (the freeze never covered it).
+- **Why this preserves the guard instead of weakening it** — measured with two negative controls,
+  run against the real test function in-process:
+
+  | Control | Manipulation | Result |
+  |---|---|---|
+  | baseline | the extended allowlist as committed | green |
+  | 1 — content still asserted | replace `templates/commands/review.md`'s markers with one that does not exist | **red**: "allowed post-baseline change must carry its own intended content … is missing marker '## Marker That Does Not Exist'" |
+  | 2 — drift still detected | delete the `templates/commands/review.md` entry (its file HAS drifted) | **red**: "non-wiring source changed (C-5 …). drifted: ['templates/commands/review.md', …]" |
+
+  So the three original properties survive: an unnamed drift still reds, a named drift whose
+  intended content is gone still reds, and the historical pre-change hash is untouched (the frozen
+  manifest was not re-frozen and `coverage-baseline.txt` was not touched).
+- **What this correction is not.** It is not FR-027's pin change: FR-027's single authorized
+  assertion change remains `test_review_p1_review_loop.py::test_c15` (T030), and nothing here
+  rewrites an existing assertion's subject. It also is not a second-author allowlist habit: the two
+  new entries name files a *declared surface* of this feature must edit, and the entry form now
+  forces each future drift to state its own markers.
+- **Evidence**: `python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c5` →
+  `3 passed, 13 deselected`, exit `0` (before the correction: `1 failed, 2 passed`, with
+  `drifted: ['skills/internal/code-review/SKILL.md', 'templates/commands/review.md']`).

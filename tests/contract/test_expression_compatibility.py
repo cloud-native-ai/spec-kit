@@ -357,14 +357,47 @@ def test_c1_skill_inventory_is_frozen():
 # --------------------------------------------------------------------------- #
 # C-5 — non-wiring sources keep their frozen bytes; framework paths untouched
 # --------------------------------------------------------------------------- #
+# The historical pre-change hash stays untouched. This allowlist names every
+# post-baseline drift with its reason AND the markers its intended content must
+# still carry, so the guard keeps working in both directions: a drift not named
+# here stays red, and a named drift is re-asserted on content instead of being
+# waved through. Each entry is measured against its own markers — a marker list
+# shared by every entry would let one file's content vouch for another's.
+#
 # 2026-10-25: a later fix legitimately edits one non-wiring source — the loop
 # driver gained the per-window iteration token (Qoder duplicate-call guard).
-# The historical pre-change hash stays untouched; this allowlist names every
-# post-baseline drift with its reason and re-asserts the intended content.
+# 2026-10-27 (Feature 071): the review × code-review composition legitimately
+# edits two more — the command template gains its composition and applicability
+# triage sections (FR-001/FR-003/FR-008) and the code-review skill body gains the
+# renderer-absence rewrite plus the `receipt --review-file` path (FR-013/FR-023).
+# Both are declared surfaces of Feature 071 and are pinned by
+# `tests/contract/test_review_code_composition.py`, `test_code_review_skill_contract.py`
+# and `test_coverage_receipt.py`; this entry records the drift, it does not
+# authorize any other.
 ALLOWED_POST_BASELINE_CHANGES = {
-    "skills/external/sdd-loop-driver/SKILL.md": (
-        "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)"
-    ),
+    "skills/external/sdd-loop-driver/SKILL.md": {
+        "reason": "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)",
+        "markers": ("监听签名唯一", "--iter"),
+    },
+    "templates/commands/review.md": {
+        "reason": (
+            "2026-10-27 Feature 071 composes the review command's two segments "
+            "(FR-008 gate ownership; FR-001/FR-003 the composed surface): the "
+            "`## Composition` and `## Applicability triage` sections are that "
+            "feature's declared surfaces, pinned by "
+            "tests/contract/test_review_code_composition.py"
+        ),
+        "markers": ("## Composition", "## Applicability triage"),
+    },
+    "skills/internal/code-review/SKILL.md": {
+        "reason": (
+            "2026-10-27 Feature 071 rewrites the renderer-absence clause instead of "
+            "deleting it (FR-013) and adds the `receipt --review-file` step (FR-023), "
+            "pinned by tests/contract/test_code_review_skill_contract.py and "
+            "tests/contract/test_coverage_receipt.py"
+        ),
+        "markers": ("renderer: text", "receipt --review-file"),
+    },
 }
 
 
@@ -400,11 +433,16 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
         "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
         "feedback-step pointer). drifted: %r" % drifted
     )
-    for rel, reason in ALLOWED_POST_BASELINE_CHANGES.items():
+    for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
-        assert "监听签名唯一" in text and "--iter" in text, (
-            "allowed post-baseline change must carry its intended content: %s (%s)"
-            % (rel, reason)
+        for marker in allowance["markers"]:
+            assert marker in text, (
+                "allowed post-baseline change must carry its own intended content: "
+                "%s is missing marker %r (%s)" % (rel, marker, allowance["reason"])
+            )
+        assert rel in manifest, (
+            "%s is allowlisted but is not a manifest entry, so the freeze never "
+            "covered it and the allowance is vacuous" % rel
         )
 
 
