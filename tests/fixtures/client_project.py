@@ -425,6 +425,40 @@ class ClientProject:
             stderr=completed.stderr,
         )
 
+    # -- driving skill scripts (bash) ---------------------------------------- #
+
+    def run_script(
+        self,
+        script: str,
+        *args: str,
+        extra_env: Optional[Dict[str, str]] = None,
+        timeout: int = 120,
+    ) -> EngineRun:
+        """Invoke a bash script (e.g. the code-review skill's deterministic
+        script) with this repository as the working directory.
+
+        The framework copy is passed by absolute path; the script's own
+        self-location rules anchor every engine it spawns to this repository
+        (the real client topology), never to the framework tree.
+        """
+        self._guard("script-cwd", self.path)
+        argv = ["bash", str(script), *args]
+        completed = subprocess.run(
+            argv,
+            cwd=str(self.path),
+            env=self.env(extra_env),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        return EngineRun(
+            argv=argv,
+            cwd=str(self.path),
+            returncode=completed.returncode,
+            stdout=completed.stdout,
+            stderr=completed.stderr,
+        )
+
     # -- probe registry facts (machine-readable output only, C-9) ----------- #
 
     def probe_registry_json(self, installed: bool = True) -> Dict:

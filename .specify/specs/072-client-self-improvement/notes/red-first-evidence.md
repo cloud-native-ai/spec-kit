@@ -19,10 +19,11 @@
 
 ### G1 — test_client_capture.py (T004)
 
-- 命令行: _pending — 红运行后回填_
-- 真实输出: _pending_
-- 退出码: _pending_
-- 失败计数: _pending_
+- 命令行: `python3 -m pytest -q tests/contract/test_client_capture.py`
+- 真实输出: `15 failed, 1 passed in 1.98s`（失败名见下；普遍形态 = `bash .../git-delta-review.sh capture ...` 返回 `✗ 未知命令: capture`，及 SKILL.md 非交互路径仍为四步）
+- 退出码: `1`
+- 失败计数: `15`
+- 失败名（2026-10-27 未改动树 @ ac98d354）: test_c10_step_enumeration_is_five_steps_with_reason_and_cost · test_c11_capture_subcommand_parameter_form · test_c12_capture_fires_once_and_is_idempotent · test_c12_gate_deny_does_not_suppress_capture · test_c13_framework_hat_writes_nothing_and_names_the_hat_verdict · test_c14_non_run_triage_discloses_no_capture_object[not-applicable] · test_c14_non_run_triage_discloses_no_capture_object[not-evaluated] · test_c15_pointer_payload_is_a_closed_field_set_without_opinion_bodies · test_c16_six_counts_verbatim_from_summary_json_including_zeros · test_c19_capture_never_edits_the_record_or_receipt_block · test_c21_summary_exit_2_discloses_counts_unavailable · test_c21_engine_refusal_discloses_counts_unavailable_and_never_blocks · test_c22_exactly_one_outcome_line_with_token_and_applicability_visible · test_c23_no_phoenix_empty_entry_for_failed_capture · test_c24_disclosure_lives_only_in_the_run_conclusion（唯一通过项 test_c17 钉的是既有文本/退出码面，红运行前即成立，不作红声称）
 
 ### G2 — test_client_armed_state.py (T009)
 
