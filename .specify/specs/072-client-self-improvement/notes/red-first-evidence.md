@@ -43,10 +43,11 @@
 
 ### G4 — test_client_improve_loop.py (T016)
 
-- 命令行: _pending — 红运行后回填_
-- 真实输出: _pending_
-- 退出码: _pending_
-- 失败计数: _pending_
+- 命令行: `python3 -m pytest -q tests/contract/test_client_improve_loop.py`
+- 真实输出: `6 failed, 6 passed in 0.34s`（失败名见下；普遍形态 = `docs/reference/commands/improve.md` 缺失（plan 同步面缺口）、三处循环面（workflow SI-1 / self-improvement SKILL.md / improve 命令模板）尚无「运行判定历史未评估」披露字面量与引擎 fail-closed 原因引文、「kind: external」客户通道观察源规则与「没有唯一所有者」SI-0 停机报告字面量）
+- 退出码: `1`
+- 失败计数: `6`
+- 失败名（2026-10-27 未改动树 @ ca1e51bd，US3 已落地后）: test_c33_five_criteria_gain_no_relaxation_for_custom_subjects · test_c34_why_discloses_run_determination_history_not_evaluated · test_c35_observation_source_is_client_channel_plus_existing_lanes · test_c37_how_routes_existing_dispatch_table_with_no_client_improver · test_c39_no_unique_editable_definition_halts_at_si0_with_named_report · test_t018_improve_docs_template_and_tool_copies_aligned。红运行前已成立、不作红声称的 6 项：test_c33_loop_reuses_si0_through_si9_with_no_client_specific_flow（SI-0…SI-9 步骤面 + 无客户专用技能 + 五条判据归 definitions owner 且不被复述）、test_c34_engine_fail_closed_for_custom_subject_is_observable_in_client（引擎对 custom: 主体 fail-closed 钉的是既有引擎面，per test_run_determination_engine.py:1393）、test_c36_engine_source_contract_not_widened_and_no_second_observer（引擎单一持久化适配器 + 无第二观察引擎/并行历史存储）、test_c38_falsification_attempt_ledger_hard_limit_outcome_pending（四约束既有文本逐字钉）、test_c39_resolution_failure_mutates_nothing_in_the_client_project（引擎只读 + 工作树零变更行为面）、test_t017_t018_mirror_isomorphism_for_the_edited_surfaces（镜像同构，T017/T018 同步后仍须成立）。
 
 ### G5 — test_client_metrics.py (T020)
 
