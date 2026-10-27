@@ -1,0 +1,9 @@
+file: .specify/specs/072-client-self-improvement/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 300 lines, 36 definition rows, 10 shared strings
+0 error(s), 0 warning(s)

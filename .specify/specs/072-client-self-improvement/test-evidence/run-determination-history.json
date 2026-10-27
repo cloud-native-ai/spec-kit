@@ -1,0 +1,144 @@
+{
+  "target": "/speckit.requirements",
+  "counts": {
+    "total": 13,
+    "settled": 3,
+    "unsettled": 10,
+    "derived_accepts": 0,
+    "red_state_undeclared_accepts": 0,
+    "trigger_feedback": 0
+  },
+  "records": [
+    {
+      "unit_id": "/speckit.requirements",
+      "run_id": "r20261027T091830Z-072a",
+      "determined_at": "2026-10-27T09:18:25Z",
+      "settled_at": null,
+      "complexity": "complex",
+      "qualification": "qualified",
+      "axes": {
+        "token_consumption": {
+          "verdict": "not_evaluated",
+          "reason": "source_unavailable",
+          "signal": {
+            "key": "token_consumption",
+            "direction": "reduce"
+          }
+        },
+        "elapsed": {
+          "verdict": "not_evaluated",
+          "reason": "source_unavailable",
+          "signal": {
+            "key": "elapsed",
+            "direction": "reduce"
+          }
+        },
+        "artifact_correctness": {
+          "verdict": "not_evaluated",
+          "reason": "no_declared_checks",
+          "signal": {
+            "key": "artifact_correctness",
+            "direction": "improve"
+          }
+        },
+        "satisfaction": {
+          "verdict": "not_evaluated",
+          "reason": "pending_next_turn",
+          "signal": {
+            "key": "satisfaction",
+            "direction": "improve"
+          }
+        }
+      },
+      "change_point": {
+        "id": "cp-r20261027T091830Z-072a",
+        "clean": false,
+        "finding_axes": [
+          "token_consumption",
+          "elapsed",
+          "artifact_correctness",
+          "satisfaction"
+        ]
+      },
+      "passive_trigger": {
+        "trigger_feedback": false
+      },
+      "provenance": {
+        "declared_by_caller": [
+          "complexity",
+          "user_turn_class",
+          "unresolved_red",
+          "qualification",
+          "feature"
+        ]
+      }
+    },
+    {
+      "unit_id": "/speckit.requirements",
+      "run_id": "r20261027T061144Z-a3ec",
+      "determined_at": "2026-10-27T06:20:08Z",
+      "settled_at": "2026-10-27T09:18:25Z",
+      "complexity": "complex",
+      "qualification": "qualified",
+      "axes": {
+        "token_consumption": {
+          "verdict": "not_evaluated",
+          "reason": "source_unavailable",
+          "signal": {
+            "key": "token_consumption",
+            "direction": "reduce"
+          }
+        },
+        "elapsed": {
+          "verdict": "not_evaluated",
+          "reason": "source_unavailable",
+          "signal": {
+            "key": "elapsed",
+            "direction": "reduce"
+          }
+        },
+        "artifact_correctness": {
+          "verdict": "not_evaluated",
+          "reason": "no_baseline",
+          "signal": {
+            "key": "artifact_correctness",
+            "direction": "improve"
+          }
+        },
+        "satisfaction": {
+          "verdict": "not_evaluated",
+          "reason": "no_user_input",
+          "signal": {
+            "key": "satisfaction",
+            "direction": "improve"
+          }
+        }
+      },
+      "change_point": {
+        "id": "cp-r20261027T061144Z-a3ec",
+        "clean": false,
+        "finding_axes": [
+          "token_consumption",
+          "elapsed",
+          "artifact_correctness",
+          "satisfaction"
+        ]
+      },
+      "passive_trigger": {
+        "trigger_feedback": false
+      },
+      "provenance": {
+        "declared_by_caller": [
+          "complexity",
+          "user_turn_class",
+          "unresolved_red",
+          "qualification",
+          "declared_check",
+          "green_check",
+          "red_first_refs",
+          "collected"
+        ]
+      }
+    }
+  ]
+}
