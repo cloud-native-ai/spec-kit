@@ -58,6 +58,10 @@ pytestmark = pytest.mark.contract
 #: The approved plan commit — the frozen "before" of every sweep comparison
 #: (state spine: plan_commit / approved_baseline_commit = 6dca65a5).
 BASELINE_COMMIT = "6dca65a5"
+# The guard validates Feature 072's own surface. The trunk integration after the
+# feature closed (merge of gitlab/master) must not be attributed to this feature,
+# so diff-based checks stop at the feature's last own commit instead of HEAD.
+FEATURE_HEAD = "c9ff29ead"
 
 REVIEW_SCRIPT = FRAMEWORK_ROOT / "skills" / "internal" / "code-review" / "scripts" / "git-delta-review.sh"
 SKILL_MD = FRAMEWORK_ROOT / "skills" / "internal" / "code-review" / "SKILL.md"
@@ -161,7 +165,7 @@ def baseline_text(rel: str) -> str:
 
 
 def changed_name_status() -> List[str]:
-    return git("diff", "--name-status", f"{BASELINE_COMMIT}..HEAD").splitlines()
+    return git("diff", "--name-status", f"{BASELINE_COMMIT}..{FEATURE_HEAD}").splitlines()
 
 
 def run_review(project: ClientProject, *args: str,
@@ -231,7 +235,7 @@ def test_c51_four_red_lines_verbatim_and_equal_client_coverage():
         )
     # The owner text is untouched by this feature (verbatim preservation is
     # a diff-level fact, not only a containment check).
-    assert git("diff", "--name-only", f"{BASELINE_COMMIT}..HEAD",
+    assert git("diff", "--name-only", f"{BASELINE_COMMIT}..{FEATURE_HEAD}",
                "--", "shared/workflow/feedback-step.md") == "", (
         "the four-red-line owner MUST NOT be edited by this feature (C-51)"
     )
@@ -242,13 +246,13 @@ def test_c51_four_red_lines_verbatim_and_equal_client_coverage():
 # --------------------------------------------------------------------------- #
 
 def test_c52_dependency_files_frozen_and_no_new_scripts():
-    assert git("diff", "--name-only", f"{BASELINE_COMMIT}..HEAD",
+    assert git("diff", "--name-only", f"{BASELINE_COMMIT}..{FEATURE_HEAD}",
                "--", "pyproject.toml", "uv.lock") == "", (
         "C-52: no new dependency may be added — pyproject.toml / uv.lock MUST be "
         "unchanged by this feature"
     )
     added_scripts = git("diff", "--diff-filter=A", "--name-only",
-                        f"{BASELINE_COMMIT}..HEAD", "--", "scripts/", ".specify/scripts/")
+                        f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--", "scripts/", ".specify/scripts/")
     assert added_scripts == "", (
         f"C-52/C-62: no new engine or script may be created; added:\n{added_scripts}"
     )
@@ -257,7 +261,7 @@ def test_c52_dependency_files_frozen_and_no_new_scripts():
 def test_c52_added_imports_are_stdlib_only():
     added_imports: Set[str] = set()
     for rel in ("scripts/python/feedback-utils.py", "scripts/python/probe-utils.py"):
-        for line in git("diff", f"{BASELINE_COMMIT}..HEAD", "--", rel).splitlines():
+        for line in git("diff", f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--", rel).splitlines():
             m = re.match(r"^\+(?:import\s+(\w+)|from\s+(\w+)\s+import\s)", line)
             if m:
                 added_imports.add(m.group(1) or m.group(2))
@@ -383,7 +387,7 @@ def test_c55_engine_faces_grow_by_exactly_the_two_authorized():
     assert not base_dispatch - cur_dispatch, "no existing subcommand may be lost"
     # Its added long options are bounded to the authorized set.
     added_opts = set()
-    for line in git("diff", f"{BASELINE_COMMIT}..HEAD", "--",
+    for line in git("diff", f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--",
                     "skills/internal/code-review/scripts/git-delta-review.sh").splitlines():
         m = re.match(r"^\+\s*(--[a-z-]+)\)", line)
         if m:
@@ -644,7 +648,7 @@ def test_c59_vendored_framework_source_takes_the_framework_branch(vendored_dir):
 
 def test_c60_no_existing_feedback_entry_or_review_report_modified():
     modified_or_deleted = git(
-        "diff", "--diff-filter=MD", "--name-only", f"{BASELINE_COMMIT}..HEAD", "--",
+        "diff", "--diff-filter=MD", "--name-only", f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--",
         ".specify/memory/feedback/", ".specify/review/",
     )
     assert modified_or_deleted == "", (
@@ -685,7 +689,7 @@ def test_c60_legacy_monolithic_store_is_read_only_for_this_feature():
 
 def test_c62_no_new_engine_store_ledger_scoring_or_id_family():
     # No new engine / store / ledger files anywhere in the feature diff.
-    added = git("diff", "--diff-filter=A", "--name-only", f"{BASELINE_COMMIT}..HEAD")
+    added = git("diff", "--diff-filter=A", "--name-only", f"{BASELINE_COMMIT}..{FEATURE_HEAD}")
     banned_roots = ("scripts/", ".specify/scripts/", "src/")
     offenders = [p for p in added.splitlines() if p.startswith(banned_roots)]
     assert not offenders, (
@@ -697,7 +701,7 @@ def test_c62_no_new_engine_store_ledger_scoring_or_id_family():
     # scoring system, no new id family.
     added_defs = set(re.findall(
         r"(?m)^\+def (\w+)",
-        git("diff", f"{BASELINE_COMMIT}..HEAD", "--", "scripts/python/feedback-utils.py")))
+        git("diff", f"{BASELINE_COMMIT}..{FEATURE_HEAD}", "--", "scripts/python/feedback-utils.py")))
     allowed_defs = {
         "_parse_iso_epoch", "_code_segment_record_stamps", "_entry_record_pointer",
         "_record_pairs", "_routing_backlog_rows", "_row_is_carried",

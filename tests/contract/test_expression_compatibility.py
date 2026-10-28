@@ -472,6 +472,18 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "reason": "2026-10-27 Feature 073 record-retention lane entry and delegation",
         "markers": ("--lane materials|retention|all", "record-retention.py"),
     },
+    # 2026-10-28 trunk fix(sdd-loop-driver): read-only stages account for the
+    # wrap-up bookkeeping entries; the analyze surface scopes its read-only
+    # promise to artifacts. Both are non-wiring sources and are pinned by
+    # tests/contract/test_sdd_loop_driver_wrapup_accounting.py.
+    "skills/internal/analyze-artifacts/SKILL.md": {
+        "reason": "2026-10-28 trunk: read-only on artifacts + wrap-up bookkeeping exception",
+        "markers": ("strictly read-only on artifacts", "wrap-up engine entries"),
+    },
+    "templates/commands/analyze.md": {
+        "reason": "2026-10-28 trunk: analyze command read-only-on-artifacts wording",
+        "markers": ("read-only **on artifacts**", "Wrap-up bookkeeping entries"),
+    },
 }
 
 # The historical baseline stays; a later amendment that legitimately edits an
@@ -871,10 +883,17 @@ def test_c6_feedback_step_edit_is_additive_single_line():
         "C-6: the existing complexity criterion and red-line paragraphs must stay "
         "byte-identical — removed lines: %r" % removed
     )
-    assert len(added) == 1, (
-        "C-6: exactly one pointer line may be added to feedback-step.md, found %d: %r"
-        % (len(added), added)
+    # 2026-10-28 trunk fix(sdd-loop-driver): a six-line additive "Feature
+    # attribution" block joined the one 069a pointer line. The pin keeps its
+    # additive-only intent: no existing line may be removed, and the additions
+    # are exactly the pointer plus that block.
+    assert len(added) == 7, (
+        "C-6: the 069a pointer plus the 2026-10-28 feature-attribution block are "
+        "the only additive lines; found %d: %r" % (len(added), added)
     )
     assert CLASS_OWNER in added[0], (
-        "the added line must point at %s: %r" % (CLASS_OWNER, added[0])
+        "the first added line must point at %s: %r" % (CLASS_OWNER, added[0])
+    )
+    assert any("**Feature attribution.**" in line for line in added), (
+        "the 2026-10-28 feature-attribution addition must be present: %r" % added
     )
