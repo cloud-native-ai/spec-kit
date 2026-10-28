@@ -86,8 +86,8 @@ SKILL_BASELINE = frozenset(
     {
         "create-docs", "create-pages", "create-skills", "database-utils",
         "document-utils", "draw-diagram", "git-utils", "humanize",
-        "improve-docs", "improve-skills", "merge-skills", "sdd-loop-driver",
-        "sdd-project-setup", "think-skills", "analyze-artifacts",
+        "improve-docs", "improve-skills", "merge-skills", "sdd-house-keeping",
+        "sdd-loop-driver", "sdd-project-setup", "think-skills", "analyze-artifacts",
         "archive-session", "clarify-artifact", "code-review",
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",
@@ -102,7 +102,7 @@ SKILL_BASELINE = frozenset(
     }
 )
 assert len(COMMAND_BASELINE) == 27
-assert len(SKILL_BASELINE) == 51
+assert len(SKILL_BASELINE) == 52
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

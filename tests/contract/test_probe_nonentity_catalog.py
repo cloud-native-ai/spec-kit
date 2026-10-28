@@ -95,7 +95,8 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # stale-pin update (067 T025, 2026-10-22): 112 -> 116; +4 Objects registered by
     # pre-067 features (063 evidence/gate objects etc.; the engine-loaded registry
     # already holds 116 at branch point 7f9033ec, errors-free at HEAD).
-    assert internal == 116, (
+    # 2026-10-27: Feature 071 adds one skill-wrapup Object (sdd-house-keeping); 116 -> 117.
+    assert internal == 117, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

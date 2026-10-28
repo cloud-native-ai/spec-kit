@@ -100,6 +100,14 @@ python3 .specify/scripts/python/feedback-utils.py --action client-metrics [--uni
 - **Honesty rules**: any zero or missing denominator renders that metric `not-evaluated` with its reason — never `0`, never `100%`, and the row is never omitted. No scoring, weights, total, or cross-metric conversion exists; the four metrics never compose into a single number.
 - **The readings influence nothing**: they are read-only presentation for the digest report — never merged into cleanup, **never a gate**, **never a status-transition condition**, and **never a threshold input**.
 
+### Post-consume retirement
+
+Path A's `dispose` marks an entry processed/ignored but leaves the raw entry in place. The
+governed retirement path is `/speckit.sanitize --lane retention`: it writes a receipt that
+names the durable carrier (the disposition reason, the introspection reference, or the
+consume-log row) and deletes the raw entry only after the 30-day grace. Open entries are
+never retired. Package-scoped `cleanup` remains the Path B closing step and is unchanged.
+
 ## Path B — Package For The Framework Upstream
 
 Reached automatically only from a **client project**. In the framework project the router never selects this path — there is no upstream to deliver to — and it runs only on an explicit `package` request.

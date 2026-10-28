@@ -31,6 +31,7 @@ INSTR_LIVE = ROOT / ".specify" / "instructions.md"
 TEMP_DOC = ROOT / "shared" / "guidelines" / "temp-directory-discipline.md"
 LOOP_SKILL = ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
 SETUP_SKILL = ROOT / "skills" / "external" / "sdd-project-setup" / "SKILL.md"
+HOUSE_KEEPING_SKILL = ROOT / "skills" / "external" / "sdd-house-keeping" / "SKILL.md"
 GATE_SCANNER = ROOT / "scripts" / "python" / "scan-confirmation-gates.py"
 
 TITLE = "Directory Governance (Named, Documented, Ignored When Temporary)"
@@ -163,7 +164,8 @@ def test_loop_driver_defaults_no_longer_name_the_retired_root():
 
 
 @pytest.mark.parametrize(
-    "path", [LOOP_SKILL, SETUP_SKILL], ids=["loop-driver", "project-setup"],
+    "path", [LOOP_SKILL, SETUP_SKILL, HOUSE_KEEPING_SKILL],
+    ids=["loop-driver", "project-setup", "house-keeping"],
 )
 def test_remote_capable_skills_bind_target_governance(path: Path):
     body = _text(path)

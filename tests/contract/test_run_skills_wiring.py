@@ -29,7 +29,7 @@ PROBE_DEFS_MIRROR = REPO_ROOT / ".specify" / "shared" / "definitions" / "probe-d
 BASELINE_EXTERNAL = [
     "create-docs", "create-pages", "create-skills", "database-utils", "document-utils",
     "draw-diagram", "git-utils", "humanize", "improve-docs", "improve-skills", "merge-skills",
-    "sdd-loop-driver", "sdd-project-setup", "think-skills",
+    "sdd-house-keeping", "sdd-loop-driver", "sdd-project-setup", "think-skills",
 ]
 BASELINE_INTERNAL = [
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -143,16 +143,16 @@ def test_c8_run_team_frontmatter_classification_and_skill_id():
     assert 'skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"' in text
 
 
-# --- C-9: compiled wrap-up embeds, zero drift, 74 units (73 + humanize, feature 062) ---
+# --- C-9: compiled wrap-up embeds, zero drift, 75 units (+ sdd-house-keeping) ---
 
-def test_c9_compile_embeds_zero_drift_74_units():
+def test_c9_compile_embeds_zero_drift_75_units():
     out = subprocess.run(
         ["python3", "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"],
         cwd=REPO_ROOT, capture_output=True, text=True,
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "74 units" in combined, f"expected 74 units, got: {combined[-400:]}"
+    assert "75 units" in combined, f"expected 75 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

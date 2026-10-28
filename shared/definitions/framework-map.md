@@ -6,7 +6,7 @@ This is a **map, not a manual**: it tells you *what* exists and *where* it lives
 
 | What | Where | Notes (what lives there — not how to use it) |
 |------|-------|-----------------------------------------------|
-| Project memory | `.specify/memory/` | constitution, features index + `features/<ID>.md`, glossary, register, `tools/` records, feedback store, `session/` + `knowledge/` (memory-as-files), `evidence/` (evidence runs), `exec-quant/` (run measurements), `trigger/` (proactive-flow state), `sanitize/` (findings cache) |
+| Project memory | `.specify/memory/` | constitution, features index + `features/<ID>.md`, glossary, register, `tools/` records, feedback store, `session/` + `knowledge/` (memory-as-files), `evidence/` (evidence runs), `exec-quant/` (run measurements), `retention/` (record consume→receipt→retire summaries, receipts, plans, ledgers), `trigger/` (proactive-flow state), `sanitize/` (findings cache) |
 | Long-lived runtime state | `.specify/state/` | per-entry state kept across sessions (never one shared aggregate); e.g. SDD loop-driver line spines — owner: `shared/guidelines/directory-governance.md` §5 |
 | Temporary workspace | `.specify/.tmp/` | git-ignored scratch, cleaned at work-item end; e.g. `.specify/.tmp/sdd-loop/` (worktrees, cache, tmp) — owner: `shared/guidelines/temp-directory-discipline.md` |
 | Goals | `.specify/goal/<slug>/` | goal definitions plus per-goal `summary/`; owner: `/speckit.goal` + `goal-utils.py` |

@@ -504,7 +504,7 @@ def test_trigger_routing_guard_pinned():
         "improve-skills",
         "create-skills",
         "只做技能维护",
-        "当前工作目录含",
+        "target-resolution.md",
     ]:
         assert needle in text, f"trigger-routing guard missing: {needle}"
     docs = DOCS_PAGE.read_text(encoding="utf-8")
@@ -549,15 +549,18 @@ def test_c22_watch_target_hook_selftest():
 
 
 # ---------------------------------------------------------------- C-23
-# 2026-10-21: an entry with no host+path must default to the current
-# project and dispatch to the host's native subagent; qodercli is reserved
-# for the remote topology.
+# 2026-10-21: an entry with no host+path must resolve the nearest
+# .specify/ ancestor from the session cwd and dispatch to the host's native
+# subagent; qodercli is reserved for the remote topology. 2026-10-27: if no
+# .specify/ is found, the skill refuses and hands off sdd-project-setup.
 
 
 def test_c23_local_native_subagent_default():
     text = _skill_text()
     fields, _ = _parse_frontmatter(text)
-    assert "当前项目" in text, "no host+path must default to the current project"
+    assert "向上搜索" in text, "no host+path must search upward for .specify/"
+    assert "会话 cwd" in text, "the upward search starts at the session cwd"
+    assert "sdd-project-setup" in text, "missing .specify/ must hand off setup"
     assert "原生子代理" in text, "local topology must name the native subagent"
     assert "MUST NOT 启动 qodercli" in text, (
         "local topology must forbid launching qodercli"

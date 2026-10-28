@@ -39,7 +39,8 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
-    "think-skills", "git-utils", "sdd-loop-driver", "sdd-project-setup", "humanize",
+    "think-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
+    "sdd-project-setup", "humanize",
 }
 INTERNAL_SKILLS = {
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -87,8 +88,8 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 14, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 14 external "
+    assert len(seen) == 15, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 15 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"

@@ -110,7 +110,7 @@ FROZEN_COMMANDS = (
     "tools",
 )
 
-# C-1 frozen denominator: 51 skill units, layer-qualified so a layer move or a
+# C-1 frozen denominator: 52 skill units, layer-qualified so a layer move or a
 # rename is a failure rather than a silent re-count.
 FROZEN_SKILLS = (
     "external/create-docs",
@@ -124,6 +124,7 @@ FROZEN_SKILLS = (
     "external/improve-docs",
     "external/improve-skills",
     "external/merge-skills",
+    "external/sdd-house-keeping",
     "external/sdd-loop-driver",
     "external/sdd-project-setup",
     "external/think-skills",
@@ -462,6 +463,14 @@ ALLOWED_POST_BASELINE_CHANGES = {
     "skills/internal/manage-constitution/SKILL.md": {
         "reason": "2026-10-27 Directory Governance MUST-include entry (Principle XVII)",
         "markers": ("Directory Governance (Named, Documented, Ignored When Temporary)",),
+    },
+    "skills/internal/sanitize-materials/SKILL.md": {
+        "reason": "2026-10-27 Feature 073 record-retention lane (sanitize --lane retention)",
+        "markers": ("--lane materials|retention|all", "record-retention.py", "Receipt red line"),
+    },
+    "templates/commands/sanitize.md": {
+        "reason": "2026-10-27 Feature 073 record-retention lane entry and delegation",
+        "markers": ("--lane materials|retention|all", "record-retention.py"),
     },
 }
 

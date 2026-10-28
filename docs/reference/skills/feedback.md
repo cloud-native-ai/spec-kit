@@ -98,11 +98,20 @@ python3 .specify/scripts/python/feedback-utils.py --action <action> [options]
 | `reindex` | Explicit reconciliation and migration entry point (req 055): derives entries from the entry files, materializes store scalars into `state/`, retires a legacy `index.json`, and reports `migrated`. Idempotent. |
 | `package` | Zip pending entries into `packages/` for **manual** delivery; source files untouched; no network access. Only framework-owned units are packaged (`/speckit.*` commands; skills bundled with Spec Kit) — entries about user-project skills are excluded and stay local. `--include-introspection` additionally packs the introspection reports covering the selected entries (plus a `## Introspection Reports` MANIFEST section). |
 | `cleanup` | After packaging, remove the entries contained in a given zip from the active store (`--package <zip|latest>`, `--dry-run` preview first); every removal is logged to `cleanup-log.md`. |
+| `retention (via /speckit.sanitize --lane retention)` | After local consumption, `record-retention.py` writes a receipt for entries with a durable carrier (`disposition_reason`, `introspection_ref`, or a consume-log row) and retires them after the 30-day grace. Open entries are never retired. This is separate from package-scoped `cleanup`. |
 | `ingest-exec-quant` | Receiving side of the exec-quant channel (068): unpack an inbound bundle's `exec-quant/` payload into the aggregated layer (`.specify/memory/exec-quant/aggregated/<source-slug>/records/`) with package-level identity attribution; `--package <zip>` required. Idempotent via identity-key dedup (`duplicates_skipped`); never touches the feedback store; degradations (unreadable manifest/records, `unknown-project` identity, conflicts) exit 0 with counters, while a call that cannot run (missing/non-zip package, unwritable store) exits 2. |
 | `probes` / `map` / `probe-inject` | Migrated to the shared probe engine (056): run them on `probe-utils.py` — see [probe.md](probe.md) for the probe-family CLI, the Handler/HandlerBinding model, and the read-only host boundary. |
 | `migrate-legacy` | One-shot convergence of legacy entries per an approved plan file (`--plan-file`, one `<entry-id> -> delete|re-register` per line); every outcome lands in the migration log. |
 | `upstream` | Show (or `--set`) the upstream repo URL used for manual delivery guidance. |
 | `introspect-register` | Validate an introspection report (`--report-file`), link its member entries (`introspection_ref`), and flip `supersedes` targets; the report roster is derived by scanning `introspection/*.md` (req 055 — nothing to maintain in an index); `--confirm` (after user ratification) flips the report to `confirmed` and applies each finding's `建议处置` rows as batch dispositions. Validation failure exits 2 listing every violation. `dispose` also accepts optional `--reason`/`--ref` provenance fields. |
+
+### Post-consume retirement
+
+Path A's `dispose` marks an entry processed/ignored but leaves the raw entry in place. The
+governed retirement path is `/speckit.sanitize --lane retention`: it writes a receipt that
+names the durable carrier (the disposition reason, the introspection reference, or the
+consume-log row) and deletes the raw entry only after the 30-day grace. Open entries are
+never retired. Package-scoped `cleanup` remains the Path B closing step and is unchanged.
 
 - `--unit-id` must match `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$` (else exit code 2).
 - A `record` with an empty `--review` or empty `--points` exits with code 2.

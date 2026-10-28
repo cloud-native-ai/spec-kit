@@ -97,3 +97,4 @@
 | REC-072-02 | C-56 编辑面白名单的镜像部分改由 `sync-mirrors.py` MIRROR_PAIRS 测试时推导，不再硬编码 `.specify/skills/internal/` 子树——合法生成器写入不再能制造守护违规 | `.specify/specs/072-client-self-improvement/review.md` § 5.3 REC-072-02（F2） | open |
 | REC-072-03 | `templates/commands/feedback.md` Path A 委派 bullet 收敛回指针形态（载体闭集与呈报三项事实归 `references/path-a-digest.md` § A4a/A4b 独有），消除第三处内容型重复 | `.specify/specs/072-client-self-improvement/review.md` § 5.1 REC-072-03（F3） | open |
 | REC-072-04 | plan 约束激活期间的规格头状态簿记对账（或把头状态字段退役给登记表）：避免 plan-owned 冻结把 `requirements.md` 头状态滞留在 `Draft` | `.specify/specs/072-client-self-improvement/review.md` § 5.4 REC-072-04（F4） | open |
+| OI-073-01 | 仓库既有 contract 债务未在 Feature 073 范围内修复：`analyze-artifacts`/`analyze` 冻结哈希漂移、`feedback-step.md` 附加行、确认门 27>23 基线、四个技能的裸 `shared/` 引用 | `tests/contract/test_expression_compatibility.py`、`test_shared_reference_rewrite.py`、`test_fast_fail_discipline.py` | open（owner = 后续仓库卫生切片；解除条件 = 逐项修复或明确豁免并更新冻结基线） |

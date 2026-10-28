@@ -285,7 +285,7 @@ def test_real_owner_declares_the_ledger_version_exactly_once():
 def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     proc, record = _check(REPO_ROOT)
     assert proc.returncode == 0, (
-        "the real 78-row ledger must reconcile clean; findings=%r stderr=%r"
+        "the real 79-row ledger must reconcile clean; findings=%r stderr=%r"
         % (None if record is None else record.get("findings"), proc.stderr)
     )
     assert record is not None and record.get("findings") == []
@@ -295,9 +295,9 @@ def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     )
     coverage = _coverage(record)
     _assert_coverage_shape(coverage)
-    assert coverage["inventory_units"] == record["units"] == 78
-    assert coverage["ledger_rows"] == 78
-    assert coverage["matched"] == 78
+    assert coverage["inventory_units"] == record["units"] == 79
+    assert coverage["ledger_rows"] == 79
+    assert coverage["matched"] == 79
     assert coverage["gaps"] == 0
     assert coverage["parse_errors"] == 0
     assert coverage["floor"] == LEDGER_FLOOR == 39

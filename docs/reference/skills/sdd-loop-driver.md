@@ -26,6 +26,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - 宿主环境**无需** `.specify/` 目录、无需安装 spec-kit——skill 全部操作要点内联自包含。
 - 投递后宿主按手册驱动循环：断点探测 → 阶段派发（远端脱离后台自跑；本地原生直接调用）→ 统一监听（仅外部 CLI：长轮询窗口，事件优先）→ 哨兵与独立校验 → 续环 → git 状态判定合并收尾。
 - **目标项目侧依赖**：仅当子代理要在目标项目执行 `/speckit.*` 阶段命令时，目标项目才需要具备 `.specify/` 结构；目标项目无 `.specify/` 时机制报告停线、不自动初始化。
+- **与 setup / house-keeping 的交接**：目标解析共享 `shared/workflow/target-resolution.md`；本技能强依赖 `.specify/`，从显式路径/会话 cwd 向上搜索最近的合法 `.specify/` 根，找不到就拒绝执行并 handoff `sdd-project-setup` / 提示 `specify init`。preflight ⑤ fail → `sdd-project-setup` 做 bootstrap；setup 返回 `bootstrap-complete / maintenance-pending` → `sdd-house-keeping` H1–H4 做首次维护，H4 三条件成立才是 `ready`；house-keeping 不可用时，只有 preflight ⑤ 通过才可继续并记 `maintenance=not_evaluated`。目标项目已初始化、仅需维护 → 直接 `sdd-house-keeping`；本技能不执行初始化或周期维护，只推进 SDD 阶段。
 
 ## 机制归属（Feature 060 委派化）
 
@@ -78,6 +79,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **大特性拆分门**：plan 入口 FR >30 或 tasks U4 任务 >40 时判 `split-required`，驱动必须先拆成各自落入区间（8–30 FR / 10–40 任务）的切片，再逐条走完整链（`scripts/decomposition-check.py`）。
 - **确定性预检**：requirements/plan/tasks 的 U4 在派发下一阶段前运行 `scripts/pre-analyze-check.py`，机械拦截重复/悬空 ID、`blockedBy` 断链、计数声明漂移与死路径；机械项不再留到 analyze。
 - **跨特性重叠预检**：clarify U4 运行 `scripts/overlap-check.py` 比较同级特性的共享交付路径（`same-path`/`nested-path`），重叠必须先完成归属裁决并写入两条线状态脊，才能派发 plan。
+- **Wrap-up 记账核验**：U4 校验该阶段 unit-id 的 run-determination 与 feedback 记录；有特性上下文时条目须带 `--feature`；阶段返回 `WRAPUP-DEFERRED` 时驱动者补跑三步后再放行（owner：`references/stage-prompts.md` § Independent Verification）。
 
 **日志形态变化（已披露）**：stream 模式新增 `raw-<line>-<stage>.jsonl` 与派生 `log-<line>-<stage>.log`；CLI 不支持该输出模式或派生失败时降级为既有缓冲模式，并在 status 记录 `progress=degraded` 与原因。完成判定不变：哨兵仍只认 live log 最后非空行，watcher 判定与退出码、确认门、独立校验与卡死处置均未改变。
 

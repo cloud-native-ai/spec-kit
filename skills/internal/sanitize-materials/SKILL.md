@@ -1,6 +1,6 @@
 ---
 name: sanitize-materials
-description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration. Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "speckit.sanitize"].
+description: Framework material hygiene governance for the Spec Kit workspace — scan framework-owned materials (parked ideas, drafts, indexes, mirrors, compatibility links, the docs tree) for stale residue and redundancy, run deterministic correctness checks (dead references, index consistency, symlinks, mirror drift, init migration residue), persist findings in a ledger with pending state, and after explicit user confirmation clean up per the two-level criteria (destructive delete/archive behind a single front-loaded batch confirmation, reversible repairs auto-execute), closing with a three-element execution report. Also the wrap-up step after a cross-generation `specify init` migration, and the record-retention lane for consumed exec-quant / feedback / session records (consume → receipt → retire; no receipt means no deletion; 30-day grace). Never evaluates, modifies, or reports user source code, product scripts, or test cases. Internal Spec Kit skill; it depends on the .specify/ structure. Use this when the user mentions ["sanitize", "资料卫生", "过期残留", "清理过期资料", "框架资料清理", "stale residue", "死引用", "dead reference", "镜像漂移", "mirror drift", "台账清理", "索引不一致", "init 迁移收尾", "迁移残留", "记录回收", "retention", "consume-then-retire", "speckit.sanitize"].
 classification: internal
 skill_id: "<SKILL:.specify/skills/internal/sanitize-materials/SKILL.md>"
 ---
@@ -20,6 +20,12 @@ Owning command: `/speckit.sanitize`. The command template keeps entry, parameter
 and the command-lifecycle wrap-up surfaces; this skill carries the entire executable
 seven-stage flow.
 
+The skill also owns a **record-retention lane** (`--lane retention`): a separate
+consume → receipt → retire lifecycle for the per-run record stores. It is not part of the
+prose-hygiene findings ledger; it uses its own plan, receipts and retirement ledger under
+`.specify/memory/retention/`. A raw record is deleted only when a durable receipt covers
+it and the 30-day grace period has elapsed.
+
 Canonical extraction source: `templates/commands/sanitize.md` § Outline, § Stage 1–7
 (Preflight / Collect / Judge / Present / Confirm / Apply / Wrap-up), and § Behavior Rules.
 Content moved here verbatim in substance; the command keeps entry + lifecycle only.
@@ -33,10 +39,14 @@ merge semantics, and gate criteria defer to engine output and `--help`.
 Parameters are parsed by the command from `$ARGUMENTS` (protocol owned by the command
 template); their semantics govern how this skill runs:
 
+- `--lane materials|retention|all` — select the lane. `materials` (default) is the
+  existing seven-stage prose-hygiene flow; `retention` runs only the record-retention
+  lane (R1–R5 below); `all` runs materials first, then retention.
 - `--roots <csv>` — restrict scanning to a subset of material root kinds. A partial scan
   **never auto-resolves**: pending findings on unscanned roots keep their state (findings
   contract C-14; design authority named under Stores below).
-- `check` — check-only mode: stops after Present, never enters Confirm/Apply.
+- `check` — check-only mode: stops after Present (materials) or after Scan/Present
+  (retention), never enters Confirm/Apply.
 - Trigger: manual, on demand only.
 - Glossary: apply the project glossary protocol (`.specify/memory/glossary.md` +
   `.specify/shared/workflow/glossary.md`) before acting — the entry step stays with the command.
@@ -79,6 +89,26 @@ digest plus target-path lists — never paste raw evidence full text into the co
 plan lives at `.specify/memory/sanitize/cleanup-plan.json`. Physical layout and the
 cross-run merge state machine are owned by the sanitize findings contract in the
 framework spec set (enforced by the engine) — point at it, never restate it.
+
+**Retention lane engine**: the lane uses a sibling engine, not the four prose actions
+above. Always run it with `--workspace-root .` and `--format json`:
+
+```bash
+# R2 — read-only inventory (eligible / blocked / too-young; no bodies)
+python3 .specify/scripts/python/record-retention.py --action scan --workspace-root . --format json
+
+# R3 — write monthly summaries + per-entry receipts
+python3 .specify/scripts/python/record-retention.py --action distill --workspace-root . --promotions <promotions.json> --format json
+
+# R4 — write a retention plan (confirmed: false)
+python3 .specify/scripts/python/record-retention.py --action plan --workspace-root . --format json
+
+# R5 — execute the confirmed plan
+python3 .specify/scripts/python/record-retention.py --action apply --plan <plan.json> --workspace-root . --format json
+```
+
+The retention engine never writes the sanitize findings ledger. Its stores are
+`.specify/memory/retention/{summaries,receipts,plans,ledger}/`.
 
 ## Workflow (seven stages)
 
@@ -179,6 +209,56 @@ python3 .specify/scripts/python/feedback-utils.py --action record \
   --review "<观察事实,正文 MUST 含字面标记 confirm-gate>" --points-file "<要点文件>"
 ```
 
+## Retention lane (R1–R5)
+
+Runs when `--lane retention` or `--lane all`; `--lane materials` keeps the seven-stage
+flow above unchanged.
+
+### R1 — Preflight
+
+Probe `python3` and `.specify/scripts/python/record-retention.py`; if missing, give an
+actionable hint and stop.
+
+### R2 — Scan
+
+Run `--action scan`. Present the per-store digest (`total` / `eligible` / `too_young` /
+`blocked` / `with_receipt`) and the blocked reasons (`open`, `unsettled`,
+`needs-promotion`, `no-carrier`, `unreadable`, `invalid-record`). Never paste record
+bodies. `check` stops here.
+
+### R3 — Distill / promote
+
+Run `--action distill`. It writes one summary per month for exec-quant and
+run-determination, and one receipt per covered entry. Feedback entries need
+`disposition ∈ {processed, ignored}` plus a carrier (`disposition_reason`,
+`introspection_ref`, or a consume-log row); entries without a carrier stay blocked.
+
+Session topic notes need a promotion decision before a receipt can be written: promote
+durable content with `memory-record` (knowledge) or `/speckit.history` (history), or mark
+the note `ephemeral` with a reason. Write the decisions to a promotions file and rerun
+`distill --promotions <file>`. A note without a decision stays `needs-promotion` and is
+never deleted. An open feedback entry and a run-determination record without `settled_at`
+are reported as backlog, never settled or deleted by this lane.
+
+### R4 — Plan / present
+
+Run `--action plan`. Present the plan: per-store counts, the oldest candidate, the grace
+boundary, and the blocked backlog. The plan is written with `confirmed: false`.
+Destructive confirmation uses the same single front-loaded batch as Stage 5; the
+retention lane adds no second gate.
+
+### R5 — Apply
+
+After the user releases the plan: set `confirmed: true`, then run `--action apply`. The
+engine re-checks every receipt, grace, entry state and git cleanliness. It refuses when
+target paths are dirty or the workspace is not a git repository; a non-git workspace
+needs the explicit `--allow-unversioned` override. It deletes only covered raw records,
+writes one retirement ledger per batch, and asserts `remaining + retired = original`.
+
+Report the three-element execution report: removed entries per store, the ledger path,
+and the modification path (git history recovers deleted records; receipts, summaries and
+ledger remain). A failed item is reported; there is no rollback.
+
 ## Behavior Rules (red lines)
 
 - **Scope red line (范围红线)**: never evaluate, modify, or report user source code,
@@ -192,6 +272,19 @@ python3 .specify/scripts/python/feedback-utils.py --action record \
 - **Evidence red line (证据红线)**: semantic verdicts' `evidenceRefs` must cite concrete
   commit hashes / paths; insufficient-evidence candidates get no verdict and are never
   entered into the ledger.
+- **Receipt red line (回执红线)**: a raw record is deleted only when a retention receipt
+  covers it. No receipt means no deletion; distill first.
+- **Open/unsettled red line**: open feedback, unsettled run-determination records,
+  unreadable exec-quant records and session notes without a promotion/ephemeral decision
+  are never retired; they remain in the blocked backlog.
+- **Grace red line**: the default grace period is 30 days after the receipt; the plan and
+  apply re-check it. Deleting a younger record is a defect, not a shortcut.
+- **Git-clean red line**: apply refuses dirty target paths; a non-git workspace needs the
+  explicit `--allow-unversioned` override. Do not bypass this by staging or reverting
+  unrelated work.
+- **Lane separation**: the retention lane never writes the sanitize findings ledger or
+  merges its candidates into it; receipts/summaries/ledger live under
+  `.specify/memory/retention/`.
 - Manual on-demand trigger only; `check` stops at Present and never enters Confirm.
 - Ledger accumulation semantics: on repeat runs, new findings merge in; undisposed
   findings keep their state; externally repaired materials not re-detected auto-resolve
@@ -201,8 +294,11 @@ python3 .specify/scripts/python/feedback-utils.py --action record \
 
 - **Two-level criteria governance** (destructive/irreversible → front-loaded
   confirmation; reversible → auto-execute + execution report) is owned by
-  `.specify/shared/guidelines/confirmation-gates.md` — this skill applies it at Stage 5/6;
-  never copy or restate its rule text here.
+  `.specify/shared/guidelines/confirmation-gates.md` — this skill applies it at Stage 5/6
+  and in the retention lane's R4/R5; never copy or restate its rule text here.
+- **Retention store ownership**: `.specify/memory/retention/` is owned by
+  `record-retention.py`; summaries, receipts, plans and ledgers are append-only durable
+  evidence and are never deleted by the retention lane itself.
 - **Delegate items are recommendations only** — this skill never executes another
   command's work; hand off per the Stage 4 triage list.
 - **Command-lifecycle surfaces stay in the command template**: `$ARGUMENTS` parsing (User

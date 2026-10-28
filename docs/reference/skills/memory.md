@@ -53,6 +53,14 @@ engine enforces the boundary: every `record` must carry a `--source` of the form
 - **knowledge** — durable, cross-session knowledge (stable preferences, conventions,
   lasting decisions). Re-recording the same title updates the existing entry.
 
+**Governed session retention**: `/speckit.sanitize --lane retention` consumes session
+records and deletes them only after a durable carrier exists. Run-determination records
+are retired only when `settled_at` is present; free-form session notes need a promotion
+decision first (a `knowledge/` entry, a `.specify/history/` entry, or an explicit
+`ephemeral` label). The default grace after the receipt is 30 days. `prune` remains the
+low-level age/count bound; it does not perform the promotion/receipt gate and should not
+be used as the primary retention path.
+
 Each entry is a Markdown file with YAML frontmatter (`id, scope, source, feature, tags,
 title, created, session_id, summary`) plus a body. Conflict-free store discipline
 (req 055): the per-scope entry list is **derived on demand** by scanning `*.md`
@@ -81,7 +89,7 @@ The engine is a shared, standard-library-only script at
 | `record` | Write one entry to `session` or `knowledge` (the only write target is the entry file itself). Requires a valid `--source`. |
 | `recall` | Search by `--query` keywords + `--tags` / `--source` / `--feature` / `--since` filters; ranks by keyword overlap and recency. |
 | `list` | List the most recent entries in a scope (no query). |
-| `prune` | Bound short-term memory via `--max-entries` and/or `--max-age-days`. |
+| `prune` | Low-level bound on short-term memory via `--max-entries` and/or `--max-age-days` (no promotion/receipt gate; governed consumption is `/speckit.sanitize --lane retention`). |
 | `reindex` | Explicit migration entry point (req 055): derives entries from the files and retires a legacy per-scope `index.json`. Idempotent. |
 
 Example:

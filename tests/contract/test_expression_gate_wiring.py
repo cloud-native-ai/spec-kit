@@ -351,7 +351,7 @@ def test_a6_wiring_inventory_matches_the_frozen_denominator():
         SKILLS_DIR.glob("internal/*/SKILL.md")
     )
     assert len(templates) == 27, "template inventory drifted: %d (expected 27)" % len(templates)
-    assert len(skills) == 51, "skill inventory drifted: %d (expected 51)" % len(skills)
+    assert len(skills) == 52, "skill inventory drifted: %d (expected 52)" % len(skills)
 
 
 # --------------------------------------------------------------------------- #

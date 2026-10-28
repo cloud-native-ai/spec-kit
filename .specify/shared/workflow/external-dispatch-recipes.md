@@ -13,6 +13,8 @@ Operational recipes for driving an **external subagent** (Mode 3 in [`subagent-d
 
 Both topologies support parallel lines: one connection/process per line, each line tracked with its own task entry (e.g. TaskCreate/TaskUpdate) so the orchestrator never conflates their states.
 
+> **SDD-driving skills boundary**: for `sdd-project-setup`, `sdd-house-keeping` and `sdd-loop-driver`, the **local** topology defaults to the orchestrator / host native subagent and MUST NOT launch `qodercli` locally. The local external-CLI variant in Recipe 5 is for consumers that explicitly choose external dispatch; it is not the SDD local default. The **remote** topology is `ssh <alias>` → `su - <run-user>` → `cd <project-dir>` → subagent CLI; the CLI default is the execution-config defaults layer (`templates/execution-config-defaults.yaml`, `cli: qodercli`).
+
 ## Recipe 1 — Breakpoint Probe (断点探测)
 
 Before dispatching, detect which SDD stage the target project is currently at, so the entry can resume from the breakpoint instead of restarting:

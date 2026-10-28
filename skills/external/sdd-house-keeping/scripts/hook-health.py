@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Host hook health check for unattended SDD runs (sdd-project-setup S4).
+"""Host hook health check for unattended SDD runs (sdd-house-keeping H4).
 
 Every tool call in an unattended run (sdd-loop-driver) passes through the
 host agent's hooks. A synchronous hook is a serial blocking point: at best it

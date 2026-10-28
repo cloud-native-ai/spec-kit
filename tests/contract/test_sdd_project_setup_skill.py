@@ -1,377 +1,237 @@
-"""Structure contract tests for the sdd-project-setup skill.
+"""Structure contract for sdd-project-setup (bootstrap + handoff).
 
-sdd-project-setup was created outside a numbered-feature flow (2026-10-16,
-as the soft-collaboration companion of sdd-loop-driver), so there is no
-spec-owned clause numbering. Clause numbers below are local to this file
-and pin the structural facts the skill's own documents declare:
-
-  C-1 frontmatter convention fields       C-7 soft-collaboration redlines
-  C-2 classification tension annotation   C-8 handoff twin in sdd-loop-driver
-  C-3 H2 routing skeleton                 C-9 inventory script contract
-  C-4 loop stage chain S0–S5              C-10 mirror byte-identical
-  C-5 mechanism matrix + grading          C-11 roster baselines updated
-  C-6 reconcile sequence literal          C-12 docs page content blocks
-  C-13 instruction budget convergence path
-  C-14 host hook health check wiring
-  C-15 local default + native-subagent carrier rule
+The skill was split: bootstrap stays here, periodic maintenance moved to
+sdd-house-keeping. These pins protect that boundary rather than the old
+S0–S5 all-in-one loop.
 """
+from __future__ import annotations
 
 import re
 from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SKILL_DIR = REPO_ROOT / "skills" / "external" / "sdd-project-setup"
+ROOT = Path(__file__).resolve().parents[2]
+SKILL_DIR = ROOT / "skills" / "external" / "sdd-project-setup"
 SKILL_MD = SKILL_DIR / "SKILL.md"
+RECIPES = SKILL_DIR / "references" / "setup-recipes.md"
+DOCS = ROOT / "docs" / "reference" / "skills" / "sdd-project-setup.md"
 
-PINNED_H2_SECTIONS = [
+pytestmark = pytest.mark.contract
+
+PINNED_H2 = [
     "What This Skill Does",
     "When to Load",
-    "The Loop (S0–S5)",
+    "The Loop (S0–S2 + HANDOFF)",
     "Hard Requirements",
     "Discipline Defaults",
     "References",
-    "Subagent Delegation（子代理委派说明——2026-10-16 裁定）",  # 060 C-32: delegation section
+    "Subagent Delegation（子代理委派说明——2026-10-16 裁定）",
     "Boundary",
-    "Wrap-up",  # compiled section (probe registry; AUTO-GENERATED)
+    "Wrap-up",
 ]
 
+STAGE_CHAIN = ["S0 ENTRY", "S1 ASSESS", "S2 INSTALL", "S2.5 BOOTSTRAP",
+               "HANDOFF      "]
 
-def _skill_text() -> str:
+
+def _skill() -> str:
     return SKILL_MD.read_text(encoding="utf-8")
 
 
-def _parse_frontmatter(text: str):
-    """Minimal frontmatter parser (no PyYAML per repo convention)."""
-    if not text.startswith("---"):
-        raise AssertionError("SKILL.md has no frontmatter block")
+def _recipes() -> str:
+    return RECIPES.read_text(encoding="utf-8")
+
+
+def _frontmatter(text: str):
+    assert text.startswith("---")
     end = text.find("\n---", 3)
-    assert end != -1, "frontmatter block not closed"
-    block = text[4:end]
-    body = text[end + 4:].lstrip("\n")
+    assert end != -1
     fields = {}
-    for line in block.splitlines():
-        if not line.strip():
+    for line in text[4:end].splitlines():
+        if ":" not in line:
             continue
         key, _, value = line.partition(":")
         value = value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
             value = value[1:-1]
         fields[key.strip()] = value
-    return fields, body
+    return fields
 
 
-def _h2_sections(text: str) -> list:
-    return [
-        line[3:].strip()
-        for line in text.splitlines()
-        if line.startswith("## ")
-    ]
+def _h2(text: str):
+    return [line[3:].strip() for line in text.splitlines()
+            if line.startswith("## ")]
 
 
-# ---------------------------------------------------------------- C-1
+# ---------------------------------------------------------------- C-1/C-2
 
 
-def test_c1_frontmatter_four_fields():
-    fields, _ = _parse_frontmatter(_skill_text())
-    assert set(fields) == {
-        "name",
-        "description",
-        "skill_id",
-        "classification",
-    }, f"frontmatter must carry exactly the four convention fields, got {sorted(fields)}"
+def test_frontmatter_four_fields():
+    fields = _frontmatter(_skill())
+    assert set(fields) == {"name", "description", "skill_id", "classification"}
     assert fields["name"] == "sdd-project-setup"
-    assert fields["description"], "description must be non-empty"
-    assert "sdd-project-setup" in fields["description"]
     assert fields["skill_id"] == (
-        "<SKILL:.specify/skills/sdd-project-setup/SKILL.md>"
-    )
+        "<SKILL:.specify/skills/sdd-project-setup/SKILL.md>")
     assert fields["classification"] == "external"
+    assert "bootstrap" in fields["description"]
+    assert "sdd-house-keeping" in fields["description"]
 
 
-# ---------------------------------------------------------------- C-2
+def test_classification_annotation_declares_three_skill_split():
+    body = _skill().split("---", 2)[2]
+    head = body[:1000]
+    assert "依赖轴" in head and "external" in head
+    assert "语义耦合" in head
+    assert "sdd-house-keeping" in head and "sdd-loop-driver" in head
+    assert "bootstrap" in head
 
 
-def test_c2_classification_tension_annotation():
-    _, body = _parse_frontmatter(_skill_text())
-    head = body[:900]
-    assert "依赖轴" in head, (
-        "first body paragraph must state the dependency-axis ruling"
-    )
-    assert "external" in head
-    assert "语义耦合" in head, (
-        "annotation must declare the semantic coupling explicitly"
-    )
-    assert "软协同" in head and "非强绑定" in head, (
-        "soft-collaboration (not strong binding) must be declared up front"
-    )
+# ---------------------------------------------------------------- C-3/C-4
 
 
-# ---------------------------------------------------------------- C-3
+def test_routing_skeleton():
+    assert _h2(_skill()) == PINNED_H2
 
 
-def test_c3_skill_md_section_set():
-    sections = _h2_sections(_skill_text())
-    assert sections == PINNED_H2_SECTIONS, (
-        f"H2 set must equal the pinned routing skeleton, got {sections}"
-    )
-
-
-# ---------------------------------------------------------------- C-4
-
-STAGE_CHAIN = [
-    "S0 ENTRY",
-    "S1 ASSESS",
-    "S2 INSTALL",
-    "S3 RECONCILE",
-    "S4 VERIFY",
-    "S5 SUGGEST",
-]
-
-
-def test_c4_loop_stage_chain_in_order():
-    text = _skill_text()
+def test_loop_stage_chain_in_order():
+    text = _skill()
     positions = [text.find(stage) for stage in STAGE_CHAIN]
-    assert all(p != -1 for p in positions), f"missing stages: {positions}"
-    assert positions == sorted(positions), (
-        "S0–S5 must appear in loop order in SKILL.md"
-    )
+    assert all(pos != -1 for pos in positions), (
+        f"missing bootstrap stages: {positions}")
+    assert positions == sorted(positions)
+    recipes = _recipes()
+    assert "S2.5 BOOTSTRAP CONTENT" in recipes
+    assert "## HANDOFF" in recipes
 
 
-def test_c4_reconcile_sequence_literal():
-    text = _skill_text() + (SKILL_DIR / "references" / "setup-recipes.md").read_text(
-        encoding="utf-8"
-    )
-    assert "/speckit.constitution" in text
-    assert "/speckit.sanitize" in text
-    assert "/speckit.feature" in text
-    assert "/speckit.instructions" in text
-    assert "/speckit.docs" in text
+def test_bootstrap_commands_and_handoff_owner():
+    text = _skill() + _recipes()
+    for command in ("/speckit.constitution", "/speckit.feature",
+                    "/speckit.docs", "/speckit.goal"):
+        assert command in text, f"bootstrap command missing: {command}"
+    assert "sdd-house-keeping" in text
+    assert "H0–H4" in text or "H1–H4" in text
+    # sanitize is house-keeping's job, not setup's
+    assert "MUST NOT 执行 `/speckit.sanitize`" in _skill()
+    assert "retention apply" in _skill()
 
 
 # ---------------------------------------------------------------- C-5
 
-RECIPES_MD = SKILL_DIR / "references" / "setup-recipes.md"
 
-
-def _recipes_text() -> str:
-    return RECIPES_MD.read_text(encoding="utf-8")
-
-
-def test_c5_mechanism_matrix_dimensions_pinned():
-    text = _recipes_text()
-    # the 13 inventory dimensions, by their matrix keys
-    for key in [
-        "const", "feat", "gloss", "fb", "reg", "kb", "session",
-        "tools", "skills", "tmpl", "specs", "src", "compat",
-    ]:
+def test_mechanism_matrix_dimensions_pinned():
+    text = _recipes()
+    for key in ["const", "feat", "gloss", "fb", "reg", "kb", "session",
+                "tools", "skills", "tmpl", "specs", "src", "compat"]:
         assert re.search(rf"\|\s*{key}\s*\|", text), (
-            f"mechanism matrix dimension missing: {key}"
-        )
+            f"mechanism matrix dimension missing: {key}")
 
 
-def test_c5_grading_literature_pinned():
-    text = _recipes_text()
+def test_grading_literature_pinned():
+    text = _recipes()
     for grade in ["absent", "degraded", "partial", "complete"]:
-        assert f"`{grade}`" in text, f"grade literal missing: {grade}"
-    assert "缺≠错" in text, "reconcile-needed-is-not-wrong ruling must be pinned"
-    assert "未处理清单" in text, "declarative-gap ledger must be pinned"
+        assert f"`{grade}`" in text
+    assert "缺≠错" in text
+    assert "未处理清单" in text
 
 
-# ---------------------------------------------------------------- C-6
+# ---------------------------------------------------------------- C-6/C-7
 
 
-def test_c6_hard_requirements_numbered_five():
-    text = _skill_text()
+def test_hard_requirements_numbered_and_state_oracle():
+    text = _skill()
     for n in range(1, 6):
-        assert re.search(rf"^{n}\. \*\*", text, re.MULTILINE), (
-            f"Hard Requirement {n} missing"
-        )
+        assert re.search(rf"^{n}\. \*\*", text, re.MULTILINE)
     assert "盘点先于处置" in text
-    assert "三态判定" in text or "就绪是三态" in text
+    assert "就绪是三态判定" in text
+    assert "bootstrap + 首次维护" in text
 
 
-# ---------------------------------------------------------------- C-7
+def test_suggestion_not_mandate_redline():
+    text = _skill() + _recipes()
+    assert "建议而非强制" in text
+    assert "不携带任何「必须调用 sdd-loop-driver」的语义" in text
 
 
-def test_c7_suggestion_not_mandate_redline():
-    text = _skill_text() + _recipes_text()
-    assert "建议而非强制" in text, "advisory-not-mandatory ruling must be pinned"
-    assert "不携带任何「必须调用 sdd-loop-driver」的语义" in text, (
-        "the semantic redline against mandatory handoff must be pinned verbatim"
-    )
+def test_no_sdd_stage_advancement_and_bootstrap_command_set():
+    text = _skill()
+    assert "不做任何 SDD 阶段推进" in text
+    assert "constitution/feature/docs/goal/agents/team" in text
 
 
-def test_c7_governance_commands_only_boundary():
-    text = _skill_text()
-    assert "不做任何 SDD 阶段推进" in text, (
-        "boundary must exclude SDD stage driving (that is sdd-loop-driver's)"
-    )
-    assert "constitution/sanitize/feature/instructions/docs" in text
+def test_setup_creates_specify_and_does_not_require_it():
+    text = _skill() + _recipes()
+    assert "不依赖 `.specify/`" in text
+    assert "不向上搜索 `.specify/`" in text
+    assert "由本 skill 创建/刷新" in text
 
 
-# ---------------------------------------------------------------- C-8
+def test_handoff_and_completion_contract():
+    text = _skill()
+    assert "bootstrap-complete / maintenance-pending" in text
+    assert "ready" in text and "H4" in text
+    assert "不得冒充 ready" in text or "不冒充 ready" in text
 
 
-def test_c8_handoff_twin_in_loop_driver():
-    ld_recipes = (
-        REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "references" / "dispatch-recipes.md"
-    ).read_text(encoding="utf-8")
-    # 060 C-27: preflight ownership moved to run-agent — the handoff twin now lives there
-    assert "handoff 给 sdd-project-setup" in ld_recipes or "dispatch-preflight.md" in ld_recipes, (
-        "sdd-loop-driver must reference the preflight authority carrying the handoff"
-    )
-    ld_skill = (
-        REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
-    ).read_text(encoding="utf-8")
-    assert "非强绑定" in ld_skill and "各自可独立运行" in ld_skill, (
-        "loop-driver must declare the same soft-collaboration semantics"
-    )
-    assert "sdd-project-setup" in ld_skill
+# ---------------------------------------------------------------- C-8/C-9
 
 
-# ---------------------------------------------------------------- C-9
-
-SCRIPT = SKILL_DIR / "scripts" / "mechanism-inventory.py"
-
-
-def test_c9_inventory_script_contract():
-    text = SCRIPT.read_text(encoding="utf-8")
-    assert "--project" in text and 'required=True' in text, (
-        "--project is the one required argument"
-    )
-    assert "--json" in text, "machine-readable output flag must exist"
-    assert "return 2" in text, "argument/path errors exit 2"
-    assert "specify_dir" in text, "absent grading depends on the specify_dir fact"
-    # read-only scanner: no write-side effects anywhere in the script
-    assert not re.search(r"open\([^)]*['\"][wax]", text), (
-        "inventory script must be read-only (no write-mode open)"
-    )
-    assert not re.search(r"mkdir|makedirs|shutil|rmtree|unlink|remove\(", text), (
-        "inventory script must not mutate the tree"
-    )
+def test_handoff_twin_in_loop_driver():
+    ld = (ROOT / "skills" / "external" / "sdd-loop-driver" / "SKILL.md"
+          ).read_text(encoding="utf-8")
+    assert "sdd-project-setup" in ld
+    assert "sdd-house-keeping" in ld
 
 
-def test_c9_grading_matches_recipes():
-    script = SCRIPT.read_text(encoding="utf-8")
-    recipes = _recipes_text()
-    for grade in ["absent", "degraded", "partial", "complete"]:
-        assert f'"{grade}"' in script, f"script must grade {grade}"
-        assert f"`{grade}`" in recipes, f"recipes must document {grade}"
+def test_inventory_script_contract():
+    text = (SKILL_DIR / "scripts" / "mechanism-inventory.py").read_text(
+        encoding="utf-8")
+    assert "--project" in text and "required=True" in text
+    assert "--json" in text
+    assert "return 2" in text
+    assert not re.search(r"open\([^)]*['\"][wax]", text)
+    assert not re.search(r"mkdir|makedirs|shutil|rmtree|unlink|remove\(", text)
 
 
-# ---------------------------------------------------------------- C-10
+# ---------------------------------------------------------------- C-10..C-15
 
 
-# test_c10_mirror_byte_identical folded into
-# tests/contract/test_mirror_parity_suite.py (spec 067 T021; ledger row in
-# test-evidence/test-consolidation-ledger.md).
-
-
-# ---------------------------------------------------------------- C-11
-
-
-def test_c11_roster_baselines_updated():
-    wiring = (
-        REPO_ROOT / "tests" / "contract" / "test_run_skills_wiring.py"
-    ).read_text(encoding="utf-8")
-    assert '"sdd-project-setup"' in wiring, (
-        "BASELINE_EXTERNAL roster must include sdd-project-setup"
-    )
-    guards = (
-        REPO_ROOT / "tests" / "contract" / "test_skill_layer_visibility_guards.py"
-    ).read_text(encoding="utf-8")
-    assert '"sdd-project-setup"' in guards, (
-        "EXTERNAL_SKILLS census must include sdd-project-setup"
-    )
-
-
-# ---------------------------------------------------------------- C-12
-
-DOCS_PAGE = REPO_ROOT / "docs" / "reference" / "skills" / "sdd-project-setup.md"
-
-
-def test_c12_docs_page_content_blocks():
-    text = DOCS_PAGE.read_text(encoding="utf-8")
+def test_docs_page_bootstrap_and_handoff():
+    text = DOCS.read_text(encoding="utf-8")
     assert "sdd-project-setup" in text
-    assert "三模式" in text and "入口参数" in text, (
-        "docs page must carry the three-mode instantiation guide"
-    )
-    assert "S0–S5" in text, "docs page must present the five-step loop"
-    assert "软协同契约" in text, "docs page must state the soft-collaboration contract"
-    assert "可移植" in text, "docs page must explain executor-side portability"
+    assert "bootstrap" in text
+    assert "S0–S2" in text
+    assert "sdd-house-keeping" in text
+    assert "软协同" in text
+    assert "可移植" in text
     assert "边界" in text
 
 
-def test_c12_wrapup_compiled_block_present():
-    text = _skill_text()
+def test_wrapup_compiled_block_present():
+    text = _skill()
     assert "## Wrap-up" in text
     assert "AUTO-GENERATED by probe-utils.py" in text
     assert 'unit-id "skill:sdd-project-setup"' in text
 
 
-# ---------------------------------------------------------------- C-13
+def test_instruction_budget_and_hook_health_are_pointers():
+    text = _skill() + _recipes()
+    for literal in ("S3.4", "R3", "BUDGET", "placeholder=yes", "pending",
+                    "S4-H", "hook-health.py", "vendor-managed"):
+        assert literal in text, f"pointer literal missing: {literal}"
+    docs = DOCS.read_text(encoding="utf-8")
+    assert "预算" in docs and "R3" in docs
+    assert "hook-health" in docs
 
 
-def test_c13_instruction_budget_convergence_is_wired():
-    text = _skill_text() + _recipes_text()
-    for literal in ("S3.4", "R3", "BUDGET", "placeholder=yes", "pending"):
-        assert literal in text, f"instruction budget convergence missing: {literal}"
-    docs = DOCS_PAGE.read_text(encoding="utf-8")
-    assert "预算" in docs and "R3" in docs, (
-        "docs page must explain the instruction budget convergence path"
-    )
-
-
-# ---------------------------------------------------------------- C-14
-
-HOOK_HEALTH = SKILL_DIR / "scripts" / "hook-health.py"
-
-
-def test_c14_hook_health_script_contract():
-    text = HOOK_HEALTH.read_text(encoding="utf-8")
-    for flag in ("--project", "--settings", "--max-sync-timeout", "--fix", "--json"):
-        assert flag in text, f"hook-health must expose {flag}"
-    assert "vendor-managed" in text and "fixable" in text, (
-        "the two finding classes must be visible in the script"
-    )
-    assert "return 10" in text, "unresolved risks must exit 10"
-    assert "hook-health.bak-" in text, "fix mode must back up settings first"
-
-
-def test_c14_recipes_and_docs_wire_hook_health():
-    recipes = _recipes_text()
-    assert "hook-health.py" in recipes and "S4-H" in recipes, (
-        "S4 must run the host hook health check"
-    )
-    assert "vendor-managed" in recipes, (
-        "the vendor self-healing constraint must be documented"
-    )
-    docs = DOCS_PAGE.read_text(encoding="utf-8")
-    assert "hook-health" in docs, "docs page must mention the hook health check"
-
-
-# ---------------------------------------------------------------- C-15
-
-
-def test_c15_local_default_and_native_subagent():
-    text = _skill_text()
-    assert "S0 入口缺省解析" in text, "S0 default-resolution table must exist"
-    assert "当前项目" in text, (
-        "entry without host+path must default to the current project"
-    )
-    assert "原生子代理" in text, (
-        "local topology must name the host's native subagent"
-    )
-    assert "MUST NOT 启动 `qodercli`" in text, (
-        "local topology must forbid launching qodercli as a subagent"
-    )
-    recipes = _recipes_text()
-    assert "本地拓扑" in recipes and "n/a" in recipes, (
-        "S4 recipes must record local-topology inapplicability of preflight ①–③"
-    )
-    docs = DOCS_PAGE.read_text(encoding="utf-8")
-    assert "当前项目" in docs and "原生子代理" in docs, (
-        "docs page must carry the local default and native-subagent rule"
-    )
+def test_local_default_and_native_subagent():
+    text = _skill()
+    assert "S0 入口缺省解析" in text
+    assert "当前项目" in text
+    assert "原生子代理" in text
+    assert "MUST NOT 启动 `qodercli`" in text
+    recipes = _recipes()
+    assert "本地拓扑" in recipes and "n/a" in recipes
+    docs = DOCS.read_text(encoding="utf-8")
+    assert "当前项目" in docs and "原生子代理" in docs
