@@ -65,7 +65,7 @@ projection of an edited source is produced by the mirror/generator machinery, ne
 the four predecessor contracts named in FR-027 stay additive.
 **Scale/Scope**: 28 FR / 8 SC / 11 shared strings → 5 contract files with 67 clauses (C-1…C-67),
 11 data-model entities, 29 validation rules, 3 state machines, 1 new engine (3 actions), 12 edited
-framework files, 3 new framework files, 7 new test files, 1 declared pin change.
+framework files, 3 new framework files, 6 new test files, 1 declared pin change.
 
 ## Constitution Check
 
@@ -205,7 +205,7 @@ tests/fixtures/
 
 **Structure Decision**: this spec extends the existing SDD-framework layout; it creates **no new
 top-level directory**. Three framework files are new (one owner document, one driver reference, one
-engine), twelve are edited, seven test files are new and one gains a declared pin change. The
+engine), twelve are edited, six test files are new and one gains a declared pin change. The
 documentation plane and the runtime plane stay separate: every edit in the tree above is a source
 edit, and the `.specify/` runtime copies listed under Mirror Obligations are produced by the
 mirror/generator machinery.
