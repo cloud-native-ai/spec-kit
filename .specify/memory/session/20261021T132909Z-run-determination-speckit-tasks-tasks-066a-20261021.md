@@ -6,10 +6,10 @@ feature: "066-loop-state-awareness-a"
 tags: ["run-determination", "tasks-066a-20261021"]
 title: "run-determination /speckit.tasks tasks-066a-20261021"
 created: "2026-10-21T13:29:09Z"
-summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=rejected"
 ---
 
-/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=rejected
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not
   "feature": "066-loop-state-awareness-a",
   "feature_id": "065",
   "determined_at": "2026-10-21T13:29:09Z",
-  "settled_at": null,
+  "settled_at": "2026-10-24T12:45:44Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "rejected",
+      "reason": null,
+      "user_turn_class": "continuation_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -160,9 +160,9 @@ summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not
       },
       {
         "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "verdict": "rejected",
+        "reason": null,
+        "observation": "satisfaction rejected: user_turn_class=continuation_negative unresolved_red=unknown adjacent=False",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -173,7 +173,7 @@ summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not
     ]
   },
   "passive_trigger": {
-    "trigger_feedback": false,
+    "trigger_feedback": true,
     "composes_with_should_prompt": true,
     "out_of_scope": [
       {
@@ -188,11 +188,6 @@ summary: "/speckit.tasks run=tasks-066a-20261021 token=not_evaluated elapsed=not
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

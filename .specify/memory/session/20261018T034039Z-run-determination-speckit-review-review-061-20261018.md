@@ -6,10 +6,10 @@ feature: "061-subagent-cli-config"
 tags: ["run-determination", "review-061-20261018"]
 title: "run-determination /speckit.review review-061-20261018"
 created: "2026-10-18T03:40:39Z"
-summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.review run=review-061-20261018 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.review run=review-061-20261018 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=no
   "feature": "061-subagent-cli-config",
   "feature_id": "061",
   "determined_at": "2026-10-18T03:40:39Z",
-  "settled_at": null,
+  "settled_at": "2026-10-24T15:14:42Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,14 +83,14 @@ summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=no
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": "red_state_undeclared",
+      "user_turn_class": "session_end",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
       },
-      "adjacent": false,
+      "adjacent": true,
       "signal": {
         "key": "satisfaction",
         "direction": "improve"
@@ -157,18 +157,6 @@ summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=no
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -188,11 +176,6 @@ summary: "/speckit.review run=review-061-20261018 token=not_evaluated elapsed=no
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
