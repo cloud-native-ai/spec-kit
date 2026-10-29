@@ -39,11 +39,17 @@ neutral: false
 
 ## S2 — 三例判定：已声明 / 未声明 / 取值越界
 
-三例都用临时仓库树 + `--repo`，不往真实 `.specify/specs/` 写夹具：
+三例都用临时仓库树 + `--repo`，不往真实 `.specify/specs/` 写夹具。**临时树必须自带 owner 文档**：
+解析入口先解析 owner（`shared/definitions/flow-class-definitions.md`，相对 `--repo`），树里没有它时三例
+会一起降到退出码 2（`owner-unavailable`）——那是「机制缺席」的形态，不是本场景要判的三态。
 
 ```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
 TMP=$(mktemp -d)                       # 临时根，用完即删
 mkdir -p "$TMP/.specify/specs/fx-declared" "$TMP/.specify/specs/fx-absent" "$TMP/.specify/specs/fx-bad"
+mkdir -p "$TMP/shared/definitions"     # ← 补 owner：缺这行三例会同时降级
+cp shared/definitions/flow-class-definitions.md "$TMP/shared/definitions/"
+
 printf '# fx\n\n**Flow Class**: expression\n' > "$TMP/.specify/specs/fx-declared/requirements.md"
 printf '# fx\n'                                > "$TMP/.specify/specs/fx-absent/requirements.md"
 printf '# fx\n\n**Flow Class**: expressive\n'  > "$TMP/.specify/specs/fx-bad/requirements.md"
@@ -55,20 +61,23 @@ done
 rm -rf "$TMP"
 ```
 
-**实测（2026-10-30，实施前）**：三例**都**返回 `invalid unit id 'spec:fx-…'` 与 `flow_class: execution` /
-`source: default` / `marker: null`，**退出码均为 2**。这条「三例同答」正是要修的缺陷：
-声明行存在与否在今天的引擎里不可区分，作者笔误也会落到「未声明」的同一形态上。
-
-**实施后期望**：`fx-declared` → `expression` / `source: declaration` / exit 0（三者各答不同）；
+**实施后期望**（2026-10-30 实跑）：`fx-declared` → `expression` / `source: declaration` / exit 0；
 `fx-absent` → `execution` / `source: default` / `marker: <069 默认标记>` / `error.label: declaration-absent`（advisory）/ exit 0
 （这一行是「任何无该字段的线」——引擎不区分存量/新增——不阻断；它与「机制降级」的差别在 `error.label` 上可见）；
 `fx-bad` → `flow_class: null` / `source: declaration` / stderr 一行 `<code>: <path>:<line> carries 'expressive', …` /
-**exit 1**（不是 2）。
+**exit 1**（不是 2）。三例各答不同，且 `fx-absent` 与降级形态的标签不同。
 
-**Premises**：`--repo` 接受任意目录作为仓库根；三份夹具的 `requirements.md` 只需头部区即可解析；
+**裸树形态（不补 owner）**：三例一起返回 `flow_class: execution` / `source: default` / `marker: null` /
+`error.label: owner-unavailable`（stderr 点名 owner 文档不存在）/ exit 2——这是 FR-009 / C-012 的降级分支，
+**不是**本场景的三态判定；默认类别在场而 `owner-unavailable` 在 `error.label`，因此它不会被读成「作者未声明」。
+「退出码 2 不带任何类别值」的现成样例是另一条路径：spec 目录或 `requirements.md` 不存在（`flow_class: null`，C-003）。
+
+**Premises**：`--repo` 接受任意目录作为仓库根；**该根下必须有 `shared/definitions/flow-class-definitions.md`**
+（或 `.specify/shared/…` 的同名副本），否则解析在 owner 一步就降级；三份夹具的 `requirements.md` 只需头部区即可解析；
 `fx-bad` 的 `expressive` 落在封闭集之外。
-**Pinned by**：`tests/unit/test_flow_class_spec_key.py`（退出码与记录）、
-`tests/contract/test_flow_class_spec_declaration.py`（四个声明码）。
+**Pinned by**：`tests/unit/test_flow_class_spec_key.py`（退出码、记录与退出码 2 的标签）、
+`tests/contract/test_flow_class_spec_declaration.py`（四个声明码）、
+`tests/integration/test_expression_line_pilot.py`（把同样的「临时树 + 真实 owner」构造搬成夹具，八条阶段算子实跑）。
 
 ## S3 — 文档结构门禁（今天：`--action structure` 不存在）
 

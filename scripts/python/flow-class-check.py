@@ -904,18 +904,30 @@ def display_path(repo: Path, path: Path) -> str:
 
 
 def spec_input_error(repo: Path, unit_id: str, path: Path, stamp: str,
-                     output_format: str) -> int:
+                     output_format: str, detail: str = "") -> int:
     """Exit 2 for a well-formed ``spec:`` key whose line cannot be read.
 
-    The code stays inside the closed finding set: the owner parsed, so the
-    degradation is *not* ``owner-unavailable`` (that label is reserved for
-    mechanism absence, requirements FR-009); what failed is the input — the spec
-    directory or its ``requirements.md`` does not exist.
+    Two registrations meet here (contracts/class-resolution.md C-003 / C-006):
+
+    * the label is ``owner-unavailable``, not ``invalid-unit-id``. The key is
+      legal — what is missing is the input it names (the spec directory, its
+      ``requirements.md``, or a readable copy of it). Requirements FR-009 puts
+      "key or input invalid (exit 2)" in the *same* degradation branch as an
+      absent owner, and the dispatch payload's ``error`` slot is a closed
+      two-value domain ``{owner-unavailable, -}``; a third label here would
+      leave the driver's U4 without a branch (code review important-1). The
+      distinguishing information moves into ``detail``.
+    * ``flow_class`` is ``null``: an exit-2 record must never hand a consumer a
+      decided class (C-003 / C-007 — a misspelled spec key would otherwise read
+      as a firm ``execution``). ``source`` stays ``default`` because no
+      declaration line was read, and ``error.label`` is what keeps that pair
+      from being read as "not declared" (C-005, narrowed for this path).
     """
-    detail = "spec input not found: %s" % display_path(repo, path)
+    detail = detail or ("spec input not found: %s" % display_path(repo, path))
     record = default_lookup_record(unit_id, stamp)
-    record["error"] = {"label": "invalid-unit-id", "detail": detail}
-    print("invalid-unit-id: %s" % detail, file=sys.stderr)
+    record[CLASS_KEY] = None
+    record["error"] = {"label": DEGRADATION_LABEL, "detail": detail}
+    print("%s: %s" % (DEGRADATION_LABEL, detail), file=sys.stderr)
     emit_lookup(record, output_format)
     return 2
 
@@ -1065,12 +1077,13 @@ def action_lookup_spec(repo: Path, unit_id: str, name: str, stamp: str,
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
-        detail = "spec requirements unreadable: %s (%s)" % (display_path(repo, path), exc)
-        record = default_lookup_record(unit_id, stamp)
-        record["error"] = {"label": "invalid-unit-id", "detail": detail}
-        print("invalid-unit-id: %s" % detail, file=sys.stderr)
-        emit_lookup(record, output_format)
-        return 2
+        # Same exit-2 registration as an absent file: the input cannot be read,
+        # so no class is decided and the label is the closed degradation one.
+        return spec_input_error(
+            repo, unit_id, path, stamp, output_format,
+            detail="spec requirements unreadable: %s (%s)"
+                   % (display_path(repo, path), exc),
+        )
 
     declaration = parse_spec_declaration(text)
     if declaration["status"] == "error":

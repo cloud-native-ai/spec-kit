@@ -15,7 +15,10 @@
   MUST NOT 接受含 `/` 的路径形，MUST NOT 以 `feature:<ID>` 为键。(FR-003, FR-007)
 
 - **C-003** 解析位置 MUST 是 `<repo>/.specify/specs/<name>/requirements.md`；`--repo` 指向 `.specify` 自身时
-  退化为 `<repo>/specs/<name>`。spec 目录不存在时 MUST 退出码 2，且 MUST NOT 返回任何类别值。(FR-003)
+  退化为 `<repo>/specs/<name>`。spec 目录（或其 `requirements.md`）不存在或不可读时 MUST 退出码 2，且 MUST NOT 返回
+  任何类别值——`flow_class` MUST 为 `null`，`error.label` MUST 为 `owner-unavailable`，原因进 `error.detail`。
+  MUST NOT 记 `invalid-unit-id`：键是合法的，缺的是它指向的输入；阶段命令把标签原样带进派发载荷，而载荷 `error`
+  的值域恰为 `{owner-unavailable, -}`（`driver-integration.md` C-001），第三个标签会让 U4 无分支可走。(FR-003, FR-009)
 
 ## 记录形态
 
@@ -26,14 +29,18 @@
   `neutral` 为 `false`。(FR-003)
 
 - **C-005** 记录的互斥约束 MUST 成立：`source: declaration` 与 `marker: <默认标记>` MUST NOT 同时出现；
-  `flow_class: null` 与 `source: default` MUST NOT 同时出现。任一组合出现即第三态缺陷。(FR-003, FR-004)
+  `flow_class: null` 与 `source: default` 的唯一合法组合是退出码 2 的输入缺失路径，且 MUST 带
+  `error.label = owner-unavailable`——该标签是让「没有类别」不被读成「按默认的执行类」的判别位；无标签即第三态缺陷。
+  退出码 1 的作者错误 MUST 写 `flow_class: null` + `source: declaration`（C-007）。(FR-003, FR-004)
 
 ## 退出码
 
 - **C-006** 退出码 MUST 分三段：**0** = 已解析（含未声明按默认，此时 `marker` 为 069 登记的默认标记；
   `declaration-absent` 亦落此段，作 advisory）；**1** = 已声明但取值不在封闭集内，或声明行形态错误
   （`invalid-class` / `declaration-malformed` / `declaration-duplicate` / `declaration-misplaced`）；
-  **2** = 键或输入非法、spec 目录不存在、owner 不可解析（`owner-unavailable`）。1 与 2 MUST NOT 合并。(FR-003, FR-005, FR-009)
+  **2** = 键或输入非法、spec 目录不存在、owner 不可解析（`owner-unavailable`）。1 与 2 MUST NOT 合并。
+  **退出码 2 在 `spec:` 族内只有一个标签**：输入缺失 / 不可读与 owner 不可解析同为 `owner-unavailable`，
+  差别只进 `error.detail`；`invalid-unit-id` 只留给不属于任何已登记键族的调用方缺陷。(FR-003, FR-005, FR-009)
 
 - **C-007** 退出码 1 时 `flow_class` MUST 写 `null`，`source` MUST 写 `declaration`。MUST NOT 写
   `flow_class: execution` + `source: default`——那会让只看记录不看退出码的消费方把作者笔误读成一个判定。(FR-005)
@@ -59,5 +66,6 @@
 - **C-012** 解析失败 MUST 打印 `owner-unavailable` 并保持既有执行类门禁集不变；MUST NOT 中断流程、
   MUST NOT 静默切换门禁集、MUST NOT 把降级结果读作通过。该路径 MUST 只覆盖三类输入，每类都有**调用方可观察**的触发：
   ① owner 不可解析；② **调用方无法执行引擎**——触发是「引擎文件不存在」或「操作系统拒绝执行 / 进程未产出记录」，
-  此时降级标签与记录 MUST 由**调用方**写下（MUST NOT 用「引擎自己返回退出码 2」描述这一情形）；③ 键或输入非法（退出码 2）。
+  此时降级标签与记录 MUST 由**调用方**写下（MUST NOT 用「引擎自己返回退出码 2」描述这一情形）；③ 键或输入非法（退出码 2）——
+  含 spec 目录或其 `requirements.md` 不存在 / 不可读，标签同为 `owner-unavailable`、`flow_class` 为 `null`（C-003 / C-006）。
   降级 MUST 在记录（`error.label`）与派发载荷（`error=owner-unavailable`；载荷值域恰为该项与 `-`，`declaration-absent` 是 advisory 码、不进载荷）里可表示，使「降级」与「作者未声明」可区分。(FR-009)

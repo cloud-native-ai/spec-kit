@@ -20,6 +20,12 @@ whole-repository contract test cannot isolate:
 * the three exit-code segments: 0 = resolved (declared, or undeclared on the
   default), 1 = declared value outside the closed set, 2 = invalid key / missing
   spec directory / unparsable owner — 1 and 2 are never merged;
+* every exit-2 outcome of an in-family ``spec:`` key carries the one closed
+  ``owner-unavailable`` label and ``flow_class: null`` (``contracts/
+  class-resolution.md`` C-003 / C-006 / C-007): a missing spec directory or an
+  unreadable ``requirements.md`` must never read as ``invalid-unit-id`` (the key
+  is legal) nor hand a consumer a decided class; the distinguishing cause lives
+  in ``error.detail``;
 * owner resolution precedes key-grammar matching (the registered change in
   ``requirements.md`` FR-011 exemption ①): with the owner unavailable, *any* key
   exits 2 with the same ``owner-unavailable`` label;
@@ -244,6 +250,15 @@ def test_resolves_when_repo_names_dot_specify_itself(tmp_path):
 
 
 def test_missing_spec_directory_exits_2_without_a_decided_class(tmp_path):
+    """C-003 / C-006: exit 2, no class value, the closed degradation label.
+
+    A later review round found this path labelled ``invalid-unit-id`` with a
+    decided ``flow_class: execution`` — the key is well formed, so the label
+    pointed at the wrong thing, and the class contradicted C-003's "MUST NOT
+    return any class value". Both halves are asserted here: the record carries
+    no class, and the label is the one the dispatch payload's closed domain
+    (``{owner-unavailable, -}``) can carry.
+    """
     repo = _make_repo(tmp_path)
 
     proc = _lookup(repo, "spec:does-not-exist")
@@ -255,10 +270,23 @@ def test_missing_spec_directory_exits_2_without_a_decided_class(tmp_path):
     record = _json(proc)
     assert record["source"] == "default"
     assert record["marker"] is None
-    assert record["error"] and record["error"]["label"] in EXIT_2_LABELS
-    assert record["error"]["label"] == "invalid-unit-id", (
-        "the owner is parsable here, so the degradation must not be "
-        "owner-unavailable (that label is reserved for mechanism absence)"
+    assert record["flow_class"] is None, (
+        "C-003: exit 2 MUST NOT return any class value — a misspelled spec key "
+        "must not read as a firm `execution`; got %r"
+        % (record["flow_class"],)
+    )
+    assert record["error"] and record["error"]["label"] == "owner-unavailable", (
+        "a missing spec input is the same degradation branch as an absent owner "
+        "(FR-009 class ③) and must stay inside the payload's two-value error "
+        "domain; label=%r" % ((record["error"] or {}).get("label"),)
+    )
+    assert "spec input not found" in record["error"]["detail"], (
+        "the distinguishing cause belongs in detail: %r"
+        % record["error"]["detail"]
+    )
+    assert proc.stderr.startswith("owner-unavailable:"), (
+        "the stage card prints the label verbatim, so stderr must carry it: %r"
+        % proc.stderr
     )
 
 
@@ -269,7 +297,11 @@ def test_existing_spec_directory_without_requirements_exits_2(tmp_path):
     proc = _lookup(repo, "spec:fx-empty")
 
     assert proc.returncode == 2
-    assert _json(proc)["error"] is not None
+    record = _json(proc)
+    assert record["error"] is not None
+    assert record["flow_class"] is None, (
+        "C-003 holds on every exit-2 input path, not only on the missing-dir one"
+    )
 
 
 def test_spec_key_without_an_existing_directory_never_reads_the_ledger(tmp_path):

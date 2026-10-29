@@ -803,3 +803,49 @@ file.176.verdict=reviewed
 file.177.path=tests/unit/test_flow_class_spec_key.py
 file.177.verdict=reviewed
 <!-- coverage-receipt:end -->
+
+---
+
+## Author Responses（实现方逐条答复，2026-10-30）
+
+*范围：三条 `important` 逐条答复（同意／不同意 + 理由 + 修复位置）；四条 `suggestion`、两条 `nitpick`、一条 `question` 本轮不处置，仍留在上面各自的条目里，未静默丢弃。披露口径：本轮实现面只改了 `important-1/2` 点名的那一处引擎行为（把已登记的 C-003 执行到位）与 `important-3` 的模板指引，其余为规格、证据与登记面的对齐。*
+
+### [IMPORTANT] scripts/python/flow-class-check.py (Line 917) — exit 2 的标签与载荷 `error` 值域不符
+
+**同意。取「把输入缺失并入 `owner-unavailable`」这一支，不取「扩载荷值域」那一支。**
+
+**理由**：`requirements.md` FR-003 与 FR-009 ③ 早已把「键或输入非法（退出码 2）」写进同一个降级分支，`contracts/class-resolution.md` C-006 也把「spec 目录不存在」列在该段；实现却把它记成 `invalid-unit-id`——键是合法的，缺的是它指向的输入，这个标签指向了错的东西。扩值域要同时改三处（FR-018 的值域、`data-model.md` E9、U4(c) 加第三条分支），而收窄标签只要改一处，且让载荷值域继续是封闭二值 `{owner-unavailable, -}`：U4 无需新分支，接线子节「原样显示该标签」也不会再产出值域外的键。`invalid-unit-id` 保留给**不属于任何已登记键族**的调用方缺陷（裸目录名、`feature:<ID>`、路径形、`spec:` 文法之外）。
+
+**修复位置**：
+- `scripts/python/flow-class-check.py`：`spec_input_error()` 改为记 `owner-unavailable` + `flow_class: null`，原因进 `detail`；`action_lookup_spec()` 的不可读分支走同一函数（不再各自写 `invalid-unit-id`）。镜像 `.specify/scripts/python/flow-class-check.py` 由 `sync-mirrors.py --write` 生成。
+- `tests/unit/test_flow_class_spec_key.py`：`test_missing_spec_directory_exits_2_without_a_decided_class` 改为断言标签 `owner-unavailable`、`flow_class is None`、`detail` 含 `spec input not found`、stderr 以标签起头（原断言 `invalid-unit-id` 与其理由一并删除——那条理由本身与 FR-009 ③ 相反）。
+- 规格面：`requirements.md` FR-003 / FR-004 / FR-018 / FR-019(c)；`data-model.md` E3 / E2 / E9；`contracts/class-resolution.md` C-003 / C-005 / C-006 / C-012；`contracts/driver-integration.md` C-001 / C-004(c)；`skills/external/sdd-loop-driver/references/stage-prompts.md`（载荷纪律段 + U4(c) 段）。
+- 证据：`test-evidence/pilot-expression-line.txt` § 5（实跑记录：`flow_class: null` / `owner-unavailable` / `spec input not found: …` / exit 2）。
+
+### [IMPORTANT] scripts/python/flow-class-check.py (Line 910) — C-003 与引擎行为各占一半
+
+**同意。取「该路径 `flow_class` 写 `null`」这一支。**
+
+**理由**：C-003 的原文是「spec 目录不存在时 MUST 退出码 2，且 MUST NOT 返回任何类别值」，而实测给的是 `execution` + `source: default`——一个拼错的 spec 键会让「只看记录不看退出码」的消费方拿到一个确定的执行类判定，正是 C-007 的立论在 exit 2 上失效的形态。另一支（保留默认类别、靠 `error.label` 区分）会让同一族在 exit 1 与 exit 2 上对「有没有类别值」给两种答案；既然 C-003 只对**输入缺失**这一路径写死了「不带类别值」，就把这一路径执行到位。**同时把「两种形态」写清楚**（这是本条必须一起做的部分）：owner 不可解析 / 调用方无法执行引擎仍沿用既有默认记录（`execution` + `error.label`，语义是「保持既有执行类门禁集」，C-012），只有输入缺失取 `null`；这样 C-005 的互斥规则被收窄成「`null` + `default` 的唯一合法形态是输入缺失且必带 `owner-unavailable`」，而不是被悄悄放宽。
+
+**修复位置**：
+- `scripts/python/flow-class-check.py`：与上一条同一处（`spec_input_error` 写 `record[CLASS_KEY] = None`）。
+- `tests/unit/test_flow_class_spec_key.py`：新增断言 `record["flow_class"] is None`（C-003 的机器可判形态）；`test_existing_spec_directory_without_requirements_exits_2` 同步加一条同样断言，使该义务在两个输入路径上各被钉一次。
+- 规格面：`contracts/class-resolution.md` C-003 / C-005；`data-model.md` E2（`flow_class` 取值域与 `null` 的两处来源）；`requirements.md` FR-003 的「两种形态」段。
+- 证据：`test-evidence/pilot-expression-line.txt` § 5；`quickstart.md` § S2 的「裸树形态」实测（形态②的现成样例）。
+
+### [IMPORTANT] templates/plan-template.md (Line 179) — `[[STR-002]]`…`[[STR-006]]` 在下游不可解
+
+**同意。删掉 `[[STR-NNN]]` 引用，改成「逐字标题 + code-first owner 指针」。**
+
+**理由**：STR id 是每个 spec 私有的命名空间（077 自己的规格里就注明 069 已占用 `STR-003` / `STR-004`），而这份模板随 `specify init` 下发到每个项目——下游作者照这句话去自己 spec 的 § Shared Strings 找 `STR-002..006`，只会找到无关字面量或什么都找不到。可执行的 owner 在同一段里本来就有：检查器的 `STRUCTURE_HEADING` / `STRUCTURE_SUBSECTIONS` 与三个列集合常量；模板自身则是骨架的**产出方**，五个标题在模板里逐字可见，下游照抄即可，无需任何 STR 注册表。
+
+**修复位置**：
+- `templates/plan-template.md`：`## Document Structure` 注释块改写为——五个标题逐字列出 + 「读本文件，不要读别的项目的 spec 制品」+ 检查器常量名作为 code-first owner + 「本特性规格可自留 STR 表并按 id 引用，那是本规格的便利，不是 owner」。
+- `.specify/templates/plan-template.md`：镜像由 `sync-mirrors.py --write --only templates/plan-template.md` 生成，`--check` 后六对 `ok`。
+- 未动的部分（有意）：`tests/contract/test_document_structure_gate.py::test_plan_template_carries_the_document_structure_skeleton` 仍从 077 的 § Shared Strings 读字面量、与模板逐字比对——那是**本仓**的漂移守卫，不是下游的解析路径；模板不再引用 STR id 之后，该守卫的断言依然成立（27 passed）。
+
+### 静默项（未采纳但已登记，不属本轮）
+
+- 四条 `suggestion`（`stage-prompts.md` 的 `owner:` 相对路径、降级与执行类共用 `not-applicable`、`requirements-template.md` 的 `[FLOW CLASS]` 注释、证据清单的子串匹配）与两条 `nitpick`（`files_scanned` 的虚数、U4 存在性断言）、一条 `question`（围栏内的示例声明行算不算第二处声明）：本轮未改，仍以原条目为准。
+- 框架级字面量的 owner 归位（过程报告 F6 / REC_T1）本轮不改，登记为 roadmap：`.specify/memory/features/077.md` § Future Evolution Suggestions。

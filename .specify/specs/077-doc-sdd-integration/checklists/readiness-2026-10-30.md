@@ -232,6 +232,14 @@
 > **第二轮 analyze（HEAD `6217a86f`，判 BLOCKED）**：1 HIGH（R-01）+ 6 MEDIUM（R-02…R-07）+ 5 LOW（首轮 14 HIGH 已全关闭）。
 > 处置分工——R-01 与 R-02 分别**复关**已有的第 12/14/15 行（CHK026/CHK028/CHK029）与第 17 行（CHK033）；
 > R-03…R-07 与 5 条 LOW 落**第 20–29 行**。表共 **29 行**（19 条首轮 + 10 条第 20–29 行），可 29/29 逐行复核。
+>
+> **第三轮 analyze（HEAD `0c8f95d3`，0 CRITICAL / 0 HIGH，判放行）**：3 MEDIUM + 10 LOW，全部由修复提交
+> `f7ec22c5` 关闭，落**第 30–42 行**。表共 **42 行**。
+> **覆盖范围（本节自述，勿按单一计数读）**：本节覆盖 `analyze` #1 → #3 三轮——第 1–19 行 = checklist 阶段的
+> 19 条 `fail`；第 20–29 行 = analyze #2 的 10 条（R-01…R-07 与 5 条 LOW 合并为一行）；第 30–42 行 = analyze #3 的 13 条
+> （F-01…F-10 + C-02 + E-02 + B-01）。三轮的严重度计数（14 HIGH / 9 MEDIUM / 6 LOW；1 HIGH / 6 MEDIUM / 5 LOW；
+> 0 HIGH / 3 MEDIUM / 10 LOW）**只在上一段的轮次标题里各出现一次**，本表不复述、其它面只留指针
+> （`/speckit.review` 判定的计数以 `review.md` §2 为准）。
 
 | CHK | 处置落点 | 修法一句话 |
 |-----|----------|------------|
@@ -265,5 +273,19 @@
 | **28** R-07.3（MEDIUM · 29/29 可复核） | 本清单文件 | 追加本表第 20–29 行，使两轮 analyze 的全部发现各有一行处置记录、29 行可逐行复核 |
 | **29** LOW 组（5 条） | ① research R-7 → R-9；② data-model E1；③ FR-013 / E6 / C-001（doc）；④ research R-9 / C-007（wire）；⑤ FR-001 | ① 子节字面量改为**指向 R-9 的指针**（不再重抄、不引带后缀标题）；② E1「头部区内恰 1 行」统一为「**至多一行**，缺省合法」；③ 整章缺失时只报 `document-structure-missing`、**抑制**四条 `subsection-missing`（父子同因只报一次）；④ 明确「块内任何同级或更高级标题（含 `###`）一律视为块结束」、需分层用 `####`；⑤ `declaration-absent` 只作 **advisory**、不承担合规判定；新线漏声明由 plan / tasks 阶段对 `**Flow Class**` 存在性的检查承担 |
 
-**未在任何行关闭的项**：无。**清单判定的保留**：上文的 21/19 判定仍是那个时点的实测结论，不回填为 pass——
+| **30** F-01（LOW · E9 marker 行自相矛盾） | `data-model.md` E9 `marker` 行 | 「`source: default` 时空值即缺字段」改为「**且** `error=-` 时空值即缺字段」——否则同一节宣告合法的降级形态（`source=default` + 空 marker + `error=owner-unavailable`）会被自己判成缺字段 |
+| **31** F-02（MEDIUM · `docs-utils` 三选一未定） | `data-model.md` E7/E8、`contracts/document-structure.md` C-017、`contracts/driver-integration.md` C-006、`requirements.md` FR-020、`tasks.md` T019 | 四条 CLI 面行与 `structure` 子步登记为 `face_scope=sub` 面级行（不进 `passed`/`failed`）；`docs-utils.py --action validate` 取**运行**并进槽位 `command` 串——另两支被否（显式 NA 与 E7「NA 只在子行」冲突；换子步会丢掉断链检查的基线） |
+| **32** F-03（LOW · CHK029 残留条数等式） | 本文件 CHK029 处置行 | 删去「并由条数等式约束」，与第 20 行 R-01 的「删除跨级等式」一致 |
+| **33** F-04（LOW · `declaration-absent` 触发语与引擎不符） | `data-model.md` E3、`quickstart.md` S2 | 触发语改为「任何无该字段的线」（引擎不区分存量/新增）；S2 同句同步 |
+| **34** F-05（LOW · NA 豁免范围过宽） | `requirements.md` SC-003、`data-model.md` E8 `passed` 行 | NA 豁免只限 NA 子行；子行为 `fail` 时仍把算子级 verdict 转 `fail`（从而改变槽位行） |
+| **35** F-06（LOW · R-10 标题与表不符） | `research.md` R-10 | 标题「三个契约文件」→「四个契约文件」，与同节五行表一致 |
+| **36** F-07（LOW · 清单项数写错） | `plan.md` § Project Structure | 「17 项质量清单」按 `checklists/requirements.md` 的实际项数写 |
+| **37** F-08（LOW · 编辑面漏 `tests/`） | `requirements.md` FR-024、`contracts/invariants-and-distribution.md` C-004 | 编辑面枚举补 `tests/`——本特性确有框架测试面改动 |
+| **38** F-09（LOW · FR-005 覆盖行缺认领） | `tasks.md` 覆盖表 FR-005 行 | 补 T009 / T010（exit-1 停止句真正被写与被断言的两任务） |
+| **39** F-10（LOW · 错字） | `contracts/driver-integration.md` C-004(b) | 「不新增加记账字段」→「不新增记账字段」 |
+| **40** C-02（MEDIUM · 子行 fail 未钉到算子级） | `tasks.md` T016 | 断言「`build` 子行 `fail` ⇒ 算子级 `verdict=fail`」 |
+| **41** E-02（MEDIUM · SC-004 第二个落文夹具未被任务点名） | `tasks.md` T013 | T013 点名「结构绿而内容红」的第二个落文夹具 |
+| **42** B-01（MEDIUM · 零命中 grep 的 token 集过宽） | `tasks.md` T016 | token 集收窄为 `flow_class|flow-class`：`expression` 会误命中 `watch-model.md` 的 `integer expression expected`（实测：宽 token 命中该文件，窄 token 零命中） |
+
+**未在任何行关闭的项**：无——**本节覆盖 analyze #1–#3 三轮**（第 1–19 行 = checklist 阶段 19 条 `fail`；第 20–29 行 = analyze #2 的 10 条；第 30–42 行 = analyze #3 的 13 条），每一轮的每条发现都恰有一行处置。**清单判定的保留**：上文的 21/19 判定仍是那个时点的实测结论，不回填为 pass——
 本节只说明它们在修复轮之后由谁承接。

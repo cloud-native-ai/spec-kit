@@ -275,6 +275,33 @@ The findings themselves live in `.specify/specs/077-doc-sdd-integration/code-rev
 - [x] Section 5 recommendations each cite an exact target file in the spec-kit repo and at least one source finding ID.
 - [x] P0 validation status is stated explicitly. No P0 findings raised; the P0 independent-validation pass is vacuously satisfied.
 
-## 8. Feedback
+## 8. Post-review Fix
+
+The two P1s and the three `important` entries were closed by the driver after this review
+run, in one review-fix commit:
+
+- **P1-a** — a real expression-class pilot line now exists:
+  `tests/integration/test_expression_line_pilot.py` + `tests/fixtures/expression_line/`
+  (12 passed). It runs the eight stage operators for real against a synthetic fixture
+  (gate-level execution, labelled as such, never presented as a customer line).
+  `verification.md` was updated from its results: **SC-003 → `pass`**; SC-002 / SC-005 /
+  SC-008 stay `partial` with narrowed, named gaps (no real expression-class stage chain
+  in this repo).
+- **P1-b** — `quickstart.md` S2 was rewritten to the runnable form (owner documents in the
+  fixture), recorded as `PLAN-EDIT: quickstart.md — minor`.
+- **important-1/2** — a missing `spec:` input now returns exit 2 with the
+  `owner-unavailable` label and `flow_class: null` (no class value), aligning the engine
+  with C-003/C-007 and the payload `error` domain; `test_flow_class_spec_key.py` carries
+  the assertion.
+- **important-3** — the `## Document Structure` skeleton in `templates/plan-template.md`
+  now carries downstream-parsable literal headings plus an owner pointer, not per-spec
+  `[[STR-NNN]]` tokens.
+- **Author responses** for all three `important` entries are appended to `code-review.md`.
+
+Re-measured after the fix: seven gates exit 0; 218 touched/neighbour tests passed; the
+status-gate conditions are unchanged (0 open tasks, review evidence present, **0
+`blocking`**), so the Feature stays at `Ready for Review`.
+
+## 9. Feedback
 
 Please share the contents of this document with the spec-kit framework developers.

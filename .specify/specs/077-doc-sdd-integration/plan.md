@@ -253,3 +253,16 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 - **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — CHK029 处置行删去「并由条数等式约束」，与同表第 20 行 R-01 的「删除跨级等式」一致（F-03）；分类=minor。
 
 **本轮非 plan 属主制品**：`requirements.md` 的 SC-003（仅 NA 子行限定，F-05）、FR-020 的 `command` 串（补算子级 `docs-utils.py --action validate`，F-02③）与 FR-024（编辑面补 `tests/`，F-08）属 requirements 面；`tasks.md` 的 T013（补 SC-004 第二个落文夹具，E-02）/ T016（`build` 子行 fail ⇒ 算子级 fail；grep token 集收窄为 `flow_class|flow-class`，C-02 + B-01）/ T019（`command` 串同步，F-02③）与覆盖表 FR-005 行（补 T009 / T010，F-09）属 tasks 面；`quickstart.md` 的 S2 触发语（F-04）——均不在本表登记。
+
+### 修复轮 4（review 修复，2026-10-30）
+
+*`/speckit.review` 判 0 blocking → `Ready for Review`，但过程段留 2 P1 + 4 P2、代码段留 3 important 未答复。本轮按调用方派发逐条处置：**范围不变**，实现面只改了 review important-1/2 点名的退出码 2 对齐（把已登记的 C-003 执行到位，标签与类别值各一处），其余为证据与措辞；计数不变（25 FR / 8 SC / 77 条款 / 6 STR / 28 任务），`coverage-baseline.txt` 不重冻结，`shared/workflow/expression-gates.md` 与 `shared/definitions/flow-class-definitions.md` 不动，`expression-gates.md` 的算子表不碰。*
+
+- **PLAN-EDIT**: `requirements.md` — FR-003 登记「退出码 2 单一标签、两种形态」（输入缺失 ⇒ `flow_class: null`；owner 不可解析 / 引擎不可执行 ⇒ 既有默认记录 + 标签），FR-004 登记第三种合法记录形态，FR-018 / FR-019(c) 写明 `error` 值域不含第三项、U4(c) 不按原因分叉；分类=**substantive**（把「exit 2 带什么类别值」这条此前半条执行的义务定死）。
+- **PLAN-EDIT**: `data-model.md` — E3 把 `owner-unavailable` 拆成「输入缺失（`null`）」与「owner / 引擎不可用（默认类别）」两行、`invalid-unit-id` 收窄为调用方缺陷；E2 的 `flow_class` / 互斥约束同步；E9 的 `error` 行补「三类降级同一标签」；分类=**substantive**（同上）。
+- **PLAN-EDIT**: `contracts/class-resolution.md` — C-003 补 `null` + 标签 + 不得记 `invalid-unit-id`；C-005 把 `null`+`default` 的禁止收窄为「唯一合法形态且必带标签」；C-006 补「族内单一标签」；C-012 ③ 补输入缺失；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/driver-integration.md` — C-001 补降级三因同一标签、C-004(c) 补「不按原因分叉」；分类=minor（值域不变，只把已定的域与三种原因对齐）。
+- **PLAN-EDIT**: `quickstart.md` — fix S2 to the runnable form; 分类=minor。（S2 的临时树补 `shared/definitions/` 的 owner 文档、更新 Premises 与「裸树形态」实测，并把 `tests/integration/test_expression_line_pilot.py` 列入 Pinned by；证据见 `test-evidence/pilot-expression-line.txt` § 3。）
+- **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — 处置表追加第 30–42 行（analyze #3 的 13 项）并改写覆盖范围句；分类=minor。
+
+**本轮非 plan 属主制品**：`verification.md`（SC-002/003/005/008 按试点实跑更新，属 implement 面）、`code-review.md`（Author Responses，属 review 报告面）、`.specify/memory/features.md` 与 `features/077.md`（登记面）、`.specify/state/077-doc-sdd-integration.md`（状态脊）——均不在本表登记。框架源侧的改动（`scripts/python/flow-class-check.py` 的退出码 2 标签与类别值、`templates/plan-template.md` 的 STR 指针、`skills/external/sdd-loop-driver/references/stage-prompts.md` 的载荷纪律）属实现面，不进 Plan Edits。

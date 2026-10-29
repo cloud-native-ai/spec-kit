@@ -1,0 +1,115 @@
+# Evidence — expression-line pilot (077 review P1-a)
+# Generated: 2026-10-29T20:08:19Z on branch 077-doc-sdd-integration
+# Interpreter: /Users/liuqiming.lqm/project/profiles/.venv/bin/python
+# Scope: synthetic fixture pilot (tests/fixtures/expression_line/), gate-level real execution.
+#        Not a customer line; nothing here is a delivery claim beyond the eight rows.
+
+## 1. The pilot suite (eight operator rows + two gate mutations + one slot-shape mutation)
+$ python -m pytest tests/integration/test_expression_line_pilot.py -q
+............                                                             [100%]
+12 passed in 3.47s
+
+## 2. The eight-row transcript (one tree, run in order)
+$ python -m pytest tests/integration/test_expression_line_pilot.py -q -s -k all_eight
+row | verdict | rc | operator
+--- | ------- | -- | --------
+S1 | pass | 0 | flow-class-check.py --action lookup spec:777-expression-line-pilot
+S2 | pass | 0 | validate-requirements.py <fixture requirements.md>
+S3 | pass | 0 | doc-consistency-check.py --action structure --path <delivered>
+S4 | pass | 0 | doc-consistency-check.py --action verify --faces reader,evidence,duplicate,count
+S5 | pass | 0 | validate-decision-tensions.py --spec <fixture spec>
+S6 | pass | 0 | templates/commands/{7} — wiring card presence
+S7 | pass | 0 | docs-utils.py --action validate --root <pilot repo>
+S8 | pass | 1 | audit-test-budget.py --spine <fixture> --stage-check closure
+
+detail per row:
+  S1: flow_class='expression' source='declaration' marker=None error=None
+  S2: status='ok' labels=['[id-contiguous] pass (0)', '[doc-order] pass (0)', '[ref-resolvable] pass (0)', '[marker-count] pass (0)', '[dup-id] pass (0)']
+  S3: status='ok' two_way='run' findings=0 subsections={'### Chapter Tree': True, '### Reader Baseline': True, '### Evidence List': True, '### Fact Owners': True} codes=[]
+  S4: faces={'reader': 'pass', 'evidence': 'pass', 'duplicate': 'pass', 'count': 'pass'} findings=0
+  S5: status='ok' labels=['[dtr-anchor] pass (0)', '[dtr-section-missing] pass (0)', '[dtr-record-incomplete] pass (0)', '[dtr-tension-id] pass (0)', '[dtr-rejected-form] pass (0)', '[expected-sacrifice-unmapped] pass (0)']
+  S6: {'requirements': {'files': 1, 'headings': 1, 'lookups': 1}, 'clarify': {'files': 1, 'headings': 1, 'lookups': 1}, 'plan': {'files': 1, 'headings': 1, 'lookups': 1}, 'tasks': {'files': 1, 'headings': 1, 'lookups': 1}, 'checklist': {'files': 1, 'headings': 1, 'lookups': 1}, 'analyze': {'files': 1, 'headings': 1, 'lookups': 1}, 'implement': {'files': 1, 'headings': 1, 'lookups': 1}}
+  S7: violations=[]
+  S8: summary='slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0' slot_violations=[]
+.
+1 passed, 11 deselected in 0.87s
+
+## 3. quickstart S2 re-run — the runnable form (owner document copied into the temp root)
+$ bash <<'S2'  … (the snippet in quickstart.md § S2, verbatim)
+unit_id: spec:fx-declared
+flow_class: expression
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+unit_id: spec:fx-absent
+flow_class: execution
+source: default
+marker: 未声明·按默认
+basis: null
+neutral: false
+exit=0
+unit_id: spec:fx-bad
+flow_class: null
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=1
+
+## 4. The bare-tree form (no owner document) — the degradation branch, kept for contrast
+$ python scripts/python/flow-class-check.py --repo <bare tmp> --action lookup --unit-id spec:fx-declared
+unit_id: spec:fx-declared
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+exit=2
+
+## 5. The exit-2 input-missing path (C-003: no class value) — engine re-run
+$ python scripts/python/flow-class-check.py --repo <pilot repo> --action lookup --unit-id spec:missing-x --format json
+{
+  "action": "lookup",
+  "checked_at": "2026-10-29T20:08:32Z",
+  "unit_id": "spec:missing-x",
+  "flow_class": null,
+  "source": "default",
+  "marker": null,
+  "basis": null,
+  "neutral": false,
+  "error": {
+    "label": "owner-unavailable",
+    "detail": "spec input not found: .specify/specs/missing-x/requirements.md"
+  }
+}
+exit=2
+
+## 6. Non-vacuity controls (each turns its own row red; asserted by name inside the test)
+$ python -m pytest tests/integration/test_expression_line_pilot.py -q -k "turns_red or missing_slot_field"
+...                                                                      [100%]
+3 passed, 9 deselected in 0.89s
+  - test_s4_turns_red_when_the_delivered_reader_declaration_disappears
+      mutation: drop the `**Readers**:` line from the delivered document
+      asserted red: verify exits 1 with `faces.reader = fail` (named, not merely non-zero rc)
+  - test_s3_turns_red_when_the_chapter_tree_subsection_disappears
+      mutation: rename `### Chapter Tree` in the plan
+      asserted red: structure reports `subsection-missing` (a closed code, named)
+  - test_s8_a_missing_slot_field_is_named_by_the_audit
+      mutation: drop `selection_basis` from the closure slot row
+      asserted red: audit prints `reason=row 2: missing selection_basis`
+
+## 7. Reading notes (what this pilot does and does not prove)
+
+- Scope: a **synthetic fixture line** (three files under `tests/fixtures/expression_line/`) in a
+  throw-away repository under pytest's `tmp_path`. Every verdict above is read from a shipped
+  engine's exit code or output line; none is hand-written. It is not a customer line and is not
+  presented as one.
+- S8 exits 1 because the six per-stage E3 evidence files are not part of the eight rows
+  (`unknown=6`). That is the audit behaving as specified, not a slot violation: the slot half —
+  `slots=baseline:1 closure:1`, no slot-level reason — is what this row measures.
+- The stderr lines of a run may appear above its stdout in this transcript (unbuffered stderr
+  versus block-buffered stdout under command substitution); the content is verbatim.
+- Still not proven here: an `analyze` / `review` call pair on a driven expression line (SC-008's
+  2/2), and the U4 half of SC-005 (a driver prompt rule needs a driven line, not a test).

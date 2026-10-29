@@ -66,7 +66,7 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 | `action` | 常量 | `lookup` | 与既有记录一致 |
 | `checked_at` | ISO-8601 UTC | 运行时刻 | 与既有记录一致 |
 | `unit_id` | string | 键原文（含 `spec:` 前缀） | 不剥前缀，便于与台账键区分 |
-| `flow_class` | `execution` \| `expression` \| `null` | 已声明取声明值；未声明取 `execution`；取值非法取 `null` | `null` 只出现在退出码 1 |
+| `flow_class` | `execution` \| `expression` \| `null` | 已声明取声明值；未声明取 `execution`；取值非法取 `null`；**退出码 2 的输入缺失（spec 目录 / `requirements.md` 不存在或不可读）取 `null`** | `null` 出现在退出码 1（作者错误）与退出码 2 的输入缺失路径；owner 不可解析的降级形态仍带默认类别 `execution` + `error.label = owner-unavailable`（C-012 的既有语义：保持执行类门禁集） |
 | `source` | `declaration` \| `default` | 声明行在场即 `declaration`（含非法取值） | 与 `marker` 互斥（见下） |
 | `marker` | string \| `null` | 未声明时为 069 登记的默认标记；否则 `null` | 字面量归 069 § Shared Strings |
 | `basis` | `null` | 恒 `null` | 特性线的判定依据是声明行，不是台账列 |
@@ -74,7 +74,9 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 | `error` | object \| `null` | `{label, detail}` 或 `null` | `label` 取 E3 的码 |
 
 **互斥约束**：`source: declaration` 与 `marker: <默认标记>` MUST NOT 同时出现（requirements FR-004 的第三态缺陷）；
-`flow_class: null` 与 `source: default` MUST NOT 同时出现（那会把作者错误读成未声明）。
+`flow_class: null` 与 `source: default` 的**唯一合法组合**是退出码 2 的输入缺失路径，且 MUST 带
+`error.label = owner-unavailable`（原因写 `detail`）——无该标签即第三态缺陷；退出码 1 的作者错误
+MUST 写 `flow_class: null` + `source: declaration`（C-007）。
 
 **键文法**：`^spec:[a-z0-9][a-z0-9-]*$`。裸目录名、`feature:<ID>`、含 `/` 的路径都保持 `invalid-unit-id`（E3）。
 
@@ -89,8 +91,11 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 | `declaration-duplicate` | 头部区/全文出现第二行同字段 | **1** | 同上 | 阻断；点名两处行号 |
 | `declaration-misplaced` | 唯一一行位于 `## Related Feature` 之后 | **1** | 同上 | 阻断；点名行号 |
 | `declaration-absent` | 任何无该字段的线（引擎不区分存量/新增；FR-001 的作用域之外——新线漏声明的合规判定归 plan/tasks 阶段） | **0** | `flow_class: execution` / `source: default` / `marker: <默认标记>` / `error: {label: declaration-absent}` | advisory：提示可补声明；不阻断、不计缺陷、不进判定集合 |
-| `invalid-unit-id` | 键不合文法 | **2** | `flow_class: execution` / `source: default` | 降级标签同 `owner-unavailable` 的行为面 |
-| `owner-unavailable` | owner 不可解析；或**调用方无法执行引擎**（可观察触发：引擎文件不存在 / 操作系统拒绝执行 / 进程未产出记录——此时标签由调用方写下，引擎不在场自然无记录） | **2** | 同上 | 保持既有门禁集，不中断，不记通过；载荷 `error` 位取同一标签 |
+| `invalid-unit-id` | 键不属于任何已登记键族（裸目录名、`feature:<ID>`、含 `/` 的路径形、`spec:` 文法之外的形态） | **2** | `flow_class: execution` / `source: default` | 调用方缺陷，与阶段读取无关；阶段只会用 `spec:<spec 目录名>` 构造键 |
+| `owner-unavailable` | **输入缺失 / 不可读**：键合法但 spec 目录或其 `requirements.md` 不存在、不可解码（`detail` 记 `spec input not found: …` / `spec requirements unreadable: …`） | **2** | `flow_class: null` / `source: default` / `marker: null` | 保持既有门禁集，不中断，不记通过；载荷 `error` 位取同一标签 |
+| `owner-unavailable` | owner 不可解析；或**调用方无法执行引擎**（可观察触发：引擎文件不存在 / 操作系统拒绝执行 / 进程未产出记录——此时标签由调用方写下，引擎不在场自然无记录） | **2** | 沿用默认记录：`flow_class: execution` / `source: default`（调用方侧无记录可写时可写 `null`） | 同上；该形态的语义是「保持既有执行类门禁集」，类别值不构成判定 |
+
+**退出码 2 的单一标签、两种形态（2026-10-30 review 修复轮）**：键合法但输入缺失这一路径过去报 `invalid-unit-id` 并带 `flow_class: execution`——两处都与本条不符：键是合法的（缺的是输入），且 C-003 要求该路径不带任何类别值。修复后它在族内与 owner 不可解析打同一标签，`flow_class` 取 `null`、原因进 `detail`；owner 不可解析则沿用既有默认记录（类别在场但 `error.label` 标出降级，语义是「保持既有执行类门禁集」）。因此载荷 `error` 值域无需第三个取值，U4(c) 也无需第三条分支。
 
 **优先级**：`owner-unavailable` 先于键文法判断（**本特性把 owner 解析提前到键文法之前——这是相对既有 `action_lookup` 的登记变更**：既有顺序是先 `UNIT_ID_RE` 后 `parse_owner`，因此「键非法 **且** owner 不可解析」这一输入过去报 `invalid-unit-id`，此后报 `owner-unavailable`。两者同为退出码 2、门禁集不变，差异登记在 requirements FR-011 的豁免①）；同一文件既重复又错位时只报 `declaration-duplicate`（同一根因只报一次）。`declaration-absent` 与 `owner-unavailable` 互斥：前者要求「引擎与 owner 都可用」这一前提成立。
 
@@ -210,7 +215,7 @@ MUST NOT 再对四个子节逐个报 `subsection-missing`（否则同一根因�
 | `flow_class` | `execution` / `expression` | 派发构造缺陷，U4 不放行 |
 | `source` | `declaration` / `default` | 同上 |
 | `marker` | 默认标记字面量或空 | 同上（**收窄**：仅 `source: default` **且** `error=-` 时空值即缺字段；`error=owner-unavailable` 的降级形态下 `marker` 空是合法取值，不构成缺字段） |
-| `error` | **`owner-unavailable` 或 `-`**（值域恰为这两项；`-` = 无错误位。`declaration-absent` 是 advisory 发现码，只出现在 E3 的发现里，MUST NOT 进载荷） | 同上 |
+| `error` | **`owner-unavailable` 或 `-`**（值域恰为这两项；`-` = 无错误位。`owner-unavailable` 覆盖三类降级：owner 不可解析、调用方无法执行引擎、退出码 2 的输入缺失（见 E3）。`declaration-absent` 是 advisory 发现码，只出现在 E3 的发现里，MUST NOT 进载荷） | 同上 |
 
 **两个可区分的未声明形态**（本表存在的理由）：`source=default` + `marker=<默认标记>` + `error=-` = 作者没写声明（`declaration-absent` 的冷形态）；`source=default` + `marker` 空 + `error=owner-unavailable` = 机制降级。U4 必须能把二者分开：后者 MUST 走 `owner-unavailable` 分支（记降级观测、保持既有门禁集），MUST NOT 当作「作者未声明」放行，也 MUST NOT 按表达类四项校验（requirements FR-019(c)）。
 

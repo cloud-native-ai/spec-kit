@@ -10,7 +10,8 @@
 
 - **C-001** 每次阶段派发 MUST 在第①段携带类别**四元组**：`flow_class=<值>`、`source=<declaration|default>`、
   `marker=<默认标记或空>`、`error=<owner-unavailable|->`（**值域恰为这两项**：`-` = 无错误位，`owner-unavailable` =
-  机制降级；`declaration-absent` 是 advisory 发现码，MUST NOT 进载荷）。本地原生子代理与远端 CLI 两种拓扑 MUST 同规——
+  降级——owner 不可解析 / 调用方无法执行引擎 / 解析退出码 2 的输入缺失（`class-resolution.md` C-003）；`declaration-absent`
+  是 advisory 发现码，MUST NOT 进载荷）。本地原生子代理与远端 CLI 两种拓扑 MUST 同规——
   提示词是类别的唯一载体。`error` 位存在的理由是把「机制降级」与「作者未声明」在载荷上分开
   （两者都可能出现 `source=default`）。(FR-018)
 
@@ -32,7 +33,8 @@
   verdict 只由 (a) 读记录取得，MUST NOT 由「文件存在」反推；
   (c) 载荷类别与 U4 当场解析值一致，不一致判派发构造缺陷；**且载荷 `error` 位非 `-`（值域恰为
   `owner-unavailable` / `-`，故非 `-` 只能是 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支**——记一条降级观测、保持既有执行类门禁集，MUST NOT 按表达类四项校验，
-  也 MUST NOT 当作「作者未声明」放行；(d) 本阶段的 `stage-status` 行在场。(FR-019)
+  也 MUST NOT 当作「作者未声明」放行。该分支**不按降级原因分叉**（owner 不可解析 / 引擎不可执行 / 退出码 2 的输入缺失走同一分支），
+  U4 MUST NOT 为输入缺失设第三个分支，也 MUST NOT 按 `detail` 文本判定；(d) 本阶段的 `stage-status` 行在场。(FR-019)
 
 - **C-005** 哨兵与产物具备而门禁证据缺失时 MUST 判未完成，MUST NOT 以「产物看起来对」放行；MUST NOT 派发下一阶段。(FR-019)
 

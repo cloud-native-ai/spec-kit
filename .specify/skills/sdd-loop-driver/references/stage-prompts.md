@@ -27,7 +27,7 @@
 - **唯一载体**：提示词是类别的唯一载体（环境变量不被远端子代理继承）；本地原生子代理与远端 CLI 两种拓扑**同规**——四元组一律写在第①段，两种拓扑逐字相同。
 - **取值来源**：唯一来源是该线 `requirements.md` 的**声明行**，经同一解析入口在**每次阶段派发前**解析一次；状态脊中的类别行只是带日期的观测，MUST NOT 充当**取值来源**；重入时重新解析并与观测比对，不一致记 `re-baseline` 事件并更新观测。
 - **缺键即缺陷**：缺任一元组键（`flow_class=` / `source=` / `marker=` / `error=`）即判**派发构造缺陷**，U4 不放行。阶段**子代理** MUST NOT 自行**推断**、补默认或按介质猜测类别——它既没有声明面，也没有解析入口。
-- **`error` 位值域**：`error` 的值域恰为 `owner-unavailable` / `-` 两项——`-` = 无错误位，`owner-unavailable` = 机制降级。`declaration-absent` 是 advisory 发现码，MUST NOT 进入**载荷**（否则「作者未声明」会被读成一种错误）。
+- **`error` 位值域**：`error` 的值域恰为 `owner-unavailable` / `-` 两项——`-` = 无错误位，`owner-unavailable` = 降级。**降级有三种原因，标签只有一个**：owner 不可解析、调用方无法执行引擎、解析以退出码 2 报输入缺失（spec 目录或其 `requirements.md` 不存在 / 不可读；`flow-class-check.py` 对该路径同样打 `owner-unavailable`，原因写 `detail`）。**不要**把 `invalid-unit-id` 写进载荷——它只属于「键不属于任何已登记键族」的调用方缺陷，阶段永远不会用它构造键。`declaration-absent` 是 advisory 发现码，MUST NOT 进入**载荷**（否则「作者未声明」会被读成一种错误）。
 - **`marker` 位的收窄**：`marker` 为空只在 `error=owner-unavailable` 时合法（降级形态本就没有默认标记）；`source=default` 且 `error=-` 时 `marker` 为空即**缺字段**，按缺键处置。两个可区分的未声明形态：`source=default` + `marker=<默认标记>` + `error=-` = 作者没写声明；`source=default` + `marker` 空 + `error=owner-unavailable` = 机制降级。
 
 ### 第②段：执行要求（默认纪律，每次派发原样携带）
@@ -88,7 +88,7 @@ analyze 等声明只读的阶段沿用同一三段骨架，但第①/②段 MUST
 
 - **(a) 算子结果齐备**：本阶段**在门禁 owner 阶段算子表中登记的 blocking 行**各有一条结果记录，且无 `not-evaluated`——**计数分母只取该表**：表达类 implement 为 1 行（`G-implement-structure`）；四个 CLI 输出面 MUST NOT 各自被当作算子重复计入。站点构建检查并入同一算子的 `face=build` **子行**，不另立算子、不另占 `operator_id`（`face_scope` 三值：`gate` / `cli` 只出现在算子级行，`sub` 只出现在面级解释行）。
 - **(b) 证据文件存在且非空**：该记录指向的证据文件存在且非空——**不做哈希比对**；MUST NOT 给算子记录新增 `evidence_sha256` 之类的**记账字段**（既有 `gate-implement-evidence-binding` 的哈希只约束 `verification.md` 的 SC 样本行，其 owner 明写非 `pass` 判定不承担绑定义务）。verdict 只由 (a) 读记录取得，MUST NOT 由「文件存在」反推。
-- **(c) 载荷与当场解析一致 + 降级分支**：派发载荷的类别与 U4 **当场解析**值**一致**，不一致判**派发构造缺陷**；载荷 `error` 位非 `-`（值域恰为 `owner-unavailable` / `-`，故非 `-` 只能是 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支——记一条**降级观测**、**保持既有**执行类门禁集，MUST NOT 按**表达类**四项校验，也 MUST NOT 当作「作者未声明」放行。
+- **(c) 载荷与当场解析一致 + 降级分支**：派发载荷的类别与 U4 **当场解析**值**一致**，不一致判**派发构造缺陷**；载荷 `error` 位非 `-`（值域恰为 `owner-unavailable` / `-`，故非 `-` 只能是 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支——记一条**降级观测**、**保持既有**执行类门禁集，MUST NOT 按**表达类**四项校验，也 MUST NOT 当作「作者未声明」放行。该分支**不按原因分叉**：owner 不可解析、引擎不可执行与退出码 2 的输入缺失（spec 目录 / `requirements.md` 不存在）同走一条，MUST NOT 为输入缺失设第三分支，也 MUST NOT 按 `detail` 文本判定。
 - **(d) `stage-status` 行在场**：本阶段的 `stage-status` 行**在场**；定向集记录义务不因类别免除——仅文档改动亦 MUST 留该行。
 
 **「四面」与算子表不是同一计量单位**：四面指 CLI 输出面（`reader` / `evidence` / `duplicate` / `count`），不是算子表的四行；U4(a) 的计数分母取算子表（表达类 implement 仅 `G-implement-structure` 一行），四面结果与结构子步由同一份门禁输出文件承载。

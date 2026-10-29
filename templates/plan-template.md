@@ -175,14 +175,18 @@ reference the real directories captured above. Explicitly note any new top-level
   ACTION REQUIRED (expression-class lines only): replace every [<placeholder>] below, or delete
   this whole section. Delete it also when this line declares no class.
 
-  OWNERSHIP: the four subsection literals and the chapter/reader/evidence/owner semantics are
-  registered in the feature's `requirements.md` § Shared Strings ([[STR-002]] … [[STR-006]]), and
-  the three column sets plus the two reader markers are held code-first by
+  OWNERSHIP: this template is the **producer** of the skeleton, so the literals are written here
+  verbatim — the chapter heading `## Document Structure` and its four subsections `### Chapter Tree`,
+  `### Reader Baseline`, `### Evidence List`, `### Fact Owners`. Read them from this file, not from
+  another project's spec artifacts: `[[STR-NNN]]` ids are a per-spec namespace, so a downstream
+  project that went looking for `[[STR-002]]`…`[[STR-006]]` in its own § Shared Strings would find
+  unrelated literals or nothing at all.
+  The semantics, and the code-first owner of the grammar, are
   `scripts/python/doc-consistency-check.py` (`STRUCTURE_HEADING`, `STRUCTURE_SUBSECTIONS`,
   `CHAPTER_TREE_COLUMNS`, `EVIDENCE_LIST_COLUMNS`, `FACT_OWNERS_COLUMNS`,
-  `READER_BASELINE_MARKERS`). This template is the **producer** of the skeleton — that is why the
-  literals appear here once. Every other artifact (contracts, requirements, tasks, tests, script
-  constants) MUST reference them as `[[STR-NNN]]` and MUST NOT re-copy the literals.
+  `READER_BASELINE_MARKERS`); a checker consumes those constants, never a copied heading.
+  A feature spec that keeps its own Shared Strings table MAY cite this section by its STR ids —
+  that is a per-spec convenience and never the owner.
 
   CLASS CONDITION: 表达类 MUST 产出该章节、执行类 MUST NOT 被要求产出 — this section is a required
   plan output for an expression-class line, and it MUST NOT become a new mandatory section for an

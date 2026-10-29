@@ -115,7 +115,8 @@ last_verdict: implement DONE — 28/28 任务（4 段）；Feature 077 = Impleme
 
 - analyze #1（`d05d3bef`）：14 HIGH / 9 MEDIUM / 6 LOW → 修复 `6217a86f`（29/29）
 - analyze #2（`6217a86f`）：1 HIGH（R-01 NA 计数单位）/ 6 MEDIUM / 5 LOW → 修复 `0c8f95d3`（12/12，R-01 取「构建并入 `G-implement-structure` 单条结果、删槽位等式、NA 面级」）
-- analyze #3（`0c8f95d3`）：**0 CRITICAL / 0 HIGH** / 5 MEDIUM / 10 LOW → 放行 implement；实现前提醒 F-01/F-02/F-03 由 `f7ec22c5` 微修（13/13，记录形态，计数不变）
+- analyze #3（`0c8f95d3`）：**0 CRITICAL / 0 HIGH** / 3 MEDIUM / 10 LOW → 放行 implement；实现前提醒 F-01/F-02/F-03 由 `f7ec22c5` 微修（13/13，记录形态，计数不变）
+  - **计数更正（2026-10-30 review 修复轮）**：本行原写「5 MEDIUM」。`/speckit.review` 的过程报告 `review.md` § F4 以三处记录（本行 / `plan.md` § 修复轮 3 / 提交 `f7ec22c5` 的说明）比对，判 3 MEDIUM 为真：修复提交的 13 项 = F-01…F-10（10 项）+ C-02 + E-02 + B-01（3 项），且 `plan.md` 与提交说明均写「3 MEDIUM + 10 LOW」。**此处以 `review.md` 为准**，回改为 3；派生计数此后只在 checklist 处置表的分轮登记里出现一次（第 30–42 行），本脊与 `features.md` 只留指针。
 - 七道门全程 exit 0；069 契约与状态零回写
 
 ## Implement 分段计划
@@ -136,6 +137,7 @@ last_verdict: implement DONE — 28/28 任务（4 段）；Feature 077 = Impleme
 - 探针：`lookup spec:077-doc-sdd-integration` → `flow_class=execution, source=declaration, error=null`
 - 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
 - 偏差：Measured Premises 条款提及数 85→99（定义数仍 77）；测试断言改为点名第二行取值；缺 spec 目录取 `invalid-unit-id`；模板字段行不带行尾两空格
+  - **更正（2026-10-30 review 修复轮）**：上一条「缺 spec 目录取 `invalid-unit-id`」不再是当前事实——`/speckit.review` 的代码段把它列为 important-1/2：该路径的键合法，标签应落 `owner-unavailable`，且 C-003 要求退出码 2 不带任何类别值。现行为：`owner-unavailable` + `flow_class: null` + `detail: spec input not found: …`（见 `verification.md` 的 review 修复轮登记与 `test-evidence/pilot-expression-line.txt` § 5）。原行保留为 P1 时点的记录。
 
 ### implement P2 — DONE（2026-10-30）
 
