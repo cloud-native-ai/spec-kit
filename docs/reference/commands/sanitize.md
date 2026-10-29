@@ -5,12 +5,14 @@ Framework material hygiene: detects stale/residual and redundant materials (sema
 ## Execution Flow
 
 ```text
-/speckit.sanitize [check] [--lane materials|retention|all] [--roots <csv>]
+/speckit.sanitize [check] [--lane materials|retention|renumber|all] [--roots <csv>]
 ```
 
 **Materials lane (default)** — seven stages: Preflight → Collect → Judge → Present → Confirm → Apply → Wrap-up. Default runs the full flow; `check` stops after Present (no cleanup prompt); `--roots` restricts the scan to a subset of material roots (partial scans never auto-resolve findings).
 
-**Retention lane (`--lane retention`)** — consume → receipt → retire for the per-run record stores. Five steps: Preflight → Scan → Distill/Promote → Plan/Present → Confirm/Apply. `--lane all` runs materials first, then retention. `check` stops after Scan/Present.
+**Retention lane (`--lane retention`)** — consume → receipt → retire for the per-run record stores. Five steps: Preflight → Scan → Distill/Promote → Plan/Present → Confirm/Apply. `--lane all` runs materials first, then retention, then renumber. `check` stops after Scan/Present.
+
+**Renumber lane (`--lane renumber`)** — sequence-number collision repair for concurrent/parallel lines: Preflight → Scan → Plan/Present → Confirm → Apply. Four families: spec directory numbers (`.specify/specs/NNN-slug`), register IDs (`REC-<prefix>-NN`, `OI-<prefix>-NN`, `OI-N`, `T-NNN`), REC/OI prefix-follow for a renamed spec, and feature-local `T`/`CHK` duplicates. Repair is **duplicate-only**: a freed number is never reused and gaps are never compacted.
 
 ### Engine Calls
 
@@ -43,6 +45,31 @@ Retention artifacts are durable evidence under `.specify/memory/retention/`:
 
 `apply` requires `confirmed: true`, re-checks every receipt / grace / entry state, and refuses dirty git paths. A non-git workspace needs the explicit `--allow-unversioned` override. The lane never writes the materials findings ledger.
 
+### Renumber Engine Calls
+
+```bash
+python3 .specify/scripts/python/renumber-utils.py --action scan --workspace-root . --format json
+python3 .specify/scripts/python/renumber-utils.py --action plan --workspace-root . --format json
+python3 .specify/scripts/python/renumber-utils.py --action apply --plan <plan.json> [--groups <csv>] --workspace-root . --format json
+python3 .specify/scripts/python/renumber-utils.py --action dismiss --group <id> --reason <path> --workspace-root . --format json
+python3 .specify/scripts/python/renumber-utils.py --action status --workspace-root . --format json
+```
+
+Stage semantics:
+
+- **Scan** is read-only and reports per-family counts, the collision groups, and informational notes (non-conforming spec prefixes such as `065a-`, register codes with no machine allocation rule).
+- **Plan** writes `confirmed: false` under `.specify/memory/renumber/plans/`. Each group names the kept owner with its evidence, the old → new token, the full reference inventory (file × hit count), branch-name guards, ambiguous-reference counts and cross-group dependencies. Next-free allocation counts archived spec numbers and never reuses a freed number.
+- **Confirm** is the same single front-loaded destructive batch as the cleanup plan — no second gate. A group with ambiguous references is `needs-decision` and is never guessed: a duplicated identifier cannot say which definition a mention means. `--adopt-ambiguous-refs` exists only for the user-stated reading that every mention refers to the kept definition.
+- **Apply** requires `confirmed: true` and a git workspace (a directory rename outside git loses its history). It re-checks the mapping, the git-clean state of every target and the branch guard, executes renames plus rewrites, re-scans, and writes one ledger per batch. Rewrites cover framework-owned materials; `.specify/history/`, archives, `test-evidence/` logs and date-named files keep the old identity and are reported as `excluded_hits` (not a failure). Branch renames are printed as `git branch -m` commands, never executed.
+
+Renumber artifacts under `.specify/memory/renumber/` are durable evidence, one file per entry (concurrent writers never share a path):
+
+| Path | Content |
+|------|---------|
+| `plans/` | one per plan, `confirmed: false` until the user releases it |
+| `dismissals/` | one per adjudicated overlap: group id, reason path, timestamp |
+| `ledger/` | one per apply batch: groups applied, unresolved groups, excluded hits |
+
 ## Findings Store
 
 `.specify/memory/sanitize/findings.json` — a cumulative ledger keyed by stable IDs (`sha1(category|target)[:12]`). Lifecycle: `pending` → `resolved` (disposition executed) or `dismissed` (user rejects); findings not re-detected on a full scan auto-resolve (external fixes converge naturally); re-detection after resolution reopens the finding (regression signal).
@@ -68,7 +95,7 @@ Retention artifacts are durable evidence under `.specify/memory/retention/`:
 
 ## Scope
 
-Checks and cleanup target **framework-owned materials only** (memory layer, specs, history, mirrors, compat symlinks, docs tree). The retention lane additionally treats the framework-owned record stores (`exec-quant`, `feedback`, `session`) as **data**; it consumes and retires them under the receipt gate. User source code, product scripts, and test cases are never assessed or modified. Non-git environments degrade semantic detection (deterministic checks unaffected); retention deletion in a non-git workspace requires an explicit override.
+Checks and cleanup target **framework-owned materials only** (memory layer, specs, history, mirrors, compat symlinks, docs tree). The retention lane additionally treats the framework-owned record stores (`exec-quant`, `feedback`, `session`) as **data**; it consumes and retires them under the receipt gate. The renumber lane rewrites references inside framework-owned materials but never touches git refs, dated records, or evidence logs. User source code, product scripts, and test cases are never assessed or modified. Non-git environments degrade semantic detection (deterministic checks unaffected); retention deletion in a non-git workspace requires an explicit override, while renumber apply refuses a non-git workspace outright.
 
 ## See Also
 

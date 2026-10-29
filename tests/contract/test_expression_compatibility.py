@@ -461,6 +461,26 @@ ALLOWED_POST_BASELINE_CHANGES = {
         ),
         "markers": ("Custom-subject observation source", "运行判定历史未评估"),
     },
+    # 2026-10-29 renumber lane (sanitize --lane renumber): two non-wiring skills
+    # gain the one sanctioned exception to their "never renumber" rule —
+    # duplicate-ID collision repair, which only re-labels a duplicated definition.
+    # Pinned by tests/contract/test_sanitize_renumber_lane.py and
+    # tests/unit/test_renumber_engine.py.
+    "skills/internal/create-tasks/SKILL.md": {
+        "reason": (
+            "2026-10-29 renumber lane: the rerun contract names its sole exception "
+            "(duplicate-ID collision repair by /speckit.sanitize --lane renumber) "
+            "so the append-only rule stops reading as absolute"
+        ),
+        "markers": ("one sanctioned exception", "/speckit.sanitize --lane renumber"),
+    },
+    "skills/internal/implement-feature/SKILL.md": {
+        "reason": (
+            "2026-10-29 renumber lane: the append-tasks directive names the same "
+            "sole exception, scoped to a duplicated definition"
+        ),
+        "markers": ("one sanctioned exception", "/speckit.sanitize --lane renumber"),
+    },
     # 2026-10-27 Directory Governance amendment (trunk): two non-wiring skills
     # legitimately gained their Directory Governance segments; each entry carries
     # the needles its change must contain.
@@ -474,11 +494,11 @@ ALLOWED_POST_BASELINE_CHANGES = {
     },
     "skills/internal/sanitize-materials/SKILL.md": {
         "reason": "2026-10-27 Feature 073 record-retention lane (sanitize --lane retention)",
-        "markers": ("--lane materials|retention|all", "record-retention.py", "Receipt red line"),
+        "markers": ("--lane materials|retention|renumber|all", "record-retention.py", "Receipt red line"),
     },
     "templates/commands/sanitize.md": {
         "reason": "2026-10-27 Feature 073 record-retention lane entry and delegation",
-        "markers": ("--lane materials|retention|all", "record-retention.py"),
+        "markers": ("--lane materials|retention|renumber|all", "record-retention.py", "renumber-utils.py"),
     },
     # 2026-10-28 trunk fix(sdd-loop-driver): read-only stages account for the
     # wrap-up bookkeeping entries; the analyze surface scopes its read-only

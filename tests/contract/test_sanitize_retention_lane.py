@@ -33,7 +33,7 @@ def _text(path: Path) -> str:
 
 def test_skill_declares_lane_and_receipt_gate():
     text = _text(SKILL)
-    assert "--lane materials|retention|all" in text
+    assert "--lane materials|retention|renumber|all" in text
     assert "record-retention.py --action scan" in text
     assert "Receipt red line" in text
     assert "No receipt means no deletion" in text
@@ -45,7 +45,7 @@ def test_skill_declares_lane_and_receipt_gate():
 
 def test_template_declares_lane_and_engine():
     text = _text(TEMPLATE)
-    assert "--lane materials|retention|all" in text
+    assert "--lane materials|retention|renumber|all" in text
     assert "record-retention.py" in text
     assert "retention lane" in text
     assert ".specify/memory/retention/" in text

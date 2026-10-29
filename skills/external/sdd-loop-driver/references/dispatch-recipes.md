@@ -22,7 +22,7 @@
 - **等待**：原生调用是同步阻塞调用，返回即阶段结束——这次调用本身就是 U3 的等待；不适用 `watch-model.md` 的窗口/心跳/退出记录判定，也不得为它启动 `watch-target.sh`。
 - **状态与校验**：U2 派发前写状态脊；返回后按 U4 独立校验（校验者仍不是执行子代理）。失败/超时按 U5 的重试与上送规则处置——没有后台进程可杀。
 - **多线**：宿主支持并行原生调用时可按线并行；否则串行，一线一状态脊。
-- **边界**：MUST NOT 在本地以 `qodercli` / `claude -p` 等外部 CLI 启动子代理；本文件 Recipe 2–3 的 runner/脱离/统一监听仅用于远端拓扑。宿主没有原生子代理能力时，由驱动者在本会话直接执行阶段命令（单代理形态），仍不得降级到外部 CLI。
+- **边界**：MUST NOT 在本地以 `qodercli` / `claude -p` 等外部 CLI 启动子代理；本文件 Recipe 2–3 的 runner/脱离/统一监听仅用于远端拓扑。宿主没有原生子代理能力时，由驱动者在本会话直接执行阶段命令（单代理形态），仍不得降级到外部 CLI。本条只约束**阶段派发**：`/speckit.analyze` §5.5 的只读验证波不是阶段子代理，执行者不可嵌套时按 `.specify/shared/definitions/subagent-definitions.md` § Mode Selection 选 external 只读校验器（`qodercli` 允许），MUST NOT 用宿主会话创建 API（`create_chat_session` 等）。
 
 ## 阶段子代理预算与分段（Stage Subagent Budget & Bounded Dispatch）
 
@@ -182,7 +182,7 @@ ssh -o BatchMode=yes <alias> \
 
 ## Recipe 5 — 本地拓扑与远端 runner 变体
 
-> **SDD local default**：本地拓扑的缺省承载是**宿主原生子代理 / 编排者直执**（见本文件 `## 本地原生拓扑`）。下面的 runner/脱离形态用于**远端**；本地 MUST NOT 以 `qodercli` 作为 SDD 缺省子代理。只有入口显式要求“本地外部派发”时才允许本地 runner，并须记录该例外。
+> **SDD local default**：本地拓扑的缺省承载是**宿主原生子代理 / 编排者直执**（见本文件 `## 本地原生拓扑`）。下面的 runner/脱离形态用于**远端**；本地 MUST NOT 以 `qodercli` 作为 SDD 缺省子代理。只有入口显式要求“本地外部派发”时才允许本地 runner，并须记录该例外。（analyze 验证波例外见 `## 本地原生拓扑` 边界条。）
 
 - **本地原生缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`~/tmp/<project>/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」；一阶段一次原生调用，不写 runner、不建 FIFO/hook。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听不适用窗口模型（`watch-model.md` §6）。
 - **远端 runner（缺省形态，与远端同构）**：`setsid` 可用时优先，本机 macOS 无 `setsid` 时用 `nohup + disown`；stdin 接 `/dev/null`，stdout/stderr 重定向到 runner-log：

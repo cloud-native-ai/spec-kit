@@ -31,6 +31,7 @@ probe_utils = _load_module("probe_utils", "probe-utils.py")
 feedback_utils = _load_module("feedback_utils", "feedback-utils.py")
 history_utils = _load_module("history_utils", "history-utils.py")
 sanitize_utils = _load_module("sanitize_utils", "sanitize-utils.py")
+renumber_utils = _load_module("renumber_utils", "renumber-utils.py")
 
 
 def run_specify_init(args: list[str]):
