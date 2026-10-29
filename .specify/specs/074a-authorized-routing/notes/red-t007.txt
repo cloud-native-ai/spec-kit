@@ -1,0 +1,226 @@
+### CMD: python3 -m pytest -q tests/contract/test_sdd_authorization.py
+EEEEEEEEEEE                                                              [100%]
+==================================== ERRORS ====================================
+_________ ERROR at setup of test_both_halves_allowed_resolves_allowed __________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+__________ ERROR at setup of test_seat_forbidden_names_the_seat_half ___________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+_________ ERROR at setup of test_agent_key_absent_names_the_agent_half _________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+____________ ERROR at setup of test_both_halves_failing_names_both _____________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+________ ERROR at setup of test_absent_seats_map_defaults_to_forbidden _________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+________ ERROR at setup of test_absent_seat_entry_defaults_to_forbidden ________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+__ ERROR at setup of test_flow_style_seats_map_is_refused_with_the_seat_named __
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+__ ERROR at setup of test_dangling_seat_entry_is_refused_with_the_seat_named ___
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+_________ ERROR at setup of test_payload_with_only_the_seat_is_refused _________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+_ ERROR at setup of test_refusal_record_carries_two_source_paths_and_the_seat_slug _
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+_______________ ERROR at setup of test_authorize_writes_no_file ________________
+
+    @pytest.fixture(autouse=True)
+    def _engine_present():
+        """Fail on absence for the right reason.
+    
+        Without this guard every ``rc == 2`` assertion below would pass while the engine
+        does not exist yet (``python3 <missing file>`` also exits 2), which is exactly the
+        false green this slice's red-first discipline exists to prevent.
+        """
+>       assert ENGINE.is_file(), (
+            f"--action authorize engine is missing: {ENGINE} (delivered by task T011)"
+        )
+E       AssertionError: --action authorize engine is missing: /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T011)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py').is_file
+
+tests/contract/test_sdd_authorization.py:53: AssertionError
+=========================== short test summary info ============================
+ERROR tests/contract/test_sdd_authorization.py::test_both_halves_allowed_resolves_allowed
+ERROR tests/contract/test_sdd_authorization.py::test_seat_forbidden_names_the_seat_half
+ERROR tests/contract/test_sdd_authorization.py::test_agent_key_absent_names_the_agent_half
+ERROR tests/contract/test_sdd_authorization.py::test_both_halves_failing_names_both
+ERROR tests/contract/test_sdd_authorization.py::test_absent_seats_map_defaults_to_forbidden
+ERROR tests/contract/test_sdd_authorization.py::test_absent_seat_entry_defaults_to_forbidden
+ERROR tests/contract/test_sdd_authorization.py::test_flow_style_seats_map_is_refused_with_the_seat_named
+ERROR tests/contract/test_sdd_authorization.py::test_dangling_seat_entry_is_refused_with_the_seat_named
+ERROR tests/contract/test_sdd_authorization.py::test_payload_with_only_the_seat_is_refused
+ERROR tests/contract/test_sdd_authorization.py::test_refusal_record_carries_two_source_paths_and_the_seat_slug
+ERROR tests/contract/test_sdd_authorization.py::test_authorize_writes_no_file
+11 errors in 0.09s
+### RC=1
