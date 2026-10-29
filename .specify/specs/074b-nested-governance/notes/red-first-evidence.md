@@ -330,3 +330,69 @@ effective: forbidden forbidden
 ```
 
 Had any other field moved, the C-2 cases fail — which is the property they are written to hold.
+
+## E-7 · `tests/contract/test_sdd_compat_containment.py` — RED (T019)
+
+**Captured**: 2026-10-29, before the file existed. The red form for a not-yet-written suite is its
+absence, so the capture is the failing lookup rather than a failing assertion:
+
+```text
+$ test -e tests/contract/test_sdd_compat_containment.py; echo "exists rc=$?"
+exists rc=1
+
+$ python3 -m pytest -q tests/contract/test_sdd_compat_containment.py
+ERROR: file or directory not found: tests/contract/test_sdd_compat_containment.py
+no tests ran in 0.01s
+rc=4
+```
+
+**Reading**: rc=4 is pytest's "no such path", so no case of this suite could have run before it was
+written — the red is the missing file, and the green below is therefore the first execution of every
+case in it.
+
+## E-8 · `tests/contract/test_sdd_compat_containment.py` — GREEN (T019 file landed, T020 run)
+
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_compat_containment.py
+...........                                                              [100%]
+11 passed in 0.32s
+rc=0
+```
+
+**T020's run** — the compatibility suite together with the file T017 extended, because the two files
+together are what carry C-1…C-12:
+
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_invocation_governance.py
+..................................                                       [100%]
+34 passed in 0.85s
+rc=0
+```
+
+**Non-vacuity of the six negative clauses** (measured, not assumed). Each clause is an *absence*, and
+an absence assertion is worthless if its token set could never appear. Two checks, both executed:
+
+1. The section reader is live — `_report_section()` returns `1612` characters of the actual
+   `### Nested SDD Runs section` body (and the helper asserts a single heading and a non-empty body
+   before any case uses it), so the absence checks are run against text, not against `""`.
+2. Injecting the forbidden token into the extracted text flips the corresponding criterion:
+
+```text
+clean offenders: []
+mutated 集成  : ['集成']
+mutated 确认门: ['确认门']
+C-8 on clean: []
+C-8 mutated : ['Work Package']
+C-9 U-token on clean: None
+C-9 U-token mutated : <re.Match object; span=(1617, 1619), match='U3'>
+C-12 target_ref on clean: True True
+```
+
+The tokens are also ordinary vocabulary elsewhere in the framework sources (`集成` in 18 files,
+`确认门` in 17, `daemon` in 13, `scheduler` in 4, `自动上送` in 2), so their absence from this one
+section is a property of the section rather than of an unreachable string list.
+
+3. The C-10 gate case carries its own positive control: the scanner reports gates in
+   `skills/internal/create-team/references/summary-mapping.md` and
+   `shared/guidelines/task-complexity-rubric.md`, i.e. it does see these document families, while
+   none of the slice's nine delivered paths is a gate source.

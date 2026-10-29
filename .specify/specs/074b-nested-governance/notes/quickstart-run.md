@@ -199,3 +199,44 @@ slice does not own (`tests/contract/test_proactive_trigger_section.py` C-3 and C
 adjacency, and `test_ask_record_repeat.py` re-states it). The section was moved to the next free
 slot; no contract text changed, only the position. Commit `e1ee11c35`.
 
+
+---
+
+## S6 — the containment claim's post-change half (executed 2026-10-29, T020)
+
+The pre-change half of S6 (`quickstart.md` § S6) froze 266 cases across 17 files in 7 named sets.
+This is the half it deferred: the same command over the same file list, compared set-wise, with the
+verdicts of the shared ids measured rather than assumed.
+
+```bash
+# collection, same command and same file list as the pre-change capture
+$ python3 -m pytest --collect-only -q <the 17 files of the 7 named sets>
+272 tests collected in 0.31s
+
+# per set: comm -23 <(sort pre) <(sort post) MUST be empty
+S1: dropped=0 added=6
+S2: dropped=0 added=0
+S3: dropped=0 added=0
+S4: dropped=0 added=0
+S5: dropped=0 added=0
+S6: dropped=0 added=0
+S7: dropped=0 added=0
+
+# verdicts of the shared ids
+$ bash scripts/bash/run-tests.sh <the same 17 files>
+============================= 272 passed in 27.26s =============================
+rc=0
+```
+
+**Reading**: `dropped=0` in every set discharges the superset direction by *name* (a rename plus an
+addition nets to zero in a count and would hide a dropped obligation, which is why the count line
+above is labelled orientation-only). The six additions are exactly the cases T017 landed in S1 and
+they are listed one by one in `test-evidence/containment-post-change-collect.txt`. All 266 shared ids
+are green after the change as they were green before it, so no shared id's verdict moved.
+
+**Also re-measured here** (same run, `notes/pre-change-measurements.md` § 10): the four predecessor
+surfaces are a zero diff against the baseline commit, with a positive control showing the same
+`git diff` form reporting a non-empty stat for a path this slice did edit.
+
+**Premises**: the comparison is node-id set based, never count based; the baseline commit is the one
+the carrier names (`stage_base=33269994a`), not the current HEAD.
