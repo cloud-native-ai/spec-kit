@@ -124,6 +124,7 @@
 - **只有非裁定分支里**，§ Definition-class default 的跨切面默认才生效。
 - **MUST NOT 静默默认 `direct`**：`direct` 只在 § Verdict table 六条全部成立时返回；任何一条不成立都不会落到它，也不会落到一个「差不多」的值上。
 - **每个裁决带一个理由码**：取自 § Reason codes 的封闭词表，且 MUST 同时携带五项输入原值与全部命中条件 id，使同一输入求值两次得到逐字节相同的输出（SC-002）。
+- **「全部命中条件」含被吸收的那些**：记录的 `triggered_conditions` 是三个分支一起算出的**全部**命中条件 id。一个 `sdd` 裁决旁边出现属于 `direct` 分支的条件 id 是预期的——它表示那条边际条件当时也成立，只是被更高优先级的裁决吸收了；反过来，`adjudicate` 裁决旁边出现 `sdd` 或 `direct` 的条件 id 同理。
 
 **机读面（优先级 / precedence，1 最高）**：`adjudicate` > `sdd` > `direct`
 
@@ -182,3 +183,30 @@
 
 - **载体**：本切片的裁决记录落在 **Agent 执行证据**里。嵌套运行的 handoff 与调用方的结果**按稳定路径引用同一条记录**，不复算——外层读到的就是该职责实际据以行动的那条裁决。
 - **时间戳由记录侧承载、引擎不自造**：引擎 MUST NOT 读时钟（同一输入两次求值必须逐字节一致，C-24）。`recorded_at` 缺省为 `null`，由调用方以 `--recorded-at` 传入，或在写入证据时补齐；引擎只把它原样放进载荷。
+
+## Golden case table
+
+黄金用例（F-2 / F-4 的逐行可判定面）。**行集的唯一落点是本表**：测试代码、独立数据文件、任何第二个表都 MUST NOT 复制这些行——`--action golden` 在运行时解析本表并逐行判定，判定结果同时给出实际裁决与实际理由码，因此表与实现之间不可能悄悄漂移。
+
+表头是机读契约：每个输入占一列（列名即 § Inputs 的输入标识），`rationale` 列承载有界修正要求的非空理由，最后三列依次是期望裁决、期望理由码与所覆盖的需求面。单元格缺值写 `—`，它就是「该输入缺失」，不是空字符串。
+
+| case id | change_nature | traceability | blast_radius | reversibility | complexity | rationale | 期望裁决 | 期望理由码 | 覆盖的需求面 |
+|---|---|---|---|---|---|---|---|---|---|
+| G1-feature-scale | feature | required | cross-cutting | hard | standard | — | sdd | sdd-capability-or-contract-change | FR-009：功能规模的变更 |
+| G2-bounded-maintenance | maintenance | not-required | local | reversible | standard | — | direct | direct-conditions-all-hold | FR-010：六条全部成立的有界维护 |
+| G3-cross-cutting | maintenance | not-required | cross-cutting | reversible | trivial | — | sdd | sdd-cross-cutting-radius | FR-009：有效半径跨切面 |
+| G4-irreversible | maintenance | not-required | local | hard | standard | — | sdd | sdd-hard-reversal | FR-009：不可逆或难以反向 |
+| G5-ambiguous-value | maintenance | not-required | local | reversible | deep | — | adjudicate | adjudicate-ambiguous-value | FR-011：域外取值（ambiguous） |
+| G6-conflicting | feature | not-required | local-bounded-definition-correction | reversible | trivial | 只收紧一处定义措辞 | adjudicate | adjudicate-conflicting-inputs | FR-011 / C-24：冲突组合（conflicting） |
+| G7-bounded-definition-correction | definition-class | not-required | local-bounded-definition-correction | reversible | trivial | 只收紧一处定义措辞，语义不变 | direct | direct-conditions-all-hold | FR-008 / FR-010：满足其余全部条件的有界定义修正 |
+| G8-missing-input | maintenance | not-required | local | reversible | — | — | adjudicate | adjudicate-missing-input | FR-011：缺项（未声明复杂度层级） |
+| G9-definition-class-default | definition-class | not-required | local | reversible | standard | — | sdd | sdd-cross-cutting-radius | FR-008 / FR-010：definition-class 默认跨切面，声明 local 不被接受为等价 |
+| G10-complexity-high | maintenance | not-required | local | reversible | high-stakes | — | sdd | sdd-complexity-high | FR-009：层级为高 |
+| G11-traceability | maintenance | required | local | reversible | standard | — | sdd | sdd-traceability-required | FR-009：需要持久可追溯 |
+| G12-bounded-without-rationale | definition-class | not-required | local-bounded-definition-correction | reversible | trivial | — | adjudicate | adjudicate-missing-input | C-20：有界修正必须随附非空理由 |
+| G13-all-sdd-conditions | feature | required | cross-cutting | hard | high-stakes | — | sdd | sdd-capability-or-contract-change | FR-009 / C-24：五条全部命中，取码次序取首条且携带全部命中条件 |
+| G14-ambiguous-beats-conflict | feature | not-required | local-bounded-definition-correction | maybe | standard | 只收紧一处定义措辞 | adjudicate | adjudicate-ambiguous-value | C-24：多条件同时命中时按声明次序取码（ambiguous 先于 conflicting） |
+
+七类必备覆盖与行号对应：feature-scale = G1；bounded maintenance = G2；cross-cutting = G3；irreversible = G4；ambiguous = G5、G14；conflicting = G6、G14；满足其余全部条件的有界定义修正 = G7。G8 / G12 补上「缺项」这一裁定形态，G9 / G10 / G11 / G13 把默认值与其余分类条件各钉一行。
+
+**判定语不是错误**：某行判定与期望不符时，`--action golden` 在载荷里把它报为 `match: false`，退出码仍为 `0`——一个不匹配是**已产出的判定**，不是引擎故障；把它读成故障会让「表漂移」和「引擎坏了」这两件事无法区分。

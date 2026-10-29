@@ -665,17 +665,16 @@ def test_exit_alphabet_has_exactly_two_meanings(tmp_path):
 def test_route_and_golden_write_no_file(tmp_path):
     working = tmp_path / "cwd"
     working.mkdir()
-    engine_before, doc_before = _fingerprint(ENGINE, OWNER_DOC)
+    before = _fingerprint(ENGINE, OWNER_DOC)
     _run(_argv("route", nature="feature", traceability="required"), cwd=working)
     _run(_argv("route", nature="definition-class", blast_radius="local"), cwd=working)
     _run(_argv("golden"), cwd=working)
     assert list(working.iterdir()) == [], (
         "the engine is read-only: no file may be created in the working directory (C-28)"
     )
-    assert _fingerprint(ENGINE, OWNER_DOC) == {
-        str(ENGINE): engine_before,
-        str(OWNER_DOC): doc_before,
-    }, "the engine MUST NOT rewrite itself or its owner document (C-28)"
+    assert _fingerprint(ENGINE, OWNER_DOC) == before, (
+        "the engine MUST NOT rewrite itself or its owner document (C-28)"
+    )
 
 
 # ---------------------------------------------------------------------------
