@@ -314,3 +314,86 @@ so the generator is idempotent over the section T013 added — a second run neit
 nor rewrites a neighbour. The four compatibility symlinks still point at the live file and needed no
 repair; `git status --short` after the run lists no change outside the pre-existing dirty files, so the
 live instructions were never hand-edited.
+
+---
+
+## structure — no new command, no new skill, no new store (executed 2026-10-29, T024)
+
+Measured against the T001 capture commit `241a6082b` (the baseline `notes/pre-change-measurements.md`
+was taken at), not against a number quoted in another document.
+
+### (a) command and skill rosters
+
+```bash
+$ git ls-tree --name-only 241a6082b -- templates/commands/ | grep -c '\.md$'
+27
+$ ls templates/commands/*.md | wc -l
+27
+
+$ git ls-tree -d --name-only 241a6082b:skills/external | wc -l
+15
+$ ls -d skills/external/*/ | wc -l
+15
+
+$ git ls-tree -d --name-only 241a6082b:skills/internal | wc -l
+37
+$ ls -d skills/internal/*/ | wc -l
+37
+```
+
+The stronger form of the same criterion — the tracked file **name sets**, not their counts:
+
+```bash
+$ for d in templates/commands skills/external skills/internal; do
+    git ls-tree -r --name-only 241a6082b -- "$d" | sort > base.txt
+    git ls-tree -r --name-only HEAD        -- "$d" | sort > head.txt
+    echo "$d added=$(comm -13 base.txt head.txt | wc -l) removed=$(comm -23 base.txt head.txt | wc -l)"
+  done
+templates/commands added=0 removed=0
+skills/external    added=0 removed=0
+skills/internal    added=0 removed=0
+```
+
+**Reading**: zero new `/speckit.*` command and zero new skill — at directory level and at file-name
+level. A working-tree `find` over the same two skill roots lists 412 and 140 files rather than the
+tracked 406 and 136, and every one of those six / four extra names is a `__pycache__/*.pyc`
+interpreter byproduct from the test runs of this stage (`git status --ignored` reports the
+`__pycache__/` directories as `!!`). They are build residue, not shipped names, which is why the
+criterion is read on the tracked set.
+
+### (b) storage surfaces
+
+The comparator is the frozen pre-change name set in
+[`pre-change-file-sets.txt`](pre-change-file-sets.txt) (688 lines with headers; `.specify/state/` 3
+names, `.specify/memory/` 681 names), re-captured with the command recorded in that file's header:
+
+```bash
+$ find .specify/state -maxdepth 1 -type f | sort > state-now.txt      # 3 names
+$ find .specify/memory -type f | sort > memory-now.txt                # 681 names
+
+$ comm -13 <pre-change .specify/state/> <state-now.txt>       # MUST be empty
+$ comm -23 <pre-change .specify/state/> <state-now.txt>
+                                     # both empty: 3 → 3, no added and no removed name
+
+$ comm -13 <pre-change .specify/memory/> <memory-now.txt>     # MUST be empty
+$ comm -23 <pre-change .specify/memory/> <memory-now.txt>
+                                     # both empty: 681 → 681, no added and no removed name
+```
+
+**Reading**: the slice added no registry, ledger, state spine, ownership model, integration queue or
+any other store — the two name sets are identical in both directions. The containment carrier
+(`test-evidence/compat-baseline-nodeids.txt`) is a test-evidence artifact under
+`.specify/specs/074b-nested-governance/`, lands in neither set by design, and is a carrier for a
+comparison rather than a store.
+
+### (c) flow-class ledger
+
+```bash
+$ python3 .specify/scripts/python/flow-class-check.py --action check
+flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=79, clean]
+coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
+rc=0
+```
+
+**Reading**: identical to the T001 baseline block (`pre-change-measurements.md` § 6) — no flow unit
+was added by this slice, so the ledger needs no row and reports no gap.
