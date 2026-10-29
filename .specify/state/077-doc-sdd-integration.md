@@ -189,6 +189,8 @@ last_verdict: review PASS（0 blocking，2 P1 / 4 P2 / 3 important）→ 状态�
 |-----|------|-------|-----------------|---------|----|---------------|-------------------|--------------|
 | 1 | baseline | implement | full-suite | `PATH=<pybin>:$PATH SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/077-doc-sdd-integration/baseline-failed.txt` | 1（39 既有失败） | 6593 passed / 39 failed / 7 skipped（553.62s） | `.specify/specs/077-doc-sdd-integration/baseline-failed.txt`（39 名，与 076 closure 逐名相同） | 本行 + 基线文件 |
 
+| 2 | closure | review 之后 | full-suite | `PATH=<pybin>:$PATH SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/077-doc-sdd-integration/closure-failed.txt` | 1（仅 39 既有失败） | 6779 passed / 39 failed / 7 skipped（570.83s） | `.specify/specs/077-doc-sdd-integration/closure-failed.txt`（39 名） | `comm -13`（新增）**空**；`comm -23`（修复）**空** → 零新增失败，closure 通过 |
+
 中间阶段一律用定向集，禁止第二次全量；closure 全量在 review 之后。
 
 （implement 起点与 review 后写入。）
