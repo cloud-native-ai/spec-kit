@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
 stage: implement
-stage_started_at: 1793299603
-stage_deadline_epoch: 1793305003
-stage_base_commit: f7ec22c5
+stage_started_at: 1793300898
+stage_deadline_epoch: 1793306298
+stage_base_commit: 29b515b4
 attempt: 0
 retry_limit: 2
-last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH（5 MEDIUM / 10 LOW）；实现前提醒 F-01/F-02/F-03 已由 `f7ec22c5` 微修（13/13）；implement 起点全量运行中（后台 b7yhd4v28）
+last_verdict: implement P1 DONE — T001–T008 闭合（`29b515b4`）；8/28；43 定向测试绿；`spec:` 探针返回 declaration；validate-tasks PASS；镜像 ok；下一步 P2（T009–T015）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -127,6 +127,15 @@ last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH（5 MEDIUM / 10 LOW）；�
   2. **P2**：T009–T015（七模板接线 / 两 owner 追加 / 闭合集守卫 / 文档结构 CLI 与两向比对）
   3. **P3**：T016–T022（驱动载荷四元组 / stage-prompts / efficiency-model 槽位 / SKILL / 零新增机制 / 镜像）
   4. **P4**：T023–T028（两态等价 / 069 不变量 / owner 取证 / quickstart S1–S7 / 收尾门禁 / plan 模板骨架）
+
+### implement P1 — DONE（2026-10-30）
+
+- 提交：`29b515b4`；T001–T008 闭合（8/28）
+- 产物：`scripts/python/flow-class-check.py` 的 `spec:` 键族 + 声明解析 + 四错码；`templates/requirements-template.md` 的 `**Flow Class**:` 行；两个新测试文件；`features/077.md` 指针
+- 定向：43 passed；邻近引擎 292 passed；既有 39 条基线失败未触碰
+- 探针：`lookup spec:077-doc-sdd-integration` → `flow_class=execution, source=declaration, error=null`
+- 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
+- 偏差：Measured Premises 条款提及数 85→99（定义数仍 77）；测试断言改为点名第二行取值；缺 spec 目录取 `invalid-unit-id`；模板字段行不带行尾两空格
 
 ## 测试预算（E2/E3）
 
