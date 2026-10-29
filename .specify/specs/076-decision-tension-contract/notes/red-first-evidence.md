@@ -176,6 +176,26 @@ All commands below are run from the repo root with that interpreter.
   lines, 2 record(s)`, exit `0` — the feature's own two records still satisfy the now-live
   `dtr-rejected-form` / `expected-sacrifice-unmapped` rules.
 
+### G7 (T008 follow-up) — the precedence guards are mutation-checked, not merely green
+
+- **Added**: three cross-label precedence guards in `test_decision_tension_validator.py` — an
+  empty value or the literal `none` reports only `dtr-rejected-form`; a missing field label
+  reports only `dtr-record-incomplete`; undecidable wording does NOT suppress the mapping verdict
+  (A-26). Precedence ③ has no red-first run of its own (it was implemented with the same T008
+  edit), so its guards are validated by mutation instead of asserted by assertion.
+- **Replay command**: remove the `if empty_value: continue` block and the precedence-②
+  `continue` from `scripts/python/validate-decision-tensions.py`, then
+  `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_validator.py`
+- **Real output** (mutant; file restored byte-identically afterwards, `git diff` empty):
+  ```
+  FAILED ...::test_empty_value_or_literal_none_reports_only_the_rejected_form
+  FAILED ...::test_missing_field_label_reports_only_the_record_incomplete
+  2 failed, 17 passed in 2.20s
+  ```
+  Restored tree: `19 passed in 2.22s`.
+- **Exit code**: `1` under the mutant / `0` on the restored tree
+- **Failure count**: `2 failed / 17 passed` (mutant) → `0 failed / 19 passed` (real tree)
+
 ### G3 — validator smoke on the feature's own plan (dogfooding)
 
 - **Replay command**:

@@ -328,6 +328,65 @@ def test_inverse_samples_turn_red(tmp_path, mutate, label):
 
 
 # --------------------------------------------------------------------------- #
+# Cross-label precedence (FR-016 ①②③) — 「one root cause, one finding」
+# --------------------------------------------------------------------------- #
+
+def test_empty_value_or_literal_none_reports_only_the_rejected_form(tmp_path):
+    """Precedence ③: an empty value has no decidable content, so nothing else may fire."""
+    cases = {
+        "blank-sacrifice": lambda: plan(set_value("T-001", "expected_sacrifice", "")),
+        "literal-none": lambda: plan(set_value("T-001", "expected_sacrifice", "none")),
+        "empty-pole": lambda: plan(set_value("T-001", "binding_constraints", "").replace(
+            "  - pole_b: 实现必须能用现有工具链构建。", "  - pole_b:"
+        )),
+    }
+    for name, mutate in cases.items():
+        proc = run(write_spec(tmp_path / name, mutate()), "--json")
+        counts = counts_of(payload_of(proc))
+        assert proc.returncode == 1, f"{name}: a rejected form is a verdict (exit 1)"
+        assert counts["dtr-rejected-form"] == 1, f"{name}: counts={counts!r}"
+        assert counts["dtr-record-incomplete"] == 0, (
+            f"{name}: an empty value must NOT also be counted as an incomplete record"
+        )
+        assert counts["expected-sacrifice-unmapped"] == 0, (
+            f"{name}: an empty value must NOT also be counted as a failed mapping"
+        )
+        assert sum(counts.values()) == 1, f"{name}: exactly one finding; counts={counts!r}"
+
+
+def test_missing_field_label_reports_only_the_record_incomplete(tmp_path):
+    """Precedence ②: a missing label leaves no value to parse, so mapping never runs."""
+    proc = run(write_spec(tmp_path, plan(drop_field("T-001", "expected_sacrifice"))), "--json")
+    counts = counts_of(payload_of(proc))
+    assert proc.returncode == 1
+    assert counts["dtr-record-incomplete"] == 1, f"counts={counts!r}"
+    assert counts["expected-sacrifice-unmapped"] == 0, (
+        "a record missing the field label has no value to map; the mapping verdict is suppressed"
+    )
+    assert counts["dtr-rejected-form"] == 0, (
+        "a missing field label is not an empty value; the rejected-form verdict stays silent"
+    )
+    assert sum(counts.values()) == 1, f"counts={counts!r}"
+
+
+def test_undecidable_wording_still_leaves_the_mapping_verdict_running(tmp_path):
+    """Undecidable wording is a rejected form, but the value stays parseable — both may fire."""
+    mut = set_value("T-001", "decision", "要平衡两方面的诉求，综合考虑后再定。")
+    mut = mut.replace(
+        "- **expected_sacrifice**: SC-001 Source",
+        "- **expected_sacrifice**: SC-099 Source",
+    )
+    proc = run(write_spec(tmp_path, plan(mut)), "--json")
+    counts = counts_of(payload_of(proc))
+    assert proc.returncode == 1
+    assert counts["dtr-rejected-form"] == 1, f"counts={counts!r}"
+    assert counts["expected-sacrifice-unmapped"] == 1, (
+        "the undecidable-wording rejection must not suppress the mapping verdict; "
+        f"counts={counts!r}"
+    )
+
+
+# --------------------------------------------------------------------------- #
 # Record index export (T007) — one parser, two consumers (validator + ADR link check)
 # --------------------------------------------------------------------------- #
 
