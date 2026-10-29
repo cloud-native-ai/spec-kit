@@ -1,0 +1,52 @@
+# Stage evidence — /speckit.requirements, slice 074b-nested-governance
+# Captured: 2026-10-29 (single-run capture: command line, exit status, full output)
+# Base commit: 9360718a1 (074a merged to master)
+
+=== [1] validate-requirements.py ===
+$ python3 scripts/python/validate-requirements.py .specify/specs/074b-nested-governance/requirements.md
+file: .specify/specs/074b-nested-governance/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 308 lines, 10 definition rows, 7 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+=== [2] decomposition-check.py --mode plan ===
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/074b-nested-governance/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 8, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-29T04:30:28Z"}
+exit=0
+
+=== [3] pre-analyze-check.py --stage requirements ===
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/074b-nested-governance --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 8, "sc": 2, "tasks": 0, "clauses": 0, "files": 1}, "checked_at": "2026-10-29T04:30:28Z"}
+exit=0
+
+=== [4] projection fidelity probe (parent blocks vs slice blocks) ===
+# Probe path: .specify/.tmp/074b-projection-diff.py (sanctioned scratch; gitignored)
+# Method: extract "- **FR-NNN**:" / "- **SC-NNN**:" blocks and the "### User Story N" blocks from
+# the parent and the slice; canonicalise Shared-Strings ids on BOTH sides to semantic tokens
+# (parent STR-010 and slice STR-007 -> HDR; parent STR-007 / slice STR-004 -> COMPLETED;
+#  parent STR-008 / slice STR-005 -> BLOCKED; parent STR-009 / slice STR-006 -> FAILED;
+#  STR-001..003 unchanged); collapse whitespace; compare block bodies.
+$ python3 .specify/.tmp/074b-projection-diff.py
+FR-001 <- FR-020 : IDENTICAL
+FR-002 <- FR-021 : DIFFERS
+FR-003 <- FR-022 : IDENTICAL
+FR-004 <- FR-023 : IDENTICAL
+FR-005 <- FR-024 : IDENTICAL
+FR-006 <- FR-026 : IDENTICAL
+FR-007 <- FR-027 : IDENTICAL
+FR-008 <- FR-028 : IDENTICAL
+SC-001 <- SC-005 : IDENTICAL
+SC-002 <- SC-008 : IDENTICAL
+local US1 <- parent US4 : DIFFERS
+local US2 <- parent US5 : DIFFERS
+
+drift_blocks=3
+--- FR-021 -> FR-002
+exit=0
