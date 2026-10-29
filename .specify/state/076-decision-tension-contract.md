@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: review
-stage_started_at: 1793276657
-stage_deadline_epoch: 1793282057
-stage_base_commit: 7d3ebb58
+stage: closure
+stage_started_at: 1793278840
+stage_deadline_epoch: 1793284240
+stage_base_commit: e2ca76b5
 attempt: 0
 retry_limit: 2
-last_verdict: implement DONE — 27/27 任务闭合（4 段）；8/8 SC pass 且 sha256 绑定；66 特性契约测试 + 70 邻近守卫绿；零新增命令/依赖/进程；镜像逐字节一致；quickstart S1–S5 实跑；Feature 076 `Planned → Implemented`；下一步 review（过程段 + 代码段）
+last_verdict: review #2 PASS — 0 blocking，状态推进 `Ready for Review`（`1430314e` + `609e8a46`）；F13（P1）已由驱动者以 `e2ca76b5` 关闭（N/A 规则入 owner、长度阈值移除、短而有据通过）；closure 全量运行中（后台 b16n5app1）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (27 tasks <= 40, tightly coupled, shared files) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -204,6 +204,34 @@ last_verdict: implement DONE — 27/27 任务闭合（4 段）；8/8 SC pass 且
 - P4 `84de4ddf` + `7d3ebb58`：T021–T027（场景 F/G 守卫 / 零新增机制集合差 / 术语复测 / 镜像收尾 / 闭合面终判 / quickstart S1–S5 / Feature 集成）；**Feature 076 → Implemented**
 - 终验：0 open tasks；8/8 SC pass；66 特性契约测试 + 70 邻近守卫绿
 - 披露：tasks.md T027「状态保持 Planned」与状态机 owner 冲突 → 裁决 void 并就地标注；SC-002/SC-003 快照是「程序 verdict 在通道 HIGH-or-0 映射下的渲染」，`/speckit.analyze` 叙事层未整链跑，无 SC 依赖它；四元组键重复归 `missing-field`
+
+### review #1 — DENY（2026-10-29）
+
+- 过程段：P0×1（F1 owner 未写记录行文法）/ P1×5（F2 N/A fail-open、F3 两标签无类、F4 SC-002/003 由测试自写证据、F5 checklist 缺口无闭环、F6 指针按作者目录解析）/ P2×6
+- 代码段：blocking×1（同 F1）+ important×5 + suggestion×2 + nitpick×3 + praise×6
+- 状态门：条件 1/2 满足，条件 3 不满足 → 保持 `Implemented`，记 `blocking-unresolved`
+- 提交：`633bf744`（review.md / code-review.md / probes）
+
+### review-fix — DONE（2026-10-29）
+
+- 提交：`1298aef7 fix(076-decision-tension-contract): resolve review findings (P0/P1)`
+- F1：owner 增「记录行文法」+ 可复制示例 + 示例喂校验器 exit 0 守卫
+- F2：N/A 改为四类触发逐条一行；三条 fail-open 逆样本变红
+- F3：通道表覆盖六标签；测试导入 `LABELS` 断言集合相等
+- F4：校验器输出显式 HIGH-or-0 映射；七份快照重生成；SC-002/003 note 指向程序输出
+- F5：checklist 追加 Closure 块，10/10 fail 映射到 analyze disposition
+- F6：指针改为仓库相对形态，并按实例化计划目录断言
+- code important：四元组键允许列表/标题前缀；`link_verdict()` 真判断链
+- important 5/5 答复（全部同意）；P2：F9/F10 事实修正，F7/F8/F11 accepted-for-roadmap，F12 deferred
+- 门：三特性文件 76 passed；邻近 70 passed；validate-tasks PASS；镜像六对 ok；命令副本 OK
+
+### review #2 — PASS → Ready for Review（2026-10-29）
+
+- 复核：F1–F6 与两条 code important 全部关闭（逐条在树上重测，不以修复轮声称代替）
+- 新发现：F13（P1，`N/A` 判据的未声明规则误拒合规短理由）/ F14（P2，severity 消费契约与第二定义点）；代码段 0 blocking
+- 状态门三条件全满足 → `Implemented → Ready for Review`（`features.md` + `features/076.md` 同步）
+- 提交：`1430314e` / `609e8a46`（评审记录与更正）
+- F13 随后由驱动者关闭：`e2ca76b5`（移除 `NA_MIN_JUSTIFICATION=8`、改「理由非空且非裸否定」封闭集；owner 增 `N/A` 文法；短而有据样本通过）；三特性 + C-11 守卫 87 passed；镜像 clean；validate-tasks PASS
 
 ## 框架观察
 
