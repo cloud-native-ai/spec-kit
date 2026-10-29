@@ -320,6 +320,26 @@ connected surface; the other is a documentation seam the repair created.
   New findings continue the prior round's `F-` sequence (F13, F14) so the two rounds cross-reference
   without ambiguity.
 
-## 8. Feedback
+## 8. Post-review Fix (F13)
+
+`F13` (P1) was closed by the driver after this review run, in a separate commit:
+
+- `scripts/python/validate-decision-tensions.py`: the undeclared `NA_MIN_JUSTIFICATION = 8`
+  threshold is gone; the rule is now "the remainder must say why", with a **closed** bare-negation
+  set (`不会` / `不是` / `没有` / `否` / `无` / `不成立` / `不存在`) as the mechanical line.
+- `shared/guidelines/decision-tension.md` § 记录行文法: the `N/A` grammar is now declared —
+  one trigger per line, each with a reason, bare negations rejected, length explicitly not the
+  test.
+- `tests/contract/test_decision_tension_contract.py`: the stub inverse sample still goes red (bare
+  negation), and a new **short-but-real** sample (`无迁移` / `不动契约` / `限于本节` / `不触 MUST`)
+  passes — proving length was the wrong proxy.
+- Evidence: three feature suites + the C-11 guard = **87 passed**; mirrors `--check` clean;
+  `validate-tasks` PASS.
+
+`F14` (P2) remains `accepted-for-roadmap`: the severity consumption contract in
+`contracts/analyze-channel.md` still does not name `channel.high`, and the channel table's
+`Severity` column duplicates `CHANNEL_SEVERITY` as a second definition point.
+
+## 9. Feedback
 
 Please share the contents of this document with the spec-kit framework developers.

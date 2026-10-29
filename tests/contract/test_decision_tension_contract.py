@@ -1361,7 +1361,7 @@ class TestScenarioDNonLoadBearingGating:
         )
         assert counts["dtr-section-missing"] == 1, counts
 
-        # (b) the remainder after the trigger name must still be a sentence.
+        # (b) a bare negation is not a reason.
         stub = (
             "N/A — 四类触发逐条不成立：\n\n"
             "- 不可逆：不会。\n"
@@ -1372,10 +1372,26 @@ class TestScenarioDNonLoadBearingGating:
         code, payload = validator_payload(write_channel_spec(tmp_path / "stub", channel_plan(stub)))
         counts = label_counts(payload)
         assert code == 1, (
-            "a two-character remainder is not an explanation of why the trigger does not hold; "
+            "a bare negation does not say why the trigger does not hold; "
             f"counts={counts!r}"
         )
         assert counts["dtr-section-missing"] == 1, counts
+
+        # (c) short but real reasons pass: the bar is "says why", not a character count.
+        short = (
+            "N/A — 四类触发逐条不成立：\n\n"
+            "- 不可逆：无迁移。\n"
+            "- 跨团队：不动契约。\n"
+            "- 高爆炸半径：限于本节。\n"
+            "- 与宪法原则相关：不触 MUST。\n"
+        )
+        code, payload = validator_payload(
+            write_channel_spec(tmp_path / "short-reason", channel_plan(short))
+        )
+        assert code == 0, (
+            "a short but real reason satisfies the per-trigger rule; "
+            f"counts={label_counts(payload)!r}"
+        )
 
         # The compliant shape — one trigger per line, each with its own reason — stays green.
         code, payload = validator_payload(

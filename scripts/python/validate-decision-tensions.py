@@ -112,8 +112,10 @@ NA_LITERAL = "N/A"
 NA_DOES_NOT_HOLD = "不成立"
 LOAD_BEARING_TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法原则相关")
 # One line justifies one trigger: naming a trigger on a line that also names another is a list,
-# not a justification, and the remainder after the trigger name must still read as a sentence.
-NA_MIN_JUSTIFICATION = 8
+# not a justification. The remainder must say why the trigger does not hold; a bare negation is
+# not a reason, and this closed set is the mechanical line between the two (owner: the N/A
+# grammar in ``shared/guidelines/decision-tension.md`` § 记录行文法).
+NA_NEGATION_ONLY = ("不会", "不是", "没有", "否", "无", "不成立", "不存在")
 
 # The ADR's ``tension_id`` reference slot (``docs/decisions/template.md`` § Alternatives): the
 # slot label followed by a backticked ``T-NNN`` identifier. Read only on such a line, so an
@@ -317,14 +319,15 @@ def _justified_trigger(line):
     One line justifies one trigger. A line naming two or more triggers lists them instead of
     explaining any of them (the flat-sentence defect: four trigger names in one sentence, no
     reason attached to any), and the remainder left once the trigger name, the punctuation and the
-    surrounding whitespace are removed must still be a sentence rather than a word or two.
+    surrounding whitespace are removed must still say why — a bare negation is not a reason, and
+    length is not the test (a short real reason passes).
     """
     hits = [trigger for trigger in LOAD_BEARING_TRIGGERS if trigger in line]
     if len(hits) != 1:
         return None
     remainder = line.replace(hits[0], "", 1).strip()
     remainder = remainder.strip("-—:：,，.。;；、!！?？()（）[]【】 \t")
-    return hits[0] if len(remainder) >= NA_MIN_JUSTIFICATION else None
+    return hits[0] if remainder and remainder not in NA_NEGATION_ONLY else None
 
 
 def na_verdict(section_lines):
