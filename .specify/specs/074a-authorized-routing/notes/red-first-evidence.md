@@ -134,3 +134,32 @@ new key (so an authored instance can declare it and `validate_agent_metadata` ca
 outside its closed set) while quoting none of the owner's values; the three suites that read those
 surfaces stay green.
 
+
+## T012 — `tests/contract/test_nested_sdd_invocation.py` (red)
+
+Written after T011 landed the engine and **before** `sdd-loop-driver/SKILL.md` gains its
+invoked-from-team entry and `references/nested-invocation.md` exists. Red shape = sections missing
+(the documents the cases read do not exist yet); full log: `red-t012.txt`.
+
+```console
+$ python3 -m pytest -q tests/contract/test_nested_sdd_invocation.py
+FFFFFFFFFFFFFFFFFFFFFFF                                                  [100%]
+E       AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry exactly one 'Invoked-from-Team Entry' section, found []
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_form_section_exists_as_an_additive_subsection
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_form_accepts_exactly_the_six_facts
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_validation_table_covers_the_closed_condition_set
+FAILED tests/contract/test_nested_sdd_invocation.py::test_no_instruction_issues_a_merge_or_push
+FAILED tests/contract/test_nested_sdd_invocation.py::test_nested_run_reaches_review_zero_merge_zero_push
+FAILED tests/contract/test_nested_sdd_invocation.py::test_no_second_registry_ledger_spine_or_queue
+FAILED tests/contract/test_nested_sdd_invocation.py::test_artifact_and_evidence_paths_are_referenceable
+23 failed in 0.38s
+# RC=1
+```
+
+**Reading of the red**: every one of the 23 cases fails on absence — no case fails for a
+contradictory assertion, and none passes vacuously. Two cases needed their own anti-vacuity guard
+to get there: the merge/push scan now requires both prohibitions to be **stated** (a scan that can
+only be empty would pass on a document that never forbids merging), and the handoff completeness
+test derives its required field set from the document's own schema table, so an absent document is
+a failure rather than an empty requirement.
