@@ -38,7 +38,7 @@ declaration, hierarchy chain + boundary, direct-modification definition, the fou
 shared-string citation resolution). The five failing cases are exactly the facts whose content is
 task T017's (`§ Inputs`, the `definition-class` value, the tier-by-reference rule, the forbidden-input
 rule) plus the landing-resolution check that consumes them. No case fails for any other reason
-(full log: `red-t005.log`).
+(full log: `red-t005.txt`).
 
 ## T007 — `tests/contract/test_sdd_authorization.py` (red)
 
@@ -73,7 +73,8 @@ ERROR tests/contract/test_sdd_authorization.py::test_authorize_writes_no_file
 `--action authorize`), which is task T011's deliverable in the next part. The red is *absence*, not
 a contradictory assertion: the record shape the cases assert (`agent_capability`, `seat_policy`,
 `effective`, `verdict`, `reason`, `failed_half`, `team_slug`, `seat_slug`, `sources`) is the
-authorization-probe record contracted by C-8 / C-14, and T011 implements to it.
+authorization-probe record contracted by C-8 / C-14, and T011 implements to it
+(full log: `red-t007.txt`).
 
 ## T006 — fixture smoke check (not a test row)
 
