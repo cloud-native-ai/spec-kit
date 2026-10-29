@@ -25,7 +25,7 @@
 - DoD-8: 两项包含性声明按**用例 node-id 名字集**判定（post ⊇ pre 且共享 id 裁决不变），载体是 `test-evidence/compat-baseline-nodeids.txt` 的 7 个具名集合；**计数比较判不合规**——不得以条数或模块数替代。
 - DoD-9: plan_constraint 全趟遵守——`plan.md` / `data-model.md` / `contracts/` / `quickstart.md` / `research.md` / `feature-ref.md` 的任一改动只能是行级小修（错字 / 措辞 / 断链 / 格式 / 行级一致），逐项在 `verification.md` 声明 `PLAN-EDIT: <path> — <理由>；分类=minor`；任何实质性改动停线回抛，不静默重写。
 
-**DoD Status**: pending（本阶段只产出任务清单；`green` 由 `/speckit.implement` 收口时逐行测定后翻转）
+**DoD Status**: green（`/speckit.implement` 收口时逐行测定，DoD-1…DoD-9 各自的实测面记录在 `verification.md` § DoD close 与 § Gates；无 void 行。父 074 的 `tasks.md` 仍留 57 行 `[ ]` 是父产物的切分前状态，已带实测披露在 Feature 074 记录中，不属本文件的 DoD 行）
 
 ## Completion Gate
 
