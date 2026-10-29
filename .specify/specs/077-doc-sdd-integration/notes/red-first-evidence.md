@@ -178,3 +178,98 @@
 - **退出码**：`0` / `0`（两条 grep 均无匹配，`||` 分支打印说明）/ `0`
 - **失败计数**：`0 failed / 43 passed`
 - **判定**：台账行集未变（`spec:` 键不进台账，写入即会产生 `unknown` 发现）；索引无类别列；详情只多一条指向声明行的指针、不复制取值。原始输出留档 `test-evidence/tasks-ledger-boundary.txt`。
+
+---
+
+## Part 2 / 4 段（T009–T015）
+
+本段开头复核：`tests/contract/test_expression_compatibility.py` 与
+`tests/contract/test_expression_gate_wiring.py` 在改动前均为绿（`32 passed`，退出码 0），
+二者属 P1 段登记的 16 文件邻近引擎定向集，因此本段对它们承担「零新增失败」义务。
+
+### T009 — 七模板接线与 execution 零变化反向守卫（red，2026-10-30，HEAD `8ad9d871`）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_stage_class_wiring.py -q`（cwd = 仓库根）
+- **真实输出**（失败名摘要，完整留档见原始输出文件）：
+
+  ```text
+  FAILED ...::test_each_stage_template_carries_exactly_one_wiring_card[requirements|clarify|plan|tasks|checklist|analyze|implement]
+  FAILED ...::test_the_card_calls_the_single_lookup_once[...7...]
+  FAILED ...::test_the_card_points_at_both_owners[...7...]
+  FAILED ...::test_the_card_states_the_two_branches_and_the_degradation[...7...]
+  FAILED ...::test_the_card_stops_on_author_input_errors[...7...]
+  FAILED ...::test_the_card_carries_no_copied_tables_or_allow_lists[...7...]
+  FAILED ...::test_each_generated_command_copy_carries_the_card[...7...]
+  FAILED ...::test_stripping_the_card_restores_the_baseline_bytes[...7...]
+  FAILED ...::test_the_card_is_not_inside_another_section[...7...]
+  63 failed, 8 passed in 0.43s
+  ```
+
+- **退出码**：`1`
+- **失败计数**：`63 failed / 8 passed`（71 项）
+- **红的是什么**：七个模板今天对 `flow_class|flow-class|expression` 零命中（`test-evidence/plan-stage-template-zero-hit.txt`），故 63 项接线断言全红；8 项已绿的是两条**回归守卫**——整模板不含特性号（7）与 `docs.md` / `humanize.md` 保持基线字节（1）。反向守卫的红另有其义：树上没有子节可剥离，正是「无接线即不得空绿」这条性质本身。
+- **原始输出留档**：`test-evidence/p2-t009-red.txt`
+
+### T010 / T011 / T012 — 接线、owner 追加与闭合集名册（green，2026-10-30）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_stage_class_wiring.py tests/contract/test_expression_gate_wiring.py -q`
+- **真实输出**：
+
+  ```text
+  ...............................................................         [100%]
+  87 passed in 1.49s
+  ```
+
+- **退出码**：`0`；**失败计数**：`0 failed / 87 passed`（T009 的同一文件红前为 `63 failed / 8 passed`）
+- **owner 面复核**：`flow-class-check.py --action check` → `79 unit(s) scanned, 0 finding(s)`、`ledger_rows=79 matched=79 inventory_units=79 gaps=0`；`--action faces` → `6 face(s) parsed, 0 finding(s)`；`--action isomorphism` → `8 stage row(s), 6 gate face(s), 0 finding(s)`；`--action lookup --unit-id "spec:077-doc-sdd-integration"` → `execution` / `source: declaration`。两份 owner 的既有条款零删除、零改写（只增节与行）。
+- **分发两态**：`regen-command-copies.py` 产出四个工具的七份副本（`.claude` / `.github` / `.opencode` / `.qoder`）；`sync-mirrors.py --write` 后 `--check` 六对全 `ok`、`regen-command-copies.py --check` 输出 `OK: all per-tool command copies match the source templates.`，退出码均 0。
+- **确认门预算**：`scan-confirmation-gates.py --summary` → `blocking confirmation gates: 27`（destructive 20 / governance_kept 7）、`violations 0`——与改动前读数**相等**（R-12 的零余量预算未动）。
+
+### 偏差 D-1 — 069a 的 `test_expression_compatibility.py` 名册与冻结哈希（已作最小修复，需复核）
+
+- **事实**：`templates/commands/` 的七个阶段模板一旦带上接线卡，`tests/contract/test_expression_compatibility.py` 的两条腿必然转红（实测：`test_c5_non_wiring_files_keep_their_frozen_hashes` 与 `test_c5_wiring_surface_is_closed`，2 FAILED）。该文件属 P1 段登记的 16 文件邻近定向集，改动前全绿，且不在 `baseline-failed.txt` 的 39 条既有失败内——留着就是 GATE-5 的**新增失败**。
+- **为何不删/不放宽**：两条断言承载的命题（「引擎与 owner 只可出现在被指定的名册里」「未被指定的源保持冻结」）没有被本特性废除，只被**扩大名册**。这与 `research.md` R-8 对 `test_expression_gate_wiring.py` 的裁决同源。
+- **实际改法（只增不改）**：① 新增 `POST_077_WIRING_TEMPLATES`（七个阶段模板）并只让 `test_c5_wiring_surface_is_closed` 跳过它——`WIRING_TEMPLATES` 仍是 W1–W4，故「25 模板 + 49 技能」的冻结清单与其补集断言原样保留；② 用该文件**自带的** `ALLOWED_POST_BASELINE_CHANGES` 机制，为七个模板各登记一条（reason + 必须在场的三枚 marker：`spec:<spec 目录名>` / `--action lookup` / `owner-unavailable`），冻结哈希的数量断言（74 / 25 / 49）与漂移判定一律未动。
+- **未动**：没有任何断言被删除或放宽；`test_c5_untouchable_framework_paths_are_unchanged`、C-1 冻结分母、C-4 未刷新形态等其余腿逐字未改。
+- **复核后**：两文件 `32 passed`，退出码 0。
+
+### T013 — 结构门禁契约测试（red，2026-10-30，HEAD `8ad9d871`；两组腿一次写全）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_document_structure_gate.py -q`
+- **真实输出**（失败名摘要，完整留档见原始输出文件）：
+
+  ```text
+  FAILED ...::test_structure_action_exists_and_needs_a_spec_dir
+  FAILED ...::test_default_run_is_plan_side_only_and_says_two_way_not_run
+  FAILED ...::test_subsections_and_columns_are_checker_constants
+  FAILED ...::test_the_code_set_is_exactly_the_four_families
+  FAILED ...::test_expression_line_with_a_complete_plan_passes
+  ...（结构语法 4 例 / 证据面 5 例 / owner 面 3 例 / 两向 2 例 / NA·降级·作者错误 / 基线两例 / --freeze / 重跑稳定）
+  FAILED ...::test_a_missing_baseline_reads_as_the_empty_set
+  FAILED ...::test_same_plan_yields_the_same_violation_set
+  25 failed, 1 passed in 1.82s
+  ```
+
+- **退出码**：`1`
+- **失败计数**：`25 failed / 1 passed`（26 项）
+- **红的是什么**：今天 `--action structure` 被 argparse 以 `invalid choice` 拒绝、退出码 2（与 `test-evidence/plan-resolution-baseline.txt` 一致），因此四子节、四族码、两向比对、基线、NA/降级/作者错误全部不可达。唯一已绿的是 `test_faces_and_parse_faces_are_unchanged`——**回归守卫**，今天成立且实现后也必须成立。
+- **一次中间修正（属纠正）**：`test_the_cli_rejects_structure_as_a_face` 起初在红树上「通过」，但原因是**整个动作**被拒而非 `--faces structure` 被拒（空绿）。改为先跑一次 `--faces reader` 作对照（同样为 `--action structure`，必须能跑）、再断言 `--faces structure` 退出 2，红计数由 24 变 25。
+- **原始输出留档**：`test-evidence/p2-t013-red.txt`
+
+### T014 / T015 — `--action structure` 与两向比对（green，2026-10-30）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_document_structure_gate.py tests/contract/test_stage_class_wiring.py tests/contract/test_expression_gate_wiring.py -q`
+- **真实输出**：
+
+  ```text
+  .........................................                              [100%]
+  113 passed in 6.73s
+  ```
+
+- **退出码**：`0`；**失败计数**：`0 failed / 113 passed`（结构门禁 26 / 接线 71 / 闭合集 16）
+- **真机复核**（本线自身是 `execution`，故结构门禁对它应报不适用而不是通过）：
+  `python3 scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/077-doc-sdd-integration`
+  → `class=execution source=declaration` / `status: not-applicable` / `two-way: not-run` / `files_scanned: 1` / `not-applicable: 结构门禁只适用于表达类…`，退出码 0。
+- **四面未动**：`--faces` 的取值集仍是 `reader` / `evidence` / `duplicate` / `count`；`--action` 的 choices 为 `{verify, structure}`；六面 owner 与阶段算子表一行未改（`--action faces` 仍 `6 face(s) parsed, 0 finding(s)`）。
+- **一次中间修正（属纠正）**：`Reader Baseline` 两行在 plan 与落文里逐字相同，被复用的 `duplicate` 面按机械下限判成 `duplicate-fact`（假阳性——读者声明是**结构标记**，plan 与落文都必须携带，不是手写事实副本）。修法是在重复判定前剔除两枚 reader 标记行，阈值与码一律未动（MUST NOT 自建第二套阈值）。
+- **原始输出留档**：`test-evidence/p2-t015-green.txt`、`test-evidence/p2-t009-t015-green.txt`

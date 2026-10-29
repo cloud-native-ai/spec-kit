@@ -1,0 +1,1985 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........FFFFFFFFFFFFFFFFFFFFF  [100%]
+=================================== FAILURES ===================================
+____ test_each_stage_template_carries_exactly_one_wiring_card[requirements] ____
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______ test_each_stage_template_carries_exactly_one_wiring_card[clarify] _______
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________ test_each_stage_template_carries_exactly_one_wiring_card[plan] ________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_each_stage_template_carries_exactly_one_wiring_card[tasks] ________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____ test_each_stage_template_carries_exactly_one_wiring_card[checklist] ______
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______ test_each_stage_template_carries_exactly_one_wiring_card[analyze] _______
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____ test_each_stage_template_carries_exactly_one_wiring_card[implement] ______
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_stage_template_carries_exactly_one_wiring_card(stem):
+>       heading, _body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+___________ test_the_card_calls_the_single_lookup_once[requirements] ___________
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_calls_the_single_lookup_once[clarify] ______________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______________ test_the_card_calls_the_single_lookup_once[plan] _______________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______________ test_the_card_calls_the_single_lookup_once[tasks] _______________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_calls_the_single_lookup_once[checklist] _____________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_calls_the_single_lookup_once[analyze] ______________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_calls_the_single_lookup_once[implement] _____________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_calls_the_single_lookup_once(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______________ test_the_card_points_at_both_owners[requirements] _______________
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________________ test_the_card_points_at_both_owners[clarify] _________________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+__________________ test_the_card_points_at_both_owners[plan] ___________________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+__________________ test_the_card_points_at_both_owners[tasks] __________________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________________ test_the_card_points_at_both_owners[checklist] ________________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________________ test_the_card_points_at_both_owners[analyze] _________________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________________ test_the_card_points_at_both_owners[implement] ________________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_points_at_both_owners(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+___ test_the_card_states_the_two_branches_and_the_degradation[requirements] ____
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______ test_the_card_states_the_two_branches_and_the_degradation[clarify] ______
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_the_card_states_the_two_branches_and_the_degradation[plan] ________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_the_card_states_the_two_branches_and_the_degradation[tasks] _______
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____ test_the_card_states_the_two_branches_and_the_degradation[checklist] _____
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______ test_the_card_states_the_two_branches_and_the_degradation[analyze] ______
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____ test_the_card_states_the_two_branches_and_the_degradation[implement] _____
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_states_the_two_branches_and_the_degradation(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+___________ test_the_card_stops_on_author_input_errors[requirements] ___________
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_stops_on_author_input_errors[clarify] ______________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______________ test_the_card_stops_on_author_input_errors[plan] _______________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______________ test_the_card_stops_on_author_input_errors[tasks] _______________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_stops_on_author_input_errors[checklist] _____________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_stops_on_author_input_errors[analyze] ______________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_stops_on_author_input_errors[implement] _____________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_stops_on_author_input_errors(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:309: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____ test_the_card_carries_no_copied_tables_or_allow_lists[requirements] ______
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________ test_the_card_carries_no_copied_tables_or_allow_lists[clarify] ________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________ test_the_card_carries_no_copied_tables_or_allow_lists[plan] __________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________ test_the_card_carries_no_copied_tables_or_allow_lists[tasks] _________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_the_card_carries_no_copied_tables_or_allow_lists[checklist] _______
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________ test_the_card_carries_no_copied_tables_or_allow_lists[analyze] ________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_the_card_carries_no_copied_tables_or_allow_lists[implement] _______
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_carries_no_copied_tables_or_allow_lists(stem):
+>       _heading, body = wiring_block(_stage_path(stem))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:162: in wiring_block
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_______ test_each_generated_command_copy_carries_the_card[requirements] ________
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.requirements.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb772c9000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb772c9000> = '<!-- AUTO-GENERATED from templates/commands/requirements.md — do not edit; edit the source template, then run scripts...as `[NEEDS CLARIFICATION]` or `Related Feature: Need clarification` → `/speckit.clarify`. Otherwise → `/speckit.plan`.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+__________ test_each_generated_command_copy_carries_the_card[clarify] __________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.clarify.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb772ba000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb772ba000> = '<!-- AUTO-GENERATED from templates/commands/clarify.md — do not edit; edit the source template, then run scripts/pyth...from file existence.\n\n**After**: Mode A → `/speckit.plan`. Mode B → `/speckit.tasks`. Mode C → `/speckit.implement`.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+___________ test_each_generated_command_copy_carries_the_card[plan] ____________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.plan.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb76528000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb76528000> = '<!-- AUTO-GENERATED from templates/commands/plan.md — do not edit; edit the source template, then run scripts/python/...le task list.\n- Optionally run `/speckit.checklist` to introduce domain-specific quality gates before implementation.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+___________ test_each_generated_command_copy_carries_the_card[tasks] ___________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.tasks.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb7652b800>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb7652b800> = '<!-- AUTO-GENERATED from templates/commands/tasks.md — do not edit; edit the source template, then run scripts/python...un `/speckit.checklist` to create quality gates.\n- Then run `/speckit.implement` to execute the tasks phase-by-phase.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+_________ test_each_generated_command_copy_carries_the_card[checklist] _________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.checklist.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb77d6a000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb77d6a000> = '<!-- AUTO-GENERATED from templates/commands/checklist.md — do not edit; edit the source template, then run scripts/py...ded.\n\n**After**: If items fail → iterate `/speckit.plan` or `/speckit.tasks`. Once satisfied → `/speckit.implement`.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+__________ test_each_generated_command_copy_carries_the_card[analyze] __________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.analyze.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb771ab000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb771ab000> = '<!-- AUTO-GENERATED from templates/commands/analyze.md — do not edit; edit the source template, then run scripts/pyth...a `/speckit.requirements`, `/speckit.plan`, or `/speckit.tasks` and re-run. Otherwise proceed to `/speckit.implement`.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+_________ test_each_generated_command_copy_carries_the_card[implement] _________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_each_generated_command_copy_carries_the_card(stem):
+        copies = _tool_copies(stem)
+        assert copies, (
+            "sentinel: no per-tool command directory exists, so this leg would spin green"
+        )
+        heading = wiring_heading()
+        for path in copies:
+            assert path.is_file(), "generated command copy missing: %s" % path.relative_to(
+                REPO_ROOT
+            )
+            text = path.read_text(encoding="utf-8")
+>           assert text.count(heading) == 1, (
+                "%s: the copy must carry the wiring card exactly once (run "
+                "regen-command-copies.py)" % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: .github/prompts/speckit.implement.prompt.md: the copy must carry the wiring card exactly once (run regen-command-copies.py)
+E           assert 0 == 1
+E            +  where 0 = <built-in method count of str object at 0xb771b1000>('### 类别读取与文档型门禁')
+E            +    where <built-in method count of str object at 0xb771b1000> = '<!-- AUTO-GENERATED from templates/commands/implement.md — do not edit; edit the source template, then run scripts/py....\n\n**After**: `/speckit.review` for SDD process quality evaluation. Optional `/speckit.analyze` for drift detection.'.count
+
+tests/contract/test_stage_class_wiring.py:379: AssertionError
+______ test_stripping_the_card_restores_the_baseline_bytes[requirements] _______
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________ test_stripping_the_card_restores_the_baseline_bytes[clarify] _________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+__________ test_stripping_the_card_restores_the_baseline_bytes[plan] ___________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+__________ test_stripping_the_card_restores_the_baseline_bytes[tasks] __________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________ test_stripping_the_card_restores_the_baseline_bytes[checklist] ________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_________ test_stripping_the_card_restores_the_baseline_bytes[analyze] _________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+________ test_stripping_the_card_restores_the_baseline_bytes[implement] ________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_stripping_the_card_restores_the_baseline_bytes(stem):
+        text = _read(_stage_path(stem))
+>       stripped, block = strip_wiring(text)
+                          ^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:395: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_stage_class_wiring.py:188: in strip_wiring
+    start, end = _bounds(lines, heading)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+__________ test_the_card_is_not_inside_another_section[requirements] ___________
+
+stem = 'requirements'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Create or update the Requirements from a natural language feature description.', 'short-description: 从自然语言特性描述创建或更新 requirements.md', 'handoffs:', '   - label: Clarify Requirements', '     agent: speckit.clarify', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_is_not_inside_another_section[clarify] _____________
+
+stem = 'clarify'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: "Identify underspecified areas in the current feature artifacts and encode answers back into the...ription: 识别特性产物中的欠指定区域，并将澄清答案写回对应阶段文件', 'handoffs:', '  - label: Build Technical Plan', '    agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______________ test_the_card_is_not_inside_another_section[plan] _______________
+
+stem = 'plan'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the implementation planning workflow using the plan template to generate design artifa...hort-description: 基于需求生成实现规划，产出 plan.md 设计产物', 'handoffs:', '  - label: Create Tasks', '    agent: speckit.tasks', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+______________ test_the_card_is_not_inside_another_section[tasks] ______________
+
+stem = 'tasks'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate an actionable, dependency-ordered tasks.md for the feature based on available design ar...on: 基于设计产物生成依赖有序的 tasks.md 任务清单', 'handoffs:', '  - label: Analyze For Consistency', '    agent: speckit.analyze', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_is_not_inside_another_section[checklist] ____________
+
+stem = 'checklist'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Generate a requirements-quality checklist for the current feature (Feature as requirement-level scope).', 'short-description: 为当前特性生成需求质量检查清单', 'handoffs:', '   - label: Back to Plan', '     agent: speckit.plan', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+_____________ test_the_card_is_not_inside_another_section[analyze] _____________
+
+stem = 'analyze'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Perform a non-destructive cross-artifact consistency and quality analysis across requirements.md...n: 跨产物只读一致性分析，检查需求/规划/任务间的漂移与缺口', 'handoffs:', '  - label: Update Feature Registry', '    agent: speckit.feature', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+____________ test_the_card_is_not_inside_another_section[implement] ____________
+
+stem = 'implement'
+
+    @pytest.mark.parametrize("stem", STAGE_STEMS)
+    def test_the_card_is_not_inside_another_section(stem):
+        """The card sits after ``## User Input`` and before the next ``## `` heading."""
+        heading = wiring_heading()
+        lines = _read(_stage_path(stem)).split("\n")
+>       start, _end = _bounds(lines, heading)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_stage_class_wiring.py:417: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+lines = ['---', 'description: Implement the feature by processing and implementing all tasks defined in tasks.md', 'short-description: 按 tasks.md 顺序逐项实现当前特性的全部任务', 'handoffs:', '  - label: Review Implementation', '    agent: speckit.review', ...]
+heading = '### 类别读取与文档型门禁'
+
+    def _bounds(lines: list[str], heading: str) -> tuple[int, int]:
+        """R-9's frozen strip endpoints: (start, end), both inclusive."""
+        starts = [index for index, line in enumerate(lines) if line == heading]
+>       assert len(starts) == 1, (
+            "%s must carry exactly %d wiring subsection(s) headed %r, found %d"
+            % ("the template", 1, heading, len(starts))
+        )
+E       AssertionError: the template must carry exactly 1 wiring subsection(s) headed '### 类别读取与文档型门禁', found 0
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_stage_class_wiring.py:141: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_stage_template_carries_exactly_one_wiring_card[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_calls_the_single_lookup_once[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_points_at_both_owners[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_states_the_two_branches_and_the_degradation[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_stops_on_author_input_errors[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_carries_no_copied_tables_or_allow_lists[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_each_generated_command_copy_carries_the_card[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[implement]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[requirements]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[clarify]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[plan]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[tasks]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[checklist]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[analyze]
+FAILED tests/contract/test_stage_class_wiring.py::test_the_card_is_not_inside_another_section[implement]
+63 failed, 8 passed in 0.43s

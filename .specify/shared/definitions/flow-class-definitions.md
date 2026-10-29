@@ -243,9 +243,19 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | date | unit_id | before → after | basis | 依据 |
 | --- | --- | --- | --- | --- |
 
+## 特性线声明面（`spec:` 键）
+
+本节是**类条件追加**：它只登记「特性线把类别写在哪、由谁解析、谁消费」，不重定义 § 判据 的两个取值，也不在 § 逐流程台账 里增行。
+
+- **声明单位是特性线**：一条 spec 目录声明自己的类别，载体是该线 `requirements.md` 头部区（`## Related Feature` 之前）**至多一行**的声明字段；字段行文法、位置、四个作者错误码（`invalid-class` / `declaration-malformed` / `declaration-duplicate` / `declaration-misplaced`）与三段退出码（0 已解析 / 1 作者输入错误 / 2 输入非法或 owner 不可解析）归 `.specify/specs/077-doc-sdd-integration/requirements.md` 的 FR-001 / FR-003 / FR-005。取值仍只有 § 判据 的两个取值，本节不复述判据句。
+- **解析入口仍是唯一引擎**：`scripts/python/flow-class-check.py --action lookup --unit-id "spec:<spec 目录名>"`。键取该 spec 目录的 basename（不取路径、不取 Feature 号），记录与单元键**逐字段同形**；新增第二个解析函数或第二份分类数据文件即违反本节。
+- **不进逐流程台账**：特性线声明 MUST NOT 写入 § 逐流程台账——该表的行集等于框架单元清单（`templates/commands/*.md` + `skills/{external,internal}/*/SKILL.md`），写入即产生 `unknown` 发现。本节不登记任何特性线的取值：类别只由作者判定，MUST NOT 从路径、文件名、内容或提交信息推断。
+- **消费方**：七个阶段命令模板（`requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement`）与 `sdd-loop-driver` 的阶段派发载荷；接线形态归 `shared/workflow/expression-gates.md` § 特性线阶段命令，本文件不登记算子、面名或槽位。
+
 ## 消费方指针
 
 - 读取类别：`scripts/python/flow-class-check.py --action lookup --unit-id <id>`（唯一读取路径；命令模板与技能 MUST NOT 内嵌类别副本）。
+- 读取特性线类别：同一入口的 `spec:` 键（`--unit-id "spec:<spec 目录名>"`），声明面见 § 特性线声明面（`spec:` 键）；本文件不为特性线存取值。
 - 对账：同引擎 `--action check`（八类 finding 与反空真下限归契约 `contracts/flow-class-ledger.md`）。
 - 同构映射与边界核对：同引擎 `--action isomorphism`（只读；判定归本文件 § 同构映射 / § 不可同构边界与门禁 owner）。
 - 门禁算子与调用点：`shared/workflow/expression-gates.md`（本文件不列举面名、算子与调用点）。

@@ -1,0 +1,447 @@
+FF.FFFFFFFFFFFFFFFFFFFFFFF                                               [100%]
+=================================== FAILURES ===================================
+______________ test_structure_action_exists_and_needs_a_spec_dir _______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_structure_action_exists_a0')
+
+    def test_structure_action_exists_and_needs_a_spec_dir(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path)
+        proc = run_structure(spec_dir)
+>       assert proc.returncode in (0, 1), (
+            "`--action structure` must be an accepted action; exit=%d stderr=%r"
+            % (proc.returncode, proc.stderr)
+        )
+E       AssertionError: `--action structure` must be an accepted action; exit=2 stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert 2 in (0, 1)
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:213: AssertionError
+_________ test_default_run_is_plan_side_only_and_says_two_way_not_run __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_default_run_is_plan_side_0')
+
+    def test_default_run_is_plan_side_only_and_says_two_way_not_run(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path)
+        proc = run_structure(spec_dir, fmt="text")
+>       assert proc.returncode in (0, 1), proc.stderr
+E       AssertionError: usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]
+E                                         [--path PATH] [--owner-path OWNER_PATH]
+E                                         [--faces FACES] [--strict] [--allow-degraded]
+E                                         [--format {text,json}] [--json-out JSON_OUT]
+E         doc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')
+E         
+E       assert 2 in (0, 1)
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:229: AssertionError
+___________________ test_the_cli_rejects_structure_as_a_face ___________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_the_cli_rejects_structure0')
+
+    def test_the_cli_rejects_structure_as_a_face(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path)
+        control = _run("--action", "structure", "--spec-dir", str(spec_dir), "--faces", "reader")
+>       assert control.returncode in (0, 1), (
+            "control: the same action with a registered face must run, so the rejection "
+            "below is about the value and not about the action; exit=%d stderr=%r"
+            % (control.returncode, control.stderr)
+        )
+E       AssertionError: control: the same action with a registered face must run, so the rejection below is about the value and not about the action; exit=2 stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert 2 in (0, 1)
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:257: AssertionError
+______________ test_subsections_and_columns_are_checker_constants ______________
+
+    def test_subsections_and_columns_are_checker_constants():
+        module = _load_checker()
+>       subsections = tuple(module.STRUCTURE_SUBSECTIONS)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module '_doc_consistency_under_test' has no attribute 'STRUCTURE_SUBSECTIONS'
+
+tests/contract/test_document_structure_gate.py:273: AttributeError
+________________ test_the_code_set_is_exactly_the_four_families ________________
+
+    def test_the_code_set_is_exactly_the_four_families():
+        module = _load_checker()
+>       families = module.STRUCTURE_CODE_FAMILIES
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module '_doc_consistency_under_test' has no attribute 'STRUCTURE_CODE_FAMILIES'
+
+tests/contract/test_document_structure_gate.py:288: AttributeError
+_______________ test_expression_line_with_a_complete_plan_passes _______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_expression_line_with_a_co0')
+
+    def test_expression_line_with_a_complete_plan_passes(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path)
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 0, "a complete structure must pass; stderr=%r" % proc.stderr
+E       AssertionError: a complete structure must pass; stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:310: AssertionError
+_ test_whole_chapter_missing_reports_one_code_and_suppresses_subsection_codes __
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_whole_chapter_missing_rep0')
+
+    def test_whole_chapter_missing_reports_one_code_and_suppresses_subsection_codes(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, plan=build_plan(heading=False))
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 1, "a missing `## Document Structure` must fail the gate"
+E       AssertionError: a missing `## Document Structure` must fail the gate
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:324: AssertionError
+_____________ test_missing_chapter_tree_reports_subsection_missing _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_missing_chapter_tree_repo0')
+
+    def test_missing_chapter_tree_reports_subsection_missing(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, plan=build_plan(omit=("chapter_tree",)))
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:335: AssertionError
+_____________ test_missing_reader_lines_report_subsection_missing ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_missing_reader_lines_repo0')
+
+    def test_missing_reader_lines_report_subsection_missing(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, plan=build_plan(reader=""))
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 1, (
+            "a Reader Baseline subsection without the two marker lines must go red"
+        )
+E       AssertionError: a Reader Baseline subsection without the two marker lines must go red
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:347: AssertionError
+________________________ test_chapter_tree_syntax_codes ________________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_chapter_tree_syntax_codes0')
+
+    def test_chapter_tree_syntax_codes(tmp_path):
+        cases = {
+            "parent-unknown": ("| 概览 | — | 决定是否继续 | 不覆盖细节 |\n"
+                               "| 实现 | 不存在的节 | 决定改动点 | 不覆盖运维 |\n"),
+            "chapter-duplicate": ("| 概览 | — | 决定是否继续 | 不覆盖细节 |\n"
+                                  "| 概览 | — | 决定改动点 | 不覆盖运维 |\n"),
+            "chapter-purpose-missing": ("| 概览 | — |  | 不覆盖细节 |\n"),
+            "chapter-boundary-missing": ("| 概览 | — | 决定是否继续 |  |\n"),
+        }
+        for rule, rows in cases.items():
+            case_dir = tmp_path / rule
+            _repo, spec_dir = make_repo(case_dir, plan=build_plan(chapter_tree=rows))
+            proc = run_structure(spec_dir)
+>           assert proc.returncode == 1, "%s must fail the gate" % rule
+E           AssertionError: parent-unknown must fail the gate
+E           assert 2 == 1
+E            +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:368: AssertionError
+________________ test_evidence_codes_are_reused_not_reinvented _________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_evidence_codes_are_reused0')
+
+    def test_evidence_codes_are_reused_not_reinvented(tmp_path):
+        cases = {
+            "grade-invalid": "| 引擎存在 | 也许 | 2026-10-30 | source-x |\n",
+            "as-of-malformed": "| 引擎存在 | 实测 | 2026/10/30 | source-x |\n",
+            "source-missing": "| 引擎存在 | 实测 | 2026-10-30 |  |\n",
+            "grade-asof-unpaired": "| 引擎存在 | 实测 |  | source-x |\n",
+        }
+        for rule, rows in cases.items():
+            case_dir = tmp_path / rule
+            _repo, spec_dir = make_repo(case_dir, plan=build_plan(evidence=rows))
+            proc = run_structure(spec_dir)
+>           assert proc.returncode == 1, "%s must fail the gate" % rule
+E           AssertionError: grade-invalid must fail the gate
+E           assert 2 == 1
+E            +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:389: AssertionError
+_____________ test_evidence_unlisted_requires_a_delivered_document _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_evidence_unlisted_require0')
+
+    def test_evidence_unlisted_requires_a_delivered_document(tmp_path):
+        doc = DELIVERED_OK + (
+            "\n## 附录\n\n另一条断言（证据：实测，as-of 2026-10-30，source: 未登记）。\n"
+        )
+        _repo, spec_dir = make_repo(tmp_path, delivered=doc)
+        proc = run_structure(spec_dir, "--path", str(spec_dir / "delivered.md"))
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:401: AssertionError
+_______________________________ test_owner_codes _______________________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_owner_codes0')
+
+    def test_owner_codes(tmp_path):
+        cases = {
+            "owner-duplicate": ("| 引擎存在 | `docs/fact-owner.md` | § 概览 |\n"
+                                "| 引擎存在 | `docs/other-owner.md` | § 实现 |\n"),
+            "owner-path-missing": "| 引擎存在 | `docs/not-there.md` | § 概览 |\n",
+            "owner-anchor-missing": "| 引擎存在 | `docs/fact-owner.md` |  |\n",
+        }
+        for rule, rows in cases.items():
+            case_dir = tmp_path / rule
+            _repo, spec_dir = make_repo(case_dir, plan=build_plan(owners=rows))
+            proc = run_structure(spec_dir)
+>           assert proc.returncode == 1, "%s must fail the gate" % rule
+E           AssertionError: owner-duplicate must fail the gate
+E           assert 2 == 1
+E            +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:425: AssertionError
+__________ test_verbatim_hand_copy_uses_the_existing_duplicate_floor ___________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_verbatim_hand_copy_uses_t0')
+
+    def test_verbatim_hand_copy_uses_the_existing_duplicate_floor(tmp_path):
+        copied = "这一行在计划与落文里逐字重复，长度远超机械下限，必须被既有阈值判出。"
+        plan = build_plan(extra="\n" + copied + "\n")
+        doc = DELIVERED_OK + "\n" + copied + "\n"
+        _repo, spec_dir = make_repo(tmp_path, plan=plan, delivered=doc)
+        proc = run_structure(spec_dir, "--path", str(spec_dir / "delivered.md"))
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:437: AssertionError
+____________________ test_delivered_document_chapter_codes _____________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_delivered_document_chapte0')
+
+    def test_delivered_document_chapter_codes(tmp_path):
+        unexpected = DELIVERED_OK + "\n## 附录\n\n计划外的顶层章节。\n"
+        _repo, spec_dir = make_repo(tmp_path / "unexpected", delivered=unexpected)
+        proc = run_structure(spec_dir, "--path", str(spec_dir / "delivered.md"))
+>       assert proc.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:451: AssertionError
+_____________ test_a_non_top_level_extra_section_does_not_turn_red _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_a_non_top_level_extra_sec0')
+
+    def test_a_non_top_level_extra_section_does_not_turn_red(tmp_path):
+        doc = DELIVERED_OK.replace(
+            "改动点落在既有文件的扩展点上，不新增门禁面。",
+            "改动点落在既有文件的扩展点上。\n\n### 细节\n\n非顶层小节不因本条转红。",
+        )
+        _repo, spec_dir = make_repo(tmp_path, delivered=doc)
+        proc = run_structure(spec_dir, "--path", str(spec_dir / "delivered.md"))
+        assert proc.returncode == 0, (
+            "an unexpected NON-top-level section must not turn the gate red; findings=%r"
+>           % payload_of(proc)["findings"]
+              ^^^^^^^^^^^^^^^^
+        )
+
+tests/contract/test_document_structure_gate.py:474: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n")
+
+    def payload_of(proc):
+>       assert proc.stdout.strip(), (
+            "expected a JSON payload on stdout; stderr=%r" % proc.stderr
+        )
+E       AssertionError: expected a JSON payload on stdout; stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x101057630>()
+E        +    where <built-in method strip of str object at 0x101057630> = ''.strip
+E        +      where '' = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").stdout
+
+tests/contract/test_document_structure_gate.py:191: AssertionError
+_____________ test_structure_green_content_red_is_still_a_failure ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_structure_green_content_r0')
+
+    def test_structure_green_content_red_is_still_a_failure(tmp_path):
+        """SC-004's second delivered-document fixture: structure green, content red."""
+        plan = build_plan(evidence="| 引擎存在 | 实测 | 2026-10-30 |  |\n")
+        _repo, spec_dir = make_repo(tmp_path, plan=plan, delivered=DELIVERED_OK)
+        proc = run_structure(spec_dir, "--path", str(spec_dir / "delivered.md"))
+>       assert proc.returncode == 1, (
+            "one assertion without `source` must fail the gate even when the chapter "
+            "structure is clean — structure is necessary, never sufficient"
+        )
+E       AssertionError: one assertion without `source` must fail the gate even when the chapter structure is clean — structure is necessary, never sufficient
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:483: AssertionError
+___________ test_execution_class_is_not_applicable_and_never_a_pass ____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_execution_class_is_not_ap0')
+
+    def test_execution_class_is_not_applicable_and_never_a_pass(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, requirements=DECLARED_EXECUTION)
+        proc = run_structure(spec_dir, fmt="text")
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]
+E                                         [--path PATH] [--owner-path OWNER_PATH]
+E                                         [--faces FACES] [--strict] [--allow-degraded]
+E                                         [--format {text,json}] [--json-out JSON_OUT]
+E         doc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:502: AssertionError
+____ test_undeclared_class_is_not_applicable_and_carries_the_default_source ____
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_undeclared_class_is_not_a0')
+
+    def test_undeclared_class_is_not_applicable_and_carries_the_default_source(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, requirements=UNDECLARED)
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 0
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:516: AssertionError
+_________ test_degraded_owner_is_not_applicable_with_the_visible_label _________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_degraded_owner_is_not_app0')
+
+    def test_degraded_owner_is_not_applicable_with_the_visible_label(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, with_owner=False)
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 0, (
+            "an absent owner degrades visibly, it does not fail the stage; stderr=%r"
+            % proc.stderr
+        )
+E       AssertionError: an absent owner degrades visibly, it does not fail the stage; stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:526: AssertionError
+_______________________ test_author_error_stops_the_gate _______________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_author_error_stops_the_ga0')
+
+    def test_author_error_stops_the_gate(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, requirements=DECLARED_INVALID)
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 1, (
+            "an out-of-set declaration must stop the gate (FR-005), got exit %d"
+            % proc.returncode
+        )
+E       AssertionError: an out-of-set declaration must stop the gate (FR-005), got exit 2
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:538: AssertionError
+____________________ test_baseline_subset_is_the_criterion _____________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_baseline_subset_is_the_cr0')
+
+    def test_baseline_subset_is_the_criterion(tmp_path):
+        _repo, spec_dir = make_repo(
+            tmp_path, plan=build_plan(owners="| 引擎存在 | `docs/not-there.md` |  |\n")
+        )
+        first = run_structure(spec_dir)
+>       assert first.returncode == 1
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:555: AssertionError
+________________ test_a_missing_baseline_reads_as_the_empty_set ________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_a_missing_baseline_reads_0')
+
+    def test_a_missing_baseline_reads_as_the_empty_set(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, plan=build_plan(owners="| 引擎存在 | `docs/not-there.md` | § |\n"))
+        assert not (spec_dir / "structure-baseline.txt").exists()
+        proc = run_structure(spec_dir)
+>       assert proc.returncode == 1, "no baseline file means no tolerance — an absolute judge"
+E       AssertionError: no baseline file means no tolerance — an absolute judge
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:575: AssertionError
+_____________________ test_freeze_prints_and_never_writes ______________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_freeze_prints_and_never_w0')
+
+    def test_freeze_prints_and_never_writes(tmp_path):
+        _repo, spec_dir = make_repo(tmp_path, plan=build_plan(owners="| 引擎存在 | `docs/not-there.md` | § |\n"))
+        proc = run_structure(spec_dir, "--freeze")
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]
+E                                         [--path PATH] [--owner-path OWNER_PATH]
+E                                         [--faces FACES] [--strict] [--allow-degraded]
+E                                         [--format {text,json}] [--json-out JSON_OUT]
+E         doc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").returncode
+
+tests/contract/test_document_structure_gate.py:582: AssertionError
+_________________ test_same_plan_yields_the_same_violation_set _________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1760/test_same_plan_yields_the_same0')
+
+    def test_same_plan_yields_the_same_violation_set(tmp_path):
+        plan = build_plan(
+            chapter_tree="| 概览 | — |  |  |\n| 概览 | — | 决定 |  |\n",
+            evidence="| 引擎存在 | 也许 | 2026/10/30 |  |\n",
+        )
+        _repo, spec_dir = make_repo(tmp_path, plan=plan)
+>       first = payload_of(run_structure(spec_dir))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_document_structure_gate.py:600: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n")
+
+    def payload_of(proc):
+>       assert proc.stdout.strip(), (
+            "expected a JSON payload on stdout; stderr=%r" % proc.stderr
+        )
+E       AssertionError: expected a JSON payload on stdout; stderr="usage: doc-consistency-check.py [-h] [--action {verify}] [--spec-dir SPEC_DIR]\n                                [--path PATH] [--owner-path OWNER_PATH]\n                                [--faces FACES] [--strict] [--allow-degraded]\n                                [--format {text,json}] [--json-out JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n"
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0x101057630>()
+E        +    where <built-in method strip of str object at 0x101057630> = ''.strip
+E        +      where '' = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t JSON_OUT]\ndoc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')\n").stdout
+
+tests/contract/test_document_structure_gate.py:191: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_document_structure_gate.py::test_structure_action_exists_and_needs_a_spec_dir
+FAILED tests/contract/test_document_structure_gate.py::test_default_run_is_plan_side_only_and_says_two_way_not_run
+FAILED tests/contract/test_document_structure_gate.py::test_the_cli_rejects_structure_as_a_face
+FAILED tests/contract/test_document_structure_gate.py::test_subsections_and_columns_are_checker_constants
+FAILED tests/contract/test_document_structure_gate.py::test_the_code_set_is_exactly_the_four_families
+FAILED tests/contract/test_document_structure_gate.py::test_expression_line_with_a_complete_plan_passes
+FAILED tests/contract/test_document_structure_gate.py::test_whole_chapter_missing_reports_one_code_and_suppresses_subsection_codes
+FAILED tests/contract/test_document_structure_gate.py::test_missing_chapter_tree_reports_subsection_missing
+FAILED tests/contract/test_document_structure_gate.py::test_missing_reader_lines_report_subsection_missing
+FAILED tests/contract/test_document_structure_gate.py::test_chapter_tree_syntax_codes
+FAILED tests/contract/test_document_structure_gate.py::test_evidence_codes_are_reused_not_reinvented
+FAILED tests/contract/test_document_structure_gate.py::test_evidence_unlisted_requires_a_delivered_document
+FAILED tests/contract/test_document_structure_gate.py::test_owner_codes - Ass...
+FAILED tests/contract/test_document_structure_gate.py::test_verbatim_hand_copy_uses_the_existing_duplicate_floor
+FAILED tests/contract/test_document_structure_gate.py::test_delivered_document_chapter_codes
+FAILED tests/contract/test_document_structure_gate.py::test_a_non_top_level_extra_section_does_not_turn_red
+FAILED tests/contract/test_document_structure_gate.py::test_structure_green_content_red_is_still_a_failure
+FAILED tests/contract/test_document_structure_gate.py::test_execution_class_is_not_applicable_and_never_a_pass
+FAILED tests/contract/test_document_structure_gate.py::test_undeclared_class_is_not_applicable_and_carries_the_default_source
+FAILED tests/contract/test_document_structure_gate.py::test_degraded_owner_is_not_applicable_with_the_visible_label
+FAILED tests/contract/test_document_structure_gate.py::test_author_error_stops_the_gate
+FAILED tests/contract/test_document_structure_gate.py::test_baseline_subset_is_the_criterion
+FAILED tests/contract/test_document_structure_gate.py::test_a_missing_baseline_reads_as_the_empty_set
+FAILED tests/contract/test_document_structure_gate.py::test_freeze_prints_and_never_writes
+FAILED tests/contract/test_document_structure_gate.py::test_same_plan_yields_the_same_violation_set
+25 failed, 1 passed in 1.82s
