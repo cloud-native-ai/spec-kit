@@ -155,3 +155,128 @@ the slice's own criterion ("this slice's edit does not move the total", measured
   comparison is used as evidence (§ 10 of `notes/pre-change-measurements.md`).
 - **DoD-9**: plan_constraint honoured — `plan_edit_count=0`, measured by an empty `git diff --stat`
   over every plan-owned path for the whole implement stage.
+
+# -- Gates (tasks T026, re-run against the frozen task list) --
+
+Four gate commands in the order `tasks.md` § Completion Gate names them, plus the two
+measured-after-close items and the evidence-binding check. Real output verbatim; the frozen list was
+not renumbered and no rerun row was appended. Recorded tip at gate time: `820f65062` (the four
+commands ran while T026's own row was still open — GATE-8 is measured after closing it, below).
+
+### GATE-1 — task-file structure
+
+```console
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/074b-nested-governance/tasks.md
+PASS: .specify/specs/074b-nested-governance/tasks.md — 0 error(s), 0 warning(s)
+rc=0
+```
+
+### GATE-2 — cross-artifact consistency
+
+```console
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/074b-nested-governance --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0,
+ "waived": 0, "fr": 8, "sc": 2, "tasks": 26, "clauses": 0, "files": 12},
+ "checked_at": "2026-10-29T06:38:46Z"}
+rc=0
+```
+
+**Advisories**: there are none to adjudicate. The tasks-stage run reported 21 `missing-path`
+advisories naming the three contract-test files T004 / T010 / T019 would create; those files now
+exist, so the same command returns a clean report. The count moving is the expected consequence of
+the slice landing, not a waived finding.
+
+### GATE-3 — decomposition size
+
+```console
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+    --requirements .specify/specs/074b-nested-governance/requirements.md \
+    --tasks .specify/specs/074b-nested-governance/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 8, "task_count": 26,
+ "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-29T06:38:53Z"}
+rc=0
+```
+
+### GATE-4 — clause coverage
+
+```console
+$ python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/074b-nested-governance
+claimed clauses (this feature): 30
+baseline: .specify/specs/074b-nested-governance/coverage-baseline.txt (495 names)
+baseline-internal existing uncovered: 495
+uncovered beyond baseline: 0
+
+FR universe: 8
+FR claimed: 8
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 30, scanned files 215,
+clause universe 1315, FR universe 8
+  [clause-uncovered] pass (495) — 495 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 8 of 8 FRs cited from citation groups
+  [clause-unparsable] warn (94) — 94 files yield no clause id under the owner's forms; 0 of them
+    declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 495 names; 495 uncovered items are
+    baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+rc=0
+```
+
+All 30 clauses are claimed exactly once, the FR lane is 8/8, and nothing is uncovered beyond the
+frozen baseline. The `[clause-unparsable]` warn is the baseline's own parse-doubt class (0 of those
+94 files declare a positive form) and is unchanged by this slice.
+
+### GATE-5 / GATE-6 / GATE-7 — measured by the tasks that own them
+
+These three are not re-run here because each already has a single owner and a single measurement, and
+a second run would only produce a second copy of the same comparison:
+
+- **GATE-5** (zero new failing node ids) → T023, `notes/pre-change-measurements.md` § 11:
+  `comm -13` empty **and** `comm -23` empty against the T002 re-capture; 338 collected, 337 passed,
+  1 failed.
+- **GATE-6** (mirror and command-copy drift) → T021/T022, `notes/quickstart-run.md` § refresh:
+  `sync-mirrors.py --check` clean on all six pairs with the T001 file counts (22 / 406 / 136 / 3 /
+  114 / 59), `regen-command-copies.py --check` `OK`, five `cmp`-identical pairs, second generator run
+  byte-identical (sha256 `23aaf2684c7fab9f31846e930d0cdf0c7a9ada19a74547dcbdf349862cbbeebb`).
+- **GATE-7** (zero new storage surface) → T024, `notes/quickstart-run.md` § structure:
+  `.specify/state/` (3 names) and `.specify/memory/` (681 names) both `comm -13` and `comm -23`
+  empty.
+
+### GATE-8 / GATE-9 — no open rows, SC rows complete
+
+Measured **after** closing T026's own row, which is the only moment GATE-8 can be 0:
+
+```console
+# before closing T026 — read from the commit that still carried the open row
+$ git show 820f65062:.specify/specs/074b-nested-governance/tasks.md | grep -cE '^- \[[ >]\]'
+1
+# after closing T026 — the working tree
+$ grep -cE '^- \[[ >]\]' .specify/specs/074b-nested-governance/tasks.md
+0
+$ grep -cE '^- \[[xX]\] T[0-9]+' .specify/specs/074b-nested-governance/tasks.md
+26
+$ grep -cE '^- \[~\]' .specify/specs/074b-nested-governance/tasks.md
+0
+$ grep -cE '^- \*\*SC-00[12]\*\*' .specify/specs/074b-nested-governance/verification.md
+2
+```
+
+### Evidence binding — every `pass` row re-hashed at gate time
+
+```console
+$ python3 - <<'PY'   # parse the evidence rows, recompute SHA-256 over each archived file
+  SC-001: exists=True bytes=15028 sha_match=True verdict=pass -> BOUND
+  SC-002: exists=True bytes=18811 sha_match=True verdict=pass -> BOUND
+BINDING: green
+rc=0
+```
+
+Both `pass` rows are complete and bound: the archived artifacts exist, are non-empty, and their
+computed digests equal the recorded ones. No `pass` in this file is `unverified`.
+
+**Structural drift check**: none was found between the frozen 26-row list and the delivered slice, so
+no rerun row was appended and nothing was renumbered. The four gate commands above therefore ran
+against the same list T026 was written against.
