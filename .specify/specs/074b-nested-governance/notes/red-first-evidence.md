@@ -278,3 +278,55 @@ three remaining failures are all **pre-existing** members of the 21-name `baseli
 `test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`). `comm -13` against the
 baseline is **empty**. Capture: `test-evidence/implement-targeted-part2-supp-run.txt`, failing names
 in `implement-targeted-part2-supp-failed.txt`, row: `implement.jsonl` seq 5.
+
+## E-6 · `tests/contract/test_sdd_invocation_governance.py` — superset edit (T017, no red step by instruction)
+
+**Why no red step**: `tasks.md` T017 places this row under the migration/regression exception — the
+file guards behaviour `074a` already delivered (`sdd-route.py --action authorize`, whose absent-key
+default is owned by `NEUTRAL_AGENT_METADATA_KEYS`), so there can be no red-first run: the behaviour
+exists before the case does. The guard against a sham superset is the *pre-edit* run below plus the
+rule that no existing case's proposition changes.
+
+**Pre-edit run** (before any line of this edit, 2026-10-29):
+
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py
+.................                                                        [100%]
+17 passed in 0.24s
+rc=0
+```
+
+**Post-edit run** (same command, after the six new cases landed):
+
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py
+.......................                                                  [100%]
+23 passed in 0.59s
+rc=0
+```
+
+**Reading**: 23 = the 17 preserved cases + 6 new ones; `17 ⊂ 23` and all 17 keep their verdict, so the
+edit is a superset in the direction C-1/C-2 require. The six added node ids:
+
+```text
+tests/contract/test_sdd_invocation_governance.py::test_c1_an_agent_definition_without_the_key_resolves_forbidden
+tests/contract/test_sdd_invocation_governance.py::test_c1_a_seat_without_the_policy_entry_resolves_forbidden[block-seat_absent-absent-entry]
+tests/contract/test_sdd_invocation_governance.py::test_c1_a_seat_without_the_policy_entry_resolves_forbidden[no-seats-seat_allowed-absent-map]
+tests/contract/test_sdd_invocation_governance.py::test_c1_the_absent_recipient_cannot_receive_a_driver_naming_dispatch
+tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_agent_key_changes_no_other_field_of_the_dispatch
+tests/contract/test_sdd_invocation_governance.py::test_c2_an_absent_seat_key_changes_no_other_field_of_the_dispatch
+```
+
+**Non-vacuity of the C-2 cases** (measured, not assumed): the declared/absent pair differs by one
+line of the same document at the same path, and the two records differ in exactly the declaring
+source — `supplying.agent: declared → absent-key`, with `effective`, `failed_half` and `reason`
+identical:
+
+```text
+diff fields: ['supplying']
+supplying: {'agent': 'declared', 'seat': 'declared'} -> {'agent': 'absent-key', 'seat': 'declared'}
+reason equal: True | failed_half: agent agent
+effective: forbidden forbidden
+```
+
+Had any other field moved, the C-2 cases fail — which is the property they are written to hold.

@@ -39,6 +39,25 @@ Boundary: this module asserts nothing about the routing *outcome* reasoning
 (`test_sdd_routing_engine.py`), nothing about the owner document's overall shape
 (`test_sdd_routing_definitions.py`), and nothing about the nested run's handoff
 (`test_nested_sdd_invocation.py`).
+
+Slice 074b, task T017 — the absent-declaration cases (superset direction)
+-----------------------------------------------------------------------
+`contracts/compat-and-safety.md` C-1 and C-2, added on top of every case above without changing
+one of their propositions:
+
+- **C-1** — a recipient carrying no `sdd-invocation` declaration (no key on the Agent definition,
+  no entry / no map on the seat side) resolves to `forbidden`, and the pre-dispatch probe therefore
+  refuses a dispatch that names an SDD driver.
+- **C-2** — that absence alters **nothing else** about the recipient's dispatch. The criterion is
+  executed, not narrated: the same document is measured twice — once declaring the key, once with
+  that single line removed and every path held constant — and the two authorization records may
+  differ in the *declaring source* field alone. Other keys' resolutions, every payload field, and
+  the failure-message form are inside that comparison, so a regression that reshapes the record for
+  the absent case fails here.
+
+This file is written green by instruction (tasks.md T017, migration/regression exception): it pins
+behaviour `074a` already delivered, so there is no red-first step — the guard is that no existing
+case's proposition moves, which the pre-edit count of 17 preserved cases records.
 """
 
 from __future__ import annotations
@@ -48,7 +67,7 @@ from pathlib import Path
 
 import pytest
 
-from fixtures.nested_sdd import ALLOWED, ENGINE, build
+from fixtures.nested_sdd import ALLOWED, ENGINE, FORBIDDEN, KEY, build
 
 pytestmark = pytest.mark.contract
 
@@ -272,6 +291,159 @@ def test_c9_no_second_copy_of_the_prohibition_set():
             f"({SUBAGENT_DEFS.relative_to(REPO_ROOT)}), found on "
             f"{[str(path.relative_to(REPO_ROOT)) for path in hits]} (C-9)"
         )
+
+
+# ---------------------------------------------------------------------------
+# C-1 / C-2 — no declaration resolves `forbidden`, and changes nothing else
+# ---------------------------------------------------------------------------
+
+
+def _absent_copy(source: Path, target: Path) -> Path:
+    """A copy of ``source`` with its single ``sdd-invocation:`` line removed.
+
+    The pair (declared, absent) then differs by exactly one line, which is what makes the
+    record comparison below a comparison of *this* absence rather than of two documents.
+    """
+    lines = source.read_text(encoding="utf-8").splitlines()
+    kept = [line for line in lines if not line.strip().startswith(KEY)]
+    assert len(kept) == len(lines) - 1, (
+        f"{source} must carry exactly one {KEY!r} line for the declared/absent pair to differ by "
+        f"one line; removed {len(lines) - len(kept)}"
+    )
+    target.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return target
+
+
+def _changed_fields(before: dict, after: dict) -> list:
+    """Top-level fields whose value moved between two records (key set mismatch included)."""
+    assert sorted(after) == sorted(before), (
+        "the absent case must produce the same record shape — a field appearing or disappearing "
+        f"is itself a change: {sorted(set(after) ^ set(before))}"
+    )
+    return sorted(field for field in before if before[field] != after[field])
+
+
+def test_c1_an_agent_definition_without_the_key_resolves_forbidden(project):
+    """C-1 (agent half): no declaration on the definition means `forbidden`, and only its own
+    half moves — the seat half still reports what the roster declares."""
+    allowed = project.run_authorize_json(project.seat_allowed)
+    assert allowed["effective"] == ALLOWED, "control: both halves declared allowed"
+
+    absent = project.run_authorize_json(project.seat_allowed, agent=project.agent_forbidden)
+    assert absent["agent_capability"] == FORBIDDEN, (
+        "an Agent definition with no capability key must resolve to the owner's absent-key default"
+    )
+    assert "absent" in absent["supplying"]["agent"], (
+        "the record must distinguish a missing declaration from a declared refusal (C-14): "
+        f"supplying.agent={absent['supplying']['agent']!r}"
+    )
+    assert absent["effective"] == FORBIDDEN and absent["verdict"] == FORBIDDEN
+    assert absent["failed_half"] == "agent"
+    assert absent["seat_policy"] == ALLOWED and absent["supplying"]["seat"] == "declared", (
+        "the seat half's resolution must be untouched by the agent half's absence (C-2)"
+    )
+
+
+@pytest.mark.parametrize(
+    "variant, seat_attr, absent_form",
+    [
+        ("block", "seat_absent", "absent-entry"),
+        ("no-seats", "seat_allowed", "absent-map"),
+    ],
+)
+def test_c1_a_seat_without_the_policy_entry_resolves_forbidden(
+    tmp_path: Path, variant: str, seat_attr: str, absent_form: str
+):
+    """C-1 (seat half): an absent entry and an absent map both resolve `forbidden`, and the
+    agent half keeps the value the definition declares."""
+    project = build(tmp_path / variant, variant=variant)
+    record = project.run_authorize_json(getattr(project, seat_attr))
+    assert record["seat_policy"] == FORBIDDEN, (
+        f"{absent_form} must resolve to the owner's absent-key default"
+    )
+    assert record["supplying"]["seat"] == absent_form, (
+        f"the record must name the absent form ({absent_form}), got "
+        f"{record['supplying']['seat']!r}"
+    )
+    assert record["effective"] == FORBIDDEN and record["verdict"] == FORBIDDEN
+    assert record["failed_half"] == "seat"
+    assert record["agent_capability"] == ALLOWED, (
+        "the agent half's resolution must be untouched by the seat half's absence (C-2)"
+    )
+
+
+def test_c1_the_absent_recipient_cannot_receive_a_driver_naming_dispatch(project):
+    """C-1 (enforcement half): the predicate is unsatisfiable without the declaration, and the
+    rule that a driver-naming prompt is not dispatched when it fails is stated once, on the owner
+    site the probe cites."""
+    gov = _governance()
+    assert "without all three conditions is not dispatched" in gov, (
+        "the owner site must state that a driver-naming prompt failing the conditions is not "
+        "dispatched — without it, 'resolves forbidden' would carry no pre-dispatch consequence"
+    )
+    probe = _probe()
+    assert "sdd-route.py" in probe and "--action authorize" in probe, (
+        "the refusal must come from the resolution, not from the prompt's wording (C-1 / C-10)"
+    )
+    absent = project.run_authorize_json(project.seat_allowed, agent=project.agent_forbidden)
+    assert absent["effective"] != ALLOWED, (
+        "the pre-dispatch probe fails closed on this record: a recipient without the declaration "
+        "has no path to `allowed`, so a driver-naming dispatch to it is not sent"
+    )
+
+
+def test_c2_an_absent_agent_key_changes_no_other_field_of_the_dispatch(project):
+    """C-2 (agent half), executed: the declared and the absent runs differ by the declaring
+    source alone — no other key's resolution, no payload field, no failure-message form."""
+    declared_path = project.agent_allowed.parent / "declared-forbidden.agent.md"
+    declared = project.agent_forbidden.read_text(encoding="utf-8").replace(
+        "\n---\n", f"\n{KEY}: {FORBIDDEN}\n---\n", 1
+    )
+    assert f"{KEY}: {FORBIDDEN}" in declared, "the declared twin must carry the key"
+    declared_path.write_text(declared, encoding="utf-8")
+    before = project.run_authorize_json(project.seat_allowed, agent=declared_path)
+    assert before["agent_capability"] == FORBIDDEN
+
+    _absent_copy(declared_path, declared_path)
+    after = project.run_authorize_json(project.seat_allowed, agent=declared_path)
+
+    assert after["agent_capability"] == FORBIDDEN, (
+        "the declared refusal and the absent key must reach the same value"
+    )
+    changed = _changed_fields(before, after)
+    assert changed == ["supplying"], (
+        "removing the declaration may alter the declaring source only; everything else about "
+        f"that recipient's dispatch is fixed. Fields that moved: {changed}. "
+        f"before.reason={before['reason']!r} after.reason={after['reason']!r}"
+    )
+    assert before["reason"] == after["reason"] and before["failed_half"] == after["failed_half"], (
+        "the failure-message form must not depend on whether the declaration was absent"
+    )
+
+
+def test_c2_an_absent_seat_key_changes_no_other_field_of_the_dispatch(project):
+    """C-2 (seat half), executed: removing the key inside one seat's entry leaves that seat's
+    record identical but for the declaring source, and leaves every other seat's record bit for
+    bit unchanged."""
+    others_before = project.run_authorize_json(project.seat_allowed)
+    before = project.run_authorize_json(project.seat_forbidden, agent=project.agent_allowed)
+    assert before["seat_policy"] == FORBIDDEN
+
+    team = project.team_md.read_text(encoding="utf-8").splitlines()
+    kept = [line for line in team if line.strip() != f"{KEY}: {FORBIDDEN}"]
+    assert len(kept) == len(team) - 1, (
+        "the fixture must carry exactly one declared refusal for this seat"
+    )
+    project.team_md.write_text("\n".join(kept) + "\n", encoding="utf-8")
+
+    after = project.run_authorize_json(project.seat_forbidden, agent=project.agent_allowed)
+    assert after["seat_policy"] == FORBIDDEN
+    assert _changed_fields(before, after) == ["supplying"], (
+        "the absent entry key may alter the declaring source only (C-2)"
+    )
+    assert project.run_authorize_json(project.seat_allowed) == others_before, (
+        "one seat's absent declaration must not perturb another recipient's dispatch (C-2)"
+    )
 
 
 # ---------------------------------------------------------------------------
