@@ -111,7 +111,10 @@ and "claims it ran" are indistinguishable on the artifact. `shared/workflow/self
 **Decision.** Four literal keys, each appearing exactly once (`attempt:`, `exit_code:`,
 `observation:`, `would_go_red_if:`), value on the same line or in an indented continuation.
 `exit_code` is an integer; `observation` must begin with the literal `raw:`; `would_go_red_if`
-must name a backticked input span and a named red signal. The script never replays `attempt`.
+is split at the **first** occurrence of the literal `red:` (a later `red:` never moves the
+split): at least one backtick span before that point names the broken input, and at least one
+backtick span after it names the red signal (an assertion, a check label or a non-zero exit
+code). The script never replays `attempt`.
 
 **Rejected alternative.** Semantic judgement by the receiving agent. The same payload would
 produce different verdicts across models or runs, which is exactly the failure FR-021 closes;
@@ -130,10 +133,11 @@ disguised paraphrase passes (bound to `SC-004 Source`), and the grammar can only
 skills/external 406 / skills/internal 136 / agents 3 / scripts 115 / shared 59 files).
 `python3 scripts/python/regen-command-copies.py --check` → exit 0.
 
-**Decision.** The criterion is "no NEW drift on the seven rows of FR-025's table, relative to
-this baseline", never "the command exits 0" — a bare exit code is passable or unpassable by
-things this spec does not touch. `templates/commands/**` is not touched, so the per-tool copy set
-is empty; the row-5 SKILL.md edit is inside an already-listed mirror pair.
+**Decision.** The criterion is "no NEW drift on the rows of FR-025's table (the row count is
+owned by that table and is not restated here), relative to this baseline", never "the command
+exits 0" — a bare exit code is passable or unpassable by things this spec does not touch.
+`templates/commands/**` is not touched, so the per-tool copy set is empty; the row-5 SKILL.md
+edit is inside an already-listed mirror pair.
 
 **Rejected alternative.** Freezing an "all green" criterion: it would make the check fail for
 pre-existing drift on unrelated pairs and would tell a reader nothing about this spec's surface.
@@ -196,9 +200,13 @@ not a spec fact).
 **Decision.** Three new contract-test files, written before the implementation they judge:
 `test_decision_tension_contract.py` (owner doc, template anchor, analyze channel, ADR slot,
 mirror parity, terminology, containment), `test_decision_tension_validator.py` (six labels,
-exit codes, positive + five negative fixtures), `test_falsification_quartet_validator.py`
-(one accept + six rejects, exit codes 0/1/2). Negative samples live in the tests, never only in
-prose (FR-017).
+exit codes, one compliant plan plus the six inverse-input classes expanded to twelve runs —
+the six field deletions plus `expected_sacrifice: none`, undecidable wording, a duplicate
+`tension_id`, a skipped `tension_id` and an unmapped source), `test_falsification_quartet_validator.py`
+(one accept plus the six rejection reason codes at 6/6, with four additional `missing-field`
+samples — eleven runs in the reason-code matrix — covering exit codes 0/1/2; a separate
+double-`red:` fixture pins the first-occurrence split and stays outside that matrix count).
+Negative samples live in the tests, never only in prose (FR-017).
 
 **Rejected alternative.** One monolithic file: the two validators are separate programs with
 separate exit-code semantics, and a single file would make a red run ambiguous about which

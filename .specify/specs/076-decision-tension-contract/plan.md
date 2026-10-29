@@ -226,13 +226,35 @@ N/A — Constitution Check 18 项全部 Pass，无 Violation 需要辩护，本�
 | 9 | `requirements.md`（SC-001、SC-001 Source、FR-017、Edge Cases）、`tasks.md`（T003、T008、T026、US1 Checkpoint、MVP 步骤）、`quickstart.md` S2、`feature-ref.md`（SC-001 行）、本文件（§ Testing、§ Phase 1 Quickstart 行） | 反向输入由五类改为六类：补 `tension_id` 跳号，并把「删任一字段」明确为六字段逐一各跑一次（共 12 次运行） | 原五类反向输入缺 Edge Cases 已声明的跳号形态，SC-001 的「不依赖人工阅读」因此有一个已声明缺陷没有被夹具覆盖 | A-09 |
 | 10 | `tasks.md` T013/T014 | 要求 owner 小节披露两处已披露限制（`raw:` 可伪造、红色结果不可证）及处置，并由契约测试断言其存在 | 两处限制此前只写在 Clarifications Q5，没有任何实现行承接 | A-10 |
 | 11 | `requirements.md` § Shared Strings 的 Citation convention | 约定收窄为「仅 requirements.md 内」；契约与任务文件逐字书写字面量 | 原文要求契约与任务也写 `[[STR-NNN]]`，而它们实际逐字书写且必须逐字（实现期要匹配），约定与用法不一致 | A-11 |
-| 12 | `requirements.md` A3 + FR-024 | 别名白名单三处对齐：A3、owner 术语注记、`.specify/memory/features/076.md` § 附（并说明该文件不在三棵分发面内） | A3 允许其映射存放在 Feature 详情附录，FR-024 的白名单却只列两处，两处自相矛盾 | A-12 |
+| 12 | `requirements.md` A3 + FR-024 | 别名白名单三处对齐：A3、owner 术语注记、`.specify/memory/features/076.md` § 附（并说明该文件不在三棵分发面内）（**本轮已按 A-12 收缩为两处：A3 + Feature 详情 § 附，owner 侧术语注记项删除**） | A3 允许其映射存放在 Feature 详情附录，FR-024 的白名单却只列两处，两处自相矛盾 | A-12（第一轮口径已在第二轮收缩） |
 | 13 | `feature-ref.md` § 绑定关系 | 删去不存在的 `plan.md § Feature Integration` 引用，改为指向本条绑定结论与 `tasks.md` T027 | 该章节不存在，引用不可解析 | A-13 |
 | 14 | `.specify/memory/features/076.md`、`.specify/memory/features.md` 076 行 | 追加 checklist 阶段记录（`cde66c0b`），状态保持 `Planned` | 阶段记录缺失，索引与详情的「最后更新」停在 tasks 阶段 | A-14 |
 | 15 | 本文件（Summary / Project Structure）、`tasks.md` T016 | 「改写并删复述」改为「核验 SI-3C 仍为指针形并留证」，交付面相应改为「1 份工作流步骤核验」 | 实测 SI-3C 已只保留步骤摘要与 owner 指针、无四元组字段清单可删；原文描述的是一次空操作，且会让交付面计数虚高 | A-15 |
 | 16 | `tasks.md` § Requirement Coverage Map | 增一行：T001 / T026 / T027 是流程行，不映射任何 FR / SC | 原表只列有 FR / SC 映射的行，读者无法判断三行是漏映射还是流程行 | A-16 |
 | 17 | 本文件 § Scale/Scope / § Mirror Obligations、`tasks.md` DoD-5 / § Mirror Obligations / T024 | 「七行 / 7 对」改为「以 `requirements.md` FR-025 的表为准（行数不在本处重复）」 | 同一个数字在四处各写一份，改表就会漂移（系统性建议，本轮采纳） | A-01…A-16 的系统性收口 |
 
-**未改动**：`research.md`（Phase 0 实测记录，本轮无新实测需要回填）；`checklists/readiness-2026-10-29.md`（dated record，不回改）；`coverage-baseline.txt`（claims 数未变，不重冻结）。
+**第一轮未改动**：`research.md`（Phase 0 实测记录，第一轮无新实测需要回填；第二轮按 A-18 / A-22 更新 R-5 / R-6 / R-9）；`checklists/readiness-2026-10-29.md`（dated record，不回改）；`coverage-baseline.txt`（claims 数未变，不重冻结）。
 
 **连带面说明**：上表每行的文件列包含该发现的**分发面同步**（同一处措辞在 SC 源、契约条款、任务行、quickstart、feature-ref 上的一致性改写），不另立发现编号；没有第 17 条之外的独立改动。
+
+### 第二轮（analyze #2 之后的 spec-only 修复）
+
+本轮仍无 FR / SC / 契约条款 / 任务行增删——26 FR / 8 SC / 34 条款 / 27 任务行在改动前后相同。
+逐文件声明（上表第 12 行的三处白名单口径已被本轮 A-12 收缩为两处）：
+
+- PLAN-EDIT: research.md — align R-5/R-9 with the remediated shapes；分类=minor
+- PLAN-EDIT: research.md — replace R-6's "seven rows" literal with a pointer to FR-025's table；分类=minor
+- PLAN-EDIT: requirements.md — drop the owner terminology note from the A3 / FR-024 whitelist, add the third cross-label precedence (empty values → `dtr-rejected-form`), pin the first-`red:` split, and sync FR-004 / FR-017 / SC-007 / US2 AS2 / Q3 / FR-025 row 3；分类=minor
+- PLAN-EDIT: data-model.md — mirror the third cross-label precedence in R3 / R5 and the dedup paragraph, and the first-`red:` split in E5 / E6；分类=minor
+- PLAN-EDIT: contracts/validator.md — add the third cross-label precedence to C-2 and restate C-4's sample as the literal `none`；分类=minor
+- PLAN-EDIT: contracts/decision-tension-owner.md — judge a blank `expected_sacrifice` under the first rejection entry（C-4）；分类=minor
+- PLAN-EDIT: contracts/falsification-quartet.md — pin the first-occurrence `red:` split in C-2 / C-3；分类=minor
+- PLAN-EDIT: contracts/mirrors-and-scope.md — replace the "seven-row" literal with a pointer to FR-025's table（C-3）；分类=minor
+- PLAN-EDIT: tasks.md — T003 / T007 / T008 precedence, T012 double-`red:` fixture, T015 split rule, T017 / T026 report snapshots, T021 / T023 whitelist wording；分类=minor
+- PLAN-EDIT: quickstart.md — S3 label / count sync, S4 first-`red:` split, dedup wording under 「失败时怎么读」；分类=minor
+- PLAN-EDIT: plan.md — this record and row 12's superseding note；分类=minor
+
+**A-19 选项（写明）**：SC-002 / SC-003 的观测保持「analyze 报告快照」（选项 ②）。快照产出落在
+T017（SC-003 三连跑，D-1 / D-2 / D-3 各一份）与 T026（SC-002 四类夹具，各一份），不把 SC 的观测
+降级为「契约测试的标签→HIGH 映射输出 + 通过/失败计数」（选项 ① 未采用：它会把报告快照这一原始
+观测意图换成测试断言，SC-002 / SC-003 的判据就只剩测试是否跑绿）。

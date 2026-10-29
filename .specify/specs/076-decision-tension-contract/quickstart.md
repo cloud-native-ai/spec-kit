@@ -74,7 +74,7 @@ python3 scripts/python/validate-decision-tensions.py --spec <fixture-dir> --json
 |------|----------------|
 | 合规计划（记录齐备、代价可解析） | 0 |
 | 整份计划无 `## Decision Tensions` | 1（不得跳过） |
-| 一条记录缺 `revision_trigger` 或单极约束 | 1 |
+| 一条记录缺 `revision_trigger`（变体 a）或 `binding_constraints` 只有单极（变体 b）——每次运行只放一个变体 | 1：a → `dtr-record-incomplete`；b → `dtr-rejected-form`（抑制 `dtr-record-incomplete`，不叠加计数） |
 | `expected_sacrifice` 指向不存在的来源 | 1 |
 
 ```
@@ -86,7 +86,7 @@ python3 scripts/python/validate-decision-tensions.py --spec <fixture-dir> --json
 ## S4 — 证伪四元组的接收与六类拒收
 
 **前提**：载荷是 Markdown 文件，含四个字面键各一次；`observation` 值以 `raw:` 起头；
-`would_go_red_if` 以字面 `red:` 分隔两半——前半一个反引号跨度（被改坏的具名输入），
+`would_go_red_if` 以**第一次**出现的字面 `red:` 分隔两半——前半一个反引号跨度（被改坏的具名输入），
 后半至少一个反引号跨度（断言名 / 检查标签 / 非零退出码之一）。
 **钉住者**：`tests/contract/test_falsification_quartet_validator.py`。
 **状态**：plan 阶段未执行。
@@ -107,7 +107,9 @@ python3 scripts/python/validate-falsification-quartet.py <payload.md>
 
 表内六行即封闭六拒收原因码各一例，拒收率 6/6；「四字段各缺一」的四例不单列，
 作为 `missing-field` 的附加样本（同一原因码，不参与 6/6 计数）。合计十一次运行
-（1 合规 + 6 个原因码 + 4 个附加样本），退出码 0/1/2 三值均有覆盖。
+（1 合规 + 6 个原因码 + 4 个附加样本），退出码 0/1/2 三值均有覆盖。另有一个双 `red:` 定点载荷
+只验证「以第一次出现的 `red:` 切分」得到确定 verdict（首次切分后信号半仍有反引号跨度 → 接收；
+若按后一次切分会变 `tautology`），它不进上表的原因码矩阵与十一次计数。
 
 ## S5 — 镜像与术语
 
@@ -131,4 +133,4 @@ python3 scripts/python/regen-command-copies.py --check
 - 校验器返回 2：先看入参是否指向 spec 目录、两份工件是否都存在且可解码——它不是「记录不成立」。
 - `dtr-anchor` 单独变红：先看三行标题是否相邻，不要先改记录内容。
 - `expected-sacrifice-unmapped` 与 `dtr-rejected-form` 同时出现于同一记录：这是一个实现缺陷
-  （去重规则要求只报前者之一），不是作者的错。
+  （去重规则要求只报 `dtr-rejected-form`，抑制 `expected-sacrifice-unmapped`），不是作者的错。

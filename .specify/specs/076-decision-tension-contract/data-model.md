@@ -63,16 +63,18 @@
 |------|------|------|----------------------|
 | R1 章节存在与锚点 | `## Constitution Check` → `## Decision Tensions` → `## Project Structure` 三行相邻 | `dtr-anchor` | HIGH（章节缺失时抑制：只报 R2） |
 | R2 章节缺失 / 裸 `N/A` | 无该章节，或有章节但 `N/A` 未逐条说明四类触发均不成立 | `dtr-section-missing` | HIGH（与 R1 同红时优先） |
-| R3 六字段齐备 | 六个字段名各出现一次且值非空；`binding_constraints` 双极均非空 | `dtr-record-incomplete` | HIGH |
+| R3 六字段齐备 | 六个字段标签各出现一次；`decision` / `antithesis` / `discriminating_evidence` / `revision_trigger` 的值非空；`expected_sacrifice` 与两极的值留空归 R5 | `dtr-record-incomplete` | HIGH（空值不在此判，见去重规则 ③） |
 | R4 标识形态 | `T-NNN`、唯一、按序递增 | `dtr-tension-id` | HIGH |
-| R5 拒绝形态 | 命中 owner 的拒绝清单（含 `expected_sacrifice: none` 与不可判定措辞） | `dtr-rejected-form` | HIGH |
-| R6 代价可映射 | E3 解析成功 | `expected-sacrifice-unmapped` | HIGH |
+| R5 拒绝形态 | 命中 owner 的拒绝清单（含 `expected_sacrifice: none` 或留空、任一极点为空、不可判定措辞） | `dtr-rejected-form` | HIGH |
+| R6 代价可映射 | E3 解析成功；字段标签缺失或值留空时不执行本规则 | `expected-sacrifice-unmapped` | HIGH |
 
-**去重规则**：同一记录同一标签只报一条。跨标签优先级两条：① 章节缺失 → 只报
+**去重规则**：同一记录同一标签只报一条。跨标签优先级三条：① 章节缺失 → 只报
 `dtr-section-missing` 并抑制 `dtr-anchor`（三行相邻断言在章节不存在时必然同红，同一根因不计两次）；
-② `expected_sacrifice` 恰为 `none` 时只报 `dtr-rejected-form`，不再叠加
-`expected-sacrifice-unmapped`（否则 SC-001 的反向夹具会被双计数）。六个标签覆盖锚点断言、三类缺陷
-与两个记录级形态（标识、拒绝形态），不是与四件事的一一对应。
+② 六个字段标签行任一缺失 → 只报 `dtr-record-incomplete`，且不再叠加 `expected-sacrifice-unmapped`
+（缺字段即无可解析值）；③ 值为空（`expected_sacrifice` 值留空、`pole_a` 或 `pole_b` 行缺失或留空）
+或 `expected_sacrifice` 恰为 `none` → 只报 `dtr-rejected-form`，抑制 `dtr-record-incomplete` 与
+`expected-sacrifice-unmapped`（空值没有可判定内容，否则 SC-001 的反向夹具会被双计数）。六个标签覆盖
+锚点断言、三类缺陷与两个记录级形态（标识、拒绝形态），不是与四件事的一一对应。
 
 ## E2 — Binding Constraints
 
@@ -98,7 +100,9 @@
 | 尾部 | 阈值或说明自由书写，不参与解析 |
 
 **解析状态**：`resolved` / `unmapped`（标识不存在、方向缺失或非二值、出现第二个标识、无 `Source`
-连接词 → 一律 `unmapped`，MUST NOT 回落为人工阅读判定）。
+连接词 → 一律 `unmapped`，MUST NOT 回落为人工阅读判定）。值的归属优先于解析状态：字段标签缺失走
+`dtr-record-incomplete`，值留空或恰为 `none` 走 `dtr-rejected-form`，两者都不再报 `unmapped`
+（见 E1 去重规则 ② / ③）。
 
 ## E4 — Load-Bearing Predicate
 
@@ -119,7 +123,7 @@
 | `attempt` | 命令 / grep / 测试 / 测量 | 一位复核者可原样重放；脚本 MUST NOT 重放它，也 MUST NOT 判「可否重放」——可重放性是复核者规则，脚本只判非空 |
 | `exit_code` | 整数（0 合法） | 非整数即拒收 |
 | `observation` | 以字面 `raw:` 起头的原样摘录 | 无该标记即 `observation-not-raw`（「非转述」的机械代理） |
-| `would_go_red_if` | 输入半：字面 `red:` 之前的反引号跨度（被改坏的具名输入）；信号半：`red:` 之后至少一个反引号跨度（断言名 / 检查标签 / 非零退出码） | 缺 `red:` 标记或缺任一半即 `tautology`；只判形状，不判「改坏后是否真会变红」（后者属复核者与 SI-6） |
+| `would_go_red_if` | 以第一次出现的字面 `red:` 切分（后续 `red:` 不移动切分点）；输入半：切分点之前的反引号跨度（被改坏的具名输入）；信号半：切分点之后至少一个反引号跨度（断言名 / 检查标签 / 非零退出码） | 缺 `red:` 标记或缺任一半即 `tautology`；只判形状，不判「改坏后是否真会变红」（后者属复核者与 SI-6） |
 
 **载体**：SI-4 派发载荷、SI-7 intervention 记录（既有载体，不新增台账）。
 
@@ -131,7 +135,7 @@
 | `empty-field` | 键出现但值（含缩进续行）为空 |
 | `exit-code-not-integer` | `exit_code` 值不是整数 |
 | `observation-not-raw` | `observation` 值不以 `raw:` 起头 |
-| `tautology` | `would_go_red_if` 未同时给出被改坏的具名输入与 `red:` 之后的具名红色信号：缺 `red:` 标记、`red:` 之前无反引号跨度、`red:` 之后无反引号跨度，任一成立即命中。可重放性缺陷（`attempt` 无法原样重放）**不**在此集内，属复核者非阻断注记 |
+| `tautology` | `would_go_red_if` 未同时给出被改坏的具名输入与 `red:` 之后的具名红色信号：缺 `red:` 标记、第一次出现的 `red:` 之前无反引号跨度、该切分点之后无反引号跨度，任一成立即命中（多个 `red:` 以第一次出现切分，切分点唯一）。可重放性缺陷（`attempt` 无法原样重放）**不**在此集内，属复核者非阻断注记 |
 | `input-unreadable` | 载荷不可读（退出码 2，按拒收处置） |
 
 **判决者**：`scripts/python/validate-falsification-quartet.py`。接收方 agent MUST NOT 反向覆盖，
