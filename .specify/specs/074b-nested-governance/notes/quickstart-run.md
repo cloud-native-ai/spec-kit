@@ -108,10 +108,94 @@ independent fixtures rather than asserted once.
 
 ---
 
-## S4 — the Stage vocabulary is disambiguated and nothing is renamed (pinned, executed below)
+## S4 — the Stage vocabulary is disambiguated and nothing is renamed (pinned, executed)
 
-<!-- S4 block appended by T016 -->
+**Pinned test**: `tests/contract/test_sdd_diffusion.py` C-13 / C-14 cases. **Captured** after
+`7842fa888`, comparing the edited bullet against the same bullet at the part-2 base commit.
 
-## S5 — the instructions pointer is one additive section, regenerated (pinned, executed below)
+```bash
+python3 - <<'PY'
+re/Path/git as above: read the Stage bullet at f26eb59ac and in the working tree,
+print the backticked values of each, whether the disambiguation landed, whether the
+roster owner is named, which SDD stage names appear in the bullet, and the `## ` count.
+PY
+```
 
-<!-- S5 block appended by T016 -->
+```text
+stage_values_before: ['executor', 'evaluator', 'optimizer']
+stage_values_after : ['executor', 'evaluator', 'optimizer']
+values_unchanged   : True
+disambiguation_added: True
+roster_owner_named  : True
+sdd_stage_names_in_bullet: []
+top_level_sections: 7
+any_sdd_heading: []
+
+$ git show 7842fa888 --numstat --format="" -- skills/internal/create-team/references/conceptual-model.md
+1	1	skills/internal/create-team/references/conceptual-model.md
+
+$ python3 -m pytest -q tests/contract/test_single_conceptual_model.py
+...                                                                      [100%]
+3 passed in 0.04s
+rc=0
+```
+
+**Reading**: the three canonical values are byte-identical before and after, and not one SDD stage
+name appears in the bullet — the roster is reached by path (`skills/external/sdd-loop-driver/SKILL.md`)
+and never enumerated. The change is `1 insertion / 1 deletion` on the *same line*: the sentence is
+appended to the existing Stage bullet in place, and the file's seven `## ` sections are untouched
+(no SDD-shaped heading), which is what "no new top-level section" means mechanically. The sibling
+suite that pins the Role × Stage × Type model stays green.
+
+---
+
+## S5 — the instructions pointer is one additive section, regenerated (pinned, executed)
+
+**Captured** after `1f7fd6e61` (source edit `e1ee11c35` + this generation).
+
+```bash
+$ python3 scripts/python/sync-mirrors.py --write --only templates --only skills --only shared
+sync  templates/ -> .specify/templates/ (1 files)
+sync  shared/ -> .specify/shared/ (1 files)
+
+$ bash scripts/bash/generate-instructions.sh
+| SDD Routing Decision (SDD 分流裁决)                 | 1262   | 1262   | 0     | no          | no            |
+…
+success Instructions generated/updated at .specify/instructions.md
+rc=0
+```
+
+```text
+live_carries_heading: True
+live_neighbours: ## Fact, Correctness & Logic Checks (Input Sanity) -> ## SDD Routing Decision (SDD 分流裁决) -> ## One Source Of Truth
+live_block_bytes: 1261
+template_block_bytes: 1261
+verbatim_equal: True
+live_bytes_before: 41948 after: 43210 delta: 1262
+
+$ git diff --stat .specify/instructions.md
+ .specify/instructions.md | 11 +++++++++++
+
+$ git diff -U0 .specify/instructions.md | grep -c "^+[^+]"   # 7
+$ git diff -U0 .specify/instructions.md | grep -c "^-[^-]"   # 0
+
+$ ls -l AGENTS.md CLAUDE.md QODER.md .github/copilot-instructions.md
+AGENTS.md -> .specify/instructions.md
+CLAUDE.md -> .specify/instructions.md
+.github/copilot-instructions.md -> ../.specify/instructions.md
+QODER.md -> .specify/instructions.md
+```
+
+**Reading**: one additive `## ` section, injected at the template's position (after Input Sanity,
+before One Source Of Truth), carried verbatim into the live file, and **zero lines removed** — no
+existing section was rewritten. The measured delta is 1,262 B against the section's own declared
+ceiling of 2,000 B; the generator's budget is not cited as the criterion anywhere, because both
+files already exceeded it before this slice. The four compatibility paths still resolve at the live
+file, so no symlink repair was needed. The second-run idempotence check is T022's and is not run here.
+
+**Placement constraint discovered (disclosed)**: the first placement — between `## Proactive Flow
+Trigger` and `## Fact, Correctness & Logic Checks (Input Sanity)` — broke a delivered guard this
+slice does not own (`tests/contract/test_proactive_trigger_section.py` C-3 and C-9 pin that exact
+adjacency, and `test_ask_record_repeat.py` re-states it). The section was moved to the next free
+slot; no contract text changed, only the position. Commit `e1ee11c35`.
+

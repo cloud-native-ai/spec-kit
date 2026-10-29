@@ -184,7 +184,56 @@ repair, 10 failed / 5 passed after it. No implementation face was touched to pro
 
 ## E-5 · `tests/contract/test_sdd_diffusion.py` — GREEN (T011–T015 landed, T016)
 
-<!-- E-5 block pasted below after the T016 green run -->
+**Captured**: 2026-10-29T06:3Z, after the five edits and the regeneration. The same 15 cases that ran in
+E-4 are the ones that run here; no case was added, renamed or relaxed, and the 10 that were red are
+now green.
+
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_diffusion.py
+...............                                                          [100%]
+15 passed in 0.31s
+rc=0
+```
+
+**E3 · targeted-set-v1 (part 2)** — the 19 baseline files plus the two suites this slice owns, run
+**once** (no second full suite in this part; the full-suite slot belongs to implement start / review
+closure). Full capture: `test-evidence/implement-targeted-part2-run.txt`.
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out test-evidence/implement-targeted-part2-failed.txt \
+    <the 19 files of test-evidence/targeted-set-v1-baseline.txt> \
+    tests/contract/test_nested_run_report.py tests/contract/test_sdd_diffusion.py
+collected 321 items
+======================== 1 failed, 320 passed in 32.54s ========================
+# failed-name list written: …/implement-targeted-part2-failed.txt (1 entries)
+rc=1
+
+$ cat test-evidence/implement-targeted-part2-failed.txt
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+
+$ comm -13 <(sort test-evidence/implement-targeted-part1-failed.txt) \
+           <(sort test-evidence/implement-targeted-part2-failed.txt)
+                       # empty → zero NEW failing node ids
+```
+
+**Reading**: the single failure is the same pre-existing red node id recorded in
+`test-evidence/targeted-set-v1-baseline.txt` (gate total 27 vs the frozen 23, four earlier features'
+declarations, not this slice's to repair), and the name-level comparison is empty in the
+new-failures direction. Collected count moved 290 → 321 exactly by the two suites this slice owns
+(16 + 15 cases); no existing case disappeared.
+
+**Two disclosures, both corrections repaired in passing** — neither changed a contract:
+
+1. **Test-side lookup defect (E-4)**: `_shared_string_ids()` matched the registry heading exactly while
+   it carries a parenthetical suffix; replaced by a prefix match. Affected only my own new suite and
+   only its first red run (11 failed / 4 passed → 10 failed / 5 passed).
+2. **Section position (T013)**: the routing section was first placed between `## Proactive Flow
+   Trigger` and `## Fact, Correctness & Logic Checks (Input Sanity)`. Two delivered guards pin that
+   exact adjacency (`tests/contract/test_proactive_trigger_section.py` C-3 / C-9 and
+   `test_ask_record_repeat.py`), so the first placement turned them red. The section moved to the next
+   free slot (after Input Sanity, before `## One Source Of Truth`); commit `e1ee11c35`. Both guards are
+   green in the E3 run above.
+
 
 
 
