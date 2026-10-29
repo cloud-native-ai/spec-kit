@@ -247,8 +247,8 @@ vocabulary is unchanged.
   run, because virtual execution occupies the orchestrating session and collapses the outer
   layer into the driver. A stage executor MUST NOT start or host any SDD run; an SDD stage
   executor MUST NOT itself be an SDD invocation host; SDD-within-SDD recursion is prohibited.
-  A member MUST host at most one SDD run at a time unless the team declares a higher per-member
-  cap within the existing line mechanism. The anti-nesting owner document MUST be amended to
+  A member MUST host at most one SDD run at a time; no higher per-member cap escape exists.
+  The anti-nesting owner document MUST be amended to
   state this depth-2 chain and the virtual prohibition; FR-005 is the closed form of that
   amendment.
 
@@ -485,8 +485,8 @@ vocabulary is unchanged.
   adjudication.
 - **A8**: Goal and Requirement remain on different planes with no structural link; observational
   attribution is the only connection.
-- **A9**: The default concurrency cap is one nested run per member; a higher per-member cap is
-  permitted only within the existing line registry and territory constraints.
+- **A9**: The concurrency cap is one nested run per member; no higher per-member cap escape
+  exists.
 - **A10**: The nested run's review stage may include the driver's existing review-repair loop of
   Feature 063; ending "at review" means after that loop settles, not before findings are
   addressed.
@@ -521,3 +521,7 @@ vocabulary is unchanged.
 - Q: 合法的嵌套链与执行模态如何限定？ → A: 深度 2（团队编排者 → 成员 driver host → 阶段执行者 leaf）；virtual 成员不得承载 SDD；阶段执行者仍是叶子，SDD-within-SDD 禁止。
 - Q: Team 席位的 sdd-invocation 策略应存储并解析在哪里？ → A: `team.md` frontmatter 的 `seats` 映射，按 (team, seat) 解析；与席位实例上的 Agent 能力形成真正的 AND。
 - 修正（非用户裁决，同轮边界回修）：routing unit = 每成员职责一次并复用至输入变化；并发上限 = 每成员一（A9 由「每团队」改为「每成员」）；handoff 增补 line id / branch / worktree / HEAD 集成身份；ledger 归因由 team supervisor 写入，嵌套运行不写 tracked 工件。
+
+### Session 2026-10-29
+
+- Q: 074a 的 B-04 修复删除了每成员并发上限的逃逸口；父规格是否跟随？ → A: 跟随——父 FR-006/A9 现为每成员硬上限 1，不再允许团队声明更高 per-member cap（2026-10-29，切片 074a 分析回环）。

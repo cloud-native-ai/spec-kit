@@ -264,7 +264,7 @@ Task: "条款覆盖基线重采（T003）"
 
 ## Notes
 
-- **plan_constraint（active since 2026-10-29T02:11Z，plan_commit = 907d21fbe）**: 本切片的 plan-owned 面（`plan.md` / `data-model.md` / `contracts/**` / `quickstart.md` / `research.md` / `feature-ref.md`）只接受行级小修，逐项在 `verification.md` 声明 `PLAN-EDIT: <path> — <理由>；分类=minor`；实质性改动停线回抛，不静默重写。父设计 `.specify/specs/074-goal-team-sdd-unification/**` 全程只读。
+- **plan_constraint（active since 2026-10-29T02:44Z，plan_commit = 8f991f375）**: 本切片的 plan-owned 面（`plan.md` / `data-model.md` / `contracts/**` / `quickstart.md` / `research.md` / `feature-ref.md`）只接受行级小修，逐项在 `verification.md` 声明 `PLAN-EDIT: <path> — <理由>；分类=minor`；实质性改动停线回抛，不静默重写。父设计 `.specify/specs/074-goal-team-sdd-unification/**` 全程只读。
 - **测试预算**: 本切片使用 targeted-set-v1（`stage_base=tasks`）；全量 baseline / closure 两个槽位归 implement 与 review 阶段，本文件不预占。
 - **陷阱形复核**: 「新增存储面为零」的计量单位是**文件名集合**（`comm -13`），不是行数或目录数；「`sdd-invocation` 已落盘处数」的计量单位是代码 owner 文件，不是全仓 grep 命中（设计文档里的说明文字是引用，不是定义）。
 - **不复述面**: 五项输入取值域 / 三值裁决表 / 固定优先级 / 理由码词表 / 复杂度层级信号 / 门禁集合 / 阶段名册 一律按路径抵达各自 owner，本文件与任何实现面 MUST NOT 复述。

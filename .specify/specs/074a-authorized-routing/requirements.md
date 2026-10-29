@@ -283,7 +283,9 @@ dispatched.
   `.specify/memory/constitution.md`, `.specify/instructions.md`
   (including its per-tool compatibility symlinks), `.specify/agents/{templates,instances}/`,
   `agents/`, `.specify/skills/`, `skills/`, `.specify/teams/`, or `templates/` is a
-  `definition-class` change, and such a change is cross-cutting by default — it is bounded only
+  `definition-class` change; a change whose target paths all fall outside these roots is not
+  `definition-class`, and for a multi-path change any path inside these roots makes it
+  `definition-class`. Such a change is cross-cutting by default — it is bounded only
   when the caller declares a bounded correction and records the rationale. This path predicate
   is the only place the decision may read the target path; it does not classify by
   implementation medium, file extension, language, artifact count, or author identity, and the
@@ -294,7 +296,8 @@ dispatched.
   Complex or High-stakes.
 - **FR-010**: The decision MUST return [[STR-005]] only when all of the following hold: the
   change preserves every existing capability and contract; no durable traceability is
-  required; the blast radius is local; the change is reversible; the complexity tier is
+  required; the blast radius is local — or, for a `definition-class` change, the declared
+  bounded-correction value; the change is reversible; the complexity tier is
   Trivial or Standard; and, for a `definition-class` change, the caller declares a bounded
   correction with a recorded rationale.
 - **FR-011**: The decision MUST apply one fixed precedence: [[STR-006]] first, then
