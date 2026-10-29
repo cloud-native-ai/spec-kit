@@ -1310,3 +1310,356 @@ class TestScenarioEADRReferenceSlot:
         assert "adr" not in proc.stdout.lower(), (
             "C-2: a link-check command was added; the call surface is the contract test only"
         )
+
+
+# --------------------------------------------------------------------------- #
+# Scenario F — terminology zero-hit guard (T021, post-implementation guard)
+# --------------------------------------------------------------------------- #
+#
+# A post-implementation guard, not a red-first slice: it asserts a before/after property of a
+# tree whose sources were finished in US1–US5. The judgement is a count over three trees plus a
+# positive control, so an emptied A3 list cannot turn the zero-hit scan vacuously green.
+
+DISTRIBUTION_TREES = ("shared", "templates", "skills")
+FEATURE_DETAIL = ROOT / ".specify" / "memory" / "features" / "076.md"
+REQUIREMENTS = SPEC_DIR / "requirements.md"
+
+# The alias list is PARSED out of the spec's A3 (the owner). This literal tuple is the drift
+# guard a test is allowed to carry: if A3 is renamed, reworded or emptied, the parse or this
+# comparison reds instead of the scan silently having nothing to look for.
+EXPECTED_ALIASES = ("矛盾论", "主要矛盾", "矛盾的主要方面", "对抗性矛盾", "矛盾转化条件")
+A3_MARKER = "**A3（术语裁决）**"
+A3_LIST_INTRO = "尤其 MUST NOT 进入任何用户可见正文或分发面："
+
+
+def a3_line() -> str:
+    line = next(
+        (raw for raw in read(REQUIREMENTS).splitlines() if A3_MARKER in raw),
+        None,
+    )
+    assert line is not None, "the spec lost its § Assumptions A3 terminology ruling"
+    return line
+
+
+def a3_aliases() -> tuple[str, ...]:
+    """The five internal aliases, read from the sentence that enumerates them."""
+    line = a3_line()
+    index = line.find(A3_LIST_INTRO)
+    assert index != -1, (
+        "A3 no longer names the alias list with its introducer; the positive control cannot read it"
+    )
+    tail = line[index + len(A3_LIST_INTRO):].split("。")[0]
+    return tuple(item.strip() for item in tail.split("、") if item.strip())
+
+
+def distribution_files() -> list[Path]:
+    """Every file under the three distribution trees (junk dirs excluded, nothing else)."""
+    files: list[Path] = []
+    for tree in DISTRIBUTION_TREES:
+        root = ROOT / tree
+        assert root.is_dir(), f"missing distribution tree: {root}"
+        files.extend(
+            path for path in sorted(root.rglob("*"))
+            if path.is_file() and "__pycache__" not in path.parts
+        )
+    return files
+
+
+def alias_hits(aliases) -> dict[str, list[str]]:
+    """alias -> repo-relative paths that mention it (one pass over the scanned file set)."""
+    hits: dict[str, list[str]] = {alias: [] for alias in aliases}
+    for path in distribution_files():
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for alias in aliases:
+            if alias in text:
+                hits[alias].append(path.relative_to(ROOT).as_posix())
+    return hits
+
+
+def inside_distribution_tree(path: Path) -> bool:
+    for tree in DISTRIBUTION_TREES:
+        try:
+            path.relative_to(ROOT / tree)
+        except ValueError:
+            continue
+        return True
+    return False
+
+
+class TestScenarioFTerminologyZeroHit:
+    """FR-024 / SC-007: engineering words only on every distribution surface.
+
+    The whitepaper aliases live in exactly two places, both OUTSIDE the three trees
+    (``requirements.md`` § Assumptions A3 and the feature detail's § 附 mapping table); the
+    owner sits inside ``shared/`` and is therefore NOT whitelisted — it must read in
+    engineering words like every other distribution file.
+    """
+
+    # --- positive control ---------------------------------------------------
+
+    def test_a3_alias_list_still_exists(self):
+        aliases = a3_aliases()
+        assert aliases == EXPECTED_ALIASES, (
+            "the positive control failed: A3's alias list was renamed, reordered or emptied "
+            f"({aliases!r}); the zero-hit scan below would otherwise look for nothing"
+        )
+        assert len(set(aliases)) == len(aliases) == 5, (
+            f"A3 must enumerate five distinct aliases; got {aliases!r}"
+        )
+        # The ruling still declares the whitelist as exactly two places and names the second.
+        line = a3_line()
+        assert "白名单只有两处" in line, (
+            "A3 must keep declaring a two-place whitelist; a widened whitelist is a contract "
+            "change, not a wording tweak"
+        )
+        assert ".specify/memory/features/076.md" in line, (
+            "A3 must keep naming the feature-detail appendix as the second whitelisted place"
+        )
+
+    # --- zero hits ----------------------------------------------------------
+
+    def test_distribution_trees_carry_zero_internal_aliases(self):
+        aliases = a3_aliases()
+        scanned = distribution_files()
+        assert len(scanned) > 100, (
+            f"the scan is vacuous: only {len(scanned)} files found under the three trees"
+        )
+        assert OWNER in scanned, (
+            "the DTR owner must be inside the scanned surface: it is a distribution file and "
+            "is explicitly NOT whitelisted"
+        )
+
+        hits = alias_hits(aliases)
+        offenders = {alias: paths for alias, paths in hits.items() if paths}
+        assert offenders == {}, (
+            f"internal aliases leaked onto a distribution surface: {offenders!r}"
+        )
+        assert sum(len(paths) for paths in hits.values()) == 0, (
+            f"SC-007 counts must be zero across shared/ templates/ skills/; got {hits!r}"
+        )
+
+    # --- whitelist boundary -------------------------------------------------
+
+    def test_whitelist_is_two_places_outside_the_distribution_trees(self):
+        for path in (REQUIREMENTS, FEATURE_DETAIL):
+            assert path.is_file(), f"whitelisted place is missing: {path}"
+            assert not inside_distribution_tree(path), (
+                f"{path.relative_to(ROOT)} is inside a distribution tree, so it cannot be a "
+                "whitelisted exception — the trees must be clean without exceptions"
+            )
+
+        # The whitelist is genuinely used, not merely allowed: the mapping table still carries
+        # the aliases, which is why the two places are named in A3 at all. Four are spelled
+        # literally; the fifth (`对抗性矛盾`) is carried as its concept pair 「对抗性 / 非对抗性」,
+        # so the assertion is the literal four plus that pair.
+        detail = read(FEATURE_DETAIL)
+        appendix = detail.split("## 附", 1)
+        assert len(appendix) == 2, "the feature detail lost its § 附 alias mapping appendix"
+        used = [alias for alias in EXPECTED_ALIASES if alias in appendix[1]]
+        assert len(used) >= 4, (
+            f"the appendix must still carry the alias mapping (the whitelist's only use); "
+            f"found {used!r}"
+        )
+        assert "对抗性" in appendix[1], (
+            "the appendix must still carry the adversarial concept line 「对抗性 / 非对抗性」"
+        )
+
+
+# --------------------------------------------------------------------------- #
+# Scenario G — closed-set delta guard (T021, post-implementation guard)
+# --------------------------------------------------------------------------- #
+#
+# FR-014 / FR-026 / SC-008. Both touched closed-set owners are judged as an only-add
+# containment claim against commit ``ac63fe8c``: the comparison unit is the paragraph, the
+# allowed delta set is 「the new paragraph(s) + the count line the new channel forces」, and
+# everything outside it must be byte-identical. Item-level assertions compare counts against
+# the baseline, never against prose.
+
+QUARTET_SUBSECTION_HEADING = "### 产出形态:四元组(封闭四字段)"
+CRITIQUE_REJECTION_HEADING = "### 拒绝形态(封闭清单,命中即拒)"
+CRITIQUE_BOUNDARY_HEADING = "## 边界(本纪律不做什么)"
+CRITIQUE_CONSUMER_HEADING = "## 消费者清单"
+DETECTION_DO_NOT_FLAG_HEADING = (
+    "## DO-NOT-FLAG list (noise control — do not report these at any severity)"
+)
+SEVERITY_DOMAIN = ("CRITICAL", "HIGH", "MEDIUM", "LOW")
+
+
+def h3_section_lines(text: str, heading: str) -> list[str]:
+    """An H3 section's lines, up to the next H3 or H2 (trailing blank lines trimmed)."""
+    lines = text.splitlines()
+    assert heading in lines, f"missing section: {heading}"
+    start = lines.index(heading)
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or lines[index].startswith("### "):
+            end = index
+            break
+    body = lines[start:end]
+    while body and not body[-1].strip():
+        body.pop()
+    return body
+
+
+def quartet_section_lines() -> list[str]:
+    """The quartet subsection as written in the owner — the declared added paragraph.
+
+    The trailing blank line that separates it from the next H2 is part of the added block, so
+    it is kept: the delta is compared verbatim, and trimming it here would hide a real difference.
+    """
+    lines = read(CRITIQUE).splitlines()
+    assert QUARTET_SUBSECTION_HEADING in lines, (
+        f"the quartet subsection is missing: {QUARTET_SUBSECTION_HEADING!r}"
+    )
+    start = lines.index(QUARTET_SUBSECTION_HEADING)
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return lines[start:end]
+
+
+def bullet_items(text: str, heading: str) -> list[str]:
+    """Top-level ``- `` bullets of one H2/H3 section (the item-count surface)."""
+    lines = text.splitlines()
+    try:
+        start = lines.index(heading)
+    except ValueError:  # pragma: no cover - reported as a readable failure
+        raise AssertionError(f"missing section: {heading}")
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or lines[index].startswith("### "):
+            end = index
+            break
+    return [line for line in lines[start + 1:end] if line.startswith("- ")]
+
+
+def consumer_rows(text: str, heading: str) -> list[str]:
+    """Data rows of the first table inside a section (header and separator dropped)."""
+    lines = text.splitlines()
+    try:
+        start = lines.index(heading)
+    except ValueError:  # pragma: no cover - reported as a readable failure
+        raise AssertionError(f"missing section: {heading}")
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or lines[index].startswith("### "):
+            end = index
+            break
+    rows = [line for line in lines[start + 1:end] if line.strip().startswith("|")]
+    return [row for row in rows if "---" not in row][1:]
+
+
+def channel_letters(text: str) -> list[str]:
+    return [m.group(1) for m in re.finditer(r"(?m)^### ([A-Z])\. ", text)]
+
+
+class TestScenarioGClosedSetDelta:
+    """FR-026 / SC-008: the two touched closed-set owners only grew.
+
+    Delta equality (not "no removals") is the criterion: a rewrite shows up as a removed plus
+    an added line and would silently pass a removals-only check. The enumerated delta is
+    compared to the declared allowed set verbatim, so only the count line and the new
+    paragraph(s) can move.
+    """
+
+    # --- detection-and-severity.md -----------------------------------------
+
+    def test_detection_and_severity_delta_is_the_declared_allowed_set(self):
+        removed, added = diff_lines(ANALYZE_DETECTION)
+
+        # Exactly one rewritten line: the pass count heading the new channel forces to change.
+        assert removed == ["## The seven passes"], (
+            "the count line is the ONLY deleted or rewritten line this file may carry; "
+            f"removed {removed!r}"
+        )
+        assert added == ["## The eight passes"] + channel_section_lines(), (
+            "every added line must belong to the new channel section or be the count heading; "
+            f"outside-the-set additions: {[line for line in added if line not in ['## The eight passes'] + channel_section_lines()]!r}"
+        )
+
+        # Structural invariants inside the delta, re-read on the current file: the channel
+        # letters stay unique and the defect table keeps three HIGH rows.
+        current = read(ANALYZE_DETECTION)
+        letters = channel_letters(current)
+        assert len(set(letters)) == len(letters), f"a channel letter repeats: {letters!r}"
+        assert set(channel_letters(git_show(ANALYZE_DETECTION))) <= set(letters), (
+            "a baseline pass letter was removed or renamed"
+        )
+        rows = defect_table(channel_section())
+        assert len(rows) == 3 and all(row[2] == "HIGH" for row in rows), (
+            f"the three defect classes must stay HIGH; rows={rows!r}"
+        )
+
+    # --- critique-and-self-critique.md -------------------------------------
+
+    def test_critique_delta_is_the_declared_allowed_set(self):
+        removed, added = diff_lines(CRITIQUE)
+        allowed_added = quartet_section_lines()
+
+        assert removed == [], (
+            "the quartet rides BELOW the one-line falsification paragraph: zero deleted or "
+            f"rewritten lines are allowed in this file; removed {removed!r}"
+        )
+        assert added == allowed_added, (
+            "the only added paragraph must be the quartet subsection; outside-the-set "
+            f"additions: {[line for line in added if line not in allowed_added]!r}"
+        )
+
+        # Structural invariants inside the delta: the four literal keys are each written once,
+        # and the parent paragraph is byte-identical to the baseline (it was never rewritten).
+        section = "\n".join(quartet_section_lines())
+        for key in QUARTET_KEYS:
+            assert section.count(f"`{key}`") == 1, (
+                f"the quartet subsection must name `{key}` exactly once; "
+                f"count={section.count(f'`{key}`')}"
+            )
+        baseline_parent = h2_section(git_show(CRITIQUE), QUARTET_PARENT_HEADING)
+        live_parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        parent_lines = [line for line in baseline_parent.splitlines()]
+        assert all(line in live_parent.splitlines() for line in parent_lines), (
+            "the pre-existing 「每个提案一条证伪尝试」 paragraph must survive verbatim"
+        )
+
+    # --- item counts never fall below the baseline -------------------------
+
+    def test_item_counts_do_not_fall_below_baseline(self):
+        critique_base = git_show(CRITIQUE)
+        critique_now = read(CRITIQUE)
+
+        for heading in (CRITIQUE_REJECTION_HEADING, CRITIQUE_BOUNDARY_HEADING):
+            base_items = bullet_items(critique_base, heading)
+            live_items = bullet_items(critique_now, heading)
+            assert len(live_items) >= len(base_items), (
+                f"{heading}: item count fell from {len(base_items)} to {len(live_items)}"
+            )
+            assert live_items[:len(base_items)] == base_items, (
+                f"{heading}: an existing item was reworded or reordered; the closed set grows "
+                "only by appending"
+            )
+
+        base_rows = consumer_rows(critique_base, CRITIQUE_CONSUMER_HEADING)
+        live_rows = consumer_rows(critique_now, CRITIQUE_CONSUMER_HEADING)
+        assert len(live_rows) >= len(base_rows), (
+            f"the consumer list fell from {len(base_rows)} to {len(live_rows)} rows"
+        )
+        assert live_rows[:len(base_rows)] == base_rows, (
+            "the consumer list must grow only by appending; an existing row changed"
+        )
+
+        detection_base = git_show(ANALYZE_DETECTION)
+        detection_now = read(ANALYZE_DETECTION)
+        base_dnf = bullet_items(detection_base, DETECTION_DO_NOT_FLAG_HEADING)
+        live_dnf = bullet_items(detection_now, DETECTION_DO_NOT_FLAG_HEADING)
+        assert len(live_dnf) >= len(base_dnf), (
+            f"the DO-NOT-FLAG list fell from {len(base_dnf)} to {len(live_dnf)} items"
+        )
+        for value in SEVERITY_DOMAIN:
+            assert f"**{value}**" in detection_now, (
+                f"the severity value domain lost {value!r}; the four-value domain is a "
+                "structural invariant of the closed set"
+            )
+        assert len(channel_letters(detection_now)) >= len(channel_letters(detection_base)), (
+            "a pass section was deleted from the detection owner"
+        )

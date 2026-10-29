@@ -1,0 +1,30 @@
+# T021 — post-implementation guard slices F (terminology) and G (closed-set delta)
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# interpreter: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest
+
+== 1. the two guard slices are green on the finished tree ==
+$ pytest -q tests/contract/test_decision_tension_contract.py -k 'ScenarioF or ScenarioG'
+......                                                                   [100%]
+6 passed, 28 deselected in 0.32s
+EXIT=0
+
+== 2. negative probe — scenario F must go red when an alias leaks onto a distribution file ==
+$ printf '\n内部别名泄漏探针：主要矛盾\n' >> shared/guidelines/decision-tension.md ; pytest -k ScenarioF
+E         Left contains 1 more item:
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioFTerminologyZeroHit::test_distribution_trees_carry_zero_internal_aliases
+1 failed, 2 passed, 31 deselected in 0.11s
+restore: cp backup back over the probe line; git status shows no change to that file
+       0
+
+== 3. negative probe — scenario G must go red when a baseline line is rewritten ==
+$ rewrite '**Limit to 50 findings total**' -> 60 in detection-and-severity.md ; pytest -k ScenarioG
+E         Left contains one more item: 'Focus on high-signal findings. **Limit to 50 findings total**; aggregate the remainder in an'
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioGClosedSetDelta::test_detection_and_severity_delta_is_the_declared_allowed_set
+1 failed, 2 passed, 31 deselected in 0.17s
+restore: cp backup back; git status shows no change to that file
+       0
+
+== 4. re-run the full file after both probes are reverted ==
+..................................                                       [100%]
+34 passed in 1.29s

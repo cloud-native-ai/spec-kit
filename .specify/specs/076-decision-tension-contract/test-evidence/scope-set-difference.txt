@@ -1,0 +1,7 @@
+# T022 — pointer slot (tasks.md names this path)
+
+The complete capture and verdict for T022 live in:
+
+  .specify/specs/076-decision-tension-contract/test-evidence/zero-new-mechanism.txt
+
+Verdict: allowed-delta set = {} (empty), new mechanism count = 0 (PASS).

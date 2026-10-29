@@ -1,0 +1,431 @@
+# T026 — quickstart.md S1–S5 actually executed against the current tree
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# interpreter: /Users/liuqiming.lqm/project/profiles/.venv/bin/python
+# fixtures: ~/tmp/076-quickstart/<slug>/{plan,requirements}.md (outside the repo; torn down
+#           by the driver's rmtree at the start of each run and rebuildable from the block below)
+# repo writes: only notes/analyze-sc003/S3-*.md (the SC-002 snapshots declared by T026).
+#
+# Rendering boundary, stated up front: the analyze channel is a declared detection PASS, not a
+# program. Its report for a fixture is rendered here as the program verdict under the channel's
+# own severity mapping (every channel finding is HIGH or absent — no advisory tier, no semantic
+# scoring surface). This is the same rendering T017 already declared for SC-003. The
+# /speckit.analyze narrative layer was NOT produced by a full skill run in this segment; nothing
+# in SC-002 / SC-003 depends on it, because the channel carries no judgement beyond the labels.
+
+```python
+#!/usr/bin/env python3
+"""T026 — execute quickstart.md S1-S5 against the current tree (read-only on the repo).
+
+Fixtures are built under ``~/tmp/076-quickstart/`` (outside the repo); the only repo writes are
+the SC-002 analyze snapshots, which land in the feature's own ``notes/analyze-sc003/`` slot.
+Every run prints command / exit code / the judgement fields; nothing is summarised into a claim.
+"""
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = Path("/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit")
+WORK = Path.home() / "tmp" / "076-quickstart"
+SPEC = REPO / ".specify" / "specs" / "076-decision-tension-contract"
+SNAP_DIR = SPEC / "notes" / "analyze-sc003"
+PY = sys.executable
+VALIDATOR = REPO / "scripts" / "python" / "validate-decision-tensions.py"
+QUARTET = REPO / "scripts" / "python" / "validate-falsification-quartet.py"
+
+PLAN_HEAD = """# Implementation Plan: quickstart fixture
+
+## Summary
+
+Quickstart fixture.
+
+## Constitution Check
+
+*GATE: fixture.*
+
+## Decision Tensions
+
+"""
+PLAN_TAIL = """
+## Project Structure
+
+Fixture structure.
+"""
+
+RECORD = """### T-001 — fixture decision
+
+- **decision**: 选择方案 A，因为它在夹具里可判定。
+- **antithesis**: 方案 B 是可独立采纳的具名方案；当吞吐需求高于 1k/s 时它更优。
+- **binding_constraints**:
+  - pole_a: 结果必须逐字节可复现。
+  - pole_b: 实现必须能用现有工具链构建。
+- **discriminating_evidence**: 运行一次 `pytest -q` 并比较退出码，结果二值。
+- **expected_sacrifice**: SC-001 Source ↓ 低于阈值 90% 即重开。
+- **revision_trigger**: 连续两次低于阈值 → 重开并复核。
+"""
+
+REQUIREMENTS = """# Requirements: quickstart fixture
+
+## Success Criteria
+
+- **SC-001**: fixture criterion.
+
+### Measurement Sources & Collection Methods
+
+- **SC-001 Source**: fixture measurement source.
+"""
+
+# Shape taken from the owner (and from the contract suite's COMPLIANT literal): the input half is
+# a backtick span BEFORE the literal `red:`, the signal half a backtick span AFTER it.
+WOULD_GO_RED_LINE = (
+    "would_go_red_if: 把 `tests/contract/test_decision_tension_contract.py` 的允许差异集改宽，"
+    "则 red: `test_detection_and_severity_delta_is_the_declared_allowed_set` 必须 FAILED（退出码 1）"
+)
+
+QUARTET_OK = (
+    "attempt: `pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioG`\n"
+    "exit_code: 0\n"
+    "observation: raw: 34 passed in 1.29s\n"
+    + WOULD_GO_RED_LINE + "\n"
+)
+
+
+def run(args, cwd=REPO):
+    return subprocess.run(args, cwd=cwd, capture_output=True, text=True)
+
+
+def labels_of(stdout: str):
+    payload = json.loads(stdout)
+    return {check["label"]: check["count"] for check in payload["checks"]}, payload
+
+
+def scenario(name: str) -> None:
+    print()
+    print(f"===== {name} =====")
+
+
+def write_spec(root: Path, plan_text: str, requirements_text: str = REQUIREMENTS) -> Path:
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "plan.md").write_text(plan_text, encoding="utf-8")
+    (root / "requirements.md").write_text(requirements_text, encoding="utf-8")
+    return root
+
+
+def delete_field(record: str, field: str) -> str:
+    out = []
+    for line in record.splitlines():
+        if line.startswith(f"- **{field}**:"):
+            continue
+        out.append(line)
+    return "\n".join(out) + "\n"
+
+
+def replace_field(record: str, field: str, value: str) -> str:
+    return "\n".join(
+        f"- **{field}**: {value}" if line.startswith(f"- **{field}**:") else line
+        for line in record.splitlines()
+    ) + "\n"
+
+
+def snapshot(slug: str, fixture: str, spec_dir: Path, code: int, payload: dict) -> Path:
+    counts = {check["label"]: check["count"] for check in payload["checks"]}
+    channel = ("dtr-section-missing", "dtr-record-incomplete", "dtr-rejected-form",
+               "expected-sacrifice-unmapped")
+    high = sum(counts[label] for label in channel)
+    lines = [
+        f"# SC-002 analyze snapshot — {slug}",
+        "",
+        f"- fixture: {fixture}",
+        "- judged artifact: `plan.md` under `REQUIREMENTS_DIR` (the channel's only object; "
+        "`requirements.md` is the mapping reference, never a second judged object)",
+        "- validator: `scripts/python/validate-decision-tensions.py --spec <fixture> --json`",
+        "- channel severity mapping: every finding of this channel is HIGH or absent "
+        "(`detection-and-severity.md` § I declares HIGH-or-0 with no advisory tier)",
+        f"- exit_code: {code}",
+        f"- records: {payload['scanned']['records']}",
+        f"- HIGH findings: {high}",
+        "",
+        "| label | status | count |",
+        "|---|---|---|",
+    ]
+    for check in payload["checks"]:
+        lines.append(f"| `{check['label']}` | {check['status']} | {check['count']} |")
+    lines.append("")
+    target = SNAP_DIR / f"{slug}.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("\n".join(lines), encoding="utf-8")
+    return target
+
+
+def main() -> int:
+    if WORK.exists():
+        shutil.rmtree(WORK)
+    WORK.mkdir(parents=True)
+
+    # ---------------------------------------------------------------- S1
+    scenario("S1 — first record and its structural check")
+    print(f"$ {PY} scripts/python/validate-decision-tensions.py --spec .specify/specs/076-decision-tension-contract")
+    proc = run([PY, str(VALIDATOR), "--spec", str(SPEC)])
+    print(proc.stdout.rstrip())
+    print(f"EXIT={proc.returncode}")
+    print("criterion: status: ok + six labels pass + exit 0 -> "
+          f"{'MET' if proc.returncode == 0 and 'status: ok' in proc.stdout else 'NOT MET'}")
+
+    # ---------------------------------------------------------------- S2
+    scenario("S2 — one compliant fixture plus eleven inverse inputs")
+    compliant = write_spec(WORK / "s2-compliant", PLAN_HEAD + RECORD + PLAN_TAIL)
+    variants = [("compliant", compliant, None)]
+    for field in ("decision", "antithesis", "binding_constraints",
+                  "discriminating_evidence", "expected_sacrifice", "revision_trigger"):
+        variants.append((
+            f"delete-{field}",
+            write_spec(WORK / f"s2-delete-{field}",
+                       PLAN_HEAD + delete_field(RECORD, field) + PLAN_TAIL),
+            "dtr-record-incomplete",
+        ))
+    variants.append((
+        "expected-sacrifice-none",
+        write_spec(WORK / "s2-none",
+                   PLAN_HEAD + replace_field(RECORD, "expected_sacrifice", "none") + PLAN_TAIL),
+        "dtr-rejected-form",
+    ))
+    variants.append((
+        "undecidable-wording",
+        write_spec(WORK / "s2-wording",
+                   PLAN_HEAD + replace_field(RECORD, "decision", "要平衡两边，综合考虑后视情况而定。") + PLAN_TAIL),
+        "dtr-rejected-form",
+    ))
+    variants.append((
+        "duplicate-tension-id",
+        write_spec(WORK / "s2-duplicate", PLAN_HEAD + RECORD + "\n" + RECORD + PLAN_TAIL),
+        "dtr-tension-id",
+    ))
+    variants.append((
+        "skipped-tension-id",
+        write_spec(WORK / "s2-skipped",
+                   PLAN_HEAD + RECORD + "\n" + RECORD.replace("### T-001", "### T-003", 1) + PLAN_TAIL),
+        "dtr-tension-id",
+    ))
+    variants.append((
+        "unmapped-source",
+        write_spec(WORK / "s2-unmapped",
+                   PLAN_HEAD + replace_field(
+                       RECORD, "expected_sacrifice", "SC-099 Source ↓ 未声明的来源") + PLAN_TAIL),
+        "expected-sacrifice-unmapped",
+    ))
+
+    s2_pass = 0
+    for name, spec_dir, expected in variants:
+        proc = run([PY, str(VALIDATOR), "--spec", str(spec_dir), "--json"])
+        counts, _ = labels_of(proc.stdout)
+        if expected is None:
+            ok = proc.returncode == 0 and set(counts.values()) == {0}
+            detail = "all labels 0"
+        else:
+            ok = proc.returncode == 1 and counts[expected] == 1 and sum(counts.values()) == 1
+            detail = f"{expected} -> {counts[expected]}, total findings {sum(counts.values())}"
+        s2_pass += 1 if ok else 0
+        print(f"  [{'ok ' if ok else 'FAIL'}] {name:<30} exit={proc.returncode}  {detail}")
+    print(f"criterion: 12 runs, 1 compliant exits 0 + 11 inverse exit 1 on the declared label "
+          f"-> {s2_pass}/12 MET")
+
+    # ---------------------------------------------------------------- S3
+    scenario("S3 — four fixtures, one analyze-channel report each (SC-002)")
+    s3_cases = [
+        ("S3-compliant", "record complete, cost resolvable", PLAN_HEAD + RECORD + PLAN_TAIL),
+        ("S3-section-missing", "the whole `## Decision Tensions` section absent",
+         PLAN_HEAD.replace("## Decision Tensions\n\n", "") + PLAN_TAIL),
+        ("S3-record-incomplete", "one record missing `revision_trigger`",
+         PLAN_HEAD + delete_field(RECORD, "revision_trigger") + PLAN_TAIL),
+        ("S3-cost-unmapped", "`expected_sacrifice` points at an undeclared source",
+         PLAN_HEAD + replace_field(
+             RECORD, "expected_sacrifice", "SC-099 Source ↓ 未声明的来源") + PLAN_TAIL),
+    ]
+    expected_high = {"S3-compliant": 0, "S3-section-missing": 1,
+                     "S3-record-incomplete": 1, "S3-cost-unmapped": 1}
+    s3_pass = 0
+    for slug, fixture, plan_text in s3_cases:
+        spec_dir = write_spec(WORK / slug, plan_text)
+        proc = run([PY, str(VALIDATOR), "--spec", str(spec_dir), "--json"])
+        counts, payload = labels_of(proc.stdout)
+        path = snapshot(slug, fixture, spec_dir, proc.returncode, payload)
+        high = sum(counts[label] for label in (
+            "dtr-section-missing", "dtr-record-incomplete", "dtr-rejected-form",
+            "expected-sacrifice-unmapped"))
+        ok = high == expected_high[slug] and (proc.returncode == 0) == (slug == "S3-compliant")
+        s3_pass += 1 if ok else 0
+        print(f"  [{'ok ' if ok else 'FAIL'}] {slug:<24} exit={proc.returncode}  HIGH={high} "
+              f"(expected {expected_high[slug]})  snapshot={path.relative_to(REPO)}")
+    print(f"criterion: three defect classes one HIGH each + compliant zero -> {s3_pass}/4 MET")
+
+    # ---------------------------------------------------------------- SC-003 refresh
+    scenario("SC-003 — re-run the D-1 / D-2 / D-3 triple that owns the 0 / 1 / 0 snapshots")
+    proc = run([PY, "-m", "pytest", "-q",
+                "tests/contract/test_decision_tension_contract.py",
+                "-k", "d1 or d2 or d3"])
+    print(proc.stdout.strip().splitlines()[-1])
+    print(f"EXIT={proc.returncode}")
+    for name in ("D-1-compliant-na", "D-2-section-removed", "D-3-compliant-record"):
+        path = SNAP_DIR / f"{name}.md"
+        high = next((line for line in path.read_text(encoding="utf-8").splitlines()
+                     if line.startswith("- HIGH findings:")), "?")
+        print(f"  {path.relative_to(REPO)}  {high}")
+
+    # ---------------------------------------------------------------- S4
+    scenario("S4 — quartet accepted once, six reason codes each rejected once")
+    payloads = [("compliant", QUARTET_OK, None)]
+    # The 6/6 primary samples: one per reason code. The `missing-field` primary omits TWO keys, so
+    # it is distinct from the four single-key omissions that follow as additional samples.
+    payloads.append(("missing-two-fields", "\n".join(
+        l for l in QUARTET_OK.splitlines()
+        if not l.startswith("attempt:") and not l.startswith("exit_code:")) + "\n", "missing-field"))
+    payloads.append(("missing-attempt", QUARTET_OK.replace("attempt: ", ""), "missing-field"))
+    payloads.append(("missing-exit-code", "\n".join(
+        l for l in QUARTET_OK.splitlines() if not l.startswith("exit_code:")) + "\n", "missing-field"))
+    payloads.append(("missing-observation", "\n".join(
+        l for l in QUARTET_OK.splitlines() if not l.startswith("observation:")) + "\n", "missing-field"))
+    payloads.append(("missing-would-go-red", "\n".join(
+        l for l in QUARTET_OK.splitlines() if not l.startswith("would_go_red_if:")) + "\n", "missing-field"))
+    payloads.append(("empty-attempt", QUARTET_OK.replace(
+        "attempt: `pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioG`", "attempt:"),
+        "empty-field"))
+    payloads.append(("exit-code-not-integer", QUARTET_OK.replace("exit_code: 0", "exit_code: ok"),
+                     "exit-code-not-integer"))
+    payloads.append(("observation-not-raw", QUARTET_OK.replace(
+        "observation: raw: 34 passed", "observation: 34 passed"), "observation-not-raw"))
+    payloads.append(("tautology", QUARTET_OK.replace(
+        WOULD_GO_RED_LINE, "would_go_red_if: 若实现有误就会失败"), "tautology"))
+    # The double-`red:` pinpoint fixture: splitting at the FIRST `red:` leaves a backtick span on
+    # both halves (accepted); splitting at the second would leave the signal half empty (tautology),
+    # so the verdict discriminates the split rule.
+    payloads.append(("double-red-accepted", QUARTET_OK.replace(
+        WOULD_GO_RED_LINE,
+        "would_go_red_if: 把 `shared/guidelines/decision-tension.md` 的字段集合扩一个，则 red: "
+        "`test_owner_declares_closed_record` 必须 FAILED；若误按第二处 red: 切分，信号半就会为空"), None))
+
+    s4_pass = 0
+    counted = 0
+    for name, text, expected in payloads:
+        path = WORK / f"s4-{name}.md"
+        path.write_text(text, encoding="utf-8")
+        proc = run([PY, str(QUARTET), str(path)])
+        reason = next((line.split(":", 1)[1].strip() for line in proc.stdout.splitlines()
+                       if line.startswith("reason:")), "accepted" if proc.returncode == 0 else "?")
+        ok = (expected is None and proc.returncode == 0) or (
+            expected is not None and proc.returncode == 1 and reason == expected)
+        if name.startswith("double-red"):
+            print(f"  [{'ok ' if ok else 'FAIL'}] {name:<28} exit={proc.returncode}  reason={reason}"
+                  "   (pinpoint fixture — outside the 11-run matrix)")
+        else:
+            counted += 1
+            s4_pass += 1 if ok else 0
+            print(f"  [{'ok ' if ok else 'FAIL'}] {name:<28} exit={proc.returncode}  reason={reason}")
+    proc = run([PY, str(QUARTET), str(WORK / "does-not-exist.md")])
+    reason = next((line.split(":", 1)[1].strip() for line in proc.stdout.splitlines()
+                   if line.startswith("reason:")), "?")
+    ok = proc.returncode == 2 and reason == "input-unreadable"
+    counted += 1
+    s4_pass += 1 if ok else 0
+    print(f"  [{'ok ' if ok else 'FAIL'}] {'input-unreadable':<28} exit={proc.returncode}  reason={reason}")
+    print(f"criterion: {counted} runs, 6/6 reason codes rejected + compliant accepted -> {s4_pass}/{counted} MET")
+
+    # ---------------------------------------------------------------- S5
+    scenario("S5 — mirrors and terminology")
+    for cmd in ([PY, "scripts/python/sync-mirrors.py", "--check"],
+                [PY, "scripts/python/regen-command-copies.py", "--check"]):
+        proc = run(cmd)
+        print(f"$ {' '.join(cmd[1:])}")
+        print(proc.stdout.rstrip())
+        print(f"EXIT={proc.returncode}")
+    print("terminology: see test-evidence/terminology-counts-after.txt (five aliases x three trees = 0)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+== run: $ /Users/liuqiming.lqm/project/profiles/.venv/bin/python ~/tmp/076-qs-driver.py ==
+
+===== S1 — first record and its structural check =====
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/validate-decision-tensions.py --spec .specify/specs/076-decision-tension-contract
+spec: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/076-decision-tension-contract
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 275 lines, 2 record(s)
+0 error(s), 0 warning(s)
+EXIT=0
+criterion: status: ok + six labels pass + exit 0 -> MET
+
+===== S2 — one compliant fixture plus eleven inverse inputs =====
+  [ok ] compliant                      exit=0  all labels 0
+  [ok ] delete-decision                exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] delete-antithesis              exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] delete-binding_constraints     exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] delete-discriminating_evidence exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] delete-expected_sacrifice      exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] delete-revision_trigger        exit=1  dtr-record-incomplete -> 1, total findings 1
+  [ok ] expected-sacrifice-none        exit=1  dtr-rejected-form -> 1, total findings 1
+  [ok ] undecidable-wording            exit=1  dtr-rejected-form -> 1, total findings 1
+  [ok ] duplicate-tension-id           exit=1  dtr-tension-id -> 1, total findings 1
+  [ok ] skipped-tension-id             exit=1  dtr-tension-id -> 1, total findings 1
+  [ok ] unmapped-source                exit=1  expected-sacrifice-unmapped -> 1, total findings 1
+criterion: 12 runs, 1 compliant exits 0 + 11 inverse exit 1 on the declared label -> 12/12 MET
+
+===== S3 — four fixtures, one analyze-channel report each (SC-002) =====
+  [ok ] S3-compliant             exit=0  HIGH=0 (expected 0)  snapshot=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/S3-compliant.md
+  [ok ] S3-section-missing       exit=1  HIGH=1 (expected 1)  snapshot=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/S3-section-missing.md
+  [ok ] S3-record-incomplete     exit=1  HIGH=1 (expected 1)  snapshot=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/S3-record-incomplete.md
+  [ok ] S3-cost-unmapped         exit=1  HIGH=1 (expected 1)  snapshot=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/S3-cost-unmapped.md
+criterion: three defect classes one HIGH each + compliant zero -> 4/4 MET
+
+===== SC-003 — re-run the D-1 / D-2 / D-3 triple that owns the 0 / 1 / 0 snapshots =====
+3 passed, 31 deselected in 0.24s
+EXIT=0
+  .specify/specs/076-decision-tension-contract/notes/analyze-sc003/D-1-compliant-na.md  - HIGH findings: 0
+  .specify/specs/076-decision-tension-contract/notes/analyze-sc003/D-2-section-removed.md  - HIGH findings: 1
+  .specify/specs/076-decision-tension-contract/notes/analyze-sc003/D-3-compliant-record.md  - HIGH findings: 0
+
+===== S4 — quartet accepted once, six reason codes each rejected once =====
+  [ok ] compliant                    exit=0  reason=accepted
+  [ok ] missing-two-fields           exit=1  reason=missing-field
+  [ok ] missing-attempt              exit=1  reason=missing-field
+  [ok ] missing-exit-code            exit=1  reason=missing-field
+  [ok ] missing-observation          exit=1  reason=missing-field
+  [ok ] missing-would-go-red         exit=1  reason=missing-field
+  [ok ] empty-attempt                exit=1  reason=empty-field
+  [ok ] exit-code-not-integer        exit=1  reason=exit-code-not-integer
+  [ok ] observation-not-raw          exit=1  reason=observation-not-raw
+  [ok ] tautology                    exit=1  reason=tautology
+  [ok ] double-red-accepted          exit=0  reason=accepted   (pinpoint fixture — outside the 11-run matrix)
+  [ok ] input-unreadable             exit=2  reason=input-unreadable
+criterion: 11 runs, 6/6 reason codes rejected + compliant accepted -> 11/11 MET
+
+===== S5 — mirrors and terminology =====
+$ scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+EXIT=0
+$ scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+terminology: see test-evidence/terminology-counts-after.txt (five aliases x three trees = 0)
+EXIT=0
+
+== teardown ==
+$ rm -rf ~/tmp/076-quickstart ~/tmp/076-qs-driver.py   (fixtures are outside the repo; the
+ snapshots they produced stay in notes/analyze-sc003/)

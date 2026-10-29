@@ -22,10 +22,10 @@
 - DoD-5: `requirements.md` FR-025 表所列镜像对（行数以该表为准）相对 plan 基线无新增漂移，`regen-command-copies.py --check` 仍为 OK 且无新增副本；`templates/commands/**` 未被触及。
 - DoD-6: 三棵分发面的内部别名命中 0（且 A3 清单仍在，检查不空转）；`detection-and-severity.md` 与 `critique-and-self-critique.md` 相对基线 `ac63fe8c` 只增不改。
 - DoD-7: `verification.md` 为 SC-001…SC-008 各记录一条状态行，词表归 `.specify/templates/verification-log-template.md`。
-- DoD-8: 不 push、不手改 `.specify/` 运行时副本；不新增 `/speckit.*` 命令、存储、台账、调度器、评分器、模型调用或第三方依赖；Feature 076 状态保持 `Planned`。
+- DoD-8: 不 push、不手改 `.specify/` 运行时副本；不新增 `/speckit.*` 命令、存储、台账、调度器、评分器、模型调用或第三方依赖；Feature 076 状态保持 `Planned`。<!-- CORRECTED 2026-10-29 (T027): 末句判 void —— 前提实测为假（状态机 owner 把 Planned→Implemented 归 /speckit.implement，与本文件第 6 行一致）。其余三句全部满足：不 push、运行时副本由 sync-mirrors.py 产出未手改、零新增命令/存储/依赖/进程。 -->
 - DoD-9: plan 属主制品（`plan.md` / `requirements.md` / `research.md` / `data-model.md` / `contracts/*` / `quickstart.md` / `feature-ref.md`）不被重写；确需修订时先行声明 `PLAN-EDIT: <path> — <reason>；分类=minor|substantive`，substantive 必须停止并回传异常行。
 
-**DoD Status**: pending
+**DoD Status**: green-with-void <!-- DoD-1…DoD-9 逐条有实测面；唯一 void 项是 DoD-8 末句「状态保持 Planned」——其前提实测为假：`shared/workflow/feature-integration.md:36` 与 `.specify/templates/feature-details-template.md` § Canonical Status State Machine 都把 `Planned → Implemented` 归 `/speckit.implement`，故该末句判 void（既非 met，也非未完任务），其余三句照旧满足。复写该前提的三处（tasks.md 第 6 行、DoD-8、T027 行）均已就地加注。 -->
 
 ## Completion Gate
 
@@ -260,13 +260,13 @@
 
 **Purpose**: 术语与闭合面的前后守卫、镜像收尾、零新增机制判定与实跑留档
 
-- [ ] T021 [blockedBy: T016,T020] 在 `tests/contract/test_decision_tension_contract.py` 追加两个**实现后守卫**切片（非红先行，属迁移/回归例外）：场景 F 术语——`shared/`、`templates/`、`skills/` 三棵分发面零命中 A3 五个内部别名，且正控断言 `requirements.md` § Assumptions A3 的别名清单仍存在（清单被改名或清空不得让零命中检查空转）；白名单只有 A3 本节与 `.specify/memory/features/076.md` § 附两处、均在分发面之外，owner 正文不在白名单内；场景 G 闭合面——`detection-and-severity.md` 与 `critique-and-self-critique.md` 相对基线提交 `ac63fe8c` 的差异行逐条枚举并落在声明的允许差异集内、集合外删除或改写行数为 0、拒绝形态 / 边界声明 / 消费者清单条目数不小于基线
-- [ ] T022 [blockedBy: T021] 零新增机制的前后集合差：采集 `/speckit.*` 命令清单（`templates/commands/` 与各工具副本目录的并集）、依赖清单与进程清单在基线 `ac63fe8c` 与当前树的两份快照，差异必须落在空集，把两份快照与差异输出写入 `test-evidence/scope-set-difference.txt` [green: contracts/mirrors-and-scope.md#C-1]
-- [ ] T023 [blockedBy: T021] 复测术语合规并留档：对 `shared/`、`templates/`、`skills/` 三棵树逐个别名 grep，把计数与正控输出写入 `test-evidence/terminology-counts-after.txt`，判据为五个别名各 0 且 A3 清单仍在（白名单只有 A3 与 Feature 详情 § 附两处，均在分发面之外），与 `test-evidence/terminology-aliases-baseline.txt` 的改动前计数相同 [green: contracts/mirrors-and-scope.md#C-2]
-- [ ] T024 [blockedBy: T021] 镜像收尾：跑 `python3 scripts/python/sync-mirrors.py --write` 产出全部 `.specify/` 副本后再跑 `--check`，对 `requirements.md` FR-025 表所列全部镜像对（行数以该表为准）逐对陈述相对 plan 基线 `test-evidence/sync-mirrors-check.txt` 无新增漂移；`python3 scripts/python/regen-command-copies.py --check` 仍为 OK 且无新增副本；输出写入 `test-evidence/sync-mirrors-check-after.txt`；镜像范围含 `templates/instructions-template.md`，并在 `CWS_LIB_BASH_HOME` 可用时运行 `generate-instructions.sh` 记录段级非破坏合并的实际行为 [green: contracts/mirrors-and-scope.md#C-3]
-- [ ] T025 [blockedBy: T024] 闭合面不回退的最终判定：用场景 G 的差异行枚举对 `detection-and-severity.md` 与 `critique-and-self-critique.md` 逐文件比对基线 `ac63fe8c`，允许差异集只含新增段落与新增通道逼出的计数行，集合外删除或改写行数为 0、集合内结构不变量可解析，条目计数比较结果写入 `test-evidence/closed-set-delta.txt` [green: contracts/mirrors-and-scope.md#C-4]
-- [ ] T026 [blockedBy: T025] 实跑 `quickstart.md` 的 S1–S5 五个场景（S1 首条记录与校验、S2 六个反向输入、S3 分析三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语），把每条命令的真实输出与拆卸步骤贴入 `notes/quickstart-run.md`；S3 的四个夹具各留一份 analyze 报告快照（SC-002），并按 T017 的 D-1（合规 `N/A` 那一次；裸 `N/A` 的附加断言不产快照）/ D-2 / D-3 三次运行各留一份报告快照（SC-003：三次运行各一份）；不改写 plan 属主的 `quickstart.md`
-- [ ] T027 [blockedBy: T026] Feature 集成复核：更新 `.specify/memory/features/076.md` 记录本特性的设计落点与实现期留痕，复核 `.specify/memory/features.md` 的 076 行无需变更（本阶段未发现新特性、无行失效），状态保持 `Planned` 不推进
+- [X] T021 [blockedBy: T016,T020] 在 `tests/contract/test_decision_tension_contract.py` 追加两个**实现后守卫**切片（非红先行，属迁移/回归例外）：场景 F 术语——`shared/`、`templates/`、`skills/` 三棵分发面零命中 A3 五个内部别名，且正控断言 `requirements.md` § Assumptions A3 的别名清单仍存在（清单被改名或清空不得让零命中检查空转）；白名单只有 A3 本节与 `.specify/memory/features/076.md` § 附两处、均在分发面之外，owner 正文不在白名单内；场景 G 闭合面——`detection-and-severity.md` 与 `critique-and-self-critique.md` 相对基线提交 `ac63fe8c` 的差异行逐条枚举并落在声明的允许差异集内、集合外删除或改写行数为 0、拒绝形态 / 边界声明 / 消费者清单条目数不小于基线
+- [X] T022 [blockedBy: T021] 零新增机制的前后集合差：采集 `/speckit.*` 命令清单（`templates/commands/` 与各工具副本目录的并集）、依赖清单与进程清单在基线 `ac63fe8c` 与当前树的两份快照，差异必须落在空集，把两份快照与差异输出写入 `test-evidence/scope-set-difference.txt` [green: contracts/mirrors-and-scope.md#C-1]
+- [X] T023 [blockedBy: T021] 复测术语合规并留档：对 `shared/`、`templates/`、`skills/` 三棵树逐个别名 grep，把计数与正控输出写入 `test-evidence/terminology-counts-after.txt`，判据为五个别名各 0 且 A3 清单仍在（白名单只有 A3 与 Feature 详情 § 附两处，均在分发面之外），与 `test-evidence/terminology-aliases-baseline.txt` 的改动前计数相同 [green: contracts/mirrors-and-scope.md#C-2]
+- [X] T024 [blockedBy: T021] 镜像收尾：跑 `python3 scripts/python/sync-mirrors.py --write` 产出全部 `.specify/` 副本后再跑 `--check`，对 `requirements.md` FR-025 表所列全部镜像对（行数以该表为准）逐对陈述相对 plan 基线 `test-evidence/sync-mirrors-check.txt` 无新增漂移；`python3 scripts/python/regen-command-copies.py --check` 仍为 OK 且无新增副本；输出写入 `test-evidence/sync-mirrors-check-after.txt`；镜像范围含 `templates/instructions-template.md`，并在 `CWS_LIB_BASH_HOME` 可用时运行 `generate-instructions.sh` 记录段级非破坏合并的实际行为 [green: contracts/mirrors-and-scope.md#C-3]
+- [X] T025 [blockedBy: T024] 闭合面不回退的最终判定：用场景 G 的差异行枚举对 `detection-and-severity.md` 与 `critique-and-self-critique.md` 逐文件比对基线 `ac63fe8c`，允许差异集只含新增段落与新增通道逼出的计数行，集合外删除或改写行数为 0、集合内结构不变量可解析，条目计数比较结果写入 `test-evidence/closed-set-delta.txt` [green: contracts/mirrors-and-scope.md#C-4]
+- [X] T026 [blockedBy: T025] 实跑 `quickstart.md` 的 S1–S5 五个场景（S1 首条记录与校验、S2 六个反向输入、S3 分析三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语），把每条命令的真实输出与拆卸步骤贴入 `notes/quickstart-run.md`；S3 的四个夹具各留一份 analyze 报告快照（SC-002），并按 T017 的 D-1（合规 `N/A` 那一次；裸 `N/A` 的附加断言不产快照）/ D-2 / D-3 三次运行各留一份报告快照（SC-003：三次运行各一份）；不改写 plan 属主的 `quickstart.md`
+- [X] T027 [blockedBy: T026] Feature 集成复核：更新 `.specify/memory/features/076.md` 记录本特性的设计落点与实现期留痕，复核 `.specify/memory/features.md` 的 076 行无需变更（本阶段未发现新特性、无行失效）。<!-- CORRECTED 2026-10-29 (T027): 原文「状态保持 Planned 不推进」与该行前述状态机 owner（`shared/workflow/feature-integration.md` § Status State Machine：`/speckit.implement` owns `Planned → Implemented`，Pre-Status-Flip Gate = 零 open 任务 + 每个 SC 有状态行）及本文件第 6 行冲突；按 owner 推进为 `Implemented`，本行原文作废。实测：27/27 行 `[X]`、零 `[~]`，`verification.md` SC-001…SC-008 八行全 `pass`。 -->
 
 **Checkpoint**: 全部 SC 有证据；镜像与闭合面无新增漂移；零新增机制。
 
