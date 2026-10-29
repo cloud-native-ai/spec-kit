@@ -365,3 +365,135 @@ evaluations of the same inputs stay byte-identical (C-24).
 reason-code order, exit alphabet, zero writes, three owner-document mutation probes, golden row
 judging, golden byte-identity). **Full logs**: `green-t021.txt`, `golden-run1.json`,
 `golden-run2.json`, `golden-rows.txt`.
+
+---
+
+## Governance — pre-dispatch blocking records (US3) · EXECUTED 2026-10-29
+
+`quickstart.md` carries no governance scenario (its S1–S7 are routing, authorization, nested run,
+acceptance evidence and the three baselines), so this section is US3's own evidence and does not
+reuse S6. Part 4 of 5 (tasks T022–T025), `HEAD=0dbe8897b` before this part's commits; the record below
+was produced against the slice's disposable target project (`tests/fixtures/nested_sdd.py`,
+`variant="block"`: one allowed seat, one forbidden seat, one seat with no roster entry).
+
+**The four dispatch forms and the surface that decides each** (US3's independent test as
+`test_sdd_invocation_governance.py::test_the_four_dispatch_forms_each_carry_their_rule`):
+
+| Form | Decision | Decided by |
+|------|----------|------------|
+| authorized SDD assignment | dispatched, basis recorded | `sdd-route.py --action authorize` (two halves) + the duty's recorded `sdd` decision |
+| prompt naming a driver without both halves | blocked before dispatch, failed condition named | the probe (`run-agent/SKILL.md`) on the engine's refusal |
+| stage executor hosting a driver | refused — a stage executor is a leaf | owner site § Dispatch-Time Governance Obligation (`MUST NOT start or host any SDD run`) |
+| SDD attempt inside a stage | refused — SDD-within-SDD recursion prohibited | same owner site |
+| virtual-mode member hosting a run | refused — virtual execution occupies the orchestrating session | same owner site (`MUST NOT host an SDD run`) |
+
+**Live blocking records (two declared halves, real output).** Command shape for every case:
+`python3 <repo>/scripts/python/sdd-route.py --action authorize --agent <definition> --team
+fixture-team --seat <seat> --format json`, run with the target project as working directory.
+
+```console
+$ cd <target-project> && python3 <repo>/scripts/python/sdd-route.py --action authorize \
+    --agent <target-project>/.specify/agents/instances/seat-allowed.agent.md \
+    --team fixture-team --seat seat-allowed --format json
+# form 1 — authorized SDD assignment: dispatched, authorization basis recorded
+{
+  "action": "authorize",
+  "agent_capability": "allowed",
+  "seat_policy": "allowed",
+  "effective": "allowed",
+  "verdict": "allowed",
+  "reason": "both halves allow SDD invocation: the agent definition declares the capability and the seat policy allows it",
+  "failed_half": null,
+  "team_slug": "fixture-team",
+  "seat_slug": "seat-allowed",
+  "supplying": {"agent": "declared", "seat": "declared"},
+  "sources": {"agent": ".../agents/instances/seat-allowed.agent.md", "team": ".../teams/fixture-team/team.md"}
+}
+# RC=0
+
+$ cd <target-project> && python3 <repo>/scripts/python/sdd-route.py --action authorize \
+    --agent <target-project>/.specify/agents/instances/seat-allowed.agent.md \
+    --team fixture-team --seat seat-forbidden --format json
+# form 2a — the seat half refuses: BLOCKED before dispatch, condition = seat
+{
+  "action": "authorize",
+  "agent_capability": "allowed",
+  "seat_policy": "forbidden",
+  "effective": "forbidden",
+  "verdict": "forbidden",
+  "reason": "the seat half does not allow SDD invocation (absent map, absent entry for this seat, or explicit refusal)",
+  "failed_half": "seat",
+  "team_slug": "fixture-team",
+  "seat_slug": "seat-forbidden",
+  "supplying": {"agent": "declared", "seat": "declared"},
+  "sources": {"agent": ".../agents/instances/seat-allowed.agent.md", "team": ".../teams/fixture-team/team.md"}
+}
+# RC=0
+
+$ cd <target-project> && python3 <repo>/scripts/python/sdd-route.py --action authorize \
+    --agent <target-project>/.specify/agents/instances/seat-forbidden.agent.md \
+    --team fixture-team --seat seat-allowed --format json
+# form 2b — the agent half refuses (key absent ⇒ default deny): BLOCKED, condition = agent
+{
+  "action": "authorize",
+  "agent_capability": "forbidden",
+  "seat_policy": "allowed",
+  "effective": "forbidden",
+  "verdict": "forbidden",
+  "reason": "the agent half does not allow SDD invocation (absent key or explicit refusal; the owner's absent-key default is deny)",
+  "failed_half": "agent",
+  "team_slug": "fixture-team",
+  "seat_slug": "seat-allowed",
+  "supplying": {"agent": "absent-key", "seat": "declared"},
+  "sources": {"agent": ".../agents/instances/seat-forbidden.agent.md", "team": ".../teams/fixture-team/team.md"}
+}
+# RC=0
+```
+
+Two further cases, same command shape, field projection of the run (full payloads have the shape
+above):
+
+```console
+# form 2c — the seat has no seats entry:    verdict=forbidden  failed_half="seat"   supplying.seat="absent-entry"  seat_slug=seat-absent    # RC=0
+# form 2d — both halves refuse:             verdict=forbidden  failed_half="both"   reason="neither half allows SDD invocation: the agent definition and the seat policy both deny"  seat_slug=seat-forbidden  # RC=0
+```
+
+Every refusal is a **produced verdict**, not an error status (exit `0`), and every one names the
+failed condition, the recipient's resolved values, both source paths and the seat slug — the field
+set C-14 requires, and the reason no reader has to accept a bare "not authorized".
+
+**Stage executor and virtual-mode refusals — declared, not engine-produced.** The engine above
+returns `allowed` for the authorized seat, which is exactly why the leaf rule and the virtual-mode
+rule cannot live in the engine action: they are conditions on the *dispatch* (chain position and
+execution mode), read by the probe from the target project's state, not facts of the two declared
+halves. This slice adds no new command, gate or scheduler to make them executable (C-16), so their
+evidence is the declaration plus the executable case that pins it:
+
+- `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation —
+  `a stage executor MUST NOT start or host any SDD run`; `a member executed in virtual mode MUST NOT
+  host an SDD run` … `the dispatch is refused before it leaves and the reason is reported`; refusal
+  record = `failed condition + recipient's resolved values + both source paths + seat slug`.
+- `skills/internal/run-agent/SKILL.md` § Pre-dispatch probe (fail-closed) — `a stage executor stays a
+  leaf: a dispatch prompt handed to it MUST NOT name a driver`, and `Rewording the prompt cannot
+  repair a refusal`.
+- Pinned by `test_sdd_invocation_governance.py::test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch`,
+  `::test_c12_virtual_mode_must_not_host_a_run`, `::test_c14_a_refusal_record_names_the_condition_and_the_resolved_values`
+  (17 passed, `notes/green-t025.txt`).
+
+**Structure face — the authorization surface added no machinery** (`git diff --name-status
+0dbe8897b..HEAD`): six paths, and not one of them is a command template, a skill directory, a
+registry, a ledger or a state file —
+
+```console
+M shared/definitions/subagent-definitions.md     # owner site amended in place
+M skills/internal/run-agent/SKILL.md             # probe amended in place
+A tests/contract/test_sdd_invocation_governance.py
+M .specify/specs/074a-authorized-routing/tasks.md
+M .specify/specs/074a-authorized-routing/notes/red-first-evidence.md
+A .specify/specs/074a-authorized-routing/notes/red-t022.txt
+# git diff --name-status 0dbe8897b..HEAD -- .specify/state/ .specify/memory/registers  → empty
+```
+
+The confirmation-gate count, the scheduler inventory and the registry set are therefore unchanged by
+this part; the full baseline comparison is task T028's (part 5), and this line only states what this
+part's own diff shows.

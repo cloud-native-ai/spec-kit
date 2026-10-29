@@ -330,3 +330,91 @@ behavioural groups (the allowed form, and the three refusal cases naming `seat` 
 plus the two containment guards (`test_c9_the_original_prohibition_survives_word_for_word`,
 `test_the_pre_existing_probe_terms_still_hold`): they consume surfaces US1/us already landed, and
 they are here so that the narrowing cannot pass by disturbing them. Full log: `red-t022.txt`.
+
+## T023 — owner site amended + probe wired to the engine (partial green)
+
+T023 replaced the unqualified "loop depth is always 1" sentence at `subagent-definitions.md`
+§ Dispatch-Time Governance Obligation with the three-condition predicate (keeping the three original
+prohibition clauses word for word), and rewrote the `run-agent/SKILL.md` anti-nesting paragraph so
+the pre-dispatch probe calls `scripts/python/sdd-route.py --action authorize` and fails closed. The
+same module re-run at that commit (`8b0c3c672`) — summary lines only, the full log of the end state
+is `green-t025.txt`:
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_no_second_copy_of_the_prohibition_set
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c11_the_permitted_chain_is_depth_two_with_its_three_prohibitions
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c12_virtual_mode_must_not_host_a_run
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c14_a_refusal_record_names_the_condition_and_the_resolved_values
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c16_no_confirmation_gate_no_scheduler_no_second_registry
+FAILED tests/contract/test_sdd_invocation_governance.py::test_the_four_dispatch_forms_each_carry_their_rule
+8 failed, 9 passed in 0.24s
+# RC=1
+```
+
+The three cases T023 claims went green here: `test_c9_the_predicate_narrows_to_exactly_three_conditions`,
+`test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate`, and
+`test_c10_the_probe_calls_the_engine_and_fails_closed` — 9 passed = those three + the 6 that were
+already green at T022. The 8 still red are exactly the clauses T024 owns (C-11…C-16), each failing
+as a missing statement.
+
+## Correction disclosed — one pre-existing paragraph restored between T023 and T024
+
+Splitting T023 and T024 into two commits over one file cost one paragraph: the pre-existing sentence
+"*The obligation binds all three execution modes (native / virtual / external) equally … so the
+wrapper stays generic and unchanged*" was cut together with T024's block when the block was staged
+out of the T023 commit, so the T023 commit (`8b0c3c672`) is missing it and the T024 commit
+(`cfa925c1a`) restores it **verbatim**:
+
+```console
+$ git show 8b0c3c672:shared/definitions/subagent-definitions.md | grep -c "binds all three execution modes"
+0
+$ git show cfa925c1a:shared/definitions/subagent-definitions.md | grep -c "binds all three execution modes"
+1
+```
+
+Verified byte-identical to the pre-slice text (`git show 0dbe8897b:…` compared by string equality),
+so the end state of the part carries no unintended deletion — the defect lived in the intermediate
+commit only, and the file's final content is what both the tests and the contract read.
+
+## T024 / T025 — US3 green and its evidence
+
+T024 declared the depth-2 chain and its three prohibitions, the virtual-mode exclusion, the
+one-run-per-member hard cap, the refusal record's field set and the no-new-machinery statement on the
+same owner site. The module is green over the same 17 cases that were red:
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py
+.................                                                        [100%]
+17 passed in 0.24s
+# RC=0
+```
+
+Full log: `green-t025.txt`. No case was weakened, renamed or skipped between the red run and this one:
+the 17 node ids are identical in both logs (11 failed → 17 passed through the 8-case intermediate
+above).
+
+The pre-existing anti-nesting cases were re-run in the same part at name level — see the regression
+check below; the governance record itself (the four forms, the live refusal payloads, the declared
+leaf/virtual refusals and the structure face) is in `quickstart-run.md` § Governance.
+
+## Regression check for this part
+
+The slice's fixed targeted set (the 13 contract files owned by
+`test-evidence/targeted-set-v1-baseline.txt`) was re-run once for this part:
+
+```console
+$ bash scripts/bash/run-tests.sh --names-out notes/targeted-set-v1-failed.txt <the 13 files>
+============================= 191 passed in 21.62s =============================
+# failed-name list written: notes/targeted-set-v1-failed.txt (0 entries)
+# RC=0
+```
+
+Name-level identical to the implement-start re-capture (191 passed, 0 failed names; the names-out
+file is byte-identical — `git diff` on it is empty), so this part introduces no new failure in the
+slice's non-regression set, and the three pre-existing anti-nesting assertions
+(`test_agent_dispatch_mechanism.py` C-6 / C-20, `test_sdd_loop_driver_skill.py` C-20) keep their
+verdict. Full log: `green-t025-targeted.txt`. No second full-suite run was made: the E2 baseline slot
+was consumed at implement start (`test-evidence/implement.jsonl` seq 1).
