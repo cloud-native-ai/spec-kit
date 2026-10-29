@@ -52,6 +52,15 @@ pre-change case passes. The carriers are sets `S2` (standalone driver entry), `S
 `S4` (064 line/worktree/ownership) and `S5` (058 U0–U6) of
 `test-evidence/compat-baseline-nodeids.txt` (FR-007, SC-001). *(parent C-61)*
 
+*Reading rule for C-3 and C-6, and for the set both claims reach (S2, the standalone-driver entry
+suite named by FR-006/SC-001 and one of C-6's four surfaces)*: the criterion for a case id that is
+**already red in the pre-change baseline** is **verdict-unchanged** — the post-change verdict equals
+the pre-change verdict, red included — and the "every pre-change case MUST pass" criterion of FR-007 /
+C-6 applies only to case ids that are **green** in that baseline. The two readings are therefore not
+alternatives to be chosen between: on the shared set `S2` they are read jointly by this rule, so a
+pre-existing red is neither required to be repaired (T023 forbids it) nor counted as an added failure,
+while a case that turns red after the change still fails the claim (FR-006, FR-007, SC-001).
+
 **C-7**: The nested entry form stays additive on the standalone entry contract: the standalone
 default-resolution behaviour is unchanged, and the nested form remains a distinct entry whose
 semantics are validation-then-refuse rather than default-resolution. This slice adds no fact to that
@@ -75,7 +84,9 @@ authorization to integrate (FR-008). *(parent C-63)*
 **C-11**: The slice adds no new `/speckit.*` command and no new skill: every capability lands on an
 existing command, skill, engine, template, or shared definition, and the delivered file set is a diff
 of those owners. The flow-class inventory therefore keeps its unit count and finding count (FR-008).
-*(parent C-67, parent FR 028 facet)*
+*(parent C-67, parent FR 028 facet. Requirement anchor: `requirements.md` § Overview prose — "no new
+command, no new skill, no new store" — **rated prose-level**: FR-008's four prohibitions do not name
+commands or skills, so this clause is a prose-anchored design obligation, not an FR clause claim)*
 
 **C-12**: The slice adds no store: the report section is text inside an existing report, the
 attribution row is one item in the existing team ledger, the pointer surfaces are sections of existing

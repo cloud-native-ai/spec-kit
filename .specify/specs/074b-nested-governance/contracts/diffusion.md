@@ -8,7 +8,8 @@ conjunction. Each diffused fact is a **pointer** to its owner: the routing owner
 `shared/definitions/sdd-routing-definitions.md`, the neutral key set in `src/specify_cli/__init__.py`,
 and the driver's stage roster. None of them restates a table, a threshold, or an enumeration.
 **Pinned by**: `tests/contract/test_sdd_diffusion.py` (planned)
-**Measures**: —
+**Measures**: DoD-2 / DoD-4 / DoD-6 + T010/T016/T019/T024 (pointers into `tasks.md`; no SC is added or
+re-scoped here — the diffusion faces are graded by those rows rather than by a second acceptance claim)
 **Parent source**: `parent C-55`, `parent C-66` (Stage-vocabulary facet), `parent C-25`,
 `parent C-26`, `parent C-56`, `parent C-57`; `parent C-60` is cited (claimed and delivered by
 `074a`).
@@ -16,8 +17,12 @@ and the driver's stage roster. None of them restates a table, a threshold, or an
 **C-13**: The team conceptual model states that its Stage dimension (`executor` / `evaluator` /
 `optimizer`) is not the SDD stage roster, and that the SDD stage roster remains owned by the driver.
 No team Stage value is renamed or overloaded with an SDD stage name, and the statement is added at the
-existing Stage bullet rather than as a new top-level section of the owner file (FR-003).
-*(parent C-55)*
+existing Stage bullet rather than as a new top-level section of the owner file (FR-003). *(parent C-55.
+The constraint is **bidirectional**: no team Stage value may take an SDD stage name, and no SDD stage
+name may be added to the team Stage vocabulary — C-14 asserts the second direction as an absence. Where
+one definition appears to carry both the hosting duty and the stage-execution duty, the seat's
+**operating object** decides — the layer the seat actually operates on selects its duty set — never its
+name, and C-15…C-17 state that leaf side (FR-003))*
 
 **C-14**: No surface produced by this slice enumerates SDD stage names, duplicates the stage roster,
 or declares a second team Stage vocabulary. The check reads the text this slice adds and asserts the
@@ -58,7 +63,11 @@ discipline by pointer; the trigger document gains one sentence inside its existi
 `scripts/bash/generate-instructions.sh`; the live file is never hand-edited, and the compatibility
 instruction symlinks follow because they point at it. Because both files already exceeded the
 generator's byte budget before this slice, the acceptance criterion is the section's own declared byte
-ceiling plus a measured delta, never an absolute "fits the budget" claim (FR-005).
+ceiling plus a measured delta, never an absolute "fits the budget" claim (FR-005). *(Design-level
+criterion: the requirement anchor is FR-005's "one pointer-level routing surface", while the byte
+ceiling, the generator route and the symlink consequence are design quantities with no requirement
+anchor; this clause is therefore graded as a design obligation and MUST NOT be cited as an
+acceptance criterion in its own right)*
 
 ## Traceability
 

@@ -32,15 +32,25 @@ the run. A nested run writes no tracked artifact: no report edit, no goal-archiv
 spec-directory write. Its product is the returned handoff, consumed by the supervisor (FR-001).
 *(parent C-50)*
 
-**C-25**: At report time the team supervisor appends exactly one ledger item carrying the existing
-Target reference, using the ledger's existing attribution field. On each of these the section is a
-consumer, not an owner: no new Goal field, no structural link from a Goal to a requirements
-specification, and no write to the Goal definition (FR-001). *(parent C-51)*
+**C-25**: At report time the team supervisor appends **at most one** ledger item carrying the existing
+Target reference — **exactly one** when the run declared a Target, and **none** when it declared none
+(C-26) — using the ledger's existing attribution field. On each of these the section is a consumer,
+not an owner: no new Goal field, no structural link from a Goal to a requirements specification, and
+no write to the Goal definition (FR-001). *(parent C-51; cardinality read together with
+`data-model.md` V-5 / V-6)*
 
 **C-26**: The parsed Goal field set is identical before and after a nested run. Attribution is
 observational only: it appears through the existing ledger reference and the run report, never as a
 Goal-scoped field, and no Target is invented for a run that declared none — such a run's row omits the
 attribution field, which is the existing Goal-wide form (FR-001, SC-002). *(parent C-52)*
+
+*Bound reading of FR-001's observation channel ("the team run report **and summary**")*: the summary
+is the **existing goal-level summary channel**, not a second artifact — the goal index's `summary/`
+directory (`.specify/goal/<goal-slug>/summary/`), refreshed by `summarize-project` under
+`skills/internal/create-team/references/summary-mapping.md`, exactly as every other team run reaches it.
+This slice adds no file, no field and no section there; the nested section's content reaches the summary
+only as report content reaches any other consumer, so the clause above is the whole obligation, and
+FR-001 names one observation channel reached twice, never two artifacts.
 
 **C-27**: The other mandatory report sections keep their existing content obligations. The nested
 section is a peer of the verification section, not a replacement: a nested run's own verification
@@ -56,9 +66,12 @@ facet; D-2)*
 
 **C-29**: The section reads the handoff's closed field set by reference and adds no field of its own: a
 field the section lists that the handoff does not carry is recorded as missing, never filled in from
-the invoking agent's own prose. A `[[STR-005]]` or `[[STR-006]]` outcome is carried through to the
-outer layer unchanged, so a blocked or failed nested run can never be reported as success (FR-002).
-*(parent C-41 cited, delivered by `074a`)*
+the invoking agent's own prose. The **integration identity** — line id, branch, worktree path and HEAD
+commit, in the form the handoff's owner defines it — is read from the handoff by that same rule: a
+handoff that carries no integration identity is an **incomplete handoff**, and the outer layer MUST NOT
+report the run as success on an incomplete handoff, whatever its outcome value. A `[[STR-005]]` or
+`[[STR-006]]` outcome is carried through to the outer layer unchanged, so a blocked or failed nested
+run can never be reported as success (FR-002). *(parent C-41 cited, delivered by `074a`)*
 
 **C-30**: The report contract has exactly one owner (`create-team/SKILL.md` § Report contract); the
 `run-team` report duty keeps delegating to it and gains no second statement of the section. This slice

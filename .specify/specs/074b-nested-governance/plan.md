@@ -221,6 +221,35 @@ taken.)
 
 N/A — the Constitution Check has no ❌ Fail and no ⚠ Partial row.
 
+## Plan Revision
+
+**2026-10-29 — analyze-fix round 1 (slice `074b-nested-governance`).** One remediation pass after
+`/speckit.analyze` returned 0 CRITICAL / 2 HIGH / 7 MEDIUM / 5 LOW. The requirement text is not
+re-derived here; each entry records what changed in the design and why.
+
+1. **F-01 (HIGH) — one containment criterion instead of two (classification: minor).**
+   `contracts/compat-and-safety.md` gains a reading rule between C-6 and C-7 that reads FR-006/SC-001's
+   "same verdict" and FR-007/C-6's "every pre-change case passes" as **one** decidable criterion over
+   the set both claims reach (`S2`, the standalone-driver entry suite): for a case id that is already
+   **red** in the pre-change baseline the criterion is **verdict-unchanged**, and "MUST pass" governs
+   only the case ids that are **green** in that baseline. Reason: two criteria stood over one shared
+   suite and they disagree exactly on an already-red case — "same verdict" permits it to stay red while
+   "MUST pass" forbids it, and T023 forbids repairing a pre-existing red, so no reader could tell which
+   one governs. The edit changes no scope, no architecture, no clause id and no clause count (still 30,
+   `md-bold-closed`); it is text-level disambiguation, hence **minor**, and the plan's scope needs no
+   re-anchoring beyond this record.
+2. **Text-level alignment carried in the same pass (classification: minor).** MEDIUM/LOW findings whose
+   remedy is wording rather than design: C-25 and `data-model.md` V-5 now state **one** cardinality (at
+   most one attributed ledger item per report — exactly one with a Target, none without) instead of
+   "exactly one" versus "at most one"; FR-001's "summary" is bound to the **existing** goal-level
+   summary channel so it cannot be read as a second artifact; C-29 names the handoff's integration
+   identity and the incomplete-handoff rule (missing identity ⇒ the outer layer MUST NOT report
+   success); `contracts/diffusion.md` `Measures` names the DoD / task rows that grade the diffusion
+   faces instead of `—`, adding no SC; C-11 declares its anchor prose-level (`requirements.md`
+   § Overview) and C-20 declares itself a design-level criterion; C-13 states the Stage boundary
+   **bidirectionally** and lets the seat's operating object — not the name — decide a definition that
+   carries both duties.
+
 ## Parent Design Mapping
 
 **Reading**: this slice's requirement entries come from

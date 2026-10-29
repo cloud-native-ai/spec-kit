@@ -48,11 +48,11 @@ owned by `skills/internal/create-team/references/summary-mapping.md` and
 
 | 事实 | 规则 |
 |------|------|
-| 写者 | team supervisor，在报告时追加**一行** |
-| 何时写 | 该次运行声明了 Target；对 Goal 整体运行则不带归因字段（既有形态，V-6） |
+| 写者 | team supervisor，在报告时追加**至多一行**归因条目 |
+| 何时写 | 该次运行声明了 Target ⇒ **恰一行**；未声明 Target ⇒ **零行**归因条目（台账行仍可存在，但不带归因字段——既有 Goal 整体形态，V-6） |
 | 禁止 | 新增 Goal 字段、写 Goal 定义文件、由嵌套运行写该行 |
 
-**V-5**: 一次报告的归因行最多一行；两行即判重复归因，MUST NOT 以「补充说明」为由再写一行。
+**V-5**: 一次报告的归因条目基数为「至多一条」——声明了 Target 时**恰一条**，未声明 Target 时**零条**；超过一条即判重复归因，MUST NOT 以「补充说明」为由再写一条。
 **V-6**: 未声明 Target 的运行 MUST NOT 发明占位 Target；其台账行不带归因字段，这是既有 Goal 整体形态。
 **V-7**: 归因 MUST 只经既有台账引用解析；解析出的 Goal 字段集在运行前后 MUST 完全一致（SC-002）。
 
