@@ -1,0 +1,120 @@
+### CMD: python3 -m pytest -q tests/contract/test_sdd_routing_definitions.py
+..FFFFF.......                                                           [100%]
+=================================== FAILURES ===================================
+_______________ test_each_fact_has_a_resolvable_landing_section ________________
+
+    def test_each_fact_has_a_resolvable_landing_section():
+        preamble = _preamble(_read_owner())
+        sections = _sections(_read_owner())
+        rows = {row[0].strip("* "): row for row in _table_rows(preamble) if row and len(row) >= 3}
+        for fact_id, _keywords in FACTS:
+            key = next((k for k in rows if k.startswith(fact_id) or fact_id in k), None)
+            assert key is not None, f"{fact_id} not declared"
+            landing_cell = rows[key][-1]
+            landing = landing_cell.lstrip("§ ").strip()
+            landing = re.split(r"[（(]", landing)[0].strip()
+>           assert landing in sections, (
+                f"{fact_id} declares its landing as '## {landing}', which the document does "
+                f"not contain — an ownership claim with no landing point is not decidable "
+                f"(sections present: {sorted(sections)})"
+            )
+E           AssertionError: F-1 declares its landing as '## Inputs', which the document does not contain — an ownership claim with no landing point is not decidable (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
+E           assert 'Inputs' in {'Direct modification': '**直接修改** = 执行一次变更而**不产生 SDD 工件链**：不建立工件链、不经过驱动的阶段与哨兵、不产出 handoff。\n\n它与 SDD 运行只在这一件事上不同，**不是减...ction authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。'}
+
+tests/contract/test_sdd_routing_definitions.py:193: AssertionError
+________________ test_five_inputs_declare_closed_value_domains _________________
+
+    def test_five_inputs_declare_closed_value_domains():
+>       body = _section_or_fail("Inputs")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sdd_routing_definitions.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'Inputs'
+
+    def _section_or_fail(name: str) -> str:
+        sections = _sections(_read_owner())
+>       assert name in sections, (
+            f"owner document has no '## {name}' section; declared landings must resolve "
+            f"(sections present: {sorted(sections)})"
+        )
+E       AssertionError: owner document has no '## Inputs' section; declared landings must resolve (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
+E       assert 'Inputs' in {'Direct modification': '**直接修改** = 执行一次变更而**不产生 SDD 工件链**：不建立工件链、不经过驱动的阶段与哨兵、不产出 handoff。\n\n它与 SDD 运行只在这一件事上不同，**不是减...ction authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。'}
+
+tests/contract/test_sdd_routing_definitions.py:123: AssertionError
+______________ test_change_nature_domain_carries_definition_class ______________
+
+    def test_change_nature_domain_carries_definition_class():
+>       body = _section_or_fail("Inputs")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sdd_routing_definitions.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'Inputs'
+
+    def _section_or_fail(name: str) -> str:
+        sections = _sections(_read_owner())
+>       assert name in sections, (
+            f"owner document has no '## {name}' section; declared landings must resolve "
+            f"(sections present: {sorted(sections)})"
+        )
+E       AssertionError: owner document has no '## Inputs' section; declared landings must resolve (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
+E       assert 'Inputs' in {'Direct modification': '**直接修改** = 执行一次变更而**不产生 SDD 工件链**：不建立工件链、不经过驱动的阶段与哨兵、不产出 handoff。\n\n它与 SDD 运行只在这一件事上不同，**不是减...ction authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。'}
+
+tests/contract/test_sdd_routing_definitions.py:123: AssertionError
+______________ test_complexity_tier_domain_cites_the_rubric_owner ______________
+
+    def test_complexity_tier_domain_cites_the_rubric_owner():
+>       body = _section_or_fail("Inputs")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_sdd_routing_definitions.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'Inputs'
+
+    def _section_or_fail(name: str) -> str:
+        sections = _sections(_read_owner())
+>       assert name in sections, (
+            f"owner document has no '## {name}' section; declared landings must resolve "
+            f"(sections present: {sorted(sections)})"
+        )
+E       AssertionError: owner document has no '## Inputs' section; declared landings must resolve (sections present: ['Direct modification', 'Hierarchy', 'Invocation kinds'])
+E       assert 'Inputs' in {'Direct modification': '**直接修改** = 执行一次变更而**不产生 SDD 工件链**：不建立工件链、不经过驱动的阶段与哨兵、不产出 handoff。\n\n它与 SDD 运行只在这一件事上不同，**不是减...ction authorize`。谓词不是第二个谓词，其义务位点归 `shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation。'}
+
+tests/contract/test_sdd_routing_definitions.py:123: AssertionError
+________________ test_forbidden_dimensions_are_stated_as_a_rule ________________
+
+    def test_forbidden_dimensions_are_stated_as_a_rule():
+        text = _read_owner()
+        rule_line = next(
+            (
+                line
+                for line in text.splitlines()
+                if any(marker in line for marker in ("MUST NOT", "不得"))
+                and all(
+                    any(form in line for form in dimension)
+                    for dimension in FORBIDDEN_DIMENSIONS
+                )
+            ),
+            None,
+        )
+>       assert rule_line is not None, (
+            "the owner document MUST state, as a rule, that the decision consumes none of: "
+            "implementation medium, file extension, language, artifact count, author "
+            "identity (C-18)"
+        )
+E       AssertionError: the owner document MUST state, as a rule, that the decision consumes none of: implementation medium, file extension, language, artifact count, author identity (C-18)
+E       assert None is not None
+
+tests/contract/test_sdd_routing_definitions.py:274: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_sdd_routing_definitions.py::test_each_fact_has_a_resolvable_landing_section
+FAILED tests/contract/test_sdd_routing_definitions.py::test_five_inputs_declare_closed_value_domains
+FAILED tests/contract/test_sdd_routing_definitions.py::test_change_nature_domain_carries_definition_class
+FAILED tests/contract/test_sdd_routing_definitions.py::test_complexity_tier_domain_cites_the_rubric_owner
+FAILED tests/contract/test_sdd_routing_definitions.py::test_forbidden_dimensions_are_stated_as_a_rule
+5 failed, 9 passed in 0.09s
+### RC=1

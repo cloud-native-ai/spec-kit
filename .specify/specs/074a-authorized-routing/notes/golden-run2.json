@@ -1,0 +1,373 @@
+{
+  "action": "golden",
+  "owner_document": "/storage/project/cloud-native-ai/spec-kit/shared/definitions/sdd-routing-definitions.md",
+  "case_count": 14,
+  "all_match": true,
+  "cases": [
+    {
+      "case_id": "G1-feature-scale",
+      "inputs": {
+        "change_nature": "feature",
+        "traceability": "required",
+        "blast_radius": "cross-cutting",
+        "reversibility": "hard",
+        "complexity": "standard"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-capability-or-contract-change",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-capability-or-contract-change",
+      "triggered_conditions": [
+        "nature-feature",
+        "traceability-required",
+        "blast-cross-cutting",
+        "reversal-hard",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "FR-009：功能规模的变更"
+    },
+    {
+      "case_id": "G2-bounded-maintenance",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": "standard"
+      },
+      "rationale": null,
+      "expected_verdict": "direct",
+      "expected_reason_code": "direct-conditions-all-hold",
+      "actual_verdict": "direct",
+      "actual_reason_code": "direct-conditions-all-hold",
+      "triggered_conditions": [
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-010：六条全部成立的有界维护"
+    },
+    {
+      "case_id": "G3-cross-cutting",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "cross-cutting",
+        "reversibility": "reversible",
+        "complexity": "trivial"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-cross-cutting-radius",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-cross-cutting-radius",
+      "triggered_conditions": [
+        "blast-cross-cutting",
+        "nature-preserves",
+        "traceability-not-required",
+        "reversal-reversible",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "FR-009：有效半径跨切面"
+    },
+    {
+      "case_id": "G4-irreversible",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "hard",
+        "complexity": "standard"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-hard-reversal",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-hard-reversal",
+      "triggered_conditions": [
+        "reversal-hard",
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-009：不可逆或难以反向"
+    },
+    {
+      "case_id": "G5-ambiguous-value",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": "deep"
+      },
+      "rationale": null,
+      "expected_verdict": "adjudicate",
+      "expected_reason_code": "adjudicate-ambiguous-value",
+      "actual_verdict": "adjudicate",
+      "actual_reason_code": "adjudicate-ambiguous-value",
+      "triggered_conditions": [
+        "input-ambiguous",
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-011：域外取值（ambiguous）"
+    },
+    {
+      "case_id": "G6-conflicting",
+      "inputs": {
+        "change_nature": "feature",
+        "traceability": "not-required",
+        "blast_radius": "local-bounded-definition-correction",
+        "reversibility": "reversible",
+        "complexity": "trivial"
+      },
+      "rationale": "只收紧一处定义措辞",
+      "expected_verdict": "adjudicate",
+      "expected_reason_code": "adjudicate-conflicting-inputs",
+      "actual_verdict": "adjudicate",
+      "actual_reason_code": "adjudicate-conflicting-inputs",
+      "triggered_conditions": [
+        "input-conflicting",
+        "nature-feature",
+        "blast-cross-cutting",
+        "traceability-not-required",
+        "reversal-reversible",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "FR-011 / C-24：冲突组合（conflicting）"
+    },
+    {
+      "case_id": "G7-bounded-definition-correction",
+      "inputs": {
+        "change_nature": "definition-class",
+        "traceability": "not-required",
+        "blast_radius": "local-bounded-definition-correction",
+        "reversibility": "reversible",
+        "complexity": "trivial"
+      },
+      "rationale": "只收紧一处定义措辞，语义不变",
+      "expected_verdict": "direct",
+      "expected_reason_code": "direct-conditions-all-hold",
+      "actual_verdict": "direct",
+      "actual_reason_code": "direct-conditions-all-hold",
+      "triggered_conditions": [
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local-bounded-definition-correction",
+      "match": true,
+      "face": "FR-008 / FR-010：满足其余全部条件的有界定义修正"
+    },
+    {
+      "case_id": "G8-missing-input",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": null
+      },
+      "rationale": null,
+      "expected_verdict": "adjudicate",
+      "expected_reason_code": "adjudicate-missing-input",
+      "actual_verdict": "adjudicate",
+      "actual_reason_code": "adjudicate-missing-input",
+      "triggered_conditions": [
+        "input-missing",
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-011：缺项（未声明复杂度层级）"
+    },
+    {
+      "case_id": "G9-definition-class-default",
+      "inputs": {
+        "change_nature": "definition-class",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": "standard"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-cross-cutting-radius",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-cross-cutting-radius",
+      "triggered_conditions": [
+        "blast-cross-cutting",
+        "nature-preserves",
+        "traceability-not-required",
+        "reversal-reversible",
+        "complexity-low"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "FR-008 / FR-010：definition-class 默认跨切面，声明 local 不被接受为等价"
+    },
+    {
+      "case_id": "G10-complexity-high",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "not-required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": "high-stakes"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-complexity-high",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-complexity-high",
+      "triggered_conditions": [
+        "complexity-high",
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-009：层级为高"
+    },
+    {
+      "case_id": "G11-traceability",
+      "inputs": {
+        "change_nature": "maintenance",
+        "traceability": "required",
+        "blast_radius": "local",
+        "reversibility": "reversible",
+        "complexity": "standard"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-traceability-required",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-traceability-required",
+      "triggered_conditions": [
+        "traceability-required",
+        "nature-preserves",
+        "blast-local",
+        "reversal-reversible",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "local",
+      "match": true,
+      "face": "FR-009：需要持久可追溯"
+    },
+    {
+      "case_id": "G12-bounded-without-rationale",
+      "inputs": {
+        "change_nature": "definition-class",
+        "traceability": "not-required",
+        "blast_radius": "local-bounded-definition-correction",
+        "reversibility": "reversible",
+        "complexity": "trivial"
+      },
+      "rationale": null,
+      "expected_verdict": "adjudicate",
+      "expected_reason_code": "adjudicate-missing-input",
+      "actual_verdict": "adjudicate",
+      "actual_reason_code": "adjudicate-missing-input",
+      "triggered_conditions": [
+        "input-missing",
+        "nature-preserves",
+        "traceability-not-required",
+        "blast-local",
+        "reversal-reversible",
+        "complexity-low"
+      ],
+      "effective_blast_radius": "local-bounded-definition-correction",
+      "match": true,
+      "face": "C-20：有界修正必须随附非空理由"
+    },
+    {
+      "case_id": "G13-all-sdd-conditions",
+      "inputs": {
+        "change_nature": "feature",
+        "traceability": "required",
+        "blast_radius": "cross-cutting",
+        "reversibility": "hard",
+        "complexity": "high-stakes"
+      },
+      "rationale": null,
+      "expected_verdict": "sdd",
+      "expected_reason_code": "sdd-capability-or-contract-change",
+      "actual_verdict": "sdd",
+      "actual_reason_code": "sdd-capability-or-contract-change",
+      "triggered_conditions": [
+        "nature-feature",
+        "traceability-required",
+        "blast-cross-cutting",
+        "reversal-hard",
+        "complexity-high",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "FR-009 / C-24：五条全部命中，取码次序取首条且携带全部命中条件"
+    },
+    {
+      "case_id": "G14-ambiguous-beats-conflict",
+      "inputs": {
+        "change_nature": "feature",
+        "traceability": "not-required",
+        "blast_radius": "local-bounded-definition-correction",
+        "reversibility": "maybe",
+        "complexity": "standard"
+      },
+      "rationale": "只收紧一处定义措辞",
+      "expected_verdict": "adjudicate",
+      "expected_reason_code": "adjudicate-ambiguous-value",
+      "actual_verdict": "adjudicate",
+      "actual_reason_code": "adjudicate-ambiguous-value",
+      "triggered_conditions": [
+        "input-ambiguous",
+        "input-conflicting",
+        "nature-feature",
+        "blast-cross-cutting",
+        "traceability-not-required",
+        "complexity-low",
+        "bounded-correction-recorded"
+      ],
+      "effective_blast_radius": "cross-cutting",
+      "match": true,
+      "face": "C-24：多条件同时命中时按声明次序取码（ambiguous 先于 conflicting）"
+    }
+  ]
+}

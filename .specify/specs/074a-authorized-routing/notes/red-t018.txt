@@ -1,0 +1,467 @@
+EEEEEEEEEEEEEEEEEEEEE                                                    [100%]
+==================================== ERRORS ====================================
+________________ ERROR at setup of test_route_is_deterministic _________________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+____________ ERROR at setup of test_route_feature_scale_returns_sdd ____________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_______ ERROR at setup of test_route_bounded_maintenance_returns_direct ________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+____ ERROR at setup of test_record_carries_the_e4_face_and_invents_no_clock ____
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+__________ ERROR at setup of test_missing_input_never_returns_direct ___________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+__________ ERROR at setup of test_ambiguous_value_returns_adjudicate ___________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_________ ERROR at setup of test_conflicting_inputs_return_adjudicate __________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+________ ERROR at setup of test_adjudicate_outranks_every_sdd_condition ________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_ ERROR at setup of test_reason_code_follows_the_declared_order_and_carries_every_condition _
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+______ ERROR at setup of test_definition_class_defaults_to_cross_cutting _______
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_ ERROR at setup of test_bounded_definition_correction_with_rationale_returns_direct _
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_ ERROR at setup of test_bounded_definition_correction_without_rationale_is_a_missing_input _
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+________ ERROR at setup of test_exit_alphabet_has_exactly_two_meanings _________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+____________ ERROR at setup of test_route_and_golden_write_no_file _____________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+___ ERROR at setup of test_engine_carries_no_second_copy_of_the_owner_facts ____
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+__________ ERROR at setup of test_route_follows_a_renamed_reason_code __________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_________ ERROR at setup of test_route_follows_a_reordered_precedence __________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+_________ ERROR at setup of test_route_follows_a_mutated_value_domain __________
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+______ ERROR at setup of test_golden_judges_every_row_of_the_owner_table _______
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+______ ERROR at setup of test_golden_output_is_byte_identical_across_runs ______
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+__ ERROR at setup of test_ambiguous_and_conflicting_rows_never_return_direct ___
+
+    @pytest.fixture(autouse=True)
+    def _routing_actions_present():
+        """Fail on absence for the right reason.
+    
+        The parser names the actions it accepts in its invalid-choice diagnostic; asserting on
+        that text means a missing action fails here instead of being read as "the verdict was
+        adjudicate", which is the classic false green for this slice's two exit meanings.
+        """
+        diagnostic = _run(["--action", "__absent-action__"])
+        offered = diagnostic.stderr + diagnostic.stdout
+        missing = [action for action in ("route", "golden") if action not in offered]
+>       assert not missing, (
+            f"--action {' / '.join(missing)} missing from {ENGINE} (delivered by task T019); "
+            f"the parser offered: {offered.strip()!r}"
+        )
+E       AssertionError: --action golden missing from /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} [--agent AGENT] [--team TEAM]\n                    [--seat SEAT] [--format {json,text}]\nsdd-route.py: error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+E       assert not ['golden']
+
+tests/contract/test_sdd_routing_engine.py:240: AssertionError
+=========================== short test summary info ============================
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_is_deterministic
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_feature_scale_returns_sdd
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_bounded_maintenance_returns_direct
+ERROR tests/contract/test_sdd_routing_engine.py::test_record_carries_the_e4_face_and_invents_no_clock
+ERROR tests/contract/test_sdd_routing_engine.py::test_missing_input_never_returns_direct
+ERROR tests/contract/test_sdd_routing_engine.py::test_ambiguous_value_returns_adjudicate
+ERROR tests/contract/test_sdd_routing_engine.py::test_conflicting_inputs_return_adjudicate
+ERROR tests/contract/test_sdd_routing_engine.py::test_adjudicate_outranks_every_sdd_condition
+ERROR tests/contract/test_sdd_routing_engine.py::test_reason_code_follows_the_declared_order_and_carries_every_condition
+ERROR tests/contract/test_sdd_routing_engine.py::test_definition_class_defaults_to_cross_cutting
+ERROR tests/contract/test_sdd_routing_engine.py::test_bounded_definition_correction_with_rationale_returns_direct
+ERROR tests/contract/test_sdd_routing_engine.py::test_bounded_definition_correction_without_rationale_is_a_missing_input
+ERROR tests/contract/test_sdd_routing_engine.py::test_exit_alphabet_has_exactly_two_meanings
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_and_golden_write_no_file
+ERROR tests/contract/test_sdd_routing_engine.py::test_engine_carries_no_second_copy_of_the_owner_facts
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_follows_a_renamed_reason_code
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_follows_a_reordered_precedence
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_follows_a_mutated_value_domain
+ERROR tests/contract/test_sdd_routing_engine.py::test_golden_judges_every_row_of_the_owner_table
+ERROR tests/contract/test_sdd_routing_engine.py::test_golden_output_is_byte_identical_across_runs
+ERROR tests/contract/test_sdd_routing_engine.py::test_ambiguous_and_conflicting_rows_never_return_direct
+21 errors in 0.82s
+RC=1

@@ -133,6 +133,10 @@ def test_c6_framework_keys_are_marked_non_rendering():
         "role-scope",
         "project",
         "team-scope",
+        # Feature 074 / slice 074a — the single declared pin change (RA8): the
+        # framework-key set gains exactly one member, in the same change as the
+        # code edit that adds `sdd-invocation` to the neutral metadata map.
+        "sdd-invocation",
     }
     for key in NEUTRAL_AGENT_FRAMEWORK_KEYS:
         _domain, _default, renders = NEUTRAL_AGENT_METADATA_KEYS[key]

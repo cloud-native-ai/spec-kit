@@ -135,19 +135,33 @@ NEUTRAL_AGENT_METADATA_KEYS = {
     # (used by agent-team-supervisor-template.md); `project` marks
     # project-custom agents (agent-project-custom-template.md);
     # `team-scope` is the seat-provenance key on instances instantiated
-    # by the create-team flow (which team a seat belongs to).
+    # by the create-team flow (which team a seat belongs to);
+    # `sdd-invocation` (Feature 074 / slice 074a) is the agent half of the
+    # two-half SDD invocation authorization: this entry owns its closed domain
+    # and its default (the seat-side counterpart is owned by
+    # skills/internal/create-team/references/create-mode.md, and
+    # shared/definitions/sdd-routing-definitions.md cites this key set as the
+    # value-domain owner rather than restating it).
     "supervisor": ("bool", False, False),
     "capacity-scope": (None, None, False),
     "role-scope": (None, None, False),
     "project": (None, None, False),
     "team-scope": (None, None, False),
+    "sdd-invocation": ({"allowed", "forbidden"}, "forbidden", False),
 }
 
 NEUTRAL_AGENT_REQUIRED_KEYS = ("name", "description")
 
 # Keys reserved for framework assembly; excluded from tool rendering (C-6).
 NEUTRAL_AGENT_FRAMEWORK_KEYS = frozenset(
-    {"supervisor", "capacity-scope", "role-scope", "project", "team-scope"}
+    {
+        "supervisor",
+        "capacity-scope",
+        "role-scope",
+        "project",
+        "team-scope",
+        "sdd-invocation",
+    }
 )
 
 # Tool-dialect vocabulary forbidden anywhere in agent metadata (C-4).

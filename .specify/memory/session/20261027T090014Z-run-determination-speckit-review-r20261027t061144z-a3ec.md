@@ -21,7 +21,7 @@ summary: "/speckit.review run=r20261027T061144Z-a3ec token=not_evaluated elapsed
   "feature": "071-review-code-integration",
   "feature_id": "071",
   "determined_at": "2026-10-27T09:00:14Z",
-  "settled_at": null,
+  "settled_at": "2026-10-29T06:56:53Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -86,7 +86,7 @@ summary: "/speckit.review run=r20261027T061144Z-a3ec token=not_evaluated elapsed
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -169,8 +169,8 @@ summary: "/speckit.review run=r20261027T061144Z-a3ec token=not_evaluated elapsed
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -200,7 +200,7 @@ summary: "/speckit.review run=r20261027T061144Z-a3ec token=not_evaluated elapsed
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

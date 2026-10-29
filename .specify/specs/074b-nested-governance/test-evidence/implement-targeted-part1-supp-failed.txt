@@ -1,0 +1,1 @@
+tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target

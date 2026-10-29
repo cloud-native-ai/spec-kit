@@ -376,6 +376,14 @@ def test_c1_skill_inventory_is_frozen():
 # and `test_coverage_receipt.py`; this entry records the drift, it does not
 # authorize any other.
 ALLOWED_POST_BASELINE_CHANGES = {
+    "skills/internal/create-team/SKILL.md": {
+        "reason": "2026-10-29 Feature 074b adds the mandatory `## Nested SDD Runs` report section (report contract)",
+        "markers": ("## Nested SDD Runs", "Nested SDD Runs section"),
+    },
+    "skills/internal/run-agent/SKILL.md": {
+        "reason": "2026-10-29 Feature 074a wires the pre-dispatch governance probe to sdd-route.py authorize",
+        "markers": ("sdd-invocation", "authorize"),
+    },
     "skills/external/sdd-loop-driver/SKILL.md": {
         "reason": "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)",
         "markers": ("监听签名唯一", "--iter"),
@@ -512,6 +520,10 @@ ALLOWED_POST_BASELINE_PATHS = {
     ".specify/instructions.md": (
         "2026-10-27 Directory Governance pointer in the Temporary Directory Discipline section",
         ("directory-governance.md",),
+    ),
+    "src/specify_cli/__init__.py": (
+        "2026-10-29 Feature 074a adds the sdd-invocation neutral key and its validator allowlist",
+        ("sdd-invocation", "NEUTRAL_AGENT_METADATA_KEYS"),
     ),
 }
 

@@ -1,0 +1,73 @@
+# T023 targeted regression — part 4/4 (final), slice 074b-nested-governance
+# Captured: 2026-10-29T06:32:18Z  HEAD: 1c8b89778ccf3eeb683cf49a19ccdc91d95f5e62
+# Selection: the 19 files owned by test-evidence/targeted-set-v1-baseline.txt + the 3 suites this slice owns (T004/T010/T019).
+# Single run, full output, exit status.
+$ bash scripts/bash/run-tests.sh --names-out .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part4-failed.txt <the 19 baseline files> tests/contract/test_nested_run_report.py tests/contract/test_sdd_diffusion.py tests/contract/test_sdd_compat_containment.py
+# test runner: python3 -m pytest tests/contract/test_team_item_ledger.py tests/contract/test_team_command_routing.py tests/contract/test_team_territory.py tests/contract/test_single_conceptual_model.py tests/contract/test_sdd_invocation_governance.py tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_shipped_agent_presets.py tests/contract/test_neutral_metadata_schema.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_064.py tests/contract/test_non_regression_070.py tests/contract/test_line_registry_contract.py tests/contract/test_instructions_section_propagation.py tests/contract/test_instructions_size_budget.py tests/contract/test_proactive_trigger_section.py tests/contract/test_goal_definition.py tests/contract/test_flow_class_ledger.py tests/contract/test_nested_run_report.py tests/contract/test_sdd_diffusion.py tests/contract/test_sdd_compat_containment.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 338 items
+
+tests/contract/test_team_item_ledger.py .............                    [  3%]
+tests/contract/test_team_command_routing.py ............................ [ 12%]
+....                                                                     [ 13%]
+tests/contract/test_team_territory.py ......                             [ 15%]
+tests/contract/test_single_conceptual_model.py ...                       [ 15%]
+tests/contract/test_sdd_invocation_governance.py ....................... [ 22%]
+                                                                         [ 22%]
+tests/contract/test_agent_dispatch_mechanism.py ........................ [ 29%]
+........                                                                 [ 32%]
+tests/contract/test_shipped_agent_presets.py .....                       [ 33%]
+tests/contract/test_neutral_metadata_schema.py ......................... [ 41%]
+....                                                                     [ 42%]
+tests/contract/test_sdd_loop_driver_skill.py .........................   [ 49%]
+tests/contract/test_sdd_loop_driver_gates.py .......                     [ 51%]
+tests/contract/test_sdd_loop_driver_wp_preset.py ..............          [ 55%]
+tests/contract/test_non_regression_064.py .........                      [ 58%]
+tests/contract/test_non_regression_070.py ..........                     [ 61%]
+tests/contract/test_line_registry_contract.py .............              [ 65%]
+tests/contract/test_instructions_section_propagation.py ..               [ 65%]
+tests/contract/test_instructions_size_budget.py ............             [ 69%]
+tests/contract/test_proactive_trigger_section.py ...........F........... [ 76%]
+                                                                         [ 76%]
+tests/contract/test_goal_definition.py ...........................       [ 84%]
+tests/contract/test_flow_class_ledger.py ...........                     [ 87%]
+tests/contract/test_nested_run_report.py ................                [ 92%]
+tests/contract/test_sdd_diffusion.py ...............                     [ 96%]
+tests/contract/test_sdd_compat_containment.py ...........                [100%]
+
+=================================== FAILURES ===================================
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+======================== 1 failed, 337 passed in 34.04s ========================
+# failed-name list written: .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part4-failed.txt (1 entries)
+rc=1
+duration_s=34

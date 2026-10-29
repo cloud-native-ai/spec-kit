@@ -1,0 +1,94 @@
+# Targeted-set-v1 baseline — slice 074b-nested-governance
+# Re-captured 2026-10-29T05:52Z at stage_base=implement (HEAD=241a6082b), BEFORE any edit of this slice's
+# delivery surface (never-cache rule: the plan-stage capture at HEAD=33269994a is superseded, not reused).
+# Single-run capture: command line, full output, exit status. This file is the sole owner of this
+# targeted-set-v1 baseline; the selection basis and the pre-existing-red declaration below are unchanged.
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/074b-targeted-failed.txt \
+    tests/contract/test_team_item_ledger.py tests/contract/test_team_command_routing.py \
+    tests/contract/test_team_territory.py tests/contract/test_single_conceptual_model.py \
+    tests/contract/test_sdd_invocation_governance.py tests/contract/test_agent_dispatch_mechanism.py \
+    tests/contract/test_shipped_agent_presets.py tests/contract/test_neutral_metadata_schema.py \
+    tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_gates.py \
+    tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_064.py \
+    tests/contract/test_non_regression_070.py tests/contract/test_line_registry_contract.py \
+    tests/contract/test_instructions_section_propagation.py tests/contract/test_instructions_size_budget.py \
+    tests/contract/test_proactive_trigger_section.py tests/contract/test_goal_definition.py \
+    tests/contract/test_flow_class_ledger.py
+
+# test runner: python3 -m pytest tests/contract/test_team_item_ledger.py tests/contract/test_team_command_routing.py tests/contract/test_team_territory.py tests/contract/test_single_conceptual_model.py tests/contract/test_sdd_invocation_governance.py tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_shipped_agent_presets.py tests/contract/test_neutral_metadata_schema.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_non_regression_064.py tests/contract/test_non_regression_070.py tests/contract/test_line_registry_contract.py tests/contract/test_instructions_section_propagation.py tests/contract/test_instructions_size_budget.py tests/contract/test_proactive_trigger_section.py tests/contract/test_goal_definition.py tests/contract/test_flow_class_ledger.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 290 items
+
+tests/contract/test_team_item_ledger.py .............                    [  4%]
+tests/contract/test_team_command_routing.py ............................ [ 14%]
+....                                                                     [ 15%]
+tests/contract/test_team_territory.py ......                             [ 17%]
+tests/contract/test_single_conceptual_model.py ...                       [ 18%]
+tests/contract/test_sdd_invocation_governance.py .................       [ 24%]
+tests/contract/test_agent_dispatch_mechanism.py ........................ [ 32%]
+........                                                                 [ 35%]
+tests/contract/test_shipped_agent_presets.py .....                       [ 37%]
+tests/contract/test_neutral_metadata_schema.py ......................... [ 45%]
+....                                                                     [ 47%]
+tests/contract/test_sdd_loop_driver_skill.py .........................   [ 55%]
+tests/contract/test_sdd_loop_driver_gates.py .......                     [ 58%]
+tests/contract/test_sdd_loop_driver_wp_preset.py ..............          [ 63%]
+tests/contract/test_non_regression_064.py .........                      [ 66%]
+tests/contract/test_non_regression_070.py ..........                     [ 69%]
+tests/contract/test_line_registry_contract.py .............              [ 74%]
+tests/contract/test_instructions_section_propagation.py ..               [ 74%]
+tests/contract/test_instructions_size_budget.py ............             [ 78%]
+tests/contract/test_proactive_trigger_section.py ...........F........... [ 86%]
+                                                                         [ 86%]
+tests/contract/test_goal_definition.py ...........................       [ 96%]
+tests/contract/test_flow_class_ledger.py ...........                     [100%]
+
+=================================== FAILURES ===================================
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+======================== 1 failed, 289 passed in 32.11s ========================
+# failed-name list written: .specify/.tmp/074b-targeted-failed.txt (1 entries)
+rc=1
+
+# failed-name list: .specify/.tmp/074b-targeted-failed.txt
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+
+# Selection basis: the 19 suites that pin every surface this slice touches or must not disturb —
+# the report-contract and attribution surfaces (team item ledger, team command routing, team territory,
+# single conceptual model), the pre-dispatch governance surface and its pre-existing anti-nesting cases,
+# the shipped agent presets and neutral metadata schema (leaf negative + key set), the standalone driver
+# and 058/064/070 predecessor suites (the four additivity surfaces), the instructions propagation and size
+# budget (the pointer's delivery mechanism), the proactive-trigger discipline (the pointer's other host),
+# the goal engine (SC-002's instrument), and the flow-class ledger (no-new-flow-unit).
+# Pre-existing red disclosed: tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+# fails at this commit (gate total 27 vs its frozen 23). Four gates predate this slice; the failure is recorded
+# and not repaired here. This slice's criterion is that its own edit does not move the total.

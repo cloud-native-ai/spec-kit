@@ -1,0 +1,1 @@
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged

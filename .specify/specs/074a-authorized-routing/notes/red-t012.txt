@@ -1,0 +1,837 @@
+FFFFFFFFFFFFFFFFFFFFFFF                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_entry_form_section_exists_as_an_additive_subsection ___________
+
+    def test_entry_form_section_exists_as_an_additive_subsection():
+        """The new entry form is an H3 under an existing H2, so the standalone skeleton is untouched.
+    
+        The pinned H2 skeleton of `sdd-loop-driver/SKILL.md` is owned by
+        `test_sdd_loop_driver_skill.py::test_c3_skill_md_section_set`; this slice adds no H2, which
+        is how "the standalone entry contract is unchanged" stays mechanically true instead of
+        being a prose promise.
+        """
+>       level, title, _body = _block(SKILL_MD, ENTRY_TITLE)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:179: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md')
+title = 'Invoked-from-Team Entry'
+
+    def _block(path: Path, title: str):
+        """The single heading block whose title starts with ``title`` (case-sensitive)."""
+        hits = [
+            block
+            for block in _heading_blocks(_read(path))
+            if block[1].startswith(title) or block[1].lstrip("§ ").startswith(title)
+        ]
+>       assert len(hits) == 1, (
+            f"{path.relative_to(REPO_ROOT)} must carry exactly one '{title}' section, found "
+            f"{[hit[1] for hit in hits]}"
+        )
+E       AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry exactly one 'Invoked-from-Team Entry' section, found []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_nested_sdd_invocation.py:114: AssertionError
+________________ test_entry_form_accepts_exactly_the_six_facts _________________
+
+    def test_entry_form_accepts_exactly_the_six_facts():
+>       body = _entry_section()
+               ^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:159: in _entry_section
+    return _section_body(SKILL_MD, ENTRY_TITLE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md')
+title = 'Invoked-from-Team Entry'
+
+    def _block(path: Path, title: str):
+        """The single heading block whose title starts with ``title`` (case-sensitive)."""
+        hits = [
+            block
+            for block in _heading_blocks(_read(path))
+            if block[1].startswith(title) or block[1].lstrip("§ ").startswith(title)
+        ]
+>       assert len(hits) == 1, (
+            f"{path.relative_to(REPO_ROOT)} must carry exactly one '{title}' section, found "
+            f"{[hit[1] for hit in hits]}"
+        )
+E       AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry exactly one 'Invoked-from-Team Entry' section, found []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_nested_sdd_invocation.py:114: AssertionError
+______________________ test_entry_validation_precedes_u0 _______________________
+
+    def test_entry_validation_precedes_u0():
+>       body = _entry_section()
+               ^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:159: in _entry_section
+    return _section_body(SKILL_MD, ENTRY_TITLE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md')
+title = 'Invoked-from-Team Entry'
+
+    def _block(path: Path, title: str):
+        """The single heading block whose title starts with ``title`` (case-sensitive)."""
+        hits = [
+            block
+            for block in _heading_blocks(_read(path))
+            if block[1].startswith(title) or block[1].lstrip("§ ").startswith(title)
+        ]
+>       assert len(hits) == 1, (
+            f"{path.relative_to(REPO_ROOT)} must carry exactly one '{title}' section, found "
+            f"{[hit[1] for hit in hits]}"
+        )
+E       AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry exactly one 'Invoked-from-Team Entry' section, found []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_nested_sdd_invocation.py:114: AssertionError
+_________ test_entry_validation_table_covers_the_closed_condition_set __________
+
+    def test_entry_validation_table_covers_the_closed_condition_set():
+>       body = _own_body(_reference_section("Entry validation table"))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+____________ test_run_stops_at_review_and_claims_no_merge_authority ____________
+
+    def test_run_stops_at_review_and_claims_no_merge_authority():
+>       body = _entry_section()
+               ^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:252: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:159: in _entry_section
+    return _section_body(SKILL_MD, ENTRY_TITLE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md')
+title = 'Invoked-from-Team Entry'
+
+    def _block(path: Path, title: str):
+        """The single heading block whose title starts with ``title`` (case-sensitive)."""
+        hits = [
+            block
+            for block in _heading_blocks(_read(path))
+            if block[1].startswith(title) or block[1].lstrip("§ ").startswith(title)
+        ]
+>       assert len(hits) == 1, (
+            f"{path.relative_to(REPO_ROOT)} must carry exactly one '{title}' section, found "
+            f"{[hit[1] for hit in hits]}"
+        )
+E       AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry exactly one 'Invoked-from-Team Entry' section, found []
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/contract/test_nested_sdd_invocation.py:114: AssertionError
+_______________________ test_handoff_field_set_is_closed _______________________
+
+    def test_handoff_field_set_is_closed():
+>       fields = _handoff_fields()
+                 ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+___________ test_a_handoff_missing_any_field_is_incomplete[outcome] ____________
+
+dropped = 'outcome'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+________ test_a_handoff_missing_any_field_is_incomplete[stages_reached] ________
+
+dropped = 'stages_reached'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+________ test_a_handoff_missing_any_field_is_incomplete[artifact_paths] ________
+
+dropped = 'artifact_paths'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+________ test_a_handoff_missing_any_field_is_incomplete[evidence_paths] ________
+
+dropped = 'evidence_paths'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_____ test_a_handoff_missing_any_field_is_incomplete[unresolved_findings] ______
+
+dropped = 'unresolved_findings'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_________ test_a_handoff_missing_any_field_is_incomplete[anomaly_line] _________
+
+dropped = 'anomaly_line'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_____ test_a_handoff_missing_any_field_is_incomplete[integration_identity] _____
+
+dropped = 'integration_identity'
+
+    @pytest.mark.parametrize("dropped", HANDOFF_FIELDS)
+    def test_a_handoff_missing_any_field_is_incomplete(dropped):
+        complete = {field: None for field in HANDOFF_FIELDS}
+>       assert _gaps(complete) == [], "the complete handoff must be complete"
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+___________________ test_outcome_takes_exactly_three_values ____________________
+
+    def test_outcome_takes_exactly_three_values():
+>       body = _own_body(_reference_section("Handoff schema"))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+____ test_integration_identity_is_four_facts_with_the_retained_branch_named ____
+
+    def test_integration_identity_is_four_facts_with_the_retained_branch_named():
+>       body = _reference_section("Handoff schema")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:324: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_________ test_handoff_without_integration_identity_is_not_successful __________
+
+    def test_handoff_without_integration_identity_is_not_successful():
+        complete = {field: None for field in HANDOFF_FIELDS}
+        del complete["integration_identity"]
+>       assert _gaps(complete) == ["integration_identity"]
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:345: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+__________________ test_no_instruction_issues_a_merge_or_push __________________
+
+    def test_no_instruction_issues_a_merge_or_push():
+        """Every line that mentions a merge/push command must also prohibit it (C-37).
+    
+        The test also requires the prohibition to be **present**: a scan that can only ever be
+        empty would pass on a document that never forbids merging at all, which is the classic
+        green check that would not go red.
+        """
+>       assert REFERENCE_MD.is_file(), (
+            f"missing document: {REFERENCE_MD.relative_to(REPO_ROOT)}"
+        )
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:387: AssertionError
+_____________ test_nested_run_reaches_review_zero_merge_zero_push ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-2407/test_nested_run_reaches_review0')
+
+    def test_nested_run_reaches_review_zero_merge_zero_push(tmp_path):
+        """The end-to-end content face (C-41, D-3): review reached, zero merge, zero push.
+    
+        There is no executable nested run in this slice (the driver is a chat instruction, not a
+        CLI), so the decidable face is: the entry precondition resolves allowed on the fixture's
+        authorized seat, the handoff assembled from the run's own facts is complete, the stages
+        reached stop at review, and a real repository's log/status are byte-identical before and
+        after — a merge or a push would change at least one of them.
+        """
+        project = build(tmp_path / "project")
+        repo = tmp_path / "line"
+        repo.mkdir()
+        (repo / "artifact.md").write_text("reviewed artifact\n", encoding="utf-8")
+        _git(repo, "init", "-q", "-b", "main")
+        _git(repo, "add", "artifact.md")
+        _git(repo, "commit", "-q", "-m", "nested run: artifact chain through review")
+        before = _git_state(repo)
+    
+        rc, _stdout, _stderr = project.run_authorize(project.seat_allowed)
+        payload = project.run_authorize_json(project.seat_allowed)
+        assert rc == 0 and payload["effective"] == ALLOWED, (
+            f"the authorized seat must resolve allowed before a nested run may start (C-8): "
+            f"rc={rc} payload={payload!r}"
+        )
+    
+        handoff = {
+            "outcome": "completed",
+            "stages_reached": [
+                "requirements",
+                "clarify",
+                "plan",
+                "tasks",
+                "checklist",
+                "analyze",
+                "implement",
+                "review",
+            ],
+            "artifact_paths": [str(repo / "artifact.md")],
+            "evidence_paths": [str(project.verdict_record)],
+            "unresolved_findings": [],
+            "anomaly_line": "未发现异常",
+            "integration_identity": {
+                "line_id": "074a-fixture-line",
+                "branch": before["branch"],
+                "worktree_path": str(repo),
+                "head_commit": before["head"],
+            },
+        }
+>       assert _gaps(handoff) == [], (
+               ^^^^^^^^^^^^^^
+            f"the end-to-end handoff must carry the whole closed field set (C-34 / C-41): "
+            f"gaps={_gaps(handoff)}"
+        )
+
+tests/contract/test_nested_sdd_invocation.py:461: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:276: in _gaps
+    return [field for field in _handoff_fields() if field not in set(present)]
+                               ^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:270: in _handoff_fields
+    body = _own_body(_reference_section("Handoff schema"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_____________ test_line_registration_reuses_the_existing_mechanism _____________
+
+    def test_line_registration_reuses_the_existing_mechanism():
+>       body = _reference_section("Line registration")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:483: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_______________ test_failure_and_stall_handoff_has_four_elements _______________
+
+    def test_failure_and_stall_handoff_has_four_elements():
+>       body = _reference_section("Failure and stall handoff")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+_________ test_consumer_duty_carries_the_handoff_and_hides_no_failure __________
+
+    def test_consumer_duty_carries_the_handoff_and_hides_no_failure():
+>       body = _reference_section("Consumer duty")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:523: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+________________ test_no_second_registry_ledger_spine_or_queue _________________
+
+    def test_no_second_registry_ledger_spine_or_queue():
+>       text = _read(REFERENCE_MD)
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:538: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+______________ test_artifact_and_evidence_paths_are_referenceable ______________
+
+    def test_artifact_and_evidence_paths_are_referenceable():
+        """D-3 content face: paths are carried by reference; the report section is not asserted."""
+>       body = _own_body(_reference_section("Handoff schema"))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_nested_sdd_invocation.py:553: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_nested_sdd_invocation.py:163: in _reference_section
+    return _section_body(REFERENCE_MD, title)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:122: in _section_body
+    return _block(path, title)[2]
+           ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_nested_sdd_invocation.py:111: in _block
+    for block in _heading_blocks(_read(path))
+                                 ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), f"missing document: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: missing document: skills/external/sdd-loop-driver/references/nested-invocation.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/nested-invocation.md').is_file
+
+tests/contract/test_nested_sdd_invocation.py:84: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_form_section_exists_as_an_additive_subsection
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_form_accepts_exactly_the_six_facts
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_validation_precedes_u0
+FAILED tests/contract/test_nested_sdd_invocation.py::test_entry_validation_table_covers_the_closed_condition_set
+FAILED tests/contract/test_nested_sdd_invocation.py::test_run_stops_at_review_and_claims_no_merge_authority
+FAILED tests/contract/test_nested_sdd_invocation.py::test_handoff_field_set_is_closed
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[outcome]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[stages_reached]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[artifact_paths]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[evidence_paths]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[unresolved_findings]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[anomaly_line]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_a_handoff_missing_any_field_is_incomplete[integration_identity]
+FAILED tests/contract/test_nested_sdd_invocation.py::test_outcome_takes_exactly_three_values
+FAILED tests/contract/test_nested_sdd_invocation.py::test_integration_identity_is_four_facts_with_the_retained_branch_named
+FAILED tests/contract/test_nested_sdd_invocation.py::test_handoff_without_integration_identity_is_not_successful
+FAILED tests/contract/test_nested_sdd_invocation.py::test_no_instruction_issues_a_merge_or_push
+FAILED tests/contract/test_nested_sdd_invocation.py::test_nested_run_reaches_review_zero_merge_zero_push
+FAILED tests/contract/test_nested_sdd_invocation.py::test_line_registration_reuses_the_existing_mechanism
+FAILED tests/contract/test_nested_sdd_invocation.py::test_failure_and_stall_handoff_has_four_elements
+FAILED tests/contract/test_nested_sdd_invocation.py::test_consumer_duty_carries_the_handoff_and_hides_no_failure
+FAILED tests/contract/test_nested_sdd_invocation.py::test_no_second_registry_ledger_spine_or_queue
+FAILED tests/contract/test_nested_sdd_invocation.py::test_artifact_and_evidence_paths_are_referenceable
+23 failed in 0.38s

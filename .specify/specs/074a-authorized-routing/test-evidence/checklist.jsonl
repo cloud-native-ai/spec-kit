@@ -1,0 +1,1 @@
+{"seq": 1, "row_type": "stage-status", "stage": "checklist", "status": "not-run-docs-only", "selection_basis": "docs-only checklist stage; no executable change", "evidence_ptr": ".specify/specs/074a-authorized-routing/checklists/readiness-2026-10-29.md", "changed_paths": ["checklists/readiness-2026-10-29.md"]}
