@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: clarify
-stage_started_at: 1793266844
-stage_deadline_epoch: 1793272244
-stage_base_commit: 0518c7ef
+stage: tasks
+stage_started_at: 1793267858
+stage_deadline_epoch: 1793273258
+stage_base_commit: 246eba85
 attempt: 0
 retry_limit: 2
-last_verdict: requirements DONE — 26 FR / 8 SC / 5 US；validate exit 0；quality 16/16；decomposition proceed；pre-analyze pass（2 expected advisories）；wrap-up 三步由驱动者补跑
+last_verdict: plan DONE — 8 contracts / 34 clauses；FR 26/26；宪法 18 行全 Pass；pre-analyze pass；镜像与命令副本 clean；DTR 试点 2 条；wrap-up 由驱动者补跑
 <!-- loop-state:end -->
 
 - line_id: `076-decision-tension-contract`
@@ -75,6 +75,22 @@ last_verdict: requirements DONE — 26 FR / 8 SC / 5 US；validate exit 0；qual
 - 独立校验：哨兵 ✓ / 产物 ✓ / 纪律（未 push、未提交脏文件）✓ / Wrap-up 由驱动者补跑 ✓
 - 偏差：A1 脚手架分支动作被抑制；A2 编号 075→076；A4 绑定提前到 requirements
 - Related Feature：绑定 076（reuse-first 六候选逐条核验，A 无既有 owner、B 的 owner 未被任何 Feature 收编）
+
+### clarify — DONE（2026-10-29）
+
+- 提交：`2c208998`（requirements.md 单文件）+ `80d26698`（wrap-up 记录与状态脊）
+- 六处裁定：① 模板锚点 = Constitution Check 直接后继；② analyze 只判当前 spec 的 plan.md，历史计划无豁免、无 advisory 档；③ 校验器 `scripts/python/validate-decision-tensions.py --spec <dir> [--json]`，退出码 0/1/2，六个封闭检查标签；④ `expected_sacrifice` 封闭语法 `<SC-NNN> Source <↓|↑>`；⑤ 四元组拒收由 `scripts/python/validate-falsification-quartet.py` 确定性判定，六类拒收原因；⑥ 七行镜像对（工具命令副本面为空）
+- 回修 FR：008 / 009 / 010 / 011 / 016 / 021 / 025；计数不变 26 FR / 8 SC / 4 STR
+- 门：`validate-requirements` ok（287 行 / 34 定义行）；`overlap-check` clear；`pre-analyze --stage requirements` pass（6 expected advisories，均为待建文件）
+- 披露：两处语义判据被换成形状判据（`raw:` 标记代理「非转述」、反引号输入 + 具名红色信号代理「反空真」）；脚本不重放 `attempt`
+
+### plan — DONE（2026-10-29）
+
+- 提交：`246eba85`；产物 `plan.md` / `research.md`（R-1…R-11）/ `data-model.md`（E1–E8 + 6 校验规则 + 6 状态迁移）/ `contracts/` 8 文件 34 条款 / `quickstart.md`（5 场景）/ `feature-ref.md` / `test-evidence/`（6 份）
+- 门：`pre-analyze --stage plan` pass（errors=0 / advisories=25 全是待建文件）；镜像六对 ok；命令副本 OK；宪法 18 行全 Pass；定向 70 passed
+- 结构：`## Constitution Check` → `## Decision Tensions` → `## Project Structure` 三行相邻（FR-008 锚点已在本计划内生效）
+- DTR 试点：T-001（四元组判定者＝确定性脚本 vs agent，expected_sacrifice = `SC-004 Source ↓`）、T-002（封闭文法 vs 自由文本，`SC-002 Source ↑`），六字段齐备、反题为可独立采纳方案
+- 偏差：`create-new-plan.sh` 因缺 `CWS_LIB_BASH_HOME` 退出 1（未产生分支动作）；模板尚无该章节属本特性待实现面；同作者门按 direct-read 标记回退；pytest 走 profiles venv
 
 ## 框架观察
 
