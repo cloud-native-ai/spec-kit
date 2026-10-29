@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
 stage: implement
-stage_started_at: 1793300898
-stage_deadline_epoch: 1793306298
-stage_base_commit: 29b515b4
+stage_started_at: 1793301839
+stage_deadline_epoch: 1793307239
+stage_base_commit: a401db98
 attempt: 0
 retry_limit: 2
-last_verdict: implement P1 DONE — T001–T008 闭合（`29b515b4`）；8/28；43 定向测试绿；`spec:` 探针返回 declaration；validate-tasks PASS；镜像 ok；下一步 P2（T009–T015）
+last_verdict: implement P2 DONE — T009–T015 闭合（`a401db98`）；15/28；四个关键测试 129 passed；镜像/命令副本 ok；D-1 兼容性修复为只增不改；下一步 P3（T016–T022）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -136,6 +136,15 @@ last_verdict: implement P1 DONE — T001–T008 闭合（`29b515b4`）；8/28；
 - 探针：`lookup spec:077-doc-sdd-integration` → `flow_class=execution, source=declaration, error=null`
 - 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
 - 偏差：Measured Premises 条款提及数 85→99（定义数仍 77）；测试断言改为点名第二行取值；缺 spec 目录取 `invalid-unit-id`；模板字段行不带行尾两空格
+
+### implement P2 — DONE（2026-10-30）
+
+- 提交：`a401db98`；T009–T015 闭合（15/28）
+- 产物：七模板接线子节 + 四工具副本；两 owner 类条件追加（只增不改）；`doc-consistency-check.py --action structure`（17 码 / 四族 / 两向仅 `--path`）；两个新测试文件 + 两个既有守卫修订
+- 定向：四关键文件 129 passed；邻近 432 passed；`test_expression_gate_wiring` 七模板并入名册、分母不变
+- 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
+- D-1 披露：`test_expression_compatibility.py` 以文件自带的 `ALLOWED_POST_BASELINE_CHANGES` 机制为七模板登记 reason + marker，未删断言、未改冻结计数；驱动者接受
+- 同趟纠正：`--faces` 对照腿补空绿；读者声明行从 duplicate 面剔除
 
 ## 测试预算（E2/E3）
 
