@@ -121,14 +121,70 @@ against a known-green neighbour rather than against a moving one.
 
 ## E-4 · `tests/contract/test_sdd_diffusion.py` — RED (T010)
 
-**Captured**: 2026-10-29T06:1Z, HEAD `f26eb59ac`, after the suite was written and before any Phase 3 edit.
+**Captured**: 2026-10-29T06:2Z, HEAD `f26eb59ac`, after the suite was written and before any Phase 3 edit.
 **Red shape**: the four diffusion surfaces are not landed yet, so the surface cases fail as *absent
 statements/sections*, not as contradictory assertions.
 
-<!-- E-4 block pasted below after the T010 red run -->
+```text
+$ python3 -m pytest -q tests/contract/test_sdd_diffusion.py
+FF.F.FFFFFF..F.                                                          [100%]
+=================================== FAILURES ===================================
+____ test_stage_bullet_keeps_the_three_values_and_gains_the_disambiguation _____
+
+    def test_stage_bullet_keeps_the_three_values_and_gains_the_disambiguation():
+        bullet = _stage_bullet()
+        stated = re.findall(r"`([^`]+)`", bullet.split("(canonical names")[0])
+>       assert tuple(stated) == TEAM_STAGE_VALUES, (...)
+>       assert "SDD" in bullet and re.search(r"阶段名册|roster", bullet), (
+            "the added text MUST state that this dimension is not the SDD stage roster (C-13)"
+        )
+E       AssertionError: the added text MUST state that this dimension is not the SDD stage roster (C-13)
+
+______________________ test_no_added_surface_enumerates_the_sdd_stage_roster ______________________
+E       in _added_texts -> hosting = _hosting_paragraph()
+E       AssertionError: the authoring baseline must carry exactly one hosting-responsibility
+        paragraph (C-17), found 0
+
+=================== short test summary info ====================
+FAILED tests/contract/test_sdd_diffusion.py::test_stage_bullet_keeps_the_three_values_and_gains_the_disambiguation
+FAILED tests/contract/test_sdd_diffusion.py::test_no_added_surface_enumerates_the_sdd_stage_roster
+FAILED tests/contract/test_sdd_diffusion.py::test_hosting_rule_states_the_three_responsibilities_and_the_together_reading
+FAILED tests/contract/test_sdd_diffusion.py::test_hosting_rule_sits_immediately_after_the_existing_key_paragraph
+FAILED tests/contract/test_sdd_diffusion.py::test_hosting_rule_points_at_the_key_set_owner_and_restates_no_domain
+FAILED tests/contract/test_sdd_diffusion.py::test_instructions_carry_exactly_one_routing_pointer_section
+FAILED tests/contract/test_sdd_diffusion.py::test_instructions_pointer_restates_no_owner_fact
+FAILED tests/contract/test_sdd_diffusion.py::test_instructions_section_declares_and_respects_its_own_byte_ceiling
+FAILED tests/contract/test_sdd_diffusion.py::test_trigger_gains_the_conjunction_sentence_inside_an_existing_section
+FAILED tests/contract/test_sdd_diffusion.py::test_generated_instructions_carry_the_section_verbatim_and_follow_the_symlinks
+10 failed, 5 passed in 0.38s
+rc=1
+```
+
+**Reading of the five green cases in the red run** — each is an *invariance* pin, green before the edit
+because nothing has moved yet, and red if this slice breaks its subject:
+
+- `test_shipped_stage_executor_preset_declares_no_hosting_capability` — the shipped leaf already carries
+  no `sdd-invocation` key; asserted against the artifact, not against a convention (C-15).
+- `test_the_hosting_criterion_fails_in_both_directions` — the C-16 criterion is *executed* over
+  synthetic definitions (declaration-only fails, statements-only fails); it does not depend on the
+  authoring baseline carrying the rule yet.
+- `test_trigger_section_set_stays_the_delivered_closed_set` — the trigger document already has exactly
+  its delivered 10 sections; the pin exists to go red when a section is added.
+- `test_trigger_edit_moves_no_gate` — the scanner already reports the pre-change total (27); the pin
+  exists to go red when the sentence adds a gate-scannable declaration.
+- `test_every_shared_string_citation_resolves_to_a_registry_row` — all `[[STR-NNN]]` citations in the
+  slice already resolve; the pin exists to catch a new dangling citation.
+
+One in-passing test-defect repair, disclosed: the first red run of this suite reported 11 failures
+because `_shared_string_ids()` looked the registry section up by *exact* title, while
+`requirements.md`'s heading carries a parenthetical suffix (`## Shared Strings *(optional, …)*`). The
+lookup was replaced by `_section_starting()` (prefix match, one hit) — a structural read instead of a
+spelling test. `notes/red-first-evidence.md` keeps both numbers: 11 failed / 4 passed before the
+repair, 10 failed / 5 passed after it. No implementation face was touched to produce the difference.
 
 ## E-5 · `tests/contract/test_sdd_diffusion.py` — GREEN (T011–T015 landed, T016)
 
 <!-- E-5 block pasted below after the T016 green run -->
+
 
 
