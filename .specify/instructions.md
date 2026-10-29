@@ -208,6 +208,7 @@ Every durable identifier — a decision (D-…), open item (OI-…), stage (S…
 
 - **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate the decision content (One Source Of Truth).
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.
+- **Sole sanctioned writer**: the register is hand-maintained; the one exception is duplicate-ID collision repair by `/speckit.sanitize --lane renumber`, which renumbers a duplicated definition only and never registers a new ID.
 
 ## Tech Stack & Resources
 - **Project Name**: spec-kit (distributed as `specify-cli`)

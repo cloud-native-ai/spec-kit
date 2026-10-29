@@ -51,11 +51,13 @@ HISTORICAL_RECORD_PREFIXES = (
     ".specify/memory/knowledge/",
 )
 
-# The sanitize findings ledger (Feature 047) is a machine-generated observation
-# cache whose job is recording dead references to renamed assets — every entry
-# names an old identifier by design, so the literal scan must skip it.
+# The sanitize findings ledger and the renumber plans/ledgers (Feature 047 / the
+# renumber lane) are machine-generated observation caches whose job is recording
+# dead references to renamed assets — every entry names an old identifier by
+# design, so the literal scan must skip them.
 RUNTIME_CACHE_PREFIXES = (
     ".specify/memory/sanitize/",
+    ".specify/memory/renumber/",
 )
 
 
