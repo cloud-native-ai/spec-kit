@@ -119,10 +119,31 @@ ungoverned and editing the prompt cannot undo that.
 **Anti-nesting obligation (反嵌套，派发前拦截)**: the outgoing prompt MUST NOT reference any
 driver/loop skill (e.g. `sdd-loop-driver`), MUST NOT instruct the subagent to load any skill,
 and MUST NOT contain loop logic — the loader of a driver manual is the driver itself, and a
-subagent that receives the manual becomes a second driver, so the hierarchy escapes (循环层级
-恒为 1：驱动者 → 阶段执行者，不存在第三层). The pre-dispatch probe extends to this obligation:
-a prompt that names a driver skill fails the probe and MUST NOT be dispatched. Provenance:
-the sdd-loop-driver Driver Topology defect fix (2026-10-16); obligation declared in
+subagent that receives the manual becomes a second driver, so the hierarchy escapes.
+
+**The narrowed hierarchy is depth 2, not an exemption**: 循环层级深度 2，其三个条件的完整谓词、
+链上三个禁令、virtual 模态排除与「每成员一运行」的硬上限的唯一声明位点是
+`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation —
+referenced here, never restated. A stage executor stays a leaf: a dispatch prompt handed to it
+MUST NOT name a driver.
+
+**Pre-dispatch probe (fail-closed)**: the probe resolves the two declared halves by calling the
+engine, never by re-reading the definitions in prose:
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action authorize \
+    --agent <agent-definition> --team <team-slug> --seat <seat-slug> --format json
+```
+
+Run it from the target project root, so the roster resolves. Dispatch only when the record's
+`effective` value is `allowed` **and** the duty's recorded routing decision is `sdd`; any other
+value, an unreadable input (exit `2`), or a missing decision record blocks the dispatch. The
+probe fails closed and a refusal is never dispatched: it MUST name the failed condition — the
+failing half (`agent` / `seat` / `both`), the recipient's resolved values, the two source paths
+and the seat slug — because a record saying only "not authorized" tells the reader nothing about
+which declaration to fix. Rewording the prompt cannot repair a refusal: the verdict is resolved
+from the declarations, not from the prompt's wording. Provenance: the sdd-loop-driver Driver
+Topology defect fix (2026-10-16); obligation declared in
 `.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.
 
 **Scope boundary**: Run mode executes a **single** agent on a **single** task. For
