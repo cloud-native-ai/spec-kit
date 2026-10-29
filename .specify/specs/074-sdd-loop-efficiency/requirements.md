@@ -1,6 +1,6 @@
 # Requirements Specification: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
-**Requirement Branch**: `063-sdd-loop-efficiency`  
+**Requirement Branch**: `074-sdd-loop-efficiency`  
 **Created**: 2026-10-20  
 **Status**: Draft  
 **Input**: User description: "优化 sdd-loop-driver 无人值守 SDD 运行吞吐：为中型特性提供显式、可审计的快车道（跳过 checklist，保留 analyze/review）；全量测试每特性运行仅两次（implement 起点与最终收口），中间阶段与 review 使用定向测试并记录证据；plan 阶段预置「下游只小修、不重审」约束（框架命令内部硬约束不可安全实现时显式排除）；阶段派发采用 stream-json 进度可见与 nohup 完全解耦，保持完成哨兵、独立校验、确认门与卡死处置不变。本特性自身仍走完整阶段链（checklist/analyze/review 必需），快车道仅作用于未来运行。" 需求语义权威（brief）已归档为 dated record：[notes/source-requirement.md](notes/source-requirement.md)（2026-10-20 逐字快照）；原 `/tmp/sdd-loop-efficiency-brief.md` 仅保留为 provenance 注记，不再作为权威引用。**CLI 能力档案归属（2026-10-20 裁决）**：CLI 能力档案（集合、必填维度、known/unknown、U2/U4/U5 观测、probe/feedback、契约与测试）唯一归属于 Feature 064（`.specify/specs/064-subagent-concurrency/`；逐条裁决见 `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md`）。本规格只保留四项吞吐优化与 stream-json / nohup 能力，不再定义、复制或测试 CLI 档案；需要 CLI 行为知识时指向 064 的 `contracts/cli-profiles.md` 与 `skills/external/sdd-loop-driver/references/cli/index.md`。

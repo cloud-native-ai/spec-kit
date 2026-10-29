@@ -7,7 +7,7 @@ recording), **driver closure** (owned by the driver after review).
 
 - State spine: `/tmp/sdd-loop-efficiency/state.md` (`spine_write_mode=direct`)
 - E2 ledger fence position: `<!-- test-budget:begin -->` line 1 (`seq=1`, `slot=baseline`)
-- Command: `bash scripts/bash/run-tests.sh --names-out .specify/specs/063-sdd-loop-efficiency/notes/baseline-failed-tests.txt`
+- Command: `bash scripts/bash/run-tests.sh --names-out .specify/specs/074-sdd-loop-efficiency/notes/baseline-failed-tests.txt`
 - Result: `68 failed, 4115 passed, 1 skipped, 4 warnings in 397.21s`; exit `1`
 - Failed-name list: `notes/baseline-failed-tests.txt` (68 entries)
 - Full log: `/tmp/t002-full-suite.log`
@@ -109,7 +109,7 @@ recording), **driver closure** (owned by the driver after review).
   historical S3 output is superseded by the T022 repair record below.
 - Live 063 spine (`/tmp/sdd-loop-efficiency/state.md`), **post-review repair
   (2026-10-20)**: `audit-test-budget.py --spine ... --spec-dir
-  .specify/specs/063-sdd-loop-efficiency --stage-check implement` → exit `1`,
+  .specify/specs/074-sdd-loop-efficiency --stage-check implement` → exit `1`,
   `slots=baseline:1 closure:0 reruns=0 exceptions=0 unknown=6
   environment_failures=0`, `stages=6 complete=0`, `status=fail` with one
   `stage evidence file missing` reason per E3 stage. The old `stages=0

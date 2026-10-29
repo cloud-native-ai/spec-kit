@@ -1,6 +1,6 @@
 # Data Model: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
-**Feature**: 063-sdd-loop-efficiency → Feature 058（演化特性）
+**Feature**: 074-sdd-loop-efficiency → Feature 058（演化特性）
 **Spec**: [requirements.md](requirements.md)
 **说明**: 本特性不新增数据库或常驻存储。实体全部落在文件上：每线**状态脊**（Markdown，承载记录与台账）、特性目录下的**测试证据文件**（JSONL）、阶段运行产物（raw stream / live log / pid / status / heartbeat / runner-log）。本文件登记字段面与校验规则，是契约测试与审计脚本的判定对象；字段值域以本节为 plan 期权威，实现后由脚本常量与契约测试共同钉住。除 E1–E8 实体外，本文件还登记一个**非实体证据制品**：Stall Behavior Baseline（SC-010）。CLI Capability Profile 与 CLI 观测字段由 Feature 064 的 `data-model.md` E9/E10 拥有，不在本文件定义。
 

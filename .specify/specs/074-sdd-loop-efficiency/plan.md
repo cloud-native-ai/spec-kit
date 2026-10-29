@@ -1,8 +1,8 @@
 # Implementation Plan: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
-**Branch**: `063-sdd-loop-efficiency` | **Date**: 2026-10-20 | **Spec**: [requirements.md](requirements.md)
-**Requirement → Feature**: `063-sdd-loop-efficiency` → Feature 058 无人值守 SDD 循环驱动机制
-**Input**: Specification from `.specify/specs/063-sdd-loop-efficiency/requirements.md`
+**Branch**: `074-sdd-loop-efficiency` | **Date**: 2026-10-20 | **Spec**: [requirements.md](requirements.md)
+**Requirement → Feature**: `074-sdd-loop-efficiency` → Feature 058 无人值守 SDD 循环驱动机制
+**Input**: Specification from `.specify/specs/074-sdd-loop-efficiency/requirements.md`
 
 ## Summary
 
@@ -126,7 +126,7 @@ SC-010 以冻结提交上录制的三类卡死处置元组（[[STR-007]]）为�
 ### Documentation (this spec)
 
 ```text
-.specify/specs/063-sdd-loop-efficiency/
+.specify/specs/074-sdd-loop-efficiency/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — R-1…R-12 + B-1…B-8 基线实测
 ├── data-model.md        # Phase 1 output — E1…E8 + 41 条 E 校验规则 + 卡死行为基线（SB-1…SB-5）

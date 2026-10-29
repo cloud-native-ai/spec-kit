@@ -338,7 +338,7 @@ def test_clp_17_no_063_duplicate_owner():
     assert payload["status"] in {"branch-absent", "pending-merge-obligation", "clean"}
     if payload["status"] == "pending-merge-obligation":
         assert any(
-            path.endswith("063-sdd-loop-efficiency/contracts/cli-profiles.md")
+            path.endswith("074-sdd-loop-efficiency/contracts/cli-profiles.md")
             for path in payload["paths"]
         ), payload
     strict = subprocess.run(

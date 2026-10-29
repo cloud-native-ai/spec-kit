@@ -1,0 +1,269 @@
+{
+  "kind": "speckit.renumber.ledger",
+  "schema_version": 1,
+  "applied_at": "2026-10-29T04:41:57Z",
+  "plan": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/memory/renumber/plans/20261029T044150175815Z-plan.json",
+  "groups": [
+    {
+      "group_id": "12c5c5e8186f",
+      "family": "spec-number",
+      "old_token": "063-sdd-loop-efficiency",
+      "new_token": "074-sdd-loop-efficiency",
+      "written": [
+        {
+          "path": ".specify/memory/features/058.md",
+          "hits": 5
+        },
+        {
+          "path": ".specify/skills/sdd-loop-driver/scripts/check-063-overlap.py",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md",
+          "hits": 3
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/review.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/tasks.md",
+          "hits": 4
+        },
+        {
+          "path": ".specify/specs/067-loop-efficiency-hardening/notes/state-spine.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/067-loop-efficiency-hardening/requirements.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/070-subagent-task-teams/feature-ref.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/070-subagent-task-teams/notes/overlap-adjudication-plan.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/checklists/efficiency.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/data-model.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/feature-ref.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/notes/analysis-gate-report.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/notes/pre-change-measurements.md",
+          "hits": 3
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/plan.md",
+          "hits": 4
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/requirements.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/research.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/review.md",
+          "hits": 40
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/tasks.md",
+          "hits": 31
+        },
+        {
+          "path": ".specify/specs/074-sdd-loop-efficiency/verification.md",
+          "hits": 2
+        },
+        {
+          "path": "skills/external/sdd-loop-driver/scripts/check-063-overlap.py",
+          "hits": 2
+        },
+        {
+          "path": "docs/reference/skills/sdd-loop-driver.md",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_non_regression_070.py",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_sdd_loop_driver_cli_profiles.py",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_sdd_loop_driver_efficiency.py",
+          "hits": 1
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "excluded_hits": [
+    {
+      "path": ".specify/memory/feedback/20261019T163355Z-speckit-requirements.md",
+      "hits": 3,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/feedback/20261019T164049Z-speckit-clarify.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/feedback/20261019T170645Z-speckit-plan.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/feedback/20261019T172529Z-speckit-checklist.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/feedback/20261020T130450Z-speckit-review.md",
+      "hits": 41,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/feedback/20261020T131909Z-speckit-implement.md",
+      "hits": 4,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/session/20261019T163228Z-run-determination-speckit-requirements-063-sdd-loop-efficien.md",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/session/20261019T164004Z-run-determination-speckit-clarify-speckit-clarify-20261019t1.md",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/session/20261019T170609Z-run-determination-speckit-plan-speckit-plan-20261019t170452z.md",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/session/20261019T172506Z-run-determination-speckit-checklist-063-sdd-loop-efficiency.md",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/memory/session/20261020T130418Z-run-determination-speckit-review-063-review-a108ff11.md",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/067-loop-efficiency-hardening/checklists/test-slimming-2026-10-22.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/067-loop-efficiency-hardening/notes/test-slimming-scope-2026-10-22.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/067-loop-efficiency-hardening/test-evidence/analyze-findings-2026-10-22.md",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/070-subagent-task-teams/test-evidence/analyze-repair-overlap.txt",
+      "hits": 3,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/070-subagent-task-teams/test-evidence/overlap-plan.json",
+      "hits": 3,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/070-subagent-task-teams/test-evidence/overlap-plan.txt",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/analyze.jsonl",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/checklist.jsonl",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/clarify.jsonl",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/implement.jsonl",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/plan.jsonl",
+      "hits": 10,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/review.jsonl",
+      "hits": 2,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    },
+    {
+      "path": ".specify/specs/074-sdd-loop-efficiency/test-evidence/tasks.jsonl",
+      "hits": 1,
+      "group_id": "12c5c5e8186f",
+      "old_token": "063-sdd-loop-efficiency"
+    }
+  ],
+  "verification": {
+    "resolved": 1,
+    "unresolved": [],
+    "excluded_hits": 24
+  },
+  "ok": true
+}

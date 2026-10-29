@@ -1,6 +1,6 @@
 # Research: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
-**Feature**: 063-sdd-loop-efficiency → Feature 058 无人值守 SDD 循环驱动机制（演化特性）
+**Feature**: 074-sdd-loop-efficiency → Feature 058 无人值守 SDD 循环驱动机制（演化特性）
 **Date**: 2026-10-20
 **Method**: Phase 0 勘探 = 读取既有承载面（SKILL.md / 三份 references / watch-target.sh / docs 页）、既有 stream-json 先例、契约测试与校验器；基线实测在 2026-10-20 执行并逐条记录。全部为仓内证据，无外部厂商比较。
 
@@ -12,7 +12,7 @@
 | B-2 | `python3 scripts/python/sync-mirrors.py --check --only skills/external` | plan 期（合并 064 前）退出码 2，**68 个 DIFF，跨 12 个技能目录**；其中 sdd-loop-driver 3 文件（SKILL.md、references/dispatch-recipes.md、references/watch-model.md），其余为 draw-diagram 36、improve-skills 8、merge-skills 4、git-utils 4、sdd-project-setup 3、create-pages 3、database-utils 2、create-skills 2、think-skills 1、improve-docs 1、document-utils 1。sdd-loop-driver 镜像侧含 `.specify/` 前缀路径，且编译 fingerprint 与源侧不同（不判断哪侧“更新”，fingerprint 不表达新旧）。**2026-10-20 合并 064 后复测：62 DIFF / 12 目录，sdd-loop-driver 对 0 DIFF。** | 既有契约 `test_c12_mirror_byte_identical` / `test_c18_mirror_pair_no_drift` 在 plan 基线即红（21 passed / 2 failed；测试函数共 23）；合并 064 后本对已一致。本特性只拥有 sdd-loop-driver 对并维持零 drift，其余目录的既有漂移不在本特性面，采用「零 NEW drift」相对判据并完整披露 |
 | B-3 | `python -m pytest tests/contract/test_sdd_loop_driver_skill.py -q` | **21 passed / 2 failed**（即 B-2 的 C-12/C-18；文件共 23 个测试函数） | 既有 H2 节集合（C-3）与 C-4 的 `sed` 断言当前为绿；本特性若新增 H2 或替换 runner 派生形态，必须有意更新并在 plan/tasks 记录理由（FR-041） |
 | B-4 | `bash scripts/bash/run-tests.sh --names-out /tmp/063-names-probe.txt tests/unit/test_ensure_symlink.py -q` | 7 passed；names 文件 0 行；脚本自行输出解释器与条目数 | `--names-out` 接口可直接用于两个全量槽位的名称级差集（`comm -13`），无需新增测试引擎 |
-| B-5 | `python3 scripts/python/validate-requirements.py .specify/specs/063-sdd-loop-efficiency/requirements.md` | `status: ok`；301 lines / 56 definition rows / 6 shared strings；0 error / 0 warning（requirements-repair 后 313 / 56 / 8；plan-repair-2 的临时 CLI profiles delta 后 382 / 65 / 10；tasks-repair-2 收口后 343 / 56 / 8，见 `feature-ref.md` 基线记录） | 规格可作为 plan 的权威输入；准入脚本的 FR 计数口径应与该校验器的定义行口径一致 |
+| B-5 | `python3 scripts/python/validate-requirements.py .specify/specs/074-sdd-loop-efficiency/requirements.md` | `status: ok`；301 lines / 56 definition rows / 6 shared strings；0 error / 0 warning（requirements-repair 后 313 / 56 / 8；plan-repair-2 的临时 CLI profiles delta 后 382 / 65 / 10；tasks-repair-2 收口后 343 / 56 / 8，见 `feature-ref.md` 基线记录） | 规格可作为 plan 的权威输入；准入脚本的 FR 计数口径应与该校验器的定义行口径一致 |
 | B-6 | `python3 --version` / `python --version` | 3.9.6 / 3.14.6 | 新脚本按 `pyproject.toml` 的 `>=3.8` 编写（不用 3.9+ 专属语法）；pytest 由 `run-tests.sh` 自行解析 |
 | B-7 | 检索 `--output-format stream-json` | 既有先例：`skills/internal/create-team/scripts/dispatch.sh` + `stream-filter.py`；形状权威：`.specify/shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract（事件 `assistant` / `system(init)` / `result`） | 派生规则可复用**事件形状知识**，但 loop-driver 分类为 external、运行时零框架依赖，不能复用内部技能脚本；必须自包含实现并在文中声明「设计期参考、运行时无依赖」 |
 | B-8 | CLI 能力档案与 probe 注册现状 | 由 Feature 064 记录并拥有（`skills/external/sdd-loop-driver/references/cli/index.md`、`contracts/cli-profiles.md`、`notes/063-overlap-adjudication.md`）；063 不再重复测量。2026-10-20 合并 064 后：`probes --validate` exit 0，`compile-embeds --check` 74 units zero drift，`skill:sdd-project-setup` 的 probe 缺口仍为既有例外 | 063 只读引用 064 档案；不注册 Object、不复制档案、不新增 CP 契约/测试 |
