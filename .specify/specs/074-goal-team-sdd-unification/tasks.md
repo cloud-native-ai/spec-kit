@@ -1,5 +1,7 @@
 # Tasks: Unified Goal/Team/Agent Control Hierarchy with SDD Invocation
 
+> **SUPERSEDED (2026-10-29)**: This 57-row task list was split at tasks U4 (`split-required`, 57 > 40) into `074a-authorized-routing` (32 tasks) and `074b-nested-governance` (26 tasks). The open rows below are the **pre-split state**, not outstanding work; see `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录. Retained as the split record.
+
 **Requirement ID**: 074
 **Requirement Key**: `074-goal-team-sdd-unification`
 **Related Feature**: 074 Goal/Team/Agent 与 SDD 开发流程统一（Unified Goal/Team/Agent Control Hierarchy with SDD Invocation）
