@@ -715,3 +715,152 @@ sentence. It pre-dates this slice's implement stage, it is a registry record rat
 implementation surface, and rewriting its Key Changes content is not a task row of this slice — so it
 goes to `/speckit.review` (the classification-honesty audit face) instead of being silently edited
 here. T031 touches only that file's slice line and `Last Updated`.
+
+---
+
+## Structure — the slice added no command, no skill and no store (T028) · EXECUTED 2026-10-29
+
+T028 audits two faces: (a) zero new `/speckit.*` commands and zero new skills, (b) zero new registry,
+ledger, state spine, ownership model or integration queue.
+
+### (a) Commands and skills — identical **name sets**, not merely equal counts
+
+Counts alone can hide a swap, so the probe compares the sorted name sets against the T001 baseline
+commit `71954e31a`:
+
+```console
+$ ls templates/commands/*.md | wc -l                                    # now
+27
+$ git ls-tree -r --name-only 71954e31a -- templates/commands | wc -l    # baseline
+27
+$ diff <(git ls-tree -r --name-only 71954e31a -- templates/commands | sort) \
+       <(ls templates/commands/*.md | sort) && echo IDENTICAL-SET
+IDENTICAL-SET
+
+$ diff <(git ls-tree -r --name-only 71954e31a -- skills/external | cut -d/ -f3 | sort -u) \
+       <(ls -d skills/external/*/ | xargs -n1 basename | sort) && echo IDENTICAL-SET
+IDENTICAL-SET
+$ ls -d skills/external/*/ | wc -l
+15
+
+$ diff <(git ls-tree -r --name-only 71954e31a -- skills/internal | cut -d/ -f3 | sort -u) \
+       <(ls -d skills/internal/*/ | xargs -n1 basename | sort) && echo IDENTICAL-SET
+IDENTICAL-SET
+$ ls -d skills/internal/*/ | wc -l
+37
+```
+
+An empty `diff` on a **sorted set** is the claim: 27 command files, 15 external skill directories and 37
+internal skill directories, and every name is the same one the baseline commit carried. The slice
+therefore added no `/speckit.*` command and no skill — it changed existing files and added a *reference*
+document inside an existing skill (`skills/external/sdd-loop-driver/references/nested-invocation.md`),
+which is not a skill directory.
+
+### (b) No new store surface
+
+`.specify/state/` and `.specify/memory/` are compared by **file-name set** (`comm -13`) against the T001
+capture in `pre-change-measurements.md` § 6, exactly as GATE-7 requires:
+
+```console
+$ comm -13 <(printf '%s\n' 074-goal-team-sdd-unification.md eval-baseline speckit-docs-expression.md | sort) \
+           <(ls -1 .specify/state | sort)
+(no output)
+$ comm -13 <(printf '%s\n' constitution.md evidence exec-quant features features.md feedback glossary.md \
+             knowledge register.md sanitize session tools tools.md trigger | sort) \
+           <(ls -1 .specify/memory | sort)
+(no output)
+```
+
+Both empty. **Instrument note (disclosed)**: the third surface T028 names — the environment-level line
+registry — was **not** listed in the T001 capture (it lives outside the repository, at
+`${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`), so `comm -13` has no recorded referent for it.
+The same question is answered by two decidable measurements instead:
+
+```console
+$ REG="${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines"
+$ ls -l --time-style=full-iso "$REG"/*.json | awk '{print $6, $7, $9}' | sort
+2026-10-22 14:15:43.351187282 …/cws-logger-unification.json
+2026-10-22 18:04:39.930367222 …/speckit-068-execquant-feedback.json
+2026-10-23 20:56:23.063450743 …/nginx-layered.json
+2026-10-27 17:09:00.042290219 …/review-code-integration.json
+2026-10-27 21:55:12.983977494 …/client-self-improvement.json
+2026-10-29 00:08:32.481002866 …/074-goal-team-sdd-unification.json
+$ ls -1 "$REG" | grep -c '074a'
+0
+```
+
+(paths above are elided to their basename; the prefix is
+`${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines/` on every line.)
+
+Six line entries, the newest written **2026-10-29 00:08:32** — nearly three hours before the T001 capture
+(`02:5xZ`) and before this implement stage began — and none carries a slice-level id. So this slice
+registered no line: it reuses this loop's existing line, as C-43 requires.
+
+### The added-path inventory (the strongest form of the same claim)
+
+```console
+$ comm -13 <(git ls-tree -r --name-only 71954e31a | sort) <(git ls-files | sort)
+scripts/python/sdd-route.py
+shared/definitions/sdd-routing-definitions.md
+skills/external/sdd-loop-driver/references/nested-invocation.md
+.specify/scripts/python/sdd-route.py
+.specify/shared/definitions/sdd-routing-definitions.md
+.specify/skills/sdd-loop-driver/references/nested-invocation.md
+.specify/specs/074a-authorized-routing/baseline-failed.txt
+.specify/specs/074a-authorized-routing/checklists/recheck-2026-10-29-implement-start.md
+.specify/specs/074a-authorized-routing/notes/full-baseline-run.txt
+.specify/specs/074a-authorized-routing/notes/golden-rows.txt
+.specify/specs/074a-authorized-routing/notes/golden-run1.json
+.specify/specs/074a-authorized-routing/notes/golden-run2.json
+.specify/specs/074a-authorized-routing/notes/green-t016-demo.txt
+.specify/specs/074a-authorized-routing/notes/green-t016.txt
+.specify/specs/074a-authorized-routing/notes/green-t017.txt
+.specify/specs/074a-authorized-routing/notes/green-t021.txt
+.specify/specs/074a-authorized-routing/notes/green-t025-targeted.txt
+.specify/specs/074a-authorized-routing/notes/green-t025.txt
+.specify/specs/074a-authorized-routing/notes/pre-change-measurements.md
+.specify/specs/074a-authorized-routing/notes/quickstart-run.md
+.specify/specs/074a-authorized-routing/notes/red-first-evidence.md
+.specify/specs/074a-authorized-routing/notes/red-t005.txt
+.specify/specs/074a-authorized-routing/notes/red-t007.txt
+.specify/specs/074a-authorized-routing/notes/red-t012.txt
+.specify/specs/074a-authorized-routing/notes/red-t018.txt
+.specify/specs/074a-authorized-routing/notes/red-t022.txt
+.specify/specs/074a-authorized-routing/notes/targeted-set-v1-failed.txt
+.specify/specs/074a-authorized-routing/test-evidence/implement.jsonl
+tests/contract/test_nested_sdd_invocation.py
+tests/contract/test_sdd_authorization.py
+tests/contract/test_sdd_invocation_governance.py
+tests/contract/test_sdd_routing_definitions.py
+tests/contract/test_sdd_routing_engine.py
+tests/fixtures/nested_sdd.py
+$ comm -23 <(git ls-tree -r --name-only 71954e31a | sort) <(git ls-files | sort)
+(no output)
+```
+
+Thirty-four added paths and zero deleted. Classified: **3** new framework sources and their **3**
+`.specify/` mirrors; **6** new test files (5 modules + 1 fixture); **21** slice evidence artifacts under
+`.specify/specs/074a-authorized-routing/{notes,test-evidence,checklists}`, plus `baseline-failed.txt`.
+Not one added path is a registry, a ledger, an integration queue, an ownership manifest or a state
+spine — and the deleted set is empty, so nothing pre-existing was repurposed into one.
+
+### A nested run's record resolves to the existing line entry and the existing spine
+
+The two cases that pin this are green:
+
+```console
+$ python3 -m pytest -q \
+    tests/contract/test_nested_sdd_invocation.py::test_line_registration_reuses_the_existing_mechanism \
+    tests/contract/test_sdd_invocation_governance.py::test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism
+..                                                                       [100%]
+2 passed in 0.05s
+# RC=0
+```
+
+The first requires `references/nested-invocation.md` § Line registration to name the existing line
+registry, cite `worktree-per-write-line`, require serialization or rejection of overlapping territories,
+and forbid a second mechanism. The second requires the per-member cap to be hard and its second-duty case
+to be resolved by the existing line regime ("Feature 064"), with no second concurrency primitive. Both
+are satisfied by the landed text, so a nested run resolves to the existing registry entry and this loop's
+existing state spine — `contracts/nested-invocation.md` C-43 and `contracts/bootstrap-and-maintenance.md`
+C-47 hold.
