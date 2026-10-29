@@ -1,0 +1,65 @@
+..........FF..F.                                                         [100%]
+=================================== FAILURES ===================================
+________________ test_inverse_samples_turn_red[sacrifice-none] _________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_6')
+mutate = <function <lambda> at 0x10b42aa30>, label = 'dtr-rejected-form'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+        payload = payload_of(proc)
+        counts = counts_of(payload)
+>       assert proc.returncode == 1, (
+            f"inverse sample {label!r} must exit 1 (a verdict, not unreadable input 2); "
+            f"counts={counts!r} stdout={proc.stdout!r}"
+        )
+E       AssertionError: inverse sample 'dtr-rejected-form' must exit 1 (a verdict, not unreadable input 2); counts={'dtr-anchor': 0, 'dtr-section-missing': 0, 'dtr-record-incomplete': 0, 'dtr-tension-id': 0, 'dtr-rejected-form': 0, 'expected-sacrifice-unmapped': 0} stdout='{\n  "spec": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_6/spec",\n  "status": "ok",\n  "checks": [\n    {\n      "label": "dtr-anchor",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-section-missing",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-record-incomplete",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-tension-id",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-rejected-form",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "expected-sacrifice-unmapped",\n      "status": "pass",\n      "count": 0\n    }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n'
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...   }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n', stderr='').returncode
+
+tests/contract/test_decision_tension_validator.py:321: AssertionError
+______________ test_inverse_samples_turn_red[undecidable-wording] ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_7')
+mutate = <function <lambda> at 0x10b42aae0>, label = 'dtr-rejected-form'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+        payload = payload_of(proc)
+        counts = counts_of(payload)
+>       assert proc.returncode == 1, (
+            f"inverse sample {label!r} must exit 1 (a verdict, not unreadable input 2); "
+            f"counts={counts!r} stdout={proc.stdout!r}"
+        )
+E       AssertionError: inverse sample 'dtr-rejected-form' must exit 1 (a verdict, not unreadable input 2); counts={'dtr-anchor': 0, 'dtr-section-missing': 0, 'dtr-record-incomplete': 0, 'dtr-tension-id': 0, 'dtr-rejected-form': 0, 'expected-sacrifice-unmapped': 0} stdout='{\n  "spec": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_7/spec",\n  "status": "ok",\n  "checks": [\n    {\n      "label": "dtr-anchor",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-section-missing",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-record-incomplete",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-tension-id",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-rejected-form",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "expected-sacrifice-unmapped",\n      "status": "pass",\n      "count": 0\n    }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n'
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...   }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n', stderr='').returncode
+
+tests/contract/test_decision_tension_validator.py:321: AssertionError
+__________ test_inverse_samples_turn_red[unmapped-measurement-source] __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_10')
+mutate = <function <lambda> at 0x10b42acf0>
+label = 'expected-sacrifice-unmapped'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+        payload = payload_of(proc)
+        counts = counts_of(payload)
+>       assert proc.returncode == 1, (
+            f"inverse sample {label!r} must exit 1 (a verdict, not unreadable input 2); "
+            f"counts={counts!r} stdout={proc.stdout!r}"
+        )
+E       AssertionError: inverse sample 'expected-sacrifice-unmapped' must exit 1 (a verdict, not unreadable input 2); counts={'dtr-anchor': 0, 'dtr-section-missing': 0, 'dtr-record-incomplete': 0, 'dtr-tension-id': 0, 'dtr-rejected-form': 0, 'expected-sacrifice-unmapped': 0} stdout='{\n  "spec": "/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1578/test_inverse_samples_turn_red_10/spec",\n  "status": "ok",\n  "checks": [\n    {\n      "label": "dtr-anchor",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-section-missing",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-record-incomplete",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-tension-id",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "dtr-rejected-form",\n      "status": "pass",\n      "count": 0\n    },\n    {\n      "label": "expected-sacrifice-unmapped",\n      "status": "pass",\n      "count": 0\n    }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n'
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...   }\n  ],\n  "errors": 0,\n  "warnings": 0,\n  "scanned": {\n    "lines": 27,\n    "records": 1\n  }\n}\n', stderr='').returncode
+
+tests/contract/test_decision_tension_validator.py:321: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[sacrifice-none]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[undecidable-wording]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[unmapped-measurement-source]
+3 failed, 13 passed in 2.36s

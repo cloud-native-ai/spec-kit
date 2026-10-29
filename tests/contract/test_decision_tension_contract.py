@@ -23,7 +23,11 @@ template, so "pointer, not a copy" is decided by a comparison rather than by rea
 """
 from __future__ import annotations
 
+import importlib.util
+import json
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +39,26 @@ RUBRIC = ROOT / "shared" / "guidelines" / "task-complexity-rubric.md"
 DERIVATION = ROOT / "shared" / "definitions" / "derivation-definitions.md"
 FAST_FAIL = ROOT / "shared" / "guidelines" / "fast-fail.md"
 CRITIQUE = ROOT / "shared" / "guidelines" / "critique-and-self-critique.md"
+
+ANALYZE_DETECTION = (
+    ROOT / "skills" / "internal" / "analyze-artifacts" / "references"
+    / "detection-and-severity.md"
+)
+ANALYZE_SKILL = ROOT / "skills" / "internal" / "analyze-artifacts" / "SKILL.md"
+ANALYSIS_GATE = ROOT / "shared" / "workflow" / "objective-analysis-gate.md"
+VALIDATOR = ROOT / "scripts" / "python" / "validate-decision-tensions.py"
+
+WORKFLOW = ROOT / "shared" / "workflow" / "self-improvement-workflow.md"
+
+# The quartet's closed field set (FR-019) and the owner section it refines: the one-line
+# 「每个提案一条证伪尝试」 description stays byte-identical, the quartet is added beneath it.
+QUARTET_KEYS = ("attempt", "exit_code", "observation", "would_go_red_if")
+QUARTET_PARENT_HEADING = "## 输出形态:每个提案一条证伪尝试"
+SI3C_HEADING = "### SI-3C — Critique Before Dispatch"
+
+# The structural channel's level-3 heading. ``I`` is the next free letter: ``H`` is taken by the
+# checklist pass (``SKILL.md`` step 5), so the numbering cannot be reassigned by taste.
+CHANNEL_HEADING = "### I."
 
 # The three repo-resolvable adjacent owners; ``/speckit.clarify`` is a command surface, named in
 # prose only (it has no file to resolve, and the owner's clause is a boundary statement, not a path).
@@ -348,3 +372,613 @@ class TestScenarioAOwnerAndTemplateAnchor:
             assert threshold_definition not in section, (
                 f"C-3: the template reproduces the threshold table: {threshold_definition!r}"
             )
+
+
+# --------------------------------------------------------------------------- #
+# Scenario B — analyze structural channel (T009)
+# --------------------------------------------------------------------------- #
+
+CHANNEL_PLAN_HEAD = """# Implementation Plan: channel fixture
+
+## Summary
+
+Fixture plan for the analysis channel.
+
+## Constitution Check
+
+*GATE: fixture.*
+
+"""
+
+CHANNEL_PLAN_TAIL = """
+## Project Structure
+
+Fixture structure.
+"""
+
+CHANNEL_RECORD = """### T-001 — fixture decision
+
+- **decision**: 选择方案 A，因为它在夹具里可判定。
+- **antithesis**: 方案 B 是可独立采纳的具名方案；当吞吐需求高于 1k/s 时它更优。
+- **binding_constraints**:
+  - pole_a: 结果必须逐字节可复现。
+  - pole_b: 实现必须能用现有工具链构建。
+- **discriminating_evidence**: 运行一次 `pytest -q` 并比较退出码，结果二值。
+- **expected_sacrifice**: SC-001 Source ↓ 低于阈值 90% 即重开。
+- **revision_trigger**: 连续两次低于阈值 → 重开并复核。
+"""
+
+CHANNEL_NA = """N/A — 四类触发逐条不成立：
+
+- 不可逆：改动只替换一处措辞，回滚无需迁移或重建。
+- 跨团队：不改变他人依赖的契约或接口。
+- 高爆炸半径：故障影响面限于本节文字。
+- 与宪法原则相关：不触及任何 MUST 条。
+"""
+
+CHANNEL_REQUIREMENTS = """# Requirements: channel fixture
+
+## Success Criteria
+
+- **SC-001**: fixture criterion.
+
+### Measurement Sources & Collection Methods
+
+- **SC-001 Source**: fixture measurement source.
+"""
+
+CHANNEL_REQUIREMENTS_NO_SOURCES = """# Requirements: channel fixture
+
+## Success Criteria
+
+- **SC-001**: fixture criterion.
+"""
+
+
+def channel_section_lines() -> list[str]:
+    """The channel's own level-3 section, line-for-line (trailing blank line included)."""
+    lines = read(ANALYZE_DETECTION).splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith(CHANNEL_HEADING):
+            start = index
+            break
+    assert start is not None, (
+        f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+        f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+    )
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or lines[index].startswith("### "):
+            end = index
+            break
+    return lines[start:end]
+
+
+def channel_section() -> str:
+    """The channel's own level-3 section — the only region this scenario judges."""
+    return "\n".join(channel_section_lines())
+
+
+def channel_plan(*records: str) -> str:
+    body = "## Decision Tensions\n\n" + "\n".join(records) + "\n"
+    return CHANNEL_PLAN_HEAD + body + CHANNEL_PLAN_TAIL
+
+
+def channel_record(field: str = None, value: str = None) -> str:
+    """The compliant record, optionally with one field line deleted or its value replaced."""
+    if field is None:
+        return CHANNEL_RECORD
+    if value is None:
+        return "\n".join(
+            line for line in CHANNEL_RECORD.splitlines()
+            if not line.startswith(f"- **{field}**:")
+        ) + "\n"
+    return "\n".join(
+        f"- **{field}**: {value}" if line.startswith(f"- **{field}**:") else line
+        for line in CHANNEL_RECORD.splitlines()
+    ) + "\n"
+
+
+def write_channel_spec(root: Path, plan_text: str, requirements_text: str = CHANNEL_REQUIREMENTS) -> Path:
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "plan.md").write_text(plan_text, encoding="utf-8")
+    (root / "requirements.md").write_text(requirements_text, encoding="utf-8")
+    return root
+
+
+def run_validator(spec_dir: Path) -> subprocess.CompletedProcess:
+    assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+    return subprocess.run(
+        [sys.executable, str(VALIDATOR), "--spec", str(spec_dir), "--json"],
+        capture_output=True,
+        text=True,
+    )
+
+
+def verdict_of(spec_dir: Path) -> tuple[int, dict]:
+    """Run the program and return ``(exit_code, label -> count)`` — never a re-derivation."""
+    proc = run_validator(spec_dir)
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+        raise AssertionError(
+            f"validator --json did not print JSON; exit={proc.returncode} "
+            f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+        )
+    return proc.returncode, {check["label"]: check["count"] for check in payload["checks"]}
+
+
+def validator_labels() -> tuple[str, ...]:
+    """The validator's closed label set, imported rather than restated."""
+    assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+    spec = importlib.util.spec_from_file_location("_dt_validator_for_channel", VALIDATOR)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return tuple(module.LABELS)
+
+
+def defect_table(section: str) -> list[list[str]]:
+    """The channel's defect-class table rows (data rows only), cells stripped."""
+    rows = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or "---" in stripped:
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        rows.append(cells)
+    return rows[1:]  # drop the header row
+
+
+# The containment baseline named by ``contracts/analyze-channel.md`` C-5 / FR-014. A dated
+# referent, never "whatever HEAD says": the allowed delta is measured against this commit.
+BASELINE_COMMIT = "ac63fe8c"
+
+SKILL_ENUMERATION_RE = re.compile(r"^(Seven|Eight) passes \(A duplication")
+
+
+def git_show(rel_path: Path, revision: str = BASELINE_COMMIT) -> str:
+    rel = rel_path.relative_to(ROOT).as_posix()
+    proc = subprocess.run(
+        ["git", "show", f"{revision}:{rel}"], cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, f"cannot read {rel} at {revision}: {proc.stderr}"
+    return proc.stdout
+
+
+def diff_lines(rel_path: Path, revision: str = BASELINE_COMMIT) -> tuple[list[str], list[str]]:
+    """``(removed, added)`` line bodies for one file against the baseline — no hunk chrome."""
+    rel = rel_path.relative_to(ROOT).as_posix()
+    proc = subprocess.run(
+        ["git", "diff", "--no-color", "-U0", revision, "--", rel],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, f"git diff failed for {rel}: {proc.stderr}"
+    removed, added = [], []
+    for line in proc.stdout.splitlines():
+        if line.startswith("---") or line.startswith("+++"):
+            continue
+        if line.startswith("-"):
+            removed.append(line[1:])
+        elif line.startswith("+"):
+            added.append(line[1:])
+    return removed, added
+
+
+def pointer_paragraph(text: str) -> list[str]:
+    """The pass-enumeration paragraph that points at the detection reference."""
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if SKILL_ENUMERATION_RE.match(line):
+            start = index
+            break
+    assert start is not None, "the pass-enumeration paragraph is missing from SKILL.md"
+    end = start
+    while end < len(lines) and "detection-and-severity.md" not in lines[end]:
+        end += 1
+    assert end < len(lines), "the enumeration paragraph lost its pointer line"
+    return lines[start:end + 1]
+
+
+def h3_section(text: str, heading: str) -> str:
+    """Body of an H3 section, up to the next H3 or H2."""
+    m = re.search(rf"^{re.escape(heading)}\s*$(.*?)(?=^### |^## |\Z)", text, re.M | re.S)
+    assert m, f"missing H3 section: {heading}"
+    return m.group(1)
+
+
+class TestScenarioBAnalyzeStructuralChannel:
+    """US2: the analysis stage stops a tension record that does not hold.
+
+    Contract traceability: ``contracts/analyze-channel.md`` C-1…C-4 (C-5 is pinned by the
+    allowed-delta enumeration added with the channel registration).
+    """
+
+    # --- C-1 --------------------------------------------------------------
+
+    def test_channel_scope_is_one_plan_artifact(self, tmp_path):
+        section = norm(channel_section())
+        assert "REQUIREMENTS_DIR" in section, (
+            "C-1: the judged object must be named as the plan under REQUIREMENTS_DIR"
+        )
+        assert "exactly one artifact" in section, (
+            "C-1: the channel must declare a single judged artifact"
+        )
+        assert "never a second judged object" in section, (
+            "C-1: requirements.md must be declared a mapping reference, not a second object"
+        )
+        assert "MUST NOT open any other feature directory" in section, (
+            "C-1: the channel must forbid opening another feature directory's plan"
+        )
+        assert "produce no finding at all" in section, (
+            "C-1: an out-of-scope plan must produce no finding at all"
+        )
+        assert "NOT exempt" in section, (
+            "C-1: in-scope historical plans must not be exempted"
+        )
+
+        # Mechanical half: the checker is directory-scoped. A broken sibling directory never
+        # colours the verdict on a compliant spec, and the in-scope plan written before the
+        # contract (no section at all) is reported rather than skipped.
+        good = write_channel_spec(tmp_path / "in-scope-good", channel_plan(CHANNEL_RECORD))
+        write_channel_spec(tmp_path / "out-of-scope-broken", CHANNEL_PLAN_HEAD + CHANNEL_PLAN_TAIL)
+        code, counts = verdict_of(good)
+        assert code == 0, f"a compliant in-scope plan must exit 0; counts={counts!r}"
+        assert set(counts.values()) == {0}, (
+            f"a broken sibling directory must not colour this verdict; counts={counts!r}"
+        )
+
+        historical = write_channel_spec(
+            tmp_path / "in-scope-historical", CHANNEL_PLAN_HEAD + CHANNEL_PLAN_TAIL
+        )
+        code, counts = verdict_of(historical)
+        assert code == 1, "an in-scope plan without the section is a defect, not a skip"
+        assert counts["dtr-section-missing"] == 1, (
+            f"the missing-section class must be reported once; counts={counts!r}"
+        )
+
+    # --- C-2 --------------------------------------------------------------
+
+    def test_three_defect_classes_fail_closed_no_advisory(self, tmp_path):
+        section = norm(channel_section())
+        assert "HIGH or 0" in section, (
+            "C-2: the value domain must be declared as HIGH or 0"
+        )
+        assert "no advisory or downgrade tier" in section, (
+            "C-2: the channel must forbid an advisory or downgrade tier"
+        )
+
+        rows = defect_table(channel_section())
+        assert len(rows) == 3, (
+            f"C-2: exactly three defect classes must be declared, found {len(rows)}"
+        )
+        closed = set(validator_labels())
+        declared = set()
+        for row in rows:
+            assert len(row) == 3, f"C-2: a defect row must have three cells; got {row!r}"
+            assert row[2] == "HIGH", (
+                f"C-2: every defect class is HIGH, found severity {row[2]!r} in {row!r}"
+            )
+            labels = set(re.findall(r"`([a-z-]+)`", row[1]))
+            assert labels, f"C-2: the row names no validator label: {row!r}"
+            assert labels <= closed, (
+                f"C-2: the row names labels outside the validator's closed set: "
+                f"{sorted(labels - closed)}"
+            )
+            declared |= labels
+        # The three declared classes cover exactly these four validator labels; the validator's
+        # remaining labels (the template anchor, the identifier shape) are not channel classes.
+        assert declared == {
+            "dtr-section-missing",
+            "dtr-record-incomplete",
+            "dtr-rejected-form",
+            "expected-sacrifice-unmapped",
+        }, f"C-2: the declared defect classes cover {sorted(declared)}"
+
+        # One fixture per class; each defect run yields exactly one finding (no double counting).
+        compliant = write_channel_spec(tmp_path / "compliant", channel_plan(CHANNEL_RECORD))
+        code, counts = verdict_of(compliant)
+        assert code == 0 and set(counts.values()) == {0}, (
+            f"a compliant plan must be clean; counts={counts!r}"
+        )
+
+        cases = [
+            ("missing-section", CHANNEL_PLAN_HEAD + CHANNEL_PLAN_TAIL, "dtr-section-missing"),
+            ("incomplete-record", channel_plan(channel_record("revision_trigger")),
+             "dtr-record-incomplete"),
+            ("single-pole", channel_plan(
+                channel_record().replace("- pole_b: 实现必须能用现有工具链构建。", "- pole_b:"),
+            ), "dtr-rejected-form"),
+            ("unmappable-cost", channel_plan(
+                channel_record("expected_sacrifice", "SC-099 Source ↓ 未声明的来源"),
+            ), "expected-sacrifice-unmapped"),
+        ]
+        for name, plan_text, label in cases:
+            spec = write_channel_spec(tmp_path / name, plan_text)
+            code, counts = verdict_of(spec)
+            assert code == 1, f"{name}: a defect class must exit 1; counts={counts!r}"
+            assert counts[label] == 1, f"{name}: expected one {label}; counts={counts!r}"
+            assert sum(counts.values()) == 1, (
+                f"{name}: fail-closed means one finding per defect, not a pile; counts={counts!r}"
+            )
+
+    def test_requirements_without_measurement_sources_branches_on_record_count(self, tmp_path):
+        section = norm(channel_section())
+        assert "branch mechanically on the record count" in section, (
+            "C-2: the missing-measurement-source branch must be declared mechanical"
+        )
+        assert "one or more records fail mapping one by one" in section, (
+            "C-2: with records present, each one fails mapping"
+        )
+        assert "zero findings" in section, (
+            "C-2: a compliant N/A with zero records produces zero findings"
+        )
+
+        with_records = write_channel_spec(
+            tmp_path / "records-no-sources",
+            channel_plan(CHANNEL_RECORD),
+            CHANNEL_REQUIREMENTS_NO_SOURCES,
+        )
+        code, counts = verdict_of(with_records)
+        assert code == 1, "records without a declared source must fail mapping"
+        assert counts["expected-sacrifice-unmapped"] == 1, (
+            f"the single record must fail mapping once; counts={counts!r}"
+        )
+
+        without_records = write_channel_spec(
+            tmp_path / "na-no-sources",
+            channel_plan(CHANNEL_NA),
+            CHANNEL_REQUIREMENTS_NO_SOURCES,
+        )
+        code, counts = verdict_of(without_records)
+        assert code == 0, "a compliant N/A with zero records must not fail mapping"
+        assert set(counts.values()) == {0}, (
+            f"zero records means the mapping verdict is not executed; counts={counts!r}"
+        )
+
+    # --- C-3 --------------------------------------------------------------
+
+    def test_severity_follows_propagation_surface(self):
+        assert ANALYSIS_GATE.is_file(), f"missing severity owner: {ANALYSIS_GATE}"
+        gate = norm(read(ANALYSIS_GATE))
+        assert "propagation-surface" in gate and "FIRST field" in gate, (
+            "C-3: the gate owner must still carry the propagation-surface criterion"
+        )
+
+        section = norm(channel_section())
+        assert "objective-analysis-gate.md" in section, (
+            "C-3: the channel must reach the severity owner by path"
+        )
+        assert "no new severity level" in section, (
+            "C-3: the channel must not invent a severity level"
+        )
+        assert "计划 → 任务 / 实现" in section, (
+            "C-3: every finding must name its propagation surface"
+        )
+        assert "FIRST field" in section, (
+            "C-3: the propagation surface must be the finding's first field"
+        )
+
+    # --- C-4 --------------------------------------------------------------
+
+    def test_verdicts_come_from_the_program(self, tmp_path):
+        section = norm(channel_section())
+        assert "scripts/python/validate-decision-tensions.py" in section, (
+            "C-4: the channel must name the program that prints the verdict"
+        )
+        assert "MUST NOT re-score" in section, (
+            "C-4: the model must consume the verdict instead of scoring semantically"
+        )
+
+        code, counts = verdict_of(
+            write_channel_spec(tmp_path / "program-verdict", channel_plan(CHANNEL_RECORD))
+        )
+        assert code == 0 and set(counts.values()) == {0}, (
+            "C-4: the verdict must be the program's exit code plus its label counts"
+        )
+        assert set(counts) == set(validator_labels()), (
+            "C-4: the consumption surface is the program's own closed label set"
+        )
+
+    # --- C-5 --------------------------------------------------------------
+
+    def test_channel_only_add_allowed_delta_enumeration(self):
+        detection = read(ANALYZE_DETECTION)
+
+        # (1) The count heading changes by exactly one, and the new channel letter is unique.
+        count_headings = [line for line in detection.splitlines()
+                          if line.startswith("## The ") and line.endswith("passes")]
+        assert count_headings == ["## The eight passes"], (
+            "C-5: the count heading must carry the new channel; found "
+            f"{count_headings!r}"
+        )
+        subsections = [line for line in detection.splitlines()
+                       if re.match(r"^### [A-Z]\. ", line)]
+        letters = [re.match(r"^### ([A-Z])\. ", line).group(1) for line in subsections]
+        assert letters == ["A", "B", "C", "D", "E", "F", "G", "I"], (
+            f"C-5: the channel letters must be A-G plus I (H is the checklist pass); {letters!r}"
+        )
+        assert len(set(letters)) == len(letters), f"C-5: a channel letter repeats: {letters!r}"
+
+        # (2) The declared allowed delta is exactly 「the new channel section + the count line」.
+        removed, added = diff_lines(ANALYZE_DETECTION)
+        assert removed == ["## The seven passes"], (
+            "C-5: the delta set declares ZERO deleted or rewritten lines outside the count "
+            f"line; removed {removed!r}"
+        )
+        assert added == ["## The eight passes"] + channel_section_lines(), (
+            "C-5: every added line must belong to the new channel section or be the count "
+            "heading; the comparison unit is 「existing paragraph / new paragraph」"
+        )
+
+        # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only delta is the
+        # enumeration paragraph, and that paragraph now names the new channel.
+        old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
+        new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
+        removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
+        assert removed_skill == [line for line in old_paragraph if line not in new_paragraph], (
+            "C-5: SKILL.md must change only inside its pass-enumeration paragraph; "
+            f"removed {removed_skill!r}"
+        )
+        assert added_skill == [line for line in new_paragraph if line not in old_paragraph], (
+            f"C-5: SKILL.md gained a change outside the enumeration paragraph: {added_skill!r}"
+        )
+        updated = " ".join(new_paragraph)
+        assert "Eight passes" in updated, (
+            f"C-5: the two enumerations must not drift; SKILL.md still says: {updated!r}"
+        )
+        assert "I decision tension records" in updated, (
+            f"C-5: the new channel is missing from the SKILL.md enumeration: {updated!r}"
+        )
+
+
+# --------------------------------------------------------------------------- #
+# Scenario C — falsification quartet owner and the SI-3C pointer (T013)
+# --------------------------------------------------------------------------- #
+
+def quartet_section() -> str:
+    """The quartet sub-section inside the owner's output-form section.
+
+    Located by content (all four literal keys), not by its heading wording: the heading is the
+    owner's to phrase, the field set is the contract's.
+    """
+    parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+    blocks = re.split(r"(?m)^### ", parent)
+    for block in blocks[1:]:
+        if all(f"`{key}`" in block for key in QUARTET_KEYS):
+            return block
+    raise AssertionError(
+        "the quartet sub-section is missing: no `### ` block under "
+        f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+    )
+
+
+class TestScenarioCQuartetOwner:
+    """US3: a falsification attempt must actually have run, and must be able to go red.
+
+    Contract traceability: ``contracts/falsification-quartet.md`` C-1, C-2, C-4, C-5 (C-3 is
+    pinned by ``test_falsification_quartet_validator.py``).
+    """
+
+    # --- C-1 --------------------------------------------------------------
+
+    def test_owner_declares_closed_quartet(self):
+        section = quartet_section()
+        for key in QUARTET_KEYS:
+            assert f"`{key}`" in section, (
+                f"C-1: the quartet field {key!r} is not declared verbatim in its sub-section"
+            )
+        joined = norm(section)
+        assert "字段集合封闭" in joined, "C-1: the quartet's field set must be declared closed"
+        assert "MUST 走本文件修订" in joined, (
+            "C-1: extending the quartet must be routed through an owner revision"
+        )
+        assert "产出形态" in joined, (
+            "C-1: the sub-section must declare the quartet to BE the produced form"
+        )
+
+        # The earlier one-line description is preserved byte-identical, and the quartet is
+        # appended beneath it — the refinement is normative while containment stays true.
+        baseline = h2_section(git_show(CRITIQUE), QUARTET_PARENT_HEADING)
+        current = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        assert current.startswith(baseline), (
+            "C-1: the existing 「one falsification attempt per proposal」 text must stay "
+            "byte-identical; the quartet is an addition, never a rewrite"
+        )
+        assert len(current) > len(baseline), (
+            "C-1: the quartet sub-section is missing from the output-form section"
+        )
+
+    # --- C-2 --------------------------------------------------------------
+
+    def test_field_semantics_decidable(self):
+        joined = norm(quartet_section())
+        # attempt — replayable by a reviewer; replayability is a reviewer rule, not a verdict.
+        assert "可原样重放" in joined or "原样重放" in joined, (
+            "C-2: `attempt` must be declared replayable verbatim by a reviewer"
+        )
+        assert "只判非空" in joined, (
+            "C-2: the checker may only require `attempt` to be non-empty"
+        )
+        assert "MUST NOT 判其可否重放" in joined or "MUST NOT 判它「可否重放」" in joined, (
+            "C-2: replayability must be declared a reviewer rule, never a program verdict"
+        )
+        # exit_code — an integer.
+        assert "整数" in joined, "C-2: `exit_code` must be declared an integer"
+        # observation — the literal marker is the mechanical proxy for 「not a paraphrase」.
+        assert "`raw:`" in joined, "C-2: `observation` must carry the literal `raw:` marker"
+        assert "转述" in joined, (
+            "C-2: `raw:` must be declared the mechanical proxy for 「not a paraphrase」"
+        )
+        # would_go_red_if — both halves, first-`red:` split, backtick spans.
+        assert "第一次出现" in joined, (
+            "C-2: the split point is the FIRST occurrence of the literal `red:`"
+        )
+        assert "`red:`" in joined, "C-2: the literal `red:` marker must be named"
+        assert "反引号跨度" in joined, (
+            "C-2: both halves are machine-checkable only as backtick spans"
+        )
+        assert "两半" in joined, "C-2: both halves must be declared"
+        for named in ("断言名", "检查标签", "非零退出码"):
+            assert named in joined, (
+                f"C-2: the signal half must name one of {named!r}"
+            )
+
+    # --- C-4 --------------------------------------------------------------
+
+    def test_carrier_unchanged_no_new_store(self):
+        joined = norm(quartet_section())
+        assert "MUST NOT 新建台账、存储、probe 或评分" in joined, (
+            "C-4: the quartet must keep the proposal's existing carrier — no ledger, store, "
+            "probe or score"
+        )
+
+    # --- disclosed limitations (C-3's non-blocking half) -------------------
+
+    def test_disclosed_limitations_are_non_blocking(self):
+        joined = norm(quartet_section())
+        assert "可被伪造" in joined, (
+            "the `raw:` marker's forgeability must be disclosed, not hidden"
+        )
+        assert "不可证" in joined, (
+            "the truth of the `red:` signal (a broken input that never goes red) must be "
+            "disclosed as unprovable by the shape"
+        )
+        assert "非阻断注记" in joined, (
+            "both limitations must be disposed as non-blocking notes"
+        )
+        assert "不进程序判决" in joined, (
+            "neither limitation may enter the program verdict"
+        )
+        assert "复核者" in joined, (
+            "both limitations are found by reviewers, not by the checker"
+        )
+
+    # --- C-5 --------------------------------------------------------------
+
+    def test_si3c_pointer_only_both_directions(self):
+        workflow = norm(h3_section(read(WORKFLOW), SI3C_HEADING))
+        assert "shared/guidelines/critique-and-self-critique.md" in workflow, (
+            "C-5: SI-3C must reach the owner by path"
+        )
+        assert "falsification attempt" in workflow, (
+            "C-5: SI-3C must keep its step summary"
+        )
+        for key in QUARTET_KEYS:
+            assert f"{key}:" not in workflow, (
+                f"C-5: SI-3C restates the quartet field {key!r} — the owner defines it once"
+            )
+        for reason in (
+            "missing-field", "empty-field", "exit-code-not-integer",
+            "observation-not-raw", "tautology", "input-unreadable",
+        ):
+            assert reason not in workflow, (
+                f"C-5: SI-3C restates the rejection reason {reason!r}"
+            )
+        # The other direction: the owner does define them (a pointer with no target is a dead end).
+        owner = norm(quartet_section())
+        for key in QUARTET_KEYS:
+            assert f"`{key}`" in owner, f"C-5: the owner does not define {key!r}"

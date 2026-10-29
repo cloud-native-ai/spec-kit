@@ -35,6 +35,36 @@ All commands below are run from the repo root with that interpreter.
 
 ## Group 1 — `test_decision_tension_contract.py` (scenario A: owner + template anchor)
 
+### R4 (T009) — red run for scenario B (analyze structural channel) before the channel landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output** (tail; full capture `test-evidence/red-first-scenario-b.txt`):
+  ```
+  FAILED ...::TestScenarioBAnalyzeStructuralChannel::test_channel_scope_is_one_plan_artifact
+  FAILED ...::TestScenarioBAnalyzeStructuralChannel::test_three_defect_classes_fail_closed_no_advisory
+  FAILED ...::TestScenarioBAnalyzeStructuralChannel::test_requirements_without_measurement_sources_branches_on_record_count
+  FAILED ...::TestScenarioBAnalyzeStructuralChannel::test_severity_follows_propagation_surface
+  FAILED ...::TestScenarioBAnalyzeStructuralChannel::test_verdicts_come_from_the_program
+  5 failed, 11 passed in 0.13s
+  ```
+  Decisive excerpt: `AssertionError: the structural channel section (### I.) is not declared in
+  skills/internal/analyze-artifacts/references/detection-and-severity.md` — artifact-missing, not
+  an assertion-shape defect.
+- **Exit code**: `1`
+- **Failure count**: `5 failed / 11 passed` (of 16 collected)
+
+### G6 (T010 / T011) — green run after the channel section, its registration and the delta pins
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output**: `.................                                        [100%]` / `17 passed in 0.85s`
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 17 passed`; evidence `test-evidence/green-scenario-b.txt`
+- **C-5 red-then-green measured separately**: with the channel section present but the count
+  heading still `## The seven passes`, `test_channel_only_add_allowed_delta_enumeration` failed
+  with `At index 0 diff: '## The seven passes' != '## The eight passes'` (exit `1`); after the
+  heading change plus the `SKILL.md` enumeration update it passes. The allowed delta set is
+  therefore enforced, not merely declared.
+
 ### R1 — red run before implementation
 
 - **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
@@ -119,6 +149,33 @@ All commands below are run from the repo root with that interpreter.
 - **Exit code**: `1`
 - **Failure count**: `3 failed / 13 passed` (of 16 collected)
 
+### R3 (T008) — red run captured immediately before the two record-level rules landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_validator.py`
+- **Real output** (tail; full capture `test-evidence/red-first-t008.txt`):
+  ```
+  FAILED ...::test_inverse_samples_turn_red[sacrifice-none]
+  FAILED ...::test_inverse_samples_turn_red[undecidable-wording]
+  FAILED ...::test_inverse_samples_turn_red[unmapped-measurement-source]
+  3 failed, 13 passed in 2.36s
+  ```
+  Decisive excerpt: `AssertionError: inverse sample 'expected-sacrifice-unmapped' must exit 1
+  (a verdict, not unreadable input 2) ... assert 0 == 1` — the checker printed
+  `expected-sacrifice-unmapped: 0` for a plan naming `SC-099`, i.e. the rule did not exist yet.
+- **Exit code**: `1`
+- **Failure count**: `3 failed / 13 passed` (of 16 collected)
+
+### G5 (T008) — green run after the parsing and rejection rules landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_validator.py`
+- **Real output**: `................                                             [100%]` / `16 passed in 2.15s`
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 16 passed`; evidence `test-evidence/green-t008.txt`
+- **Dogfooding re-check**: `python3 scripts/python/validate-decision-tensions.py --spec
+  .specify/specs/076-decision-tension-contract` → `status: ok`, six `pass (0)`, `scanned: 275
+  lines, 2 record(s)`, exit `0` — the feature's own two records still satisfy the now-live
+  `dtr-rejected-form` / `expected-sacrifice-unmapped` rules.
+
 ### G3 — validator smoke on the feature's own plan (dogfooding)
 
 - **Replay command**:
@@ -159,7 +216,50 @@ All commands below are run from the repo root with that interpreter.
 
 ## Group 3 — `test_falsification_quartet_validator.py` (US3, later phase)
 
-- **Status**: not started in this implementation segment (T012+ belong to a later segment).
+### R5 (T012) — red run before the quartet checker exists
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_falsification_quartet_validator.py`
+- **Real output** (tail; full capture `test-evidence/red-first-quartet.txt`):
+  ```
+  FAILED ...::test_compliant_payload_is_accepted
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[missing-field]
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[empty-field]
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[exit-code-not-integer]
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[observation-not-raw]
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[tautology]
+  FAILED ...::test_rejection_is_program_verdict_closed_reasons[input-unreadable]
+  FAILED ...::test_each_omitted_field_is_a_missing_field_rejection[attempt|exit_code|observation|would_go_red_if]
+  FAILED ...::test_double_red_splits_at_first_occurrence
+  12 failed, 1 passed in 0.12s
+  ```
+  Decisive excerpt: `AssertionError: missing artifact:
+  .../scripts/python/validate-falsification-quartet.py` — artifact-missing, not an assertion-shape
+  defect. The one passing test (`test_rejection_rate_is_six_of_six`) is a guard on the test's own
+  matrix (six reasons, six samples, exit-code triple), not on the artifact.
+- **Exit code**: `1`
+- **Failure count**: `12 failed / 1 passed` (of 13 collected)
+- **Scope note**: this group is red BY DESIGN at the end of this segment — T012 writes the test,
+  T015 builds the checker. The red is the recorded carrier of that deferred scope.
+
+### R6 (T013) — red run for scenario C (quartet owner + SI-3C pointer)
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output** (tail; full capture `test-evidence/red-first-scenario-c.txt`):
+  ```
+  FAILED ...::TestScenarioCQuartetOwner::test_owner_declares_closed_quartet
+  FAILED ...::TestScenarioCQuartetOwner::test_field_semantics_decidable
+  FAILED ...::TestScenarioCQuartetOwner::test_carrier_unchanged_no_new_store
+  FAILED ...::TestScenarioCQuartetOwner::test_disclosed_limitations_are_non_blocking
+  FAILED ...::TestScenarioCQuartetOwner::test_si3c_pointer_only_both_directions
+  5 failed, 17 passed in 1.08s
+  ```
+  Decisive excerpt: `AssertionError: the quartet sub-section is missing: no `### ` block under
+  '## 输出形态:每个提案一条证伪尝试' names all four keys (...)`. The block is located by content
+  (all four literal keys), not by heading wording.
+- **Exit code**: `1`
+- **Failure count**: `5 failed / 17 passed` (of 22 collected)
+- **Scope note**: red BY DESIGN at the end of this segment — T013 writes the test, T014 writes the
+  owner subsection.
 
 ---
 

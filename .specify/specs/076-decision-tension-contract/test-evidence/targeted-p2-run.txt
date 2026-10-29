@@ -1,0 +1,509 @@
+.................FFFFF................FFFFFFF.FFFFF                      [100%]
+=================================== FAILURES ===================================
+_________ TestScenarioCQuartetOwner.test_owner_declares_closed_quartet _________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x109c58550>
+
+    def test_owner_declares_closed_quartet(self):
+>       section = quartet_section()
+                  ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:869: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+___________ TestScenarioCQuartetOwner.test_field_semantics_decidable ___________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x109c58190>
+
+    def test_field_semantics_decidable(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:898: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+________ TestScenarioCQuartetOwner.test_carrier_unchanged_no_new_store _________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x109a889d0>
+
+    def test_carrier_unchanged_no_new_store(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+____ TestScenarioCQuartetOwner.test_disclosed_limitations_are_non_blocking _____
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x109a88770>
+
+    def test_disclosed_limitations_are_non_blocking(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:942: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+_______ TestScenarioCQuartetOwner.test_si3c_pointer_only_both_directions _______
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x109a371d0>
+
+    def test_si3c_pointer_only_both_directions(self):
+        workflow = norm(h3_section(read(WORKFLOW), SI3C_HEADING))
+        assert "shared/guidelines/critique-and-self-critique.md" in workflow, (
+            "C-5: SI-3C must reach the owner by path"
+        )
+        assert "falsification attempt" in workflow, (
+            "C-5: SI-3C must keep its step summary"
+        )
+        for key in QUARTET_KEYS:
+            assert f"{key}:" not in workflow, (
+                f"C-5: SI-3C restates the quartet field {key!r} — the owner defines it once"
+            )
+        for reason in (
+            "missing-field", "empty-field", "exit-code-not-integer",
+            "observation-not-raw", "tautology", "input-unreadable",
+        ):
+            assert reason not in workflow, (
+                f"C-5: SI-3C restates the rejection reason {reason!r}"
+            )
+        # The other direction: the owner does define them (a pointer with no target is a dead end).
+>       owner = norm(quartet_section())
+                     ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:982: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+______________________ test_compliant_payload_is_accepted ______________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_compliant_payload_is_acce0')
+
+    def test_compliant_payload_is_accepted(tmp_path):
+>       proc = run(write(tmp_path, COMPLIANT), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_compliant_payload_is_acce0/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+_______ test_rejection_is_program_verdict_closed_reasons[missing-field] ________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd0')
+build = <function <lambda> at 0x109c63a00>, reason = 'missing-field'
+exit_code = 1, detail_token = 'attempt'
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd0/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+________ test_rejection_is_program_verdict_closed_reasons[empty-field] _________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd1')
+build = <function <lambda> at 0x109c63ab0>, reason = 'empty-field'
+exit_code = 1, detail_token = 'observation'
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd1/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+___ test_rejection_is_program_verdict_closed_reasons[exit-code-not-integer] ____
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd2')
+build = <function <lambda> at 0x109c63b60>, reason = 'exit-code-not-integer'
+exit_code = 1, detail_token = 'exit_code'
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd2/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+____ test_rejection_is_program_verdict_closed_reasons[observation-not-raw] _____
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd3')
+build = <function <lambda> at 0x109c63c10>, reason = 'observation-not-raw'
+exit_code = 1, detail_token = 'raw:'
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd3/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+_________ test_rejection_is_program_verdict_closed_reasons[tautology] __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd4')
+build = <function <lambda> at 0x109c63cc0>, reason = 'tautology', exit_code = 1
+detail_token = 'red:'
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd4/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+______ test_rejection_is_program_verdict_closed_reasons[input-unreadable] ______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd5')
+build = <function <lambda> at 0x109c63d70>, reason = 'input-unreadable'
+exit_code = 2, detail_token = None
+
+    @pytest.mark.parametrize("build,reason,exit_code,detail_token", REJECTION_MATRIX)
+    def test_rejection_is_program_verdict_closed_reasons(tmp_path, build, reason, exit_code, detail_token):
+        text = build()
+        target = (tmp_path / "missing.md") if text is None else write(tmp_path, text)
+    
+>       proc = run(target, "--json")
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_rejection_is_program_verd5/missing.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+________ test_each_omitted_field_is_a_missing_field_rejection[attempt] _________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m0')
+field = 'attempt'
+
+    @pytest.mark.parametrize("field", KEYS)
+    def test_each_omitted_field_is_a_missing_field_rejection(tmp_path, field):
+>       proc = run(write(tmp_path, payload(**{field: None})), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m0/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+_______ test_each_omitted_field_is_a_missing_field_rejection[exit_code] ________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m1')
+field = 'exit_code'
+
+    @pytest.mark.parametrize("field", KEYS)
+    def test_each_omitted_field_is_a_missing_field_rejection(tmp_path, field):
+>       proc = run(write(tmp_path, payload(**{field: None})), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m1/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+______ test_each_omitted_field_is_a_missing_field_rejection[observation] _______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m2')
+field = 'observation'
+
+    @pytest.mark.parametrize("field", KEYS)
+    def test_each_omitted_field_is_a_missing_field_rejection(tmp_path, field):
+>       proc = run(write(tmp_path, payload(**{field: None})), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m2/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+____ test_each_omitted_field_is_a_missing_field_rejection[would_go_red_if] _____
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m3')
+field = 'would_go_red_if'
+
+    @pytest.mark.parametrize("field", KEYS)
+    def test_each_omitted_field_is_a_missing_field_rejection(tmp_path, field):
+>       proc = run(write(tmp_path, payload(**{field: None})), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_each_omitted_field_is_a_m3/payload.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+__________________ test_double_red_splits_at_first_occurrence __________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_double_red_splits_at_firs0')
+
+    def test_double_red_splits_at_first_occurrence(tmp_path):
+        value = DOUBLE_RED.split("would_go_red_if:", 1)[1]
+        positions = [match.start() for match in re.finditer("red:", value)]
+        assert len(positions) == 2, (
+            f"this fixed fixture must carry exactly two `red:` markers; found {len(positions)}"
+        )
+        first, second = positions
+        assert "`" in value[:first], "the input half (before the FIRST `red:`) must carry a span"
+        assert "`" in value[first:second], (
+            "the signal half is the segment after the first marker — it must carry a span, "
+            "otherwise the fixture cannot distinguish the two split points"
+        )
+        assert "`" not in value[second:], (
+            "the text after the SECOND `red:` must carry no span, so splitting there would yield "
+            "an empty signal half and a `tautology` — that is what makes this fixture discriminating"
+        )
+    
+>       proc = run(write(tmp_path, DOUBLE_RED, "double-red.md"), "--json")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_falsification_quartet_validator.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1601/test_double_red_splits_at_firs0/double-red.md')
+extra = ('--json',)
+
+    def run(target: Path, *extra: str) -> subprocess.CompletedProcess:
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-falsification-quartet.py').is_file
+
+tests/contract/test_falsification_quartet_validator.py:71: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_owner_declares_closed_quartet
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_field_semantics_decidable
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_carrier_unchanged_no_new_store
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_disclosed_limitations_are_non_blocking
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_si3c_pointer_only_both_directions
+FAILED tests/contract/test_falsification_quartet_validator.py::test_compliant_payload_is_accepted
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[missing-field]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[empty-field]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[exit-code-not-integer]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[observation-not-raw]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[tautology]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_rejection_is_program_verdict_closed_reasons[input-unreadable]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_each_omitted_field_is_a_missing_field_rejection[attempt]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_each_omitted_field_is_a_missing_field_rejection[exit_code]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_each_omitted_field_is_a_missing_field_rejection[observation]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_each_omitted_field_is_a_missing_field_rejection[would_go_red_if]
+FAILED tests/contract/test_falsification_quartet_validator.py::test_double_red_splits_at_first_occurrence
+17 failed, 34 passed in 3.27s

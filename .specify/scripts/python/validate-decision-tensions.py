@@ -27,11 +27,13 @@ cross-label precedence is load-bearing):
   expected-sacrifice-unmapped    ``expected_sacrifice`` does not resolve to a ``**SC-NNN Source**``
                                  entry of the same feature's ``requirements.md``
 
-Scope of this file in the current implementation stage: the anchor, section, field-presence and
-identifier checks are live; ``dtr-rejected-form`` and ``expected-sacrifice-unmapped`` are declared
-in the label set and are wired by the immediately following task (T008) — until then they report
-``pass (0)``. Their inverse samples already exist and are RED in
-``tests/contract/test_decision_tension_validator.py``, so the gap cannot be mistaken for a green.
+Every rule is live. The third cross-label precedence is the one that keeps the label counts
+comparable to the sample count (FR-016 ③): a record whose ``expected_sacrifice`` is blank or the
+literal ``none``, or whose ``binding_constraints`` misses a non-empty pole, reports ONLY
+``dtr-rejected-form`` — ``dtr-record-incomplete`` and ``expected-sacrifice-unmapped`` are
+suppressed, because an empty value has no decidable content and one root cause must not be
+counted twice. Undecidable wording is a rejected form too, but it leaves the value parseable, so
+the mapping verdict still runs beside it (a record can carry both labels).
 
 Exit codes: 0 = no error (warnings allowed) / 1 = at least one error / 2 = input unreadable
 (either file missing, undecodable, or without content lines). Read-only: no write point of any
@@ -67,6 +69,26 @@ LABELS = (
 SECTION_HEADING = "## Decision Tensions"
 ANCHOR_BEFORE = "## Constitution Check"
 ANCHOR_AFTER = "## Project Structure"
+
+# The mapping target: the requirements section holding ``**SC-NNN Source**`` entries (FR-010).
+MEASUREMENT_SECTION = "### Measurement Sources & Collection Methods"
+
+# The closed reference form ``<SC-NNN> Source <↓|↑>`` — the identifier, one space, the literal
+# connective, then a mandatory direction token; anything after the token is free-form.
+SACRIFICE_ID_RE = re.compile(r"SC-\d{3}")
+SACRIFICE_CONNECTIVE = " Source "
+DIRECTION_TOKENS = ("↓", "↑")
+SOURCE_ENTRY_RE = re.compile(r"^[ \t]*(?:[-*+][ \t]+)?\*\*(SC-\d{3}) Source\*\*")
+
+# ``binding_constraints`` carries its two poles as the two lines beneath the field label.
+POLE_RE = re.compile(r"^-[ \t]*pole_(a|b)[ \t]*:[ \t]*(.*)$")
+
+# The owner's undecidable-wording list (closed): replacing a trade-off with one of these phrases
+# is a rejected form. Extending the list is an owner revision, never a local edit.
+UNDECIDABLE_WORDING = ("要平衡", "综合考虑", "视情况而定")
+
+# The literal that rejects the record outright (STR-002); a blank value is judged the same way.
+NONE_LITERAL = "none"
 
 # The six field labels, verbatim; the field set is closed by the owner (FR-002).
 FIELD_NAMES = (
@@ -155,6 +177,27 @@ class Record:
         entry = self.fields.get(name)
         return 0 if entry is None else entry["count"]
 
+    def poles(self):
+        """``{"a"|"b": value}`` for the pole lines carried under ``binding_constraints``.
+
+        The record shape (``data-model.md`` E2) puts ``pole_a`` / ``pole_b`` on the two lines
+        beneath the field label, so a pole written anywhere else is absent — the same reading the
+        owner gives "行缺失或留空". A pole line repeated keeps its first value.
+        """
+        found = {}
+        entry = self.fields.get("binding_constraints")
+        if entry is None:
+            return found
+        for line in entry["continuation"]:
+            match = POLE_RE.match(line.strip())
+            if match:
+                found.setdefault(match.group(1), match.group(2).strip())
+        return found
+
+    def field_text(self):
+        """The record's field values as one string — the surface the wording list is matched on."""
+        return " ".join(self.value(name) for name in FIELD_NAMES)
+
 
 def _visible_lines(text):
     """Lines with fenced code blocks blanked — the same rule the record grammar declares."""
@@ -201,6 +244,64 @@ def _records(lines, start, end):
         current.finalize()
         records.append(current)
     return records
+
+
+def parse_sacrifice(value):
+    """Parse ``expected_sacrifice`` against the closed form ``<SC-NNN> Source <↓|↑>``.
+
+    Returns ``(state, detail)``: ``state`` is ``"resolved"`` (detail = the identifier) or
+    ``"unmapped"`` (detail = why). A value naming zero or several identifiers is unmapped — a
+    multi-source "cost" has no single value (``contracts/measurement-binding.md`` C-2). The
+    direction token is a record-level assertion: only membership in the two-value set is judged,
+    never whether the direction matches the source's real semantics (C-1).
+    """
+    text = value.strip()
+    identifiers = SACRIFICE_ID_RE.findall(text)
+    if len(identifiers) != 1:
+        return "unmapped", "binds %d SC-NNN identifiers; exactly one source is allowed" % len(
+            identifiers
+        )
+    identifier = identifiers[0]
+    if not text.startswith(identifier):
+        return "unmapped", "does not begin with its %s identifier" % identifier
+    remainder = text[len(identifier):]
+    if remainder == SACRIFICE_CONNECTIVE.rstrip():
+        return "unmapped", "direction token is missing or outside {%s}" % ", ".join(
+            DIRECTION_TOKENS
+        )
+    if not remainder.startswith(SACRIFICE_CONNECTIVE):
+        return "unmapped", "lacks the literal `%s` connective after %s" % (
+            SACRIFICE_CONNECTIVE.strip(), identifier,
+        )
+    tail = remainder[len(SACRIFICE_CONNECTIVE):]
+    if not tail or tail[0] not in DIRECTION_TOKENS:
+        return "unmapped", "direction token is missing or outside {%s}" % ", ".join(
+            DIRECTION_TOKENS
+        )
+    return "resolved", identifier
+
+
+def measurement_sources(requirements_text):
+    """The ``SC-NNN`` identifiers declared as ``**SC-NNN Source**`` in the requirements section.
+
+    The section is the mapping target owned by the feature's ``requirements.md``; this function
+    only collects its entry identifiers and never restates what the entries say.
+    """
+    sources = set()
+    inside = False
+    for line in _visible_lines(requirements_text):
+        stripped = line.strip()
+        if stripped == MEASUREMENT_SECTION.strip():
+            inside = True
+            continue
+        if inside and re.match(r"^#{1,3}\s", stripped):
+            inside = False
+            continue
+        if inside:
+            match = SOURCE_ENTRY_RE.match(line)
+            if match:
+                sources.add(match.group(1))
+    return sources
 
 
 def index_records(plan_text):
@@ -294,6 +395,8 @@ def validate(spec):
         start, end = _section_bounds(lines, section_index)
         records = _records(lines, start, end)
 
+    sources = measurement_sources(texts["requirements.md"])
+
     for position, record in enumerate(records, start=1):
         expected_id = "T-%03d" % position
         if record.tension_id is None:
@@ -324,9 +427,51 @@ def validate(spec):
             buckets["dtr-record-incomplete"].append(Finding(
                 record.line, "dtr-record-incomplete", "; ".join(parts),
             ))
+            # Precedence ②: a missing field label leaves no value to parse, so the mapping
+            # verdict and the rejected-form verdict are both suppressed for this record.
+            continue
 
-    # ``dtr-rejected-form`` and ``expected-sacrifice-unmapped`` are declared in the closed set
-    # here and wired by T008 (see the module docstring); their inverse samples are red until then.
+        # Precedence ③: an empty value (or the literal ``none``) is a rejected form, judged
+        # once — it suppresses both ``dtr-record-incomplete`` and ``expected-sacrifice-unmapped``.
+        rejected = []
+        sacrifice = record.value("expected_sacrifice")
+        empty_value = False
+        if sacrifice.strip() == NONE_LITERAL:
+            rejected.append("`expected_sacrifice` is the literal `%s`" % NONE_LITERAL)
+            empty_value = True
+        elif not sacrifice.strip():
+            rejected.append("`expected_sacrifice` is blank")
+            empty_value = True
+        poles = record.poles()
+        for pole in ("a", "b"):
+            if not poles.get(pole, "").strip():
+                rejected.append("`binding_constraints` misses a non-empty `pole_%s`" % pole)
+                empty_value = True
+        wording = [phrase for phrase in UNDECIDABLE_WORDING if phrase in record.field_text()]
+        if wording:
+            rejected.append(
+                "undecidable wording instead of a trade-off: %s" % ", ".join(wording)
+            )
+        if rejected:
+            buckets["dtr-rejected-form"].append(Finding(
+                record.line, "dtr-rejected-form", "; ".join(rejected),
+            ))
+            if empty_value:
+                continue
+
+        if sacrifice.strip():
+            state, detail = parse_sacrifice(sacrifice)
+            if state == "unmapped":
+                buckets["expected-sacrifice-unmapped"].append(Finding(
+                    record.line, "expected-sacrifice-unmapped",
+                    "`expected_sacrifice` %s" % detail,
+                ))
+            elif detail not in sources:
+                buckets["expected-sacrifice-unmapped"].append(Finding(
+                    record.line, "expected-sacrifice-unmapped",
+                    "`expected_sacrifice` names %s, which has no `**%s Source**` entry under "
+                    "`%s` in requirements.md" % (detail, detail, MEASUREMENT_SECTION),
+                ))
 
     findings = [finding for label in LABELS for finding in buckets[label]]
     checks = [
