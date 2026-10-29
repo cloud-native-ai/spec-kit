@@ -234,3 +234,57 @@ Full log: `green-t017.txt`. The five cases that were red at T005 are the same fi
 the landing-resolution check, the five-input domain table, the `definition-class` value, the
 tier-by-reference rule and the forbidden-input rule — so the green is the same case set, not a
 reduced one. The US2 close-out run (both modules together) is appended from T021's measurement.
+
+## T019 / T021 — `tests/contract/test_sdd_routing_engine.py` (green) and the US2 close-out
+
+T019 landed `--action route` and `--action golden` in the same engine, reading the four facts out of
+the owner document at run time; T020 added the owner's § Golden case table (14 rows, the seven
+required faces). The two routing modules now run together:
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_routing_definitions.py tests/contract/test_sdd_routing_engine.py
+...................................                                      [100%]
+35 passed in 1.67s
+# RC=0
+```
+
+Full log: `green-t021.txt`. The green is the same case set that was red, not a reduced one: 14
+owner-document cases (T005's 5 red + 9 that were already green) and 21 engine cases (T018's red).
+Five of the 21 stayed red between the T019 commit and the T020 commit for the predicted reason — the
+golden action had no table to judge yet — and turned green when T020 landed the rows; no case was
+weakened, deleted or skipped to get there.
+
+Two anchored properties deserve their own lines, because they are the ones a plausible implementation
+would fail:
+
+- **The four facts are read, not copied.** Three probes mutate a temp *copy* of the owner document
+  and require the engine to follow: a renamed reason code (`sdd-capability-or-contract-change` →
+  `capability-change-renamed`) changes the reported code; a reversed precedence line flips the same
+  inputs from `adjudicate` to `sdd`; narrowing the reversibility domain turns the previously direct
+  case into `adjudicate / adjudicate-ambiguous-value`. A fourth probe scans the engine source and
+  requires that no reason code, no verdict literal, no domain value and no domain/condition sequence
+  appears in it.
+- **No clock.** `recorded_at` is null unless the caller passes `--recorded-at`, because a timestamp
+  read inside the engine would break the byte-identical property C-24 requires. The golden action
+  reads no clock at all, so its two runs are byte-identical (`notes/golden-run1.json` /
+  `golden-run2.json`, same sha256 `7ad8419e…`).
+
+The golden table's own evidence — two byte-identical `--action golden` runs plus the row-by-row
+judgement — is recorded in `quickstart-run.md` § S1 / § S2 / § S3 (the scenario sections T021 asks
+for), with the raw payloads at `golden-run1.json`, `golden-run2.json` and `golden-rows.txt`.
+
+## Regression check for this part
+
+The slice's fixed targeted set (13 contract files, the sufficiency statement in
+`test-evidence/targeted-set-v1-baseline.txt`) was re-run once for this part:
+
+```console
+$ bash scripts/bash/run-tests.sh --names-out notes/targeted-set-v1-failed.txt <the 13 files>
+============================= 191 passed in 22.63s =============================
+# failed-name list written: notes/targeted-set-v1-failed.txt (0 entries)
+# RC=0
+```
+
+Name-level identical to the implement-start re-capture (191 passed, 0 failed names), so this part
+introduces no new failure in the slice's non-regression set. No second full-suite run was made: the
+E2 baseline slot was consumed at implement start (`test-evidence/implement.jsonl` seq 1).

@@ -147,3 +147,221 @@ authorized seat resolves `allowed`, the forbidden seat resolves `forbidden` with
 **Pinning test**: `tests/contract/test_nested_sdd_invocation.py::test_nested_run_reaches_review_zero_merge_zero_push`
 (the same shape is restated case by case across the module's 23 cases). **Full log**:
 `green-t016-demo.txt`.
+
+---
+
+Part 3 of 5 (tasks T017–T021), 2026-10-29, `HEAD=186d6ce9b` before this part's commits.
+
+## S1 — Route a feature-scale change · EXECUTED 2026-10-29
+
+`quickstart.md` S1 runs the route action against a feature-scale change. The command below is
+S1 verbatim, with the `.specify/` mirror path (the shipped copy, not the canonical source):
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route \
+    --nature feature --traceability required \
+    --blast-radius cross-cutting --reversibility hard \
+    --complexity standard --format json
+```
+
+Real output, exit `0`:
+
+```json
+{
+  "action": "route",
+  "owner_document": "/storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/sdd-routing-definitions.md",
+  "verdict": "sdd",
+  "reason_code": "sdd-capability-or-contract-change",
+  "triggered_conditions": [
+    "nature-feature",
+    "traceability-required",
+    "blast-cross-cutting",
+    "reversal-hard",
+    "complexity-low",
+    "bounded-correction-recorded"
+  ],
+  "inputs": {
+    "change_nature": "feature",
+    "traceability": "required",
+    "blast_radius": "cross-cutting",
+    "reversibility": "hard",
+    "complexity": "standard"
+  },
+  "effective_blast_radius": "cross-cutting",
+  "bounded_correction_rationale": null,
+  "absent_inputs": [],
+  "ambiguous_inputs": [],
+  "actor": null,
+  "recorded_at": null,
+  "override": null
+}
+# RC=0
+```
+
+**Reading**: the expected shape from `quickstart.md` holds — verdict `sdd`, a reason code from the
+owner's closed vocabulary (`sdd-capability-or-contract-change` is the first declared *sdd* row whose
+condition held), and the five input values echoed back. The two `direct`-branch condition ids in
+`triggered_conditions` are expected and documented in the owner's § Precedence: the carried set is
+every triggered condition across the three branches, so a marginal direct condition that held but was
+absorbed by the higher-precedence verdict still appears.
+
+## S2 — Route a bounded maintenance change · EXECUTED 2026-10-29
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route \
+    --nature maintenance --traceability not-required \
+    --blast-radius local --reversibility reversible \
+    --complexity standard --format json
+```
+
+Real output, exit `0`:
+
+```json
+{
+  "action": "route",
+  "owner_document": "/storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/sdd-routing-definitions.md",
+  "verdict": "direct",
+  "reason_code": "direct-conditions-all-hold",
+  "triggered_conditions": [
+    "nature-preserves",
+    "traceability-not-required",
+    "blast-local",
+    "reversal-reversible",
+    "complexity-low",
+    "bounded-correction-recorded"
+  ],
+  "inputs": {
+    "change_nature": "maintenance",
+    "traceability": "not-required",
+    "blast_radius": "local",
+    "reversibility": "reversible",
+    "complexity": "standard"
+  },
+  "effective_blast_radius": "local",
+  "bounded_correction_rationale": null,
+  "absent_inputs": [],
+  "ambiguous_inputs": [],
+  "actor": null,
+  "recorded_at": null,
+  "override": null
+}
+# RC=0
+```
+
+**Reading**: verdict `direct` with the record naming all six conditions that held (C-22 is an `all`
+branch, so the record shows the whole conjoint set, not just one witness). The value literals used
+here (`maintenance`, `not-required`, `local`, `reversible`, `standard`) are the owner document's
+declared domain values — S2's own disclaimer said the example would be wrong if they differed, and
+they do not.
+
+## S3 — A missing input never falls through to direct · EXECUTED 2026-10-29
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route \
+    --nature maintenance --traceability not-required \
+    --blast-radius local --reversibility reversible --format json
+```
+
+Real output, exit `0` — the complexity tier was not declared, and every supplied value points at
+direct:
+
+```json
+{
+  "action": "route",
+  "owner_document": "/storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/sdd-routing-definitions.md",
+  "verdict": "adjudicate",
+  "reason_code": "adjudicate-missing-input",
+  "triggered_conditions": [
+    "input-missing",
+    "nature-preserves",
+    "traceability-not-required",
+    "blast-local",
+    "reversal-reversible",
+    "bounded-correction-recorded"
+  ],
+  "inputs": {
+    "change_nature": "maintenance",
+    "traceability": "not-required",
+    "blast_radius": "local",
+    "reversibility": "reversible",
+    "complexity": null
+  },
+  "effective_blast_radius": "local",
+  "bounded_correction_rationale": null,
+  "absent_inputs": [
+    "complexity"
+  ],
+  "ambiguous_inputs": [],
+  "actor": null,
+  "recorded_at": null,
+  "override": null
+}
+# RC=0
+```
+
+The conflicting form from the same scenario — a feature-scale change paired with a bounded
+definition correction:
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route \
+    --nature feature --blast-radius local-bounded-definition-correction \
+    --traceability not-required --reversibility reversible --complexity trivial \
+    --rationale "只收紧一处定义措辞" --format json
+# verdict: adjudicate / reason_code: adjudicate-conflicting-inputs
+# triggered_conditions: input-conflicting, nature-feature, blast-cross-cutting, ...
+# RC=0
+```
+
+**Reading**: both adjudicate forms exit `0` — an adjudication is a produced verdict, not an engine
+failure (C-28) — and neither falls through to `direct` even though five of the six direct conditions
+held in the first case. `absent_inputs` names the missing input rather than leaving the reader to
+infer it.
+
+## S1 / S2 / S3 — golden table judged row by row · EXECUTED 2026-10-29
+
+The owner document's § Golden case table is the row set's single landing place; the golden action
+parses it and judges every row. Two runs, byte-identical:
+
+```console
+$ python3 scripts/python/sdd-route.py --action golden --format json > notes/golden-run1.json   # RC=0
+$ python3 scripts/python/sdd-route.py --action golden --format json > notes/golden-run2.json   # RC=0
+$ cmp notes/golden-run1.json notes/golden-run2.json && echo identical
+identical
+$ sha256sum notes/golden-run1.json notes/golden-run2.json
+7ad8419ee75bbdd9d33d57b5662003a22ab24553509ff15dc036bdbce97b8fe9  notes/golden-run1.json
+7ad8419ee75bbdd9d33d57b5662003a22ab24553509ff15dc036bdbce97b8fe9  notes/golden-run2.json
+```
+
+Row-by-row check (`--action golden --format text`, exit `0`):
+
+```text
+ok   G1-feature-scale: sdd / sdd-capability-or-contract-change (expected sdd / sdd-capability-or-contract-change)
+ok   G2-bounded-maintenance: direct / direct-conditions-all-hold (expected direct / direct-conditions-all-hold)
+ok   G3-cross-cutting: sdd / sdd-cross-cutting-radius (expected sdd / sdd-cross-cutting-radius)
+ok   G4-irreversible: sdd / sdd-hard-reversal (expected sdd / sdd-hard-reversal)
+ok   G5-ambiguous-value: adjudicate / adjudicate-ambiguous-value (expected adjudicate / adjudicate-ambiguous-value)
+ok   G6-conflicting: adjudicate / adjudicate-conflicting-inputs (expected adjudicate / adjudicate-conflicting-inputs)
+ok   G7-bounded-definition-correction: direct / direct-conditions-all-hold (expected direct / direct-conditions-all-hold)
+ok   G8-missing-input: adjudicate / adjudicate-missing-input (expected adjudicate / adjudicate-missing-input)
+ok   G9-definition-class-default: sdd / sdd-cross-cutting-radius (expected sdd / sdd-cross-cutting-radius)
+ok   G10-complexity-high: sdd / sdd-complexity-high (expected sdd / sdd-complexity-high)
+ok   G11-traceability: sdd / sdd-traceability-required (expected sdd / sdd-traceability-required)
+ok   G12-bounded-without-rationale: adjudicate / adjudicate-missing-input (expected adjudicate / adjudicate-missing-input)
+ok   G13-all-sdd-conditions: sdd / sdd-capability-or-contract-change (expected sdd / sdd-capability-or-contract-change)
+ok   G14-ambiguous-beats-conflict: adjudicate / adjudicate-ambiguous-value (expected adjudicate / adjudicate-ambiguous-value)
+14 cases, all_match=True
+```
+
+**Ambiguous and conflicting rows return `adjudicate`, never `direct`** (the explicit re-check T021
+asks for): G5 and G14 both land on `adjudicate / adjudicate-ambiguous-value`, G6 on
+`adjudicate / adjudicate-conflicting-inputs`. G14 is the code-taking-order witness — it hits *both*
+an ambiguous value and the conflict combination, and the record shows
+`triggered_conditions: [input-ambiguous, input-conflicting, nature-feature, blast-cross-cutting, ...]`
+while the reason code is the earlier declared row (`adjudicate-ambiguous-value`, row 2, taken ahead
+of `adjudicate-conflicting-inputs`, row 3), so every triggered condition is carried and two
+evaluations of the same inputs stay byte-identical (C-24).
+
+**Pinning tests**: `tests/contract/test_sdd_routing_engine.py` (21 cases: determinism, precedence,
+reason-code order, exit alphabet, zero writes, three owner-document mutation probes, golden row
+judging, golden byte-identity). **Full logs**: `green-t021.txt`, `golden-run1.json`,
+`golden-run2.json`, `golden-rows.txt`.
