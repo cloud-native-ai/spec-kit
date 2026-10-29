@@ -1,0 +1,202 @@
+F.FFFFFFFFF....F.                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_c9_the_predicate_narrows_to_exactly_three_conditions ___________
+
+    def test_c9_the_predicate_narrows_to_exactly_three_conditions():
+        """Only a dispatch satisfying all three conditions may name a driver (C-9).
+    
+        The three conditions are asserted by their distinguishing tokens rather than by one
+        sentence: (1) the recipient Agent definition declares the capability key, (2) its seat
+        policy declares the same key, (3) the assigned task is an SDD assignment. The third
+        condition's definition (and its exclusion set) must be stated, because a term nobody
+        defines is not decidable.
+        """
+        gov = _governance()
+>       assert "sdd-invocation" in gov, (
+            "owner site must name the capability key the recipient Agent definition declares (C-9/1)"
+        )
+E       AssertionError: owner site must name the capability key the recipient Agent definition declares (C-9/1)
+E       assert 'sdd-invocation' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:211: AssertionError
+________ test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate _________
+
+    def test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate():
+        """The unqualified "loop depth is always 1" claim is the sentence the narrowing replaces.
+    
+        Leaving it in place would state a contradiction: an unconditioned depth-1 rule beside a
+        predicate that permits depth 2.
+        """
+        gov = _governance()
+>       assert "loop depth is always 1" not in gov, (
+            "the owner site still carries the unqualified 'loop depth is always 1' sentence beside "
+            "the narrowed predicate — the two cannot both hold (C-11)"
+        )
+E       AssertionError: the owner site still carries the unqualified 'loop depth is always 1' sentence beside the narrowed predicate — the two cannot both hold (C-11)
+E       assert 'loop depth is always 1' not in '\nThe Visib...unchanged.\n'
+E         
+E         'loop depth is always 1' is contained here:
+E            escapes (loop depth is always 1: driver → stage executor). The operational enforcement lives in `skills/internal/run-agent/SKILL.md` dispatch governance (pre-dispatch probe extended to this obligation); the ruling's provenance is the sdd-loop-driver Driver Topology defect fix (2026-10-16).
+E         ?           ++++++++++++++++++++++
+E           
+E           The obligation binds all three execution modes (native / virtual / external) equally, and virtual mode is not exempt merely because the session itself holds a standing instruction layer. It is a **caller-si...
+E         
+E         ...Full output truncated (1 line hidden), use '-vv' to show
+
+tests/contract/test_sdd_invocation_governance.py:252: AssertionError
+________________ test_c9_no_second_copy_of_the_prohibition_set _________________
+
+    def test_c9_no_second_copy_of_the_prohibition_set():
+        """The narrowed prohibitions are stated once, on the owner site (C-9).
+    
+        "The amendment states the predicate without moving the obligation, and no second copy of
+        the predicate is created elsewhere": a second landing place is exactly what this counts.
+        """
+        for literal in PROHIBITIONS:
+            hits = [path for path in _framework_sources() if literal in _safe_read(path)]
+>           assert hits == [SUBAGENT_DEFS], (
+                f"the prohibition {literal!r} must be declared on exactly one source surface "
+                f"({SUBAGENT_DEFS.relative_to(REPO_ROOT)}), found on "
+                f"{[str(path.relative_to(REPO_ROOT)) for path in hits]} (C-9)"
+            )
+E           AssertionError: the prohibition 'MUST NOT start or host any SDD run' must be declared on exactly one source surface (shared/definitions/subagent-definitions.md), found on [] (C-9)
+E           assert [] == [PosixPath('/...initions.md')]
+E             
+E             Right contains one more item: PosixPath('/storage/project/cloud-native-ai/spec-kit/shared/definitions/subagent-definitions.md')
+E             Use -v to get more diff
+
+tests/contract/test_sdd_invocation_governance.py:270: AssertionError
+_____________ test_c10_the_probe_calls_the_engine_and_fails_closed _____________
+
+    def test_c10_the_probe_calls_the_engine_and_fails_closed():
+        """C-10: the pre-dispatch probe calls the C-8 action, refuses before dispatch, and names
+        the failed condition; a caller cannot repair a refusal by rewording the prompt."""
+        probe = _probe()
+>       assert "sdd-route.py" in probe and "--action authorize" in probe, (
+            "the probe must call the engine action of C-8 rather than re-reading the definitions in "
+            "prose (C-10)"
+        )
+E       AssertionError: the probe must call the engine action of C-8 rather than re-reading the definitions in prose (C-10)
+E       assert ('sdd-route.py' in 'Anti-nesting obligation (反嵌套，派发前拦截)**: the outgoing prompt MUST NOT reference any\ndriver/loop skill (e.g. `sdd-loop-...ligation declared in\n`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.\n\n')
+
+tests/contract/test_sdd_invocation_governance.py:286: AssertionError
+____ test_c11_the_permitted_chain_is_depth_two_with_its_three_prohibitions _____
+
+    def test_c11_the_permitted_chain_is_depth_two_with_its_three_prohibitions():
+        """C-11: team orchestrator → invoking member (driver host) → stage executor (leaf), in
+        place of the unqualified depth-1 sentence, with the three prohibitions stated."""
+        gov = _governance()
+>       assert "depth 2" in gov, "the permitted chain's depth must be stated as depth 2 (C-11)"
+E       AssertionError: the permitted chain's depth must be stated as depth 2 (C-11)
+E       assert 'depth 2' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:315: AssertionError
+__________________ test_c12_virtual_mode_must_not_host_a_run ___________________
+
+    def test_c12_virtual_mode_must_not_host_a_run():
+        """C-12: virtual execution occupies the orchestrating session, so it can never host."""
+        gov = _governance()
+        assert "virtual mode" in gov, "the virtual-mode exclusion must be stated on the owner site"
+>       assert "MUST NOT host an SDD run" in gov, (
+            "the model must refuse virtual-mode hosting as a rule, not as a preference (C-12)"
+        )
+E       AssertionError: the model must refuse virtual-mode hosting as a rule, not as a preference (C-12)
+E       assert 'MUST NOT host an SDD run' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:328: AssertionError
+__ test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism ___
+
+    def test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism():
+        """C-13: one run per member, no escape, and the second-duty case resolved by the existing
+        line regime rather than by a new concurrency primitive."""
+        gov = _governance()
+>       assert "at most one SDD run at a time" in gov, (
+            "the per-member cap must be stated as a hard rule (C-13)"
+        )
+E       AssertionError: the per-member cap must be stated as a hard rule (C-13)
+E       assert 'at most one SDD run at a time' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:344: AssertionError
+____ test_c14_a_refusal_record_names_the_condition_and_the_resolved_values _____
+
+    def test_c14_a_refusal_record_names_the_condition_and_the_resolved_values():
+        """C-14: a record stating only "not authorized" is non-conforming — the two halves exist
+        precisely so a reader can tell a policy decision from a missing declaration."""
+        gov = _governance()
+        for token in ("failed condition", "resolved values", "source paths", "seat slug"):
+>           assert token in gov, (
+                f"the refusal record's required field {token!r} is not stated (C-14)"
+            )
+E           AssertionError: the refusal record's required field 'failed condition' is not stated (C-14)
+E           assert 'failed condition' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:369: AssertionError
+_ test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch _
+
+    def test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch():
+        """C-15: stage executors cannot start a run, and every prompt naming a driver without the
+        three conditions is blocked before dispatch."""
+        gov = _governance()
+        assert "stage executor" in gov, (
+            "the stage-executor refusal must be stated on the owner site (C-15)"
+        )
+>       assert "MUST NOT start or host any SDD run" in gov, (
+            "the stage executor is a leaf: it must be stated as a rule, not as guidance (C-15)"
+        )
+E       AssertionError: the stage executor is a leaf: it must be stated as a rule, not as guidance (C-15)
+E       assert 'MUST NOT start or host any SDD run' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:385: AssertionError
+________ test_c16_no_confirmation_gate_no_scheduler_no_second_registry _________
+
+    def test_c16_no_confirmation_gate_no_scheduler_no_second_registry():
+        """C-16: the authorization surface's only stored state is the two declared values."""
+        gov = _governance()
+        for token in (
+            "no confirmation gate",
+            "no scheduler",
+            "no second registry",
+            "two declared values",
+        ):
+>           assert token in gov, f"the owner site must state {token!r} (C-16)"
+E           AssertionError: the owner site must state 'no confirmation gate' (C-16)
+E           assert 'no confirmation gate' in '\nThe Visibility Contract above owns whether a dispatch is **observable**. This section owns whether it is **governed... that depends on one execution path can be bypassed by choosing another, so the wrapper stays generic and unchanged.\n'
+
+tests/contract/test_sdd_invocation_governance.py:402: AssertionError
+______________ test_the_four_dispatch_forms_each_carry_their_rule ______________
+
+    def test_the_four_dispatch_forms_each_carry_their_rule():
+        """US3's independent test: only the authorized SDD assignment is dispatched; the other
+        three forms are refused on a surface that names the blocking rule.
+    
+        Form 1 is decided behaviourally by the two cases above, so it contributes no token here;
+        it stays in the table so the form set is closed and a dropped form is visible.
+        """
+        surfaces = {"owner": _governance(), "probe": _probe()}
+        for form, surface, tokens in FORMS:
+            if surface == "behaviour":
+                continue
+            body = surfaces[surface]
+            for token in tokens:
+>               assert token in body, (
+                    f"dispatch form {form!r} is not decidable: the {surface} surface does not "
+                    f"name {token!r}"
+                )
+E               AssertionError: dispatch form 'prompt-names-a-driver' is not decidable: the probe surface does not name 'failed condition'
+E               assert 'failed condition' in 'Anti-nesting obligation (反嵌套，派发前拦截)**: the outgoing prompt MUST NOT reference any\ndriver/loop skill (e.g. `sdd-loop-...ligation declared in\n`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation.\n\n'
+
+tests/contract/test_sdd_invocation_governance.py:466: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_the_predicate_narrows_to_exactly_three_conditions
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_no_second_copy_of_the_prohibition_set
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c10_the_probe_calls_the_engine_and_fails_closed
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c11_the_permitted_chain_is_depth_two_with_its_three_prohibitions
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c12_virtual_mode_must_not_host_a_run
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c14_a_refusal_record_names_the_condition_and_the_resolved_values
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c16_no_confirmation_gate_no_scheduler_no_second_registry
+FAILED tests/contract/test_sdd_invocation_governance.py::test_the_four_dispatch_forms_each_carry_their_rule
+11 failed, 6 passed in 0.24s
+RC=1

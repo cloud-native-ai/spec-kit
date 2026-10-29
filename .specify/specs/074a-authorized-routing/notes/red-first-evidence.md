@@ -288,3 +288,45 @@ $ bash scripts/bash/run-tests.sh --names-out notes/targeted-set-v1-failed.txt <t
 Name-level identical to the implement-start re-capture (191 passed, 0 failed names), so this part
 introduces no new failure in the slice's non-regression set. No second full-suite run was made: the
 E2 baseline slot was consumed at implement start (`test-evidence/implement.jsonl` seq 1).
+
+---
+
+# Part 4 of 5 — tasks T022–T025 (US3, started from `HEAD=0dbe8897b`)
+
+## T022 — `tests/contract/test_sdd_invocation_governance.py` (red)
+
+Written after US1/US2 closed and **before** the owner site's amendment (the narrowing, the depth-2
+chain, the virtual prohibition, the cap and the refusal record) and before the probe is wired to the
+engine. The file decides each clause on the surface that carries it: the owner site
+(`shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation), the probe
+(`skills/internal/run-agent/SKILL.md`, anti-nesting paragraph), and the executable half
+(`scripts/python/sdd-route.py --action authorize`).
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_invocation_governance.py
+F.FFFFFFFFF....F.                                                        [100%]
+=========================== short test summary info ============================
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_the_predicate_narrows_to_exactly_three_conditions
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_the_exclusivity_sentence_is_replaced_by_the_predicate
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c9_no_second_copy_of_the_prohibition_set
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c10_the_probe_calls_the_engine_and_fails_closed
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c11_the_permitted_chain_is_depth_two_with_its_three_prohibitions
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c12_virtual_mode_must_not_host_a_run
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c14_a_refusal_record_names_the_condition_and_the_resolved_values
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c15_stage_executors_and_unqualified_prompts_are_blocked_before_dispatch
+FAILED tests/contract/test_sdd_invocation_governance.py::test_c16_no_confirmation_gate_no_scheduler_no_second_registry
+FAILED tests/contract/test_sdd_invocation_governance.py::test_the_four_dispatch_forms_each_carry_their_rule
+11 failed, 6 passed in 0.24s
+# RC=1
+```
+
+**Reading of the red**: the eleven failures are the eleven *declaration* cases — every one fails as
+a **missing statement** on the surface that owns it (`'no confirmation gate' in gov` → the C-16
+sentence does not exist yet; `dispatch form 'prompt-names-a-driver' … does not name 'failed
+condition'` → the probe still restates the obligation in prose). No case fails as a contradictory
+assertion, and no case fails for a reason outside US3's scope. The six passes are the two
+behavioural groups (the allowed form, and the three refusal cases naming `seat` / `agent` / `both`)
+plus the two containment guards (`test_c9_the_original_prohibition_survives_word_for_word`,
+`test_the_pre_existing_probe_terms_still_hold`): they consume surfaces US1/us already landed, and
+they are here so that the narrowing cannot pass by disturbing them. Full log: `red-t022.txt`.
