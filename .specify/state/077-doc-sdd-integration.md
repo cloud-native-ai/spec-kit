@@ -4,13 +4,14 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: analyze
-stage_started_at: 1793297689
-stage_deadline_epoch: 1793303089
-stage_base_commit: 6217a86f
-attempt: 1
+stage: implement
+stage_started_at: 1793299603
+stage_deadline_epoch: 1793305003
+stage_base_commit: f7ec22c5
+attempt: 0
 retry_limit: 2
-last_verdict: analyze #2 BLOCKED（1 HIGH / 6 MEDIUM / 5 LOW）→ spec-only 修复轮：R-01…R-07 + 5 LOW 全处置；计数保持 25 FR / 8 SC / 77 条款 / 6 STR / 28 任务；七道门 + R-01 算术自检全过；待 analyze #3 复核
+last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH（5 MEDIUM / 10 LOW）；实现前提醒 F-01/F-02/F-03 已由 `f7ec22c5` 微修（13/13）；implement 起点全量运行中（后台 b7yhd4v28）
+<!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -109,6 +110,23 @@ last_verdict: analyze #2 BLOCKED（1 HIGH / 6 MEDIUM / 5 LOW）→ spec-only 修
 - 处置：R-01 取「构建并入单条结果」——站点构建是 `G-implement-structure` 的 `face=build` 子行；删除「算子总数 − (passed+failed) = NA 条数」跨级等式；SC-003 改面级断言。R-02 收窄 `error ∈ {owner-unavailable, -}`。R-03 更正并留日期注记。R-04 改为 reader / evidence / duplicate / count 四面 + `structure` 子步。R-05 改为 `scripts/python/scan-confirmation-gates.py`。R-06 T028 增自有断言。R-07 补 tasks 记录（`ab288aab` / `45b6b732`）、`239 行` 改指针、处置表补第 20–29 行
 - 门：validate-requirements / validate-tasks / account-clause-coverage / pre-analyze --stage tasks / validate-decision-tensions / sync-mirrors --check / regen-command-copies --check 全 exit 0（证据 `test-evidence/*-fix2.txt`）；R-01 算术自检 PASS（`test-evidence/r01-na-arithmetic-fix2.txt`）
 - 计数：25 FR / 8 SC / 77 条款 / 6 STR / 28 任务；`coverage-baseline.txt` 未重冻结；`expression-gates.md` 与 `flow-class-definitions.md` 未改动
+
+### analyze #1–#3 — PASS（2026-10-30）
+
+- analyze #1（`d05d3bef`）：14 HIGH / 9 MEDIUM / 6 LOW → 修复 `6217a86f`（29/29）
+- analyze #2（`6217a86f`）：1 HIGH（R-01 NA 计数单位）/ 6 MEDIUM / 5 LOW → 修复 `0c8f95d3`（12/12，R-01 取「构建并入 `G-implement-structure` 单条结果、删槽位等式、NA 面级」）
+- analyze #3（`0c8f95d3`）：**0 CRITICAL / 0 HIGH** / 5 MEDIUM / 10 LOW → 放行 implement；实现前提醒 F-01/F-02/F-03 由 `f7ec22c5` 微修（13/13，记录形态，计数不变）
+- 七道门全程 exit 0；069 契约与状态零回写
+
+## Implement 分段计划
+
+- **拆解决策**：`single-package`（reason=not-beneficial）——28 任务 ≤ 40、共享同一引擎与七模板、拆包无收益
+- **测试预算**：implement 起点一次全量（`baseline-failed.txt`，后台 b7yhd4v28，PATH 修正）；中间定向；review 后一次 closure
+- **分段**（每段 ≤8 任务）：
+  1. **P1**：T001–T008（证据槽 / `spec:` 键 / 声明文法与发现 / requirements 模板 / 台账边界）
+  2. **P2**：T009–T015（七模板接线 / 两 owner 追加 / 闭合集守卫 / 文档结构 CLI 与两向比对）
+  3. **P3**：T016–T022（驱动载荷四元组 / stage-prompts / efficiency-model 槽位 / SKILL / 零新增机制 / 镜像）
+  4. **P4**：T023–T028（两态等价 / 069 不变量 / owner 取证 / quickstart S1–S7 / 收尾门禁 / plan 模板骨架）
 
 ## 测试预算（E2/E3）
 
