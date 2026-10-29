@@ -184,3 +184,53 @@ handoff completeness test derives its required field set from the document's own
 A per-seat walk-through of the same engine against the fixture — the allowed seat, the forbidden
 seat, and the malformed `seats:` map — is recorded with its real output in `quickstart-run.md`
 § S4 / § S5 (full log: `green-t016-demo.txt`).
+
+---
+
+Part 3 of 5 (tasks T017–T021), 2026-10-29, starting from `HEAD=186d6ce9b`.
+
+## T018 — `tests/contract/test_sdd_routing_engine.py` (red)
+
+Written after T017 landed the routing body in the owner document (five input domains, verdict
+table, precedence, conflict set, reason codes) and **before** `scripts/python/sdd-route.py` has the
+`route` / `golden` actions. Red shape is the one the task predicts: **the two actions do not exist**.
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_routing_engine.py
+EEEEEEEEEEEEEEEEEEEEE                                                    [100%]
+E       AssertionError: --action route / golden missing from
+E       /storage/project/cloud-native-ai/spec-kit/scripts/python/sdd-route.py (delivered by task
+E       T019); the parser offered: "usage: sdd-route.py [-h] --action {authorize} ...\nsdd-route.py:
+E       error: argument --action: invalid choice: '__absent-action__' (choose from 'authorize')"
+...
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_is_deterministic
+ERROR tests/contract/test_sdd_routing_engine.py::test_route_feature_scale_returns_sdd
+... (21 errors, one per case)
+21 errors in 0.82s
+# RC=1
+```
+
+**Reading of the red**: all 21 cases fail on absence through an autouse guard that reads the
+parser's own invalid-choice diagnostic. That guard is the anti-false-green device for this module:
+without it, `python3 <engine> --action route` exits `2` for a *missing action* exactly as it does
+for a *malformed input*, so every `rc == 2` assertion would pass while `rc == 0` behaviour was never
+exercised. No case fails on a contradictory assertion and none passes vacuously (full log:
+`red-t018.txt`).
+
+## T017 / T021 — `tests/contract/test_sdd_routing_definitions.py` (red → green)
+
+The T005 red (5 failed / 9 passed, § T005 above) turns green at T017, which landed § Inputs,
+§ Definition-class default, § Verdict table, § Precedence, § Conflict set, § Reason codes,
+§ User override, § Per-duty application and § Verdict record in the owner document:
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_routing_definitions.py
+..............                                                           [100%]
+14 passed in 0.10s
+# RC=0
+```
+
+Full log: `green-t017.txt`. The five cases that were red at T005 are the same five that pass here —
+the landing-resolution check, the five-input domain table, the `definition-class` value, the
+tier-by-reference rule and the forbidden-input rule — so the green is the same case set, not a
+reduced one. The US2 close-out run (both modules together) is appended from T021's measurement.
