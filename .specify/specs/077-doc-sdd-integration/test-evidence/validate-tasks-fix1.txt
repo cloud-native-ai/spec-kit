@@ -1,0 +1,8 @@
+# /speckit.analyze fix round (fix1) — full capture, no truncation
+# captured_at: 2026-10-29T18:13:58Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/validate-tasks.py .specify/specs/077-doc-sdd-integration/tasks.md
+PASS: .specify/specs/077-doc-sdd-integration/tasks.md — 0 error(s), 0 warning(s)
+
+# exit=0

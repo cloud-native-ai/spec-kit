@@ -202,6 +202,7 @@
 - [ ] **CHK039** — **fail** — 确认门预算 27 在改动后由哪条 FR / 契约 / 任务**重新测量**？ `[Coverage · Plan §Constraints · Plan §research R-12]`
   - 证据: R-12「实测 `scan-confirmation-gates.py --summary` = blocking gates **27**…该预算是整数、零余量」（今日复跑仍为 `blocking confirmation gates: 27`）；但 077 的 25 条 FR / 8 条 SC / 6 份契约都没有提到它，27 个任务里也没有一行跑扫描器。既有守卫只对四个具名面断言零命中（`GOAL_SURFACES` / `RUN_DETERMINATION_SURFACES`），总量断言是 `cap = baseline["total"] * 0.25`，+1 不会转红。
   - 风险形态: 七模板子节的措辞一旦命中阻断式确认语，预算从 27 变 28，没有任何门会响；「零整数余量」只停留在 plan 的散文里。
+  - **更正（2026-10-30 analyze 修复轮）**: 上面这句「没有任何门会响」描述的是**既有守卫的现状**（总量断言是 `baseline.total * 0.25`，+1 不转红），不是本缺口可被接受的结论——它正说明缺口必须靠**直接读计数**关闭。修复已落：requirements FR-022 把「两次 `scan-confirmation-gates.py --summary` 的 `blocking confirmation gates` 计数相等」写成可判定条款，SC-006 同列该项，T021 增加一次扫描器运行与两次读数对照。故本缺口不再是「预算只活在散文里」。
   - 将继承缺口的实现面: **T010**（子节措辞）、**T021/T027**（无门禁计数任务）。
 
 - [ ] **CHK040** — **fail** — Feature 登记里的派生计数是否由某个任务重新校准？ `[Consistency · Gap · Plan §Feature Integration · T024]`
@@ -220,3 +221,35 @@
 - **User-specified items incorporated**: 七条重点全部落为分节骨架；其中 4 条（③ 的剥离边界、④ 的两向输入与 plan 指令面、⑤ 的 U4 证据绑定与 `not-applicable` 计数、⑦ 的确认门预算）各拆出多于一条检查项
 - **Same-author condition**: held；检测走受限直读（subagent unavailable），见文件头标记
 - **No repair in this stage**: 19 条 fail 均只点名继承面，未修改任何 plan-owned 工件
+
+---
+
+## 修复轮处置（/speckit.analyze 之后，2026-10-30）
+
+> 本节是**追加的处置记录**，不改写上文的判定与证据（上文是 checklist 阶段的 dated record）。19 条 `fail`
+> 全部由 `/speckit.analyze` 修复轮关闭；`/speckit.analyze` 的 29 条发现（14 HIGH / 9 MEDIUM / 6 LOW）逐条对应下表。
+
+| CHK | 处置落点 | 修法一句话 |
+|-----|----------|------------|
+| CHK004（exit-1 无停止句） | FR-005、`contracts/class-declaration.md` C-009、`contracts/stage-wiring.md` C-003、data-model E4、T009/T010 | 接线子节增「退出码 1 的停止句」，并明确它 MUST NOT 落入「既有门禁集逐字不变」那一支 |
+| CHK005（MUST vs 缺省合法） | FR-001/FR-004、C-001/C-008（decl）、E3 | 择一：MUST 只约束**新增声明线**，存量线按缺省 + advisory 码 `declaration-absent`（退出码 0） |
+| CHK009（引擎缺席不可观测） | FR-009、C-012（res）、E3 | 改为**调用方可观察**触发（引擎文件不存在 / 拒绝执行 / 无记录 → 由调用方记 `owner-unavailable`） |
+| CHK010（8 vs 9 字段） | FR-003、C-004（res）、E2、T002/T004 | 统一为**九项**（含 `error`），"MUST NOT 新增第十项" |
+| CHK011（查找顺序声明错） | FR-003、C-009（res）、E3、FR-011 豁免①、T007 | 承认这是**顺序变更**（owner 先于键文法），登记可观察差异（`invalid-unit-id` → `owner-unavailable`，同为退出码 2） |
+| CHK014（子节标题无字面量 owner） | R-9、C-002（wire）、E4、T009/T010 | 标题登记为**唯一字面量**（登记处 = R-9，STR 表行数不变） |
+| CHK015（剥离边界未定） | C-007（wire）、R-9、T009/T010 | 钉死算法（起点=标题行，终点=下一个 `^#{1,3} ` 行前一行）+ 块末恰一个空行 + **可复算样例** |
+| CHK019（缺三缺节码） | FR-013、C-001/C-013（doc）、E6、T013/T014 | 统一 `subsection-missing`（`name=` 取四个登记字面量）+ `document-structure-missing` |
+| CHK021（无落文输入） | FR-014、C-008（doc）、E6、T013/T014/T015 | 把既有 `--path` 登记为落文输入；缺省只做 plan 侧并标 `two-way: not-run` |
+| CHK022（plan 侧不产四子节） | FR-013/FR-023、C-001（doc）、E5、**T028**、plan § Plan Edits | `templates/plan-template.md` 进接线面与编辑面，任务 27→28 |
+| CHK023（结构绿内容红无实例） | FR-017、C-019（doc）、SC-004 与 Source | 增「结构/链接/构建零新增违规 + 证据面缺 `source`」的落文夹具，并消歧「结构动作 finding ≠ 门禁结构面」 |
+| CHK026（U4 四项 vs 算子表） | FR-017/FR-019、C-017（doc）、C-004（drv）、T017/T018 | 「四面」= 门禁输出的面（`FACES`）；U4(a) 分母只取算子表（implement 1 行） |
+| CHK027（E7 无哈希） | FR-019(b)、C-004(b)（drv）、E7、T016/T017 | 择一：(b) 降为「存在且非空」，删哈希比对，并写明为何不给 E7 加字段 |
+| CHK028（四面两义） | FR-017/FR-020、C-017（doc）、C-006/C-007（drv）、SC-003 | 统一为 CLI `FACES = (reader, evidence, duplicate, count)`；结构两向登记为 `structure` 子步 |
+| CHK029（not-applicable 计 pass） | FR-020、C-007（drv）、E7/E8、SC-003 | `not-applicable` **单列**，不计 `passed`/`failed`，并由条数等式约束 |
+| CHK031（rc 无单一进程） | FR-020、C-006（drv）、E8、T019 | `rc` = 逐命令**非零优先**的聚合退出码；逐命令原始 rc 落证据文件；不新增聚合脚本 |
+| CHK033（降级不可表示） | FR-009/FR-018/FR-019(c)、C-001/C-004（drv）、E9、T017/T020 | 载荷增 `error=<label|->` 第四位；U4 在 `error` 非 `-` 时走 `owner-unavailable` 分支 |
+| CHK039（确认门预算） | FR-022、SC-006 与 Source、T021 + 本条更正行 | 写成可判定条款（两次扫描读数相等），T021 实跑扫描器 |
+| CHK040（派生计数 stale） | `.specify/memory/features.md` 077 行、`.specify/memory/features/077.md`、`checklists/requirements.md` | 计数一律**指针化**到 `validate-requirements.py` 输出，不再复述数字 |
+
+**未在任何行关闭的项**：无。**清单判定的保留**：上文的 21/19 判定仍是那个时点的实测结论，不回填为 pass——
+本节只说明它们在修复轮之后由谁承接。

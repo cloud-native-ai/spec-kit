@@ -23,7 +23,10 @@
 
 - **C-005** 分发判据 MUST 是「相对改动前基线零新增漂移」：`sync-mirrors.py --check` 与
   `regen-command-copies.py --check` 在本特性改动后 MUST 相对基线（两者均为退出码 0）无新增漂移。
-  `templates/commands/**` MUST NOT 进入 templates 镜像对，只经六套 per-tool 命令副本分发。(FR-024)
+  `templates/commands/**` MUST NOT 进入 templates 镜像对，只经 per-tool 命令副本分发。**副本套数 MUST 以脚本为准**：
+  `regen-command-copies.py` 的 `_ASSISTANT_COMMAND_DIRS` 最多登记六个目标，而它只为**本仓已存在**的目标目录产出副本
+  （当前本仓四个：`.claude` / `.github` / `.qoder` / `.opencode`）；契约 MUST NOT 写死某个套数，MUST NOT 把「六」当成
+  「本仓应产出的数量」。(FR-024)
 
 - **C-006** 未刷新的项目 MUST 保持改动前行为：旧副本不含类别读取，其七个模板 MUST NOT 出现接线子节。
   「刷新前后差异只出现在是否含类别读取」这一点上，MUST NOT 顺带改变其他行为。(FR-024)

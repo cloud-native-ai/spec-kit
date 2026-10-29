@@ -1,0 +1,8 @@
+# /speckit.analyze fix round (fix1) — full capture, no truncation
+# captured_at: 2026-10-29T18:13:58Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+
+# exit=0

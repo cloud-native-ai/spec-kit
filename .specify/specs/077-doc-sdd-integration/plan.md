@@ -16,10 +16,10 @@
    执行类剥离该子节后与基线提交 `c1cd4600` **逐字相同**（可复算的零行为变化）。
 3. **文档结构与逻辑硬约束 + 驱动接入**：表达类 `plan.md` 的 `## Document Structure` 四子节由
    `doc-consistency-check.py` 的**新动作** `--action structure` 校验（不新增第七面）；`sdd-loop-driver`
-   的派发载荷携带类别三元组、U4 增补四项 blocking 校验、两槽位换成两个文档门禁槽位
+   的派发载荷携带类别四元组、U4 增补四项 blocking 校验、两槽位换成两个文档门禁槽位
    （`selection_basis=docs-gate-full`，时点与审计口径不变）。
 
-交付面 = 7 个命令模板子节 + 1 个模板字段行 + 2 份 owner 的类条件追加 + 2 个既有引擎的扩展（1 个键族、
+交付面 = 7 个命令模板子节 + 1 个模板字段行 + 1 个 plan 模板的结构骨架（`## Document Structure` 四子节，判定侧的「可达一侧」）+ 2 份 owner 的类条件追加 + 2 个既有引擎的扩展（1 个键族、
 1 个动作）+ 3 份驱动 references 的类别分支 + 5 个新测试文件 + 1 个既有闭合集测试的名册修订。
 零新命令、零新门禁面、零新存储、零常驻进程、零第三方依赖。25 条 FR / 8 条 SC / 4 个用户故事。
 
@@ -30,10 +30,10 @@
 **Storage**: N/A——声明行落既有 `requirements.md` 头部；结构基线落既有 spec 目录的命名面（`<spec-dir>/structure-baseline.txt`，由 `--freeze` 打印、脚本不写文件）；槽位落既有状态脊围栏；门禁输出落既有 `test-evidence/`
 **Testing**: Tests Mode **ON**。五个新测试文件 red-first 写在实现之前（对象见 `research.md` R-10）；plan 期定向基线 = 14 个既有测试文件 **1015 passed**（`test-evidence/plan-targeted-tests-baseline.txt`）
 **Target Platform**: 仓库工具链（macOS 与 Linux），Python ≥3.8；两个引擎扩展均为只读、无常驻、无平台分支
-**Project Type**: 框架源（两顶帽子：改动落 `templates/`、`shared/`、`skills/`、`scripts/`；`.specify/` 副本与六套 per-tool 命令副本经既有再生成机制产出；`tests/` 无镜像）
+**Project Type**: 框架源（两顶帽子：改动落 `templates/`、`shared/`、`skills/`、`scripts/`；`.specify/` 副本与 per-tool 命令副本经既有再生成机制产出——副本套数以 `regen-command-copies.py` 实际产出的目标目录为准，注册表最多六个、本仓当前四个；`tests/` 无镜像）
 **Performance Goals**: 单次解析为「读一份 `requirements.md` 头部 + 正则匹配」，单次结构校验为一次线性扫描；无递归全仓遍历、无轮询、无后台进程
-**Constraints**: 解析退出码封闭三段（0/1/2）；结构 finding 码集封闭三族；模板子节 MUST NOT 出现 `G-` 算子 id、face id 表、`flow_class=` 赋值形与任何白名单；`--faces` 四面取值集与六面 owner 不变；`templates/commands/**` 不入 templates 镜像对；确认门预算零整数余量（实测 blocking gates 27），子节措辞 MUST NOT 新增阻断式确认句
-**Scale/Scope**: 7 个模板子节；1 个模板字段；2 份 owner 类条件追加；2 个引擎扩展；3 份驱动 references；6 份契约（77 条款）；5 个测试文件 + 1 个测试名册修订；镜像对以 `requirements.md` 的接线面与本节 Mirror Obligations 为准（行数不在本行重复）
+**Constraints**: 解析退出码封闭三段（0/1/2，另加一个退出码 0 的 advisory 码 `declaration-absent`）；结构 finding 码集封闭四族；模板子节 MUST NOT 出现 `G-` 算子 id、face id 表、`flow_class=` 赋值形与任何白名单；`--faces` 四面取值集与六面 owner 不变；`templates/commands/**` 不入 templates 镜像对；确认门预算零整数余量（实测 blocking gates 27），子节措辞 MUST NOT 新增阻断式确认句，且该预算按 requirements FR-022 在改动前后各测一次计数相等
+**Scale/Scope**: 7 个模板子节；1 个模板字段 + 1 个 plan 模板结构骨架；2 份 owner 类条件追加；2 个引擎扩展；3 份驱动 references；6 份契约（77 条款）；5 个测试文件 + 1 个测试名册修订；镜像对以 `requirements.md` 的接线面与本节 Mirror Obligations 为准（行数不在本行重复）
 
 ## Constitution Check
 
@@ -144,12 +144,13 @@ table, the rejection list or the threshold table.*
 ```text
 templates/commands/                          # 七个阶段模板各新增一个接线子节（docs / humanize 不动）
 templates/requirements-template.md           # 头部新增 **Flow Class** 字段行（Status 之后、Input 之前）
+templates/plan-template.md                   # 新增 `## Document Structure` 四子节骨架（表达类必要产出、执行类非必填）
 shared/definitions/flow-class-definitions.md # 类条件追加：特性线声明面与 `spec:` 键的消费方指针
 shared/workflow/expression-gates.md          # 类条件追加：特性线调用点行（六面与算子表不动）
 scripts/python/flow-class-check.py           # 扩展 `spec:` 键族 + 四个作者错误码 + 三段退出码
 scripts/python/doc-consistency-check.py      # 扩展 `--action structure`（--faces 四面不变）
 skills/external/sdd-loop-driver/SKILL.md     # 类别感知落点（指针 + Hard Requirement 的类别分支）
-skills/external/sdd-loop-driver/references/stage-prompts.md    # 第①段类别三元组 + U4 四项
+skills/external/sdd-loop-driver/references/stage-prompts.md    # 第①段类别四元组 + U4 四项
 skills/external/sdd-loop-driver/references/efficiency-model.md # §2 槽位内容的类别分支（时点与审计不变）
 tests/unit/test_flow_class_spec_key.py                        # 新建（red-first）
 tests/contract/test_flow_class_spec_declaration.py            # 新建（red-first）
@@ -160,24 +161,24 @@ tests/contract/test_expression_gate_wiring.py                 # 改写：闭合�
 .specify/specs/077-doc-sdd-integration/      # 本特性 plan 与设计产物（不含实现代码）
 ```
 
-**Structure Decision**: 本特性是**框架源的接线扩展**，不是新组件：七个模板加子节、两份 owner 加类条件段落、
+**Structure Decision**: 本特性是**框架源的接线扩展**，不是新组件：七个命令模板加子节、plan 模板加结构骨架、两份 owner 加类条件段落、
 两个既有引擎各加一个扩展点、三份驱动 references 加类别分支。唯一的「新增能力」是特性线声明这一对象族，
 它没有自己的存储——声明就是规格文件里的一行。两顶帽子明确：编辑面是 `templates/`、`shared/`、`skills/`、
-`scripts/`、`tests/`；`.specify/` 下的同名文件与六套 per-tool 命令副本一律由 `sync-mirrors.py` /
+`scripts/`、`tests/`；`.specify/` 下的同名文件与 per-tool 命令副本一律由 `sync-mirrors.py` /
 `regen-command-copies.py` 产出，MUST NOT 手改。
 
 ### Mirror Obligations
 
 镜像对清单的 owner 是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对）；本节按其行序登记本次受影响的四对
-与命令副本面。**基线**：改动前实测 `sync-mirrors.py --check` 退出码 0、六对全 `ok`
+与命令副本面（第 1 行现有两个文件：requirements 模板的字段行与 plan 模板的结构骨架）。**基线**：改动前实测 `sync-mirrors.py --check` 退出码 0、六对全 `ok`
 （skills/external 406 / skills/internal 136 / agents 3 / scripts 117 / shared 60 文件，templates 对同 `ok`），
 `regen-command-copies.py --check` 同样退出码 0；原始输出见 `test-evidence/plan-sync-mirrors-baseline.txt` 与
 `test-evidence/plan-regen-command-copies-baseline.txt`。
 
 | # | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |---|----------------------|---------------------------------------------------|--------|
-| 1 | `templates/requirements-template.md` | `.specify/templates/requirements-template.md` | 改动后跑 `sync-mirrors.py --check`，判据为「templates 对相对上述基线无新增漂移」，不以单一退出码作判据 |
-| 2 | `templates/commands/{requirements,clarify,plan,tasks,checklist,analyze,implement}.md` | **无 templates 镜像**（`commands` 在 MIRROR_PAIRS 的排除集内）；六套 per-tool 副本：`.claude/commands/speckit.<stem>.md`、`.github/prompts/speckit.<stem>.prompt.md`、`.hermes/commands/speckit.<stem>.md`、`.opencode/command/speckit.<stem>.md`、`.qoder/commands/speckit.<stem>.md`、`.codex/commands/speckit.<stem>.md`，由 `regen-command-copies.py` 产出 | 改动后跑 `regen-command-copies.py --check`，判据为「副本集合相对基线无新增漂移」且七套副本含接线子节（契约测试断言） |
+| 1 | `templates/requirements-template.md`、`templates/plan-template.md` | `.specify/templates/requirements-template.md`、`.specify/templates/plan-template.md` | 改动后跑 `sync-mirrors.py --check`，判据为「templates 对相对上述基线无新增漂移」，不以单一退出码作判据 |
+| 2 | `templates/commands/{requirements,clarify,plan,tasks,checklist,analyze,implement}.md` | **无 templates 镜像**（`commands` 在 MIRROR_PAIRS 的排除集内）；per-tool 副本由 `regen-command-copies.py` 产出——注册表 `_ASSISTANT_COMMAND_DIRS` 最多六个目标，但只为**本仓已存在**的目录产出，本仓当前四个：`.claude/commands/speckit.<stem>.md`、`.github/prompts/speckit.<stem>.prompt.md`、`.opencode/command/speckit.<stem>.md`、`.qoder/commands/speckit.<stem>.md`（`.codex` / `.hermes` 目录不存在，故不产出） | 改动后跑 `regen-command-copies.py --check`，判据为「副本集合相对基线无新增漂移」且**每个实际产出的副本**含接线子节（契约测试断言；套数由脚本实测，不写死） |
 | 3 | `shared/definitions/flow-class-definitions.md`、`shared/workflow/expression-gates.md` | `.specify/shared/definitions/…`、`.specify/shared/workflow/…` | 同 #1（shared 对） |
 | 4 | `scripts/python/flow-class-check.py`、`scripts/python/doc-consistency-check.py` | `.specify/scripts/python/…` 同名两份 | 同 #1（scripts 对） |
 | 5 | `skills/external/sdd-loop-driver/{SKILL.md,references/stage-prompts.md,references/efficiency-model.md}` | `.specify/skills/sdd-loop-driver/…`（skills/external 对的 `external` 层展开） | 同 #1（skills/external 对） |
@@ -193,7 +194,7 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
-| Data model | [`data-model.md`](data-model.md) | 9 entities（E1 声明行 / E2 解析记录 / E3 声明发现 / E4 接线卡 / E5 结构产物 / E6 结构违规 / E7 算子结果 / E8 槽位行 / E9 派发载荷）+ 9 行校验规则汇总 |
+| Data model | [`data-model.md`](data-model.md) | 9 entities（E1 声明行 / E2 解析记录 / E3 声明发现 / E4 接线卡 / E5 结构产物 / E6 结构违规 / E7 算子结果 / E8 槽位行 / E9 派发载荷）+ 校验规则汇总（行数以该文件 § 校验规则汇总 的实测为准，本表不复述计数） |
 | Contracts | [`contracts/`](contracts/) | 6 files：`class-declaration.md`(13) / `class-resolution.md`(12) / `stage-wiring.md`(13) / `document-structure.md`(19) / `driver-integration.md`(11) / `invariants-and-distribution.md`(9) = **77 条款**，全部 `md-bold-closed`（`clause_extract.py` 实测，`test-evidence/plan-clause-extract.txt`） |
 | Quickstart | [`quickstart.md`](quickstart.md) | 7 scenarios（S1 解析 / S2 三例判定 / S3 结构门禁 / S4 接线存在性 / S5 分发漂移 / S6 槽位审计 / S7 清理）；S1–S6 六个场景的「今天实测」输出均为本次会话跑出，实施后的期望值一律由各场景的 Pinned by 指名的测试负责 |
 | Feature reference | [`feature-ref.md`](feature-ref.md) | 25 条 FR → 设计落点 + 8 条 SC → 证据来源 |
@@ -201,3 +202,25 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 
 **与 Phase 0 预期的偏差**：预期 6 份契约、实际 6 份；预期「每个 FR 至少被引用一次」的 FR 车道实测
 `FR uncovered: 0`（25/25）。条款数（77）在写契约前未预设，是落盘后由 `clause_extract.py` 读出的。
+
+## Plan Edits
+
+*`/speckit.analyze` 修复轮（2026-10-30）对 plan 属主制品的逐行声明。`minor` = 措辞/计数/引用的收紧与更正，不改变已批准的范围与语义读数；`substantive` = 在「两种自洽读法」之间择一、或改变某条已声明义务的边界。所有 substantive 行都对应 analyze 报告点名的冲突簇，修复轮已按调用方派发逐条裁决（裁决记录见 `requirements.md` § Clarifications 的「analyze 修复轮裁决」小节），故未就地停机，而是把选择连同理由登记在此。*
+
+- **PLAN-EDIT**: `requirements.md` — 择一登记三处冲突（FR-001 的作用域收窄为「新增声明线」并新增 advisory 码 `declaration-absent`；FR-017 的「四面」定义为「门禁输出的面」而 U4(a) 取算子表分母；FR-019(b) 降为「存在且非空」、不做哈希），补 FR-005 的 exit-1 停止句、FR-009 的调用方可观察触发、FR-018 的 `error` 位、FR-020 的 `rc` 聚合与 `not-applicable` 单列、FR-022 的确认门计数判据、FR-023 的 `templates/plan-template.md`，并把派生计数改为指针；分类=**substantive**。
+- **PLAN-EDIT**: `data-model.md` — E2 字段集统一为九项（原「八项」与其自身 9 行表冲突）、E3 增 `declaration-absent` 与解析顺序变更登记、E4 增停止句与标题字面量指针、E5 增产出侧、E6 码族统一四族并增两个缺节码与落文输入、E7 计数规则与「不新增哈希字段」、E8 `rc` 聚合与 `not-applicable` 单列、E9 四元组；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/class-declaration.md` — C-001 作用域 + C-008 缺省两形态 + C-009 阶段侧停止句；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/class-resolution.md` — C-004 九项字段、C-006 补 `declaration-absent`、C-009 登记顺序变更、C-012 调用方可观察触发与降级可表示；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/stage-wiring.md` — C-002 标题字面量的登记处指向 R-9、C-003 增停止句、C-007 钉死剥离算法与块末单空行、C-012 接线面加 `templates/plan-template.md`、C-013 守卫同时断言子节在场；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/document-structure.md` — C-001 缺节码与产出侧、C-008 落文输入复用 `--path`、C-013 四族与术语消歧、C-017 四面读法与结构子步、C-019 结构绿内容红实例；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/driver-integration.md` — C-001 四元组、C-004(a)(b)(c) 三项重写、C-006 `rc` 聚合、C-007 `not-applicable` 单列与计数等式；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/invariants-and-distribution.md` — C-005 副本套数改为「以脚本实测为准、不写死」；分类=minor。
+- **PLAN-EDIT**: `research.md` — R-9 增子节标题的唯一登记处与剥离算法、可复算样例（原「到下一个 `##` 或 `###` 为止」不足以让两个实现者算出同一字节）；分类=**substantive**。
+- **PLAN-EDIT**: `research.md` — 更正偏差 #2 的 freeze 判断：`coverage-baseline.txt` **已**由 tasks 阶段按 77 条款认领冻结，clause 车道实测 `status: ok` / `beyond baseline=0`，原「不冻结 / 设计内红」不再成立（保留原判断并标注更正时点）；分类=minor。
+- **PLAN-EDIT**: `research.md` — R-3 字段数 8→9、R-5 `rc`/`not-applicable`、R-6 四元组与 (b)、R-7/R-11 副本套数去数字、R-12 确认门判据可判定化、R-4 四面→四族；分类=minor。
+- **PLAN-EDIT**: `quickstart.md` — S2/S3 的期望值补 `declaration-absent` 与 `two-way: not-run`、S5 的副本套数改为按实测、S6 的槽位计数补 `not-applicable` 单列；分类=minor。
+- **PLAN-EDIT**: `feature-ref.md` — 25 条 FR 的设计落点列按上述改动回填（不增删 FR 行）；分类=minor。
+- **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — 追加「修复轮处置」表，并更正 CHK039 的「没有任何门会响」这一表述（该缺口已由 FR-022 + T021 承接）；分类=minor。
+- **PLAN-EDIT**: `checklists/requirements.md` — 派生计数（shared strings 等）改为按 `validate-requirements.py` 输出取值，不再写死；分类=minor。
+
+**非 plan 属主制品**：`tasks.md` 的改动（T001…T028，任务行 27→28）属 tasks 阶段产物，不在此登记；`coverage-baseline.txt` 未改动（条款认领仍为 77，无需重冻结）。

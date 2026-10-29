@@ -60,7 +60,8 @@ rm -rf "$TMP"
 声明行存在与否在今天的引擎里不可区分，作者笔误也会落到「未声明」的同一形态上。
 
 **实施后期望**：`fx-declared` → `expression` / `source: declaration` / exit 0（三者各答不同）；
-`fx-absent` → `execution` / `source: default` / `marker: <069 默认标记>` / exit 0；
+`fx-absent` → `execution` / `source: default` / `marker: <069 默认标记>` / `error.label: declaration-absent`（advisory）/ exit 0
+（这一行是「存量缺省」，不阻断；它与「机制降级」的差别在 `error.label` 上可见）；
 `fx-bad` → `flow_class: null` / `source: declaration` / stderr 一行 `<code>: <path>:<line> carries 'expressive', …` /
 **exit 1**（不是 2）。
 
@@ -87,7 +88,17 @@ doc-consistency-check.py: error: argument --action: invalid choice: 'structure' 
 **实施后期望**：本线类别为 `execution`，故输出 `status: not-applicable`、打印 `class=execution source=declaration`
 与被检查文件数，**退出码 0**，且**不**出现 `0 violation(s) passed` 一类措辞。
 
-一条表达类夹具线的期望（四子节齐备 → 绿；缺 `### Chapter Tree` → 红）由 `Pinned by` 的契约测试负责。
+只做 plan 侧时输出 MUST 另标 `two-way: not-run`（不给 `--path` 就没有落文可比，缺省形态 MUST NOT 被读作两向通过）。
+两向比对的形态是同一个命令追加既有 `--path`（不新增参数）：
+
+```bash
+/Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/doc-consistency-check.py \
+  --action structure --spec-dir .specify/specs/077-doc-sdd-integration \
+  --path .specify/specs/077-doc-sdd-integration/plan.md
+```
+
+一条表达类夹具线的期望（四子节齐备 → 绿；缺 `### Chapter Tree` → 结构语法族的
+`subsection-missing`，`name=` 点名缺失子节）由 `Pinned by` 的契约测试负责。
 
 **Premises**：`--action` 的 choices 从 `("verify",)` 扩为 `("verify","structure")`；`--faces` 四面取值集不变；
 `not-applicable` 的呈现形态（`class=` / `source=` / 伴生量）。
@@ -123,7 +134,8 @@ cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
 
 **实施后期望**：仍退出码 0——本次改动全部落框架源，副本由再生成机制产出，判据是「相对上述基线无新增漂移」。
 
-**Premises**：`.claude/` / `.github/` / `.qoder/` / `.opencode/` / `.codex/` / `.hermes/` 六套命令副本目录存在；
+**Premises**：per-tool 命令副本目录的存在性由 `regen-command-copies.py` 实测（注册表最多六个目标，本仓当前四个：
+`.claude/` / `.github/` / `.qoder/` / `.opencode/`；`.codex/` 与 `.hermes/` 目录不存在，故不产出，也不算漂移）；
 `templates/commands/**` 不进 templates 镜像对。
 **Pinned by**：`tests/contract/test_mirror_parity_suite.py`（既有）与 `tests/contract/test_stage_class_wiring.py`
 （副本携带接线子节）。
@@ -142,7 +154,8 @@ mkdir -p "$D"            # .specify/.gitignore 已忽略 .tmp/
 
 **实测（2026-10-30）**：`slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0`，
 槽位层面**零违规**；`status=fail` 全部来自夹具未提供六阶段 E3 证据（与槽位内容无关）。负控（追加第二个
-`baseline` 行）转红，证明该探针不是空绿。
+`baseline` 行）转红，证明该探针不是空绿。**计数读法**：`passed` 只数 `pass`，`not-applicable` 单列且不计入——
+夹具里若含 `not-applicable` 行，`passed + failed` 会小于算子总数，差额必须等于证据文件里 `not-applicable` 的条数。
 
 **实施后期望**：审计行为**不变**——这是「槽位只换内容」的验收点。
 

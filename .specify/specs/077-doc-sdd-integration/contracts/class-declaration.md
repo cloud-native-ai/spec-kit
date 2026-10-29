@@ -7,7 +7,7 @@
 
 ## 声明行
 
-- **C-001** 每条特性线 MUST 在其 `requirements.md` 头部区（`## Related Feature` 标题之前）声明恰好一行类别字段。行形态逐字为「`**Flow Class**` + 半角冒号 + 一个空格 + 取值」，行尾 MUST NOT 有尾随空白。字段名与取值均大小写敏感；全角冒号、字段名大小写变体、行内附加注释一律不合语法。(FR-001)
+- **C-001** 每条特性线 MUST 在其 `requirements.md` 头部区（`## Related Feature` 标题之前）**至多**声明一行类别字段。行形态逐字为「`**Flow Class**` + 半角冒号 + 一个空格 + 取值」，行尾 MUST NOT 有尾随空白。字段名与取值均大小写敏感；全角冒号、字段名大小写变体、行内附加注释一律不合语法。**作用域 = 新增声明线**：本特性落地前已存在的特性线不承担回填义务，它们按 C-008 的缺省路径解析并可获 advisory 码 `declaration-absent`（见 C-008）；存量条数取 `.specify/specs/*` 的实际目录集，本契约不记数。(FR-001)
 
 - **C-002** 取值 MUST 为封闭二值 `execution` / `expression`。取值 MUST 只由作者判定；脚本 MUST NOT 从路径、文件名、
   扩展名、内容或提交信息推断类别。(FR-001)
@@ -34,11 +34,17 @@
 
 ## 缺省与阻断
 
-- **C-008** 全文无该字段的特性线 MUST 按 `execution` 运行，`source` MUST 标为 `default`，并在每个消费点显示
-  069 登记的默认标记。未声明 MUST NOT 被呈现为已判定，也 MUST NOT 被读作表达类。(FR-004)
+- **C-008** 无该字段的特性线 MUST 按 `execution` 运行，`source` MUST 标为 `default`，并在每个消费点显示
+  069 登记的默认标记。未声明 MUST NOT 被呈现为已判定，也 MUST NOT 被读作表达类。未声明 MUST 分两种可区分形态：
+  **存量缺省**（头部区无该行，属 C-001 作用域之外）可附 advisory 码 `declaration-absent`——退出码 0、不计缺陷、
+  不进判定集合；**机制降级**（owner 不可解析 / 调用方无法执行引擎，见 `class-resolution.md` C-012）记录
+  `error.label = owner-unavailable`，MUST NOT 被标 `declaration-absent`。(FR-004)
 
 - **C-009** 取值在封闭集之外 MUST 按阻断处理：解析侧退出码 1，声明所在阶段的门禁 MUST 以非零退出阻断，
-  并点名文件、行号与越界取值。MUST NOT 静默回落默认类，MUST NOT 继续以 `execution` 运行。(FR-005)
+  并点名文件、行号与越界取值。MUST NOT 静默回落默认类，MUST NOT 继续以 `execution` 运行。**阶段侧的呈现 MUST 是「停下」**：
+  阶段命令的接线子节 MUST 要求本阶段在解析退出码为 1 时停止后续动作，并以阶段协议的异常行形态
+  （owner：`skills/external/sdd-loop-driver/references/stage-prompts.md`）作最后一行输出；
+  MUST NOT 落入「其余既有门禁集逐字不变」那一支继续执行。(FR-005)
 
 - **C-010** 作者输入错误（C-004 / C-005 / C-006 / C-009 四个码）MUST 全部归退出码 1，MUST NOT 归退出码 2。
   判据：退出码 2 的语义是「机制缺席、保持既有门禁集」（见 `class-resolution.md` C-006），把作者笔误判成 2

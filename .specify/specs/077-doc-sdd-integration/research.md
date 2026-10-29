@@ -52,20 +52,21 @@
 - **为何是 basename 而不是路径**：`spec:` 键的唯一消费者是阶段命令与驱动，二者都从 spec 目录出发；用 basename
   让同一台机器上「源仓 `.specify/specs/<name>`」与「客户项目 `.specify/specs/<name>`」两顶帽子解析出同一个键，
   而绝对路径会让同一个特性线在不同环境下拿到两个键（跨环境漂移）。
-- **resolution 顺序不可变**：owner 先解析（与既有 `action_lookup` 一致），再判键族，再读声明行。owner 不可解析时
+- **resolution 顺序（本特性登记的一次变更）**：owner 先解析，再判键族，再读声明行。**既有 `action_lookup` 并不是这个顺序**——它先 `UNIT_ID_RE` 再 `parse_owner`；本特性把 owner 提前，因此「键非法 **且** owner 不可解析」这一输入从 `invalid-unit-id` 改报 `owner-unavailable`（同为退出码 2、门禁集不变），差异登记为 requirements FR-011 的豁免①。owner 不可解析时
   任何键都走退出码 2，不会因为键是新族而给出不同的降级标签。
 - **Evidence**: 同一文件（`plan-resolution-baseline.txt`）记录了现在 `spec:` 键的退出码与降级记录形态。
 
 ## R-3 记录形态：与单元键逐字段同形，退出码 1 的记录不带类别值
 
-- 字段集沿用 `action_lookup` 现有八项（`action` / `checked_at` / `unit_id` / `flow_class` / `source` / `marker` /
+- 字段集沿用 `action_lookup` 现有**九项**（`action` / `checked_at` / `unit_id` / `flow_class` / `source` / `marker` /
   `basis` / `neutral` / `error`），`spec:` 键不新增字段：`unit_id` 取键原文、`source` ∈ {`declaration`, `default`}、
-  `basis` 为 `null`、`neutral` 为 `false`。
+  `basis` 为 `null`、`neutral` 为 `false`、`error` 取 `{label, detail}` 或 `null`（`default_lookup_record` 今天正是九键，
+  所以「九项」不是本特性的新增，而是既有形态的原文）。
 - **退出码 1 的取值裁决**：记录里 `flow_class` 写 `null`（不是 `execution`）。理由：既有 `owner_degradation()`
   在退出码 2 时返回「默认类 + `source: default`」是安全的，因为 FR-009 允许那条路径保持执行类；而退出码 1 若也返回
   `execution`，任何只看记录不看退出码的消费方都会把作者笔误读成一个判定。`null` 让「类别不存在」在字段面上可见。
 - **文件与行号走 stderr**：`invalid-class: <repo 相对路径>:<行号> carries '<值>', outside the closed set (...)`
-  一行，满足 FR-005「点名文件、行号与越界取值」，同时不往记录里塞第九个字段。
+  一行，满足 FR-005「点名文件、行号与越界取值」，同时不往记录里塞第十个字段。
 - **不写台账**：`spec:` 键 MUST NOT 进入 § 逐流程台账。`--action check` 的行集对照的是**框架单元清单**
   （`templates/commands/*.md` + `skills/{external,internal}/*/SKILL.md`），spec 目录不在该清单里，写入即产生
   `unknown` 发现（requirements FR-003 已钉）。
@@ -76,7 +77,7 @@
   `("verify", "structure")`；`--faces` 的四面取值集与 `--faces` 的解析器**一律不动**（FR-013 的「不新增第七面」）。
   实测现状：`--action structure` 今天报 `invalid choice` 退出码 2（`plan-resolution-baseline.txt`）。
 - **主体与作用域**：本动作的判定对象是**指定 spec 目录的 `plan.md`**（`--spec-dir`）。类别解析复用 R-2 的同一条路径。
-  - 解析为表达类 → 进入四面检查；
+  - 解析为表达类 → 进入四子节与四族码检查（结构语法 / 两向比对 / 证据面 / owner 面）；
   - 解析为执行类或未声明 → `status: not-applicable`，并打印 `class=<值> source=<来源>` 与一个非空伴生量
     （被检查的文件数），使「不适用」不可被读成「0 违规通过」。
 - **基线**：按 clarify 第四条，基线 = 该线首次声明那一次实测出的违规集，判据是「当前违规集 ⊆ 基线集」按
@@ -90,24 +91,30 @@
 
 ## R-5 两槽位：只换内容，审计与字段集不动（已用夹具实测）
 
-- `selection_basis=docs-gate-full`；`command` 记该次文档门禁命令串；`passed` 记 verdict ∈ {pass, not-applicable}
-  的 blocking 算子数，`failed` 记 verdict ∈ {fail, not-evaluated} 的算子数；closure 的 `baseline_compare` 写成
-  算子 id 名称级差集（`comm -13 <基线算子名单> <收口算子名单>`）；`failed_names_path` 指向**失败算子 id 名单**文件。
+- `selection_basis=docs-gate-full`；`command` 记该次文档门禁命令串；`rc` 记该串的**聚合退出码**（逐命令非零优先，
+  逐命令原始 rc 留在 `evidence_ptr` 指向的门禁输出里——这是「`rc` 无单一进程」的解法，不引入聚合脚本）；
+  `passed` 记 verdict = `pass` 的 blocking 算子数，`failed` 记 verdict ∈ {`fail`, `not-evaluated`} 的算子数，
+  `not-applicable` **单列**（不计 `passed`、不计 `failed`，条数由「算子总数 − (`passed`+`failed`)」这条等式约束，
+  与门禁 owner「不得记为通过」一致）；closure 的 `baseline_compare` 写成算子 id 名称级差集
+  （`comm -13 <基线算子名单> <收口算子名单>`）；`failed_names_path` 指向**失败算子 id 名单**文件。
 - **实测结论**：`audit-test-budget.py` 对 `selection_basis` **不做枚举校验**（只校验在场），对 `passed` / `failed`
   只校验可解析为整数，closure 的 `baseline_compare` 只校验「名称级」形态（接受 `comm -13` / JSON 数组 /
   `new failures:` 三种写法之一）。因此 `docs-gate-full` 与算子计数**无需改审计脚本**，FR-020 的「审计判定不变」可兑现。
   证据：`test-evidence/plan-audit-test-budget-docs-gate-probe.txt`（正样本 `baseline:1 closure:1` 零槽位违规，
   负样本追加第二个 baseline 后转红，证明该探针不是空绿）。
 
-## R-6 驱动载荷与 U4：三元组、四项 blocking、两槽位替代
+## R-6 驱动载荷与 U4：四元组、四项 blocking、两槽位替代
 
-- **载荷三元组**：`flow_class=<值>` / `source=<declaration|default>` / `marker=<默认标记或空>`，写进第①段
-  「背景与权威文档」，因此本地原生派发与远端 CLI 派发携带的是同一份文本（提示词是唯一载体，环境变量不参与）。
-- **U4 的四项**（在既有四条件之外，全部 blocking）：(a) 本阶段 blocking 算子各有一条结果记录且无 `not-evaluated`；
-  (b) 该记录的 `evidence_path` 指向的文件存在、非空、SHA-256 与 `evidence_sha256` 一致（复用既有
-  `gate-implement-evidence-binding` 的四键口径，owner 为 `templates/verification-log-template.md` 与
-  `skills/internal/implement-feature/SKILL.md` 的同一门）；(c) 载荷类别与 U4 当场解析值一致；(d) 本阶段
-  `stage-status` 行在场。
+- **载荷四元组**：`flow_class=<值>` / `source=<declaration|default>` / `marker=<默认标记或空>` /
+  `error=<E3 码或 ->`，写进第①段「背景与权威文档」，因此本地原生派发与远端 CLI 派发携带的是同一份文本
+  （提示词是唯一载体，环境变量不参与）。`error` 位的用途是把「机制降级（`owner-unavailable`）」与
+  「作者没写声明」在载荷上分开——两者都可能是 `source=default`。
+- **U4 的四项**（在既有四条件之外，全部 blocking）：(a) 本阶段**算子表登记的 blocking 行**各有一条结果记录且无
+  `not-evaluated`（计数分母只取算子表：implement 为 1 行 `G-implement-structure`，四个 CLI 面不各自算算子）；
+  (b) 该记录的 `evidence_path` 指向的文件存在且非空——**不做哈希比对**（既有 `gate-implement-evidence-binding` 的
+  哈希只约束 `verification.md` 的 SC 样本行，且其 owner 明写非 `pass` 不承担绑定义务，给算子记录加哈希会反转它）；
+  (c) 载荷类别与 U4 当场解析值一致，且载荷 `error` 位非 `-` 时走 `owner-unavailable` 分支（记降级观测、保持既有门禁集）；
+  (d) 本阶段 `stage-status` 行在场。
 - **不缓存**：类别在**每次派发前**解析一次；状态脊里的类别行只是带日期的观测，重入时重新解析并与观测比对，
   不一致记 re-baseline。这条同时封住「跨阶段缓存」与「从脊读值」两个口子。
 
@@ -125,8 +132,9 @@
 - **读一次的实现位置**：命令模板是 agent 读的指令，因此「读一次」写在模板里；委派技能不再读（FR-008）。
   六个阶段的读取点是阶段入口；`requirements` 阶段的读取点是类别行写入之后、`validate-requirements.py` 之前
   （FR-006 的特例，由 requirements 模板独立一句话承载）。
-- **本特性落点**：上述改动只落 `templates/commands/*.md`（框架源），`.claude/` / `.github/` / `.qoder/` /
-  `.opencode/` / `.codex/` / `.hermes/` 六套副本由 `regen-command-copies.py` 产出。
+- **本特性落点**：上述改动只落 `templates/commands/*.md`（框架源），per-tool 副本由 `regen-command-copies.py` 产出
+  （该脚本的 `_ASSISTANT_COMMAND_DIRS` 最多登记六个目标，只为**本仓已存在**的目标目录产出；本仓当前四个：
+  `.claude/` / `.github/` / `.qoder/` / `.opencode/`，`.codex/` 与 `.hermes/` 目录不存在故不产出）。
 
 ## R-8 七模板接线会让既有闭合集守卫转红：同一次改动内修订该守卫（实证）
 
@@ -139,14 +147,42 @@
   （与 docs/humanize 并列），其余模板与技能仍零命中；分母断言（27 模板 / 52 技能）不动。
   「删掉断言」与「整体放宽」都是把命题删掉，MUST NOT 采用。
 
-## R-9 execution 零变化的反向守卫：剥离子节后与基线提交逐字相同
+## R-9 execution 零变化的反向守卫：剥离子节后与基线提交逐字相同（标题字面量与剥离算法的唯一登记处）
 
-- 判据形态：对七个模板，删去新增子节（以子节标题为界、到下一个 `##` 或 `###` 为止）后的文本，MUST 与基线提交
-  `c1cd4600` 的同名文件**逐字相同**（SHA-256 相等）。这把「零行为变化」从印象变成可复算的字节相等。
-- **不把哈希预先写死**：基线 blob 的哈希在实现期由 `git show c1cd4600:<path> | sha256sum` 实测后钉进测试常量
-  （合法的「测试内冻结字面量」形态）。本 plan 只钉判据与方法，不预写数字——预写的期望值会与实际碰撞。
-- **子节边界**是判据的一部分：若子节没有明确终止边界，剥离就不可复算，测试会随排版漂移。故模板里该子节 MUST
-  以固定标题起头、并位于它自己的 `##`/`###` 块内，不与既有条款混排。
+- **子节标题字面量（唯一登记处 = 本节）**：`### 类别读取与文档型门禁`——逐字、无后缀、无变体。它是
+  「每模板恰一个子节」的计数锚、剥离器的起点，也是执行类反向守卫边界的一半；模板、契约、测试与剥离器
+  MUST 从这里取值，MUST NOT 各自复制一份（`templates/commands/docs.md` 的既有标题带后缀，属另一条入口，
+  不得照抄它的形态，也不得把两者混为一谈）。登记处选在本节而不是 requirements § Shared Strings，
+  是为了不改变该表的行数（6 行）：本字面量的消费者只有 stage-wiring 契约与两个测试文件，不是跨规格共享词汇。
+- **剥离算法（钉死，两个实现者必须算出同一结果）**：
+  1. **起点** = 子节标题行（含）；
+  2. **终点** = 该行之后第一个同级或更高级标题行（匹配 `^#{1,3} `，即 `#` / `##` / `###`）的**前一行**（含）；
+     其后无任何标题行时，终点 = 文件最后一行（含）；
+  3. 删除起点至终点，**不额外插入也不删除空行**。
+- **成立前提（作者义务）**：子节块 MUST 以**恰一个空行**收尾——块末与下一个标题之间不得出现两个及以上空行。
+  这样端点必然落在「一个空行」上，删除后剩下的分隔空行与插入前的基线逐字相同；违反该形态即判接线形态违规
+  （由 `test_stage_class_wiring.py` 断言），否则剥离不可复算。
+- **可复算样例（两份实现都应得到同一结果）**：
+
+  ```text
+  插入后（行号只是说明，不进入文件）          剥离后
+  1  ## User Input                            1  ## User Input
+  2  （既有正文）                              2  （既有正文）
+  3  （空行）                                  3  （空行）
+  4  ### 类别读取与文档型门禁                  4  ## Outline
+  5  （子节第 1 段）
+  6  （子节第 n 段）
+  7  （空行）
+  8  ## Outline
+  ```
+
+  端点：起点 = 4；4 之后第一个 `^#{1,3} ` 行是 8，故终点 = 7；删除 4–7 后剩 `## User Input` / 正文 / 空行 / `## Outline`，
+  与插入前的基线逐字相同。若把第 7 行写成两个空行，终点仍为 7 的下一行、删除后留下一个多余空行，
+  字节判据立即失效——这正是要把它写成作者义务的原因。
+- **判据形态**：对七个模板，按上述算法剥离后的文本 MUST 与基线提交 `c1cd4600` 的同名文件**逐字相同**
+  （SHA-256 相等），**且**同时断言子节在场（只断言「剥离后相等」会在无接线时空转）。
+- **不把哈希预先写死**：基线 blob 的哈希在实现期由 `git show c1cd4600:<path> | shasum -a 256` 实测后钉进测试常量
+  （合法的「测试内冻结字面量」形态）。本 plan 只钉判据、算法与样例，不预写数字——预写的期望值会与实际碰撞。
 
 ## R-10 测试布局：按被测对象拆三个契约文件 + 一个单元文件
 
@@ -156,7 +192,7 @@
 | `tests/contract/test_flow_class_spec_declaration.py` | 声明行文法与四个码（`invalid-class` / `malformed` / `duplicate` / `misplaced`）、模板字段位置、索引与详情不存取值 | 模板与引擎都不认识该字段 |
 | `tests/contract/test_stage_class_wiring.py` | 七模板的一次 lookup、零副本、execution 反向守卫（R-9）、闭合集名册修订（R-8）、命令副本携带 | 七模板零命中（实测） |
 | `tests/contract/test_document_structure_gate.py` | `--action structure` 的四子节、列语义、`chapter-*` / `owner-*` / `evidence-*` 码、主体集合与 `not-applicable`、`--faces` 不变 | `--action structure` 退出码 2（实测） |
-| `tests/contract/test_docs_gate_driver.py` | 载荷三元组、U4 四项、两槽位内容、阶段序列与 100% 调用率不变 | 驱动技能零命中 |
+| `tests/contract/test_docs_gate_driver.py` | 载荷四元组、U4 四项、两槽位内容、阶段序列与 100% 调用率不变 | 驱动技能零命中 |
 
 五个文件都是 red-first；负样本只留在测试里，不进任何 owner 文档（与 069a/076 同纪律）。
 
@@ -168,11 +204,16 @@
 - **受影响的对**：`templates/` → `.specify/templates/`（`requirements-template.md`、`plan-template.md`）；
   `shared/` → `.specify/shared/`（两份 owner 的类条件追加）；`scripts/` → `.specify/scripts/`（两个引擎）；
   `skills/external` → `.specify/skills/`（驱动技能及其 `references/`）。`templates/commands/**` **不在**
-  templates 对的镜像范围内（`commands` 被排除），只走 `regen-command-copies.py` 的六套 per-tool 副本。
+  templates 对的镜像范围内（`commands` 被排除），只走 `regen-command-copies.py` 的 per-tool 副本——套数以该脚本实际
+  产出的目标目录为准（注册表最多六个，本仓当前四个），契约与任务都 MUST NOT 写死套数。
 
-## R-12 零新增确认门：子节措辞必须避开阻断式确认语
+## R-12 零新增确认门：子节措辞必须避开阻断式确认语，且预算必须被**重新测量**
 
 - 实测 `scan-confirmation-gates.py --summary` = blocking gates **27**，violations 0；该预算是整数、零余量。
+- **判据可判定化**：既有守卫的总量断言是 `cap = baseline["total"] * 0.25`，因此 `+1` **不会**让它转红——
+  「没有任何门会响」正是这条发现的实质。故 requirements FR-022 把该预算写成可判定条款：改动前后各跑一次
+  `scan-confirmation-gates.py --summary`，两次 `blocking confirmation gates` 计数 MUST 相等；T021 含一次该扫描器运行
+  （证据落 `test-evidence/tasks-scope-set-difference.txt`）。SC-006 同列该项。
 - 因此七模板子节的措辞**不得**新增「问用户是否继续 / 等待确认 / 批准后执行」一类阻断句；表达方式一律用
   「读数 → 按 owner 执行算子 → 未通过即报未通过」的陈述句。降级句写「显示标签并保持既有门禁集」，
   不写「提示用户选择」。
@@ -183,17 +224,19 @@
   结构基线落既有 spec 目录命名面）、不新增第三方依赖、不引入常驻进程。
 - 不回写 069 的正文/状态，不在 069 的详情文件里补写承接关系（承接关系记在 `features/077.md` 与本 plan 的
   `feature-ref.md`）。
-- 不修 `provisioner`-类遗留问题、不动 `069` 的三条切片规格、不冻结 `coverage-baseline.txt`（见下条偏差）。
+- 不修 `provisioner`-类遗留问题、不动 `069` 的三条切片规格、不改 `coverage-baseline.txt` 的冻结内容（该文件已由
+  tasks 阶段按 77 条款认领冻结；只有条款认领变化时才重冻结，本轮不变）。
 
 ## 偏差与披露（disclosed, not silent）
 
 1. **脚手架**：`create-new-plan.sh` 在 `CWS_LIB_BASH_HOME` 未设时以非零退出且不产出 `plan.md`；派发同时禁止切分支。
    故按调用方允许的偏差路径，`plan.md` 由 `.specify/templates/plan-template.md` 就地填写，分支保持
    `077-doc-sdd-integration`。该脚本被抑制的动作是「模板复制」，不是分支操作。
-2. **clause 车道的 `baseline-missing` 是设计内红**：`account-clause-coverage.py` 要求
-   `<spec-dir>/coverage-baseline.txt` 冻结**其它 spec** 的既有未覆盖条款名（它是一个豁免清单）。本特性不消费
-   该车道（条款为新建、非派生），冻结它会顺手把 495 条历史未覆盖条款登记成「本特性的豁免」，属伪造基线。
-   故如实记录 `status: baseline-missing`，并在证据里保留原始输出。FR 车道则必须是全覆盖（25/25），它才是本特性的门。
+2. **clause 车道**：本阶段写下时该车道报 `baseline-missing`（`account-clause-coverage.py` 要求
+   `<spec-dir>/coverage-baseline.txt` 冻结**其它 spec** 的既有未覆盖条款名，它是一个豁免清单；当时尚未冻结）。
+   **该判断已被后续阶段推翻，特此更正（见 `plan.md` § Plan Edits 的 PLAN-EDIT: minor）**：tasks 阶段已按 77 条款认领
+   冻结 `coverage-baseline.txt`（只冻结他线既有未覆盖名，base-sha `06c31b1d`），当前该车道实测
+   `claimed=77`、`beyond baseline=0`、`status: ok`。本条目保留为「当时的判断 + 何时被更正」的记录，不再作为现状引用。
 3. **同作者门（objective-analysis-gate）**：本 run 从 requirements 到 plan 无断点，被评分的工件由同一 agent 产出。
    本执行环境未向执行 agent 暴露子代理派发工具（工具面为文件读写、检索与命令执行），按该 owner 的
    subagent-unavailable 降级形态，评分走直接受限读，并在 plan 的 Constitution Check 段逐行标注
