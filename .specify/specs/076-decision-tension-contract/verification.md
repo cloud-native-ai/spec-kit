@@ -25,6 +25,11 @@ post_change_commit=3c1a288c
 # belongs after review and is NOT pre-spent here.
 post_change_targeted_set_passed=131
 post_change_targeted_set_failed=0
+# P4 measured its own two targeted sets (no full-suite run in this segment, by budget).
+post_change_p4_contract_suites_passed=66
+post_change_p4_contract_suites_failed=0
+post_change_p4_guard_suites_passed=70
+post_change_p4_guard_suites_failed=0
 post_change_remaining_open_tasks=0
 
 # -- Evidence records (bind every `pass` claim to archived evidence) --
