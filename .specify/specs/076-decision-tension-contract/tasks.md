@@ -3,7 +3,7 @@
 **Requirement ID**: 076
 **Requirement Key**: `076-decision-tension-contract`
 **Branch**: `076-decision-tension-contract`（本阶段禁止切换或新建分支）
-**Related Feature**: Feature 076 — 决策反题与反指标契约（Decision Tension Record）, status `Planned`（tasks 阶段不推进状态机；`Implemented` 属 `/speckit.implement`）
+**Related Feature**: Feature 076 — 决策反题与反指标契约（Decision Tension Record）, status `Planned`（tasks 阶段不推进状态机；`Implemented` 属 `/speckit.implement`）<!-- CORRECTED 2026-10-29 (review F9): 本行的状态引文在 tasks 阶段为**准确**（状态机 owner 把 Planned→Implemented 归 /speckit.implement），但阶段推进后它会变成过期事实。故补一条指针：状态不是本文件的判断，活状态只在 `.specify/memory/features.md` 的 076 行（实现后实测为 `Implemented`）；本行的 `Planned` 读作「tasks 阶段结束时点的快照」，不是当前事实，也不再在任何门禁里被引用。 -->
 **Input**: Design documents from `.specify/specs/076-decision-tension-contract/`
 **Prerequisites**: `plan.md`（required）、`requirements.md`（required；26 FR / 8 SC / 5 用户故事 / 4 Shared Strings）、`research.md`（R-1…R-11）、`data-model.md`（E1–E8 / R1–R6 / 6 条状态迁移）、`contracts/`（8 份文件 / 34 条条款）、`quickstart.md`（S1–S5）、`feature-ref.md`
 

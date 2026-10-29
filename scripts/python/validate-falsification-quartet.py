@@ -8,7 +8,9 @@ and prints a verdict, it never restates them.
 
 Payload form: the four literal keys ``attempt`` / ``exit_code`` / ``observation`` /
 ``would_go_red_if``, each appearing exactly once, the value on the same line or in an indented
-continuation of that key.
+continuation of that key. A key may stand at the start of a line or behind a markdown list marker
+(``- `` / ``* `` / ``+ ``) or heading prefix (``## ``); an INDENTED key is not a key — it belongs to
+the value above it.
 
 Closed rejection reason set (data-model.md E6; no seventh value exists):
   missing-field            one of the four keys does not appear (a key appearing more than once is
@@ -61,7 +63,7 @@ REASONS = (
 # The closed quartet (owner: shared/guidelines/critique-and-self-critique.md).
 KEYS = ("attempt", "exit_code", "observation", "would_go_red_if")
 
-KEY_RE = re.compile(r"^(%s)[ \t]*:[ \t]*(.*)$" % "|".join(KEYS))
+KEY_RE = re.compile(r"^(?:[-*+][ \t]+|#{1,6}[ \t]+)?(%s)[ \t]*:[ \t]*(.*)$" % "|".join(KEYS))
 INTEGER_RE = re.compile(r"^[+-]?\d+$")
 
 RAW_MARKER = "raw:"
@@ -119,8 +121,11 @@ def parse_fields(text):
     """``name -> value`` for the quartet keys; a repeated key keeps every occurrence in order.
 
     Values are the inline remainder plus any indented continuation lines beneath the key, which is
-    the payload grammar the owner declares. Keys are read only at column zero, so an indented line
-    mentioning a key name stays part of the value above it.
+    the payload grammar the owner declares. A key may stand alone or behind a markdown list marker
+    (``- `` / ``* `` / ``+ ``) or a heading prefix (``## ``) — SI-4 payloads are markdown, so an
+    indented bullet list is an ordinary shape and rejecting it would record a payload that did run
+    its falsification attempt as having no attempt. What the anchor forbids is an INDENTED key: an
+    indented line belongs to the value above it, which keeps the continuation rule unambiguous.
     """
     fields = {}
     current = None

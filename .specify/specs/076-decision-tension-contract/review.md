@@ -631,3 +631,55 @@ blocks, and none of them was answered in this run because no author turn occurre
 ## 8. Feedback
 
 Please share the contents of this document with the spec-kit framework developers.
+
+## 9. Disposition (author turn, 2026-10-29)
+
+> Appended by the review-remediation round. §3 is left byte-identical on purpose: a finding is a
+> dated observation, and rewriting it would erase what was found. This section records what each
+> finding received. Nothing here re-states a verdict — the code segment's gate is re-measured by the
+> next review run, not by this note.
+
+### 9.1 Repaired in this round
+
+| Finding | Repair | Where the repair lives |
+|---------|--------|------------------------|
+| F1 (P0) | The owner now carries the line grammar the validator enforces: one `- **<field>**:` line per field, the two two-space-indented `pole_a` / `pole_b` sub-lines, the `### T-NNN` carrier, and one copy-pasteable complete record. A contract test extracts that example **verbatim** and requires exit 0, so owner and checker cannot drift. | `shared/guidelines/decision-tension.md` § 记录形态 → `### 记录行文法（校验器强制的形态）`; `tests/contract/test_decision_tension_contract.py::test_owner_example_passes_the_validator_verbatim` |
+| F2 (P1) | The `N/A` rule is now per trigger: each trigger must own a **distinct line** whose remainder, once the trigger name and punctuation are removed, is still a sentence (≥8 chars); a line naming two or more triggers justifies none. Measured: the flat sentence, a two-trigger line and a two-character remainder all exit 0 under the previous rule and exit 1 now. | `scripts/python/validate-decision-tensions.py::na_verdict` / `_justified_trigger`; inverse samples `test_flat_sentence_na_justifies_no_trigger`, `test_per_trigger_na_needs_one_trigger_and_a_reason_per_line` |
+| F3 (P1) | The channel table now covers all six labels — `dtr-anchor` (misplaced section) and `dtr-tension-id` (identifier malformed / duplicated / skipped) each own a class at HIGH. The guard imports the validator's `LABELS` and asserts set equality with the table's label column, so neither a seventh label nor a dropped row can pass. | `skills/internal/analyze-artifacts/references/detection-and-severity.md` § I; `test_defect_classes_fail_closed_no_advisory`, scenario G |
+| F4 (P1) | The severity mapping is now a program output, not a table a test fills in: every finding carries `severity=HIGH`, every label carries `HIGH` or `0` (the declared HIGH-or-0 domain), and the aggregate `channel.high` is printed in both the human and `--json` forms. All seven `notes/analyze-sc003/` snapshots are re-rendered from that output and carry a per-label severity column; SC-002/SC-003 read `channel.high`. The disclosure that the `/speckit.analyze` narrative layer was never run end to end is retained. | `validate-decision-tensions.py` (`CHANNEL_VALUE_DOMAIN`, per-check / per-finding severity, `channel` block); `write_analyze_snapshot`; `verification.md` SC-002/SC-003 notes + refreshed sha256 |
+| F5 (P1) | A `## Closure` block now maps all ten `fail` rows to their analyze disposition (A-01…A-11 in `16a44ea0`, the carried A-12 plus A-17…A-22 in `8a5f7aea`, A-23…A-27 in `d4479500`), the FR / contract clause / task that closes each, and the assertion that holds it. The original ten rows are untouched. | `checklists/readiness-2026-10-29.md` § Closure |
+| F6 (P1) | The template pointer is authored for its consumer: `.specify/shared/guidelines/decision-tension.md`, read from the repository root (the form the rest of the template already uses). The assertion now derives its base from an instantiated plan at `.specify/specs/<key>/plan.md` and asserts the plan-directory-relative form is dead — the base at which the old defect could not appear is no longer used. | `templates/plan-template.md` § Decision Tensions; `test_template_is_pointer_not_copy_and_path_resolves` (`consumer_plan`, `pointer_base`) |
+
+### 9.2 Corrected (fact errors), not repaired as written
+
+- **F9 — tasks.md status sites.** The finding's title ("three artifacts … all three copied it wrong")
+  over-counts: `tasks.md:6` quotes the state-machine owner **correctly** (a tasks-stage file does not
+  advance the status); DoD-8 and T027 were the two that restated it wrongly, and the implement stage
+  already left a dated correction on both (the owner's rule plus the measured flip to `Implemented`).
+  What was missing is the third site, added here: line 6 gains a pointer to the live owner
+  (`.specify/memory/features.md`) and the same dated trace, because a status fact restated in a task
+  file goes stale the moment the stage advances. No task row, count or clause was changed.
+  → `tasks.md` lines 6 / DoD-8 / T027.
+- **F10 — SC-001's cardinal.** Recounted against the file: the parenthetical enumerates **six
+  inverse-input classes**, and the first class ("删去任一字段——六字段逐一各跑一次") expands to six
+  runs; 6 + 5 = 11 inverse runs, plus the compliant run = 12, which is exactly what
+  `SC-001 Source` states ("十二次运行（1 合规 + 删除一类按六字段逐一各一次 + 其余五个反向输入各
+  一次）"). The arithmetic in the finding (6 + 5 = 11 against a stated 12) is the error, not the
+  criterion: the two numbers reconcile, and the expansion is stated in the text. `requirements.md`
+  is therefore unchanged — the review round's own constraint forbids editing it, and there is
+  nothing to correct. What remains valid in F10 is the stylistic advice (a cardinal restated in SC
+  prose is a second definition point), which is a requirements-template improvement, not a defect
+  in this criterion. → no artifact change; this paragraph is the trace.
+
+### 9.3 Not implemented
+
+Disposition: F7 (P2) accepted-for-roadmap — `templates/verification-log-template.md`'s
+`post_change_commit=` cannot be filled by the run that writes the log; replacing it with a
+post-commit pointer is a template-wide change outside this feature's scope.
+Disposition: F8 (P2) accepted-for-roadmap — `templates/feature-details-template.md`'s
+`## Latest Review` placeholder and `/speckit.feature`'s reconcile are framework surfaces.
+Disposition: F11 (P2) accepted-for-roadmap — a durable analyze report path belongs to
+`templates/commands/analyze.md` and the analyze skill, not to this feature.
+Disposition: F12 (P2) deferred — declaring `CWS_LIB_BASH_HOME` and adding a discovery order touches
+the first command of every stage; it needs an environment-prerequisite decision (which sibling
+layout to probe, and what the guard prints) that this round's scope cannot settle.

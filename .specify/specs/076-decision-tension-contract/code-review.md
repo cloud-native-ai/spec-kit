@@ -690,3 +690,18 @@ file.135.verdict=reviewed
 - **未提交面**: 评审开始时 `git status --short` 为空；本记录、`review.md` 与 `test-evidence/review-probes.txt` 是本次运行自己的产出，不是被评审的代码面。
 - **判据面**: 逐条意见的判定只读实现与可执行证据：4 条可重放探针存于 `test-evidence/review-probes.txt`（P-1 记录文法 / P-2 `N/A` 失败开放 / P-3 缺类标签 / P-4 四元组列首缩进），另有本特性 66 条契约测试在本树实跑 `66 passed`。未跑全量套件（预算：closure 全量由驱动者在 review 之后执行）。
 - **裁决说明**: `blocking` 只有一条，理由取「必须修改，否则不能合入」的定义而非口径紧张度 —— owner 是分发文件，其缺失的半段规则会让下一个特性的每位计划作者写下被拒的记录，且修复面只是一段示例。
+
+---
+
+## Author Responses（2026-10-29）
+
+> 逐条答复本记录的五条 `important`。每条只给三件事：同意 / 不同意、一句理由、修复位置。
+> 段裁决不在此重述——`blocking` 已修复，但「是否合入」由下一次评审运行重新测量，作者不改写本次记录。
+
+| # | 意见（行） | 结论 | 理由（一句） | 修复位置 |
+|---|-----------|------|--------------|----------|
+| 1 | `validate-decision-tensions.py:312` — `N/A` 判据失败开放 | **同意** | 一行平铺四个触发名而不给任何一条理由，正好绕过 fail-closed 设计；判据必须逐触发各占一行且余部是句子，否则「缺记录」就该报。 | `scripts/python/validate-decision-tensions.py` → `na_verdict()` + `_justified_trigger()`（单行只认一个触发、余部去标点后 ≥8 字符）；逆样本 `test_flat_sentence_na_justifies_no_trigger`、`test_per_trigger_na_needs_one_trigger_and_a_reason_per_line`（后者的 flat / 双触发单行 / 两字余部三例在旧判据下均 exit 0，新判据 exit 1） |
+| 2 | `detection-and-severity.md:103` — 两个标签无缺陷类 | **同意** | 通道自称封闭 HIGH-or-0，却让 `dtr-anchor` / `dtr-tension-id` 无处落位，等于把「程序判红、检测器报 0」的失败开放上移一层。 | `skills/internal/analyze-artifacts/references/detection-and-severity.md` § I 表扩到六标签（新增 Misplaced section、Record identifier 两行，均 HIGH）；守卫改为**导入**校验器 `LABELS` 后断言表内标签集合等于程序封闭集，不再手抄 |
+| 3 | `templates/plan-template.md:65` — 指针按模板自身目录写 | **同意** | 指针的读者是 `.specify/specs/<key>/plan.md`，`../shared/...` 在那里指向不存在的路径；断言在模板目录解析，正好是缺陷不可能出现的那一个基。 | `templates/plan-template.md` § Decision Tensions 改用仓库根形态 `.specify/shared/guidelines/decision-tension.md`；断言改为从实例化计划 `.specify/specs/<key>/plan.md`（`consumer_plan()` / `pointer_base()`）推出基址解析，并显式断言语料中「计划目录相对形态在此基址下确实解析失败」作为可红对照 |
+| 4 | `validate-falsification-quartet.py:64` — 四元组键硬锚列 0 | **同意** | SI-4 载荷本身就是 markdown，缩进列表是最自然的写法；把跑过证伪尝试的载荷记成「没有 attempt」是反方向的静默失败。 | `validate-falsification-quartet.py` → `KEY_RE` 允许 `- ` / `* ` / `+ ` 列表符号与 `#`…`######` 标题前缀（缩进的键仍属上一条值的续行），仍要求每键恰一次；正样本 `test_bullet_list_payload_is_the_same_grammar`、`test_heading_prefix_payload_is_the_same_grammar`，逆样本 `test_duplicate_key_under_a_prefix_is_still_one_field_too_many`，另加 `test_indented_key_stays_part_of_the_value_above` 守住续行边界 |
+| 5 | `test_decision_tension_contract.py:1289` — 断链未真判 | **同意** | 那时「错误」由测试自己算（`not in index` 换个写法），删掉断言套件行为不变，正是「绿不是证据」；判定必须由被评审的生产代码作出。 | `scripts/python/validate-decision-tensions.py` 新增 `link_verdict(adr_text, plan_text)`（内部复用 `index_records`，返回 `("ok", [])` / `("error", [ids])`）；`test_dangling_tension_id_is_an_error` 改为断言该生产判决的两个方向（`T-007` → error，`T-001` → ok），并保留「不新增命令、CLI 仍为 `--spec` / `--json`」的守护 |

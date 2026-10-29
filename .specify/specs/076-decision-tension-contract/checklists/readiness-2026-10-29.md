@@ -184,3 +184,35 @@
 - **Focus areas**: DTR six-field and rejection-form decidability; `expected_sacrifice` grammar coverage and direction semantics; shape-vs-semantic limitation ownership; mirror-pair/task consistency; terminology guard; zero-new-mechanism set difference
 - **Depth level**: Standard
 - **User-specified items incorporated**: all six special checks from the caller (DTR decidability, measurement-source grammar, quartet limitation task, seven-row mirror consistency, terminology guard, zero-new-mechanism set difference)
+
+## Closure
+
+> **Appended 2026-10-29 by the review-remediation round (process review F5).** The ten `fail` rows
+> above are left byte-identical — this checklist is a dated audit, not a status board. This block
+> records, for each of them, where the gap was dispositioned and which artifact closes it, so a
+> later reader can tell “closed” from “ignored” without re-deriving the analyze narrative. The
+> dispositions come from the three `/speckit.analyze` rounds of the same feature: A-01…A-11 were
+> adjudicated in analyze #1 and remediated in `16a44ea0`; A-12 (carried from #1) and A-17…A-22 in
+> analyze #2 and `8a5f7aea`; A-23…A-27 in analyze #3 and `d4479500`.
+
+| CHK | 原缺口（一句话） | analyze 处置 | 落点（FR / 合同 / 任务） | 闭环证据 |
+|-----|------------------|--------------|--------------------------|----------|
+| CHK004 | 语义类拒绝形态（稻草人反题、不可执行/非二值证据）无具名裁决者 | A-05（MEDIUM，analyze #1）→ `16a44ea0`：判定者分工写入 owner | FR-003 / FR-004；`contracts/decision-tension-owner.md` C-3、C-4；`contracts/validator.md` C-2/C-4；T004 / T008 | owner § 拒绝形态「判定者分工」区分机器三项与复核者两项；`test_rejection_forms_closed_and_named` 断言两侧裁决者与「同一 verdict」 |
+| CHK011 | 方向记号 `↓`/`↑` 已解析但未绑定被断言方向的指标轴 | A-06（MEDIUM）→ `16a44ea0`：把方向明确为**记录性断言**，程序只判是否落在两值内 | FR-010；`contracts/measurement-binding.md` C-1；T008 | `parse_sacrifice` 的 docstring 与 `test_inverse_samples_turn_red` 族：只判成员资格，不断言语义方向；C-1 明文写「MUST NOT assert that the direction matches the source metric's real semantics」 |
+| CHK014 | SC-003 的「补入不可逆决策」夹具未说明合规 `N/A` 去留，禁判承重的检测器无法产出恰 1 条 HIGH | A-01（HIGH，analyze #1）→ `16a44ea0`：钉死为「并**移除**其合规 `N/A` 章节」的三子场景 | FR-011；SC-003；`contracts/analyze-channel.md` C-2；T017 / T018 | 场景 D 的 `d1/d2/d3` 三用例（`notes/analyze-sc003/D-{1,2,3}-*.md`），D-2 显式断言 `## Decision Tensions` 已移除且恰 1 条 `dtr-section-missing` |
+| CHK018 | 断链 `tension_id` 只在契约测试夹具上被调用，无真实入口 | A-07（MEDIUM）→ `16a44ea0`：把「唯一调用面 = 契约测试、复用 `index_records`」写进契约 | FR-015；SC-006；`contracts/adr-reference.md` C-2；T019 / T020 | 场景 E `test_dangling_tension_id_is_an_error`：本轮的 important-b 修复后，判定改由校验器导出的 `link_verdict()` 作出（不可解析 → `("error", [...])`，可解析 → `("ok", [])`），不再由测试自己重述 `not in index` |
+| CHK020 | 章节缺失时 `dtr-anchor` 与 `dtr-section-missing` 双标签同红，与 SC-002「恰 1 条 HIGH」冲突 | A-02（HIGH，analyze #1）→ `16a44ea0`：写下三条跨标签优先级 | FR-016；`contracts/validator.md` C-2；`contracts/analyze-channel.md` C-2；T007 / T010 | `test_label_set_closed_and_dedup_precedence` 断言缺章节时 `dtr-anchor == 0`；`test_anchor_requires_three_adjacent_headings` 断言章节存在但错位时只报 `dtr-anchor` |
+| CHK022 | 五个逆样本未能证明「六字段逐一删除」与 Edge-Case 的跳号规则 | A-09（MEDIUM）→ `16a44ea0`：SC-001 改写为逐字段各一次 + 跳号夹具 | FR-017；SC-001；`contracts/validator.md` C-4；T003 / T007 | `INVERSE_SAMPLES` 含六个 `delete-<field>` 参数化用例 + `skipped-tension-id`（`T-001` 后写 `T-003`）+ `duplicate-tension-id`，每条各跑一次红 |
+| CHK026 | 「`attempt` 必须可执行」的可采纳判据未被执行：脚本不重放、接收方又不得否决 | A-08（MEDIUM）→ `16a44ea0`：把可重放性显式归属复核者规则 | FR-019 / FR-020 / FR-021；`contracts/falsification-quartet.md` C-2；T014 / T015 | owner 四元组小节写「只判非空」与「MUST NOT 判其可否重放」；场景 C `test_field_semantics_decidable` 两侧断言 |
+| CHK027 | `would_go_red_if` 的「具名红色信号」无机械形状，`tautology` 不可判定 | A-03（HIGH，analyze #1）→ `16a44ea0`：首次 `red:` 切分 + 两半反引号跨度 | FR-020 / FR-021；`contracts/falsification-quartet.md` C-2、C-3；T012 / T015 | `judge_would_go_red_if()` 只判形状；`test_double_red_splits_at_first_occurrence` 先证明夹具可区分两个切分点，再断言判决 |
+| CHK029 | SC-004 的六个不合格载荷与 FR-021/T012 的六个原因码不是同一集合，6/6 无法同时成立 | A-04（HIGH，analyze #1）→ `16a44ea0`：SC-004 改为「十一次运行」= 1 合规 + 六原因码各一例 + 四个附加 `missing-field` 样本 | FR-021；SC-004；`contracts/falsification-quartet.md` C-3；T012 | 四元组套件的 `REJECTION_MATRIX` 六例 + `test_rejection_rate_is_six_of_six`（覆盖 = 封闭集，退出码 0/1/2 三值齐）+ 四个逐字段附加样本单列 |
+| CHK031 | 已披露的 shape-vs-semantic 限制（可伪造 `raw:`、不可证的红色结果）只写在澄清里，没有承接任务 | A-10（MEDIUM）→ `16a44ea0`：限制落到 owner 的消费者可读面 | Clarifications Q5；`contracts/falsification-quartet.md` C-2、C-3；T014 / T016 | owner 四元组小节的两个限制段落（「可被伪造」「不可证」+「非阻断注记，不进程序判决」）；`test_disclosed_limitations_are_non_blocking` 逐条断言 |
+
+**Closure status**: 10 / 10 dispositioned and closed — 0 deferred, 0 waived. Each row's evidence is
+an assertion in one of the three feature suites (or the owner text that assertion reads), so a
+regression re-opens the gap visibly rather than silently.
+
+**Evidence path convention**: contract tests live at `tests/contract/test_decision_tension_contract.py`
+(F/G scenarios, C/D/E classes), `tests/contract/test_decision_tension_validator.py` (validator C-1…C-4)
+and `tests/contract/test_falsification_quartet_validator.py` (quartet C-3); the archived program
+outputs they write are under `.specify/specs/076-decision-tension-contract/notes/analyze-sc003/`.

@@ -42,6 +42,12 @@ Exit codes: 0 = no error (warnings allowed) / 1 = at least one error / 2 = input
 (either file missing, undecodable, or without content lines). Read-only: no write point of any
 kind, no resident process, standard library only.
 
+Channel severity: the analyze channel's value domain is HIGH or 0 — a label either fired (HIGH)
+or counted nothing (0), with no advisory or downgrade tier (``detection-and-severity.md`` § I).
+That mapping is printed here, by the program, so the channel report records a verdict instead of
+a table a consumer fills in: every finding carries ``severity=HIGH`` and every label carries its
+own severity (HIGH when it fired, 0 when it did not).
+
 Usage: python3 validate-decision-tensions.py --spec <spec-dir> [--json]
 """
 from __future__ import annotations
@@ -68,6 +74,11 @@ LABELS = (
     "dtr-rejected-form",
     "expected-sacrifice-unmapped",
 )
+
+# The channel's value domain, and the single severity every label carries inside it
+# (``detection-and-severity.md`` § I). A label that did not fire counts 0, never a lower tier.
+CHANNEL_VALUE_DOMAIN = "HIGH-or-0"
+CHANNEL_SEVERITY = "HIGH"
 
 SECTION_HEADING = "## Decision Tensions"
 ANCHOR_BEFORE = "## Constitution Check"
@@ -100,6 +111,14 @@ NONE_LITERAL = "none"
 NA_LITERAL = "N/A"
 NA_DOES_NOT_HOLD = "不成立"
 LOAD_BEARING_TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法原则相关")
+# One line justifies one trigger: naming a trigger on a line that also names another is a list,
+# not a justification, and the remainder after the trigger name must still read as a sentence.
+NA_MIN_JUSTIFICATION = 8
+
+# The ADR's ``tension_id`` reference slot (``docs/decisions/template.md`` § Alternatives): the
+# slot label followed by a backticked ``T-NNN`` identifier. Read only on such a line, so an
+# unrelated ``T-NNN`` mention elsewhere in the ADR never becomes a reference.
+ADR_TENSION_ID_RE = re.compile(r"tension_id[^\n]*?`(T-\d{3})`")
 
 # The six field labels, verbatim; the field set is closed by the owner (FR-002).
 FIELD_NAMES = (
@@ -292,25 +311,39 @@ def parse_sacrifice(value):
     return "resolved", identifier
 
 
+def _justified_trigger(line):
+    """The load-bearing trigger this line justifies, or ``None`` when it justifies none.
+
+    One line justifies one trigger. A line naming two or more triggers lists them instead of
+    explaining any of them (the flat-sentence defect: four trigger names in one sentence, no
+    reason attached to any), and the remainder left once the trigger name, the punctuation and the
+    surrounding whitespace are removed must still be a sentence rather than a word or two.
+    """
+    hits = [trigger for trigger in LOAD_BEARING_TRIGGERS if trigger in line]
+    if len(hits) != 1:
+        return None
+    remainder = line.replace(hits[0], "", 1).strip()
+    remainder = remainder.strip("-—:：,，.。;；、!！?？()（）[]【】 \t")
+    return hits[0] if len(remainder) >= NA_MIN_JUSTIFICATION else None
+
+
 def na_verdict(section_lines):
     """Judge the ``N/A`` form of a section that carries no record; ``None`` means it holds.
 
     FR-011 (a) is fail-closed in both directions: a section that carries neither a ``T-NNN`` record
     nor the literal ``N/A`` is a missing record, and an ``N/A`` that does not justify the four
     load-bearing triggers one by one is a missing record too. The criterion is mechanical — the
-    literal marker is present, the section says the triggers do not hold, and each trigger is named
-    on a line that carries an explanation of its own — so the checker never has to judge whether
-    the plan "really" contains a load-bearing decision (FR-011 forbids asking it to).
+    literal marker is present, the section says the triggers do not hold, and each trigger owns a
+    distinct line whose remainder is an explanation of its own — so the checker never has to judge
+    whether the plan "really" contains a load-bearing decision (FR-011 forbids asking it to).
     """
     block = [line for line in section_lines if line.strip()]
     if not any(line.strip().startswith(NA_LITERAL) for line in block):
         return "carries neither a `T-NNN` record nor the literal `%s`" % NA_LITERAL
     if not any(NA_DOES_NOT_HOLD in line for line in block):
         return "`%s` does not state that the four triggers do not hold" % NA_LITERAL
-    unjustified = [
-        trigger for trigger in LOAD_BEARING_TRIGGERS
-        if not any(trigger in line and len(line.strip()) - len(trigger) >= 2 for line in block)
-    ]
+    justified = {trigger for trigger in (_justified_trigger(line) for line in block) if trigger}
+    unjustified = [trigger for trigger in LOAD_BEARING_TRIGGERS if trigger not in justified]
     if unjustified:
         return "`%s` does not justify these triggers one by one: %s" % (
             NA_LITERAL, "、".join(unjustified),
@@ -368,12 +401,38 @@ def index_records(plan_text):
     return index
 
 
+def link_verdict(adr_text, plan_text):
+    """Judge one ADR's ``tension_id`` references against one plan; ``(status, dangling)``.
+
+    ``contracts/adr-reference.md`` C-2 makes an unresolvable reference a broken-link **error**, and
+    requires the resolution to reuse this module's record index so one parser serves both the
+    identifier check and the link check. Returns ``("ok", [])`` when every reference resolves and
+    ``("error", [identifiers])`` when any does not — the same value domain the checker's own exit
+    code uses (``STATUS_OK`` / ``STATUS_ERROR``), so a caller reads the verdict, never prose.
+
+    The declared call surface is the contract test over a fixture pair: this function adds no
+    command, and the analyze channel never scans ``docs/decisions/`` (C-2). An ADR carrying no
+    ``tension_id`` slot at all is not a broken link — the slot requirement is C-1's, judged by the
+    ADR template test.
+    """
+    index = index_records(plan_text)
+    dangling = []
+    for line in _visible_lines(adr_text):
+        for match in ADR_TENSION_ID_RE.finditer(line):
+            identifier = match.group(1)
+            if identifier not in index and identifier not in dangling:
+                dangling.append(identifier)
+    return (STATUS_ERROR if dangling else STATUS_OK), dangling
+
+
 def _unreadable(spec, reason):
     return {
         "spec": str(spec),
         "status": STATUS_UNREADABLE,
-        "checks": [{"label": label, "status": "pass", "count": 0} for label in LABELS],
+        "checks": [{"label": label, "status": "pass", "count": 0, "severity": 0}
+                   for label in LABELS],
         "findings": [],
+        "channel": {"value_domain": CHANNEL_VALUE_DOMAIN, "high": 0},
         "reason": reason,
         "scanned": {"lines": 0, "records": 0},
     }
@@ -523,7 +582,10 @@ def validate(spec):
     findings = [finding for label in LABELS for finding in buckets[label]]
     checks = [
         {"label": label, "status": "fail" if buckets[label] else "pass",
-         "count": len(buckets[label])}
+         "count": len(buckets[label]),
+         # The channel's value domain, printed by the program: a label that fired is HIGH, a
+         # label that did not is 0. There is no advisory or downgrade tier between them.
+         "severity": CHANNEL_SEVERITY if buckets[label] else 0}
         for label in LABELS
     ]
     status = STATUS_ERROR if any(f.severity == "error" for f in findings) else STATUS_OK
@@ -532,6 +594,7 @@ def validate(spec):
         "status": status,
         "checks": checks,
         "findings": findings,
+        "channel": {"value_domain": CHANNEL_VALUE_DOMAIN, "high": len(findings)},
         "scanned": {"lines": len(lines), "records": len(records)},
     }
 
@@ -559,6 +622,12 @@ def main(argv=None):
             "errors": errors,
             "warnings": warnings,
             "scanned": result["scanned"],
+            "channel": result["channel"],
+            "findings": [
+                {"line": finding.line, "label": finding.label,
+                 "severity": CHANNEL_SEVERITY, "text": finding.text}
+                for finding in findings
+            ],
         }, ensure_ascii=False, indent=2))
     else:
         print("spec: %s" % result["spec"])
@@ -567,10 +636,12 @@ def main(argv=None):
             print("  [%s] %s (%d)" % (check["label"], check["status"], check["count"]))
         print("scanned: %d lines, %d record(s)"
               % (result["scanned"]["lines"], result["scanned"]["records"]))
+        print("channel: value_domain=%s, high=%d"
+              % (result["channel"]["value_domain"], result["channel"]["high"]))
         if result.get("reason"):
             print("unreadable: %s" % result["reason"])
         for finding in findings:
-            print(finding.render())
+            print("%s %s" % (CHANNEL_SEVERITY, finding.render()))
         print("%d error(s), %d warning(s)" % (errors, warnings))
 
     if result["status"] == STATUS_UNREADABLE:

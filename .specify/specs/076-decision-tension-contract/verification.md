@@ -41,12 +41,12 @@ verdict=pass
 
 sample_id=SC-002_analyze_snapshot_set
 evidence_path=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/S3-section-missing.md
-evidence_sha256=4f78b18354170efa6c6dbac0ccfb7bf440fe6ff409426fbff99d3a06855a1092
+evidence_sha256=4b76be5b0992981e80537a61d857fd7a5d0a958f83f780890381e552bc121a0f
 verdict=pass
 
 sample_id=SC-003_gating_triple
 evidence_path=.specify/specs/076-decision-tension-contract/notes/analyze-sc003/D-2-section-removed.md
-evidence_sha256=d3590e0791e6ff24380eb16775ec8607652e8e8257ee2ffcf373e21d68e123c0
+evidence_sha256=5f0fc21d9bb391316e1fc7d9f0abc0345644d9291c7e95f121ff1ff08b67f4f0
 verdict=pass
 
 sample_id=SC-004_quartet_eleven_runs
@@ -84,11 +84,11 @@ SC-001_note=evidence test-evidence/quickstart-s1-s5.txt § S1 + § S2; the compl
 
 SC-002_status=pass
 SC-002_value=HIGH counts 0 / 1 / 1 / 1 across the four fixtures; the missing-section fixture is reported, not skipped
-SC-002_note=snapshots notes/analyze-sc003/S3-{compliant,section-missing,record-incomplete,cost-unmapped}.md; channel is a detection pass rendering the program verdict under its HIGH-or-0 mapping — the /speckit.analyze narrative layer was not produced by a full skill run and no SC depends on it
+SC-002_note=snapshots notes/analyze-sc003/S3-{compliant,section-missing,record-incomplete,cost-unmapped}.md are rendered from `scripts/python/validate-decision-tensions.py --json` — each carries the program's `channel.high`, the declared HIGH-or-0 value domain and a per-label severity column (the mapping is printed by the program, never summed by the test); generation is the `test_sc002_four_fixtures_render_the_program_channel_counts` run. **Disclosure retained**: the `/speckit.analyze` narrative layer was not produced by a full skill run, and no SC depends on it — SC-002's observation is the program's channel output
 
 SC-003_status=pass
 SC-003_value=three snapshots 0 / 1 / 0 (compliant N/A → 0, section removed → 1, compliant record → 0)
-SC-003_note=notes/analyze-sc003/D-{1,2,3}-*.md re-rendered by the `-k "d1 or d2 or d3"` run (3 passed); the bare-`N/A` case stays an additional assertion outside the triple
+SC-003_note=notes/analyze-sc003/D-{1,2,3}-*.md are re-rendered from the same program's `--json` output (`channel.high` plus per-label severity) by the `-k "d1 or d2 or d3"` run (3 passed); the bare-`N/A` case and the flat-sentence `N/A` inverse stay additional assertions outside the triple
 
 SC-004_status=pass
 SC-004_value=11 runs: 1 accepted (exit 0) + 6 reason codes rejected once each (6/6) + 4 additional `missing-field` samples; exit codes 0/1/2 all covered; double-`red:` pinpoint accepted on the first split
@@ -117,4 +117,4 @@ deferred_reason_summary=
 
 # -- Free-form notes --
 
-notes=T021 landed the two post-implementation guard slices (F terminology, G closed-set delta) and both were proven to go red under mutation before being declared green (test-evidence/t021-scenario-fg-guards.txt). T022's set difference is empty on all three inventories. T023 re-measured terminology at 0. T024 ran sync-mirrors --write then --check (all six pairs ok, all seven FR-025 pairs plus templates/instructions-template.md byte-identical) and actually ran scripts/bash/generate-instructions.sh under CWS_LIB_BASH_HOME: live .specify/instructions.md sha256 unchanged (41fd81a0…), reconcile reported 「live instructions already carry all template sections」, and the section table shows Task Complexity Rubric live 894 B vs template 1208 B — the measured proof that an existing section is never rewritten, so the T005 template pointer rides in only on that section's next whole-section convergence. T026 executed quickstart S1–S5 green with real exit codes. No deviation from the plan-owned artifacts: git diff --stat on plan.md / requirements.md / research.md / data-model.md / contracts/ / quickstart.md / feature-ref.md is empty.
+notes=T021 landed the two post-implementation guard slices (F terminology, G closed-set delta) and both were proven to go red under mutation before being declared green (test-evidence/t021-scenario-fg-guards.txt). T022's set difference is empty on all three inventories. T023 re-measured terminology at 0. T024 ran sync-mirrors --write then --check (all six pairs ok, all seven FR-025 pairs plus templates/instructions-template.md byte-identical) and actually ran scripts/bash/generate-instructions.sh under CWS_LIB_BASH_HOME: live .specify/instructions.md sha256 unchanged (41fd81a0…), reconcile reported 「live instructions already carry all template sections」, and the section table shows Task Complexity Rubric live 894 B vs template 1208 B — the measured proof that an existing section is never rewritten, so the T005 template pointer rides in only on that section's next whole-section convergence. T026 executed quickstart S1–S5 green with real exit codes. 2026-10-29 review 修复轮 (F4): the analyze-channel severity mapping is now printed by scripts/python/validate-decision-tensions.py (human + --json: per-finding severity, a per-label HIGH-or-0 severity, channel.high), and all seven analyze-sc003 snapshots were regenerated from that output; SC-002/SC-003 now read the program's channel.high, and their two bound sha256 values were refreshed. No deviation from the plan-owned artifacts: git diff --stat on plan.md / requirements.md / research.md / data-model.md / contracts/ / quickstart.md / feature-ref.md is empty.

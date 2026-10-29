@@ -62,9 +62,11 @@
 ## Decision Tensions
 
 *Owner of the record shape, the admissibility criteria, the rejection forms and the load-bearing
-threshold: [`shared/guidelines/decision-tension.md`](../shared/guidelines/decision-tension.md).
-This section lists the field names and points at that file — it MUST NOT restate the criteria
-table, the rejection list or the threshold table.*
+threshold: `.specify/shared/guidelines/decision-tension.md` — one pointer, read from the repository
+root (the same form this template uses for `.specify/memory/constitution.md`); a plan artifact lives
+under `.specify/specs/<key>/`, so a plan-directory-relative link would resolve to a path that does
+not exist. This section lists the field names and points at that file — it MUST NOT restate the
+criteria table, the rejection list or the threshold table.*
 
 Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole_b`),
 `discriminating_evidence`, `expected_sacrifice`, `revision_trigger`; record identifier `tension_id`

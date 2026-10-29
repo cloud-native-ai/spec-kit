@@ -84,6 +84,8 @@ OWNER_SECTION_REJECTION = "## 拒绝形态（封闭清单，命中即拒）与�
 OWNER_SECTION_THRESHOLD = "## 承重门槛（四类触发）与复杂度门控"
 OWNER_SECTION_BOUNDARY = "## 与相邻 owner 的边界"
 OWNER_SECTION_CONSUMERS = "## 消费者与引用方式"
+OWNER_SECTION_RECORD_SHAPE = "## 记录形态：六字段 + 记录标识（封闭集）"
+OWNER_GRAMMAR_HEADING = "### 记录行文法（校验器强制的形态）"
 
 TEMPLATE_SECTION = "## Decision Tensions"
 
@@ -126,6 +128,66 @@ def owner_rejection_bullets() -> list[str]:
             if line.strip().startswith("- ")]
 
 
+def owner_example_lines() -> list[str]:
+    """The complete record example as the owner writes it — the copy-paste surface.
+
+    Read line by line with fence tracking rather than through ``h3_section``: the example is a
+    fenced block whose own first line is a ``### T-001`` heading, so a regex that stops at the next
+    ``### `` would truncate it at exactly the line that makes it a record.
+    """
+    lines = read(OWNER).splitlines()
+    assert OWNER_GRAMMAR_HEADING in lines, (
+        f"the owner lost its line-grammar block ({OWNER_GRAMMAR_HEADING}); the grammar the "
+        "validator enforces must live here, not only in a feature's data-model"
+    )
+    start = lines.index(OWNER_GRAMMAR_HEADING)
+    block: list[str] = []
+    in_fence = False
+    for line in lines[start + 1:]:
+        if line.strip().startswith("```"):
+            if in_fence:
+                if block and block[0].startswith("### T-"):
+                    return block
+                block = []
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            block.append(line)
+        elif line.startswith("## "):
+            break
+    raise AssertionError(
+        f"no fenced record example found under {OWNER_GRAMMAR_HEADING!r}: the owner must carry a "
+        "copy-pasteable record, not only a field table"
+    )
+
+
+# The pointer forms a template may use: an inline-code path or a markdown link. Both are read as
+# paths, and both are resolved from the base the CONSUMER implies — never from the template's own
+# directory, which is the one base where a dead pointer cannot show (review F6).
+POINTER_RE = re.compile(
+    r"(?:`([^`\n]*decision-tension\.md)`|\]\(([^)\n]*decision-tension\.md)\))"
+)
+
+
+def consumer_plan(fixture_key: str = "999-pointer-fixture") -> Path:
+    """Where this section actually lands: an instantiated plan under `.specify/specs/<key>/`."""
+    return ROOT / ".specify" / "specs" / fixture_key / "plan.md"
+
+
+def pointer_base(plan_path: Path) -> Path:
+    """The base such a plan's reader uses for a repo-root pointer.
+
+    Derived from the instantiated plan's own location rather than from the template's: walking up
+    from `.specify/specs/<key>/plan.md`, the first ancestor that carries `.specify/` is the
+    repository root. A plan-directory-relative reading lands under `.specify/specs/` instead and
+    cannot find the owner — which is exactly why the pointer must be repo-root-relative.
+    """
+    for parent in plan_path.parents:
+        if (parent / ".specify").is_dir():
+            return parent
+    raise AssertionError(f"no ancestor of {plan_path} carries a .specify/ directory")
+
+
 # --------------------------------------------------------------------------- #
 # Scenario A — owner and template anchor (T002)
 # --------------------------------------------------------------------------- #
@@ -156,6 +218,71 @@ class TestScenarioAOwnerAndTemplateAnchor:
         )
 
     # --- owner: C-2 -------------------------------------------------------
+
+    def test_record_line_grammar_is_written_in_the_owner(self):
+        """F1: the grammar the validator enforces must be readable from the owner itself.
+
+        The owner declares the field *names and content*; without the line grammar a plan author
+        who writes exactly what the owner says is rejected with a wrong diagnosis. The block must
+        pin the three enforced shapes verbatim: the six `- **<field>**:` lines, the two
+        two-space-indented pole lines, and the `### T-NNN` heading.
+        """
+        shape = h2_section(read(OWNER), OWNER_SECTION_RECORD_SHAPE)
+        assert OWNER_GRAMMAR_HEADING in read(OWNER), (
+            f"the owner has no line-grammar block ({OWNER_GRAMMAR_HEADING})"
+        )
+        for pinned in (
+            "- **<字段名>**: <值>",
+            "`  - pole_a: <约束>`",
+            "`  - pole_b: <约束>`",
+            "`### T-001 — <一句话标题>`",
+            "缩进两格",
+            "各占**一行**",
+        ):
+            assert pinned in shape, (
+                f"the owner's record-shape section does not pin {pinned!r}; the grammar must be "
+                "normative text, not only an example"
+            )
+
+    def test_owner_example_passes_the_validator_verbatim(self, tmp_path):
+        """The copy-paste guard: the owner's own example, fed to the checker unchanged, exits 0.
+
+        Owner and checker cannot drift while this holds — a grammar change on either side makes
+        the documented example fail, which is the only way the two files stay one source of truth
+        (review F1). The example is used verbatim: extracting it and editing it here would restore
+        the very gap being closed.
+        """
+        example = owner_example_lines()
+        body = "\n".join(example)
+        assert example[0].startswith("### T-001"), (
+            f"the example must open with a T-NNN heading; got {example[0]!r}"
+        )
+        for field in ("decision", "antithesis", "binding_constraints",
+                      "discriminating_evidence", "expected_sacrifice", "revision_trigger"):
+            assert f"- **{field}**:" in body, (
+                f"the owner's example does not carry the {field!r} field line"
+            )
+        # The two-space indentation is load-bearing: an unindented pole line is not a pole.
+        for pole in ("pole_a", "pole_b"):
+            assert f"\n  - {pole}:" in body, (
+                f"the owner's example must indent `{pole}` two spaces under the field line"
+            )
+            assert f"\n- {pole}:" not in body, (
+                f"the owner's example writes `{pole}` at the field column, where it is not a pole"
+            )
+        assert re.search(r"(?m)^### T-\d{3}\s", body), (
+            "the example must carry its T-NNN carrier heading"
+        )
+
+        spec = write_channel_spec(tmp_path / "owner-example", channel_plan(body))
+        code, counts = verdict_of(spec)
+        assert code == 0, (
+            "a record written exactly as the owner documents it must be accepted; the owner's "
+            f"example was rejected: counts={counts!r}"
+        )
+        assert set(counts.values()) == {0}, (
+            f"the owner's example must produce zero findings; counts={counts!r}"
+        )
 
     def test_record_field_set_is_closed_six_plus_id(self):
         text = read(OWNER)
@@ -346,14 +473,46 @@ class TestScenarioAOwnerAndTemplateAnchor:
         assert "shared/guidelines/decision-tension.md" in section, (
             "C-3: the section must point at the owner by path"
         )
-        link = re.search(r"\]\(([^)]*decision-tension\.md)\)", section)
-        assert link, "C-3: the pointer is not a resolvable markdown link"
-        target = (TEMPLATE.parent / link.group(1)).resolve()
-        assert target.is_file(), (
-            f"C-3: the pointer path does not resolve to an existing file: {link.group(1)!r}"
+        link = POINTER_RE.search(section)
+        assert link, "C-3: the pointer is not a readable path"
+        pointer = next(group for group in link.groups() if group)
+        # The pointer is authored for its CONSUMER: a plan is instantiated under
+        # `.specify/specs/<key>/plan.md`, so it must be repo-root-relative and resolve from the
+        # base that plan's own location implies (review F6).
+        plan = consumer_plan()
+        base = pointer_base(plan)
+        assert pointer.startswith(".specify/"), (
+            f"C-3: the pointer must be repo-root-relative for an instantiated plan; got "
+            f"{pointer!r}"
         )
-        assert target == OWNER.resolve(), (
-            "C-3: the pointer resolves somewhere other than the owner document"
+        target = (base / pointer).resolve()
+        assert target.is_file(), (
+            f"C-3: the pointer path does not resolve for its consumer (base {base}, pointer "
+            f"{pointer!r})"
+        )
+        # A client project ships `.specify/` only, so the consumer-side pointer reaches the owner
+        # through its runtime mirror; the mirror is generated, so the guarantee is byte equality.
+        mirror = (ROOT / ".specify" / "shared" / "guidelines" / "decision-tension.md").resolve()
+        assert target in {OWNER.resolve(), mirror}, (
+            "C-3: the pointer resolves somewhere other than the owner document or its mirror: "
+            f"{target}"
+        )
+        assert target.read_bytes() == OWNER.read_bytes(), (
+            "C-3: the pointer reaches a file that is not byte-identical to the owner, so the "
+            "documented shape and the shipped one can drift"
+        )
+        # The negative control — the defect this assertion exists to catch: a link written relative
+        # to the template (or to the plan's own directory) lands under `.specify/specs/` and dies,
+        # and resolving it from the template's directory is the one base where the bug cannot show.
+        dead = (plan.parent / "../shared/guidelines/decision-tension.md").resolve()
+        assert not dead.is_file(), (
+            f"C-3: the control is not discriminating — {dead} exists, so a plan-relative pointer "
+            "would look healthy and this assertion could never go red for its subject"
+        )
+        assert not (TEMPLATE.parent / pointer).is_file(), (
+            f"C-3: the pointer also resolves from the template's own directory ("
+            f"{TEMPLATE.parent / pointer}); a guard based there cannot observe the consumer's "
+            "path, and this assertion would stop discriminating"
         )
         for field in FIELD_NAMES:
             assert field in section, f"C-3: the field-name list is missing {field!r}"
@@ -642,7 +801,7 @@ class TestScenarioBAnalyzeStructuralChannel:
 
     # --- C-2 --------------------------------------------------------------
 
-    def test_three_defect_classes_fail_closed_no_advisory(self, tmp_path):
+    def test_defect_classes_fail_closed_no_advisory(self, tmp_path):
         section = norm(channel_section())
         assert "HIGH or 0" in section, (
             "C-2: the value domain must be declared as HIGH or 0"
@@ -652,9 +811,6 @@ class TestScenarioBAnalyzeStructuralChannel:
         )
 
         rows = defect_table(channel_section())
-        assert len(rows) == 3, (
-            f"C-2: exactly three defect classes must be declared, found {len(rows)}"
-        )
         closed = set(validator_labels())
         declared = set()
         for row in rows:
@@ -669,14 +825,19 @@ class TestScenarioBAnalyzeStructuralChannel:
                 f"{sorted(labels - closed)}"
             )
             declared |= labels
-        # The three declared classes cover exactly these four validator labels; the validator's
-        # remaining labels (the template anchor, the identifier shape) are not channel classes.
-        assert declared == {
-            "dtr-section-missing",
-            "dtr-record-incomplete",
-            "dtr-rejected-form",
-            "expected-sacrifice-unmapped",
-        }, f"C-2: the declared defect classes cover {sorted(declared)}"
+        # The table's label column equals the program's closed set — compared against the imported
+        # tuple, never a hand-copied list, so a seventh label or a dropped row reds here (review F3).
+        assert declared == closed, (
+            "C-2: the defect table must cover every label the program can print; missing "
+            f"{sorted(closed - declared)}, extra {sorted(declared - closed)}"
+        )
+        # The two record-level labels are live and each owns a class, not an omission: a plan the
+        # program rejects must never map to 0 HIGH upstream of the report.
+        for label in ("dtr-anchor", "dtr-tension-id"):
+            assert label in declared, (
+                f"C-2: {label} has no class in the channel table, so a detector rendering only "
+                "the table would report 0 HIGH for a plan the program rejects"
+            )
 
         # One fixture per class; each defect run yields exactly one finding (no double counting).
         compliant = write_channel_spec(tmp_path / "compliant", channel_plan(CHANNEL_RECORD))
@@ -704,6 +865,47 @@ class TestScenarioBAnalyzeStructuralChannel:
             assert sum(counts.values()) == 1, (
                 f"{name}: fail-closed means one finding per defect, not a pile; counts={counts!r}"
             )
+
+    def test_sc002_four_fixtures_render_the_program_channel_counts(self, tmp_path):
+        """SC-002's evidence is the program's own HIGH count, snapshotted once per fixture.
+
+        The four fixtures are the channel's judgment set: compliant, section absent, incomplete
+        record, unmappable cost. The expected 0/1/1/1 is asserted against `channel.high` — the
+        number the program prints — and each run refreshes its snapshot, so the archived evidence
+        can be re-derived instead of being a table this test fills in (review F4).
+        """
+        cases = [
+            ("S3-compliant", "record complete, cost resolvable",
+             channel_plan(CHANNEL_RECORD), 0),
+            ("S3-section-missing", "the whole `## Decision Tensions` section absent",
+             CHANNEL_PLAN_HEAD + CHANNEL_PLAN_TAIL, 1),
+            ("S3-record-incomplete",
+             "one field label deleted from an otherwise compliant record",
+             channel_plan(channel_record("revision_trigger")), 1),
+            ("S3-cost-unmapped",
+             "`expected_sacrifice` names an `SC-NNN` with no declared source",
+             channel_plan(channel_record("expected_sacrifice", "SC-099 Source ↓ 未声明的来源")), 1),
+        ]
+        measured = []
+        for slug, description, plan_text, expected_high in cases:
+            spec = write_channel_spec(tmp_path / slug, plan_text)
+            code, payload = validator_payload(spec)
+            high = payload["channel"]["high"]
+            measured.append((slug, high))
+            assert code == (1 if expected_high else 0), (
+                f"{slug}: exit code must follow the channel's HIGH count; got {code} "
+                f"payload={payload!r}"
+            )
+            assert high == expected_high, (
+                f"{slug}: the program's channel HIGH count must be {expected_high}; "
+                f"got {high} (checks={payload['checks']!r})"
+            )
+            snapshot = write_analyze_snapshot("SC-002", slug, description, spec, code, payload)
+            assert snapshot.is_file(), f"{slug}: SC-002's snapshot must be archived"
+        assert measured == [
+            ("S3-compliant", 0), ("S3-section-missing", 1),
+            ("S3-record-incomplete", 1), ("S3-cost-unmapped", 1),
+        ], measured
 
     def test_requirements_without_measurement_sources_branches_on_record_count(self, tmp_path):
         section = norm(channel_section())
@@ -991,15 +1193,6 @@ class TestScenarioCQuartetOwner:
 SPEC_DIR = ROOT / ".specify" / "specs" / "076-decision-tension-contract"
 ANALYZE_SNAPSHOT_DIR = SPEC_DIR / "notes" / "analyze-sc003"
 
-# The channel's four defect classes are the count surface for SC-003; ``dtr-anchor`` is not one of
-# them (it is the template-adjacency assertion, suppressed whenever the section is missing).
-SC003_CHANNEL_LABELS = (
-    "dtr-section-missing",
-    "dtr-record-incomplete",
-    "dtr-rejected-form",
-    "expected-sacrifice-unmapped",
-)
-
 # The four load-bearing triggers, spelled as the owner's threshold section spells them. A compliant
 # ``N/A`` must say, trigger by trigger, why that trigger does not hold.
 TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法原则相关")
@@ -1022,32 +1215,38 @@ def label_counts(payload: dict) -> dict:
     return {check["label"]: check["count"] for check in payload["checks"]}
 
 
-def write_sc003_snapshot(slug: str, fixture: str, spec_dir: Path, exit_code: int, payload: dict) -> Path:
-    """Archive one SC-003 analyze-channel snapshot; SC-003's HIGH count reads only these files.
+def write_analyze_snapshot(criterion: str, slug: str, fixture: str, spec_dir: Path,
+                           exit_code: int, payload: dict) -> Path:
+    """Archive one analyze-channel snapshot from the PROGRAM's verdict; the criterion reads these.
 
-    The channel is a declared detection pass, not a program, so the run that produces its report is
-    this test: the snapshot carries the program's verdict verbatim (exit code, per-label counts,
-    record count) under the channel's four defect classes. Rendering is deterministic, so a re-run
-    refreshes it instead of accumulating near-duplicates.
+    The channel is a declared detection pass, not a separate scorer, so the run that produces its
+    report is this test — but every number in the snapshot is the program's own output (exit code,
+    per-label count, per-label channel severity, the HIGH total under the declared HIGH-or-0
+    domain). Nothing here is a sum the test computes over the labels it then asserts, which is what
+    makes the evidence independently observed (review F4). Rendering is deterministic, so a re-run
+    refreshes the snapshot instead of accumulating near-duplicates.
     """
-    counts = label_counts(payload)
-    high = sum(counts[label] for label in SC003_CHANNEL_LABELS)
+    channel = payload["channel"]
     lines = [
-        f"# SC-003 analyze snapshot — {slug}",
+        f"# {criterion} analyze snapshot — {slug}",
         "",
         f"- fixture: {fixture}",
         "- judged artifact: `plan.md` under `REQUIREMENTS_DIR` (the channel's only object; "
         "`requirements.md` is the mapping reference, never a second judged object)",
         f"- validator: `scripts/python/validate-decision-tensions.py --spec <fixture> --json`",
+        f"- channel: value_domain={channel['value_domain']} — printed by the program; every label "
+        "is HIGH when it fires and 0 when it does not (no advisory or downgrade tier)",
         f"- exit_code: {exit_code}",
         f"- records: {payload['scanned']['records']}",
-        f"- HIGH findings: {high}",
+        f"- HIGH findings: {channel['high']}",
         "",
-        "| label | status | count |",
-        "|---|---|---|",
+        "| label | status | count | severity |",
+        "|---|---|---|---|",
     ]
     for check in payload["checks"]:
-        lines.append(f"| `{check['label']}` | {check['status']} | {check['count']} |")
+        lines.append(
+            f"| `{check['label']}` | {check['status']} | {check['count']} | {check['severity']} |"
+        )
     lines.append("")
     target = ANALYZE_SNAPSHOT_DIR / f"{slug}.md"
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -1091,8 +1290,9 @@ class TestScenarioDNonLoadBearingGating:
             f"D-1: a compliant N/A must produce zero findings; counts={counts!r}"
         )
 
-        snapshot = write_sc003_snapshot(
-            "D-1-compliant-na", "trivial plan: N/A plus one line per trigger", spec, code, payload
+        snapshot = write_analyze_snapshot(
+            "SC-003", "D-1-compliant-na", "trivial plan: N/A plus one line per trigger",
+            spec, code, payload,
         )
         assert snapshot.is_file(), "D-1's SC-003 snapshot must be archived"
 
@@ -1114,6 +1314,76 @@ class TestScenarioDNonLoadBearingGating:
         )
         assert payload["scanned"]["records"] == 0, (
             f"a bare N/A still carries no record; scanned={payload['scanned']!r}"
+        )
+
+    def test_flat_sentence_na_justifies_no_trigger(self, tmp_path):
+        """The inverse sample review F2 measured: four trigger names in ONE sentence.
+
+        Naming the triggers is not justifying them. The fail-closed half of FR-011 (a) is the shape
+        of `N/A`, so a line that lists all four triggers with one shared clause ("四类触发均不成立")
+        attaches no reason to any single trigger and must be read as a missing record.
+        """
+        flat = (
+            "N/A — 不可逆、跨团队、高爆炸半径、与宪法原则相关四类触发均不成立。\n"
+        )
+        na_block = h2_section(channel_plan(flat), "## Decision Tensions")
+        for trigger in TRIGGERS:
+            assert trigger in na_block, "the fixture must still name all four triggers"
+
+        spec = write_channel_spec(tmp_path / "flat-na", channel_plan(flat))
+        code, payload = validator_payload(spec)
+        counts = label_counts(payload)
+        assert code == 1, (
+            "one flat sentence names the triggers without justifying any of them, so it is a "
+            f"missing record; counts={counts!r}"
+        )
+        assert counts["dtr-section-missing"] == 1, (
+            f"the flat sentence must be counted once as a missing record; counts={counts!r}"
+        )
+        assert sum(counts.values()) == 1, (
+            f"one root cause, one finding; counts={counts!r}"
+        )
+
+    def test_per_trigger_na_needs_one_trigger_and_a_reason_per_line(self, tmp_path):
+        """The two mechanical conditions of the per-trigger rule, each measured on its own line."""
+        # (a) two triggers on one line is a list, not a justification — even with a long clause.
+        paired = (
+            "N/A — 四类触发逐条不成立：\n\n"
+            "- 不可逆、跨团队：前者回滚无需迁移或重建，后者不改变他人依赖的契约或接口。\n"
+            "- 高爆炸半径：故障影响面限于本节文字。\n"
+            "- 与宪法原则相关：不触及任何 MUST 条。\n"
+        )
+        code, payload = validator_payload(write_channel_spec(tmp_path / "paired", channel_plan(paired)))
+        counts = label_counts(payload)
+        assert code == 1, (
+            "a line naming two triggers justifies neither of them; "
+            f"counts={counts!r}"
+        )
+        assert counts["dtr-section-missing"] == 1, counts
+
+        # (b) the remainder after the trigger name must still be a sentence.
+        stub = (
+            "N/A — 四类触发逐条不成立：\n\n"
+            "- 不可逆：不会。\n"
+            "- 跨团队：不会。\n"
+            "- 高爆炸半径：不会。\n"
+            "- 与宪法原则相关：不会。\n"
+        )
+        code, payload = validator_payload(write_channel_spec(tmp_path / "stub", channel_plan(stub)))
+        counts = label_counts(payload)
+        assert code == 1, (
+            "a two-character remainder is not an explanation of why the trigger does not hold; "
+            f"counts={counts!r}"
+        )
+        assert counts["dtr-section-missing"] == 1, counts
+
+        # The compliant shape — one trigger per line, each with its own reason — stays green.
+        code, payload = validator_payload(
+            write_channel_spec(tmp_path / "compliant", channel_plan(CHANNEL_NA))
+        )
+        assert code == 0, (
+            f"one trigger per line with a reason each must still be accepted; "
+            f"counts={label_counts(payload)!r}"
         )
 
     # --- D-2 (SC-003 run 2) ------------------------------------------------
@@ -1140,8 +1410,8 @@ class TestScenarioDNonLoadBearingGating:
             f"D-2: 'exactly 1 HIGH' must hold, not 'at least 1'; counts={counts!r}"
         )
 
-        snapshot = write_sc003_snapshot(
-            "D-2-section-removed",
+        snapshot = write_analyze_snapshot(
+            "SC-003", "D-2-section-removed",
             "trivial plan plus one irreversible decision (rollback requires a migration), "
             "compliant N/A section removed",
             spec, code, payload,
@@ -1167,8 +1437,8 @@ class TestScenarioDNonLoadBearingGating:
             f"D-3: the repair returns to zero HIGH; counts={counts!r}"
         )
 
-        snapshot = write_sc003_snapshot(
-            "D-3-compliant-record",
+        snapshot = write_analyze_snapshot(
+            "SC-003", "D-3-compliant-record",
             "same fixture with one compliant T-001 record written in place of the N/A block",
             spec, code, payload,
         )
@@ -1218,9 +1488,9 @@ class TestScenarioEADRReferenceSlot:
 
     Contract traceability: ``contracts/adr-reference.md`` C-1 (the slot) and C-2 (a dangling
     reference is an error). C-2's call surface is declared: this class is the ONLY caller, and it
-    resolves the reference by importing the validator's ``index_records`` as a library call — the
-    feature adds no command and no second parser, and the analyze channel never scans
-    ``docs/decisions/``.
+    resolves the reference by importing the validator's ``index_records`` (the one parser) and its
+    ``link_verdict`` (the error judgement over an ADR/plan pair) as library calls — the feature adds
+    no command and no second parser, and the analyze channel never scans ``docs/decisions/``.
     """
 
     # --- C-1 --------------------------------------------------------------
@@ -1285,10 +1555,26 @@ class TestScenarioEADRReferenceSlot:
         assert dangling not in index, (
             "C-2: the fixture's reference must not resolve, otherwise it cannot discriminate"
         )
-        # The broken link is an error, not a hint: the same call answers both directions.
-        broken = [identifier for identifier in (dangling,) if identifier not in index]
-        assert broken == [dangling], (
-            "C-2: an unresolvable `tension_id` must be reported as a broken link, never passed"
+        # The broken link is an ERROR, judged by the validator's own link verdict. A test that
+        # computed `identifier not in index` here would restate the assertion two lines above and
+        # could be deleted with the suite behaving identically — the production verdict is what
+        # this asserts (review: code important-b).
+        assert callable(getattr(module, "link_verdict", None)), (
+            "C-2: the validator must expose the link verdict over (adr_text, plan_text); the "
+            "record index alone answers 'does it resolve', never 'is this an error'"
+        )
+        status, broken = module.link_verdict(adr_text, plan_text)
+        assert (status, broken) == ("error", [dangling]), (
+            "C-2: an unresolvable `tension_id` must be a broken-link error naming the identifier; "
+            f"got status={status!r} dangling={broken!r}"
+        )
+        resolving = adr_text.replace(f"`{dangling}`", "`T-001`")
+        assert resolving != adr_text, "the control fixture must actually change the reference"
+        resolved_status, resolved_dangling = module.link_verdict(resolving, plan_text)
+        assert (resolved_status, resolved_dangling) == ("ok", []), (
+            "C-2: the resolving direction must not be reported as broken, otherwise the verdict "
+            f"is a constant rather than a judgement; got {resolved_status!r} "
+            f"{resolved_dangling!r}"
         )
 
         # The record's cost still resolves to a declared measurement source: the pair exercises the
@@ -1580,7 +1866,7 @@ class TestScenarioGClosedSetDelta:
         )
 
         # Structural invariants inside the delta, re-read on the current file: the channel
-        # letters stay unique and the defect table keeps three HIGH rows.
+        # letters stay unique and the defect table keeps one HIGH row per label the program prints.
         current = read(ANALYZE_DETECTION)
         letters = channel_letters(current)
         assert len(set(letters)) == len(letters), f"a channel letter repeats: {letters!r}"
@@ -1588,8 +1874,15 @@ class TestScenarioGClosedSetDelta:
             "a baseline pass letter was removed or renamed"
         )
         rows = defect_table(channel_section())
-        assert len(rows) == 3 and all(row[2] == "HIGH" for row in rows), (
-            f"the three defect classes must stay HIGH; rows={rows!r}"
+        assert rows and all(row[2] == "HIGH" for row in rows), (
+            f"every defect class must stay HIGH; rows={rows!r}"
+        )
+        declared = set()
+        for row in rows:
+            declared |= set(re.findall(r"`([a-z-]+)`", row[1]))
+        assert declared == set(validator_labels()), (
+            "the channel table's label column must equal the program's closed set; "
+            f"declared={sorted(declared)}"
         )
 
     # --- critique-and-self-critique.md -------------------------------------

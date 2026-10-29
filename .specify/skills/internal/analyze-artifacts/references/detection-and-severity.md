@@ -96,14 +96,18 @@ the remedy is to add it.
 Record shape, admissibility criteria, rejection forms and the load-bearing threshold are owned by
 `shared/guidelines/decision-tension.md` — read that owner; do not restate its tables here.
 
-Three defect classes, each **HIGH**. The value domain is HIGH or 0 — there is **no advisory or
-downgrade tier**, and the detector MUST NOT be asked to decide whether the plan holds a
-load-bearing decision: a missing record is judged fail-closed.
+Three defect classes, each **HIGH**, plus the two record-level validator labels — the section anchor
+and the identifier shape — which carry the same severity, so the table below covers all six labels
+the program can print and no finding can be dropped between the program and this mapping. The value
+domain is HIGH or 0 — there is **no advisory or downgrade tier**, and the detector MUST NOT be asked
+to decide whether the plan holds a load-bearing decision: a missing record is judged fail-closed.
 
 | Defect class | Validator label(s) | Severity |
 |--------------|--------------------|----------|
 | No record — the `## Decision Tensions` section is absent, or present with a bare `N/A` carrying no one-line justification per load-bearing trigger | `dtr-section-missing` | HIGH |
+| Misplaced section — the section is present but is not the direct successor of `## Constitution Check` followed by `## Project Structure`, so the record no longer sits beside the gate it defends | `dtr-anchor` | HIGH |
 | Incomplete record — a field label missing or blank, a single-pole `binding_constraints`, an empty `expected_sacrifice` or the literal `none` | `dtr-record-incomplete`, `dtr-rejected-form` | HIGH |
+| Record identifier malformed, duplicated or skipped — the sub-section heading does not begin with `T-NNN`, or the identifiers are not unique and increasing in document order | `dtr-tension-id` | HIGH |
 | Unmappable cost — `expected_sacrifice` does not resolve to a declared measurement source | `expected-sacrifice-unmapped` | HIGH |
 
 When `requirements.md` has no measurement-source section, branch mechanically on the record

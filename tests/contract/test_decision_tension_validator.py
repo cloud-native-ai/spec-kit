@@ -260,18 +260,52 @@ def test_output_shape_human_and_json(tmp_path):
         assert re.search(rf"(?m)^\s*\[{re.escape(label)}\] (pass|fail) \(\d+\)$", human), (
             f"missing per-label line for {label!r}:\n{human}"
         )
+    # The channel mapping is printed by the program, so a report records its verdict instead of
+    # a table a consumer fills in (review F4). The value domain is the declared HIGH-or-0.
+    assert re.search(r"(?m)^channel: value_domain=HIGH-or-0, high=0$", human), human
 
     proc = run(spec, "--json")
     payload = payload_of(proc)
-    assert set(payload) == {
+    # The six keys C-3 pins are all present; `channel` and `findings` are the additive surface
+    # the analyze channel's severity mapping needs (every finding carries its own severity, and
+    # the aggregate is HIGH-or-0). Nothing C-3 names was renamed or dropped.
+    assert {
         "spec", "status", "checks", "errors", "warnings", "scanned",
-    }, f"the --json envelope must carry exactly the six declared fields; got {sorted(payload)}"
+    } <= set(payload), f"the C-3 envelope lost a declared key; got {sorted(payload)}"
+    assert set(payload) == {
+        "spec", "status", "checks", "errors", "warnings", "scanned", "channel", "findings",
+    }, f"the --json envelope carries an undeclared field; got {sorted(payload)}"
     assert payload["status"] == "ok"
     assert payload["errors"] == 0 and payload["warnings"] == 0
     assert [check["label"] for check in payload["checks"]] == list(LABELS)
-    assert all(set(check) == {"label", "status", "count"} for check in payload["checks"]), (
-        "each check entry carries exactly label/status/count"
+    assert all(set(check) == {"label", "status", "count", "severity"} for check in payload["checks"]), (
+        "each check entry carries label/status/count plus its channel severity"
     )
+    assert payload["channel"] == {"value_domain": "HIGH-or-0", "high": 0}, payload["channel"]
+    assert [check["severity"] for check in payload["checks"]] == [0] * len(LABELS), (
+        "a label that did not fire counts 0 — there is no advisory tier below HIGH"
+    )
+
+
+def test_channel_severity_is_high_per_finding_and_zero_for_quiet_labels(tmp_path):
+    """The mapping is the program's, and it is the declared domain: HIGH or 0, nothing between."""
+    spec = write_spec(tmp_path, PLAN_HEAD + PLAN_TAIL.lstrip("\n"))  # section absent
+    proc = run(spec, "--json")
+    payload = payload_of(proc)
+    assert proc.returncode == 1
+    assert payload["channel"]["value_domain"] == "HIGH-or-0"
+    assert payload["channel"]["high"] == 1, (
+        f"the program must count the channel's HIGH findings itself; got {payload['channel']!r}"
+    )
+    assert [finding["label"] for finding in payload["findings"]] == ["dtr-section-missing"]
+    assert all(finding["severity"] == "HIGH" for finding in payload["findings"]), (
+        f"every finding of this channel is HIGH; got {payload['findings']!r}"
+    )
+    fired = {check["label"]: check["severity"] for check in payload["checks"]}
+    assert fired["dtr-section-missing"] == "HIGH"
+    assert {label: value for label, value in fired.items() if label != "dtr-section-missing"} == {
+        label: 0 for label in LABELS if label != "dtr-section-missing"
+    }, f"a quiet label must read 0, never a lower tier: {fired!r}"
 
 
 # --------------------------------------------------------------------------- #

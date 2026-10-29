@@ -231,3 +231,83 @@ def test_double_red_splits_at_first_occurrence(tmp_path):
     )
     verdict = verdict_of(proc)
     assert verdict["status"] == "accepted", verdict
+
+
+# --------------------------------------------------------------------------- #
+# C-3 — the key anchor: a list marker or heading prefix is not a second grammar
+# --------------------------------------------------------------------------- #
+#
+# SI-4 payloads are markdown, so the ordinary shape an author produces is a bullet list under a
+# heading. The key is the same four literal names in the same order — only the prefix differs — so
+# the payload must be read identically and accepted (review: code important-a). What the anchor
+# still forbids is an INDENTED key: that line belongs to the value above it.
+
+BULLET_PAYLOAD = """## Falsification attempt
+
+- attempt: `pytest -q tests/contract/test_decision_tension_validator.py`
+- exit_code: 0
+- observation: raw: 16 passed in 2.15s
+- would_go_red_if: 把 `expected_sacrifice` 改成字面 `none`，则 red: `test_inverse_samples_turn_red[sacrifice-none]` 必须 FAILED（退出码 1）
+"""
+
+HEADING_PAYLOAD = """### attempt: `pytest -q tests/contract/test_falsification_quartet_validator.py`
+### exit_code: 1
+### observation: raw: 1 failed, 20 passed
+### would_go_red_if: 把 `KEYS` 里删掉一个名字，则 red: `test_rejection_rate_is_six_of_six` 必须 FAILED
+"""
+
+
+def test_bullet_list_payload_is_the_same_grammar(tmp_path):
+    """Four keys as markdown list items: accepted, and read as the same quartet."""
+    proc = run(write(tmp_path, BULLET_PAYLOAD, "bullet.md"), "--json")
+    assert proc.returncode == 0, (
+        "a bullet-list quartet is the ordinary markdown shape and must be accepted; "
+        f"stdout={proc.stdout!r}"
+    )
+    verdict = verdict_of(proc)
+    assert verdict["status"] == "accepted", verdict
+    assert verdict["reason"] is None, verdict
+
+
+def test_heading_prefix_payload_is_the_same_grammar(tmp_path):
+    """A heading prefix is read the same way — the prefix is markup, not part of the key."""
+    proc = run(write(tmp_path, HEADING_PAYLOAD, "headings.md"), "--json")
+    assert proc.returncode == 0, (
+        f"a heading-prefixed quartet must be accepted; stdout={proc.stdout!r}"
+    )
+    assert verdict_of(proc)["status"] == "accepted"
+
+
+def test_indented_key_stays_part_of_the_value_above(tmp_path):
+    """The guard on the other side: an indented key is a continuation, never a second key.
+
+    Without this half, widening the anchor would let an indented `- attempt:` inside a value start
+    a second `attempt` — which is what makes the exactly-once rule unreadable.
+    """
+    indented = payload(
+        observation="raw: 16 passed\n  - attempt: 这不是第二个 attempt，而是 observation 的续行",
+    )
+    proc = run(write(tmp_path, indented, "indented.md"), "--json")
+    assert proc.returncode == 0, (
+        "an indented key-shaped line is a continuation of the value above it, so the payload "
+        f"still carries four keys exactly once; stdout={proc.stdout!r}"
+    )
+
+
+def test_duplicate_key_under_a_prefix_is_still_one_field_too_many(tmp_path):
+    """A repeat is a repeat whatever prefix it wears: no second `attempt` may pass as first."""
+    duplicated = BULLET_PAYLOAD.replace(
+        "- exit_code: 0",
+        "- attempt: `pytest -q another_test.py`\n- exit_code: 0",
+    )
+    assert duplicated.count("attempt:") == 2, "the fixture must carry two `attempt` keys"
+    proc = run(write(tmp_path, duplicated, "duplicate.md"), "--json")
+    assert proc.returncode == 1, (
+        f"a duplicated key must be rejected, not silently collapsed; stdout={proc.stdout!r}"
+    )
+    verdict = verdict_of(proc)
+    assert verdict["reason"] == "missing-field", (
+        "the closed set has no duplicate-field member: a key that does not appear exactly once "
+        f"cannot be read unambiguously. got {verdict!r}"
+    )
+    assert "attempt" in verdict["detail"], verdict
