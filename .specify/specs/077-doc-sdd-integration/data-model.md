@@ -88,7 +88,7 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 | `declaration-malformed` | 字段在场但形态不合规范（全角冒号 / 字段名大小写变体 / 尾随空白 / 行内注释） | **1** | 同上 | 同上；MUST NOT 落成「无该行」 |
 | `declaration-duplicate` | 头部区/全文出现第二行同字段 | **1** | 同上 | 阻断；点名两处行号 |
 | `declaration-misplaced` | 唯一一行位于 `## Related Feature` 之后 | **1** | 同上 | 阻断；点名行号 |
-| `declaration-absent` | **存量线**头部区无该字段（FR-001 的作用域之外） | **0** | `flow_class: execution` / `source: default` / `marker: <默认标记>` / `error: {label: declaration-absent}` | advisory：提示可补声明；不阻断、不计缺陷、不进判定集合 |
+| `declaration-absent` | 任何无该字段的线（引擎不区分存量/新增；FR-001 的作用域之外——新线漏声明的合规判定归 plan/tasks 阶段） | **0** | `flow_class: execution` / `source: default` / `marker: <默认标记>` / `error: {label: declaration-absent}` | advisory：提示可补声明；不阻断、不计缺陷、不进判定集合 |
 | `invalid-unit-id` | 键不合文法 | **2** | `flow_class: execution` / `source: default` | 降级标签同 `owner-unavailable` 的行为面 |
 | `owner-unavailable` | owner 不可解析；或**调用方无法执行引擎**（可观察触发：引擎文件不存在 / 操作系统拒绝执行 / 进程未产出记录——此时标签由调用方写下，引擎不在场自然无记录） | **2** | 同上 | 保持既有门禁集，不中断，不记通过；载荷 `error` 位取同一标签 |
 
@@ -170,7 +170,7 @@ MUST NOT 再对四个子节逐个报 `subsection-missing`（否则同一根因�
 | 字段 | 取值 | 说明 |
 |------|------|------|
 | `operator_id` | `G-…` | 取自门禁 owner 的算子表，不在此重列；**子行沿用父行的 `operator_id`**，MUST NOT 自造 id |
-| `face` | 六面 face id（`face_scope=gate`）/ CLI 输出面 id `reader`·`evidence`·`duplicate`·`count`（`face_scope=cli`）/ 面级子行 id `build`（`face_scope=sub`） | 三者不是同一集合：六面是判据面（owner 是门禁文档），四面是工具输出面（owner 是 `doc-consistency-check.py` 的 `FACES` 常量），`build` 是 `G-implement-structure` 的站点构建子行；记录 MUST 写明取的是哪一种（`face_scope` 三值） |
+| `face` | 六面 face id（`face_scope=gate`）/ CLI 输出面 id `reader`·`evidence`·`duplicate`·`count`（`face_scope=cli`，用于算子入口本身就是一次 `--faces` 调用、记录直接取该 CLI 面 id 的算子级行）/ 面级行 id `reader`·`evidence`·`duplicate`·`count`·`structure`·`build`（`face_scope=sub`） | 三者不是同一集合：六面是判据面（owner 是门禁文档），四面是工具输出面（owner 是 `doc-consistency-check.py` 的 `FACES` 常量），`structure` 是 `doc-consistency-check.py --action structure` 的结构子步，`build` 是站点构建检查；记录 MUST 写明取的是哪一种（`face_scope` 三值）。**`face_scope` 是唯一判别位**：`gate` / `cli` 只出现在**算子级行**（每个 blocking 算子恰一条），`sub` 只出现在**面级行**（解释，MUST NOT 占 `operator_id`、MUST NOT 参与 `passed`/`failed` 计数） |
 | `verdict` | 算子级：`pass` \| `fail` \| `not-evaluated`；子行：另可用 `not-applicable` | 封闭集；`not-applicable` MUST NOT 出现在算子级行（NA 是面级结论，见下） |
 | `entry` | 命令串或「人工/受委托代理」 | 算子入口 |
 | `rc` | 整数或 `null` | 该条命令自身的原始退出码（槽位行的 `rc` 是聚合值，见 E8） |
@@ -178,7 +178,7 @@ MUST NOT 再对四个子节逐个报 `subsection-missing`（否则同一根因�
 
 **字段集止于此**：本实体 MUST NOT 新增 `evidence_sha256` 之类的记账字段。U4 的 (b) 项判据是「证据文件存在且非空」，不做哈希比对——既有 `gate-implement-evidence-binding` 的哈希绑定只约束 `verification.md` 的 SC 样本行，且其 owner 明写非 `pass` 判定不承担绑定义务，给算子记录加哈希会把该规则反转（requirements FR-019(b)）。
 
-**算子级行与子行**：每个 blocking 算子恰一条算子级行（`face_scope=gate|cli`）；站点构建检查是 `G-implement-structure` 的**子行**（`face_scope=sub`、`face=build`）——MUST NOT 被读成第二个算子，MUST NOT 自占 `operator_id`。**子行是解释、不是独立口径**：子行为 `fail` 时算子级 verdict MUST 为 `fail`（不允许「子行红、算子绿」）。**计数规则**（槽位的 `passed`/`failed` 由此导出）：`pass` 计 `passed`；`fail` 与 `not-evaluated` 计 `failed`——两值之和 MUST 等于本次运行产出结果的 blocking **算子级**行数；`not-applicable` 只出现在子行，**单列**——MUST NOT 计入 `passed`、MUST NOT 计入 `failed`（与门禁 owner「站点层不存在时记 `not-applicable`，不得记为通过」一致），其条数从子行直接数、按面级断言核对。本实体 MUST NOT 定义「算子总数 − (`passed`+`failed`) = `not-applicable` 条数」这类**跨级**等式：算子级行与子行不是同一计量单位。逐面的 `not-evaluated` 原因写进 `evidence_ptr` 指向的门禁输出，MUST NOT 并入 `passed`、MUST NOT 以 0 表示未运行。
+**算子级行与子行**：每个 blocking 算子恰一条算子级行（`face_scope=gate|cli`）；站点构建检查是 `G-implement-structure` 的**子行**（`face_scope=sub`、`face=build`）——MUST NOT 被读成第二个算子，MUST NOT 自占 `operator_id`。**表达类 implement 的四条 CLI 面行同为面级行**（`face_scope=sub`，`face` 分别取 `reader` / `evidence` / `duplicate` / `count`），`structure` 子步亦然（`face_scope=sub`、`face=structure`）：它们**不参与** `passed`/`failed` 计数，MUST NOT 因「四个 CLI 面」把 implement 的算子级行膨胀成四行——该阶段算子级行仍只取 `G-implement-structure` 一条（`face=structure-links-build`、`face_scope=gate`）。**子行是解释、不是独立口径**：子行为 `fail` 时算子级 verdict MUST 为 `fail`（不允许「子行红、算子绿」）。**`docs-utils.py --action validate` 仍运行**（三选一取「运行」）：它是 `G-implement-structure` 的登记执行入口、是该算子级行的 `entry`（结构/链接/构建零新增违规），因此 MUST 出现在该算子的 `entry` 与槽位 `command` 的命令串里（`rc` 的逐命令非零优先聚合自然覆盖它）；本特性新增的四条 CLI 面行、`structure` 子步与 `build` 子行都在**同一条算子**下作面级解释，MUST NOT 替换它、MUST NOT 把它记 `not-applicable`（记录形态见 `contracts/document-structure.md` C-017）。**计数规则**（槽位的 `passed`/`failed` 由此导出）：`pass` 计 `passed`；`fail` 与 `not-evaluated` 计 `failed`——两值之和 MUST 等于本次运行产出结果的 blocking **算子级**行数；`not-applicable` 只出现在子行，**单列**——MUST NOT 计入 `passed`、MUST NOT 计入 `failed`（与门禁 owner「站点层不存在时记 `not-applicable`，不得记为通过」一致），其条数从子行直接数、按面级断言核对。本实体 MUST NOT 定义「算子总数 − (`passed`+`failed`) = `not-applicable` 条数」这类**跨级**等式：算子级行与子行不是同一计量单位。逐面的 `not-evaluated` 原因写进 `evidence_ptr` 指向的门禁输出，MUST NOT 并入 `passed`、MUST NOT 以 0 表示未运行。
 
 ## E8 — Docs Gate Slot Row
 
@@ -190,9 +190,9 @@ MUST NOT 再对四个子节逐个报 `subsection-missing`（否则同一根因�
 | `slot` | `baseline`（implement 起点）/ `closure`（review 通过后） | 同 |
 | `stage` | `implement` / `closure` | 同 |
 | `selection_basis` | **`docs-gate-full`** | `full-suite` |
-| `command` | 该次文档门禁命令串（一次四面调用 + 结构子步；站点层存在时加构建子行检查——同一算子的面级子行，不是第二个算子） | `run-tests.sh …` |
+| `command` | 该次文档门禁命令串（一次四面调用 + 结构子步 + 算子级 `docs-utils.py --action validate`；站点层存在时加构建子行检查——同一算子的面级子行，不是第二个算子） | `run-tests.sh …` |
 | `rc` | **聚合退出码**：该次门禁的命令串逐命令取非零优先（任一命令非零则非零，全为 0 才 0） | 同（单条命令的 rc 即聚合值） |
-| `passed` | verdict = **`pass`** 的 blocking 算子数（`not-applicable` 不计入） | 通过用例数 |
+| `passed` | verdict = **`pass`** 的 blocking 算子数——**仅** `not-applicable` 的 `build` 子行不计入；该子行为 `fail` 时按 E7 把算子级 verdict 转 `fail`，**仍改变本列** | 通过用例数 |
 | `failed` | verdict ∈ {`fail`, `not-evaluated`} 的算子数 | 失败用例数 |
 | `failed_names_path` | 失败算子 id 名单文件 | 失败用例名单 |
 | `baseline_compare` | closure：算子 id 集合的名称级差集（`comm -13` 形态） | closure：失败名单名称级差集 |
@@ -209,7 +209,7 @@ MUST NOT 再对四个子节逐个报 `subsection-missing`（否则同一根因�
 |----|------|----------|
 | `flow_class` | `execution` / `expression` | 派发构造缺陷，U4 不放行 |
 | `source` | `declaration` / `default` | 同上 |
-| `marker` | 默认标记字面量或空 | 同上（`source: default` 时空值即缺字段） |
+| `marker` | 默认标记字面量或空 | 同上（**收窄**：仅 `source: default` **且** `error=-` 时空值即缺字段；`error=owner-unavailable` 的降级形态下 `marker` 空是合法取值，不构成缺字段） |
 | `error` | **`owner-unavailable` 或 `-`**（值域恰为这两项；`-` = 无错误位。`declaration-absent` 是 advisory 发现码，只出现在 E3 的发现里，MUST NOT 进载荷） | 同上 |
 
 **两个可区分的未声明形态**（本表存在的理由）：`source=default` + `marker=<默认标记>` + `error=-` = 作者没写声明（`declaration-absent` 的冷形态）；`source=default` + `marker` 空 + `error=owner-unavailable` = 机制降级。U4 必须能把二者分开：后者 MUST 走 `owner-unavailable` 分支（记降级观测、保持既有门禁集），MUST NOT 当作「作者未声明」放行，也 MUST NOT 按表达类四项校验（requirements FR-019(c)）。

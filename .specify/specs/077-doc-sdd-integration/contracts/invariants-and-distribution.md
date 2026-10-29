@@ -18,7 +18,7 @@
 
 ## 编辑面与镜像
 
-- **C-004** 改动的唯一编辑面 MUST 是框架源（`templates/`、`shared/`、`skills/`、`scripts/`）。`.specify/` 运行时副本
+- **C-004** 改动的唯一编辑面 MUST 是框架源与框架测试面（`templates/`、`shared/`、`skills/`、`scripts/`、`tests/`）。`.specify/` 运行时副本
   MUST 由既有同步机制产出，MUST NOT 手改。(FR-024)
 
 - **C-005** 分发判据 MUST 是「相对改动前基线零新增漂移」：`sync-mirrors.py --check` 与

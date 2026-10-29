@@ -249,7 +249,7 @@
 | CHK026（U4 四项 vs 算子表） | FR-017/FR-019、C-017（doc）、C-004（drv）、T017/T018 | 「四面」= 门禁输出的面（`FACES`）；U4(a) 分母只取算子表（implement 1 行） |
 | CHK027（E7 无哈希） | FR-019(b)、C-004(b)（drv）、E7、T016/T017 | 择一：(b) 降为「存在且非空」，删哈希比对，并写明为何不给 E7 加字段 |
 | CHK028（四面两义） | FR-017/FR-020、C-017（doc）、C-006/C-007（drv）、SC-003 | 统一为 CLI `FACES = (reader, evidence, duplicate, count)`；结构两向登记为 `structure` 子步 |
-| CHK029（not-applicable 计 pass） | FR-020、C-007（drv）、E7/E8、SC-003 | `not-applicable` **单列**，不计 `passed`/`failed`，并由条数等式约束 |
+| CHK029（not-applicable 计 pass） | FR-020、C-007（drv）、E7/E8、SC-003 | `not-applicable` **单列**，不计 `passed`/`failed` |
 | CHK031（rc 无单一进程） | FR-020、C-006（drv）、E8、T019 | `rc` = 逐命令**非零优先**的聚合退出码；逐命令原始 rc 落证据文件；不新增聚合脚本 |
 | CHK033（降级不可表示） | FR-009/FR-018/FR-019(c)、C-001/C-004（drv）、E9、T017/T020 | 载荷增 `error=<label|->` 第四位；U4 在 `error` 非 `-` 时走 `owner-unavailable` 分支 |
 | CHK039（确认门预算） | FR-022、SC-006 与 Source、T021 + 本条更正行 | 写成可判定条款（两次扫描读数相等），T021 实跑扫描器 |

@@ -61,7 +61,7 @@ rm -rf "$TMP"
 
 **实施后期望**：`fx-declared` → `expression` / `source: declaration` / exit 0（三者各答不同）；
 `fx-absent` → `execution` / `source: default` / `marker: <069 默认标记>` / `error.label: declaration-absent`（advisory）/ exit 0
-（这一行是「存量缺省」，不阻断；它与「机制降级」的差别在 `error.label` 上可见）；
+（这一行是「任何无该字段的线」——引擎不区分存量/新增——不阻断；它与「机制降级」的差别在 `error.label` 上可见）；
 `fx-bad` → `flow_class: null` / `source: declaration` / stderr 一行 `<code>: <path>:<line> carries 'expressive', …` /
 **exit 1**（不是 2）。
 

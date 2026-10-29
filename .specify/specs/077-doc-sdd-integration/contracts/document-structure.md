@@ -86,6 +86,13 @@
   MUST NOT 被登记为第五个 CLI 面）；③ 站点层存在时的构建检查——它是 `G-implement-structure` 的 `face=build`
   **面级子行**（`face_scope=sub`），MUST NOT 被登记为独立算子或独立 `operator_id`；站点层不存在时该子行取
   `not-applicable`（显式）。任一面、子步或子行为 `not-evaluated` MUST NOT 计为通过。
+  **三者的记录形态同一，且都是面级行**：①②③ 一律记作 `face_scope=sub` 的面级行，`face` 分别取
+  `reader` / `evidence` / `duplicate` / `count`、`structure`、`build`；面级行 MUST NOT 自占 `operator_id`、
+  MUST NOT 参与槽位 `passed`/`failed` 计数——表达类 implement 的算子级行仍只取 `G-implement-structure` 一条
+  （`data-model.md` E7、`driver-integration.md` C-004(a)）。**`docs-utils.py --action validate` 取「运行」**：
+  它仍是 `G-implement-structure` 的登记执行入口与该算子级行的 `entry`（结构/链接/构建零新增违规），MUST 出现在
+  该算子的 `entry` 与槽位 `command` 的命令串里；①②③ 是同一条算子下的面级解释，MUST NOT 替换它，
+  MUST NOT 把它记 `not-applicable`。
   **「四面」的唯一读法**：指 ① 的四个 CLI 输出面，MUST NOT 被读作阶段算子表的四行——该表在 implement 只登记
   一行 blocking（`G-implement-structure`）与一行 advisory（`G-implement-reader`），U4(a) 的计数分母取该表
   （`driver-integration.md` C-004），四个 CLI 面由其绑定的同一份门禁输出文件承载。(FR-017)

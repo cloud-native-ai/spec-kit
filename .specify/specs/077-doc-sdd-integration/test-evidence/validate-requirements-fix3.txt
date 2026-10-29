@@ -1,0 +1,19 @@
+# /speckit.analyze #3 fix round (fix3) — full capture, no truncation
+# captured_at: 2026-10-29T18:45:45Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+# branch: 077-doc-sdd-integration
+# head: 0c8f95d3
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/validate-requirements.py .specify/specs/077-doc-sdd-integration/requirements.md
+
+file: .specify/specs/077-doc-sdd-integration/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 264 lines, 33 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+
+# exit=0

@@ -133,7 +133,7 @@ table, the rejection list or the threshold table.*
 │   ├── driver-integration.md
 │   └── invariants-and-distribution.md
 ├── feature-ref.md       # Phase 1 output — 25 条 FR → 设计落点 + 8 条 SC → 证据来源
-├── checklists/          # requirements 阶段的 16 项质量清单
+├── checklists/          # requirements 阶段的 17 项质量清单
 ├── test-evidence/       # 本阶段 13 份全量捕获（见 Phase 1 表的 Evidence 行）
 ├── tasks.md             # Phase 2 output (/speckit.tasks — NOT created by /speckit.plan)
 └── verification.md      # Implementation output (/speckit.implement)
@@ -240,3 +240,16 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 - **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — 追加「修复轮处置」第 20–29 行（R-01…R-07 与 5 条 LOW），使表共 29 行、29/29 可复核；分类=minor。
 
 **本轮非 plan 属主制品**：`tasks.md` 的 T016/T017/T019/T021/T028 修订属 tasks 阶段产物；`.specify/memory/features.md` 077 行与 `.specify/memory/features/077.md` 的阶段记录属 Feature 登记面——均不在本表登记。
+
+### 修复轮 3（minor，analyze #3，2026-10-30）
+
+*第三轮 `/speckit.analyze`（0 CRITICAL / 0 HIGH）留下的 3 MEDIUM + 10 LOW 中，凡落在 plan 属主制品的条目在此登记。本轮仍为 spec-only 修复，计数不变（25 FR / 8 SC / 77 条款 / 6 STR / 28 任务），`coverage-baseline.txt` 不重冻结，`shared/workflow/expression-gates.md` 与 `shared/definitions/flow-class-definitions.md` 不动。*
+
+- **PLAN-EDIT**: `data-model.md` — E9 `marker` 行收窄为「`source: default` **且** `error=-` 时空值即缺字段」（F-01）；E3 的 `declaration-absent` 触发语改为「任何无该字段的线（引擎不区分存量/新增）」（F-04）；E7 `face` 行把四条 CLI 面行与 `structure` 一并登记为 `face_scope=sub` 面级行，并在「算子级行与子行」写明 `docs-utils.py --action validate` 取「运行」（F-02①②③）；E8 `command` 行补该算子级调用、`passed` 行加「仅 NA 子行」限定（F-02③ / F-05）；分类=minor（措辞收紧，不新增/删除条款，不改变任何已声明义务的计量单位）。
+- **PLAN-EDIT**: `contracts/document-structure.md` — C-017 补①「四条 CLI 面行是面级行」②「`structure` 取 `face_scope=sub`」③「`docs-utils.py --action validate` 取运行」（F-02）；分类=minor。
+- **PLAN-EDIT**: `contracts/driver-integration.md` — C-004(b) 错字「不新增加记账字段」→「不新增记账字段」（F-10）；C-006 的 `command` 串补算子级 `docs-utils.py --action validate`（F-02③）；分类=minor。
+- **PLAN-EDIT**: `contracts/invariants-and-distribution.md` — C-004 编辑面枚举补 `tests/`（F-08）；分类=minor。
+- **PLAN-EDIT**: `research.md` — R-10 标题「三个契约文件」→「四个契约文件」（与同节五行表一致，F-06）；分类=minor。
+- **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — CHK029 处置行删去「并由条数等式约束」，与同表第 20 行 R-01 的「删除跨级等式」一致（F-03）；分类=minor。
+
+**本轮非 plan 属主制品**：`requirements.md` 的 SC-003（仅 NA 子行限定，F-05）、FR-020 的 `command` 串（补算子级 `docs-utils.py --action validate`，F-02③）与 FR-024（编辑面补 `tests/`，F-08）属 requirements 面；`tasks.md` 的 T013（补 SC-004 第二个落文夹具，E-02）/ T016（`build` 子行 fail ⇒ 算子级 fail；grep token 集收窄为 `flow_class|flow-class`，C-02 + B-01）/ T019（`command` 串同步，F-02③）与覆盖表 FR-005 行（补 T009 / T010，F-09）属 tasks 面；`quickstart.md` 的 S2 触发语（F-04）——均不在本表登记。
