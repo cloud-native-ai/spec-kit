@@ -497,3 +497,221 @@ A .specify/specs/074a-authorized-routing/notes/red-t022.txt
 The confirmation-gate count, the scheduler inventory and the registry set are therefore unchanged by
 this part; the full baseline comparison is task T028's (part 5), and this line only states what this
 part's own diff shows.
+
+
+---
+
+Part 5 of 5 (tasks T026–T032), 2026-10-29, `HEAD=ff1ef3527` before this part's commits.
+
+## Single-owner — the four routing facts land once (T027) · EXECUTED 2026-10-29
+
+T027 is a **reverse count**, not a reading of the owner document: take each fact as it landed, then
+count where else that phrasing occurs. The four facts are named here only by pointer —
+`shared/definitions/sdd-routing-definitions.md` § Inputs (F-1), § Verdict table (F-2), § Precedence
+(F-3), § Reason codes (F-4) — because restating them in this file would itself be the defect being
+measured.
+
+The probe is a program, and its output carries a **digest per phrase instead of the phrase**. That is
+deliberate: an audit record that spells the vocabularies out would show up as an "outside hit" of its
+own scan and force every later reader to discount it. The digest lets anyone re-run the same program
+and confirm which phrase a row refers to, without this file becoming a second copy.
+
+```console
+$ python3 - <<'PY'
+import hashlib, pathlib, re, subprocess
+
+OWNER = "shared/definitions/sdd-routing-definitions.md"
+MIRROR = ".specify/shared/definitions/sdd-routing-definitions.md"
+text = pathlib.Path(OWNER).read_text(encoding="utf-8")
+
+def section(name):
+    m = re.search(rf"^## {re.escape(name)}$(.*?)(?=^## |\Z)", text, re.S | re.M)
+    assert m, name
+    return m.group(1)
+
+def table_rows(body):
+    out = []
+    for line in body.splitlines():
+        line = line.strip()
+        if not line.startswith("|") or set(line) <= set("|- "):
+            continue
+        out.append([c.strip() for c in line.strip("|").split("|")])
+    return out
+
+phrases = []
+for row in table_rows(section("Inputs")):
+    if len(row) >= 3 and row[0].startswith("`") and "`--" in row[0]:
+        phrases.append((f"F-1 in:{row[0].split('`')[1]}", row[2]))
+for row in table_rows(section("Verdict table")):
+    if len(row) >= 3 and row[0].startswith("`") and row[1].startswith("`"):
+        phrases.append((f"F-2 v:{row[0].strip('`')}", f"| {row[0]} | {row[1]} |"))
+body = section("Precedence")
+phrases.append(("F-3 prose", next(l for l in body.splitlines() if "固定优先级（F-3）" in l).split("：", 1)[1].split("。")[0]))
+machine = next(l.strip() for l in body.splitlines() if l.strip().startswith("**") and ">" in l)
+phrases.append(("F-3 machine", machine))
+order = re.findall(r"`([^`]+)`(?=\s*(?:>|$))", machine.strip("*").split("：", 1)[1])
+assert len(order) >= 3, order
+phrases.append(("F-3 ascii rendering", " > ".join(order)))
+for i, row in enumerate([r for r in table_rows(section("Reason codes")) if len(r) >= 2 and r[0].isdigit()], 1):
+    phrases.append((f"F-4 row{i:02d}", row[1].strip("`")))
+
+tracked = [p for p in subprocess.run(["git", "ls-files", "-z"], capture_output=True, text=True).stdout.split("\0") if p]
+bodies = {}
+for p in tracked:
+    try:
+        bodies[p] = pathlib.Path(p).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        pass
+
+print(f"tracked files scanned: {len(bodies)}; phrases parsed from {OWNER}: {len(phrases)}")
+outside_total = 0
+for label, phrase in phrases:
+    hits = [p for p, b in bodies.items() if phrase in b]
+    outside = [h for h in hits if h not in (OWNER, MIRROR)]
+    outside_total += len(outside)
+    print(f"{label:20.20} sha1={hashlib.sha1(phrase.encode()).hexdigest()[:10]} "
+          f"owner={'Y' if OWNER in hits else 'N'} mirror={'Y' if MIRROR in hits else 'N'} outside={len(outside)}")
+    for h in outside:
+        print(f"    {h}")
+print(f"total outside hits: {outside_total}")
+PY
+tracked files scanned: 4585; phrases parsed from shared/definitions/sdd-routing-definitions.md: 20
+F-1 in:change_nature sha1=d727dd3043 owner=Y mirror=Y outside=0
+F-1 in:traceability  sha1=e28c58c0d7 owner=Y mirror=Y outside=0
+F-1 in:blast_radius  sha1=68d5fd3cb9 owner=Y mirror=Y outside=0
+F-1 in:reversibility sha1=d50d6374c3 owner=Y mirror=Y outside=0
+F-1 in:complexity    sha1=c48ce7e138 owner=Y mirror=Y outside=0
+F-2 v:sdd            sha1=0af42c3cde owner=Y mirror=Y outside=0
+F-2 v:direct         sha1=dea678c25d owner=Y mirror=Y outside=0
+F-2 v:adjudicate     sha1=7b0bc9bf6a owner=Y mirror=Y outside=0
+F-3 prose            sha1=a85714d8e0 owner=Y mirror=Y outside=0
+F-3 machine          sha1=a6e357f250 owner=Y mirror=Y outside=0
+F-3 ascii rendering  sha1=0bf12078ee owner=N mirror=N outside=7
+    .specify/memory/features/074.md
+    .specify/specs/074-goal-team-sdd-unification/checklists/requirements.md
+    .specify/specs/074-goal-team-sdd-unification/data-model.md
+    .specify/specs/074-goal-team-sdd-unification/requirements.md
+    .specify/specs/074-goal-team-sdd-unification/tasks.md
+    .specify/specs/074a-authorized-routing/checklists/readiness-2026-10-29.md
+    .specify/specs/074a-authorized-routing/requirements.md
+F-4 row01            sha1=8f1512a6b1 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row02            sha1=20b76bed77 owner=Y mirror=Y outside=5
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+    .specify/specs/074a-authorized-routing/notes/red-first-evidence.md
+F-4 row03            sha1=8435ae48f8 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row04            sha1=353af799a7 owner=Y mirror=Y outside=5
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+    .specify/specs/074a-authorized-routing/notes/red-first-evidence.md
+F-4 row05            sha1=992cad811a owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row06            sha1=738432d695 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row07            sha1=d772a23ce0 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row08            sha1=d6d7623304 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+F-4 row09            sha1=b3e48a7e63 owner=Y mirror=Y outside=4
+    .specify/specs/074a-authorized-routing/notes/golden-rows.txt
+    .specify/specs/074a-authorized-routing/notes/golden-run1.json
+    .specify/specs/074a-authorized-routing/notes/golden-run2.json
+    .specify/specs/074a-authorized-routing/notes/quickstart-run.md
+total outside hits: 45
+# RC=0
+```
+
+### Reading the count
+
+- **F-1 and F-2 — zero copies outside the owner and its mirror.** All five domain cells and all three
+  verdict-table rows exist in exactly two files, and the second is the generated mirror that T026
+  proved byte-identical.
+- **F-3 — the owner's own two landed forms are unique**, but the same fact has a second *rendering*
+  (the ASCII chain) that appears in 7 records. The probe reports it as its own row precisely so this
+  audit does not claim more than it measured.
+- **F-4 — the reason-code vocabulary appears outside the owner only in dated evidence records**: the
+  real `--action golden` payloads and this record's own quoted runs. Nothing resolves a judgement
+  through them.
+
+### Every non-owner hit, classified
+
+| File(s) | Fact | Class | Why it is not a second owner |
+|---------|------|-------|------------------------------|
+| `.specify/shared/definitions/sdd-routing-definitions.md` | F-1…F-4 | machine-regenerated mirror | never hand-edited; T026 proved byte-identical to the source in the same run |
+| `.specify/specs/074a-authorized-routing/requirements.md` | F-3 | requirement source (FR-011 / FR-014 acceptance text) | upstream of the owner: the requirement states *what must hold*, the owner fixes *the one reading*; this slice's implement stage did not edit it |
+| `.specify/specs/074a-authorized-routing/checklists/readiness-2026-10-29.md` | F-3 | checklist quoting the requirement text as an anchor | a dated evaluation record that cites the requirement and owns nothing |
+| `.specify/specs/074a-authorized-routing/notes/{golden-rows.txt,golden-run1.json,golden-run2.json,quickstart-run.md,red-first-evidence.md}` | F-4 | dated execution evidence (real payloads) | records what a run printed; no surface reads a judgement through them |
+| `.specify/memory/features/074.md` | F-3 | Feature 074 registry record, written by earlier stages | not produced by this slice's implement stage, and it names the single owner in the same sentence — see the residual observation below |
+| `.specify/specs/074-goal-team-sdd-unification/{requirements,data-model,tasks,checklists/requirements}.md` | F-3 | parent spec, **read-only** for this slice | the parent's own design record, outside this slice's edit scope per `tasks.md` § Path Conventions |
+
+### The implementation surfaces reach the facts by path
+
+```console
+$ git ls-files -z | xargs -0 grep -l -F 'sdd-routing-definitions.md' 2>/dev/null \
+    | grep -E '^(scripts/|shared/|skills/|src/|tests/)' | sort
+scripts/python/sdd-route.py
+shared/definitions/sdd-routing-definitions.md
+shared/definitions/subagent-definitions.md
+src/specify_cli/__init__.py
+tests/contract/test_sdd_invocation_governance.py
+tests/contract/test_sdd_routing_definitions.py
+tests/contract/test_sdd_routing_engine.py
+tests/fixtures/nested_sdd.py
+```
+
+Three surfaces do **not** name the owner document, and each reaches the decision through an executable
+form instead: `skills/internal/run-agent/SKILL.md` and `skills/external/sdd-loop-driver/SKILL.md` § U0
+call `python3 …/sdd-route.py --action authorize` (the engine is the owner document's only reader), and
+`skills/external/sdd-loop-driver/references/nested-invocation.md` V-6 requires a **recorded** decision
+by reference (`verdict_ref`) instead of restating the vocabulary. `skills/internal/create-team/…/
+create-mode.md` cites the neutral key set's own owner, not the routing facts.
+
+The decisive check is program, not prose:
+
+```console
+$ python3 -m pytest -q \
+    tests/contract/test_sdd_routing_engine.py::test_engine_carries_no_second_copy_of_the_owner_facts \
+    tests/contract/test_sdd_routing_definitions.py::test_owned_vocabularies_are_written_only_in_the_owner_document
+..                                                                       [100%]
+2 passed in 0.15s
+# RC=0
+```
+
+The first case re-derives the vocabularies from the owner document and fails if the engine carries any
+reason code, verdict literal, domain value, domain sequence or condition list; the second does the same
+over the six edited/new framework surfaces. Both green, so the reverse count and the program agree.
+
+**Result**: `contracts/routing-decision.md` C-30 holds on every surface this slice produces — F-1, F-2
+and F-4 have exactly one landing place plus the mirror, and F-3's remaining hits are records that cite
+rather than own.
+
+**Residual observation (recorded, not repaired — by design)**: `.specify/memory/features/074.md`
+(Key Changes item 3) spells the precedence order out in prose while naming the owner in the same
+sentence. It pre-dates this slice's implement stage, it is a registry record rather than an
+implementation surface, and rewriting its Key Changes content is not a task row of this slice — so it
+goes to `/speckit.review` (the classification-honesty audit face) instead of being silently edited
+here. T031 touches only that file's slice line and `Last Updated`.
