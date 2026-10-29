@@ -142,3 +142,93 @@ name there is a stage record, not a registry, ledger, state spine, ownership mod
   re-captures it in place).
 - Clause-coverage baseline: owned by [`../coverage-baseline.txt`](../coverage-baseline.txt) (T003 freezes
   it).
+
+## 10. Containment (post-change): the two claims discharged by name-set comparison (T018)
+
+This section is written **after** the change (the file's other sections are the pre-change halves of
+the same comparisons). It discharges `contracts/compat-and-safety.md` C-3, C-4, C-5 and C-6 — the
+slice's two containment claims and the four-surface additivity audit — and it is the only place the
+comparison is made.
+
+### 10.1 Claim 1+2 — post ⊇ pre per named set, shared ids verdict-unchanged (C-3, C-4, C-6)
+
+**Same command, same file lists** as the pre-change capture that owns the sets
+([`../test-evidence/compat-baseline-nodeids.txt`](../test-evidence/compat-baseline-nodeids.txt),
+`stage_base=33269994a`, 7 sets / 17 files / 266 cases):
+
+```text
+$ python3 -m pytest --collect-only -q <the 17 files of each named set>
+# raw capture: ../test-evidence/containment-post-change-collect.txt
+S1 pre=49 post=55 lost=0 added=6
+S2 pre=25 post=25 lost=0 added=0
+S3 pre=24 post=24 lost=0 added=0
+S4 pre=40 post=40 lost=0 added=0
+S5 pre=36 post=36 lost=0 added=0
+S6 pre=54 post=54 lost=0 added=0
+S7 pre=38 post=38 lost=0 added=0
+```
+
+**Set containment (the criterion), never a count comparison**: `pre \ post` is empty for every set —
+no pre-change case id disappeared — and the only additions are the six cases T017 landed in set `S1`
+(they are listed by name in the capture, not summarised as "+6"). `S2`–`S7` are id-identical.
+
+**Shared-id verdicts** — the same 17 files executed once:
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/containment-post-failed.txt <the 17 files>
+============================= 272 passed in 27.26s =============================
+# failed-name list written: .specify/.tmp/containment-post-failed.txt (0 entries)
+rc=0
+```
+
+Every one of the 266 shared ids is **green after** as it was **green before**: the post-change failing
+set is empty, so it agrees with the pre-change verdict for every shared id (the reading rule for
+C-3/C-6 admits a case red in the baseline to stay red; here there is none — none of the 17 files
+appears in [`../baseline-failed.txt`](../baseline-failed.txt)). Full capture:
+[`../test-evidence/containment-post-change-run.txt`](../test-evidence/containment-post-change-run.txt).
+
+### 10.2 Claim 3 — the four predecessor surfaces are untouched (C-5, C-7, C-8, C-9)
+
+`git diff` against the baseline commit named above, over each surface's owner paths. **The positive
+control matters**: without it an empty diff proves only that the command printed nothing, so the last
+block runs the identical command form on a path this slice *did* edit and shows it reporting.
+
+```text
+$ git rev-parse 33269994a
+33269994a7dba7976d25c44da9ef319045a4f517
+
+$ git diff --stat 33269994a -- skills/external/sdd-loop-driver .specify/specs/058-sdd-loop-driver
+[changed paths: 0]                                   # S2 — standalone driver entry (058-sdd-loop-driver)
+
+$ git diff --stat 33269994a -- skills/external/sdd-loop-driver/references/decomposition-model.md \
+                            .specify/specs/070-subagent-task-teams
+[changed paths: 0]                                   # S3 — Feature 070 stage-team preset contract
+
+$ git diff --stat 33269994a -- scripts/python/line-registry.py .specify/specs/064-subagent-concurrency
+[changed paths: 0]                                   # S4 — Feature 064 line / worktree / ownership
+
+$ git diff --stat 33269994a -- skills/external/sdd-loop-driver/SKILL.md \
+                            skills/external/sdd-loop-driver/references/stage-prompts.md \
+                            skills/external/sdd-loop-driver/references/watch-model.md \
+                            .specify/specs/058-sdd-loop-driver
+[changed paths: 0]                                   # S5 — Feature 058 U0–U6 contract
+
+$ git diff --stat 33269994a -- skills/internal/create-team/SKILL.md
+ skills/internal/create-team/SKILL.md | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+[changed paths: 1]                                   # POSITIVE CONTROL — the same form, a path this slice edited
+```
+
+**Reading**: no existing key, section, entry form or exit-code meaning on those four surfaces moved,
+because nothing on them changed at all; and the control shows the command form returns a non-empty
+stat when its subject does move, so the four empty results are evidence rather than silence.
+
+The slice's other read-only subjects were checked the same way (empty output = zero diff):
+
+```text
+$ git diff --stat 33269994a -- skills/internal/run-team/SKILL.md agents/sdd-executor.agent.md \
+      scripts/python/sdd-route.py shared/definitions/subagent-definitions.md \
+      shared/definitions/sdd-routing-definitions.md src/specify_cli/__init__.py \
+      tests/fixtures/nested_sdd.py templates/commands
+                                     # empty: every one of the eight read-only subjects is untouched
+```
