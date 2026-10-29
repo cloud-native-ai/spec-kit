@@ -24,7 +24,7 @@
 - DoD-7: `verification.md` 逐条列 `- **SC-001**` … `- **SC-006**` 的状态（只从 `.specify/templates/verification-log-template.md` 的封闭词表取值）、命令、输出摘要与证据指针；无来源的量记 `not-evaluated` + reason，不记 0、不记达成。
 - DoD-8: plan_constraint 全趟遵守——`plan.md` / `data-model.md` / `contracts/` / `quickstart.md` / `research.md` / `feature-ref.md` 的任一改动只能是行级小修（错字 / 措辞 / 断链 / 格式 / 行级一致），逐项在 `verification.md` 声明 `PLAN-EDIT: <path> — <理由>；分类=minor`；任何实质性改动停线回抛，不静默重写。
 
-**DoD Status**: pending
+**DoD Status**: satisfied at implement close (DoD-1…DoD-8 each measured — see `verification.md` § DoD close and § Gates; the stage verdict itself belongs to `/speckit.review`)
 
 ## Completion Gate
 
@@ -199,7 +199,7 @@
 - [X] T029 [blockedBy: T026] 定向回归与分类诚实性审计面：重跑 `test-evidence/targeted-set-v1-baseline.txt` 的 13 个既有契约文件 + 5 个新测试文件（`python3 -m pytest -q …`），把既有 13 文件的失败 nodeid 排序后与 T002 重采名单做 `comm -13`（MUST 为空，判据是名字级不是条数级），5 个新文件 MUST 全绿；同趟落审计职责——`/speckit.review` 是本切片的分类诚实性审计面（复核每条已声明输入的分类、记录不一致；嵌套运行另加驱动 U4 独立校验），引擎的确定性只覆盖声明输入，故审计结论记入 review 证据而不回写裁决；结果与命令追加 `notes/pre-change-measurements.md` 的回归小节。
 - [X] T030 [blockedBy: T029] 快速走查取证：按 `quickstart.md` 的 S1–S7 逐条执行（S1 route feature-scale / S2 bounded maintenance / S3 missing input / S4 effective authorization / S5 nested run + handoff / S6 acceptance evidence / S7 三项基线在实现起点重测），把每条命令、真实输出、退出码写入 `notes/quickstart-run.md`；无法执行的场景记 `not-evaluated` + reason，不记达成。
 - [X] T031 [blockedBy: T030] SC 证据与登记收口：把 SC-001…SC-006 的状态（只从 `.specify/templates/verification-log-template.md` 的封闭词表取值）、命令、输出摘要与证据指针逐条写入 `.specify/specs/074a-authorized-routing/verification.md`，并逐条声明本趟的 `PLAN-EDIT:`（若有）；同步 `.specify/memory/features/074.md` 的切片行与 `.specify/memory/features.md` 的 074 行 Last Updated（状态列保持 `Planned`；`Implemented` 转移按 `.specify/shared/workflow/feature-integration.md` 判定，不在本行擅自推进）。
-- [ ] T032 [blockedBy: T031] 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/074a-authorized-routing/tasks.md`（0 error / 0 warning）、`python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/074a-authorized-routing --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/074a-authorized-routing/requirements.md --tasks .specify/specs/074a-authorized-routing/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/074a-authorized-routing`（claimed = 47 / FR 20 / uncovered beyond baseline = 0），把四段真实输出贴入 `verification.md` 的 gates 小节；若发现与冻结清单的结构漂移，按 rerun 契约追加新行而不重编号。
+- [X] T032 [blockedBy: T031] 终局门禁复跑：依次跑 `python3 .specify/scripts/python/validate-tasks.py .specify/specs/074a-authorized-routing/tasks.md`（0 error / 0 warning）、`python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/074a-authorized-routing --stage tasks --repo .`（errors=0，advisory 逐条裁定）、`python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/074a-authorized-routing/requirements.md --tasks .specify/specs/074a-authorized-routing/tasks.md`（`proceed`）、`python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/074a-authorized-routing`（claimed = 47 / FR 20 / uncovered beyond baseline = 0），把四段真实输出贴入 `verification.md` 的 gates 小节；若发现与冻结清单的结构漂移，按 rerun 契约追加新行而不重编号。
 
 ---
 

@@ -128,3 +128,121 @@ deferred_reason_summary=
 notes=Gate re-runs (tasks T032) are recorded in the `# -- Gates --` section appended below by that task;
 all four gates ran against the frozen task list without renumbering. The closure full-suite run is the
 driver's, after review (see the `post_change_full_suite_*` note above).
+
+# -- Gates (tasks T032, re-run against the frozen task list) --
+
+Four gate commands, run in order, real output verbatim. No task was renumbered; the frozen list is the
+one T032 was written against.
+
+### GATE-1 — task-file structure
+
+```console
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/074a-authorized-routing/tasks.md
+PASS: .specify/specs/074a-authorized-routing/tasks.md — 0 error(s), 0 warning(s)
+RC=0
+```
+
+### GATE-2 — cross-artifact consistency
+
+```console
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/074a-authorized-routing --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=3 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [
+  {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 66,
+   "message": "path does not exist under the repo: .specify/specs/074b-nested-governance"},
+  {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 60,
+   "message": "path does not exist under the repo: tests/contract/test_nested_run_report.py"},
+  {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 62,
+   "message": "path does not exist under the repo: feedback/20261028T160637Z-speckit-requirements.md"}],
+ "summary": {"errors": 0, "advisories": 3, "waived": 0, "fr": 20, "sc": 6, "tasks": 32,
+             "clauses": 0, "files": 14}, "checked_at": "2026-10-29T03:55:15Z"}
+RC=0
+```
+
+**Adjudication of the 3 advisories — each `expected absent`, none waived silently:**
+
+1. `tasks.md:66` → `.specify/specs/074b-nested-governance`. The sibling slice has **not** started; its
+   absence is exactly what the slice's path conventions require (`tasks.md` § Path Conventions marks it
+   `MUST NOT implement`). The citation is a boundary statement, not a promise of an existing file.
+2. `feature-ref.md:60` → `tests/contract/test_nested_run_report.py`. That test belongs to 074b together
+   with the report section it pins (recorded decision D-3). Absent by design.
+3. `checklists/requirements.md:62` → `feedback/20261028T160637Z-speckit-requirements.md`. The bundle
+   **does** exist, at `.specify/memory/feedback/20261028T160637Z-speckit-requirements.md`; the checklist
+   cites `.specify/memory/`-relative paths throughout (the same line cites `session/…` and
+   `exec-quant/records/…` the same way), so this is a resolution-convention artefact rather than a
+   missing artifact. The checklist is a dated record from an earlier stage; its citations are left
+   byte-identical rather than rewritten in this stage.
+
+### GATE-3 — decomposition size
+
+```console
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+    --requirements .specify/specs/074a-authorized-routing/requirements.md \
+    --tasks .specify/specs/074a-authorized-routing/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 20, "task_count": 32,
+ "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-29T03:55:13Z"}
+RC=0
+```
+
+### GATE-4 — clause coverage
+
+```console
+$ python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/074a-authorized-routing
+== clause coverage (universe: contract files per the owner's forms; claimed: tasks.md [green:] declarations) ==
+claimed clauses (this feature): 47
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 20
+FR claimed: 20
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 47, scanned files 212, clause universe 1285, FR universe 20
+  [clause-uncovered] pass (495) — 495 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 20 of 20 FRs cited from citation groups
+  [clause-unparsable] warn (94) — 94 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 495 names; 495 uncovered items are baseline-internal and do not block
+uncovered beyond baseline: 0
+0 error(s), 0 warning(s)
+status: ok
+RC=0
+```
+
+All 47 clauses are claimed exactly once, the FR lane is 20/20, and the uncovered count is 0 beyond the
+frozen baseline — the `[clause-unparsable]` warn is the baseline's own parse-doubt class (0 of those
+files declare a positive form), unchanged by this slice.
+
+### GATE-8 / GATE-9 — no open rows, SC rows complete
+
+Both are measured **after** T032 itself was closed, which is the only moment GATE-8 can be 0 — while the
+last row is still open it reports 1, and that is what it returned on the first look. Stated explicitly so
+the number is not read as a pre-close measurement:
+
+```console
+$ grep -cE '^- \[[ >]\]' .specify/specs/074a-authorized-routing/tasks.md   # before closing T032
+1
+$ grep -cE '^- \[[ >]\]' .specify/specs/074a-authorized-routing/tasks.md   # after closing T032
+0
+$ grep -cE '^- \*\*SC-00[1-6]\*\*' .specify/specs/074a-authorized-routing/verification.md
+6
+```
+
+**Structural drift check**: no drift was found between the frozen task list and the delivered slice, so
+no rerun row was appended and nothing was renumbered.
+
+---
+
+# -- DoD close --
+
+- **DoD-1**: 32/32 rows `[X]`; `deferred_tasks=` empty (no `[~]` row exists).
+- **DoD-2**: 15-row delivery surface as `feature-ref.md` § 2 declares — 9 new (3 framework sources + 5 test
+  modules + 1 fixture) and 6 changed; zero new command, zero new skill.
+- **DoD-3**: 47/47 clauses claimed once each; GATE-4 above.
+- **DoD-4**: 5 new modules green (86 cases); zero new failed nodeids against the implement-start re-capture.
+- **DoD-5**: 7 source/mirror pairs `cmp`-identical; `sync-mirrors.py --check` clean; `.specify/` mirrors
+  were never hand-edited.
+- **DoD-6**: the four routing facts land once (reverse count in `notes/quickstart-run.md` § Single-owner);
+  zero new registry, ledger, state spine, ownership model, integration queue, confirmation gate,
+  scheduler, daemon or automatic transfer (§ Structure).
+- **DoD-7**: the six `- **SC-00N**` rows above carry status, command, output summary and evidence pointer.
+- **DoD-8**: plan_constraint honoured — `plan_edit_count=0`, measured by an empty `git diff --stat` over
+  every plan-owned path for the whole implement stage.
