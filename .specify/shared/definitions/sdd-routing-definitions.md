@@ -84,21 +84,27 @@
 
 **机读面（层级分档）**：上表 `complexity` 行的四名按 rubric 自身的分档二分——高 = `complex` / `high-stakes`；低 = `trivial` / `standard`。分档不改写层级名，只声明哪两名属于「高」这一侧。
 
+**机读面（取值语义 / value semantics）**：下列具名句柄指向 § Inputs 已经声明的取值，**不复述任何取值域**——它只给引擎一个可引用的名字，使引擎的每个条件判定都不必自己写死人名外的字面量；改域时这一块随上表一起改（同一文件、同一处）。
+
+- `definition_class` = `definition-class`
+- `feature_nature` = `feature`
+- `traceability_required` = `required`
+- `traceability_not_required` = `not-required`
+- `plain_local` = `local`
+- `cross_cutting` = `cross-cutting`
+- `bounded_correction` = `local-bounded-definition-correction`
+- `definition_class_default` = `cross-cutting`
+- `reversal_hard` = `hard`
+- `reversal_reversible` = `reversible`
+
 ## Definition-class default
 
 `definition-class` 变更**默认跨切面**：它落盘的表面定义着其他表面的行为，所以默认值是 `change_nature` 这个取值的属性，不是调用方另传的类别标志，也不是引擎的临场判断（C-20）。
 
 - **有界修正是唯一逃逸口**：调用方必须声明独立的半径取值 `local-bounded-definition-correction` 并随附**非空理由**。声明普通 `local` 而指望被当作等价物不成立——`local` 对 `definition-class` 不被接受为等价，此时有效半径取默认值 `cross-cutting`。
-- **理由缺失或为空是缺项，不是默许**：判 `input-missing`（见 § Reason codes），MUST NOT 补一个推定的理由后继续。
+- **理由缺失或为空是缺项，不是默许**：条件 `input-missing` 命中，理由码取 `adjudicate-missing-input`（见 § Reason codes），MUST NOT 补一个推定的理由后继续。
 - **逃逸口只在定义面上成立**：`local-bounded-definition-correction` 与其它变更性质同时声明时，它不构成本地半径，有效半径取 `cross-cutting`；唯一例外是 § Conflict set 里的冲突组合，那一条按裁定处理。
-- **有效半径（effective blast radius）**是记录里随 `inputs` 一起落盘的派生值：声明 `definition-class` 取值时，有界修正 + 非空理由 → 该有界值，否则 → 默认值；其余变更性质下沿用声明值，唯独有界修正取值按上一条取 `cross-cutting`。
-
-**机读面（半径语义 / radius semantics）**:
-
-- `definition_class` = `definition-class`
-- `bounded_correction` = `local-bounded-definition-correction`
-- `plain_local` = `local`
-- `definition_class_default` = `cross-cutting`
+- **有效半径（effective blast radius）**是记录里随 `inputs` 一起落盘的派生值：声明 `definition-class` 取值时，有界修正 + 非空理由 → 该有界值，否则 → 默认值；其余变更性质下沿用声明值，唯独有界修正取值按上一条取 `cross-cutting`。推导所用的取值句柄见 § Inputs 的「机读面（取值语义）」。
 
 ## Verdict table
 
@@ -129,27 +135,27 @@
 |---|---|---|
 | 1 | `change_nature=feature` & `blast_radius=local-bounded-definition-correction` | 一次新增或改变能力/契约的变更不可能同时是一条「有界定义修正」：两个声明互相取消对方的前提，任选其一都是替调用方做决定。 |
 
-组合格的机读形态是 `输入=取值` 项以 `&` 连接的一行；命中任何一行即 `input-conflicting`。多条冲突以外的多条件同时命中，裁决按 § Precedence 走，理由码按 § Reason codes 的行序取首条。
+组合格的机读形态是 `输入=取值` 项以 & 符号连接的一行；命中任何一行即条件 `input-conflicting`。多条冲突以外的多条件同时命中，裁决按 § Precedence 走，理由码按 § Reason codes 的行序取首条。
 
 ## Reason codes
 
-理由码词表（F-4）——封闭，且**行序即取码次序**：同一裁决下多条条件同时命中时，取本表中行号最小的那条。第 5 列说明读者该用它判断什么，不是触发条件的第二份定义。
+理由码词表（F-4）——封闭，且**行序即取码次序**：同一裁决下多条条件同时命中时，取本表中行号最小的那条。第 5 列说明读者该用它判断什么，不是触发条件的第二份定义。理由码自带裁决前缀（`adjudicate-` / `sdd-` / `direct-`），因此一个理由码本身就说清了它是哪一种裁决，而不必回查第 3 列。
 
 | # | 理由码 | 归属裁决 | 条件 id | 读者用它判断什么 |
 |---|---|---|---|---|
-| 1 | `input-missing` | `adjudicate` | `input-missing` | 哪一项输入缺失（含 `definition-class` 上缺失的有界修正理由） |
-| 2 | `input-ambiguous` | `adjudicate` | `input-ambiguous` | 哪个声明值落在封闭取值域之外 |
-| 3 | `input-conflicting` | `adjudicate` | `input-conflicting` | 命中了 § Conflict set 的哪一条组合 |
-| 4 | `capability-or-contract-change` | `sdd` | `nature-feature` | 变更新增或改变了能力/契约 |
-| 5 | `traceability-required` | `sdd` | `traceability-required` | 需要持久可追溯 |
-| 6 | `blast-radius-cross-cutting` | `sdd` | `blast-cross-cutting` | 有效半径跨切面（含 `definition-class` 的默认） |
-| 7 | `reversal-hard` | `sdd` | `reversal-hard` | 不可逆或难以反向 |
-| 8 | `complexity-high` | `sdd` | `complexity-high` | 层级为高 |
+| 1 | `adjudicate-missing-input` | `adjudicate` | `input-missing` | 哪一项输入缺失（含 `definition-class` 上缺失的有界修正理由） |
+| 2 | `adjudicate-ambiguous-value` | `adjudicate` | `input-ambiguous` | 哪个声明值落在封闭取值域之外 |
+| 3 | `adjudicate-conflicting-inputs` | `adjudicate` | `input-conflicting` | 命中了 § Conflict set 的哪一条组合 |
+| 4 | `sdd-capability-or-contract-change` | `sdd` | `nature-feature` | 变更新增或改变了能力/契约 |
+| 5 | `sdd-traceability-required` | `sdd` | `traceability-required` | 需要持久可追溯 |
+| 6 | `sdd-cross-cutting-radius` | `sdd` | `blast-cross-cutting` | 有效半径跨切面（含 `definition-class` 的默认） |
+| 7 | `sdd-hard-reversal` | `sdd` | `reversal-hard` | 不可逆或难以反向 |
+| 8 | `sdd-complexity-high` | `sdd` | `complexity-high` | 层级为高 |
 | 9 | `direct-conditions-all-hold` | `direct` | — | 六条全部成立，走直接修改 |
 
 条件 id 为 `—` 的行表示该裁决没有被更细的条件 id 细分（`direct` 的六条本身就是 § Verdict table 那一行），它在归属裁决胜出时即命中。
 
-**理由码不是错误码**：`input-missing` / `input-ambiguous` / `input-conflicting` 都是**已产出的裁决**，进程退出码仍为 `0`；退出码阶梯（`0` 产出裁决 / `2` 输入错误，无第三值）归 `contracts/routing-decision.md` C-28。
+**理由码不是错误码**：`adjudicate-missing-input` / `adjudicate-ambiguous-value` / `adjudicate-conflicting-inputs` 都是**已产出的裁决**，进程退出码仍为 `0`；退出码阶梯（`0` 产出裁决 / `2` 输入错误，无第三值）归 `contracts/routing-decision.md` C-28。
 
 ## User override
 

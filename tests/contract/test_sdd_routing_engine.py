@@ -257,7 +257,7 @@ def _argv(
     owner_doc: Path | None = None,
     fmt: str = "json",
 ) -> list:
-    argv = [str(ENGINE), "--action", action, "--format", fmt]
+    argv = ["--action", action, "--format", fmt]
     flags = _flag_map()
     for input_id, value in (
         ("change_nature", nature),
