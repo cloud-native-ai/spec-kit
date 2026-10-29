@@ -21,7 +21,7 @@ summary: "/speckit.requirements run=r20261028T132000Z-074d token=not_evaluated e
   "feature": "074a-authorized-routing",
   "feature_id": "074",
   "determined_at": "2026-10-28T16:03:59Z",
-  "settled_at": null,
+  "settled_at": "2026-10-29T04:31:31Z",
   "complexity": "complex",
   "qualification": "partial",
   "axes": {
