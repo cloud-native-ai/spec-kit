@@ -396,3 +396,31 @@ section is a property of the section rather than of an unreachable string list.
    `skills/internal/create-team/references/summary-mapping.md` and
    `shared/guidelines/task-complexity-rubric.md`, i.e. it does see these document families, while
    none of the slice's nine delivered paths is a gate source.
+
+### E-9 · targeted-set-v1 (part 3) — one run for the whole part
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out …/implement-targeted-part3-failed.txt \
+    <the 19 files of test-evidence/targeted-set-v1-baseline.txt> \
+    tests/contract/test_nested_run_report.py tests/contract/test_sdd_diffusion.py \
+    tests/contract/test_sdd_compat_containment.py
+======================== 1 failed, 337 passed in 34.13s ========================
+# failed-name list written: …/implement-targeted-part3-failed.txt (1 entries)
+rc=1                                       # wall 34.95 s
+
+$ cat …/implement-targeted-part3-failed.txt
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+
+$ comm -13 <(sort …/implement-targeted-part2-failed.txt) <(sort …/implement-targeted-part3-failed.txt)
+                                           # empty → zero NEW failing node ids in this part
+
+$ comm -13 <(sort baseline-failed.txt) <(sort …/implement-targeted-part3-failed.txt)
+                                           # empty → the one failure is a member of the 21-name
+                                           #         full-suite baseline (gate total 27 vs its frozen 23,
+                                           #         four gates predating this slice)
+```
+
+**Reading**: collected moved 321 → 338, exactly the 17 cases this part added (6 in the governance file,
+11 in the new containment suite); nothing existing disappeared. The single failure is the pre-existing
+gate-total red, unmoved and not claimed green. Capture: `test-evidence/implement-targeted-part3-run.txt`,
+row `implement.jsonl` seq 6.
