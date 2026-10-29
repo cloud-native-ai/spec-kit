@@ -1,0 +1,61 @@
+# Review #2 independent probes — feature 076 (code segment)
+# Written by the reviewer; none of this is the feature's own test code.
+# Run: 2026-10-29T12:57:33Z · Python 3.14.6
+# Labels P-A…P-F: decision-tension validator; P-G…P-J: quartet validator; P-K: link_verdict; P-L: bold-marker N/A.
+
+######## probe.py (decision-tension validator) ########
+== P-A: owner example verbatim ==
+  P-A-owner-example: exit=0 counts={} high=0
+== P-B: flat sentence N/A (must be rejected) ==
+  P-B-flat: exit=1 counts={'dtr-section-missing': 1} high=1
+== P-C: terse but per-trigger justification (documented rule satisfied) ==
+  P-C-terse: exit=1 counts={'dtr-section-missing': 1} high=1
+== P-D: per-trigger line whose reason mentions another trigger ==
+  P-D-cross: exit=1 counts={'dtr-section-missing': 1} high=1
+== P-E: owner example with poles at the field column (owner says: not a pole) ==
+  P-E-poles-unindented: exit=1 counts={'dtr-rejected-form': 1} high=1
+== P-F: record inside a fenced block (owner: not a record) ==
+  P-F-fenced: exit=1 counts={'dtr-section-missing': 1} high=1
+
+======== finding text for P-C / P-D / P-E ========
+-- P-C-terse --
+channel: value_domain=HIGH-or-0, high=1
+HIGH 11: dtr-section-missing: `## Decision Tensions` section `N/A` does not justify these triggers one by one: 不可逆、跨团队、高爆炸半径
+1 error(s), 0 warning(s)
+-- P-D-cross --
+channel: value_domain=HIGH-or-0, high=1
+HIGH 11: dtr-section-missing: `## Decision Tensions` section `N/A` does not justify these triggers one by one: 与宪法原则相关
+1 error(s), 0 warning(s)
+-- P-E-poles-unindented --
+channel: value_domain=HIGH-or-0, high=1
+HIGH 13: dtr-rejected-form: `binding_constraints` misses a non-empty `pole_a`; `binding_constraints` misses a non-empty `pole_b`
+1 error(s), 0 warning(s)
+
+######## probe2.py (quartet + link_verdict) ########
+== code important-a: quartet key anchor ==
+  P-G plain-column-0: exit=0 out={
+  "payload": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmpb01hkh5f.md",
+  "status": "accepted",
+  "reason": nu
+  P-H bullet-list: exit=0 out={
+  "payload": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmpqlg83ev5.md",
+  "status": "accepted",
+  "reason": nu
+  P-I indented-key-is-not-a-key: exit=1 out={
+  "payload": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmpj6d7b_km.md",
+  "status": "rejected",
+  "reason": "m
+  P-J duplicate-under-bullet: exit=1 out={
+  "payload": "/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp40iy1z4c.md",
+  "status": "rejected",
+  "reason": "m
+== code important-b: link_verdict ==
+  P-K dangling: ('error', ['T-007'])
+  P-K resolving: ('ok', [])
+  P-K no-slot: ('ok', [])
+
+== P-L: bold trigger, four-character reason ==
+-- bold --
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+exit=0
