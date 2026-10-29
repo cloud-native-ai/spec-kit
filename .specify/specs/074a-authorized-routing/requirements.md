@@ -25,12 +25,12 @@
 | 控制层级与授权 | `FR-001`–`FR-006` | 全部纳入并定义（本地 `FR-001`–`FR-006`） |
 | 分流裁决 | `FR-007`–`FR-014` | 全部纳入并定义（本地 `FR-007`–`FR-014`） |
 | 嵌套调用契约 | `FR-015`–`FR-019` | 全部纳入并定义（本地 `FR-015`–`FR-019`） |
-| 引导/维护路径分流面 | `FR-025` | 纳入并定义（本地 `FR-020`） |
-| 成功判据 | `SC-001`–`SC-004`、`SC-006`、`SC-007` | 全部纳入（本地 `SC-001`–`SC-006`） |
+| 引导/维护路径分流面 | `FR 025` | 纳入并定义（本地 `FR-020`） |
+| 成功判据 | `SC-001`–`SC-004`、`SC-006`、`SC 007` | 全部纳入（本地 `SC-001`–`SC-006`） |
 | 共享字符串 | `STR-001`–`STR-009`、`STR-011` | 全部纳入（本地 `STR-001`–`STR-010`） |
-| 外层消费与交接 | `US4`、`FR-020`–`FR-024` | 不在本切片；由 `074b-nested-governance` 承接 |
+| 外层消费与交接 | `US4`、`FR-020`–`FR 024` | 不在本切片；由 `074b-nested-governance` 承接 |
 | team report 嵌套段 | 父 `STR-010` | 不在本切片；由 `074b-nested-governance` 承接 |
-| 兼容与安全 | `SC-005`、`SC-008`、`FR-026`–`FR-028` | 不在本切片；由 `074b-nested-governance` 承接 |
+| 兼容与安全 | `SC-005`、`SC 008`、`FR 026`–`FR 028` | 不在本切片；由 `074b-nested-governance` 承接 |
 
 本切片 FR 定义总数 = 20（本地 `FR-001`–`FR-020`），落在分解门 8–30 区间内；`074b` = 8 条，同区间。
 
@@ -61,7 +61,7 @@
 | `FR-017` | `FR-017` | 调用方 Agent 必须把 handoff 原样或按稳定路径带入自身结果与 team run report；嵌套 outcome 为 blocked/failed 时不得报成功 |
 | `FR-018` | `FR-018` | 嵌套运行以「一条写线」注册到既有 line registry 与 worktree/ownership 机制；领域重叠须串行化或拒绝；不得新建第二套机制 |
 | `FR-019` | `FR-019` | stall / 超时 / 预算耗尽时停止、持久化状态脊、返回 failed handoff，并套用外层失败隔离与上报；不得静默等待 |
-| `FR-020` | `FR-025` | `sdd-project-setup` 与 `sdd-house-keeping` 在同一分流面被归类为引导/维护路径（区别于 SDD 开发流程）；派发子代理时适用同一有效授权谓词；只有 `sdd-loop-driver` 构成 SDD 调用 |
+| `FR-020` | `FR 025` | `sdd-project-setup` 与 `sdd-house-keeping` 在同一分流面被归类为引导/维护路径（区别于 SDD 开发流程）；派发子代理时适用同一有效授权谓词；只有 `sdd-loop-driver` 构成 SDD 调用 |
 
 ### Slice SC → Parent SC
 
@@ -72,7 +72,7 @@
 | `SC-003` | `SC-003` | 嵌套运行到达 review、产出完整 SDD 工件链、零 merge 零 push，且 report 嵌套段引用每条工件与证据路径 |
 | `SC-004` | `SC-004` | 阶段执行者不能启动 SDD 运行；任何未满足三项授权条件却点名 driver 的派发提示在派发前被阻断；既有反嵌套契约测试对非授权路径保持绿 |
 | `SC-005` | `SC-006` | 不引入第二套 registry / ledger / 状态脊 / ownership 模型 / 集成队列；嵌套运行的记录落在既有 line 与状态工件上 |
-| `SC-006` | `SC-007` | 任何歧义或冲突输入集产出 adjudicate 而绝不产出 direct，且在黄金表全部用例上成立 |
+| `SC-006` | `SC 007` | 任何歧义或冲突输入集产出 adjudicate 而绝不产出 direct，且在黄金表全部用例上成立 |
 
 ### Slice STR → Parent STR
 
@@ -421,7 +421,7 @@ dispatched.
 | Stage-team preset and work-package decomposition | Feature 070 | Preserve; it is the in-run decomposition mechanism, not a substitute for nested invocation |
 | Flow class, fast-fail, confirmation gates, Task Complexity Rubric | Features 069 / 052 and the shared guidelines | Reference by path; no restatement |
 | Goal, Target, and Goal–Team binding | `goal-definitions.md` | Reference; no structural link or new mandatory field |
-| Team conceptual model, patterns, run report | `create-team` / `run-team`; report contract in `create-team/SKILL.md` § Report contract | Reference; the nested-SDD report section itself is parent `FR-021` and belongs to `074b-nested-governance` |
+| Team conceptual model, patterns, run report | `create-team` / `run-team`; report contract in `create-team/SKILL.md` § Report contract | Reference; the nested-SDD report section itself is parent `FR 021` and belongs to `074b-nested-governance` |
 | Anti-nesting obligation | `subagent-definitions.md` § Dispatch-Time Governance Obligation | Amend the predicate once to the depth-2 chain and the virtual prohibition; do not duplicate it |
 
 ## Assumptions
@@ -456,7 +456,7 @@ dispatched.
 
 ## Out of Scope
 
-- **074b 承接（显式记录）**: 父 `US4`、父 `US5`；父 `FR-020`–`FR-024`（Goal 侧观察性归因与 ledger 归因、team report 强制嵌套段、Team Stage 维度消歧、SDD-host Agent 责任声明、项目指令指针面）；父 `FR-026`–`FR-028`（兼容与安全、四面可加性、不新增调度/守护/自动传输/第二确认门）；父 `STR-010`（team report 的 `## Nested SDD Runs` 段标题）；父 `SC-005`、父 `SC-008`。以上全部由 `074b-nested-governance` 承接，本切片不定义、不实现。
+- **074b 承接（显式记录）**: 父 `US4`、父 `US5`；父 `FR-020`–`FR 024`（Goal 侧观察性归因与 ledger 归因、team report 强制嵌套段、Team Stage 维度消歧、SDD-host Agent 责任声明、项目指令指针面）；父 `FR 026`–`FR 028`（兼容与安全、四面可加性、不新增调度/守护/自动传输/第二确认门）；父 `STR-010`（team report 的 `## Nested SDD Runs` 段标题）；父 `SC-005`、父 `SC 008`。以上全部由 `074b-nested-governance` 承接，本切片不定义、不实现。
 - Automatic merge or push by a nested run.
 - Changing the internal workflow of any individual `/speckit.*` stage command.
 - Allowing stage executors to drive, dispatch, or load any driver.
