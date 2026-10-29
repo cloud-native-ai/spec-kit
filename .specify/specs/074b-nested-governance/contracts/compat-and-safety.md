@@ -50,7 +50,9 @@ exit code is removed, renamed, or changed in meaning; additions are permitted (F
 pre-change case set captured at the baseline commit named in the verification record, and every
 pre-change case passes. The carriers are sets `S2` (standalone driver entry), `S3` (070 preset),
 `S4` (064 line/worktree/ownership) and `S5` (058 U0–U6) of
-`test-evidence/compat-baseline-nodeids.txt` (FR-007, SC-001). *(parent C-61)*
+`test-evidence/compat-baseline-nodeids.txt` (FR-007, SC-001). The team suite (`S6`) and Agent suite
+(`S7`) in the same carrier are the SC-001 carriers for those two surfaces and are read with the same
+superset-and-verdict rule. *(parent C-61)*
 
 *Reading rule for C-3 and C-6, and for the set both claims reach (S2, the standalone-driver entry
 suite named by FR-006/SC-001 and one of C-6's four surfaces)*: the criterion for a case id that is

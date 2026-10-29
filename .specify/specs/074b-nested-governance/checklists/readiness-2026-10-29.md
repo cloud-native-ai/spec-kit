@@ -139,3 +139,16 @@ The repair path is the driver's `plan` / `tasks` loop, per this command's Handof
 ### Reader baseline
 
 A framework maintainer who did not take part in this run. Every framework term used above (`[[STR-…]]`, D-1/D-2/D-3, the containment claim, the handoff, the integration identity) is either defined in `requirements.md` or reached by owner path named in the anchor.
+
+## Post-Remediation Dispositions (2026-10-29)
+
+The fail verdicts above are the checklist's dated record. After the analyze remediation (`7945a4e9b`), the following items are dispositioned; the original rows are kept append-only.
+
+| Item | Disposition | Evidence |
+|------|-------------|----------|
+| CHK003 | resolved | C-25 is now at-most-one per report (exactly one with a Target, none without) and matches V-5 |
+| CHK005 | accepted design-level anchor | C-21 (no rename/merge/reorder of existing mandatory sections) + C-27 (nested evidence does not discharge the outer verification duty); no requirement-level SC is added |
+| CHK013 | resolved | the C-3/C-6 reading rule: ids already red in the pre-change baseline are verdict-unchanged; the MUST-pass clause governs ids green in that baseline |
+| CHK017 | accepted | `Measures:` pointers to DoD-2 / DoD-4 / DoD-6 + T010/T016/T019/T024; no new SC |
+| CHK018 | resolved | C-4/C-6 bind the carrier sets S1–S7; T018 asserts all seven; S6/S7 are now named in C-6 |
+| CHK002 | resolved | C-26 + V-6: a no-Target run omits the attribution field and is not given an invented Target |

@@ -65,8 +65,10 @@ fabricated or re-computed reference is a contract violation (FR-002). *(parent C
 facet; D-2)*
 
 **C-29**: The section reads the handoff's closed field set by reference and adds no field of its own: a
-field the section lists that the handoff does not carry is recorded as missing, never filled in from
-the invoking agent's own prose. The **integration identity** — line id, branch, worktree path and HEAD
+required handoff field that the **delivered handoff** omits is recorded as missing (instance-level,
+not mode-level), never filled in from the invoking agent's own prose. The routing-verdict reference of
+C-28 is **not** a handoff field — it is read from the Agent execution evidence, so its absence from the
+handoff is not a missing field. The **integration identity** — line id, branch, worktree path and HEAD
 commit, in the form the handoff's owner defines it — is read from the handoff by that same rule: a
 handoff that carries no integration identity is an **incomplete handoff**, and the outer layer MUST NOT
 report the run as success on an incomplete handoff, whatever its outcome value. A `[[STR-005]]` or
