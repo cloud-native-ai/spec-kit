@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
 stage: implement
-stage_started_at: 1793301839
-stage_deadline_epoch: 1793307239
-stage_base_commit: a401db98
+stage_started_at: 1793302745
+stage_deadline_epoch: 1793308145
+stage_base_commit: f5835e0e
 attempt: 0
 retry_limit: 2
-last_verdict: implement P2 DONE — T009–T015 闭合（`a401db98`）；15/28；四个关键测试 129 passed；镜像/命令副本 ok；D-1 兼容性修复为只增不改；下一步 P3（T016–T022）
+last_verdict: implement P3 DONE — T016–T022 闭合（`0fb8a2bf` + `f5835e0e`）；22/28；驱动契约 33 passed + 邻近 411；零新增机制（差分空 / 确认门 27=27）；镜像六对 ok；下一步 P4（T023–T028）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -145,6 +145,14 @@ last_verdict: implement P2 DONE — T009–T015 闭合（`a401db98`）；15/28�
 - 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
 - D-1 披露：`test_expression_compatibility.py` 以文件自带的 `ALLOWED_POST_BASELINE_CHANGES` 机制为七模板登记 reason + marker，未删断言、未改冻结计数；驱动者接受
 - 同趟纠正：`--faces` 对照腿补空绿；读者声明行从 duplicate 面剔除
+
+### implement P3 — DONE（2026-10-30）
+
+- 提交：`0fb8a2bf` + `f5835e0e`；T016–T022 闭合（22/28）
+- 产物：`test_docs_gate_driver.py`（33 条）；`stage-prompts.md` 四元组 + U4 四项 + implement 证据面；`efficiency-model.md` §2.8 `docs-gate-full`；`SKILL.md` Hard Requirement 13；零新增机制与镜像收尾证据
+- 零新增机制：命令 27/27 差分 `[]`、依赖 6/6、进程 19/19、服务空集、确认门 27=27、FACES 仍四面
+- 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
+- 偏差：证据文件双轨命名（四份并存）；五次同趟断言对齐；T018 以新增 H3 落位，未改既有清单
 
 ## 测试预算（E2/E3）
 
