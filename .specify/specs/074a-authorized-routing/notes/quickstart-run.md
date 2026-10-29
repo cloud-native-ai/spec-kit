@@ -864,3 +864,218 @@ to be resolved by the existing line regime ("Feature 064"), with no second concu
 are satisfied by the landed text, so a nested run resolves to the existing registry entry and this loop's
 existing state spine — `contracts/nested-invocation.md` C-43 and `contracts/bootstrap-and-maintenance.md`
 C-47 hold.
+
+---
+
+## Quickstart walkthrough S1–S7, executed at implement close (T030) · EXECUTED 2026-10-29
+
+Every scenario of `quickstart.md` is now executable against the delivered slice (it was not at
+slice-plan time, which is what its per-example disclaimers say). This section is the walkthrough for
+T030: one row per scenario, with the command that was actually run, the real output, the exit code and
+where the full record lives. S4 was re-run **after** the slice closed, against a freshly built fixture;
+S1–S3 likewise.
+
+| Scenario | Status | Exit | Where the full output is |
+|----------|--------|------|--------------------------|
+| S1 route feature-scale | executed (this pass) | 0 | below |
+| S2 route bounded maintenance | executed (this pass) | 0 | below |
+| S3 missing input + conflicting | executed (this pass) | 0 / 0 | below |
+| S4 effective authorization | executed (this pass, post-closure) | 0 / 0 | below |
+| S5 nested run + handoff | executed (content face), part 2 | 0 | § S5 above |
+| S6 acceptance evidence | partially executed — one half `not-evaluated` | — | below |
+| S7 three baselines at implement start | re-measured | 0 | below |
+
+**Rendering note for this section**: the JSON payloads are re-wrapped to keep the lines readable, and
+long absolute paths are shortened to `<repo>/…` or `…/`. Field names, values, their order and every exit
+code are verbatim; re-running the command shown reproduces the payload byte-for-byte, which is also what
+`--format json` guarantees (SC-002).
+
+### S1 — route a feature-scale change
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route --nature feature \
+    --traceability required --blast-radius cross-cutting --reversibility hard \
+    --complexity standard --format json
+{
+  "action": "route",
+  "owner_document": "/storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/sdd-routing-definitions.md",
+  "verdict": "sdd",
+  "reason_code": "sdd-capability-or-contract-change",
+  "triggered_conditions": [
+    "nature-feature", "traceability-required", "blast-cross-cutting", "reversal-hard",
+    "complexity-low", "bounded-correction-recorded"
+  ],
+  "inputs": {
+    "change_nature": "feature",
+    "traceability": "required",
+    "blast_radius": "cross-cutting",
+    "reversibility": "hard",
+    "complexity": "standard"
+  },
+  "effective_blast_radius": "cross-cutting",
+  "bounded_correction_rationale": null,
+  "absent_inputs": [],
+  "ambiguous_inputs": [],
+  "actor": null,
+  "recorded_at": null,
+  "override": null
+}
+RC=0
+```
+
+(`triggered_conditions` and the rest are re-wrapped here for width; see the rendering note above.) The
+verdict is `sdd`, the reason code is the first declared row whose condition held, and the five declared
+inputs are echoed back — the shape S1 expects.
+
+### S2 — route a bounded maintenance change
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route --nature maintenance \
+    --traceability not-required --blast-radius local --reversibility reversible \
+    --complexity standard --format json
+{ "action": "route", "verdict": "direct", "reason_code": "direct-conditions-all-hold",
+  "triggered_conditions": ["nature-preserves", "traceability-not-required", "blast-local",
+    "reversal-reversible", "complexity-low", "bounded-correction-recorded"],
+  "inputs": { "change_nature": "maintenance", "traceability": "not-required",
+    "blast_radius": "local", "reversibility": "reversible", "complexity": "standard" },
+  "effective_blast_radius": "local", "bounded_correction_rationale": null,
+  "absent_inputs": [], "ambiguous_inputs": [], "actor": null, "recorded_at": null,
+  "override": null }
+RC=0
+```
+
+The closed value literals quoted in `quickstart.md` S2 are the owner document's own declared values, so
+the example holds as written. Verdict `direct`, with all six conditions named in the record.
+
+### S3 — a missing input never falls through to direct
+
+```console
+$ python3 .specify/scripts/python/sdd-route.py --action route --nature maintenance \
+    --traceability not-required --blast-radius local --reversibility reversible --format json
+{ "action": "route", "verdict": "adjudicate", "reason_code": "adjudicate-missing-input",
+  "triggered_conditions": ["input-missing", "nature-preserves", "traceability-not-required",
+    "blast-local", "reversal-reversible", "bounded-correction-recorded"],
+  "inputs": { "change_nature": "maintenance", "traceability": "not-required",
+    "blast_radius": "local", "reversibility": "reversible", "complexity": null },
+  "effective_blast_radius": "local", "absent_inputs": ["complexity"], "ambiguous_inputs": [] }
+RC=0
+
+$ python3 .specify/scripts/python/sdd-route.py --action route --nature feature \
+    --blast-radius local-bounded-definition-correction --traceability not-required \
+    --reversibility reversible --complexity standard --rationale "只收紧一处定义措辞" --format json
+{ "action": "route", "verdict": "adjudicate", "reason_code": "adjudicate-conflicting-inputs",
+  "triggered_conditions": ["input-conflicting", "nature-feature", "blast-cross-cutting",
+    "traceability-not-required", "reversal-reversible", "complexity-low",
+    "bounded-correction-recorded"],
+  "effective_blast_radius": "cross-cutting",
+  "bounded_correction_rationale": "只收紧一处定义措辞", "absent_inputs": [], "ambiguous_inputs": [] }
+RC=0
+```
+
+Both adjudicate cases exit `0` — an adjudication is a produced verdict, not a process failure — and the
+first one proves the precedence rule: every supplied value points at `direct`, and the absent complexity
+tier still outranks it.
+
+### S4 — resolve effective authorization (re-run after closure)
+
+The slice's fixture team was rebuilt under the sanctioned scratch root
+(`~/tmp/spec-kit/074a-s4/`, removed after the run) and the engine run from inside it:
+
+```console
+$ cd ~/tmp/spec-kit/074a-s4/project
+$ python3 <repo>/scripts/python/sdd-route.py --action authorize \
+    --agent .specify/agents/instances/seat-allowed.agent.md \
+    --team fixture-team --seat seat-allowed --format json
+{ "action": "authorize", "agent_capability": "allowed", "seat_policy": "allowed",
+  "effective": "allowed", "verdict": "allowed",
+  "reason": "both halves allow SDD invocation: the agent definition declares the capability and the seat policy allows it",
+  "failed_half": null, "team_slug": "fixture-team", "seat_slug": "seat-allowed",
+  "supplying": { "agent": "declared", "seat": "declared" },
+  "sources": { "agent": "…/project/.specify/agents/instances/seat-allowed.agent.md",
+               "team": "…/project/.specify/teams/fixture-team/team.md" } }
+RC=0
+
+$ python3 <repo>/scripts/python/sdd-route.py --action authorize \
+    --agent .specify/agents/instances/seat-allowed.agent.md \
+    --team fixture-team --seat seat-forbidden --format json
+{ "action": "authorize", "agent_capability": "allowed", "seat_policy": "forbidden",
+  "effective": "forbidden", "verdict": "forbidden",
+  "reason": "the seat half does not allow SDD invocation (absent map, absent entry for this seat, or explicit refusal)",
+  "failed_half": "seat", "team_slug": "fixture-team", "seat_slug": "seat-forbidden",
+  "supplying": { "agent": "declared", "seat": "declared" },
+  "sources": { … } }
+RC=0
+```
+
+The exit alphabet holds in both directions: an allow and a refusal are both exit `0`, and the refusal
+names the failing half plus both source paths and the seat slug. The malformed-`seats`-map case (exit
+`2`) is recorded verbatim in § S4 above.
+
+### S5 — nested run and handoff
+
+Executed as a **content face** in part 2 and recorded in full in § S5 above: the entry precondition
+resolves allowed / refused-with-the-half-named, the handoff carries the closed field set, `stages_reached`
+stops at `review`, and a real repository's `git log` / `git status` / branch / HEAD are identical before
+and after. It is not re-run here because it emits no shell command by design (the driver is a chat
+instruction, not a CLI) and re-running would produce the same fixture output the section already carries.
+
+### S6 — read the slice's acceptance evidence
+
+Half of this scenario is decidable today, half is not, so it is split rather than claimed:
+
+```console
+$ git log --merges --oneline 71954e31a..HEAD | wc -l
+0
+$ git rev-parse --abbrev-ref '@{u}'
+fatal: no upstream configured for branch '074-goal-team-sdd-unification'
+$ git status --porcelain | wc -l
+46
+```
+
+- **Decidable and executed**: the slice's whole commit range contains **zero merge commits**, and the
+  branch has **no upstream**, so nothing in this slice's history merged or pushed.
+- **`not-evaluated`**: the `git log --oneline <line-base>..<line-head>` form over a *real* nested run's
+  own line branch. Reason: no nested run has actually been started in this repository — the
+  invoked-from-team path was exercised through the fixture's content face only (part 2), so
+  `<line-base>` / `<line-head>` have no real referent. The 46 dirty entries in `git status` are this
+  loop's pre-existing dirty set (session / feedback / exec-quant records plus the untracked state
+  spine), untouched by this slice and unrelated to a nested run's worktree.
+
+### S7 — the three baselines, re-measured
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (114 files)
+ok    shared/ == .specify/shared/ (59 files)
+RC=0
+```
+
+- **S7.1** — clean now, and clean at the same six pairs before any edit; the file counts grew exactly by
+  this slice's three new sources and their mirrors (405→406 external, 113→114 scripts, 58→59 shared).
+- **S7.2** — the 13-file targeted suite was re-captured at implement start and again at close:
+  `test-evidence/targeted-set-v1-baseline.txt` (191 passed) and § Regression in
+  `pre-change-measurements.md` (277 passed including the 86 new cases).
+- **S7.3** — the three files that "do not exist yet" now exist, as this pass measures:
+
+```console
+$ ls -1 shared/definitions/sdd-routing-definitions.md scripts/python/sdd-route.py \
+       skills/external/sdd-loop-driver/references/nested-invocation.md
+scripts/python/sdd-route.py
+shared/definitions/sdd-routing-definitions.md
+skills/external/sdd-loop-driver/references/nested-invocation.md
+RC=0
+$ grep -c 'sdd-invocation' src/specify_cli/__init__.py
+3
+```
+
+**Reading S7.3 honestly**: the "absent at plan time" half of this scenario cannot be re-measured after
+implementation — its measurement stands as the one `tasks.md` § Measured Premises records at the tasks
+stage (`9/9 ABSENT`) and as T001's `grep -c 'sdd-invocation' … = 0` at implement start; this pass records
+the *current* state instead and does not restate the old one as if it were fresh. The metadata key now
+appears 3 times in its owner file (the comment, the metadata map and the framework frozenset), pinned by
+`tests/contract/test_neutral_metadata_schema.py`.
