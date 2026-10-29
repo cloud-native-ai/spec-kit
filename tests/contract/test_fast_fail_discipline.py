@@ -713,14 +713,15 @@ def test_a6_not_inside_three_section_window():
 
 
 def test_a7_section_counts_20_to_21_and_21_to_22():
-    """C-7: top-level counts -- template 29, live 30. Stale-pin update (2026-10-27):
-    the Closed-Set Claims amendment adds one ambient section (on top of the
-    Grounded Naming amendment's two); the pin had already drifted to 28/29 via
-    pre-067 instructions-section additions."""
+    """C-7: top-level counts -- template 30, live 31. Stale-pin update (2026-10-29):
+    slice 074b adds one ambient section (the SDD routing pointer) on top of the
+    Closed-Set Claims amendment's one (2026-10-27) and the Grounded Naming
+    amendment's two; the pin had already drifted to 28/29 via pre-067
+    instructions-section additions."""
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
-    assert tpl == 29, f"C-7: template has {tpl} top-level sections; expected 29"
-    assert live == 30, f"C-7: live file has {live} top-level sections; expected 30"
+    assert tpl == 30, f"C-7: template has {tpl} top-level sections; expected 30"
+    assert live == 31, f"C-7: live file has {live} top-level sections; expected 31"
     tpl_set = {l for l in _lines(INSTR) if l.startswith("## ")}
     live_set = {l for l in _lines(INSTR_LIVE) if l.startswith("## ")}
     assert tpl_set <= live_set, f"C-7: template sections missing from live: {sorted(tpl_set - live_set)}"

@@ -237,3 +237,44 @@ new-failures direction. Collected count moved 290 → 321 exactly by the two sui
 
 
 
+
+### E-5b · supplementary targeted check — the template-reading suites (part 2)
+
+**Why this run exists**: `templates/instructions-template.md` is read by ~28 contract suites, most of
+them outside the 19-file targeted set. Part 1 already ran a supplementary set for the same reason
+(`implement.jsonl` seq 3); part 2 does the same rather than trust that no neighbour reads the surface
+it edits *on principle*, without verification.
+
+**First supplementary run (before the two repairs below)**: `1189 collected / 1182 passed / 7 failed`.
+Set-diff against `baseline-failed.txt` (`comm -13`) named **four** new failures:
+
+```text
+tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-team/SKILL.md->.specify/skills/internal/create-team/SKILL.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-team/references/conceptual-model.md->.specify/skills/internal/create-team/references/conceptual-model.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/run-agent/SKILL.md->.specify/skills/internal/run-agent/SKILL.md]
+```
+
+**Repair 1 — the section-count pin (disclosed, cross-feature)**. `test_a7_section_counts_…` pins the
+template at exactly 29 top-level `## ` sections and the live file at 30; C-18 requires exactly one
+additive `## ` section, so both counts move by one. The pin's own docstring documents the protocol
+("Stale-pin update (2026-10-27): the Closed-Set Claims amendment adds one ambient section"), i.e. the
+integer is a *counter of ambient sections*, and adding one is its recorded update path. Bumped
+29 → 30 and 30 → 31 with a dated docstring line naming slice 074b. This is the only file this part
+touches outside the delivery surface `feature-ref.md` § 2 declares, and it changes two integers plus
+one comment line — no clause, no proposition, no scope.
+
+**Repair 2 — the three drifted skill mirrors**. `skills/internal/{create-team/SKILL.md,
+create-team/references/conceptual-model.md, run-agent/SKILL.md}` had stale `.specify/` projections
+(the first is part 1's T005–T007 edit, which left the mirror for T021; the other two are part-2 edits).
+Synced with `python3 scripts/python/sync-mirrors.py --write --only skills/internal` — the projection is
+mechanical, one reading only (mirror := source). `sync-mirrors.py --check` is now clean on all six
+pairs and `regen-command-copies.py --check` still reports `OK`.
+
+**Second supplementary run (after both repairs)**: `1189 collected / 1186 passed / 3 failed`, and the
+three remaining failures are all **pre-existing** members of the 21-name `baseline-failed.txt`
+(`test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline`,
+`test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc`,
+`test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`). `comm -13` against the
+baseline is **empty**. Capture: `test-evidence/implement-targeted-part2-supp-run.txt`, failing names
+in `implement-targeted-part2-supp-failed.txt`, row: `implement.jsonl` seq 5.

@@ -203,6 +203,15 @@ values. `validate_agent_metadata` rejects a declaration whose value falls outsid
 owner's closed set, and `parse_agent_frontmatter` accepts it only as a flat scalar (no list
 or mapping form).
 
+**承载责任（hosting responsibility）**：声明 `sdd-invocation: allowed` 的定义 MUST 在正文里同时写明
+三件事 —— ① 承载驱动（`sdd-loop-driver`）本身；② 自身不执行任何阶段命令；③ 止于 review，并把
+handoff 交回外层。声明与正文 MUST 一起被读取：只有声明而缺这三条陈述判不合规，只有这三条陈述而
+没有声明同样判不合规 —— 承载能力不是一件可以默认成立的事。阶段执行者能力仍是叶子，MUST NOT 声明
+`allowed`，该禁令对本仓出厂预设置件 `agents/sdd-executor.agent.md` 直接断言，而不是对一条约定断言。
+取值域、缺省与「不渲染到宿主工具」三项一律按路径读中立键集所有者
+`src/specify_cli/__init__.py`（`NEUTRAL_AGENT_METADATA_KEYS` / `NEUTRAL_AGENT_FRAMEWORK_KEYS`），
+本节不复述取值。
+
 **Authoring rules**: focus on **what** the agent does and **when to call** it; concise,
 explicit instructions over narrative; a single responsibility per agent; least-privilege
 tool set; approved providers only — Claude Code, opencode, Qoder, Codex CLI, Hermes Agent,

@@ -1,0 +1,100 @@
+# test runner: python3 -m pytest tests/contract/test_ask_record_repeat.py tests/contract/test_closed_set_claims.py tests/contract/test_directory_governance.py tests/contract/test_dogfooding_practice.py tests/contract/test_fast_fail_discipline.py tests/contract/test_knowledge_promotion.py tests/contract/test_objective_analysis_gate.py tests/contract/test_one_source_of_truth.py tests/contract/test_problem_solving_naming.py tests/contract/test_progress_reporting.py tests/contract/test_run_determination_passive_wiring.py tests/contract/test_task_complexity_rubric.py tests/contract/test_temp_directory_discipline.py tests/contract/test_token_efficiency_discipline.py tests/contract/test_user_facing_comprehension_section.py tests/contract/test_user_facing_comprehension_doc.py tests/contract/test_todo_in_context_wiring.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_mirror_parity_suite.py tests/contract/test_registry_completeness.py
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1189 items
+
+tests/contract/test_ask_record_repeat.py .................               [  1%]
+tests/contract/test_closed_set_claims.py ..........                      [  2%]
+tests/contract/test_directory_governance.py .....................        [  4%]
+tests/contract/test_dogfooding_practice.py .....................         [  5%]
+tests/contract/test_fast_fail_discipline.py ............................ [  8%]
+...................................................................F.... [ 14%]
+....                                                                     [ 14%]
+tests/contract/test_knowledge_promotion.py ...........                   [ 15%]
+tests/contract/test_objective_analysis_gate.py ......................... [ 17%]
+............................                                             [ 19%]
+tests/contract/test_one_source_of_truth.py ...............               [ 21%]
+tests/contract/test_problem_solving_naming.py .........                  [ 21%]
+tests/contract/test_progress_reporting.py .......                        [ 22%]
+tests/contract/test_run_determination_passive_wiring.py ................ [ 23%]
+...................................                                      [ 26%]
+tests/contract/test_task_complexity_rubric.py .............              [ 27%]
+tests/contract/test_temp_directory_discipline.py ...........             [ 28%]
+tests/contract/test_token_efficiency_discipline.py .........F            [ 29%]
+tests/contract/test_user_facing_comprehension_section.py ...........     [ 30%]
+tests/contract/test_user_facing_comprehension_doc.py ................... [ 32%]
+...                                                                      [ 32%]
+tests/contract/test_todo_in_context_wiring.py ........                   [ 33%]
+tests/contract/test_confirmation_gates_sweep.py .F...................... [ 35%]
+......................                                                   [ 37%]
+tests/contract/test_mirror_parity_suite.py ............................. [ 39%]
+........................................................................ [ 45%]
+........................................................................ [ 51%]
+........................................................................ [ 57%]
+........................................................................ [ 63%]
+........................................................................ [ 69%]
+........................................................................ [ 75%]
+........................................................................ [ 81%]
+........................................................................ [ 87%]
+........................................................................ [ 93%]
+.....................................................................    [ 99%]
+tests/contract/test_registry_completeness.py ...                         [100%]
+
+=================================== FAILURES ===================================
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1852: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+======================== 3 failed, 1186 passed in 4.94s ========================
+# failed-name list written: .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part2-supp-failed.txt (3 entries)
