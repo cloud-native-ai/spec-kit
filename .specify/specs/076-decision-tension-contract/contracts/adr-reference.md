@@ -10,7 +10,7 @@
 ## 条款
 
 - **C-1** (slot in Alternatives): `## Alternatives` MUST gain a `tension_id` reference slot that points to a `T-NNN` record in the same feature's plan, MUST NOT copy any field of that record, and MUST require an explicit statement plus the threshold verdict when the decision has no load-bearing record rather than leaving the slot empty. (FR-015)
-- **C-2** (dangling reference is an error): a `tension_id` that does not resolve to a record in the referenced plan MUST be reported as a broken-link error and MUST NOT be silently passed; resolution MUST reuse the record-index function of the deterministic validator so that one implementation serves both the validator's identifier check and this link check, and the check MUST be exercised by a contract test over a fixture pair containing a deliberately unresolvable id. (FR-015)
+- **C-2** (dangling reference is an error): a `tension_id` that does not resolve to a record in the referenced plan MUST be reported as a broken-link error and MUST NOT be silently passed; resolution MUST reuse the record-index function of the deterministic validator so that one implementation serves both the validator's identifier check and this link check, and the check's **call surface MUST be declared**: its only surface is a contract test over a fixture pair (one plan plus one ADR fragment carrying a deliberately unresolvable id) that imports the validator's exported record-index function as a library call; the feature MUST NOT add a command, and the analyze channel MUST NOT scan `docs/decisions/`, because either would open a new scan surface. (FR-015)
 
 ## 可追溯性
 

@@ -9,7 +9,7 @@
 - 绑定结论与候选核验见 `requirements.md` § Related Feature；本 plan 不新建、不合并、不废弃任何 Feature。
 - 本特性**不**扩展任何既有 Feature 的能力面：A（DTR）是新 owner 与新通道，B（四元组）的 owner 文件
   此前未被任何 Feature 收编（requirements § Related Feature 已逐条核验六个候选）。
-- 因此 Feature 集成动作只有两条：索引行状态推进 + 详情文件记录本 plan 的关键变更（见 `plan.md` § Feature Integration）。
+- 因此 Feature 集成动作只有两条：索引行状态推进（本阶段状态保持 `Planned`，不推进）+ 详情文件记录本 plan 的关键变更（承接行是 `tasks.md` T027；`plan.md` 没有 `## Feature Integration` 章节，本特性也不新增该章节）。
 
 ## FR → 设计映射
 
@@ -18,7 +18,7 @@
 | FR-001 规范 owner 与路径引用 | `shared/guidelines/decision-tension.md`（新建）；`data-model.md` E1 | C-1、C-8（owner） |
 | FR-002 封闭六字段 + `tension_id` | owner § 记录形态；`data-model.md` E1 | C-2（owner） |
 | FR-003 可采纳判据（封闭四条） | owner § 可采纳判据 | C-3（owner） |
-| FR-004 拒绝形态（封闭清单） | owner § 拒绝形态；`data-model.md` E1 R5 | C-4（owner） |
+| FR-004 拒绝形态（封闭清单） | owner § 拒绝形态 + 判定者分工（机械三项 / 语义两项）；`data-model.md` E1 R5 | C-4（owner） |
 | FR-005 承重门槛（四类触发） | owner § 承重门槛；`data-model.md` E4 | C-5（owner） |
 | FR-006 复杂度门控 | owner § 门控；引用 `shared/guidelines/task-complexity-rubric.md` | C-6（owner） |
 | FR-007 相邻 owner 边界 | owner § 边界（四个相邻机制，路径引用） | C-7（owner） |
@@ -46,12 +46,12 @@
 
 | SC | 观测 | 证据落点 |
 |----|------|----------|
-| SC-001 | 合规夹具一次 + 五个反向输入各一次的退出码与报告条目 | `test-evidence/` 的六次运行记录（实现期） |
+| SC-001 | 合规夹具一次 + 六个反向输入（删除一类逐字段展开）的退出码与报告条目 | `test-evidence/` 的十二次运行记录（实现期） |
 | SC-002 | 四个夹具的 analyze 报告严重度列与计数 | 报告快照（实现期） |
-| SC-003 | 同一 trivial 夹具前后两次 HIGH 计数与记录条数 | 两份报告快照（实现期） |
-| SC-004 | 一个合规 + 六个不合格载荷的接收/拒收判决 | 校验器输出（实现期） |
+| SC-003 | 同一 trivial 夹具三次运行（合规 `N/A` / 删章节 / 补记录）的 HIGH 计数与记录条数 | 三份报告快照（实现期） |
+| SC-004 | 一个合规 + 六个原因码各一例 + 四个附加 `missing-field` 样本的接收/拒收判决 | 校验器输出（实现期） |
 | SC-005 | 命令清单 / 依赖清单 / 进程清单的前后集合差 | plan 期基线与实现后采集 |
-| SC-006 | ADR 模板文本断言 + 记录到测量来源的解析结果 | 契约测试输出 |
+| SC-006 | ADR 模板文本断言 + 记录到测量来源的解析结果 + 断链夹具对的契约测试输出（唯一调用面） | 契约测试输出 |
 | SC-007 | 三棵分发面的别名计数（改动前后各一次） | plan 期计数与实现后计数 |
 | SC-008 | 两个 owner 文件与基线提交的逐字 diff + 契约测试断言计数 | 差异行枚举（实现期） |
 

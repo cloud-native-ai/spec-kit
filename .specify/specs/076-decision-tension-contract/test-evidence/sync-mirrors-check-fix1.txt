@@ -1,0 +1,17 @@
+# remediation round (analyze #1) — verbatim runs
+# commands: python3 scripts/python/sync-mirrors.py --check ; python3 scripts/python/regen-command-copies.py --check
+# date: 2026-10-29
+
+== sync-mirrors.py --check ==
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (115 files)
+ok    shared/ == .specify/shared/ (59 files)
+EXIT=0
+
+== regen-command-copies.py --check ==
+OK: all per-tool command copies match the source templates.
+EXIT=0

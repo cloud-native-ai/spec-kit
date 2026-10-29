@@ -41,7 +41,7 @@ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/076-d
 - **revision_trigger**: <指标恶化到什么程度 / 出现什么证据 → 重开>
 ```
 
-## S2 — 五个反向输入逐个变红
+## S2 — 六个反向输入逐个变红
 
 **前提**：同 S1 的合规计划；每次只改一处，其余保持合规。
 **钉住者**：`tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red`。
@@ -49,11 +49,14 @@ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/076-d
 
 | 变更 | 期望退出码 | 期望命中的标签 |
 |------|-----------|----------------|
-| 删去任一字段 | 1 | `dtr-record-incomplete` |
+| 删去任一字段（六字段逐一各跑一次） | 1 | `dtr-record-incomplete` |
 | `expected_sacrifice: none` | 1 | `dtr-rejected-form`（仅此一条，不叠加 unmapped） |
 | 写入「要平衡 / 综合考虑」类措辞 | 1 | `dtr-rejected-form` |
 | 复制一条记录的 `tension_id` | 1 | `dtr-tension-id` |
+| `tension_id` 跳号（`T-001` 后接 `T-003`） | 1 | `dtr-tension-id` |
 | 指向不存在的 `SC-NNN` | 1 | `expected-sacrifice-unmapped` |
+
+六类各一例，删除一类再按字段逐一展开，合计十二次运行（1 合规 + 11）。
 
 ```bash
 python3 scripts/python/validate-decision-tensions.py --spec <fixture-dir> --json
@@ -83,13 +86,14 @@ python3 scripts/python/validate-decision-tensions.py --spec <fixture-dir> --json
 ## S4 — 证伪四元组的接收与六类拒收
 
 **前提**：载荷是 Markdown 文件，含四个字面键各一次；`observation` 值以 `raw:` 起头；
-`would_go_red_if` 同时给出反引号包裹的输入与具名红色信号。
+`would_go_red_if` 以字面 `red:` 分隔两半——前半一个反引号跨度（被改坏的具名输入），
+后半至少一个反引号跨度（断言名 / 检查标签 / 非零退出码之一）。
 **钉住者**：`tests/contract/test_falsification_quartet_validator.py`。
 **状态**：plan 阶段未执行。
 
 ```bash
 python3 scripts/python/validate-falsification-quartet.py <payload.md>
-# 期望：退出码 0（合规载荷）/ 1（六类不合格）/ 2（载荷不可读，按拒收处置）
+# 期望：退出码 0（合规载荷）/ 1（六个拒收原因码各一例）/ 2（载荷不可读，按拒收处置）
 ```
 
 | 载荷 | 期望原因 |
@@ -98,8 +102,12 @@ python3 scripts/python/validate-falsification-quartet.py <payload.md>
 | 字段存在但值为空 | `empty-field` |
 | `exit_code: ok` | `exit-code-not-integer` |
 | `observation` 无 `raw:` 前缀 | `observation-not-raw` |
-| `would_go_red_if: 若实现有误就会失败` | `tautology` |
+| `would_go_red_if: 若实现有误就会失败`（无 `red:` 标记） | `tautology` |
 | 载荷不可读 | `input-unreadable`（退出码 2） |
+
+表内六行即封闭六拒收原因码各一例，拒收率 6/6；「四字段各缺一」的四例不单列，
+作为 `missing-field` 的附加样本（同一原因码，不参与 6/6 计数）。合计十一次运行
+（1 合规 + 6 个原因码 + 4 个附加样本），退出码 0/1/2 三值均有覆盖。
 
 ## S5 — 镜像与术语
 

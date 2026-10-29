@@ -14,7 +14,7 @@
 与 `scripts/python/validate-falsification-quartet.py`；同时把 SI-3C 的证伪尝试升级为封闭四元组
 （`attempt` / `exit_code` / `observation` / `would_go_red_if`），由脚本判决、接收方不得反向覆盖。
 
-交付面 = 1 份新 owner 文档 + 2 份既有 owner 改写（只增不改）+ 1 个模板章节 + 1 条分析通道
+交付面 = 1 份新 owner 文档 + 1 份既有 owner 改写（只增不改）+ 1 份工作流步骤的指针形核验（现状已无复述，本特性只加守卫断言并留证）+ 1 个模板章节 + 1 条分析通道
 （`detection-and-severity.md` 的通道小节与其计数标题；`SKILL.md` 的枚举句同步更新）+ 1 个 ADR
 引用位 + 2 个校验器 + 3 个契约测试文件。8 份契约共 34 条条款，FR 车道 26/26 全覆盖。零新命令、
 零新存储、零常驻进程、零第三方依赖、零模型调用。
@@ -27,12 +27,12 @@
 **Language/Version**: Markdown 规范面（owner / 模板 / 通道 / ADR 模板）+ Python ≥3.8 仅标准库（两个校验器）；测试为仓库既有 pytest 契约层
 **Primary Dependencies**: 既有 `scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/python/clause_extract.py`、既有 `pytest`；**不新增**任何第三方依赖、不引入网络或模型 API
 **Storage**: N/A——张力记录搭在 `plan.md` 工件上；四元组搭在 SI-4 派发载荷与 SI-7 intervention 记录上；判定结果只进既有 analyze 报告与计划文本
-**Testing**: Tests Mode **ON**。三个新契约测试文件按 red-first 写在实现之前：`test_decision_tension_contract.py`（owner / 模板锚点 / 通道 / ADR 槽位 / 镜像 / 术语 / 闭合面）、`test_decision_tension_validator.py`（六标签、退出码、正样本 + 五个反向输入）、`test_falsification_quartet_validator.py`（一个合规载荷 + 六类拒收 + 退出码 0/1/2）。plan 期定向测试基线：五个既有契约测试文件 70 passed
+**Testing**: Tests Mode **ON**。三个新契约测试文件按 red-first 写在实现之前：`test_decision_tension_contract.py`（owner / 模板锚点 / 通道 / ADR 槽位 / 镜像 / 术语 / 闭合面）、`test_decision_tension_validator.py`（六标签、退出码、正样本 + 六个反向输入，含逐字段删除与 `tension_id` 跳号）、`test_falsification_quartet_validator.py`（一个合规载荷 + 六类拒收 + 退出码 0/1/2）。plan 期定向测试基线：五个既有契约测试文件 70 passed
 **Target Platform**: 仓库工具链（macOS 与 Linux），Python ≥3.8；校验器只读、无常驻、无平台分支
 **Project Type**: 框架源（两顶帽子：改动落 `shared/`、`templates/`、`skills/internal/`、`scripts/`、`docs/`，`.specify/` 副本经 `sync-mirrors.py` 同步；`tests/` 与 `docs/decisions/` 无镜像）
 **Performance Goals**: 单份计划的校验为一次线性扫描，无递归全仓遍历（检测范围只有 `REQUIREMENTS_DIR/plan.md`）；无轮询、无后台进程；不新增任何运行期等待
 **Constraints**: 校验器只读、只用标准库、退出码 0/1/2；标签封闭六项、拒收原因封闭六值；`expected_sacrifice` 只有一个解析形态；通道取值只有 HIGH 与 0；不改动既有通道 A–H 的判据；`templates/commands/**` 不动
-**Scale/Scope**: 1 份新 owner；2 份既有 owner 只增不改；1 个模板章节；1 条分析通道 + 2 处计数行；1 个 ADR 槽位；2 个校验器；8 份契约（34 条款）；3 个契约测试文件；7 对镜像
+**Scale/Scope**: 1 份新 owner；1 份既有 owner 只增不改 + 1 份工作流步骤核验；1 个模板章节；1 条分析通道 + 2 处计数行；1 个 ADR 槽位；2 个校验器；8 份契约（34 条款）；3 个契约测试文件；镜像对以 `requirements.md` FR-025 的表为准（行数不在本行重复）
 
 ## Constitution Check
 
@@ -120,7 +120,7 @@
 
 ```text
 shared/guidelines/                 # 新建 decision-tension.md；改写 critique-and-self-critique.md（只增不改）
-shared/workflow/                   # 改写 self-improvement-workflow.md § SI-3C（保留指针、去掉可复述面）
+shared/workflow/                   # self-improvement-workflow.md § SI-3C：核验仍为指针形并留证（现状无复述，不改写）
 templates/                         # 改写 plan-template.md（新增 ## Decision Tensions，紧随 Constitution Check）
 skills/internal/analyze-artifacts/ # 改写 references/detection-and-severity.md（新增 I 通道）与 SKILL.md（通道计数行）
 scripts/python/                    # 新建两个确定性校验器（张力结构 / 证伪四元组）
@@ -137,7 +137,7 @@ owner / 模板 / 通道 / 脚本目录的增补。两顶帽子明确：编辑面
 
 ### Mirror Obligations
 
-镜像对清单的 owner 是 `requirements.md` FR-025 的表（七行）；本节按其行序逐对登记本次的同步与核验，
+镜像对清单的 owner 是 `requirements.md` FR-025 的表（行数以该表为准，本节不重复计数）；本节按其行序逐对登记本次的同步与核验，
 不重写表的语义。**基线**：改动前实测 `sync-mirrors.py --check` 退出码 0、六对全 `ok`
 （templates 22 / skills/external 406 / skills/internal 136 / agents 3 / scripts 115 / shared 59 文件），
 原始输出见 `test-evidence/sync-mirrors-check.txt`；`regen-command-copies.py --check` 同样退出码 0。
@@ -200,7 +200,39 @@ N/A — Constitution Check 18 项全部 Pass，无 Violation 需要辩护，本�
 |----------|------|---------------|
 | Data model | [`data-model.md`](data-model.md) | 8 个实体（E1–E8）+ 记录行文法 + 6 条校验规则 + 6 条状态迁移 |
 | Contracts | [`contracts/`](contracts/) | 8 份文件 / 34 条条款，全部 `md-bold-closed`：`decision-tension-owner.md`(8)、`plan-template-anchor.md`(3)、`measurement-binding.md`(3)、`analyze-channel.md`(5)、`adr-reference.md`(2)、`validator.md`(4)、`falsification-quartet.md`(5)、`mirrors-and-scope.md`(4) |
-| Quickstart | [`quickstart.md`](quickstart.md) | 5 个场景（S1 首条记录与校验、S2 五个反向输入、S3 analyze 三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语） |
+| Quickstart | [`quickstart.md`](quickstart.md) | 5 个场景（S1 首条记录与校验、S2 六个反向输入、S3 analyze 三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语） |
 | Feature reference | [`feature-ref.md`](feature-ref.md) | 26 条 FR → 设计落点的逐行映射 + 8 条 SC → 观测方式 |
 | Research | [`research.md`](research.md) | 11 项（R-1…R-11），含实测命令与被否决读法 |
 | FR 车道核算 | [`test-evidence/account-clause-coverage.txt`](test-evidence/account-clause-coverage.txt) | 26 / 26 由条款引用组认领，uncovered 0；clause 车道 `baseline-missing`（tasks.md 尚未生成，属设计内红） |
+
+## Plan Edits
+
+*本轮（analyze #1 之后的修复轮）改动了 plan 属主面：以下逐条写明改了哪个文件、为什么、对应哪条 analyze 发现。
+不含新增或删除 FR / SC / 契约条款 / 任务行——26 FR / 8 SC / 34 条款 / 27 任务行在改动前后相同。
+对应 `tasks.md` DoD-9 的声明形态：表中每行即一句 `PLAN-EDIT: <path> — <reason>`，分类统一为
+`minor`（只改措辞与夹具定义，把已声明的判据钉成可判定的机械形状；无需求、条款、任务增删，无范围扩张，
+无 `substantive` 项，故无异常行需要回传）。*
+
+| # | 文件 | 改动 | 为什么 | analyze 发现 |
+|---|------|------|--------|--------------|
+| 1 | `requirements.md`（SC-003、SC-003 Source、US4）、`tasks.md`（T017、US4 Checkpoint）、`feature-ref.md`（SC-003 行） | SC-003 与 US4 AS2 钉死「补入不可逆决策的同时移除合规 `N/A`」，并补一步「写入合规记录替换 `N/A` → HIGH 归 0」；T017 拆为 D-1/D-2/D-3 三个子场景 | 原措辞下「恰 1 条 HIGH」不可达：检测面按 FR-011 不判「计划里是否存在承重决策」，保留合规 `N/A` 与补记录并存时结果只能是 0 | A-01 |
+| 2 | `requirements.md`（FR-016、Q3）、`data-model.md`（E1 R1/R2、§ 校验规则措辞）、`contracts/validator.md` C-2 | 增跨标签优先级（章节缺失 → 只报 `dtr-section-missing`，抑制 `dtr-anchor`）；「一一对应」改为「锚点 + 三类缺陷 + 两个记录级形态的 4 + 2 划分」 | 缺章节时三行相邻断言必然同红，同一根因被计两次会让「1 条 HIGH」与退出码计数翻倍；六标签与四件事本就不是一一对应 | A-02 |
+| 3 | `requirements.md`（FR-021、US3 AS1）、`contracts/falsification-quartet.md`（C-2、C-3）、`data-model.md`（E5、E6）、`tasks.md` T015 | 给「具名红色信号」定义机械形状：`would_go_red_if` 的值 MUST 以字面 `red:` 分隔，前半是反引号跨度（被改坏输入）、后半至少一个反引号跨度（断言名 / 检查标签 / 非零退出码） | 原文只写「具名红色信号」，程序无从判定，`tautology` 实际不可确定性判 | A-03 |
+| 4 | `requirements.md`（SC-004、SC-004 Source）、`tasks.md`（T012、US3 Independent Test / Checkpoint）、`quickstart.md` S4、`feature-ref.md`（SC-004 行） | 六个不合格载荷改为「封闭六拒收原因码各一例，6/6」；四字段各缺一降为 `missing-field` 的附加样本（11 次运行，退出码 0/1/2 全覆盖） | 原六个载荷（四字段各缺一 + 转述 + 空真）与六个原因码不是同一集合，6/6 无法同时成立 | A-04 |
+| 5 | `requirements.md` FR-004、`contracts/decision-tension-owner.md` C-4、`tasks.md`（T002、T004）、`feature-ref.md`（FR-004 行） | 点名语义拒绝形态的判定者（两位复核者按同一判据，须同 verdict），并要求 owner 写出、owner 契约与契约测试各断言一次 | 原 FR-004 只列拒绝形态、未说谁判语义项，owner 与测试都无承接点 | A-05 |
+| 6 | `requirements.md` FR-010 + Clarifications Q4、`contracts/measurement-binding.md` C-1、`data-model.md` E3 | 声明方向记号是**记录性断言**：程序只判取值落在两值内，不断言方向与来源指标语义一致，值里不写指标名 | 原文把方向记号写成机器判定的「变差方向」，但无任何绑定机制，读起来像已校验而实际没有 | A-06 |
+| 7 | `requirements.md`（FR-015、SC-006、SC-006 Source）、`contracts/adr-reference.md` C-2、`feature-ref.md`（SC-006 行） | 明写断链检查的唯一调用面是契约测试（导入校验器的记录索引函数作库调用），并禁止新增命令或在 analyze 通道扫描 `docs/decisions/` | 原文要求「引用 MUST 可解析」，却没有任何程序在跑，断链实际无人判 | A-07 |
+| 8 | `requirements.md` FR-020/FR-021 + Q5、`contracts/falsification-quartet.md` C-2/C-3、`data-model.md` E5/E6 | 声明 `attempt` 的「可重放」是复核者规则、不进程序判决，封闭原因集不设 `attempt-not-replayable` | 「可重放」原文列在字段语义里，看不出由谁判；扩原因集会破坏封闭六值 | A-08 |
+| 9 | `requirements.md`（SC-001、SC-001 Source、FR-017、Edge Cases）、`tasks.md`（T003、T008、T026、US1 Checkpoint、MVP 步骤）、`quickstart.md` S2、`feature-ref.md`（SC-001 行）、本文件（§ Testing、§ Phase 1 Quickstart 行） | 反向输入由五类改为六类：补 `tension_id` 跳号，并把「删任一字段」明确为六字段逐一各跑一次（共 12 次运行） | 原五类反向输入缺 Edge Cases 已声明的跳号形态，SC-001 的「不依赖人工阅读」因此有一个已声明缺陷没有被夹具覆盖 | A-09 |
+| 10 | `tasks.md` T013/T014 | 要求 owner 小节披露两处已披露限制（`raw:` 可伪造、红色结果不可证）及处置，并由契约测试断言其存在 | 两处限制此前只写在 Clarifications Q5，没有任何实现行承接 | A-10 |
+| 11 | `requirements.md` § Shared Strings 的 Citation convention | 约定收窄为「仅 requirements.md 内」；契约与任务文件逐字书写字面量 | 原文要求契约与任务也写 `[[STR-NNN]]`，而它们实际逐字书写且必须逐字（实现期要匹配），约定与用法不一致 | A-11 |
+| 12 | `requirements.md` A3 + FR-024 | 别名白名单三处对齐：A3、owner 术语注记、`.specify/memory/features/076.md` § 附（并说明该文件不在三棵分发面内） | A3 允许其映射存放在 Feature 详情附录，FR-024 的白名单却只列两处，两处自相矛盾 | A-12 |
+| 13 | `feature-ref.md` § 绑定关系 | 删去不存在的 `plan.md § Feature Integration` 引用，改为指向本条绑定结论与 `tasks.md` T027 | 该章节不存在，引用不可解析 | A-13 |
+| 14 | `.specify/memory/features/076.md`、`.specify/memory/features.md` 076 行 | 追加 checklist 阶段记录（`cde66c0b`），状态保持 `Planned` | 阶段记录缺失，索引与详情的「最后更新」停在 tasks 阶段 | A-14 |
+| 15 | 本文件（Summary / Project Structure）、`tasks.md` T016 | 「改写并删复述」改为「核验 SI-3C 仍为指针形并留证」，交付面相应改为「1 份工作流步骤核验」 | 实测 SI-3C 已只保留步骤摘要与 owner 指针、无四元组字段清单可删；原文描述的是一次空操作，且会让交付面计数虚高 | A-15 |
+| 16 | `tasks.md` § Requirement Coverage Map | 增一行：T001 / T026 / T027 是流程行，不映射任何 FR / SC | 原表只列有 FR / SC 映射的行，读者无法判断三行是漏映射还是流程行 | A-16 |
+| 17 | 本文件 § Scale/Scope / § Mirror Obligations、`tasks.md` DoD-5 / § Mirror Obligations / T024 | 「七行 / 7 对」改为「以 `requirements.md` FR-025 的表为准（行数不在本处重复）」 | 同一个数字在四处各写一份，改表就会漂移（系统性建议，本轮采纳） | A-01…A-16 的系统性收口 |
+
+**未改动**：`research.md`（Phase 0 实测记录，本轮无新实测需要回填）；`checklists/readiness-2026-10-29.md`（dated record，不回改）；`coverage-baseline.txt`（claims 数未变，不重冻结）。
+
+**连带面说明**：上表每行的文件列包含该发现的**分发面同步**（同一处措辞在 SC 源、契约条款、任务行、quickstart、feature-ref 上的一致性改写），不另立发现编号；没有第 17 条之外的独立改动。
