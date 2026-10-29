@@ -1,0 +1,18 @@
+# Targeted-set-v1 baseline — slice 074a-authorized-routing, plan stage
+# recorded 2026-10-29T02:06Z (stage_base=939766891)
+$ python3 -m pytest -q tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_neutral_metadata_schema.py tests/contract/test_tool_mapping.py tests/contract/test_neutral_vocabulary_scan.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_team_command_routing.py tests/contract/test_agent_chain_guards.py tests/contract/test_no_nested_skills.py tests/contract/test_goal_definition.py tests/contract/test_instructions_section_propagation.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py tests/contract/test_shipped_agent_presets.py
+
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+...............................................                          [100%]
+191 passed in 22.64s
+rc=0 duration_ms=23129
+
+# Selection basis: the suites that pin every surface this slice touches — the anti-nesting and
+# dispatch-governance cases (SC-004's second half), the neutral metadata schema and tool mapping
+# (FR-003 and the declared pin change), the driver skill (FR-015 entry form), the team command
+# routing, goal definition (FR-015's Goal/Target validation), the instructions section propagation
+# and size budget, and the flow-class ledger (FR-020's no-new-flow-unit check).
+# Sufficiency: these are the pre-change cases that must stay green for the paths that do not satisfy
+# the narrowed predicate; the slice makes no superset claim over them (that claim is parent FR 027's
+# and belongs to 074b-nested-governance).
