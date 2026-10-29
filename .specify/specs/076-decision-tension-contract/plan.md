@@ -230,7 +230,7 @@ N/A — Constitution Check 18 项全部 Pass，无 Violation 需要辩护，本�
 | 13 | `feature-ref.md` § 绑定关系 | 删去不存在的 `plan.md § Feature Integration` 引用，改为指向本条绑定结论与 `tasks.md` T027 | 该章节不存在，引用不可解析 | A-13 |
 | 14 | `.specify/memory/features/076.md`、`.specify/memory/features.md` 076 行 | 追加 checklist 阶段记录（`cde66c0b`），状态保持 `Planned` | 阶段记录缺失，索引与详情的「最后更新」停在 tasks 阶段 | A-14 |
 | 15 | 本文件（Summary / Project Structure）、`tasks.md` T016 | 「改写并删复述」改为「核验 SI-3C 仍为指针形并留证」，交付面相应改为「1 份工作流步骤核验」 | 实测 SI-3C 已只保留步骤摘要与 owner 指针、无四元组字段清单可删；原文描述的是一次空操作，且会让交付面计数虚高 | A-15 |
-| 16 | `tasks.md` § Requirement Coverage Map | 增一行：T001 / T026 / T027 是流程行，不映射任何 FR / SC | 原表只列有 FR / SC 映射的行，读者无法判断三行是漏映射还是流程行 | A-16 |
+| 16 | `tasks.md` § Requirement Coverage Map | 增一行：T001 / T026 / T027 是流程行，不映射任何 FR / SC（**第三轮已按 A-23 修正：T001 / T027 为流程行，T026 为执行/取证行，计入 SC-002 / SC-003**） | 原表只列有 FR / SC 映射的行，读者无法判断三行是漏映射还是流程行 | A-16 |
 | 17 | 本文件 § Scale/Scope / § Mirror Obligations、`tasks.md` DoD-5 / § Mirror Obligations / T024 | 「七行 / 7 对」改为「以 `requirements.md` FR-025 的表为准（行数不在本处重复）」 | 同一个数字在四处各写一份，改表就会漂移（系统性建议，本轮采纳） | A-01…A-16 的系统性收口 |
 
 **第一轮未改动**：`research.md`（Phase 0 实测记录，第一轮无新实测需要回填；第二轮按 A-18 / A-22 更新 R-5 / R-6 / R-9）；`checklists/readiness-2026-10-29.md`（dated record，不回改）；`coverage-baseline.txt`（claims 数未变，不重冻结）。
@@ -255,6 +255,18 @@ N/A — Constitution Check 18 项全部 Pass，无 Violation 需要辩护，本�
 - PLAN-EDIT: plan.md — this record and row 12's superseding note；分类=minor
 
 **A-19 选项（写明）**：SC-002 / SC-003 的观测保持「analyze 报告快照」（选项 ②）。快照产出落在
-T017（SC-003 三连跑，D-1 / D-2 / D-3 各一份）与 T026（SC-002 四类夹具，各一份），不把 SC 的观测
+T017（SC-003 三连跑，D-1 / D-2 / D-3 各一份；D-1 的裸 `N/A` 那次是 SC-003 之外的附加断言，不产快照、
+不计入 SC-003）与 T026（SC-002 四类夹具各一份，并按 T017 的 D-1 / D-2 / D-3 重跑 SC-003 三份），
+因此 `tasks.md` § Requirement Coverage Map 把 T026 计入 SC-002 与 SC-003 两行，不把 SC 的观测
 降级为「契约测试的标签→HIGH 映射输出 + 通过/失败计数」（选项 ① 未采用：它会把报告快照这一原始
 观测意图换成测试断言，SC-002 / SC-003 的判据就只剩测试是否跑绿）。
+
+### 第三轮（analyze #3 之后的 spec-only 修复）
+
+本轮仍无 FR / SC / 契约条款 / 任务行增删——26 FR / 8 SC / 34 条款 / 27 任务行在改动前后相同。
+逐文件声明：
+
+- PLAN-EDIT: plan.md — sync the A-19 snapshot allocation with the coverage map (T026 credited for SC-002 / SC-003; D-1's bare `N/A` run declared an extra assertion outside SC-003) and record this round；分类=minor
+- PLAN-EDIT: quickstart.md — scope the co-occurrence defect rule to an empty or literal `none` `expected_sacrifice`, leaving the undecidable-wording `dtr-rejected-form` free to co-exist with `expected-sacrifice-unmapped`（A-26）；分类=minor
+
+非 plan 属主：`.specify/memory/features/076.md` 的正文别名改为工程词（§ 附 映射表保留，白名单不扩大）。

@@ -132,5 +132,8 @@ python3 scripts/python/regen-command-copies.py --check
 
 - 校验器返回 2：先看入参是否指向 spec 目录、两份工件是否都存在且可解码——它不是「记录不成立」。
 - `dtr-anchor` 单独变红：先看三行标题是否相邻，不要先改记录内容。
-- `expected-sacrifice-unmapped` 与 `dtr-rejected-form` 同时出现于同一记录：这是一个实现缺陷
-  （去重规则要求只报 `dtr-rejected-form`，抑制 `expected-sacrifice-unmapped`），不是作者的错。
+- 当 `expected_sacrifice` 为空或恰为 `none` 时，`expected-sacrifice-unmapped` 与 `dtr-rejected-form`
+  同时出现于同一记录：这是一个实现缺陷（去重规则要求只报 `dtr-rejected-form`，抑制
+  `expected-sacrifice-unmapped`），不是作者的错。该判据不外推——记录因不可判定措辞被拒而命中的
+  `dtr-rejected-form`，可与 `expected-sacrifice-unmapped` 合法共存（代价值仍是可解析的字段，只是
+  记录整体因措辞被拒），两者同现不构成缺陷。

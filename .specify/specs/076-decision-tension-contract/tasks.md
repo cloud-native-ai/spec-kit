@@ -123,15 +123,15 @@
 | Success Criterion | Tasks |
 |-------------------|-------|
 | SC-001 | T003, T008 |
-| SC-002 | T009, T010 |
-| SC-003 | T017, T018 |
+| SC-002 | T009, T010, T026 |
+| SC-003 | T017, T018, T026 |
 | SC-004 | T012, T015 |
 | SC-005 | T022 |
 | SC-006 | T019, T020 |
 | SC-007 | T023 |
 | SC-008 | T025 |
 
-**流程行（无 FR / SC 映射）**: T001（证据槽）、T026（quickstart 实跑）、T027（Feature 集成复核）是流程行，不承接任何 FR 或 SC——不是漏映射，故不在上两表出现。其余 24 行各至少映射一条需求。
+**流程行与执行/取证行**: T001（证据槽）、T027（Feature 集成复核）为流程行，不承接任何 FR 或 SC——不是漏映射，故不在上两表出现；T026 为执行/取证行——不认领 FR，但产出 SC-002 / SC-003 的报告快照，故出现在 SC 两表。其余 25 行各至少映射一条需求（FR 或 SC）。
 
 ## Mirror Obligations
 
@@ -173,7 +173,7 @@
 - [ ] T004 [US1] [blockedBy: T002] 新建 `shared/guidelines/decision-tension.md` 的开篇与判据段：开头逐项声明本文件拥有六字段记录形态、可采纳判据、拒绝形态、承重门槛、相邻 owner 边界与记录标识形态，并写明一切消费者以路径引用而不复述；随后写出封闭六字段（`decision` / `antithesis` / `binding_constraints` 含 `pole_a` 与 `pole_b` / `discriminating_evidence` / `expected_sacrifice` / `revision_trigger`）与 `tension_id` 形态、四条可采纳判据（单句点名一极；反题为可独立采纳的具名方案并给出至少一条「在什么条件下更优」；双极非空且被选方案不同时满足；判别性证据一位复核者可执行且结果二值）、封闭拒绝清单（首条字面 `expected_sacrifice: none`，值为空按同一条判；另含空极点、不可执行或非二值证据、稻草人反题、以「要平衡」「综合考虑」「视情况而定」代替取舍），并写出**拒绝形态的判定者分工**：机械可判三项（`none` 或空代价、空极点、命中措辞清单）归校验器，语义两项（稻草人、证据不可执行或非二值）归两位复核者按同一判据判定且必须得到同一 verdict [green: contracts/decision-tension-owner.md#C-1] [green: contracts/decision-tension-owner.md#C-2] [green: contracts/decision-tension-owner.md#C-3] [green: contracts/decision-tension-owner.md#C-4]
 - [ ] T005 [US1] [blockedBy: T004] 在 `templates/plan-template.md` 的 `## Constitution Check` 之后、`## Project Structure` 之前插入 `## Decision Tensions`：内容只有一条指向 `shared/guidelines/decision-tension.md` 的指针加字段名清单，写明每条记录以 `### T-NNN` 子节承载、无承重决策时写 `N/A` 并逐条说明四类触发均不成立（不得删除或留空），且不复述 owner 的可采纳判据表、拒绝清单或门槛表；`.specify/templates/plan-template.md` 由 `sync-mirrors.py` 产出，不手改 [green: contracts/plan-template-anchor.md#C-1] [green: contracts/plan-template-anchor.md#C-2] [green: contracts/plan-template-anchor.md#C-3]
 - [ ] T006 [US1] [blockedBy: T004] 续写 `shared/guidelines/decision-tension.md` 的门槛与边界段：承重四类触发（不可逆 / 跨团队 / 高爆炸半径 / 与宪法原则相关）任一成立即承重，不满足任一触发的决策不得被要求写记录、缺记录不得判缺陷；复杂度门控引用 `shared/guidelines/task-complexity-rubric.md` 的分级并声明 Trivial 按定义不含承重决策、分级与承重判据冲突时按该 rubric 的 tie-break 取较高一级且以承重判据为准；声明与 `shared/definitions/derivation-definitions.md` § Contradiction Handling、`/speckit.clarify` 与访谈账本、`shared/guidelines/fast-fail.md`、`shared/guidelines/critique-and-self-critique.md` 四个相邻机制的分工并各以路径引用，限定自己只承接方向已选定之后的技术取舍；消费者清单写成「路径 + 引用方式」指针形，全文不引入台账、调度器、评分器或运行时 [green: contracts/decision-tension-owner.md#C-5] [green: contracts/decision-tension-owner.md#C-6] [green: contracts/decision-tension-owner.md#C-7] [green: contracts/decision-tension-owner.md#C-8]
-- [ ] T007 [US1] [blockedBy: T003] 新建 `scripts/python/validate-decision-tensions.py` 的骨架与四条结构检查：只用标准库、只读、无常驻进程，参数 `--spec <spec-dir>` 与 `--json`，读 `<spec-dir>/plan.md` 与 `<spec-dir>/requirements.md`（缺任一、不可解码或无内容行 → 退出码 2）；实现 `dtr-anchor`（`^## ` 序列三行相邻）、`dtr-section-missing`（章节缺失）、`dtr-record-incomplete`（六个字段标签齐备；空值归拒绝形态，见 T008）、`dtr-tension-id`（`T-NNN` 形态、唯一、按序递增）；输出 `status` 行 + 每标签 `[label] pass|fail (count)` + findings，`--json` 输出六字段；导出记录索引函数供 ADR 断链检查复用 [green: contracts/validator.md#C-1] [green: contracts/validator.md#C-2] [green: contracts/validator.md#C-3]
+- [ ] T007 [US1] [blockedBy: T003] 新建 `scripts/python/validate-decision-tensions.py` 的骨架与四条结构检查：只用标准库、只读、无常驻进程，参数 `--spec <spec-dir>` 与 `--json`，读 `<spec-dir>/plan.md` 与 `<spec-dir>/requirements.md`（缺任一、不可解码或无内容行 → 退出码 2）；实现 `dtr-anchor`（`^## ` 序列三行相邻）、`dtr-section-missing`（章节缺失）、`dtr-record-incomplete`（六个字段标签齐备；`decision` / `antithesis` / `discriminating_evidence` / `revision_trigger` 留空仍判本标签，只有 `expected_sacrifice` 留空或字面 `none`、`pole_a` / `pole_b` 行缺失或留空归 `dtr-rejected-form`，见 T008）、`dtr-tension-id`（`T-NNN` 形态、唯一、按序递增）；输出 `status` 行 + 每标签 `[label] pass|fail (count)` + findings，`--json` 输出六字段；导出记录索引函数供 ADR 断链检查复用 [green: contracts/validator.md#C-1] [green: contracts/validator.md#C-2] [green: contracts/validator.md#C-3]
 - [ ] T008 [US1] [blockedBy: T007] 在 `scripts/python/validate-decision-tensions.py` 内实现 `expected_sacrifice` 解析与拒绝形态：封闭形态 `<SC-NNN> Source <↓|↑>`，标识必须解析到 `requirements.md` § `### Measurement Sources & Collection Methods` 中 `**SC-NNN Source**` 起头的条目，方向缺失或越出两值、值中出现第二个 `SC-NNN`、无 `Source` 连接词一律判 `expected-sacrifice-unmapped`，不回落人工阅读；字段标签缺失时只报 `dtr-record-incomplete` 且不再执行映射判定；值为空（`expected_sacrifice` 留空、任一极点缺失或留空）或 `expected_sacrifice` 恰为 `none` 时只报 `dtr-rejected-form`，抑制 `dtr-record-incomplete` 与 `expected-sacrifice-unmapped`；实现不可判定措辞与空极点的拒绝形态，使六个反向输入各自单独命中一个标签（章节缺失类另判跨标签优先级）、`tests/contract/test_decision_tension_validator.py` 转绿 [green: contracts/measurement-binding.md#C-1] [green: contracts/measurement-binding.md#C-2] [green: contracts/measurement-binding.md#C-3] [green: contracts/validator.md#C-4]
 
 **Checkpoint**: US1 独立可验——夹具计划一条记录经校验器返回 0，六个反向输入各返回 1（删除一类逐字段各一次）；模板与 owner 的结构断言全绿。
@@ -228,7 +228,7 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T017 [US4] [blockedBy: T006,T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 D（非承重不触发与门控可达性），拆成三个独立子场景、每次运行只断言一个变体：**D-1 基线**——trivial 夹具写 `N/A` 并逐条说明四类触发均不成立 → 校验器退出 0、记录条数 0；同一夹具写裸 `N/A`（无逐条说明）→ 退出 1 且命中 `dtr-section-missing`。**D-2 删章节**——同一夹具补入一条不可逆决策（回滚需要迁移）并**移除**该合规 `N/A` 章节 → 复跑恰一条 `dtr-section-missing`（在 SC-003 的三连跑内，「恰 1 条 HIGH」只在此步可达；`dtr-anchor` 被抑制不叠加）。**D-3 补记录**——在同一位置写入一条合规 `### T-001` 记录以替换 `N/A` → 复跑 0 条 HIGH（修复路径成立）；三个子场景各运行一次并各留一份 analyze 报告快照到 `notes/analyze-sc003/`（D-1 / D-2 / D-3 各一份），SC-003 的 HIGH 计数只读这三份快照；`requirements.md` 无 `### Measurement Sources & Collection Methods` 时按记录数机械分叉（≥1 条记录则逐条 `expected-sacrifice-unmapped`，合规 `N/A` 零记录则零发现）；复杂度与承重判据冲突时以 rubric tie-break 取较高一级；跑出记录在案的失败运行
+- [ ] T017 [US4] [blockedBy: T006,T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 D（非承重不触发与门控可达性），拆成三个独立子场景、每次运行只断言一个变体：**D-1 基线**——trivial 夹具写 `N/A` 并逐条说明四类触发均不成立 → 校验器退出 0、记录条数 0（这一次运行即 SC-003 的第一份快照）；同一夹具写裸 `N/A`（无逐条说明）→ 退出 1 且命中 `dtr-section-missing`——该裸 `N/A` 运行是 **SC-003 三次运行之外的附加断言**，只钉 `N/A` 判据，不产快照、不计入 SC-003。**D-2 删章节**——同一夹具补入一条不可逆决策（回滚需要迁移）并**移除**该合规 `N/A` 章节 → 复跑恰一条 `dtr-section-missing`（在 SC-003 的三连跑内，「恰 1 条 HIGH」只在此步可达；`dtr-anchor` 被抑制不叠加）。**D-3 补记录**——在同一位置写入一条合规 `### T-001` 记录以替换 `N/A` → 复跑 0 条 HIGH（修复路径成立）；SC-003 只取三份快照——合规 `N/A` → 0、删章节 → 1、补合规记录 → 0，三个子场景各运行一次并各留一份 analyze 报告快照到 `notes/analyze-sc003/`（D-1 / D-2 / D-3 各一份），SC-003 的 HIGH 计数只读这三份快照；`requirements.md` 无 `### Measurement Sources & Collection Methods` 时按记录数机械分叉（≥1 条记录则逐条 `expected-sacrifice-unmapped`，合规 `N/A` 零记录则零发现）；复杂度与承重判据冲突时以 rubric tie-break 取较高一级；跑出记录在案的失败运行
 
 ### Implementation for User Story 4
 
@@ -265,7 +265,7 @@
 - [ ] T023 [blockedBy: T021] 复测术语合规并留档：对 `shared/`、`templates/`、`skills/` 三棵树逐个别名 grep，把计数与正控输出写入 `test-evidence/terminology-counts-after.txt`，判据为五个别名各 0 且 A3 清单仍在（白名单只有 A3 与 Feature 详情 § 附两处，均在分发面之外），与 `test-evidence/terminology-aliases-baseline.txt` 的改动前计数相同 [green: contracts/mirrors-and-scope.md#C-2]
 - [ ] T024 [blockedBy: T021] 镜像收尾：跑 `python3 scripts/python/sync-mirrors.py --write` 产出全部 `.specify/` 副本后再跑 `--check`，对 `requirements.md` FR-025 表所列全部镜像对（行数以该表为准）逐对陈述相对 plan 基线 `test-evidence/sync-mirrors-check.txt` 无新增漂移；`python3 scripts/python/regen-command-copies.py --check` 仍为 OK 且无新增副本；输出写入 `test-evidence/sync-mirrors-check-after.txt` [green: contracts/mirrors-and-scope.md#C-3]
 - [ ] T025 [blockedBy: T024] 闭合面不回退的最终判定：用场景 G 的差异行枚举对 `detection-and-severity.md` 与 `critique-and-self-critique.md` 逐文件比对基线 `ac63fe8c`，允许差异集只含新增段落与新增通道逼出的计数行，集合外删除或改写行数为 0、集合内结构不变量可解析，条目计数比较结果写入 `test-evidence/closed-set-delta.txt` [green: contracts/mirrors-and-scope.md#C-4]
-- [ ] T026 [blockedBy: T025] 实跑 `quickstart.md` 的 S1–S5 五个场景（S1 首条记录与校验、S2 六个反向输入、S3 分析三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语），把每条命令的真实输出与拆卸步骤贴入 `notes/quickstart-run.md`；S3 的四个夹具各留一份 analyze 报告快照（SC-002），并按 T017 的 D-1 / D-2 / D-3 三次运行各留一份报告快照（SC-003：三次运行各一份）；不改写 plan 属主的 `quickstart.md`
+- [ ] T026 [blockedBy: T025] 实跑 `quickstart.md` 的 S1–S5 五个场景（S1 首条记录与校验、S2 六个反向输入、S3 分析三类缺陷、S4 四元组接收与六类拒收、S5 镜像与术语），把每条命令的真实输出与拆卸步骤贴入 `notes/quickstart-run.md`；S3 的四个夹具各留一份 analyze 报告快照（SC-002），并按 T017 的 D-1（合规 `N/A` 那一次；裸 `N/A` 的附加断言不产快照）/ D-2 / D-3 三次运行各留一份报告快照（SC-003：三次运行各一份）；不改写 plan 属主的 `quickstart.md`
 - [ ] T027 [blockedBy: T026] Feature 集成复核：更新 `.specify/memory/features/076.md` 记录本特性的设计落点与实现期留痕，复核 `.specify/memory/features.md` 的 076 行无需变更（本阶段未发现新特性、无行失效），状态保持 `Planned` 不推进
 
 **Checkpoint**: 全部 SC 有证据；镜像与闭合面无新增漂移；零新增机制。
