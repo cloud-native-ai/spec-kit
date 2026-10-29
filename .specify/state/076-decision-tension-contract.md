@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: implement
-stage_started_at: 1793272815
-stage_deadline_epoch: 1793278215
-stage_base_commit: d4479500
+stage: review
+stage_started_at: 1793276657
+stage_deadline_epoch: 1793282057
+stage_base_commit: 7d3ebb58
 attempt: 0
 retry_limit: 2
-last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH；微修复 A-23..A-27 完成（`d4479500`）；implement 起点全量 baseline 运行中（后台 b2mkejfup）
+last_verdict: implement DONE — 27/27 任务闭合（4 段）；8/8 SC pass 且 sha256 绑定；66 特性契约测试 + 70 邻近守卫绿；零新增命令/依赖/进程；镜像逐字节一致；quickstart S1–S5 实跑；Feature 076 `Planned → Implemented`；下一步 review（过程段 + 代码段）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (27 tasks <= 40, tightly coupled, shared files) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -170,6 +170,40 @@ last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH；微修复 A-23..A-27 完
 | 1 | baseline | implement | full-suite | `SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/076-decision-tension-contract/baseline-failed.txt` | 1（39 既有失败） | 6514 passed / 39 failed / 7 skipped（622.70s） | `.specify/specs/076-decision-tension-contract/baseline-failed.txt`（39 名） | 本行 + 基线文件 |
 
 中间阶段一律用定向集，禁止第二次全量；closure 全量在 review 之后。
+
+### implement P1 — DONE（2026-10-29）
+
+- 提交：`c69dbb81 feat(076-decision-tension-contract): implement T001-T007 with the instruction-surface pointer`
+- 闭合任务：T001–T007（证据槽 / 场景 A 契约测试 11 条 / 校验器契约测试 16 条 / owner 判据与门槛段 / plan 模板 `## Decision Tensions` / 校验器骨架与四检查）
+- 定向：35 passed / 3 failed（3 条恰为 T008 范围的逆样本：`sacrifice-none` / `undecidable-wording` / `unmapped-measurement-source`）
+- 门：`validate-tasks` PASS（34 claims）；`sync-mirrors --check` 六对 ok；`regen-command-copies --check` OK
+- **C-11(b) 异常裁决**：新增 `decision-tension.md` 触发 Feature 051 余集断言。C-11(b) 明文禁止第 4 个名字、并明文预期「补指针只会让余集变小」，故**补指令面指针**（`templates/instructions-template.md` § Task Complexity Rubric 一行），**不改 051 契约、不改 `UNPOINTED_BY_STRUCTURE`**；guard 复跑 11 passed
+- 生成器实测：`generate-instructions.sh` 为**段级非破坏合并**，已存在节不改写 → live `.specify/instructions.md` 暂不含该行（新项目 init 会带；本仓待该节整段收敛）
+- PLAN-EDIT：`templates/instructions-template.md` 一行指针，分类 `substantive`（交付面 +1 行，无 FR/SC/条款/任务增删）
+
+### implement P2 — DONE（2026-10-29）
+
+- 提交：`b99b3670 feat: T008–T013`、`4c532433 test: 三条跨标签优先级守卫`
+- 闭合：T008（`expected_sacrifice` 封闭解析 + 第三条优先级 + 两条拒绝标签）/ T009–T011（analyze 第 I 通道 + `seven→eight passes` + 允许差异集）/ T012（四元组契约测试，12 红）/ T013（场景 C，5 红）
+- 定向：`17 failed / 37 passed` —— 17 红全部属 T012/T013 设计内，待 T014/T015 实现；五个既有守护套件 70 passed 零新增失败
+- 门：validate-tasks PASS；account-clause-coverage ok（34/26/26）；镜像六对 ok；命令副本 OK
+- 披露：新增三条优先级守卫（变异验证）；`missing-field` 矩阵取双字段缺失避免重复计数；owner 标题用半角冒号以磁盘为准；四元组 `--json` 信封由测试钉住
+
+### implement P3 — DONE（2026-10-29）
+
+- 提交：`3c1a288c feat(076-decision-tension-contract): implement T014-T020`
+- 闭合：T014（四元组小节，只增不改 + 两处限制）/ T015（`validate-falsification-quartet.py`，六原因码 + 首次 `red:` 切分）/ T016（SI-3C 指针形核验，非改写）/ T017（场景 D 三子场景 + 裸 `N/A` 附加断言）/ T018（`N/A` 判据与来源缺失分叉）/ T019（场景 E 断链经 `index_records()`）/ T020（ADR `tension_id` 槽位）
+- 定向：三个特性文件 **60 passed / 0 failed**；P2 遗留 17 红全清；邻近守护 71 passed
+- 门：validate-tasks PASS；镜像六对 ok（scripts 117）；命令副本 OK
+- 披露：`verification.md` 在 T016 种下，8 条 SC 置 `unknown`（不预支结论）；四元组键重复归 `missing-field`（封闭集无第七原因）
+
+### implement P2–P4 — DONE（2026-10-29）
+
+- P2 `b99b3670` + `4c532433`：T008–T013（`expected_sacrifice` 解析 / 三条优先级 / analyze 第 I 通道 / 四元组与场景 C 测试）
+- P3 `3c1a288c`：T014–T020（四元组 owner 小节 / 四元组校验器 / SI-3C 指针核验 / 场景 D 三子场景 + 裸 N/A / `N/A` 判据 / 场景 E / ADR `tension_id`）；三个特性测试 60 passed / 0 failed
+- P4 `84de4ddf` + `7d3ebb58`：T021–T027（场景 F/G 守卫 / 零新增机制集合差 / 术语复测 / 镜像收尾 / 闭合面终判 / quickstart S1–S5 / Feature 集成）；**Feature 076 → Implemented**
+- 终验：0 open tasks；8/8 SC pass；66 特性契约测试 + 70 邻近守卫绿
+- 披露：tasks.md T027「状态保持 Planned」与状态机 owner 冲突 → 裁决 void 并就地标注；SC-002/SC-003 快照是「程序 verdict 在通道 HIGH-or-0 映射下的渲染」，`/speckit.analyze` 叙事层未整链跑，无 SC 依赖它；四元组键重复归 `missing-field`
 
 ## 框架观察
 
