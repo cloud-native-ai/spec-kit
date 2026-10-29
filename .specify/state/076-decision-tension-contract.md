@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: checklist
-stage_started_at: 1793268574
-stage_deadline_epoch: 1793273974
-stage_base_commit: 920e0f8d
+stage: analyze
+stage_started_at: 1793269113
+stage_deadline_epoch: 1793274513
+stage_base_commit: cde66c0b
 attempt: 0
 retry_limit: 2
-last_verdict: tasks DONE — 27 tasks（≤40）；34 条款各认领一次；validate-tasks PASS 0/0；decomposition proceed；pre-analyze pass（41 expected advisories）；coverage baseline 冻结 @412b4245b461
+last_verdict: checklist DONE — 37 项（27 pass / 10 fail），26 FR / 8 SC 全覆盖，10 项 fail 逐条点名继承实现面；待 analyze 裁决严重度
 <!-- loop-state:end -->
 
 - line_id: `076-decision-tension-contract`
@@ -99,6 +99,14 @@ last_verdict: tasks DONE — 27 tasks（≤40）；34 条款各认领一次；va
 - 条款：34 条各认领恰好一次；`account-clause-coverage` status=ok / FR 26/26 / beyond baseline 0
 - 门：`validate-tasks` PASS（0 error / 0 warning）；`decomposition --mode tasks` proceed（26 FR / 27 tasks）；`pre-analyze --stage tasks` pass（41 advisories 全为待建文件）
 - 偏差：无 `[P]` 行（同文件写读被判非并行安全）；US1 行序重标号一次；两条认领是「实现后守卫」非红先行
+
+### checklist — DONE（2026-10-29）
+
+- 提交：`cde66c0b`；产物 `checklists/readiness-2026-10-29.md`（37 项：27 pass / 10 fail）+ `test-evidence/checklist-stage-checks.md`
+- 覆盖：26 FR / 8 SC 全覆盖，100% 带可追溯锚点
+- 10 项 fail 及继承面：CHK004 语义拒绝形态无裁决者（T004/T008）；CHK011 方向记号未绑定指标轴（T008）；CHK014 SC-003 夹具的 N/A 保留歧义（T017/T018）；CHK018 断链无真实 ADR 入口（T019/T020）；CHK020 缺章节时双标签重复（T007/T010）；CHK022 逆样本未覆盖六字段逐个删除（T003/T007）；CHK026 attempt 不可重放未被执行（T014/T015）；CHK027 `would_go_red_if` 无机械形态（T012/T015）；CHK029 SC-004 与 FR-021 拒收集不一致（T012/T015）；CHK031 披露局限未落到 owner（T014/T016）
+- 零修改面成立：requirements / plan / tasks / contracts 一字未改
+- 结构检查：`validate-requirements` ok（287 行 / 34 定义行 / 4 shared strings）
 
 ## 框架观察
 
