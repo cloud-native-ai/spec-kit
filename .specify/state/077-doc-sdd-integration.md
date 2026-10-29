@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: clarify
-stage_started_at: 1793293871
-stage_deadline_epoch: 1793299271
-stage_base_commit: 481242b5
+stage: plan
+stage_started_at: 1793294348
+stage_deadline_epoch: 1793299748
+stage_base_commit: 5f88e3b5
 attempt: 0
 retry_limit: 2
-last_verdict: requirements DONE — 25 FR / 8 SC / 4 US；validate ok / pre-analyze pass / decomposition proceed；Feature 077 = Draft；gate 全过；wrap-up 记录待驱动者提交
+last_verdict: clarify DONE — 8 条裁定 / 18 条 FR 回修；25 FR / 8 SC / 4 US 不变，STR 2→6；validate ok / overlap clear / pre-analyze pass；下一步 plan
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -74,6 +74,12 @@ last_verdict: requirements DONE — 25 FR / 8 SC / 4 US；validate ok / pre-anal
 - 门：`validate-requirements` ok（239 行 / 33 定义行）；`pre-analyze --stage requirements` pass（0/0）；`decomposition --mode plan` proceed（25 ≤ 30）
 - 绑定：新建 Feature 077；069 作为前序 owner（分类轴），不触碰其正文与状态
 - 偏差：A3 派发句「六个模板」与枚举七个命令名不一致 → 以枚举为准（含 clarify）；A7 脚手架在仓库外调用以抑制切分支
+
+### clarify — DONE（2026-10-30）
+
+- 提交：`5f88e3b5`
+- 八条裁定：① `**Flow Class**: <value>` 单行、仅 requirements 头部、非法值阻断/缺省 execution+标注；② 接线面 **七个**命令；③ `flow-class-check.py lookup` 第三键族 `spec:<dir>`，退出码 0/1/2 三分；④ `## Document Structure` 四子节 + `doc-consistency-check.py --action structure`（不新增第七面），基线=主体集合首次运行违规集；⑤ implement 证据面 = template-only Partial + SC 记门禁 verdict；⑥ 驱动从规格读类别、U4 四项 blocking、两槽位换 docs-gate 内容；⑦ 077 新 Feature 承接边，069 保持 Implemented；⑧ 回退四条且「取值越界」不在回退列
+- 门：validate ok（256 行 / 33 定义行 / 6 STR）；overlap clear；pre-analyze pass（0/0）
 
 ## 测试预算（E2/E3）
 
