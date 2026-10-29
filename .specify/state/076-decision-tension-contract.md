@@ -1,16 +1,16 @@
 # Line State — 076-decision-tension-contract
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: closure
-stage_started_at: 1793278840
-stage_deadline_epoch: 1793284240
-stage_base_commit: e2ca76b5
+stage: done
+stage_started_at: 1793280045
+stage_deadline_epoch: 1793285445
+stage_base_commit: b1ddeae4
 attempt: 0
 retry_limit: 2
-last_verdict: review #2 PASS — 0 blocking，状态推进 `Ready for Review`（`1430314e` + `609e8a46`）；F13（P1）已由驱动者以 `e2ca76b5` 关闭（N/A 规则入 owner、长度阈值移除、短而有据通过）；closure 全量运行中（后台 b16n5app1）
+last_verdict: MERGED to master at b1ddeae4; line deregistered (closed); Feature 076 = Ready for Review; closure 39 failed (exact baseline) / 6593 passed, zero new failures
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (27 tasks <= 40, tightly coupled, shared files) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -235,7 +235,20 @@ last_verdict: review #2 PASS — 0 blocking，状态推进 `Ready for Review`（
 - 提交：`1430314e` / `609e8a46`（评审记录与更正）
 - F13 随后由驱动者关闭：`e2ca76b5`（移除 `NA_MIN_JUSTIFICATION=8`、改「理由非空且非裸否定」封闭集；owner 增 `N/A` 文法；短而有据样本通过）；三特性 + C-11 守卫 87 passed；镜像 clean；validate-tasks PASS
 
+### closure — DONE / MERGED（2026-10-29）
+
+- closure 原始运行：65 failed —— 其中 26 条为**环境性误红**（后台 shell 的 `python3` 解析到 Homebrew，缺 PyYAML/httpx）；26/26 在修正 PATH 后单独复跑全绿
+- closure 重跑（`PATH` 指向 `/usr/bin/python3`）：**39 failed / 6593 passed / 7 skipped**，失败名单与基线逐名相同（`comm -13` 与 `comm -23` 皆空）→ **零新增失败**
+- 合并：`b1ddeae4 merge(076): land the decision tension contract (DTR + falsification quartet)`（`--no-ff`，自 `master@26731b67`）
+- 合并后冒烟：76 passed；分支已删除；状态脊写为 `completed`；Line Registry `state=closed`
+- 临时目录 `.specify/.tmp/sdd-loop/tmp/pybin` 已清理
+
 ## 框架观察
+
+- **指令面再生是段级非破坏合并**：`generate-instructions.sh` 只追加缺失章节，不改写已存在章节；因此放进既有章节的新增指针不会进入 live `.specify/instructions.md`（新项目 init 会带上）。若要让它进入本仓 live 文件，只能整段收敛该节或新开一节。
+- **后台 shell 与前台 shell 的 `python3` 解析可能不同**：后台运行把 Homebrew python3 排在前，导致 26 条 subprocess 测试因缺 PyYAML/httpx 误红；全量 closure 必须固定 `PATH` 或让 subprocess 用 `SPECKIT_PYTHON`。
+- **C-11(b) 余集断言**：新增 `shared/guidelines/*.md` 必须同时在指令面留指针（或落在既有的三个无指针文件之一）；契约明文禁止第 4 个名字，但明文预期「补指针」。
+- **Feature 051 的同一批义务**：模板改动与其镜像、指令再生必须同批，否则守卫在中间态合法变红。
 
 （U4/U6 时补记：现象 / 框架位置 / 对驱动的影响。）
 
