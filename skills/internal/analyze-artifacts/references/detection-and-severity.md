@@ -10,6 +10,11 @@ current session** — the ordinary case for a `requirements → clarify → plan
 without a break — self-review is weak evidence, and detection MUST be delegated to
 fresh-context read-only subagents rather than left to the validation wave.
 
+The delegation wave uses the same carrier rule as §5.5: **workers, never sessions** — the native
+subagent tool when the runtime exposes one, the external read-only CLI (`qodercli -p` /
+`claude -p`) when the executing agent is itself a non-nesting subagent, and the marked direct
+re-read only as the fallback. Host session-creation APIs (`create_chat_session`, `fork_chat_session`, or equivalent) are **PROHIBITED**; owner: `.specify/shared/definitions/subagent-definitions.md` § Mode Selection.
+
 Apply the canonical gate in `.specify/shared/workflow/objective-analysis-gate.md` (single
 source of truth; do not restate its rules). **Local parameters for this skill**: the
 propagation-surface cap is **MEDIUM** (used when no downstream artifact inherits the
