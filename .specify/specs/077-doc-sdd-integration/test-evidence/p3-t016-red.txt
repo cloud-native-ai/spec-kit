@@ -1,0 +1,718 @@
+# T016 red run — 2026-10-29T19:28:06Z HEAD 0970c519
+# cwd = repo root
+# replay: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_docs_gate_driver.py -q
+
+FFFFFFFF.FFFFFFFFFFFFFFFFFFFF.FFF                                        [100%]
+=================================== FAILURES ===================================
+___________ test_the_stage_prompt_skeleton_carries_the_class_quartet ___________
+
+    def test_the_stage_prompt_skeleton_carries_the_class_quartet():
+        skeleton = _code_block(_section(_prompts(), "### 第①段"))
+        missing = [key for key in QUARTET_KEYS if key not in skeleton]
+>       assert not missing, (
+            "segment ① must carry the class quartet %r (C-001); missing %r in the "
+            "skeleton" % (QUARTET_KEYS, missing)
+        )
+E       AssertionError: segment ① must carry the class quartet ('flow_class=', 'source=', 'marker=', 'error=') (C-001); missing ['flow_class=', 'source=', 'marker=', 'error='] in the skeleton
+E       assert not ['flow_class=', 'source=', 'marker=', 'error=']
+
+tests/contract/test_docs_gate_driver.py:146: AssertionError
+__________________ test_the_payload_value_domains_are_closed ___________________
+
+    def test_the_payload_value_domains_are_closed():
+        skeleton = _code_block(_section(_prompts(), "### 第①段"))
+>       assert "declaration|default" in skeleton, (
+            "`source` must state its closed domain `<declaration|default>` (C-001)"
+        )
+E       AssertionError: `source` must state its closed domain `<declaration|default>` (C-001)
+E       assert 'declaration|default' in '你在推进 <project> 的无人值守 SDD 特性开发，当前阶段：<STAGE>。\n- 项目终态权威文档：<target-state-doc>（所有取舍以它为准）\n- 项目宪法：<project>/.specify/memor...ne_path>（U0 入口声明；缺失即快速失败）\n- 证据目录：EVIDENCE_DIR=<spec-dir>/test-evidence\n- 状态脊写入模式：SPINE_WRITE_MODE=direct|transport\n'
+
+tests/contract/test_docs_gate_driver.py:154: AssertionError
+_______________ test_the_quartet_is_one_rule_for_both_topologies _______________
+
+    def test_the_quartet_is_one_rule_for_both_topologies():
+>       _mentions(
+            _prompts(),
+            ("本地", "远端", "同规"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('本地', '远端', '同规'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('本地', '远端', '同规') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_________ test_a_missing_quartet_key_is_a_dispatch_construction_defect _________
+
+    def test_a_missing_quartet_key_is_a_dispatch_construction_defect():
+>       _mentions(
+            _prompts(),
+            ("派发构造缺陷", "U4", "不放行"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('派发构造缺陷', 'U4', '不放行'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('派发构造缺陷', 'U4', '不放行') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+__________ test_the_stage_subagent_may_not_infer_or_default_the_class __________
+
+    def test_the_stage_subagent_may_not_infer_or_default_the_class():
+>       _mentions(
+            _prompts(),
+            ("子代理", "MUST NOT", "推断"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:186: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('子代理', 'MUST NOT', '推断'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('子代理', 'MUST NOT', '推断') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____________ test_the_error_slot_domain_excludes_the_advisory_code _____________
+
+    def test_the_error_slot_domain_excludes_the_advisory_code():
+>       _mentions(
+            _prompts(),
+            ("error", "值域", "owner-unavailable"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('error', '值域', 'owner-unavailable'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('error', '值域', 'owner-unavailable') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_______ test_an_empty_marker_is_missing_only_outside_the_degraded_shape ________
+
+    def test_an_empty_marker_is_missing_only_outside_the_degraded_shape():
+>       _mentions(
+            _prompts(),
+            ("marker", "空", "缺字段"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('marker', '空', '缺字段'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('marker', '空', '缺字段') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____ test_the_class_value_comes_from_the_requirements_declaration_each_time ____
+
+    def test_the_class_value_comes_from_the_requirements_declaration_each_time():
+>       _mentions(
+            _prompts(),
+            ("requirements.md", "声明行", "每次阶段派发前"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('requirements.md', '声明行', '每次阶段派发前'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('requirements.md', '声明行', '每次阶段派发前') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____________ test_u4_adds_four_blocking_checks_for_expression_lines ____________
+
+    def test_u4_adds_four_blocking_checks_for_expression_lines():
+        u4 = _u4()
+>       assert "表达类" in u4, "U4 must scope the additions to the expression class"
+E       AssertionError: U4 must scope the additions to the expression class
+E       assert '表达类' in '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+
+tests/contract/test_docs_gate_driver.py:251: AssertionError
+____________ test_u4_counts_operators_from_the_operator_table_only _____________
+
+    def test_u4_counts_operators_from_the_operator_table_only():
+        u4 = _u4()
+>       _mentions(u4, ("计数分母", "算子表"), "U4")
+
+tests/contract/test_docs_gate_driver.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('计数分母', '算子表'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('计数分母', '算子表') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_____ test_u4_evidence_is_existence_and_non_empty_without_hash_comparison ______
+
+    def test_u4_evidence_is_existence_and_non_empty_without_hash_comparison():
+        u4 = _u4()
+>       _mentions(u4, ("存在且非空", "不做哈希比对"), "U4")
+
+tests/contract/test_docs_gate_driver.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('存在且非空', '不做哈希比对'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('存在且非空', '不做哈希比对') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+________ test_u4_compares_the_payload_class_with_the_on_the_spot_parse _________
+
+    def test_u4_compares_the_payload_class_with_the_on_the_spot_parse():
+>       _mentions(_u4(), ("当场解析", "一致", "派发构造缺陷"), "U4")
+
+tests/contract/test_docs_gate_driver.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('当场解析', '一致', '派发构造缺陷'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('当场解析', '一致', '派发构造缺陷') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_ test_u4_routes_the_owner_unavailable_payload_away_from_the_expression_checks _
+
+    def test_u4_routes_the_owner_unavailable_payload_away_from_the_expression_checks():
+        u4 = _u4()
+>       _mentions(u4, ("owner-unavailable", "降级观测", "保持既有"), "U4")
+
+tests/contract/test_docs_gate_driver.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('owner-unavailable', '降级观测', '保持既有'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('owner-unavailable', '降级观测', '保持既有') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____________________ test_u4_requires_the_stage_status_row _____________________
+
+    def test_u4_requires_the_stage_status_row():
+>       _mentions(_u4(), ("stage-status", "在场"), "U4")
+
+tests/contract/test_docs_gate_driver.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('stage-status', '在场'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('stage-status', '在场') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____ test_gate_evidence_missing_is_incomplete_and_blocks_the_next_dispatch _____
+
+    def test_gate_evidence_missing_is_incomplete_and_blocks_the_next_dispatch():
+        u4 = _u4()
+>       _mentions(u4, ("门禁证据", "未完成"), "U4")
+
+tests/contract/test_docs_gate_driver.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('门禁证据', '未完成'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('门禁证据', '未完成') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_________ test_a_build_sub_row_failure_turns_the_operator_verdict_fail _________
+
+    def test_a_build_sub_row_failure_turns_the_operator_verdict_fail():
+        u4 = _u4()
+>       _mentions(u4, ("子行", "算子级", "fail"), "U4")
+
+tests/contract/test_docs_gate_driver.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('子行', '算子级', 'fail'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('子行', '算子级', 'fail') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+___________ test_a_not_applicable_build_sub_row_is_listed_separately ___________
+
+    def test_a_not_applicable_build_sub_row_is_listed_separately():
+        u4 = _u4()
+>       _mentions(u4, ("not-applicable", "子行", "单列"), "U4")
+
+tests/contract/test_docs_gate_driver.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Independent Verification（独立校验程序，U4）\n\n阶段完成判定由**独立校验步骤**执行——校验者不是该阶段的执行子代理（由主代理自身核验，或另行派发一个校验子代理）。四条件同时成立才判完成：\n\n...P-DEFERRED` 的，U4 不得放行。**U3 返回 `DONE` 只是候选**，四条件同时成立才放行；`INCOMPLETE`（退出 rc=0 但哨兵缺失）按伪完成判未完成。校验结论含逐项证据指针，可被第二位复核者独立复现。\n'
+tokens = ('not-applicable', '子行', '单列'), context = 'U4'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: U4: no paragraph carries all of ('not-applicable', '子行', '单列') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_____________________ test_the_slot_skeleton_is_unchanged ______________________
+
+    def test_the_slot_skeleton_is_unchanged():
+        slots = _slots()
+>       assert "恰好两个槽位" in slots, (
+            "the run line keeps exactly two slots (C-008; owner 067's skeleton)"
+        )
+E       AssertionError: the run line keeps exactly two slots (C-008; owner 067's skeleton)
+E       assert '恰好两个槽位' in '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+
+tests/contract/test_docs_gate_driver.py:311: AssertionError
+___________ test_expression_lines_use_the_docs_gate_selection_basis ____________
+
+    def test_expression_lines_use_the_docs_gate_selection_basis():
+        slots = _slots()
+>       assert "docs-gate-full" in slots, (
+            "the expression-class slot takes the new `selection_basis` value (C-006)"
+        )
+E       AssertionError: the expression-class slot takes the new `selection_basis` value (C-006)
+E       assert 'docs-gate-full' in '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+
+tests/contract/test_docs_gate_driver.py:324: AssertionError
+________________ test_the_rc_column_is_the_aggregated_exit_code ________________
+
+    def test_the_rc_column_is_the_aggregated_exit_code():
+        slots = _slots()
+>       _mentions(slots, ("聚合", "逐命令", "非零优先"), "efficiency §2")
+
+tests/contract/test_docs_gate_driver.py:344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('聚合', '逐命令', '非零优先'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('聚合', '逐命令', '非零优先') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+____________ test_passed_and_failed_count_operator_level_rows_only _____________
+
+    def test_passed_and_failed_count_operator_level_rows_only():
+        slots = _slots()
+>       _mentions(slots, ("passed", "算子级", "pass"), "efficiency §2")
+
+tests/contract/test_docs_gate_driver.py:350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('passed', '算子级', 'pass'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('passed', '算子级', 'pass') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+______________ test_not_applicable_is_not_a_cross_level_equation _______________
+
+    def test_not_applicable_is_not_a_cross_level_equation():
+        slots = _slots()
+>       _mentions(slots, ("MUST NOT", "跨级", "算子总数"), "efficiency §2")
+
+tests/contract/test_docs_gate_driver.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('MUST NOT', '跨级', '算子总数'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('MUST NOT', '跨级', '算子总数') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+________ test_closure_baseline_compare_is_a_name_level_operator_id_diff ________
+
+    def test_closure_baseline_compare_is_a_name_level_operator_id_diff():
+>       _mentions(
+            _slots(),
+            ("baseline_compare", "名称级", "算子 id"),
+            "efficiency §2",
+        )
+
+tests/contract/test_docs_gate_driver.py:362: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('baseline_compare', '名称级', '算子 id'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('baseline_compare', '名称级', '算子 id') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_____________ test_an_unrun_slot_writes_no_row_and_records_no_zero _____________
+
+    def test_an_unrun_slot_writes_no_row_and_records_no_zero():
+        slots = _slots()
+>       _mentions(slots, ("未运行", "槽位行"), "efficiency §2")
+
+tests/contract/test_docs_gate_driver.py:371: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('未运行', '槽位行'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('未运行', '槽位行') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_____________ test_the_audit_and_the_slot_semantics_are_unchanged ______________
+
+    def test_the_audit_and_the_slot_semantics_are_unchanged():
+        slots = _slots()
+>       _mentions(slots, ("audit-test-budget.py", "不变"), "efficiency §2")
+
+tests/contract/test_docs_gate_driver.py:377: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## 2. 两槽位测试预算（Test Budget）\n\n### 2.1 全量定义与作用域\n\n**全量测试运行** = 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件（本仓 = `bash scripts/bash/r...计行为由 `tests/unit/test_audit_test_budget.py` 覆盖；名称级回归由 `tests/integration/test_sdd_loop_efficiency_regression.py` 覆盖。\n'
+tokens = ('audit-test-budget.py', '不变'), context = 'efficiency §2'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: efficiency §2: no paragraph carries all of ('audit-test-budget.py', '不变') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+_________ test_the_class_branch_moves_nothing_but_operators_and_slots __________
+
+    def test_the_class_branch_moves_nothing_but_operators_and_slots():
+        text = _prompts()
+>       _mentions(
+            text,
+            ("MUST NOT 因类别改变", "阶段序列"),
+            "stage-prompts.md",
+        )
+
+tests/contract/test_docs_gate_driver.py:389: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Stage Prompts — 阶段提示词骨架、校验与运行程序（sdd-loop-driver）\n\n> 本文件是每阶段派发提示词与阶段判定程序的自包含手册。全部文本可直接进入派发提示词；对框架文档的引用仅为溯源注解（运行时不解... 本文件不改变各阶段命令自身的内部流程——它只规定**派发什么、怎么判定完成**。\n- 撰写底稿注解：三段骨架与校验程序撰写时取材于 shared 层 `unattended-loop-pattern.md` 底稿；运行时零依赖。\n'
+tokens = ('MUST NOT 因类别改变', '阶段序列'), context = 'stage-prompts.md'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: stage-prompts.md: no paragraph carries all of ('MUST NOT 因类别改变', '阶段序列') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+___________ test_the_skill_hard_requirements_carry_the_class_branch ____________
+
+    def test_the_skill_hard_requirements_carry_the_class_branch():
+        hard = _hard_requirements()
+        for key in ("flow_class", "source", "marker", "error"):
+>           assert key in hard, (
+                "the Hard Requirements branch must name the quartet key %r (C-009)"
+                % key
+            )
+E           AssertionError: the Hard Requirements branch must name the quartet key 'flow_class' (C-009)
+E           assert 'flow_class' in '## Hard Requirements\n\n1. **自迭代**：U4 通过后立即派发下一阶段（U2），不等用户任何形式的「继续」。\n2. **独立校验**：阶段完成判定不由执行者自报——校验者不是该阶段执行子代理；哨兵在而产物...建第二套 registry / ownership 模型 / integration queue。运行止于 review 并交回 handoff：MUST NOT merge、MUST NOT push——集成归外层按其确认门处置。\n'
+
+tests/contract/test_docs_gate_driver.py:408: AssertionError
+________ test_the_skill_declares_the_invariants_the_class_may_not_move _________
+
+    def test_the_skill_declares_the_invariants_the_class_may_not_move():
+        hard = _hard_requirements()
+>       _mentions(
+            hard,
+            ("阶段序列", "哨兵字面量", "watcher", "快车道"),
+            "SKILL.md § Hard Requirements",
+        )
+
+tests/contract/test_docs_gate_driver.py:424: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '## Hard Requirements\n\n1. **自迭代**：U4 通过后立即派发下一阶段（U2），不等用户任何形式的「继续」。\n2. **独立校验**：阶段完成判定不由执行者自报——校验者不是该阶段执行子代理；哨兵在而产物...建第二套 registry / ownership 模型 / integration queue。运行止于 review 并交回 handoff：MUST NOT merge、MUST NOT push——集成归外层按其确认门处置。\n'
+tokens = ('阶段序列', '哨兵字面量', 'watcher', '快车道')
+context = 'SKILL.md § Hard Requirements'
+
+    def _mentions(text: str, tokens: tuple[str, ...], context: str) -> str:
+        """Assert some paragraph carries every token; return that paragraph."""
+        for block in _blocks(text):
+            if all(token in block for token in tokens):
+                return block
+>       raise AssertionError(
+            "%s: no paragraph carries all of %r — the rule is not stated as one "
+            "judgeable unit" % (context, tokens)
+        )
+E       AssertionError: SKILL.md § Hard Requirements: no paragraph carries all of ('阶段序列', '哨兵字面量', 'watcher', '快车道') — the rule is not stated as one judgeable unit
+
+tests/contract/test_docs_gate_driver.py:110: AssertionError
+___________ test_the_class_branch_lives_in_the_three_declared_files ____________
+
+    def test_the_class_branch_lives_in_the_three_declared_files():
+        for path in CLASS_BRANCH_FILES:
+>           assert CLASS_TOKEN_RE.search(_read(path)), (
+                "%s must carry the class branch (T017/T019/T020)"
+                % path.relative_to(REPO_ROOT)
+            )
+E           AssertionError: skills/external/sdd-loop-driver/SKILL.md must carry the class branch (T017/T019/T020)
+E           assert None
+E            +  where None = <built-in method search of re.Pattern object at 0x10bdd4ac0>('---\nname: sdd-loop-driver\ndescription: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶...en Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n')
+E            +    where <built-in method search of re.Pattern object at 0x10bdd4ac0> = re.compile('flow_class|flow-class').search
+E            +    and   '---\nname: sdd-loop-driver\ndescription: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶...en Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n' = _read(PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md'))
+
+tests/contract/test_docs_gate_driver.py:454: AssertionError
+___ test_the_driver_names_the_implement_operator_and_copies_no_other[path0] ____
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/stage-prompts.md')
+
+    @pytest.mark.parametrize("path", [STAGE_PROMPTS, EFFICIENCY])
+    def test_the_driver_names_the_implement_operator_and_copies_no_other(path):
+        ids = set(OPERATOR_ID_RE.findall(_read(path)))
+>       assert IMPLEMENT_OPERATOR in ids, (
+            "%s must name %s — U4(a)'s denominator is that single registered row, so "
+            "the operator must be cited somewhere for the count to exist (C-004)"
+            % (path.relative_to(REPO_ROOT), IMPLEMENT_OPERATOR)
+        )
+E       AssertionError: skills/external/sdd-loop-driver/references/stage-prompts.md must name G-implement-structure — U4(a)'s denominator is that single registered row, so the operator must be cited somewhere for the count to exist (C-004)
+E       assert 'G-implement-structure' in set()
+
+tests/contract/test_docs_gate_driver.py:475: AssertionError
+___ test_the_driver_names_the_implement_operator_and_copies_no_other[path1] ____
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/efficiency-model.md')
+
+    @pytest.mark.parametrize("path", [STAGE_PROMPTS, EFFICIENCY])
+    def test_the_driver_names_the_implement_operator_and_copies_no_other(path):
+        ids = set(OPERATOR_ID_RE.findall(_read(path)))
+>       assert IMPLEMENT_OPERATOR in ids, (
+            "%s must name %s — U4(a)'s denominator is that single registered row, so "
+            "the operator must be cited somewhere for the count to exist (C-004)"
+            % (path.relative_to(REPO_ROOT), IMPLEMENT_OPERATOR)
+        )
+E       AssertionError: skills/external/sdd-loop-driver/references/efficiency-model.md must name G-implement-structure — U4(a)'s denominator is that single registered row, so the operator must be cited somewhere for the count to exist (C-004)
+E       assert 'G-implement-structure' in set()
+
+tests/contract/test_docs_gate_driver.py:475: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_docs_gate_driver.py::test_the_stage_prompt_skeleton_carries_the_class_quartet
+FAILED tests/contract/test_docs_gate_driver.py::test_the_payload_value_domains_are_closed
+FAILED tests/contract/test_docs_gate_driver.py::test_the_quartet_is_one_rule_for_both_topologies
+FAILED tests/contract/test_docs_gate_driver.py::test_a_missing_quartet_key_is_a_dispatch_construction_defect
+FAILED tests/contract/test_docs_gate_driver.py::test_the_stage_subagent_may_not_infer_or_default_the_class
+FAILED tests/contract/test_docs_gate_driver.py::test_the_error_slot_domain_excludes_the_advisory_code
+FAILED tests/contract/test_docs_gate_driver.py::test_an_empty_marker_is_missing_only_outside_the_degraded_shape
+FAILED tests/contract/test_docs_gate_driver.py::test_the_class_value_comes_from_the_requirements_declaration_each_time
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_adds_four_blocking_checks_for_expression_lines
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_counts_operators_from_the_operator_table_only
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_evidence_is_existence_and_non_empty_without_hash_comparison
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_compares_the_payload_class_with_the_on_the_spot_parse
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_routes_the_owner_unavailable_payload_away_from_the_expression_checks
+FAILED tests/contract/test_docs_gate_driver.py::test_u4_requires_the_stage_status_row
+FAILED tests/contract/test_docs_gate_driver.py::test_gate_evidence_missing_is_incomplete_and_blocks_the_next_dispatch
+FAILED tests/contract/test_docs_gate_driver.py::test_a_build_sub_row_failure_turns_the_operator_verdict_fail
+FAILED tests/contract/test_docs_gate_driver.py::test_a_not_applicable_build_sub_row_is_listed_separately
+FAILED tests/contract/test_docs_gate_driver.py::test_the_slot_skeleton_is_unchanged
+FAILED tests/contract/test_docs_gate_driver.py::test_expression_lines_use_the_docs_gate_selection_basis
+FAILED tests/contract/test_docs_gate_driver.py::test_the_rc_column_is_the_aggregated_exit_code
+FAILED tests/contract/test_docs_gate_driver.py::test_passed_and_failed_count_operator_level_rows_only
+FAILED tests/contract/test_docs_gate_driver.py::test_not_applicable_is_not_a_cross_level_equation
+FAILED tests/contract/test_docs_gate_driver.py::test_closure_baseline_compare_is_a_name_level_operator_id_diff
+FAILED tests/contract/test_docs_gate_driver.py::test_an_unrun_slot_writes_no_row_and_records_no_zero
+FAILED tests/contract/test_docs_gate_driver.py::test_the_audit_and_the_slot_semantics_are_unchanged
+FAILED tests/contract/test_docs_gate_driver.py::test_the_class_branch_moves_nothing_but_operators_and_slots
+FAILED tests/contract/test_docs_gate_driver.py::test_the_skill_hard_requirements_carry_the_class_branch
+FAILED tests/contract/test_docs_gate_driver.py::test_the_skill_declares_the_invariants_the_class_may_not_move
+FAILED tests/contract/test_docs_gate_driver.py::test_the_class_branch_lives_in_the_three_declared_files
+FAILED tests/contract/test_docs_gate_driver.py::test_the_driver_names_the_implement_operator_and_copies_no_other[path0]
+FAILED tests/contract/test_docs_gate_driver.py::test_the_driver_names_the_implement_operator_and_copies_no_other[path1]
+31 failed, 2 passed in 0.20s
+pytest exit=1
+
+# red-first token set (narrowed to flow_class|flow-class; 'expression' excluded — watch-model.md:158 has an unrelated 'integer expression expected')
+# replay: grep -rn -E 'flow_class|flow-class' skills/external/sdd-loop-driver/
+grep exit=1 (1 = zero hits, the intended red premise)
+
+# excluded token counter-example
+skills/external/sdd-loop-driver/references/watch-model.md:158:# 后续 [ "$count" -eq 0 ] 报 "integer expression expected"，

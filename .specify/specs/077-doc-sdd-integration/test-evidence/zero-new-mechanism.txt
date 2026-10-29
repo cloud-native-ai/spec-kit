@@ -1,0 +1,15 @@
+# T021 conclusion — zero new mechanism
+# full command/dependency/process listings: test-evidence/tasks-scope-set-difference.txt
+
+## VERDICT
+allowed difference set = []
+new commands = 0
+new dependencies = 0
+new resident-process carriers = 0
+new service/daemon declarations = 0
+
+FACES = ('reader', 'evidence', 'duplicate', 'count') (count=4)
+
+## blocking confirmation gates (FR-022: the two readings must be equal)
+baseline reading (plan-scan-confirmation-gates.txt): blocking confirmation gates: 27
+current reading: blocking confirmation gates: 27

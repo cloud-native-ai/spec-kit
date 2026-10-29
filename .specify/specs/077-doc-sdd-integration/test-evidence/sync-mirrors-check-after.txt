@@ -1,0 +1,20 @@
+# T022 — sync-mirrors --check after the writer (raw capture)
+# generated automatically; per-pair statement also recorded in tasks-distribution-after.txt
+
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit=0
+
+## per-pair relative to the baseline
+
+- templates/ == .specify/templates/ — baseline 22 files / current 22 files → no new drift (ok)
+- skills/external/ == .specify/skills/ — baseline 406 files / current 406 files → no new drift (ok)
+- skills/internal/ == .specify/skills/internal/ — baseline 136 files / current 136 files → no new drift (ok)
+- agents/ == .specify/agents/templates/ — baseline 3 files / current 3 files → no new drift (ok)
+- scripts/ == .specify/scripts/ — baseline 117 files / current 117 files → no new drift (ok)
+- shared/ == .specify/shared/ — baseline 60 files / current 60 files → no new drift (ok)

@@ -273,3 +273,74 @@
 - **四面未动**：`--faces` 的取值集仍是 `reader` / `evidence` / `duplicate` / `count`；`--action` 的 choices 为 `{verify, structure}`；六面 owner 与阶段算子表一行未改（`--action faces` 仍 `6 face(s) parsed, 0 finding(s)`）。
 - **一次中间修正（属纠正）**：`Reader Baseline` 两行在 plan 与落文里逐字相同，被复用的 `duplicate` 面按机械下限判成 `duplicate-fact`（假阳性——读者声明是**结构标记**，plan 与落文都必须携带，不是手写事实副本）。修法是在重复判定前剔除两枚 reader 标记行，阈值与码一律未动（MUST NOT 自建第二套阈值）。
 - **原始输出留档**：`test-evidence/p2-t015-green.txt`、`test-evidence/p2-t009-t015-green.txt`
+
+---
+
+## Part 3 / 4 段（T016–T022）
+
+### T016 — 驱动载荷 / U4 / 两槽位契约测试（red，2026-10-30，HEAD `0970c519`）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_docs_gate_driver.py -q`（cwd = 仓库根）
+- **真实输出**（失败名摘要，完整留档见原始输出文件）：
+
+  ```text
+  FAILED ...::test_the_stage_prompt_skeleton_carries_the_class_quartet
+  FAILED ...::test_the_payload_value_domains_are_closed
+  FAILED ...::test_the_quartet_is_one_rule_for_both_topologies
+  FAILED ...::test_a_missing_quartet_key_is_a_dispatch_construction_defect
+  FAILED ...::test_the_stage_subagent_may_not_infer_or_default_the_class
+  FAILED ...::test_the_error_slot_domain_excludes_the_advisory_code
+  FAILED ...::test_an_empty_marker_is_missing_only_outside_the_degraded_shape
+  FAILED ...::test_the_class_value_comes_from_the_requirements_declaration_each_time
+  FAILED ...::test_u4_adds_four_blocking_checks_for_expression_lines
+  FAILED ...::test_u4_counts_operators_from_the_operator_table_only
+  FAILED ...::test_u4_evidence_is_existence_and_non_empty_without_hash_comparison
+  FAILED ...::test_u4_compares_the_payload_class_with_the_on_the_spot_parse
+  FAILED ...::test_u4_routes_the_owner_unavailable_payload_away_from_the_expression_checks
+  FAILED ...::test_u4_requires_the_stage_status_row
+  FAILED ...::test_gate_evidence_missing_is_incomplete_and_blocks_the_next_dispatch
+  FAILED ...::test_a_build_sub_row_failure_turns_the_operator_verdict_fail
+  FAILED ...::test_a_not_applicable_build_sub_row_is_listed_separately
+  FAILED ...::test_the_slot_skeleton_is_unchanged
+  FAILED ...::test_expression_lines_use_the_docs_gate_selection_basis
+  FAILED ...::test_the_rc_column_is_the_aggregated_exit_code
+  FAILED ...::test_passed_and_failed_count_operator_level_rows_only
+  FAILED ...::test_not_applicable_is_not_a_cross_level_equation
+  FAILED ...::test_closure_baseline_compare_is_a_name_level_operator_id_diff
+  FAILED ...::test_an_unrun_slot_writes_no_row_and_records_no_zero
+  FAILED ...::test_the_audit_and_the_slot_semantics_are_unchanged
+  FAILED ...::test_the_class_branch_moves_nothing_but_operators_and_slots
+  FAILED ...::test_the_skill_hard_requirements_carry_the_class_branch
+  FAILED ...::test_the_skill_declares_the_invariants_the_class_may_not_move
+  FAILED ...::test_the_class_branch_lives_in_the_three_declared_files
+  FAILED ...::test_the_driver_names_the_implement_operator_and_copies_no_other[path0]
+  FAILED ...::test_the_driver_names_the_implement_operator_and_copies_no_other[path1]
+  31 failed, 2 passed in 0.21s
+  ```
+
+- **退出码**：`1`；**失败计数**：`31 failed / 2 passed`（33 项）
+- **红的是什么**：驱动技能与 `references/` 对**收窄 token 集** `flow_class|flow-class` 零命中（`grep -rn -E "flow_class|flow-class" skills/external/sdd-loop-driver/` 退出码 1）；骨架无类别四元组、U4 无表达类四项、efficiency-model §2 无 `docs-gate-full` 分支、`SKILL.md` 的 `## Hard Requirements` 无类别分支——31 条断言因此全红。
+- **两绿的是回归守卫**（今天成立且实现后必须成立）：U4 的既有四条件（哨兵/产物/纪律/记账）与八阶段链 + 哨兵字面量。
+- **token 集收窄的证据**：`expression` 不纳入——`skills/external/sdd-loop-driver/references/watch-model.md:158` 有无关的 `integer expression expected`，纳入即产出假阳性（该反例已随红记录留档）。
+- **原始输出留档**：`test-evidence/p3-t016-red.txt`。
+
+### T017 / T018 / T019 / T020 — 四文件类分支落地（green，2026-10-30）
+
+- **重放命令**：`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_docs_gate_driver.py -q`
+- **真实输出**：`33 passed in 0.06s`，退出码 `0`（红前同一文件 `31 failed / 2 passed`）
+- **转绿的是哪一组**：T017 → 第①段四元组 + 本地/远端同规 + 缺键即派发构造缺陷 + `error` 值域与 advisory 排除 + `marker` 收窄 + 每次派发前从声明行解析；U4 四项 blocking（算子表分母 / 证据存在且非空不做哈希 / 载荷与当场解析一致且 `owner-unavailable` 分支 / `stage-status` 在场）与「门禁证据缺失 = 未完成」。T018 → implement 证据面（四面 + `structure` 子步 + `face=build` 子行 + 唯一证据来源 + SC 记法）与 U4 的「四面 ≠ 算子表四行」读法。T019 → efficiency-model §2.8 的 `docs-gate-full` 槽位内容（`selection_basis` / `command` / 聚合 `rc` / 算子级 `passed`/`failed` / 名称级 `baseline_compare` / `not-applicable` 单列 / 未运行不写行）。T020 → `SKILL.md` Hard Requirement 13（四元组、U4 门禁证据、`owner-unavailable` 分支、两条 references 指针、阶段序列与 100% 调用率不动）。
+- **邻近定向集**：18 个文件 `411 passed`，退出码 `0`——含 `test_sdd_loop_driver_efficiency`（TB-01…TB-10 全绿，§2 骨架未被改写）、`test_sdd_loop_driver_skill`（H2 清单与镜像字节）、`test_expression_compatibility`（SKILL.md 的 `ALLOWED_POST_BASELINE_CHANGES` 三枚 marker 仍在场）、`test_migration_distribution`（skills 未新增 `--action check|delegation|faces|isomorphism` 调用点）。
+- **原始输出留档**：`test-evidence/p3-t016-t020-green.txt`。
+
+### 本段五次「纠正」（非裁定；均为测试断言与契约字面量的对齐，未改契约）
+
+1. `test_the_driver_names_the_implement_operator_and_copies_no_other` 起初只断言「id 集合 ⊆ {`G-implement-structure`}」——空集时**空绿**。改为同时要求该 id 在场（U4(a) 的分母必须可寻），红计数由 29 failed 变 31 failed。
+2. `assert "review 通过之后"` 与实现里的 `` `review` 通过之后 `` 因反引号不相邻而失配——断言语义正确、字面形态错误；改为 `"review"` 与 `"通过之后"` 两条并存。
+3. `("不新增聚合脚本",)` 与实现句「MUST NOT 为此新增聚合脚本」不相邻——改为 `("MUST NOT", "新增聚合脚本")`，与 C-006 的否定形态一致。
+4. `("之和", …)` 与实现里的 `两值之**和**` 因加粗标记拆断——把实现改成 `两值之和`（措辞未变义）。
+5. 载体守卫起初要求三个文件都出现 `flow_class`——但 T019 只要求 efficiency-model 出现 `docs-gate-full`（槽位 owner 不复述类别键）；改为**按文件登记各自 marker**，stray 扫描仍用 `flow_class|flow-class`。
+
+### T021 / T022 — 零新增机制与分发收尾（green，2026-10-30）
+
+- **T021**：`/speckit.*` 命令清单（`templates/commands` ∪ 四个 per-tool 副本目录）基线 27 / 当前 27、差集 `[]`；依赖清单 6 / 6、`pyproject.toml` blob 逐字相同；进程清单 19 / 19（`while True|serve_forever|socketserver|APScheduler|schedule.every|daemon=True` 于 `*.py`/`*.sh`）、服务声明文件空集对空集；`doc-consistency-check.py` 的 `FACES` 仍四面、`--faces structure` 以退出码 2 被拒；`scan-confirmation-gates.py --summary` 两次读数同为 `blocking confirmation gates: 27`。`allowed difference set = []`、新增命令/依赖/常驻进程/确认门均 0。留档 `test-evidence/tasks-scope-set-difference.txt`、`test-evidence/zero-new-mechanism.txt`。
+- **T022**：经 profiles venv 跑 `sync-mirrors.py --write` 后 `--check` 六对全 `ok`、退出码 0，文件数与基线逐对相同（22 / 406 / 136 / 3 / 117 / 60）；`regen-command-copies.py --check` 报 `OK: all per-tool command copies match the source templates.`、退出码 0；副本套数为本仓实存的四个目标（`.claude` / `.github` / `.qoder` / `.opencode`），`templates/commands/**` 不在 templates 镜像对内。留档 `test-evidence/tasks-distribution-after.txt`、`test-evidence/sync-mirrors-check-after.txt`。
