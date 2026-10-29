@@ -17,7 +17,7 @@ salvage: none
 - **line_id**: 067-loop-efficiency-hardening
 - **target_project**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
 - **topology**: local (host-native subagent; qodercli MUST NOT be started)
-- **authority**: `.specify/specs/067-loop-efficiency-hardening/requirements.md`, `.specify/specs/074-sdd-loop-efficiency/`, `scripts/bash/run-tests.sh`, `pyproject.toml`, `.specify/memory/constitution.md`
+- **authority**: `.specify/specs/067-loop-efficiency-hardening/requirements.md`, `.specify/specs/075-sdd-loop-efficiency/`, `scripts/bash/run-tests.sh`, `pyproject.toml`, `.specify/memory/constitution.md`
 - **slice**: 067-loop-efficiency-hardening; this run's focus = drastically slim the spec-kit framework's own test workflow so one complete run finishes within 10 minutes
 - **breakpoint (U1)**: requirements — 067 has Draft `requirements.md` only; no plan/tasks/checklist/analyze; feature binding = Feature 058
 - **branch**: 067-loop-efficiency-hardening (short-lived feature branch off master `7f9033ec`; U6 merges locally, push requires explicit authorization)

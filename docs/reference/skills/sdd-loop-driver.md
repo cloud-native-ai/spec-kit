@@ -65,7 +65,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 - **与 Registry 的关系**：`scripts/line-registry.py` 的条目提供路径与 `stage` 回退（显式参数 > Registry 条目 > 环境约定 > `null`）；条目缺失记 `status=missing` 且不致命，绝不猜路径、不扫进程。
 - **只读边界**：快照不改任何 mtime、不写四件套与工作树；`stop` 只是建议，停线须在最终快照与用户显式决定之后。
 
-## 运行效率优化（074-sdd-loop-efficiency 切片；058 演化）
+## 运行效率优化（075-sdd-loop-efficiency 切片；058 演化）
 
 四项编排层优化，规则与字段面 owner 是 skill 参考手册 `references/efficiency-model.md`：
 

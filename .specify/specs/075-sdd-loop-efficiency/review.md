@@ -1,4 +1,4 @@
-# Specification-Driven Development (SDD) Process Review Report: 074-sdd-loop-efficiency
+# Specification-Driven Development (SDD) Process Review Report: 075-sdd-loop-efficiency
 
 > **Audience**: spec-kit framework maintainers.
 > **Purpose**: Identify concrete problems and improvement targets in spec-kit templates, command prompts, automation, and workflow as exposed by this feature's SDD lifecycle.
@@ -9,13 +9,13 @@
 | Field | Value |
 |-------|-------|
 | Requirement ID | 063 |
-| Requirement Key | 074-sdd-loop-efficiency |
+| Requirement Key | 075-sdd-loop-efficiency |
 | Requirement Name | sdd-loop-driver 运行效率优化（SDD Loop Efficiency） |
 | Related Feature | 058 无人值守 SDD 循环驱动机制（Unattended SDD Loop Driver） |
 | Repository | spec-kit |
 | Repository URL | SSH-only remotes: `git@github.com:cloud-native-ai/spec-kit.git`, `git@gitee.com:cloud-native-ai/spec-kit.git`, `git@gitlab.alibaba-inc.com:cloud-native-ai/spec-kit.git` — none exposes an HTTPS web URL |
 | Reachability of COMMIT_SHA | UNRESOLVABLE: `git branch -r --contains HEAD` is empty (0 remotes contain the commit). All citations below use absolute local paths; recover any file with `git -C /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit show afca82f7:<path>` |
-| Branch | 074-sdd-loop-efficiency |
+| Branch | 075-sdd-loop-efficiency |
 | Commit SHA | afca82f77779a714eec56fe554f5799852ab3bcf (short: afca82f7) |
 | Repo Root (absolute) | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit |
 | Review Date | 2026-10-20 |
@@ -27,17 +27,17 @@
 
 | Artifact | Lines | Absolute Path | One-line Summary |
 |----------|------:|---------------|-------------------|
-| requirements.md | 347 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/requirements.md | 43 FR / 13 SC / 8 shared strings; four loop-efficiency optimizations plus safety invariants |
-| plan.md | 363 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/plan.md | Design by optimization, constitution check, five plan-repair records |
-| tasks.md | 364 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/tasks.md | 53 task rows (T000 + T001…T052), seven target groups / 24 mutations |
-| verification.md | 385 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md | Per-task gates, mutation tables, SC-001…SC-013 status table |
-| research.md | 106 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/research.md | R-1…R-12 decisions plus B-1…B-8 measured baselines |
-| data-model.md | 274 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/data-model.md | E1…E8 entities, 41 validation rules, stall behavior baseline SB-1…SB-5 |
-| quickstart.md | 187 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/quickstart.md | S1…S7 scenarios with preconditions and pinning tests |
-| feature-ref.md | 145 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/feature-ref.md | FR/SC mapping, 24 deliverables, baseline records, exclusions |
-| contracts/ (5 files, 50 clauses) | 300+ | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/contracts/ | FL-01…FL-10, TB-01…TB-10, PC-01…PC-11, PD-01…PD-10, DI-01…DI-09 |
-| checklists/ (2 files) | 39 + 16 items | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/checklists/ | efficiency checklist 31 pass / 8 not pass; requirements checklist 16/16 |
-| notes/ (12 evidence files) | ~40 KB | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/ | Pre-change measurements, red-first evidence, quickstart runs, stall baseline, S7 trace |
+| requirements.md | 347 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/requirements.md | 43 FR / 13 SC / 8 shared strings; four loop-efficiency optimizations plus safety invariants |
+| plan.md | 363 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/plan.md | Design by optimization, constitution check, five plan-repair records |
+| tasks.md | 364 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/tasks.md | 53 task rows (T000 + T001…T052), seven target groups / 24 mutations |
+| verification.md | 385 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md | Per-task gates, mutation tables, SC-001…SC-013 status table |
+| research.md | 106 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/research.md | R-1…R-12 decisions plus B-1…B-8 measured baselines |
+| data-model.md | 274 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/data-model.md | E1…E8 entities, 41 validation rules, stall behavior baseline SB-1…SB-5 |
+| quickstart.md | 187 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/quickstart.md | S1…S7 scenarios with preconditions and pinning tests |
+| feature-ref.md | 145 | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/feature-ref.md | FR/SC mapping, 24 deliverables, baseline records, exclusions |
+| contracts/ (5 files, 50 clauses) | 300+ | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/contracts/ | FL-01…FL-10, TB-01…TB-10, PC-01…PC-11, PD-01…PD-10, DI-01…DI-09 |
+| checklists/ (2 files) | 39 + 16 items | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/checklists/ | efficiency checklist 31 pass / 8 not pass; requirements checklist 16/16 |
+| notes/ (12 evidence files) | ~40 KB | /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/ | Pre-change measurements, red-first evidence, quickstart runs, stall baseline, S7 trace |
 | Analyze logs (4 rounds) | 20–27 KB each | /tmp/sdd-loop-efficiency/log-sdd-loop-efficiency-analyze*.log | Gate reports: round 1 2 HIGH → rerun 1 HIGH → rerun 2 1 HIGH → rerun 3 READY 0/0/3/3 |
 
 ## 1. Process Execution Timeline
@@ -89,7 +89,7 @@
 
 - **Severity**: P0 (independently validated: confirm)
 - **Category**: Automation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/audit-test-budget.py:347-350; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_audit_test_budget.py:433-443; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/requirements.md:187,270; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:350
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/audit-test-budget.py:347-350; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_audit_test_budget.py:433-443; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/requirements.md:187,270; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:350
 - **Evidence** (verbatim quote):
 
   ```
@@ -126,7 +126,7 @@
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:336-340,348,357; /tmp/sdd-loop-efficiency/state.md (test-budget fence contains only `seq=1, slot=baseline`)
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:336-340,348,357; /tmp/sdd-loop-efficiency/state.md (test-budget fence contains only `seq=1, slot=baseline`)
 - **Evidence** (verbatim quote):
 
   ```
@@ -143,7 +143,7 @@
   ```
   (verification.md:348,357)
 
-  The only E2 row in /tmp/sdd-loop-efficiency/state.md is `{"seq":1,"slot":"baseline",...}`; no `closure` row exists, and no `final-failed.txt` exists under /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/.
+  The only E2 row in /tmp/sdd-loop-efficiency/state.md is `{"seq":1,"slot":"baseline",...}`; no `closure` row exists, and no `final-failed.txt` exists under /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/.
 
 - **Why it's a problem**: SC-012's "name-level new failures empty" is the result of the closure `comm -13` comparison, which has not run. GATE-8 itself says the closure check fails until the driver appends the row. Marking these criteria `pass` at review time is a false green: a regression introduced between the implement-start baseline and the final tree would be invisible to the reader.
 - **Proposed fix**: Change SC-003 and SC-012 to `pending (driver closure)` in verification.md until the closure E2 row and `comm -13` output exist; add a verification rule (in the implement/review command prompt or a validator) that any SC whose evidence class includes "driver closure" cannot be `pass` before the closure artifact is present. The closure must be recorded before merge.
@@ -152,7 +152,7 @@
 
 - **Severity**: P1
 - **Category**: Automation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py:225-229,299-310,436; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/requirements.md:222; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:355
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py:225-229,299-310,436; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/requirements.md:222; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:355
 - **Evidence** (verbatim quote):
 
   ```
@@ -176,11 +176,11 @@
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/test-evidence/; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/audit-test-budget.py:33 (`E3_STAGES` excludes `implement`); /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:106-114,350
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/test-evidence/; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/audit-test-budget.py:33 (`E3_STAGES` excludes `implement`); /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:106-114,350
 - **Evidence** (verbatim quote):
 
   ```
-  $ ls .specify/specs/074-sdd-loop-efficiency/test-evidence/
+  $ ls .specify/specs/075-sdd-loop-efficiency/test-evidence/
   implement.jsonl
   ```
   (the only file; `implement` is not in `E3_STAGES = ("clarify", "plan", "tasks", "checklist", "analyze", "review")`)
@@ -202,7 +202,7 @@
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/requirements.md:338; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/research.md:18,87; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/checklists/efficiency.md:158; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/checklists/requirements.md:41
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/requirements.md:338; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/research.md:18,87; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/checklists/efficiency.md:158; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/checklists/requirements.md:41
 - **Evidence** (verbatim quote):
 
   ```
@@ -226,7 +226,7 @@
 
 - **Severity**: P2
 - **Category**: Automation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/watch-target.sh (grace-timeout self-test); /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:328; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/tasks.md:23 (DoD-5)
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/watch-target.sh (grace-timeout self-test); /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:328; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/tasks.md:23 (DoD-5)
 - **Evidence** (verbatim quote):
 
   ```
@@ -247,7 +247,7 @@
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/stall-behavior-baseline.json:18,32,46; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py:357-370
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/stall-behavior-baseline.json:18,32,46; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py:357-370
 - **Evidence** (verbatim quote):
 
   ```
@@ -261,7 +261,7 @@
   (driver-stall-fixture.py:369-370 — the recording root is deleted at the end of `record()`)
 
 - **Why it's a problem**: The baseline's per-scenario `evidence_ptr` is supposed to let a reviewer locate the observed spine/status/watcher output. The temp root is deleted, so the pointer cannot be resolved; the replay artifact also normalizes the pointer to the basename `spine.md`. The tuple is reproducible only by re-running the fixture, not from the recorded baseline alone.
-- **Proposed fix**: Before `rmtree`, copy each scenario's spine/status/watcher output into a durable location under the feature notes (e.g., `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/stall-evidence/<scenario>/`) and write those paths into the baseline; keep the replay normalization but compare the durable relative paths.
+- **Proposed fix**: Before `rmtree`, copy each scenario's spine/status/watcher output into a durable location under the feature notes (e.g., `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/stall-evidence/<scenario>/`) and write those paths into the baseline; keep the replay normalization but compare the durable relative paths.
 
 ### F8 — Security-invariant clauses are pinned by substring presence, not behavior
 
@@ -287,7 +287,7 @@
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/plan.md:70; tasks.md:30; checklists/efficiency.md:15; /tmp/sdd-loop-efficiency/log-sdd-loop-efficiency-analyze-rerun-3.log (L-01/F-01)
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/plan.md:70; tasks.md:30; checklists/efficiency.md:15; /tmp/sdd-loop-efficiency/log-sdd-loop-efficiency-analyze-rerun-3.log (L-01/F-01)
 - **Evidence** (verbatim quote):
 
   ```
@@ -307,7 +307,7 @@
 
 - **Severity**: P2
 - **Category**: Workflow
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/plan.md:241,286; commits bcf27c77, 144093c8, 53162f4f
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/plan.md:241,286; commits bcf27c77, 144093c8, 53162f4f
 - **Evidence** (verbatim quote):
 
   ```
@@ -339,7 +339,7 @@
 
 - **Severity**: P2
 - **Category**: Workflow
-- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/s7-dry-run-trace.md:3-6; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/verification.md:347 (SC-002 evidence class)
+- **Location**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/s7-dry-run-trace.md:3-6; /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/verification.md:347 (SC-002 evidence class)
 - **Evidence** (verbatim quote):
 
   ```
@@ -389,8 +389,8 @@
 
 ### 5.4 Documentation Improvements
 
-- **REC-D1 — Complete the L-02 pointer correction** — Target: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/requirements.md, /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/research.md, and /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/checklists/. Change: use `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` everywhere; add a grep guard. Source: F5. Expected impact: every pointer resolves from the 063 spec directory.
-- **REC-D2 — Make the stall baseline self-contained** — Target: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/074-sdd-loop-efficiency/notes/stall-behavior-baseline.json and the fixture. Change: durable evidence copies plus relative pointers; replay compares them. Source: F7. Expected impact: the baseline can be audited without re-running the fixture.
+- **REC-D1 — Complete the L-02 pointer correction** — Target: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/requirements.md, /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/research.md, and /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/checklists/. Change: use `.specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md` everywhere; add a grep guard. Source: F5. Expected impact: every pointer resolves from the 063 spec directory.
+- **REC-D2 — Make the stall baseline self-contained** — Target: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/075-sdd-loop-efficiency/notes/stall-behavior-baseline.json and the fixture. Change: durable evidence copies plus relative pointers; replay compares them. Source: F7. Expected impact: the baseline can be audited without re-running the fixture.
 - **REC-D3 — Mark pending closure explicitly** — Target: the verification template/section in /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/commands/implement.md and the 063 verification.md. Change: add `pending (driver closure)` as a first-class status; never use `pass` with an absent artifact. Source: F2. Expected impact: readers cannot mistake a pending safety net for a green one.
 
 ## 6. Priority Roadmap
@@ -401,7 +401,7 @@
 | P1 | Forbid `pass` before driver-owned closure evidence | templates/commands/implement.md; review closing rules; verification.md | F2 |
 | P1 | Make SC-010's dispatch field observable and evidence durable | tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py | F3, F7 |
 | P1 | Require E3 evidence for the feature's own run | skills/external/sdd-loop-driver/references/stage-prompts.md; driver U4/U5 | F4 |
-| P2 | Complete L-02 pointers | .specify/specs/074-sdd-loop-efficiency/{requirements,research,checklists} | F5 |
+| P2 | Complete L-02 pointers | .specify/specs/075-sdd-loop-efficiency/{requirements,research,checklists} | F5 |
 | P2 | Stabilize the watcher self-test | skills/external/sdd-loop-driver/scripts/watch-target.sh | F6 |
 | P2 | Replace DI substring checks with behavior checks | tests/contract/test_sdd_loop_driver_efficiency.py | F8 |
 | P2 | Generate counts from validators | .specify/scripts/python/validate-*.py; plan/tasks/checklist templates | F9 |

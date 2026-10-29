@@ -1,8 +1,8 @@
-# Analyze gate report — 074-sdd-loop-efficiency (analyze-rerun-3)
+# Analyze gate report — 075-sdd-loop-efficiency (analyze-rerun-3)
 
 > Provenance: transcribed from the analyze stage log `/tmp/sdd-loop-efficiency/log-sdd-loop-efficiency-analyze-rerun-3.log` at closure so the read-only stage leaves a durable artifact; the report itself is the stage output, unmodified below this header.
 
-# /speckit.analyze 复核报告 — 074-sdd-loop-efficiency（analyze-rerun-3）
+# /speckit.analyze 复核报告 — 075-sdd-loop-efficiency（analyze-rerun-3）
 
 **执行阶段命令**: `/speckit.analyze`（严格只读；前置 `check-prerequisites.sh --json --require-tasks --include-tasks` 通过）
 **分析范围**: requirements.md、plan.md、research.md、data-model.md、contracts/×5、quickstart.md、feature-ref.md、tasks.md、checklists/×2、Feature 058 索引与详情、宪法 v1.13.0；064 的 `notes/063-overlap-adjudication.md`、`contracts/cli-profiles.md`、`data-model.md` E9/E10；061 的 `CAPABILITY_MATRIX` 边界；上两轮 analyze 报告；tasks-repair-3 提交 `a2279cc5`。

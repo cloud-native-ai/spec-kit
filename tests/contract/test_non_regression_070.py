@@ -321,7 +321,7 @@ PREDECESSOR_DOCS_H2 = [
     "机制归属（Feature 060 委派化）",
     "统一监听模型",
     "状态感知快照（065a-state-awareness）",
-    "运行效率优化（074-sdd-loop-efficiency 切片；058 演化）",
+    "运行效率优化（075-sdd-loop-efficiency 切片；058 演化）",
     "并发归属与生命周期",
     "CLI 能力档案",
     "Hook 兜底与远程 SSH（2026-10-19 增强）",

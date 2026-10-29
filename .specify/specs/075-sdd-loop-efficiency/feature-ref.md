@@ -1,7 +1,7 @@
 # Feature Reference: sdd-loop-driver 运行效率优化（SDD Loop Efficiency）
 
 **Feature ID**: 058 | **Feature Name**: 无人值守 SDD 循环驱动机制（Unattended SDD Loop Driver）
-**Requirement**: `.specify/specs/074-sdd-loop-efficiency/requirements.md`（演化特性，2026-10-20 绑定；058 状态保持 `Implemented`，不回退）
+**Requirement**: `.specify/specs/075-sdd-loop-efficiency/requirements.md`（演化特性，2026-10-20 绑定；058 状态保持 `Implemented`，不回退）
 **Status at plan time**: 058 = Implemented（扩展切片：只记录本特性规划，不改变状态）
 
 ## FR → 设计映射

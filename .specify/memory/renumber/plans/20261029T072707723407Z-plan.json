@@ -1,0 +1,284 @@
+{
+  "kind": "speckit.renumber.plan",
+  "schema_version": 1,
+  "created_at": "2026-10-29T07:27:07Z",
+  "workspace_root": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit",
+  "confirmed": true,
+  "families": [
+    "spec-number",
+    "register",
+    "rec-follow",
+    "local"
+  ],
+  "groups": [
+    {
+      "family": "spec-number",
+      "scope": "074",
+      "old_token": "074-sdd-loop-efficiency",
+      "new_token": "075-sdd-loop-efficiency",
+      "keep": {
+        "token": "074-goal-team-sdd-unification",
+        "evidence": "features-row"
+      },
+      "status": "proposed",
+      "verify": "token-absent",
+      "items": [
+        {
+          "kind": "dir-rename",
+          "from": ".specify/specs/074-sdd-loop-efficiency",
+          "to": ".specify/specs/075-sdd-loop-efficiency"
+        }
+      ],
+      "refs": {
+        "in_scope": [
+          {
+            "path": ".specify/memory/features/058.md",
+            "hits": 5
+          },
+          {
+            "path": ".specify/skills/sdd-loop-driver/scripts/check-063-overlap.py",
+            "hits": 2
+          },
+          {
+            "path": ".specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md",
+            "hits": 3
+          },
+          {
+            "path": ".specify/specs/064-subagent-concurrency/review.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/064-subagent-concurrency/tasks.md",
+            "hits": 4
+          },
+          {
+            "path": ".specify/specs/067-loop-efficiency-hardening/notes/state-spine.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/feature-ref.md",
+            "hits": 2
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/notes/overlap-adjudication-plan.md",
+            "hits": 2
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/checklists/efficiency.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/data-model.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/feature-ref.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/notes/analysis-gate-report.md",
+            "hits": 2
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/notes/pre-change-measurements.md",
+            "hits": 3
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/plan.md",
+            "hits": 4
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/requirements.md",
+            "hits": 1
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/research.md",
+            "hits": 2
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/review.md",
+            "hits": 40
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/tasks.md",
+            "hits": 31
+          },
+          {
+            "path": ".specify/specs/074-sdd-loop-efficiency/verification.md",
+            "hits": 2
+          },
+          {
+            "path": "skills/external/sdd-loop-driver/scripts/check-063-overlap.py",
+            "hits": 2
+          },
+          {
+            "path": "docs/reference/skills/sdd-loop-driver.md",
+            "hits": 1
+          },
+          {
+            "path": "tests/contract/test_non_regression_070.py",
+            "hits": 1
+          },
+          {
+            "path": "tests/contract/test_sdd_loop_driver_cli_profiles.py",
+            "hits": 1
+          },
+          {
+            "path": "tests/contract/test_sdd_loop_driver_efficiency.py",
+            "hits": 1
+          }
+        ],
+        "excluded": [],
+        "in_scope_total": 114,
+        "excluded_total": 0
+      },
+      "guards": {
+        "branches": [],
+        "ambiguous_refs": 0
+      },
+      "depends_on": [],
+      "group_id": "e28a6ef4a4e0"
+    }
+  ],
+  "info": [
+    {
+      "kind": "nonconforming-spec-prefix",
+      "target": "065a-state-awareness",
+      "hint": "字母后缀前缀不被 common.sh 识别,解析器会回退到最新 spec"
+    },
+    {
+      "kind": "nonconforming-spec-prefix",
+      "target": "069a-flow-classification-docs-gates",
+      "hint": "字母后缀前缀不被 common.sh 识别,解析器会回退到最新 spec"
+    },
+    {
+      "kind": "nonconforming-spec-prefix",
+      "target": "069b-isomorphism-migration-metrics",
+      "hint": "字母后缀前缀不被 common.sh 识别,解析器会回退到最新 spec"
+    },
+    {
+      "kind": "nonconforming-spec-prefix",
+      "target": "074a-authorized-routing",
+      "hint": "字母后缀前缀不被 common.sh 识别,解析器会回退到最新 spec"
+    },
+    {
+      "kind": "nonconforming-spec-prefix",
+      "target": "074b-nested-governance",
+      "hint": "字母后缀前缀不被 common.sh 识别,解析器会回退到最新 spec"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "D1–D9",
+      "line": 11,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "B1–B4",
+      "line": 12,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "S1–S5",
+      "line": 13,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "S3b",
+      "line": 14,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "OI-1…OI-9",
+      "line": 15,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "**D-A**",
+      "line": 25,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "**D-B**",
+      "line": 26,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "SI-0…SI-9",
+      "line": 28,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "F-A02",
+      "line": 29,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "F-01…F-07 / M-1 / M-2 / D-01",
+      "line": 30,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "goal.session-driven-self-improvement",
+      "line": 32,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "S0-command-census / S1-extract-annotate / S2a-contract-conformance / S2b-structure-alignment / S3-command-thinning",
+      "line": 33,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "goal.skill-layer-install-separation",
+      "line": 34,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "S-A-skill-pair-decouple / S-B-rehome-and-refs / S-C-toolchain-split / S-D-tests-and-guards / S-E-runtime-refresh",
+      "line": 35,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "goal.post-refactor-mechanism-integrity",
+      "line": 36,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "team.post-refactor-mechanism-integrity / S1-fix-and-regression / S2-upgrade-sim-verify / S3-criterion-reconcile",
+      "line": 37,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "**c7**",
+      "line": 38,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "**G1**",
+      "line": 39,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    },
+    {
+      "kind": "non-machine-register-code",
+      "target": "**T1**",
+      "line": 40,
+      "hint": "无机器分配规则的编号,只报告不重排"
+    }
+  ]
+}

@@ -406,7 +406,7 @@
                             "contracts" / "cli-profiles.md"], spec_contracts
   ```
 
-  但 `git show bcf27c77:.specify/specs/074-sdd-loop-efficiency/contracts/cli-profiles.md` 仍然存在（本次只读检视确认），且 063 分支未合入 master（`git merge-base --is-ancestor bcf27c77 master` 返回 1）。`notes/063-overlap-adjudication.md:50-55` 明确把删除/指针动作列为“merge-time obligations”。
+  但 `git show bcf27c77:.specify/specs/075-sdd-loop-efficiency/contracts/cli-profiles.md` 仍然存在（本次只读检视确认），且 063 分支未合入 master（`git merge-base --is-ancestor bcf27c77 master` 返回 1）。`notes/063-overlap-adjudication.md:50-55` 明确把删除/指针动作列为“merge-time obligations”。
 
 - **Why it's a problem**: 守卫的“repository-wide”只是当前 worktree 范围；它看不到 063 分支的 provisional contract、CP 测试和 Probe Object 设计。只有在 063 合并进包含 064 的分支后，守卫才会因两份 `contracts/cli-profiles.md` 或第二个 Probe Object 转红——这是**合并后**发现，不是合并前阻止。若合并者忽略 notes 的手工义务，双 owner 会短暂进入主线，违反 FR-044“MUST NOT 双 owner”。当前 063 分支没有实际的 `references/cli/` 文件或 Probe 行，所以运行时风险较低，但契约/规格层仍是双份。
 - **Proposed fix**: 把守卫改为分支感知：在 CI/merge checklist 中对 063 的树执行同一 residual scan（`git grep`/`git ls-tree` 063 分支），或在 063 合并 PR 的模板中加入“删除 CP-01…CP-10 / `test_cli_profile_record.py` / `skill-sdd-loop-driver-wrapup`”的强制检查项。守卫的失败消息应直接指出 063 分支路径，而不是仅在合并后报“第二个 contract”。

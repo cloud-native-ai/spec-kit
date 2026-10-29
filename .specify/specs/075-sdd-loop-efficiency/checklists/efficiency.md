@@ -2,7 +2,7 @@
 
 **Purpose**: 验证四项运行效率优化（中型特性快车道、两槽位测试预算、plan 只小修约束、stream-json 进度与 nohup 解耦）的需求质量、可判定性、完整性与一致性——需求写作的“单元测试”，不是实现行为验证。
 **Created**: 2026-10-20
-**Feature (Requirement Scope)**: 074-sdd-loop-efficiency → Feature 058 无人值守 SDD 循环驱动机制（演化特性）
+**Feature (Requirement Scope)**: 075-sdd-loop-efficiency → Feature 058 无人值守 SDD 循环驱动机制（演化特性）
 **Requirements (What)**: [requirements.md](../requirements.md)
 **Specifications (How, context only)**: [plan.md](../plan.md)、[tasks.md](../tasks.md)、[contracts/](../contracts/)、[data-model.md](../data-model.md)
 **Checklist Domain**: efficiency / decidability / completeness / consistency

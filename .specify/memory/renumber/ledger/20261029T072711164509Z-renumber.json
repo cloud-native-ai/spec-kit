@@ -1,0 +1,120 @@
+{
+  "kind": "speckit.renumber.ledger",
+  "schema_version": 1,
+  "applied_at": "2026-10-29T07:27:11Z",
+  "plan": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/memory/renumber/plans/20261029T072707723407Z-plan.json",
+  "groups": [
+    {
+      "group_id": "e28a6ef4a4e0",
+      "family": "spec-number",
+      "old_token": "074-sdd-loop-efficiency",
+      "new_token": "075-sdd-loop-efficiency",
+      "written": [
+        {
+          "path": ".specify/memory/features/058.md",
+          "hits": 5
+        },
+        {
+          "path": ".specify/skills/sdd-loop-driver/scripts/check-063-overlap.py",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/notes/063-overlap-adjudication.md",
+          "hits": 3
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/review.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/064-subagent-concurrency/tasks.md",
+          "hits": 4
+        },
+        {
+          "path": ".specify/specs/067-loop-efficiency-hardening/notes/state-spine.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/070-subagent-task-teams/feature-ref.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/070-subagent-task-teams/notes/overlap-adjudication-plan.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/checklists/efficiency.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/data-model.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/feature-ref.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/notes/analysis-gate-report.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/notes/pre-change-measurements.md",
+          "hits": 3
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/plan.md",
+          "hits": 4
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/requirements.md",
+          "hits": 1
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/research.md",
+          "hits": 2
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/review.md",
+          "hits": 40
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/tasks.md",
+          "hits": 31
+        },
+        {
+          "path": ".specify/specs/075-sdd-loop-efficiency/verification.md",
+          "hits": 2
+        },
+        {
+          "path": "skills/external/sdd-loop-driver/scripts/check-063-overlap.py",
+          "hits": 2
+        },
+        {
+          "path": "docs/reference/skills/sdd-loop-driver.md",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_non_regression_070.py",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_sdd_loop_driver_cli_profiles.py",
+          "hits": 1
+        },
+        {
+          "path": "tests/contract/test_sdd_loop_driver_efficiency.py",
+          "hits": 1
+        }
+      ]
+    }
+  ],
+  "failures": [],
+  "excluded_hits": [],
+  "verification": {
+    "resolved": 1,
+    "unresolved": [],
+    "excluded_hits": 0
+  },
+  "ok": true
+}

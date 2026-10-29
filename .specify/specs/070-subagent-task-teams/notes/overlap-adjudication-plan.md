@@ -32,8 +32,8 @@ A literal `clear` is not achievable for an honest full-surface declaration. Narr
 | 6 | `060-decompose-subagent-dispatch` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
 | 7 | `062-humanize-command` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
 | 8 | `063-review-p1-governance` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
-| 9 | `074-sdd-loop-efficiency` | `same-path` | `docs/reference/skills/sdd-loop-driver.md` | `docs/reference/skills/sdd-loop-driver.md` |
-| 10 | `074-sdd-loop-efficiency` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
+| 9 | `075-sdd-loop-efficiency` | `same-path` | `docs/reference/skills/sdd-loop-driver.md` | `docs/reference/skills/sdd-loop-driver.md` |
+| 10 | `075-sdd-loop-efficiency` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
 | 11 | `064-subagent-concurrency` | `same-path` | `docs/reference/skills/sdd-loop-driver.md` | `docs/reference/skills/sdd-loop-driver.md` |
 | 12 | `064-subagent-concurrency` | `same-path` | `skills/external/sdd-loop-driver/SKILL.md` | `skills/external/sdd-loop-driver/SKILL.md` |
 | 13 | `065-loop-interruption-recovery` | `same-path` | `docs/reference/skills/sdd-loop-driver.md` | `docs/reference/skills/sdd-loop-driver.md` |

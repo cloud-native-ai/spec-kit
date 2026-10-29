@@ -36,8 +36,8 @@
 
 ## 3. 验证清单（063 合并时执行）
 
-1. `grep -rn "CLI Capability Profiles\|references/cli/" .specify/specs/074-sdd-loop-efficiency/` 只应命中指向 064 的指针行，不应有独立条款正文或第二套 CP 编号。
-2. `.specify/specs/074-sdd-loop-efficiency/contracts/cli-profiles.md` 已删除（或替换为不超过 5 行的指针文件）。
+1. `grep -rn "CLI Capability Profiles\|references/cli/" .specify/specs/075-sdd-loop-efficiency/` 只应命中指向 064 的指针行，不应有独立条款正文或第二套 CP 编号。
+2. `.specify/specs/075-sdd-loop-efficiency/contracts/cli-profiles.md` 已删除（或替换为不超过 5 行的指针文件）。
 3. `skills/external/sdd-loop-driver/references/cli/` 只由 064 引入；063 不新增/修改该目录。
 4. `shared/definitions/probe-definitions.md` 中 `unit=skill:sdd-loop-driver` 的 Object 恰好 1 行，id 为 `skill-sdd-loop-driver-cli-profile`。
 5. `tests/unit/test_cli_profile_record.py` 不存在或已迁移至 064 的测试文件；不存在两组档案断言。
@@ -47,7 +47,7 @@
 
 Read-only inspection of `bcf27c77` (main worktree) and repository-wide residual scan on `064-subagent-concurrency`:
 
-- `git show bcf27c77:.specify/specs/074-sdd-loop-efficiency/contracts/cli-profiles.md` exists on 063 only; this tree contains exactly one CLI-profile contract at `.specify/specs/064-subagent-concurrency/contracts/cli-profiles.md`.
+- `git show bcf27c77:.specify/specs/075-sdd-loop-efficiency/contracts/cli-profiles.md` exists on 063 only; this tree contains exactly one CLI-profile contract at `.specify/specs/064-subagent-concurrency/contracts/cli-profiles.md`.
 - No `references/cli/README.md` exists in this tree; the schema owner is `references/cli/index.md`.
 - No `tests/unit/test_cli_profile_record.py` exists in this tree.
 - `shared/definitions/probe-definitions.md` contains exactly one object for `unit=skill:sdd-loop-driver`: `skill-sdd-loop-driver-cli-profile` (no `skill-sdd-loop-driver-wrapup`).

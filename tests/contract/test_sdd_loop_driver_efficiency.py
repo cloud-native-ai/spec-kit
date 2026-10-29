@@ -26,7 +26,7 @@ PROMPTS = SKILL_DIR / "references" / "stage-prompts.md"
 WATCH = SKILL_DIR / "references" / "watch-model.md"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 DOCS_PAGE = REPO_ROOT / "docs" / "reference" / "skills" / "sdd-loop-driver.md"
-SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "074-sdd-loop-efficiency"
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "075-sdd-loop-efficiency"
 REQUIREMENTS = SPEC_DIR / "requirements.md"
 CONTRACTS = SPEC_DIR / "contracts"
 

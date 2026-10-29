@@ -1,7 +1,7 @@
 # Pre-Change Measurements — Feature 063
 
 - Date: 2026-10-20
-- Branch: `074-sdd-loop-efficiency`
+- Branch: `075-sdd-loop-efficiency`
 - HEAD at measurement: `ed96d5c8` (spec corrections only; no behavior-face change)
 - State spine: `/tmp/sdd-loop-efficiency/state.md` (`spine_write_mode=direct`)
 
@@ -33,7 +33,7 @@ ba785b0a feat(064-subagent-concurrency): implement workspace isolation and integ
 
 ## SC-010 behavior baseline recording
 
-- Command: `python3 tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py --record --worktree /tmp/063-baseline-a1aac7e5 --out .specify/specs/074-sdd-loop-efficiency/notes/stall-behavior-baseline.json`
+- Command: `python3 tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py --record --worktree /tmp/063-baseline-a1aac7e5 --out .specify/specs/075-sdd-loop-efficiency/notes/stall-behavior-baseline.json`
 - Read-only worktree: `git worktree add --detach /tmp/063-baseline-a1aac7e5 a1aac7e5`
 - Exit status: `0`
 - File root: `base_commit=a1aac7e5f8a6174d8cf26b0c1665c539dad3383d`, `recorded_at=1792494509`, `initial_retries=0`, three scenarios.
@@ -72,7 +72,7 @@ Observed tuples (fixture observation, not transcribed):
 
 - `python3 --version` → `Python 3.9.6`
 - `python --version` → `Python 3.14.6`
-- `python3 .specify/scripts/python/validate-requirements.py .specify/specs/074-sdd-loop-efficiency/requirements.md` → `348 lines, 56 definition rows, 8 shared strings, 0 error(s), 0 warning(s)`
+- `python3 .specify/scripts/python/validate-requirements.py .specify/specs/075-sdd-loop-efficiency/requirements.md` → `348 lines, 56 definition rows, 8 shared strings, 0 error(s), 0 warning(s)`
 
 ## Deliverable initial state (24 paths in `feature-ref.md`)
 
