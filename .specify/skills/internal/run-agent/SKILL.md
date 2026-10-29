@@ -169,7 +169,18 @@ at init time): `name` (required), `description` (required), `capability-tools`,
 `disallowed-tools`, `model-tier` (`auto` / `lite` / `efficient` / `performance` /
 `ultimate`), `run-turn-budget`, `timeout-mins`, `skills`, `mcp-servers`, `permission-mode`,
 `background`, `isolation`, `display-color`, plus the framework fields `user-invocable`,
-`disable-model-invocation`, `supervisor`, `role-scope`, `project`.
+`disable-model-invocation`, `supervisor`, `role-scope`, `project`, `sdd-invocation`.
+
+**`sdd-invocation`** is the SDD invocation capability key (Feature 074 / slice
+`074a-authorized-routing`): an authored instance declares it to state whether its seat may
+start a nested SDD run, and its seat-side counterpart is the `seats:` entry in `team.md`.
+Three facts about it are **owned elsewhere and cited here, never restated**: the closed
+value set, the absent-key default, and the framework-only (never rendered to a host tool)
+status all live in the neutral key set `NEUTRAL_AGENT_METADATA_KEYS` /
+`NEUTRAL_AGENT_FRAMEWORK_KEYS` in `src/specify_cli/__init__.py` — read that owner for the
+values. `validate_agent_metadata` rejects a declaration whose value falls outside the
+owner's closed set, and `parse_agent_frontmatter` accepts it only as a flat scalar (no list
+or mapping form).
 
 **Authoring rules**: focus on **what** the agent does and **when to call** it; concise,
 explicit instructions over narrative; a single responsibility per agent; least-privilege

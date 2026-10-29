@@ -137,10 +137,11 @@ NEUTRAL_AGENT_METADATA_KEYS = {
     # `team-scope` is the seat-provenance key on instances instantiated
     # by the create-team flow (which team a seat belongs to);
     # `sdd-invocation` (Feature 074 / slice 074a) is the agent half of the
-    # two-half SDD invocation authorization — its closed domain, default and
-    # the seat-side counterpart are owned by
-    # shared/definitions/sdd-routing-definitions.md and
-    # skills/internal/create-team/references/create-mode.md.
+    # two-half SDD invocation authorization: this entry owns its closed domain
+    # and its default (the seat-side counterpart is owned by
+    # skills/internal/create-team/references/create-mode.md, and
+    # shared/definitions/sdd-routing-definitions.md cites this key set as the
+    # value-domain owner rather than restating it).
     "supervisor": ("bool", False, False),
     "capacity-scope": (None, None, False),
     "role-scope": (None, None, False),

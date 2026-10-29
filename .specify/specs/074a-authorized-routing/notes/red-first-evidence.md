@@ -2,7 +2,8 @@
 
 Per `tasks.md` line 12: one entry per test group, carrying the command, the real output and the
 exit code. Nothing in this file is reconstructed from memory; every block was copied from a run in
-this session (2026-10-29, `HEAD=71954e31a`, part 1 of 5 = tasks T001–T008).
+this session (2026-10-29) — part 1 of 5 = tasks T001–T008 at `HEAD=71954e31a`, part 2 of 5 =
+tasks T009–T016 starting from `HEAD=08258b795`.
 
 The green evidence for each group is appended by the row that turns it green — T016 for
 `test_sdd_authorization.py`, T021 for `test_sdd_routing_definitions.py` — so this file always ends
@@ -94,3 +95,42 @@ The five files are the four surfaces the slice reads (seat policy map, two agent
 Goal with one `open` Target) plus the pre-recorded routing verdict that keeps US1 independent of
 US2. Four `seats:` variants are reachable (`block` / `flow` / `dangling` / `no-seats`) because a
 malformed-input guard that can only be driven in one direction proves nothing.
+
+## T009 / T010 — authoring-surface checks (not test rows)
+
+Both rows edit prose surfaces (the `run-agent` authoring baseline and the `team.md` schema), so their
+verification is a content read, not a pytest case; the executable halves of the same facts are pinned
+by `test_sdd_authorization.py` (resolution) and `test_sdd_routing_definitions.py` (single landing
+place). Real output (2026-10-29, part 2):
+
+```console
+$ grep -c 'sdd-invocation' skills/internal/run-agent/SKILL.md \
+      skills/internal/create-team/references/create-mode.md
+skills/internal/run-agent/SKILL.md:2
+skills/internal/create-team/references/create-mode.md:1
+
+$ grep -n 'sdd-invocation.*\(allowed\|forbidden\)' skills/internal/run-agent/SKILL.md \
+      skills/internal/create-team/references/create-mode.md
+(no output)
+# RC=1 — neither surface restates the closed value set; both point at the key-set owner.
+
+$ sed -n '/^seats:/,/^members:/p' skills/internal/create-team/references/create-mode.md
+seats:                         # optional (074a) — per-seat SDD invocation policy; block map ONLY
+  <seat-slug>:                 #   keyed by seat slug; the slug MUST resolve to a roster member
+    sdd-invocation: <value>    #   the same key the agent definition carries; value set and
+                               #   absent-entry default are owned by NEUTRAL_AGENT_METADATA_KEYS
+                               #   (src/specify_cli/__init__.py) — cited, never restated here
+members:
+
+$ python3 -m pytest -q tests/contract/test_neutral_vocabulary_scan.py \
+      tests/contract/test_team_command_routing.py tests/contract/test_neutral_metadata_schema.py
+..................................................................       [100%]
+66 passed in 0.58s
+# RC=0
+```
+
+**Reading**: the pointer discipline holds in both directions — the two authoring surfaces name the
+new key (so an authored instance can declare it and `validate_agent_metadata` can reject a value
+outside its closed set) while quoting none of the owner's values; the three suites that read those
+surfaces stay green.
+
