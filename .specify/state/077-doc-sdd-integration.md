@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: checklist
-stage_started_at: 1793295760
-stage_deadline_epoch: 1793301160
-stage_base_commit: 45b6b732
+stage: analyze
+stage_started_at: 1793296373
+stage_deadline_epoch: 1793301773
+stage_base_commit: d05d3bef
 attempt: 0
 retry_limit: 2
-last_verdict: tasks DONE — 27 任务（≤40）；77 条款各认领一次；validate-tasks PASS 0/0；decomposition proceed；pre-analyze pass（32 advisories）；coverage baseline 冻结 @06c31b1d；下一步 checklist
+last_verdict: checklist DONE — 40 项（21 pass / 19 fail），25 FR / 8 SC 全覆盖，失败项已点名实现面；待 analyze 裁决严重度
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -95,6 +95,12 @@ last_verdict: tasks DONE — 27 任务（≤40）；77 条款各认领一次；v
 - 27 任务（Setup 1 / US1 7 / US2 4 / US3 3 / US4 5 / Polish 7）；77 条款由 19 行认领，各一次、同文件内单调
 - 门：`validate-tasks` PASS（0/0，green_claims=77）；`decomposition --mode tasks` proceed（25 FR / 27 tasks）；`pre-analyze --stage tasks` pass（32 advisory，全为待建测试文件）；coverage ok（77/25/25）；baseline 冻结 `1a00c4b5…` @`06c31b1d`
 - 偏差：五个红先行项落四个测试文件（execution 反向守卫是同文件具名腿）；`green-path-divergence` WARN 以 `see` 指针消解；MVP = US1+US2+US3
+
+### checklist — DONE（2026-10-30）
+
+- 提交：`d05d3bef`；产物 `checklists/readiness-2026-10-30.md`（40 项：21 pass / 19 fail）+ `test-evidence/checklist-stage-checks.md`
+- 失败簇：声明与接线（exit-1 停止指令、子节字面量、剥离边界）、解析引擎（字段 8 vs 9、查找顺序、引擎缺席不可观测、声明/缺省未裁决）、文档结构（缺三子节码、章节两向比对无输入、plan 不产四子节）、驱动槽位（U4 与 implement 算子表不相容、无哈希字段、`not-applicable` 记 pass 冲突、槽位 rc 无单一进程）、不变量（确认门 27 无复测、features 仍写 2 STR）
+- 零修改面成立；`validate-requirements` ok（256 行 / 33 定义行 / 6 STR）
 
 ## 测试预算（E2/E3）
 
