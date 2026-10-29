@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: plan
-stage_started_at: 1793294348
-stage_deadline_epoch: 1793299748
-stage_base_commit: 5f88e3b5
+stage: tasks
+stage_started_at: 1793295128
+stage_deadline_epoch: 1793300528
+stage_base_commit: 159aa940
 attempt: 0
 retry_limit: 2
-last_verdict: clarify DONE — 8 条裁定 / 18 条 FR 回修；25 FR / 8 SC / 4 US 不变，STR 2→6；validate ok / overlap clear / pre-analyze pass；下一步 plan
+last_verdict: plan DONE — 6 契约 / 77 条款；FR 25/25；宪法 18 行全 Pass；DTR 3 条（validator ok）；pre-analyze pass；镜像 clean；定向 1062 passed；下一步 tasks
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -80,6 +80,14 @@ last_verdict: clarify DONE — 8 条裁定 / 18 条 FR 回修；25 FR / 8 SC / 4
 - 提交：`5f88e3b5`
 - 八条裁定：① `**Flow Class**: <value>` 单行、仅 requirements 头部、非法值阻断/缺省 execution+标注；② 接线面 **七个**命令；③ `flow-class-check.py lookup` 第三键族 `spec:<dir>`，退出码 0/1/2 三分；④ `## Document Structure` 四子节 + `doc-consistency-check.py --action structure`（不新增第七面），基线=主体集合首次运行违规集；⑤ implement 证据面 = template-only Partial + SC 记门禁 verdict；⑥ 驱动从规格读类别、U4 四项 blocking、两槽位换 docs-gate 内容；⑦ 077 新 Feature 承接边，069 保持 Implemented；⑧ 回退四条且「取值越界」不在回退列
 - 门：validate ok（256 行 / 33 定义行 / 6 STR）；overlap clear；pre-analyze pass（0/0）
+
+### plan — DONE（2026-10-30）
+
+- 提交：`159aa940`
+- 产物：`plan.md`（18 行宪法检查 + 3 条 DTR）/ `research.md`（R-1…R-13）/ `data-model.md`（E1–E9 + 9 规则）/ `contracts/` 6 文件 77 条款 / `quickstart.md` 7 场景 / `feature-ref.md` / 13 份证据
+- 门：`pre-analyze --stage plan` pass（errors=0 / advisories=13–14，全为待建测试文件）；FR 25/25；clause 车道 baseline-missing（设计内）；镜像六对 ok；`validate-decision-tensions` 0 error / 0 HIGH
+- 关键发现：① 七模板接线必然打破 069a 的 `test_a6_wiring_set_is_closed`，修订方式是把七模板并入已接线名册、分母不变；② `flow-class-check.py` 对 `spec:` 键今天返回 exit 2 + default，声明行不可区分；③ `audit-test-budget.py` 不校验 `selection_basis` 枚举，`docs-gate-full` 可被接纳；④ 确认门预算 27 项零余量
+- 结构：`## Constitution Check` → `## Decision Tensions` → `## Project Structure` 相邻（076 模板契约生效）
 
 ## 测试预算（E2/E3）
 
