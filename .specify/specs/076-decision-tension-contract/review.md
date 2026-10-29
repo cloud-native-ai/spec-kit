@@ -180,7 +180,7 @@ connected surface; the other is a documentation seam the repair created.
   - 与宪法原则相关：不触及任何 MUST 条，也不存在不可逆的迁移。
   => discarded whole (the line also names 不可逆), so BOTH that trigger and 不可逆 are reported unjustified
 
-  - **不可逆**：只改文档。            -> ACCEPTED (the four asterisks push the remainder to 8)
+  - **不可逆**：只改文档。            -> ACCEPTED (the asterisks and colon push the remainder to 9)
   - 不可逆：只改文档。               -> REJECTED (same content, no markup)
   ```
 
@@ -189,7 +189,7 @@ connected surface; the other is a documentation seam the repair created.
   exclusivity — decide whether a plan passes a HIGH gate. An author who writes exactly what the
   template asks is rejected, and the diagnosis says the triggers were not justified one by one when
   they were. The floor also measures markup rather than content: identical wording passes bold and
-  fails plain. The direction is fail-closed (no bad plan slips through), so nothing is corrupted —
+  fails plain (the bold form's remainder is 9 characters, the plain form's is 4). The direction is fail-closed (no bad plan slips through), so nothing is corrupted —
   but every trivial plan that writes a terse clause pays a rewrite against a gate whose message
   points at the wrong cause. This is the F1 defect class (an enforcement rule with no normative
   home) surviving in the half of the `N/A` rule the repair rebuilt.
