@@ -1,0 +1,8 @@
+# T027 — the five 077 suites on the closing tree (targeted set, no full run)
+# 2026-10-29T19:46:28Z head=c991b628 (dirty tree: this segment not yet committed)
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/unit/test_flow_class_spec_key.py tests/contract/test_flow_class_spec_declaration.py tests/contract/test_stage_class_wiring.py tests/contract/test_document_structure_gate.py tests/contract/test_docs_gate_driver.py -q
+........................................................................ [ 41%]
+........................................................................ [ 82%]
+..............................                                           [100%]
+174 passed in 7.32s
+exit=0

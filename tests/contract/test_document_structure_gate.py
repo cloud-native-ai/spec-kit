@@ -43,12 +43,17 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHECKER = REPO_ROOT / "scripts" / "python" / "doc-consistency-check.py"
+PLAN_TEMPLATE = REPO_ROOT / "templates" / "plan-template.md"
+REQUIREMENTS = (
+    REPO_ROOT / ".specify" / "specs" / "077-doc-sdd-integration" / "requirements.md"
+)
 
 SPEC_NAME = "777-fixture-line"
 
@@ -601,4 +606,115 @@ def test_same_plan_yields_the_same_violation_set(tmp_path):
     second = payload_of(run_structure(spec_dir))
     assert first["findings"] == second["findings"], (
         "the same plan must yield the same violation set, in a stable order"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Producer side — the plan template carries the skeleton (T028 / FR-013)
+# --------------------------------------------------------------------------- #
+# This leg is deliberately independent of the stage-wiring guard (T009) and of the
+# runner legs above (T013): it reads `templates/plan-template.md` directly, takes the
+# five literals from the feature's `requirements.md` § Shared Strings and the three
+# column sets from the checker's constants, and never hand-copies either. Without it
+# the producer side would only be covered by "someone else's green".
+CLASS_CONDITION_SENTENCE = "表达类 MUST 产出该章节、执行类 MUST NOT 被要求产出"
+
+
+def _shared_strings() -> dict:
+    """``STR-NNN -> literal`` from the feature's requirements § Shared Strings table."""
+    assert REQUIREMENTS.is_file(), "requirements owner missing: %s" % REQUIREMENTS
+    text = REQUIREMENTS.read_text(encoding="utf-8")
+    start = text.index("## Shared Strings")
+    tail = text[start:]
+    following = re.search(r"^## ", tail[3:], re.MULTILINE)
+    block = tail[: following.start() + 3] if following else tail
+    rows = re.findall(r"^\|\s*`(STR-\d{3})`\s*\|\s*\"([^\"]*)\"\s*\|", block, re.MULTILINE)
+    assert rows, "the Shared Strings table yielded no `STR-NNN` rows"
+    return dict(rows)
+
+
+def _table_header_after(lines: list, heading: str) -> list:
+    """The first markdown table's header cells under ``heading`` (stops at the next `## `)."""
+    assert heading in lines, "plan template lacks %r" % heading
+    start = lines.index(heading)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            break
+        if lines[index].startswith("|"):
+            return [cell.strip() for cell in lines[index].strip().strip("|").split("|")]
+    return []
+
+
+def test_plan_template_carries_the_document_structure_skeleton():
+    """The template is the producer of `## Document Structure` and the four subsections.
+
+    Two owners meet here and are asserted to agree: the feature's requirements
+    (the literal register) and the checker's constants (the code-first column owner).
+    """
+    facts = _shared_strings()
+    for key in ("STR-002", "STR-003", "STR-004", "STR-005", "STR-006"):
+        assert key in facts, "requirements § Shared Strings lost %s" % key
+
+    module = _load_checker()
+    # Register and code agree before either is compared with the template.
+    assert facts["STR-002"] == module.STRUCTURE_HEADING, (
+        "requirements and the checker disagree on the chapter heading: %r vs %r"
+        % (facts["STR-002"], module.STRUCTURE_HEADING)
+    )
+    assert tuple(facts["STR-00%d" % i] for i in range(3, 7)) == tuple(
+        module.STRUCTURE_SUBSECTIONS
+    ), "requirements and the checker disagree on the four subsection literals"
+
+    text = PLAN_TEMPLATE.read_text(encoding="utf-8")
+    lines = text.split("\n")
+
+    heading = facts["STR-002"]
+    assert heading in lines, (
+        "plan template lacks %r — expression-class plans would have no reachable producer"
+        % heading
+    )
+    assert text.count("\n" + heading + "\n") == 1, (
+        "%r must appear exactly once in the template" % heading
+    )
+
+    subsections = [facts["STR-00%d" % i] for i in range(3, 7)]
+    positions = []
+    for literal in subsections:
+        assert literal in lines, "plan template lacks the subsection %r" % literal
+        assert text.count("\n" + literal + "\n") == 1, (
+            "%r must appear exactly once in the template" % literal
+        )
+        positions.append(lines.index(literal))
+    assert positions == sorted(positions), (
+        "the four subsections must appear in the registered order %r, got %r"
+        % (subsections, [lines[p] for p in positions])
+    )
+    assert positions[0] > lines.index(heading), "subsections must sit under the chapter"
+
+    chapter_tree, reader_baseline, evidence_list, fact_owners = subsections
+    assert _table_header_after(lines, chapter_tree) == list(module.CHAPTER_TREE_COLUMNS), (
+        "the Chapter Tree table header must be the checker's CHAPTER_TREE_COLUMNS"
+    )
+    assert _table_header_after(lines, evidence_list) == list(module.EVIDENCE_LIST_COLUMNS), (
+        "the Evidence List table header must be the checker's EVIDENCE_LIST_COLUMNS"
+    )
+    assert _table_header_after(lines, fact_owners) == list(module.FACT_OWNERS_COLUMNS), (
+        "the Fact Owners table header must be the checker's FACT_OWNERS_COLUMNS"
+    )
+
+    start = lines.index(reader_baseline) + 1
+    end = next(
+        (i for i in range(start, len(lines)) if lines[i].startswith("### ") or lines[i].startswith("## ")),
+        len(lines),
+    )
+    reader_block = "\n".join(lines[start:end])
+    for marker in module.READER_BASELINE_MARKERS:
+        assert reader_block.count(marker) == 1, (
+            "the Reader Baseline subsection must carry %r exactly once (two lines, as the "
+            "checker parses them); block=%r" % (marker, reader_block)
+        )
+
+    assert CLASS_CONDITION_SENTENCE in text, (
+        "the template must state %r — without the second half an execution-class line would "
+        "gain a new mandatory section (FR-011)" % CLASS_CONDITION_SENTENCE
     )

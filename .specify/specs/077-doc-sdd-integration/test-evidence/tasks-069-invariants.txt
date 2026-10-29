@@ -1,0 +1,65 @@
+# T024 — 069 invariant re-check (read-only; the owner document is not rewritten)
+# generated 2026-10-29T19:47:36Z on branch 077-doc-sdd-integration
+
+## method
+- eight-stage set: the `## 阶段算子表` rows in `shared/workflow/expression-gates.md` compared with the same section at `c1cd4600`, plus the engine cross-check `flow-class-check.py --action isomorphism` (8 stage rows / 6 gate faces).
+- gate count: the `## 六面（封闭集）` section compared byte for byte with the baseline, and the CLI face set re-read (`--faces reader` still resolves to a registered face; a fifth face stays unknown).
+- P0/P1 definitions: the three files that define the severities must show an empty `git diff --numstat` against `c1cd4600`, and the no-downgrade clause in `## 阻断级别` must be byte-identical.
+- analyze / review call rate: the `## 阶段不变量` section (which states the 100% rule) must be byte-identical and name both stages.
+- 069 / 069a / 069b: `git status --short` and `git diff --numstat` over their Feature details and spec dirs must be empty (the receiving edge lives only on the 077 side).
+
+## command
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/python tmp/t024_invariants.py
+# exit=0
+```
+
+## output
+
+```text
+## 1. eight-stage set (owner: shared/workflow/expression-gates.md § 阶段算子表)
+baseline stages (8): ['requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review']
+current  stages (8): ['requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review']
+identical: True
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/flow-class-check.py --action isomorphism
+flow-class isomorphism: 8 stage row(s), 6 gate face(s), 0 finding(s)
+exit=0
+=> stage rows 8 (must be 8) / gate faces 6 (must be 6)
+
+## 2. gate count not lowered
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/doc-consistency-check.py --faces reader --spec-dir <077>
+faces line: reader=not-applicable  (exit=0)
+六面 table rows (incl. header): baseline 7 / current 7
+六面 section byte-identical  : True
+
+## 3. P0/P1 definitions untouched (diff vs c1cd4600 must be empty)
+skills/internal/code-review/references/review-workflow.md              unchanged
+skills/internal/code-review/SKILL.md                                   unchanged
+skills/external/sdd-loop-driver/references/dispatch-recipes.md         unchanged
+§ 阻断级别 (the no-downgrade clause) byte-identical: True
+  clause: ['- 不得把既有 P0/P1 判定降为 advisory；不得把表达类读作更宽松的通道。本门禁集只决定「用哪套算子证明同一不变量」，不新增、不放宽判定阈值。']
+
+## 4. analyze / review call rate 100%
+## 阶段不变量
+
+- 阶段完整性由既有阶段记录判定，类别 MUST NOT 参与该判定。
+- `analyze` 与 `review` 的调用率 MUST 为 100%。
+- 任何以「本流程属表达类」为由跳过、缩短或改判阶段的请求 MUST 被拒绝——该规则无例外。
+
+§ 阶段不变量 byte-identical to c1cd4600: True
+
+## 5. 069 / 069a / 069b bodies and status untouched
+$ git status --short -- <069 files/specs>
+(clean — zero change)
+diff vs baseline: (empty)
+
+## verdict
+eight-stage set: 8 -> 8 (identical)
+gate count: six faces (section byte-identical) + four CLI faces; nothing lowered
+P0/P1 definitions: untouched (three owner files unchanged, no-downgrade clause intact)
+analyze / review call rate: still 100% (section byte-identical)
+069 / 069a / 069b: zero change to bodies and status
+```

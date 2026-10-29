@@ -1,0 +1,64 @@
+# T025 — the two owner documents: class-conditional append delta vs c1cd4600
+# generated 2026-10-29T19:42:02Z on branch 077-doc-sdd-integration
+
+## method
+- diff the two owner documents against baseline commit `c1cd4600`; classify every diff line as insert vs delete/rewrite.
+- re-extract the sections that MUST NOT move (six faces / stage operator table / blocking levels / stage invariants / operator dedup / orthogonality on the gate owner; criteria / ledger / class-neutral roster / isomorphism / non-isomorphic boundary on the class owner) from both states and compare byte for byte.
+- re-measure the ledger with the engine (`--action check`): 79 rows of register, `gaps=0`, and the new `spec:` key must not appear among the ledger rows.
+
+## command
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/python tmp/t025_owner_append.py
+# exit=0
+```
+
+## output
+
+```text
+baseline commit: c1cd4600
+owner files    : shared/definitions/flow-class-definitions.md, shared/workflow/expression-gates.md
+
+## 1. diff shape (git diff --numstat + deletion lines)
+$ git diff --numstat c1cd4600 -- shared/definitions/flow-class-definitions.md shared/workflow/expression-gates.md
+10	0	shared/definitions/flow-class-definitions.md
+18	0	shared/workflow/expression-gates.md
+exit=0
+
+$ git diff --unified=0 c1cd4600 -- <owners>   # added / deleted line classification
+added lines  : 28
+deleted lines: 0   []
+
+## 2. frozen sections byte-identical (the parts that MUST NOT move)
+file                                                 section                                    sha(baseline)      sha(current)       verdict
+------------------------------------------------------------------------------------------------------------------------------------------------------
+shared/definitions/flow-class-definitions.md         ## 判据                                      504d1617580a6935   504d1617580a6935   identical
+shared/definitions/flow-class-definitions.md         ## 逐流程台账                                   4b6275cfa1b8aa99   4b6275cfa1b8aa99   identical
+shared/definitions/flow-class-definitions.md         ## 类中立清单                                   67eb517f3431f14a   67eb517f3431f14a   identical
+shared/definitions/flow-class-definitions.md         ## 同构映射（8 阶段 × 3 面）                        440087d55e0b902c   440087d55e0b902c   identical
+shared/definitions/flow-class-definitions.md         ## 不可同构边界                                  b74443466d54992f   b74443466d54992f   identical
+shared/workflow/expression-gates.md                  ## 六面（封闭集）                                 7b0b6df172cd61e2   7b0b6df172cd61e2   identical
+shared/workflow/expression-gates.md                  ## 阶段算子表                                   0315ff4268390d33   0315ff4268390d33   identical
+shared/workflow/expression-gates.md                  ## 阻断级别                                    a353898fc2f84b28   a353898fc2f84b28   identical
+shared/workflow/expression-gates.md                  ## 阶段不变量                                   c0bf256c176cd0bd   c0bf256c176cd0bd   identical
+shared/workflow/expression-gates.md                  ## 算子去重                                    bd4d668ed133c6f9   bd4d668ed133c6f9   identical
+shared/workflow/expression-gates.md                  ## 与复杂度轴正交                                 9d1fef23c9996867   9d1fef23c9996867   identical
+
+## 3. ledger unchanged (79 rows, gaps=0, `spec:` key never enters it)
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/flow-class-check.py --action check
+flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=79, clean]
+coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
+exit=0
+
+ledger table rows (incl. header): 80
+rows mentioning `spec:`         : 0   []
+
+## verdict
+existing clauses deleted or rewritten: 0
+sections that must not move (six faces / operator table / blocking levels /
+invariants / operator dedup / orthogonality / criteria / ledger / roster /
+isomorphism / non-isomorphic boundary): byte-identical to c1cd4600
+ledger rows: 79 (unchanged), gaps=0; `spec:` key does not enter the ledger
+=> the change is a class-conditional APPEND on both owner documents.
+```
