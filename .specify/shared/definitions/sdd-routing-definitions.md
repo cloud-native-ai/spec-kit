@@ -84,7 +84,7 @@
 
 **机读面（层级分档）**：上表 `complexity` 行的四名按 rubric 自身的分档二分——高 = `complex` / `high-stakes`；低 = `trivial` / `standard`。分档不改写层级名，只声明哪两名属于「高」这一侧。
 
-**机读面（取值语义 / value semantics）**：下列具名句柄指向 § Inputs 已经声明的取值，**不复述任何取值域**——它只给引擎一个可引用的名字，使引擎的每个条件判定都不必自己写死人名外的字面量；改域时这一块随上表一起改（同一文件、同一处）。
+**机读面（取值语义 / value semantics）**：下列具名句柄指向 § Inputs 已经声明的取值，**不复述任何取值域**——它只给引擎一个可引用的名字，使条件判定不必自己写死取值字面量；改域时这一块随上表一起改（同一文件、同一处）。
 
 - `definition_class` = `definition-class`
 - `feature_nature` = `feature`
