@@ -34,7 +34,7 @@
 ## 现状锚点（2026-10-30 本机实测；dated record，仅作可行性输入，非运行时保证）
 
 - **分类轴已存在，但对象是流程单元，不是特性**：`python3 scripts/python/flow-class-check.py --action check` 报 `79 unit(s) scanned, 0 finding(s)`、`ledger_rows=79 matched=79 inventory_units=79 gaps=0`（27 个命令模板 + 52 个技能）；`--action lookup --unit-id "/speckit.implement"` 返回 `flow_class: execution`、`basis: mixed-oracle`、`source: ledger`。特性索引 `.specify/memory/features.md` 没有类别列，Feature 详情文件也没有该字段。
-- **引擎只认两类键**：`--action lookup --unit-id "feature:077"` 返回 `invalid unit id 'feature:077': expected /speckit.<stem> or skill:<dir>`、退出码 2（同时仍打印一条 `source: default` 的降级记录）。特性级类别需要一个自己的键族，且不能被当成「格式非法的单元」。
+- **引擎只认两类键**：`--action lookup --unit-id "feature:077"` 返回 `invalid unit id 'feature:077': expected /speckit.<stem> or skill:<dir>`、退出码 2（同时仍打印一条 `source: default` 的降级记录）。特性级类别需要一个自己的键族，且不能被当成「格式非法的单元」。**键族裁决见 § Clarifications 第三条：`spec:<spec 目录名>`，`feature:<ID>` 不予采用**（同 Feature 多切片必然指错线）；本行是 as-of 2026-10-30 的实测记录，保留原样。
 - **七个阶段命令模板零接线**：`templates/commands/` 下 `requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement` 七个模板对 `flow_class` / `flow-class` / `expression` 零命中；已接线的只有 `docs.md`、`review.md`、`humanize.md` 三个。
 - **门禁算子表已就绪且自洽**：`shared/workflow/expression-gates.md` 有封闭六面与 16 行阶段算子（八阶段各 2 行）；`--action isomorphism` 报 `8 stage row(s), 6 gate face(s), 0 finding(s)`，`--action faces` 报 `6 face(s) parsed, 0 finding(s)`。
 - **驱动侧无类别感知**：`skills/external/sdd-loop-driver/` 的 `SKILL.md` 与 `references/*.md` 对 `flow_class` / `flow-class` / `expression` 零命中；两槽位测试预算的时点是 implement 起点（baseline）与 review 之后（closure），`not-run-docs-only` 只是定向集阶段的一种 `stage-status`，不是槽位语义。
@@ -45,15 +45,15 @@
 
 - **A1（编号依据）**：编号 077 由脚手架 `create-new-requirements.sh` 派生——`.specify/specs/` 下最大目录为 `076-decision-tension-contract`，故下一个为 077；`features.md` 的「Total Features」是行数（72），不是最大编号，两者不一致（075 缺号）属既有状态，本特性不借机回填。
 - **A2（类别当前按单元、不按特性——实测事实）**：判据与台账的覆盖对象是命令模板与技能（79 个单元，0 缺口）；引擎只解析 `/speckit.<stem>` 与 `skill:<dir>` 两类键，对其他键报 `invalid unit id` 并退出 2。**特性级类别是新增对象族，不是既有能力的别名**，因此必须有可判定、可降级的解析面，不能靠「读 feature 详情里的一句话」。
-- **A3（接线改动面的边界，含一处计数纠正）**：派发文本一处写「六个命令模板」、同句又枚举了 `requirements/clarify/plan/tasks/checklist/analyze/implement` **七个**名字。以枚举为准：接线面 = **七个**命令模板 + 驱动技能及其 `references/`。依据：`clarify` 同样是零命中的阶段命令，且门禁 owner 的阶段算子表为 clarify 登记了两行算子；把 clarify 排除会让该阶段成为唯一无类感知的阶段，与「每阶段按类换算子」直接冲突。
-- **A4（声明位置裁决：requirements 头部字段）**：三选一中选 **requirements.md 的头部字段**，理由五条——① **时序**：requirements 是链上第一个阶段，也是第一个做门禁判定的阶段；若声明落在 clarify 才创建的 Feature 详情里，第一个阶段必然在错误门禁集下运行，之后才翻转，正是要禁的「静默切换」。② **共址**：七个阶段命令与驱动都以 spec 目录为输入，声明与产物同目录，零额外查找。③ **单一性**：特性索引与详情至多留指针，避免出现第二份分类数据。④ **可判定**：单行定值字段、封闭取值，解析成本最低；而在 76 行宽表上加列会让每行出现空值，把「未声明」变成默认态。⑤ **切片友好**：一条特性线 = 一条 spec 目录，多切片特性各自声明（见 A5）。clarify 若裁定改位，MUST 同步改本文件的 FR 与 Shared Strings。
+- **A3（接线改动面的边界，含一处计数纠正）**：派发文本一处写「六个命令模板」、同句又枚举了 `requirements/clarify/plan/tasks/checklist/analyze/implement` **七个**名字。以枚举为准：接线面 = **七个**命令模板 + 驱动技能及其 `references/`。依据：`clarify` 同样是零命中的阶段命令，且门禁 owner 的阶段算子表为 clarify 登记了两行算子；把 clarify 排除会让该阶段成为唯一无类感知的阶段，与「每阶段按类换算子」直接冲突。**clarify（2026-10-30）复核确认：七个，不改判**（复核证据：`for f in requirements clarify plan tasks checklist analyze implement` 逐模板 grep 三类关键词，七个模板命中数全为 0；`expression-gates.md` 阶段算子表中 clarify 有两行）。
+- **A4（声明位置裁决：requirements 头部字段）**：三选一中选 **requirements.md 的头部字段**，理由五条——① **时序**：requirements 是链上第一个阶段，也是第一个做门禁判定的阶段；若声明落在 clarify 才创建的 Feature 详情里，第一个阶段必然在错误门禁集下运行，之后才翻转，正是要禁的「静默切换」。② **共址**：七个阶段命令与驱动都以 spec 目录为输入，声明与产物同目录，零额外查找。③ **单一性**：特性索引与详情至多留指针，避免出现第二份分类数据。④ **可判定**：单行定值字段、封闭取值，解析成本最低；而在 76 行宽表上加列会让每行出现空值，把「未声明」变成默认态。⑤ **切片友好**：一条特性线 = 一条 spec 目录，多切片特性各自声明（见 A5）。clarify 若裁定改位，MUST 同步改本文件的 FR 与 Shared Strings。**clarify（2026-10-30）复核确认不改位**，只把行形态、重复/错位判定与非法值处置钉死（FR-001 / FR-005 与 § Clarifications 首条）。
 - **A5（声明单位 = 特性线）**：类别按**特性线**（一条 spec 目录）声明，不按 Feature 编号聚合；同一 Feature 的多个切片允许不同类别（例：069a 交付引擎属执行、069b 交付映射文档属表达），注册表不汇总为一个取值。跨线并发时类别按线解析，不得用进程级/环境级全局值跨线复用。
 - **A6（本特性自身按判据属 execution）**：本特性交付命令模板、驱动技能、owner 文档与确定性检查器，缺陷最先以「阶段命令不读类别」「驱动放行了缺证据的阶段」这类行为差异暴露，按 069 判据为 `execution`；本特性不替自己主张表达类，也不因此获得任何门禁豁免。
 - **A7（脚手架偏差，披露）**：因当前分支已是 `077-doc-sdd-integration` 且派发禁止切换分支，脚手架在**仓库外**调用，使其判定无 git 上下文而跳过分支动作（stderr 留痕 `skipped branch creation for 077-doc-sdd-integration`）；编号与 spec 目录创建能力照用，分支保持 `077-doc-sdd-integration` 不变。若在仓库内调用，脚本会把已存在的 077 分支计入编号源并派生出 078，与你指定的目录冲突。
 - **A8（绑定与登记时点偏离默认协议）**：默认把 Feature 绑定推迟到 `/speckit.clarify`；本轮按调用方要求在本阶段完成绑定并落登记行与详情文件，属显式偏离，已在此登记为恢复点。
 - **A9（无新增持久编号）**：本阶段未引入 D-/OI-/REC- 等持久编号；若 plan 取号，须按 ID Register 在取号当刻登记 `.specify/memory/register.md`。
 - **A10（术语与所有者）**：`flow_class`、`execution`、`expression` 的语义、判据、台账与同义消歧归 069 与 `shared/definitions/flow-class-definitions.md`；六面、算子表、阻断级别、读者声明与证据语法归 `shared/workflow/expression-gates.md`。本文件只引用，不重定义、不复述判据句。
-- **A11（形制留待 plan）**：具体命令、退出码、字段子结构、检查器文件名、模板文本（除已钉住的 Shared Strings）属 plan；本文件只固定语义、所有权与可判定验收面。
+- **A11（形制留待 plan）**：具体命令、退出码、字段子结构、检查器文件名、模板文本（除已钉住的 Shared Strings）属 plan；本文件只固定语义、所有权与可判定验收面。**clarify（2026-10-30）已把四处形制提前钉住**（超出本条原意，属显式偏离）：特性线键形态与三段退出码（FR-003）、四个子节标题与列语义（FR-013，新增 STR-003…STR-006）、`--action structure` 的归属检查器（FR-013 / FR-023）、槽位字段的取值语义（FR-020）——不钉住它们，验收面就无法只读退出码与记录字段判定。其余形制（行内字段子结构、错误文本、测试文件名、plan 模板文本）仍归 plan。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -141,43 +141,43 @@
 
 #### A. 类别声明与解析（US1）
 
-- **FR-001**: 每条特性线 MUST 在其 `requirements.md` 的头部区（`## Related Feature` 之前）声明恰好一行类别字段 [[STR-001]]，其后接 `: <value>`，取值 MUST 为封闭集 `execution` / `expression`；值 MUST 只由作者判定，MUST NOT 由脚本从路径、文件名或内容推断。
+- **FR-001**: 每条特性线 MUST 在其 `requirements.md` 的头部区（`## Related Feature` 之前）声明恰好一行类别字段 [[STR-001]]，行形态逐字为 `**Flow Class**: <value>`——[[STR-001]] 后接半角冒号、一个空格、取值，行尾 MUST NOT 有尾随空白，字段名与取值均大小写敏感（全角冒号、大小写变体、行内附加注释一律不合语法）；取值 MUST 为封闭集 `execution` / `expression`；值 MUST 只由作者判定，MUST NOT 由脚本从路径、文件名或内容推断。该行出现第二次（不论两次取值是否相同）MUST 判 `declaration-duplicate`；出现在 `## Related Feature` 之后 MUST 判 `declaration-misplaced`；两个码 MUST 由确定性检查报出，MUST NOT 依赖人工阅读发现。
 - **FR-002**: 类别声明 MUST 单一：`.specify/memory/features.md` 与 `.specify/memory/features/<ID>.md` MUST NOT 保存该特性线的类别取值（至多留指向声明行的指针）；同一特性线出现第二处声明 MUST 判为缺陷并由确定性检查报出，MUST NOT 依赖人工阅读发现。
-- **FR-003**: 类别解析 MUST 复用既有唯一读取引擎 `scripts/python/flow-class-check.py --action lookup`：该引擎 MUST 能按特性线键解析出与流程单元**同形**的记录（类别、`source`、`marker`、`basis`），退出码语义与既有 `lookup` 一致（0 = 已解析，2 = 键或输入非法）；MUST NOT 新增第二份分类数据文件、MUST NOT 新增第二条读取路径。
-- **FR-004**: 未声明类别的特性线 MUST 按 `execution` 运行，`source` MUST 标为「未声明」，并在每个消费点显示 069 登记的默认标记（该标记的语义与字面归 069 § Shared Strings，本文件不复述其文本）；未声明 MUST NOT 被呈现为已判定，也 MUST NOT 被读作表达类。
-- **FR-005**: 已声明但取值不在封闭集内 MUST 按**阻断错误**处理：声明所在阶段的门禁 MUST 失败并点名该行；MUST NOT 静默回落默认类、MUST NOT 继续以 `execution` 运行。本条与「owner/引擎不可用」的降级路径（FR-009）是两件事：前者是作者输入错误，后者是外部机制缺席。
-- **FR-006**: 类别 MUST 在任何阶段作出第一次门禁判定之前可读，**包括 requirements 自身**；在 requirements 阶段写入或修改该行后，下游阶段 MUST 读到新值。类别在 requirements 阶段门禁通过后发生变更的，MUST 记为 re-baseline 事件（写入阶段记录）并按新类别重跑 requirements 门禁集；MUST NOT 静默翻转。
+- **FR-003**: 类别解析 MUST 复用既有唯一读取引擎 `scripts/python/flow-class-check.py --action lookup`：该引擎 MUST 能按特性线键解析出与流程单元**同形**的记录（类别、`source`、`marker`、`basis`）；MUST NOT 新增第二份分类数据文件、MUST NOT 新增第二条读取路径、MUST NOT 新建第二个解析函数。特性线键 MUST 取 `spec:<spec 目录名>`（如 `spec:077-doc-sdd-integration`，键族并入同一 `--action lookup`）；MUST NOT 接受裸目录名，MUST NOT 以 `feature:<ID>` 为键——同一 Feature 的多条切片线（`069` / `069a` / `069b`）各自独立声明，Feature 键必然指错线。记录字段集 MUST 与单元键同形：`unit_id` 取键原文、`source` 取 `declaration`（已声明）或 `default`（未声明）、`basis` 为 `null`（判定依据是台账列，声明不携带）、`neutral` 为 `false`。退出码 MUST 分三段：**0** = 已解析（含未声明按默认，此时 `marker` 为 069 登记的默认标记）；**1** = 已声明但取值不在封闭集内（`invalid-class`，阻断，MUST NOT 与 2 合并）；**2** = 键或输入非法、spec 目录不存在、owner 不可解析（`owner-unavailable`，沿用既有前置：owner 先于匹配解析）。特性线声明 MUST NOT 写入逐流程台账——台账行集等于框架单元清单，写入即产生 `unknown` 发现。
+- **FR-004**: 未声明类别的特性线 MUST 按 `execution` 运行，`source` MUST 标为 `default`（未声明），并在每个消费点显示 069 登记的默认标记（该标记的语义与字面归 069 § Shared Strings，本文件不复述其文本）；未声明 MUST NOT 被呈现为已判定，也 MUST NOT 被读作表达类。同一解析记录 MUST NOT 同时携带该默认标记与 `source: declaration`——两者互斥，同时出现即第三态缺陷。
+- **FR-005**: 已声明但取值不在封闭集内 MUST 按**阻断错误**处理：声明所在阶段的门禁 MUST 失败并点名该行；MUST NOT 静默回落默认类、MUST NOT 继续以 `execution` 运行。解析侧 MUST 以退出码 1 报出该错误（FR-003），门禁侧 MUST 以非零退出阻断并点名文件、行号与越界取值。本条与「owner/引擎不可用」的降级路径（FR-009）是两件事：前者是作者输入错误，后者是外部机制缺席。该阻断与本线类别无关——类别无法判定，不存在「按哪一类继续」这第三种选择；且它只可能出现在显式写了越界值的线上，因此不构成执行类回归。
+- **FR-006**: 类别 MUST 在任何阶段作出第一次门禁判定之前可读，**包括 requirements 自身**；在 requirements 阶段写入或修改该行后，下游阶段 MUST 读到新值。读取时点 MUST 是阶段入口，即早于该阶段第一件依赖类别的动作（产物生成或门禁判定，取先发生者）；requirements 阶段的读取 MUST 发生在类别行写入之后、`validate-requirements.py` 之前。类别在 requirements 阶段门禁通过后发生变更的，MUST 记为 re-baseline 事件（写入阶段记录）并按新类别重跑 requirements 门禁集；MUST NOT 静默翻转。
 - **FR-007**: 声明单位 MUST 是**特性线**（一条 spec 目录）；同一 Feature 的多个切片各自声明、允许不同类别，注册表 MUST NOT 把它们汇总为一个取值；并发场景下类别 MUST 按线解析，MUST NOT 用进程级、环境级或会话级全局值让一条线的类别泄漏给另一条线。
 
 #### B. 阶段命令按类切换算子（US2）
 
-- **FR-008**: `templates/commands/` 下的 `requirements`、`clarify`、`plan`、`tasks`、`checklist`、`analyze`、`implement` 七个模板 MUST 在其阶段门禁判定之前读取一次类别，并按 `shared/workflow/expression-gates.md` § 阶段算子表执行本阶段的算子行；模板 MUST NOT 内嵌类别取值、判据句、六面表或算子表副本，只可出现读取调用与 owner 指针。
-- **FR-009**: 类别读取失败（owner 文件不可解析、引擎缺席、退出码 2）MUST 打印 `owner-unavailable` 并保持既有 `execution` 门禁集不变；MUST NOT 中断流程、MUST NOT 静默切换门禁集、MUST NOT 把降级结果读作通过。
+- **FR-008**: `templates/commands/` 下的 `requirements`、`clarify`、`plan`、`tasks`、`checklist`、`analyze`、`implement` 七个模板 MUST 在其阶段门禁判定之前读取一次类别（时点按 FR-006），并按 `shared/workflow/expression-gates.md` § 阶段算子表执行本阶段的算子行；接线面 MUST 是这七个——`clarify` 在内，因为门禁 owner 的阶段算子表为它登记了两行算子（`G-clarify-clarity` / `G-clarify-reader`），排除它会让该阶段成为唯一无类感知的阶段。同一次阶段运行 MUST 只读取一次，结果复用于本阶段全部算子调用；命令与其委托技能在同一产物变更上重叠时 MUST 复用调用方结果，技能 MUST NOT 再读一次；跨阶段 MUST NOT 缓存（requirements 写入或改判后，下游 MUST 读到新值）；跨线 MUST NOT 复用。模板 MUST NOT 内嵌类别取值、判据句、六面表或算子表副本，只可出现读取调用与 owner 指针。
+- **FR-009**: 类别读取失败 MUST 打印 `owner-unavailable` 并保持既有 `execution` 门禁集不变；MUST NOT 中断流程、MUST NOT 静默切换门禁集、MUST NOT 把降级结果读作通过。本路径 MUST 只覆盖三类输入：owner 不可解析、引擎缺席或不可执行、键或输入非法（解析退出码 2）；三者打同一标签、同一行为。MUST NOT 把「已声明但取值越界」（FR-005）并入本路径——把作者输入错误降级成默认类，正是本条与 FR-005 要分开的那件事。
 - **FR-010**: 表达类特性线上，本阶段登记的 blocking 算子 MUST 真正阻断——任一面为 `not-evaluated` 时该阶段门禁判未通过；表达类 MUST NOT 继承代码型算子（测试执行、覆盖率、编译），但当该线同时产出代码或站点时，这些产物对应的代码型算子 MUST 按产物补回（按产物、不按类别）。
 - **FR-011**: 执行类特性线的可观察行为 MUST 不变：同一输入上 MUST 零新增阻断检查、零新增必填章节，门禁判定集合与基线提交 `c1cd4600` 逐项相同；新增的类别读取对执行类 MUST 非阻断——引擎缺席时执行类阶段照常完成，不新增失败。
 - **FR-012**: 切换 MUST 只由类别驱动：模板与技能 MUST NOT 内嵌按特性号、路径、关键词或文件类型的「允许列表」来判定是否走文档门禁；判定面 MUST 是「两条仅类别不同的夹具线跑同一模板，输出差异完全由声明解释」，且模板全文 grep 不出现任何特性号或路径白名单。
 
 #### C. 文档结构与逻辑的硬约束（US3）
 
-- **FR-013**: 表达类特性线的 plan MUST 产出 [[STR-002]] 章节，且 MUST 含四项：① **章节树**（每节：名称、目的＝读者读完要做的决定、父节、边界＝本节不覆盖什么）；② **基准读者与阅读场景**两行，读者定义 MUST 沿用 `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议，MUST NOT 新建第二套定义；③ **证据清单**（每条拟写入文档的事实性断言 → 证据等级、as-of、source 三件套）；④ **事实 owner 清单**（每条事实 → 唯一 owner 路径与章节锚）。
-- **FR-014**: 章节树 MUST 是实现阶段的唯一结构来源：计划中的每一节 MUST 出现在落文中，落文出现的计划外顶层章节 MUST 判为结构违规；两向判定 MUST 只读章节标题与计划表即可完成，MUST NOT 依赖通读正文或人工印象。
-- **FR-015**: 证据清单 MUST 覆盖 implement 写入的每条事实性断言：清单外的断言 MUST 判违规；清单条目的等级、as-of、source MUST 成组出现，缺任一 MUST 判违规（语法与判定归 `shared/workflow/expression-gates.md` § 证据分级与 as-of，本文件不复述）。
-- **FR-016**: 事实 owner 清单 MUST 让每条事实恰有一个 owner；同一事实出现两个 owner、或文档正文把同一事实重复手写 MUST 判违规，修复方向 MUST 是改为指向唯一 owner，MUST NOT 靠对齐措辞。
-- **FR-017**: 表达类特性线的 implement MUST 按章节树落文，并 MUST 通过四面 blocking 门禁：读者声明（前 40 个非空行内的读者与阅读场景）、证据三件套、事实唯一性、结构/链接/构建零新增违规；任一面为 `not-evaluated` MUST NOT 计为通过。
+- **FR-013**: 表达类特性线的 plan MUST 产出 [[STR-002]] 章节，且 MUST 含四项：① **章节树**（每节：名称、目的＝读者读完要做的决定、父节、边界＝本节不覆盖什么）；② **基准读者与阅读场景**两行，读者定义 MUST 沿用 `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议，MUST NOT 新建第二套定义；③ **证据清单**（每条拟写入文档的事实性断言 → 证据等级、as-of、source 三件套）；④ **事实 owner 清单**（每条事实 → 唯一 owner 路径与章节锚）。四项 MUST 各落一个固定子节，子节标题逐字取 [[STR-003]]（章节树）/ [[STR-004]]（基准读者）/ [[STR-005]]（证据清单）/ [[STR-006]]（事实 owner 清单）；子节标题缺任一即判违规。每个子节的表头列语义固定——章节树 4 列（节名 / 父节 / 目的 / 边界，`父节` 取顶层标记 `—` 或本表另一行的节名）、证据清单 4 列（断言 / 证据等级 / as-of / source）、事实 owner 清单 3 列（事实 / owner 路径 / 章节锚）；列名由检查器以常量声明（code-first owner），解析 MUST 按列名，MUST NOT 猜列位——与逐流程台账同一纪律，测试 MUST 从该常量读取列名，MUST NOT 手抄。校验器 MUST 是既有 `scripts/python/doc-consistency-check.py` 的新增动作 `--action structure`；本特性 MUST NOT 新增第七个门禁面（该检查器 `--faces` 仍为四面，六面 owner 不变），理由是该检查器已持有读者标记、证据三件套与副本下限三项语法，另置检查器会造出第二套同义解析。四项的校验 MUST 是可重跑的：同一份 plan 上重跑同一命令 MUST 得同一违规集。
+- **FR-014**: 章节树（[[STR-003]] 子节）MUST 是实现阶段的唯一结构来源：计划中的每一节 MUST 出现在落文中，落文出现的计划外顶层章节 MUST 判为结构违规；两向判定 MUST 只读章节标题与计划表即可完成，MUST NOT 依赖通读正文或人工印象。判定 MUST 只产出两个具名码：落文缺失计划中的节 → `chapter-missing`；落文出现计划外顶层章节（其父节为顶层标记）→ `chapter-unexpected`；MUST NOT 引入第三个阻断码，非顶层的计划外章节不因本条转红。章节树自身的语法违规 MUST 由 FR-013 的同一动作报出，MUST NOT 另判一处：父节指向不存在的节 → `parent-unknown`，节名重复 → `chapter-duplicate`，目的为空 → `chapter-purpose-missing`，边界为空 → `chapter-boundary-missing`。
+- **FR-015**: 证据清单 MUST 覆盖 implement 写入的每条事实性断言：清单外的断言 MUST 判违规；清单条目的等级、as-of、source MUST 成组出现，缺任一 MUST 判违规（语法与判定归 `shared/workflow/expression-gates.md` § 证据分级与 as-of，本文件不复述）。语法 MUST 复用 [[STR-005]] 的四列与既有证据码（`grade-invalid` / `as-of-malformed` / `source-missing` / `grade-asof-unpaired`），MUST NOT 另造同义码；落文中带证据标记、却在清单里找不到对应行的断言 MUST 判 `evidence-unlisted`。
+- **FR-016**: 事实 owner 清单（[[STR-006]] 子节）MUST 让每条事实恰有一个 owner；同一事实出现两个 owner、或文档正文把同一事实重复手写 MUST 判违规，修复方向 MUST 是改为指向唯一 owner，MUST NOT 靠对齐措辞。判定 MUST 用三个具名码：同一事实两行 owner → `owner-duplicate`；owner 路径在仓库内不存在 → `owner-path-missing`；章节锚为空 → `owner-anchor-missing`。正文重复手写 MUST 沿用既有 `duplicate` 面的机械下限（归一化后全等且长度 ≥ 24 字符，或相似度 ≥ 0.90 且长度 ≥ 40 字符），MUST NOT 自建第二套阈值，也 MUST NOT 把该下限读作判据放宽（下限之下仍由评审面判定）。
+- **FR-017**: 表达类特性线的 implement MUST 按章节树落文，并 MUST 通过四面 blocking 门禁：读者声明（落文前 40 个非空行内的读者与阅读场景）、证据三件套、事实唯一性、结构/链接/构建零新增违规；任一面为 `not-evaluated` MUST NOT 计为通过。章节两向比对（FR-014）属结构面内的第二个算子，MUST NOT 被登记为第五面。结构面通过 MUST NOT 被援引为内容正确性的证据——它只是必要条件，判据归 `shared/workflow/expression-gates.md` § 结构/链接/构建只是必要条件；`## Document Structure` 内 [[STR-004]] 的两行不套用「前 40 个非空行」窗口，该窗口适用于落文文档。四面结果 MUST 落在同一份门禁输出文件，作为本阶段 SC 证据的唯一来源（形态见 FR-020 的槽位与 verification 记录）。
 
 #### D. 驱动接入（US4）
 
-- **FR-018**: `skills/external/sdd-loop-driver/` 的阶段派发载荷 MUST 携带已解析的类别（取值 + `source` + 标注），本地原生子代理与远端 CLI 两种拓扑同规；子代理 MUST NOT 自行推断、补默认或按介质猜测类别；载荷缺该字段 MUST 判为派发构造缺陷，U4 不放行。
-- **FR-019**: 表达类特性线的 U4 MUST 在该阶段既有四条件（哨兵、产物、纪律、记账）之外，校验该阶段的表达式门禁证据（算子入口、退出码或摘要）；哨兵与产物具备但门禁证据缺失 MUST 判未完成，MUST NOT 以「产物看起来对」放行。
-- **FR-020**: 表达类特性线的两槽位测试预算 MUST 替换为两个**文档门禁槽位**，时点不变（implement 起点 baseline、review 通过后 closure），槽位记录 MUST 落在既有状态脊围栏内；槽位 MUST NOT 静默跳过、MUST NOT 在未运行时记 0 或记通过；非槽位阶段的定向集记录义务不因类别免除——仅文档改动亦 MUST 留 `stage-status` 行。
-- **FR-021**: 驱动 MUST NOT 因类别改变阶段序列、哨兵字面量、watcher 判定与退出码、卡死处置、快车道判据或 analyze/review 调用率；类别只改变两件事：用哪套算子证明同一不变量、预算槽位里装什么。
+- **FR-018**: `skills/external/sdd-loop-driver/` 的阶段派发载荷 MUST 携带已解析的类别（取值 + `source` + 标注），本地原生子代理与远端 CLI 两种拓扑同规；子代理 MUST NOT 自行推断、补默认或按介质猜测类别；载荷缺该字段 MUST 判为派发构造缺陷，U4 不放行。载荷 MUST 写成 key=value 三元组（`flow_class=<值>`、`source=<declaration|default>`、`marker=<默认标记或空>`）。取值的唯一来源 MUST 是该线 `requirements.md` 的声明行，经同一解析入口取得；类别 MUST 在**每次阶段派发前**解析一次，MUST NOT 从状态脊、环境变量或上一阶段缓存取值。状态脊中的类别行只是带日期的观测记录，MUST NOT 充当取值来源；重入时 MUST 重新解析并与观测比对，不一致即记 re-baseline 事件并更新观测。
+- **FR-019**: 表达类特性线的 U4 MUST 在该阶段既有四条件（哨兵、产物、纪律、记账）之外，校验该阶段的表达式门禁证据（算子入口、退出码或摘要）；哨兵与产物具备但门禁证据缺失 MUST 判未完成，MUST NOT 以「产物看起来对」放行。增补项 MUST 是以下四条且全部 blocking：(a) 本阶段登记的 blocking 算子各有一条结果记录，且无 `not-evaluated`；(b) 该记录指向的证据文件存在、非空，且其 SHA-256 与记账值一致（复用既有 `gate-implement-evidence-binding` 口径）；(c) 派发载荷的类别与 U4 当场解析值一致，不一致判派发构造缺陷；(d) 本阶段的 `stage-status` 行在场（定向集义务不因类别免除）。
+- **FR-020**: 表达类特性线的两槽位测试预算 MUST 替换为两个**文档门禁槽位**，时点不变（implement 起点 baseline、review 通过后 closure），槽位记录 MUST 落在既有状态脊围栏内并沿用既有行字段；变化只在内容——`selection_basis` 取新值 `docs-gate-full`（与 `full-suite` 同位，只在表达类线出现），`command` 记该次文档门禁命令串（读者 / 证据 / 副本 / 计数四面 + 结构两向比对，站点层存在时加构建算子），`passed` 记 verdict ∈ {pass, not-applicable} 的 blocking 算子数，`failed` 记 verdict ∈ {fail, not-evaluated} 的算子数，closure 的 `baseline_compare` MUST 是算子 id 集合的名称级差集（与 `full-suite` 的失败名单差集同形态）。逐面的 `not-evaluated` 原因 MUST 写在 `evidence_ptr` 指向的门禁输出里，MUST NOT 并入 `passed`、MUST NOT 以 0 表示未运行。槽位 MUST NOT 静默跳过、MUST NOT 在未运行时写槽位行；槽位数、时点、槽位顺序、closure 名称级差集与 `audit-test-budget.py` 的判定 MUST NOT 改变；非槽位阶段的定向集记录义务不因类别免除——仅文档改动亦 MUST 留 `stage-status` 行。
+- **FR-021**: 驱动 MUST NOT 因类别改变阶段序列、哨兵字面量、watcher 判定与退出码、卡死处置、快车道判据或 analyze/review 调用率；类别只改变两件事：用哪套算子证明同一不变量、预算槽位里装什么。槽位内容的替换 MUST NOT 构成审计口径变更——两槽位计数、槽位顺序、closure 名称级差集与 `stage-check` 语义逐字不变。
 
 #### E. 不变量、边界与分发
 
 - **FR-022**: 本特性 MUST NOT 新增 `/speckit.*` 命令，MUST NOT 引入运行时调度器、评分器或常驻服务，MUST NOT 新增第三方依赖；新增的确定性检查 MUST 只用标准库并落在既有 `scripts/python/` 下。
-- **FR-023**: 接线面 MUST 是封闭集：七个命令模板 + `skills/external/sdd-loop-driver/` 及其 `references/` + 两份 owner 文档（`shared/definitions/flow-class-definitions.md`、`shared/workflow/expression-gates.md`）+ `scripts/python/flow-class-check.py`；扩面 MUST 走契约修订，MUST NOT 由某个模板或技能就地扩面。
+- **FR-023**: 接线面 MUST 是封闭集：七个命令模板 + `skills/external/sdd-loop-driver/` 及其 `references/` + 两份 owner 文档（`shared/definitions/flow-class-definitions.md`、`shared/workflow/expression-gates.md`）+ `scripts/python/flow-class-check.py` + `scripts/python/doc-consistency-check.py`（仅新增 `--action structure`，四面与 `--faces` 取值集不变）；扩面 MUST 走契约修订，MUST NOT 由某个模板或技能就地扩面。
 - **FR-024**: 改动的唯一编辑面 MUST 是框架源（`templates/`、`shared/`、`skills/`、`scripts/`）；`.specify/` 运行时副本与各工具命令副本 MUST 由既有同步/再生成机制产出，MUST NOT 手改；未刷新的项目 MUST 保持改动前行为（旧副本不含类别读取）。
-- **FR-025**: 本特性 MUST NOT 削弱 069 已建立的不变量（八阶段集合不变、门禁数量不降、P0/P1 定义不动、analyze 与 review 调用率 100%），MUST NOT 回退 069 的 `Implemented` 状态；判据 owner 为 069 与 `shared/workflow/expression-gates.md` § 阶段不变量，本文件只引用、不复述。
+- **FR-025**: 本特性 MUST NOT 削弱 069 已建立的不变量（八阶段集合不变、门禁数量不降、P0/P1 定义不动、analyze 与 review 调用率 100%），MUST NOT 回退 069 的 `Implemented` 状态、MUST NOT 改写其正文或其切片规格；一条 spec 目录 MUST 只绑一个 Feature，Feature 可拥有多条线（069 拥有 `069-` / `069a-` / `069b-` 三条），因此 077 是**新建 Feature 的承接边**而非 069 的新切片：承接关系记录在新 Feature 侧（`features/077.md` 与本文件 § Related Feature），MUST NOT 反向写入 069 的详情文件。判据 owner 为 069 与 `shared/workflow/expression-gates.md` § 阶段不变量，本文件只引用、不复述。
 
 ### 显式排除项（Out of Scope）
 
@@ -188,7 +188,7 @@
 - **不新建命令集、不新建「文档专用阶段」**：阶段集合固定为既有八阶段。
 - **不引入运行时调度器、评分系统、报表引擎或常驻服务**（宪法 IX：框架而非运行时）。
 - **不重写 058 / 067 的既有规则**：阶段序列、槽位时点、审计口径在 `execution` 分支上逐字不变；本特性只在这些 owner 文件中增加**类别分支**。
-- **不规定实现形式**：命令、退出码、字段子结构、检查器文件名与模板文本属 plan；本文件只钉 Shared Strings 两行。
+- **不规定实现形式**：命令与脚本的内部形制、字段子结构、错误文本、测试与模板文本属 plan；本文件只钉可判定验收面所需的那几项（Shared Strings 表、特性线键形态与三段退出码、四个子节标题与列语义、槽位字段取值语义）。
 - **不把客户项目的具体文档当规范对象**：仓库外样本只作动机证据，引用时须带 as-of。
 
 ### Key Entities *(include if requirement involves data)*
@@ -230,9 +230,26 @@
 |-----------|------------------|-------------|
 | `STR-001` | "**Flow Class**" | FR-001 |
 | `STR-002` | "## Document Structure" | FR-013 |
+| `STR-003` | "### Chapter Tree" | FR-013, FR-014 |
+| `STR-004` | "### Reader Baseline" | FR-013, FR-017 |
+| `STR-005` | "### Evidence List" | FR-013, FR-015 |
+| `STR-006` | "### Fact Owners" | FR-013, FR-016 |
 
-**Citation convention**: 下游制品（FR 行、模板、契约、任务、测试）引用这两个字面量时 MUST 写 `[[STR-NNN]]`，MUST NOT 重抄字面量；本表是它们的唯一登记处。
+**Citation convention**: 下游制品（FR 行、模板、契约、任务、测试）引用本表字面量时 MUST 写 `[[STR-NNN]]`，MUST NOT 重抄字面量；本表是它们的唯一登记处。
+
+**编号范围说明**：本表编号**只在本规格内解析**，新登记的四行接续编为 `STR-003`…`STR-006`。069 已在其 § Shared Strings 占用 `STR-003`（`flow_class`）与 `STR-004`（默认标记字面量），那是 069 的命名空间：本文件正文引用 069 的字面量时只写 owner 路径，不写它的方括号 id，因此本规格的 `[[STR-004]]` 只指「基准读者」子节标题。`STR-001` / `STR-002` 是 requirements 阶段登记的既有行，按 append-only 保留原号不动。
 
 ## Clarifications
 
 <!-- Populated by /speckit.clarify: - Q: <question> → A: <answer> -->
+
+### Session 2026-10-30
+
+- Q: 类别声明落在 requirements 头部、Feature 详情，还是两处？行形态如何、非法值怎么处置？ → A: 只落 `requirements.md` 头部区、`## Related Feature` 之前，恰一行 `**Flow Class**: <value>`（半角冒号 + 一个空格 + 取值，行尾无尾随空白，字段名与取值大小写敏感）；索引与详情不存取值。第二次出现判 `declaration-duplicate`，位于 `## Related Feature` 之后判 `declaration-misplaced`。取值越界按阻断处理（解析退出码 1，声明阶段门禁非零退出并点名行号与取值），不回落默认类；无该行 → `execution` + 未声明来源 + 069 登记的默认标记。落 FR-001 / FR-004 / FR-005。
+- Q: 接线面是六个还是七个阶段命令？各阶段在什么时点读一次类别、如何避免重复读？ → A: **七个**——`requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement`；派发文本「六个」与同句枚举七个不一致，以枚举为准。`clarify` 必须在内：门禁 owner 的阶段算子表为它登记了两行算子（`G-clarify-clarity` / `G-clarify-reader`），排除它会让该阶段成为唯一无类感知的阶段。读取时点是阶段入口（早于该阶段第一件依赖类别的动作），同一次阶段运行只读一次并复用于本阶段全部算子；命令与其委托技能在同一次产物变更上重叠时复用调用方结果；跨阶段不缓存，跨线不复用。落 FR-006 / FR-008。
+- Q: 特性级类别用扩展既有引擎的第三个键族，还是新建解析函数？键形态、记录形状与退出码如何？ → A: 扩 `flow-class-check.py --action lookup` 的**键族**，不新建解析函数、不新增第二份分类数据。键取 `spec:<spec 目录名>`（如 `spec:077-doc-sdd-integration`），不接受裸目录名，也不接受 `feature:<ID>`——`069` / `069a` / `069b` 三条线同属一个 Feature，按 Feature 键必然指错线。记录沿用同一字段集（`unit_id` 为键原文、`source` 取 `declaration` 或 `default`、`basis` 为 `null`、`neutral` 为 `false`）。退出码分三段：0 = 已解析（含未声明按默认）；**1 = 已声明但取值越界**（阻断）；2 = 键或输入非法、spec 目录不存在、owner 不可解析（`owner-unavailable`）。1 与 2 必须分开，否则「作者写错」会被当成「引擎缺席」静默降级为 `execution`。特性线声明 MUST NOT 写进逐流程台账（台账行集等于框架单元清单，多出行即 `unknown`）。落 FR-003。
+- Q: `## Document Structure` 四项的精确语法是什么，由哪个确定性检查器验，零新增违规基线怎么取？ → A: 四项各落一个固定子节，子节标题逐字登记为本规格的四个新字面量（`[[STR-003]]`…`[[STR-006]]`，本规格内的编号，与 069 同号字面量互不相指，见 § Shared Strings 的编号范围说明）；表头列语义固定为——章节树 4 列（节名 / 父节 / 目的 / 边界，`父节` 取顶层标记 `—` 或本表另一行节名）、读者 2 行（沿用既有 `**Readers**:` / `**Reading scenario**:` 标记）、证据 4 列（断言 / 证据等级 / as-of / source）、owner 3 列（事实 / owner 路径 / 章节锚）；表头按列名解析、不猜列位。检查器 = 既有 `scripts/python/doc-consistency-check.py` 的新增动作 `--action structure`（不是第七个门禁面：该检查器 `--faces` 仍为四面，六面 owner 不变），理由是其三项语法（读者标记、证据三件套、副本下限）已在同一检查器内，换一个检查器会造出第二套同义解析。基线取法：主体集合 = 经类别解析为 `expression` 的特性线 spec 目录，首次声明那一次运行实测出的违规集即基线，此后判定「当前违规集 ⊆ 基线集」（按 文件 + 违规码 + 节名 三元组比对，差集为空），不是「总数不增」；新线首次声明时基线为空集，即判绝对。主体集合为空时输出 `not-applicable`，MUST NOT 记 0 违规通过。全仓 `structure-links-build` 面的既有 3 条违规基线归 `docs-utils.py`，本检查不读也不改。落 FR-013 / FR-014 / FR-015 / FR-016 / FR-023。
+- Q: 表达类的 implement 证据面如何落——Test-First 怎么判、`verification.md` 写什么、「结构通过只是必要条件」写在哪？ → A: Test-First 按宪法 VII 的 template-only 条款判 `Partial (justified)`，justification 写在 `tasks.md` 的判定行与 `verification.md` 的 `notes=`：该线无运行时代码，替代验证是四项文档门禁输出；`Partial (justified)` 是合法状态，既不记 `pass` 也不记 `fail`。`verification.md` 的 SC 证据改用门禁输出：`SC-NNN_value=` 记门禁摘要（逐面 `面=verdict`），证据记录沿用既有四键（`sample_id` / `evidence_path` / `evidence_sha256` / `verdict`），`evidence_path` 指向 `test-evidence/` 下的该次门禁输出文件；`verdict` 仍取模板既有的五值词表，门禁某面 `not-evaluated` → 该 SC 记 `unknown` 并点名面与原因，MUST NOT 记 `pass`。「结构通过只是必要条件」写进 FR-017 的验收句：结构面绿不得被援引为内容正确性证据；SC-004 的第四个负向夹具（同一事实两个 owner）本身就是「结构绿而内容红」的验收实例，不新增 SC。落 FR-017。
+- Q: 驱动侧从哪里取类别、U4 对表达类新增哪些校验、两槽位预算装什么？ → A: 取值的唯一来源是该线 `requirements.md` 的声明行，经同一解析入口在**每次阶段派发前**解析一次；状态脊中的类别行只是带日期的观测，不当取值来源，重入时重新解析并与观测比对，不一致记 re-baseline。派发载荷为 key=value 三元组（取值 + 来源 + 默认标记）。U4 在既有四条件之外增补四项 blocking 校验：算子结果齐备且无 `not-evaluated`、证据文件的 SHA-256 与记账一致（复用既有绑定门）、载荷类别与当场解析值一致、`stage-status` 行在场。两槽位：`slot`、时点、槽位顺序、closure 名称级差集与审计脚本判定全不变，只换内容——`selection_basis=docs-gate-full`、`command` 记文档门禁命令串、`passed` 记 `pass` 与 `not-applicable`、`failed` 记 `fail` 与 `not-evaluated`（逐面原因写进 `evidence_ptr` 指向的输出）、closure 的 `baseline_compare` 为算子 id 集合的名称级差集；未运行不得写槽位行、不得记 0。不改阶段序列与 analyze/review 100%。落 FR-018 / FR-019 / FR-020 / FR-021。
+- Q: 077 与 069 是什么关系，一条 spec 到底绑几个 Feature？ → A: 一条 spec 目录绑一个 Feature，Feature 可拥有多个 spec（069 拥有 `069-` / `069a-` / `069b-` 三条线）。077 是新建 Feature，与 069 是一条「承接」边而非归属：069 保持 `Implemented`，其正文与状态 MUST NOT 回退或改写，本特性只在 069 的两个 owner 文件（`shared/definitions/flow-class-definitions.md`、`shared/workflow/expression-gates.md`）做类条件追加；承接关系记录在新 Feature 侧（`features/077.md` 与本节），不在 069 的详情文件里补写。落 § Related Feature 与 FR-025。
+- Q: execution 特性如何保证逐字不变，接线失败时回退到哪？ → A: execution 线上新增的只有一次类别读取，判定集合、必填章节、阻断项与基线提交 `c1cd4600` 逐项相同；模板 diff 限于读取调用与 owner 指针。回退路径封闭为四条且都不改判定结果：owner 不可解析 → `owner-unavailable` + 保持既有 `execution` 门禁集；引擎缺席或不可执行 → 同一标签、同一行为；键或输入非法（退出码 2）→ 同一行为；未刷新的旧副本 → 无类别读取，行为与改动前一致。已声明但取值越界不在此列（FR-005 阻断）。任何一条 MUST NOT 静默切换门禁集、MUST NOT 把降级读作通过。落 FR-009 / FR-011 / FR-024。
