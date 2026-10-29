@@ -1,0 +1,1 @@
+{"seq": 1, "row_type": "stage-status", "stage": "clarify", "status": "not-run-docs-only", "selection_basis": "docs-only clarify; no executable change", "evidence_ptr": ".specify/specs/074b-nested-governance/requirements.md", "changed_paths": ["requirements.md"]}
