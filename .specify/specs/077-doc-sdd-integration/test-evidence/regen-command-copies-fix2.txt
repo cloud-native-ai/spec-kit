@@ -1,0 +1,11 @@
+# /speckit.analyze #2 fix round (fix2) — full capture, no truncation
+# captured_at: 2026-10-29T18:31:02Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+# branch: 077-doc-sdd-integration
+# head: 6217a86f
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/regen-command-copies.py --check
+
+OK: all per-tool command copies match the source templates.
+
+# exit=0

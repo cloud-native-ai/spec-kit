@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
 stage: analyze
-stage_started_at: 1793296373
-stage_deadline_epoch: 1793301773
-stage_base_commit: d05d3bef
-attempt: 0
+stage_started_at: 1793297689
+stage_deadline_epoch: 1793303089
+stage_base_commit: 6217a86f
+attempt: 1
 retry_limit: 2
-last_verdict: checklist DONE — 40 项（21 pass / 19 fail），25 FR / 8 SC 全覆盖，失败项已点名实现面；待 analyze 裁决严重度
+last_verdict: analyze #2 BLOCKED（1 HIGH / 6 MEDIUM / 5 LOW）→ spec-only 修复轮：R-01…R-07 + 5 LOW 全处置；计数保持 25 FR / 8 SC / 77 条款 / 6 STR / 28 任务；七道门 + R-01 算术自检全过；待 analyze #3 复核
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -101,6 +101,14 @@ last_verdict: checklist DONE — 40 项（21 pass / 19 fail），25 FR / 8 SC �
 - 提交：`d05d3bef`；产物 `checklists/readiness-2026-10-30.md`（40 项：21 pass / 19 fail）+ `test-evidence/checklist-stage-checks.md`
 - 失败簇：声明与接线（exit-1 停止指令、子节字面量、剥离边界）、解析引擎（字段 8 vs 9、查找顺序、引擎缺席不可观测、声明/缺省未裁决）、文档结构（缺三子节码、章节两向比对无输入、plan 不产四子节）、驱动槽位（U4 与 implement 算子表不相容、无哈希字段、`not-applicable` 记 pass 冲突、槽位 rc 无单一进程）、不变量（确认门 27 无复测、features 仍写 2 STR）
 - 零修改面成立；`validate-requirements` ok（256 行 / 33 定义行 / 6 STR）
+
+### analyze — BLOCKED ×2，两轮修复均已落地（2026-10-30）
+
+- 提交：`6217a86f`（analyze #1：14 HIGH / 9 MEDIUM / 6 LOW → 29/29 修复）；本轮 spec-only 提交（analyze #2：1 HIGH + 6 MEDIUM + 5 LOW）
+- analyze #2 发现：R-01（HIGH，U4(a) 分母与槽位 NA 跨级等式在「structure=pass + build=NA」的合规样例上给出 `1−1=0≠1` 的伪违规）；R-02（`error` 值域双义）；R-03（Clarifications 陈旧副本）；R-04（登记面第三种「四面」）；R-05（确认门脚本路径错）；R-06（T028 绿而不证）；R-07（阶段记录与台账缺失）；5 条 LOW（R-7 字面量重抄、E1 行数、缺节码同真、剥离遇块内 `###`、FR-001 存量/新增不可判）
+- 处置：R-01 取「构建并入单条结果」——站点构建是 `G-implement-structure` 的 `face=build` 子行；删除「算子总数 − (passed+failed) = NA 条数」跨级等式；SC-003 改面级断言。R-02 收窄 `error ∈ {owner-unavailable, -}`。R-03 更正并留日期注记。R-04 改为 reader / evidence / duplicate / count 四面 + `structure` 子步。R-05 改为 `scripts/python/scan-confirmation-gates.py`。R-06 T028 增自有断言。R-07 补 tasks 记录（`ab288aab` / `45b6b732`）、`239 行` 改指针、处置表补第 20–29 行
+- 门：validate-requirements / validate-tasks / account-clause-coverage / pre-analyze --stage tasks / validate-decision-tensions / sync-mirrors --check / regen-command-copies --check 全 exit 0（证据 `test-evidence/*-fix2.txt`）；R-01 算术自检 PASS（`test-evidence/r01-na-arithmetic-fix2.txt`）
+- 计数：25 FR / 8 SC / 77 条款 / 6 STR / 28 任务；`coverage-baseline.txt` 未重冻结；`expression-gates.md` 与 `flow-class-definitions.md` 未改动
 
 ## 测试预算（E2/E3）
 

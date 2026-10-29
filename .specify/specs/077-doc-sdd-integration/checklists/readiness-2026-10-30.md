@@ -228,6 +228,10 @@
 
 > 本节是**追加的处置记录**，不改写上文的判定与证据（上文是 checklist 阶段的 dated record）。19 条 `fail`
 > 全部由 `/speckit.analyze` 修复轮关闭；`/speckit.analyze` 的 29 条发现（14 HIGH / 9 MEDIUM / 6 LOW）逐条对应下表。
+>
+> **第二轮 analyze（HEAD `6217a86f`，判 BLOCKED）**：1 HIGH（R-01）+ 6 MEDIUM（R-02…R-07）+ 5 LOW（首轮 14 HIGH 已全关闭）。
+> 处置分工——R-01 与 R-02 分别**复关**已有的第 12/14/15 行（CHK026/CHK028/CHK029）与第 17 行（CHK033）；
+> R-03…R-07 与 5 条 LOW 落**第 20–29 行**。表共 **29 行**（19 条首轮 + 10 条第 20–29 行），可 29/29 逐行复核。
 
 | CHK | 处置落点 | 修法一句话 |
 |-----|----------|------------|
@@ -250,6 +254,16 @@
 | CHK033（降级不可表示） | FR-009/FR-018/FR-019(c)、C-001/C-004（drv）、E9、T017/T020 | 载荷增 `error=<label|->` 第四位；U4 在 `error` 非 `-` 时走 `owner-unavailable` 分支 |
 | CHK039（确认门预算） | FR-022、SC-006 与 Source、T021 + 本条更正行 | 写成可判定条款（两次扫描读数相等），T021 实跑扫描器 |
 | CHK040（派生计数 stale） | `.specify/memory/features.md` 077 行、`.specify/memory/features/077.md`、`checklists/requirements.md` | 计数一律**指针化**到 `validate-requirements.py` 输出，不再复述数字 |
+| **20** R-01（HIGH · NA 计量单位） | requirements FR-019(a)/FR-020/SC-003 与 SC-003 Source、data-model E7/E8、C-007（drv）、T016/T019、quickstart S6、research R-5 | 站点构建并入 `G-implement-structure` 的 `face=build` **子行**（`face_scope=sub`，不另立 `operator_id`）；**删除**槽位「算子总数 − (passed+failed) = NA 条数」跨级等式；SC-003 的 NA 断言改为**面级**（`structure` 面 = pass、`build` 子行 = NA，不参与算子级计数）。**复关**第 12/14/15 行（CHK026/CHK028/CHK029） |
+| **21** R-02（MEDIUM · `error` 值域双义） | FR-018/FR-019(c)、C-001/C-004（drv）、C-012（res）、E9、research R-6、T017 | 取「收窄值域」支：载荷 `error ∈ {owner-unavailable, -}`；`declaration-absent` 只出现在 advisory 发现里、**不进载荷**。**复关**第 17 行（CHK033） |
+| **22** R-03（MEDIUM · Clarifications 陈旧副本） | requirements § Clarifications Session 2026-10-30 第 6 条 | 把「`passed` 记 `pass` 与 `not-applicable`」改为「算子级 `pass` + `build` 子行 NA 单列」，并在同条加**带日期更正注记**（保留原答其余判定） |
+| **23** R-04（MEDIUM · 登记面第三种「四面」） | `.specify/memory/features.md` 077 行 | 「读者/证据/事实/结构四面」→「reader / evidence / duplicate / count 四面 + `structure` 子步」 |
+| **24** R-05（MEDIUM · 路径错） | FR-022、T021 | `skills/external/…/scan-confirmation-gates.py` → `scripts/python/scan-confirmation-gates.py`（实跑 `blocking confirmation gates: 27`） |
+| **25** R-06（MEDIUM · T028 绿而不证） | tasks.md T028 | 增**自有断言**：读取 `templates/plan-template.md`，断 `## Document Structure` 四子节字面量与「表达类 MUST 产出」句在场——不再只引用 T009/T013（二者都不读该模板） |
+| **26** R-07.1（MEDIUM · 阶段记录缺失） | `features/077.md`、`features.md` 077 行 | 追加 tasks 阶段记录（`ab288aab` 落 tasks + 77 条款分区并冻结基线、`45b6b732` 收尾记账）、更新 `Last Updated`；状态保持 `Planned` |
+| **27** R-07.2（MEDIUM · 派生计数写死） | `features.md` 077 行、`features/077.md` | 两处「239 行」改为指针——行数/定义行/字符串数以 `validate-requirements.py` 输出为准（现值 264 行），登记面不复述 |
+| **28** R-07.3（MEDIUM · 29/29 可复核） | 本清单文件 | 追加本表第 20–29 行，使两轮 analyze 的全部发现各有一行处置记录、29 行可逐行复核 |
+| **29** LOW 组（5 条） | ① research R-7 → R-9；② data-model E1；③ FR-013 / E6 / C-001（doc）；④ research R-9 / C-007（wire）；⑤ FR-001 | ① 子节字面量改为**指向 R-9 的指针**（不再重抄、不引带后缀标题）；② E1「头部区内恰 1 行」统一为「**至多一行**，缺省合法」；③ 整章缺失时只报 `document-structure-missing`、**抑制**四条 `subsection-missing`（父子同因只报一次）；④ 明确「块内任何同级或更高级标题（含 `###`）一律视为块结束」、需分层用 `####`；⑤ `declaration-absent` 只作 **advisory**、不承担合规判定；新线漏声明由 plan / tasks 阶段对 `**Flow Class**` 存在性的检查承担 |
 
 **未在任何行关闭的项**：无。**清单判定的保留**：上文的 21/19 判定仍是那个时点的实测结论，不回填为 pass——
 本节只说明它们在修复轮之后由谁承接。

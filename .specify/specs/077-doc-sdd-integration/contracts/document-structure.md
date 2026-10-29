@@ -11,7 +11,9 @@
 - **C-001** 表达类特性线的 `plan.md` MUST 产出 `## Document Structure` 章节（[[STR-002]]），且 MUST 含四个固定子节，
   标题逐字取 [[STR-003]]（章节树）/ [[STR-004]]（基准读者）/ [[STR-005]]（证据清单）/ [[STR-006]]（事实 owner 清单）。
   **缺节 MUST 有码**：整章缺失 → `document-structure-missing`；子节缺任一 → `subsection-missing`
-  （finding 以 `name=` 携带缺失子节的登记字面量，取值域恰为这四个）。**产出侧 MUST 同时落地**：
+  （finding 以 `name=` 携带缺失子节的登记字面量，取值域恰为这四个）。**父子同因只报一次**：整章缺失时 MUST 只报
+  `document-structure-missing`，MUST NOT 再对四个子节逐个报 `subsection-missing`；子节缺席判定只在章节存在时执行。
+  **产出侧 MUST 同时落地**：
   `templates/plan-template.md` MUST 携带该章节与四个子节骨架（标题与登记值逐字相同、表头列名同 C-002 / C-004 / C-005），
   并写明该章节对表达类是必要产出、对执行类 MUST NOT 构成必填项。模板是这四个字面量的**产出方**；骨架之外的一切工件
   （契约正文、FR、任务、测试、脚本常量）MUST 只写 `[[STR-NNN]]`，MUST NOT 重抄字面量。(FR-013)
@@ -81,7 +83,9 @@
 - **C-017** 表达类特性线的 implement MUST 按章节树落文，并 MUST 通过以下判定，全部按 blocking 处理：
   ① **门禁输出的四面** `reader` / `evidence` / `duplicate` / `count`（取值集归 `scripts/python/doc-consistency-check.py`
   的 `FACES` 常量，本契约只引用、MUST NOT 重定义或增删）；② **结构子步** `structure`（章节树语法 + 两向比对，
-  MUST NOT 被登记为第五个 CLI 面）；③ 站点层存在时的构建算子。任一面或子步为 `not-evaluated` MUST NOT 计为通过。
+  MUST NOT 被登记为第五个 CLI 面）；③ 站点层存在时的构建检查——它是 `G-implement-structure` 的 `face=build`
+  **面级子行**（`face_scope=sub`），MUST NOT 被登记为独立算子或独立 `operator_id`；站点层不存在时该子行取
+  `not-applicable`（显式）。任一面、子步或子行为 `not-evaluated` MUST NOT 计为通过。
   **「四面」的唯一读法**：指 ① 的四个 CLI 输出面，MUST NOT 被读作阶段算子表的四行——该表在 implement 只登记
   一行 blocking（`G-implement-structure`）与一行 advisory（`G-implement-reader`），U4(a) 的计数分母取该表
   （`driver-integration.md` C-004），四个 CLI 面由其绑定的同一份门禁输出文件承载。(FR-017)

@@ -224,3 +224,19 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 - **PLAN-EDIT**: `checklists/requirements.md` — 派生计数（shared strings 等）改为按 `validate-requirements.py` 输出取值，不再写死；分类=minor。
 
 **非 plan 属主制品**：`tasks.md` 的改动（T001…T028，任务行 27→28）属 tasks 阶段产物，不在此登记；`coverage-baseline.txt` 未改动（条款认领仍为 77，无需重冻结）。
+
+### 修复轮 2（analyze #2，2026-10-30）
+
+*第二轮 analyze（HEAD `6217a86f`）判 BLOCKED：1 HIGH + 6 MEDIUM + 5 LOW。本轮为 spec-only 修复，计数不变（25 FR / 8 SC / 77 条款 / 6 STR / 28 任务），`coverage-baseline.txt` 不重冻结，`shared/workflow/expression-gates.md` 与 `shared/definitions/flow-class-definitions.md` 不动。*
+
+- **PLAN-EDIT**: `requirements.md` — R-01 取「构建并入单条结果」支（FR-019(a) 把站点构建登记为 `G-implement-structure` 的 `face=build` 子行；FR-020 删除「算子总数 − (passed+failed) = NA 条数」跨级等式；SC-003 的 NA 断言改为面级）；R-02 收窄载荷 `error` 值域为 `{owner-unavailable, -}`（FR-018 / FR-019(c)）；LOW 组：FR-001 补「引擎不可判存量/新增，`declaration-absent` 仅 advisory，新线漏声明归 plan/tasks 阶段检查」、FR-013 补缺节优先级；R-05 更正确认门脚本路径；R-03 更正 Clarifications 第 6 条并加带日期注记；分类=**substantive**（NA 计量单位与 `error` 值域各改变一条已声明义务的边界）。
+- **PLAN-EDIT**: `data-model.md` — E1 行数统一为「至多一行（缺省合法）」；E6 增 `document-structure-missing` 优先于 `subsection-missing`；E7 增算子级行/子行二分（`face_scope` 三值、NA 只在子行）、重写计数规则；E8 计数口径去跨级等式；E9 `error` 值域收窄；校验规则汇总同步；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/driver-integration.md` — C-001 `error` 值域；C-004(a) 补子行、C-004(c) 补值域；C-007 重写为「算子级行数 = `passed`+`failed`，NA 面级单列、不设跨级等式」；分类=**substantive**。
+- **PLAN-EDIT**: `contracts/class-resolution.md` — C-012 的载荷示例由 `error=<label>` 收窄为 `error=owner-unavailable` 并注明值域；分类=minor。
+- **PLAN-EDIT**: `contracts/stage-wiring.md` — C-007 补「块内任何同级或更高级标题（含 `###`）一律视为块结束」；分类=minor。
+- **PLAN-EDIT**: `contracts/document-structure.md` — C-001 补「父子同因只报一次」（整章缺失抑制四条 `subsection-missing`）、C-017 ③ 把站点构建改写为 `G-implement-structure` 的 `face=build` 面级子行；分类=minor。
+- **PLAN-EDIT**: `research.md` — R-5 计数口径去跨级等式、R-6 `error` 值域、R-7 子节字面量改为指向 R-9 的指针（不重抄、不引带后缀标题）、R-9 补块内标题纪律；分类=minor。
+- **PLAN-EDIT**: `quickstart.md` — S6 的计数读法改为「算子级 `passed`/`failed` + `build` 子行面级单列，不用跨级等式反推」；分类=minor。
+- **PLAN-EDIT**: `checklists/readiness-2026-10-30.md` — 追加「修复轮处置」第 20–29 行（R-01…R-07 与 5 条 LOW），使表共 29 行、29/29 可复核；分类=minor。
+
+**本轮非 plan 属主制品**：`tasks.md` 的 T016/T017/T019/T021/T028 修订属 tasks 阶段产物；`.specify/memory/features.md` 077 行与 `.specify/memory/features/077.md` 的阶段记录属 Feature 登记面——均不在本表登记。

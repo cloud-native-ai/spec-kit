@@ -154,8 +154,9 @@ mkdir -p "$D"            # .specify/.gitignore 已忽略 .tmp/
 
 **实测（2026-10-30）**：`slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0`，
 槽位层面**零违规**；`status=fail` 全部来自夹具未提供六阶段 E3 证据（与槽位内容无关）。负控（追加第二个
-`baseline` 行）转红，证明该探针不是空绿。**计数读法**：`passed` 只数 `pass`，`not-applicable` 单列且不计入——
-夹具里若含 `not-applicable` 行，`passed + failed` 会小于算子总数，差额必须等于证据文件里 `not-applicable` 的条数。
+`baseline` 行）转红，证明该探针不是空绿。**计数读法**：`passed` 只数**算子级** `pass`，`failed` 只数算子级 `fail` / `not-evaluated`，
+两者之和等于算子级行数；`not-applicable` 只出现在 `G-implement-structure` 的 `build` **子行**并面级单列——
+MUST NOT 用「算子总数 − (`passed` + `failed`)」反推它（子行与算子级行不是同一计量单位）。
 
 **实施后期望**：审计行为**不变**——这是「槽位只换内容」的验收点。
 

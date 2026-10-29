@@ -9,7 +9,8 @@
 ## 派发载荷
 
 - **C-001** 每次阶段派发 MUST 在第①段携带类别**四元组**：`flow_class=<值>`、`source=<declaration|default>`、
-  `marker=<默认标记或空>`、`error=<E3 登记的码或 ->`。本地原生子代理与远端 CLI 两种拓扑 MUST 同规——
+  `marker=<默认标记或空>`、`error=<owner-unavailable|->`（**值域恰为这两项**：`-` = 无错误位，`owner-unavailable` =
+  机制降级；`declaration-absent` 是 advisory 发现码，MUST NOT 进载荷）。本地原生子代理与远端 CLI 两种拓扑 MUST 同规——
   提示词是类别的唯一载体。`error` 位存在的理由是把「机制降级」与「作者未声明」在载荷上分开
   （两者都可能出现 `source=default`）。(FR-018)
 
@@ -24,12 +25,13 @@
 
 - **C-004** 表达类特性线的 U4 MUST 在既有四条件（哨兵、产物、纪律、记账）之外增补四项**全部 blocking**的校验：
   (a) 本阶段**在门禁 owner 阶段算子表中登记的 blocking 行**各有一条结果记录，且无 `not-evaluated`——计数分母 MUST
-  只取该表（表达类 implement 为 1 行，即 `G-implement-structure`；四个 CLI 门禁面 MUST NOT 各自被当作算子重复计入）；
+  只取该表（表达类 implement 为 1 行，即 `G-implement-structure`；四个 CLI 门禁面 MUST NOT 各自被当作算子重复计入；
+  站点构建检查 MUST 并入该算子的 `face=build` **子行**，MUST NOT 登记为独立算子、MUST NOT 自占 `operator_id`）；
   (b) 该记录指向的证据文件存在且非空——**不做哈希比对、不新增加记账字段**：既有 `gate-implement-evidence-binding`
   的 `evidence_sha256` 只约束 `verification.md` 的 SC 样本行，且其 owner 明写非 `pass` 判定不承担绑定义务；
   verdict 只由 (a) 读记录取得，MUST NOT 由「文件存在」反推；
-  (c) 载荷类别与 U4 当场解析值一致，不一致判派发构造缺陷；**且载荷 `error` 位非 `-`（即 `owner-unavailable`）时
-  MUST 走 `owner-unavailable` 分支**——记一条降级观测、保持既有执行类门禁集，MUST NOT 按表达类四项校验，
+  (c) 载荷类别与 U4 当场解析值一致，不一致判派发构造缺陷；**且载荷 `error` 位非 `-`（值域恰为
+  `owner-unavailable` / `-`，故非 `-` 只能是 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支**——记一条降级观测、保持既有执行类门禁集，MUST NOT 按表达类四项校验，
   也 MUST NOT 当作「作者未声明」放行；(d) 本阶段的 `stage-status` 行在场。(FR-019)
 
 - **C-005** 哨兵与产物具备而门禁证据缺失时 MUST 判未完成，MUST NOT 以「产物看起来对」放行；MUST NOT 派发下一阶段。(FR-019)
@@ -39,14 +41,16 @@
 - **C-006** 表达类特性线的两槽位 MUST 换为两个文档门禁槽位，时点不变（implement 起点 `baseline`、review 通过后
   `closure`），槽位记录 MUST 落在既有状态脊围栏内。`selection_basis` MUST 取 `docs-gate-full`；`command` MUST 记
   该次文档门禁的命令串（一次四面调用 `--action verify --faces reader,evidence,duplicate,count` + 结构子步
-  `--action structure --spec-dir <dir> --path <落文>`；站点层存在时加构建算子）；`rc` MUST 是该命令串的**聚合退出码**——
+  `--action structure --spec-dir <dir> --path <落文>`；站点层存在时加构建**子行**检查——同一算子的面级子行，不另立算子）；`rc` MUST 是该命令串的**聚合退出码**——
   逐命令取非零优先（任一非零则非零，全为 0 才 0），逐命令原始 rc MUST 记在 `evidence_ptr` 指向的门禁输出里，
   MUST NOT 为此新增聚合脚本（接线面封闭）。(FR-020)
 
-- **C-007** `passed` MUST 记 verdict = `pass` 的 blocking 算子数；`failed` MUST 记 verdict ∈ {`fail`, `not-evaluated`}
-  的算子数；**`not-applicable` MUST 单列**——MUST NOT 计入 `passed`、MUST NOT 计入 `failed`（与
-  `shared/workflow/expression-gates.md` § 结构/链接/构建「不得记为通过」一致），其条数 MUST 从 `evidence_ptr` 指向的
-  门禁输出读出，且「算子总数 − (`passed` + `failed`)」MUST 等于该条数（U4 校验该等式）。closure 的 `baseline_compare`
+- **C-007** `passed` MUST 记 verdict = `pass` 的 blocking **算子**数；`failed` MUST 记 verdict ∈ {`fail`, `not-evaluated`}
+  的**算子**数——两者之和 MUST 等于本次运行产出结果的 blocking **算子级**行数；**`not-applicable` MUST 单列**——
+  MUST NOT 计入 `passed`、MUST NOT 计入 `failed`（与 `shared/workflow/expression-gates.md` § 结构/链接/构建
+  「不得记为通过」一致），它只出现在 `G-implement-structure` 的 `face=build` **子行**（C-004(a)），其条数 MUST 从
+  `evidence_ptr` 指向的门禁输出按**面级**读出；MUST NOT 定义「算子总数 − (`passed` + `failed`) = `not-applicable` 条数」
+  这类跨级等式（算子级行与子行不是同一计量单位；子行为 `fail` 时算子级 verdict MUST 为 `fail`）。closure 的 `baseline_compare`
   MUST 是算子 id 集合的**名称级**差集。逐面的 `not-evaluated` 原因 MUST 写在 `evidence_ptr` 指向的门禁输出里，
   MUST NOT 并入 `passed`，MUST NOT 以 0 表示未运行。(FR-020)
 

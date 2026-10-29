@@ -1,0 +1,17 @@
+# /speckit.analyze #2 fix round (fix2) — full capture, no truncation
+# captured_at: 2026-10-29T18:31:02Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+# branch: 077-doc-sdd-integration
+# head: 6217a86f
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/sync-mirrors.py --check
+
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+
+# exit=0

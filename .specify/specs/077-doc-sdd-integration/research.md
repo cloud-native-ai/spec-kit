@@ -24,7 +24,7 @@
 
 ## R-1 声明行的判定面：一行文法 + 三个作者错误码，全部归退出码 1
 
-- **文法**：位于 `## Related Feature` 之前的头部区，恰一行，逐字 `^\*\*Flow Class\*\*: (execution|expression)$`
+- **文法**：位于 `## Related Feature` 之前的头部区，**至多一行**（缺省合法，缺省按 `execution` 解析），逐字 `^\*\*Flow Class\*\*: (execution|expression)$`
   （半角冒号 + 一个空格 + 值，行尾无空白，字段名与取值大小写敏感）。
 - **四个判定结果**，只由形态决定，MUST NOT 读正文语义：
   1. 命中规范形态且取值在封闭集内 → `source: declaration`，退出码 0；
@@ -94,8 +94,8 @@
 - `selection_basis=docs-gate-full`；`command` 记该次文档门禁命令串；`rc` 记该串的**聚合退出码**（逐命令非零优先，
   逐命令原始 rc 留在 `evidence_ptr` 指向的门禁输出里——这是「`rc` 无单一进程」的解法，不引入聚合脚本）；
   `passed` 记 verdict = `pass` 的 blocking 算子数，`failed` 记 verdict ∈ {`fail`, `not-evaluated`} 的算子数，
-  `not-applicable` **单列**（不计 `passed`、不计 `failed`，条数由「算子总数 − (`passed`+`failed`)」这条等式约束，
-  与门禁 owner「不得记为通过」一致）；closure 的 `baseline_compare` 写成算子 id 名称级差集
+  `not-applicable` **单列**（不计 `passed`、不计 `failed`；它只出现在 `G-implement-structure` 的 `build` 子行，按面级读，
+  与门禁 owner「不得记为通过」一致；MUST NOT 用「算子总数 − (`passed`+`failed`)」跨级等式反推——子行与算子级行不是同一计量单位）；closure 的 `baseline_compare` 写成算子 id 名称级差集
   （`comm -13 <基线算子名单> <收口算子名单>`）；`failed_names_path` 指向**失败算子 id 名单**文件。
 - **实测结论**：`audit-test-budget.py` 对 `selection_basis` **不做枚举校验**（只校验在场），对 `passed` / `failed`
   只校验可解析为整数，closure 的 `baseline_compare` 只校验「名称级」形态（接受 `comm -13` / JSON 数组 /
@@ -106,7 +106,7 @@
 ## R-6 驱动载荷与 U4：四元组、四项 blocking、两槽位替代
 
 - **载荷四元组**：`flow_class=<值>` / `source=<declaration|default>` / `marker=<默认标记或空>` /
-  `error=<E3 码或 ->`，写进第①段「背景与权威文档」，因此本地原生派发与远端 CLI 派发携带的是同一份文本
+  `error=<owner-unavailable|->`（值域恰为这两项；`declaration-absent` 是 advisory 码、不进载荷），写进第①段「背景与权威文档」，因此本地原生派发与远端 CLI 派发携带的是同一份文本
   （提示词是唯一载体，环境变量不参与）。`error` 位的用途是把「机制降级（`owner-unavailable`）」与
   「作者没写声明」在载荷上分开——两者都可能是 `source=default`。
 - **U4 的四项**（在既有四条件之外，全部 blocking）：(a) 本阶段**算子表登记的 blocking 行**各有一条结果记录且无
@@ -120,7 +120,7 @@
 
 ## R-7 七模板的接线形态：一个子节、一次 lookup、零副本
 
-- 形态取既有先例 `templates/commands/docs.md` 的 `### 类别读取与文档型门禁` 子节：一个三级子节，内含
+- 形态取既有先例 `templates/commands/docs.md` 的**子节形态**（该文件的标题带后缀，属另一条入口，MUST NOT 照抄，也不得与本节混为一谈）；本特性子节的标题**逐字取 R-9 登记的唯一字面量**（登记处只有 R-9 一处，本行不复述字面量）：一个三级子节，内含
   **一次** lookup 调用（`--unit-id "spec:<spec 目录名>"`）、两条 owner 指针（判据 owner、门禁 owner）、
   一个分支句（表达类 → 按阶段算子表执行本阶段登记的行；其余 → 既有门禁集逐字不变）、一条降级可见句。
 - **文本卫生**（沿用 069a A5 的纪律）：子节内 MUST NOT 出现
@@ -159,6 +159,9 @@
   2. **终点** = 该行之后第一个同级或更高级标题行（匹配 `^#{1,3} `，即 `#` / `##` / `###`）的**前一行**（含）；
      其后无任何标题行时，终点 = 文件最后一行（含）；
   3. 删除起点至终点，**不额外插入也不删除空行**。
+- **块内标题纪律（防提前截断）**：块内出现**任何同级或更高级标题（含 `###`）一律视为块结束**——剥离器 MUST NOT 采用「跳过小标题继续吃」的启发式；
+  因此子节正文 MUST NOT 嵌 `###` 小标题，需要分层时用 `####`（不匹配 `^#{1,3} `，不会提前截断）。判定由同一守卫断言，
+  违反即判接线形态违规——否则「块尾恰一个空行」的前提会在块内 `###` 处塌陷，剥离结果不可复算。
 - **成立前提（作者义务）**：子节块 MUST 以**恰一个空行**收尾——块末与下一个标题之间不得出现两个及以上空行。
   这样端点必然落在「一个空行」上，删除后剩下的分隔空行与插入前的基线逐字相同；违反该形态即判接线形态违规
   （由 `test_stage_class_wiring.py` 断言），否则剥离不可复算。

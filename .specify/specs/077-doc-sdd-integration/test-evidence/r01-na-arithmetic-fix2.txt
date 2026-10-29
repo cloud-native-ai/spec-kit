@@ -1,0 +1,118 @@
+# /speckit.analyze #2 fix round (fix2) — R-01 arithmetic self-check
+# captured_at: 2026-10-29T18:28:17Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+# scope: spec-only (no implementation code in this round); this file is a derivation + fixture spec,
+#        not a test run. The executable leg lands with T016 / T019 in /speckit.implement.
+
+## 1. What R-01 was
+
+Two readings could not both hold:
+
+- FR-019(a) (before fix): U4(a) 的分母只取门禁 owner 的阶段算子表 → 表达类 implement 恰 1 行
+  `G-implement-structure`。
+- FR-020 / C-007 (before fix): 槽位计数由等式「算子总数 − (`passed` + `failed`) = `not-applicable` 条数」约束。
+
+在**合规**场景（structure 面 = pass、站点层不存在 → build 检查 = not-applicable）下，旧等式给出
+`1 − (1 + 0) = 0 ≠ 1`：一条完全合规的记录被判违规。若把 build 计成独立算子，E7 的 `operator_id`
+又必须是 `G-…`（取自算子表），而无处登记第二个 id。两个自洽读法互斥 → 择一。
+
+## 2. Chosen reading (②: build folds into the single operator result; NA becomes a face-level assertion)
+
+- 门禁 owner 的 implement 行只有 1 条 blocking 算子：`G-implement-structure`（面 = `structure-links-build`，
+  含结构 / 链接 / 构建）。**站点构建检查是本算子的 `face=build` 子行**（`face_scope=sub`），沿用同一个
+  `operator_id`，MUST NOT 另立算子、MUST NOT 自占 `operator_id`。`shared/workflow/expression-gates.md` 不动。
+- **删除**「算子总数 − (`passed`+`failed`) = NA 条数」跨级等式。算子级行与子行不是同一计量单位：
+  `passed` / `failed` 只统计**算子级**行；`not-applicable` 只在子行出现，面级单列。
+- SC-003 的 NA 断言改为**面级**：`structure` 面 = pass、`build` 子行 = not-applicable。
+
+## 3. Compliant sample (structure=pass, build=not-applicable)
+
+Fixture: 一条声明 `expression` 的特性线，跑 implement 阶段；环境**无站点层**。
+
+Operator table (owner: `shared/workflow/expression-gates.md` § 阶段算子表):
+
+    | stage      | operator_id            | gate                 | severity |
+    |------------|------------------------|----------------------|----------|
+    | implement  | G-implement-structure  | structure-links-build| blocking |
+    | implement  | G-implement-reader     | reader-purpose       | advisory |
+
+Gate evidence output (one file under `test-evidence/`; E7 records):
+
+    operator_id: G-implement-structure
+    face: structure-links-build
+    face_scope: gate
+    verdict: pass                      # 结构面通过
+    rc: 0
+
+    operator_id: G-implement-structure
+    face: build
+    face_scope: sub                     # 面级子行，不是第二个算子
+    verdict: not-applicable            # 站点层不存在（显式）
+    rc: null
+
+Slot row (state spine, E8):
+
+    slot=baseline  selection_basis=docs-gate-full
+    passed=1  failed=0  rc=0
+    evidence_ptr=<the gate evidence file above>
+
+U4 evaluation of this sample:
+
+    (a) 算子表 blocking 行数 = 1（G-implement-structure）
+        记录存在 = yes；算子级 verdict = pass（非 not-evaluated）        → pass
+        （build 子行的 not-applicable 不进 (a) 的判定：它既不是第二条算子记录，
+          也不构成 not-evaluated）
+    (b) evidence 文件存在且非空（不做哈希）                              → pass
+    (c) 载荷类别 = 当场解析值 = expression；payload error = -            → pass
+    (d) 本阶段 stage-status 行在场                                       → pass
+
+    U4 verdict: pass（**不报违规**）
+
+Counting check under the new rule:
+
+    算子级行数 = 1
+    passed      = 1   （verdict == pass 的算子级行）
+    failed      = 0   （verdict ∈ {fail, not-evaluated} 的算子级行）
+    passed + failed = 1 = 算子级行数                                    → 成立
+
+    not-applicable 子行 = 1（面级，单列）
+    不参与任何跨级等式：本规格已删除「算子总数 − (passed+failed) = NA 条数」这一条，
+    因此不再对合规样例报出 1 − 1 = 0 ≠ 1 的伪违规。
+
+## 4. Why the old reading failed on this exact sample (regression witness)
+
+    old rule: 算子总数(1) − (passed(1) + failed(0)) = 0
+              expected NA count                          = 1（build 行）
+              0 ≠ 1 → 违规
+
+The sample is fully compliant (structure pass, build legitimately not-applicable), so the old rule
+produced a **false positive**. The new rule removes the cross-level equation instead of special-casing NA.
+
+## 5. Fixture spec for T016 / T019 (no code written in this round)
+
+Test file: `tests/contract/test_docs_gate_driver.py`（T016 编写，T019 让槽位组转绿）
+
+1. **正样本**：按 §3 构造 E7 记录（算子级 1 行 + `build` 子行 1 行）与 E8 槽位行（`passed=1`、`failed=0`）。
+   - 断言 U4 四项全 pass、总判定 `pass`；
+   - 断言 `build` 子行**不**出现在 `failed_names_path` 的名单里；
+   - 断言槽位计数只读算子级行：`passed + failed == 算子级行数 == 1`；
+   - 断言实现**不**计算「总数 − passed − failed」（该等式不再是判据；出现即为契约违规）。
+2. **负控 1（防空绿）**：把算子级 `verdict` 改成 `not-evaluated` → U4(a) 必须 fail；
+   证明上面的绿不是「什么都不检查」。
+3. **负控 2（防 NA 混入计数）**：把 `build` 子行计入 `failed`（或计入 `passed`）→ 断言必须 fail；
+   证明「NA 单列」是可观测约束，而不只是措辞。
+4. 子行的 `face_scope` 取 `sub`、`operator_id` 与父行相同 → 断言通过；给子行另造一个 `G-…` id → 断言 fail
+   （证明「不另立算子」可判定）。
+5. **负控 3（子行红不得算子绿）**：把 `build` 子行改成 `verdict: fail` 而算子级仍写 `pass` → 断言必须 fail
+   （子行是同一算子的面级解释，不是独立口径；FR-019(a) / E7 / C-007 均要求算子级随子行转红）。
+
+## 6. Files this self-check pins
+
+- `requirements.md` FR-019(a) / FR-020 / SC-003（+ SC-003 Source）
+- `data-model.md` E7（算子级行 vs 子行；`face_scope` 三值；计数规则）/ E8（`rc` 与计数口径）
+- `contracts/driver-integration.md` C-004(a)、C-007
+- `tasks.md` T016 / T019
+- `quickstart.md` S6（计数读法）
+- `research.md` R-5
+
+# result: PASS — 合规样例在新规则下不报违规；负控各自的转红条件已写进夹具规格
