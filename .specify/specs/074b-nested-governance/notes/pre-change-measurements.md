@@ -232,3 +232,72 @@ $ git diff --stat 33269994a -- skills/internal/run-team/SKILL.md agents/sdd-exec
       tests/fixtures/nested_sdd.py templates/commands
                                      # empty: every one of the eight read-only subjects is untouched
 ```
+
+## 11. Regression (T023): the targeted set re-run once, judged by node-id name
+
+One run, at HEAD `1c8b89778` (part 3 committed), before this task's own edits. Full capture:
+[`../test-evidence/implement-targeted-part4-run.txt`](../test-evidence/implement-targeted-part4-run.txt).
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out \
+    .specify/specs/074b-nested-governance/test-evidence/implement-targeted-part4-failed.txt \
+    <the 19 files owned by test-evidence/targeted-set-v1-baseline.txt> \
+    tests/contract/test_nested_run_report.py tests/contract/test_sdd_diffusion.py \
+    tests/contract/test_sdd_compat_containment.py
+collected 338 items
+=========================== short test summary info ============================
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+======================== 1 failed, 337 passed in 34.04s ========================
+# failed-name list written: …/implement-targeted-part4-failed.txt (1 entries)
+rc=1
+duration_s=34
+```
+
+**Name-level comparison against the T002 re-capture** (the baseline file is the owner of that
+list; the comparison extracts its recorded `tests/…::…` line rather than re-deriving it):
+
+```text
+$ awk '/^# failed-name list: /{f=1;next} f&&/^tests\//{print}' \
+    .specify/specs/074b-nested-governance/test-evidence/targeted-set-v1-baseline.txt | sort
+tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+
+$ comm -13 <T002 re-capture name list> <part-4 failing name list>   # MUST be empty
+                                     # empty — zero NEW failing node ids
+$ comm -23 <T002 re-capture name list> <part-4 failing name list>   # reverse direction
+                                     # empty — the pre-existing red was neither fixed nor renamed
+```
+
+**The three suites this slice owns are green, counted by file** (`pytest --collect-only -q`):
+
+```text
+tests/contract/test_nested_run_report.py: 16 tests collected
+tests/contract/test_sdd_diffusion.py: 15 tests collected
+tests/contract/test_sdd_compat_containment.py: 11 tests collected
+                                     # 42 cases, all passed in the run above
+```
+
+**The single pre-existing red is unmoved** — same name, same residual, same integer (measured
+here, not quoted from the baseline):
+
+```text
+$ python3 .specify/scripts/python/scan-confirmation-gates.py --root . --json \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin)["total"])'
+27
+$ python3 -c "import json;print(json.load(open('.specify/specs/050-proactive-flow-trigger/baseline-gates.json'))['confirmationGates']['total'])"
+23
+                                     # 27 before and after this slice: no green claim is made
+                                     # for this case, and no repair is attempted
+```
+
+**Classification-honesty audit duty**: `/speckit.review` is this slice's classification-honesty
+audit surface (T023's own wording); this task therefore records no adjudication of its own and
+writes none back. What this task contributes to that audit is the measured base it will read: the
+E3 row below, the name-level comparison above, and the disclosed pre-existing red.
+
+**E3 stage-status row (targeted evidence, part 4/4)** — `stage=implement`, `row_type=stage-status`,
+`status=ran`, `selection_basis=targeted-set-v1` (the 19 files owned by
+`test-evidence/targeted-set-v1-baseline.txt` plus this slice's 3 suites, run **once** for this part;
+no second full suite), `changed_paths[]=.specify/specs/074b-nested-governance/{verification.md,
+tasks.md,notes/pre-change-measurements.md,notes/quickstart-run.md,test-evidence/implement-targeted-part4-*}`,
+`evidence_ptr=.specify/specs/074b-nested-governance/test-evidence/implement-targeted-part4-run.txt`.
+The jsonl row is `test-evidence/implement.jsonl` `seq=7`.
