@@ -70,7 +70,7 @@ an oversight): `skills/internal/create-team/SKILL.md` § Report contract (`## Ne
 | FR-005 | C-8, C-9, C-10, C-14, C-46 | anti-nesting owner; pre-dispatch probe |
 | FR-006 | C-11, C-12, C-13, C-15 | depth-2 chain; virtual prohibition; per-member cap |
 | FR-007 | C-28, C-29 | engine; golden table |
-| FR-008 | C-18, C-19, C-20 | five inputs; rubric reference; definition-class default |
+| FR-008 | C-18, C-19, C-20 | five inputs; rubric reference; `definition-class` closure (a change-nature value, path-derived) and its cross-cutting default |
 | FR-009 | C-21 | SDD branch conditions |
 | FR-010 | C-20, C-22 | direct branch conditions |
 | FR-011 | C-23, C-24 | precedence; conflict set |

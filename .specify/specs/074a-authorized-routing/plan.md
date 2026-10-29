@@ -60,8 +60,10 @@ spine, scheduler, daemon, confirmation gate, or automatic feedback transmission;
 projection of an edited source is produced by the mirror machinery, never hand-edited; the slice stays
 additive on the four predecessor surfaces `074b` must later claim containment over.
 **Scale/Scope**: 20 FR / 6 SC / 10 shared strings → 4 contract files with 47 clauses (C-1…C-47),
-9 data-model entities, 29 validation rules, 3 state machines, 1 engine (3 actions), 8 edited framework
-files, 3 new framework files, 5 new test files, 1 new fixture, 1 declared pin change.
+9 data-model entities, 29 validation rules, 3 state machines, 1 engine (3 actions), and a **15-row
+delivery surface = 9 new + 6 edited** (`feature-ref.md` § 2): 3 new framework files, 5 new test files,
+1 new fixture, 5 edited framework sources, 1 edited existing test file carrying the declared pin
+change. No new `/speckit.*` command and no new skill.
 
 ## Constitution Check
 
@@ -184,8 +186,8 @@ tests/fixtures/
 
 **Structure Decision**: this slice extends the existing SDD-framework layout and creates **no new
 top-level directory** — the three new framework files land in `shared/definitions/`,
-`skills/external/sdd-loop-driver/references/`, and `scripts/python/`; eight files are edited; five test
-files are new, one fixture is new, and one existing test file gains a declared pin change. The
+`skills/external/sdd-loop-driver/references/`, and `scripts/python/`; six files are edited (five
+framework sources and one existing test file); five test files are new, and one fixture is new. The
 documentation plane and the runtime plane stay separate: every edit above is a source edit, and the
 `.specify/` runtime copies listed under Mirror Obligations are produced by the mirror machinery.
 
@@ -308,3 +310,50 @@ rows in `tasks.md` and freezing a baseline before any claim exists would make th
 green; `pre-analyze-check.py --stage plan` → see the recorded output;
 `sync-mirrors.py --check` → exit 0, no drift; `regen-command-copies.py --check` → clean;
 `flow-class-check.py --action check` → 79 units, 0 findings; targeted suite → 191 passed.
+
+## Plan Revision
+
+**2026-10-29 — analyze-fix round 1 (slice `074a-authorized-routing`).** Authorized by the driver for
+one plan re-review (efficiency-model §3.5(a)) after `/speckit.analyze` returned 0 CRITICAL / 3 HIGH /
+8 MEDIUM / 3 LOW. Each entry records the decision and the reason; the requirement text each one
+projects is already in `requirements.md` and is read there, never re-derived here.
+
+1. **F-01 — `authorize` exit alphabet (substantive: C-8, C-28, `quickstart.md` S4, `tasks.md` T007).**
+   Decision: `authorize` exits `0` for **any** authorization verdict — allowed and refused alike — and
+   `2` for malformed or unreadable input; a refusal is expressed by the JSON `verdict` / `reason`
+   fields together with the failing half, never by the process status. Reason: the pre-revision text
+   carried two contradictory alphabets for one engine (C-28 fixed `0` / `2` for `route`, while
+   `quickstart.md` S4 documented `0` / `2` / `3` for `authorize`), so a caller could not tell
+   "refused" from "engine failed", and any test written from one surface would have contradicted the
+   other. Both verdict-producing actions now share one two-valued alphabet, and the refusal/error
+   distinction lives where the record is. Pinned by `tests/contract/test_sdd_authorization.py`, whose
+   T007 obligation now asserts `0` on the refused case.
+2. **HIGH-1 — definition-class closure (substantive: C-18, C-20, with C-21 / C-22 / C-24 kept in
+   step).** Decision: `definition-class` is a value of `change_nature` — the five inputs stay five —
+   its membership is derived from the target path by the predicate owned by `requirements.md` FR-008,
+   and the change is cross-cutting by default, bounded only on a declared bounded correction with a
+   recorded rationale. Reason: the class was an open phrase ("templates that generate them") while
+   both the cross-cutting default and the bounded-correction escape keyed off class membership, so no
+   implementer could decide membership; carrying it inside the declared change nature closes the set
+   without adding the sixth input C-18 forbids. C-21's and C-22's first conditions are now read off
+   the `feature` / `maintenance` values instead of an unmapped one, and C-24's conflict pair uses the
+   `feature` literal.
+3. **HIGH-2 — `SDD assignment` defined (substantive, narrow: C-9).** Decision: the third predicate
+   condition names a defined term — a member duty whose routing decision is recorded as [[STR-004]],
+   with the definition owned by `requirements.md` FR-005. Reason: two readings survived (a recorded
+   `sdd` verdict vs. any dispatch intending to run SDD) and they differ exactly on the dispatch FR-005
+   exists to block. The three conditions themselves are unchanged.
+4. **Driver-adjudicated MEDIUM repairs touching this plan's artifacts** (decisions recorded in the
+   state spine; listed here so the plan does not read as untouched): C-13's per-member cap escape is
+   removed in favour of a hard cap of one run per member (B-04); C-14 names the two SC-001 carriers
+   (B-01); C-25 makes the FR-011 reason code mandatory on an override record (B-03); C-26 defines
+   `write-bearing change` by pointer to FR-007 (C-03); `data-model.md` E4 / E7 carry the same three
+   alignments; and the delivery-surface counts become 15 rows = 9 new + 6 edited with `feature-ref.md`
+   § 2 as the owner (F-02).
+
+**What this revision does not do**: it changes no clause id, adds no clause, moves no clause between
+files, defers no clause differently, and re-opens no requirement. The clause count stays 47 and the
+C-1…C-47 partition `tasks.md` claims is untouched, so every `[green:]` claim still resolves. The same
+eighteen Constitution Check rows remain ✅ Pass: no principle depends on the exit alphabet or on the
+class phrase, and the one-source-of-truth row is strengthened rather than weakened, because the path
+predicate now has a single owner in `requirements.md` FR-008 that the contracts cite.

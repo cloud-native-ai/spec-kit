@@ -18,7 +18,7 @@ slice's content-face acceptance shape (D-3).
 
 ```bash
 python3 .specify/scripts/python/sdd-route.py --action route \
-  --nature capability --traceability required \
+  --nature feature --traceability required \
   --blast-radius cross-cutting --reversibility hard \
   --complexity standard --format json
 ```
@@ -62,7 +62,7 @@ python3 .specify/scripts/python/sdd-route.py --action route \
 Expected shape: verdict `adjudicate` with the missing-input reason code — the complexity tier was not
 declared, and the precedence rule forbids the direct branch when a required input is absent, even
 though every supplied value points at direct. The conflicting form is the second adjudicate case:
-`--nature capability --blast-radius local-bounded-definition-correction` (a capability change cannot
+`--nature feature --blast-radius local-bounded-definition-correction` (a feature-scale change cannot
 be a bounded correction).
 
 **Disclaimer (per example)**: not executable at slice-plan time. Premises: (a) the precedence rule is
@@ -82,16 +82,19 @@ python3 .specify/scripts/python/sdd-route.py --action authorize \
 ```
 
 Expected shape: `agent_capability`, `seat_policy`, `effective`, and the supplying halves; exit `0`
-when `effective = allowed`, exit `3` when refused with the failing half named, exit `2` on malformed
-input (unreadable definition, malformed `seats` map, unknown seat).
+for **any** authorization verdict — `0` when `effective = allowed` and `0` when it is refused, with
+the refusal carried by the JSON `verdict` / `reason` fields and the failing half named — and exit `2`
+on malformed input (unreadable definition, malformed `seats` map, unknown seat). No third exit code
+exists.
 
 **Disclaimer (per example)**: not executable at slice-plan time. Premises: (a) the `<team-slug>` and
 `<seat-slug>` placeholders resolve against a real `.specify/teams/<slug>/team.md` carrying a block
 `seats:` map — no such file exists in this repository today, so the example is written against the
-fixture built for the tests; (b) the exit alphabet `0 / 2 / 3` is contracted scope
-(`contracts/hierarchy-and-authorization.md` C-8 and C-28), not an observation of the not-yet-written
-engine; (c) the agent path form `.specify/agents/instances/<slug>.agent.md` is the existing instance
-location. **Pinning test**: `tests/contract/test_sdd_authorization.py` (four cases: allowed,
+fixture built for the tests; (b) the exit alphabet `0 / 2` is contracted scope
+(`contracts/hierarchy-and-authorization.md` C-8 and `contracts/routing-decision.md` C-28), not an
+observation of the not-yet-written engine — a refusal is a produced verdict, so it does not raise the
+process status; (c) the agent path form `.specify/agents/instances/<slug>.agent.md` is the existing
+instance location. **Pinning test**: `tests/contract/test_sdd_authorization.py` (four cases: allowed,
 seat-forbidden, agent-forbidden, malformed map).
 
 ## S5 — Start a nested run and receive the handoff · NOT EXECUTED

@@ -58,15 +58,24 @@ the seat cannot satisfy the predicate and is refused. (FR-004)
 policy, both resolved through one deterministic, read-only engine action
 (`scripts/python/sdd-route.py --action authorize`). An SDD run MUST NOT start unless the effective
 value is [[STR-002]]. A refusal names which half failed — the Agent side, the seat side, or both —
-and records both source paths plus the seat slug so the verdict is recheckable. (FR-004, SC-001)
+and records both source paths plus the seat slug so the verdict is recheckable. The action's exit
+alphabet is exactly two-valued, as C-28 fixes it for both verdict-producing actions: `0` for any
+authorization verdict — [[STR-002]] and [[STR-003]] alike — with the refusal expressed by the
+verdict and reason fields of the record, and `2` for malformed or unreadable input only; a refusal
+is a produced verdict, never an error status. The record produced here is the **authorization probe
+record**; the team run report written under the existing `create-team` report contract carries the
+same resolution, and those two records are the carriers SC-001 names. (FR-004, SC-001)
 
 **C-9** (父 C-20): The anti-nesting obligation is narrowed once, in its existing owner
 (`.specify/shared/definitions/subagent-definitions.md` § Dispatch-Time Governance Obligation), to a
 decidable predicate: a dispatch prompt may name or assign an SDD driver only when the recipient
 resolves to an Agent definition declaring [[STR-002]], its seat policy declares [[STR-002]], and the
-assigned task is an SDD assignment. Every dispatch that does not satisfy all three conditions keeps
-the original prohibition unchanged; the amendment states the predicate without moving the obligation,
-and no second copy of the predicate is created elsewhere. (FR-005)
+assigned task is an SDD assignment. An **SDD assignment** is a member duty whose routing decision is
+recorded as [[STR-004]]; the term's definition is owned by `../requirements.md` FR-005, and a duty
+whose decision is absent, [[STR-005]], or [[STR-006]] is not one. Every dispatch that does not
+satisfy all three conditions keeps the original prohibition unchanged; the amendment states the
+predicate without moving the obligation, and no second copy of the predicate is created elsewhere.
+(FR-005)
 
 **C-10** (父 C-21): The pre-dispatch probe in `skills/internal/run-agent/SKILL.md` enforces the
 predicate and fails closed: a prompt naming an SDD driver without all three conditions is not
@@ -84,16 +93,19 @@ invocation host; SDD-within-SDD recursion is prohibited. (FR-006)
 occupies the orchestrating session, so hosting a driver inside it collapses the outer layer into the
 driver; the probe refuses the dispatch before it leaves and reports the reason. (FR-006)
 
-**C-13** (父 C-24): A member hosts at most one SDD run at a time unless the team declares a higher
-per-member cap within the existing line mechanism. No second concurrency primitive is introduced:
-overlapping territories are serialized or rejected by the line registry and ownership mechanism of
-Feature 064, and the decision cites that mechanism rather than inventing a gate.
-(FR-006, FR-018, SC-005)
+**C-13** (父 C-24): A member hosts at most one SDD run at a time — a hard cap with no escape: no
+higher per-member cap is declarable and no team-level override exists. A second duty that would need
+a concurrent run on the same member is serialized or rejected by the line registry and ownership
+mechanism of Feature 064, which also settles overlapping territories between two authorized seats. No
+second concurrency primitive is introduced, and the decision cites that mechanism rather than
+inventing a gate. (FR-006, FR-018, SC-005)
 
 **C-14** (父 C-29): A refused dispatch produces a record naming the failed condition and the
 recipient's resolved values. A record that states only "not authorized" is non-conforming: the two
-halves exist precisely so a reader can tell a policy decision from a missing declaration.
-(FR-005, SC-001)
+halves exist precisely so a reader can tell a policy decision from a missing declaration. The record
+lands in the authorization probe record of C-8 and is carried into the team run report written under
+the existing `create-team` report contract — those are the two carriers of SC-001's "both records",
+and neither is a new store. (FR-005, SC-001)
 
 **C-15** (父 C-28): Stage executors cannot start an SDD run, and every dispatch prompt that names a
 driver without satisfying all three conditions is blocked before dispatch. All pre-existing

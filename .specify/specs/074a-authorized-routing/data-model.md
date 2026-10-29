@@ -101,11 +101,11 @@
 
 | 字段 | 来源 | 规则 |
 |------|------|------|
-| `inputs` | 调用方声明（5 项） | 逐项记录原值；缺项即 [[STR-006]]（V-24） |
+| `inputs` | 调用方声明（5 项） | 逐项记录原值；缺项即 [[STR-006]]（V-24）。`change_nature` 的封闭取值含 `definition-class`，其成员资格由目标路径谓词派生——路径清单与谓词归 `../requirements.md` FR-008（设计面见 `contracts/routing-decision.md` C-18/C-20），此处不复述 |
 | `verdict` | 引擎 | 三值之一，取值由 owner 定义（不在此复述） |
 | `reason_code` | 引擎 | 来自 owner 的封闭词表；多条命中时按固定次序取第一条（V-25） |
 | `actor` | 调用方 | 作出声明的单元标识（席位或 agent） |
-| `override` | 用户裁决（可选） | 含用户指令原文与被覆盖的 verdict（V-26） |
+| `override` | 用户裁决（可选） | 含用户指令原文、被覆盖的 verdict，以及 FR-011 要求的理由码——裁定记录同样是裁决记录，理由码必填（V-26） |
 | `recorded_at` | 引擎 | 时间戳；同一裁决复用到输入变化为止（V-27） |
 
 **Record carrier in this slice**（`../requirements.md` § Cross-Slice Design Attribution D-2）：本切片不定义
@@ -150,11 +150,13 @@ paths、unresolved findings、anomaly line、integration identity（含被点名
 | 层 | 允许承载 | 禁止 |
 |----|----------|------|
 | 团队编排者 | 派发成员 | — |
-| 成员 driver host | 承载**一个** SDD 运行（有效授权 [[STR-002]] 且为 SDD 指派） | 承载第二个（除非团队在既有 line 机制内声明更高上限）；virtual 模态承载 |
+| 成员 driver host | 承载**一个** SDD 运行（有效授权 [[STR-002]] 且为 SDD 指派） | 承载第二个（硬上限 1/成员，无可声明的更高上限）；virtual 模态承载 |
 | 阶段执行者 | 执行单个阶段 | 启动/承载任何 SDD 运行；自身声明 [[STR-002]] |
 
 **Predicate（三条件同时成立才允许提示词点名/指派驱动）**: 收件 Agent 定义声明 [[STR-002]] ∧ 其席位策略声明
 [[STR-002]] ∧ 所指派任务是 SDD 指派。任一不成立 → 保持原禁令并点名失败条件。
+**SDD 指派**的定义归 `../requirements.md` FR-005（已记录裁决为 [[STR-004]] 的成员职责）；本实体只按该定义
+求值，无裁决记录、[[STR-005]] 或 [[STR-006]] 一律不构成 SDD 指派。
 **Additional prohibitions**: SDD-within-SDD；阶段执行者启动运行；virtual 成员承载。
 
 ---

@@ -212,9 +212,10 @@ dispatched.
 - **The handoff lacks its integration identity**: the outer layer cannot integrate; the handoff
   is incomplete and the run MUST NOT be reported successful.
 - **A declared input is knowingly misclassified** (e.g. a feature reported as maintenance):
-  the deterministic engine cannot detect a dishonest declaration; the review surface audits
-  the classification and records the discrepancy. The engine's determinism is over declared
-  inputs, not over the truthfulness of the declaration.
+  the deterministic engine cannot detect a dishonest declaration; the `/speckit.review` surface
+  audits the classification and records the discrepancy, and inside a nested run the driver's U4
+  verification checks it independently. The engine's determinism is over declared inputs, not over
+  the truthfulness of the declaration.
 - **User explicitly directs the opposite path**: user authority wins; the override is recorded
   as an adjudication.
 
@@ -247,32 +248,46 @@ dispatched.
 - **FR-005**: The existing anti-nesting obligation MUST be narrowed to a decidable predicate: a
   dispatch prompt may name or assign an SDD driver only when the recipient resolves to an Agent
   definition declaring [[STR-002]], its seat policy declares [[STR-002]], and the assigned
-  task is an SDD assignment. Every dispatch that does not satisfy all three conditions keeps
-  the original prohibition. The pre-dispatch probe MUST enforce the predicate and fail closed,
-  naming the condition that failed.
+  task is an SDD assignment. An **SDD assignment** is a member duty whose routing decision has
+  been recorded as [[STR-004]] under FR-013; a duty whose decision is absent, is [[STR-005]], or
+  is [[STR-006]] is not an SDD assignment. Every dispatch that does not satisfy all three
+  conditions keeps the original prohibition. The pre-dispatch probe MUST enforce the predicate
+  and fail closed, naming the condition that failed.
 - **FR-006**: The permitted nesting chain MUST be depth 2: team orchestrator → invoking member
   (driver host) → stage executor (leaf). A member executed in virtual mode MUST NOT host an SDD
   run, because virtual execution occupies the orchestrating session and collapses the outer
   layer into the driver. A stage executor MUST NOT start or host any SDD run; an SDD stage
   executor MUST NOT itself be an SDD invocation host; SDD-within-SDD recursion is prohibited.
-  A member MUST host at most one SDD run at a time unless the team declares a higher per-member
-  cap within the existing line mechanism. The anti-nesting owner document MUST be amended to
-  state this depth-2 chain and the virtual prohibition; FR-005 is the closed form of that
-  amendment.
+  A member MUST host at most one SDD run at a time: no higher per-member cap is declarable. A
+  second duty that would need a concurrent run on the same member is serialized or rejected by
+  the existing line/ownership mechanism (FR-018) and is never hosted concurrently. The
+  anti-nesting owner document MUST be amended to state this depth-2 chain and the virtual
+  prohibition; FR-005 is the closed form of that amendment.
 
 **Routing decision**
 
 - **FR-007**: The framework MUST provide one authoritative routing decision that classifies a
   write-bearing change as [[STR-004]] (run the SDD flow), [[STR-005]] (direct modification),
   or [[STR-006]] (adjudicate), implemented by a deterministic engine that returns the same
-  verdict for the same inputs.
+  verdict for the same inputs. A **write-bearing change** is any change that writes a tracked
+  file — source, configuration, definition, or documentation; a read-only analysis that writes
+  no tracked file is not a write-bearing change and needs no verdict.
 - **FR-008**: The decision MUST consume declared inputs only: change nature, whether durable
   traceability is required, blast radius, reversibility, and the existing Task Complexity
   Rubric tier. Each input MUST have a closed value domain defined in the routing owner
-  document. It MUST NOT use implementation medium, file extension, language, artifact count,
-  or author identity. Changes to definition-class surfaces (constitution, instructions,
-  Agent/Skill/Team definitions, and templates that generate them) are treated as cross-cutting
-  by default.
+  document, and no sixth input may carry the surface class. The change nature domain is
+  `change_nature ∈ {feature, maintenance, definition-class}`, where `feature` declares a change
+  that adds or alters a capability or contract, `maintenance` declares one that preserves every
+  existing capability and contract, and membership of the `definition-class` value MUST be
+  derivable from the target path without judgement: a change whose target path falls under
+  `.specify/memory/constitution.md`, `.specify/instructions.md`
+  (including its per-tool compatibility symlinks), `.specify/agents/{templates,instances}/`,
+  `agents/`, `.specify/skills/`, `skills/`, `.specify/teams/`, or `templates/` is a
+  `definition-class` change, and such a change is cross-cutting by default — it is bounded only
+  when the caller declares a bounded correction and records the rationale. This path predicate
+  is the only place the decision may read the target path; it does not classify by
+  implementation medium, file extension, language, artifact count, or author identity, and the
+  decision MUST NOT use any of those.
 - **FR-009**: The decision MUST return [[STR-004]] when any of the following holds: the change
   adds or alters a capability or contract; durable traceability is required; the blast radius
   is cross-cutting; the change is irreversible or hard to reverse; or the complexity tier is
@@ -280,7 +295,7 @@ dispatched.
 - **FR-010**: The decision MUST return [[STR-005]] only when all of the following hold: the
   change preserves every existing capability and contract; no durable traceability is
   required; the blast radius is local; the change is reversible; the complexity tier is
-  Trivial or Standard; and, for a definition-class surface, the change is declared a bounded
+  Trivial or Standard; and, for a `definition-class` change, the caller declares a bounded
   correction with a recorded rationale.
 - **FR-011**: The decision MUST apply one fixed precedence: [[STR-006]] first, then
   [[STR-004]], then [[STR-005]]. It MUST return [[STR-006]] whenever a required input is
@@ -290,8 +305,9 @@ dispatched.
   NOT silently default to [[STR-005]]. Every verdict MUST carry its inputs and a reason code
   from a closed vocabulary owned by the routing owner document.
 - **FR-012**: An explicit user instruction overrides the verdict; the override MUST be recorded
-  as an adjudication containing the user's instruction and the overridden verdict. The engine
-  MUST NOT override the user.
+  as an adjudication containing the user's instruction and the overridden verdict, and it MUST
+  additionally carry the reason code FR-011 requires of every verdict, because an adjudication is
+  itself a verdict record. The engine MUST NOT override the user.
 - **FR-013**: The decision MUST be applied once per declared member duty before that duty
   performs a write-bearing change; the verdict is reused for that duty until one of its inputs
   changes. The verdict with its inputs and reason code MUST be recorded in the team run report
@@ -362,7 +378,8 @@ dispatched.
 - **SC-001**: In a fixture team with one authorized and one unauthorized seat, the same
   SDD-routed duty starts exactly one nested run from the authorized seat and is blocked before
   dispatch for the unauthorized seat, with the failing authorization half named in both
-  records.
+  records — the authorization probe record for the authorized seat and the team run report
+  written under the existing `create-team` report contract for the blocked seat.
 - **SC-002**: The routing engine returns the documented verdict and reason code for every row
   of a golden case table covering feature, maintenance, cross-cutting, irreversible, ambiguous,
   conflicting, and bounded definition-correction changes; ambiguous and conflicting rows expect
@@ -437,15 +454,17 @@ dispatched.
 - **A4**: The routing engine is deterministic over declared inputs, whose closed value domains
   and mechanical classification tests are owned by
   `shared/definitions/sdd-routing-definitions.md`. Honest classification remains the caller's
-  duty, audited by the review surface; the engine never invents an input.
+  duty, audited by `/speckit.review` — inside a nested run the driver's U4 verification checks it
+  independently as well — and the engine never invents an input.
 - **A5**: A nested SDD run is the only sanctioned nesting. Feature 070 work packages remain the
   only in-run decomposition; no third nesting form is introduced.
 - **A6**: Of the `sdd-*` skills, only `sdd-loop-driver` constitutes the SDD development flow;
   `sdd-project-setup` and `sdd-house-keeping` are routed bootstrap/maintenance paths.
 - **A7**: An explicit user instruction overrides the routing verdict and is recorded as an
   adjudication.
-- **A9**: The default concurrency cap is one nested run per member; a higher per-member cap is
-  permitted only within the existing line registry and territory constraints.
+- **A9**: The concurrency cap is one nested run per member, with no escape: no higher per-member
+  cap may be declared, and a second duty that would need a concurrent run is serialized or
+  rejected by the existing line/ownership mechanism (FR-018).
 - **A10**: The nested run's review stage may include the driver's existing review-repair loop of
   Feature 063; ending "at review" means after that loop settles, not before findings are
   addressed.
