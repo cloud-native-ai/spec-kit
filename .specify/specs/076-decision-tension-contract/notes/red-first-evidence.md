@@ -306,3 +306,154 @@ All commands below are run from the repo root with that interpreter.
 - **Known red kept**: the three validator inverse samples (`sacrifice-none`, `undecidable-wording`,
   `unmapped-measurement-source`) remain red until T008; they are the visible carrier of that
   deferred scope, not masked.
+
+---
+
+## Group 5 — implement P3 (T014–T020)
+
+Stage base `4c532433`. Every block below is a four-field observation; the captures live in
+`test-evidence/`.
+
+### R7 (T014) — red run before the quartet owner subsection landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output** (tail; full capture `test-evidence/red-first-t014-t015.txt`):
+  ```
+  FAILED ...::TestScenarioCQuartetOwner::test_owner_declares_closed_quartet
+  FAILED ...::TestScenarioCQuartetOwner::test_field_semantics_decidable
+  FAILED ...::TestScenarioCQuartetOwner::test_carrier_unchanged_no_new_store
+  FAILED ...::TestScenarioCQuartetOwner::test_disclosed_limitations_are_non_blocking
+  FAILED ...::TestScenarioCQuartetOwner::test_si3c_pointer_only_both_directions
+  ```
+  Decisive excerpt: `AssertionError: the quartet sub-section is missing: no `### ` block under
+  '## 输出形态:每个提案一条证伪尝试' names all four keys (...)`. Artifact-missing, not an
+  assertion-shape defect.
+- **Exit code**: `1`
+- **Failure count**: `5 failed / 17 passed` (of 22 collected; the combined contract + quartet run
+  in the same capture is `17 failed / 18 passed` of 35)
+
+### G8 (T014) — green run after the owner subsection landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output**: `......................                                   [100%]` / `22 passed in 0.86s`
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 22 passed`
+- **Containment check**: the H2 section is asserted to `startswith` its `ac63fe8c` baseline, so the
+  one-line form is byte-identical and the quartet is an addition (the edit appends a `###` block at
+  the end of that section, before `## 判定与处置`).
+
+### R8 (T015) — red run before the quartet checker exists
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_falsification_quartet_validator.py`
+- **Real output** (decisive excerpt, full capture `test-evidence/red-first-t014-t015.txt`):
+  `AssertionError: missing artifact: .../scripts/python/validate-falsification-quartet.py` —
+  artifact-missing, not an assertion-shape defect. The one passing test
+  (`test_rejection_rate_is_six_of_six`) guards the matrix itself, not the artifact.
+- **Exit code**: `1`
+- **Failure count**: `12 failed / 1 passed` (of 13 collected)
+
+### G9 (T015) — green run after the checker landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_falsification_quartet_validator.py`
+- **Real output**: `.............                                            [100%]` / `13 passed in 0.97s`
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 13 passed`
+- **Stdlib-only check**: `python3 -m py_compile scripts/python/validate-falsification-quartet.py` →
+  `compile-ok` (no third-party import; `argparse` / `json` / `re` / `sys` / `pathlib` only).
+
+### G10 (T016) — SI-3C stays pointer-shaped (verification row, not a rewrite)
+
+- **Replay command** (five commands, full output `test-evidence/t016-si3c-pointer-shape.txt`):
+  `sed -n "/^### SI-3C — Critique Before Dispatch/,/^### SI-4/p" shared/workflow/self-improvement-workflow.md`;
+  `grep -nE "^(attempt|exit_code|observation|would_go_red_if):" …`;
+  `grep -noE "missing-field|empty-field|exit-code-not-integer|observation-not-raw|tautology|input-unreadable" …`
+- **Real output**: the section carries a four-sentence step summary plus
+  `` `shared/guidelines/critique-and-self-critique.md` `` and the sentence "this step references that
+  owner and MUST NOT restate its rules". Command 2 exits `1` (zero key lines), command 3 exits `1`
+  (zero reason strings); command 5 = `1 passed, 21 deselected`.
+- **Exit code**: `0` for the reads, `1` for the two zero-hit greps (which is the expected "no hit")
+- **Failure count**: `0 failed / 1 passed` for the two-direction guard
+- **Verdict**: pointer shape holds, so **no edit** to `shared/workflow/self-improvement-workflow.md`
+  was needed or made. Evidence is also recorded in `verification.md`.
+
+### R9 (T017) — red run before the `N/A` criterion exists
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioD`
+- **Real output** (full capture `test-evidence/red-first-t017-scenario-d.txt`):
+  ```
+  FAILED ...::test_bare_na_without_per_trigger_justification_is_a_missing_record
+  E  AssertionError: a bare N/A claims 'no load-bearing decision' without the per-trigger
+     justification, so it is treated as a missing record; counts={'dtr-anchor': 0,
+     'dtr-section-missing': 0, ...}
+  1 failed, 3 passed, 22 deselected
+  ```
+- **Exit code**: `1`
+- **Failure count**: `1 failed / 3 passed` (of 4 collected)
+- **Scope note**: D-1 / D-2 / D-3 pass already because the anchor suppression and the
+  mapping rule landed in T007/T008; the one red is exactly T018's scope (the `N/A` criterion).
+  D-1 and D-3 each archive their SC-003 snapshot, so the triple is not held hostage to the red.
+
+### G11 (T018) — green run after the `N/A` criterion landed, plus a mutation check
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioD`
+- **Real output**: `....                                                     [100%]` / `4 passed, 22 deselected`
+  (`test-evidence/green-t018-scenario-d.txt`)
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 4 passed`
+- **Mutation check**: replacing `if na_detail is not None:` with `if False:` and re-running the
+  scenario turns it into `1 failed / 3 passed` (exit `1`); the file was restored and verified
+  byte-identical by SHA-256, so the criterion is enforced rather than merely declared.
+- **SC-003 snapshots**: `notes/analyze-sc003/{D-1-compliant-na,D-2-section-removed,D-3-compliant-record}.md`
+  carry exit code / records / HIGH count + per-label table. HIGH = 0 / 1 / 0.
+
+### R10 (T019) — red run before the ADR slot exists
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioE`
+- **Real output** (full capture `test-evidence/red-first-t019-scenario-e.txt`):
+  `AssertionError: C-1: `## Alternatives` must carry a `tension_id` reference slot`
+  / `1 failed, 1 passed, 26 deselected`
+- **Exit code**: `1`
+- **Failure count**: `1 failed / 1 passed` (of 2 collected)
+- **Scope note**: the dangling-link half is green already because it is a library call on
+  `index_records()`, exported by T007; its red was the artifact-missing run in Group 2 (R2,
+  `test_record_index_exported_for_adr_link_check`). Building it again here would be a second parser.
+
+### G12 (T020) — green run after the ADR slot landed
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py`
+- **Real output**: `............................                             [100%]` / `28 passed in 1.09s`
+  (`test-evidence/green-t019-t020-scenario-e.txt` holds the two scenario-E tests: `2 passed`)
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 28 passed`
+- **No-copy check**: no line in `## Alternatives` matches a record field line
+  (`- **decision**:` … `- **pole_b**:`), and no mirror exists for `docs/` (the file is outside
+  `MIRROR_PAIRS`).
+
+### G13 — the targeted set for this segment (three feature files + five neighbour guards)
+
+- **Replay command**: `$SPECKIT_PYTHON -m pytest -q tests/contract/test_decision_tension_contract.py
+  tests/contract/test_decision_tension_validator.py tests/contract/test_falsification_quartet_validator.py
+  tests/contract/test_validate_tasks_parallel_safety.py tests/contract/test_user_facing_comprehension_doc.py
+  tests/contract/test_closed_set_claims.py tests/contract/test_validation_carrier_contract.py
+  tests/contract/test_self_improvement_conformance.py
+  tests/contract/test_fast_fail_discipline.py::test_x16_plan_template_zero_change`
+- **Real output**: `131 passed in 3.85s`
+- **Exit code**: `0`
+- **Failure count**: `0 failed / 131 passed` — the 17 reds left at the end of P2 (T012 ×12 + T013
+  ×5) are all green, and the neighbour guards hold at their P2 count (71).
+
+### Disclosed deviations in this segment
+
+1. **`verification.md` seeded at T016 with the SC rows left `unknown`.** The template's seeding
+   instruction belongs to the start of the implement run, which had not created it; T016 names it as
+   an evidence destination. The eight SC rows are seeded with `unknown` so the SC verdicts stay with
+   T026/T027, which own the runs that decide them. (T016's own evidence is complete: one `pass`
+   sample row bound to `test-evidence/t016-si3c-pointer-shape.txt` by SHA-256.)
+2. **A duplicate quartet key collapses into `missing-field`.** The closed reason set has no
+   duplicate-field member, and `data-model.md` E6 defines `missing-field` as "任一未出现". A key
+   appearing twice cannot be read unambiguously, so the checker reports `missing-field` naming that
+   key and stating the required occurrence count — inside the closed set, no seventh reason.
+3. **`regen-command-copies.py` needs a `python3` with `httpx`.** Under the bare Homebrew
+   `python3` (3.14.6) it exits 1 with `ModuleNotFoundError: No module named 'httpx'`; run with the
+   profiles venv on `PATH` it reports `OK` and `sync-mirrors.py --check` reports six `ok` pairs.
+   This is an environment fact, not a tree fact — T024 inherits it.

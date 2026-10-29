@@ -1,0 +1,38 @@
+# T016 — SI-3C stays pointer-shaped (measured 2026-10-29T12:07:33Z)
+
+## command 1 — the SI-3C section as written
+$ sed -n "/^### SI-3C — Critique Before Dispatch/,/^### SI-4/p" shared/workflow/self-improvement-workflow.md
+### SI-3C — Critique Before Dispatch
+
+At the head of dispatch, critique decides what is actually worth changing: every
+proposal frozen by diagnosis — including a re-cut of this loop's own criteria or
+prior rulings — carries one falsification attempt, executed before routing. A
+proposal whose premise is falsified is void and is never routed; the loop's own
+prior output is critiqued in the same form as external proposals.
+
+Output form, acceptability criteria, verdict handling, self-critique rules, and the
+failure-mode mapping are defined once in
+`shared/guidelines/critique-and-self-critique.md`; this step references that owner
+and MUST NOT restate its rules.
+
+### SI-4 — Route to the Canonical Improver
+exit=0
+
+## command 2 — the quartet field names must not appear as key lines
+$ grep -nE "^(attempt|exit_code|observation|would_go_red_if):" shared/workflow/self-improvement-workflow.md
+exit=1 (1 = zero hits, which is the pointer shape)
+
+## command 3 — the closed rejection reasons must not be restated
+$ grep -noE "missing-field|empty-field|exit-code-not-integer|observation-not-raw|tautology|input-unreadable" shared/workflow/self-improvement-workflow.md
+exit=1 (1 = zero hits)
+
+## command 4 — the pointer target exists
+$ ls -l shared/guidelines/critique-and-self-critique.md && grep -c "critique-and-self-critique.md" shared/workflow/self-improvement-workflow.md
+-rw-r--r--@ 1 liuqiming.lqm  staff  11440 Oct 29 20:06 shared/guidelines/critique-and-self-critique.md
+1
+exit=0
+
+## command 5 — both directions pinned by the contract test
+$ pytest -q tests/contract/test_decision_tension_contract.py -k si3c_pointer_only_both_directions
+.                                                                        [100%]
+1 passed, 21 deselected in 0.03s

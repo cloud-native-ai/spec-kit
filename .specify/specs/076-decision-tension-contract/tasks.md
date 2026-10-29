@@ -212,9 +212,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] [blockedBy: T013] 改写 `shared/guidelines/critique-and-self-critique.md`：在既有「输出形态：每个提案一条证伪尝试」段之后新增四元组小节（四个字面键各出现一次、值取键后同行或缩进续行、`raw:` 代理、`red:` 分隔的两半形状、反空真两半条件、扩展须走 owner 修订），声明四元组是产出形态，并**披露两处限制及其处置**——`raw:` 标记可被伪造、`red:` 信号的真实性不可证，两处均由复核者发现、只作非阻断注记、不进程序判决；既有段落逐字保留，不改写、不删除；`.specify/shared/guidelines/critique-and-self-critique.md` 由 `sync-mirrors.py` 产出，不手改 [green: contracts/falsification-quartet.md#C-1] [green: contracts/falsification-quartet.md#C-2]
-- [ ] T015 [US3] [blockedBy: T012,T014] 新建 `scripts/python/validate-falsification-quartet.py`：调用 `python3 scripts/python/validate-falsification-quartet.py <payload.md> [--json]`，退出码 0 接收 / 1 拒收 / 2 载荷不可读（按拒收处置，原因 `input-unreadable`）；判四个字面键各出现一次、`exit_code` 为整数、`observation` 值以 `raw:` 起头、`would_go_red_if` 按机械形状判两半（切分点取**第一次**出现的字面 `red:`，后续 `red:` 不移动切分点；切分点之前至少一个反引号跨度＝被改坏的具名输入；切分点之后至少一个反引号跨度＝断言名 / 检查标签 / 非零退出码），缺标记或缺任一 span 即 `tautology`；拒收原因取封闭六值并具名指出缺哪个字段或哪半条件；只用标准库、只读、不重放 `attempt` 也不判其可重放性（故不设 `attempt-not-replayable`）、不新增台账或存储 [green: contracts/falsification-quartet.md#C-3] [green: contracts/falsification-quartet.md#C-4]
-- [ ] T016 [US3] [blockedBy: T015] 核验 `shared/workflow/self-improvement-workflow.md` § SI-3C 仍为**指针形**并留证：读该步，确认它只有步骤摘要加指向 `shared/guidelines/critique-and-self-critique.md` 的指针、没有四元组字段清单或拒收规则的复述（现状实测已如此，本行不是改写行）；若 T014 之后出现了复述则删去该复述再留证。证据写入 `notes/red-first-evidence.md` 的对应组（命令、输出、退出码、判定）与 `verification.md`；`.specify/shared/workflow/self-improvement-workflow.md` 只在确有复述时才改，且改动由 `sync-mirrors.py` 产出副本 [green: contracts/falsification-quartet.md#C-5]
+- [X] T014 [US3] [blockedBy: T013] 改写 `shared/guidelines/critique-and-self-critique.md`：在既有「输出形态：每个提案一条证伪尝试」段之后新增四元组小节（四个字面键各出现一次、值取键后同行或缩进续行、`raw:` 代理、`red:` 分隔的两半形状、反空真两半条件、扩展须走 owner 修订），声明四元组是产出形态，并**披露两处限制及其处置**——`raw:` 标记可被伪造、`red:` 信号的真实性不可证，两处均由复核者发现、只作非阻断注记、不进程序判决；既有段落逐字保留，不改写、不删除；`.specify/shared/guidelines/critique-and-self-critique.md` 由 `sync-mirrors.py` 产出，不手改 [green: contracts/falsification-quartet.md#C-1] [green: contracts/falsification-quartet.md#C-2]
+- [X] T015 [US3] [blockedBy: T012,T014] 新建 `scripts/python/validate-falsification-quartet.py`：调用 `python3 scripts/python/validate-falsification-quartet.py <payload.md> [--json]`，退出码 0 接收 / 1 拒收 / 2 载荷不可读（按拒收处置，原因 `input-unreadable`）；判四个字面键各出现一次、`exit_code` 为整数、`observation` 值以 `raw:` 起头、`would_go_red_if` 按机械形状判两半（切分点取**第一次**出现的字面 `red:`，后续 `red:` 不移动切分点；切分点之前至少一个反引号跨度＝被改坏的具名输入；切分点之后至少一个反引号跨度＝断言名 / 检查标签 / 非零退出码），缺标记或缺任一 span 即 `tautology`；拒收原因取封闭六值并具名指出缺哪个字段或哪半条件；只用标准库、只读、不重放 `attempt` 也不判其可重放性（故不设 `attempt-not-replayable`）、不新增台账或存储 [green: contracts/falsification-quartet.md#C-3] [green: contracts/falsification-quartet.md#C-4]
+- [X] T016 [US3] [blockedBy: T015] 核验 `shared/workflow/self-improvement-workflow.md` § SI-3C 仍为**指针形**并留证：读该步，确认它只有步骤摘要加指向 `shared/guidelines/critique-and-self-critique.md` 的指针、没有四元组字段清单或拒收规则的复述（现状实测已如此，本行不是改写行）；若 T014 之后出现了复述则删去该复述再留证。证据写入 `notes/red-first-evidence.md` 的对应组（命令、输出、退出码、判定）与 `verification.md`；`.specify/shared/workflow/self-improvement-workflow.md` 只在确有复述时才改，且改动由 `sync-mirrors.py` 产出副本 [green: contracts/falsification-quartet.md#C-5]
 
 **Checkpoint**: US3 独立可验——一个合规载荷接收、六个拒收原因码各拒收一次（加四个 `missing-field` 附加样本）、`raw:` 与 `red:` 两处形状各判一次。
 
@@ -228,11 +228,11 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T017 [US4] [blockedBy: T006,T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 D（非承重不触发与门控可达性），拆成三个独立子场景、每次运行只断言一个变体：**D-1 基线**——trivial 夹具写 `N/A` 并逐条说明四类触发均不成立 → 校验器退出 0、记录条数 0（这一次运行即 SC-003 的第一份快照）；同一夹具写裸 `N/A`（无逐条说明）→ 退出 1 且命中 `dtr-section-missing`——该裸 `N/A` 运行是 **SC-003 三次运行之外的附加断言**，只钉 `N/A` 判据，不产快照、不计入 SC-003。**D-2 删章节**——同一夹具补入一条不可逆决策（回滚需要迁移）并**移除**该合规 `N/A` 章节 → 复跑恰一条 `dtr-section-missing`（在 SC-003 的三连跑内，「恰 1 条 HIGH」只在此步可达；`dtr-anchor` 被抑制不叠加）。**D-3 补记录**——在同一位置写入一条合规 `### T-001` 记录以替换 `N/A` → 复跑 0 条 HIGH（修复路径成立）；SC-003 只取三份快照——合规 `N/A` → 0、删章节 → 1、补合规记录 → 0，三个子场景各运行一次并各留一份 analyze 报告快照到 `notes/analyze-sc003/`（D-1 / D-2 / D-3 各一份），SC-003 的 HIGH 计数只读这三份快照；`requirements.md` 无 `### Measurement Sources & Collection Methods` 时按记录数机械分叉（≥1 条记录则逐条 `expected-sacrifice-unmapped`，合规 `N/A` 零记录则零发现）；复杂度与承重判据冲突时以 rubric tie-break 取较高一级；跑出记录在案的失败运行
+- [X] T017 [US4] [blockedBy: T006,T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 D（非承重不触发与门控可达性），拆成三个独立子场景、每次运行只断言一个变体：**D-1 基线**——trivial 夹具写 `N/A` 并逐条说明四类触发均不成立 → 校验器退出 0、记录条数 0（这一次运行即 SC-003 的第一份快照）；同一夹具写裸 `N/A`（无逐条说明）→ 退出 1 且命中 `dtr-section-missing`——该裸 `N/A` 运行是 **SC-003 三次运行之外的附加断言**，只钉 `N/A` 判据，不产快照、不计入 SC-003。**D-2 删章节**——同一夹具补入一条不可逆决策（回滚需要迁移）并**移除**该合规 `N/A` 章节 → 复跑恰一条 `dtr-section-missing`（在 SC-003 的三连跑内，「恰 1 条 HIGH」只在此步可达；`dtr-anchor` 被抑制不叠加）。**D-3 补记录**——在同一位置写入一条合规 `### T-001` 记录以替换 `N/A` → 复跑 0 条 HIGH（修复路径成立）；SC-003 只取三份快照——合规 `N/A` → 0、删章节 → 1、补合规记录 → 0，三个子场景各运行一次并各留一份 analyze 报告快照到 `notes/analyze-sc003/`（D-1 / D-2 / D-3 各一份），SC-003 的 HIGH 计数只读这三份快照；`requirements.md` 无 `### Measurement Sources & Collection Methods` 时按记录数机械分叉（≥1 条记录则逐条 `expected-sacrifice-unmapped`，合规 `N/A` 零记录则零发现）；复杂度与承重判据冲突时以 rubric tie-break 取较高一级；跑出记录在案的失败运行
 
 ### Implementation for User Story 4
 
-- [ ] T018 [US4] [blockedBy: T017] 在 `scripts/python/validate-decision-tensions.py` 内实现 `N/A` 判据与测量来源缺失的机械分叉：`N/A` 必须伴随四类触发逐条「均不成立」的说明，否则计入 `dtr-section-missing`；`requirements.md` 缺测量来源节时，计划含 ≥1 条记录则每条 `expected_sacrifice` 判解析失败，合规 `N/A`（零记录）则不执行映射判定、零发现；不引入 advisory 或降级档，使场景 D 转绿
+- [X] T018 [US4] [blockedBy: T017] 在 `scripts/python/validate-decision-tensions.py` 内实现 `N/A` 判据与测量来源缺失的机械分叉：`N/A` 必须伴随四类触发逐条「均不成立」的说明，否则计入 `dtr-section-missing`；`requirements.md` 缺测量来源节时，计划含 ≥1 条记录则每条 `expected_sacrifice` 判解析失败，合规 `N/A`（零记录）则不执行映射判定、零发现；不引入 advisory 或降级档，使场景 D 转绿
 
 **Checkpoint**: US4 独立可验——同一夹具三次运行（合规 `N/A` / 删章节 / 补合规记录）的记录数与发现数即可判定，「恰 1 条 HIGH」只在删章节那一次出现，不需读正文。
 
@@ -246,11 +246,11 @@
 
 ### Tests for User Story 5 (MANDATORY) ⚠️
 
-- [ ] T019 [US5] [blockedBy: T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 E（ADR 引用位与断链）：`docs/decisions/template.md` 的 `## Alternatives` 含 `tension_id` 引用位、以 `T-NNN` 指向同一特性计划记录且不复制字段内容、无承重记录时须写「无承重张力记录」加判定结论、指向不存在记录的引用经校验器的记录索引函数被判断链错误（夹具对：一份计划 + 一条不可解析的 `tension_id`）；同一夹具计划中每条记录的 `expected_sacrifice` 均可解析到一条已声明测量来源；跑出记录在案的失败运行
+- [X] T019 [US5] [blockedBy: T008] 红先行编写 `tests/contract/test_decision_tension_contract.py` 的场景 E（ADR 引用位与断链）：`docs/decisions/template.md` 的 `## Alternatives` 含 `tension_id` 引用位、以 `T-NNN` 指向同一特性计划记录且不复制字段内容、无承重记录时须写「无承重张力记录」加判定结论、指向不存在记录的引用经校验器的记录索引函数被判断链错误（夹具对：一份计划 + 一条不可解析的 `tension_id`）；同一夹具计划中每条记录的 `expected_sacrifice` 均可解析到一条已声明测量来源；跑出记录在案的失败运行
 
 ### Implementation for User Story 5
 
-- [ ] T020 [US5] [blockedBy: T019] 改写 `docs/decisions/template.md` 的 `## Alternatives`：增加 `tension_id` 引用位（`T-NNN` 指向同一特性计划中的记录、不复制任何字段内容），并写明无承重张力记录时须显式写「无承重张力记录」及判定结论而非留空；断链判定复用 `scripts/python/validate-decision-tensions.py` 的记录索引函数，不新写第二个解析器；`docs/` 不在镜像对内，本文件无副本 [green: contracts/adr-reference.md#C-1] [green: contracts/adr-reference.md#C-2]
+- [X] T020 [US5] [blockedBy: T019] 改写 `docs/decisions/template.md` 的 `## Alternatives`：增加 `tension_id` 引用位（`T-NNN` 指向同一特性计划中的记录、不复制任何字段内容），并写明无承重张力记录时须显式写「无承重张力记录」及判定结论而非留空；断链判定复用 `scripts/python/validate-decision-tensions.py` 的记录索引函数，不新写第二个解析器；`docs/` 不在镜像对内，本文件无副本 [green: contracts/adr-reference.md#C-1] [green: contracts/adr-reference.md#C-2]
 
 **Checkpoint**: US5 独立可验——三处（计划记录 / ADR 引用 / 测量来源）各自只是引用，断链报错。
 

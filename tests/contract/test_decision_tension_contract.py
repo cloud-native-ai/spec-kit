@@ -982,3 +982,331 @@ class TestScenarioCQuartetOwner:
         owner = norm(quartet_section())
         for key in QUARTET_KEYS:
             assert f"`{key}`" in owner, f"C-5: the owner does not define {key!r}"
+
+
+# --------------------------------------------------------------------------- #
+# Scenario D — non-load-bearing gating (T017)
+# --------------------------------------------------------------------------- #
+
+SPEC_DIR = ROOT / ".specify" / "specs" / "076-decision-tension-contract"
+ANALYZE_SNAPSHOT_DIR = SPEC_DIR / "notes" / "analyze-sc003"
+
+# The channel's four defect classes are the count surface for SC-003; ``dtr-anchor`` is not one of
+# them (it is the template-adjacency assertion, suppressed whenever the section is missing).
+SC003_CHANNEL_LABELS = (
+    "dtr-section-missing",
+    "dtr-record-incomplete",
+    "dtr-rejected-form",
+    "expected-sacrifice-unmapped",
+)
+
+# The four load-bearing triggers, spelled as the owner's threshold section spells them. A compliant
+# ``N/A`` must say, trigger by trigger, why that trigger does not hold.
+TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法原则相关")
+
+
+def validator_payload(spec_dir: Path) -> tuple[int, dict]:
+    """``(exit_code, full --json payload)`` — the record count is read, never re-derived."""
+    proc = run_validator(spec_dir)
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+        raise AssertionError(
+            f"validator --json did not print JSON; exit={proc.returncode} "
+            f"stdout={proc.stdout!r} stderr={proc.stderr!r}"
+        )
+    return proc.returncode, payload
+
+
+def label_counts(payload: dict) -> dict:
+    return {check["label"]: check["count"] for check in payload["checks"]}
+
+
+def write_sc003_snapshot(slug: str, fixture: str, spec_dir: Path, exit_code: int, payload: dict) -> Path:
+    """Archive one SC-003 analyze-channel snapshot; SC-003's HIGH count reads only these files.
+
+    The channel is a declared detection pass, not a program, so the run that produces its report is
+    this test: the snapshot carries the program's verdict verbatim (exit code, per-label counts,
+    record count) under the channel's four defect classes. Rendering is deterministic, so a re-run
+    refreshes it instead of accumulating near-duplicates.
+    """
+    counts = label_counts(payload)
+    high = sum(counts[label] for label in SC003_CHANNEL_LABELS)
+    lines = [
+        f"# SC-003 analyze snapshot — {slug}",
+        "",
+        f"- fixture: {fixture}",
+        "- judged artifact: `plan.md` under `REQUIREMENTS_DIR` (the channel's only object; "
+        "`requirements.md` is the mapping reference, never a second judged object)",
+        f"- validator: `scripts/python/validate-decision-tensions.py --spec <fixture> --json`",
+        f"- exit_code: {exit_code}",
+        f"- records: {payload['scanned']['records']}",
+        f"- HIGH findings: {high}",
+        "",
+        "| label | status | count |",
+        "|---|---|---|",
+    ]
+    for check in payload["checks"]:
+        lines.append(f"| `{check['label']}` | {check['status']} | {check['count']} |")
+    lines.append("")
+    target = ANALYZE_SNAPSHOT_DIR / f"{slug}.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("\n".join(lines), encoding="utf-8")
+    return target
+
+
+class TestScenarioDNonLoadBearingGating:
+    """US4: a trivial plan pays no ceremony, and the gate stays reachable when it stops being trivial.
+
+    SC-003 is read from exactly three snapshots (``notes/analyze-sc003/``): the compliant ``N/A``
+    run (0), the section-removed run (1) and the compliant-record run (0). The bare-``N/A`` case is
+    an ADDITIONAL assertion on the ``N/A`` criterion: it pins the rule, produces no snapshot and is
+    not part of the SC-003 triple.
+    """
+
+    # --- D-1 (SC-003 run 1) ------------------------------------------------
+
+    def test_d1_compliant_na_yields_zero_records_and_zero_findings(self, tmp_path):
+        plan_text = channel_plan(CHANNEL_NA)
+        # The fixture really is the declared shape: one line per trigger, each explaining why it
+        # does not hold — the criterion the checker must be able to read.
+        na_block = h2_section(plan_text, "## Decision Tensions")
+        assert "N/A" in na_block, "the fixture must carry the literal N/A"
+        assert "不成立" in norm(na_block), (
+            "D-1: a compliant N/A must state that the triggers do not hold"
+        )
+        for trigger in TRIGGERS:
+            assert trigger in na_block, (
+                f"D-1: the compliant N/A must justify the {trigger!r} trigger one by one"
+            )
+
+        spec = write_channel_spec(tmp_path / "d1-compliant-na", plan_text)
+        code, payload = validator_payload(spec)
+        counts = label_counts(payload)
+        assert payload["scanned"]["records"] == 0, (
+            f"D-1: a compliant N/A carries zero records; scanned={payload['scanned']!r}"
+        )
+        assert code == 0, f"D-1: a compliant N/A must exit 0; counts={counts!r}"
+        assert set(counts.values()) == {0}, (
+            f"D-1: a compliant N/A must produce zero findings; counts={counts!r}"
+        )
+
+        snapshot = write_sc003_snapshot(
+            "D-1-compliant-na", "trivial plan: N/A plus one line per trigger", spec, code, payload
+        )
+        assert snapshot.is_file(), "D-1's SC-003 snapshot must be archived"
+
+    # --- additional assertion (not part of the SC-003 triple) --------------
+
+    def test_bare_na_without_per_trigger_justification_is_a_missing_record(self, tmp_path):
+        spec = write_channel_spec(tmp_path / "bare-na", channel_plan("N/A\n"))
+        code, payload = validator_payload(spec)
+        counts = label_counts(payload)
+        assert code == 1, (
+            "a bare N/A claims 'no load-bearing decision' without the per-trigger justification, so "
+            f"it is treated as a missing record; counts={counts!r}"
+        )
+        assert counts["dtr-section-missing"] == 1, (
+            f"the bare N/A must be counted once as a missing record; counts={counts!r}"
+        )
+        assert sum(counts.values()) == 1, (
+            f"one root cause, one finding; counts={counts!r}"
+        )
+        assert payload["scanned"]["records"] == 0, (
+            f"a bare N/A still carries no record; scanned={payload['scanned']!r}"
+        )
+
+    # --- D-2 (SC-003 run 2) ------------------------------------------------
+
+    def test_d2_removing_the_section_reports_exactly_one_missing_section(self, tmp_path):
+        # The same fixture, now carrying a load-bearing decision (rollback requires a migration)
+        # whose record section is gone: fail-closed, the missing section is the single finding.
+        plan_text = CHANNEL_PLAN_HEAD + CHANNEL_PLAN_TAIL
+        assert "## Decision Tensions" not in plan_text, (
+            "D-2's whole point is the removed section"
+        )
+        spec = write_channel_spec(tmp_path / "d2-section-removed", plan_text)
+        code, payload = validator_payload(spec)
+        counts = label_counts(payload)
+        assert code == 1, f"D-2: a missing section must exit 1; counts={counts!r}"
+        assert counts["dtr-section-missing"] == 1, (
+            f"D-2: exactly one dtr-section-missing is reachable here; counts={counts!r}"
+        )
+        assert counts["dtr-anchor"] == 0, (
+            "D-2: the anchor assertion is suppressed when the section is missing — the three-line "
+            f"adjacency necessarily reds, and one root cause is counted once; counts={counts!r}"
+        )
+        assert sum(counts.values()) == 1, (
+            f"D-2: 'exactly 1 HIGH' must hold, not 'at least 1'; counts={counts!r}"
+        )
+
+        snapshot = write_sc003_snapshot(
+            "D-2-section-removed",
+            "trivial plan plus one irreversible decision (rollback requires a migration), "
+            "compliant N/A section removed",
+            spec, code, payload,
+        )
+        assert snapshot.is_file(), "D-2's SC-003 snapshot must be archived"
+
+    # --- D-3 (SC-003 run 3) ------------------------------------------------
+
+    def test_d3_writing_a_compliant_record_returns_to_zero(self, tmp_path):
+        # The repair path: one compliant record written where the N/A block stood.
+        plan_text = channel_plan(CHANNEL_RECORD)
+        assert "N/A" not in h2_section(plan_text, "## Decision Tensions"), (
+            "D-3 replaces the N/A block with a record; the two are mutually exclusive"
+        )
+        spec = write_channel_spec(tmp_path / "d3-compliant-record", plan_text)
+        code, payload = validator_payload(spec)
+        counts = label_counts(payload)
+        assert payload["scanned"]["records"] == 1, (
+            f"D-3: the repair writes exactly one record; scanned={payload['scanned']!r}"
+        )
+        assert code == 0, f"D-3: a compliant record must exit 0; counts={counts!r}"
+        assert set(counts.values()) == {0}, (
+            f"D-3: the repair returns to zero HIGH; counts={counts!r}"
+        )
+
+        snapshot = write_sc003_snapshot(
+            "D-3-compliant-record",
+            "same fixture with one compliant T-001 record written in place of the N/A block",
+            spec, code, payload,
+        )
+        assert snapshot.is_file(), "D-3's SC-003 snapshot must be archived"
+
+        # The missing-measurement-source branch is mechanical on the record count: with one record
+        # present, that record fails mapping; a compliant N/A (zero records) would not run mapping.
+        no_sources = write_channel_spec(
+            tmp_path / "d3-no-sources", plan_text, CHANNEL_REQUIREMENTS_NO_SOURCES
+        )
+        code_ns, payload_ns = validator_payload(no_sources)
+        counts_ns = label_counts(payload_ns)
+        assert code_ns == 1, "D-3: records without a declared source must fail mapping"
+        assert counts_ns["expected-sacrifice-unmapped"] == payload_ns["scanned"]["records"], (
+            "D-3: the branch is per record, not per plan; "
+            f"counts={counts_ns!r} scanned={payload_ns['scanned']!r}"
+        )
+
+
+# --------------------------------------------------------------------------- #
+# Scenario E — ADR reference slot and the dangling link (T019)
+# --------------------------------------------------------------------------- #
+
+ADR_TEMPLATE = ROOT / "docs" / "decisions" / "template.md"
+ADR_ALTERNATIVES = "## Alternatives"
+
+# The six record fields (plus the two pole lines) that the ADR slot MUST NOT reproduce: the ADR
+# points at the record, the record owns its fields.
+RECORD_FIELD_LINE_RE = re.compile(
+    r"^\s*[-*]\s+\*\*(decision|antithesis|binding_constraints|discriminating_evidence|"
+    r"expected_sacrifice|revision_trigger|pole_a|pole_b)\*\*\s*:"
+)
+
+
+def validator_module():
+    """The validator imported as a library — the record index is its exported surface (C-2)."""
+    spec = importlib.util.spec_from_file_location("_dt_validator_for_adr", VALIDATOR)
+    assert spec is not None and spec.loader is not None, f"cannot import {VALIDATOR}"
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+class TestScenarioEADRReferenceSlot:
+    """US5: the plan, the ADR and the measurement source reach each other and copy nothing.
+
+    Contract traceability: ``contracts/adr-reference.md`` C-1 (the slot) and C-2 (a dangling
+    reference is an error). C-2's call surface is declared: this class is the ONLY caller, and it
+    resolves the reference by importing the validator's ``index_records`` as a library call — the
+    feature adds no command and no second parser, and the analyze channel never scans
+    ``docs/decisions/``.
+    """
+
+    # --- C-1 --------------------------------------------------------------
+
+    def test_adr_alternatives_carries_tension_slot(self):
+        template = read(ADR_TEMPLATE)
+        section = h2_section(template, ADR_ALTERNATIVES)
+        joined = norm(section)
+
+        assert "tension_id" in section, (
+            "C-1: `## Alternatives` must carry a `tension_id` reference slot"
+        )
+        assert "T-NNN" in section, (
+            "C-1: the slot must be typed to the `T-NNN` record identifier"
+        )
+        assert "plan.md" in section, (
+            "C-1: the slot must point at the record in the same feature's plan"
+        )
+        assert "无承重张力记录" in section, (
+            "C-1: a decision without a load-bearing record must say so explicitly — "
+            "an empty slot is indistinguishable from a slot nobody examined"
+        )
+        assert ("判定结论" in joined) or ("threshold verdict" in joined), (
+            "C-1: the no-record disposition must require the threshold verdict, not just the phrase"
+        )
+
+        # No field content is copied: the section may not carry the record's field lines.
+        copied = [line for line in section.splitlines() if RECORD_FIELD_LINE_RE.match(line)]
+        assert copied == [], (
+            f"C-1: the ADR slot must not reproduce any record field; copied lines={copied!r}"
+        )
+
+    # --- C-2 --------------------------------------------------------------
+
+    def test_dangling_tension_id_is_an_error(self, tmp_path):
+        module = validator_module()
+        assert callable(getattr(module, "index_records", None)), (
+            "C-2: the validator must export its record-index function for the link check; "
+            "a second parser would be a second source of truth"
+        )
+
+        # The fixture pair: one plan carrying `T-001`, one ADR fragment pointing at `T-007`.
+        fixture = tmp_path / "adr-link"
+        fixture.mkdir(parents=True, exist_ok=True)
+        plan_text = channel_plan(CHANNEL_RECORD)
+        (fixture / "plan.md").write_text(plan_text, encoding="utf-8")
+        (fixture / "requirements.md").write_text(CHANNEL_REQUIREMENTS, encoding="utf-8")
+        adr_text = (
+            "# ADR-0001: fixture\n\n"
+            "- **Status:** Proposed\n"
+            "- **Date:** 2026-10-29\n\n"
+            "## Alternatives\n\n"
+            "- **tension_id:** `T-007` — deliberately unresolvable in this fixture plan.\n"
+        )
+        (fixture / "adr.md").write_text(adr_text, encoding="utf-8")
+
+        index = module.index_records((fixture / "plan.md").read_text(encoding="utf-8"))
+        assert "T-001" in index, (
+            f"C-2: the fixture plan's record must resolve; index keys={sorted(index)}"
+        )
+        dangling = re.search(r"`(T-\d{3})`", adr_text).group(1)
+        assert dangling not in index, (
+            "C-2: the fixture's reference must not resolve, otherwise it cannot discriminate"
+        )
+        # The broken link is an error, not a hint: the same call answers both directions.
+        broken = [identifier for identifier in (dangling,) if identifier not in index]
+        assert broken == [dangling], (
+            "C-2: an unresolvable `tension_id` must be reported as a broken link, never passed"
+        )
+
+        # The record's cost still resolves to a declared measurement source: the pair exercises the
+        # link only, not the mapping rule.
+        code, counts = verdict_of(fixture)
+        assert code == 0, f"C-2: the fixture plan itself is compliant; counts={counts!r}"
+        assert counts["expected-sacrifice-unmapped"] == 0, (
+            f"C-2: every record's expected_sacrifice must resolve; counts={counts!r}"
+        )
+
+        # No new command surface: the validator's CLI stays `--spec` / `--json`.
+        proc = subprocess.run(
+            [sys.executable, str(VALIDATOR), "--help"], capture_output=True, text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        assert "--spec" in proc.stdout and "--json" in proc.stdout, (
+            f"C-2: the CLI contract changed: {proc.stdout!r}"
+        )
+        assert "adr" not in proc.stdout.lower(), (
+            "C-2: a link-check command was added; the call surface is the contract test only"
+        )

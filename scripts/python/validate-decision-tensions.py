@@ -12,9 +12,12 @@ cross-label precedence is load-bearing):
   dtr-anchor                     the ``^## `` heading sequence contains the three consecutive
                                  entries ``## Constitution Check`` -> ``## Decision Tensions`` ->
                                  ``## Project Structure``
-  dtr-section-missing            the plan carries no ``## Decision Tensions`` section; when it is
-                                 missing, ``dtr-anchor`` is suppressed (the adjacency assertion
-                                 necessarily reds, and one root cause is counted once)
+  dtr-section-missing            the plan carries no ``## Decision Tensions`` section, or the
+                                 section carries no record while failing the ``N/A`` form (the
+                                 literal ``N/A`` plus one explanation per load-bearing trigger,
+                                 saying why that trigger does not hold). When it fires, ``dtr-anchor``
+                                 is suppressed (the adjacency assertion necessarily reds, and one
+                                 root cause is counted once)
   dtr-record-incomplete          a record does not carry each of the six field labels exactly
                                  once, or one of ``decision`` / ``antithesis`` /
                                  ``discriminating_evidence`` / ``revision_trigger`` is blank.
@@ -89,6 +92,14 @@ UNDECIDABLE_WORDING = ("要平衡", "综合考虑", "视情况而定")
 
 # The literal that rejects the record outright (STR-002); a blank value is judged the same way.
 NONE_LITERAL = "none"
+
+# The ``N/A`` form: when the section carries no record, it must carry the literal ``N/A`` plus one
+# explanation per load-bearing trigger, saying why that trigger does not hold. The trigger names are
+# the owner's (``shared/guidelines/decision-tension.md`` § 承重门槛) — this checker reads them, it
+# does not define them; extending the trigger set is an owner revision.
+NA_LITERAL = "N/A"
+NA_DOES_NOT_HOLD = "不成立"
+LOAD_BEARING_TRIGGERS = ("不可逆", "跨团队", "高爆炸半径", "与宪法原则相关")
 
 # The six field labels, verbatim; the field set is closed by the owner (FR-002).
 FIELD_NAMES = (
@@ -281,6 +292,32 @@ def parse_sacrifice(value):
     return "resolved", identifier
 
 
+def na_verdict(section_lines):
+    """Judge the ``N/A`` form of a section that carries no record; ``None`` means it holds.
+
+    FR-011 (a) is fail-closed in both directions: a section that carries neither a ``T-NNN`` record
+    nor the literal ``N/A`` is a missing record, and an ``N/A`` that does not justify the four
+    load-bearing triggers one by one is a missing record too. The criterion is mechanical — the
+    literal marker is present, the section says the triggers do not hold, and each trigger is named
+    on a line that carries an explanation of its own — so the checker never has to judge whether
+    the plan "really" contains a load-bearing decision (FR-011 forbids asking it to).
+    """
+    block = [line for line in section_lines if line.strip()]
+    if not any(line.strip().startswith(NA_LITERAL) for line in block):
+        return "carries neither a `T-NNN` record nor the literal `%s`" % NA_LITERAL
+    if not any(NA_DOES_NOT_HOLD in line for line in block):
+        return "`%s` does not state that the four triggers do not hold" % NA_LITERAL
+    unjustified = [
+        trigger for trigger in LOAD_BEARING_TRIGGERS
+        if not any(trigger in line and len(line.strip()) - len(trigger) >= 2 for line in block)
+    ]
+    if unjustified:
+        return "`%s` does not justify these triggers one by one: %s" % (
+            NA_LITERAL, "、".join(unjustified),
+        )
+    return None
+
+
 def measurement_sources(requirements_text):
     """The ``SC-NNN`` identifiers declared as ``**SC-NNN Source**`` in the requirements section.
 
@@ -394,6 +431,16 @@ def validate(spec):
             ))
         start, end = _section_bounds(lines, section_index)
         records = _records(lines, start, end)
+        if not records:
+            # No record: the section must declare the ``N/A`` form and justify it trigger by
+            # trigger. Anything else is the same defect class as a missing section (FR-011 (a)):
+            # a record-less plan that does not say why must not pass as a clean trivial plan.
+            na_detail = na_verdict(lines[start:end])
+            if na_detail is not None:
+                buckets["dtr-section-missing"].append(Finding(
+                    section_index + 1, "dtr-section-missing",
+                    "`%s` section %s" % (SECTION_HEADING, na_detail),
+                ))
 
     sources = measurement_sources(texts["requirements.md"])
 
