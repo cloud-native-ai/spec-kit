@@ -240,3 +240,77 @@ surfaces are a zero diff against the baseline commit, with a positive control sh
 
 **Premises**: the comparison is node-id set based, never count based; the baseline commit is the one
 the carrier names (`stage_base=33269994a`), not the current HEAD.
+
+---
+
+## refresh — mirror parity, command copies, and generator idempotency (executed 2026-10-29, T021–T022)
+
+T021 and T022 share this section (same evidence sink, run in row order).
+
+### T021 — the five edited sources and their `.specify/` projections
+
+```bash
+$ python3 scripts/python/sync-mirrors.py --write --only templates --only skills --only shared
+scope --only: templates, skills, shared
+ok    templates/ == .specify/templates/ (22 files)
+ok    shared/ == .specify/shared/ (59 files)
+rc=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (114 files)
+ok    shared/ == .specify/shared/ (59 files)
+rc=0
+
+# pair-by-pair, byte comparison (cmp -s: silent + rc 0 means identical)
+identical  skills/internal/create-team/SKILL.md                     <->  .specify/skills/internal/create-team/SKILL.md
+identical  skills/internal/create-team/references/conceptual-model.md <-> .specify/skills/internal/create-team/references/conceptual-model.md
+identical  skills/internal/run-agent/SKILL.md                       <->  .specify/skills/internal/run-agent/SKILL.md
+identical  shared/guidelines/proactive-trigger.md                   <->  .specify/shared/guidelines/proactive-trigger.md
+identical  templates/instructions-template.md                      <->  .specify/templates/instructions-template.md
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+```
+
+**Reading**: the `--write` pass wrote nothing — part 2 had already projected the three skill edits and
+the two other sourced files, and part 3 touched no framework source at all. `--check` is clean on all
+six pairs with the same file counts as the T001 baseline (22 / 406 / 136 / 3 / 114 / 59), so there is
+no new drift; the five `cmp` results are byte equality, not a summary of it. `regen-command-copies`
+still reporting `OK` is the proof that `templates/commands/**` was not touched (a changed command
+template would make at least one per-tool copy stale). No mirror was hand-edited.
+
+### T022 — the generator is idempotent and the four compatibility paths still resolve
+
+```bash
+$ sha256sum .specify/instructions.md          # the first generation (T015, committed)
+23aaf2684c7fab9f31846e930d0cdf0c7a9ada19a74547dcbdf349862cbbeebb
+
+$ bash scripts/bash/generate-instructions.sh
+...
+success Instructions generated/updated at .specify/instructions.md
+rc=0
+
+$ sha256sum .specify/instructions.md          # the second generation
+23aaf2684c7fab9f31846e930d0cdf0c7a9ada19a74547dcbdf349862cbbeebb
+
+$ git diff --stat -- .specify/instructions.md
+                                              # empty: byte-identical, zero working-tree change
+
+$ ls -l AGENTS.md CLAUDE.md QODER.md .github/copilot-instructions.md
+AGENTS.md                     -> .specify/instructions.md
+CLAUDE.md                     -> .specify/instructions.md
+QODER.md                      -> .specify/instructions.md
+.github/copilot-instructions.md -> ../.specify/instructions.md
+```
+
+**Reading**: two generations from the same template produce the same bytes (same sha256, empty diff),
+so the generator is idempotent over the section T013 added — a second run neither appends a duplicate
+nor rewrites a neighbour. The four compatibility symlinks still point at the live file and needed no
+repair; `git status --short` after the run lists no change outside the pre-existing dirty files, so the
+live instructions were never hand-edited.
