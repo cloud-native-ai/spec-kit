@@ -144,7 +144,83 @@ trigger
 The GATE-7 comparison is a **file-name set** diff (`comm -13`) over these two surfaces (plus the
 existing line-registry directory), never a line or directory count.
 
-## 7. What this file is not
+**Correction (recorded at T028)**: the line registry is environment-level (outside the repository, at
+`${XDG_STATE_HOME:-$HOME/.local/state}/spec-kit/lines`), so this capture does **not** hold a referent for
+it. T028 answered the same question by two measurements instead — every entry's mtime predates this
+stage, and no entry carries a slice-level id; both are in `../notes/quickstart-run.md` § Structure.
+
+## 7. Regression at implement close (task T029, 2026-10-29)
+
+The targeted program is the 13 files owned by `../test-evidence/targeted-set-v1-baseline.txt` plus this
+slice's 5 new modules. Full output is captured verbatim in `part5-regression.txt` (single-run capture, one
+file rather than a re-run); the failed-nodeid list is the designated sink `part5-failed.txt`.
+
+```console
+$ bash scripts/bash/run-tests.sh --names-out .specify/specs/074a-authorized-routing/notes/part5-failed.txt \
+    tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_neutral_metadata_schema.py \
+    tests/contract/test_tool_mapping.py tests/contract/test_neutral_vocabulary_scan.py \
+    tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_team_command_routing.py \
+    tests/contract/test_agent_chain_guards.py tests/contract/test_no_nested_skills.py \
+    tests/contract/test_goal_definition.py tests/contract/test_instructions_section_propagation.py \
+    tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py \
+    tests/contract/test_shipped_agent_presets.py tests/contract/test_sdd_authorization.py \
+    tests/contract/test_nested_sdd_invocation.py tests/contract/test_sdd_routing_definitions.py \
+    tests/contract/test_sdd_routing_engine.py tests/contract/test_sdd_invocation_governance.py
+tests/contract/test_sdd_authorization.py ...........                     [ 72%]
+tests/contract/test_nested_sdd_invocation.py .......................     [ 81%]
+tests/contract/test_sdd_routing_definitions.py ..............            [ 86%]
+tests/contract/test_sdd_routing_engine.py .....................          [ 93%]
+tests/contract/test_sdd_invocation_governance.py .................       [100%]
+
+============================= 277 passed in 24.04s =============================
+# failed-name list written: .specify/specs/074a-authorized-routing/notes/part5-failed.txt (0 entries)
+rc=0
+```
+
+277 = 191 (the 13 baseline files) + 34 (authorization 11 + nested invocation 23) + 14 (routing
+definitions) + 21 (routing engine) + 17 (invocation governance). The five new modules are green in full.
+
+### Name-level comparison (MUST be empty, and shown to be non-vacuous)
+
+```console
+$ comm -13 <(sort -u .specify/specs/074a-authorized-routing/notes/targeted-set-v1-failed.txt) \
+           <(sort -u .specify/specs/074a-authorized-routing/notes/part5-failed.txt)
+(no output)
+```
+
+Both sides are empty — T002's re-capture recorded `191 passed` with a 0-entry failed-name list — so this
+`comm` alone proves little. The instrument's non-vacuity is measured separately: the full-suite baseline
+does carry failures, and none of them lives in the 13 targeted files, which is why "0 now" is a real
+statement rather than an artefact of an empty set on both sides.
+
+```console
+$ wc -l < .specify/specs/074a-authorized-routing/baseline-failed.txt
+23
+$ grep -F -f <(printf '%s\n' tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_neutral_metadata_schema.py tests/contract/test_tool_mapping.py tests/contract/test_neutral_vocabulary_scan.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_team_command_routing.py tests/contract/test_agent_chain_guards.py tests/contract/test_no_nested_skills.py tests/contract/test_goal_definition.py tests/contract/test_instructions_section_propagation.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py tests/contract/test_shipped_agent_presets.py) \
+       .specify/specs/074a-authorized-routing/baseline-failed.txt | sort
+(no output)
+```
+
+The 23 pre-existing failures (all outside this slice's surface) are untouched, unfixed and unclaimed:
+their names still stand in `baseline-failed.txt`, and no targeted-set file is among them. The closure
+full-suite re-run belongs to the driver after review, not to this stage (its E2 slot was spent at
+implement start, `test-evidence/implement.jsonl` seq 1: `6361 passed / 23 failed`).
+
+### The classification-honesty audit is a declared handoff, not a green here
+
+T029 also lands the audit duty rather than the audit. `/speckit.review` is this slice's
+classification-honesty audit face: it re-checks every **declared** input's classification and records
+inconsistencies, and a nested run additionally gets the driver's own U4 independent verification. The
+engine's determinism covers only the declared inputs — it cannot audit whether a caller classified a
+change honestly — so audit conclusions are recorded in **review evidence** and MUST NOT be written back
+into a verdict (the owner document's § Verdict record forbids re-computing or overwriting a recorded
+decision: a user override and a re-judgement are recorded side by side, never merged).
+
+Status of that face at this point: **`not-evaluated`** — reason: the review stage has not run yet in the
+SDD loop (this stage is `implement`). No review evidence file exists for this slice, and this file does
+not stand in for one.
+
+## 8. What this file is not
 
 It records denominators only. The name-level test baseline is owned by
 `../test-evidence/targeted-set-v1-baseline.txt` (re-captured as T002) and the clause-coverage
