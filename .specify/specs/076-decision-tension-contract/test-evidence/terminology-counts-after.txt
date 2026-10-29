@@ -1,0 +1,34 @@
+# SC-007 — terminology counts AFTER implementation (three distribution trees)
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# baseline compared against: test-evidence/terminology-aliases-baseline.txt (2026-10-29, plan stage)
+# alias list: parsed from requirements.md § Assumptions A3 (owner), five terms
+
+== 1. per-alias counts (command form is the baseline's, one run per alias) ==
+$ grep -rF --include=*.md -- '<alias>' shared templates skills | wc -l
+矛盾论	       0
+主要矛盾	       0
+矛盾的主要方面	       0
+对抗性矛盾	       0
+矛盾转化条件	       0
+
+== 2. widened scan: every file (not just *.md) under the three trees, via the contract test ==
+$ pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioF
+...                                                                      [100%]
+3 passed, 31 deselected in 0.10s
+
+== 3. positive control — the A3 alias list still exists in the spec ==
+$ grep -nF -- '**A3（术语裁决）**' .specify/specs/076-decision-tension-contract/requirements.md
+42:- **A3（术语裁决）**：对外一律工程词——DTR、反题（antithesis）、反指标（落在 `expected_s
+A3 alias-list lines: 1
+alias tokens parsed from A3: 1 occurrence(s) of the full five-term run
+
+== 4. whitelist check — both places are OUTSIDE the three trees ==
+$ pytest -q ... -k 'ScenarioF and whitelist'
+.                                                                        [100%]
+1 passed, 33 deselected in 0.02s
+
+== 5. verdict ==
+five aliases x three trees = 0 hits (unchanged from the baseline table: all five were 0);
+A3 list still present and still five terms; owner shared/guidelines/decision-tension.md is
+inside the scanned surface and carries zero aliases (it is NOT whitelisted). SC-007 = 0.

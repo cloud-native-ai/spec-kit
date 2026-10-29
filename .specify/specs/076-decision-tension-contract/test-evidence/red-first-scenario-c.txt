@@ -1,0 +1,173 @@
+.................FFFFF                                                   [100%]
+=================================== FAILURES ===================================
+_________ TestScenarioCQuartetOwner.test_owner_declares_closed_quartet _________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x1094a0910>
+
+    def test_owner_declares_closed_quartet(self):
+>       section = quartet_section()
+                  ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:869: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+___________ TestScenarioCQuartetOwner.test_field_semantics_decidable ___________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x1094a0a50>
+
+    def test_field_semantics_decidable(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:898: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+________ TestScenarioCQuartetOwner.test_carrier_unchanged_no_new_store _________
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x1093bd350>
+
+    def test_carrier_unchanged_no_new_store(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+____ TestScenarioCQuartetOwner.test_disclosed_limitations_are_non_blocking _____
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x1093bd480>
+
+    def test_disclosed_limitations_are_non_blocking(self):
+>       joined = norm(quartet_section())
+                      ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:942: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+_______ TestScenarioCQuartetOwner.test_si3c_pointer_only_both_directions _______
+
+self = <contract.test_decision_tension_contract.TestScenarioCQuartetOwner object at 0x10936f2f0>
+
+    def test_si3c_pointer_only_both_directions(self):
+        workflow = norm(h3_section(read(WORKFLOW), SI3C_HEADING))
+        assert "shared/guidelines/critique-and-self-critique.md" in workflow, (
+            "C-5: SI-3C must reach the owner by path"
+        )
+        assert "falsification attempt" in workflow, (
+            "C-5: SI-3C must keep its step summary"
+        )
+        for key in QUARTET_KEYS:
+            assert f"{key}:" not in workflow, (
+                f"C-5: SI-3C restates the quartet field {key!r} — the owner defines it once"
+            )
+        for reason in (
+            "missing-field", "empty-field", "exit-code-not-integer",
+            "observation-not-raw", "tautology", "input-unreadable",
+        ):
+            assert reason not in workflow, (
+                f"C-5: SI-3C restates the rejection reason {reason!r}"
+            )
+        # The other direction: the owner does define them (a pointer with no target is a dead end).
+>       owner = norm(quartet_section())
+                     ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:982: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def quartet_section() -> str:
+        """The quartet sub-section inside the owner's output-form section.
+    
+        Located by content (all four literal keys), not by its heading wording: the heading is the
+        owner's to phrase, the field set is the contract's.
+        """
+        parent = h2_section(read(CRITIQUE), QUARTET_PARENT_HEADING)
+        blocks = re.split(r"(?m)^### ", parent)
+        for block in blocks[1:]:
+            if all(f"`{key}`" in block for key in QUARTET_KEYS):
+                return block
+>       raise AssertionError(
+            "the quartet sub-section is missing: no `### ` block under "
+            f"{QUARTET_PARENT_HEADING!r} names all four keys {QUARTET_KEYS!r}"
+        )
+E       AssertionError: the quartet sub-section is missing: no `### ` block under '## 输出形态:每个提案一条证伪尝试' names all four keys ('attempt', 'exit_code', 'observation', 'would_go_red_if')
+
+tests/contract/test_decision_tension_contract.py:853: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_owner_declares_closed_quartet
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_field_semantics_decidable
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_carrier_unchanged_no_new_store
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_disclosed_limitations_are_non_blocking
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioCQuartetOwner::test_si3c_pointer_only_both_directions
+5 failed, 17 passed in 1.08s

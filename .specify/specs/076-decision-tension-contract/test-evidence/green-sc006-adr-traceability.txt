@@ -1,0 +1,28 @@
+# SC-006 — ADR reference slot, cost resolution, and the dangling-link call surface
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# scenario E is the ONE declared call surface for the dangling-link check (FR-015): it imports
+# the validator's record index as a library call; no command was added and the analyze channel
+# never scans docs/decisions/.
+
+$ pytest -q tests/contract/test_decision_tension_contract.py -k ScenarioE
+rootdir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.14.1, typeguard-4.5.2
+collected 34 items / 32 deselected / 2 selected
+
+tests/contract/test_decision_tension_contract.py ..                      [100%]
+
+======================= 2 passed, 32 deselected in 0.15s =======================
+EXIT=0
+
+== the slot itself (docs/decisions/template.md § Alternatives) ==
+What other options were considered, and why were they rejected?
+
+- **tension_id:** `T-NNN` — the identifier of the Decision Tension Record that carries this
+  trade-off, in the same feature's `plan.md`. Write the identifier only: the record's fields and
+  their criteria stay in the plan (owner: `shared/guidelines/decision-tension.md`), and copying any
+  of them here would create a second definition point that drifts.
+- **No load-bearing record:** write the literal 无承重张力记录 plus the threshold verdict (why none
+  of the load-bearing triggers holds for this decision). Never leave the slot empty — an empty slot
+  cannot be told apart from a slot nobody examined.

@@ -1,0 +1,7 @@
+# remediation round (analyze #1) — verbatim run
+# command: python3 .specify/scripts/python/validate-tasks.py .specify/specs/076-decision-tension-contract/tasks.md
+# date: 2026-10-29
+
+PASS: .specify/specs/076-decision-tension-contract/tasks.md — 0 error(s), 0 warning(s)
+
+EXIT=0

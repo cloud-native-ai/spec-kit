@@ -100,10 +100,10 @@ Internal representations only — raw artifacts never appear in the output:
 
 ### 5. Detection passes
 
-Seven passes (A duplication · B ambiguity · C underspecification · D constitution alignment
-· E coverage gaps · F inconsistency · G feature relevance & accuracy) plus one checklist
-pass (H), the same-author delegation rule, the stale-copy decision test, and the
-do-not-flag noise floor:
+Eight passes (A duplication · B ambiguity · C underspecification · D constitution alignment
+· E coverage gaps · F inconsistency · G feature relevance & accuracy · I decision tension
+records) plus one checklist pass (H), the same-author delegation rule, the stale-copy decision
+test, and the do-not-flag noise floor:
 [`./references/detection-and-severity.md`](./references/detection-and-severity.md).
 
 **H — checklist accountability.** Every unchecked `[Gap]` item under

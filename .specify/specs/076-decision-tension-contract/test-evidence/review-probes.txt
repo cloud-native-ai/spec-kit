@@ -1,0 +1,123 @@
+# Review-stage probes — 076-decision-tension-contract
+
+Captured 2026-10-29 by the `/speckit.review` run (run id `r20261029T172918Z-076a`, stage `review`).
+Each probe is a **read-only** run of a shipped artifact against a fixture built outside the repo
+(`/tmp/dt-probe`), and each one exists because a shipped document and a shipped program disagree
+about the same rule. Nothing in the repository was modified to produce these outputs.
+
+Interpreter: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python` (the repo's own `.venv`
+carries no pytest, per `notes/pre-change-measurements.md`).
+
+## P-1 — a record written in the shape the owner and the plan template describe
+
+Fixture `a/plan.md`: `## Constitution Check` -> `## Decision Tensions` -> `### T-001` -> six lines of
+the form `- decision: ...` (plain bullet, field name **not** bolded), which is what
+`shared/guidelines/decision-tension.md` § 记录形态 (a field table, no line grammar) plus
+`templates/plan-template.md` ("its six fields are written in the owner's shape") actually describe.
+The fixture's `expected_sacrifice` is the valid closed form `SC-001 Source ↓ ...` and
+`a/requirements.md` declares `- **SC-001 Source**: ...`.
+
+```
+$ python3 scripts/python/validate-decision-tensions.py --spec a
+spec: a
+status: error
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] fail (1)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 22 lines, 1 record(s)
+9: dtr-record-incomplete: missing field label(s): decision, antithesis, binding_constraints, discriminating_evidence, expected_sacrifice, revision_trigger
+1 error(s), 0 warning(s)
+exit=1
+```
+
+Reading: the author wrote all six fields; the verdict says all six are missing, because the
+enforced grammar is `- **<field>**:` (`FIELD_RE`, `scripts/python/validate-decision-tensions.py:126`)
+and that bullet form is declared only in the plan-owned `data-model.md:32-48`.
+
+## P-2 — the `N/A` form written as one flat line naming the four triggers
+
+Fixture `b/plan.md`: `## Decision Tensions` contains exactly one sentence —
+`N/A — 不可逆、跨团队、高爆炸半径、与宪法原则相关四类触发均不成立。` — with no per-trigger
+justification.
+
+```
+$ python3 scripts/python/validate-decision-tensions.py --spec b
+spec: b
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 13 lines, 0 record(s)
+0 error(s), 0 warning(s)
+exit=0
+```
+
+Reading: `na_verdict` (`scripts/python/validate-decision-tensions.py:295-318`) accepts any line that
+contains a trigger plus ≥2 other characters, so a single sentence satisfies four "per-trigger"
+justifications at once. Both declared rules are stricter:
+`templates/plan-template.md` — "one line per trigger explaining why that trigger does not hold" —
+and `skills/internal/analyze-artifacts/references/detection-and-severity.md` — "a bare `N/A`
+carrying no one-line justification per load-bearing trigger".
+
+## P-3 — the section present but not the direct successor of `## Constitution Check`
+
+Fixture `c/plan.md`: `## Constitution Check` -> `## Project Structure` -> `## Decision Tensions`
+(with a compliant `N/A` body).
+
+```
+$ python3 scripts/python/validate-decision-tensions.py --spec c
+spec: c
+status: error
+  [dtr-anchor] fail (1)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 16 lines, 0 record(s)
+1: dtr-anchor: `## Decision Tensions` is not the direct successor of `## Constitution Check` followed by `## Project Structure`
+1 error(s), 0 warning(s)
+exit=1
+```
+
+Reading: `dtr-anchor` is the only label that fires, and the analyze channel's defect table
+(`detection-and-severity.md`, three rows over four of the six labels) has no class — therefore no
+severity — for it. The same holds for `dtr-tension-id`. A detector that renders only the table's
+classes reports 0 HIGH for a plan the program rejects.
+
+## P-4 — a compliant quartet written as a markdown bullet list
+
+Fixture `q-indented.md`:
+
+```
+# SI-4 dispatch payload
+
+## Falsification quartet
+
+- attempt: `pytest -q tests/contract/test_x.py`
+- exit_code: 0
+- observation: raw: 16 passed in 2.15s
+- would_go_red_if: 把 `input_a` 改坏，则 red: `test_x` 必须 FAILED
+```
+
+```
+$ python3 scripts/python/validate-falsification-quartet.py q-indented.md
+payload: q-indented.md
+status: rejected
+reason: missing-field
+detail: missing field: attempt (the quartet requires it once)
+exit=1
+```
+
+Reading: `KEY_RE` (`scripts/python/validate-falsification-quartet.py:64`) anchors the four literal
+keys at column 0. Neither owner states that: `shared/guidelines/critique-and-self-critique.md` says
+only "四个字面键各写一次,值取键后的同一行,或键下一行的缩进续行", and FR-021 pins only the value
+rule. A SI-4 dispatch payload is a markdown document, so a bullet list is the ordinary shape — and
+it is rejected as "no attempt", the worst available direction for a mechanism whose purpose is to
+tell "ran" from "claims it ran".

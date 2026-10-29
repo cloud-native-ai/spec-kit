@@ -1,0 +1,15 @@
+# remediation round (analyze #1) — verbatim run
+# command: python3 scripts/python/validate-requirements.py .specify/specs/076-decision-tension-contract/requirements.md
+# date: 2026-10-29
+
+file: .specify/specs/076-decision-tension-contract/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+scanned: 287 lines, 34 definition rows, 4 shared strings
+0 error(s), 0 warning(s)
+
+EXIT=0

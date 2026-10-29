@@ -1,0 +1,21 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___ TestScenarioEADRReferenceSlot.test_adr_alternatives_carries_tension_slot ___
+
+self = <contract.test_decision_tension_contract.TestScenarioEADRReferenceSlot object at 0x109984f50>
+
+    def test_adr_alternatives_carries_tension_slot(self):
+        template = read(ADR_TEMPLATE)
+        section = h2_section(template, ADR_ALTERNATIVES)
+        joined = norm(section)
+    
+>       assert "tension_id" in section, (
+            "C-1: `## Alternatives` must carry a `tension_id` reference slot"
+        )
+E       AssertionError: C-1: `## Alternatives` must carry a `tension_id` reference slot
+E       assert 'tension_id' in '\nWhat other options were considered, and why were they rejected?\n\n'
+
+tests/contract/test_decision_tension_contract.py:1233: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioEADRReferenceSlot::test_adr_alternatives_carries_tension_slot
+1 failed, 1 passed, 26 deselected in 0.18s

@@ -1,0 +1,89 @@
+# T024 — mirror closeout: --write then --check, per-pair byte comparison, instructions merge
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# baseline referent: test-evidence/sync-mirrors-check.txt (2026-10-29, plan stage: six pairs ok,
+# templates 22 / skills/external 406 / skills/internal 136 / agents 3 / scripts 115 / shared 59;
+# regen-command-copies --check OK).
+# Criterion is 「no NEW drift relative to that baseline」 — never the bare exit code, which an
+# unrelated pre-existing drift would also turn red.
+
+== 1. write pass (produces every .specify/ copy from the canonical sources) ==
+$ python3 scripts/python/sync-mirrors.py --write
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+EXIT=0
+
+== 2. check pass (read-only) ==
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+EXIT=0
+
+== 3. per-pair statement — every pair from requirements.md FR-025, plus the instructions template ==
+# (FR-025's table owns the row list; this section walks it in the table's order without
+#  restating its mechanism column.)
+$ cmp -s <source> <mirror>   # per file
+row 1  SAME (byte-identical, no drift) shared/guidelines/decision-tension.md
+row 2  SAME (byte-identical, no drift) shared/guidelines/critique-and-self-critique.md
+row 3  SAME (byte-identical, no drift) shared/workflow/self-improvement-workflow.md
+row 4  SAME (byte-identical, no drift) templates/plan-template.md
+row 4b SAME (byte-identical, no drift) templates/instructions-template.md
+row 5  SAME (byte-identical, no drift) skills/internal/analyze-artifacts/references/detection-and-severity.md
+row 5  SAME (byte-identical, no drift) skills/internal/analyze-artifacts/SKILL.md
+row 6  SAME (byte-identical, no drift) scripts/python/validate-decision-tensions.py
+row 7  SAME (byte-identical, no drift) scripts/python/validate-falsification-quartet.py
+
+== 4. command-copy surface ==
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+templates/commands/ untouched since the baseline: 0 diff lines
+per-tool command files added/removed since the baseline: 0 entries
+
+== 5. generate-instructions.sh — section-level non-destructive merge, actually run ==
+$ CWS_LIB_BASH_HOME=/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-bash bash scripts/bash/generate-instructions.sh
+sha256 BEFORE: 41fd81a0aa2fe8a031e26a137710c0ff2a73e22c42d5b6074f8b8e9f42395ca3  .specify/instructions.md
+--- script output (verbatim, section table trimmed to the two sections this feature touched) ---
+[2026-10-29 20:17:30][1551][INFO]Generating tool JSON manifests...
+[2026-10-29 20:17:32][1551][INFO]Backing up existing instructions to .specify/instructions.md-2026-10-29-201732
+[2026-10-29 20:17:32][1551][INFO]Existing instructions kept as the refresh base (not overwritten).
+[2026-10-29 20:17:32][1551][INFO]Section reconcile: live instructions already carry all template sections.
+[2026-10-29 20:17:32][1551][INFO]The /speckit.instructions command reconciles each section against current
+[2026-10-29 20:17:32][1551][INFO]project state and the latest template, and can recover content dropped by
+[2026-10-29 20:17:32][1551][INFO]older versions from the .specify/instructions.md-* backup history.
+warning Instructions size 43439 B has reached the 32768 B budget (over by 10671 B). Section table, largest first:
+| Task Complexity Rubric                          | 894    | 1208   | -314  | no          | no            |
+[2026-10-29 20:17:32][1551][INFO]Ensured project glossary at .specify/memory/glossary.md (non-destructive)
+[2026-10-29 20:17:32][1551][INFO]Updating symlinks for AI tools...
+success Instructions generated/updated at .specify/instructions.md
+EXIT=0
+sha256 AFTER : 41fd81a0aa2fe8a031e26a137710c0ff2a73e22c42d5b6074f8b8e9f42395ca3  .specify/instructions.md
+live .specify/instructions.md changed: NO (identical sha256 before and after)
+observed merge behaviour: existing sections are kept as the refresh base and are NEVER
+rewritten; the reconcile only injects template sections MISSING from the live file, and it
+reported 「live instructions already carry all template sections」. The section table's
+'Task Complexity Rubric' row (live 894 B vs template 1208 B, delta -314) is the measured
+proof: the live copy kept its own body, so the one-line pointer added to the TEMPLATE in T005
+is NOT pulled into an existing section. It rides in on the next full-section convergence of
+that section (or on a fresh 'specify init'), exactly as plan.md records.
+side effects (all gitignored, no tracked file changed): .specify/instructions.md-<timestamp>
+backup, .specify/tools/{system,shell,project}.json manifests.
+git status of tracked files after the run: only the feature's own edits (see commit).
+
+== 6. verdict ==
+All seven FR-025 pairs (nine files, two of them sharing row 5) are byte-identical to their
+canonical sources; regen-command-copies --check is OK with zero added/removed copies; the
+templates pair additionally covers templates/instructions-template.md. Per-pair drift
+relative to the plan baseline: NONE (every pair prints ok on both sides; the file counts
+moved 115->117 (scripts) and 59->60 (shared) because this feature ADDED files to those
+sources — a count change from added sources, not a DIFF line).

@@ -1,0 +1,12 @@
+# terminology baseline — internal aliases in the three distribution trees
+# date: 2026-10-29 (plan stage; MUST be re-measured after implementation, SC-007)
+# command: grep -rF --include=*.md -- '<alias>' shared templates skills | wc -l   (one run per alias)
+
+矛盾论	0
+主要矛盾	0
+矛盾的主要方面	0
+对抗性矛盾	0
+矛盾转化条件	0
+
+# positive control — the alias list itself still exists in the spec (Assumptions A3):
+requirements.md A3 alias-list lines: 1

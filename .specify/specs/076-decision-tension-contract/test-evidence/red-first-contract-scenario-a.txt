@@ -1,0 +1,252 @@
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+_ TestScenarioAOwnerAndTemplateAnchor.test_owner_declares_ownership_and_pointer_duty _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109bca850>
+
+    def test_owner_declares_ownership_and_pointer_duty(self):
+>       opening = norm("\n".join(read(OWNER).splitlines()[:14]))
+                                 ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_record_field_set_is_closed_six_plus_id _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109bcbd90>
+
+    def test_record_field_set_is_closed_six_plus_id(self):
+>       text = read(OWNER)
+               ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+____ TestScenarioAOwnerAndTemplateAnchor.test_admissibility_is_closed_four _____
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109ce8770>
+
+    def test_admissibility_is_closed_four(self):
+>       section = h2_section(read(OWNER), OWNER_SECTION_ADMISSIBILITY)
+                             ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+__ TestScenarioAOwnerAndTemplateAnchor.test_rejection_forms_closed_and_named ___
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109ce89d0>
+
+    def test_rejection_forms_closed_and_named(self):
+>       section = h2_section(read(OWNER), OWNER_SECTION_REJECTION)
+                             ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:173: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_load_bearing_threshold_four_triggers _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109c94830>
+
+    def test_load_bearing_threshold_four_triggers(self):
+>       joined = norm(h2_section(read(OWNER), OWNER_SECTION_THRESHOLD))
+                                 ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_complexity_gating_points_at_rubric __
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109c89590>
+
+    def test_complexity_gating_points_at_rubric(self):
+>       joined = norm(h2_section(read(OWNER), OWNER_SECTION_THRESHOLD))
+                                 ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+__ TestScenarioAOwnerAndTemplateAnchor.test_adjacent_owner_boundaries_by_path __
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109c897b0>
+
+    def test_adjacent_owner_boundaries_by_path(self):
+>       section = h2_section(read(OWNER), OWNER_SECTION_BOUNDARY)
+                             ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:238: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_owner_has_no_second_definition_or_carrier _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109cd1950>
+
+    def test_owner_has_no_second_definition_or_carrier(self):
+>       text = read(OWNER)
+               ^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:256: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md')
+
+    def read(path: Path) -> str:
+        """Read an artifact, failing as 'missing file' rather than as a wrong assertion."""
+>       assert path.is_file(), f"missing file: {path}"
+E       AssertionError: missing file: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/decision-tension.md').is_file
+
+tests/contract/test_decision_tension_contract.py:73: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_template_section_adjacent_to_constitution_check _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109cd1b50>
+
+    def test_template_section_adjacent_to_constitution_check(self):
+        headings = h2_headings(read(TEMPLATE))
+>       assert headings.count(TEMPLATE_SECTION) == 1, (
+            f"C-1: `{TEMPLATE_SECTION}` must appear exactly once; found "
+            f"{headings.count(TEMPLATE_SECTION)}"
+        )
+E       AssertionError: C-1: `## Decision Tensions` must appear exactly once; found 0
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x109e69540>('## Decision Tensions')
+E        +    where <built-in method count of list object at 0x109e69540> = ['## Summary', '## Technical Context', '## Constitution Check', '## Project Structure', '## Complexity Tracking', '## Phase 1: Design Artifacts Summary'].count
+
+tests/contract/test_decision_tension_contract.py:287: AssertionError
+____ TestScenarioAOwnerAndTemplateAnchor.test_template_carrier_and_na_rule _____
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109c5b6b0>
+
+    def test_template_carrier_and_na_rule(self):
+>       section = h2_section(read(TEMPLATE), TEMPLATE_SECTION)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →...n| [e.g. Contracts] | [`contracts/`] | [N files: names] |\n| [e.g. Quickstart] | [`quickstart.md`] | [N scenarios] |\n'
+heading = '## Decision Tensions'
+
+    def h2_section(text: str, heading: str) -> str:
+        """Body of an H2 section, up to the next H2 or EOF."""
+        m = re.search(rf"^{re.escape(heading)}\s*$(.*?)(?=^## |\Z)", text, re.M | re.S)
+>       assert m, f"missing H2 section: {heading}"
+E       AssertionError: missing H2 section: ## Decision Tensions
+E       assert None
+
+tests/contract/test_decision_tension_contract.py:89: AssertionError
+_ TestScenarioAOwnerAndTemplateAnchor.test_template_is_pointer_not_copy_and_path_resolves _
+
+self = <contract.test_decision_tension_contract.TestScenarioAOwnerAndTemplateAnchor object at 0x109c5b890>
+
+    def test_template_is_pointer_not_copy_and_path_resolves(self):
+>       section = h2_section(read(TEMPLATE), TEMPLATE_SECTION)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Implementation Plan: [SPEC]\n\n**Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]\n**Requirement →...n| [e.g. Contracts] | [`contracts/`] | [N files: names] |\n| [e.g. Quickstart] | [`quickstart.md`] | [N scenarios] |\n'
+heading = '## Decision Tensions'
+
+    def h2_section(text: str, heading: str) -> str:
+        """Body of an H2 section, up to the next H2 or EOF."""
+        m = re.search(rf"^{re.escape(heading)}\s*$(.*?)(?=^## |\Z)", text, re.M | re.S)
+>       assert m, f"missing H2 section: {heading}"
+E       AssertionError: missing H2 section: ## Decision Tensions
+E       assert None
+
+tests/contract/test_decision_tension_contract.py:89: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_owner_declares_ownership_and_pointer_duty
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_record_field_set_is_closed_six_plus_id
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_admissibility_is_closed_four
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_rejection_forms_closed_and_named
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_load_bearing_threshold_four_triggers
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_complexity_gating_points_at_rubric
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_adjacent_owner_boundaries_by_path
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_owner_has_no_second_definition_or_carrier
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_template_section_adjacent_to_constitution_check
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_template_carrier_and_na_rule
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioAOwnerAndTemplateAnchor::test_template_is_pointer_not_copy_and_path_resolves
+11 failed in 0.13s
+EXIT=1

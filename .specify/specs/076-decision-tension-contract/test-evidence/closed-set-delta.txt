@@ -1,0 +1,220 @@
+# T025 — final judgment: the two touched closed sets did not regress (SC-008)
+# feature: 076-decision-tension-contract
+# date: 2026-10-29
+# baseline referent: commit ac63fe8c (the plan-stage baseline named by FR-014 / FR-026).
+# comparison unit: paragraph; the allowed delta set is 「the new paragraph + the count line
+# the new channel forces to change」. Deleted or rewritten lines OUTSIDE that set must be 0.
+# Method is the scenario-G enumeration from tests/contract/test_decision_tension_contract.py;
+# this run reproduces it as a standalone read-only sweep so the line bodies are visible.
+
+```python
+#!/usr/bin/env python3
+"""T025 closed-set delta enumeration against baseline ac63fe8c (read-only).
+
+Same comparison unit as scenario G: ``git diff -U0`` line bodies per file, split into the
+declared allowed delta set and everything else. Prints the enumeration, then the item counts.
+"""
+import re
+import subprocess
+from pathlib import Path
+
+ROOT = Path("/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit")
+BASELINE = "ac63fe8c"
+
+FILES = {
+    "skills/internal/analyze-artifacts/references/detection-and-severity.md": "detection-and-severity.md",
+    "shared/guidelines/critique-and-self-critique.md": "critique-and-self-critique.md",
+}
+
+
+def read(rel: str) -> str:
+    return (ROOT / rel).read_text(encoding="utf-8")
+
+
+def show(rel: str) -> str:
+    return subprocess.run(["git", "show", f"{BASELINE}:{rel}"], cwd=ROOT,
+                          capture_output=True, text=True, check=True).stdout
+
+
+def delta(rel: str) -> tuple[list[str], list[str]]:
+    out = subprocess.run(["git", "diff", "--no-color", "-U0", BASELINE, "--", rel], cwd=ROOT,
+                         capture_output=True, text=True, check=True).stdout
+    removed, added = [], []
+    for line in out.splitlines():
+        if line.startswith("---") or line.startswith("+++") or line.startswith("@@"):
+            continue
+        if line.startswith("-"):
+            removed.append(line[1:])
+        elif line.startswith("+"):
+            added.append(line[1:])
+    return removed, added
+
+
+def section(text: str, heading: str, stop_at_h3: bool) -> list[str]:
+    lines = text.splitlines()
+    start = lines.index(heading)
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## ") or (stop_at_h3 and lines[index].startswith("### ")):
+            end = index
+            break
+    return lines[start:end]
+
+
+def bullets(text: str, heading: str) -> list[str]:
+    body = section(text, heading, stop_at_h3=True)
+    return [line for line in body if line.startswith("- ")]
+
+
+def consumer_rows(text: str, heading: str) -> list[str]:
+    body = section(text, heading, stop_at_h3=True)
+    rows = [line for line in body if line.strip().startswith("|")]
+    return [row for row in rows if "---" not in row][1:]
+
+
+total_outside = 0
+for rel, label in FILES.items():
+    removed, added = delta(rel)
+    now = read(rel)
+    base = show(rel)
+
+    if "detection" in label:
+        allowed_removed = ["## The seven passes"]
+        allowed_added = ["## The eight passes"] + section(
+            now, "### I. Decision Tension records", stop_at_h3=True)
+    else:
+        allowed_removed = []
+        allowed_added = section(now, "### 产出形态:四元组(封闭四字段)", stop_at_h3=False)
+
+    outside_removed = [line for line in removed if line not in allowed_removed]
+    outside_added = [line for line in added if line not in allowed_added]
+    total_outside += len(outside_removed) + len(outside_added)
+
+    print(f"## {rel}")
+    print(f"   removed lines: {len(removed)}  (inside the allowed set: "
+          f"{len(removed) - len(outside_removed)}, outside: {len(outside_removed)})")
+    for line in removed:
+        print(f"     -{'IN ' if line in allowed_removed else 'OUT'} {line!r}")
+    print(f"   added lines  : {len(added)}  (inside the allowed set: "
+          f"{len(added) - len(outside_added)}, outside: {len(outside_added)})")
+    for line in added:
+        print(f"     +{'IN ' if line in allowed_added else 'OUT'} {line!r}")
+    print()
+
+print("## item counts (must not fall below the baseline)")
+crit_base, crit_now = show("shared/guidelines/critique-and-self-critique.md"), read("shared/guidelines/critique-and-self-critique.md")
+for heading in ("### 拒绝形态(封闭清单,命中即拒)", "## 边界(本纪律不做什么)"):
+    b, c = bullets(crit_base, heading), bullets(crit_now, heading)
+    print(f"   {heading}: baseline {len(b)} -> current {len(c)}   "
+          f"{'NO REGRESSION' if len(c) >= len(b) and c[:len(b)] == b else 'REGRESSION'}")
+b, c = consumer_rows(crit_base, "## 消费者清单"), consumer_rows(crit_now, "## 消费者清单")
+print(f"   ## 消费者清单 data rows: baseline {len(b)} -> current {len(c)}   "
+      f"{'NO REGRESSION' if len(c) >= len(b) and c[:len(b)] == b else 'REGRESSION'}")
+
+det_base = show("skills/internal/analyze-artifacts/references/detection-and-severity.md")
+det_now = read("skills/internal/analyze-artifacts/references/detection-and-severity.md")
+letters_b = re.findall(r"(?m)^### ([A-Z])\. ", det_base)
+letters_c = re.findall(r"(?m)^### ([A-Z])\. ", det_now)
+print(f"   pass sections: baseline {letters_b} -> current {letters_c}   "
+      f"{'NO REGRESSION' if set(letters_b) <= set(letters_c) else 'REGRESSION'}")
+dnf_b = bullets(det_base, "## DO-NOT-FLAG list (noise control — do not report these at any severity)")
+dnf_c = bullets(det_now, "## DO-NOT-FLAG list (noise control — do not report these at any severity)")
+print(f"   DO-NOT-FLAG items: baseline {len(dnf_b)} -> current {len(dnf_c)}   "
+      f"{'NO REGRESSION' if len(dnf_c) >= len(dnf_b) else 'REGRESSION'}")
+sev_b = [v for v in ("CRITICAL", "HIGH", "MEDIUM", "LOW") if f"**{v}**" in det_base]
+sev_c = [v for v in ("CRITICAL", "HIGH", "MEDIUM", "LOW") if f"**{v}**" in det_now]
+print(f"   severity value domain: baseline {len(sev_b)} values -> current {len(sev_c)} values   "
+      f"{'PRESERVED' if sev_b == sev_c else 'REGRESSION'}")
+print()
+print(f"## VERDICT")
+print(f"   deleted or rewritten lines outside the allowed delta set: {total_outside}   (must be 0)")
+print(f"   SC-008: {'PASS' if total_outside == 0 else 'FAIL'}")
+```
+
+== run: /Users/liuqiming.lqm/project/profiles/.venv/bin/python ~/tmp/076-delta/enumerate.py ==
+## skills/internal/analyze-artifacts/references/detection-and-severity.md
+   removed lines: 1  (inside the allowed set: 1, outside: 0)
+     -IN  '## The seven passes'
+   added lines  : 37  (inside the allowed set: 37, outside: 0)
+     +IN  '## The eight passes'
+     +IN  '### I. Decision Tension records'
+     +IN  ''
+     +IN  'Judged object: **exactly one artifact** — the `plan.md` under the `REQUIREMENTS_DIR` resolved by'
+     +IN  'the prerequisite script. The `requirements.md` in the same directory is a mapping reference and'
+     +IN  "is never a second judged object. The channel MUST NOT open any other feature directory's"
+     +IN  '`plan.md`: a plan outside `REQUIREMENTS_DIR` will produce no finding at all. In-scope historical'
+     +IN  'plans written before this channel existed are NOT exempt — a missing section is reported, and'
+     +IN  'the remedy is to add it.'
+     +IN  ''
+     +IN  'Record shape, admissibility criteria, rejection forms and the load-bearing threshold are owned by'
+     +IN  '`shared/guidelines/decision-tension.md` — read that owner; do not restate its tables here.'
+     +IN  ''
+     +IN  'Three defect classes, each **HIGH**. The value domain is HIGH or 0 — there is **no advisory or'
+     +IN  'downgrade tier**, and the detector MUST NOT be asked to decide whether the plan holds a'
+     +IN  'load-bearing decision: a missing record is judged fail-closed.'
+     +IN  ''
+     +IN  '| Defect class | Validator label(s) | Severity |'
+     +IN  '|--------------|--------------------|----------|'
+     +IN  '| No record — the `## Decision Tensions` section is absent, or present with a bare `N/A` carrying no one-line justification per load-bearing trigger | `dtr-section-missing` | HIGH |'
+     +IN  '| Incomplete record — a field label missing or blank, a single-pole `binding_constraints`, an empty `expected_sacrifice` or the literal `none` | `dtr-record-incomplete`, `dtr-rejected-form` | HIGH |'
+     +IN  '| Unmappable cost — `expected_sacrifice` does not resolve to a declared measurement source | `expected-sacrifice-unmapped` | HIGH |'
+     +IN  ''
+     +IN  'When `requirements.md` has no measurement-source section, branch mechanically on the record'
+     +IN  'count: one or more records fail mapping one by one; a compliant `N/A` with zero records produces'
+     +IN  'zero findings.'
+     +IN  ''
+     +IN  'Severity: the propagation-surface criterion owned by'
+     +IN  '`.specify/shared/workflow/objective-analysis-gate.md` — no new severity level, score or maturity'
+     +IN  'verdict. Every finding names its propagation surface as its FIRST field, namely the plan flowing'
+     +IN  'into tasks and implementation (`计划 → 任务 / 实现`).'
+     +IN  ''
+     +IN  'Deterministic verdicts: every mechanically decidable part — field presence, enumerated values,'
+     +IN  'reference resolution — is printed by `scripts/python/validate-decision-tensions.py`, whose'
+     +IN  '`--json` `checks` array carries the per-label counts. Consume that verdict; MUST NOT re-score the'
+     +IN  'record semantically, and MUST NOT turn a label count into a percentage or a maturity score.'
+     +IN  ''
+
+## shared/guidelines/critique-and-self-critique.md
+   removed lines: 0  (inside the allowed set: 0, outside: 0)
+   added lines  : 18  (inside the allowed set: 18, outside: 0)
+     +IN  '### 产出形态:四元组(封闭四字段)'
+     +IN  ''
+     +IN  '证伪尝试的**产出形态**就是下面这个四元组:四个字面键各写一次,值取键后的同一行,或键下一行的缩进续行。'
+     +IN  ''
+     +IN  '- `attempt` —— 一条命令、grep、测试或测量,一位复核者能从仓库根**可原样重放**。脚本对它的判定**只判非空**:重放与可重放性属 SI-6 与复核者,**MUST NOT 判其可否重放**(所以拒收原因集里没有「不可重放」这一类)。'
+     +IN  '- `exit_code` —— 一个**整数**(`0` 合法);非整数即拒收。'
+     +IN  '- `observation` —— 原样摘录的运行输出,值以字面 `raw:` 起头。该标记是「非转述」的机械代理:没有标记就说明写的是转述,不是输出。'
+     +IN  '- `would_go_red_if` —— **两半**形状,以**第一次出现**的字面 `red:` 切分(后续 `red:` 不移动切分点):切分点之前至少一个**反引号跨度**,即被改坏的具名输入;切分点之后至少一个反引号跨度,即断言名 / 检查标签 / 非零退出码之一。缺标记或缺任一半,即判为反空真失败(空真)。'
+     +IN  ''
+     +IN  '**字段集合封闭**:新增、改名或删除字段 MUST 走本文件修订,MUST NOT 在消费点就地扩展。四元组记在提案**已有的载体**上——SI-4 派发载荷与 SI-7 intervention 记录;MUST NOT 新建台账、存储、probe 或评分。'
+     +IN  ''
+     +IN  '**两处已披露限制及其处置**:'
+     +IN  ''
+     +IN  '1. `raw:` 标记**可被伪造**——脚本只判标记在不在,判不了摘录是否被改写;'
+     +IN  '2. `red:` 信号的真实性**不可证**——形状成立只说明两半都写了,并不说明把具名输入改坏之后信号真的会变红。'
+     +IN  ''
+     +IN  '两处都由**复核者**在评审时发现,只记**非阻断注记**,**不进程序判决**,也不构成拒收理由——把它们写进判决,等于用一个判不了的命题去否决一个可判的判决。'
+     +IN  ''
+
+## item counts (must not fall below the baseline)
+   ### 拒绝形态(封闭清单,命中即拒): baseline 4 -> current 4   NO REGRESSION
+   ## 边界(本纪律不做什么): baseline 6 -> current 6   NO REGRESSION
+   ## 消费者清单 data rows: baseline 4 -> current 4   NO REGRESSION
+   pass sections: baseline ['A', 'B', 'C', 'D', 'E', 'F', 'G'] -> current ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'I']   NO REGRESSION
+   DO-NOT-FLAG items: baseline 6 -> current 6   NO REGRESSION
+   severity value domain: baseline 4 values -> current 4 values   PRESERVED
+
+## VERDICT
+   deleted or rewritten lines outside the allowed delta set: 0   (must be 0)
+   SC-008: PASS
+EXIT=0
+
+== conclusion ==
+detection-and-severity.md: 1 removed line + 37 added lines; the removed line is the count
+heading the new channel forces to change, and all 37 added lines are the new channel section
+plus that heading. Set-external deletions/rewrites = 0.
+critique-and-self-critique.md: 0 removed lines, 18 added lines, all belonging to the single
+appended quartet subsection. Set-external deletions/rewrites = 0.
+Item counts: rejection forms 4 -> 4, boundary declarations 6 -> 6, consumer-list rows 4 -> 4,
+pass sections A-G -> A-G+I (superset), DO-NOT-FLAG items 6 -> 6, severity value domain 4 -> 4.
+SC-008 = PASS.

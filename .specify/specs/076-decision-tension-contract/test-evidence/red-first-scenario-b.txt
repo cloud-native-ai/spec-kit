@@ -1,0 +1,159 @@
+...........FFFFF                                                         [100%]
+=================================== FAILURES ===================================
+_ TestScenarioBAnalyzeStructuralChannel.test_channel_scope_is_one_plan_artifact _
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x10bb14690>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1585/test_channel_scope_is_one_plan0')
+
+    def test_channel_scope_is_one_plan_artifact(self, tmp_path):
+>       section = norm(channel_section())
+                       ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def channel_section() -> str:
+        """The channel's own level-3 section — the only region this scenario judges."""
+        text = read(ANALYZE_DETECTION)
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith(CHANNEL_HEADING):
+                start = index
+                break
+>       assert start is not None, (
+            f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+            f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+        )
+E       AssertionError: the structural channel section (### I.) is not declared in skills/internal/analyze-artifacts/references/detection-and-severity.md
+E       assert None is not None
+
+tests/contract/test_decision_tension_contract.py:439: AssertionError
+_ TestScenarioBAnalyzeStructuralChannel.test_three_defect_classes_fail_closed_no_advisory _
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x10bb147d0>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1585/test_three_defect_classes_fail0')
+
+    def test_three_defect_classes_fail_closed_no_advisory(self, tmp_path):
+>       section = norm(channel_section())
+                       ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:576: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def channel_section() -> str:
+        """The channel's own level-3 section — the only region this scenario judges."""
+        text = read(ANALYZE_DETECTION)
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith(CHANNEL_HEADING):
+                start = index
+                break
+>       assert start is not None, (
+            f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+            f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+        )
+E       AssertionError: the structural channel section (### I.) is not declared in skills/internal/analyze-artifacts/references/detection-and-severity.md
+E       assert None is not None
+
+tests/contract/test_decision_tension_contract.py:439: AssertionError
+_ TestScenarioBAnalyzeStructuralChannel.test_requirements_without_measurement_sources_branches_on_record_count _
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x10b694fc0>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1585/test_requirements_without_meas0')
+
+    def test_requirements_without_measurement_sources_branches_on_record_count(self, tmp_path):
+>       section = norm(channel_section())
+                       ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:639: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def channel_section() -> str:
+        """The channel's own level-3 section — the only region this scenario judges."""
+        text = read(ANALYZE_DETECTION)
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith(CHANNEL_HEADING):
+                start = index
+                break
+>       assert start is not None, (
+            f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+            f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+        )
+E       AssertionError: the structural channel section (### I.) is not declared in skills/internal/analyze-artifacts/references/detection-and-severity.md
+E       assert None is not None
+
+tests/contract/test_decision_tension_contract.py:439: AssertionError
+_ TestScenarioBAnalyzeStructuralChannel.test_severity_follows_propagation_surface _
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x10b6950f0>
+
+    def test_severity_follows_propagation_surface(self):
+        assert ANALYSIS_GATE.is_file(), f"missing severity owner: {ANALYSIS_GATE}"
+        gate = norm(read(ANALYSIS_GATE))
+        assert "propagation-surface" in gate and "FIRST field" in gate, (
+            "C-3: the gate owner must still carry the propagation-surface criterion"
+        )
+    
+>       section = norm(channel_section())
+                       ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:681: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def channel_section() -> str:
+        """The channel's own level-3 section — the only region this scenario judges."""
+        text = read(ANALYZE_DETECTION)
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith(CHANNEL_HEADING):
+                start = index
+                break
+>       assert start is not None, (
+            f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+            f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+        )
+E       AssertionError: the structural channel section (### I.) is not declared in skills/internal/analyze-artifacts/references/detection-and-severity.md
+E       assert None is not None
+
+tests/contract/test_decision_tension_contract.py:439: AssertionError
+__ TestScenarioBAnalyzeStructuralChannel.test_verdicts_come_from_the_program ___
+
+self = <contract.test_decision_tension_contract.TestScenarioBAnalyzeStructuralChannel object at 0x10b64b410>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1585/test_verdicts_come_from_the_pr0')
+
+    def test_verdicts_come_from_the_program(self, tmp_path):
+>       section = norm(channel_section())
+                       ^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_contract.py:698: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def channel_section() -> str:
+        """The channel's own level-3 section — the only region this scenario judges."""
+        text = read(ANALYZE_DETECTION)
+        lines = text.splitlines()
+        start = None
+        for index, line in enumerate(lines):
+            if line.startswith(CHANNEL_HEADING):
+                start = index
+                break
+>       assert start is not None, (
+            f"the structural channel section ({CHANNEL_HEADING}) is not declared in "
+            f"{ANALYZE_DETECTION.relative_to(ROOT)}"
+        )
+E       AssertionError: the structural channel section (### I.) is not declared in skills/internal/analyze-artifacts/references/detection-and-severity.md
+E       assert None is not None
+
+tests/contract/test_decision_tension_contract.py:439: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_scope_is_one_plan_artifact
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_three_defect_classes_fail_closed_no_advisory
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_requirements_without_measurement_sources_branches_on_record_count
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_severity_follows_propagation_surface
+FAILED tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_verdicts_come_from_the_program
+5 failed, 11 passed in 0.13s

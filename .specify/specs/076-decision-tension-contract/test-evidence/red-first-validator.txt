@@ -1,0 +1,877 @@
+FFFFFFFFFFFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+_______________________ test_cli_contract_and_exit_codes _______________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_cli_contract_and_exit_cod0')
+
+    def test_cli_contract_and_exit_codes(tmp_path):
+        spec = write_spec(tmp_path, plan(VALID_RECORD))
+    
+        ok = run(spec)
+>       assert ok.returncode == 0, f"compliant plan must exit 0:\n{ok.stdout}\n{ok.stderr}"
+E       AssertionError: compliant plan must exit 0:
+E         
+E         /opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n").returncode
+
+tests/contract/test_decision_tension_validator.py:167: AssertionError
+__________________ test_label_set_closed_and_dedup_precedence __________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_label_set_closed_and_dedu0')
+
+    def test_label_set_closed_and_dedup_precedence(tmp_path):
+>       compliant = run(write_spec(tmp_path / "a", plan(VALID_RECORD)))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_decision_tension_validator.py:120: in write_spec
+    spec.mkdir()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_label_set_closed_and_dedu0/a/spec')
+mode = 511, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_label_set_closed_and_dedu0/a/spec'
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py:1011: FileNotFoundError
+_________________ test_anchor_requires_three_adjacent_headings _________________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_anchor_requires_three_adj0')
+
+    def test_anchor_requires_three_adjacent_headings(tmp_path):
+        # Section present, but placed after `## Project Structure` — the sequence is not adjacent.
+        moved = PLAN_HEAD + PLAN_TAIL + "\n## Decision Tensions\n\n" + VALID_RECORD
+        proc = run(write_spec(tmp_path, moved), "--json")
+>       counts = counts_of(payload_of(proc))
+                           ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+_______________________ test_output_shape_human_and_json _______________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_output_shape_human_and_js0')
+
+    def test_output_shape_human_and_json(tmp_path):
+        spec = write_spec(tmp_path, plan(VALID_RECORD))
+        human = run(spec).stdout
+>       assert re.search(r"(?m)^status: ok$", human), human
+E       AssertionError: 
+E       assert None
+E        +  where None = <function search at 0x101130250>('(?m)^status: ok$', '')
+E        +    where <function search at 0x101130250> = re.search
+
+tests/contract/test_decision_tension_validator.py:258: AssertionError
+________________ test_inverse_samples_turn_red[delete-decision] ________________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_0')
+mutate = <function <lambda> at 0x10816ab90>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+_______________ test_inverse_samples_turn_red[delete-antithesis] _______________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_1')
+mutate = <function <lambda> at 0x10816ac40>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+__________ test_inverse_samples_turn_red[delete-binding_constraints] ___________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_2')
+mutate = <function <lambda> at 0x10816acf0>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+________ test_inverse_samples_turn_red[delete-discriminating_evidence] _________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_3')
+mutate = <function <lambda> at 0x10816ada0>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+___________ test_inverse_samples_turn_red[delete-expected_sacrifice] ___________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_4')
+mutate = <function <lambda> at 0x10816ae50>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+____________ test_inverse_samples_turn_red[delete-revision_trigger] ____________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_5')
+mutate = <function <lambda> at 0x10816af00>, label = 'dtr-record-incomplete'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+________________ test_inverse_samples_turn_red[sacrifice-none] _________________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_6')
+mutate = <function <lambda> at 0x10816afb0>, label = 'dtr-rejected-form'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+______________ test_inverse_samples_turn_red[undecidable-wording] ______________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_7')
+mutate = <function <lambda> at 0x10816b060>, label = 'dtr-rejected-form'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+_____________ test_inverse_samples_turn_red[duplicate-tension-id] ______________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_8')
+mutate = <function <lambda> at 0x10816b110>, label = 'dtr-tension-id'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+______________ test_inverse_samples_turn_red[skipped-tension-id] _______________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_9')
+mutate = <function <lambda> at 0x10816b1c0>, label = 'dtr-tension-id'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+__________ test_inverse_samples_turn_red[unmapped-measurement-source] __________
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+>           return json.loads(proc.stdout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x1062e7620>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py:363: JSONDecodeError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1557/test_inverse_samples_turn_red_10')
+mutate = <function <lambda> at 0x10816b270>
+label = 'expected-sacrifice-unmapped'
+
+    @pytest.mark.parametrize("mutate,label", INVERSE_SAMPLES)
+    def test_inverse_samples_turn_red(tmp_path, mutate, label):
+        proc = run(write_spec(tmp_path, mutate()), "--json")
+>       payload = payload_of(proc)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n")
+
+    def payload_of(proc: subprocess.CompletedProcess) -> dict:
+        try:
+            return json.loads(proc.stdout)
+        except json.JSONDecodeError:  # pragma: no cover - surfaced as a readable failure
+>           raise AssertionError(
+                f"--json did not print JSON; exit={proc.returncode} stdout={proc.stdout!r} "
+                f"stderr={proc.stderr!r}"
+            )
+E           AssertionError: --json did not print JSON; exit=2 stdout='' stderr="/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_decision_tension_validator.py:138: AssertionError
+________________ test_record_index_exported_for_adr_link_check _________________
+
+    def test_record_index_exported_for_adr_link_check():
+>       module = load_module()
+                 ^^^^^^^^^^^^^
+
+tests/contract/test_decision_tension_validator.py:335: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def load_module():
+        """Import the real checker as a library — never a re-implementation of its parser."""
+>       assert VALIDATOR.is_file(), f"missing artifact: {VALIDATOR}"
+E       AssertionError: missing artifact: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/python/validate-decision-tensions.py').is_file
+
+tests/contract/test_decision_tension_validator.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_decision_tension_validator.py::test_cli_contract_and_exit_codes
+FAILED tests/contract/test_decision_tension_validator.py::test_label_set_closed_and_dedup_precedence
+FAILED tests/contract/test_decision_tension_validator.py::test_anchor_requires_three_adjacent_headings
+FAILED tests/contract/test_decision_tension_validator.py::test_output_shape_human_and_json
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-decision]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-antithesis]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-binding_constraints]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-discriminating_evidence]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-expected_sacrifice]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[delete-revision_trigger]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[sacrifice-none]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[undecidable-wording]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[duplicate-tension-id]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[skipped-tension-id]
+FAILED tests/contract/test_decision_tension_validator.py::test_inverse_samples_turn_red[unmapped-measurement-source]
+FAILED tests/contract/test_decision_tension_validator.py::test_record_index_exported_for_adr_link_check
+16 failed in 0.93s
+EXIT=1
