@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: implement
-stage_started_at: 1793302745
-stage_deadline_epoch: 1793308145
-stage_base_commit: f5835e0e
+stage: review
+stage_started_at: 1793303420
+stage_deadline_epoch: 1793308820
+stage_base_commit: 0abf94c3
 attempt: 0
 retry_limit: 2
-last_verdict: implement P3 DONE — T016–T022 闭合（`0fb8a2bf` + `f5835e0e`）；22/28；驱动契约 33 passed + 邻近 411；零新增机制（差分空 / 确认门 27=27）；镜像六对 ok；下一步 P4（T023–T028）
+last_verdict: implement DONE — 28/28 任务（4 段）；Feature 077 = Implemented；8 SC 状态行（4 pass / 4 partial，partial 均需真实表达类试点线）；174 定向测试；零新增机制；镜像与副本 clean；下一步 review
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -153,6 +153,15 @@ last_verdict: implement P3 DONE — T016–T022 闭合（`0fb8a2bf` + `f5835e0e`
 - 零新增机制：命令 27/27 差分 `[]`、依赖 6/6、进程 19/19、服务空集、确认门 27=27、FACES 仍四面
 - 门：validate-tasks PASS；镜像六对 ok；命令副本 OK
 - 偏差：证据文件双轨命名（四份并存）；五次同趟断言对齐；T018 以新增 H3 落位，未改既有清单
+
+### implement P4 — DONE（2026-10-30）
+
+- 提交：`0abf94c3`；T023–T028 闭合（28/28，0 `[ ]` / 0 `[~]`）
+- 两态等价：35 文件剥离后逐字回基线；owner 追加 +28/−0，11 个禁动章节逐字节相同；069 六份规格 diff 空
+- SC：SC-001/004/006/007 = pass；SC-002/003/005/008 = **partial**（均需一条真实表达类试点线；每条 note 写明测了什么/没测什么）
+- quickstart S1–S7 实跑；S2 前提补 owner 后三例吻合；S4 正控口径更正（humanize 基线 0→0）
+- plan-template 骨架 +61 行；`test_x16` 未转红；镜像第二次同步后六对 ok
+- 偏差：T027 在 T028 之后跑两次（取最终树）；翻转与最后两个 `[X]` 同提交；S2 夹具补 owner 文档
 
 ## 测试预算（E2/E3）
 
