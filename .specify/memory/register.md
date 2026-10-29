@@ -98,3 +98,8 @@
 | REC-072-03 | `templates/commands/feedback.md` Path A 委派 bullet 收敛回指针形态（载体闭集与呈报三项事实归 `references/path-a-digest.md` § A4a/A4b 独有），消除第三处内容型重复 | `.specify/specs/072-client-self-improvement/review.md` § 5.1 REC-072-03（F3） | open |
 | REC-072-04 | plan 约束激活期间的规格头状态簿记对账（或把头状态字段退役给登记表）：避免 plan-owned 冻结把 `requirements.md` 头状态滞留在 `Draft` | `.specify/specs/072-client-self-improvement/review.md` § 5.4 REC-072-04（F4） | open |
 | OI-073-01 | 仓库既有 contract 债务未在 Feature 073 范围内修复：`analyze-artifacts`/`analyze` 冻结哈希漂移、`feedback-step.md` 附加行、确认门 27>23 基线、四个技能的裸 `shared/` 引用 | `tests/contract/test_expression_compatibility.py`、`test_shared_reference_rewrite.py`、`test_fast_fail_discipline.py` | open（owner = 后续仓库卫生切片；解除条件 = 逐项修复或明确豁免并更新冻结基线） |
+| REC-074a-01 | read-only 权威面须可声明并由审计脚本机械核对（含审计基线之前的触碰） | `.specify/specs/074a-authorized-routing/review.md` § REC-1（F1） | open |
+| REC-074a-02 | code-review 的机器路径与 help 由同一有序步骤表派生，`capture` 不得只在机器路径存在 | `.specify/specs/074a-authorized-routing/review.md` § REC-2（F2） | open |
+| REC-074a-03 | `pre-analyze-check` 的路径引用第二候根 `.specify/memory/` 解析，消除永久 advisory 噪声 | `.specify/specs/074a-authorized-routing/review.md` § REC-3（F3） | open |
+| REC-074a-04 | 下游承接义务须有独立状态；`post_change_commit` 改名并强制收口任务推进 | `.specify/specs/074a-authorized-routing/review.md` § REC-4（F5/F6） | open |
+| REC-074a-05 | 入口校验 id 移出 `V-` 空间；golden 行增 `target_paths` 使 FR-008 路径谓词可判定 | `.specify/specs/074a-authorized-routing/review.md` § REC-5（F4 + §2.2） | open |
