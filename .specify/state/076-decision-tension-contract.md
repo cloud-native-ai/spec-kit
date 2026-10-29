@@ -168,6 +168,8 @@ last_verdict: review #2 PASS — 0 blocking，状态推进 `Ready for Review`（
 | seq | slot | stage | selection_basis | command | rc | passed/failed | failed_names_path | evidence_ptr |
 |-----|------|-------|-----------------|---------|----|---------------|-------------------|--------------|
 | 1 | baseline | implement | full-suite | `SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/076-decision-tension-contract/baseline-failed.txt` | 1（39 既有失败） | 6514 passed / 39 failed / 7 skipped（622.70s） | `.specify/specs/076-decision-tension-contract/baseline-failed.txt`（39 名） | 本行 + 基线文件 |
+| 2 | closure（原始） | review 之后 | full-suite | 同上（后台 shell） | 1 | 6567 passed / **65 failed** | `closure-failed.txt`（65 名） | **无效运行**：后台 shell 的 `python3` 解析到 Homebrew（缺 PyYAML/httpx），26 条 subprocess 测试为环境性误红；26/26 在修正 PATH 后单独复跑全绿 |
+| 3 | closure（修正 PATH） | review 之后 | full-suite | `PATH=<pybin:/usr/bin/python3>:$PATH SPECKIT_PYTHON=<profiles-venv> bash … --names-out …/closure-failed-rerun.txt` | 1（仅 39 既有失败） | 6593 passed / **39 failed** / 7 skipped（556.37s） | `closure-failed-rerun.txt`（39 名） | `comm -13`（新增）**空**；`comm -23`（修复）**空** → 零新增失败，closure 通过 |
 
 中间阶段一律用定向集，禁止第二次全量；closure 全量在 review 之后。
 
