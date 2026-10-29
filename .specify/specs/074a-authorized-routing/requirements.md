@@ -466,9 +466,26 @@ dispatched.
 - Adding a scheduler, daemon, second confirmation gate, or automatic feedback transmission.
 - Rewriting the anti-nesting rule for dispatches that do not satisfy FR-005.
 
+## Cross-Slice Design Attribution（跨切片交付归属）
+
+**读法**: 本节裁定 074a 在父设计（`.specify/specs/074-goal-team-sdd-unification/plan.md` 与同目录 `contracts/`）与 `074b-nested-governance` 之间的交付归属。它不改写 `## Requirements`、`## Success Criteria`、`## Out of Scope` 的任何条文，只说明本切片如何兑现它们；父设计文件是投影来源，不是切片边界。
+
+- **D-1 归属按需求条目切分，不按父设计文件的物理分组**：本切片的设计集覆盖本地 `FR-001`–`FR-020` 与 `SC-001`–`SC-006`。凡对应父条款，无论落在哪个父 contract 文件，都整体继承为来源并保留父条款编号作来源标注——例如 `nested-invocation.md` 的父 C-45，以及 `diffusion-and-compat.md` 的父 C-58 / C-59 / C-67 与 C-64、C-66 中涉及本地 `FR-018`、`FR-014` 的部分；`074b-nested-governance` 只重 derive 其自有的父 `FR 020`–`FR 024`、`FR 026`–`FR 028` 与父 `SC 005`、`SC 008` 面。
+  理由：拆分记录（`.specify/state/074-goal-team-sdd-unification.md` § 拆分记录，`confirmed-user`）按需求条目切分，并声明两片 FR 集互斥、并集 = 28。若改按父文件物理分组，本地 `FR-020`（父 `FR 025`）与 `FR-018` / `FR-014` 的条款面会漂到 074b，与本切片 20 FR 的声明直接冲突。
+- **D-2 分流裁决的记录面在本切片内是 Agent 执行证据**：本地 `FR-013` 的「team run report 或 Agent 执行证据」在本切片由 Agent 执行证据兑现（输入、裁决、理由码、actor、用户覆盖记录），并由 handoff 与调用方结果按稳定路径引用。父 contract C-54 的 report 段 verdict reference 随 074b 的段契约落地时读同一条记录，不得重算。
+  理由：本切片不定义 team report 的固定段（父 `STR 010` 的标题字面量），故唯一可交付的记录面是 Agent 执行证据；`FR-013` 原文的「或」已允许该读法，父条文不改写。
+- **D-3 `SC-003` 在本切片交付内容面，不交付段标题格式**：一次嵌套运行止于 review、产出完整 SDD 工件链、零 merge 零 push（`git log` / `git status` 可断言），且调用方结果与 team supervisor 按既有 report 契约写下的记录携带每条工件与证据路径的引用（本地 `FR-017` 已要求）。父 `STR 010` 的固定标题与「每次运行强制存在、无嵌套则声明 none」的段语义由 `074b-nested-governance` 兑现，本切片的夹具因此不断言该标题字面量。
+  理由：`SC-003` 的工件链、零 merge/push、路径引用三项都可由本切片的可交付面机械断言，只有段标题与段语义属 074b——这与 `## Out of Scope` 的「team report 嵌套段」行一致：不在本切片的是段标题与段语义，不是路径引用的内容面。越界建段等于把 074b 的契约拉进本切片。
+
 ## Clarifications
 
 ### Session 2026-10-28
 
 - Q: 本切片的编号为何与父规格 074 不同？ → A: 本切片是父规格 074 的两片拆分投影（用户 2026-10-28 确认，`confirmed-user`），不是新的需求裁定。切片内 FR / SC / STR 采用连续本地编号，逐条父映射见 `## Parent Mapping`；父规格仍是权威，编号变化不构成删除、合并或重排。拆分依据与边界见 `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录（tasks U4，2026-10-28）。
 - Q: 父规格既有裁定对本切片是否仍然生效？ → A: 生效，且不重开裁定。父规格 `## Clarifications` > `### Session 2026-10-28` 的裁定与同轮边界回修，对纳入本切片的条目原样适用：授权面 = Agent 能力 + Team 席位策略；分流判据 = 复合确定性判据；嵌套止于 review 交接；分流规则唯一 owner 文件 `shared/definitions/sdd-routing-definitions.md`；优先级 `adjudicate > sdd > direct`；深度 2 嵌套链与 virtual 禁用；席位策略存于 `team.md` frontmatter 的 `seats` 映射并按 (team, seat) 解析；routing unit = 每成员职责一次并复用至输入变化；并发上限 = 每成员一；handoff 携带集成身份；ledger 归因由 team supervisor 写入。
+
+### Session 2026-10-29
+
+- Q: 074a 的设计条款是否按本切片自己的需求集重新 derive，包括那些在父设计里被放在 074b 侧重文件中的条款（`diffusion-and-compat.md` 的父 C-58 / C-59 / C-67，以及 C-64、C-66 中涉及本地 `FR-018`、`FR-014` 的部分）？ → A: 按需求条目重 derive。归属以 `.specify/state/074-goal-team-sdd-unification.md` § 拆分记录（`confirmed-user`）划分的需求集为准，不以父 contract 文件的物理分组为准：本切片覆盖本地 `FR-001`–`FR-020` 与 `SC-001`–`SC-006`，继承对应父条款并保留父编号作来源标注；074b 只重 derive 其自有条目（整合为 `## Cross-Slice Design Attribution` D-1）。**无人值守自裁**——拆分记录已声明两片 FR 集互斥、并集 = 28，且父设计文件按主题而非按切片组织；若按文件分组，本地 `FR-020`（父 `FR 025`）与 `FR-018` / `FR-014` 的条款面会漂出本切片，与 20 FR 的声明直接冲突，故只有一种与已记录意图一致的读法，属纠正而非裁定。
+- Q: 本地 `FR-013` 的裁决记录面在本切片落在哪里（team run report 还是 Agent 执行证据），已知 team report 的固定段（父 `STR 010` 标题）不在本切片？ → A: 本切片由 Agent 执行证据承载（输入、裁决、理由码、actor、用户覆盖记录），handoff 与调用方结果按稳定路径引用；team report 段的 verdict reference 随 074b 段契约落地时读同一条记录、不得重算（D-2）。**无人值守自裁**——本切片不定义 report 固定段，可交付记录面只有 Agent 执行证据；`FR-013` 原文的「或」已允许该读法，父条文一句不改，未证伪任何下游前提。
+- Q: 本地 `SC-003` 要求 team run report 的嵌套段引用每条工件与证据路径，而该段的固定标题与强制语义属 074b——本切片如何交付 `SC-003`？ → A: 交付内容面：嵌套运行止于 review、完整 SDD 工件链、零 merge 零 push、调用方结果与既有 report 记录携带路径引用；固定标题字面量与段语义交 074b，本切片夹具不断言该标题（D-3）。**无人值守自裁**——`SC-003` 的三项均可由本切片可交付面机械断言；若不划分，本切片要么越界实现 074b 的段契约，要么 `SC-003` 无落点，两种读法里只有一种与本切片 `## Out of Scope` 的「team report 嵌套段」行相容。
