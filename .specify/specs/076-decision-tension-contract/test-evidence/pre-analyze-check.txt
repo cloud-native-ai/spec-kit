@@ -1,0 +1,3 @@
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=1 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 150, "message": "path does not exist under the repo: shared/guidelines/decision-tension.md"}], "summary": {"errors": 0, "advisories": 1, "waived": 0, "fr": 26, "sc": 8, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-10-29T09:37:18Z"}
+EXIT=0
