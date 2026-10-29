@@ -104,3 +104,31 @@ skeleton literal, the subsection heading that states the obligation, and the sen
 `run-team` keeps delegating at `:66` and gains no second statement; `run-agent` is untouched by this face.
 Measured per **document**, which is the unit "one owner" is decidable in.
 
+## E-3 · `tests/contract/test_nested_run_report.py` — GREEN (T009, US1 closed)
+
+**Captured**: 2026-10-29T06:0Z, HEAD `f26eb59ac`, at the start of implement part 2, before any Phase 3 edit.
+No case was added, renamed, relaxed or removed relative to E-1/E-2.
+
+```text
+$ python3 -m pytest -q tests/contract/test_nested_run_report.py
+................                                                         [100%]
+16 passed in 0.08s
+rc=0
+```
+
+**Reading**: US1's acceptance surface is green at the part-2 base commit, so US2's edits can be judged
+against a known-green neighbour rather than against a moving one.
+
+## E-4 · `tests/contract/test_sdd_diffusion.py` — RED (T010)
+
+**Captured**: 2026-10-29T06:1Z, HEAD `f26eb59ac`, after the suite was written and before any Phase 3 edit.
+**Red shape**: the four diffusion surfaces are not landed yet, so the surface cases fail as *absent
+statements/sections*, not as contradictory assertions.
+
+<!-- E-4 block pasted below after the T010 red run -->
+
+## E-5 · `tests/contract/test_sdd_diffusion.py` — GREEN (T011–T015 landed, T016)
+
+<!-- E-5 block pasted below after the T016 green run -->
+
+
