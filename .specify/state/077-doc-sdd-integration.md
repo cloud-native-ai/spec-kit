@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: review
-stage_started_at: 1793303420
-stage_deadline_epoch: 1793308820
-stage_base_commit: 0abf94c3
+stage: closure
+stage_started_at: 1793304777
+stage_deadline_epoch: 1793310177
+stage_base_commit: 336421df
 attempt: 0
 retry_limit: 2
-last_verdict: implement DONE — 28/28 任务（4 段）；Feature 077 = Implemented；8 SC 状态行（4 pass / 4 partial，partial 均需真实表达类试点线）；174 定向测试；零新增机制；镜像与副本 clean；下一步 review
+last_verdict: review PASS（0 blocking，2 P1 / 4 P2 / 3 important）→ 状态推进 Ready for Review；review-fix `336421df` 关闭 2 P1 + 3 important（含真实表达类试点线 12 passed、exit-2 对齐、plan-template 指针可解析、quickstart S2 回写）；七道门全过 + 218 邻近测试；closure 全量运行中（后台 b3yh4eihp）
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -164,6 +164,24 @@ last_verdict: implement DONE — 28/28 任务（4 段）；Feature 077 = Impleme
 - quickstart S1–S7 实跑；S2 前提补 owner 后三例吻合；S4 正控口径更正（humanize 基线 0→0）
 - plan-template 骨架 +61 行；`test_x16` 未转红；镜像第二次同步后六对 ok
 - 偏差：T027 在 T028 之后跑两次（取最终树）；翻转与最后两个 `[X]` 同提交；S2 夹具补 owner 文档
+
+### review — PASS → Ready for Review（2026-10-30）
+
+- 过程段 P0 0 / P1 2 / P2 4；代码段 blocking 0 / important 3 / suggestion 4 / nitpick 2 / question 1 / praise 2
+- 状态门三条件全满足 → `Implemented → Ready for Review`（`features.md` + `features/077.md` 同步）
+- 提交：`96e83f13`（两份报告 + 状态推进）、`31cc4ca8`（wrap-up）
+- P1：4 条 partial SC 无真实表达类试点线；quickstart S2 已知跑不通
+- important：exit-2 标签与 `error` 值域不一致；C-003 与引擎行为不一致；plan-template 的 `[[STR-NNN]]` 下游不可解
+
+### review-fix — DONE（2026-10-30）
+
+- 提交：`336421df`
+- 新增真实表达类试点线：`tests/integration/test_expression_line_pilot.py` + `tests/fixtures/expression_line/`（12 passed，gate-level real execution，标注 synthetic）；SC-003 → pass，SC-002/005/008 保持 partial 并收窄缺口
+- quickstart S2 回写可跑通形态（`PLAN-EDIT: minor`）
+- exit-2 对齐：缺失 spec 输入 → `owner-unavailable` + `flow_class: null`（C-003/C-007）
+- plan-template 改用下游可解析的字面标题 + owner 指针
+- 3 条 important 答复写入 `code-review.md`；review.md 增 §8 Post-review Fix
+- 门：七道门 exit 0；218 邻近测试绿；状态门仍满足（0 blocking）
 
 ## 测试预算（E2/E3）
 
