@@ -6,7 +6,7 @@
 **Flow Class**: execution
 **Input**: User description: "把**项目文档**的开发接入 SDD 阶段链，使 `sdd-loop-driver` 能无人值守驱动文档开发。项目文档与办公文档不同：项目文档应像代码一样有严密的结构和逻辑；接入后应能无人值守开发。"
 
-> **本行的由来（自用声明）**：`**Flow Class**` 正是本特性要建立的字段（[[STR-001]]），此处先行自用。本特性的交付物是命令模板、驱动技能与确定性检查器，缺陷最先以行为暴露，按 069 的判据属 `execution`（理由见 § Assumptions A6）。接线落地前该字段不被任何阶段读取；落地后即成为本线的生效取值。
+> **本行的由来（自用声明）**：标题区那一行类别字段（[[STR-001]]）正是本特性要建立的字段，此处先行自用。本特性的交付物是命令模板、驱动技能与确定性检查器，缺陷最先以行为暴露，按 069 的判据属 `execution`（理由见 § Assumptions A6）。接线落地前该字段不被任何阶段读取；落地后即成为本线的生效取值。
 
 ## Related Feature *(mandatory)*
 
@@ -39,7 +39,7 @@
 - **门禁算子表已就绪且自洽**：`shared/workflow/expression-gates.md` 有封闭六面与 16 行阶段算子（八阶段各 2 行）；`--action isomorphism` 报 `8 stage row(s), 6 gate face(s), 0 finding(s)`，`--action faces` 报 `6 face(s) parsed, 0 finding(s)`。
 - **驱动侧无类别感知**：`skills/external/sdd-loop-driver/` 的 `SKILL.md` 与 `references/*.md` 对 `flow_class` / `flow-class` / `expression` 零命中；两槽位测试预算的时点是 implement 起点（baseline）与 review 之后（closure），`not-run-docs-only` 只是定向集阶段的一种 `stage-status`，不是槽位语义。
 - **069 的推迟是白纸黑字**：`069` 规格 § 显式排除项含「不新建表达类专用命令集，也不新增 `/speckit.*` 命令」，并把项目侧声明面记为「属后续特性」。
-- **登记现状**：`features.md` 行数 72、最大编号 076（075 未使用，编号不连续）；`.specify/specs/` 最大目录 076。
+- **登记现状**：`features.md` 行数 72（注册本特性**之前**）、最大编号 076（075 未使用，编号不连续）；`.specify/specs/` 最大目录 076。本特性登记后行数为 73。
 
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
