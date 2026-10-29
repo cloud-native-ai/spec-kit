@@ -138,7 +138,7 @@
 - **计划在后续阶段新增承重决策**（澄清或任务回环）：计划更新时必须补写记录；analyze 复跑必须仍能检出缺失，不得以「计划已通过一次门」为由跳过。
 - **证伪尝试退出码为 0 但观察为空**：视为「跑了但没留下结果」，判不合格并拒收。
 - **反空真条件写成条件句**（「如果实现错了就会失败」）：空真，拒收；`would_go_red_if` 必须点名具体输入与被改坏后必红的结果。
-- **历史计划没有该章节**：判 HIGH 而非跳过；作者补写，或显式声明 `N/A` 并给出判据结论。
+- **历史计划没有该章节**：判 HIGH 而非跳过；作者补写，或显式声明 `N/A` 并给出判据结论。范围见 FR-011：只判本轮 `REQUIREMENTS_DIR` 下的 `plan.md`，其他 spec 目录的历史计划不在检查范围、因而不产生发现。
 - **术语越界**：分发面出现 A3 列出的内部别名 → 判用户可见面违规，MUST 改为工程词。
 
 ## Requirements *(mandatory)*
@@ -157,13 +157,13 @@
 
 #### A-2 计划模板落点
 
-- **FR-008**: `templates/plan-template.md` MUST 新增 `## Decision Tensions`（[[STR-001]]）章节，位置 MUST 在 `## Constitution Check` 之后、`## Complexity Tracking` 之前。当计划含至少一条承重决策时该章节必填，每条记录以 `T-NNN` 起头的子节承载；当且仅当无承重决策时，章节 MUST 写 `N/A` 并逐条说明四类触发均不成立，MUST NOT 删除章节或留空。
-- **FR-009**: 该章节 MUST 只引用 owner 的字段名与判据（一条指针加字段清单），MUST NOT 复制 owner 的可采纳判据表、拒绝清单或承重门槛表；MUST 由契约测试守卫三件事：章节存在、指针路径可解析、判据表未被逐行复制。
-- **FR-010**: 每条记录的 `expected_sacrifice` MUST 映射到同一特性 `requirements.md` 的 `### Measurement Sources & Collection Methods` 中已声明的一条测量来源（写明测量来源标识与变差方向，可附阈值）。无法映射时 MUST 二选一并在计划中留痕：按澄清或范围变更路径补建测量来源，或把该决策降级为普通取舍并撤销该记录。
+- **FR-008**: `templates/plan-template.md` MUST 新增 `## Decision Tensions`（[[STR-001]]）章节，位置 MUST 是本模板 `##` 级标题序列中 `## Constitution Check` 的**直接后继**，因而也是 `## Project Structure` 的直接前驱。本条是该章节的唯一锚点：原措辞「在 `## Constitution Check` 之后、`## Complexity Tracking` 之前」有两个满足位（紧跟门，或插在 `## Project Structure` 之后），不构成可判定的位置约束。判定方式 MUST 是标题序列检查——抽取全部 `^## ` 行，断言 `## Constitution Check` → `## Decision Tensions` → `## Project Structure` 三者相邻；模板侧由契约测试断言（FR-009），计划实例侧由 FR-016 校验器的 `dtr-anchor` 断言。当计划含至少一条承重决策时该章节必填，每条记录以 `T-NNN` 起头的子节承载；当且仅当无承重决策时，章节 MUST 写 `N/A` 并逐条说明四类触发均不成立，MUST NOT 删除章节或留空。
+- **FR-009**: 该章节 MUST 只引用 owner 的字段名与判据（一条指针加字段清单），MUST NOT 复制 owner 的可采纳判据表、拒绝清单或承重门槛表；MUST 由契约测试守卫四件事：章节存在、章节位置（按 FR-008 的标题序列相邻性断言）、指针路径可解析、判据表未被逐行复制。
+- **FR-010**: 每条记录的 `expected_sacrifice` MUST 映射到同一特性 `requirements.md` 的 `### Measurement Sources & Collection Methods` 中已声明的一条测量来源（写明测量来源标识与变差方向，可附阈值）。引用形态 MUST 是封闭形式 `<SC-NNN> Source <↓|↑>`：以 `SC-NNN` 标识、空格、字面 `Source` 起头，随后是必填的变差方向记号（`↓` 或 `↑`），其后的阈值或说明自由。`SC-NNN` MUST 解析到该节中以 `**SC-NNN Source**` 起头的条目；一条记录 MUST 只解析到一条来源，值中出现第二个 `SC-NNN` 判解析失败。无该前缀、标识解析不到条目、方向记号缺失或不在 `↓`/`↑` 两值内，一律判「无法解析」并由校验器返回错误（FR-016），MUST NOT 回落为人工阅读判定。无法映射时 MUST 二选一并在计划中留痕：按澄清或范围变更路径补建测量来源，或把该决策降级为普通取舍并撤销该记录。
 
 #### A-3 分析检测
 
-- **FR-011**: `/speckit.analyze` MUST 新增一个结构通道，判定三类缺陷并各判 HIGH：(a) 计划缺 [[STR-001]] 章节，或该章节写 `N/A` 却未逐条说明四类触发均不成立——两者都按「缺记录」判 HIGH（fail-closed），检测器 MUST NOT 被要求自行判断计划里是否存在承重决策；(b) 任一记录六字段缺失或为空，含 `binding_constraints` 只有单极；(c) `expected_sacrifice` 无法解析到 requirements 中已声明的测量来源。
+- **FR-011**: `/speckit.analyze` MUST 新增一个结构通道，判定三类缺陷并各判 HIGH：(a) 计划缺 [[STR-001]] 章节，或该章节写 `N/A` 却未逐条说明四类触发均不成立——两者都按「缺记录」判 HIGH（fail-closed），检测器 MUST NOT 被要求自行判断计划里是否存在承重决策；(b) 任一记录六字段缺失或为空，含 `binding_constraints` 只有单极；(c) `expected_sacrifice` 无法解析到 requirements 中已声明的测量来源。检查范围的被判定对象 MUST 只有一份工件：本轮经前置脚本解析出的 `REQUIREMENTS_DIR` 下的 `plan.md`（该目录内的 `requirements.md` 只是映射比对的参照，不是第二个被判定对象）；其他特性目录下的 `plan.md` MUST NOT 被本通道打开（全仓遍历会把实测 68 份历史计划一次性判 HIGH，且需新增扫描面，违 FR-018）。范围之内的历史计划（契约生效前写下的 `plan.md`）MUST NOT 豁免：缺章节或 `N/A` 未逐条说明照判 HIGH，修复动作是补章节。requirements 无 `### Measurement Sources & Collection Methods` 时按记录数机械分叉：计划含 ≥1 条记录 → 每条 `expected_sacrifice` 解析失败 → 按 (c) 判 HIGH；合规 `N/A`（零记录）→ 映射判定不执行 → 0 条发现。该通道 MUST NOT 设 advisory 或降级档：三类缺陷的取值只有 HIGH 与 0。
 - **FR-012**: 该通道的严重度 MUST 采用既有传播面判据（`.specify/shared/workflow/objective-analysis-gate.md`），MUST NOT 新造严重度等级、评分或成熟度结论；每条发现 MUST 写明其传播面（计划 → 任务 / 实现）。
 - **FR-013**: 结构判定 MUST 是确定性的（字段存在性、枚举取值、引用解析），MUST NOT 交给模型按语义打分；可机械判定的部分 MUST 由既有 `scripts/python/` 下的程序执行并输出 verdict，模型只消费 verdict。
 - **FR-014**: 该通道 MUST 落在 `detection-and-severity.md`（检测通道与严重度的 owner）内并与既有通道并列；对既有内容采用**只增不改**的包含性声明（判据 owner：`shared/guidelines/closed-set-claims.md`）：基线参照物为本特性基线提交 `ac63fe8c` 处的该文件，比较单元为「既有段落 / 新增段落」两类，允许差异集为「本特性新增的通道小节 + 因新增通道而更新的计数行」，集合之内 MUST 通过结构不变量（通道编号唯一、严重度取值落在既有四值域内），集合之外 MUST 与基线逐字节一致（删除或改写行数为 0）；实际差异行 MUST 由契约测试枚举并与声明的允许差异集比对（漂移守卫）。
@@ -174,7 +174,7 @@
 
 #### A-5 确定性校验与机制边界
 
-- **FR-016**: 结构校验 MUST 由既有 `scripts/python/` 下的确定性程序执行（只用标准库、无第三方依赖、无常驻进程），至少检查：六字段齐备、`binding_constraints` 双极非空、`tension_id` 唯一且按序、`T-NNN` 形态、拒绝形态命中（含 [[STR-002]]）、`expected_sacrifice` 可解析到测量来源。退出码语义 MUST 与既有检查器一致：0 无错误、1 发现错误、2 输入不可读。
+- **FR-016**: 结构校验 MUST 由 `scripts/python/validate-decision-tensions.py` 执行（既有 `scripts/python/` 下的确定性程序：只用标准库、无第三方依赖、无常驻进程、只读）。调用契约 MUST 是 `python3 scripts/python/validate-decision-tensions.py --spec <spec-dir> [--json]`，读取 `<spec-dir>/plan.md` 与 `<spec-dir>/requirements.md`；选目录而非文件，是因为判定需跨两份工件解析测量来源（单文件位置参数读不到 requirements）。退出码语义 MUST 与既有检查器一致：0 无错误（允许 warning）、1 发现错误、2 输入不可读（任一文件缺失、不可解码或无内容行）。输出 MUST 沿用 `validate-requirements.py` 形态：默认人读（`status` 行 + 每个检查一行 `[label] pass|fail (count)` + findings），`--json` 输出 `{"spec","status","checks":[{"label","status","count"}],"errors","warnings","scanned"}`。检查标签 MUST 是封闭六项，且与 FR-008 锚点、FR-011 三类缺陷一一对应：`dtr-anchor`、`dtr-section-missing`、`dtr-record-incomplete`（六字段齐备、双极非空）、`dtr-tension-id`（唯一、按序、`T-NNN` 形态）、`dtr-rejected-form`（拒绝形态命中，含 [[STR-002]] 与不可判定措辞清单）、`expected-sacrifice-unmapped`（按 FR-010 解析）。同一记录同一标签 MUST 只报一条；`expected_sacrifice` 恰为 `none` 时只报 `dtr-rejected-form`，不再叠加 `expected-sacrifice-unmapped`。校验器 MUST 只输出 verdict，MUST NOT 提议改写。
 - **FR-017**: 该校验器 MUST 拥有逆样本（快速失败纪律对机器给出的绿同样成立）：删任一字段、置空预期代价、写入不可判定措辞、重复 `tension_id`、指向不存在的测量来源——每一例 MUST 在契约测试中产生一次红运行记录；逆样本 MUST NOT 只写在文档描述里。
 - **FR-018**: 本特性 MUST NOT 新增 `/speckit.*` 命令、存储、台账、调度器、评分器或模型调用；张力记录搭在计划工件上，判定结果只进既有 analyze 报告与计划文本。
 
@@ -182,7 +182,7 @@
 
 - **FR-019**: `shared/guidelines/critique-and-self-critique.md` 的输出形态 MUST 由「一句话加 verdict」升级为封闭四元组：`attempt`、`exit_code`、`observation`、`would_go_red_if`（[[STR-003]]）；四元组 MUST 在派发前产生，字段集合封闭，扩展 MUST 走 owner 修订。
 - **FR-020**: 四元组各字段 MUST 有可判定语义：`attempt` 是一位复核者可原样重放的命令、grep、测试或测量；`exit_code` 是整数；`observation` 是原样输出摘要（模型转述判为不合格）；[[STR-003]] 点名「把哪个输入改坏，该尝试必须变红」的具体输入与预期红色结果。
-- **FR-021**: 拒收规则：四元组任一字段缺失或为空、`observation` 为转述、或 [[STR-003]] 给不出可执行的反空真条件（例如只写「若实现有误就会失败」）时，SI-4 接收方 MUST 拒收该提案；拒收 MUST NOT 折算为「未达成」，MUST NOT 静默接受，也 MUST NOT 以「已执行」字样通过。
+- **FR-021**: 拒收规则：四元组任一字段缺失或为空、`observation` 为转述、或 [[STR-003]] 给不出可执行的反空真条件（例如只写「若实现有误就会失败」）时，SI-4 接收方 MUST 拒收该提案；拒收 MUST NOT 折算为「未达成」，MUST NOT 静默接受，也 MUST NOT 以「已执行」字样通过。判定者 MUST 是确定性程序 `scripts/python/validate-falsification-quartet.py` 而不是接收方 agent 的判断：调用契约 `python3 scripts/python/validate-falsification-quartet.py <payload.md> [--json]`，退出码 0 接收 / 1 拒收 / 2 载荷不可读（按拒收处置，原因 `input-unreadable`）。四元组在派发载荷中的形态 MUST 是四个字面键 `attempt:`、`exit_code:`、`observation:`、`would_go_red_if:` 各出现一次（值取键后同行或缩进续行）；`exit_code` MUST 是整数（0 合法）；`observation` MUST 以字面 `raw:` 起头承载原样摘录——这是「非转述」的机械代理，无该标记即判 `observation-not-raw`；[[STR-003]] MUST 同时给出被改坏的具名输入（反引号跨度）与具名红色信号，缺任一判 `tautology`。拒收原因 MUST 取自封闭集 `missing-field` / `empty-field` / `exit-code-not-integer` / `observation-not-raw` / `tautology` / `input-unreadable`，并具名指出缺哪个字段或哪半条件。接收方 agent MUST NOT 反向覆盖判决：不得接收脚本退出码非 0 的载荷，MUST NOT 在封闭原因集之外另立拒收理由，额外疑虑只能写成非阻断注记。脚本 MUST NOT 重放 `attempt`（重放属 SI-6 与复核者的动作，重放本身已是既有流程，不引入执行运行时）。
 - **FR-022**: 载体 MUST 不变：四元组记在提案已有载体（SI-4 派发载荷、SI-7 intervention 记录），MUST NOT 新建台账、存储、probe 或评分。
 - **FR-023**: `shared/workflow/self-improvement-workflow.md` 的 SI-3C MUST 只保留步骤摘要与指向 owner 的指针，MUST NOT 复述四元组字段清单或拒收规则；契约测试 MUST 断言「owner 有字段定义」且「workflow 无第二份定义」。
 
@@ -190,6 +190,22 @@
 
 - **FR-024**: 用户可见正文 MUST 只用工程词（DTR、反题、反指标、判别性证据、重开条件）；§ Assumptions A3 列为内部别名的术语 MUST NOT 出现在任何分发面的用户可见文本中（`shared/`、`templates/`、`skills/`）。内部别名只允许出现在本规格的 Assumptions 与 owner 的术语注记内。
 - **FR-025**: 两顶帽子：唯一编辑面 MUST 是框架源（`shared/`、`templates/`、`skills/internal/analyze-artifacts/`、`scripts/python/`、`docs/decisions/`）；`.specify/` 运行时副本与各工具命令副本 MUST 经既有同步或再生成机制产出，MUST NOT 手改；计划 MUST 列出本次触及的镜像对，并以「相对改动前测量无新增漂移」为判定方式。
+
+**镜像对清单（clarify 阶段钉死；plan 阶段 MUST 原样引用，实现中若发现新增受影响面 MUST 先在本表补行，MUST NOT 静默扩面）**
+
+| # | 框架源（唯一编辑面） | `.specify/` 运行时副本 / 工具副本 | 产出机制 |
+|---|---|---|---|
+| 1 | `shared/guidelines/decision-tension.md`（新建） | `.specify/shared/guidelines/decision-tension.md` | `sync-mirrors.py`（shared 对） |
+| 2 | `shared/guidelines/critique-and-self-critique.md`（改写） | `.specify/shared/guidelines/critique-and-self-critique.md` | 同上 |
+| 3 | `shared/workflow/self-improvement-workflow.md`（改写） | `.specify/shared/workflow/self-improvement-workflow.md` | 同上 |
+| 4 | `templates/plan-template.md`（改写） | `.specify/templates/plan-template.md` | `sync-mirrors.py`（templates 对；本文件不在被排除的 `commands/` 子树内，故无工具命令副本） |
+| 5 | `skills/internal/analyze-artifacts/`（改写 `references/detection-and-severity.md`，若 `SKILL.md` 亦需指针则同对） | `.specify/skills/internal/analyze-artifacts/` 下同名文件 | `sync-mirrors.py`（skills/internal 对） |
+| 6 | `scripts/python/validate-decision-tensions.py`（新建） | `.specify/scripts/python/validate-decision-tensions.py` | `sync-mirrors.py`（scripts 对） |
+| 7 | `scripts/python/validate-falsification-quartet.py`（新建） | `.specify/scripts/python/validate-falsification-quartet.py` | 同上 |
+
+- **工具命令副本面**：本次 MUST NOT 触及 `templates/commands/**`，因此 `regen-command-copies.py` 的 per-tool 副本集合为空（无新增或修改的命令副本）；若实现阶段确需改命令模板，MUST 先把受影响副本补进本表再改。
+- **无镜像面**：`docs/decisions/template.md`（`docs/` 不在 `MIRROR_PAIRS`）与 `tests/**` 契约测试（不入镜像），这两处只做源文件改动。
+- **漂移基线（2026-10-29 clarify 阶段实测，dated record）**：`python3 scripts/python/sync-mirrors.py --check` 退出码 0，六对镜像均 `ok`（templates 22 / skills/external 406 / skills/internal 136 / agents 3 / scripts 115 / shared 59 文件）。判定 MUST 是实现后再跑同一命令并与该基线比对：本表所列对 MUST 无新增漂移；MUST NOT 以「命令退出码 0」单独作判据——它同样会被无关面的既有漂移拉红。
 - **FR-026**: 既有闭合面 MUST 不回退，按包含性声明（判据 owner：`shared/guidelines/closed-set-claims.md`）表述：基线参照物为基线提交 `ac63fe8c`，比较单元为 `critique-and-self-critique.md` 与 `detection-and-severity.md` 两个文件按段落；允许差异集仅为本特性新增的段落，集合之外 MUST 与基线逐字节一致（删除或改写行数为 0），集合之内 MUST 通过结构不变量（拒绝形态、边界声明、消费者清单、严重度四值域保持可解析）；条目级断言（拒绝形态条数、边界声明条数、消费者清单行数）MUST 不小于基线，由契约测试给出基线与当前的计数比较。
 
 ### 显式排除项（Out of Scope）
@@ -252,3 +268,19 @@
 - 本轮无活动 `[NEEDS CLARIFICATION]` 标记；三处原可发问的开放点按缺省裁决记录，未进入问题队列：编号顺延（A2）、内部别名的对外边界（A3）、载体选择（A6）。
 - 特性绑定在本阶段给出而非推迟到 `/speckit.clarify`（A4）；绑定结论与候选核验表见 § Related Feature。
 - 显式排除项以 § Requirements 的「显式排除项（Out of Scope）」为准，不在 clarify 阶段重新开启。
+
+### Session 2026-10-29（clarify round 1 · 无人值守）
+
+> 运行模式 A（post-requirements，目标 `requirements.md`；spec 目录内尚无 `plan.md`，模式判定未偏离）。本轮**无用户在环**：六处已知欠指定点由执行代理按项目宪法、仓库实测与规格既有判据自行裁决，每条记录候选读法、代价与被否决理由，供 plan 阶段复核。扫描方式为同作者直读——本阶段无独立子代理派发能力，按 `.specify/shared/workflow/objective-analysis-gate.md` § 7 回退，逐条标注 `(detected: direct read, subagent unavailable)`。未新增或删除 FR / SC / Shared String（仍 26 FR / 8 SC / 4 STR），故 `checklists/requirements.md` 的派生计数无需回改；该清单里 `scanned 255 lines` 是 requirements 阶段那次运行的 `dated record`（指向 `test-evidence/validate-requirements.txt`），本阶段编辑面限本文件、未重盖该戳，因 FR / SC / STR 计数未变而不存在过期派生计数。文中钉入的实测数字（68 份在册计划、镜像文件计数）为本轮 `dated record`，供判定参照，不是长期事实声明。§ Requirements 的「显式排除项」未被重新开启。
+
+- **Q1（模板锚点）→ A：唯一锚点是 `## Constitution Check` 的直接后继。** 实测 `templates/plan-template.md` 的 `##` 级标题序为 Constitution Check → Project Structure（含 Mirror Obligations）→ Complexity Tracking → Phase 1，故原措辞「Constitution Check 之后、Complexity Tracking 之前」有两个满足位（紧跟门，或插在 Project Structure 之后），不可机械判定。取前者：决策记录紧贴它所辩护的门，读者在门与结构方案之间就看见取舍；插在结构方案之后会把「方向取舍」读成「目录布局的注脚」。判定方式是标题序列检查——抽 `^## ` 行，断言 `## Constitution Check` → `## Decision Tensions` → `## Project Structure` 三者相邻；模板侧由契约测试断言，计划实例侧由校验器 `dtr-anchor` 断言。（FR-008、FR-009）`(detected: direct read, subagent unavailable)`
+
+- **Q2（analyze 的适用范围）→ A：只判本轮 spec 目录下的 `plan.md`；范围外的历史计划零发现，范围内不设豁免，缺 Measurement Sources 由记录数机械分叉。** 依据是代码事实（宪法 VIII）：`/speckit.analyze` 的上下文来自 `check-prerequisites.sh` 解析出的 `REQUIREMENTS_DIR`，只加载该目录的 artifacts；在册 `plan.md` 实测 68 份，全仓遍历会一次性把历史特性判成 HIGH，且需新增扫描面（违 FR-018 与宪法 IX）。因此「历史计划一律 HIGH」只在范围内成立：本特性在契约生效前写下的 `plan.md` 缺章节照判 HIGH，修复动作是补章节，不是降级。`requirements.md` 无 `### Measurement Sources & Collection Methods` 时不设 advisory 中间态——计划有 ≥1 条记录则每条解析失败判 HIGH；合规 `N/A`（零记录）则映射判定不执行、0 条发现。被否决读法与代价：给历史计划加 provenance 豁免标记（等于新增逐计划状态位，违 IX）；按 git 首次提交判新旧（rebase 与浅克隆下不可复现）。（FR-011、Edge Cases）`(detected: direct read, subagent unavailable)`
+
+- **Q3（校验器契约）→ A：`scripts/python/validate-decision-tensions.py`，入参是 spec 目录，退出码 0/1/2，人读默认 + `--json`。** 契约钉死为 `python3 scripts/python/validate-decision-tensions.py --spec <spec-dir> [--json]`，读 `<spec-dir>/plan.md` 与 `<spec-dir>/requirements.md`（缺任一或不可解析 → 2）。选目录而非文件：判定要跨两份工件解析测量来源，同仓 `account-clause-coverage.py --spec <spec-dir>` 已是这一形态；`validate-requirements.py` 的单文件位置参数在此读不到 requirements，故不照搬。输出沿用既有检查器：人读模式给 `status` 行、每检查一行 `[label] pass|fail (count)` 与 findings；`--json` 给 `{"spec","status","checks":[{"label","status","count"}],"errors","warnings","scanned"}`。检查标签是封闭六项并与三条 HIGH 一一对应：`dtr-anchor` / `dtr-section-missing` / `dtr-record-incomplete` / `dtr-tension-id` / `dtr-rejected-form` / `expected-sacrifice-unmapped`；同记录同标签只报一条，`expected_sacrifice` 恰为 `none` 时只报 `dtr-rejected-form`，避免 SC-001 的反向夹具出现双计数。被否决读法：复用 `validate-tasks.py` 加子命令（把两种工件语义塞进一个入口，退出码与输出形态都会分叉）。（FR-013、FR-016）`(detected: direct read, subagent unavailable)`
+
+- **Q4（`expected_sacrifice` 的映射规则）→ A：封闭引用形态 `<SC-NNN> Source <↓|↑>`，解析失败即判「无法映射」，不回落人工阅读。** 选字面 `Source` 作连接词，是因为 `### Measurement Sources & Collection Methods` 的条目本来就以 `**SC-NNN Source**` 起头，它是唯一可直接对上的连接键；只写 `SC-NNN` 会与同名 Success Criterion 共用一个命名空间，无法区分「引用判据」与「引用它的测量来源」。方向记号取封闭两值 `↓`/`↑`（指标的变差方向），使 FR-010 要求的「变差方向」也进机器判定；阈值与说明放在记号之后自由书写，不参与解析。一条记录只绑定一条来源，值里出现第二个 `SC-NNN` 判解析失败——多条来源会让「代价」失去单值语义，也让 SC-001 的「一条记录一条来源」无法计数。代价：作者必须记住这个前缀形态；收益是映射失败变成退出码而非阅读判断。（FR-010、FR-016）`(detected: direct read, subagent unavailable)`
+
+- **Q5（B 的拒收判定者）→ A：确定性脚本判决，接收方 agent 只消费判决、不得反向覆盖。** 若把拒收留给接收方 agent，同一载荷换一个模型或换一次运行就可能得到不同 verdict，「跑过 vs 声称跑过」重新退化为不可判定，SC-004 的 6/6 也无法复现。故裁决为脚本 `scripts/python/validate-falsification-quartet.py <payload.md> [--json]`（0 接收 / 1 拒收 / 2 载荷不可读按拒收处置），拒收原因取封闭集 `missing-field` / `empty-field` / `exit-code-not-integer` / `observation-not-raw` / `tautology` / `input-unreadable`。两处「语义判据」被换成可判定的形状判据，代价如实记录：① 「`observation` 是转述」——机器判不了语义，改为要求值以字面 `raw:` 起头承载原样摘录，无标记即拒，标记可被伪造（伪造由复核者发现，属非阻断注记，不进判决）；② 「反空真条件」——改为要求 [[STR-003]] 同时给出被改坏的具名输入（反引号跨度）与具名红色信号，缺任一判 `tautology`，但它管不到「输入改坏了却不会变红」这层真实性（那属 SI-6 与复核者）。同时钉死脚本 MUST NOT 重放 `attempt`：重放是复核者与 SI-6 的动作，脚本重放会引入执行运行时（宪法 IX）。被否决读法：agent 判定 + 可复现判据清单（清单本身要执行语义比较，仍不可复现）；脚本判定但保留 agent 否决权（双向覆盖会让判决再次发散）。（FR-019、FR-020、FR-021）`(detected: direct read, subagent unavailable)`
+
+- **Q6（两顶帽子与镜像面）→ A：七行镜像对 + 两个无镜像面，工具命令副本面为空，漂移基线为零。** 清单落在 FR-025 的表里（唯一 owner，plan 阶段原样引用，新增面必须先补行）：`shared/` 三项（含新建 `decision-tension.md`）、`templates/plan-template.md`、`skills/internal/analyze-artifacts/`、`scripts/python/` 两个新脚本，各自经 `sync-mirrors.py` 落到对应 `.specify/` 副本；`docs/decisions/template.md` 与 `tests/**` 不在 `MIRROR_PAIRS`，无镜像。本次不触及 `templates/commands/**`，故 `regen-command-copies.py` 的 per-tool 副本集合为空——这一条必须写明，否则「镜像对清单」会被读成「只列了 `.specify/` 而漏了工具副本」。基线为本轮实测：`sync-mirrors.py --check` 退出码 0、六对均 `ok`，因此判定是「实现后再跑同一命令，相对该基线无新增漂移」，而不是「命令退出码 0」——后者会被无关面的既有漂移拉红，写成绝对判据即不可通过。（FR-025）`(detected: direct read, subagent unavailable)`
