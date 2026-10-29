@@ -4,13 +4,14 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: analyze
-stage_started_at: 1793269113
-stage_deadline_epoch: 1793274513
-stage_base_commit: cde66c0b
+stage: implement
+stage_started_at: 1793272815
+stage_deadline_epoch: 1793278215
+stage_base_commit: d4479500
 attempt: 0
 retry_limit: 2
-last_verdict: checklist DONE — 37 项（27 pass / 10 fail），26 FR / 8 SC 全覆盖，10 项 fail 逐条点名继承实现面；待 analyze 裁决严重度
+last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH；微修复 A-23..A-27 完成（`d4479500`）；implement 起点全量 baseline 运行中（后台 b2mkejfup）
+<!-- plan-fence: decomposition=single-package reason=not-beneficial (27 tasks <= 40, tightly coupled, shared files) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
 - line_id: `076-decision-tension-contract`
@@ -107,6 +108,68 @@ last_verdict: checklist DONE — 37 项（27 pass / 10 fail），26 FR / 8 SC �
 - 10 项 fail 及继承面：CHK004 语义拒绝形态无裁决者（T004/T008）；CHK011 方向记号未绑定指标轴（T008）；CHK014 SC-003 夹具的 N/A 保留歧义（T017/T018）；CHK018 断链无真实 ADR 入口（T019/T020）；CHK020 缺章节时双标签重复（T007/T010）；CHK022 逆样本未覆盖六字段逐个删除（T003/T007）；CHK026 attempt 不可重放未被执行（T014/T015）；CHK027 `would_go_red_if` 无机械形态（T012/T015）；CHK029 SC-004 与 FR-021 拒收集不一致（T012/T015）；CHK031 披露局限未落到 owner（T014/T016）
 - 零修改面成立：requirements / plan / tasks / contracts 一字未改
 - 结构检查：`validate-requirements` ok（287 行 / 34 定义行 / 4 shared strings）
+
+### analyze #1 — BLOCKED（2026-10-29）
+
+- 只读合规：无制品改动、无提交
+- 结论：0 CRITICAL / **4 HIGH** / 8 MEDIUM / 4 LOW；按判定口径阻断 implement
+- 4 HIGH：
+  - **A-01** SC-003「补入不可逆决策后恰 1 条 HIGH」未钉死合规 `N/A` 去留 → 修复面 `requirements.md` SC-003 + US4 AS2、`tasks.md` T017
+  - **A-02** 缺章节时 `dtr-anchor` 与 `dtr-section-missing` 双标签同红，无跨标签优先级；六标签「一一对应」措辞不成立 → FR-016 + `data-model.md` E1 R1/R2 + `contracts/validator.md` C-2
+  - **A-03** `would_go_red_if` 的「具名红色信号」无机械形状，`tautology` 不可确定性判定 → FR-021 + `contracts/falsification-quartet.md` C-3 + `data-model.md` E5
+  - **A-04** SC-004 的六个不合格载荷与 FR-021/T012 的六个拒收原因码不是同一集合，6/6 无法同时成立 → SC-004 + T012 + `quickstart.md` S4
+- 8 MEDIUM：A-05 语义拒绝无裁决者；A-06 方向记号未绑定指标；A-07 断链无真实入口；A-08 attempt 可重放无执行者；A-09 逆样本缺跳号/逐字段；A-10 披露局限无承接任务；A-11 `[[STR-NNN]]` 约定空转；A-12 别名白名单与 A3 自相矛盾
+- 4 LOW：A-13 引用不存在的 plan 章节；A-14 缺 checklist 阶段记录；A-15 T016 与 SI-3C 现状不符；A-16 覆盖表未标流程行
+- 框架观察：验证波派发失败（qodercli SDK auth），4 条 HIGH 均按 objective-analysis-gate rule 7 标记 direct-read，独立验证器确认数 0/4
+
+### analyze #1 修复轮 — DONE（2026-10-29）
+
+- 提交：`16a44ea0 fix(076-decision-tension-contract): remediate analyze #1 findings`
+- 16/16 修：4 HIGH（SC-003 夹具三子场景 / 跨标签优先级 / `red:` 机械形状 / SC-004 六原因码 6/6）+ 8 MEDIUM（判定者、方向记号记录性、断链调用面、attempt 复核者规则、跳号夹具、限制承接、STR 约定收窄、别名白名单）+ 4 LOW（引用、checklist 记录、T016 指针核验、流程行标注）
+- 计数保持：26 FR / 8 SC / 34 条款 / 27 任务 / 4 STR；`coverage-baseline.txt` 未重冻结
+- 门：validate-requirements ok / validate-tasks PASS / account-clause-coverage ok（34 claimed / FR 26/26）/ pre-analyze tasks pass（44 advisories）/ mirrors ok / command copies OK
+- `## Plan Edits` 17 行，全部 `minor`，无 substantive
+
+### analyze #2 — PASS（2026-10-29）
+
+- 只读合规；HEAD `16a44ea0`
+- 裁决：**0 CRITICAL / 0 HIGH** → 放行 implement；4 MEDIUM / 3 LOW
+- 4 HIGH 全关：A-01（SC-003 三子场景）/ A-02（跨标签优先级 + 4+2 划分）/ A-03（`red:` 两半机械形状）/ A-04（六原因码 6/6）
+- 遗留 7 条：A-12（别名白名单与 FR-024 自相矛盾，carried）/ A-17（空值双报无优先级）/ A-18（research R-5/R-9 未回填）/ A-19（SC-002/SC-003 缺报告快照承载任务）/ A-20（quickstart「前者」措辞反向）/ A-21（`red:` 切分位置未钉死）/ A-22（「七行」副本与 FR-025「改写」措辞）
+- 系统性观察：本轮残留均属「钉主用例、留同类边界」；修复自身连带面未回填
+
+### analyze #2 修复轮 — DONE（2026-10-29）
+
+- 提交：`8a5f7aea fix(076-decision-tension-contract): remediate analyze #2 findings`（16 files，+647/−55）
+- 7/7 修：A-12 白名单收为两处（owner 不再写术语注记）/ A-17 第三条优先级（空值与 `none` 只报 `dtr-rejected-form`）/ A-18 research R-5/R-9 回填 + PLAN-EDIT minor / A-19 T017/T026 增 analyze 报告快照步 / A-20 quickstart 措辞纠正 / A-21 `red:` 首次切分 + 双 `red:` 夹具 / A-22 两处计数改指针 + FR-025 措辞
+- 计数保持：26 FR / 8 SC / 34 条款 / 27 任务 / 4 STR；baseline 未重冻结
+- 六道门全过（输出在 `test-evidence/*-fix2.txt`）
+
+### analyze #3 — PASS（2026-10-29）+ 微修复
+
+- 终裁：0 CRITICAL / 0 HIGH / 1 MEDIUM（A-23）/ 4 LOW（A-24..A-27）→ **放行 implement**
+- 7 条遗留全部关闭（A-12/A-17/A-18/A-19/A-20/A-21/A-22）
+- 微修复 `d4479500`：A-23 覆盖表补 T026；A-24 标签范围限定；A-25 裸 `N/A` 标为附加断言；A-26 quickstart 抑制条件限定；A-27 features/076.md 非 § 附 别名改工程词
+- 计数保持 26 FR / 8 SC / 34 条款 / 27 任务；validate-requirements / validate-tasks / pre-analyze 全过
+
+## Implement 分段计划
+
+- **拆解决策**：`single-package`（reason=not-beneficial）——27 任务 ≤ 40、A/B 共享判据与文件、拆包无收益
+- **测试预算**：implement 起点一次全量（`baseline-failed.txt`，后台 b2mkejfup）；中间阶段用定向集；review 后一次 closure 全量
+- **分段**（每段 ≤8 任务，串行）：
+  1. **P1**：T001–T007（证据槽 / owner 判据段 / 模板锚点 / 校验器骨架）
+  2. **P2**：T008–T013（校验器解析与拒绝形态 / analyze 通道 / 四元组 owner 与测试）
+  3. **P3**：T014–T020（四元组正文 / 四元组校验器 / SI-3C 核验 / N/A 判据 / ADR）
+  4. **P4**：T021–T027（术语与闭合面守卫 / 零新增机制集合差 / 镜像收尾 / quickstart 实跑 / Feature 集成）
+- 每段产出：任务行闭合、定向测试、红先行证据、commit；段间由驱动者独立校验后续派发
+
+## 测试预算（E2/E3）
+
+| seq | slot | stage | selection_basis | command | rc | passed/failed | failed_names_path | evidence_ptr |
+|-----|------|-------|-----------------|---------|----|---------------|-------------------|--------------|
+| 1 | baseline | implement | full-suite | `SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/076-decision-tension-contract/baseline-failed.txt` | 1（39 既有失败） | 6514 passed / 39 failed / 7 skipped（622.70s） | `.specify/specs/076-decision-tension-contract/baseline-failed.txt`（39 名） | 本行 + 基线文件 |
+
+中间阶段一律用定向集，禁止第二次全量；closure 全量在 review 之后。
 
 ## 框架观察
 
