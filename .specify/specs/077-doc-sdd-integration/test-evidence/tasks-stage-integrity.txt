@@ -1,0 +1,10 @@
+# T027 / SC-008 support — stage-integrity guard (the judge reads stage records, never the class)
+# 2026-10-29T19:46:41Z head=c991b628 (dirty tree: this segment not yet committed)
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_expression_compatibility.py -q
+................                                                         [100%]
+16 passed in 0.52s
+exit=0
+
+# the two assertions this file owns for SC-008:
+825:def test_c9_pre_completion_specs_stay_byte_identical():
+837:def test_stage_integrity_section_reads_no_class():

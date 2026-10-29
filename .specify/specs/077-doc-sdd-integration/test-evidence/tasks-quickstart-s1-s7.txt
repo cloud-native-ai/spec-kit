@@ -1,0 +1,260 @@
+# T026 — quickstart S1–S7 actually run (full transcript)
+# generated 2026-10-29T19:43:08Z on branch 077-doc-sdd-integration ; interpreter = /Users/liuqiming.lqm/project/profiles/.venv/bin/python
+# runner: bash tmp/t026_quickstart.sh (S1–S7) then bash tmp/t026_s2b.sh (S2b)
+# S2b exists because the S2 snippet as written points --repo at a bare temp tree; the engine
+# resolves its class owner under that root, so the bare form degrades to owner-unavailable for
+# all three fixtures (recorded below unchanged). S2b completes the fixture the way the pinned
+# unit test does (owner doc present) — that is the form "三例各答不同" is about.
+
+================================================================
+S1–S7 transcript (verbatim)
+================================================================
+
+----- S1 — 本线解析 -----
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/flow-class-check.py --action lookup --unit-id "spec:077-doc-sdd-integration"
+unit_id: spec:077-doc-sdd-integration
+flow_class: execution
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+
+----- S2 — 三例判定（已声明 / 未声明 / 取值越界） -----
+TMP=/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr
+--- spec:fx-declared ---
+owner-unavailable: owner document unreadable: none of /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/shared/definitions/flow-class-definitions.md, /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/.specify/shared/definitions/flow-class-definitions.md exists
+unit_id: spec:fx-declared
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+exit=2
+--- spec:fx-absent ---
+owner-unavailable: owner document unreadable: none of /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/shared/definitions/flow-class-definitions.md, /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/.specify/shared/definitions/flow-class-definitions.md exists
+unit_id: spec:fx-absent
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+exit=2
+--- spec:fx-bad ---
+owner-unavailable: owner document unreadable: none of /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/shared/definitions/flow-class-definitions.md, /private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr/.specify/shared/definitions/flow-class-definitions.md exists
+unit_id: spec:fx-bad
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+exit=2
+cleanup: /var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.c0wNY0tJqr removed
+
+----- S3 — 结构门禁（plan 侧，无 --path） -----
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/077-doc-sdd-integration
+doc-consistency-check: structure
+checked_at: 2026-10-29T19:42:31Z
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+files_scanned: 1
+not-applicable: 结构门禁只适用于表达类；已检视 1 个文件，未做结构判定
+exit=0
+
+----- S3b — 结构门禁（追加既有 --path，两向比对） -----
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/doc-consistency-check.py --action structure --spec-dir .specify/specs/077-doc-sdd-integration --path .specify/specs/077-doc-sdd-integration/plan.md
+doc-consistency-check: structure
+checked_at: 2026-10-29T19:42:31Z
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+files_scanned: 2
+not-applicable: 结构门禁只适用于表达类；已检视 2 个文件，未做结构判定
+exit=0
+
+----- S4 — 七模板接线存在性 -----
+$ grep -c -E 'flow-class-check\.py' templates/commands/{requirements,clarify,plan,tasks,checklist,analyze,implement}.md
+requirements 1
+clarify 1
+plan 1
+tasks 1
+checklist 1
+analyze 1
+implement 1
+--- control: the two pre-077 entry points must be unchanged (each already 1) ---
+docs 1
+humanize 0
+
+----- S5 — 分发漂移检查 -----
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit=0
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+----- S6 — 两槽位审计对 docs-gate-full 的接纳 -----
+fixture: .specify/.tmp/sdd-loop/tmp/plan077/spine.md
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine "$D/spine.md" --spec-dir .specify/specs/077-doc-sdd-integration --stage-check closure
+slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0
+stages=6 complete=0
+status=fail
+reason=clarify: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=plan: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=tasks: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=checklist: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=analyze: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=review: stage evidence file missing; counted in the completeness denominator (unknown)
+exit=1
+
+----- S6b — 负控（追加第二个 baseline 行，必须转红） -----
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine "$D/spine-neg.md" --spec-dir .specify/specs/077-doc-sdd-integration --stage-check closure
+slots=baseline:2 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0
+stages=6 complete=0
+status=fail
+reason=row 3: a second baseline slot is not allowed
+reason=expected exactly 1 baseline slot, found 2
+reason=clarify: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=plan: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=tasks: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=checklist: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=analyze: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=review: stage evidence file missing; counted in the completeness denominator (unknown)
+exit=1
+
+----- S7 — 清理 -----
+removed: .specify/.tmp/sdd-loop/tmp/plan077
+$ git status --ignored --short
+?? .specify/specs/077-doc-sdd-integration/test-evidence/tasks-distribution-two-state.txt
+?? .specify/specs/077-doc-sdd-integration/test-evidence/tasks-owner-append-delta.txt
+?? tmp/
+!! .DS_Store
+!! .pytest_cache/
+!! .qoder/.DS_Store
+!! .specify/.DS_Store
+!! .specify/agents/execution/logs/
+!! .specify/instructions.md-2026-10-14-235946
+!! .specify/instructions.md-2026-10-18-091554
+!! .specify/instructions.md-2026-10-24-210714
+!! .specify/instructions.md-2026-10-27-201916
+!! .specify/instructions.md-2026-10-29-195041
+!! .specify/instructions.md-2026-10-29-201732
+!! .specify/memory/exec-quant/.write.lock
+!! .specify/scripts/python/__pycache__/
+!! .specify/specs/067-loop-efficiency-hardening/notes/baseline-full-2026-10-22.log
+!! .specify/specs/067-loop-efficiency-hardening/notes/full-run-2026-10-22-closure.log
+!! .specify/specs/067-loop-efficiency-hardening/notes/full-run-2026-10-22-implement-start.log
+!! .specify/specs/069-execution-expression-sdd/test-evidence/log-requirements-validate.log
+!! .specify/tools/
+!! .venv/
+!! .vscode/
+!! docs/.hugo_build.lock
+!! docs/public/
+!! scripts/python/__pycache__/
+!! skills/external/merge-skills/scripts/__pycache__/
+!! skills/external/sdd-loop-driver/scripts/__pycache__/
+!! skills/internal/archive-session/scripts/__pycache__/
+!! skills/internal/create-team/scripts/__pycache__/
+!! skills/internal/summarize-project/scripts/__pycache__/
+!! src/__pycache__/
+!! src/specify_cli/__pycache__/
+!! src/specify_cli/_source_commit.json
+!! tests/__pycache__/
+!! tests/contract/__pycache__/
+!! tests/fixtures/__pycache__/
+!! tests/integration/__pycache__/
+!! tests/unit/__pycache__/
+--- any residue of the S2 temp root or the S6 fixture? ---
+!! skills/external/sdd-loop-driver/scripts/__pycache__/
+.specify/.tmp
+.specify/.tmp still exists (check it is empty)
+done
+
+================================================================
+S2b — S2 completed with the owner document present
+================================================================
+TMP=/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.EsmRdIl0sG
+fixture owner doc: shared/definitions/flow-class-definitions.md copied verbatim (same bytes as the tree's copy)
+
+--- spec:fx-declared (text) ---
+unit_id: spec:fx-declared
+flow_class: expression
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0
+--- spec:fx-declared (json, the record consumers read) ---
+{
+  "action": "lookup",
+  "checked_at": "2026-10-29T19:43:04Z",
+  "unit_id": "spec:fx-declared",
+  "flow_class": "expression",
+  "source": "declaration",
+  "marker": null,
+  "basis": null,
+  "neutral": false,
+  "error": null
+}
+exit=0
+
+--- spec:fx-absent (text) ---
+unit_id: spec:fx-absent
+flow_class: execution
+source: default
+marker: 未声明·按默认
+basis: null
+neutral: false
+exit=0
+--- spec:fx-absent (json, the record consumers read) ---
+{
+  "action": "lookup",
+  "checked_at": "2026-10-29T19:43:04Z",
+  "unit_id": "spec:fx-absent",
+  "flow_class": "execution",
+  "source": "default",
+  "marker": "未声明·按默认",
+  "basis": null,
+  "neutral": false,
+  "error": {
+    "label": "declaration-absent",
+    "detail": "no `**Flow Class**: <class>` line in the head region of .specify/specs/fx-absent/requirements.md; running on the default class"
+  }
+}
+exit=0
+
+--- spec:fx-bad (text) ---
+invalid-class: .specify/specs/fx-bad/requirements.md:3 carries 'expressive', outside the closed set (execution, expression)
+unit_id: spec:fx-bad
+flow_class: null
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=1
+--- spec:fx-bad (json, the record consumers read) ---
+invalid-class: .specify/specs/fx-bad/requirements.md:3 carries 'expressive', outside the closed set (execution, expression)
+{
+  "action": "lookup",
+  "checked_at": "2026-10-29T19:43:04Z",
+  "unit_id": "spec:fx-bad",
+  "flow_class": null,
+  "source": "declaration",
+  "marker": null,
+  "basis": null,
+  "neutral": false,
+  "error": {
+    "label": "invalid-class",
+    "detail": ".specify/specs/fx-bad/requirements.md:3 carries 'expressive', outside the closed set (execution, expression)"
+  }
+}
+exit=1
+
+cleanup: /var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/tmp.EsmRdIl0sG removed

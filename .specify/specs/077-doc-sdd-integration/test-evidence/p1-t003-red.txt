@@ -1,0 +1,630 @@
+# T003 red run — tests/contract/test_flow_class_spec_declaration.py
+# command: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/contract/test_flow_class_spec_declaration.py -q
+# cwd: repo root; date: 2026-10-30; HEAD: e14408f7
+
+FFFFFFFFFFFFFFFF...                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_well_formed_declaration_is_read_verbatim _________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_well_formed_declaration_i0')
+
+    def test_well_formed_declaration_is_read_verbatim(tmp_path):
+        repo = _repo_with(
+            tmp_path, "fx-ok", "# fixture spec\n\n**Flow Class**: expression\n"
+        )
+    
+        proc = _lookup(repo, "spec:fx-ok")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-ok': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...it.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-ok': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:178: AssertionError
+_____ test_malformed_forms_report_declaration_malformed[full-width-colon] ______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_malformed_forms_report_de0')
+declaration = '**Flow Class**：execution'
+
+    @pytest.mark.parametrize(
+        "declaration",
+        [
+            "**Flow Class**：execution",                   # full-width colon
+            "**flow class**: execution",                   # field-name case variant
+            "**Flow Class**: execution   ",                # trailing whitespace
+            "**Flow Class**: execution <!-- keep -->",     # inline comment
+        ],
+        ids=["full-width-colon", "field-name-case", "trailing-space", "inline-comment"],
+    )
+    def test_malformed_forms_report_declaration_malformed(tmp_path, declaration):
+        repo = _repo_with(
+            tmp_path, "fx-malformed", "# fixture spec\n\n%s\n" % declaration
+        )
+    
+        proc = _lookup(repo, "spec:fx-malformed")
+    
+>       _assert_author_error(
+            proc, "declaration-malformed", name="fx-malformed", line_numbers={3}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-malformed', name = 'fx-malformed', line_numbers = {3}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-malformed must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:03Z",\n  "unit_id": "spec:fx-malformed",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+______ test_malformed_forms_report_declaration_malformed[field-name-case] ______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_malformed_forms_report_de1')
+declaration = '**flow class**: execution'
+
+    @pytest.mark.parametrize(
+        "declaration",
+        [
+            "**Flow Class**：execution",                   # full-width colon
+            "**flow class**: execution",                   # field-name case variant
+            "**Flow Class**: execution   ",                # trailing whitespace
+            "**Flow Class**: execution <!-- keep -->",     # inline comment
+        ],
+        ids=["full-width-colon", "field-name-case", "trailing-space", "inline-comment"],
+    )
+    def test_malformed_forms_report_declaration_malformed(tmp_path, declaration):
+        repo = _repo_with(
+            tmp_path, "fx-malformed", "# fixture spec\n\n%s\n" % declaration
+        )
+    
+        proc = _lookup(repo, "spec:fx-malformed")
+    
+>       _assert_author_error(
+            proc, "declaration-malformed", name="fx-malformed", line_numbers={3}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-malformed', name = 'fx-malformed', line_numbers = {3}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-malformed must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-malformed",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+______ test_malformed_forms_report_declaration_malformed[trailing-space] _______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_malformed_forms_report_de2')
+declaration = '**Flow Class**: execution   '
+
+    @pytest.mark.parametrize(
+        "declaration",
+        [
+            "**Flow Class**：execution",                   # full-width colon
+            "**flow class**: execution",                   # field-name case variant
+            "**Flow Class**: execution   ",                # trailing whitespace
+            "**Flow Class**: execution <!-- keep -->",     # inline comment
+        ],
+        ids=["full-width-colon", "field-name-case", "trailing-space", "inline-comment"],
+    )
+    def test_malformed_forms_report_declaration_malformed(tmp_path, declaration):
+        repo = _repo_with(
+            tmp_path, "fx-malformed", "# fixture spec\n\n%s\n" % declaration
+        )
+    
+        proc = _lookup(repo, "spec:fx-malformed")
+    
+>       _assert_author_error(
+            proc, "declaration-malformed", name="fx-malformed", line_numbers={3}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-malformed', name = 'fx-malformed', line_numbers = {3}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-malformed must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-malformed",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+______ test_malformed_forms_report_declaration_malformed[inline-comment] _______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_malformed_forms_report_de3')
+declaration = '**Flow Class**: execution <!-- keep -->'
+
+    @pytest.mark.parametrize(
+        "declaration",
+        [
+            "**Flow Class**：execution",                   # full-width colon
+            "**flow class**: execution",                   # field-name case variant
+            "**Flow Class**: execution   ",                # trailing whitespace
+            "**Flow Class**: execution <!-- keep -->",     # inline comment
+        ],
+        ids=["full-width-colon", "field-name-case", "trailing-space", "inline-comment"],
+    )
+    def test_malformed_forms_report_declaration_malformed(tmp_path, declaration):
+        repo = _repo_with(
+            tmp_path, "fx-malformed", "# fixture spec\n\n%s\n" % declaration
+        )
+    
+        proc = _lookup(repo, "spec:fx-malformed")
+    
+>       _assert_author_error(
+            proc, "declaration-malformed", name="fx-malformed", line_numbers={3}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-malformed', name = 'fx-malformed', line_numbers = {3}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-malformed must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-malformed",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-malformed': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+______ test_value_is_case_sensitive_and_outside_set_reports_invalid_class ______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_value_is_case_sensitive_a0')
+
+    def test_value_is_case_sensitive_and_outside_set_reports_invalid_class(tmp_path):
+        repo = _repo_with(
+            tmp_path, "fx-case", "# fixture spec\n\n**Flow Class**: Expression\n"
+        )
+    
+        proc = _lookup(repo, "spec:fx-case")
+    
+>       _assert_author_error(
+            proc,
+            "invalid-class",
+            name="fx-case",
+            line_numbers={3},
+            value_fragment="Expression",
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n....<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-case': expected /speckit.<stem> or skill:<dir>\n")
+code = 'invalid-class', name = 'fx-case', line_numbers = {3}
+value_fragment = 'Expression'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: invalid-class must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-case",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-case': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n....<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-case': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+_______________ test_invalid_class_names_the_file_line_and_value _______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_invalid_class_names_the_f0')
+
+    def test_invalid_class_names_the_file_line_and_value(tmp_path):
+        repo = _repo_with(
+            tmp_path, "fx-bad", "# fixture spec\n\n**Flow Class**: expressive\n"
+        )
+    
+        proc = _lookup(repo, "spec:fx-bad")
+    
+>       record = _assert_author_error(
+            proc,
+            "invalid-class",
+            name="fx-bad",
+            line_numbers={3},
+            value_fragment="expressive",
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-bad': expected /speckit.<stem> or skill:<dir>\n")
+code = 'invalid-class', name = 'fx-bad', line_numbers = {3}
+value_fragment = 'expressive'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: invalid-class must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-bad",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-bad': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-bad': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+___________ test_declaration_after_related_feature_reports_misplaced ___________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_declaration_after_related0')
+
+    def test_declaration_after_related_feature_reports_misplaced(tmp_path):
+        text = (
+            "# fixture spec\n"                      # 1
+            "\n"                                    # 2
+            "## Related Feature *(mandatory)*\n"    # 3
+            "\n"                                    # 4
+            "**Flow Class**: execution\n"           # 5
+        )
+        repo = _repo_with(tmp_path, "fx-misplaced", text)
+    
+        proc = _lookup(repo, "spec:fx-misplaced")
+    
+>       _assert_author_error(
+            proc, "declaration-misplaced", name="fx-misplaced", line_numbers={5}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:257: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-misplaced': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-misplaced', name = 'fx-misplaced', line_numbers = {5}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-misplaced must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-misplaced",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-misplaced': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...m> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-misplaced': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+__________________ test_field_in_the_head_region_stays_legal ___________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_field_in_the_head_region_0')
+
+    def test_field_in_the_head_region_stays_legal(tmp_path):
+        text = (
+            "# fixture spec\n"                               # 1
+            "\n"                                             # 2
+            "**Flow Class**: execution\n"                    # 3
+            "\n"                                             # 4
+            "## Related Feature *(mandatory)*\n"             # 5
+            "\n"                                             # 6
+            "**Feature ID**: 999\n"                          # 7
+        )
+        repo = _repo_with(tmp_path, "fx-head", text)
+    
+        proc = _lookup(repo, "spec:fx-head")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-head': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n....<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-head': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:276: AssertionError
+____________ test_second_declaration_reports_duplicate[same-value] _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_second_declaration_report0')
+first = 'execution', second = 'execution'
+
+    @pytest.mark.parametrize(
+        "first,second",
+        [("execution", "execution"), ("execution", "expression")],
+        ids=["same-value", "different-values"],
+    )
+    def test_second_declaration_reports_duplicate(tmp_path, first, second):
+        text = (
+            "# fixture spec\n"                       # 1
+            "\n"                                     # 2
+            "**Flow Class**: {first}\n"              # 3
+            "\n"                                     # 4
+            "**Flow Class**: {second}\n"             # 5
+            "\n"                                     # 6
+            "## Related Feature *(mandatory)*\n"     # 7
+        ).format(first=first, second=second)
+        repo = _repo_with(tmp_path, "fx-dup", text)
+    
+        proc = _lookup(repo, "spec:fx-dup")
+    
+>       _assert_author_error(
+            proc, "declaration-duplicate", name="fx-dup", line_numbers={3, 5}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-duplicate', name = 'fx-dup', line_numbers = {3, 5}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-duplicate must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-dup",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+_________ test_second_declaration_reports_duplicate[different-values] __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_second_declaration_report1')
+first = 'execution', second = 'expression'
+
+    @pytest.mark.parametrize(
+        "first,second",
+        [("execution", "execution"), ("execution", "expression")],
+        ids=["same-value", "different-values"],
+    )
+    def test_second_declaration_reports_duplicate(tmp_path, first, second):
+        text = (
+            "# fixture spec\n"                       # 1
+            "\n"                                     # 2
+            "**Flow Class**: {first}\n"              # 3
+            "\n"                                     # 4
+            "**Flow Class**: {second}\n"             # 5
+            "\n"                                     # 6
+            "## Related Feature *(mandatory)*\n"     # 7
+        ).format(first=first, second=second)
+        repo = _repo_with(tmp_path, "fx-dup", text)
+    
+        proc = _lookup(repo, "spec:fx-dup")
+    
+>       _assert_author_error(
+            proc, "declaration-duplicate", name="fx-dup", line_numbers={3, 5}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-duplicate', name = 'fx-dup', line_numbers = {3, 5}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-duplicate must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-dup",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-dup': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+__________ test_duplicate_outranks_misplaced_for_the_same_root_cause ___________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_duplicate_outranks_mispla0')
+
+    def test_duplicate_outranks_misplaced_for_the_same_root_cause(tmp_path):
+        text = (
+            "# fixture spec\n"                      # 1
+            "\n"                                    # 2
+            "**Flow Class**: execution\n"           # 3
+            "\n"                                    # 4
+            "## Related Feature *(mandatory)*\n"    # 5
+            "\n"                                    # 6
+            "**Flow Class**: execution\n"           # 7
+        )
+        repo = _repo_with(tmp_path, "fx-both", text)
+    
+        proc = _lookup(repo, "spec:fx-both")
+    
+>       _assert_author_error(
+            proc, "declaration-duplicate", name="fx-both", line_numbers={3, 7}
+        )
+
+tests/contract/test_flow_class_spec_declaration.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n....<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-both': expected /speckit.<stem> or skill:<dir>\n")
+code = 'declaration-duplicate', name = 'fx-both', line_numbers = {3, 7}
+value_fragment = 'execution'
+
+    def _assert_author_error(
+        proc: subprocess.CompletedProcess,
+        code: str,
+        *,
+        name: str,
+        line_numbers: set[int],
+        value_fragment: str = "execution",
+    ) -> dict:
+        """Assert one exit-1 author error, its stderr shape and its record."""
+>       assert proc.returncode == 1, (
+            "%s must be exit 1 (blocking), never the exit-2 degradation "
+            "(stdout=%r stderr=%r)" % (code, proc.stdout, proc.stderr)
+        )
+E       AssertionError: declaration-duplicate must be exit 1 (blocking), never the exit-2 degradation (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T19:01:04Z",\n  "unit_id": "spec:fx-both",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-both': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n....<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-both': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:136: AssertionError
+_________ test_the_four_author_error_codes_never_collapse_into_exit_2 __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_the_four_author_error_cod0')
+
+    def test_the_four_author_error_codes_never_collapse_into_exit_2(tmp_path):
+        fixtures = {
+            "fx-invalid": ("# f\n\n**Flow Class**: expressive\n", "invalid-class"),
+            "fx-malformed": ("# f\n\n**Flow Class**：execution\n", "declaration-malformed"),
+            "fx-dup": (
+                "# f\n\n**Flow Class**: execution\n\n**Flow Class**: execution\n",
+                "declaration-duplicate",
+            ),
+            "fx-misplaced": (
+                "# f\n\n## Related Feature *(mandatory)*\n\n**Flow Class**: execution\n",
+                "declaration-misplaced",
+            ),
+        }
+        codes = set()
+        for name, (text, expected) in fixtures.items():
+            repo = _repo_with(tmp_path / name, name, text)
+            proc = _lookup(repo, "spec:%s" % name)
+>           assert proc.returncode == 1, (name, proc.returncode, proc.stderr)
+E           AssertionError: ('fx-invalid', 2, "invalid unit id 'spec:fx-invalid': expected /speckit.<stem> or skill:<dir>
+E             ")
+E           assert 2 == 1
+E            +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...tem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-invalid': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:349: AssertionError
+___________________ test_absent_field_is_not_an_author_error ___________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1728/test_absent_field_is_not_an_au0')
+
+    def test_absent_field_is_not_an_author_error(tmp_path):
+        repo = _repo_with(
+            tmp_path,
+            "fx-absent",
+            "# fixture spec\n\n## Related Feature *(mandatory)*\n\n**Feature ID**: 999\n",
+        )
+    
+        proc = _lookup(repo, "spec:fx-absent")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/contract/test_flow_class_spec_declaration.py:364: AssertionError
+___________ test_template_carries_the_field_between_status_and_input ___________
+
+    def test_template_carries_the_field_between_status_and_input():
+        lines = _template_lines()
+        status = next(i for i, line in enumerate(lines) if line.startswith("**Status**:"))
+        field = next(
+            (i for i, line in enumerate(lines) if line.startswith("**Flow Class**: ")),
+            None,
+        )
+>       assert field is not None, (
+            "the requirements template must carry one `**Flow Class**: ` field line"
+        )
+E       AssertionError: the requirements template must carry one `**Flow Class**: ` field line
+E       assert None is not None
+
+tests/contract/test_flow_class_spec_declaration.py:390: AssertionError
+______________ test_template_placeholder_does_not_prefill_a_class ______________
+
+    def test_template_placeholder_does_not_prefill_a_class():
+        lines = _template_lines()
+>       line = next(line for line in lines if line.startswith("**Flow Class**: "))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/contract/test_flow_class_spec_declaration.py:402: StopIteration
+=========================== short test summary info ============================
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_well_formed_declaration_is_read_verbatim
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_malformed_forms_report_declaration_malformed[full-width-colon]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_malformed_forms_report_declaration_malformed[field-name-case]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_malformed_forms_report_declaration_malformed[trailing-space]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_malformed_forms_report_declaration_malformed[inline-comment]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_value_is_case_sensitive_and_outside_set_reports_invalid_class
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_invalid_class_names_the_file_line_and_value
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_declaration_after_related_feature_reports_misplaced
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_field_in_the_head_region_stays_legal
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_second_declaration_reports_duplicate[same-value]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_second_declaration_reports_duplicate[different-values]
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_duplicate_outranks_misplaced_for_the_same_root_cause
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_the_four_author_error_codes_never_collapse_into_exit_2
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_absent_field_is_not_an_author_error
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_template_carries_the_field_between_status_and_input
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_template_placeholder_does_not_prefill_a_class
+16 failed, 3 passed in 1.13s

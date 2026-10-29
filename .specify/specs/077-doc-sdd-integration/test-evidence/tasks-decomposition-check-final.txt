@@ -1,0 +1,5 @@
+# decomposition-check.py --mode tasks
+# 2026-10-29T19:48:54Z head=c991b628 (tree dirty: T023–T028 of this segment not yet committed)
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/077-doc-sdd-integration/requirements.md --tasks .specify/specs/077-doc-sdd-integration/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 25, "task_count": 28, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-29T19:48:54Z"}
+exit=0

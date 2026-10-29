@@ -1,0 +1,184 @@
+# T023 — distribution two-state equivalence (unrefreshed c1cd4600 vs refreshed tree)
+# generated 2026-10-29T19:41:28Z on branch 077-doc-sdd-integration
+
+## method
+- "unrefreshed" side = the per-tool command copies and the seven source templates as recorded at baseline commit `c1cd4600` (`git show c1cd4600:<path>`).
+- "refreshed" side = the working tree after T022 ran `sync-mirrors.py --write` + `regen-command-copies.py --write` (per-tool copies), i.e. the tree these seven templates actually ship today.
+- the wiring subsection heading and the strip algorithm are **imported** from the module that owns them (`tests/contract/test_stage_class_wiring.py`, per research.md R-9) — this evidence does not keep a second implementation.
+- verdict per file: base carries 0/0/0 hits of `flow-class-check.py` / the two owner pointers; refreshed carries 1/1/1; `strip_wiring(refreshed) == base` byte for byte; the base→refresh diff contains only `insert` opcodes (no delete, no replace).
+
+## command
+
+```bash
+cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+/Users/liuqiming.lqm/project/profiles/.venv/bin/python tmp/t023_two_state.py
+# exit=0
+```
+
+## output
+
+```text
+baseline commit : c1cd4600
+refreshed side  : working tree (produced by T022's sync/regen --write)
+wiring heading  : '### 类别读取与文档型门禁'  (read from research.md R-9 via the owning test module)
+strip algorithm : R-9 frozen — start = heading line; end = line before the next
+                  ^#{1,3} heading (or EOF); delete start..end, no blank-line edit
+files compared  : 35 (7 source templates + 28 per-tool copies)
+
+file                                                 state           engine/CLS/GATE strip==baseline diff-non-insert verdict
+----------------------------------------------------------------------------------------------------------------------------
+templates/commands/requirements.md                   unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=10 line(s) sha(base)=31d0e1b43079a35f sha(ref)=600b6e357753bd8a sha(strip)=31d0e1b43079a35f
+
+.github/prompts/speckit.requirements.prompt.md       unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=10 line(s) sha(base)=cea21fc98cf5f51a sha(ref)=b19f77f82a8b2f7d sha(strip)=cea21fc98cf5f51a
+
+.claude/commands/speckit.requirements.md             unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=10 line(s) sha(base)=cea21fc98cf5f51a sha(ref)=b19f77f82a8b2f7d sha(strip)=cea21fc98cf5f51a
+
+.opencode/command/speckit.requirements.md            unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=10 line(s) sha(base)=cea21fc98cf5f51a sha(ref)=b19f77f82a8b2f7d sha(strip)=cea21fc98cf5f51a
+
+.qoder/commands/speckit.requirements.md              unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=10 line(s) sha(base)=5a87d6d805aac525 sha(ref)=231ef791433d34d7 sha(strip)=5a87d6d805aac525
+
+templates/commands/clarify.md                        unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=baf687495d7f5bee sha(ref)=1efb4d74917652ff sha(strip)=baf687495d7f5bee
+
+.github/prompts/speckit.clarify.prompt.md            unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=6a52ab6972c6fe13 sha(ref)=ebe387f9570e3b7a sha(strip)=6a52ab6972c6fe13
+
+.claude/commands/speckit.clarify.md                  unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=6a52ab6972c6fe13 sha(ref)=ebe387f9570e3b7a sha(strip)=6a52ab6972c6fe13
+
+.opencode/command/speckit.clarify.md                 unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=6a52ab6972c6fe13 sha(ref)=ebe387f9570e3b7a sha(strip)=6a52ab6972c6fe13
+
+.qoder/commands/speckit.clarify.md                   unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=05af7f1db79e048d sha(ref)=3c3589d82b73d672 sha(strip)=05af7f1db79e048d
+
+templates/commands/plan.md                           unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=1833be4a713f7b9c sha(ref)=f16641f66891dbe1 sha(strip)=1833be4a713f7b9c
+
+.github/prompts/speckit.plan.prompt.md               unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=e31b90112c4c73b7 sha(ref)=cb50e388f0650d98 sha(strip)=e31b90112c4c73b7
+
+.claude/commands/speckit.plan.md                     unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=e31b90112c4c73b7 sha(ref)=cb50e388f0650d98 sha(strip)=e31b90112c4c73b7
+
+.opencode/command/speckit.plan.md                    unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=e31b90112c4c73b7 sha(ref)=cb50e388f0650d98 sha(strip)=e31b90112c4c73b7
+
+.qoder/commands/speckit.plan.md                      unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=27e9c16760893ace sha(ref)=178734fe5fe1735e sha(strip)=27e9c16760893ace
+
+templates/commands/tasks.md                          unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=205fa17fe0050ad1 sha(ref)=308a8caad9830a29 sha(strip)=205fa17fe0050ad1
+
+.github/prompts/speckit.tasks.prompt.md              unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f910aecb398ca063 sha(ref)=8ce26e4b4bb7c6c0 sha(strip)=f910aecb398ca063
+
+.claude/commands/speckit.tasks.md                    unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f910aecb398ca063 sha(ref)=8ce26e4b4bb7c6c0 sha(strip)=f910aecb398ca063
+
+.opencode/command/speckit.tasks.md                   unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f910aecb398ca063 sha(ref)=8ce26e4b4bb7c6c0 sha(strip)=f910aecb398ca063
+
+.qoder/commands/speckit.tasks.md                     unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=3447ad00acf7ba8e sha(ref)=abfca8042a8f2d7b sha(strip)=3447ad00acf7ba8e
+
+templates/commands/checklist.md                      unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=54ca213e7c102af6 sha(ref)=037d6e25e337ffe0 sha(strip)=54ca213e7c102af6
+
+.github/prompts/speckit.checklist.prompt.md          unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=2bbde9e3c70e8825 sha(ref)=6dbc679ad53f4711 sha(strip)=2bbde9e3c70e8825
+
+.claude/commands/speckit.checklist.md                unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=2bbde9e3c70e8825 sha(ref)=6dbc679ad53f4711 sha(strip)=2bbde9e3c70e8825
+
+.opencode/command/speckit.checklist.md               unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=2bbde9e3c70e8825 sha(ref)=6dbc679ad53f4711 sha(strip)=2bbde9e3c70e8825
+
+.qoder/commands/speckit.checklist.md                 unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=a4ca572962ffd200 sha(ref)=1aac39ec4813beb9 sha(strip)=a4ca572962ffd200
+
+templates/commands/analyze.md                        unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=31dc261d9bf76243 sha(ref)=e365058a17d99509 sha(strip)=31dc261d9bf76243
+
+.github/prompts/speckit.analyze.prompt.md            unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f13c9cb204b5551f sha(ref)=6dc476a46511f7f7 sha(strip)=f13c9cb204b5551f
+
+.claude/commands/speckit.analyze.md                  unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f13c9cb204b5551f sha(ref)=6dc476a46511f7f7 sha(strip)=f13c9cb204b5551f
+
+.opencode/command/speckit.analyze.md                 unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=f13c9cb204b5551f sha(ref)=6dc476a46511f7f7 sha(strip)=f13c9cb204b5551f
+
+.qoder/commands/speckit.analyze.md                   unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=34ce2c88aa9f381d sha(ref)=d48278fec135461d sha(strip)=34ce2c88aa9f381d
+
+templates/commands/implement.md                      unrefreshed     0/0/0         -             -           source template
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=86974490811efa04 sha(ref)=5e4eff02772e7827 sha(strip)=86974490811efa04
+
+.github/prompts/speckit.implement.prompt.md          unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=a754e472b1c2cfe5 sha(ref)=2b333e256678fe23 sha(strip)=a754e472b1c2cfe5
+
+.claude/commands/speckit.implement.md                unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=a754e472b1c2cfe5 sha(ref)=2b333e256678fe23 sha(strip)=a754e472b1c2cfe5
+
+.opencode/command/speckit.implement.md               unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=a754e472b1c2cfe5 sha(ref)=2b333e256678fe23 sha(strip)=a754e472b1c2cfe5
+
+.qoder/commands/speckit.implement.md                 unrefreshed     0/0/0         -             -           per-tool copy
+                                                     refreshed       1/1/1         yes           none        OK
+                                                     block=8 line(s) sha(base)=b7f12741e7ea6776 sha(ref)=4ff8489f6b3d0612 sha(strip)=b7f12741e7ea6776
+
+## summary
+templates compared          : 7
+per-tool copies compared    : 28
+unrefreshed engine hits     : [0]
+unrefreshed owner hits      : [(0, 0)]
+refreshed engine hits       : [1]
+refreshed owner hits        : [(1, 1)]
+strip == baseline (byte)    : 35/35
+diff opcodes other than insert: []
+
+VERDICT: the only difference between the two states is the wiring subsection —
+         base has 0 engine/owner hits, refreshed has 1/1/1, and stripping the
+         subsection from the refreshed copy restores the baseline byte for byte
+         (diff consists of insert-only opcodes; no line is deleted or rewritten).
+```

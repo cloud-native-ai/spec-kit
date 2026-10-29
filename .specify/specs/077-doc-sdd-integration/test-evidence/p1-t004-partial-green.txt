@@ -1,0 +1,10 @@
+# T004 partial green — tests/unit/test_flow_class_spec_key.py
+# command: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/unit/test_flow_class_spec_key.py -q
+# date: 2026-10-30
+
+tests/unit/test_flow_class_spec_key.py:389: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_flow_class_spec_key.py::test_resolves_under_the_dot_specify_specs_directory
+FAILED tests/unit/test_flow_class_spec_key.py::test_declared_expression_exits_0_with_declaration_source
+FAILED tests/unit/test_flow_class_spec_key.py::test_invalid_class_value_exits_1_not_2
+3 failed, 21 passed in 2.18s

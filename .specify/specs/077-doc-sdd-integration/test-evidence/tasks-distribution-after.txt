@@ -1,0 +1,40 @@
+# T022 — distribution after (the single sync+verify row)
+# generated 2026-10-29T19:32:21Z on branch 077-doc-sdd-integration
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/sync-mirrors.py --write
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit=0
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit=0
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+## per-pair statement against test-evidence/plan-sync-mirrors-baseline.txt
+## per-pair statement against test-evidence/plan-sync-mirrors-baseline.txt
+six pairs, all `ok`, zero new DIFF; file counts identical to the pre-change baseline:
+
+- templates/ == .specify/templates/ — baseline 22 files / current 22 files → no new drift (ok)
+- skills/external/ == .specify/skills/ — baseline 406 files / current 406 files → no new drift (ok)
+- skills/internal/ == .specify/skills/internal/ — baseline 136 files / current 136 files → no new drift (ok)
+- agents/ == .specify/agents/templates/ — baseline 3 files / current 3 files → no new drift (ok)
+- scripts/ == .specify/scripts/ — baseline 117 files / current 117 files → no new drift (ok)
+- shared/ == .specify/shared/ — baseline 60 files / current 60 files → no new drift (ok)
+
+command copies: `regen-command-copies.py --check` → `OK: all per-tool command copies match the source templates.`, exit 0.
+copy set: the four targets that exist in this checkout (.claude / .github / .qoder / .opencode); `templates/commands/**` is not part of the templates mirror pair.

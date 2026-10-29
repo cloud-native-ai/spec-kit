@@ -1,0 +1,16 @@
+# T008 — single source and ledger boundary
+# date: 2026-10-30; HEAD: e14408f7
+
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=79, clean]
+coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
+# exit=0
+
+$ grep -nE "\|\s*(flow_class|Flow Class)\s*\|" .specify/memory/features.md
+# (no match — the feature index has no class column)
+
+$ grep -nE "^\*\*Flow Class\*\*:|^\s*[-*]?\s*flow_class\s*[:=]" .specify/memory/features/077.md
+# (no match — the detail stores no value, only the pointer)
+
+$ grep -n "Flow Class Declaration" .specify/memory/features/077.md
+62:- Flow Class Declaration: 本条特性线的类别只写在 `.specify/specs/077-doc-sdd-integration/requirements.md` 头部区的 `**Flow Class**` 行；本文件与本特性索引至多留此指针，不复制取值（单一真源，`contracts/class-declaration.md` C-007）

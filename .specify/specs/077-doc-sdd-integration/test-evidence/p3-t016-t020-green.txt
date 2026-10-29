@@ -1,0 +1,44 @@
+# T016–T020 green runs — 2026-10-29T19:36:10Z HEAD 0970c519
+# cwd = repo root; pytest = /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest
+
+## own contract file
+.................................                                        [100%]
+33 passed in 0.06s
+exit=0
+
+## targeted set (this segment's files + driver contracts + P1/P2 neighbours)
+...................................................                      [100%]
+411 passed in 49.40s
+exit=0
+
+## class-token carrier map (flow_class|flow-class)
+skills/external/sdd-loop-driver/references/stage-prompts.md
+skills/external/sdd-loop-driver/SKILL.md
+
+## distribution state after T022
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit=0
+
+## environment note — the only red in the adjacent integration sweep
+`tests/integration/test_sdd_loop_efficiency_regression.py::test_injected_regression_found_by_name_diff`
+shells out to `scripts/bash/run-tests.sh`, which resolves its interpreter from
+`SPECKIT_PYTHON` / `.venv/bin/python` / `python3` / `python`. This checkout's
+`.venv` has no pytest (tasks.md § Environment Prerequisites), so without the hint
+the runner exits 1 with `no interpreter with pytest found`. With the prescribed
+environment it passes:
+
+$ SPECKIT_PYTHON=/Users/liuqiming.lqm/project/profiles/.venv/bin/python \
+  /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest \
+  tests/integration/test_sdd_loop_efficiency_regression.py -q
+1 passed in 0.91s
+
+Not a regression: the full-suite baseline row in the state spine was captured with
+the same `SPECKIT_PYTHON` / PATH fix, which is why this name is absent from
+`baseline-failed.txt`. It is an interpreter-resolution condition of the local
+checkout, unchanged by this feature.

@@ -20,8 +20,12 @@ C-15 and ``contracts/expression-gate-operators.md`` C-12/C-14/C-15 that
 * **A5** wiring text hygiene — after removing the owner paths no independent
   ``expression`` / ``execution`` word and no class-attribution assertion remains;
   no class-key assignment form and no ledger-style row anywhere;
-* **A6** closed wiring — the other 25 templates and 49 skills reference neither
-  engine nor the gate owner;
+* **A6** closed wiring — every template and skill outside the wired roster
+  references neither engine nor the gate owner. The roster is W1…W4 plus the seven
+  stage templates Feature 077 wires (``requirements`` / ``clarify`` / ``plan`` /
+  ``tasks`` / ``checklist`` / ``analyze`` / ``implement`` — 077 stage-wiring
+  contract C-013). Widening a roster keeps the closed-set proposition; the
+  denominator assertion below is the half that MUST NOT move;
 * **A7** the eight generated command copies carry the same wiring (docs: lookup +
   owner pointer; humanize: the two owner pointers and no engine call);
 * **A8** the wired checker command is **executed**, not grepped: the exact string
@@ -322,10 +326,27 @@ def test_a5_no_class_key_assignment_or_ledger_row():
 # --------------------------------------------------------------------------- #
 # A6 — closed wiring set
 # --------------------------------------------------------------------------- #
+# W1…W4 (069a) plus the seven stage templates 077 wires. The roster is the ONLY
+# thing 077 widens here: `test_a6_wiring_inventory_matches_the_frozen_denominator`
+# below pins the denominator (27 templates / 52 skills) and MUST NOT move, so a
+# new template or skill still has to be justified rather than absorbed.
+WIRED_TEMPLATE_NAMES = (
+    "docs.md",
+    "humanize.md",
+    "requirements.md",
+    "clarify.md",
+    "plan.md",
+    "tasks.md",
+    "checklist.md",
+    "analyze.md",
+    "implement.md",
+)
+
+
 def test_a6_wiring_set_is_closed():
     offenders: list[str] = []
     for path in sorted(COMMANDS_DIR.glob("*.md")):
-        if path.name in ("docs.md", "humanize.md"):
+        if path.name in WIRED_TEMPLATE_NAMES:
             continue
         text = path.read_text(encoding="utf-8")
         for token in ENGINE_TOKENS:

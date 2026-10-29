@@ -1,0 +1,6 @@
+doc-consistency-check: verify
+checked_at: 2026-10-29T17:18:19Z
+faces: reader=not-applicable
+files_scanned: 2
+findings: 0
+reader=0

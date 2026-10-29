@@ -1,0 +1,6 @@
+# pre-analyze-check.py --stage tasks
+# 2026-10-29T19:48:54Z head=c991b628 (tree dirty: T023–T028 of this segment not yet committed)
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/077-doc-sdd-integration --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=3 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 62, "message": "path does not exist under the repo: .specify/.tmp/"}, {"check": "missing-path", "severity": "advisory", "path": "tasks.md", "line": 263, "message": "path does not exist under the repo: .specify/.tmp/"}, {"check": "missing-path", "severity": "advisory", "path": "quickstart.md", "line": 169, "message": "path does not exist under the repo: .specify/.tmp/sdd-loop/tmp/plan077"}], "summary": {"errors": 0, "advisories": 3, "waived": 0, "fr": 25, "sc": 8, "tasks": 28, "clauses": 0, "files": 15}, "checked_at": "2026-10-29T19:48:54Z"}
+exit=0

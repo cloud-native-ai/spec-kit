@@ -1,0 +1,13 @@
+# validate-tasks.py .specify/specs/077-doc-sdd-integration/tasks.md
+# 2026-10-29T17:41:02Z head=06c31b1d branch=077-doc-sdd-integration
+PASS: .specify/specs/077-doc-sdd-integration/tasks.md — 0 error(s), 0 warning(s)
+exit=0
+
+# --json claim census
+errors=0 warnings=0 green_claims=77
+  contracts/class-declaration.md                     13
+  contracts/class-resolution.md                      12
+  contracts/document-structure.md                    19
+  contracts/driver-integration.md                    11
+  contracts/invariants-and-distribution.md           9
+  contracts/stage-wiring.md                          13

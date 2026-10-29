@@ -1,0 +1,55 @@
+# T021 — zero-new-mechanism set difference (baseline c1cd4600 vs current tree)
+# generated 2026-10-29T19:31:48Z on branch 077-doc-sdd-integration
+
+## 1. /speckit.* command inventory
+scope: templates/commands/*.md UNION per-tool copies ['.claude/commands', '.github/prompts', '.opencode/command', '.qoder/commands']
+baseline=27 current=27
+only-in-baseline: []
+only-in-current : []
+DIFFERENCE: []
+
+## 2. dependency inventory
+scope: pyproject.toml [project].dependencies + [project.optional-dependencies]
+baseline=6 ['typer', 'rich', 'httpx[socks]', 'platformdirs', 'readchar', "truststore>=0.10.4; python_version >= '3.10'"]
+current =6 ['typer', 'rich', 'httpx[socks]', 'platformdirs', 'readchar', "truststore>=0.10.4; python_version >= '3.10'"]
+only-in-baseline: []
+only-in-current : []
+pyproject blob: baseline=4dcd0f0d4aa9fb1efae52c7b41b25c28cb8f8088 current=4dcd0f0d4aa9fb1efae52c7b41b25c28cb8f8088
+lock/manifest files present: []
+
+## 3. process inventory
+scope: tracked *.py / *.sh matching 'while True|serve_forever|socketserver|APScheduler|schedule\\.every|daemon=True'
+baseline=19 current=19
+only-in-baseline: []
+only-in-current : []
+service/daemon declaration files: baseline=[] current=[] equal=True
+
+## VERDICT
+allowed difference set = []
+new commands = 0
+new dependencies = 0
+new resident-process carriers = 0
+new service/daemon declarations = 0
+
+## 4. doc-consistency-check faces (must stay four; parser not widened)
+FACES = ('reader', 'evidence', 'duplicate', 'count') (count=4)
+
+$ python3 scripts/python/doc-consistency-check.py --faces reader --spec-dir .specify/specs/077-doc-sdd-integration
+doc-consistency-check: verify
+checked_at: 2026-10-29T19:31:48Z
+faces: reader=not-applicable
+files_scanned: 15
+findings: 0
+exit=0
+
+$ python3 scripts/python/doc-consistency-check.py --faces structure --spec-dir .specify/specs/077-doc-sdd-integration
+doc-consistency-check: input error: unknown face(s): structure (registered faces: reader, evidence, duplicate, count)
+exit=2  (2 = the structure step is an action, not a fifth face)
+
+## 5. blocking confirmation gates (FR-022: two readings must be equal)
+baseline reading (test-evidence/plan-scan-confirmation-gates.txt):
+blocking confirmation gates: 27
+current reading:
+blocking confirmation gates: 27
+violations (reversible gates still blocking): 0
+exit=0

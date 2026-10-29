@@ -1,0 +1,15 @@
+# Probe: seven stage templates vs the three class tokens (pre-implementation)
+# 2026-10-29T17:24:15Z
+
+$ for f in requirements clarify plan tasks checklist analyze implement; do printf '%s ' $f; grep -c -E 'flow_class|flow-class|flow-class-check|expression-gates' templates/commands/$f.md; done
+requirements 0
+clarify 0
+plan 0
+tasks 0
+checklist 0
+analyze 0
+implement 0
+
+# Positive control — the two already-wired templates must be non-zero:
+docs 3
+humanize 2

@@ -74,6 +74,19 @@ FEEDBACK_STEP = REPO_ROOT / "shared" / "workflow" / "feedback-step.md"
 
 # The wiring surface (C-5): the only four files allowed to name an engine/owner.
 WIRING_TEMPLATES = ("docs.md", "humanize.md")
+# 2026-10-30 Feature 077 widens the closed surface by the seven stage templates —
+# the same proposition ("only a designated roster names the engine or an owner"),
+# a larger roster. Kept apart from WIRING_TEMPLATES because the frozen-hash leg
+# above still means "069a's 25-template non-wiring complement".
+POST_077_WIRING_TEMPLATES = (
+    "requirements.md",
+    "clarify.md",
+    "plan.md",
+    "tasks.md",
+    "checklist.md",
+    "analyze.md",
+    "implement.md",
+)
 WIRING_SKILLS = (
     "skills/external/create-docs/SKILL.md",
     "skills/external/humanize/SKILL.md",
@@ -514,6 +527,19 @@ ALLOWED_POST_BASELINE_CHANGES = {
     },
 }
 
+# 2026-10-30 Feature 077 stage-wiring amendment. 069a's manifest is that slice's
+# window record ("the slice may only touch W1-W4"); it stays at 74 sources with its
+# 25/49 counts untouched. 077 legitimately wires seven further stage templates, so
+# each records itself here with the content its card must carry — the same
+# mechanism the two entries above use, and the reason this leg still proves
+# "no unannounced edit" rather than "no edit ever".
+for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
+               "analyze", "implement"):
+    ALLOWED_POST_BASELINE_CHANGES["templates/commands/%s.md" % _stage] = {
+        "reason": "2026-10-30 Feature 077 stage-wiring: one class-read card per stage",
+        "markers": ("spec:<spec 目录名>", "--action lookup", "owner-unavailable"),
+    }
+
 # The historical baseline stays; a later amendment that legitimately edits an
 # untouchable path records itself here with the content it must carry.
 ALLOWED_POST_BASELINE_PATHS = {
@@ -637,7 +663,7 @@ def test_c2_no_project_side_classification_store():
 def test_c5_wiring_surface_is_closed():
     offenders: list[str] = []
     for path in sorted(COMMANDS_DIR.glob("*.md")):
-        if path.name in WIRING_TEMPLATES:
+        if path.name in WIRING_TEMPLATES + POST_077_WIRING_TEMPLATES:
             continue
         text = path.read_text(encoding="utf-8")
         offenders.extend(

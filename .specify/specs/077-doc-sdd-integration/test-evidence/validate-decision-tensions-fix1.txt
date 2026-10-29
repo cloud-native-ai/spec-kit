@@ -1,0 +1,18 @@
+# /speckit.analyze fix round (fix1) — full capture, no truncation
+# captured_at: 2026-10-29T18:13:58Z
+# cwd: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python scripts/python/validate-decision-tensions.py --spec .specify/specs/077-doc-sdd-integration
+spec: .specify/specs/077-doc-sdd-integration
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 226 lines, 3 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+
+# exit=0

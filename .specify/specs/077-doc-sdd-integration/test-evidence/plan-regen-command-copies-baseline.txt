@@ -1,0 +1,2 @@
+OK: all per-tool command copies match the source templates.
+regen exit=0
