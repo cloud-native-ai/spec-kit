@@ -347,7 +347,7 @@ def test_c13_the_per_member_cap_is_hard_and_cites_the_existing_line_mechanism():
     assert "no higher per-member cap is declarable" in gov, (
         "the cap must have no declarable escape, or it is a default rather than a cap (C-13)"
     )
-    assert "Feature 064" in gov, (
+    assert "existing line registry and worktree-per-write-line ownership mechanism" in gov, (
         "the second-duty case must cite the existing line registry / ownership mechanism "
         "(C-13), not an invented gate"
     )
@@ -394,7 +394,7 @@ def test_c16_no_confirmation_gate_no_scheduler_no_second_registry():
     """C-16: the authorization surface's only stored state is the two declared values."""
     gov = _governance()
     for token in (
-        "no confirmation gate",
+        "no additional user-confirmation step",
         "no scheduler",
         "no second registry",
         "two declared values",
