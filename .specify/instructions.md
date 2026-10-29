@@ -60,6 +60,17 @@ Escalation rules:
 - If the suspected error impacts correctness, security, data loss, or large refactors: **pause and ask a clarifying question**.
 - If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
 
+## SDD Routing Decision (SDD 分流裁决)
+
+当一次**写留存变更**（会把内容落到磁盘上的变更）被提出时，先到路由规则的唯一所有者处执行一次裁决，再决定这次变更走 SDD 开发流程还是直接修改：
+
+- **规则所有者**：`.specify/shared/definitions/sdd-routing-definitions.md` —— 输入集、封闭取值域、裁决表、优先级与理由码词表全部在那里；本节一律不复述，只按路径抵达。
+- **可执行形态**：`.specify/scripts/python/sdd-route.py` —— 动作、参数与退出码以该引擎的 `--help` 为准。
+- **裁决之后还有一层**：按该裁决走 SDD 开发流程时，启动一次嵌套运行仍需**有效授权**；授权谓词的取值域与缺省按上一条的指针表抵达键集所有者，本节不列取值。
+- **建议不等于启动**：一条主动触发建议本身不足以启动一次 SDD 运行；晋升与自动执行边界见 `.specify/shared/guidelines/proactive-trigger.md` § Promotion & Safety Boundary。
+
+**本节字节上限：2,000 B** —— 判据是这里声明的上限加上生成后的实测增量；生成器的字节预算不构成本节的判据（它可能早已被既有内容超出，也可能尚有余量）。
+
 ## One Source Of Truth
 
 Every fact — a concept's meaning, a normative rule, a threshold, an enumerated list, a configuration value, a count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/one-source-of-truth.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
