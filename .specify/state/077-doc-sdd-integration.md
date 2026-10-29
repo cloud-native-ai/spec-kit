@@ -130,6 +130,12 @@ last_verdict: analyze #3 PASS — 0 CRITICAL / 0 HIGH（5 MEDIUM / 10 LOW）；�
 
 ## 测试预算（E2/E3）
 
+| seq | slot | stage | selection_basis | command | rc | passed/failed | failed_names_path | evidence_ptr |
+|-----|------|-------|-----------------|---------|----|---------------|-------------------|--------------|
+| 1 | baseline | implement | full-suite | `PATH=<pybin>:$PATH SPECKIT_PYTHON=<profiles-venv> bash .specify/scripts/bash/run-tests.sh --names-out .specify/specs/077-doc-sdd-integration/baseline-failed.txt` | 1（39 既有失败） | 6593 passed / 39 failed / 7 skipped（553.62s） | `.specify/specs/077-doc-sdd-integration/baseline-failed.txt`（39 名，与 076 closure 逐名相同） | 本行 + 基线文件 |
+
+中间阶段一律用定向集，禁止第二次全量；closure 全量在 review 之后。
+
 （implement 起点与 review 后写入。）
 
 ## 框架观察
