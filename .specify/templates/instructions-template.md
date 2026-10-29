@@ -99,6 +99,8 @@ Right-size your thinking to the task: under-thinking complex or high-stakes task
 
 Full tier table with signals and thinking-depth prescriptions: `.specify/shared/guidelines/task-complexity-rubric.md`.
 
+Load-bearing decisions (承重决策：不可逆 / 跨团队 / 高爆炸半径 / 触及宪法 MUST) record their antithesis, discriminating evidence, expected anti-metric and reopening condition per `.specify/shared/guidelines/decision-tension.md`, the owner of that shape — do not restate its thresholds here.
+
 ## Token Efficiency Discipline
 
 LLM token usage efficiency is a framework-level quality attribute. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/token-efficiency.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:

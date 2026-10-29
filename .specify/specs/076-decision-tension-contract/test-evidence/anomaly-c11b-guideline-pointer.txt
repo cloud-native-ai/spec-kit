@@ -1,0 +1,59 @@
+# ANOMALY evidence — C-11(b) guideline-pointer remainder (Feature 051 contract)
+# command: $SPECKIT_PYTHON -m pytest -q tests/contract/test_user_facing_comprehension_section.py
+# date: 2026-10-29 (implement segment 1, after T001–T007)
+
+..........F                                                              [100%]
+=================================== FAILURES ===================================
+_____ test_c11_no_dangling_guideline_pointer_on_either_instruction_surface _____
+
+    def test_c11_no_dangling_guideline_pointer_on_either_instruction_surface():
+        surfaces = (("template", TEMPLATE), ("live", LIVE))
+        pointed: set[str] = set()
+        for label, path in surfaces:
+            names = set(GUIDELINE_POINTER_RE.findall(_text(path)))
+            assert names, f"the {label} instruction surface carries no guideline pointer at all"
+            pointed |= names
+    
+        # A pointer's whole job is to let a reader open the file, so the target that must exist
+        # is the one the reader actually resolves: `.specify/shared/guidelines/<name>.md`.
+        # Checking only the framework source leaves the downstream failure mode invisible —
+        # proven by drill: with the runtime copy moved aside and the source intact, a
+        # source-only version of this clause still passed. Both halves are asserted, because
+        # the source is what regenerates the runtime copy.
+        runtime_dir = ROOT / ".specify" / "shared" / "guidelines"
+        dangling_runtime = sorted(n for n in pointed if not (runtime_dir / n).is_file())
+        assert not dangling_runtime, (
+            "instruction surfaces point at guidelines with no runtime copy under "
+            ".specify/shared/guidelines/ — a reader following the pointer finds nothing, which "
+            "is the delivery window FR-038 / SC-017 exists to close "
+            f"(run scripts/python/sync-mirrors.py --write shared): {dangling_runtime}"
+        )
+        dangling_source = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
+        assert not dangling_source, (
+            "instruction surfaces point at guidelines with no framework source under "
+            f"shared/guidelines/ — the runtime copy cannot be regenerated: {dangling_source}"
+        )
+    
+        # C-11(b): the remainder must not grow past the three structurally unpointed files.
+        # Anti-vacuity: name the three and require them to exist, so an empty guidelines
+        # directory cannot make the subset assertion pass on nothing.
+        for name in UNPOINTED_BY_STRUCTURE:
+            assert (GUIDELINES / name).is_file(), (
+                f"C-11(b) names {name} as unpointed-by-structure but it is not in shared/guidelines/"
+            )
+        full = {p.name for p in GUIDELINES.glob("*.md")}
+        remainder = full - pointed
+        unexpected = sorted(remainder - set(UNPOINTED_BY_STRUCTURE))
+>       assert not unexpected, (
+            "a guideline lost its instruction-surface pointer, so it can no longer dangle "
+            "loudly — coverage shrank silently. Either restore the pointer or amend "
+            f"ambient-section.md C-11(b) with a recorded reason: {unexpected}"
+        )
+E       AssertionError: a guideline lost its instruction-surface pointer, so it can no longer dangle loudly — coverage shrank silently. Either restore the pointer or amend ambient-section.md C-11(b) with a recorded reason: ['decision-tension.md']
+E       assert not ['decision-tension.md']
+
+tests/contract/test_user_facing_comprehension_section.py:283: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface
+1 failed, 10 passed in 0.06s
+EXIT=1

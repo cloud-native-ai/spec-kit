@@ -232,6 +232,9 @@ N/A — Constitution Check 18 项全部 Pass，无 Violation 需要辩护，本�
 | 15 | 本文件（Summary / Project Structure）、`tasks.md` T016 | 「改写并删复述」改为「核验 SI-3C 仍为指针形并留证」，交付面相应改为「1 份工作流步骤核验」 | 实测 SI-3C 已只保留步骤摘要与 owner 指针、无四元组字段清单可删；原文描述的是一次空操作，且会让交付面计数虚高 | A-15 |
 | 16 | `tasks.md` § Requirement Coverage Map | 增一行：T001 / T026 / T027 是流程行，不映射任何 FR / SC（**第三轮已按 A-23 修正：T001 / T027 为流程行，T026 为执行/取证行，计入 SC-002 / SC-003**） | 原表只列有 FR / SC 映射的行，读者无法判断三行是漏映射还是流程行 | A-16 |
 | 17 | 本文件 § Scale/Scope / § Mirror Obligations、`tasks.md` DoD-5 / § Mirror Obligations / T024 | 「七行 / 7 对」改为「以 `requirements.md` FR-025 的表为准（行数不在本处重复）」 | 同一个数字在四处各写一份，改表就会漂移（系统性建议，本轮采纳） | A-01…A-16 的系统性收口 |
+| 18 | `templates/instructions-template.md`（+ 镜像 `.specify/templates/instructions-template.md`）、`tasks.md`（T005、T024 子步骤） | 在 `## Task Complexity Rubric` 节补一行指向 `shared/guidelines/decision-tension.md` 的指令面指针 | 新增的 guideline owner 触发 Feature 051 的 C-11(b) 余集断言；该条明文禁止第 4 个名字、并明文预期「补上指针只会让余集变小、不误报」，故补指针而非改契约 | implement P1 异常（非 analyze 编号） |
+
+**分类更正**：第 18 行为 implement P1 期间的 `PLAN-EDIT: templates/instructions-template.md — one-line instruction-surface pointer to decision-tension.md (required by Feature 051 C-11(b))`，分类 **`substantive`**（交付面新增一行指令面指针；无 FR / SC / 条款 / 任务增删）。因此本特性的 plan-owned 变更不再是全 `minor`。已核实：生成器为**段级非破坏合并**——已存在的 `## Task Complexity Rubric` 不会被改写，故本仓 live `.specify/instructions.md` 暂不含该行，将在该节下次整段收敛时带入；新项目经 `specify init` 初始化时按模板整篇渲染会直接带上。该行为已写入 `notes/red-first-evidence.md` 与 T024 子步骤。
 
 **第一轮未改动**：`research.md`（Phase 0 实测记录，第一轮无新实测需要回填；第二轮按 A-18 / A-22 更新 R-5 / R-6 / R-9）；`checklists/readiness-2026-10-29.md`（dated record，不回改）；`coverage-baseline.txt`（claims 数未变，不重冻结）。
 

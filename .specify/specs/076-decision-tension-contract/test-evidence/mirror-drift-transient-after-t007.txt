@@ -1,0 +1,12 @@
+# mirror check AFTER T007 (segment 1) — declared transient until T024
+# command: python3 scripts/python/sync-mirrors.py --check
+
+OK: all per-tool command copies match the source templates.
+DIFF  .specify/templates/plan-template.md
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+MISS  .specify/scripts/python/validate-decision-tensions.py
+MISS  .specify/shared/guidelines/decision-tension.md
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+EXIT=2
