@@ -1,0 +1,16 @@
+# targeted contract-test baseline (plan stage; BEFORE implementation)
+# interpreter: /Users/liuqiming.lqm/project/profiles/.venv/bin/python3 (pytest 9.1.1) via SPECKIT_PYTHON-equivalent;
+#   the repo's own .venv currently has no pytest installed (environment fact, recorded not hidden)
+# command: python -m pytest tests/contract/test_closed_set_claims.py \
+#            tests/contract/test_self_improvement_conformance.py \
+#            tests/contract/test_validation_carrier_contract.py \
+#            tests/contract/test_user_facing_comprehension_doc.py \
+#            tests/contract/test_validate_tasks_parallel_safety.py -q
+# date: 2026-10-29
+# why these five: they are the existing guards over the surfaces this feature edits
+#   (closed-set claims, SI-3C/self-improvement, detection-and-severity carrier,
+#    user-facing prose rules, plan-template parallel-safety pins).
+
+......................................................................   [100%]
+70 passed in 0.59s
+EXIT=0

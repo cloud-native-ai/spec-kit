@@ -1,0 +1,47 @@
+# clause_extract.py over contracts/ (captured verbatim)
+# command: python3 scripts/python/clause_extract.py .specify/specs/076-decision-tension-contract/contracts/*.md
+# date: 2026-10-29
+
+adr-reference.md	form=md-bold-closed	clauses=2
+  C-1
+  C-2
+analyze-channel.md	form=md-bold-closed	clauses=5
+  C-1
+  C-2
+  C-3
+  C-4
+  C-5
+decision-tension-owner.md	form=md-bold-closed	clauses=8
+  C-1
+  C-2
+  C-3
+  C-4
+  C-5
+  C-6
+  C-7
+  C-8
+falsification-quartet.md	form=md-bold-closed	clauses=5
+  C-1
+  C-2
+  C-3
+  C-4
+  C-5
+measurement-binding.md	form=md-bold-closed	clauses=3
+  C-1
+  C-2
+  C-3
+mirrors-and-scope.md	form=md-bold-closed	clauses=4
+  C-1
+  C-2
+  C-3
+  C-4
+plan-template-anchor.md	form=md-bold-closed	clauses=3
+  C-1
+  C-2
+  C-3
+validator.md	form=md-bold-closed	clauses=4
+  C-1
+  C-2
+  C-3
+  C-4
+EXIT=0
