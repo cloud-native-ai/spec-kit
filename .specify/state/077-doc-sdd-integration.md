@@ -1,16 +1,16 @@
 # Line State — 077-doc-sdd-integration
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: closure
-stage_started_at: 1793304777
-stage_deadline_epoch: 1793310177
-stage_base_commit: 336421df
+stage: done
+stage_started_at: 1793305401
+stage_deadline_epoch: 1793310801
+stage_base_commit: 3a4d9f18
 attempt: 0
 retry_limit: 2
-last_verdict: review PASS（0 blocking，2 P1 / 4 P2 / 3 important）→ 状态推进 Ready for Review；review-fix `336421df` 关闭 2 P1 + 3 important（含真实表达类试点线 12 passed、exit-2 对齐、plan-template 指针可解析、quickstart S2 回写）；七道门全过 + 218 邻近测试；closure 全量运行中（后台 b3yh4eihp）
+last_verdict: MERGED to master at 3a4d9f18; line deregistered (closed); Feature 077 = Ready for Review; closure 39 failed (exact baseline) / 6779 passed, zero new failures
 <!-- plan-fence: decomposition=single-package reason=not-beneficial (28 tasks <= 40, tightly coupled shared engine and seven templates) test-budget=baseline@implement-start + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -182,6 +182,20 @@ last_verdict: review PASS（0 blocking，2 P1 / 4 P2 / 3 important）→ 状态�
 - plan-template 改用下游可解析的字面标题 + owner 指针
 - 3 条 important 答复写入 `code-review.md`；review.md 增 §8 Post-review Fix
 - 门：七道门 exit 0；218 邻近测试绿；状态门仍满足（0 blocking）
+
+### closure — DONE / MERGED（2026-10-30）
+
+- closure 全量（review 后唯一一次）：**39 failed / 6779 passed / 7 skipped**，失败名单与基线逐名相同（`comm -13` 与 `comm -23` 皆空）→ 零新增失败
+- 合并：`3a4d9f18 merge(077): land document-type SDD`（`--no-ff`，自 `master@c1cd4600`）
+- 合并后冒烟：186 passed；分支已删除；Line Registry `state=closed`；状态脊 `completed`；临时 `~/tmp/pybin` 已清理
+- Feature 077 = `Ready for Review`（`Completed` 属人工/治理终验）
+
+## 框架观察
+
+- **文档型 SDD 的三层缺口**：分类轴（069）→ 阶段命令接线（077）→ 驱动槽位（077）。本次把后两层接上后，表达类特性首次具备「八阶段 + 文档门禁 + 可无人值守」的完整路径。
+- **「判红容易、可达难」**：analyze 三轮里最反复的形态是「检查器/码表齐备，但没人产出被检对象」；修法一律是补产出侧（plan 模板、`--path` 落文输入、缺节码）。
+- **派生计数仍在漂**：FR/SC/条款/任务之外的行数、模板数、副本数多次出现字面量；可靠做法是一律指针化到 `validate-*.py` 输出。
+- **partial SC 的诚实边界**：本仓没有真实表达类客户线，4 条 partial 全部写明「测了什么 / 没测什么」，补一条 synthetic 试点线后 SC-003 转 pass，其余仍留 partial——不把 synthetic 说成真实线。
 
 ## 测试预算（E2/E3）
 
