@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261030T010236Z-077a
 slice: 077
-stage: tasks
-stage_started_at: 1793295128
-stage_deadline_epoch: 1793300528
-stage_base_commit: 159aa940
+stage: checklist
+stage_started_at: 1793295760
+stage_deadline_epoch: 1793301160
+stage_base_commit: 45b6b732
 attempt: 0
 retry_limit: 2
-last_verdict: plan DONE — 6 契约 / 77 条款；FR 25/25；宪法 18 行全 Pass；DTR 3 条（validator ok）；pre-analyze pass；镜像 clean；定向 1062 passed；下一步 tasks
+last_verdict: tasks DONE — 27 任务（≤40）；77 条款各认领一次；validate-tasks PASS 0/0；decomposition proceed；pre-analyze pass（32 advisories）；coverage baseline 冻结 @06c31b1d；下一步 checklist
 <!-- loop-state:end -->
 
 - line_id: `077-doc-sdd-integration`
@@ -88,6 +88,13 @@ last_verdict: plan DONE — 6 契约 / 77 条款；FR 25/25；宪法 18 行全 P
 - 门：`pre-analyze --stage plan` pass（errors=0 / advisories=13–14，全为待建测试文件）；FR 25/25；clause 车道 baseline-missing（设计内）；镜像六对 ok；`validate-decision-tensions` 0 error / 0 HIGH
 - 关键发现：① 七模板接线必然打破 069a 的 `test_a6_wiring_set_is_closed`，修订方式是把七模板并入已接线名册、分母不变；② `flow-class-check.py` 对 `spec:` 键今天返回 exit 2 + default，声明行不可区分；③ `audit-test-budget.py` 不校验 `selection_basis` 枚举，`docs-gate-full` 可被接纳；④ 确认门预算 27 项零余量
 - 结构：`## Constitution Check` → `## Decision Tensions` → `## Project Structure` 相邻（076 模板契约生效）
+
+### tasks — DONE（2026-10-30）
+
+- 提交：`ab288aab`（tasks + baseline + 证据）、`45b6b732`（wrap-up）
+- 27 任务（Setup 1 / US1 7 / US2 4 / US3 3 / US4 5 / Polish 7）；77 条款由 19 行认领，各一次、同文件内单调
+- 门：`validate-tasks` PASS（0/0，green_claims=77）；`decomposition --mode tasks` proceed（25 FR / 27 tasks）；`pre-analyze --stage tasks` pass（32 advisory，全为待建测试文件）；coverage ok（77/25/25）；baseline 冻结 `1a00c4b5…` @`06c31b1d`
+- 偏差：五个红先行项落四个测试文件（execution 反向守卫是同文件具名腿）；`green-path-divergence` WARN 以 `see` 指针消解；MVP = US1+US2+US3
 
 ## 测试预算（E2/E3）
 
