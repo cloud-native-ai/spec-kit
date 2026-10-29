@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261029T172918Z-076a
 slice: 076
-stage: tasks
-stage_started_at: 1793267858
-stage_deadline_epoch: 1793273258
-stage_base_commit: 246eba85
+stage: checklist
+stage_started_at: 1793268574
+stage_deadline_epoch: 1793273974
+stage_base_commit: 920e0f8d
 attempt: 0
 retry_limit: 2
-last_verdict: plan DONE — 8 contracts / 34 clauses；FR 26/26；宪法 18 行全 Pass；pre-analyze pass；镜像与命令副本 clean；DTR 试点 2 条；wrap-up 由驱动者补跑
+last_verdict: tasks DONE — 27 tasks（≤40）；34 条款各认领一次；validate-tasks PASS 0/0；decomposition proceed；pre-analyze pass（41 expected advisories）；coverage baseline 冻结 @412b4245b461
 <!-- loop-state:end -->
 
 - line_id: `076-decision-tension-contract`
@@ -91,6 +91,14 @@ last_verdict: plan DONE — 8 contracts / 34 clauses；FR 26/26；宪法 18 行�
 - 结构：`## Constitution Check` → `## Decision Tensions` → `## Project Structure` 三行相邻（FR-008 锚点已在本计划内生效）
 - DTR 试点：T-001（四元组判定者＝确定性脚本 vs agent，expected_sacrifice = `SC-004 Source ↓`）、T-002（封闭文法 vs 自由文本，`SC-002 Source ↑`），六字段齐备、反题为可独立采纳方案
 - 偏差：`create-new-plan.sh` 因缺 `CWS_LIB_BASH_HOME` 退出 1（未产生分支动作）；模板尚无该章节属本特性待实现面；同作者门按 direct-read 标记回退；pytest 走 profiles venv
+
+### tasks — DONE（2026-10-29）
+
+- 提交：`920e0f8d`；产物 `tasks.md`（27 行，T001–T027）/ `coverage-baseline.txt`（495 名，base `412b4245b461`）/ 5 份 test-evidence
+- 分组：Setup 1 / US1 7 / US2 3 / US3 5 / US4 2 / US5 2 / Polish 7；无 Foundational 相位
+- 条款：34 条各认领恰好一次；`account-clause-coverage` status=ok / FR 26/26 / beyond baseline 0
+- 门：`validate-tasks` PASS（0 error / 0 warning）；`decomposition --mode tasks` proceed（26 FR / 27 tasks）；`pre-analyze --stage tasks` pass（41 advisories 全为待建文件）
+- 偏差：无 `[P]` 行（同文件写读被判非并行安全）；US1 行序重标号一次；两条认领是「实现后守卫」非红先行
 
 ## 框架观察
 
