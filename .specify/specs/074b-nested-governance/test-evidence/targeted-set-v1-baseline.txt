@@ -1,7 +1,8 @@
 # Targeted-set-v1 baseline — slice 074b-nested-governance
-# Captured 2026-10-29 during /speckit.plan at stage_base=33269994a (HEAD=33269994a), BEFORE any edit of this slice.
-# Single-run capture: command line, full output, exit status. The plan commit adds specification artifacts only,
-# so this run is also the plan-stage baseline for the suites the slice will touch.
+# Re-captured 2026-10-29T05:52Z at stage_base=implement (HEAD=241a6082b), BEFORE any edit of this slice's
+# delivery surface (never-cache rule: the plan-stage capture at HEAD=33269994a is superseded, not reused).
+# Single-run capture: command line, full output, exit status. This file is the sole owner of this
+# targeted-set-v1 baseline; the selection basis and the pre-existing-red declaration below are unchanged.
 $ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/074b-targeted-failed.txt \
     tests/contract/test_team_item_ledger.py tests/contract/test_team_command_routing.py \
     tests/contract/test_team_territory.py tests/contract/test_single_conceptual_model.py \
@@ -74,7 +75,7 @@ E       assert 27 == 23
 tests/contract/test_proactive_trigger_section.py:365: AssertionError
 =========================== short test summary info ============================
 FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
-======================== 1 failed, 289 passed in 34.27s ========================
+======================== 1 failed, 289 passed in 32.11s ========================
 # failed-name list written: .specify/.tmp/074b-targeted-failed.txt (1 entries)
 rc=1
 
