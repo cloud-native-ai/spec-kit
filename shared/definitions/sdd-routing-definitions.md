@@ -13,7 +13,7 @@
 
 **机读面**: 唯一的读取者是只读 stdlib 引擎 `scripts/python/sdd-route.py`（动作 `route` / `authorize` / `golden`）。它在运行时解析本文件，MUST NOT 自带第二份取值域、裁决表、优先级或理由码；引擎的接口与退出码归 `contracts/routing-decision.md` C-28 所有。
 
-**字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是 Feature 074 切片 `074a-authorized-routing` 的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。
+**字面量登记处**: `[[STR-001]]` … `[[STR-010]]` 的取值与语义 owner 是本特性切片的 `requirements.md` § Shared Strings；本文件以 `[[STR-NNN]]` 引用其语义，不另立第二张字面量表。
 
 **不在本文件（只给指针，不复述）**:
 

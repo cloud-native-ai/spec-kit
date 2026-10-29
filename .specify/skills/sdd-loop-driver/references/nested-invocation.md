@@ -9,8 +9,8 @@
 | 阶段名册、状态脊格式、哨兵、U0–U6、卡死处置 | `../SKILL.md` § The Loop 与 `stage-prompts.md` |
 | Goal / Target 的身份、状态机与绑定校验 | `shared/definitions/goal-definitions.md` 与 `scripts/python/goal-utils.py` |
 | 授权谓词的两半（Agent 能力 AND 席位策略） | `skills/internal/run-agent/SKILL.md`、`skills/internal/create-team/references/create-mode.md` |
-| line registry、worktree-per-write-line、ownership、集成队列 | Feature 064 的既有机制（`scripts/line-registry.py` 与其 references）；本文件只引用，MUST NOT 重述其语义 |
-| 工作包模型（包执行者、集成队列的包侧语义） | Feature 070 的既有契约；本文件不涉及 |
+| line registry、worktree-per-write-line、ownership、集成队列 | 既有机制（`scripts/line-registry.py` 与其 references）；本文件只引用，MUST NOT 重述其语义 |
+| 工作包模型（包执行者、集成队列的包侧语义） | 既有契约；本文件不涉及 |
 
 **调用边界一句话**: 一条已获有效授权的团队成员职责 → **恰好一次**有界嵌套 SDD 运行 → 止于 review → 一份字段集封闭的 handoff。SDD 运行是从属执行路径：它 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team 或 roster。
 
