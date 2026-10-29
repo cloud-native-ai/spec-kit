@@ -1,0 +1,13 @@
+# T005 partial green — declaration parsing
+# command: pytest tests/unit/test_flow_class_spec_key.py -q ; pytest tests/contract/test_flow_class_spec_declaration.py -q
+# date: 2026-10-30
+
+## unit
+=========================== short test summary info ============================
+FAILED tests/unit/test_flow_class_spec_key.py::test_invalid_class_value_exits_1_not_2
+1 failed, 23 passed in 2.09s
+
+## contract
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_template_carries_the_field_between_status_and_input
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_template_placeholder_does_not_prefill_a_class
+13 failed, 6 passed in 1.29s

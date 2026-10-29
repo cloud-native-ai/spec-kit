@@ -3,6 +3,8 @@
 **Requirement Branch**: `[###-requirement-name]`  
 **Created**: [DATE]  
 **Status**: Draft  
+**Flow Class**: [FLOW CLASS]
+<!-- 这一行是特性线类别的唯一声明处：取值只由作者填写；特性索引与详情至多留指向本行的指针，不复制取值。 -->
 **Input**: User description: "$ARGUMENTS"
 
 ## Related Feature *(mandatory)*

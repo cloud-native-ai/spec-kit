@@ -1,0 +1,14 @@
+# T006 partial green — templates/requirements-template.md field line
+# command: pytest tests/contract/test_flow_class_spec_declaration.py -q
+# date: 2026-10-30
+
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_duplicate_outranks_misplaced_for_the_same_root_cause
+FAILED tests/contract/test_flow_class_spec_declaration.py::test_the_four_author_error_codes_never_collapse_into_exit_2
+11 failed, 8 passed in 1.13s
+
+## template-adjacent regression
+.............................................                            [100%]
+45 passed in 0.57s
+
+## mirror
+sync-mirrors --write: synced templates/(1) scripts/(1); --check exit=0, six pairs ok

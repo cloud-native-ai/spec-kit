@@ -1,0 +1,24 @@
+# T007 green — declaration findings and blocking
+# date: 2026-10-30
+
+## new test files
+# command: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/unit/test_flow_class_spec_key.py tests/contract/test_flow_class_spec_declaration.py -q
+# exit=0
+...........................................                              [100%]
+43 passed in 3.44s
+
+## engine-adjacent targeted set (16 files)
+# command: pytest <16 files> -q
+# exit=0
+....                                                                     [100%]
+292 passed in 27.63s
+
+## real line
+# command: python3 scripts/python/flow-class-check.py --action lookup --unit-id "spec:077-doc-sdd-integration"
+unit_id: spec:077-doc-sdd-integration
+flow_class: execution
+source: declaration
+marker: null
+basis: null
+neutral: false
+# exit=0

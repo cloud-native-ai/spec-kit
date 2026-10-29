@@ -1,0 +1,166 @@
+# T002 red run — tests/unit/test_flow_class_spec_key.py
+# command: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest tests/unit/test_flow_class_spec_key.py -q
+# cwd: repo root; date: 2026-10-30; HEAD: e14408f7
+
+..........FFF...F..FFFF.                                                 [100%]
+=================================== FAILURES ===================================
+__________ test_valid_spec_key_is_not_rejected_as_an_invalid_unit_id ___________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_valid_spec_key_is_not_rej0')
+
+    def test_valid_spec_key_is_not_rejected_as_an_invalid_unit_id(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-declared", DECLARED)
+    
+        proc = _lookup(repo, "spec:fx-declared")
+    
+>       assert proc.returncode != 2, (
+            "a well-formed spec: key pointing at an existing spec directory must "
+            "resolve (stderr=%r)" % proc.stderr
+        )
+E       AssertionError: a well-formed spec: key pointing at an existing spec directory must resolve (stderr="invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 != 2
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...em> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:209: AssertionError
+_____________ test_resolves_under_the_dot_specify_specs_directory ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_resolves_under_the_dot_sp0')
+
+    def test_resolves_under_the_dot_specify_specs_directory(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-declared", DECLARED)
+    
+        proc = _lookup(repo, "spec:fx-declared")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...em> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:226: AssertionError
+_______________ test_resolves_when_repo_names_dot_specify_itself _______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_resolves_when_repo_names_0')
+
+    def test_resolves_when_repo_names_dot_specify_itself(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-declared", DECLARED)
+    
+        source_hat = _lookup(repo, "spec:fx-declared")
+        payload_hat = _lookup(repo / ".specify", "spec:fx-declared")
+    
+>       assert source_hat.returncode == 0, source_hat.stderr
+E       AssertionError: invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...em> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:239: AssertionError
+_____________ test_record_carries_exactly_the_nine_unit_key_fields _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_record_carries_exactly_th0')
+
+    def test_record_carries_exactly_the_nine_unit_key_fields(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-absent", UNDECLARED)
+    
+        proc = _lookup(repo, "spec:fx-absent")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:310: AssertionError
+___________ test_declared_expression_exits_0_with_declaration_source ___________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_declared_expression_exits0')
+
+    def test_declared_expression_exits_0_with_declaration_source(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-declared", DECLARED)
+    
+        proc = _lookup(repo, "spec:fx-declared")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...em> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-declared': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:361: AssertionError
+_____________ test_undeclared_spec_exits_0_with_the_default_marker _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_undeclared_spec_exits_0_w0')
+
+    def test_undeclared_spec_exits_0_with_the_default_marker(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-absent", UNDECLARED)
+    
+        proc = _lookup(repo, "spec:fx-absent")
+    
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-absent': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:376: AssertionError
+____________________ test_invalid_class_value_exits_1_not_2 ____________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_invalid_class_value_exits0')
+
+    def test_invalid_class_value_exits_1_not_2(tmp_path):
+        repo = _make_repo(tmp_path)
+        _add_spec(repo, "fx-bad", INVALID_VALUE)
+    
+        proc = _lookup(repo, "spec:fx-bad")
+    
+>       assert proc.returncode == 1, (
+            "an author typo must be exit 1 (blocking), never the exit-2 "
+            "degradation path (stdout=%r stderr=%r)" % (proc.stdout, proc.stderr)
+        )
+E       AssertionError: an author typo must be exit 1 (blocking), never the exit-2 degradation path (stdout='{\n  "action": "lookup",\n  "checked_at": "2026-10-29T18:59:52Z",\n  "unit_id": "spec:fx-bad",\n  "flow_class": "execution",\n  "source": "default",\n  "marker": null,\n  "basis": null,\n  "neutral": false,\n  "error": {\n    "label": "invalid-unit-id",\n    "detail": "expected /speckit.<stem> or skill:<dir>"\n  }\n}\n' stderr="invalid unit id 'spec:fx-bad': expected /speckit.<stem> or skill:<dir>\n")
+E       assert 2 == 1
+E        +  where 2 = CompletedProcess(args=['/Users/liuqiming.lqm/project/profiles/.venv/bin/python', '/Users/liuqiming.lqm/project/cloud-n...t.<stem> or skill:<dir>"\n  }\n}\n', stderr="invalid unit id 'spec:fx-bad': expected /speckit.<stem> or skill:<dir>\n").returncode
+
+tests/unit/test_flow_class_spec_key.py:389: AssertionError
+__________________ test_owner_resolution_precedes_key_grammar __________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-1727/test_owner_resolution_precedes0')
+
+    def test_owner_resolution_precedes_key_grammar(tmp_path):
+        repo = _make_repo(tmp_path, with_owner=False)
+        _add_spec(repo, "fx-declared", DECLARED)
+    
+        spec_proc = _lookup(repo, "spec:fx-declared")
+        junk_proc = _lookup(repo, "definitely-not-a-unit")
+    
+        assert spec_proc.returncode == 2
+        assert junk_proc.returncode == 2
+        spec_record = _json(spec_proc)
+        junk_record = _json(junk_proc)
+>       assert spec_record["error"]["label"] == "owner-unavailable", (
+            "with the owner unavailable, every key takes the same degradation label "
+            "(the registered ordering change — requirements FR-011 exemption ①)"
+        )
+E       AssertionError: with the owner unavailable, every key takes the same degradation label (the registered ordering change — requirements FR-011 exemption ①)
+E       assert 'invalid-unit-id' == 'owner-unavailable'
+E         
+E         - owner-unavailable
+E         + invalid-unit-id
+
+tests/unit/test_flow_class_spec_key.py:415: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_flow_class_spec_key.py::test_valid_spec_key_is_not_rejected_as_an_invalid_unit_id
+FAILED tests/unit/test_flow_class_spec_key.py::test_resolves_under_the_dot_specify_specs_directory
+FAILED tests/unit/test_flow_class_spec_key.py::test_resolves_when_repo_names_dot_specify_itself
+FAILED tests/unit/test_flow_class_spec_key.py::test_record_carries_exactly_the_nine_unit_key_fields
+FAILED tests/unit/test_flow_class_spec_key.py::test_declared_expression_exits_0_with_declaration_source
+FAILED tests/unit/test_flow_class_spec_key.py::test_undeclared_spec_exits_0_with_the_default_marker
+FAILED tests/unit/test_flow_class_spec_key.py::test_invalid_class_value_exits_1_not_2
+FAILED tests/unit/test_flow_class_spec_key.py::test_owner_resolution_precedes_key_grammar
+8 failed, 16 passed in 6.65s
