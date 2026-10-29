@@ -232,13 +232,13 @@ def test_entry_validation_table_covers_the_closed_condition_set():
         assert any(needle in joined.lower() for needle in needles), (
             f"§ Entry validation table does not cover the condition '{label}' (C-32)"
         )
-    assert re.search(r"(点名|names the condition|名称)", joined), (
+    assert re.search(r"(点名|names the condition|名称)", body), (
         "every failing condition MUST be named in the refusal (C-32)"
     )
-    assert re.search(r"(不启动|does not start|MUST NOT start)", joined), (
+    assert re.search(r"(不启动|does not start|MUST NOT start)", body), (
         "a failing entry MUST NOT start a run (C-32)"
     )
-    assert re.search(r"(不重划|does not re-scope|MUST NOT re-scope)", joined), (
+    assert re.search(r"(不重划|does not re-scope|MUST NOT re-scope)", body), (
         "a failing entry MUST NOT re-scope the duty to fit (C-32)"
     )
 

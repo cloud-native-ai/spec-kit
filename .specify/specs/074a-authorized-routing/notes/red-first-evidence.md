@@ -163,3 +163,24 @@ to get there: the merge/push scan now requires both prohibitions to be **stated*
 only be empty would pass on a document that never forbids merging), and the handoff completeness
 test derives its required field set from the document's own schema table, so an absent document is
 a failure rather than an empty requirement.
+
+## T011 / T016 — `tests/contract/test_sdd_authorization.py` (green) and `test_nested_sdd_invocation.py` (green)
+
+T011 landed the engine action the T007 red was blocked on; T013–T015 landed the two driver
+surfaces the T012 red was blocked on. The two modules now run together:
+
+```console
+$ python3 -m pytest -q tests/contract/test_sdd_authorization.py tests/contract/test_nested_sdd_invocation.py
+..................................                                       [100%]
+34 passed in 0.49s
+# RC=0
+```
+
+Full log: `green-t016.txt`. The green is the *same* case set that was red, not a reduced one: 11
+authorization cases (T007) + 23 nested-invocation cases (T012), with the two anti-vacuity guards
+T012 added still in place (the merge/push scan requires both prohibitions to be stated, and the
+handoff completeness test derives its required field set from the document's own schema table).
+
+A per-seat walk-through of the same engine against the fixture — the allowed seat, the forbidden
+seat, and the malformed `seats:` map — is recorded with its real output in `quickstart-run.md`
+§ S4 / § S5 (full log: `green-t016-demo.txt`).
