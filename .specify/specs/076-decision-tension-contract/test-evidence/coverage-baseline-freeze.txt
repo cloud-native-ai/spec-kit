@@ -1,0 +1,7 @@
+# coverage-baseline.txt freeze record
+# command: python3 scripts/python/account-clause-coverage.py .specify/specs/076-decision-tension-contract --freeze > .specify/specs/076-decision-tension-contract/coverage-baseline.txt
+# date: 2026-10-29 (frozen AFTER the 34 [green:] claims landed in tasks.md)
+# names: 495  lines:      497
+# sha256: 12b6264692ca376e531b7493c1bd9deba60348d29bfa062ca4de642d22f6cf27
+# frozen-from header (verbatim):
+# frozen-from: .specify/specs/*/contracts/* excluding 076-decision-tension-contract | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 412b4245b461 | files: 215 (parsed 121 + named 94)

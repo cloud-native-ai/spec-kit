@@ -1,0 +1,17 @@
+# validate-tasks.py (captured verbatim)
+# command: python3 .specify/scripts/python/validate-tasks.py .specify/specs/076-decision-tension-contract/tasks.md
+# date: 2026-10-29 (re-captured after the US1 renumbering pass)
+
+PASS: .specify/specs/076-decision-tension-contract/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+# --json headline (claims parsed by the validator itself)
+status=PASS errors=0 warnings=0 green_claims=34
+  contracts/adr-reference.md                     2
+  contracts/analyze-channel.md                   5
+  contracts/decision-tension-owner.md            8
+  contracts/falsification-quartet.md             5
+  contracts/measurement-binding.md               3
+  contracts/mirrors-and-scope.md                 4
+  contracts/plan-template-anchor.md              3
+  contracts/validator.md                         4

@@ -1,0 +1,6 @@
+# decomposition-check.py --mode tasks (captured verbatim)
+# command: python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/076-decision-tension-contract/requirements.md --tasks .specify/specs/076-decision-tension-contract/tasks.md
+# date: 2026-10-29
+
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 26, "task_count": 27, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-29T10:07:46Z"}
+EXIT=0
