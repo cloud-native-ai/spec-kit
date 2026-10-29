@@ -1,0 +1,12 @@
+# post-plan re-run of the distribution baselines (no source file was edited in the plan stage)
+# 2026-10-29T17:31:10Z
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+sync-mirrors exit=0
+OK: all per-tool command copies match the source templates.
+regen exit=0

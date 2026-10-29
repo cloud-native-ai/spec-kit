@@ -1,0 +1,6 @@
+# scan-confirmation-gates --summary — 2026-10-29T17:27:34Z
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+exit=0

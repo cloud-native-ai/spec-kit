@@ -1,0 +1,84 @@
+# clause_extract over this feature's six contracts — 2026-10-29T17:27:30Z
+class-declaration.md	form=md-bold-closed	clauses=13
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+  C-012
+  C-013
+class-resolution.md	form=md-bold-closed	clauses=12
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+  C-012
+document-structure.md	form=md-bold-closed	clauses=19
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+  C-012
+  C-013
+  C-014
+  C-015
+  C-016
+  C-017
+  C-018
+  C-019
+driver-integration.md	form=md-bold-closed	clauses=11
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+invariants-and-distribution.md	form=md-bold-closed	clauses=9
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+stage-wiring.md	form=md-bold-closed	clauses=13
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+  C-012
+  C-013

@@ -1,0 +1,29 @@
+# Probe: does audit-test-budget.py accept docs-gate-full slot content without any change?
+# Fixture (temp, outside git): .specify/.tmp/sdd-loop/tmp/plan077/spine.md
+# Run at 2026-10-29T17:24:07Z on branch 077-doc-sdd-integration @ 937c06bf
+$ python3 skills/external/sdd-loop-driver/scripts/audit-test-budget.py --spine <fixture> --spec-dir .specify/specs/077-doc-sdd-integration --stage-check closure
+slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0
+stages=6 complete=0
+status=fail
+reason=clarify: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=plan: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=tasks: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=checklist: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=analyze: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=review: stage evidence file missing; counted in the completeness denominator (unknown)
+exit=1
+
+# Negative control (a second baseline slot appended) — the same command must go red, proving the probe is not vacuous:
+slots=baseline:2 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0
+stages=6 complete=0
+status=fail
+reason=row 3: seq is not strictly increasing
+reason=row 3: a second baseline slot is not allowed
+reason=expected exactly 1 baseline slot, found 2
+reason=clarify: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=plan: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=tasks: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=checklist: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=analyze: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=review: stage evidence file missing; counted in the completeness denominator (unknown)
+exit=1

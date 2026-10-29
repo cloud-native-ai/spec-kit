@@ -1,0 +1,28 @@
+# Probe: spec:<dir> key family and structure action — today's behaviour (pre-implementation baseline)
+# 2026-10-29T17:24:12Z branch=077-doc-sdd-integration head=937c06bf
+
+$ flow-class-check.py --action lookup --unit-id "spec:077-doc-sdd-integration"
+invalid unit id 'spec:077-doc-sdd-integration': expected /speckit.<stem> or skill:<dir>
+unit_id: spec:077-doc-sdd-integration
+flow_class: execution
+source: default
+marker: null
+basis: null
+neutral: false
+exit=2
+
+# Positive control (a ledger unit must still resolve, so the leg is not vacuous):
+$ flow-class-check.py --action lookup --unit-id "/speckit.implement"
+unit_id: /speckit.implement
+flow_class: execution
+source: ledger
+marker: null
+basis: mixed-oracle
+neutral: false
+exit=0
+
+$ doc-consistency-check.py --action structure --spec-dir .specify/specs/077-doc-sdd-integration
+                                [--faces FACES] [--strict] [--allow-degraded]
+                                [--format {text,json}] [--json-out JSON_OUT]
+doc-consistency-check.py: error: argument --action: invalid choice: 'structure' (choose from 'verify')
+exit=2
