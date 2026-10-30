@@ -57,3 +57,52 @@
 - **执行体**：执行体是**会话级临时执行体**——不写入 `.specify/agents/`、不产生 `.agent.md`、不占 Agent 席位；本次派发不声明 SDD 执行席位；`run-agent` 的「按名解析已存 Agent」分支不适用于本次派发，MUST NOT 因此就在磁盘上创建一个只为本次运行存在的 Agent 定义。若指令本身要启动一次 SDD 运行，那次运行的授权由指令所属单元自己的入口判定，本命令不代替判定。
 - **载体模式**：按宿主能力二选一——具备原生派发通道 → `native`；不具备 → `in-session`（会话内执行，不是可选）。`run-agent` 的独立 CLI 进程模式 MUST NOT 被本命令使用：它会带来进程、凭据与网络面。
 - **载体标记**：载体标记 MUST 与真实载体一致且恰一个——`native` → `mode: subagent`；`in-session` → `mode: in-session-degraded`。MUST NOT 冒充、MUST NOT 双写、MUST NOT 漏写。降级不得冒充子代理，也不得把会话内执行的推断当作子代理的观测。
+
+## Payload
+
+派发载荷是执行体在本跳能看到的**全部**上下文——它拿不到本会话的其余部分。载荷 MUST 按下列顺序携带六项，顺序本身是契约面（EX-06）：
+
+1. **快速失败注入子句**：第一项，置于载荷开头的**独立段落**，不与其他规则混排。其内容 MUST 与 `shared/guidelines/fast-fail.md` § 子代理派发注入 的拥有者字面量**逐字节相等**；本文件只引用该所有者，MUST NOT 在此改写、摘要、缩写或重排它。缺该子句即判载荷不合格，按 `contracts/execution-dispatch.contract.md` EX-11 处理：MUST NOT 以「补发一次」修复。
+2. **指令原文**：逐字（含换行与引号），与 § Parse 解析出的 `instruction_text` 完全相同。MUST NOT 附加步骤编号、注释、执行提示或「建议先读某文件」一类的先验。
+3. **回传信封的字段与封闭取值**：点名回传 MUST 是 `data-model.md` § E5 的信封，并列全该表的字段名；`status` 的取值域只引用 requirements FR-012（本文件不复述枚举）。执行体 MUST NOT 自创字段或改写取值。
+4. **不得撰写最终报告**：执行体只回传信封；报告由 humanize 主会话撰写，形态归 `references/report-shape.md`。执行体写了报告也算违约，其输出不做报告来源。
+5. **不得重试、不得代替用户答复确认**：失败即失败；确认由指令自身的步骤处理，执行体与主会话都 MUST NOT 代答、MUST NOT 推断「用户大概会同意」。
+6. **指令自身再调用本命令即拒绝并回传**：指令文本命中封闭 token 集时按 `data-model.md` § E2 的 `nested-invocation` 拒绝，拒绝结果作为信封内容回传，MUST NOT 继续执行该指令。
+
+载荷 MUST NOT 把指令改写成步骤清单、MUST NOT 预先替指令挑选实现路径、MUST NOT 把 humanize 的报告要求当作指令的执行目标（EX-07）。载荷 MUST 声明：**指令自身的确认步骤与权限边界优先**——执行体遇需确认且无法取得答复时**停在该步**，MUST NOT 继续推进、MUST NOT 换一个等价动作绕开；该停点按 § Envelope 的 `blocked_at` 回传（EX-08）。
+
+## Envelope
+
+回传 MUST 是 `data-model.md` § E5 的**消息**，不是报告文件：执行体只回传信封，MUST NOT 以「写了报告文件」代替回传；本次运行对报告不做任何磁盘写入（**零写入**，A9 / EX-09）。
+
+### 逐字段语义
+
+- `status`：七个取值；取值域的拥有者是 requirements FR-012，本文件不复述枚举。三个取值在 humanize 侧另有落点：
+  - `denied`：用户**明确拒绝**确认。该步 MUST NOT 被执行，且 MUST NOT 执行任何替代动作；报告 verdict 按 FR-019 的映射取 `aborted`（映射 owner 是 FR-019），文案 MUST 写明「用户拒绝确认」与未执行范围。
+  - `needs-confirmation`：需确认而无法取得答复；不变量见下，报告口径由 § Confirmation Missing 拥有。
+  - `not-an-action`：指令不是可执行动作；报告措辞见 `references/report-shape.md` § Conclusion。
+- `products`：`{path, kind: created|modified}` 列表，只写**指令造成**的写入，逐项。
+- `evidence`：`{pointer, kind: command|path|reading}` 列表——命令与退出码、产物路径或测试读数，供报告前逐项核对可定位性（EX-14）。
+- `failures`：`{where, what}` 列表，失败坐标与信息；无失败为空列表。
+- `blocked_at`：需确认却无法询问时停下的位置；无卡点为 null。
+- `anomaly_line`：显式异常行。无异常写 `未发现异常`；有异常以**行首** `ANOMALY:` 逐条列出。子句本身的物理注入归 § Payload 第 1 项。
+
+### 不变量
+
+- `needs-confirmation` ⇒ `blocked_at` 非空，且 `products` 只含该步**之前**已完成的写入。
+- `completed` 且无输出、无产物 ⇒ 报告如实写「无可报告输出」，`## Evidence` 写 `none`（`none` 的字面量 owner 是 requirements § Shared Strings）；MUST NOT 编造证据填空。
+- **缺显式异常行即判信封不完整**：其结论 MUST NOT 被消费，报告按失败/不完整处理，并在 `## Conclusion` **点名缺失项**（EX-10）。这是硬判定，不是风格建议——沉默 MUST NOT 被读作干净。
+
+## Context Assembly
+
+报告动笔之前 MUST 装配三类上下文，并**逐类**记录状态（三态语义与判定 owner 是 requirements FR-014；字段集 owner 是 `data-model.md` § E6）：
+
+| 类 | 内容 | 读取口径 |
+|----|------|----------|
+| 动作输出/证据 | 回传信封的 `final_output`、`products`、`evidence`、`failures` | 逐项核对可定位性；核对不上的记「未能核实」 |
+| 项目治理（四件） | `.specify/instructions.md`、`.specify/memory/constitution.md`、`.specify/memory/glossary.md`、`.specify/memory/features.md` 的 062 / 079 行 | 摘要优先：治理文档取相关段落，Feature 注册表取行投影 |
+| 本次会话 | 调用方在本次会话里已给出的指令、确认与答复 | 只取可复核的部分；推断不算读取 |
+
+- **摘要优先**：MUST NOT 把机器管理的原始数据文件整文件注入——Feature 注册表 MUST 只取行投影，治理文档 MUST 只取相关段落。整文件注入既浪费上下文，也会把无人阅读的细节误当作「已装配的上下文」。
+- **尝试并记录**：装配是 attempt-and-record，不是「必须可读」。路径不存在或不可读记 `unavailable`，本轮未尝试记 `not-read`，实际载入记 `read`。MUST NOT 为了来源清单好看把未载入的来源记为 `read`。
+- **落点**：三类来源的读取状态决定 `references/report-shape.md` § Risks & Limits 的来源清单与缺失声明；装配本身不写盘（零写入），也不产生任何中间文件。
