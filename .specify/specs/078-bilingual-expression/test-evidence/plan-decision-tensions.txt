@@ -1,0 +1,12 @@
+# validate-decision-tensions --spec 078-bilingual-expression — 2026-10-30T09:19:31Z
+spec: .specify/specs/078-bilingual-expression
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 236 lines, 4 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)

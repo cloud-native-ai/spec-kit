@@ -1,0 +1,24 @@
+{
+  "violations": [
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/unit/test_qoder_support_matrix.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/integration/test_qoder_refresh.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/reference/commands/improve.md",
+      "detail": "../../shared/workflow/self-improvement-workflow.md"
+    },
+    {
+      "kind": "note-frontmatter",
+      "path": "docs/notes/type-follows-stage-misclassification.md",
+      "detail": "missing: "
+    }
+  ]
+}
