@@ -1,0 +1,7 @@
+# Environment attribution — 077 expression-line pilot
+date=2026-10-30T16:52:06Z
+system_date=2026-10-31
+fixture_as_of=2026-10-30
+test_file_diff_vs_baseline:
+failure_reason=as-of-stale (doc-consistency-check): fixture as-of date 2026-10-30 is older than the 2026-10-31 system date
+verdict=environment-date-boundary, not caused by 079 (test file unchanged; baseline run on 2026-10-30 passed these two)
