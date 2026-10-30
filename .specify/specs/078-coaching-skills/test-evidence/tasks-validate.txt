@@ -1,4 +1,4 @@
-# validate-tasks — 2026-10-30 — stage=tasks (analyze loop 1 fix)
+# validate-tasks — 2026-10-30 — stage=tasks (tasks-fix-2: claim owner alignment + M-14 scenario order)
 # command: python3 scripts/python/validate-tasks.py .specify/specs/078-coaching-skills/tasks.md
 PASS: .specify/specs/078-coaching-skills/tasks.md — 0 error(s), 0 warning(s)
 # exit 0

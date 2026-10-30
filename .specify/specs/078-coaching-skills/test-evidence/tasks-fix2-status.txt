@@ -1,0 +1,21 @@
+stage=tasks-fix2 (analyze loop 1/1, human-authorized planned design repair follow-up: align tasks to the repaired claim protocol + M-14 scenario order)
+status=not-run-docs-only
+date=2026-10-30
+stage_base=66edf74f
+budget=docs-only：只改 tasks.md 与 test-evidence/**；不跑实现测试
+scope_changed=tasks.md, test-evidence/tasks-validate.txt, test-evidence/tasks-decomposition-check.txt, test-evidence/tasks-decomposition-check.json, test-evidence/tasks-pre-analyze-check.txt, test-evidence/tasks-fix2-status.txt
+scope_untouched=requirements.md, plan.md, data-model.md, contracts/**, quickstart.md, research.md, feature-ref.md, state spine（只读）, 既有脏文件（不提交不还原）
+
+fixes:
+  M-14=done: quickstart 场景 5（teardown）不再由 T028 提前执行——T028 只跑场景 1 / 3；T029 在场景 2 / 4 的真实运行之后执行 teardown，`RUN_ID` 由本次运行报告与运行目录名回填（不再硬编码 `20261030T101500Z-memory-recall`），先 `test -d` 留证运行目录真实存在，再按 data-model.md § Optimization claim 从 `RUN_ID` 派生 Trainee slug 并记录 claim 当前状态（场景 2 的 `optimization: skipped` 按 owner 不创建 claim；存在的条目按 owner 判为崩溃残留并记下 run-id），最后对当次 `RUN_ID` 与该 Trainee 的 claim 路径各断言 `test ! -e` 退出 0。
+  T012=done: 删除「先建 `.optimization-claim` 并扫描同一 Trainee 的其它 claim」的 check-then-act 描述；改为引用 data-model.md § Optimization claim 并写明唯一时点（执行闭环完成、提升计划落盘后、调用 improve-skills 之前）、共享路径上的 `O_CREAT|O_EXCL` 原子创建、`EEXIST` 即冲突 → fail closed、记 `optimization: failed` 并点名冲突 run-id、预期阶段不创建 claim；正文不得重述协议或以读后写作判定。
+  T016=synced: 预期阶段「不得创建 claim」保留为 zero-side-effect 声明，并补指针到唯一 owner（data-model.md § Optimization claim）。
+
+gates:
+  validate-tasks=PASS 0 error(s), 0 warning(s) exit 0 -> tasks-validate.txt
+  decomposition-check=decision=proceed task_count=31 task_ceiling=40 fr_count=29 exit 0 -> tasks-decomposition-check.txt / tasks-decomposition-check.json
+  pre-analyze-check=decision=pass errors=0 advisories=52 waived=0 tasks=31 exit 0 -> tasks-pre-analyze-check.txt（52 条全为 missing-path，均为实现前待建路径 / plan 期既有待建清单，未新增非预期 advisory）
+  tests=not-run-docs-only
+
+residuals:
+  - none：本轮未发现需改 plan 属主制品的实质问题；quickstart.md 场景 5 的命令文本保持原样（plan 属主），tasks 侧只负责排序与 run-id 回填。
