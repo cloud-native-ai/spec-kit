@@ -1,12 +1,1 @@
-{
-  "mode": "tasks",
-  "decision": "proceed",
-  "measured": {
-    "fr_count": 29,
-    "task_count": 30,
-    "fr_ceiling": 30,
-    "task_ceiling": 40
-  },
-  "reasons": [],
-  "checked_at": "2026-10-30T06:04:03Z"
-}
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 29, "task_count": 31, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T06:36:15Z"}

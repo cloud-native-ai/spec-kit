@@ -11,18 +11,19 @@
 
 **Tests**: 五组红先行各自先在未改动树上跑出**记录在案的失败**（命令、真实输出、退出码、失败计数四字段，落入 `.specify/specs/078-coaching-skills/notes/red-first-evidence.md`）：`tests/contract/test_coaching_run_contract.py`（T009）、`tests/contract/test_coaching_expectation_contract.py`（T014）、`tests/contract/test_coaching_observation_contract.py` + `tests/contract/test_coaching_dispatch_contract.py`（T017）、`tests/contract/test_coaching_wiring_contract.py`（T020）。四个冻结基线测试的更新（T027）属**实现后守卫**（迁移/回归例外），排在全部接线之后并携带显式 `[blockedBy:]`，不作红先行声称。
 
-**Organization**: 按 `requirements.md` 的四个用户故事分组（US1、US2 为 P1；US3、US4 为 P2）；Setup / Foundational / Polish 行无故事标签。38 条契约条款由 15 行以 `[green:]` 认领，每条款恰好一行、同一契约内条款序随行序递增（§ Clause Partition）。Foundational 承载「改名骨架」——新目录、身份 frontmatter、台账行、probe 行、目录登记与编译面，因为 US1…US3 的正文都必须写在新坐标上；它不是任意故事的内容。
+**Organization**: 按 `requirements.md` 的四个用户故事分组（US1、US2 为 P1；US3、US4 为 P2）；Setup / Foundational / Polish 行无故事标签。38 条契约条款由 16 行以 `[green:]` 认领，每条款恰好一行、同一契约内条款序随行序递增（§ Clause Partition）。Foundational 承载「改名骨架」——新目录、身份 frontmatter、台账行、probe 行、目录登记与编译面，因为 US1…US3 的正文都必须写在新坐标上；它不是任意故事的内容。
 
 ## Definition of Done (DoD)
 
 - DoD-1: 本文件每一行为 `[X]`，或 `[~]` 且原因记录在 `.specify/specs/078-coaching-skills/verification.md` 的 `deferred_tasks=`。
 - DoD-2: 38 条契约条款各被恰好一行 `[green:]` 认领；`python3 scripts/python/validate-tasks.py .specify/specs/078-coaching-skills/tasks.md` 退出 0，四项 green 检查（dangling / cross-phase / clause-collision / path-divergence）零 finding。
 - DoD-3: 五个新契约测试文件红先行（`notes/red-first-evidence.md` 四字段记录）并全部转绿；四个冻结基线测试显式更新（每处带 2026-10-30 与 Feature 078 的日期理由），更新后的计数与目录实测一致。
-- DoD-4: 八身份坐标一致——新目录、frontmatter `name`、`skill_id`、运行时 unit id、台账行、probe 行、路由行、description 触发词；`flow-class-check.py --action lookup --unit-id "skill:coaching-skills"` 报 `source: ledger` / `execution` / `behavior-oracle`；`probe-utils.py --action compile-embeds --check` 报 `75 units, zero drift`。
-- DoD-5: 闭集内旧名出现次数恰为 1（仅 `_OBSOLETE_SKILLS` 条目）；`.specify/skills/think-skills` 不存在；`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 相对改动前基线零新增漂移。
+- DoD-4: 八身份坐标一致——新目录、frontmatter `name`、`skill_id`、运行时 unit id、台账行、probe 行、路由行、description 触发词；每个坐标各以一条判定通过并按坐标计数（`coaching-skills` 被 `skill:coaching-skills` 包含不重复计，8/8）；`flow-class-check.py --action lookup --unit-id "skill:coaching-skills"` 报 `source: ledger` / `execution` / `behavior-oracle`；`probe-utils.py --action compile-embeds --check` 报 `75 units, zero drift`。
+- DoD-5: 闭集内旧名出现次数恰为 1（仅 `_OBSOLETE_SKILLS` 条目），裁决由 guard copy 机械派生（`MIRROR_PAIRS` 六对 + `regen-command-copies.py` 目标 + A10 残余成员），`.qoder/agents`、`.specify/agents/templates`、`.specify/shared/definitions`、`.specify/memory/feedback/probe-map.md` 各独立判定；`.specify/skills/think-skills` 不存在；`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 相对改动前基线零新增漂移。
 - DoD-6: 教练闭环的四产物在 `notes/quickstart-run.md` 记录的一次真实运行中按序存在，夹具主产物真实存在；优化状态以封闭值域单列，且优化不可用不把执行判为失败。
-- DoD-7: 零新增阻断式确认门——`git diff` 的**新增行**对 `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS` 零命中；技能保持 `classification: external`。
+- DoD-7: 零新增阻断式确认门——`git diff <base> -- <scan-confirmation-gates.py 的 SCAN_DIRS + SCAN_ROOT_FILES 扫描面> | grep '^+'` 的**新增行 0 命中** `BLOCKING_PATTERNS`（pattern 集与改动前基线读数入证据；不以新增前后总量相等为判据）；技能保持 `classification: external`。
 - DoD-8: `verification.md` 为 SC-001…SC-009 各记一条状态行；历史记录（`.specify/specs/**` 旧特性、`memory/evidence/**`、`features/<ID>.md`、reviews、eval-baseline）未被改写。
+- DoD-9: 新技能形态 `skill-shape.py --budget-tokens 5000` 判 `pass`（退出 0），读数与 findings 记入 `notes/skill-shape-after.md`；T001 采的旧技能基线只作对照，不替代本项。
 
 **DoD Status**: pending
 
@@ -33,17 +34,17 @@
 - GATE-3: 拆解尺度 — check: `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/078-coaching-skills/requirements.md --tasks .specify/specs/078-coaching-skills/tasks.md` 报 `decision=proceed`，`task_count` 不超过该脚本的 `TASK_CEILING`。
 - GATE-4: 条款认领 — check: `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/078-coaching-skills` 报 `claimed clauses (this feature): 38`，且 `UNCOVERED` 名单中不出现任何 `078-coaching-skills/contracts/` 名字。该命令的 FR 车道读数为 0/29：本特性的契约正文不带引用组，FR→条款的映射目前只写在 `plan.md` § Phase 1（指针所有者），属制品缺口而非本阶段可修项，交 `/speckit.analyze` 裁定（见 § Measured Premises）。
 - GATE-5: 新组转绿且既有守卫无新增失败 — check（经 profiles venv 的 `python -m pytest -q`）：五个新测试文件全绿、四个冻结基线测试全绿，且既有套件失败名集合相对实现期基线（捕获形式归 `/speckit.implement` 的 `**Test runs**` bullet，此处引用不重述）无新增。
-- GATE-6: 接线与派生面 — check: `flow-class-check.py --action check` 报 `matched=79 inventory_units=79`、`probe-utils.py --action probes --validate` 退出 0、`probe-utils.py --action compile-embeds --check` 报 75 units 零漂移、`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 退出 0、闭集 `git grep -n` 旧名恰 1 处。
+- GATE-6: 接线与派生面 — check: `flow-class-check.py --action check` 报 `matched=79 inventory_units=79`、`probe-utils.py --action probes --validate` 退出 0、`probe-utils.py --action compile-embeds --check` 报 75 units 零漂移、`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 退出 0；旧名残留的**裁决**由 `tests/contract/test_coaching_wiring_contract.py` 给出（候选集机械派生 + 恰一处断言），`.qoder/agents` / `.specify/agents/templates` / `.specify/shared/definitions` / `.specify/memory/feedback/probe-map.md` 各独立判定；`git grep -n` 仅作诊断旁证。
 - GATE-7: 无未完行 — check: `grep -cE '^- \[[ >]\]' .specify/specs/078-coaching-skills/tasks.md` 返回 0。
 
 ## Environment Prerequisites
 
 本特性无容器、镜像、集群、注册表或特殊硬件依赖；全部工作为本地文件、本地 git、本地 pytest。
 
-- Python（系统解释器）: **available** — probe: `python3 --version` → `Python 3.9.6` @ 2026-10-30；affected: T002、T004–T030 的全部确定性引擎行（只要求 ≥3.8 与标准库）。
-- pytest: **partial** — probe: `.venv/bin/python -m pytest --version` → `No module named pytest`（仓库自带 `.venv` 是 Python 3.14.6 但未装 pytest）；`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest --version` → `pytest 9.1.1` @ 2026-10-30。affected: T009、T014、T017、T020、T027、T030。处置：测试一律经 profiles venv 的 `python -m pytest` 运行。
+- Python（系统解释器）: **available** — probe: `python3 --version` → `Python 3.9.6` @ 2026-10-30；affected: T002、T004–T031 的全部确定性引擎行（只要求 ≥3.8 与标准库）。
+- pytest: **partial** — probe: `.venv/bin/python -m pytest --version` → `No module named pytest`（仓库自带 `.venv` 是 Python 3.14.6 但未装 pytest）；`/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest --version` → `pytest 9.1.1` @ 2026-10-30。affected: T009、T014、T017、T020、T027、T031。处置：测试一律经 profiles venv 的 `python -m pytest` 运行。
 - `specify` CLI: **partial** — probe: `.venv/bin/specify render-agents --help` 可用（渲染入口存在）@ 2026-10-30；PATH 上的 `specify` 是**改动前**的构建，不含本次 `_OBSOLETE_SKILLS` 条目。affected: T023（只用 render 子命令）、T020 / T028（升级语义改由 `cleanup_obsolete_framework_assets` 的真实调用验证，不依赖重新构建 CLI）。
-- Git: **available** — probe: `git --version` → `git 2.54.0 (Apple Git-157)` @ 2026-10-30；affected: T004（`git mv`）、T026（闭集 `git grep`）、T030（新增行门禁判定）。
+- Git: **available** — probe: `git --version` → `git 2.54.0 (Apple Git-157)` @ 2026-10-30；affected: T004（`git mv`）、T026（残留审计面诊断）、T031（新增行门禁判定）。
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -79,8 +80,8 @@
 | 覆盖率基线 | `head -2 .specify/specs/078-coaching-skills/coverage-baseline.txt` | 头部含 `excluding 078-coaching-skills`、`files: 229 (parsed 135 + named 94)`、`base-sha: bc0ea7fbd268`——本阶段已冻结；本特性 38 条只能被任务行认领，不能被自己的基线豁免 |
 | FR 车道现状 | `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/078-coaching-skills \| tail -8` | `FR claimed: 0` / `FR uncovered: 29`——五份契约正文不带引用组，FR→条款映射目前只写在 `plan.md` § Phase 1；本阶段不改写 plan 属主制品，故在 GATE-4 如实记录为制品缺口 |
 | 待建目录 | `ls -d .specify/memory/coaching .specify/specs/078-coaching-skills/notes tests/fixtures/coaching` | 生成时三条都是 `No such file or directory`：`notes/` 由 T001 建并写测量，`tests/fixtures/coaching/` 由 T003 建，`.specify/memory/coaching/` 由 T011 的首次运行建；本阶段只把 `coverage-baseline.txt` 冻结到 spec 目录根（不在 `notes/` 内），未替这三处预置任何内容 |
-| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/078-coaching-skills/tasks.md` | 本文件 30 行（T001–T030），不超过 `decomposition-check.py` 的 `TASK_CEILING` 上限 |
-| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/078-coaching-skills/tasks.md \| wc -l` | 远大于 30——这是任务标识的**提及**数（`[blockedBy:]`、覆盖表、认领表都在引用），不是定义数；单位是任务**行**时用行首锚定 `^- \[ \] T` |
+| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/078-coaching-skills/tasks.md` | 本文件 31 行（T001–T031），不超过 `decomposition-check.py` 的 `TASK_CEILING` 上限 |
+| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/078-coaching-skills/tasks.md \| wc -l` | 远大于 31——这是任务标识的**提及**数（`[blockedBy:]`、覆盖表、认领表都在引用），不是定义数；单位是任务**行**时用行首锚定 `^- \[ \] T` |
 
 ## Clause Partition
 
@@ -103,9 +104,9 @@
 | `contracts/identity-and-wiring.contract.md` | C-5 | T025 |
 | `contracts/identity-and-wiring.contract.md` | C-6 | T026 |
 | `contracts/identity-and-wiring.contract.md` | C-7 | T027 |
-| `contracts/identity-and-wiring.contract.md` | C-8 | T030 |
+| `contracts/identity-and-wiring.contract.md` | C-8 | T031 |
 
-**Partition check**: 14 + 5 + 6 + 5 + 8 = 38；15 个认领行，无条款落在两行，无行认领其相位之后才能转绿的条款带。
+**Partition check**: 14 + 5 + 6 + 5 + 8 = 38；16 个认领行，无条款落在两行，无行认领其相位之后才能转绿的条款带。
 
 ## Requirement Coverage Map
 
@@ -124,7 +125,7 @@
 | FR-009 | T011, T019 | FR-024 | T026, T027 |
 | FR-010 | T011 | FR-025 | T011, T019 |
 | FR-011 | T018 | FR-026 | T004, T025 |
-| FR-012 | T011, T018 | FR-027 | T013, T030 |
+| FR-012 | T011, T018 | FR-027 | T013, T031 |
 | FR-013 | T013, T018 | FR-028 | T011, T012 |
 | FR-014 | T012, T018 | FR-029 | T012, T019 |
 | FR-015 | T012, T018 | — | — |
@@ -136,16 +137,16 @@
 | SC-003 | T012, T014 |
 | SC-004 | T017, T018 |
 | SC-005 | T012, T017, T029 |
-| SC-006 | T021, T022, T023, T024, T025, T026, T027, T030 |
+| SC-006 | T020, T021, T022, T023, T024, T025, T026, T027, T031 |
 | SC-007 | T020, T024, T028 |
 | SC-008 | T023, T028 |
 | SC-009 | T027 |
 
-**流程行与取证行**: T001、T002、T003、T028、T029 为证据与执行行，不认领条款；它们服务 SC-001 / SC-006 / SC-007 / SC-008 的复现，不构成漏映射。
+**流程行与取证行**: T001、T002、T003、T028、T029、T030 为证据与执行行，不认领条款——T028 / T029 服务 SC-001 / SC-005 / SC-007 / SC-008 的复现，T030 服务技能形态预算，T020 / T026 服务 SC-006 的残留裁决；T031 是终局门禁与 SC 状态行落档行。不构成漏映射。
 
 ## Mirror Obligations
 
-镜像对的清单所有者是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对），范围登记见 `plan.md` § Mirror Obligations，本文件不复述其行内容。落地形态：源编辑分散在 T004（技能包）、T005 / T006 / T007（三份 `shared/definitions`）、T021（路由模板）、T022（agents 与角色模板与 docs）；**T023 是唯一的同步与验证行**（`--write` 后逐对陈述无新增漂移），T024 的 `_OBSOLETE_SKILLS` 与 T027 的冻结测试无镜像义务；`templates/commands/**` 不在 templates 镜像对内，只经 `regen-command-copies.py` 产出 per-tool 副本。派生面 MUST 由再生成入口产出，MUST NOT 手改。
+镜像对的清单所有者是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对），范围登记见 `plan.md` § Mirror Obligations，本文件不复述其行内容。落地形态：源编辑分散在 T004（技能包）、T005 / T006 / T007（三份 `shared/definitions`）、T021（路由模板）、T022（agents 与角色模板与 docs）；**T023 是唯一的镜像同步与再生成行**（`--write` 后逐对陈述无新增漂移），T026 的残留裁决与 T031 的终局验证只读不写；T024 的 `_OBSOLETE_SKILLS` 与 T027 的冻结测试无镜像义务；`templates/commands/**` 不在 templates 镜像对内，只经 `regen-command-copies.py` 产出 per-tool 副本。派生面 MUST 由再生成入口产出，MUST NOT 手改。
 
 ## Test Budget
 
@@ -249,7 +250,7 @@
 
 ### Tests for User Story 4 (MANDATORY)
 
-- [ ] T020 [US4] [blockedBy: T004,T005,T006,T008] 红先行写 `tests/contract/test_coaching_wiring_contract.py`：按 `contracts/identity-and-wiring.contract.md` 的 C-1…C-8 断言八坐标（目录、frontmatter、`skill_id`、unit id、台账行、probe 行、路由行、触发词）、闭集内旧名恰一处、`flow-class-check.py --action lookup` 的 `source: ledger`、probe 编译零漂移、镜像与命令副本零漂移、四个冻结名册含新名，并用 `cleanup_obsolete_framework_assets` 在 `tmp_path` 上断言旧实体目录被删而同名用户符号链接保留（SC-007 的可执行形态）；真实失败记入 `.specify/specs/078-coaching-skills/notes/red-first-evidence.md`。
+- [ ] T020 [US4] [blockedBy: T004,T005,T006,T008] 红先行**创建** `tests/contract/test_coaching_wiring_contract.py`：按 `contracts/identity-and-wiring.contract.md` 的 C-1…C-8 为 SC-006 的**八个身份坐标**各写一条独立判定（① 目录存在/旧目录不存在、② frontmatter `name`、③ `skill_id` 与 Canonical ID/Path、④ unit id 的 `flow-class-check.py --action lookup` 解析、⑤ 台账行、⑥ probe 行与编译检查、⑦ 路由行与路径、⑧ description 触发词与两参数调用形态），并按坐标计数至 `8/8`（`coaching-skills` 被 `skill:coaching-skills` 包含时不重复计）；同时把残留审计的候选集实现为**运行时机械派生**——`MIRROR_PAIRS` 六对的源侧与镜像侧、`regen-command-copies.py` 实际扇出的逐工具副本目标、A10 中不经生成器的残余手改成员（`.qoder/agents`、probe 编译面 `## Wrap-up`、`.specify/memory/feedback/probe-map.md` 在测试内点名并各自独立断言），统一要求 `.qoder/agents`、`.specify/agents/templates`、`.specify/shared/definitions`、`.specify/memory/feedback/probe-map.md` 各面 0 命中、`src/specify_cli/__init__.py` 的 `_OBSOLETE_SKILLS` 条目恰 1 处；再断言 probe 编译零漂移、镜像与命令副本零漂移、四个冻结名册含新名，并用 `cleanup_obsolete_framework_assets` 在 `tmp_path` 上断言旧实体目录被删而同名用户符号链接保留（SC-007 的可执行形态）；真实失败记入 `.specify/specs/078-coaching-skills/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 4
 
@@ -258,7 +259,7 @@
 - [ ] T023 [US4] [blockedBy: T022] [green: contracts/identity-and-wiring.contract.md#C-3] 重生成派生面：`python3 scripts/python/sync-mirrors.py --write --only skills/external`、`--only shared`、`--only agents`；显式删除 `.specify/skills/think-skills`（`sync-mirrors.py` 不删 extras）；`python3 scripts/python/regen-command-copies.py` 扇出命令副本；`.venv/bin/specify render-agents --ai qoder` 重渲在场宿主 agents；再跑 `probe-utils.py --action compile-embeds` 与 `--action map` 重算 probe 派生面——全程不手改派生文件。
 - [ ] T024 [US4] [blockedBy: T023] [green: contracts/identity-and-wiring.contract.md#C-4] 接通升级清理：在 `src/specify_cli/__init__.py` 的 `_OBSOLETE_SKILLS` 元组按字典序加入旧目录名条目，并把 OBSOLETE-ASSET-REGISTRY 区内那行历史注释改成不带旧名字面量的表述（保留改名链语义并指向 Feature 078）；`cleanup_obsolete_framework_assets` 删实体目录、跳过符号链接的既有语义不改。
 - [ ] T025 [US4] [blockedBy: T024] [green: contracts/identity-and-wiring.contract.md#C-5] 核对路由与发现面一致：`templates/commands/skills.md` 仍为五行且 modify 族指向新路径、技能位于 `skills/external/coaching-skills` 且 `classification: external`、description 写明两参数调用形态；用 `python3 scripts/python/flow-class-check.py --action lookup --unit-id "skill:coaching-skills"` 确认 `source: ledger` / `execution` / `behavior-oracle`。
-- [ ] T026 [US4] [blockedBy: T025] [green: contracts/identity-and-wiring.contract.md#C-6] 残留审计：对闭集路径（`skills/external/coaching-skills`、`skills/internal/run-skills/SKILL.md`、`templates/commands/skills.md`、`agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md`、`skills/internal/create-agent/templates`、`shared/definitions`、`src/specify_cli/__init__.py`、`docs/reference/agents/command-and-skills.md`、`docs/tutorials/quickstart.md`、`tests/contract`、`.specify/skills`）跑 `git grep -n` 旧名，结果必须恰为 1 处（`_OBSOLETE_SKILLS` 条目）；历史记录目录（`.specify/specs/**`、`memory/evidence/**`、`features/`、reviews、eval-baseline）不在闭集内，不改写。
+- [ ] T026 [US4] [blockedBy: T025] [green: contracts/identity-and-wiring.contract.md#C-6] 残留审计裁决（机械派生，不手写第五份清单）：运行 T020 创建的 `tests/contract/test_coaching_wiring_contract.py`，其候选路径集由三源在运行时合成——`scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS` 六对（源侧与镜像侧，含 `.specify/agents/templates`、`.specify/shared/definitions`）、`scripts/python/regen-command-copies.py` 实际扇出的逐工具命令副本目标、以及 A10 中不经任一生成器的残余手改成员（`.qoder/agents`、probe 编译面 `## Wrap-up`、`.specify/memory/feedback/probe-map.md`，在测试内以字面量钉住）；逐面读取判定：`.qoder/agents`、`.specify/agents/templates`、`.specify/shared/definitions`、`.specify/memory/feedback/probe-map.md` 各面旧名 0 命中，`src/specify_cli/__init__.py` 的 `_OBSOLETE_SKILLS` 条目恰 1 处；把测试输出与逐面读数记入 `.specify/specs/078-coaching-skills/notes/residual-audit.md` 供 T031 引用；`git grep -n` 只是诊断旁证，不是裁决；历史记录目录（`.specify/specs/**`、`memory/evidence/**`、`features/`、reviews、eval-baseline）不在面内，不改写。
 - [ ] T027 [US4] [blockedBy: T026] [green: contracts/identity-and-wiring.contract.md#C-7] 显式更新四个冻结基线测试 `tests/contract/test_expression_compatibility.py`、`tests/contract/test_migration_distribution.py`、`tests/contract/test_skill_layer_visibility_guards.py`、`tests/contract/test_run_skills_wiring.py`：名册换新名并各带 2026-10-30 / Feature 078 的日期与理由注记，计数与目录实测一致（27 命令、52 技能 = 15 external + 37 internal、49 条 manifest 技能）；069a 的哈希清单不改写，改为从清单里找出磁盘上已不存在的唯一路径、映射到新路径并在新文件上重新断言内容标记，从而不重复写出旧名字面量（SC-006 只允许一处）。
 
 **Checkpoint**: US4 可独立验证——四类派生面零漂移、闭集旧名恰一处、升级夹具证明「删实体目录、留用户符号链接」。
@@ -271,9 +272,10 @@
 
 - [ ] T028 [blockedBy: T027] 跑 quickstart 场景 1 / 3 / 5 并记录：`python3 scripts/python/flow-class-check.py --action lookup --unit-id "skill:coaching-skills"`、`--action check`（`matched=79`）、`probe-utils.py --action probes --validate`、`probe-utils.py --action compile-embeds --check`、`sync-mirrors.py --check`、`regen-command-copies.py --check`、`scan-confirmation-gates.py --summary`、`test ! -e .specify/skills/think-skills` 的真实输出，以及在一次性夹具目录里调用 `cleanup_obsolete_framework_assets` 验证「删实体目录、留同名符号链接」；连同场景 5 的清理步骤一并写入 `.specify/specs/078-coaching-skills/notes/quickstart-run.md`。
 - [ ] T029 [blockedBy: T028] 跑 quickstart 场景 2 / 4 的教练闭环：以 `tests/fixtures/coaching/fixture-trainee` 为 Trainee 执行一次真实教练运行（优化置 `skipped`，不动 Trainee 文件），核对 `.specify/memory/coaching/<run-id>/` 下四产物齐备、`expectation.md` 早于第一次派发动作、主产物存在、观测记录每行带来源；再在 `.specify/.tmp/coaching-degraded/` 的一次性副本里让 `improve-skills` 两层都不可用，核对 `optimization: unavailable` 且 `run` 不为 `failed`；两次运行的真实输出与清理步骤追加进 `.specify/specs/078-coaching-skills/notes/quickstart-run.md`。
-- [ ] T030 [blockedBy: T028,T029] [green: contracts/identity-and-wiring.contract.md#C-8] 终局门禁与留档：依次跑 `validate-tasks.py`、`pre-analyze-check.py --stage tasks`、`decomposition-check.py --mode tasks`、`account-clause-coverage.py`、`contracts/identity-and-wiring.contract.md` C-8 列出的七条验证命令，把真实输出贴入 `.specify/specs/078-coaching-skills/verification.md`，并为 SC-001…SC-009 各记一条状态行（无一条留空）。
+- [ ] T030 [blockedBy: T027] 新技能形态预算：对最终形态的 `skills/external/coaching-skills/SKILL.md` 跑 `python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/coaching-skills/SKILL.md --budget-tokens 5000`，判 `pass`（退出 0，可控正文 ≤ 5000 tokens），把命令、`≈N tokens / 预算 5000`、行数与 findings 逐条写入 `.specify/specs/078-coaching-skills/notes/skill-shape-after.md`；T001 采的是旧技能基线，只作前后对照，不能替代本行判定。
+- [ ] T031 [blockedBy: T028,T029,T030] [green: contracts/identity-and-wiring.contract.md#C-8] 终局门禁与留档：依次跑 `validate-tasks.py`、`pre-analyze-check.py --stage tasks`、`decomposition-check.py --mode tasks`、`account-clause-coverage.py`、`contracts/identity-and-wiring.contract.md` C-8 列出的七条验证命令；确认门预算按**新增行**判定：先把 `BASE=<feature baseline commit>`（基线提交 SHA 与取法）记入 `verification.md` 的 SC-008 行，再跑 `git diff "$BASE" -- templates/commands skills shared 'templates/*.md' | grep '^+' | grep -v '^+++'`，逐新增行对照 `scripts/python/scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`（编译形态 `BLOCKING_RE`），要求 `blocking_hits=0` 且退出 0；同命令同 pattern 集的改动前基线读数（`test-evidence/gate-newline-baseline.txt`：`added_lines=0` / `blocking_hits=0`；`--summary`：`blocking=27` = destructive 20 + governance_kept 7，`violations=0`）与本次读数并列入证据，**不以新增前后总量相等为判据**；把全部真实输出贴入 `.specify/specs/078-coaching-skills/verification.md`，并为 SC-001…SC-009 各记一条状态行（无一条留空）。
 
-**Checkpoint**: SC-001…SC-009 每条都有可复现的证据来源，`verification.md` 是它们的唯一索引。
+**Checkpoint**: SC-001…SC-009 每条都有可复现的证据来源，`verification.md` 是它们的唯一索引；新技能形态的 `skill-shape.py` 读数在 `notes/skill-shape-after.md`，与 T001 的旧技能基线成对可对照。
 
 ---
 
