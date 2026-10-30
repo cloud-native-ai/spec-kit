@@ -1,19 +1,19 @@
 # Line State — 078-coaching-skills
 
 <!-- loop-state:begin -->
-spine_state: stalled
+spine_state: running
 run_id: r20261030T054502Z-078a
 slice: 078
-stage: analyze-r2
-stage_started_at: 1793342849
-stage_deadline_epoch: 1793348249
-stage_base_commit: f61d8a23
-attempt: 1
+stage: implement (baseline slot running)
+stage_started_at: 1793346566
+stage_deadline_epoch: 1793351966
+stage_base_commit: 9a738770
+attempt: 0
 retry_limit: 2
-last_verdict: STALLED — analyze-r2 C=0/H=1 new H-04 (optimization claim protocol) after the single allowed repair loop; gate forbids a second loop
+last_verdict: analyze-r3 GATE PASS (C=0/H=0; H-04/M-11 closed; 9M/9L non-blocking)
 <!-- plan-constraint: active activated_at=2026-10-30T05:55Z plan_commit=375805f2 approved_baseline_commit=d0f50759 -->
 <!-- rebaseline-events: [{"trigger":"analyze loop requirements M-01/M-02/H-02","commit":"d0f50759","at":"2026-10-30T06:24Z"}] -->
-<!-- plan-fence: decomposition(plan)=single-package reason=not-beneficial (plan 产物少且强耦合); implement/review=auto slot_cap=2 test-budget=baseline@implement-start + targeted-mid + closure@post-review -->
+<!-- plan-fence: decomposition(plan)=single-package reason=not-beneficial (plan 产物少且强耦合); decomposition(implement)=single-package reason=not-beneficial (31 tasks, tightly coupled rename surface); review=auto slot_cap=2 test-budget=baseline@implement-start + targeted-mid + closure@post-review -->
 <!-- loop-state:end -->
 
 - line_id: `078-coaching-skills`
@@ -66,7 +66,11 @@ last_verdict: STALLED — analyze-r2 C=0/H=1 new H-04 (optimization claim protoc
 | plan-fix | done（commit 21e15d53；U4 PASS） | H-01/C-01/H-02/M-07；6 条 substantive PLAN-EDIT（分支 a 授权）；pre-analyze pass |
 | tasks-fix | done（commit f61d8a23；U4 PASS） | H-03/C-01 全派生面审计+guard copy；H-02 新增行门；M-06 skill-shape；L-01/L-02 |
 | analyze-r2 | done（ANALYZE-DONE；门 FAIL：C0/H1 新发现 H-04） | 上轮 C01/H01/H02/H03 全部闭合；H-04 = claim 创建时点三处冲突（data-model:174 / C-9 / expectation C-5） |
-| implement | **not dispatched（停线）** | 回环规则：第二轮仍有 HIGH → 停线上送 |
+| implement | **not dispatched（停线，等待人工）** | 回环规则：第二轮仍有 HIGH → 停线上送 |
+| plan-fix-2 | done（commit 66edf74f；U4 PASS） | H-04 claim 唯一 owner + O_EXCL 原子创建；M-11 → `optimization: failed`；3 条 substantive PLAN-EDIT（人工授权） |
+| tasks-fix-2 | done（commit 5e82668e；U4 PASS） | T012 引用 claim owner + O_EXCL；M-14 teardown 后置；三门 pass |
+| analyze-r3 | done（ANALYZE-DONE；门 PASS C0/H0） | H-04/M-11 闭合；M-15/M-16 等 9M/9L 留待实现时顺带处理 |
+| implement | dispatched（single-package；分段 ≤8 任务/part） | baseline slot running |
 
 ## Analyze 回环计划（loop 1/1）
 
@@ -94,3 +98,12 @@ last_verdict: STALLED — analyze-r2 C=0/H=1 new H-04 (optimization claim protoc
 1. 授权一次**计划内设计修复**：只改 `data-model.md`（claim 唯一 owner + 原子步骤）与 `contracts/coaching-run.contract.md` C-9（冲突映射 `optimization: failed`），顺带 M-11；修复后重跑 analyze 第三轮（属人工授权的例外，不属于自动回环）。
 2. 把 H-04 降级为「实现前必须解决的设计注释」，带风险进入 implement（不推荐：跨产物矛盾会在实现与测试中放大）。
 3. 暂停该线，保留全部工件与状态脊，等人工评审后再重入（重入只认状态脊，不会重派已完成阶段）。
+
+## Implement 分段计划（bounded dispatch，≤8 任务/part）
+
+- Part 1：T001–T008（Setup / Foundational：证据落点、基线冻结、夹具、改名骨架、台账/ probe/目录/编译面）
+- Part 2：T009–T016（US1 + US2 前半：预期双维度与运行目录）
+- Part 3：T017–T024（US2 后半 + US3：派发/观测/失败/状态）
+- Part 4：T025–T031（US4 重命名兼容面 + 终局门）
+- 每段：定向测试 + 证据 + 单行提交；返回 `PARTn-DONE`；驱动 U4 通过后派下一段。
+- 全量基线槽：`baseline-failed.txt`（implement 起点，唯一一次全量）；closure 在全量 review 后。
