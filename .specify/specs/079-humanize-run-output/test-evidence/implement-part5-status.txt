@@ -1,0 +1,90 @@
+# Implement part 5/5 — stage status (T033–T036)
+
+date=2026-10-31
+stage=implement
+part=5/5
+feature=079-humanize-run-output
+base_commit=ecc8ac58
+scope=T033,T034,T035,T036
+selection_basis=targeted-set-v1
+
+command=.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py tests/contract/test_feedback_command_classification.py tests/contract/test_migration_distribution.py tests/contract/test_run_skills_wiring.py tests/contract/test_skill_layer_visibility_guards.py
+rc=0
+passed=303
+failed=0
+skipped=0
+new_failures=0
+sufficiency=complete-for-scope — the T036 group (WC-05…WC-20 + the clause↔test map judge) is green, the nine frozen surfaces are green and byte-identical, and the two derived-face engines both exit 0; the 077 pilot date-boundary reds are out of this command's scope and are not this feature's failures
+
+## E3 stage-status line
+
+`stage=implement part=5/5 selection=targeted-set-v1 command=".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_correctness.py tests/contract/test_feedback_command_classification.py tests/contract/test_migration_distribution.py tests/contract/test_run_skills_wiring.py tests/contract/test_skill_layer_visibility_guards.py" rc=0 passed=303 failed=0 skipped=0 new_failures=0 sufficiency=complete-for-scope`
+
+## T033 — frozen surfaces and fixture set
+
+```console
+$ .venv/bin/python -m pytest -q <the nine frozen files>
+131 passed, 1 warning in 7.83s
+$ git diff --name-only 35ff11bc -- <the nine frozen files>
+（空）
+$ .venv/bin/python -m pytest "tests/contract/test_feedback_command_classification.py::test_simple_command_omits_feedback_step[humanize]" "tests/contract/test_feedback_command_classification.py::test_table_covers_every_command_template" -v
+2 passed
+$ git diff --name-only 35ff11bc -- tests/fixtures/humanize ':(exclude)tests/fixtures/humanize/run'
+（空）
+```
+
+Seven run-fixture classes present (success / failure / non-action / needs-confirmation / nested / degraded / reservations), plus `denied/`, `injection/`, `governance/`. WC-14 / WC-15 / WC-20 are also asserted in-suite by `test_wc14_frozen_surfaces_unchanged`, `test_wc15_run_fixtures_present`, `test_wc20_command_stays_simple`.
+
+## T034 — gate, roster, zero runtime
+
+```console
+$ ls templates/commands/*.md | wc -l
+27
+$ git diff --stat 35ff11bc -- src/specify_cli scripts
+（空）
+$ python3 scripts/python/flow-class-check.py --action lookup --unit-id "skill:humanize"
+flow_class: expression / basis: reader-oracle / source: ledger
+$ python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 75 units, zero drift
+$ git diff 35ff11bc -- templates/commands skills docs shared 'templates/*.md' | grep '^+' | grep -v '^+++'
+added_lines=390 · blocking_hits=0   （scanner scope, no docs: 331 / 0）
+```
+
+Baseline row (`test-evidence/gate-newline-baseline.txt`): `added_lines=0` / `blocking_hits=0`. Judged on **added lines**, so the 27 pre-existing tree-wide gates are not charged to this feature.
+
+## T035 — SC closure
+
+`verification.md` created: T031–T034 real outputs pasted, one status row + evidence path for each of SC-001…SC-010 (none blank). SC-006 closure guard re-ran the unlimited discovery on `35ff11bc`: `164` hits, `live-source=7 / derived-copy=4 / mirror=1 / dated-record=114 / frozen-verification=38 / unclassified=0`, `LC_ALL=C comm -3` against the pinned inventory is **empty (0 lines)**, and all **38/38** frozen-verification files pass `git diff --quiet 35ff11bc`. Serialized invariants: roster 27, `blocking_hits=0`, Feature 062 `Implemented`.
+
+```console
+$ .venv/bin/python -m pytest "tests/contract/test_humanize_command_surface.py::test_wc12_clause_test_map_is_total" -v
+1 passed     → clause-test-map=total
+$ python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
+PASS — 0 error(s), 0 warning(s)
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
+```
+
+## T036 — WC-05…WC-15 group + clause ↔ test map
+
+`tests/contract/test_humanize_command_surface.py` extended in place (no new file) with `test_wc05…test_wc20` (16 guards) and the judge `test_wc12_clause_test_map_is_total`. WC-16…WC-20 landed in the same pass because the judge's reverse-claim leg refuses any unclaimed `test_(ip|ex|rp|cm|wc)` function, so their contracted traceability names must resolve to real functions. Real readings and the two-column labelling (invariant guard vs genuine red) are in `notes/red-first-evidence.md` § T036.
+
+```console
+$ .venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py -k "wc05 or ... or wc20"
+17 passed, 84 deselected        (first run before the waiver row: 4 failed, 13 passed)
+```
+
+## new_failures 归属（0）
+
+本段定向集 `0 failed`。如实声明：`tests/integration/test_expression_line_pilot.py` 的两条仍红于 **077 夹具的 `as-of 2026-10-30` 在系统日期 2026-10-31 下被判 `as-of-stale`**——环境日期边界，与本特性无关；本段不修改 077 冻结夹具，不计入本特性 new_failure（见 `verification.md` § 环境日期边界）。
+
+## 就地修正（fast-fail correction，逐条披露）
+
+1. T036 首次运行 4 红中 3 条是测试自身构造缺陷：WC-11 锚点用「五节」而 062 索引描述用逐节列举（改为断言该列举，强度不变）；WC-13 误把 077 的 `strip_wiring()` 套在 `humanize`（pre-077 入口由 `UNCHANGED_SHA256` 持有，改为断言钉扎重测 + 对 `STAGE_STEMS` 复验剥离基线）；WC-16 的 `git ls-tree <rev> templates/commands` 只列目录条目（补尾斜杠）。
+2. 第 4 条是真红：判定器无法认领自己；按 M-21 在 `tasks.md` § Clause Test Waivers 追加显式 waiver 行（reason / remedy / 证据槽齐备），断言形态未动。
+3. `notes/quickstart-run.md` 的「不可复现场景」表把 `test_ip12_output_occupied_rejected` 写成了不存在的 `test_ip12_target_occupied`，一并改正（仅该引用）。
+
+## 未跑的东西（如实声明）
+
+- 全量套件本段未重跑（E2 已在 implement 起点消耗；closure 归 review 后由驱动执行）。
+- 原生子代理派发腿（SC-001 的 `dispatches: 1`、S7 A）在本宿不可复现，已按降级载体真实运行并如实标注。
