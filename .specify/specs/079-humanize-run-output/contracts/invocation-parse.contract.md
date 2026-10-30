@@ -11,7 +11,7 @@
 
 - **IP-01**: 选项集为 `[[STR-008]]`、`[[STR-009]]`、`--tone`、`--audience`、`--output`、`--force`，只出现在指令之前；`--` 终止选项解析，其后全部逐字进入指令；无 `--` 时第一个不可识别为选项的 token 即指令起点。解析 MUST 是纯语法过程：同样的 argv 得到同样的结果，MUST NOT 读取指令内容来猜测意图（FR-001, FR-006）。
 - **IP-02**: 选项之后的剩余文本整体是**待执行指令**（逐字，含换行与引号）；本命令 MUST NOT 改写、摘要或规范化它（FR-001, FR-013）。裸文本 MUST NOT 再被解释为待改写内容（A4 的破坏性变更）。
-- **IP-03**: `--tone` 的取值集与拒收语义、`--audience` 的自由文本语义、`--output` 与 `--force` 的写入语义 MUST 与既有契约逐字一致；本契约不新增取值、不改缺省（FR-004）。
+- **IP-03**: `--tone` 的取值集与拒收语义、`--audience` 的自由文本语义（空字符串或纯空白 = **未提供**：不拒收、不改变表达层缺省）、`--force` 的覆盖语义 MUST 与既有契约逐字一致；`--output` 的写入语义按模式分属——内容模式沿用既有契约，运行模式由 FR-024 独占拥有（见 IP-16 / IP-17）。本契约不新增取值、不改缺省（FR-004, FR-024）。
 - **IP-04**: 解析结果 MUST 落入 `data-model.md` § E2 的字段集，且 `mode` 只能是 `run` / `content` / `reject`；不存在第四种或「模糊」形态（FR-006）。
 
 ## 模式路由（封闭判定表）
@@ -36,7 +36,7 @@
 
 ## 输出目标形态
 
-- **IP-16**: 运行模式的 `--output` 扩展名 MUST 落在 `.md` / `.markdown` / `.txt` 封闭集内；不匹配既有格式族规则（运行模式没有输入格式可对齐），其余写入语义（原子写、`--force`、同路径拒绝、不可写即拒绝且不留部分文件）沿用既有契约（FR-024）。
+- **IP-16**: 运行模式 `--output` 的扩展名封闭集（`.md` / `.markdown` / `.txt`，此处为测试钉扎字面量）与写入内容由 requirements FR-024 独占拥有；本条款只断言该集合生效、集合外拒绝为 `bad-extension`，其余写入语义（原子写、`--force`、目标已存在且未给 `--force`、不可写即拒绝且不留部分文件）同样按 FR-024——运行模式没有输入格式可对齐，MUST NOT 复用内容模式的「扩展名跟随输入」规则（FR-004, FR-024）。
 - **IP-17**: 内容模式的 `--output` 语义完全不变：扩展名与输入格式族一致，文件只含改写文本（FR-023, FR-024）。
 
 ## 可追溯性
@@ -45,7 +45,7 @@
 |------|-----|----------------|
 | IP-01 | FR-001, FR-006 | `test_ip01_parse_is_pure_syntax` |
 | IP-02 | FR-001, FR-013 | `test_ip02_instruction_is_verbatim` |
-| IP-03 | FR-004 | `test_ip03_option_domain_unchanged` |
+| IP-03 | FR-004, FR-024 | `test_ip03_option_domain_unchanged` |
 | IP-04 | FR-006 | `test_ip04_parse_fields_closed` |
 | IP-05 | FR-001, FR-002, FR-003 | `test_ip05_routing_table_order` |
 | IP-06 | FR-002, FR-006 | `test_ip06_source_and_instruction_rejected` |
@@ -58,5 +58,5 @@
 | IP-13 | FR-030 | `test_ip13_nested_invocation_rejected` |
 | IP-14 | FR-003, FR-030 | `test_ip14_reject_paths_write_nothing` |
 | IP-15 | FR-023, FR-030 | `test_ip15_content_mode_unreserved` |
-| IP-16 | FR-024 | `test_ip16_run_output_extension` |
+| IP-16 | FR-004, FR-024 | `test_ip16_run_output_extension` |
 | IP-17 | FR-023, FR-024 | `test_ip17_content_output_unchanged` |

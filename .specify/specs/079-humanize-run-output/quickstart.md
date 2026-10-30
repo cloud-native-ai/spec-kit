@@ -50,7 +50,7 @@ $ python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/
 **看什么**
 
 - 五个 H2 小节按 `## Conclusion` → `## Key Changes` → `## Evidence` → `## Risks & Limits` →
-  `## Next Steps` 顺序出现，标题逐字。
+  `## Next Steps` 顺序出现，标题逐字；`## Conclusion` 首行是 `verdict: success`。
 - 五节之前恰有一行 `mode: subagent`（或降级时 `mode: in-session-degraded`），其后再有一行迁移提示
   （本次是裸文本调用）。
 - `## Evidence` 含 `dispatches: 1` 一行，并给出命令与退出码。
@@ -75,7 +75,7 @@ gitignored）。
 
 **看什么**
 
-- `## Conclusion` 明确写失败，且全文不出现「成功/通过」类措辞（允许「部分完成」）。
+- `## Conclusion` 首行是 `verdict: failure`，正文明确写失败，且全文不出现「成功/通过」类措辞（允许「部分完成」）。
 - `## Evidence` 给出命令与退出码 3。
 - 没有第二次派发、没有自动重跑。
 
@@ -96,14 +96,16 @@ gitignored）。
 
 **看什么**
 
-- `## Conclusion` 写「未执行任何动作」。
-- `## Evidence` 写 `none`。
+- `## Conclusion` 首行是 `verdict: success`，正文写「未执行任何动作」（按 FR-019 的 `not-an-action` 映射：verdict 取 `success`，但不称执行成功）。
+- 恰有**一次派发**（执行体正是判定「这不是动作」的那一次），`## Evidence` 含 `dispatches: 1`；证据指针写 `none`（该 literal 只替代证据指针，派发记录行保留）。
 - 迁移提示行仍在（裸文本调用）。
-- 不派发、不写入任何文件。
+- 不写入任何文件。
 
-**前提清单**：执行体把非动作请求判为 `not-an-action`；占位移除；`git status` 无新增。
+**前提清单**：宿主具备原生派发通道（降级时 `dispatches: 0` 且载体标记为 `mode: in-session-degraded`）；
+执行体把非动作请求判为 `not-an-action`；占位移除；`git status` 无新增。
 
-**执行状态**：`not-run at plan stage`。承载：`test_rp07_evidence_pointers`（`none` 分支）、
+**执行状态**：`not-run at plan stage`。承载：`test_rp05_conclusion_verdict`、
+`test_rp07_evidence_pointers`（`none` 分支）、`test_ex01_exactly_one_dispatch`、
 `test_rp04_zero_write_default`、`test_ex03_temporary_executor_no_agent_file`。
 
 ---

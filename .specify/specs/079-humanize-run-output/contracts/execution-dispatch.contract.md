@@ -46,7 +46,7 @@
 
 - **EX-19**: humanize 自身 MUST NOT 发起网络请求、MUST NOT 调用外部服务或模型 API；指令自身按其契约产生的联网行为 MUST 在 `## Evidence` / `## Key Changes` 披露，MUST NOT 记作 humanize 的外发（FR-010, SC-007）。
 - **EX-20**: 退出路径（成功、失败、中止、异常）MUST 全部释放占位（`data-model.md` § E4）；占位残留即判违反（FR-030, 零写入）。
-- **EX-21**: 派发记录 MUST 是 `## Evidence` 内一行元数据，只计 humanize 发起的顶层派发；指令自身再发起的派发归该指令单元，MUST NOT 重复计数（FR-007）。
+- **EX-21**: 派发记录 MUST 是 `[[STR-003]]` 内一行元数据，键名 `[[STR-011]]`（字面量 owner = requirements § Shared Strings）；本条款是**计数口径的唯一 owner**：只计 humanize 发起的顶层派发（原生 `1` / 降级 `0`），指令自身再发起的派发归该指令单元，MUST NOT 重复计数（FR-007）。
 
 ## 可追溯性
 

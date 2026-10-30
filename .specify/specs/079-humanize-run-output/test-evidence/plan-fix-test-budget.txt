@@ -1,0 +1,14 @@
+# Plan-fix stage test budget — Feature 079（analyze 回环修复轮 1/1）
+
+date=2026-10-30
+stage=plan-fix (analyze loop 1/1, branch a)
+base_commit=bd8648b7
+status=not-run-docs-only
+reason=本阶段只改写 plan 属主制品（plan.md / data-model.md / contracts/ / quickstart.md / feature-ref.md）、
+  Feature 062 详情元数据与阶段证据；不改 requirements.md / tasks.md，不改任何可执行面、接线文件或测试文件。
+  测试预算按 docs-only 处理。
+runnable-checks-executed=
+  test-evidence/validate-decision-tensions.txt   exit 0（status=ok；3 条记录；expected-sacrifice-unmapped 0）
+  test-evidence/pre-analyze-check-plan.txt       exit 0（decision=pass；errors=0；advisories=21，全部为既有 missing-path 建议）
+test-run=not run at this stage
+next=tasks 修复轮按 analyze-fix-brief 的 tasks 归属推进（H-02 发现/守卫、M-03、M-21），随后复跑 analyze（第二轮，本轮唯一允许的回环）

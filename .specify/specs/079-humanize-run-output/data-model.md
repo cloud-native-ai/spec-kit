@@ -47,7 +47,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 | 字段 | 类型 | 语义 | 来源 |
 |------|------|------|------|
 | `tone` | `professional` \| `humorous` \| `empathetic` \| `colloquial` \| null | 取值域沿用既有契约，本特性不改 | FR-004 |
-| `audience` | string \| null | 自由文本，只作用于表达层 | FR-004, FR-022 |
+| `audience` | string \| null | 自由文本，只作用于表达层；空字符串或纯空白按 `null`（**未提供**）处理——不拒收、不改变表达层缺省 | FR-004, FR-022 |
 | `file` | path \| null | 显式内容源 | FR-002 |
 | `inline` | string \| null | 显式内联内容源 | FR-002 |
 | `output` | path \| null | 显式写入目标 | FR-004 |
@@ -88,7 +88,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 | 字段 | 类型 | 语义 | 来源 |
 |------|------|------|------|
 | `text` | string | 指令原文，逐字进入派发载荷与报告；MUST NOT 被 humanize 改写或简化 | FR-001, FR-013 |
-| `language` | `zh` \| `latin` \| `undetermined` | 报告语言的第一顺位判据 | FR-018（语言条） |
+| `language` | `zh` \| `en` \| `undetermined` | 报告语言的第一顺位判据（封闭域 `zh` / `en`；不可判为 `undetermined`，交由治理回退） | FR-018（A7） |
 | `nesting_hits` | string[] | 指令中出现的本命令调用 token（空 = 无嵌套） | FR-030 |
 
 `language` 的判定复用既有主语言计数口径（占位符、代码与纯数字/符号剔除后按书写系统计数，并列取
@@ -122,7 +122,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 
 | 字段 | 类型 | 语义 | 来源 |
 |------|------|------|------|
-| `status` | `completed` \| `failed` \| `partial` \| `aborted` \| `needs-confirmation` \| `not-an-action` | 执行结果类别 | FR-012, FR-019 |
+| `status` | `completed` \| `failed` \| `partial` \| `aborted` \| `denied` \| `needs-confirmation` \| `not-an-action` | 执行结果类别；取值域的 owner 是 FR-012 | FR-012 |
 | `final_output` | string \| null | 子代理的最终输出原文（可为空） | FR-009 |
 | `products` | `{path, kind: created\|modified}[]` | 指令造成的写入，逐项 | FR-009, FR-024 |
 | `evidence` | `{pointer, kind: command\|path\|reading}[]` | 可定位证据：命令 + 退出码 / 产物路径 / 测试读数 | FR-009, FR-020 |
@@ -133,6 +133,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 不变量：
 
 - `status=needs-confirmation` ⇒ `blocked_at` 非空，且 `products` 只含该步之前已完成的写入。
+- `status=denied`（用户明确拒绝确认）⇒ 不执行该步、不执行替代动作；报告 verdict 按 FR-019 取 `aborted`，文案写明拒绝与未执行范围（FR-012）。
 - `status=completed` 且 `final_output=null` 且 `products=[]` ⇒ 报告写「无可报告输出」，`## Evidence` 写 `none`（SC-009）。
 - 缺 `anomaly_line` ⇒ 信封不完整：结论 MUST NOT 被消费（EX 契约）；报告按失败/不完整处理。
 - `not-an-action`：指令不是可执行动作（散文/聊天式提问），报告 `## Conclusion` 写「未执行任何动作」（Edge Cases）。
@@ -148,7 +149,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 | `governance.constitution` | 同上 | `.specify/memory/constitution.md` | FR-014, FR-015 |
 | `governance.glossary` | 同上 | `.specify/memory/glossary.md` | FR-014, FR-015 |
 | `governance.feature_registry` | 同上 | `.specify/memory/features.md`（索引行投影，非整文件注入） | FR-014, FR-015 |
-| `session` | `read` \| `unavailable` | 本次会话上下文 | FR-014, FR-015 |
+| `session` | `read` \| `not-read` \| `unavailable` | 本次会话上下文（三态与治理来源同一口径） | FR-014, FR-015 |
 
 不变量：来源清单只列 `read` 的来源；`unavailable` / `not-read` 必须在 `## Risks & Limits` 声明缺失
 （FR-015）。读取按摘要优先——注册表取行投影，治理文档取相关段落，不整文件注入。
@@ -162,23 +163,15 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 | `carrier_marker` | `mode: subagent` \| `mode: in-session-degraded` | 五节之前的一行元数据；恰一个 | FR-011, FR-018 |
 | `migration_hint` | literal \| null | 裸文本调用时为固定整句；非裸文本为 null | FR-005（A4） |
 | `sections` | 有序五节 | 标题逐字：`## Conclusion` / `## Key Changes` / `## Evidence` / `## Risks & Limits` / `## Next Steps` | FR-018, STR 表 |
-| `verdict` | `success` \| `partial` \| `failure` \| `aborted` \| `needs-confirmation` | 报告口径的总结论；由 E5 `status` 映射 | FR-019 |
-| `dispatch_count` | int | `## Evidence` 的派发记录行：只计 humanize 发起的顶层派发 | FR-007 |
-| `language` | `zh` \| `latin` | 正文语言：指令优先，治理回退 | FR-018（语言条） |
+| `verdict` | 见 requirements FR-019（封闭集与映射的唯一 owner；本文件不复制枚举） | 报告口径的总结论；由 E5 `status` 映射 | FR-019 |
+| `dispatch_count` | int | `## Evidence` 的派发记录行（键名 `[[STR-011]]`）：只计 humanize 发起的顶层派发（原生 1 / 降级 0） | FR-007 |
+| `language` | `zh` \| `en` | 正文语言（封闭域）：指令优先，治理回退，回退 `en` 并声明 | FR-018（A7） |
 | `sources` | string[] | `## Risks & Limits` 内的实际读取来源清单 | FR-015 |
 
-### E5 → E7 的 verdict 映射（封闭）
+### E5 → E7 的 verdict 映射（指针）
 
-| E5.status | verdict |
-|-----------|---------|
-| `completed` | `success` |
-| `partial` | `partial` |
-| `failed` | `failure` |
-| `aborted` | `aborted` |
-| `needs-confirmation` | `needs-confirmation` |
-| `not-an-action` | `success`（结论文案为「未执行任何动作」，不称执行成功） |
-
-映射是单向的：`verdict` MUST NOT 被上调（`partial` 不得写成 `success`），也不得因表达层需要被下调
+映射（含 `not-an-action` → `success` + 「未执行任何动作」文案、`denied` → `aborted`）的**唯一 owner** 是
+requirements FR-019：集合封闭、映射单向（不得上调，也不得因表达层需要下调）；本文件不复制映射表
 （FR-019, FR-012）。
 
 ---
@@ -225,7 +218,7 @@ E8 的显式输出外，没有任何实体落盘。字段名与语义在本文�
 | V-21 | `## Evidence` 的每条关键结论 MUST 带可定位指针；无可报告输出写 `none` | FR-020 |
 | V-22 | 无已知风险时 MUST 显式写「无已知风险」/`no known risks`，该节不得省略 | FR-021 |
 | V-23 | 旧内容模式 MUST NOT 派发、MUST NOT 生成五节、`--output` 只写改写文本 | FR-023, FR-024 |
-| V-24 | 注入防护 MUST 在两种模式下同时生效 | FR-025（FR-029 溯源） |
+| V-24 | 注入防护 MUST 在两种模式下同时生效，并覆盖指令原文、内容源、回传字段与产物内容 | FR-025 |
 | V-25 | 并发与嵌套 MUST fail-closed，并点名冲突运行/路径/字面量 | FR-030 |
 | V-26 | Feature 062 状态 MUST 保持 `Implemented`，扩展只追加记录 | FR-029 |
 

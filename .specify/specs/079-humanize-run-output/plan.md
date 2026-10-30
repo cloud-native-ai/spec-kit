@@ -29,7 +29,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 **Project Type**: single（框架源码 + 自举运行时双帽；改动落在 `templates/`、`skills/`、`docs/`、`tests/`，`.specify/` 侧由再生成入口产出）
 **Performance Goals**: 无吞吐目标。两条可测预算：① 技能正文 ≤ 5000 tokens（基线 ≈4090 / 123 行，实测见 `test-evidence/stage-plan-baselines.txt` § 5，判定工具 `skills/external/improve-skills/scripts/skill-shape.py`）；② 一次运行恰好一次顶层派发（1/1）
 **Constraints**: 零新增阻断式确认门（判定单位是 `git diff 35ff11bc` 的新增行，基线 `test-evidence/gate-newline-baseline.txt`：added_lines=0 / blocking_hits=0）；零新增外发；零隐式写入；命令保持 `Simple`（无 `scripts:`、无 `## Feedback`）；类别与 probe 注册表不动；历史语料不改写
-**Scale/Scope**: 一份命令模板 + 四份按工具副本（再生成）+ 一份技能源（`SKILL.md` + `references/`）与运行时镜像 + 一页 docs + 主契约测试与钉扎测试；需手改的活接线面由 requirements A11 冻结、落地清单在 `tasks.md` 实测
+**Scale/Scope**: 一份命令模板 + 四份按工具副本（再生成）+ 一份技能源（`SKILL.md` + `references/`）与运行时镜像 + 一页 docs + 主契约测试与钉扎测试；需手改的活接线面由 requirements § Wiring Surface — A11 Closed Set 拥有（发现命令 + 分类规则 + 守卫），成员是基线树上的派生量，由 tasks 阶段按该节实测重算（不手写白名单）
 
 ## Constitution Check
 
@@ -42,7 +42,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每条设计决定都追到 FR：契约的可追溯性表是 FR→条款→测试的唯一映射（`contracts/*.contract.md` § 可追溯性），本文件不复述 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 062（`feature-ref.md`），本阶段只追加 `Latest Review` / `Key Changes` / `Last Updated`，不新建行、不回退状态 |
 | III | Intent-Driven Development | ✅ Pass | Summary 与 `contracts/report-assembly.contract.md` 先给「报告要对读者做什么」，实现细节留到 tasks |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 五份契约均带 clause→test 映射，实现期先写/更新这些测试再改模板与技能；本阶段按 docs-only 预算不跑测试（`test-evidence/stage-status.txt`） |
+| IV | Test-First & Contract-Driven Implementation | ◐ Partial（经 VII 的 template-only 门正当化） | 本特性无运行时，交付物是命令模板与技能正文；Test-First 的形态是**先于模板改写**写/更新结构契约测试（clause→test 映射见五份契约 § 可追溯性），不是 unit/integration 测；本阶段按 docs-only 预算不跑测试（`test-evidence/plan-fix-test-budget.txt`）。判定与 `tasks.md` § Tests Mode 的同一行一致（Partial + template-only 门） |
 | V | AI Agent Integration Standards | ✅ Pass | 不动 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；四份按工具副本只经 `regen-command-copies.py` 生成 |
 | VI | Continuous Quality & Observability | ✅ Pass | 基线读数冻结于 `test-evidence/stage-plan-baselines.txt`；breaking change 与迁移方式在模板、技能、docs 三处声明（WC-01, WC-08, CM-09） |
 | VII | Specification-Plan-Task-Implementation Workflow (NON-NEGOTIABLE) | ✅ Pass | 只推进到 `Planned` 之前的本阶段产物；Feature 复用优先、状态不回退（FR-029）；模板类特性的 Test-First 按 template-only 门判（契约测试验证模板内容与结构） |
@@ -58,9 +58,9 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `references/` 是 `skills.md` 已文档化的既有形态；临时占位落 `.specify/.tmp/`（已由 `.specify/.gitignore` 匹配，`git check-ignore` 实测见基线 § 8） |
 | XVIII | Grounded Naming | ✅ Pass | 用户裁定的定位名「动作输出人类友好化」贯穿 Feature 名、描述、模板与 docs；新文件名取自其承载的概念（`run-mode` / `report-shape`），不发明新术语 |
 
-**Gates Status**: ✅ 全部通过，无未证成 Fail/Partial 行。
+**Gates Status**: ✅ 无 Fail 行；Principle IV 为 **Partial**，经 Principle VII 的 template-only 门正当化（理由见该行，与 `tasks.md` § Tests Mode 的判定同源）。无其余未证成的 Fail/Partial 行。
 
-**Re-check after Phase 1** (2026-10-30, against `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md`): 同一 18 行逐行复核，结论不变。设计产物只增加了三类内容——把运行模式的行为拆成 `references/` 两个文件（不引入新运行时）、把并发观测收窄为一个 gitignored 占位（宪法 IX/XVII 的边界内）、把 FR→条款映射交给五份契约的可追溯性表（减少本文件的重复定义点）。没有新增门禁、没有新增外部依赖、没有新增命令。
+**Re-check after Phase 1** (2026-10-30, against `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md`): 同一 18 行逐行复核，结论不变（IV 仍为 Partial/正当化，其余 17 行为 Pass）。设计产物只增加了三类内容——把运行模式的行为拆成 `references/` 两个文件（不引入新运行时）、把并发观测收窄为一个 gitignored 占位（宪法 IX/XVII 的边界内）、把 FR→条款映射交给五份契约的可追溯性表（减少本文件的重复定义点）。没有新增门禁、没有新增外部依赖、没有新增命令。
 
 > **说明**：本 plan 的评分与 § Post-Generation 质量自查由同一 agent 完成；按 `.specify/shared/workflow/objective-analysis-gate.md`，同作者条件成立时评分应委派 fresh-context 只读子代理。本线的执行约束明确禁止派发子代理，因此此处**未委派**，该缺口记录在 § Phase 0 的降级证据路径与下方 Handoff 中，供 analyze 阶段以独立上下文复核。
 
@@ -76,7 +76,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
   - pole_a: FR-007 与 A5 要求经**既有** run-agent 且不引入第二套机制；新增 Agent 定义会随框架分发给所有消费项目，并把一个非 SDD 动作塞进为 SDD 阶段设计的席位授权探针（探针要求 `--agent/--team/--seat`，临时执行体没有席位）。
   - pole_b: run-agent 的按名解析分支假定磁盘上存在定义（否则走 "agent not found"），因此临时执行体必须**显式说明**它不声称已存 Agent，否则实现者会为了「让解析通过」而真的去建一个定义。
 - **discriminating_evidence**: 夹具运行结束后 `git status --porcelain` 中不出现任何 `.agent.md`，且报告首行是 `mode: subagent`（或降级时 `mode: in-session-degraded`）；一项契约测试对 `.specify/agents/` 做前后存在性比对。结果二值：出现 / 不出现。
-- **expected_sacrifice**: 临时执行体没有持久定义，因此拿不到 run-agent 给具名 Agent 的 execution-config 快照与日志三联；humanize 的可观测性止于报告里的派发记录行与证据指针（SC-007 的审计因此依赖 `git status` + 报告，而不是运行日志）。
+- **expected_sacrifice**: SC-007 Source ↓ 临时执行体没有持久定义，因此拿不到 run-agent 给具名 Agent 的 execution-config 快照与日志三联；humanize 的可观测性止于报告里的派发记录行与证据指针（该审计因此依赖 `git status` + 报告，而不是运行日志）。
 - **revision_trigger**: 出现两次以上「执行体需要固定工具集或固定模型档，默认继承不足以完成指令」→ 重开，改为落一个通用执行 Agent 定义，并把席位探针的适用条件写清楚。
 
 ### T-002 — 并发观测用受制裁临时根下的一次性占位，而不是「完全不落盘」
@@ -87,7 +87,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
   - pole_a: FR-030 要求「同一仓库已有活动运行」可判并**点名冲突运行**；纯会话内检测看不见另一个会话或另一条分支上的运行，等于把 fail-closed 降级成「看不见就不管」。
   - pole_b: A9 把零写入范围收窄为「报告或副本」；占位两者都不是，但它仍必须落在受制裁的临时根、被 `.gitignore` 匹配（实测 `git check-ignore` 命中 `.specify/.gitignore` 的 `.tmp/`）、并在运行结束时消失，否则 SC-007 的 `git status` 审计会被自己的机制污染。
 - **discriminating_evidence**: 两个并发夹具运行，第二个的拒绝消息含第一个的 run_id 与起始时间；运行结束后 `ls .specify/.tmp/humanize/` 为空且 `git status --porcelain` 无新增。结果二值：点名 / 不点名、为空 / 不为空。
-- **expected_sacrifice**: 引入一个瞬时文件面与一个 TTL 数值（24h，owner = `contracts/invocation-parse.contract.md` IP-11 所引的 `data-model.md` § E4）；进程被强杀时可能留下遗弃占位，只能靠 TTL 与报告点名兜底。
+- **expected_sacrifice**: SC-007 Source ↓ 引入一个瞬时文件面与一个 TTL 数值（24h，owner = `contracts/invocation-parse.contract.md` IP-11 所引的 `data-model.md` § E4）；进程被强杀时可能留下遗弃占位，只能靠 TTL 与报告点名兜底。
 - **revision_trigger**: 出现两次以上「遗弃占位在 TTL 内阻塞后续运行且无人清理」→ 重开，改为占位携带 pid/时间戳的自动回收，或退回纯会话内检测并把 FR-030 的可判范围写窄。
 
 ### T-003 — 命令复杂度分类保持 Simple，不把「读治理文档」算作跨流程消费
@@ -98,7 +98,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
   - pole_a: 027 判据的既有先例把治理文档读取排除在外：`feature` 读 `features.md`、`constitution` 读宪法，两者仍是 Simple，理由写作「注册表编辑 / 非脚本化链」。
   - pole_b: 「Simple 且无 feedback」被 `tests/contract/test_feedback_command_classification.py` 从 027 表**派生**钉扎；改类必须同时改 027 表、模板与计数，属跨特性变更，不能由本特性顺手做。
 - **discriminating_evidence**: 解析 027 表后 humanize 仍为 Simple，且 `templates/commands/humanize.md` 不含 `feedback-utils.py` 标记。结果二值。
-- **expected_sacrifice**: 命令侧不进反馈通道，humanize 的运行质量只由技能侧 wrap-up 记录；报告质量问题的入口比 Complex 命令少一条。
+- **expected_sacrifice**: SC-008 Source ↓ 命令侧不进反馈通道，humanize 的运行质量只由技能侧 wrap-up 记录；报告质量问题的入口比 Complex 命令少一条。
 - **revision_trigger**: 若后续把「报告」正式定义为被某个 `/speckit.*` 消费的跨流程制品，本裁决立即重开（判据 (b) 同时成立，Simple 不再站得住）。
 
 ## Project Structure
@@ -108,7 +108,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 ```text
 .specify/specs/079-humanize-run-output/
 ├── plan.md              # This file (/speckit.plan command output)
-├── requirements.md      # Upstream authority (30 FR / 10 SC / 10 Shared Strings)
+├── requirements.md      # Upstream authority (30 FR / 10 SC / 15 Shared Strings)
 ├── checklists/          # Requirements-quality checklist (requirements stage)
 ├── test-evidence/       # Deterministic-check evidence per stage
 ├── data-model.md        # Phase 1 output (8 entities, 26 validation rules)
@@ -161,7 +161,7 @@ tests/fixtures/humanize/run/              # NEW run-mode fixtures (success/failu
 
 ## Complexity Tracking
 
-N/A — Constitution Check 无 Fail/Partial 行，三处承重裁决记录在 § Decision Tensions，不构成需要豁免的违例。
+N/A — Constitution Check 无 Fail 行；Principle IV 的 Partial 由 Principle VII 的 template-only 门正当化（不是违例，因此不需要复杂度豁免）；三处承重裁决记录在 § Decision Tensions。
 
 ## Phase 0: Research Review
 
@@ -170,7 +170,7 @@ N/A — Constitution Check 无 Fail/Partial 行，三处承重裁决记录在 §
 `fast-fail.md`、027 分类契约、`sync-mirrors.py` MIRROR_PAIRS、`scan-confirmation-gates.py` 的模式表 +
 四组确定性检查实跑。降级不影响结论，但同作者评分缺口见 § Constitution Check 的说明。
 
-**无 `[NEEDS CLARIFICATION]`**：requirements 已过 clarify（30 FR / 10 SC / 10 STR），无未决标记。
+**无 `[NEEDS CLARIFICATION]`**：requirements 已过 clarify（30 FR / 10 SC / 15 STR），无未决标记。
 
 关键发现（每条都改变了设计，而不是复述已知）：
 
@@ -223,14 +223,18 @@ $ grep -cE '^## [0-9]+\. S[0-9]' quickstart.md     → 7
 命中可追溯性表的行（后者形如 `| IP-01 |`，行首是竖线），因此计数即条款数；`data-model` 的实体计数用
 `^## E[0-9] ` 只匹配实体标题，不命中 `### E1 状态机` 这类三级标题。
 
-**FR 覆盖**（每份契约的可追溯性表是唯一权威映射；此处只给 FR→文件的索引，不复制条款行）：
-FR-001…FR-006 → `invocation-parse`；FR-007…FR-013 → `execution-dispatch`；FR-014…FR-022 → `report-assembly`；
-FR-023…FR-025 → `content-mode`；FR-026…FR-029 → `wiring-compat`；FR-030 → `invocation-parse`（入口态）+
-`execution-dispatch`（嵌套）。**与 Phase 0 预期的漂移**：原计划 CM 契约只写「等价性」三条，落盘后发
-现还需要固定「迁移可发现性」与「检测器诚实」两条，CM 由 3 条增至 10 条；总条款数因此高于初估。
+**FR 覆盖**：FR→条款的唯一权威映射是五份契约各自的 § 可追溯性表；本文件不保留索引副本（索引会与 owner
+漂移，且 FR-024 这类跨模式条目本就分属多份契约）。**与 Phase 0 预期的漂移**：原计划 CM 契约只写「等价性」
+三条，落盘后发现还需要固定「迁移可发现性」与「检测器诚实」两条，CM 由 3 条增至 10 条；总条款数因此高
+于初估。
+
+**FR-014 的 doc-only 声明**（analyze M-04）：上下文装配**不新增契约条款**，显式判定为 doc-only。理由：
+装配是提示词步骤，本身没有独立的机器可判面；它的两个可判定面已各有 owner——来源三态由 `data-model.md`
+§ E6 拥有并在 V-16 固定，来源清单与缺失声明由 RP-10（FR-015）的 `test_rp10_sources_read_list` 断言。再补
+一条装配条款只会让同一事实出现第二个定义点（违反 One Source Of Truth），并不增加任何新断言。
 
 ## Handoff
 
-- **下一阶段**：`/speckit.tasks` 按五份契约的 clause→test 映射生成任务；A11 的封闭接线集由该阶段实测冻结。
+- **下一阶段**：`/speckit.tasks` 按五份契约的 clause→test 映射生成任务；A11 的发现命令由该阶段在基线提交上执行，命中按 § Wiring Surface — A11 Closed Set 的规则重算并分类（派生量，不写白名单）。
 - **需独立上下文复核的点**：本文件的宪法自评与质量自查为同作者（§ Constitution Check 的说明），
   `/speckit.analyze` 应以独立上下文复核 18 行判据与三处 Decision Tensions 的可采纳性。

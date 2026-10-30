@@ -48,7 +48,7 @@
 | `data-model.md` | 8 实体 + 26 条校验规则；运行状态机；信封与报告映射 |
 | `contracts/invocation-parse.contract.md` | FR-001…FR-006、FR-030（入口态） |
 | `contracts/execution-dispatch.contract.md` | FR-007…FR-013、FR-030（嵌套） |
-| `contracts/report-assembly.contract.md` | FR-014…FR-022、FR-024 |
+| `contracts/report-assembly.contract.md` | FR-015…FR-022、FR-024（FR-014 为 doc-only，见 plan § Phase 1 的声明） |
 | `contracts/content-mode.contract.md` | FR-023…FR-025（不回归 + 共存） |
 | `contracts/wiring-compat.contract.md` | FR-026…FR-029 + A2/WC-19 |
 | `quickstart.md` | SC-001…SC-010 的可执行验收路径 |
