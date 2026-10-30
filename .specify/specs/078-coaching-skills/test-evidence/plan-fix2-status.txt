@@ -1,0 +1,30 @@
+stage=plan-fix2 (analyze loop 1/1, constraint branch (a): planned design repair, H-04 + M-11 only)
+status=not-run-docs-only
+date=2026-10-30
+stage_base=e43f4c1a
+budget=docs-only：只改 plan 属主制品（data-model.md / contracts/coaching-run.contract.md / quickstart.md）与证据；不跑实现测试
+scope_changed=data-model.md, contracts/coaching-run.contract.md, quickstart.md, test-evidence/**
+scope_untouched=requirements.md, tasks.md, plan.md（仅引用 owner，无需改）, checklists/**, state spine（只读）
+
+plan_edits:
+  data-model.md:
+    - § Optimization claim（H-04 owner）: 改写为该协议的唯一 owner——声明所有权（路径 / 时点 / 原子创建 / 冲突 / 释放 / 残留全部归此节），claim 记录迁到共享路径 `.specify/memory/coaching/.optimization-claims/<trainee-slug>`；时点固定为 `plan-written → optimization-*` 的单一原子步骤（执行闭环完成、提升计划已写、调用 improve-skills 之前），并明写预期/派发/观测阶段均不创建、不尝试优化的运行不创建；创建收敛为单一 exclusive-create 原语 `O_CREAT|O_EXCL`（shell `set -C; : > <path>`），明确 MUST NOT 枚举兄弟运行目录或任何先读后写序列（check-then-act 取消），容器目录 `mkdir -p` 不具互斥含义；冲突→fail closed 点名冲突 run-id（内容不可读时记 `unreadable`），记录 `optimization: failed` + `claim-conflict: <run-id>`，不重试不交错不改 Trainee；释放仅限持有者 run-id 且仅在 improve-skills 尝试结束后；残留（崩溃）保持阻塞同一 Trainee，由 quickstart 场景 5 的运维拆除清除。
+    - § CoachRun `artifacts` 行: 删除「claim marker 是运行目录内 dotfile（`.optimization-claim`）」表述，改为「claim 是协调状态、位于 trainee 级 claim store，不是运行产物」，避免第五个产物与双份状态。
+    - § State Transitions 表: `expectation-written → dispatched` guard 删除「claim created only if an optimization will be attempted」，改为「no claim exists yet」，与 contracts/expectation.contract.md C-5 rule 4 一致；`plan-written → optimization-*` guard 改为「先按 § Optimization claim 原子取 claim，再解析/拒绝/不可用 improve-skills」，把时点钉在唯一 owner 上。
+    - § Cross-Entity Invariants rule 4: 隔离不变量补唯一例外——trainee 级 claim 是锁而非运行产物：仅一个运行创建、创建后无人再写、仅持有者释放。
+  contracts/coaching-run.contract.md:
+    - C-9 改为引用 owner（首条 Protocol owner），删除「creates `<run-dir>/.optimization-claim` … scans sibling run directories」整段与其中隐含的「先建后扫/先扫后建」语义；新增两条：非一致实现判定（扫描定夺、或早于 owner 时点建 claim 均不合规）、冲突分支收敛（H-04/M-11）。
+  quickstart.md:
+    - 场景 5 Teardown: claim 已迁出运行目录，删除目录不再清除 claim；命令补 `rm -f .specify/memory/coaching/.optimization-claims/memory-recall` 与第二条 `test ! -e`，期望改为两条 test 均退出 0；前提 (b) 改为「claim 在共享 claim store、按 Trainee slug 键控，清理由独立运维步骤在确认无活跃持有者后执行」。
+
+fixes:
+  H-04=done: claim 协议时序与原子性收敛为单一步骤 + 单一 owner。时序：仅在「执行闭环完成（observation/deviations/improvement-plan 已写）→ 调用 improve-skills 之前」这唯一转换内创建；预期阶段不创建（与 expectation.contract.md C-5 rule 4 对齐，data-model 第 174 行原表述已删除）。原子性：共享路径上的 `O_CREAT|O_EXCL` exclusive-create，EEXIST 即冲突信号；先扫后建（check-then-act）在 owner 与 C-9 两处均被显式判为非合规实现。冲突：fail closed 并点名冲突 run-id。C-9 不再持有第二套协议，只引用 owner。
+  M-11=done: C-9 的 claim 冲突分支映射到 STR-010 封闭值域中的 `failed`（不新增取值、不新增分支），并带冲突 run-id 注记（owner 定义 `claim-conflict: <run-id>`，不可读时记 `unreadable`）。
+
+gates:
+  pre-analyze-check-plan=decision=pass errors=0 advisories=52 waived=0 exit 0 -> pre-analyze-check-plan-fix2.txt（52 条全为 missing-path：实现前目标路径未创建属预期；新增 1 条为本阶段引入的 `.specify/memory/coaching/.optimization-claims/`，同为预期）
+  tests=not-run-docs-only
+
+residuals:
+  - tasks.md T012 仍写「先建 `.optimization-claim` 并扫描同一 Trainee 的其它 claim」——本阶段授权范围禁止修改 tasks.md，该行与新 owner 冲突，须在 tasks 阶段按 § Optimization claim 改写为原子创建 + 冲突映射 failed。已记录，未静默。
+  - 本阶段未重跑 analyze（授权：不得触发第二次自动回环）。

@@ -64,9 +64,11 @@
 
 ## C-9 Optimization Application
 
+- **Protocol owner**: [`../data-model.md`](../data-model.md) § Optimization claim owns the claim protocol — its path, its timing (one atomic step inside `plan-written → optimization-*`, after the execution loop is complete and the improvement plan is written, before `improve-skills` is invoked), its atomic creation, its conflict rule, its release and its leftover semantics. This clause references that owner and states no second version of it.
 - The plan is applied through the existing `improve-skills` entry, passing the Trainee target and the deviation evidence.
 - The skill MUST NOT rewrite Trainee files directly during this run, and MUST NOT change `improve-skills`' contract.
-- Before applying, the skill creates `<run-dir>/.optimization-claim` naming the Trainee and run-id, and scans sibling run directories for a claim on the same Trainee. A claim under another run-id fails this step closed and names that run-id. The claim is removed after the attempt resolves.
+- A claim is taken only by the owner's single exclusive-create primitive on the owner's shared path. Deciding by scanning sibling run directories — or by any other read-then-write sequence — is a non-conforming implementation of this clause, and so is creating a claim at an earlier transition than the owner's timing permits.
+- A claim conflict fails this step closed: the recorded outcome is `optimization: failed` — one value of STR-010's closed domain, no new value and no extra branch — with the conflicting run-id named as the owner's conflict rule prescribes.
 - A rejection by `improve-skills` is recorded as `optimization: failed` (or `unavailable` when the entry could not be resolved) and is not retried in a loop.
 
 ## C-10 Run Status

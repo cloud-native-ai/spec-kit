@@ -2,7 +2,7 @@
 
 **Feature**: 078 Coaching Skills | **Plan**: [plan.md](./plan.md) | **Requirements**: [requirements.md](./requirements.md)
 
-**Authority**: this file refines the *shape* of the records defined by `requirements.md` § Key Entities. The literal values (17 Shared Strings), the closed status value domains and the normative rules stay owned by `requirements.md`; the run-status **combination rule** is owned here (§ RunStatus), because the requirements fix the domains and the "optimization never fails the execution" rule but not the ladder that combines an execution outcome with an optimization outcome. A disagreement on shape resolves to `requirements.md`; a disagreement on what a status means resolves to § RunStatus.
+**Authority**: this file refines the *shape* of the records defined by `requirements.md` § Key Entities. The literal values (17 Shared Strings), the closed status value domains and the normative rules stay owned by `requirements.md`; the run-status **combination rule** is owned here (§ RunStatus), because the requirements fix the domains and the "optimization never fails the execution" rule but not the ladder that combines an execution outcome with an optimization outcome. A disagreement on shape resolves to `requirements.md`; a disagreement on what a status means resolves to § RunStatus; a disagreement on claim timing, atomicity, conflict, release or leftovers resolves to § Optimization claim, which owns that protocol.
 
 ## Entity Overview
 
@@ -24,7 +24,7 @@
 | `run-id` | `YYYYMMDDTHHMMSSZ-<trainee-slug>` (UTC, slug = resolved trainee name, lowercase kebab) | Derived at run start. If the directory already exists, the run fails closed naming the existing path — never append a suffix (two runs must never share a directory). |
 | `run-dir` | `.specify/memory/coaching/<run-id>/` | The literal is owned by `requirements.md` STR-013. |
 | `trainee` | TraineeTarget | Resolved once, before the expectation is written. |
-| `artifacts` | fixed set of four files | `expectation.md`, `observation.md`, `deviations.md`, `improvement-plan.md` (STR-014…STR-017). No fifth product file; the claim marker is a dotfile (`.optimization-claim`). |
+| `artifacts` | fixed set of four files | `expectation.md`, `observation.md`, `deviations.md`, `improvement-plan.md` (STR-014…STR-017). No fifth product file: the optimization claim is coordination state held in the trainee-scoped claim store, not a run artifact (§ Optimization claim owns its path). |
 | `started-at` | ISO-8601 UTC | Written into `expectation.md` § Run header. |
 
 **Validation**: all four paths exist under `/memory/coaching/`; `expectation.md` mtime precedes the first dispatch action recorded in `observation.md` § Dispatch; no path escapes the run directory.
@@ -171,11 +171,11 @@ preflight → expectation-written → dispatched → observed
 | From | To | Guard |
 |------|----|-------|
 | preflight | expectation-written | Trainee resolved uniquely, `<work>` non-empty, run directory created |
-| expectation-written | dispatched | `expectation.md` exists with both dimension sections; claim created only if an optimization will be attempted |
+| expectation-written | dispatched | `expectation.md` exists with both dimension sections; no claim exists yet (§ Optimization claim — the expectation phase never creates one) |
 | dispatched | observed | exactly one DispatchRecord exists |
 | observed | deviations-written | observation record written (gaps counted) |
 | deviations-written | plan-written | every finding cites evidence or is marked `evidence: none` |
-| plan-written | optimization-* | `improve-skills` entry resolved, rejected, or unavailable |
+| plan-written | optimization-* | claim taken by the atomic create of § Optimization claim, then `improve-skills` entry resolved, rejected, or unavailable |
 
 ### Failure branch
 
@@ -187,12 +187,25 @@ No transition returns from the failure branch to `dispatched` — the single-dis
 
 ### Optimization claim
 
-```text
-no-claim → claimed(this run-id, trainee) → released
-                                       → left-behind (crash; blocks the same trainee on later runs)
-```
+**Ownership**: this subsection is the single definition point of the claim protocol — when the claim is created, how it is created atomically, how a conflict is detected and recorded, how it is released, and what a leftover claim means. `contracts/coaching-run.contract.md` C-9 and the skill body MUST reference this subsection instead of restating the protocol; a claim rule stated anywhere else is a copy and loses to this one.
 
-Claim file: `<run-dir>/.optimization-claim` containing `trainee: <resolved-path>` and `run-id: <run-id>`. Before claiming, the skill scans `.specify/memory/coaching/*/.optimization-claim`; a claim naming the same Trainee under a different run-id fails the optimization step closed and names that run-id (FR-028). Distinct Trainees never collide because the file is per run directory.
+Claim record: `.specify/memory/coaching/.optimization-claims/<trainee-slug>` — one file per Trainee slug, outside every run directory, holding `trainee: <resolved-path>`, `run-id: <run-id>` and `claimed-at: <ISO-8601 UTC>`. The slug is the one already used in `run-id`; two Trainees whose names share a slug therefore share a claim key and collide by design, matching the fail-closed name-ambiguity rule of § TraineeTarget rule 3.
+
+**Timing — one step, one place**: the claim is created exactly once, inside the transition `plan-written → optimization-*`: after the execution loop is complete (observation, deviations and improvement plan written) and before the `improve-skills` entry is invoked. The expectation phase never creates it (that prohibition belongs to `contracts/expectation.contract.md` C-5 rule 4); the dispatch and observation phases never create it either; a run that will not attempt optimization creates no claim at all (`optimization: skipped` / `unavailable` are recorded without one).
+
+**Creation — atomic, never scan-then-create**: the create is one exclusive-create primitive on the shared path above — `open(2)` with `O_CREAT|O_EXCL` (shell: `set -C; : > <claim-path>`), whose "already exists" answer is itself the conflict signal. The skill MUST NOT enumerate sibling run directories, or scan any other path, to decide whether it may claim: a scan reads a state that can change before the write and is therefore not a mutual-exclusion test. The container `.specify/memory/coaching/.optimization-claims/` is created idempotently (`mkdir -p`) before the attempt and carries no exclusion meaning; only the per-Trainee create is the mutex.
+
+**Conflict → fail closed**: an existing claim is a conflict regardless of which run created it or whether its content is complete (FR-028). The skill fails the optimization step closed, names the conflicting `run-id` read from the claim (or `unreadable` when the file exists but carries no readable `run-id`), records `optimization: failed` — one value of the closed domain, never a new one — with the annotation `claim-conflict: <run-id>`; it does not retry, does not interleave edits, and does not touch the Trainee.
+
+**Release**: only the claiming run removes the claim, only after its `improve-skills` attempt has resolved, and only when the file's `run-id` equals its own. A mismatch leaves the file untouched — a run never releases another run's claim.
+
+**Leftover**: a crash between claim and release leaves the claim behind by design. It blocks that same Trainee on later runs (fail closed, naming that `run-id`) until an operator clears it after confirming no live run owns it; the teardown in `quickstart.md` Scenario 5 is that clearing step.
+
+```text
+no-claim → claimed(this run-id, trainee)   [atomic create: O_CREAT|O_EXCL on the shared path]
+        → released                          [owner run-id, after the attempt resolves]
+        → left-behind (crash; blocks the same trainee on later runs)
+```
 
 ### Degradation ladder
 
@@ -208,6 +221,6 @@ no observation at all → plan written with evidence: none, run: partial
 1. **Order**: `expectation.md` before the first dispatch action (SC-002).
 2. **One dispatch**: exactly one DispatchRecord and exactly one subagent execution per run (FR-009).
 3. **No re-run**: the coach never executes Trainee steps itself and never injects extra side effects (FR-012).
-4. **Isolation**: each run writes only inside its own run directory, so two concurrent runs write different paths (FR-028).
+4. **Isolation**: each run writes only inside its own run directory, so two concurrent runs write different paths (FR-028). The single exception is the trainee-scoped claim of § Optimization claim — a lock, not a run artifact: exactly one run creates it, no run writes it after creation, and only its owner releases it.
 5. **Honesty**: gaps are counted, never filled; failures are recorded as failures (SC-004 / FR-013).
 6. **Primary result**: the Trainee's real output is the primary result; optimization status is reported separately (FR-010 / FR-017).

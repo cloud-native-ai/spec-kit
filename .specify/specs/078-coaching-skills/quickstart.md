@@ -200,14 +200,17 @@ the two closed values are read.
 
 ```bash
 rm -rf .specify/memory/coaching/20261030T101500Z-memory-recall
+rm -f .specify/memory/coaching/.optimization-claims/memory-recall
 test ! -e .specify/memory/coaching/20261030T101500Z-memory-recall
+test ! -e .specify/memory/coaching/.optimization-claims/memory-recall
 ```
 
-Expected: the second command exits 0; no `.optimization-claim` file survives under
-`.specify/memory/coaching/`.
+Expected: both `test` commands exit 0 — neither the run directory nor that Trainee's claim survives.
 
 Verification: **not executed in the plan phase** — `.specify/memory/coaching/` does not exist yet.
-Premises: (a) the run-id directory name is the one the fixture run produced; (b) the claim file lives
-inside that directory, so removing the directory removes the claim; (c) a fixture run that crashed
-mid-optimization leaves a claim behind by design, and this teardown is how it is cleared — the skill
-itself never removes another run's claim.
+Premises: (a) the run-id directory name and the Trainee slug are the ones the fixture run produced;
+(b) the claim lives in the shared claim store of `data-model.md` § Optimization claim, keyed by Trainee
+slug, so removing the run directory does **not** remove it — clearing it is a separate operator step,
+taken only after confirming no live run owns it; (c) a fixture run that crashed mid-optimization leaves
+a claim behind by design, and this teardown is how it is cleared — the skill itself never removes
+another run's claim.
