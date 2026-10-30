@@ -33,13 +33,14 @@ python3 scripts/python/probe-utils.py --action probes --validate
 python3 scripts/python/probe-utils.py --action compile-embeds --check
 ```
 
-Expected: `matched=79 inventory_units=79, clean`; probe validation exit 0; `76 units, zero drift`.
+Expected: `matched=79 inventory_units=79, clean`; probe validation exit 0; `75 units, zero drift`.
 
 Verification: the ledger and compile-embeds commands were executed in this phase and returned
-`matched=79 inventory_units=79, clean` and `75 units, zero drift`; only the unit count changes (75 → 76)
-because the probe Object row is renamed, not duplicated. Premises: (a) exactly one probe Object row is
-renamed; (b) the new skill body carries the compiled `## Wrap-up` block produced by
-`--action compile-embeds`.
+`matched=79 inventory_units=79, clean` and `75 units, zero drift`; the unit count does **not** change,
+because the engine derives one unit per skill directory (23 command templates carry a `## Wrap-up` face
+plus 52 skills = 75 on 2026-10-30) and a rename removes one unit while adding one. Premises: (a) exactly
+one probe Object row is renamed; (b) the new skill body carries the compiled `## Wrap-up` block produced
+by `--action compile-embeds`.
 
 ### 1.3 Derived faces carry no drift and no stale copy
 

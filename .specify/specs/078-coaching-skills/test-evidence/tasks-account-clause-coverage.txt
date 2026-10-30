@@ -1,0 +1,16 @@
+# account-clause-coverage — 2026-10-30 — stage=tasks
+# command: python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/078-coaching-skills
+UNCOVERED-FR: FR-029
+FR uncovered: 29
+
+companion (must be non-empty on a green run): claimed clauses 38, scanned files 234, clause universe 1464, FR universe 29
+  [clause-uncovered] pass (495) — 495 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] fail (29) — 0 of 29 FRs cited from citation groups
+  [clause-unparsable] warn (94) — 94 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 495 names; 495 uncovered items are baseline-internal and do not block
+29 error(s), 0 warning(s)
+status: uncovered
+# exit 1 (FR lane only): the clause lane is green (claimed 38, 0 beyond the frozen baseline).
+# The FR lane reads 0/29 because the five contracts carry no FR citation groups; the FR->clause
+# mapping lives only in plan.md § Phase 1. That is a plan-owned artifact gap recorded in tasks.md
+# § Measured Premises / § Notes, not rewritten at the tasks stage.
