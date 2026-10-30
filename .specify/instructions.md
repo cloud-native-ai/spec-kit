@@ -9,154 +9,151 @@ This project documentation is distributed across several key files. You MUST ref
 
 | Document | Location | Purpose | Key Content |
 |----------|----------|---------|-------------|
-| **Constitution** | `.specify/memory/constitution.md` | Single source of truth for principles | Numbered Core Principles + governance rules; that file is the authoritative roster, count, and version — not restated here |
-| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status for /speckit.* commands, AI tool support, skills, and core capabilities; **hand-maintained** — no script regenerates it, so the `Total Features` header and the rows are edited together by the /speckit.* commands (recording duties: `.specify/shared/workflow/feature-integration.md`) |
+| **Constitution** | `.specify/memory/constitution.md` | Principles | Numbered Core Principles + governance rules; that file is authoritative for the roster, count and version |
+| **Feature Index** | `.specify/memory/features.md` | Feature roadmap status | Per-feature status; **hand-maintained** — header and rows edited together (`.specify/shared/workflow/feature-integration.md`) |
 | **Feature Details** | `.specify/memory/features/<ID>.md` | Per-feature deep dives | Overview, key changes, implementation notes, status criteria |
-| **Glossary** | `.specify/memory/glossary.md` | Project vocabulary anchor & domain dictionary | Canonical terms, homophone/confusable variants, meanings; voice-input correction source (protocol: `.specify/shared/workflow/glossary.md`) |
-| **Readme** | `README.md` | Project entry point | Spec-Driven Development overview, supported AI agents, feature list, installation pointer |
-| **Installation** | `docs/tutorials/installation.md` | How to install the CLI | Setup steps for the `specify` CLI |
-| **Quickstart** | `docs/tutorials/quickstart.md` | First-run walkthrough | End-to-end /speckit.* workflow example |
-| **Command Reference** | `docs/reference/commands/` | Per-command documentation | Execution flow, output artifacts, and usage notes for every `/speckit.*` command |
-| **SDD Methodology** | `docs/concepts/spec-driven.md` | Why specs drive implementation | Principles behind Spec-Driven Development |
-| **Vibe Coding** | `docs/concepts/vibe-coding.md` | Iterative AI-assisted style guide | When and how to combine specs with exploratory coding |
-| **Upstream** | `docs/concepts/upstream.md` | Relationship to github/spec-kit | Divergence points and sync model |
-| **Security** | `docs/concepts/security.md` | Security considerations | Threat surface and handling guidance |
-| **Memory System** | `docs/reference/skills/memory.md` | Dynamic memory-as-files layer | session/ (short-term) + knowledge/ (long-term) store, `memory-utils.py` engine, memory-record / memory-recall skills, Spec-Kit-only recording boundary |
-| **Feedback System** | `docs/reference/skills/feedback.md` | Distributed local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py` engine, `## Feedback` step on all skills + every **complex** command (simple commands excluded by the classification rule; the live embed set is read from the probe registry, never restated), threshold-triggered **non-blocking** submission notice (never blocks wrap-up, never auto-transmits), distinct from global `/speckit.review`; inbound bundles received from users land in the repo-root `feedback/` intake directory (see Key Directories) |
-| **Probe System** | `docs/reference/skills/probe.md` | Umbrella probe infrastructure (056) | Probe Class × Object / Handler / HandlerBinding model, truth source `shared/definitions/probe-definitions.md`, `probe-utils.py` engine (probes / map / probe-inject / handlers / compile-embeds), compiled AUTO-GENERATED `## Wrap-up` faces, compile → regen → sync fixed order, host read-only boundary |
-| **Better Harness** | `docs/concepts/better-harness.md` + `.specify/shared/guidelines/better-harness.md` | Shared goal of all improvement mechanisms (Constitution Principle XIII) | Harness definition, feedforward/feedback loop, five Agent Work Loop dimensions mapped to Spec Kit mechanisms, evidence discipline (configured ≠ used), Bootstrap/Operationalize/Optimize tracks |
-| **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Confirmation-gate governance criteria | Two-level taxonomy (destructive/irreversible → front-loaded confirmation; reversible → auto-execute + execution report), destructive list, governance-kept list, doubtful-strict rule, anti-backflow constraint; enforced by `scan-confirmation-gates.py` + structural contract tests |
-| **Objective Analysis** | `.specify/shared/workflow/objective-analysis-gate.md` | Same-author detection delegation criteria | When the artifacts under analysis were written by the agent now analyzing them, detection MUST be delegated to fresh-context read-only subagents; firing condition, the gate rules, severity-cap discipline, scope limits |
-| **History System** | `docs/reference/commands/history.md` | Distilled conversation knowledge base | `/speckit.history` distills the current AI tool's past project conversations into `.specify/history/` (theme-aggregated: decisions, lessons, TODOs, interaction flows, conflicts); `history-utils.py` engine with pluggable `STORE_RESOLVERS` + incremental manifest |
-| **Documentation Model** | `docs/concepts/documentation-model.md` + `docs/decisions/` | Docs taxonomy, uppercase special-name registry, notes lifecycle (ADR-0001); managed by `/speckit.docs` | Six-type `docs/` layout, root thin layer, notes exit mechanism |
-| **Recurring Lessons** | `docs/reference/history/00-cross-cutting-lessons.md` | Cross-session operational gotchas | Authoritative body of the lessons the ambient `## Recurring Operational Lessons` section names by topic only; per-domain siblings `01`–`05` in the same directory |
-| **Skills Docs** | `docs/reference/skills/` | Skills system reference | Specification, troubleshooting, VS Code integration |
-| **Agent Tools** | `docs/reference/cli/` | Supported agent tool reference | Per-tool CLI reference docs for every supported agent (Claude Code, Codex CLI, Qoder CLI, GitHub Copilot, opencode, Hermes Agent) |
-| **TODO-in-Context** | `docs/concepts/todo-in-context.md` + `.specify/shared/guidelines/todo-in-context.md` | Embedding todos at the code location they refer to | Marker form ownership (fence vs comment), context-completed interpretation, perception obligations for other workflows (do not silently remove / take into account / report), insert→perceive→collect→execute→remove lifecycle, Park store boundary |
+| **Glossary** | `.specify/memory/glossary.md` | Vocabulary anchor | Canonical terms, confusables, meanings (protocol: `.specify/shared/workflow/glossary.md`) |
+| **Readme** | `README.md` | Project entry point | SDD overview, supported agents, feature list, installation pointer |
+| **Installation** | `docs/tutorials/installation.md` | CLI installation | Setup steps for the `specify` CLI |
+| **Quickstart** | `docs/tutorials/quickstart.md` | First run | End-to-end /speckit.* example |
+| **Command Reference** | `docs/reference/commands/` | Per-command docs | Execution flow, artifacts and usage for every `/speckit.*` command |
+| **SDD Methodology** | `docs/concepts/spec-driven.md` | Why specs drive code | Principles behind Spec-Driven Development |
+| **Vibe Coding** | `docs/concepts/vibe-coding.md` | Iterative style guide | When to combine specs with exploratory coding |
+| **Upstream** | `docs/concepts/upstream.md` | github/spec-kit relationship | Divergence points and sync model |
+| **Security** | `docs/concepts/security.md` | Security | Threat surface and handling guidance |
+| **Memory System** | `docs/reference/skills/memory.md` | Memory-as-files layer | session/ + knowledge/ stores, `memory-utils.py`, record/recall skills, Spec-Kit-only boundary |
+| **Feedback System** | `docs/reference/skills/feedback.md` | Local-scope feedback layer | `.specify/memory/feedback/` store, `feedback-utils.py`, threshold-triggered non-blocking notice (never auto-transmits); inbound bundles land in root `feedback/` |
+| **Probe System** | `docs/reference/skills/probe.md` | Probe infrastructure (056) | Probe Class × Object/Handler/Binding, `shared/definitions/probe-definitions.md`, `probe-utils.py`, compiled `## Wrap-up` faces, host read-only boundary |
+| **Better Harness** | `docs/concepts/better-harness.md` + `.specify/shared/guidelines/better-harness.md` | Shared goal of improvement mechanisms | Harness, feedforward/feedback loop, five work-loop dimensions, evidence discipline, Bootstrap/Operationalize/Optimize |
+| **Confirmation Gates** | `.specify/shared/guidelines/confirmation-gates.md` | Gate governance criteria | Two-level taxonomy, destructive list, governance-kept list, doubtful-strict rule; enforced by `scan-confirmation-gates.py` |
+| **Objective Analysis** | `.specify/shared/workflow/objective-analysis-gate.md` | Same-author detection delegation criteria | Delegate detection to fresh-context read-only subagents; firing condition, gate rules, severity cap, scope limits |
+| **History System** | `docs/reference/commands/history.md` | Distilled conversation KB | `/speckit.history` → `.specify/history/` (decisions, lessons, TODOs, flows, conflicts); `history-utils.py` + incremental manifest |
+| **Documentation Model** | `docs/concepts/documentation-model.md` + `docs/decisions/` | Docs taxonomy; managed by `/speckit.docs` | Six-type `docs/` layout, root thin layer, notes exit mechanism |
+| **Recurring Lessons** | `docs/reference/history/00-cross-cutting-lessons.md` | Cross-session gotchas | Authoritative body for `## Recurring Operational Lessons`; per-domain siblings `01`–`05` |
+| **Skills Docs** | `docs/reference/skills/` | Skills reference | Specification, troubleshooting, VS Code integration |
+| **Agent Tools** | `docs/reference/cli/` | Per-tool CLI reference | Reference docs for every supported agent |
+| **TODO-in-Context** | `docs/concepts/todo-in-context.md` + `.specify/shared/guidelines/todo-in-context.md` | Todos at the code location | Marker ownership, context-completed interpretation, perception obligations, lifecycle, Park store boundary |
 
 > **Directive**: When answering questions or generating code, ALWAYS check the relevant document from the map above first.
 
 ## Proactive Flow Trigger
 
-Every user turn carries a silent assessment of which flow is worth running next, and a suggestion appears only when a known situation actually matches. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/proactive-trigger.md` (do NOT copy its rules; reference the file) — which owns the situation vocabulary, the promotion semantics, the telemetry retention window, and the tuning protocol:
+Every user turn silently assesses which flow is worth running next; a suggestion appears only when a known situation actually matches. Full discipline — situation vocabulary, promotion semantics, telemetry retention, tuning protocol: `.specify/shared/guidelines/proactive-trigger.md` (do NOT copy its rules; reference the file).
 
-- **Assess every turn (每回合评估)**: judge on each user turn whether the current state makes some flow worth running. The assessment itself is silent — zero user-visible output when no flow applies or nothing changed since the previous turn.
-- **Same pass, compliance first (同一趟、合规先行)**: make that judgement in the same pass as, and after, the compliance checks the Documentation Map directive above requires. A suggestion never precedes them.
-- **Evidence budget (证据预算)**: rely only on information already in context. When that is insufficient, escalate through the criteria the discipline doc declares; never pull artifact bodies into context in order to decide.
-- **Suggestion shape (建议形态)**: one non-blocking line = what the flow is for + the exact invocation the engine supplies. The user may adopt it or ignore it; ignoring never affects their current request.
-- **Engine entry (引擎入口)**: state inspection, reset, disabling, and tuning all go through the `trigger-utils.py` engine, whose action list the discipline doc carries. No new name to memorize is introduced.
+- **Assess every turn (每回合评估)**: silent when no flow applies or nothing changed since the previous turn — zero user-visible output.
+- **Same pass, compliance first (同一趟、合规先行)**: judge in the same pass as, and after, the Documentation Map compliance checks; a suggestion never precedes them.
+- **Evidence budget (证据预算)**: rely only on information already in context; never pull artifact bodies into context in order to decide.
+- **Suggestion shape (建议形态)**: one non-blocking line — what the flow is for plus the exact invocation the engine supplies; ignoring it never affects the current request.
+- **Engine entry (引擎入口)**: state inspection, reset, disabling and tuning all go through the `trigger-utils.py` engine.
 
 ## Fact, Correctness & Logic Checks (Input Sanity)
-User-provided context can be wrong (misconceptions), incomplete, or contain typos. Before acting on user input, perform a basic sanity check to avoid propagating errors.
+User-provided context — and a premise inherited from an earlier artifact — can be wrong, incomplete, or contain typos. Sanity-check before acting to avoid propagating errors.
 
-Minimum checks:
-- **Names & identifiers**: Verify file paths, module/package names, commands, and symbols exist in the repo. If uncertain, search the workspace rather than guessing.
-- **Factual claims**: Treat user statements as hypotheses; confirm against the repo (code/config), the Documentation Map, or authoritative references.
-- **Logical consistency**: Detect contradictions between requirements, constraints, and desired outcomes (e.g., incompatible versions, mutually exclusive goals).
-- **Typos & near-misses**: Correct obvious typos (paths, flags, option names) and explicitly state the corrected interpretation.
-- **Assumptions**: If you must assume, keep assumptions minimal, label them clearly, and prefer reversible changes.
+- **Names & identifiers**: verify paths, modules, commands and symbols exist in the repo; search rather than guess.
+- **Factual claims & inherited premises**: treat both as hypotheses; re-measure counts and paths against the repo, the Documentation Map, or authoritative references.
+- **Logical consistency**: detect contradictions between requirements, constraints and desired outcomes.
+- **Typos & near-misses**: correct obvious typos and state the corrected interpretation.
+- **Assumptions**: keep them minimal, label them, prefer reversible changes.
 
-Escalation rules:
-- If the suspected error impacts correctness, security, data loss, or large refactors: **pause and ask a clarifying question**.
-- If the issue is low-risk and the fix is obvious: proceed with the correction and mention it briefly.
+Escalate: correctness, security, data-loss or large-refactor risk → **pause and ask a clarifying question**; low-risk obvious fix → proceed and mention it briefly.
 
 ## SDD Routing Decision (SDD 分流裁决)
 
 当一次**写留存变更**（会把内容落到磁盘上的变更）被提出时，先到路由规则的唯一所有者处执行一次裁决，再决定这次变更走 SDD 开发流程还是直接修改：
 
-- **规则所有者**：`.specify/shared/definitions/sdd-routing-definitions.md` —— 输入集、封闭取值域、裁决表、优先级与理由码词表全部在那里；本节一律不复述，只按路径抵达。
+- **规则所有者**：`.specify/shared/definitions/sdd-routing-definitions.md` —— 输入集、封闭取值域、裁决表、优先级与理由码词表全部在那里；本节不复述，只按路径抵达。
 - **可执行形态**：`.specify/scripts/python/sdd-route.py` —— 动作、参数与退出码以该引擎的 `--help` 为准。
-- **裁决之后还有一层**：按该裁决走 SDD 开发流程时，启动一次嵌套运行仍需**有效授权**；授权谓词的取值域与缺省按上一条的指针表抵达键集所有者，本节不列取值。
+- **授权层**：按该裁决走 SDD 开发流程时，启动一次嵌套运行仍需**有效授权**；授权谓词的取值域与缺省按上一条的指针表抵达键集所有者，本节不列取值。
 - **建议不等于启动**：一条主动触发建议本身不足以启动一次 SDD 运行；晋升与自动执行边界见 `.specify/shared/guidelines/proactive-trigger.md` § Promotion & Safety Boundary。
 
-**本节字节上限：2,000 B** —— 判据是这里声明的上限加上生成后的实测增量；生成器的字节预算不构成本节的判据（它可能早已被既有内容超出，也可能尚有余量）。
+**本节字节上限：2,000 B** —— 判据是这里声明的上限加上生成后的实测增量。
 
 ## One Source Of Truth
 
-Every fact — a concept's meaning, a normative rule, a threshold, an enumerated list, a configuration value, a count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/one-source-of-truth.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+Every fact — meaning, rule, threshold, enumeration, configuration value, count — MUST have exactly one authoritative definition point (its **owner**), and every other location MUST reach it by reference. Full discipline: `.specify/shared/guidelines/one-source-of-truth.md` (do NOT copy its rules; reference the file).
 
-- **Owner, declared**: an owning document says so in its opening lines and names what it owns. Where several candidates exist, authority goes to code first (facts about actual behavior), then a machine-generated artifact (anything a generator can derive, especially counts and indexes), then an authored document (definitional facts).
-- **Reference, not copy**: cite the owner's path (plus a section anchor when relevant); never restate its table, threshold literal, or enumeration. A summary is fine only while a reader who intends to act must still open the owner. If changing a fact would require editing more than one file, the discipline is already broken.
-- **Only three duplicates are legitimate**: a machine-regenerated copy (mirrors, per-tool copies, generated indexes — never hand-edited), a literal pinned in a test to detect drift, and a dated record that is never cited as current reality. Anything else repeating a fact is stale-in-waiting: repair it by turning it into a reference, not by correcting its wording.
+- **Owner, declared**: the owning document says so up front and names what it owns; authority goes to code, then a generated artifact, then an authored document.
+- **Pointer, not copy**: cite the owner's path; never restate its table, threshold or enumeration. If changing a fact needs more than one file, the discipline is already broken.
+- **Only three duplicates**: a machine-regenerated copy, a literal pinned in a test, and a dated record — nothing else.
 
-Owner-selection order, the duplicate conditions, the counts/enumerations rules, and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
+Owner-selection order, duplicate conditions, counts/enumerations rules and the disagreement procedure: `.specify/shared/guidelines/one-source-of-truth.md`.
 
 ## Closed-Set Claims (封闭清单声明)
 
-A requirement, success criterion, DoD item, or verification task that asserts a machine-produced surface "changes only within …" or that anything "unaffected" stays identical is a **containment claim**, and MUST be decidable. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/closed-set-claims.md` (do NOT copy its rules; reference the file) — which owns the claim taxonomy (determinism vs containment), the required elements, the void conditions, and the repair procedure. Applies to every stability or containment assertion over generated or machine-produced surfaces.
+A requirement, success criterion, DoD item or verification task that asserts a machine-produced surface "changes only within …" or that anything "unaffected" stays identical is a **containment claim**, and MUST be decidable. Full discipline — claim taxonomy, required elements, void conditions, repair procedure: `.specify/shared/guidelines/closed-set-claims.md` (do NOT copy its rules; reference the file).
 
 ## Grounded Naming
 
-A name is key information: it links the entity into the project's knowledge network, and every later reader, search, and agent reaches the entity through it. Naming MUST NOT be improvised — when a name must be chosen, the first available source decides, in this order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name. A name mandated by a higher-priority source MUST be carried through every reference in the same change. Owner: the project constitution's Grounded Naming principle.
+A name links the entity into the project's knowledge network; every later reader, search and agent reaches it through that name. Naming MUST NOT be improvised — the first available source decides, in this order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name. A name mandated by a higher-priority source MUST be carried through every reference in the same change. Owner: the project constitution's Grounded Naming principle.
 
 ## Concurrent Development Safety (并发开发安全)
 
 Parallel branches and agent flows share one git history, so any machine-managed file that several flows rewrite is a merge-conflict hotspot. Storage design MUST assume concurrent writers:
 
-- **Records are per-entry files (记录类数据一文一件)**: append-only observations — run records, scores, evidence runs, feedback entries, memory entries, logs — MUST land as one file per entry, with a timestamp or stable entry id in the filename; they MUST NOT share one `.jsonl` stream or one mutable aggregate. Two branches running the same command must add different paths (or no path), so git merges them without conflict.
-- **Derived indexes are rebuilt, never shared state (派生索引即读即建)**: an index reconstructible from the entries MUST be rebuilt on read or kept per entry; never commit a mutable aggregate that every flow rewrites. A legacy monolithic store stays readable as a read-only fallback and is never rewritten.
-- **Single-owner state is the exception (单一所有者的状态除外)**: canonical registries (`features.md`, `register.md`, `glossary.md`), the constitution/instructions, and authored knowledge aggregates stay single files by design — conflicts there are semantic merges, not layout defects. A mutable processing state (e.g. a progress manifest) stays single-file only while no two flows are expected to write it concurrently; otherwise split it per key.
-- **Verify before shipping (先验证再落地)**: every new or changed store ships a test that simulates two writers and asserts they produce distinct paths.
+- **Records are per-entry files (记录类数据一文一件)**: append-only observations (run records, scores, evidence, feedback, memory, logs) MUST land one file per entry with a timestamp or stable id — never one shared `.jsonl` stream or mutable aggregate — so two branches add different paths or no path.
+- **Derived indexes are rebuilt, never shared state (派生索引即读即建)**: rebuild on read or keep per entry; a legacy monolithic store stays readable as a read-only fallback but is never rewritten.
+- **Single-owner state is the exception (单一所有者的状态除外)**: canonical registries (`features.md`, `register.md`, `glossary.md`), the constitution/instructions and authored aggregates stay single files; split any mutable processing state per key.
+- **Verify before shipping (先验证再落地)**: every new or changed store ships a test that simulates two writers and asserts distinct paths.
 
-Before creating or changing a machine-managed store, ask: **what happens if two branches run this at the same time?** If the answer is "they write the same path", the layout is wrong.
+Before creating or changing a machine-managed store, ask: **if two branches run this at the same time, do they write the same path?** If yes, the layout is wrong.
 
 ## Temporary Directory Discipline
 
-Agent-created scratch MUST use a sanctioned temp root and MUST already be matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup, and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows the naming and registration rules in `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
+Agent-created scratch MUST use a sanctioned temp root already matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
 
 ## Task Complexity Rubric
 
-Right-size your thinking to the task: under-thinking complex or high-stakes tasks causes defects and rework (a **quality** cost); over-thinking trivial tasks wastes time and adds noise (an **efficiency** cost). Classify each task by scope/size, uncertainty/novelty, blast radius/reversibility, cross-cutting impact, and requirements clarity, then adopt the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier** (blast radius and requirements clarity dominate); treat unclassifiable tasks as **Standard** (the default), and treat unclear/under-specified requirements as themselves a High-stakes signal — clarify before proceeding.
+Right-size thinking: under-thinking complex or high-stakes work causes defects and rework (a **quality** cost); over-thinking trivial work wastes time and adds noise (an **efficiency** cost). Classify by scope, uncertainty, blast radius, cross-cutting impact and requirements clarity, then take the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier**; treat unclassifiable work as **Standard** (the default), and unclear requirements as themselves a High-stakes signal — clarify first.
 
-Full tier table with signals and thinking-depth prescriptions: `.specify/shared/guidelines/task-complexity-rubric.md`.
+Signals and depth prescriptions: `.specify/shared/guidelines/task-complexity-rubric.md`. Load-bearing decisions (承重决策：不可逆 / 跨团队 / 高爆炸半径 / 触及宪法 MUST) record their antithesis, discriminating evidence, expected anti-metric and reopening condition per `.specify/shared/guidelines/decision-tension.md`, the owner of that shape.
 
 ## Token Efficiency Discipline
 
-LLM token usage efficiency is a framework-level quality attribute. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/token-efficiency.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+LLM token usage efficiency is a framework-level quality attribute. Full discipline: `.specify/shared/guidelines/token-efficiency.md` (do NOT copy its rules; reference the file) — binds all commands, skills and agents:
 
-- **Program-First (程序优先)**: text/data judgments expressible as fixed rules (pattern matching, structural validation, counting, dedup, sorting, diff) go to deterministic programs (scripts/engines/regex), never to the LLM; the LLM receives verdicts or digests only.
-- **Summary-First (摘要优先)**: never inject the whole raw content of machine-managed data files (feedback, memory, evidence, history stores, run artifacts, inventories) into LLM context; consume digests, field projections, or targeted excerpts, escalating per the discipline doc's escalation ladder (exceptions: edit target, small-file threshold, recorded justification).
-- **Consumption Observation (消耗观察)**: at feedback wrap-up, self-assess avoidable token spend; findings carry the stable `token-efficiency` marker (retrievable via `feedback-utils.py --action list --contains token-efficiency`); never fabricate token counts.
+- **Program-First (程序优先)**: fixed-rule text/data judgments (matching, validation, counting, dedup, sorting, diff) go to deterministic programs; the LLM receives verdicts or digests only.
+- **Summary-First (摘要优先)**: never inject whole raw machine-managed data files; consume digests, field projections or targeted excerpts, escalating per the owner's ladder (exceptions: edit target, small-file threshold, recorded justification).
+- **Consumption Observation (消耗观察)**: at wrap-up, self-assess avoidable token spend; mark findings with the stable `token-efficiency` marker; never fabricate token counts.
 
 ## Single-Run Evidence Discipline
 
-An expensive execution (long-running tests, builds, bulk queries, remote calls) is a one-time evidence-gathering opportunity: the run itself is what costs, and its complete output is nearly free to keep. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/single-run-evidence.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+An expensive execution (long tests, builds, bulk queries, remote calls) is a one-time evidence opportunity: the run itself costs, and its complete output is nearly free to keep. Full discipline: `.specify/shared/guidelines/single-run-evidence.md` (do NOT copy its rules; reference the file).
 
-- **Capture-in-Full (执行时全量捕获)**: the command line, exit status, complete stdout/stderr, and duration of an expensive run are persisted to an artifact at execution time; filtered views derive from that record, never from an in-flight pipeline that discards the original.
-- **Diagnostics-Before-the-Run (诊断开关前置)**: opt-in, side-effect-free diagnostics (per-item durations, verbose logging) are enabled before an expensive run — once the run finishes without them, that information is gone for good.
-- **Consume-the-Record (消费留痕而非重跑)**: follow-up questions about a completed execution are answered from the record; re-running to recover information the first run already produced is the canonical anti-pattern — the full cost is paid a second time, with non-reproducibility risk on top.
+- **Capture-in-Full (执行时全量捕获)**: persist the command line, exit status, complete stdout/stderr and duration at execution time; filtered views derive from that record, never from a pipeline that discards it.
+- **Diagnostics-Before-the-Run (诊断开关前置)**: enable opt-in, side-effect-free diagnostics before the run; once it finishes without them, that information is gone.
+- **Consume-the-Record (消费留痕而非重跑)**: answer follow-up questions from the record; re-running to recover information already produced is the canonical anti-pattern.
 
 ## Progress Reporting Discipline
 
-A long-running task owes the user a periodic sign of life: many minutes of silence is indistinguishable from a hang, and the only recovery the user has is to interrupt work that may be nearly finished. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/progress-reporting.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+A long-running task owes the user a periodic sign of life: minutes of silence are indistinguishable from a hang. Full discipline: `.specify/shared/guidelines/progress-reporting.md` (do NOT copy its rules; reference the file).
 
-- **Rhythm (沉默有上限)**: while a long-running task runs, a progress report is emitted every **15 minutes by default**, anchored on the task's start rather than on the previous report; the interval is a ceiling on silence, never a floor on chatter — a milestone, blocker, or change of direction MAY be reported sooner, while a report is never skipped for lack of news. A user-supplied interval replaces the default for that run.
-- **Content floor (四要素)**: one to three lines carrying where the run stands, what changed since the last report, what remains with a rough completion estimate, and any blocker — with "no blocker" stated explicitly rather than left to inference.
-- **Measured, not invented (数字须可溯源)**: a progress figure comes from an artifact this run actually produced (a counter, a progress line, a finished-item list); when no such sensor exists, the report says the progress cannot be quantified instead of inventing a percentage, and an estimate is labelled as one.
-- **Boundary-respecting (不打断原子步骤、不当确认门)**: a report never splits an indivisible step — it lands at the next step boundary and says it is late; nor does reporting ever pause the run for an answer, because a report is a statement (陈述), not an approval request (确认门), and approving a destructive action keeps its own front-loaded criterion.
-- **Exemptions and precedence (短任务豁免、异常优先)**: a task that ends before the first interval produces no periodic report, its result being the report; an anomaly found mid-run is surfaced immediately per the Fast Fail Discipline, ahead of the cadence; and an orchestrator carries the reporting duty into every long-running subagent dispatch, since ambient instructions never reach a subagent.
+- **Rhythm (沉默有上限)**: report every **15 minutes by default**, anchored on the task's start — a ceiling on silence, not a floor on chatter. A user-supplied interval replaces the default; report sooner at milestones, blockers or direction changes, and never skip a report for lack of news.
+- **Content floor (四要素)**: one to three lines — where the run stands, what changed, what remains (rough estimate) and any blocker, with "no blocker" stated explicitly.
+- **Measured, not invented (数字须可溯源)**: take figures from an artifact this run actually produced; if no such sensor exists, say the progress cannot be quantified and label any estimate as one.
+- **Boundary-respecting (不打断原子步骤、不当确认门)**: land reports at step boundaries, never split an indivisible step; a report is a statement, not an approval request, and approving a destructive action keeps its own front-loaded criterion.
+- **Exemptions and precedence (短任务豁免、异常优先)**: a task ending before the first interval produces no periodic report; surface anomalies immediately per the Fast Fail Discipline; an orchestrator carries the reporting duty into every long-running subagent dispatch.
 
 ## Run Determination
 
-Once per completed run, at wrap-up, a program measures how that run went and the result routes into the existing feedback flow. The wiring is defined in a single source of truth — `.specify/shared/workflow/feedback-step.md` § Run Determination (do NOT copy its rules; reference the file) — which owns the consumption point, the composition with the wrap-up notification, the missing-record degradation and the passive non-exhaustiveness constraint. The engine `.specify/scripts/python/run-determination.py` is the code-side owner of the record schema, every value domain and the routing-bit derivation:
+Once per completed run, at wrap-up, a program measures how the run went and routes the result into the existing feedback flow. Full discipline: `.specify/shared/workflow/feedback-step.md` § Run Determination (do NOT copy its rules; reference the file). The engine `.specify/scripts/python/run-determination.py` owns the record schema, value domains and routing-bit derivation.
 
-- **One run, one record (每轮一条)**: the record is the 改点 — an observation sensor inside the improve flow. It is not a feedback entry, not an intervention ledger, and it authorizes no mutation.
-- **Measured, not impressed (测量而非印象)**: the four quantities are token 消耗, 耗时, 制品正确性 and 满意度. A quantity with no source reports itself as not evaluated — never as fine, never as zero, never as a fabricated number.
-- **Passive, never exhaustive (被动而不面面俱到)**: only this run's own evaluated findings feed the flow; everything else is recorded with no carrier assigned and left for the active improve path. A single regressed comparison axis is recorded, not fired.
-- **Inference, not solicitation (推断而非征询)**: the passive path classifies a user turn that already happened. It never asks the user for feedback content and adds no user-facing surface.
-- **Sibling, not twin (与情境评估相邻而不同)**: 情境评估 asks, every turn, what is worth running next; 运行判定 asks, once, how the run that just finished went. Neither calls the other.
+- **One run, one record (每轮一条)**: the record is the 改点 — an observation sensor in the improve flow, not a feedback entry, not an intervention ledger, and it authorizes no mutation.
+- **Measured, not impressed (测量而非印象)**: the four quantities are token 消耗, 耗时, 制品正确性 and 满意度; a quantity with no source reports itself as not evaluated — never as fine, zero or a fabricated number.
+- **Passive, never exhaustive (被动而不面面俱到)**: only this run's evaluated findings feed the flow; one regressed comparison axis is recorded, not fired.
+- **Inference, not solicitation (推断而非征询)**: the passive path classifies a turn that already happened; it never asks the user for feedback content and adds no user-facing surface.
+- **Sibling, not twin (与情境评估相邻而不同)**: 情境评估 asks what to run next; 运行判定 asks how the finished run went. Neither calls the other.
 
 ## User-Facing Comprehension
 
-Every user-facing output has to be readable by someone who did not take part in the run. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/user-facing-comprehension.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
+Every user-facing output must be readable by someone who did not take part in the run. Full discipline: `.specify/shared/guidelines/user-facing-comprehension.md` (do NOT copy its rules; reference the file).
 
-- **Jargon is bounded, not banned (行话有界而非禁绝)**: a closed whitelist decides when a term may stand unexplained and a closed blacklist decides what may never reach a reader. Outside the whitelist counts as a violation — there is no "use sparingly" middle tier, because that is not decidable.
-- **Context is bounded as well (上下文同样有界)**: each message carries the facts a reader needs in order to act without opening another artifact, and reaches everything else by path reference. Restating an artifact the reader could open themselves is a violation at any length.
-- **One reader, one verdict (判定对象唯一)**: a single baseline reader definition serves both the jargon side and the context side; a per-class override takes effect where it is declared and is never written back into the owner.
-- **Judgement is reproducible (判定可复现)**: two independent reviewers applying the criteria to the same message must reach the same verdict. Disagreement means the criteria need fixing, not that both reviewers are right.
-- **Governed surfaces are a closed set (受约束的界面类为封闭集)**: which kinds of user-facing output the discipline governs is enumerated in the owner, and that list grows only by revising it — never per command template.
+- **Jargon is bounded, not banned (行话有界而非禁绝)**: a closed whitelist allows a term to stand unexplained and a closed blacklist forbids it outright; anything outside the whitelist is a violation — there is no middle tier.
+- **Context is bounded as well (上下文同样有界)**: carry the facts a reader needs in order to act, and reach everything else by path reference instead of restating it.
+- **One reader, one verdict (判定对象唯一)**: one baseline reader definition serves both the jargon and context sides; a per-class override applies only where it is declared.
+- **Judgement is reproducible (判定可复现)**: two independent reviewers applying the criteria to one message must reach the same verdict.
+- **Governed surfaces are a closed set (受约束的界面类为封闭集)**: the owner enumerates which outputs are governed; that list grows only by revising the owner.
 
-Should the owner document be missing from a project, it ships with the framework: refresh the project instructions to restore it together with its mirror copy. Do not reconstruct the rules from memory or act on a summary of them.
+If the owner is missing, it ships with the framework: re-run the CLI's project initialization to restore `.specify/shared/guidelines/`. Do not reconstruct its rules from memory or act on a summary of them.
 
 ## Root-Cause Problem Solving
 
@@ -166,48 +163,48 @@ A problem is solved only when the whole run is correct, never because one step t
 
 An anomaly found mid-run must never be quietly patched over — a wrong premise that nobody sees spreads into every artifact built on it. The full discipline is defined in a single source of truth — `.specify/shared/guidelines/fast-fail.md` (do NOT copy its rules; reference the file) — and binds all commands, skills, and agents:
 
-- **One binary question (一个问题,二值答案)**: does resolving this need *correction* — exactly one reading consistent with the recorded intent, local and reversible, no downstream premise falsified, blast radius inside the declared scope — or *decision*, meaning choosing between readings or inventing intent no artifact records? Correction is repaired in passing and disclosed at wrap-up; decision halts at the anomaly point and hands the user a surface report. There is no severity scale and no middle tier, because neither is decidable.
-- **The mechanical test (机械测试)**: if the explanation of a fix has to contain the word "assumed", it was not a repair — it was a fast fail.
-- **Two closed lists (两份封闭清单)**: which anomaly classes must be surfaced and which may be repaired in passing are enumerated in the owner and grow only by revising it — never per command template or skill.
-- **Criteria outrank list membership (判据优先于清单命中)**: a list hit is not a licence. Doubtful cases go the strict way; an anomaly that recurs within one run escalates.
-- **A green check is a claim, not evidence (机器给出的绿同样受判据约束)**: a check that would not go red when its subject breaks proves nothing. The two companion techniques are named by the owner, not reinvented here.
-- **Subagents are injected at dispatch (子代理在派发那一刻注入)**: this ambient layer cannot reach a subagent, because a subagent's prompt derives from its own definition and dispatch payload rather than from the orchestrator's conversation. The owner holds the clause; callers carry it into every dispatch and require an explicit anomaly line on return, so silence is never read as clean.
-- **Nothing to report is still something to say (无事可报也要明说)**: a run with no anomaly and no in-passing repair states that explicitly, so an ungoverned run cannot be mistaken for a clean one.
+- **One binary question (一个问题,二值答案)**: is this a *correction* — one reading consistent with the recorded intent, local and reversible — or a *decision* — choosing between readings or inventing intent no artifact records? Correction is repaired in passing and disclosed at wrap-up; decision halts at the anomaly point and hands the user a surface report. There is no severity scale.
+- **The mechanical test (机械测试)**: if explaining a fix needs the word "assumed", it was a fast fail, not a repair.
+- **Two closed lists (两份封闭清单)**: which anomaly classes must be surfaced and which may be repaired in passing are enumerated in the owner and grow only by revising it.
+- **Criteria outrank list membership (判据优先于清单命中)**: a list hit is not a licence; doubtful cases go the strict way, and a recurring anomaly escalates.
+- **A green check is a claim, not evidence (机器给出的绿同样受判据约束)**: a check that would not go red when its subject breaks proves nothing.
+- **Subagents are injected at dispatch (子代理在派发那一刻注入)**: this ambient layer never reaches a subagent; callers carry the clause into every dispatch and require an explicit anomaly line on return.
+- **Nothing to report is still something to say (无事可报也要明说)**: state explicitly that a run had no anomaly and no in-passing repair.
 
-Should the owner document be missing from a project, it ships with the framework: re-run the CLI's project initialization (`specify init`), whose asset-copy step is what actually creates `.specify/shared/guidelines/`. Refreshing the project instructions does **not** copy guideline files, so it cannot restore this one. Do not reconstruct the rules from memory or act on a summary of them.
+If the owner is missing, re-run the CLI's project initialization (`specify init`): its asset-copy step creates `.specify/shared/guidelines/`. Refreshing the instructions does **not** copy guideline files, so it cannot restore this one.
 
 ## Dogfooding Practice
 
-Dogfooding — the people who build a product also rely on it in their real daily work, so a smooth **use → feedback → iterate** loop forms naturally — proves development-assistance capabilities the way self-hosting proves a compiler. Two loops already exist and add no new tools, steps, or storage:
+Dogfooding — builders rely on their own product daily, so a smooth **use → feedback → iterate** loop forms naturally — proves development-assistance capabilities the way self-hosting proves a compiler. Two loops already exist and add no new tools, steps, or storage:
 
-- **Loop A — feed framework usage upstream**: record real friction via `feedback-utils.py` (`--action record`); a threshold prompt invites (never forces) consolidated submission (`/speckit.feedback package`, manual delivery — **no automatic transmission** ever).
-- **Loop B — run the same loop for your own product**: reuse the framework's feedback / memory / history / review / task-record capabilities; adoption advice is advisory, never a gate — avoid the anti-patterns *formalism*, *echo chamber*, *dead-letter feedback*, *over-idealization*.
+- **Loop A — feed framework usage upstream**: record real friction via `feedback-utils.py`; a threshold prompt invites (never forces) consolidated submission, delivered manually — **no automatic transmission** ever.
+- **Loop B — run the same loop for your own product**: reuse the framework's feedback / memory / history / review / task-record capabilities; adoption advice is advisory, never a gate.
 
-Operational steps, the capability table, and adoption advice: `.specify/shared/guidelines/dogfooding.md`.
+Operational steps, capability table and adoption advice: `.specify/shared/guidelines/dogfooding.md`.
 
 ## Two Hats: Framework Source vs Client Runtime
 
-A self-hosting repository is **two things at once**: the framework's own source (`templates/`, `shared/`, `scripts/`, `src/`) and one of its client projects (`.specify/`, installed by the same init/refresh flow every downstream project uses). The same logic exists in two roles, and edits are not interchangeable:
+A self-hosting repository is **two things at once**: the framework source (`templates/`, `shared/`, `scripts/`, `src/`) and one of its client projects (`.specify/`, installed by the same flow every downstream project uses). The same logic exists in two roles, and edits are not interchangeable:
 
-- **Name the hat before editing.** A change intended for *every* consuming project MUST land in the framework sources and ride the publish → install → init flow. A direct edit to this repo's `.specify/` runtime copies is a client-side instance fix: it never reaches another project, and the next refresh may overwrite it.
-- **Mirrors are generated, never hand-edited.** The `.specify/` copies are a controlled projection of the sources — edit the source, then re-sync.
-- **Path-resolution trap.** Because both surfaces live in one tree, any "walk up to the nearest ancestor containing `.specify/`" heuristic **self-matches here**, resolving every invocation to the framework repo instead of the caller's workspace. Engine self-location may fire only on a literal `.specify` component of its own resolved path, and the negative case needs its own assertion — this defect surfaces as workspace state written into the framework repo, not as a failing test.
+- **Name the hat before editing.** A change for *every* consuming project MUST land in the framework sources and ride publish → install → init; a direct edit to this repo's `.specify/` runtime is a client-side fix that never reaches another project and may be overwritten on refresh.
+- **Mirrors are generated, never hand-edited.** Edit the source, then re-sync.
+- **Path-resolution trap.** A "walk up to the nearest ancestor containing `.specify/`" heuristic **self-matches here**; engine self-location may fire only on a literal `.specify` component of its own resolved path, and the negative case needs its own assertion — this defect shows up as workspace state written into the framework repo.
 
-> Not the same subject as **Dogfooding Practice** above. That section is the use → feedback → iterate loop; this one is *which of the two source trees an edit belongs in*. Two different owners, one shared word — check which you need.
+> Not the same subject as **Dogfooding Practice** above: that is the use → feedback → iterate loop; this is *which source tree an edit belongs in*.
 
-Full rule, its rationale, and the three-copy topology: `.specify/shared/definitions/dogfooding-definitions.md` § 2.1.
+Full rule, rationale and three-copy topology: `.specify/shared/definitions/dogfooding-definitions.md` § 2.1.
 
 ## Ask, Record, Repeat
 
-Three ideas, one loop — **acquire → retain → keep reachable**. Each closes a failure mode the other two cannot, and all three fail *silently*:
+Three ideas, one loop — **acquire → retain → keep reachable**; each closes a failure mode the other two cannot, and all three fail *silently*:
 
-- **Ask (问好过于猜)**: when a load-bearing fact is unknown or ambiguous, ask rather than guess — but resolve it from the repo and docs first, batch related questions together, and bring a recommendation with its tradeoff so the user is deciding, not researching. One question is cheap; a wrong premise is expensive and gets cited downstream as though it were fact.
-- **Record (好记性不如烂笔头)**: an answer obtained from the user MUST be written where the next turn will read it — conversation context dies with the session, so an answer kept only there was never recorded. Record the **rule, not the instance** (举一反三): generalize from the single correction to its class, note *why* it holds, and handle the sibling cases in the same pass.
-- **Repeat (重要的事情说三遍)**: a rule stated in exactly one place is effectively absent, because nothing guarantees a reader will open that place. Correct ownership does not equal reachability. The house pattern is three surfaces — owner doc (detail) → ambient section (summary + pointer) → contract test (drift guard). Repetition count is an importance signal in both directions: a rule you keep re-deriving is a rule that still needs a surface.
+- **Ask (问好过于猜)**: when a load-bearing fact is unknown or ambiguous, ask rather than guess — but resolve it from the repo and docs first, batch questions together, and bring a recommendation with its tradeoff so the user is deciding, not researching.
+- **Record (好记性不如烂笔头)**: an answer obtained from the user MUST be written where the next turn will read it — conversation context dies with the session. Record the **rule, not the instance** (举一反三).
+- **Repeat (重要的事情说三遍)**: ownership is not reachability. The house pattern is three surfaces — owner doc (detail) → ambient section (summary + pointer) → contract test (drift guard); a rule you keep re-deriving still needs a surface.
 
-**Boundary with One Source Of Truth**: repetition is legitimate in **pointer shape** (a short normative reminder plus the owner's path) and forbidden in **content shape** (restating the owner's table, threshold literal, or enumeration). Mechanical test — if changing the fact requires editing more than the owner, it is already a copy; convert it back into a reference rather than re-wording it to agree.
+**Boundary with One Source Of Truth**: repetition is legitimate in **pointer shape** (a short normative reminder plus the owner's path) and forbidden in **content shape** (restating the owner's table, threshold or enumeration).
 
-Full philosophy, the load-bearing criteria, and where each kind of answer belongs: `.specify/shared/guidelines/ask-record-repeat.md`.
+Full philosophy, the load-bearing criteria and where each kind of answer belongs: `.specify/shared/guidelines/ask-record-repeat.md`.
 
 ## Knowledge Recording & Promotion
 
@@ -215,30 +212,29 @@ Every non-derivable takeaway from a run MUST be recorded before wrap-up; normati
 
 ## ID Register (编号登记)
 
-Every durable identifier — a decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session, and citing it as known is the silent-context failure this register closes.
+Every durable identifier — decision (D-…), open item (OI-…), stage (S…), target (T-…), finding (F-…), criterion (B-…), recommendation (`REC-…`) — MUST be recorded in `.specify/memory/register.md` **at the moment the ID is coined**, never left only in session history, a git-ignored workspace, or conversation: an unregistered ID is uninterpretable to any later session.
 
-- **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate the decision content (One Source Of Truth).
+- **Pointer shape**: identifier → one-line meaning → authority path → status; MUST NOT restate decision content.
 - **Durable test**: anything cited by a tracked artifact or still pending registers; a throwaway enumeration inside one reply does not.
-- **Sole sanctioned writer**: the register is hand-maintained; the one exception is duplicate-ID collision repair by `/speckit.sanitize --lane renumber`, which renumbers a duplicated definition only and never registers a new ID.
+- **Sole sanctioned writer**: hand-maintained; the one exception is duplicate-ID collision repair by `/speckit.sanitize --lane renumber`.
 
 ## Tech Stack & Resources
-- **Project Name**: spec-kit (distributed as `specify-cli`)
+- **Project Name**: spec-kit (published as `specify-cli`)
 - **Root Path**: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
-- **Languages**: Python `>=3.8` (per `pyproject.toml`)
-- **Build / Packaging**: `hatchling` (PEP 517). Recommended install via `uv tool install` or `pipx`; runtime is published as `specify-cli` (version `0.0.22`) with entrypoint `specify = "specify_cli:main"`.
-- **Runtime Dependencies**: `typer` (CLI framework), `rich` (TTY rendering), `httpx[socks]` (HTTP for template/release fetch), `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
-- **Test Framework**: `pytest` with markers `contract` and `integration` (see `pyproject.toml` → `[tool.pytest.ini_options]`). Run with `pytest` or `pytest -m contract` / `pytest -m integration`.
+- **Languages**: Python `>=3.8` (`pyproject.toml`)
+- **Build / Packaging**: `hatchling` (PEP 517); entrypoint `specify = "specify_cli:main"`; install via `uv tool install` or `pipx`.
+- **Runtime Dependencies**: `typer` (CLI), `rich` (TTY), `httpx[socks]`, `platformdirs`, `readchar`, `truststore` (Python ≥ 3.10).
+- **Test Framework**: `pytest` (markers `contract`, `integration`): `pytest`, `pytest -m contract`, `pytest -m integration`.
 - **Key Directories**:
-  - `src/specify_cli/`: single-module CLI implementation (`__init__.py`; Typer commands live here).
-  - `templates/`: Source-of-truth templates packaged into the wheel (constitution, plan, requirements, tasks, agent variants, `commands/` for /speckit.* prompts, plus tool/skill templates).
-  - `scripts/bash/` and `scripts/python/`: Repeatable workflow scripts mirrored from `.specify/scripts/`. Use these for shell automation; never call `/speckit.*` as a shell command.
-  - `skills/`: Installed Spec Kit skills, one directory per skill — the directory listing and `.specify/skills.md` are the authoritative roster and count; neither is restated here. Mirrored to `.specify/skills/` via package install; `.github/skills/` is a compatibility symlink.
-  - `agents/`: Role-based agent definitions (`*.agent.md`) mirrored to `.specify/agents/`.
-  - `tests/`: `contract/`, `contracts/`, `integration/`, `scenarios/`, `unit/`, with shared `conftest.py`, `fixtures/`, `script_api.py`.
-  - `memory/`: Default in-package memory shipped with the CLI; the canonical project memory lives at `.specify/memory/` (constitution, features, features/<ID>.md, plus the dynamic memory-as-files layer under `session/` and `knowledge/`).
-  - `docs/`: spec-kit 自身的开发文档，不随框架分发（shared/docs 边界见 Documentation Map）。
-  - `feedback/`: **Inbound feedback intake** — one bundle per file as `feedback/feedback-*.zip` (produced by `feedback-utils.py --action package`, delivered manually per Dogfooding Loop A; `feedback/.gitignore` re-includes the zips the root `.gitignore` ignores). The process-all-bundles-as-one-batch discipline is owned by the feedback command.
-  - `.specify/`: Project runtime — `instructions.md` (this file), `memory/`, `skills/`, `agents/`, `scripts/`, `specs/<NNN-feature-slug>/`, `templates/`. Treat as the canonical workspace; ignore any `.specify/` inside subdirectories.
+  - `src/specify_cli/`: single-module Typer CLI.
+  - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, tools/skills).
+  - `scripts/bash/`, `scripts/python/`: workflow scripts mirrored from `.specify/scripts/`; never call `/speckit.*` as a shell command.
+  - `skills/`, `agents/`: installed skills and agent definitions, mirrored to `.specify/`.
+  - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`.
+  - `memory/`: default in-package memory; canonical memory is `.specify/memory/`.
+  - `docs/`: this project's development docs, not shipped (boundary above).
+  - `feedback/`: inbound `feedback-*.zip` bundles for `/speckit.feedback`.
+  - `.specify/`: project runtime (instructions, memory, skills, agents, scripts, specs, templates); ignore nested `.specify/` dirs.
 
 # Tool And Skills Usage Guide
 > **Note**: Tool and Skills details are injected into prompts by the agent when needed. This section is guidance only.
@@ -247,9 +243,9 @@ Every durable identifier — a decision (D-…), open item (OI-…), stage (S…
 - Prefer scripts under `.specify/scripts/` and `scripts/` for repeatable operations.
 - `/speckit.*` commands are chat instructions, not terminal commands.
 - Treat Constitution as the authority for architecture and workflow constraints.
-- **Reuse a Tool before generating a script**: before writing script code for a complex or repeatable action, look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules outrank your training knowledge, and its environment applicability (verified version / version differences / platform / architecture / fallback / preflight) tells you the form that actually holds here. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
+- **Reuse a Tool before generating a script**: look for an existing **Tool** under `.specify/memory/tools/` and reuse it — its behavioral rules and environment applicability outrank your training knowledge. No Tool for the capability? Writing the code is the expected outcome. See `.specify/shared/workflow/tool-reuse-gate.md` (Constitution Principle XII).
 
-> **Terminology**: "tools" means three different things here — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation, the discovery inventories, the `.specify/memory/tools.md`-singular vs `tools/`-directory trap, and the regeneration path are owned by `shared/definitions/tool-definitions.md` § Terminology — read it before writing anything tool-related.
+> **Terminology**: "tools" means three different things — the **Tool record** (`.specify/memory/tools/<name>.md`, owned by `/speckit.tools`), the **AI agent CLI**, and the **tool-call list** (`tools:` frontmatter key). Disambiguation and the `.specify/memory/tools.md`-singular vs `tools/`-directory trap: `shared/definitions/tool-definitions.md` § Terminology.
 
 ## AI Tool Compatibility
 - **Supported Agents**: the canonical list lives in `AGENT_CONFIG` / `_ASSISTANT_TIERS` (`src/specify_cli/__init__.py`); per-tool config and CLI arguments: `docs/reference/cli/supported-agent-tools.md` — never guess flags or config keys.
@@ -257,26 +253,27 @@ Every durable identifier — a decision (D-…), open item (OI-…), stage (S…
 
 ## Spec Kit Framework Map
 
-The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: project memory `.specify/memory/` (constitution, features, glossary, `tools/` records), artifact templates `.specify/templates/`, automation scripts `.specify/scripts/`, installed skills `.specify/skills/` (guide: `.specify/skills.md`), agent layer `.specify/agents/` (templates/instances/execution), teams `.specify/teams/`, shared conventions `.specify/shared/`, feature specs `.specify/specs/<ID>-<slug>/`.
+The `.specify/` layout is a **map, not a manual** — *what* exists and *where* it lives; the *how* belongs to the documents each row points to. Highlights: `.specify/memory/`, `.specify/templates/`, `.specify/scripts/`, `.specify/skills/`, `.specify/agents/`, `.specify/teams/`, `.specify/shared/`, `.specify/specs/<ID>-<slug>/`.
 
-Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution) is defined once in `.specify/shared/definitions/agent-definitions.md` — consult it before creating/refining/running agents.
+Full table with per-row notes: `.specify/shared/definitions/framework-map.md`. Agent layer taxonomy (Template → Instance → Execution): `.specify/shared/definitions/agent-definitions.md`.
 
 ## Spec Kit Runtime & Symlink Model
 
-`.specify/instructions.md` is the single source of truth for project-level AI instructions; compatibility files (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, `.github/copilot-instructions.md`) and the skills alias `.github/skills` are **symlinks** into `.specify/`. Edit through canonical `.specify/...` paths — never delete/rename/recreate a link by hand (that severs it and the affected tool silently diverges). A broken or replaced link is repaired by running `/speckit.instructions`, which regenerates the canonical instructions and all compatibility symlinks.
+`.specify/instructions.md` is the single source of truth for project-level AI instructions; compatibility files (`CLAUDE.md`, `QODER.md`, `AGENTS.md`, `.github/copilot-instructions.md`) and the `.github/skills` alias are **symlinks** into `.specify/`. Edit through canonical paths — never recreate a link by hand (that severs it and the tool silently diverges); repair with `/speckit.instructions`.
 
-Full model (per-consumer notes incl. Qoder CLI vs IDE, detection commands, regeneration behavior): `.specify/shared/workflow/symlink-model.md`.
+Full model (Qoder CLI vs IDE, detection, regeneration): `.specify/shared/workflow/symlink-model.md`.
 
 ## Recurring Operational Lessons
-Project-specific gotchas distilled from prior sessions — the set that prevents the most common rework: mirror sync, script names, root-owned paths, shell and grep traps, test baselines, the blind-check class, `git diff` forms, scaffold overwrite, template neutrality, doc reference direction, removal safety, obsolete-asset reclaim, YAML CJK escaping, git object buckets, and end-to-end execution of a restructured pipeline.
+Project-specific gotchas distilled from prior sessions — mirror sync, script names, root-owned paths, shell/grep traps, test baselines, blind checks, `git diff` forms, scaffold overwrite, template neutrality, doc reference direction, removal safety, obsolete-asset reclaim, YAML CJK escaping, git object buckets, restructured pipelines.
 
-Owner: `docs/reference/history/` — `00-cross-cutting-lessons.md` carries the cross-cutting lessons, `01`–`05` the per-domain ones. Read the owner before acting on any of them. This section MUST NOT restate their rules: a copy here is a copy that drifts, and the drift stays invisible until someone follows the stale one.
+Owner: `docs/reference/history/` — `00-cross-cutting-lessons.md` plus per-domain `01`–`05`. Read the owner before acting on any of them; this section MUST NOT restate their rules: a copy here drifts, and the drift stays invisible until someone follows the stale copy.
 
 ## Git Workflow
-This project's git workflow is a **per-project choice (a suggestion for managing the repo well, not a framework mandate)** — common models include single-branch, dual-branch (daily-dev branch + archive/upstream-tracking branch), temp-branch (a trunk plus short-lived feature branches), and the MAIN/PRE/DEV three-tier; the `git-workspace` skill (scope A) maintains whichever model this project declared in **`docs/git-workflow.md`** — that managed block is the **single source of truth** for every git operation here. Do not edit it by hand and do not record branch information anywhere else; the operational procedure (pre-checks, sync/merge sequences, push strategy, `.gitexcludes` subroutine, safety rules) lives in the skill and its references.
+This project's git workflow is a **per-project choice** (a suggestion for managing the repo well, not a framework mandate) — common models include single-branch, dual-branch, temp-branch and the MAIN/PRE/DEV three-tier. The `git-utils` skill (scope A) maintains whichever model this project declared in **`docs/git-workflow.md`**: that managed block is the **single source of truth** for every git operation here — do not edit it by hand and do not record branch information anywhere else. The operational procedure lives in the skill and its references.
 
 ## Skills & Tools
-No registration tables are maintained — agents discover resources natively from the filesystem:
+No registration tables — agents discover resources from the filesystem:
 
-- **Skills**: `.specify/skills/`, one directory per skill; system guide: `.specify/skills.md`. Create/improve via the `create-skills` / `improve-skills` skills.
-- **Tools**: `.specify/memory/tools/<name>.md` definition records; system guide: `.specify/tools.md`. Reuse a Tool before generating a script (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
+- **Skills**: `.specify/skills/`, one directory per skill; guide: `.specify/skills.md`. Create/improve via the `create-skills` / `improve-skills` skills.
+- **Tools**: `.specify/memory/tools/<name>.md` records; guide: `.specify/tools.md`. Reuse before scripting (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.
+
