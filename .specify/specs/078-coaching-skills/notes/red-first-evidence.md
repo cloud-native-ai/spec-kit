@@ -59,3 +59,59 @@ FAILED tests/contract/test_coaching_expectation_contract.py::test_c5_expectation
 - Cause: `references/prompt-templates.md` still holds the retired thought-experiment
   fragments; none of the expectation skeleton, derivation method or zero-side-effect
   sections exists. The three passing tests are the document validator's drills.
+
+## T017 — `tests/contract/test_coaching_observation_contract.py` + `tests/contract/test_coaching_dispatch_contract.py`
+
+- Command: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q tests/contract/test_coaching_observation_contract.py tests/contract/test_coaching_dispatch_contract.py`
+- Exit code: `1`
+- Failure count: `13 failed, 12 passed`
+- Output slice:
+
+```text
+FAILED tests/contract/test_coaching_observation_contract.py::test_c1_template_declares_the_five_sections_in_order
+FAILED tests/contract/test_coaching_observation_contract.py::test_c1_dispatch_block_carries_the_five_record_fields
+FAILED tests/contract/test_coaching_observation_contract.py::test_c2_step_table_carries_the_nine_columns
+FAILED tests/contract/test_coaching_observation_contract.py::test_c2_consistency_is_observation_only
+FAILED tests/contract/test_coaching_observation_contract.py::test_c3_sources_are_closed_and_host_event_wins_on_conflict
+FAILED tests/contract/test_coaching_observation_contract.py::test_c4_gap_marker_lives_only_on_step_rows
+FAILED tests/contract/test_coaching_observation_contract.py::test_c5_failure_timeout_and_refusal_keep_their_coordinates
+FAILED tests/contract/test_coaching_observation_contract.py::test_c6_no_observation_still_produces_the_record
+FAILED tests/contract/test_coaching_dispatch_contract.py::test_c1_every_required_field_is_named_with_its_rule
+FAILED tests/contract/test_coaching_dispatch_contract.py::test_c2_the_four_forbidden_classes_are_declared
+FAILED tests/contract/test_coaching_dispatch_contract.py::test_c3_single_payload_and_no_retry_with_a_modified_payload
+FAILED tests/contract/test_coaching_dispatch_contract.py::test_c4_return_is_recorded_and_never_inflated
+FAILED tests/contract/test_coaching_dispatch_contract.py::test_c5_transport_and_payload_reference_are_recorded
+```
+
+- Cause: `references/prompt-templates.md` carries only the expectation-side sections, so
+  the observation skeleton, the nine-column step table and the gap rules are absent;
+  `SKILL.md` has no `## Dispatch Payload` section, so every payload clause is unclaimed.
+  The 12 passing tests are the two validators' compliant/counterexample drills (they
+  exercise the test helpers, not the skill content).
+
+## T020 — `tests/contract/test_coaching_wiring_contract.py`
+
+- Command: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q tests/contract/test_coaching_wiring_contract.py`
+- Exit code: `1`
+- Failure count: `12 failed, 5 passed`
+- Output slice:
+
+```text
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_the_old_literal_has_no_live_occurrence_in_the_wiring_surface
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_the_single_permitted_occurrence_is_the_obsolete_skills_entry
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_each_named_face_carries_zero_occurrences[.qoder/agents]
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_each_named_face_carries_zero_occurrences[.specify/agents/templates]
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_each_named_face_carries_zero_occurrences[.specify/shared/definitions]
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_each_named_face_carries_zero_occurrences[.specify/memory/feedback/probe-map.md]
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c6_the_old_mirror_directory_is_gone_and_the_new_one_exists
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c3_mirrors_and_command_copies_are_zero_drift
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c4_cleanup_removes_the_entity_directory
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c7_the_four_frozen_rosters_carry_the_new_name
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+```
+
+- Cause: the route row still names the retired skill (coordinate 7), the shared mirrors
+  and the old mirror directory are not regenerated yet (C-3, C-6), the retired directory
+  name is not in `_OBSOLETE_SKILLS` yet (C-4), and the four frozen rosters still carry
+  the old name (C-7, owned by T027). The 5 passing tests are the face-derivation drills.
