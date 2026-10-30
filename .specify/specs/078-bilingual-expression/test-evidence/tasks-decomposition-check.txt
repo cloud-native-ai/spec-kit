@@ -1,0 +1,4 @@
+# decomposition-check.py --mode tasks
+# 2026-10-30 HEAD=5a4dc5a4
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 18, "task_count": 19, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T09:48:30Z"}
+exit=0

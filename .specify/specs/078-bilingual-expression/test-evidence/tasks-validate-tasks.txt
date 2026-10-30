@@ -1,0 +1,5 @@
+# validate-tasks.py .specify/specs/078-bilingual-expression/tasks.md
+# 2026-10-30 HEAD=5a4dc5a4
+WARN  174: parallel-safe: [P] tasks T004 (line 174) and T005 (line 175) both WRITE ['specify/memory/glossary.md'] in phase `## Phase 3: User Story 2 - 词汇表维护者登记新术语时，Canonical 直接采用双语形态 (` — [P] requires different write targets; drop [P] from one row or re-target it, never by deleting the cited path
+PASS (with warnings): .specify/specs/078-bilingual-expression/tasks.md — 0 error(s), 1 warning(s)
+exit=0
