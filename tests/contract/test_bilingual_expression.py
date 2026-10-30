@@ -24,7 +24,8 @@ and quickstart.md S2/S3/S7/S8. Legs:
   have unique consumption points; (ii) the three mirror copies are byte-equal
   to their framework sources, with the mirror list derived from
   ``sync-mirrors.py`` ``MIRROR_PAIRS`` (not hardcoded); (iii) the ambient
-  section is summary + pointer (``[[STR-001]]`` present, zero keyword hits).
+  section is summary + pointer (literal ``shared/guidelines/bilingual-expression.md``
+  owner pointer present, no ``[[STR-`` token, zero keyword hits).
 * sampling leg (T011, measurement.md C-004): the checker module exposes
   ``sample_lines(lines)`` selecting every k-th line with k = ceil(n/10),
   pinned deterministic.
@@ -387,7 +388,10 @@ def test_drift_ambient_summary_plus_pointer_form():
     heading = "## Bilingual Expression (双语表述)"
     assert lines.count(heading) == 1, f"ambient heading must appear exactly once, got {lines.count(heading)}"
     body = "\n".join(_ambient_section_lines())
-    assert "[[STR-001]]" in body, "ambient section must carry the [[STR-001]] owner pointer"
+    assert "shared/guidelines/bilingual-expression.md" in body, (
+        "ambient section must carry the literal shared/guidelines/bilingual-expression.md owner pointer"
+    )
+    assert "[[" not in body, "ambient section must not leak [[STR-NNN]] placeholder tokens"
     leaked = [kw for kw in all_keywords() if kw and kw in body]
     assert leaked == [], f"ambient section repeats enumeration keywords: {leaked}"
 

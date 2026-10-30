@@ -93,7 +93,7 @@
 
 - 约定只约束新写内容与本文件的维护；既有 dated records、已完成规格、历史记录不追溯重写（FR-006/FR-016）。
 - 存量不合规形态记为已知差异，随自然修订收敛；**首次定义处仍需双语**——修订触及定义处时按本约定执行。
-- 存量差异的清单化载体是 E6（检查器 `--scope full` 全量扫描输出，落 `.specify/specs/078-bilingual-expression/test-evidence/`，dated record、append-only）；本文件只指针，不承载清单。
+- 存量差异的清单化载体是 E6（检查器 `--scope full` 全量扫描输出，dated record、append-only，由运行面按日期落盘）；本文件只指针，不承载清单。
 - `--scope full` 输入规模预期（C-01）：覆盖面清单内文件的线性读取（数十文件，亚秒至秒级墙钟）；census 墙钟 > 60s 触发抽样决策重开（research.md R-11 的重开条件）。
 
 ## 与相邻纪律的交界
@@ -104,7 +104,7 @@
 
 ## 检查器与守卫
 
-机械守卫的入口是 `scripts/python/bilingual-expression-check.py`；**行为契约全文（入口/退出码/扫描规则/判定边界）归 `.specify/specs/078-bilingual-expression/contracts/checker.md`，本节只指针**。
+机械守卫的入口是 `scripts/python/bilingual-expression-check.py`（已分发脚本，镜像于 `.specify/scripts/python/`）；**行为说明（入口/退出码/扫描规则/判定边界）见该脚本的 `--help` 与模块 docstring，本节只指针**。
 
 - 能判（三类机械判定）：(a) 信号行是否含登记的半角紧贴双语形态；(b) 括号语言是否与文档主语言相反；(c) 覆盖定义面是否齐全。
 - 不能判：语义——「括号内英文是否译得准」「这行是否在信号清单外仍是定义处」；检查器的绿是必要条件，MUST NOT 被援引为内容正确性证据（A7/C-012），最终验收归读者 oracle。

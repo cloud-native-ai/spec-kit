@@ -88,7 +88,7 @@ A name links the entity into the project's knowledge network; every later reader
 
 ## Bilingual Expression (双语表述)
 
-Core concepts and key processes carry a bilingual form at their definition site — the bracket language follows the document's primary language — so readers across contexts and models anchor on the same meaning. Full discipline: [[STR-001]] (do NOT copy its rule enumerations; reference the file).
+Core concepts and key processes carry a bilingual form at their definition site — the bracket language follows the document's primary language — so readers across contexts and models anchor on the same meaning. Full discipline: shared/guidelines/bilingual-expression.md (do NOT copy its rule enumerations; reference the file).
 
 ## Concurrent Development Safety (并发开发安全)
 
