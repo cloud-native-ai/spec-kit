@@ -102,6 +102,41 @@ Exactly four files, in this order:
 - The coach never executes Trainee steps itself and never injects side effects into
   the subagent's work.
 
+## Dispatch Payload
+
+The payload is a closed field set; anything not listed below is forbidden.
+
+| Field | Content | Rule |
+|-------|---------|------|
+| `trainee` | resolved identifier, resolved path, layer | the exact path this run resolved; no alternatives offered |
+| `work` | `<work>` verbatim | byte-for-byte the second positional parameter |
+| `instruction` | "Follow the Trainee's own `SKILL.md` as the highest execution guidance" | never replaced by a coach-authored procedure |
+| `return-contract` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state | powers `self-report` when host events are unavailable |
+| `anomaly-line` | "State one explicit anomaly line on return; state `none` when there is none" | silence is not read as clean |
+| `fast-fail-clause` | the dispatcher's anomaly discipline | injected at dispatch time; a subagent does not inherit this conversation |
+| `confirmation-relay` | "If the Trainee flow reaches a destructive step, stop and report it back instead of approving it yourself" | the answer comes from the user; the subagent never self-approves |
+
+The payload MUST NOT contain:
+
+1. the expectation file, any `OC-*` / `PE-*` row, or a summary of them;
+2. the coach's deviation guesses or conclusions about `<work>`;
+3. a coach-authored simplification or reordering of the Trainee flow;
+4. any artifact path inside the run directory — the subagent writes Trainee outputs,
+   not coach records.
+
+Exactly one payload is dispatched per run. A failed dispatch is not re-sent with a
+modified payload; the failure is recorded instead.
+
+On return, the anomaly line is written into the DispatchRecord unchanged. Self-reported
+steps become `self-report` rows, and anything the self-report does not cover becomes an
+`observation-gap` row rather than an inferred one. A return that claims completion
+without the Trainee's primary artifact is recorded as `partial`, not `completed`.
+
+The transport — `native` host subagent tool, `run-agent-fallback`, or
+`run-skills-explicit-path` mode — is recorded in the DispatchRecord `mode` field, and the
+rendered payload is stored or referenced by `payload-ref`. The payload's raw text never
+enters the coach's user-facing report.
+
 ## Compare
 
 Write `deviations.md` by comparing the expectation with the observation on both

@@ -94,3 +94,114 @@ The expectation phase MUST NOT:
 
 Reading the Trainee's `SKILL.md` and the reference files it needs is permitted and is
 the only allowed interaction.
+
+## Observation Record Template
+
+Path: `.specify/memory/coaching/<run-id>/observation.md`. Write it after the single
+dispatch and before `deviations.md`: it records what actually happened, never what the
+expectation predicted.
+
+```markdown
+## Run header
+- run-id: <YYYYMMDDTHHMMSSZ-trainee-slug>
+- trainee: <resolved Trainee name and path>
+- observation-window: <first observed step at> .. <last observed step at>
+
+## Dispatch
+- mode: native | run-agent-fallback | run-skills-explicit-path
+- dispatched-at: <ISO-8601 UTC; later than the expectation.md mtime>
+- payload-ref: <path or hash of the rendered payload>
+- returned: completed | partial | failed | timeout | refused
+- anomaly-line: <the subagent's anomaly line, verbatim>
+- failure-coordinates: <step id, error, completed portion; omit only when returned is completed>
+
+## Steps
+| step | trigger/instruction | action | tool-call | state-change | artefact | elapsed | source | consistency |
+|---|---|---|---|---|---|---|---|---|
+| S1 | <Trainee instruction> | <what the subagent did> | <tool + key argument, or —> | <state delta> | <path, or —> | <duration> | host-event | on-critical-path: yes; vs-expected-steps: within |
+| S2 | <Trainee instruction> | <the step no channel carried> | — | — | — | — | observation-gap | on-critical-path: yes; vs-expected-steps: beyond |
+
+## Gaps
+- gap-count: <number of gap rows>
+- step ids: <S-ids, comma-separated>
+- <plain prose: which steps carried no observation channel and what information is missing>
+
+## Result
+- state: completed | partial | failed
+- failure-coordinates: <step id, error, completed portion; omit only when completed>
+```
+
+Rules for the record:
+
+- Section order is fixed: `## Run header` → `## Dispatch` → `## Steps` → `## Gaps` →
+  `## Result`. Exactly one dispatch block: a second one is a contract violation even when
+  the first dispatch failed.
+- `consistency` is an observation-only judgement with two closed sub-fields:
+  `on-critical-path: yes|no` and `vs-expected-steps: within|beyond`. It MUST NOT execute
+  the Trainee's verification logic — verifying the Trainee's output is the Trainee's job,
+  not an observation side effect.
+- Every step row carries a `source`: `host-event` when the host reported the step,
+  `self-report` when only the subagent's structured return described it, and
+  `observation-gap` when neither channel carried it. When both channels describe one step
+  and disagree at field level, the `host-event` value wins.
+- The gap marker `observation-gap` appears only on step rows. `## Gaps` describes the gaps
+  in plain prose and does not repeat the marker; it reports the count (`gap-count`) and
+  the affected step ids. An unobservable step is never omitted and never reconstructed
+  from the expectation.
+- A failed, timed-out, or refused dispatch keeps its coordinates: which step, which error,
+  which part completed. Gaps never mask a failure and the record never narrates an
+  incomplete run as completed.
+- If no observation could be collected at all, the file still exists, `## Gaps` states the
+  total absence, and `## Result` says so plainly; downstream `deviations.md` and
+  `improvement-plan.md` carry `evidence: none` and the run stays `partial`.
+
+## Deviations Template
+
+Path: `.specify/memory/coaching/<run-id>/deviations.md`. Both dimension sections are
+required:
+
+```markdown
+## Outcome Correctness
+| id | expectation | observed | dimension | severity | evidence |
+|---|---|---|---|---|---|
+| D-1 | <OC id and its expectation> | <what the observation record carries> | result-deviation | <low\|medium\|high> | S2 / checklist.md |
+
+## Process Efficiency
+| id | expectation | observed | dimension | severity | evidence |
+|---|---|---|---|---|---|
+| D-2 | <PE id and its expectation> | <observed step count and tool profile> | process-deviation | <low\|medium\|high> | S1-S4 |
+
+## Readings
+- coach reading of `<work>`: <one line>
+- Trainee actual reading: <one line>
+- material divergence: <what separates the two readings beyond normal execution noise>
+```
+
+Rules for the deviations: every finding cites a step id and/or an artifact path from
+`observation.md`; the dimension column uses only `result-deviation` or
+`process-deviation`; a partially completed flow separates the two classes. When the
+observation carries no evidence, each row is marked `evidence: none` instead of being
+dropped.
+
+## Improvement Plan Template
+
+Path: `.specify/memory/coaching/<run-id>/improvement-plan.md`. Entries are
+priority-ordered and concrete:
+
+```markdown
+## Improvements
+1. `I-1` — target: `<Trainee file>` § `<section>`; tweak: `<one concrete change>`; cites:
+   `D-1`.
+2. `I-2` — target: `<Trainee file>` § `<section>`; tweak: `<one concrete change>`; cites:
+   `evidence: none`.
+
+## Run Status
+- run: success | partial | failed
+- optimization: applied | skipped | unavailable | failed
+```
+
+Rules for the plan: each entry names a concrete Trainee file and section plus one concrete
+tweak — generic advice is invalid. Each entry cites `D-*` findings or is marked
+`evidence: none`; the plan is still produced when the observation is empty. Both status
+values are recorded once, in `## Run Status`, and the combination rule is owned by
+`data-model.md` § RunStatus — consult it, do not restate it here.
