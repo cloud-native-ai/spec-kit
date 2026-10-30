@@ -106,3 +106,54 @@
 - **摘要优先**：MUST NOT 把机器管理的原始数据文件整文件注入——Feature 注册表 MUST 只取行投影，治理文档 MUST 只取相关段落。整文件注入既浪费上下文，也会把无人阅读的细节误当作「已装配的上下文」。
 - **尝试并记录**：装配是 attempt-and-record，不是「必须可读」。路径不存在或不可读记 `unavailable`，本轮未尝试记 `not-read`，实际载入记 `read`。MUST NOT 为了来源清单好看把未载入的来源记为 `read`。
 - **落点**：三类来源的读取状态决定 `references/report-shape.md` § Risks & Limits 的来源清单与缺失声明；装配本身不写盘（零写入），也不产生任何中间文件。
+
+## Failure & No Retry
+
+失败就是失败：本次运行至多一次执行尝试，不自动重试，也 MUST NOT 用第二次派发补救第一次的失败。
+
+- **不补发**：载荷发出后才发现缺快速失败注入子句时，MUST 停止消费该次结果并按失败报告；MUST NOT 以「补发一次」修复——补发本身就是第二次派发，按 § Dispatch 的恰好一个与 EX-11 判违反。
+- **失败坐标**：派发失败、超时或执行体中止时，MUST 在 `## Evidence` 记录失败坐标——载体（`native` / `in-session`）、阶段（parse / dispatch / execution / report）、错误信息——与已完成部分；MUST NOT 改写为成功，MUST NOT 用「基本完成」掩盖失败。
+- **超时不可判**：超时的定义与阈值归执行载体/宿主所有；载体不提供超时信号时该失败类别不可判，MUST 在 `## Risks & Limits` 声明，MUST NOT 自设阈值。
+- **用户中止**：指令被用户中止时，MUST 记录中止点与已完成部分，报告口径为「已中止」；MUST NOT 使用成功措辞。
+- **证据可定位性核对**：执行体回传的 `products` 与 `evidence` MUST 逐项核对——路径存在且可打开、命令与退出码自洽、读数可复核；核对不上的项 MUST NOT 作为证据写进报告，MUST 在 `## Risks & Limits` 记为「未能核实」。核对是报告前的动作，不是可选的形式检查。
+- **派发计数不因失败而变**：`## Evidence` 的 `dispatches:` 行在失败路径仍须出现，取值口径归 `references/report-shape.md` § Evidence（只计 humanize 发起的顶层派发）；失败 MUST NOT 被计成第二次派发。
+
+## Confirmation Missing
+
+执行体执行到**需要用户确认**的步骤、而它无法向用户提问时，行为是 fail-closed：不执行该步，不猜、不代答、不绕开。
+
+- **停在该步**：该步 MUST NOT 被执行；`blocked_at` MUST 记录卡点（步骤位置），`## Conclusion` MUST 写「需要确认，未获答复」并给出一句可直接行动的理由（例如需要用户确认哪一步）。
+- **其余已完成部分照常报告**：卡点之前已完成的部分 MUST 照常写进报告；`products` 只含该步之前已完成的写入，MUST NOT 把未执行的步骤算作完成。
+- **不代答**：humanize 主会话 MUST NOT 代替用户回答该确认，MUST NOT 以「用户可能同意」继续，MUST NOT 换一个等价动作绕开该步；转达请求或答复不等于代答。
+- **用户明确拒绝（`denied`）**：当用户明确拒绝确认时，该步 MUST NOT 被执行，且 MUST NOT 执行任何替代动作（零副作用）；`## Conclusion` MUST 写明「用户拒绝确认」与未执行范围，`## Evidence` MUST 列出拒绝原因与未执行范围；verdict 按 FR-019 的映射取 `aborted`（映射 owner 是 FR-019）。拒绝路径 MUST NOT 派发、MUST NOT 留下占位、MUST NOT 写入任何文件。
+- **不是失败，也不是成功**：确认缺失停在卡点并如实报告，等待用户答复后才能继续；MUST NOT 把它写成失败或成功。
+
+## Degradation & Boundaries
+
+宿主没有原生派发通道时，命令 MUST 降级为会话内执行（不是可选），并声明降级：载体标记写 `mode: in-session-degraded`，派发记录为 `dispatches: 0`。降级不是失败，也不是冒充——MUST NOT 冒充 `mode: subagent`。
+
+- **只把可观察结果当事实**：会话内执行能看到什么就写什么；MUST NOT 把推断描述为子代理的观测，MUST NOT 声称有独立上下文或独立工具集，MUST NOT 假装有一条并不存在的派发通道。
+- **降级不改报告契约**：五节、证据义务与保真底线在降级下完全不变；降级只改载体标记与该载体带来的限制描述（例如「无独立上下文，观测来自本会话」写进 `## Risks & Limits`）。
+- **humanize 自身的边界**：humanize 自身 MUST NOT 发起网络请求、MUST NOT 调用外部服务或模型 API。指令自身按其契约产生的联网行为（例如指令要求查询某个服务）MUST 在 `## Evidence` / `## Key Changes` 披露，MUST NOT 记作 humanize 的外发；披露不等于授权——指令自身的权限边界由指令所属单元判定。
+- **零写入边界**：未给 `--output` 时 humanize 不写报告、不写副本；指令造成的写入按 § Envelope 的 `products` 逐项披露。
+
+## Reservation & Nesting
+
+运行模式的并发与嵌套判定是 fail-closed 的；内容模式不取占位、不受并发拒收影响。
+
+### 占位（E4）
+
+- **仓库级占位**：派发前 MUST 在 `.specify/.tmp/humanize/<run_id>.run` 建立仓库级占位（一文一件，文件名即 `run_id`）；同一仓库（`git rev-parse --show-toplevel`）同一时刻至多一个未过期占位。
+- **已有占位 → `active-run`**：已有未过期占位时 MUST 拒绝为 `active-run`，点名冲突 `run_id` 与起始时间；MUST NOT 排队等待、MUST NOT 复用他人占位。
+- **目标级占位**：给 `--output` 时 MUST 同时取得目标级占位；目标已被另一未过期运行占用时 MUST 拒绝为 `output-occupied`，点名目标路径与冲突 `run_id`。
+- **遗弃占位**：超过 24h 的占位视为遗弃，MUST NOT 阻断本次运行，MUST NOT 删除他人文件，只在 `## Risks & Limits` 点名「检测到遗弃占位」。
+- **出口记账**：任一出口——正常、失败、中止、异常——MUST 释放本人占位；占位残留即判违反，不留残骸。
+
+### 嵌套（封闭 token）
+
+- **`nested-invocation`**：指令文本含封闭 token 集 `speckit.humanize`（大小写不敏感）时 MUST 拒绝为 `nested-invocation` 并点名命中的字面量。这是**保守判定**：宁可误拒提及该名称的指令，也不放过一次真实嵌套；拒绝消息 MUST 说明这一点。
+
+### 拒绝路径与计数口径
+
+- **拒绝路径零副作用**：任何拒绝路径 MUST NOT 产生派发、MUST NOT 留下占位、MUST NOT 写入任何文件；拒绝消息 MUST 含原因码对应的点名要素（owner = `data-model.md` § E2 `reject_code` 表）。
+- **派发记录口径**：`## Evidence` 的 `dispatches:` 行只计 humanize 发起的顶层派发（原生 `1` / 降级 `0`）；指令自身再发起的派发归该指令单元，MUST NOT 重复计数。计数口径的 owner 是 `contracts/execution-dispatch.contract.md` EX-21，报告面落点见 `report-shape.md` § Evidence。
