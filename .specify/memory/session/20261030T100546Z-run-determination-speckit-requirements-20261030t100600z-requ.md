@@ -20,7 +20,7 @@ summary: "/speckit.requirements run=20261030T100600Z-requirements-079 token=not_
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-10-30T10:05:46Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T11:41:41Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,7 +83,7 @@ summary: "/speckit.requirements run=20261030T100600Z-requirements-079 token=not_
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "false",
@@ -162,8 +162,8 @@ summary: "/speckit.requirements run=20261030T100600Z-requirements-079 token=not_
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -193,7 +193,7 @@ summary: "/speckit.requirements run=20261030T100600Z-requirements-079 token=not_
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

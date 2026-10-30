@@ -6,10 +6,10 @@ feature: "078-coaching-skills"
 tags: ["run-determination", "r20261030t054502z-078a-a3"]
 title: "run-determination /speckit.analyze r20261030T054502Z-078a-a3"
 created: "2026-10-30T07:47:57Z"
-summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated
+/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated ela
   "feature": "078-coaching-skills",
   "feature_id": null,
   "determined_at": "2026-10-30T07:47:57Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T11:32:08Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,9 +87,9 @@ summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated ela
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -162,18 +162,6 @@ summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated ela
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -188,11 +176,6 @@ summary: "/speckit.analyze run=r20261030T054502Z-078a-a3 token=not_evaluated ela
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

@@ -1,0 +1,13 @@
+stage=analyze
+status=not-run-docs-only
+date=2026-10-30
+stage_base=2cc53ea4
+budget=docs-only：只读分析阶段不修改实现面；targeted-set-v1 不适用（本阶段不产生实现代码）；不跑全量测试套件
+checks_run_readonly=validate-requirements.py (status ok, 0 error/0 warning); validate-tasks.py (PASS 0 error/0 warning); validate-decision-tensions.py --spec .specify/specs/079-humanize-run-output (status error; expected-sacrifice-unmapped fail 3; HIGH=3; exit 1); account-clause-coverage.py --spec .specify/specs/079-humanize-run-output (status=baseline-missing; claimed clauses 0; FR uncovered 30/30; 88 two-letter clauses form=md-none; exit 1); pre-analyze-check.py --stage tasks (decision=pass errors=0 advisories=21); decomposition-check.py --mode tasks (proceed, fr 30/30, tasks 35/40); flow-class-check.py --action check (79 units, 0 findings, clean); probe-utils.py --action compile-embeds --check (75 units, zero drift); sync-mirrors.py --check (6 pairs ok); regen-command-copies.py --check (exit 0); scan-confirmation-gates.py --summary (blocking=27 = destructive 20 + governance_kept 7, violations=0)
+validation_wave=9 read-only external validators (qodercli -p, --tools Read Grep Glob Bash, --no-session-persistence, one process per CRITICAL/HIGH finding); 5 confirm / 4 downgrade / 0 reject; downgrade rate 44.4% (4/9); git status --porcelain unchanged (6 entries before and after the wave)
+gate=CRITICAL 0 / HIGH 5 (H-01 conclusion outcome set; H-02 SC-006 wiring containment; H-03 injection scope; H-04 SC-003 banned-word set; H-05 Decision Tensions expected_sacrifice x3) → implement NOT released; loop back to requirements/plan/tasks
+checklist_h_pass=unchecked 39/39; [Gap] items 20; raised 16; covered-by 4 (CHK008/CHK009/CHK015/CHK034); unraised+undispositioned=0
+coverage=FR→contract traceability 29/30 (FR-014 cited by no contract clause); FR→task 30/30; contract clauses 88/88 assigned in § Contract Coverage Map by hand; machine-verified clause coverage 0/88 (baseline-missing + form=md-none); WC-05..15 have no red-first test-writing row
+feature_linkage=Feature 062 bound; index row name/description/Last Updated aligned; detail file Last Updated=2026-10-19 and header Description still the old text-rewrite wording; status Implemented held
+zero_finding_floor=not applicable (findings exist)
+note=this file is stage evidence only; no spec artifact, plan-owned artifact, template, skill, test or source file was modified by the analyze stage. The only other writes are the sanctioned wrap-up records (Run Determination / Exec Quant / Feedback Record).
