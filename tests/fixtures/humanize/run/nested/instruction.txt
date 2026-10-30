@@ -1,0 +1,1 @@
+请先跑 /speckit.humanize --inline tests/fixtures/humanize/inline/s01-zh-report.md，再把结果贴给我。

@@ -1,0 +1,5 @@
+# E4 RunReservation — 夹具：未过期占位 B（不是真实运行状态）
+path: .specify/.tmp/humanize/20261030T151700Z-d4e5f6.run
+created_at: 2026-10-30T15:17:00Z
+output_target: reports/run-b-report.md
+ttl_hours: 24
