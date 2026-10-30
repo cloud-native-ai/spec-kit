@@ -6,7 +6,7 @@ disable-model-invocation: false
 supervisor: true
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [study-project, git-workflow, think-skills]
+skills: [study-project, git-workflow, coaching-skills]
 run-turn-budget: 15
 display-color: orange
 ---

@@ -123,6 +123,7 @@
   - `skill-analyze-artifacts-wrapup` — skill:analyze-artifacts @ wrap-up
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
   - `skill-clarify-artifact-wrapup` — skill:clarify-artifact @ wrap-up
+  - `skill-coaching-skills-wrapup` — skill:coaching-skills @ wrap-up
   - `skill-code-review-wrapup` — skill:code-review @ wrap-up
   - `skill-collect-evidence-wrapup` — skill:collect-evidence @ wrap-up
   - `skill-create-agent-wrapup` — skill:create-agent @ wrap-up
@@ -171,7 +172,6 @@
   - `skill-self-improvement-wrapup` — skill:self-improvement @ wrap-up
   - `skill-study-project-wrapup` — skill:study-project @ wrap-up
   - `skill-summarize-project-wrapup` — skill:summarize-project @ wrap-up
-  - `skill-think-skills-wrapup` — skill:think-skills @ wrap-up
 
 ### trigger-escalation  [slice: scripts]
 
@@ -271,6 +271,7 @@ graph TD
   class_skill_wrapup --> obj_skill_analyze_artifacts_wrapup[skill-analyze-artifacts-wrapup]
   class_skill_wrapup --> obj_skill_archive_session_wrapup[skill-archive-session-wrapup]
   class_skill_wrapup --> obj_skill_clarify_artifact_wrapup[skill-clarify-artifact-wrapup]
+  class_skill_wrapup --> obj_skill_coaching_skills_wrapup[skill-coaching-skills-wrapup]
   class_skill_wrapup --> obj_skill_code_review_wrapup[skill-code-review-wrapup]
   class_skill_wrapup --> obj_skill_collect_evidence_wrapup[skill-collect-evidence-wrapup]
   class_skill_wrapup --> obj_skill_create_agent_wrapup[skill-create-agent-wrapup]
@@ -319,7 +320,6 @@ graph TD
   class_skill_wrapup --> obj_skill_self_improvement_wrapup[skill-self-improvement-wrapup]
   class_skill_wrapup --> obj_skill_study_project_wrapup[skill-study-project-wrapup]
   class_skill_wrapup --> obj_skill_summarize_project_wrapup[skill-summarize-project-wrapup]
-  class_skill_wrapup --> obj_skill_think_skills_wrapup[skill-think-skills-wrapup]
   kind_internal --> class_trigger_escalation[trigger-escalation]
   class_trigger_escalation --> obj_trigger_p1_feature_dir[trigger-p1-feature-dir]
   class_trigger_escalation --> obj_trigger_p2_clarification_markers[trigger-p2-clarification-markers]
@@ -397,6 +397,7 @@ graph TD
 | `skill-analyze-artifacts-wrapup` | skill-wrapup | internal | skill:analyze-artifacts @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-archive-session-wrapup` | skill-wrapup | internal | skill:archive-session @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-clarify-artifact-wrapup` | skill-wrapup | internal | skill:clarify-artifact @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-coaching-skills-wrapup` | skill-wrapup | internal | skill:coaching-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-code-review-wrapup` | skill-wrapup | internal | skill:code-review @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-collect-evidence-wrapup` | skill-wrapup | internal | skill:collect-evidence @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-create-agent-wrapup` | skill-wrapup | internal | skill:create-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -445,7 +446,6 @@ graph TD
 | `skill-self-improvement-wrapup` | skill-wrapup | internal | skill:self-improvement @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-study-project-wrapup` | skill-wrapup | internal | skill:study-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-summarize-project-wrapup` | skill-wrapup | internal | skill:summarize-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-think-skills-wrapup` | skill-wrapup | internal | skill:think-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `trigger-p1-feature-dir` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
 | `trigger-p2-clarification-markers` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
 | `trigger-p3-tasks-state` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
