@@ -1,0 +1,19 @@
+=== T008 镜像同步与验证 (2026-10-30T11:11:44Z) ===
+--- sync-mirrors.py --write (raw) ---
+(see git history; below is --check output after write)
+--- sync-mirrors.py --check ---
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (118 files)
+ok    shared/ == .specify/shared/ (61 files)
+CHECK_RC=0
+--- 三对镜像逐字一致性 (sha256) ---
+f38be28f1db326e50c0bad2c39291ba589bdefac626b0c3ff7aa4481f3a66d9c  shared/guidelines/bilingual-expression.md
+f38be28f1db326e50c0bad2c39291ba589bdefac626b0c3ff7aa4481f3a66d9c  .specify/shared/guidelines/bilingual-expression.md
+37c7e0b49aed6eaaaadf0201a10da66d7de19af9c803391f4e4ef96819207267  templates/instructions-template.md
+37c7e0b49aed6eaaaadf0201a10da66d7de19af9c803391f4e4ef96819207267  .specify/templates/instructions-template.md
+71f69fc3a680ff2ec023a46a18aa8502f26ab643ee284efb48dbc92ae1328fb7  scripts/python/bilingual-expression-check.py
+71f69fc3a680ff2ec023a46a18aa8502f26ab643ee284efb48dbc92ae1328fb7  .specify/scripts/python/bilingual-expression-check.py

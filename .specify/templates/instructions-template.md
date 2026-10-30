@@ -74,6 +74,10 @@ A requirement, success criterion, DoD item or verification task that asserts a m
 
 A name links the entity into the project's knowledge network; every later reader, search and agent reaches it through that name. Naming MUST NOT be improvised — the first available source decides, in this order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name. A name mandated by a higher-priority source MUST be carried through every reference in the same change. Owner: the project constitution's Grounded Naming principle.
 
+## Bilingual Expression (双语表述)
+
+Core concepts and key processes carry a bilingual form at their definition site — the bracket language follows the document's primary language — so readers across contexts and models anchor on the same meaning. Full discipline: [[STR-001]] (do NOT copy its rule enumerations; reference the file).
+
 ## Concurrent Development Safety (并发开发安全)
 
 Parallel branches and agent flows share one git history, so any machine-managed file that several flows rewrite is a merge-conflict hotspot. Storage design MUST assume concurrent writers:
