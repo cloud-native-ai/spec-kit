@@ -1,5 +1,61 @@
 # Verification — 079 Humanize Run Output（implement 收口）
 
+<!-- Canonical machine-readable block (owner: templates/verification-log-template.md). -->
+
+baseline_commit=35ff11bc
+baseline_date=2026-10-30
+baseline_branch=079-humanize-run-output
+
+implementation_date=2026-10-31
+post_change_commit=PENDING_SELF_COMMIT
+
+SC-001_status=partial
+SC-001_value=五节 5/5 已证；dispatches 原生 1 不可复现，降级载体实跑取 0
+SC-001_note=缺口：原生子代理派发腿（dispatches: 1）在本宿不可复现；降级载体 dispatches: 0 已真实执行。承载证据：notes/quickstart-run.md § S1、test_rp01_five_sections_in_order、test_ex21_dispatch_record_line、test_ex17_degraded_honesty、test_ex18_degraded_keeps_report_contract。
+
+SC-002_status=pass
+SC-002_value=结论一致 1/1；证据指针 L/L（L=报告 Evidence 条目数，全量可定位）；来源清单 read 1/1
+SC-002_note=承载证据：notes/quickstart-run.md § S1 `## Evidence`、test_rp07_evidence_pointers、test_rp10_sources_read_list、test_rp16_no_fabrication。
+
+SC-003_status=pass
+SC-003_value=verdict: failure 1/1；banned_hits 0；失败证据 1/1
+SC-003_note=承载证据：notes/quickstart-run.md § S2、test_rp05_conclusion_verdict、§ SC-003 封闭词表扫描（banned_hits=0）。
+
+SC-004_status=partial
+SC-004_value=零副作用 1/1；denied + aborted + 拒绝原因/未执行范围 2/2
+SC-004_note=缺口：确认拒绝的运行腿 not-reproducible（无人值守无用户可拒）；夹具断言与零副作用已证。承载证据：tests/fixtures/humanize/run/denied/envelope.md、test_sc04_denied_no_side_effect、test_sc04_denied_verdict_and_scope。
+
+SC-005_status=pass
+SC-005_value=--inline 1/1；--file 1/1；裸文本被执行 1/1
+SC-005_note=承载证据：notes/quickstart-run.md § S4 调用 A/B/C、test_cm01_content_mode_equivalence、test_ip05_routing_table_order。
+
+SC-006_status=pass
+SC-006_value=未分类 0（164 = 7+4+1+114+38）；活源 7/7；引擎 rc=0 2/2；冻结 38/38；命令 27；blocking_hits 0
+SC-006_note=承载证据：本文件 § SC-006 闭环守卫、test-evidence/wiring-inventory-baseline.txt。
+
+SC-007_status=pass
+SC-007_value=无网络外发 1/1；无 --output 零写入 2/2；失败不重试 1/1
+SC-007_note=承载证据：test_ex19_no_network_from_humanize、test_rp04_zero_write_default、notes/quickstart-run.md § Teardown、test_ex11_no_compensating_redispatch、test_ex12_failure_coordinates_no_retry。
+
+SC-008_status=pass
+SC-008_value=Implemented 3/3；详情含扩展记录；索引名称/描述已更新；门禁新增行 0
+SC-008_note=承载证据：test_wc10_feature_062_status_held、test_wc11_feature_row_name_description、test_wc17_new_line_gate_zero。
+
+SC-009_status=pass
+SC-009_value=9/9（同现拒绝、active-run、output-occupied、nested-invocation、内容模式豁免、降级标记、无已知风险、下一步、空输出 none）
+SC-009_note=承载证据：test_ip06_source_and_instruction_rejected、test_ip11_active_run_rejected、test_ip12_output_occupied_rejected、test_ip13_nested_invocation_rejected、test_ip15_content_mode_unreserved、test_ex17_degraded_honesty、test_rp09_no_known_risks_explicit、test_rp11_next_steps_or_none、test_rp07_evidence_pointers、notes/quickstart-run.md § S3/S5/S6/S7。
+
+SC-010_status=pass
+SC-010_value=12/12（三组注入样本 × 四项规则）
+SC-010_note=承载证据：tests/fixtures/humanize/run/injection/、tests/fixtures/humanize/inline/s08-threat-inline.md、files/instruction-threat-file.md、test_cm06_injection_defense_both_modes、test_cm07_fidelity_both_modes、test_ex19_no_network_from_humanize。
+
+deferred_tasks=
+deferred_reason_summary=
+
+notes=canonical 状态块；逐条证据正文见下方表格与 T031–T034 小节；证据目录 .specify/specs/079-humanize-run-output/test-evidence
+
+**指针**：canonical 状态以上方 `SC-NNN_status=` 块为准；下方表格是逐条证据正文。
+
 **Owner rows**: T031–T036（Polish）。本文件是 SC-001…SC-010 的唯一索引：每条 SC 一条状态行 + 证据路径，无一条留空。
 **基线**: 契约基线提交 `35ff11bc`（A11 发现命令与全部 `git diff` 判据的参照物）；本段起点 `ecc8ac58`。
 **日期**: 2026-10-31（系统日期已跨日，见 § 环境日期边界）。
