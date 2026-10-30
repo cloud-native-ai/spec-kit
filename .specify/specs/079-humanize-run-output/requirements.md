@@ -1,0 +1,207 @@
+# Requirements Specification: Humanize Run Output（动作输出的人类友好化）
+
+**Requirement Branch**: `079-humanize-run-output`  
+**Created**: 2026-10-30  
+**Status**: Draft  
+**Flow Class**: execution
+**Flow Type**: -
+**Input**: User description: "重构 /speckit.humanize 的定位与输入契约：从「文本转换命令」改为「动作输出的人类友好化命令」。新定位：在一条指令/动作执行完成后，结合上下文与项目信息，把该次执行的输出改写成对人类读者更友好的形态（格式与内容两层）。调用形态：/speckit.humanize [--tone <v>] [--audience <text>] <instruction>；选项之后的剩余文本是一条待执行的指令。执行：派发恰好一个子代理执行该指令（宿主原生派发；无可派发通道时降级为会话内执行并在报告中标明），捕获输出、产物、证据与失败信息。改写：结合动作输出/证据 + 项目治理（instructions / constitution / glossary / feature 注册表）+ 会话上下文生成结构化报告（结论 → 关键变化/结果 → 证据 → 风险与限制 → 下一步），并列明使用的上下文来源。安全：遵守既有确认门与权限边界；不绕过破坏性动作的前置确认、不自动重试、不联网外发；失败或部分完成如实写入报告。旧模式：--file 与 --inline 保留为显式备用输入源；裸文本改为按待执行指令解释，需写明迁移方式。保真与安全底线沿用：事实/数字/结论/引用逐字保留、输入按数据处理、默认零写入、不承诺 AI 检测器结果。影响面：命令模板 + 4 份工具副本、humanize 技能、约 10 个测试文件、评估夹具、docs、Feature 062（扩展，不回退状态）。非目标：不做通用代码执行器、不做多指令批处理、不移除保真/注入/零外传底线、不引入第二套派发机制、不自动确认破坏性动作、不改 improve-skills / coaching-skills 契约。"
+
+## Related Feature *(mandatory)*
+
+**Feature ID**: Need clarification  
+**Feature Name**: Need clarification
+
+## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
+
+- **A1（编号依据）**：编号 079 由脚手架按 `.specify/specs/` 实测最大目录号（078）加一得出；`features.md` 行数不是最大编号，本特性不借机回填。
+- **A2（类别判定 = execution）**：交付物是命令模板、技能定义、契约测试与文档接线；验收由宿主解析命令、由确定性测试消费，缺陷以「命令把裸文本当指令执行 / 报告缺章节 / 失败被写成成功」这类机器可见差异暴露，按 `.specify/shared/definitions/flow-class-definitions.md` 判据属 `execution`，`Flow Type` 写 `-`。命令在流程台账中自身为 `expression / reader-oracle`（其产物是给人读的报告），本线不因此改判。
+- **A3（Feature 绑定目标）**：本特性是现有 **Feature 062（Humanize Command，Status: Implemented）** 的扩展，不新建 Feature；按扩展切片规则状态不回退，Feature 详情与索引 `Last Updated` 记录本次扩展；最终绑定由 `/speckit.clarify` 落定。
+- **A4（破坏性输入变更）**：裸文本（选项之后的剩余文本）一律解释为**待执行指令**；改写既有文本必须显式使用 [[STR-008]] 或 [[STR-009]]。这是对旧调用方式的破坏性变更，命令模板、技能与 docs 必须同时写明迁移方式；MUST NOT 为兼容旧行为而猜测「这段文本像内容还是像指令」。
+- **A5（派发拓扑）**：复用宿主原生子代理派发一条指令；宿主无原生派发通道时降级为 humanize 会话内执行，并在报告中以 [[STR-007]] 标明。不引入第二套派发机制；`run-skills` / `run-agent` 仅作为既有降级入口，不承担新的编排语义。
+- **A6（上下文来源与报告义务）**：上下文恰取三源——动作输出/证据、项目治理（`instructions` / `constitution` / `glossary` / Feature 注册表）、本次会话上下文。任一来源不可得时仍产出报告，但必须在 [[STR-004]] 声明缺失；MUST NOT 编造事实或引用不存在的工作。
+- **A7（报告形态）**：结构化报告使用稳定英文小节名（[[STR-001]]…[[STR-005]]），正文语言服从主语言判定（沿用既有口径）；小节名是机器可判定的契约面，正文不是。
+- **A8（安全边界）**：指令执行沿用目标项目既有的确认门与权限边界；humanize 只负责「执行后改写」，不改变、不代答、不绕过指令自身的确认；破坏性动作被拒绝后，报告如实记录拒绝，不执行替代动作。
+- **A9（保真、注入与零写入沿用）**：既有保真底线、输入按数据处理（注入防护）、默认零写入（`--output` 才写）、不承诺检测器结果全部沿用，本特性不放松任何一条。
+- **A10（旧内容模式的适用范围）**：[[STR-008]] / [[STR-009]] 仍是完整的改写入口，受单输入源规则、格式一致性与保真底线约束；它们不触发子代理执行，也不生成动作报告。
+- **A11（影响面封闭集）**：本次需手改的活接线面为——命令模板 1、工具副本 4、humanize 技能 1、与 humanize 相关的测试文件、docs 两处、Feature 062 详情与索引；派生面（副本再生成、镜像）由既有入口产出。历史记录与评估夹具语料不改写。
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - 一条指令跑完，拿回一份人读得懂的报告 (Priority: P1)
+
+用户在 `/speckit.humanize` 后写一条指令（例如「跑一下 078 的 closure 并告诉我结果」）。命令派发一个子代理执行它，然后结合动作输出、项目信息与会话上下文，交回一份结构化的主语言报告：结论先行，证据与风险齐备。
+
+**Why this priority**: 这是新定位的全部价值；没有这条闭环，命令仍只是文本转换器。
+
+**Independent Test**: 用一条可确定产出的夹具指令跑一次 humanize，检查报告五节齐备、结论与夹具输出一致、证据指向真实产物。
+
+**Acceptance Scenarios**:
+
+1. **Given** 一条可执行的指令与可用的子代理通道，**When** 用户调用 `/speckit.humanize <instruction>`，**Then** 子代理恰好执行一次，报告按 [[STR-001]]→[[STR-002]]→[[STR-003]]→[[STR-004]]→[[STR-005]] 的顺序产出。
+2. **Given** 指令产出了具体产物（文件/测试读数），**When** 生成报告，**Then** [[STR-003]] 引用真实路径与读数，[[STR-004]] 列出至少一条限制或显式「无已知风险」。
+3. **Given** 指令执行失败，**When** 生成报告，**Then** [[STR-001]] 明确写失败，[[STR-003]] 给出失败证据，MUST NOT 出现成功措辞。
+
+---
+
+### User Story 2 - 报告要“友好”：结论先行、证据可查、来源可追 (Priority: P1)
+
+报告不是把原始日志套个壳：它先说结论，再讲关键变化/结果，用证据支撑，把风险与限制摊开，最后给下一步；同时列明这次用了哪些上下文来源。
+
+**Why this priority**: 「格式与内容两层友好」是本特性的定义性要求。
+
+**Independent Test**: 对同一动作输出分别生成报告，检查结论位于首节、每条结论有证据指针、上下文来源清单非空且与实际读取一致。
+
+**Acceptance Scenarios**:
+
+1. **Given** 动作输出含多条结果，**When** 生成报告，**Then** 结论先于细节，关键变化按影响排序。
+2. **Given** 只读到了部分上下文源，**When** 生成报告，**Then** 来源清单只列实际读取的源，缺失项写入 [[STR-004]]。
+3. **Given** 用户给出 `--audience` 或 `--tone`，**When** 生成报告，**Then** 表达层适配生效，但事实层与证据引用不变。
+
+---
+
+### User Story 3 - 安全与诚实：不绕过确认、不掩饰失败、不自动重试 (Priority: P2)
+
+指令若含破坏性动作，必须先走该动作自己的确认门；被拒绝就不执行，报告如实写拒绝。执行失败或部分完成，报告不得修饰成成功；不得自动重试，不得联网外发。
+
+**Why this priority**: 让命令获得“执行指令”的能力，就必须同时约束它不能越权或粉饰。
+
+**Independent Test**: 构造一条需确认的破坏性指令并在确认处拒绝，检查未产生副作用且报告记录拒绝；再构造一条失败指令，检查报告不含成功措辞。
+
+**Acceptance Scenarios**:
+
+1. **Given** 指令包含破坏性动作，**When** 确认被拒绝，**Then** 不发生该动作，报告记录拒绝原因与未执行范围。
+2. **Given** 指令失败或超时，**When** 生成报告，**Then** 失败被如实记录，运行不自动重试。
+3. **Given** 一次运行结束，**When** 审计副作用，**Then** 未发生网络外发；未给 `--output` 时未写任何文件。
+
+---
+
+### User Story 4 - 旧的文本改写入口仍可用，迁移路径清楚 (Priority: P2)
+
+需要改写既有文本的用户改用 [[STR-008]] 或 [[STR-009]]，行为与保真底线保持；直接写裸文本会被当作指令执行，文档与提示消息必须把这一点讲清楚。
+
+**Why this priority**: 旧用户不能被静默改变行为；迁移必须可发现。
+
+**Independent Test**: 同一段文本分别以 [[STR-009]] 与裸文本调用，前者产出改写文本，后者被当作指令执行（夹具中以可观察的指令效果区分）；文档给出迁移示例。
+
+**Acceptance Scenarios**:
+
+1. **Given** [[STR-008]] 或 [[STR-009]]，**When** 调用，**Then** 走原改写流程，输出格式与输入一致，保真底线不变。
+2. **Given** 裸文本，**When** 调用，**Then** 它被执行而不是被改写；文档与命令说明写明迁移方式。
+
+### Edge Cases
+
+- 只有选项没有指令且无内容源：拒绝并给用法，不派发子代理。
+- 指令为空或纯空白：拒绝。
+- 子代理通道不可用：降级为会话内执行，报告以 [[STR-007]] 标明降级；不得冒充 [[STR-006]]。
+- 指令被用户中止：报告记录中止点与已完成部分，[[STR-001]] 写「已中止」，不得写完成。
+- 指令产出为空（无输出、无产物）：报告如实写「无可报告输出」，[[STR-003]] 写 `none`，不得编造证据。
+- 项目无 `.specify/` 治理文件：报告只列实际可得的来源，缺失项入 [[STR-004]]。
+- `--tone` 非法或 `--audience` 为空：沿用既有拒收语义，不静默替换。
+- `--output` 指向不可写路径：拒绝写入并报告，不产生部分文件。
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+#### A. 调用与输入解析
+
+- **FR-001**: `/speckit.humanize` MUST 接受两个位置语义：选项集（`--tone` / `--audience` / [[STR-008]] / [[STR-009]] / `--output` / `--force`）与**待执行指令**。选项之后的剩余文本 MUST 解释为待执行指令；裸文本 MUST NOT 再被解释为待改写内容。
+- **FR-002**: 当给出 [[STR-008]] 或 [[STR-009]] 时，输入 MUST 按显式备用内容源处理，受既有单输入源、扩展名与空输入拒收规则约束；本路径 MUST NOT 派发子代理执行任何内容。
+- **FR-003**: 当既无显式内容源、也无非空指令时，命令 MUST 拒绝并给出用法与迁移提示（裸文本→指令；改写文本→[[STR-008]]/[[STR-009]]），MUST NOT 猜测用户意图。
+- **FR-004**: `--tone` 的取值域与拒收语义、`--audience` 的自由文本语义、`--output` 的显式写入语义 MUST 沿用现有契约，本特性不改其取值域。
+- **FR-005**: 命令模板 MUST 在入口处写明破坏性变更：裸文本 = 指令；改写既有文本 MUST 显式使用 [[STR-008]] 或 [[STR-009]]；并给出一条迁移示例。
+- **FR-006**: 解析 MUST 是确定性的：同样的参数序列得到同样的解释，不依赖模型对内容的猜测；解析歧义（如内容源与非空指令同现）MUST 拒绝并点名冲突项。
+
+#### B. 指令执行
+
+- **FR-007**: 命令 MUST 为一次调用派发**恰好一个**子代理执行该指令；派发载体 MUST 记录为 [[STR-006]] 或降级时的 [[STR-007]]。
+- **FR-008**: 指令执行 MUST 遵循目标项目既有的确认门与权限边界；humanize MUST NOT 代替用户回答、绕过或自动确认破坏性动作。
+- **FR-009**: 命令 MUST 捕获并保留：子代理最终输出、产生的产物路径、可定位证据（读数/命令/退出码）、失败或中止信息；捕获面 MUST 足以支撑 [[STR-003]] 的证据引用。
+- **FR-010**: 命令 MUST NOT 自动重试失败的指令，MUST NOT 联网外发，MUST NOT 引入外部服务或模型 API。
+- **FR-011**: 宿主无原生派发通道时，命令 MAY 降级为会话内执行；降级 MUST 在报告中显式标注（[[STR-007]]），且不得把会话内执行的推断当作子代理的观测事实。
+- **FR-012**: 指令自身失败、超时或被拒绝时，命令 MUST 如实记录失败坐标与已完成部分；运行状态 MUST NOT 被叙述为成功。
+- **FR-013**: 命令 MUST NOT 把指令改写为自己的简化流程；执行体按指令原文与其所属命令/技能的既有契约执行。
+
+#### C. 上下文装配
+
+- **FR-014**: 生成报告前，命令 MUST 装配三类上下文：动作输出/证据、项目治理（`instructions` / `constitution` / `glossary` / Feature 注册表）、本次会话上下文。读取 MUST 按摘要优先，不得把机器管理的原始数据整文件注入。
+- **FR-015**: 报告 MUST 列出本次实际读取的上下文来源；未读取或不可得的来源 MUST 在 [[STR-004]] 显式声明缺失，MUST NOT 列出来源却未使用。
+- **FR-016**: 上下文补全 MUST 只使用已蕴含或可严格推出的信息；MUST NOT 引入新事实、新数字、新来源或新因果。
+- **FR-017**: 保真底线（事实/数字/单位/日期/名称/结论/因果/引文/代码/路径/URL/标识符）MUST 在报告与旧内容模式中同时生效。
+
+#### D. 报告生成
+
+- **FR-018**: 报告 MUST 按顺序包含五个固定小节：[[STR-001]]、[[STR-002]]、[[STR-003]]、[[STR-004]]、[[STR-005]]；缺任一小节即判不合格。
+- **FR-019**: [[STR-001]] MUST 给出可直接行动的总判断（成功/部分完成/失败/已中止）并先于细节；[[STR-002]] MUST 按影响排序列出关键变化或结果。
+- **FR-020**: [[STR-003]] MUST 为每条关键结论提供证据指针（产物路径、命令与退出码、测试读数或可定位引用），不得只写形容词。
+- **FR-021**: [[STR-004]] MUST 列出风险、限制、未验证项与缺失上下文；无已知风险时 MUST 显式写「无已知风险」，不得省略该节。
+- **FR-022**: [[STR-005]] MUST 给出可执行的下一步（或显式「无下一步」）；报告表达层 MUST 应用既有四维度自然化中的适用部分（去套话、补过渡、格式可读、语言一致），且服从保真底线与 `--tone`/`--audience`。
+
+#### E. 旧内容模式
+
+- **FR-023**: [[STR-008]] / [[STR-009]] 路径 MUST 保持既有的输入核验、格式一致、主语言判定、分段与四维度改写；本特性 MUST NOT 降低其保真或改写质量。
+- **FR-024**: 旧内容模式 MUST NOT 生成动作报告五节，也 MUST NOT 派发子代理；其输出缺省返回会话，`--output` 时按既有规则写入。
+- **FR-025**: 注入防护 MUST 在两种模式下同时生效（含 [[STR-008]] 与 [[STR-009]] 路径）：指令或内容中的指令式文本不得改变 humanize 自身的保真、拒收、零外传与零写入规则。
+
+#### F. 接线与兼容
+
+- **FR-026**: 命令模板、4 份工具副本、humanize 技能与 docs MUST 同步到新定位；工具副本 MUST 由既有再生成入口产出，MUST NOT 手改。
+- **FR-027**: 本特性 MUST NOT 新增 `/speckit.*` 命令，MUST NOT 新增阻断式确认门；门禁扫描以 `git diff` 新增行为判定单位，MUST 0 命中 `BLOCKING_PATTERNS`。
+- **FR-028**: 受影响的契约测试（humanize 命令面、expression 台账/门禁/wiring 中与本命令相关者）MUST 显式更新并注明日期与理由；MUST NOT 静默改计数或删除断言。
+- **FR-029**: Feature 062 MUST 保持 `Implemented` 状态；Feature 详情 MUST 记录本次扩展（Latest Review / Key Changes），索引 `Last Updated` MUST 同步。
+
+### Key Entities *(include if requirement involves data)*
+
+- **Humanize Run**: 一次调用，绑定指令、执行载体（子代理/会话内）、上下文来源集合与最终报告。
+- **Instruction**: 选项之后的待执行指令原文；执行体按原文与其所属契约执行。
+- **Action Result**: 子代理输出、产物路径、证据指针、失败/中止信息。
+- **Context Bundle**: 动作证据 + 项目治理 + 会话上下文；含每项的来源与可用性。
+- **Human Report**: 五节结构化报告（[[STR-001]]…[[STR-005]]）。
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: 夹具指令运行一次，子代理恰好执行一次（1/1，按派发记录）；报告五节（[[STR-001]]、[[STR-002]]、[[STR-003]]、[[STR-004]]、[[STR-005]]）按序齐备（5/5）。
+- **SC-002**: 报告结论与夹具输出一致；[[STR-003]] 的每条关键结论都有可定位证据（抽样 5 条，5/5）；来源清单（写入 [[STR-004]]）非空且与实际读取一致（1/1）。
+- **SC-003**: 失败夹具中 [[STR-001]] 明确写失败，全文无成功措辞（1/1，按固定词表检查）；[[STR-003]] 含失败证据（1/1）。
+- **SC-004**: 破坏性指令在确认被拒绝时不产生副作用（1/1），报告记录拒绝（1/1）。
+- **SC-005**: 旧模式回归——[[STR-009]] 与 [[STR-008]] 各跑一次，输出格式与输入一致且保真检查通过（2/2）；裸文本夹具被执行而非改写（1/1）。
+- **SC-006**: 接线一致性——命令模板 + 4 副本 + 技能 + docs 全部含新定位与迁移说明（5/5）；`regen-command-copies --check` 与镜像检查退出 0（2/2）；无新增命令（1/1）。
+- **SC-007**: 安全与写入——运行前后无网络外发（1/1）；无 `--output` 时仓库无新增/修改文件（1/1）；失败不触发重试（1/1）。
+- **SC-008**: Feature 062 在运行前后均为 `Implemented`，详情含扩展记录（2/2）；门禁新增行 0 命中（1/1）。
+
+### Measurement Sources & Collection Methods
+
+- **SC-001 Source**: 夹具运行的派发记录与报告文件；按小节标题解析。
+- **SC-002 Source**: 报告与夹具输出的逐条对照；证据路径存在性检查。
+- **SC-003 Source**: 失败夹具报告；固定词表扫描（成功/完成/通过等词在失败结论下不得出现）。
+- **SC-004 Source**: 需确认指令夹具 + 拒绝路径；副作用快照（`git status` / 目标文件哈希）。
+- **SC-005 Source**: [[STR-009]] / [[STR-008]] 回归夹具 + 裸文本指令夹具；保真差异脚本 `tests/fixtures/humanize/diff_protected.py`。
+- **SC-006 Source**: `git grep` 活接线面 + `regen-command-copies.py --check` + `sync-mirrors.py --check` + 命令清单对比。
+- **SC-007 Source**: 运行前后 `git status --porcelain` 与网络调用审计（无外部请求记录）；重试记录计数。
+- **SC-008 Source**: `features.md` / `features/062.md` 状态与详情；`scan-confirmation-gates.py` 新增行判定。
+
+## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*
+
+| String ID | Value (verbatim) | Consumed by |
+|-----------|------------------|-------------|
+| `STR-001` | `## Conclusion` | FR-018, FR-019, SC-001, SC-003 |
+| `STR-002` | `## Key Changes` | FR-018, FR-019, SC-001 |
+| `STR-003` | `## Evidence` | FR-018, FR-020, SC-001, SC-002, SC-003 |
+| `STR-004` | `## Risks & Limits` | FR-018, FR-021, SC-001, SC-002 |
+| `STR-005` | `## Next Steps` | FR-018, FR-022, SC-001 |
+| `STR-006` | `mode: subagent` | FR-007, 派发记录 |
+| `STR-007` | `mode: in-session-degraded` | FR-007, FR-011, Edge Cases |
+| `STR-008` | `--file` | FR-001, FR-002, FR-003, FR-005, FR-023, FR-025, SC-005 |
+| `STR-009` | `--inline` | FR-001, FR-002, FR-003, FR-005, FR-023, FR-025, SC-005 |
+
+**Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal.
+
+## Clarifications
+
+<!--
+This section will be populated by /speckit.clarify command with questions and answers.
+Format: - Q: <question> → A: <answer>
+-->
