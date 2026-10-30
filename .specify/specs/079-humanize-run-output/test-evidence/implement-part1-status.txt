@@ -1,0 +1,44 @@
+# Implement part 1/5 — stage status (T001–T008)
+
+date=2026-10-30
+stage=implement
+part=1/5
+feature=079-humanize-run-output
+base_commit=c6ac8c99
+scope=T001,T002,T003,T004,T005,T006,T007,T008
+selection_basis=targeted-set-v1
+
+command=.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py
+rc=1
+passed=163
+failed=12
+skipped=0
+new_failures=11
+sufficiency=partial — all segment-reachable clauses are green (IP-01…IP-10, EX-01…EX-05); the remaining reds are the recorded red-first frontier plus one attributable mirror-parity transient whose owner row has not run yet; no unexplained failure
+
+## E3 stage-status line
+
+`stage=implement part=1/5 selection=targeted-set-v1 command=".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py" rc=1 passed=163 failed=12 skipped=0 new_failures=11 sufficiency=partial-expected-frontier`
+
+## new_failures 归属（11 = 10 预期红先行 + 1 可归属的镜像同步暂态）
+
+| # | 失败名 | 归属 | 说明 |
+|---|--------|------|------|
+| 1–5 | `test_humanize_command_surface.py::test_ex06…test_ex10` | 预期红先行（T009 / T010 行） | § Payload / § Envelope 尚未落笔；本段范围止于 T008 |
+| 6–9 | `test_humanize_command_surface.py::test_rp01…test_rp04` | 预期红先行（T011 行） | `references/report-shape.md` 尚未创建 |
+| 10 | `test_humanize_command_surface.py::test_wc01_template_declares_breaking_change` | 预期红先行（T012 行） | 命令模板仍为 062 口径 |
+| 11 | `test_expression_compatibility.py::test_c7_mirrors_are_byte_identical` | 可归属暂态 → **T028** | 报错原文：`.specify/skills/humanize/SKILL.md — mirror differs from skills/external/humanize/SKILL.md`。镜像由 `sync-mirrors.py --write` 再生成，唯一再生成行是 T028（本段禁止手改或提前再生成派生面）。SKILL.md 与 `references/run-mode.md` 落定后再生成即转绿 |
+
+## 已知基线失败（不计入 new_failures）
+
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— 在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条 E2 基线内；本段未改测试来掩盖。
+
+## 补充定向运行（同一 E3 会话，不改判定）
+
+command=.venv/bin/python -m pytest -q tests/contract/test_feedback_command_classification.py tests/contract/test_flow_class_correctness.py tests/contract/test_flow_class_ledger.py tests/contract/test_migration_distribution.py tests/contract/test_run_skills_wiring.py
+rc=0 passed=77 failed=0 skipped=0
+
+## 未跑的东西（如实声明）
+
+- **全量套件未重跑**：E2 已在 implement 起点消耗（17 failed / 6881 passed / 7 skipped，998s），本文件不重捕获。
+- `notes/red-first-evidence.md` 的红态读数来自 T005 落笔后、T006–T008 落笔前的真实运行（实现文档临时移出后跑、跑完还原）。
