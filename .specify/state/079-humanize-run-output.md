@@ -1,16 +1,16 @@
 # Line State — 079-humanize-run-output
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 run_id: r20261030T110000Z-079a
 slice: 079
-stage: closure (post-review full suite)
+stage: done
 stage_started_at: 1793377872
 stage_deadline_epoch: 1793383272
 stage_base_commit: 03ce8e25
 attempt: 0
 retry_limit: 2
-last_verdict: review P0=1/P1=8; review-repair done (F1 evidence binding PASS, F2 wording, F4 limitation); closure running
+last_verdict: MERGED to master (fast-forward) locally; branch deleted; line deregistered (closed); NOT pushed (no authorization for 079). closure 19 failed vs baseline 17: only 2 new, both 077 pilot date-rollover attributed to environment (test file unchanged); budget audit baseline:1 closure:1 reruns:1; stages=6 complete=6; status=ok.
 <!-- plan-constraint: active activated_at=2026-10-30T11:08Z plan_commit=201ace01 approved_baseline_commit=35ff11bc -->
 <!-- test-budget:begin -->
 {"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "implement-start baseline", "trigger": "implement start", "at": "2026-10-30T13:20Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/079-humanize-run-output/baseline-failed.txt", "selection_basis": "full-suite", "rc": 1, "passed": 6881, "failed": 17, "skipped": 7, "failed_names_path": ".specify/specs/079-humanize-run-output/baseline-failed.txt", "evidence_ptr": ".specify/.tmp/sdd-loop/079-humanize-run-output/baseline-run.log"}
@@ -28,7 +28,7 @@ last_verdict: review P0=1/P1=8; review-repair done (F1 evidence binding PASS, F2
 - base_sha: `35ff11bc`（clarify 收尾）
 - trunk: `master`
 - topology: `local`（宿主原生子代理；不启动 qodercli）
-- state: `running`
+- state: `completed`
 
 ## U0 入口声明
 
@@ -97,3 +97,13 @@ last_verdict: review P0=1/P1=8; review-repair done (F1 evidence binding PASS, F2
 1. 授权一次**计划内传播修复**（推荐）：tasks T010 六值→七值并补 `denied` 语义、T004 增 `denied/envelope.md`、T019/T013 增拒绝断言、SC-004 行补承载测试、quickstart S6/§8 补拒绝场景，顺带修 M-22/M-23/L-01；随后跑 analyze 第三轮（人工授权的例外，不属自动回环）。
 2. 把 H-06 记为实现前必修注记，带风险进入 implement（不推荐）。
 3. 暂停该线，保留工件与状态脊，人工评审后重入。
+
+## U6 收尾（2026-10-31）
+
+- **合并**：`079-humanize-run-output` 快进合并到 `master`（本地）；**未 push**——本次入口未授权推送。
+- **分支清理**：本地分支已删除（`git branch -d`，合并后才允许）；远端无该分支。
+- **写线登记**：注销为 `closed`。
+- **closure 判定**：基线 17；首轮 20（+2 代码回归 +2 系统日期），修复后 in-slot 重跑 19——仅 2 条新增，均为 077 pilot 的 `as-of-stale` 环境日期边界（测试文件相对基线零改动），已留证 `test-evidence/closure-environment-attribution.txt`；预算审计通过。
+- **Feature 062**：`Implemented` 保持；名称/描述更新为「动作输出人类友好化」；扩展记录已入详情与索引。
+- **SC 状态**：8 pass / 2 partial（SC-001、SC-004 的原生派发腿不可复现，已如实记录）。
+- **工作树归档判定**：归零（运行记录、E2/E3 账本、全量日志、环境归因均已归档提交）。
