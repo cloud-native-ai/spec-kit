@@ -1,5 +1,5 @@
 ---
-description: 跑一条指令并给出一份人读的五节报告；或按 --file / --inline 把内容改写得像人写的，事实逐字保全
+description: 跑一条指令并给人读五节报告；或按 --file/--inline 改写内容，事实逐字保全
 ---
 <!-- AUTO-GENERATED from templates/commands/humanize.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
 ## User Input

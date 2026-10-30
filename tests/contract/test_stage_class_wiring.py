@@ -98,12 +98,13 @@ BASELINE_SHA256 = {
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
-# humanize re-measured 2026-10-31 (079 WC-13): the template was rewritten by
+# humanize re-measured 2026-10-31 (079 WC-13): the template was rewritten by 079,
+# then its short-description was shortened to satisfy the 50-char frontmatter guard.
 # feature 079 (run-then-report repositioning + breaking-change/migration block),
 # so its pinned bytes move with that rewrite; docs is untouched.
 UNCHANGED_SHA256 = {
     "docs": "3684c30ed841ab4256e4c30ff9382f769ccc1f68713b94e7c1ccd4832c0407c9",
-    "humanize": "dd7c77efb1848ad088c4c5c2d930cd05cefc14a8d7ad183bf555d98ac6bb4a27",
+    "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
 }
 
 

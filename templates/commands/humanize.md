@@ -1,6 +1,6 @@
 ---
 description: Run one instruction through exactly one temporary executor and return a five-section human report (run mode, the default), or rewrite given content so it reads as naturally human-written (content mode, selected by --file / --inline) — every fact, number, unit, date, name, quote, code token, path, URL and version stays verbatim. Use this when the user mentions ["跑这条指令并给我报告", "执行这条指令", "动作输出报告", "五节报告", "run this and report back", "instruction to report", "humanize run", "人性化改写", "改写", "humanize", "去掉 AI 味", "改得像人写的", "make it sound human", "natural rewrite", "润色", "语气改写", "--file 改写", "--inline 改写"].
-short-description: 跑一条指令并给出一份人读的五节报告；或按 --file / --inline 把内容改写得像人写的，事实逐字保全
+short-description: 跑一条指令并给人读五节报告；或按 --file/--inline 改写内容，事实逐字保全
 ---
 
 ## User Input
