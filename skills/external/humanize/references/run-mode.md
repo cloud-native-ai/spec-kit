@@ -157,3 +157,14 @@
 
 - **拒绝路径零副作用**：任何拒绝路径 MUST NOT 产生派发、MUST NOT 留下占位、MUST NOT 写入任何文件；拒绝消息 MUST 含原因码对应的点名要素（owner = `data-model.md` § E2 `reject_code` 表）。
 - **派发记录口径**：`## Evidence` 的 `dispatches:` 行只计 humanize 发起的顶层派发（原生 `1` / 降级 `0`）；指令自身再发起的派发归该指令单元，MUST NOT 重复计数。计数口径的 owner 是 `contracts/execution-dispatch.contract.md` EX-21，报告面落点见 `report-shape.md` § Evidence。
+
+## Output
+
+运行模式给 `--output` 时 MUST 写出一份完整五节报告；未给 `--output` 时报告只回会话（零写入，见 § Envelope）。
+
+- **扩展名封闭集**：运行模式的目标扩展名只有 `.md` / `.markdown` / `.txt`（大小写不敏感）；集合外拒绝为 `bad-extension` 并点名该值与支持集合。运行模式没有输入格式可对齐，MUST NOT 复用内容模式的「扩展名跟随输入」规则。
+- **写入内容**：写入的 MUST 是与目标内容一致的完整五节报告，并在五个 H2 之前包含载体标记行、`verdict:` 行与 `dispatches:` 行（行格式与取值口径的 owner 是 `references/report-shape.md`）。MUST NOT 写入迁移提示行——迁移提示是调用级会话通知（§ Migration Hint）。
+- **会话回显**：写文件后会话 MUST 回显一份摘要；摘要只作索引，MUST NOT 替代报告，MUST NOT 成为报告的第六节。
+- **原子写**：写入 MUST 是原子写——先在同目录写临时文件，再重命名到目标；失败时删除临时文件。
+- **覆盖与失败**：目标已存在且未给 `--force` → 拒绝覆盖，目标逐字节不变；目标不可写（父目录缺失、权限不足）→ 拒绝，删除临时文件，不留部分文件，既有目标逐字节不变。
+- **内容模式不变**：内容模式的 `--output` 语义完全不变——扩展名与输入格式族一致、文件只含改写文本（见 `SKILL.md` Stage 7 与 IP-17）。
