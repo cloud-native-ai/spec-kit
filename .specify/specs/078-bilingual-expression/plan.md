@@ -211,7 +211,7 @@ tests/fixtures/bilingual/                        # 夹具（合规/全角违规/
 | 读者基准 | `.specify/shared/guidelines/user-facing-comprehension.md` | § 基准读者与覆盖协议 |
 | 词汇表登记协议 | `shared/workflow/glossary.md` | 整文件（协议即判据） |
 | 跨文档一致性判定基准（词条） | `.specify/memory/glossary.md` | Canonical 列 |
-| 检查器行为（入口/退出码/扫描规则/判定边界） | `scripts/python/bilingual-expression-check.py` + `contracts/checker.md` | 整文件（代码与契约并读） |
+| 检查器行为（入口/退出码/扫描规则/判定边界） | `scripts/python/bilingual-expression-check.py` | 整文件（代码与契约并读；行为契约 contracts/checker.md 并参） |
 | SC 测量程序 | `.specify/specs/078-bilingual-expression/contracts/measurement.md` | 整文件 |
 | ambient 小节形态 | `templates/instructions-template.md` | § Bilingual Expression (双语表述) |
 | 镜像对清单 | `scripts/python/sync-mirrors.py` | `MIRROR_PAIRS` 常量 |

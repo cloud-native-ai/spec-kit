@@ -348,18 +348,16 @@ def test_drift_str_literal_unique_consumers():
     assert violations == [], f"STR literals escaped their unique consumption points: {violations}"
 
 
-def _mirror_pairs() -> list[tuple[str, str]]:
+def _mirror_pairs() -> list[tuple[str, str, object, object]]:
     sync_mirrors = _load_module(SYNC_MIRRORS, "sync_mirrors_for_drift_guard")
-    return [(src, dst) for src, dst, _strict, _excl in sync_mirrors.MIRROR_PAIRS]
+    return list(sync_mirrors.MIRROR_PAIRS)
 
 
 def _mirror_path_for(source_rel: Path) -> Path | None:
     """Derive the mirror destination for a framework-source path from
     ``sync-mirrors.py`` MIRROR_PAIRS (never a hardcoded mapping)."""
     source_posix = source_rel.as_posix()
-    for src_root, dst_root, _strict, exclude_parts in [
-        (s, d, st, ex) for s, d, st, ex in _mirror_pairs()
-    ]:
+    for src_root, dst_root, _strict, exclude_parts in _mirror_pairs():
         parts = Path(source_posix).parts
         if any(part in exclude_parts for part in parts):
             continue
