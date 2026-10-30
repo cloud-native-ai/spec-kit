@@ -5,5 +5,5 @@ status: ok
   [ref-resolvable] pass (0)
   [marker-count] pass (0)
   [dup-id] pass (0)
-scanned: 218 lines, 40 definition rows, 10 shared strings
+scanned: 271 lines, 40 definition rows, 15 shared strings
 0 error(s), 0 warning(s)

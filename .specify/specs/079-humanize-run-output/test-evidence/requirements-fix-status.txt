@@ -1,0 +1,48 @@
+# Requirements-fix stage status — Feature 079（analyze 回环修复轮 1/1）
+
+date=2026-10-30
+stage=requirements-fix (analyze loop 1/1)
+base_commit=2cc53ea4
+status=not-run-docs-only
+reason=本阶段只改写 requirements.md（及其 checklist 头部计数与 Shared Strings 登记），不改 plan / data-model / contracts / quickstart / tasks，不改任何可执行面与接线文件；测试预算按 docs-only 处理。
+
+runnable-checks-executed=
+  test-evidence/validate-requirements.txt      exit 0（status=ok；40 definition rows；15 shared strings）
+  test-evidence/decomposition-check.json       exit 0（proceed；fr_count=30，ceiling=30）
+  test-evidence/pre-analyze-check.txt          exit 0（decision=pass；errors=0；advisories=21，全部为既有 missing-path 建议，与修复前相同）
+test-run=not run at this stage
+next=plan/contracts 与 tasks 修复轮按 analyze-fix-brief 的归属推进；本文件末节列出跨轮交接点
+
+## Items closed on the requirements side
+
+- H-01：FR-019 独占 verdict 封闭集（`success` / `partial` / `failure` / `aborted` / `needs-confirmation`）、status→verdict 映射与呈现形态（首行 `verdict: <token>` 英文 token + 报告语言措辞）；STR-012/013/014/015 登记。RP-05 / E7 改为引用 FR-019（plan/contracts 轮）。
+- H-02：新增 § Wiring Surface — A11 Closed Set，拥有无限制发现命令（基线提交上的 `git grep -l -i humanize`）、五类分类规则与类义务、无「其他」桶、四项闭环守卫；A11 与 SC-006 指向该节，分母改为实测重算（L/F），补集断言为 `git diff --quiet`。MUST NOT 委托给 tasks.md。
+- H-03：FR-025 覆盖指令原文、内容源、执行体回传 `final_output` / `evidence` / `products` 与产物内容；SC-010 增第三组回传样本（3 组 × 4 断言 = 12/12）。
+- H-04：新增 § Failure Wording — Closed Banned Vocabulary（zh/en 封闭词表 + 先剥离允许短语、最长优先的确定性匹配规则），解决「完成」与「部分完成」子串冲突；SC-003 与 Measurement Sources 引用该节。
+- M-01：FR-011 MAY→MUST；「无通道」由 run-agent 模式选择判定；降级派发计数 0（`dispatches: 0`）+ 一条降级记录（STR-007）。
+- M-02：FR-030 限定运行模式；「同一仓库」= git 工作树根；观察载体 = `.specify/.tmp/humanize/<run_id>.run`（24h TTL、gitignored、离开即移除）；三类拒绝点名要素写死；SC-009 扩展为 9 条断言覆盖三类拒绝与内容模式豁免。
+- M-05：FR-004 的 `--output` 语义收窄到内容模式；运行模式扩展名集由 FR-024 独占。
+- M-06：`--audience` 空/纯空白 = 未提供（不拒收）；与 `--tone` 空值拒收区分。
+- M-08：FR-014/015 定义 `read` / `not-read` / `unavailable` 的可观察语义（摘要/行投影/段落摘录入装配上下文），删除 `used` 独立判据；会话上下文同取三态。
+- M-09：status `denied`（STR-014）→ verdict `aborted` + 「用户拒绝确认」文案 + 未执行范围。
+- M-10：允许转达（请求与答复原话），转达 ≠ 代答；执行体取不到答复时 fail-closed。
+- M-11：超时定义与阈值归执行载体/宿主；humanize 不自设阈值；无信号时声明不可判。
+- M-13：A7 语言域封闭为 `zh` / `en`，顺位指令→治理→回退 `en`，回退在 `## Risks & Limits` 声明；第三书写系统按回退处理且原文逐字保留；FR-018 承载该规则。
+- M-14：运行模式 `--output` 写完整五节 + 元数据行（载体/verdict/派发记录）；迁移提示仅会话回显一次、不写入文件。
+- M-15：`## Key Changes` 排序用封闭影响尺（用户可见行为 > 接线/接口 > 文档与记录；并列按文件路径字典序）。
+- M-16：`none` 只替代证据指针与产物清单，派发记录行保留。
+- M-18：SC-002 抽样规则固定（分母 = 报告 `## Key Changes` 条目；≤5 全量，>5 取前 5，按报告顺序不挑选）。
+- A4 提示语言：迁移提示声明为语言不变的固定通知。
+- 派发键名：STR-011 `dispatches:` 登记并由 FR-007 / SC-001 引用（RP-08 / EX-21 在 plan/contracts 轮改为引用）。
+
+## Decisions taken without asking（访谈式问题的自行裁决）
+
+- M-02 的三类拒绝未新增 SC-011：SC 定义数被 plan / tasks / checklist 的既有计数钉扎，而本阶段不得修改 plan / tasks；覆盖并入已拥有拒收面的 SC-009（9 条断言），记录在 Clarifications。
+- verdict 呈现形态选「英文 token + 本地化措辞」双面：token 供测试与契约判定，措辞供读者。
+- `--audience` 空值选「视为未提供」而非新增 reject code：与 062 既有「自由文本、只作用于表达层」最小偏离。
+
+## Handoff to the next repair rounds（不改其属主制品）
+
+- plan/contracts 轮：RP-05 / E7 引用 FR-019；E2 / E6 对齐 status 集与上下文三态；CM-06 引用扩展后的 FR-025；IP-16 与 FR-024 对齐；RP-02 与 FR-024 对齐（文件内不写迁移提示）；plan 索引中的 Shared Strings 计数由 10 更新为 15。
+- tasks 轮：GATE-3 的 Shared Strings 期望值由 10 更新为 15；A11 的 7-path grep 改为 § Wiring Surface 的无限制发现 + 分类；SC-006 的分母改为 L/F 实测值；M-03 / M-21 按简报处理。
+- 证据面：analyze-fix-brief.md 与 analyze-stage-status.txt 仍为上一阶段未跟踪证据，本阶段未提交（既有脏文件不提交不还原）。
