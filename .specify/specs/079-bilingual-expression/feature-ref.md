@@ -1,7 +1,7 @@
 # Feature Reference: 双语表述（Bilingual Expression）
 
-**Bound Feature**: Feature 078 双语表述（Bilingual Expression）——`.specify/memory/features/078.md`，索引行 `.specify/memory/features.md`
-**Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+**Bound Feature**: Feature 079 双语表述（Bilingual Expression）——`.specify/memory/features/079.md`，索引行 `.specify/memory/features.md`
+**Spec**: `.specify/specs/079-bilingual-expression/` | **Date**: 2026-10-30
 **本 plan 的映射**：18 条 FR → 设计落点；5 条 SC → 证据来源。Feature 状态由本阶段推进 `Draft → Planned`（`Implemented` 归 `/speckit.implement`）。
 
 ## FR → 设计落点
@@ -24,8 +24,8 @@
 | FR-014 | 漂移守卫 = 契约测试（`contracts/distribution.md` C-006） |
 | FR-015 | Scope：交付物清单即 owner 文档 + ambient + 检查器 + 测试 + 登记（plan § Project Structure；无运行时/服务） |
 | FR-016 | 存量差异清单化（E6，`data-model.md`；`contracts/checker.md` C-010；测量 `contracts/measurement.md` C-003/C-006） |
-| FR-017 | Feature 登记（本阶段 `features.md` 078 行 `Draft → Planned` + `features/078.md` 阶段记录） |
-| FR-018 | ID 登记（`register.md` 登记 T-001…T-004 与四份契约 35 条 C- 条款号，`contracts/measurement.md` C-008） |
+| FR-017 | Feature 登记（本阶段 `features.md` 079 行 `Draft → Planned` + `features/079.md` 阶段记录） |
+| FR-018 | ID 登记（`register.md` 登记 T-013…T-016 与四份契约 35 条 C- 条款号，`contracts/measurement.md` C-008） |
 
 ## SC → 证据来源
 
@@ -39,6 +39,6 @@
 
 ## 绑定关系
 
-- Feature 078 为新建 Feature（requirements § Related Feature 绑定，reuse-first 复核 014/018/Glossary/instructions 机制/069 均无归属）。
-- 本 plan 不新建/合并/废弃其他 Feature；`features.md` 只改 078 行的 Status 与 Last Updated。
-- 规格路径保持 `.specify/specs/078-bilingual-expression/requirements.md` 不变。
+- Feature 079 为新建 Feature（requirements § Related Feature 绑定，reuse-first 复核 014/018/Glossary/instructions 机制/069 均无归属）。
+- 本 plan 不新建/合并/废弃其他 Feature；`features.md` 只改 079 行的 Status 与 Last Updated。
+- 规格路径保持 `.specify/specs/079-bilingual-expression/requirements.md` 不变。

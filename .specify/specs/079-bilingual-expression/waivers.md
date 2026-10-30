@@ -1,4 +1,4 @@
-# 078 Checklist 豁免门裁决 — bilingual-convention-2026-10-30.md（35 条）
+# 079 Checklist 豁免门裁决 — bilingual-convention-2026-10-30.md（35 条）
 
 **裁决阶段**：implement Part 4（T019 checklist 豁免门；2026-10-30T12:10Z）
 **裁决口径**：每条给 satisfied（由具名工件闭合）或 waiver（风险显式接受）；逐条 grounding 到唯一 owner 路径。
@@ -8,7 +8,7 @@
 
 - CHK001 satisfied — 覆盖判定完全由 FR-007 封闭集决定；封闭集之外显式不受约束（owner 文档 § 覆盖定义面「清单本身之外的面不受约束」），非 silently unconstrained。
 - CHK002 satisfied — 无面归属的定义处的程序 = 经 owner 文档修订封闭集（owner 文档 § 覆盖定义面「封闭集增删只能经本文件修订」）。
-- CHK003 satisfied — owner 文档 § 检查器与守卫 C-01 行：`--scope full` 输入规模（数十文件线性读取、亚秒至秒级）+ census 墙钟 >60s 重开条件（T-004）。
+- CHK003 satisfied — owner 文档 § 检查器与守卫 C-01 行：`--scope full` 输入规模（数十文件线性读取、亚秒至秒级）+ census 墙钟 >60s 重开条件（T-016）。
 - CHK004 satisfied — owner 文档头部示范声明（C-02）：本文件自身定义行按登记逐字形态示范双语（声明：是）。
 - CHK005 satisfied — owner 文档头部 Shared Strings 维护协议（C-03）：STR 字面量增改归 requirements.md 修订；消费点由契约测试漂移守卫核验。
 
@@ -32,7 +32,7 @@
 ## Measurability
 
 - CHK017 satisfied — SC-002 分母操作化为 changed-path 信号行（plan 裁决 `--scope changed`；T010 实测 205 信号行、新写内容合规率 100%，22 findings 全分类为非新写内容）。
-- CHK018 satisfied — plan T-004 裁决 100% census 不做抽样（重开条件 = 墙钟 >60s 实测）；T015 受控语料端到端验证。
+- CHK018 satisfied — plan T-016 裁决 100% census 不做抽样（重开条件 = 墙钟 >60s 实测）；T015 受控语料端到端验证。
 - CHK019 satisfied — 关键词表程序派生自 owner 文档四组枚举（measurement C-001/C-002；us9 快照含 as-of 日期与可重放命令；T018 S7 复跑一致）。
 - CHK020 satisfied — SC-003 判定标准逐字成文（小节标题逐字 / 枚举关键词零命中 / [[STR-001]] 指针），T013 pilot 实测 ≥1 次。
 - CHK021 satisfied — SC-004 白名单封闭可枚举（tasks T014 六类；us14 审计 69 文件全数落白名单、白名单外修改行数 0）。
@@ -45,12 +45,12 @@
 - CHK025 satisfied — owner 文档范围声明（C-06）：只约束 zh/en 主语言文档，其他主语言文档不在封闭集内。
 - CHK026 satisfied — 标题语言与文档主语言不一致时按 C-04 层级（声明优先 → 保守缺省），豁免面/方向规则不受标题单语影响。
 - CHK027 satisfied — owner 文档 C-07 行：未知动作/缺参/路径不存在/文件不可读/owner 清单畸形/词汇表缺失一律退出码 2，不静默跳过（T018 S3b 实测 coverage --path rc=2）。
-- CHK028 satisfied — 新信号的登记程序 = owner 文档修订（封闭集增删只能经本文件修订）；登记前 findings 归评审面（C-05 warning 形态 + us11 抽样），检查器不接线门禁（FR-010/T-003）。
+- CHK028 satisfied — 新信号的登记程序 = owner 文档修订（封闭集增删只能经本文件修订）；登记前 findings 归评审面（C-05 warning 形态 + us11 抽样），检查器不接线门禁（FR-010/T-015）。
 
 ## Dependencies & Assumptions
 
-- CHK029 satisfied — 全部 deferral 具名决定阶段与义务：FR-010 退出码（plan/checker 契约）、FR-014 漂移守卫形态（T002 测试三腿）、SC-005 抽样比例（plan T-004 100% census），无无主的 deferral。
-- CHK030 satisfied（I-01 处置）— A2/A4 重开条件的监控挂载：显式 inert-by-design + 具名触发器。A2（oracle 升级）触发器 = 每阶段派发的 flow-class-check 再基线（既有机制，requirements 期 re-baseline 已实测发生一次）；A4（用户明示全角优先）触发器 = 用户指令（无被动传感器可行，inert-by-design）；T-001…T-004 重开条件常驻 register.md（status=active），review 阶段 Decision Tensions 复核可见。本行即 I-01 的成文处置。
+- CHK029 satisfied — 全部 deferral 具名决定阶段与义务：FR-010 退出码（plan/checker 契约）、FR-014 漂移守卫形态（T002 测试三腿）、SC-005 抽样比例（plan T-016 100% census），无无主的 deferral。
+- CHK030 satisfied（I-01 处置）— A2/A4 重开条件的监控挂载：显式 inert-by-design + 具名触发器。A2（oracle 升级）触发器 = 每阶段派发的 flow-class-check 再基线（既有机制，requirements 期 re-baseline 已实测发生一次）；A4（用户明示全角优先）触发器 = 用户指令（无被动传感器可行，inert-by-design）；T-013…T-016 重开条件常驻 register.md（status=active），review 阶段 Decision Tensions 复核可见。本行即 I-01 的成文处置。
 - CHK031 satisfied — STR 消费方封闭枚举由漂移守卫腿 (i) 白名单钉死（owner 文档 + ambient + 检查器常量三面），新增消费方 MUST 先改守卫（C-03）。
 - CHK032 satisfied — glossary-utils 只读复用、行为零改动（T004/T015 复用实测；检查器以其文件位置加载不改其代码）。
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Deterministic mechanical guard for Feature 078 bilingual-expression.
+"""Deterministic mechanical guard for Feature 079 bilingual-expression.
 
-Behavior contract: ``.specify/specs/078-bilingual-expression/contracts/checker.md``
+Behavior contract: ``.specify/specs/079-bilingual-expression/contracts/checker.md``
 (C-001..C-012). Rule owner (signals / coverage faces / unique form / exemption
 faces): ``shared/guidelines/bilingual-expression.md`` — read at runtime; no
 rule enumeration is embedded in this script (One Source Of Truth).
@@ -57,7 +57,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 OWNER_DOC_REL = "shared/guidelines/bilingual-expression.md"
 GLOSSARY_REL = ".specify/memory/glossary.md"
 GLOSSARY_UTILS_REL = "scripts/python/glossary-utils.py"
-E6_REL = ".specify/specs/078-bilingual-expression/test-evidence/us10-e6-legacy-divergence.txt"
+E6_REL = ".specify/specs/079-bilingual-expression/test-evidence/us10-e6-legacy-divergence.txt"
 
 COVERAGE_HEADING = "## 覆盖定义面（封闭集）"
 SIGNAL_HEADING = "## 定义处与可判定信号"

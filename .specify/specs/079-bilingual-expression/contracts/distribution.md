@@ -1,6 +1,6 @@
 # Contract: 分发与两顶帽子（Distribution）
 
-**Feature**: 078-bilingual-expression
+**Feature**: 079-bilingual-expression
 **Spec**: [requirements.md](../requirements.md)
 **Owner 指针**：镜像对清单归 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对）；
 instructions 生成归 `scripts/bash/generate-instructions.sh`；两顶帽子归

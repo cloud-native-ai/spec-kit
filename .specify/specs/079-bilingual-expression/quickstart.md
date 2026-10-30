@@ -1,6 +1,6 @@
 # Quickstart: 双语表述（Bilingual Expression）
 
-**Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+**Spec**: `.specify/specs/079-bilingual-expression/` | **Date**: 2026-10-30
 **执行-verify 说明**：本文件每个命令示例标注「本次实测」（本 plan 会话已原样执行，输出摘录）或「Pinned by」（尚不存在实现，由具名契约测试钉住，premises 已列出）。检查器在 plan 期不存在，其示例一律 Pinned by `tests/contract/test_bilingual_expression.py`（red-first，implement 交付）。
 
 ## S1 约定核对（读者面，无命令）

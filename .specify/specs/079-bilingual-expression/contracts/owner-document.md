@@ -1,6 +1,6 @@
 # Contract: 约定本体 owner 文档（Owner Document）
 
-**Feature**: 078-bilingual-expression
+**Feature**: 079-bilingual-expression
 **Spec**: [requirements.md](../requirements.md)
 **Owner 指针**：双语规则的六组事实（方向、形态、覆盖面、豁免、一致性、迁移）唯一 owner 是
 `shared/guidelines/bilingual-expression.md`（[[STR-001]]）；读者基准归

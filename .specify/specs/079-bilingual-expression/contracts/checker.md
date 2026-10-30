@@ -1,6 +1,6 @@
 # Contract: 确定性检查器（Checker）
 
-**Feature**: 078-bilingual-expression
+**Feature**: 079-bilingual-expression
 **Spec**: [requirements.md](../requirements.md)
 **Owner 指针**：定义处信号清单归 [[STR-001]] § 定义处与可判定信号；豁免面归其 § 豁免面；
 词汇表读取协议归 `scripts/python/glossary-utils.py`。本契约钉检查器的**行为契约**（入口、退出码、

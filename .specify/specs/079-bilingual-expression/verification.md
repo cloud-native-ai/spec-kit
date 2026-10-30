@@ -1,10 +1,10 @@
-# Verification Log — 078-bilingual-expression
+# Verification Log — 079-bilingual-expression
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changes the tree) --
 
 baseline_commit=cc508bfe
 baseline_date=2026-10-30
-baseline_branch=078-bilingual-expression
+baseline_branch=079-bilingual-expression
 
 baseline_checker_finding_codes=4 (full-width-parens / same-language-bracket / missing-bilingual / coverage-missing)
 baseline_docs_utils_violations=4 (broken-link 3 + note-frontmatter 1)
@@ -33,37 +33,37 @@ review_fix_round=important 1 条已答复并本轮回落地（S1 解析缺口修
 review_targeted_set=tests/contract/test_bilingual_expression.py 16 passed / 0 failed（targeted-set-v1，E3 review.jsonl stage-status）
 
 sample_id=SC-001
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us9-sc001-keyword-snapshot.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us9-sc001-keyword-snapshot.txt
 evidence_sha256=78f95b750cfe125bd1eeb815f964f721d0f5fb24a842eae15db6511f9a4c7a3f
 verdict=pass
 
 sample_id=SC-002-implement-face
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us10-sc002-changed-scope.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us10-sc002-changed-scope.txt
 evidence_sha256=aa597df8c916c0361cfc1eb9a840642814fb8ac248922fa5c8d0f0ee4195552c
 verdict=pass
 
 sample_id=SC-002-review-face
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us18-sc002-review-recheck.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us18-sc002-review-recheck.txt
 evidence_sha256=319aa06bfa163c24f5ca425ab8e4347725d48425eeeceaa88da425f6a63f4945
 verdict=pass
 
 sample_id=SC-003
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us13-sc003-pilot.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us13-sc003-pilot.txt
 evidence_sha256=1d10ce23ecb99f2743324d23406f9affefb598a9c9695b52306a6d68a5e4d93e
 verdict=pass
 
 sample_id=SC-004
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us14-sc004-diff-audit.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us14-sc004-diff-audit.txt
 evidence_sha256=3d7e46d353ebbeac18fb219c35553806823bea431eaf7ba973edc57fc9cf207a
 verdict=pass
 
 sample_id=SC-005-implement-face
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us15-census-controlled.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us15-census-controlled.txt
 evidence_sha256=694bccbf6c4d191fa04bb54b56789189cb1e036ea8fc2697f1af7faac317f7cd
 verdict=pass
 
 sample_id=SC-005-review-face
-evidence_path=.specify/specs/078-bilingual-expression/test-evidence/us19-sc005-census-live.txt
+evidence_path=.specify/specs/079-bilingual-expression/test-evidence/us19-sc005-census-live.txt
 evidence_sha256=85b2930f7e60749d07764ae7b521f7210425bbdb5e8c372b8ce6aaaebd9a27a3
 verdict=pass
 

@@ -1,7 +1,7 @@
-"""Contract tests for Feature 078 bilingual-expression (red-first, T002).
+"""Contract tests for Feature 079 bilingual-expression (red-first, T002).
 
 Owns the assertions pinned by
-``.specify/specs/078-bilingual-expression/contracts/{owner-document,checker,distribution}.md``
+``.specify/specs/079-bilingual-expression/contracts/{owner-document,checker,distribution}.md``
 and quickstart.md S2/S3/S7/S8. Legs:
 
 * owner-document structure leg (T003 turns green): plan.md § Document Structure

@@ -1,6 +1,6 @@
 # Requirements Specification: 双语表述（Bilingual Expression）
 
-**Requirement Branch**: `078-bilingual-expression`
+**Requirement Branch**: `079-bilingual-expression`
 **Created**: 2026-10-30
 **Status**: Draft
 **Flow Class**: expression
@@ -11,10 +11,10 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: 078
+**Feature ID**: 079
 **Feature Name**: 双语表述（Bilingual Expression）
 
-**绑定结论**：绑定**新建 Feature 078**（`Draft`，2026-10-30 立项）；登记行与详情文件随本阶段落盘。**不**把本规格挂到任何既有 Feature 名下。
+**绑定结论**：绑定**新建 Feature 079**（`Draft`，2026-10-30 立项）；登记行与详情文件随本阶段落盘。**不**把本规格挂到任何既有 Feature 名下。
 
 **reuse-first 复核（宪法 VII；判据是「该 Feature 是否已拥有本特性要建立的能力」，不是「是否持有交付载体」）**：
 
@@ -57,7 +57,7 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 - **A3（Flow Type = `technique-document`）**：本线主交付物是框架自身的写作技术规范，属 owner 封闭集中的技术文档；`user-manual` / `reference` / `runbook` / `design-note` 均不贴合（约定不是给用户/运维/设计的说明）。
 - **A4（唯一形态裁决：半角括号、无前置空格；承重决策）**：唯一形态定为 `中文(English)` 与 `English(中文)`——半角括号、括号紧贴两侧词条、括号内为另一语言。最强反题：仓内 EN-first 全角形态量级更大（M-2 = 1383 处）。裁决依据 Grounded Naming 来源顺序：**用户输入最高优先**——用户原文逐字以半角书写两种方向；全角形态是自发实践、非用户裁决。预期反指标：既有 1383 处全角形态在新约定下全部不合规——这正是现状锚点要暴露的缺陷而非迁移负担（FR-006 不追溯）。重开条件：用户明示全角优先。
 - **A5（词汇表 Canonical 双语化）**：以中文为主的项目词汇表，新增/修订条目的 Canonical 采用 `中文(English)` 形态；纯英文专名（如 Spec Kit、SDD）维持原样并依赖 FR-004 豁免。这是裁决而非共识，clarify 可推翻。
-- **A6（Related Feature 本阶段直接绑定）**：派发简报裁决「解析为新建 Feature 078 并写绑定结论」，覆盖技能默认的「Need clarification」初始化；故无 `[NEEDS CLARIFICATION]` 标记。
+- **A6（Related Feature 本阶段直接绑定）**：派发简报裁决「解析为新建 Feature 079 并写绑定结论」，覆盖技能默认的「Need clarification」初始化；故无 `[NEEDS CLARIFICATION]` 标记。
 - **A7（检查器为交付物之一，但语义判断不在其内）**：确定性检查器按 FR-009/FR-010 交付；它只判机械形态，「这行是否定义处」的可判定信号由 owner 文档界定（FR-002），信号之外的部分由评审面承担，检查器不做语义判断、LLM 不参与匹配计数。
 - **A8（中文侧用词以词汇表为准的判读）**：「中文侧用词以项目词汇表为准」（简报 §4）落实为——同一概念的英文形式由 owner 约定给出后，中文形式 MUST 与词汇表 Canonical 的中文侧一致；词汇表无该词条时，先登记词条再使用双语形态。
 - **A9（无人值守 clarify 的裁决权威与登记位置）**：本轮 `/speckit.clarify` 无人值守运行，访谈式问题按 materiality 过滤（答案会改变下游产物的才成题）由执行者自行裁决；全部裁决以 Q/A 形态登记于 `## Clarifications` → `### Session 2026-10-30`（本阶段追加 5 行），可推翻项（A5 等）经复核后维持原裁决。
@@ -169,7 +169,7 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 - **FR-014**: 与 One Source of Truth（宪法 XIV）对齐：双语规则只有 FR-001 一处 owner；ambient 只有摘要 + 指针；漂移守卫由本特性的契约测试或检查器承担（plan 阶段落具体形式）。
 - **FR-015**: Scope Discipline（宪法 IX）：不新增运行时、服务、后台进程；交付物限于 owner 文档、ambient 小节、检查器脚本及其测试、 Feature 登记。
 - **FR-016**: 迁移执行边界：不做一次性大规模重写；存量差异清单化（由 FR-009 检查器的扫描输出派生）但不批量改写；每个文档在其下次自然修订时按 owner 约定收敛。
-- **FR-017**: Feature 登记：Feature 078 在 `.specify/memory/features.md` 登记行、`.specify/memory/features/078.md` 详情随本阶段落盘；登记遵守 `shared/workflow/feature-integration.md` 的索引纪律（手维护，头与行同改）。
+- **FR-017**: Feature 登记：Feature 079 在 `.specify/memory/features.md` 登记行、`.specify/memory/features/079.md` 详情随本阶段落盘；登记遵守 `shared/workflow/feature-integration.md` 的索引纪律（手维护，头与行同改）。
 - **FR-018**: ID 登记：本特性产出的 durable identifier（契约条款号、决策记录号等）在首次 coin 时登记 `.specify/memory/register.md`。
 
 ### 显式排除项（Out of Scope）
@@ -221,7 +221,7 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 
 - Q: 原文「English(中问)」的读法 → A: 按「English(中文)」理解，`中问` 为 `中文` 的笔误（用户裁决，U0 入口声明；登记为 Assumptions A1）。
 - Q: 括号形态的唯一标准（半角/全角、空格） → A: 半角括号、紧贴两侧词条（`中文(English)` / `English(中文)`），依据 Grounded Naming 用户输入优先（Assumptions A4）；全角 1383 处存量形态记为已知差异不追溯。
-- Q: Related Feature 绑定时机（技能默认「Need clarification」） → A: 派发简报裁决本阶段直接绑定新建 Feature 078（Assumptions A6）。
+- Q: Related Feature 绑定时机（技能默认「Need clarification」） → A: 派发简报裁决本阶段直接绑定新建 Feature 079（Assumptions A6）。
 - Q: 读者声明缺失（G-clarify-reader 算子，blocking）如何补齐 → A: 头部（前 40 非空行内）补 `**Readers**` / `**Reading scenario**` 两行且值非空；读者基准不新建，引用 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议。
 - Q: A5（词汇表 Canonical 双语化，原文留「clarify 可推翻」）本轮是否推翻 → A: 维持 A5。Canonical 是 FR-005 跨文档一致性的唯一判定基准，回退单语将使 SC-005 失去锚点；现状锚点 M-7（132/161 已双语化）表明该实践已被接受；推翻需联动改写 FR-005 / US2 / SC-005 而无下游收益，materiality 过滤不通过。
 - Q: 唯一形态的大小写维度（`english(中文)` vs `English(中文)`）是否需新增显式条款 → A: 无需新增 FR。FR-005 与 US2 验收场景的「逐字一致 / 以词汇表 Canonical 为准」已把大小写纳入精确匹配；检查器的形态常量（含大小写）归 owner 文档（FR-001）与 plan 阶段落实，本阶段不锁定字面量。

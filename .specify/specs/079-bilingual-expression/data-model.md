@@ -1,6 +1,6 @@
 # Data Model: 双语表述（Bilingual Expression）
 
-**Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30 | **Source**: `requirements.md` § Key Entities（4 实体）+ plan 期派生（E5…E7）
+**Spec**: `.specify/specs/079-bilingual-expression/` | **Date**: 2026-10-30 | **Source**: `requirements.md` § Key Entities（4 实体）+ plan 期派生（E5…E7）
 
 实体的唯一 owner 以「承载位置」列为准；本文件只做投影，规则正文 MUST NOT 在此复述（One Source of Truth，宪法 XIV）。
 

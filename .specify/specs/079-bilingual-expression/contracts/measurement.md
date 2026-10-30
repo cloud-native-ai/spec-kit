@@ -1,6 +1,6 @@
 # Contract: 成功标准测量（Measurement）
 
-**Feature**: 078-bilingual-expression
+**Feature**: 079-bilingual-expression
 **Spec**: [requirements.md](../requirements.md)（SC-001…SC-005 与其 Measurement Sources 为判据 owner，本契约钉测量程序，不复述 SC 正文）
 
 ## SC-001 复制位置数 = 0
@@ -21,7 +21,7 @@
 
 ## SC-004 追溯重写 = 0
 
-- **C-006** 测量 MUST 对本特性全部提交做 diff 文件清单审计：除 [[STR-001]]、登记文件（`features.md`、`features/078.md`、`register.md`）、ambient 载体（`templates/instructions-template.md` 及其镜像与生成产物）、检查器与其测试、规格产物（`.specify/specs/078-bilingual-expression/`）外，既有文档的修改行数 MUST 为 0；测量命令 = `git diff --stat <base>..HEAD` 对照 FR-006/FR-016 白名单，原始输出落 `test-evidence/`。(SC-004)
+- **C-006** 测量 MUST 对本特性全部提交做 diff 文件清单审计：除 [[STR-001]]、登记文件（`features.md`、`features/079.md`、`register.md`）、ambient 载体（`templates/instructions-template.md` 及其镜像与生成产物）、检查器与其测试、规格产物（`.specify/specs/079-bilingual-expression/`）外，既有文档的修改行数 MUST 为 0；测量命令 = `git diff --stat <base>..HEAD` 对照 FR-006/FR-016 白名单，原始输出落 `test-evidence/`。(SC-004)
 
 ## SC-005 跨文档一致性不一致处数 = 0
 
@@ -29,4 +29,4 @@
 
 ## 登记面
 
-- **C-008** 本特性产出的 durable identifier（T-001…T-004 决策张力记录、四份契约的 C- 条款号：owner-document C-001…C-009 / checker C-001…C-012 / distribution C-001…C-006 / measurement C-001…C-008）MUST 在 plan 阶段首次 coin 时登记 `.specify/memory/register.md`（指针形态：编号 → 一行含义 → 权威路径 → 状态）。(FR-017, FR-018)
+- **C-008** 本特性产出的 durable identifier（T-013…T-016 决策张力记录、四份契约的 C- 条款号：owner-document C-001…C-009 / checker C-001…C-012 / distribution C-001…C-006 / measurement C-001…C-008）MUST 在 plan 阶段首次 coin 时登记 `.specify/memory/register.md`（指针形态：编号 → 一行含义 → 权威路径 → 状态）。(FR-017, FR-018)

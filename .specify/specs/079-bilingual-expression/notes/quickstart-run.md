@@ -1,7 +1,7 @@
-# quickstart S1–S8 实跑留档 — 078 双语表述（Bilingual Expression）
+# quickstart S1–S8 实跑留档 — 079 双语表述（Bilingual Expression）
 
 **实跑阶段**：implement Part 4（T018 收口；2026-10-30T11:58–12:05Z）
-**权威场景源**：`.specify/specs/078-bilingual-expression/quickstart.md` S1–S8（MUST NOT 改写）
+**权威场景源**：`.specify/specs/079-bilingual-expression/quickstart.md` S1–S8（MUST NOT 改写）
 
 ## 场景清单与各自判据
 
@@ -44,7 +44,7 @@
 
 ## S4 实跑
 
-pilot 根：`.specify/.tmp/078-bilingual-expression/s4-pilot-t018`（受认可 .specify/.tmp 根；git init + 复制
+pilot 根：`.specify/.tmp/079-bilingual-expression/s4-pilot-t018`（受认可 .specify/.tmp 根；git init + 复制
 `.specify/templates/` 与 `.specify/scripts/` 镜像为 init 载荷；在 pilot 目录内以框架源脚本绝对路径运行）。
 `bash <framework-abs>/scripts/bash/generate-instructions.sh` → tail：
 `success Instructions generated/updated at .specify/instructions.md`；generator_rc=0。

@@ -1,10 +1,10 @@
-# Tasks: 双语表述（Bilingual Expression）— 078
+# Tasks: 双语表述（Bilingual Expression）— 079
 
-**Requirement ID**: 078
-**Requirement Key**: `078-bilingual-expression`
-**Branch**: `078-bilingual-expression`（本阶段禁止切换或新建分支；不 push）
-**Related Feature**: Feature 078 — 双语表述（Bilingual Expression）, status `Planned`（tasks 阶段不推进状态机；`Planned → Implemented` 归 `/speckit.implement`，活状态只在 `.specify/memory/features.md` 的 078 行）
-**Input**: Design documents from `.specify/specs/078-bilingual-expression/`
+**Requirement ID**: 079
+**Requirement Key**: `079-bilingual-expression`
+**Branch**: `079-bilingual-expression`（本阶段禁止切换或新建分支；不 push）
+**Related Feature**: Feature 079 — 双语表述（Bilingual Expression）, status `Planned`（tasks 阶段不推进状态机；`Planned → Implemented` 归 `/speckit.implement`，活状态只在 `.specify/memory/features.md` 的 079 行）
+**Input**: Design documents from `.specify/specs/079-bilingual-expression/`
 **Prerequisites**: `plan.md`（required，含 `## Document Structure` 四子节）、`requirements.md`（required；18 FR / 5 SC / 4 用户故事 / 3 Shared Strings）、`research.md`（R-1…R-12，三项基线冻结于 R-8）、`data-model.md`（E1…E7）、`contracts/`（4 份文件 / 35 条款，全部 `md-bold-closed`）、`quickstart.md`（S1–S8）、`feature-ref.md`
 
 **Tests Mode**: ON — 宪法 Principle IV「Test-First & Contract-Driven Implementation」把测试定为先写后实现；本特性红先行起点 = 本次实测的红（`tests/contract/test_bilingual_expression.py`、检查器 [[STR-001]] 的实现载体、ambient 小节均不存在）。按 Principle VII 的 template-only 门复核：本特性的测试对象含真实可执行检查器（`scripts/python/bilingual-expression-check.py`），「Partial (justified)」路径按 plan § Constitution Check VII 的裁决**不存在**；owner 文档与 ambient 这类文档面由同一红先行测试文件内的**结构契约腿**（章节树逐字、owner 声明、枚举列表形态、ambient 摘要+指针形态）验证，不另立运行时测试，两层不互相替代。
@@ -15,27 +15,27 @@
 
 ## Definition of Done (DoD)
 
-- DoD-1: 本文件每一行为 `[X]`，或 `[~]` 且原因记录在 `.specify/specs/078-bilingual-expression/verification.md` 的 `deferred_tasks=`。
-- DoD-2: 35 条契约条款各被恰好一行 `[green:]` 认领；`python3 scripts/python/account-clause-coverage.py .specify/specs/078-bilingual-expression` 报 `status: ok`、claimed=35、beyond baseline=0、FR 车道 `FR uncovered: 0`（18/18）。
+- DoD-1: 本文件每一行为 `[X]`，或 `[~]` 且原因记录在 `.specify/specs/079-bilingual-expression/verification.md` 的 `deferred_tasks=`。
+- DoD-2: 35 条契约条款各被恰好一行 `[green:]` 认领；`python3 scripts/python/account-clause-coverage.py .specify/specs/079-bilingual-expression` 报 `status: ok`、claimed=35、beyond baseline=0、FR 车道 `FR uncovered: 0`（18/18）。
 - DoD-3: `tests/contract/test_bilingual_expression.py` 红先行（`notes/red-first-evidence.md` 四字段齐全）并全绿；夹具三文件（合规 / 全角违规 / 同向违规）存在且被测试引用。
-- DoD-4: 检查器只用标准库、只读扫描、无常驻进程；三动作 `scan`/`coverage`/`census`、退出码 0/1/2、finding 码封闭四值（`full-width-parens` / `same-language-bracket` / `missing-bilingual` / `coverage-missing`）；不并入 `doc-consistency-check.py`（T-002 的解耦裁决）、不绑定任何阶段门禁算子（FR-010）。
+- DoD-4: 检查器只用标准库、只读扫描、无常驻进程；三动作 `scan`/`coverage`/`census`、退出码 0/1/2、finding 码封闭四值（`full-width-parens` / `same-language-bracket` / `missing-bilingual` / `coverage-missing`）；不并入 `doc-consistency-check.py`（T-014 的解耦裁决）、不绑定任何阶段门禁算子（FR-010）。
 - DoD-5: 分发判据为「相对 plan 期基线无新增漂移」——`sync-mirrors.py --check` 本特性触碰的三对（shared / templates / scripts）相对 `test-evidence/plan-sync-mirrors-baseline.txt` 无新增 DIFF；`.specify/instructions.md` 与根 `AGENTS.md` 由 `generate-instructions.sh` 刷新产出（非手改），生成器 size report 留档；`scan-confirmation-gates.py --summary` 的 blocking 计数相对基线 27 不变。
 - DoD-6: SC-001…SC-005 的 implement 期采证全部落 `test-evidence/`（E6 存量清单 / E7 关键词快照 / SC-003 pilot / SC-004 diff 审计 / 受控语料 census）；SC-002 的 review 面抽样复核与 SC-005 的真实词汇表实跑归 review 阶段，implement 期交付确定性抽样程序与受控语料证据，不预支 review 结论。
 - DoD-7: `verification.md` 为 SC-001…SC-005 各记录一条状态行，词表归 `.specify/templates/verification-log-template.md`；Test-First 记 ON（本特性有真实可执行检查器为测试对象，不走宪法 VII 的 Partial 路径；owner 文档 / ambient 面由结构契约腿替代验证并写明）。
-- DoD-8: 不新增 `/speckit.*` 命令、不引入运行时/服务/后台进程、不新增第三方依赖；Feature 078 在 tasks 阶段结束时保持 `Planned`；除 owner 文档、ambient 载体、检查器与其测试、登记文件与规格产物外，既有文档修改行数为 0（SC-004 审计）。
+- DoD-8: 不新增 `/speckit.*` 命令、不引入运行时/服务/后台进程、不新增第三方依赖；Feature 079 在 tasks 阶段结束时保持 `Planned`；除 owner 文档、ambient 载体、检查器与其测试、登记文件与规格产物外，既有文档修改行数为 0（SC-004 审计）。
 - DoD-9: plan 属主制品（`plan.md` / `research.md` / `data-model.md` / `contracts/*` / `quickstart.md` / `feature-ref.md`）不被重写；本阶段对 `checklists/requirements.md` 一行的改写属证据面误捕修复（G-tasks-evidence 实测 `grade-asof-unpaired`，与 requirements 阶段已记录的同类修复同形），已在本文件头与收尾声明，非 plan 属主制品。
 
 **DoD Status**: complete（19/19 `[X]`；DoD-1…DoD-9 于 implement Part 4 逐条核毕——条款覆盖 35/35、红先行四字段齐备且全绿、检查器三动作四码、镜像与确认门收口、SC implement 期采证齐落 test-evidence/、verification.md 五行齐备（SC-002/005 记 unknown 待 review 面，不预支）、零新命令/零运行时/零第三方依赖、plan 属主制品零重写（唯一 PLAN-EDIT minor 已审计））
 
 ## Completion Gate
 
-- GATE-1: 任务文件结构合法 — check: `python3 scripts/python/validate-tasks.py .specify/specs/078-bilingual-expression/tasks.md` 退出 0，0 error（WARN 逐条裁定）。
-- GATE-2: 跨制品一致性 — check: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/078-bilingual-expression --stage tasks --repo .` 报 `decision=pass`、`errors=0`；`missing-path` advisory 只允许命名本特性将新建的文件（[[STR-001]]、检查器、契约测试、夹具、`notes/*`、本阶段 `test-evidence/tasks*`）。
-- GATE-3: 拆解尺度门 — check: `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/078-bilingual-expression/requirements.md --tasks .specify/specs/078-bilingual-expression/tasks.md` 报 `decision=proceed`、`task_count` ≤ 40。
-- GATE-4: 条款覆盖 — check: `python3 scripts/python/account-clause-coverage.py .specify/specs/078-bilingual-expression` 报 `status: ok`、claimed=35、beyond baseline=0；非零 beyond-baseline 用认领修复，永不重冻结基线。
+- GATE-1: 任务文件结构合法 — check: `python3 scripts/python/validate-tasks.py .specify/specs/079-bilingual-expression/tasks.md` 退出 0，0 error（WARN 逐条裁定）。
+- GATE-2: 跨制品一致性 — check: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-bilingual-expression --stage tasks --repo .` 报 `decision=pass`、`errors=0`；`missing-path` advisory 只允许命名本特性将新建的文件（[[STR-001]]、检查器、契约测试、夹具、`notes/*`、本阶段 `test-evidence/tasks*`）。
+- GATE-3: 拆解尺度门 — check: `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/079-bilingual-expression/requirements.md --tasks .specify/specs/079-bilingual-expression/tasks.md` 报 `decision=proceed`、`task_count` ≤ 40。
+- GATE-4: 条款覆盖 — check: `python3 scripts/python/account-clause-coverage.py .specify/specs/079-bilingual-expression` 报 `status: ok`、claimed=35、beyond baseline=0；非零 beyond-baseline 用认领修复，永不重冻结基线。
 - GATE-5: 红先行留档且新测试转绿、既有守护无新增失败 — check（实现期，经 `python3 -m pytest`）：`tests/contract/test_bilingual_expression.py` 全绿，捕获与比较形式归 `/speckit.implement` step 6 的 `**Test runs**` bullet（此处引用不重述）。
 - GATE-6: 镜像与确认门收口 — check: `python3 scripts/python/sync-mirrors.py --check` 相对 `test-evidence/plan-sync-mirrors-baseline.txt` 无新增 DIFF（本特性三对）；`python3 scripts/python/scan-confirmation-gates.py --summary` 的 blocking 计数 == 27（基线 `test-evidence/plan-scan-confirmation-gates.txt`）。
-- GATE-7: 无未完行 — check: `grep -cE '^- \[[ >]\]' .specify/specs/078-bilingual-expression/tasks.md` 返回 0。
+- GATE-7: 无未完行 — check: `grep -cE '^- \[[ >]\]' .specify/specs/079-bilingual-expression/tasks.md` 返回 0。
 
 ## Environment Prerequisites
 
@@ -54,25 +54,25 @@
 - **[green: <contract>#<clause>]**: 本行是把该条款转绿的那一行；标签面定义归 `.specify/templates/tasks-template.md` § Format，机器校验归 `scripts/python/validate-tasks.py`，合同路径相对本文件目录解析。认领分区见 § Clause Partition，同一行内多条款按序递增书写。
 - 每行给出具体文件路径与可执行验收；测试行写明它写入的证据槽，实现行写明它让哪一组断言转绿。
 
-## Measured Premises（2026-10-30 生成时实测，HEAD `5a4dc5a4`，分支 `078-bilingual-expression`）
+## Measured Premises（2026-10-30 生成时实测，HEAD `5a4dc5a4`，分支 `079-bilingual-expression`）
 
 | Premise | Re-derivation command | Real output |
 |---------|-----------------------|-------------|
-| FR 定义行 | `grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/078-bilingual-expression/requirements.md` | `18` |
-| SC 定义行 | `grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/078-bilingual-expression/requirements.md` | `5` |
-| 用户故事数 | `grep -cE '^### User Story' .specify/specs/078-bilingual-expression/requirements.md` | `4` |
-| Shared Strings | `grep -cE '^\| .STR-[0-9]{3}.' .specify/specs/078-bilingual-expression/requirements.md` | `3` |
-| 契约文件数 | `ls .specify/specs/078-bilingual-expression/contracts/*.md \| wc -l` | `4` |
-| 契约条款定义 | `python3 scripts/python/clause_extract.py .specify/specs/078-bilingual-expression/contracts/*.md \| grep -c '^  C-'` | `35`（owner-document 9 + checker 12 + distribution 6 + measurement 8） |
-| 条款计数陷阱形 | `grep -oh 'C-[0-9]\{2,3\}' .specify/specs/078-bilingual-expression/contracts/*.md \| wc -l` | `71` — 这是条款 id 的*提及*数（条款内互引与 [[STR]] 引用），不是定义数；单位是条款*定义*时正确答案是 `35`。两数并记，表明测量是有意取的而非碰巧 |
-| 五个交付物路径不在树 | `ls shared/guidelines/bilingual-expression.md scripts/python/bilingual-expression-check.py tests/contract/test_bilingual_expression.py tests/fixtures/bilingual .specify/specs/078-bilingual-expression/notes` | 五行 `No such file or directory`（T003 / T007 / T002 创建；`notes/` 由 T001 创建；红先行起点即此实测红） |
+| FR 定义行 | `grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/079-bilingual-expression/requirements.md` | `18` |
+| SC 定义行 | `grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/079-bilingual-expression/requirements.md` | `5` |
+| 用户故事数 | `grep -cE '^### User Story' .specify/specs/079-bilingual-expression/requirements.md` | `4` |
+| Shared Strings | `grep -cE '^\| .STR-[0-9]{3}.' .specify/specs/079-bilingual-expression/requirements.md` | `3` |
+| 契约文件数 | `ls .specify/specs/079-bilingual-expression/contracts/*.md \| wc -l` | `4` |
+| 契约条款定义 | `python3 scripts/python/clause_extract.py .specify/specs/079-bilingual-expression/contracts/*.md \| grep -c '^  C-'` | `35`（owner-document 9 + checker 12 + distribution 6 + measurement 8） |
+| 条款计数陷阱形 | `grep -oh 'C-[0-9]\{2,3\}' .specify/specs/079-bilingual-expression/contracts/*.md \| wc -l` | `71` — 这是条款 id 的*提及*数（条款内互引与 [[STR]] 引用），不是定义数；单位是条款*定义*时正确答案是 `35`。两数并记，表明测量是有意取的而非碰巧 |
+| 五个交付物路径不在树 | `ls shared/guidelines/bilingual-expression.md scripts/python/bilingual-expression-check.py tests/contract/test_bilingual_expression.py tests/fixtures/bilingual .specify/specs/079-bilingual-expression/notes` | 五行 `No such file or directory`（T003 / T007 / T002 创建；`notes/` 由 T001 创建；红先行起点即此实测红） |
 | 生成器输入模板 | `grep -n 'TEMPLATE_FILE=' scripts/bash/generate-instructions.sh` | `TEMPLATE_FILE=".specify/templates/instructions-template.md"` — 生成器读运行时镜像，故 T012 刷新必须排在 T008 镜像同步之后（相位序已按此排列） |
 | ambient 插入位置锚点 | `grep -n '^## Grounded Naming' templates/instructions-template.md` | 在场（plan Assumptions P2 登记插于其后的唯一锚点） |
-| 确认门基线 | `tail -3 .specify/specs/078-bilingual-expression/test-evidence/plan-scan-confirmation-gates.txt` | blocking 27 / violations 0（T006 与 T012 的判据基线，原始输出留档于该文件） |
-| 镜像基线 | `tail -2 .specify/specs/078-bilingual-expression/test-evidence/plan-sync-mirrors-baseline.txt` | 六对全 ok（2026-10-30 实测），T008 的「无新增漂移」判据基线 |
-| coverage 基线 | `head -2 .specify/specs/078-bilingual-expression/coverage-baseline.txt` | plan 期已冻结（35 条 078 条款为 plan 期设计内红，本阶段认领后 beyond baseline 归零；不重冻结） |
-| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/078-bilingual-expression/tasks.md` | `19`（T001–T019）≤ 40 上限（`decomposition-check.py` 的 `TASK_CEILING = 40`） |
-| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/078-bilingual-expression/tasks.md \| wc -l` | 远大于 19——这是任务标识的*提及*数（`[blockedBy:]`、认领表、覆盖表都在引用），不是定义数；单位是任务*行*时用行首锚定 `^- \[ \] T` 取数 |
+| 确认门基线 | `tail -3 .specify/specs/079-bilingual-expression/test-evidence/plan-scan-confirmation-gates.txt` | blocking 27 / violations 0（T006 与 T012 的判据基线，原始输出留档于该文件） |
+| 镜像基线 | `tail -2 .specify/specs/079-bilingual-expression/test-evidence/plan-sync-mirrors-baseline.txt` | 六对全 ok（2026-10-30 实测），T008 的「无新增漂移」判据基线 |
+| coverage 基线 | `head -2 .specify/specs/079-bilingual-expression/coverage-baseline.txt` | plan 期已冻结（35 条 079 条款为 plan 期设计内红，本阶段认领后 beyond baseline 归零；不重冻结） |
+| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/079-bilingual-expression/tasks.md` | `19`（T001–T019）≤ 40 上限（`decomposition-check.py` 的 `TASK_CEILING = 40`） |
+| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/079-bilingual-expression/tasks.md \| wc -l` | 远大于 19——这是任务标识的*提及*数（`[blockedBy:]`、认领表、覆盖表都在引用），不是定义数；单位是任务*行*时用行首锚定 `^- \[ \] T` 取数 |
 
 ## Clause Partition
 
@@ -123,7 +123,7 @@
 
 ## Mirror Obligations
 
-镜像对清单的属主是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对）；范围登记见 `plan.md` § Mirror Obligations（本特性触碰 shared / templates / scripts 三对，命令副本面零触碰），本文件不复述其行内容。**T008 是唯一的同步与验证行**（`--write` 后 `--check`，逐对陈述相对 `test-evidence/plan-sync-mirrors-baseline.txt` 无新增漂移）；T012 的 instructions 刷新消费 T008 产出的 templates 镜像（生成器输入路径实测见 § Measured Premises），`.specify/instructions.md` 与根 `AGENTS.md` 由 `generate-instructions.sh` 产出、MUST NOT 手改；`tests/**` 与 `.specify/specs/078-bilingual-expression/**` 无任何镜像义务；`regen-command-copies.py --check` 相对基线无新增漂移（本特性不触碰 `templates/commands/**`）。
+镜像对清单的属主是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`（六对）；范围登记见 `plan.md` § Mirror Obligations（本特性触碰 shared / templates / scripts 三对，命令副本面零触碰），本文件不复述其行内容。**T008 是唯一的同步与验证行**（`--write` 后 `--check`，逐对陈述相对 `test-evidence/plan-sync-mirrors-baseline.txt` 无新增漂移）；T012 的 instructions 刷新消费 T008 产出的 templates 镜像（生成器输入路径实测见 § Measured Premises），`.specify/instructions.md` 与根 `AGENTS.md` 由 `generate-instructions.sh` 产出、MUST NOT 手改；`tests/**` 与 `.specify/specs/079-bilingual-expression/**` 无任何镜像义务；`regen-command-copies.py --check` 相对基线无新增漂移（本特性不触碰 `templates/commands/**`）。
 
 ## Test Budget
 
@@ -137,7 +137,7 @@
 
 **Purpose**: 先建好证据槽，红先行日志与测量前提都有固定落点
 
-- [X] T001 建立本特性证据槽并冻结实测前提：新建 `.specify/specs/078-bilingual-expression/notes/red-first-evidence.md`（头部点名 `tests/contract/test_bilingual_expression.py` 一个文件，并规定红先行记录四个字段——重放命令 / 真实输出 / 退出码 / 失败计数）、`notes/pre-change-measurements.md`（逐条粘贴本文件 § Measured Premises 的实测值与命令，带日期 2026-10-30）、`notes/quickstart-run.md`（头部列 S1–S8 八个场景及各自判据，真实输出留实现期粘贴）
+- [X] T001 建立本特性证据槽并冻结实测前提：新建 `.specify/specs/079-bilingual-expression/notes/red-first-evidence.md`（头部点名 `tests/contract/test_bilingual_expression.py` 一个文件，并规定红先行记录四个字段——重放命令 / 真实输出 / 退出码 / 失败计数）、`notes/pre-change-measurements.md`（逐条粘贴本文件 § Measured Premises 的实测值与命令，带日期 2026-10-30）、`notes/quickstart-run.md`（头部列 S1–S8 八个场景及各自判据，真实输出留实现期粘贴）
 
 **Checkpoint**: 证据槽就位；本特性无阻断全部故事的前置，故无 Foundational 相位。
 
@@ -216,12 +216,12 @@
 - [X] T011 [blockedBy: T010] review 面确定性抽样交付（measurement C-004 的 implement 侧）：对 T010 `--scope changed --json` 输出的信号行清单调用检查器模块的 `sample_lines`（每隔 k 行取 1，k=⌈n/10⌉；行数 < 10 时全量），把抽样行清单、参数与真实输出写入 `test-evidence/us11-review-sample.txt`，作为 review 阶段抽样复核的输入 artifact（复核分歧登记归 review 产物）；抽样选择由程序给出，MUST NOT 由评审自选 [green: contracts/measurement.md#C-004]
 - [X] T012 [blockedBy: T006,T008] instructions 刷新与 ambient 两态复核：`bash scripts/bash/generate-instructions.sh` 刷新 `.specify/instructions.md` 与根 `AGENTS.md`（生成器输入为 `.specify/templates/` 镜像，故排在 T008 之后；两文件 MUST NOT 手改），捕获生成器 size report 原始输出到 `test-evidence/us12-instructions-refresh.txt`（模板 27,940 B / live 32,259 B 为 R-5 基线，超预算只报 warning 但报告必须留档）；重跑 T006 的同组断言于刷新产物：`.specify/instructions.md` 含逐字 `## Bilingual Expression (双语表述)` 小节、小节内四组枚举关键词零命中、含 [[STR-001]] 指针；再跑 `scan-confirmation-gates.py --summary` 确认 blocking 计数 == 27 [green: contracts/distribution.md#C-003] [green: contracts/distribution.md#C-004] [green: contracts/distribution.md#C-005]
 - [X] T013 [blockedBy: T012] SC-003 下游生成管道实测（implement 期一次）：在受认可临时根（`.specify/.tmp/` 或 `mktemp -d`）按 quickstart S4 的管道构造下游树（`.specify/templates/instructions-template.md` 与 `.specify/scripts/` 载荷），以框架源脚本绝对路径运行 `generate-instructions.sh`，断言产物含逐字 ambient 小节标题、小节内四组枚举关键词零命中且含 [[STR-001]] 指针（「摘要 + 指针」形态）；命令、真实输出、产物检查结果与拆卸步骤写入 `test-evidence/us13-sc003-pilot.txt`（pilot 必须拆除） [green: contracts/measurement.md#C-005]
-- [X] T014 SC-004 追溯重写 = 0 审计：`git diff --stat 5a4dc5a4..HEAD` 全量文件清单对照白名单——允许改动：[[STR-001]]（框架源 + 镜像）、`templates/instructions-template.md`（+ 镜像与生成产物 `.specify/instructions.md`、根 `AGENTS.md`）、检查器与其镜像、契约测试与夹具、登记文件（`features.md`、`features/078.md`、`register.md`）、规格产物（`.specify/specs/078-bilingual-expression/`）；白名单外既有文档的修改行数必须为 0；原始输出与逐文件判定写入 `test-evidence/us14-sc004-diff-audit.txt` [green: contracts/measurement.md#C-006]
+- [X] T014 SC-004 追溯重写 = 0 审计：`git diff --stat 5a4dc5a4..HEAD` 全量文件清单对照白名单——允许改动：[[STR-001]]（框架源 + 镜像）、`templates/instructions-template.md`（+ 镜像与生成产物 `.specify/instructions.md`、根 `AGENTS.md`）、检查器与其镜像、契约测试与夹具、登记文件（`features.md`、`features/079.md`、`register.md`）、规格产物（`.specify/specs/079-bilingual-expression/`）；白名单外既有文档的修改行数必须为 0；原始输出与逐文件判定写入 `test-evidence/us14-sc004-diff-audit.txt` [green: contracts/measurement.md#C-006]
 - [X] T015 [blockedBy: T007] 受控语料 census 端到端采证（SC-005 的 implement 侧）：在临时根构造受控语料（复制 owner 文档覆盖面清单所指的定义面样本 + T004 演练词汇表），运行 `--action census`，断言退出码 0（受控语料内不一致处数 0）且中文侧比对逐字执行；真实词汇表的 census 实跑归 review 阶段（quickstart S8），本行不预支；命令、真实输出与拆卸写入 `test-evidence/us15-census-controlled.txt` [green: contracts/measurement.md#C-007]
-- [X] T016 [blockedBy: T003,T007] ID 登记完整性复核：核对 `.specify/memory/register.md` 的 078 登记行（T-001…T-004、078-C-clauses 命名空间行，plan 期已 coin）指针形态合规（编号 → 一行含义 → 权威路径 → 状态，MUST NOT 复述决策正文），且本特性新产出未 coin 任何未登记 durable identifier；核对结果写入 `test-evidence/us16-register-check.txt` [green: contracts/measurement.md#C-008]
+- [X] T016 [blockedBy: T003,T007] ID 登记完整性复核：核对 `.specify/memory/register.md` 的 079 登记行（T-013…T-016、079-C-clauses 命名空间行，plan 期已 coin）指针形态合规（编号 → 一行含义 → 权威路径 → 状态，MUST NOT 复述决策正文），且本特性新产出未 coin 任何未登记 durable identifier；核对结果写入 `test-evidence/us16-register-check.txt` [green: contracts/measurement.md#C-008]
 - [X] T017 [blockedBy: T003,T006,T007,T008,T012] 漂移守卫全绿确认：`python3 -m pytest tests/contract/test_bilingual_expression.py -q` 全绿，逐腿确认漂移守卫三腿(i/ii/iii)转绿——[[STR-001]]/[[STR-002]]/[[STR-003]] 唯一消费点、镜像三面逐字一致（清单派生自 `MIRROR_PAIRS`）、ambient「摘要 + 指针」形态；原始输出写入 `test-evidence/us17-drift-guard-green.txt` [green: contracts/distribution.md#C-006]
-- [X] T018 实跑 `quickstart.md` 的 S1–S8 八个场景（S1 四步核对 / S2 三例判定 / S3 覆盖面 / S4 下游生成 / S5 镜像漂移 / S6 结构面 / S7 关键词扫描 / S8 census），把每条命令的真实输出与拆卸步骤贴入 `.specify/specs/078-bilingual-expression/notes/quickstart-run.md`；S4/S8 的临时目录必须清除，`git status --ignored` 不得把它们当新增；不改写 plan 属主的 `quickstart.md`
-- [X] T019 收尾门禁留档与 Feature 复核：把 `validate-tasks.py`、`decomposition-check.py --mode tasks`、`pre-analyze-check.py --stage tasks`、`account-clause-coverage.py`、`doc-consistency-check.py --faces evidence` 五条命令的真实输出写入 `test-evidence/tasks-*.txt`；按 Feature Integration Protocol 复核 Feature 列表——本任务拆解未暴露新 Feature、未使既有 Feature 失效，`.specify/memory/features.md` 的 078 行保持 `Planned` 不改；复核「零新命令 / 零运行时 / 零第三方依赖」前后集合差；并只为本特性产物建立提交（不 push，不夹带既有脏文件）
+- [X] T018 实跑 `quickstart.md` 的 S1–S8 八个场景（S1 四步核对 / S2 三例判定 / S3 覆盖面 / S4 下游生成 / S5 镜像漂移 / S6 结构面 / S7 关键词扫描 / S8 census），把每条命令的真实输出与拆卸步骤贴入 `.specify/specs/079-bilingual-expression/notes/quickstart-run.md`；S4/S8 的临时目录必须清除，`git status --ignored` 不得把它们当新增；不改写 plan 属主的 `quickstart.md`
+- [X] T019 收尾门禁留档与 Feature 复核：把 `validate-tasks.py`、`decomposition-check.py --mode tasks`、`pre-analyze-check.py --stage tasks`、`account-clause-coverage.py`、`doc-consistency-check.py --faces evidence` 五条命令的真实输出写入 `test-evidence/tasks-*.txt`；按 Feature Integration Protocol 复核 Feature 列表——本任务拆解未暴露新 Feature、未使既有 Feature 失效，`.specify/memory/features.md` 的 079 行保持 `Planned` 不改；复核「零新命令 / 零运行时 / 零第三方依赖」前后集合差；并只为本特性产物建立提交（不 push，不夹带既有脏文件）
 
 **Checkpoint**: 全部 SC 有 implement 期采证；镜像与生成产物收口；漂移守卫全绿；八场景实跑有据。
 

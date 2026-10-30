@@ -1,8 +1,8 @@
-# 红先行证据 — 078 双语表述（Bilingual Expression）
+# 红先行证据 — 079 双语表述（Bilingual Expression）
 
 **测试对象（唯一）**：`tests/contract/test_bilingual_expression.py`（含夹具 `tests/fixtures/bilingual/*`）
 
-**起点实测（2026-10-30，HEAD `cc508bfe`，分支 `078-bilingual-expression`）**：五个交付物路径均不在树
+**起点实测（2026-10-30，HEAD `cc508bfe`，分支 `079-bilingual-expression`）**：五个交付物路径均不在树
 （owner 文档 `shared/guidelines/bilingual-expression.md`、检查器 `scripts/python/bilingual-expression-check.py`、
 契约测试、夹具目录、本 `notes/` 目录），红先行起点 = 本次实测的红。
 

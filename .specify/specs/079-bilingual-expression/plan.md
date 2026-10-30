@@ -1,8 +1,8 @@
 # Implementation Plan: 双语表述（Bilingual Expression）
 
-**Branch**: `078-bilingual-expression` | **Date**: 2026-10-30 | **Spec**: [requirements.md](requirements.md)
-**Requirement → Feature**: `078-bilingual-expression` → Feature 078 双语表述（Bilingual Expression）
-**Input**: Specification from `.specify/specs/078-bilingual-expression/requirements.md`
+**Branch**: `079-bilingual-expression` | **Date**: 2026-10-30 | **Spec**: [requirements.md](requirements.md)
+**Requirement → Feature**: `079-bilingual-expression` → Feature 079 双语表述（Bilingual Expression）
+**Input**: Specification from `.specify/specs/079-bilingual-expression/requirements.md`
 
 ## Summary
 
@@ -36,8 +36,8 @@
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
 | I | Specification-Driven Development (SDD) as Foundation | Pass | 18 条 FR 逐条映射到设计落点（`feature-ref.md` FR 表）；形态/入口/测量三处 plan 期决定各有研究记录（research.md R-10/R-11）与契约条款（contracts/checker.md、contracts/measurement.md） |
-| II | Feature-Centric Development | Pass | 绑定新建 Feature 078（requirements § Related Feature 复核五候选）；本 plan 只推进 `Draft → Planned`，不新建/合并/废弃其他 Feature；索引行与详情同阶段更新 |
-| III | Intent-Driven Development | Pass | 先定「约定归属谁、守卫判什么不判什么、测量从哪采」，再定形态；四条承重取舍以 DTR 留反面与代价（## Decision Tensions T-001…T-004） |
+| II | Feature-Centric Development | Pass | 绑定新建 Feature 079（requirements § Related Feature 复核五候选）；本 plan 只推进 `Draft → Planned`，不新建/合并/废弃其他 Feature；索引行与详情同阶段更新 |
+| III | Intent-Driven Development | Pass | 先定「约定归属谁、守卫判什么不判什么、测量从哪采」，再定形态；四条承重取舍以 DTR 留反面与代价（## Decision Tensions T-013…T-016） |
 | IV | Test-First & Contract-Driven Implementation | Pass | `test_bilingual_expression.py` red-first，起点 = 本次实测的红（检查器、owner 文档、ambient 小节均不存在）；夹具合规/违规对（quickstart S2）先行钉定期望 |
 | V | AI Agent Integration Standards | Pass | 不改 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；本特性显式排除命令模板改写，per-tool 命令副本面零触碰（feature-ref.md FR-008 落点只在 instructions 模板） |
 | VI | Continuous Quality & Observability | Pass | 判定全走退出码与封闭 finding 码；plan 期证据按执行时全量捕获落 `test-evidence/`（镜像基线、docs-utils 基线、确认门、S4 管道冒烟）；判据用「相对基线无新增漂移」而非绝对绿；无 `.bak` 类副本 |
@@ -51,7 +51,7 @@
 | XIV | One Source of Truth (Authority & Reference Discipline) | Pass | 六组事实唯一 owner = [[STR-001]]；ambient/契约/测试只引用不复述（owner-document.md C-007、distribution.md C-003）；关键词表程序派生不手写（measurement.md C-001）；漂移守卫 = 契约测试（distribution.md C-006） |
 | XV | User-Facing Comprehension (No-Jargon, With Context) | Pass | owner 文档头部按全局基准读者声明 Readers/Reading scenario（C-001，复用 `user-facing-comprehension.md` 基准，不新建第二套）；检查器 finding 行 `file:line [code] message` 自带定位，读者无需内部知识即可行动 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | Pass | 承重裁决（A2/A4 及其重开条件）在 requirements 留痕并在本 plan 以 DTR 承接；「检查器不签字语义」的绿被显式标注为读者-oracle 而非充分条件（A7、checker.md C-012）；本 plan 无静默就地修平的裁定类异常（§ Assumptions 记录两项自行裁决） |
-| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | Pass | 不新建目录：owner 文档落既有 `shared/guidelines/`，夹具落既有 `tests/fixtures/`，plan 期临时产物落受认可根 `.specify/.tmp/078-bilingual-expression/`（`.specify/.gitignore` 已匹配 `.tmp/`，S4 pilot 已拆除留档） |
+| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | Pass | 不新建目录：owner 文档落既有 `shared/guidelines/`，夹具落既有 `tests/fixtures/`，plan 期临时产物落受认可根 `.specify/.tmp/079-bilingual-expression/`（`.specify/.gitignore` 已匹配 `.tmp/`，S4 pilot 已拆除留档） |
 | XVIII | Grounded Naming | Pass | 命名来源序：用户词「双语表述」→ slug `bilingual-expression`（requirements 既定）→ 同类兄弟（`doc-consistency-check.py` 的 `<domain>-check.py` 形态定检查器名）；[[STR-001]]/[[STR-002]]/[[STR-003]] 经 `[[STR-NNN]]` 引用不复制字面量 |
 
 **Gates Status**: 全部 18 项 Pass，无 Fail / Partial；## Complexity Tracking 记 N/A。
@@ -67,7 +67,7 @@ threshold: `.specify/shared/guidelines/decision-tension.md` — one pointer, rea
 root. This section lists the field names and points at that file; it does not restate the criteria
 table, the rejection list or the threshold table.*
 
-### T-001 — owner 文档新建独立 guidelines 文件，而不是扩展词汇表/读者理解纪律的既有 owner
+### T-013 — owner 文档新建独立 guidelines 文件，而不是扩展词汇表/读者理解纪律的既有 owner
 
 - **decision**: 双语约定的六组事实落在新建 [[STR-001]]，不扩展 `shared/workflow/glossary.md` 或 `shared/guidelines/user-facing-comprehension.md`。
 - **antithesis**: 扩展 `shared/workflow/glossary.md` 承接方向/形态规则（它是术语相关协议的既有 owner）；当「双语形态被读作术语登记纪律的一部分、且维护者已习惯改术语时只开词汇表」时它更优——规则与词条同文件，一次编辑完成两处维护。
@@ -78,7 +78,7 @@ table, the rejection list or the threshold table.*
 - **expected_sacrifice**: SC-001 Source ↓ `shared/guidelines/` 目录文件数 +1（60 → 61，2026-10-30 实测），跨纪律检索多一个打开目标。
 - **revision_trigger**: 两个迭代内出现 ≥2 次「修订双语规则时同时必须修订词汇表协议文件、且两处修订总是同批提交」→ 重开，评估合并 owner；合并时 MUST 走两份 owner 文件的自我声明修订，MUST NOT 静默搬移。
 
-### T-002 — 新建独立检查器脚本，而不是给 doc-consistency-check.py 加动作
+### T-014 — 新建独立检查器脚本，而不是给 doc-consistency-check.py 加动作
 
 - **decision**: 双语形态检查落新建 `scripts/python/bilingual-expression-check.py`；MUST NOT 给 `doc-consistency-check.py` 增加 `--action bilingual`。
 - **antithesis**: 给 `doc-consistency-check.py` 加 `--action bilingual`（077 加 `--action structure` 的同款路径）；当「所有文档类机械判定收敛在一个 CLI、维护者只需记一个入口」时它更优——命令面不增殖，测试基建直接复用。
@@ -89,7 +89,7 @@ table, the rejection list or the threshold table.*
 - **expected_sacrifice**: SC-002 Source ↓ 命令面 +1（多一个 CLI 入口与其契约测试），复用收益只保留在「读取模式」层（glossary-utils 的表解析）。
 - **revision_trigger**: 两个迭代内出现 ≥2 次「维护者因入口太多跑漏了双语扫描、且 SC-002 采证因此缺失」→ 重开，评估把 scan 判定迁入 doc-consistency-check 的独立动作（守卫面隔离测试先行），但 `--faces` 封闭语义不动。
 
-### T-003 — 检查器本特性内不接线门禁，SC-002 用 --scope changed 采证
+### T-015 — 检查器本特性内不接线门禁，SC-002 用 --scope changed 采证
 
 - **decision**: 检查器只交付退出码契约（0/1/2）与运行入口，不绑定任何阶段门禁算子；SC-002 由 review 阶段对改动路径跑 `--scope changed` 采证，存量差异只进 E6 清单。
 - **antithesis**: 把 `scan` 接线为表达类某阶段的 blocking 算子（如 implement 的 G-implement-structure 子行）；当「合规率 100% 必须有强制门、否则靠自觉」成为团队共识时它更优——不合规提交在阶段面被拦下。
@@ -100,7 +100,7 @@ table, the rejection list or the threshold table.*
 - **expected_sacrifice**: SC-002 Source ↓ 采证依赖 review 阶段的执行纪律（无门禁强制），漏跑的风险由 E3 台账的 `stage-status` 行完整性兜底。
 - **revision_trigger**: 一个迭代内出现 ≥1 次「改动路径上的全角形态随提交进入 master」→ 重开，评估把 `--scope changed` 包装为提交前钩子或 stage 子行（存量面显式豁免、只判新增行）。
 
-### T-004 — SC-005 取 100% census 全查，不做抽样
+### T-016 — SC-005 取 100% census 全查，不做抽样
 
 - **decision**: SC-005 的总体 = 词汇表全部双语 Canonical 词条，测量方式为检查器 `census` 动作全查（抽样比例 100%）。
 - **antithesis**: 程序抽样（如系统抽样 1/3 条目）+ 人工复核；当「词条规模增长到全查成本不可忽略、且评审时间成为瓶颈」时它更优——成本随总体线性下降。
@@ -116,7 +116,7 @@ table, the rejection list or the threshold table.*
 ### Documentation (this spec)
 
 ```text
-.specify/specs/078-bilingual-expression/
+.specify/specs/079-bilingual-expression/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — R-1…R-12 实测与研究裁决（无独立外部调研，<50 行结论外加测量留档）
 ├── data-model.md        # Phase 1 output — E1…E7 实体与校验规则
@@ -141,7 +141,7 @@ templates/instructions-template.md               # 新增 ambient 小节（## Bi
 scripts/python/bilingual-expression-check.py     # 确定性检查器（新建；stdlib only）
 tests/contract/test_bilingual_expression.py      # 契约测试（red-first；漂移守卫 C-006 + 夹具断言）
 tests/fixtures/bilingual/                        # 夹具（合规/全角违规/同向违规定义行，implement 随测试建立）
-.specify/specs/078-bilingual-expression/         # 本特性 spec 产物（非分发载荷，无镜像义务）
+.specify/specs/079-bilingual-expression/         # 本特性 spec 产物（非分发载荷，无镜像义务）
 ```
 
 **Structure Decision**: 本特性是**框架源的约定 + 守卫交付**，不是新组件：一份 owner 文档、一个模板小节、一个单文件检查器、一个契约测试文件。编辑面 = `shared/`、`templates/`、`scripts/`、`tests/`；`.specify/` 同名副本一律经 `sync-mirrors.py` 产出，`.specify/instructions.md` / 根 `AGENTS.md` 经 `generate-instructions.sh` 产出（distribution.md C-001/C-005）。不新建任何目录（夹具落既有 `tests/fixtures/`）。
@@ -157,7 +157,7 @@ tests/fixtures/bilingual/                        # 夹具（合规/全角违规/
 | 3 | `scripts/python/bilingual-expression-check.py` | `.specify/scripts/python/bilingual-expression-check.py` | 同 #1（scripts 对） |
 | 4 | 命令模板面 | 本特性**不触碰** `templates/commands/**`（显式排除项）：per-tool 副本零改动；未来命令/技能引用约定时只走「路径 + 锚」指针形态（FR-001 消费纪律） | `regen-command-copies.py --check` 相对基线无新增漂移（基线实测 `OK`，plan-sync-mirrors-baseline.txt 首行） |
 
-**无镜像面**：`tests/**` 不入任何镜像对；`.specify/specs/078-bilingual-expression/**` 是规格产物、不是分发载荷（`MIRROR_PAIRS` 无此对），只做源文件改动。
+**无镜像面**：`tests/**` 不入任何镜像对；`.specify/specs/079-bilingual-expression/**` 是规格产物、不是分发载荷（`MIRROR_PAIRS` 无此对），只做源文件改动。
 
 ## Assumptions（plan 期自行裁决，登记备查）
 
@@ -212,7 +212,7 @@ tests/fixtures/bilingual/                        # 夹具（合规/全角违规/
 | 词汇表登记协议 | `shared/workflow/glossary.md` | 整文件（协议即判据） |
 | 跨文档一致性判定基准（词条） | `.specify/memory/glossary.md` | Canonical 列 |
 | 检查器行为（入口/退出码/扫描规则/判定边界） | `scripts/python/bilingual-expression-check.py` | 整文件（代码与契约并读；行为契约 contracts/checker.md 并参） |
-| SC 测量程序 | `.specify/specs/078-bilingual-expression/contracts/measurement.md` | 整文件 |
+| SC 测量程序 | `.specify/specs/079-bilingual-expression/contracts/measurement.md` | 整文件 |
 | ambient 小节形态 | `templates/instructions-template.md` | § Bilingual Expression (双语表述) |
 | 镜像对清单 | `scripts/python/sync-mirrors.py` | `MIRROR_PAIRS` 常量 |
 
