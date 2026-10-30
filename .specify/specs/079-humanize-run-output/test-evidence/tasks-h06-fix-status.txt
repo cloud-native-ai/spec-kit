@@ -1,0 +1,32 @@
+# Tasks H-06 propagation fix — stage status
+
+date=2026-10-30
+stage=tasks H-06 fix (analyze round 2, sole HIGH; human-authorized propagation repair)
+stage_base=c0135989
+budget=docs-only
+status=not-run-docs-only
+scope=079 only
+
+## Closed findings
+
+- H-06: SC-004 denial path now has a fixture (`tests/fixtures/humanize/run/denied/envelope.md`), assertions (`test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope` in T019), the SC-004 coverage row (T019, T021, T031), and a quickstart scenario (S6-B).
+- M-22: Shared Strings count corrected to 15 in Prerequisites and Measured Premises (measured: `grep -cE '^\| .STR-[0-9]{3}.'` = 15).
+- M-23: Feature 062 registry refreshed to 36 task rows / 31 assigned rows plus a tasks-fix record.
+- L-01: `features/062.md` H1 now uses the new name 「动作输出人类友好化」.
+- L-02: T014 references FR-019 instead of restating the five-value verdict enumeration.
+- M-24: SC-010's three injection groups now have fixtures — content-mode corpus (existing `tests/fixtures/humanize/files/`, `inline/`) plus `run/injection/instruction.md` and `run/injection/envelope.md`; T024 consumes them and the SC-010 row names T024.
+
+## Gates (re-run, captured in the sibling files)
+
+- validate-tasks.py: PASS, 0 error(s), 0 warning(s), exit 0.
+- decomposition-check.py --mode tasks: decision=proceed, task_count=36 ≤ 40, fr 30/30, exit 0.
+- pre-analyze-check.py --stage tasks: decision=pass, errors=0, advisories=23 (21 prior + denied/ + injection/, all under the GATE-2 allowed new-path set), exit 0.
+
+## Plan-owned edit
+
+PLAN-EDIT: .specify/specs/079-humanize-run-output/quickstart.md — add S6-B (user explicitly refuses the confirmation) and relabel the SC-004 row to distinguish S6-A/S6-B; wording aligned with FR-012 / FR-019 / SC-004, no semantic change；分类=minor
+
+## Anomalies and in-passing repairs
+
+- Anomaly: no anomaly. The analyze brief's option-B wording ("确认缺失→SC-009") does not match requirements SC-009, whose nine assertions do not include confirmation-missing; the chosen option A (add the S6-B scenario) also relabels the §8 row to map denial to SC-004 and confirmation-missing to FR-008, which is the accurate attribution. Recorded here rather than silently adopted.
+- In-passing repair: Phase-2 Checkpoint and Incremental Delivery no longer say "九件齐备" (stale count after the fixture set grew); they now describe the set without a fabricated total.

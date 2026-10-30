@@ -177,24 +177,28 @@ gitignored）。
 
 ---
 
-## 6. S6 — 需确认却无法询问：停住并如实报告
+## 6. S6 — 确认缺失 / 用户拒绝确认：停住并如实报告
 
-**调用**
+**调用 A（确认缺失：执行体无法询问）**
 
 ```text
 /speckit.humanize 删掉 .specify/.tmp 下的临时文件
 ```
 
+**调用 B（用户明确拒绝确认）**：在能把该动作自身的确认请求转达给用户的宿主上重复调用 A，用户明确回答「不」。
+
 **看什么**
 
-- 该步未执行；`## Conclusion` 写「需要确认，未获答复」。
-- `## Evidence` 记录卡点位置；已完成部分（若有）照常列出。
-- 不重试、不代替用户答复、不换等价动作绕开。
+- A：该步未执行；`## Conclusion` 写「需要确认，未获答复」；`## Evidence` 记录卡点位置；已完成部分（若有）照常列出；不重试、不代替用户答复、不换等价动作绕开。
+- B：该步未执行、也不执行任何替代动作；报告记 status `denied`（来自信封），`## Conclusion` 首行是 `verdict: aborted`，正文写明「用户拒绝确认」并给出拒绝原因与未执行范围；`## Evidence` 列出拒绝原因与未执行范围。
+- B 的副作用快照前后一致：目标文件哈希不变、`git status --porcelain` 无新增；全程只有一次派发、无重试。
+- 两种情形下 humanize 都不代替用户答复（转达请求与答复 ≠ 代答）。
 
-**前提清单**：执行体无法向用户发问；该动作自身的确认步骤未被 auto-approve 配置跳过。
+**前提清单**：A 的执行体无法向用户发问；两种情形的动作自身确认步骤都未被 auto-approve 配置跳过；B 的宿主允许把确认请求转达给用户，且用户的答复为明确拒绝。
 
 **执行状态**：`not-run at plan stage`。承载：`test_ex15_confirmation_missing_fail_closed`、
-`test_ex16_no_proxy_answer`。
+`test_ex16_no_proxy_answer`、`test_sc04_denied_no_side_effect`、
+`test_sc04_denied_verdict_and_scope`。
 
 ---
 
@@ -232,7 +236,7 @@ gitignored）。
 | 五节按序齐备、载体标记恰一个 | requirements SC-001 |
 | 结论与夹具输出一致、证据可定位、来源清单非空 | requirements SC-002 |
 | 失败不写成成功、无重试 | requirements SC-003 |
-| 确认缺失不产生副作用 | requirements SC-004 |
+| S6：拒绝确认不产生副作用（`denied` → `aborted`，含拒绝原因与未执行范围）；确认缺失停住（`needs-confirmation`） | requirements SC-004 / FR-008 |
 | 旧内容模式两个入口与裸文本三分支 | requirements SC-005 |
 | 接线封闭集一致、副本与镜像零漂移、无新增命令 | requirements SC-006 |
 | 零外发、零隐式写入、写入披露 | requirements SC-007 |
