@@ -4,15 +4,20 @@
 spine_state: running
 run_id: r20261030T054502Z-078a
 slice: 078
-stage: implement (baseline slot running)
-stage_started_at: 1793346566
-stage_deadline_epoch: 1793351966
-stage_base_commit: 9a738770
+stage: closure (post-review full suite)
+stage_started_at: 1793350891
+stage_deadline_epoch: 1793356291
+stage_base_commit: a5daa52e
 attempt: 0
 retry_limit: 2
-last_verdict: analyze-r3 GATE PASS (C=0/H=0; H-04/M-11 closed; 9M/9L non-blocking)
+last_verdict: review P0=0/P1=5; repair round done (F1-F5; SC-001/005 honestly partial); closure running
 <!-- plan-constraint: active activated_at=2026-10-30T05:55Z plan_commit=375805f2 approved_baseline_commit=d0f50759 -->
 <!-- rebaseline-events: [{"trigger":"analyze loop requirements M-01/M-02/H-02","commit":"d0f50759","at":"2026-10-30T06:24Z"}] -->
+<!-- test-budget:begin -->
+{"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "implement-start baseline", "trigger": "implement start", "at": "2026-10-30T16:00Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/078-coaching-skills/baseline-failed.txt", "selection_basis": "full-suite", "rc": 1, "passed": 6810, "failed": 16, "skipped": 7, "failed_names_path": ".specify/specs/078-coaching-skills/baseline-failed.txt", "evidence_ptr": ".specify/specs/078-coaching-skills/test-evidence/baseline-full-run.log"}
+{"seq": 2, "slot": "closure", "stage": "closure", "purpose": "post-review closure", "trigger": "review passed (P0=0)", "at": "2026-10-30T17:30Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/078-coaching-skills/final-failed.txt", "selection_basis": "full-suite", "rc": 1, "passed": 6881, "failed": 17, "skipped": 7, "failed_names_path": ".specify/specs/078-coaching-skills/test-evidence/closure-first-failed.txt", "baseline_compare": "comm -13 baseline-failed.txt closure-first-failed.txt -> 1 new (test_i11_channel_two_mirrors_and_per_tool_copies), root-caused to the agent renderer and fixed in-slot", "evidence_ptr": ".specify/specs/078-coaching-skills/test-evidence/closure-full-run.log"}
+{"seq": 3, "slot": "in-slot-rerun", "stage": "closure", "purpose": "closure regression fix (agent renderer rewrite_paths)", "trigger": "1 new closure failure fixed", "at": "2026-10-30T18:00Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/078-coaching-skills/final-failed.txt", "selection_basis": "full-suite", "rc": 1, "passed": 6882, "failed": 16, "skipped": 7, "failed_names_path": ".specify/specs/078-coaching-skills/final-failed.txt", "baseline_compare": "comm -13 baseline-failed.txt final-failed.txt -> []", "evidence_ptr": ".specify/specs/078-coaching-skills/test-evidence/closure-full-run-rerun.log"}
+<!-- test-budget:end -->
 <!-- plan-fence: decomposition(plan)=single-package reason=not-beneficial (plan 产物少且强耦合); decomposition(implement)=single-package reason=not-beneficial (31 tasks, tightly coupled rename surface); review=auto slot_cap=2 test-budget=baseline@implement-start + targeted-mid + closure@post-review -->
 <!-- loop-state:end -->
 
@@ -70,7 +75,13 @@ last_verdict: analyze-r3 GATE PASS (C=0/H=0; H-04/M-11 closed; 9M/9L non-blockin
 | plan-fix-2 | done（commit 66edf74f；U4 PASS） | H-04 claim 唯一 owner + O_EXCL 原子创建；M-11 → `optimization: failed`；3 条 substantive PLAN-EDIT（人工授权） |
 | tasks-fix-2 | done（commit 5e82668e；U4 PASS） | T012 引用 claim owner + O_EXCL；M-14 teardown 后置；三门 pass |
 | analyze-r3 | done（ANALYZE-DONE；门 PASS C0/H0） | H-04/M-11 闭合；M-15/M-16 等 9M/9L 留待实现时顺带处理 |
-| implement | dispatched（single-package；分段 ≤8 任务/part） | baseline slot running |
+| implement | part 1/4 done（U4 PASS） | 技能包已改名、台账/probe/目录/编译面就绪；6 个预期红点归属 T023/T027 |
+| implement part 2 | done（U4 PASS） | 教练闭环正文 + 预期模板；两份新契约测试 30/30 |
+| implement part 3 | done（U4 PASS） | 观测/载荷/接线/派发面完成；改名在宿主发现面生效 |
+| implement part 4 | done（U4 PASS） | 冻结基线转绿、quickstart 实跑、verification.md 9/9 SC；Feature -> Implemented |
+| review | done（REVIEW-DONE；P0=0/P1=5） | review.md；定向集 162 passed |
+| review-repair | done（REVIEW-FIX-DONE） | F1–F5 处置；122 passed/0 failed；Feature=Implemented |
+| closure | in-slot-rerun（修复 1 条新增失败后重跑） | 新增失败 `test_i11_channel_two_mirrors_and_per_tool_copies`；根因=渲染器未 rewrite_paths，已修并重渲染四工具 agents |
 
 ## Analyze 回环计划（loop 1/1）
 
@@ -98,6 +109,13 @@ last_verdict: analyze-r3 GATE PASS (C=0/H=0; H-04/M-11 closed; 9M/9L non-blockin
 1. 授权一次**计划内设计修复**：只改 `data-model.md`（claim 唯一 owner + 原子步骤）与 `contracts/coaching-run.contract.md` C-9（冲突映射 `optimization: failed`），顺带 M-11；修复后重跑 analyze 第三轮（属人工授权的例外，不属于自动回环）。
 2. 把 H-04 降级为「实现前必须解决的设计注释」，带风险进入 implement（不推荐：跨产物矛盾会在实现与测试中放大）。
 3. 暂停该线，保留全部工件与状态脊，等人工评审后再重入（重入只认状态脊，不会重派已完成阶段）。
+
+## 外部合并事件与人工裁决（2026-10-30）
+
+- 观测到另一执行者在基线运行期间把 `078-coaching-skills` 快进合并到 `master` 并推送：`master` = `gitlab/master` = `500ff717`（`chore(078): settle run records and line state before merge`）；远端无 078 分支；本地 078 与 master 同提交，已判定 merged。
+- 当时 **implement 未开始、review 未执行**；用户 2026-10-30 裁定：**保留 078 分支到实现完成**，待 implement/review 通过后再合并、推送、删除分支。
+- 当前已在 078 分支继续；master 已含规划侧全部提交，最终合并将只新增实现/评审提交。
+- 推送能力：仓库仅配置 `gitlab` 远端；`github`/`gitee` 未配置，无需镜像推送。
 
 ## Implement 分段计划（bounded dispatch，≤8 任务/part）
 
