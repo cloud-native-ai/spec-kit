@@ -26,10 +26,15 @@ PROBE_DEFS_MIRROR = REPO_ROOT / ".specify" / "shared" / "definitions" / "probe-d
 # C-12 pin: baseline skill rosters measured 2026-10-14 (see spec notes/pre-change-measurements.md).
 # A pinned list is the sanctioned "literal pinned in a test" duplicate (Constitution XIV).
 # Updated 2026-10-19: humanize added as an external skill (feature 062).
+# Updated 2026-10-30 (Feature 078): the pre-existing external skill unit now named
+# `coaching-skills` was renamed in place (FR-001/FR-018); the roster swaps that one
+# name, so the external layer is still 15 and the retired literal is not repeated
+# here (A10's closed surface allows it exactly once — the CLI upgrade registry).
 BASELINE_EXTERNAL = [
-    "create-docs", "create-pages", "create-skills", "database-utils", "document-utils",
-    "draw-diagram", "git-utils", "humanize", "improve-docs", "improve-skills", "merge-skills",
-    "sdd-house-keeping", "sdd-loop-driver", "sdd-project-setup", "think-skills",
+    "coaching-skills", "create-docs", "create-pages", "create-skills", "database-utils",
+    "document-utils", "draw-diagram", "git-utils", "humanize", "improve-docs",
+    "improve-skills", "merge-skills", "sdd-house-keeping", "sdd-loop-driver",
+    "sdd-project-setup",
 ]
 BASELINE_INTERNAL = [
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -162,8 +167,10 @@ def test_c9_compile_embeds_zero_drift_75_units():
 
 def test_c10_skills_md_routing_five_rows():
     text = _read(SKILLS_CMD)
+    # 2026-10-30 (Feature 078): the modify-family row now routes the coaching
+    # intent to `coaching-skills` (same five rows, new target and call form).
     for needle in [
-        "create-skills", "improve-skills", "merge-skills", "think-skills",
+        "create-skills", "improve-skills", "merge-skills", "coaching-skills",
         "skills/internal/run-skills/SKILL.md",
         "run-skills <名称|路径>",
     ]:

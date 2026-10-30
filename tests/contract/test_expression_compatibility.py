@@ -10,7 +10,8 @@ unrefreshed form has no call sites at all):
 * **C-1 zero new commands** — ``templates/commands/`` holds exactly the frozen
   27 command templates (count *and* name set), and no command file exists below
   a subdirectory; ``skills/{external,internal}/*/SKILL.md`` holds exactly the
-  frozen 51 skill units.
+  frozen 52 skill units (51 at the 069a baseline; 2026-10-30 Feature 078 renames
+  one of them in place, so the count is unchanged).
 * **C-2 zero project-side storage** — nothing under ``.specify/memory/`` is a
   second classification store (no classification-named file, no ledger-style
   row, no ``flow_class`` assignment).
@@ -125,7 +126,16 @@ FROZEN_COMMANDS = (
 
 # C-1 frozen denominator: 52 skill units, layer-qualified so a layer move or a
 # rename is a failure rather than a silent re-count.
+#
+# 2026-10-30 (Feature 078): the pre-existing external mental-simulation unit is
+# renamed to `coaching-skills` in place (FR-001/FR-018). The roster therefore swaps
+# one name for another and the count stays 52 = 15 external + 37 internal — a
+# name change is recorded here deliberately, not re-counted as a new skill. The
+# retired literal is not written in this file: these four frozen rosters are
+# inside A10's closed surface, where SC-006 permits it exactly once (the CLI
+# upgrade-registry entry), so the hash-manifest handoff below derives it instead.
 FROZEN_SKILLS = (
+    "external/coaching-skills",
     "external/create-docs",
     "external/create-pages",
     "external/create-skills",
@@ -140,7 +150,6 @@ FROZEN_SKILLS = (
     "external/sdd-house-keeping",
     "external/sdd-loop-driver",
     "external/sdd-project-setup",
-    "external/think-skills",
     "internal/analyze-artifacts",
     "internal/archive-session",
     "internal/clarify-artifact",
@@ -313,6 +322,37 @@ def _hash_manifest() -> dict[str, str]:
         assert match, "malformed manifest line: %r" % line
         entries[match.group(2)] = match.group(1)
     return entries
+
+
+# --------------------------------------------------------------------------- #
+# C-5 retired-path register (2026-10-30, Feature 078 rename)
+# --------------------------------------------------------------------------- #
+# 069a's hash manifest is a dated record and is not rewritten, so it still lists
+# the skill source that Feature 078 renamed; that path no longer exists on disk.
+# The register derives the retired side mechanically from the manifest (the unique
+# entry gone from disk) and states only the *new* name as the mapping target — the
+# retired literal is never spelled here, because these rosters sit inside A10's
+# closed wiring surface, where SC-006 permits it exactly once (the CLI upgrade-
+# registry entry). Exactly one manifest path may be gone, otherwise the mapping
+# stops being decidable, so the freeze keeps catching drift instead of degrading
+# into an empty assertion (plan § Decision Tensions T-001).
+RENAMED_SKILL_REL = "skills/external/coaching-skills/SKILL.md"
+
+
+def _retired_skill_register(manifest: dict[str, str]) -> dict[str, str]:
+    missing = sorted(rel for rel in manifest if not (REPO_ROOT / rel).is_file())
+    assert len(missing) == 1, (
+        "the retired-path register expects exactly one manifest entry gone from "
+        "disk (the 2026-10-30 Feature 078 rename); got %r" % missing
+    )
+    retired = missing[0]
+    assert (REPO_ROOT / retired).parent.parent == (
+        REPO_ROOT / RENAMED_SKILL_REL
+    ).parent.parent, "a rename must stay inside its layer: %s -> %s" % (
+        retired,
+        RENAMED_SKILL_REL,
+    )
+    return {retired: RENAMED_SKILL_REL}
 
 
 # --------------------------------------------------------------------------- #
@@ -525,6 +565,20 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "reason": "2026-10-28 trunk: analyze command read-only-on-artifacts wording",
         "markers": ("read-only **on artifacts**", "Wrap-up bookkeeping entries"),
     },
+    # 2026-10-30 (Feature 078): the rename touches two non-wiring sources inside
+    # 069a's non-wiring complement — the `/speckit.skills` route table (one
+    # modify-family row repointed, five rows kept) and the run-skills skill's
+    # routing pointer. Both are declared edit surfaces of Feature 078 (FR-019 /
+    # FR-022) and are pinned by tests/contract/test_coaching_wiring_contract.py;
+    # this records the drift, it does not authorize any other.
+    "templates/commands/skills.md": {
+        "reason": "2026-10-30 Feature 078 repoints the modify-family route row at the coaching skill",
+        "markers": ("coaching-skills", "skills/external/coaching-skills/SKILL.md"),
+    },
+    "skills/internal/run-skills/SKILL.md": {
+        "reason": "2026-10-30 Feature 078 updates the run-skills routing-family pointer",
+        "markers": ("coaching-skills",),
+    },
 }
 
 # 2026-10-30 Feature 077 stage-wiring amendment. 069a's manifest is that slice's
@@ -568,9 +622,16 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
         "the manifest is the NON-wiring complement; it still lists a wiring skill"
     )
 
+    # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+    # the register above, then re-asserted on content at its new path — the
+    # manifest entry itself stays untouched as 069a's dated record.
+    retired = _retired_skill_register(manifest)
+
     drifted: list[str] = []
     missing: list[str] = []
     for rel, expected in sorted(manifest.items()):
+        if rel in retired:
+            continue
         path = REPO_ROOT / rel
         if not path.is_file():
             missing.append(rel)
@@ -586,6 +647,18 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
         "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
         "feedback-step pointer). drifted: %r" % drifted
     )
+    for retired_rel, replacement_rel in retired.items():
+        assert not (REPO_ROOT / retired_rel).exists(), (
+            "the retired source came back at its manifest path: %s" % retired_rel
+        )
+        replacement = _read(REPO_ROOT / replacement_rel)
+        for marker in ("name: coaching-skills", "classification: external"):
+            assert marker in replacement, (
+                "the replacement of %s must carry the rename's own content: %r "
+                "missing from %s (2026-10-30, Feature 078)"
+                % (retired_rel, marker, replacement_rel)
+            )
+
     for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
         for marker in allowance["markers"]:
