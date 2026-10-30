@@ -1,0 +1,108 @@
+== G-implement-structure faces (implement part 2/4, T004-T007 landed) ==
++checked_at: 2026-10-30T11:05Z
+command: doc-consistency-check.py --path shared/guidelines/bilingual-expression.md --spec-dir .specify/specs/078-bilingual-expression --faces reader,evidence,duplicate,count
+doc-consistency-check: verify
+checked_at: 2026-10-30T11:05:56Z
+faces: reader=pass evidence=pass duplicate=pass count=pass
+files_scanned: 14
+findings: 0
+RC=0
+
+== structure substep (two-way vs plan Chapter Tree; T007 后 owner-path-missing 应消失) ==
+command: doc-consistency-check.py --action structure --spec-dir .specify/specs/078-bilingual-expression --path shared/guidelines/bilingual-expression.md
+doc-consistency-check: structure
+checked_at: 2026-10-30T11:05:56Z
+class=expression source=declaration
+status: fail
+two-way: run
+files_scanned: 2
+.specify/specs/078-bilingual-expression/checklists/bilingual-convention-2026-10-30.md:13: duplicate-fact: ## Requirement Completeness
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:3: duplicate-fact: **Feature**: 078-bilingual-expression
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:4: duplicate-fact: **Spec**: [requirements.md](../requirements.md)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/feature-ref.md:4: duplicate-fact: **Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/plan.md:214: owner-path-missing: 检查器行为（入口/退出码/扫描规则/判定边界）
+    fix: owner 路径必须存在于仓库内
+.specify/specs/078-bilingual-expression/requirements.md:3: duplicate-fact: **Requirement Branch**: `078-bilingual-expression`
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:67: duplicate-fact: ### User Story 1 - 框架作者在核心概念的定义处写出双语形态，读者跨 context / 跨模型读到一致的语义锚点 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:83: duplicate-fact: ### User Story 2 - 词汇表维护者登记新术语时，Canonical 直接采用双语形态 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:98: duplicate-fact: ### User Story 3 - 下游项目经 `specify init` 获得约定的 ambient 摘要与指针 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:113: duplicate-fact: ### User Story 4 - 维护者运行确定性检查器，机械校验定义行形态与覆盖面 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+baseline: entries=0 new=10
+findings: 10
+
+== findings classification (Part 2/4) ==
+owner-path-missing 预期已消失(T007 落盘 scripts/python/bilingual-expression-check.py);余 findings 应为 Part 1 已分类的 9 条 spec boilerplate duplicate-fact。
+face=build: not-applicable (no site build surface in this feature's stage gate set; no build subrow runnable)
+
+== operator-level: docs-utils validate (zero new violations vs baseline 4) ==
+command: python3 .specify/skills/create-docs/scripts/docs-utils.py --action validate
+{
+  "violations": [
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/unit/test_qoder_support_matrix.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/integration/test_qoder_refresh.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/reference/commands/improve.md",
+      "detail": "../../shared/workflow/self-improvement-workflow.md"
+    },
+    {
+      "kind": "note-frontmatter",
+      "path": "docs/notes/type-follows-stage-misclassification.md",
+      "detail": "missing: "
+    }
+  ]
+}
+RC=0
+
+== structure substep 复跑（PLAN-EDIT 小修后:plan.md 事实 owner 单元格改为单一可解析路径） ==
+command: doc-consistency-check.py --action structure --spec-dir .specify/specs/078-bilingual-expression --path shared/guidelines/bilingual-expression.md
+doc-consistency-check: structure
+checked_at: 2026-10-30T11:07:19Z
+class=expression source=declaration
+status: fail
+two-way: run
+files_scanned: 2
+.specify/specs/078-bilingual-expression/checklists/bilingual-convention-2026-10-30.md:13: duplicate-fact: ## Requirement Completeness
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:3: duplicate-fact: **Feature**: 078-bilingual-expression
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:4: duplicate-fact: **Spec**: [requirements.md](../requirements.md)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/feature-ref.md:4: duplicate-fact: **Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:3: duplicate-fact: **Requirement Branch**: `078-bilingual-expression`
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:67: duplicate-fact: ### User Story 1 - 框架作者在核心概念的定义处写出双语形态，读者跨 context / 跨模型读到一致的语义锚点 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:83: duplicate-fact: ### User Story 2 - 词汇表维护者登记新术语时，Canonical 直接采用双语形态 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:98: duplicate-fact: ### User Story 3 - 下游项目经 `specify init` 获得约定的 ambient 摘要与指针 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:113: duplicate-fact: ### User Story 4 - 维护者运行确定性检查器，机械校验定义行形态与覆盖面 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+baseline: entries=0 new=9
+findings: 9
+
+== findings classification (Part 2/4, 复跑后) ==
+chapter two-way comparison vs plan Chapter Tree: PASS (0 chapter-* findings; all 9 chapters matched verbatim)
+owner-path-missing: 已消失（PLAN-EDIT 小修:plan.md 事实 owner 单元格由双路径「`a` + `b`」改为单一可解析路径 + 契约指针移入 anchor 格;检查器路径 scripts/python/bilingual-expression-check.py 由 T007 落盘）
+remaining findings: 9 duplicate-fact = Part 1 已分类的 spec boilerplate（契约头两行、清单两个二级标题、requirements 分支行与 US 标题）,全部提交于 5a4dc5a4 之前的阶段链,非本段引入
+face=build: not-applicable (no site build surface in this feature's stage gate set; no build subrow runnable)
+docs-utils validate: 4 violations == 基线 4（zero new;RC=0）

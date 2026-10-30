@@ -1,0 +1,39 @@
+# T015 SC-005 implement 侧：受控语料 census 端到端采证（2026-10-30T11:52Z）
+
+临时根：.specify/.tmp/078-bilingual-expression/us15-census（受认可 .specify/.tmp 根；已 rm -rf 拆卸，
+git status --ignored 仅剩 .specify/.tmp/ 空根，无新增）。
+构造：复制框架源检查器 + glossary-utils + owner 文档（coverage 清单来源）到临时根（REPO_ROOT 由脚本
+位置解析到临时根）；受控词汇表 3 条紧贴双语 Canonical（样例概念(Sample Concept) / 锚定语义(Anchored
+Semantics) / 演练词条(Drill Term)，第三条沿用 T004 虚构词条）；覆盖定义面样本 = shared/definitions/
++ templates/ + .specify/memory/constitution.md + .specify/instructions.md 各一件。
+真实词汇表 census 实跑按 tasks 约定归 review 阶段（quickstart S8），本行不预支。
+
+## A. 一致受控语料（期望 rc=0，census_total=3）
+command: python3 .specify/.tmp/078-bilingual-expression/us15-census/scripts/python/bilingual-expression-check.py --action census --json
+real output:
+{"action": "census", "files_scanned": 7, "findings_count": 0, "findings": [], "scope": "owner-doc", "census_total": 3, "form_regex": "[^\\s()（）]+\\([^()\\n]+\\)"}
+rc=0 — 不一致处数 0，中文侧逐字比对（含 Variants 归一：演练词→演练词条(Drill Term)）全量执行。
+
+## B. 负控（注入 **错写概念**(Sample Concept) 一行；期望 rc=1 且恰好新增 1 条 finding）
+command: 同上（注入后复跑）
+real output:
+{"action": "census", "files_scanned": 7, "findings_count": 1, "findings": [{"path": "shared/definitions/sample-concept.md", "line": 13, "code": "missing-bilingual", "message": "中文侧与 Canonical 不一致: 行内 '错写概念' != 词汇表 '样例概念' (样例概念(Sample Concept))", "severity": "error"}], "scope": "owner-doc", "census_total": 3, "form_regex": "[^\\s()（）]+\\([^()\\n]+\\)"}
+rc=1 — 证明比对真实执行（非恒绿）：错写中文侧被逐字比对判出。
+
+## C. 恢复语料复跑（期望 rc=0）
+command: 同上（恢复后复跑）
+real output:
+{"action": "census", "files_scanned": 7, "findings_count": 0, "findings": [], "scope": "owner-doc", "census_total": 3, "form_regex": "[^\\s()（）]+\\([^()\\n]+\\)"}
+rc=0
+
+## 机械边界观察（correction 级披露，非阻断）
+census 抽取中文侧时剥除加粗标记 ** 但不剥除行首 Markdown 结构标记（## 、- 列表符）：
+`- **样例概念**(Sample Concept)` 与 `## 锚定语义(Anchored Semantics)` 形态的行会把标记计入中文侧
+而误报。受控语料按该机械语义构造（加粗定义行顶格书写）；真实树行为由契约腿
+test_census_action（真词汇表、rc=0）钉死并通过 T017。行结构标记剥离属检查器机械边界的后续改进候选，
+不影响本特性 SC 判据（SC-005 的正式实跑在 review 阶段以契约腿同一命令采证）。
+
+## 拆卸
+rm -rf .specify/.tmp/078-bilingual-expression/us15-census（done）；
+git status --ignored --porcelain .specify/.tmp/ → 仅 `!! .specify/.tmp/`（空根），受控语料不作新增。
+真词汇表 .specify/memory/glossary.md 全程零修改。

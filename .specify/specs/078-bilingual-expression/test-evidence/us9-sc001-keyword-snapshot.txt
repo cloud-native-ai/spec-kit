@@ -1,0 +1,34 @@
+=== T009 SC-001 关键词快照 (2026-10-30T11:12:17Z) ===
+派生方式：owner 文档四组枚举 `- ` 列表项字面量（程序派生，非手写）
+[group:direction] (3 items)
+  - 文档主语言为中文 ⇒ 形态逐字为「中文(English)」（[[STR-002]]）。
+  - 文档主语言为英文 ⇒ 形态逐字为「English(中文)」（[[STR-003]]）。
+  - 括号内一律为文档主语言的另一语言；同一文档以文档主语言决定括号语言。
+[group:coverage] (7 items)
+  - 词汇表条目 Canonical：`.specify/memory/glossary.md` 全部词条。
+  - `shared/definitions/` 概念条目。
+  - `shared/guidelines/` 与 `shared/workflow/` 文档的标题与定义行。
+  - 宪法原则标题：`.specify/memory/constitution.md` 的编号原则标题。
+  - instructions ambient 小节标题：`.specify/instructions.md` 的 `## ` 小节标题。
+  - `templates/` 章节标题。
+  - 命令与技能名首次定义处的承载文件。
+[group:exemption] (7 items)
+  - 代码标识符：函数、变量、类名等源代码标识符。
+  - 路径：文件与目录路径。
+  - 命令字面量：shell 命令与 CLI 调用串。
+  - API 名：函数签名、端点、库接口名。
+  - YAML/JSON 键：结构化数据键名。
+  - 第三方专名：外部产品/项目/组织的名称。
+  - 公认缩写：如 SDD，在首次双语定义后可单语使用。
+[group:form] (5 items)
+  - 半角括号：括号宽度逐字为 `(` 与 `)`；全角 `（` `）` 紧贴词条即不合规。
+  - 紧贴：词条与左括号之间无空格，括号紧贴词条（`中文(English)` 形态内无任何空白）。
+  - 大小写逐字：词条大小写随登记形态逐字匹配，不自动归一（FR-005 的精确一致性自然覆盖大小写）。
+  - 不判翻译质量：括号内英文是否译得准不在本约定判定范围（显式排除项）。
+  - 形态判定正则（检查器唯一登记行）：`[^\s()（）]+\([^()\n]+\)`；检查器 MUST 逐字读取本行登记的形态，语义不随实现漂移。
+
+检索范围: ['shared', 'templates', '.specify']（排除 ('.specify/specs/', '.specify/history/')），扫描文件数 17307
+排除规则: (i) owner 文档自身（框架源 + .specify 镜像）；(ii) 含 [[STR-001]] 指针的「路径+锚」引用行
+
+判定：命中总数 0，排除 0，计入复制位置数 = 0
+SC-001 verdict: PASS (复制位置数 = 0)

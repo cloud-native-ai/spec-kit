@@ -1,0 +1,17 @@
+# doc-consistency-check.py --action verify --faces evidence --path .specify/specs/078-bilingual-expression --spec-dir .specify/specs/078-bilingual-expression
+# 2026-10-30 HEAD=5a4dc5a4  (G-tasks-evidence, 复扫含本 stage 新落的 tasks.md)
+doc-consistency-check: verify
+checked_at: 2026-10-30T09:48:39Z
+faces: evidence=pass
+files_scanned: 12
+findings: 0
+exit=0
+
+# === implement Part 4 closure re-run (2026-10-30T12:08Z) ===
+# command: python3 scripts/python/doc-consistency-check.py --action verify --faces evidence --path .specify/specs/078-bilingual-expression --spec-dir .specify/specs/078-bilingual-expression
+doc-consistency-check: verify
+checked_at: 2026-10-30T11:33:36Z
+faces: evidence=pass
+files_scanned: 16
+findings: 0
+exit=0

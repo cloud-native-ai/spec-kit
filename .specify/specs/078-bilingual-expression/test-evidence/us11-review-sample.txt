@@ -1,0 +1,26 @@
+=== T011 review 面确定性抽样 (2026-10-30T11:14:48Z) ===
+输入：T010 --scope changed 的信号行清单（程序派生，同 changed_paths('5a4dc5a4') 并集）
+n = 205 行；k = ceil(n/10) = 21；规则：每隔 k 行取 1（行数 < 10 时全量，本条 n>=10）
+sample_lines 来源：检查器模块 import（scripts/python/bilingual-expression-check.py），非评审自选
+抽样行数 = 9
+
+[01] .specify/memory/glossary.md:52
+     | qwen3 系列模型 ID | qwen3.7-max, qwen3.7-plus, Qwen3.8-Max, qwen3-rerank | **百炼大模型 ID**(非工具名):cli-setup 的模型四元组仍在使用,状态为活跃。与已下线的 Qwen Code CLI 仅名称形近、语义无关;
+[02] .specify/shared/guidelines/bilingual-expression.md:85
+     ## 一致性与词汇表
+[03] .specify/specs/078-bilingual-expression/notes/quickstart-run.md:19
+     ## S1 实跑
+[04] .specify/specs/078-bilingual-expression/plan.md:221
+     ## Complexity Tracking
+[05] .specify/specs/078-bilingual-expression/tasks.md:230
+     ## Dependencies & Execution Order
+[06] .specify/templates/instructions-template.md:69
+     ## Closed-Set Claims (封闭清单声明)
+[07] .specify/templates/instructions-template.md:213
+     ## Tech Stack & Resources
+[08] .specify/templates/instructions-template.md:27
+     ## Proactive Flow Trigger
+[09] .specify/templates/instructions-template.md:189
+     ## Ask, Record, Repeat
+
+本文件为 review 阶段抽样复核的输入 artifact；复核分歧登记归 review 产物（measurement C-004）

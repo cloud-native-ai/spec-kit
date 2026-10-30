@@ -1,0 +1,44 @@
+# T014 SC-004 追溯重写 = 0 审计（2026-10-30T11:45Z）
+
+审计范围：本特性全部提交相对 trunk 基线 7c835ba6（master HEAD，077 收尾后）的改动并集；
+任务命名的判据命令 `git diff --stat 5a4dc5a4..HEAD`（stage base 以 plan_commit 计）原始输出附于下方。
+untracked 运行时记录（.specify/state/、.specify/memory/{session,feedback,exec-quant}/、.specify/memory/todo/、
+.specify/memory/glossary.md 的 plan 期既有改动）按纪律不提交、不还原，不计入追溯重写面（无一为既有文档改写）。
+
+## 白名单（封闭集，对照 FR-006/FR-015/SC-004 与 tasks.md T014）
+
+W1 [[STR-001]] owner 文档：框架源 + .specify/ 镜像
+W2 ambient 载体：templates/instructions-template.md（框架源 + .specify/ 镜像）与生成产物 .specify/instructions.md、根 AGENTS.md（符号链接面，未手改）
+W3 检查器与其镜像：scripts/python/bilingual-expression-check.py + .specify/scripts/ 镜像
+W4 契约测试与夹具：tests/contract/test_bilingual_expression.py、tests/fixtures/bilingual/*
+W5 登记文件：.specify/memory/features.md、features/078.md、register.md
+W6 规格产物：.specify/specs/078-bilingual-expression/** 全部
+
+## 逐文件判定（git diff --name-only 7c835ba6..HEAD，共 69 = 14 非 spec + 55 spec）
+
+非 spec 目录文件（14）：
+  .specify/instructions.md                     → W2 生成产物（T012 由 generate-instructions.sh 刷新，非手改）
+  .specify/memory/features.md                  → W5 登记（requirements 期 078 行）
+  .specify/memory/features/078.md              → W5 登记
+  .specify/memory/register.md                  → W5 登记（T-001…T-004、078-C-clauses，plan 期）
+  .specify/scripts/python/bilingual-expression-check.py → W3 镜像（T008 sync-mirrors --write 产出）
+  .specify/shared/guidelines/bilingual-expression.md    → W1 镜像（T008）
+  .specify/templates/instructions-template.md  → W2 镜像（T008）
+  scripts/python/bilingual-expression-check.py  → W3 检查器（T007）
+  shared/guidelines/bilingual-expression.md     → W1 owner 文档（T003）
+  templates/instructions-template.md            → W2 ambient 载体（T006）
+  tests/contract/test_bilingual_expression.py   → W4 契约测试（T002）
+  tests/fixtures/bilingual/compliant-definition.md      → W4 夹具（T002）
+  tests/fixtures/bilingual/fullwidth-definition.md      → W4 夹具（T002）
+  tests/fixtures/bilingual/same-language-definition.md  → W4 夹具（T002）
+spec 目录文件（55）→ W6 规格产物（含 plan.md +1/-1 的 PLAN-EDIT minor（T007 已审计 declared，
+audit-plan-changes.py undeclared=false）与 checklists/requirements.md 一行的证据面误捕修复
+（bb138fa2，与 requirements 期同类修复同形，tasks.md DoD-9 已声明））
+
+白名单外既有文档的修改行数：0
+白名单外新增文件数：0
+结论：SC-004 追溯重写 = 0 成立；迁移只发生在 owner 文档自身与规格产物内。
+
+## 任务命名判据命令原始输出：git diff --stat 5a4dc5a4..HEAD
+（44 files changed, 4256 insertions(+), 3 deletions(-)；3 行删除 = plan.md PLAN-EDIT minor 1 行 +
+checklists/requirements.md 1 行 + .specify/instructions.md 生成器替换 1 行，均属 W2/W6 面）

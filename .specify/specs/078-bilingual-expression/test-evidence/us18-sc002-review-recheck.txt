@@ -1,0 +1,58 @@
+=== SC-002 review 面抽样复核（2026-10-30T12:2xZ, review 阶段）===
+输入：test-evidence/us11-review-sample.txt（T011 程序确定性抽样，n=205 信号行，k=21，抽 9 行；n<10 全量复核）
+复核方式：逐行对照当前树（9 行内容与抽样文件逐字一致，行号未漂移）+ owner 文档
+（shared/guidelines/bilingual-expression.md）信号 S1–S4、方向规则、机械判定边界（C-012）、
+覆盖定义面封闭集（FR-007）、迁移边界。
+
+[01] .specify/memory/glossary.md:52（S1 词汇表表体行）
+  行内容：| qwen3 系列模型 ID | ... | **百炼大模型 ID**(非工具名):... |
+  检查器旧判定：零 finding。
+  复核判定：分歧。owner 文档登记的 missing-bilingual 机械落点是「S1 表体行中含 CJK 却无任何
+  括号形态的 Canonical」；该行 Canonical「qwen3 系列模型 ID」含 CJK 无括号，应判
+  missing-bilingual。根因：scan_file 的 S1 header 正则 ^\|\s*Canonical\s*\| 先命中词汇表文件
+  前部 Column Definitions 表的两列行「| Canonical | The agreed project term ... |」，
+  in_table=True 后在「## Glossary」处 break，真正 5 列词条表从未进入判定（实测复现：旧检查器
+  scan 真词汇表 rc=0；修复后 rc=1，26 行存量命中）。
+  处置（本轮回落地）：(a) 检查器修复——header 判定要求 ≥5 列（scripts/python/bilingual-expression-check.py，
+  红先行：新增契约腿 test_scan_glossary_shape_skips_column_definitions_decoy 先红后绿，
+  定向集 16/16）；(b) 该行属既有提交存量（git diff 证实未提交增量仅「双语表述」一词条），按迁移边界
+  登记 E6 存量差异清单（scan --scope full append-only 追加），不追溯重写。
+  SC-002 影响：无。分歧行不在「新写内容」分子分母内（既有提交行）；新写内容合规率 100% 不变。
+
+[02] .specify/shared/guidelines/bilingual-expression.md:85  ## 一致性与词汇表（S2 章节标题）
+  复核判定：同意零 finding。无括号段 → 按 C-012 机械边界缺失判定归评审面；该标题是内容组织性
+  话题标签，不是核心概念名词/关键流程动词的定义处（FR-002 约束对象=定义处）；owner 文档示范
+  声明（C-02）自身即以单语章节标题为样例，coverage 清单项约束的是「定义行/概念名」非导航标题。
+
+[03] .specify/specs/078-bilingual-expression/notes/quickstart-run.md:19  ## S1 实跑
+  复核判定：同意零 finding。spec 产物（notes）不在 FR-007 覆盖定义面封闭集内（owner 文档：
+  「清单本身之外的面不受约束」）。
+
+[04] plan.md:221  ## Complexity Tracking / [05] tasks.md:230  ## Dependencies & Execution Order
+  复核判定：同意零 finding。spec 产物标题不在覆盖封闭集内；en 主语言结构性标题，非概念定义处。
+
+[06] .specify/templates/instructions-template.md:69  ## Closed-Set Claims (封闭清单声明)
+  复核判定：同意零 finding。templates/ 章节标题在覆盖封闭集内，形态 = en 主语言 + 半角紧贴中文
+  括号，与登记的 English(中文) 逐字形态一致（合规样本）。
+
+[07] templates/instructions-template.md:213  ## Tech Stack & Resources
+[08] templates/instructions-template.md:27   ## Proactive Flow Trigger
+[09] templates/instructions-template.md:189  ## Ask, Record, Repeat
+  复核判定：同意零 finding。三行均为模板存量结构性标题（ambient 插入前的既有小节，行号 37/98/
+  197/229/235/254 同批存量已在 us10 分类）；非概念定义处；且按迁移边界存量不追溯重写。
+
+=== 修复后 changed-scope 复跑（固定检查器，base 5a4dc5a4，2026-10-30T12:2xZ）===
+findings_count=68（us10 的 22 + 新增 46）：
+- 词汇表 S1 存量 26 行（修复使 S1 判定首次生效；全部既有提交行，含分歧行 :48/:52）
+- features.md 14 行（全为其它特性行的存量内容；078 行本身非加粗引导、信号门不触发，且
+  features.md 不在 FR-007 覆盖封闭集内——owner 文档「清单之外的面不受约束」）
+- instructions 模板+镜像+live 生成产物 18 行（=us10 已分类的 12 存量模板与镜像 + 同源的
+  .specify/instructions.md 生成镜像 6 行）
+- plan 2 / tasks 4 / checklist 1（=us10 已分类的约定前 boilerplate）
+- 夹具标本 2 / 状态脊 1（=us10 已分类排除项）
+全部归类为非新写内容；新写内容 finding = 0 → 新写内容合规率维持 100%。
+
+=== 分歧登记汇总 ===
+分歧 1 条（[01]），根因已修（检查器 S1 解析），处置落 E6 存量清单；抽样 9/9 行复核完毕，
+修复后检查器判定与评审 oracle 完全一致（26 行存量命中与人工抽查 :48/:52/:55 一致）。
+SC-002 review 面 verdict=pass（分歧已登记、已处置、不影响新写内容合规率）。
