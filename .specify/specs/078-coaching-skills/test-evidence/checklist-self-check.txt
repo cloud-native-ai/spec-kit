@@ -1,0 +1,8 @@
+command: python3 - <<'PY'  (inline checker over checklists/coaching-loop-2026-10-30.md)
+date: 2026-10-30
+items: 36 (soft cap 40)
+ids contiguous from CHK001: True
+traceable items: 36/36 = 100% (floor 80%)
+prohibited openers (Verify/Test/Confirm/Check): 0
+duplicate ids: 0
+existing file preserved: checklists/requirements.md untouched (git status shows no change to it)
