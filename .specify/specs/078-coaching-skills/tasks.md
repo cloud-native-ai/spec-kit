@@ -161,8 +161,8 @@
 
 **Purpose**: 证据槽与改动前/基线读数——后续每个相位都往这两个落点写，先建好它。
 
-- [ ] T001 建证据槽并采集改动前读数：把六条命令的真实输出（命令、日期、退出码一并）写进 `.specify/specs/078-coaching-skills/notes/pre-change-measurements.md` —— `git grep -l "think-skills" | wc -l`、闭集逐文件 `git grep -c`、`python3 scripts/python/flow-class-check.py --action check`、`python3 scripts/python/probe-utils.py --action compile-embeds --check`、`python3 scripts/python/scan-confirmation-gates.py --summary`、`python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/think-skills/SKILL.md`；该文件是全特性「改动前侧」的唯一落点。
-- [ ] T002 在实现起点按 never-cache 规则重采条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/078-coaching-skills --freeze > .specify/specs/078-coaching-skills/coverage-baseline.txt`（脚本只打印、不写文件），核对头部含 `excluding 078-coaching-skills` 且正文不含本特性任何一条条款名；把两车道读数（`claimed clauses`、`UNCOVERED` 中属于本特性的条数、`FR uncovered`）追加进 `.specify/specs/078-coaching-skills/notes/pre-change-measurements.md`，并注明 FR 车道的成因见 § Measured Premises。
+- [X] T001 建证据槽并采集改动前读数：把六条命令的真实输出（命令、日期、退出码一并）写进 `.specify/specs/078-coaching-skills/notes/pre-change-measurements.md` —— `git grep -l "think-skills" | wc -l`、闭集逐文件 `git grep -c`、`python3 scripts/python/flow-class-check.py --action check`、`python3 scripts/python/probe-utils.py --action compile-embeds --check`、`python3 scripts/python/scan-confirmation-gates.py --summary`、`python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/think-skills/SKILL.md`；该文件是全特性「改动前侧」的唯一落点。
+- [X] T002 在实现起点按 never-cache 规则重采条款覆盖基线：`python3 scripts/python/account-clause-coverage.py .specify/specs/078-coaching-skills --freeze > .specify/specs/078-coaching-skills/coverage-baseline.txt`（脚本只打印、不写文件），核对头部含 `excluding 078-coaching-skills` 且正文不含本特性任何一条条款名；把两车道读数（`claimed clauses`、`UNCOVERED` 中属于本特性的条数、`FR uncovered`）追加进 `.specify/specs/078-coaching-skills/notes/pre-change-measurements.md`，并注明 FR 车道的成因见 § Measured Premises。
 
 **Checkpoint**: 两个证据落点存在且写着真实读数——后续任何行引用「改动前」时只指向 `notes/pre-change-measurements.md` 与 `coverage-baseline.txt`。
 
@@ -172,12 +172,12 @@
 
 **Purpose**: 让新坐标先存在——夹具、改名骨架、台账行、probe 行、目录登记与编译面。四个故事都写在新名字、新路径上，没有这一相位它们无处落笔。
 
-- [ ] T003 [P] 建夹具：写 `tests/fixtures/coaching/fixture-trainee/SKILL.md`（最小 Trainee，主产物为一份清单文件，流程内置一处正确性缺陷与一处效率退化，供 US1/US2/US3 的记录契约测试共用）与 `tests/fixtures/coaching/work.md`（夹具工作原文，逐字进入派发载荷断言）。
-- [ ] T004 [P] 改名技能包骨架：`git mv skills/external/think-skills skills/external/coaching-skills`，然后把 `skills/external/coaching-skills/SKILL.md` 的 frontmatter 改为 `name: coaching-skills`、`skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"`、description 触发词改为 教练 / 陪练 / 观察执行 / 预期 vs 实际 / 执行偏差 / 微调建议 / coaching 并写明调用形态 `coaching-skills <trainee-name|trainee-path> <work>`，删掉 thought experiment / 思想实验 / 不要真的执行 这类承诺零副作用的说法；`classification: external` 不动，正文留给 T010–T013 与 T015/T016/T018 重写。
-- [ ] T005 [P] 台账行改名：在 `shared/definitions/flow-class-definitions.md` 用 `skill:coaching-skills | execution | behavior-oracle | （空中立标记）| 理由改写为「先给预期、再看真实执行、最后给微调」的教练闭环` 替换旧名行，台账版本 1 → 2（2026-10-30），§ 变更记录 追加一条；同时把文件头过期的 78 行 / 51 技能读数更正为实测的 27 命令 + 52 技能 = 79 行并标注 2026-10-30。
-- [ ] T006 [P] probe 行改名：把 `shared/definitions/probe-definitions.md` 的 Object 行 `skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up` 改成 `skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up`；改名只换行不新增行，单元数不变。
-- [ ] T007 [P] 登记运行目录：在 `shared/definitions/framework-map.md` 的 Project memory 行补 `.specify/memory/coaching/`（`<run-id>` 运行产物目录，一文一件），同一次变更内完成（宪法 XVII 目录治理）。
-- [ ] T008 [blockedBy: T004,T006] 重建编译面：`python3 scripts/python/probe-utils.py --action compile-embeds` 让 `skills/external/coaching-skills/SKILL.md` 的 `## Wrap-up` 由注册表编译（不得手写），再 `--action map` 重建 `.specify/memory/feedback/probe-map.md`；随后 `--action compile-embeds --check` 应报 `75 units, zero drift`。
+- [X] T003 [P] 建夹具：写 `tests/fixtures/coaching/fixture-trainee/SKILL.md`（最小 Trainee，主产物为一份清单文件，流程内置一处正确性缺陷与一处效率退化，供 US1/US2/US3 的记录契约测试共用）与 `tests/fixtures/coaching/work.md`（夹具工作原文，逐字进入派发载荷断言）。
+- [X] T004 [P] 改名技能包骨架：`git mv skills/external/think-skills skills/external/coaching-skills`，然后把 `skills/external/coaching-skills/SKILL.md` 的 frontmatter 改为 `name: coaching-skills`、`skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"`、description 触发词改为 教练 / 陪练 / 观察执行 / 预期 vs 实际 / 执行偏差 / 微调建议 / coaching 并写明调用形态 `coaching-skills <trainee-name|trainee-path> <work>`，删掉 thought experiment / 思想实验 / 不要真的执行 这类承诺零副作用的说法；`classification: external` 不动，正文留给 T010–T013 与 T015/T016/T018 重写。
+- [X] T005 [P] 台账行改名：在 `shared/definitions/flow-class-definitions.md` 用 `skill:coaching-skills | execution | behavior-oracle | （空中立标记）| 理由改写为「先给预期、再看真实执行、最后给微调」的教练闭环` 替换旧名行，台账版本 1 → 2（2026-10-30），§ 变更记录 追加一条；同时把文件头过期的 78 行 / 51 技能读数更正为实测的 27 命令 + 52 技能 = 79 行并标注 2026-10-30。
+- [X] T006 [P] probe 行改名：把 `shared/definitions/probe-definitions.md` 的 Object 行 `skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up` 改成 `skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up`；改名只换行不新增行，单元数不变。
+- [X] T007 [P] 登记运行目录：在 `shared/definitions/framework-map.md` 的 Project memory 行补 `.specify/memory/coaching/`（`<run-id>` 运行产物目录，一文一件），同一次变更内完成（宪法 XVII 目录治理）。
+- [X] T008 [blockedBy: T004,T006] 重建编译面：`python3 scripts/python/probe-utils.py --action compile-embeds` 让 `skills/external/coaching-skills/SKILL.md` 的 `## Wrap-up` 由注册表编译（不得手写），再 `--action map` 重建 `.specify/memory/feedback/probe-map.md`；随后 `--action compile-embeds --check` 应报 `75 units, zero drift`。
 
 **Checkpoint**: 新名在目录、frontmatter、unit id、台账、probe 与编译块上各就位；`flow-class-check.py --action lookup --unit-id "skill:coaching-skills"` 报 `source: ledger`。
 

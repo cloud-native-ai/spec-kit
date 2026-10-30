@@ -113,7 +113,7 @@
 | skill-sdd-house-keeping-wrapup | skill-wrapup | skill:sdd-house-keeping | wrap-up |
 | skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
-| skill-think-skills-wrapup | skill-wrapup | skill:think-skills | wrap-up |
+| skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |
 | gate-feature-status-regression | command-gate | /speckit.feature | gate-feature-status-regression |
 | gate-implement-checklist-waiver | command-gate | /speckit.implement | gate-implement-checklist-waiver |
