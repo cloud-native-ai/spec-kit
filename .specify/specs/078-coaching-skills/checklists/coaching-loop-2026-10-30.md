@@ -48,7 +48,7 @@
 ## Rename Identity and Closed Wiring Surface
 
 - [ ] CHK026 - Do FR-018's eight identity coordinates and SC-006's counted coordinate list agree — given that description triggers are an identity coordinate but are absent from the 5/5 counting set? [Consistency, Req §FR-018, Req §SC-006]
-- [ ] CHK027 - Is the closed wiring surface owned by exactly one enumerated list, with A10's 19-file count, the contract's 19-row table and the task-level path list cross-checked against it (no second authoritative enumeration)? [Consistency, Req §A10]
+- [ ] CHK027 - Is the closed wiring surface owned by exactly one enumerated list, with A10's closed-surface count (20 hand-edited sources, count and category split stated there) and the task-level path list cross-checked against it (no second authoritative enumeration)? [Consistency, Req §A10]
 - [ ] CHK028 - Is FR-024's "`.specify/specs/**` MUST NOT be rewritten" scoped so this feature's own spec artifacts can still evolve, and is the intended exclusion ("older features' history") stated rather than inferred? [Ambiguity, Req §FR-024, Req §A9]
 - [ ] CHK029 - Is the allowed-difference set for SC-006 expressed so the sole `_OBSOLETE_SKILLS` exception and the derived-face exclusion cannot overlap or double-count? [Clarity, Req §SC-006, Req §A10]
 - [ ] CHK030 - Is "zero drift" for `sync-mirrors.py --check` and `regen-command-copies.py --check` defined (no new DIFF/MISS/EXTRA versus exit code 0) relative to the recorded pre-change baseline? [Clarity, Req §SC-008]

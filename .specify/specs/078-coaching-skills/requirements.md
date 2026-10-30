@@ -19,7 +19,7 @@
 
 重命名与兼容面（已实测的影响面）：
 - 重命名必须同时改身份坐标：源目录 skills/external/<name>/、frontmatter name、skill_id / Resource ID（Canonical ID/Path）、运行时 unit id skill:<name>、flow-class 定义行、probe 定义行与 probe id、/speckit.skills 路由表行与路径、description 触发词。
-- 已知引用面：77 个受版本管理文件；需手改的源码 19 个（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src/specify_cli OBSOLETE 名册 1、docs 2、contract tests 4）。派生面（.specify 镜像、命令副本、.qoder/.claude/.github agents、Wrap-up 编译块、probe-map）只能再生成，不能手改。
+- 已知引用面：77 个受版本管理文件（requirements 成文时读数）；需手改的源码清单与分类计数以 A10 的封闭活接线面为唯一 owner（本段不复述枚举）。派生面（.specify 镜像、命令副本、.qoder/.claude/.github agents、Wrap-up 编译块、probe-map）只能再生成，不能手改。
 - 旧项目兼容：旧目录名必须进入 src/specify_cli/__init__.py 的 _OBSOLETE_SKILLS，使升级后的项目删除残留目录；升级不得删除用户自建的同名符号链接。
 - 四个冻结基线测试（test_expression_compatibility、test_migration_distribution、test_skill_layer_visibility_guards、test_run_skills_wiring）必须显式更新并注明日期与理由，不得静默改计数。
 - 历史记录（.specify/specs/**、memory/evidence/**、features/*.md、reviews、eval-baseline、按旧 unit id 归档的 run 记录）不改写、不回填。
@@ -44,7 +44,7 @@
 - **A7（两个新概念无既有 owner）**：本文定义的「结果—正确性」与「过程—效率」在框架内无既有 owner；本文是它们的首个定义点，plan/contracts 可细化但 MUST NOT 另立第二份定义。它们与 `run-determination` 的四量（token 消耗/耗时/制品正确性/满意度）不是同一组概念：后者描述一次运行的判定，前者描述「Trainee 相对预期」的偏差。
 - **A8（旧项目升级）**：旧目录名进入 `_OBSOLETE_SKILLS` 后，`specify init` 的加性 copytree 会留下旧目录，清理步骤 MUST 删除该**实体目录**，但 MUST NOT 删除用户自建的同名**符号链接**（既有清理纪律：符号链接可能是用户别名）。
 - **A9（历史不改写）**：不改写的边界是**本特性 `078-coaching-skills` 自己的产物目录之外的既有记录**——其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、`features/<其他ID>.md`、reviews、eval-baseline、按 `skill:think-skills` 归档的 run/feedback 记录均为 dated record，不改写、不回填。本特性自身的产物（`.specify/specs/078-coaching-skills/**`、`.specify/memory/features/078.md` 与本特性新写入的 run/feedback 记录）不属历史记录，MUST 可正常改写与重跑；新名的 run 从空历史开始（不继承旧名 run 记录）。
-- **A10（封闭清单判据）**：「活接线面」是封闭集——本特性开始前实测的 19 个需手改源文件（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src `_OBSOLETE_SKILLS` 1、docs 2、contract tests 4），加上由它们再生成的派生面；SC-006 / SC-008 的零残留与零漂移判据以该封闭集为参照，历史记录不在集合内（A9）。**允许差异集恰为一项**：`_OBSOLETE_SKILLS` 中保留旧名的那一行（FR-020 要求它必须存在）；除此之外空集。
+- **A10（封闭清单判据）**：「活接线面」是封闭集——本特性开始前实测 19 个需手改源文件，加上实现期由既有漂移守卫（`LEGACY_SKILL_NAMES` 必须与 CLI `_OBSOLETE_SKILLS` 一致）被迫追加的第 20 个注册表消费面 `scripts/python/sanitize-utils.py`，共 **20 个需手改源文件**（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src `_OBSOLETE_SKILLS` 1、sanitize `LEGACY_SKILL_NAMES` 1、docs 2、contract tests 4），加上由它们再生成的派生面；SC-006 / SC-008 的零残留与零漂移判据以该封闭集为参照，历史记录不在集合内（A9）。**允许差异集恰为一项**：`_OBSOLETE_SKILLS` 中保留旧名的那一行（FR-020 要求它必须存在）；除此之外空集。`sanitize-utils.py` 中的旧名条目位于 `OBSOLETE-ASSET-REGISTRY` 移除清单块内、在计数前被剥离，属删除用注册表镜像而非活引用，因此不扩大允许差异集。
 - **A11（零新增门禁）**：门控预算整数余量当前为 0（既有 owner 记载），本特性 MUST NOT 在扫描面新增任何命中 `BLOCKING_PATTERNS` 的文案；判定单位是 `git diff` 的**新增行**而非总量（总量相等允许「加一门、删一门」的规避）。技能流程中的「暂停询问」措辞 MUST 按既有门禁纪律书写，且不得以确认门形态表达。
 
 ## User Scenarios & Testing *(mandatory)*

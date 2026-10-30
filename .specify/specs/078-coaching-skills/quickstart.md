@@ -68,7 +68,10 @@ explicitly, because `sync-mirrors.py` never removes extras; (c) `regen-command-c
 Expected: pass. That test is the guard copy: it derives the candidate set at run time (the six mirror
 pairs from `MIRROR_PAIRS`, the per-tool copy targets from `regen-command-copies.py`, and A10's residual
 hand-edited members pinned inside the test) and asserts the only surviving old-name occurrence is the
-`_OBSOLETE_SKILLS` entry. The path list lives in that test, never in this quickstart — requirements
+`_OBSOLETE_SKILLS` entry. A10's 20th hand-edited source, `scripts/python/sanitize-utils.py`
+(`LEGACY_SKILL_NAMES`), arrives through the `scripts` mirror pair; its old-name entry sits in the
+sanctioned `OBSOLETE-ASSET-REGISTRY` block, is stripped before counting, and does not enlarge the
+allowed difference set. The path list lives in that test, never in this quickstart — requirements
 **A10** owns the closed surface and its allowed difference set, and a second prose list is exactly the
 duplicate the analyze pass removed.
 
