@@ -1,0 +1,25 @@
+# T016 ID 登记完整性复核（2026-10-30T11:55Z）
+
+## 1. register.md 078 登记行指针形态核对（.specify/memory/register.md L106–L110）
+
+行结构 = | 编号 | 一行含义 | 权威路径 | 状态 |，四列齐备：
+- T-001（owner 新建独立 guidelines；反题与重开条件收在一行含义内，正文归 plan.md § Decision Tensions）
+- T-002（检查器独立不并入 doc-consistency-check）
+- T-003（不接线门禁，changed-scope 采证）
+- T-004（SC-005 取 100% census）
+- 078-C-clauses（四份契约条款号命名空间行，指向 contracts/ 各文件内逐条）
+判定：合规。编号 → 一行含义 → 权威路径（plan.md § / contracts/）→ 状态（active）齐备；
+一行含义承载决策 essence（含反题/重开条件的单行摘要），未复述决策正文——完整正文只在
+权威路径一处（One Source Of Truth）；plan 期 U4 已校验，形态未漂移。
+authoritative paths 实测在场：plan.md § Decision Tensions（T-001…T-004 四记录）、contracts/ 四文件。
+
+## 2. 本特性 implement 期新产出未登记 durable identifier 扫描
+
+命令：grep -nE '(T-[0-9]{3}|D-[0-9]{3}|OI-[0-9]{3}|F-[0-9]{3}|B-[0-9]{3}|REC-[0-9]{3})'
+  shared/guidelines/bilingual-expression.md scripts/python/bilingual-expression-check.py
+  tests/contract/test_bilingual_expression.py test-evidence/us*.txt notes/*.md
+real output:（零命中）exit=1
+判定：implement 期（T001–T015 已落产物）未 coin 任何 D-/OI-/T-/F-/B-/REC- 级 durable identifier；
+E1…E7（data-model 实体）、R-1…R-12（research）、CHK001…035（清单条目）均为规格目录内自闭合枚举，
+非跨工件 durable ID，不属 register.md 登记面（与 tasks/plan 阶段判定一致）。
+结论：登记完整性复核通过。

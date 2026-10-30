@@ -1,0 +1,6 @@
+# T017 漂移守卫全绿确认（2026-10-30T11:56Z）
+# command: python3 -m pytest tests/contract/test_bilingual_expression.py -q
+# drift-guard 三腿： (i) STR-001/002/003 唯一消费点; (ii) 镜像三面逐字一致(清单派生自 MIRROR_PAIRS); (iii) ambient 摘要+指针形态
+...............                                                          [100%]
+15 passed in 0.53s
+exit=0
