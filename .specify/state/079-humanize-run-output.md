@@ -107,3 +107,10 @@ last_verdict: MERGED to master (fast-forward) locally; branch deleted; line dere
 - **Feature 062**：`Implemented` 保持；名称/描述更新为「动作输出人类友好化」；扩展记录已入详情与索引。
 - **SC 状态**：8 pass / 2 partial（SC-001、SC-004 的原生派发腿不可复现，已如实记录）。
 - **工作树归档判定**：归零（运行记录、E2/E3 账本、全量日志、环境归因均已归档提交）。
+
+## 合并后发现：远端编号冲突（2026-10-31）
+
+- 本地 `master` 已快进合并本线（`079-humanize-run-output`），工作树干净，**未 push**。
+- 比对远端后发现 `gitlab/master` 已由另一条线推进：`8d0e0106 merge(master): integrate gitlab trunk (078-coaching-skills) with local 079-bilingual-expression`，其中 `c93071ae refactor(079): renumber bilingual-expression from 078 to resolve trunk collision`。
+- 因此远端已存在一个 **079-bilingual-expression**，与本次的 **079-humanize-run-output** 发生编号碰撞；本地 `master` 相对 `gitlab/master` 为 ahead 43 / behind 20。
+- 处置建议（未执行，需用户裁决）：fetch 后把本线规格目录与 Feature 引用重编号为 **080**（或由远端那条改号），再合并远端 master；在解决前**不得 push**（会被拒绝或产生冲突）。
