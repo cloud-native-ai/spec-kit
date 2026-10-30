@@ -719,7 +719,7 @@ def render_agents_for_tool(project_path, tool, tracker=None):
                     f"{rule['emit']}: {_format_agent_frontmatter_value(value)}"
                 )
         out_lines.append("---")
-        body = definition["body"].lstrip("\n")
+        body = rewrite_paths(definition["body"].lstrip("\n"))
         content = "\n".join(out_lines) + "\n" + body
         if not content.endswith("\n"):
             content += "\n"
