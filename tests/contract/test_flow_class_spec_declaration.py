@@ -46,11 +46,12 @@ TEMPLATE = REPO_ROOT / "templates" / "requirements-template.md"
 FEATURE_INDEX = REPO_ROOT / ".specify" / "memory" / "features.md"
 FEATURE_DETAIL = REPO_ROOT / ".specify" / "memory" / "features" / "077.md"
 
-NINE_FIELDS = {
+RECORD_FIELDS = {
     "action",
     "checked_at",
     "unit_id",
     "flow_class",
+    "flow_type",
     "source",
     "marker",
     "basis",
@@ -156,7 +157,7 @@ def _assert_author_error(
         "<one sentence>`; got %r" % first
     )
     record = _json(proc)
-    assert set(record) == NINE_FIELDS
+    assert set(record) == RECORD_FIELDS
     assert record["flow_class"] is None, (
         "an author error must not present a decided class"
     )
@@ -455,4 +456,127 @@ def test_feature_detail_stores_no_class_value():
     )
     assert not re.search(r"^\s*(?:[-*]\s*)?flow_class\s*[:=]", text, re.MULTILINE), (
         "the feature detail must not store the class value; at most a pointer"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# F. flow type — the subordinate attribute (owner: § 文档类型)
+# --------------------------------------------------------------------------- #
+def test_flow_type_is_read_into_the_record(tmp_path):
+    repo = _repo_with(
+        tmp_path,
+        "fx-type",
+        "# fixture spec\n\n**Flow Class**: expression\n"
+        "**Flow Type**: technique-document\n",
+    )
+
+    proc = _lookup(repo, "spec:fx-type")
+
+    assert proc.returncode == 0, proc.stderr
+    record = _json(proc)
+    assert record["flow_class"] == "expression"
+    assert record["flow_type"] == "technique-document"
+    assert record["source"] == "declaration"
+
+
+def test_expression_without_flow_type_leaves_it_null(tmp_path):
+    repo = _repo_with(
+        tmp_path, "fx-no-type", "# fixture spec\n\n**Flow Class**: expression\n"
+    )
+
+    record = _json(_lookup(repo, "spec:fx-no-type"))
+
+    assert record["flow_class"] == "expression"
+    assert record["flow_type"] is None
+
+
+def test_execution_may_carry_only_the_explicit_dash(tmp_path):
+    repo = _repo_with(
+        tmp_path,
+        "fx-exec",
+        "# fixture spec\n\n**Flow Class**: execution\n**Flow Type**: -\n",
+    )
+
+    record = _json(_lookup(repo, "spec:fx-exec"))
+
+    assert record["flow_class"] == "execution"
+    assert record["flow_type"] == "-"
+
+
+def test_document_type_on_an_execution_line_is_a_mismatch(tmp_path):
+    repo = _repo_with(
+        tmp_path,
+        "fx-mismatch",
+        "# fixture spec\n\n**Flow Class**: execution\n"
+        "**Flow Type**: user-manual\n",
+    )
+
+    proc = _lookup(repo, "spec:fx-mismatch")
+
+    _assert_author_error(
+        proc, "flow-type-mismatch", name="fx-mismatch",
+        line_numbers={4}, value_fragment="user-manual",
+    )
+
+
+def test_invalid_flow_type_is_an_author_error(tmp_path):
+    repo = _repo_with(
+        tmp_path,
+        "fx-bad-type",
+        "# fixture spec\n\n**Flow Class**: expression\n**Flow Type**: manual\n",
+    )
+
+    proc = _lookup(repo, "spec:fx-bad-type")
+
+    _assert_author_error(
+        proc, "invalid-flow-type", name="fx-bad-type",
+        line_numbers={4}, value_fragment="manual",
+    )
+
+
+@pytest.mark.parametrize(
+    ("text", "code", "value_fragment", "lines"),
+    [
+        (
+            "# f\n\n**Flow Class**: expression\n"
+            "**Flow Type**: technique-document\n**Flow Type**: user-manual\n",
+            "flow-type-duplicate",
+            "user-manual",
+            {5},
+        ),
+        (
+            "# f\n\n**Flow Class**: expression\n"
+            "**Flow Type**：technique-document\n",
+            "flow-type-malformed",
+            "**Flow Type**",
+            {4},
+        ),
+    ],
+)
+def test_flow_type_shape_errors_are_author_errors(
+    tmp_path, text, code, value_fragment, lines
+):
+    repo = _repo_with(tmp_path, "fx-type-shape", text)
+
+    proc = _lookup(repo, "spec:fx-type-shape")
+
+    _assert_author_error(
+        proc, code, name="fx-type-shape",
+        line_numbers=lines, value_fragment=value_fragment,
+    )
+
+
+def test_flow_type_after_related_feature_is_misplaced(tmp_path):
+    repo = _repo_with(
+        tmp_path,
+        "fx-type-misplaced",
+        "# f\n\n**Flow Class**: expression\n\n## Related Feature\n\n"
+        "**Flow Type**: technique-document\n",
+    )
+
+    proc = _lookup(repo, "spec:fx-type-misplaced")
+
+    _assert_author_error(
+        proc, "flow-type-misplaced", name="fx-type-misplaced",
+        line_numbers={7}, value_fragment="technique-document",
     )

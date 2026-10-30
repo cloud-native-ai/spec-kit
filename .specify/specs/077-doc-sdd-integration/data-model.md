@@ -24,7 +24,7 @@
 
 ## E1 — Flow Class Declaration Line
 
-**定位**：特性线声明自己类别的唯一载体。一条特性线（一条 spec 目录）恰好一行；索引与详情至多留指针。
+**定位**：特性线声明自己类别的唯一载体。一条特性线（一条 spec 目录）至多两行——类别行 + 可选的 `**Flow Type**` 文档类型行（077a 扩展）；索引与详情至多留指针。
 
 **行形态**（逐字，字段名与取值大小写敏感）：
 
@@ -40,7 +40,7 @@
 | 字段名 | `**Flow Class**`（[[STR-001]]，requirements § Shared Strings） |
 | 冒号与分隔 | 半角冒号 + **一个**空格 |
 | 值域 | 封闭二值 `execution` / `expression` |
-| 行数 | 头部区**至多一行**（缺省合法——无该行按 `execution` 解析，见下方「缺省语义」）；全文出现第二行即 `declaration-duplicate` |
+| 行数 | 头部区**类别行至多一条**（缺省合法——无该行按 `execution` 解析，见下方「缺省语义」）；全文出现第二行即 `declaration-duplicate`。可选的 `**Flow Type**` 行同一规则（`flow-type-duplicate` / `flow-type-misplaced`），见 owner § 文档类型 |
 | 行尾 | 无尾随空白；附加注释即 `declaration-malformed` |
 | 缺省语义 | 无该行 → 类别按 `execution`，`source: default`，带 069 登记的默认标记；存量线另可获 advisory 码 `declaration-absent`（退出码 0、不计缺陷，见 E3） |
 | 判定主体 | 作者手写；脚本 MUST NOT 从路径、文件名、内容或提交信息推断 |
@@ -59,7 +59,7 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 
 ## E2 — Class Resolution Record
 
-**定位**：解析引擎对 `spec:<spec 目录名>` 键返回的记录。**与单元键逐字段同形**（九项键集，不新增第十项——`error` 早在单元键记录里就有，本特性只是让它对 `spec:` 键也有取值）。
+**定位**：解析引擎对 `spec:<spec 目录名>` 键返回的记录。**与单元键逐字段同形**（十项键集；`flow_type` 是 077a 扩展的第十项，其余九项不变）。
 
 | 字段 | 类型 | `spec:` 键的取值 | 说明 |
 |------|------|------------------|------|
@@ -67,6 +67,7 @@ absent ──作者写入──▶ declared ──作者改写（requirements �
 | `checked_at` | ISO-8601 UTC | 运行时刻 | 与既有记录一致 |
 | `unit_id` | string | 键原文（含 `spec:` 前缀） | 不剥前缀，便于与台账键区分 |
 | `flow_class` | `execution` \| `expression` \| `null` | 已声明取声明值；未声明取 `execution`；取值非法取 `null`；**退出码 2 的输入缺失（spec 目录 / `requirements.md` 不存在或不可读）取 `null`** | `null` 出现在退出码 1（作者错误）与退出码 2 的输入缺失路径；owner 不可解析的降级形态仍带默认类别 `execution` + `error.label = owner-unavailable`（C-012 的既有语义：保持执行类门禁集） |
+| `flow_type` | owner § 文档类型 的封闭集 \| `null` | 已声明取声明值；缺行取 `null`；`execution` 线只接受 `-` | 从属属性（077a）：只在 `expression` 线上细分文档类型；作者错误走退出码 1 |
 | `source` | `declaration` \| `default` | 声明行在场即 `declaration`（含非法取值） | 与 `marker` 互斥（见下） |
 | `marker` | string \| `null` | 未声明时为 069 登记的默认标记；否则 `null` | 字面量归 069 § Shared Strings |
 | `basis` | `null` | 恒 `null` | 特性线的判定依据是声明行，不是台账列 |
@@ -242,7 +243,7 @@ E1 声明行 ──(解析)──▶ E2 记录 ──(分支)──▶ E4 接线
 | E1 行文法与位置 | `flow-class-check.py --action lookup`（`spec:` 键） | 退出码 0/1/2 + E2/E3 |
 | E1 单一性 | 同上（`declaration-duplicate`） | 退出码 1 |
 | E1 存量缺省 | 同上（`declaration-absent`） | 退出码 0 + advisory（不计缺陷） |
-| E2 记录形态 | 单元测试断言字段集（九项）与互斥约束 | 字段相等 / 不存在 |
+| E2 记录形态 | 单元测试断言字段集（十项）与互斥约束 | 字段相等 / 不存在 |
 | E4 接线形态 | 契约测试（每模板恰一次 lookup、零副本、退出码 1 停止句在场、剥离后与基线字节相同） | 计数 / 字符串 / SHA-256 |
 | E5 四子节（plan 侧） | `doc-consistency-check.py --action structure --spec-dir` | 退出码 + findings |
 | E5 骨架产出侧 | 模板静态检查（四子节骨架在场、执行类不构成必填） | 字符串 / 计数 |

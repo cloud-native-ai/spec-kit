@@ -22,9 +22,9 @@
 
 ## 记录形态
 
-- **C-004** 键族为 `spec:` 时返回的记录 MUST 与单元键**逐字段同形**：字段集为**九项**——
-  `action` / `checked_at` / `unit_id` / `flow_class` / `source` / `marker` / `basis` / `neutral` / `error`，
-  MUST NOT 新增第十个字段（`error` 本就是单元键记录的字段，本特性只是让它对 `spec:` 键也有取值：
+- **C-004** 键族为 `spec:` 时返回的记录 MUST 与单元键**逐字段同形**：字段集为**十项**——
+  `action` / `checked_at` / `unit_id` / `flow_class` / `flow_type` / `source` / `marker` / `basis` / `neutral` / `error`，
+  MUST NOT 新增第十一个字段（`flow_type` 是 077a 扩展的从属属性；取值 `null` 或 owner § 文档类型 的封闭集）（`error` 本就是单元键记录的字段，本特性只是让它对 `spec:` 键也有取值：
   `{label, detail}` 或 `null`）。`unit_id` 取键原文、`source` 取 `declaration` 或 `default`、`basis` 为 `null`、
   `neutral` 为 `false`。(FR-003)
 

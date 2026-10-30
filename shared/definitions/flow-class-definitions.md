@@ -252,6 +252,16 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 - **不进逐流程台账**：特性线声明 MUST NOT 写入 § 逐流程台账——该表的行集等于框架单元清单（`templates/commands/*.md` + `skills/{external,internal}/*/SKILL.md`），写入即产生 `unknown` 发现。本节不登记任何特性线的取值：类别只由作者判定，MUST NOT 从路径、文件名、内容或提交信息推断。
 - **消费方**：七个阶段命令模板（`requirements` / `clarify` / `plan` / `tasks` / `checklist` / `analyze` / `implement`）与 `sdd-loop-driver` 的阶段派发载荷；接线形态归 `shared/workflow/expression-gates.md` § 特性线阶段命令，本文件不登记算子、面名或槽位。
 
+## 文档类型（`flow_type`，从属轴）
+
+本节是 `flow_class` 的**从属属性**：它只在 `expression` 线上细分「这是什么文档」，不改变两值判据、不改门禁算子集，也不在 § 逐流程台账 里增行。取值集扩展是本文件的 owner 修订，MUST NOT 由消费方就地增删。
+
+- **载体与文法**：与类别同一条声明区、`**Flow Type**: <type>` 单行；位置、重复 / 错位 / 形态判定复用类别行的规则（实现入口 `scripts/python/flow-class-check.py` 的 `parse_spec_flow_type`）。
+- **封闭取值**：`technique-document`（技术文档）/ `user-manual`（用户手册）/ `reference`（参考手册）/ `runbook`（运维手册）/ `design-note`（设计说明）/ `-`（未细分）。新增类型 MUST 走本文件修订。
+- **类约束**：`expression` 可带任一取值或 `-`；`execution` 只允许 `-`（文档类型对执行类无意义），违者 `flow-type-mismatch`（退出码 1）。
+- **缺省**：该行可以缺失——缺失记 `flow_type: null`，不构成缺陷；作者显式写 `-` 与缺失的区别只在记录（`null` vs `"-"`），门禁等价。
+- **解析与消费**：同一引擎的同一 `lookup`，记录多一个 `flow_type` 字段；消费方（阶段命令模板、驱动派发载荷）以路径引用本节，MUST NOT 复制取值集。
+
 ## 消费方指针
 
 - 读取类别：`scripts/python/flow-class-check.py --action lookup --unit-id <id>`（唯一读取路径；命令模板与技能 MUST NOT 内嵌类别副本）。

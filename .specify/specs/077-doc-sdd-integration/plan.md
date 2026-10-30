@@ -205,6 +205,10 @@ N/A——Constitution Check 18 项全部 Pass，无 Fail / Partial 行需要理�
 
 ## Plan Edits
 
+### 077a 扩展（2026-10-30，minor）
+
+- **PLAN-EDIT**: `requirements.md` / `data-model.md` / `contracts/class-resolution.md` — 记录字段集九→十（新增 `flow_type`）、声明区由「至多一行」改为「类别行 + 可选文档类型行」；分类=**minor**（从属属性扩展，不改判据与门禁）。
+
 *`/speckit.analyze` 修复轮（2026-10-30）对 plan 属主制品的逐行声明。`minor` = 措辞/计数/引用的收紧与更正，不改变已批准的范围与语义读数；`substantive` = 在「两种自洽读法」之间择一、或改变某条已声明义务的边界。所有 substantive 行都对应 analyze 报告点名的冲突簇，修复轮已按调用方派发逐条裁决（裁决记录见 `requirements.md` § Clarifications 的「analyze 修复轮裁决」小节），故未就地停机，而是把选择连同理由登记在此。*
 
 - **PLAN-EDIT**: `requirements.md` — 择一登记三处冲突（FR-001 的作用域收窄为「新增声明线」并新增 advisory 码 `declaration-absent`；FR-017 的「四面」定义为「门禁输出的面」而 U4(a) 取算子表分母；FR-019(b) 降为「存在且非空」、不做哈希），补 FR-005 的 exit-1 停止句、FR-009 的调用方可观察触发、FR-018 的 `error` 位、FR-020 的 `rc` 聚合与 `not-applicable` 单列、FR-022 的确认门计数判据、FR-023 的 `templates/plan-template.md`，并把派生计数改为指针；分类=**substantive**。

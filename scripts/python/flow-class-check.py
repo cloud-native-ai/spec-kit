@@ -800,6 +800,10 @@ def render_lookup_text(record: dict) -> str:
             CLASS_KEY,
             record[CLASS_KEY] if record[CLASS_KEY] is not None else "null",
         ),
+        "%s: %s" % (
+            FLOW_TYPE_KEY,
+            record.get(FLOW_TYPE_KEY) if record.get(FLOW_TYPE_KEY) is not None else "null",
+        ),
         "source: %s" % record["source"],
         "marker: %s" % (record["marker"] if record["marker"] is not None else "null"),
         "basis: %s" % (record["basis"] if record["basis"] is not None else "null"),
@@ -838,6 +842,7 @@ def default_lookup_record(unit_id: str, stamp: str) -> dict:
         "checked_at": stamp,
         "unit_id": unit_id,
         CLASS_KEY: DEFAULT_CLASS,
+        FLOW_TYPE_KEY: None,
         "source": "default",
         "marker": None,
         "basis": None,
@@ -866,6 +871,24 @@ DECLARATION_LINE_RE = re.compile(r"^\*\*Flow Class\*\*: ([^\s]+)$")
 # tolerated here on purpose — a shifted line is a malformed field, not a missing one.
 DECLARATION_PROBE_RE = re.compile(r"^\s*\*\*\s*flow\s+class\s*\*\*", re.IGNORECASE)
 DECLARATION_ABSENT = "declaration-absent"
+
+# The document type: a subordinate attribute of ``flow_class`` (owner:
+# ``shared/definitions/flow-class-definitions.md`` § 文档类型). It is optional —
+# a line that is absent leaves ``flow_type: null`` — but when present it is
+# closed-set and only meaningful for ``expression`` lines; an ``execution`` line
+# may carry only the explicit ``-``. Extending the set is an owner revision.
+FLOW_TYPE_KEY = "flow_type"
+FLOW_TYPE_NONE = "-"
+FLOW_TYPE_VALUES = (
+    "technique-document",
+    "user-manual",
+    "reference",
+    "runbook",
+    "design-note",
+    FLOW_TYPE_NONE,
+)
+FLOW_TYPE_LINE_RE = re.compile(r"^\*\*Flow Type\*\*: ([^\s]+)$")
+FLOW_TYPE_PROBE_RE = re.compile(r"^\s*\*\*\s*flow\s+type\s*\*\*", re.IGNORECASE)
 
 
 def spec_key_name(unit_id: str):
@@ -1020,6 +1043,101 @@ def parse_spec_declaration(text: str) -> dict:
     return {"status": "absent"}
 
 
+def parse_spec_flow_type(text: str, class_value) -> dict:
+    """Read the optional ``**Flow Type**`` line; absent is legal, malformed is not.
+
+    Same head-region and verbatim rules as the class line (owner:
+    ``shared/definitions/flow-class-definitions.md`` § 文档类型). The type is
+    subordinate: an ``execution`` line — or the default class when the class line
+    is absent — accepts only the explicit ``-``. Author errors use the same exit 1
+    as class errors; an absent line leaves ``flow_type: null``.
+    """
+    lines = text.splitlines()
+    related_index = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if line.startswith(RELATED_FEATURE_HEADING)
+        ),
+        None,
+    )
+    field_lines = [
+        (index + 1, line)
+        for index, line in enumerate(lines)
+        if FLOW_TYPE_PROBE_RE.match(line)
+    ]
+
+    if len(field_lines) > 1:
+        first_line, _first_text = field_lines[0]
+        second_line, second_text = field_lines[1]
+        return {
+            "status": "error",
+            "code": "flow-type-duplicate",
+            "line": second_line,
+            "value": flow_type_value_fragment(second_text),
+            "reason": "the field appears more than once — a second declaration is "
+                      "a second source of truth",
+            "also_line": first_line,
+        }
+
+    if len(field_lines) == 1:
+        line_no, line = field_lines[0]
+        if related_index is not None and (line_no - 1) > related_index:
+            return {
+                "status": "error",
+                "code": "flow-type-misplaced",
+                "line": line_no,
+                "value": flow_type_value_fragment(line),
+                "reason": "the declaration belongs in the head region, before "
+                          "`%s`" % RELATED_FEATURE_HEADING,
+                "also_line": None,
+            }
+        match = FLOW_TYPE_LINE_RE.fullmatch(line)
+        if not match:
+            return {
+                "status": "error",
+                "code": "flow-type-malformed",
+                "line": line_no,
+                "value": line.strip(),
+                "reason": "the field must read exactly `**Flow Type**: <type>` — "
+                          "half-width colon, one space, no trailing whitespace, no "
+                          "inline comment",
+                "also_line": None,
+            }
+        value = match.group(1)
+        if value not in FLOW_TYPE_VALUES:
+            return {
+                "status": "error",
+                "code": "invalid-flow-type",
+                "line": line_no,
+                "value": value,
+                "reason": "outside the closed set (%s)" % ", ".join(FLOW_TYPE_VALUES),
+                "also_line": None,
+            }
+        effective_class = class_value if class_value is not None else DEFAULT_CLASS
+        if effective_class == EXECUTION and value != FLOW_TYPE_NONE:
+            return {
+                "status": "error",
+                "code": "flow-type-mismatch",
+                "line": line_no,
+                "value": value,
+                "reason": "a document type is only meaningful for expression lines; "
+                          "execution lines carry `%s`" % FLOW_TYPE_NONE,
+                "also_line": None,
+            }
+        return {"status": "declared", "value": value, "line": line_no}
+
+    return {"status": "absent"}
+
+
+def flow_type_value_fragment(line: str) -> str:
+    """The value (or the raw line) a diagnostic carries for an offending type field."""
+    match = FLOW_TYPE_LINE_RE.fullmatch(line)
+    if match:
+        return match.group(1)
+    return line.strip()
+
+
 def declaration_value_fragment(line: str) -> str:
     """The value (or the raw line) a diagnostic carries for an offending field."""
     match = DECLARATION_LINE_RE.fullmatch(line)
@@ -1053,6 +1171,35 @@ def spec_declaration_error(repo: Path, unit_id: str, path: Path, declaration: di
     record["source"] = "declaration"
     record["error"] = {"label": declaration["code"], "detail": detail}
     print("%s: %s" % (declaration["code"], detail), file=sys.stderr)
+    emit_lookup(record, output_format)
+    return 1
+
+
+def spec_type_error(repo: Path, unit_id: str, path: Path, finding: dict,
+                    stamp: str, output_format: str) -> int:
+    """Exit 1: an author error in the optional ``**Flow Type**`` line.
+
+    The record carries ``flow_class: null`` and ``flow_type: null`` — an
+    undeclared pair must never be presented as decided (C-007's reading, applied
+    to the subordinate axis). The diagnostic names the file, the line and the
+    offending value, exactly like the class-line errors.
+    """
+    detail = "%s:%d carries '%s', %s" % (
+        display_path(repo, path),
+        finding["line"],
+        finding["value"],
+        finding["reason"],
+    )
+    if finding.get("also_line"):
+        detail += " (first declared at %s:%d)" % (
+            display_path(repo, path),
+            finding["also_line"],
+        )
+    record = default_lookup_record(unit_id, stamp)
+    record[CLASS_KEY] = None
+    record["source"] = "declaration"
+    record["error"] = {"label": finding["code"], "detail": detail}
+    print("%s: %s" % (finding["code"], detail), file=sys.stderr)
     emit_lookup(record, output_format)
     return 1
 
@@ -1091,21 +1238,28 @@ def action_lookup_spec(repo: Path, unit_id: str, name: str, stamp: str,
             repo, unit_id, path, declaration, stamp, output_format
         )
 
+    flow_type = parse_spec_flow_type(
+        text,
+        declaration["value"] if declaration["status"] == "declared" else None,
+    )
+    if flow_type["status"] == "error":
+        return spec_type_error(repo, unit_id, path, flow_type, stamp, output_format)
+
     record = default_lookup_record(unit_id, stamp)
     if declaration["status"] == "declared":
         record[CLASS_KEY] = declaration["value"]
         record["source"] = "declaration"
-        emit_lookup(record, output_format)
-        return 0
-
-    record["marker"] = DEFAULT_MARKER
-    record["error"] = {
-        "label": DECLARATION_ABSENT,
-        "detail": (
-            "no `**Flow Class**: <class>` line in the head region of %s; running "
-            "on the default class" % display_path(repo, path)
-        ),
-    }
+    else:
+        record["marker"] = DEFAULT_MARKER
+        record["error"] = {
+            "label": DECLARATION_ABSENT,
+            "detail": (
+                "no `**Flow Class**: <class>` line in the head region of %s; "
+                "running on the default class" % display_path(repo, path)
+            ),
+        }
+    if flow_type["status"] == "declared":
+        record[FLOW_TYPE_KEY] = flow_type["value"]
     emit_lookup(record, output_format)
     return 0
 

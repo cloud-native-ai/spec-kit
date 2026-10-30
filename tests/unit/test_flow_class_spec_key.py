@@ -12,7 +12,7 @@ whole-repository contract test cannot isolate:
   ``<repo>/specs/<name>/requirements.md``;
 * a missing spec directory (or a directory without ``requirements.md``) is exit
   code 2, never a silently-typed class;
-* the record is **field-for-field identical** to a unit-key record: nine keys
+* the record is **field-for-field identical** to a unit-key record: ten keys
   (``action`` / ``checked_at`` / ``unit_id`` / ``flow_class`` / ``source`` /
   ``marker`` / ``basis`` / ``neutral`` / ``error``); ``unit_id`` is the key
   verbatim; ``source`` is ``declaration`` or ``default`` (never ``ledger``);
@@ -57,11 +57,12 @@ ENGINE = REPO_ROOT / "scripts" / "python" / "flow-class-check.py"
 
 # requirements.md § Shared Strings (pinned copies; the test may pin literals).
 DEFAULT_MARKER = "未声明·按默认"   # 069 § Shared Strings, [[STR-004]]
-NINE_FIELDS = {
+RECORD_FIELDS = {
     "action",
     "checked_at",
     "unit_id",
     "flow_class",
+    "flow_type",
     "source",
     "marker",
     "basis",
@@ -333,7 +334,7 @@ def test_spec_key_without_an_existing_directory_never_reads_the_ledger(tmp_path)
 # --------------------------------------------------------------------------- #
 # C. record shape — nine fields, unit-key identical
 # --------------------------------------------------------------------------- #
-def test_record_carries_exactly_the_nine_unit_key_fields(tmp_path):
+def test_record_carries_exactly_the_ten_unit_key_fields(tmp_path):
     repo = _make_repo(tmp_path)
     _add_spec(repo, "fx-absent", UNDECLARED)
 
@@ -341,10 +342,10 @@ def test_record_carries_exactly_the_nine_unit_key_fields(tmp_path):
 
     assert proc.returncode == 0, proc.stderr
     record = _json(proc)
-    assert set(record) == NINE_FIELDS, (
+    assert set(record) == RECORD_FIELDS, (
         "the spec record must be field-for-field identical to a unit-key "
         "record: extra=%r missing=%r"
-        % (sorted(set(record) - NINE_FIELDS), sorted(NINE_FIELDS - set(record)))
+        % (sorted(set(record) - RECORD_FIELDS), sorted(RECORD_FIELDS - set(record)))
     )
     assert record["action"] == "lookup"
     assert ISO_Z_RE.match(record["checked_at"]), record["checked_at"]
