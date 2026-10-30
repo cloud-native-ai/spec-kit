@@ -34,5 +34,6 @@
 
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
 - 计数与引用解析来源：`validate-requirements.py` 实跑输出（本清单落盘前最近一次运行）：status ok / 0 error / 0 warning / 23 definition rows / 3 shared strings；FR 计数以该输出与脚本判定为准
+- 写回后复跑留档：expression 类 G-req-evidence 门禁首跑报 `grade-asof-unpaired`（requirements.md 第 54 行「判别性证据：」被 `证据：` 标记语法误捕），就地改写为「判别性依据：」；复跑 `validate-requirements.py` `status: ok`（0/0，计数不变）+ `doc-consistency-check.py --faces evidence` `evidence=pass`（findings=0）；本清单各勾选项的计数依据该次复跑，与勾选时一致
 - Related Feature 已由派发简报裁决直接绑定新建 Feature 078（Assumptions A6），非「Need clarification」挂起态
 - Flow Class 声明 `expression` / Flow Type `technique-document` 已写入头部并经 `flow-class-check.py --action lookup` 解析（exit 0，source=declaration）；与 U1 探测的 `flow_class: null / owner-unavailable` 不一致属声明落地后的正常 re-baseline 比对输入

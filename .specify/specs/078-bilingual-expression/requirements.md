@@ -51,7 +51,7 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
 - **A1（输入笔误更正，用户已裁决）**：原文「English(中问)」按「English(中文)」理解（`中问` 为 `中文` 的笔误，U0 入口声明已记）。
-- **A2（Flow Class = `expression`，basis = reader-oracle；承重决策）**：按 `.specify/shared/definitions/flow-class-definitions.md` 两步判据——主交付物是双语写作约定的 owner 文档（`shared/guidelines/bilingual-expression.md`）；其缺陷最先在**读者面**暴露（作者写错方向/宽度、读者跨 context 误读锚点）。最强反题：交付物含被机器执行的确定性检查器，是否构成 mixed-oracle 改判 `execution`？裁决：否——形态检查器只是「结构 / 链接 / 构建」类检查，按判据「结构检查通过不构成充分条件、MUST NOT 参与判定」不改判；约定的最终验收由读者承担，检查器不签字语义。预期反指标：plan 阶段若把检查器升格为最终验收 oracle，须 re-baseline 改判 `execution` 并重跑本阶段门禁。判别性证据：边界例「站点构建通过不改变判定」同构。
+- **A2（Flow Class = `expression`，basis = reader-oracle；承重决策）**：按 `.specify/shared/definitions/flow-class-definitions.md` 两步判据——主交付物是双语写作约定的 owner 文档（`shared/guidelines/bilingual-expression.md`）；其缺陷最先在**读者面**暴露（作者写错方向/宽度、读者跨 context 误读锚点）。最强反题：交付物含被机器执行的确定性检查器，是否构成 mixed-oracle 改判 `execution`？裁决：否——形态检查器只是「结构 / 链接 / 构建」类检查，按判据「结构检查通过不构成充分条件、MUST NOT 参与判定」不改判；约定的最终验收由读者承担，检查器不签字语义。预期反指标：plan 阶段若把检查器升格为最终验收 oracle，须 re-baseline 改判 `execution` 并重跑本阶段门禁。判别性依据：边界例「站点构建通过不改变判定」同构。
 - **A3（Flow Type = `technique-document`）**：本线主交付物是框架自身的写作技术规范，属 owner 封闭集中的技术文档；`user-manual` / `reference` / `runbook` / `design-note` 均不贴合（约定不是给用户/运维/设计的说明）。
 - **A4（唯一形态裁决：半角括号、无前置空格；承重决策）**：唯一形态定为 `中文(English)` 与 `English(中文)`——半角括号、括号紧贴两侧词条、括号内为另一语言。最强反题：仓内 EN-first 全角形态量级更大（M-2 = 1383 处）。裁决依据 Grounded Naming 来源顺序：**用户输入最高优先**——用户原文逐字以半角书写两种方向；全角形态是自发实践、非用户裁决。预期反指标：既有 1383 处全角形态在新约定下全部不合规——这正是现状锚点要暴露的缺陷而非迁移负担（FR-006 不追溯）。重开条件：用户明示全角优先。
 - **A5（词汇表 Canonical 双语化）**：以中文为主的项目词汇表，新增/修订条目的 Canonical 采用 `中文(English)` 形态；纯英文专名（如 Spec Kit、SDD）维持原样并依赖 FR-004 豁免。这是裁决而非共识，clarify 可推翻。
