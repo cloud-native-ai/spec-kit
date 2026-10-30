@@ -1,0 +1,150 @@
+# Plan-stage baseline measurements — Feature 079 (2026-10-30)
+
+All commands run from the repository root on branch `079-humanize-run-output`, HEAD `35ff11bc`
+(pre-change readings: they make the post-change criteria "no NEW drift" decidable instead of
+absolute). The only working-tree entry at measurement time is the untracked driver state spine
+`.specify/state/079-humanize-run-output.md` (driver-owned, never committed by this stage).
+
+## 1. Generated command copies — `scripts/python/regen-command-copies.py --check`
+
+```
+OK: all per-tool command copies match the source templates.
+exit 0
+```
+
+Baseline is clean, so "zero NEW drift" and "absolute exit 0" coincide for this pair. The four
+copies that will be regenerated (measured by their existence in the tree):
+
+```
+.claude/commands/speckit.humanize.md
+.github/prompts/speckit.humanize.prompt.md
+.opencode/command/speckit.humanize.md
+.qoder/commands/speckit.humanize.md
+```
+
+## 2. Runtime mirrors — `scripts/python/sync-mirrors.py --check`
+
+```
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+```
+
+Baseline clean. The pair this feature touches is `skills/external/ == .specify/skills/`; the
+command templates pair excludes `commands` (retired), so `templates/commands/humanize.md`
+fans out only through the per-tool copies measured in § 1.
+
+## 3. Compiled probe surface — `probe-utils.py --action compile-embeds --check`
+
+```
+compile-embeds --check: 75 units, zero drift
+```
+
+Baseline clean; this feature plans no probe-registry change, so the post-change criterion is
+"still zero drift" (a moved fingerprint would surface here).
+
+## 4. Confirmation-gate scan — `scripts/python/scan-confirmation-gates.py --summary`
+
+```
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+exit 0
+```
+
+Same reading as Feature 078's `gate-newline-baseline.txt` (measured on the tree before the
+clarify commit), so the tree has not drifted in this measure. The new-lines criterion of FR-027
+is measured separately in `gate-newline-baseline.txt`.
+
+## 5. Skill body budget — `skills/external/improve-skills/scripts/skill-shape.py skills/external/humanize/SKILL.md`
+
+```
+判定        pass
+正文估算    ≈4090 tokens 可控 / 预算 5000（123 行）
+最大章节     Workflow
+! [oversized-section] Workflow=59行（单章节建议上限 40 行）
+! [flags-outside-contract] 38 个具体 CLI flag 出现在非约束章节
+```
+
+The body sits ≈910 tokens below the 5000 budget before this feature adds the run mode. This
+measurement is why the plan routes run-mode detail into `references/` instead of the body.
+
+## 6. Live wiring surface referencing `humanize` (measured, not remembered)
+
+`git grep -l -i humanize` over `tests docs shared templates skills agents src .qoder .claude
+.github .opencode` returns these live files (spec directories, memory records, site assets and
+the `.venv/` copy of the installed package excluded — they are not wiring this feature edits):
+
+```
+.claude/commands/speckit.humanize.md
+.github/prompts/speckit.humanize.prompt.md
+.opencode/command/speckit.humanize.md
+.qoder/commands/speckit.humanize.md
+docs/reference/commands/humanize.md
+shared/definitions/flow-class-definitions.md
+shared/definitions/probe-definitions.md
+shared/workflow/expression-gates.md
+skills/external/humanize/SKILL.md
+templates/commands/humanize.md
+tests/contract/test_expression_compatibility.py
+tests/contract/test_expression_gate_wiring.py
+tests/contract/test_expression_gates_doc.py
+tests/contract/test_feedback_command_classification.py
+tests/contract/test_flow_class_correctness.py
+tests/contract/test_flow_class_ledger.py
+tests/contract/test_humanize_command_surface.py
+tests/contract/test_migration_distribution.py
+tests/contract/test_run_skills_wiring.py
+tests/contract/test_skill_layer_visibility_guards.py
+tests/contract/test_stage_class_wiring.py
+tests/fixtures/flow_class/classification-oracle.md
+tests/fixtures/humanize/diff_protected.py
+tests/fixtures/humanize/README.md
+tests/fixtures/humanize/rubric.md
+tests/fixtures/humanize/tone/rubric.md
+tests/fixtures/humanize/files/README.md
+tests/integration/test_expression_line_pilot.py
+```
+
+The per-file edit/verify decision for this set is frozen by requirements A11 and materialised in
+`tasks.md`; this list is the measurement it rests on, not a second owner of the set.
+
+Two members were probed further because they pin bytes or counts:
+
+- `tests/contract/test_stage_class_wiring.py` pins `UNCHANGED_SHA256["humanize"]` — a hard byte
+  hash of `templates/commands/humanize.md`. Editing the template necessarily re-measures that row
+  (FR-028 allows it with date + reason).
+- `tests/contract/test_feedback_command_classification.py` derives its lists from
+  `.specify/specs/027-feedback-mechanism/contracts/command-classification.md`; `humanize` is one
+  of its four `Simple` rows. The plan keeps the class (see plan § Decision Tensions T-003), so
+  this file is expected to stay green unedited.
+
+## 7. Registries the feature must not disturb
+
+```
+shared/definitions/flow-class-definitions.md:151  | /speckit.humanize | expression | reader-oracle | ...
+shared/definitions/flow-class-definitions.md:174  | skill:humanize | expression | reader-oracle | ...
+shared/definitions/probe-definitions.md:99        | skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up |
+shared/definitions/probe-definitions.md:251       | h-docs-sync-eval | @point:wrap-up | skill-humanize-wrapup | ...
+```
+
+Both ledgers carry the humanize rows this feature keeps unchanged: the class stays
+`expression / reader-oracle` (requirements A2), and the skill wrap-up binding stays as is
+(§ 3's zero drift is the evidence that the compile face is intact).
+
+## 8. Temporary-root check for the run reservation
+
+```
+$ git check-ignore -v .specify/.tmp/humanize/x.lock
+.specify/.gitignore:30:.tmp/	.specify/.tmp/humanize/x.lock
+$ git check-ignore -v .specify/state/x.md
+(no output, exit 1)
+```
+
+`.specify/.tmp/` is a sanctioned root matched by `.specify/.gitignore`; `.specify/state/` is
+tracked long-lived state and would show up in `git status` — which is why the reservation design
+(plan § Decision Tensions T-002) does not use it.

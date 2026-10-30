@@ -1,0 +1,10 @@
+# Plan-stage test status — Feature 079
+date=2026-10-30
+stage=plan
+status=not-run-docs-only
+reason=本阶段只产出设计产物（plan.md / data-model.md / contracts/ / quickstart.md / feature-ref.md）与
+  Feature 062 的扩展登记，不改动任何可执行面与接线文件，测试预算按 docs-only 处理。
+runnable-checks-executed=test-evidence/stage-plan-baselines.txt § 1–§ 5（regen --check / sync-mirrors
+  --check / probe compile-embeds --check / scan-confirmation-gates --summary / skill-shape）
+test-run=not run at this stage
+next=implement 阶段按 contracts 的 clause→test 映射先写/更新契约测试再改制品

@@ -1,0 +1,34 @@
+# FR-027 门控判定基线（新增行单位）— Feature 079, plan stage
+date=2026-10-30
+stage=plan
+base_commit=35ff11bc
+scope=templates/commands/**.md, skills/**.md, shared/**.md, templates/*.md
+   （= `scripts/python/scan-confirmation-gates.py` 的 SCAN_DIRS + SCAN_ROOT_FILES）
+
+## 为什么在 plan 阶段测
+FR-027 的判定单位是 `git diff` 的**新增行**，不是整棵树的命中数：树里已有的 27 处阻断式门是
+其他特性的合法资产，按整树计数会把它们算到本特性头上。plan 阶段不修改任何接线文件（docs-only
+阶段），因此这里测的是「本阶段的基线增量」，并冻结测法供 implement/review 阶段复用。
+
+## 新增行
+$ git diff 35ff11bc -- templates/commands skills shared templates/*.md | grep '^+' | grep -v '^+++' | wc -l
+added_lines=0
+
+## 新增行对照 BLOCKING_PATTERNS（scripts/python/scan-confirmation-gates.py:46）
+$ <同上管道> | grep -cE '<BLOCKING_PATTERNS 逐项展开>'
+blocking_hits=0
+
+## 工具自身基线读数（同一棵树）
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+
+## 对 implement 阶段的传导
+- 判据：`git diff 35ff11bc` 的新增行与 BLOCKING_PATTERNS 的交集 MUST 为 0（不是「整树 27 变 27」）。
+- 硬约束（实测同一条正则）：新增文案 MUST NOT 使用英文短语 `confirmation gate`、`after
+  confirmation`、`Confirm before`、`stop and confirm`，也 MUST NOT 使用「确认门禁」「确认门控」。
+  描述既有确认行为时用「该动作自身的确认步骤 / 未获答复」等不含上述字面量的表达。
+- 复核命令与本节第 2 段同形；命中即 FR-027 失败，不得以「命中行属于既有资产」豁免
+  （新增行全部是本特性写的）。

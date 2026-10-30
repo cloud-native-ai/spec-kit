@@ -1,0 +1,42 @@
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage plan --repo .
+
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=3 waived=0
+
+{
+    "stage": "plan",
+    "decision": "pass",
+    "findings": [
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "plan.md",
+            "line": 27,
+            "message": "path does not exist under the repo: tests/fixtures/humanize/run/"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "quickstart.md",
+            "line": 167,
+            "message": "path does not exist under the repo: .specify/.tmp/humanize/"
+        },
+        {
+            "check": "missing-path",
+            "severity": "advisory",
+            "path": "contracts/wiring-compat.contract.md",
+            "line": 39,
+            "message": "path does not exist under the repo: tests/fixtures/humanize/run/"
+        }
+    ],
+    "summary": {
+        "errors": 0,
+        "advisories": 3,
+        "waived": 0,
+        "fr": 30,
+        "sc": 10,
+        "tasks": 0,
+        "clauses": 88,
+        "files": 11
+    },
+    "checked_at": "2026-10-30T11:07:00Z"
+}
