@@ -6,10 +6,10 @@ feature: "074b-nested-governance"
 tags: ["run-determination", "r20261029t064500z-074b4"]
 title: "run-determination /speckit.implement r20261029T064500Z-074b4"
 created: "2026-10-29T06:41:38Z"
-summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated"
+summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted"
 ---
 
-/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated
+/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated ela
   "feature": "074b-nested-governance",
   "feature_id": "074",
   "determined_at": "2026-10-29T06:41:38Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T08:40:31Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,9 +87,9 @@ summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated ela
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -155,18 +155,6 @@ summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated ela
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -181,11 +169,6 @@ summary: "/speckit.implement run=r20261029T064500Z-074b4 token=not_evaluated ela
       },
       {
         "observation": "elapsed not_evaluated via source=unavailable: current=None baseline=None reason=source_unavailable",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

@@ -719,7 +719,7 @@ def render_agents_for_tool(project_path, tool, tracker=None):
                     f"{rule['emit']}: {_format_agent_frontmatter_value(value)}"
                 )
         out_lines.append("---")
-        body = definition["body"].lstrip("\n")
+        body = rewrite_paths(definition["body"].lstrip("\n"))
         content = "\n".join(out_lines) + "\n" + body
         if not content.endswith("\n"):
             content += "\n"
@@ -850,7 +850,8 @@ _ASSISTANT_ARG_FORMATS = {
 # export-session→archive-session; extension-e2e-test→browser-extension;
 # mysql/postgres-utils→database-utils;
 # playwright-utils/web-test→browser-utils; organize-agents→create-team;
-# thought-experiment-verifier→think-skills;
+# thought-experiment-verifier→the pre-078 coaching skill name (renamed again by
+#   Feature 078 — 078-coaching-skills);
 # manage-project→visualize-project→summarize-project;
 # sdd-workflow→shared/workflow;
 # draw-{d3js,drawio,echarts,excalidraw,mermaid,plantuml}→draw-diagram
@@ -888,6 +889,7 @@ _OBSOLETE_SKILLS = (
     "sdd-workflow",
     "skill-creator",
     "theme-creator",
+    "think-skills",
     "thought-experiment-verifier",
     "visualize-project",
     "web-test",

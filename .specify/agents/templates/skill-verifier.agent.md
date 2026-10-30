@@ -6,7 +6,7 @@ disable-model-invocation: false
 supervisor: true
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash]
-skills: [think-skills, collect-evidence, memory-recall]
+skills: [coaching-skills, collect-evidence, memory-recall]
 run-turn-budget: 12
 display-color: purple
 ---

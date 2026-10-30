@@ -10,10 +10,11 @@
 - **收集内容**: 保留确认点触发后的用户决定观察事实(门控必要性证据)
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: confirm-gate
-- **Objects** (10):
+- **Objects** (11):
   - `gate-feature-status-regression` — /speckit.feature @ gate-feature-status-regression
   - `gate-glossary-user-entry-overwrite` — /speckit.instructions @ gate-glossary-user-entry-overwrite
   - `gate-implement-checklist-waiver` — /speckit.implement @ gate-implement-checklist-waiver
+  - `gate-implement-evidence-binding` — /speckit.implement @ gate-implement-evidence-binding
   - `gate-rubric-high-stakes` — /speckit.instructions @ gate-rubric-high-stakes
   - `gate-sanitize-destructive-cleanup` — /speckit.sanitize @ gate-sanitize-destructive-cleanup
   - `gate-session-export-overwrite` — /speckit.session @ gate-session-export-overwrite
@@ -62,6 +63,17 @@
   - `evidence-probe-platforms` — scripts/python/evidence-utils.py @ collect
   - `evidence-probe-session-store` — scripts/python/evidence-utils.py @ collect
 
+### exec-quant  [slice: scripts]
+
+- **收集内容**: 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only)
+- **处理流程**: collect→durable-record
+- **适用插入位置**: wrap-up
+- **Objects** (4):
+  - `eq-collect-execution` — scripts/python/exec-quant.py @ wrap-up
+  - `eq-probe-determination-link` — scripts/python/exec-quant.py @ wrap-up
+  - `eq-probe-host-config` — scripts/python/exec-quant.py @ wrap-up
+  - `eq-probe-host-process` — scripts/python/exec-quant.py @ wrap-up
+
 ### run-determination  [slice: scripts]
 
 - **收集内容**: 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane)
@@ -107,10 +119,11 @@
 - **收集内容**: 技能单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (48):
+- **Objects** (52):
   - `skill-analyze-artifacts-wrapup` — skill:analyze-artifacts @ wrap-up
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
   - `skill-clarify-artifact-wrapup` — skill:clarify-artifact @ wrap-up
+  - `skill-coaching-skills-wrapup` — skill:coaching-skills @ wrap-up
   - `skill-code-review-wrapup` — skill:code-review @ wrap-up
   - `skill-collect-evidence-wrapup` — skill:collect-evidence @ wrap-up
   - `skill-create-agent-wrapup` — skill:create-agent @ wrap-up
@@ -128,6 +141,7 @@
   - `skill-document-utils-wrapup` — skill:document-utils @ wrap-up
   - `skill-draw-diagram-wrapup` — skill:draw-diagram @ wrap-up
   - `skill-git-utils-wrapup` — skill:git-utils @ wrap-up
+  - `skill-humanize-wrapup` — skill:humanize @ wrap-up
   - `skill-implement-feature-wrapup` — skill:implement-feature @ wrap-up
   - `skill-improve-agent-wrapup` — skill:improve-agent @ wrap-up
   - `skill-improve-docs-wrapup` — skill:improve-docs @ wrap-up
@@ -152,10 +166,12 @@
   - `skill-run-skills-wrapup` — skill:run-skills @ wrap-up
   - `skill-run-team-wrapup` — skill:run-team @ wrap-up
   - `skill-sanitize-materials-wrapup` — skill:sanitize-materials @ wrap-up
+  - `skill-sdd-house-keeping-wrapup` — skill:sdd-house-keeping @ wrap-up
+  - `skill-sdd-loop-driver-cli-profile` — skill:sdd-loop-driver @ wrap-up
+  - `skill-sdd-project-setup-wrapup` — skill:sdd-project-setup @ wrap-up
   - `skill-self-improvement-wrapup` — skill:self-improvement @ wrap-up
   - `skill-study-project-wrapup` — skill:study-project @ wrap-up
   - `skill-summarize-project-wrapup` — skill:summarize-project @ wrap-up
-  - `skill-think-skills-wrapup` — skill:think-skills @ wrap-up
 
 ### trigger-escalation  [slice: scripts]
 
@@ -188,6 +204,7 @@ graph TD
   class_command_gate --> obj_gate_feature_status_regression[gate-feature-status-regression]
   class_command_gate --> obj_gate_glossary_user_entry_overwrite[gate-glossary-user-entry-overwrite]
   class_command_gate --> obj_gate_implement_checklist_waiver[gate-implement-checklist-waiver]
+  class_command_gate --> obj_gate_implement_evidence_binding[gate-implement-evidence-binding]
   class_command_gate --> obj_gate_rubric_high_stakes[gate-rubric-high-stakes]
   class_command_gate --> obj_gate_sanitize_destructive_cleanup[gate-sanitize-destructive-cleanup]
   class_command_gate --> obj_gate_session_export_overwrite[gate-session-export-overwrite]
@@ -223,6 +240,11 @@ graph TD
   class_evidence_lane --> obj_evidence_probe_node[evidence-probe-node]
   class_evidence_lane --> obj_evidence_probe_platforms[evidence-probe-platforms]
   class_evidence_lane --> obj_evidence_probe_session_store[evidence-probe-session-store]
+  kind_internal --> class_exec_quant[exec-quant]
+  class_exec_quant --> obj_eq_collect_execution[eq-collect-execution]
+  class_exec_quant --> obj_eq_probe_determination_link[eq-probe-determination-link]
+  class_exec_quant --> obj_eq_probe_host_config[eq-probe-host-config]
+  class_exec_quant --> obj_eq_probe_host_process[eq-probe-host-process]
   kind_internal --> class_run_determination[run-determination]
   class_run_determination --> obj_rd_axis_artifact_correctness[rd-axis-artifact-correctness]
   class_run_determination --> obj_rd_axis_elapsed[rd-axis-elapsed]
@@ -249,6 +271,7 @@ graph TD
   class_skill_wrapup --> obj_skill_analyze_artifacts_wrapup[skill-analyze-artifacts-wrapup]
   class_skill_wrapup --> obj_skill_archive_session_wrapup[skill-archive-session-wrapup]
   class_skill_wrapup --> obj_skill_clarify_artifact_wrapup[skill-clarify-artifact-wrapup]
+  class_skill_wrapup --> obj_skill_coaching_skills_wrapup[skill-coaching-skills-wrapup]
   class_skill_wrapup --> obj_skill_code_review_wrapup[skill-code-review-wrapup]
   class_skill_wrapup --> obj_skill_collect_evidence_wrapup[skill-collect-evidence-wrapup]
   class_skill_wrapup --> obj_skill_create_agent_wrapup[skill-create-agent-wrapup]
@@ -266,6 +289,7 @@ graph TD
   class_skill_wrapup --> obj_skill_document_utils_wrapup[skill-document-utils-wrapup]
   class_skill_wrapup --> obj_skill_draw_diagram_wrapup[skill-draw-diagram-wrapup]
   class_skill_wrapup --> obj_skill_git_utils_wrapup[skill-git-utils-wrapup]
+  class_skill_wrapup --> obj_skill_humanize_wrapup[skill-humanize-wrapup]
   class_skill_wrapup --> obj_skill_implement_feature_wrapup[skill-implement-feature-wrapup]
   class_skill_wrapup --> obj_skill_improve_agent_wrapup[skill-improve-agent-wrapup]
   class_skill_wrapup --> obj_skill_improve_docs_wrapup[skill-improve-docs-wrapup]
@@ -290,10 +314,12 @@ graph TD
   class_skill_wrapup --> obj_skill_run_skills_wrapup[skill-run-skills-wrapup]
   class_skill_wrapup --> obj_skill_run_team_wrapup[skill-run-team-wrapup]
   class_skill_wrapup --> obj_skill_sanitize_materials_wrapup[skill-sanitize-materials-wrapup]
+  class_skill_wrapup --> obj_skill_sdd_house_keeping_wrapup[skill-sdd-house-keeping-wrapup]
+  class_skill_wrapup --> obj_skill_sdd_loop_driver_cli_profile[skill-sdd-loop-driver-cli-profile]
+  class_skill_wrapup --> obj_skill_sdd_project_setup_wrapup[skill-sdd-project-setup-wrapup]
   class_skill_wrapup --> obj_skill_self_improvement_wrapup[skill-self-improvement-wrapup]
   class_skill_wrapup --> obj_skill_study_project_wrapup[skill-study-project-wrapup]
   class_skill_wrapup --> obj_skill_summarize_project_wrapup[skill-summarize-project-wrapup]
-  class_skill_wrapup --> obj_skill_think_skills_wrapup[skill-think-skills-wrapup]
   kind_internal --> class_trigger_escalation[trigger-escalation]
   class_trigger_escalation --> obj_trigger_p1_feature_dir[trigger-p1-feature-dir]
   class_trigger_escalation --> obj_trigger_p2_clarification_markers[trigger-p2-clarification-markers]
@@ -311,6 +337,7 @@ graph TD
 | `gate-feature-status-regression` | command-gate | internal | /speckit.feature @ gate-feature-status-regression | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-glossary-user-entry-overwrite` | command-gate | internal | /speckit.instructions @ gate-glossary-user-entry-overwrite | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-implement-checklist-waiver` | command-gate | internal | /speckit.implement @ gate-implement-checklist-waiver | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
+| `gate-implement-evidence-binding` | command-gate | internal | /speckit.implement @ gate-implement-evidence-binding | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-rubric-high-stakes` | command-gate | internal | /speckit.instructions @ gate-rubric-high-stakes | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-sanitize-destructive-cleanup` | command-gate | internal | /speckit.sanitize @ gate-sanitize-destructive-cleanup | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-session-export-overwrite` | command-gate | internal | /speckit.session @ gate-session-export-overwrite | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
@@ -344,6 +371,10 @@ graph TD
 | `evidence-probe-node` | evidence-lane | internal | scripts/python/evidence-utils.py @ collect | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | collect→findings.json |
 | `evidence-probe-platforms` | evidence-lane | internal | scripts/python/evidence-utils.py @ collect | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | collect→findings.json |
 | `evidence-probe-session-store` | evidence-lane | internal | scripts/python/evidence-utils.py @ collect | 证据引擎 lane 的可用性探测(node 运行时 / session store / 平台存储清单) | collect→findings.json |
+| `eq-collect-execution` | exec-quant | internal | scripts/python/exec-quant.py @ wrap-up | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | collect→durable-record |
+| `eq-probe-determination-link` | exec-quant | internal | scripts/python/exec-quant.py @ wrap-up | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | collect→durable-record |
+| `eq-probe-host-config` | exec-quant | internal | scripts/python/exec-quant.py @ wrap-up | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | collect→durable-record |
+| `eq-probe-host-process` | exec-quant | internal | scripts/python/exec-quant.py @ wrap-up | 受测单元执行的环境与质量遥测采集(agent 程序 / LLM 详细 / 质量指标;exec-quant durable store,Recording Only) | collect→durable-record |
 | `rd-axis-artifact-correctness` | run-determination | internal | scripts/python/run-determination.py @ wrap-up | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | determine→session-record→route-into-feedback |
 | `rd-axis-elapsed` | run-determination | internal | scripts/python/run-determination.py @ wrap-up | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | determine→session-record→route-into-feedback |
 | `rd-axis-satisfaction` | run-determination | internal | scripts/python/run-determination.py @ wrap-up | 运行判定四轴测量与两个可用性探测(token/elapsed/artifact_correctness/satisfaction;session store / evidence lane) | determine→session-record→route-into-feedback |
@@ -366,6 +397,7 @@ graph TD
 | `skill-analyze-artifacts-wrapup` | skill-wrapup | internal | skill:analyze-artifacts @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-archive-session-wrapup` | skill-wrapup | internal | skill:archive-session @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-clarify-artifact-wrapup` | skill-wrapup | internal | skill:clarify-artifact @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-coaching-skills-wrapup` | skill-wrapup | internal | skill:coaching-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-code-review-wrapup` | skill-wrapup | internal | skill:code-review @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-collect-evidence-wrapup` | skill-wrapup | internal | skill:collect-evidence @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-create-agent-wrapup` | skill-wrapup | internal | skill:create-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -383,6 +415,7 @@ graph TD
 | `skill-document-utils-wrapup` | skill-wrapup | internal | skill:document-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-diagram-wrapup` | skill-wrapup | internal | skill:draw-diagram @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-git-utils-wrapup` | skill-wrapup | internal | skill:git-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-humanize-wrapup` | skill-wrapup | internal | skill:humanize @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-implement-feature-wrapup` | skill-wrapup | internal | skill:implement-feature @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-agent-wrapup` | skill-wrapup | internal | skill:improve-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-docs-wrapup` | skill-wrapup | internal | skill:improve-docs @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -407,10 +440,12 @@ graph TD
 | `skill-run-skills-wrapup` | skill-wrapup | internal | skill:run-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-run-team-wrapup` | skill-wrapup | internal | skill:run-team @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-sanitize-materials-wrapup` | skill-wrapup | internal | skill:sanitize-materials @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-sdd-house-keeping-wrapup` | skill-wrapup | internal | skill:sdd-house-keeping @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-sdd-loop-driver-cli-profile` | skill-wrapup | internal | skill:sdd-loop-driver @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-sdd-project-setup-wrapup` | skill-wrapup | internal | skill:sdd-project-setup @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-self-improvement-wrapup` | skill-wrapup | internal | skill:self-improvement @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-study-project-wrapup` | skill-wrapup | internal | skill:study-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-summarize-project-wrapup` | skill-wrapup | internal | skill:summarize-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-think-skills-wrapup` | skill-wrapup | internal | skill:think-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `trigger-p1-feature-dir` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
 | `trigger-p2-clarification-markers` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
 | `trigger-p3-tasks-state` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |

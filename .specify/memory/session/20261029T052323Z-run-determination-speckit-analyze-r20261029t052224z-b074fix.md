@@ -21,7 +21,7 @@ summary: "/speckit.analyze run=r20261029T052224Z-b074fix token=not_evaluated ela
   "feature": "074b-nested-governance",
   "feature_id": "074",
   "determined_at": "2026-10-29T05:23:23Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T07:47:57Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -92,7 +92,7 @@ summary: "/speckit.analyze run=r20261029T052224Z-b074fix token=not_evaluated ela
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "true",
@@ -164,8 +164,8 @@ summary: "/speckit.analyze run=r20261029T052224Z-b074fix token=not_evaluated ela
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -185,7 +185,7 @@ summary: "/speckit.analyze run=r20261029T052224Z-b074fix token=not_evaluated ela
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=true adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

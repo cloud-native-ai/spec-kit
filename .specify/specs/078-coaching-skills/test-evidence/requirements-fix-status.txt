@@ -1,0 +1,20 @@
+stage=requirements-fix (analyze loop 1/1)
+status=not-run-docs-only
+date=2026-10-30
+stage_base=6c5e26f9
+budget=docs-only：仅改 requirements.md 与 requirements 清单 + 证据；不跑实现测试
+scope_changed=requirements.md, checklists/requirements.md, test-evidence/**
+scope_untouched=plan.md, contracts/**, tasks.md（同源修复留给后续阶段）
+
+fixes:
+  M-01=done: FR-024 / A9 的不改写边界改为「本特性 078-coaching-skills 目录之外的既有记录」；本特性自身产物（.specify/specs/078-coaching-skills/**、.specify/memory/features/078.md）明示可正常改写与重跑
+  M-02=done: SC-006 计数集 = FR-018 的八个身份坐标（源目录 / frontmatter name / skill_id 与 Canonical ID/Path / 运行时 unit id / flow-class 行 / probe 行与 probe id / 路由行与路径 / description 触发词与调用形态），8/8；按坐标计数、STR-001 被 STR-003 包含不重复计的规则保留
+  H-02=done: SC-008 第三条改为 git diff 新增行 0 命中 BLOCKING_PATTERNS（FR-027/A11 同单位），点名可执行判定命令与基线读数要求；基线见 gate-newline-baseline.txt
+  C-01(req-side)=done: checklists/requirements.md 的 Containment claims 锚点 A11 -> A10，允许差异集改为恰为 _OBSOLETE_SKILLS 一行
+  renumber=not-triggered: 未新增 FR/SC 编号
+
+gates:
+  validate-requirements=status: ok 0 error(s) 0 warning(s) exit 0 -> validate-requirements.txt
+  decomposition-check=decision=proceed fr_count=29 fr_ceiling=30 exit 0 -> decomposition-check.json
+  pre-analyze-check=decision=pass errors=0 advisories=50 waived=0 exit 0 -> pre-analyze-check.txt (50 条全为 missing-path，实现前目标路径未创建属预期)
+  newline-gate-baseline=added_lines 0 / blocking_hits 0；总量基线 blocking=27 -> gate-newline-baseline.txt

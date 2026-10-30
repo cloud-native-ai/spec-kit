@@ -1,0 +1,172 @@
+......................................................................F. [  7%]
+..............F..........F.F............................................ [ 14%]
+........................................................................ [ 21%]
+........................................................................ [ 28%]
+........................................................................ [ 35%]
+........................................................................ [ 42%]
+........................................................................ [ 49%]
+........................................................................ [ 56%]
+........................................................................ [ 63%]
+........................................................................ [ 71%]
+........................................................................ [ 78%]
+........................................................................ [ 85%]
+.................................................FF................F.... [ 92%]
+........................................................................ [ 99%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_c7_the_four_frozen_rosters_carry_the_new_name ______________
+
+    def test_c7_the_four_frozen_rosters_carry_the_new_name():
+        stale = [
+            rel for rel in FROZEN_ROSTERS if NEW not in _read(ROOT / rel)
+        ]
+>       assert not stale, f"frozen roster(s) still lack the new name: {stale}"
+E       AssertionError: frozen roster(s) still lack the new name: ['tests/contract/test_expression_compatibility.py', 'tests/contract/test_migration_distribution.py', 'tests/contract/test_skill_layer_visibility_guards.py', 'tests/contract/test_run_skills_wiring.py']
+E       assert not ['tests/contract/test_expression_compatibility.py', 'tests/contract/test_migration_distribution.py', 'tests/contract/test_skill_layer_visibility_guards.py', 'tests/contract/test_run_skills_wiring.py']
+
+tests/contract/test_coaching_wiring_contract.py:412: AssertionError
+_______________ test_flat_discovery_surfaces_external_layer_only _______________
+
+    def test_flat_discovery_surfaces_external_layer_only():
+        seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
+        # Sentinels: the face is non-empty and the exclusion is meaningful.
+        assert len(seen) == 15, (
+            f"flat discovery saw {len(seen)} skills, expected exactly the 15 external "
+            f"ones — a count both proves non-vacuity and pins the split: {seen}"
+        )
+        internal_dir = RUNTIME_SKILLS / "internal"
+        assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
+        internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
+        # 35 既有 + 057 run-skills/run-team = 37（同任务更新计数契约）
+        assert len(internal_nested) == 37, (
+            f"internal subtree carries {len(internal_nested)} skills, expected 37 — "
+            f"guard 1 only proves something when internal skills actually exist"
+        )
+>       assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"
+E       AssertionError: flat discovery leaked non-external skills: ['coaching-skills']
+E       assert ['coaching-skills'] == []
+E         
+E         Left contains one more item: 'coaching-skills'
+E         Use -v to get more diff
+
+tests/contract/test_skill_layer_visibility_guards.py:103: AssertionError
+_____________________ test_c10_skills_md_routing_five_rows _____________________
+
+    def test_c10_skills_md_routing_five_rows():
+        text = _read(SKILLS_CMD)
+        for needle in [
+            "create-skills", "improve-skills", "merge-skills", "think-skills",
+            "skills/internal/run-skills/SKILL.md",
+            "run-skills <名称|路径>",
+        ]:
+>           assert needle in text, f"skills.md routing missing: {needle}"
+E           AssertionError: skills.md routing missing: think-skills
+E           assert 'think-skills' in '---\ndescription: Create Agent Skills\nshort-description: 技能管理编排入口：委托创建或优化对应技能\nhandoffs:\n  - label: Update Instruct...e embedded step points here)"\n\n## Handoffs\n\n**After**: Run `/speckit.instructions` to update discovery metadata.\n'
+
+tests/contract/test_run_skills_wiring.py:170: AssertionError
+__________________ test_c12_no_duplicate_semantic_skill_dirs ___________________
+
+    def test_c12_no_duplicate_semantic_skill_dirs():
+        external = sorted(p.name for p in (REPO_ROOT / "skills" / "external").iterdir() if p.is_dir())
+        internal = sorted(p.name for p in (REPO_ROOT / "skills" / "internal").iterdir() if p.is_dir())
+>       assert external == sorted(BASELINE_EXTERNAL), (
+            f"external layer changed unexpectedly: {set(external) ^ set(BASELINE_EXTERNAL)}"
+        )
+E       AssertionError: external layer changed unexpectedly: {'think-skills', 'coaching-skills'}
+E       assert ['coaching-sk...t-utils', ...] == ['create-docs...diagram', ...]
+E         
+E         At index 0 diff: 'coaching-skills' != 'create-docs'
+E         Use -v to get more diff
+
+tests/contract/test_run_skills_wiring.py:187: AssertionError
+______________________ test_c1_skill_inventory_is_frozen _______________________
+
+    def test_c1_skill_inventory_is_frozen():
+        found = sorted(
+            "%s/%s" % (layer, directory.name)
+            for layer in ("external", "internal")
+            for directory in (SKILLS_DIR / layer).iterdir()
+            if directory.is_dir() and (directory / "SKILL.md").is_file()
+        )
+>       assert found == sorted(FROZEN_SKILLS), (
+            "skill inventory drifted (C-1: zero new / renamed / deleted skills). "
+            "expected %d, found %d; symmetric difference: %r"
+            % (
+                len(FROZEN_SKILLS),
+                len(found),
+                sorted(set(found) ^ set(FROZEN_SKILLS)),
+            )
+        )
+E       AssertionError: skill inventory drifted (C-1: zero new / renamed / deleted skills). expected 52, found 52; symmetric difference: ['external/coaching-skills', 'external/think-skills']
+E       assert ['external/co...t-utils', ...] == ['external/cr...diagram', ...]
+E         
+E         At index 0 diff: 'external/coaching-skills' != 'external/create-docs'
+E         Use -v to get more diff
+
+tests/contract/test_expression_compatibility.py:350: AssertionError
+______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
+
+    def test_c5_non_wiring_files_keep_their_frozen_hashes():
+        manifest = _hash_manifest()
+        templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+        skills = [rel for rel in manifest if rel.startswith("skills/")]
+        assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+        assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+        assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+        assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+            "the manifest is the NON-wiring complement; it still lists a wiring template"
+        )
+        assert not any(rel in WIRING_SKILLS for rel in skills), (
+            "the manifest is the NON-wiring complement; it still lists a wiring skill"
+        )
+    
+        drifted: list[str] = []
+        missing: list[str] = []
+        for rel, expected in sorted(manifest.items()):
+            path = REPO_ROOT / rel
+            if not path.is_file():
+                missing.append(rel)
+                continue
+            if _sha256(path) != expected:
+                if rel in ALLOWED_POST_BASELINE_CHANGES:
+                    continue
+                drifted.append(rel)
+>       assert not missing, (
+            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+        )
+E       AssertionError: non-wiring source disappeared (C-5, zero new commands/skills): ['skills/external/think-skills/SKILL.md']
+E       assert not ['skills/external/think-skills/SKILL.md']
+
+tests/contract/test_expression_compatibility.py:582: AssertionError
+_________________ test_skill_name_set_matches_frozen_baseline __________________
+
+    def test_skill_name_set_matches_frozen_baseline() -> None:
+        names = {
+            path.parent.name
+            for path in SKILLS_DIR.rglob("SKILL.md")
+            if path.parent.parent.name in {"external", "internal"}
+        }
+>       assert names == SKILL_BASELINE, (
+            "skills file-name set changed: "
+            f"unexpected={sorted(names - SKILL_BASELINE)} "
+            f"missing={sorted(SKILL_BASELINE - names)}"
+        )
+E       AssertionError: skills file-name set changed: unexpected=['coaching-skills'] missing=['think-skills']
+E       assert {'analyze-art...vidence', ...} == frozenset({'a...-agent', ...})
+E         
+E         Extra items in the left set:
+E         'coaching-skills'
+E         Extra items in the right set:
+E         'think-skills'
+E         Use -v to get more diff
+
+tests/contract/test_migration_distribution.py:258: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c7_the_four_frozen_rosters_carry_the_new_name
+FAILED tests/contract/test_skill_layer_visibility_guards.py::test_flat_discovery_surfaces_external_layer_only
+FAILED tests/contract/test_run_skills_wiring.py::test_c10_skills_md_routing_five_rows
+FAILED tests/contract/test_run_skills_wiring.py::test_c12_no_duplicate_semantic_skill_dirs
+FAILED tests/contract/test_expression_compatibility.py::test_c1_skill_inventory_is_frozen
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+FAILED tests/contract/test_migration_distribution.py::test_skill_name_set_matches_frozen_baseline
+7 failed, 1007 passed in 10.28s

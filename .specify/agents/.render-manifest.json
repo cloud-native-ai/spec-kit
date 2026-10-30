@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "opencode",
-  "rendered_at": "20261022T020659Z",
+  "rendered_at": "20261030T091456Z",
   "entries": {
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -13,7 +13,7 @@
     },
     ".qoder/agents/sdd-executor.agent.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "f27b6eee12d2e25d659c670b313316c0e5a8dc461a2d6b4c8d6425b379e4d84f"
+      "sha256": "052b14a09cffa99609042adf479f9a251e52e91acfdcfec0a14b9853e2e36282"
     },
     ".qoder/agents/sdd-requirements-executor.agent.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
@@ -25,11 +25,11 @@
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "56d0cb2dffef1272ee6943f0f91df5a2bf27586fb1b9655f6242bb3b8ff0f0fb"
+      "sha256": "38cfc6ad6b96c79abfc035770c92323d22be1e863cd504b65e16c3cb57245401"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "034ba320d8fe145e95b1853424dbe11160a9c74eb80becdf5615213512396040"
+      "sha256": "96621da078ea87e099a897c5257eb3033b2b932e92cbf8040b568d3620aa96cd"
     },
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -41,7 +41,7 @@
     },
     ".claude/agents/sdd-executor.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "6d817c5afc544c315f5d2563f19def3366d595c325dffda80868750331c88a8a"
+      "sha256": "b6e3b8c02aa82cc6296219f0ca264d66d144a5285d0c1cfd88fe9ea0a74378df"
     },
     ".claude/agents/sdd-requirements-executor.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
@@ -69,7 +69,7 @@
     },
     ".github/agents/sdd-executor.agent.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "ae867668654c424d563ea8c6e68f5288583acedd3c168375e57d00f4ac2d8ff9"
+      "sha256": "86da7dfe08ee8c0544d643ce1f03ad8934161a8beffd878f7aafe0ba460dcde3"
     },
     ".github/agents/sdd-requirements-executor.agent.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
@@ -97,7 +97,7 @@
     },
     ".opencode/agents/sdd-executor.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "b0de38ed28b5f9830d60db6d4ff50b1ada40f4301507e4fe053bd0a4bc343a7b"
+      "sha256": "054e05cf2b7ec4866cd60ffb20fd9031812d2936749c34c8d4a7f1c662c71cc4"
     },
     ".opencode/agents/sdd-requirements-executor.md": {
       "source": "instances/sdd-requirements-executor.agent.md",

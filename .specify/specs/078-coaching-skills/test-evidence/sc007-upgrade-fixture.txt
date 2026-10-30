@@ -1,0 +1,16 @@
+# SC-007 evidence — upgrade deletes the entity directory and keeps a user symlink
+# date=2026-10-30  feature=078-coaching-skills
+
+## disposable fixture, real cleanup_obsolete_framework_assets
+entity: old dir exists before = True
+entity: removed entries = ['.specify/skills/think-skills']
+entity: old dir exists after  = False (expected False)
+linked: symlink exists before = True
+linked: removed entries = []
+linked: symlink kept after    = True (expected True)
+linked: target untouched      = True (expected True)
+scenario3 verdict: pass
+
+## contract guards
+..                                                                       [100%]
+2 passed, 15 deselected in 0.08s

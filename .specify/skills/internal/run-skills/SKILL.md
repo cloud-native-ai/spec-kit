@@ -50,7 +50,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 ## Boundaries
 
 - 只做「解析 → 执行 → 转述」;不承载任何具体技能的业务逻辑,不替代斜杠命令入口(已注册技能优先直呼)。
-- 不修改目标技能文件;目标技能自身的 improve/create 语义归 `/speckit.skills` 路由族(improve-skills / merge-skills / think-skills / create-skills)。
+- 不修改目标技能文件;目标技能自身的 improve/create 语义归 `/speckit.skills` 路由族(improve-skills / merge-skills / coaching-skills / create-skills)。
 - 多宿主降级:发现面无法注册 internal 技能的宿主,经 `/speckit.skills` 的 run 意图路由以显式路径加载同一技能,功能等价(指南 § Where skills live)。
 
 ## Wrap-up

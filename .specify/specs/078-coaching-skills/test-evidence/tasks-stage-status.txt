@@ -1,0 +1,4 @@
+stage-status: stage=tasks status=not-run-docs-only reason="本阶段只修复 tasks.md、Feature 详情/索引与证据文件（validate-tasks / decomposition-check / pre-analyze-check / account-clause-coverage 四个确定性门），无代码改动；定向集 targeted-set-v1（stage_base=bc0ea7fb）的测试预算按 tasks.md § Test Budget 留给 /speckit.implement。"
+repair_round: analyze-loop-1 tasks fix
+repair_scope: H-03/C-01 (mechanical residual-audit surface), H-02 (new-line gate unit), M-06 (skill-shape task), L-01 (16 green-claim rows), M-02 (SC-006 8/8 coordinates), L-02 (feature metadata)
+date: 2026-10-30

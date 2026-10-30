@@ -1,0 +1,14 @@
+# review-repair targeted status — 2026-10-30 — feature 078-coaching-skills
+# stage: review-repair (record-only P1 fix round; no implementation behavior change)
+
+command=/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q --tb=no -rf tests/contract/test_coaching_*.py tests/contract/test_expression_compatibility.py tests/contract/test_migration_distribution.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_run_skills_wiring.py tests/contract/test_compile_propagation_order.py
+selection=5 coaching contract files + the four frozen baseline tests + test_compile_propagation_order.py
+rc=0
+passed=122
+failed=0
+skipped=0
+new_failures=0
+baseline_source=.specify/specs/078-coaching-skills/baseline-failed.txt (16 full-suite failing node ids captured at implement start)
+baseline_comparison=no failing node ids were produced by this run, so `comm -13 baseline-failed.txt <this-run-failed-names>` is empty: zero new failures
+raw_capture=.specify/specs/078-coaching-skills/test-evidence/review-repair-targeted-raw.txt
+note=scope is the review-repair targeted set, not the review-stage 162-case set; no full-suite slot was consumed

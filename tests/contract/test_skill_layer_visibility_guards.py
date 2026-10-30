@@ -36,10 +36,16 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 # sdd-loop-driver; soft-collaboration contract, both independently runnable).
 # 13 -> 14 on 2026-10-19: humanize added as an external skill (feature 062 — generic
 # content-rewriting capability, no spec-kit-internal dependencies).
+# 2026-10-30 (Feature 078): one external entry is renamed in place — the mental-
+# simulation skill became `coaching-skills` with the expectation → real execution →
+# observation → improvement-plan loop (FR-001/FR-018). The census therefore stays
+# 15 external / 35 internal; only the name changes. The retired literal is kept out
+# of this file on purpose: these rosters sit inside A10's closed surface, where
+# SC-006 permits it exactly once (the CLI upgrade-registry entry).
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
-    "think-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
+    "coaching-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
     "sdd-project-setup", "humanize",
 }
 INTERNAL_SKILLS = {

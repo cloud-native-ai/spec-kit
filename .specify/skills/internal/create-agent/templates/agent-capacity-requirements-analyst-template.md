@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: requirements-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [draw-diagram, memory-recall, memory-record, think-skills]
+skills: [draw-diagram, memory-recall, memory-record, coaching-skills]
 run-turn-budget: 25
 display-color: blue
 ---
@@ -121,4 +121,4 @@ Framework skills and agent definitions install together, so every skill I declar
 | draw-diagram | Draw diagrams (UML / architecture / flow / sequence / data visualization / hand-drawn / whiteboard) via the unified front door, which routes to the best-fit internal engine layer |
 | memory-recall | Recall prior requirements, clarifications, and decisions before analyzing a new request |
 | memory-record | Persist clarifications, assumptions, and requirement decisions for later reuse |
-| think-skills | Mentally simulate requirement logic and edge cases before finalizing the spec |
+| coaching-skills | Coach one skill through a real work item: state the expectation first, observe the real execution, then hand back the micro-adjustment plan |

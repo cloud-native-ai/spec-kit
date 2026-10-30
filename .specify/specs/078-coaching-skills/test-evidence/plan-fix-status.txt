@@ -1,0 +1,26 @@
+stage=plan-fix (analyze loop 1/1, constraint branch a: full plan re-review + one U4 re-verification)
+status=not-run-docs-only
+date=2026-10-30
+stage_base=d0f50759 (approved_baseline_commit; plan_constraint=active, plan_commit=375805f2)
+budget=docs-only：只改 plan 属主制品（plan.md / data-model.md / contracts/ / quickstart.md / feature-ref.md）与证据；不跑实现测试
+scope_changed=plan.md, data-model.md, contracts/coaching-run.contract.md, contracts/identity-and-wiring.contract.md, quickstart.md, feature-ref.md, test-evidence/**
+scope_untouched=requirements.md, tasks.md, checklists/**, state spine（只读）
+
+fixes:
+  H-01=done: contracts/coaching-run.contract.md C-10 改写为 FR-017 例外——优化不可用/跳过/失败不再无条件封顶；主工件按 OC-1 完成则 run: success（除零观测证据这一独立 partial 触发外），否则至多 partial。C-10 内部「success 需主工件 + 优化不可用至多 partial」两条相邻规则的自相矛盾消除。
+       运行状态语义唯一 owner = data-model.md § RunStatus：新增「Ownership」声明 + 判定阶梯（failed > partial > success，optimization 与阶梯正交）。C-10 与 future SKILL.md 正文只引用 owner；C-11 末条与 data-model § DeviationFinding validation 改为引用 owner 规则。
+       owner 内部补齐原分散规则：零观测证据 → partial（原 C-11 末条 / quickstart 场景 4 / DeviationFinding validation 的隐含规则收归一处）。
+  C-01=done: contracts/identity-and-wiring.contract.md C-2 的 19 行文件表删除，改为引用 requirements A10（封闭活接线面 + 允许差异集恰为 _OBSOLETE_SKILLS 一行；计数与分项由 A10 拥有）；逐文件义务指向 FR-018/FR-022/FR-023。
+       C-3 声明：派生面不是本契约拥有的枚举，只映射「再生成入口 → 面」。
+       C-6 的封闭面与历史边界改为引用 A10 / FR-024+A9；残留审计的逐路径清单改由 guard copy 派生——tests/contract/test_coaching_wiring_contract.py 组合 sync-mirrors.py 的 MIRROR_PAIRS、regen-command-copies.py 的 per-tool 目标、A10 残留成员（pin 在测试内），契约写明该派生来源，不再有第五份手写枚举。
+       quickstart.md § 1.4 同步：判定改为 guard copy，路径清单不再写在 quickstart。
+  H-02=done: contracts/identity-and-wiring.contract.md C-8 新增 § New-line gate——pathspec 取 scanner 自身 SCAN_DIRS + SCAN_ROOT_FILES（A10 子集），命令为 git diff 新增行逐行对照 BLOCKING_PATTERNS（BLOCKING_RE），要求基线读数入证据；C-13 引用该节而不复述命令。
+       quickstart.md § 1.5 同步同一命令与基线读数；本阶段实测 added_lines=0 blocking_hits=0，总量 blocking=27（destructive 20 / governance_kept 7），violations=0（见 plan-fix-newline-gate.txt）。
+  M-07=done (option b, explicit exemption): plan.md § Phase 1 新增 FR → Clause Mapping（29 行，逐 FR 一行，含 data-model 段引用）作为 FR→条款追溯的唯一 owner；新增 FR-Lane Exemption 节——account-clause-coverage.py 的 FR 车道对本特性不适用（契约刻意不用 CITATION GROUP，车道会按构造报零覆盖），clause 车道不受影响，代价（FR 覆盖转由本表 + analyze 独立复核）与重开条件（任一契约改用 CITATION GROUP 则豁免作废）留痕。
+       quickstart.md 新增「Verification boundary — FR → clause traceability」指向 plan § Phase 1。
+  self-consistency=done: Constitution Check 行 I / XIV 证据更新（FR 映射 owner、A10 owner、RunStatus owner）；Re-check after Phase 1 增 analyze loop 1 重审结论；Phase 0 finding 1 与 Technical Context Scale/Scope 改为引用 A10（删除 19 个文件的分类复述）；feature-ref.md 的 identity/quickstart 映射行同步（A10 引用 + FR 追溯边界）。
+
+gates:
+  pre-analyze-check=decision=pass errors=0 advisories=50 waived=0 exit 0 -> pre-analyze-check-plan-fix.txt（50 条全为 missing-path：实现前目标路径未创建属预期）
+  newline-gate=added_lines=0 blocking_hits=0 exit 0；总量 blocking=27 (destructive 20 / governance_kept 7) violations=0 -> plan-fix-newline-gate.txt
+  tests=not-run-docs-only：本阶段无代码/测试改动，不产生 red-first 或回归证据

@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: test-engineer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [database-utils, think-skills]
+skills: [database-utils, coaching-skills]
 run-turn-budget: 15
 display-color: yellow
 ---
@@ -108,4 +108,4 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | database-utils | Execute read-only SQL to verify data-backed behavior during testing |
-| think-skills | Simulate test scenarios and edge cases before authoring test cases |
+| coaching-skills | Coach one skill through a real work item: state the expectation first, observe the real execution, then hand back the micro-adjustment plan |

@@ -1,0 +1,22 @@
+# SC-009 evidence — four frozen baselines carry the new name with a dated note and pass
+# date=2026-10-30  feature=078-coaching-skills
+
+## dated notes (grep, Feature 078 lines only)
+tests/contract/test_expression_compatibility.py:13:  frozen 52 skill units (51 at the 069a baseline; 2026-10-30 Feature 078 renames
+tests/contract/test_expression_compatibility.py:130:# 2026-10-30 (Feature 078): the pre-existing external mental-simulation unit is
+tests/contract/test_expression_compatibility.py:328:# C-5 retired-path register (2026-10-30, Feature 078 rename)
+tests/contract/test_expression_compatibility.py:346:        "disk (the 2026-10-30 Feature 078 rename); got %r" % missing
+tests/contract/test_expression_compatibility.py:568:    # 2026-10-30 (Feature 078): the rename touches two non-wiring sources inside
+tests/contract/test_expression_compatibility.py:575:        "reason": "2026-10-30 Feature 078 repoints the modify-family route row at the coaching skill",
+tests/contract/test_expression_compatibility.py:579:        "reason": "2026-10-30 Feature 078 updates the run-skills routing-family pointer",
+tests/contract/test_expression_compatibility.py:625:    # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+tests/contract/test_expression_compatibility.py:658:                "missing from %s (2026-10-30, Feature 078)"
+tests/contract/test_migration_distribution.py:11:  2026-10-30 Feature 078 rename swaps one name in place, so the count is unchanged);
+tests/contract/test_migration_distribution.py:77:# 2026-10-30 (Feature 078): the pre-existing external skill unit now named
+tests/contract/test_run_skills_wiring.py:29:# Updated 2026-10-30 (Feature 078): the pre-existing external skill unit now named
+tests/contract/test_run_skills_wiring.py:170:    # 2026-10-30 (Feature 078): the modify-family row now routes the coaching
+tests/contract/test_skill_layer_visibility_guards.py:39:# 2026-10-30 (Feature 078): one external entry is renamed in place — the mental-
+
+## the four files pass on the new tree
+................................................                         [100%]
+48 passed in 0.95s

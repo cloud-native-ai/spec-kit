@@ -7,7 +7,8 @@ that ``tasks.md`` T010 names:
 * C-1  an unrefreshed project keeps its old behaviour: no command template and no
   skill carries a call to one of the new engine actions (``check`` /
   ``delegation`` / ``faces`` / ``isomorphism``), and the shipped file-name sets
-  are unchanged (27 command templates, 51 skills);
+  are unchanged (27 command templates, 52 skills — 51 at the 069b baseline; the
+  2026-10-30 Feature 078 rename swaps one name in place, so the count is unchanged);
 * C-2  a refresh lands every payload from the same release package: the owner and
   the engine travel via ``pyproject.toml`` force-include (``shared`` /
   ``scripts``), the command copies via ``templates``, the skills via
@@ -72,7 +73,12 @@ NEW_ACTION_CALL_RE = re.compile(
 )
 ENGINE_REF = "flow-class-check.py"
 
-# Contract C-1: the frozen pre-change inventory (27 command templates, 51 skills).
+# Contract C-1: the frozen pre-change inventory (27 command templates, 52 skills).
+# 2026-10-30 (Feature 078): the pre-existing external skill unit now named
+# `coaching-skills` was renamed in place (FR-001/FR-018), so the shipped file-name
+# set swaps one name for another and the count stays 52 = 15 external + 37 internal.
+# The retired literal is not repeated here: these rosters are inside A10's closed
+# surface, where SC-006 permits it exactly once (the CLI upgrade-registry entry).
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
@@ -87,7 +93,7 @@ SKILL_BASELINE = frozenset(
         "create-docs", "create-pages", "create-skills", "database-utils",
         "document-utils", "draw-diagram", "git-utils", "humanize",
         "improve-docs", "improve-skills", "merge-skills", "sdd-house-keeping",
-        "sdd-loop-driver", "sdd-project-setup", "think-skills", "analyze-artifacts",
+        "sdd-loop-driver", "sdd-project-setup", "coaching-skills", "analyze-artifacts",
         "archive-session", "clarify-artifact", "code-review",
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",

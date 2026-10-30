@@ -3,7 +3,7 @@ name: Skill Verifier
 description: Verifies skill execution effects — runs or audits a skill's execution evidence and judges whether its declared outcome actually occurred. Use when validating a skill run, auditing skill side effects, or checking skill-execution claims.
 model: auto
 tools: [Read, Grep, Glob, Bash]
-skills: [think-skills, collect-evidence, memory-recall]
+skills: [coaching-skills, collect-evidence, memory-recall]
 maxTurns: 12
 color: purple
 ---

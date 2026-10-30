@@ -3,7 +3,7 @@ name: Structure Adjuster
 description: Adjusts project structure — directory layout, file organization, and structural conventions. Use when reorganizing directories, relocating assets, or enforcing layout conventions.
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [study-project, git-workflow, think-skills]
+skills: [study-project, git-workflow, coaching-skills]
 maxTurns: 15
 color: orange
 ---

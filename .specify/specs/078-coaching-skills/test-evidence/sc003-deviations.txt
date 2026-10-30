@@ -1,0 +1,10 @@
+# SC-003 evidence — both deviation dimensions carry evidenced findings
+# date=2026-10-30  feature=078-coaching-skills
+
+## real run deviations.md rows (transcribed from the run, see notes/quickstart-run.md)
+D-1 | OC-1 — 5 rows expected | 4 rows observed (item 4 dropped) | result-deviation | high | S6 / checklist.md
+D-2 | PE-1 — 1 read + 1 write | 5 brief reads (S1 + S2-S5), 1 write, 7 steps | process-deviation | medium | S1-S5
+
+## contract guard — both dimensions + two deviation classes
+.                                                                        [100%]
+1 passed in 0.04s

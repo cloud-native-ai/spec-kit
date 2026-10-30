@@ -634,7 +634,7 @@ LEGACY_SKILL_NAMES = (
     "manage-project", "mcp-creator", "mysql-utils", "notebooklm-utils",
     "organize-agents", "pdf-utils", "playwright-utils", "postgres-utils",
     "pptx-utils", "refresh-mcp-tools", "sdd-workflow", "skill-creator",
-    "theme-creator", "thought-experiment-verifier", "visualize-project",
+    "theme-creator", "think-skills", "thought-experiment-verifier", "visualize-project",
     "web-test", "xlsx-utils",
 )
 

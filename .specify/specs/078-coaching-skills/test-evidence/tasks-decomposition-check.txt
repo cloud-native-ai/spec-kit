@@ -1,0 +1,4 @@
+# decomposition-check — 2026-10-30 — stage=tasks (tasks-fix-2: claim owner alignment + M-14 scenario order)
+# command: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/078-coaching-skills/requirements.md --tasks .specify/specs/078-coaching-skills/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 29, "task_count": 31, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T07:37:32Z"}
+# exit 0

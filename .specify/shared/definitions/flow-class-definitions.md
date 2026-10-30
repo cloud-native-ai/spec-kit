@@ -8,7 +8,7 @@
 四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
-清单规模（实测 2026-10-24：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 51）：命令 27 + 技能 51 = **78 行台账**。
+清单规模（实测 2026-10-30：`ls templates/commands/*.md | wc -l` → 27；`ls skills/{external,internal}/*/SKILL.md | wc -l` → 52）：命令 27 + 技能 52 = **79 行台账**。
 
 **不在本文件**（只给指针，不复述）：
 
@@ -126,7 +126,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 
 ## 逐流程台账
 
-**台账版本**: 1（2026-10-25）
+**台账版本**: 2（2026-10-30）
 生效版本由本文件的文档版本与既有 § 变更记录 共同承载；台账**行级不设版本列**，
 本声明在 § 逐流程台账 内只出现一次（缺失 → `ledger-version-missing`，重复 → `row-malformed`；规范条款归
 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-5）。
@@ -178,7 +178,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:sdd-loop-driver | execution | behavior-oracle |  | 交付阶段推进与证据；由阶段记录与检查器判定 |
 | skill:sdd-project-setup | execution | behavior-oracle |  | 交付项目调谐结果；由机制分级脚本判定 |
 | skill:sdd-house-keeping | execution | behavior-oracle |  | 交付周期性维护结果与运行报告；由盘点/验证脚本与 sanitize 回收结果判定 |
-| skill:think-skills | execution | behavior-oracle |  | 交付执行行为的模拟判定；以与真实运行一致为准 |
+| skill:coaching-skills | execution | behavior-oracle |  | 先给预期、再看真实执行、最后给微调的教练闭环；以真实执行行为与偏差报告判定 |
 | skill:analyze-artifacts | execution | behavior-oracle |  | 交付一致性分析结论；可重跑复算并作为门禁裁决 |
 | skill:archive-session | execution | behavior-oracle | yes | 类中立（session）：导出会话产物，无自身交付物 |
 | skill:clarify-artifact | execution | behavior-oracle |  | 交付写回制品的裁定；由下游读取与校验判定 |
@@ -242,6 +242,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 
 | date | unit_id | before → after | basis | 依据 |
 | --- | --- | --- | --- | --- |
+| 2026-10-30 | skill:coaching-skills | execution → execution | behavior-oracle | Feature 078 改名：旧技能单元 → 本单元，类别不变；教练闭环为「先给预期、再看真实执行、最后给微调」；旧名字面量只保留在 `src/specify_cli/__init__.py` 的 `_OBSOLETE_SKILLS` 条目 |
 
 ## 特性线声明面（`spec:` 键）
 

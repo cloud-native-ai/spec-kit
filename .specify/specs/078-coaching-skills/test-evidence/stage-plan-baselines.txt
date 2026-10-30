@@ -1,0 +1,167 @@
+# Plan-stage baseline measurements — Feature 078 (2026-10-30)
+
+All commands run from repository root on branch `078-coaching-skills`, HEAD `ab7be630`, working tree clean
+apart from the untracked driver state spine. These are pre-change readings: they make the
+post-change criteria ("no NEW drift", "exactly one residual") decidable instead of absolute.
+
+## 1. Old-name surface (`git grep -l "think-skills"`)
+
+```
+79      tracked files contain the old literal
+```
+
+The requirements text records `77` for the same measure; that reading predates the clarify commit,
+which added hits inside `requirements.md` and the feature registry. The difference is a measuring
+time, not a design disagreement — SC-006 is judged against the closed set (A10), not this total.
+
+Per-file line counts inside the closed wiring surface (A10's 19 files):
+
+```
+agents/skill-verifier.agent.md:1
+agents/structure-adjuster.agent.md:1
+docs/reference/agents/command-and-skills.md:1
+docs/tutorials/quickstart.md:1
+shared/definitions/flow-class-definitions.md:1
+shared/definitions/probe-definitions.md:1
+skills/external/think-skills/SKILL.md:8
+skills/external/think-skills/references/prompt-templates.md:1
+skills/internal/create-agent/templates/agent-capacity-module-designer-template.md:2
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:2
+skills/internal/create-agent/templates/agent-capacity-system-designer-template.md:2
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:2
+skills/internal/run-skills/SKILL.md:1
+src/specify_cli/__init__.py:1
+templates/commands/skills.md:1
+tests/contract/test_expression_compatibility.py:1
+tests/contract/test_migration_distribution.py:1
+tests/contract/test_run_skills_wiring.py:2
+tests/contract/test_skill_layer_visibility_guards.py:1
+```
+
+Note on `src/specify_cli/__init__.py`: the single current hit is the historical comment
+(`thought-experiment-verifier→think-skills;`), **not** an `_OBSOLETE_SKILLS` entry. After the rename the
+tuple entry carries the literal and the comment must be restated without it, so the count stays 1.
+
+## 2. Registries
+
+```
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "skill:think-skills"
+unit_id: skill:think-skills
+flow_class: execution
+flow_type: null
+source: ledger
+basis: behavior-oracle
+neutral: false
+exit 0
+
+$ python3 .specify/scripts/python/flow-class-check.py --action check
+flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=79, clean]
+coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
+exit 0
+```
+
+Ledger composition measured from the file itself: 27 command rows + 52 skill rows = 79. The file header's
+"78 rows (27 + 51, measured 2026-10-24)" is a stale count and is not used as a criterion.
+
+```
+$ ls skills/external/*/SKILL.md | wc -l   -> 15
+$ ls skills/internal/*/SKILL.md | wc -l   -> 37
+```
+
+## 3. Derived faces
+
+```
+$ python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 75 units, zero drift
+exit 0
+
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+exit 0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit 0
+```
+
+Baseline is clean, so the post-change criterion is "still zero drift" rather than "no NEW drift" — but it
+is stated as the latter so a pre-existing drift introduced by another branch cannot silently be blamed on
+this feature.
+
+## 4. Gate budget
+
+```
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+exit 0
+```
+
+Scan surface: `templates/commands`, `skills`, `shared`, `templates/*.md`. The judged unit for FR-027 is the
+added line in `git diff`, so this baseline is the pre-change reference (27) and the criterion is "no added
+blocking line", not "total equals 27".
+
+## 5. Frozen baseline tests (baseline probe)
+
+```
+$ /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest \
+    tests/contract/test_expression_compatibility.py \
+    tests/contract/test_migration_distribution.py \
+    tests/contract/test_skill_layer_visibility_guards.py \
+    tests/contract/test_run_skills_wiring.py -q
+48 passed in 1.52s
+```
+
+This probe is a measurement for the plan's design (the four files are the acceptance surface for SC-009);
+it is not the plan stage's targeted set — the plan stage changes documentation only, which is why the
+`stage-status` row is `not-run-docs-only` (see `plan.jsonl`).
+
+## 6. Skill shape of the skill being replaced
+
+```
+$ python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/think-skills/SKILL.md
+判定        pass
+正文估算    ≈1981 tokens 可控 / 预算 5000（110 行）
+代码围栏     0 段 / 0 行 = 0%
+最大章节     Workflow
+发现：
+  ! [oversized-section] Workflow=51行（单章节建议上限 40 行）
+  ! [flags-outside-contract] 23 个具体 CLI flag 出现在非约束章节：Wrap-up(23)
+exit 0
+```
+
+The two advisories are inherited properties of the compiled `## Wrap-up` block and a long Workflow; the new
+body keeps Workflow as a skeleton and moves per-step detail into `references/` so it does not grow them.
+
+## 7. Regeneration entries exist
+
+```
+$ .venv/bin/specify render-agents --help
+Usage: specify render-agents [OPTIONS]
+... exit 0
+```
+
+`--ai` accepts qoder / claude / copilot / opencode; only `.qoder/agents/*.agent.md` currently carry the
+`skills:` field, so only that tree changes content on regeneration.
+
+## 8. `_OBSOLETE_SKILLS` cleanup semantics (read, not run)
+
+`cleanup_obsolete_framework_assets()` in `src/specify_cli/__init__.py`:
+
+```python
+for name in _OBSOLETE_SKILLS:
+    target = skills_dir / name
+    if target.is_symlink() or not target.exists():
+        continue
+    if target.is_dir():
+        shutil.rmtree(target, ignore_errors=True)
+```
+
+Entity directory removed, user-authored symlink skipped — FR-020 / A8 hold without a code change.

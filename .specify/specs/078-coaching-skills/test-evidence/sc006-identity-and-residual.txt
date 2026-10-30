@@ -1,0 +1,24 @@
+# SC-006 evidence — eight identity coordinates 8/8 and exactly one surviving old literal
+# date=2026-10-30  feature=078-coaching-skills
+
+## runtime unit id (coordinate 4)
+unit_id: skill:coaching-skills
+flow_class: execution
+flow_type: null
+source: ledger
+marker: null
+basis: behavior-oracle
+neutral: false
+rc=0
+
+## guard copy — all coordinates, derived candidate faces, single permitted occurrence
+.................                                                        [100%]
+17 passed in 2.04s
+
+## per-face residual audit (mechanical derivation, 22 faces / 1608 files, 0 live occurrences)
+see notes/residual-audit.md § 2
+
+## diagnostic: repo grep over A10's 19 hand-edited sources (+ the four frozen rosters)
+$ git grep -n <retired> -- <A10 hand-edited sources>
+src/specify_cli/__init__.py:892:    "think-skills",
+hit count above = 1 (the _OBSOLETE_SKILLS tuple entry); diagnostic only, the guard copy is the verdict

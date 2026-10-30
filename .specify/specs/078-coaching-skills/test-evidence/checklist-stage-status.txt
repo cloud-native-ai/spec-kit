@@ -1,0 +1,1 @@
+stage-status: stage=checklist status=not-run-docs-only reason="本阶段只新增需求质量清单与证据文件，无源码或行为改动；定向集 targeted-set-v1（stage_base=38b17a83）的测试预算留给 /speckit.implement 与 /speckit.analyze，本阶段不跑测试。"
