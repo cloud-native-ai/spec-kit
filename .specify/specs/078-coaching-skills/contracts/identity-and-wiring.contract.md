@@ -19,30 +19,15 @@
 
 Trigger rule: triggers that promise a side-effect-free mental simulation only (“thought experiment”, “思想实验”, “不要真的执行”) MUST NOT survive, because the skill dispatches a real subagent. Triggers that express “predict first, then look at the real execution” may stay.
 
-## C-2 Hand-Edited Source Files (closed set, 19)
+## C-2 Hand-Edited Source Files (closed set)
 
-| # | File | Change |
-|---|------|--------|
-| 1 | `skills/external/coaching-skills/SKILL.md` | New body (renamed from `skills/external/think-skills/SKILL.md`, rewritten to the coach loop) |
-| 2 | `skills/external/coaching-skills/references/prompt-templates.md` | Renamed; expectation-phase fragments retained, observation/deviation templates added |
-| 3 | `templates/commands/skills.md` | Route row + call form for the modify family |
-| 4 | `agents/skill-verifier.agent.md` | `skills:` list |
-| 5 | `agents/structure-adjuster.agent.md` | `skills:` list |
-| 6–9 | `skills/internal/create-agent/templates/agent-capacity-{module-designer,requirements-analyst,system-designer,test-engineer}-template.md` | `skills:` list line **and** the capability-table row whose description states the old “simulate” meaning |
-| 10 | `skills/internal/run-skills/SKILL.md` | modify-family pointer list |
-| 11 | `shared/definitions/flow-class-definitions.md` | Ledger row, ledger version, change record |
-| 12 | `shared/definitions/probe-definitions.md` | Probe Object row (id + handler unit) |
-| 13 | `src/specify_cli/__init__.py` | `_OBSOLETE_SKILLS` entry; the historical comment restated without the old literal (C-6) |
-| 14 | `docs/reference/agents/command-and-skills.md` | `skills:` example list |
-| 15 | `docs/tutorials/quickstart.md` | Skill list entry (description updated, not just renamed) |
-| 16 | `tests/contract/test_expression_compatibility.py` | Frozen roster + retired-path register (C-7) |
-| 17 | `tests/contract/test_migration_distribution.py` | Frozen skill roster |
-| 18 | `tests/contract/test_skill_layer_visibility_guards.py` | Frozen external roster + count assertion |
-| 19 | `tests/contract/test_run_skills_wiring.py` | Frozen rosters + route-table needle |
-
-Additionally, `shared/definitions/framework-map.md` gains the `.specify/memory/coaching/` row required by the new run directory (Constitution XVII). This is an addition, not a rename coordinate, and it introduces no occurrence of the old name.
+- The closed set and its allowed difference set are **owned by** [`../requirements.md`](../requirements.md) § Assumptions **A10**: the hand-edited source files (count and category split stated there) plus the derived faces regenerated from them, with exactly one permitted occurrence of the old literal (the `_OBSOLETE_SKILLS` entry). This contract MUST NOT re-list that set — a second enumeration is a copy that drifts from the owner, and the residual audit needs one decidable list, not several.
+- Per-file obligations are owned by the requirements' own phrasing: FR-018 (identity coordinates), FR-022 (live wiring references), FR-023 (frozen tests). This contract adds only the constraints the requirements leave to the design: C-6's comment restatement and C-7's dated notes.
+- `shared/definitions/framework-map.md` gains the `.specify/memory/coaching/` row required by the new run directory (Constitution XVII). This is a new-directory registration, not a rename coordinate, and it introduces no occurrence of the old name.
 
 ## C-3 Derived Faces — Regenerated, Never Hand-Edited
+
+Derived faces are not a list this contract owns either: they are whatever the generators below produce from A10's source members. The table maps **regeneration entry → face** so the implementation knows which command owns each face; it is not a second face enumeration.
 
 | Derived face | Regeneration entry |
 |--------------|--------------------|
@@ -69,15 +54,16 @@ Additionally, `shared/definitions/framework-map.md` gains the `.specify/memory/c
 
 ## C-6 Residual Rule
 
-- Inside the closed wiring surface (C-2 plus C-3 derived faces), the old literal appears **exactly once**: the `_OBSOLETE_SKILLS` tuple entry.
+- The closed wiring surface and its allowed difference set are owned by [`../requirements.md`](../requirements.md) § Assumptions **A10**: inside that surface the old literal appears exactly once, and the one permitted difference is the `_OBSOLETE_SKILLS` tuple entry. This clause neither re-lists the surface nor restates its count.
 - Consequence for `src/specify_cli/__init__.py`: the historical comment that currently spells the old name (inside the OBSOLETE-ASSET-REGISTRY region) is restated without the literal — it keeps the rename-chain meaning and points at Feature 078 instead of repeating the token.
-- Historical records are outside the surface: `.specify/specs/**`, `.specify/memory/evidence/**`, `.specify/memory/features*/**`, `reviews/`, `eval-baseline/`, and run/feedback records archived under the old unit id.
+- Historical records are outside the surface: the boundary is owned by FR-024 / A9, not enumerated here.
+- **Residual audit derivation (no fifth hand-written enumeration)**: the audit's candidate path list is derived at run time by the guard copy — `tests/contract/test_coaching_wiring_contract.py` (plan § Project Structure; tasks T020/T026). It combines (i) the six mirror pairs declared by `scripts/python/sync-mirrors.py` `MIRROR_PAIRS` (source side plus mirror side), (ii) the per-tool copy targets declared by `scripts/python/regen-command-copies.py`, and (iii) A10's residual hand-edited members not reachable through either generator, pinned as a literal **inside that test** — the one place one-source-of-truth admits a duplicate (a guard copy). The assertion is: exactly one surviving occurrence, in `src/specify_cli/__init__.py`. A change to A10 must land in the requirements first; the guard then fails until it is updated, and that failure is the point.
 
 ## C-7 Frozen Baseline Tests
 
 - All four test files are updated explicitly, each carrying a dated note with the reason (2026-10-30, Feature 078 rename).
 - Counts stay consistent with the directory: 52 skills (15 external + 37 internal), 27 command templates, 49 hash-manifest skills.
-- The hash manifest of 069a is a dated record and is not rewritten. `test_expression_compatibility.py` gains a retired-path register mapping the old manifest path to the new one with date and reason, so the C-5 “no new skill” assertion stays decidable instead of degrading into an empty assertion (see plan T-001).
+- The hash manifest of 069a is a dated record and is not rewritten. `test_expression_compatibility.py` gains a retired-path register mapping the old manifest path to the new one with date and reason, so the C-5 “no new skill” assertion stays decidable instead of degrading into an empty assertion (see plan § Decision Tensions T-001).
 - No test count may change silently; a change without its date-and-reason note fails review.
 
 ## C-8 Verifiable Surface
@@ -92,7 +78,28 @@ python3 scripts/python/probe-utils.py --action compile-embeds --check
 python3 scripts/python/sync-mirrors.py --check
 python3 scripts/python/regen-command-copies.py --check
 python3 scripts/python/scan-confirmation-gates.py --summary
-git grep -n "think-skills" -- <closed surface paths>
 ```
 
-The `git grep` line is a template: the closed surface is enumerated in C-2 and C-3, and the expected result is one hit (the `_OBSOLETE_SKILLS` entry).
+The residual-audit verdict is **not** a prose pathspec: it is the guard copy named in C-6 (`tests/contract/test_coaching_wiring_contract.py`, run through the project's pytest). It derives the candidate set and asserts the single permitted hit; a concrete `git grep` path list here would be exactly the duplicate this contract removed. An ad-hoc `git grep -n` over A10's surface is a diagnostic, not the verdict; a repo-wide `git grep -c` counts records and proves nothing, because SC-006 is scoped to A10.
+
+### New-line gate (SC-008 third condition / FR-027)
+
+The judged unit is the **added line**, not the total. The pathspec is the scanner's own scan surface (`SCAN_DIRS` + `SCAN_ROOT_FILES` declared in `scripts/python/scan-confirmation-gates.py`), which is a subset of A10's closed surface — so the surface is derived from the scanner, never re-listed here.
+
+```bash
+BASE=<feature baseline commit>   # A10 baseline; its SHA is recorded in the stage evidence before the run
+git diff "$BASE" -- templates/commands skills shared 'templates/*.md' \
+  | grep '^+' | grep -v '^+++' \
+  | python3 -c '
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("gates", "scripts/python/scan-confirmation-gates.py")
+gates = importlib.util.module_from_spec(spec); spec.loader.exec_module(gates)
+lines = [line[1:].rstrip("\n") for line in sys.stdin if line.startswith("+")]
+hits = [(i, line) for i, line in enumerate(lines, 1) if gates.BLOCKING_RE.search(line)]
+print("added_lines=%d blocking_hits=%d" % (len(lines), len(hits)))
+for i, line in hits: print("hit %d: %s" % (i, line))
+sys.exit(1 if hits else 0)
+'
+```
+
+Expected: `blocking_hits=0`, exit 0. The baseline reading (same command, same pattern source, taken before the change) MUST be recorded in the stage evidence; the current reading is `test-evidence/gate-newline-baseline.txt` (added_lines=0, blocking_hits=0; total blocking=27 = destructive 20 + governance_kept 7, violations=0).

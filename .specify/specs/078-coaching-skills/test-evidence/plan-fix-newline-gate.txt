@@ -1,0 +1,36 @@
+# SC-008 / FR-027 new-line gate (H-02 repair) — plan-fix reading
+date=2026-10-30
+stage=plan-fix (analyze loop 1/1, constraint branch a)
+base_commit=d0f50759 (approved_baseline_commit; plan_constraint=active, plan_commit=375805f2)
+
+## Judged unit
+The added line, not the total. Pathspec = scan-confirmation-gates.py's own scan surface
+(SCAN_DIRS + SCAN_ROOT_FILES), a subset of A10's closed surface; the surface is derived from
+the scanner, not re-listed by the plan or the contract.
+
+## Command (executed, exit 0)
+$ BASE=d0f50759
+$ git diff "$BASE" -- templates/commands skills shared 'templates/*.md' \
+    | grep '^+' | grep -v '^+++' \
+    | python3 -c '<import BLOCKING_RE from scripts/python/scan-confirmation-gates.py; match every added line>'
+
+added_lines=0
+blocking_hits=0
+
+## Total baseline (same tree, same pattern source)
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+exit 0
+
+## Why added_lines=0
+This stage edits only plan-owner artifacts under .specify/specs/078-coaching-skills/ and the
+evidence under the same directory. The scanner's scan surface (templates/commands, skills,
+shared, templates/*.md) is untouched by this stage, so the diff over that pathspec is empty.
+The measurement is still the required reading: it proves the repair introduced no new
+blocking wording in the governed surface.
+
+结论：新增行 0 命中 BLOCKING_PATTERNS；总量基线 blocking=27（destructive 20 / governance_kept 7），
+violations=0；与 requirements-fix 阶段的 gate-newline-baseline.txt 读数一致。

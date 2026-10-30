@@ -19,8 +19,8 @@
 **Target Platform**: 任何支持 Spec Kit 的 agent 宿主；技能是提示词层，不依赖特定运行时
 **Project Type**: single（框架源码 + 自举运行时双帽）
 **Performance Goals**: 无吞吐目标。可用预算有两条：技能正文过 `skills/external/improve-skills/scripts/skill-shape.py`（基线 ≈1981 tokens / 预算 5000，判定 pass）；单次教练运行的步骤行数与上下文消耗属观测项、不是门禁
-**Constraints**: 零新增阻断式确认门（判定单位是 `git diff` 新增行，基线读数见 `test-evidence/stage-plan-baselines.txt`）；旧名在封闭活接线面内至多 1 次（`_OBSOLETE_SKILLS` 条目）；期望必须在派发前落盘；每次运行恰好 1 次派发；派生面只再生成、不手改；历史记录不改写
-**Scale/Scope**: 1 个技能包（`SKILL.md` + `references/`）；5 份契约；19 个需手改源文件 + 4 类派生面；4 个冻结基线测试显式更新；台账 79 行（27 命令 + 52 技能，实测）
+**Constraints**: 零新增阻断式确认门（判定单位是 `git diff` 新增行，可执行判定见 `contracts/identity-and-wiring.contract.md` C-8 § New-line gate；基线读数见 `test-evidence/gate-newline-baseline.txt`）；旧名在封闭活接线面内恰为 1 次（封闭面与允许差异集 owner 为 requirements § Assumptions A10，本文件不复述其清单）；期望必须在派发前落盘；每次运行恰好 1 次派发；派生面只再生成、不手改；历史记录不改写
+**Scale/Scope**: 1 个技能包（`SKILL.md` + `references/`）；5 份契约；封闭活接线面、允许差异集与派生面范围见 requirements A10（本文件不复述）；4 个冻结基线测试显式更新；台账 79 行（27 命令 + 52 技能，实测）
 
 ## Constitution Check
 
@@ -30,7 +30,7 @@
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `requirements.md` 的 FR/SC 逐条落进 `contracts/` 条款与 `data-model.md` 校验规则；无需求外设计 |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | `requirements.md` 的 FR/SC 逐条落进 `contracts/` 条款与 `data-model.md` 校验规则；FR→条款映射 owner 为本文件 § Phase 1（逐 FR 一行）；无需求外设计 |
 | II | Feature-Centric Development | ✅ Pass | Feature 078 已登记，本阶段把 `Draft` 推进到 `Planned` 并更新 `.specify/memory/features/078.md` |
 | III | Intent-Driven Development | ✅ Pass | Summary 与 `contracts/coaching-run.contract.md` 先给「what/why」，实现细节留到 tasks |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | 四个冻结测试与新增契约测试先于技能正文落地；夹具场景对 SC-001…SC-005 |
@@ -43,7 +43,7 @@
 | XI | Dogfooding (Self-Application) | ✅ Pass | 改动落在框架源（`skills/`、`shared/`、`src/`），`.specify/` 侧全部再生成；旧目录清理走 `_OBSOLETE_SKILLS` 机制而非实例补丁 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 复用 `run-skills` 解析、`improve-skills` 入口、`probe-utils`/`sync-mirrors`/`regen-command-copies`；不新增脚本 |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 强化 Controlled Execution（Trainee 按自身流程真实跑通）与 Learning Capture（偏差 → 提升计划）两个维度 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 17 个 STR 字面量 owner 为 `requirements.md`；契约只细化形态；台账/probe 行各有 owner；计数取实测 |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 17 个 STR 字面量 owner 为 `requirements.md`；封闭活接线面与允许差异集 owner 为 A10（契约 C-2/C-6 只引用，不重列）；运行状态语义 owner 为 `data-model.md` § RunStatus（契约 C-10 与技能正文引用）；FR→条款映射 owner 为本文件 § Phase 1；台账/probe 行各有 owner；计数取实测 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 澄清句与运行报告按 owner 写作；内部引擎调用形式不出现在用户面 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 派发载荷注入快速失败条款并要求子代理显式回传异常行；不可见步骤标 `observation-gap` 不编造 |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | 新目录 `.specify/memory/coaching/` 在同一变更内登记进 `shared/definitions/framework-map.md` 的 memory 区（镜像再生成） |
@@ -52,6 +52,8 @@
 **Gates Status**: ✅ 全部通过，无未证成 Fail/Partial 行。
 
 **Re-check after Phase 1** (2026-10-30, against `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md`): 同一 18 行逐行复核，结论不变——设计产物只增加「运行目录登记」「契约条款编号」「派生面再生成命令」三类内容，未引入新运行时、新门禁或新事实定义点。
+
+**Analyze 回环第 1 轮的 plan 重审（约束分支 a）** 再次逐行复核：H-01 把运行状态语义收归 `data-model.md` § RunStatus，契约 C-10 只保留 FR-017 例外、不再无条件封顶；C-01 让契约 C-2/C-6 与 `quickstart.md` 引用 A10 而不重列封闭面，逐路径判定改由 guard copy 派生；H-02 在契约 C-8 与 quickstart § 1.5 落成可执行的新增行判定；M-07 以显式豁免留痕（见 § Phase 1）。18 行结论不变：这些改动只减少重复定义点，不新增门禁、运行时或事实 owner。
 
 ## Decision Tensions
 
@@ -147,7 +149,7 @@ N/A — 无 Constitution Check 违规项，无需要证成的 Fail/Partial 行�
 
 关键实测（2026-10-30，均写入 `test-evidence/stage-plan-baselines.txt`）：
 
-1. **活接线面**：`git grep -l think-skills` 命中 79 个受版本管理文件；其中需手改的源码恰为需求 A10 声明的 19 个（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src 1、docs 2、contract tests 4），其余为派生面与历史记录。需求正文写的「77 个受版本管理文件」是 requirements 成文时的读数，成文后 `requirements.md` 与 `features*.md` 自身也新增了命中，故当前读数为 79——差异来自计量时点，不是设计分歧；SC-006 的判据以 A10 的**封闭集**为准，不吃全仓计数。
+1. **活接线面**：`git grep -l think-skills` 命中 79 个受版本管理文件；其中需手改的源码恰为需求 A10 声明的封闭活接线面（逐项清单与计数见 A10，本文件不复述），其余为派生面与历史记录。需求正文写的「77 个受版本管理文件」是 requirements 成文时的读数，成文后 `requirements.md` 与 `features*.md` 自身也新增了命中，故当前读数为 79——差异来自计量时点，不是设计分歧；SC-006 的判据以 A10 的**封闭集**为准，不吃全仓计数。
 2. **`src/specify_cli/__init__.py` 的两处命中**：`_OBSOLETE_SKILLS` 之外还有一行历史注释 `thought-experiment-verifier→think-skills;`。SC-006 要求旧名在封闭面内恰为 1 次，因此该注释必须以不带旧名字面量的方式重述（保留改名链语义，指向 Feature 078），否则计数就是 2。
 3. **镜像不删 extras**：`sync-mirrors.py` 对 `skills/external` 只同步 MISS/DIFF，extras 只提示不删除；改名后 `.specify/skills/think-skills/` 必须显式删除，否则旧名留在安装面。
 4. **`_OBSOLETE_SKILLS` 清理语义**：`cleanup_obsolete_framework_assets()` 对 symlink 或不存在者 `continue`，只 `rmtree` 实体目录——与 FR-020 的「删实体、留用户符号链接」天然一致，无需改代码。
@@ -162,11 +164,60 @@ N/A — 无 Constitution Check 违规项，无需要证成的 Fail/Partial 行�
 
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
-| Data model | [`data-model.md`](./data-model.md) | 8 entities（CoachRun / TraineeTarget / ExpectationCriteria / ObservationStep / DispatchRecord / DeviationFinding / ImprovementEntry / RunStatus）+ 4 状态机 |
+| Data model | [`data-model.md`](./data-model.md) | 8 entities（CoachRun / TraineeTarget / ExpectationCriteria / ObservationStep / DispatchRecord / DeviationFinding / ImprovementEntry / RunStatus）+ 4 状态机；§ RunStatus 是运行状态语义的唯一 owner |
 | Contracts | [`contracts/`](./contracts/) | 5 files: `coaching-run.contract.md`, `expectation.contract.md`, `observation.contract.md`, `dispatch-payload.contract.md`, `identity-and-wiring.contract.md` |
-| Quickstart | [`quickstart.md`](./quickstart.md) | 5 scenarios（wiring 验证 / 夹具教练运行 / 升级兼容 / 退化路径 / 清理） |
+| Quickstart | [`quickstart.md`](./quickstart.md) | 5 scenarios（wiring 验证 / 夹具教练运行 / 升级兼容 / 退化路径 / 清理）+ FR 追溯边界说明 |
 | Feature reference | [`feature-ref.md`](./feature-ref.md) | Feature 078 绑定与映射表 |
 
-契约条款覆盖核对（FR → 契约）：FR-001…FR-003 → `coaching-run.contract.md` C-1…C-3；FR-004…FR-008 → `expectation.contract.md` C-1…C-5；FR-009…FR-013 → `dispatch-payload.contract.md` C-1…C-5 + `observation.contract.md` C-1…C-6 + `coaching-run.contract.md` C-5/C-6；FR-014…FR-017 → `coaching-run.contract.md` C-7…C-10；FR-018…FR-024 → `identity-and-wiring.contract.md` C-1…C-7；FR-025…FR-029 → `coaching-run.contract.md` C-3/C-9/C-12…C-14。SC-006 / SC-008 的可复核命令面写在 `identity-and-wiring.contract.md` C-8。
+### FR → Clause Mapping (traceability owner)
 
-与 Phase 0 预期的偏差：无。Phase 0 预计「契约 4–5 份」，实际 5 份——多出的 `identity-and-wiring.contract.md` 把 A10 的 19 文件封闭集与 4 类派生面写成可逐行勾选的接线表，因为改名是本特性的另一半工作。
+This table is the **owner** of FR→clause traceability for Feature 078. The contracts are condition-shaped and carry no FR citation groups; no other artifact restates this mapping.
+
+| FR | Clause(s) |
+|----|-----------|
+| FR-001 | coaching-run C-1, C-2 |
+| FR-002 | coaching-run C-2; expectation C-5 |
+| FR-003 | coaching-run C-2, C-12 |
+| FR-004 | expectation C-1; coaching-run C-4 |
+| FR-005 | expectation C-2 |
+| FR-006 | expectation C-3 |
+| FR-007 | expectation C-4 |
+| FR-008 | expectation C-5 |
+| FR-009 | dispatch-payload C-1, C-2, C-3; coaching-run C-6 |
+| FR-010 | coaching-run C-5 |
+| FR-011 | observation C-1, C-2, C-3, C-4 |
+| FR-012 | coaching-run C-5, C-6 |
+| FR-013 | observation C-5; coaching-run C-6, C-11 |
+| FR-014 | coaching-run C-7 |
+| FR-015 | coaching-run C-8 |
+| FR-016 | coaching-run C-9 |
+| FR-017 | coaching-run C-10; data-model § RunStatus |
+| FR-018 | identity-and-wiring C-1 |
+| FR-019 | identity-and-wiring C-1, C-5 |
+| FR-020 | identity-and-wiring C-4 |
+| FR-021 | identity-and-wiring C-3 |
+| FR-022 | identity-and-wiring C-2, C-6; requirements A10 |
+| FR-023 | identity-and-wiring C-7 |
+| FR-024 | identity-and-wiring C-6; requirements A9 |
+| FR-025 | coaching-run C-12; dispatch-payload C-5 |
+| FR-026 | identity-and-wiring C-1, C-5 |
+| FR-027 | coaching-run C-13; identity-and-wiring C-8 § New-line gate |
+| FR-028 | coaching-run C-3, C-9; data-model § Optimization claim |
+| FR-029 | coaching-run C-14; dispatch-payload C-2 |
+
+SC-006 / SC-008 的可复核命令面写在 `identity-and-wiring.contract.md` C-8（含 § New-line gate）。
+
+### FR-Lane Exemption (explicit, M-07 disposition)
+
+- `account-clause-coverage.py` 的 **FR 车道对本特性不适用**：该车道的 claimed 子集取自每个条款块最后一个含 FR/SC 的括号组（CITATION GROUP），而本特性的契约刻意采用条件形态条款、不带 citation group，运行该车道只会按构造报「零覆盖」，不是映射缺失。判定与命令的完整说明归 `account-clause-coverage.py` 自身 docstring；本文件只做豁免裁决。
+- **Clause 车道不受影响**，仍由 tasks 的 `[green: <contract>#<clause>]` 声明消费；本豁免只覆盖 FR 车道。
+- 代价与重开条件：FR 覆盖不再由程序车道机械复核，改由上表 + `/speckit.analyze` 的独立复核承担；若本特性的任一契约改用 CITATION GROUP 形态，本豁免作废、该车道须转绿。记录于此，避免后续会话从「静默」重新推导豁免。
+
+### Design Constants Kept by Reference
+
+- 封闭活接线面与允许差异集 → requirements **A10**（契约 C-2/C-6 与 quickstart § 1.4 只引用）。
+- 运行状态语义（判定阶梯与优化状态的独立性）→ `data-model.md` § RunStatus（契约 C-10 只保留 FR-017 例外）。
+- 新增行门禁判定（pathspec / pattern 集 / 基线读数）→ `identity-and-wiring.contract.md` C-8 § New-line gate（pathspec 取自 scanner 自身的 `SCAN_DIRS` + `SCAN_ROOT_FILES`）。
+- 派生面 → 契约 C-3 列出的再生成入口；面清单由这些生成器从 A10 的源成员产出，契约不另立枚举。
+
+与 Phase 0 预期的偏差：无。Phase 0 预计「契约 4–5 份」，实际 5 份——多出的 `identity-and-wiring.contract.md` 承载改名这一半工作的设计约束（封闭面引用 A10、再生成入口、冻结测试与历史边界），并为 SC-006 / SC-008 提供可复核命令面。

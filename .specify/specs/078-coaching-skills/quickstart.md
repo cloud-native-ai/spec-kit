@@ -61,20 +61,63 @@ explicitly, because `sync-mirrors.py` never removes extras; (c) `regen-command-c
 ### 1.4 Old name survives exactly once
 
 ```bash
-git grep -n "think-skills" -- \
-  skills/external/coaching-skills skills/internal/run-skills/SKILL.md \
-  templates/commands/skills.md agents/skill-verifier.agent.md agents/structure-adjuster.agent.md \
-  skills/internal/create-agent/templates shared/definitions src/specify_cli/__init__.py \
-  docs/reference/agents/command-and-skills.md docs/tutorials/quickstart.md \
-  tests/contract .specify/skills
+/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest \
+  tests/contract/test_coaching_wiring_contract.py -q
 ```
 
-Expected: one hit — the `_OBSOLETE_SKILLS` tuple entry in `src/specify_cli/__init__.py`.
+Expected: pass. That test is the guard copy: it derives the candidate set at run time (the six mirror
+pairs from `MIRROR_PAIRS`, the per-tool copy targets from `regen-command-copies.py`, and A10's residual
+hand-edited members pinned inside the test) and asserts the only surviving old-name occurrence is the
+`_OBSOLETE_SKILLS` entry. The path list lives in that test, never in this quickstart — requirements
+**A10** owns the closed surface and its allowed difference set, and a second prose list is exactly the
+duplicate the analyze pass removed.
 
-Verification: **not executed for the post-rename state** (it would find the pre-rename tree). Premises:
-(a) the historical comment inside the OBSOLETE-ASSET-REGISTRY region is restated without the literal;
-(b) every listed path is part of the closed surface defined by `contracts/identity-and-wiring.contract.md`
-C-2/C-3, and historical records outside that list are intentionally excluded.
+Verification: **not executed in the plan phase** (the test does not exist yet). Premises: (a) the
+historical comment inside the OBSOLETE-ASSET-REGISTRY region is restated without the literal; (b) the
+guard copy's A10 residue matches the requirements' closed surface; (c) `git grep -l` outside the
+closed surface still finds records under `.specify/specs/**` and the feature registry, which A10/C-6
+exclude by reference to A9 — a repo-wide count is a diagnostic, not the verdict.
+
+### 1.5 Zero new blocking confirmation gates (SC-008 third condition)
+
+```bash
+BASE=d0f50759   # feature baseline; record the SHA in the evidence before running
+git diff "$BASE" -- templates/commands skills shared 'templates/*.md' \
+  | grep '^+' | grep -v '^+++' \
+  | python3 -c '
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location("gates", "scripts/python/scan-confirmation-gates.py")
+gates = importlib.util.module_from_spec(spec); spec.loader.exec_module(gates)
+lines = [line[1:].rstrip("\n") for line in sys.stdin if line.startswith("+")]
+hits = [(i, line) for i, line in enumerate(lines, 1) if gates.BLOCKING_RE.search(line)]
+print("added_lines=%d blocking_hits=%d" % (len(lines), len(hits)))
+for i, line in hits: print("hit %d: %s" % (i, line))
+sys.exit(1 if hits else 0)
+'
+```
+
+Expected: `blocking_hits=0`, exit 0.
+
+Verification: executed in this phase against `BASE=d0f50759`; all stage edits are under
+`.specify/specs/`, outside the scanner's surface, so the reading was `added_lines=0 blocking_hits=0`
+(exit 0). The pre-change reading of the same command and the scanner's total baseline (`blocking=27`,
+destructive 20 + governance_kept 7, violations 0) are in `test-evidence/gate-newline-baseline.txt`;
+this phase's reading is in `test-evidence/plan-fix-newline-gate.txt`. Premises: (a) the pathspec is
+the scanner's own `SCAN_DIRS` + `SCAN_ROOT_FILES`, a subset of A10's closed surface, so the surface is
+derived from the scanner and not re-listed; (b) `BASE` is the feature baseline commit, not the
+previous stage commit, so every feature-added line inside the scan surface is counted.
+
+---
+
+## Verification boundary — FR → clause traceability
+
+The FR → contract mapping is **owned by plan § Phase 1** (one row per FR). This feature declares
+`account-clause-coverage.py`'s **FR lane not applicable**: that lane reads each clause block's
+citation group, and these contracts deliberately use condition-shaped clauses without citation
+groups, so the lane would report zero coverage by construction rather than by a missing mapping. The
+clause lane is unaffected. The full statement, its cost and its reopening condition live in plan
+§ Phase 1; this quickstart only points at the owner so the exemption is visible at the verification
+surface.
 
 ---
 
@@ -136,7 +179,9 @@ User: coaching-skills memory-recall "List every TODO marker in docs/ with file a
 ```
 
 Expected: the Trainee's primary output is still delivered; `## Run Status` shows
-`optimization: unavailable` and `run: success` (or `partial` when the Trainee's own criteria are not met).
+`optimization: unavailable` and `run: success` (or `partial` when the Trainee's own criteria are not
+met). The verdict ladder is owned by `data-model.md` § RunStatus: optimization status never caps a
+completed execution.
 
 ```text
 User: coaching-skills <trainee> "<work>"   # in a fixture whose subagent returns no log at all

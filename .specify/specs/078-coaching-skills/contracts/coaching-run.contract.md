@@ -76,8 +76,8 @@
 | `run` | `success` \| `partial` \| `failed` | `improvement-plan.md` § Run Status |
 | `optimization` | applied \| skipped \| unavailable \| failed (STR-010) | same section |
 
-- `run: success` requires the primary artifact to exist and satisfy the first Outcome Correctness criterion.
-- An unavailable, skipped, or failed optimization keeps the run's verdict at most `partial` and never turns a completed Trainee execution into `failed`.
+- **Semantics owner**: [`../data-model.md`](../data-model.md) § RunStatus owns the verdict ladder — how an execution outcome plus an optimization outcome combine into these two values. This clause owns the field shape and the recording location; the skill body (`SKILL.md`) and the run report reference the owner instead of restating the ladder. The one boundary rule this clause does fix is the FR-017 exception below, because it is the misreading the shape must prevent.
+- **FR-017 exception, stated at the contract boundary because it is the misreading this shape must prevent**: optimization status is reported beside the execution verdict, never inside it. An unavailable, skipped, or failed optimization never turns a completed Trainee execution into `failed`. When the primary artifact is complete per its `OC-1` criterion the optimization cap does not apply and the run closes `run: success` — unless the owner's separate partial trigger fires (zero observation evidence, `data-model.md` § RunStatus rule 2); otherwise the run stays at or below `partial`. Optimization status is never an input to this decision.
 - The user-facing run report restates both values and names the four artifact paths.
 
 ## C-11 Degradation Ladder
@@ -85,7 +85,7 @@
 - Host events available → steps are `host-event`.
 - Host events unavailable, subagent self-report available → steps are `self-report`.
 - Neither → the step is a row marked `observation-gap`, counted in the gap list, never invented.
-- No observation at all → the plan still exists, every entry is `evidence: none`, and the run closes `run: partial`.
+- No observation at all → the plan still exists and every entry is `evidence: none`; the verdict follows [`../data-model.md`](../data-model.md) § RunStatus (zero observation evidence is not `success`).
 
 ## C-12 Dispatch Mechanism Boundary
 
@@ -96,7 +96,7 @@
 ## C-13 Governance Budget
 
 - The skill remains `classification: external`; it MUST NOT move into the internal layer.
-- New wording introduced by this feature MUST NOT add blocking confirmation phrasing: the judged unit is the added line in `git diff`, and those lines must contain zero hits against `scan-confirmation-gates.py`'s blocking patterns.
+- New wording introduced by this feature MUST NOT add blocking confirmation phrasing: the judged unit is the added line in `git diff`, and those lines must contain zero hits against `scan-confirmation-gates.py`'s blocking patterns. The executable judgment (pathspec, pattern source, baseline reading) is owned by `identity-and-wiring.contract.md` C-8 § New-line gate; this clause states the rule, not the command.
 - Relaying a destructive step that belongs to the Trainee's own flow is a governance-kept relay, not a new gate: the skill states the step, gets the answer, then dispatches; the subagent never self-approves.
 
 ## C-14 Dual Independent Context

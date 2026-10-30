@@ -26,8 +26,8 @@
 | `contracts/expectation.contract.md` | Feature Key Change 2: the two-dimension expectation produced by the former simulation procedure |
 | `contracts/observation.contract.md` | Feature Key Change 4: per-step observation, source tagging, gap marking |
 | `contracts/dispatch-payload.contract.md` | Feature Key Change 3: dual independent contexts, verbatim `<work>` |
-| `contracts/identity-and-wiring.contract.md` | Feature Key Change 1 and Implementation Notes (obsolete list, derived faces, frozen tests, history boundary) |
-| `quickstart.md` | Acceptance path for SC-001…SC-009 |
+| `contracts/identity-and-wiring.contract.md` | Feature Key Change 1 and Implementation Notes: the closed wiring surface by reference to requirements A10 (with the guard-copy derivation for the residual audit), derived faces, frozen tests, history boundary |
+| `quickstart.md` | Acceptance path for SC-001…SC-009, plus the FR-traceability verification boundary owned by plan § Phase 1 |
 
 ## Feature-List Review
 

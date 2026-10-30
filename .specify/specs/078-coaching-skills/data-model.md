@@ -2,7 +2,7 @@
 
 **Feature**: 078 Coaching Skills | **Plan**: [plan.md](./plan.md) | **Requirements**: [requirements.md](./requirements.md)
 
-**Authority**: this file refines the *shape* of the records defined by `requirements.md` § Key Entities. The literal values (17 Shared Strings), the closed status vocabularies and the normative rules stay owned by `requirements.md`; a disagreement resolves there, never here.
+**Authority**: this file refines the *shape* of the records defined by `requirements.md` § Key Entities. The literal values (17 Shared Strings), the closed status value domains and the normative rules stay owned by `requirements.md`; the run-status **combination rule** is owned here (§ RunStatus), because the requirements fix the domains and the "optimization never fails the execution" rule but not the ladder that combines an execution outcome with an optimization outcome. A disagreement on shape resolves to `requirements.md`; a disagreement on what a status means resolves to § RunStatus.
 
 ## Entity Overview
 
@@ -125,7 +125,7 @@ Step table columns (all required per row, FR-011):
 | `class` | `result-deviation` \| `process-deviation` | A partially completed run MUST separate these two classes (Edge Cases). |
 | `coach-vs-trainee` | `aligned` \| `diverged` (+ one line) | Where the coach's reading of `<work>` and the Trainee's actual reading/execution materially differ beyond execution noise (FR-029). |
 
-**Validation**: with zero observation evidence the file still exists, every finding carries no execution evidence, and the run closes `run: partial` (Edge Cases).
+**Validation**: with zero observation evidence the file still exists, every finding carries no execution evidence, and the § RunStatus ladder places the run at `partial` (rule 2; Edge Cases).
 
 ## ImprovementEntry
 
@@ -139,12 +139,22 @@ Step table columns (all required per row, FR-011):
 
 ## RunStatus
 
-The single definition point for the run's two closed values (written as the last section of `improvement-plan.md`):
+**Ownership**: this section is the single definition point for run-status **semantics** — how an execution outcome and an optimization outcome combine into the two recorded values. The value domains themselves are owned by `requirements.md` (FR-017 / STR-010); the combination rule belongs here. `contracts/coaching-run.contract.md` C-10 and the skill body MUST reference this section instead of restating a verdict rule or a cap.
 
-| Field | Domain | Rule |
-|-------|--------|------|
-| `run` | `success` \| `partial` \| `failed` | `success` requires the primary artifact to exist and meet its `OC-1` criterion; `failed` covers a failed Trainee flow with no usable result; everything else is `partial` (FR-017). |
-| `optimization` | `applied` \| `skipped` \| `unavailable` \| `failed` | Independent of `run`; an unavailable/rejected optimization never turns the execution into a failure (FR-017, SC-005). |
+Written as the last section of `improvement-plan.md`:
+
+| Field | Domain | Meaning |
+|-------|--------|---------|
+| `run` | `success` \| `partial` \| `failed` | Execution verdict; ladder below. |
+| `optimization` | `applied` \| `skipped` \| `unavailable` \| `failed` | Reported beside the execution verdict; never gates, caps or fails it (FR-017, SC-005). |
+
+**Verdict ladder** (evaluate top-down; first match wins):
+
+1. `failed` — the Trainee flow ended with no usable primary artifact.
+2. `partial` — a primary artifact exists but does not meet its `OC-1` acceptance criterion, **or** the observation record has no step row carrying `host-event` / `self-report` (zero observation evidence: the execution is not certified).
+3. `success` — the primary artifact exists, meets its `OC-1` acceptance criterion, and at least one step row carries `host-event` or `self-report`.
+
+Optimization status is orthogonal to this ladder: `applied`, `skipped`, `unavailable` and `failed` coexist with any `run` value. An unavailable, skipped, or failed optimization never turns a completed execution into `failed` and never lowers a `success` — the FR-017 exception is keyed to the primary artifact, not to optimization status.
 
 ## State Transitions
 
