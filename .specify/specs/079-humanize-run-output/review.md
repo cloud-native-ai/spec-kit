@@ -418,3 +418,33 @@ P1 不构成硬阻塞，但其中 **F2（同一文件两个相反判定）** 与
 **合并面的事实**：分支 `079-humanize-run-output` 未 push（`git branch -r --contains HEAD` 为空），本线只可能做本地合并；合并动作本身未被本次评审授权，本次也未执行。**状态迁移**：`Implemented → Ready for Review` 未被判定（code segment 未派发，见 § 2.1 / F9），因此不得提前翻状态。
 
 **本次复算的通过面**（供 closure 参考，不替代 F1 要求的四键证据行）：`.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py` → `172 passed, 1 warning`，rc=0；`regen-command-copies.py --check` rc=0；`sync-mirrors.py --check` 六对全 ok；`skill-shape.py` 判 `pass`（≈4999 / 5000 tokens）。完整输出见 `test-evidence/review-targeted.txt`。
+
+## Post-review repair (2026-10-31)
+
+修复范围仅限本文件的同批处置对象 **F1（P0）/ F2（P1）/ F4（P1）**；实现代码与 `requirements.md` / `plan.md` / `contracts/` / `tasks.md` 未改动。修复只落在 `.specify/specs/079-humanize-run-output/verification.md`、本文件与新增证据 `test-evidence/review-repair-binding-check.txt`。
+
+### F1（P0）— 8 条 `pass` 的证据绑定已补，绑定自检 rc=0
+
+在 `verification.md` 的 canonical 块中新增 8 条四键 Evidence record（`sample_id` / `evidence_path` / `evidence_sha256` / `verdict=pass`），每个 `sample_id` 唯一；`SC-001` / `SC-004` 仍为 `partial`，未补记录、未升为 `pass`。`evidence_path` 均为仓库相对路径，`evidence_sha256` 为文件字节的 SHA-256（`shasum -a 256` 同值）：
+
+| sample_id | evidence_path（仓库相对） | evidence_sha256 |
+|---|---|---|
+| `SC-002_quickstart_s1` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-003_quickstart_s2` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-005_quickstart_s4` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-006_wiring_inventory` | `.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt` | `867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514` |
+| `SC-007_implement_part4` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
+| `SC-008_implement_part5` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt` | `b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744` |
+| `SC-009_quickstart_s3_s7` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-010_implement_part4` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
+
+同一文件被多条记录复用，但每条记录 `sample_id` 唯一（自检读数 `unique_sample_ids=true`）。绑定自检的检查器源码与逐条读数落盘在 `test-evidence/review-repair-binding-check.txt`：`records=8`，8 条全部 `exists=true`、`bytes>0`、`hash_match=true`，`pass_records_cover=SC-002,SC-003,SC-005,SC-006,SC-007,SC-008,SC-009,SC-010`，`pass_sc_without_record=none`，`RESULT=PASS failures=0`，命令 rc=0。
+
+### F2（P1）— SC 收口表与 canonical 块的判定已统一
+
+`verification.md` § SC 收口表的 SC-001 / SC-004 状态词由「达成（…）」改为「**部分达成（partial）**（…）」，与 canonical 块的 `SC-001_status=partial` / `SC-004_status=partial` 一致；括号内的读数与证据路径原样保留。其余 8 行的状态词与内容未改。
+
+### F4（P1）— quickstart「真实执行」的证据级别已在限制节声明
+
+`verification.md` § 未跑与限制新增一条明确声明：quickstart 中被真实执行的只是内层命令（退出码与 stdout）；`/speckit.humanize` 的解析、占位与五节报告装配未作为端到端调用发生，五节报告正文由实现者在同一会话内按 SKILL 规范撰写；宿主原生派发通道（`mode: subagent` / `dispatches: 1`）未实测。该限制注明与 **SC-001 的 partial**（原生派发腿不可复现）及 **SC-004 的 partial**（用户拒绝确认腿 `not-reproducible`）对应。F4 提出的框架侧整改（执行级别枚举）仍归 REC-079-07，不在本次 review 修复内落地。
+

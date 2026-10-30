@@ -1,0 +1,124 @@
+# Review-repair binding self-check — 079-humanize-run-output
+# date=2026-10-31 | cwd=<repo root> | run from the repo root; the script below is the exact checker (stdin to .venv/bin/python, output via tee).
+# Environment: python 3.14 (.venv); SHA-256 over the archived file bytes.
+
+## Checker (verbatim)
+```python
+import hashlib, pathlib, re, sys
+
+root = pathlib.Path.cwd()
+vf = root / ".specify/specs/079-humanize-run-output/verification.md"
+keys = ("sample_id", "evidence_path", "evidence_sha256", "verdict")
+
+rows, block = [], {}
+for line in vf.read_text(encoding="utf-8").splitlines():
+    m = re.match(r"^(sample_id|evidence_path|evidence_sha256|verdict)=(.*)$", line)
+    if not m:
+        continue
+    key, value = m.group(1), m.group(2).strip()
+    if key == "sample_id" and block:
+        rows.append(block)
+        block = {}
+    block[key] = value
+if block:
+    rows.append(block)
+
+failures = 0
+print(f"verification.md={vf.relative_to(root)}")
+print(f"records={len(rows)}")
+print()
+for r in rows:
+    sid = r.get("sample_id", "<missing>")
+    missing = [k for k in keys if not r.get(k)]
+    if missing:
+        print(f"{sid}: FAIL missing keys: {', '.join(missing)}")
+        failures += 1
+        continue
+    path = root / r["evidence_path"]
+    exists = path.is_file()
+    size = path.stat().st_size if exists else 0
+    computed = hashlib.sha256(path.read_bytes()).hexdigest() if exists else "-"
+    hash_match = computed == r["evidence_sha256"]
+    ok = exists and size > 0 and hash_match
+    print(f"sample_id={sid}")
+    print(f"  evidence_path={r['evidence_path']}")
+    print(f"  exists={str(exists).lower()} bytes={size} nonempty={str(size > 0).lower()}")
+    print(f"  evidence_sha256(recorded)={r['evidence_sha256']}")
+    print(f"  evidence_sha256(computed)={computed}")
+    print(f"  hash_match={str(hash_match).lower()} verdict={r['verdict']} result={'PASS' if ok else 'FAIL'}")
+    failures += 0 if ok else 1
+
+pass_scs = sorted({r["sample_id"].split("_")[0] for r in rows if r.get("verdict") == "pass"})
+expected = ["SC-002", "SC-003", "SC-005", "SC-006", "SC-007", "SC-008", "SC-009", "SC-010"]
+statuses = dict(re.findall(r"(?m)^(SC-\d{3})_status=(\w+)$", vf.read_text(encoding="utf-8")))
+print()
+print(f"pass_records_cover={','.join(pass_scs)}")
+print(f"pass_coverage_matches_expected={str(pass_scs == expected).lower()}")
+print(f"SC-001_status={statuses.get('SC-001')} (no binding duty: non-pass)")
+print(f"SC-004_status={statuses.get('SC-004')} (no binding duty: non-pass)")
+print(f"pass_sc_without_record={','.join(sorted(s for s in expected if s not in pass_scs)) or 'none'}")
+print(f"unique_sample_ids={str(len({r.get('sample_id') for r in rows}) == len(rows)).lower()}")
+print(f"RESULT={'PASS' if failures == 0 and pass_scs == expected else 'FAIL'} failures={failures}")
+sys.exit(0 if failures == 0 and pass_scs == expected else 1)
+```
+
+## Readings
+verification.md=.specify/specs/079-humanize-run-output/verification.md
+records=8
+
+sample_id=SC-002_quickstart_s1
+  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  exists=true bytes=10647 nonempty=true
+  evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-003_quickstart_s2
+  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  exists=true bytes=10647 nonempty=true
+  evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-005_quickstart_s4
+  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  exists=true bytes=10647 nonempty=true
+  evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-006_wiring_inventory
+  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
+  exists=true bytes=12952 nonempty=true
+  evidence_sha256(recorded)=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
+  evidence_sha256(computed)=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-007_implement_part4
+  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+  exists=true bytes=6672 nonempty=true
+  evidence_sha256(recorded)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+  evidence_sha256(computed)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-008_implement_part5
+  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt
+  exists=true bytes=6947 nonempty=true
+  evidence_sha256(recorded)=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
+  evidence_sha256(computed)=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-009_quickstart_s3_s7
+  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  exists=true bytes=10647 nonempty=true
+  evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+  hash_match=true verdict=pass result=PASS
+sample_id=SC-010_implement_part4
+  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+  exists=true bytes=6672 nonempty=true
+  evidence_sha256(recorded)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+  evidence_sha256(computed)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+  hash_match=true verdict=pass result=PASS
+
+pass_records_cover=SC-002,SC-003,SC-005,SC-006,SC-007,SC-008,SC-009,SC-010
+pass_coverage_matches_expected=true
+SC-001_status=partial (no binding duty: non-pass)
+SC-004_status=partial (no binding duty: non-pass)
+pass_sc_without_record=none
+unique_sample_ids=true
+RESULT=PASS failures=0

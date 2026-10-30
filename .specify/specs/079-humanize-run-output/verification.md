@@ -9,6 +9,52 @@ baseline_branch=079-humanize-run-output
 implementation_date=2026-10-31
 post_change_commit=46394dd4
 
+# -- Evidence records (owner: templates/verification-log-template.md) --
+# One record per `pass` SC sample (SC-002/003/005/006/007/008/009/010).
+# `evidence_path` is repo-relative; `evidence_sha256` is SHA-256 over the archived
+# file's bytes (`shasum -a 256`); non-`pass` SCs (SC-001/SC-004) carry no record.
+# Self-check readings: test-evidence/review-repair-binding-check.txt
+
+sample_id=SC-002_quickstart_s1
+evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+verdict=pass
+
+sample_id=SC-003_quickstart_s2
+evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+verdict=pass
+
+sample_id=SC-005_quickstart_s4
+evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+verdict=pass
+
+sample_id=SC-006_wiring_inventory
+evidence_path=.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
+evidence_sha256=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
+verdict=pass
+
+sample_id=SC-007_implement_part4
+evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+evidence_sha256=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+verdict=pass
+
+sample_id=SC-008_implement_part5
+evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt
+evidence_sha256=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
+verdict=pass
+
+sample_id=SC-009_quickstart_s3_s7
+evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
+verdict=pass
+
+sample_id=SC-010_implement_part4
+evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+evidence_sha256=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
+verdict=pass
+
 SC-001_status=partial
 SC-001_value=五节 5/5 已证；dispatches 原生 1 不可复现，降级载体实跑取 0
 SC-001_note=缺口：原生子代理派发腿（dispatches: 1）在本宿不可复现；降级载体 dispatches: 0 已真实执行。承载证据：notes/quickstart-run.md § S1、test_rp01_five_sections_in_order、test_ex21_dispatch_record_line、test_ex17_degraded_honesty、test_ex18_degraded_keeps_report_contract。
@@ -184,10 +230,10 @@ blocking_hits=0
 
 | SC | 状态 | 证据路径 |
 |----|------|----------|
-| **SC-001** | 达成（五节 5/5；派发记录的原生 `1` 腿受宿主限制，降级载体取 `0`） | `notes/quickstart-run.md` § S1（真实五节报告）；`tests/contract/test_humanize_command_surface.py::test_rp01_five_sections_in_order`、`test_ex21_dispatch_record_line`；降级腿 `test_ex17_degraded_honesty`、`test_ex18_degraded_keeps_report_contract` |
+| **SC-001** | 部分达成（partial）（五节 5/5；派发记录的原生 `1` 腿受宿主限制，降级载体取 `0`） | `notes/quickstart-run.md` § S1（真实五节报告）；`tests/contract/test_humanize_command_surface.py::test_rp01_five_sections_in_order`、`test_ex21_dispatch_record_line`；降级腿 `test_ex17_degraded_honesty`、`test_ex18_degraded_keeps_report_contract` |
 | **SC-002** | 达成（结论一致 1/1；证据指针 L/L；来源清单 1/1） | `notes/quickstart-run.md` § S1 `## Evidence`；`::test_rp07_evidence_pointers`、`::test_rp10_sources_read_list`、`::test_rp16_no_fabrication` |
 | **SC-003** | 达成（`verdict: failure` 1/1；封闭词表扫描命中 0；失败证据 1/1） | `notes/quickstart-run.md` § S2；`::test_rp05_conclusion_verdict`；词表扫描见下 |
-| **SC-004** | 达成（无副作用 1/1；`denied` + `aborted` + 拒绝原因/未执行范围 2/2）。运行腿 `not-reproducible`（无人值守无用户可拒），以夹具与契约断言承载 | `tests/fixtures/humanize/run/denied/envelope.md`；`::test_sc04_denied_no_side_effect`、`::test_sc04_denied_verdict_and_scope` |
+| **SC-004** | 部分达成（partial）（无副作用 1/1；`denied` + `aborted` + 拒绝原因/未执行范围 2/2）。运行腿 `not-reproducible`（无人值守无用户可拒），以夹具与契约断言承载 | `tests/fixtures/humanize/run/denied/envelope.md`；`::test_sc04_denied_no_side_effect`、`::test_sc04_denied_verdict_and_scope` |
 | **SC-005** | 达成（`--inline` / `--file` 各 1/1；裸文本被执行 1/1） | `notes/quickstart-run.md` § S4 调用 A/B/C；`::test_cm01_content_mode_equivalence`、`::test_ip05_routing_table_order` |
 | **SC-006** | 达成（①–⑤ 见下节闭环守卫） | 本文件 § SC-006 闭环守卫；`test-evidence/wiring-inventory-baseline.txt` |
 | **SC-007** | 达成（无网络外发 1/1；无 `--output` 零写入 2/2；失败不重试 1/1） | `::test_ex19_no_network_from_humanize`、`::test_rp04_zero_write_default`；`notes/quickstart-run.md` § Teardown（`ls -A .specify/.tmp/humanize/` = 0、`git status --porcelain` 无新增）；`::test_ex11_no_compensating_redispatch`、`::test_ex12_failure_coordinates_no_retry` |
@@ -266,3 +312,4 @@ pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0     
 
 - 全量套件本段未重跑（E2 已在 implement 起点消耗；closure 由 review 后驱动执行）。
 - 原生子代理派发腿（SC-001 的 `dispatches: 1`、S7 A）在本宿不可复现：本段授权不派发子代理，且宿主无原生通道时按降级载体真实执行。
+- **quickstart「真实执行」的证据级别（F4，如实限定）**：`notes/quickstart-run.md` 中被真实执行的只是每条指令的内层命令（如 `python3 -c ...` 的退出码与 stdout）；`/speckit.humanize` 的解析、占位与五节报告装配**未作为端到端调用发生**，五节报告正文由实现者在同一会话内按 SKILL 规范撰写；宿主原生派发通道（`mode: subagent` / `dispatches: 1`）本段未实测。该限制与 **SC-001 的 partial**（原生派发腿不可复现、降级载体取 `dispatches: 0`）及 **SC-004 的 partial**（用户拒绝确认腿 `not-reproducible`，以夹具断言替代）一一对应，相关证据不得读作端到端执行的证明。
