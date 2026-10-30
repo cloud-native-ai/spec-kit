@@ -9,14 +9,14 @@
 
 **Tests Mode**: ON — 宪法 Principle IV「Test-First & Contract-Driven Implementation」把测试定为先写后实现；本特性无运行时，按 Principle VII 的 **template-only 门**下判 Partial（正当化），测试形态是**结构契约测试**（命令模板与技能正文的条款断言、夹具记录集的正/反例判定、坐标与名册计数、镜像与副本零漂移、门禁新增行判据），不是 unit/integration 测。
 
-**Tests**: 四个红先行行（T005 / T013 / T019 / T024）各自先在未改动的树上跑出**记录在案的失败**（命令、真实输出、退出码、失败计数四字段，落入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`），主载体是 `tests/contract/test_humanize_command_surface.py`（WC-12）。`tests/contract/test_stage_class_wiring.py` 的模板字节钉扎属**实现后守卫**（迁移/回归例外，WC-13），排在模板改写之后，不作红先行声称。
+**Tests**: 红先行行 T005 / T013 / T019 / T024 / T036 各自先在未改动的树上跑出**记录在案的失败**（命令、真实输出、退出码、失败计数四字段，落入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`），主载体是 `tests/contract/test_humanize_command_surface.py`（WC-12）。T036 覆盖 WC-05…WC-15 与「条款 id ↔ 测试名」机器核对；其中不依赖实现产物的不变量守卫（WC-14 冻结面、WC-15 夹具存在性）可先绿，逐条标注为守卫、不作红先行声称。`tests/contract/test_stage_class_wiring.py` 的模板字节钉扎属**实现后守卫**（迁移/回归例外，WC-13），排在模板改写之后，不作红先行声称。
 
-**Organization**: 按 `requirements.md` 的四个用户故事分组（US1、US2 为 P1；US3、US4 为 P2）。Foundational 只放四份故事都必须落地的两件事：技能的模式分叉（运行模式 / 内容模式）与运行夹具集——没有它们，四个故事的正文都无处落笔。88 条条款的覆盖由 § Contract Coverage Map 与各行内的条款 id 承担，不使用 `[green:]` 标签（原因见 § Format）。
+**Organization**: 按 `requirements.md` 的四个用户故事分组（US1、US2 为 P1；US3、US4 为 P2）。Foundational 只放四份故事都必须落地的两件事：技能的模式分叉（运行模式 / 内容模式）与运行夹具集——没有它们，四个故事的正文都无处落笔。88 条条款的覆盖由 § Contract Coverage Map 与各行内的条款 id 承担，并由 T036 的 `test_wc12_clause_test_map_is_total` 做「条款 id ↔ 测试名」机器核对（未转绿前不得称零缺口），不使用 `[green:]` 标签（原因见 § Format）。
 
 ## Definition of Done (DoD)
 
 - DoD-1: 本文件每一行为 `[X]`，或 `[~]` 且原因记录在 `.specify/specs/079-humanize-run-output/verification.md` 的 `deferred_tasks=`。
-- DoD-2: 88 条条款各被 § Contract Coverage Map 指派给恰一行，且该行正文显式引用这些条款 id；`python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md` 退出 0。
+- DoD-2: 88 条条款各被 § Contract Coverage Map 指派给恰一行，且该行正文显式引用这些条款 id；T036 的 `test_wc12_clause_test_map_is_total` 转绿——每个条款 id 在契约可追溯性表里有非空测试名，且该名字被套件函数或 § Clause Test Waivers 的显式 waiver + remedy 认领；机器断言未绿前，人工表不得称「零缺口」。`python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md` 退出 0。
 - DoD-3: 运行模式的全部行为落在 `skills/external/humanize/SKILL.md`（路由与不可协商项）与其 `references/run-mode.md`、`references/report-shape.md`（细则）；技能正文 `skill-shape.py` 判 `pass`（≤ 5000 tokens）；命令模板保持薄入口（恰好命名一个技能、frontmatter 无 `scripts:`、正文无 `## Wrap-up`）。
 - DoD-4: 报告面契约成立——五个 H2 逐字且按序、载体标记行恰一个且与真实载体一致、裸文本迁移提示整句恰一次、`## Evidence` 含派发记录行、无风险时显式写「无已知风险」/`no known risks`、无可报告输出时 `## Evidence` 写 `none`。
 - DoD-5: 四个派生面再生成后零漂移：`regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均 exit 0，`probe-utils.py --action compile-embeds --check` 报 `75 units, zero drift`。
@@ -32,7 +32,7 @@
 - GATE-1: 任务文件结构合法 — check: `python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md` 退出 0，0 error。
 - GATE-2: 跨制品一致 — check: `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .` 报 `decision=pass`、`errors=0`；`missing-path` advisory 只允许命名本特性将要新建的路径（`notes/**`、`verification.md`、`coverage-baseline.txt`、`tests/fixtures/humanize/run/**`、`references/**`），其它路径的 advisory 是缺陷。
 - GATE-3: 拆解尺度 — check: `python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/079-humanize-run-output/requirements.md --tasks .specify/specs/079-humanize-run-output/tasks.md` 报 `decision=proceed`（任务行数不超过该脚本的 `TASK_CEILING`）。
-- GATE-4: 条款指派完整 — check: § Contract Coverage Map 的行数与五份契约的条款 id 逐一对应（`grep -ohE '\b(IP|EX|RP|CM|WC)-[0-9]{2}\b' .specify/specs/079-humanize-run-output/contracts/*.md | sort -u` 的每个 id 都在表中出现恰一次）；该表是人工指派，机器核算不可用（原因见 § Format）。
+- GATE-4: 条款指派完整且可机器核对 — check: 分区辅助为 `grep -ohE '\b(IP|EX|RP|CM|WC)-[0-9]{2}\b' .specify/specs/079-humanize-run-output/contracts/*.md | sort -u` 的每个 id 在 § Contract Coverage Map 出现恰一次；**真正判据**是 T036 的 `test_wc12_clause_test_map_is_total` 转绿：88 条条款↔测试名全量认领，未认领项只能以 § Clause Test Waivers 的显式 waiver + remedy 出现。人工表本身不构成「零缺口」证明。
 - GATE-5: 契约套件转绿且既有守卫无新增失败 — check（经仓库 `.venv` 的 `python -m pytest -q`）：`tests/contract/test_humanize_command_surface.py` 与 `tests/contract/test_stage_class_wiring.py` 全绿，且既有套件的失败名集合相对实现期基线（捕获形式归 `/speckit.implement` 的 `**Test runs**` bullet，此处引用不重述）无新增。
 - GATE-6: 派生面与门禁 — check: `python3 scripts/python/regen-command-copies.py --check`、`python3 scripts/python/sync-mirrors.py --check`、`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 均 exit 0；`git diff 35ff11bc -- templates/commands skills docs shared 'templates/*.md' | grep '^+' | grep -v '^+++'` 逐行对照 `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`，`blocking_hits=0`。
 - GATE-7: 无未完行 — check: `grep -cE '^- \[[ >]\]' .specify/specs/079-humanize-run-output/tasks.md` 返回 0。
@@ -41,8 +41,8 @@
 
 本特性无容器、镜像、集群、注册表或特殊硬件依赖；全部工作为本地文件、本地 git 与本地 pytest。
 
-- Python（系统解释器）: **available** — probe: `python3 --version` → `Python 3.9.6` @ 2026-10-30；affected: T001–T035 的全部确定性脚本行（只要求 ≥3.8 与标准库）。
-- pytest（仓库 `.venv`）: **available** — probe: `.venv/bin/python -m pytest --version` → `pytest 9.2.0`（解释器 `Python 3.14.6`）@ 2026-10-30；affected: T005、T013、T019、T024、T032、T035。
+- Python（系统解释器）: **available** — probe: `python3 --version` → `Python 3.9.6` @ 2026-10-30；affected: T001–T036 的全部确定性脚本行（只要求 ≥3.8 与标准库）。
+- pytest（仓库 `.venv`）: **available** — probe: `.venv/bin/python -m pytest --version` → `pytest 9.2.0`（解释器 `Python 3.14.6`）@ 2026-10-30；affected: T005、T013、T019、T024、T032、T035、T036。
 - pytest（profiles venv，备用）: **available** — probe: `/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest --version` → `pytest 9.1.1` @ 2026-10-30；affected: 同上（`.venv` 不可用时改用该解释器，两处基线需一致记录）。
 - Git: **available** — probe: `git --version` → `git 2.54.0 (Apple Git-157)` @ 2026-10-30；affected: T001、T031、T033、T034。
 - 受制裁临时根: **available** — probe: `git check-ignore -v .specify/.tmp/humanize/x.run` → `.specify/.gitignore:30:.tmp/` 命中，exit 0 @ 2026-10-30；affected: T023（并发占位）、T031（teardown 断言）。
@@ -56,7 +56,7 @@
 - 任务状态符（`- [ ]` / `- [>]` / `- [X]` / `- [~]`）归 `.specify/templates/tasks-template.md` § Task State Sigil，本文件不复述。
 - 每行必须单行完成（含文件路径），不得换行续写；测试行写明它写入的证据槽，实现行写明它让哪一组断言转绿。
 
-## Measured Premises（2026-10-30 生成时实测，HEAD `7b61789f`，分支 `079-humanize-run-output`）
+## Measured Premises（2026-10-30 生成时实测，HEAD `7b61789f`；tasks-fix 轮在 `70dd9e78` 上重测 § Wiring Surface 发现与任务行预算，分支 `079-humanize-run-output`）
 
 | Premise | Re-derivation command | Real output |
 |---------|-----------------------|-------------|
@@ -67,28 +67,29 @@
 | 契约条款定义（按行首标记） | `grep -cE '^- \*\*[A-Z]{2}-[0-9]{2}\*\*' .specify/specs/079-humanize-run-output/contracts/*.md` | `content-mode 10 / execution-dispatch 21 / invocation-parse 17 / report-assembly 20 / wiring-compat 20`，合计 `88` |
 | 条款计数陷阱形 | `grep -ohE '\b(IP\|EX\|RP\|CM\|WC)-[0-9]{2}\b' .specify/specs/079-humanize-run-output/contracts/*.md \| wc -l` | `191`——这是条款 id 的**提及**数（互引、可追溯性表），单位是条款**定义**时正确答案是 88；两数并记，表明测量是有意取的 |
 | 条款可解析形态 | `python3 scripts/python/clause_extract.py .specify/specs/079-humanize-run-output/contracts/invocation-parse.contract.md` | `form=md-none clauses=0` + `UNPARSABLE-NAMED`——两字母命名空间不在 `shared/definitions/contract-clause-definitions.md` § 2 的 `C-<n>` 形态集内，故本条特性不用 `[green:]`、不改契约（061/066/067 先例） |
-| 需手改的活接线面（A11 封闭集） | `git grep -l -i "humanize" -- templates/commands/humanize.md skills/external/humanize docs/reference/commands/humanize.md tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py .specify/memory/features/062.md .specify/memory/features.md \| wc -l` | `7` 个文件（模板 / 技能源 / docs 页 / 主契约测试 / 字节钉扎测试 / Feature 详情 / Feature 索引） |
-| 活接线面计数陷阱形 | `git grep -l -i humanize \| wc -l` | `177`——含 dated record（`.specify/specs/**`、`memory/session/**`、`memory/feedback/**`）、派生副本与镜像，单位是「手改源」时正确答案是 7 |
+| 接线面发现（A11，无限制） | `git grep -l -i humanize 35ff11bc` | `164` 行命中。按 requirements § Wiring Surface — A11 Closed Set 的五类有序规则重算（规则 owner 在 requirements，本文件不复制判据）：活源 `7` / 派生副本 `4` / 镜像 `1` / dated record `114` / 冻结验证 `38`，未分类 `0`。逐文件清单（class + path）pin 在 `test-evidence/wiring-inventory-baseline.txt`（派生记录，不是白名单，也不是人工挑选的路径清单） |
+| 接线面计数陷阱形 | `git grep -l -i humanize` | `190`——这是当前工作树的命中数，含本特性新增的 spec / 证据 / state 与既有 dated record；单位是「需手改的活接线面」时正确答案由基线提交上的无限制发现 + 分类得出（`7`），不是当前树命中数 |
 | 派生面基线 | `python3 scripts/python/regen-command-copies.py --check`；`python3 scripts/python/sync-mirrors.py --check` | `OK: all per-tool command copies match the source templates.`（exit 0）；`skills/external/ == .specify/skills/ (406 files)` 等六对全 ok（exit 0）——判据为绝对 exit 0 |
 | 编译面基线 | `python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` | `compile-embeds --check: 75 units, zero drift`（exit 0） |
 | 技能正文预算 | `python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/humanize/SKILL.md` | `判定 pass`，`≈4090 tokens 可控 / 预算 5000（123 行）`；两条 warning（`oversized-section` Workflow=59 行、`flags-outside-contract` 38 flag） |
 | 门禁基线 | `python3 scripts/python/scan-confirmation-gates.py --summary` | `blocking confirmation gates: 27`（destructive 20 + governance_kept 7），`violations 0` |
 | 命令名册 | `ls templates/commands/*.md \| wc -l` | `27`（WC-16 的判据是名册不变，不是新增） |
 | 历史语料 | `git diff --stat 35ff11bc -- tests/fixtures/humanize` | 空输出——`tests/fixtures/humanize/` 的既有语料自基线以来未变，本特性 MUST NOT 改写它（WC-15） |
-| 待建路径 | `ls .specify/specs/079-humanize-run-output/notes tests/fixtures/humanize/run skills/external/humanize/references` | 三条都是 `No such file or directory`：`notes/` 由 T001 建，`tests/fixtures/humanize/run/` 由 T004 建，`skills/external/humanize/references/` 由 T006 建 |
-| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/079-humanize-run-output/tasks.md` | 本文件 35 行（T001–T035），不超过 `decomposition-check.py` 的 `TASK_CEILING`（40） |
-| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/079-humanize-run-output/tasks.md \| wc -l` | 远大于 35——这是任务标识的**提及**数（`[blockedBy:]`、覆盖表、相位说明都在引用），单位是任务**行**时用行首锚定 `^- \[ \] T` |
+| 待建路径 | `ls .specify/specs/079-humanize-run-output/notes tests/fixtures/humanize/run skills/external/humanize/references` | 三条都是 `No such file or directory`：`notes/` 由 T001 建，`tests/fixtures/humanize/run/` 由 T004 建，`skills/external/humanize/references/` 由 T006 建。条款覆盖基线不再待建：`coverage-baseline.txt` 已在 tasks 阶段冻结（497 行，`frozen-from` 头记录 base-sha `70dd9e78`） |
+| 任务行预算 | `grep -cE '^- \[ \] T[0-9]{3}' .specify/specs/079-humanize-run-output/tasks.md` | 本文件 36 行（T001–T036，T036 为本轮新增的 WC 覆盖守卫行），不超过 `decomposition-check.py` 的 `TASK_CEILING`（40） |
+| 任务行预算陷阱形 | `grep -oE 'T[0-9]{3}' .specify/specs/079-humanize-run-output/tasks.md \| wc -l` | 远大于 36——这是任务标识的**提及**数（`[blockedBy:]`、覆盖表、相位说明都在引用），单位是任务**行**时用行首锚定 `^- \[ \] T` |
 
 ## Contract Coverage Map
 
-88 条条款各指派给恰一行；本表是人工指派（机器核算不可用，原因见 § Format），行正文重复引用其条款 id。测试行（T005 / T013 / T019 / T024）与指派行是两回事：测试行先写、先红，指派行是把它转绿的那一行。
+88 条条款各指派给恰一行；本表是人工指派，**机器核对由 T036 的 `test_wc12_clause_test_map_is_total` 承担**——它解析五份契约的条款定义与可追溯性表（条款 → 测试名）和本表（条款 → 行），断言分区完备且每个测试名可被套件函数认领（或出现在 § Clause Test Waivers）。在该断言转绿之前，本表只是候选指派，MUST NOT 被表述为「零缺口」。行正文重复引用其条款 id。测试行（T005 / T013 / T019 / T024 / T036）与指派行是两回事：测试行先写、先红，指派行是把它转绿的那一行。
 
 | Contract | Clauses | Row |
 |---|---|---|
 | `contracts/invocation-parse.contract.md` | IP-01、IP-02、IP-03、IP-04 | T006 |
 | `contracts/invocation-parse.contract.md` | IP-05、IP-06、IP-07、IP-08、IP-09、IP-10 | T007 |
 | `contracts/invocation-parse.contract.md` | IP-11、IP-12、IP-13、IP-14 | T023 |
-| `contracts/invocation-parse.contract.md` | IP-15、IP-16、IP-17 | T027 |
+| `contracts/invocation-parse.contract.md` | IP-15 | T025 |
+| `contracts/invocation-parse.contract.md` | IP-16、IP-17 | T027 |
 | `contracts/execution-dispatch.contract.md` | EX-01、EX-02、EX-03、EX-04、EX-05 | T008 |
 | `contracts/execution-dispatch.contract.md` | EX-06、EX-07、EX-08 | T009 |
 | `contracts/execution-dispatch.contract.md` | EX-09、EX-10 | T010 |
@@ -113,9 +114,19 @@
 | `contracts/wiring-compat.contract.md` | WC-10、WC-11 | T030 |
 | `contracts/wiring-compat.contract.md` | WC-12、WC-13 | T032 |
 | `contracts/wiring-compat.contract.md` | WC-14、WC-15 | T033 |
-| `contracts/wiring-compat.contract.md` | WC-16、WC-17、WC-18、WC-19、WC-20 | T034 |
+| `contracts/wiring-compat.contract.md` | WC-16、WC-17、WC-18、WC-19 | T034 |
+| `contracts/wiring-compat.contract.md` | WC-20 | T033 |
 
-**Partition check**: 17（IP）+ 21（EX）+ 20（RP）+ 10（CM）+ 20（WC）= 88；29 行指派，无条款落在两行，无条款无行。
+**Partition check**: 17（IP）+ 21（EX）+ 20（RP）+ 10（CM）+ 20（WC）= 88；31 行指派，无条款落在两行，无条款无行。IP-15（内容模式不取占位）实质落在内容模式，故随 CM-04 归 T025；WC-20（命令保持 `Simple`）由 `test_feedback_command_classification.py` 承载，故归 T033。
+
+### Clause Test Waivers (M-21)
+
+T036 的 `test_wc12_clause_test_map_is_total` 只认两种认领：套件里可解析的测试函数名（含参数化 id），或本表的显式 waiver 行。本表初始为空；实现期若某个契约可追溯性表里的测试名确实无法落在测试套件中，MUST 追加一行并带 remedy 与证据槽：
+
+| 条款 | 测试名 | 不能落地的原因 | remedy（谁在何时补上） | 证据槽 |
+|------|--------|----------------|------------------------|--------|
+
+**空表不等于「零缺口」**：零缺口只由 `test_wc12_clause_test_map_is_total` 转绿证明，不由本表的行数或人手核对证明。
 
 ## Requirement Coverage Map
 
@@ -133,10 +144,10 @@
 | FR-008 | T009, T021 | FR-023 | T025, T026 |
 | FR-009 | T010, T011 | FR-024 | T027, T029 |
 | FR-010 | T020, T022 | FR-025 | T026 |
-| FR-011 | T022 | FR-026 | T012, T028, T029 |
+| FR-011 | T022 | FR-026 | T012, T028, T029, T036 |
 | FR-012 | T020 | FR-027 | T034 |
-| FR-013 | T006, T009 | FR-028 | T032, T033 |
-| FR-014 | T016 | FR-029 | T030 |
+| FR-013 | T006, T009 | FR-028 | T032, T033, T036 |
+| FR-014 | T016 | FR-029 | T030, T036 |
 | FR-015 | T016 | FR-030 | T023 |
 
 | Success Criterion | Rows |
@@ -146,23 +157,27 @@
 | SC-003 | T020, T031 |
 | SC-004 | T021, T031 |
 | SC-005 | T025, T029, T031 |
-| SC-006 | T028, T029, T033 |
-| SC-007 | T023, T027, T031 |
+| SC-006 | T028, T029, T033, T035 |
+| SC-007 | T019, T023, T027, T031 |
 | SC-008 | T030, T034 |
 | SC-009 | T007, T016, T022, T031 |
 | SC-010 | T026 |
 
-**证据行与执行行**: T001、T002、T003、T004、T031、T035 为证据与执行行，不指派条款——T031 服务 SC-001…SC-009 的可复现验收，T035 把 SC 逐条收口。不构成漏映射。
+**SC-006 闭环**: T035 按 pin 的 `test-evidence/wiring-inventory-baseline.txt` 做补集断言（重跑无限制发现 + 分类后 `comm -3` 为空；冻结验证类每个文件 `git diff --quiet 35ff11bc` 差异集合为空）与结构不变量（命令名册 27、门禁新增行 0 命中、Feature 062 状态不变），不以 T033 已列出的九个测试文件为全部分母。
+
+**SC-007 审计仪器**: ① **静态扫描**——对 `templates/commands/humanize.md` 与 `skills/external/humanize/**` 做网络调用字面量扫描（`curl` / `wget` / `httpx` / `requests.` / `urllib` / `fetch(`），要求 0 命中（URL 文本不算调用）；② **`git status`**——运行前后 `git status --porcelain` 对比，无 `--output` 时无报告/副本写入，指令造成的写入逐项在 [[STR-003]] 披露；③ **派发记录行**——报告中的 `dispatches:` 行是派发计数与重试计数的唯一来源（重试 = 同一次调用出现第二个顶层派发；不以散文叙述为源）。T019 承载网络与重试断言（EX-11…EX-19），T023/T027 承载占位与写入边界，T031 产出真实运行读数。
+
+**证据行与执行行**: T001、T002、T003、T004、T031、T035 为证据与执行行，不指派条款——T031 服务 SC-001…SC-009 的可复现验收，T035 把 SC 逐条收口并执行 SC-006 的闭环守卫。不构成漏映射。
 
 ## Mirror Obligations
 
-镜像对的清单所有者是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`，命令副本的扇出目标所有者是 `scripts/python/regen-command-copies.py`；范围登记见 `plan.md` § Mirror Obligations，本文件不复述其行内容。落地形态：源编辑分散在 T012（`templates/commands/humanize.md`）、T003 / T025 / T026（`skills/external/humanize/SKILL.md`）、T006–T011 / T016 / T020–T023 / T027（`skills/external/humanize/references/`）；**T028 是唯一的再生成行**（`regen-command-copies.py` 扇出四份按工具副本、`sync-mirrors.py --write --only skills/external` 重建技能镜像，随后逐对陈述零漂移）；T033 的终局核对只读不写。`shared/definitions/*` 本特性不改，`sync-mirrors.py --check` 仍须 exit 0（防止误改）。派生面 MUST 由再生成入口产出，MUST NOT 手改。
+镜像对的清单所有者是 `scripts/python/sync-mirrors.py` 的 `MIRROR_PAIRS`，命令副本的扇出目标所有者是 `scripts/python/regen-command-copies.py`；范围登记见 `plan.md` § Mirror Obligations，本文件不复述其行内容。落地形态：源编辑分散在 T012（`templates/commands/humanize.md`）、T003 / T025 / T026（`skills/external/humanize/SKILL.md`）、T006–T011 / T016 / T020–T023 / T027（`skills/external/humanize/references/`）；**T028 是唯一的再生成行**（`regen-command-copies.py` 扇出四份按工具副本、`sync-mirrors.py --write --only skills/external` 重建技能镜像，随后逐对陈述零漂移）；T033 与 T035 的终局核对只读不写。`shared/definitions/*` 本特性不改，`sync-mirrors.py --check` 仍须 exit 0（防止误改）。派生面 MUST 由再生成入口产出，MUST NOT 手改。
 
 ## Test Budget
 
-- **本阶段（tasks）不运行任何测试套件**（docs-only 预算）：`validate-tasks` / `decomposition-check` / `pre-analyze-check` 的输出留档 `test-evidence/tasks-*.txt`，预算判定留档 `test-evidence/tasks-test-budget.txt`（`status=not-run-docs-only`）。
+- **本阶段（tasks）不运行任何测试套件**（docs-only 预算）：`validate-tasks` / `decomposition-check` / `pre-analyze-check` 的输出留档 `test-evidence/tasks-*.txt`，预算判定留档 `test-evidence/tasks-test-budget.txt`（`status=not-run-docs-only`）；接线面 pin 清单留档 `test-evidence/wiring-inventory-baseline.txt`，条款覆盖基线留档 `coverage-baseline.txt`（两者都是本阶段产物，不是测试运行）。
 - **实现期基线（恰好一次）**: 实现开始时按 `templates/commands/implement.md` step 6 `**Test runs**` bullet 的捕获命令与名级比较形式捕获失败名基线；本文件任何行不得重捕获或刷新。
-- **中间阶段**: 定向集——逐故事只跑本故事新增/更新的测试文件（T005 / T013 / T019 / T024 各自的行），不跑全量。
+- **中间阶段**: 定向集——逐故事只跑本故事新增/更新的测试文件（T005 / T013 / T019 / T024 / T036 各自的行），不跑全量。
 - **闭环节点**: review 之后由驱动者跑一次全量并按名比较；本特性任何行不得预支。
 
 ---
@@ -171,8 +186,8 @@
 
 **Purpose**: 证据槽与改动前读数——后续每一相位都往这两个落点写，先建好它。
 
-- [ ] T001 建证据槽并采改动前读数：创建 `.specify/specs/079-humanize-run-output/notes/` 并把六类命令的真实输出（命令、日期、退出码一并）写进 `.specify/specs/079-humanize-run-output/notes/pre-change-measurements.md` —— ①四组计数（FR / SC / 用户故事 / Shared Strings）；②五份契约逐份条款行首计数；③需手改的活接线面 7 个文件（`git grep -l` 的显式路径清单见 § Measured Premises）；④`regen-command-copies.py --check`、`sync-mirrors.py --check`、`probe-utils.py --action compile-embeds --check`、`scan-confirmation-gates.py --summary` 四条基线；⑤`skill-shape.py skills/external/humanize/SKILL.md` 的正文预算读数；⑥`git diff --stat 35ff11bc -- tests/fixtures/humanize` 与 `git check-ignore -v .specify/.tmp/humanize/x.run`；该文件是全特性「改动前侧」的唯一落点。
-- [ ] T002 在实现起点按 never-cache 规则冻结条款覆盖基线：跑 `python3 scripts/python/account-clause-coverage.py .specify/specs/079-humanize-run-output --freeze > .specify/specs/079-humanize-run-output/coverage-baseline.txt`（脚本只打印、不写文件），再不带 `--freeze` 跑一次，把两车道读数（`claimed clauses`、`UNCOVERED` 中属于本特性的条数、`FR uncovered`）追加进 `.specify/specs/079-humanize-run-output/notes/pre-change-measurements.md`，并注明：本特性的 5 份契约在 `clause_extract.py` 下实测 `form=md-none`，故条款车道看不见这 88 条，该缺口按 § Format 由本文件的 Coverage Map 承担、不靠基座豁免。
+- [ ] T001 建证据槽并采改动前读数：创建 `.specify/specs/079-humanize-run-output/notes/` 并把六类命令的真实输出（命令、日期、退出码一并）写进 `.specify/specs/079-humanize-run-output/notes/pre-change-measurements.md` —— ①四组计数（FR / SC / 用户故事 / Shared Strings）；②五份契约逐份条款行首计数；③A11 接线面发现：在基线提交 `35ff11bc` 上跑**无限制** `git grep -l -i humanize`，按 requirements § Wiring Surface — A11 Closed Set 的五类有序规则（活源 / 派生副本 / 镜像 / dated record / 冻结验证）为每个命中归类，未分类须为 0；把「class + path」清单与 tasks-fix 阶段 pin 的 `test-evidence/wiring-inventory-baseline.txt` 做 `LC_ALL=C comm -3`（差异为空；该文件是派生记录，不是白名单）；④`regen-command-copies.py --check`、`sync-mirrors.py --check`、`probe-utils.py --action compile-embeds --check`、`scan-confirmation-gates.py --summary` 四条基线；⑤`skill-shape.py skills/external/humanize/SKILL.md` 的正文预算读数；⑥`git diff --stat 35ff11bc -- tests/fixtures/humanize` 与 `git check-ignore -v .specify/.tmp/humanize/x.run`；该文件是全特性「改动前侧」的唯一落点。
+- [ ] T002 复核已在 tasks 阶段冻结的条款覆盖基线：`coverage-baseline.txt` 由 `python3 scripts/python/account-clause-coverage.py .specify/specs/079-humanize-run-output --freeze > .specify/specs/079-humanize-run-output/coverage-baseline.txt` 在 tasks 阶段产出（497 行，头部记录 `base-sha 70dd9e78`；它是派生记录，不是本文件 Coverage Map 的副本）；实现起点只**不带 `--freeze`** 重算一次，把两车道读数（`claimed clauses`、`UNCOVERED` 中属于本特性的条数、`FR uncovered`）与冻结基线的差值追加进 `.specify/specs/079-humanize-run-output/notes/pre-change-measurements.md`；MUST NOT 重写基线，读数漂移即记录为差异并交 `/speckit.analyze` 裁定。并注明：本特性的 5 份契约在 `clause_extract.py` 下实测 `form=md-none`，故条款车道看不见这 88 条，该缺口按 § Format 由本文件的 Coverage Map + T036 的机器核对承担、不靠基座豁免。
 
 **Checkpoint**: 两个证据落点存在且写着真实读数——后续任何行引用「改动前」时只指向 `notes/pre-change-measurements.md` 与 `coverage-baseline.txt`。
 
@@ -243,7 +258,7 @@
 
 ### Tests for User Story 3 (MANDATORY)
 
-- [ ] T019 [US3] [blockedBy: T013] 红先行补 `tests/contract/test_humanize_command_surface.py` 的 US3 组：按 `contracts/execution-dispatch.contract.md` EX-11…EX-21 与 `contracts/invocation-parse.contract.md` IP-11…IP-14 断言（不补发、失败坐标与不重试、中止如实、证据可定位性核对、确认缺失 fail-closed 与不代答、降级诚实、降级不改报告契约、零外发、占位全出口释放、派发记录只计顶层；仓库级占位、目标级占位、嵌套 token、拒绝路径零写入）；用 `tests/fixtures/humanize/run/reservations/`、`needs-confirmation/`、`nested/`、`degraded/` 造正反例，并把真实失败记入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`。
+- [ ] T019 [US3] [blockedBy: T013] 红先行补 `tests/contract/test_humanize_command_surface.py` 的 US3 组：按 `contracts/execution-dispatch.contract.md` EX-11…EX-21 与 `contracts/invocation-parse.contract.md` IP-11…IP-14 断言（不补发、失败坐标与不重试、中止如实、证据可定位性核对、确认缺失 fail-closed 与不代答、降级诚实、降级不改报告契约、零外发、占位全出口释放、派发记录只计顶层；仓库级占位、目标级占位、嵌套 token、拒绝路径零写入）；用 `tests/fixtures/humanize/run/reservations/`、`needs-confirmation/`、`nested/`、`degraded/` 造正反例；「零外发」与「不重试」的判定仪器写死在本行断言里——静态扫描（模板与技能源对 `curl` / `wget` / `httpx` / `requests.` / `urllib` / `fetch(` 0 命中，URL 文本不算调用）、运行前后 `git status --porcelain` 对比无未授权写入、报告 `dispatches:` 行作为派发与重试计数的唯一来源（同一次调用出现第二个顶层派发即判重试，不以散文叙述为源）；并把真实失败记入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 3
 
@@ -265,15 +280,16 @@
 ### Tests for User Story 4 (MANDATORY)
 
 - [ ] T024 [US4] [blockedBy: T019] 红先行补 `tests/contract/test_humanize_command_surface.py` 的 US4 组：按 `contracts/content-mode.contract.md` CM-01…CM-10、`contracts/invocation-parse.contract.md` IP-15…IP-17、`contracts/report-assembly.contract.md` RP-19…RP-20 断言（内容模式等价与输出只含改写文本、无报告脚手架、无派发无占位、路由 owner 不重述、注入与保真与检测器诚实两模式同时生效、迁移示例可在模板与 docs 中抄到、内容模式措辞不被写成兼容垫片；运行模式 `--output` 扩展名封闭集、写完整报告并回显摘要、原子写与 `--force`、不可写即拒绝且不留部分文件）；用 `tests/fixtures/humanize/files/`、`inline/` 的既有语料与 `tmp_path` 造正反例，并把真实失败记入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`。
+- [ ] T036 [US4] [blockedBy: T024] 红先行补 WC-05…WC-15 组与「条款 id ↔ 测试名」机器核对（同一主契约套件 `tests/contract/test_humanize_command_surface.py`，不新增文件）：①派生面 WC-05/06/07（四份副本与镜像只由再生成入口产出、`--check` exit 0、与源逐字节相等、技能正文 `skill-shape.py` 判 pass 且 ≤5000 tokens）；②docs WC-08/09（新定位、迁移示例、默认零写入、不承诺检测器、`--output` 双语义）；③Feature 登记 WC-10/11（状态保持 `Implemented`、`## Latest Review`/`## Key Changes` 追加、062 行名称/描述口径）；④套件与钉扎 WC-12/13（五命名空间的可判定子集全被断言、既有断言不删、`UNCHANGED_SHA256["humanize"]` 重测且保留 `strip_wiring()` 剥后等于基线）；⑤冻结面 WC-14（九个既有测试文件的名册/计数零变更）与夹具 WC-15（七类运行夹具逐例存在、历史语料未改写）；⑥写 `test_wc12_clause_test_map_is_total`：解析五份契约的条款定义（88）、可追溯性表（条款 → 测试名）与本文件 § Contract Coverage Map（条款 → 行），断言条款集合恰分区、每条有非空测试名、每个名字可在本套件/`tests/contract/test_stage_class_wiring.py`/`tests/contract/test_feedback_command_classification.py` 解析为函数（含参数化 id）或在 § Clause Test Waivers 有显式 waiver + remedy，并反向断言套件中 `test_(ip|ex|rp|cm|wc)` 前缀函数都被覆盖表或 waiver 认领；⑦逐条标注「预期红」与「不变量守卫（可先绿，不声称红先行）」两栏，真实失败记入 `.specify/specs/079-humanize-run-output/notes/red-first-evidence.md`。
 
 ### Implementation for User Story 4
 
-- [ ] T025 [US4] [blockedBy: T024] 在 `skills/external/humanize/SKILL.md` 落定内容模式分支：保留既有输入核验、扩展名与空输入拒收、输出格式跟随输入、主语言判定、分段与四维度改写的全部条款（逐字不动），内容模式的 `--output` 只写改写文本、输出不含五节与载体标记与迁移提示、不派发执行体、不取得并发占位、不读取动作结果（CM-01、CM-02、CM-03、CM-04）。
+- [ ] T025 [US4] [blockedBy: T024] 在 `skills/external/humanize/SKILL.md` 落定内容模式分支：保留既有输入核验、扩展名与空输入拒收、输出格式跟随输入、主语言判定、分段与四维度改写的全部条款（逐字不动），内容模式的 `--output` 只写改写文本、输出不含五节与载体标记与迁移提示、不派发执行体、不取得并发占位（同一仓库两次内容模式调用互不影响）、不读取动作结果（CM-01、CM-02、CM-03、CM-04、IP-15）。
 - [ ] T026 [US4] [blockedBy: T025] 写同一文件的模式分界与两模式共有的防线：模式路由的唯一所有者是 `references/run-mode.md` 的判定表，内容模式节只留一行指针、不复述判定表；注入防护两模式同时生效（内容与指令中的指令式文本不得改变保真、拒收、零外传、零写入规则，运行模式下它只改变被执行的动作）；保真底线两模式同时生效且不复制受保护集合；检测器诚实条款在两种模式的文本与输出中继续成立（CM-05、CM-06、CM-07、CM-08）。
-- [ ] T027 [US4] [blockedBy: T023] 写 `skills/external/humanize/references/run-mode.md` 的 § Output：运行模式 `--output` 的扩展名落在 `.md` / `.markdown` / `.txt` 封闭集内（运行模式没有输入格式可对齐）、写入与目标内容一致的完整五节报告并在会话回显一份摘要（摘要不替代报告、不成为第六节）、原子写（临时文件 + 重命名）、目标已存在且未给 `--force` 即拒绝覆盖且目标逐字节不变、不可写即拒绝且不留部分文件；内容模式 `--output` 语义完全不变（CM 侧见 T025）（IP-15、IP-16、IP-17、RP-19、RP-20）。
+- [ ] T027 [US4] [blockedBy: T023] 写 `skills/external/humanize/references/run-mode.md` 的 § Output：运行模式 `--output` 的扩展名落在 `.md` / `.markdown` / `.txt` 封闭集内（运行模式没有输入格式可对齐）、写入与目标内容一致的完整五节报告并在会话回显一份摘要（摘要不替代报告、不成为第六节）、原子写（临时文件 + 重命名）、目标已存在且未给 `--force` 即拒绝覆盖且目标逐字节不变、不可写即拒绝且不留部分文件；内容模式 `--output` 语义完全不变（CM 侧见 T025）（IP-16、IP-17、RP-19、RP-20）。
 - [ ] T028 [US4] [blockedBy: T012,T026] 再生成派生面并逐对陈述零漂移：`python3 scripts/python/regen-command-copies.py` 扇出四份按工具副本（`.claude/commands/`、`.github/prompts/`、`.opencode/command/`、`.qoder/commands/`），`python3 scripts/python/sync-mirrors.py --write --only skills/external` 重建 `.specify/skills/humanize/`（含 `references/`），再跑 `regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均须 exit 0；随后跑 `python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/humanize/SKILL.md` 判 `pass` 且正文 ≤ 5000 tokens（运行模式细则都在 `references/`，不塞正文）；全程不手改派生文件（WC-05、WC-06、WC-07）。
 - [ ] T029 [US4] [blockedBy: T028] 改写 `docs/reference/commands/humanize.md`：新定位（跑一条指令 → 五节报告）＋保留旧内容模式的调用方式、一条可复制的迁移示例（同一段文本用 `--inline` 或 `--file` 调用即得改写，裸文本会被当作指令执行）、默认零写入、不承诺检测器结果、输入按数据处理；写明 `--output` 在运行模式写完整报告并回显摘要、在内容模式只写改写文本（WC-08、WC-09、CM-09）。
-- [ ] T030 [US4] [blockedBy: T029] 收口措辞并登记 Feature 062：核对模板与 docs 未把内容模式写成「兼容垫片」或暗示它是新能力的向下兼容层（它是保留的既有入口）；在两处登记面做**追加**（不改既有段落）——`.specify/memory/features/062.md` 的 `## Latest Review` 追加 tasks 阶段扩展记录（本规格 35 行任务、88 条款人工指派、四个红先行行、主契约套件载体）与 `## Key Changes` 追加一条，`.specify/memory/features.md` 的 062 行 `Last Updated` 追加 tasks 阶段标记；状态列保持 `Implemented`，不新建 Feature 行，并核对 062 行的名称/描述已是「动作输出人类友好化」口径（WC-10、WC-11、CM-10）。
+- [ ] T030 [US4] [blockedBy: T029] 收口措辞并登记 Feature 062：核对模板与 docs 未把内容模式写成「兼容垫片」或暗示它是新能力的向下兼容层（它是保留的既有入口）；在两处登记面做**追加**（不改既有段落）——`.specify/memory/features/062.md` 的 `## Latest Review` 追加 tasks 阶段扩展记录（本规格 36 行任务、88 条款人工指派 + T036 机器核对、五个红先行行、主契约套件载体）与 `## Key Changes` 追加一条，`.specify/memory/features.md` 的 062 行 `Last Updated` 追加 tasks 阶段标记；状态列保持 `Implemented`，不新建 Feature 行，并核对 062 行的名称/描述已是「动作输出人类友好化」口径（WC-10、WC-11、CM-10）。
 
 **Checkpoint**: US4 可独立验证——两个旧入口给出改写文本、裸文本被执行、docs 可抄到迁移写法、四份副本与技能镜像零漂移、Feature 062 状态未动。
 
@@ -285,9 +301,9 @@
 
 - [ ] T031 [blockedBy: T028,T030] 跑 quickstart S1–S7 并记录：按 `.specify/specs/079-humanize-run-output/quickstart.md` 逐场景真实调用 `/speckit.humanize`（S1 成功、S2 失败、S3 非动作、S4 内容模式两入口 + 裸文本、S5 A 同现拒绝 / C 嵌套拒绝、S6 确认缺失、S7 B 写出报告 / C 不可写目标），每条记录命令、真实输出与退出码；S5 B（两会话并发）与 S7 A（无子代理通道的宿主）在本宿主不可复现，如实标注 `not-reproducible in this host` 并改用 `tests/fixtures/humanize/run/reservations/` 与 `degraded/` 的夹具断言替代；全部真实输出写入 `.specify/specs/079-humanize-run-output/notes/quickstart-run.md`，并记录 teardown 后 `ls .specify/.tmp/humanize/` 为空与 `git status --porcelain` 无新增。
 - [ ] T032 [blockedBy: T031] 主契约套件转绿并重测字节钉扎：跑 `python -m pytest -q tests/contract/test_humanize_command_surface.py` 全绿（覆盖 IP-01…IP-17、EX-01…EX-21、RP-01…RP-20、CM-01…CM-10、WC-01…WC-15 的可判定部分），既有断言一条不删、不以「计数变了」为由放宽；把 `tests/contract/test_stage_class_wiring.py` 的 `UNCHANGED_SHA256["humanize"]` 按新模板重新度量，在该行注明日期与理由（模板已按 079 改写），并保留「剥掉接线小节后等于基线」的判定形态（`strip_wiring()` 剥后的字节对冻结基线断言），跑该文件全绿（WC-12、WC-13）。
-- [ ] T033 [blockedBy: T032] 核对冻结面与夹具集：逐项跑 `tests/contract/test_expression_gate_wiring.py`、`test_expression_gates_doc.py`、`test_expression_compatibility.py`、`test_flow_class_ledger.py`、`test_flow_class_correctness.py`、`test_feedback_command_classification.py`、`test_migration_distribution.py`、`test_run_skills_wiring.py`、`test_skill_layer_visibility_guards.py` 并记录「无需改动且仍绿」的实测（名册/计数零变更）；断言 `tests/fixtures/humanize/run/` 七类夹具（成功、失败、非动作、需确认、嵌套、降级、并发）逐例存在，且 `git diff --stat 35ff11bc -- tests/fixtures/humanize ':!tests/fixtures/humanize/run'` 为空（历史语料未改写）；实测写入 `.specify/specs/079-humanize-run-output/verification.md`（WC-14、WC-15）。
-- [ ] T034 [blockedBy: T033] 门禁、名册与零运行时核对：`ls templates/commands/*.md | wc -l` 仍为 27（无新增命令）；`git diff --stat 35ff11bc -- src/specify_cli scripts` 为空（零新增运行时与依赖）；`python3 scripts/python/flow-class-check.py --action lookup --unit-id "skill:humanize"` 仍报 `expression` / `reader-oracle`，`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 仍报 `75 units, zero drift`（无新增注册行）；按**新增行**判定确认门预算：`git diff 35ff11bc -- templates/commands skills docs shared 'templates/*.md' | grep '^+' | grep -v '^+++'` 逐行对照 `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`，要求 `blocking_hits=0`，并与 `test-evidence/gate-newline-baseline.txt` 的改动前读数（`added_lines=0` / `blocking_hits=0`）并列记录（WC-16、WC-17、WC-18、WC-19、WC-20）。
-- [ ] T035 [blockedBy: T034] SC 收口与留档：把 T031–T034 的真实输出贴入 `.specify/specs/079-humanize-run-output/verification.md`，为 SC-001…SC-010 各记一条状态行与证据路径（无一条留空），并把 88 条条款的指派核对结果与「机器核算不可用」的成因（`form=md-none`）一并记入；最后跑一次 `python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md` 与 `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .` 留档。
+- [ ] T033 [blockedBy: T032] 核对冻结面与夹具集：逐项跑 `tests/contract/test_expression_gate_wiring.py`、`test_expression_gates_doc.py`、`test_expression_compatibility.py`、`test_flow_class_ledger.py`、`test_flow_class_correctness.py`、`test_feedback_command_classification.py`、`test_migration_distribution.py`、`test_run_skills_wiring.py`、`test_skill_layer_visibility_guards.py` 并记录「无需改动且仍绿」的实测（名册/计数零变更）；WC-20 的判据落在 `test_feedback_command_classification.py` 的 `test_simple_command_omits_feedback_step[humanize]`（模板无 `## Feedback` 步）与 `test_table_covers_every_command_template`（027 分类表仍覆盖全部模板），须记录这两个测试 id 的实测，不只声明「仍为 Simple」；断言 `tests/fixtures/humanize/run/` 七类夹具（成功、失败、非动作、需确认、嵌套、降级、并发）逐例存在，且 `git diff --stat 35ff11bc -- tests/fixtures/humanize ':!tests/fixtures/humanize/run'` 为空（历史语料未改写）；实测写入 `.specify/specs/079-humanize-run-output/verification.md`（WC-14、WC-15、WC-20）。
+- [ ] T034 [blockedBy: T033] 门禁、名册与零运行时核对：`ls templates/commands/*.md | wc -l` 仍为 27（无新增命令）；`git diff --stat 35ff11bc -- src/specify_cli scripts` 为空（零新增运行时与依赖）；`python3 scripts/python/flow-class-check.py --action lookup --unit-id "skill:humanize"` 仍报 `expression` / `reader-oracle`，`python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check` 仍报 `75 units, zero drift`（无新增注册行）；按**新增行**判定确认门预算：`git diff 35ff11bc -- templates/commands skills docs shared 'templates/*.md' | grep '^+' | grep -v '^+++'` 逐行对照 `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`，要求 `blocking_hits=0`，并与 `test-evidence/gate-newline-baseline.txt` 的改动前读数（`added_lines=0` / `blocking_hits=0`）并列记录（WC-16、WC-17、WC-18、WC-19）。
+- [ ] T035 [blockedBy: T034] SC 收口与留档：把 T031–T034 的真实输出贴入 `.specify/specs/079-humanize-run-output/verification.md`，为 SC-001…SC-010 各记一条状态行与证据路径（无一条留空）；跑 SC-006 **闭环守卫**——在基线提交 `35ff11bc` 上重跑无限制 `git grep -l -i humanize`，按 requirements § Wiring Surface — A11 Closed Set 的五类有序规则重新分类，与 pin 的 `test-evidence/wiring-inventory-baseline.txt` 做 `LC_ALL=C comm -3`（输出为空：无新增命中、无未分类项），再对冻结验证类的**每个**文件跑 `git diff --quiet 35ff11bc -- <path>`（差异集合为空 = 补集为空；不得只核对 T033 已列出的九个测试文件），并逐项记录结构不变量（命令名册 27、门禁新增行 0 命中、Feature 062 状态 `Implemented`）；跑 T036 的 `test_wc12_clause_test_map_is_total` 并记录 `clause-test-map=total`（任何未认领的测试名必须出现在 § Clause Test Waivers 且带 remedy），未经该断言不得把人工表称为「零缺口」；最后跑一次 `python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md` 与 `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .` 留档。
 
 **Checkpoint**: SC-001…SC-010 每条都有可复现的证据来源，`verification.md` 是它们的唯一索引；quickstart 的真实运行在 `notes/quickstart-run.md`。
 
@@ -300,25 +316,25 @@
 - **Setup (Phase 1)**: 无依赖，先做——T001 与 T002 都写 `notes/pre-change-measurements.md`，故串行。
 - **Foundational (Phase 2)**: 依赖 Setup；**阻塞全部故事**。T003（技能骨架）与 T004（夹具集）写目标不同，可并行。
 - **User Stories (Phase 3–6)**: 依赖 Foundational 完成。US1 与 US2 共用 `report-shape.md`，按 `[blockedBy:]` 串行；US3 续写 `run-mode.md`；US4 落定内容模式分支与派生面。
-- **Polish (Phase 7)**: 依赖 t030 与 T028 完成（接线与登记都落定后才跑真实运行）。
+- **Polish (Phase 7)**: 依赖 T030 与 T028 完成（接线与登记都落定后才跑真实运行）。
 
 ### User Story Dependencies
 
 - **US1 (P1)**: Foundational 之后可独立开工；不依赖 US2/US3/US4 的产物（它只消费夹具与技能骨架）。
 - **US2 (P1)**: Foundational 之后可开工；它与 US1 同写 `report-shape.md`，故在 US1 的报告骨架之后落笔。
 - **US3 (P2)**: 两个 P2 故事中先做——它的安全条款写在 US1 已建好的 `run-mode.md` 上，且 US4 的拒绝路径（IP-06…IP-08）与它共用同一个点名要素表；两个 P2 同级，先安全后接线。
-- **US4 (P2)**: 依赖 US3（`run-mode.md` 已定稿才写 § Output 的边界）与 T012（模板改完才再生成副本）。
+- **US4 (P2)**: 依赖 US3（`run-mode.md` 已定稿才写 § Output 的边界）与 T012（模板改完才再生成副本）；其测试小节有两行（T024 覆盖 CM/IP-15…17/RP-19…20，T036 覆盖 WC-05…WC-15 与条款↔测试名机器核对），两行都先于 T025 起的实现行落笔。
 
 ### Within Each User Story
 
-- 测试先写、先红、先留证；实现行随后让它转绿。
+- 测试先写、先红、先留证；实现行随后让它转绿。T036 虽编号在 35 之后，却与 T024 同处 US4 的测试小节、按行序先于 T025 起的实现行执行；编号是标识，执行序由小节的 blockedBy 与行序给出。
 - 同一文件的多行按行序串行（`SKILL.md`、`references/run-mode.md`、`references/report-shape.md` 各有多个写入行）。
 - 每个故事在自己的 Checkpoint 处可独立验证，不靠后续故事补齐。
 
 ### Parallel Opportunities
 
 - Foundational 的 T003（`SKILL.md`）与 T004（`tests/fixtures/humanize/run/`）写目标互不相交，可并行。
-- 本文件其余段落零 `[P]`：`notes/red-first-evidence.md` 是四个测试行共用的追加落点，`notes/quickstart-run.md` 与 `verification.md` 是多个 Polish 行共用的追加落点，`SKILL.md`、`run-mode.md`、`report-shape.md`、`docs/reference/commands/humanize.md` 各被多行写入——共享 sink 与同文件即同写目标，按行序串行，不靠删路径消警。
+- 本文件其余段落零 `[P]`：`notes/red-first-evidence.md` 是五个测试行（含 T036）共用的追加落点，`notes/quickstart-run.md` 与 `verification.md` 是多个 Polish 行共用的追加落点，`SKILL.md`、`run-mode.md`、`report-shape.md`、`docs/reference/commands/humanize.md` 各被多行写入——共享 sink 与同文件即同写目标，按行序串行，不靠删路径消警。
 
 ---
 
@@ -347,7 +363,8 @@
 
 - [P] 只标在写目标不同、无未完依赖的行；共享追加落点（`notes/*.md`、`verification.md`）与同文件多写行一律串行。
 - **PLAN-EDIT 声明（本阶段实际发生）**: 无。本阶段未修改任何 plan 属主制品（`plan.md` / `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md` 均未触碰），因此没有 `PLAN-EDIT:` 行。
-- **条款核算缺口（如实记录，不在本阶段修）**: 五份契约使用 `IP` / `EX` / `RP` / `CM` / `WC` 两字母条款命名空间，`clause_extract.py` 实测 `form=md-none`，因而 `account-clause-coverage.py` 的条款车道与 FR 车道都看不见这 88 条（FR 车道 0/30）。这不阻断本阶段的三道确定性门（它们不读条款形态），覆盖由 § Contract Coverage Map 人工指派承担；把 88 条改名为 `C-<n>` 属 plan 属主制品的内容变更（分类 = substantive），交 `/speckit.analyze` 裁定。
+- **Analyze 回环修复（tasks 轮，本阶段实际发生）**: ①H-02——§ Measured Premises 的「7 条显式路径 grep」换成基线提交上的**无限制发现 + 五类分类规则**，结果集 pin 在 `test-evidence/wiring-inventory-baseline.txt`（派生记录，不是白名单；规则 owner 是 requirements § Wiring Surface），T035 增加补集为空 + 结构不变量的闭环守卫；②M-03——SC-007 覆盖行加入 T019，审计仪器写为静态扫描 + `git status` + 报告 `dispatches:` 行，重试计数以派发记录为源；③M-21——`coverage-baseline.txt` 在 tasks 阶段冻结，IP-15 改归 T025（实质 CM-04）、WC-20 改归 T033（`test_feedback_command_classification.py`），新增 T036 覆盖 WC-05…WC-15 与「条款 id ↔ 测试名」机器核对，并在 § Clause Test Waivers 定义显式 waiver 机制。
+- **条款核算缺口（如实记录）**: 五份契约使用 `IP` / `EX` / `RP` / `CM` / `WC` 两字母条款命名空间，`clause_extract.py` 实测 `form=md-none`，因而 `account-clause-coverage.py` 的条款车道与 FR 车道都看不见这 88 条（FR 车道 0/30）；`coverage-baseline.txt` 已在 tasks 阶段冻结，实现起点只复核、不重写。覆盖由 § Contract Coverage Map 人工指派 + T036 的机器核对承担；机器断言转绿前，本表不是「零缺口」证明。把 88 条改名为 `C-<n>` 属 plan 属主制品变更，本阶段不做。
 - **历史不改写**: `.specify/specs/**` 的既有特性、`memory/evidence/**`、`features/<ID>.md` 的既有段落（只追加）、reviews、eval-baseline、`tests/fixtures/humanize/` 既有语料都是 dated record，本文件任何行不得回填。
 - **临时目录**: 只有运行模式的并发占位落 `.specify/.tmp/humanize/`（已被 `.specify/.gitignore` 的 `.tmp/` 规则匹配，`git check-ignore` 实测命中）；运行结束即释放，残留即判违反。
 - **零写入边界**: humanize 自身不写报告与副本（除显式 `--output`）；指令自身产生的写入是执行结果的一部分，必须在报告中逐项披露，不视为违反零写入。

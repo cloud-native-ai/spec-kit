@@ -1,0 +1,15 @@
+# Tasks-fix evidence — clause coverage map partition (M-21)
+date=2026-10-30
+stage=tasks-fix (analyze loop 1/1)
+fixture=.specify/specs/079-humanize-run-output/tasks.md + contracts/*.md
+check=parse clause definitions (^- **XX-NN**:) per contract; parse § Contract Coverage Map rows (clauses -> row); assert exact partition and that each clause id is named in its assigned task row body
+--- result ---
+clause_definitions=88 unique=88
+coverage_map_rows=31 assigned=88 unique=88
+missing=[]
+duplicates={}
+extra=[]
+clause_not_named_in_assigned_row=[]
+IP-15 -> T025
+WC-20 -> T033
+verdict=PASS

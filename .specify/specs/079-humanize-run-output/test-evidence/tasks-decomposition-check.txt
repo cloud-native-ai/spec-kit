@@ -1,8 +1,8 @@
 # Tasks-stage gate — decomposition-check.py --mode tasks
 date=2026-10-30
-stage=tasks
-note=re-captured after the Phase-3/4 heading cleanup (cosmetic, verdicts unchanged)
+stage=tasks-fix (analyze loop 1/1)
+note=re-captured after the tasks-fix round; 36 task rows (T001-T036, T036 added for WC-05..15 coverage guard)
 cmd=python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/079-humanize-run-output/requirements.md --tasks .specify/specs/079-humanize-run-output/tasks.md
 --- stdout/stderr ---
-{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 35, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T11:16:11Z"}
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 36, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T11:54:13Z"}
 exit_status=0

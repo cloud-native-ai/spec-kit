@@ -1,0 +1,18 @@
+# Tasks-fix evidence — A11 wiring surface discovery + closure (H-02)
+date=2026-10-30
+stage=tasks-fix (analyze loop 1/1)
+base=35ff11bc
+discovery=git grep -l -i humanize 35ff11bc
+classification=requirements.md § Wiring Surface — A11 Closed Set (five ordered classes: live-source / derived-copy / mirror / dated-record / frozen-verification)
+pin=.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
+--- result ---
+pin_rows=164 pin_unique_paths=164 fresh=164
+comm_-3_empty=True
+live-source=7
+derived-copy=4
+mirror=1
+dated-record=114
+frozen-verification=38
+frozen_files=38 frozen_diff_set=[]
+unclassified=0
+verdict=PASS

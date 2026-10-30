@@ -1,8 +1,8 @@
 # Tasks-stage gate — validate-tasks.py
 date=2026-10-30
-stage=tasks
+stage=tasks-fix (analyze loop 1/1)
 cmd=python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
-note=re-captured after the Phase-3/4 heading cleanup (cosmetic, verdicts unchanged)
+note=re-captured after the tasks-fix round (H-02 discovery/closure, M-03 SC-007 instruments, M-21 coverage guard)
 --- stdout/stderr ---
 PASS: .specify/specs/079-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)
 exit_status=0
