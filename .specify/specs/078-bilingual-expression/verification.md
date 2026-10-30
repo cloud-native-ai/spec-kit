@@ -15,7 +15,7 @@ baseline_census_denominator_tight=7 (as-of 2026-10-30T11:04Z, us2-census-denomin
 # -- /speckit.implement results --
 
 implementation_date=2026-10-30
-post_change_commit=<recorded in follow-up commit — see git log>
+post_change_commit=5aa7168a（implement Part 4 收尾提交；本行由紧随其后的登记提交回填）
 
 post_change_checker_finding_codes=4 (unchanged, closed set)
 post_change_docs_utils_violations=4 (new=0, gone=0 vs baseline)
