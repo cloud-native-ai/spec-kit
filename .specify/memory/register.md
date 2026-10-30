@@ -108,3 +108,6 @@
 | T-003 | 078 plan 承重决策：检查器本特性内不接线门禁，SC-002 以 `--scope changed` 采证（反题=接线 blocking；重开条件=≥1 次全角形态随提交进 master） | `.specify/specs/078-bilingual-expression/plan.md` § Decision Tensions T-003 | active（重开条件见记录） |
 | T-004 | 078 plan 承重决策：SC-005 取 100% census 全查不做抽样（反题=程序抽样；重开条件=census 墙钟 > 60s 实测） | `.specify/specs/078-bilingual-expression/plan.md` § Decision Tensions T-004 | active（重开条件见记录） |
 | 078-C-clauses | Feature 078 四份契约的条款号命名空间：owner-document C-001…C-009 / checker C-001…C-012 / distribution C-001…C-006 / measurement C-001…C-008（共 35 条，`md-bold-closed`，条款认领基线冻结于 `.specify/specs/078-bilingual-expression/coverage-baseline.txt`） | `.specify/specs/078-bilingual-expression/contracts/`（各文件内逐条） | active（plan 期 coined，tasks 阶段认领） |
+| REC-078-01 | 消费既有注册输入（词汇表/登记表等）的机械守卫，每个 action 至少一条契约腿钉真实输入形状（或程序派生同形状合成夹具），不得只用简化夹具 | `.specify/specs/078-bilingual-expression/review.md` § 5.3 REC-078-01（F1） | open |
+| REC-078-02 | 测量契约「每个交付里程碑后各测一次」任务化：每段收口复跑 changed-scope 测量并落 test-evidence，或把「交付里程碑」收窄定义为最终交付 | `.specify/specs/078-bilingual-expression/review.md` § 5.4 REC-078-02（F2） | open |
+| REC-078-03 | `git-delta-review.sh receipt` 在 `--base`/`--head` 缺省时优先复用记录头登记的 base/head，世系不符再要求显式覆盖 | `.specify/specs/078-bilingual-expression/review.md` § 5.3 REC-078-03（F3） | open |

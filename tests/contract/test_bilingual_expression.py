@@ -409,3 +409,42 @@ def test_sample_lines_deterministic():
     assert sample_lines(lines) == sample_lines(list(lines)), "sample_lines must be deterministic"
     short = lines[:5]
     assert sample_lines(short) == short, "n<10 (k=1) must sample every line"
+
+
+# --------------------------------------------------------------------------- #
+# S1 glossary-table shape leg (review stage, 2026-10-30): the real glossary
+# carries a two-column ``| Canonical | <meaning> |`` row inside its
+# ``## Column Definitions`` table; the S1 header detection must not collide
+# with that decoy row and must not stop before the real five-column table.
+# --------------------------------------------------------------------------- #
+
+
+def test_scan_glossary_shape_skips_column_definitions_decoy(tmp_path):
+    checker_module = _load_module(CHECKER, "bilingual_expression_check_for_glossary_shape")
+    fixture = tmp_path / "glossary-shaped.md"
+    fixture.write_text(
+        "# Project Glossary (项目词汇表)\n"
+        "\n"
+        "## Column Definitions\n"
+        "\n"
+        "| Column | Meaning |\n"
+        "|--------|---------|\n"
+        "| Canonical | The agreed project term (unique, case-insensitive). |\n"
+        "| Status | proposed or confirmed. |\n"
+        "\n"
+        "## Glossary\n"
+        "\n"
+        "| Canonical | Variants | Meaning | Origin | Status |\n"
+        "|-----------|----------|---------|--------|--------|\n"
+        "| Program-First | - | english headword | auto | confirmed |\n"
+        "| 工作项四态色板 | - | cjk headword without bracket form | auto | confirmed |\n",
+        encoding="utf-8",
+    )
+    findings = checker_module.scan_file(fixture, is_glossary=True)
+    flagged = [f for f in findings if f["code"] == "missing-bilingual"]
+    assert len(flagged) == 1, (
+        f"expected exactly one missing-bilingual finding (the CJK no-bracket "
+        f"Canonical in the real table), got: {findings}"
+    )
+    assert flagged[0]["line"] == 15, f"finding must land on the real table row: {flagged[0]}"
+    assert "工作项四态色板" in flagged[0]["message"]

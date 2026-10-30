@@ -732,3 +732,763 @@ skills/internal/summarize-project/references/task-progress.md:11 [full-width-par
 skills/internal/summarize-project/references/task-progress.md:40 [full-width-parens] 全角括号紧贴词条: daily→weekly→monthly
 skills/internal/summarize-project/references/task-progress.md:144 [full-width-parens] 全角括号紧贴词条: 全部 not-started
 skills/internal/summarize-project/references/work-breakdown.md:27 [full-width-parens] 全角括号紧贴词条: 字段清单见 people-encoding 第 1.0 节
+
+<!-- run: 2026-10-30T11:58:46Z files_scanned=454 findings=758 -->
+.specify/memory/glossary.md:48 [missing-bilingual] Canonical 含中文但无括号双语形态: 工作项四态色板
+.specify/memory/glossary.md:52 [missing-bilingual] Canonical 含中文但无括号双语形态: qwen3 系列模型 ID
+.specify/memory/glossary.md:55 [missing-bilingual] Canonical 含中文但无括号双语形态: Probe(插点,伞形)
+.specify/memory/glossary.md:70 [same-language-bracket] Canonical 括号语言与词条同向: 三查命令(消歧)
+.specify/memory/glossary.md:71 [same-language-bracket] Canonical 括号语言与词条同向: 三捕获机制(消歧)
+.specify/memory/glossary.md:72 [missing-bilingual] Canonical 含中文但无括号双语形态: Feature ↔ Requirement 编号空间
+.specify/memory/glossary.md:74 [missing-bilingual] Canonical 含中文但无括号双语形态: .specify 工作区
+.specify/memory/glossary.md:120 [same-language-bracket] Canonical 括号语言与词条同向: Red-First 取证 (Red-First Evidence)
+.specify/memory/glossary.md:151 [missing-bilingual] Canonical 含中文但无括号双语形态: 可交互图表
+.specify/memory/glossary.md:152 [missing-bilingual] Canonical 含中文但无括号双语形态: SDD 循环驱动
+.specify/memory/glossary.md:153 [missing-bilingual] Canonical 含中文但无括号双语形态: 断点探测
+.specify/memory/glossary.md:154 [missing-bilingual] Canonical 含中文但无括号双语形态: 阶段尾标
+.specify/memory/glossary.md:155 [missing-bilingual] Canonical 含中文但无括号双语形态: 窄读法授权
+.specify/memory/glossary.md:156 [missing-bilingual] Canonical 含中文但无括号双语形态: 状态脊
+.specify/memory/glossary.md:157 [missing-bilingual] Canonical 含中文但无括号双语形态: 一遍性入口
+.specify/memory/glossary.md:158 [missing-bilingual] Canonical 含中文但无括号双语形态: 执行量化记录
+.specify/memory/glossary.md:159 [missing-bilingual] Canonical 含中文但无括号双语形态: 量化方法
+.specify/memory/glossary.md:160 [missing-bilingual] Canonical 含中文但无括号双语形态: 配置快照
+.specify/memory/glossary.md:161 [missing-bilingual] Canonical 含中文但无括号双语形态: 默认层
+.specify/memory/glossary.md:162 [missing-bilingual] Canonical 含中文但无括号双语形态: CLI 能力矩阵
+.specify/memory/glossary.md:173 [missing-bilingual] Canonical 含中文但无括号双语形态: 执行类流程
+.specify/memory/glossary.md:174 [missing-bilingual] Canonical 含中文但无括号双语形态: 表达类流程
+.specify/memory/glossary.md:175 [missing-bilingual] Canonical 含中文但无括号双语形态: 同构
+.specify/memory/glossary.md:176 [missing-bilingual] Canonical 含中文但无括号双语形态: 文档型门禁
+.specify/memory/glossary.md:178 [missing-bilingual] Canonical 含中文但无括号双语形态: SDD 调用
+.specify/memory/glossary.md:179 [missing-bilingual] Canonical 含中文但无括号双语形态: 执行路径判定
+shared/definitions/agent-definitions.md:22 [same-language-bracket] 括号语言与词条同向: authoring time
+shared/definitions/agent-definitions.md:23 [same-language-bracket] 括号语言与词条同向: runtime
+shared/definitions/agent-definitions.md:32 [same-language-bracket] 括号语言与词条同向: Template → Instance
+shared/definitions/agent-definitions.md:33 [same-language-bracket] 括号语言与词条同向: Instance → Execution
+shared/definitions/agent-definitions.md:38 [full-width-parens] 全角括号紧贴词条: 编排
+shared/definitions/agent-definitions.md:90 [same-language-bracket] 括号语言与词条同向: this document
+shared/definitions/contract-clause-definitions.md:17 [same-language-bracket] 括号语言与词条同向: 六种
+shared/definitions/contract-clause-definitions.md:36 [same-language-bracket] 括号语言与词条同向: 覆盖核算、基线冻结、 认领
+shared/definitions/contract-clause-definitions.md:43 [same-language-bracket] 括号语言与词条同向: 能抽出 id、能判定可解析性
+shared/definitions/derivation-definitions.md:16 [same-language-bracket] 括号语言与词条同向: this concept
+shared/definitions/derivation-definitions.md:211 [same-language-bracket] 括号语言与词条同向: engine-enforced
+shared/definitions/derivation-definitions.md:358 [same-language-bracket] 括号语言与词条同向: C1 fails by construction
+shared/definitions/derivation-definitions.md:402 [same-language-bracket] 括号语言与词条同向: this document
+shared/definitions/dogfooding-definitions.md:138 [same-language-bracket] 括号语言与词条同向: 词汇表
+shared/definitions/goal-definitions.md:7 [same-language-bracket] 括号语言与词条同向: never a derived artifact
+shared/definitions/goal-definitions.md:9 [same-language-bracket] 括号语言与词条同向: north star
+shared/definitions/goal-definitions.md:13 [same-language-bracket] 括号语言与词条同向: see Target Decomposition below
+shared/definitions/goal-definitions.md:27 [same-language-bracket] 括号语言与词条同向: decided 2026-08-04
+shared/definitions/goal-definitions.md:35 [same-language-bracket] 括号语言与词条同向: a governance principle
+shared/definitions/goal-definitions.md:39 [same-language-bracket] 括号语言与词条同向: decided 2026-08-04
+shared/definitions/goal-definitions.md:67 [same-language-bracket] 括号语言与词条同向: Success Criteria in a requirements spec
+shared/definitions/goal-definitions.md:95 [same-language-bracket] 括号语言与词条同向: 一类
+shared/definitions/goal-definitions.md:97 [same-language-bracket] 括号语言与词条同向: 「所有绘图技能」「draw-diagram 与其余六个」
+shared/definitions/goal-definitions.md:114 [same-language-bracket] 括号语言与词条同向: see Target Decomposition below
+shared/definitions/goal-definitions.md:127 [same-language-bracket] 括号语言与词条同向: "log component split complete"
+shared/definitions/goal-definitions.md:133 [same-language-bracket] 括号语言与词条同向: n of m slices done
+shared/definitions/goal-definitions.md:163 [same-language-bracket] 括号语言与词条同向: this document
+shared/definitions/goal-definitions.md:171 [same-language-bracket] 括号语言与词条同向: this document
+shared/definitions/sdd-routing-definitions.md:59 [full-width-parens] 全角括号紧贴词条: development flow
+shared/definitions/sdd-routing-definitions.md:60 [full-width-parens] 全角括号紧贴词条: bootstrap
+shared/definitions/sdd-routing-definitions.md:61 [full-width-parens] 全角括号紧贴词条: house-keeping
+shared/definitions/sdd-routing-definitions.md:62 [full-width-parens] 全角括号紧贴词条: direct modification
+shared/definitions/sdd-routing-definitions.md:174 [full-width-parens] 全角括号紧贴词条: duty
+shared/definitions/self-improvement-definitions.md:11 [full-width-parens] 全角括号紧贴词条: 执行主体
+shared/definitions/self-improvement-definitions.md:33 [full-width-parens] 全角括号紧贴词条: 自我提升
+shared/definitions/self-improvement-definitions.md:52 [full-width-parens] 全角括号紧贴词条: 他者辅助提升
+shared/definitions/self-improvement-definitions.md:71 [full-width-parens] 全角括号紧贴词条: 自我提升闭环
+shared/definitions/subagent-definitions.md:64 [full-width-parens] 全角括号紧贴词条: 双形态等价
+shared/definitions/subagent-definitions.md:76 [same-language-bracket] 括号语言与词条同向: observed in real team runs
+shared/definitions/subagent-definitions.md:130 [same-language-bracket] 括号语言与词条同向: a.k.a. agent definition
+shared/definitions/subagent-definitions.md:131 [same-language-bracket] 括号语言与词条同向: this document
+shared/definitions/tool-definitions.md:30 [same-language-bracket] 括号语言与词条同向: this document
+shared/guidelines/ask-record-repeat.md:5 [same-language-bracket] 括号语言与词条同向: 重复到它会抵达下一回合的地方
+shared/guidelines/better-harness.md:5 [full-width-parens] 全角括号紧贴词条: 七态 evidenceState、"配置≠使用"红线
+shared/guidelines/better-harness.md:26 [full-width-parens] 全角括号紧贴词条: 前馈引导
+shared/guidelines/better-harness.md:27 [full-width-parens] 全角括号紧贴词条: 反馈传感
+shared/guidelines/better-harness.md:37 [full-width-parens] 全角括号紧贴词条: 任务理解
+shared/guidelines/better-harness.md:38 [full-width-parens] 全角括号紧贴词条: 可控执行
+shared/guidelines/better-harness.md:39 [full-width-parens] 全角括号紧贴词条: 改动验证
+shared/guidelines/better-harness.md:40 [full-width-parens] 全角括号紧贴词条: 可靠交付
+shared/guidelines/better-harness.md:41 [full-width-parens] 全角括号紧贴词条: 经验沉淀
+shared/guidelines/checklist-methodology.md:99 [same-language-bracket] 括号语言与词条同向: makes it an implementation test
+shared/guidelines/checklist-methodology.md:109 [same-language-bracket] 括号语言与词条同向: tests requirements quality
+shared/guidelines/closed-set-claims.md:41 [full-width-parens] 全角括号紧贴词条: 命中即 void
+shared/guidelines/critique-and-self-critique.md:24 [same-language-bracket] 括号语言与词条同向: 改进提案 vs 推导步骤
+shared/guidelines/critique-and-self-critique.md:44 [same-language-bracket] 括号语言与词条同向: 所以拒收原因集里没有「不可重放」这一类
+shared/guidelines/critique-and-self-critique.md:45 [same-language-bracket] 括号语言与词条同向: 合法
+shared/guidelines/critique-and-self-critique.md:83 [same-language-bracket] 括号语言与词条同向: 本纪律不做什么
+shared/guidelines/critique-and-self-critique.md:87 [same-language-bracket] 括号语言与词条同向: 证伪尝试
+shared/guidelines/directory-governance.md:56 [full-width-parens] 全角括号紧贴词条: 运行期根
+shared/guidelines/dogfooding.md:30 [same-language-bracket] 括号语言与词条同向: advisory — never a gate
+shared/guidelines/fast-fail.md:51 [same-language-bracket] 括号语言与词条同向: 把被守物弄坏 → 变红 → 复原 → 恢复绿
+shared/guidelines/fast-fail.md:128 [same-language-bracket] 括号语言与词条同向: 自检子句在场
+shared/guidelines/fast-fail.md:214 [same-language-bracket] 括号语言与词条同向: 单键
+shared/guidelines/fast-fail.md:233 [same-language-bracket] 括号语言与词条同向: 带标记的反馈条目与其处置字段
+shared/guidelines/proactive-trigger.md:48 [same-language-bracket] 括号语言与词条同向: 用途说明
+shared/guidelines/proactive-trigger.md:50 [same-language-bracket] 括号语言与词条同向: 见
+shared/guidelines/proactive-trigger.md:70 [same-language-bracket] 括号语言与词条同向: 默认 3
+shared/guidelines/proactive-trigger.md:80 [same-language-bracket] 括号语言与词条同向: 下调阈值或关闭机制
+shared/guidelines/proactive-trigger.md:90 [same-language-bracket] 括号语言与词条同向: 诚实声明
+shared/guidelines/proactive-trigger.md:94 [same-language-bracket] 括号语言与词条同向: 建议了但情境判断本不成立
+shared/guidelines/proactive-trigger.md:118 [same-language-bracket] 括号语言与词条同向: seed
+shared/guidelines/progress-reporting.md:3 [same-language-bracket] 括号语言与词条同向: 生成的
+shared/guidelines/progress-reporting.md:15 [same-language-bracket] 括号语言与词条同向: 约束对象
+shared/guidelines/progress-reporting.md:16 [same-language-bracket] 括号语言与词条同向: 豁免
+shared/guidelines/progress-reporting.md:26 [same-language-bracket] 括号语言与词条同向: 优先级由高到低
+shared/guidelines/progress-reporting.md:30 [same-language-bracket] 括号语言与词条同向: 四要素
+shared/guidelines/progress-reporting.md:55 [same-language-bracket] 括号语言与词条同向: 补报规则
+shared/guidelines/progress-reporting.md:67 [same-language-bracket] 括号语言与词条同向: 与快速失败的关系
+shared/guidelines/progress-reporting.md:74 [same-language-bracket] 括号语言与词条同向: 派发时注入
+shared/guidelines/progress-reporting.md:76 [same-language-bracket] 括号语言与词条同向: 间隔 + 四要素 + 返回时给一条异常行
+shared/guidelines/requirements-guidelines.md:147 [same-language-bracket] 括号语言与词条同向: implementation-focused
+shared/guidelines/single-run-evidence.md:15 [same-language-bracket] 括号语言与词条同向: 约束对象
+shared/guidelines/single-run-evidence.md:16 [same-language-bracket] 括号语言与词条同向: 豁免
+shared/guidelines/single-run-evidence.md:23 [same-language-bracket] 括号语言与词条同向: 含全部参数与开关
+shared/guidelines/single-run-evidence.md:39 [same-language-bracket] 括号语言与词条同向: 逐项耗时、verbose 日志、统计输出
+shared/guidelines/token-efficiency.md:20 [same-language-bracket] 括号语言与词条同向: a
+shared/guidelines/token-efficiency.md:21 [same-language-bracket] 括号语言与词条同向: b
+shared/guidelines/token-efficiency.md:38 [same-language-bracket] 括号语言与词条同向: 双条件同时满足
+shared/guidelines/token-efficiency.md:50 [same-language-bracket] 括号语言与词条同向: 机器管理数据文件整体入上下文
+shared/guidelines/token-efficiency.md:51 [same-language-bracket] 括号语言与词条同向: 固定规则判断未交程序
+shared/guidelines/user-facing-comprehension.md:3 [same-language-bracket] 括号语言与词条同向: 唯一定义处
+shared/guidelines/user-facing-comprehension.md:9 [same-language-bracket] 括号语言与词条同向: 白名单
+shared/guidelines/user-facing-comprehension.md:21 [same-language-bracket] 括号语言与词条同向: 黑名单
+shared/guidelines/user-facing-comprehension.md:32 [same-language-bracket] 括号语言与词条同向: 由  §1.7 提升而来
+shared/workflow/docs-step.md:26 [same-language-bracket] 括号语言与词条同向: the embedded step points here
+shared/workflow/evidence-step.md:13 [same-language-bracket] 括号语言与词条同向: steps for the embedding unit
+shared/workflow/execution-topology.md:11 [full-width-parens] 全角括号紧贴词条: CLI、python-speckit 运行时、 均非必需
+shared/workflow/execution-topology.md:29 [same-language-bracket] 括号语言与词条同向: local vs remote
+shared/workflow/execution-topology.md:33 [same-language-bracket] 括号语言与词条同向: no ssh alias + run user + project directory
+shared/workflow/execution-topology.md:43 [same-language-bracket] 括号语言与词条同向: S0–S2 + handoff
+shared/workflow/execution-topology.md:44 [same-language-bracket] 括号语言与词条同向: H0–H5
+shared/workflow/execution-topology.md:45 [same-language-bracket] 括号语言与词条同向: U0–U6
+shared/workflow/external-dispatch-recipes.md:3 [same-language-bracket] 括号语言与词条同向: Mode 3 in []
+shared/workflow/external-dispatch-recipes.md:5 [same-language-bracket] 括号语言与词条同向: one source of truth
+shared/workflow/external-dispatch-recipes.md:29 [same-language-bracket] 括号语言与词条同向: 阶段化 prompt 文件
+shared/workflow/external-dispatch-recipes.md:43 [same-language-bracket] 括号语言与词条同向: see
+shared/workflow/external-dispatch-recipes.md:48 [same-language-bracket] 括号语言与词条同向: runner 脚本与派生
+shared/workflow/feature-integration.md:40 [same-language-bracket] 括号语言与词条同向: implement phase only
+shared/workflow/feature-integration.md:55 [same-language-bracket] 括号语言与词条同向: clarify checkpoint
+shared/workflow/feedback-step.md:72 [same-language-bracket] 括号语言与词条同向: the embedded step points here
+shared/workflow/feedback-step.md:96 [same-language-bracket] 括号语言与词条同向: 机器管理数据文件整体注入上下文
+shared/workflow/feedback-step.md:287 [same-language-bracket] 括号语言与词条同向: canonical semantics for step 6
+shared/workflow/feedback-step.md:345 [same-language-bracket] 括号语言与词条同向: local value of the store
+shared/workflow/feedback-step.md:366 [same-language-bracket] 括号语言与词条同向: never packaged upstream
+shared/workflow/glossary.md:17 [same-language-bracket] 括号语言与词条同向: voice-first
+shared/workflow/glossary.md:31 [same-language-bracket] 括号语言与词条同向: maps to more than one canonical term
+shared/workflow/glossary.md:45 [same-language-bracket] 括号语言与词条同向: at checkpoints
+shared/workflow/glossary.md:90 [same-language-bracket] 括号语言与词条同向: no per-feature glossaries
+shared/workflow/interview-walkthrough.md:13 [same-language-bracket] 括号语言与词条同向: user already provides a written requirement
+shared/workflow/interview-walkthrough.md:16 [same-language-bracket] 括号语言与词条同向: choose one at Phase 0 and record it in the ledger header
+shared/workflow/interview-walkthrough.md:49 [same-language-bracket] 括号语言与词条同向: when loop coupling = delivery-loop
+shared/workflow/interview-walkthrough.md:160 [same-language-bracket] 括号语言与词条同向: contract gaps
+shared/workflow/runtime-mode.md:19 [same-language-bracket] 括号语言与词条同向: canonical
+shared/workflow/target-resolution.md:65 [same-language-bracket] 括号语言与词条同向: owned by each skill
+.specify/memory/constitution.md:151 [same-language-bracket] 括号语言与词条同向: Planned→Implemented
+.specify/instructions.md:49 [same-language-bracket] 括号语言与词条同向: Input Sanity
+.specify/instructions.md:110 [same-language-bracket] 括号语言与词条同向: a quality cost
+.specify/instructions.md:209 [same-language-bracket] 括号语言与词条同向: a short normative reminder plus the owner's path
+.specify/instructions.md:246 [same-language-bracket] 括号语言与词条同向: High-Level
+.specify/instructions.md:252 [same-language-bracket] 括号语言与词条同向: frontmatter key
+.specify/instructions.md:276 [same-language-bracket] 括号语言与词条同向: scope A
+templates/commands/analyze.md:49 [same-language-bracket] 括号语言与词条同向: with its
+templates/commands/derive.md:23 [same-language-bracket] 括号语言与词条同向: the domain question to derive an architecture for
+templates/commands/docs.md:17 [same-language-bracket] 括号语言与词条同向: e.g. "整理 README"、"激进重组"
+templates/commands/implement.md:45 [same-language-bracket] 括号语言与词条同向: before entering the skill
+templates/commands/improve.md:51 [full-width-parens] 全角括号紧贴词条: 未评估
+templates/commands/requirements.md:46 [same-language-bracket] 括号语言与词条同向: ambient via the Documentation Map
+templates/commands/tasks.md:51 [same-language-bracket] 括号语言与词条同向: command-provided
+templates/commands/tasks.md:57 [same-language-bracket] 括号语言与词条同向: skill-owned
+templates/commands/team.md:23 [same-language-bracket] 括号语言与词条同向: Role × Stage × Type roster
+templates/commands/team.md:39 [same-language-bracket] 括号语言与词条同向: redefining it is a first-class edit that realigns both structures
+templates/commands/team.md:69 [same-language-bracket] 括号语言与词条同向: or a path to its
+templates/commands/todo.md:53 [same-language-bracket] 括号语言与词条同向: command-provided
+templates/commands/tools.md:45 [same-language-bracket] 括号语言与词条同向: never auto-populate a tool's contract from built-in knowledge
+templates/commit-template.md:8 [same-language-bracket] 括号语言与词条同向: single line
+templates/feature-details-template.md:116 [same-language-bracket] 括号语言与词条同向: To be removed after instantiation
+templates/instructions-template.md:37 [same-language-bracket] 括号语言与词条同向: Input Sanity
+templates/instructions-template.md:98 [same-language-bracket] 括号语言与词条同向: a quality cost
+templates/instructions-template.md:197 [same-language-bracket] 括号语言与词条同向: a short normative reminder plus the owner's path
+templates/instructions-template.md:229 [same-language-bracket] 括号语言与词条同向: High-Level
+templates/instructions-template.md:235 [same-language-bracket] 括号语言与词条同向: frontmatter key
+templates/instructions-template.md:254 [same-language-bracket] 括号语言与词条同向: scope A
+templates/plan-template.md:50 [same-language-bracket] 括号语言与词条同向: rendered from
+templates/requirements-template.md:14 [same-language-bracket] 括号语言与词条同向: mandatory
+templates/requirements-template.md:24 [same-language-bracket] 括号语言与词条同向: mandatory
+templates/requirements-template.md:105 [same-language-bracket] 括号语言与词条同向: mandatory
+templates/requirements-template.md:130 [same-language-bracket] 括号语言与词条同向: mandatory
+templates/review-template.md:6 [same-language-bracket] 括号语言与词条同向: it resolves on any checkout
+templates/review-template.md:19 [same-language-bracket] 括号语言与词条同向: Self-Contained Snapshot
+templates/review-template.md:90 [same-language-bracket] 括号语言与词条同向: Problems & Improvement Targets
+templates/review-template.md:99 [same-language-bracket] 括号语言与词条同向: verbatim quote
+templates/review-template.md:110 [same-language-bracket] 括号语言与词条同向: Brief
+templates/skills.md:9 [same-language-bracket] 括号语言与词条同向: for consuming projects and their agents
+templates/skills.md:10 [same-language-bracket] 括号语言与词条同向: Spec Kit workflow machinery
+templates/skills.md:28 [same-language-bracket] 括号语言与词条同向: Spec Kit development repositories only
+templates/tasks-template.md:20 [same-language-bracket] 括号语言与词条同向: DoD
+templates/tasks-template.md:107 [same-language-bracket] 括号语言与词条同向: optional
+templates/tasks-template.md:108 [same-language-bracket] 括号语言与词条同向: mechanical-validation contract
+templates/tasks-template.md:156 [same-language-bracket] 括号语言与词条同向: Shared Infrastructure
+templates/tasks-template.md:166 [same-language-bracket] 括号语言与词条同向: Blocking Prerequisites
+templates/tools.md:9 [same-language-bracket] 括号语言与词条同向: the LLM's callable surface
+skills/external/create-docs/SKILL.md:81 [same-language-bracket] 括号语言与词条同向: inline
+skills/external/create-pages/SKILL.md:87 [same-language-bracket] 括号语言与词条同向: → docker
+skills/external/create-pages/SKILL.md:99 [same-language-bracket] 括号语言与词条同向: book mode
+skills/external/create-pages/references/hugo-site.md:241 [same-language-bracket] 括号语言与词条同向: stage 3 input
+skills/external/create-pages/scripts/ci-templates/README.md:23 [same-language-bracket] 括号语言与词条同向: adding a new platform
+skills/external/create-pages/scripts/ci-templates/github/README.md:19 [same-language-bracket] 括号语言与词条同向: shared by every platform template
+skills/external/create-pages/scripts/ci-templates/github/README.md:34 [same-language-bracket] 括号语言与词条同向: mirror the aoneci template
+skills/external/create-skills/SKILL.md:22 [same-language-bracket] 括号语言与词条同向: inspect one or two siblings first
+skills/external/create-skills/SKILL.md:76 [same-language-bracket] 括号语言与词条同向: minimum required
+skills/external/create-skills/SKILL.md:96 [same-language-bracket] 括号语言与词条同向: mandatory
+skills/external/create-skills/SKILL.md:167 [same-language-bracket] 括号语言与词条同向: skills this run never touched — an unsynced  mirror is the common case
+skills/external/create-skills/SKILL.md:171 [same-language-bracket] 括号语言与词条同向: one that constrains agent behavior
+skills/external/create-skills/references/name-collision-and-layering.md:83 [same-language-bracket] 括号语言与词条同向: Step 6
+skills/external/create-skills/references/skill-creation-quality-checklist.md:33 [same-language-bracket] 括号语言与词条同向: no registry
+skills/external/document-utils/SKILL.md:22 [same-language-bracket] 括号语言与词条同向: Word
+skills/external/document-utils/SKILL.md:24 [same-language-bracket] 括号语言与词条同向: PowerPoint
+skills/external/document-utils/SKILL.md:25 [same-language-bracket] 括号语言与词条同向: Excel
+skills/external/document-utils/SKILL.md:188 [same-language-bracket] 括号语言与词条同向: auto-configured via
+skills/external/document-utils/references/docx-creation.md:62 [same-language-bracket] 括号语言与词条同向: Override Built-in Headings
+skills/external/document-utils/references/docx-creation.md:88 [same-language-bracket] 括号语言与词条同向: NEVER use unicode bullets
+skills/external/document-utils/references/pdf-forms.md:96 [same-language-bracket] 括号语言与词条同向: Preferred
+skills/external/document-utils/references/pdf-forms.md:172 [same-language-bracket] 括号语言与词条同向: Fallback
+skills/external/document-utils/references/pdf-forms.md:262 [same-language-bracket] 括号语言与词条同向: from Approach B
+skills/external/document-utils/references/pptx-design.md:76 [same-language-bracket] 括号语言与词条同向: Common Mistakes
+skills/external/document-utils/references/pptx-editing.md:97 [same-language-bracket] 括号语言与词条同向: choosing layouts
+skills/external/draw-diagram/SKILL.md:56 [full-width-parens] 全角括号紧贴词条: 六个内置引擎层
+skills/external/draw-diagram/SKILL.md:79 [full-width-parens] 全角括号紧贴词条: schema 见 semantic-model.md Geometry
+skills/external/draw-diagram/SKILL.md:121 [full-width-parens] 全角括号紧贴词条: Progressive Disclosure —— 五层
+skills/external/draw-diagram/SKILL.md:129 [full-width-parens] 全角括号紧贴词条: Step 1
+skills/external/draw-diagram/SKILL.md:130 [full-width-parens] 全角括号紧贴词条: Step 2
+skills/external/draw-diagram/SKILL.md:146 [full-width-parens] 全角括号紧贴词条: One Source Of Truth 风险已登记
+skills/external/draw-diagram/SKILL.md:185 [same-language-bracket] 括号语言与词条同向: 绘制评价单
+skills/external/draw-diagram/references/delivery-contract.md:3 [full-width-parens] 全角括号紧贴词条: One Source Of Truth
+skills/external/draw-diagram/references/delivery-contract.md:9 [full-width-parens] 全角括号紧贴词条: 每次交付必备
+skills/external/draw-diagram/references/delivery-contract.md:93 [full-width-parens] 全角括号紧贴词条: D7.1
+skills/external/draw-diagram/references/routing-matrix.md:56 [full-width-parens] 全角括号紧贴词条: Exclusivity Registry —— 只有一家能画
+skills/external/draw-diagram/references/routing-matrix.md:75 [full-width-parens] 全角括号紧贴词条: 像素自定义
+skills/external/draw-diagram/references/routing-matrix.md:76 [full-width-parens] 全角括号紧贴词条: UML 严格语义
+skills/external/draw-diagram/references/routing-matrix.md:79 [full-width-parens] 全角括号紧贴词条: 原生
+skills/external/draw-diagram/references/routing-matrix.md:95 [full-width-parens] 全角括号紧贴词条: MUST NOT
+skills/external/draw-diagram/references/self-deploy-render-service.md:53 [same-language-bracket] 括号语言与词条同向: Node
+skills/external/draw-diagram/references/self-deploy-render-service.md:54 [same-language-bracket] 括号语言与词条同向: Node
+skills/external/draw-diagram/references/self-deploy-render-service.md:60 [full-width-parens] 全角括号紧贴词条: 每次绘图执行前先探测
+skills/external/draw-diagram/references/self-deploy-render-service.md:70 [full-width-parens] 全角括号紧贴词条: 不要默认 docker
+skills/external/draw-diagram/references/self-deploy-render-service.md:163 [full-width-parens] 全角括号紧贴词条: 已有集群时
+skills/external/draw-diagram/references/self-deploy-render-service.md:275 [full-width-parens] 全角括号紧贴词条: MUST NOT
+skills/external/draw-diagram/references/semantic-model.md:45 [full-width-parens] 全角括号紧贴词条: interactivity_intent —— 可交互图表的前门规约
+skills/external/draw-diagram/references/semantic-model.md:89 [full-width-parens] 全角括号紧贴词条: Step 4 验收
+skills/external/draw-diagram/references/semantic-model.md:133 [full-width-parens] 全角括号紧贴词条: 语法层偏离声明规则
+skills/external/draw-diagram/references/types/d3js/d3js.md:9 [full-width-parens] 全角括号紧贴词条: standalone
+skills/external/draw-diagram/references/types/d3js/d3js.md:23 [full-width-parens] 全角括号紧贴词条: interactivity_intent → D3 交互
+skills/external/draw-diagram/references/types/d3js/d3js.md:127 [same-language-bracket] 括号语言与词条同向: if requested
+skills/external/draw-diagram/references/types/d3js/d3js.md:181 [same-language-bracket] 括号语言与词条同向: visible collapsible footer section plus a header comment block
+skills/external/draw-diagram/references/types/d3js/references/cycle3-reproduction-lessons.md:12 [same-language-bracket] 括号语言与词条同向: do not regress fidelity
+skills/external/draw-diagram/references/types/d3js/references/cycle3-reproduction-lessons.md:17 [same-language-bracket] 括号语言与词条同向: DO NOT CHANGE
+skills/external/draw-diagram/references/types/d3js/references/d3js-guide.md:5 [same-language-bracket] 括号语言与词条同向: Core Concept
+skills/external/draw-diagram/references/types/d3js/references/d3js-guide.md:356 [full-width-parens] 全角括号紧贴词条: 行
+skills/external/draw-diagram/references/types/d3js/references/d3js-guide.md:619 [full-width-parens] 全角括号紧贴词条: 接收 draw-diagram weight_plan
+skills/external/draw-diagram/references/types/drawio/drawio.md:38 [full-width-parens] 全角括号紧贴词条: Deviation Declaration 第 1 类
+skills/external/draw-diagram/references/types/drawio/drawio.md:80 [full-width-parens] 全角括号紧贴词条: Delivery
+skills/external/draw-diagram/references/types/drawio/drawio.md:92 [full-width-parens] 全角括号紧贴词条: 本技能不带脚本
+skills/external/draw-diagram/references/types/drawio/references/mxgraph-format.md:207 [full-width-parens] 全角括号紧贴词条: well-formedness
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:65 [full-width-parens] 全角括号紧贴词条: ELK  流
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:74 [full-width-parens] 全角括号紧贴词条: 自带尚可的走线
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:83 [full-width-parens] 全角括号紧贴词条: vertex 会被移动
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:91 [full-width-parens] 全角括号紧贴词条: 该不该自由版面、该多密、该分几组
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:97 [full-width-parens] 全角括号紧贴词条: 已核对 dev 分支
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:101 [full-width-parens] 全角括号紧贴词条: 收窄
+skills/external/draw-diagram/references/types/drawio/references/render-and-export.md:103 [full-width-parens] 全角括号紧贴词条: 官方 assistant-plugin 说明
+skills/external/draw-diagram/references/types/echarts/best-practices/best-practices.md:53 [full-width-parens] 全角括号紧贴词条: vendor 非空
+skills/external/draw-diagram/references/types/echarts/best-practices/best-practices.md:83 [full-width-parens] 全角括号紧贴词条: design tokens
+skills/external/draw-diagram/references/types/echarts/echarts.md:13 [same-language-bracket] 括号语言与词条同向: e.g.
+skills/external/draw-diagram/references/types/echarts/echarts.md:23 [full-width-parens] 全角括号紧贴词条: canvas、每图元 、zone 盒、relation 锚点
+skills/external/draw-diagram/references/types/echarts/echarts.md:42 [full-width-parens] 全角括号紧贴词条: interactivity_intent → ECharts 交互
+skills/external/draw-diagram/references/types/echarts/echarts.md:116 [same-language-bracket] 括号语言与词条同向: with
+skills/external/draw-diagram/references/types/echarts/echarts.md:117 [same-language-bracket] 括号语言与词条同向: e.g. "RUNNING 直接 Delete 未详述"
+skills/external/draw-diagram/references/types/echarts/echarts.md:125 [same-language-bracket] 括号语言与词条同向: e.g. a  for deployment topology
+skills/external/draw-diagram/references/types/echarts/echarts.md:193 [same-language-bracket] 括号语言与词条同向: download + verify with
+skills/external/draw-diagram/references/types/echarts/echarts.md:234 [same-language-bracket] 括号语言与词条同向: e.g.
+skills/external/draw-diagram/references/types/echarts/references/cycle3-reproduction-lessons.md:5 [same-language-bracket] 括号语言与词条同向: ALL must be applied
+skills/external/draw-diagram/references/types/echarts/references/cycle3-reproduction-lessons.md:13 [same-language-bracket] 括号语言与词条同向: DO NOT CHANGE
+skills/external/draw-diagram/references/types/echarts/references/echarts-guide.md:5 [same-language-bracket] 括号语言与词条同向: Core Concept
+skills/external/draw-diagram/references/types/echarts/references/echarts-guide.md:159 [same-language-bracket] 括号语言与词条同向: Recommended for Tabular Data
+skills/external/draw-diagram/references/types/echarts/references/echarts-guide.md:503 [same-language-bracket] 括号语言与词条同向: an empty-string label formatter renders them as unidentifiable empty circles
+skills/external/draw-diagram/references/types/echarts/references/echarts-guide.md:780 [full-width-parens] 全角括号紧贴词条: 接收 draw-diagram weight_plan
+skills/external/draw-diagram/references/types/echarts/references/echarts-official-docs.md:284 [full-width-parens] 全角括号紧贴词条: Dataset
+skills/external/draw-diagram/references/types/echarts/references/sds-realization.md:9 [full-width-parens] 全角括号紧贴词条: 偏离维度 + 幅度 + 原因
+skills/external/draw-diagram/references/types/echarts/references/sds-realization.md:23 [full-width-parens] 全角括号紧贴词条: 消除死白
+skills/external/draw-diagram/references/types/echarts/references/sds-realization.md:29 [full-width-parens] 全角括号紧贴词条: 精确落点
+skills/external/draw-diagram/references/types/echarts/references/sds-realization.md:48 [full-width-parens] 全角括号紧贴词条: 测量 → config JSON → render.mjs
+skills/external/draw-diagram/references/types/echarts/references/sds-realization.md:51 [full-width-parens] 全角括号紧贴词条: 唯一权威
+skills/external/draw-diagram/references/types/excalidraw/best-practices/best-practices.md:20 [full-width-parens] 全角括号紧贴词条: 浅色背景 + solid
+skills/external/draw-diagram/references/types/excalidraw/excalidraw.md:7 [full-width-parens] 全角括号紧贴词条: draw-diagram 产出
+skills/external/draw-diagram/references/types/excalidraw/excalidraw.md:8 [full-width-parens] 全角括号紧贴词条: 布局自动、成功率最高
+skills/external/draw-diagram/references/types/excalidraw/excalidraw.md:11 [full-width-parens] 全角括号紧贴词条: 或直接调用无声明
+skills/external/draw-diagram/references/types/excalidraw/excalidraw.md:77 [full-width-parens] 全角括号紧贴词条: 如 box 装不下 label
+skills/external/draw-diagram/references/types/excalidraw/references/cycle3-reproduction-lessons.md:5 [same-language-bracket] 括号语言与词条同向: ALL must be applied
+skills/external/draw-diagram/references/types/excalidraw/references/cycle3-reproduction-lessons.md:14 [same-language-bracket] 括号语言与词条同向: DO NOT CHANGE
+skills/external/draw-diagram/references/types/excalidraw/references/guide/scene-schema-reference.md:100 [full-width-parens] 全角括号紧贴词条: 可选分组
+skills/external/draw-diagram/references/types/excalidraw/references/guide/scene-schema-reference.md:109 [full-width-parens] 全角括号紧贴词条: Excalidraw 官方
+skills/external/draw-diagram/references/types/excalidraw/references/guide/scene-schema-reference.md:123 [full-width-parens] 全角括号紧贴词条: 接收 draw-diagram weight_plan
+skills/external/draw-diagram/references/types/excalidraw/references/guide/scene-schema-reference.md:125 [full-width-parens] 全角括号紧贴词条: draw-diagram
+skills/external/draw-diagram/references/types/excalidraw/references/guide/server-deployment.md:34 [full-width-parens] 全角括号紧贴词条: 服务器部署
+skills/external/draw-diagram/references/types/excalidraw/references/howto/00-semantic-analysis.md:3 [full-width-parens] 全角括号紧贴词条: 无 SDS
+skills/external/draw-diagram/references/types/excalidraw/references/howto/01-path-selection.md:14 [full-width-parens] 全角括号紧贴词条: 简单树也可 Mermaid
+skills/external/draw-diagram/references/types/excalidraw/references/howto/01-path-selection.md:21 [full-width-parens] 全角括号紧贴词条: 经  规范化
+skills/external/draw-diagram/references/types/excalidraw/references/howto/04-rendering-and-output.md:29 [full-width-parens] 全角括号紧贴词条: 渲染后必做
+skills/external/draw-diagram/references/types/excalidraw/references/sds-realization.md:32 [full-width-parens] 全角括号紧贴词条: exit 2
+skills/external/draw-diagram/references/types/excalidraw/references/sds-realization.md:34 [full-width-parens] 全角括号紧贴词条: tier → strokeWidth
+skills/external/draw-diagram/references/types/mermaid/best-practices/best-practices.md:31 [full-width-parens] 全角括号紧贴词条: hub-and-spoke
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:25 [full-width-parens] 全角括号紧贴词条: 用户直调
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:42 [full-width-parens] 全角括号紧贴词条: 列对齐
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:73 [full-width-parens] 全角括号紧贴词条: 按需选用
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:102 [full-width-parens] 全角括号紧贴词条: 直调回退
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:114 [full-width-parens] 全角括号紧贴词条: flowchart 用  边标签或  节点、sequence 用 、class 用
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:130 [full-width-parens] 全角括号紧贴词条: 非 UML
+skills/external/draw-diagram/references/types/mermaid/mermaid.md:154 [full-width-parens] 全角括号紧贴词条: 最佳实践
+skills/external/draw-diagram/references/types/mermaid/references/cycle3-reproduction-lessons.md:7 [same-language-bracket] 括号语言与词条同向: ALL must be applied
+skills/external/draw-diagram/references/types/mermaid/references/cycle3-reproduction-lessons.md:19 [same-language-bracket] 括号语言与词条同向: DO NOT CHANGE
+skills/external/draw-diagram/references/types/mermaid/references/document/03-sequence-diagram.md:19 [full-width-parens] 全角括号紧贴词条: UML 语义
+skills/external/draw-diagram/references/types/mermaid/references/document/03-sequence-diagram.md:31 [full-width-parens] 全角括号紧贴词条: Interaction Use
+skills/external/draw-diagram/references/types/mermaid/references/document/04-usecase-diagram.md:5 [full-width-parens] 全角括号紧贴词条: Actor
+skills/external/draw-diagram/references/types/mermaid/references/document/04-usecase-diagram.md:10 [full-width-parens] 全角括号紧贴词条: Use Case
+skills/external/draw-diagram/references/types/mermaid/references/document/04-usecase-diagram.md:15 [full-width-parens] 全角括号紧贴词条: System Boundary
+skills/external/draw-diagram/references/types/mermaid/references/document/09-grasp-principles.md:37 [full-width-parens] 全角括号紧贴词条: 图可暴露
+skills/external/draw-diagram/references/types/mermaid/references/guide/layout.md:5 [full-width-parens] 全角括号紧贴词条: 见 diagram-principles §2.1
+skills/external/draw-diagram/references/types/mermaid/references/guide/style.md:87 [full-width-parens] 全角括号紧贴词条: 接收 draw-diagram weight_plan
+skills/external/draw-diagram/references/types/mermaid/references/guide/syntax-reference.md:46 [full-width-parens] 全角括号紧贴词条: 时序图
+skills/external/draw-diagram/references/types/mermaid/references/guide/syntax-reference.md:75 [full-width-parens] 全角括号紧贴词条: 类图
+skills/external/draw-diagram/references/types/mermaid/references/guide/syntax-reference.md:104 [full-width-parens] 全角括号紧贴词条: 状态机图
+skills/external/draw-diagram/references/types/mermaid/references/guide/syntax-reference.md:149 [full-width-parens] 全角括号紧贴词条: 甘特图
+skills/external/draw-diagram/references/types/mermaid/references/howto/01-choose-diagram-type.md:3 [full-width-parens] 全角括号紧贴词条: 本技能核心
+skills/external/draw-diagram/references/types/mermaid/references/howto/02-class-diagram.md:48 [full-width-parens] 全角括号紧贴词条: 包内组织
+skills/external/draw-diagram/references/types/mermaid/references/howto/03-component-diagram.md:42 [full-width-parens] 全角括号紧贴词条: 标准组件视图
+skills/external/draw-diagram/references/types/mermaid/references/howto/04-deployment-diagram.md:38 [full-width-parens] 全角括号紧贴词条: 如
+skills/external/draw-diagram/references/types/mermaid/references/howto/05-sequence-diagram.md:137 [full-width-parens] 全角括号紧贴词条: 饱和分支
+skills/external/draw-diagram/references/types/mermaid/references/howto/08-activity-diagram.md:7 [full-width-parens] 全角括号紧贴词条: flowchart 活动语义
+skills/external/draw-diagram/references/types/mermaid/references/howto/08-activity-diagram.md:25 [full-width-parens] 全角括号紧贴词条: subgraph 近似
+skills/external/draw-diagram/references/types/mermaid/references/howto/12-rendering-and-output.md:24 [full-width-parens] 全角括号紧贴词条: <1200px
+skills/external/draw-diagram/references/types/mermaid/references/howto/15-mindmap-diagram.md:43 [full-width-parens] 全角括号紧贴词条: classDef
+skills/external/draw-diagram/references/types/mermaid/references/howto/20-c4-diagram.md:5 [full-width-parens] 全角括号紧贴词条: 等
+skills/external/draw-diagram/references/types/mermaid/references/howto/20-c4-diagram.md:59 [full-width-parens] 全角括号紧贴词条: 动态视图
+skills/external/draw-diagram/references/types/mermaid/references/sds-realization.md:83 [full-width-parens] 全角括号紧贴词条: 不作现行规范引用
+skills/external/draw-diagram/references/types/mermaid/server/README.md:8 [full-width-parens] 全角括号紧贴词条: 与 mermaid.ink 一致
+skills/external/draw-diagram/references/types/plantuml/plantuml.md:45 [full-width-parens] 全角括号紧贴词条: 需求清单覆盖检查见 [01-choose-diagram-type.md]
+skills/external/draw-diagram/references/types/plantuml/plantuml.md:90 [full-width-parens] 全角括号紧贴词条: 非 UML
+skills/external/draw-diagram/references/types/plantuml/plantuml.md:113 [full-width-parens] 全角括号紧贴词条: 详见 [12-rendering-and-output.md §4.4]
+skills/external/draw-diagram/references/types/plantuml/plantuml.md:115 [full-width-parens] 全角括号紧贴词条: 最佳实践
+skills/external/draw-diagram/references/types/plantuml/references/cycle3-reproduction-lessons.md:3 [full-width-parens] 全角括号紧贴词条: dated record
+skills/external/draw-diagram/references/types/plantuml/references/cycle3-reproduction-lessons.md:7 [same-language-bracket] 括号语言与词条同向: ALL must be applied
+skills/external/draw-diagram/references/types/plantuml/references/cycle3-reproduction-lessons.md:24 [same-language-bracket] 括号语言与词条同向: DO NOT CHANGE
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:11 [full-width-parens] 全角括号紧贴词条: Information Expert
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:21 [full-width-parens] 全角括号紧贴词条: Creator
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:33 [full-width-parens] 全角括号紧贴词条: Controller
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:43 [full-width-parens] 全角括号紧贴词条: Low Coupling
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:51 [full-width-parens] 全角括号紧贴词条: High Cohesion
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:59 [full-width-parens] 全角括号紧贴词条: Polymorphism
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:67 [full-width-parens] 全角括号紧贴词条: Pure Fabrication
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:75 [full-width-parens] 全角括号紧贴词条: Indirection
+skills/external/draw-diagram/references/types/plantuml/references/document/09-grasp-principles.md:83 [full-width-parens] 全角括号紧贴词条: Protected Variations
+skills/external/draw-diagram/references/types/plantuml/references/document/11-wbs-diagram.md:176 [same-language-bracket] 括号语言与词条同向: with inline or style color
+skills/external/draw-diagram/references/types/plantuml/references/document/12-gantt-diagram.md:1700 [same-language-bracket] 括号语言与词条同向: 30 days
+skills/external/draw-diagram/references/types/plantuml/references/document/13-mindmap-diagram.md:296 [same-language-bracket] 括号语言与词条同向: whole
+skills/external/draw-diagram/references/types/plantuml/references/guide/content.md:178 [full-width-parens] 全角括号紧贴词条: legend
+skills/external/draw-diagram/references/types/plantuml/references/guide/diagram-principles.md:46 [full-width-parens] 全角括号紧贴词条: pre-attentive
+skills/external/draw-diagram/references/types/plantuml/references/guide/large-diagram-playbook.md:13 [full-width-parens] 全角括号紧贴词条: [principles §2–§3]
+skills/external/draw-diagram/references/types/plantuml/references/guide/large-diagram-playbook.md:88 [same-language-bracket] 括号语言与词条同向: b
+skills/external/draw-diagram/references/types/plantuml/references/guide/layout.md:436 [full-width-parens] 全角括号紧贴词条: top-to-bottom
+skills/external/draw-diagram/references/types/plantuml/references/guide/style.md:42 [full-width-parens] 全角括号紧贴词条: Monochrome vs Color
+skills/external/draw-diagram/references/types/plantuml/references/guide/style.md:144 [full-width-parens] 全角括号紧贴词条: 非 UML
+skills/external/draw-diagram/references/types/plantuml/references/guide/style.md:263 [full-width-parens] 全角括号紧贴词条: visual weight
+skills/external/draw-diagram/references/types/plantuml/references/guide/style.md:311 [full-width-parens] 全角括号紧贴词条: 直接调用本技能
+skills/external/draw-diagram/references/types/plantuml/references/guide/syntax-reference.md:677 [full-width-parens] 全角括号紧贴词条: 零或一
+skills/external/draw-diagram/references/types/plantuml/references/howto/01-choose-diagram-type.md:37 [full-width-parens] 全角括号紧贴词条: 专项
+skills/external/draw-diagram/references/types/plantuml/references/howto/01-choose-diagram-type.md:38 [full-width-parens] 全角括号紧贴词条: 专项
+skills/external/draw-diagram/references/types/plantuml/references/howto/01-choose-diagram-type.md:87 [full-width-parens] 全角括号紧贴词条: Fowler
+skills/external/draw-diagram/references/types/plantuml/references/howto/03-component-diagram.md:211 [full-width-parens] 全角括号紧贴词条: 勿用嵌套 component 表达分组
+skills/external/draw-diagram/references/types/plantuml/references/howto/04-deployment-diagram.md:448 [full-width-parens] 全角括号紧贴词条: 部署图信息密度治理
+skills/external/draw-diagram/references/types/plantuml/references/howto/05-sequence-diagram.md:249 [full-width-parens] 全角括号紧贴词条: monochrome 会把所有颜色转灰度
+skills/external/draw-diagram/references/types/plantuml/references/howto/09-state-machine-diagram.md:308 [full-width-parens] 全角括号紧贴词条: 见 [01-choose-diagram-type.md 需求清单覆盖检查]
+skills/external/draw-diagram/references/types/plantuml/references/howto/12-rendering-and-output.md:41 [full-width-parens] 全角括号紧贴词条: 本地 jar
+skills/external/draw-diagram/references/types/plantuml/references/howto/12-rendering-and-output.md:238 [full-width-parens] 全角括号紧贴词条: 要么全 HTML、要么全 Markdown
+skills/external/draw-diagram/references/types/plantuml/references/howto/12-rendering-and-output.md:251 [full-width-parens] 全角括号紧贴词条: SKILL_HOME = 技能根目录
+skills/external/draw-diagram/references/types/plantuml/references/howto/13-wbs-diagram.md:14 [full-width-parens] 全角括号紧贴词条: Mindmap
+skills/external/draw-diagram/references/types/plantuml/references/howto/13-wbs-diagram.md:561 [full-width-parens] 全角括号紧贴词条: 红
+skills/external/draw-diagram/references/types/plantuml/references/howto/13-wbs-diagram.md:582 [full-width-parens] 全角括号紧贴词条: legend
+skills/external/draw-diagram/references/types/plantuml/references/howto/14-gantt-diagram.md:393 [full-width-parens] 全角括号紧贴词条: daily→weekly→monthly
+skills/external/draw-diagram/references/types/plantuml/references/howto/14-gantt-diagram.md:729 [full-width-parens] 全角括号紧贴词条: weekly→monthly
+skills/external/draw-diagram/references/types/plantuml/references/howto/14-gantt-diagram.md:782 [full-width-parens] 全角括号紧贴词条: week 10、week 20…
+skills/external/draw-diagram/references/types/plantuml/references/howto/15-mindmap-diagram.md:382 [full-width-parens] 全角括号紧贴词条: 提升留白的第一杠杆
+skills/external/draw-diagram/references/types/plantuml/references/howto/15-mindmap-diagram.md:389 [full-width-parens] 全角括号紧贴词条: viewBox 宽度不变
+skills/external/draw-diagram/references/types/plantuml/references/howto/16-json-diagram.md:386 [full-width-parens] 全角括号紧贴词条: 纵向
+skills/external/draw-diagram/references/types/plantuml/references/howto/16-json-diagram.md:388 [full-width-parens] 全角括号紧贴词条: 长 URL、长 ID
+skills/external/draw-diagram/references/types/plantuml/references/howto/16-json-diagram.md:450 [full-width-parens] 全角括号紧贴词条: 接近方形 ~1.02
+skills/external/draw-diagram/references/types/plantuml/references/sds-realization.md:30 [full-width-parens] 全角括号紧贴词条: zone
+skills/external/draw-diagram/references/types/plantuml/references/sds-realization.md:72 [full-width-parens] 全角括号紧贴词条: 如"zone 边框 4px、流线 1px、子模块 2.5px"
+skills/external/git-utils/SKILL.md:4 [same-language-bracket] 括号语言与词条同向: A
+skills/external/git-utils/SKILL.md:36 [full-width-parens] 全角括号紧贴词条: trunk-based
+skills/external/git-utils/SKILL.md:41 [full-width-parens] 全角括号紧贴词条: spec
+skills/external/git-utils/references/bootstrap-commands.md:3 [full-width-parens] 全角括号紧贴词条: 遗留配置迁移
+skills/external/git-utils/references/fleet-coordination-playbook.md:100 [same-language-bracket] 括号语言与词条同向: SAFE set
+skills/external/git-utils/references/fleet-coordination-playbook.md:103 [same-language-bracket] 括号语言与词条同向: separate skill
+skills/external/git-utils/references/gitexcludes-subroutine.md:13 [full-width-parens] 全角括号紧贴词条: sync 前
+skills/external/git-utils/references/gitexcludes-subroutine.md:45 [full-width-parens] 全角括号紧贴词条: sync 后
+skills/external/git-utils/references/health-check-commands.md:3 [full-width-parens] 全角括号紧贴词条: 分支结构、同步状态、 一致性检查、维护报告模板
+skills/external/git-utils/references/server-troubleshooting.md:85 [full-width-parens] 全角括号紧贴词条: 不是 git
+skills/external/git-utils/references/server-troubleshooting.md:205 [full-width-parens] 全角括号紧贴词条: 服务端写路径判据
+skills/external/git-utils/references/server-workflow.md:5 [full-width-parens] 全角括号紧贴词条: reconcile
+skills/external/git-utils/references/submodule-workflow.md:42 [same-language-bracket] 括号语言与词条同向: not off an arbitrary upstream tip
+skills/external/git-utils/references/submodule-workflow.md:72 [same-language-bracket] 括号语言与词条同向: s
+skills/external/git-utils/references/submodule-workflow.md:73 [same-language-bracket] 括号语言与词条同向: so the parent no longer tracks a private branch commit
+skills/external/humanize/SKILL.md:29 [full-width-parens] 全角括号紧贴词条: 每一条都优先于任何改写质量诉求
+skills/external/humanize/SKILL.md:104 [full-width-parens] 全角括号紧贴词条: 本技能的质量证据链
+skills/external/improve-skills/SKILL.md:23 [same-language-bracket] 括号语言与词条同向: user names a *set* of Skills or a whole directory
+skills/external/improve-skills/SKILL.md:45 [same-language-bracket] 括号语言与词条同向: session + feedback lanes carry the strongest signals
+skills/external/improve-skills/SKILL.md:51 [same-language-bracket] 括号语言与词条同向: diagnose as a constraint-*placement* problem per [] before rewording the rule
+skills/external/improve-skills/SKILL.md:78 [same-language-bracket] 括号语言与词条同向: of the governing feature
+skills/external/improve-skills/SKILL.md:135 [same-language-bracket] 括号语言与词条同向: or traced line-by-line against the documented API
+skills/external/improve-skills/references/constraint-placement.md:46 [same-language-bracket] 括号语言与词条同向: L0–L3 progressive disclosure
+skills/external/improve-skills/references/constraint-placement.md:48 [same-language-bracket] 括号语言与词条同向: read on demand
+skills/external/improve-skills/references/hardening-examples.md:12 [same-language-bracket] 括号语言与词条同向: a loop that toggled its own state
+skills/external/improve-skills/references/hardening-examples.md:48 [same-language-bracket] 括号语言与词条同向: title body-leak
+skills/external/improve-skills/references/hardening-examples.md:93 [same-language-bracket] 括号语言与词条同向: N panels
+skills/external/improve-skills/references/loop-playbook.md:24 [same-language-bracket] 括号语言与词条同向: 超越规范符合性
+skills/external/improve-skills/references/loop-playbook.md:153 [same-language-bracket] 括号语言与词条同向: doc-workspace tooling
+skills/external/improve-skills/references/loop-playbook.md:242 [same-language-bracket] 括号语言与词条同向: 用户要求 vs 内置优化默认
+skills/external/improve-skills/references/loop-playbook.md:245 [same-language-bracket] 括号语言与词条同向: 用户要求 vs 规范性义务
+skills/external/improve-skills/references/red-lines.md:31 [same-language-bracket] 括号语言与词条同向: before acting
+skills/external/improve-skills/references/red-lines.md:32 [same-language-bracket] 括号语言与词条同向: must exit  before finishing
+skills/external/improve-skills/references/red-lines.md:83 [same-language-bracket] 括号语言与词条同向: rigor gate
+skills/external/improve-skills/references/red-lines.md:107 [same-language-bracket] 括号语言与词条同向: Hard Constraint 5
+skills/external/improve-skills/references/skill-slimming-principles.md:207 [same-language-bracket] 括号语言与词条同向: always in context
+skills/external/merge-skills/SKILL.md:21 [same-language-bracket] 括号语言与词条同向: Constitution Principle XIII — Better-Harness
+skills/external/merge-skills/SKILL.md:27 [same-language-bracket] 括号语言与词条同向: see Phase 6
+skills/external/merge-skills/SKILL.md:117 [same-language-bracket] 括号语言与词条同向: when decommission touched wiring
+skills/external/merge-skills/references/content-extraction.md:18 [same-language-bracket] 括号语言与词条同向: they fold into the target's
+skills/external/merge-skills/references/content-extraction.md:20 [same-language-bracket] 括号语言与词条同向: example
+skills/external/merge-skills/references/decommission-and-wiring.md:65 [same-language-bracket] 括号语言与词条同向: feeds Phase 8
+skills/external/merge-skills/references/decommission-and-wiring.md:71 [same-language-bracket] 括号语言与词条同向: app may need restart to reload
+skills/external/merge-skills/references/provenance-record.md:113 [same-language-bracket] 括号语言与词条同向: Phase 5
+skills/external/merge-skills/references/restructure-mapping.md:28 [same-language-bracket] 括号语言与词条同向: see
+skills/external/merge-skills/references/restructure-mapping.md:43 [same-language-bracket] 括号语言与词条同向: not yours to delete
+skills/external/sdd-house-keeping/SKILL.md:25 [same-language-bracket] 括号语言与词条同向: H0–H5
+skills/external/sdd-loop-driver/SKILL.md:38 [full-width-parens] 全角括号紧贴词条: 外部 CLI
+skills/external/sdd-loop-driver/SKILL.md:75 [same-language-bracket] 括号语言与词条同向: U0–U6
+skills/external/sdd-loop-driver/SKILL.md:117 [full-width-parens] 全角括号紧贴词条: 校验程序归  § Independent Verification
+skills/external/sdd-loop-driver/SKILL.md:123 [full-width-parens] 全角括号紧贴词条: 运行效率优化
+skills/external/sdd-loop-driver/SKILL.md:137 [full-width-parens] 全角括号紧贴词条: 任务拆解与配合
+skills/external/sdd-loop-driver/SKILL.md:174 [full-width-parens] 全角括号紧贴词条: 子代理创建与派发委派
+skills/external/sdd-loop-driver/SKILL.md:179 [full-width-parens] 全角括号紧贴词条: MUST NOT 启动 qodercli
+skills/external/sdd-loop-driver/SKILL.md:183 [full-width-parens] 全角括号紧贴词条: 反馈与探针采集点
+skills/external/sdd-loop-driver/references/decomposition-model.md:76 [same-language-bracket] 括号语言与词条同向: a child is never split again
+skills/external/sdd-loop-driver/references/decomposition-model.md:158 [same-language-bracket] 括号语言与词条同向: SD-01…SD-16
+skills/external/sdd-loop-driver/references/decomposition-model.md:194 [same-language-bracket] 括号语言与词条同向: OR-14…OR-16
+skills/external/sdd-loop-driver/references/decomposition-model.md:208 [same-language-bracket] 括号语言与词条同向: VI-01…VI-06
+skills/external/sdd-loop-driver/references/decomposition-model.md:226 [same-language-bracket] 括号语言与词条同向: VI-07…VI-14
+skills/external/sdd-loop-driver/references/decomposition-model.md:248 [same-language-bracket] 括号语言与词条同向: ST-01…ST-12
+skills/external/sdd-loop-driver/references/decomposition-model.md:277 [same-language-bracket] 括号语言与词条同向: OR-03…OR-16
+skills/external/sdd-loop-driver/references/decomposition-model.md:313 [same-language-bracket] 括号语言与词条同向: FN-01…FN-08
+skills/external/sdd-loop-driver/references/decomposition-model.md:343 [same-language-bracket] 括号语言与词条同向: FN-09…FN-16
+skills/external/sdd-loop-driver/references/dispatch-recipes.md:27 [full-width-parens] 全角括号紧贴词条: Stage Subagent Budget & Bounded Dispatch
+skills/external/sdd-loop-driver/references/dispatch-recipes.md:34 [full-width-parens] 全角括号紧贴词条: Stage Prompt File
+skills/external/sdd-loop-driver/references/dispatch-recipes.md:152 [full-width-parens] 全角括号紧贴词条: Stage Chain & Closure
+skills/external/sdd-loop-driver/references/dispatch-recipes.md:180 [full-width-parens] 全角括号紧贴词条: 实测教训 2026-10-15 xuanji-robot 漏扫
+skills/external/sdd-loop-driver/references/efficiency-model.md:7 [full-width-parens] 全角括号紧贴词条: Fast Lane
+skills/external/sdd-loop-driver/references/efficiency-model.md:83 [full-width-parens] 全角括号紧贴词条: Test Budget
+skills/external/sdd-loop-driver/references/efficiency-model.md:161 [full-width-parens] 全角括号紧贴词条: MUST NOT 以 0 表示未运行
+skills/external/sdd-loop-driver/references/efficiency-model.md:164 [full-width-parens] 全角括号紧贴词条: Plan Constraint
+skills/external/sdd-loop-driver/references/efficiency-model.md:243 [full-width-parens] 全角括号紧贴词条: Progress & Detach
+skills/external/sdd-loop-driver/references/efficiency-model.md:289 [full-width-parens] 全角括号紧贴词条: Decomposition Gate
+skills/external/sdd-loop-driver/references/efficiency-model.md:327 [full-width-parens] 全角括号紧贴词条: Pre-Analyze Deterministic Gate
+skills/external/sdd-loop-driver/references/efficiency-model.md:365 [full-width-parens] 全角括号紧贴词条: Cross-Feature Overlap Pre-check
+skills/external/sdd-loop-driver/references/nested-invocation.md:19 [full-width-parens] 全角括号紧贴词条: 六项事实在 U0 之前的校验集
+skills/external/sdd-loop-driver/references/nested-invocation.md:59 [full-width-parens] 全角括号紧贴词条: 写线登记
+skills/external/sdd-loop-driver/references/nested-invocation.md:66 [full-width-parens] 全角括号紧贴词条: 失败与卡死交回
+skills/external/sdd-loop-driver/references/nested-invocation.md:72 [full-width-parens] 全角括号紧贴词条: why the run was costly
+skills/external/sdd-loop-driver/references/nested-invocation.md:75 [full-width-parens] 全角括号紧贴词条: 调用方义务
+skills/external/sdd-loop-driver/references/stage-prompts.md:63 [full-width-parens] 全角括号紧贴词条: Watch Protocol
+skills/external/sdd-loop-driver/references/stage-prompts.md:68 [full-width-parens] 全角括号紧贴词条: subagent 结束即停摆
+skills/external/sdd-loop-driver/references/stage-prompts.md:90 [same-language-bracket] 括号语言与词条同向: b
+skills/external/sdd-loop-driver/references/stage-prompts.md:120 [full-width-parens] 全角括号紧贴词条: 快车道条件块
+skills/external/sdd-loop-driver/references/stage-prompts.md:224 [full-width-parens] 全角括号紧贴词条: plan 完成后的只小修块
+skills/external/sdd-loop-driver/references/stage-prompts.md:249 [full-width-parens] 全角括号紧贴词条: 进度与脱离
+skills/external/sdd-loop-driver/references/stage-prompts.md:458 [full-width-parens] 全角括号紧贴词条: 已验证变体
+skills/external/sdd-loop-driver/references/state-awareness.md:37 [full-width-parens] 全角括号紧贴词条: 物理隔离与 stale-unisolated 停线由 065c 承接
+skills/external/sdd-loop-driver/references/watch-model.md:9 [full-width-parens] 全角括号紧贴词条: Invariants
+skills/external/sdd-loop-driver/references/watch-model.md:11 [full-width-parens] 全角括号紧贴词条: driver liveness
+skills/external/sdd-loop-driver/references/watch-model.md:18 [full-width-parens] 全角括号紧贴词条: Vocabulary
+skills/external/sdd-loop-driver/references/watch-model.md:45 [full-width-parens] 全角括号紧贴词条: Verdict State Machine
+skills/external/sdd-loop-driver/references/watch-model.md:112 [full-width-parens] 全角括号紧贴词条: Proactive Rules
+skills/external/sdd-loop-driver/references/watch-model.md:123 [full-width-parens] 全角括号紧贴词条: Host Adapters
+skills/external/sdd-loop-driver/references/watch-model.md:150 [full-width-parens] 全角括号紧贴词条: pgrep 陷阱
+skills/external/sdd-loop-driver/references/watch-model.md:170 [full-width-parens] 全角括号紧贴词条: Manifest
+skills/external/sdd-project-setup/SKILL.md:26 [full-width-parens] 全角括号紧贴词条: 如「初始化 spec-kit」
+skills/external/sdd-project-setup/SKILL.md:33 [same-language-bracket] 括号语言与词条同向: S0–S2 + HANDOFF
+skills/external/sdd-project-setup/SKILL.md:97 [full-width-parens] 全角括号紧贴词条: 子代理委派说明——2026-10-16 裁定
+skills/internal/analyze-artifacts/references/detection-and-severity.md:6 [same-language-bracket] 括号语言与词条同向: applies before any pass
+skills/internal/analyze-artifacts/references/detection-and-severity.md:159 [same-language-bracket] 括号语言与词条同向: noise control — do not report these at any severity
+skills/internal/analyze-artifacts/references/validation-and-report.md:6 [same-language-bracket] 括号语言与词条同向: independent subagent pass
+skills/internal/analyze-artifacts/references/validation-and-report.md:93 [same-language-bracket] 括号语言与词条同向: report-skeleton slot
+skills/internal/analyze-artifacts/references/validation-and-report.md:99 [same-language-bracket] 括号语言与词条同向: post-remediation runs
+skills/internal/archive-session/SKILL.md:16 [same-language-bracket] 括号语言与词条同向: 不是按操作系统
+skills/internal/archive-session/SKILL.md:97 [same-language-bracket] 括号语言与词条同向: 候选路径均不存在
+skills/internal/archive-session/SKILL.md:98 [same-language-bracket] 括号语言与词条同向: 候选路径均不存在
+skills/internal/clarify-artifact/SKILL.md:70 [same-language-bracket] 括号语言与词条同向: see taxonomy reference
+skills/internal/clarify-artifact/SKILL.md:104 [same-language-bracket] 括号语言与词条同向: never ask the user for anything the repo can answer
+skills/internal/clarify-artifact/SKILL.md:128 [same-language-bracket] 括号语言与词条同向: max 5 questions internally
+skills/internal/clarify-artifact/SKILL.md:159 [same-language-bracket] 括号语言与词条同向: after each write
+skills/internal/code-review/SKILL.md:117 [full-width-parens] 全角括号紧贴词条: additional segment
+skills/internal/code-review/SKILL.md:121 [full-width-parens] 全角括号紧贴词条: reviewed files
+skills/internal/code-review/references/delta-setup.md:4 [full-width-parens] 全角括号紧贴词条: TTY
+skills/internal/code-review/references/delta-setup.md:33 [full-width-parens] 全角括号紧贴词条: Dockerfile 片段
+skills/internal/code-review/references/review-workflow.md:19 [full-width-parens] 全角括号紧贴词条: Author 的责任
+skills/internal/code-review/references/review-workflow.md:76 [full-width-parens] 全角括号紧贴词条: Reviewer 的责任
+skills/internal/collect-evidence/SKILL.md:12 [same-language-bracket] 括号语言与词条同向: 证据层中立红线
+skills/internal/collect-evidence/SKILL.md:27 [same-language-bracket] 括号语言与词条同向: 必填
+skills/internal/collect-evidence/references/evidence-discipline.md:27 [same-language-bracket] 括号语言与词条同向: 防侵蚀
+skills/internal/collect-evidence/references/evidence-discipline.md:31 [same-language-bracket] 括号语言与词条同向: 参考
+skills/internal/create-agent/SKILL.md:80 [same-language-bracket] 括号语言与词条同向: or refine it via
+skills/internal/create-agent/SKILL.md:122 [full-width-parens] 全角括号紧贴词条: 框架分发角色集
+skills/internal/create-agent/SKILL.md:123 [full-width-parens] 全角括号紧贴词条: 项目侧容量模板
+skills/internal/create-agent/SKILL.md:135 [same-language-bracket] 括号语言与词条同向: temporary vs persistent
+skills/internal/create-agent/SKILL.md:156 [same-language-bracket] 括号语言与词条同向: e.g. one per stage duty
+skills/internal/create-agent/SKILL.md:190 [same-language-bracket] 括号语言与词条同向: see § Mode Confirmation
+skills/internal/create-agent/SKILL.md:209 [same-language-bracket] 括号语言与词条同向: and optional wrapper script
+skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md:66 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md:70 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-module-designer-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-module-designer-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-module-designer-template.md:54 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-module-designer-template.md:58 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md:48 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md:53 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md:55 [same-language-bracket] 括号语言与词条同向: gap feedback
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:50 [same-language-bracket] 括号语言与词条同向: classic flow
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:55 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:58 [same-language-bracket] 括号语言与词条同向: interview mode
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:61 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:69 [same-language-bracket] 括号语言与词条同向: interview mode
+skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md:70 [same-language-bracket] 括号语言与词条同向: interview mode
+skills/internal/create-agent/templates/agent-capacity-system-designer-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-system-designer-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-system-designer-template.md:51 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-system-designer-template.md:55 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:48 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:52 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md:54 [same-language-bracket] 括号语言与词条同向: feedback loop
+skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md:19 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md:20 [same-language-bracket] 括号语言与词条同向: Meta role
+skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md:49 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md:54 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-agent/templates/agent-supervision-delegation.md:43 [same-language-bracket] 括号语言与词条同向: agent-layer objects
+skills/internal/create-agent/templates/agent-supervision-delegation.md:45 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-plan/SKILL.md:40 [same-language-bracket] 括号语言与词条同向: Outline steps 1–5
+skills/internal/create-requirements/SKILL.md:116 [same-language-bracket] 括号语言与词条同向: if data involved
+skills/internal/create-requirements/SKILL.md:125 [same-language-bracket] 括号语言与词条同向: do not paraphrase or condense it
+skills/internal/create-tasks/SKILL.md:42 [same-language-bracket] 括号语言与词条同向: Outline steps 1–6
+skills/internal/create-tasks/SKILL.md:426 [same-language-bracket] 括号语言与词条同向: per the S0 ruling
+skills/internal/create-team/SKILL.md:12 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-team/SKILL.md:22 [same-language-bracket] 括号语言与词条同向: create mode
+skills/internal/create-team/SKILL.md:33 [same-language-bracket] 括号语言与词条同向: 不设阻塞式停等
+skills/internal/create-team/SKILL.md:38 [same-language-bracket] 括号语言与词条同向: run mode
+skills/internal/create-team/SKILL.md:89 [same-language-bracket] 括号语言与词条同向: Decision Tree
+skills/internal/create-team/SKILL.md:131 [same-language-bracket] 括号语言与词条同向: all patterns
+skills/internal/create-team/SKILL.md:177 [same-language-bracket] 括号语言与词条同向: default REJECT
+skills/internal/create-team/references/capacity-vs-responsibility.md:16 [same-language-bracket] 括号语言与词条同向: create-agent
+skills/internal/create-team/references/capacity-vs-responsibility.md:26 [same-language-bracket] 括号语言与词条同向: create-team
+skills/internal/create-team/references/capacity-vs-responsibility.md:36 [same-language-bracket] 括号语言与词条同向: both directions
+skills/internal/create-team/references/conceptual-model.md:11 [same-language-bracket] 括号语言与词条同向: see the criterion below
+skills/internal/create-team/references/conceptual-model.md:44 [same-language-bracket] 括号语言与词条同向: necessary
+skills/internal/create-team/references/conceptual-model.md:45 [same-language-bracket] 括号语言与词条同向: not sufficient
+skills/internal/create-team/references/conceptual-model.md:59 [same-language-bracket] 括号语言与词条同向: Team Supervisor
+skills/internal/create-team/references/conceptual-model.md:67 [same-language-bracket] 括号语言与词条同向: single Meta role
+skills/internal/create-team/references/conceptual-model.md:70 [same-language-bracket] 括号语言与词条同向: task decomposition + worker dispatch
+skills/internal/create-team/references/conceptual-model.md:73 [same-language-bracket] 括号语言与词条同向: the dynamic structure
+skills/internal/create-team/references/conceptual-model.md:75 [same-language-bracket] 括号语言与词条同向: they run once and stop
+skills/internal/create-team/references/create-mode.md:9 [same-language-bracket] 括号语言与词条同向: unless one-shot
+skills/internal/create-team/references/create-mode.md:14 [same-language-bracket] 括号语言与词条同向: static structure
+skills/internal/create-team/references/create-mode.md:16 [same-language-bracket] 括号语言与词条同向: dynamic structure
+skills/internal/create-team/references/create-mode.md:28 [same-language-bracket] 括号语言与词条同向: user names a slug absent from
+skills/internal/create-team/references/create-mode.md:30 [same-language-bracket] 括号语言与词条同向: the plane the goal's object lives on
+skills/internal/create-team/references/create-mode.md:32 [same-language-bracket] 括号语言与词条同向: GD-2 slice scale
+skills/internal/create-team/references/create-mode.md:53 [same-language-bracket] 括号语言与词条同向: no per-tool symlink — framework-internal
+skills/internal/create-team/references/create-mode.md:135 [same-language-bracket] 括号语言与词条同向: 074a
+skills/internal/create-team/references/execution-guide.md:15 [same-language-bracket] 括号语言与词条同向: standard output
+skills/internal/create-team/references/goal.md:7 [full-width-parens] 全角括号紧贴词条: 协作模式
+skills/internal/create-team/references/goal.md:26 [same-language-bracket] 括号语言与词条同向: 目标叙述 + 成功判据
+skills/internal/create-team/references/goal.md:34 [same-language-bracket] 括号语言与词条同向: 重写目标或判据
+skills/internal/create-team/references/goal.md:42 [same-language-bracket] 括号语言与词条同向: 校验器与  同源
+skills/internal/create-team/references/goal.md:45 [same-language-bracket] 括号语言与词条同向: 写域是
+skills/internal/create-team/references/operating-loops.md:7 [full-width-parens] 全角括号紧贴词条: 收敛型
+skills/internal/create-team/references/operating-loops.md:66 [full-width-parens] 全角括号紧贴词条: 运行节奏
+skills/internal/create-team/references/operating-loops.md:96 [full-width-parens] 全角括号紧贴词条: report-only 的前置降档
+skills/internal/create-team/references/operating-loops.md:97 [full-width-parens] 全角括号紧贴词条: 等价临时降到 L1
+skills/internal/create-team/references/operating-loops.md:104 [full-width-parens] 全角括号紧贴词条: 区别于每次一份的
+skills/internal/create-team/references/operating-loops.md:150 [full-width-parens] 全角括号紧贴词条: continuous 扩展
+skills/internal/create-team/references/operating-loops.md:185 [full-width-parens] 全角括号紧贴词条: run 时 Supervisor 遵循
+skills/internal/create-team/references/optimization-goals.md:36 [full-width-parens] 全角括号紧贴词条: 工作副本 vs 真实路径 vs standalone 安装
+skills/internal/create-team/references/optimization-goals.md:45 [full-width-parens] 全角括号紧贴词条: 用最新实现产出制品
+skills/internal/create-team/references/optimization-goals.md:60 [full-width-parens] 全角括号紧贴词条: 两阶段标准套路
+skills/internal/create-team/references/patterns.md:7 [same-language-bracket] 括号语言与词条同向: Decision Tree
+skills/internal/create-team/references/patterns.md:35 [same-language-bracket] 括号语言与词条同向: 仅报告、不派 worker —  §1 与 §9
+skills/internal/create-team/references/patterns.md:56 [same-language-bracket] 括号语言与词条同向: no file overlap
+skills/internal/create-team/references/patterns.md:100 [same-language-bracket] 括号语言与词条同向: simulated in-session
+skills/internal/create-team/references/patterns.md:178 [same-language-bracket] 括号语言与词条同向: quality-first
+skills/internal/create-team/references/patterns.md:304 [same-language-bracket] 括号语言与词条同向: converge to the goal
+skills/internal/create-team/references/patterns.md:348 [same-language-bracket] 括号语言与词条同向: e.g. extend
+skills/internal/create-team/references/patterns.md:387 [same-language-bracket] 括号语言与词条同向: the "proxy"
+skills/internal/create-team/references/patterns.md:389 [same-language-bracket] 括号语言与词条同向: reload the latest target each iteration — see the progressive strategy's "重载最新实现" in
+skills/internal/create-team/references/summary-mapping.md:12 [same-language-bracket] 括号语言与词条同向: 派生物、自包含交付目录
+skills/internal/create-team/references/summary-mapping.md:28 [same-language-bracket] 括号语言与词条同向: 见 §3
+skills/internal/create-team/references/summary-mapping.md:168 [same-language-bracket] 括号语言与词条同向: 含总结状态行
+skills/internal/create-team/references/summary-mapping.md:192 [same-language-bracket] 括号语言与词条同向: 声明即同一 goal
+skills/internal/create-team/references/team-presets.md:60 [same-language-bracket] 括号语言与词条同向: its  reports are the evidence
+skills/internal/create-team/templates/agents/agent-parallel-orchestration-template.md:74 [same-language-bracket] 括号语言与词条同向: when the team config sets
+skills/internal/create-team/templates/agents/agent-serial-orchestration-template.md:8 [same-language-bracket] 括号语言与词条同向: optional quality gate between stages
+skills/internal/create-team/templates/agents/agent-stage-evaluator-template.md:14 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/create-team/templates/agents/agent-stage-evaluator-template.md:38 [same-language-bracket] 括号语言与词条同向: MANDATORY
+skills/internal/create-team/templates/agents/agent-stage-executor-template.md:23 [same-language-bracket] 括号语言与词条同向: MANDATORY
+skills/internal/create-team/templates/agents/agent-stage-optimizer-template.md:14 [same-language-bracket] 括号语言与词条同向: agent-layer objects
+skills/internal/create-team/templates/agents/agent-stage-optimizer-template.md:29 [same-language-bracket] 括号语言与词条同向: for convergence awareness
+skills/internal/create-team/templates/agents/agent-stage-optimizer-template.md:51 [same-language-bracket] 括号语言与词条同向: MANDATORY
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:19 [same-language-bracket] 括号语言与词条同向: task coordination
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:31 [same-language-bracket] 括号语言与词条同向: two layers
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:87 [same-language-bracket] 括号语言与词条同向: operating loop
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:91 [same-language-bracket] 括号语言与词条同向: one-line note to
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:98 [same-language-bracket] 括号语言与词条同向: Inputs
+skills/internal/create-team/templates/agents/agent-team-supervisor-template.md:104 [same-language-bracket] 括号语言与词条同向: Outputs
+skills/internal/create-team/templates/teams/capability-arena.md:122 [same-language-bracket] 括号语言与词条同向: ≥2 个同类能力单元同题对比
+skills/internal/create-tools/SKILL.md:14 [same-language-bracket] 括号语言与词条同向: same behavior across runs and agents
+skills/internal/implement-feature/SKILL.md:37 [same-language-bracket] 括号语言与词条同向: steps 1–9
+skills/internal/implement-feature/SKILL.md:261 [same-language-bracket] 括号语言与词条同向: named action
+skills/internal/implement-feature/SKILL.md:377 [same-language-bracket] 括号语言与词条同向: fallback
+skills/internal/implement-feature/SKILL.md:398 [same-language-bracket] 括号语言与词条同向: a clarify pass outside a running implementation
+skills/internal/improve-team/SKILL.md:23 [same-language-bracket] 括号语言与词条同向: cascades into structure realignment — see
+skills/internal/improve-team/SKILL.md:30 [same-language-bracket] 括号语言与词条同向: 条目多不代表目标范围被覆盖
+skills/internal/improve-team/SKILL.md:33 [same-language-bracket] 括号语言与词条同向: never auto-scan other teams
+skills/internal/improve-team/SKILL.md:36 [same-language-bracket] 括号语言与词条同向: examples
+skills/internal/improve-team/references/goal-editing.md:3 [same-language-bracket] 括号语言与词条同向: 定义、与 requirement 的分界、判据权威、单一性
+skills/internal/improve-team/references/goal-editing.md:16 [full-width-parens] 全角括号紧贴词条: 重定义总体目标
+skills/internal/improve-team/references/goal-editing.md:18 [same-language-bracket] 括号语言与词条同向: 声明了
+skills/internal/improve-team/references/goal-editing.md:19 [same-language-bracket] 括号语言与词条同向: 未声明
+skills/internal/manage-agents/references/setup/available-tuples.md:37 [same-language-bracket] 括号语言与词条同向: when all credentials loaded
+skills/internal/manage-agents/references/setup/unified-variables.md:54 [same-language-bracket] 括号语言与词条同向: per tool
+skills/internal/manage-features/SKILL.md:25 [same-language-bracket] 括号语言与词条同向: the durable artifact space this skill owns
+skills/internal/manage-features/SKILL.md:29 [same-language-bracket] 括号语言与词条同向: user-facing
+skills/internal/manage-features/SKILL.md:30 [same-language-bracket] 括号语言与词条同向: existing
+skills/internal/manage-features/SKILL.md:68 [same-language-bracket] 括号语言与词条同向: Actions 0–9
+skills/internal/manage-features/SKILL.md:70 [same-language-bracket] 括号语言与词条同向: MUST do first
+skills/internal/manage-features/SKILL.md:78 [same-language-bracket] 括号语言与词条同向: functional + non-functional
+skills/internal/manage-feedback/SKILL.md:14 [same-language-bracket] 括号语言与词条同向: digest in this project
+skills/internal/manage-feedback/SKILL.md:15 [same-language-bracket] 括号语言与词条同向: package for the framework upstream
+skills/internal/manage-feedback/SKILL.md:148 [same-language-bracket] 括号语言与词条同向: possible only in a client project
+skills/internal/manage-feedback/references/path-a-digest.md:13 [same-language-bracket] 括号语言与词条同向: framework hat only
+skills/internal/manage-feedback/references/path-a-digest.md:127 [same-language-bracket] 括号语言与词条同向: 或
+skills/internal/manage-feedback/references/path-a-digest.md:248 [same-language-bracket] 括号语言与词条同向: mandatory closing step of the digest run
+skills/internal/manage-feedback/references/path-b-and-probe.md:8 [same-language-bracket] 括号语言与词条同向: Package For The Framework Upstream
+skills/internal/manage-feedback/references/path-b-and-probe.md:78 [same-language-bracket] 括号语言与词条同向: explicit request only
+skills/internal/manage-goal/SKILL.md:22 [same-language-bracket] 括号语言与词条同向: carried verbatim from the command's positioning
+skills/internal/manage-goal/SKILL.md:183 [same-language-bracket] 括号语言与词条同向: kept in
+skills/internal/manage-history/SKILL.md:45 [same-language-bracket] 括号语言与词条同向: where its history would live
+skills/internal/manage-history/SKILL.md:64 [same-language-bracket] 括号语言与词条同向: no verbatim retelling
+skills/internal/manage-history/SKILL.md:107 [same-language-bracket] 括号语言与词条同向: writing distilled knowledge into long-term project memory
+skills/internal/manage-instructions/SKILL.md:76 [same-language-bracket] 括号语言与词条同向: Update Strategy
+skills/internal/manage-instructions/SKILL.md:148 [same-language-bracket] 括号语言与词条同向: Actions 1–8
+skills/internal/manage-instructions/SKILL.md:165 [same-language-bracket] 括号语言与词条同向: never rendering the template over it
+skills/internal/manage-instructions/SKILL.md:381 [same-language-bracket] 括号语言与词条同向: content restored from backup history
+skills/internal/manage-todo/SKILL.md:123 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/manage-todo/SKILL.md:133 [same-language-bracket] 括号语言与词条同向: see Park Mode Step 4
+skills/internal/manage-todo/SKILL.md:216 [same-language-bracket] 括号语言与词条同向: any other file
+skills/internal/manage-todo/SKILL.md:300 [same-language-bracket] 括号语言与词条同向: delegated
+skills/internal/manage-todo/SKILL.md:307 [same-language-bracket] 括号语言与词条同向: kept in
+skills/internal/research-feature/SKILL.md:36 [same-language-bracket] 括号语言与词条同向: Outline steps 1–5
+skills/internal/review-sdd-process/SKILL.md:105 [same-language-bracket] 括号语言与词条同向: used when no downstream artifact or process step inherits the finding
+skills/internal/review-sdd-process/SKILL.md:118 [same-language-bracket] 括号语言与词条同向: quoted excerpt
+skills/internal/run-agent/SKILL.md:15 [same-language-bracket] 括号语言与词条同向: the frontmatter vocabulary and validation rules
+skills/internal/run-agent/SKILL.md:57 [full-width-parens] 全角括号紧贴词条: 拒收报错并列冲突字段
+skills/internal/run-agent/SKILL.md:58 [full-width-parens] 全角括号紧贴词条: 模板缺失即停
+skills/internal/run-agent/SKILL.md:85 [full-width-parens] 全角括号紧贴词条: 用户可随时叫停
+skills/internal/run-agent/SKILL.md:240 [same-language-bracket] 括号语言与词条同向: organize or run several agents together
+skills/internal/run-agent/references/dispatch-preflight.md:15 [full-width-parens] 全角括号紧贴词条: 目标项目侧
+skills/internal/run-interview/SKILL.md:122 [same-language-bracket] 括号语言与词条同向: what converges
+skills/internal/run-interview/SKILL.md:143 [same-language-bracket] 括号语言与词条同向: see
+skills/internal/run-interview/SKILL.md:308 [same-language-bracket] 括号语言与词条同向: fire-and-forget subagent invocation
+skills/internal/run-team/SKILL.md:17 [same-language-bracket] 括号语言与词条同向: 下无匹配 slug
+skills/internal/sanitize-materials/SKILL.md:146 [same-language-bracket] 括号语言与词条同向: seven stages
+skills/internal/sanitize-materials/SKILL.md:194 [same-language-bracket] 括号语言与词条同向: with reversibility marking
+skills/internal/sanitize-materials/SKILL.md:245 [same-language-bracket] 括号语言与词条同向: R1–R5
+skills/internal/sanitize-materials/SKILL.md:295 [same-language-bracket] 括号语言与词条同向: N1–N5
+skills/internal/sanitize-materials/SKILL.md:352 [same-language-bracket] 括号语言与词条同向: red lines
+skills/internal/self-improvement/SKILL.md:35 [same-language-bracket] 括号语言与词条同向: optional
+skills/internal/self-improvement/SKILL.md:36 [same-language-bracket] 括号语言与词条同向: optional
+skills/internal/study-project/SKILL.md:114 [same-language-bracket] 括号语言与词条同向: 3-5 similar projects with positioning differences
+skills/internal/study-project/SKILL.md:115 [same-language-bracket] 括号语言与词条同向: why this project needs to exist separately
+skills/internal/study-project/SKILL.md:131 [same-language-bracket] 括号语言与词条同向: ≤3 per round
+skills/internal/study-project/SKILL.md:140 [same-language-bracket] 括号语言与词条同向: no fixed template
+skills/internal/study-project/SKILL.md:208 [same-language-bracket] 括号语言与词条同向: follow user's language if different
+skills/internal/summarize-project/SKILL.md:4 [full-width-parens] 全角括号紧贴词条: 由 manage-project 重构而来
+skills/internal/summarize-project/SKILL.md:31 [full-width-parens] 全角括号紧贴词条: 呈现位总表与模板见 [progress-presentation.md]
+skills/internal/summarize-project/references/consistency-rules.md:50 [full-width-parens] 全角括号紧贴词条: 规程见 [source-tiers.md]
+skills/internal/summarize-project/references/consistency-rules.md:188 [full-width-parens] 全角括号紧贴词条: 见 §0.3 与 [source-tiers.md]
+skills/internal/summarize-project/references/consistency-rules.md:358 [full-width-parens] 全角括号紧贴词条: 可移植性纪律见 [portability.md]
+skills/internal/summarize-project/references/consistency-rules.md:428 [full-width-parens] 全角括号紧贴词条: §0.1、§10.3 W-3
+skills/internal/summarize-project/references/consistency-rules.md:521 [full-width-parens] 全角括号紧贴词条: Feedback 冲突裁决
+skills/internal/summarize-project/references/consistency-rules.md:567 [full-width-parens] 全角括号紧贴词条: CG-COVERAGE
+skills/internal/summarize-project/references/consistency-rules.md:636 [full-width-parens] 全角括号紧贴词条: 见 [source-tiers.md] §5.3
+skills/internal/summarize-project/references/data-model.md:23 [full-width-parens] 全角括号紧贴词条: Record
+skills/internal/summarize-project/references/data-model.md:44 [full-width-parens] 全角括号紧贴词条: 见 [degradation.md] 第 3 节
+skills/internal/summarize-project/references/data-model.md:45 [full-width-parens] 全角括号紧贴词条: 字段清单与红线见 [people-encoding.md] 第 1.0 节
+skills/internal/summarize-project/references/data-model.md:48 [full-width-parens] 全角括号紧贴词条: Goal Block
+skills/internal/summarize-project/references/data-model.md:67 [full-width-parens] 全角括号紧贴词条: Task Record
+skills/internal/summarize-project/references/data-model.md:92 [full-width-parens] 全角括号紧贴词条: Milestone Record
+skills/internal/summarize-project/references/data-model.md:111 [full-width-parens] 全角括号紧贴词条: 可移植性纪律见 [portability.md]
+skills/internal/summarize-project/references/data-model.md:113 [full-width-parens] 全角括号紧贴词条: People Roster
+skills/internal/summarize-project/references/degradation.md:16 [full-width-parens] 全角括号紧贴词条: 档位见 [required-info.md] 第 2 节
+skills/internal/summarize-project/references/degradation.md:56 [full-width-parens] 全角括号紧贴词条: 不强求 phase→task→subtask
+skills/internal/summarize-project/references/degradation.md:73 [full-width-parens] 全角括号紧贴词条: duration
+skills/internal/summarize-project/references/degradation.md:105 [full-width-parens] 全角括号紧贴词条: git tag、release note、verification 通过记录、路线图节点、用户明确口述的节点
+skills/internal/summarize-project/references/milestones.md:11 [full-width-parens] 全角括号紧贴词条: 见 [people-encoding.md] 第 2 节
+skills/internal/summarize-project/references/milestones.md:25 [full-width-parens] 全角括号紧贴词条: 如  的 version
+skills/internal/summarize-project/references/milestones.md:69 [full-width-parens] 全角括号紧贴词条: 细则与唯一权威见 [people-encoding.md] 4.3
+skills/internal/summarize-project/references/milestones.md:73 [full-width-parens] 全角括号紧贴词条: 见 people-encoding 4.4
+skills/internal/summarize-project/references/people-encoding.md:56 [full-width-parens] 全角括号紧贴词条: 色板全表见 [reporting-playbook.md] §1.1
+skills/internal/summarize-project/references/people-encoding.md:248 [full-width-parens] 全角括号紧贴词条: 遵循 draw-diagram
+skills/internal/summarize-project/references/portability.md:65 [full-width-parens] 全角括号紧贴词条: 结构见 [degradation.md] 第 6 节
+skills/internal/summarize-project/references/portability.md:66 [full-width-parens] 全角括号紧贴词条: [consistency-rules.md] §1.1
+skills/internal/summarize-project/references/progress-presentation.md:9 [full-width-parens] 全角括号紧贴词条: JSON
+skills/internal/summarize-project/references/progress-presentation.md:45 [full-width-parens] 全角括号紧贴词条: 读者用语纪律见 [reporting-playbook.md] §1.7
+skills/internal/summarize-project/references/progress-presentation.md:246 [full-width-parens] 全角括号紧贴词条: 与 [degradation.md] 协同
+skills/internal/summarize-project/references/reporting-playbook.md:5 [full-width-parens] 全角括号紧贴词条: 见 [consistency-rules.md] §0.1
+skills/internal/summarize-project/references/reporting-playbook.md:86 [full-width-parens] 全角括号紧贴词条: 命令见第 5 节
+skills/internal/summarize-project/references/reporting-playbook.md:258 [full-width-parens] 全角括号紧贴词条: [progress-presentation.md] §5 清单逐行
+skills/internal/summarize-project/references/reporting-playbook.md:293 [full-width-parens] 全角括号紧贴词条: [progress-presentation.md] §2 总表逐行核对
+skills/internal/summarize-project/references/reporting-playbook.md:305 [full-width-parens] 全角括号紧贴词条: [consistency-rules.md] §0.1、CG-11
+skills/internal/summarize-project/references/reporting-playbook.md:306 [full-width-parens] 全角括号紧贴词条: 判读纪律见 [consistency-rules.md] §8.1
+skills/internal/summarize-project/references/reporting-playbook.md:307 [full-width-parens] 全角括号紧贴词条: [consistency-rules.md] §11
+skills/internal/summarize-project/references/reporting-playbook.md:308 [full-width-parens] 全角括号紧贴词条: 条形起止 ⇄ 引擎日期、里程碑菱形 ⇄  一致
+skills/internal/summarize-project/references/reporting-playbook.md:314 [full-width-parens] 全角括号紧贴词条: [portability.md] 第 5 节
+skills/internal/summarize-project/references/reporting-playbook.md:319 [full-width-parens] 全角括号紧贴词条: 见 [required-info.md]
+skills/internal/summarize-project/references/reporting-playbook.md:326 [full-width-parens] 全角括号紧贴词条: 委托 [degradation.md]
+skills/internal/summarize-project/references/required-info.md:55 [full-width-parens] 全角括号紧贴词条: 与 [degradation.md] 第 3 节同口径
+skills/internal/summarize-project/references/required-info.md:133 [full-width-parens] 全角括号紧贴词条: 该组非空时
+skills/internal/summarize-project/references/required-info.md:153 [full-width-parens] 全角括号紧贴词条: 硬约定
+skills/internal/summarize-project/references/required-info.md:180 [full-width-parens] 全角括号紧贴词条: 默认 OFF
+skills/internal/summarize-project/references/source-tiers.md:3 [full-width-parens] 全角括号紧贴词条: 唯一权威见 [required-info.md]
+skills/internal/summarize-project/references/source-tiers.md:79 [full-width-parens] 全角括号紧贴词条: 例如只为  读 features.md 的状态列
+skills/internal/summarize-project/references/source-tiers.md:191 [full-width-parens] 全角括号紧贴词条: [milestones.md]「锚定与状态规则」
+skills/internal/summarize-project/references/source-tiers.md:262 [full-width-parens] 全角括号紧贴词条: [portability.md]
+skills/internal/summarize-project/references/task-progress.md:11 [full-width-parens] 全角括号紧贴词条: 降级形态见 [degradation.md] 第 5 节
+skills/internal/summarize-project/references/task-progress.md:40 [full-width-parens] 全角括号紧贴词条: daily→weekly→monthly
+skills/internal/summarize-project/references/task-progress.md:144 [full-width-parens] 全角括号紧贴词条: 全部 not-started
+skills/internal/summarize-project/references/work-breakdown.md:27 [full-width-parens] 全角括号紧贴词条: 字段清单见 people-encoding 第 1.0 节

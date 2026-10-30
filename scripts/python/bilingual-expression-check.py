@@ -321,7 +321,16 @@ def scan_file(path: Path, is_glossary: bool) -> List[Dict[str, Any]]:
         separator_re = re.compile(r"^\|[\s:|-]+\|?\s*$")
         for line_no, line in enumerate(lines, 1):
             if header_re.match(line):
-                in_table = True
+                # Header detection must require the full entry column set:
+                # the real glossary also carries a two-column
+                # ``| Canonical | <meaning> |`` row inside its
+                # ``## Column Definitions`` table: treating that row as the
+                # S1 header stops the scan at the next heading before the
+                # real entry table (review-stage regression leg
+                # test_scan_glossary_shape_skips_column_definitions_decoy).
+                header_cells = [c.strip() for c in line.strip().strip("|").split("|")]
+                if len(header_cells) >= 5:
+                    in_table = True
                 continue
             if not in_table or separator_re.match(line):
                 continue
