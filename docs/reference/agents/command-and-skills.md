@@ -143,7 +143,7 @@ they prefer a purpose-built framework skill over improvising the same operation.
 (and its `agent-capacity-*-template.md` generator) declares two things:
 
 1. **`skills:` frontmatter** — a YAML list of the canonical slugs of the installed skills
-   relevant to that role (e.g. `skills: [draw-diagram, memory-recall, memory-record, think-skills]`).
+   relevant to that role (e.g. `skills: [draw-diagram, memory-recall, memory-record, coaching-skills]`).
    Slugs MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`. Meta/framework-authoring skills (`create-agent`, `improve-agent`,
    `create-skills`, `improve-skills`, `create-team`, `improve-team`) are **non-declarable** and never appear
    in a role agent's list.

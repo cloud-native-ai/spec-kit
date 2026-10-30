@@ -33,7 +33,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 | NOT exists | `create-skills` | `skills/external/create-skills/SKILL.md` |
 | EXISTS(常规改优/两阶段合规) | `improve-skills` | `skills/external/improve-skills/SKILL.md` |
 | merge 意图(把一个技能合并进另一个) | `merge-skills` | `skills/external/merge-skills/SKILL.md` |
-| think / 思想演练意图(心智模拟一次执行) | `think-skills` | `skills/external/think-skills/SKILL.md` |
+| 教练意图(先给预期、再看真实执行、最后给微调) | `coaching-skills` | `skills/external/coaching-skills/SKILL.md`；调用形态 `coaching-skills <trainee-name\|trainee-path> <work>` |
 | run 意图(运行技能,含未被宿主注册者) | `run-skills` | `skills/internal/run-skills/SKILL.md` |
 
 ### `create-skills` — new Skill

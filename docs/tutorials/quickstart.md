@@ -125,7 +125,7 @@ Spec Kit ships with these skills ready to use:
 - `draw-diagram` — Interactive D3.js visualizations
 - `create-skills` / `improve-skills` — Skill lifecycle management
 - `create-agent` / `improve-agent` — Agent template lifecycle management
-- `think-skills` — Dry-run simulation of skills
+- `coaching-skills` — Coach a skill through one real run: expectation first, then the real execution, then the micro-adjustment plan
 
 ---
 
