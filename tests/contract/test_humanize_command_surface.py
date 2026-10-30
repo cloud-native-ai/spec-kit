@@ -39,8 +39,10 @@ runtime gates recorded in ``verification.md``, not in-test assertions.
 """
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import re
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -925,3 +927,331 @@ def test_rp18_reader_comprehension():
         "内部引擎调用形式",
     ):
         assert anchor in body, f"§ Fidelity & Honesty lacks the reader anchor {anchor!r} (RP-18)"
+
+
+# ===========================================================================
+# 079 US3 — safety & honesty clauses (T019)
+#
+# Clause groups and their owners:
+#   EX-11…EX-14  run-mode § Failure & No Retry (T020)
+#   EX-15、EX-16  run-mode § Confirmation Missing (T021)
+#   EX-17…EX-19  run-mode § Degradation & Boundaries (T022)
+#   EX-20、EX-21  run-mode § Reservation & Nesting (T023)
+#   IP-11…IP-14  run-mode § Reservation & Nesting (T023)
+#   SC-004       denied fixture + § Confirmation Missing (FR-012 / FR-019 / SC-004)
+#
+# This group lands BEFORE its implementation rows (T020–T023): red = the asserted
+# section or anchor is not on disk yet. The SC-004 pair is named with the SC prefix
+# because the clause tables carry no `denied`-specific clause; it therefore stays
+# outside T036's `test_(ip|ex|rp|cm|wc)` reverse-claim surface. The zero-exfiltration
+# and no-retry instruments are fixed here: a literal scan over the command template
+# and the skill source, a `git status --porcelain` snapshot around the assertions,
+# and the report `dispatches:` line as the only dispatch/retry counter source.
+# ===========================================================================
+
+NETWORK_CALL_TOKENS = ("curl", "wget", "httpx", "requests.", "urllib", "fetch(")
+
+
+def _run_mode_section(heading: str) -> str:
+    assert RUN_MODE_DOC.is_file(), f"run-mode reference missing: {RUN_MODE_DOC}"
+    return _section_body(_read(RUN_MODE_DOC), heading)
+
+
+def _reservation(stem: str) -> dict:
+    path = RUN_FIXTURES / "reservations" / f"{stem}.run"
+    assert path.is_file(), f"reservation fixture missing: {path}"
+    data = yaml.safe_load(_read(path))
+    assert isinstance(data, dict), f"{path} is not a reservation mapping (E4)"
+    for field in ("path", "created_at", "output_target", "ttl_hours"):
+        assert field in data, f"{path} lacks E4 field {field!r}"
+    return data
+
+
+def _git_status_snapshot() -> set:
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
+        capture_output=True, text=True, check=True,
+    )
+    return set(out.stdout.splitlines())
+
+
+def _tree_digest(root: Path) -> dict:
+    return {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*")) if path.is_file()
+    }
+
+
+def _network_hits(text: str) -> list:
+    return [
+        (i + 1, token)
+        for i, line in enumerate(text.splitlines())
+        for token in NETWORK_CALL_TOKENS
+        if token in line
+    ]
+
+
+# ---------------------------------------------------------------------------
+# EX-11 .. EX-14 — § Failure & No Retry (T020)
+# ---------------------------------------------------------------------------
+
+def test_ex11_no_compensating_redispatch():
+    body = _run_mode_section("## Failure & No Retry")
+    for anchor in ("至多一次执行尝试", "不自动重试", "补发一次", "停止消费"):
+        assert anchor in body, f"§ Failure & No Retry lacks the no-retry anchor {anchor!r} (EX-11)"
+
+
+def test_ex12_failure_coordinates_no_retry():
+    body = _run_mode_section("## Failure & No Retry")
+    for anchor in ("失败坐标", "载体", "阶段", "错误信息", "已完成部分", "MUST NOT 改写为成功"):
+        assert anchor in body, (
+            f"§ Failure & No Retry lacks the failure-coordinate anchor {anchor!r} (EX-12)"
+        )
+    failure = _envelope("failure")
+    assert failure["status"] == "failed", "the failure fixture must carry status failed (EX-12)"
+    assert failure["failures"], "the failure fixture must carry at least one failure coordinate"
+    for item in failure["failures"]:
+        assert item.get("where") and item.get("what"), (
+            f"failure fixture coordinate lacks where/what: {item!r} (EX-12)"
+        )
+
+
+def test_ex13_aborted_reported_as_aborted():
+    body = _run_mode_section("## Failure & No Retry")
+    for anchor in ("已中止", "中止点", "已完成部分"):
+        assert anchor in body, f"§ Failure & No Retry lacks the abort anchor {anchor!r} (EX-13)"
+
+
+def test_ex14_evidence_locatability_check():
+    body = _run_mode_section("## Failure & No Retry")
+    for anchor in ("可定位性", "未能核实", "MUST NOT 作为证据", "路径存在", "退出码自洽"):
+        assert anchor in body, (
+            f"§ Failure & No Retry lacks the locatability anchor {anchor!r} (EX-14)"
+        )
+    success = _envelope("success")
+    kinds = [e.get("kind") for e in success["evidence"] if isinstance(e, dict)]
+    assert "command" in kinds and "reading" in kinds, (
+        f"success fixture must pair a command pointer with a reading pointer, got {kinds}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# EX-15 .. EX-16 — § Confirmation Missing (T021)
+# ---------------------------------------------------------------------------
+
+def test_ex15_confirmation_missing_fail_closed():
+    body = _run_mode_section("## Confirmation Missing")
+    for anchor in ("不执行该步", "`blocked_at`", "需要确认，未获答复", "其余已完成部分照常报告"):
+        assert anchor in body, (
+            f"§ Confirmation Missing lacks the fail-closed anchor {anchor!r} (EX-15)"
+        )
+    pending = _envelope("needs-confirmation")
+    assert pending["status"] == "needs-confirmation"
+    assert pending["blocked_at"], "needs-confirmation fixture must record the blocking point"
+    assert pending["products"] == [], (
+        "needs-confirmation fixture must not claim writes from the unexecuted step"
+    )
+
+
+def test_ex16_no_proxy_answer():
+    body = _run_mode_section("## Confirmation Missing")
+    for anchor in ("MUST NOT 代替", "用户可能同意", "等价动作"):
+        assert anchor in body, (
+            f"§ Confirmation Missing lacks the no-proxy-answer anchor {anchor!r} (EX-16)"
+        )
+
+
+# ---------------------------------------------------------------------------
+# EX-17 .. EX-19 — § Degradation & Boundaries (T022)
+# ---------------------------------------------------------------------------
+
+def test_ex17_degraded_honesty():
+    body = _run_mode_section("## Degradation & Boundaries")
+    for anchor in ("声明降级", "可观察", "MUST NOT 把推断", "独立上下文", "独立工具集"):
+        assert anchor in body, (
+            f"§ Degradation & Boundaries lacks the honesty anchor {anchor!r} (EX-17)"
+        )
+    degraded = _envelope("degraded")
+    assert degraded["status"] == "completed"
+    assert degraded["failures"] == [], "degraded fixture models an observable clean run"
+
+
+def test_ex18_degraded_keeps_report_contract():
+    body = _run_mode_section("## Degradation & Boundaries")
+    for anchor in ("五节", "证据义务", "保真底线", "不改报告契约"):
+        assert anchor in body, (
+            f"§ Degradation & Boundaries lacks the unchanged-contract anchor {anchor!r} (EX-18)"
+        )
+
+
+def test_ex19_no_network_from_humanize():
+    body = _run_mode_section("## Degradation & Boundaries")
+    for anchor in (
+        "MUST NOT 发起网络请求",
+        "MUST NOT 调用外部服务",
+        "模型 API",
+        "披露",
+        "MUST NOT 记作",
+    ):
+        assert anchor in body, (
+            f"§ Degradation & Boundaries lacks the boundary anchor {anchor!r} (EX-19)"
+        )
+    before = _git_status_snapshot()
+    surfaces = [TEMPLATE, SKILL_SRC, *sorted(SKILL_SRC.parent.rglob("*.md"))]
+    hits = [(str(path), line_no, token)
+            for path in surfaces if path.is_file()
+            for line_no, token in _network_hits(_read(path))]
+    assert hits == [], (
+        f"humanize surfaces carry network-call literals (SC-007/EX-19): {hits}"
+    )
+    assert _git_status_snapshot() == before, (
+        "the contract check must not write to the working tree (zero-write/EX-19)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# EX-20 .. EX-21 — § Reservation & Nesting (T023)
+# ---------------------------------------------------------------------------
+
+def test_ex20_reservation_released_all_paths():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in ("任一出口", "正常", "失败", "中止", "异常", "释放", "不留残骸"):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the release anchor {anchor!r} (EX-20)"
+        )
+    run_a = _reservation("run-a")
+    run_b = _reservation("run-b")
+    assert run_a["ttl_hours"] == run_b["ttl_hours"] == 24, (
+        "the reservation fixtures must use the 24h TTL (E4)"
+    )
+    assert run_a["path"] != run_b["path"], "the two reservations must be distinct files (一文一件)"
+    assert run_a["created_at"] != run_b["created_at"], (
+        "the two reservations must carry distinct start times for conflict naming"
+    )
+
+
+def test_ex21_dispatch_record_line():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in ("`report-shape.md` § Evidence", "只计 humanize 发起的顶层派发"):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the dispatch-count pointer {anchor!r} (EX-21)"
+        )
+    evidence = _section_body(_read(REPORT_SHAPE_DOC), "## Evidence")
+    assert "`dispatches:`" in evidence, (
+        "§ Evidence must own the dispatches: record line (EX-21/RP-08)"
+    )
+    assert "MUST NOT 重复计数" in evidence, (
+        "§ Evidence must state that instruction-owned dispatches are not recounted (EX-21)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# IP-11 .. IP-14 — § Reservation & Nesting (T023)
+# ---------------------------------------------------------------------------
+
+def test_ip11_active_run_rejected():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in (
+        "`.specify/.tmp/humanize/<run_id>.run`",
+        "`active-run`",
+        "冲突 `run_id`",
+        "起始时间",
+        "仓库级",
+    ):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the active-run anchor {anchor!r} (IP-11)"
+        )
+    assert _reservation("run-a")["path"].startswith(".specify/.tmp/humanize/"), (
+        "reservation fixture path must model the sanctioned temp root (E4)"
+    )
+
+
+def test_ip12_output_occupied_rejected():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in ("`output-occupied`", "目标路径", "冲突 `run_id`", "目标级"):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the output-occupied anchor {anchor!r} (IP-12)"
+        )
+    assert _reservation("run-b")["output_target"], (
+        "run-b must model a target-level reservation with an output target"
+    )
+    assert _reservation("run-a")["output_target"] is None, (
+        "run-a must model a repository-level reservation without an output target"
+    )
+
+
+def test_ip13_nested_invocation_rejected():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in ("`nested-invocation`", "speckit.humanize", "大小写不敏感", "保守判定", "命中的字面量"):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the nesting anchor {anchor!r} (IP-13)"
+        )
+    nested = (RUN_FIXTURES / "nested" / "instruction.txt").read_text(encoding="utf-8")
+    assert "speckit.humanize" in nested.lower(), (
+        "the nested fixture must carry the closed invocation token (IP-13)"
+    )
+
+
+def test_ip14_reject_paths_write_nothing():
+    body = _run_mode_section("## Reservation & Nesting")
+    for anchor in (
+        "拒绝路径",
+        "MUST NOT 产生派发",
+        "MUST NOT 留下占位",
+        "MUST NOT 写入任何文件",
+    ):
+        assert anchor in body, (
+            f"§ Reservation & Nesting lacks the reject-path anchor {anchor!r} (IP-14)"
+        )
+    before = _git_status_snapshot()
+    _ = _reservation("run-a")
+    _ = _reservation("run-b")
+    assert _git_status_snapshot() == before, (
+        "reading the reject-path fixtures must not write to the working tree (IP-14)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# SC-004 — user denied the confirmation (FR-012 / FR-019 / SC-004)
+# ---------------------------------------------------------------------------
+
+def test_sc04_denied_no_side_effect():
+    body = _run_mode_section("## Confirmation Missing")
+    for anchor in ("零副作用", "MUST NOT 执行任何替代动作", "MUST NOT 写入任何文件"):
+        assert anchor in body, (
+            f"§ Confirmation Missing lacks the denied-no-side-effect anchor {anchor!r} (SC-004)"
+        )
+    denied = _envelope("denied")
+    assert denied["status"] == "denied", "the denied fixture must carry status denied"
+    assert denied["products"] == [], "a denied step must produce no products (SC-004)"
+    whats = " ".join(item.get("what", "") for item in denied["failures"])
+    assert "未执行任何替代动作" in whats, (
+        f"the denied fixture must state that no substitute action ran (SC-004): {whats!r}"
+    )
+    target = RUN_FIXTURES / "needs-confirmation"
+    before_status = _git_status_snapshot()
+    before_tree = _tree_digest(target)
+    _ = _envelope("denied")
+    after_tree = _tree_digest(target)
+    assert after_tree == before_tree, (
+        "the denied path must leave the target tree byte-identical (SC-004): "
+        f"{sorted(set(after_tree.items()) ^ set(before_tree.items()))}"
+    )
+    assert _git_status_snapshot() == before_status, (
+        "the denied path must leave the working tree unchanged (SC-004)"
+    )
+
+
+def test_sc04_denied_verdict_and_scope():
+    body = _run_mode_section("## Confirmation Missing")
+    for anchor in ("用户拒绝确认", "未执行范围", "`## Evidence`", "aborted", "FR-019"):
+        assert anchor in body, (
+            f"§ Confirmation Missing lacks the denied-report anchor {anchor!r} (SC-004)"
+        )
+    denied = _envelope("denied")
+    assert denied["status"] == "denied"
+    assert denied["blocked_at"], "the denied fixture must keep the refusal point in blocked_at"
+    whats = " ".join(item.get("what", "") for item in denied["failures"])
+    assert "用户拒绝确认" in whats and "未执行范围" in whats, (
+        f"the denied fixture must record the refusal reason and unexecuted scope: {whats!r}"
+    )

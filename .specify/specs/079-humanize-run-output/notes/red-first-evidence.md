@@ -112,3 +112,46 @@ FAILED tests/contract/test_humanize_command_surface.py::test_rp18_reader_compreh
 - **退出码**: `1`；**读数**: `8 failed, 6 passed, 38 deselected, 1 warning in 0.10s`
 - **转绿**: `test_rp05…test_rp10`（6 条；§ Conclusion / § Key Changes / § Evidence / § Risks & Limits 已落盘）。
 - **仍红（预期红先行）**: `test_rp11…test_rp18`（8 条）——§ Next Steps / § Language / § Fidelity & Honesty 的实施行是 T017 / T018，不在本段范围。
+
+---
+
+## T019 — US3 契约组（2026-10-30T16:05Z）
+
+### 树状态（红态）
+
+- `tests/contract/test_humanize_command_surface.py`：新增 US3 组 `test_ex11…test_ex21`、`test_ip11…test_ip14` 与 SC-004 拒绝确认对 `test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope`（函数名逐字取自 `contracts/execution-dispatch.contract.md`、`contracts/invocation-parse.contract.md` 的可追溯性表；SC 前缀组按 tasks.md T019 的命名约定，不进条款反向认领面）。
+- `skills/external/humanize/references/run-mode.md`：§ Failure & No Retry、§ Confirmation Missing、§ Degradation & Boundaries、§ Reservation & Nesting **尚未落笔**（T020–T023 的实现目标）。
+- 判定仪器写死在断言里：网络调用字面量静态扫描（`curl` / `wget` / `httpx` / `requests.` / `urllib` / `fetch(`，URL 文本不计）、`git status --porcelain` 前后快照、`dispatches:` 行作为派发与重试计数唯一来源。
+
+### 命令与真实输出
+
+```
+.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py -k "ex11 or ex12 or ex13 or ex14 or ex15 or ex16 or ex17 or ex18 or ex19 or ex20 or ex21 or ip11 or ip12 or ip13 or ip14 or sc04"
+```
+
+- **退出码**: `1`
+- **失败计数**: `17 failed, 52 deselected, 1 warning in 0.37s`
+
+失败名（真实 short summary，逐字）：
+
+```
+FAILED tests/contract/test_humanize_command_surface.py::test_ex11_no_compensating_redispatch
+FAILED tests/contract/test_humanize_command_surface.py::test_ex12_failure_coordinates_no_retry
+FAILED tests/contract/test_humanize_command_surface.py::test_ex13_aborted_reported_as_aborted
+FAILED tests/contract/test_humanize_command_surface.py::test_ex14_evidence_locatability_check
+FAILED tests/contract/test_humanize_command_surface.py::test_ex15_confirmation_missing_fail_closed
+FAILED tests/contract/test_humanize_command_surface.py::test_ex16_no_proxy_answer
+FAILED tests/contract/test_humanize_command_surface.py::test_ex17_degraded_honesty
+FAILED tests/contract/test_humanize_command_surface.py::test_ex18_degraded_keeps_report_contract
+FAILED tests/contract/test_humanize_command_surface.py::test_ex19_no_network_from_humanize
+FAILED tests/contract/test_humanize_command_surface.py::test_ex20_reservation_released_all_paths
+FAILED tests/contract/test_humanize_command_surface.py::test_ex21_dispatch_record_line
+FAILED tests/contract/test_humanize_command_surface.py::test_ip11_active_run_rejected
+FAILED tests/contract/test_humanize_command_surface.py::test_ip12_output_occupied_rejected
+FAILED tests/contract/test_humanize_command_surface.py::test_ip13_nested_invocation_rejected
+FAILED tests/contract/test_humanize_command_surface.py::test_ip14_reject_paths_write_nothing
+FAILED tests/contract/test_humanize_command_surface.py::test_sc04_denied_no_side_effect
+FAILED tests/contract/test_humanize_command_surface.py::test_sc04_denied_verdict_and_scope
+```
+
+失败原因统一为「被断言的小节不存在」（`section '## Failure & No Retry' / '## Confirmation Missing' / '## Degradation & Boundaries' / '## Reservation & Nesting' missing`）；这是预期的红先行态，不是实现缺陷。
