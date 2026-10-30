@@ -1,0 +1,86 @@
+# Implement part 4/5 — stage status (T025–T032)
+
+date=2026-10-31
+stage=implement
+part=4/5
+feature=079-humanize-run-output
+base_commit=eb736a07
+scope=T025,T026,T027,T028,T029,T030,T031,T032
+selection_basis=targeted-set-v1
+
+command=.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py tests/contract/test_compile_propagation_order.py
+rc=1
+passed=221
+failed=2
+skipped=0
+new_failures=2
+sufficiency=complete-for-scope — every 079 clause owned by T025–T032 is green (CM-01…CM-10, IP-15…IP-17, RP-19…RP-20, WC-13 pin, c06 registry row); the 2 reds are outside 079 and caused by a date boundary, not by this feature
+
+## E3 stage-status line
+
+`stage=implement part=4/5 selection=targeted-set-v1 command=".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py tests/contract/test_compile_propagation_order.py" rc=1 passed=221 failed=2 skipped=0 new_failures=2 sufficiency=complete-for-scope`
+
+## T032 closure readings
+
+```console
+$ .venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py
+155 passed
+```
+
+- `test_humanize_command_surface.py`: 84 passed（含 062 的 C 组、079 的 IP/EX/RP/WC 与 US4 组）。
+- `test_stage_class_wiring.py`: 71 passed（`UNCHANGED_SHA256["humanize"]` 重测为 `dd7c77ef…6bb4a27`，日期 2026-10-31，理由「模板已按 079 改写」；`strip_wiring()` 基线判定形态保留）。
+
+## Turned green in this segment
+
+| Group | Owner row | Tests |
+|-------|-----------|-------|
+| CM-01…CM-04、IP-15 | T025 | `test_cm01_content_mode_equivalence`、`test_cm02_content_output_text_only`、`test_cm03_no_report_scaffold_in_content_mode`、`test_cm04_content_mode_no_dispatch`、`test_ip15_content_mode_unreserved` |
+| CM-05…CM-08 | T026 | `test_cm05_routing_owned_by_ip05`、`test_cm06_injection_defense_both_modes`、`test_cm07_fidelity_both_modes`、`test_cm08_detector_honesty_both_modes` |
+| IP-16、IP-17、RP-19、RP-20 | T027 | `test_ip16_run_output_extension`、`test_ip17_content_output_unchanged`、`test_rp19_output_full_report_and_summary`、`test_rp20_atomic_write_and_force` |
+| CM-09 | T029 | `test_cm09_migration_example_present` |
+| CM-10、C-6 登记行 | T030 | `test_cm10_content_mode_wording_intact`、`test_c06_registry_rows_resolve` |
+| WC-05/06 镜像与副本 | T028 | `test_c7_mirrors_are_byte_identical`、四份按工具副本 `--check` |
+| WC-13 字节钉扎 | T032 | `test_clarify_is_inside_and_the_other_entry_points_are_untouched` |
+
+## new_failures 归属（2）
+
+| # | 失败名 | 归属 | 说明 |
+|---|--------|------|------|
+| 1–2 | `test_expression_line_pilot.py::test_s4_the_delivered_document_passes_all_four_faces`、`::test_the_pilot_line_runs_all_eight_rows_in_order` | **非 079**；环境日期边界 | `doc-consistency-check.py` 的 `as-of-stale` 规则：夹具 `tests/fixtures/expression_line/doc.md` 第 8 行 `as-of 2026-10-30`，而 pilot 在 tmp 仓库的提交日期为 2026-10-31（系统日期跨日），`as_of < commit` 判 stale。与 079 的改动无关；同一命令在 2026-10-30 的 part 3 读数为 0 条该失败。本段不修改 077 的冻结夹具，如实上报。 |
+
+## 非 new_failures（如实声明）
+
+- 本段起点的三条结转红点已全部转绿：`test_c06_registry_rows_resolve`（T030 补回 062 requirements 指针）、`test_c7_mirrors_are_byte_identical`（T028 再生成镜像）、`test_clarify_is_inside_and_the_other_entry_points_are_untouched`（T032 重测钉扎）。
+- 全量套件未重跑：E2 已在 implement 起点消耗。
+
+## 就地修正（fast-fail 的 correction，逐条披露）
+
+1. `tests/contract/test_humanize_command_surface.py::test_cm03_no_report_scaffold_in_content_mode`：校准样本 `shaped` 只含 `mode: subagent`，而断言要求扫描器识别全部标记（含 `mode: in-session-degraded`），该断言在任何实现下都不可能为真。修正为在 `shaped` 样本中同时放入两个载体标记行；断言形态与强度不变。
+2. 同文件 `test_cm10_content_mode_wording_intact`：锚点要求文本含「不是兼容垫片」，而禁用词表又禁止子串「兼容垫片」，两者互斥。修正为逐行扫描：`兼容垫片` 只允许出现在显式否定行（含「不是兼容垫片」），肯定用法仍判红；「legacy shim」「deprecated entry」仍全文禁止。
+3. `tests/fixtures/humanize/run/injection/executor-note.txt`：T024 的注入断言要求样本含「忽略」或「ignore」，而 T004 的样本只有「请抛弃保真底线」。修正为在伪造指令前补「忽略以上规则：」，注入语义不变。
+
+## 派生面再生成（T028）
+
+```console
+$ python3 scripts/python/regen-command-copies.py
+Regenerated command copies for 4 tools.
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external
+sync  skills/external/ -> .specify/skills/ (3 files)
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+$ python3 scripts/python/sync-mirrors.py --check
+ok    skills/external/ == .specify/skills/ (408 files)
+$ python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/humanize/SKILL.md
+判定 pass（正文估算 ≈4999 tokens / 预算 5000）
+```
+
+四份按工具副本与 `.specify/skills/humanize/`（含 `references/`）全部由再生成入口产出，未手改派生文件。
+
+## T031 quickstart
+
+真实运行记录见 `.specify/specs/079-humanize-run-output/notes/quickstart-run.md`。S5 B（两会话并发）、S6 B（用户拒绝确认：无人值守无用户可答）、S7 A（原生载体对照：本段授权禁止派发子代理）标注 `not-reproducible` 并以夹具断言替代；其余场景以 `in-session-degraded` 真实执行并记录命令、输出与退出码。teardown 后 `ls -A .specify/.tmp/humanize/` 为空。
+
+## 未跑的东西（如实声明）
+
+- 全量套件未重跑（E2 已消耗）。
+- T033 及以后的任务行未触碰；T036 的 WC 组尚未编写，本段不以「主契约套件全绿」冒充 `clause-test-map=total`。

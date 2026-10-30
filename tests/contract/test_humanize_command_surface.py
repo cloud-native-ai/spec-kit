@@ -1340,6 +1340,7 @@ def test_cm03_no_report_scaffold_in_content_mode(tmp_path):
     shaped.write_text(
         "\n".join([
             CARRIER_NATIVE,
+            CARRIER_DEGRADED,
             "verdict: success",
             "## Conclusion",
             "## Key Changes",
@@ -1437,10 +1438,18 @@ def test_cm10_content_mode_wording_intact():
         assert anchor in text, (
             f"SKILL.md lacks the retained-entry anchor {anchor!r} (CM-10)"
         )
-    for banned in ("legacy shim", "deprecated entry", "兼容垫片"):
+    for banned in ("legacy shim", "deprecated entry"):
         assert banned not in text, (
             f"SKILL.md must not downgrade content mode with {banned!r} (CM-10)"
         )
+    # "兼容垫片" is admissible only inside an explicit negation ("不是兼容垫片");
+    # any affirmative use would downgrade the retained entry (CM-10).
+    for i, line in enumerate(text.splitlines()):
+        if "兼容垫片" in line:
+            assert "不是兼容垫片" in line, (
+                f"SKILL.md:{i + 1} uses 兼容垫片 without an explicit negation (CM-10): "
+                f"{line.strip()[:80]!r}"
+            )
 
 
 # ---------------------------------------------------------------------------
