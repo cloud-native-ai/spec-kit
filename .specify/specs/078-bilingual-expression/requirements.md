@@ -5,6 +5,8 @@
 **Status**: Draft
 **Flow Class**: expression
 **Flow Type**: technique-document
+**Readers**: 框架维护者（编写与评审 `shared/`、`templates/` 文档的作者）、词汇表维护者、下游项目使用者——读者基准不新建，按 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议 的全局基准读者判定
+**Reading scenario**: 判断一处概念/流程的定义行是否必须双语、其形态（方向/括号宽度/紧贴/用词）是否合规时打开本规格核对 FR-001…FR-018，并据其决定是否为 `/speckit.plan` 放行
 **Input**: User description: "在当前项目中增加一个新的特性: \"双语表述\". 这个特性的主要内容是: 所有核心概念,关键流程在定义名词和动词的时候需要添加中英文双语的形式, 中文(English)或English(中文), 在之前的框架中已经包含了这一概念,很多核心文档也是这样实践的. 这样做的好处是在不同的context和大语言模型中能够\"锚定语义\", 避免因为名词或动词的错误理解造成语义错误."
 
 ## Related Feature *(mandatory)*
@@ -58,6 +60,7 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 - **A6（Related Feature 本阶段直接绑定）**：派发简报裁决「解析为新建 Feature 078 并写绑定结论」，覆盖技能默认的「Need clarification」初始化；故无 `[NEEDS CLARIFICATION]` 标记。
 - **A7（检查器为交付物之一，但语义判断不在其内）**：确定性检查器按 FR-009/FR-010 交付；它只判机械形态，「这行是否定义处」的可判定信号由 owner 文档界定（FR-002），信号之外的部分由评审面承担，检查器不做语义判断、LLM 不参与匹配计数。
 - **A8（中文侧用词以词汇表为准的判读）**：「中文侧用词以项目词汇表为准」（简报 §4）落实为——同一概念的英文形式由 owner 约定给出后，中文形式 MUST 与词汇表 Canonical 的中文侧一致；词汇表无该词条时，先登记词条再使用双语形态。
+- **A9（无人值守 clarify 的裁决权威与登记位置）**：本轮 `/speckit.clarify` 无人值守运行，访谈式问题按 materiality 过滤（答案会改变下游产物的才成题）由执行者自行裁决；全部裁决以 Q/A 形态登记于 `## Clarifications` → `### Session 2026-10-30`（本阶段追加 5 行），可推翻项（A5 等）经复核后维持原裁决。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -219,3 +222,8 @@ M-1/M-2 为行长匹配聚合数（同一行多次出现会重复计数），作
 - Q: 原文「English(中问)」的读法 → A: 按「English(中文)」理解，`中问` 为 `中文` 的笔误（用户裁决，U0 入口声明；登记为 Assumptions A1）。
 - Q: 括号形态的唯一标准（半角/全角、空格） → A: 半角括号、紧贴两侧词条（`中文(English)` / `English(中文)`），依据 Grounded Naming 用户输入优先（Assumptions A4）；全角 1383 处存量形态记为已知差异不追溯。
 - Q: Related Feature 绑定时机（技能默认「Need clarification」） → A: 派发简报裁决本阶段直接绑定新建 Feature 078（Assumptions A6）。
+- Q: 读者声明缺失（G-clarify-reader 算子，blocking）如何补齐 → A: 头部（前 40 非空行内）补 `**Readers**` / `**Reading scenario**` 两行且值非空；读者基准不新建，引用 `.specify/shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议。
+- Q: A5（词汇表 Canonical 双语化，原文留「clarify 可推翻」）本轮是否推翻 → A: 维持 A5。Canonical 是 FR-005 跨文档一致性的唯一判定基准，回退单语将使 SC-005 失去锚点；现状锚点 M-7（132/161 已双语化）表明该实践已被接受；推翻需联动改写 FR-005 / US2 / SC-005 而无下游收益，materiality 过滤不通过。
+- Q: 唯一形态的大小写维度（`english(中文)` vs `English(中文)`）是否需新增显式条款 → A: 无需新增 FR。FR-005 与 US2 验收场景的「逐字一致 / 以词汇表 Canonical 为准」已把大小写纳入精确匹配；检查器的形态常量（含大小写）归 owner 文档（FR-001）与 plan 阶段落实，本阶段不锁定字面量。
+- Q: A2 / A4 携带条件升级条款（re-baseline / 重开条件）是否构成未决选择 → A: 不构成。按 decision-tension 形态为承重决策记录预期反指标与重开条件，是裁决的组成部分而非挂起项；判定维持 Flow Class `expression`（A2）与半角唯一形态（A4）。
+- Q: FR-010 / FR-014 / SC-005 将机制决定（检查器运行入口与退出码、漂移守卫形态、SC-005 抽样比例）推迟至 plan 阶段，是否现在锁定 → A: 维持分阶段推迟。三处均在规格内留名了决定者与义务，属 SDD 固有分工；现在锁定只缩减 plan 自由度、不改变任何下游产物内容，materiality 过滤不通过。
