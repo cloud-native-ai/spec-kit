@@ -8,9 +8,18 @@ baseline_branch=078-coaching-skills
 baseline_commit_derivation=the requirements-fix commit the analyze-loop rebaseline event names in `.specify/state/078-coaching-skills.md` (`<!-- rebaseline-events -->`), and the `BASE` the plan/quickstart pin for the SC-008 new-line gate; it is the last commit before the first implementation edit and an ancestor of HEAD (`git merge-base --is-ancestor d0f50759 HEAD` exit 0)
 baseline_full_suite_passed=6810
 baseline_full_suite_failed=16
-baseline_full_suite_note=the single implement-start full-suite slot (E2); the 16 names are frozen in `baseline-failed.txt` and are pre-existing reds unrelated to this feature — the seven frozen-roster reds this feature owns are the ones counted next
+baseline_full_suite_note=the single implement-start full-suite slot (E2); the 16 names are frozen in the tracked, name-sorted `baseline-failed.txt` (repo-relative path `.specify/specs/078-coaching-skills/baseline-failed.txt`) and are pre-existing reds unrelated to this feature — the seven frozen-roster reds this feature owns are the ones counted next
 baseline_frozen_roster_reds=7
 baseline_gate_blocking_total=27
+
+# -- Closure failure-name comparison (F5) --
+
+closure_baseline_evidence=.specify/specs/078-coaching-skills/baseline-failed.txt
+closure_baseline_scope=full suite at implement start: 6810 passed / 16 failed / 7 skipped; 16 failing node ids, C-sorted
+closure_final_evidence=.specify/specs/078-coaching-skills/final-failed.txt (written by the post-review closure full-suite slot; not created yet)
+closure_comparison_command=comm -13 .specify/specs/078-coaching-skills/baseline-failed.txt .specify/specs/078-coaching-skills/final-failed.txt
+closure_comparison_rule=output lists node ids present only in the final run; empty output means zero new failures
+closure_comparison_note=`baseline-failed.txt` is the single name-level baseline for closure and is now tracked; `test-evidence/part4-baseline-failed.txt` and `test-evidence/part4-current-failed.txt` are feature-scoped diagnostics and are never the closure comparator
 
 # -- /speckit.implement results --
 
@@ -31,7 +40,7 @@ post_change_skill_shape_tokens=3278
 sample_id=SC-001
 evidence_path=.specify/specs/078-coaching-skills/test-evidence/sc001-run-artifacts.txt
 evidence_sha256=c041ccee01f7980d74130352e0c82d7b90f9e7adad9e94208f785a5385b75ca1
-verdict=pass
+verdict=partial
 
 sample_id=SC-002
 evidence_path=.specify/specs/078-coaching-skills/test-evidence/sc002-ordering.txt
@@ -51,7 +60,7 @@ verdict=pass
 sample_id=SC-005
 evidence_path=.specify/specs/078-coaching-skills/test-evidence/sc005-degraded.txt
 evidence_sha256=d80c9cd59e1b535d90d07bb8ebe1afb1f5fbc523fe0b2795c318fe69818f490c
-verdict=pass
+verdict=partial
 
 sample_id=SC-006
 evidence_path=.specify/specs/078-coaching-skills/test-evidence/sc006-identity-and-residual.txt
@@ -75,9 +84,11 @@ verdict=pass
 
 # -- Success Criteria evaluation --
 
-SC-001_status=pass
+SC-001_status=partial
 SC-001_value=4/4 artifacts + 1/1 primary artifact
+SC-001_transport=self-report (scripted one-shot runner, mode: run-skills-explicit-path)
 SC-001_note=the real fixture run produced `expectation.md`, `observation.md`, `deviations.md`, `improvement-plan.md` under `.specify/memory/coaching/20261030T083250Z-fixture-trainee/` and its Trainee artifact `checklist.md`; the run-shape validator returned no error; see notes/quickstart-run.md § Scenario 2 and test-evidence/sc001-run-artifacts.txt
+SC-001_validation_gap=宿主原生子代理派发通道未实测：本轮由脚本化 one-shot runner 驱动，七行观测全为 `self-report`，FR-009「恰好一个子代理」与 A5 的原生派发优先阶梯未被该运行证据覆盖。已证事实保留：四产物 4/4 按序存在、主产物 `checklist.md` 真实存在（4/5 行完成，OC-1 未达，run: partial）。
 
 SC-002_status=pass
 SC-002_value=ordering holds 1/1; negative control 1/1
@@ -91,13 +102,15 @@ SC-004_status=pass
 SC-004_value=gap marker 1/1; invented steps 0
 SC-004_note=the contract guard pins the marker to step rows only, counts it once and rejects a repeated marker or a stale count; the real run recorded `gap-count: 0` with seven rows all `source: self-report` and added no step the runner's event log does not contain
 
-SC-005_status=pass
+SC-005_status=partial
 SC-005_value=primary artifact 1/1; `optimization: unavailable` 1/1
+SC-005_transport=self-report (scripted one-shot runner; degraded copy)
 SC-005_note=with `improve-skills` removed from both layers (`skills/external`, `skills/internal` and the `.specify/skills` mirror), the degraded run still delivered the Trainee artifact and closed `run: partial` + `optimization: unavailable` — never `failed`
+SC-005_validation_gap=退化运行同样由脚本化 one-shot runner 完成、观测为 `self-report`；FR-029 的「两个独立上下文」未实测，宿主原生派发通道未覆盖。已证事实保留：两层 `improve-skills` 均不可用时主产物仍交付、`run: partial` + `optimization: unavailable`、未判 `failed`。
 
 SC-006_status=pass
 SC-006_value=8/8 coordinates; 1 surviving occurrence
-SC-006_note=the guard copy passes all eight coordinate judgements and derives its candidate faces at run time (22 faces / 1608 files, 0 live occurrences); the diagnostic repo grep over A10's 19 hand-edited sources finds exactly one hit, `src/specify_cli/__init__.py:892` — the `_OBSOLETE_SKILLS` tuple entry (`notes/residual-audit.md`)
+SC-006_note=the guard copy passes all eight coordinate judgements and derives its candidate faces at run time (22 faces / 1608 files, 0 live occurrences); the diagnostic repo grep over the 19 pre-feature hand-edited sources enumerated by A10 finds exactly one hit, `src/specify_cli/__init__.py:892` — the `_OBSOLETE_SKILLS` tuple entry (`notes/residual-audit.md`). A10's 20th hand-edited source, `scripts/python/sanitize-utils.py` (`LEGACY_SKILL_NAMES`), is covered by the guard copy through the `scripts` mirror pair and its old-name entry sits inside the sanctioned `OBSOLETE-ASSET-REGISTRY` block, stripped before live counting; the allowed difference set remains exactly the `_OBSOLETE_SKILLS` line
 
 SC-007_status=pass
 SC-007_value=2/2
@@ -111,10 +124,39 @@ SC-009_status=pass
 SC-009_value=4/4
 SC-009_note=each of the four frozen rosters carries the new name plus a 2026-10-30 / Feature 078 note (counts unchanged: 27 commands, 52 skills = 15 external + 37 internal, 49 hash-manifest skills) and the four files pass together (48 passed); no silent count edit — the manifest itself stays untouched and the retired path is resolved by the register instead
 
+# -- Analyze 残留处置（F3, analyze loop 1/1） --
+
+disposition_note=本表只承载处置与证据指针，不复制 analyze 报告中的 finding 正文；ID 以 analyze 门报出的编号为准
+residual_count_at_analyze_gate=9 MEDIUM + 9 LOW（M-08…M-17 去掉已闭合的 M-11；L-11…L-19）
+disposition_summary=2 fixed-in-implementation（M-11, M-14）；17 accepted-deferred；0 waived
+disposition_closed_definition=accepted-deferred 表示已判定为非阻断、本轮不改、closure 不以它为前提；无一项被静默丢弃
+
+| ID | Severity | Disposition | One-line reason | Evidence pointer |
+|----|----------|-------------|-----------------|------------------|
+| M-08 | MEDIUM | accepted-deferred | 非阻断；实现阶段未对该项做改动，按 analyze-r3 的 C0/H0 放行原样保留，closure 不以它为前提 | `test-evidence/analyze-stage-status.txt:28` |
+| M-09 | MEDIUM | accepted-deferred | 非阻断；实现阶段未对该项做改动，按 analyze-r3 的 C0/H0 放行原样保留，closure 不以它为前提 | `test-evidence/analyze-stage-status.txt:28` |
+| M-10 | MEDIUM | accepted-deferred | 非阻断；实现阶段未对该项做改动，按 analyze-r3 的 C0/H0 放行原样保留，closure 不以它为前提 | `test-evidence/analyze-stage-status.txt:28` |
+| M-11 | MEDIUM | fixed-in-implementation | claim 冲突分支映射到 `optimization: failed`（不新增取值），随 plan-fix2 落地 | `66edf74f`; `test-evidence/plan-fix2-status.txt` |
+| M-12 | MEDIUM | accepted-deferred | 非阻断；实现阶段未对该项做改动，按 analyze-r3 的 C0/H0 放行原样保留，closure 不以它为前提 | `test-evidence/analyze-stage-status.txt:28` |
+| M-13 | MEDIUM | accepted-deferred | 由 checklist H pass 提出（raised 5 之一）；属文本/一致性缺口，未在实现面产生变更 | `test-evidence/analyze-stage-status.txt:28`; `checklists/coaching-loop-2026-10-30.md` |
+| M-14 | MEDIUM | fixed-in-implementation | teardown 后置到场景 2/4 实跑之后，RUN_ID 由本次运行回填，不再硬编码 | `5e82668e`; `test-evidence/tasks-fix2-status.txt` |
+| M-15 | MEDIUM | accepted-deferred | 实现按 `data-model.md` § Optimization claim 执行；owner 文本歧义留作后续 plan 小修 | `data-model.md` § Optimization claim; `review.md` § F3 |
+| M-16 | MEDIUM | accepted-deferred | 实现按 `data-model.md` § Optimization claim 执行；owner 文本歧义留作后续 plan 小修 | `data-model.md` § Optimization claim; `review.md` § F3 |
+| M-17 | MEDIUM | accepted-deferred | 由 checklist H pass 提出（raised 5 之一）；属文本/一致性缺口，未在实现面产生变更 | `test-evidence/analyze-stage-status.txt:28`; `checklists/coaching-loop-2026-10-30.md` |
+| L-11 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+| L-12 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+| L-13 | LOW | accepted-deferred | 由 checklist H pass 提出（raised 5 之一）；文本/一致性缺口，既有条款已覆盖其判定面 | `test-evidence/analyze-stage-status.txt:28`; `checklists/coaching-loop-2026-10-30.md` |
+| L-14 | LOW | accepted-deferred | 由 checklist H pass 提出（raised 5 之一）；文本/一致性缺口，既有条款已覆盖其判定面 | `test-evidence/analyze-stage-status.txt:28`; `checklists/coaching-loop-2026-10-30.md` |
+| L-15 | LOW | accepted-deferred | 由 checklist H pass 提出（raised 5 之一）；文本/一致性缺口，既有条款已覆盖其判定面 | `test-evidence/analyze-stage-status.txt:28`; `checklists/coaching-loop-2026-10-30.md` |
+| L-16 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+| L-17 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+| L-18 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+| L-19 | LOW | accepted-deferred | 非阻断 LOW；无 SC 或门禁引用，按原样保留为后续小修 | `test-evidence/analyze-stage-status.txt:28` |
+
 # -- Deferred tasks --
 
-deferred_tasks=
-deferred_reason_summary=none — T025-T031 all executed in this segment
+deferred_tasks=none (all T025-T031 executed in this segment)
+deferred_reason_summary=tasks: none; analyze residuals: 17 accepted-deferred + 2 fixed-in-implementation (M-11, M-14), see § Analyze 残留处置
 
 # -- Free-form notes --
 

@@ -1,0 +1,6 @@
+# targeted set — 2026-10-30 — review-repair
+# command: /Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q --tb=no -rf tests/contract/test_coaching_*.py tests/contract/test_expression_compatibility.py tests/contract/test_migration_distribution.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_run_skills_wiring.py tests/contract/test_compile_propagation_order.py
+........................................................................ [ 59%]
+..................................................                       [100%]
+122 passed in 4.50s
+exit=0
