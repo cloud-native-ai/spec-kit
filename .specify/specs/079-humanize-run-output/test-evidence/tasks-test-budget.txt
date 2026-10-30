@@ -1,0 +1,8 @@
+# Tasks-stage test budget — Feature 079
+date=2026-10-30
+stage=tasks
+status=not-run-docs-only
+reason=本阶段只产出 tasks.md（任务清单）与 Feature 062 的 tasks 阶段追加登记，不改动任何可执行面、接线文件与测试文件；测试预算按 docs-only 处理。
+runnable-checks-executed=test-evidence/tasks-validate.txt / tasks-decomposition-check.txt / tasks-pre-analyze-check.txt
+test-run=not run at this stage
+next=implement 阶段按 § Test Budget 在起点捕获一次失败名基线，再逐故事跑定向集，review 后 closure 跑全量

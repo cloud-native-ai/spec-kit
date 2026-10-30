@@ -1,0 +1,7 @@
+# Tasks-stage gate — validate-tasks.py
+date=2026-10-30
+stage=tasks
+cmd=python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
+--- stdout/stderr ---
+PASS: .specify/specs/079-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)
+exit_status=0
