@@ -7,7 +7,7 @@ baseline_date=2026-10-30
 baseline_branch=079-humanize-run-output
 
 implementation_date=2026-10-31
-post_change_commit=PENDING_SELF_COMMIT
+post_change_commit=46394dd4
 
 SC-001_status=partial
 SC-001_value=五节 5/5 已证；dispatches 原生 1 不可复现，降级载体实跑取 0
