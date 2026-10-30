@@ -1,4 +1,4 @@
-# validate-requirements — 2026-10-30 — stage=review-repair (F1 A10 20-file closed surface)
+# validate-requirements — 2026-10-30 — stage=review-repair (F1 A10 20-file closed surface; final HEAD)
 # command: python3 scripts/python/validate-requirements.py .specify/specs/078-coaching-skills/requirements.md
 file: .specify/specs/078-coaching-skills/requirements.md
 status: ok

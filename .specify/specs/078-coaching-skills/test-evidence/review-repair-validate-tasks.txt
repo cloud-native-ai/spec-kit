@@ -1,4 +1,4 @@
-# validate-tasks — 2026-10-30 — stage=review-repair (F1)
+# validate-tasks — 2026-10-30 — stage=review-repair (final HEAD)
 # command: python3 scripts/python/validate-tasks.py .specify/specs/078-coaching-skills/tasks.md
 PASS: .specify/specs/078-coaching-skills/tasks.md — 0 error(s), 0 warning(s)
 exit=0
