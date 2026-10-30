@@ -1,0 +1,19 @@
+# SC-001 evidence — one fixture coaching run produced 4/4 artifacts and a real primary artifact
+# date=2026-10-30  feature=078-coaching-skills
+
+## run-shape validator (imported from tests/contract/test_coaching_run_contract.py)
+run_dir: .specify/memory/coaching/20261030T083250Z-fixture-trainee
+artifacts: ['deviations.md', 'expectation.md', 'improvement-plan.md', 'observation.md']
+expectation mtime: 1793349175.2307684
+validator errors: []
+verdict: pass
+
+## primary artifact (the Trainee's checklist.md, copied from the run workspace)
+| # | item | status |
+|---|---|---|
+| 1 | Build passes. | PENDING |
+| 2 | Unit tests pass. | PENDING |
+| 3 | Migration dry-run succeeds. | PENDING |
+| 5 | On-call owner is named. | PENDING |
+
+## artifact census: expectation.md observation.md deviations.md improvement-plan.md = 4/4; primary artifact rows=4 of 5 (OC-1 not met -> run: partial)

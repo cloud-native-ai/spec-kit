@@ -1,0 +1,11 @@
+# SC-002 evidence — expectation.md lands before the first dispatch action, negative control included
+# date=2026-10-30  feature=078-coaching-skills
+
+## run 1 ordering (real run)
+expectation.md mtime : 1793349175.2307684 (= 2026-10-30T08:32:55.230768Z), read by the validator
+dispatched-at        : 2026-10-30T08:32:58.017522+00:00
+expectation older than dispatch = yes (validator reported no ordering error)
+
+## negative control — a missing expectation or a second dispatch must fail the validator
+.                                                                        [100%]
+1 passed in 0.02s

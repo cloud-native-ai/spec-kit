@@ -1,0 +1,44 @@
+# SC-008 evidence — derived faces zero drift, new lines zero blocking hits
+# date=2026-10-30  feature=078-coaching-skills
+
+## mirrors and command copies
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (406 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (117 files)
+ok    shared/ == .specify/shared/ (60 files)
+sync-mirrors rc=0
+OK: all per-tool command copies match the source templates.
+regen-command-copies rc=0
+
+## new-line gate — BASE=d0f50759 (feature baseline: the requirements-fix commit named by the analyze-loop rebaseline event in .specify/state/078-coaching-skills.md)
+$ git diff "$BASE" -- templates/commands skills shared 'templates/*.md' | grep "^+" | grep -v "^+++" | <BLOCKING_RE filter>
+### new-line gate BASE=d0f50759
+added_lines=475 blocking_hits=0
+rc=0
+
+## pre-change baseline reading (same command, same pattern source)
+# SC-008 / FR-027 门控判定基线（H-02 修复：新增行单位）
+date=2026-10-30
+stage=requirements-fix (analyze loop 1/1)
+base_commit=6c5e26f9
+
+## 扫描面（scan-confirmation-gates.py 的 SCAN_DIRS + SCAN_ROOT_FILES）
+templates/commands/**.md, skills/**.md, shared/**.md, templates/*.md
+
+$ git diff 6c5e26f9 -- templates/commands skills shared templates/*.md | grep '^+' | grep -v '^+++'
+added_lines=0
+
+## 新增行对照 BLOCKING_PATTERNS（scripts/python/scan-confirmation-gates.py:46）
+blocking_hits=0
+
+## 工具自身基线读数（同一棵树）
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+
+结论：新增行 0 命中 BLOCKING_PATTERNS；总量基线 blocking=27（destructive 20 / governance_kept 7），violations=0。本阶段为 docs-only，扫描面本身零差异。

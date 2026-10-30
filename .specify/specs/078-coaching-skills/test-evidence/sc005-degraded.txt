@@ -1,0 +1,25 @@
+# SC-005 evidence — improve-skills unavailable in both layers, execution still delivered
+# date=2026-10-30  feature=078-coaching-skills
+
+## both layers absent in the one-shot copy
+absent: skills/external/improve-skills/SKILL.md
+absent: skills/internal/improve-skills/SKILL.md
+absent: .specify/skills/improve-skills/SKILL.md
+absent: .specify/skills/internal/improve-skills/SKILL.md
+
+## degraded run validator
+run_dir: .specify/.tmp/coaching-degraded/.specify/memory/coaching/20261030T083352Z-fixture-trainee
+artifacts: ['deviations.md', 'expectation.md', 'improvement-plan.md', 'observation.md']
+validator errors: []
+run-not-failed: True
+
+## run status of the degraded run
+## Run Status
+- run: partial
+- optimization: unavailable
+
+`optimization: unavailable` because the `improve-skills` entry cannot be resolved in this one-shot copy at either layer — `skills/external/improve-skills/SKILL.md` and `.specify/skills/improve-skills/SKILL.md` are both absent (the internal layer too). Per `data-model.md` § RunStatus the unavailable optimization is reported beside the execution verdict and does not cap it: the run stays `partial` because the primary artifact exists but misses `OC-1`, never `failed` for lack of optimization.
+
+## contract guard — unavailable never fails a completed execution
+.                                                                        [100%]
+1 passed in 0.02s
