@@ -6,10 +6,10 @@ feature: "076"
 tags: ["run-determination", "r20261029t172918z-076a-chk"]
 title: "run-determination /speckit.checklist r20261029T172918Z-076a-chk"
 created: "2026-10-29T10:18:33Z"
-summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated 
   "feature": "076",
   "feature_id": null,
   "determined_at": "2026-10-29T10:18:33Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T11:21:11Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated 
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -157,18 +157,6 @@ summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated 
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -188,11 +176,6 @@ summary: "/speckit.checklist run=r20261029T172918Z-076a-chk token=not_evaluated 
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
