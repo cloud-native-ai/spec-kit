@@ -1,3 +1,4 @@
+$ python3 scripts/python/validate-requirements.py .specify/specs/078-coaching-skills/requirements.md
 file: .specify/specs/078-coaching-skills/requirements.md
 status: ok
   [id-contiguous] pass (0)
@@ -7,3 +8,7 @@ status: ok
   [dup-id] pass (0)
 scanned: 251 lines, 38 definition rows, 17 shared strings
 0 error(s), 0 warning(s)
+exit=0
+duration_ms=50
+date=2026-10-30
+stage=requirements-fix (analyze loop 1/1)

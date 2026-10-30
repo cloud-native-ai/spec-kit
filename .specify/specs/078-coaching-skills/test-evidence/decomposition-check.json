@@ -1,1 +1,6 @@
-{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 29, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T05:37:20Z"}
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/078-coaching-skills/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 29, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T06:22:40Z"}
+exit=0
+duration_ms=41
+date=2026-10-30
+stage=requirements-fix (analyze loop 1/1)

@@ -43,7 +43,7 @@
 - **A6（观测通道与缺省）**：宿主能看到子代理事件时以**宿主事件**为主（字段标 [[STR-011]]）；看不到时子代理 MUST 回传结构化记录（逐步动作、工具调用、产物、耗时、状态变化，字段标 [[STR-012]]）；两通道都有时字段级冲突以宿主事件为准。两者都拿不到的步骤以 [[STR-006]] 标注为观测缺口，**不得编造**；缺口不计入效率评分，但必须在报告中计数与点名。
 - **A7（两个新概念无既有 owner）**：本文定义的「结果—正确性」与「过程—效率」在框架内无既有 owner；本文是它们的首个定义点，plan/contracts 可细化但 MUST NOT 另立第二份定义。它们与 `run-determination` 的四量（token 消耗/耗时/制品正确性/满意度）不是同一组概念：后者描述一次运行的判定，前者描述「Trainee 相对预期」的偏差。
 - **A8（旧项目升级）**：旧目录名进入 `_OBSOLETE_SKILLS` 后，`specify init` 的加性 copytree 会留下旧目录，清理步骤 MUST 删除该**实体目录**，但 MUST NOT 删除用户自建的同名**符号链接**（既有清理纪律：符号链接可能是用户别名）。
-- **A9（历史不改写）**：`.specify/specs/**`、`memory/evidence/**`、`features/<ID>.md`、reviews、eval-baseline、按 `skill:think-skills` 归档的 run/feedback 记录均为 dated record，不改写、不回填；新名的 run 从空历史开始。
+- **A9（历史不改写）**：不改写的边界是**本特性 `078-coaching-skills` 自己的产物目录之外的既有记录**——其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、`features/<其他ID>.md`、reviews、eval-baseline、按 `skill:think-skills` 归档的 run/feedback 记录均为 dated record，不改写、不回填。本特性自身的产物（`.specify/specs/078-coaching-skills/**`、`.specify/memory/features/078.md` 与本特性新写入的 run/feedback 记录）不属历史记录，MUST 可正常改写与重跑；新名的 run 从空历史开始（不继承旧名 run 记录）。
 - **A10（封闭清单判据）**：「活接线面」是封闭集——本特性开始前实测的 19 个需手改源文件（技能本体 2、路由模板 1、agents 2、create-agent 角色模板 4、run-skills 1、shared/definitions 2、src `_OBSOLETE_SKILLS` 1、docs 2、contract tests 4），加上由它们再生成的派生面；SC-006 / SC-008 的零残留与零漂移判据以该封闭集为参照，历史记录不在集合内（A9）。**允许差异集恰为一项**：`_OBSOLETE_SKILLS` 中保留旧名的那一行（FR-020 要求它必须存在）；除此之外空集。
 - **A11（零新增门禁）**：门控预算整数余量当前为 0（既有 owner 记载），本特性 MUST NOT 在扫描面新增任何命中 `BLOCKING_PATTERNS` 的文案；判定单位是 `git diff` 的**新增行**而非总量（总量相等允许「加一门、删一门」的规避）。技能流程中的「暂停询问」措辞 MUST 按既有门禁纪律书写，且不得以确认门形态表达。
 
@@ -164,7 +164,7 @@
 - **FR-021**: 派生面（`.specify/skills/**`、命令副本、渲染后的宿主 agents、编译的 `## Wrap-up`、probe-map）MUST 由既有再生成入口产出，MUST NOT 手改。
 - **FR-022**: 全部活接线引用（`agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md`、四个 `create-agent` 角色模板、`run-skills` 的 modify 族说明、docs 两处）MUST 更新为新名；活接线面 MUST NOT 残留 [[STR-002]]。
 - **FR-023**: 四个冻结基线测试 MUST 显式更新并注明日期与理由；MUST NOT 静默改计数，更新后的计数 MUST 与目录实测一致。
-- **FR-024**: 历史记录（`.specify/specs/**`、`memory/evidence/**`、`features/<ID>.md`、reviews、eval-baseline、按旧 unit id 归档的 run/feedback 记录）MUST NOT 被改写或回填。
+- **FR-024**: **本特性 `078-coaching-skills` 产物目录之外的**既有记录（其他特性的 `.specify/specs/<其他特性>/**`、`memory/evidence/**`、其他 `features/<ID>.md`、reviews、eval-baseline、按旧 unit id 归档的 run/feedback 记录）MUST NOT 被改写或回填；反过来，本特性自身产物（`.specify/specs/078-coaching-skills/**`、`.specify/memory/features/078.md`）不属历史记录，MUST 可正常改写与重跑，MUST NOT 以「历史不改写」为由拒绝更新。
 
 #### F. 治理
 
@@ -192,9 +192,9 @@
 - **SC-003**: 双维度判定——含植入的正确性缺陷与效率退化的夹具，偏差报告在 [[STR-008]] 与 [[STR-009]] 两个维度各至少一条带证据的偏差（2/2）；只有单一维度时判失败。
 - **SC-004**: 观测诚实性——含一處不可观测步骤的夹具，记录中[[STR-006]]恰出现一次（1/1），且无编造步骤（人工复核 0 条）。
 - **SC-005**: 执行优先——在夹具中同时移除 `improve-skills` 的源与镜像两层并让入口指向一个不存在的单元（确保「不可用」可构造），运行仍交付 Trainee 主工件（1/1），并以 `optimization: unavailable`（[[STR-010]]）单列报告（1/1）。
-- **SC-006**: 重命名一致性——在 A10 的封闭活接线面内 [[STR-002]] 出现次数**恰为 1**（仅 `_OBSOLETE_SKILLS` 行，允许差异集见 A10）；[[STR-001]]/[[STR-003]] 在每个坐标上各出现**恰好一次**（目录、frontmatter、skill_id、路由行、flow-class 行、probe 行；计数按坐标而非子串，[[STR-001]] 被 [[STR-003]] 包含不重复计）；`flow-class-check.py --action lookup` 对 [[STR-003]] 解析为 `execution / behavior-oracle`；probe 编译 `--check` 退出 0；路由行指向 [[STR-005]]（5/5）。
+- **SC-006**: 重命名一致性——在 A10 的封闭活接线面内 [[STR-002]] 出现次数**恰为 1**（仅 `_OBSOLETE_SKILLS` 行，允许差异集见 A10）；FR-018 的**八个身份坐标**逐个核对、每个坐标各以一条判定通过：① 源目录（`skills/external/[[STR-001]]/` 存在、`skills/external/[[STR-002]]/` 不存在）；② frontmatter `name`；③ `skill_id` 与 Resource ID 的 Canonical ID/Path；④ 运行时 unit id [[STR-003]]（`flow-class-check.py --action lookup` 对其解析为 `execution / behavior-oracle`）；⑤ flow-class 定义行；⑥ probe 定义行与 probe id [[STR-004]]（probe 编译 `--check` 退出 0）；⑦ `/speckit.skills` 路由行与路径（指向 [[STR-005]]）；⑧ description 触发词与 Trainee 调用形态（点名 [[STR-001]] 且写明 `[[STR-001]] <trainee-name|trainee-path> <work>`）。计数按坐标而非子串，[[STR-001]] 被 [[STR-003]] 包含不重复计（8/8）。
 - **SC-007**: 升级兼容——夹具项目含旧实体目录与用户同名符号链接，跑一次 `specify init` 后旧目录被删除、符号链接保留（2/2）。
-- **SC-008**: 派生零漂移——`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均退出 0；`scan-confirmation-gates.py` 的 blocking 计数改动前后相等（3/3）。
+- **SC-008**: 派生零漂移——`sync-mirrors.py --check` 与 `regen-command-copies.py --check` 均退出 0；门控判定与 FR-027/A11 同单位：`git diff <base> -- <A10 封闭活接线面> | grep '^+'` 的**新增行 0 命中** `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`（命令、pattern 集与改动前基线读数 MUST 记入测量证据，「0 新增」可复核；不使用前后总量相等作判据）（3/3）。
 - **SC-009**: 冻结基线显式更新——四个测试文件中新名与日期注记同时存在，且四个文件在新树上通过；无「只改名不注记」的条目（4/4）。
 
 ### Measurement Sources & Collection Methods
@@ -204,9 +204,9 @@
 - **SC-003 Source**: 植入式夹具的偏差报告；按维度解析条目数。
 - **SC-004 Source**: 观测记录中 [[STR-006]] 标记计数 + 人工/脚本复核编造项。
 - **SC-005 Source**: 将 improve-skills 从夹具环境移除后运行，读取运行结论。
-- **SC-006 Source**: `git grep` 活接线面、`flow-class-check.py` 退出码与解析记录、`probe-utils.py` 编译检查。
+- **SC-006 Source**: 按八个坐标逐项取证的记录——目录存在性、frontmatter 与 `skill_id`/Canonical ID 解析、`flow-class-check.py --action lookup` 解析记录、`probe-utils.py` 编译检查、路由行文本、description 文本；旧名计数取 `git grep` 在 A10 封闭面内的命中。
 - **SC-007 Source**: 夹具安装项目的 `specify init` 前后目录/链接状态。
-- **SC-008 Source**: 三个确定性检查命令的退出码与摘要输出。
+- **SC-008 Source**: `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 的退出码；`git diff <base> -- <A10 封闭面> | grep '^+'` 的新增行逐行对照 `scan-confirmation-gates.py` 的 `BLOCKING_PATTERNS`；改动前基线读数（同命令、同 pattern 集）与判定结果一并入证据。
 - **SC-009 Source**: 四个冻结基线测试的源码注记与测试结果。
 
 ## Shared Strings *(optional, recommended when any string-literal is consumed verbatim by tests, contracts, snippets, or source)*

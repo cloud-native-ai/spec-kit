@@ -1,0 +1,7 @@
+stage=analyze
+status=not-run-docs-only
+date=2026-10-30
+stage_base=6c5e26f9
+budget=中间阶段/纯文档：不跑全量；targeted-set-v1 不适用于只读分析阶段（本阶段不产生实现代码）
+checks_run_readonly=validate-tasks.py (PASS 0 error/0 warning); validate-decision-tensions.py --spec .specify/specs/078-coaching-skills (0 errors/0 warnings, 2 records); account-clause-coverage.py --spec-dir .specify/specs/078-coaching-skills (claimed clauses 38, status=uncovered, FR lane 0/29); pre-analyze-check.py --stage tasks (decision=pass errors=0 advisories=50); flow-class-check.py --action check (matched=79 inventory_units=79 clean); probe-utils.py --action compile-embeds --check (75 units, zero drift); sync-mirrors.py --check / regen-command-copies.py --check (exit 0); scan-confirmation-gates.py --summary (blocking=27, violations=0)
+validation_wave=5 read-only external validators (qodercli -p, write tools disabled, no session persistence); 4 confirm / 1 downgrade / 0 reject; git status unchanged
