@@ -1255,3 +1255,252 @@ def test_sc04_denied_verdict_and_scope():
     assert "用户拒绝确认" in whats and "未执行范围" in whats, (
         f"the denied fixture must record the refusal reason and unexecuted scope: {whats!r}"
     )
+
+
+# ===========================================================================
+# 079 US4 — content-mode preservation & output target (T024)
+#
+# Clause groups and their owners:
+#   CM-01…CM-04   SKILL.md content-mode branch (T025)
+#   CM-05…CM-08   SKILL.md mode boundary & shared defenses (T026)
+#   CM-09         command template + docs migration example (T029)
+#   CM-10         content-mode wording (T030)
+#   IP-15         content mode takes no reservation (T025)
+#   IP-16、IP-17  run-mode § Output (T027)
+#   RP-19、RP-20  run-mode § Output (T027)
+#
+# Red-first frontier: T025/T026/T027/T029/T030 have not run yet. The two
+# invariant guards that already hold on the current tree (CM-01 equivalence
+# anchors, CM-05 single routing owner) are annotated as guards and are not
+# claimed as red-first. `tmp_path` calibrates the scaffold scanner used by
+# CM-03 (positive and negative samples), so the predicate itself is exercised.
+# ===========================================================================
+
+INJECTION_INSTRUCTION = RUN_FIXTURES / "injection" / "instruction.md"
+INJECTION_ENVELOPE = RUN_FIXTURES / "injection" / "envelope.md"
+INJECTION_PRODUCT = RUN_FIXTURES / "injection" / "executor-note.txt"
+CONTENT_INJECTION = (
+    REPO_ROOT / "tests" / "fixtures" / "humanize" / "inline" / "s08-threat-inline.md",
+    REPO_ROOT / "tests" / "fixtures" / "humanize" / "files" / "instruction-threat-file.md",
+)
+REPORT_SCAFFOLD_MARKERS = (
+    *FIVE_SECTIONS,
+    CARRIER_NATIVE,
+    CARRIER_DEGRADED,
+    "verdict:",
+    "dispatches:",
+)
+
+
+def _skill_text() -> str:
+    assert SKILL_SRC.is_file(), f"external skill missing: {SKILL_SRC}"
+    return _read(SKILL_SRC)
+
+
+def _scaffold_hits(text: str) -> list:
+    return [marker for marker in REPORT_SCAFFOLD_MARKERS if marker in text]
+
+
+# ---------------------------------------------------------------------------
+# CM-01 .. CM-04 — SKILL.md content-mode branch (T025)
+# ---------------------------------------------------------------------------
+
+def test_cm01_content_mode_equivalence():
+    text = _skill_text()
+    for anchor in ("既有改写入口", "Stage 1", "Stage 7", "逐字不动", "四维度"):
+        assert anchor in text, (
+            f"SKILL.md lacks the content-mode equivalence anchor {anchor!r} (CM-01)"
+        )
+    for stage in ("输入解析", "主语言判定", "窗口估算", "保真自检", "输出与文件行为"):
+        assert stage in text, f"SKILL.md lost the Stage anchor {stage!r} (CM-01)"
+
+
+def test_cm02_content_output_text_only():
+    text = _skill_text()
+    for anchor in ("内容模式", "只写改写文本", "`--output`"):
+        assert anchor in text, (
+            f"SKILL.md lacks the content-mode output anchor {anchor!r} (CM-02)"
+        )
+    assert "原子写" in text or "原子重命名" in text, (
+        "SKILL.md must keep the content-mode output write rules (CM-02)"
+    )
+
+
+def test_cm03_no_report_scaffold_in_content_mode(tmp_path):
+    text = _skill_text()
+    for anchor in ("不含五节", "载体标记", "迁移提示"):
+        assert anchor in text, (
+            f"SKILL.md lacks the no-scaffold anchor {anchor!r} (CM-03)"
+        )
+    # Calibrate the scanner on both sides (tmp_path): a rewritten-only sample
+    # has zero hits, a report-shaped sample is recognised marker by marker.
+    rewritten = tmp_path / "rewritten-only.md"
+    rewritten.write_text("这是一段只含改写文本的段落，没有任何报告脚手架。\n", encoding="utf-8")
+    shaped = tmp_path / "report-shaped.md"
+    shaped.write_text(
+        "\n".join([
+            CARRIER_NATIVE,
+            "verdict: success",
+            "## Conclusion",
+            "## Key Changes",
+            "## Evidence",
+            "dispatches: 1",
+            "## Risks & Limits",
+            "## Next Steps",
+        ]) + "\n",
+        encoding="utf-8",
+    )
+    assert _scaffold_hits(_read(rewritten)) == [], (
+        "a rewritten-only sample must carry no report scaffold (CM-03)"
+    )
+    assert set(_scaffold_hits(_read(shaped))) == set(REPORT_SCAFFOLD_MARKERS), (
+        "the scaffold scanner must recognise every report marker (CM-03)"
+    )
+
+
+def test_cm04_content_mode_no_dispatch():
+    text = _skill_text()
+    for anchor in ("不派发执行体", "不取得并发占位", "不读取动作结果", "两次内容模式调用互不影响"):
+        assert anchor in text, (
+            f"SKILL.md lacks the content-mode isolation anchor {anchor!r} (CM-04)"
+        )
+
+
+# ---------------------------------------------------------------------------
+# CM-05 .. CM-08 — mode boundary & shared defenses (T026)
+# ---------------------------------------------------------------------------
+
+def test_cm05_routing_owned_by_ip05():
+    text = _skill_text()
+    assert "references/run-mode.md" in text and "Mode Routing" in text, (
+        "SKILL.md must point at the single routing owner (CM-05)"
+    )
+    assert "both-sources-and-instruction" not in text, (
+        "SKILL.md must not restate the routing rejection table (CM-05)"
+    )
+    assert "本次内容源判定的唯一所有者" not in text, (
+        "SKILL.md must not claim a second routing owner (CM-05)"
+    )
+
+
+def test_cm06_injection_defense_both_modes():
+    text = _skill_text()
+    for anchor in ("两种模式", "指令原文", "`final_output`", "`evidence`", "`products`", "产物内容"):
+        assert anchor in text, (
+            f"SKILL.md lacks the both-mode injection anchor {anchor!r} (CM-06)"
+        )
+    samples = [INJECTION_INSTRUCTION, INJECTION_ENVELOPE, INJECTION_PRODUCT, *CONTENT_INJECTION]
+    for path in samples:
+        assert path.is_file(), f"injection fixture missing: {path}"
+        body = _read(path).lower()
+        assert "忽略" in body or "ignore" in body, (
+            f"{path} must carry instruction-like text (SC-010)"
+        )
+
+
+def test_cm07_fidelity_both_modes():
+    text = _skill_text()
+    for anchor in ("两种模式", "受保护集合", "不复制", "FR-017"):
+        assert anchor in text, (
+            f"SKILL.md lacks the both-mode fidelity anchor {anchor!r} (CM-07)"
+        )
+
+
+def test_cm08_detector_honesty_both_modes():
+    text = _skill_text()
+    for anchor in ("两种模式", "检测器", "不承诺"):
+        assert anchor in text, (
+            f"SKILL.md lacks the both-mode detector anchor {anchor!r} (CM-08)"
+        )
+
+
+# ---------------------------------------------------------------------------
+# CM-09 .. CM-10 — migration example & wording (T029 / T030)
+# ---------------------------------------------------------------------------
+
+def test_cm09_migration_example_present():
+    template = _read(TEMPLATE)
+    for anchor in ("迁移示例", "--inline", "裸文本", "指令"):
+        assert anchor in template, (
+            f"command template lacks the migration-example anchor {anchor!r} (CM-09)"
+        )
+    docs = _read(DOCS_PAGE)
+    for anchor in ("迁移示例", "裸文本", "指令", "--inline"):
+        assert anchor in docs, (
+            f"docs page lacks the copy-pasteable migration anchor {anchor!r} (CM-09)"
+        )
+
+
+def test_cm10_content_mode_wording_intact():
+    text = _skill_text()
+    for anchor in ("既有入口", "不是兼容垫片"):
+        assert anchor in text, (
+            f"SKILL.md lacks the retained-entry anchor {anchor!r} (CM-10)"
+        )
+    for banned in ("legacy shim", "deprecated entry", "兼容垫片"):
+        assert banned not in text, (
+            f"SKILL.md must not downgrade content mode with {banned!r} (CM-10)"
+        )
+
+
+# ---------------------------------------------------------------------------
+# IP-15 .. IP-17 — reservation and output targets
+# ---------------------------------------------------------------------------
+
+def test_ip15_content_mode_unreserved():
+    text = _skill_text()
+    for anchor in ("不取得并发占位", "两次内容模式调用互不影响"):
+        assert anchor in text, (
+            f"SKILL.md lacks the content-mode no-reservation anchor {anchor!r} (IP-15)"
+        )
+
+
+def test_ip16_run_output_extension():
+    body = _run_mode_section("## Output")
+    for anchor in ("`.md`", "`.markdown`", "`.txt`", "`bad-extension`"):
+        assert anchor in body, (
+            f"§ Output lacks the run-mode extension anchor {anchor!r} (IP-16)"
+        )
+    assert "MUST NOT 复用内容模式的「扩展名跟随输入」规则" in body, (
+        "§ Output must exclude the content-mode extension-follows-input rule (IP-16)"
+    )
+
+
+def test_ip17_content_output_unchanged():
+    body = _run_mode_section("## Output")
+    assert "内容模式的 `--output` 语义完全不变" in body, (
+        "§ Output must state that content-mode --output semantics are unchanged (IP-17)"
+    )
+    text = _skill_text()
+    for anchor in ("与输入格式族一致", "只含改写文本"):
+        assert anchor in text, (
+            f"SKILL.md lost the content-mode output anchor {anchor!r} (IP-17)"
+        )
+
+
+# ---------------------------------------------------------------------------
+# RP-19 .. RP-20 — run-mode output target (T027)
+# ---------------------------------------------------------------------------
+
+def test_rp19_output_full_report_and_summary():
+    body = _run_mode_section("## Output")
+    for anchor in (
+        "完整五节报告",
+        "载体标记行",
+        "`verdict:`",
+        "`dispatches:`",
+        "MUST NOT 写入迁移提示行",
+        "摘要",
+        "MUST NOT 成为报告的第六节",
+    ):
+        assert anchor in body, (
+            f"§ Output lacks the full-report anchor {anchor!r} (RP-19)"
+        )
+
+
+def test_rp20_atomic_write_and_force():
+    body = _run_mode_section("## Output")
+    for anchor in ("原子写", "临时文件", "重命名", "`--force`", "逐字节不变", "不留部分文件"):
+        assert anchor in body, (
+            f"§ Output lacks the atomic-write anchor {anchor!r} (RP-20)"
+        )

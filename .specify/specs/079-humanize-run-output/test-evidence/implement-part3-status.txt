@@ -1,0 +1,61 @@
+# Implement part 3/5 — stage status (T017–T024)
+
+date=2026-10-30
+stage=implement
+part=3/5
+feature=079-humanize-run-output
+base_commit=7f2084dd
+scope=T017,T018,T019,T020,T021,T022,T023,T024
+selection_basis=targeted-set-v1
+
+command=.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py
+rc=1
+passed=205
+failed=16
+skipped=0
+new_failures=13
+sufficiency=partial — every clause owned by this segment turned green (RP-11…RP-18 via T017/T018; EX-11…EX-21 and IP-11…IP-14 via T019 tests + T020–T023 implementation); the 13 new reds are the US4 red-first frontier owned by T025/T026/T027/T029/T030; the three carried reds (E2 baseline, mirror regeneration, template pin) are unchanged; no unexplained failure
+
+## E3 stage-status line
+
+`stage=implement part=3/5 selection=targeted-set-v1 command=".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py" rc=1 passed=205 failed=16 skipped=0 new_failures=13 sufficiency=partial-expected-frontier`
+
+## Turned green in this segment
+
+| Group | Owner row | Tests |
+|-------|-----------|-------|
+| RP-11、RP-12、RP-13、RP-14 | T017 | `test_rp11_next_steps_or_none`、`test_rp12_language_priority`、`test_rp13_headings_stay_english`、`test_rp14_language_keeps_identifiers` |
+| RP-15、RP-16、RP-17、RP-18 | T018 | `test_rp15_fidelity_floor`、`test_rp16_no_fabrication`、`test_rp17_expression_and_detector_honesty`、`test_rp18_reader_comprehension` |
+| EX-11…EX-14 | T020 | `test_ex11_no_compensating_redispatch`…`test_ex14_evidence_locatability_check` |
+| EX-15、EX-16 | T021 | `test_ex15_confirmation_missing_fail_closed`、`test_ex16_no_proxy_answer` |
+| EX-17…EX-19 | T022 | `test_ex17_degraded_honesty`、`test_ex18_degraded_keeps_report_contract`、`test_ex19_no_network_from_humanize` |
+| EX-20、EX-21、IP-11…IP-14 | T023 | `test_ex20_reservation_released_all_paths`、`test_ex21_dispatch_record_line`、`test_ip11_active_run_rejected`…`test_ip14_reject_paths_write_nothing` |
+| SC-004（denied 组） | T019 / FR-012、FR-019 | `test_sc04_denied_no_side_effect`、`test_sc04_denied_verdict_and_scope` |
+
+Part 2 结转的 8 条 RP 前哨（`test_rp11…test_rp18`）在 T017/T018 落笔后全部转绿。
+
+## new_failures 归属（13）
+
+| # | 失败名 | 归属 | 说明 |
+|---|--------|------|------|
+| 1–3 | `test_cm02_content_output_text_only`、`test_cm03_no_report_scaffold_in_content_mode`、`test_cm04_content_mode_no_dispatch` | 预期红先行 → **T025** | SKILL.md 内容模式分支收口尚未落笔 |
+| 4–6 | `test_cm06_injection_defense_both_modes`、`test_cm07_fidelity_both_modes`、`test_cm08_detector_honesty_both_modes` | 预期红先行 → **T026** | 两模式共有防线尚未落笔 |
+| 7 | `test_cm09_migration_example_present` | 预期红先行 → **T029** | docs 迁移示例尚未落笔 |
+| 8 | `test_cm10_content_mode_wording_intact` | 预期红先行 → **T030** | 内容模式措辞收口尚未落笔 |
+| 9 | `test_ip15_content_mode_unreserved` | 预期红先行 → **T025** | 内容模式不取占位与互不影响尚未写进 SKILL.md |
+| 10–11 | `test_ip16_run_output_extension`、`test_ip17_content_output_unchanged` | 预期红先行 → **T027** | `run-mode.md` § Output 尚未落笔 |
+| 12–13 | `test_rp19_output_full_report_and_summary`、`test_rp20_atomic_write_and_force` | 预期红先行 → **T027** | 同上 |
+
+红态读数与命令见 `notes/red-first-evidence.md` § T024；US3 的 17 条红先行读数见同文件 § T019。
+
+## 非 new_failures（如实声明）
+
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
+- `test_expression_compatibility.py::test_c7_mirrors_are_byte_identical` —— part 1 已在册的镜像暂态；唯一再生成行是 **T028**，本段未再生成派生面。
+- `test_stage_class_wiring.py::test_clarify_is_inside_and_the_other_entry_points_are_untouched` —— 模板字节钉扎，按 WC-13 由 **T032** 在模板改写后重新度量；本段未提前改钉扎。
+
+## 未跑的东西（如实声明）
+
+- **全量套件未重跑**：E2 已在 implement 起点消耗（17 failed / 6881 passed / 7 skipped），本文件不重捕获。
+- 派生面（四份按工具副本、`.specify/skills/humanize/` 镜像）MUST NOT 手改：本段未运行 `regen-command-copies.py` / `sync-mirrors.py --write`，两者保持 T028 的再生成入口。
+- T025 及以后的任务行未触碰。

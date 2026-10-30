@@ -155,3 +155,42 @@ FAILED tests/contract/test_humanize_command_surface.py::test_sc04_denied_verdict
 ```
 
 失败原因统一为「被断言的小节不存在」（`section '## Failure & No Retry' / '## Confirmation Missing' / '## Degradation & Boundaries' / '## Reservation & Nesting' missing`）；这是预期的红先行态，不是实现缺陷。
+
+---
+
+## T024 — US4 契约组（2026-10-30T16:12Z）
+
+### 树状态（红态）
+
+- `tests/contract/test_humanize_command_surface.py`：新增 US4 组 `test_cm01…test_cm10`、`test_ip15…test_ip17`、`test_rp19`、`test_rp20`（函数名逐字取自 `contracts/content-mode.contract.md`、`contracts/invocation-parse.contract.md`、`contracts/report-assembly.contract.md` 的可追溯性表）。
+- 未落笔的实现面：`SKILL.md` 的内容模式分支收口（T025）、两模式共有防线（T026）、`run-mode.md` 的 § Output（T027）、docs 迁移示例（T029）与内容模式措辞（T030）。
+- 两条**不变量守卫**（先绿，不声称红先行）：`test_cm01_content_mode_equivalence`（Stage 1–7 逐字保留）与 `test_cm05_routing_owned_by_ip05`（路由唯一 owner 指向 `references/run-mode.md` § Mode Routing，且 SKILL 未重述判定表）。
+
+### 命令与真实输出
+
+```
+.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py -k "cm01 or cm02 or cm03 or cm04 or cm05 or cm06 or cm07 or cm08 or cm09 or cm10 or ip15 or ip16 or ip17 or rp19 or rp20"
+```
+
+- **退出码**: `1`
+- **失败计数**: `13 failed, 2 passed, 69 deselected, 1 warning in 0.25s`
+
+失败名（真实 short summary，逐字）：
+
+```
+FAILED tests/contract/test_humanize_command_surface.py::test_cm02_content_output_text_only
+FAILED tests/contract/test_humanize_command_surface.py::test_cm03_no_report_scaffold_in_content_mode
+FAILED tests/contract/test_humanize_command_surface.py::test_cm04_content_mode_no_dispatch
+FAILED tests/contract/test_humanize_command_surface.py::test_cm06_injection_defense_both_modes
+FAILED tests/contract/test_humanize_command_surface.py::test_cm07_fidelity_both_modes
+FAILED tests/contract/test_humanize_command_surface.py::test_cm08_detector_honesty_both_modes
+FAILED tests/contract/test_humanize_command_surface.py::test_cm09_migration_example_present
+FAILED tests/contract/test_humanize_command_surface.py::test_cm10_content_mode_wording_intact
+FAILED tests/contract/test_humanize_command_surface.py::test_ip15_content_mode_unreserved
+FAILED tests/contract/test_humanize_command_surface.py::test_ip16_run_output_extension
+FAILED tests/contract/test_humanize_command_surface.py::test_ip17_content_output_unchanged
+FAILED tests/contract/test_humanize_command_surface.py::test_rp19_output_full_report_and_summary
+FAILED tests/contract/test_humanize_command_surface.py::test_rp20_atomic_write_and_force
+```
+
+失败原因分两类：① `SKILL.md` 尚无两模式共有防线与内容模式收口锚点（CM-02…CM-08、CM-10、IP-15）；② `run-mode.md` 的 § Output 尚不存在（IP-16、IP-17、RP-19、RP-20），docs 尚无迁移示例（CM-09）。均为预期红先行态。
