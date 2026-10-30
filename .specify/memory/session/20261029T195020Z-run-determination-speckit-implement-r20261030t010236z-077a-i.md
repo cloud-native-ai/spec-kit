@@ -6,10 +6,10 @@ feature: "077"
 tags: ["run-determination", "r20261030t010236z-077a-impl"]
 title: "run-determination /speckit.implement r20261030T010236Z-077a-impl"
 created: "2026-10-29T19:50:20Z"
-summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated
   "feature": "077",
   "feature_id": null,
   "determined_at": "2026-10-29T19:50:20Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T08:40:02Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -157,18 +157,6 @@ summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -188,11 +176,6 @@ summary: "/speckit.implement run=r20261030T010236Z-077a-impl token=not_evaluated
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
