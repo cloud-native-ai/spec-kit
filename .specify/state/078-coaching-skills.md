@@ -1,16 +1,16 @@
 # Line State — 078-coaching-skills
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 run_id: r20261030T054502Z-078a
 slice: 078
-stage: closure (post-review full suite)
+stage: done
 stage_started_at: 1793350891
 stage_deadline_epoch: 1793356291
 stage_base_commit: a5daa52e
 attempt: 0
 retry_limit: 2
-last_verdict: review P0=0/P1=5; repair round done (F1-F5; SC-001/005 honestly partial); closure running
+last_verdict: MERGED to master at 73d81bc0 (fast-forward); pushed gitlab/master; local branch deleted; line deregistered (closed). closure 16 failed = baseline 16, comm -13 empty; Feature 078 Implemented (review P0=0; SC-001/SC-005 partial with a recorded validation gap).
 <!-- plan-constraint: active activated_at=2026-10-30T05:55Z plan_commit=375805f2 approved_baseline_commit=d0f50759 -->
 <!-- rebaseline-events: [{"trigger":"analyze loop requirements M-01/M-02/H-02","commit":"d0f50759","at":"2026-10-30T06:24Z"}] -->
 <!-- test-budget:begin -->
@@ -29,7 +29,7 @@ last_verdict: review P0=0/P1=5; repair round done (F1-F5; SC-001/005 honestly pa
 - base_sha: `ab7be630`（clarify 提交后的 master 线起点）
 - trunk: `master`（`docs/git-workflow.md`）
 - topology: `local`（宿主原生子代理；不启动 qodercli）
-- state: `running`
+- state: `completed`
 
 ## U0 入口声明
 
@@ -125,3 +125,12 @@ last_verdict: review P0=0/P1=5; repair round done (F1-F5; SC-001/005 honestly pa
 - Part 4：T025–T031（US4 重命名兼容面 + 终局门）
 - 每段：定向测试 + 证据 + 单行提交；返回 `PARTn-DONE`；驱动 U4 通过后派下一段。
 - 全量基线槽：`baseline-failed.txt`（implement 起点，唯一一次全量）；closure 在全量 review 后。
+
+## U6 收尾（2026-10-30）
+
+- **合并**：`078-coaching-skills` 快进合并到 `master` → `73d81bc0`；`git push gitlab master` 成功（`500ff717..73d81bc0`）；`master...gitlab/master` 左右计数 0/0。
+- **分支清理**：本地 `078-coaching-skills` 已删除（`git branch -d`，合并后才允许）；远端本无该分支。
+- **写线登记**：`078-coaching-skills` 注销为 `closed`。
+- **closure 判定**：首次 closure 16→17（新增 `test_i11_channel_two_mirrors_and_per_tool_copies`，根因=agent 渲染器未 `rewrite_paths`），修复后 in-slot-rerun：16 failed = 基线 16，`comm -13` 为空；预算审计 `baseline:1 closure:1 reruns:1; stages=6 complete=6; status=ok`。
+- **Feature 078**：`Implemented`；review `P0=0 / P1=5` 已修（F1–F5），SC-001/SC-005 如实记 `partial`（宿主原生派发通道未实测，self-report 路径）。
+- **工作树归档判定**：归零（`git status --porcelain` 为空；运行记录、E2/E3 账本、全量日志均已归档提交）。
