@@ -1,0 +1,18 @@
+# review targeted set — 079 (process review)
+# date=2026-10-30T16:24:51Z stage_base=cad4bda7
+# command: .venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py
+
+........................................................................ [ 41%]
+........................................................................ [ 83%]
+............................                                             [100%]
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+172 passed, 1 warning in 1.29s
+rc=0

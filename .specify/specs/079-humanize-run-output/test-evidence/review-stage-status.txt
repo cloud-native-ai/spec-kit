@@ -1,0 +1,29 @@
+{
+  "stage": "review",
+  "substage": "process-segment",
+  "row_type": "stage-status",
+  "status": "ran",
+  "selection_basis": "targeted-set-v1 (stage_base=cad4bda7): the process review re-read the feature's full artifact chain (requirements / plan / data-model / 5 contracts / quickstart / tasks / 2 checklists / verification / notes / test-evidence) plus the owner documents it cites (verification-log-template, review-template, review command, implement skill, feedback-step), and re-ran the two contract suites the SC block leans on. No full-suite run: the closure slot belongs to post-review.",
+  "changed_paths": [
+    ".specify/specs/079-humanize-run-output/review.md",
+    ".specify/specs/079-humanize-run-output/test-evidence/review-stage-status.txt",
+    ".specify/specs/079-humanize-run-output/test-evidence/review-targeted.txt"
+  ],
+  "evidence_ptr": ".specify/specs/079-humanize-run-output/test-evidence/review-targeted.txt; process findings in .specify/specs/079-humanize-run-output/review.md",
+  "command": ".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py",
+  "rc": 0,
+  "passed": 172,
+  "failed": 0,
+  "new_failures": 0,
+  "new_failure_names": [],
+  "code_segment": "not dispatched in this run (process-scoped stage directive); no code-review.md exists; review.md § 2.1 records not-evaluated for both segment and gate verdict",
+  "findings": {
+    "p0": 1,
+    "p1": 8,
+    "p2": 3,
+    "p0_ids": ["F1"],
+    "verdict": "closure and merge blocked pending F1 (evidence-binding gate not executed; 8 pass statuses have no four-key evidence rows)"
+  },
+  "test_budget": "targeted set only; the implement-start full-suite slot was consumed at implement start (6881 passed / 17 failed / 998s) and the closure full-suite slot belongs to post-review",
+  "at": "2026-10-31"
+}
