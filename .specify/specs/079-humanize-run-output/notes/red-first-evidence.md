@@ -194,3 +194,51 @@ FAILED tests/contract/test_humanize_command_surface.py::test_rp20_atomic_write_a
 ```
 
 失败原因分两类：① `SKILL.md` 尚无两模式共有防线与内容模式收口锚点（CM-02…CM-08、CM-10、IP-15）；② `run-mode.md` 的 § Output 尚不存在（IP-16、IP-17、RP-19、RP-20），docs 尚无迁移示例（CM-09）。均为预期红先行态。
+
+---
+
+## T036 — WC-05…WC-15 组 + 条款 ↔ 测试名机器核对（2026-10-31）
+
+### 树状态
+
+- `tests/contract/test_humanize_command_surface.py`：追加 WC 组 16 个函数（`test_wc05…test_wc15` 为 T036 正文所指的十一个，`test_wc16…test_wc20` 随 ⑥ 的认领完备性一并落笔——四条 traceability 名若没有函数可解析，`test_wc12_clause_test_map_is_total` 无法转绿）与判定器 `test_wc12_clause_test_map_is_total`；未新增文件。
+- `tasks.md` § Clause Test Waivers 追加一行（判定器自身），这是 M-21 机制规定的唯一认领形态。
+- 实现面（T025–T032）与派生面（T028）已在此行之前落地：WC-05…WC-15 守卫的制品按构造已存在。
+
+### 两栏标注（⑥/⑦）
+
+| 栏 | 成员 | 说明 |
+|----|------|------|
+| **不变量守卫（先绿，不声称红先行）** | `test_wc05…test_wc11`、`test_wc13…test_wc20`（16 个） | 它们断言的制品由 T025–T032 产出，在本行落笔时已存在；首次运行即绿是预期，不作红先行声称 |
+| **真实失败（红→绿）** | `test_wc12_clause_test_map_is_total` | 首次运行真实红：反向认领断言命中一个无人认领的套件函数 `test_wc12_clause_test_map_is_total`（判定器无法认领自己）；按 M-21 追加显式 waiver 行后转绿 |
+
+### 命令与真实输出（首次运行，红态）
+
+```
+.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py -k "wc05 or ... or wc20"
+```
+
+- **退出码**: `1`
+- **失败计数**: `4 failed, 13 passed`（其中 1 条为契约红，3 条为测试自身构造缺陷，见下）
+
+真实 short summary：
+
+```
+FAILED tests/contract/test_humanize_command_surface.py::test_wc11_feature_row_name_description
+FAILED tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured
+FAILED tests/contract/test_humanize_command_surface.py::test_wc16_command_roster_unchanged
+FAILED tests/contract/test_humanize_command_surface.py::test_wc12_clause_test_map_is_total
+```
+
+### 就地修正（fast-fail correction，逐条披露）
+
+1. `test_wc11_feature_row_name_description`：锚点写成 `五节`，而 062 索引描述用的是逐节列举「结论/关键变化/证据/风险/下一步」；改为断言该列举，强度不变。
+2. `test_wc13_stage_class_pin_remeasured`：误把 077 的 `strip_wiring()` 套到 `humanize` 上——`humanize` 是 pre-077 入口，由 `UNCHANGED_SHA256` 字节钉扎与 WC-03 的 `## Outline` 锚点持有；改为断言钉扎重测 + 对 `STAGE_STEMS` 逐个复验「剥掉接线小节后等于基线」的判定形态。
+3. `test_wc16_command_roster_unchanged`：`git ls-tree <rev> templates/commands` 只列出目录条目本身，补尾斜杠后改为列内容。
+4. `test_wc12_clause_test_map_is_total`：真红——判定器无法认领自己；按 M-21 在 `tasks.md` § Clause Test Waivers 追加显式 waiver 行（含原因、remedy 与证据槽）后转绿。这不是放宽断言，断言形态未动。
+
+### 复测（同一命令）
+
+- **退出码**: `0`
+- **读数**: `17 passed, 84 deselected`
+- 逐条 node id：`test_wc05_copies_regenerated` … `test_wc20_command_stays_simple` 全 PASSED，判定器 `test_wc12_clause_test_map_is_total` PASSED（`clause-test-map=total`）。

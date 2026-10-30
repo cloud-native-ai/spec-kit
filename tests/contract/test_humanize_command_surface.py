@@ -41,8 +41,10 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -1513,3 +1515,534 @@ def test_rp20_atomic_write_and_force():
         assert anchor in body, (
             f"§ Output lacks the atomic-write anchor {anchor!r} (RP-20)"
         )
+
+
+# ===========================================================================
+# 079 — WC-05 .. WC-15 (T036): derived faces, docs, registration, the suite
+# pin, the frozen surfaces and the fixture set — plus the clause ↔ test map
+# machine check.
+#
+# The wiring contract splits each clause into a structural leg (asserted here)
+# and a runtime leg recorded as stage evidence in verification.md: the two
+# ``--check`` engines, the unlimited discovery inventory and the probe drift
+# count. Asserting the structural leg in-suite is what keeps a hand-edited
+# copy, mirror, docs page, registry row, frozen surface or fixture from passing
+# silently; the evidence leg is where the engines' own exit codes live.
+#
+# WC-16..WC-20 land here as well: the map check below refuses any WC-prefixed
+# suite function that no clause and no waiver claims, so their contracted
+# traceability names MUST resolve to real functions.
+# ===========================================================================
+
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "079-humanize-run-output"
+CONTRACTS_DIR = SPEC_DIR / "contracts"
+TASKS_DOC = SPEC_DIR / "tasks.md"
+BASELINE_COMMIT = "35ff11bc"
+
+CONTRACT_FILES = (
+    "invocation-parse.contract.md",
+    "execution-dispatch.contract.md",
+    "report-assembly.contract.md",
+    "content-mode.contract.md",
+    "wiring-compat.contract.md",
+)
+CLAUSE_TOTALS = {"IP": 17, "EX": 21, "RP": 20, "CM": 10, "WC": 20}
+
+FROZEN_SURFACES = (
+    "tests/contract/test_expression_gate_wiring.py",
+    "tests/contract/test_expression_gates_doc.py",
+    "tests/contract/test_expression_compatibility.py",
+    "tests/contract/test_flow_class_ledger.py",
+    "tests/contract/test_flow_class_correctness.py",
+    "tests/contract/test_feedback_command_classification.py",
+    "tests/contract/test_migration_distribution.py",
+    "tests/contract/test_run_skills_wiring.py",
+    "tests/contract/test_skill_layer_visibility_guards.py",
+)
+
+# WC-15's seven classes: success, failure, non-action, needs-confirmation,
+# nested, degraded, concurrency.
+RUN_FIXTURE_CLASSES = {
+    "success": ("envelope.md",),
+    "failure": ("envelope.md",),
+    "non-action": ("envelope.md",),
+    "needs-confirmation": ("envelope.md",),
+    "nested": ("instruction.txt",),
+    "degraded": ("envelope.md",),
+    "reservations": ("run-a.run", "run-b.run"),
+}
+HISTORICAL_FIXTURES = (
+    "files", "inline", "selftest", "tone", "rubric.md", "diff_protected.py",
+)
+
+CLAUSE_DEF_RE = re.compile(r"^- \*\*((?:IP|EX|RP|CM|WC)-\d{2})\*\*:", re.MULTILINE)
+CLAUSE_ROW_RE = re.compile(r"^\| ((?:IP|EX|RP|CM|WC)-\d{2}) \|")
+MAP_ROW_RE = re.compile(
+    r"^\| `contracts/([a-z-]+\.contract\.md)` \| ([^|]+?) \| (T\d{3}) \|",
+    re.MULTILINE,
+)
+TASK_ROW_RE = re.compile(r"^- \[[ X]\] (T\d{3}) ")
+FUNC_RE = re.compile(r"^def (test_[a-z0-9_]+)\(", re.MULTILINE)
+TEST_NAME_RE = re.compile(r"`(test_[a-z0-9_]+)(\[[^\]]*\])?`")
+
+
+def _git_names(rev: str, *paths: str) -> list:
+    """Tracked paths whose bytes differ from ``rev`` (untracked files excluded)."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", rev, "--", *paths],
+        capture_output=True, text=True, encoding="utf-8", check=True,
+    )
+    return [ln for ln in out.stdout.splitlines() if ln.strip()]
+
+
+def _git_tracked(rev: str, path: str) -> set:
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "ls-tree", "--name-only", rev, path],
+        capture_output=True, text=True, encoding="utf-8", check=True,
+    )
+    return {ln.strip() for ln in out.stdout.splitlines() if ln.strip()}
+
+
+def _git_added_lines(rev: str, *paths: str) -> list:
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", rev, "--", *paths],
+        capture_output=True, text=True, encoding="utf-8", check=True,
+    )
+    return [ln[1:] for ln in out.stdout.splitlines()
+            if ln.startswith("+") and not ln.startswith("+++")]
+
+
+def _gates_module():
+    spec = importlib.util.spec_from_file_location("scan_confirmation_gates", GATES_SCANNER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _mirror_tree(root: Path) -> dict:
+    return {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and "__pycache__" not in path.parts
+    }
+
+
+def _feature_row_062() -> list:
+    for line in _read(REGISTRY).splitlines():
+        if line.startswith("| 062 |"):
+            cells = [c.strip() for c in line.split("|")]
+            assert len(cells) > 6, f"062 registry row is malformed: {line[:120]!r}"
+            return cells
+    raise AssertionError("registry lacks the `| 062 |` row")
+
+
+def test_wc05_copies_regenerated():
+    anchor = "裸文本 = 待执行指令"
+    assert anchor in _read(TEMPLATE), f"source template lacks the 079 marker {anchor!r} (WC-05)"
+    for copy in COPIES:
+        rel = str(copy.relative_to(REPO_ROOT))
+        text = _read(copy)
+        assert "AUTO-GENERATED from templates/commands/humanize.md" in text, (
+            f"{rel} lacks the regeneration header naming its source template (WC-05)"
+        )
+        assert anchor in text, (
+            f"{rel} is stale: the 079 marker is missing, so it was not regenerated (WC-05)"
+        )
+        assert DELEGATION_PATH in text, (
+            f"{rel} does not delegate to the single skill {DELEGATION_PATH} (WC-05)"
+        )
+        assert _git_names(BASELINE_COMMIT, rel), (
+            f"{rel} equals the baseline copy — 079 never regenerated it (WC-05)"
+        )
+
+
+def test_wc06_mirror_in_sync():
+    src_root = SKILL_SRC.parent
+    mirror_root = REPO_ROOT / ".specify" / "skills" / "humanize"
+    src, mirror = _mirror_tree(src_root), _mirror_tree(mirror_root)
+    assert src, f"skill source tree is empty: {src_root}"
+    assert set(src) == set(mirror), (
+        f"mirror file set drifted — missing: {sorted(set(src) - set(mirror))}; "
+        f"extra: {sorted(set(mirror) - set(src))} (WC-06)"
+    )
+    drift = sorted(rel for rel in src if src[rel] != mirror[rel])
+    assert not drift, f"mirror bytes drifted from the source: {drift} (WC-06)"
+    assert "references/run-mode.md" in src and "references/report-shape.md" in src, (
+        "the mirror must carry the run-mode and report-shape references (WC-06)"
+    )
+    engine = _read(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py")
+    assert '("skills/external", ".specify/skills"' in engine, (
+        "sync-mirrors.py no longer declares the skills/external pair (WC-06)"
+    )
+
+
+def test_wc07_skill_body_budget():
+    script = REPO_ROOT / "skills" / "external" / "improve-skills" / "scripts" / "skill-shape.py"
+    out = subprocess.run(
+        [sys.executable, str(script), str(SKILL_SRC), "--json"],
+        capture_output=True, text=True, encoding="utf-8", cwd=str(REPO_ROOT), timeout=180,
+    )
+    assert out.returncode == 0, f"skill-shape.py failed (WC-07): {out.stderr[-800:]}"
+    report = json.loads(out.stdout)
+    assert report["verdict"] == "pass", f"skill-shape verdict is {report['verdict']!r} (WC-07)"
+    metrics = report["metrics"]
+    assert metrics["budget_tokens"] <= 5000, (
+        f"the body budget may not be raised above 5000 tokens (WC-07): {metrics['budget_tokens']}"
+    )
+    assert metrics["est_tokens_controllable"] <= 5000, (
+        f"SKILL.md controllable body is {metrics['est_tokens_controllable']} tokens (WC-07)"
+    )
+
+
+def test_wc08_docs_new_positioning():
+    text = _read(DOCS_PAGE)
+    for anchor in (
+        "Run mode（缺省）",
+        "五节",
+        "Content mode（显式",
+        "## Migration Example",
+        "缺省不写入任何文件",
+        "不承诺任何检测结果",
+        "Instruction-like text",
+        "--inline",
+        "--file",
+    ):
+        assert anchor in text, f"docs page lacks the new-positioning anchor {anchor!r} (WC-08)"
+    assert "绕过检测" not in text, "docs page carries a forbidden detector-evasion claim (WC-08)"
+
+
+def test_wc09_docs_output_semantics():
+    text = _read(DOCS_PAGE)
+    headings = [ln.strip() for ln in text.splitlines()
+                if ln.startswith("## ") and "`--output` Semantics" in ln]
+    assert headings, "docs page lacks the `--output` Semantics section (WC-09)"
+    body = _section_body(text, headings[0])
+    for anchor in ("运行模式", "完整五节报告", "摘要", "改写文本", "内容模式"):
+        assert anchor in body, f"§ `--output` Semantics lacks the anchor {anchor!r} (WC-09)"
+
+
+def test_wc10_feature_062_status_held():
+    detail = _read(FEATURE_DETAILS)
+    assert "**Status**: Implemented" in detail, "Feature 062 detail lost its Implemented status (WC-10)"
+    for heading in ("## Latest Review", "## Key Changes"):
+        assert heading in detail, f"062 detail lacks {heading} (WC-10)"
+    review = _section_body(detail, "## Latest Review")
+    changes = _section_body(detail, "## Key Changes")
+    assert "079" in review, "## Latest Review carries no 079 extension record (WC-10)"
+    assert "079" in changes, "## Key Changes carries no 079 extension record (WC-10)"
+    cells = _feature_row_062()
+    assert "Implemented" in cells, f"the 062 registry row left the Implemented state (WC-10): {cells[:5]}"
+    last_updated = [c for c in cells if c][-1]
+    assert "079" in last_updated, (
+        f"the 062 registry row's Last Updated cell carries no 079 marker (WC-10): {last_updated[:200]!r}"
+    )
+
+
+def test_wc11_feature_row_name_description():
+    cells = _feature_row_062()
+    name, description = cells[2], cells[3]
+    assert "动作输出人类友好化" in name, f"062 row name is not the new positioning (WC-11): {name!r}"
+    assert "人类友好" in description, f"062 row description is not the new positioning (WC-11)"
+    assert "结论/关键变化/证据/风险/下一步" in description, (
+        f"062 row description must name the five-section report (WC-11): {description[:160]!r}"
+    )
+
+
+def test_wc12_contract_suite_extended():
+    names = FUNC_RE.findall(_read(Path(__file__)))
+    for namespace, total in CLAUSE_TOTALS.items():
+        owned = {n for n in names if n.startswith(f"test_{namespace.lower()}")}
+        assert len(owned) >= total, (
+            f"the suite carries {len(owned)} {namespace}-prefixed test functions, "
+            f"below the {total} {namespace} clauses (WC-12)"
+        )
+    legacy = (
+        "test_c01_thin_entry_shape",
+        "test_c02_single_skill_delegation",
+        "test_c03_skill_frontmatter_and_self_sufficient",
+        "test_c04_generated_copies_present",
+        "test_c05_docs_page_content",
+        "test_c06_registry_rows_resolve",
+        "test_c07_skill_probe_unit_and_compiled_wrapup",
+        "test_c08_no_runtime_surface",
+        "test_c09_baseline_no_new_failures",
+        "test_c10_detector_honesty_wording",
+        "test_sc04_denied_no_side_effect",
+        "test_sc04_denied_verdict_and_scope",
+    )
+    missing = [n for n in legacy if n not in names]
+    assert not missing, f"pre-079 assertions were deleted (WC-12): {missing}"
+
+
+def test_wc13_stage_class_pin_remeasured():
+    module = _import_test_module("test_stage_class_wiring.py")
+    pinned = module.UNCHANGED_SHA256.get("humanize")
+    measured = hashlib.sha256(TEMPLATE.read_bytes()).hexdigest()
+    assert pinned, "UNCHANGED_SHA256 lost its humanize row (WC-13)"
+    assert pinned == measured, (
+        f"the humanize byte pin is stale — re-measure it, do not drop it (WC-13): "
+        f"pinned={pinned} measured={measured}"
+    )
+    assert "humanize re-measured 2026-10-31 (079" in _read(
+        REPO_ROOT / "tests" / "contract" / "test_stage_class_wiring.py"
+    ), "the humanize pin row lost its date-and-reason comment (WC-13)"
+    # The judgement shape that must survive: stripping the 077 wiring card from a
+    # stage template restores the frozen baseline byte for byte. humanize is a
+    # pre-077 entry point, so it is held by the byte pin above (and by WC-03's
+    # ## Outline anchors), not by a card strip.
+    assert callable(getattr(module, "strip_wiring", None)), (
+        "the strip-away-the-wiring card leg was removed (WC-13)"
+    )
+    assert module.STAGE_STEMS, "the stage-stem roster is empty (WC-13)"
+    for stem in module.STAGE_STEMS:
+        stripped, block = module.strip_wiring(
+            (REPO_ROOT / "templates" / "commands" / f"{stem}.md").read_text(encoding="utf-8")
+        )
+        assert block.strip(), f"{stem}: the strip found no wiring card (WC-13)"
+        assert hashlib.sha256(stripped.encode("utf-8")).hexdigest() == module.BASELINE_SHA256[stem], (
+            f"{stem}: stripping the wiring card no longer restores the frozen baseline (WC-13)"
+        )
+
+
+def test_wc14_frozen_surfaces_unchanged():
+    for rel in FROZEN_SURFACES:
+        path = REPO_ROOT / rel
+        assert path.is_file(), f"frozen surface missing: {rel} (WC-14)"
+        assert FUNC_RE.findall(_read(path)), f"{rel} carries no test function (WC-14)"
+        changed = _git_names(BASELINE_COMMIT, rel)
+        assert not changed, (
+            f"frozen surface {rel} differs from {BASELINE_COMMIT} (WC-14): the roster/count "
+            f"of a verification-only suite may not move with this feature"
+        )
+
+
+def test_wc15_run_fixtures_present():
+    for class_name, files in RUN_FIXTURE_CLASSES.items():
+        for name in files:
+            path = RUN_FIXTURES / class_name / name
+            assert path.is_file(), f"run fixture missing: {path} ({class_name}, WC-15)"
+    assert _envelope("denied")["status"] == "denied", "the denied fixture lost its status (WC-15)"
+    for name in HISTORICAL_FIXTURES:
+        assert (REPO_ROOT / "tests" / "fixtures" / "humanize" / name).exists(), (
+            f"historical fixture corpus entry missing: {name} (WC-15)"
+        )
+    rewritten = _git_names(
+        BASELINE_COMMIT, "tests/fixtures/humanize",
+        ":(exclude)tests/fixtures/humanize/run",
+    )
+    assert not rewritten, (
+        f"the historical fixture corpus was rewritten (WC-15): {rewritten}"
+    )
+
+
+def test_wc16_command_roster_unchanged():
+    live = {p.name for p in (REPO_ROOT / "templates" / "commands").glob("*.md")}
+    base = {Path(n).name for n in _git_tracked(BASELINE_COMMIT, "templates/commands/")}
+    assert base, "the baseline tree lists no command templates"
+    assert live == base, (
+        f"command roster drifted — added: {sorted(live - base)}; "
+        f"removed: {sorted(base - live)} (WC-16)"
+    )
+    assert len(live) == 27, f"the roster must stay at 27 command templates, found {len(live)} (WC-16)"
+
+
+def test_wc17_new_line_gate_zero():
+    gates = _gates_module()
+    added = _git_added_lines(BASELINE_COMMIT, *gates.SCAN_DIRS, "templates/*.md")
+    assert added, "no added lines on the scan surface — the diff base or paths are wrong"
+    hits = [line[:120] for line in added if gates.BLOCKING_RE.search(line)]
+    assert not hits, f"new blocking confirmation-gate lines introduced (WC-17): {hits}"
+
+
+def test_wc18_no_runtime_surface_added():
+    changed = _git_names(BASELINE_COMMIT, "src/specify_cli", "scripts")
+    assert not changed, (
+        f"the runtime surface moved — this feature adds no runtime and no dependency (WC-18): {changed}"
+    )
+
+
+def test_wc19_ledgers_unchanged():
+    changed = _git_names(
+        BASELINE_COMMIT,
+        "shared/definitions/flow-class-definitions.md",
+        "shared/definitions/probe-definitions.md",
+    )
+    assert not changed, f"a class/probe registry moved (WC-19): {changed}"
+    ledger = _read(REPO_ROOT / "shared" / "definitions" / "flow-class-definitions.md")
+    rows = [ln for ln in ledger.splitlines()
+            if ln.startswith("|") and "skill:humanize" in ln]
+    assert rows, "the flow-class ledger lost its skill:humanize row (WC-19)"
+    for row in rows:
+        assert "expression" in row and "reader-oracle" in row, (
+            f"skill:humanize left expression/reader-oracle (WC-19): {row}"
+        )
+    assert not any(ln.startswith("| /speckit.humanize ") for ln in
+                   _read(PROBE_DEFS).splitlines()), (
+        "a probe command unit was registered for the Simple command (WC-19)"
+    )
+
+
+def test_wc20_command_stays_simple():
+    text = _read(TEMPLATE)
+    assert "scripts:" not in _frontmatter(text), "a scripts: block would classify it Complex (WC-20)"
+    assert "## Wrap-up" not in text, "a ## Wrap-up face would classify it Complex (WC-20)"
+    assert "## Feedback" not in text, "a ## Feedback step would classify it Complex (WC-20)"
+    feedback = _import_test_module("test_feedback_command_classification.py")
+    assert "humanize" in feedback.SIMPLE_COMMANDS, (
+        "the 027 classification table no longer derives humanize as Simple (WC-20)"
+    )
+    assert "humanize" not in feedback.COMPLEX_COMMANDS, "humanize moved to Complex (WC-20)"
+    names = set(FUNC_RE.findall(
+        _read(REPO_ROOT / "tests" / "contract" / "test_feedback_command_classification.py")
+    ))
+    for required in ("test_simple_command_omits_feedback_step",
+                     "test_table_covers_every_command_template"):
+        assert required in names, f"the WC-20 carrier {required} disappeared (WC-20)"
+
+
+# ---------------------------------------------------------------------------
+# WC-12 machine leg — the clause ↔ test map is total.
+#
+# The three inputs are the five contracts (clause definitions + traceability
+# names), this file's § Contract Coverage Map (clause → task row) and the
+# § Clause Test Waivers table. "Zero gap" is this assertion turning green, not
+# a human reading of the table: a clause with no test name, a test name that
+# resolves to no function, a WC-prefixed function nobody claims, or a clause
+# assigned twice all fail here.
+# ---------------------------------------------------------------------------
+
+def _clause_definitions() -> tuple:
+    definitions, traceability = {}, {}
+    for fname in CONTRACT_FILES:
+        path = CONTRACTS_DIR / fname
+        assert path.is_file(), f"contract missing: {path} (WC-12)"
+        text = _read(path)
+        for clause in CLAUSE_DEF_RE.findall(text):
+            assert clause not in definitions, (
+                f"{clause} is defined twice: {definitions.get(clause)} and {fname} (WC-12)"
+            )
+            definitions[clause] = fname
+        for line in text.splitlines():
+            if not CLAUSE_ROW_RE.match(line):
+                continue
+            clause = CLAUSE_ROW_RE.match(line).group(1)
+            found = TEST_NAME_RE.search(line)
+            traceability[clause] = (found.group(1) + (found.group(2) or "")) if found else ""
+    return definitions, traceability
+
+
+def _waiver_rows() -> list:
+    lines = _read(TASKS_DOC).splitlines()
+    start = next(
+        i for i, ln in enumerate(lines) if ln.strip().startswith("### Clause Test Waivers")
+    )
+    rows = []
+    for line in lines[start + 1:]:
+        if line.startswith("## ") or (line.startswith("### ")
+                                      and "Clause Test Waivers" not in line):
+            break
+        if not line.strip().startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if cells[0] == "条款" or set("".join(cells)) <= set("-: "):
+            continue
+        rows.append(cells)
+    return rows
+
+
+def test_wc12_clause_test_map_is_total():
+    definitions, traceability = _clause_definitions()
+    assert len(definitions) == sum(CLAUSE_TOTALS.values()), (
+        f"the five contracts define {len(definitions)} clauses, expected "
+        f"{sum(CLAUSE_TOTALS.values())} (WC-12)"
+    )
+    for namespace, total in CLAUSE_TOTALS.items():
+        measured = len([c for c in definitions if c.startswith(namespace + "-")])
+        assert measured == total, (
+            f"{namespace} defines {measured} clauses, the partition says {total} (WC-12)"
+        )
+    assert set(traceability) == set(definitions), (
+        f"clauses with no traceability row: {sorted(set(definitions) - set(traceability))}; "
+        f"traceability rows for undefined clauses: {sorted(set(traceability) - set(definitions))}"
+    )
+    unnamed = sorted(c for c, name in traceability.items() if not name.strip())
+    assert not unnamed, f"clauses with an empty test name in the traceability table: {unnamed}"
+
+    tasks_text = _read(TASKS_DOC)
+    coverage = _section_body(tasks_text, "## Contract Coverage Map")
+    row_of, mapped = {}, {}
+    for line in coverage.splitlines():
+        match = MAP_ROW_RE.match(line)
+        if not match:
+            continue
+        contract_file, clause_cell, row_id = match.group(1), match.group(2), match.group(3)
+        clauses = re.findall(r"(?:IP|EX|RP|CM|WC)-\d{2}", clause_cell)
+        assert clauses, f"coverage-map row for {row_id} names no clause (WC-12)"
+        for clause in clauses:
+            assert clause in definitions, (
+                f"coverage map names undefined clause {clause} under {contract_file}"
+            )
+            assert clause not in mapped, (
+                f"{clause} is assigned to two rows: {mapped[clause]} and {row_id} (WC-12)"
+            )
+            assert definitions[clause] == contract_file, (
+                f"{clause} is defined in {definitions[clause]} but mapped under {contract_file}"
+            )
+            mapped[clause] = row_id
+    assert set(mapped) == set(definitions), (
+        f"clauses with no coverage-map row: {sorted(set(definitions) - set(mapped))}; "
+        f"map rows naming no defined clause: {sorted(set(mapped) - set(definitions))}"
+    )
+
+    task_bodies = {}
+    for line in tasks_text.splitlines():
+        match = TASK_ROW_RE.match(line)
+        if match:
+            task_bodies[match.group(1)] = line
+    for clause, row_id in mapped.items():
+        assert row_id in task_bodies, (
+            f"{clause} is assigned to {row_id}, which is not a task row (WC-12)"
+        )
+        assert clause in task_bodies[row_id], (
+            f"task row {row_id} does not repeat the clause {clause} it owns (WC-12)"
+        )
+
+    waivers = {}
+    for cells in _waiver_rows():
+        assert len(cells) == 5, f"malformed waiver row (want 5 cells): {cells}"
+        found = TEST_NAME_RE.search(cells[1])
+        assert found, f"waiver row names no test function: {cells}"
+        assert cells[2] and cells[3] and cells[4], (
+            f"waiver row lacks a reason, a remedy or an evidence slot (M-21): {cells}"
+        )
+        waivers[found.group(1)] = cells
+
+    resolvable = {}
+    for rel in (
+        "tests/contract/test_humanize_command_surface.py",
+        "tests/contract/test_stage_class_wiring.py",
+        "tests/contract/test_feedback_command_classification.py",
+    ):
+        for name in FUNC_RE.findall(_read(REPO_ROOT / rel)):
+            resolvable[name] = rel
+    claimed, unresolved = set(), []
+    for clause, test_id in traceability.items():
+        base = test_id.split("[")[0]
+        if base in resolvable or base in waivers:
+            claimed.add(base)
+        else:
+            unresolved.append(f"{clause}->{test_id}")
+    assert not unresolved, (
+        f"traceability names that resolve to no suite function and carry no waiver (WC-12): "
+        f"{unresolved}"
+    )
+
+    orphans = sorted(
+        name for name in FUNC_RE.findall(_read(Path(__file__)))
+        if re.match(r"test_(ip|ex|rp|cm|wc)", name)
+        and name not in claimed
+        and name not in waivers
+    )
+    assert not orphans, (
+        f"WC-prefixed suite functions that no clause and no waiver claims (WC-12): {orphans}"
+    )

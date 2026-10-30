@@ -316,6 +316,6 @@ $ ls -A .specify/.tmp/humanize/ | wc -l
 
 | 场景 | 原因 | 替代证据 |
 |------|------|----------|
-| S5 B 两会话并发 | 单会话执行无法构造两个同时调用 | 夹具占位断言 `test_ip11_active_run_rejected`、`test_ip12_target_occupied` |
+| S5 B 两会话并发 | 单会话执行无法构造两个同时调用 | 夹具占位断言 `test_ip11_active_run_rejected`、`test_ip12_output_occupied_rejected` |
 | S6 B 用户拒绝确认 | 无人值守运行没有可转达确认的用户；不得伪造用户答复 | `test_sc04_denied_no_side_effect`、`test_sc04_denied_verdict_and_scope` |
 | S7 A 原生载体对照 | 本段授权禁止派发子代理；原生载体未执行 | `test_ex17_degraded_honesty`、`test_ex18_degraded_keeps_report_contract`；且本页所有运行均以真实降级载体记录 |
