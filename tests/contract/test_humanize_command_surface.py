@@ -12,12 +12,13 @@ detector-honesty wording scan.
 **Ownership, part 2 — feature 079 (run mode).** The ``test_ip* / test_ex* / test_rp* /
 test_wc*`` block owns the 079 clauses assigned to this file by
 ``.specify/specs/079-humanize-run-output/tasks.md`` § Contract Coverage Map: IP-01…IP-10
-and EX-01…EX-05 (US1 implementation rows T006–T008), plus the tests-side frontier of the
-later US1 rows — EX-06…EX-10 (T009/T010), RP-01…RP-04 (T011) and WC-01…WC-04 (T012).
+and EX-01…EX-05 (US1 implementation rows T006–T008), the tests-side frontier of the
+later US1 rows — EX-06…EX-10 (T009/T010), RP-01…RP-04 (T011) and WC-01…WC-04 (T012) —
+and the US2 group RP-05…RP-18 (T013, landed before its implementation rows T014–T018).
 Function names are the contract traceability names verbatim, so T036's
-``test_wc12_clause_test_map_is_total`` can claim each clause. The later groups are this
-file's recorded red-first frontier: they stay red until their implementation row lands;
-no assertion here is allowed to pass by weakening the contract.
+``test_wc12_clause_test_map_is_total`` can claim each clause. A group whose
+implementation row has not run yet is this file's recorded red-first frontier; no
+assertion here is allowed to pass by weakening the contract.
 
 Red-Green discipline (Constitution IV, template-only form): assertions land BEFORE the
 artifacts they describe; red = the asserted section/anchor/fixture value is not there
@@ -729,3 +730,198 @@ def test_wc04_no_blocking_literals():
     hits = [(i + 1, ln) for i, ln in enumerate(_read(TEMPLATE).splitlines())
             if blocking.search(ln)]
     assert not hits, f"template carries blocking-gate literals (WC-04): {hits}"
+
+
+# ---------------------------------------------------------------------------
+# RP-05 .. RP-18 — report-shape § Conclusion … § Fidelity & Honesty (T013)
+#
+# T013 lands this group BEFORE the implementation rows (T014 § Conclusion/§ Key
+# Changes, T015 § Evidence, T016 § Risks & Limits, T017 § Next Steps/§ Language,
+# T018 § Fidelity & Honesty). Clauses whose row has not run yet are the recorded
+# red-first frontier. The governance fixture directory is projected into the two
+# source states FR-014 distinguishes — all sources readable, and one source
+# unavailable — so the source-list obligation is asserted on data, not prose.
+# ---------------------------------------------------------------------------
+
+GOVERNANCE = RUN_FIXTURES / "governance"
+GOVERNANCE_STEMS = ("instructions", "constitution", "glossary", "features")
+
+
+def _report_shape() -> str:
+    assert REPORT_SHAPE_DOC.is_file(), f"report-shape reference missing: {REPORT_SHAPE_DOC}"
+    return _read(REPORT_SHAPE_DOC)
+
+
+def _rs_section(heading: str) -> str:
+    return _section_body(_report_shape(), heading)
+
+
+def _governance_state(missing: tuple = ()) -> dict:
+    """Project the governance stubs into FR-014 source states (two-state fixture)."""
+    states = {}
+    for stem in GOVERNANCE_STEMS:
+        path = GOVERNANCE / f"{stem}.md"
+        assert path.is_file(), f"governance projection missing: {path}"
+        body = _read(path)
+        assert "source:" in body and "status: read" in body, (
+            f"{path} is not a readable governance projection stub (FR-014)"
+        )
+        states[stem] = "unavailable" if stem in missing else "read"
+    return states
+
+
+def test_rp05_conclusion_verdict():
+    body = _rs_section("## Conclusion")
+    for anchor in (
+        "先于一切细节",
+        "首行",
+        "`verdict: <token>`",
+        "英文原样",
+        "报告语言",
+        "FR-019",
+        "未执行任何动作",
+        "MUST NOT 被写成「执行成功」",
+        "MUST NOT 使用成功措辞",
+        "部分完成",
+    ):
+        assert anchor in body, f"§ Conclusion lacks the verdict anchor {anchor!r} (RP-05)"
+
+
+def test_rp06_key_changes_by_impact():
+    body = _rs_section("## Key Changes")
+    for anchor in (
+        "按影响降序",
+        "FR-019",
+        "字典序",
+        "封闭影响尺",
+        "无变化",
+        "MUST NOT 留空",
+        "指令造成的写入",
+        "`products`",
+    ):
+        assert anchor in body, f"§ Key Changes lacks the impact-order anchor {anchor!r} (RP-06)"
+
+
+def test_rp07_evidence_pointers():
+    body = _rs_section("## Evidence")
+    for anchor in (
+        "每条关键结论配可定位指针",
+        "产物路径",
+        "命令与退出码",
+        "测试读数",
+        "`none`",
+        "逐项",
+    ):
+        assert anchor in body, f"§ Evidence lacks the pointer anchor {anchor!r} (RP-07)"
+
+
+def test_rp08_dispatch_record_line():
+    body = _rs_section("## Evidence")
+    for anchor in (
+        "`dispatches:`",
+        "顶层派发",
+        "成功路径恒为 1",
+        "降级为 `0`",
+        "MUST NOT 重复计数",
+    ):
+        assert anchor in body, f"§ Evidence lacks the dispatch-record anchor {anchor!r} (RP-08)"
+
+
+def test_rp09_no_known_risks_explicit():
+    body = _rs_section("## Risks & Limits")
+    for anchor in (
+        "风险",
+        "限制",
+        "未验证项",
+        "缺失上下文",
+        "no known risks",
+        "MUST NOT 省略",
+    ):
+        assert anchor in body, f"§ Risks & Limits lacks the risk anchor {anchor!r} (RP-09)"
+    success = _envelope("success")
+    assert success["failures"] == [], (
+        "the success fixture models the 'no known risks' state (RP-09/SC-009)"
+    )
+
+
+def test_rp10_sources_read_list():
+    body = _rs_section("## Risks & Limits")
+    for anchor in (
+        "来源清单",
+        "只列",
+        "实际读取",
+        "MUST NOT 列进来源清单",
+        "`not-read`",
+        "`unavailable`",
+        "FR-014",
+    ):
+        assert anchor in body, f"§ Risks & Limits lacks the source anchor {anchor!r} (RP-10)"
+
+    full = _governance_state()
+    assert len(full) == 4, f"the full state must carry the four governance sources, got {full}"
+    assert set(full.values()) == {"read"}, f"the full state must be all-read, got {full}"
+
+    partial = _governance_state(missing=("glossary",))
+    assert partial["glossary"] == "unavailable", (
+        "the partial state must model one unavailable governance source (FR-014)"
+    )
+    assert [s for s, state in partial.items() if state == "read"] == [
+        "instructions", "constitution", "features",
+    ], f"the partial state must keep the other three readable, got {partial}"
+    missing = [s for s, state in partial.items() if state != "read"]
+    listed = [s for s, state in partial.items() if state == "read"]
+    assert missing == ["glossary"] and "glossary" not in listed, (
+        "a missing source is declared as missing, never listed as read (RP-10)"
+    )
+
+
+def test_rp11_next_steps_or_none():
+    body = _rs_section("## Next Steps")
+    for anchor in ("可执行的下一步", "无下一步", "泛泛建议"):
+        assert anchor in body, f"§ Next Steps lacks the actionable anchor {anchor!r} (RP-11)"
+
+
+def test_rp12_language_priority():
+    body = _rs_section("## Language")
+    for anchor in ("指令主语言", "项目治理", "回退", "`en`", "声明"):
+        assert anchor in body, f"§ Language lacks the priority anchor {anchor!r} (RP-12)"
+
+
+def test_rp13_headings_stay_english():
+    body = _rs_section("## Language")
+    for anchor in ("英文原样", "小节标题", "载体标记", "派发记录", "键名"):
+        assert anchor in body, f"§ Language lacks the invariant-literal anchor {anchor!r} (RP-13)"
+
+
+def test_rp14_language_keeps_identifiers():
+    body = _rs_section("## Language")
+    for anchor in ("术语", "专有名词", "代码标识符", "路径", "命令", "MUST NOT 改变事实层"):
+        assert anchor in body, f"§ Language lacks the identifier anchor {anchor!r} (RP-14)"
+
+
+def test_rp15_fidelity_floor():
+    body = _rs_section("## Fidelity & Honesty")
+    for anchor in ("保真底线", "FR-017", "受保护集合", "已蕴含"):
+        assert anchor in body, f"§ Fidelity & Honesty lacks the fidelity anchor {anchor!r} (RP-15)"
+
+
+def test_rp16_no_fabrication():
+    body = _rs_section("## Fidelity & Honesty")
+    for anchor in ("MUST NOT 编造", "未读取", "不存在的路径", "未能核实"):
+        assert anchor in body, f"§ Fidelity & Honesty lacks the honesty anchor {anchor!r} (RP-16)"
+
+
+def test_rp17_expression_and_detector_honesty():
+    body = _rs_section("## Fidelity & Honesty")
+    for anchor in ("四维度", "`--tone`", "`--audience`", "MUST NOT 承诺", "检测器"):
+        assert anchor in body, f"§ Fidelity & Honesty lacks the expression anchor {anchor!r} (RP-17)"
+
+
+def test_rp18_reader_comprehension():
+    body = _rs_section("## Fidelity & Honesty")
+    for anchor in (
+        "面向读者",
+        "user-facing-comprehension.md",
+        "内部引擎调用形式",
+    ):
+        assert anchor in body, f"§ Fidelity & Honesty lacks the reader anchor {anchor!r} (RP-18)"

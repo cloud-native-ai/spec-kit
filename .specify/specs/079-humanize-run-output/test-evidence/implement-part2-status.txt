@@ -1,0 +1,49 @@
+# Implement part 2/5 — stage status (T009–T016)
+
+date=2026-10-30
+stage=implement
+part=2/5
+feature=079-humanize-run-output
+base_commit=faeb251a
+scope=T009,T010,T011,T012,T013,T014,T015,T016
+selection_basis=targeted-set-v1
+
+command=.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py
+rc=1
+passed=178
+failed=11
+skipped=0
+new_failures=9
+sufficiency=partial — every clause owned by this segment turned green (EX-06…EX-10, RP-01…RP-10, WC-01…WC-04); the remaining reds are the US2 red-first frontier for T017/T018 plus two attributable owner-row reds (T032 template pin, T028 mirror regeneration) and one E2 baseline failure; no unexplained failure
+
+## E3 stage-status line
+
+`stage=implement part=2/5 selection=targeted-set-v1 command=".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_compatibility.py tests/integration/test_expression_line_pilot.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_stage_class_wiring.py" rc=1 passed=178 failed=11 skipped=0 new_failures=9 sufficiency=partial-expected-frontier`
+
+## Turned green (10 of the 11 part-1 frontier reds)
+
+| Group | Owner row | Tests |
+|-------|-----------|-------|
+| EX-06、EX-07、EX-08 | T009 | `test_ex06_payload_six_items`、`test_ex07_payload_keeps_instruction_verbatim`、`test_ex08_payload_defers_to_instruction_gates` |
+| EX-09、EX-10 | T010 | `test_ex09_envelope_is_message`、`test_ex10_missing_anomaly_line_blocks_consumption` |
+| RP-01…RP-04 | T011 | `test_rp01_five_sections_in_order`…`test_rp04_zero_write_default` |
+| WC-01 | T012 | `test_wc01_template_declares_breaking_change` |
+
+Segment-added US2 clauses also turned green in the same pass: RP-05…RP-10 (T014 / T015 / T016) = `test_rp05_conclusion_verdict`…`test_rp10_sources_read_list`.
+
+## new_failures 归属（9）
+
+| # | 失败名 | 归属 | 说明 |
+|---|--------|------|------|
+| 1–8 | `test_humanize_command_surface.py::test_rp11…test_rp18` | 预期红先行（T017 / T018 行） | T013 按 RP-05…RP-18 落笔；§ Next Steps / § Language（T017）与 § Fidelity & Honesty（T018）尚未落笔，红 = 断言的小节不存在。真实红态读数与分析见 `notes/red-first-evidence.md` § T013 |
+| 9 | `test_stage_class_wiring.py::test_clarify_is_inside_and_the_other_entry_points_are_untouched` | 实现后守卫 → **T032** | 报错原文：`templates/commands/humanize.md is a pre-077 wiring entry point and must keep its bytes in this feature`（`09545126…` vs 改写后 `dd7c77ef…`）。模板字节钉扎按 WC-13 排在模板改写之后由 T032 重新度量，本段不提前改钉扎 |
+
+## 非 new_failures（如实声明）
+
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
+- `test_expression_compatibility.py::test_c7_mirrors_are_byte_identical` —— part 1 已在册的镜像暂态，仍报 `.specify/skills/humanize/SKILL.md — mirror differs from skills/external/humanize/SKILL.md`；唯一再生成行是 **T028**，本段按纪律不提前再生成派生面（WC-05/WC-06）。
+
+## 未跑的东西（如实声明）
+
+- **全量套件未重跑**：E2 已在 implement 起点消耗（17 failed / 6881 passed / 7 skipped / 998s），本文件不重捕获。
+- 派生面（四份按工具副本、`.specify/skills/humanize/` 镜像）MUST NOT 手改：本段未运行 `regen-command-copies.py` / `sync-mirrors.py --write`，两者保持 T028 的再生成入口。
