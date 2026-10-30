@@ -1,0 +1,23 @@
+{
+  "stage": "review",
+  "substage": "process-segment",
+  "row_type": "stage-status",
+  "status": "ran",
+  "selection_basis": "targeted-set-v1 (stage_base=347a1458): the review re-read the feature's five coaching contract files, the four frozen baselines, and the compiled-face, directory-governance and confirmation-gate guards that read the surfaces this feature changed. No full-suite run: the closure slot belongs to post-review.",
+  "changed_paths": [
+    ".specify/specs/078-coaching-skills/review.md",
+    ".specify/specs/078-coaching-skills/test-evidence/review-stage-status.txt",
+    ".specify/specs/078-coaching-skills/test-evidence/review-targeted.txt",
+    ".specify/memory/register.md"
+  ],
+  "evidence_ptr": ".specify/specs/078-coaching-skills/test-evidence/review-targeted.txt; process findings in .specify/specs/078-coaching-skills/review.md",
+  "command": "/Users/liuqiming.lqm/project/profiles/.venv/bin/python -m pytest -q tests/contract/test_expression_compatibility.py tests/contract/test_migration_distribution.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_run_skills_wiring.py tests/contract/test_coaching_dispatch_contract.py tests/contract/test_coaching_expectation_contract.py tests/contract/test_coaching_observation_contract.py tests/contract/test_coaching_run_contract.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_compile_embeds.py tests/contract/test_compile_propagation_order.py tests/contract/test_compile_reconcile_guards.py tests/contract/test_directory_governance.py tests/contract/test_scan_confirmation_gates.py",
+  "rc": 0,
+  "passed": 162,
+  "failed": 0,
+  "new_failures": 0,
+  "new_failure_names": [],
+  "code_segment": "not dispatched in this run (process-scoped stage); review.md § 2.1 records not-evaluated / blocking-unresolved",
+  "test_budget": "targeted set only; the implement-start full-suite slot was consumed at implement start and the closure full-suite slot belongs to post-review",
+  "at": "2026-10-30"
+}

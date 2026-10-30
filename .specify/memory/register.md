@@ -103,3 +103,10 @@
 | REC-074a-03 | `pre-analyze-check` 的路径引用第二候根 `.specify/memory/` 解析，消除永久 advisory 噪声 | `.specify/specs/074a-authorized-routing/review.md` § REC-3（F3） | open |
 | REC-074a-04 | 下游承接义务须有独立状态；`post_change_commit` 改名并强制收口任务推进 | `.specify/specs/074a-authorized-routing/review.md` § REC-4（F5/F6） | open |
 | REC-074a-05 | 入口校验 id 移出 `V-` 空间；golden 行增 `target_paths` 使 FR-008 路径谓词可判定 | `.specify/specs/074a-authorized-routing/review.md` § REC-5（F4 + §2.2） | open |
+| REC-078-01 | 封闭集须同时枚举「字面命中」与「注册表增长后必然获得该字面量的消费方」，否则封闭性声明会被一次被迫的消费方编辑证伪 | `.specify/specs/078-coaching-skills/review.md` § 5.4 REC-078-01（F1） | open |
+| REC-078-02 | analyze 存活的 M/L findings 在编号时登记、在 implement 以逐条 disposition 行（fixed / carried / waived）收口，缺失即门禁失败 | `.specify/specs/078-coaching-skills/review.md` § 5.4 REC-078-02（F3） | open |
+| REC-078-03 | 运行期事件的 SC 判定须携带传输身份（`host-event` / `self-report` / `scripted-substitute`）；替代传输把判定封顶为 `partial` | `.specify/specs/078-coaching-skills/review.md` § 5.4 REC-078-03（F4） | open |
+| REC-078-04 | 写入状态脊或 `verification.md` 的证据路径必须受版本管理；失败名证据件须带 command / scope / base / counts 头 | `.specify/specs/078-coaching-skills/review.md` § 5.3 REC-078-04（F5） | open |
+| REC-078-05 | 覆盖率引擎须能消费书面车道豁免（`--waive-lane fr --reason-file`），把「按构造不适用」与「未覆盖」分开 | `.specify/specs/078-coaching-skills/review.md` § 5.3 REC-078-05（F6） | open |
+| REC-078-06 | 同作者门禁增加 `operating-constraint` 降级理由与规定标记，使被迫不委派可跨阶段比较 | `.specify/specs/078-coaching-skills/review.md` § 5.4 REC-078-06（F8） | open |
+| REC-078-07 | `/speckit.review` 增加非阻断的「调用方限定只跑过程段」triage 值；`blocking-unresolved` 只留给真正未解决的 blocking 代码项 | `.specify/specs/078-coaching-skills/review.md` § 5.2 REC-078-07（F9） | open |
