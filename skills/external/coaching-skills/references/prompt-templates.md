@@ -1,114 +1,96 @@
-# Thought Experiment Prompt Templates
+# Coaching Prompt Templates
 
-Use these templates only as prompt fragments. They are designed for mental simulation, not real execution.
+Fill-in shapes for one coaching run. The skill body owns the rules; this file owns the
+skeletons, the derivation method and the phase boundaries.
 
-## Mental Dry Run for a Prompt or Skill
+## Execution Expectation Template
 
-```text
-Act as a strict mental simulator for the following Skill or prompt. Do not execute tools, code, shell commands, network calls, file writes, or external actions unless I explicitly ask for real execution later.
-
-Target:
-[Paste the Skill, prompt, or workflow]
-
-Scenario:
-[Describe the user request, inputs, environment, and constraints]
-
-Simulation contract:
-1. List the initial state, known rules, assumptions, and unknowns.
-2. Process the target step by step.
-3. For every step, output: Step, Trigger/Instruction, Mental Action, State Delta, Consistency Check, Risk/Uncertainty.
-4. If a step would require a real side effect, mark it as "would execute" and simulate only the expected logical consequence.
-5. Stop if rules conflict or required information is missing.
-6. End with verdict, likely output, failure modes, and patch recommendations.
-```
-
-## State Machine Simulation
-
-```text
-Treat the target workflow as a closed state machine.
-
-Initial State:
-[State object]
-
-Rules:
-[Allowed transitions and constraints]
-
-Events:
-[Sequence of user/tool/system events to simulate]
-
-For each event, update and print the State Object, cite the rule applied, and run a consistency check. Do not use real tools or external knowledge beyond the provided rules.
-```
-
-## Devil's Advocate Verification
-
-```text
-Stress-test this Skill or prompt without executing it.
-
-Target goal:
-[Goal]
-
-Target rules:
-[Rules]
-
-Create three edge-case scenarios:
-1. Happy path with minimal ambiguity
-2. Missing/conflicting input
-3. Tool/action failure or forbidden side effect
-
-For each scenario, mentally simulate the target step by step, track state changes, identify where it succeeds or fails, and propose minimal prompt/Skill patches.
-```
-
-## Self-Audit Footer
-
-```text
-Self-audit your simulation:
-- Did any step claim real execution?
-- Did any state change skip a rule?
-- Did any conclusion rely on hidden assumptions?
-- Which result still requires real execution, tests, or tool calls to confirm?
-Revise the trace if needed.
-```
-
----
-
-## Simulation Report Output Template
-
-The full report skeleton a `think-skills` run emits. Copy it verbatim and fill each field;
-every heading is mandatory (the Self-Audit and Verdict sections are what make a simulation
-auditable rather than a guess).
+Path: `.specify/memory/coaching/<run-id>/expectation.md`. Write it **before any
+dispatch action**; the `dispatched-at` field of `observation.md` § Dispatch is the
+ordering evidence.
 
 ```markdown
-## Simulation Scope
-- Target:
-- Scenario:
-- Forbidden real actions:
+## Run header
+- run-id: <YYYYMMDDTHHMMSSZ-trainee-slug>
+- trainee: <resolved Trainee name and path>
+- started-at: <ISO-8601 UTC>
 
-## Initial State / Rules / Assumptions
-- Initial State:
-- Rules:
-- Assumptions:
-- Unknowns:
+## Trainee
+- identifier (verbatim):
+- resolved-path:
+- layer: external | internal
+- failure-semantics: <extracted from the Trainee's own text>
 
-## Mental Trace
-| Step | Trigger / Instruction | Mental Action | State Delta | Consistency Check | Risk / Uncertainty |
+## Outcome Correctness
+<!-- `OC-1` MUST name the primary deliverable: an artifact path, or a checkable
+conclusion (decision, report, verdict statement) for a Trainee that produces no
+artifact. The acceptance and allowed-deviation columns accept only `pass|fail` or
+`tolerance=<number><unit> severity=<low|medium|high>`; undecidable wording such as
+"roughly matches" or "reasonable" is invalid in either column. -->
+| id | object | acceptance | allowed-deviation | derivation |
+|---|---|---|---|---|
+| OC-1 | <primary deliverable> | <closed form> | <closed form> | <Trainee file#section> |
+| OC-2 | <check item or verdict statement> | <closed form> | <closed form> | <Trainee file#section> |
+
+## Process Efficiency
+<!-- Every row derives from the Trainee text. `steps` is an order of magnitude
+(`~5-8`), `tool-calls` is a profile (which tools, how many rounds), `retries` is the
+allowed redundancy budget, and `critical-path` names the step sequence that must not
+be skipped. `derivation` is a Trainee anchor or `validation-gap`; a validation-gap
+row carries no invented numbers. `validation-gap` is the expectation-side unknown
+marker and must not be swapped with `observation-gap`, which belongs to the
+observation record only. -->
+| id | steps | tool-calls | retries | critical-path | derivation |
 |---|---|---|---|---|---|
+| PE-1 | ~<order of magnitude> | <tools and rounds> | <allowed retries> | <named step sequence> | <Trainee file#section> |
+| PE-2 | validation-gap | validation-gap | validation-gap | validation-gap | validation-gap |
 
-## Edge Cases
-1. Happy path:
-2. Missing or conflicting input:
-3. Tool/action failure or forbidden side effect:
+## Assumptions
+- <what this expectation takes for granted>
 
-## Self-Audit
-- Real execution claims:
-- Skipped logic:
-- Hidden assumptions:
-- Needs real validation:
-- Deterministic vs Judgmental boundary:
+## Unknowns
+- <what cannot be derived from the Trainee text and will be checked after execution>
 
-## Verdict
-- Result:
-- Likely behavior:
-- Failure modes:
-- Minimal patches:
-- Logic extraction opportunities:
+## Forbidden Side Effects
+- No Trainee tool, script or command is executed in this phase.
+- No write inside the Trainee directory.
+- No network or external call.
+- No claim marker is created; the claim protocol belongs to `data-model.md` §
+  Optimization claim and to the optimization step only.
+
+## Trainee Failure Semantics
+- <which failure stops the run, which continues, and what the Trainee promises to
+  report; extracted from the Trainee's own text>
 ```
+
+## Derivation Method
+
+Produce the expectation by the mental-simulation procedure carried over from the
+pre-rename skill:
+
+1. Build the simulation contract: **Initial State**, **Rules**, **Known Constraints**,
+   **Assumptions**, **Unknowns**, plus the side effects forbidden for this phase.
+2. Run the mental trace step by step. For each Trainee step record the expected
+   action, the state delta and a consistency check against the critical path.
+3. Run the **Logic Implementation Audit**. Separate **Natural Language Logic**
+   (judgement steps executed by reasoning: trade-offs, quality review, intent) from
+   **Programmatic Logic** (deterministic script calls). Take each script's contract
+   as given (input → output) and audit its invocation timing, preconditions and
+   downstream consumption instead of simulating its internals.
+4. Record the audit result in `expectation.md`: which Trainee steps are judgement,
+   which are deterministic calls, and which side effects are forbidden for this
+   phase.
+5. Extract the Trainee's own failure semantics here; the compare phase reuses them to
+   decide continue-vs-stop.
+
+## Zero Side Effects of the Expectation Phase
+
+The expectation phase MUST NOT:
+
+1. execute any Trainee tool, script, or command;
+2. write inside the Trainee's directory;
+3. make network or external calls;
+4. create the run's claim marker — that belongs to the optimization step.
+
+Reading the Trainee's `SKILL.md` and the reference files it needs is permitted and is
+the only allowed interaction.

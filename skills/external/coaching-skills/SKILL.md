@@ -10,75 +10,182 @@ classification: external
 
 ## Goal
 
-Verify the likely behavior of another Skill, prompt, workflow, or instruction set by running a structured mental simulation only. The result should expose hidden assumptions, skipped logic, conflicts, side effects, and edge-case failures before any real execution occurs.
+Coach one Trainee skill through one real work item: state the execution expectation
+first (outcome correctness and process efficiency), dispatch exactly one subagent to
+execute the Trainee's own `SKILL.md`, observe what actually happens, compare the two,
+and hand a micro-adjustment plan to the existing `improve-skills` entry. The Trainee's
+real work is the primary result; optimizing the Trainee is secondary.
 
-## Operating Rules
+## Inputs
 
-- Do not actually execute the target Skill, prompt, code, commands, network calls, file writes, tool calls, or external actions during the simulation.
-- Reading the target text is allowed when needed; triggering its side effects is not.
-- Use an auditable trace table or state object instead of claiming that anything really ran.
-- Mark uncertainty explicitly. Do not invent facts, tool outputs, files, timing behavior, or empirical results.
-- If the target requires real execution for confirmation, label that as a validation gap rather than simulating certainty.
+Invocation: `coaching-skills <trainee-name|trainee-path> <work>`.
 
-## Workflow
+- Exactly two positional parameters: `<trainee-name|trainee-path>` and `<work>`.
+- `<work>` MUST be non-empty and enters the run and the dispatch payload verbatim;
+  never rewrite, summarize, or re-scope it.
+- A missing or empty parameter fails closed and names the missing parameter; never
+  substitute one parameter for the other and never pick a topic on the user's behalf.
+- Missing-argument handling is a plain one-sentence clarification, then stop. It is
+  not a confirmation step.
 
-1. **Identify target and scenario**
-   - Determine the target Skill, prompt, or workflow to simulate.
-   - Identify whether the target Skill bundles executable scripts under its `scripts/` directory. If it does, those scripts are also part of the simulation target — trace their input/output contracts and execution effects, not just the natural-language flow.
-   - Capture the user request, inputs, environment assumptions, allowed tools, forbidden actions, and desired output.
-   - If critical target text or scenario data is missing, ask one targeted clarification question.
+## Trainee Resolution
 
-2. **Build the simulation contract**
-   - List `Initial State`, `Rules`, `Known Constraints`, `Assumptions`, and `Unknowns`.
-   - Define what counts as a side effect and explicitly mark it as forbidden for this run.
-   - Choose the trace mode:
-     - `Line-by-line` for code-like prompts or procedural Skills.
-     - `State machine` for workflows, agents, tool orchestration, or multi-step user journeys.
-     - `Devil's advocate` for robustness, adversarial edge cases, and prompt patching.
-   - Perform a `Logic Implementation Audit` to separate the two kinds of logic in the target:
-     - `Natural Language Logic`: judgmental instructions executed by LLM reasoning (trade-offs, quality review, intent understanding).
-     - `Programmatic Logic`: deterministic logic executed by scripts in `${SKILL_HOME}/scripts/`.
-     - For `Programmatic Logic`, assume each script runs per the contract described in its docs/comments (input → output mapping). Do not simulate script internals; instead verify the invocation timing, that inputs satisfy the script's preconditions, and that outputs are correctly consumed downstream.
+Reuse the `run-skills` position ladder, with no second resolution rule: canonical
+internal → canonical external → installed internal → installed external.
 
-3. **Run the mental trace**
-   - Process the target step by step.
-   - For each step, record:
-     - `Step`
-     - `Trigger / Instruction`
-     - `Mental Action`
-     - `State Delta`
-     - `Consistency Check`
-     - `Risk / Uncertainty`
-   - When a step would use a real tool or cause a side effect, write `would execute`, infer only the logical intent, and continue with a clearly marked hypothetical state.
-   - When a step invokes a script from `${SKILL_HOME}/scripts/`, record it as `deterministic execution`: take the script's contract output directly as the `State Delta` without LLM-level reasoning about its internals. Focus the checks on whether the script's preconditions were satisfied by prior steps and whether its output is correctly used by later steps.
+- A source hit and its installed mirror hit are one hit for the same skill; only two
+  distinct layers carrying the same name are two hits.
+- Two hits: fail closed naming both candidate paths; never pick the nearest.
+- Zero hits: fail closed naming the resolved identifier and the searched coordinates.
+- Reject before the expectation phase when the directory has no readable `SKILL.md`
+  or its frontmatter is invalid.
+- Reject a target that resolves to `coaching-skills` itself: recursion depth is 1 and
+  no dispatch happens.
+- When the host can only load by explicit path, use the `run-skills` explicit-path
+  mode and record it in the DispatchRecord `mode`.
+- Read the Trainee's `SKILL.md` and the reference files it needs; change nothing and
+  trigger no Trainee side effect in this phase.
 
-4. **Stress-test edge cases**
-   - Simulate at least three scenarios when scope permits:
-     - Happy path with clear inputs.
-     - Missing, ambiguous, or contradictory input.
-     - Tool failure, forbidden side effect, stale context, or policy/constraint conflict.
-     - Script failure or abnormal script output — trace the degradation path when a `${SKILL_HOME}/scripts/` script errors, times out, or returns unexpected values.
-   - For loops or repeated steps, trace the first few iterations in detail, then summarize the invariant or stopping condition. Do not hallucinate large traces.
+## Preflight
 
-5. **Audit the simulation**
-   - Check whether any step falsely claimed real execution.
-   - Check whether any state update skipped a rule or depended on a hidden assumption.
-   - Check whether the target over-promises reliability where real execution, tests, or empirical data are required.
-   - Check whether the boundary between deterministic logic (scripts) and judgmental logic (natural language) is drawn correctly — flag deterministic logic still expressed in natural language (a candidate for extraction into a script), and judgmental logic wrongly hard-coded into a script (should stay natural language).
-   - Revise the trace if the audit finds inconsistencies.
+Run these checks in order before writing any artifact:
 
-6. **Report verdict and patches**
-   - Provide a concise verdict: `Likely works`, `Works with caveats`, `Ambiguous`, or `Likely fails`.
-   - Summarize expected behavior, failure modes, and validation gaps.
-   - Recommend minimal prompt or Skill changes using precise instruction text.
+1. both positional parameters are present and `<work>` is non-empty;
+2. exactly one Trainee hit resolves from the ladder, with valid frontmatter and a
+   target other than this skill;
+3. the run directory does not already exist (see § Run Identity).
 
-## Output Template
+Any failure stops the run before the expectation phase and names what failed and
+where it was searched. A run that passes preflight proceeds to write the expectation;
+nothing else is a precondition.
 
-Emit the full report skeleton from [`./references/prompt-templates.md`](./references/prompt-templates.md#simulation-report-output-template) — six mandatory sections: Simulation Scope, Initial State / Rules / Assumptions, Mental Trace (table), Edge Cases, Self-Audit, Verdict. Every heading is required; Self-Audit and Verdict are what make the simulation auditable rather than a guess.
+## Run Identity
+
+- `run-id`: `YYYYMMDDTHHMMSSZ-<trainee-slug>` — a UTC timestamp plus the lowercase
+  kebab slug of the resolved Trainee name.
+- Run directory: `.specify/memory/coaching/<run-id>/`, created before the expectation
+  is written.
+- If the directory already exists the run fails closed naming the existing path;
+  MUST NOT append a suffix and MUST NOT reuse the directory.
+- All four artifacts live inside the run directory; no artifact path escapes it.
+
+## Artifacts and Order
+
+Exactly four files, in this order:
+
+1. `expectation.md`
+2. `observation.md`
+3. `deviations.md`
+4. `improvement-plan.md`
+
+- `expectation.md` MUST land on disk before the first action of the dispatched
+  subagent. The DispatchRecord field `dispatched-at` is the ordering evidence.
+- Observation, deviations and improvement plan follow in that order; a missing file
+  fails the run regardless of how good the others are.
+- The two closed status values are recorded once, in `improvement-plan.md` § Run
+  Status.
+
+## Execution First
+
+- The primary success condition is: the Trainee's real work completed and its primary
+  artifact exists.
+- Optimization MUST NOT be a precondition of execution and MUST NOT shorten, redirect,
+  or simplify the execution to collect optimization material.
+- The coach MUST NOT run any Trainee step in parallel with the subagent.
+
+## Single Dispatch
+
+- Dispatch exactly one subagent per run. A failed, timed-out, or refused dispatch is
+  recorded as such and never retried inside the same run.
+- After a failed dispatch, continue into `deviations.md` and `improvement-plan.md` —
+  continue means exactly that and nothing more.
+- The coach never executes Trainee steps itself and never injects side effects into
+  the subagent's work.
+
+## Compare
+
+Write `deviations.md` by comparing the expectation with the observation on both
+dimensions: `## Outcome Correctness` and `## Process Efficiency`.
+
+- Every finding cites concrete evidence from `observation.md`: a step id and/or an
+  artifact path.
+- Classify every finding `result-deviation` or `process-deviation`; a partially
+  completed Trainee flow separates the two classes.
+- State where the coach's reading of `<work>` and the Trainee's actual
+  reading/execution materially diverged beyond normal execution noise.
+
+## Improvement Plan
+
+Write `improvement-plan.md` with entries ordered by priority.
+
+- Each entry names a concrete Trainee file and section plus one concrete tweak;
+  generic advice ("improve clarity", "be more careful") is invalid.
+- Each entry cites `D-*` findings, or is marked `evidence: none` when no execution
+  evidence exists.
+- When observation is empty the plan is still produced; it is never dropped for lack
+  of evidence.
+
+## Optimization
+
+- Apply the plan through the existing `improve-skills` entry, passing the Trainee
+  target and the deviation evidence. Do not rewrite Trainee files directly and do not
+  change that entry's contract.
+- Claim protocol: the sole owner is `data-model.md` § Optimization claim. Apply that
+  section's single timing (after the execution loop and the plan are written, before
+  `improve-skills` is invoked), its atomic creation, its conflict rule and its
+  release/leftover semantics exactly as written there. This skill states no second
+  version and never decides a claim by scanning run directories or by any
+  read-then-write sequence.
+- A claim conflict fails the step closed: record `optimization: failed` and name the
+  conflicting run-id, as the owner's conflict rule prescribes.
+- A rejection by `improve-skills` is recorded as `optimization: failed` (or
+  `unavailable` when the entry cannot be resolved); never retry in a loop.
+
+## Run Status
+
+Record both values once, in `improvement-plan.md` § Run Status:
+
+- `run:` one of `success`, `partial`, `failed`.
+- `optimization:` one of `applied`, `skipped`, `unavailable`, `failed`.
+
+Report optimization beside the execution verdict, never inside it: an unavailable,
+skipped, or failed optimization never turns a completed Trainee execution into `failed`.
+The verdict ladder itself is owned by `data-model.md` § RunStatus — consult
+it instead of restating it here. The run report restates both values and names the
+four artifact paths.
+
+## Degradation Ladder
+
+- Host events available: steps carry `host-event`.
+- Host events unavailable but the subagent's structured return is available: steps
+  carry `self-report`.
+- Neither: the step is a row marked `observation-gap`, counted in the gap list, never
+  invented.
+- No observation at all: the plan still exists, every entry is `evidence: none`, and
+  the run closes `run: partial` per `data-model.md` § RunStatus.
+
+## Boundaries
+
+- Dispatch mechanism: host-native subagent capability first; `run-agent` is the
+  fallback; `run-skills` only resolves and executes the Trainee and carries no
+  dispatch duty. No second mechanism is introduced; the mode used is recorded in the
+  DispatchRecord.
+- Governance: this skill stays `classification: external`. Relaying a destructive
+  step that belongs to the Trainee's own flow is a governance-kept relay: state the
+  step to the user, obtain the answer, then dispatch; the subagent never
+  self-approves.
+- Dual independent context: the coach forms the expectation from its own reading of
+  `<work>`. The dispatch payload carries `<work>` verbatim, the Trainee target, and
+  the instruction to execute per the Trainee's own `SKILL.md`; it never carries the
+  expectation, deviation guesses, or the coach's conclusions. The coach never
+  pre-digests `<work>`; divergence is a reportable finding, not something to
+  eliminate.
 
 ## Resources
 
-- Prompt fragments, reusable templates, and the report output template: `./references/prompt-templates.md`
+- Expectation skeleton, derivation method and the zero-side-effect declaration:
+  [`./references/prompt-templates.md`](./references/prompt-templates.md).
+- Observation, deviation and improvement-plan templates: the same file.
 
 ## Resource ID
 - Canonical ID: `<SKILL:.specify/skills/coaching-skills/SKILL.md>`
@@ -90,7 +197,8 @@ Emit the full report skeleton from [`./references/prompt-templates.md`](./refere
 - No scripts required.
 
 ### References (`./references/`)
-- `./references/prompt-templates.md` — mental dry-run, state-machine, devil's advocate, and self-audit prompt fragments.
+- `./references/prompt-templates.md` — execution-expectation skeleton, derivation
+  method, zero-side-effect declaration, and the later run-record templates.
 
 ### Assets (`./assets/`)
 - No assets required.
