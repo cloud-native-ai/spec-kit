@@ -6,10 +6,10 @@ feature: "078-coaching-skills"
 tags: ["run-determination", "r20261030t1540z-078-tasksfix2"]
 title: "run-determination /speckit.tasks r20261030T1540Z-078-tasksfix2"
 created: "2026-10-30T07:38:28Z"
-summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated e
   "feature": "078-coaching-skills",
   "feature_id": "078",
   "determined_at": "2026-10-30T07:38:28Z",
-  "settled_at": null,
+  "settled_at": "2026-10-30T11:15:36Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated e
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -166,18 +166,6 @@ summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated e
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -197,11 +185,6 @@ summary: "/speckit.tasks run=r20261030T1540Z-078-tasksfix2 token=not_evaluated e
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=3 collected=None reason=no_baseline",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }
