@@ -1,0 +1,32 @@
+== T005 census 分母冻结（US2；程序枚举；dated record；真词汇表零修改） ==
++checked_at: 2026-10-30T11:04Z
++method: scripts/python/glossary-utils.py parse_entries 表解析模式（读取模式复用,未改其行为）
++worktree: total=157 tight_bilingual=7 loose_bracket=92 loose_with_cjk=92
++HEAD(committed): total=156 tight_bilingual=7 loose_bracket=91
+
+-- M-7 锚点比对（差异上报,不静默采用）--
+| 口径 | 总数 | 双语 Canonical |
+|---|---|---|
+| M-7(requirements 2026-10-30 内联脚本,CJK…(ASCII) 宽松正则) | 161 | 132 |
+| HEAD committed(glossary-utils parse_entries + 紧贴正则) | 156 | 7 |
+| worktree 现态(含 plan 期未提交词条) | 157 | 7 |
+| worktree 宽松口径(含半角括号即计,含带空格形态) | 157 | 92 |
+
+差异归因:
+1. M-7 的 132 按宽松正则计(允许词条与括号间空格,如「程序优先 (Program-First)」);约定的唯一形态(A4)为紧贴,契约测试钉死的双语 Canonical 判定同为紧贴正则 ^[^\s|]+\([^()]+\)$。
+2. 宽松口径现测 = 92(全部含 CJK),与 M-7 的 132 仍有差:plan 阶段对词汇表有未提交改动(追加 1 条 proposed 词条)且 M-7 内联脚本未留档可重放,两时点文件与口径均不可直接对表。
+3. census 分母(契约 checker.md C-011 + 测试腿 test_census_action 钉死)取紧贴形态程序枚举值;as-of 现态 = 7,HEAD committed = 7。
+
+-- 紧贴形态双语 Canonical 全量清单(census 分母,逐字冻结) --
+  1. Handler(反应)
+  2. HandlerBinding(订阅)
+  3. Probe(插点,伞形)
+  4. Session(消歧)
+  5. target(消歧)
+  6. 三捕获机制(消歧)
+  7. 三查命令(消歧)
+
+frozen_total: 7
+as_of: 2026-10-30T11:04Z
+glossary_sha256_worktree: 8447bdab494a48def9c5948973d2594c63bb2ba3b4c41d30229f392982318a80
+零修改声明:本记录为只读枚举;真词汇表 .specify/memory/glossary.md 未被本任务修改。

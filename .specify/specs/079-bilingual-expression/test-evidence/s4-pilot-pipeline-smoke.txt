@@ -1,0 +1,52 @@
+# S4 pilot pipeline smoke — 2026-10-30T09:09:02Z
+## setup: mktemp-style pilot under sanctioned root .specify/.tmp/078-bilingual-expression/s4-pilot
+## git init + .specify/templates/instructions-template.md (copied from framework source 2026-10-30) + .specify/scripts (init payload)
+## command: bash <framework>/scripts/bash/generate-instructions.sh
+[2026-10-30 17:09:03][435060][INFO]Generating tool JSON manifests...
+[2026-10-30 17:09:03][435060][INFO]Backing up existing instructions to .specify/instructions.md-2026-10-30-170903
+[2026-10-30 17:09:03][435060][INFO]Existing instructions kept as the refresh base (not overwritten).
+[2026-10-30 17:09:03][435060][INFO]Section reconcile: live instructions already carry all template sections.
+[2026-10-30 17:09:03][435060][INFO]The /speckit.instructions command reconciles each section against current
+[2026-10-30 17:09:03][435060][INFO]project state and the latest template, and can recover content dropped by
+[2026-10-30 17:09:03][435060][INFO]older versions from the .specify/instructions.md-* backup history.
+[2026-10-30 17:09:03][435060][INFO]Instructions size: 28005 B (budget 32768 B, 4763 B headroom). Section table, largest first:
+| section                                         | live B | tmpl B | delta | placeholder | project-owned |
+|-------------------------------------------------|--------|--------|-------|-------------|---------------|
+| Documentation Map                               | 2726   | 2726   | 0     | yes         | no            |
+| Fast Fail Discipline                            | 1993   | 1993   | 0     | no          | no            |
+| Progress Reporting Discipline                   | 1481   | 1481   | 0     | no          | no            |
+| User-Facing Comprehension                       | 1353   | 1353   | 0     | no          | no            |
+| Run Determination                               | 1351   | 1351   | 0     | no          | no            |
+| Concurrent Development Safety (并发开发安全)          | 1337   | 1337   | 0     | no          | no            |
+| Two Hats: Framework Source vs Client Runtime    | 1315   | 1315   | 0     | no          | no            |
+| Ask, Record, Repeat                             | 1281   | 1281   | 0     | no          | no            |
+| Proactive Flow Trigger                          | 1129   | 1129   | 0     | no          | no            |
+| SDD Routing Decision (SDD 分流裁决)                 | 1124   | 1124   | 0     | no          | no            |
+| Suggested Tooling Scope (High-Level)            | 1002   | 1002   | 0     | no          | no            |
+| Task Complexity Rubric                          | 996    | 996    | 0     | no          | no            |
+| One Source Of Truth                             | 967    | 967    | 0     | no          | no            |
+| Fact, Correctness & Logic Checks (Input Sanity) | 955    | 955    | 0     | no          | no            |
+| Single-Run Evidence Discipline                  | 901    | 901    | 0     | no          | no            |
+| Token Efficiency Discipline                     | 880    | 880    | 0     | no          | no            |
+| ID Register (编号登记)                              | 814    | 814    | 0     | no          | no            |
+| Dogfooding Practice                             | 810    | 810    | 0     | no          | no            |
+| Root-Cause Problem Solving                      | 637    | 637    | 0     | no          | no            |
+| Git Workflow                                    | 576    | 576    | 0     | no          | no            |
+| Tech Stack & Resources                          | 562    | 562    | 0     | yes         | no            |
+| Spec Kit Framework Map                          | 551    | 551    | 0     | no          | no            |
+| Spec Kit Runtime & Symlink Model                | 541    | 541    | 0     | no          | no            |
+| Grounded Naming                                 | 518    | 518    | 0     | no          | no            |
+| Skills & Tools                                  | 468    | 468    | 0     | no          | no            |
+| Closed-Set Claims (封闭清单声明)                      | 456    | 456    | 0     | no          | no            |
+| Temporary Directory Discipline                  | 415    | 415    | 0     | no          | no            |
+| Knowledge Recording & Promotion                 | 364    | 364    | 0     | no          | no            |
+| Project Overview                                | 236    | 236    | 0     | yes         | no            |
+| AI Tool Compatibility                           | 228    | 228    | 0     | no          | no            |
+| (before the first ## heading)                   | 38     | 38     | 0     | no          | no            |
+warning Glossary engine or template not found; skipping glossary initialization
+[2026-10-30 17:09:03][435060][INFO]Updating symlinks for AI tools...
+success Instructions generated/updated at .specify/instructions.md
+## post-check: 28005 bytes, 30 top-level sections
+## ambient Bilingual Expression section present? 0 (expected 0 at plan time — template not yet updated; assertion pinned by tests/contract/test_bilingual_expression.py)
+## teardown: rm -rf pilot (next command)
+teardown ok: pilot removed

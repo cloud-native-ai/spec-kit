@@ -1,0 +1,14 @@
+doc-consistency-check: structure
+checked_at: 2026-10-30T09:22:12Z
+class=expression source=declaration
+status: fail
+two-way: not-run
+files_scanned: 1
+.specify/specs/078-bilingual-expression/plan.md:209: owner-path-missing: 双语规则六组事实（方向、形态、覆盖面、豁免、一致性、迁移）
+    fix: owner 路径必须存在于仓库内
+.specify/specs/078-bilingual-expression/plan.md:210: owner-path-missing: 定义处可判定信号 S1…S4
+    fix: owner 路径必须存在于仓库内
+.specify/specs/078-bilingual-expression/plan.md:214: owner-path-missing: 检查器行为（入口/退出码/扫描规则/判定边界）
+    fix: owner 路径必须存在于仓库内
+baseline: entries=0 new=3
+findings: 3

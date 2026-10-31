@@ -1,0 +1,74 @@
+== G-implement-structure faces (implement part 1/4, T003 landed doc) ==
++checked_at: 2026-10-30T10:23:29Z
+command: doc-consistency-check.py --path shared/guidelines/bilingual-expression.md --spec-dir .specify/specs/078-bilingual-expression --faces reader,evidence,duplicate,count
+doc-consistency-check: verify
+checked_at: 2026-10-30T10:23:29Z
+faces: reader=pass evidence=pass duplicate=pass count=pass
+files_scanned: 14
+findings: 0
+RC=0
+
+== structure substep (two-way vs plan Chapter Tree) ==
+command: doc-consistency-check.py --action structure --spec-dir .specify/specs/078-bilingual-expression --path shared/guidelines/bilingual-expression.md
+doc-consistency-check: structure
+checked_at: 2026-10-30T10:23:30Z
+class=expression source=declaration
+status: fail
+two-way: run
+files_scanned: 2
+.specify/specs/078-bilingual-expression/checklists/bilingual-convention-2026-10-30.md:13: duplicate-fact: ## Requirement Completeness
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:3: duplicate-fact: **Feature**: 078-bilingual-expression
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:4: duplicate-fact: **Spec**: [requirements.md](../requirements.md)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/feature-ref.md:4: duplicate-fact: **Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/plan.md:214: owner-path-missing: 检查器行为（入口/退出码/扫描规则/判定边界）
+    fix: owner 路径必须存在于仓库内
+.specify/specs/078-bilingual-expression/requirements.md:3: duplicate-fact: **Requirement Branch**: `078-bilingual-expression`
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:67: duplicate-fact: ### User Story 1 - 框架作者在核心概念的定义处写出双语形态，读者跨 context / 跨模型读到一致的语义锚点 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:83: duplicate-fact: ### User Story 2 - 词汇表维护者登记新术语时，Canonical 直接采用双语形态 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:98: duplicate-fact: ### User Story 3 - 下游项目经 `specify init` 获得约定的 ambient 摘要与指针 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:113: duplicate-fact: ### User Story 4 - 维护者运行确定性检查器，机械校验定义行形态与覆盖面 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+baseline: entries=0 new=10
+findings: 10
+RC=1
+
+== findings classification (Part 1/4) ==
+chapter two-way comparison vs plan Chapter Tree: PASS (0 chapter-* findings; all 9 chapters matched verbatim)
+remaining findings: 9 duplicate-fact = pre-existing spec boilerplate (contract file headers x3-pair, two checklist '## Requirement Completeness' headings, requirements branch line, US titles), all committed in stages 2fc9f22f..cc508bfe before Part 1; surfaced now because implement-stage invocation scans the spec dir (plan-era run scoped plan.md only, see plan-structure-judgement.txt)
+1 owner-path-missing (plan.md:214 检查器行为) = scheduled-expected per plan.md Assumptions P1 until T007 lands scripts/python/bilingual-expression-check.py
+face=build: not-applicable (no site build surface in this feature's stage gate set; no build subrow runnable)
+
+== operator-level: docs-utils validate (zero new violations vs baseline 4) ==
+{
+  "violations": [
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/unit/test_qoder_support_matrix.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/concepts/overview.md",
+      "detail": "../../tests/integration/test_qoder_refresh.py"
+    },
+    {
+      "kind": "broken-link",
+      "path": "docs/reference/commands/improve.md",
+      "detail": "../../shared/workflow/self-improvement-workflow.md"
+    },
+    {
+      "kind": "note-frontmatter",
+      "path": "docs/notes/type-follows-stage-misclassification.md",
+      "detail": "missing: "
+    }
+  ]
+}
+RC=0

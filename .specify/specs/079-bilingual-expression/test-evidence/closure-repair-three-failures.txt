@@ -1,0 +1,16 @@
+$ pytest tests/contract/test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22 tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface -v
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+tests/contract/test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation PASSED [ 33%]
+tests/contract/test_fast_fail_discipline.py::test_a7_section_counts_20_to_21_and_21_to_22 PASSED [ 66%]
+tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface PASSED [100%]
+
+============================== 3 passed in 0.36s ===============================
+exit=0

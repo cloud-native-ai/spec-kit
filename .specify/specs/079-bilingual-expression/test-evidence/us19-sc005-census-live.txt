@@ -1,0 +1,15 @@
+=== SC-005 review 面：真实词汇表 census 实跑（quickstart S8，2026-10-30T12:2xZ, review 阶段）===
+command: python3 scripts/python/bilingual-expression-check.py --action census
+  （quickstart.md S8 原样命令；checklist 修复后复跑同判定）
+rc=0
+stdout: {"action": "census", "files_scanned": 7, "findings_count": 0, "findings": [],
+         "scope": "owner-doc", "census_total": 7,
+         "form_regex": "[^\\s()（）]+\\([^()\\n]+\\)"}
+wall_clock: 0.275s user+sys（远低于 60s 重开条件，research R-11 不触发）
+判定：总体 = 词汇表全部双语 Canonical 词条（glossary-utils 独立解析，census_total=7，
+       与 tests/contract/test_bilingual_expression.py::test_census_action 的程序派生期望一致）；
+       范围 = owner 文档覆盖定义面清单内 7 面；判定 = 第二处定义中文侧与 Canonical 逐字一致
+       （C-011）。不一致处数 = 0。
+跨面核对：census 的词条解析走 glossary-utils（与本 review 修复的 scan S1 分支相互独立），
+       修复前后 census 输出逐字一致（us15 受控语料 rc=0/1/0 与本次真实实跑 rc=0 互补）。
+SC-005 review 面 verdict=pass；SC-005_status=pass（implement 面 + review 面齐备）。

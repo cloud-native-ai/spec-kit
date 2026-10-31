@@ -1,0 +1,31 @@
+$ pytest tests/contract/test_bilingual_expression.py tests/contract/test_instructions_section_propagation.py -v
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.4.2, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /storage/project/cloud-native-ai/spec-kit
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, xdist-3.8.0, asyncio-1.4.0, Faker-40.43.0, typeguard-4.4.2, mock-3.15.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 18 items
+
+tests/contract/test_bilingual_expression.py::test_owner_doc_chapter_tree_verbatim PASSED [  5%]
+tests/contract/test_bilingual_expression.py::test_owner_doc_header_declaration PASSED [ 11%]
+tests/contract/test_bilingual_expression.py::test_owner_doc_four_enumerations_are_lists PASSED [ 16%]
+tests/contract/test_bilingual_expression.py::test_owner_doc_signal_list_s1_s4 PASSED [ 22%]
+tests/contract/test_bilingual_expression.py::test_owner_doc_str_forms_and_single_regex_registration PASSED [ 27%]
+tests/contract/test_bilingual_expression.py::test_scan_compliant_fixture PASSED [ 33%]
+tests/contract/test_bilingual_expression.py::test_scan_fullwidth_fixture_red PASSED [ 38%]
+tests/contract/test_bilingual_expression.py::test_scan_same_language_fixture_red PASSED [ 44%]
+tests/contract/test_bilingual_expression.py::test_coverage_action PASSED [ 50%]
+tests/contract/test_bilingual_expression.py::test_census_action PASSED   [ 55%]
+tests/contract/test_bilingual_expression.py::test_sc001_keyword_snapshot PASSED [ 61%]
+tests/contract/test_bilingual_expression.py::test_drift_str_literal_unique_consumers PASSED [ 66%]
+tests/contract/test_bilingual_expression.py::test_drift_mirror_identity_derived_from_mirror_pairs PASSED [ 72%]
+tests/contract/test_bilingual_expression.py::test_drift_ambient_summary_plus_pointer_form PASSED [ 77%]
+tests/contract/test_bilingual_expression.py::test_sample_lines_deterministic PASSED [ 83%]
+tests/contract/test_bilingual_expression.py::test_scan_glossary_shape_skips_column_definitions_decoy PASSED [ 88%]
+tests/contract/test_instructions_section_propagation.py::test_c1_live_instructions_carry_all_template_sections PASSED [ 94%]
+tests/contract/test_instructions_section_propagation.py::test_c2_generator_injects_missing_sections_additively PASSED [100%]
+
+============================== 18 passed in 2.16s ==============================
+exit=0

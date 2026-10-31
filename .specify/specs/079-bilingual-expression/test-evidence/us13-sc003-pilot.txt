@@ -1,0 +1,11 @@
+# T013 SC-003 下游生成管道实测 — 2026-10-30T11:16:26Z
+## setup: pilot under sanctioned root .specify/.tmp/078-bilingual-expression/s4-pilot-t013
+## git init + .specify/templates/instructions-template.md (本特性 T008 后的 .specify 镜像) + .specify/scripts/ (init 载荷)
+## command: bash <framework-abs>/scripts/bash/generate-instructions.sh (在 pilot 目录内运行)
+## generator tail:
+(generated ok; assertions below)
+产物含逐字小节标题: count=1 PASS
+小节内四组枚举关键词命中 = 0 PASS
+含 [[STR-001]] 指针: True PASS
+grep -c '^## Bilingual Expression' = 1
+## teardown: rm -rf pilot (done)

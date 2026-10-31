@@ -1,0 +1,42 @@
+=== implement Part 3 expression gates (2026-10-30T11:16:52Z) ===
+--- 四面 ---
+doc-consistency-check: verify
+checked_at: 2026-10-30T11:16:52Z
+faces: reader=pass evidence=pass duplicate=pass count=pass
+files_scanned: 14
+findings: 0
+faces_rc=0
+--- 结构子步 ---
+doc-consistency-check: structure
+checked_at: 2026-10-30T11:16:52Z
+class=expression source=declaration
+status: fail
+two-way: run
+files_scanned: 2
+.specify/specs/078-bilingual-expression/checklists/bilingual-convention-2026-10-30.md:13: duplicate-fact: ## Requirement Completeness
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:3: duplicate-fact: **Feature**: 078-bilingual-expression
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/contracts/checker.md:4: duplicate-fact: **Spec**: [requirements.md](../requirements.md)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/feature-ref.md:4: duplicate-fact: **Spec**: `.specify/specs/078-bilingual-expression/` | **Date**: 2026-10-30
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:3: duplicate-fact: **Requirement Branch**: `078-bilingual-expression`
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:67: duplicate-fact: ### User Story 1 - 框架作者在核心概念的定义处写出双语形态，读者跨 context / 跨模型读到一致的语义锚点 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:83: duplicate-fact: ### User Story 2 - 词汇表维护者登记新术语时，Canonical 直接采用双语形态 (Priority: P1)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:98: duplicate-fact: ### User Story 3 - 下游项目经 `specify init` 获得约定的 ambient 摘要与指针 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+.specify/specs/078-bilingual-expression/requirements.md:113: duplicate-fact: ### User Story 4 - 维护者运行确定性检查器，机械校验定义行形态与覆盖面 (Priority: P2)
+    fix: 改为对唯一 owner 的引用
+baseline: entries=0 new=9
+findings: 9
+structure_rc=1
+--- face=build ---
+not-applicable（本仓无站点构建面，显式单列）
+--- 算子级 docs-utils validate ---
+docs_utils_rc=2
+--- docs-utils validate（更正：脚本实际路径 skills/external/create-docs/scripts/docs-utils.py）---
+baseline violations=4 / now violations=4 / new=0 / gone=0 — 零新增违规（对 plan 基线 plan-docs-utils-validate-baseline.txt 逐条 JSON 比较）

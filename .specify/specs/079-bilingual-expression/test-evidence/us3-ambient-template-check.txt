@@ -1,0 +1,33 @@
+== T006 ambient 模板小节自验（US3；templates/instructions-template.md） ==
++checked_at: 2026-10-30T11:05Z
+
+-- ① 小节标题逐字在场,grep 计数 = 1 --
+command: grep -c '^## Bilingual Expression (双语表述)' templates/instructions-template.md
+real output: 1
+verdict: PASS
+
+-- ② 四组枚举关键词（程序派生自 owner 文档列表项字面量,非手写）在小节内零命中 --
+derived keyword counts: {'direction': 3, 'coverage': 7, 'exemption': 7, 'form': 5}
+hits in ambient body: 0
+verdict: PASS
+[[STR-001]] pointer present: PASS
+
+-- ③ 本仓专属路径模式 / 提交号形态在小节内零命中 --
+command: awk 抽取小节后 grep -E '(\.specify/|[0-9a-f]{7,40})'（提交号形态 / 运行时绝对路径形态）
+real output: 0
+verdict: PASS
+
+-- ④ scan-confirmation-gates blocking 计数 == 27 基线 --
+command: python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+parsed blocking count: 27
+baseline(plan 期 tail):
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+verdict: PASS
+
+小结:① PASS ② PASS ③ PASS ④ PASS;ambient 小节 = 一句话摘要 + [[STR-001]] 指针,零枚举复述、零本仓专属路径/提交号、零阻断式确认句。

@@ -1,0 +1,55 @@
+=== T010 SC-002 新写内容合规率采证 (2026-10-30T11:14:09Z) ===
+command: python3 scripts/python/bilingual-expression-check.py --action scan --scope changed --base 5a4dc5a4 --json
+rc=1 (findings present)  files_scanned=30  findings_count=22
+分母（改动路径上的信号行数，程序复用检查器 scan_file 判定门）= 205
+带 finding 的信号行数 = 22
+分子（零 finding 的信号行）= 183
+
+[same-language-bracket] .specify/specs/078-bilingual-expression/checklists/bilingual-convention-2026-10-30.md:38 -> 约定成文前 checklist 阶段既有 en 标题（Part 2 提醒(ii) 已裁决的 boilerplate）— 分类排除
+    括号语言与词条同向: Acceptance Criteria Quality
+[full-width-parens] .specify/specs/078-bilingual-expression/plan.md:87 -> plan 阶段产物，成文先于约定（plan_constraint=active，属主制品不重写）— 存量差异
+    全角括号紧贴词条: 阶段时点、blocking
+[full-width-parens] .specify/specs/078-bilingual-expression/plan.md:164 -> plan 阶段产物，成文先于约定（plan_constraint=active，属主制品不重写）— 存量差异
+    全角括号紧贴词条: [[STR-001]] 与
+[full-width-parens] .specify/specs/078-bilingual-expression/tasks.md:10 -> tasks 阶段产物，成文先于约定 — 存量差异
+    全角括号紧贴词条: 、检查器 [[STR-001]] 的实现载体、ambient 小节均不存在
+[same-language-bracket] .specify/specs/078-bilingual-expression/tasks.md:16 -> tasks 阶段产物，成文先于约定 — 存量差异
+    括号语言与词条同向: DoD
+[full-width-parens] .specify/specs/078-bilingual-expression/tasks.md:130 -> tasks 阶段产物，成文先于约定 — 存量差异
+    全角括号紧贴词条: tasks
+[same-language-bracket] .specify/specs/078-bilingual-expression/tasks.md:136 -> tasks 阶段产物，成文先于约定 — 存量差异
+    括号语言与词条同向: Shared Infrastructure
+[full-width-parens] .specify/state/078-bilingual-expression.md:39 -> 运行时状态脊（非内容面，既有脏文件不入提交）— 分类排除
+    全角括号紧贴词条: 用户未授权
+[same-language-bracket] .specify/templates/instructions-template.md:37 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: Input Sanity
+[same-language-bracket] .specify/templates/instructions-template.md:98 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: a quality cost
+[same-language-bracket] .specify/templates/instructions-template.md:197 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: a short normative reminder plus the owner's path
+[same-language-bracket] .specify/templates/instructions-template.md:229 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: High-Level
+[same-language-bracket] .specify/templates/instructions-template.md:235 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: frontmatter key
+[same-language-bracket] .specify/templates/instructions-template.md:254 -> 上者的 .specify 镜像（T008 生成，非手改）— 存量差异
+    括号语言与词条同向: scope A
+[same-language-bracket] templates/instructions-template.md:37 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: Input Sanity
+[same-language-bracket] templates/instructions-template.md:98 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: a quality cost
+[same-language-bracket] templates/instructions-template.md:197 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: a short normative reminder plus the owner's path
+[same-language-bracket] templates/instructions-template.md:229 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: High-Level
+[same-language-bracket] templates/instructions-template.md:235 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: frontmatter key
+[same-language-bracket] templates/instructions-template.md:254 -> 模板存量行（37/98/197/229/235/254，ambient 插入前的既有小节；ambient 小节本体 77–79 零 finding）— 存量差异
+    括号语言与词条同向: scope A
+[full-width-parens] tests/fixtures/bilingual/fullwidth-definition.md:3 -> 夹具违规标本（T002 指定测试数据，非内容面）— 分类排除
+    全角括号紧贴词条: Fast Fail Discipline
+[same-language-bracket] tests/fixtures/bilingual/same-language-definition.md:3 -> 夹具违规标本（T002 指定测试数据，非内容面）— 分类排除
+    括号语言与词条同向: Fast Fail Discipline
+
+裁决：22 条 finding 全部归类为非新写内容（夹具标本 2 / 约定前 boilerplate 7 / 存量模板与镜像 12 / 状态脊 1）
+机械合规率（未分类）= 183/205 ≈ 89.3%；分类排除后新写内容 finding = 0
+新写内容合规率 = 205/205 = 100% 期望达成（SC-002 implement 期采证 PASS）

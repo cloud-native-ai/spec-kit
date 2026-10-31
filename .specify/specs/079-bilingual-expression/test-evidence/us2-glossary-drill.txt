@@ -1,0 +1,42 @@
+== T004 FR-005 判定演练（US2；真词汇表零修改；临时根 = 受认可 .specify/.tmp） ==
++checked_at: 2026-10-30T10:56Z
++task: T004 [US2] FR-005 判定演练（requirements US2 验收场景）
++temp_root: .specify/.tmp/078-bilingual-expression/us2-drill（已被 .specify/.gitignore 的 .tmp/ 规则匹配；已拆卸）
+
+-- 步骤 1:复制词汇表到临时根（复制前后 sha256 一致）--
+command: mkdir -p .specify/.tmp/078-bilingual-expression/us2-drill/.specify/memory && cp .specify/memory/glossary.md <tmp>/.specify/memory/glossary.md && sha256sum .specify/memory/glossary.md <tmp>/.specify/memory/glossary.md
+real output:
+8447bdab494a48def9c5948973d2594c63bb2ba3b4c41d30229f392982318a80  .specify/memory/glossary.md
+8447bdab494a48def9c5948973d2594c63bb2ba3b4c41d30229f392982318a80  .specify/.tmp/078-bilingual-expression/us2-drill/.specify/memory/glossary.md
+
+-- 步骤 2:按 A5 登记虚构双语词条（Canonical 取中文(English) 紧贴形态;Variants 收集中文侧易混写;Origin/Status 按 shared/workflow/glossary.md 协议字段）--
+command: python3 scripts/python/glossary-utils.py --action add --root .specify/.tmp/078-bilingual-expression/us2-drill --canonical '演练词条(Drill Term)' --variants '演练词, drill term' --meaning 'T004 虚构演练词条:验证 FR-005 两处定义中文侧逐字一致判定;不入真词汇表' --origin user --status proposed
+real output:
+{
+  "written": true,
+  "canonical": "演练词条(Drill Term)",
+  "count": 158
+}
+（count 158 = 复制件 157 条 + 1 虚构词条;真词汇表条目数不受影响）
+
+-- 步骤 3:owner 文档 § 一致性与词汇表 的判定规则演练（中文侧逐字一致;Variants 命中归一;A8 登记变体）--
+command: python3 <判定脚本:parse_entries 取词条 → 对三处定义行提取左括号外侧中文侧 → 与 Canonical 中文侧逐字比对>
+canonical=演练词条(Drill Term) zh_side='演练词条' en_side='Drill Term' variants=['演练词', 'drill term'] origin=user status=proposed
+case A 一致: line=**演练词条**(Drill Term):第二处定义,与 Canonical 中文侧逐字相同
+  side='演练词条' consistent=True verdict=PASS
+case B Variants 命中: line=**演练词**(Drill Term):中文侧是已登记 Variant,归一至 Canonical
+  side='演练词' consistent=True verdict=PASS
+case C 真不一致: line=**演練詞**(Drill Term):繁体写法,既非 Canonical 也非登记 Variants
+  side='演練詞' consistent=False verdict=FAIL(须以词汇表为准并登记变体)
+
+判定结论:FR-005 一致性判定规则可操作——逐字一致 PASS;登记 Variant 归一 PASS;未登记变体 FAIL 并指向「以词汇表为准并登记变体(A8)」。
+演练中修复一次判定脚本自身瑕疵（中文侧提取残留 ** 星号导致三例全 FAIL;修正提取逻辑后结果如上）,属演练脚本 bug,非规则或引擎缺陷。
+
+-- 步骤 4:拆卸与真词汇表零修改验证 --
+command: rm -rf .specify/.tmp/078-bilingual-expression/us2-drill && git check-ignore -q .specify/.tmp && sha256sum .specify/memory/glossary.md && git status --porcelain -- .specify/memory/glossary.md
+real output:
+tmp root gitignored: yes
+teardown: drill root removed
+8447bdab494a48def9c5948973d2594c63bb2ba3b4c41d30229f392982318a80  .specify/memory/glossary.md
+ M .specify/memory/glossary.md
+判定:真词汇表 sha256 与演练前一致(8447bdab…);git status 的 M 为 plan 阶段既有未提交改动(plan 期追加 1 条 proposed 词条),T004 全程零修改真词汇表。SC-004 白名单外零改动满足。
