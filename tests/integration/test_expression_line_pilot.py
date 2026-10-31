@@ -46,9 +46,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -145,7 +147,16 @@ def build_pilot(root: Path) -> Pilot:
     pilot = Pilot(root)
     _write(pilot.requirements, (FIXTURES / "requirements.md").read_text(encoding="utf-8"))
     _write(pilot.plan, (FIXTURES / "plan.md").read_text(encoding="utf-8"))
-    _write(pilot.delivered, (FIXTURES / "doc.md").read_text(encoding="utf-8"))
+    # The doc fixture carries an ``as-of`` the evidence face compares with the
+    # file's last commit date. Stamp it with the commit day so the fixture is
+    # timeless instead of going stale the day after it was authored.
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    doc_text = re.sub(
+        r"(as-of\s+)\d{4}-\d{2}-\d{2}",
+        lambda m: m.group(1) + today,
+        (FIXTURES / "doc.md").read_text(encoding="utf-8"),
+    )
+    _write(pilot.delivered, doc_text)
 
     # The class owner is the framework's own document, copied — not a stub. A stub
     # would let the pilot pass on a ledger the real engine would never see.

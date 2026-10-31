@@ -212,13 +212,20 @@ def test_c05_docs_page_content():
 # ---------------------------------------------------------------------------
 
 def test_c06_registry_rows_resolve():
+    # 2026-10-31 (080 renumber): Feature 062's Spec Path moved from the retired
+    # 062-humanize-command spec to its extension spec. Resolve the row's current
+    # cell instead of pinning the retired path.
     assert FEATURE_DETAILS.is_file(), f"feature details file missing: {FEATURE_DETAILS}"
     assert REGISTRY.is_file(), f"feature registry missing: {REGISTRY}"
     reg = _read(REGISTRY)
-    row = [ln for ln in reg.splitlines() if "062-humanize-command" in ln]
-    assert row, "registry lacks a 062-humanize-command row"
-    assert any(".specify/specs/062-humanize-command/requirements.md" in ln for ln in row), (
-        "062 registry row does not point at its requirements.md"
+    row = [ln for ln in reg.splitlines() if ln.startswith("| 062 ")]
+    assert row, "registry lacks a 062 row"
+    spec_cell = row[0].split("|")[6].strip()
+    assert spec_cell.endswith("/requirements.md"), (
+        f"062 registry row does not point at a requirements.md: {spec_cell!r}"
+    )
+    assert (REPO_ROOT / spec_cell).is_file(), (
+        f"062 registry row points at a missing spec: {spec_cell!r}"
     )
 
 
@@ -1595,6 +1602,18 @@ def _git_names(rev: str, *paths: str) -> list:
     return [ln for ln in out.stdout.splitlines() if ln.strip()]
 
 
+LINE_MERGE_HEAD = "929209e3"
+
+
+def _git_names_between(head: str, base: str, *paths: str) -> list:
+    """Tracked paths changed between ``base`` and ``head`` (line's own range)."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", base, head, "--", *paths],
+        capture_output=True, text=True, encoding="utf-8", check=True,
+    )
+    return [ln for ln in out.stdout.splitlines() if ln.strip()]
+
+
 def _git_tracked(rev: str, path: str) -> set:
     out = subprocess.run(
         ["git", "-C", str(REPO_ROOT), "ls-tree", "--name-only", rev, path],
@@ -1855,7 +1874,9 @@ def test_wc17_new_line_gate_zero():
 
 
 def test_wc18_no_runtime_surface_added():
-    changed = _git_names(BASELINE_COMMIT, "src/specify_cli", "scripts")
+    # 2026-10-31: compare the line's own range (base..line head), not the merged
+    # trunk — another line legitimately added scripts/python/bilingual-expression-check.py.
+    changed = _git_names_between(LINE_MERGE_HEAD, BASELINE_COMMIT, "src/specify_cli", "scripts")
     assert not changed, (
         f"the runtime surface moved — this feature adds no runtime and no dependency (WC-18): {changed}"
     )
