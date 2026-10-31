@@ -1,6 +1,6 @@
 # Data Model: Humanize Run Output（动作输出的人类友好化）
 
-**Feature**: 062 扩展（本规格 `079-humanize-run-output`）
+**Feature**: 062 扩展（本规格 `080-humanize-run-output`）
 **Input**: `requirements.md` § Key Entities + FR-001…FR-030
 **性质**: 设计期数据模型。实体是**提示词契约里的结构化概念**，不是数据库表——除 E4 的临时占位文件与
 E8 的显式输出外，没有任何实体落盘。字段名与语义在本文件定义一次；契约测试按此断言，别处只引用。

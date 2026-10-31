@@ -24,7 +24,7 @@ scope=079 only
 
 ## Plan-owned edit
 
-PLAN-EDIT: .specify/specs/079-humanize-run-output/quickstart.md — add S6-B (user explicitly refuses the confirmation) and relabel the SC-004 row to distinguish S6-A/S6-B; wording aligned with FR-012 / FR-019 / SC-004, no semantic change；分类=minor
+PLAN-EDIT: .specify/specs/080-humanize-run-output/quickstart.md — add S6-B (user explicitly refuses the confirmation) and relabel the SC-004 row to distinguish S6-A/S6-B; wording aligned with FR-012 / FR-019 / SC-004, no semantic change；分类=minor
 
 ## Anomalies and in-passing repairs
 

@@ -1,6 +1,6 @@
 # Quickstart: Humanize Run Output（动作输出的人类友好化）
 
-**Feature**: 062 扩展（`079-humanize-run-output`）
+**Feature**: 062 扩展（`080-humanize-run-output`）
 **用途**: 本阶段的验收路径。每一步给出「怎么调用 / 看什么 / 什么算通过」。
 **执行状态标注**: plan 阶段是 docs-only（`test-evidence/stage-status.txt`），行为类步骤一律
 `not-run at plan stage`，并逐例列出**前提清单**（这些示例所依赖的假定）与实现期承载它的测试名。
@@ -33,7 +33,7 @@ $ python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/
 正文估算    ≈4090 tokens 可控 / 预算 5000（123 行）
 ```
 
-**前提**：仓库根为工作目录；分支 `079-humanize-run-output`；HEAD `35ff11bc` 之上只多了本阶段的
+**前提**：仓库根为工作目录；分支 `080-humanize-run-output`；HEAD `35ff11bc` 之上只多了本阶段的
 规格产物与本阶段的 untracked 状态脊。**执行状态**：已执行（2026-10-30），证据
 `test-evidence/stage-plan-baselines.txt`。
 
@@ -209,7 +209,7 @@ gitignored）。
 **调用 B（写出报告）**
 
 ```text
-/speckit.humanize --output .specify/specs/079-humanize-run-output/notes/report-sample.md 运行 `python3 -c "print('out')"`
+/speckit.humanize --output .specify/specs/080-humanize-run-output/notes/report-sample.md 运行 `python3 -c "print('out')"`
 ```
 
 **调用 C（目标不可写）**：把 `--output` 指向只读目录。
@@ -221,7 +221,7 @@ gitignored）。
 - B 写出完整五节报告，会话里只回显摘要；文件内容与回显的结论一致。
 - C 被拒，目标逐字节不变，不留临时文件。
 
-**前提清单**：A 的宿主确实无原生派发通道；B 的 `.specify/specs/079-humanize-run-output/notes/`
+**前提清单**：A 的宿主确实无原生派发通道；B 的 `.specify/specs/080-humanize-run-output/notes/`
 目录存在（示例路径，不存在时改用任一可写目录）；C 的目录权限为只读。
 
 **执行状态**：`not-run at plan stage`。承载：`test_ex17_degraded_honesty`、

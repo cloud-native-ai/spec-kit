@@ -127,9 +127,9 @@ dated-record	.specify/specs/077-doc-sdd-integration/test-evidence/tasks-quicksta
 dated-record	.specify/specs/078-coaching-skills/test-evidence/baseline-full-run.txt
 dated-record	.specify/specs/078-coaching-skills/test-evidence/closure-full-run-rerun.txt
 dated-record	.specify/specs/078-coaching-skills/test-evidence/closure-full-run.txt
-dated-record	.specify/specs/079-humanize-run-output/checklists/requirements.md
-dated-record	.specify/specs/079-humanize-run-output/requirements.md
-dated-record	.specify/specs/079-humanize-run-output/test-evidence/validate-requirements.txt
+dated-record	.specify/specs/080-humanize-run-output/checklists/requirements.md
+dated-record	.specify/specs/080-humanize-run-output/requirements.md
+dated-record	.specify/specs/080-humanize-run-output/test-evidence/validate-requirements.txt
 dated-record	.specify/state/077-doc-sdd-integration.md
 dated-record	.specify/state/speckit-docs-expression.md
 frozen-verification	.specify/memory/exec-quant/records.jsonl

@@ -2,7 +2,7 @@
 
 本目录是 079「动作输出的人类友好化」的**运行模式**夹具集。它只服务契约测试与评估，不是运行产物；`tests/fixtures/humanize/` 的既有内容语料（`files/`、`inline/`、`selftest/`、`tone/`、`rubric.md`、`diff_protected.py`）不被本目录替代、也不被改写（WC-15）。
 
-字段语义的唯一所有者是 `.specify/specs/079-humanize-run-output/data-model.md`；本文件只指路，不复制字段表。
+字段语义的唯一所有者是 `.specify/specs/080-humanize-run-output/data-model.md`；本文件只指路，不复制字段表。
 
 ## 信封格式（E5 ActionResultEnvelope）
 

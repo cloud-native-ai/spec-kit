@@ -21,14 +21,14 @@ whether the finding below is now closed. Do not modify any file. Cite file and l
 
 Round-2 evidence locations:
 
-- `.specify/specs/079-humanize-run-output/requirements.md` — SC-004, US3 scenario 1, Edge Cases, FR-012, FR-019
-- `.specify/specs/079-humanize-run-output/tasks.md` — Requirement Coverage Map SC-004 row; T004; T010; T019; T021; T031
-- `.specify/specs/079-humanize-run-output/quickstart.md` — § S6 and § 8
-- `.specify/specs/079-humanize-run-output/data-model.md` — § E5 status enum and invariants
+- `.specify/specs/080-humanize-run-output/requirements.md` — SC-004, US3 scenario 1, Edge Cases, FR-012, FR-019
+- `.specify/specs/080-humanize-run-output/tasks.md` — Requirement Coverage Map SC-004 row; T004; T010; T019; T021; T031
+- `.specify/specs/080-humanize-run-output/quickstart.md` — § S6 and § 8
+- `.specify/specs/080-humanize-run-output/data-model.md` — § E5 status enum and invariants
 
 Closure evidence to check (current working tree at `9dfa8b2a`):
 
-- `.specify/specs/079-humanize-run-output/tasks.md` T004 fixture set (does it define `denied/envelope.md` with refusal reason, empty products, no substitute action?)
+- `.specify/specs/080-humanize-run-output/tasks.md` T004 fixture set (does it define `denied/envelope.md` with refusal reason, empty products, no substitute action?)
 - `tasks.md` T010 (does the `denied` semantics match FR-012 / FR-019: no execution, no substitute action, verdict `aborted`, wording "用户拒绝确认" + unexecuted scope?)
 - `tasks.md` T019 (do the named assertions `test_sc04_denied_no_side_effect` / `test_sc04_denied_verdict_and_scope` produce SC-004's evidence: no side effect snapshot, `denied`→`verdict: aborted`, refusal reason and unexecuted scope in the report?)
 - `tasks.md` Requirement Coverage Map SC-004 row (does it cite T019?)

@@ -1,6 +1,6 @@
 # Contract: 接线与兼容（wiring-compat）
 
-**Feature**: 062 扩展 | **规格**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: 062 扩展 | **规格**: `.specify/specs/080-humanize-run-output/requirements.md`
 **性质**: 结构契约。判定命令模板、按工具副本、技能与技能引用、docs 页、Feature 登记、测试与门禁。
 **覆盖**: 见文末可追溯性表。
 **封闭集**: 「需手改的活接线面」的成员与计数拥有者是 requirements A11，落地清单由 `tasks.md`

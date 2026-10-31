@@ -1,7 +1,7 @@
 # Quickstart run — 079 humanize run mode（S1–S7）
 
 **日期**: 2026-10-31（本段 implement part 4）
-**宿主**: macOS 本地工作区（分支 `079-humanize-run-output`，base `eb736a07`）
+**宿主**: macOS 本地工作区（分支 `080-humanize-run-output`，base `eb736a07`）
 **载体声明**: 本段授权明确**不派发子代理**，因此运行模式按 `in-session` 载体执行：每条报告携带
 `mode: in-session-degraded` 与 `dispatches: 0`。原生载体（`mode: subagent` / `dispatches: 1`）的
 场景在本段**未执行**，其契约面由主契约套件的断言承载（见 § 不可复现场景）。
@@ -244,7 +244,7 @@ $ .venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py 
 ### 调用 B（写出报告）
 
 ```text
-/speckit.humanize --output .specify/specs/079-humanize-run-output/notes/report-sample.md 运行 `python3 -c "print('out')"`
+/speckit.humanize --output .specify/specs/080-humanize-run-output/notes/report-sample.md 运行 `python3 -c "print('out')"`
 ```
 
 **真实执行**
@@ -305,9 +305,9 @@ $ ls -A .specify/.tmp/humanize/ | wc -l
  M tests/contract/test_humanize_command_surface.py
  M tests/fixtures/humanize/run/injection/executor-note.txt
 ?? .specify/skills/humanize/references/
-?? .specify/specs/079-humanize-run-output/baseline-failed.txt
-?? .specify/specs/079-humanize-run-output/notes/report-sample.md
-?? .specify/state/079-humanize-run-output.md
+?? .specify/specs/080-humanize-run-output/baseline-failed.txt
+?? .specify/specs/080-humanize-run-output/notes/report-sample.md
+?? .specify/state/080-humanize-run-output.md
 ```
 
 未出现 `.specify/.tmp/humanize/` 残骸；除 `notes/report-sample.md`（S7 B 的显式输出）外没有新增文件。

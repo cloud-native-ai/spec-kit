@@ -1,6 +1,6 @@
-$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/079-humanize-run-output
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/080-humanize-run-output
 
-spec: .specify/specs/079-humanize-run-output
+spec: .specify/specs/080-humanize-run-output
 status: ok
   [dtr-anchor] pass (0)
   [dtr-section-missing] pass (0)

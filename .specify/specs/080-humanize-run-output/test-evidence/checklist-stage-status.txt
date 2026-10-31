@@ -1,12 +1,12 @@
 stage-status: stage=checklist status=not-run-docs-only reason="本阶段只新增一份需求质量清单与证据文件，无源码、模板、契约或行为改动；测试预算（targeted-set-v1，stage_base=37fe86d5）留给 /speckit.analyze 与 /speckit.implement，本阶段不跑任何测试套件。"
-checklist: .specify/specs/079-humanize-run-output/checklists/run-then-report-2026-10-30.md (new; 39 items; earlier checklists/requirements.md untouched)
+checklist: .specify/specs/080-humanize-run-output/checklists/run-then-report-2026-10-30.md (new; 39 items; earlier checklists/requirements.md untouched)
 checks-run: inline self-check only (item count / id contiguity / traceability / prohibited openers / duplicate ids / non-overwrite) -> test-evidence/checklist-self-check.txt
 no-suite-run: pytest not invoked; no template, skill, contract or plan artifact modified
 plan-constraint: active (no plan/data-model/contracts/quickstart/feature-ref edit; see git status below)
 git-status-at-stage-end:
-?? .specify/specs/079-humanize-run-output/checklists/run-then-report-2026-10-30.md
-?? .specify/specs/079-humanize-run-output/test-evidence/checklist-self-check.txt
-?? .specify/specs/079-humanize-run-output/test-evidence/checklist-stage-status.txt
-?? .specify/state/079-humanize-run-output.md
+?? .specify/specs/080-humanize-run-output/checklists/run-then-report-2026-10-30.md
+?? .specify/specs/080-humanize-run-output/test-evidence/checklist-self-check.txt
+?? .specify/specs/080-humanize-run-output/test-evidence/checklist-stage-status.txt
+?? .specify/state/080-humanize-run-output.md
 (the state spine is driver-owned and is not committed by this stage; no plan-owned artifact appears above)
 feature-integration: not-applicable (Feature 062 stays `Implemented` per FR-029; the extension record itself is task T030 at the implement stage)

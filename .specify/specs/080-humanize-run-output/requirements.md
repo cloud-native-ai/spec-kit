@@ -1,6 +1,6 @@
 # Requirements Specification: Humanize Run Output（动作输出的人类友好化）
 
-**Requirement Branch**: `079-humanize-run-output`  
+**Requirement Branch**: `080-humanize-run-output`（原 `079-humanize-run-output`；2026-10-31 因与远端 `079-bilingual-expression` 编号碰撞而重编号）  
 **Created**: 2026-10-30  
 **Status**: Draft  
 **Flow Class**: execution
@@ -14,7 +14,7 @@
 
 ## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
 
-- **A1（编号依据）**：编号 079 由脚手架按 `.specify/specs/` 实测最大目录号（078）加一得出；`features.md` 行数不是最大编号，本特性不借机回填。
+- **A1（编号依据与重编号）**：初编号 079 由脚手架按当时最大目录号（078）加一得出；2026-10-31 合并远端主干时发现 `079-bilingual-expression` 已存在，故本线重编号为 **080**，目录与引用同步更新（历史证据中的 079 字样保留为当时读数）。`features.md` 行数不是最大编号，本特性不借机回填。
 - **A2（类别判定 = execution；命令台账类别不变）**：交付物是命令模板、技能定义、契约测试与文档接线；验收由宿主解析命令、由确定性测试消费，缺陷以「命令把裸文本当指令执行 / 报告缺章节 / 失败被写成成功」这类机器可见差异暴露，按 `.specify/shared/definitions/flow-class-definitions.md` 判据属 `execution`，`Flow Type` 写 `-`。命令在流程台账中自身保持 `expression / reader-oracle`——它的交付物仍是给人读的报告；指令执行产生的副作用归该指令所属单元自己的类别与门禁，不改写本命令的台账类别（此张力已显式记录，不是遗漏）。
 - **A3（Feature 绑定目标）**：本特性是现有 **Feature 062（Humanize Command，Status: Implemented）** 的扩展，不新建 Feature；按扩展切片规则状态不回退，Feature 详情与索引 `Last Updated` 记录本次扩展；最终绑定由 `/speckit.clarify` 落定。
 - **A4（破坏性输入变更）**：裸文本（选项之后的剩余文本）一律解释为**待执行指令**；改写既有文本必须显式使用 [[STR-008]] 或 [[STR-009]]。这是对旧调用方式的破坏性变更，命令模板、技能与 docs 必须同时写明迁移方式，且每次裸文本调用 MUST 输出一行迁移提示（「已按指令执行；改写文本请用 --file/--inline」）；MUST NOT 为兼容旧行为而猜测「这段文本像内容还是像指令」。迁移提示是**语言不变的固定通知**（与五个英文小节标题同属契约面固定 literal，不随正文语言翻译、不因 `--tone`/`--audience` 改写）；它是调用级会话通知，只在会话回显一次，MUST NOT 写入 `--output` 文件。

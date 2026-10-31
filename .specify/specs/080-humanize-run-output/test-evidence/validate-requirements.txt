@@ -1,4 +1,4 @@
-file: .specify/specs/079-humanize-run-output/requirements.md
+file: .specify/specs/080-humanize-run-output/requirements.md
 status: ok
   [id-contiguous] pass (0)
   [doc-order] pass (0)

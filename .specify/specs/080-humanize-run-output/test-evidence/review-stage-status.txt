@@ -5,11 +5,11 @@
   "status": "ran",
   "selection_basis": "targeted-set-v1 (stage_base=cad4bda7): the process review re-read the feature's full artifact chain (requirements / plan / data-model / 5 contracts / quickstart / tasks / 2 checklists / verification / notes / test-evidence) plus the owner documents it cites (verification-log-template, review-template, review command, implement skill, feedback-step), and re-ran the two contract suites the SC block leans on. No full-suite run: the closure slot belongs to post-review.",
   "changed_paths": [
-    ".specify/specs/079-humanize-run-output/review.md",
-    ".specify/specs/079-humanize-run-output/test-evidence/review-stage-status.txt",
-    ".specify/specs/079-humanize-run-output/test-evidence/review-targeted.txt"
+    ".specify/specs/080-humanize-run-output/review.md",
+    ".specify/specs/080-humanize-run-output/test-evidence/review-stage-status.txt",
+    ".specify/specs/080-humanize-run-output/test-evidence/review-targeted.txt"
   ],
-  "evidence_ptr": ".specify/specs/079-humanize-run-output/test-evidence/review-targeted.txt; process findings in .specify/specs/079-humanize-run-output/review.md",
+  "evidence_ptr": ".specify/specs/080-humanize-run-output/test-evidence/review-targeted.txt; process findings in .specify/specs/080-humanize-run-output/review.md",
   "command": ".venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py",
   "rc": 0,
   "passed": 172,

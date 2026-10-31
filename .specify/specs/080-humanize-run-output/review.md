@@ -9,13 +9,13 @@
 | Field | Value |
 |-------|-------|
 | Requirement ID | 079 |
-| Requirement Key | `079-humanize-run-output` |
+| Requirement Key | `080-humanize-run-output` |
 | Requirement Name | Humanize Run Output（动作输出的人类友好化） |
 | Related Feature | 062 Humanize Command（动作输出人类友好化） |
 | Repository | `spec-kit` (repo root `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit`) |
 | Repository URL | `git@gitlab.alibaba-inc.com:cloud-native-ai/spec-kit.git` (remote name `gitlab`; SSH-only, so `blob/` URLs cannot be rendered for this remote) |
 | Reachability of COMMIT_SHA | **UNRESOLVABLE**: `git branch -r --contains HEAD` is empty — the whole feature line is unpushed. Every citation below uses absolute paths plus `git show <sha>:<path>` recovery. |
-| Branch | `079-humanize-run-output` |
+| Branch | `080-humanize-run-output` |
 | Commit SHA | `cad4bda7b359b3cc684f736065c3d695b21ae816` (short: `cad4bda7`) |
 | Repo Root (absolute) | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit` |
 | Review Date | 2026-10-31（本地日期；UTC `2026-10-30T16:23Z`。系统日期已跨日，这正是本特性 § 环境日期边界的成因） |
@@ -27,22 +27,22 @@
 
 | Artifact | Lines | Absolute Path | One-line Summary |
 |----------|------:|---------------|-------------------|
-| `requirements.md` | 270 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/requirements.md` | 30 FR / 10 SC / 4 US / 15 STR；含 A11 接线封闭集、失败禁用词表、3 轮 analyze 的 Clarifications 记录 |
-| `plan.md` | 240 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/plan.md` | 18 行宪法检查（IV = Partial/正当化）、3 条 Decision Tensions、Phase 0 八条设计发现 |
-| `data-model.md` | 232 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/data-model.md` | E1–E8、26 条 V 规则、1 个运行状态机 |
-| `contracts/` (5 files) | 322 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/contracts/` | 88 条款：IP 17 / EX 21 / RP 20 / CM 10 / WC 20；各带可追溯性表 |
-| `quickstart.md` | 245 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/quickstart.md` | S1–S7 + §0 基线读数 + §8 完成判据（含 H-06 补入的 S6-B） |
-| `tasks.md` | 372 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/tasks.md` | 36 任务 / 7 相位 / 31 行条款指派 / DoD 9 条 / GATE 7 条 |
-| `verification.md` | 268 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/verification.md` | canonical SC 块（8 pass / 2 partial）+ T031–T034 实测 + SC 收口表 |
-| `feature-ref.md` | 61 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/feature-ref.md` | Feature 062 扩展绑定与登记面映射 |
-| `checklists/run-then-report-2026-10-30.md` | 85 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/checklists/run-then-report-2026-10-30.md` | 39 项需求质量清单（traceability 39/39） |
-| `checklists/requirements.md` | 42 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/checklists/requirements.md` | requirements 阶段清单（未被覆盖） |
-| `notes/pre-change-measurements.md` | 128 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/notes/pre-change-measurements.md` | 改动前唯一落点：计数 / 接线 164 / 四条基线 / 技能预算 / 覆盖基线复核 |
-| `notes/red-first-evidence.md` | 244 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/notes/red-first-evidence.md` | 五个红先行行的真实失败读数（T005/T013/T019/T024/T036） |
-| `notes/quickstart-run.md` | 321 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | S1–S7 运行记录 + teardown + 三条 `not-reproducible` 声明 |
-| `notes/report-sample.md` | 26 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/notes/report-sample.md` | S7-B 的 `--output` 样本（901 bytes） |
-| `test-evidence/` (34 files) | — | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/test-evidence/` | 逐阶段 E3 状态、analyze 三轮门禁、修复简报、验证器简报、接线 pin、覆盖基线 |
-| `review.md` | this file | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/review.md` | 本报告 |
+| `requirements.md` | 270 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/requirements.md` | 30 FR / 10 SC / 4 US / 15 STR；含 A11 接线封闭集、失败禁用词表、3 轮 analyze 的 Clarifications 记录 |
+| `plan.md` | 240 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/plan.md` | 18 行宪法检查（IV = Partial/正当化）、3 条 Decision Tensions、Phase 0 八条设计发现 |
+| `data-model.md` | 232 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/data-model.md` | E1–E8、26 条 V 规则、1 个运行状态机 |
+| `contracts/` (5 files) | 322 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/contracts/` | 88 条款：IP 17 / EX 21 / RP 20 / CM 10 / WC 20；各带可追溯性表 |
+| `quickstart.md` | 245 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/quickstart.md` | S1–S7 + §0 基线读数 + §8 完成判据（含 H-06 补入的 S6-B） |
+| `tasks.md` | 372 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/tasks.md` | 36 任务 / 7 相位 / 31 行条款指派 / DoD 9 条 / GATE 7 条 |
+| `verification.md` | 268 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/verification.md` | canonical SC 块（8 pass / 2 partial）+ T031–T034 实测 + SC 收口表 |
+| `feature-ref.md` | 61 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/feature-ref.md` | Feature 062 扩展绑定与登记面映射 |
+| `checklists/run-then-report-2026-10-30.md` | 85 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/checklists/run-then-report-2026-10-30.md` | 39 项需求质量清单（traceability 39/39） |
+| `checklists/requirements.md` | 42 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/checklists/requirements.md` | requirements 阶段清单（未被覆盖） |
+| `notes/pre-change-measurements.md` | 128 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/notes/pre-change-measurements.md` | 改动前唯一落点：计数 / 接线 164 / 四条基线 / 技能预算 / 覆盖基线复核 |
+| `notes/red-first-evidence.md` | 244 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/notes/red-first-evidence.md` | 五个红先行行的真实失败读数（T005/T013/T019/T024/T036） |
+| `notes/quickstart-run.md` | 321 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/notes/quickstart-run.md` | S1–S7 运行记录 + teardown + 三条 `not-reproducible` 声明 |
+| `notes/report-sample.md` | 26 | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/notes/report-sample.md` | S7-B 的 `--output` 样本（901 bytes） |
+| `test-evidence/` (34 files) | — | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/test-evidence/` | 逐阶段 E3 状态、analyze 三轮门禁、修复简报、验证器简报、接线 pin、覆盖基线 |
+| `review.md` | this file | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/review.md` | 本报告 |
 
 ## 1. Process Execution Timeline
 
@@ -92,7 +92,7 @@
 | Segment verdict | `not-evaluated` | reason: this stage's directive limits the review object to the SDD process; the `code-review` skill was not loaded and no subagent was dispatched |
 | Gate verdict | `not-evaluated` | the `Implemented → Ready for Review` transition was not judged; no `code-review.md` existence test was performed |
 | Reason, when one applies | `not-evaluated`: 本阶段指令把评审对象限定为 SDD 过程（process segment only），code segment 未派发，故无 coverage receipt、无合并门判定 | run directive; `templates/commands/review.md:31,105` |
-| Uncommitted scope | 工作树未被评审：`M .specify/memory/session/20261029T101833Z-run-determination-speckit-checklist-r20261029t172918z-076a-c.md`（既有脏文件，未触碰）、`?? .specify/specs/079-humanize-run-output/baseline-failed.txt`、`?? .specify/state/079-humanize-run-output.md`（驱动状态脊）。本报告不据此作出任何通过结论。 | `git status --short` at review time |
+| Uncommitted scope | 工作树未被评审：`M .specify/memory/session/20261029T101833Z-run-determination-speckit-checklist-r20261029t172918z-076a-c.md`（既有脏文件，未触碰）、`?? .specify/specs/080-humanize-run-output/baseline-failed.txt`、`?? .specify/state/080-humanize-run-output.md`（驱动状态脊）。本报告不据此作出任何通过结论。 | `git status --short` at review time |
 | Record | `not written` | triage value is not `run` |
 | Archive | `none` | first review run for this feature |
 
@@ -102,7 +102,7 @@
 
 - **Severity**: P0 (validated: direct re-read, subagent unavailable — the stage directive prohibits dispatch)
 - **Category**: Automation
-- **Location**: `.specify/specs/079-humanize-run-output/verification.md:12-50`（绝对路径：`/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/079-humanize-run-output/verification.md`）；owner：`templates/verification-log-template.md:54-66`；gate 义务：`skills/internal/implement-feature/SKILL.md:319`
+- **Location**: `.specify/specs/080-humanize-run-output/verification.md:12-50`（绝对路径：`/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/verification.md`）；owner：`templates/verification-log-template.md:54-66`；gate 义务：`skills/internal/implement-feature/SKILL.md:319`
 - **Evidence** (verbatim quote):
 
   ```
@@ -124,7 +124,7 @@
   > exists, is non-empty, and whose computed SHA-256 equals the recorded hash
   ```
 
-  实测（本次 review 复算）：`grep -c 'sample_id=' .specify/specs/079-humanize-run-output/verification.md` → `0`；同文件 `grep -c '_status=pass'` → `8`、`_status=partial` → `2`。相邻特性均按四键落行（076 = 8 行、077 = 8 行、078 = 9 行）。
+  实测（本次 review 复算）：`grep -c 'sample_id=' .specify/specs/080-humanize-run-output/verification.md` → `0`；同文件 `grep -c '_status=pass'` → `8`、`_status=partial` → `2`。相邻特性均按四键落行（076 = 8 行、077 = 8 行、078 = 9 行）。
 - **Why it's a problem**: `verification.md` 的 8 条 `pass` 没有 `sample_id` / `evidence_path` / `evidence_sha256` / `verdict` 四键证据行，模板把这种状态明确定义为 `unverified`，并禁止下游把它当作通过证据引用；而 closure 与合并正是它的下游。`gate-implement-evidence-binding` 是注册过的 command-gate，本轮既没有执行记录，也没有「未触发」的 disclosure——这是一次**静默跳过的门**，而不是已披露的降级。该文件同时是 SC 的唯一索引（`verification.md:59`），因此缺口不会被别的产物自动暴露。
 - **Proposed fix**: 在 closure 前为每条 `pass` SC 补一行四键证据（指向已提交的 `test-evidence/*.txt` 或 `notes/quickstart-run.md`，计算 SHA-256），并复跑绑定检查；同时在 `skills/internal/implement-feature/SKILL.md` § Step 9 增加一条可直接执行的检查命令，把「未记录」与「记录但哈希不符」合并为同一种 RED。
 
@@ -132,7 +132,7 @@
 
 - **Severity**: P1
 - **Category**: Documentation
-- **Location**: `.specify/specs/079-humanize-run-output/verification.md:12,24,57,187,190`
+- **Location**: `.specify/specs/080-humanize-run-output/verification.md:12,24,57,187,190`
 - **Evidence** (verbatim quote):
 
   ```
@@ -152,7 +152,7 @@
 
 - **Severity**: P1
 - **Category**: Automation
-- **Location**: `.specify/specs/079-humanize-run-output/tasks.md:55,369`；`scripts/python/clause_extract.py`；`scripts/python/account-clause-coverage.py`
+- **Location**: `.specify/specs/080-humanize-run-output/tasks.md:55,369`；`scripts/python/clause_extract.py`；`scripts/python/account-clause-coverage.py`
 - **Evidence** (verbatim quote):
 
   ```
@@ -170,7 +170,7 @@
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: `.specify/specs/079-humanize-run-output/notes/quickstart-run.md:8,20-48`；`.specify/specs/079-humanize-run-output/verification.md:75`
+- **Location**: `.specify/specs/080-humanize-run-output/notes/quickstart-run.md:8,20-48`；`.specify/specs/080-humanize-run-output/verification.md:75`
 - **Evidence** (verbatim quote):
 
   ```
@@ -194,7 +194,7 @@
 
 - **Severity**: P1
 - **Category**: Automation
-- **Location**: `.specify/specs/079-humanize-run-output/test-evidence/analyze-r3-stage-status.txt:8`
+- **Location**: `.specify/specs/080-humanize-run-output/test-evidence/analyze-r3-stage-status.txt:8`
 - **Evidence** (verbatim quote):
 
   ```
@@ -207,7 +207,7 @@
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: `.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt:58-59`；`implement-part5-status.txt:83`；`notes/red-first-evidence.md:14`
+- **Location**: `.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt:58-59`；`implement-part5-status.txt:83`；`notes/red-first-evidence.md:14`
 - **Evidence** (verbatim quote):
 
   ```
@@ -250,7 +250,7 @@
 
 - **Severity**: P1
 - **Category**: Workflow
-- **Location**: `.specify/specs/079-humanize-run-output/test-evidence/analyze-fix-brief.md:23,39`；`test-evidence/analyze-r2-stage-status.txt:11`
+- **Location**: `.specify/specs/080-humanize-run-output/test-evidence/analyze-fix-brief.md:23,39`；`test-evidence/analyze-r2-stage-status.txt:11`
 - **Evidence** (verbatim quote):
 
   ```
@@ -269,7 +269,7 @@
 
 - **Severity**: P1
 - **Category**: Command Prompt
-- **Location**: `templates/commands/review.md:31,105`；实测缺失 `.specify/specs/079-humanize-run-output/code-review.md`
+- **Location**: `templates/commands/review.md:31,105`；实测缺失 `.specify/specs/080-humanize-run-output/code-review.md`
 - **Evidence** (verbatim quote):
 
   ```
@@ -280,7 +280,7 @@
   The criteria — three conjunctive conditions, the third an existence test over the current `code-review.md` — are owned by `templates/feature-details-template.md` § Canonical Status State Machine.
   ```
 
-  实测：`ls .specify/specs/079-humanize-run-output/code-review.md` → `No such file or directory`。
+  实测：`ls .specify/specs/080-humanize-run-output/code-review.md` → `No such file or directory`。
 - **Why it's a problem**: 命令模板把双段写成不可选择、不可跳过；无人值守的 review 阶段却只派发了过程段，所以第三个条件（`code-review.md` 存在）从未被检验，`Implemented → Ready for Review` 的迁移也没有被判定。模板允许 `not-evaluated` 的代码段不阻塞迁移，但前提是它被显式记录；本特性连 `code-review.md` 与代码段记录都不存在，读者无法区分“代码段没跑”与“跑了但没发现问题”。该缺口已在 078 评审登记为 **REC-078-07**（`.specify/memory/register.md`，`open`），本特性再次命中——这是复发，不是新发现。
 - **Proposed fix**: 执行已登记的 **REC-078-07**：为 `/speckit.review` 增加一个非阻断的 process-only triage 值，并把未判定的迁移门写进 § 2.1。若该行短期不落地，至少由驱动侧在 review 阶段补写 `not-evaluated` 的代码段记录。
 
@@ -288,7 +288,7 @@
 
 - **Severity**: P2
 - **Category**: Workflow
-- **Location**: `.specify/specs/079-humanize-run-output/plan.md:65`；`checklists/run-then-report-2026-10-30.md:78`
+- **Location**: `.specify/specs/080-humanize-run-output/plan.md:65`；`checklists/run-then-report-2026-10-30.md:78`
 - **Evidence** (verbatim quote):
 
   ```
@@ -305,7 +305,7 @@
 
 - **Severity**: P2
 - **Category**: Automation
-- **Location**: `.specify/specs/079-humanize-run-output/tasks.md:28`
+- **Location**: `.specify/specs/080-humanize-run-output/tasks.md:28`
 - **Evidence** (verbatim quote):
 
   ```
@@ -351,7 +351,7 @@
 
 ### 5.1 Template Improvements
 
-- **REC-079-01 — 技能正文预算保留余量** — Target: `skills/external/improve-skills/scripts/skill-shape.py`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/improve-skills/scripts/skill-shape.py`），并同步 `templates/` 的技能写作说明。Change: 在 100% 硬上限之外增加 95% warning 档，或把“写作目标”定义为上限的 90%，禁止以个位数 token 余量通过。Source: F7. Expected impact: 下一个改 humanize 正文的特性不会一开始就红。
+- **REC-080-01 — 技能正文预算保留余量** — Target: `skills/external/improve-skills/scripts/skill-shape.py`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/improve-skills/scripts/skill-shape.py`），并同步 `templates/` 的技能写作说明。Change: 在 100% 硬上限之外增加 95% warning 档，或把“写作目标”定义为上限的 90%，禁止以个位数 token 余量通过。Source: F7. Expected impact: 下一个改 humanize 正文的特性不会一开始就红。
 
 ### 5.2 Command Prompt Improvements
 
@@ -359,39 +359,39 @@
 
 ### 5.3 Automation / Script Improvements
 
-- **REC-079-02 — 让证据绑定门可执行、可失败** — Target: `scripts/python/` 新增一个 `check-verification-evidence.py`（或把等价逻辑并入 `gate-implement-evidence-binding` 的调用行），由 `skills/internal/implement-feature/SKILL.md` § Step 9 显式调用。Change: 解析 `verification.md` 的 SC 状态与四键证据行，重算 SHA-256；任何 `pass` 缺行 / 空文件 / 哈希不符即 RED，并输出 sample id。Source: F1. Expected impact: F1 这一类“门存在但没跑”不会再静默通过。
-- **REC-079-03 — 让条款/FR 覆盖通道识别非 `C-<n>` 命名空间** — Target: `scripts/python/clause_extract.py` 与 `shared/definitions/contract-clause-definitions.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/definitions/contract-clause-definitions.md`）。Change: 支持按契约声明的命名空间前缀（如 `IP/EX/RP/CM/WC`），或在扫描期归一化为 `C-<n>`；迁移前把“每特性自写判定器”登记为已知债务。Source: F3. Expected impact: 88 条款与 30 FR 不再对机器车道隐形，066/067/079 不再各自重写判定器。
-- **REC-079-04 — 派发层加墙钟与无进展判死** — Target: `skills/external/sdd-loop-driver/references/stage-prompts.md` 的验证器派发 helper（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/stage-prompts.md`），并同步 analyze 的 fallback 条款。Change: 单次派发设 10–15 分钟墙钟上限；“连续 N 个 stream event 无 verdict”判死；fallback 自动写入 `validated: direct re-read` 并上报 fallback 率。Source: F5. Expected impact: 71 分钟静默挂起与“靠人记得写 fallback”同时消失。
-- **REC-079-05 — 让 DoD Status 有明确翻绿所有者** — Target: `templates/tasks-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/tasks-template.md`）。Change: Polish 相位固定一行“逐条核对 DoD-N 并翻绿”；或 `validate-tasks.py` 在 36/36 `[X]` 且 `verification.md` 存在时对 `pending` 报 warning。Source: F11. Expected impact: closure 不再读到与事实相反的 DoD 信号。
+- **REC-080-02 — 让证据绑定门可执行、可失败** — Target: `scripts/python/` 新增一个 `check-verification-evidence.py`（或把等价逻辑并入 `gate-implement-evidence-binding` 的调用行），由 `skills/internal/implement-feature/SKILL.md` § Step 9 显式调用。Change: 解析 `verification.md` 的 SC 状态与四键证据行，重算 SHA-256；任何 `pass` 缺行 / 空文件 / 哈希不符即 RED，并输出 sample id。Source: F1. Expected impact: F1 这一类“门存在但没跑”不会再静默通过。
+- **REC-080-03 — 让条款/FR 覆盖通道识别非 `C-<n>` 命名空间** — Target: `scripts/python/clause_extract.py` 与 `shared/definitions/contract-clause-definitions.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/definitions/contract-clause-definitions.md`）。Change: 支持按契约声明的命名空间前缀（如 `IP/EX/RP/CM/WC`），或在扫描期归一化为 `C-<n>`；迁移前把“每特性自写判定器”登记为已知债务。Source: F3. Expected impact: 88 条款与 30 FR 不再对机器车道隐形，066/067/079 不再各自重写判定器。
+- **REC-080-04 — 派发层加墙钟与无进展判死** — Target: `skills/external/sdd-loop-driver/references/stage-prompts.md` 的验证器派发 helper（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/references/stage-prompts.md`），并同步 analyze 的 fallback 条款。Change: 单次派发设 10–15 分钟墙钟上限；“连续 N 个 stream event 无 verdict”判死；fallback 自动写入 `validated: direct re-read` 并上报 fallback 率。Source: F5. Expected impact: 71 分钟静默挂起与“靠人记得写 fallback”同时消失。
+- **REC-080-05 — 让 DoD Status 有明确翻绿所有者** — Target: `templates/tasks-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/tasks-template.md`）。Change: Polish 相位固定一行“逐条核对 DoD-N 并翻绿”；或 `validate-tasks.py` 在 36/36 `[X]` 且 `verification.md` 存在时对 `pending` 报 warning。Source: F11. Expected impact: closure 不再读到与事实相反的 DoD 信号。
 
 ### 5.4 Workflow Improvements
 
-- **REC-079-06 — analyze 修复简报增加 `propagation` 字段** — Target: `skills/internal/analyze-artifacts/SKILL.md` 与 `templates/commands/analyze.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/analyze-artifacts/SKILL.md`）。Change: 每条 finding 的修复行必须列出 owner → plan → contracts → tasks → quickstart → SC 覆盖行的传播面；无传播面显式写 `none`，修复轮逐项声明关闭位置。Source: F8. Expected impact: M-09 这类“需求侧关闭、下游未接”的 HIGH 不会在下一轮才被发现。
-- **REC-079-07 — quickstart 证据引入封闭的执行级别** — Target: `skills/internal/implement-feature/SKILL.md` 的 quickstart 证据规范（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/implement-feature/SKILL.md`）。Change: 逐场景强制标注 `end-to-end` / `inner-command-only` / `fixture-substituted`；非 `end-to-end` 禁止写“真实执行”；来源清单类断言必须绑定可观察读取痕迹。Source: F4. Expected impact: SC-001/SC-002 的执行证据不再与“照规范写的样本”混同。
-- **REC-079-08 — 红先行增加“该测试能否转绿”的自检** — Target: `skills/internal/implement-feature/SKILL.md` 与 `templates/tasks-template.md`。Change: 红先行行记录红的枚举原因，并在声明前用最小合规样本验证该测试可转绿；禁止用“临时移出实现文件”重建红态。Source: F6. Expected impact: 首红从“看起来红”变成“因缺目标行为而红”。
+- **REC-080-06 — analyze 修复简报增加 `propagation` 字段** — Target: `skills/internal/analyze-artifacts/SKILL.md` 与 `templates/commands/analyze.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/analyze-artifacts/SKILL.md`）。Change: 每条 finding 的修复行必须列出 owner → plan → contracts → tasks → quickstart → SC 覆盖行的传播面；无传播面显式写 `none`，修复轮逐项声明关闭位置。Source: F8. Expected impact: M-09 这类“需求侧关闭、下游未接”的 HIGH 不会在下一轮才被发现。
+- **REC-080-07 — quickstart 证据引入封闭的执行级别** — Target: `skills/internal/implement-feature/SKILL.md` 的 quickstart 证据规范（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/implement-feature/SKILL.md`）。Change: 逐场景强制标注 `end-to-end` / `inner-command-only` / `fixture-substituted`；非 `end-to-end` 禁止写“真实执行”；来源清单类断言必须绑定可观察读取痕迹。Source: F4. Expected impact: SC-001/SC-002 的执行证据不再与“照规范写的样本”混同。
+- **REC-080-08 — 红先行增加“该测试能否转绿”的自检** — Target: `skills/internal/implement-feature/SKILL.md` 与 `templates/tasks-template.md`。Change: 红先行行记录红的枚举原因，并在声明前用最小合规样本验证该测试可转绿；禁止用“临时移出实现文件”重建红态。Source: F6. Expected impact: 首红从“看起来红”变成“因缺目标行为而红”。
 - **REC-078-06（已登记，未落地）— 同作者门禁增加 operating-constraint 标记** — Target: `shared/workflow/objective-analysis-gate.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/workflow/objective-analysis-gate.md`）。Change: 按已登记行的原意落地：定义 `operating-constraint` 降级标记与固定的 analyze handoff 行清单。Source: F10. Expected impact: 同作者缺口的披露位置与复核范围可机器核对。
 
 ### 5.5 Documentation Improvements
 
-- **REC-079-09 — 一份 verification 只允许一个 SC 判定源** — Target: `templates/verification-log-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/verification-log-template.md`）。Change: 禁止收口表用自然语言重述 SC 状态；状态列必须从 canonical 块派生，或只保留证据指针。Source: F2. Expected impact: 同一 SC 不再同时是 `partial` 与“达成”。
-- **REC-079-10 — 扩展改变定位时强制同步 Feature Overview** — Target: `templates/feature-details-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/feature-details-template.md`）与 manage-features 技能。Change: 扩展若改变 Feature 定位，`## Overview` 必须同步，或在开头声明“保留原始定位，扩展见 Key Changes”。Source: F12. Expected impact: Feature 详情不再出现“头部新定位、正文旧定位”的反向事实源。
+- **REC-080-09 — 一份 verification 只允许一个 SC 判定源** — Target: `templates/verification-log-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/verification-log-template.md`）。Change: 禁止收口表用自然语言重述 SC 状态；状态列必须从 canonical 块派生，或只保留证据指针。Source: F2. Expected impact: 同一 SC 不再同时是 `partial` 与“达成”。
+- **REC-080-10 — 扩展改变定位时强制同步 Feature Overview** — Target: `templates/feature-details-template.md`（absolute supplement: `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/templates/feature-details-template.md`）与 manage-features 技能。Change: 扩展若改变 Feature 定位，`## Overview` 必须同步，或在开头声明“保留原始定位，扩展见 Key Changes”。Source: F12. Expected impact: Feature 详情不再出现“头部新定位、正文旧定位”的反向事实源。
 
 ## 6. Priority Roadmap
 
 | Priority | Recommendation | Target File / Subsystem | Source Finding(s) |
 |----------|----------------|--------------------------|-------------------|
-| P0 | REC-079-02 证据绑定门可执行、可失败 | `scripts/python/` + `skills/internal/implement-feature/SKILL.md` | F1 |
-| P1 | REC-079-03 条款/FR 通道识别非 `C-<n>` 命名空间 | `scripts/python/clause_extract.py` + `shared/definitions/contract-clause-definitions.md` | F3 |
-| P1 | REC-079-06 修复简报增加 `propagation` 字段 | `skills/internal/analyze-artifacts/SKILL.md` | F8 |
-| P1 | REC-079-04 派发层墙钟与无进展判死 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | F5 |
-| P1 | REC-079-07 quickstart 证据执行级别 | `skills/internal/implement-feature/SKILL.md` | F4 |
-| P1 | REC-079-08 红先行“能否转绿”自检 | `skills/internal/implement-feature/SKILL.md` + `templates/tasks-template.md` | F6 |
-| P1 | REC-079-01 技能预算保留余量 | `skills/external/improve-skills/scripts/skill-shape.py` | F7 |
+| P0 | REC-080-02 证据绑定门可执行、可失败 | `scripts/python/` + `skills/internal/implement-feature/SKILL.md` | F1 |
+| P1 | REC-080-03 条款/FR 通道识别非 `C-<n>` 命名空间 | `scripts/python/clause_extract.py` + `shared/definitions/contract-clause-definitions.md` | F3 |
+| P1 | REC-080-06 修复简报增加 `propagation` 字段 | `skills/internal/analyze-artifacts/SKILL.md` | F8 |
+| P1 | REC-080-04 派发层墙钟与无进展判死 | `skills/external/sdd-loop-driver/references/stage-prompts.md` | F5 |
+| P1 | REC-080-07 quickstart 证据执行级别 | `skills/internal/implement-feature/SKILL.md` | F4 |
+| P1 | REC-080-08 红先行“能否转绿”自检 | `skills/internal/implement-feature/SKILL.md` + `templates/tasks-template.md` | F6 |
+| P1 | REC-080-01 技能预算保留余量 | `skills/external/improve-skills/scripts/skill-shape.py` | F7 |
 | P1 | REC-078-07（已登记）review 的 process-only triage | `templates/commands/review.md` | F9 |
-| P1 | REC-079-09 一份 verification 只允许一个 SC 判定源 | `templates/verification-log-template.md` | F2 |
+| P1 | REC-080-09 一份 verification 只允许一个 SC 判定源 | `templates/verification-log-template.md` | F2 |
 | P2 | REC-078-06（已登记）同作者门 operating-constraint 标记 | `shared/workflow/objective-analysis-gate.md` | F10 |
-| P2 | REC-079-05 DoD Status 翻绿所有者 | `templates/tasks-template.md` | F11 |
-| P2 | REC-079-10 扩展时同步 Feature Overview | `templates/feature-details-template.md` | F12 |
+| P2 | REC-080-05 DoD Status 翻绿所有者 | `templates/tasks-template.md` | F11 |
+| P2 | REC-080-10 扩展时同步 Feature Overview | `templates/feature-details-template.md` | F12 |
 
 ## 7. Self-Containment Check
 
@@ -415,13 +415,13 @@ Please share the contents of this document with the spec-kit framework developer
 
 P1 不构成硬阻塞，但其中 **F2（同一文件两个相反判定）** 与 **F4（quickstart“真实执行”结论过强）** 直接决定 closure 读到什么，建议与 F1 同批处理；其余 P1（F3/F5/F6/F7/F8/F9）可登记为框架债务并进入下一轮改进。P2 可留到 sanitize/下一特性。
 
-**合并面的事实**：分支 `079-humanize-run-output` 未 push（`git branch -r --contains HEAD` 为空），本线只可能做本地合并；合并动作本身未被本次评审授权，本次也未执行。**状态迁移**：`Implemented → Ready for Review` 未被判定（code segment 未派发，见 § 2.1 / F9），因此不得提前翻状态。
+**合并面的事实**：分支 `080-humanize-run-output` 未 push（`git branch -r --contains HEAD` 为空），本线只可能做本地合并；合并动作本身未被本次评审授权，本次也未执行。**状态迁移**：`Implemented → Ready for Review` 未被判定（code segment 未派发，见 § 2.1 / F9），因此不得提前翻状态。
 
 **本次复算的通过面**（供 closure 参考，不替代 F1 要求的四键证据行）：`.venv/bin/python -m pytest -q tests/contract/test_humanize_command_surface.py tests/contract/test_stage_class_wiring.py` → `172 passed, 1 warning`，rc=0；`regen-command-copies.py --check` rc=0；`sync-mirrors.py --check` 六对全 ok；`skill-shape.py` 判 `pass`（≈4999 / 5000 tokens）。完整输出见 `test-evidence/review-targeted.txt`。
 
 ## Post-review repair (2026-10-31)
 
-修复范围仅限本文件的同批处置对象 **F1（P0）/ F2（P1）/ F4（P1）**；实现代码与 `requirements.md` / `plan.md` / `contracts/` / `tasks.md` 未改动。修复只落在 `.specify/specs/079-humanize-run-output/verification.md`、本文件与新增证据 `test-evidence/review-repair-binding-check.txt`。
+修复范围仅限本文件的同批处置对象 **F1（P0）/ F2（P1）/ F4（P1）**；实现代码与 `requirements.md` / `plan.md` / `contracts/` / `tasks.md` 未改动。修复只落在 `.specify/specs/080-humanize-run-output/verification.md`、本文件与新增证据 `test-evidence/review-repair-binding-check.txt`。
 
 ### F1（P0）— 8 条 `pass` 的证据绑定已补，绑定自检 rc=0
 
@@ -429,14 +429,14 @@ P1 不构成硬阻塞，但其中 **F2（同一文件两个相反判定）** 与
 
 | sample_id | evidence_path（仓库相对） | evidence_sha256 |
 |---|---|---|
-| `SC-002_quickstart_s1` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
-| `SC-003_quickstart_s2` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
-| `SC-005_quickstart_s4` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
-| `SC-006_wiring_inventory` | `.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt` | `867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514` |
-| `SC-007_implement_part4` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
-| `SC-008_implement_part5` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt` | `b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744` |
-| `SC-009_quickstart_s3_s7` | `.specify/specs/079-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
-| `SC-010_implement_part4` | `.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
+| `SC-002_quickstart_s1` | `.specify/specs/080-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-003_quickstart_s2` | `.specify/specs/080-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-005_quickstart_s4` | `.specify/specs/080-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-006_wiring_inventory` | `.specify/specs/080-humanize-run-output/test-evidence/wiring-inventory-baseline.txt` | `867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514` |
+| `SC-007_implement_part4` | `.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
+| `SC-008_implement_part5` | `.specify/specs/080-humanize-run-output/test-evidence/implement-part5-status.txt` | `b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744` |
+| `SC-009_quickstart_s3_s7` | `.specify/specs/080-humanize-run-output/notes/quickstart-run.md` | `c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b` |
+| `SC-010_implement_part4` | `.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt` | `6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b` |
 
 同一文件被多条记录复用，但每条记录 `sample_id` 唯一（自检读数 `unique_sample_ids=true`）。绑定自检的检查器源码与逐条读数落盘在 `test-evidence/review-repair-binding-check.txt`：`records=8`，8 条全部 `exists=true`、`bytes>0`、`hash_match=true`，`pass_records_cover=SC-002,SC-003,SC-005,SC-006,SC-007,SC-008,SC-009,SC-010`，`pass_sc_without_record=none`，`RESULT=PASS failures=0`，命令 rc=0。
 
@@ -446,5 +446,5 @@ P1 不构成硬阻塞，但其中 **F2（同一文件两个相反判定）** 与
 
 ### F4（P1）— quickstart「真实执行」的证据级别已在限制节声明
 
-`verification.md` § 未跑与限制新增一条明确声明：quickstart 中被真实执行的只是内层命令（退出码与 stdout）；`/speckit.humanize` 的解析、占位与五节报告装配未作为端到端调用发生，五节报告正文由实现者在同一会话内按 SKILL 规范撰写；宿主原生派发通道（`mode: subagent` / `dispatches: 1`）未实测。该限制注明与 **SC-001 的 partial**（原生派发腿不可复现）及 **SC-004 的 partial**（用户拒绝确认腿 `not-reproducible`）对应。F4 提出的框架侧整改（执行级别枚举）仍归 REC-079-07，不在本次 review 修复内落地。
+`verification.md` § 未跑与限制新增一条明确声明：quickstart 中被真实执行的只是内层命令（退出码与 stdout）；`/speckit.humanize` 的解析、占位与五节报告装配未作为端到端调用发生，五节报告正文由实现者在同一会话内按 SKILL 规范撰写；宿主原生派发通道（`mode: subagent` / `dispatches: 1`）未实测。该限制注明与 **SC-001 的 partial**（原生派发腿不可复现）及 **SC-004 的 partial**（用户拒绝确认腿 `not-reproducible`）对应。F4 提出的框架侧整改（执行级别枚举）仍归 REC-080-07，不在本次 review 修复内落地。
 

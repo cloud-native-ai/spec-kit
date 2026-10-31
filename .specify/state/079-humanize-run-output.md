@@ -114,3 +114,8 @@ last_verdict: MERGED to master (fast-forward) locally; branch deleted; line dere
 - 比对远端后发现 `gitlab/master` 已由另一条线推进：`8d0e0106 merge(master): integrate gitlab trunk (078-coaching-skills) with local 079-bilingual-expression`，其中 `c93071ae refactor(079): renumber bilingual-expression from 078 to resolve trunk collision`。
 - 因此远端已存在一个 **079-bilingual-expression**，与本次的 **079-humanize-run-output** 发生编号碰撞；本地 `master` 相对 `gitlab/master` 为 ahead 43 / behind 20。
 - 处置建议（未执行，需用户裁决）：fetch 后把本线规格目录与 Feature 引用重编号为 **080**（或由远端那条改号），再合并远端 master；在解决前**不得 push**（会被拒绝或产生冲突）。
+
+## 重编号（2026-10-31）
+
+- 规格目录与当前态引用已由 `079-humanize-run-output` 重编号为 `080-humanize-run-output`（与远端 `079-bilingual-expression` 解除编号碰撞）；REC 编号同步改为 `REC-080-*`。
+- 本状态脊文件保留原名，作为该写线的历史记录。

@@ -3,7 +3,7 @@
 date=2026-10-31
 stage=implement
 part=4/5
-feature=079-humanize-run-output
+feature=080-humanize-run-output
 base_commit=eb736a07
 scope=T025,T026,T027,T028,T029,T030,T031,T032
 selection_basis=targeted-set-v1
@@ -78,7 +78,7 @@ $ python3 skills/external/improve-skills/scripts/skill-shape.py skills/external/
 
 ## T031 quickstart
 
-真实运行记录见 `.specify/specs/079-humanize-run-output/notes/quickstart-run.md`。S5 B（两会话并发）、S6 B（用户拒绝确认：无人值守无用户可答）、S7 A（原生载体对照：本段授权禁止派发子代理）标注 `not-reproducible` 并以夹具断言替代；其余场景以 `in-session-degraded` 真实执行并记录命令、输出与退出码。teardown 后 `ls -A .specify/.tmp/humanize/` 为空。
+真实运行记录见 `.specify/specs/080-humanize-run-output/notes/quickstart-run.md`。S5 B（两会话并发）、S6 B（用户拒绝确认：无人值守无用户可答）、S7 A（原生载体对照：本段授权禁止派发子代理）标注 `not-reproducible` 并以夹具断言替代；其余场景以 `in-session-degraded` 真实执行并记录命令、输出与退出码。teardown 后 `ls -A .specify/.tmp/humanize/` 为空。
 
 ## 未跑的东西（如实声明）
 

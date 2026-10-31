@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-10-30
-**Feature**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: `.specify/specs/080-humanize-run-output/requirements.md`
 
 ## Content Quality
 
@@ -32,7 +32,7 @@
 
 ## Notes
 
-- **Deterministic checker (authority for every count)**: `python3 scripts/python/validate-requirements.py .specify/specs/079-humanize-run-output/requirements.md` → `status: ok`；`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` 全 pass；`0 error(s), 0 warning(s)`；exit 0。逐字输出存于 `test-evidence/validate-requirements.txt`。本清单不手抄计数。
+- **Deterministic checker (authority for every count)**: `python3 scripts/python/validate-requirements.py .specify/specs/080-humanize-run-output/requirements.md` → `status: ok`；`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` 全 pass；`0 error(s), 0 warning(s)`；exit 0。逐字输出存于 `test-evidence/validate-requirements.txt`。本清单不手抄计数。
 - **Decomposition gate**: `decomposition-check.py --mode plan` → `decision=proceed`，`fr_count=30 ≤ fr_ceiling=30`；exit 0。输出存于 `test-evidence/decomposition-check.json`。
 - **Pre-analyze gate (requirements)**: `decision=pass errors=0 advisories=0 waived=0`；exit 0，存于 `test-evidence/pre-analyze-check.txt`。
 - **Breaking change is explicit**: A4/FR-001/FR-005 把「裸文本 = 指令、改写文本必须显式 `--file`/`--inline`」写成可判定的迁移契约，并附迁移示例要求；不是隐式行为改变。

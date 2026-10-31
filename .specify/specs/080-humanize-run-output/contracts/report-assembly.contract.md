@@ -1,6 +1,6 @@
 # Contract: 上下文装配与报告（report-assembly）
 
-**Feature**: 062 扩展 | **规格**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: 062 扩展 | **规格**: `.specify/specs/080-humanize-run-output/requirements.md`
 **性质**: 结构 + 内容契约。判定五节报告的形态、来源清单、语言与保真。
 **覆盖**: 见文末可追溯性表。
 **字面量**: 五个小节标题与两个载体标记的拥有者是 requirements § Shared Strings（`[[STR-001]]`…`[[STR-007]]`）；本文件只引用。

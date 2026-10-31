@@ -1,6 +1,6 @@
 # Contract: 旧内容模式（content-mode）
 
-**Feature**: 062 扩展 | **规格**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: 062 扩展 | **规格**: `.specify/specs/080-humanize-run-output/requirements.md`
 **性质**: 不回归契约。判定 `[[STR-008]]` / `[[STR-009]]` 路径在重构后仍与既有行为等价。
 **覆盖**: 见文末可追溯性表。
 **所有者边界**: 内容模式的行为细则（输入核验、主语言判定、窗口分段、四维度改写、文件写入细则）由

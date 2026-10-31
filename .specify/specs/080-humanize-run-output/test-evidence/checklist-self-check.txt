@@ -1,6 +1,6 @@
 command: python3 - <<'PY'  (inline checker over checklists/run-then-report-2026-10-30.md)
 date: 2026-10-30
-file: .specify/specs/079-humanize-run-output/checklists/run-then-report-2026-10-30.md
+file: .specify/specs/080-humanize-run-output/checklists/run-then-report-2026-10-30.md
 items: 39 (soft cap 40)
 ids contiguous from CHK001: True
 duplicate ids: 0
@@ -9,4 +9,4 @@ items carrying a quality-dimension bracket: 39/39
 prohibited openers (Verify/Test/Confirm/Check + behaviour): 0
 earlier checklist preserved: True (3458 bytes); overwritten: False (new filename)
 git status (checklists/):
-?? .specify/specs/079-humanize-run-output/checklists/run-then-report-2026-10-30.md
+?? .specify/specs/080-humanize-run-output/checklists/run-then-report-2026-10-30.md

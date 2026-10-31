@@ -839,8 +839,8 @@ __________________ test_c1_every_referenced_spec_path_exists ___________________
             "features.md references non-existent spec paths (stale archive/move "
             f"references): {bad}"
         )
-E       AssertionError: features.md references non-existent spec paths (stale archive/move references): ['Feature 062: .specify/specs/062-humanize-command/requirements.md（原始规格）+ .specify/specs/079-humanize-run-output/requirements.md（079 扩展）']
-E       assert not ['Feature 062: .specify/specs/062-humanize-command/requirements.md（原始规格）+ .specify/specs/079-humanize-run-output/requirements.md（079 扩展）']
+E       AssertionError: features.md references non-existent spec paths (stale archive/move references): ['Feature 062: .specify/specs/062-humanize-command/requirements.md（原始规格）+ .specify/specs/080-humanize-run-output/requirements.md（079 扩展）']
+E       assert not ['Feature 062: .specify/specs/062-humanize-command/requirements.md（原始规格）+ .specify/specs/080-humanize-run-output/requirements.md（079 扩展）']
 
 tests/contract/test_spec_feature_binding_integrity.py:49: AssertionError
 ___________________ test_cd5_headings_only_in_discipline_doc ___________________
@@ -998,5 +998,5 @@ FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_onl
 FAILED tests/integration/test_expression_line_pilot.py::test_s4_the_delivered_document_passes_all_four_faces
 FAILED tests/integration/test_expression_line_pilot.py::test_the_pilot_line_runs_all_eight_rows_in_order
 ====== 20 failed, 6971 passed, 7 skipped, 5 warnings in 590.71s (0:09:50) ======
-# failed-name list written: .specify/specs/079-humanize-run-output/final-failed.txt (      20 entries)
+# failed-name list written: .specify/specs/080-humanize-run-output/final-failed.txt (      20 entries)
 RC=1

@@ -18,22 +18,22 @@ exactly one verdict on the finding below. Do not modify any file.
 
 ## Evidence locations
 
-- `.specify/specs/079-humanize-run-output/requirements.md`
+- `.specify/specs/080-humanize-run-output/requirements.md`
   - line 174 — SC-004
   - line 73 — US3 acceptance scenario 1 (confirmation refused)
   - line 100 — Edge Cases bullet (explicit refusal)
   - line 127 — FR-012 (`denied` status and its verdict mapping)
-- `.specify/specs/079-humanize-run-output/tasks.md`
+- `.specify/specs/080-humanize-run-output/tasks.md`
   - line 158 — SC-004 row in the Requirement Coverage Map
   - line 201 — T004 run-fixture set (the fixture kinds enumerated)
   - line 261 — T019 US3 assertion list
   - line 266 — T021 (confirmation missing)
   - line 283 — T036 WC-15 fixture kinds
   - line 302 — T031 (quickstart S1–S7)
-- `.specify/specs/079-humanize-run-output/quickstart.md`
+- `.specify/specs/080-humanize-run-output/quickstart.md`
   - lines 42–224 — S1–S7 scenarios
   - line 235 — completion-criteria row for SC-004
-- `.specify/specs/079-humanize-run-output/data-model.md`
+- `.specify/specs/080-humanize-run-output/data-model.md`
   - line 125 — E5 `status` enum including `denied`
   - line 136 — E5 invariant for `status=denied`
 

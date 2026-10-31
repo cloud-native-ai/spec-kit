@@ -1,8 +1,8 @@
 # Tasks-stage gate — validate-tasks.py
 date=2026-10-30
 stage=tasks H-06 propagation fix (analyze round 2, sole HIGH)
-cmd=python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
+cmd=python3 scripts/python/validate-tasks.py .specify/specs/080-humanize-run-output/tasks.md
 note=re-captured after the H-06 fix (T010 seven-value status + denied semantics, T004 denied/injection fixtures, T019 denial assertions + SC-004 row, M-22 Shared Strings 15, L-02 FR-019 pointer, M-24 injection fixtures)
 --- stdout/stderr ---
-PASS: .specify/specs/079-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)
+PASS: .specify/specs/080-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)
 exit_status=0

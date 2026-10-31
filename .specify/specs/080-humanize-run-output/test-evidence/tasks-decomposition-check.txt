@@ -2,7 +2,7 @@
 date=2026-10-30
 stage=tasks H-06 propagation fix (analyze round 2, sole HIGH)
 note=re-captured after the H-06 fix; 36 task rows (T001-T036, numbering continuous, no new row), T019 extends the US3 assertion group with the denied path
-cmd=python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/079-humanize-run-output/requirements.md --tasks .specify/specs/079-humanize-run-output/tasks.md
+cmd=python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/080-humanize-run-output/requirements.md --tasks .specify/specs/080-humanize-run-output/tasks.md
 --- stdout/stderr ---
 {"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 30, "task_count": 36, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-10-30T13:09:58Z"}
 exit_status=0

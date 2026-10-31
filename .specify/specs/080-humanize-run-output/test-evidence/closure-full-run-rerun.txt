@@ -972,5 +972,5 @@ FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_onl
 FAILED tests/integration/test_expression_line_pilot.py::test_s4_the_delivered_document_passes_all_four_faces
 FAILED tests/integration/test_expression_line_pilot.py::test_the_pilot_line_runs_all_eight_rows_in_order
 ====== 19 failed, 6972 passed, 7 skipped, 5 warnings in 592.19s (0:09:52) ======
-# failed-name list written: .specify/specs/079-humanize-run-output/final-failed.txt (      19 entries)
+# failed-name list written: .specify/specs/080-humanize-run-output/final-failed.txt (      19 entries)
 RC=1

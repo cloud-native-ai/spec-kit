@@ -118,13 +118,13 @@
 | REC-078-05 | 覆盖率引擎须能消费书面车道豁免（`--waive-lane fr --reason-file`），把「按构造不适用」与「未覆盖」分开 | `.specify/specs/078-coaching-skills/review.md` § 5.3 REC-078-05（F6） | open |
 | REC-078-06 | 同作者门禁增加 `operating-constraint` 降级理由与规定标记，使被迫不委派可跨阶段比较 | `.specify/specs/078-coaching-skills/review.md` § 5.4 REC-078-06（F8） | open |
 | REC-078-07 | `/speckit.review` 增加非阻断的「调用方限定只跑过程段」triage 值；`blocking-unresolved` 只留给真正未解决的 blocking 代码项 | `.specify/specs/078-coaching-skills/review.md` § 5.2 REC-078-07（F9） | open |
-| REC-079-01 | 技能正文预算增加 95% warning 档或把写作目标定为上限 90%，禁止个位数 token 余量通过 | `.specify/specs/079-humanize-run-output/review.md` § 5.1 REC-079-01（F7） | open |
-| REC-079-02 | 证据绑定门可执行化：解析 `verification.md` 的 SC 状态与四键证据行并重算 SHA-256，`pass` 缺行/空文件/哈希不符即 RED | `.specify/specs/079-humanize-run-output/review.md` § 5.3 REC-079-02（F1） | open |
-| REC-079-03 | 条款/FR 覆盖通道识别非 `C-<n>` 命名空间（按契约声明前缀或扫描期归一化），迁移前把自写判定器登记为债务 | `.specify/specs/079-humanize-run-output/review.md` § 5.3 REC-079-03（F3） | open |
-| REC-079-04 | 验证器派发层加 10–15 分钟墙钟上限与「连续 N 个 stream event 无 verdict」判死，fallback 自动落 `validated: direct re-read` | `.specify/specs/079-humanize-run-output/review.md` § 5.3 REC-079-04（F5） | open |
-| REC-079-05 | DoD Status 有明确翻绿所有者：Polish 相位固定一行翻绿，或 `validate-tasks.py` 对全 `[X]` 且 verification 存在时的 `pending` 报 warning | `.specify/specs/079-humanize-run-output/review.md` § 5.3 REC-079-05（F11） | open |
-| REC-079-06 | analyze 修复简报为每条 finding 增加 `propagation` 字段，覆盖 owner→plan→contracts→tasks→quickstart→SC 覆盖行，无传播面显式 `none` | `.specify/specs/079-humanize-run-output/review.md` § 5.4 REC-079-06（F8） | open |
-| REC-079-07 | quickstart 证据引入封闭执行级别（`end-to-end`/`inner-command-only`/`fixture-substituted`），非端到端禁止「真实执行」措辞 | `.specify/specs/079-humanize-run-output/review.md` § 5.4 REC-079-07（F4） | open |
-| REC-079-08 | 红先行增加「该测试能否转绿」自检与红因枚举，禁止用临时移出实现文件重建红态 | `.specify/specs/079-humanize-run-output/review.md` § 5.4 REC-079-08（F6） | open |
-| REC-079-09 | 一份 verification 只允许一个 SC 判定源：收口表不得用自然语言重述状态，须从 canonical 块派生或只留证据指针 | `.specify/specs/079-humanize-run-output/review.md` § 5.5 REC-079-09（F2） | open |
-| REC-079-10 | 扩展改变 Feature 定位时强制同步 `## Overview`，或声明「保留原始定位，扩展见 Key Changes」 | `.specify/specs/079-humanize-run-output/review.md` § 5.5 REC-079-10（F12） | open |
+| REC-080-01 | 技能正文预算增加 95% warning 档或把写作目标定为上限 90%，禁止个位数 token 余量通过 | `.specify/specs/080-humanize-run-output/review.md` § 5.1 REC-080-01（F7） | open |
+| REC-080-02 | 证据绑定门可执行化：解析 `verification.md` 的 SC 状态与四键证据行并重算 SHA-256，`pass` 缺行/空文件/哈希不符即 RED | `.specify/specs/080-humanize-run-output/review.md` § 5.3 REC-080-02（F1） | open |
+| REC-080-03 | 条款/FR 覆盖通道识别非 `C-<n>` 命名空间（按契约声明前缀或扫描期归一化），迁移前把自写判定器登记为债务 | `.specify/specs/080-humanize-run-output/review.md` § 5.3 REC-080-03（F3） | open |
+| REC-080-04 | 验证器派发层加 10–15 分钟墙钟上限与「连续 N 个 stream event 无 verdict」判死，fallback 自动落 `validated: direct re-read` | `.specify/specs/080-humanize-run-output/review.md` § 5.3 REC-080-04（F5） | open |
+| REC-080-05 | DoD Status 有明确翻绿所有者：Polish 相位固定一行翻绿，或 `validate-tasks.py` 对全 `[X]` 且 verification 存在时的 `pending` 报 warning | `.specify/specs/080-humanize-run-output/review.md` § 5.3 REC-080-05（F11） | open |
+| REC-080-06 | analyze 修复简报为每条 finding 增加 `propagation` 字段，覆盖 owner→plan→contracts→tasks→quickstart→SC 覆盖行，无传播面显式 `none` | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-06（F8） | open |
+| REC-080-07 | quickstart 证据引入封闭执行级别（`end-to-end`/`inner-command-only`/`fixture-substituted`），非端到端禁止「真实执行」措辞 | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-07（F4） | open |
+| REC-080-08 | 红先行增加「该测试能否转绿」自检与红因枚举，禁止用临时移出实现文件重建红态 | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-08（F6） | open |
+| REC-080-09 | 一份 verification 只允许一个 SC 判定源：收口表不得用自然语言重述状态，须从 canonical 块派生或只留证据指针 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-09（F2） | open |
+| REC-080-10 | 扩展改变 Feature 定位时强制同步 `## Overview`，或声明「保留原始定位，扩展见 Key Changes」 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-10（F12） | open |

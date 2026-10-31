@@ -1,8 +1,8 @@
 # Implementation Plan: Humanize Run Output（动作输出的人类友好化）
 
-**Branch**: `079-humanize-run-output` | **Date**: 2026-10-30 | **Spec**: [requirements.md](./requirements.md)
-**Requirement → Feature**: `079-humanize-run-output` → Feature 062 Humanize Command（动作输出人类友好化）
-**Input**: Specification from `.specify/specs/079-humanize-run-output/requirements.md`
+**Branch**: `080-humanize-run-output` | **Date**: 2026-10-30 | **Spec**: [requirements.md](./requirements.md)
+**Requirement → Feature**: `080-humanize-run-output` → Feature 062 Humanize Command（动作输出人类友好化）
+**Input**: Specification from `.specify/specs/080-humanize-run-output/requirements.md`
 
 ## Summary
 
@@ -106,7 +106,7 @@ FR-030 的并发场景可判；报告默认只在会话里，显式 `--output` �
 ### Documentation (this spec)
 
 ```text
-.specify/specs/079-humanize-run-output/
+.specify/specs/080-humanize-run-output/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── requirements.md      # Upstream authority (30 FR / 10 SC / 15 Shared Strings)
 ├── checklists/          # Requirements-quality checklist (requirements stage)

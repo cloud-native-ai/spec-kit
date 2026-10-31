@@ -11,7 +11,7 @@ detector-honesty wording scan.
 
 **Ownership, part 2 — feature 079 (run mode).** The ``test_ip* / test_ex* / test_rp* /
 test_wc*`` block owns the 079 clauses assigned to this file by
-``.specify/specs/079-humanize-run-output/tasks.md`` § Contract Coverage Map: IP-01…IP-10
+``.specify/specs/080-humanize-run-output/tasks.md`` § Contract Coverage Map: IP-01…IP-10
 and EX-01…EX-05 (US1 implementation rows T006–T008), the tests-side frontier of the
 later US1 rows — EX-06…EX-10 (T009/T010), RP-01…RP-04 (T011) and WC-01…WC-04 (T012) —
 and the US2 group RP-05…RP-18 (T013, landed before its implementation rows T014–T018).
@@ -1534,7 +1534,7 @@ def test_rp20_atomic_write_and_force():
 # traceability names MUST resolve to real functions.
 # ===========================================================================
 
-SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "079-humanize-run-output"
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "080-humanize-run-output"
 CONTRACTS_DIR = SPEC_DIR / "contracts"
 TASKS_DOC = SPEC_DIR / "tasks.md"
 BASELINE_COMMIT = "35ff11bc"

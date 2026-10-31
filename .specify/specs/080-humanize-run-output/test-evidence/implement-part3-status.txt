@@ -3,7 +3,7 @@
 date=2026-10-30
 stage=implement
 part=3/5
-feature=079-humanize-run-output
+feature=080-humanize-run-output
 base_commit=7f2084dd
 scope=T017,T018,T019,T020,T021,T022,T023,T024
 selection_basis=targeted-set-v1
@@ -50,7 +50,7 @@ Part 2 结转的 8 条 RP 前哨（`test_rp11…test_rp18`）在 T017/T018 落�
 
 ## 非 new_failures（如实声明）
 
-- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/080-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
 - `test_expression_compatibility.py::test_c7_mirrors_are_byte_identical` —— part 1 已在册的镜像暂态；唯一再生成行是 **T028**，本段未再生成派生面。
 - `test_stage_class_wiring.py::test_clarify_is_inside_and_the_other_entry_points_are_untouched` —— 模板字节钉扎，按 WC-13 由 **T032** 在模板改写后重新度量；本段未提前改钉扎。
 

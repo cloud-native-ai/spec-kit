@@ -3,7 +3,7 @@
 date=2026-10-30
 stage=implement
 part=1/5
-feature=079-humanize-run-output
+feature=080-humanize-run-output
 base_commit=c6ac8c99
 scope=T001,T002,T003,T004,T005,T006,T007,T008
 selection_basis=targeted-set-v1
@@ -31,7 +31,7 @@ sufficiency=partial — all segment-reachable clauses are green (IP-01…IP-10, 
 
 ## 已知基线失败（不计入 new_failures）
 
-- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— 在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条 E2 基线内；本段未改测试来掩盖。
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— 在 `.specify/specs/080-humanize-run-output/baseline-failed.txt` 的 17 条 E2 基线内；本段未改测试来掩盖。
 
 ## 补充定向运行（同一 E3 会话，不改判定）
 

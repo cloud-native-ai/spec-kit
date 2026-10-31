@@ -1,9 +1,9 @@
 # Plan-stage baseline measurements — Feature 079 (2026-10-30)
 
-All commands run from the repository root on branch `079-humanize-run-output`, HEAD `35ff11bc`
+All commands run from the repository root on branch `080-humanize-run-output`, HEAD `35ff11bc`
 (pre-change readings: they make the post-change criteria "no NEW drift" decidable instead of
 absolute). The only working-tree entry at measurement time is the untracked driver state spine
-`.specify/state/079-humanize-run-output.md` (driver-owned, never committed by this stage).
+`.specify/state/080-humanize-run-output.md` (driver-owned, never committed by this stage).
 
 ## 1. Generated command copies — `scripts/python/regen-command-copies.py --check`
 

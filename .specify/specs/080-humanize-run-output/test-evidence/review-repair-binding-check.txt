@@ -1,4 +1,4 @@
-# Review-repair binding self-check — 079-humanize-run-output
+# Review-repair binding self-check — 080-humanize-run-output
 # date=2026-10-31 | cwd=<repo root> | run from the repo root; the script below is the exact checker (stdin to .venv/bin/python, output via tee).
 # Environment: python 3.14 (.venv); SHA-256 over the archived file bytes.
 
@@ -7,7 +7,7 @@
 import hashlib, pathlib, re, sys
 
 root = pathlib.Path.cwd()
-vf = root / ".specify/specs/079-humanize-run-output/verification.md"
+vf = root / ".specify/specs/080-humanize-run-output/verification.md"
 keys = ("sample_id", "evidence_path", "evidence_sha256", "verdict")
 
 rows, block = [], {}
@@ -63,53 +63,53 @@ sys.exit(0 if failures == 0 and pass_scs == expected else 1)
 ```
 
 ## Readings
-verification.md=.specify/specs/079-humanize-run-output/verification.md
+verification.md=.specify/specs/080-humanize-run-output/verification.md
 records=8
 
 sample_id=SC-002_quickstart_s1
-  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
   exists=true bytes=10647 nonempty=true
   evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   hash_match=true verdict=pass result=PASS
 sample_id=SC-003_quickstart_s2
-  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
   exists=true bytes=10647 nonempty=true
   evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   hash_match=true verdict=pass result=PASS
 sample_id=SC-005_quickstart_s4
-  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
   exists=true bytes=10647 nonempty=true
   evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   hash_match=true verdict=pass result=PASS
 sample_id=SC-006_wiring_inventory
-  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
+  evidence_path=.specify/specs/080-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
   exists=true bytes=12952 nonempty=true
   evidence_sha256(recorded)=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
   evidence_sha256(computed)=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
   hash_match=true verdict=pass result=PASS
 sample_id=SC-007_implement_part4
-  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+  evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt
   exists=true bytes=6672 nonempty=true
   evidence_sha256(recorded)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
   evidence_sha256(computed)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
   hash_match=true verdict=pass result=PASS
 sample_id=SC-008_implement_part5
-  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt
+  evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part5-status.txt
   exists=true bytes=6947 nonempty=true
   evidence_sha256(recorded)=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
   evidence_sha256(computed)=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
   hash_match=true verdict=pass result=PASS
 sample_id=SC-009_quickstart_s3_s7
-  evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+  evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
   exists=true bytes=10647 nonempty=true
   evidence_sha256(recorded)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   evidence_sha256(computed)=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
   hash_match=true verdict=pass result=PASS
 sample_id=SC-010_implement_part4
-  evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+  evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt
   exists=true bytes=6672 nonempty=true
   evidence_sha256(recorded)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
   evidence_sha256(computed)=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b

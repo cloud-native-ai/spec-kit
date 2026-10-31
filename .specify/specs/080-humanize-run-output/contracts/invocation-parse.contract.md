@@ -1,6 +1,6 @@
 # Contract: 调用与解析（invocation-parse）
 
-**Feature**: 062 扩展 | **规格**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: 062 扩展 | **规格**: `.specify/specs/080-humanize-run-output/requirements.md`
 **性质**: 结构 + 行为契约。判定入口语法、模式路由、拒绝面与入口态 fail-closed。
 **覆盖**: 见文末可追溯性表（唯一权威映射；本文件头部不复制枚举）。
 **字面量**: `[[STR-NNN]]` 的拥有者是 requirements § Shared Strings；本文件只引用，不复制值。

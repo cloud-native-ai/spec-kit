@@ -1,6 +1,6 @@
 # Contract: 指令执行与派发（execution-dispatch）
 
-**Feature**: 062 扩展 | **规格**: `.specify/specs/079-humanize-run-output/requirements.md`
+**Feature**: 062 扩展 | **规格**: `.specify/specs/080-humanize-run-output/requirements.md`
 **性质**: 行为契约。判定派发载体、载荷、回传、失败与降级。
 **覆盖**: 见文末可追溯性表。
 **外部所有者**: `run-agent` 技能的 Run Mode 是本契约的**载体所有者**（载体的步骤、拓扑声明与

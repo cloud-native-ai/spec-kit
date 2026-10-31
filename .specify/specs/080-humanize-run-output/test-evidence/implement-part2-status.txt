@@ -3,7 +3,7 @@
 date=2026-10-30
 stage=implement
 part=2/5
-feature=079-humanize-run-output
+feature=080-humanize-run-output
 base_commit=faeb251a
 scope=T009,T010,T011,T012,T013,T014,T015,T016
 selection_basis=targeted-set-v1
@@ -40,7 +40,7 @@ Segment-added US2 clauses also turned green in the same pass: RP-05…RP-10 (T01
 
 ## 非 new_failures（如实声明）
 
-- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/079-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
+- `test_humanize_command_surface.py::test_c06_registry_rows_resolve` —— E2 既有基线失败（在 `.specify/specs/080-humanize-run-output/baseline-failed.txt` 的 17 条内），本段未改测试掩盖、也未提前改登记面（WC-10/WC-11 归 T030）。
 - `test_expression_compatibility.py::test_c7_mirrors_are_byte_identical` —— part 1 已在册的镜像暂态，仍报 `.specify/skills/humanize/SKILL.md — mirror differs from skills/external/humanize/SKILL.md`；唯一再生成行是 **T028**，本段按纪律不提前再生成派生面（WC-05/WC-06）。
 
 ## 未跑的东西（如实声明）

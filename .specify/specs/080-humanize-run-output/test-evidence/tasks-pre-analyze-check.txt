@@ -1,7 +1,7 @@
 # Tasks-stage gate — pre-analyze-check.py --stage tasks
 date=2026-10-30
 stage=tasks H-06 propagation fix (analyze round 2, sole HIGH)
-cmd=python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .
+cmd=python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/080-humanize-run-output --stage tasks --repo .
 note=re-captured after the H-06 fix; advisories rose 21 → 23 because T019 now names tests/fixtures/humanize/run/denied/ and T024 names tests/fixtures/humanize/run/injection/, both under the GATE-2 allowed new-path set
 --- stdout/stderr ---
 pre-analyze-check: stage=tasks decision=pass errors=0 advisories=23 waived=0

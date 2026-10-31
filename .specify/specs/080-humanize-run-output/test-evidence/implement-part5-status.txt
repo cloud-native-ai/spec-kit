@@ -3,7 +3,7 @@
 date=2026-10-31
 stage=implement
 part=5/5
-feature=079-humanize-run-output
+feature=080-humanize-run-output
 base_commit=ecc8ac58
 scope=T033,T034,T035,T036
 selection_basis=targeted-set-v1
@@ -59,9 +59,9 @@ Baseline row (`test-evidence/gate-newline-baseline.txt`): `added_lines=0` / `blo
 ```console
 $ .venv/bin/python -m pytest "tests/contract/test_humanize_command_surface.py::test_wc12_clause_test_map_is_total" -v
 1 passed     → clause-test-map=total
-$ python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
+$ python3 scripts/python/validate-tasks.py .specify/specs/080-humanize-run-output/tasks.md
 PASS — 0 error(s), 0 warning(s)
-$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/080-humanize-run-output --stage tasks --repo .
 pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0
 ```
 

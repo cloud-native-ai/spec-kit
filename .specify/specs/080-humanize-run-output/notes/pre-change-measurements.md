@@ -3,8 +3,8 @@
 **Role**: 本文件是全特性「改动前侧」的唯一落点（T001 / T002）。后续任何行引用「改动前」时只指向这里与 `coverage-baseline.txt`；实现期不得回填或刷新本文件的历史读数，只能追加新小节。
 
 - **Measured at**: 2026-10-30T15:41Z（T001 起点；命令逐条真实执行，命令、日期与退出码一并记录）
-- **Branch**: `079-humanize-run-output`
-- **HEAD**: `c6ac8c99`（上一阶段 implement 起点提交；工作树已有脏文件 `M .specify/memory/session/20261029T101833Z-...md`、`?? baseline-failed.txt`、`?? state/079-humanize-run-output.md`，均非本段产物、不提交不还原）
+- **Branch**: `080-humanize-run-output`
+- **HEAD**: `c6ac8c99`（上一阶段 implement 起点提交；工作树已有脏文件 `M .specify/memory/session/20261029T101833Z-...md`、`?? baseline-failed.txt`、`?? state/080-humanize-run-output.md`，均非本段产物、不提交不还原）
 - **Wiring baseline commit**: `35ff11bc`（A11 发现命令的固定参照物）
 - **解释器**: `python3` = `Python 3.9.6`；pytest 走仓库 `.venv`（本文件不重测，基线见 E2）
 
@@ -14,14 +14,14 @@
 
 | 测量 | 命令 | 真实输出 | 退出码 |
 |------|------|----------|--------|
-| FR 定义行 | `grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/079-humanize-run-output/requirements.md` | `30` | 0 |
-| SC 定义行 | `grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/079-humanize-run-output/requirements.md` | `10` | 0 |
-| 用户故事数 | `grep -cE '^### User Story' .specify/specs/079-humanize-run-output/requirements.md` | `4` | 0 |
-| Shared Strings | `grep -cE '^\| .STR-[0-9]{3}.' .specify/specs/079-humanize-run-output/requirements.md` | `15` | 0 |
+| FR 定义行 | `grep -cE '^- \*\*FR-[0-9]{3}\*\*:' .specify/specs/080-humanize-run-output/requirements.md` | `30` | 0 |
+| SC 定义行 | `grep -cE '^- \*\*SC-[0-9]{3}\*\*:' .specify/specs/080-humanize-run-output/requirements.md` | `10` | 0 |
+| 用户故事数 | `grep -cE '^### User Story' .specify/specs/080-humanize-run-output/requirements.md` | `4` | 0 |
+| Shared Strings | `grep -cE '^\| .STR-[0-9]{3}.' .specify/specs/080-humanize-run-output/requirements.md` | `15` | 0 |
 
 ## ② 五份契约逐份条款行首计数
 
-命令：`grep -cE '^- \*\*[A-Z]{2}-[0-9]{2}\*\*' .specify/specs/079-humanize-run-output/contracts/*.md`（日期 2026-10-30，退出码 0）
+命令：`grep -cE '^- \*\*[A-Z]{2}-[0-9]{2}\*\*' .specify/specs/080-humanize-run-output/contracts/*.md`（日期 2026-10-30，退出码 0）
 
 | 契约文件 | 条款定义行 |
 |----------|-----------|
@@ -94,11 +94,11 @@
 
 # T002 — 冻结条款覆盖基线复核（2026-10-30T15:47Z）
 
-**基线文件**：`.specify/specs/079-humanize-run-output/coverage-baseline.txt`（497 行 = 2 行头 + 495 个冻结 UNCOVERED 名；头记录 `base-sha 70dd9e78`、`files: 234`）。本小节只**复核**，MUST NOT 重写基线（未使用 `--freeze`）。
+**基线文件**：`.specify/specs/080-humanize-run-output/coverage-baseline.txt`（497 行 = 2 行头 + 495 个冻结 UNCOVERED 名；头记录 `base-sha 70dd9e78`、`files: 234`）。本小节只**复核**，MUST NOT 重写基线（未使用 `--freeze`）。
 
 **命令**（退出码 1 —— 该工具在「有未覆盖项」时按设计返回 1，不是本阶段异常）：
 ```
-python3 scripts/python/account-clause-coverage.py .specify/specs/079-humanize-run-output
+python3 scripts/python/account-clause-coverage.py .specify/specs/080-humanize-run-output
 ```
 
 **真实读数**：
@@ -118,11 +118,11 @@ python3 scripts/python/account-clause-coverage.py .specify/specs/079-humanize-ru
 
 **为什么条款车道看不见本特性的 88 条**（同一命令的 `--list-named` 实测）：
 ```
-python3 scripts/python/account-clause-coverage.py .specify/specs/079-humanize-run-output --list-named
-  NAMED: 079-humanize-run-output/contracts/content-mode.contract.md
-  NAMED: 079-humanize-run-output/contracts/execution-dispatch.contract.md
-  NAMED: 079-humanize-run-output/contracts/invocation-parse.contract.md
-  NAMED: 079-humanize-run-output/contracts/report-assembly.contract.md
-  NAMED: 079-humanize-run-output/contracts/wiring-compat.contract.md
+python3 scripts/python/account-clause-coverage.py .specify/specs/080-humanize-run-output --list-named
+  NAMED: 080-humanize-run-output/contracts/content-mode.contract.md
+  NAMED: 080-humanize-run-output/contracts/execution-dispatch.contract.md
+  NAMED: 080-humanize-run-output/contracts/invocation-parse.contract.md
+  NAMED: 080-humanize-run-output/contracts/report-assembly.contract.md
+  NAMED: 080-humanize-run-output/contracts/wiring-compat.contract.md
 ```
 五份契约在 `clause_extract.py` / owner forms 下均判 `md-none`（命名但不可解析，0 clauses）：`IP` / `EX` / `RP` / `CM` / `WC` 两字母命名空间不在 `C-<n>` 形态集内。故条款车道看不见这 88 条，覆盖由 `tasks.md` § Contract Coverage Map 的人工指派 + T036 的 `test_wc12_clause_test_map_is_total` 机器核对承担，**不靠基座豁免**。把 88 条改名为 `C-<n>` 属 plan 属主制品变更，本阶段不做。

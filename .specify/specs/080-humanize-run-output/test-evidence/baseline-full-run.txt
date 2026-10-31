@@ -881,5 +881,5 @@ FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installe
 FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
 FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
 ====== 17 failed, 6881 passed, 7 skipped, 5 warnings in 998.52s (0:16:38) ======
-# failed-name list written: .specify/specs/079-humanize-run-output/baseline-failed.txt (      17 entries)
+# failed-name list written: .specify/specs/080-humanize-run-output/baseline-failed.txt (      17 entries)
 RC=1

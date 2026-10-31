@@ -4,7 +4,7 @@
 
 baseline_commit=35ff11bc
 baseline_date=2026-10-30
-baseline_branch=079-humanize-run-output
+baseline_branch=080-humanize-run-output
 
 implementation_date=2026-10-31
 post_change_commit=46394dd4
@@ -16,42 +16,42 @@ post_change_commit=46394dd4
 # Self-check readings: test-evidence/review-repair-binding-check.txt
 
 sample_id=SC-002_quickstart_s1
-evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
 evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
 verdict=pass
 
 sample_id=SC-003_quickstart_s2
-evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
 evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
 verdict=pass
 
 sample_id=SC-005_quickstart_s4
-evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
 evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
 verdict=pass
 
 sample_id=SC-006_wiring_inventory
-evidence_path=.specify/specs/079-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
+evidence_path=.specify/specs/080-humanize-run-output/test-evidence/wiring-inventory-baseline.txt
 evidence_sha256=867c9be042f75eb54394355ecba0eac01967d1b2fa35754cccf5db4e36f7a514
 verdict=pass
 
 sample_id=SC-007_implement_part4
-evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt
 evidence_sha256=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
 verdict=pass
 
 sample_id=SC-008_implement_part5
-evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part5-status.txt
+evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part5-status.txt
 evidence_sha256=b2f25d0b6bd715efb072f6cdbbd17df4fb7eb90c794b181e78cddff453bb1744
 verdict=pass
 
 sample_id=SC-009_quickstart_s3_s7
-evidence_path=.specify/specs/079-humanize-run-output/notes/quickstart-run.md
+evidence_path=.specify/specs/080-humanize-run-output/notes/quickstart-run.md
 evidence_sha256=c67faa94fed563203653c22cea4c50ea07d4bcda69b708e6624f74880dcf7b9b
 verdict=pass
 
 sample_id=SC-010_implement_part4
-evidence_path=.specify/specs/079-humanize-run-output/test-evidence/implement-part4-status.txt
+evidence_path=.specify/specs/080-humanize-run-output/test-evidence/implement-part4-status.txt
 evidence_sha256=6a5fbcc8991711c822fad995f2779329b66209ed4286d3126e713852585ac91b
 verdict=pass
 
@@ -98,7 +98,7 @@ SC-010_note=承载证据：tests/fixtures/humanize/run/injection/、tests/fixtur
 deferred_tasks=
 deferred_reason_summary=
 
-notes=canonical 状态块；逐条证据正文见下方表格与 T031–T034 小节；证据目录 .specify/specs/079-humanize-run-output/test-evidence
+notes=canonical 状态块；逐条证据正文见下方表格与 T031–T034 小节；证据目录 .specify/specs/080-humanize-run-output/test-evidence
 
 **指针**：canonical 状态以上方 `SC-NNN_status=` 块为准；下方表格是逐条证据正文。
 
@@ -296,9 +296,9 @@ T036 组整体读数：`17 passed`（WC-05…WC-20 与判定器），红先行�
 ## 阶段门留档
 
 ```console
-$ python3 scripts/python/validate-tasks.py .specify/specs/079-humanize-run-output/tasks.md
-PASS: .specify/specs/079-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)   （rc=0）
-$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/079-humanize-run-output --stage tasks --repo .
+$ python3 scripts/python/validate-tasks.py .specify/specs/080-humanize-run-output/tasks.md
+PASS: .specify/specs/080-humanize-run-output/tasks.md — 0 error(s), 0 warning(s)   （rc=0）
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/080-humanize-run-output --stage tasks --repo .
 pre-analyze-check: stage=tasks decision=pass errors=0 advisories=0 waived=0        （rc=0）
 ```
 

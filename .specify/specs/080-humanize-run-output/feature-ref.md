@@ -1,6 +1,6 @@
-# Feature Reference: `079-humanize-run-output` → Feature 062
+# Feature Reference: `080-humanize-run-output` → Feature 062
 
-**Requirement branch**: `079-humanize-run-output`
+**Requirement branch**: `080-humanize-run-output`
 **Bound Feature**: 062 — Humanize Command（动作输出人类友好化）
 **Binding kind**: 扩展（extension），不是新 Feature
 **Status contract**: Feature 062 MUST 保持 `Implemented`（FR-029）；本阶段（plan）不做状态迁移
@@ -15,7 +15,7 @@
 | Feature 详情 | `.specify/memory/features/062.md` | requirements FR-029 |
 | Feature 索引行 | `.specify/memory/features.md` 062 行 | requirements FR-029 |
 | 首个规格 | `.specify/specs/062-humanize-command/requirements.md` | 062 详情 `## Related Specifications/Requirements` |
-| 本规格 | `.specify/specs/079-humanize-run-output/requirements.md` | requirements 头 |
+| 本规格 | `.specify/specs/080-humanize-run-output/requirements.md` | requirements 头 |
 | 绑定裁决 | clarify 2026-10-30（改名/描述更新，状态不回退） | requirements § Clarifications |
 
 一个 Feature 承接两个规格是宪法 VII 的 **Feature reuse-first** 形态（many-specs-to-one-feature）：
