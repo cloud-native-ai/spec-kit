@@ -50,7 +50,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -150,7 +150,7 @@ def build_pilot(root: Path) -> Pilot:
     # The doc fixture carries an ``as-of`` the evidence face compares with the
     # file's last commit date. Stamp it with the commit day so the fixture is
     # timeless instead of going stale the day after it was authored.
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now().strftime("%Y-%m-%d")  # local date: git commits use local time
     doc_text = re.sub(
         r"(as-of\s+)\d{4}-\d{2}-\d{2}",
         lambda m: m.group(1) + today,
