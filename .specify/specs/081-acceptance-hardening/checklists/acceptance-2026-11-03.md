@@ -228,6 +228,8 @@
 | P7 | `wc -l baseline-failed.txt` + 基线日志末行 | 39 行 / `39 failed, 6970 passed, 7 skipped` |
 | P8 | `ls .specify/templates/commands`、`grep -n MIRROR_PAIRS -A 8 scripts/python/sync-mirrors.py` | 目录不存在（retired 属实）/ 六对与 `plan.md:192-200` 相符 |
 | P9 | `grep -rn test_acceptance_schema_ownership` 于 plan/tasks/quickstart + `ls tests/contract/` | 零命中、文件不存在（→ CHK024） |
+| P10 | `sed -n '98p' templates/feature-details-template.md`、`sed -n '121p' skills/internal/manage-features/SKILL.md`、`sed -n '20p' templates/feature-index-template.md` + `wc -l` | 前两处有取值域清单；第三处只有 `Status` 列、全文 21 行（→ CHK005） |
+| P11 | `grep -n '^### Step 8\|^### Step 9' skills/internal/implement-feature/SKILL.md` | `249:### Step 8 — Completion validation`、`310:### Step 9 — Pre-Status-Flip Gate …`（→ CHK035） |
 
 逐字输出存档：`test-evidence/checklist-probes.txt`。
 
