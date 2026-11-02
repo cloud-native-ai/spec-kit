@@ -1,0 +1,74 @@
+# checklist probes — feature 081 (slice 081a), checklist stage
+# run 2026-11-03, all commands read-only, cwd = repo root
+
+## P1 regen-command-copies --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+## P2 sync-mirrors --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (408 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (118 files)
+ok    shared/ == .specify/shared/ (61 files)
+exit=0
+
+## P3 GATE-5 awk probe on the feature registry
+col5=[ Planned ]
+
+## P4 Path marker census on SC definition lines
+line 201: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 202: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 203: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 204: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 205: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 206: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=2
+line 207: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 208: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+line 209: strict **Path** count=1 ends_with_marker=True 'Path'-substring count=1
+
+## P5 inherited-blocker source rows (071 / 077)
+.specify/specs/071-review-code-integration/verification.md:66:SC-001_status=partial
+.specify/specs/071-review-code-integration/verification.md:86:SC-006_status=partial
+.specify/specs/077-doc-sdd-integration/verification.md:77:SC-002_status=partial
+.specify/specs/077-doc-sdd-integration/verification.md:89:SC-005_status=partial
+.specify/specs/077-doc-sdd-integration/verification.md:101:SC-008_status=partial
+.specify/specs/071-review-code-integration/verification.md:96:deferred_tasks=
+.specify/specs/077-doc-sdd-integration/verification.md:107:deferred_tasks=
+
+## P6 dependency '## Deferred' sections
+(no output above = zero matches)
+
+## P7 baseline
+      39 .specify/specs/081-acceptance-hardening/baseline-failed.txt
+39 failed, 6970 passed, 7 skipped, 4 warnings in 596.80s (0:09:56)
+# failed-name list written: .specify/specs/081-acceptance-hardening/baseline-failed.txt (      39 entries)
+
+## P8 mirror topology
+ls: .specify/templates/commands: No such file or directory
+82:MIRROR_PAIRS = [
+83-    ("templates", ".specify/templates", False, {"commands"}),
+84-    ("skills/external", ".specify/skills", False, {"site", "internal"}),
+85-    ("skills/internal", ".specify/skills/internal", False, {"site"}),
+86-    ("agents", ".specify/agents/templates", False, set()),
+87-    ("scripts", ".specify/scripts", True, set()),
+88-    ("shared", ".specify/shared", False, set()),
+89-]
+90-
+
+## P9 contract-cited guard module test_acceptance_schema_ownership
+(plan/tasks/quickstart: no output = zero matches)
+0
+(0 = file absent)
+
+## P10 state machine / vocabulary carriers as they exist today
+| [FEATURE_STATUS] | Draft | Planned | Implemented | Ready for Review | Completed |
+- Status vocabulary: `Draft | Planned | Implemented | Ready for Review | Completed`
+| ID | Name | Description | Status | Feature Details | Last Updated |
+      21 templates/feature-index-template.md
+
+## P11 implement-feature step boundaries
+249:### Step 8 — Completion validation
+310:### Step 9 — Pre-Status-Flip Gate and Verification Log
