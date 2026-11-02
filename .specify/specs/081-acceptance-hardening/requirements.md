@@ -9,21 +9,43 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 081
+**Feature Name**: 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
 
-## Assumptions（对输入中开放点的缺省裁决，clarify 阶段可推翻）
+**Binding basis**: `/speckit.clarify` Mode A 按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 扫描候选人后判定无归属，新建 Feature 081；详情落在 `.specify/memory/features/081.md`，索引行由 `.specify/memory/features.md` 承载（`Total Features` 与行数同趟重算）。候选人复核与 ID 取值的裁决见 `## Clarifications` § Session 2026-11-03。
 
-- **A1（类别判定 = execution，basis = behavior-oracle）**：主交付物是确定性脚本、门禁条款与命令模板；缺陷最先在机器面暴露（checker 对被禁止的特性返回 `accept`、门禁放行一个 final-path 全未通过的切片、`--check` 退出码非 0），按 `.specify/shared/definitions/flow-class-definitions.md` § 判据属 `execution`，`Flow Type` 写 `-`。产物中包含大量 Markdown（模板、文档），但介质不参与判定（owner §不参与判定的因素）。
-- **A2（Feature 绑定）**：`Related Feature` 保持 `Need clarification`；绑定/新建由 `/speckit.clarify` 按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 落定。本特性是框架自身能力的新增，不是既有 Feature 的扩展切片，预计为新建 Feature。
-- **A3（review 组合结构的选择）**：产物审查与实现审查作为**新增的兄弟段**加入 `/speckit.review`，而不是塞进 `review-sdd-process`。理由：`templates/commands/review.md` § Composition 把「恰好两段、固定顺序」写成封闭结构，且明文限定 process 段的判定对象是流程而非代码与产物；把产物审查并入同一段会让一个段同时承载两个判定对象，与该 owner 的明文冲突。因此本特性把该 owner 的组合从两段改为三段，顺序仍固定，且 MUST 在该 owner 内声明。
-- **A4（`Path` 标注的落位）**：标注写在 SC 定义行内（`- **SC-001**: … **Path**: final`），不新增独立小节表。理由：`Path` 是每条 SC 的属性而非全局集合；行内标注能被 `validate-requirements.py` 与 closure checker 同时确定性解析，也不需要第二处需要与 SC 列表保持同步的表。
-- **A5（`blocked` 字面的四处不同语义）**：特性状态的 `Blocked`、verification 行的 `blocked`、`sdd-loop-driver` 的线状态 `blocked`、任务行的 `[blockedBy: …]` 是**四个互不相同的封闭集**，共用字面但语义与 owner 各不相同。本特性新增其中两处（特性状态、线状态），MUST 各自写进自己的 owner；调和结论只落一处（见 FR-019）。
-- **A6（线状态集的扩张）**：`skills/external/sdd-loop-driver/scripts/line-registry.py` 的 `STATE_VALUES` 当前是封闭集 `{active, waiting, stalled, completed, orphaned, stale, closed}`，不含 `blocked`。按用户指令「a `block` … marks the line `blocked`」，本特性要求把 `blocked` 加入该封闭集；随之必须显式处置 `merge_ready`、`HOLDING_STATES`、revival 与各 `integration-*` 动作的既有约束。本规格只要求「新值不得留下未处置的旧约束」，具体处置由 plan 给出并由 FR-017 的验收断言覆盖。
-- **A7（新 schema 的单一 owner 落点）**：两张新表（运行时栈/依赖所有权、执行前提与继承 blocker）以及 `Path` 标注、封闭原因集的 schema，只有一个 owner 文档 `shared/workflow/acceptance-hardening.md`；其镜像由 mirror 引擎生成。其余模板/命令/技能只引用路径与章节锚。
-- **A8（冻结集）**：阶段序列、阶段哨兵、watcher 语义、test-budget 槽位、loop 的 U0–U6 流程全部冻结，本特性不改；历史特性状态与历史 verification 记录不回写（审计只读）。
-- **A9（零 clarification marker）**：本规格不含 `[NEEDS CLARIFICATION]` 标记。所有开放点都能在目标仓库内裁决（现有 owner 文档、`line-registry.py` 的封闭集、`review.md` 的组合声明），故不留标记，裁决记于本节。
-- **A10（语言）**：正文中文；契约面字面量（脚本路径、命令、状态值、原因标签、列名）一律英文原样，MUST NOT 翻译或音译。
+## Assumptions（clarify 阶段逐条裁决；每条给出裁决、证据与对产物的影响）
+
+裁决语法：**ratified** = 原假设成立、证据在仓内可复核；**revised** = 前提成立但表述或边界需改写，改写内容即该条正文；**superseded** = 该假设要交给后续阶段做的事已在本阶段完成。没有一条被静默丢弃。
+
+- **A1（类别判定 = execution，basis = behavior-oracle）— 裁决：ratified**。主交付物是确定性脚本、门禁条款与命令模板；缺陷最先在机器面暴露（checker 对被禁止的特性返回 `accept`、门禁放行一个 final-path 全未通过的切片、`--check` 退出码非 0），按 `.specify/shared/definitions/flow-class-definitions.md` § 判据属 `execution`，`Flow Type` 写 `-`。产物中包含大量 Markdown（模板、文档），但介质不参与判定（owner §不参与判定的因素）。**证据**：`python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:081-acceptance-hardening"` → `flow_class: execution` / `flow_type: -` / `source: declaration` / `marker: null` / exit 0——类别由本文件头部声明行解析，不依赖任何注册表行。
+- **A2（Feature 绑定）— 裁决：superseded（本阶段已执行）**。原表述「`Related Feature` 保持 `Need clarification`，预计新建」由本阶段兑现：已按 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 落定**新建 Feature 081**，并写出详情文件与索引行。**候选人复核**：本仓 `features.md` 的 026 是「Agent Skill Enablement」（spec 025），055 是「冲突无关存储」，062 是「Humanize Command」（spec 080 绑定的目标），071 是「Review × Code-Review 组合」但只治理**两段**的既有组合与严重度不互转，077 是「文档型阶段门禁」、079 是「双语表述」——均不覆盖「final 路径阈值 + smoke 硬条件 + 三处共享判定 + 产物/实现审查」这一组合，故 create 而非 bind。
+- **A3（review 组合结构）— 裁决：revised（结构从「两段」改为「四段 + 一次确定性判定」）**。
+  - **终态组合与固定顺序**：① 过程段 `review-sdd-process`（保留）→ ② 产物段（新增）→ ③ 实现段（新增）→ ④ 代码段 `code-review`（保留）→ ⑤ **Acceptance Reality Check**（不是段，是确定性判定）。
+  - **各段判定对象**：① = 产出该切片的 SDD 流程本身（流程与工具质量，不是业务价值，也不是代码）；② = 当次存在的每个阶段产物本身（完整性、内部一致性、可追溯性、依赖与前提所有权、验收诚实性）；③ = 本次实现本身（`base..head` 的实现相对 requirements 与 tasks 的正确性、范围与回归，并实跑或核验 smoke 并记录命令／退出码／证据路径）；④ = 该切片已提交代码 delta 中可验证的缺陷；⑤ = 「声称的特性状态」与「final 路径实际通过数」是否对得上。
+  - **顺序理由**：过程段无条件先跑且最便宜，它交代切片是怎么被做出来的；产物段只读已在盘上的文件；实现段需要 `base..head` 且要实跑 smoke（最贵），排在读盘之后；代码段是最深的 diff 阅读，放在实现段之后以免与实现段的结论抢跑；ARC 最后，因为它裁决的是**声称的状态**与前面各段已确立的证据之间的差额，早跑等于在证据产生前下判断，且它直接压住 `Implemented → Ready for Review` 的翻转点。
+  - **职责边界（MUST 在该 owner 内声明）**：`review-sdd-process` MUST NOT 被当作产物段或实现段的替代；实现段 MUST NOT 由代码段代答，代码段 MUST NOT 由实现段代答（两段各自成文、各自定级、互不转换）；ARC 的判定 MUST NOT 由任何模型判断代替，它只读 `verification.md` 与特性状态；段数与顺序是模板属性，`$ARGUMENTS` 不得选择跳过任一段。`code-review` 仍保留（FR-014 明文「MUST NOT 替换」），故终态是**四段 + 一次判定**而非三段。
+  - **owner 改写点**：`templates/commands/review.md` § Composition 现以「two segments, one fixed order」把「恰好两段」写成封闭结构，`## Delegation` 亦写明「Each segment is delegated to its existing skill」。本特性 MUST 在该 owner 内改写标题句、段数断言与 Delegation 形态，并逐段补出 ②③ 两段的 Skill／判定对象／严重度／输入／输出五项，以及 ⑤ 的调用点与产出（三计数 + 固定 P0）。
+  - **本阶段不改源**：Two Hats——该改写属框架源（`templates/commands/review.md`，逐工具副本由 `scripts/python/regen-command-copies.py` 重生成），是 plan/implement 阶段的义务；clarify 阶段只把它写成 `requirements` 的强制条款（FR-013），MUST NOT 在本阶段手改模板，也 MUST NOT 以手改 `.specify/` 镜像代替。
+- **A4（`Path` 标注的落位）— 裁决：ratified 并收紧**。标注写在 SC 定义行内（`- **SC-001**: … **Path**: final`），不新增独立小节表：`Path` 是每条 SC 的属性而非全局集合，行内标记不需要第二处与 SC 列表保持同步的表（否则违反一源）。**确定性可解析性证据**：`scripts/python/validate-requirements.py` 的 `DEFINITION_RE = ^- \*\*(FR|SC)-(\d+)([a-z]?)\*\*` 锚定行首、不消费冒号之后的内容；`skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` 的 `SC_DEF = ^- \*\*SC-(\d{3})\*\*:` 同样只锚前缀——两处解析器都容得下行尾标记。**收紧条款**：标记 MUST 是 SC 定义行的**最后一个 token**、形如 `**Path**: final` 或 `**Path**: supporting`，每行恰好出现一次；行中不得出现第二处 `**Path**`。closure checker 按该形态机械解析，取二值之外或缺失即判不合格（FR-001）。
+- **A5（`blocked` 字面的四处不同语义）— 裁决：ratified**。四处封闭集与 owner 各自独立：特性状态 `Blocked`（owner `templates/feature-details-template.md` § Canonical Status State Machine）、verification 行 `blocked`（owner `templates/verification-log-template.md`，其词表现为 `pass|fail|partial|deferred|unknown`）、线状态 `blocked`（owner `skills/external/sdd-loop-driver/scripts/line-registry.py` 的 `STATE_VALUES`）、任务行 `[blockedBy: …]`（owner `templates/tasks-template.md`，该处是**任务依赖标签**、不是状态）。本特性新增其中两处（特性状态、线状态），各处写进自己的 owner；调和结论只落一处（FR-019）。
+- **A6（线状态集的扩张）— 裁决：revised（给出八项具体处置，并更正一处用词）**。`STATE_VALUES` 现为封闭集 `{active, waiting, stalled, completed, orphaned, stale, closed}`。**用词更正**：该文件内不存在名为 `revival` 的符号或动作（`grep -n "revive\|revival"` 零命中），原假设中的「revival」实指 `promote-waiting` 与 `ownership-check` 两条恢复路径，本规格一律用后者命名。八项处置（plan 必须逐项落地，FR-017 的断言覆盖）：
+  1. `STATE_VALUES` 加入 `blocked`（7 → 8 个取值）。
+  2. `ACTIVE_STATES = {active, waiting}` **不变**：`blocked` 不是活跃态——它不进 `--active` 列表（`action_list`）、不进 `_active_entries`、不占并发槽（`promote-waiting` 的 `active` 计数只看 `state == "active"`）。
+  3. `HOLDING_STATES = {active, completed}` **不变**，但 MUST 声明 `blocked` 不持有任何资源：转入 `blocked` 时 MUST 释放 lease 并清空 `holder_line_id` / `waiting_reason`（与 `closed` 同款清理），否则阻塞线会像泄漏的 lease 一样把等待者钉死。
+  4. `merge_ready`：`merge_ready=true` 要求 `state=completed` 的既有前置**不变**；新增不变量 `state=blocked ⇒ merge_ready` MUST NOT 为真（在同一校验点断言，不靠前置隐式排除）。
+  5. `integration-enqueue` / `integration-plan` / `integration-record` 均要求 `state=completed`，**不变**：`blocked` 线结构性不可入队、不可记录合并结果。
+  6. **终态守卫集 `{closed, stale, orphaned}` MUST NOT 加入 `blocked`**（`ownership-check`、`release-ownership`、`allocate-resources`、`archive-runtime` 等处的 `not in {closed, stale, orphaned}` 守卫）：那三值语义是「不可再动作」，而 `blocked` 按设计可恢复，恢复路径是既有的 `update --state active` 并记 unblock 原因。
+  7. `promote-waiting` 要求 `state == "waiting"`，**不变**：`blocked` 线不得经该动作直接复活，也不得绕过 `ownership-check` 的重新取权。
+  8. `deregister --reason stale-cleanup` 会写 `stale_from_state = <前值>`；MUST 声明该字段可承载新值 `blocked`（不需要枚举扩张，但要写进注释与测试）。
+  - 不引入任何「线状态不再回退」规则：线状态集本就没有 never-regress 语义，本特性不为它新增一条。
+- **A7（新 schema 的单一 owner 落点）— 裁决：ratified**。两张新表（运行时栈/依赖所有权、执行前提与继承 blocker）以及 `Path` 标注、封闭原因集的 schema，owner 只有一个文件 `shared/workflow/acceptance-hardening.md`（该路径当前不存在，是 FR-022 的交付物；目录 `shared/workflow/` 已存在且承载同类规范文档）；其镜像由 mirror 引擎生成，其余模板/命令/技能只引用路径与章节锚。
+- **A8（冻结集）— 裁决：revised（收窄）**。原表述把「loop 的 U0–U6 流程全部冻结」写死，与 FR-017 冲突：FR-017 明确要求 driver 的 closure/merge 步改跑 [[STR-005]] 并在 [[STR-007]] 时把线标 `blocked`，那正是 U6 内的判定变化。收窄后的冻结集：阶段序列、阶段哨兵、watcher 语义、test-budget 槽位、U0–U6 的**阶段骨架与顺序**冻结；**唯一例外**是 closure/merge 步的判定来源（改由 [[STR-005]] 给出）与线状态集（加 `blocked`）。历史特性状态与历史 verification 记录仍不回写（审计只读）。
+- **A9（零 clarification marker）— 裁决：ratified**。本规格不含 `[NEEDS CLARIFICATION]` 标记；`validate-requirements.py` 的 `marker-count` 项 pass。开放点全部在仓内可裁决（现有 owner 文档、`line-registry.py` 的封闭集、`review.md` 的组合声明），裁决记于本节。
+- **A10（语言）— 裁决：ratified**。正文中文；契约面字面量（脚本路径、命令、状态值、原因标签、列名）一律英文原样，MUST NOT 翻译或音译（本文件自身即样本）。
+- **A11（`026` 是外部事故的代称，不是本仓可核验的特性）— 裁决：新增（clarify 补齐）**。本规格四处以「026」指代触发本特性的事故，但该编号在本仓不可核验：本仓 `features.md` 的 026 是「Agent Skill Enablement」（bound spec 025），`.specify/specs/` 下不存在 `026-*` 目录，规格树内只有本文件引用这个编号。因此 026 的**规范内容**以本规格的内联重述为准——「任务全关 + 每条 SC 有状态行 + final 路径 SC 全 `blocked`/`deferred`」「运行时外部化成散文」——任何产物 MUST NOT 把 026 当作可核验证据引用，也 MUST NOT 补造其细节。Feature 081 的详情文件同样只按内联重述记录该形态。
+- **A12（review 新增两段的严重度与载体）— 裁决：新增（clarify 补齐）**。不新增第三套严重度词汇：产物段与实现段产出 `P0`/`P1`/`P2`（owner `skills/internal/review-sdd-process/SKILL.md`），代码段继续用自己的六级（owner `skills/internal/code-review/SKILL.md`），ARC 的 [[STR-016]] 固定为 `P0`；两个家族之间仍无映射表、无转换、无统一分数。方法论载体 MUST 是一个能以运行时路径抵达的具名 owner（首选新增内部技能，沿用 owner 现有「段 → 技能」形态），`templates/commands/review.md` MUST NOT 内联方法论；载体究竟是新技能还是既有技能下的命名文档，由 plan 决定并记录。
+- **A13（三张「前提／环境」表不叠位）— 裁决：新增（clarify 补齐）**。`templates/tasks-template.md` § Environment Prerequisites 已声明自己是「probe conclusions 的唯一落地处」。若不划界，FR-010／FR-011 会造出第二处 owner，直接违反 FR-019／FR-022。边界：plan § Execution Premises = 计划期承重前提及其证据状态；plan § Inherited Blockers = 依赖特性详情里的 `## Deferred`／blocked 记录及本特性的处置；tasks § Environment Prerequisites = 任务生成期的环境探针判决（带探测命令与日期）。三者判定对象互斥，同一事实 MUST 只落一处，其余以 `(see § …)` 指针引用。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -100,6 +122,9 @@
 - **用户显式豁免**：`Implemented → Ready for Review` 的第四个条件允许用户豁免，但豁免 MUST 落在该转移 owner 已声明的可核验载体上；agent 的确认不是用户裁定，无异议也不是豁免。
 - **final 与 supporting 混合**：只要有一条 final SC 非 `pass` 即 [[STR-007]]，原因点名该 SC；supporting SC 的非 `pass` 不单独阻断。
 - **审计遇到历史遗留的「零通过但 Implemented」**：`--audit-existing` 只报告，MUST NOT 改写历史状态，也 MUST NOT 以其发现阻断其它阶段的正常运行。
+- **review 的实测结论不得充当 implement 的门禁输入（循环）**：任何 SC 若只能在 review 阶段测量，MUST NOT 被记为 [[STR-003]]；否则 `Planned → Implemented` 要求它 `pass`，而它要等 review，`Blocked → Ready for Review` 又非法（FR-003），门禁自锁。本规格据此把 SC-006 保持在 [[STR-004]]（见该 SC 的 Path 裁决）。
+- **三张「前提／环境」表不得叠位**：plan § Execution Premises、plan § Inherited Blockers 与 `templates/tasks-template.md` § Environment Prerequisites 的判定对象互斥，同一事实 MUST 只落一处、其余以 `(see § …)` 指针引用；同一事实出现两处即「一源多写」缺陷（承载 FR-019、FR-022）。理由见 A13。
+- **线 `blocked` 与 `merge_ready` 互斥**：`merge_ready=true` 要求 `state=completed`；一条线一旦被判 [[STR-007]] 并标 [[STR-002]]，其 `merge_ready` MUST NOT 为真。两者同时为真即闭合判定被绕过，MUST 判为缺陷而不是「历史残留」。
 
 ## Requirements *(mandatory)*
 
@@ -107,29 +132,29 @@
 
 #### A. final 路径验收、`Blocked`、smoke test 与 closure checker（US1）
 
-- **FR-001**: `requirements.md` 中每条 SC 定义行 MUST 携带 `Path` 标注，取值取封闭二值 [[STR-003]] 与 [[STR-004]]：`final` = 该 SC 证明特性的主用户旅程／产品流程可用；`supporting` = 辅助质量、卫生、文档或非阻断证据。每个 `execution` 类特性 MUST 至少有一条 [[STR-003]] SC；`expression` 类特性不受该下限约束。标注 MUST 写在 SC 定义行内，使确定性校验器能判定；缺失或取二值之外的值即不合格。
+- **FR-001**: `requirements.md` 中每条 SC 定义行 MUST 携带 `Path` 标注，取值取封闭二值 [[STR-003]] 与 [[STR-004]]：`final` = 该 SC 证明特性的主用户旅程／产品流程可用；`supporting` = 辅助质量、卫生、文档或非阻断证据。每个 `execution` 类特性 MUST 至少有一条 [[STR-003]] SC；`expression` 类特性不受该下限约束。标注 MUST 写在 SC 定义行内、作为该行最后一个 token（形态 `**Path**: final`，每行恰好一次），使确定性校验器能判定（解析器容差见 A4）；缺失、出现两次或取二值之外的值即不合格。
 - **FR-002**: `Planned → Implemented` MUST 为四条件合取：① `tasks.md` 零 `[ ]`；② 每条 SC 有 verification 状态行；③ **每条 [[STR-003]] 路径 SC 的状态为 `pass`**；④ 该特性的基本 smoke test 为 `pass`。该转移的判据 owner 仍是 `templates/feature-details-template.md` § Canonical Status State Machine，其他产物 MUST 只引用不复制。
 - **FR-003**: MUST 新增 [[STR-001]] 为一等特性状态并写入上述 owner 的转移表：`Planned → Blocked`（任务已关闭但至少一条 [[STR-003]] 路径 SC 非 `pass`）；`Blocked → Implemented` 仅在 blocker 解除且 [[STR-003]] 路径 SC 全 `pass` 时允许；`Blocked → Ready for Review` MUST 非法；`Implemented → Blocked` 仅允许作为审计纠正，且 MUST 引用证据。
 - **FR-004**: `templates/verification-log-template.md`（词表 owner）MUST 增加 [[STR-002]] 并给出与 `deferred` 的区分：`blocked` = 环境无法测量该断言、因此特性不可验收；`deferred` = 本轮未尝试但特性仍可验收（仅限 `supporting` 路径）。`blocked` / `deferred` / `partial` 行 MUST 携带 `blocked_at`（或原因）、`reduced_measurement`、`reduced_measurement_run=yes|no`、`why_reduced_insufficient`、`unblock` 五项；当存在可用的 reduced measurement 而 `reduced_measurement_run=no` 时该行 MUST 判为非法（对应命名原因 [[STR-010]]）。
 - **FR-005**: 每个 `execution` 特性 MUST 在其 `tasks.md` / `verification.md` 中命名**恰好一条**确定性、最小、可复现的 smoke 命令，端到端覆盖该特性的主流程（不是完整 E2E 套件），并记录命令原文、退出码、证据路径三件。本特性（081）的 smoke 命令 MUST 至少覆盖三件事：在临时夹具上运行 `specify init`；对正／负夹具运行 closure checker；运行 `python3 scripts/python/regen-command-copies.py --check`。smoke test 无法运行时该特性 MUST 为 [[STR-001]]，MUST NOT 为 `Implemented`。
-- **FR-006**: MUST 交付框架自有的确定性脚本 [[STR-005]]。它读取 `requirements.md`、`plan.md`、`tasks.md`、`verification.md`、特性注册表／详情与依赖特性详情，输出 [[STR-006]] 或 [[STR-007]]；`block` 时 MUST 给出**封闭原因集**中的命名原因：[[STR-008]]、[[STR-009]]（后接 `SC-NNN`）、[[STR-010]]（后接 `SC-NNN`）、[[STR-011]]（后接 `RS-NNN`）、[[STR-012]]（后接 `EP-NNN`）、[[STR-013]]（后接依赖特性 ID）、[[STR-014]]。退出码 MUST 区分三态：0 = [[STR-006]]、1 = [[STR-007]]、2 = 输入缺失或不可解析。脚本 MUST 只读、stdlib-only、不含模型判断。
+- **FR-006**: MUST 交付框架自有的确定性脚本 [[STR-005]]。它读取 `requirements.md`、`plan.md`、`tasks.md`、`verification.md`、特性注册表／详情与依赖特性详情，输出 [[STR-006]] 或 [[STR-007]]；`block` 时 MUST 给出**封闭原因集**中的命名原因：[[STR-008]]、[[STR-009]]（后接 `SC-NNN`）、[[STR-010]]（后接 `SC-NNN`）、[[STR-011]]（后接 `RS-NNN`）、[[STR-012]]（后接 `EP-NNN`）、[[STR-013]]（后接依赖特性 ID）、[[STR-014]]。退出码 MUST 区分三态：0 = [[STR-006]]、1 = [[STR-007]]、2 = 输入缺失或不可解析。输出 MUST 同时给出 [[STR-003]] 路径的三计数（`final_pass` / `final_blocked` / `final_deferred`），供 FR-015 的 Acceptance Reality Check 直接引用，MUST NOT 由第二处重新统计。脚本 MUST 只读、stdlib-only、不含模型判断。
 - **FR-007**: [[STR-005]] MUST 有 pytest 契约／单元测试与两套最小夹具：① 负夹具复现 026 模式（任务全关、每条 SC 有状态行、final-path SC 全 `blocked`/`deferred`），断言 [[STR-007]] 且原因在封闭集内；② 正夹具（final-path 全 `pass`、smoke 记录齐备），断言 [[STR-006]]。夹具 MUST 是声明式最小文件集（requirements/plan/tasks/verification/注册表），MUST NOT 依赖真实特性目录。
 - **FR-008**: [[STR-005]] MUST 被三处调用：`/speckit.implement`（`Planned → Implemented` 判定前）、`/speckit.review`（`Implemented → Ready for Review` 判定前）、`sdd-loop-driver` 的 closure/merge 步。任一处得到 [[STR-007]] MUST 拒绝该转移或合并并输出命名原因；MUST NOT 用模型判断代替脚本判定。
 
 #### B. 运行时栈／依赖所有权、执行前提与继承 blocker（US2）
 
-- **FR-009**: `execution` 特性的 `requirements.md` MUST 包含强制表 § Runtime Stack & Dependency Ownership，列固定为 `ID | Capability | Form | Owner | Pin | Joint acceptance | FR`；`Form` 取封闭集 `in-scope | signed-contract | user-waived`：`in-scope` MUST 有对应 FR、对应任务与 verification 中的联合验收；`signed-contract` MUST 给出契约路径、pin（commit/digest/version）、外部 owner 与具名联合验收 owner 或命令；`user-waived` MUST 引用用户裁定并写明残余风险。仅以散文声明「由某仓／某线提供」而无表行 MUST 判违规（[[STR-011]]）。纯文档／表达类特性 MAY 记 `not-required` 并给理由。
+- **FR-009**: `execution` 特性的 `requirements.md` MUST 包含强制表 § Runtime Stack & Dependency Ownership，列固定为 `ID | Capability | Form | Owner | Pin | Joint acceptance | FR`；`Form` 取封闭集 `in-scope | signed-contract | user-waived`：`in-scope` MUST 有对应 FR、对应任务与 verification 中的联合验收；`signed-contract` MUST 给出契约路径、pin（commit/digest/version）、外部 owner 与具名联合验收 owner 或命令；`user-waived` MUST 引用用户裁定并写明残余风险。仅以散文声明「由某仓／某线提供」而无表行 MUST 判违规（[[STR-011]]）。`in-scope` 的判据是**本特性交付该能力**；由外部供给、本仓只消费的运行时能力 MUST 记 `signed-contract`（或 `user-waived`），MUST NOT 记 `in-scope`——否则「外部化」只是换了个 Form 值而已。纯文档／表达类特性 MAY 记 `not-required` 并给理由。
 - **FR-010**: `plan.md` MUST 包含强制表 § Execution Premises，列 `ID | Premise | Evidence | Status | Decision`；`Status` 取封闭集 `verified | unverified | falsified`；`falsified` MUST 带 `Decision` ∈ `resolve-in-scope | fallback | user-waiver`（缺失即 [[STR-012]]）；每条依赖运行时能力的 FR MUST 引用一个 premise ID。已知的负面结论 MUST NOT 被降级为「范围外 P2/P3」一行搁置。
 - **FR-011**: `plan.md` MUST 包含 § Inherited Blockers 表：对每个被依赖特性，其详情中每一行 `## Deferred`／blocked 记录 MUST 被处置为 `resolved | inherited | not-applicable` 并附证据；确定性检查 MUST 从依赖特性详情抽取这些行，任一行未处置即失败（[[STR-013]]）。
 - **FR-012**: 四类确定性发现 MUST 落地并被阻断：运行时栈行缺失或为空、`signed-contract` 缺 pin 或契约、`falsified` premise 缺 decision、继承 blocker 未处置。它们 MUST 在 requirements/plan 的 U4 处运行并阻断下一阶段；落地载体是既有 `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` 或同层框架 checker，MUST NOT 新建第二套并行门禁体系。
 
 #### C. review 审查实现与产物（US3）
 
-- **FR-013**: `/speckit.review` MUST 新增强制**产物审查**：对当次存在的每个阶段产物（`requirements.md`、`plan.md`、`tasks.md`、`contracts/`、`data-model.md`、`quickstart.md`、`verification.md`）判定完整性、内部一致性、可追溯性（FR→task→SC→证据）、依赖／前提所有权与验收诚实性，每条 finding MUST 带严重度与「产物路径 + 行号」定位。`templates/commands/review.md` § Composition 现把「恰好两段、固定顺序」写成封闭结构，本特性 MUST 在该 owner 内把它改为三段并声明顺序；`review-sdd-process` 的判定对象仍是流程，MUST NOT 被当作产物审查的替代。
-- **FR-014**: `/speckit.review` MUST 新增强制**实现审查**：以 `base..head` 的实现 diff 为对象，对照 requirements 与 tasks 判定正确性、范围与回归，运行或核验 smoke test 并记录命令、退出码与证据路径。该段的判定对象是本次实现本身，MUST 与 `code-review` 的通用 delta 评审、与流程回顾相互区分，且 MUST NOT 替换 `code-review`。
+- **FR-013**: `/speckit.review` MUST 新增强制**产物审查**：对当次存在的每个阶段产物（`requirements.md`、`plan.md`、`tasks.md`、`contracts/`、`data-model.md`、`quickstart.md`、`verification.md`）判定完整性、内部一致性、可追溯性（FR→task→SC→证据）、依赖／前提所有权与验收诚实性，每条 finding MUST 带严重度与「产物路径 + 行号」定位。`templates/commands/review.md` § Composition 现把「恰好两段、固定顺序」写成封闭结构（原句 `Composition — two segments, one fixed order`），本特性 MUST 在该 owner 内把它改写为**四段加一次确定性判定、固定顺序**（过程段 → 产物段 → 实现段 → 代码段 → Acceptance Reality Check），并逐段声明判定对象与职责边界；组合定义、顺序理由与边界条款以本规格 A3 为准。`review-sdd-process` 的判定对象仍是流程，MUST NOT 被当作产物审查或实现审查的替代。该 owner 改写是 plan／implement 阶段的义务（Two Hats：改框架源并重生成逐工具副本），MUST NOT 在本 clarify 阶段改源，也 MUST NOT 以手改 `.specify/` 镜像代替。
+- **FR-014**: `/speckit.review` MUST 新增强制**实现审查**：以 `base..head` 的实现 diff 为对象，对照 requirements 与 tasks 判定正确性、范围与回归，运行或核验 smoke test 并记录命令、退出码与证据路径。该段的判定对象是本次实现本身，MUST 与 `code-review` 的通用 delta 评审、与流程回顾相互区分，且 MUST NOT 替换 `code-review`。两段的判定对象互不代答：实现段不得由代码段代答，代码段不得由实现段代答；两段各自成文、各自定级、互不转换。该段的方法论载体 MUST 是能以运行时路径抵达的具名 owner（见 A12），模板 MUST NOT 内联方法论。
 - **FR-015**: `/speckit.review` MUST 新增 **Acceptance Reality Check**：统计 [[STR-003]] 路径 SC 的 `pass` / `blocked` / `deferred` 计数并与特性声明的状态比较；当特性声明 `Implemented` 或 `Ready for Review` 而该 `pass` 计数为 0 时，MUST 产出 P0 [[STR-016]] 并拒绝该转移；三个计数 MUST 写入 `review.md`（可核验载体）。
 - **FR-016**: `Implemented → Ready for Review` 门 MUST 增加第四个合取条件：不存在处于 `blocked` / `deferred` / `fail` 的 [[STR-003]] 路径 SC，除非有显式用户豁免。判据 owner 仍是 `templates/feature-details-template.md` § Canonical Status State Machine；`/speckit.review`、`/speckit.checklist` 与 `.specify/shared/workflow/feature-integration.md` § Pre-Status-Flip Gate MUST 只引用该 owner，不复制条款。
-- **FR-017**: `sdd-loop-driver` 的 closure/merge 步 MUST 运行 [[STR-005]]；得到 [[STR-007]] 时 MUST 拒绝合并、把该线标记为 [[STR-002]] 并记录命名原因，该线 MUST NOT 成为 `completed`。线状态封闭集的扩张（[[STR-002]] 加入 `line-registry.py`）MUST 同时处置由此受影响的既有约束（`merge_ready`、`HOLDING_STATES`、revival、各 `integration-*` 动作），MUST NOT 留下与新值矛盾的旧约束。
+- **FR-017**: `sdd-loop-driver` 的 closure/merge 步 MUST 运行 [[STR-005]]；得到 [[STR-007]] 时 MUST 拒绝合并、把该线标记为 [[STR-002]] 并记录命名原因，该线 MUST NOT 成为 `completed`。线状态封闭集的扩张（[[STR-002]] 加入 `line-registry.py`）MUST 同时处置由此受影响的既有约束（`merge_ready`、`ACTIVE_STATES`、`HOLDING_STATES`、终态守卫集 `{closed, stale, orphaned}`、`promote-waiting`、各 `integration-*` 动作、`deregister --reason stale-cleanup` 写入的 `stale_from_state`），MUST NOT 留下与新值矛盾的旧约束；逐项处置内容以 A6 的八项为准（该文件中不存在 `revival` 符号，恢复路径名为 `promote-waiting`／`ownership-check`）。
 
 #### D. 词表、注册表、迁移、文档与镜像同步（US4）
 
@@ -138,7 +163,7 @@
 - **FR-020**: [[STR-005]] MUST 提供只读 [[STR-015]] 模式：报告现有 `Implemented` 特性中按新规则会变成 [[STR-001]] 的清单与原因。该模式 MUST 零写入（无文件创建或修改，`git status --porcelain` 增量恒空）、MUST NOT 改任何历史状态；其退出码 MUST 只反映输入有效性（0 = 审计完成，2 = 输入缺失或不可解析），MUST NOT 因发现而改为阻断语义。
 - **FR-021**: `templates/commands/implement.md`、`templates/commands/review.md`、`templates/commands/tasks.md` MUST 按需更新以接入新门；逐工具副本 MUST 由 `python3 scripts/python/regen-command-copies.py` 重生成且 `--check` exit 0；镜像 MUST 由仓库的 mirror 引擎（`scripts/python/sync-mirrors.py`）同步且 `--check` exit 0。MUST NOT 以手改 `.specify/skills`、`.specify/shared`、`.specify/scripts` 镜像副本作为主改动。
 - **FR-022**: 新 schema（`Path` 标注、封闭原因集、两张新表的列与取值域）的 owner MUST 是单一文件 [[STR-017]]，其镜像由 mirror 引擎生成；`CHANGELOG.md` MUST 记录本特性；既有 owner（`templates/feature-details-template.md`、`templates/verification-log-template.md`、`.specify/shared/workflow/feature-integration.md`、`templates/tasks-template.md` 的 GATE-4、`skills/internal/implement-feature/SKILL.md`、`skills/internal/review-sdd-process/SKILL.md`、`skills/external/sdd-loop-driver/`）MUST 以「路径 + 章节锚」指回该 owner，MUST NOT 复制同一张表或同一份阈值。
-- **FR-023**: MUST 提供 pytest 单元／契约测试覆盖 closure checker、四处门禁与审计模式；实现前 MUST 把失败用例 id 集合采集到 `<spec-dir>/baseline-failed.txt` 作为基线参照物，实现后 `head 失败集 − 基线失败集` MUST 为空（0 个新增失败）；本特性的 smoke 命令（见 FR-005）MUST 通过，且同一命令连跑两次退出码一致。
+- **FR-023**: MUST 提供 pytest 单元／契约测试覆盖 closure checker、四处门禁与审计模式；实现前 MUST 把失败用例 id 集合采集到 `<spec-dir>/baseline-failed.txt` 作为基线参照物，并在同一次采集里把 `pytest --version` 与 `git --version` 的原文一并落到 `test-evidence/`（这就是运行时栈 RS-002／RS-003 行的 pin——本仓此前没有任何版本声明，pin 只能由首次运行记录，MUST NOT 凭空写一个版本号）；实现后 `head 失败集 − 基线失败集` MUST 为空（0 个新增失败）；本特性的 smoke 命令（见 FR-005）MUST 通过，且同一命令连跑两次退出码一致。
 - **FR-024**: 改动 MUST 落在框架源（`templates/`、`shared/`、`skills/`、`scripts/`）；`.specify/` 下的同名文件是生成镜像，任一镜像与源出现差异时 MUST 判为缺陷，修复方式是重生成而不是手改镜像（由 FR-021 的两个 `--check` 证明）。
 - **FR-025**: 新增的脚本／测试／夹具路径 MUST 被登记并在目录治理文档中就位；每个新门禁 MUST 有一个确定性脚本给出的判定，MUST NOT 存在「只能由模型判断」的新门禁；临时产物 MUST 落 `.specify/.tmp/`。
 
@@ -152,17 +177,17 @@
 - **Execution Premise**：一行 `ID | Premise | Evidence | Status | Decision`，声明 plan 依赖的一条执行前提及其是否已被证据支持。
 - **Inherited Blocker**：依赖特性详情中的一条 `## Deferred`／blocked 记录，加上本特性对它的处置（`resolved` / `inherited` / `not-applicable`）。
 - **Smoke Test Record**：一条覆盖主流程的最小命令，加命令原文、退出码、证据路径三件。
-- **Review Finding**：三段之一产出的一条带严重度、产物路径与行号定位的结论；`F-ACCEPTANCE` 是其中一条固定 id 的 P0 项。
+- **Review Finding**：四段之一产出的一条带严重度、产物路径与行号定位的结论；`F-ACCEPTANCE` 是 Acceptance Reality Check 的固定 P0 项。
 
 ### Runtime Stack & Dependency Ownership（081 自身的运行时栈表）
 
-本特性的运行时栈全部在本仓内，故无 `signed-contract` 行——这正是 US2 要防的反面（026 把运行时外部化成「A 线」）。
+本特性**交付**的运行时能力只有一条（RS-004：`specify init` 在 `src/` 内实现）。其余三条是由外部供给、本仓只消费的能力——按 FR-009 的判据它们 MUST 记 `signed-contract` 并给出契约路径、pin 与具名联合验收，MUST NOT 记 `in-scope`（记 `in-scope` 会把「外部化」洗成一个 Form 值）。026 的失守形态不是「有没有外部依赖」，而是「外部依赖只写成散文、无表行、无 pin、无联合验收」：本表四行都必须可机械判，零散文行。
 
 | ID | Capability | Form | Owner | Pin | Joint acceptance | FR |
 |----|------------|------|-------|-----|------------------|-----|
-| RS-001 | Python 3 解释器（跑 closure checker、validator、审计模式；stdlib-only） | in-scope | 本仓 `scripts/python/` | 仓内 commit（同一次提交） | checker 的正／负夹具测试与审计模式的零写入断言同时为 `pass` | FR-006, FR-007, FR-020 |
-| RS-002 | pytest 测试运行器（契约／单元测试） | in-scope | 本仓 `scripts/bash/run-tests.sh` 与既有测试树 | 仓内 commit（同一次提交） | 基线对比零新增失败且新增测试全绿 | FR-023 |
-| RS-003 | `git`（实现审查的 `base..head` delta 解析；镜像与副本 `--check` 的差异判定） | in-scope | 既有声明的框架前置依赖（`scripts/bash/common.sh` 的 `check_dependency`） | 沿用既有前置声明，不新增 pin | 实现审查段能算出 delta，且两个 `--check` 均 exit 0 | FR-014, FR-021 |
+| RS-001 | Python 3 解释器（跑 closure checker、validator、审计模式） | signed-contract | CPython 上游（本仓只消费）；契约路径 `pyproject.toml` § `[project] requires-python` + `scripts/bash/run-tests.sh` § `resolve_python` | `requires-python >= "3.8"`（已在 `pyproject.toml` 声明，不新增 pin）；新增脚本 stdlib-only——无第三方 import，机械可判 | 本特性全部新脚本在 `>=3.8` 解释器上通过 FR-007 的正／负夹具测试与 FR-005 的 smoke，且静态 import 清单为空 | FR-006, FR-007, FR-020 |
+| RS-002 | pytest（契约／单元测试运行器） | signed-contract | pytest 上游（本仓只消费）；契约路径 `scripts/bash/run-tests.sh`（解释器与 pytest 解析的唯一入口） | 本仓当前**无** pytest 版本声明（`pyproject.toml` 只有 `[tool.pytest.ini_options]`，无 pin）；pin 由 FR-023 在采集基线同一次记录的 `pytest --version` 原文提供，落 `test-evidence/` | 基线重跑在同一 pin 上复现失败集（`head 失败集 − 基线失败集` 为空），且新增测试全绿 | FR-023 |
+| RS-003 | `git`（实现审查的 `base..head` delta 解析；两个 `--check` 的树差异判定；审计的 `git status --porcelain`） | signed-contract | git 上游（本仓只消费）；契约路径 `scripts/bash/common.sh` § `check_dependency`（只检存在、不检版本） | 本仓无版本声明；pin 由 FR-023 同一次采集记录的 `git --version` 原文提供，落 `test-evidence/` | 实跑一次 `base..head` 解析（实现段据此成文）+ `regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均 exit 0 + 审计前后 `git status --porcelain` 增量为空 | FR-014, FR-020, FR-021 |
 | RS-004 | 本仓自己的 `specify init`（smoke 命令在临时夹具上执行它） | in-scope | 本仓 `src/` 与 `scripts/` | 仓内 commit（同一次提交） | smoke 命令在临时目录执行 `specify init` 后退出码为 0 且夹具被生成 | FR-005 |
 
 ### Decomposition & Ceiling
@@ -178,7 +203,7 @@
 - **SC-003**: 词表与状态机对齐——[[STR-001]] 在三处 owner 各出现且语义一致（3/3）；`templates/feature-details-template.md` 的转移表含四条新增行（`Planned→Blocked`、`Blocked→Implemented`、`Blocked→Ready for Review` 非法、`Implemented→Blocked` 审计例外，4/4）；never-regress-status 的窄例外存在（1/1）。**Path**: supporting
 - **SC-004**: 验证词表与测量阶梯可判——词表 owner 含 [[STR-002]]（1/1）；`blocked`/`deferred`/`partial` 行缺任一必填字段、或存在可用 reduced measurement 而 `reduced_measurement_run=no` 时均被判非法（夹具 3/3），其中「有可用测量却未跑」一项 MUST 命中 [[STR-010]]。**Path**: supporting
 - **SC-005**: 所有权与前提是结构化一等产物——本 requirements 的运行时栈表行数 ≥1 且每行 `Form` 合法（分母 = 实测行数，L/L）；plan 的 Execution Premises 与 Inherited Blockers 表存在，依赖特性 deferred 行处置率 100%（100%）；四类确定性缺陷各被指名抓到（4/4）。**Path**: supporting
-- **SC-006**: review 三段齐备且可定位——一次 review 的 `review.md` 同时含产物审查段（覆盖当次实际存在的每个阶段产物，覆盖率 = 实测分母）、实现审查段（含 smoke 命令原文、退出码、证据路径，3/3）与 Acceptance Reality Check 的 final-path 三计数（`pass`/`blocked`/`deferred` 齐备，3/3）；每条 finding 带严重度与「产物路径 + 行号」（抽样 L/L）；负夹具下产出 P0 [[STR-016]] 并拒绝转移（1/1）。**Path**: supporting
+- **SC-006**: review 四段与 Acceptance Reality Check 齐备且可定位——一次 review 的 `review.md` 同时含产物审查段（覆盖当次实际存在的每个阶段产物，覆盖率 = 实测分母）、实现审查段（含 smoke 命令原文、退出码、证据路径，3/3）与 Acceptance Reality Check 的 final-path 三计数（`pass`/`blocked`/`deferred` 齐备，3/3）；每条 finding 带严重度与「产物路径 + 行号」（抽样 L/L）；负夹具下产出 P0 [[STR-016]] 并拒绝转移（1/1）。实现期可确定性测量的部分是**结构与 schema**：组合声明存在且段数与固定顺序与 A3 一致、finding 定位字段可解析、三计数行齐备、负夹具下 [[STR-016]] 与拒绝转移；「一次真实 review 的 `review.md`」只能在 review 阶段采证。**Path 裁决**：这里保持 [[STR-004]]（clarify 的显式裁决）——若把它记为 [[STR-003]]，081 自身的 `Planned → Implemented` 将要求 SC-006 为 `pass`，而 SC-006 只能在 review 阶段测量，同时 `Blocked → Ready for Review` 非法（FR-003），于是形成无解的循环门禁；review 处的**门禁强制力**已由 SC-001 的第三个调用点（[[STR-003]] 路径）覆盖，因此保持 [[STR-004]] 不失去约束。**Path**: supporting
 - **SC-007**: 审计只读且可判——[[STR-015]] 在既有仓库上运行时文件系统零写入（`git status --porcelain` 增量行数 = 0）、历史特性状态零变更（0 变更），输出清单每行带原因列（L/L）。**Path**: supporting
 - **SC-008**: smoke 记录存在且可复现——081 的 `tasks.md`／`verification.md` 给出恰好一条 smoke 记录（命令原文、退出码、证据路径，3/3），同一命令连跑两次退出码相同（2/2），且该命令覆盖 FR-005 要求的三件事（3/3）。**Path**: supporting
 - **SC-009**: 框架卫生，含一条可判定的包含性声明——① `python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0（2/2）；② 测试基线包含性成立，五要件齐备：**基线参照物** = 本特性实现起始提交上由 `bash scripts/bash/run-tests.sh` 采集的失败用例 id 集合（存于 `<spec-dir>/baseline-failed.txt`）；**比较单元** = 失败用例 id 集合（按 id 比对，不按字节，也不用「全仓测试」这类未定义聚合词）；**允许差异集来源** = 空集（新失败一条都不允许，机械可得）；**补集与不变量** = `head 失败集 − 基线失败集` MUST 为空（0 个新增失败），而 `基线失败集 − head 失败集` MUST 逐条列为已修复项（MUST NOT 静默丢弃）；③ `CHANGELOG.md` 含本特性条目（1/1）；④ schema 唯一性：由 Shared Strings 表与 owner 文档章节目录**机械导出**的列名与取值域字面量，在 `templates/` 与 `shared/` 两类路径下的出现点，除 owner 文档外 MUST 为 0，且守卫测试把真实命中枚举出来并断言等于豁免清单（0 个未豁免命中）。**Path**: supporting
@@ -229,3 +254,14 @@
 ## Clarifications
 
 本次运行未提出 clarification marker（见 A9）：所有开放点均在目标仓库内可裁决，裁决记在 `## Assumptions`。`/speckit.clarify` 若仍需提问，答案按 `<question>` → `<answer>` 追加为 `### Session <date>` 小节。
+
+### Session 2026-11-03
+
+本轮为无人值守运行，**零提问**：答案空间由仓内证据闭合，每条裁决的证据写在 `## Assumptions` 对应条目内。下列五行是本轮改变产物的五个决定（不含只在 Assumptions 内落地的 A11）。
+
+- Q: 本规格绑到既有 Feature 还是新建？→ A: 新建 **Feature 081**。复核 026／055／062／071／077／079 均不覆盖「final 路径阈值 + smoke 硬条件 + 三处共享判定 + 产物／实现审查」的组合（依据 `.specify/shared/workflow/feature-integration.md` § Feature Binding Rules 的 bind/create 判据与 binding-precedent 启发式）。**ID 取值 081** 而非「下一个空号 080」：本仓 spec key 与 Feature ID 是两套编号（spec 080 绑的是 Feature 062），取与 spec key 对齐的 081 是 Grounded Naming 下「用户指令 > 项目惯例」的直接结果；080 留空与既有 054／066／067／075 留空同形。已落 `.specify/memory/features/081.md` 与 `.specify/memory/features.md` 行（`Total Features` 同趟重算）。
+- Q: `/speckit.review` 的终态组合是什么？→ A: **四段 + 一次确定性判定、固定顺序** = 过程段 `review-sdd-process` → 产物段（新增）→ 实现段（新增）→ 代码段 `code-review` → Acceptance Reality Check（确定性判定，不委派技能）。理由、顺序与边界见 A3。用户需求里的「三件事」指新增的三项职责（产物审查、实现审查、ARC），但 `code-review` 按 FR-014 不得被替换，故终态不是三段。`templates/commands/review.md` § Composition 的 owner 文本改写**不在本阶段落地**（Two Hats），已写成 FR-013 的 plan／implement 义务。
+- Q: `Path` 怎么标、final 集合是哪几条？→ A: 标注写 SC 定义行行尾、形如 `**Path**: final`，每行恰好一次（A4 的解析器容差证据）；final 集合 = **SC-001、SC-002**，其余七条 `supporting`。SC-006 明确**不**升级为 final：把它记为 final 会让 081 自己的 implement 门禁依赖一个只能在 review 阶段产生的测量，与 `Blocked → Ready for Review` 非法叠加后自锁（见该 SC 的 Path 裁决与 Edge Cases）。review 处的门禁强制力由 SC-001 的第三个调用点承担，不需要靠染指 `Path` 来补。
+- Q: 运行时栈表每行真的都是 `in-scope` 吗？→ A: 不是。**RS-001（CPython）／RS-002（pytest）／RS-003（git）= `signed-contract`**（本仓只消费，不交付），**RS-004（`specify init`）= `in-scope`**（本仓交付）。三条外部行各带契约路径与联合验收；由于本仓此前没有 pytest／git 的版本声明，pin 由 FR-023 在采集基线时记录的 `--version` 原文提供，MUST NOT 凭空写版本号。判据补进 FR-009：`in-scope` 意味着「本特性交付该能力」。
+- Q: `blocked` 进入线状态集后，既有约束怎么处置？→ A: 八项逐条处置写进 A6（`STATE_VALUES` 扩容、`ACTIVE_STATES` 与 `HOLDING_STATES` 不变并声明不持有资源、`merge_ready` 加互斥不变量、`integration-*` 结构性不可达、终态守卫集**不**纳入 `blocked`、`promote-waiting` 不得直通、`stale_from_state` 可承载新值、不新增线级 never-regress 规则）；同时更正原假设的用词——该文件里没有 `revival` 符号，恢复路径叫 `promote-waiting`／`ownership-check`。FR-017 的清单按此改写，MUST NOT 留下与新值矛盾的旧约束。
+

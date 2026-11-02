@@ -1,0 +1,2 @@
+overlap-check: current=081-acceptance-hardening checked=1 overlaps=0 decision=clear
+{"decision": "clear", "current_spec": "081-acceptance-hardening", "checked_specs": ["081-acceptance-hardening"], "overlaps": [], "note": "current feature has no declaration artifact", "checked_at": "2026-11-02T23:15:19Z"}
