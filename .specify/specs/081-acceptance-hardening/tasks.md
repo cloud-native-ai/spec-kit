@@ -28,7 +28,7 @@
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/specs/081-acceptance-hardening/tasks.md` returns 0
 - GATE-4: The slice's single smoke command passes twice with the same exit code — check: `bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q` run twice, identical exit status, evidence at `.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt`
 - GATE-5: The feature status is not `Implemented` after this slice — check: `awk -F'|' '$2 ~ /^ *081 *$/ {print $5}' .specify/memory/features.md` does not print `Implemented`
-- GATE-6: The checker refuses to judge an unparsable feature — check: `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening` exits 2 (not 0) while that spec dir carries no cross-artifact verdict yet
+- GATE-6: The checker refuses this feature and does not read it as accepted — check: `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening` exits 1 with `zero-final-path-pass` once T020 has seeded `verification.md` (before T020 it exits 2 as an input error, never 0)
 
 ## Environment Prerequisites
 
