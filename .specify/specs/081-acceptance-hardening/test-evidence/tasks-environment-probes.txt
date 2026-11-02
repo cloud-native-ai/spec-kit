@@ -1,0 +1,28 @@
+# Environment probes @ 2026-11-03 — single landing point: tasks.md § Environment Prerequisites
+
+$ .venv/bin/python -m pytest --version
+pytest 9.2.0
+
+$ ls -l .venv/bin/specify && .venv/bin/specify --help | head -3
+-rwxr-xr-x@ 1 liuqiming.lqm  staff  212 Oct 30 17:14 .venv/bin/specify
+              ███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗              
+              ██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔════╝╚██╗ ██╔╝              
+              ███████╗██████╔╝█████╗  ██║     ██║█████╗   ╚████╔╝               
+specify --help exit=0
+
+$ git --version
+git version 2.54.0 (Apple Git-157)
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (408 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (118 files)
+ok    shared/ == .specify/shared/ (61 files)
+exit=0

@@ -1,0 +1,242 @@
+# Tasks: Stricter Acceptance & Artifact Review（更严格的验收与产物审查）— Slice 081a
+
+**Requirement ID**: 081
+**Requirement Key**: 081-acceptance-hardening
+**Related Feature**: 081 更严格的验收与产物审查（Stricter Acceptance & Artifact Review）
+**Input**: Design documents from `.specify/specs/081-acceptance-hardening/`
+**Prerequisites**: plan.md (required), requirements.md (required), research.md, data-model.md, contracts/ (5 files), quickstart.md, baseline-failed.txt
+
+**Tests Mode**: ON — Constitution Principle IV "Test-First & Contract-Driven Implementation" is MUST-level (`Pure functions/utilities MUST have unit tests`, `Critical flows MUST have automated regression coverage`, `Integration/contract tests MUST cover cross-service communication`), and plan.md § Constitution Check row IV already commits the five red-first contract test paths. Every new deterministic judgement therefore lands with a contract test that goes red before its implementation row closes.
+
+**Scope**: this file covers **slice 081a only** (plan.md § D10: "US1 + the shared core"). Slices 081b–081d are recorded in `## Deferred Slices` as future work, not as tasks. The slice boundary and its status consequence are stated once in `## Slice Boundary`.
+
+## Definition of Done (DoD)
+
+- DoD-1: Every 081a row's stated artifact exists at the path the row names, and every edited framework source has a regenerated mirror / per-tool copy
+- DoD-2: The 081a contract tests (`test_closure_acceptance_check.py`, `test_requirements_checker.py` path-marker cases, `test_acceptance_state_machine.py`, `test_gate_wiring_081.py`) are green, and none of the four was green before its implementation row
+- DoD-3: The closure checker is stdlib-only, read-only, and exits 0 / 1 / 2 with no fourth verdict and no reason outside the seven-value closed set
+- DoD-4: `python3 scripts/python/regen-command-copies.py --check` and `python3 scripts/python/sync-mirrors.py --check` both exit 0 on the post-change tree
+- DoD-5: The feature is **not** `Implemented` at the end of this slice — it is `Blocked`, with the reason visible in `verification.md` (see `## Slice Boundary`)
+- DoD-6: No new failing test vs `baseline-failed.txt` (39 ids, plan-stage capture) for the modules this slice touches
+
+**DoD Status**: pending
+
+## Completion Gate
+
+- GATE-1: The four 081a contract modules are green — check: `bash scripts/bash/run-tests.sh tests/contract/test_closure_acceptance_check.py tests/contract/test_requirements_checker.py tests/contract/test_acceptance_state_machine.py tests/contract/test_gate_wiring_081.py -q`
+- GATE-2: Mirror and per-tool-copy parity holds — check: `python3 scripts/python/regen-command-copies.py --check` and `python3 scripts/python/sync-mirrors.py --check` both exit 0
+- GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/specs/081-acceptance-hardening/tasks.md` returns 0
+- GATE-4: The slice's single smoke command passes twice with the same exit code — check: `bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q` run twice, identical exit status, evidence at `.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt`
+- GATE-5: The feature status is not `Implemented` after this slice — check: `awk -F'|' '$2 ~ /^ *081 *$/ {print $5}' .specify/memory/features.md` does not print `Implemented`
+- GATE-6: The checker refuses to judge an unparsable feature — check: `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening` exits 2 (not 0) while that spec dir carries no cross-artifact verdict yet
+
+## Environment Prerequisites
+
+- pytest runner — available — probe: `.venv/bin/python -m pytest --version` @ 2026-11-03 → `pytest 9.2.0` on CPython 3.14.6; affected phases/tasks: all test rows (T007–T010, T017)
+- `specify` console script — available — probe: `ls -l .venv/bin/specify && .venv/bin/specify --help` @ 2026-11-03 → executable present, Typer help exits 0; affected phases/tasks: T002, T017 (smoke sub-check A)
+- `git` — available — probe: `git --version` @ 2026-11-03 → `git version 2.54.0 (Apple Git-157)`; affected phases/tasks: T018, T019 (tree-difference and porcelain checks)
+- mirror engines — available — probe: `python3 scripts/python/regen-command-copies.py --check` and `python3 scripts/python/sync-mirrors.py --check` @ 2026-11-03 → both exit 0 on the pre-change tree; affected phases/tasks: T018
+
+Planning-time premises are NOT restated here — they live in `plan.md` § Execution Premises (EP-001…EP-009). Boundary owner: `shared/workflow/acceptance-hardening.md` § Gates (A13).
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: Can run in parallel (different files, no dependencies)
+- **[Story]**: Which user story this task belongs to (`[US1]` only in this slice — 081a is the US1 slice)
+- **[blockedBy: T001,T002]**: this row MUST NOT start until every listed task is `[X]`
+- Include exact file paths in descriptions; keep each task row on ONE line
+- `[green: <contract>#<clause>]` is not used in this slice: every contract it touches is claimed by exactly one row set inside a single slice, so there is no cross-phase green point to partition
+
+**Tests Mode note**: the four test rows below come before their implementation rows. Tests for *new* behaviour are strictly red-first; the gate-wiring test (T010) asserts the runtime-reachable invocation, so it is red until T016 lands — that ordering is deliberate and is why T016 carries T007 and T010 as blockers.
+
+## Task State Sigil
+
+`- [ ]` open · `- [>]` claimed · `- [X]` closed · `- [~]` deferred (reason recorded in `verification.md` `deferred_tasks=`).
+
+## Path Conventions
+
+Single project: framework sources at repository root (`templates/`, `shared/`, `skills/`, `scripts/`, `src/`, `tests/`); `.specify/` copies are generated mirrors (`.specify/templates/`, `.specify/shared/`, `.specify/skills/`, `.specify/scripts/`); per-tool command copies live in `.claude/commands/`, `.github/prompts/`, `.qoder/commands/`, `.opencode/command/`.
+
+---
+
+## Phase 1: Setup (Shared Infrastructure)
+
+**Purpose**: Freeze the slice's measurement points, remove the one measured environment blocker, and author the declarative fixture inputs every later row is proved on.
+
+- [ ] T001 [P] Create the slice's runtime-evidence landing points at `.specify/specs/081-acceptance-hardening/notes/red-first-evidence.md` (per-test command, real output, exit status for each red-first contract test) and `.specify/specs/081-acceptance-hardening/notes/pre-change-measurements.md` (the frozen pre-change side, recorded by pointer to `test-evidence/plan-baseline-run.txt` for the 39 failed / 6970 passed / 7 skipped baseline and to `test-evidence/plan-runner-pins.txt` for the pytest and git pins — do not re-run the full suite)
+- [ ] T002 [P] Add the repo-root fallback to `get_resource_path()` in `src/specify_cli/__init__.py` so a development checkout resolves working-tree templates while the installed layout keeps precedence (plan § T-005; EP-002 is `falsified` with `Decision: resolve-in-scope`); no mirror duty (`src/` is outside `MIRROR_PAIRS`)
+- [ ] T003 [P] Author the two declarative fixture sets `tests/fixtures/acceptance-hardening/negative/` (the 026 shape: zero `[ ]`, a status row per SC, every `final`-path SC `blocked`/`deferred`) and `tests/fixtures/acceptance-hardening/positive/` (every `final`-path SC `pass`, complete three-field smoke record, valid runtime rows, all premises `verified`) — each a minimal file set (`requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail, a registry row) and neither referencing a real feature directory (data-model.md § Fixture set)
+- [ ] T004 [P] Author the two mutation fixtures `tests/fixtures/acceptance-hardening/ladder-mutation/` (a `blocked` row whose `reduced_measurement` is present while `reduced_measurement_run=no`, on top of the five required ladder fields) and `tests/fixtures/acceptance-hardening/smoke-mutation/` (`positive` with the smoke record deleted), as minimal file sets on the same shape as T003
+
+**Checkpoint**: the fixture inputs and the measurement landing points exist; every later assertion has something deterministic to read.
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: The single schema owner and the checker's calling surface. No US1 row can start before these two exist, because every other row either points at the owner doc or exercises the checker.
+
+**⚠️ CRITICAL**: No user-story row may start until T005 and T006 are closed.
+
+- [ ] T005 Create the schema owner document `shared/workflow/acceptance-hardening.md` carrying ONLY the sections this slice owns — `§ Feature Status` (the `Blocked` value + the four transitions + the narrow `Implemented → Blocked` audit-correction exception + the four conjunctive `Planned → Implemented` conditions), `§ Verification Vocabulary` (the six-value status set, the five measurement-ladder fields, the illegal-row rule, the three-field smoke record), `§ Gates` (the fourth `Implemented → Ready for Review` condition, the A13 three-carrier boundary), `§ Closure Verdict` (the binary verdict, the seven-value closed reason set, the three exit codes, the `final_path` counts) — plus clearly marked extension points for the sections 081b/081c/081d add; mirror: `.specify/shared/workflow/acceptance-hardening.md` via `python3 scripts/python/sync-mirrors.py`
+- [ ] T006 Create `scripts/python/closure-acceptance-check.py` with its stable calling surface only — `--spec-dir` (required), `--repo`, `--feature-detail` / `--feature-registry`, `--audit-existing`, `--json` / `--json-out`, repeatable `--waive CODE:TARGET`; exit `2` with a message naming the path when an input is missing or unparsable; no verdict logic yet (contracts/closure-acceptance-check.contract.md C-01…C-06, C-10); mirror: `.specify/scripts/python/closure-acceptance-check.py` (that pair is `STRICT` — an extra mirror-only file fails `--check`)
+
+**Checkpoint**: the owner doc and the CLI surface exist; US1 rows can now be written against them.
+
+---
+
+## Phase 3: User Story 1 - final 路径没通过就不叫「实现了」，而且必须有 smoke test (Priority: P1)
+
+**Goal**: `Planned → Implemented` becomes four conjunctive conditions (zero `[ ]`; a status row per SC; every `final`-path SC `pass`; the smoke record `pass`), `Blocked` becomes a first-class feature status, the verification vocabulary gains `blocked` with its five-field measurement ladder, and one deterministic script — `scripts/python/closure-acceptance-check.py` — produces the shared verdict at the **implement** call site.
+
+**Independent Test**: run `python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative --json` at the implement gate path and observe `verdict: block` with `zero-final-path-pass` in a reason set drawn from the seven-value closed set, exit 1; run the same command on `tests/fixtures/acceptance-hardening/positive` and observe `accept`, exit 0. This proves 1 of SC-001's 3 required call points — see `## Slice Boundary`.
+
+### Tests for User Story 1 (MANDATORY) ⚠️
+
+> **NOTE: write these FIRST; each MUST fail before its implementation row closes.**
+
+- [ ] T007 [P] [US1] Author the checker contract test `tests/contract/test_closure_acceptance_check.py` covering `positive` → `accept` / exit 0, `negative` → `block` / exit 1 with `zero-final-path-pass`, `ladder-mutation` → `blocked-without-measurement-ladder: SC-NNN`, a missing input → exit 2 (never `block`), every reported reason verbatim inside the seven-value closed set, `final_path` counts computed once by the script, and the `--waive CODE:TARGET` grammar removing a reason from the blocking set while counting it as waived (clauses C-01…C-09, C-13…C-16; V-5, V-6, V-11, V-14)
+- [ ] T008 [P] [US1] Extend `tests/contract/test_requirements_checker.py` with the sixth check label `path-marker`: a missing marker, a second `**Path**` on the same line, and a value outside `final` / `supporting` each fail with file and line; the existing five labels keep their meanings; an `execution`-class feature with zero `final`-path SC fails while an `expression`-class one is not forced to invent one (clauses AS-01…AS-04; V-1…V-3)
+- [ ] T009 [P] [US1] Author the state-machine and vocabulary contract test `tests/contract/test_acceptance_state_machine.py` asserting, in `templates/feature-details-template.md` § Canonical Status State Machine, the four conjunctive `Planned → Implemented` conditions, the four `Blocked` rows including the explicitly **illegal** `Blocked → Ready for Review`, the narrow `Implemented → Blocked` audit exception with its cited-evidence requirement, the fourth `Implemented → Ready for Review` condition, and the `[FEATURE_STATUS]` token carrying `Blocked`; plus, in `templates/verification-log-template.md`, the six-value status set with the one-sentence `blocked` vs `deferred` distinction, the five ladder fields, the illegal-row rule, and the exactly-one three-field smoke record (clauses SV-03…SV-11; V-4…V-10, V-23, V-24)
+- [ ] T010 [P] [US1] Author the gate-wiring contract test `tests/contract/test_gate_wiring_081.py` covering the **implement call site only**: the invocation `scripts/python/closure-acceptance-check.py` is named by `skills/internal/implement-feature/SKILL.md` step 8 and by `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate, the same invocation extracts and runs against `tests/fixtures/acceptance-hardening/negative` (block, and the gate must then land `Blocked`, never `Implemented`) and against `positive` (accept), and no second judgement source (a different script, an ad-hoc grep, a model call) is offered by either carrier; the review and driver call sites are asserted as absent-with-reason here and are 081c / 081d work (clauses GW-01, GW-04)
+
+### Implementation for User Story 1
+
+- [ ] T011 [US1] [blockedBy: T008] Add the `path-marker` check as the sixth label in `scripts/python/validate-requirements.py`, reporting file and line and leaving the existing five labels untouched (clauses AS-02; V-2); mirror: `.specify/scripts/python/validate-requirements.py` via `python3 scripts/python/sync-mirrors.py`
+- [ ] T012 [US1] [blockedBy: T009] Rewrite `templates/feature-details-template.md` § Canonical Status State Machine: four conjunctive `Planned → Implemented` conditions, the `Planned → Blocked` / `Blocked → Implemented` / `Blocked → Ready for Review` (illegal) / `Implemented → Blocked` (audit correction, must cite evidence) rows, the fourth `Implemented → Ready for Review` condition stated **in this owner block only**, and `Blocked` in the `[FEATURE_STATUS]` glossary token; every other artifact reaches these by pointer, never by copy (D3 row 1; SV-03…SV-07); mirror: `.specify/templates/feature-details-template.md`
+- [ ] T013 [US1] [blockedBy: T009] Rewrite `templates/verification-log-template.md`: the six-value status set `pass|fail|partial|blocked|deferred|unknown`, the `blocked` vs `deferred` distinction (feature not acceptable vs feature still acceptable on a `supporting` path), the five ladder fields (`blocked_at`, `reduced_measurement`, `reduced_measurement_run`, `why_reduced_insufficient`, `unblock`) for `blocked`/`deferred`/`partial`, the illegal-row rule, and the exactly-one three-field smoke record (`smoke_command`, `smoke_exit_code`, `smoke_evidence_path`) (D3 row 2; SV-08…SV-11); mirror: `.specify/templates/verification-log-template.md`
+- [ ] T014 [US1] [blockedBy: T013] Upgrade GATE-4 in `templates/tasks-template.md` to require, for every `final`-path SC, a `pass` status **and** a present smoke record (or an explicit user waiver naming the SC), and add the A13 boundary note to its § Environment Prerequisites; add the matching GATE-4 obligation sentence to `templates/commands/tasks.md` so `/speckit.tasks` emits the upgraded gate (GW-09, GW-10); mirrors: `.specify/templates/tasks-template.md` and the four per-tool copies of `tasks.md` via `python3 scripts/python/regen-command-copies.py`
+- [ ] T015 [US1] [blockedBy: T006,T007,T011] Complete `scripts/python/closure-acceptance-check.py`: parse the SC definition lines and their `**Path**` markers plus the runtime-stack rows from `requirements.md`, the premises and inherited-blocker rows from `plan.md`, the `[ ]` / `[>]` / `[~]` counts from `tasks.md`, the status and ladder and smoke fields from `verification.md`, and the claimed status from the feature detail / registry; emit `accept|block`, the named reasons from the seven-value closed set (`zero-final-path-pass`, `final-path-not-pass: SC-NNN`, `blocked-without-measurement-ladder: SC-NNN`, `runtime-dependency-not-owned: RS-NNN`, `falsified-premise-undecided: EP-NNN`, `inherited-blocker-undisposed: <feature>:<row>`, `status-claims-implemented-but-blocked`), and the `final_path` counts computed once here; exit 0/1/2; the three external-source reasons are emitted from the rows present today and their full source extraction lands in 081b (§ Deferred Slices), so the closed set is never silently narrowed (C-07…C-09, C-13…C-17; V-11, V-12, V-14)
+- [ ] T016 [US1] [blockedBy: T007,T010,T015] Wire the implement call site: `skills/internal/implement-feature/SKILL.md` step 8 and `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate run the checker before the flip and land `Blocked` on `block` (never a zero-final-pass `Implemented`), with one pointer to the owner doc and no restated criteria; `templates/commands/implement.md` carries the invocation and the `Blocked` landing rule (GW-01, GW-04); mirrors: `.specify/skills/internal/implement-feature/SKILL.md`, `.specify/shared/workflow/feature-integration.md`, and the four per-tool copies of `implement.md` via `python3 scripts/python/regen-command-copies.py`
+- [ ] T017 [US1] [blockedBy: T002,T003,T015] Author the feature's single smoke test `tests/integration/test_acceptance_smoke.py` covering exactly three sub-checks — `specify init` on a `tmp_path` fixture asserting exit 0 and a generated `.specify/` tree; the closure checker on `tests/fixtures/acceptance-hardening/positive` (accept, exit 0) and `negative` (block, exit 1, `zero-final-path-pass`); `python3 scripts/python/regen-command-copies.py --check` exit 0 — with no network and no wall-clock in the assertions, writing the three sub-commands and exit codes to `.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt` (D7; FR-005's three required subjects)
+- [ ] T018 [US1] [blockedBy: T012,T013,T014,T015,T016] Regenerate every mirror and per-tool copy after the source edits: `python3 scripts/python/regen-command-copies.py` then `--check` (exit 0), `python3 scripts/python/sync-mirrors.py` then `--check` (exit 0); update in the same row any frozen count pinned by a guard test that the new files move, stating the reason inline, and never edit a `.specify/` copy by hand as the primary change (GW-11…GW-13; FR-024)
+
+**Checkpoint**: the checker, the state machine, the vocabulary, the gate wiring, the fixtures and the smoke exist; the negative fixture is refused at 1 of the 3 required call sites and the positive fixture is accepted.
+
+---
+
+## Phase 4: Polish & Cross-Cutting Concerns
+
+**Purpose**: Close the slice with its own recorded evidence, and record honestly that the feature is `Blocked`.
+
+- [ ] T019 [blockedBy: T017,T018] Run the slice's smoke command twice — `bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q` — confirm both runs return the same exit status, and record command, exit code, evidence path and the two identical exit codes in `.specify/specs/081-acceptance-hardening/notes/quickstart-run.md`
+- [ ] T020 [blockedBy: T013,T019] Seed `.specify/specs/081-acceptance-hardening/verification.md` from the upgraded `templates/verification-log-template.md`: one status row for each of SC-001…SC-009, all five ladder fields on every `blocked` / `deferred` / `partial` row, and the three smoke fields from T019; SC-001 and SC-002 MUST be recorded `blocked` with the reason "1 of 3 call sites wired; 081c/081d own the review and driver sites", because after 081a the feature is `Blocked`, never `Implemented`
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Phase 1 (Setup)**: starts immediately; its four rows are mutually independent
+- **Phase 2 (Foundational)**: T005 and T006 block every US1 row (T005 owns the schemas the tests read; T006 owns the CLI the tests invoke)
+- **Phase 3 (US1)**: after Phase 2. Tests T007–T010 first; then T011 → T012 → T013 → T014 → T015 → T016 → T017 → T018
+- **Phase 4 (Polish)**: after Phase 3; T019 needs the smoke test and the regenerated tree, T020 needs the upgraded vocabulary template and T019's measured exit codes
+
+### User Story Dependencies
+
+- **US1 (P1)**: no dependency on another story — this slice is US1 plus the shared core
+
+### Within This Slice
+
+- Tests MUST fail before the implementation row that answers them closes
+- Owner doc → state machine / vocabulary templates → gate wiring → regeneration
+- The checker's skeleton (T006) precedes its contract test (T007); the test precedes its completion (T015)
+
+### Parallel Opportunities
+
+- Phase 1: T001–T004 all run in parallel (four disjoint path sets)
+- Phase 3 tests: T007–T010 all run in parallel (four disjoint test modules)
+- T011 and T012 are independent of each other once their tests exist; T013 depends on T009 only
+
+---
+
+## Parallel Example: User Story 1
+
+```bash
+# Launch the four red-first contract tests together:
+Task: "checker contract test in tests/contract/test_closure_acceptance_check.py"
+Task: "path-marker cases in tests/contract/test_requirements_checker.py"
+Task: "state machine + vocabulary test in tests/contract/test_acceptance_state_machine.py"
+Task: "implement call-site test in tests/contract/test_gate_wiring_081.py"
+```
+
+---
+
+## Implementation Strategy
+
+### MVP First
+
+**MVP scope**: US1 alone — it is the whole of slice 081a. It is independently testable through the checker on the positive/negative fixtures plus the state-machine contract test, and it is the threshold without which no later slice has a verdict to share.
+
+1. Complete Phase 1 (Setup) and Phase 2 (Foundational)
+2. Complete US1 in the order given: tests → `validate-requirements` → state machine → vocabulary → GATE-4 → checker → implement wiring → smoke → regeneration
+3. **STOP and VALIDATE**: run the checkpoint's two checker invocations and the four contract modules
+4. Do not advance the feature status — see `## Slice Boundary`
+
+### Incremental Delivery
+
+`081a` (this slice) → `081b` (ownership tables and the four deterministic findings) → `081c` (review composition + ARC + the review call site) → `081d` (vocabulary owners, audit mode, driver line state and closure/merge site, mirrors, docs, smoke evidence). Each later slice depends on 081a's owner doc sections and on 081a's checker; the FR/SC mapping is in `## Slice Boundary`.
+
+---
+
+## Slice Boundary
+
+**Slice**: `081a` — plan.md § D10 "US1 + the shared core". Boundaries are cut at plan entry; **no requirement is dropped**, each FR and SC below is assigned to exactly one slice.
+
+### FR / SC coverage in this slice
+
+| FR / SC | 081a status | What 081a delivers | Remainder and owner |
+|---|---|---|---|
+| FR-001 (`Path` marker) | **covered** | marker form + last-token rule in the owner doc; sixth `path-marker` check label in `scripts/python/validate-requirements.py`; `final ≥ 1` for `execution`, exempt for `expression` | — |
+| FR-002 (four conjunctive conditions) | **covered** | owner block rewrite + contract test | — |
+| FR-003 (`Blocked` transitions) | **covered** | four transitions including the illegal one and the audit-correction exception | — |
+| FR-004 (verification vocabulary + ladder) | **covered** | six-value set, five ladder fields, illegal-row rule, `blocked-without-measurement-ladder` reason | — |
+| FR-005 (one smoke command, three subjects) | **partial** | the smoke **test** exists and covers the three required subjects; the command is recorded in `tasks.md` | the recorded `smoke_command` / `smoke_exit_code` / `smoke_evidence_path` triple is an implement-stage output (T019, T020) |
+| FR-006 (checker: verdict, closed set, exit codes, counts) | **partial** | script, seven-value closed set, three exit codes, single-computation `final_path` counts | full source extraction for `runtime-dependency-not-owned`, `falsified-premise-undecided`, `inherited-blocker-undisposed` → **081b** (the codes exist and are emitted from today's rows; the extraction checks land there) |
+| FR-007 (pytest tests + positive/negative fixtures) | **covered for 081a's subject set** | `test_closure_acceptance_check.py` + `positive` / `negative` / `ladder-mutation` / `smoke-mutation` fixtures | 081b adds the premise / runtime-gap fixtures for its three reasons |
+| FR-008 (three call sites) | **partial — 1 of 3** | the **implement** call site is wired and asserted | `/speckit.review` site → **081c**; `sdd-loop-driver` closure/merge site → **081d** |
+| FR-009…FR-012 (ownership / premises / inherited blockers / four findings) | **deferred** | — | **081b** |
+| FR-013…FR-016 (artifact review, implementation review, ARC, fourth condition at the review gate) | **deferred** | — | **081c** (the fourth condition's *owner text* is written in 081a as part of FR-002/FR-003's owner block; the review-side enforcement is 081c) |
+| FR-017 (driver line state + closure/merge) | **deferred** | — | **081d** |
+| FR-018 (three vocabulary owners + never-regress narrow exception) | **partial** | `templates/feature-details-template.md` carries `Blocked` and the narrow exception | `templates/feature-index-template.md` and `skills/internal/manage-features/SKILL.md` → **081d** |
+| FR-019 (four `blocked` literals reconciled once) | **deferred** | — | **081d** |
+| FR-020 (`--audit-existing`) | **deferred** (CLI flag present, mode unimplemented) | the flag is on the stable surface (T006) | **081d** |
+| FR-021 (command templates + regeneration) | **partial** | `templates/commands/implement.md` and `templates/commands/tasks.md` wired and regenerated | `templates/commands/review.md` → **081c**; the final two `--check` sweeps → **081d** |
+| FR-022 (single schema owner + owner pointers + CHANGELOG) | **partial** | the owner document exists with its 081a sections and extension points | owner pointers for the 081b/c/d sections, CHANGELOG, docs → **081d** |
+| FR-023 (tests + baseline compare) | **partial** | the four contract modules + the smoke exist; baseline is the plan-stage capture | id-level baseline differencing and the zero-new-failure claim → **081d** |
+| FR-024 (source not mirror) | **covered for 081a's edits** | every edit lands in `templates/` / `shared/` / `skills/` / `scripts/` / `src/` / `tests/`, then T018 regenerates | later slices repeat the rule for their own edits |
+| FR-025 (registration + deterministic-only gates) | **partial** | every new gate in this slice is a deterministic script verdict; new temp artifacts go to `.specify/.tmp/` | directory registration of `tests/fixtures/` in `.specify/instructions.md` § Key Directories → **081d** |
+| SC-001 (3/3 call sites refuse the 026 shape) | **partial — 1/3** | the implement site refuses, with a named reason from the closed set | review site (081c) and driver closure/merge site (081d) — **SC-001 cannot pass until all three are wired** |
+| SC-002 (positive path not killed; smoke is a hard condition) | **partial** | positive fixture `accept`; the `Planned → Implemented` half of the walk; `smoke-mutation` → `Blocked` | the `Implemented → Ready for Review` leg needs the fourth-condition gate at the review site (081c) |
+| SC-003 (vocabulary + state machine alignment) | **partial** | the feature-details owner and its four transition rows | the other two owners → **081d** |
+| SC-004 (vocabulary + measurement ladder judgeable) | **partial** | six-value set, five fields, illegal-row rule, `blocked-without-measurement-ladder` reason and its fixture | no remainder |
+| SC-005 (ownership + premises are first-class artifacts) | **deferred** | — | **081b** |
+| SC-006 (review four segments + ARC) | **deferred** | — | **081c** |
+| SC-007 (audit read-only) | **deferred** | — | **081d** |
+| SC-008 (smoke record present and reproducible) | **partial** | exactly one smoke command exists and its two-run determinism is a slice gate (GATE-4) | the recorded triple in `verification.md` closes with T020; final claim in **081d** |
+| SC-009 (framework hygiene + the containment claim) | **partial** | both `--check` runs exit 0 on the 081a tree | `CHANGELOG` entry and the schema-uniqueness guard test → **081d** |
+
+### Status consequence (load-bearing — do not soften)
+
+**After 081a the feature is `Blocked`, not `Implemented`.** SC-001 requires the negative fixture to be rejected at **three** call sites (implement, review, driver closure/merge); 081a wires **one** (implement) and therefore satisfies 1/3. SC-001 and SC-002 are the feature's two `final`-path criteria, and `Planned → Implemented` requires **every** `final`-path SC to be `pass`. `Blocked → Ready for Review` is illegal by design (FR-003). Consequently:
+
+- `Implemented` requires the 081c (review) and 081d (driver closure/merge) call sites **and** final-path SC-001 / SC-002 all pass; no artifact of this slice may claim otherwise.
+- `verification.md` records SC-001 and SC-002 as `blocked` with the 1-of-3 reason (T020), so the honest state is visible at the gate rather than inferred from this paragraph.
+- GATE-5 makes the claim machine-checkable: the registry row for Feature 081 must not read `Implemented` when this slice closes.
+
+## Deferred Slices
+
+Not tasks. Listed so nothing is silently dropped and so `/speckit.tasks` for those slices starts from the plan's D10 scope.
+
+- **081b — US2, ownership and premises** (plan § D10: runtime stack table, Execution Premises + Inherited Blockers, four `pre-analyze-check.py` findings, `expression-gates.md` rows, A13 boundary). FR-009, FR-010, FR-011, FR-012; SC-005; the checker's full source extraction for `runtime-dependency-not-owned`, `falsified-premise-undecided`, `inherited-blocker-undisposed`; the `premise-mutation` / `runtime-gap-mutation` fixtures. Depends on 081a's owner-doc sections.
+- **081c — US3, review composition and ARC** (plan § D10: `review-feature-quality` skill, review-template slots `### 2.2`–`### 2.4`, `templates/commands/review.md` composition rewrite, ARC, census 3→4 plus its guard, the checker at the **review** call site). FR-013, FR-014, FR-015, FR-016; SC-002's second leg; SC-006; `tests/contract/test_acceptance_review_composition.py` and the deliberate update of `tests/contract/test_review_feedback_boundary.py`. Depends on 081a's `final_path` counts.
+- **081d — US4 and all remaining wiring** (plan § D10: three vocabulary owners, `--audit-existing`, driver line state `blocked` and its eight dispositions, the closure/merge call site, mirrors, docs / CHANGELOG / directory registration, smoke evidence, baseline comparison). FR-017, FR-018's other two owners, FR-019, FR-020, FR-022's pointers, FR-023's id-level differencing, FR-025's registration; SC-001's third site, SC-003, SC-007, SC-008's final claim, SC-009. Depends on 081a's checker and 081c's composition text.
+
+## Notes
+
+- [P] rows write disjoint path sets; any row that writes a file another row also writes carries no `[P]` and an explicit `[blockedBy:]`
+- Two Hats: every edit lands in `templates/`, `shared/`, `skills/`, `scripts/`, `src/` or `tests/`; `.specify/` copies are regenerated by T018, never hand-edited. Exact pairs: plan.md § Mirror Obligations
+- The pre-change side of every "diff against pre-change output" premise is already frozen at plan stage — `test-evidence/plan-baseline-run.txt` (39 failed / 6970 passed / 7 skipped), `test-evidence/plan-runner-pins.txt` (pytest 9.2.0 / CPython 3.14.6 / git 2.54.0), `test-evidence/plan-gates.txt`. Do not re-run the full suite to re-derive them
+- The feature's single smoke command, recorded verbatim: `bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q`
+- Deferral discipline: prefer `[~]` with a recorded reason over leaving a row `[ ]`
