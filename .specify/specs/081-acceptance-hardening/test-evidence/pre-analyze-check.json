@@ -1,16 +1,31 @@
 {
   "stage": "requirements",
   "decision": "pass",
-  "findings": [],
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 23,
+      "message": "path does not exist under the repo: shared/workflow/acceptance-hardening.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 225,
+      "message": "path does not exist under the repo: shared/workflow/acceptance-hardening.md"
+    }
+  ],
   "summary": {
     "errors": 0,
-    "advisories": 0,
+    "advisories": 2,
     "waived": 0,
     "fr": 25,
     "sc": 9,
     "tasks": 0,
     "clauses": 0,
-    "files": 1
+    "files": 2
   },
-  "checked_at": "2026-11-02T23:06:35Z"
+  "checked_at": "2026-11-02T23:07:51Z"
 }

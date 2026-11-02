@@ -1,2 +1,2 @@
-pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
-{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 25, "sc": 9, "tasks": 0, "clauses": 0, "files": 1}, "checked_at": "2026-11-02T23:06:35Z"}
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=2 waived=0
+# advisory disposition: both missing-path advisories point at shared/workflow/acceptance-hardening.md, a planned deliverable created in the plan stage (FR-022); advisory-only, not a defect.
