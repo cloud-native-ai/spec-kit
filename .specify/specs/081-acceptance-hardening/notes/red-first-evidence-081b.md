@@ -58,16 +58,123 @@ FAILED tests/contract/test_acceptance_premises.py::test_h3_the_fenced_exclusion_
   part, and it was run against the unmodified checkers — so the red is a measurement of the
   missing implementation, not a re-statement of it.
 
-## 2. Polish readings (written by T011 and T012)
+## 2. Polish readings (§ 2.1 written by T011; T012 did not run — § 2.2; T010 stopped — § 2.3)
 
-- **T011 — the feature's single smoke command, run twice**: both exit codes, plus the refreshed
-  `test-evidence/smoke-081.txt` content, land here; 081a's smoke evidence is preserved first as
-  `test-evidence/smoke-081a.txt`. Status: **pending** (part 3).
-- **T012 — the slice's contract modules**: `test_acceptance_premises.py`, `test_closure_acceptance_check.py`,
-  `test_expression_gates_doc.py`, `test_expression_gate_wiring.py` and `test_premise_carrier_contract.py`, with the
-  console transcript written to `test-evidence/tasks-081b-slice-tests.txt`. Status: **pending** (part 3).
-- **Not this file's job**: the feature-level id-level baseline comparison is **081d's** (FR-023). This slice's
-  narrower observation MUST NOT stand in for it, and no full-suite run is taken in 081b.
+**Part 3 outcome, stated first**: T011 **completed**; T010 **stopped** on a fast-fail (§ 2.3), and
+T012 — whose row is `[blockedBy: T005,T009,T010]` — therefore did **not** run. The slice did not
+close in part 3; the feature stays `Blocked` and no status was moved.
+
+### 2.1 T011 — the feature's single smoke command, run twice (COMPLETED)
+
+- 081a's record preserved **first**, before either run: `test-evidence/smoke-081a.txt` is a
+  byte-identical copy of `test-evidence/smoke-081.txt` as committed at `da5e4480`
+  (`diff smoke-081a.txt <(git show HEAD:.specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt)`
+  → no output). It is kept as a separate file, never merged: 081a's record describes a different tree.
+- Run 1 — `bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q`
+  → exit **0** · `1 passed in 1.33s`
+- Run 2 — same command, immediately after → exit **0** · `1 passed in 1.21s`
+- Identical exit status across the two runs: **yes** (0 / 0) — the property GATE-7 asks for.
+- Refreshed `test-evidence/smoke-081.txt` content: **unchanged**. Both runs rewrote the same three
+  sub-check blocks 081a recorded — `specify init` exit 0 with the generated `.specify/` tree; the
+  closure checker on `positive` (accept, exit 0) and on `negative` (block, exit 1,
+  `zero-final-path-pass`); `regen-command-copies.py --check` exit 0 — and `git diff HEAD` on the file
+  is empty afterwards. That equality is a *reading* (the file was rewritten, its contents did not
+  move), not a skipped refresh.
+- **SC-008 stays `partial`**: its final claim is 081d's, over the 081d tree. T011 re-runs the smoke
+  on *this* tree and proves nothing about later ones.
+
+### 2.2 T012 — the slice's contract modules: NOT RUN (blocked by T010)
+
+T012's row is `[blockedBy: T005,T009,T010]`. T010 could not complete (§ 2.3), so this row did not
+start and `test-evidence/tasks-081b-slice-tests.txt` was **not** written — writing it would have
+declared a slice-close record for a slice that did not close.
+
+Measured anyway, as a **diagnostic only** (informational; NOT T012's close record):
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py \
+      tests/contract/test_closure_acceptance_check.py tests/contract/test_expression_gates_doc.py \
+      tests/contract/test_expression_gate_wiring.py tests/contract/test_premise_carrier_contract.py -q
+89 passed in 4.85s          # exit 0
+```
+
+That green is confined to the fixtures and to the frozen guards. It says nothing about this
+feature's own spec directory, which the checker refuses before it reaches any assertion (§ 2.3) —
+which is precisely why it MUST NOT be read as a close record.
+
+### 2.3 T010 — STOPPED: the checker cannot produce a payload for this feature's own spec dir
+
+T010's second instruction is to re-run the closure checker with `--json-out` and **copy** the
+acceptance summary from that payload. The payload does not exist: the checker exits `2` (input
+error) on this feature's own artifacts. Measured on the unmodified tree at `793aff9e`:
+
+```text
+=== P1 — real spec dir, unchanged tree (HEAD 793aff9e) ===
+closure-acceptance-check: input error: .specify/specs/081-acceptance-hardening/requirements.md
+  § Runtime Stack row RS-001 names a `Contract` path that does not resolve in the checkout:
+  pyproject.toml`（`[project] requires-python`）+ `scripts/bash/run-tests.sh`（`resolve_python`） (AS-06)
+EXIT=2
+```
+
+Peeling that error back one layer at a time on a **temp copy** (`.specify/.tmp/probe-specA`,
+`.specify/.tmp/probe-specB` — copies, never the tracked artifacts) shows there are **three**
+independent defects, and that repairing the first only exposes the next:
+
+```text
+=== P2 — temp copy, only the 3 signed-contract `Contract` cells narrowed to bare resolvable paths ===
+closure-acceptance-check: input error: plan.md § Inherited Blockers row IB-003 carries `Source row`
+  '071:SC-001_status`（第 66 行）', which is not a `<feature>:<row>` locator — the join key has one
+  grammar (C-17)
+EXIT=2
+
+=== P3 — temp copy, `Contract` cells + the 5 `Source row` annotations narrowed ===
+verdict: block
+final_path: pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2
+reason: zero-final-path-pass
+reason: inherited-blocker-undisposed: 081:SC-001_status
+reason: inherited-blocker-undisposed: 081:SC-002_status
+reason: inherited-blocker-undisposed: 081:SC-003_status
+reason: inherited-blocker-undisposed: 081:SC-005_status
+reason: inherited-blocker-undisposed: 081:SC-006_status
+reason: inherited-blocker-undisposed: 081:SC-007_status
+reason: inherited-blocker-undisposed: 081:SC-008_status
+reason: inherited-blocker-undisposed: 081:SC-009_status
+reason: inherited-blocker-undisposed: 081:deferred_tasks
+EXIT=1
+```
+
+The three defects, each with its owner and the rule it contradicts:
+
+| # | Where | Measured | Contradicts |
+|---|-------|----------|-------------|
+| 1 | `requirements.md` § Runtime Stack, the three `signed-contract` rows (`RS-001`, `RS-002`, `RS-003`) | the `Contract` cells are annotated prose, e.g. `` `pyproject.toml`（`[project] requires-python`）+ `scripts/bash/run-tests.sh`（`resolve_python`） `` — two paths plus two annotations in one cell, and `RS-001` names **two** candidate contract files | owner § Runtime Stack: `Contract` = "repo-relative path of the file the contract actually lives in … it MUST resolve in the checkout"; AS-06 / C-13 make an unresolvable path an input error |
+| 2 | `plan.md` § Inherited Blockers, all five disposition rows (`IB-003`, `IB-004`, `IB-006`, `IB-007`, `IB-008`) | every `Source row` cell carries a `（第 N 行）` annotation, e.g. `` `071:SC-001_status`（第 66 行） `` | the same section's own grammar line ("`Source row` = `<feature-id>:<row-locator>`, **no whitespace**", FR-011 `^\S+:\S+$`) and C-17's join key |
+| 3 | `scripts/python/closure-acceptance-check.py` — `declared_dependency_files()` + `extracted_dependency_rows()` | any backticked `.md` token in § Inherited Blockers that resolves **under this spec dir** is treated as a dependency artifact, so the section's prose mention of `` `verification.md` `` resolves to *this* spec's own log; the feature id is then read from that log's first line (`# Verification Log — 081-…`) → nine `inherited-blocker-undisposed: 081:*` reasons. Measured: the tokens `requirements.md`, `research.md`, `tasks.md`, `verification.md` all resolve under the spec dir | FR-011 / C-17: the dependency set is "declared, never implied", and a feature cannot be its own dependency — the recorded reading (T010's row, `plan.md` § Readings) is **7/8 records settled + 1 `inherited-later`**, never 9 undisposed rows |
+
+Defect 3 is load-bearing for T010 beyond the two input errors: even with both artifacts repaired,
+the checker cannot emit the reading T010 is instructed to record, and any attempt to state
+"7/8 settled + 1 `inherited-later`" from a payload would be a hand-computed number the checker
+never produced (C-08 forbids exactly that).
+
+**Consequence for T010**: neither half was performed.
+
+- the SC-005 row was **not** rewritten — its evidence is the checker's own reading of the four
+  findings, the three `in-scope` duties and the 8 inherited records, and that reading is the payload
+  that does not exist; writing the numbers by hand is the recomputation C-08 forbids;
+- the acceptance summary was **not** copied — there is no payload to copy it from;
+- `verification.md`'s existing acceptance-summary block therefore still describes the 081a tree and
+  MUST NOT be read as this slice's close state.
+
+**Why this stopped here rather than being repaired in passing**: each of the three needs a ruling,
+not a correction — `RS-001` names two legitimate contract files and the schema admits one cell
+(choosing is inventing intent); `plan.md` and `requirements.md` are outside T010's declared write
+scope (its rows write `verification.md` and the evidence paths); and defect 3 is a rule choice about
+which tokens constitute a declared dependency artifact, with a fixture suite that currently asserts
+the present behaviour. Two of the three are in artifacts the dispatch brief explicitly puts out of
+bounds. Recorded, not touched.
+
+The raw transcript of P1/P2/P3 is reproducible from the commands above; the temp copies live under
+`.specify/.tmp/` (git-ignored) and were removed after the readings were taken.
 
 ## 3. Absence record measured when this landing point was opened (T002)
 
