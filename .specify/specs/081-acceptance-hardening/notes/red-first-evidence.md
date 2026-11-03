@@ -175,3 +175,20 @@ SC-001 `blocked` and SC-002 `partial`, and the closure checker returns `block` /
 `zero-final-path-pass`. The feature is therefore **`Blocked`**, never `Implemented`; this is the strict-acceptance
 outcome the feature is built to produce.
 
+### 2.6 Clean full-suite closure — authoritative T022 measurement (2026-11-03)
+
+After the concurrent `90de4d7f` landed and the tree was stable, the full suite was rerun once:
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-clean.txt -q
+39 failed, 7023 passed, 7 skipped, 4 warnings in 699.18s (0:11:39)
+EXIT=1
+```
+
+- `head 失败集 − 基线失败集`: **empty** (0 new).
+- `基线失败集 − head 失败集`: **empty** (0 fixed).
+- pins re-read: `pytest 9.2.0`, `Python 3.14.6`, `git 2.54.0` (match `plan-runner-pins.txt`).
+- T022 closes; T024 remains deferred to 081d. The earlier run2 mirror-parity failure is attributed to the
+  concurrent commit, not to 081; the clean set is the T022 evidence.
+
+

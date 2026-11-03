@@ -86,18 +86,18 @@ SC-008_why_reduced_insufficient=later slices edit the same sources and must reru
 SC-008_unblock=081d reruns the smoke on the final tree and records the triple
 
 SC-009_status=partial
-SC-009_value=mirror/regen `--check` both exit 0; five frozen-pin guards pass; the full-suite id-level diff is not empty (one order-dependent mirror-parity flake) and the coverage lane is `uncovered`
-SC-009_note=the flake passes in isolation and the two files are byte-identical; the coverage lane records 17 clauses beyond the frozen baseline
-SC-009_blocked_at=full-suite `head − baseline` is not empty: `tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/references/prompt-templates.md->.specify/skills/coaching-skills/references/prompt-templates.md]`; coverage `status: uncovered`
-SC-009_reduced_measurement=the flake passes alone; `sync-mirrors.py --check` passes; five frozen-pin guards pass; coverage freeze/read is recorded
+SC-009_value=mirror/regen `--check` exit 0; five frozen-pin guards pass; clean full-suite 39 failed / 7023 passed / 7 skipped with `head − baseline` empty; the coverage lane is `uncovered` (17 clauses beyond the frozen baseline) and the schema-ownership guard is 081d work
+SC-009_note=the set-level full-suite invariant is now clean; the remaining gaps are the coverage lane and the 081d schema-ownership guard
+SC-009_blocked_at=coverage lane status `uncovered`; `tests/contract/test_acceptance_schema_ownership.py` is 081d work
+SC-009_reduced_measurement=clean full-suite id-level diff: head 39 = baseline 39, 0 new, 0 fixed; five frozen-pin guards pass; mirror/regen 0
 SC-009_reduced_measurement_run=yes
-SC-009_why_reduced_insufficient=the acceptance unit is the full-suite id-level set; an order-dependent flake is not a clean set
-SC-009_unblock=fix the 078 mirror-parity test isolation or rerun the full suite in a clean order, then close T022; record the coverage lane verdict
+SC-009_why_reduced_insufficient=the coverage lane and the schema-ownership guard are not measured in 081a
+SC-009_unblock=081d lands the schema-ownership guard; the coverage lane verdict is tracked as a separate gap (T023)
 
 # -- Deferred tasks --
 
-deferred_tasks=T022,T024
-deferred_reason_summary=T022: full-suite closure-repair found one order-dependent mirror-parity flake (isolation pass, byte-identical files); T024: the third vocabulary owner is deferred to 081d because WC-14 freezes the C-5 verification suite.
+deferred_tasks=T024
+deferred_reason_summary=T024: the third vocabulary owner is deferred to 081d because WC-14 freezes the C-5 verification suite.
 
 # -- Acceptance summary (human; the checker recomputes) --
 
