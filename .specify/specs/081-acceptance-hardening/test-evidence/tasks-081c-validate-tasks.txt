@@ -1,0 +1,6 @@
+# gate: python3 scripts/python/validate-tasks.py .specify/specs/081-acceptance-hardening/tasks.md
+# run: 2026-11-03
+
+PASS: .specify/specs/081-acceptance-hardening/tasks.md — 0 error(s), 0 warning(s)
+
+exit=0

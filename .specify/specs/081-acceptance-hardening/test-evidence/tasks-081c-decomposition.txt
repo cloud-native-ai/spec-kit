@@ -1,0 +1,6 @@
+# gate: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/081-acceptance-hardening/requirements.md --tasks .specify/specs/081-acceptance-hardening/tasks.md
+# run: 2026-11-03
+
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 25, "task_count": 14, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-03T06:14:09Z"}
+
+exit=0
