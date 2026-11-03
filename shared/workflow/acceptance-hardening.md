@@ -8,10 +8,13 @@ surface — template, command, skill, driver doc — reaches these by path plus 
 restates** a table, a value domain, a threshold or a reason literal.
 
 **Declared carriers (projections, never second owners)**: `templates/feature-details-template.md` § Canonical
-Status State Machine, `templates/verification-log-template.md` and `templates/tasks-template.md` (§ GATE-4)
-physically hold what this file defines, because a consumer that is editing a template must find the rules where
-it is editing. A carrier is a **declared projection**: it may not widen a value domain, and where a carrier and
-this file disagree, this file wins and the carrier is stale.
+Status State Machine, `templates/verification-log-template.md`, `templates/tasks-template.md` (§ GATE-4) and
+`templates/plan-template.md` (the two plan-table skeletons, which carry **column names only**) physically hold what
+this file defines, because a consumer that is editing a template must find the rules where it is editing. A carrier
+is a **declared projection**: it may not widen a value domain, and where a carrier and this file disagree, this file
+wins and the carrier is stale. The four carriers are also the exemption list of the schema-uniqueness guard
+(`requirements.md` SC-009 ④), and each carries its own narrowing assertion — the plan skeleton, in particular, may
+repeat a column set and **zero** domain literals.
 
 **Scope of this revision**: § Feature Status · § Verification Vocabulary · § Gates · § Closure Verdict. Sections
 belonging to later slices are listed in § Extension Points, together with the owner their obligations currently
@@ -169,7 +172,7 @@ them. A second count is a second source of truth, and the two drift.
 | `zero-final-path-pass` | — |
 | `final-path-not-pass: SC-NNN` | `SC-\d{3}` |
 | `blocked-without-measurement-ladder: SC-NNN` | `SC-\d{3}` |
-| `runtime-dependency-not-owned: RS-NNN` | `RS-\d{3}` |
+| `runtime-dependency-not-owned: RS-NNN` | `RS-\d{3}`, or the reserved literal `runtime-stack` for a section with zero data rows |
 | `falsified-premise-undecided: EP-NNN` | `EP-\d{3}` |
 | `inherited-blocker-undisposed: <feature>:<row>` | `<feature>` = the dependency's feature id; `<row>` = that source row's locator as the dependency artifact writes it |
 | `status-claims-implemented-but-blocked` | — |
@@ -179,7 +182,10 @@ them. A second count is a second source of truth, and the two drift.
 removed, joined by exactly one `": "`, and the argument satisfies the grammar above. Membership is therefore a
 mechanical **two-part test**: template match (byte-identical prefix) **and** a well-formed argument. A bare
 prefix of an argument-taking template is not a member; no third spelling, trailing colon or re-spelled
-placeholder is admitted. A reason outside the set, or an instance with a malformed argument, is a defect of the
+placeholder is admitted. One argument slot is a **reserved literal** rather than an id: the runtime-row class has a
+shape with no `RS-NNN` to name — the section exists but carries **zero data rows** — and that shape's instance is
+`runtime-dependency-not-owned: runtime-stack`. Emitting nothing there is the false green the finding exists to
+catch, and a fabricated `RS-NNN` would be worse than silence: it points at a row nobody wrote. A reason outside the set, or an instance with a malformed argument, is a defect of the
 checker — not a finding about the feature.
 
 The set is **closed**: an eighth reason requires revising this file, never a local addition. A non-`pass`
@@ -215,15 +221,24 @@ may substitute a model judgement, a different script or an ad-hoc grep for it.
 Sections later slices add to **this** file. Each line names the owner its obligations have **today**, so that
 nothing is undefined while the section is absent.
 
+- `## Runtime Stack & Dependency Ownership` (**081b**) — the requirements-side table's column set
+  (`ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises`), the `Form` domain and the
+  judgement class of each `in-scope` duty, including the three shapes of the runtime-row class (absent section /
+  zero data rows / empty required cell) and the prose-declaration marker rule. Owned today by the declaring
+  specification's **FR-009** and **FR-012**; the schema lands here with the same slice and MUST be moved verbatim,
+  never re-invented.
 - `## Execution Premises` + `## Inherited Blockers` (**081b**) — the two tables' column sets, value domains and
   invalid-row rules. The carriers themselves are already named in § Gates above (the A13 boundary), so this
   extension adds the schema, not the boundary. Obligations these sections will carry are owned today by the
   declaring specification's functional requirements **FR-010** (execution premises) and **FR-011** (inherited
   blockers). In particular the `inherited` disposition's **carrier obligation** — an `inherited` row MUST name a
   runtime-reachable carrier, and that carrier MUST NOT be a deferrable `supporting`-path criterion — is owned by
-  **FR-011** and is *not* left undefined by the absence of this section. The matching plan skeleton belongs to
-  `templates/plan-template.md` and lands with the same slice; it carries the column sets only, never a value
-  domain and never an invalid-row rule.
+  **FR-011** and is *not* left undefined by the absence of this section. The **syntax** of both the `Source row`
+  locator (`<feature-id>:<row-locator>`, the join key) and the `Carrier` (`task:<T-ID>+test:<path>` — conjunctive —
+  or `gate:<GATE-ID>`, plus the `Carrier slice` cell whose later-slice value reads `inherited-later`) is likewise
+  owned by **FR-011** until this section exists, and lands here **verbatim**: the section records the schema, it
+  does not get to invent a second grammar. The matching plan skeleton belongs to `templates/plan-template.md` and
+  lands with the same slice; it carries the column sets only, never a value domain and never an invalid-row rule.
 - `## Review Composition` (**081c**) — the process → artifact → implementation → code segments plus the
   Acceptance Reality Check, the expected-artifact denominator, and their boundaries.
 - Additions to § Verification Vocabulary (**081d**) — the reconciliation of the four `blocked` literals (owner:

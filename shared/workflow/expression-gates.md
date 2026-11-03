@@ -27,15 +27,19 @@
 八个阶段各至少一行：阶段、算子 id、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。任一阶段无算子即失败；算子行不得是空表头行。
 `算子 id` 是稳定标识（`G-…`，全表唯一），供分类 owner 映射表的 `强制门禁引用` 列以 `gate:<算子 id>` 引用；id 变更即引用失效，两者 MUST 同步修订。
 
+**三处义务按可读面分派（一条义务只在一个阶段判）**：`in-scope` 的第 ① 项（`FR` 单元格可解析）在 requirements 阶段判且判为输入错误；第 ② 项（`tasks.md` 有行级引用该 FR 的必做任务行）在 tasks 阶段的 `G-tasks-fact` 判；第 ③ 项（`verification.md` 有点名该 `RS-NNN` 的联合验收行）**不在本表任何阶段行判**——`verification.md` 从不是阶段输入，它由 closure 判定（`scripts/python/closure-acceptance-check.py`）判。任一阶段 MUST NOT 把读不到的产物所承载的义务记为通过。
+
+**算子命令必须可调用**：本表每一行的「执行算子」列 MUST 是**可解析、可调用**的命令形态（可执行入口 + 该入口真实接受的参数形态）。守卫测试 `tests/contract/test_expression_gates_doc.py` MUST 断言两件事：(a) 每行首个命令的脚本路径存在，且其参数形态能被该脚本的 `--help` 接住（不接受 `--spec-dir` 的脚本 MUST NOT 被写成接受它）；(b) 当某行点名 `validate-requirements.py` 的检查项数时，该数字 MUST 等于脚本 `LABELS` 元组的长度（今天是 6）——计数只写在一个地方、由哨兵校验，正是本条要防的漂移。
+
 | 阶段 | 算子 id | 执行算子 | 对应面 | 阻断级别 |
 | --- | --- | --- | --- | --- |
-| requirements | `G-req-clarity` | `validate-requirements.py --spec-dir <spec dir>`（五项结构检查）+ `pre-analyze-check.py --stage requirements` | requirements-clarity | blocking |
+| requirements | `G-req-clarity` | `python3 scripts/python/validate-requirements.py <spec dir>/requirements.md`（六项结构检查：`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` / `path-marker`；位置参数是 `requirements.md` 路径，该脚本**不**接受 `--spec-dir`）+ `pre-analyze-check.py --stage requirements`（运行时行类第 1、2 条发现、`in-scope` 义务 ① 的输入错误判决、散文声明规则） | requirements-clarity | blocking |
 | requirements | `G-req-evidence` | 证据三件套语法预检（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
 | clarify | `G-clarify-clarity` | `pre-analyze-check.py --stage requirements`（仅在需求变更后重跑一次） | requirements-clarity | blocking |
 | clarify | `G-clarify-reader` | 读者声明与阅读场景补齐（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
-| plan | `G-plan-fact` | `pre-analyze-check.py --stage plan`（事实唯一性与悬空引用一次比对） | fact-consistency | blocking |
+| plan | `G-plan-fact` | `pre-analyze-check.py --stage plan`（事实唯一性与悬空引用一次比对；运行时行类第 1、2 条在本阶段以 `plan.md` 可读面复读一次，`falsified` premise 缺 `Decision` 与继承 blocker 未处置两类**只**在本阶段判） | fact-consistency | blocking |
 | plan | `G-plan-structure` | 结构面复核（`docs-utils.py --action validate`，判据为零新增违规） | structure-links-build | blocking |
-| tasks | `G-tasks-fact` | `pre-analyze-check.py --stage tasks`（计数判定，委派） | fact-consistency | blocking |
+| tasks | `G-tasks-fact` | `pre-analyze-check.py --stage tasks`（计数判定，委派；并承载 `in-scope` 的第 ② 项义务——`tasks.md` 中**行级**引用该 FR 的必做任务行 `^- \[.\] T\d{3}.*\bFR-0NN\b`，`tasks.md` 首次成为阶段输入即在此） | fact-consistency | blocking |
 | tasks | `G-tasks-evidence` | 证据等级与 as-of 复核（`doc-consistency-check.py --faces evidence`） | evidence-asof | blocking |
 | checklist | `G-checklist-reader` | 读者声明复核（`doc-consistency-check.py --faces reader`） | reader-purpose | blocking |
 | checklist | `G-checklist-duplicate` | 跨文件手写副本（`doc-consistency-check.py --faces duplicate`） | fact-consistency | blocking |
