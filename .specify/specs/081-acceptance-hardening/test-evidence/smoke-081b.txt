@@ -1,0 +1,24 @@
+# Feature 081 smoke record — the acceptance gate end to end
+# Command: bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q
+# Written by tests/integration/test_acceptance_smoke.py; no network, no wall clock.
+
+sub-check 1 — specify init builds a `.specify/` tree from the checkout's own templates
+  $ specify init smoke-081 --ai claude --no-git --script sh --ignore-agent-tools   # cwd: <tmp_path>
+  exit 0
+  generated: .specify/.gitignore, .specify/agents, .specify/memory, .specify/scripts, .specify/shared, .specify/skills, .specify/source.json, .specify/templates
+
+
+sub-check 2 — the closure checker on both fixture sets
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/positive --json
+  exit 0
+  verdict=accept reasons=[]
+
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative --json
+  exit 1
+  verdict=block reasons=['zero-final-path-pass']
+
+
+sub-check 3 — the per-tool command copies still match their templates
+  $ python3 scripts/python/regen-command-copies.py --check
+  exit 0
+  mismatches: none

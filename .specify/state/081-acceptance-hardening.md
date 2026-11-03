@@ -397,3 +397,13 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - analyze-r2（`notes/analyze-081c-r2.md`）：C=0 / H=0，9/9 resolved，gate **pass**；新增 4 M + 3 L。
 - analyze-fix part 2（本次提交）：修复 R2-F-10…F-16 与 round-1 F-11…F-21、F-24；F-22/F-23 记为 L 级 known item。复跑 requirements ok、tasks 0/0、pre-analyze pass（0 errors / 69 advisories）。
 - 下一阶段 = implement 081c（T001–T017，分 3–4 段）。
+
+## 081c implement + slice close（2026-11-03 07:35 UTC）
+
+- part 1 `959e9e49`：red-first note、三夹具（review-implemented-clean accept / review-implemented-blocked block / expected-artifact-missing 6/7 vs 6/6）、owner doc § Review Composition、两个兄弟技能边界；`a5b82dd8` 把 shipped 示例里的 071 路径改为中性占位（C-57）。
+- part 2a `4ee76e5e`：`test_acceptance_review_composition.py` 32 tests，red 23F/9P（legs a–k）。
+- part 2b `df9bbe0e`：`review-feature-quality` 技能 + review-template 槽位 + review 命令四段改写；carrier 32/32。
+- part 3 `dc72c941`：review 调用点接线（2/3）、四守卫重钉（C-01/C-59/C-61 engine set/C-53 census）、docs 页 + checklist 指针、三个 inventory census（38/53/53）；targeted 211 passed。
+- part 4：T012 28 passed + 0 inherited rows；T013 SC-001 blocked(2/3)、SC-002 partial、SC-005 pass、SC-006 partial；T014 smoke 0/0、mirrors/regen 0、close set 214 passed。
+- 最终 checker：`verdict=block`、exit 1、`zero-final-path-pass`、`final_path pass=0 blocked=1 partial=1`、tasks 17 closed/0 open；payload `test-evidence/closure-verdict-081c.json`。
+- Feature 仍 **`Blocked`**（081d 接 driver closure/merge 调用点）。下一阶段 = 081c review。

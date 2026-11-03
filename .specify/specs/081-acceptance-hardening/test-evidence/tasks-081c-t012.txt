@@ -1,0 +1,17 @@
+=== T012a test_acceptance_premises (081b module) ===
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_premises.py -q
+............................                                             [100%]
+28 passed in 3.43s
+EXIT=0
+
+=== T012b closure checker on Feature 081 ===
+verdict: block
+spec_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/081-acceptance-hardening
+flow_class: execution
+claimed_status: Blocked
+final_path: pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2
+reason: zero-final-path-pass
+EXIT=1
+
+=== T012c inherited reasons in payload ===
+inherited-blocker-undisposed: 0
