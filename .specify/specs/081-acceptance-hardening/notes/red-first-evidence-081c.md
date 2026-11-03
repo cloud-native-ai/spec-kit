@@ -708,3 +708,12 @@ compile-embeds --check: 76 units, zero drift
 - **T012** — `bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py -q` → `28 passed in 3.43s`, exit 0. Closure payload (`--json-out .specify/.tmp/081c-closure-verdict.json`): `verdict=block`, exit 1, `zero-final-path-pass`, `final_path pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2`, **zero** `inherited-blocker-undisposed` rows. Evidence: `test-evidence/tasks-081c-t012.txt`.
 - **T013** — SC-001 stays `blocked` (2/3 call sites; the driver closure/merge site is 081d's), SC-002 stays `partial` (the fixture-level checker is a reduced measurement; no real review command run), SC-006 moves `deferred → partial` (structure measured, no produced `review.md`), SC-005 becomes `pass` (all three inherited carriers resolve in the live `tasks.md`; 28 passed + zero inherited rows). The acceptance summary is copied from `test-evidence/closure-verdict-081c.json`.
 - **T014** — 081b's smoke record preserved as `test-evidence/smoke-081b.txt`; the single smoke command ran twice, both exit **0** (`1 passed in 1.63s`, `1 passed in 1.34s`), and `test-evidence/smoke-081.txt` was refreshed by the smoke itself. Mirrors/regen `--check` exit 0 (templates 22 / skills-external 409 / skills-internal 138 / agents 3 / scripts 119 / shared 62; command copies OK). Close set: `214 passed in 9.53s`, exit 0 (`test-evidence/tasks-081c-slice-tests.txt`). No full-suite run — the feature-level baseline comparison is 081d's.
+
+## 10. Repair record for the C-57 neutrality red (added by the 081c review-fix)
+
+The § 6 reading said the neutrality red would be left open for a decision. The **next commit**,
+`a5b82dd8 fix(081c): keep the shipped dependency example neutral`, took the first reading: the example's
+real feature id and path in `shared/workflow/acceptance-hardening.md` became neutral placeholders
+(`NNN` / `NNN-<slug>`). The guard is green (`test_c57_shipped_text_adds_no_fresh_neutrality_violation`,
+1 passed), no `PRE_EXISTING_NEUTRALITY_DEBT` entry was added, and the edit now has task row T018. The
+earlier "not repaired here" sentence is preserved as the record of the point at which it was true.

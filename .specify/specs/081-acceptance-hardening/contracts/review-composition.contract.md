@@ -43,7 +43,7 @@
 |---|---|---|
 | FR-013 | RC-01…RC-06, RC-10, RC-11, RC-17 | `tests/contract/test_acceptance_review_composition.py` (+ updated `test_review_code_composition.py`) |
 | FR-014 | RC-07, RC-08, RC-09 | `tests/contract/test_acceptance_review_composition.py` |
-| FR-015 | RC-13…RC-16 | `tests/contract/test_acceptance_review_composition.py` (negative fixture: `F-ACCEPTANCE` + refusal) |
+| FR-015 | RC-13…RC-16 | `tests/contract/test_acceptance_review_composition.py` (`review-implemented-blocked` fixture: `F-ACCEPTANCE` + refusal; `negative` cannot produce it) |
 | FR-016 | RC-15 | `tests/contract/test_acceptance_state_machine.py` |
 | Plan § D10 081c (census mechanism; no FR — recorded) | RC-18, RC-19 | `tests/contract/test_review_feedback_boundary.py` (deliberate update) |
 | SC-006 | RC-05…RC-07, RC-14, RC-17 | the same two files |

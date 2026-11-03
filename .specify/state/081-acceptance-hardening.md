@@ -407,3 +407,10 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - part 4：T012 28 passed + 0 inherited rows；T013 SC-001 blocked(2/3)、SC-002 partial、SC-005 pass、SC-006 partial；T014 smoke 0/0、mirrors/regen 0、close set 214 passed。
 - 最终 checker：`verdict=block`、exit 1、`zero-final-path-pass`、`final_path pass=0 blocked=1 partial=1`、tasks 17 closed/0 open；payload `test-evidence/closure-verdict-081c.json`。
 - Feature 仍 **`Blocked`**（081d 接 driver closure/merge 调用点）。下一阶段 = 081c review。
+
+## 081c review + review-fix（2026-11-03 08:10 UTC）
+
+- 首次用新四段组合 + ARC 对 081c 自身做 dogfooding 评审：process / artifact / implementation / code / ARC；P0=1（review-template 2.2/2.3 前言与 findings 表互相否定）、P1=4（analyze round-2 只裁 C/H 且 M/L 残留无机械载体；FR-015 追溯指向错误夹具；severity 定义两套；2.1 要求覆盖率回执但无步骤产出）、P2=10、code=6。
+- review-fix：2.2/2.3 改为“verdict + finding rows only，无叙事意见体/无严重度汇滚”；§ A.4 删除第二套 severity 定义改为评分程序；FR-015 追溯 → `review-implemented-blocked`；analyze skill 增加 round 语义 + residue JSON（22 条）；code 段 receipt 强制化并对本记录生成回执（67/29/38/0）；rotation 改为 `<record>-<slice>.md` + 时间戳兜底（`test_c12` 重钉）；命令 frontmatter 四段化；docs 页 judgment-object 改指针；owner 补 denominator/ARC alphabet/rotation；quickstart/known-items 的 smoke 脏树描述改为 byte-stable；T018 记录 neutrality 修复。
+- 复测：targeted 11 模块 `239 passed` exit 0；mirror/regen 0；closure `block`/exit 1/`zero-final-path-pass`（final_path 0/1/0/1/0/0/2）；validators 0/0。
+- Feature 仍 **`Blocked`**。下一阶段 = 081d（最后一片：manage-features/feature-index 词表、`--audit-existing`、driver line-state/merge gate、schema-ownership guard、全量基线对照、final smoke）。

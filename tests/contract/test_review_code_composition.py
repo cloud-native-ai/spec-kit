@@ -65,6 +65,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
+OWNER = ROOT / "shared" / "workflow" / "acceptance-hardening.md"
 REVIEW_CMD = ROOT / "templates" / "commands" / "review.md"
 REVIEW_TEMPLATE = ROOT / "templates" / "review-template.md"
 
@@ -444,19 +445,30 @@ def test_c11_record_existence_follows_the_triage_value():
     )
 
 
-def test_c12_rotation_uses_the_utc_second_timestamp_form():
+def test_c12_rotation_uses_the_slice_key_form_with_a_timestamp_fallback():
+    """081c review-fix: the project archive form is `<record>-<slice>.md` (081a/081b/081c
+    all use it); the timestamped form is the fallback when no slice id exists. The rule
+    is owned by the owner doc; the command points at it, so the detailed clauses are
+    asserted on the owner and the pointer/slice-key literal on the command.
+    """
     body = _cmd()
-    assert "code-review-<YYYYMMDDTHHMMSSZ>.md" in body, (
-        "the archive name form MUST be the literal one, not a description of it"
+    owner = OWNER.read_text(encoding="utf-8")
+    assert _has(body, "Records and rotation"), (
+        "the command MUST point at the owner's rotation rule instead of restating it"
     )
-    assert _has(body, "second resolution"), "the timestamp is UTC, second resolution"
-    assert _has(body, "exit `2`"), (
+    assert "<record>-<slice>.md" in body, (
+        "the archive name form MUST be the literal slice-key form"
+    )
+    assert "<record>-<slice>.md" in owner, "the owner states the slice-key form"
+    assert "<YYYYMMDDTHHMMSSZ>.md" in owner, "the owner keeps the timestamp fallback"
+    assert _has(owner, "second resolution"), "the fallback timestamp is UTC, second resolution"
+    assert _has(owner, "exit `2`"), (
         "a same-second collision waits or exits `2`; it never overwrites"
     )
     assert _has(body, "`none` on a first run"), (
         "a first run records `none` rather than an empty field"
     )
-    assert _has(body, "never overwritten"), (
+    assert _has(owner, "never overwritten"), (
         "an existing archive path MUST NOT be overwritten"
     )
 

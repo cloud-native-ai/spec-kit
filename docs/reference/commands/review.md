@@ -39,8 +39,8 @@ Each segment is delegated to its existing skill by runtime path. The command orc
 | # | Segment | Skill (runtime path) | Judgment object |
 |---|---------|----------------------|-----------------|
 | 1 | Process segment | `review-sdd-process` (`.specify/skills/internal/review-sdd-process/SKILL.md`) | the SDD process that produced the feature — process and tooling quality, never the feature's business merits, never the artifacts' content, never the code it produced |
-| 2 | Artifact segment | `review-feature-quality` § Segment A (`.specify/skills/internal/review-feature-quality/SKILL.md`) | the slice's stage artifacts, taken as the expected set — completeness, internal consistency, traceability, dependency and premise ownership, acceptance honesty |
-| 3 | Implementation segment | `review-feature-quality` § Segment B (`.specify/skills/internal/review-feature-quality/SKILL.md`) | this slice's implementation as the range `base..head`, judged against `requirements.md` and `tasks.md` for correctness, scope and regression |
+| 2 | Artifact segment | `review-feature-quality` § Segment A (`.specify/skills/internal/review-feature-quality/SKILL.md`) | see `shared/workflow/acceptance-hardening.md` § Review Composition |
+| 3 | Implementation segment | `review-feature-quality` § Segment B (`.specify/skills/internal/review-feature-quality/SKILL.md`) | see `shared/workflow/acceptance-hardening.md` § Review Composition |
 | 4 | Code segment | `code-review` (`.specify/skills/internal/code-review/SKILL.md`) | verifiable defects in this feature slice's committed code delta |
 
 A process-segment abort suppresses none of the other three: the four judgment objects are independent, the abort is recorded as `not-evaluated` with its reason, and the command itself authors the minimal process report (carrying the code-segment subsection and the abort reason) so the verifiable carrier stays the single `review.md`.

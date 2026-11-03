@@ -542,8 +542,20 @@ to each run's taste.
 
 The coverage line is written `checked / expected`, and its product is a **per-feature fact, not a constant**: for a
 feature whose plan declares the standard spec set the union is that set, and for a slice whose stage rules add or
-drop a member it is not. The finding form (severity, artifact path, and the `line` rule with its one stated-reason
+drop a member it is not. The seven-member set is the product **when the plan declares nothing further**; a plan
+that declares additional artifacts extends the set, and the run MUST print the size it used — one number, never
+two readings of the same rule. The finding form (severity, artifact path, and the `line` rule with its one stated-reason
 escape) belongs to the segment's method, not here.
+
+### Records and rotation
+
+A composed run writes two records: `review.md` (the four segments plus ARC) and `code-review.md` (the code
+segment). When a record already exists, the run archives it **inside the same directory** as
+`<record>-<slice>.md` — the slice id of the run, e.g. `review-081c.md` — and then writes the new record. The
+timestamped `<record>-<YYYYMMDDTHHMMSSZ>.md` (UTC, second resolution) form is the fallback when no slice id
+exists; two runs inside one second either wait for the next second or exit `2`, an existing archive path is
+never overwritten, and a first run records `none`. Both records follow the same rule, and the run records the
+archive path it used.
 
 ### The Acceptance Reality Check is a check, not a fifth segment
 
@@ -559,6 +571,10 @@ and it leaves the claimed status **unchanged** — `Implemented` stays `Implemen
 `Ready for Review`, because a refusal is not a downgrade and this feature does not admit one. A user waiver of the
 transition's conditions does not lift ARC's zero-`pass` refusal; the waiver is recorded as residual risk in
 `review.md` and the item still fires.
+
+The comparison verdict pairs the two alphabets explicitly: `agree` when the checker's verdict is `block` and
+the claim is already `Blocked`/`Planned` (or when `accept` agrees with the claim); `refused` when the verdict is
+`block` and the claim is `Implemented`/`Ready for Review`, or when `F-ACCEPTANCE` fires.
 
 ARC is **not a segment** and is **not delegated**: it runs one deterministic program and reports that program's
 verdict, so there is no judgement for a skill to own and no fifth entry in the order above. It is not a model

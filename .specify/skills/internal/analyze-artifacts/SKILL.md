@@ -22,6 +22,16 @@ Canonical extraction source: `templates/commands/analyze.md` § Execution Steps 
 Operating Principles, and the do-not-flag list. The command template keeps entry +
 delegation only.
 
+## Rounds
+
+- **Round 1** adjudicates the full severity set (`CRITICAL`/`HIGH`/`MEDIUM`/`LOW`).
+- **Round 2** (a rerun after fixes) re-adjudicates the round-1 findings **and** the full severity set,
+  or declares itself **C/H-only** in the report. A C/H-only round 2 MUST enumerate every open
+  `MEDIUM`/`LOW` round-1 finding as a **residue row** in the findings JSONL — `status` plus a
+  disposition (`fixed` / `deferred` / `rejected`, with the reason) — and a round-2 pass without that
+  residue list is incomplete: it MUST NOT be read as closing the gate. Prose residue in a notes file
+  is not a gate input.
+
 ## Input Contract
 
 - **Prerequisite**: `/speckit.tasks` has produced a complete `tasks.md`. Abort with a

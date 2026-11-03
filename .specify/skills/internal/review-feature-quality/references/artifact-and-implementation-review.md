@@ -78,13 +78,16 @@ expected set. That reading is wrong by construction, not by judgement.
 
 ### A.4 Severity assignment
 
-- `P0` — a reader acting on the artifacts would be misled, or the slice's acceptance claim is false: a
-  missing required artifact, a `pass` without its measurement, a red-first claim with no red run, a
-  broken traceability link whose far end is the acceptance evidence.
-- `P1` — a defect every later slice pays for: the same fact stated twice, a row that names no owner, a
-  premise copied instead of referenced.
-- `P2` — a local quality defect with no downstream propagation: a stale section heading, an unfilled
-  optional-of-format field that changes no reading.
+The `P0`/`P1`/`P2` meanings are owned once, by the report template's severity table; this segment
+applies them, it does not define them. The grading procedure is the only thing stated here:
+
+1. read the owner's table;
+2. grade the finding by its consequence — for an artifact finding, the consequence for a reader acting
+   on the artifacts; for an implementation finding, the consequence for the slice's correctness, scope
+   or regression;
+3. when two levels could apply, take the higher one and write the reason in the finding.
+
+No second table, no paraphrase of the owner's level meanings.
 
 ### A.5 Finding field set
 

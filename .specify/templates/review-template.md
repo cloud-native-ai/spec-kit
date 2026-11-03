@@ -77,7 +77,7 @@ Reconstruct what actually happened during this feature's SDD lifecycle. Capture 
 | Head commit | [HEAD_SHA] | the run-start `HEAD`, fixed for the run even if commits land later |
 | Base source | [BASE_SOURCE] | the resolution tier the code segment reported |
 | Renderer mode | [RENDERER_MODE] | the code record's header marker (`renderer: text` or `renderer: delta`) |
-| Changed / judged / skipped / gap files | [CHANGED_COUNT] / [JUDGED_COUNT] / [SKIPPED_COUNT] / [GAP_COUNT] | copied field by field from the coverage receipt block; never recomputed, re-aggregated, or read off the record's prose |
+| Changed / judged / skipped / gap files | [CHANGED_COUNT] / [JUDGED_COUNT] / [SKIPPED_COUNT] / [GAP_COUNT] | copied field by field from the record's coverage receipt block; a missing receipt block is an input error, never a prose-filled count, and the values are never recomputed or re-aggregated |
 | Segment verdict | [SEGMENT_VERDICT] | one of the four closed values the `code-review` skill owns (`pass`, `blocked`, `not-applicable`, `not-evaluated`) |
 | Gate verdict | [GATE_VERDICT] | the merge-gate verdict source; when it refuses, the named literal `blocking-unresolved` |
 | Reason, when one applies | [SEGMENT_REASON] | mandatory for `not-applicable` (a basis) and for `not-evaluated` (a reason); `none` otherwise |
@@ -89,7 +89,7 @@ This subsection carries the verdict and the pointers only: no opinion body, no p
 
 ### 2.2 Artifact Review Segment
 
-> Verdicts and pointers only: this slot carries no opinion body and no per-item count. The dimension set, the
+> Verdicts and finding rows only: no narrative opinion body and no severity roll-up (the roll-up lives in § 2's summary); the findings table below is the required per-finding record. The dimension set, the
 > finding form and the denominator's consequence are owned by
 > `.specify/skills/internal/review-feature-quality/SKILL.md` § Segment A — Artifact Review, which reaches the
 > derivation rule at `shared/workflow/acceptance-hardening.md` § Review Composition. This slot copies neither
@@ -112,7 +112,7 @@ it is never dropped from the denominator.
 
 ### 2.3 Implementation Review Segment
 
-> Verdicts and pointers only, on the same terms as the artifact slot: no opinion body, no per-item count. The
+> Verdicts and finding rows only, on the same terms as the artifact slot: no narrative opinion body and no severity roll-up; the findings table below is the required per-finding record. The
 > judgment object, the three judgments and the smoke triple are owned by
 > `.specify/skills/internal/review-feature-quality/SKILL.md` § Segment B — Implementation Review; this slot copies
 > no dimension list and no severity definition.
@@ -285,7 +285,7 @@ Please share the contents of this document with the spec-kit framework developer
 | [IMPL_SCOPE_VERDICT] | The implementation segment's scope-and-regression reading, as its own conclusion |
 | [ARC_CLAIMED_STATUS] | The status the bound feature detail claims, copied and never written back |
 | [ARC_PASS] / [ARC_BLOCKED] / [ARC_DEFERRED] / [ARC_PARTIAL] / [ARC_FAIL] / [ARC_UNKNOWN] / [ARC_TOTAL] | The seven keys of the checker's `final_path` record, copied verbatim and in full — a three-count summary is not this record |
-| [ARC_VERDICT] | `agree` when the claimed status survives the copied record, `refused` when it does not |
+| [ARC_VERDICT] | `agree` when the checker's verdict is `block` and the claim is already `Blocked`/`Planned`, or when `accept` agrees with the claim; `refused` when the verdict is `block` and the claim is `Implemented`/`Ready for Review`, or when `F-ACCEPTANCE` fires |
 | [ARC_FAILED_CONDITION] | On refusal, the condition that failed — named, not merely that the transition was refused |
 | [ARC_FIXED_ITEM] | On refusal, `F-ACCEPTANCE` at `P0` spelled exactly; `none` otherwise |
 
