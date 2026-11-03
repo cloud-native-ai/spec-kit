@@ -16,7 +16,7 @@ classification: internal
 
 - **脚本（确定性）**：`diff` 渲染、`review` 逐文件流程、`note` 意见落盘、`report` 汇总与合入门禁判定、`base` 基准解析、`triage` 适用性判定、`start` 记录创建与轮转、`receipt` 覆盖率回执与段裁决 — 全部封装在 `${SKILL_HOME}/scripts/git-delta-review.sh`。
 - **Reviewer（判断性）**：按 P0–P6 维度读代码、写意见、做合入决策 — 方法论见 [`${SKILL_HOME}/references/review-workflow.md`](./references/review-workflow.md)。
-- **与 `review-sdd-process` 的关系（不同判定对象，由命令组合）**：本技能判定一次**已提交代码 delta** 的可核验缺陷；`review-sdd-process` 判定产出该特性的 **SDD 过程**。`/speckit.review` 按**固定顺序**组合两者——过程段先、代码段后——两段各自保留自己的严重度词汇，既不互相折算，也不互相冒充；本技能不因组合而改变自己的判定对象、方法论或记录形态。
+- **与 `review-sdd-process` 的关系（不同判定对象，由命令组合）**：本技能判定一次**已提交代码 delta** 的可核验缺陷；`review-sdd-process` 判定产出该特性的 **SDD 过程**。`/speckit.review` 按**固定顺序**组合四个段——过程段 → 产物段 → 实现段 → **代码段**——本技能就是其中的**第四段**，位置由组合内容的 owner `shared/workflow/acceptance-hardening.md` § Review Composition 定义，本节只声明自己的位次与判定对象。各段各自保留自己的严重度词汇，既不互相折算，也不互相冒充：本技能的六级词汇（由 § Workflow 的 `### Phase 3 — 反馈与迭代` 定义，本节不复述）不因组合而改名、不参与任何映射表、不折算为别家级别；本技能也不因组合而改变自己的判定对象、方法论或记录形态。
 
 ## Workflow
 
@@ -108,13 +108,13 @@ classification: internal
 
 ### 本技能自己的收尾记录（嵌套执行时的单元普查）
 
-`/speckit.review` 组合运行时，一次运行的单元普查为**三个单元**：命令单元 `/speckit.review`、被委派的过程技能单元 `skill:review-sdd-process`、被委派的代码技能单元 `skill:code-review`。三者共享同一个 run id、各自 `unit_id` 不同，这正是反馈引擎既有的 `(unit_id, run_id)` 键：没有任何一个单元去重、合并或截断另一个，因此三条记录并存是设计结果，不是重复。
+`/speckit.review` 组合运行时，一次运行的单元普查为**四个单元**：命令单元 `/speckit.review`、被委派的过程技能单元 `skill:review-sdd-process`、被委派的产物／实现段载体技能单元 `skill:review-feature-quality`、被委派的代码技能单元 `skill:code-review`。四者共享同一个 run id、各自 `unit_id` 不同，这正是反馈引擎既有的 `(unit_id, run_id)` 键：没有任何一个单元去重、合并或截断另一个，因此四条记录并存是设计结果，不是重复。普查数量随「可运行时抵达的段载体」走，而不是反过来把某个载体折进邻居以维持旧计数；某段记为 `not-applicable` 或 `not-evaluated` 时它照样完成自己的收尾记录——非结论是关于该段的结论，不是少了一个单元。
 
 本技能的义务说全：本技能在 `## Wrap-up` 里以 `skill:code-review` 作为自己的单元身份、以本次运行的 shared run id 完成**自己的收尾记录**；命令侧 MUST NOT 抑制本技能的收尾，MUST NOT 代写本技能运行判定，也 MUST NOT 事后补记；本技能同样不替另一个单元记录，不对另一个单元的条目做修改。
 
 ## Expression face protection（表达面保护，以及回执与覆盖率的区分）
 
-表达类交付物的评审面仍按声明的读者基准判定；该面及其判据由表达类评审面的 owner 声明（本技能不复述、也不另开一条 wiring 引用）。代码段是**附加段**（additional segment）：它回答的是"这段已提交的代码 delta 里有没有可验证的缺陷"，判的是另一个对象。本特性没有代码 delta 时，代码段按 `triage` 记为 `not-applicable` 并写明依据——它不替代、也不短路读者基准判定，读者的过程评审结论照旧成立。
+表达类交付物的评审面仍按声明的读者基准判定；该面及其判据由表达类评审面的 owner 声明（本技能不复述、也不另开一条 wiring 引用）。代码段是**附加段**（additional segment），位次是固定顺序中的**第四段**——过程段 → 产物段 → 实现段 → 代码段，之后是 Acceptance Reality Check；该顺序的 owner 是 `shared/workflow/acceptance-hardening.md` § Review Composition，本技能只声明自己位次第 4。它回答的是"这段已提交的代码 delta 里有没有可验证的缺陷"，判的是另一个对象。本特性没有代码 delta 时，代码段按 `triage` 记为 `not-applicable` 并写明依据——它不替代、也不短路读者基准判定，也不替代产物段或实现段，读者的过程评审结论照旧成立。
 
 覆盖率回执的计数对象必须说清楚，因为两个不同的问题共用了"coverage"这个词：
 

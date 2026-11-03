@@ -19,9 +19,9 @@ wins and the carrier is stale. The four carriers are also the exemption list of 
 repeat a column set and **zero** domain literals.
 
 **Scope of this revision**: § Feature Status · § Verification Vocabulary · § Gates · § Closure Verdict ·
-§ Runtime Stack & Dependency Ownership · § Execution Premises · § Inherited Blockers. Sections belonging to later
-slices are listed in § Extension Points, together with the owner their obligations currently have. Nothing here is
-inferred from a slice that has not landed.
+§ Runtime Stack & Dependency Ownership · § Execution Premises · § Inherited Blockers · § Review Composition.
+Sections belonging to later slices are listed in § Extension Points, together with the owner their obligations
+currently have. Nothing here is inferred from a slice that has not landed.
 
 **Machine-readable form**: `scripts/python/closure-acceptance-check.py` is the only program that turns these
 schemas into a verdict. Its calling surface is fixed by a contract; its verdict is **not** re-derivable by a
@@ -446,13 +446,155 @@ them. A later-slice `Carrier slice` is not in that class — that is `inherited-
 Boundary (A13): dependency-inherited records only. § Gates § The A13 boundary owns the split between this table,
 the plan's premises and `tasks.md` § Environment Prerequisites; this section does not restate it.
 
+## Review Composition
+
+What `/speckit.review` runs, in what order, and what each part is allowed to answer. This section owns the
+composition's **content** — the four segments and their fixed order, each segment's judgment object and boundary
+sentence, the expected-artifact denominator and its derivation rule, the Acceptance Reality Check's clause and the
+feedback unit census of one composed run. It owns no segment's **method**: the dimension sets and the report slots
+belong to the skills, and the two segments a skill carries are named in `skills/internal/review-feature-quality/SKILL.md`
+§ Segment A / § Segment B.
+
+**The two layers, and which one this is.** A **content** owner is the one place a fact about the composition is
+written. A **declaration** owner repeats only the shape a caller must find where it is editing: the four segment
+headings and the five per-segment field names (`Skill`, `Judgment object`, `Severity vocabulary`, `Inputs`,
+`Outputs`) are declared in `templates/commands/review.md` § Composition **by anchor** to this section. A declaration
+made of headings and field names is not a second definition; a copy of this section's segment prose, order rationale
+or boundary sentences at that anchor would be, and is a defect. Every other surface — the report template, the two
+sibling skills, the docs page — reaches this content by path plus `§ Review Composition`.
+
+Obligations: FR-013, FR-014, FR-015 and FR-016 of the declaring feature own the requirements side; RC-01…RC-19 of
+its `contracts/review-composition.contract.md` own the clause-level form; SV-05 owns the status-vocabulary
+boundary. This section states what those obligations mean together and cites nothing's wording on their behalf.
+
+### Four segments, one fixed order, and one check that is not a segment
+
+| Order | Segment | Judged by | Answers the question |
+|-------|---------|-----------|----------------------|
+| 1 | process | `review-sdd-process` | was this slice produced by a sound SDD process? |
+| 2 | artifact | `review-feature-quality` § Segment A | does the slice's artifact set meet what its stage requires? |
+| 3 | implementation | `review-feature-quality` § Segment B | does this slice's delta do what `requirements.md` and `tasks.md` say? |
+| 4 | code | `code-review` | does the committed code delta contain verifiable defects? |
+| — | Acceptance Reality Check | the closure checker, through § Closure Verdict | does the feature's claimed status survive its own counts? |
+
+**The order is content, not invocation.** `$ARGUMENTS` guides review focus; it never selects, reorders or skips a
+segment. No execution class and no expression class exempts the process segment, and neither does an absent code
+delta, an empty base range or an earlier segment's outcome: the process segment runs on every invocation. Because the
+order is a property of the composition, no delegated skill may reverse or skip another — and the Acceptance Reality
+Check is last for the same reason, since its input is the state the four segments leave behind.
+
+### Each segment answers its own question, and only that
+
+**Process** judges the SDD process that produced the slice — process and tooling quality: friction, ambiguity,
+cargo-cult boilerplate, drift risk and process gaps. It does not judge the artifacts' content and it does not judge
+the code, and it is **not** a substitute for the artifact or implementation segments: a clean process review says
+nothing about whether the artifacts are complete or whether the implementation delivered.
+
+**Artifact** judges the slice's **stage artifacts** — the set the slice's stage rules and `plan.md` § Project
+Structure require (see the derivation rule below) — for completeness, internal consistency, traceability
+(FR → task → SC → evidence), dependency and premise ownership, and acceptance honesty. Its object is the artifacts,
+not the code that produced them and not the process that produced them.
+
+**Implementation** judges **this slice's `base..head` delta** against `requirements.md` and `tasks.md` for
+correctness, scope and regression, and it runs or verifies the feature's smoke test, recording the command, the exit
+code and the evidence path. `base..head` resolution has one route, the code skill's
+`skills/internal/code-review/scripts/git-delta-review.sh`; this segment implements no second base resolution. The
+`final_path` record appears here only as a **quotation** — the hard condition stays the implement gate's.
+
+**Code** judges the committed code delta for verifiable defects under its own method and its own six-level family.
+
+**Neither answers the other, and the code segment answers neither.** An artifact set can be complete while the
+implementation is wrong, an implementation can satisfy every requirement while the artifacts contradict each other,
+and a code delta can be clean while a requirement went unimplemented — so the artifact and implementation segments
+MUST NOT substitute for one another, and neither MUST be answered by the code segment. Each of the four is written
+up, ranked and read on its own conclusion.
+
+The artifact segment reads the three plan/tasks tables' **ownership** as evidence — which artifact owns a fact and
+whether the pointer is there — but not their rules: the same-fact rule's one statement is § Gates § The A13 boundary,
+and this section does not restate it.
+
+### Never merged, never converted, never scored
+
+The four conclusions are never merged. Not into one severity system, not into one score, not through a mapping
+table, not through a numeric conversion, and not through a "highest severity wins" rule: no mapping table between
+the `P0`/`P1`/`P2` family and the six-level code family may exist anywhere in the tree, and the run stores no
+combined value. Each family keeps its own owner — `P0`/`P1`/`P2` by `skills/internal/review-sdd-process/SKILL.md`,
+the six-level family by `skills/internal/code-review/SKILL.md` — and neither skill redefines, relabels or reweights a
+level of the other's family. Two vocabularies that can be converted into one another are one vocabulary, and the
+second one then no longer means what its owner says.
+
+### The artifact denominator is the expected set
+
+The coverage denominator is derived, and the derivation is the whole rule:
+
+> The **expected set** is the union of what the slice's stage rules require it to have produced for the stage it is
+> closing, and what that feature's `plan.md` **§ Project Structure** declares it owns. The denominator is that union —
+> never "the artifacts that happen to exist".
+
+A member of the expected set that is absent from disk is **a finding** and **counts as uncovered**. Both, not
+either: a missing artifact reported but excluded from the denominator under-reports the gap, and one counted but not
+named tells a reader a number moved without telling them what is missing.
+
+"Not present" therefore can never render as 100 % coverage, and that is the entire point of the rule. The competing
+reading fails in one direction only — a missing artifact drops out of the denominator, so an empty directory reads as
+full coverage and the review reports nothing — which is why the denominator's source is fixed here rather than left
+to each run's taste.
+
+The coverage line is written `checked / expected`, and its product is a **per-feature fact, not a constant**: for a
+feature whose plan declares the standard spec set the union is that set, and for a slice whose stage rules add or
+drop a member it is not. The finding form (severity, artifact path, and the `line` rule with its one stated-reason
+escape) belongs to the segment's method, not here.
+
+### The Acceptance Reality Check is a check, not a fifth segment
+
+The Acceptance Reality Check (ARC) reads the closure checker's `final_path` record for the feature and copies it
+**verbatim and in full** into the report's carrier slot `### 2.4`. The record's key set, its closure and its bucket
+meanings are owned by § Closure Verdict § `final_path` counts, computed once; this section does not restate them, and
+neither does ARC print a narrower summary of them — a partial copy is a re-derivation with extra steps.
+
+ARC then compares the copied record against the feature's **claimed** status. When the claim is `Implemented` or
+`Ready for Review` and the record's `pass` bucket is zero, ARC emits the fixed item `F-ACCEPTANCE` at `P0` and the
+transition is **refused**. The refusal names the condition that failed, not merely that the transition was refused,
+and it leaves the claimed status **unchanged** — `Implemented` stays `Implemented` and `Ready for Review` stays
+`Ready for Review`, because a refusal is not a downgrade and this feature does not admit one. A user waiver of the
+transition's conditions does not lift ARC's zero-`pass` refusal; the waiver is recorded as residual risk in
+`review.md` and the item still fires.
+
+ARC is **not a segment** and is **not delegated**: it runs one deterministic program and reports that program's
+verdict, so there is no judgement for a skill to own and no fifth entry in the order above. It is not a model
+judgement, it is not "ARC reads `verification.md` and counts", and it never recomputes a bucket — the three
+call sites share one verdict (§ Closure Verdict § When the judgement runs), and a second counter at the review site
+would be a second source of truth for the same counts.
+
+The literal `F-ACCEPTANCE` is owned by the declaring feature's `## Shared Strings`, so its tests can pin the spelling
+verbatim; that is a per-spec declaration for matching, not a second schema, exactly as with the seven reason
+templates in § Closure Verdict.
+
+### The feedback unit census of one composed run
+
+One composed run records **four** units, not three and not two: the command (`/speckit.review`), the delegated
+process skill (`skill:review-sdd-process`), the carrier skill of the two middle segments
+(`skill:review-feature-quality`) and the delegated code skill (`skill:code-review`). All four share the run's
+`run_id` and differ in `unit_id` — the key the feedback engine already uses — so none dedups, merges or truncates
+another, and each completes its **own** closing record.
+
+The count is a consequence, not a preference: every runtime-reachable segment carrier is a unit, so adding a carrier
+adds a unit, and the count moves with the carrier rather than the carrier being folded into a neighbour to keep the
+number still. Three rules follow:
+
+- the command MUST NOT suppress any skill's wrap-up, MUST NOT write a skill's run determination on its behalf, and
+  MUST NOT back-fill one after the fact;
+- a segment recorded `not-applicable` or `not-evaluated` still closes its own record — a non-conclusion is a
+  conclusion about that segment, not a missing unit;
+- the census is stated on the surfaces that run it (the command's feedback boundary and each skill's own
+  closing-record section) and counted by a guard, so a quiet reversion to three is a failing assertion rather than a
+  reading nobody re-checks.
+
 ## Extension Points
 
 Sections later slices add to **this** file. Each line names the owner its obligations have **today**, so that
 nothing is undefined while the section is absent.
 
-- `## Review Composition` (**081c**) — the process → artifact → implementation → code segments plus the
-  Acceptance Reality Check, the expected-artifact denominator, and their boundaries.
 - Additions to § Verification Vocabulary (**081d**) — the reconciliation of the four `blocked` literals (owner:
   the declaring specification's **FR-019**) and the closed status vocabulary of
   `templates/feature-index-template.md`, which today carries only a `Status` column header, so its obligation is
