@@ -579,6 +579,10 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "reason": "2026-10-30 Feature 078 updates the run-skills routing-family pointer",
         "markers": ("coaching-skills",),
     },
+    "skills/internal/manage-features/SKILL.md": {
+        "reason": "2026-11-03 Feature 081 adds `Blocked` to the status vocabulary and points at the owner (FR-018)",
+        "markers": ("Blocked", "acceptance-hardening.md"),
+    },
 }
 
 # 2026-10-30 Feature 077 stage-wiring amendment. 069a's manifest is that slice's

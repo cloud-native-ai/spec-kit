@@ -17,6 +17,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
 - **两分支**：解析为**表达类**时，本阶段按门禁 owner § 阶段算子表执行本阶段登记的行；其余情形（含未声明按默认）保持既有门禁集**逐字不变**——零新增阻断项、零新增必填章节。
 - **降级可见**：读取报 `owner-unavailable`（退出码 2：引擎缺席、owner 不可解析或输入非法）时，原样显示该标签并保持既有门禁集，不中断本阶段、不转绿、不切换门禁集。
 - **作者输入错误即停**：解析以退出码 1 报作者输入错误（取值越界或声明行形态不合规）时，本阶段停下，以阶段协议异常行 `ANOMALY: <一句话事实>` 作为最后一行输出并点名文件与行号；MUST NOT 落入上一条「既有门禁集逐字不变」那一支继续执行——那一支只适用于退出码 0 的未声明与降级路径。
+- **Closure verdict before the flip**：`python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` MUST run before landing the status; verdict/reason set/counts are owned by `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict. On `block`, land `Blocked` (record the reasons in `REQUIREMENTS_DIR/verification.md`) and MUST NOT write `Implemented`; this command calls that judgement and restates no condition.
 
 ## Glossary
 
@@ -40,8 +41,6 @@ The executable core of this command is the **`implement-feature`** skill (`.spec
 ## Feature Integration
 
 Apply [Feature Integration Protocol](.specify/shared/workflow/feature-integration.md). This command's transition: `Planned → Implemented` (requires gate pass).
-
-- **Closure verdict before the flip**: run `python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the repository root before landing the status. The verdict, the closed reason set and the `final_path` counts are owned by `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict — this command calls that judgement and never restates a condition. On `block`, land `Blocked` (recording the emitted reasons in `REQUIREMENTS_DIR/verification.md`) and MUST NOT write `Implemented`: a `block` is the honest outcome of a run whose `final`-path criterion did not pass, not a defect of this command.
 
 ## Wrap-up
 
