@@ -1,0 +1,43 @@
+# environment probes for slice 081d — each command's real output, run 2026-11-03
+
+$ python3 --version
+Python 3.9.6
+$ .venv/bin/python --version
+Python 3.14.6
+$ .venv/bin/python -m pytest --version
+pytest 9.2.0
+$ git --version
+git version 2.54.0 (Apple Git-157)
+
+# closure checker: the flag is on the stable surface, the mode is not (FR-020 / C-04 / C-10)
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/positive --audit-existing
+closure-acceptance-check: input error: --audit-existing is not implemented in this slice: FR-020's read-only audit is 081d work (plan.md § Slice Boundary). Refusing to emit a per-feature verdict from an audit invocation rather than report the opposite of what the mode must do.
+EXIT=2
+
+# mirror engines: zero pre-change drift (EP-004)
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+EXIT=0
+
+# coverage accountant: the lane is NOT green, and that reading is the finding (DoD-8)
+$ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/081-acceptance-hardening
+UNCOVERED-FR: FR-025
+FR uncovered: 23
+
+companion (must be non-empty on a green run): claimed clauses 0, scanned files 248, clause universe 1517, FR universe 25
+  [clause-uncovered] fail (513) — 513 uncovered, 18 beyond the frozen baseline
+  [fr-uncovered] fail (23) — 2 of 25 FRs cited from citation groups
+  [clause-unparsable] warn (103) — 103 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (18) — baseline holds 495 names; 495 uncovered items are baseline-internal and do not block
+41 error(s), 0 warning(s)
+status: uncovered
+EXIT=0
