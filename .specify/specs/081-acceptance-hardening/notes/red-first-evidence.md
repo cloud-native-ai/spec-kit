@@ -65,13 +65,76 @@ ABSENT  tests/integration/test_acceptance_smoke.py
 `test_requirements_checker.py` is the one **extension** module (five labels exist today, the sixth `path-marker`
 label does not), so its red run is a new failing case inside an existing file rather than an absent file.
 
-## 2. Slice-close set-level comparison (GATE-7 / DoD-6) — **pending (written by T022)**
+## 2. Slice-close set-level comparison (GATE-7 / DoD-6) — **measured 2026-11-03; the comparison FAILED (T022 not closed)**
 
-Not re-derived here: the baseline side is the plan-stage capture, recorded by pointer in
-`notes/pre-change-measurements.md`. T022 re-reads the two runner pins, runs the full suite once with
-`--names-out`, and lands both set differences plus the two pin readings in this section:
+Owner of the comparison rule: `tasks.md` DoD-6 / GATE-7 — the comparison unit is the failing test **id set**,
+never a count and never a byte diff. The baseline side is the plan-stage capture and was **not** re-collected
+(FR-023); only the head side was measured here.
 
-- `head 失败集 − 基线失败集`: pending
-- `基线失败集 − head 失败集`: pending
-- pin re-read (`pytest --version` / `git --version`) vs `test-evidence/plan-runner-pins.txt`: pending
-- exit status of the full-suite run: pending
+### 2.1 Pin re-read (the comparison's validity precondition, FR-023)
+
+```text
+$ .venv/bin/python -m pytest --version   →  pytest 9.2.0
+$ .venv/bin/python --version            →  Python 3.14.6
+$ git --version                         →  git version 2.54.0 (Apple Git-157)
+```
+
+Both pins match `test-evidence/plan-runner-pins.txt` line for line, so this comparison is **valid** (not the
+exit-2 input-error case): the difference below is a real difference about the tree, not a different runner.
+
+### 2.2 The head run
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q
+43 failed, 7018 passed, 7 skipped, 4 warnings in 602.58s (0:10:02)
+# failed-name list written: .specify/.tmp/081a-head-failed.txt (      43 entries)
+EXIT=1
+```
+
+- exit status of the full-suite run: **1** (failures present — expected; the baseline run also exited 1)
+- head failed id set: 43 entries, `.specify/.tmp/081a-head-failed.txt` (temporary, `FR-025`, not committed)
+- baseline side, by pointer: 39 entries, `baseline-failed.txt` (`test-evidence/plan-baseline-run.txt` carries
+  the `39 failed, 6970 passed, 7 skipped` console transcript)
+
+### 2.3 The two set differences
+
+```text
+$ comm -23 <(sort .specify/.tmp/081a-head-failed.txt) <(sort baseline-failed.txt)   # head − baseline
+tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured
+tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[implement]
+tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[tasks]
+
+$ comm -13 <(sort .specify/.tmp/081a-head-failed.txt) <(sort baseline-failed.txt)   # baseline − head
+(empty)
+```
+
+- `head 失败集 − 基线失败集`: **4 ids — NOT empty.** The DoD-6 / GATE-7 invariant (`head − baseline` empty)
+  does **not** hold on this tree, so T022's own criterion is unmet and the row stays open.
+- `基线失败集 − head 失败集`: **empty** — this slice fixed none of the 39 pre-existing failures (nothing to
+  enumerate row by row; the "fixed items" list is legitimately zero-length, not silently dropped).
+
+### 2.4 What the four ids are (measured, not inferred)
+
+All four are **frozen-pin guards** — no behavioural regression; each fires because an 081a edit moved a byte
+that another feature froze on purpose:
+
+| New id | Failing assertion | What moved it |
+|---|---|---|
+| `test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes` | `drifted: ['skills/internal/manage-features/SKILL.md']` — the C-5 non-wiring complement is byte-frozen | **T024** (this part): `Blocked` added to that skill's status vocabulary |
+| `test_stage_class_wiring.py::…[tasks]` | `tasks: stripping the wiring card no longer restores the frozen baseline` | **T014** (part 3): the upgraded GATE-4 sentence in `templates/commands/tasks.md` |
+| `test_stage_class_wiring.py::…[implement]` | the same assertion for `implement` | **T016** (part 3): the checker invocation + `Blocked` landing rule in `templates/commands/implement.md` |
+| `test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured` | `tasks: stripping the wiring card no longer restores the frozen baseline` (it re-runs the same strip leg) | the same two templates |
+
+Three of the four predate this part (they were already red on `da5e4480`, the part-3 commit); one is T024's.
+Re-measuring these pins is a **decision that belongs to the pins' owning features** — `test_expression_compatibility`
+C-5 says in its own failure text that "the slice may only touch W1-W4 and the feedback-step pointer", and
+`test_stage_class_wiring`'s baselines are 077's frozen bytes. That authority is not recorded in any 081a row, so
+this note **records** the difference and does not move a pin, an assertion or the baseline to make it disappear
+(FR-023's "zeros new failures" is a finding to be earned, never a number to be arranged).
+
+**Consequence for the slice**: with `head − baseline` non-empty, T022 cannot close, therefore `tasks.md` is not
+zero-open, therefore the `Planned → Blocked` transition licensed by `shared/workflow/acceptance-hardening.md`
+§ Feature Status ("the tasks are closed and at least one `final`-path criterion is not `pass`") is **not yet
+licensed**. T020 therefore did not run in this part; the feature stays `Planned` until the four pins are
+dispositioned by their owners and T022 is re-run.
