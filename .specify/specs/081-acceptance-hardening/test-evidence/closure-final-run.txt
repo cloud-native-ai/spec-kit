@@ -1,0 +1,1672 @@
+# test runner: .venv/bin/python -m pytest -q
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........F............................................................... [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................F............................................... [  9%]
+...................................sF................................... [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+.....................F.................................................. [ 16%]
+..........................ssss..s....................................... [ 17%]
+.......................F.FFFF................FF......................... [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................F............... [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+..........FFFFFFF....................................................... [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+......................................................F................. [ 49%]
+........................................................................ [ 50%]
+.....................................................................FF. [ 51%]
+FFF..................................................................... [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+...............................................................F........ [ 68%]
+F.......F............................................FF................. [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+............................................................F........... [ 74%]
+.........................................................F.............. [ 75%]
+.....F.................................................................. [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+...........s............................................................ [ 83%]
+...............FFFFF.................................................... [ 84%]
+.....................F.................................................. [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+...............                                                          [100%]
+=================================== FAILURES ===================================
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+_______ test_create_new_tools_find_returns_structured_not_found_payload ________
+
+    def test_create_new_tools_find_returns_structured_not_found_payload():
+        root = Path(__file__).resolve().parents[2]
+        script = root / ".specify" / "scripts" / "bash" / "create-new-tools.sh"
+        tool_name = "definitely-not-a-real-tool-7ac4f7b4"
+    
+>       result = subprocess.run(
+            [str(script), "--json", "--name", tool_name, "--action", "find"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+tests/contract/test_create_new_tools_find.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/create-new-tools.sh', '--json', '--name', 'definitely-not-a-real-tool-7ac4f7b4', '--action', 'find'],)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/create-new-tools.sh', '--json', '--name', 'definitely-not-a-real-tool-7ac4f7b4', '--action', 'find']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+_ TestCF13FeedbackPackageExclusion.test_package_zip_contains_no_evidence_paths _
+
+self = <contract.test_evidence_findings_schema.TestCF13FeedbackPackageExclusion object at 0x11602d310>
+artifacts = {'findings': {'schemaVersion': 1, 'kind': 'speckit.evidence-findings', 'target': 'project', 'runId': 'ev-20261103-0358...jm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/evidence0/ws/.specify/memory/evidence/ev-20261103-035856-project'), ...}
+
+    def test_package_zip_contains_no_evidence_paths(self, artifacts):
+        workspace = artifacts["workspace"]
+        feedback_utils = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+        subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "reindex",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        result = subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "package", "--all",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        assert result.returncode == 0, result.stderr
+        packages_dir = workspace / ".specify" / "memory" / "feedback" / "packages"
+        zips = sorted(packages_dir.glob("feedback-*.zip"))
+>       assert zips, "package produced no zip in the isolated workspace"
+E       AssertionError: package produced no zip in the isolated workspace
+E       assert []
+
+tests/contract/test_evidence_findings_schema.py:223: AssertionError
+____________ TestLLMCollection.test_endpoint_candidates_origin_only ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1160d3890>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_endpoint_candidates_origi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_endpoint_candidates_origi0/home')
+
+    def test_endpoint_candidates_origin_only(self, ws, fake_home):
+        # the whitelist is read from the HOST process environ, so the values
+        # must be planted on the impersonated host (the wrapper), not the
+        # engine's own env
+        result = run_via_host_wrapper(
+            collect_args(ws),
+            env_home=fake_home,
+            extra_env={"ANTHROPIC_BASE_URL": "https://user:pw@api.example.com/v1/path?k=1",
+                       "DASHSCOPE_API_URL": "https://dashscope.example.com/compatible/v1"},
+        )
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        endpoints = record["llm"]["endpoint_candidates"]
+>       assert isinstance(endpoints, dict), f"expected candidate mapping: {endpoints!r}"
+E       AssertionError: expected candidate mapping: 'not_evaluated'
+E       assert False
+E        +  where False = isinstance('not_evaluated', dict)
+
+tests/contract/test_exec_quant_engine.py:518: AssertionError
+____________ TestLLMCollection.test_qoder_adapter_reads_config_face ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x11613cd60>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_qoder_adapter_reads_confi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_qoder_adapter_reads_confi0/home')
+
+    def test_qoder_adapter_reads_config_face(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "gfmodel",
+                      "preferences": {"gfmodel": {"contextWindow": 1000000}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:544: AssertionError
+_____ TestLLMCollection.test_qoder_adapter_reads_per_model_effort_when_set _____
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x11613ce90>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_qoder_adapter_reads_per_m0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_qoder_adapter_reads_per_m0/home')
+
+    def test_qoder_adapter_reads_per_model_effort_when_set(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "qmodel_38max",
+                      "preferences": {"qmodel_38max": {
+                          "contextWindow": 1000000,
+                          "reasoning": {"enabled": True, "effort": "xhigh"}}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        llm = load_single_record(ws)["llm"]
+>       assert llm["reasoning_effort"] == {"value": "xhigh", "provenance": "measured"}
+E       AssertionError: assert 'not_evaluated' == {'value': 'xhigh', 'provenance': 'measured'}
+
+tests/contract/test_exec_quant_engine.py:565: AssertionError
+________ TestLLMCollection.test_missing_config_face_degrades_to_marker _________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x1160edb50>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_missing_config_face_degra0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_missing_config_face_degra0/home')
+
+    def test_missing_config_face_degrades_to_marker(self, ws, fake_home):
+        # fake HOME has no .qoder/ at all — the adapter finds nothing
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:572: AssertionError
+_______ TestAgentCollection.test_resolved_agent_fields_from_wrapper_host _______
+
+self = <contract.test_exec_quant_engine.TestAgentCollection object at 0x1160d3b10>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_resolved_agent_fields_fro0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_resolved_agent_fields_fro0/home')
+
+    def test_resolved_agent_fields_from_wrapper_host(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        agent = record["agent"]
+>       assert agent["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:585: AssertionError
+_______ TestSizeCap.test_oversized_record_is_field_truncated_and_capped ________
+
+self = <contract.test_exec_quant_engine.TestSizeCap object at 0x116198550>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_oversized_record_is_field0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_oversized_record_is_field0/home')
+
+    def test_oversized_record_is_field_truncated_and_capped(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
+                                      wrapper_args=("x" * 70000,))
+        assert result.returncode == 0, result.stderr
+        entry_files = record_files(ws)
+        assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+        line = entry_files[0].read_text(encoding="utf-8").splitlines()[0]
+        assert len(line.encode("utf-8")) <= 64 * 1024 + 1, "record must fit the cap"
+        record = json.loads(line)
+>       assert record["truncated"], "truncation must be annotated in the record"
+E       AssertionError: truncation must be annotated in the record
+E       assert []
+
+tests/contract/test_exec_quant_engine.py:836: AssertionError
+___ TestCredentialDefense.test_engine_masks_credential_shaped_config_values ____
+
+self = <contract.test_exec_quant_engine.TestCredentialDefense object at 0x116198690>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_engine_masks_credential_s0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_engine_masks_credential_s0/home')
+
+    def test_engine_masks_credential_shaped_config_values(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "sk-0123456789abcdef0123",
+                      "preferences": {"sk-0123456789abcdef0123": {
+                          "contextWindow": 1000000}}}}), encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        serialized = json.dumps(record)
+        assert "sk-0123456789abcdef0123" not in serialized, \
+            "credential-shaped value must be masked before write"
+>       assert "[masked-credential:" in serialized, "mask must be annotated in place"
+E       AssertionError: mask must be annotated in place
+E       assert '[masked-credential:' in '{"kind": "speckit.exec-quant", "schema_version": 2, "unit_id": "/speckit.plan", "unit_type": "command", "run_id": "sp...d", "satisfaction": "not_evaluated", "exit_code": "not_evaluated"}, "qualification": "not_evaluated", "truncated": []}'
+
+tests/contract/test_exec_quant_engine.py:866: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1853: AssertionError
+____________ test_c2_generator_injects_missing_sections_additively _____________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_c2_generator_injects_miss0')
+
+    @pytest.mark.contract
+    def test_c2_generator_injects_missing_sections_additively(tmp_path: Path):
+        (tmp_path / ".specify" / "templates").mkdir(parents=True)
+        (tmp_path / ".specify" / "templates" / "instructions-template.md").write_text(
+            "# Instructions\n\n"
+            "## Alpha\n\nalpha body\n\n"
+            "## Beta\n\nbeta body\n\n"
+            "## Gamma\n\ngamma body\n",
+            encoding="utf-8",
+        )
+        live = tmp_path / ".specify" / "instructions.md"
+        live.write_text(
+            "# Instructions\n\n## Alpha\n\nalpha body (customized)\n\n"
+            "## Project Custom\n\nkept section\n",
+            encoding="utf-8",
+        )
+        subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+        # refresh-tools.sh (invoked by the generator) resolves tools-utils.py from
+        # the project root — mirror a real installed project's layout.
+        specify_py = tmp_path / ".specify" / "scripts" / "python"
+        specify_py.mkdir(parents=True, exist_ok=True)
+        (specify_py / "tools-utils.py").symlink_to(
+            REPO_ROOT / "scripts" / "python" / "tools-utils.py")
+    
+        result = subprocess.run(
+            ["bash", str(GENERATOR)], cwd=tmp_path, capture_output=True, text=True
+        )
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_section_propagation.py:72: AssertionError
+__________________ test_over_budget_warns_and_ranks_sections ___________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_over_budget_warns_and_ran0')
+
+    @pytest.mark.contract
+    def test_over_budget_warns_and_ranks_sections(tmp_path: Path):
+        budget = _budget_bytes()
+        live = _make_project(tmp_path, live_body=_over_budget_body(budget))
+    
+        result = _run(tmp_path)
+        out = result.stdout + result.stderr
+        # Measured after the run: the reconcile may itself inject a template
+        # section, and the report describes the file as it now stands.
+        expected = len(live.read_text(encoding="utf-8").encode())
+    
+        # Advisory by design: this script runs inside `specify init` for every
+        # downstream project, so a non-zero exit would leave an over-budget project
+        # unable to initialize or refresh at all.
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:179: AssertionError
+____________________ test_table_is_emitted_under_budget_too ____________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_table_is_emitted_under_bu0')
+
+    @pytest.mark.contract
+    def test_table_is_emitted_under_budget_too(tmp_path: Path):
+        """Action 2 consumes the table as its observation snapshot on *every* refresh,
+        not only when the file is over budget — a table that appears only on the
+        over-budget path would leave the under-budget run measuring by eye again."""
+        budget = _budget_bytes()
+        live = _make_project(tmp_path, live_body=CLASSIFIED_LIVE, template_body=PLACEHOLDER_TEMPLATE)
+    
+>       out = _run_captured(tmp_path)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_instructions_size_budget.py:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_table_is_emitted_under_bu0')
+
+    def _run_captured(tmp_path: Path) -> str:
+        result = _run(tmp_path)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:142: AssertionError
+______ test_table_carries_the_six_columns_and_classifies_all_three_kinds _______
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_table_carries_the_six_col0')
+
+    @pytest.mark.contract
+    def test_table_carries_the_six_columns_and_classifies_all_three_kinds(tmp_path: Path):
+        """The three classifications Route R1/R2 branch on, from one fixture.
+    
+        Negative propositions here (``placeholder == no`` twice) are the reason the
+        Markdown-link row exists: a link is ``[``+``]`` too, and counting it as an
+        unfilled scaffold would silently drop a genuine R1 candidate behind the
+        filter. Both ``no`` rows are matched pairs against the ``yes`` row.
+        """
+        _make_project(tmp_path, live_body=CLASSIFIED_LIVE, template_body=PLACEHOLDER_TEMPLATE)
+    
+>       out = _run_captured(tmp_path)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_instructions_size_budget.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_table_carries_the_six_col0')
+
+    def _run_captured(tmp_path: Path) -> str:
+        result = _run(tmp_path)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:142: AssertionError
+________________ test_under_budget_reports_size_without_warning ________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_under_budget_reports_size0')
+
+    @pytest.mark.contract
+    def test_under_budget_reports_size_without_warning(tmp_path: Path):
+        budget = _budget_bytes()
+        # Carries every template section, so the reconcile injects nothing and the
+        # reported size is the size this test wrote.
+        live = _make_project(
+            tmp_path,
+            live_body="# Instructions\n\n## Alpha\n\nalpha body (customized)\n\n"
+            "## Beta\n\nbeta body\n\n## Project Custom\n\nkept section\n",
+        )
+    
+        result = _run(tmp_path)
+        out = result.stdout + result.stderr
+        expected = len(live.read_text(encoding="utf-8").encode())
+    
+        assert expected < budget, "fixture is not under budget"
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:289: AssertionError
+____________________ test_new_file_branch_reports_size_too _____________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_new_file_branch_reports_s0')
+
+    @pytest.mark.contract
+    def test_new_file_branch_reports_size_too(tmp_path: Path):
+        """A first-time bootstrap renders from the template and must also report."""
+        live = _make_project(tmp_path, live_body=None)
+        assert not live.exists()
+    
+        result = _run(tmp_path)
+        out = result.stdout + result.stderr
+    
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:308: AssertionError
+__________________________ test_report_is_idempotent ___________________________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_report_is_idempotent0')
+
+    @pytest.mark.contract
+    def test_report_is_idempotent(tmp_path: Path):
+        budget = _budget_bytes()
+        _make_project(tmp_path, live_body=_over_budget_body(budget))
+    
+        first = _run(tmp_path)
+        second = _run(tmp_path)
+    
+>       assert first.returncode == 0 and second.returncode == 0
+E       AssertionError: assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_instructions_size_budget.py:322: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+_________________ test_c9_section_propagates_and_is_idempotent _________________
+
+installed_project = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_c9_section_propagates_and0')
+
+    def test_c9_section_propagates_and_is_idempotent(installed_project: Path):
+        live = installed_project / ".specify" / "instructions.md"
+        assert HEADING not in read(live), "fixture must start without the section"
+    
+        result = run_generator(installed_project)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_proactive_trigger_section.py:289: AssertionError
+_________________ test_c10_all_agent_instruction_paths_created _________________
+
+installed_project = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_c10_all_agent_instruction0')
+
+    def test_c10_all_agent_instruction_paths_created(installed_project: Path):
+        result = run_generator(installed_project)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_proactive_trigger_section.py:317: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+____________ test_c12_check_instructions_passes_for_every_tool_key _____________
+
+installed_project = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_c12_check_instructions_pa0')
+
+    def test_c12_check_instructions_passes_for_every_tool_key(installed_project: Path):
+        result = run_generator(installed_project)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/contract/test_proactive_trigger_section.py:377: AssertionError
+___________________ test_c12_every_declared_value_is_created ___________________
+
+installed_project = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_c12_every_declared_value_0')
+
+    def test_c12_every_declared_value_is_created(installed_project: Path):
+        run_generator(installed_project)
+        missing = [
+            rel for rel in set(_INSTRUCTIONS_FILE_MAP.values())
+            if not (installed_project / rel).exists()
+        ]
+>       assert not missing, f"declared but never generated: {missing}"
+E       AssertionError: declared but never generated: ['HERMES.md', 'AGENTS.md', '.opencode/instructions.md', 'CLAUDE.md', '.github/copilot-instructions.md']
+E       assert not ['HERMES.md', 'AGENTS.md', '.opencode/instructions.md', 'CLAUDE.md', '.github/copilot-instructions.md']
+
+tests/contract/test_proactive_trigger_section.py:395: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/external/create-docs/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/implement-feature/SKILL.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/manage-feedback/references/path-a-digest.md']
+E       assert not ['skills/external/create-docs/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/humanize/references/rep...l/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:103: AssertionError
+___________ test_shipped_surface_has_no_framework_runtime_references ___________
+
+    @pytest.mark.contract
+    def test_shipped_surface_has_no_framework_runtime_references():
+        violations = []
+        for root_name in SHIPPED_ROOTS:
+            for path in (REPO_ROOT / root_name).rglob("*"):
+                if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".yaml", ".yml", ".json"}:
+                    continue
+                rel = path.relative_to(REPO_ROOT).as_posix()
+                text = path.read_text(encoding="utf-8", errors="replace")
+                for pattern in BANNED_PATTERNS:
+                    for m in pattern.finditer(text):
+                        line = text[: m.start()].count("\n") + 1
+                        snippet = text.splitlines()[line - 1].strip()[:90]
+                        violations.append(f"{rel}:{line}: {snippet}")
+        fresh = [v for v in violations
+                 if v.split(":")[0] not in KNOWN_DEBT]
+>       assert not fresh, (
+            "shipped (client-visible) files reference the framework project's own "
+            "runtime artifacts; rewrite from the client-project perspective:\n"
+            + "\n".join(fresh[:15])
+        )
+E       AssertionError: shipped (client-visible) files reference the framework project's own runtime artifacts; rewrite from the client-project perspective:
+E         shared/definitions/flow-class-definitions.md:245: | 2026-10-30 | skill:coaching-skills | execution → execution | behavior-oracle | Feature 0
+E         shared/definitions/flow-class-definitions.md:86: 一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`skills/external/sdd-loop-driver
+E         shared/definitions/flow-class-definitions.md:251: - **声明单位是特性线**：一条 spec 目录声明自己的类别，载体是该线 `requirements.md` 头部区（`## Related Feature` 之前）**至多一
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:23: Ownership and read access are projections inside the line's existing Ownership Manifest (F
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:95: The ledger `dispatch` event for an implement package carries the 067 fields in addition to
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:275: The preset's provenance records that its shape derives from the Feature 070 measured basel
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:349: - **FN-11 (064)** — Feature 064's line registry, envelopes, worktree-per-write-line, Owner
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:350: - **FN-12 (067)** — Feature 067's part brief, bounded part size, dispatch log, and test ec
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:351: - **FN-13 (068)** — Feature 068's exec-quant feedback channel is unchanged; no transmissio
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:6: **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/co
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:6: **Design authority**: the seven contracts under `.specify/specs/070-subagent-task-teams/co
+E         skills/external/sdd-loop-driver/scripts/loop-state.py:3: """loop-state.py — read-only loop state snapshot engine (Feature 065 / Slice 065a).
+E       assert not ['shared/definitions/flow-class-definitions.md:245: | 2026-10-30 | skill:coaching-skills | execution → execution | beh...osition-model.md:275: The preset's provenance records that its shape derives from the Feature 070 measured basel", ...]
+
+tests/contract/test_shipped_surface_client_neutrality.py:62: AssertionError
+_ test_install_contract_reports_primary_status_and_outcome_with_custom_output_dir _
+
+    def test_install_contract_reports_primary_status_and_outcome_with_custom_output_dir():
+        root = Path(__file__).resolve().parents[2]
+        script = root / ".specify" / "scripts" / "bash" / "create-new-skill.sh"
+        output_dir = root / "tmp" / f"skill-layout-contract-{uuid.uuid4().hex}"
+    
+        try:
+            output_dir.mkdir(parents=True, exist_ok=False)
+>           result = subprocess.run(
+                [
+                    str(script),
+                    "--json",
+                    "--output-dir",
+                    str(output_dir),
+                    "contract-layout-test - verify contract payload",
+                ],
+                cwd=root,
+                stdin=subprocess.DEVNULL,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+
+tests/contract/test_skill_install_layout_contract.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/create-new-skill.sh', '--json', '--outp...ec-kit/tmp/skill-layout-contract-3e732393a65b4719b3fff07284468cb9', 'contract-layout-test - verify contract payload'],)
+kwargs = {'cwd': PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit'), 'stdin': -3, 'text': True, 'stdout': -1, ...}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/create-new-skill.sh', '--json', '--output-dir', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tmp/skill-layout-contract-3e732393a65b4719b3fff07284468cb9', 'contract-layout-test - verify contract payload']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+_____ TestSpecifyScriptPaths.test_review_prerequisite_flags_are_supported ______
+
+self = <contract.test_specify_script_paths.TestSpecifyScriptPaths object at 0x1173209e0>
+
+    def test_review_prerequisite_flags_are_supported(self):
+        """The review prompt flags must be accepted by check-prerequisites.sh.
+    
+        The proposition is flag *acceptance*, so it must not depend on whether the
+        repo's currently-resolved feature happens to own a plan.md and a tasks.md —
+        every /speckit.requirements run opens a window in which it does not, and a
+        contract test that turns red there is measuring repo state, not the flags.
+        A missing-artifact error naming plan.md or tasks.md is itself proof that the
+        corresponding --include flag was parsed and acted on, so both outcomes pass.
+        """
+        result = subprocess.run(
+            [
+                "bash",
+                ".specify/scripts/bash/check-prerequisites.sh",
+                "--json",
+                "--require-spec",
+                "--include-spec",
+                "--include-plan",
+                "--include-tasks",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        combined = result.stdout + result.stderr
+        # A rejected flag surfaces as a usage/parse error, never as a missing artifact.
+        assert "unrecognized" not in combined, (
+            f"check-prerequisites.sh rejected a review prompt flag: {combined[:300]}"
+        )
+        assert "usage:" not in combined.lower(), (
+            f"check-prerequisites.sh printed usage, so a flag was not accepted: {combined[:300]}"
+        )
+        if result.returncode == 0:
+            payload = json.loads(result.stdout)
+            # Keys the script always emits once it has resolved a feature. These
+            # are independent of which optional artifacts happen to exist.
+            for key in ("REQUIREMENTS_DIR", "FEATURE_ID", "FEATURE_NAME", "MODE", "WRITABLE"):
+                assert key in payload, f"missing {key} in the JSON output"
+            docs = payload["AVAILABLE_DOCS"]
+            assert "requirements.md" in docs, (
+                "--require-spec succeeded but requirements.md is absent from AVAILABLE_DOCS"
+            )
+            # plan.md / tasks.md are listed iff they exist on disk. Asserting them
+            # unconditionally would re-bind this test to repo state -- the exact
+            # defect the docstring rules out -- and would go red throughout every
+            # /speckit.plan -> /speckit.tasks window, where plan.md exists and
+            # tasks.md does not. The flag was still acted on: --include-plan is what
+            # puts plan.md in the list at all.
+            spec_dir = Path(payload["REQUIREMENTS_DIR"])
+            for name in ("plan.md", "tasks.md"):
+                assert (name in docs) == (spec_dir / name).is_file(), (
+                    f"AVAILABLE_DOCS disagrees with the filesystem about {name}: "
+                    f"listed={name in docs} exists={(spec_dir / name).is_file()}"
+                )
+        else:
+            # Anti-vacuity: the tolerated non-zero exit must be the missing-artifact
+            # form the --include flags themselves produce, not some other failure.
+>           assert re.search(r"(plan|tasks)\.md not found", combined), (
+                f"exit {result.returncode} for a reason other than a flag-requested "
+                f"artifact being absent: {combined[:300]}"
+            )
+E           AssertionError: exit 1 for a reason other than a flag-requested artifact being absent: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E             Dependency check failed. Initializing dependencies are required.
+E             
+E           assert None
+E            +  where None = <function search at 0x109c82090>('(plan|tasks)\\.md not found', 'Error: CWS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n')
+E            +    where <function search at 0x109c82090> = re.search
+
+tests/contract/test_specify_script_paths.py:126: AssertionError
+______ TestSpecifyScriptPaths.test_review_prerequisite_flags_show_in_help ______
+
+self = <contract.test_specify_script_paths.TestSpecifyScriptPaths object at 0x117320af0>
+
+    def test_review_prerequisite_flags_show_in_help(self):
+        """The help output should document review-compatible flags."""
+>       result = subprocess.run(
+            ["bash", ".specify/scripts/bash/check-prerequisites.sh", "--help"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+tests/contract/test_specify_script_paths.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['bash', '.specify/scripts/bash/check-prerequisites.sh', '--help'],)
+kwargs = {'cwd': PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit'), 'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['bash', '.specify/scripts/bash/check-prerequisites.sh', '--help']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+___________ test_cross_source_discovery_uses_supported_source_types ____________
+
+    def test_cross_source_discovery_uses_supported_source_types():
+        root = Path(__file__).resolve().parents[2]
+        script = root / ".specify" / "scripts" / "bash" / "refresh-tools.sh"
+>       result = subprocess.run(
+            [str(script), "--system", "--shell", "--project", "--json"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+tests/contract/test_tools_cross_source.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/refresh-tools.sh', '--system', '--shell', '--project', '--json'],)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/scripts/bash/refresh-tools.sh', '--system', '--shell', '--project', '--json']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+____________ test_refresh_tools_requires_a_source_flag_and_says_why ____________
+
+    def test_refresh_tools_requires_a_source_flag_and_says_why():
+        """The trap that made DoD-8 unsatisfiable: bare --json is a usage error.
+    
+        The message must name the requirement AND correct the inventory misconception
+        at the point of failure — that is what stops the next agent from repeating it.
+        """
+        proc = subprocess.run(
+            ["bash", str(REFRESH), "--json"], cwd=ROOT, capture_output=True, text=True
+        )
+        assert proc.returncode != 0, (
+            "refresh-tools.sh --json now succeeds standalone; if it also writes "
+            ".specify/memory/tools.md, the owner doc must be updated to say so"
+        )
+        usage = proc.stderr
+>       assert "SOURCE flag" in usage, "the usage text must say a source flag is required"
+E       AssertionError: the usage text must say a source flag is required
+E       assert 'SOURCE flag' in 'Error: CWS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n'
+
+tests/contract/test_tools_inventory_ownership.py:155: AssertionError
+_______ test_default_install_creates_primary_copy_and_compat_entrypoint ________
+
+root = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_default_install_creates_p0')
+
+    def test_default_install_creates_primary_copy_and_compat_entrypoint(root: Path):
+        skill_name = f"layout-int-{uuid.uuid4().hex[:8]}"
+        primary_dir = root / ".specify" / "skills" / skill_name
+        github_entry = root / ".github" / "skills" / skill_name
+    
+>       payload = json.loads(_run_create_skill(root, skill_name).stdout)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_skill_install_layout_integration.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_skill_install_layout_integration.py:54: in _run_create_skill
+    return subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_default_install_creates_p0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-int-fad4af29 - integration scenario'],)
+kwargs = {'cwd': PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_default_install_creates_p0'), 'env': None, 'stdin': -3, 'text': True, ...}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_default_install_creates_p0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-int-fad4af29 - integration scenario']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+__________________ test_conflict_entrypoint_blocks_overwrite ___________________
+
+root = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_conflict_entrypoint_block0')
+
+    def test_conflict_entrypoint_blocks_overwrite(root: Path):
+        skill_name = f"layout-conflict-{uuid.uuid4().hex[:8]}"
+        github_entry = root / ".github" / "skills" / skill_name
+        github_entry.parent.mkdir(parents=True, exist_ok=True)
+        github_entry.write_text("conflict", encoding="utf-8")
+    
+        result = _run_create_skill(root, skill_name, check=False)
+        assert result.returncode != 0
+>       assert "conflict" in (result.stdout + result.stderr).lower()
+E       AssertionError: assert 'conflict' in 'error: cws_lib_bash_home environment variable is not set.\ndependency check failed. initializing dependencies are required.\n'
+E        +  where 'error: cws_lib_bash_home environment variable is not set.\ndependency check failed. initializing dependencies are required.\n' = <built-in method lower of str object at 0x119e87d60>()
+E        +    where <built-in method lower of str object at 0x119e87d60> = ('' + 'Error: CWS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').lower
+E        +      where '' = CompletedProcess(args=['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/t...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').stdout
+E        +      and   'Error: CWS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n' = CompletedProcess(args=['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/t...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').stderr
+
+tests/integration/test_skill_install_layout_integration.py:90: AssertionError
+_________________ test_placeholder_fallback_mode_can_be_forced _________________
+
+root = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_placeholder_fallback_mode0')
+
+    def test_placeholder_fallback_mode_can_be_forced(root: Path):
+        skill_name = f"layout-placeholder-{uuid.uuid4().hex[:8]}"
+        github_entry = root / ".github" / "skills" / skill_name
+    
+        payload = json.loads(
+>           _run_create_skill(
+                root, skill_name, env={"SPECIFY_FORCE_PLACEHOLDER": "1"}
+            ).stdout
+        )
+
+tests/integration/test_skill_install_layout_integration.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_skill_install_layout_integration.py:54: in _run_create_skill
+    return subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_placeholder_fallback_mode0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-placeholder-54e6ccfd - integration scenario'],)
+kwargs = {'cwd': PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_p...eIdentifier': 'com.qoder.app', 'QODER_CONFIG_DIR': '/Users/liuqiming.lqm/.qoder', ...}, 'stdin': -3, 'text': True, ...}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_placeholder_fallback_mode0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-placeholder-54e6ccfd - integration scenario']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+________________ test_legacy_directory_migrates_to_primary_copy ________________
+
+root = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_directory_migrates0')
+
+    def test_legacy_directory_migrates_to_primary_copy(root: Path):
+        skill_name = f"layout-migrate-{uuid.uuid4().hex[:8]}"
+        legacy_dir = root / ".github" / "skills" / skill_name
+        primary_dir = root / ".specify" / "skills" / skill_name
+    
+        if _github_skills_is_global_symlink(root):
+            pytest.skip(
+                "legacy per-skill migration is not applicable when .github/skills is a global symlink"
+            )
+    
+        primary_dir.mkdir(parents=True)
+        (primary_dir / "legacy-overwrite.txt").write_text("from-primary", encoding="utf-8")
+        legacy_dir.mkdir(parents=True)
+        (legacy_dir / "SKILL.md").write_text(
+            "---\nname: demo\ndescription: demo\n---\n", encoding="utf-8"
+        )
+        (legacy_dir / "legacy-overwrite.txt").write_text("from-legacy", encoding="utf-8")
+        (legacy_dir / "legacy-only.txt").write_text("moved", encoding="utf-8")
+    
+>       payload = json.loads(_run_create_skill(root, skill_name).stdout)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_skill_install_layout_integration.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_skill_install_layout_integration.py:54: in _run_create_skill
+    return subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_directory_migrates0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-migrate-48cf05af - integration scenario'],)
+kwargs = {'cwd': PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_directory_migrates0'), 'env': None, 'stdin': -3, 'text': True, ...}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_directory_migrates0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-migrate-48cf05af - integration scenario']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+_______________ test_legacy_backup_failure_marks_manual_required _______________
+
+root = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_backup_failure_mar0')
+
+    def test_legacy_backup_failure_marks_manual_required(root: Path):
+        skill_name = f"layout-backup-fail-{uuid.uuid4().hex[:8]}"
+        legacy_dir = root / ".github" / "skills" / skill_name
+    
+        legacy_dir.mkdir(parents=True)
+        (legacy_dir / "SKILL.md").write_text(
+            "---\nname: demo\ndescription: demo\n---\n", encoding="utf-8"
+        )
+    
+        payload = json.loads(
+>           _run_create_skill(
+                root, skill_name, env={"SPECIFY_FORCE_BACKUP_FAIL": "1"}
+            ).stdout
+        )
+
+tests/integration/test_skill_install_layout_integration.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/test_skill_install_layout_integration.py:54: in _run_create_skill
+    return subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_backup_failure_mar0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-backup-fail-699d6eb4 - integration scenario'],)
+kwargs = {'cwd': PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_l...eIdentifier': 'com.qoder.app', 'QODER_CONFIG_DIR': '/Users/liuqiming.lqm/.qoder', ...}, 'stdin': -3, 'text': True, ...}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_legacy_backup_failure_mar0/.specify/scripts/bash/create-new-skill.sh', '--json', 'layout-backup-fail-699d6eb4 - integration scenario']' returned non-zero exit status 1.
+
+/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:578: CalledProcessError
+____________ test_disabled_state_survives_instructions_regeneration ____________
+
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-2250/test_disabled_state_survives_i0')
+
+    def test_disabled_state_survives_instructions_regeneration(ws):
+        run(["--action", "config", "--enabled", "false"], ws)
+        # A real installed project keeps its template so the generator can run.
+        (ws / ".specify" / "templates" / "instructions-template.md").write_bytes(
+            (ROOT / "templates" / "instructions-template.md").read_bytes()
+        )
+        specify_py = ws / ".specify" / "scripts" / "python"
+        specify_py.mkdir(parents=True, exist_ok=True)
+        (specify_py / "tools-utils.py").symlink_to(ROOT / "scripts" / "python" / "tools-utils.py")
+    
+        proc = subprocess.run(["bash", str(GENERATOR)], cwd=ws, capture_output=True, text=True)
+>       assert proc.returncode == 0, proc.stderr
+E       AssertionError: Error: CWS_LIB_BASH_HOME environment variable is not set.
+E         Dependency check failed. Initializing dependencies are required.
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/scripts/bash/generate-instructio...WS_LIB_BASH_HOME environment variable is not set.\nDependency check failed. Initializing dependencies are required.\n').returncode
+
+tests/integration/test_trigger_promotion.py:295: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/contract/test_evidence_utils_cli.py::TestCE3Doctor::test_node_block
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/lib/python3.14/site-packages/_pytest/fixtures.py:1392: PytestRemovedIn10Warning: Class-scoped fixtures defined as instance methods are deprecated.
+  Instance attributes set in the 'doctor' fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use a @classmethod decorator below @pytest.fixture and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_create_new_tools_find.py::test_create_new_tools_find_returns_structured_not_found_payload
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+FAILED tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_instructions_section_propagation.py::test_c2_generator_injects_missing_sections_additively
+FAILED tests/contract/test_instructions_size_budget.py::test_over_budget_warns_and_ranks_sections
+FAILED tests/contract/test_instructions_size_budget.py::test_table_is_emitted_under_budget_too
+FAILED tests/contract/test_instructions_size_budget.py::test_table_carries_the_six_columns_and_classifies_all_three_kinds
+FAILED tests/contract/test_instructions_size_budget.py::test_under_budget_reports_size_without_warning
+FAILED tests/contract/test_instructions_size_budget.py::test_new_file_branch_reports_size_too
+FAILED tests/contract/test_instructions_size_budget.py::test_report_is_idempotent
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c9_section_propagates_and_is_idempotent
+FAILED tests/contract/test_proactive_trigger_section.py::test_c10_all_agent_instruction_paths_created
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_proactive_trigger_section.py::test_c12_check_instructions_passes_for_every_tool_key
+FAILED tests/contract/test_proactive_trigger_section.py::test_c12_every_declared_value_is_created
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+FAILED tests/contract/test_skill_install_layout_contract.py::test_install_contract_reports_primary_status_and_outcome_with_custom_output_dir
+FAILED tests/contract/test_specify_script_paths.py::TestSpecifyScriptPaths::test_review_prerequisite_flags_are_supported
+FAILED tests/contract/test_specify_script_paths.py::TestSpecifyScriptPaths::test_review_prerequisite_flags_show_in_help
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_tools_cross_source.py::test_cross_source_discovery_uses_supported_source_types
+FAILED tests/contract/test_tools_inventory_ownership.py::test_refresh_tools_requires_a_source_flag_and_says_why
+FAILED tests/integration/test_skill_install_layout_integration.py::test_default_install_creates_primary_copy_and_compat_entrypoint
+FAILED tests/integration/test_skill_install_layout_integration.py::test_conflict_entrypoint_blocks_overwrite
+FAILED tests/integration/test_skill_install_layout_integration.py::test_placeholder_fallback_mode_can_be_forced
+FAILED tests/integration/test_skill_install_layout_integration.py::test_legacy_directory_migrates_to_primary_copy
+FAILED tests/integration/test_skill_install_layout_integration.py::test_legacy_backup_failure_marks_manual_required
+FAILED tests/integration/test_trigger_promotion.py::test_disabled_state_survives_instructions_regeneration
+39 failed, 7025 passed, 7 skipped, 4 warnings in 588.02s (0:09:48)
+# failed-name list written: .specify/.tmp/081a-head-failed-final.txt (      39 entries)
+RC=1

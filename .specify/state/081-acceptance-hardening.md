@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261102T225758Z-081a
 slice: 081
-stage: implement
-stage_started_at: 1793673785
-stage_deadline_epoch: 1793679185
-stage_base_commit: da5e4480
-attempt: 3
+stage: closure
+stage_started_at: 1793678783
+stage_deadline_epoch: 1793684183
+stage_base_commit: 0277b00f
+attempt: 0
 retry_limit: 2
-last_verdict: implement part 4/4 closed as Blocked @b0609f37 (T019/T020/T023 done; T022/T024 deferred; closure checker block/exit 1 zero-final-path-pass; Feature 081 Blocked; clean full-suite closure running); next = review
+last_verdict: review-fix DONE @0277b00f (P0=1/P1=5 cleared; targeted 152 passed; final full-suite 39F/7025P/7S, 0 new/0 fixed); 081a closed as Blocked; next slice = 081b
 <!-- plan-fence: decomposition=auto@plan-entry; test-budget=baseline@implement-start + closure@post-review; fast-lane=not-adopted -->
 <!-- loop-state:end -->
 
@@ -19,6 +19,7 @@ last_verdict: implement part 4/4 closed as Blocked @b0609f37 (T019/T020/T023 don
 {"seq": 2, "slot": "closure", "stage": "closure", "purpose": "first slice-close full-suite (T022)", "trigger": "implement part 4", "at": "2026-11-03T02:56Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7018, "failed": 43, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed.txt", "baseline_compare": "comm -13 baseline head -> 4 new (frozen-pin drift); comm -23 -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-repair-run.txt"}
 {"seq": 3, "slot": "in-slot-rerun", "stage": "closure", "purpose": "closure-repair after the frozen-pin fixes and T024 deferral", "trigger": "4 frozen-pin failures fixed; T024 deferred to 081d", "at": "2026-11-03T03:14Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7021, "failed": 40, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed.txt", "baseline_compare": "comm -13 baseline head -> 1 new (mirror parity, concurrent commit 90de4d7f during run); comm -23 -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-repair-run2.txt"}
 {"seq": 4, "slot": "in-slot-rerun", "stage": "closure", "purpose": "authoritative clean full-suite on the stable tree (T022)", "trigger": "concurrent writer cleared; clean tree rerun", "at": "2026-11-03T03:31Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-clean.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7023, "failed": 39, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed-clean.txt", "baseline_compare": "comm -13 baseline head -> 0 new; comm -23 baseline head -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-clean-run.txt"}
+{"seq": 5, "slot": "in-slot-rerun", "stage": "closure", "purpose": "final post-review-fix full-suite", "trigger": "review-fix P0/P1 cleared (0277b00f)", "at": "2026-11-03T04:06Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-final.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7025, "failed": 39, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed-final.txt", "baseline_compare": "comm -13 baseline head -> 0 new; comm -23 baseline head -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-final-run.txt"}
 <!-- test-budget:end -->
 
 - line_id: `081-acceptance-hardening`
@@ -281,6 +282,21 @@ last_verdict: implement part 4/4 closed as Blocked @b0609f37 (T019/T020/T023 don
 - T022 延后（需 clean full-suite set）；T024 延后到 081d（WC-14 冻结 C-5 套件）；两者均记录 unblock
 - 并发事件：`90de4d7f fix(coaching-skills)` 在 11:19:54 落到本分支，改 `skills/external/coaching-skills/references/prompt-templates.md` 与镜像；未回退、未覆盖；它是 second-run mirror flake 的直接原因，已写入 notes
 - 结论：implement 阶段以 `Blocked` 收尾（**不是** `Implemented`）；下一阶段 = review
+
+## T022 clean closure（2026-11-03 03:41 UTC）
+
+- `bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-clean.txt -q` → `39 failed, 7023 passed, 7 skipped in 699.18s`; `head − baseline` = 0; `baseline − head` = 0; pins unchanged.
+- T022 `[X]`; T024 remains `[~]` (081d). Test budget: baseline:1 closure:1 reruns:2 exceptions:0; E3 stages complete=5/6, only review pending.
+- Feature stays `Blocked` (SC-001 blocked 1/3, SC-002 partial); closure checker `block`/exit 1.
+
+## Review-fix + final closure（2026-11-03 04:06 UTC）
+
+- Review: P0=1 (F2), P1=5 (F1/F3/F4/F5/F6), P2=9; carriers `review.md` + `code-review.md`; no `blocking` code entry.
+- Review-fix `0277b00f`: F2 moved the 081 gate lines out of the 077 card and re-measured `tasks/implement` strip baselines; F4/F7 six-bucket `final_path` incl. `partial`; F1/F3/F5/F6 corrected; F8/F9/F10/F11/F15 fixed; F12/F13/F14 recorded.
+- Targeted suite 152 passed; `regen/sync --check` 0; `validate-tasks` 0/0; closure checker `block` (final_path pass0/blocked1/partial1/unknown0; tasks 23 closed/1 deferred/0 open; claimed `Blocked`).
+- Final post-review-fix full-suite: `39 failed / 7025 passed / 7 skipped`; `head−baseline` 0 new; `baseline−head` 0 fixed.
+- Test-budget audit: baseline:1 closure:1 reruns:3 exceptions:0; E3 stages complete=6/6; status=ok.
+- 081a is closed as **`Blocked`** (SC-001 1/3, SC-002 partial, T024 081d). Next slice = 081b.
 
 ## 框架观察
 

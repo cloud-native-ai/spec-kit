@@ -191,6 +191,22 @@ EXIT=1
 - T022 closes; T024 remains deferred to 081d. The earlier run2 mirror-parity failure is attributed to the
   concurrent commit, not to 081; the clean set is the T022 evidence.
 
+### 2.7 Final post-review-fix run (2026-11-03, authoritative for the closure)
+
+The review-fix P0/P1 changes (0277b00f) were re-measured once on the full suite:
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-final.txt -q
+39 failed, 7025 passed, 7 skipped, 4 warnings in 588.02s (0:09:48)
+EXIT=1
+```
+
+- `head 失败集 − 基线失败集`: **empty** (0 new); `基线失败集 − head 失败集`: **empty** (0 fixed).
+- pins: `pytest 9.2.0`, `Python 3.14.6`, `git 2.54.0` (match `plan-runner-pins.txt`).
+- The coverage lane remains `uncovered` and `test_acceptance_schema_ownership.py` remains 081d work; SC-009 stays
+  `partial` for those reasons, not for a test regression.
+
+
 ### 2.7 Review-fix re-disposition of § 2.5's pin repair (2026-11-03, supersedes 2.5 only)
 
 § 2.5 repaired the two `test_stage_class_wiring` pins by moving the 081 GATE-4 and closure-verdict lines

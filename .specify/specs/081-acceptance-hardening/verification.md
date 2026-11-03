@@ -86,7 +86,7 @@ SC-008_why_reduced_insufficient=later slices edit the same sources and must reru
 SC-008_unblock=081d reruns the smoke on the final tree and records the triple
 
 SC-009_status=partial
-SC-009_value=mirror/regen `--check` exit 0; five frozen-pin guards pass; clean full-suite 39 failed / 7023 passed / 7 skipped with `head − baseline` empty; the coverage lane is `uncovered` (17 clauses beyond the frozen baseline) and the schema-ownership guard is 081d work
+SC-009_value=mirror/regen `--check` exit 0; five frozen-pin guards pass; final post-review-fix full-suite 39 failed / 7025 passed / 7 skipped with `head − baseline` empty; the coverage lane is `uncovered` (17 clauses beyond the frozen baseline) and the schema-ownership guard is 081d work
 SC-009_note=the set-level full-suite invariant is now clean; the remaining gaps are the coverage lane and the 081d schema-ownership guard
 SC-009_blocked_at=coverage lane status `uncovered`; `tests/contract/test_acceptance_schema_ownership.py` is 081d work
 SC-009_reduced_measurement=clean full-suite id-level diff: head 39 = baseline 39, 0 new, 0 fixed; five frozen-pin guards pass; mirror/regen 0
