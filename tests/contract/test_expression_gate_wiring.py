@@ -458,7 +458,14 @@ def _wired_argv(command: str, doc: Path, spec: Path) -> list[str]:
 
 
 def _wired_fixture(root: Path) -> tuple[Path, Path]:
-    """A git-backed clean spec + document, committed with a matching as-of."""
+    """A git-backed clean spec + document, committed with a matching as-of.
+
+    The spec carries the 081b mandatory shape (runtime-stack table, `§ Execution Premises`,
+    `§ Inherited Blockers`): the count face delegates to `pre-analyze-check.py --stage plan`, and
+    since 081b an `execution`-class requirements artifact without that table is an input error —
+    a delegate exit 2 would turn this fixture's clean run into `not-run`, so the fixture is a
+    conforming spec rather than a minimal one.
+    """
     repo = root / "repo"
     repo.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "init", "-q"], cwd=str(repo), check=True)
@@ -467,10 +474,27 @@ def _wired_fixture(root: Path) -> tuple[Path, Path]:
     (spec / "requirements.md").write_text(
         "# Requirements\n\n"
         "- **FR-001**: first requirement.\n"
-        "- **SC-001**: first criterion.\n",
+        "- **SC-001**: first criterion.\n"
+        "\n### Runtime Stack & Dependency Ownership\n\n"
+        "| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |\n"
+        "|----|------------|------|-------|-----|----------|------------------|-----|----------|\n"
+        "| RS-001 | wired runtime capability | in-scope | this fixture | fixture-local | — | "
+        "the joint-acceptance row names RS-001 | FR-001 | EP-001 |\n",
         encoding="utf-8",
     )
-    (spec / "plan.md").write_text("# Plan\n\nNo count claim here.\n", encoding="utf-8")
+    (spec / "plan.md").write_text(
+        "# Plan\n\nNo count claim here.\n"
+        "\n## Execution Premises\n\n"
+        "| ID | Premise | Evidence | Status | Decision |\n"
+        "|----|---------|----------|--------|----------|\n"
+        "| EP-001 | the wired runtime is available | fixture-local | verified | — |\n"
+        "\n## Inherited Blockers\n\n"
+        "Dependency set: none.\n\n"
+        "| # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |\n"
+        "|---|-----------|-------------|---------|---------------|-----------------|\n"
+        "| IB-001 | (none) | not-applicable | — | — | the fixture has no dependency |\n",
+        encoding="utf-8",
+    )
     (spec / "tasks.md").write_text(
         "# Tasks\n\n- [ ] T001 first task\n", encoding="utf-8"
     )

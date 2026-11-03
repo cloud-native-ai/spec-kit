@@ -2,24 +2,20 @@
 
 <!-- loop-state:begin -->
 spine_state: running
-run_id: r20261102T225758Z-081a
-slice: 081
-stage: closure
-stage_started_at: 1793678783
-stage_deadline_epoch: 1793684183
-stage_base_commit: 0277b00f
-attempt: 0
+run_id: r20261103T043000Z-081b
+slice: 081b
+stage: implement
+stage_started_at: 1793683375
+stage_deadline_epoch: 1793688775
+stage_base_commit: b29a8a4c
+attempt: 1
 retry_limit: 2
-last_verdict: review-fix DONE @0277b00f (P0=1/P1=5 cleared; targeted 152 passed; final full-suite 39F/7025P/7S, 0 new/0 fixed); 081a closed as Blocked; next slice = 081b
+last_verdict: implement 081b part 1/3 PASS @b29a8a4c (T001–T004; 5 fixtures, red-first landing, owner doc 3 sections, plan-template 2 skeletons; mirror/regen 0; feature Blocked); part 2/3 dispatched (T005–T009)
 <!-- plan-fence: decomposition=auto@plan-entry; test-budget=baseline@implement-start + closure@post-review; fast-lane=not-adopted -->
 <!-- loop-state:end -->
 
 <!-- test-budget:begin -->
-{"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "implement-start baseline (plan-stage capture on the pre-implementation tree)", "trigger": "implement start", "at": "2026-11-03T02:07Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/081-acceptance-hardening/baseline-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 6970, "failed": 39, "skipped": 7, "failed_names_path": ".specify/specs/081-acceptance-hardening/baseline-failed.txt", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/plan-baseline-run.txt"}
-{"seq": 2, "slot": "closure", "stage": "closure", "purpose": "first slice-close full-suite (T022)", "trigger": "implement part 4", "at": "2026-11-03T02:56Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7018, "failed": 43, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed.txt", "baseline_compare": "comm -13 baseline head -> 4 new (frozen-pin drift); comm -23 -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-repair-run.txt"}
-{"seq": 3, "slot": "in-slot-rerun", "stage": "closure", "purpose": "closure-repair after the frozen-pin fixes and T024 deferral", "trigger": "4 frozen-pin failures fixed; T024 deferred to 081d", "at": "2026-11-03T03:14Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7021, "failed": 40, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed.txt", "baseline_compare": "comm -13 baseline head -> 1 new (mirror parity, concurrent commit 90de4d7f during run); comm -23 -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-repair-run2.txt"}
-{"seq": 4, "slot": "in-slot-rerun", "stage": "closure", "purpose": "authoritative clean full-suite on the stable tree (T022)", "trigger": "concurrent writer cleared; clean tree rerun", "at": "2026-11-03T03:31Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-clean.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7023, "failed": 39, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed-clean.txt", "baseline_compare": "comm -13 baseline head -> 0 new; comm -23 baseline head -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-clean-run.txt"}
-{"seq": 5, "slot": "in-slot-rerun", "stage": "closure", "purpose": "final post-review-fix full-suite", "trigger": "review-fix P0/P1 cleared (0277b00f)", "at": "2026-11-03T04:06Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed-final.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7025, "failed": 39, "skipped": 7, "failed_names_path": ".specify/.tmp/081a-head-failed-final.txt", "baseline_compare": "comm -13 baseline head -> 0 new; comm -23 baseline head -> 0 fixed", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-final-run.txt"}
+{"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "081b implement-start baseline (pre-081b tree; 081a final run)", "trigger": "081b implement start", "at": "2026-11-03T04:30Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/081-acceptance-hardening/baseline-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7025, "failed": 39, "skipped": 7, "failed_names_path": ".specify/specs/081-acceptance-hardening/baseline-failed.txt", "evidence_ptr": ".specify/specs/081-acceptance-hardening/test-evidence/closure-final-run.txt"}
 <!-- test-budget:end -->
 
 - line_id: `081-acceptance-hardening`
@@ -297,6 +293,43 @@ last_verdict: review-fix DONE @0277b00f (P0=1/P1=5 cleared; targeted 152 passed;
 - Final post-review-fix full-suite: `39 failed / 7025 passed / 7 skipped`; `head−baseline` 0 new; `baseline−head` 0 fixed.
 - Test-budget audit: baseline:1 closure:1 reruns:3 exceptions:0; E3 stages complete=6/6; status=ok.
 - 081a is closed as **`Blocked`** (SC-001 1/3, SC-002 partial, T024 081d). Next slice = 081b.
+
+## 081b 入口（Phase 2）
+
+- **切片**：081b — runtime stack / Execution Premises / Inherited Blockers + 四类确定性发现（parent requirements FR-009…FR-012 / SC-005；plan § D4 + D10 081b 行）。
+- **断点**：`tasks`（parent requirements/plan 已存在且覆盖 081b；081a tasks 归档在 `tasks-081a.md`；本轮生成新的 `tasks.md`）。
+- **阶段计划**：`tasks → checklist → analyze → implement → review → closure`（requirements/clarify/plan 继承 parent 081）。
+- **测试预算**：baseline = 081a final full-suite（39F / 7025P / 7S，`closure-final-run.txt`），closure = 081b review 后。
+- **不做**：081c 的 review-feature-quality / 四段组合 / review 调用点；081d 的 manage-features / feature-index / audit / driver line-state / driver merge gate / coverage guard。
+- **状态**：Feature 081 仍 `Blocked`；081b 的 supporting SC-005 可转 pass，但 final SC-001/SC-002 仍等 081c/081d。
+
+## 081b tasks（2026-11-03 04:36 UTC）
+
+- `tasks.md` 12 任务（081a 归档 `tasks-081a.md`）；FR-009…FR-012 covered；SC-005 precise partial；parent Feature 081 仍 `Blocked`。
+- 门禁：decomposition `proceed` 12/40；pre-analyze `pass`（62 planned-path advisories）；validate-tasks 0/0。
+- 提交 `8a949241`；下一阶段 = checklist。
+
+## 081b checklist（2026-11-03 04:46 UTC）
+
+- `checklists/081b-2026-11-03.md` 42 项：24 PASS / 18 FAIL；7 条 P1：CHK019（inherited 载体无解析语法/连接键）、CHK017（C-17 抽取集合与五条 partial 不相交 → 0 行静默绿）、CHK020（后续切片载体无合法处置值）、CHK018（载体三种读法）、CHK005（零行静默放行）、CHK004（义务 ②③ 判定时点）、CHK013（premise-ID 零载体）。
+- 提交 `43b0e668`；下一阶段 = analyze（裁决 18 FAIL，修 tasks/plan 后再 implement）。
+
+## 081b analyze（2026-11-03 05:02 UTC）
+
+- 结果：C=0 / H=8 / M=12 / L=4，gate fail；8 HIGH 经独立只读波确认（9 派发 / 8 confirm / 1 downgrade / 0 reject）。
+- 关键 HIGH：F-12 duty ②③ 时点；C-02 零行静默放行；E-05 premise-ID 零载体；F-13 C-17 抽取集与 `partial` 行不相交；B-02 载体三读法；C-03 载体无解析语法/连接键；F-14 `plan-template.md` 豁免清单；E-06 `signed-contract` 契约路径无列。
+- 结论：不得带病 implement；先做 spec-only analyze-fix，再 analyze-r2。
+
+## 081b analyze-fix + r2（2026-11-03 05:14 UTC）
+
+- `ce4c0f11`：8 HIGH 全修 —— C-17 抽取纳入 `partial`/`deferred_tasks`；Carrier/Source row 语法 + join key；`Carrier slice`/`inherited-later`；`Contract`/`Premises` 两列；in-scope duty ①/②/③ 分阶段；zero-data-row = block；四发现 check 名/severity；FR-005 覆盖行；plan-template 第四豁免 + 零域字面量；expression-gates 算子修正；E-10 转 081d。
+- 驱动者 r2：validate-requirements ok、validate-tasks 0/0、decision-tensions 6/6、pre-analyze tasks pass（67 planned-path advisories）；FR-009 表头 `Contract`/`Premises` 在盘；IB-004 `inherited-later`/`carrier_slice` 在盘；C-17 含 `partial`/`deferred_tasks`；无新增 C/H。
+- 结论：analyze-r2 PASS；下一阶段 = implement 081b part 1/3（T001–T004）。
+
+## implement 081b part 1（2026-11-03 05:22 UTC）
+
+- `b29a8a4c`：五套夹具（premise/runtime-gap/runtime-zero-row/inherited-mutation/inherited-clean）、`notes/red-first-evidence-081b.md`、owner doc 三节（九列/五列/继承表 + Carrier 语法 + inherited-later）、plan-template 两骨架（零域字面量）；mirror/regen 0；feature 仍 `Blocked`。
+- 披露：081a 的 `positive` 等夹具仍是七列旧形态；part 2 需升级为九列（或明确缺列不触发），否则 `positive` 接受与 `Premises` 义务冲突。
 
 ## 框架观察
 

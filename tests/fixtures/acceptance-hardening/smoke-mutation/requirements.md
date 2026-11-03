@@ -33,9 +33,9 @@ claims `Implemented` while its smoke record — the evidence that the main flow 
 
 ### Runtime Stack & Dependency Ownership
 
-| ID | Capability | Form | Owner | Pin | Joint acceptance | FR |
-|----|------------|------|-------|-----|------------------|-----|
-| RS-001 | fixture runtime capability | in-scope | this fixture | `900` fixture commit | `verification.md` carries the joint-acceptance row naming `RS-001` | FR-001 |
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | fixture runtime capability | in-scope | this fixture | `900` fixture commit | — | `verification.md` carries the joint-acceptance row naming `RS-001` | FR-001 | EP-001 |
 
 ## Success Criteria *(mandatory)*
 

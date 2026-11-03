@@ -35,20 +35,21 @@ is never reported as `block`, and in audit mode the exit code reflects input val
 IMPLEMENTATION STATE — read this before trusting an exit code
 --------------------------------------------------------------
 This is the verdict slice (task T015). Argument parsing, input resolution, the exit-2 contract and
-the judgement are implemented. Two deliberate absences, each with a named owner, so neither is a
+the judgement are implemented. One deliberate absence, with a named owner, so it is never a
 silent hole:
 
 * `--audit-existing` is **not implemented in this slice** — `plan.md` § Slice Boundary defers
   FR-020 to 081d. Passing it exits `2` with an explicit message. That is deliberate: an
   unimplemented mode MUST NOT emit a per-feature verdict, because an audit run whose exit code
   came from one feature's verdict would report the opposite of what C-10 requires of the mode.
-* The three external-source reasons are emitted from the rows **present in the artifacts today**
-  (runtime-stack rows, `§ Execution Premises` rows, `§ Inherited Blockers` rows). The extraction
-  of *dependency-feature* records — a dependency's `## Deferred` rows, its `blocked` / `deferred`
-  status rows, and its `deferred_tasks=` lists (C-17) — lands in 081b; until then a dependency set
-  is read only through the rows this plan already carries. The closed reason set is **not**
-  narrowed by that: all seven templates stay emittable, and the three external-source ones fire
-  the moment their rows exist.
+
+The external-source extraction landed in 081b (contract C-13 / C-17 / C-18): the runtime-row
+class's three shapes, the prose-declaration rule, the `signed-contract` `Contract` cell, the
+dependency-feature extraction over the closed three-source set, the `Source row` join key and the
+`inherited` carrier's three limbs. Its sibling is
+`skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`, which judges the same closed set at
+the stage gates; `tests/contract/test_acceptance_premises.py` asserts the two name the same reason
+instance, so the pair cannot drift into two spellings.
 
 Read-only and stdlib-only (C-01, V-14): no network, no model, no write — `--json-out` is the one
 declared output file, and it is written only when a payload exists.
@@ -187,7 +188,43 @@ SOURCE_LOCATOR_RE = re.compile(r"^\S+:\S+$")
 RUNTIME_SECTION_RE = re.compile(r"(?m)^#{2,4}\s*Runtime Stack & Dependency Ownership")
 PREMISES_SECTION_RE = re.compile(r"(?m)^#{2,4}\s*Execution Premises\s*$")
 INHERITED_SECTION_RE = re.compile(r"(?m)^#{2,4}\s*Inherited Blockers\s*$")
+DEFERRED_SECTION_RE = re.compile(r"(?m)^#{2,4}\s*Deferred\s*$")
+D10_SECTION_RE = re.compile(r"(?m)^#{2,4}\s*D10\b")
 HEADING_RE = re.compile(r"^#{1,6}\s")
+
+#: The prose-declaration rule is mechanical, and this is the rule (C-18): a fenced code block or a
+#: heading is removed first, then a line of this shape is a declaration. A narrative line without
+#: the marker is not — otherwise "prose" would be a judgement.
+FENCE_RE = re.compile(r"^\s*(```|~~~)")
+PROSE_DECLARATION_RE = re.compile(r"^-\s*\*\*Runtime dependency\*\*:")
+FEATURE_ID_RE = re.compile(r"(?m)^\*\*Feature ID\*\*:\s*(\d{3})\s*$")
+VERIFICATION_FIELD_RE = re.compile(r"(?m)^(?:SC-\d{3}_status|deferred_tasks)=")
+GATE_ROW_RE = re.compile(r"(?m)^\s*[-*]?\s*(GATE-\d+)\b")
+TASK_ROW_ID_RE = re.compile(r"^- \[.\] (T\d{3})")
+
+#: The `inherited` carrier's two forms (C-17), plus the `test:`-alone form that only an
+#: `inherited-later` row may use — the task id of an unwritten `tasks.md` MUST NOT be fabricated.
+CARRIER_TASK_RE = re.compile(r"^task:(T\d{3})\+test:(\S+)$")
+CARRIER_GATE_RE = re.compile(r"^gate:(GATE-\d+)$")
+CARRIER_TEST_ONLY_RE = re.compile(r"^test:(\S+)$")
+#: A later `Carrier slice` (081c, 081d, …). `this-slice` is the other legal value.
+LATER_SLICE_RE = re.compile(r"^\d{3}[a-z]?$")
+
+#: The one reserved argument slot (C-09 / C-13): the zero-data-row shape has no `RS-NNN` to name,
+#: and a fabricated id would point at a row nobody wrote.
+RESERVED_RUNTIME_ARGUMENT = "runtime-stack"
+
+#: The closed `Status` domain of `§ Execution Premises` (AS-09).
+PREMISE_STATUSES = ("verified", "unverified", "falsified")
+
+#: `Source row` values that mean "this row disposes nothing". `(none)` is the sentinel the 081a
+#: fixtures write for a feature with no dependency set; it is not a malformed locator.
+ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)")
+
+#: Statuses the dependency extraction selects on (C-17). `partial` is inside the set on purpose: a
+#: dependency may carry `partial` rows and nothing else, and an extraction set that excluded it
+#: would be disjoint from the disposition set, which makes the fourth finding unreachable.
+EXTRACTED_STATUSES = ("blocked", "deferred", "partial")
 
 
 def _blank(value):
@@ -207,33 +244,46 @@ def _read(path):
         raise InputError("input is not readable as UTF-8: %s (%s)" % (path, exc))
 
 
-def _section(text, pattern, name, path):
-    """The body of one `##`-level section, or an InputError naming the file.
+def _section_lines(text, pattern, name, path):
+    """`[(line_no, line)]` for one `##`-level section body, or an InputError naming the file.
 
     The body stops at the next heading of any level, so a table inside the section never bleeds
-    into the following prose.
+    into the following prose. Line numbers are absolute and 1-based: a finding that points at the
+    wrong line is a defect of the checker.
     """
     match = pattern.search(text)
     if not match:
         raise InputError("%s carries no § %s" % (path, name))
+    heading_line = text[:match.start()].count("\n") + 1
+    lines = text[match.end():].splitlines()
+    if lines and lines[0].strip():
+        # The carrier regex does not consume a heading's trailing tail (a parenthetical title),
+        # so that fragment is still heading text, not body.
+        lines = lines[1:]
     body = []
-    for line in text[match.end():].splitlines():
+    for step, line in enumerate(lines):
         if HEADING_RE.match(line):
             break
-        body.append(line)
-    return "\n".join(body)
+        body.append((heading_line + 1 + step, line))
+    return body
 
 
-def _table_rows(body):
-    """The rows of the first Markdown table in `body`, keyed by lower-cased column header.
+def _section(text, pattern, name, path):
+    """The body of one `##`-level section, or an InputError naming the file."""
+    return "\n".join(line for _, line in _section_lines(text, pattern, name, path))
 
-    Returns a list of `{header: cell}`. A section with no table yields an empty list: "the section
-    exists and declares nothing" is a different fact from "the section is missing", and only the
-    second is an input error (C-14).
+
+def _table_rows(body_lines):
+    """The rows of the first Markdown table in `body_lines`, as `[(line_no, {header: cell})]`.
+
+    Returns a list of `{header: cell}` pairs. A section with no table yields an empty list: "the
+    section exists and declares nothing" is a different fact from "the section is missing", and
+    only the second is an input error (C-14) — while the runtime-row class judges the first as the
+    reserved `runtime-stack` block (C-13).
     """
     header = None
     rows = []
-    for line in body.splitlines():
+    for number, line in body_lines:
         stripped = line.strip()
         if not stripped.startswith("|"):
             if header is not None and rows:
@@ -247,7 +297,7 @@ def _table_rows(body):
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if len(cells) < len(header):
             cells += [""] * (len(header) - len(cells))
-        rows.append(dict(zip(header, cells)))
+        rows.append((number, dict(zip(header, cells))))
     return rows
 
 
@@ -418,11 +468,12 @@ def resolve_claimed_status(resolved):
 # --------------------------------------------------------------------------- #
 
 def parse_requirements(path):
-    """`{path, flow_class, criteria, runtime_rows}`.
+    """`{path, flow_class, criteria, runtime_rows, runtime_row_count, prose}`.
 
     `criteria` is `{SC-NNN: "final"|"supporting"}`. A marker that cannot be parsed is an input
     error (V-3 / AS-04), never a `block`: a defect of the artifact is not a finding about the
-    feature.
+    feature. `runtime_row_count` is carried separately from `runtime_rows` because **zero data
+    rows** is a verdict of its own (C-13), not the same thing as "no runtime-stack section".
     """
     text = _read(path)
     match = FLOW_CLASS_RE.search(text)
@@ -466,9 +517,18 @@ def parse_requirements(path):
     allowed_forms = (FORM_IN_SCOPE, FORM_SIGNED, FORM_WAIVED)
     if flow_class == "expression":
         allowed_forms = allowed_forms + (FORM_NOT_REQUIRED,)
-    body = _section(text, RUNTIME_SECTION_RE, "Runtime Stack & Dependency Ownership", path)
+    try:
+        body = _section_lines(text, RUNTIME_SECTION_RE,
+                             "Runtime Stack & Dependency Ownership", path)
+        present = True
+    except InputError:
+        # Mandatory in `requirements.md` of an `execution`-class feature, exempt for an
+        # `expression`-class one: the exemption is mechanical because the class is declared.
+        if flow_class == "execution":
+            raise
+        body, present = [], False
     runtime_rows = []
-    for index, row in enumerate(_table_rows(body), start=1):
+    for index, (number, row) in enumerate(_table_rows(body), start=1):
         rs_id = _clean(_column(row, "id"))
         if not RS_ID_RE.match(rs_id):
             raise InputError(
@@ -484,17 +544,54 @@ def parse_requirements(path):
         runtime_rows.append({
             "id": rs_id,
             "form": form,
+            "capability": _column(row, "capability"),
             "owner": _column(row, "owner"),
             "pin": _column(row, "pin"),
+            "contract": _column(row, "contract"),
             "joint_acceptance": _column(row, "joint acceptance", "joint_acceptance"),
             "fr": _column(row, "fr"),
+            "premises": _column(row, "premises"),
         })
+
     return {
         "path": str(path),
         "flow_class": flow_class,
         "criteria": criteria,
         "runtime_rows": runtime_rows,
+        "runtime_row_count": len(runtime_rows),
+        "runtime_section_present": present,
+        "prose": _prose_declarations(body, path),
     }
+
+
+def _prose_declarations(body_lines, path):
+    """`[(line_no, [RS-NNN, …])]` for the section's prose declarations (C-18).
+
+    Fenced code blocks (backtick and tilde fences) and heading lines are removed first; a
+    remaining `- **Runtime dependency**: …` line is a declaration. With an id it is a finding;
+    without one it is an input error naming the line, because the reason's argument grammar
+    admits only an id — and a silent pass there would be the false green this rule removes.
+    """
+    declarations = []
+    in_fence = False
+    for number, line in body_lines:
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence or HEADING_RE.match(line):
+            continue
+        stripped = line.strip()
+        if not PROSE_DECLARATION_RE.match(stripped):
+            continue
+        declared = re.findall(r"\bRS-\d{3}\b", stripped)
+        if not declared:
+            raise InputError(
+                "%s:%d is a prose runtime declaration carrying no `RS-NNN` id: the reason's "
+                "argument grammar admits only an id, so this line is an input error rather than "
+                "a silent pass" % (path, number)
+            )
+        declarations.append((number, declared))
+    return declarations
 
 
 def parse_fr_ids(path):
@@ -511,25 +608,26 @@ def parse_plan(path, flow_class):
 
     C-14: both sections MUST be present for an `execution`-class feature; their absence is an
     input error, because an incomplete plan is a defect of the artifact rather than a finding
-    about the feature.
+    about the feature. The inherited table is read by column name, and `Carrier slice` is part of
+    every `inherited` judgement (C-17).
     """
     text = _read(path)
     result = {"premises": [], "inherited": []}
 
     try:
-        premises_body = _section(text, PREMISES_SECTION_RE, "Execution Premises", path)
+        premises_lines = _section_lines(text, PREMISES_SECTION_RE, "Execution Premises", path)
     except InputError:
         if flow_class == "execution":
             raise
-        premises_body = ""
-    for index, row in enumerate(_table_rows(premises_body), start=1):
+        premises_lines = []
+    for number, row in _table_rows(premises_lines):
         ep_id = _clean(_column(row, "id"))
         if not EP_ID_RE.match(ep_id):
             raise InputError(
-                "%s § Execution Premises row %d carries no `EP-NNN` id (AS-09)" % (path, index)
+                "%s § Execution Premises row %d carries no `EP-NNN` id (AS-09)" % (path, number)
             )
         status = _clean(_column(row, "status"))
-        if status not in ("verified", "unverified", "falsified"):
+        if status not in PREMISE_STATUSES:
             raise InputError(
                 "%s § Execution Premises row %s declares `Status: %s`; the closed set is "
                 "verified / unverified / falsified (AS-09)" % (path, ep_id, status or "<empty>")
@@ -541,18 +639,28 @@ def parse_plan(path, flow_class):
         })
 
     try:
-        inherited_body = _section(text, INHERITED_SECTION_RE, "Inherited Blockers", path)
+        inherited_lines = _section_lines(text, INHERITED_SECTION_RE, "Inherited Blockers", path)
     except InputError:
         if flow_class == "execution":
             raise
-        inherited_body = ""
-    for index, row in enumerate(_table_rows(inherited_body), start=1):
+        inherited_lines = []
+    for index, (number, row) in enumerate(_table_rows(inherited_lines), start=1):
         result["inherited"].append({
+            "line": number,
             "row": _clean(_column(row, "#", "id")) or "row-%d" % index,
-            "source": _clean(_column(row, "source row", "source")),
+            "source": _column(row, "source row", "source"),
             "disposition": _clean(_column(row, "disposition")),
             "carrier": _column(row, "carrier (must be filled when `inherited`)", "carrier"),
+            "carrier_slice": _column(row, "carrier slice"),
         })
+    result["inherited_declaration"] = "\n".join(
+        line for _, line in inherited_lines
+    )
+    try:
+        d10_lines = _section_lines(text, D10_SECTION_RE, "D10", path)
+    except InputError:
+        d10_lines = []
+    result["d10"] = "\n".join(line for _, line in d10_lines)
     return result
 
 
@@ -671,6 +779,23 @@ def _reason(code, target=""):
     return {"code": code, "target": target}
 
 
+def _dedupe(reasons):
+    """One instance per fact: the same `(code, argument)` is reported once, in first-seen order.
+
+    The reason record counts reasons, and two paths to the same fact (a runtime-stack row citing a
+    falsified premise, and the premise table itself) would otherwise make one defect look like two.
+    """
+    seen = set()
+    unique = []
+    for reason in reasons:
+        instance = (reason["code"], reason["target"])
+        if instance in seen:
+            continue
+        seen.add(instance)
+        unique.append(reason)
+    return unique
+
+
 def _first_status(statuses, sc_id):
     values = statuses.get(sc_id, [])
     return values[0] if values else ""
@@ -737,24 +862,40 @@ def ladder_reasons(criteria, verification):
     return reasons
 
 
-def runtime_reasons(requirements, fr_ids, tasks_text, verification):
-    """AS-07 / AS-08: the runtime-stack ownership obligations.
+def runtime_reasons(requirements, fr_ids, tasks_text, verification, premises, repo):
+    """AS-05…AS-08 / C-13 / C-18: the runtime-stack class and the prose-declaration rule.
 
-    Three separately judgeable obligations for an `in-scope` row — the `FR` cell resolves to an FR
-    defined in this spec (**input error**, never a `block`), a task row quotes that FR,
-    `verification.md` carries a joint-acceptance row naming the `RS-NNN`. A `signed-contract` row
-    needs a measured pin and a named joint acceptance; a `user-waived` row needs the waiver to name
-    who waived and what is accepted, because a fully anonymous row is indistinguishable from an
-    unowned one. The prose-only case (a capability declared in prose with no row) is 081b's
-    extraction — see the module docstring.
+    Three shapes, three verdicts, and **silence is not one of them**: an absent section is an
+    input error (raised by `parse_requirements`), a section with zero data rows blocks under the
+    reserved `runtime-stack` argument, and a row with a required-but-empty cell blocks under its
+    own id. Cell-shape defects — a `Form` outside the domain, a `Premises` id with no matching
+    row, a `signed-contract` `Contract` path that does not resolve — exit 2, because a cell that
+    cannot be parsed is a fact about the artifact.
+
+    Duty ③ (a joint-acceptance row naming the `RS-NNN`) is judged here, at closure: no stage gate
+    takes `verification.md` as input. Duty ② is a **line-level** `tasks.md` row match, never a
+    whole-file substring — an FR named in a table cell or in prose is not a task row (FR-009).
     """
     reasons = []
+    if not requirements.get("runtime_section_present", True):
+        # `expression`-class feature with no table: legal, and the reserved block does not apply —
+        # the section is absent for a class that is exempt, not present-and-empty.
+        return reasons
+    if requirements["runtime_row_count"] == 0:
+        reasons.append(_reason(R_RUNTIME, RESERVED_RUNTIME_ARGUMENT))
+    for _, declared in requirements["prose"]:
+        for rs_id in declared:
+            reasons.append(_reason(R_RUNTIME, rs_id))
+
     for row in requirements["runtime_rows"]:
         rs_id, form = row["id"], row["form"]
         if form == FORM_NOT_REQUIRED:
             continue
+        problems = False
+        if _blank(row["capability"]):
+            problems = True
+        cited = FR_ID_RE.findall(_clean(row["fr"]))
         if form == FORM_IN_SCOPE:
-            cited = FR_ID_RE.findall(_clean(row["fr"]))
             if not cited:
                 raise InputError(
                     "%s § Runtime Stack row %s declares `Form: in-scope` with an empty `FR` "
@@ -768,19 +909,53 @@ def runtime_reasons(requirements, fr_ids, tasks_text, verification):
                     "define — a defect of the artifact, never a `block` about the feature "
                     "(AS-07 ①)" % (requirements["path"], rs_id, ", ".join(sorted(unresolved)))
                 )
-            if not any(fr in tasks_text for fr in cited):
-                reasons.append(_reason(R_RUNTIME, rs_id))
-                continue
+            if _blank(row["joint_acceptance"]):
+                problems = True
+            if not any(_task_row_quotes(tasks_text, fr) for fr in cited):
+                problems = True
             if rs_id not in verification["joint_acceptance"]:
-                reasons.append(_reason(R_RUNTIME, rs_id))
-            continue
-        if form == FORM_SIGNED:
-            if _blank(row["pin"]) or _blank(row["joint_acceptance"]):
-                reasons.append(_reason(R_RUNTIME, rs_id))
-            continue
-        if _blank(row["owner"]) or _blank(row["joint_acceptance"]):
+                problems = True
+        elif form == FORM_SIGNED:
+            contract = _clean(row["contract"])
+            if (_blank(row["pin"]) or not contract or _blank(row["joint_acceptance"])
+                    or _blank(row["owner"])):
+                problems = True
+            if contract and not _resolves(contract, repo):
+                raise InputError(
+                    "%s § Runtime Stack row %s names a `Contract` path that does not resolve in "
+                    "the checkout: %s (AS-06)" % (requirements["path"], rs_id, contract)
+                )
+        elif _blank(row["owner"]) or _blank(row["joint_acceptance"]):
+            problems = True
+
+        if cited:
+            if _blank(row["premises"]):
+                problems = True
+            else:
+                for ep_id in EP_ID_RE.findall(_clean(row["premises"])):
+                    if ep_id not in premises:
+                        raise InputError(
+                            "%s § Runtime Stack row %s cites %s, which § Execution Premises does "
+                            "not define — a defective cell (AS-09 / AS-11)"
+                            % (requirements["path"], rs_id, ep_id)
+                        )
+        if problems:
             reasons.append(_reason(R_RUNTIME, rs_id))
     return reasons
+
+
+def _task_row_quotes(tasks_text, fr_id):
+    """Whether a **task row** quotes `fr_id` — the line-level match of FR-009, never a substring."""
+    pattern = re.compile(r"^- \[.\] T\d{3}.*\b%s\b" % re.escape(fr_id))
+    return any(pattern.match(line) for line in tasks_text.splitlines())
+
+
+def _resolves(relative_path, repo):
+    """Whether a repo-relative path resolves in the checkout."""
+    candidate = Path(relative_path)
+    if not candidate.is_absolute():
+        candidate = Path(repo) / relative_path
+    return candidate.is_file()
 
 
 def premise_reasons(plan):
@@ -796,22 +971,208 @@ def premise_reasons(plan):
     ]
 
 
-def inherited_reasons(plan, key):
-    """AS-10: an undisposed row, and the `inherited` row whose carrier is missing.
+def declared_dependency_files(section_text, spec_dir):
+    """The dependency artifacts the plan's declaration names, resolved and deduplicated.
 
-    The argument is the source row's own `<feature>:<row>` locator when the cell carries one. When
-    it does not — the dependency-artifact extraction that would supply it is 081b's — the locator
-    falls back to this feature's key plus the plan row id, so the reason still points at a real row
-    instead of carrying a placeholder or a malformed argument.
+    The dependency set is **declared, never implied**: only a backticked `.md` token inside
+    `§ Inherited Blockers` is read, so an unopened dependency is visible as a missing row instead
+    of being silently assumed away.
+    """
+    found = []
+    for token in re.findall(r"`([^`\n]+)`", section_text):
+        token = token.strip()
+        if not token.endswith(".md"):
+            continue
+        candidate = Path(spec_dir) / token
+        if candidate.is_file() and candidate not in found:
+            found.append(candidate)
+    return found
+
+
+def _deferred_locators(text, feature_id):
+    """One locator per non-empty `## Deferred` list item (`deferred:<slug>`, else `row-<n>`)."""
+    try:
+        body = _section_lines(text, DEFERRED_SECTION_RE, "Deferred", "the dependency detail")
+    except InputError:
+        return []
+    locators = []
+    index = 0
+    for _, line in body:
+        stripped = line.strip()
+        if not stripped.startswith("-"):
+            continue
+        content = stripped.lstrip("-").strip()
+        if not content:
+            continue
+        index += 1
+        label = re.match(r"\*\*(.+?)\*\*", content)
+        slug = ""
+        if label:
+            slug = re.sub(r"\s+", "-", label.group(1).strip().lower())
+            if not re.match(r"^[a-z0-9][a-z0-9-]*$", slug):
+                slug = ""
+        locators.append("%s:deferred:%s" % (feature_id, slug or "row-%d" % index))
+    return locators
+
+
+def _verification_locators(text, feature_id):
+    """`blocked` / `deferred` / **`partial`** status rows plus a non-empty `deferred_tasks=`."""
+    locators = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        status = re.match(r"^(SC-\d{3})_status=(.*)$", stripped)
+        if status:
+            if status.group(2).strip() in EXTRACTED_STATUSES:
+                locators.append("%s:%s_status" % (feature_id, status.group(1)))
+            continue
+        deferred = re.match(r"^deferred_tasks=(.*)$", stripped)
+        if deferred and deferred.group(1).strip():
+            locators.append("%s:deferred_tasks" % feature_id)
+    return locators
+
+
+def extracted_dependency_rows(section_text, spec_dir):
+    """Every row the closed three-source set yields (C-17), in declaration order.
+
+    Three sources and nowhere else: the dependency's `## Deferred` list items, its `verification.md`
+    status rows in `blocked` / `deferred` / `partial`, and a **non-empty** `deferred_tasks=` list.
+    `partial` is inside the set because a dependency may carry `partial` rows and nothing else —
+    an extraction set that excluded it would be disjoint from the disposition set and the finding
+    could never fire.
+    """
+    details, verifications = [], []
+    for path in declared_dependency_files(section_text, spec_dir):
+        text = _read(path)
+        (verifications if VERIFICATION_FIELD_RE.search(text) else details).append(text)
+
+    feature_ids = []
+    for text in details:
+        match = FEATURE_ID_RE.search(text)
+        feature_ids.append(match.group(1) if match else None)
+    default_id = next((fid for fid in feature_ids if fid), None)
+
+    locators = []
+    for text, feature_id in zip(details, feature_ids):
+        if feature_id:
+            locators.extend(_deferred_locators(text, feature_id))
+    for text in verifications:
+        first = next((line for line in text.splitlines() if line.strip()), "")
+        match = re.search(r"\b(\d{3})\b", first)
+        feature_id = match.group(1) if match else default_id
+        if feature_id:
+            locators.extend(_verification_locators(text, feature_id))
+    return locators
+
+
+def parse_carrier(raw):
+    """`("task", T-ID, path)` / `("gate", GATE-ID)` / `("test", path)` / `None`.
+
+    `SC-NNN` is not a carrier at all: a criterion that may be deferred cannot carry an inherited
+    measurement, so a `supporting`-path SC in this cell is judged exactly as an undisposed row.
+    """
+    match = CARRIER_TASK_RE.match(raw)
+    if match:
+        return ("task", match.group(1), match.group(2))
+    match = CARRIER_GATE_RE.match(raw)
+    if match:
+        return ("gate", match.group(1))
+    match = CARRIER_TEST_ONLY_RE.match(raw)
+    if match:
+        return ("test", match.group(1))
+    return None
+
+
+def carrier_resolves(parsed, tasks_text):
+    """`True` when the named carrier resolves in this slice's `tasks.md`."""
+    kind = parsed[0]
+    if kind == "task":
+        task_id, test_path = parsed[1], parsed[2]
+        rows = {}
+        for line in tasks_text.splitlines():
+            match = TASK_ROW_ID_RE.match(line)
+            if match:
+                rows[match.group(1)] = line
+        return task_id in rows and test_path in rows[task_id]
+    if kind == "gate":
+        return any(match.group(1) == parsed[1] for match in GATE_ROW_RE.finditer(tasks_text))
+    return False
+
+
+def later_slice_is_legal(slice_value, spec_dir, claimed_status, plan):
+    """A later `Carrier slice` is legal only while the parent is `Blocked` and D10 lists it."""
+    if claimed_status != "Blocked":
+        return False
+    return bool(re.search(r"(?<!\w)%s(?!\w)" % re.escape(slice_value),
+                          plan.get("d10", "")))
+
+
+def inherited_reasons(plan, key, spec_dir, tasks_text, claimed_status):
+    """AS-10 / C-17: the undisposed row, and the `inherited` row whose carrier cannot carry.
+
+    Extraction **discovers** rows: the three closed sources are read from the dependency artifacts
+    the plan declares, and every extracted locator is joined to a disposition row by its own
+    `Source row` cell. One reason covers five ways to fail — undisposed, blank carrier,
+    unparseable carrier, unresolvable carrier, deferrable-`supporting`-SC carrier — so the closed
+    set does not grow. A later-slice carrier is not one of them: `Carrier slice` plus the parent's
+    claimed status make it **`inherited-later`** — disclosed, neither blocking nor resolved.
     """
     reasons = []
+    seen = {}
+    entries = []
     for row in plan["inherited"]:
-        disposition = row["disposition"]
-        source = row["source"]
-        locator = source if SOURCE_LOCATOR_RE.match(source) else "%s:%s" % (key, row["row"])
+        source = _clean(row["source"])
+        if source and not SOURCE_LOCATOR_RE.match(source):
+            if source.lower() not in ABSENT_LOCATORS:
+                raise InputError(
+                    "plan.md § Inherited Blockers row %s carries `Source row` %r, which is not a "
+                    "`<feature>:<row>` locator — the join key has one grammar (C-17)"
+                    % (row["row"], source)
+                )
+            source = ""
+        if source:
+            if source in seen:
+                raise InputError(
+                    "plan.md § Inherited Blockers disposes %s twice (rows %s and %s) — the join "
+                    "key must be unique" % (source, seen[source], row["row"])
+                )
+            seen[source] = row["row"]
+        entries.append({
+            "source": source,
+            "row": row["row"],
+            "disposition": row["disposition"],
+            "carrier": _clean(row["carrier"]),
+            "slice": "" if _blank(row["carrier_slice"]) else _clean(row["carrier_slice"]),
+        })
+
+    for entry in entries:
+        disposition = entry["disposition"]
+        carrier = entry["carrier"]
+        slice_value = entry["slice"]
+        if slice_value and slice_value != "this-slice" and not LATER_SLICE_RE.match(slice_value):
+            raise InputError(
+                "plan.md § Inherited Blockers row %s declares `Carrier slice: %s`, which is "
+                "neither `this-slice` nor a slice id (C-17)" % (entry["row"], slice_value)
+            )
+        failed = False
         if disposition not in DISPOSITIONS:
-            reasons.append(_reason(R_INHERITED, locator))
-        elif disposition == "inherited" and _blank(row["carrier"]):
+            failed = True
+        elif disposition == "inherited":
+            parsed = parse_carrier(carrier) if carrier else None
+            if not carrier or parsed is None:
+                failed = True
+            elif LATER_SLICE_RE.match(slice_value or "") and later_slice_is_legal(
+                    slice_value, spec_dir, claimed_status, plan):
+                # `inherited-later`: the carrier is the test path alone, and the task id of an
+                # unwritten `tasks.md` MUST NOT be fabricated.
+                failed = parsed[0] != "test"
+            else:
+                failed = not carrier_resolves(parsed, tasks_text)
+        if failed:
+            reasons.append(_reason(
+                R_INHERITED, entry["source"] or "%s:%s" % (key, entry["row"])))
+
+    for locator in extracted_dependency_rows(plan.get("inherited_declaration", ""), spec_dir):
+        if locator not in seen:
             reasons.append(_reason(R_INHERITED, locator))
     return reasons
 
@@ -894,12 +1255,14 @@ def run(args):
     criteria = requirements["criteria"]
     plan = parse_plan(resolved["plan.md"], flow_class)
     tasks = parse_tasks(resolved["tasks.md"])
+    tasks_text = _read(resolved["tasks.md"])
     verification = parse_verification(resolved["verification.md"])
     smoke_passes, smoke_detail = evaluate_smoke(verification, resolved["repo"])
     claimed_status, claimed_source = resolve_claimed_status(resolved)
 
     statuses = verification["statuses"]
     counts = final_path_counts(criteria, statuses)
+    premises = {row["id"]: row for row in plan["premises"]}
 
     reasons = []
     reasons.extend(final_path_reasons(flow_class, criteria, statuses, counts))
@@ -907,11 +1270,18 @@ def run(args):
     reasons.extend(runtime_reasons(
         requirements,
         parse_fr_ids(resolved["requirements.md"]),
-        _read(resolved["tasks.md"]),
+        tasks_text,
         verification,
+        premises,
+        resolved["repo"],
     ))
     reasons.extend(premise_reasons(plan))
-    reasons.extend(inherited_reasons(plan, feature_key(spec_dir)))
+    reasons.extend(inherited_reasons(
+        plan, feature_key(spec_dir), spec_dir, tasks_text, claimed_status))
+    # Two producers, one closed set, one instance per fact: the runtime-row duty and the
+    # premise table can each reach the same falsified premise, and the payload counts reasons, so
+    # the same instance is reported once.
+    reasons = _dedupe(reasons)
 
     conditions = completion_conditions(criteria, statuses, tasks, smoke_passes, flow_class)
     if claimed_status in CLAIMED_IMPLEMENTED and not all(conditions.values()):

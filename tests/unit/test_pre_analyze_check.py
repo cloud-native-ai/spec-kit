@@ -11,16 +11,40 @@ SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "pr
 
 def _spec(tmp_path, plan_extra="", task_extra="", requirement_extra="",
           contract_text="- **AB-01**: local clause\n"):
+    """A minimal **conforming** spec.
+
+    Conforming, not incidental: since 081b the runtime-stack table, `§ Execution Premises` and
+    `§ Inherited Blockers` are mandatory for an `execution`-class feature (FR-009…FR-012), and
+    their absence is an input error at the requirements and plan stages. A fixture that omitted
+    them would be testing the new gate's input-error path in every case at once, so it carries the
+    smallest complete shape instead: one `in-scope` row, one `verified` premise, one
+    `not-applicable` inherited row, and a task row that quotes the FR (duty ② is line-level).
+    """
     spec = tmp_path / "001-demo"
     (spec / "contracts").mkdir(parents=True)
     (spec / "requirements.md").write_text(
         "# Requirements\n\n- **FR-001**: first\n- **FR-002**: second\n"
-        "- **SC-001**: criterion\n" + requirement_extra, encoding="utf-8")
+        "- **SC-001**: criterion\n" + requirement_extra
+        + "\n### Runtime Stack & Dependency Ownership\n\n"
+        "| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |\n"
+        "|----|------------|------|-------|-----|----------|------------------|-----|----------|\n"
+        "| RS-001 | demo runtime capability | in-scope | this fixture | fixture-local | — | "
+        "the joint-acceptance row names RS-001 | FR-001 | EP-001 |\n",
+        encoding="utf-8")
     (spec / "plan.md").write_text(
-        "# Plan\n\nCovers FR-001 and FR-002 against SC-001.\n" + plan_extra,
+        "# Plan\n\nCovers FR-001 and FR-002 against SC-001.\n" + plan_extra
+        + "\n## Execution Premises\n\n"
+        "| ID | Premise | Evidence | Status | Decision |\n"
+        "|----|---------|----------|--------|----------|\n"
+        "| EP-001 | the demo runtime is available | fixture-local | verified | — |\n"
+        "\n## Inherited Blockers\n\n"
+        "Dependency set: none.\n\n"
+        "| # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |\n"
+        "|---|-----------|-------------|---------|---------------|-----------------|\n"
+        "| IB-001 | (none) | not-applicable | — | — | the fixture has no dependency |\n",
         encoding="utf-8")
     (spec / "tasks.md").write_text(
-        "# Tasks\n\n- [ ] T001 first\n- [ ] T002 second [blockedBy: T001]\n"
+        "# Tasks\n\n- [ ] T001 first (FR-001)\n- [ ] T002 second [blockedBy: T001]\n"
         + task_extra, encoding="utf-8")
     if contract_text is not None:
         (spec / "contracts" / "core.md").write_text(

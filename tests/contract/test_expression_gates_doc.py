@@ -42,7 +42,10 @@ import or collection error.
 """
 from __future__ import annotations
 
+import importlib.util
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -633,4 +636,158 @@ def test_call_site_table_is_the_only_operator_registry():
     assert re.search(r"调用点表", text), "owner must name the call-site table"
     assert re.search(r"MUST NOT\s*复制|不得复制|不复述", text), (
         "owner must forbid templates / skills from copying the operator registry"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-15 / C-16 (081b) — an operator row must name a command that can actually run
+# --------------------------------------------------------------------------- #
+#: Shells that may prefix a script invocation in the operator table.
+SCRIPT_LAUNCHERS = ("python3", "python", "bash", "sh")
+#: Where a bare script name may live. Enumerated rather than globbed repo-wide: a recursive
+#: search over this tree costs more than the assertion is worth, and these are the four roots the
+#: gate rows can legitimately name.
+SCRIPT_ROOTS = (
+    "scripts/python/%s",
+    "scripts/bash/%s",
+    "skills/*/scripts/%s",
+    "skills/*/*/scripts/%s",
+)
+CHINESE_DIGITS = {
+    "零": 0, "一": 1, "二": 2, "三": 3, "四": 4,
+    "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10,
+}
+
+
+def _resolve_script(token):
+    """The file a gate row's command token names, or None."""
+    if "/" in token:
+        candidate = REPO_ROOT / token
+        return candidate if candidate.is_file() else None
+    for pattern in SCRIPT_ROOTS:
+        for candidate in sorted(REPO_ROOT.glob(pattern % token)):
+            if candidate.is_file():
+                return candidate
+    return None
+
+
+def _operator_rows():
+    header, rows = _table(_read_owner(), "阶段", "执行算子", "对应面", "阻断级别")
+    index = _column(header, "执行算子")
+    return [
+        (row[0], row[index])
+        for row in rows
+        if len(row) == len(header) and row[0] and index < len(row)
+    ]
+
+
+def _help_text(path):
+    proc = subprocess.run(
+        [sys.executable, str(path), "--help"], capture_output=True, text=True
+    )
+    return proc.returncode, proc.stdout + proc.stderr
+
+
+def test_c15_every_operator_command_names_an_invocable_script_and_accepted_flags():
+    """The § 阶段算子表 § 算子命令必须可调用 rule, asserted rather than asserted-about.
+
+    A row whose first command names a script that does not exist, or a flag that script's
+    `--help` does not accept, is a row nobody can run — and a gate row nobody can run reads as a
+    gate that passed. The check is mechanical on both halves: the path resolves, and every
+    `--flag` in the same command appears in that script's own `--help`.
+    """
+    problems = []
+    checked = 0
+    for stage, cell in _operator_rows():
+        for command in re.findall(r"`([^`\n]+)`", cell):
+            parts = command.split()
+            if not parts:
+                continue
+            token = parts[0]
+            if token in SCRIPT_LAUNCHERS:
+                if len(parts) < 2:
+                    continue
+                token = parts[1]
+            if not token.endswith(".py"):
+                continue
+            path = _resolve_script(token)
+            if path is None:
+                problems.append("%s: %r names no existing script" % (stage, token))
+                continue
+            checked += 1
+            status, helper = _help_text(path)
+            if status != 0:
+                problems.append("%s: `%s --help` exited %d" % (stage, token, status))
+                continue
+            for flag in (item.split("=")[0] for item in parts if item.startswith("--")):
+                if flag not in helper:
+                    problems.append(
+                        "%s: %r passes %s, which `%s --help` does not accept"
+                        % (stage, command, flag, token)
+                    )
+    assert checked >= 8, (
+        "the operator table must name at least one runnable command per stage; found %d" % checked
+    )
+    assert not problems, "uninvocable operator rows:\n- " + "\n- ".join(problems)
+
+
+def test_c15b_validate_requirements_is_not_written_with_a_flag_it_rejects():
+    """The specific drift this slice repaired: `--spec-dir` is not this script's calling surface."""
+    status, helper = _help_text(REPO_ROOT / "scripts" / "python" / "validate-requirements.py")
+    assert status == 0, helper
+    assert "--spec-dir" not in helper, (
+        "validate-requirements.py DOES accept --spec-dir — the owner row's parenthetical and this "
+        "guard are now disagreeing, and the owner is the one to fix"
+    )
+    for stage, cell in _operator_rows():
+        if "validate-requirements.py" not in cell:
+            continue
+        for command in re.findall(r"`([^`\n]+)`", cell):
+            if "validate-requirements.py" not in command:
+                continue
+            assert "--spec-dir" not in command, (
+                "%s: the command %r passes --spec-dir to validate-requirements.py, which the "
+                "script rejects" % (stage, command)
+            )
+
+
+def _validate_requirements_labels():
+    """The script's own `LABELS` tuple — the single owner of the check count."""
+    import importlib.util
+
+    path = REPO_ROOT / "scripts" / "python" / "validate-requirements.py"
+    assert path.is_file(), "validate-requirements.py is missing"
+    spec = importlib.util.spec_from_file_location("validate_requirements", path)
+    assert spec and spec.loader, "cannot load %s" % path
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.LABELS
+
+
+def test_c16_the_declared_check_count_equals_the_scripts_label_count():
+    """A hand-written count beside a machine-owned tuple drifts; this is the sentinel.
+
+    The count is stated once in the operator row and owned by the script's `LABELS` tuple, so the
+    assertion is `declared == len(LABELS)` **and** every label named. Adding a label without
+    touching the owner, or editing the number, fails here.
+    """
+    labels = _validate_requirements_labels()
+    rows_naming = [cell for _, cell in _operator_rows() if "validate-requirements.py" in cell]
+    assert len(rows_naming) == 1, (
+        "exactly one operator row may state validate-requirements.py's check count; found %d"
+        % len(rows_naming)
+    )
+    cell = rows_naming[0]
+    match = re.search(r"([零一二三四五六七八九十]+|\d+)\s*项结构检查", cell)
+    assert match, "the row naming validate-requirements.py must state its check count"
+    raw = match.group(1)
+    declared = int(raw) if raw.isdigit() else CHINESE_DIGITS[raw]
+    assert declared == len(labels), (
+        "the owner declares %s 项结构检查 but the script's LABELS tuple holds %d: %r"
+        % (raw, len(labels), labels)
+    )
+    missing = [label for label in labels if label not in cell]
+    assert not missing, (
+        "the owner row names %r but omits %r — the count and the label set must describe the same "
+        "tuple" % (labels, missing)
     )

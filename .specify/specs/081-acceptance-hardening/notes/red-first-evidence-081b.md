@@ -31,15 +31,32 @@ extraction) close.
 | (g) | the runtime-row class's three shapes are three verdicts, with the **zero-data-row** case asserting a block and **not** a silent pass | AS-05; C-13; V-27 | `runtime-zero-row` |
 | (h) | the prose rule's arms: a marked declaration with an `RS-NNN` fires; a marked declaration without an id is an input error; an unmarked narrative line carrying an id does not fire; a marker-shaped line inside a fenced code block does not fire | AS-08; C-18 | `runtime-gap-mutation` |
 
-### 1.1 `tests/contract/test_acceptance_premises.py` — **red run: pending, written by T005**
+### 1.1 `tests/contract/test_acceptance_premises.py` — red run recorded by T005
 
 - Command line: `bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py -q`
-- Real output: **pending** — T005 has not run in part 1. There is no red to claim yet, and none is claimed.
-- Exit status / failing count: **pending** / **pending**
-- Why no claim is made here: the module's subject — the four findings in `pre-analyze-check.py` (T006) and the
-  extraction in `closure-acceptance-check.py` (T008) — is **not landed in this part**. This part lands the
-  fixtures the legs read (T001) and the schema they judge against (T003, T004). T005 therefore authors the module
-  first and records its red run in this section before T006 and T008 close, per DoD-2.
+- Real output (tail, verbatim — full transcript in the run's console):
+
+```text
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_premises.py -q
+...
+FAILED tests/contract/test_acceptance_premises.py::test_h2_a_marked_declaration_without_an_id_is_an_input_error_naming_the_line
+FAILED tests/contract/test_acceptance_premises.py::test_h3_the_fenced_exclusion_is_mechanical_not_a_reading
+17 failed, 6 passed in 1.49s
+```
+
+- Exit status: **1** · Failing count: **17 failed, 6 passed**
+- The 17 red legs are exactly the ones whose subject is T006's four findings or T008's extraction:
+  `test_a_every_mutation_fixture_blocks_with_member_instances`, `test_b1…`,
+  `test_b1b…`, `test_b3…`, `test_c1…`, `test_c2…`, `test_c3…`, `test_c4…`, `test_c5…`, `test_d…`,
+  `test_g1…`, `test_g2…`, `test_g3…`, `test_g4…`, `test_h1…`, `test_h2…`, `test_h3…`.
+- The 6 legs that were **already green when authored** are stated rather than dressed up as a red,
+  because their subject landed earlier — part 1 for the schema, 081a for the closure verdict:
+  `test_a2…` and `test_f…` (T003/T004's owner doc and plan skeleton), `test_a3…` (the membership
+  helper reads `requirements.md` § Shared Strings), `test_b2…` (081a's joint-acceptance check),
+  `test_c2b…` (the fixtures' own `Path` markers) and `test_e…` (the runner pins recorded by 081a).
+- Why a red is claimable here at all: this module is authored **before** T006 and T008 in the same
+  part, and it was run against the unmodified checkers — so the red is a measurement of the
+  missing implementation, not a re-statement of it.
 
 ## 2. Polish readings (written by T011 and T012)
 

@@ -31,9 +31,14 @@ record is complete MUST NOT be refused.
 
 ### Runtime Stack & Dependency Ownership
 
-| ID | Capability | Form | Owner | Pin | Joint acceptance | FR |
-|----|------------|------|-------|-----|------------------|-----|
-| RS-001 | fixture runtime capability | in-scope | this fixture | `900` fixture commit | `verification.md` carries the joint-acceptance row naming `RS-001` | FR-001 |
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | fixture runtime capability | in-scope | this fixture | `900` fixture commit | — | `verification.md` carries the joint-acceptance row naming `RS-001` | FR-001 | EP-001 |
+
+The fixture also mentions RS-004 inside narrative prose, deliberately without the declaration
+marker: an id inside a sentence is not a declaration, so the prose rule MUST NOT fire on it. This
+is the exclusion arm on the accepting side — `runtime-gap-mutation` proves the same arm beside a
+real defect.
 
 ## Success Criteria *(mandatory)*
 

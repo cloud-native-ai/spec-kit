@@ -34,9 +34,9 @@ are exempt from the `final ≥ 1` floor, and the exemption is mechanical — it 
 
 An `expression`-class feature may record `not-required` with a stated reason instead of an owned capability.
 
-| ID | Capability | Form | Owner | Pin | Joint acceptance | FR |
-|----|------------|------|-------|-----|------------------|-----|
-| RS-001 | runtime capability | not-required | — | — | — | — |
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | runtime capability | not-required | — | — | — | — | — | — |
 
 Reason: the fixture delivers prose only; it runs nothing and therefore owns no runtime capability.
 

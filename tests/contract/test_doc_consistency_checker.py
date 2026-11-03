@@ -146,7 +146,14 @@ def _git_commit_all(repo: Path, message: str = "fixture") -> None:
 
 
 def _spec_dir(root: Path) -> Path:
-    """A minimal, count-consistent spec dir (3 FR / 2 SC / 3 tasks)."""
+    """A minimal, count-consistent spec dir (3 FR / 2 SC / 3 tasks).
+
+    Conforming as well as minimal: the `count` face delegates to `pre-analyze-check.py --stage
+    plan`, and since 081b an `execution`-class `requirements.md` without § Runtime Stack &
+    Dependency Ownership is an input error there (the delegate's exit 2 would leave the face
+    `not-evaluated` and every count assertion below would be testing a degradation instead of a
+    count). The three mandatory sections are therefore present in their smallest valid form.
+    """
     spec = root / "specs" / "001-fixture"
     _write(
         spec / "requirements.md",
@@ -155,9 +162,26 @@ def _spec_dir(root: Path) -> Path:
         "- **FR-002**: second requirement.\n"
         "- **FR-003**: third requirement.\n"
         "- **SC-001**: first criterion.\n"
-        "- **SC-002**: second criterion.\n",
+        "- **SC-002**: second criterion.\n"
+        "\n### Runtime Stack & Dependency Ownership\n\n"
+        "| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |\n"
+        "|----|------------|------|-------|-----|----------|------------------|-----|----------|\n"
+        "| RS-001 | fixture runtime capability | in-scope | this fixture | fixture-local | — | "
+        "the joint-acceptance row names RS-001 | FR-001 | EP-001 |\n",
     )
-    _write(spec / "plan.md", "# Plan\n\nNo count claim here.\n")
+    _write(
+        spec / "plan.md",
+        "# Plan\n\nNo count claim here.\n"
+        "\n## Execution Premises\n\n"
+        "| ID | Premise | Evidence | Status | Decision |\n"
+        "|----|---------|----------|--------|----------|\n"
+        "| EP-001 | the fixture runtime is available | fixture-local | verified | — |\n"
+        "\n## Inherited Blockers\n\n"
+        "Dependency set: none.\n\n"
+        "| # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |\n"
+        "|---|-----------|-------------|---------|---------------|-----------------|\n"
+        "| IB-001 | (none) | not-applicable | — | — | the fixture has no dependency |\n",
+    )
     _write(
         spec / "tasks.md",
         "# Tasks\n\n- [ ] T001 first task\n- [ ] T002 second task\n- [ ] T003 third task\n",
