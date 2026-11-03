@@ -32,6 +32,7 @@
 
 ## Notes
 
+- **这是一份被取代的快照（superseded snapshot，2026-11-01）**：本文件记录的是 **clarify / plan 之前**的规格状态，其中三类陈述已被后续阶段取代，读它时 MUST 以现行产物为准——① A3 的 review 组合（当时写「三段」）已由 clarify 改为**四段 + 一次确定性判定**（现行 `requirements.md` § Assumptions A3 与 FR-013）；② `Related Feature` 当时保持 `Need clarification`，已由 clarify 绑定为 **Feature 081**（`requirements.md` § Related Feature、`feature-ref.md`）；③ 下文引用的行号与计数（如 `scanned: 232 lines`）是当日文件的读数，其后每次规格修订都会移动，本节之后不再追踪。本文件不再是门禁输入，也不是任何计数的事实源。
 - **Deterministic checker（所有计数的唯一权威）**：`python3 .specify/scripts/python/validate-requirements.py .specify/specs/081-acceptance-hardening/requirements.md` → `status: ok`；`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` 全 pass；`scanned: 232 lines, 34 definition rows, 17 shared strings`；`0 error(s), 0 warning(s)`；exit 0。逐字输出存于 `test-evidence/validate-requirements.txt`。本清单不手抄计数。34 个定义行 = 25 条 FR + 9 条 SC；两个分项由下面两条门的程序输出交叉确认，不是人工拆分。
 - **Decomposition gate（FR 上限）**：`decomposition-check.py --mode plan` → `decision=proceed`，`fr_count=25 ≤ fr_ceiling=30`；exit 0。输出存于 `test-evidence/decomposition-check.json`。故 § Decomposition & Ceiling 断言「不需要切成 081a–081d」有程序读数支撑，081a–081d 只作为 plan 阶段可选边界保留。
 - **Pre-analyze gate（requirements 阶段）**：`pre-analyze-check.py --stage requirements` → `decision=pass errors=0 advisories=0 waived=0`，`fr=25 sc=9 clauses=0`；exit 0。输出存于 `test-evidence/pre-analyze-check.{txt,json}`。

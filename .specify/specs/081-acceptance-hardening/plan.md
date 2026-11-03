@@ -26,7 +26,7 @@
 **Project Type**: single（框架源码 + 自举运行时双帽：改 `templates/`、`shared/`、`skills/`、`scripts/`、`src/`、`tests/`，`.specify/` 同名文件由再生成入口产出）
 **Performance Goals**: 无吞吐目标。checker 对 081 自身规格的判定 < 1 s（4 个 Markdown 输入 + 1 个注册表）；smoke 单次 ≤ 2 min（`specify init` 一次 + 3 次引擎调用）；两次 smoke 退出码一致（2/2）
 **Constraints**: checker MUST 只读（零写入，`--audit-existing` 只读审计）且 stdlib-only；退出码三态 0/1/2；封闭原因集 7 项不得扩张；MUST NOT 新建第二套并行门禁；MUST NOT 替换 `code-review`；MUST NOT 回写历史特性状态与历史 verification 记录；不 push
-**Scale/Scope**: 4 条用户故事；25 FR / 9 SC（`final` 仅 SC-001、SC-002）；预计改/建 **42 个源面**（模板 11、shared 3、技能 9、脚本 3、`src/` 1、测试 15）+ 6 对镜像关系 + 4 份按工具命令副本；实现任务自然计数 ≈52 > 40 → 按 US1–US4 切 081a–081d（见 § Design Decisions D10）
+**Scale/Scope**: 4 条用户故事；25 FR / 9 SC（`final` 仅 SC-001、SC-002）；预计改/建 **43 个源面**（模板 10、shared 3、技能 11、脚本 2、`src/` 1、测试 16）+ 6 对镜像关系 + 4 份按工具命令副本；实现任务自然计数 ≈58（分组读数之和 55，加本阶段补入的三行：集合级基线比较、覆盖率账目、`manage-features` 词表）> 40 → 按 US1–US4 切 081a–081d（见 § Design Decisions D10）。六个分项逐项加总 = 43：模板 `feature-details`/`verification-log`/`tasks`/`feature-index`/`plan`/`review` 6 个 + `commands/` 下 `review`/`implement`/`tasks`/`checklist` 4 个；shared 3 个；技能 5 个内部技能 + `sdd-loop-driver` 的 `SKILL.md`、两份 `references/`、三个 `scripts/` = 11；脚本 2 个；`src/` 1 个；测试 = 6 个新契约模块 + 1 个 schema 唯一性守卫 + 1 个 smoke + 8 个按 `research.md` § R3 逐条改的钉扎模块 = 16（夹具目录是数据而非源面，不计入）
 
 ## Constitution Check
 
@@ -39,7 +39,7 @@
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每条设计决定都追到 FR：`contracts/gate-wiring.contract.md` § 可追溯性是 FR→条款→测试的唯一映射；两句 `MUST NOT` 阈值（`final` 路径全 `pass`、smoke 在案）直接来自 FR-002/FR-005 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 081（`feature-ref.md`）；本阶段只落 `Draft → Planned` 与 `Key Changes`，不新建行、不回退他人状态（`features.md` 行与 `features/081.md` 同趟更新） |
 | III | Intent-Driven Development | ✅ Pass | Summary 先给「用户看到的差别」，实现细节留给 `contracts/`；D1–D10 逐条记录被否决的替代方案（`## Design Decisions`）而非只留结论 |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 每个新判定都有先写或同批写的契约/单元测试：`tests/contract/test_closure_acceptance_check.py`（正／负夹具红先行）、`test_line_state_blocked.py`（八项处置）、`test_acceptance_state_machine.py`、`test_acceptance_review_composition.py`、`test_acceptance_premises.py`、`test_gate_wiring_081.py`（三处调用点，081a 断言 implement 一处）、`test_acceptance_schema_ownership.py`（SC-009 ④ 唯一性守卫与投影面豁免断言，081d）；验收场景 SC-001…SC-009 的采集方法已由 requirements § Measurement Sources 声明 |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 每个新判定都有先写或同批写的契约/单元测试：`tests/contract/test_closure_acceptance_check.py`（正／负夹具红先行）、`test_line_state_blocked.py`（A6 八项处置）、`test_acceptance_state_machine.py`、`test_acceptance_review_composition.py`、`test_acceptance_premises.py`、`test_gate_wiring_081.py`（三处调用点，081a 断言 implement 一处）、`test_acceptance_schema_ownership.py`（SC-009 ④ 唯一性守卫与声明点豁免断言，081d）；第四条件把既有 `test_status_gate_owner.py` 钉的「三个合取条件」改为四个（`all required` 措辞保留，条件计数 3→4），该模块因此进入 `research.md` § R3 的钉扎清单并随 081c 同批改；验收场景 SC-001…SC-009 的采集方法已由 requirements § Measurement Sources 声明 |
 | V | AI Agent Integration Standards | ✅ Pass | 不动 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；四份按工具副本只经 `regen-command-copies.py` 生成（`## Mirror Obligations`） |
 | VI | Continuous Quality & Observability | ✅ Pass | 关闭判据用基线差集而不是「看起来绿」：`head 失败集 − 基线失败集` 为空且 `基线失败集 − head 失败集` 逐条列为已修复项（SC-009）；历史状态不回写，审计只读（FR-020） |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | 本阶段只推进到 `Planned`；Pre-Status-Flip Gate 的判据 owner 保持 `templates/feature-details-template.md` § Canonical Status State Machine，本文件与命令面只加「第四条合取条件」的指针（FR-002/FR-016） |
@@ -52,12 +52,12 @@
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 新 schema 单一 owner = `shared/workflow/acceptance-hardening.md`（[[STR-017]]），其余位置只带路径 + 章节锚；三处词表 owner 各写自己的值（A5）；SC-009 ④ 用守卫测试机械断言「除 owner 外 0 处出现」 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 面向人的产出（review 报告、wrap-up 结论、拒绝原因）按 `shared/guidelines/user-facing-comprehension.md` 写作；机器面字面量一律英文原样（A10），翻译只发生在人的一侧 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 判定是二值（`accept` / `block`），无中间严重度层（FR-006 + `## Constraints`）；本计划已按 fast-fail 处置一处实测矛盾：`specify init` 前提不成立 → 记为 `EP-002` `falsified` + `Decision: resolve-in-scope`，不静默绕过 |
-| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | 新目录 `tests/fixtures/acceptance-hardening/` 登记进 `.specify/instructions.md` § Key Directories 的 `tests/` 行（`tests/fixtures/` 当前未登记）；临时产物落 `.specify/.tmp/`（`git check-ignore` 已覆盖） |
+| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | 新目录 `tests/fixtures/acceptance-hardening/` 登记进 `.specify/instructions.md` § Key Directories 的 `tests/` 行（`tests/fixtures/` 当前未登记），该登记是 **081a T018** 的一部分而不留作 081d 的欠账；临时产物落 `.specify/.tmp/`（`git check-ignore` 已覆盖） |
 | XVIII | Grounded Naming | ✅ Pass | 名字取自需求与兄弟形态：`closure-acceptance-check.py`（同目录既有 `validate-requirements.py` / `flow-class-check.py` 形态）、`review-feature-quality`（兄弟 `review-sdd-process` / `code-review`）、`acceptance-hardening`（branch 与 spec key）。用户裁定的中文名「更严格的验收与产物审查」贯穿 Feature 名与描述 |
 
 **Gates Status**: ✅ All gates pass — no Fail, no Partial, no Complexity Tracking row.
 
-**Re-check after Phase 1**: 2026-11-03, re-run against the landed Phase 1 artifacts — all 18 rows stay ✅ Pass. The only row whose evidence moved is IV: the red-first contract test paths now exist as planned deliverables in § Source Code (six modules for 081a plus the 081d uniqueness guard), and the fixture set (`tests/fixtures/acceptance-hardening/{positive,negative,…,mixed-path,expr-supporting-only,execution-without-final}/`) is enumerated in `data-model.md` § Fixture set instead of being named only in this table.
+**Re-check after Phase 1**: 2026-11-03, re-run against the landed Phase 1 artifacts — all 18 rows stay ✅ Pass. The only row whose evidence moved is IV: the red-first contract test paths now exist as planned deliverables in § Source Code, each annotated with the slice that owns it (081a's three new modules plus the extended `test_requirements_checker.py`; 081b's `test_acceptance_premises.py`; 081c's `test_acceptance_review_composition.py` with the deliberate updates of `test_review_code_composition.py` and `test_status_gate_owner.py`; 081d's `test_line_state_blocked.py` and `test_acceptance_schema_ownership.py`), and the fixture set (`tests/fixtures/acceptance-hardening/{positive,negative,…,mixed-path,expr-supporting-only,execution-without-final}/`) is enumerated in `data-model.md` § Fixture set instead of being named only in this table.
 
 ## Decision Tensions
 
@@ -141,47 +141,49 @@ Owner of the record shape, the admissibility criteria, the rejection forms and t
 ```text
 # 框架源（本特性实际改/建的面；.specify/ 侧是生成镜像）
 templates/
-├── feature-details-template.md        # 状态机：四条件 Planned→Implemented、Blocked 四条转移、第四条件
-├── verification-log-template.md       # 词表 +blocked、五项测量阶梯、smoke 三件记录
-├── tasks-template.md                  # GATE-4 升级（final 路径 pass/豁免 + smoke 记录）
-├── feature-index-template.md          # 状态词表 +Blocked
-├── plan-template.md                   # 新增两张强制表骨架（Execution Premises / Inherited Blockers）
-├── review-template.md                 # 新增 ### 2.2 / 2.3 / 2.4 三个稳定槽位
+├── feature-details-template.md        # 状态机：四条件 Planned→Implemented、Blocked 四条转移、第四条件（081a）
+├── verification-log-template.md       # 词表 +blocked、五项测量阶梯、smoke 三件记录（081a）
+├── tasks-template.md                  # GATE-4 升级（final 路径 pass/豁免 + smoke 记录）（081a）
+├── feature-index-template.md          # 状态词表 +Blocked（081d）
+├── plan-template.md                   # 新增两张强制表骨架（Execution Premises / Inherited Blockers），无取值域（AS-15；081b）
+├── review-template.md                 # 新增 ### 2.2 / 2.3 / 2.4 三个稳定槽位（081c）
 └── commands/
-    ├── review.md                      # Composition 改写：四段 + ARC、逐段五项、四单元 census
-    ├── implement.md                   # Pre-Status-Flip 接线 checker + Blocked 翻转
-    ├── tasks.md                       # GATE-4 接线 + smoke 任务义务
-    └── checklist.md                   # 只引用 owner，不复制第四条件
+    ├── review.md                      # Composition 改写：四段 + ARC、逐段五项、四单元 census（081c）
+    ├── implement.md                   # Pre-Status-Flip 接线 checker + Blocked 翻转（081a）
+    ├── tasks.md                       # GATE-4 接线 + smoke 任务义务（081a）
+    └── checklist.md                   # 只引用 owner，不复制第四条件（081c 改写指针，081d 复核镜像）
 shared/
-├── workflow/acceptance-hardening.md   # NEW 唯一 schema owner（STR-017）
-├── workflow/feature-integration.md    # § Pre-Status-Flip Gate 增加 checker 调用与 Blocked
-└── workflow/expression-gates.md       # requirements/plan 门行接入四类确定性发现
+├── workflow/acceptance-hardening.md   # NEW 唯一 schema owner（STR-017）；081a 落 4 节，081b 加 § Execution Premises / § Inherited Blockers，081c 加 § Review Composition
+├── workflow/feature-integration.md    # § Pre-Status-Flip Gate 增加 checker 调用与 Blocked（081a）
+└── workflow/expression-gates.md       # requirements/plan 门行接入四类确定性发现（081b）
 skills/
-├── internal/review-feature-quality/SKILL.md   # NEW 产物段 + 实现段载体
-├── internal/review-sdd-process/SKILL.md       # 严重度家族 owner + 组合顺序指针
-├── internal/manage-features/SKILL.md          # 状态词表 +Blocked
-├── internal/implement-feature/SKILL.md        # 步骤 8/9 接线 checker
-├── internal/code-review/SKILL.md              # 段位声明（仍是第 4 段，未被替换）
+├── internal/review-feature-quality/SKILL.md   # NEW 产物段 + 实现段载体（081c）
+├── internal/review-sdd-process/SKILL.md       # 严重度家族 owner + 组合顺序指针（081c）
+├── internal/manage-features/SKILL.md          # 状态词表 +Blocked（081d）
+├── internal/implement-feature/SKILL.md        # 步骤 8/9 接线 checker（081a）
+├── internal/code-review/SKILL.md              # 段位声明（仍是第 4 段，未被替换）（081c）
 └── external/sdd-loop-driver/
-    ├── SKILL.md                               # U6 收束步骤引用 closure 判定
-    ├── references/stage-prompts.md            # § U6 收尾：合并前跑 checker
-    ├── references/dispatch-recipes.md         # § 集成序列：quality gate = checker，block → 线 blocked
-    └── scripts/{pre-analyze-check,line-registry,integrate-lines}.py
+    ├── SKILL.md                               # U6 收束步骤引用 closure 判定（081d）
+    ├── references/stage-prompts.md            # § U6 收尾：线闭合前跑 checker（081d）
+    ├── references/dispatch-recipes.md         # § 集成序列：quality gate = checker，block → 线 blocked（081d）
+    └── scripts/{pre-analyze-check,line-registry,integrate-lines}.py   # 四类发现（081b）、线状态八项（081d）、closure 门（081d）
 scripts/python/
-├── closure-acceptance-check.py        # NEW 唯一判定源（stdlib-only、只读、0/1/2）
-└── validate-requirements.py           # 新增 path-marker 检查（第六个标签）
-src/specify_cli/__init__.py            # get_resource_path() 的 repo-root 回退（smoke 前提）
+├── closure-acceptance-check.py        # NEW 唯一判定源（stdlib-only、只读、0/1/2）（081a CLI + US1 判定；081b 补齐三处外部来源抽取）
+└── validate-requirements.py           # 新增 path-marker 检查（第六个标签）（081a）
+src/specify_cli/__init__.py            # get_resource_path() 的 repo-root 回退（smoke 前提）（081a）
 tests/
 ├── contract/{test_closure_acceptance_check,test_acceptance_state_machine,
-│             test_acceptance_review_composition,test_acceptance_premises,
-│             test_line_state_blocked,test_gate_wiring_081}.py  # NEW 红先行契约测试（081a）
-├── contract/test_acceptance_schema_ownership.py  # NEW SC-009 ④ 唯一性守卫（owner 字面量 0 处外溢 + 投影面两条豁免断言；081d）
-├── integration/test_acceptance_smoke.py         # NEW 唯一 smoke
-├── fixtures/acceptance-hardening/               # NEW 声明式最小夹具集（正/负/四类缺陷/混合路径/表达类豁免/审计历史）
-└── （既有 7 个钉扎测试按 research.md § R3 逐条改，理由随行）
-docs/reference/commands/review.md      # 文档面：两段 → 四段 + ARC
-CHANGELOG.md                           # 本特性条目
-.specify/instructions.md               # § Key Directories 的 tests/ 行补 fixtures/
+│             test_gate_wiring_081}.py  # NEW 红先行契约测试（081a）
+├── contract/test_acceptance_premises.py  # NEW 四类发现 + in-scope 三项义务 + inherited 载体 + pin 有效性（081b）
+├── contract/test_acceptance_review_composition.py  # NEW 四段 + ARC（081c；与既有 test_review_code_composition.py 同批改）
+├── contract/test_line_state_blocked.py   # NEW 线状态八项处置的断言载体（081d）
+├── contract/test_acceptance_schema_ownership.py  # NEW SC-009 ④ 唯一性守卫（owner 字面量 0 处外溢 + 三个声明点豁免断言；081d）
+├── integration/test_acceptance_smoke.py         # NEW 唯一 smoke（081a）
+├── fixtures/acceptance-hardening/               # NEW 声明式最小夹具集（081a 造 7 组：positive/negative/ladder-mutation/smoke-mutation/mixed-path/expr-supporting-only/execution-without-final；081b 补 premise-mutation 与 runtime-gap-mutation；081d 补 audit-history）
+└── （既有 8 个钉扎模块按 research.md § R3 逐条改，理由随行；含 test_status_gate_owner.py、test_review_code_composition.py）
+docs/reference/commands/review.md      # 文档面：两段 → 四段 + ARC（081c）
+CHANGELOG.md                           # 本特性条目（081d）
+.specify/instructions.md               # § Key Directories 的 tests/ 行补 fixtures/（081a T018）
 ```
 
 **Structure Decision**: 落在既有的「框架源 + 自举运行时」形状上，不新建任何顶层目录：新引擎进 `scripts/python/`（同目录既有 30+ 个 checker 的兄弟形态，镜像到 `.specify/scripts/python/`），新技能进 `skills/internal/`（嵌套层，不出现在平铺发现面上），新 schema 文档进 `shared/workflow/`（同目录既有 `feature-integration.md` / `expression-gates.md` 的兄弟形态），夹具进 `tests/fixtures/acceptance-hardening/`（既有 `tests/fixtures/` 下的一级概念目录）。
@@ -214,24 +216,24 @@ Owner of this table's shape, its `Status` domain and its `Decision` domain: `sha
 | EP-006 | 内部技能的嵌套层不出现在平铺发现面上，因此新增内部技能无需注册发现面 | `tests/contract/test_skill_layer_visibility_guards.py` guard 1 的实测行为 + `research.md` § R3 | verified | — |
 | EP-007 | 仓内 bash 脚本入口可执行（`scripts/bash/create-new-plan.sh` 等），使 plan/tasks 阶段的门禁与产物生成不被环境阻塞 | 直接跑 `bash scripts/bash/create-new-plan.sh --json` 失败（`CWS_LIB_BASH_HOME` 未设）；带 `CWS_LIB_BASH_HOME=/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-bash` 时输出 `{"FEATURE_SPEC":…,"IMPL_PLAN":…,"SPECS_DIR":…,"BRANCH":"081-acceptance-hardening"}` | verified | — |
 | EP-008 | 依赖特性 071 / 077 的 `verification.md` 与 `tasks.md` 是可解析的继承 blocker 来源（FR-011 的抽取对象存在） | `research.md` § R8 的逐条 grep 结果（五条 `_status=partial`、`deferred_tasks=` 为空、两处零 `[~]`） | verified | — |
-| EP-009 | 实现起始提交上可采集到失败用例 id 集合，且此后「零新增失败」是可判的 | 本阶段实测 `bash scripts/bash/run-tests.sh --names-out .specify/specs/081-acceptance-hardening/baseline-failed.txt -q` → `39 failed, 6970 passed, 7 skipped in 596.80s`；失败 id 集落 `baseline-failed.txt`（39 行），控制台全文落 `test-evidence/plan-baseline-run.txt`；实现后按 id 级差集比较 | verified | — |
+| EP-009 | 实现起始提交上可采集到失败用例 id 集合，且此后「零新增失败」是可判的 | 本阶段实测 `bash scripts/bash/run-tests.sh --names-out .specify/specs/081-acceptance-hardening/baseline-failed.txt -q` → `39 failed, 6970 passed, 7 skipped in 596.80s`；失败 id 集落 `baseline-failed.txt`（39 行），控制台全文落 `test-evidence/plan-baseline-run.txt`；实现后按 id 级差集比较。**可比性前提**：每次比较前按 FR-023 重读 `pytest --version` / `git --version`，与 `test-evidence/plan-runner-pins.txt` 不一致即判该次比较无效（exit 2），MUST NOT 读作新增失败 | verified | — |
 
 ## Inherited Blockers
 
-Owner of this table's shape, its `Disposition` domain (`resolved | inherited | not-applicable`) and its pointer duty: `shared/workflow/acceptance-hardening.md` § Inherited Blockers. Boundary (Assumptions A13): this table owns **dependency-inherited** records only; the plan-time load-bearing premises live in § Execution Premises above; environment probe verdicts live in `tasks.md` § Environment Prerequisites. No fact is written twice; a cross-reference is a pointer, never a restatement.
+Owner of this table's shape, its `Disposition` domain (`resolved | inherited | not-applicable`), the `Carrier` requirement for `inherited` rows and its pointer duty: `shared/workflow/acceptance-hardening.md` § Inherited Blockers; the obligations themselves are stated once in `requirements.md` FR-011 (081b lands the owner section; 081a's owner-doc skeleton carries only the extension point). Boundary (Assumptions A13): this table owns **dependency-inherited** records only; the plan-time load-bearing premises live in § Execution Premises above; environment probe verdicts live in `tasks.md` § Environment Prerequisites. No fact is written twice; a cross-reference is a pointer, never a restatement.
 
 **Dependency set (derived, not assumed)** — in: Feature 071 (owns the review composition sentence and the status-gate carriers 081 rewrites), Feature 077 (owns the stage-gate rows and the feature-class read 081 rides). Out with reason: Feature 062 ← spec 080 (humanize) has no shared owner document with 081; 072/073/074/076 likewise. Derivation evidence: `research.md` § R8.
 
-| # | Source row | Disposition | Evidence / note |
-|---|-----------|-------------|-----------------|
-| IB-001 | `071` detail `## Deferred` | resolved | 实测该小节不存在（`grep -rln '^## Deferred' .specify/memory/features/` 零命中），无待处置行 |
-| IB-002 | `071` `verification.md`: `deferred_tasks=` | resolved | 该值为空（第 96 行），且 `tasks.md` 零 `[~]` 行 → 无继承的延后任务 |
-| IB-003 | `071` `verification.md`: `SC-001_status=partial`（第 66 行） | not-applicable | 该 SC 度量 071 自己切片的一次端到端 review 运行；081 的 SC-001 用自建负夹具在三处调用点独立度量，不消费 071 的该测量 |
-| IB-004 | `071` `verification.md`: `SC-006_status=partial`（第 86 行） | inherited | 081 的 review 组合改写了 071 建立的两段结构，其结构证据必须由 081 的 SC-006 重新采集（产物段/实现段/三计数），不得继承 071 的旧结构结论 |
-| IB-005 | `077` `verification.md`: `deferred_tasks=` | resolved | 该值为空（第 107 行），`tasks.md` 零 `[~]` 行 |
-| IB-006 | `077` `verification.md`: `SC-002_status=partial`（第 77 行） | inherited | 081 在 `expression-gates.md` 的同一批门行上加四类发现，该门行的表达类分支实测义务由 081 的 SC-005（四类缺陷 4/4）承担 |
-| IB-007 | `077` `verification.md`: `SC-005_status=partial`（第 89 行） | inherited | 同上：门行接线改动后必须重测，081 的实现任务逐行复跑对应门禁 |
-| IB-008 | `077` `verification.md`: `SC-008_status=partial`（第 101 行） | not-applicable | 该 SC 度量表达类试点线在真实项目上的文档门禁表现；081 是 `execution` 类，不消费该测量 |
+| # | Source row | Disposition | Carrier (MUST be filled when `inherited`) | Evidence / note |
+|---|-----------|-------------|------------------------------------------|-----------------|
+| IB-001 | `071` detail `## Deferred` | resolved | — | 实测该小节不存在（`grep -rln '^## Deferred' .specify/memory/features/` 零命中），无待处置行 |
+| IB-002 | `071` `verification.md`: `deferred_tasks=` | resolved | — | 该值为空（第 96 行），且 `tasks.md` 零 `[~]` 行 → 无继承的延后任务 |
+| IB-003 | `071` `verification.md`: `SC-001_status=partial`（第 66 行） | not-applicable | — | 该 SC 度量 071 自己切片的一次端到端 review 运行；081 的 SC-001 用自建负夹具在三处调用点独立度量，不消费 071 的该测量 |
+| IB-004 | `071` `verification.md`: `SC-006_status=partial`（第 86 行） | inherited | **081c 的必做测试模块 `tests/contract/test_acceptance_review_composition.py`**（RC-01/RC-17 的结构断言，登记在 081c 切片行并在其完成门里要求全绿） | 081 的 review 组合改写了 071 建立的两段结构，其结构证据必须由 081 重新采集（产物段/实现段/三计数），不得继承 071 的旧结构结论。**载体不取 SC-006**：SC-006 是 `supporting` 路径、可被 `deferred`，按 FR-011 不构成载体 |
+| IB-005 | `077` `verification.md`: `deferred_tasks=` | resolved | — | 该值为空（第 107 行），`tasks.md` 零 `[~]` 行 |
+| IB-006 | `077` `verification.md`: `SC-002_status=partial`（第 77 行） | inherited | **081b 的必做测试模块 `tests/contract/test_acceptance_premises.py`**（四类发现经 `pre-analyze-check.py` 的断言，登记在 081b 切片行） | 081 在 `expression-gates.md` 的同一批门行上加四类发现，门行接线改动后必须重测。**载体不取 SC-005**：SC-005 是 `supporting` 路径、可被 `deferred` |
+| IB-007 | `077` `verification.md`: `SC-005_status=partial`（第 89 行） | inherited | **081b 的必做测试模块 `tests/contract/test_acceptance_premises.py`**（同一模块逐行复跑对应门禁）+ 081b 切片行对 `expression-gates.md` 门行的复测义务 | 同上：门行接线改动后必须重测，081 的实现任务逐行复跑对应门禁 |
+| IB-008 | `077` `verification.md`: `SC-008_status=partial`（第 101 行） | not-applicable | — | 该 SC 度量表达类试点线在真实项目上的文档门禁表现；081 是 `execution` 类，不消费该测量 |
 
 ## Design Decisions (D1–D10)
 
@@ -248,7 +250,7 @@ Contract (full text in `contracts/closure-acceptance-check.contract.md`):
 - **Output**: `verdict: accept|block`, `reasons: [{code, target}]` drawn from the closed 7-item set, and `final_path: {pass, blocked, deferred, fail, unknown, total}` computed **once** here (FR-006; ARC reads this, never re-counts).
 - **Exit codes**: `0` accept, `1` block, `2` input missing/unparsable. `--audit-existing` is zero-write and exits `0` whenever inputs are valid, regardless of findings (FR-020).
 - **Shape**: stdlib-only, read-only, no model judgement, self-contained parser (it must run in a checkout without `src/` on `sys.path`; the two existing parsers are reused only where their regexes are stable, per `research.md` § R4).
-- **Fixtures**: `tests/fixtures/acceptance-hardening/{positive,negative,premise-mutation,runtime-gap-mutation,ladder-mutation,smoke-mutation,mixed-path,expr-supporting-only,execution-without-final,audit-history}/` — each a declarative minimal file set (requirements/plan/tasks/verification/registry), never a real feature directory. The `negative` set reproduces the 026 shape; `positive` carries a `final`-path pass + a complete smoke record; `mixed-path` carries one failing `final` next to a passing one plus one non-`pass` `supporting` SC (Edge Case "final 与 supporting 混合"); `expr-supporting-only` and `execution-without-final` are the two halves of the class rule — an `expression` feature is not forced to invent a `final` SC, an `execution` feature with zero `final`-path SC fails (V-1 / V-11).
+- **Fixtures**: `tests/fixtures/acceptance-hardening/{positive,negative,premise-mutation,runtime-gap-mutation,ladder-mutation,smoke-mutation,mixed-path,expr-supporting-only,execution-without-final,audit-history}/` — each a declarative minimal file set (requirements/plan/tasks/verification/registry), never a real feature directory. The `negative` set reproduces the 026 shape; `positive` carries a `final`-path pass + a complete smoke record; `mixed-path` carries one failing `final` next to a passing one plus one non-`pass` `supporting` SC (Edge Case "final 与 supporting 混合"); `expr-supporting-only` and `execution-without-final` are the two halves of the class rule — an `expression` feature is not forced to invent a `final` SC, an `execution` feature with zero `final`-path SC fails (V-1 / V-11); `smoke-mutation` is `positive` with the smoke record deleted **and the claimed status set to `Implemented`**, so it is the fixture that proves the claimed-`Implemented`-but-not-accepted reason (`status-claims-implemented-but-blocked`) — without it that reason would carry no counter-example. Which slice authors which set is fixed in § Source Code.
 
 ### D3 — State machine and all call sites
 
@@ -264,8 +266,10 @@ Contract (full text in `contracts/closure-acceptance-check.contract.md`):
 ### D4 — Runtime stack, premises, inherited blockers
 
 - `requirements.md` gains the mandatory § Runtime Stack & Dependency Ownership (columns `ID | Capability | Form | Owner | Pin | Joint acceptance | FR`; `Form ∈ {in-scope, signed-contract, user-waived}` and `not-required` for expression-class features with a stated reason). Prose-only dependency declaration is a violation (`runtime-dependency-not-owned: RS-NNN`).
-- `plan.md` gains § Execution Premises (`verified | unverified | falsified`; `falsified` requires `Decision`) and § Inherited Blockers (every dependency `## Deferred`/blocked row dispositioned).
-- The four deterministic findings land in `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` and are surfaced through the existing `expression-gates.md` rows `G-req-clarity` / `G-plan-fact` — no new gate registry row, no second checker (FR-012).
+- **`in-scope` is three judged obligations, not one prose claim** (owner: `requirements.md` FR-009 / FR-012): (1) the `FR` cell resolves to an FR defined in this spec; (2) at least one `tasks.md` row quotes that FR; (3) `verification.md` carries a joint-acceptance row naming that `RS-NNN`. Judgment stays inside the existing closed set: (1) failing is an **input error (exit 2)**, never a `block`; (2) or (3) failing is `runtime-dependency-not-owned: RS-NNN` — the same reason as the prose-only case, so no eighth reason is coined. The 081a parser may stay minimal; the three checks are 081b's.
+- `plan.md` gains § Execution Premises (`verified | unverified | falsified`; `falsified` requires `Decision`) and § Inherited Blockers (every dependency `## Deferred`/blocked row dispositioned, with a `Carrier` for every `inherited` row — FR-011).
+- **Table skeletons land in `templates/plan-template.md`** (two empty tables with the fixed column sets, **no value domains and no invalid-row rules** — AS-15 keeps the semantics in the owner doc). 081b owns that edit; without it every future plan would have to invent the columns.
+- The four deterministic findings land in `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` and are surfaced through the existing `expression-gates.md` rows `G-req-clarity` / `G-plan-fact` — no new gate registry row, no second checker (FR-012). The obligations added by FR-009 (items 2–3) and FR-011 (carrier existence) are absorbed by the **existing** runtime-row and inherited-blocker classes, so the finding count stays four.
 - A13 boundary is stated once in the owner and pointed at from `templates/tasks-template.md`: plan § Execution Premises = planning-time load-bearing premises; plan § Inherited Blockers = dependency-inherited records; tasks § Environment Prerequisites = task-generation probe verdicts (with probe command + date). Same fact in two places is the defect.
 
 ### D5 — Review composition (A12 carrier decision)
@@ -279,18 +283,20 @@ Contract (full text in `contracts/closure-acceptance-check.contract.md`):
 
 ### D6 — Line state `blocked`
 
-`skills/external/sdd-loop-driver/scripts/line-registry.py`:
+**Obligation authority = `requirements.md` § Assumptions A6 items 1–8** (which invariants change, which must not, and where recovery goes). This section is a **landing map**, not a second definition: it names, per A6 item, the symbol or guard in `skills/external/sdd-loop-driver/scripts/line-registry.py` that the obligation touches, with the measured line numbers from `research.md` § R6. The single test carrier is `tests/contract/test_line_state_blocked.py` (081d), which pins each item with at least one assertion; § E-9 of `data-model.md` keeps only the entity boundary. Nothing here restates A6.
 
-1. `STATE_VALUES` 7 → 8 (`blocked` added).
-2. `ACTIVE_STATES` unchanged `{active, waiting}` — `blocked` never enters `--active` lists and never occupies a concurrency slot.
-3. `HOLDING_STATES` unchanged `{active, completed}`; the `blocked` transfer releases the lease and clears `holder_line_id` / `waiting_reason` / `queued_at` (mirrors the `closed` cleanup).
-4. `merge_ready=true ⇒ state=completed` stays; a new invariant at the same validation point rejects `state=blocked ∧ merge_ready=true`.
-5. `integration-enqueue|plan|record` keep their `state=completed` requirement (structurally unreachable for `blocked`).
-6. The terminal guard set `{closed, stale, orphaned}` MUST NOT gain `blocked` (lines 1447/1949/2139/2249/2266 stay three-valued).
-7. `promote-waiting` keeps `state == "waiting"`; `blocked` cannot shortcut it. Recovery is `update --state active` + a recorded unblock reason — which requires the "entering `active`" guard at line 764 to admit `blocked` alongside `{waiting, stalled}` (measured interaction, `research.md` § R6).
-8. `stale_from_state` may carry `blocked` (no enum expansion; comment + test).
+| A6 item | Landing point in `line-registry.py` (measured, `research.md` § R6) |
+|---|---|
+| 1 — `STATE_VALUES` 7 → 8 | the closed set literal at line 46 |
+| 2 — `ACTIVE_STATES` unchanged | the `--active` list, `_active_entries`, and `promote-waiting`'s `state == "active"` counter |
+| 3 — `HOLDING_STATES` unchanged, `blocked` holds nothing | the transfer cleanup that mirrors `closed` (`holder_line_id` / `waiting_reason` / `queued_at`) |
+| 4 — `blocked ⇒ merge_ready` false | the same validation point that enforces `merge_ready ⇒ completed` (line 707) |
+| 5 — `integration-*` unreachable | the three actions' `state == "completed"` requirements |
+| 6 — terminal guard set stays three-valued | lines 1447/1949/2139/2249/2266 |
+| 7 — `promote-waiting` keeps `state == "waiting"`; recovery is `update --state active` | `promote-waiting`'s precondition **and** the "entering `active`" guard at line 764, which must admit `blocked` alongside `{waiting, stalled}` — the one measured interaction where A6 talks to the same line from both sides (§ R6) |
+| 8 — `stale_from_state` may carry `blocked` | `deregister --reason stale-cleanup`'s write point (comment + test only, no enum expansion) |
 
-`integrate-lines.py` runs the closure checker as its gate **by default** (the existing `--gate-cmd` hook, not a second path); on `block` it records `integration-record --result failed --reason closure-blocked` **and** marks the line `blocked` with the named reason, so the line never reaches `completed`. `references/stage-prompts.md` § U6 and `references/dispatch-recipes.md` § 集成序列 point at that step; they do not restate the reason set.
+`integrate-lines.py` runs the closure checker as its gate **by default** (the existing `--gate-cmd` hook, not a second path); on `block` it records `integration-record --result failed --reason closure-blocked` **and** marks the line `blocked` with the named reason, so the line never reaches `completed`. **Timing** (FR-017 / GW-03): the judgement runs at the **feature line's closure** — one line spans 081a–081d — and MUST NOT be read as "every slice merge passes the closure judgement"; slice merges are judged by the review gate (D5). `references/stage-prompts.md` § U6 and `references/dispatch-recipes.md` § 集成序列 point at that step; they do not restate the reason set.
 
 ### D7 — Smoke test for 081
 
@@ -305,6 +311,8 @@ Contract (full text in `contracts/closure-acceptance-check.contract.md`):
 
 `research.md` § R1 is the measurement. Summary decision: repair `.venv` in place (six missing distributions from the internal mirror), keep `scripts/bash/run-tests.sh` as the single entry (it resolves `.venv/bin/python` first), and pin RS-002 / RS-003 from the first real run — `pytest 9.2.0` on `CPython 3.14.6`, `git version 2.54.0 (Apple Git-157)`. No version is invented; nothing was written into `pyproject.toml` (the repo has never pinned these). Baseline collection: `bash scripts/bash/run-tests.sh --names-out <spec-dir>/baseline-failed.txt -q`, run at plan time so the baseline predates 081's own new tests (a baseline taken after they exist would contaminate the comparison).
 
+**Pin validity** (owner: `requirements.md` FR-023; `contracts/artifact-schemas.contract.md` AS-07): a pin that is a transcript of one run is only valid while re-reading it reproduces it. Every baseline-difference comparison therefore re-reads `pytest --version` and `git --version` first; a mismatch against `test-evidence/plan-runner-pins.txt` makes **that comparison invalid** (input error, exit 2) and MUST NOT be read as new failures. A rebuilt `.venv` or a different machine means re-collecting the baseline, not reusing the old one — the 39-id baseline belongs to `pytest 9.2.0` on `CPython 3.14.6`.
+
 ### D9 — Two Hats and mirrors
 
 Source edits land in `templates/`, `shared/`, `skills/`, `scripts/`, `src/`, `tests/`. Then exactly two regeneration entries: `python3 scripts/python/regen-command-copies.py` (+ `--check`) for the four per-tool command copies, and `python3 scripts/python/sync-mirrors.py` (+ `--check`) for the six mirror pairs. `.specify/` copies are never hand-edited as the primary change; `src/` and `tests/` have no mirror. Exact pairs and the measured baseline: `## Mirror Obligations`.
@@ -317,10 +325,10 @@ Slices (boundaries at plan entry; **no requirement is dropped** — every FR/SC 
 
 | Slice | Scope | Est. tasks | Depends on |
 |---|---|---|---|
-| `081a` | US1 + the shared core: owner doc § Feature Status / Verification Vocabulary / Gates / closure reason set, `closure-acceptance-check.py`, fixtures, state machine, verification template, implement wiring, checker at the implement call site | ~14 | — |
-| `081b` | US2: runtime-stack table (§ requirements), Execution Premises + Inherited Blockers (§ plan), four `pre-analyze-check.py` findings, `expression-gates.md` rows, A13 boundary | ~10 | 081a (owner doc sections) |
-| `081c` | US3: `review-feature-quality` skill, review-template slots, `review.md` composition rewrite, ARC, census 3→4 + guards, checker at the review call site | ~12 | 081a (counts come from the checker) |
-| `081d` | US4 + all remaining wiring: three vocabulary owners, `--audit-existing`, driver line state `blocked` (8 dispositions) + closure/merge call site, mirrors/regen, docs/CHANGELOG/directory registration, smoke evidence, baseline comparison | ~16 | 081a (checker), 081c (composition text) |
+| `081a` | US1 + the shared core: owner doc § Feature Status / Verification Vocabulary / Gates / Closure Verdict (with extension points for the 081b/081c sections, including § Inherited Blockers), `closure-acceptance-check.py`, seven fixture sets, state machine, verification template, implement wiring, checker at the implement call site, `validate-requirements.py` `path-marker`, the 081a contract modules (`test_closure_acceptance_check.py`, `test_acceptance_state_machine.py`, `test_gate_wiring_081.py`, the extended `test_requirements_checker.py`), the smoke module, `tests/fixtures/` registration in the instructions § Key Directories, and the slice-close set-level baseline comparison | ~14 | — |
+| `081b` | US2: runtime-stack table (§ requirements, including the three `in-scope` obligations), Execution Premises + Inherited Blockers (§ plan + the two table skeletons in `templates/plan-template.md`, no domains), the four `pre-analyze-check.py` findings **plus** the absorbed `in-scope` task/joint-acceptance checks and the `inherited` carrier check, `expression-gates.md` rows, A13 boundary. Its row set MUST name **`tests/contract/test_acceptance_premises.py`** — the single test carrier for the four findings and for the carrier/obligation checks (SC-005) — and MUST contain a row that lands the carrier check | ~10 | 081a (owner doc sections) |
+| `081c` | US3: `review-feature-quality` skill, review-template slots, `review.md` composition rewrite, ARC, census 3→4 + guards, checker at the review call site, the expected-artifact denominator (FR-013). Its row set MUST name **`tests/contract/test_acceptance_review_composition.py`**, the deliberate update of **`tests/contract/test_review_code_composition.py`** and **`tests/contract/test_status_gate_owner.py`**, and **`templates/commands/checklist.md`** (owner pointer only, no criteria copy) | ~12 | 081a (counts come from the checker) |
+| `081d` | US4 + all remaining wiring: three vocabulary owners, `--audit-existing`, driver line state `blocked` (A6 items 1–8) + closure/merge call site, mirrors/regen, docs/CHANGELOG. Its row set MUST name **`tests/contract/test_line_state_blocked.py`** (the single carrier pinning A6's eight dispositions), **`tests/contract/test_acceptance_schema_ownership.py`**, the final sweep of **`tests/contract/test_status_gate_owner.py`** and **`templates/commands/checklist.md`**, and the feature-level id-level baseline re-run | ~16 | 081a (checker), 081c (composition text) |
 
 `/speckit.tasks` MAY keep a single 52-row list if its own decomposition check accepts it; the four boundaries above are the pre-declared fallback and they preserve the 25 FR / 9 SC set intact (requirements § Decomposition & Ceiling).
 

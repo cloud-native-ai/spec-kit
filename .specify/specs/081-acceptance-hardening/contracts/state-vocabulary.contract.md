@@ -26,7 +26,7 @@
 ## Line state (`blocked`) — SM-2
 
 - **SV-12**: `skills/external/sdd-loop-driver/scripts/line-registry.py` `STATE_VALUES` MUST become eight values with `blocked` added; `ACTIVE_STATES` and `HOLDING_STATES` MUST stay unchanged.
-- **SV-13**: The eight dispositions of `data-model.md` § E-9 MUST each be implemented and each pinned by at least one assertion in `tests/contract/test_line_state_blocked.py` — including the invariant that `state=blocked` with `merge_ready=true` is rejected, and that the terminal guard set stays three-valued.
+- **SV-13**: The eight dispositions are owned by `requirements.md` § Assumptions A6 items 1–8; their implementation lands in `skills/external/sdd-loop-driver/scripts/line-registry.py` and each one MUST be pinned by at least one assertion in `tests/contract/test_line_state_blocked.py` — including the invariant that `state=blocked` with `merge_ready=true` is rejected, and that the terminal guard set stays three-valued. Neither `data-model.md` § E-9 nor `plan.md` § D6 restates the dispositions: E-9 keeps only the entity boundary, and D6 keeps only the landing map (which symbol/guard each A6 item touches, with the measured line numbers).
 - **SV-14**: The `blocked` transfer MUST release the lease and clear `holder_line_id` / `waiting_reason` / `queued_at`, mirroring the `closed` cleanup; a `blocked` line MUST NOT hold a reservation or an ownership claim.
 - **SV-15**: Recovery MUST be `update --state active` with a recorded unblock reason, and it MUST still pass the ownership gate; `promote-waiting` and the `integration-*` actions MUST remain unreachable from `blocked`.
 - **SV-16**: `stale_from_state` MUST be documented and tested as able to carry `blocked`; no enum expansion is introduced for it.

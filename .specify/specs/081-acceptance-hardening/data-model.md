@@ -127,9 +127,10 @@ Every entity below states its **carrier** (the file that physically holds it) an
 |---|---|---|
 | source | `<feature>:<row>` | a dependency's `## Deferred` row, its `verification.md` status row, or its `deferred_tasks=` list |
 | Disposition | `resolved` / `inherited` / `not-applicable` | closed |
+| Carrier | a task id (+ its test module), or a gate id | required when `Disposition=inherited`; MUST be runtime-reachable and MUST NOT be a deferrable `supporting`-path SC (the three dispositions' obligations are owned by `requirements.md` FR-011) |
 | Evidence / note | path + one line | required |
 
-- **V-21**: every extracted row MUST have a disposition; an undisposed row is [[STR-013]] `inherited-blocker-undisposed: <feature>:<row>`.
+- **V-21**: every extracted row MUST have a disposition; an undisposed row is [[STR-013]] `inherited-blocker-undisposed: <feature>:<row>`. An `inherited` row with no `Carrier`, a `Carrier` that does not resolve, or a `Carrier` that points at a deferrable `supporting`-path SC is judged **the same** as an undisposed row, under the same reason (the closed set does not grow).
 - **V-22**: the dependency set is derived and stated (with the basis for each exclusion); it is never implied.
 
 ## E-8 — Feature status `Blocked` (SM-1)
@@ -149,19 +150,10 @@ Every entity below states its **carrier** (the file that physically holds it) an
 
 State set grows 7 → 8: `{active, waiting, stalled, completed, orphaned, stale, closed, blocked}`.
 
-| # | Invariant | Effect |
-|---|---|---|
-| I-1 | `ACTIVE_STATES = {active, waiting}` unchanged | `blocked` never appears in `--active` lists, never holds a concurrency slot |
-| I-2 | `HOLDING_STATES = {active, completed}` unchanged, with a declared rule | the `blocked` transfer releases the lease and clears `holder_line_id` / `waiting_reason` / `queued_at` |
-| I-3 | `merge_ready=true ⇒ state=completed` unchanged | plus a new assertion: `state=blocked` with `merge_ready=true` is rejected on the same validation point |
-| I-4 | `integration-enqueue` / `integration-plan` / `integration-record` require `state=completed` unchanged | a `blocked` line is structurally un-enqueueable and unrecordable |
-| I-5 | terminal guard set stays `{closed, stale, orphaned}` | `blocked` is recoverable by design and MUST NOT join it |
-| I-6 | `promote-waiting` requires `state=="waiting"` unchanged | a `blocked` line cannot shortcut ownership re-acquisition |
-| I-7 | `stale_from_state` may carry `blocked` | no enum expansion; comment + test only |
-| I-8 | recovery path = `update --state active` + recorded unblock reason | requires the "entering `active`" guard to admit `blocked` alongside `{waiting, stalled}` (measured interaction, `research.md` § R6) |
+**Authority for the eight dispositions**: `requirements.md` § Assumptions A6 items 1–8 own the obligations (which invariants change, which must not, and where recovery goes); `skills/external/sdd-loop-driver/scripts/line-registry.py` is the implementation those obligations land in, and `tests/contract/test_line_state_blocked.py` is the single test carrier that pins each one (SV-13). This section keeps only the entity boundary — its carrier, its parser and the closed-set growth above. It MUST NOT restate the eight dispositions: a second copy here would be an unguarded duplicate (the same defect SC-009 ④ guards elsewhere), and the implement-stage landing map is recorded once, in `plan.md` § D6, as a pointer to A6 items 1–8.
 
-- **V-25**: `blocked` and `merge_ready=true` MUST be mutually exclusive at every write point.
-- **V-26**: no line-level never-regress rule is introduced — the line state set never had that semantics and this feature does not add one.
+- **V-25**: `blocked` and `merge_ready=true` MUST be mutually exclusive at every write point — the obligation is A6 item 4; this rule names the assertion the guard must carry, not a second definition of the disposition.
+- **V-26**: no line-level never-regress rule is introduced — the line state set never had that semantics and this feature does not add one (A6 closing sentence).
 
 ## E-10 — Review composition record
 
@@ -171,6 +163,7 @@ State set grows 7 → 8: `{active, waiting, stalled, completed, orphaned, stale,
 | Entity | Fields | Owner |
 |---|---|---|
 | Segment run record | `segment` (process / artifact / implementation / code), `judgment object`, `verdict`, `findings[]` | `templates/commands/review.md` (order) + each segment's skill (method) |
+| Expected artifact set | `expected_artifacts[]` — every artifact the slice's stage rules and `plan.md` § Project Structure require; each member is judged | the artifact segment's coverage **denominator**. A member that is missing is itself a finding, never a silent exclusion from the denominator (obligation owned by `requirements.md` FR-013; derivation rule owned by the owner doc § Review Composition) |
 | Finding | `severity`, `artifact or diff path`, `line` (optional), `statement` | artifact/implementation: `P0`/`P1`/`P2` family owned by `review-sdd-process`; code: the six-level family owned by `code-review`; no conversion |
 | ARC record | `final_pass`, `final_blocked`, `final_deferred`, `claimed_status`, `verdict`, fixed item `F-ACCEPTANCE` (`P0`) | deterministic, from the closure checker output (never re-counted) |
 | Unit census | four units: `/speckit.review`, `skill:review-sdd-process`, `skill:review-feature-quality`, `skill:code-review` — same `run_id`, distinct `unit_id` | each unit's own closing record |
@@ -188,7 +181,7 @@ Findings are never merged across families, never converted, never scored as one 
 | `premise-mutation` | one `falsified` premise with `Decision` removed | `falsified-premise-undecided: EP-NNN` |
 | `runtime-gap-mutation` | one runtime dependency present as prose only; one `signed-contract` row with empty `Pin` | `runtime-dependency-not-owned: RS-NNN` |
 | `ladder-mutation` | a `blocked` row with all five ladder fields; then `SC-NNN_reduced_measurement_run=no` | `blocked-without-measurement-ladder: SC-NNN` |
-| `smoke-mutation` | `positive` with the smoke record removed | feature is `Blocked`, never `Implemented` |
+| `smoke-mutation` | `positive` with the smoke record removed, claimed `Implemented` | V-9 / V-12: a claimed-`Implemented` feature whose completion condition ④ fails is `block` (exit 1) with the named reason [[STR-014]], never `Implemented` — this is the one fixture that proves [[STR-014]] |
 | `mixed-path` | an `execution` feature with three SCs: `SC-001` `final` `pass`, `SC-002` `final` `fail`, `SC-003` `supporting` `deferred` (full ladder) | V-11 + Edge Case "final 与 supporting 混合": the reason is `final-path-not-pass: SC-002` (`zero-final-path-pass` is **not** emitted, since one `final` passed), and the lone `supporting` non-`pass` is not a standalone blocking reason |
 | `expr-supporting-only` | an `expression` feature whose SCs are all `supporting`, one of them `deferred` with the full ladder | V-11's `expression` exemption: the `final`-path rule is vacuous — no `final`-path reason is emitted and the fixture MUST NOT be forced to invent a `final` SC |
 | `execution-without-final` | an `execution` feature whose SCs are all `supporting` (zero `final`-path SC) | V-1 via `validate-requirements.py` check `path-marker` (an `execution` feature with zero `final`-path SC **fails**), and at the checker layer `final_path.total = 0` so V-11's `zero-final-path-pass` applies |

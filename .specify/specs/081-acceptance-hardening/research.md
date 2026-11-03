@@ -74,6 +74,7 @@ Measured by reading the guards; each row is a pin that 081 changes **on purpose*
 | `tests/contract/test_migration_distribution.py` | `SKILL_BASELINE`, 52 units | same new skill → 53 units |
 | `tests/contract/test_measurement_instruments.py` | `skill:review-sdd-process` in the instrument list | a second review-side skill becomes a measurement instrument |
 | `tests/contract/test_requirements_checker.py` | the checker's five-label set extracted from `validate-requirements.py`'s docstring | the `Path` marker needs an early deterministic verdict (R4) → a sixth label |
+| `tests/contract/test_status_gate_owner.py` | C-46: the owner row carries **three** conjunctive conditions, and the row must read as `three` / `3 conditions` / **`all required`** | FR-016 adds the fourth condition, so the count becomes four and the row must carry four markers. The wording that MUST survive is the conjunctive-phrasing assertion — `all required` (the regex also admits `three`/`3 conditions`, so the test is updated by making the **count** the measured value, not by dropping the assertion). 081c rewrites the owner row and this module in the same change; 081d re-runs it in the final sweep |
 
 ## R4 — Where the `Path` marker is judged
 
