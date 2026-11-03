@@ -172,6 +172,7 @@
 | skill-manage-instructions-wrapup | skill-wrapup | skill:manage-instructions | wrap-up |
 | skill-manage-todo-wrapup | skill-wrapup | skill:manage-todo | wrap-up |
 | skill-research-feature-wrapup | skill-wrapup | skill:research-feature | wrap-up |
+| skill-review-feature-quality-wrapup | skill-wrapup | skill:review-feature-quality | wrap-up |
 | skill-review-sdd-process-wrapup | skill-wrapup | skill:review-sdd-process | wrap-up |
 | skill-run-agent-wrapup | skill-wrapup | skill:run-agent | wrap-up |
 | skill-run-interview-wrapup | skill-wrapup | skill:run-interview | wrap-up |

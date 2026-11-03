@@ -87,6 +87,69 @@ Reconstruct what actually happened during this feature's SDD lifecycle. Capture 
 
 This subsection carries the verdict and the pointers only: no opinion body, no per-severity item count. The findings themselves live in [RECORD_PATH] and are read there.
 
+### 2.2 Artifact Review Segment
+
+> Verdicts and pointers only: this slot carries no opinion body and no per-item count. The dimension set, the
+> finding form and the denominator's consequence are owned by
+> `.specify/skills/internal/review-feature-quality/SKILL.md` § Segment A — Artifact Review, which reaches the
+> derivation rule at `shared/workflow/acceptance-hardening.md` § Review Composition. This slot copies neither
+> and restates neither.
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Expected set (denominator) | [ARTIFACT_EXPECTED_SET] | derived per slice from the stage rules and `plan.md` § Project Structure; the members named one per comma |
+| Coverage line | [ARTIFACT_COVERAGE_CHECKED] / [ARTIFACT_COVERAGE_EXPECTED] | present members / expected members — never a listing of what happens to be on disk |
+| Missing members | [ARTIFACT_MISSING_MEMBERS] | one per expected member absent from disk, or `none` |
+| Segment verdict | [ARTIFACT_SEGMENT_VERDICT] | one of `pass`, `blocked`, `not-applicable` or `not-evaluated` — the segment-verdict vocabulary `### 2.1` already uses |
+
+| Severity | Artifact path | Line | Why the line is absent | Finding |
+|----------|---------------|------|------------------------|---------|
+| [ARTIFACT_FINDING_SEVERITY] | [ARTIFACT_FINDING_PATH] | [ARTIFACT_FINDING_LINE] | [ARTIFACT_FINDING_LINE_REASON] | [ARTIFACT_FINDING_SUMMARY] |
+
+One row per finding. `line` is required whenever the artifact is line-addressable, and an omission MUST name why in
+the row's own reason cell. An expected member that is absent from disk is one finding **and** one uncovered member —
+it is never dropped from the denominator.
+
+### 2.3 Implementation Review Segment
+
+> Verdicts and pointers only, on the same terms as the artifact slot: no opinion body, no per-item count. The
+> judgment object, the three judgments and the smoke triple are owned by
+> `.specify/skills/internal/review-feature-quality/SKILL.md` § Segment B — Implementation Review; this slot copies
+> no dimension list and no severity definition.
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Base commit | [IMPL_BASE_SHA] | the resolved diff base |
+| Head commit | [IMPL_HEAD_SHA] | the run-start `HEAD`, fixed for the run |
+| Base source | [IMPL_BASE_SOURCE] | the resolution tier the code skill's `git-delta-review.sh` reported |
+| Smoke command | [IMPL_SMOKE_COMMAND] | recorded verbatim |
+| Smoke exit code | [IMPL_SMOKE_EXIT_CODE] | the integer the command returned |
+| Smoke evidence path | [IMPL_SMOKE_EVIDENCE_PATH] | must exist and be non-empty |
+| Scope and regression verdict | [IMPL_SCOPE_VERDICT] | the segment's own reading of scope and regression |
+| Segment verdict | [IMPL_SEGMENT_VERDICT] | one of `pass`, `blocked`, `not-applicable` or `not-evaluated` — the segment-verdict vocabulary `### 2.1` already uses |
+
+| Severity | Diff path | Line | Why the line is absent | Finding |
+|----------|-----------|------|------------------------|---------|
+| [IMPL_FINDING_SEVERITY] | [IMPL_FINDING_PATH] | [IMPL_FINDING_LINE] | [IMPL_FINDING_LINE_REASON] | [IMPL_FINDING_SUMMARY] |
+
+One row per finding, with the same locator rule as the artifact slot: `line` is required whenever the diff hunk is
+line-addressable, and an omission MUST name why in the row's own reason cell.
+
+### 2.4 Acceptance Reality Check
+
+> This slot **copies** the closure checker's `final_path` record. It restates neither the Acceptance Reality Check
+> clause nor the feedback unit census: both are owned by `shared/workflow/acceptance-hardening.md` § Review
+> Composition, and the record's key set, its closure and its bucket meanings are owned by that file's
+> § Closure Verdict § `final_path` counts, computed once. Nothing here is recomputed, re-counted or narrowed.
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Claimed status (read, never written) | [ARC_CLAIMED_STATUS] | the bound feature detail's claim, copied |
+| `final_path` record, copied verbatim (7/7) | pass [ARC_PASS] · blocked [ARC_BLOCKED] · deferred [ARC_DEFERRED] · partial [ARC_PARTIAL] · fail [ARC_FAIL] · unknown [ARC_UNKNOWN] · total [ARC_TOTAL] | `scripts/python/closure-acceptance-check.py --json`, never recomputed here |
+| Comparison verdict | [ARC_VERDICT] | `agree` or `refused` |
+| Failed condition, on refusal | [ARC_FAILED_CONDITION] | named, not merely "the transition was refused" |
+| Fixed item, on refusal | [ARC_FIXED_ITEM] | `F-ACCEPTANCE` at `P0`, spelled exactly; `none` otherwise |
+
 ## 3. Findings (Problems & Improvement Targets)
 
 > List **only** problems, friction, ambiguities, and concrete improvement targets. Each finding MUST include an inline quoted excerpt of the offending text and a concrete proposed fix. Order by severity (P0 → P1 → P2), then by category. Drop any finding that lacks evidence — vague complaints are not actionable.
@@ -206,6 +269,25 @@ Please share the contents of this document with the spec-kit framework developer
 | [UNCOMMITTED_DISCLOSURE] | The sentence disclosing unreviewed uncommitted working-tree scope, when any exists; the same sentence appears in the code record |
 | [RECORD_PATH] | The code segment record path, `<spec>/code-review.md` |
 | [ARCHIVE_PATH] | This run's archive path for the previous record, or `none` on a first run |
+| [ARTIFACT_EXPECTED_SET] | The expected artifact set the artifact segment is measured on, one member per comma — derived per slice, never a listing of what exists |
+| [ARTIFACT_COVERAGE_CHECKED] / [ARTIFACT_COVERAGE_EXPECTED] | The two sides of the coverage line: expected members present on disk / expected members in the set |
+| [ARTIFACT_MISSING_MEMBERS] | Every expected member absent from disk, or `none`; each one is also a finding |
+| [ARTIFACT_SEGMENT_VERDICT] / [IMPL_SEGMENT_VERDICT] | The artifact or implementation segment's verdict, drawn from the same closed set `### 2.1` uses: `pass`, `blocked`, `not-applicable` or `not-evaluated` |
+| [ARTIFACT_FINDING_SEVERITY] / [IMPL_FINDING_SEVERITY] | One token of the `P0`/`P1`/`P2` family owned by `skills/internal/review-sdd-process/SKILL.md` |
+| [ARTIFACT_FINDING_PATH] | Repo-relative path of the expected member the artifact finding is about |
+| [IMPL_FINDING_PATH] | Repo-relative path of the file (or diff hunk) the implementation finding is about |
+| [ARTIFACT_FINDING_LINE] / [IMPL_FINDING_LINE] | Line number inside that artifact or diff; required whenever the artifact is line-addressable |
+| [ARTIFACT_FINDING_LINE_REASON] / [IMPL_FINDING_LINE_REASON] | The stated reason an omission gives, in the finding itself; `none` when a line is present |
+| [ARTIFACT_FINDING_SUMMARY] / [IMPL_FINDING_SUMMARY] | One sentence naming the defect and the section that would fix it |
+| [IMPL_BASE_SHA] / [IMPL_HEAD_SHA] | The implementation segment's `base..head` pair: the resolved diff base and the run-start `HEAD` |
+| [IMPL_BASE_SOURCE] | Which resolution tier produced the base, as the code skill's `git-delta-review.sh` reported it |
+| [IMPL_SMOKE_COMMAND] / [IMPL_SMOKE_EXIT_CODE] / [IMPL_SMOKE_EVIDENCE_PATH] | The smoke triple: the command verbatim, the integer it returned, and the path holding its output |
+| [IMPL_SCOPE_VERDICT] | The implementation segment's scope-and-regression reading, as its own conclusion |
+| [ARC_CLAIMED_STATUS] | The status the bound feature detail claims, copied and never written back |
+| [ARC_PASS] / [ARC_BLOCKED] / [ARC_DEFERRED] / [ARC_PARTIAL] / [ARC_FAIL] / [ARC_UNKNOWN] / [ARC_TOTAL] | The seven keys of the checker's `final_path` record, copied verbatim and in full — a three-count summary is not this record |
+| [ARC_VERDICT] | `agree` when the claimed status survives the copied record, `refused` when it does not |
+| [ARC_FAILED_CONDITION] | On refusal, the condition that failed — named, not merely that the transition was refused |
+| [ARC_FIXED_ITEM] | On refusal, `F-ACCEPTANCE` at `P0` spelled exactly; `none` otherwise |
 
 ## Replacement Rules
 

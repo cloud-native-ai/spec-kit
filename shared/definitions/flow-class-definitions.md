@@ -207,6 +207,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:memory-recall | execution | behavior-oracle | yes | 类中立（memory）：检索并注入记忆，不产出自己的制品 |
 | skill:memory-record | execution | behavior-oracle | yes | 类中立（memory）：记录调用方流程的决策与状态 |
 | skill:research-feature | execution | behavior-oracle |  | 交付研究结论；由 plan 与 pre-analyze 检查消费判定 |
+| skill:review-feature-quality | execution | behavior-oracle |  | 交付产物段与实现段的判定结论；findings 逐条对回期望产物集与 `base..head`，覆盖行可复算 |
 | skill:review-sdd-process | execution | behavior-oracle |  | 交付评审结论；findings 逐条对回阶段记录与制品 |
 | skill:run-agent | execution | behavior-oracle |  | 交付一次代理运行结果；以运行行为判定 |
 | skill:run-interview | execution | mixed-oracle |  | 收敛须用户确认、ledger 由引擎传播；父 069 §Edge Cases 首条（规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7） |

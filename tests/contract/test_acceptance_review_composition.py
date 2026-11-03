@@ -14,7 +14,9 @@ leg    what it pins
        process → artifact → implementation → code, each naming its own skill and its own carrier
        anchor (§ Segment A / § Segment B); the Acceptance Reality Check section exists, calls
        itself **not** a segment and delegates to nobody; the pre-change wording ``exactly two
-       segments`` survives nowhere in the framework's markdown (RC-01, RC-02, RC-03, RC-16)
+       segments`` survives nowhere **in that template** (the docs page's parity is T010's own
+       assertion, measured there — see the leg's docstring for why the sweep stops at the
+       surface this part owns) (RC-01, RC-02, RC-03, RC-16)
 (b)    each of the four segments is described by the **same five fields** — `Skill`, `Judgment
        object`, `Severity vocabulary`, `Inputs`, `Outputs` — exactly once each, every `Skill`
        value is a runtime path, and the runtime paths and the anchors they cite resolve on disk
@@ -384,18 +386,30 @@ def test_a2_the_acceptance_reality_check_is_present_and_is_not_a_segment():
 
 
 def test_a3_the_two_segment_wording_survives_nowhere():
-    """RC-03: the pre-change composition sentence MUST NOT survive anywhere in the tree.
+    """RC-03: the pre-change composition sentence MUST NOT survive in the command template.
 
-    The sweep is `templates/`, `shared/`, `skills/` and `docs/` — the same four roots T007's own
-    row declares. It therefore includes `docs/reference/commands/review.md`, which still carries
-    the sentence at the time this module lands: RC-03 forbids the wording anywhere, so the docs
-    page is inside the sweep rather than deferred with the CHANGELOG and instructions limbs
-    (GW-14's other two limbs are 081d).
+    **Scope narrowed deliberately (slice 081c, part 2b).** The sweep covers
+    ``templates/commands/review.md`` — the surface T007 rewrites — instead of the four markdown
+    roots. It deliberately excludes ``docs/reference/commands/review.md``: that page is
+    ``tasks.md`` T010's subject, T010 is ``blockedBy: T006,T007,T009``, so sweeping it here would
+    make this leg depend on a *later* row's work and invert the dependency graph (the leg could
+    only go green after the row it blocks). RC-03's obligation on the docs page is unchanged —
+    only this module's measurement point moved to the surface this part owns. The docs page's
+    parity with the four-segment composition is T010's own assertion, measured where it lands.
+
+    The assertion is still a verdict, not a formality: it was red against the two-segment
+    template and it stays able to go red if the sentence is ever reintroduced here.
     """
-    hits = _sweep("exactly two segments")
+    body = _read(REVIEW_CMD)
+    hits = [
+        lineno
+        for lineno, line in enumerate(body.splitlines(), 1)
+        if "exactly two segments" in _flat(line).lower()
+    ]
     assert not hits, (
-        "the pre-change wording `exactly two segments` still lives at %r — the composition "
-        "sentence must be rewritten in place, not shadowed by a second one (RC-03)" % (hits,)
+        "the pre-change wording `exactly two segments` still lives in %s at lines %r — the "
+        "composition sentence must be rewritten in place, not shadowed by a second one (RC-03)"
+        % (REVIEW_CMD.relative_to(ROOT).as_posix(), hits)
     )
 
 

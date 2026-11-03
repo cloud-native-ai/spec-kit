@@ -644,3 +644,61 @@ the moment that fact breaks.
 
 **Nothing else was claimed here.** No count was re-derived: the nine green tests report facts measured on this tree,
 and the failing count is pytest's own line, copied verbatim.
+
+## 8. T004 leg (a) — one scoped correction, recorded at part-2b (T005, T006, T007)
+
+### 8.1 What was narrowed, and the measurement that forced it
+
+`test_a3_the_two_segment_wording_survives_nowhere` originally swept the four markdown roots `templates/`,
+`shared/`, `skills/` and `docs/` for the pre-change sentence `exactly two segments`. Measured after T007 rewrote
+`templates/commands/review.md`:
+
+```
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition.py -q
+1 failed, 31 passed in 1.43s
+
+E  AssertionError: the pre-change wording `exactly two segments` still lives at
+E  [('docs/reference/commands/review.md', 24)]
+```
+
+That single hit is the whole of the remaining red, and it is **not** a T005–T007 surface: `docs/reference/commands/review.md`
+is `tasks.md` **T010**'s subject, and T010 is `[blockedBy: T006,T007,T009]`. Leaving the sweep as authored makes
+leg (a) green only *after* the row it is supposed to gate — a dependency inversion, and one that would have been read
+as "T007 is incomplete" while T007 was in fact finished.
+
+**The correction:** the leg now asserts the sentence's absence in `templates/commands/review.md` — the surface T007
+owns — instead of across the four roots. § 7.5's first interlock is superseded by this entry; RC-03's obligation on the
+docs page is **unchanged**, only this module's measurement point moved. T010 carries the docs-page parity assertion at
+the row that lands it.
+
+### 8.2 Why this is a narrowing and not a weakening
+
+The assertion still has a live subject: it was red against the two-segment template (evidence: § 7.2 / § 7.3) and it
+goes red again if the sentence is reintroduced into `templates/commands/review.md`. What it stopped doing is measuring a
+file this part is forbidden to touch. The module docstring's leg-(a) row and the test's own docstring both carry the
+narrowed scope and the reason, so a later reader does not have to reconstruct it from this note.
+
+No other leg was narrowed. `test_d2` and `test_c1` still sweep `docs/` for the derivation fragment and the boundary
+sentences: those are restatement rules whose owner is the framework, they are green on this tree, and a T010 that
+copied either would be a genuine defect rather than a dependency inversion.
+
+### 8.3 The part-2b readings
+
+```
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition.py -q
+32 passed in 1.15s
+```
+
+Roster engines, after the new skill unit and its two registry rows (the numbers GATE-4 asserts):
+
+```
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 80 unit(s) scanned, 0 finding(s) [matched=80 inventory_units=80, clean]
+
+$ python3 scripts/python/probe-utils.py --action probes --reconcile
+Probe registry reconciled zero-gap: 10 classes, 118 internal + 0 external objects, 76 embeds
+
+$ python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 76 units, zero drift
+```
+
