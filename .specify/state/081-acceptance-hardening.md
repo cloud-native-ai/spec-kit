@@ -414,3 +414,10 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - review-fix：2.2/2.3 改为“verdict + finding rows only，无叙事意见体/无严重度汇滚”；§ A.4 删除第二套 severity 定义改为评分程序；FR-015 追溯 → `review-implemented-blocked`；analyze skill 增加 round 语义 + residue JSON（22 条）；code 段 receipt 强制化并对本记录生成回执（67/29/38/0）；rotation 改为 `<record>-<slice>.md` + 时间戳兜底（`test_c12` 重钉）；命令 frontmatter 四段化；docs 页 judgment-object 改指针；owner 补 denominator/ARC alphabet/rotation；quickstart/known-items 的 smoke 脏树描述改为 byte-stable；T018 记录 neutrality 修复。
 - 复测：targeted 11 模块 `239 passed` exit 0；mirror/regen 0；closure `block`/exit 1/`zero-final-path-pass`（final_path 0/1/0/1/0/0/2）；validators 0/0。
 - Feature 仍 **`Blocked`**。下一阶段 = 081d（最后一片：manage-features/feature-index 词表、`--audit-existing`、driver line-state/merge gate、schema-ownership guard、全量基线对照、final smoke）。
+
+## 081c closure + 081d 入口（2026-11-03 08:20 UTC）
+
+- 081c 关闭：implement 17/17、review P0/P1 全修、review-fix `f892c8a8` 已推送；载体归档 `tasks-081c.md` / `review-081c.md` / `code-review-081c.md`。Feature 仍 `Blocked`（SC-001 2/3、SC-002 partial）。
+- **081d（最后一片，Phase 4）**：manage-features / feature-index 词表接纳 `Blocked`；`--audit-existing` + `audit-history` 夹具；driver line-state `blocked` 八项处置 + `test_line_state_blocked.py`；driver 的 **closure/merge** 调用点（`integrate-lines.py`，第三处、也是最后一处）；schema-ownership guard（SC-009 ④ 四成员豁免）；coverage 0/25 车道给出读数或具名 remainder；feature-level 全量基线对照 + final smoke（SC-008）；CHANGELOG / docs / mirrors；IB-004/IB-006 行级重读。
+- **终态目标**：SC-001 3/3、SC-002 在 review 站点对 `review-implemented-clean` 的真实运行后转 `pass`；若两项 final-path 全 pass 且 tasks 0 open、smoke pass，Feature 081 可离开 `Blocked`（`Ready for Review`/`Implemented` 按状态机）。若 SC-002 仍无法真实测量，则 feature 以 `Blocked` 收尾并记录未解。
+- 阶段计划：`tasks → checklist → analyze → implement → review → closure → 合并`。
