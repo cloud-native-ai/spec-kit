@@ -103,6 +103,43 @@ A second `smoke_command=` line is a defect, not a choice. A feature that cannot 
 deterministic on a local fixture, or the feature is `Blocked`. A **missing** smoke record is never an input
 error; it is a completeness fact about the feature, and it blocks completion condition ④.
 
+### The four `blocked` literals are four unrelated facts
+
+The character sequence `blocked` is spelled in four places in this framework, and they are four independent
+closed sets with four owners. This subsection is the **only** place their reconciliation is written: each
+carrier keeps its own vocabulary and points here, and no carrier restates this table.
+
+| Literal | What it is | Owner — and the only place its domain is decided |
+|---------|-----------|--------------------------------------------------|
+| `Blocked` | a **feature status** | `templates/feature-details-template.md` § Canonical Status State Machine, whose rows and conditions this file's § Feature Status owns |
+| `blocked` | a **verification status** of one success criterion | `templates/verification-log-template.md`, whose six values and ladder this file's § Verification Vocabulary owns |
+| `blocked` | a **line state** in the driver's registry | `skills/external/sdd-loop-driver/scripts/line-registry.py` (`STATE_VALUES`; the state's consequences are A6's, not this row's) |
+| `blockedBy` | a **task dependency tag** | `templates/tasks-template.md` — a tag, **not** a state |
+
+The four stay four. No fifth meaning may be introduced, and none of the four may borrow another's value
+domain: the domains themselves — the values, the transition rows, the thresholds, the guard sets — are decided
+in the owner named in the right-hand column and are cited here, never restated. These four are also not the
+three **vocabulary owners** `Blocked` must appear in, and not this file's four **declared carriers**: the three
+sets overlap without being equal, and a reader who collapses them will demand a value domain from a file whose
+job is to tag a task.
+
+**Every other occurrence is classified, not left implicit.** An occurrence of `blocked` outside those four
+owners belongs to exactly one of two classes, and either class is decided per occurrence by these criteria
+alone — which is why no per-site list is carried here:
+
+1. **A use of one of the four vocabularies.** The occurrence reports a feature, a criterion, a line or a task
+   dependency in that state, in prose or in a machine-readable field, and it means whatever the owner above
+   says. Nothing new is created: a sentence such as "this feature is `Blocked`" is a use of row 1.
+2. **An unrelated pre-existing closed set that merely shares the spelling.** A set that exists for its own
+   reason and would still exist if this feature had never been written. The framework has one: the driver's
+   queue report groups runnable lines by the dependencies they are waiting on (`blocked_by`, emitted by
+   `skills/external/sdd-loop-driver/scripts/line-registry.py`'s `--action next-runnable`), which names a line's
+   **unmet dependencies**, never the line's own state.
+
+An occurrence that fits neither class is not classified — it is the third meaning this subsection exists to
+forbid, and it is resolved by adding a row above (or naming a new class here) **before** any carrier adopts it,
+never by quietly widening one of the four.
+
 ## Gates
 
 ### The fourth `Implemented → Ready for Review` condition
@@ -664,7 +701,9 @@ number still. Three rules follow:
 Sections later slices add to **this** file. Each line names the owner its obligations have **today**, so that
 nothing is undefined while the section is absent.
 
-- Additions to § Verification Vocabulary (**081d**) — the reconciliation of the four `blocked` literals (owner:
-  the declaring specification's **FR-019**) and the closed status vocabulary of
-  `templates/feature-index-template.md`, which today carries only a `Status` column header, so its obligation is
-  to **add** a value domain rather than to insert one value into an existing list.
+- The closed status **value domain** of `templates/feature-index-template.md` (**081d**; owner today: the
+  declaring specification's **FR-018**, via SV-06) — that file carries only the `Status` **column header** of its
+  index table today, so its obligation is to **add** a value domain rather than to insert one value into an
+  existing list, and the transition rows and row-level semantics stay with the owner named in § Feature Status.
+  The reconciliation of the four `blocked` literals (**FR-019**) is no longer promised here: it landed as
+  § Verification Vocabulary § The four `blocked` literals are four unrelated facts.

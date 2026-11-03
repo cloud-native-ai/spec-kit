@@ -1,9 +1,23 @@
-"""Contract tests for contracts/state-vocabulary.contract.md — SV-03 … SV-11 (Feature 081, T009).
+"""Contract tests for contracts/state-vocabulary.contract.md — SV-01 … SV-11 (Feature 081).
 
 Subject: the two **declared carriers** of the owner document's schemas —
 
 - ``templates/feature-details-template.md`` § Canonical Status State Machine (SV-03 … SV-07)
 - ``templates/verification-log-template.md`` (SV-08 … SV-11)
+
+and, since slice 081d, two further readers of the same owner: the reconciliation of the four
+`blocked` literals (SV-01 / SV-02, T002) and the **two remaining vocabulary owners** SV-06 names
+beyond the `[FEATURE_STATUS]` token — ``templates/feature-index-template.md`` and
+``skills/internal/manage-features/SKILL.md`` (T003).
+
+What this module asserted before 081d, and why the assertions moved: 081a's row T009 pinned
+SV-03 … SV-11 only, because those were the clauses whose carriers that slice rewrote. 081d adds
+no new carrier for them and edits no existing leg — the `[FEATURE_STATUS]`-token leg
+(``test_blocked_is_in_the_feature_status_token``) stays exactly as 081a wrote it and stays the
+third of SC-003's 3/3; the additions below are new legs with new subjects, so nothing was moved,
+deleted or narrowed to make the module green. The two SV-06 legs are **red before T010** by
+design: the index template carries no value-domain list at all today, and the management skill's
+`Status vocabulary` line carries five values without `Blocked`.
 
 Owner of every literal asserted here: ``shared/workflow/acceptance-hardening.md`` § Feature Status /
 § Verification Vocabulary / § Gates. The carriers are **declared projections**: they physically hold
@@ -32,6 +46,9 @@ pytestmark = pytest.mark.contract
 ROOT = Path(__file__).resolve().parents[2]
 DETAILS = ROOT / "templates" / "feature-details-template.md"
 VERIFICATION = ROOT / "templates" / "verification-log-template.md"
+INDEX_TEMPLATE = ROOT / "templates" / "feature-index-template.md"
+MANAGE_FEATURES = ROOT / "skills" / "internal" / "manage-features" / "SKILL.md"
+OWNER = ROOT / "shared" / "workflow" / "acceptance-hardening.md"
 
 SM_HEADING = re.compile(r"(?m)^###\s+Canonical Status State Machine")
 NEXT_HEADING = re.compile(r"(?m)^##\s")
@@ -60,6 +77,27 @@ BLOCKED_ROWS = {
     ("Implemented", "Blocked"),
 }
 
+#: The four unrelated facts the character sequence `blocked` spells, each with the marker its own
+#: carrier physically holds (SV-01). The mapping is asserted, not assumed: every owner below is
+#: required to carry its own literal, so a reader that drifted into a pointer fails here.
+BLOCKED_LITERAL_OWNERS = {
+    "templates/feature-details-template.md": "**Blocked**",
+    "templates/verification-log-template.md": "| blocked |",
+    "skills/external/sdd-loop-driver/scripts/line-registry.py": "STATE_VALUES",
+    "templates/tasks-template.md": "[blockedBy:",
+}
+
+#: The six status values each vocabulary owner must carry once `Blocked` lands (SV-06). Closed:
+#: asserted as a set, so a five-value owner fails rather than passing on a sample.
+FEATURE_STATUS_VALUES = (
+    "Draft",
+    "Planned",
+    "Implemented",
+    "Blocked",
+    "Ready for Review",
+    "Completed",
+)
+
 
 def _state_machine():
     """The § Canonical Status State Machine body — the block that owns the transitions."""
@@ -86,6 +124,38 @@ def _transitions():
             continue
         rows.append((frm, to, stripped))
     return rows
+
+
+def _reconciliation():
+    """The owner sub-block that reconciles the four `blocked` literals (FR-019 / SV-01 / SV-02).
+
+    Read, never assumed: the section is the slice's addition, so its heading is located by the
+    fact it states (four `blocked` literals) rather than by a heading string copied from here.
+    """
+    text = OWNER.read_text(encoding="utf-8")
+    start = re.search(r"(?m)^###\s+[^\n]*four\s+`?blocked`?\s+literals", text)
+    assert start, (
+        "shared/workflow/acceptance-hardening.md § Verification Vocabulary must carry the "
+        "reconciliation of the four `blocked` literals (FR-019); no such subsection exists"
+    )
+    tail = text[start.end():]
+    nxt = re.search(r"(?m)^#{1,3}\s", tail)
+    return tail[: nxt.start()] if nxt else tail
+
+
+def _never_regress_rule(text: str) -> str:
+    """The `Never regress status` bullet of the management skill, with its indented body."""
+    lines = text.splitlines()
+    start = next((i for i, l in enumerate(lines)
+                  if re.match(r"^\s*-\s*\*\*Never regress", l)), None)
+    assert start is not None, (
+        "skills/internal/manage-features/SKILL.md no longer carries its never-regress rule; the "
+        "narrow `Implemented → Blocked` exception has to live in that rule (SV-04)"
+    )
+    end = start + 1
+    while end < len(lines) and (not lines[end].strip() or lines[end].startswith((" ", "\t"))):
+        end += 1
+    return "\n".join(lines[start:end])
 
 
 def _conditions():
@@ -313,4 +383,161 @@ def test_neither_carrier_narrows_the_vocabulary():
     body = _state_machine()
     assert len(body.splitlines()) > 20, (
         "the state-machine block survived as a real block, not as a stub left after an edit"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# SV-01 / SV-02 — the four `blocked` literals are reconciled exactly once (081d T002)
+# --------------------------------------------------------------------------- #
+
+def test_the_four_blocked_literals_stay_four():
+    """FR-019's carrier: the reconciliation names four owners, one per unrelated fact.
+
+    Added by 081d's T002, which is the row FR-019 owed a carrier to — the requirement named a
+    test id and no row created it. The leg is red before T002's owner-doc addition, because until
+    then the reconciliation the requirement demands does not exist anywhere.
+
+    Four things are asserted, and each one is the difference between a reconciliation and a
+    slogan: every owner is **named** in the section; the named set is **exactly** four (a fifth
+    owner is a fifth meaning); every owner **physically holds** the literal it is named for (the
+    mapping is real, not a claim about files); and no carrier has **copied** the reconciliation
+    back (SV-02 — the reconciliation is written once, in the owner document).
+    """
+    body = _reconciliation()
+    named = {p for p in re.findall(r"`([A-Za-z0-9_./-]+\.(?:md|py))`", body)
+             if (ROOT / p).is_file()}
+    missing = sorted(set(BLOCKED_LITERAL_OWNERS) - named)
+    assert not missing, (
+        "the reconciliation must name each of the four `blocked` literal owners; not named: %r "
+        "(named: %r)" % (missing, sorted(named))
+    )
+    assert named == set(BLOCKED_LITERAL_OWNERS), (
+        "the reconciliation names %d owner(s) but the four literals have exactly four; a fifth "
+        "owner is a fifth meaning, which FR-019 forbids — extra: %r"
+        % (len(named), sorted(named - set(BLOCKED_LITERAL_OWNERS)))
+    )
+    assert re.search(r"(?i)no fifth|fifth meaning", body), (
+        "the section must state its own closure — that no fifth meaning may be introduced — "
+        "rather than leaving the count to a reader: %r" % body[:200]
+    )
+
+    for owner_path, marker in BLOCKED_LITERAL_OWNERS.items():
+        carrier = (ROOT / owner_path).read_text(encoding="utf-8")
+        assert marker in carrier, (
+            "%s is named as an owner of a `blocked` literal but does not carry it (looked for "
+            "%r); an owner that lost its literal turns the reconciliation into a bibliography"
+            % (owner_path, marker)
+        )
+
+    for owner_path in BLOCKED_LITERAL_OWNERS:
+        carrier = (ROOT / owner_path).read_text(encoding="utf-8")
+        copied = sorted(p for p in BLOCKED_LITERAL_OWNERS if p in carrier)
+        assert len(copied) < 4, (
+            "SV-02: %s restates the reconciliation (it names all four owners: %r); the four "
+            "literals are reconciled once, in shared/workflow/acceptance-hardening.md, and each "
+            "carrier must point at that section instead" % (owner_path, copied)
+        )
+
+    owner_text = OWNER.read_text(encoding="utf-8")
+    assert "Additions to § Verification Vocabulary" not in owner_text, (
+        "the § Extension Points bullet that promised this section is still standing; the file "
+        "must never carry both a section and a promise of it (FR-019)"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# SV-06 — the two remaining vocabulary owners (081d T003, red before T010)
+# --------------------------------------------------------------------------- #
+
+def test_the_feature_index_template_carries_a_closed_status_vocabulary():
+    """SV-06's first remaining owner — and the leg's subject is that a domain **exists**.
+
+    Added by 081d's T003 and red before T010 lands: measured at 21 lines, the index template's
+    only status surface is the `Status` **column header** of its table, so the obligation is to
+    add a value domain rather than to insert one value into a list that is already there. A leg
+    that assumed the list would pass on a file that has none, which is why the existence of the
+    declaration is asserted first and separately.
+
+    The domain must be the file's **own**: a pointer at § Canonical Status State Machine would
+    leave the index consumer with no values to read, so the members are required to sit in the
+    declaring lines themselves. The transition rows stay with the state-machine owner (SV-03 /
+    SV-06), which is why the same leg asserts that no `From | To` row appeared here.
+    """
+    text = INDEX_TEMPLATE.read_text(encoding="utf-8")
+    lines = [l for l in text.splitlines()
+             if re.search(r"(?i)status vocabulary|status value", l)]
+    assert lines, (
+        "templates/feature-index-template.md carries no status value domain at all; SV-06 "
+        "requires a closed status vocabulary containing `Blocked`, added beside the table "
+        "(today the file's only status surface is the `Status` column header)"
+    )
+    declared = "\n".join(lines)
+    missing = [v for v in FEATURE_STATUS_VALUES if v not in declared]
+    assert not missing, (
+        "the index template's status vocabulary is missing %r; it must be the file's own value "
+        "domain, not a pointer at another file's table — declaring lines: %r"
+        % (missing, declared)
+    )
+    assert re.search(r"(?i)closed", declared), (
+        "the index template's vocabulary must declare itself closed, or a writer may invent a "
+        "seventh value the state machine does not admit: %r" % declared
+    )
+    assert not re.search(r"(?m)^\|.*\bFrom\b.*\bTo\b", text), (
+        "the index template gained a transition table; the transition rows and the row semantics "
+        "stay with `templates/feature-details-template.md` § Canonical Status State Machine (SV-06)"
+    )
+
+
+def test_manage_features_names_blocked_and_points_at_the_machine_for_its_exception():
+    """SV-06's second remaining owner, plus FR-022's no-second-copy rule as an assertion.
+
+    Added by 081d's T003 and red before T010 lands: the skill's `Status vocabulary` line reads
+    five values and `Blocked` is not one of them, and its never-regress rule carries no
+    `Implemented → Blocked` exception at all.
+
+    The exception is required **by pointer**: the rule must name the pointer's target
+    (`.specify/templates/feature-details-template.md` § Canonical Status State Machine) and must
+    not copy the owner's criteria, so the two facts a reader needs — *that* the exception exists
+    and *what* it requires — keep one home each. The no-copy half is the assertion, not the
+    intent: the owner's condition sentence and any `From | To` row are required to be absent
+    here.
+    """
+    text = MANAGE_FEATURES.read_text(encoding="utf-8")
+    row = next((l for l in text.splitlines()
+                if re.match(r"^\s*-\s*Status vocabulary:", l)), None)
+    assert row, (
+        "skills/internal/manage-features/SKILL.md no longer declares its `Status vocabulary` line; "
+        "SV-06 requires that line to carry `Blocked`"
+    )
+    members = [v.strip().strip("`") for v in row.split(":", 1)[1].split("|")]
+    assert set(members) == set(FEATURE_STATUS_VALUES) and len(members) == 6, (
+        "the `Status vocabulary` line must be the six values %r; measured %r — five values is "
+        "the pre-081d shape, and a seventh would be a value the state machine does not admit"
+        % (list(FEATURE_STATUS_VALUES), members)
+    )
+
+    rule = _never_regress_rule(text)
+    assert "Blocked" in rule and "Implemented" in rule, (
+        "SV-04: the never-regress rule must carry the narrow `Implemented → Blocked` exception, "
+        "by pointer; the rule reads: %r" % rule
+    )
+    assert re.search(r"(?i)audit", rule) and re.search(r"(?i)evidence", rule), (
+        "the exception is an audit correction that cites its evidence — both facts belong to the "
+        "rule that grants it: %r" % rule
+    )
+    assert re.search(r"(\.specify/)?templates/feature-details-template\.md", rule), (
+        "the exception must point at the state-machine owner by path; a rule that gestures at "
+        "`the template` leaves the criteria unlocatable: %r" % rule
+    )
+    assert "Canonical Status State Machine" in rule, (
+        "the pointer must name its section anchor, not only the file (SV-03/SV-06): %r" % rule
+    )
+    assert not re.search(r"(?i)four conjunctive conditions", rule), (
+        "FR-022: the exception must not copy the owner's criteria — the pointer carries them: %r"
+        % rule
+    )
+    assert not re.search(r"(?m)^\|.*\bFrom\b.*\bTo\b", text), (
+        "the management skill gained a transition table; transitions are owned by "
+        "`templates/feature-details-template.md` § Canonical Status State Machine and are reached "
+        "by pointer (FR-022)"
     )

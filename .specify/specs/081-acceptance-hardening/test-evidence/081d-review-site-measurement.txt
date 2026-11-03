@@ -1,0 +1,132 @@
+T004 — SC-002's (ii) reading: the review site's recorded FOUR-SEGMENT composition run
+Feature 081 / slice 081d / row T004 (FR-023, SC-002; contracts/review-composition.contract.md RC-15)
+Run date: 2026-11-03T08:39:09Z · branch 081-acceptance-hardening · run-start HEAD 72c16f33
+                                        (72c16f3323e25fefbb59acf9ed93eb8c201f1df5)
+
+NOTE ON THIS FILE'S NAME: tasks.md T004 and checklists/081d-2026-11-03.md:288 both name
+`test-evidence/081d-review-site-measurement.txt` as this row's evidence path, so that is the name used.
+No second copy exists under any other name; the run's record is
+`tests/fixtures/acceptance-hardening/review-implemented-clean/review.md`.
+
+WHY THIS FILE IS THE MEASUREMENT (SC-002 ii)
+--------------------------------------------
+The reduced measurement the ladder already calls insufficient is a bare closure-checker invocation: the
+checker payload is ONE input the artifact segment consumes, not the composition. This file records the
+composition itself — the four segments executed in the fixed order process -> artifact -> implementation ->
+code, each with its own verdict, followed by ARC — on `review-implemented-clean`, plus the produced record.
+The produced record carries the four slots `### 2.1`-`### 2.4`, the four segment verdicts, the artifact
+coverage line `7 / 7`, zero finding rows, the smoke triple and the seven-key `final_path` record copied from
+the checker.
+
+SEGMENT VERDICTS (all four executed; none skipped, reordered or answered by another)
+-----------------------------------------------------------------------------------
+1. process         -> pass             (own conclusion; zero findings; the run's one deviation disclosed in
+                                       the record's § 1 row 4 rather than filed as a defect)
+2. artifact        -> pass             coverage 7 / 7, missing members: none, findings: none
+                                       expected set derived BEFORE membership was tested (declared
+                                       derivation, size printed: 7)
+3. implementation  -> not-applicable   basis: no committed delta in this repository implements feature
+                                       900's requirements — a declarative fixture is not an implementation
+                                       of itself; the smoke triple is nevertheless MEASURED (below)
+4. code            -> not-applicable   basis: `no code deliverable: the committed delta contains no code
+                                       path` (the deterministic triage step's own printed basis)
+ARC                -> verdict `accept`, claimed `Implemented`, comparison `agree`, no F-ACCEPTANCE;
+                                       the fourth `Implemented -> Ready for Review` condition JUDGED and
+                                       PASSED (the only final-path criterion, SC-001, is `pass`)
+
+COMMANDS, EXIT CODES AND OUTPUTS (verbatim)
+-------------------------------------------
+(1) Run-start context
+    $ git rev-parse HEAD
+    72c16f3323e25fefbb59acf9ed93eb8c201f1df5                      exit 0
+    $ git status --porcelain            (taken at the composition's start, before the record was written)
+     M shared/workflow/acceptance-hardening.md
+     M tests/contract/test_acceptance_state_machine.py
+    exit 0
+    -> the uncommitted scope is THIS slice's own T002/T003 edits (the owner-doc addition and the two new
+       legs), disclosed in the record's `### 2.1` "Uncommitted scope" cell and never concluded over. The
+       reviewed subject is untouched: no entry above is under tests/fixtures/acceptance-hardening/
+       review-implemented-clean/, and the record plus this evidence file are the run's own additions.
+
+(2) Code segment — base resolution and applicability triage (RC-09's single route)
+    $ bash skills/internal/code-review/scripts/git-delta-review.sh base \
+        --spec tests/fixtures/acceptance-hardening/review-implemented-clean --json
+    {"base":"c46da4d217aa1126e0bdf6b2ba3a4358f91bb01d","head":"72c16f3323e25fefbb59acf9ed93eb8c201f1df5",
+     "base_source":"feature-first-commit"}                          exit 0
+
+    $ bash skills/internal/code-review/scripts/git-delta-review.sh triage \
+        --spec tests/fixtures/acceptance-hardening/review-implemented-clean
+    base=c46da4d217aa1126e0bdf6b2ba3a4358f91bb01d
+    head=72c16f3323e25fefbb59acf9ed93eb8c201f1df5
+    base_source=feature-first-commit
+    changed_files=93
+    triage=run
+    basis=code path in the committed delta: tests/contract/test_acceptance_review_composition.py ...
+                                                                   exit 0
+
+    DISCLOSURE — that tier's range is NOT the reviewed subject's range: `feature-first-commit` resolves the
+    repository feature's first commit, so `head` is the run-start HEAD and the 93-file range folds this
+    slice's own 081d work into fixture 900's delta. The reviewed subject is the fixture, so the run passed
+    its own delta explicitly and re-triaged:
+
+    $ bash skills/internal/code-review/scripts/git-delta-review.sh triage \
+        --since c46da4d217aa1126e0bdf6b2ba3a4358f91bb01d --head 959e9e49229cbb4432765947bc9d68f1088df770
+    base=c46da4d217aa1126e0bdf6b2ba3a4358f91bb01d
+    head=959e9e49229cbb4432765947bc9d68f1088df770
+    base_source=explicit
+    changed_files=30
+    triage=not-applicable
+    basis=no code deliverable: the committed delta contains no code path        exit 0
+
+(3) Implementation segment — the smoke triple, executed rather than waived
+    $ python3 -c "print('acceptance-fixture-review-implemented-clean')"
+    acceptance-fixture-review-implemented-clean                      exit 0
+    smoke command   (verbatim from the fixture's smoke_command record):
+      python3 -c "print('acceptance-fixture-review-implemented-clean')"
+    smoke exit code: 0
+    smoke evidence path (exists, 3 lines, non-empty):
+      tests/fixtures/acceptance-hardening/review-implemented-clean/test-evidence/smoke.txt
+
+(4) Artifact segment — the denominator, derived before membership
+    $ python3 - (inline: the seven expected members vs `Path.is_file()`)
+    expected: 7
+    present:  7  ['requirements.md','plan.md','tasks.md','verification.md','feature-detail.md',
+                  'feature-registry.md','test-evidence/smoke.txt']
+    missing:  []
+    coverage line: 7 / 7                                             exit 0
+    Derivation: the six members `data-model.md` § Fixture set declares for a spec-dir case (the fixture's
+    own plan.md carries no § Project Structure, so the stage rules plus that declared shape are the union)
+    plus the smoke evidence path the fixture's verification.md record names.
+
+(5) Acceptance Reality Check — one deterministic program, record copied, never recomputed
+    $ python3 scripts/python/closure-acceptance-check.py \
+        --spec-dir tests/fixtures/acceptance-hardening/review-implemented-clean --json
+    {
+      "claimed_status": "Implemented",
+      "completion_conditions": {"every_final_path_pass": true, "no_open_rows": true,
+                                "smoke_record_pass": true, "status_row_per_criterion": true},
+      "final_path": {"blocked": 0, "deferred": 0, "fail": 0, "partial": 0, "pass": 1, "total": 1,
+                     "unknown": 0},
+      "flow_class": "execution",
+      "reasons": [],
+      "verdict": "accept",
+      "waived": []
+    }                                                              exit 0
+    Copied into `### 2.4` verbatim, seven keys on one line:
+      pass 1 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 1
+
+(6) The composition's structural carrier, re-run at this tree (081c wrote it; this run re-measures it)
+    $ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition.py -q
+    # test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_review_composition.py -q
+    32 passed in 1.33s                                            exit 0
+    RESULT: the composition's structural carrier is green on THIS tree, so the four-segment shape the
+    record above was produced under is the shape the final source carries.
+
+EVIDENCE PATHS
+--------------
+- the produced record (this run's artifact):
+    tests/fixtures/acceptance-hardening/review-implemented-clean/review.md
+- this evidence file:
+    .specify/specs/081-acceptance-hardening/test-evidence/081d-review-site-measurement.txt
+- the structural carrier's module:
+    tests/contract/test_acceptance_review_composition.py
