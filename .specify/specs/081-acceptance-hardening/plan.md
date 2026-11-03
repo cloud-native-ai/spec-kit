@@ -231,11 +231,15 @@ Owner of this table's shape, its `Disposition` domain (`resolved | inherited | n
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|
-| IB-003 | `071:SC-001_status`（第 66 行） | not-applicable | — | — | 该 SC 度量 071 自己切片的一次端到端 review 运行；081 的 SC-001 用自建负夹具在三处调用点独立度量，不消费 071 的该测量 |
-| IB-004 | `071:SC-006_status`（第 86 行） | inherited | `test:tests/contract/test_acceptance_review_composition.py` | `081c` | 081 的 review 组合改写了 071 建立的两段结构，其结构证据必须由 081 重新采集（产物段/实现段/`final_path` 计数记录），不得继承 071 的旧结构结论。载体落在 081c 的必做任务行 + 其测试模块，因此本行读作 **`inherited-later`**：父特性当前为 `Blocked`、081c 已在 § D10 表中登记，故它是已披露的合法读法，MUST NOT 被读成未处置。**载体不取 SC-006**：SC-006 是 `supporting` 路径、可被 `deferred`，按 FR-011 不构成载体 |
-| IB-006 | `077:SC-002_status`（第 77 行） | inherited | `task:T005+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 081 在 `expression-gates.md` 的同一批门行上加四类发现，门行接线改动后必须重测。载体 = 本切片 T005（四类发现断言的行）+ 其测试模块。**载体不取 SC-005**：SC-005 是 `supporting` 路径、可被 `deferred` |
-| IB-007 | `077:SC-005_status`（第 89 行） | inherited | `task:T012+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 同上：门行接线改动后必须重测；T012 是逐行复跑对应门禁的必做行，其模块即本切片的唯一测试载体 |
-| IB-008 | `077:SC-008_status`（第 101 行） | not-applicable | — | — | 该 SC 度量表达类试点线在真实项目上的文档门禁表现；081 是 `execution` 类，不消费该测量 |
+| IB-003 | `071:SC-001_status` | not-applicable | — | — | 071 verification.md line 66；该 SC 度量 071 自己切片的一次端到端 review 运行；081 的 SC-001 用自建负夹具在三处调用点独立度量，不消费 071 的该测量 |
+| IB-004 | `071:SC-006_status` | inherited | `test:tests/contract/test_acceptance_review_composition.py` | `081c` | 071 verification.md line 86；081 的 review 组合改写了 071 建立的两段结构，其结构证据必须由 081 重新采集（产物段/实现段/`final_path` 计数记录），不得继承 071 的旧结构结论。载体落在 081c 的必做任务行 + 其测试模块，因此本行读作 **`inherited-later`**：父特性当前为 `Blocked`、081c 已在 § D10 表中登记，故它是已披露的合法读法，MUST NOT 被读成未处置。**载体不取 SC-006**：SC-006 是 `supporting` 路径、可被 `deferred`，按 FR-011 不构成载体 |
+| IB-006 | `077:SC-002_status` | inherited | `task:T005+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 077 verification.md line 77；081 在 `expression-gates.md` 的同一批门行上加四类发现，门行接线改动后必须重测。载体 = 本切片 T005（四类发现断言的行）+ 其测试模块。**载体不取 SC-005**：SC-005 是 `supporting` 路径、可被 `deferred` |
+| IB-007 | `077:SC-005_status` | inherited | `task:T012+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 077 verification.md line 89；同上：门行接线改动后必须重测；T012 是逐行复跑对应门禁的必做行，其模块即本切片的唯一测试载体 |
+| IB-008 | `077:SC-008_status` | not-applicable | — | — | 077 verification.md line 101；该 SC 度量表达类试点线在真实项目上的文档门禁表现；081 是 `execution` 类，不消费该测量 |
+
+**Dependency artifacts (declared, never implied)**: the checker reads only the paths in this block, never arbitrary backticked `.md` tokens elsewhere in the section.
+- `071`: `.specify/memory/features/071.md`, `.specify/specs/071-review-code-integration/verification.md`
+- `077`: `.specify/memory/features/077.md`, `.specify/specs/077-doc-sdd-integration/verification.md`
 
 **Readings**: 8 records, 5 dispositions. All five extracted rows carry a disposition (5/5, none undisposed). Of the three `inherited` rows **2 resolve in this slice** (IB-006, IB-007) and **1 reads `inherited-later`** (IB-004, carrier in 081c). The three zero-row sources (IB-001, IB-002, IB-005) carry no disposition because there is no row to dispose — treating them as `resolved` rows would be exactly the invented-locator defect the join key exists to prevent. So the settled count in this slice is **7 of 8 records** with **1 disclosed as `inherited-later`** — not an unresolved blocker, and not a resolved carrier.
 

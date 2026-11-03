@@ -185,10 +185,12 @@
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | Python 3 解释器（跑 closure checker、validator、审计模式） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（已在 `pyproject.toml` 声明，不新增 pin）；新增脚本 stdlib-only——无第三方 import，机械可判 | `pyproject.toml`（`[project] requires-python`）+ `scripts/bash/run-tests.sh`（`resolve_python`） | 本特性全部新脚本在 `>=3.8` 解释器上通过 FR-007 的正／负夹具测试与 FR-005 的 smoke，且静态 import 清单为空 | FR-006, FR-007, FR-020 | EP-001 |
-| RS-002 | pytest（契约／单元测试运行器） | signed-contract | pytest 上游（本仓只消费） | 本仓当前**无** pytest 版本声明（`pyproject.toml` 只有 `[tool.pytest.ini_options]`，无 pin）；pin 由 FR-023 在采集基线同一次记录的 `pytest --version` 原文提供，落 `test-evidence/` | `scripts/bash/run-tests.sh`（解释器与 pytest 解析的唯一入口） | 基线重跑在同一 pin 上复现失败集（`head 失败集 − 基线失败集` 为空），且新增测试全绿 | FR-023 | EP-001 |
-| RS-003 | `git`（实现审查的 `base..head` delta 解析；两个 `--check` 的树差异判定；审计的 `git status --porcelain`） | signed-contract | git 上游（本仓只消费） | 本仓无版本声明；pin 由 FR-023 同一次采集记录的 `git --version` 原文提供，落 `test-evidence/` | `scripts/bash/common.sh` § `check_dependency`（只检存在、不检版本） | 实跑一次 `base..head` 解析（实现段据此成文）+ `regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均 exit 0 + 审计前后 `git status --porcelain` 增量为空 | FR-014, FR-020, FR-021 | EP-010 |
-| RS-004 | 本仓自己的 `specify init`（smoke 命令在临时夹具上执行它） | in-scope | 本仓 `src/` 与 `scripts/` | 仓内 commit（同一次提交） | `src/specify_cli/__init__.py`（`get_resource_path()` 的回退分支，T-005） | smoke 命令在临时目录执行 `specify init` 后退出码为 0 且夹具被生成 | FR-005 | EP-002, EP-003 |
+| RS-001 | Python 3 解释器（跑 closure checker、validator、审计模式） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（已在 `pyproject.toml` 声明，不新增 pin）；新增脚本 stdlib-only——无第三方 import，机械可判 | `pyproject.toml` | 本特性全部新脚本在 `>=3.8` 解释器上通过 FR-007 的正／负夹具测试与 FR-005 的 smoke，且静态 import 清单为空 | FR-006, FR-007, FR-020 | EP-001 |
+| RS-002 | pytest（契约／单元测试运行器） | signed-contract | pytest 上游（本仓只消费） | 本仓当前**无** pytest 版本声明（`pyproject.toml` 只有 `[tool.pytest.ini_options]`，无 pin）；pin 由 FR-023 在采集基线同一次记录的 `pytest --version` 原文提供，落 `test-evidence/` | `scripts/bash/run-tests.sh` | 基线重跑在同一 pin 上复现失败集（`head 失败集 − 基线失败集` 为空），且新增测试全绿 | FR-023 | EP-001 |
+| RS-003 | `git`（实现审查的 `base..head` delta 解析；两个 `--check` 的树差异判定；审计的 `git status --porcelain`） | signed-contract | git 上游（本仓只消费） | 本仓无版本声明；pin 由 FR-023 同一次采集记录的 `git --version` 原文提供，落 `test-evidence/` | `scripts/bash/common.sh` | 实跑一次 `base..head` 解析（实现段据此成文）+ `regen-command-copies.py --check` 与 `sync-mirrors.py --check` 均 exit 0 + 审计前后 `git status --porcelain` 增量为空 | FR-014, FR-020, FR-021 | EP-010 |
+| RS-004 | 本仓自己的 `specify init`（smoke 命令在临时夹具上执行它） | in-scope | 本仓 `src/` 与 `scripts/` | 仓内 commit（同一次提交） | `src/specify_cli/__init__.py` | smoke 命令在临时目录执行 `specify init` 后退出码为 0 且夹具被生成 | FR-005 | EP-002, EP-003 |
+
+**Contract-cell note**: each `Contract` cell carries one repo-relative path (the owner schema admits exactly one per row). Secondary references are evidence, not a second contract: RS-001's runner is `scripts/bash/run-tests.sh` § `resolve_python`; RS-002's runner is the sole interpreter/pytest entry; RS-003's check is `scripts/bash/common.sh` § `check_dependency` (existence, not version); RS-004's path is the `get_resource_path()` fallback branch (T-005).
 
 ### Decomposition & Ceiling
 

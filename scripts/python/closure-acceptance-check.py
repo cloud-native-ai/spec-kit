@@ -974,18 +974,47 @@ def premise_reasons(plan):
 def declared_dependency_files(section_text, spec_dir):
     """The dependency artifacts the plan's declaration names, resolved and deduplicated.
 
-    The dependency set is **declared, never implied**: only a backticked `.md` token inside
-    `§ Inherited Blockers` is read, so an unopened dependency is visible as a missing row instead
-    of being silently assumed away.
+    The dependency set is **declared, never implied**: only the paths inside the
+    ``**Dependency artifacts (declared, never implied)**`` block are read.  A generic
+    backticked ``.md`` token elsewhere in the section (e.g. this spec's own
+    ``verification.md``) MUST NOT become a dependency; scanning everything is how a
+    feature becomes its own dependency and emits phantom rows.
     """
+    marker = "**Dependency artifacts"
+    start = section_text.find(marker)
+    if start < 0:
+        return []
+    tail = section_text[start:]
+    # The declaration is the run of bullet lines immediately after the marker.
+    block_match = re.search(r"^\*\*Dependency artifacts[^\n]*\*\*:?[^\n]*\n(.*?)(?=\n\*\*|\n#{2,}|\Z)", tail, re.S | re.M)
+    if not block_match:
+        return []
+    block = block_match.group(1)
+    repo_root = Path(spec_dir).resolve().parents[2]
+    current = Path(spec_dir).resolve()
+    own_artifacts = {
+        current / name
+        for name in ("requirements.md", "plan.md", "tasks.md", "verification.md")
+    }
     found = []
-    for token in re.findall(r"`([^`\n]+)`", section_text):
+    for token in re.findall(r"`([^`\n]+)`", block):
         token = token.strip()
         if not token.endswith(".md"):
             continue
-        candidate = Path(spec_dir) / token
-        if candidate.is_file() and candidate not in found:
-            found.append(candidate)
+        candidates = []
+        if token.startswith(".specify/"):
+            candidates.append(repo_root / token)
+        else:
+            candidates.append(Path(spec_dir) / token)
+            candidates.append(repo_root / token)
+        for candidate in candidates:
+            if candidate.is_file():
+                resolved = candidate.resolve()
+                if resolved in own_artifacts:
+                    continue
+                if resolved not in found:
+                    found.append(resolved)
+                break
     return found
 
 

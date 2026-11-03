@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261103T043000Z-081b
 slice: 081b
 stage: implement
-stage_started_at: 1793683375
-stage_deadline_epoch: 1793688775
-stage_base_commit: b29a8a4c
-attempt: 1
+stage_started_at: 1793684686
+stage_deadline_epoch: 1793690086
+stage_base_commit: 8a4e7c7c
+attempt: 3
 retry_limit: 2
-last_verdict: implement 081b part 1/3 PASS @b29a8a4c (T001–T004; 5 fixtures, red-first landing, owner doc 3 sections, plan-template 2 skeletons; mirror/regen 0; feature Blocked); part 2/3 dispatched (T005–T009)
+last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 checker exits 2 on annotated Contract/Source row cells; T012 blocked by T010; third defect: declared_dependency_files scans arbitrary backticks and makes 081 its own dependency); repair dispatched
 <!-- plan-fence: decomposition=auto@plan-entry; test-budget=baseline@implement-start + closure@post-review; fast-lane=not-adopted -->
 <!-- loop-state:end -->
 
@@ -331,8 +331,30 @@ last_verdict: implement 081b part 1/3 PASS @b29a8a4c (T001–T004; 5 fixtures, r
 - `b29a8a4c`：五套夹具（premise/runtime-gap/runtime-zero-row/inherited-mutation/inherited-clean）、`notes/red-first-evidence-081b.md`、owner doc 三节（九列/五列/继承表 + Carrier 语法 + inherited-later）、plan-template 两骨架（零域字面量）；mirror/regen 0；feature 仍 `Blocked`。
 - 披露：081a 的 `positive` 等夹具仍是七列旧形态；part 2 需升级为九列（或明确缺列不触发），否则 `positive` 接受与 `Premises` 义务冲突。
 
+## implement 081b part 2（2026-11-03 05:38 UTC）
+
+- `793aff9e`：T005–T009；`test_acceptance_premises.py`（132 targeted passed）、pre-analyze 四发现、closure checker 外部来源抽取（partial/deferred_tasks、carrier、inherited-later、zero-row、prose）、expression-gates 修正 + 守卫、081a 夹具九列升级；mirror/regen 0；feature 仍 `Blocked`。
+- 披露：子代理在 T009 regen 处 120-turn 停止；驱动者补跑 checks、132 测试并提交。
+
+## implement 081b part 3 halt（2026-11-03 05:44 UTC）
+
+- T011 done（smoke 0/0，081a 证据保留）；T010 halted：checker exit 2 on 081's own `Contract` cells（annotated prose / two candidate paths）and `Source row` cells（`（第 N 行）` annotations violate grammar）；T012 blocked by T010.
+- 第三缺陷：`declared_dependency_files()` 扫描 § Inherited Blockers 内任意反引号 `.md`，把本 spec 的 `verification.md` 当成第九个依赖，产生 9 条 `081:...` 自依赖行。
+- 处置：不手写计数；先修 `Contract`/`Source row`/依赖声明三处（spec + checker），再重跑 T010/T012。
+- 提交 `61b62006` + `8a4e7c7c`（证据/异常记录）；feature 仍 `Blocked`。
+
 ## 框架观察
 
 - 026 的零 pass `Implemented` 不是单点事故：`Planned → Implemented` 的 DoD 只要求 tasks 收口 + SC 有状态行，不要求 final-path SC `pass`；review 门只要求 P0/P1=0，不检查验收现实；driver 合并门只看 review 通过 + 测试预算。
 - 本特性要把“更严格验收”落到确定性门：final-path SC + `Blocked` 状态 + 基本 smoke test + closure-acceptance-check；运行时栈/依赖所有权与执行前提/继承 blocker 作为模板强制字段；review 增加实现与产物质量审查。
 - 约束：Two Hats——框架源（`templates/`、`shared/`、`skills/`、`scripts/`）是改动落点，`.specify/` 镜像由同步生成，不手改；现有特性不追溯改状态，audit 只读。
+
+## implement 081b part 4 / slice close（2026-11-03 06:10 UTC）
+
+- 三缺陷修复（不手写计数）：`requirements.md` 的 `Contract` 单元格各留一条可解析路径，次级引用移入 Contract-cell note；`plan.md` 五条 `Source row` 还原为纯 locator（`（第 N 行）`移入 Evidence）；`closure-acceptance-check.py` 的依赖集改为只读 `**Dependency artifacts (declared, never implied)**` 块，自排除收窄到本 spec 的四个 canonical 文件；两个 `inherited-*` 夹具改为同一声明块形态（路径在 bullet 行）。mirror 已同步。
+- closure checker（081 spec dir）：`verdict=block`、exit 1、`zero-final-path-pass`、`final_path pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2`、tasks closed=12/deferred=0/open=0、`no_open_rows=true`、`smoke_record_pass=true`。payload `.specify/.tmp/081b-closure-verdict.json`，tracked copy `test-evidence/closure-verdict-081b.json`。
+- T010：SC-005 → `partial`；读数 = 四发现 4/4（两个 producer）、`RS-004` 三义务 3/3、8/8 records（7 settled + 1 `inherited-later`，IB-004 → 081c）；接受摘要从 payload 复制（未手算）。SC-001 保持 `blocked`，SC-002 保持 `partial`。
+- T011：part 3 已完成（smoke 0/0，`smoke-081a.txt` 保留）。
+- T012：5 模块 `89 passed` exit 0，记录 `test-evidence/tasks-081b-slice-tests.txt`；全量基线对照留给 081d（FR-023）。
+- 测试预算：baseline = 081a final full-suite（39F/7025P/7S）；081b 为切片，按 tasks.md 不做全量 closure run，T012 的 targeted 观测不冒充集合级对照。
+- 12 个任务全部 `[X]`；feature 状态仍 **`Blocked`**（081b 不接调用点，SC-001/SC-002 不动）。下一阶段 = 081b review。

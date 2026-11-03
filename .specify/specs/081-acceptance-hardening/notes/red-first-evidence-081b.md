@@ -58,7 +58,7 @@ FAILED tests/contract/test_acceptance_premises.py::test_h3_the_fenced_exclusion_
   part, and it was run against the unmodified checkers — so the red is a measurement of the
   missing implementation, not a re-statement of it.
 
-## 2. Polish readings (§ 2.1 written by T011; T012 did not run — § 2.2; T010 stopped — § 2.3)
+## 2. Polish readings (§ 2.1 T011; § 2.2 T012 completed in part 4; § 2.3 T010 stopped then repaired in part 4; § 2.4 records the repair)
 
 **Part 3 outcome, stated first**: T011 **completed**; T010 **stopped** on a fast-fail (§ 2.3), and
 T012 — whose row is `[blockedBy: T005,T009,T010]` — therefore did **not** run. The slice did not
@@ -101,6 +101,21 @@ $ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py \
 That green is confined to the fixtures and to the frozen guards. It says nothing about this
 feature's own spec directory, which the checker refuses before it reaches any assertion (§ 2.3) —
 which is precisely why it MUST NOT be read as a close record.
+
+**Part 4 completion — T012 is now the close record.** After the repair in § 2.4, the row's exact
+command was run and its console output written to `test-evidence/tasks-081b-slice-tests.txt`:
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py \
+      tests/contract/test_closure_acceptance_check.py tests/contract/test_expression_gates_doc.py \
+      tests/contract/test_expression_gate_wiring.py tests/contract/test_premise_carrier_contract.py -q
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_premises.py ... -q
+89 passed in 5.56s          # exit 0
+```
+
+The count matches the earlier diagnostic exactly, but the earlier run remains labelled a
+diagnostic: this one postdates the checker repair and T010's SC-005 row, so it is the slice's
+close observation. The feature-level id-level baseline comparison remains 081d's (FR-023).
 
 ### 2.3 T010 — STOPPED: the checker cannot produce a payload for this feature's own spec dir
 
@@ -184,6 +199,48 @@ bounds. Recorded, not touched.
 
 The raw transcript of P1/P2/P3 is reproducible from the commands above; the temp copies live under
 `.specify/.tmp/` (git-ignored) and were removed after the readings were taken.
+
+### 2.4 Part 4 — the three defects repaired, then T010 re-run
+
+The part-3 stop was a fast-fail, not a terminal state: each defect has exactly one reading
+consistent with the recorded intent, so each was repaired in place and disclosed here rather than
+left for a ruling that the artifacts already answered.
+
+| # | Repair | Why this is the one reading, not an invention |
+|---|--------|-----------------------------------------------|
+| 1 | `requirements.md` § Runtime Stack: each `Contract` cell narrowed to **one** repo-relative path (`pyproject.toml`, `scripts/bash/run-tests.sh`, `scripts/bash/common.sh`, `src/specify_cli/__init__.py`); the secondary references moved to an explicit **Contract-cell note** below the table | The owner schema says the cell names the file the contract lives in and that one cell = one path; `RS-001`'s second path was the runner, which the note still names as evidence. No contract was dropped — the table now says what the schema says |
+| 2 | `plan.md` § Inherited Blockers: the five `Source row` cells reduced to the bare locators (`071:SC-001_status`, …); the `（第 N 行）` reading moved into the `Evidence / note` cells | FR-011's grammar is `<feature-id>:<row-locator>` with no whitespace; the line number was evidence *about* the row, not part of its join key |
+| 3 | `scripts/python/closure-acceptance-check.py`: `declared_dependency_files()` now reads **only** the paths inside an explicit `**Dependency artifacts (declared, never implied)**` block, and its self-exclusion names the spec's four canonical artifacts instead of "anything under the spec dir" | FR-011's own rule is "declared, never implied"; scanning arbitrary backticked `.md` tokens made this spec its own dependency. The fixtures name their dependency files in the same block shape (paths on bullet lines, never on the marker line). The two `inherited-*` fixture plans were updated to that shape — their assertions are unchanged |
+
+**Measured after the repair** (HEAD before the closure commit; the exact commands are the ones in
+the table above):
+
+```text
+$ python3 scripts/python/closure-acceptance-check.py \
+      --spec-dir .specify/specs/081-acceptance-hardening --json-out .specify/.tmp/081b-closure-verdict.json
+verdict: block
+flow_class: execution
+claimed_status: Blocked
+final_path: pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2
+reason: zero-final-path-pass
+EXIT=1
+```
+
+No input error, no self-dependency row. The payload exists, so T010's second instruction became
+performable: the SC-005 row was rewritten to the measured reading (§ 2.5) and the acceptance
+summary was copied from the payload. **The verdict stays `block`**: 081b adds no closure call site
+and turns no `final`-path criterion to `pass`; SC-001 stays `blocked`, SC-002 stays `partial`.
+
+### 2.5 T010 — SC-005 row and the copied acceptance summary (COMPLETED after § 2.4)
+
+`verification.md`'s SC-005 row now records the supporting-path measurement: four findings 4/4
+through both producers; `RS-004`'s three `in-scope` duties 3/3; both plan tables with **8/8 records
+accounted, 7 settled in this slice + 1 disclosed `inherited-later`** (IB-004's carrier module is
+081c's `tests/contract/test_acceptance_review_composition.py`). The status is `partial`, not `pass`,
+because that carrier cannot resolve before 081c — `inherited-later` is disclosed, never counted as
+resolved and never written as undisposed. The acceptance-summary block was copied from
+`.specify/.tmp/081b-closure-verdict.json` (tracked copy: `test-evidence/closure-verdict-081b.json`);
+its counts were not recomputed by hand (C-08).
 
 ## 3. Absence record measured when this landing point was opened (T002)
 

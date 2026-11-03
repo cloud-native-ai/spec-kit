@@ -49,14 +49,14 @@ SC-004_status=pass
 SC-004_value=the six-value vocabulary, five `SC-NNN_` ladder fields, illegal-row trigger and the exactly-one smoke record are asserted by the state-machine contract test
 SC-004_note=the ladder-mutation fixture is asserted by the checker contract test
 
-SC-005_status=deferred
-SC-005_value=the runtime-stack table and the two plan tables exist; the in-scope/inherited carrier checks are 081b
-SC-005_note=this criterion is supporting; its measurement carrier is `tests/contract/test_acceptance_premises.py` (081b)
-SC-005_blocked_at=081b owns the premise/inherited tests and the four deterministic findings
-SC-005_reduced_measurement=the runtime-stack table and the two plan tables were read by the checker; the owner doc sections exist
+SC-005_status=partial
+SC-005_value=ownership and premises are first-class: the four findings fire 4/4 through both producers (`pre-analyze-check.py` and `closure-acceptance-check.py`); `RS-004`'s three `in-scope` duties are 3/3 (`FR-005` defined, quoted by this file's T011 row at line level, joint-acceptance row present); both plan tables account for 8/8 records — 7 settled in this slice + 1 disclosed `inherited-later`
+SC-005_note=the two plan tables' records: the three zero-row sources carry no disposition because there is no row to dispose; the five extracted `partial` rows are all dispositioned; of the three `inherited` rows, IB-006 (`task:T005+test:tests/contract/test_acceptance_premises.py`) and IB-007 (`task:T012+test:tests/contract/test_acceptance_premises.py`) resolve in this slice, and IB-004 reads `inherited-later` (`test:tests/contract/test_acceptance_review_composition.py`, `Carrier slice=081c`). `inherited-later` is a disclosed legal reading — neither an undisposed blocker nor a resolved carrier — which is why this row reads `partial`, not `pass`
+SC-005_blocked_at=IB-004's carrier module belongs to slice 081c, so its carrier measurement cannot resolve in 081b
+SC-005_reduced_measurement=`tests/contract/test_acceptance_premises.py` (the slice's single carrier) asserts the four findings through both producers, the three `in-scope` duties at their own stages, the carrier forms/eligibility/slice readings, the join key and the extraction; the 081b test set also keeps the frozen guards green
 SC-005_reduced_measurement_run=yes
-SC-005_why_reduced_insufficient=the carrier-existence and in-scope-obligation assertions are not in 081a
-SC-005_unblock=081b lands `test_acceptance_premises.py` and the four findings
+SC-005_why_reduced_insufficient=the inherited carrier for IB-004 is the 081c review-composition module; a supporting criterion naming that carrier cannot claim the full carrier measurement in 081b
+SC-005_unblock=081c lands `tests/contract/test_acceptance_review_composition.py` and completes IB-004's carrier to `task:<T-ID>+test:<path>`; 081d re-reads the row at line closure
 
 SC-006_status=deferred
 SC-006_value=the review composition and ARC contract exists; the four-segment review and artifact/implementation measurements are 081c
@@ -109,8 +109,8 @@ final_path_fail=0
 final_path_unknown=0
 final_path_total=2
 acceptance_verdict=block
-final_path_source=test-evidence/closure-verdict.json (produced by `closure-acceptance-check.py --json-out`; this block is a copy, not a second count)
+final_path_source=test-evidence/closure-verdict-081b.json (byte-identical copy of `.specify/.tmp/081b-closure-verdict.json`, produced by `closure-acceptance-check.py --json-out`; this block is a copy, not a second count)
 
 # -- Notes --
 
-notes=The slice is deliberately Blocked: SC-001's three call sites are 1/3 in 081a, and the feature must not be called Implemented. The baseline is the plan-stage capture (39 failed / 6970 passed / 7 skipped); the closure-repair head runs are recorded under test-evidence/closure-repair-run*.txt. The one mirror-parity delta is attributed to test-order isolation in the existing 078 suite, not to a 081 behaviour change; it is disclosed here rather than counted as a pass. Provenance of the acceptance summary above: it is copied from test-evidence/closure-verdict.json (produced by the checker with --json-out), never recomputed by hand. Two notes carry the disclosures this log only points at: notes/driver-completions.md (the three stages the loop driver completed after the stage subagent hit its 120-turn limit, with commits) and notes/known-items.md (F12 recorded, F13 fixed, F14 deferred to 081d).
+notes=081a closed as Blocked (SC-001's three call sites were 1/3); 081b lands US2 and keeps the feature Blocked — SC-005 is now `partial` with the 7/8-settled + 1-`inherited-later` reading, and the verdict remains `zero-final-path-pass` because no closure call site was added. The slice's close record is `test-evidence/tasks-081b-slice-tests.txt` (89 passed, exit 0); the feature-level baseline comparison is 081d's. Historical 081a note: the slice is deliberately Blocked: SC-001's three call sites are 1/3 in 081a, and the feature must not be called Implemented. The baseline is the plan-stage capture (39 failed / 6970 passed / 7 skipped); the closure-repair head runs are recorded under test-evidence/closure-repair-run*.txt. The one mirror-parity delta is attributed to test-order isolation in the existing 078 suite, not to a 081 behaviour change; it is disclosed here rather than counted as a pass. Provenance of the acceptance summary above: it is copied from test-evidence/closure-verdict.json (produced by the checker with --json-out), never recomputed by hand. Two notes carry the disclosures this log only points at: notes/driver-completions.md (the three stages the loop driver completed after the stage subagent hit its 120-turn limit, with commits) and notes/known-items.md (F12 recorded, F13 fixed, F14 deferred to 081d).

@@ -15,9 +15,12 @@
 
 ## Inherited Blockers
 
-**Dependency set (declared, never implied)** — in: Feature 901. Its detail is `dependency-feature-901.md` and its
-verification log is `dependency-verification-901.md`, both inside this fixture directory. Out with reason: the
-fixture depends on no other feature, so no further record can be inherited.
+**Dependency set** — in: Feature 901, inside this fixture directory. Out with reason: the fixture depends on no
+other feature, so no further record can be inherited.
+
+**Dependency artifacts (declared, never implied)** — the checker reads only the paths in this block:
+- `dependency-feature-901.md` — Feature 901's detail
+- `dependency-verification-901.md` — Feature 901's verification log
 
 **Extraction reading**: Feature 901's closed three sources yield **six** rows — the two `## Deferred` bullets,
 the three `verification.md` status rows in `blocked` / `deferred` / `partial`, and the non-empty `deferred_tasks=`

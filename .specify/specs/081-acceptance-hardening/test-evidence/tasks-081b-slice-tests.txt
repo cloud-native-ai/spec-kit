@@ -1,0 +1,4 @@
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_premises.py tests/contract/test_closure_acceptance_check.py tests/contract/test_expression_gates_doc.py tests/contract/test_expression_gate_wiring.py tests/contract/test_premise_carrier_contract.py -q
+........................................................................ [ 80%]
+.................                                                        [100%]
+89 passed in 5.56s
