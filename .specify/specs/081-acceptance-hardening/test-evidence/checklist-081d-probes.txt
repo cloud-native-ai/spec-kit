@@ -1,0 +1,424 @@
+# Probe evidence — checklists/081d-2026-11-03.md
+# repo: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+# head: b3d44922   branch: 081-acceptance-hardening
+# captured: 2026-11-03T08:04:25Z
+# Every probe is read-only: no test module was run, no full-suite run was made, no copy of the tree was created.
+# `[exit=1]` on a `grep -c` line whose output is `0` means "zero hits", not a failed probe.
+
+## P01 — P05  [Stage validators and the gates that read this slice's tasks]
+
+P01  $ python3 scripts/python/validate-requirements.py .specify/specs/081-acceptance-hardening/requirements.md
+file: .specify/specs/081-acceptance-hardening/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 272 lines, 34 definition rows, 17 shared strings
+0 error(s), 0 warning(s)
+[exit=0]
+
+P02  $ python3 scripts/python/validate-tasks.py .specify/specs/081-acceptance-hardening/tasks.md
+PASS: .specify/specs/081-acceptance-hardening/tasks.md — 0 error(s), 0 warning(s)
+[exit=0]
+
+P03  $ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/081-acceptance-hardening/requirements.md --tasks .specify/specs/081-acceptance-hardening/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 25, "task_count": 18, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-03T08:04:26Z"}
+[exit=0]
+
+P04  $ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --repo . --spec-dir .specify/specs/081-acceptance-hardening 2>&1 | sed -n '1p'
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=37 waived=0
+[exit=0]
+
+P05  $ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --repo . --spec-dir .specify/specs/081-acceptance-hardening 2>&1 | grep '^{' | python3 -c 'import json,sys;d=json.loads(sys.stdin.readline());print(json.dumps({"stage":d["stage"],"decision":d["decision"],"summary":d["summary"],"distinct_checks":sorted({f["check"] for f in d["findings"]}),"distinct_severities":sorted({f["severity"] for f in d["findings"]})},indent=1))'
+{
+ "stage": "tasks",
+ "decision": "pass",
+ "summary": {
+  "errors": 0,
+  "advisories": 37,
+  "waived": 0,
+  "fr": 25,
+  "sc": 9,
+  "tasks": 18,
+  "clauses": 66,
+  "files": 16
+ },
+ "distinct_checks": [
+  "missing-path"
+ ],
+ "distinct_severities": [
+  "advisory"
+ ]
+}
+[exit=0]
+
+## P06 — P09  [The coverage lane (SC-009, DoD-8)]
+
+P06  $ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/081-acceptance-hardening 2>&1 | grep -E 'UNCOVERED-FR|FR uncovered|fr-uncovered|clause-uncovered|coverage-baseline-delta|^status:|error\(s\)'
+UNCOVERED-FR: FR-001
+UNCOVERED-FR: FR-002
+UNCOVERED-FR: FR-003
+UNCOVERED-FR: FR-004
+UNCOVERED-FR: FR-005
+UNCOVERED-FR: FR-006
+UNCOVERED-FR: FR-007
+UNCOVERED-FR: FR-008
+UNCOVERED-FR: FR-010
+UNCOVERED-FR: FR-012
+UNCOVERED-FR: FR-013
+UNCOVERED-FR: FR-014
+UNCOVERED-FR: FR-015
+UNCOVERED-FR: FR-016
+UNCOVERED-FR: FR-017
+UNCOVERED-FR: FR-018
+UNCOVERED-FR: FR-019
+UNCOVERED-FR: FR-020
+UNCOVERED-FR: FR-021
+UNCOVERED-FR: FR-022
+UNCOVERED-FR: FR-023
+UNCOVERED-FR: FR-024
+UNCOVERED-FR: FR-025
+FR uncovered: 23
+  [clause-uncovered] fail (513) — 513 uncovered, 18 beyond the frozen baseline
+  [fr-uncovered] fail (23) — 2 of 25 FRs cited from citation groups
+  [coverage-baseline-delta] fail (18) — baseline holds 495 names; 495 uncovered items are baseline-internal and do not block
+41 error(s), 0 warning(s)
+status: uncovered
+[exit=0]
+
+P07  $ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/081-acceptance-hardening > /dev/null 2>&1; echo "exit=$?"
+exit=1
+[exit=0]
+
+P08  $ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/081-acceptance-hardening 2>&1 | sed -n '2,3p'
+corpus:   .specify/specs/*/contracts/*
+owner forms (shared/definitions/contract-clause-definitions.md): md-bold-closed, md-bold-paren, md-heading, yaml-openapi, yaml-assertions; md-none named
+[exit=0]
+
+P09  $ sed -n '299,305p' scripts/python/clause_extract.py
+def clause_citations(path):
+    """clause_id -> set of FR ids from that clause's citation group (owner doc § 4.2).
+
+    The group is the LAST parenthetical in the block that contains an FR/SC id. Ids anywhere
+    else in the block are mentions, not citations. Ranges expand; nested sub-item suffixes
+    such as `(FR-018(a))` survive; inline code spans are stripped first.
+    """
+[exit=0]
+
+## P10 — P14  [Mirror / per-tool-copy parity and the schema-literal hit census (SC-009 limbs 1 and 4)]
+
+P10  $ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+[exit=0]
+
+P11  $ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+[exit=0]
+
+P12  $ grep -rlE 'in-scope|signed-contract|user-waived|not-applicable|not-required|zero-final-path-pass|runtime-dependency-not-owned|inherited-blocker-undisposed|final-path-not-pass|falsified-premise-undecided|status-claims-implemented-but-blocked|blocked-without-measurement-ladder' templates/ shared/ | sort
+shared/definitions/derivation-definitions.md
+shared/definitions/sdd-routing-definitions.md
+shared/workflow/acceptance-hardening.md
+shared/workflow/expression-gates.md
+templates/commands/review.md
+templates/feature-details-template.md
+templates/review-template.md
+templates/verification-log-template.md
+[exit=0]
+
+P13  $ grep -rlE 'in-scope|signed-contract|user-waived|not-applicable|not-required|zero-final-path-pass|runtime-dependency-not-owned|inherited-blocker-undisposed|final-path-not-pass|falsified-premise-undecided|status-claims-implemented-but-blocked|blocked-without-measurement-ladder' templates/ shared/ | wc -l
+       8
+[exit=0]
+
+P14  $ grep -cE 'in-scope|signed-contract|user-waived|verified|unverified|falsified|not-applicable|resolved|inherited' templates/plan-template.md
+0
+[exit=1]
+
+## P15 — P24  [Vocabulary owners and the exemption-list collision (FR-018, FR-019, SC-003, SC-009 limb 4)]
+
+P15  $ wc -l templates/feature-index-template.md
+      21 templates/feature-index-template.md
+[exit=0]
+
+P16  $ grep -c 'Blocked' templates/feature-index-template.md
+0
+[exit=1]
+
+P17  $ grep -n '| Status |' templates/feature-index-template.md
+20:| ID | Name | Description | Status | Feature Details | Last Updated |
+[exit=0]
+
+P18  $ grep -n 'Status vocabulary' skills/internal/manage-features/SKILL.md
+121:- Status vocabulary: `Draft | Planned | Implemented | Ready for Review | Completed`
+[exit=0]
+
+P19  $ grep -n 'Never regress status' skills/internal/manage-features/SKILL.md
+62:- **Never regress status**: registry convergence must not move a feature's status
+[exit=0]
+
+P20  $ sed -n '/^## Extension Points/,$p' shared/workflow/acceptance-hardening.md
+## Extension Points
+
+Sections later slices add to **this** file. Each line names the owner its obligations have **today**, so that
+nothing is undefined while the section is absent.
+
+- Additions to § Verification Vocabulary (**081d**) — the reconciliation of the four `blocked` literals (owner:
+  the declaring specification's **FR-019**) and the closed status vocabulary of
+  `templates/feature-index-template.md`, which today carries only a `Status` column header, so its obligation is
+  to **add** a value domain rather than to insert one value into an existing list.
+[exit=0]
+
+P21  $ sed -n '12,20p' shared/workflow/acceptance-hardening.md
+**Declared carriers (projections, never second owners)**: `templates/feature-details-template.md` § Canonical
+Status State Machine, `templates/verification-log-template.md`, `templates/tasks-template.md` (§ GATE-4) and
+`templates/plan-template.md` (the two plan-table skeletons, which carry **column names only**) physically hold what
+this file defines, because a consumer that is editing a template must find the rules where it is editing. A carrier
+is a **declared projection**: it may not widen a value domain, and where a carrier and this file disagree, this file
+wins and the carrier is stale. The four carriers are also the exemption list of the schema-uniqueness guard
+(`requirements.md` SC-009 ④), and each carries its own narrowing assertion — the plan skeleton, in particular, may
+repeat a column set and **zero** domain literals.
+[exit=0]
+
+P22  $ grep -c 'four carriers are also the exemption list' shared/workflow/acceptance-hardening.md
+1
+[exit=0]
+
+P23  $ grep -n 'projection surfaces\|declaration site\|skeleton carrier\|exemption list' .specify/specs/081-acceptance-hardening/requirements.md | head -5
+211:- **SC-009**: 框架卫生，含一条可判定的包含性声明——① `python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0（2/2）；② 测试基线包含性成立，五要件齐备：**基线参照物** = 本特性实现起始提交上由 `bash scripts/bash/run-tests.sh` 采集的失败用例 id 集合（存于 `<spec-dir>/baseline-failed.txt`）；**比较单元** = 失败用例 id 集合（按 id 比对，不按字节，也不用「全仓测试」这类未定义聚合词）；**允许差异集来源** = 空集（新失败一条都不允许，机械可得）；**补集与不变量** = `head 失败集 − 基线失败集` MUST 为空（0 个新增失败），而 `基线失败集 − head 失败集` MUST 逐条列为已修复项（MUST NOT 静默丢弃）；③ `CHANGELOG.md` 含本特性条目（1/1）；④ schema 唯一性：由 Shared Strings 表与 owner 文档章节目录**机械导出**的列名与取值域字面量，在 `templates/` 与 `shared/` 两类路径下的出现点，除 owner 文档外 MUST 为 0，且守卫测试把真实命中枚举出来并断言等于豁免清单（0 个未豁免命中）。`data-model.md` 与 `contracts/` 记为**投影面（projection surfaces）**：它们为测试逐字匹配而展开 owner 的列名与取值域；`requirements.md` 的 FR-003 记为**规范声明点（declaration site）**：需求必须逐字写出它要求的那组转移，否则「新增哪四条转移」这条需求本身不可读，而它只写义务句、不写字段域。`templates/plan-template.md` 记为**第四处豁免：骨架载体（skeleton carrier）**——两张新表的空表必须带列名，否则每份未来的 plan 都要自行发明列，而列名正是它要继承的东西；它是 owner 文档 § Declared carriers 已列形态的第四个成员，同样只许携带列名，MUST NOT 携带取值域字面量与非法行规则。**这四处**是本条命中数的封闭豁免清单，每处带理由，豁免 MUST 有可执行的测试理由——守卫测试必须同时断言 (a) `data-model.md` 中 `From | To | Allowed | Condition` 形态的状态转移表行数为 **0**（§ E-8 只允许指针）；(b) 投影面使用的每一个取值域字面量都属于 owner 导出的取值域（投影只能收缩，MUST NOT 扩张）；(c) `requirements.md` 中 `From | To | Allowed | Condition` 形态的转移表行数同样为 **0**（规范声明点只写义务句，不得长出第二张表）；(d) `templates/plan-template.md` 中 owner 导出的**取值域字面量**数为 **0**（骨架载体只许有列名：一个列名允许出现，一个 `in-scope`／`verified`／`resolved` 之类的域值不允许）。**Path**: supporting
+[exit=0]
+
+P24  $ grep -n 'four-member' .specify/specs/081-acceptance-hardening/contracts/artifact-schemas.contract.md .specify/specs/081-acceptance-hardening/tasks-081b.md | head -4
+.specify/specs/081-acceptance-hardening/tasks-081b.md:19:- **Contracts**: `contracts/artifact-schemas.contract.md` AS-05…AS-12 (the two tables with the `Contract` / `Premises` cells, the `in-scope` duties and their three judging points, the `Source row` / `Carrier` grammar, the A13 boundary) and AS-13/AS-14/AS-15 (one owner, skeleton without domains, the four-member exemption list); `contracts/gate-wiring.contract.md` GW-05…GW-07 (the four findings in the existing checker and gate rows, waivable in the existing grammar) and GW-10 (A13 landing point); `contracts/closure-acceptance-check.contract.md` C-13/C-14/C-17/C-18 (the three runtime-row shapes, the prose-declaration rule and the external-source extraction the checker still owes). `contracts/review-composition.contract.md` and `contracts/state-vocabulary.contract.md` are out of scope — 081c / 081a.
+.specify/specs/081-acceptance-hardening/tasks-081b.md:226:- **081d — US4 and all remaining wiring** (plan § D10: the two remaining vocabulary owners, `--audit-existing` and its `audit-history` fixture, driver line state `blocked` with A6's eight dispositions, the closure/merge call site at the **feature line's closure**, mirrors, docs / `CHANGELOG.md`, the final smoke claim and the feature-level baseline re-run). Its row set MUST name `tests/contract/test_acceptance_schema_ownership.py` (SC-009 ④) and `tests/contract/test_line_state_blocked.py` (A6's eight items), and that guard MUST carry the **four-member** exemption list (projection surfaces, the FR-003 declaration site, and the `templates/plan-template.md` skeleton carrier with its zero-domain-literal assertion) — the fourth entry is settled here, in 081b, precisely so 081d's guard does not have to choose it. It is also where the schema-owner pointers of FR-022 and the `CHANGELOG.md` entry land. **Carried finding (not silently dropped)**: the analyze pass recorded the *coverage FR lane* at **0/25** — no FR of this feature is yet attributed to a measured coverage lane in `coverage-baseline.txt`. It is not a 081b deliverable (081b lands gates, not coverage), so it is carried here: 081d's row set MUST produce that reading over the final tree and either fix it or record it as a named remainder; leaving it at 0/25 without a recorded reason would be the same silent gap this feature exists to catch.
+[exit=0]
+
+## P25 — P36  [Line state, the driver call site and the audit surface, measured at HEAD]
+
+P25  $ grep -n 'STATE_VALUES = \|ACTIVE_STATES = \|HOLDING_STATES = ' skills/external/sdd-loop-driver/scripts/line-registry.py
+46:STATE_VALUES = {"active", "waiting", "stalled", "completed", "orphaned", "stale", "closed"}
+47:ACTIVE_STATES = {"active", "waiting"}
+48:HOLDING_STATES = {"active", "completed"}
+[exit=0]
+
+P26  $ grep -n 'not in {"closed", "stale", "orphaned"}\|if state in {"closed", "stale", "orphaned"}\|merge_ready requires state=completed\|entry\["stale_from_state"\]' skills/external/sdd-loop-driver/scripts/line-registry.py
+707:            require(entry.get("state") == "completed", "merge_ready requires state=completed")
+806:            entry["stale_from_state"] = previous
+1447:    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+1949:    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+2139:    require(entry.get("state") not in {"closed", "stale", "orphaned"},
+2249:    if state in {"closed", "stale", "orphaned"}:
+2266:        require(state not in {"closed", "stale", "orphaned"},
+[exit=0]
+
+P27  $ sed -n '763,766p' skills/external/sdd-loop-driver/scripts/line-registry.py
+        if data.get("state") == "active" and previous_state != "active":
+            require(previous_state in {"waiting", "stalled"},
+                    f"cannot transition from {previous_state!r} to active; "
+                    "closed/stale/orphaned/completed are not revivable")
+[exit=0]
+
+P28  $ grep -n 'INTEGRATION_RESULTS = \|integration-record requires state=completed' skills/external/sdd-loop-driver/scripts/line-registry.py
+55:INTEGRATION_RESULTS = {"merged", "failed"}
+1682:    require(entry.get("state") == "completed", "integration-record requires state=completed")
+[exit=0]
+
+P29  $ grep -c 'spec_dir\|spec-dir\|feature_key\|feature_id' skills/external/sdd-loop-driver/scripts/line-registry.py
+0
+[exit=1]
+
+P30  $ grep -c 'closure-acceptance-check' skills/external/sdd-loop-driver/scripts/integrate-lines.py
+0
+[exit=1]
+
+P31  $ grep -n 'def _record_failed\|_record_failed(reg, line_id, "quality-gate")\|run(\["bash", "-c", gate_cmd\]' skills/external/sdd-loop-driver/scripts/integrate-lines.py
+70:def _record_failed(reg: Path, line_id: str, reason: str) -> None:
+102:        gate = run(["bash", "-c", gate_cmd], cwd=wt)
+104:            _record_failed(reg, line_id, "quality-gate")
+[exit=0]
+
+P32  $ grep -n 'still_unwired\|^REVIEW_DRIVER_DEFERRED' tests/contract/test_gate_wiring_081.py
+72:REVIEW_DRIVER_DEFERRED = (
+411:def test_the_driver_call_site_is_still_unwired():
+[exit=0]
+
+P33  $ grep -c 'def test_' tests/contract/test_gate_wiring_081.py
+14
+[exit=0]
+
+P34  $ grep -n 'ModeNotImplemented\|not implemented in this slice' scripts/python/closure-acceptance-check.py
+41:* `--audit-existing` is **not implemented in this slice** — `plan.md` § Slice Boundary defers
+162:class ModeNotImplemented(InputError):
+1295:        raise ModeNotImplemented(
+1296:            "--audit-existing is not implemented in this slice: FR-020's read-only audit is "
+[exit=0]
+
+P35  $ grep -c 'audit' tests/contract/test_closure_acceptance_check.py
+0
+[exit=1]
+
+P36  $ grep -n 'add_argument("--spec-dir"\|if not args.spec_dir' scripts/python/closure-acceptance-check.py
+344:    if not args.spec_dir:
+1408:    parser.add_argument("--spec-dir", default="",
+[exit=0]
+
+## P37 — P56  [Fixture corpus, carriers, dependency graph, GW-14 limbs, evidence]
+
+P37  $ ls tests/fixtures/acceptance-hardening/ | tr '\n' ' '
+execution-without-final expected-artifact-missing expr-supporting-only inherited-clean inherited-mutation ladder-mutation mixed-path negative positive premise-mutation review-implemented-blocked review-implemented-clean runtime-gap-mutation runtime-zero-row smoke-mutation 
+[exit=0]
+
+P38  $ ls tests/contract/test_line_state_blocked.py tests/contract/test_acceptance_schema_ownership.py
+ls: tests/contract/test_acceptance_schema_ownership.py: No such file or directory
+ls: tests/contract/test_line_state_blocked.py: No such file or directory
+[exit=1]
+
+P39  $ find tests/fixtures/acceptance-hardening/positive -type f | sort
+tests/fixtures/acceptance-hardening/positive/feature-detail.md
+tests/fixtures/acceptance-hardening/positive/feature-registry.md
+tests/fixtures/acceptance-hardening/positive/plan.md
+tests/fixtures/acceptance-hardening/positive/requirements.md
+tests/fixtures/acceptance-hardening/positive/tasks.md
+tests/fixtures/acceptance-hardening/positive/test-evidence/smoke.txt
+tests/fixtures/acceptance-hardening/positive/verification.md
+[exit=0]
+
+P40  $ grep -n 'audit-history' .specify/specs/081-acceptance-hardening/data-model.md | tail -1
+206:| `audit-history` | 081d | an `Implemented` feature that would become `Blocked` under the new rules | `--audit-existing` reports it, writes nothing, exits 0 |
+[exit=0]
+
+P41  $ grep -c 'self-contained audit root' .specify/specs/081-acceptance-hardening/data-model.md
+0
+[exit=1]
+
+P42  $ grep -c 'test_the_four_blocked_literals_stay_four' tests/contract/test_acceptance_state_machine.py
+0
+[exit=1]
+
+P43  $ grep -oE '^- \[ \] T0[0-9]+( \[[^]]*\])*( \[blockedBy: [^]]*\])?' .specify/specs/081-acceptance-hardening/tasks.md
+- [ ] T001 [P]
+- [ ] T002 [P]
+- [ ] T003
+- [ ] T004 [US1]
+- [ ] T005 [US1]
+- [ ] T007 [US1]
+- [ ] T006 [US1] [blockedBy: T005]
+- [ ] T008 [US1] [blockedBy: T007]
+- [ ] T009 [US1] [blockedBy: T008]
+- [ ] T010 [US4] [blockedBy: T003]
+- [ ] T011 [US4] [blockedBy: T001]
+- [ ] T012 [US4]
+- [ ] T013 [US4] [blockedBy: T011]
+- [ ] T014 [US4] [blockedBy: T002]
+- [ ] T015 [US4] [blockedBy: T002,T009,T010,T013,T014]
+- [ ] T016 [blockedBy: T008,T013]
+- [ ] T017 [blockedBy: T016]
+- [ ] T018 [blockedBy: T017]
+[exit=0]
+
+P44  $ sed -n '233,241p' .specify/specs/081-acceptance-hardening/tasks.md | grep -oE 'FR-0[0-9]{2}' | sort | uniq -c | sort -rn | head -8
+   3 FR-022
+   3 FR-011
+   2 FR-025
+   2 FR-024
+   2 FR-023
+   2 FR-021
+   2 FR-019
+   2 FR-008
+[exit=0]
+
+P45  $ grep -cE '^- \[[ >]\]' .specify/specs/081-acceptance-hardening/tasks.md
+18
+[exit=0]
+
+P46  $ awk -F'|' '$2 ~ /^ *081 *$/ {print "col5=["$5"]"}' .specify/memory/features.md
+col5=[ Blocked ]
+[exit=0]
+
+P47  $ grep -n '^..Status..:' .specify/memory/features/081.md
+6:**Status**: Blocked
+[exit=0]
+
+P48  $ wc -l < .specify/specs/081-acceptance-hardening/baseline-failed.txt
+      39
+[exit=0]
+
+P49  $ python3 --version; .venv/bin/python --version; .venv/bin/python -m pytest --version 2>&1 | head -1; git --version
+Python 3.9.6
+Python 3.14.6
+pytest 9.2.0
+git version 2.54.0 (Apple Git-157)
+[exit=0]
+
+P50  $ grep -c 'Slice Boundary' .specify/specs/081-acceptance-hardening/plan.md
+0
+[exit=1]
+
+P51  $ grep -n 'fixtures/' .specify/instructions.md
+237:  - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`, `fixtures/` (declarative fixture sets, one directory per feature — e.g. `fixtures/acceptance-hardening/`).
+[exit=0]
+
+P52  $ grep -c 'four segments' docs/reference/commands/review.md
+4
+[exit=0]
+
+P53  $ grep -c '081' CHANGELOG.md
+0
+[exit=1]
+
+P54  $ grep -n 'Canonical Status State Machine' templates/commands/checklist.md
+44:- **Outputs**: a NEW checklist file under `REQUIREMENTS_DIR/checklists/` (short descriptive `[domain].md` filename, items numbered from CHK001, ≥80% traceability, soft cap 40) — never overwriting an existing one — plus a report (output path, item count, focus areas, depth level, user-specified items incorporated). Feature status transitions `Implemented → Ready for Review` per the Feature Integration Protocol when applicable; the transition's criteria — the fourth condition included — are owned by `templates/feature-details-template.md` § Canonical Status State Machine, which this command reaches by that pointer and restates nowhere.
+[exit=0]
+
+P55  $ grep -c 'regen-command-copies' tests/integration/test_acceptance_smoke.py
+2
+[exit=0]
+
+P56  $ git status --porcelain
+?? .specify/specs/081-acceptance-hardening/test-evidence/checklist-081d-probes.txt
+[exit=0]
+
+## P57 — P59  [Scope text this checklist judges (read for the record)]
+
+P57  $ grep -n '^- \*\*SC-001\*\*\|^- \*\*SC-002\*\*' .specify/specs/081-acceptance-hardening/requirements.md
+203:- **SC-001**: 026 形态被三处门拒绝——负夹具（任务全关、每条 SC 有状态行、[[STR-003]] 路径 SC 全 `blocked`/`deferred`）分别触发 `/speckit.implement`、`/speckit.review`、driver closure/merge，三处全部输出 [[STR-007]]（3/3 拒绝，0 处放行）；每次拒绝的命名原因逐字命中封闭集其一（[[STR-008]] / [[STR-009]] / [[STR-014]] 之一，3/3），不得为自由文本。**Path**: final
+204:- **SC-002**: 正路径不误杀且 smoke 是硬条件——正夹具（[[STR-003]] 路径 SC 全 `pass` + smoke 记录齐备）走完 `Planned → Implemented → Ready for Review` 全程 [[STR-006]]，误拒 0（2/2）；同一夹具删掉 smoke 记录后状态 MUST 为 [[STR-001]] 而非 `Implemented`（1/1）。**Path**: final
+[exit=0]
+
+P58  $ sed -n '166,168p;233,240p' .specify/specs/081-acceptance-hardening/tasks.md
+- **Phase 5 (Polish)**: T016 waits on T008 and T013 (the driver site and the audit mode are both among its readings); T017 waits on T016; T018 waits on T017
+
+### Within This Slice
+### FR ownership roster — every FR has exactly one owning slice
+
+The table above is the **change** record for this slice; this roster is the completeness claim behind "no requirement is dropped", carried forward from `tasks-081c.md` with 081d's rows resolved:
+
+- **081a** — FR-001, FR-002, FR-003, FR-004, FR-006, FR-007, FR-024 (its own edits).
+- **081b** — FR-005, FR-009, FR-010, FR-011 (the ledger schema and the extraction), FR-012, FR-019 (the schema-side statement), FR-022 (the three schema sections), FR-023 (pin validity), FR-025 (fixtures, deterministic-only findings).
+- **081c** — FR-013, FR-014, FR-015, FR-016, FR-021 (review + checklist command wiring), FR-022 (§ Review Composition), FR-008 (review call site), FR-011 (the ledger reconciliation).
+- **081d (this slice)** — FR-017, FR-018, FR-020, FR-021 (the final regeneration and the docs/`CHANGELOG` sweep), FR-022 (the remaining owner pointers), FR-023 (the feature-level comparison), FR-024 (the final sweep), FR-025 (the schema guard and the coverage-lane remainder), FR-008 (the driver call site), FR-019 (the four literals' reconciliation and the audit-facing classification), FR-011 (the line-closure re-read).
+[exit=0]
+
+P59  $ sed -n '210p;253,257p' .specify/specs/081-acceptance-hardening/tasks.md
+**Slice**: `081d` — plan.md § D10 "US4 + all remaining wiring: three vocabulary owners, `--audit-existing`, driver line state `blocked` (A6 items 1–8) + closure/merge call site, mirrors/regen, docs/CHANGELOG". This is the **final** slice: the boundaries were cut at plan entry and every FR/SC below is assigned to exactly one slice, none is dropped.
+081d is the last slice — plan.md § D10 declares four and this is the fourth. Nothing is carried forward as a *slice*; what carries forward is a **named remainder**, and a remainder is a recorded fact, not a task this file forgot:
+
+- **The coverage lane's FR claim is `2 of 25`** (`[fr-uncovered] fail`, exit 1, measured 2026-11-03; see `## Environment Prerequisites`). The lane is claimable only from citation groups inside this spec's own `contracts/` clause blocks (`scripts/python/clause_extract.py::clause_citations` — the **last** parenthetical of a block that carries an FR/SC id; our contracts carry their FR mapping in trailing traceability tables, which are not citation groups, so only the two clauses 081b wrote with an in-block parenthetical are reached). 081d owns no `contracts/` edit, so T016 records the reading and the remedy and T017 states it as a remainder; no row marks that lane green. **Reason**: the surface is out of this slice's declared scope, and editing an obligation's contract to satisfy a coverage accountant would be the tail wagging the dog.
+- **`0/25` is stale**: `tasks-081c.md` § Deferred Slices carried "currently 0/25"; 081b's two citation groups moved it to `2/25` before 081c closed. T001 records the corrected baseline so T016 does not measure a figure that no longer exists.
+- **The audit root's shape is fixed here, disclosed**: `--spec-dir` is required by the single-feature CLI (C-02) but an audit spans a repository, and `data-model.md` § Fixture set requires `audit-history` to be a self-contained declarative case. The only reading consistent with all three is that in audit mode the root is `--repo` (defaulting to the repository root) and the registry is `<root>/.specify/memory/features.md`, with `--spec-dir` not required — the alternative ("audit always reads the repository's real registry") makes the fixture unable to be a fixture and makes the zero-write assertion's subject the repository itself. T013 states the resolution in its own docstring; if the implementer finds a stronger authority, the reading moves and that row's note moves with it.
+[exit=0]
+
+## Reader note
+
+The probe set is deterministic and re-runnable from the repository root. Where a probe reads a
+`grep -c` result of `0`, the accompanying `[exit=1]` is grep's no-match status and the value `0`
+is the reading. No output was edited: the payload lines are reproduced as emitted.
+
