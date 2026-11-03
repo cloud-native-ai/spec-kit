@@ -388,3 +388,12 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - pre-analyze tasks 初次 `fail errors=1`：IB-006 的 `this-slice` 载体指向 081b 已归档的 `T005`。驱动者在 tasks 阶段做 spec-only 载体对账：IB-004 → `task:T004+test:tests/contract/test_acceptance_review_composition.py`、`Carrier slice=this-slice`；IB-006 → `task:T012+test:tests/contract/test_acceptance_premises.py`。复跑 `decision=pass errors=0 advisories=56`；红色读数保留在 `test-evidence/tasks-081c-pre-analyze.txt`。
 - 机制缺陷 F15 记录于 `notes/known-items-081c.md`：`this-slice` 载体不跨 `tasks.md` 归档；两解（显式切片 id 或 `resolved-in-earlier-slice` 读数）留给 schema owner，081c 采用“逐切片重指向”临时规则并测量。
 - 提交：`c38e92b2`（子代理 tasks.md）+ 本次对账提交。下一阶段 = checklist。
+
+## 081c checklist + analyze + analyze-fix + r2（2026-11-03 07:05 UTC）
+
+- checklist `0f66f3f0`：44 项（22 PASS / 22 FAIL；10 P1）。主要 P1：ARC 计数自相矛盾、review-site 负路径夹具不可达、census 第二载体未列、docs 页断言不可红、expected-artifact 分母不可伪。
+- analyze（`notes/analyze-081c.md`）：C=1 / H=8 / M=11 / L=4，gate fail；独立复核 19 confirm / 2 downgrade / 1 reject，并纠正简报两处（F-ACCEPTANCE 比所述更不可达；`checklist.md` 转指方向写反）。
+- analyze-fix part 1 `af43a4a4`：组合所有权按层拆分（owner doc 内容 / command 按锚声明）；新增三夹具 `review-implemented-clean` / `review-implemented-blocked` / `expected-artifact-missing` 与 T015–T017；ARC 改七键 7/7；finding locator 恢复 MUST + 唯一逃生口；RC-12 计数腿；RC-19 两个 pin；T010 指向 criteria owner。validators：requirements ok、tasks 0/0、pre-analyze pass（0 errors）、decomposition proceed 17/40。
+- analyze-r2（`notes/analyze-081c-r2.md`）：C=0 / H=0，9/9 resolved，gate **pass**；新增 4 M + 3 L。
+- analyze-fix part 2（本次提交）：修复 R2-F-10…F-16 与 round-1 F-11…F-21、F-24；F-22/F-23 记为 L 级 known item。复跑 requirements ok、tasks 0/0、pre-analyze pass（0 errors / 69 advisories）。
+- 下一阶段 = implement 081c（T001–T017，分 3–4 段）。

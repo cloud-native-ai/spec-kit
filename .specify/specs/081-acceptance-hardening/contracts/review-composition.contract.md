@@ -1,7 +1,7 @@
 # Contract — Review Composition (four segments + one deterministic check)
 
 **Status**: designed (this stage); implemented by `/speckit.implement`
-**Owner of the composition's content — the four segments, the fixed order, the per-segment boundary sentences, the expected-artifact derivation rule, the ARC clause and the unit census**: `shared/workflow/acceptance-hardening.md` § Review Composition (landed by this slice's T002). **Owner of the command-side declaration**: `templates/commands/review.md` § Composition — it declares the four segment headings and the five per-segment fields **by anchor** to that owner and restates none of its content (this is the half FR-013 requires of the command). **Owner of the two new segments' method**: `skills/internal/review-feature-quality/SKILL.md`. **Owner of the `P0`/`P1`/`P2` family**: `skills/internal/review-sdd-process/SKILL.md`. **Owner of the six-level code family**: `skills/internal/code-review/SKILL.md`. This contract states the obligations; it restates no severity definition.
+**Owner of the composition's content definitions — what the four segments, the fixed order, the per-segment boundary sentences, the expected-artifact derivation rule, the ARC clause and the unit census mean**: `shared/workflow/acceptance-hardening.md` § Review Composition (landed by this slice's T002). **Owner of the command-side declaration**: `templates/commands/review.md` § Composition — it declares the four segment headings and the five per-segment fields **by anchor** to that owner and restates none of its content (this is the half FR-013 requires of the command). **Owner of the two new segments' method**: `skills/internal/review-feature-quality/SKILL.md`. **Owner of the `P0`/`P1`/`P2` family**: `skills/internal/review-sdd-process/SKILL.md`. **Owner of the six-level code family**: `skills/internal/code-review/SKILL.md`. This contract states the obligations; it restates no severity definition. The command and report templates declare that content's fields and invocation and copy the record; they do not restate its definitions.
 
 ## Composition and order
 
@@ -28,7 +28,7 @@
 
 - **RC-13**: ARC MUST read the closure checker's `final_path` counts and MUST NOT re-count them from `verification.md`.
 - **RC-14**: ARC MUST write the closure checker's `final_path` record (`pass`, `blocked`, `deferred`, `partial`, `fail`, `unknown`, `total` — the owner doc's closed count shape, `shared/workflow/acceptance-hardening.md` § Closure Verdict) into `review.md`, in the carrier slot `### 2.4`, and MUST compare it against the feature's claimed status. The record is copied verbatim; ARC MUST NOT narrow it to a three-count summary or re-derive any bucket.
-- **RC-15**: When the claimed status is `Implemented` or `Ready for Review` and the record's `pass` bucket is zero, ARC MUST emit the fixed item `F-ACCEPTANCE` at `P0` and the transition `Implemented → Ready for Review` MUST be refused; the refusal MUST name the failed condition and leave the status at `Implemented`.
+- **RC-15**: When the claimed status is `Implemented` or `Ready for Review` and the record's `pass` bucket is zero, ARC MUST emit the fixed item `F-ACCEPTANCE` at `P0` and the transition `Implemented → Ready for Review` MUST be refused; the refusal MUST name the failed condition and leave the claimed status unchanged (`Implemented` stays `Implemented`; `Ready for Review` stays `Ready for Review` — the refusal never downgrades it).
 - **RC-16**: ARC MUST NOT be delegated to a model judgement and MUST NOT be described as a fifth segment.
 
 ## Report slots and the unit census
@@ -45,5 +45,5 @@
 | FR-014 | RC-07, RC-08, RC-09 | `tests/contract/test_acceptance_review_composition.py` |
 | FR-015 | RC-13…RC-16 | `tests/contract/test_acceptance_review_composition.py` (negative fixture: `F-ACCEPTANCE` + refusal) |
 | FR-016 | RC-15 | `tests/contract/test_acceptance_state_machine.py` |
-| FR-018 (census) | RC-18, RC-19 | `tests/contract/test_review_feedback_boundary.py` (deliberate update) |
+| Plan § D10 081c (census mechanism; no FR — recorded) | RC-18, RC-19 | `tests/contract/test_review_feedback_boundary.py` (deliberate update) |
 | SC-006 | RC-05…RC-07, RC-14, RC-17 | the same two files |

@@ -13,3 +13,23 @@ The carrier's obligation is "the measurement is taken over by a mandatory row of
 judged". Re-pointing preserves exactly that obligation and is measured by the gate; the underlying
 schema question is about **which slice** a carrier may name, not about whether the measurement runs.
 The 081c gate and closure payload are the evidence that the interim rule holds for this slice.
+
+## Post-r2 M/L cleanup (2026-11-03)
+
+The r2 gate passed with zero open C/H. The six new r2 M/L rows and the round-1 M rows with a
+one-line fix were repaired in the same pass: R2-F-10 (leg (d) now names the derivation owner and
+asserts no restatement), R2-F-11 (leg (k) names the countable dimension headings), R2-F-12 (the two
+surviving sole-ownership sentences qualified), R2-F-13 (the content-definition vs field-declaration
+split stated), R2-F-14 (legs j/k pointed from the traceability cells), R2-F-15 (DoD-6 names both
+census pins), R2-F-16 (the 56-advisory reading marked dated, 69 recorded), F-11 (extractor narrowed
+in T009), F-12 (`SEGMENTS` four-concept update in T010), F-13 (`two segments` sweep scope defined),
+F-14 (`requirements.md` added to plan § Documentation), F-15 (the implementation segment quotes the
+record; it never re-judges it), F-16 (the census no longer cites the wrong FR), F-17 (DoD-7 uses
+"carrier resolves", not "disposition resolved"), F-18/F-19 (missing `blockedBy` tags),
+F-20 (a user waiver does not lift ARC's zero-pass refusal), F-21 (GW-14's docs-page limb scoped),
+F-24 (the refusal never downgrades a `Ready for Review` claim).
+
+Deferred as L-level hygiene, recorded rather than fixed: **F-22** (an obligation re-homed into DoD-6
+and T009 without stating the carrier was adjudicated) and **F-23** (the `review-composition` probe's
+grep line numbers in the checklist's reading list need refreshing). Neither changes a verdict, and
+both are documentation-only.
