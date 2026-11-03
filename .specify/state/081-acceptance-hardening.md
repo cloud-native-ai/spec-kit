@@ -421,3 +421,11 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - **081d（最后一片，Phase 4）**：manage-features / feature-index 词表接纳 `Blocked`；`--audit-existing` + `audit-history` 夹具；driver line-state `blocked` 八项处置 + `test_line_state_blocked.py`；driver 的 **closure/merge** 调用点（`integrate-lines.py`，第三处、也是最后一处）；schema-ownership guard（SC-009 ④ 四成员豁免）；coverage 0/25 车道给出读数或具名 remainder；feature-level 全量基线对照 + final smoke（SC-008）；CHANGELOG / docs / mirrors；IB-004/IB-006 行级重读。
 - **终态目标**：SC-001 3/3、SC-002 在 review 站点对 `review-implemented-clean` 的真实运行后转 `pass`；若两项 final-path 全 pass 且 tasks 0 open、smoke pass，Feature 081 可离开 `Blocked`（`Ready for Review`/`Implemented` 按状态机）。若 SC-002 仍无法真实测量，则 feature 以 `Blocked` 收尾并记录未解。
 - 阶段计划：`tasks → checklist → analyze → implement → review → closure → 合并`。
+
+## 081d analyze + r2（2026-11-03 08:35 UTC）
+
+- checklist `312e2da4`：43 项（18 PASS / 25 FAIL；P0 CHK028：SC-009 ④ 豁免集两套权威）。
+- analyze：C=2 / H=9 / M=12 / L=6，gate fail；F-01（SC-002 可凭不足测量 pass）、F-02/F-03/F-04（schema guard 豁免集矛盾/不可达/字面量派生不可机械）、F-05/F-06（审计根与 spec-dir 数据源）。
+- analyze-fix `8b1e6cc8`：SC-002 改为三项读数（含真实四段组合运行）+ 诚实失败分支；owner “四载体即豁免集”句删除，guard 主体改为 owner 列名集、唯一允许面 `plan-template.md`（零域字面量）、扫描域外表面不再称豁免；审计根 `--repo` + `Spec Path` 解析；validators 0/0、pre-analyze pass、decomposition proceed 18/40。
+- r2：C=0 / H=1（R2-F-12：driver 对 exit 2 无处置），11/11 旧 C/H resolved。**裁决**：exit 2 = 输入错误（`closure-input-error`），记录后保持线路状态不变并拒绝合并；exit 1 才记 `closure-blocked` 并标 `blocked`。已写入 GW-03 + T008，r2 的 H 由 owner 决定关闭。
+- 下一阶段 = implement 081d part 1。
