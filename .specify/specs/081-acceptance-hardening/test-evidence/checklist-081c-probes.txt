@@ -1,0 +1,489 @@
+# checklist-081c — probe transcript (read-only, 2026-11-03)
+#
+# Slice: 081c (US3 — review composition + ARC). Branch 081-acceptance-hardening, HEAD 09079f97.
+# Every command below was run from the repository root. Nothing was written except
+# `.specify/specs/081-acceptance-hardening/test-evidence/checklist-081c-probes.txt` and
+# `.specify/specs/081-acceptance-hardening/checklists/081c-2026-11-03.md`. No fixture, no
+# source, no mirror and no test file was modified; the full test suite was NOT run.
+
+# =====================================================================
+# P1 — requirement validator (required probe)
+# =====================================================================
+$ python3 scripts/python/validate-requirements.py .specify/specs/081-acceptance-hardening/requirements.md
+file: .specify/specs/081-acceptance-hardening/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 272 lines, 34 definition rows, 17 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+# =====================================================================
+# P2 — tasks validator (required probe)
+# =====================================================================
+$ python3 scripts/python/validate-tasks.py .specify/specs/081-acceptance-hardening/tasks.md
+PASS: .specify/specs/081-acceptance-hardening/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+# =====================================================================
+# P3 — pre-analyze gate at the tasks stage (required probe)
+# =====================================================================
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --repo . --spec-dir .specify/specs/081-acceptance-hardening
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=56 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [ ... 56 x {"check": "missing-path", "severity": "advisory", ...} ... ],
+ "summary": {"errors": 0, "advisories": 56, "waived": 0, "fr": 25, "sc": 9, "tasks": 14, "clauses": 66, "files": 15},
+ "checked_at": "2026-11-03T06:16:58Z"}
+EXIT=0
+#
+# The `findings` array is elided here only for size: all 56 entries are
+# `check=missing-path, severity=advisory`, and every one names a path that a LATER slice
+# delivers (e.g. tests/contract/test_acceptance_review_composition.py,
+# tests/contract/test_acceptance_schema_ownership.py, tests/contract/test_line_state_blocked.py,
+# skills/internal/review-feature-quality/**, tests/fixtures/acceptance-hardening/audit-history/).
+# The stable readings are the summary fields: errors=0, tasks=14, fr=25, sc=9, clauses=66, files=15.
+
+# =====================================================================
+# P4 — closure checker on the fixtures the slice's live legs ride
+# =====================================================================
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/positive --json
+  "claimed_status": "Planned"
+  "completion_conditions": {"every_final_path_pass": true, "no_open_rows": true, "smoke_record_pass": true, "status_row_per_criterion": true}
+  "final_path": {"blocked": 0, "deferred": 0, "fail": 0, "partial": 0, "pass": 1, "total": 1, "unknown": 0}
+  "verdict": "accept", "reasons": []
+EXIT=0
+
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative --json
+  "claimed_status": "Planned"
+  "completion_conditions": {"every_final_path_pass": false, "no_open_rows": true, "smoke_record_pass": false, "status_row_per_criterion": true}
+  "final_path": {"blocked": 1, "deferred": 1, "fail": 0, "partial": 0, "pass": 0, "total": 2, "unknown": 0}
+  "verdict": "block", "reasons": [{"code": "zero-final-path-pass", "target": ""}]
+EXIT=1
+
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/smoke-mutation --json
+  "claimed_status": "Implemented"
+  "verdict": "block", "reasons": [{"code": "status-claims-implemented-but-blocked", "target": ""}]
+EXIT=1
+#
+# Load-bearing reading for CHK024/CHK027: `negative` claims `Planned`, so ARC's refusal
+# condition (claimed `Implemented`/`Ready for Review` + zero `pass`; RC-15 / data-model V-12)
+# is NOT reachable on it. The only fixture that claims `Implemented` is `smoke-mutation`, and
+# it is the dirty one. There is no fixture that claims `Implemented` AND clears all four
+# conditions, i.e. no positive ARC path.
+
+$ grep -n '^\*\*Status\*\*' tests/fixtures/acceptance-hardening/{positive,negative,smoke-mutation}/feature-detail.md
+tests/fixtures/acceptance-hardening/positive/feature-detail.md:9:**Status**: Planned
+tests/fixtures/acceptance-hardening/negative/feature-detail.md:9:**Status**: Planned
+tests/fixtures/acceptance-hardening/smoke-mutation/feature-detail.md:9:**Status**: Implemented
+
+# =====================================================================
+# P5 — roster engines (the denominators GATE-4 asserts)
+# =====================================================================
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 79 unit(s) scanned, 0 finding(s) [matched=79 inventory_units=79, clean]
+coverage: ledger_rows=79 matched=79 inventory_units=79 gaps=0 parse_errors=0 floor=39
+EXIT=0
+
+$ python3 scripts/python/probe-utils.py --action probes --reconcile
+Probe registry reconciled zero-gap: 10 classes, 117 internal + 0 external objects, 75 embeds
+EXIT=0
+
+$ python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 75 units, zero drift
+EXIT=0
+#
+# 79 / 117 / 75 reproduce tasks.md § Environment Prerequisites exactly; the slice claims
+# 80 / 118 / 76 after T005.
+
+# =====================================================================
+# P6 — mirror + per-tool-copy parity (GATE-5 / DoD-1, pre-change drift = 0)
+# =====================================================================
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+EXIT=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+#
+# All six counts reproduce tasks.md:55 exactly (templates 22 / skills-external 409 /
+# skills-internal 136 / agents 3 / scripts 119 / shared 62), which is what makes the
+# claim "the new skill's two files move 136 -> 138 while `shared` stays 62" measurable.
+
+# =====================================================================
+# P7 — T001's four pre-change readings, re-measured
+# =====================================================================
+$ grep -n "two segments" templates/commands/review.md
+29:## Composition — two segments, one fixed order
+31:`/speckit.review` runs exactly two segments in a fixed order. There is no parallel mode, ...
+                                                                    (2 hits, both about the composition)
+$ grep -c "three units" templates/commands/review.md
+2                     # the heading at :117 and the body paragraph at :121 — NOT found by the
+                      # `two segments` grep T001(a) records
+$ grep -c "closure-acceptance-check.py" templates/commands/review.md
+0
+$ grep -n "three conjunctive conditions" templates/commands/review.md
+105:This run judges exactly one status transition, `Implemented → Ready for Review`, ... The criteria — three conjunctive conditions, the third an existence test over the current `code-review.md` — ...
+$ ls -d skills/internal/review-feature-quality
+ls: skills/internal/review-feature-quality: No such file or directory
+#
+# T001(a) says one `grep -n "two segments"` yields both "the composition heading ... plus the
+# `three units` census heading". Measured: the two `two segments` hits are :29 (heading) and :31
+# (the normative sentence T001(a) does not mention); the census heading needs a different grep.
+
+# =====================================================================
+# P8 — scope of "MUST NOT survive anywhere" (RC-03 / DoD-3)
+# =====================================================================
+$ grep -rln "two segments" --include="*.md" . | grep -v "^./.git"
+./.qoder/commands/speckit.review.md
+./.opencode/command/speckit.review.md
+./.claude/commands/speckit.review.md
+./docs/reference/commands/review.md
+./.venv/lib/python3.14/site-packages/specify_cli/templates/commands/review.md
+./templates/commands/review.md
+./.specify/specs/071-review-code-integration/contracts/command-orchestration.md
+./.specify/specs/071-review-code-integration/contracts/tests-and-docs-sync.md
+./.specify/specs/071-review-code-integration/{tasks,research,feature-ref,plan}.md
+./.specify/specs/071-review-code-integration/notes/red-first-evidence.md
+./.specify/specs/080-humanize-run-output/review.md
+./.specify/specs/081-acceptance-hardening/{requirements,research,tasks,tasks-081a}.md
+./.specify/specs/081-acceptance-hardening/contracts/review-composition.contract.md
+./.specify/.tmp/sdd-loop/tmp/081-acceptance-hardening/plan-brief.md
+#
+# In-tree live carriers the slice must move are templates/commands/review.md (T007),
+# docs/reference/commands/review.md (T010) and the four per-tool copies (T014). Two classes are
+# NOT in any row: the installed wheel copy under .venv/.../specify_cli/templates/ (no engine
+# regenerates it) and the 071/080 spec records (dates, correctly frozen). DoD-3's "surviving
+# nowhere" therefore has no stated scope.
+
+# =====================================================================
+# P9 — the `### 2.1` extractor absorbs the slots RC-17 adds
+# =====================================================================
+$ sed -n '84,87p;109,111p' tests/contract/test_review_code_composition.py
+def _section(text: str, start: str, end: str) -> str:
+    m = re.search(rf"(?ms)^{re.escape(start)}.*?(?=^{re.escape(end)})", text)
+    assert m, f"section {start!r} not found (or no {end!r} after it)"
+    return m.group(0)
+...
+def _report_subsection() -> str:
+    return _section(REVIEW_TEMPLATE.read_text(encoding="utf-8"), "### 2.1", "## ")
+#
+# The pattern is `^### 2\.1 ... (?=^## )` in multiline mode: `^` anchors to a line start and
+# `## ` must then be the first three characters. `### 2.2` starts with `###`, so it does NOT
+# terminate the match — the returned "2.1 subsection" runs to the next `^## `, i.e. to
+# `## 3. Findings`. Inserting `### 2.2`/`### 2.3`/`### 2.4` under `### 2.1` (RC-17) therefore
+# widens the subject of every leg built on this helper:
+$ grep -n "def test_c09_subsection_content_list_is_closed\|def test_c10_no_opinion\|def test_c05_the_subsection_is_fillable\|def test_c09_every_placeholder" tests/contract/test_review_code_composition.py
+488:def test_c09_subsection_content_list_is_closed():
+522:def test_c10_no_opinion_bodies_and_no_per_item_counts_are_copied():
+536:def test_c05_the_subsection_is_fillable_as_the_whole_minimal_report():
+548:def test_c09_every_placeholder_in_the_subsection_is_glossed():
+#
+# Contrast — test_client_guard_sweep.py splits on the literal "## " instead of a line anchor, so
+# it truncates at "### 2.2" and is unaffected:
+$ sed -n '319,324p' tests/contract/test_client_guard_sweep.py
+    template = REVIEW_TEMPLATE.read_text(encoding="utf-8")
+    subsection = template.split("### 2.1 Code Segment (Verdict and Pointers)", 1)[1]
+    subsection = subsection.split("## ", 1)[0]
+
+# =====================================================================
+# P10 — the census has a second physical carrier, under a verbatim guard
+# =====================================================================
+$ sed -n '336,353p' tests/contract/test_client_guard_sweep.py
+def test_c53_closing_step_set_and_three_unit_census_verbatim():
+    ...
+    skill = SKILL_MD.read_text(encoding="utf-8")
+    assert "一次运行的单元普查为**三个单元**" in skill, (
+        "the per-run three-unit census MUST be preserved verbatim (C-53)"
+    )
+    for unit in ("/speckit.review", "skill:review-sdd-process", "skill:code-review"):
+        assert unit in skill
+$ grep -n "^SKILL_MD" tests/contract/test_client_guard_sweep.py
+67:SKILL_MD = FRAMEWORK_ROOT / "skills" / "internal" / "code-review" / "SKILL.md"
+$ grep -n "三个单元" skills/internal/code-review/SKILL.md
+111:`/speckit.review` 组合运行时，一次运行的单元普查为**三个单元**：命令单元 `/speckit.review`、被委派的过程技能单元 `skill:review-sdd-process`、被委派的代码技能单元 `skill:code-review`。...
+#
+# RC-18 moves the census to four. That literal lives in TWO carriers (the command at
+# templates/commands/review.md:117,:121 and the code-review skill at :111) and the second is
+# pinned verbatim by a module that neither RC-19, T009 nor T011 names.
+
+# =====================================================================
+# P11 — the two census carriers in the command template
+# =====================================================================
+$ sed -n '117p;121p' templates/commands/review.md
+## Feedback boundary — friction only, three units, one unchanged closing set
+**Three units, three records.** The unit census of one run is three, not two: ...
+$ grep -n "^UNITS" tests/contract/test_review_feedback_boundary.py
+83:UNITS = ("/speckit.review", "skill:review-sdd-process", "skill:code-review")
+
+# =====================================================================
+# P12 — report template: the existing slot and the glossary guard's scope
+# =====================================================================
+$ grep -n "### 2.1\|## Placeholder Glossary" templates/review-template.md
+70:### 2.1 Code Segment (Verdict and Pointers)
+171:## Placeholder Glossary
+#
+# RC-17 adds 2.2/2.3/2.4 after 2.1 and forbids renumbering 2.1 — consistent with :70.
+
+# =====================================================================
+# P13 — plan § Inherited Blockers: the three live rows the slice reconciles
+# =====================================================================
+$ grep -n "^| IB-004\|^| IB-006\|^| IB-007" .specify/specs/081-acceptance-hardening/plan.md
+235:| IB-004 | `071:SC-006_status` | inherited | `task:T004+test:tests/contract/test_acceptance_review_composition.py` | `this-slice` | 071 verification.md line 86；081 的 review 组合改写了 071 建立的两段结构，其结构证据必须由 081 重新采集（产物段/实现段/`final_path` 计数记录），不得继承 071 的旧结构结论。载体落在 081c 的必做任务行 T004 + 其测试模块；081b 曾按 **`inherited-later`** 读作已披露，081c 在 tasks 阶段完成载体并改为 `this-slice`，现在两条部分都可解析。**载体不取 SC-006**：SC-006 是 `supporting` 路径、可被 `deferred`，按 FR-011 不构成载体 |
+236:| IB-006 | `077:SC-002_status` | inherited | `task:T012+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 077 verification.md line 77；081 在 `expression-gates.md` 的同一批门行上加四类发现，门行接线改动后必须重测。载体 = 081c 的 T012（逐行复跑 077 门禁并测量 081b 模块的行）+ 其测试模块；081b 以 T005 为载体的行随 `tasks-081b.md` 归档，tasks 阶段将其重指向活行 T012。**载体不取 SC-005**：SC-005 是 `supporting` 路径、可被 `deferred` |
+237:| IB-007 | `077:SC-005_status` | inherited | `task:T012+test:tests/contract/test_acceptance_premises.py` | `this-slice` | 077 verification.md line 89；同上：门行接线改动后必须重测；T012 是逐行复跑对应门禁的必做行，其模块即本切片的唯一测试载体 |
+$ grep -n "081c update (tasks stage" .specify/specs/081-acceptance-hardening/plan.md
+  **081c update (tasks stage, 2026-11-03)**: the two live carriers were reconciled against the 081c `tasks.md` — IB-004 completes to `task:T004+test:tests/contract/test_acceptance_review_composition.py` with `Carrier slice = this-slice`, and IB-006 re-points from 081b's archived `T005` to the live `T012`. ...
+#
+# All three `inherited` rows already carry both carrier parts and `Carrier slice = this-slice`
+# (commit 09079f97), so T012(a)/(b) are confirmation rows, not edits. The Disposition cell of
+# all three stays `inherited` — which is why DoD-7's "reads as resolved" and § Deferred Slices'
+# "3 of 3 resolved" use the word for the carrier reading, not the closed Disposition value.
+
+# =====================================================================
+# P14 — the derivation rule's stated input vs the seven enumerated members
+# =====================================================================
+$ sed -n '/^### Documentation (this spec)/,/^### Source Code/p' .specify/specs/081-acceptance-hardening/plan.md
+.specify/specs/081-acceptance-hardening/
+├── plan.md              # This file (/speckit.plan output)
+├── research.md          # Phase 0 output — R1…R9 实测与否决方案
+├── data-model.md        # Phase 1 output — 实体 / 字段 / 取值域 / 状态转移
+├── quickstart.md        # Phase 1 output — 可执行场景（逐例标注执行状态与前提）
+├── contracts/           # Phase 1 output — 5 份契约
+├── feature-ref.md       # Phase 1 output — Feature 081 绑定与交付面
+├── baseline-failed.txt  # FR-023 基线失败 id 集
+├── test-evidence/       # 本阶段与实现期的证据
+├── tasks.md             # Phase 2 output
+└── verification.md      # 实现输出 (/speckit.implement)
+#
+# "stage rules + plan.md § Project Structure" (RC-06 / T002 / DoD-5) over this block yields ten
+# members — including research.md, feature-ref.md, baseline-failed.txt and test-evidence/ — and
+# omits requirements.md, while RC-06 / FR-013 / T004 leg (d) enumerate exactly seven.
+$ ls .specify/specs/081-acceptance-hardening/{requirements,plan,tasks,data-model,quickstart,verification}.md .specify/specs/081-acceptance-hardening/contracts >/dev/null && echo "all seven present"
+all seven present
+#
+# On THIS spec dir the expected set equals the present set, so a leg asserting "the seven are
+# the derivation's product" agrees with "the ones that exist" and cannot falsify the defect
+# FR-013 names. 081c authors no fixture (tasks.md § Notes), so no missing-member input exists.
+
+# =====================================================================
+# P15 — verification.md: SC-006 as it stands, and the "three counts" framing
+# =====================================================================
+$ grep -n "SC-006_\|SC-002_status" .specify/specs/081-acceptance-hardening/verification.md
+30:SC-002_status=partial
+61:SC-006_status=deferred
+62:SC-006_value=... the four-segment review and artifact/implementation measurements are 081c
+67:SC-006_why_reduced_insufficient=no real review run exists to measure the four segments and the three counts
+68:SC-006_unblock=081c lands the review composition and runs a review
+$ grep -n "最终路径\|final_path 三计数" .specify/specs/081-acceptance-hardening/requirements.md
+208:- **SC-006**: ... Acceptance Reality Check 的 final-path 三计数（`pass`/`blocked`/`deferred` 齐备，3/3）...
+155:- **FR-015**: ... 统计 [[STR-003]] 路径 SC 的 `pass` / `blocked` / `deferred` 计数并与特性声明的状态比较 ... 三个计数 MUST 写入 `review.md`（可核验载体）。
+$ sed -n '30p' .specify/specs/081-acceptance-hardening/contracts/review-composition.contract.md
+- **RC-14**: ARC MUST write the closure checker's `final_path` record (`pass`, `blocked`, `deferred`, `partial`, `fail`, `unknown`, `total` ...) into `review.md`, in the carrier slot `### 2.4` ... The record is copied verbatim; ARC MUST NOT narrow it to a three-count summary or re-derive any bucket.
+$ sed -n '29p' .specify/specs/081-acceptance-hardening/contracts/review-composition.contract.md
+- **RC-13**: ARC MUST read the closure checker's `final_path` counts and MUST NOT re-count them from `verification.md`.
+
+# =====================================================================
+# P16 — status cells GATE-8 asserts
+# =====================================================================
+$ awk -F'|' '$2 ~ /^ *081 *$/ {print "col5=["$5"]"}' .specify/memory/features.md
+col5=[ Blocked ]
+$ grep -n '^\*\*Status\*\*' .specify/memory/features/081.md
+6:**Status**: Blocked
+
+# =====================================================================
+# P17 — runner pins (Environment Prerequisites reproduce)
+# =====================================================================
+$ python3 --version; .venv/bin/python -m pytest --version; .venv/bin/python --version; git --version
+Python 3.9.6
+pytest 9.2.0
+Python 3.14.6
+git version 2.54.0 (Apple Git-157)
+$ cat .specify/specs/081-acceptance-hardening/test-evidence/plan-runner-pins.txt
+# RS-002 / RS-003 pins — measured 2026-11-03 (never invented)
+pytest --version  => pytest 9.2.0
+python --version  => Python 3.14.6
+git --version     => git version 2.54.0 (Apple Git-157)
+collect-only      => 7016 tests collected in 1.03s
+...
+
+# =====================================================================
+# P18 — two owners for one composition
+# =====================================================================
+$ sed -n '4p' .specify/specs/081-acceptance-hardening/contracts/review-composition.contract.md
+**Owner of the composition, the order and the boundaries**: `templates/commands/review.md` § Composition (the owner text this feature rewrites). **Owner of the two new segments' method**: `skills/internal/review-feature-quality/SKILL.md`. **Owner of the `P0`/`P1`/`P2` family**: `skills/internal/review-sdd-process/SKILL.md`. **Owner of the six-level code family**: `skills/internal/code-review/SKILL.md`. This contract states the obligations; it restates no severity definition.
+$ sed -n '16p' .specify/specs/081-acceptance-hardening/contracts/review-composition.contract.md
+- **RC-06**: The artifact segment's judgment object MUST be every stage artifact the slice's **stage rules and `plan.md` § Project Structure require** — `requirements.md`, `plan.md`, `tasks.md`, `contracts/`, `data-model.md`, `quickstart.md`, `verification.md` — judged for completeness, internal consistency, traceability (FR → task → SC → evidence), dependency/premise ownership and acceptance honesty; every finding MUST carry a severity and a `path` (+ `line` where the finding is line-anchored). The coverage denominator is the **expected** set, never "the ones that exist this time": a required artifact that is missing MUST produce a finding and MUST count as uncovered, otherwise a missing artifact would render as 100% coverage (`requirements.md` FR-013 owns the obligation; the derivation rule from stage rules lives in the owner doc § Review Composition).
+$ sed -n '92p' .specify/specs/081-acceptance-hardening/tasks.md
+- [ ] T002 (FR-013, FR-015, FR-022) Land `## Review Composition` in `shared/workflow/acceptance-hardening.md` as the **only** definition point, then **delete the matching bullet from `## Extension Points`** ...
+$ sed -n '264p' .specify/specs/081-acceptance-hardening/tasks.md
+- **One composition owner**: the four segments, the fixed order, the ARC clauses, the expected-set derivation rule and the census count are defined in `shared/workflow/acceptance-hardening.md` § Review Composition; the command, the report template, the two skills and the docs page reach them by path + anchor. A second statement of the derivation rule is a defect of this slice, not a clarification
+$ sed -n '153p' .specify/specs/081-acceptance-hardening/requirements.md   # FR-013
+- **FR-013**: `/speckit.review` MUST 新增强制**产物审查** ... **分母是期望集，不是「当次实际存在的集合」**：期望集由该切片的阶段规则与其 `plan.md` § Project Structure 推出（推导规则的 owner 是 `shared/workflow/acceptance-hardening.md` § Review Composition，由 081c 落地）；一个应当存在而缺失的产物 MUST 记一条 finding 并计入未覆盖 ... `templates/commands/review.md` § Composition 现把「恰好两段、固定顺序」写成封闭结构（原句 `Composition — two segments, one fixed order`），本特性 MUST 在该 owner 内把它改写为**四段加一次确定性判定、固定顺序** ...
+$ sed -n '115p' .specify/specs/081-acceptance-hardening/tasks.md   # T007
+- [ ] T007 [US3] [blockedBy: T002,T005,T006] Rewrite `templates/commands/review.md`: `## Composition` becomes four segments in one fixed order **plus** the Acceptance Reality Check, with the pre-change `two segments` wording replaced in place (RC-03) and the "no parallel mode / no single merged report / no selector" protections kept (RC-02); ...
+#
+# So: the contract names the command template as owner of the composition/order/boundaries, the
+# contract's own RC-06 names the owner doc for the derivation rule, and T002/§ Notes name the
+# owner doc as the ONLY definition point for the same four facts — while T007 writes the
+# composition into the command template.
+
+# =====================================================================
+# P19 — RC-12 has no leg; the nearest guard is presence-only
+# =====================================================================
+$ grep -n "RC-12" .specify/specs/081-acceptance-hardening/tasks.md
+93:- T003 ... its judgment object stays **single** — a second judgment object anywhere in its body is a defect (RC-12) ...
+194:| T003 | FR-013, FR-014, FR-022 | RC-05, RC-11, RC-12 | the same module (legs a, b) |
+$ sed -n '109p' .specify/specs/081-acceptance-hardening/tasks.md | grep -o "(\([a-i]\))" | tr '\n' ' '; echo
+(a) (b) (c) (d) (e) (f) (g) (h) (i)
+$ sed -n '109p' .specify/specs/081-acceptance-hardening/tasks.md | grep -c "RC-12"
+0
+#
+# Legs (a)-(i) contain no RC-12 assertion. The only existing assertion touching the process
+# skill's judgment object is presence, not uniqueness:
+$ sed -n '1069,1086p' tests/contract/test_code_review_skill_contract.py
+def test_c29_both_skills_declare_distinct_judgment_objects_composed_by_the_command():
+    for path in (SKILL_BODY, SIBLING_BODY):
+        ...
+        assert re.search(r"(?i)judgment object|判定对象", body), (
+            f"{path.name} MUST declare its own judgment object"
+        )
+        assert "speckit.review" in body, ...
+
+# =====================================================================
+# P20 — owner doc: the extension-point bullet T002 deletes, and § Gates
+# =====================================================================
+$ sed -n '/^## Extension Points/,$p' shared/workflow/acceptance-hardening.md | head -12
+## Extension Points
+Sections later slices add to **this** file. Each line names the owner its obligations have **today**, ...
+- `## Review Composition` (**081c**) — the process → artifact → implementation → code segments plus the
+  Acceptance Reality Check, the expected-artifact denominator, and their boundaries.
+- Additions to § Verification Vocabulary (**081d**) — ...
+$ sed -n '104,113p' shared/workflow/acceptance-hardening.md
+## Gates
+### The fourth `Implemented → Ready for Review` condition
+`Implemented → Ready for Review` is conjunctive like the transition that precedes it, and its fourth condition is: **no `final`-path criterion sits in `blocked` / `deferred` / `fail`, unless an explicit user waiver names it.** ... The reachable block consumers cite is § Canonical Status State Machine of `templates/feature-details-template.md`; `/speckit.review`, `/speckit.checklist` and `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate reference that block and do not restate it.
+#
+# T010 sends templates/commands/checklist.md to THIS section for the fourth condition, while this
+# section itself says consumers cite the feature-details block. FR-016/SV-05 name the feature-details
+# owner block as the reference target for /speckit.checklist.
+$ sed -n '156p' .specify/specs/081-acceptance-hardening/requirements.md   # FR-016
+- **FR-016**: `Implemented → Ready for Review` 门 MUST 增加第四个合取条件：不存在处于 `blocked` / `deferred` / `fail` 的 [[STR-003]] 路径 SC，除非有显式用户豁免。判据 owner 仍是 `templates/feature-details-template.md` § Canonical Status State Machine；`/speckit.review`、`/speckit.checklist` 与 `.specify/shared/workflow/feature-integration.md` § Pre-Status-Flip Gate MUST 只引用该 owner，不复制条款。
+$ sed -n '15p' .specify/specs/081-acceptance-hardening/contracts/state-vocabulary.contract.md
+- **SV-05**: The `Implemented → Ready for Review` gate MUST state its fourth condition (no `final`-path SC in `blocked`/`deferred`/`fail` without an explicit **user** waiver) **in that owner block only**; `/speckit.review`, `/speckit.checklist` and `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate MUST reference the block and MUST NOT restate the condition.
+
+# =====================================================================
+# P21 — the three frozen censuses T011 moves
+# =====================================================================
+$ grep -n "internal_nested) == 37" tests/contract/test_skill_layer_visibility_guards.py
+105:    assert len(internal_nested) == 37, (
+$ grep -n "assert len(SKILL_BASELINE) == 52" tests/contract/test_migration_distribution.py
+111:assert len(SKILL_BASELINE) == 52
+$ grep -n "frozen 52 skill units" tests/contract/test_expression_compatibility.py
+13:  frozen 52 skill units (51 at the 069a baseline; ...)
+
+# =====================================================================
+# P22 — docs page obligation has no verdict
+# =====================================================================
+$ sed -n '11p;42,46p;187,199p' tests/contract/test_review_docs_isomorphism.py
+11:**What "the same surface" means here** — the four things a reader must be able to learn ...
+42:SEGMENTS = {
+43:    "process segment": ("process segment", "process review segment", "process review pass"),
+44:    "code segment": ("code segment", "code-review segment", "code review segment"),
+45:}
+...
+def test_the_declared_surfaces_are_equal():
+    template = declared_surface(COMMAND_TEMPLATE.read_text(encoding="utf-8"))
+    page = declared_surface(DOCS_PAGE.read_text(encoding="utf-8"))
+    differing = {k: (template[k], page[k]) for k in template if template[k] != page[k]}
+    assert not differing, ...
+#
+# `SEGMENTS` has two names, so `_declared_segments` can only ever return a subset of those two and
+# the equality leg compares two two-concept sets. A page (or template) that declares four segments
+# plus ARC still passes; one that declares only the two also passes. GW-14 ("docs page MUST
+# describe four segments plus ARC") therefore has no assertion that can go red.
+
+# =====================================================================
+# P23 — the ARC fixtures `negative` vs `smoke-mutation` (see also P4)
+# =====================================================================
+$ grep -n "negative\|smoke-mutation" .specify/specs/081-acceptance-hardening/tasks.md | head -6
+45:- GATE-7: The review call site actually refuses — check: the invocation extracted from `templates/commands/review.md` run against `tests/fixtures/acceptance-hardening/negative` exits 1 ... and against `positive` exits 0
+109:- [ ] T004 ... (i) **the call site is wired, not named**: ... run against `tests/fixtures/acceptance-hardening/negative` (expect exit 1 ...) and `positive` (expect exit 0) ...
+269:- **This slice authors no fixture set**: ... T004's and T008's live legs ride `tests/fixtures/acceptance-hardening/{positive,negative}` ...
+
+# =====================================================================
+# P24 — blockedBy graph as written
+# =====================================================================
+$ grep -oE '^- \[ \] T0[0-9]+( \[[^]]*\])*( \[blockedBy: [^]]*\])?' .specify/specs/081-acceptance-hardening/tasks.md
+- [ ] T001 [P]
+- [ ] T002
+- [ ] T003 [blockedBy: T002]
+- [ ] T004 [US3]
+- [ ] T005 [US3] [P] [blockedBy: T004]
+- [ ] T006 [US3] [P] [blockedBy: T004]
+- [ ] T007 [US3] [blockedBy: T002,T005,T006]
+- [ ] T008 [US3] [blockedBy: T007]
+- [ ] T009 [US3] [P] [blockedBy: T007]
+- [ ] T010 [US3] [blockedBy: T006,T007,T009]
+- [ ] T011 [US3] [P] [blockedBy: T005]
+- [ ] T012
+- [ ] T013
+- [ ] T014
+$ grep -n "T013 (FR-013, FR-015)\|T014 (FR-005" .specify/specs/081-acceptance-hardening/tasks.md | cut -c1-90
+130:- [ ] T013 (FR-013, FR-015) [blockedBy: T008,T009,T012] Update the per-SC rows ...
+131:- [ ] T014 (FR-005, FR-021, FR-024) [blockedBy: T010,T011,T013] Regenerate every touched mirror ...
+#
+# (T013/T014 carry `blockedBy` after their FR tuple, which is why the first pattern above shows
+# them bare.) § Phase 2 states "No user-story row may start until T002 is closed" in prose;
+# T004/T005/T006 carry no `[blockedBy: T002]`. § Phase Dependencies states "T012 needs this file's
+# T004 id" in prose; T012 carries no `[blockedBy: T004]`. T014's transitive ancestry is
+# {T010,T011,T013,T006,T007,T009,T002,T005,T008,T012,T004} — T003 (which edits two skill sources
+# whose `.specify/skills/internal/**` mirrors T014 regenerates) is not in it.
+
+# =====================================================================
+# P25 — the pre-change guard the rewrite invalidates, and its C-groups
+# =====================================================================
+$ sed -n '117,131p' tests/contract/test_review_code_composition.py
+def test_c01_exactly_two_segments_in_a_fixed_order():
+    body = _cmd()
+    assert _has(body, "exactly two segments"), (
+        "the template MUST declare the composition as exactly two segments"
+    )
+    ...
+    markers = re.findall(
+        r"(?m)^### Segment (\d+) — (process segment|code segment)\b", body
+    )
+    assert markers == [("1", "process segment"), ("2", "code segment")], ...
+#
+# T009 names this module's C-1 group (declared) and says C-2/C-4 stay intact; P9 shows the C-5/
+# C-9/C-10 legs change subject without being named.
+
+# =====================================================================
+# P26 — post-artifact re-read of the tasks-stage gate (this checklist is itself an input to it)
+# =====================================================================
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --repo . --spec-dir .specify/specs/081-acceptance-hardening
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=58 waived=0
+summary: {"errors": 0, "advisories": 58, "waived": 0, "fr": 25, "sc": 9, "tasks": 14, "clauses": 66, "files": 16}
+EXIT=0
+#
+# P3's reading (files 15 / advisories 56) was taken before this checklist landed; the new
+# `checklists/081c-2026-11-03.md` adds one markdown file (+2 `missing-path` advisories). The
+# stable readings are unchanged: decision=pass, errors=0, tasks=14, fr=25, sc=9, clauses=66.
+# `advisories`/`files` are not a stable quantity — compare them only against the same file set.
+
+# =====================================================================
+# Nothing else was run. No fixture, source, mirror, per-tool copy or test was modified; the full
+# suite was not executed (out of scope for this stage).
+# =====================================================================
+$ git status --porcelain
+?? .specify/specs/081-acceptance-hardening/checklists/081c-2026-11-03.md
+?? .specify/specs/081-acceptance-hardening/test-evidence/checklist-081c-probes.txt
+# (before the commit below; no pre-existing dirty file was touched)
