@@ -429,3 +429,11 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - analyze-fix `8b1e6cc8`：SC-002 改为三项读数（含真实四段组合运行）+ 诚实失败分支；owner “四载体即豁免集”句删除，guard 主体改为 owner 列名集、唯一允许面 `plan-template.md`（零域字面量）、扫描域外表面不再称豁免；审计根 `--repo` + `Spec Path` 解析；validators 0/0、pre-analyze pass、decomposition proceed 18/40。
 - r2：C=0 / H=1（R2-F-12：driver 对 exit 2 无处置），11/11 旧 C/H resolved。**裁决**：exit 2 = 输入错误（`closure-input-error`），记录后保持线路状态不变并拒绝合并；exit 1 才记 `closure-blocked` 并标 `blocked`。已写入 GW-03 + T008，r2 的 H 由 owner 决定关闭。
 - 下一阶段 = implement 081d part 1。
+
+## 081d implement 分段计划（断点续跑用）
+
+- part 1：T001（red-first）、T002（owner § Verification Vocabulary 四 blocked 字面量对账）、T003（state-machine SV-06 legs）、T004（对 `review-implemented-clean` 做**真实四段组合运行**并记录 fixture-local review.md + ARC；这是 SC-002 的读数，不是 checker 调用）。
+- part 2：T005（`test_line_state_blocked.py`）、T006（`line-registry.py` 八项处置）、T007（driver 半翻正）、T008（`integrate-lines.py` 默认 quality gate + exit-2 `closure-input-error`）、T009（driver 三处 prose 指针）。
+- part 3：T010（manage-features + feature-index 词表）、T011（`audit-history` 夹具）、T012（Inherited Blockers 行级重读 + premises 模块）、T013（`--audit-existing` 实现）、T014（`test_acceptance_schema_ownership.py`）。
+- part 4：T015（CHANGELOG/docs/mirrors）、T016（feature-level readings：3/3 call sites、SC-002 真实读数、全量基线、final smoke）、T017（verification SC 行）、T018（feature 状态落地，最高只到证据允许值）。
+- 每段结束：跑对应 targeted 集、写证据、提交；不 push 直到用户授权或沿用已有推送授权。全部完成后 = 081d review → review-fix → closure → 合并。
