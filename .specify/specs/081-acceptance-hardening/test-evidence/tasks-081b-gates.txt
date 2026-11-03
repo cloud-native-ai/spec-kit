@@ -1,0 +1,30 @@
+# Tasks-stage gates — Feature 081, slice 081b
+# run 2026-11-03 from the repository root, branch 081-acceptance-hardening
+# tasks.md at this run: 12 task rows (decomposition-check measured, not counted by hand)
+
+## GATE-A decomposition-check.py --mode tasks
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/081-acceptance-hardening/requirements.md --tasks .specify/specs/081-acceptance-hardening/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 25, "task_count": 12, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-03T04:35:53Z"}
+# exit 0 — decision: proceed (fr_count 25 <= 30, task_count 12 <= 40)
+
+## GATE-B pre-analyze-check.py --stage tasks
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/081-acceptance-hardening --stage tasks --repo .
+# exit 0
+decision=pass errors=0 advisories=62 waived=0 fr=25 sc=9 tasks=12 clauses=66 files=14
+finding classes: missing-path/advisory=62
+blocking findings: 0
+# the 62 advisories are all check=missing-path/severity=advisory for paths this slice has yet to create
+# (tests/contract/test_acceptance_premises.py, the two fixture directories, and 081c/081d deliverables) —
+# the same advisory class 081a's tasks stage recorded; --strict was not passed, so none of them blocks.
+
+## GATE-C validate-tasks.py
+$ python3 scripts/python/validate-tasks.py .specify/specs/081-acceptance-hardening/tasks.md
+PASS: .specify/specs/081-acceptance-hardening/tasks.md — 0 error(s), 0 warning(s)
+# exit 0
+
+## Raw outputs
+tasks-081b-decomposition-check.json  — decomposition-check stdout (pure JSON)
+tasks-081b-pre-analyze-check.json    — pre-analyze-check payload (--json-out)
+tasks-081b-pre-analyze-check.txt     — pre-analyze-check stdout verbatim
+tasks-081b-validate-tasks.txt        — validate-tasks stdout verbatim
+tasks-081b-environment-probes.txt    — the runtime probes this run recorded

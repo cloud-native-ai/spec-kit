@@ -1,0 +1,34 @@
+# Environment probes — Feature 081, slice 081b (tasks stage), run 2026-11-03 from the repository root
+
+## system python3 (runs both stdlib-only checkers)
+$ python3 --version
+Python 3.9.6
+
+## pytest runner (the venv entry the slice tests use)
+$ .venv/bin/python --version
+Python 3.14.6
+$ .venv/bin/python -m pytest --version
+pytest 9.2.0
+
+## pins compared against test-evidence/plan-runner-pins.txt (FR-023: re-read before any comparison)
+$ cat .specify/specs/081-acceptance-hardening/test-evidence/plan-runner-pins.txt | head -4
+# RS-002 / RS-003 pins — measured 2026-11-03 (never invented)
+pytest --version  => pytest 9.2.0
+python --version  => Python 3.14.6
+git --version     => git version 2.54.0 (Apple Git-157)
+
+## git
+$ git --version
+git version 2.54.0 (Apple Git-157)
+
+## mirror engines — pre-change parity
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+# exit 0
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
