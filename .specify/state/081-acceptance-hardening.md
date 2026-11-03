@@ -437,3 +437,11 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - part 3：T010（manage-features + feature-index 词表）、T011（`audit-history` 夹具）、T012（Inherited Blockers 行级重读 + premises 模块）、T013（`--audit-existing` 实现）、T014（`test_acceptance_schema_ownership.py`）。
 - part 4：T015（CHANGELOG/docs/mirrors）、T016（feature-level readings：3/3 call sites、SC-002 真实读数、全量基线、final smoke）、T017（verification SC 行）、T018（feature 状态落地，最高只到证据允许值）。
 - 每段结束：跑对应 targeted 集、写证据、提交；不 push 直到用户授权或沿用已有推送授权。全部完成后 = 081d review → review-fix → closure → 合并。
+
+## 081d review + closure + 合并（2026-11-03 19:10 UTC）
+
+- 081d review（四段 + ARC，dogfooding）：P0=0；P1=3（实现阶段代做 R4R 翻转；SC-009 两处矛盾陈述；detail 当前位仍 `Draft`）、P2=3（55/63 暴露未入环境前提；reconciliation 披露晚于其本身；SC-001 措辞超出证据树）。P1 全部修复：T018 止于 `Implemented`，R4R 由 review 在两条记录齐备后翻转；SC-009 备注改为日期化 fail→pass；detail 当前位改 `Ready for Review`；暴露与措辞同步。
+- 最终读数：closure checker `accept`、exit 0、`final_path pass=2 blocked=0 deferred=0 partial=1?`（实际 pass=2，其余 0）、reason none；全量 39 failed / 7134 passed / 7 skipped，`head−baseline` 0 new、`baseline−head` 0 fixed；final smoke 0/0；mirrors/regen 0；schema guard 9 passed。coverage lane 仍为具名 remainder（2/25 cited）。
+- Feature 081 状态：`Ready for Review`（registry + detail 一致）；SC-001/SC-002 均为 `pass`。
+- 合并：`081-acceptance-hardening` 以 **fast-forward** 合入 `master` 并推送 `gitlab/master`（`d4d60aeb`）；工作树干净。
+- 本特性（081a–081d）关闭：Phase 1–4 的更严格验收框架改进全部落地。
