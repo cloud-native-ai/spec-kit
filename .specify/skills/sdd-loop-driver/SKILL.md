@@ -81,7 +81,7 @@ U2 DISPATCH  本地：原生子代理逐阶段派发（同步返回）；远端�
 U3 WATCH     远端统一监听：单次调用内长轮询信号（退出记录/哨兵/PID/心跳）至终止判定或窗口到期；窗口到期只返回 RUNNING 并立即以递增 --iter 重入，只有阶段 deadline 产生 TIMEOUT（本地原生调用即等待，不轮询；见 references/watch-model.md）
 U4 VERIFY    独立校验：哨兵（必要）+ 产物核验 + 纪律抽查 + Wrap-up 记账核验（充分）→ 通过才续环
 U5 STALL     超时/重试上限/预算触顶 → 停线、状态脊落盘、出上送件（绝不静默等待）
-U6 LEAVE     全线收束：逐线合并收尾（git 状态判定 + 工作树归档清扫，缺省本地合并）+ 一份收尾汇总
+U6 LEAVE     全线收束：逐线合并收尾（closure/merge 步在**特性线闭合**处跑 `scripts/python/closure-acceptance-check.py`，`block` 把该线标 `blocked`——线不是也不得再是 `completed`；切片合并仍由 review 门判定）+ 工作树归档清扫，缺省本地合并 + 一份收尾汇总
 ```
 
 多条线并行 = 多个独立循环实例：一线一连接、一线一状态脊。首次派发前登记环境级 Line Registry（`scripts/line-registry.py --action register`），事件携带 `(line_id, run_id)` 信封，U6 后 `deregister`；无标识消息经 `resolve-message` 判定，禁止进程扫描推断。

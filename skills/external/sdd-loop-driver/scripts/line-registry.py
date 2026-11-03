@@ -43,7 +43,18 @@ LINE_ID_RE = re.compile(r"^[a-z0-9][A-Za-z0-9-]{7,63}$")
 RUN_ID_RE = re.compile(r"^r[0-9]{8}T[0-9]{6}Z-[0-9a-f]{4}$")
 SLUG_RE = re.compile(r"[^a-z0-9]+")
 
-STATE_VALUES = {"active", "waiting", "stalled", "completed", "orphaned", "stale", "closed"}
+# The line state set is a closed eight-value domain. `blocked` (081, FR-017) is the closure
+# verdict's landing state: a line whose feature did not pass the closure judgement. It is
+# deliberately absent from ACTIVE_STATES (it occupies no concurrency slot and is not an active
+# entry) and from HOLDING_STATES (it holds no lease, no reservation and no ownership claim —
+# entering it clears holder_line_id / waiting_reason / queued_at and releases the lease, exactly
+# as `closed` does). It is recoverable by design, so it MUST NOT join the terminal guard set
+# `{closed, stale, orphaned}`; the recovery path is `update --state active`, which passes the
+# ownership gate like every other path into `active`. The state set has never had a
+# never-regress rule and this value adds none.
+STATE_VALUES = {
+    "active", "waiting", "stalled", "completed", "orphaned", "stale", "closed", "blocked",
+}
 ACTIVE_STATES = {"active", "waiting"}
 HOLDING_STATES = {"active", "completed"}
 EVENT_VALUES = {
@@ -440,6 +451,10 @@ def validate_entry(entry: dict) -> dict:
             require(bool(entry.get("holder_line_id")), "ownership-overlap waiting requires holder_line_id")
     if state == "closed":
         require(bool(entry.get("closed_at")), "closed requires closed_at")
+    if state == "blocked":
+        # `blocked` carries the reason it must be lifted, so a blocked line is never a bare label.
+        require(bool(entry.get("blocked_at")), "blocked requires blocked_at")
+        require(bool(entry.get("blocked_reason")), "blocked requires blocked_reason")
     if entry.get("remote") is not None:
         _validate_remote(entry["remote"])
     if entry.get("integration_result") is not None:
@@ -668,6 +683,19 @@ def _apply_update(entry: dict, args: argparse.Namespace) -> None:
         if args.state == "active":
             for key in ("waiting_reason", "holder_line_id", "queued_at"):
                 entry.pop(key, None)
+        if args.state == "blocked":
+            # `blocked` holds nothing: same cleanup as `closed`, plus the reason it must be
+            # lifted (a blocked line is recoverable, so the reason is the way back). The lease
+            # and the stage reservations are released by `action_update`, which is the only
+            # layer holding the registry path.
+            require(bool(args.reason),
+                    "entering blocked requires --reason (recorded as blocked_reason)")
+            entry["blocked_at"] = now_iso()
+            entry["blocked_reason"] = args.reason
+            entry["last_event"] = "blocked"
+            for key in ("waiting_reason", "holder_line_id", "queued_at"):
+                entry.pop(key, None)
+            entry["lease"] = None
     for pid_field, token_field in (
         ("runner_pid", "runner_start_token"),
         ("cli_pid", "cli_start_token"),
@@ -708,6 +736,18 @@ def _apply_update(entry: dict, args: argparse.Namespace) -> None:
             entry.setdefault("ready_for_merge_at", now_iso())
         else:
             entry.pop("ready_for_merge_at", None)
+    # The invariant is asserted at the same validation point as `merge_ready ⇒ completed`, not
+    # left implicit in that prerequisite: a `completed` line which is already `merge_ready` and is
+    # then asked to become `blocked` would keep the flag and land in a state the invariant
+    # forbids. The remedy is the recorded order — `integration-record --result failed` clears
+    # `merge_ready`, and the transition follows it (GW-03).
+    if entry.get("state") == "blocked" and entry.get("merge_ready") is not None \
+            and _parse_bool(entry["merge_ready"]):
+        raise EngineError(
+            EXIT_USAGE,
+            "state=blocked with merge_ready=true is not admissible: record the failed result "
+            "first (integration-record clears merge_ready), then transition the line to blocked",
+        )
 
 
 def _parse_bool(raw) -> bool:
@@ -761,9 +801,20 @@ def action_update(ctx: Context) -> int:
                 require(getattr(args, key) == data_previous.get(key),
                         f"{key} is immutable once set")
         if data.get("state") == "active" and previous_state != "active":
-            require(previous_state in {"waiting", "stalled"},
+            # `blocked` is admitted here on purpose: it is the recovery path FR-017 / A6 item 7
+            # names ("update --state active"), and this is the single line where the state set's
+            # new value and the recovery path meet. `promote-waiting` is NOT that path — it keeps
+            # requiring `state == "waiting"`, so a blocked line cannot revive itself that way.
+            require(previous_state in {"waiting", "stalled", "blocked"},
                     f"cannot transition from {previous_state!r} to active; "
                     "closed/stale/orphaned/completed are not revivable")
+            if previous_state == "blocked":
+                # SV-15: recovery carries the reason it was lifted, so the block/recover pair
+                # leaves a readable trail rather than a silent flip back.
+                require(bool(args.reason),
+                        "recovering a blocked line requires --reason (recorded as unblock_reason)")
+                data["unblock_reason"] = args.reason
+                data["unblocked_at"] = now_iso()
             # Every path into active must pass the ownership gate, not just
             # ownership-check / promote-waiting (P0-01 bypass found in review).
             if _entry_released(ctx, data):
@@ -785,7 +836,14 @@ def action_update(ctx: Context) -> int:
         elif data.get("spine_path"):
             check_spine_consistency(data, data["spine_path"])
 
-    return emit(ctx.mutate(line_id, mutate))
+    previous = {"state": entry.get("state")}
+    updated = ctx.mutate(line_id, mutate)
+    if updated.get("state") == "blocked" and previous["state"] != "blocked":
+        # Releasing the lease and the stage reservations is a registry-level operation, so it
+        # lives here rather than in `_apply_update` — the same split `action_deregister` uses for
+        # `closed`. Without it a blocked line pins its waiters the way a leaked lease does.
+        _release_resources_for_line(ctx.reg, line_id, reason="blocked")
+    return emit(updated)
 
 
 def action_deregister(ctx: Context) -> int:
@@ -803,6 +861,9 @@ def action_deregister(ctx: Context) -> int:
                 return
             entry["state"] = "stale"
             entry.setdefault("stale_at", now_iso())
+            # `stale_from_state` records *where the line came from*, so it carries whichever value
+            # the set holds — `blocked` included (081 A6 item 8). It needs no domain of its own:
+            # STATE_VALUES is its enumeration, and no second list is added for this field.
             entry["stale_from_state"] = previous
             entry["last_event"] = "stale-marked"
             return

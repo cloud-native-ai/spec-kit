@@ -451,6 +451,7 @@ CLI 行为知识的唯一落点是 `references/cli/`（schema owner：`reference
 
 ### U6 收尾（生命周期）
 
+- 特性线闭合处的 **closure 判定**由集成序列的质量门给出：`scripts/python/closure-acceptance-check.py` 在该线闭合时运行一次，`block` 把该线标 `blocked`（先在 `completed` 态记录 `integration-record --result failed` 的命名原因，随后转态——线不是也不得再是 `completed`）。判定时点是**特性线闭合**：一条线承载一个特性的全部切片，MUST NOT 被读作「每个切片合并都要过一次 closure 判定」——切片合并由 review 门判定。封闭原因集、退出码与 `final_path` 形态的真源：`shared/workflow/acceptance-hardening.md` § Closure Verdict（按路径 + 章节锚引用，本文件不复述）。
 - U6 在 `integration_result`（merged|failed）记录之后执行；只读线阶段完成直接 U6；写线集成前显式放弃以 `last_event=abandoned` 关闭。
 - U6 注销 Registry（`closed` + `closed_at`）、释放 reservation 与 lease、按保留策略归档证据；不得留下 `active` 残留。
 - worktree 的移除只由集成序列在合并成功后执行；未合并（failed/放弃）时保留并置 `worktree_retained=true`。

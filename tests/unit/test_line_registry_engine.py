@@ -204,11 +204,21 @@ def test_ingress_decision_table():
 
 
 def test_state_word_list_and_active_set():
+    """The closed state domain and the active pair (Feature 064 LR-09 + 081 A6 item 1/2).
+
+    Updated deliberately by Feature 081 (FR-017 / A6 item 1): `blocked` joined the closed set
+    because the driver's closure step needs a landing state for a line whose feature did not pass
+    the closure judgement. The domain grew 7 → 8; `ACTIVE_STATES` did not move — `blocked` holds
+    no concurrency slot and is not an active entry (A6 item 2). The eight dispositions the new
+    value requires are pinned by `tests/contract/test_line_state_blocked.py`, the single carrier;
+    this unit leg keeps only the two literals so the domain's spelling has one fast guard here.
+    """
     engine = _load_engine()
     assert engine.STATE_VALUES == {
-        "active", "waiting", "stalled", "completed", "orphaned", "stale", "closed"
+        "active", "waiting", "stalled", "completed", "orphaned", "stale", "closed", "blocked",
     }
     assert engine.ACTIVE_STATES == {"active", "waiting"}
+    assert engine.HOLDING_STATES == {"active", "completed"}
 
 
 def test_event_word_list_and_attribution_values():

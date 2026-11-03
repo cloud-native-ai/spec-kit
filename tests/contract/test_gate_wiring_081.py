@@ -29,21 +29,30 @@ old assertion claimed ("`templates/commands/review.md` does not name the checker
 design; replacing it with its positive form is what keeps the boundary checkable, and deleting it
 would have restored the silent half-wiring it exists to prevent.
 
-The **driver** closure/merge call site (GW-03) is still 081d work: it stays asserted *absent* here,
-with its reason kept as data (`REVIEW_DRIVER_DEFERRED`, now shrunk to the driver half alone). 081d
-flips that one in the same way. The review-site assertions of this module are a *wiring* reading;
-they do not re-judge a feature, and the fixture verdicts they drive are the checker's own.
+The **driver** closure/merge call site (GW-03) is wired here too (slice 081d, T007), in the same
+positive form and for the same reason: its absence assertion (`test_the_driver_call_site_is_still_
+unwired`) was true only while the site was unwired, and 081d replaced it — not deleted it. The
+driver half asserts the checker as the **default** gate through the existing `--gate-cmd` hook, and
+its evidence is a verdict, not a string match: the two fixtures are run through the command the
+script builds, and two real git worktrees show what a `block` and an input error do to the line.
+The review-site assertions of this module are a *wiring* reading; they do not re-judge a feature,
+and the fixture verdicts they drive are the checker's own.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
+import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+
+from fixtures.line_fixtures import engine_json, make_line_id, make_run_id
 
 pytestmark = pytest.mark.contract
 
@@ -65,14 +74,6 @@ INVOCATION = re.compile(r"python3\s+%s[^\n`]*" % re.escape(CHECKER_REL))
 #: would be a second judgement source (GW-04), so their absence from the gate's own sentences is
 #: part of the wiring assertion.
 OTHER_JUDGES = ("validate-requirements.py", "pre-analyze-check.py", "validate-tasks.py")
-
-#: The 081d scope boundary, recorded as data so the remaining absence assertion carries its
-#: reason. 081c (T008) moved the review half to its positive form below; this datum therefore
-#: names the **driver** call site only.
-REVIEW_DRIVER_DEFERRED = (
-    "the driver closure/merge call site (GW-03) is 081d work; 081a wires the implement call "
-    "site and 081c (this module's own slice) wires the review call site"
-)
 
 
 def _step9():
@@ -405,24 +406,345 @@ def test_the_review_call_site_offers_no_second_judgement_source():
 
 
 # --------------------------------------------------------------------------- #
-# 081d scope boundary — the driver call site is absent, with its reason
+# 081d / GW-03 — the driver call site, now wired (T007 replaced the absence half)
 # --------------------------------------------------------------------------- #
 
-def test_the_driver_call_site_is_still_unwired():
-    """Asserted absent *in 081c*; 081d replaces this assertion with its own.
+DRIVER_CALL_SITE = "the driver closure/merge call site (`integrate-lines.py`)"
+INTEGRATION_RECORD_REASONS = ("closure-blocked", "closure-input-error", "quality-gate")
 
-    What moved in 081c: the review half of this boundary became the positive assertions above,
-    because 081c wired that call site (GW-02). What did not move: the driver closure/merge call
-    site is still 081d's (GW-03), so it stays asserted absent — deleting the assertion would
-    restore the silent half-wiring it exists to prevent. The reason is data
-    (`REVIEW_DRIVER_DEFERRED`), not a comment.
+
+def _integrate_module():
+    """Load the driver's coordinator by path — no package import, one engine file."""
+    spec = importlib.util.spec_from_file_location("integrate_lines_081", INTEGRATE_LINES)
+    assert spec and spec.loader, "cannot load %s" % INTEGRATE_LINES
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["integrate_lines_081"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_driver_call_site_names_the_closure_checker_as_its_default_gate():
+    """GW-03: the closure/merge step defaults its quality gate to the checker.
+
+    The absence assertion this replaces (`test_the_driver_call_site_is_still_unwired`) was true
+    only while the site was unwired — the same move 081c made for the review half, and the same
+    reason: replacing it keeps the boundary checkable, deleting it would have restored the silent
+    half-wiring it exists to prevent.
     """
-    if INTEGRATE_LINES.is_file():
-        assert CHECKER_REL not in INTEGRATE_LINES.read_text(encoding="utf-8"), (
-            "integrate-lines.py now names the checker — if 081d landed, replace this boundary "
-            "assertion with its positive form instead of deleting it"
-        )
-    assert "081d" in REVIEW_DRIVER_DEFERRED and "GW-03" in REVIEW_DRIVER_DEFERRED, (
-        "the deferred datum must name the slice and the clause that own the driver call site, "
-        "so the absence above reads as a boundary rather than as an oversight"
+    source = INTEGRATE_LINES.read_text(encoding="utf-8")
+    assert CHECKER_REL in source, (
+        "integrate-lines.py must name `%s` as the gate it runs at the feature line's closure "
+        "(GW-03): a gate that names no runnable command leaves the judgement to whoever reads it"
+        % CHECKER_REL
     )
+    engine = _integrate_module()
+    assert engine.CHECKER_REL == CHECKER_REL, (
+        "the built command and this contract must name the checker by the same relative path"
+    )
+    for other in OTHER_JUDGES:
+        assert other not in source, (
+            "%s offers %r as a closure judge; the verdict has exactly one source (GW-04)"
+            % (DRIVER_CALL_SITE, other)
+        )
+
+
+def test_the_default_gate_runs_through_the_single_existing_hook():
+    """GW-04: one gate execution, reached through `--gate-cmd` — never a second code path.
+
+    Two readings, both mechanical: the script has exactly one `bash -c <gate>` execution site (so
+    an override and the default travel the same path), and the default is *built* into that site
+    rather than branched around it — an override is honoured and the built default is simply what
+    `--gate-cmd` was empty.
+    """
+    source = INTEGRATE_LINES.read_text(encoding="utf-8")
+    assert len(re.findall(r'run\(\["bash", "-c",\s*gate_cmd\]', source)) == 1, (
+        "the driver must keep exactly one gate execution site; a second one is the second code "
+        "path GW-03 forbids:\n%s" % source[-2000:]
+    )
+    assert '--gate-cmd' in source, "the existing hook must stay the only way to override the gate"
+    engine = _integrate_module()
+    assert callable(engine.build_gate_cmd) and callable(engine.resolve_spec_dir), (
+        "the default gate must be built by the module (so this contract can run the exact "
+        "command), not inlined as a second spell of the checker invocation"
+    )
+    # The timing obligation's carrier is the doc surface (T009), but the code side is checkable
+    # the same way: the gate is resolved per *line*, and no slice-level switch exists on the
+    # calling surface.
+    flags = set(re.findall(r'add_argument\(\s*"(--[a-z0-9-]+)"', source))
+    assert not [flag for flag in flags if "slice" in flag], (
+        "the driver must not expose a slice-scoped switch: the judgement runs at the feature "
+        "line's closure, and slice merges are the review gate's (GW-03); got %r" % flags
+    )
+
+
+def test_the_built_gate_command_blocks_the_negative_fixture():
+    """The command the script builds, run verbatim against the 026-shape fixture: it must block."""
+    engine = _integrate_module()
+    fixture = FIXTURES / "negative"
+    assert fixture.is_dir(), "the negative fixture is missing — T003 has not landed"
+    cmd = engine.build_gate_cmd(ROOT, fixture)
+    assert CHECKER_REL in cmd, "the built command must be the checker invocation: %r" % cmd
+    proc = subprocess.run(["bash", "-c", cmd], cwd=str(ROOT), capture_output=True, text=True)
+    assert proc.returncode == 1, (
+        "the built gate, run against the 026-shape fixture, must block (exit 1):\n%s\n%s"
+        % (proc.stdout, proc.stderr)
+    )
+    assert "zero-final-path-pass" in (proc.stdout + proc.stderr), proc.stdout + proc.stderr
+
+
+def test_the_built_gate_command_accepts_the_positive_fixture():
+    engine = _integrate_module()
+    fixture = FIXTURES / "positive"
+    assert fixture.is_dir(), "the positive fixture is missing — T003 has not landed"
+    cmd = engine.build_gate_cmd(ROOT, fixture)
+    proc = subprocess.run(["bash", "-c", cmd], cwd=str(ROOT), capture_output=True, text=True)
+    assert proc.returncode == 0, (
+        "a complete feature must not be blocked by the wired gate:\n%s\n%s"
+        % (proc.stdout, proc.stderr)
+    )
+
+
+# --- the verdict half: a real line, a real worktree, the recorded result -------------------- #
+
+FEATURES_HEADER = (
+    "| ID | Name | Description | Status | Feature Details | Spec Path | Last Updated |\n"
+    "|----|------|-------------|--------|-----------------|-----------|--------------|\n"
+)
+
+
+def _features_md(rows: list[tuple[str, str]]) -> str:
+    body = "".join(
+        "| %s | fixture | fixture feature | Planned | .specify/memory/features/%s.md | %s | 2026-11-03 |\n"
+        % (fid, fid, cell)
+        for fid, cell in rows
+    )
+    return "# features\n\n## Features\n\n" + FEATURES_HEADER + body
+
+
+def _make_line_repo(tmp_path: Path, name: str, branch: str, *, spec_cell: str,
+                    fixture: str | None, features_rows: list[tuple[str, str]] | None = None):
+    """A trunk repo plus a worktree on `branch` carrying exactly the gate's inputs.
+
+    The worktree is a real git worktree (the coordinator rebases before the gate) whose tree
+    carries the checker, the feature registry and — when a fixture is named — a copy of that
+    fixture's spec directory. Nothing here is the real repository.
+    """
+    repo = tmp_path / ("repo-" + name)
+    repo.mkdir()
+    for args in (["git", "init", "-q", "-b", "main", str(repo)],
+                 ["git", "-C", str(repo), "config", "user.email", "t@example.com"],
+                 ["git", "-C", str(repo), "config", "user.name", "T"],
+                 ["git", "-C", str(repo), "commit", "-q", "--allow-empty", "-m", "base"]):
+        subprocess.run(args, check=True)
+    wt = tmp_path / ("wt-" + name)
+    subprocess.run(["git", "-C", str(repo), "worktree", "add", "-q", "-b", branch, str(wt), "main"],
+           check=True)
+    (wt / "scripts" / "python").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / CHECKER_REL, wt / CHECKER_REL)
+    (wt / ".specify" / "memory").mkdir(parents=True, exist_ok=True)
+    (wt / ".specify" / "memory" / "features.md").write_text(
+        _features_md(features_rows or [("081", spec_cell)]), encoding="utf-8")
+    if fixture is not None:
+        spec_dir = wt / Path(spec_cell).parent
+        shutil.copytree(FIXTURES / fixture, spec_dir)
+    for args in (["git", "-C", str(wt), "add", "-A"],
+                 ["git", "-C", str(wt), "commit", "-q", "-m", "gate inputs"]):
+        subprocess.run(args, check=True)
+    return repo, wt
+
+
+def _register_line(reg: Path, repo: Path, wt: Path, branch: str) -> str:
+    line_id = make_line_id(slug="line081")
+    engine_json("register", "--line-id", line_id, "--run-id", make_run_id(),
+                "--project-dir", str(repo), "--repo-root", str(repo),
+                "--worktree-path", str(wt), "--branch", branch, reg=reg)
+    engine_json("update", "--line-id", line_id, "--state", "completed", reg=reg)
+    engine_json("integration-enqueue", "--line-id", line_id, reg=reg)
+    return line_id
+
+
+def _run_integrator(tmp_path: Path, repo: Path, reg: Path, line_id: str | None):
+    env = os.environ.copy()
+    env["SPECIFY_LINE_REGISTRY_DIR"] = str(reg)
+    proc = subprocess.run(
+        [sys.executable, str(INTEGRATE_LINES), "--repo", str(repo), "--trunk", "main",
+         "--registry", str(reg), "--archive", str(tmp_path / "archive")]
+        + (["--lines", line_id] if line_id else []),
+        capture_output=True, text=True, env=env,
+    )
+    assert proc.stdout.strip().startswith("{"), (
+        "the coordinator must print its JSON summary:\n%s%s" % (proc.stdout, proc.stderr)
+    )
+    return proc, json.loads(proc.stdout)
+
+
+def _result_for(summary: dict, line_id: str) -> dict:
+    rows = [row for row in summary["results"] if row["line_id"] == line_id]
+    assert rows, "the summary lost line %s: %r" % (line_id, summary)
+    return rows[0]
+
+
+def _stored_entry(reg: Path, line_id: str) -> dict:
+    return json.loads((reg / f"{line_id}.json").read_text(encoding="utf-8"))
+
+
+def test_a_block_lands_blocked_after_the_record(tmp_path):
+    """GW-03's verdict, on a real line: the failed result is recorded, then the line lands blocked.
+
+    GATE-5 reads this leg: the gate is the default (no `--gate-cmd` given), the fixture blocks,
+    the line carries `integration_result.status=failed` with the `closure-blocked` reason, its
+    state is `blocked` — and no `--result merged` follows, because a `blocked` line is
+    structurally out of the integration queue (A6 item 5).
+    """
+    repo, wt = _make_line_repo(tmp_path, "neg", "081-neg",
+                               spec_cell=".specify/specs/081-neg/requirements.md", fixture="negative")
+    reg = tmp_path / "reg"
+    reg.mkdir()
+    line_id = _register_line(reg, repo, wt, "081-neg")
+    proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+
+    assert proc.returncode != 0, "a blocked feature must refuse the merge:\n%s" % proc.stdout
+    row = _result_for(summary, line_id)
+    assert row["status"] == "failed" and row["reason"] == "closure-blocked", (
+        "the block must be recorded with the closure reason, not the override's `quality-gate`: "
+        "%r" % (row,)
+    )
+    assert "zero-final-path-pass" in row.get("detail", ""), (
+        "the recorded refusal must name what failed, not merely that it failed: %r" % (row,)
+    )
+    entry = _stored_entry(reg, line_id)
+    assert entry["state"] == "blocked", "the line must land `blocked`; got %r" % entry["state"]
+    assert entry["blocked_reason"] == "closure-blocked", entry
+    assert entry["integration_result"]["status"] == "failed", entry["integration_result"]
+    assert entry["integration_result"]["reason"] == "closure-blocked", entry["integration_result"]
+    assert not entry.get("merge_ready"), "the recorded failure clears merge_ready before the flip"
+    # The order is a constraint, and both halves together prove it: the result exists *and* the
+    # line is blocked, which only the record-then-transition order can reach (A6 item 5 keeps
+    # `integration-record` unreachable from `blocked`).
+    queued = engine_json("integration-plan", reg=reg)
+    assert line_id not in [row["line_id"] for row in queued], (
+        "the blocked line must be out of the queue — no `--result merged` follows a block"
+    )
+
+
+def test_an_input_error_refuses_the_merge_and_leaves_the_state_completed(tmp_path):
+    """GW-03's exit-2 limb, on a real line: input error ≠ quality failure.
+
+    The spec directory exists but is missing a required input, so the checker itself exits 2. The
+    driver records `closure-input-error` while the line is still `completed`, leaves the state
+    alone, and refuses the merge.
+    """
+    repo, wt = _make_line_repo(tmp_path, "inp", "082-inp",
+                               spec_cell=".specify/specs/082-inp/requirements.md", fixture="negative")
+    (wt / ".specify" / "specs" / "082-inp" / "verification.md").unlink()
+    subprocess.run(["git", "-C", str(wt), "add", "-A"], check=True)
+    subprocess.run(["git", "-C", str(wt), "commit", "-q", "-m", "remove verification"], check=True)
+    reg = tmp_path / "reg"
+    reg.mkdir()
+    line_id = _register_line(reg, repo, wt, "082-inp")
+    proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+
+    assert proc.returncode != 0, "an input error must refuse the merge:\n%s" % proc.stdout
+    row = _result_for(summary, line_id)
+    assert row["reason"] == "closure-input-error", (
+        "a checker exit 2 is an input error, never a quality failure or a block: %r" % (row,)
+    )
+    entry = _stored_entry(reg, line_id)
+    assert entry["state"] == "completed", (
+        "exit 2 must leave the line's state unchanged — it is not marked blocked and it does not "
+        "become completed: %r" % entry["state"]
+    )
+    assert entry["integration_result"]["status"] == "failed", entry["integration_result"]
+    assert entry["integration_result"]["reason"] == "closure-input-error", entry
+
+
+def test_a_passing_line_merges_and_records_merged(tmp_path):
+    """The positive side of the same gate: a passing feature merges and is recorded merged.
+
+    Without this leg the negative leg could pass for the wrong reason — a pipeline that cannot
+    merge at all also refuses. Here the gate passes, the merge lands on trunk, and the record
+    carries `merged` with the real commit.
+    """
+    repo, wt = _make_line_repo(tmp_path, "pos", "081-pos",
+                               spec_cell=".specify/specs/081-pos/requirements.md", fixture="positive")
+    reg = tmp_path / "reg"
+    reg.mkdir()
+    line_id = _register_line(reg, repo, wt, "081-pos")
+    proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+
+    assert proc.returncode == 0, "a passing feature must merge:\n%s%s" % (proc.stdout, proc.stderr)
+    row = _result_for(summary, line_id)
+    assert row["status"] == "merged" and row.get("commit"), row
+    entry = _stored_entry(reg, line_id)
+    assert entry["state"] == "completed", entry["state"]
+    assert entry["integration_result"]["status"] == "merged", entry["integration_result"]
+    assert entry["integration_result"]["commit"] == row["commit"]
+
+
+def test_the_resolution_input_error_shapes_refuse_without_inventing_a_spec_dir(tmp_path):
+    """The four GW-03 shapes are input errors (exit-2 class), each naming its subject.
+
+    Per shape, the whole pipeline runs on its own worktree: the resolution refuses, the reason is
+    `closure-input-error`, the line keeps its `completed` state and no merge follows. The branches
+    below are the shapes the live registry actually exposes (most lines carry a branch with no
+    three-digit prefix), which is why a silent skip would have made the gate a no-op for most of
+    the fleet.
+    """
+    shapes = [
+        # (name, branch, features rows, expected subject fragment)
+        ("branchless", "feature-no-id", [("081", ".specify/specs/081/requirements.md")], "branch"),
+        ("no-row", "081-norow", [("999", ".specify/specs/999/requirements.md")], "081"),
+        ("dash-cell", "081-dash", [("081", "-")], "Spec Path"),
+        ("missing-dir", "081-missing", [("081", ".specify/specs/999-absent/requirements.md")],
+         "999-absent"),
+    ]
+    reg = tmp_path / "reg"
+    reg.mkdir()
+    for name, branch, rows, subject in shapes:
+        repo, wt = _make_line_repo(tmp_path, name, branch,
+                                   spec_cell=".specify/specs/unused/requirements.md",
+                                   fixture=None, features_rows=rows)
+        line_id = _register_line(reg, repo, wt, branch)
+        proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+        assert proc.returncode != 0, "%s: an unresolvable spec dir must refuse the merge" % name
+        row = _result_for(summary, line_id)
+        assert row["reason"] == "closure-input-error", (
+            "%s: the shape is an input error, not a block and not a `quality-gate`: %r"
+            % (name, row)
+        )
+        assert subject in row.get("detail", ""), (
+            "%s: the refusal must name its subject %r; got %r" % (name, subject, row.get("detail"))
+        )
+        entry = _stored_entry(reg, line_id)
+        assert entry["state"] == "completed", (
+            "%s: the resolution error leaves the line where it was: %r" % (name, entry["state"])
+        )
+        assert entry["integration_result"]["reason"] == "closure-input-error", entry
+
+    # No fallback invents `.specify/specs/<branch>`: a branch-derived path would have made the
+    # `081-dash` shape "succeed" against a directory the registry row never named.
+    engine = _integrate_module()
+    with pytest.raises(engine.GateInputError) as excinfo:
+        engine.resolve_spec_dir({"line_id": "demo-20261103T000000Z-ab12", "branch": "081-dash"},
+                                tmp_path)
+    assert not (tmp_path / ".specify" / "specs" / "081-dash").exists(), (
+        "the refusal must not create or consult an invented `.specify/specs/<branch>` path"
+    )
+
+
+def test_an_overridden_gate_keeps_the_quality_gate_reason():
+    """`--gate-cmd` stays overridable (GW-03) and its failure is never mislabelled.
+
+    A caller-supplied gate is not the closure verdict, so its failure keeps the historical
+    `quality-gate` reason instead of borrowing the closure vocabulary.
+    """
+    source = INTEGRATE_LINES.read_text(encoding="utf-8")
+    assert "gate_cmd is None" in source or "args.gate_cmd" in source, (
+        "the override must remain the caller's own command:\n%s" % source[-2000:]
+    )
+    engine = _integrate_module()
+    assert engine.REASON_QUALITY_GATE == "quality-gate"
+    assert engine.REASON_CLOSURE_BLOCKED == "closure-blocked"
+    assert engine.REASON_CLOSURE_INPUT_ERROR == "closure-input-error"
+    for reason in INTEGRATION_RECORD_REASONS:
+        assert reason in source, "the driver's reason vocabulary lost %r:\n%s" % (reason, source)
