@@ -15,7 +15,7 @@
 - **AS-05**: `requirements.md` of an `execution`-class feature MUST carry the table with the fixed column set `ID | Capability | Form | Owner | Pin | Joint acceptance | FR` and rows `RS-NNN`.
 - **AS-06**: `Form` MUST be drawn from `in-scope` / `signed-contract` / `user-waived`; an `expression`-class feature MAY use `not-required` with a stated reason.
 - **AS-07**: `in-scope` MUST cite the FR that delivers the capability, plus a task and a verification entry naming the joint acceptance; `signed-contract` MUST carry contract path, measured pin and a named joint-acceptance owner or command; `user-waived` MUST cite the user ruling and the residual risk.
-- **AS-08**: A capability whose provider is external to this repository MUST NOT be recorded `in-scope`; a capability that has only prose and no row MUST be reported as `runtime-dependency-not-owned`.
+- **AS-08**: A capability whose provider is external to this repository MUST NOT be recorded `in-scope`; a capability that has only prose and no row MUST be reported as `runtime-dependency-not-owned: RS-NNN` ([[STR-011]]; the canonical spelling is owned by `requirements.md` § Shared Strings).
 
 ## Execution Premises and Inherited Blockers (plan)
 

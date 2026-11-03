@@ -26,7 +26,7 @@
 **Project Type**: single（框架源码 + 自举运行时双帽：改 `templates/`、`shared/`、`skills/`、`scripts/`、`src/`、`tests/`，`.specify/` 同名文件由再生成入口产出）
 **Performance Goals**: 无吞吐目标。checker 对 081 自身规格的判定 < 1 s（4 个 Markdown 输入 + 1 个注册表）；smoke 单次 ≤ 2 min（`specify init` 一次 + 3 次引擎调用）；两次 smoke 退出码一致（2/2）
 **Constraints**: checker MUST 只读（零写入，`--audit-existing` 只读审计）且 stdlib-only；退出码三态 0/1/2；封闭原因集 7 项不得扩张；MUST NOT 新建第二套并行门禁；MUST NOT 替换 `code-review`；MUST NOT 回写历史特性状态与历史 verification 记录；不 push
-**Scale/Scope**: 4 条用户故事；25 FR / 9 SC（`final` 仅 SC-001、SC-002）；预计改/建 **41 个源面**（模板 11、shared 3、技能 9、脚本 3、`src/` 1、测试 14）+ 6 对镜像关系 + 4 份按工具命令副本；实现任务自然计数 ≈52 > 40 → 按 US1–US4 切 081a–081d（见 § Design Decisions D10）
+**Scale/Scope**: 4 条用户故事；25 FR / 9 SC（`final` 仅 SC-001、SC-002）；预计改/建 **42 个源面**（模板 11、shared 3、技能 9、脚本 3、`src/` 1、测试 15）+ 6 对镜像关系 + 4 份按工具命令副本；实现任务自然计数 ≈52 > 40 → 按 US1–US4 切 081a–081d（见 § Design Decisions D10）
 
 ## Constitution Check
 
@@ -39,7 +39,7 @@
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | 每条设计决定都追到 FR：`contracts/gate-wiring.contract.md` § 可追溯性是 FR→条款→测试的唯一映射；两句 `MUST NOT` 阈值（`final` 路径全 `pass`、smoke 在案）直接来自 FR-002/FR-005 |
 | II | Feature-Centric Development | ✅ Pass | 绑定 Feature 081（`feature-ref.md`）；本阶段只落 `Draft → Planned` 与 `Key Changes`，不新建行、不回退他人状态（`features.md` 行与 `features/081.md` 同趟更新） |
 | III | Intent-Driven Development | ✅ Pass | Summary 先给「用户看到的差别」，实现细节留给 `contracts/`；D1–D10 逐条记录被否决的替代方案（`## Design Decisions`）而非只留结论 |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 每个新判定都有先写或同批写的契约/单元测试：`tests/contract/test_closure_acceptance_check.py`（正／负夹具红先行）、`test_line_state_blocked.py`（八项处置）、`test_acceptance_state_machine.py`、`test_acceptance_review_composition.py`、`test_acceptance_premises.py`；验收场景 SC-001…SC-009 的采集方法已由 requirements § Measurement Sources 声明 |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | 每个新判定都有先写或同批写的契约/单元测试：`tests/contract/test_closure_acceptance_check.py`（正／负夹具红先行）、`test_line_state_blocked.py`（八项处置）、`test_acceptance_state_machine.py`、`test_acceptance_review_composition.py`、`test_acceptance_premises.py`、`test_gate_wiring_081.py`（三处调用点，081a 断言 implement 一处）、`test_acceptance_schema_ownership.py`（SC-009 ④ 唯一性守卫与投影面豁免断言，081d）；验收场景 SC-001…SC-009 的采集方法已由 requirements § Measurement Sources 声明 |
 | V | AI Agent Integration Standards | ✅ Pass | 不动 `AGENT_CONFIG` / `_ASSISTANT_TIERS`；四份按工具副本只经 `regen-command-copies.py` 生成（`## Mirror Obligations`） |
 | VI | Continuous Quality & Observability | ✅ Pass | 关闭判据用基线差集而不是「看起来绿」：`head 失败集 − 基线失败集` 为空且 `基线失败集 − head 失败集` 逐条列为已修复项（SC-009）；历史状态不回写，审计只读（FR-020） |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | 本阶段只推进到 `Planned`；Pre-Status-Flip Gate 的判据 owner 保持 `templates/feature-details-template.md` § Canonical Status State Machine，本文件与命令面只加「第四条合取条件」的指针（FR-002/FR-016） |
@@ -57,7 +57,7 @@
 
 **Gates Status**: ✅ All gates pass — no Fail, no Partial, no Complexity Tracking row.
 
-**Re-check after Phase 1**: 2026-11-03, re-run against the landed Phase 1 artifacts — all 18 rows stay ✅ Pass. The only row whose evidence moved is IV: the five red-first contract test paths now exist as planned deliverables, and the fixture set (`tests/fixtures/acceptance-hardening/{positive,negative,...}/`) is enumerated in `data-model.md` § F1–F9 instead of being named only in this table.
+**Re-check after Phase 1**: 2026-11-03, re-run against the landed Phase 1 artifacts — all 18 rows stay ✅ Pass. The only row whose evidence moved is IV: the red-first contract test paths now exist as planned deliverables in § Source Code (six modules for 081a plus the 081d uniqueness guard), and the fixture set (`tests/fixtures/acceptance-hardening/{positive,negative,…,mixed-path,expr-supporting-only,execution-without-final}/`) is enumerated in `data-model.md` § Fixture set instead of being named only in this table.
 
 ## Decision Tensions
 
@@ -174,9 +174,10 @@ src/specify_cli/__init__.py            # get_resource_path() 的 repo-root 回�
 tests/
 ├── contract/{test_closure_acceptance_check,test_acceptance_state_machine,
 │             test_acceptance_review_composition,test_acceptance_premises,
-│             test_line_state_blocked}.py        # NEW 红先行契约测试
+│             test_line_state_blocked,test_gate_wiring_081}.py  # NEW 红先行契约测试（081a）
+├── contract/test_acceptance_schema_ownership.py  # NEW SC-009 ④ 唯一性守卫（owner 字面量 0 处外溢 + 投影面两条豁免断言；081d）
 ├── integration/test_acceptance_smoke.py         # NEW 唯一 smoke
-├── fixtures/acceptance-hardening/               # NEW 声明式最小夹具集（正/负/四类缺陷）
+├── fixtures/acceptance-hardening/               # NEW 声明式最小夹具集（正/负/四类缺陷/混合路径/表达类豁免/审计历史）
 └── （既有 7 个钉扎测试按 research.md § R3 逐条改，理由随行）
 docs/reference/commands/review.md      # 文档面：两段 → 四段 + ARC
 CHANGELOG.md                           # 本特性条目
@@ -247,17 +248,17 @@ Contract (full text in `contracts/closure-acceptance-check.contract.md`):
 - **Output**: `verdict: accept|block`, `reasons: [{code, target}]` drawn from the closed 7-item set, and `final_path: {pass, blocked, deferred, fail, unknown, total}` computed **once** here (FR-006; ARC reads this, never re-counts).
 - **Exit codes**: `0` accept, `1` block, `2` input missing/unparsable. `--audit-existing` is zero-write and exits `0` whenever inputs are valid, regardless of findings (FR-020).
 - **Shape**: stdlib-only, read-only, no model judgement, self-contained parser (it must run in a checkout without `src/` on `sys.path`; the two existing parsers are reused only where their regexes are stable, per `research.md` § R4).
-- **Fixtures**: `tests/fixtures/acceptance-hardening/{positive,negative,premise-mutation,runtime-gap-mutation,ladder-mutation,audit-history}/` — each a declarative minimal file set (requirements/plan/tasks/verification/registry), never a real feature directory. The `negative` set reproduces the 026 shape; `positive` carries a `final`-path pass + a complete smoke record.
+- **Fixtures**: `tests/fixtures/acceptance-hardening/{positive,negative,premise-mutation,runtime-gap-mutation,ladder-mutation,smoke-mutation,mixed-path,expr-supporting-only,execution-without-final,audit-history}/` — each a declarative minimal file set (requirements/plan/tasks/verification/registry), never a real feature directory. The `negative` set reproduces the 026 shape; `positive` carries a `final`-path pass + a complete smoke record; `mixed-path` carries one failing `final` next to a passing one plus one non-`pass` `supporting` SC (Edge Case "final 与 supporting 混合"); `expr-supporting-only` and `execution-without-final` are the two halves of the class rule — an `expression` feature is not forced to invent a `final` SC, an `execution` feature with zero `final`-path SC fails (V-1 / V-11).
 
 ### D3 — State machine and all call sites
 
 | Surface | Exact edit | Owner reference |
 |---|---|---|
 | `templates/feature-details-template.md` | `Planned → Implemented` becomes four conjunctive conditions; add `Blocked` rows `Planned → Blocked`, `Blocked → Implemented`, `Blocked → Ready for Review` (**illegal**), `Implemented → Blocked` (audit correction only, must cite evidence); `Implemented → Ready for Review` gains the fourth condition; `[FEATURE_STATUS]` glossary token gains `Blocked` | owner doc § Feature Status |
-| `templates/verification-log-template.md` | status set becomes `pass` / `fail` / `partial` / `blocked` / `deferred` / `unknown`; the five ladder fields for `blocked` / `deferred` / `partial`; the three-field smoke record; the illegal-row rule (`reduced_measurement` available but `reduced_measurement_run=no`) | owner doc § Verification Vocabulary |
+| `templates/verification-log-template.md` | status set becomes `pass` / `fail` / `partial` / `blocked` / `deferred` / `unknown`; the five ladder fields by their `SC-NNN_`-prefixed names for `blocked` / `deferred` / `partial`; the three-field smoke record; the illegal-row rule (`SC-NNN_reduced_measurement` non-empty AND `SC-NNN_reduced_measurement_run=no`) | owner doc § Verification Vocabulary |
 | `templates/tasks-template.md` | GATE-4 upgrade: every `final`-path SC `pass` **and** the smoke record present (or an explicit user waiver); Environment Prerequisites gains its A13 boundary note | owner doc § Gates |
-| `templates/feature-index-template.md`, `skills/internal/manage-features/SKILL.md` | status vocabulary gains `Blocked`; the never-regress rule gains its narrow audit-correction exception | owner doc § Feature Status |
-| `skills/internal/implement-feature/SKILL.md` (steps 8–9), `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate | run the checker before the flip; `block` → land `Blocked` (never a zero-final-pass `Implemented`); one pointer to the owner, no restated criteria | owner doc § Gates |
+| `templates/feature-index-template.md`, `skills/internal/manage-features/SKILL.md` | status vocabulary gains `Blocked`; the never-regress rule gains its narrow audit-correction exception. Measured: `templates/feature-index-template.md` is 21 lines and carries only the `Status` **column header** — it has no value-domain list today, so its edit is to **add** a closed status vocabulary containing `Blocked`, not to insert one value into an existing list (SV-06) | owner doc § Feature Status |
+| `skills/internal/implement-feature/SKILL.md` (**Step 8 — Completion validation** and **Step 9 — Pre-Status-Flip Gate and Verification Log**), `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate | run the checker before the flip and land `Blocked` at the status-landing point (Step 9; Step 8 is the completion-gate re-validation); `block` → land `Blocked` (never a zero-final-pass `Implemented`); one pointer to the owner, no restated criteria | owner doc § Gates |
 | `templates/commands/implement.md`, `templates/commands/tasks.md`, `templates/commands/checklist.md` | wire the gate / GATE-4 / fourth-condition reference | owner doc § Gates |
 
 ### D4 — Runtime stack, premises, inherited blockers

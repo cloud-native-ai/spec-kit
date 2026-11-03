@@ -76,10 +76,10 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 一个 `execution` 特性的 requirements 里只有「本能力由 X 仓提供」这类散文、没有运行时栈表行，**When** 确定性检查运行，**Then** 报 `runtime-dependency-not-owned` 并阻断下一阶段。
+1. **Given** 一个 `execution` 特性的 requirements 里只有「本能力由 X 仓提供」这类散文、没有运行时栈表行，**When** 确定性检查运行，**Then** 报 [[STR-011]] 并阻断下一阶段。
 2. **Given** 一行 `Form` = `signed-contract` 但缺 contract 路径、pin 或具名联合验收 owner，**When** 确定性检查运行，**Then** 该行被指名拒绝。
-3. **Given** 依赖特性详情里有一行 `## Deferred`，而本特性 plan 的继承 blocker 表没有处置它，**When** 确定性检查运行，**Then** 报 `inherited-blocker-undisposed` 并给出该行的出处。
-4. **Given** plan 里有一条 `Status` = `falsified` 但没有 `Decision`，**When** 确定性检查运行，**Then** 报 `falsified-premise-undecided`。
+3. **Given** 依赖特性详情里有一行 `## Deferred`，而本特性 plan 的继承 blocker 表没有处置它，**When** 确定性检查运行，**Then** 报 [[STR-013]] 并给出该行的出处。
+4. **Given** plan 里有一条 `Status` = `falsified` 但没有 `Decision`，**When** 确定性检查运行，**Then** 报 [[STR-012]]。
 
 ---
 
@@ -118,7 +118,7 @@
 - **特性文件缺失**：closure checker 在 `verification.md` 不存在或不可解析时 MUST 以退出码 2 表示输入错误，MUST NOT 把它读作 [[STR-006]]。三处调用点都在 `Planned` 之后，因此「缺文件」永远是缺陷而不是正常态。
 - **只有 supporting SC 的表达类特性**：`final` 路径规则对它是空真——MUST NOT 被读成「必须编造一条 final SC」，也 MUST NOT 因此让它永久停在 [[STR-001]]。
 - **smoke test 需要外部环境**：不得因为「需要真集群／真网络」而放行。要么用本地夹具把它做成确定性命令，要么特性为 [[STR-001]]。这与 `partial` 的诚实性一致：加了阈值，没有删除任何状态。
-- **reduced measurement 存在却未运行**：`blocked` / `deferred` / `partial` 行写了 `reduced_measurement` 却把 `reduced_measurement_run` 记成 `no`，判该行非法（「诚实」不构成可接受）。
+- **reduced measurement 存在却未运行**：`blocked` / `deferred` / `partial` 行的 `SC-NNN_reduced_measurement` **非空**而 `SC-NNN_reduced_measurement_run=no` 时，判该行非法（「诚实」不构成可接受）。判定只看该字段是否非空，不看测量「可用与否」。
 - **用户显式豁免**：`Implemented → Ready for Review` 的第四个条件允许用户豁免，但豁免 MUST 落在该转移 owner 已声明的可核验载体上；agent 的确认不是用户裁定，无异议也不是豁免。
 - **final 与 supporting 混合**：只要有一条 final SC 非 `pass` 即 [[STR-007]]，原因点名该 SC；supporting SC 的非 `pass` 不单独阻断。
 - **审计遇到历史遗留的「零通过但 Implemented」**：`--audit-existing` 只报告，MUST NOT 改写历史状态，也 MUST NOT 以其发现阻断其它阶段的正常运行。
@@ -135,9 +135,9 @@
 - **FR-001**: `requirements.md` 中每条 SC 定义行 MUST 携带 `Path` 标注，取值取封闭二值 [[STR-003]] 与 [[STR-004]]：`final` = 该 SC 证明特性的主用户旅程／产品流程可用；`supporting` = 辅助质量、卫生、文档或非阻断证据。每个 `execution` 类特性 MUST 至少有一条 [[STR-003]] SC；`expression` 类特性不受该下限约束。标注 MUST 写在 SC 定义行内、作为该行最后一个 token（形态 `**Path**: final`，每行恰好一次），使确定性校验器能判定（解析器容差见 A4）；缺失、出现两次或取二值之外的值即不合格。
 - **FR-002**: `Planned → Implemented` MUST 为四条件合取：① `tasks.md` 零 `[ ]`；② 每条 SC 有 verification 状态行；③ **每条 [[STR-003]] 路径 SC 的状态为 `pass`**；④ 该特性的基本 smoke test 为 `pass`。该转移的判据 owner 仍是 `templates/feature-details-template.md` § Canonical Status State Machine，其他产物 MUST 只引用不复制。
 - **FR-003**: MUST 新增 [[STR-001]] 为一等特性状态并写入上述 owner 的转移表：`Planned → Blocked`（任务已关闭但至少一条 [[STR-003]] 路径 SC 非 `pass`）；`Blocked → Implemented` 仅在 blocker 解除且 [[STR-003]] 路径 SC 全 `pass` 时允许；`Blocked → Ready for Review` MUST 非法；`Implemented → Blocked` 仅允许作为审计纠正，且 MUST 引用证据。
-- **FR-004**: `templates/verification-log-template.md`（词表 owner）MUST 增加 [[STR-002]] 并给出与 `deferred` 的区分：`blocked` = 环境无法测量该断言、因此特性不可验收；`deferred` = 本轮未尝试但特性仍可验收（仅限 `supporting` 路径）。`blocked` / `deferred` / `partial` 行 MUST 携带 `blocked_at`（或原因）、`reduced_measurement`、`reduced_measurement_run=yes|no`、`why_reduced_insufficient`、`unblock` 五项；当存在可用的 reduced measurement 而 `reduced_measurement_run=no` 时该行 MUST 判为非法（对应命名原因 [[STR-010]]）。
+- **FR-004**: `templates/verification-log-template.md`（词表 owner）MUST 增加 [[STR-002]] 并给出与 `deferred` 的区分：`blocked` = 环境无法测量该断言、因此特性不可验收；`deferred` = 本轮未尝试但特性仍可验收（仅限 `supporting` 路径）。`blocked` / `deferred` / `partial` 行 MUST 携带五项测量阶梯字段，字段名一律带 `SC-NNN_` 前缀并逐字为 `SC-NNN_blocked_at`、`SC-NNN_reduced_measurement`、`SC-NNN_reduced_measurement_run`（`yes|no`）、`SC-NNN_why_reduced_insufficient`、`SC-NNN_unblock`；**非法行**的触发条件是机械的：`SC-NNN_reduced_measurement` **非空** AND `SC-NNN_reduced_measurement_run=no`（不引入「测量是否可用」这类语义判断），命中即该行 MUST 判为非法（对应命名原因 [[STR-010]]）。
 - **FR-005**: 每个 `execution` 特性 MUST 在其 `tasks.md` / `verification.md` 中命名**恰好一条**确定性、最小、可复现的 smoke 命令，端到端覆盖该特性的主流程（不是完整 E2E 套件），并记录命令原文、退出码、证据路径三件。本特性（081）的 smoke 命令 MUST 至少覆盖三件事：在临时夹具上运行 `specify init`；对正／负夹具运行 closure checker；运行 `python3 scripts/python/regen-command-copies.py --check`。smoke test 无法运行时该特性 MUST 为 [[STR-001]]，MUST NOT 为 `Implemented`。
-- **FR-006**: MUST 交付框架自有的确定性脚本 [[STR-005]]。它读取 `requirements.md`、`plan.md`、`tasks.md`、`verification.md`、特性注册表／详情与依赖特性详情，输出 [[STR-006]] 或 [[STR-007]]；`block` 时 MUST 给出**封闭原因集**中的命名原因：[[STR-008]]、[[STR-009]]（后接 `SC-NNN`）、[[STR-010]]（后接 `SC-NNN`）、[[STR-011]]（后接 `RS-NNN`）、[[STR-012]]（后接 `EP-NNN`）、[[STR-013]]（后接依赖特性 ID）、[[STR-014]]。退出码 MUST 区分三态：0 = [[STR-006]]、1 = [[STR-007]]、2 = 输入缺失或不可解析。输出 MUST 同时给出 [[STR-003]] 路径的三计数（`final_pass` / `final_blocked` / `final_deferred`），供 FR-015 的 Acceptance Reality Check 直接引用，MUST NOT 由第二处重新统计。脚本 MUST 只读、stdlib-only、不含模型判断。
+- **FR-006**: MUST 交付框架自有的确定性脚本 [[STR-005]]。它读取 `requirements.md`、`plan.md`、`tasks.md`、`verification.md`、特性注册表／详情与依赖特性详情，输出 [[STR-006]] 或 [[STR-007]]；`block` 时 MUST 给出**封闭原因集**中的命名原因：[[STR-008]]、[[STR-009]]、[[STR-010]]、[[STR-011]]、[[STR-012]]、[[STR-013]]、[[STR-014]]——七个字面量的唯一规范形态见 `## Shared Strings`，发射时必须逐字使用该形态（冒号是参数分隔符，裸原因码不带尾随冒号，参数占位符不得改写）。退出码 MUST 区分三态：0 = [[STR-006]]、1 = [[STR-007]]、2 = 输入缺失或不可解析。输出 MUST 同时给出 [[STR-003]] 路径的三计数（`final_pass` / `final_blocked` / `final_deferred`），供 FR-015 的 Acceptance Reality Check 直接引用，MUST NOT 由第二处重新统计。脚本 MUST 只读、stdlib-only、不含模型判断。
 - **FR-007**: [[STR-005]] MUST 有 pytest 契约／单元测试与两套最小夹具：① 负夹具复现 026 模式（任务全关、每条 SC 有状态行、final-path SC 全 `blocked`/`deferred`），断言 [[STR-007]] 且原因在封闭集内；② 正夹具（final-path 全 `pass`、smoke 记录齐备），断言 [[STR-006]]。夹具 MUST 是声明式最小文件集（requirements/plan/tasks/verification/注册表），MUST NOT 依赖真实特性目录。
 - **FR-008**: [[STR-005]] MUST 被三处调用：`/speckit.implement`（`Planned → Implemented` 判定前）、`/speckit.review`（`Implemented → Ready for Review` 判定前）、`sdd-loop-driver` 的 closure/merge 步。任一处得到 [[STR-007]] MUST 拒绝该转移或合并并输出命名原因；MUST NOT 用模型判断代替脚本判定。
 
@@ -201,12 +201,12 @@
 - **SC-001**: 026 形态被三处门拒绝——负夹具（任务全关、每条 SC 有状态行、[[STR-003]] 路径 SC 全 `blocked`/`deferred`）分别触发 `/speckit.implement`、`/speckit.review`、driver closure/merge，三处全部输出 [[STR-007]]（3/3 拒绝，0 处放行）；每次拒绝的命名原因逐字命中封闭集其一（[[STR-008]] / [[STR-009]] / [[STR-014]] 之一，3/3），不得为自由文本。**Path**: final
 - **SC-002**: 正路径不误杀且 smoke 是硬条件——正夹具（[[STR-003]] 路径 SC 全 `pass` + smoke 记录齐备）走完 `Planned → Implemented → Ready for Review` 全程 [[STR-006]]，误拒 0（2/2）；同一夹具删掉 smoke 记录后状态 MUST 为 [[STR-001]] 而非 `Implemented`（1/1）。**Path**: final
 - **SC-003**: 词表与状态机对齐——[[STR-001]] 在三处 owner 各出现且语义一致（3/3）；`templates/feature-details-template.md` 的转移表含四条新增行（`Planned→Blocked`、`Blocked→Implemented`、`Blocked→Ready for Review` 非法、`Implemented→Blocked` 审计例外，4/4）；never-regress-status 的窄例外存在（1/1）。**Path**: supporting
-- **SC-004**: 验证词表与测量阶梯可判——词表 owner 含 [[STR-002]]（1/1）；`blocked`/`deferred`/`partial` 行缺任一必填字段、或存在可用 reduced measurement 而 `reduced_measurement_run=no` 时均被判非法（夹具 3/3），其中「有可用测量却未跑」一项 MUST 命中 [[STR-010]]。**Path**: supporting
+- **SC-004**: 验证词表与测量阶梯可判——词表 owner 含 [[STR-002]]（1/1）；`blocked`/`deferred`/`partial` 行缺任一必填的 `SC-NNN_` 前缀阶梯字段、或 `SC-NNN_reduced_measurement` 非空而 `SC-NNN_reduced_measurement_run=no` 时均被判非法（夹具 3/3），其中「非空却未跑」一项 MUST 命中 [[STR-010]]。**Path**: supporting
 - **SC-005**: 所有权与前提是结构化一等产物——本 requirements 的运行时栈表行数 ≥1 且每行 `Form` 合法（分母 = 实测行数，L/L）；plan 的 Execution Premises 与 Inherited Blockers 表存在，依赖特性 deferred 行处置率 100%（100%）；四类确定性缺陷各被指名抓到（4/4）。**Path**: supporting
 - **SC-006**: review 四段与 Acceptance Reality Check 齐备且可定位——一次 review 的 `review.md` 同时含产物审查段（覆盖当次实际存在的每个阶段产物，覆盖率 = 实测分母）、实现审查段（含 smoke 命令原文、退出码、证据路径，3/3）与 Acceptance Reality Check 的 final-path 三计数（`pass`/`blocked`/`deferred` 齐备，3/3）；每条 finding 带严重度与「产物路径 + 行号」（抽样 L/L）；负夹具下产出 P0 [[STR-016]] 并拒绝转移（1/1）。实现期可确定性测量的部分是**结构与 schema**：组合声明存在且段数与固定顺序与 A3 一致、finding 定位字段可解析、三计数行齐备、负夹具下 [[STR-016]] 与拒绝转移；「一次真实 review 的 `review.md`」只能在 review 阶段采证。**Path 裁决**：这里保持 [[STR-004]]（clarify 的显式裁决）——若把它记为 [[STR-003]]，081 自身的 `Planned → Implemented` 将要求 SC-006 为 `pass`，而 SC-006 只能在 review 阶段测量，同时 `Blocked → Ready for Review` 非法（FR-003），于是形成无解的循环门禁；review 处的**门禁强制力**已由 SC-001 的第三个调用点（[[STR-003]] 路径）覆盖，因此保持 [[STR-004]] 不失去约束。**Path**: supporting
 - **SC-007**: 审计只读且可判——[[STR-015]] 在既有仓库上运行时文件系统零写入（`git status --porcelain` 增量行数 = 0）、历史特性状态零变更（0 变更），输出清单每行带原因列（L/L）。**Path**: supporting
 - **SC-008**: smoke 记录存在且可复现——081 的 `tasks.md`／`verification.md` 给出恰好一条 smoke 记录（命令原文、退出码、证据路径，3/3），同一命令连跑两次退出码相同（2/2），且该命令覆盖 FR-005 要求的三件事（3/3）。**Path**: supporting
-- **SC-009**: 框架卫生，含一条可判定的包含性声明——① `python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0（2/2）；② 测试基线包含性成立，五要件齐备：**基线参照物** = 本特性实现起始提交上由 `bash scripts/bash/run-tests.sh` 采集的失败用例 id 集合（存于 `<spec-dir>/baseline-failed.txt`）；**比较单元** = 失败用例 id 集合（按 id 比对，不按字节，也不用「全仓测试」这类未定义聚合词）；**允许差异集来源** = 空集（新失败一条都不允许，机械可得）；**补集与不变量** = `head 失败集 − 基线失败集` MUST 为空（0 个新增失败），而 `基线失败集 − head 失败集` MUST 逐条列为已修复项（MUST NOT 静默丢弃）；③ `CHANGELOG.md` 含本特性条目（1/1）；④ schema 唯一性：由 Shared Strings 表与 owner 文档章节目录**机械导出**的列名与取值域字面量，在 `templates/` 与 `shared/` 两类路径下的出现点，除 owner 文档外 MUST 为 0，且守卫测试把真实命中枚举出来并断言等于豁免清单（0 个未豁免命中）。**Path**: supporting
+- **SC-009**: 框架卫生，含一条可判定的包含性声明——① `python3 scripts/python/regen-command-copies.py --check` 与 `python3 scripts/python/sync-mirrors.py --check` 均 exit 0（2/2）；② 测试基线包含性成立，五要件齐备：**基线参照物** = 本特性实现起始提交上由 `bash scripts/bash/run-tests.sh` 采集的失败用例 id 集合（存于 `<spec-dir>/baseline-failed.txt`）；**比较单元** = 失败用例 id 集合（按 id 比对，不按字节，也不用「全仓测试」这类未定义聚合词）；**允许差异集来源** = 空集（新失败一条都不允许，机械可得）；**补集与不变量** = `head 失败集 − 基线失败集` MUST 为空（0 个新增失败），而 `基线失败集 − head 失败集` MUST 逐条列为已修复项（MUST NOT 静默丢弃）；③ `CHANGELOG.md` 含本特性条目（1/1）；④ schema 唯一性：由 Shared Strings 表与 owner 文档章节目录**机械导出**的列名与取值域字面量，在 `templates/` 与 `shared/` 两类路径下的出现点，除 owner 文档外 MUST 为 0，且守卫测试把真实命中枚举出来并断言等于豁免清单（0 个未豁免命中）。`data-model.md` 与 `contracts/` 记为**投影面（projection surfaces）**：它们为测试逐字匹配而展开 owner 的列名与取值域，故不计入上述命中数，豁免 MUST 有可执行的测试理由——守卫测试必须同时断言 (a) `data-model.md` 中 `From | To | Allowed | Condition` 形态的状态转移表行数为 **0**（§ E-8 只允许指针）；(b) 投影面使用的每一个取值域字面量都属于 owner 导出的取值域（投影只能收缩，MUST NOT 扩张）。**Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
@@ -218,7 +218,7 @@
 - **SC-006 Source**: 一次真实 review 的 `review.md` 分段解析（段存在性、三计数行、finding 定位字段），加负夹具的运行结论。
 - **SC-007 Source**: 审计模式运行前后的 `git status --porcelain` 与 `features.md`／`features/*.md` 状态字段快照。
 - **SC-008 Source**: `tasks.md`／`verification.md` 中的 smoke 记录行；同一命令两次运行的退出码。
-- **SC-009 Source**: 两个 `--check` 的退出码；`<spec-dir>/baseline-failed.txt` 与 head 失败集的两集合差（采集命令与基线相同，id 级比对）；`CHANGELOG.md` 检索；由 Shared Strings 表与 owner 章节导出的字面量清单 × `templates/` 与 `shared/` 的出现点枚举（守卫测试输出）。
+- **SC-009 Source**: 两个 `--check` 的退出码；`<spec-dir>/baseline-failed.txt` 与 head 失败集的两集合差（采集命令与基线相同，id 级比对）；`CHANGELOG.md` 检索；由 Shared Strings 表与 owner 章节导出的字面量清单 × `templates/` 与 `shared/` 的出现点枚举，外加投影面的两条豁免断言（`data-model.md` 的转移表行数 = 0、投影面取值域 ⊆ owner 取值域）——三者同由守卫测试 `tests/contract/test_acceptance_schema_ownership.py` 输出（该模块是 SC-009 ④ 的唯一测试载体，归 081d）。
 
 ## Constraints（落地约束，判据在外部 owner）
 
@@ -239,17 +239,19 @@
 | `STR-006` | `accept` | FR-006, SC-002 |
 | `STR-007` | `block` | FR-006, FR-008, FR-017, SC-001 |
 | `STR-008` | `zero-final-path-pass` | FR-006, SC-001 |
-| `STR-009` | `final-path-not-pass:` | FR-006, SC-001 |
-| `STR-010` | `blocked-without-measurement-ladder:` | FR-006, SC-004 |
-| `STR-011` | `runtime-dependency-not-owned:` | FR-006, FR-009 |
-| `STR-012` | `falsified-premise-undecided:` | FR-006, FR-010 |
-| `STR-013` | `inherited-blocker-undisposed:` | FR-006, FR-011 |
+| `STR-009` | `final-path-not-pass: SC-NNN` | FR-006, SC-001 |
+| `STR-010` | `blocked-without-measurement-ladder: SC-NNN` | FR-006, SC-004 |
+| `STR-011` | `runtime-dependency-not-owned: RS-NNN` | FR-006, FR-009 |
+| `STR-012` | `falsified-premise-undecided: EP-NNN` | FR-006, FR-010 |
+| `STR-013` | `inherited-blocker-undisposed: <feature>:<row>` | FR-006, FR-011 |
 | `STR-014` | `status-claims-implemented-but-blocked` | FR-006, SC-001 |
 | `STR-015` | `--audit-existing` | FR-020, SC-007 |
 | `STR-016` | `F-ACCEPTANCE` | FR-015, SC-006 |
 | `STR-017` | `shared/workflow/acceptance-hardening.md` | FR-022 |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal.
+
+**Closed reason set — one canonical spelling (this table is its owner)**: the seven reason literals are exactly `STR-008`…`STR-014` as written above. The colon is the **argument separator**, not part of the literal: a bare reason code never carries a trailing colon, and a citation MUST write the whole form above — never the code alone, never a code with a bare trailing colon, never a different argument placeholder (e.g. `SC-NNN` vs `SC-###` vs `<id>`). `STR-008` and `STR-014` take no argument. Consumers MUST match verbatim against these forms: the checker's emission (FR-006), the reason assertion in the contract test (FR-007), the contract clause set, and the ARC presentation all quote this table and MUST NOT introduce a second spelling.
 
 ## Clarifications
 

@@ -10,16 +10,16 @@
 
 ## Feature status (`Blocked`) — SM-1
 
-- **SV-03**: `templates/feature-details-template.md` § Canonical Status State Machine MUST carry the `Blocked` row set of `data-model.md` § E-8, including the explicit **illegal** `Blocked → Ready for Review`, and MUST express `Planned → Implemented` as four conjunctive conditions.
+- **SV-03**: `templates/feature-details-template.md` § Canonical Status State Machine MUST carry the `Blocked` row set as defined by the schema owner `shared/workflow/acceptance-hardening.md` § Feature Status ([[STR-017]]) — including the explicit **illegal** `Blocked → Ready for Review` — and MUST express `Planned → Implemented` as four conjunctive conditions. This contract designates no row set of its own, and neither does `data-model.md` § E-8: both point at the owner and MUST NOT restate the `From | To | Allowed | Condition` rows.
 - **SV-04**: The `Implemented → Blocked` transition MUST be permitted only as an audit correction and MUST require cited evidence; every other backward transition remains illegal, and the never-regress rule carries exactly that one narrow exception.
 - **SV-05**: The `Implemented → Ready for Review` gate MUST state its fourth condition (no `final`-path SC in `blocked`/`deferred`/`fail` without an explicit **user** waiver) **in that owner block only**; `/speckit.review`, `/speckit.checklist` and `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate MUST reference the block and MUST NOT restate the condition.
-- **SV-06**: `templates/feature-index-template.md` and `skills/internal/manage-features/SKILL.md` MUST each carry `Blocked` in their own status vocabulary; neither may point at another file *instead of* carrying the value, because each is the vocabulary of a distinct consumer (index row / management skill).
+- **SV-06**: `templates/feature-index-template.md` and `skills/internal/manage-features/SKILL.md` MUST each carry `Blocked` in their own status vocabulary; neither may point at another file *instead of* carrying the value, because each is the vocabulary of a distinct consumer (index row / management skill). Measured state recorded so the obligation is not read as an insertion: `templates/feature-index-template.md` is a 21-line file whose only status surface is the `Status` **column header** of its index table — it carries **no value-domain list** today, so its obligation is to **add** a closed status vocabulary containing `Blocked`, not to insert one value into an existing list. The transition rows and the row-level semantics stay with the owner named in SV-03.
 - **SV-07**: A waiver of the fourth condition MUST be a user-authored artifact or the user's own ruling; a driver's or agent's confirmation, and the absence of objection, are never waivers.
 
 ## Verification vocabulary — SM-3
 
 - **SV-08**: `templates/verification-log-template.md` MUST declare the six-value set `pass` / `fail` / `partial` / `blocked` / `deferred` / `unknown` and MUST distinguish `blocked` from `deferred` in one sentence each (feature not acceptable vs feature still acceptable on a `supporting` path).
-- **SV-09**: The same file MUST carry the five ladder fields and the illegal-row rule (a ladder is available but `reduced_measurement_run=no`).
+- **SV-09**: The same file MUST carry the five ladder fields under their `SC-NNN_`-prefixed names (`SC-NNN_blocked_at`, `SC-NNN_reduced_measurement`, `SC-NNN_reduced_measurement_run`, `SC-NNN_why_reduced_insufficient`, `SC-NNN_unblock`) and the illegal-row rule, whose trigger is mechanical: `SC-NNN_reduced_measurement` non-empty AND `SC-NNN_reduced_measurement_run=no`.
 - **SV-10**: The same file MUST carry the three-field smoke record (command / exit code / evidence path) and the "exactly one per feature" rule.
 - **SV-11**: No gate, DoD row or task row MAY narrow the vocabulary to a subset of the six values.
 

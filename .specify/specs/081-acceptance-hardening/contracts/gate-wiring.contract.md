@@ -12,7 +12,7 @@
 
 ## The four deterministic findings (no second gate system)
 
-- **GW-05**: The four findings (`runtime-dependency-not-owned`, `falsified-premise-undecided`, `inherited-blocker-undisposed`, and the runtime-row emptiness check that maps onto the first) MUST be implemented in the existing `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`.
+- **GW-05**: The four findings (`runtime-dependency-not-owned: RS-NNN`, `falsified-premise-undecided: EP-NNN`, `inherited-blocker-undisposed: <feature>:<row>`, and the runtime-row emptiness check that maps onto the first) MUST be implemented in the existing `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`; the literals are quoted verbatim from `requirements.md` § Shared Strings ([[STR-011]]…[[STR-013]]), never re-spelled here.
 - **GW-06**: They MUST be surfaced through the existing gate rows in `shared/workflow/expression-gates.md` (`G-req-clarity` for the requirements stage, `G-plan-fact` for the plan stage) and MUST NOT create a new gate registry row, a new checker script or a parallel blocking path.
 - **GW-07**: Each finding MUST carry the same `check` / `severity` / `path` / `line` / `message` shape the script already emits, and MUST be waivable through the existing `--waive CHECK:REL_PATH:LINE` form.
 

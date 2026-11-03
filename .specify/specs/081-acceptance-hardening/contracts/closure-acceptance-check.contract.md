@@ -20,7 +20,7 @@ One deterministic source of truth for "may this feature be called `Implemented`?
 
 - **C-07**: The verdict MUST be exactly one of `accept` / `block`. There is no third value, no severity scale, and no advisory tier.
 - **C-08**: The payload MUST carry `final_path = {pass, blocked, deferred, fail, unknown, total}` computed by this script. No caller, template or report MAY recompute those counts; the report copies them.
-- **C-09**: Every `block` MUST carry at least one reason whose `code` is verbatim one of the seven closed values: `zero-final-path-pass`, `final-path-not-pass`, `blocked-without-measurement-ladder`, `runtime-dependency-not-owned`, `falsified-premise-undecided`, `inherited-blocker-undisposed`, `status-claims-implemented-but-blocked`. A reason outside the set is a defect of the checker, not a finding about the feature.
+- **C-09**: Every `block` MUST carry at least one reason whose `code` is verbatim one of the seven closed values: `zero-final-path-pass`, `final-path-not-pass: SC-NNN`, `blocked-without-measurement-ladder: SC-NNN`, `runtime-dependency-not-owned: RS-NNN`, `falsified-premise-undecided: EP-NNN`, `inherited-blocker-undisposed: <feature>:<row>`, `status-claims-implemented-but-blocked`. The single canonical spelling of each is owned by `requirements.md` § Shared Strings (`STR-008`…`STR-014`): the colon is the argument separator, so no bare reason code carries a trailing colon, and the argument placeholder is part of the literal. A reason outside the set is a defect of the checker, not a finding about the feature.
 
 ## Exit codes and modes
 
@@ -33,7 +33,7 @@ One deterministic source of truth for "may this feature be called `Implemented`?
 - **C-13**: From `requirements.md` it MUST read the SC definition lines and their `**Path**` markers, and the rows of `§ Runtime Stack & Dependency Ownership`. It MUST treat an unparsable `Path` marker as an input error (C-02), never as a `block` reason.
 - **C-14**: From `plan.md` it MUST read `§ Execution Premises` rows and `§ Inherited Blockers` rows; both sections MUST be present for an `execution`-class feature, and their absence is an input error (the plan artifact is incomplete, not the feature failing).
 - **C-15**: From `tasks.md` it MUST count `[ ]`, `[>]` and `[~]` rows.
-- **C-16**: From `verification.md` it MUST read each `SC-NNN_status`, the five measurement-ladder fields and the three smoke fields; it MUST evaluate V-5/V-6 of `data-model.md` (missing ladder field, or a ladder available but not run).
+- **C-16**: From `verification.md` it MUST read each `SC-NNN_status`, the five measurement-ladder fields by their `SC-NNN_`-prefixed names (`SC-NNN_blocked_at`, `SC-NNN_reduced_measurement`, `SC-NNN_reduced_measurement_run`, `SC-NNN_why_reduced_insufficient`, `SC-NNN_unblock`) and the three smoke fields; it MUST evaluate V-5/V-6 of `data-model.md` (a missing ladder field, or `SC-NNN_reduced_measurement` non-empty while `SC-NNN_reduced_measurement_run=no`).
 - **C-17**: From the dependency features' details it MUST extract `## Deferred` rows, `verification.md` status rows in `blocked`/`deferred`, and `deferred_tasks=` lists, and it MUST require each extracted row to appear with a disposition in `plan.md` § Inherited Blockers.
 
 ## Traceability

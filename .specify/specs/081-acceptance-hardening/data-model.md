@@ -2,6 +2,8 @@
 
 **Owner boundary**: this file defines the **entities, fields and validation rules** the feature introduces; the *schema authority* for the four new tables, the two vocabularies and the closed reason set is `shared/workflow/acceptance-hardening.md` (requirements [[STR-017]]). Where this file and that owner disagree, the owner wins and this file is stale.
 
+**Projection surface (SC-009 ④)**: this file is a declared projection of the owner — its value domains may narrow the owner's, never expand them, and it restates no state-transition row set (see § E-8). The uniqueness guard asserts exactly those two properties instead of counting this file's literals as duplicate hits.
+
 **Census**: 10 entities (E-1 … E-10), 26 validation rules (V-1 … V-26), 2 state machines (SM-1 feature status, SM-2 line state), 1 closed reason set (7 values), 2 closed vocabularies (verification status, runtime-stack form).
 
 Every entity below states its **carrier** (the file that physically holds it) and its **parser** (the code that reads it) — the two must be named together, because an entity whose carrier exists but whose parser does not is exactly the "green check that proves nothing" failure mode (Constitution XVI).
@@ -42,7 +44,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 
 - **V-4**: the vocabulary is a closed six-value set; the owner of the set is `templates/verification-log-template.md` and no gate may narrow it to a subset.
 - **V-5**: a `blocked` / `deferred` / `partial` row missing any of the five ladder fields is **illegal**.
-- **V-6**: a row whose `reduced_measurement` is non-empty while `reduced_measurement_run=no` is **illegal** — honesty is not an accepted substitute (reason [[STR-010]] `blocked-without-measurement-ladder: SC-NNN`).
+- **V-6**: a row whose `SC-NNN_reduced_measurement` is non-empty while `SC-NNN_reduced_measurement_run=no` is **illegal** — honesty is not an accepted substitute (reason [[STR-010]]). The trigger is mechanical: it reads *non-empty*, never "available".
 - **V-7**: `blocked` means *the environment cannot measure this assertion, so the feature is not acceptable*; `deferred` means *not attempted this round and the feature may still be acceptable* — the second is only legal on a `supporting`-path SC.
 
 ## E-3 — Smoke test record
@@ -75,7 +77,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 
 **Closed reason set (7, no growth without an owner revision)**: `zero-final-path-pass`, `final-path-not-pass: SC-NNN`, `blocked-without-measurement-ladder: SC-NNN`, `runtime-dependency-not-owned: RS-NNN`, `falsified-premise-undecided: EP-NNN`, `inherited-blocker-undisposed: <feature>:<row>`, `status-claims-implemented-but-blocked`.
 
-- **V-11**: `zero-final-path-pass` is emitted once when the `final`-path `pass` count is zero; `final-path-not-pass: SC-NNN` is emitted per failing SC when at least one other `final`-path SC passed. Both are in the set, so either satisfies "a named reason".
+- **V-11**: `zero-final-path-pass` is emitted once when the `final`-path `pass` count is zero; `final-path-not-pass: SC-NNN` is emitted per failing SC when at least one other `final`-path SC passed. Both are in the set, so either satisfies "a named reason". For an `expression`-class feature the `final`-path rule is **vacuous** (V-1 / FR-001 / Edge Case "只有 supporting SC 的表达类特性"): when the `Path` marker parse succeeds and the feature class is `expression`, neither reason may be emitted merely because there is no `final`-path SC — the class is read from `flow_class` in the same payload (E-4), so the exemption is mechanical, not a judgement.
 - **V-12**: `status-claims-implemented-but-blocked` fires only when the claimed status is `Implemented` or `Ready for Review` **and** the verdict is `block` — i.e. it is the ARC's deterministic basis, and it can never fire during `Planned → Implemented` (where the claimed status is `Planned`).
 - **V-13**: `--audit-existing` is zero-write and exits `0` whenever inputs are valid, regardless of findings; it MUST NOT block anything and MUST NOT rewrite history.
 - **V-14**: the checker is read-only and stdlib-only; it MUST NOT consult a model, a network, or `.specify/.tmp`.
@@ -96,7 +98,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 | `FR` | `FR-NNN` list | required for `in-scope` (the FR that delivers it) |
 
 - **V-15**: `in-scope` means **this feature delivers the capability**; a capability supplied externally and only consumed here MUST be `signed-contract` (or `user-waived`) — recording it `in-scope` merely renames outsourcing.
-- **V-16**: a prose-only dependency declaration with no row is a violation ([[STR-011]] `runtime-dependency-not-owned`). The defect is not "there is an external dependency"; it is "the dependency exists only as prose".
+- **V-16**: a prose-only dependency declaration with no row is a violation ([[STR-011]]). The defect is not "there is an external dependency"; it is "the dependency exists only as prose".
 - **V-17**: `user-waived` MUST cite the user ruling and state the residual risk.
 
 ## E-6 — Execution Premise
@@ -135,17 +137,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 **Carrier**: `templates/feature-details-template.md` § Canonical Status State Machine; the live value lives in `.specify/memory/features/<ID>.md` `**Status**` and in the `features.md` row.
 **Parser**: `/speckit.implement`, `/speckit.review`, `manage-features`, the closure checker (claimed-status input).
 
-| From | To | Allowed | Condition |
-|---|---|---|---|
-| (n/a) | `Draft` | yes | `/speckit.feature` |
-| `Draft` | `Planned` | yes | `/speckit.plan` artifacts + no unjustified Fail |
-| `Planned` | `Implemented` | yes | four conjunctive conditions: zero `[ ]`; every SC has a status row; **every `final`-path SC is `pass`**; **the smoke record is `pass`** |
-| `Planned` | `Blocked` | yes | tasks closed but at least one `final`-path SC is not `pass` |
-| `Blocked` | `Implemented` | yes | blocker lifted **and** every `final`-path SC is `pass` |
-| `Blocked` | `Ready for Review` | **illegal** | — |
-| `Implemented` | `Blocked` | yes, only as audit correction | MUST cite evidence |
-| `Implemented` | `Ready for Review` | yes | four conjunctive conditions (the fourth added by this feature) |
-| `Ready for Review` | `Completed` | yes | final acceptance |
+**Row set owner**: `shared/workflow/acceptance-hardening.md` § Feature Status ([[STR-017]]) owns the `From | To | Allowed | Condition` rows for `Draft` / `Planned` / `Blocked` / `Implemented` / `Ready for Review` / `Completed`, including the explicitly **illegal** `Blocked → Ready for Review` and the narrow `Implemented → Blocked` audit-correction row; `templates/feature-details-template.md` § Canonical Status State Machine is the carrier those rows must physically land in (FR-002 / FR-003 / FR-018). This section keeps only the entity boundary, its carrier and parser, and the two rules the checker reads below — the transition table MUST NOT be restated here (SC-009 ④ asserts **0** transition rows in this file; a restated row is an unguarded duplicate).
 
 - **V-23**: the never-regress rule gains exactly one narrow exception — `Implemented → Blocked` with cited audit evidence; every other backward move stays illegal.
 - **V-24**: `Implemented → Ready for Review`'s fourth condition: no `final`-path SC in `blocked` / `deferred` / `fail`, unless an explicit **user** waiver exists (a driver's or agent's confirmation is never a user ruling).
@@ -195,6 +187,9 @@ Findings are never merged across families, never converted, never scored as one 
 | `negative` | zero `[ ]`, every SC has a status row, every `final`-path SC is `blocked`/`deferred` (the 026 shape) | V-23/V-9 block at all three call sites with a named reason |
 | `premise-mutation` | one `falsified` premise with `Decision` removed | `falsified-premise-undecided: EP-NNN` |
 | `runtime-gap-mutation` | one runtime dependency present as prose only; one `signed-contract` row with empty `Pin` | `runtime-dependency-not-owned: RS-NNN` |
-| `ladder-mutation` | a `blocked` row with all five ladder fields; then `reduced_measurement_run=no` | `blocked-without-measurement-ladder: SC-NNN` |
+| `ladder-mutation` | a `blocked` row with all five ladder fields; then `SC-NNN_reduced_measurement_run=no` | `blocked-without-measurement-ladder: SC-NNN` |
 | `smoke-mutation` | `positive` with the smoke record removed | feature is `Blocked`, never `Implemented` |
+| `mixed-path` | an `execution` feature with three SCs: `SC-001` `final` `pass`, `SC-002` `final` `fail`, `SC-003` `supporting` `deferred` (full ladder) | V-11 + Edge Case "final 与 supporting 混合": the reason is `final-path-not-pass: SC-002` (`zero-final-path-pass` is **not** emitted, since one `final` passed), and the lone `supporting` non-`pass` is not a standalone blocking reason |
+| `expr-supporting-only` | an `expression` feature whose SCs are all `supporting`, one of them `deferred` with the full ladder | V-11's `expression` exemption: the `final`-path rule is vacuous — no `final`-path reason is emitted and the fixture MUST NOT be forced to invent a `final` SC |
+| `execution-without-final` | an `execution` feature whose SCs are all `supporting` (zero `final`-path SC) | V-1 via `validate-requirements.py` check `path-marker` (an `execution` feature with zero `final`-path SC **fails**), and at the checker layer `final_path.total = 0` so V-11's `zero-final-path-pass` applies |
 | `audit-history` | an `Implemented` feature that would become `Blocked` under the new rules | `--audit-existing` reports it, writes nothing, exits 0 |
