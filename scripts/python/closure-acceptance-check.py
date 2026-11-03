@@ -116,8 +116,10 @@ LADDER_FIELDS = (
     "unblock",
 )
 SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path")
-#: `final_path` is a closed count record (C-08): five status buckets plus the total.
-FINAL_PATH_BUCKETS = ("pass", "blocked", "deferred", "fail", "unknown")
+#: `final_path` is a closed count record (C-08): six status buckets plus the total. The set is the
+#: owner doc's (`§ Closure Verdict`), not this file's: `unknown` means *no status row exists*,
+#: while `partial` is a measured status and is therefore counted as itself.
+FINAL_PATH_BUCKETS = ("pass", "blocked", "deferred", "partial", "fail", "unknown")
 
 FLOW_CLASSES = ("execution", "expression")
 #: An undeclared class degrades to `execution` — the strict side. 077 FR-004 owns the default, and

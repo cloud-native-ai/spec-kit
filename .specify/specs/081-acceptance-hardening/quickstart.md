@@ -91,41 +91,61 @@ This is premise **EP-002 `falsified`** in `plan.md`, with `Decision: resolve-in-
 
 ---
 
-## S6 — The closure check on the two fixtures (not yet executable; route (b))
+## S6 — The closure check on the two fixtures (executed 2026-11-03)
 
 ```bash
 python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/positive --json
 python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative --json
 ```
 
-**NOT executed — the script and fixtures do not exist yet.** Declared expected results (route (b), not a claim): the first exits `0` with `"verdict": "accept"`; the second exits `1` with `"verdict": "block"` and a reason set ⊆ the seven closed codes, containing `zero-final-path-pass`.
+**Executed 2026-11-03** (implement 081a; the script and the seven fixtures exist). Measured:
 
-> **Premises**: (1) the fixture directories are declarative minimal file sets — `requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail and a registry row (no real feature is referenced); (2) `--spec-dir` accepts a fixture path that is not under `.specify/specs/`; (3) the checker resolves the claimed status from the fixture's own detail/registry when `--feature-detail` is passed; (4) exit codes are `0/1/2` exactly as `contracts/closure-acceptance-check.contract.md` C-10 states. Route (b): pinned by `tests/contract/test_closure_acceptance_check.py` (positive + negative + ladder + premise + runtime-gap mutation cases).
+```
+positive → EXIT=0, "verdict": "accept",  final_path pass=1 total=1, "reasons": []
+negative → EXIT=1, "verdict": "block",   final_path pass=0 blocked=1 deferred=1 total=2,
+           "reasons": [{code: "zero-final-path-pass", target: ""}]
+```
+
+The same two runs are asserted by `tests/contract/test_closure_acceptance_check.py` (positive +
+negative + ladder + smoke + premise/runtime-gap mutation cases), so this block is a **route (a)**
+observation backed by a route (b) pin.
+
+> **Premises**: (1) the fixture directories are declarative minimal file sets — `requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail and a registry row (no real feature is referenced); (2) `--spec-dir` accepts a fixture path that is not under `.specify/specs/`; (3) the claimed status resolves from the fixture's own `feature-detail.md` / `feature-registry.md` when no `--feature-detail` is passed (contract C-03's spec-local layer; measured above, `claimed_status_source` names each fixture's own detail file); (4) exit codes are `0/1/2` exactly as `contracts/closure-acceptance-check.contract.md` C-10 states.
 
 ---
 
-## S7 — Read-only audit mode (not yet executable; route (b))
+## S7 — Read-only audit mode (flag present, mode is 081d)
 
 ```bash
 python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/080-humanize-run-output --audit-existing
 git status --porcelain | wc -l
 ```
 
-**NOT executed — the script does not exist yet.** Declared expectation: the audit lists the features that would become `Blocked` under the new rules, writes nothing, and exits `0`; the `git status --porcelain` line count is identical before and after.
+**Not claimable in 081a — the flag exists, the mode does not.** The script is on disk and
+`--audit-existing` is on its stable surface (C-04), but passing it exits `2` with an explicit
+"not implemented in this slice" message (`ModeNotImplemented`), which is deliberate: an
+unimplemented audit mode MUST NOT emit a per-feature verdict, because its exit code would then
+report the opposite of what C-10 requires of the mode. Declared expectation once 081d lands it: the
+audit lists the features that would become `Blocked` under the new rules, writes nothing, and exits
+`0`; the `git status --porcelain` line count is identical before and after.
 
-> **Premises**: (1) `080-humanize-run-output` carries an `Implemented`-family claimed status for its bound Feature 062 (verify with `.specify/memory/features.md` before citing); (2) audit mode never writes, including no cache or lock file; (3) the audit's exit code reflects input validity only (C-10). Route (b): pinned by `tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing` (zero-write assertion against `git status --porcelain`) plus `tests/fixtures/acceptance-hardening/audit-history/`.
+> **Premises**: (1) `080-humanize-run-output` carries an `Implemented`-family claimed status for its bound Feature 062 (verify with `.specify/memory/features.md` before citing); (2) audit mode never writes, including no cache or lock file; (3) the audit's exit code reflects input validity only (C-10). **Carriers are 081d deliverables, not existing**: `tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing` and `tests/fixtures/acceptance-hardening/audit-history/` are both authored in 081d (contract traceability row FR-020).
 
 ---
 
-## S8 — The feature's own single smoke (not yet executable; route (b))
+## S8 — The feature's own single smoke (executed 2026-11-03)
 
 ```bash
 bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q
 ```
 
-**NOT executed — the test does not exist yet.** This is **the** smoke command this feature records in `verification.md` (`smoke_command`), and by FR-005 it must cover exactly three sub-checks: (A) `specify init` on a temp fixture, (B) the closure checker on the positive and negative fixtures, (C) `python3 scripts/python/regen-command-copies.py --check`. It must be runnable twice with the same exit code.
+**Executed 2026-11-03** (implement part 4): exit `0`, and the test exists — it is **the** smoke
+command this feature records in `verification.md` (`smoke_command`), covering exactly the three
+sub-checks FR-005 requires: (A) `specify init` on a temp fixture, (B) the closure checker on the
+positive and negative fixtures, (C) `python3 scripts/python/regen-command-copies.py --check`. It was
+run twice with the same exit code; `test-evidence/smoke-081.txt` holds the recorded triple.
 
-> **Premises**: (1) `scripts/bash/run-tests.sh` resolves `.venv/bin/python` (verified in S1 through `--collect-only`); (2) the test uses `tmp_path` for every fixture it creates, so nothing is written outside the pytest temp root except the deterministic evidence file `<spec-dir>/test-evidence/smoke-081.txt`; (3) no network is used; (4) the `specify` console script exists (S5 premise 1). Route (b): the smoke test pins itself — its three sub-checks are its own assertions, and the test's own existence is checked by the plan's `verification.md`-side record.
+> **Premises**: (1) `scripts/bash/run-tests.sh` resolves `.venv/bin/python` (verified in S1 through `--collect-only`); (2) the test uses `tmp_path` for every fixture it creates, so nothing is written outside the pytest temp root **except** `<spec-dir>/test-evidence/smoke-081.txt`, which is a **tracked** file — running the smoke rewrites it, so `git status` shows that file dirty after a run. That is the evidence-writing mechanism, not drift: review the diff and commit it deliberately rather than reverting it; (3) no network is used; (4) the `specify` console script exists (S5 premise 1) and its repo-root fallback is gated on `src/specify_cli/__init__.py`.
 
 ---
 
@@ -140,6 +160,12 @@ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition
 bash scripts/bash/run-tests.sh tests/contract/test_line_state_blocked.py -q
 ```
 
-**NOT executed — the tests do not exist yet.** Declared expectation: on the negative fixture, all three sites refuse (3/3) each with a named reason from the closed set, and the driver site leaves the line `blocked` rather than `completed`.
+**Partially executable — 1 of 3 sites has a test today.** The implement leg is green
+(`tests/contract/test_gate_wiring_081.py`); `tests/contract/test_acceptance_review_composition.py`
+and `tests/contract/test_line_state_blocked.py` are **081c / 081d deliverables, not existing**, and
+081a asserts their call sites as absent-with-reason rather than pretending to cover them. Declared
+expectation once all three exist: on the negative fixture, all three sites refuse (3/3) each with a
+named reason from the closed set, and the driver site leaves the line `blocked` rather than
+`completed`.
 
-> **Premises**: (1) `integrate-lines.py` exposes the quality gate through its existing `--gate-cmd` hook (verified by reading the script's source, `research.md` § R6); (2) the three test modules will be created by this feature; (3) the composed review run's fourth unit exists (`skill:review-feature-quality`), which is what makes the review site's own refusal observable. Route (b): the three modules named in the commands.
+> **Premises**: (1) `integrate-lines.py` exposes the quality gate through its existing `--gate-cmd` hook (verified by reading the script's source, `research.md` § R6); (2) the two missing test modules are authored by 081c (review site) and 081d (driver site); (3) the composed review run's fourth unit exists (`skill:review-feature-quality`), which is what makes the review site's own refusal observable. Route (b): the three modules named in the commands, and this feature's SC-001 is `blocked` at 1/3 for exactly this reason.

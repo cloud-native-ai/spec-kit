@@ -147,9 +147,18 @@ parse, however many features the audit reports.
 
 ### `final_path` counts, computed once
 
-`final_path = {pass, blocked, deferred, fail, unknown, total}` over the `final`-path criteria. The checker
-computes these counts; no caller, template or report recomputes them — a report copies them. A second count is a
-second source of truth, and the two drift.
+`final_path = {pass, blocked, deferred, partial, fail, unknown, total}` over the `final`-path
+criteria — six status buckets plus the total, and the record is **closed**: a seventh bucket requires
+revising this section, never a local addition. Two of the six are easy to confuse and are therefore
+distinguished here once:
+
+| Bucket | Meaning |
+|--------|---------|
+| `unknown` | **no status row exists** for the criterion. A missing measurement is not evidence of anything, least of all of a pass. |
+| `partial` | the row **exists and was measured** as `partial`. It is a measurement, not a gap — the same status the verification vocabulary admits, counted rather than reinterpreted. |
+
+The checker computes these counts; no caller, template or report recomputes them — a report copies
+them. A second count is a second source of truth, and the two drift.
 
 ### The seven reason templates
 

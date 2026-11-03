@@ -1,8 +1,11 @@
-$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening --feature-detail .specify/memory/features/081.md --json
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening --feature-detail .specify/memory/features/081.md --json --json-out .specify/specs/081-acceptance-hardening/test-evidence/closure-verdict.json
 EXIT=1
 verdict=block
 reasons=[{"code": "zero-final-path-pass", "target": ""}]
-final_path={"blocked": 1, "deferred": 0, "fail": 0, "pass": 0, "total": 2, "unknown": 1}
-tasks={"closed": 22, "deferred": 2, "in_progress": 0, "open": 0}
+final_path={"blocked": 1, "deferred": 0, "fail": 0, "partial": 1, "pass": 0, "total": 2, "unknown": 0}
+tasks={"closed": 23, "deferred": 1, "in_progress": 0, "open": 0}
 claimed_status=Blocked
 # SC-001 is blocked (1 of 3 call sites) and SC-002 is partial (the review-stage leg is 081c); no final-path SC passes.
+# final_path carries all six buckets: `partial` is a measured status (SC-002), `unknown` is reserved for a criterion
+# with no status row at all — none here. The shape is the owner doc's (shared/workflow/acceptance-hardening.md
+# § Closure Verdict); verification.md's acceptance summary is copied from closure-verdict.json, never recomputed.

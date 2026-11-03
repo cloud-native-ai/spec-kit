@@ -191,4 +191,26 @@ EXIT=1
 - T022 closes; T024 remains deferred to 081d. The earlier run2 mirror-parity failure is attributed to the
   concurrent commit, not to 081; the clean set is the T022 evidence.
 
+### 2.7 Review-fix re-disposition of § 2.5's pin repair (2026-11-03, supersedes 2.5 only)
+
+§ 2.5 repaired the two `test_stage_class_wiring` pins by moving the 081 GATE-4 and closure-verdict lines
+**inside** the 077 class-read card, so that stripping the card restored the frozen `c1cd4600` bytes. The
+review rejected that repair, correctly: it made one document (the 077 wiring card) own two unrelated
+obligations, and it hid a real framework line inside a feature-specific block.
+
+Re-dispositioned the other way, which is the way this test's own comment prescribes:
+
+- the closure-verdict bullet is back in `templates/commands/implement.md` § **Feature Integration** (where the
+  `Planned → Implemented` transition is owned) and the upgraded GATE-4 bullet back in
+  `templates/commands/tasks.md` § **Outputs** — their semantic homes;
+- `BASELINE_SHA256`'s `tasks` / `implement` rows were **re-measured with this module's own
+  `strip_wiring` + `_sha256_text`** and carry a dated reason, so the guard still asserts what it was built to
+  assert — *stripping the card restores the pinned bytes* — against the post-081 baseline instead of against
+  a byte-equality that only held while the line hid inside the card;
+- `tests/contract/test_gate_wiring_081.py` gained the command-surface assertion that was missing (deleting
+  the bullet turns it red), which is what let the misplacement survive review in the first place.
+
+Five frozen-pin guards re-verified green after the re-disposition: the two card strips, `test_wc13`'s strip
+leg, `test_wc14_frozen_surfaces_unchanged`, and `test_c5_non_wiring_files_keep_their_frozen_hashes`.
+
 

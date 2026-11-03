@@ -21,8 +21,7 @@ If empty, generate a complete `tasks.md` from available design artifacts.
 - **两条 owner 指针**：类别判据与取值归 `.specify/shared/definitions/flow-class-definitions.md`；阶段算子、阻断级别与降级归 `.specify/shared/workflow/expression-gates.md`。本模板只调用读取入口，不复制判据、面表或算子表。
 - **两分支**：解析为**表达类**时，本阶段按门禁 owner § 阶段算子表执行本阶段登记的行；其余情形（含未声明按默认）保持既有门禁集**逐字不变**——零新增阻断项、零新增必填章节。
 - **降级可见**：读取报 `owner-unavailable`（退出码 2：引擎缺席、owner 不可解析或输入非法）时，原样显示该标签并保持既有门禁集，不中断本阶段、不转绿、不切换门禁集。
-- 作者输入错误即停**：解析以退出码 1 报作者输入错误（取值越界或声明行形态不合规）时，本阶段停下，以阶段协议异常行 `ANOMALY: <一句话事实>` 作为最后一行输出并点名文件与行号；MUST NOT 落入上一条「既有门禁集逐字不变」那一支继续执行——那一支只适用于退出码 0 的未声明与降级路径。
-- **GATE-4 升级义务**：本阶段生成的 Completion Gate MUST 带 `final` 路径 SC 全 `pass` + smoke 记录在场（或显式用户豁免点名该 SC）的升级形态；条件集 owner 是 `.specify/shared/workflow/acceptance-hardening.md` § Gates，物理承载行是 `tasks-template.md` § Completion Gate——只发这一句，不复制阈值。
+- **作者输入错误即停**：解析以退出码 1 报作者输入错误（取值越界或声明行形态不合规）时，本阶段停下，以阶段协议异常行 `ANOMALY: <一句话事实>` 作为最后一行输出并点名文件与行号；MUST NOT 落入上一条「既有门禁集逐字不变」那一支继续执行——那一支只适用于退出码 0 的未声明与降级路径。
 
 ## Glossary
 
@@ -46,6 +45,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 **Outputs** (skill-owned):
 
 - A dependency-ordered `tasks.md` filled from `.specify/templates/tasks-template.md`: organized by user story, Constitution-driven tests-mode banner, strict checklist format, runtime-evidence notes at their fixed landing points.
+- The Completion Gate's **`GATE-4`** obligation in its upgraded form (GW-09): every `final`-path success criterion is `pass` **and** the feature's smoke record is present — or an explicit user waiver names that criterion. Owner of the condition set: `.specify/shared/workflow/acceptance-hardening.md` § Gates; the row that physically carries the check is `tasks-template.md` § Completion Gate, so emit it and restate no threshold of your own.
 - Mechanical structural validation: `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` run on the written file until exit 0 (the invocation instruction stays in the skill; fix every ERROR, adjudicate each WARN).
 - The run report: total/per-story task counts, parallel opportunities, independent test criteria, MVP scope, and the final validator verdict.
 - Feature-list review per the Feature Integration Protocol (the tasks phase MUST review the Feature list — new or invalidated features update `.specify/memory/features.md` and detail files synchronously).

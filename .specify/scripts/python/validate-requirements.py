@@ -33,12 +33,13 @@ least two spaces before each description are load-bearing, not cosmetic):
                   feature carries at least one `final` path. Owner of the rule: the `## Success
                   Criteria` `Path` contract in `shared/workflow/acceptance-hardening.md` § Closure
                   Verdict. Judged only on a spec that DECLARES its flow class
-                  (`**Flow Class**: execution|expression` in the header block): the declared class
-                  is what makes the rule decidable — the `final >= 1` floor is a class rule — and an
-                  undeclared spec is outside the closure system entirely, because the closure
-                  checker cannot even name its class. Applying the marker rule to every
-                  requirements.md in the checkout instead would report the whole existing corpus as
-                  a format violation, which is a migration decision this rule does not contain.
+                  (`**Flow Class**: execution|expression` in the header block), and the reason is
+                  **scope, not decidability**: the closure checker resolves an undeclared class to
+                  `execution` (the strict side, 077 FR-004), so the class is always namable — what
+                  this label declines is applying a new format rule to the whole existing corpus.
+                  Every requirements.md in the checkout that carries no declaration would then be
+                  reported as a format violation, which is a migration decision this rule does not
+                  contain.
 
 Skeleton criterion (checker-form C-12 — a semantic judgement, so it is written down here
 rather than left to the reader): an artifact is skeleton-only when a requirement row still

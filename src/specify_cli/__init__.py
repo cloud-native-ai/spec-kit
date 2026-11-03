@@ -1521,13 +1521,21 @@ def get_resource_path() -> Optional[Path]:
     checkout reports "Local templates not found" even though the working-tree
     templates are right there, which would leave the working tree — the main
     deliverable surface of a framework change — uncovered by any smoke test.
+
+    The fallback is additionally gated on the checkout's own
+    ``src/specify_cli/__init__.py``: "a grandparent that happens to carry a
+    ``templates/`` directory" is not the same fact as "this is the source
+    checkout", and only the second one licenses treating that directory as the
+    repository root.
     """
 
     if (MODULE_DIR / "templates").exists():
         return MODULE_DIR
 
     repo_root = MODULE_DIR.parent.parent
-    if (repo_root / "templates").exists():
+    if (repo_root / "templates").exists() and (
+        repo_root / "src" / "specify_cli" / "__init__.py"
+    ).is_file():
         return repo_root
 
     return None

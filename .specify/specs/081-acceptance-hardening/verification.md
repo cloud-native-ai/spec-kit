@@ -37,13 +37,13 @@ SC-002_why_reduced_insufficient=the positive path alone does not exercise the re
 SC-002_unblock=081c review-site wiring, then rerun the positive/negative pair at that site
 
 SC-003_status=partial
-SC-003_value=feature-details owner states four `Blocked` transitions and the fourth Ready-for-Review condition; `manage-features` is deferred to 081d and feature-index-template vocabulary is 081d work
-SC-003_note=2 of 3 vocabulary owners are in place; the third owner cannot land in 081a because WC-14 freezes test_expression_compatibility.py
-SC-003_blocked_at=the `manage-features` vocabulary owner is deferred to 081d; feature-index-template vocabulary is 081d
+SC-003_value=feature-details owner states four `Blocked` transitions and the fourth Ready-for-Review condition; `manage-features` (T024, deferred) and the feature-index-template vocabulary are 081d work
+SC-003_note=1 of 3 vocabulary owners is in place (feature-details only); `manage-features` and `feature-index-template` are 081d. Known window, owned by 081d: the registry row reads `Blocked` while `manage-features` does not yet admit it — un-deferring T024 here was blocked by WC-14 (`tests/contract/test_expression_compatibility.py` is frozen), so the window is recorded, not papered over
+SC-003_blocked_at=two of the three vocabulary owners are deferred: `manage-features` (T024) and feature-index-template are 081d
 SC-003_reduced_measurement=feature-details owner contract test (14 passed) and the state-machine contract test
 SC-003_reduced_measurement_run=yes
-SC-003_why_reduced_insufficient=two owners do not prove the registry tool and index template admit `Blocked`
-SC-003_unblock=081d adds `Blocked` to the third vocabulary owner and the feature-index template vocabulary
+SC-003_why_reduced_insufficient=one owner cannot prove that the registry tool and the index template admit `Blocked`
+SC-003_unblock=081d adds `Blocked` to `manage-features`' vocabulary and to the feature-index template's closed vocabulary
 
 SC-004_status=pass
 SC-004_value=the six-value vocabulary, five `SC-NNN_` ladder fields, illegal-row trigger and the exactly-one smoke record are asserted by the state-machine contract test
@@ -97,16 +97,20 @@ SC-009_unblock=081d lands the schema-ownership guard; the coverage lane verdict 
 # -- Deferred tasks --
 
 deferred_tasks=T024
-deferred_reason_summary=T024: the third vocabulary owner is deferred to 081d because WC-14 freezes the C-5 verification suite.
+deferred_reason_summary=T024 (the `manage-features` vocabulary owner) is deferred to 081d because WC-14 freezes the C-5 verification suite.
 
-# -- Acceptance summary (human; the checker recomputes) --
+# -- Acceptance summary (copied from the checker; never recomputed here) --
 
-final_path_sc_total=2
-final_path_sc_pass=0
-final_path_sc_blocked=2
-final_path_sc_deferred=0
-acceptance_verdict=blocked
+final_path_pass=0
+final_path_blocked=1
+final_path_deferred=0
+final_path_partial=1
+final_path_fail=0
+final_path_unknown=0
+final_path_total=2
+acceptance_verdict=block
+final_path_source=test-evidence/closure-verdict.json (produced by `closure-acceptance-check.py --json-out`; this block is a copy, not a second count)
 
 # -- Notes --
 
-notes=The slice is deliberately Blocked: SC-001's three call sites are 1/3 in 081a, and the feature must not be called Implemented. The baseline is the plan-stage capture (39 failed / 6970 passed / 7 skipped); the closure-repair head runs are recorded under test-evidence/closure-repair-run*.txt. The one mirror-parity delta is attributed to test-order isolation in the existing 078 suite, not to a 081 behaviour change; it is disclosed here rather than counted as a pass.
+notes=The slice is deliberately Blocked: SC-001's three call sites are 1/3 in 081a, and the feature must not be called Implemented. The baseline is the plan-stage capture (39 failed / 6970 passed / 7 skipped); the closure-repair head runs are recorded under test-evidence/closure-repair-run*.txt. The one mirror-parity delta is attributed to test-order isolation in the existing 078 suite, not to a 081 behaviour change; it is disclosed here rather than counted as a pass. Provenance of the acceptance summary above: it is copied from test-evidence/closure-verdict.json (produced by the checker with --json-out), never recomputed by hand. Two notes carry the disclosures this log only points at: notes/driver-completions.md (the three stages the loop driver completed after the stage subagent hit its 120-turn limit, with commits) and notes/known-items.md (F12 recorded, F13 fixed, F14 deferred to 081d).

@@ -42,6 +42,7 @@ SKILL = ROOT / "skills" / "internal" / "implement-feature" / "SKILL.md"
 INTEGRATION = ROOT / "shared" / "workflow" / "feature-integration.md"
 FIXTURES = ROOT / "tests" / "fixtures" / "acceptance-hardening"
 REVIEW_CMD = ROOT / "templates" / "commands" / "review.md"
+IMPLEMENT_CMD = ROOT / "templates" / "commands" / "implement.md"
 INTEGRATE_LINES = ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "integrate-lines.py"
 OWNER_DOC = "shared/workflow/acceptance-hardening.md"
 
@@ -141,6 +142,66 @@ def test_a_block_lands_blocked_and_never_implemented():
         assert re.search(r"(?i)MUST NOT[^.]*\bImplemented\b", section), (
             "%s must forbid writing `Implemented` on a `block` — the zero-final-pass "
             "`Implemented` is the exact hole this feature closes" % name
+        )
+
+
+# --------------------------------------------------------------------------- #
+# GW-01 — the command template the operator actually runs says the same thing
+# --------------------------------------------------------------------------- #
+
+def _feature_integration_section():
+    """`templates/commands/implement.md` § Feature Integration — the flip's home."""
+    text = IMPLEMENT_CMD.read_text(encoding="utf-8")
+    start = re.search(r"(?m)^##\s+Feature Integration\s*$", text)
+    assert start, "templates/commands/implement.md no longer carries § Feature Integration"
+    tail = text[start.end():]
+    nxt = re.search(r"(?m)^##\s", tail)
+    return tail[: nxt.start()] if nxt else tail
+
+
+def test_the_implement_command_template_names_the_checker_and_the_blocked_landing():
+    """The command surface must not be silently unwired.
+
+    Steps 9 and § Pre-Status-Flip Gate are the *procedure*; this template is the
+    *invocation* an operator hands the model.  A line that only exists in a skill
+    the command delegates to can be dropped from the command's own story without
+    any assertion noticing, so it is pinned here: delete the bullet and this test
+    goes red.
+
+    Placement is part of the assertion: the bullet MUST live in
+    § Feature Integration (where the `Planned → Implemented` transition is owned),
+    not inside the 077 class-read card (`### 类别读取与文档型门禁`), which owns a
+    different question — one document, one feature.
+    """
+    section = _feature_integration_section()
+    assert CHECKER_REL in section, (
+        "templates/commands/implement.md § Feature Integration must name "
+        "`%s` — the flip's closure judgement is not optional at this surface:\n%s"
+        % (CHECKER_REL, section)
+    )
+    assert re.search(r"`?Blocked`?", section), (
+        "§ Feature Integration must name the status a `block` lands — `Blocked`: %r" % section
+    )
+    assert re.search(r"(?i)MUST NOT[^.]*\bImplemented\b", section), (
+        "§ Feature Integration must forbid writing `Implemented` on a `block` — the "
+        "zero-final-pass `Implemented` is the hole this feature closes: %r" % section
+    )
+    assert OWNER_DOC in section, (
+        "§ Feature Integration must reach the verdict's criteria by path (one owner, "
+        "no restatement): %r" % section
+    )
+    # The wiring card belongs to Feature 077 and answers the class-read question.
+    # A 081 gate line inside it would make the card own two unrelated obligations —
+    # and would silently move the card's stripped bytes (C-007 of Feature 077).
+    card_start = re.search(r"(?m)^###\s+类别读取与文档型门禁\s*$", IMPLEMENT_CMD.read_text(encoding="utf-8"))
+    if card_start:
+        tail = IMPLEMENT_CMD.read_text(encoding="utf-8")[card_start.end():]
+        nxt = re.search(r"(?m)^#{1,3}\s", tail)
+        card = tail[: nxt.start()] if nxt else tail
+        assert CHECKER_REL not in card, (
+            "the 081 closure gate line is back inside the 077 class-read card — it "
+            "belongs to § Feature Integration (the semantic home); one document must "
+            "not own two features"
         )
 
 

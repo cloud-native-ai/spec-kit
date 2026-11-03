@@ -27,8 +27,8 @@
 ## Acceptance Reality Check (ARC)
 
 - **RC-13**: ARC MUST read the closure checker's `final_path` counts and MUST NOT re-count them from `verification.md`.
-- **RC-14**: ARC MUST write the three counts (`final_pass`, `final_blocked`, `final_deferred`) into `review.md`, in the carrier slot `### 2.4`, and MUST compare them against the feature's claimed status.
-- **RC-15**: When the claimed status is `Implemented` or `Ready for Review` and `final_pass` is zero, ARC MUST emit the fixed item `F-ACCEPTANCE` at `P0` and the transition `Implemented → Ready for Review` MUST be refused; the refusal MUST name the failed condition and leave the status at `Implemented`.
+- **RC-14**: ARC MUST write the closure checker's `final_path` record (`pass`, `blocked`, `deferred`, `partial`, `fail`, `unknown`, `total` — the owner doc's closed count shape, `shared/workflow/acceptance-hardening.md` § Closure Verdict) into `review.md`, in the carrier slot `### 2.4`, and MUST compare it against the feature's claimed status. The record is copied verbatim; ARC MUST NOT narrow it to a three-count summary or re-derive any bucket.
+- **RC-15**: When the claimed status is `Implemented` or `Ready for Review` and the record's `pass` bucket is zero, ARC MUST emit the fixed item `F-ACCEPTANCE` at `P0` and the transition `Implemented → Ready for Review` MUST be refused; the refusal MUST name the failed condition and leave the status at `Implemented`.
 - **RC-16**: ARC MUST NOT be delegated to a model judgement and MUST NOT be described as a fifth segment.
 
 ## Report slots and the unit census

@@ -71,7 +71,7 @@ Every entity below states its **carrier** (the file that physically holds it) an
 |---|---|
 | `verdict` | `accept` / `block` (binary; no middle tier) |
 | `reasons[]` | `{code, target}` where `code` ∈ the closed 7-value reason set |
-| `final_path` | `{pass, blocked, deferred, fail, unknown, total}` — computed **here and only here** |
+| `final_path` | `{pass, blocked, deferred, partial, fail, unknown, total}` — six status buckets plus the total, computed **here and only here**; `unknown` = no status row exists, `partial` = a measured `partial` |
 | `flow_class` | `execution` / `expression` |
 | `exit code` | `0` accept · `1` block · `2` input missing/unparsable |
 
@@ -165,7 +165,7 @@ State set grows 7 → 8: `{active, waiting, stalled, completed, orphaned, stale,
 | Segment run record | `segment` (process / artifact / implementation / code), `judgment object`, `verdict`, `findings[]` | `templates/commands/review.md` (order) + each segment's skill (method) |
 | Expected artifact set | `expected_artifacts[]` — every artifact the slice's stage rules and `plan.md` § Project Structure require; each member is judged | the artifact segment's coverage **denominator**. A member that is missing is itself a finding, never a silent exclusion from the denominator (obligation owned by `requirements.md` FR-013; derivation rule owned by the owner doc § Review Composition) |
 | Finding | `severity`, `artifact or diff path`, `line` (optional), `statement` | artifact/implementation: `P0`/`P1`/`P2` family owned by `review-sdd-process`; code: the six-level family owned by `code-review`; no conversion |
-| ARC record | `final_pass`, `final_blocked`, `final_deferred`, `claimed_status`, `verdict`, fixed item `F-ACCEPTANCE` (`P0`) | deterministic, from the closure checker output (never re-counted) |
+| ARC record | the `final_path` record copied verbatim (`pass`, `blocked`, `deferred`, `partial`, `fail`, `unknown`, `total`), `claimed_status`, `verdict`, fixed item `F-ACCEPTANCE` (`P0`) | deterministic, from the closure checker output (never re-counted; never narrowed to a three-count summary) |
 | Unit census | four units: `/speckit.review`, `skill:review-sdd-process`, `skill:review-feature-quality`, `skill:code-review` — same `run_id`, distinct `unit_id` | each unit's own closing record |
 
 Findings are never merged across families, never converted, never scored as one number.
@@ -174,15 +174,17 @@ Findings are never merged across families, never converted, never scored as one 
 
 **Carrier**: `tests/fixtures/acceptance-hardening/<case>/` — each case is a minimal file set (`requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail, a registry row); no case references a real feature directory.
 
-| Case | Shape | Proves |
+**The `Slice` column is what keeps absence readable**: a case whose slice has not landed yet is *not there yet*, not *missing*. 081a's seven cases exist on disk today; the three later ones are 081b / 081d work and are listed here so the table states the intended corpus instead of the current directory listing.
+
+| Case | Slice | Shape | Proves |
 |---|---|---|
-| `positive` | `final`-path SCs all `pass`, complete smoke record, runtime rows valid, premises all `verified` | V-1…V-26 do not over-block (`accept`, exit 0) |
-| `negative` | zero `[ ]`, every SC has a status row, every `final`-path SC is `blocked`/`deferred` (the 026 shape) | V-23/V-9 block at all three call sites with a named reason |
-| `premise-mutation` | one `falsified` premise with `Decision` removed | `falsified-premise-undecided: EP-NNN` |
-| `runtime-gap-mutation` | one runtime dependency present as prose only; one `signed-contract` row with empty `Pin` | `runtime-dependency-not-owned: RS-NNN` |
-| `ladder-mutation` | a `blocked` row with all five ladder fields; then `SC-NNN_reduced_measurement_run=no` | `blocked-without-measurement-ladder: SC-NNN` |
-| `smoke-mutation` | `positive` with the smoke record removed, claimed `Implemented` | V-9 / V-12: a claimed-`Implemented` feature whose completion condition ④ fails is `block` (exit 1) with the named reason [[STR-014]], never `Implemented` — this is the one fixture that proves [[STR-014]] |
-| `mixed-path` | an `execution` feature with three SCs: `SC-001` `final` `pass`, `SC-002` `final` `fail`, `SC-003` `supporting` `deferred` (full ladder) | V-11 + Edge Case "final 与 supporting 混合": the reason is `final-path-not-pass: SC-002` (`zero-final-path-pass` is **not** emitted, since one `final` passed), and the lone `supporting` non-`pass` is not a standalone blocking reason |
-| `expr-supporting-only` | an `expression` feature whose SCs are all `supporting`, one of them `deferred` with the full ladder | V-11's `expression` exemption: the `final`-path rule is vacuous — no `final`-path reason is emitted and the fixture MUST NOT be forced to invent a `final` SC |
-| `execution-without-final` | an `execution` feature whose SCs are all `supporting` (zero `final`-path SC) | V-1 via `validate-requirements.py` check `path-marker` (an `execution` feature with zero `final`-path SC **fails**), and at the checker layer `final_path.total = 0` so V-11's `zero-final-path-pass` applies |
-| `audit-history` | an `Implemented` feature that would become `Blocked` under the new rules | `--audit-existing` reports it, writes nothing, exits 0 |
+| `positive` | 081a | `final`-path SCs all `pass`, complete smoke record, runtime rows valid, premises all `verified` | V-1…V-26 do not over-block (`accept`, exit 0) |
+| `negative` | 081a | zero `[ ]`, every SC has a status row, every `final`-path SC is `blocked`/`deferred` (the 026 shape) | V-23/V-9 block at all three call sites with a named reason |
+| `premise-mutation` | 081b | one `falsified` premise with `Decision` removed | `falsified-premise-undecided: EP-NNN` |
+| `runtime-gap-mutation` | 081b | one runtime dependency present as prose only; one `signed-contract` row with empty `Pin` | `runtime-dependency-not-owned: RS-NNN` |
+| `ladder-mutation` | 081a | a `blocked` row with all five ladder fields; then `SC-NNN_reduced_measurement_run=no` | `blocked-without-measurement-ladder: SC-NNN` |
+| `smoke-mutation` | 081a | `positive` with the smoke record removed, claimed `Implemented` | V-9 / V-12: a claimed-`Implemented` feature whose completion condition ④ fails is `block` (exit 1) with the named reason [[STR-014]], never `Implemented` — this is the one fixture that proves [[STR-014]] |
+| `mixed-path` | 081a | an `execution` feature with three SCs: `SC-001` `final` `pass`, `SC-002` `final` `fail`, `SC-003` `supporting` `deferred` (full ladder) | V-11 + Edge Case "final 与 supporting 混合": the reason is `final-path-not-pass: SC-002` (`zero-final-path-pass` is **not** emitted, since one `final` passed), and the lone `supporting` non-`pass` is not a standalone blocking reason |
+| `expr-supporting-only` | 081a | an `expression` feature whose SCs are all `supporting`, one of them `deferred` with the full ladder | V-11's `expression` exemption: the `final`-path rule is vacuous — no `final`-path reason is emitted and the fixture MUST NOT be forced to invent a `final` SC |
+| `execution-without-final` | 081a | an `execution` feature whose SCs are all `supporting` (zero `final`-path SC) | V-1 via `validate-requirements.py` check `path-marker` (an `execution` feature with zero `final`-path SC **fails**), and at the checker layer `final_path.total = 0` so V-11's `zero-final-path-pass` applies |
+| `audit-history` | 081d | an `Implemented` feature that would become `Blocked` under the new rules | `--audit-existing` reports it, writes nothing, exits 0 |

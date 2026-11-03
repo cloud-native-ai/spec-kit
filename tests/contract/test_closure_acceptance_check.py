@@ -64,8 +64,9 @@ ARG_GRAMMAR = {
     "STR-013": r"\S+:\S+",
 }
 
-#: `final_path` is a closed count record (C-08): five status buckets plus the total.
-FINAL_PATH_KEYS = ("pass", "blocked", "deferred", "fail", "unknown", "total")
+#: `final_path` is a closed count record (C-08): six status buckets plus the total.
+#: `unknown` means "no status row exists"; `partial` is a *measured* status and gets its own bucket.
+FINAL_PATH_KEYS = ("pass", "blocked", "deferred", "partial", "fail", "unknown", "total")
 
 PASS_COUNT = re.compile(r"^final_path\b", re.M)
 
@@ -147,6 +148,22 @@ def _fixture(name):
     path = FIXTURES / name
     assert path.is_dir(), "fixture set %r is missing — T003/T004/T021 has not landed" % name
     return path
+
+
+def _load_checker():
+    """Import the checker by path, for the one assertion that judges a pure function.
+
+    The filename carries hyphens, so it is not importable by name. Everything else in this
+    module drives the real CLI; this hook exists only where the subject is a single
+    computation that no fixture can express without inventing a file for it.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("closure_acceptance_check", CHECKER)
+    assert spec and spec.loader, "cannot load %s" % CHECKER
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.final_path_counts
 
 
 def _instances(payload):
@@ -310,7 +327,31 @@ def test_final_path_counts_are_computed_from_the_rows_not_recounted_by_the_test(
     _, payload = _json(_fixture("mixed-path"))
     counts = payload["final_path"]
     assert (counts["pass"], counts["fail"], counts["total"]) == (1, 1, 2), counts
-    assert counts["blocked"] == 0 and counts["deferred"] == 0 and counts["unknown"] == 0, counts
+    assert (counts["blocked"], counts["deferred"], counts["partial"], counts["unknown"]) == (
+        0, 0, 0, 0,
+    ), counts
+
+
+def test_partial_is_its_own_bucket_and_unknown_stays_a_missing_row():
+    """C-08's two easy-to-confuse buckets, judged at the unit of the count itself.
+
+    No existing fixture carries a *`final`-path* `partial` row (the `mixed-path` fixture's
+    `partial`-shaped criterion is `supporting`), and adding one would mean a new fixture file
+    for a fact this level can measure directly. So the count is exercised here on the
+    computation, and the end-to-end shape is covered by `_assert_schema` over the fixtures:
+    `partial` must be counted as itself, never folded into `unknown` — a measured status and a
+    missing measurement are different facts about the feature.
+    """
+    final_path_counts = _load_checker()
+
+    counts = final_path_counts(
+        {"SC-001": "final", "SC-002": "final", "SC-003": "supporting"},
+        {"SC-001": ["partial"], "SC-003": ["fail"]},  # SC-002 has no status row at all
+    )
+    assert counts["partial"] == 1, counts
+    assert counts["unknown"] == 1, counts
+    assert counts["fail"] == 0, "a `supporting` criterion never enters the record: %r" % (counts,)
+    assert counts["total"] == 2, counts
 
 
 # --------------------------------------------------------------------------- #
