@@ -258,6 +258,12 @@ All tasks `[X]` or `[~]` (no `[ ]` remaining). Features match spec. Tests pass.
   **run scope** — it resets to zero at the start of every run (it is never a cross-run
   total), and its current value is written into `verification.md` so a resumed run reads
   the real count instead of inheriting a stale one.
+- **Closure verdict re-validation** (the status-liberating judgement): re-run
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` against the
+  tree this gate is about to close, exactly as Step 9 states it. A verdict read earlier in the run
+  is a measurement of an older tree, not evidence about this one — and the four conditions it
+  answers are owned by `shared/workflow/acceptance-hardening.md`, not by this step.
+
 - **Gate-premise decay** (named action): when a premise a gate item or DoD row rests on —
   a frozen SHA, a line number, a count — is falsified by measurement, re-reference the
   premise, measure the new form **more strictly, never more loosely**, and annotate the
@@ -315,6 +321,17 @@ Pre-Status-Flip Gate. Populate `REQUIREMENTS_DIR/verification.md` from
 `SC-NNN_status` vocabulary, so draw every status from the set it declares and MUST NOT
 narrow it to a subset (a gate or DoD row reading `pass|deferred` silently forbids an
 honest `partial`).
+
+- **Closure verdict — the status-landing judgement**: before the flip, run
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>` from the
+  repository root. That command is the one source of the verdict, the closed reason set and the
+  `final_path` counts; their schema owner is `shared/workflow/acceptance-hardening.md` § Closure
+  Verdict, and this step calls it by path instead of restating a condition. It MUST NOT be
+  replaced by a model judgement, another script, or an ad-hoc grep over the artifacts. On `block`,
+  land `Blocked` — recording the emitted reasons in `verification.md` — and MUST NOT write
+  `Implemented`; on `accept`, continue with the gate below. Exit `2` is an input defect in the
+  artifacts: repair it and re-run, and never read it as `accept`.
+
 
 > Gate probe: gate-implement-evidence-binding — after populating the evidence
 > records, run the binding check per the template's declared rules: every sample

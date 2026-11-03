@@ -234,7 +234,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
   - `templates/`: packaged source-of-truth templates (constitution, plan, requirements, tasks, agents, `commands/`, tools/skills).
   - `scripts/bash/`, `scripts/python/`: workflow scripts mirrored from `.specify/scripts/`; never call `/speckit.*` as a shell command.
   - `skills/`, `agents/`: installed skills and agent definitions, mirrored to `.specify/`.
-  - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`.
+  - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`, `fixtures/` (declarative fixture sets, one directory per feature — e.g. `fixtures/acceptance-hardening/`).
   - `memory/`: default in-package memory; canonical memory is `.specify/memory/`.
   - `docs/`: this project's development docs, not shipped (boundary above).
   - `feedback/`: inbound `feedback-*.zip` bundles for `/speckit.feedback`.

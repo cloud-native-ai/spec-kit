@@ -411,14 +411,19 @@ def test_c46_no_clearing_action_and_no_cleared_state_are_defined():
             continue
         states.update(part.strip("`*") for part in parts[:2])
     states.discard("(n/a)")
+    # Feature 081 (FR-003 / FR-018; owner `shared/workflow/acceptance-hardening.md` § Feature
+    # Status) adds `Blocked` to this table as a governed sixth status, so the pin reads six. What
+    # C-46 forbids is unchanged: an *ungoverned* state — `cleared`, or any other invention — still
+    # fails here, and the "no clearing action / no cleared state" sentences above stay the reason.
     assert states == {
         "Draft",
         "Planned",
+        "Blocked",
         "Implemented",
         "Ready for Review",
         "Completed",
     }, (
-        "the transition table's state set MUST stay the five published statuses; a "
+        "the transition table's state set MUST stay the six governed statuses; a "
         f"`cleared` (or any other) state is a second mechanism (C-46): {sorted(states)}"
     )
     for row in _table_rows(_integration_table()):
