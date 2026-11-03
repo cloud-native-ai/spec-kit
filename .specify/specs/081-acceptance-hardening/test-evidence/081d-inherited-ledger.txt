@@ -1,0 +1,66 @@
+081d — plan.md § Inherited Blockers ledger, re-read at line closure (task T012)
+Date: 2026-11-03 · Branch: 081-acceptance-hardening · Tree: part-3 edits + mirrors regenerated
+
+== The ledger, as it reads at line closure ==
+
+The table (plan.md lines 233-239) carries five disposition rows over eight extracted records:
+  IB-003  071:SC-001_status   not-applicable  (no carrier — the row disposes nothing)
+  IB-004  071:SC-006_status   inherited       task:T004+test:tests/contract/test_acceptance_review_composition.py  this-slice
+  IB-006  077:SC-002_status   inherited       task:T012+test:tests/contract/test_acceptance_premises.py            this-slice
+  IB-007  077:SC-005_status   inherited       task:T012+test:tests/contract/test_acceptance_premises.py            this-slice
+  IB-008  077:SC-008_status   not-applicable  (no carrier — the row disposes nothing)
+Zero-row sources (recorded in the ledger prose, no locator invented): IB-001, IB-002, IB-005.
+
+== Carrier resolution, against the live tasks.md (this file) ==
+
+A this-slice carrier resolves against the live tasks.md, so a completed slice invalidates its
+own carriers until the next slice re-points them. 081d is the slice the three inherited rows
+name; at this tree the rows are:
+
+  line 117: - [ ] T004 [US1] (FR-023, SC-002) Take **SC-002's ... — row carries
+            'tests/contract/test_acceptance_review_composition.py' verbatim  -> IB-004 resolves
+  line 139: - [ ] T012 [US4] (FR-011, SC-005) Re-read the whole ... — row carries
+            'tests/contract/test_acceptance_premises.py' verbatim             -> IB-006 resolves
+  line 139: (same row)                                                        -> IB-007 resolves
+
+Reading: **3 of 3 inherited rows resolved** — not 081b's 2-resolved-plus-1-disclosed: IB-004's
+carrier was completed at the 081c tasks stage from inherited-later to this-slice, and this
+reading is the line-closure re-read that ledger note (plan.md line 247) defers to.
+
+== Counts, cited from the payloads (never recomputed) — C-17 limb 3 ==
+
+1. Closure checker payload (.specify/.tmp/081d-closure-ledger-read.json), produced by:
+   python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening --repo . --json
+   -> exit 1, verdict=block, claimed_status=Blocked
+   -> reasons (verbatim): ['zero-final-path-pass']
+   -> inherited-blocker-undisposed instances in the payload: 0
+   (the single reason is the feature's own final-path reading — SC-001/SC-002 are not yet
+    measured; it is not an inherited reason and not a ledger defect)
+
+2. Stage-gate payload (.specify/.tmp/081d-pre-ledger-read.json), produced by:
+   python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks --repo . --spec-dir .specify/specs/081-acceptance-hardening
+   -> exit 0, decision=pass, errors=0, advisories=7 (one external-clause advisory in a checklist
+      and six missing-path advisories for paths that exist only at later stages or in git-ignored
+      run dirs — .specify/.tmp/081d-closure-verdict.json lands at T017, .specify/.tmp/081b-probe/
+      is a git-ignored run dir; none is an inherited-blocker finding; the missing-path advisories
+      that this part's own files retired — the two test carriers and the audit fixture — are gone)
+   -> findings with check=inherited-blocker: 0
+
+== The test carrier, re-run over this tree ==
+
+Command:
+  bash scripts/bash/run-tests.sh tests/contract/test_acceptance_premises.py -q
+Exit code: 0
+Output (verbatim tail):
+------------------------------------------------------------------------
+............................                                             [100%]
+28 passed in 4.25s
+------------------------------------------------------------------------
+The module's test_d2_the_real_spec_dir_emits_no_phantom_inherited_row asserts the real spec
+dir emits no fabricated 081:* row and no undisposed row — the same zero the two payloads cite.
+
+== Conclusion ==
+
+No inherited-blocker-undisposed instance exists in either payload, the three carriers resolve
+against the live tasks.md, and the reading is 3 of 3 resolved. SC-005's ledger half is
+discharged at line closure; nothing was re-pointed and no carrier was moved.

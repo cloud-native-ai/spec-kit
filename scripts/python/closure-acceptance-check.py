@@ -14,34 +14,33 @@ status). This script **implements** those schemas; it never redefines them.
 
 Calling surface (contract `contracts/closure-acceptance-check.contract.md` C-01…C-06, C-10):
 
-  --spec-dir <dir>          REQUIRED. Holds requirements.md, plan.md, tasks.md, verification.md.
-  --repo <root>             Repository root for repo-relative path resolution (default: the
-                            checkout this script lives in).
+  --spec-dir <dir>          REQUIRED outside audit mode. Holds requirements.md, plan.md,
+                            tasks.md, verification.md. Rejected in audit mode (C-02): the audit's
+                            input is a repository, not one feature's directory.
+  --repo <root>             Single-feature mode: repository root for repo-relative path resolution
+                            (default: the checkout this script lives in). Audit mode: the audited
+                            root itself (default: the current working directory), whose registry
+                            is read from `<root>/.specify/memory/features.md` (C-02/C-04).
   --feature-detail <path>   The claimed feature status, read from a feature detail file.
   --feature-registry <path> The claimed feature status, read from a registry file. Either flag
                             may be given; when neither is, the status is resolved from the spec
                             directory's own claim carriers and then from the repository registry
                             by the spec directory's key (see `resolve_claimed_status`).
-  --audit-existing          Read-only audit mode: report, write nothing, and let the exit code
-                            reflect input validity only.
+  --audit-existing          Read-only audit mode (FR-020 / C-04): enumerate the registry's
+                            `Implemented`-family rows and judge each against the spec directory
+                            that row's own `Spec Path` cell names, running the same judgement
+                            pipeline the single-feature run calls — never a second one. Writes
+                            nothing under the audited root (C-11), and the exit code reflects
+                            input validity only: `0` whenever the inputs parse, regardless of
+                            how many features the audit reports (C-10).
   --json                    Machine-readable payload on stdout.
   --json-out <path>         Write the identical payload to a file as well.
   --waive CODE:TARGET       Repeatable. Removes one reason from the blocking set while still
                             counting it as waived.
 
 Exit codes (C-10): 0 = accept, 1 = block, 2 = an input is missing or unparsable. A missing input
-is never reported as `block`, and in audit mode the exit code reflects input validity only.
-
-IMPLEMENTATION STATE — read this before trusting an exit code
---------------------------------------------------------------
-This is the verdict slice (task T015). Argument parsing, input resolution, the exit-2 contract and
-the judgement are implemented. One deliberate absence, with a named owner, so it is never a
-silent hole:
-
-* `--audit-existing` is **not implemented in this slice** — `plan.md` § Slice Boundary defers
-  FR-020 to 081d. Passing it exits `2` with an explicit message. That is deliberate: an
-  unimplemented mode MUST NOT emit a per-feature verdict, because an audit run whose exit code
-  came from one feature's verdict would report the opposite of what C-10 requires of the mode.
+is never reported as `block`, and in audit mode the exit code reflects input validity only: `0`
+whenever the inputs parse — a reported finding is not a non-zero exit.
 
 The external-source extraction landed in 081b (contract C-13 / C-17 / C-18): the runtime-row
 class's three shapes, the prose-declaration rule, the `signed-contract` `Contract` cell, the
@@ -52,11 +51,13 @@ the stage gates; `tests/contract/test_acceptance_premises.py` asserts the two na
 instance, so the pair cannot drift into two spellings.
 
 Read-only and stdlib-only (C-01, V-14): no network, no model, no write — `--json-out` is the one
-declared output file, and it is written only when a payload exists.
+declared output file, it is written only when a payload exists, and in audit mode a target under
+the audited root is refused, so the mode stays zero-write by construction (C-11).
 
 Usage:
   python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/<key>
   python3 scripts/python/closure-acceptance-check.py --spec-dir <dir> --feature-registry <path> --json
+  python3 scripts/python/closure-acceptance-check.py --audit-existing --repo <root>
 """
 from __future__ import annotations
 
@@ -157,10 +158,6 @@ if _REPO_ROOT.name == ".specify":
 
 class InputError(Exception):
     """An input is missing or unparsable — exit 2, never a verdict about the feature."""
-
-
-class ModeNotImplemented(InputError):
-    """A documented mode whose behaviour belongs to a later slice: exit 2, never a verdict."""
 
 
 # --------------------------------------------------------------------------- #
@@ -1284,21 +1281,16 @@ def apply_waivers(reasons, waivers, key):
     return blocking, waived
 
 
-def run(args):
-    """Compute the record the schema owner describes, or raise an InputError.
+def judge_spec(resolved, claimed_status, claimed_source, waivers, key):
+    """Compute one feature's record from already-resolved inputs — the one judgement pipeline.
 
+    The single-feature run and the audit mode both call this function and no other: the audit
+    MUST NOT introduce a second judgement path (C-04), so a per-feature verdict an audit reports
+    is byte-for-byte the verdict a single-feature invocation of the same directory would produce.
     It never returns a verdict it cannot justify from the inputs: every `block` carries at least
     one reason from the closed set, and an input defect is raised as an input error instead of
     being reported as a finding about the feature.
     """
-    if args.audit_existing:
-        raise ModeNotImplemented(
-            "--audit-existing is not implemented in this slice: FR-020's read-only audit is "
-            "081d work (plan.md § Slice Boundary). Refusing to emit a per-feature verdict from "
-            "an audit invocation rather than report the opposite of what the mode must do."
-        )
-
-    resolved = resolve_inputs(args)
     spec_dir = resolved["spec_dir"]
     requirements = parse_requirements(resolved["requirements.md"])
     flow_class = requirements["flow_class"]
@@ -1308,7 +1300,6 @@ def run(args):
     tasks_text = _read(resolved["tasks.md"])
     verification = parse_verification(resolved["verification.md"])
     smoke_passes, smoke_detail = evaluate_smoke(verification, resolved["repo"])
-    claimed_status, claimed_source = resolve_claimed_status(resolved)
 
     statuses = verification["statuses"]
     counts = final_path_counts(criteria, statuses)
@@ -1337,7 +1328,7 @@ def run(args):
     if claimed_status in CLAIMED_IMPLEMENTED and not all(conditions.values()):
         reasons.append(_reason(R_CLAIMED))
 
-    blocking, waived = apply_waivers(reasons, resolved["waivers"], feature_key(spec_dir))
+    blocking, waived = apply_waivers(reasons, waivers, key)
 
     return {
         "verdict": "block" if blocking else "accept",
@@ -1352,6 +1343,243 @@ def run(args):
         "completion_conditions": conditions,
         "spec_dir": str(spec_dir),
     }
+
+
+def run(args):
+    """Dispatch on the mode, then compute the record the schema owner describes.
+
+    The two modes are two explicit branches with their own messages (C-02): the audit branch
+    refuses `--spec-dir` by name, the single-feature branch requires it — neither path can end up
+    silently applying the other's rule.
+    """
+    if args.audit_existing:
+        return run_audit(args)
+    resolved = resolve_inputs(args)
+    claimed_status, claimed_source = resolve_claimed_status(resolved)
+    return judge_spec(
+        resolved, claimed_status, claimed_source, resolved["waivers"],
+        feature_key(resolved["spec_dir"]),
+    )
+
+
+# --------------------------------------------------------------------------- #
+# The audit mode (FR-020, C-02 / C-04 / C-10 / C-11 / C-12)
+# --------------------------------------------------------------------------- #
+
+#: Claimed statuses the audit enumerates (C-04's "`Implemented`-family rows"). The set is the
+#: checker's own `CLAIMED_IMPLEMENTED` — the statuses that assert the work is done — not a
+#: second list invented for the mode.
+AUDIT_FAMILY = CLAIMED_IMPLEMENTED
+
+
+def audit_registry_rows(path):
+    """`[(line_no, {feature, status, spec_path})]` for the registry's data rows, read by name.
+
+    A registry table is one whose header carries an `ID` and a `Status` column; rows are matched
+    to that header by column name, so a reordered or extended registry (the real one carries a
+    `Spec Path` column the original template lacks) still reads, and auxiliary documentation
+    tables in the same file (the real registry's `| Column | Description |` column dictionary)
+    are not registry tables and are skipped. A file with no readable registry table — including
+    one whose only ID-bearing table lacks a `Status` column — is an unparsable input (exit 2),
+    and so is a row whose `Status` cell is empty: the audit cannot even tell whether a row is in
+    scope, and guessing would be the silent misread C-02 forbids.
+    """
+    rows = []
+    header = None
+    saw_registry_table = False
+    saw_id_table_without_status = False
+    for line_no, line in enumerate(_read(path).splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            header = None  # prose ends the current table
+            continue
+        if TABLE_SEPARATOR_RE.match(stripped):
+            continue
+        cells = [_clean(c) for c in stripped.strip("|").split("|")]
+        lowered = [c.casefold() for c in cells]
+        if header is None:
+            if "id" not in lowered:
+                continue
+            if "status" not in lowered:
+                saw_id_table_without_status = True
+                continue
+            saw_registry_table = True
+            header = lowered
+            continue
+        if len(cells) < len(header):
+            raise InputError(
+                "%s line %d carries %d cells under a %d-column header — the registry row is "
+                "unparsable" % (path, line_no, len(cells), len(header))
+            )
+        row = dict(zip(header, cells))
+        status = row.get("status", "")
+        if not status:
+            raise InputError(
+                "%s line %d carries an empty `Status` cell — the audit cannot tell whether the "
+                "row is in scope (C-02)" % (path, line_no)
+            )
+        rows.append((line_no, {
+            "feature": row.get("id", ""),
+            "status": status,
+            "spec_path": row.get("spec path", ""),
+        }))
+    if not saw_registry_table:
+        raise InputError(
+            "%s carries no readable registry table%s — the audit reads tables whose header "
+            "carries an `ID` and a `Status` column (C-02)"
+            % (path, " (an `ID`-bearing table lacks a `Status` column)"
+               if saw_id_table_without_status else "")
+        )
+    return rows
+
+
+def _audit_spec_dir(spec_cell, repo):
+    """The spec directory a registry row's `Spec Path` cell names, or `None` with a reason.
+
+    The cell may name the directory itself or a file inside it (the real registry names each
+    feature's `requirements.md`), and it is read relative to the audited root — the audit never
+    resolves it against the process working directory, so the same audit reads the same tree from
+    any caller's cwd.
+    """
+    if _blank(spec_cell):
+        return None, "the row's `Spec Path` cell names no spec directory"
+    target = Path(spec_cell)
+    if not target.is_absolute():
+        target = Path(repo) / target
+    spec_dir = target.parent if target.is_file() else target
+    if not spec_dir.is_dir():
+        return None, "the row's `Spec Path` cell does not resolve under the audited root: %s" % spec_cell
+    return spec_dir, ""
+
+
+def audit_feature(row, repo, registry, waivers):
+    """Judge one registry row, or report why it cannot be judged.
+
+    A row that cannot be judged (a `Spec Path` cell that names nothing, a spec directory missing
+    a required input, defective cells) is a **fact about that row**, reported with its reason so
+    the audit of the remaining rows still completes — the mode's exit code reflects input
+    validity for the audit invocation as a whole (C-10), not one row's verdict. A judged row's
+    `verdict` is the one the single-feature pipeline produces for the same directory: `accept`
+    or `block`, and nothing else (C-07 holds inside the audit too).
+    """
+    record = {
+        "feature": row["feature"],
+        "claimed_status": row["status"],
+        "registry": str(registry),
+        "verdict": None,
+        "reasons": [],
+        "detail": "",
+    }
+    spec_dir, why_not = _audit_spec_dir(row["spec_path"], repo)
+    if spec_dir is None:
+        record["detail"] = why_not
+        return record
+
+    resolved = {"spec_dir": spec_dir, "repo": repo}
+    try:
+        for name in REQUIRED_INPUTS:
+            path = spec_dir / name
+            if not path.is_file():
+                raise InputError("required input not found: %s" % path)
+            if not _read(path).strip():
+                raise InputError("required input is empty: %s" % path)
+            resolved[name] = path
+        judged = judge_spec(resolved, row["status"], str(registry), waivers, row["feature"])
+    except InputError as exc:
+        record["detail"] = str(exc)
+        record["spec_dir"] = str(spec_dir)
+        return record
+
+    record.update({
+        "verdict": judged["verdict"],
+        "reasons": judged["reasons"],
+        "waived": judged["waived"],
+        "final_path": judged["final_path"],
+        "spec_dir": judged["spec_dir"],
+    })
+    return record
+
+
+def run_audit(args):
+    """Audit mode: enumerate, judge read-only, report — and write nothing (C-11).
+
+    Two explicit branches keep the modes from applying each other's rule (C-02): this branch
+    refuses `--spec-dir` by name — the audit's input is a repository root, and a flag honoured
+    nowhere but validated nowhere would tell the caller it audited a directory it never read —
+    while the single-feature branch keeps its own `--spec-dir` requirement and message.
+    """
+    if args.spec_dir:
+        raise InputError(
+            "--spec-dir is not an audit input: --audit-existing audits a repository root given "
+            "by --repo and reads <root>/.specify/memory/features.md (C-02/C-04); drop --spec-dir "
+            "to audit, or drop --audit-existing to check one feature's directory"
+        )
+
+    repo = Path(os.path.abspath(args.repo)) if args.repo else Path(os.getcwd())
+    if not repo.is_dir():
+        raise InputError("repo root not found: %s" % repo)
+    registry = repo / ".specify" / "memory" / "features.md"
+    if not registry.is_file():
+        raise InputError(
+            "audit registry not found: %s (--audit-existing reads <root>/.specify/memory/"
+            "features.md under the root given by --repo)" % registry
+        )
+    if args.json_out:
+        out = Path(os.path.abspath(args.json_out))
+        if out == repo or repo in out.parents:
+            raise InputError(
+                "--json-out %s is under the audited root %s: the audit performs zero writes "
+                "under the root it reads (C-11)" % (out, repo)
+            )
+
+    rows = audit_registry_rows(registry)
+    features = [
+        audit_feature(row, repo, registry, [parse_waiver(raw) for raw in (args.waive or [])])
+        for _, row in rows
+        if row["status"] in AUDIT_FAMILY
+    ]
+    judged = [f for f in features if f["verdict"] is not None]
+    affected = [f for f in judged if f["verdict"] == "block"]
+    return {
+        "mode": "audit",
+        "repo": str(repo),
+        "registry": str(registry),
+        "features": features,
+        "summary": {
+            "enumerated": len(rows),
+            "in_scope": len(features),
+            "judged": len(judged),
+            "affected": len(affected),
+            "not_judgeable": len(features) - len(judged),
+        },
+    }
+
+
+def render_audit_human(record):
+    """C-12: one line per feature with claim, verdict and every reason, plus a summary."""
+    lines = [
+        "audit: %s" % record["repo"],
+        "registry: %s" % record["registry"],
+    ]
+    for feature in record["features"]:
+        head = "feature %s — claimed %s" % (feature["feature"], feature["claimed_status"])
+        if feature["verdict"] is None:
+            lines.append("%s — not judged: %s" % (head, feature["detail"]))
+            continue
+        lines.append("%s — verdict %s" % (head, feature["verdict"]))
+        lines.append("  spec_dir: %s" % feature["spec_dir"])
+        for reason in feature["reasons"]:
+            lines.append("  reason: %s" % instance(reason))
+        for reason in feature.get("waived", []):
+            lines.append("  waived: %s" % instance(reason))
+        if not feature["reasons"]:
+            lines.append("  reason: none")
+    summary = record["summary"]
+    lines.append(
+        "summary: enumerated=%(enumerated)d in_scope=%(in_scope)d judged=%(judged)d "
+        "affected=%(affected)d not_judgeable=%(not_judgeable)d" % summary
+    )
+    return "\n".join(lines)
 
 
 def instance(reason):
@@ -1385,6 +1613,8 @@ def emit(record, args, exit_code):
 
     `--json` replaces the human report with the payload on stdout; `--json-out` writes the same
     payload to a file. The payload is computed once either way, so the two outputs cannot drift.
+    Audit records render through `render_audit_human` — one line per feature with claim, verdict
+    and reasons (C-12).
     """
     if record is None:
         return
@@ -1392,7 +1622,8 @@ def emit(record, args, exit_code):
     if args.json:
         print(payload)
     else:
-        print(render_human(record))
+        print(render_audit_human(record) if record.get("mode") == "audit"
+              else render_human(record))
     if args.json_out:
         with open(args.json_out, "w", encoding="utf-8") as handle:
             handle.write(payload + "\n")
@@ -1406,15 +1637,19 @@ def main(argv=None):
     # exit-2 message names the path argument and the inputs it must carry (C-02) instead of
     # argparse's usage banner.
     parser.add_argument("--spec-dir", default="",
-                        help="spec directory holding requirements/plan/tasks/verification")
+                        help="spec directory holding requirements/plan/tasks/verification "
+                             "(required outside audit mode; rejected by --audit-existing)")
     parser.add_argument("--repo", default="",
-                        help="repository root for repo-relative path resolution")
+                        help="repository root: repo-relative resolution base in single-feature "
+                             "mode; the audited root whose registry the audit reads")
     parser.add_argument("--feature-detail", default=None,
                         help="feature detail file carrying the claimed status")
     parser.add_argument("--feature-registry", default=None,
                         help="feature registry file carrying the claimed status")
     parser.add_argument("--audit-existing", action="store_true",
-                        help="read-only audit mode; exit code reflects input validity only")
+                        help="read-only audit of <repo>/.specify/memory/features.md's "
+                             "Implemented-family rows; zero writes, exit 0 whenever the "
+                             "inputs parse (C-10/C-11)")
     parser.add_argument("--json", action="store_true",
                         help="machine-readable payload on stdout")
     parser.add_argument("--json-out", default="",
@@ -1428,6 +1663,12 @@ def main(argv=None):
     except InputError as exc:
         print("closure-acceptance-check: input error: %s" % exc, file=sys.stderr)
         return EXIT_INPUT
+
+    if record.get("mode") == "audit":
+        # C-10: the audit's exit code reflects input validity only — reaching here means the
+        # inputs parsed, so the mode exits 0 no matter how many features it reports.
+        emit(record, args, EXIT_ACCEPT)
+        return EXIT_ACCEPT
 
     exit_code = EXIT_ACCEPT if record["verdict"] == "accept" else EXIT_BLOCK
     emit(record, args, exit_code)

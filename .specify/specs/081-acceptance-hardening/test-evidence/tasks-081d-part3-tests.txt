@@ -1,0 +1,37 @@
+081d part 3 (T010–T014) — the slice's four test carriers, run at line closure
+Date: 2026-11-03
+Tree: branch 081-acceptance-hardening, part-3 edits + mirror regeneration applied
+
+Command:
+  bash scripts/bash/run-tests.sh tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_premises.py tests/contract/test_closure_acceptance_check.py tests/contract/test_acceptance_schema_ownership.py -q
+
+Exit code: 0
+
+Output (verbatim):
+------------------------------------------------------------------------
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_state_machine.py tests/contract/test_acceptance_premises.py tests/contract/test_closure_acceptance_check.py tests/contract/test_acceptance_schema_ownership.py -q
+........................................................................ [ 93%]
+.....                                                                    [100%]
+77 passed in 6.39s
+------------------------------------------------------------------------
+
+Reading:
+  - test_acceptance_state_machine.py: 17 passed — the two SV-06 legs that were red since
+    part 1 (the index template carried no value domain; the management skill carried five
+    values without Blocked) went green when T010 landed Blocked in both vocabulary owners.
+  - test_acceptance_premises.py: green — re-run over this tree for T012's ledger reading
+    (see 081d-inherited-ledger.txt).
+  - test_closure_acceptance_check.py: 23 passed — the six audit legs authored by T011 were
+    red before T013 (the checker exited 2 with the not-implemented message); they went green
+    when --audit-existing landed, including the contract-named test_audit_writes_nothing.
+  - test_acceptance_schema_ownership.py: 9 passed — T014's guard, authored in this part; the
+    subject derives mechanically from the owner doc's three | Column | Content | tables and
+    the scan of templates/ + shared/ hits exactly templates/plan-template.md.
+
+Mirror and per-tool-copy gates, run after the edits:
+  python3 scripts/python/sync-mirrors.py && python3 scripts/python/sync-mirrors.py --check
+    -> exit 0 (templates 22 / skills-external 409 / skills-internal 138 / agents 3 /
+       scripts 119 / shared 62 files; three mirrors regenerated: feature-index-template.md,
+       manage-features/SKILL.md, closure-acceptance-check.py)
+  python3 scripts/python/regen-command-copies.py && python3 scripts/python/regen-command-copies.py --check
+    -> exit 0 ('OK: all per-tool command copies match the source templates.')

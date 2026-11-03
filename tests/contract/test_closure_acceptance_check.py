@@ -28,6 +28,8 @@ fixture          shape                                                       ver
 ``mixed-path``   one ``final`` pass, one ``final`` fail, one supporting def.  ``block`` / 1, SC-002
 ``exec-with…``   ``execution`` class, zero ``final`` SC                      ``block`` / 1, zero-pass
 ``expr-sup…``    ``expression`` class, all ``supporting``                     no final-path reason
+``audit-history`` audit root: registry + two spec dirs (901 blocked-shaped,   audit reports 901, writes
+                 902 clean), both claimed ``Implemented``                     nothing, exit 0
 ===============  ==========================================================  ======================
 """
 from __future__ import annotations
@@ -428,3 +430,199 @@ def test_the_seven_templates_are_read_from_the_declaring_specification():
         "inherited-blocker-undisposed",
         "status-claims-implemented-but-blocked",
     }, sorted(prefixes)
+
+
+# --------------------------------------------------------------------------- #
+# C-02 / C-04 / C-10 / C-11 / C-12 — the read-only audit mode (081d, T011/T013)
+#
+# The mode's input is a repository root (`--repo`), not a spec directory: it enumerates the
+# `Implemented`-family rows of `<root>/.specify/memory/features.md` and judges each against the
+# spec directory that row's own `Spec Path` cell names. `audit-history` is the corpus's only
+# audit-root case — a registry plus `.specify/specs/<key>/` directories inside the case — which is
+# exactly the shape that makes the mode's zero-write assertion testable (a flat spec-dir case
+# cannot be enumerated).
+#
+# Red before T013 closed: the checker exited `2` with the explicit not-implemented message
+# (`ModeNotImplemented`), recorded in slice 081d's red-first evidence reading (b).
+# --------------------------------------------------------------------------- #
+
+AUDIT_ROOT = FIXTURES / "audit-history"
+
+
+def _run_audit(*args):
+    """Run the checker in audit mode against `--repo` — never passing `--spec-dir`.
+
+    C-02 rejects `--spec-dir` in audit mode, so a helper that routed every call through
+    `_run(spec_dir, …)` would be unable to express the mode's real invocation shape; the one
+    leg that passes the flag does so explicitly and expects the refusal.
+    """
+    assert CHECKER.is_file(), "closure-acceptance-check.py is missing"
+    cmd = [sys.executable, str(CHECKER), "--audit-existing", *args]
+    return subprocess.run(cmd, capture_output=True, text=True, cwd=str(ROOT))
+
+
+def _run_audit_json(*args):
+    proc = _run_audit("--json", *args)
+    assert proc.stdout.strip(), "no audit payload on stdout:\n%s\n%s" % (proc.stdout, proc.stderr)
+    return proc, json.loads(proc.stdout)
+
+
+def _audit_features(payload):
+    """`{feature-id: row}` of the payload's per-feature audit records."""
+    return {row["feature"]: row for row in payload["features"]}
+
+
+def _tree_hash(root):
+    """`{relative path: sha256}` over every file under `root` — the C-11 subject that can break."""
+    import hashlib
+
+    return {
+        str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(root.rglob("*"))
+        if p.is_file()
+    }
+
+
+def test_audit_writes_nothing(tmp_path):
+    """C-11, under the contract's own test name: the audit reports and writes nothing.
+
+    Two subjects, because neither alone proves the whole claim. The **fixture copy** under
+    `tmp_path` is a tree an implementation actually could modify — a recursive content hash before
+    and after the run fails the moment the audit caches, locks, or rewrites anything under the
+    root it reads. The **`git status --porcelain`** pair is C-11's named verification, observed
+    over the repository this test runs in: it is attributed to the tree it actually observes (the
+    checkout), which is why the copy lives outside it — the fixture and the status read never
+    share a root, so neither assertion silently stands in for the other.
+    """
+    case = tmp_path / "audit-history"
+    shutil.copytree(AUDIT_ROOT, case)
+    before_hash = _tree_hash(case)
+    before_status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=str(ROOT), capture_output=True, text=True
+    ).stdout
+
+    proc = _run_audit("--repo", str(case))
+
+    after_hash = _tree_hash(case)
+    after_status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=str(ROOT), capture_output=True, text=True
+    ).stdout
+
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert before_hash == after_hash, (
+        "the audit modified the tree it read; differing paths: %r"
+        % sorted(k for k in set(before_hash) | set(after_hash)
+                 if before_hash.get(k) != after_hash.get(k))
+    )
+    assert before_status == after_status, (
+        "C-11's named verification moved: git status --porcelain changed across the audit run"
+    )
+
+
+def test_audit_reports_the_affected_feature_with_claim_verdict_and_every_reason():
+    """C-12: the list is readable without re-running the checker.
+
+    901 is the case's would-become-`Blocked` subject: its claim (`Implemented`) exceeds its
+    evidence under the new rules, so the report carries the claimed status, the computed verdict
+    and **every** reason — the zero-pass refusal and the claim-exceeds-evidence refusal, both —
+    rather than a count or a single representative line.
+    """
+    proc, payload = _run_audit_json("--repo", str(AUDIT_ROOT))
+    assert proc.returncode == 0, proc.stderr
+    rows = _audit_features(payload)
+    blocked = rows["901"]
+    assert blocked["claimed_status"] == "Implemented", blocked
+    assert blocked["verdict"] == "block", blocked
+    instances = sorted(_instance(r) for r in blocked["reasons"])
+    assert instances == [
+        "status-claims-implemented-but-blocked",
+        "zero-final-path-pass",
+    ], instances
+    # the human report carries the same facts — C-12 governs the output, not only the payload
+    human = _run_audit("--repo", str(AUDIT_ROOT)).stdout
+    assert "901" in human and "Implemented" in human and "block" in human
+    assert "zero-final-path-pass" in human and "status-claims-implemented-but-blocked" in human
+
+
+def test_audit_reports_only_affected_features_and_exits_zero_despite_the_finding():
+    """C-10: findings do not change the exit code — 0 whenever the inputs parse.
+
+    902 is the case's unaffected subject: the same `Implemented` claim, but with the evidence the
+    rules demand, so the audit judges it `accept`. An audit that reported every enumerated row, or
+    one that turned a finding into a non-zero exit, would be a verdict engine wearing an audit's
+    name — the mode's exit code reflects input validity only.
+    """
+    proc, payload = _run_audit_json("--repo", str(AUDIT_ROOT))
+    rows = _audit_features(payload)
+    clean = rows["902"]
+    assert clean["verdict"] == "accept", clean
+    assert clean["reasons"] == [], clean
+    assert payload["summary"]["affected"] == 1, payload["summary"]
+    assert payload["summary"]["judged"] == 2, payload["summary"]
+    assert proc.returncode == 0, (
+        "an audit's exit code reflects input validity only (C-10): a reported finding MUST NOT "
+        "turn it non-zero: %s%s" % (proc.stdout, proc.stderr)
+    )
+
+
+def test_audit_rejects_spec_dir_and_names_the_flag():
+    """C-02: `--spec-dir` is refused in audit mode — naming the flag, never silently ignored.
+
+    The mode check comes first and is its own branch: an audit invocation that named a spec
+    directory must learn that the flag is not an audit input, not be told that some spec
+    directory is missing. That ordering is why this leg passes a spec directory that does not
+    exist at all — if the checker reported the missing directory instead, it would have applied
+    the single-feature branch's rule to an audit invocation.
+    """
+    proc = _run_audit("--repo", str(AUDIT_ROOT), "--spec-dir", "/no-such-spec-dir-for-audit-mode")
+    assert proc.returncode == 2, proc.stdout + proc.stderr
+    assert "--spec-dir" in proc.stderr, proc.stderr
+    assert "not an audit" in proc.stderr or "audit" in proc.stderr, proc.stderr
+
+
+def test_audit_exit_two_is_reserved_for_missing_or_unparsable_input(tmp_path):
+    """C-10's other half: the mode's non-zero exits are input failures, never verdicts."""
+    missing_root = tmp_path / "not-a-repo"
+    proc = _run_audit("--repo", str(missing_root))
+    assert proc.returncode == 2, proc.stdout + proc.stderr
+
+    empty_root = tmp_path / "empty-repo"
+    (empty_root / ".specify" / "memory").mkdir(parents=True)
+    proc = _run_audit("--repo", str(empty_root))
+    assert proc.returncode == 2, proc.stdout + proc.stderr
+    assert "features.md" in proc.stderr, (
+        "the refusal must name the registry the audit could not find: %s" % proc.stderr
+    )
+
+    unparsable = tmp_path / "unparsable-repo"
+    (unparsable / ".specify" / "memory").mkdir(parents=True)
+    (unparsable / ".specify" / "memory" / "features.md").write_text(
+        "| ID | Name |\n|----|------|\n| 901 | no Status column |", encoding="utf-8"
+    )
+    proc = _run_audit("--repo", str(unparsable))
+    assert proc.returncode == 2, proc.stdout + proc.stderr
+
+
+def test_audit_skips_a_row_whose_spec_path_names_nothing_without_leaving_the_mode(tmp_path):
+    """A registry row that claims `Implemented` but names no spec dir is reported, not obeyed.
+
+    The real registry carries such rows (a feature implemented before the `Spec Path` column
+    existed). Turning one into an input error would end the audit of an entire repository over a
+    fact about a single row; silently skipping it would be the false green C-02 exists to remove.
+    The audit reports the row as not judged, with the reason, and keeps exit 0.
+    """
+    case = tmp_path / "audit-history"
+    shutil.copytree(AUDIT_ROOT, case)
+    registry = case / ".specify" / "memory" / "features.md"
+    registry.write_text(
+        registry.read_text(encoding="utf-8").replace(
+            ".specify/specs/901-audit-blocked/requirements.md", "-"
+        ),
+        encoding="utf-8",
+    )
+    proc, payload = _run_audit_json("--repo", str(case))
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    rows = _audit_features(payload)
+    assert rows["901"]["verdict"] is None, rows["901"]
+    assert "Spec Path" in rows["901"]["detail"], rows["901"]
+    assert payload["summary"]["not_judgeable"] == 1, payload["summary"]

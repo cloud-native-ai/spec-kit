@@ -1,0 +1,2 @@
+smoke run: python3 -c "print('acceptance-fixture-audit-clean')" → exit 0 (fixture-local; the
+audit-history case's 902 subject ran its main flow once, end to end)

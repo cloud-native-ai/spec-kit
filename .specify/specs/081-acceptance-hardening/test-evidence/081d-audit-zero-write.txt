@@ -1,0 +1,59 @@
+081d T011/T013 — the audit mode's zero-write readings (C-11's named verification)
+Date: 2026-11-03 · Tree: part-3 edits + mirrors regenerated
+
+== Run 1 — the audit-history fixture (the mode's own invocation shape, C-02) ==
+
+  before=$(git status --porcelain | wc -l)   -> 9
+  python3 scripts/python/closure-acceptance-check.py --audit-existing \
+           --repo tests/fixtures/acceptance-hardening/audit-history
+  after=$(git status --porcelain | wc -l)    -> 9
+
+  exit code: 0 (a reported finding does not change the exit code — C-10)
+  git status --porcelain delta: 0 lines (before == after)
+  content-hash over the whole fixture tree (shasum -a 256 of the per-file shasums),
+  taken before and after a second run: identical
+    7ab6f9cb2f3839f6973403406616f010305f3d9c0d39391a435b9a8b54bbd515
+
+  Report (verbatim):
+------------------------------------------------------------------------
+audit: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/acceptance-hardening/audit-history
+registry: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/acceptance-hardening/audit-history/.specify/memory/features.md
+feature 901 — claimed Implemented — verdict block
+  spec_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/acceptance-hardening/audit-history/.specify/specs/901-audit-blocked
+  reason: zero-final-path-pass
+  reason: status-claims-implemented-but-blocked
+feature 902 — claimed Implemented — verdict accept
+  spec_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/fixtures/acceptance-hardening/audit-history/.specify/specs/902-audit-clean
+  reason: none
+summary: enumerated=2 in_scope=2 judged=2 affected=1 not_judgeable=0
+------------------------------------------------------------------------
+
+  --spec-dir appears in neither invocation: audit mode rejects it (C-02), so passing one
+  would exercise the single-feature shape against an audit root.
+
+== Run 2 — the real repository (--repo .) ==
+
+  before=$(git status --porcelain) and after=$(git status --porcelain) captured as full
+  strings and compared: identical; 9 lines each (this part's own uncommitted edits)
+  exit code: 0
+
+  Report tail (verbatim):
+------------------------------------------------------------------------
+feature 062 — claimed Implemented — not judged: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/080-humanize-run-output/requirements.md:171 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+feature 063 — claimed Implemented — not judged: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/063-review-p1-governance/requirements.md:253 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01)
+summary: enumerated=63 in_scope=40 judged=0 affected=0 not_judgeable=40
+------------------------------------------------------------------------
+
+  Reading: 63 registry rows enumerated, 40 in the Implemented family, 0 judged — every
+  pre-081 spec's SC definition lines carry no **Path** marker yet (the marker landed with
+  081), so the checker's C-13 input rule cannot read their criteria and each row is reported
+  as not judged with that reason rather than silently skipped or turned into an exit. The
+  mode's exit code stays 0 and no file under the audited root changed: the real-repo reading
+  of FR-020 is 'the audit runs, reports, and writes nothing', not 'the repository is clean'.
+
+== The named carrier ==
+
+  tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing asserts the same
+  two subjects inside the suite — a recursive content hash over a tmp_path copy of the fixture
+  (a tree an implementation actually could modify) and the git status --porcelain pair over the
+  repository — and is green in tasks-081d-part3-tests.txt.
