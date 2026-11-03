@@ -118,11 +118,7 @@ Three binding rules of the application:
 
 - Feature names: 2–5 words
 - Index table: single header row, all columns, aligned pipes
-- Status vocabulary: `Draft | Planned | Implemented | Blocked | Ready for Review | Completed` — `Blocked` is
-  admitted because a feature whose work is done but whose closure verdict is not `accept` is `Blocked`, never
-  `Implemented`; its transitions and the narrow `Implemented → Blocked` audit-correction exception are owned by
-  `.specify/templates/feature-details-template.md` § Canonical Status State Machine (see also
-  `.specify/shared/workflow/acceptance-hardening.md` § Feature Status) — pointer only, no criteria restated here
+- Status vocabulary: `Draft | Planned | Implemented | Ready for Review | Completed`
 - Feature detail links: `.specify/memory/features/[FEATURE_ID].md`
 - Do NOT modify templates; only instantiate copies
 
