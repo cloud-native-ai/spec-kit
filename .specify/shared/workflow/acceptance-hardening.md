@@ -14,12 +14,14 @@ Status State Machine, `templates/verification-log-template.md`, `templates/tasks
 `templates/plan-template.md` (the two plan-table skeletons, which carry **column names only**) physically hold what
 this file defines, because a consumer that is editing a template must find the rules where it is editing. A carrier
 is a **declared projection**: it may not widen a value domain, and where a carrier and this file disagree, this file
-wins and the carrier is stale. The four carriers are also the exemption list of the schema-uniqueness guard
-(`requirements.md` SC-009 ④), and each carries its own narrowing assertion — the plan skeleton, in particular, may
-repeat a column set and **zero** domain literals.
+wins and the carrier is stale. Each carrier also owes a narrowing assertion of its own — the plan skeleton, in
+particular, may repeat a column set and **zero** domain literals. This paragraph declares carriers; it does **not**
+define the schema-uniqueness guard's allow-list. Which surfaces that guard permits, on which subject and across
+which paths, is owned by § Schema Uniqueness.
 
 **Scope of this revision**: § Feature Status · § Verification Vocabulary · § Gates · § Closure Verdict ·
-§ Runtime Stack & Dependency Ownership · § Execution Premises · § Inherited Blockers · § Review Composition.
+§ Runtime Stack & Dependency Ownership · § Execution Premises · § Inherited Blockers · § Schema Uniqueness ·
+§ Review Composition.
 Sections belonging to later slices are listed in § Extension Points, together with the owner their obligations
 currently have. Nothing here is inferred from a slice that has not landed.
 
@@ -445,6 +447,57 @@ them. A later-slice `Carrier slice` is not in that class — that is `inherited-
 
 Boundary (A13): dependency-inherited records only. § Gates § The A13 boundary owns the split between this table,
 the plan's premises and `tasks.md` § Environment Prerequisites; this section does not restate it.
+
+## Schema Uniqueness
+
+What the schema-uniqueness guard asserts, on what subject, over which paths — stated here once. `requirements.md`
+SC-009 ④ states the criterion's reading, `contracts/artifact-schemas.contract.md` AS-13…AS-16 the contract
+obligation, and the guard test the enumeration; none of the three re-derives an allow-list of its own.
+
+**The subject is the column-name set, not the value domain.** The guarded literal is the **`Column` cell** of each
+of this file's three column-declaration tables — the one in § Runtime Stack & Dependency Ownership, the one in
+§ Execution Premises and the one in § Inherited Blockers. The names are therefore never enumerated a second time,
+here or in the guard: the test reads them out of those three tables, which is the only place they are defined.
+
+**The domain literals are explicitly NOT the subject**, and a guard restated as "the owner's value-domain literals
+appear zero times in the scan domain" is **wrong on a real tree** — three of those literals are simultaneously
+members of unrelated closed sets that legitimately live in `templates/` and `shared/`: `not-required` is the
+traceability binary in `shared/definitions/sdd-routing-definitions.md`; `not-applicable` is the code-review
+segment verdict in `templates/review-template.md` and `templates/commands/review.md` and the site-layer verdict in
+`shared/workflow/expression-gates.md`; `in-scope` occurs as ordinary English in
+`shared/definitions/derivation-definitions.md`. A literal-set guard therefore has to carry an exclusion list of
+its own — which would make the guard's `expected` a second definition point, the very defect it exists to
+prevent. The subject is the column set precisely because a column set has no third-party meaning.
+
+**Scan domain**: `templates/` and `shared/` — framework source. `.specify/` copies are mirrors of these paths and
+are never scanned; a divergence there is a mirror defect, judged by `scripts/python/sync-mirrors.py --check`, not
+by this guard.
+
+**Assertion**: across that domain the three column sets appear **zero** times outside this file, with exactly one
+allowed surface: **`templates/plan-template.md`**, which carries the Execution Premises and Inherited Blockers
+column sets as its two skeletons, because an empty table whose columns are not given forces every future plan to
+invent its own — the columns are precisely what the skeleton exists to hand down. Its narrowing assertion is that
+it carries the column names and **zero** owner-exported domain literals (measured: 0). This file is the definition
+site and is the hit the guard excludes by identity, not by a list entry.
+
+**A hit is a whole column set, matched as the ordered cell sequence of a table header row** — not an individual
+name. That distinction is what makes the assertion true rather than aspirational: `Status`, `Form`, `Owner`, `ID`
+and `Evidence` are ordinary column names of unrelated tables in the same domain (measured: `Status` in
+`templates/feature-index-template.md`, `templates/glossary-template.md` and `templates/plan-template.md`'s
+Constitution Check table; `Form` in `shared/definitions/agent-definitions.md`; `Owner` in
+`shared/definitions/derivation-definitions.md` and `shared/guidelines/directory-governance.md`; `Capability` in
+`shared/guidelines/dogfooding.md`). Matching a single name would either fail on the tree as it stands or force the
+guard to name those tables one by one — a hand-maintained exclusion list is exactly the drift the guard exists to
+prevent. The set as a whole has no second user, which is why it is the subject.
+
+**Surfaces outside the scan are not exemptions.** `data-model.md`, `contracts/` and `requirements.md` FR-003 live
+under `.specify/specs/<key>/`, where the scan cannot reach them; they are therefore **not**, and MUST NOT be
+described as, exemptions of this guard. Each still owes its own narrowing assertion — `data-model.md` and
+`requirements.md` carry **no** `From | To | Allowed | Condition` transition row (a restated row is an unguarded
+duplicate), and a projection may narrow a value domain but never widen it. Those are duties of the projection
+relation, owned by the carrier and one-source rules in this file's opening block, not members of a guard
+allow-list: calling a path the scan cannot reach an "exemption" makes the allow-list describe a boundary of
+nothing while the in-domain surfaces that really do carry owner material go unguarded.
 
 ## Review Composition
 

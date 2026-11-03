@@ -28,13 +28,13 @@ SC-001_why_reduced_insufficient=one call site cannot prove the review or driver 
 SC-001_unblock=wire the driver closure/merge site in 081d, then rerun all three sites
 
 SC-002_status=partial
-SC-002_value=the review composition is wired and the fourth condition is measured at the fixture boundary: `review-implemented-clean` accepts (exit 0, claimed `Implemented`, all four conditions true) and `review-implemented-blocked` blocks (`zero-final-path-pass`, `F-ACCEPTANCE`); a real `/speckit.review` run over the clean fixture has not been recorded
-SC-002_note=the fixture-level checker payload is a reduced measurement, not the review command's own four-segment run; T013 records that remainder
-SC-002_blocked_at=no real review command run over `review-implemented-clean`; the fixture-level checker is the reduced measurement
-SC-002_reduced_measurement=`review-implemented-clean` accept/exit 0/all four conditions true + `review-implemented-blocked` block/exit 1/`zero-final-path-pass` + T004 leg (i)
+SC-002_value=the composition is wired and the negative pair is measured: `review-implemented-blocked` blocks (`zero-final-path-pass`, `F-ACCEPTANCE`); the positive R4R half is NOT measured, because SC-002 requires **all three** named readings — (i) implement site accepting `positive`, (ii) a **recorded review-composition run** over `review-implemented-clean` (four segments executed on that fixture, its `review.md` or an equivalent four-segment transcript, the ARC record, command / exit code / evidence path), (iii) `smoke-mutation` refusing with `status-claims-implemented-but-blocked` — and (ii) is the one that is absent. Measured today: (i) and (iii) hold at the fixture boundary; (ii) does not exist as a run
+SC-002_note=the bar is the recorded four-segment composition run, not the checker payload: a checker invocation on a fixture is the *input* the artifact segment consumes, and it is recorded below as the reduced measurement exactly because it is not the bar. 081d's T004 owns producing the reading; if it cannot be produced, this row stays `partial` and the feature stays `Blocked` (tasks.md § Status consequence)
+SC-002_blocked_at=no recorded review-composition run over `review-implemented-clean`: no four-segment transcript (or fixture-local `review.md`) plus ARC record exists with its command, exit code and evidence path
+SC-002_reduced_measurement=`review-implemented-clean` checker invocation (accept/exit 0/all four conditions true at the payload level) + `review-implemented-blocked` block/exit 1/`zero-final-path-pass` + 081c T004 leg (i) + 081a's implement-site and `smoke-mutation` readings
 SC-002_reduced_measurement_run=yes
-SC-002_why_reduced_insufficient=a checker invocation on a fixture is not the review site's four-segment run; the R4R leg requires the review command itself
-SC-002_unblock=run `/speckit.review` on `review-implemented-clean` and record the command, exit code and evidence path; then SC-002 can pass
+SC-002_why_reduced_insufficient=a checker invocation on a fixture is not the review site's four-segment run: it judges the fourth condition without executing the process, artifact, implementation and code segments over the fixture, so it carries none of their findings and no produced `review.md`. Re-taking the same invocation cannot upgrade this row
+SC-002_unblock=run the composed `/speckit.review` over `review-implemented-clean` so all four segments execute on that fixture, and record the four-segment transcript (or the fixture-local `review.md`) with the ARC record, the command, the exit code and the evidence path; then SC-002 can pass — that same recorded run is the produced `review.md` SC-006's unblock names, so one run serves both readings
 
 SC-003_status=partial
 SC-003_value=feature-details owner states four `Blocked` transitions and the fourth Ready-for-Review condition; `manage-features` (T024, deferred) and the feature-index-template vocabulary are 081d work

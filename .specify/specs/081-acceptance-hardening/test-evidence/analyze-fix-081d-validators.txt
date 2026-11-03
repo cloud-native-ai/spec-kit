@@ -1,0 +1,24 @@
+=== validate-requirements ===
+file: .specify/specs/081-acceptance-hardening/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 272 lines, 34 definition rows, 17 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+=== validate-tasks ===
+PASS: .specify/specs/081-acceptance-hardening/tasks.md — 0 error(s), 0 warning(s)
+EXIT=0
+
+=== pre-analyze --stage tasks ===
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=38 waived=0
+EXIT=0
+
+=== decomposition-check --mode tasks ===
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 25, "task_count": 18, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-03T08:25:06Z"}
+EXIT=0

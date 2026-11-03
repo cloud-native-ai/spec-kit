@@ -110,16 +110,21 @@ The same two runs are asserted by `tests/contract/test_closure_acceptance_check.
 negative + ladder + smoke + premise/runtime-gap mutation cases), so this block is a **route (a)**
 observation backed by a route (b) pin.
 
-> **Premises**: (1) the fixture directories are declarative minimal file sets — `requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail and a registry row (no real feature is referenced); (2) `--spec-dir` accepts a fixture path that is not under `.specify/specs/`; (3) the claimed status resolves from the fixture's own `feature-detail.md` / `feature-registry.md` when no `--feature-detail` is passed (contract C-03's spec-local layer; measured above, `claimed_status_source` names each fixture's own detail file); (4) exit codes are `0/1/2` exactly as `contracts/closure-acceptance-check.contract.md` C-10 states.
+> **Premises**: (1) the fixture directories are declarative minimal file sets — `requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail and a registry row (no real feature is referenced); the one exception is `audit-history`, which is the second, **audit-root** shape (`data-model.md` § Fixture set) and is read via `--repo`, not `--spec-dir` (§ S7); (2) `--spec-dir` accepts a fixture path that is not under `.specify/specs/`; (3) the claimed status resolves from the fixture's own `feature-detail.md` / `feature-registry.md` when no `--feature-detail` is passed (contract C-03's spec-local layer; measured above, `claimed_status_source` names each fixture's own detail file); (4) exit codes are `0/1/2` exactly as `contracts/closure-acceptance-check.contract.md` C-10 states.
 
 ---
 
 ## S7 — Read-only audit mode (flag present, mode is 081d)
 
 ```bash
-python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/080-humanize-run-output --audit-existing
+python3 scripts/python/closure-acceptance-check.py --audit-existing --repo .
 git status --porcelain | wc -l
 ```
+
+**The invocation shape is the audit's own**: the root is `--repo <root>` and the registry is read from
+`<root>/.specify/memory/features.md`; `--spec-dir` belongs to the single-feature mode and audit mode
+**rejects** it (exit `2`, naming the flag) rather than ignoring it — a gate that passed `--spec-dir`
+here would be exercising the single-feature shape against an audit root.
 
 **Not claimable in 081a — the flag exists, the mode does not.** The script is on disk and
 `--audit-existing` is on its stable surface (C-04), but passing it exits `2` with an explicit
@@ -129,7 +134,7 @@ report the opposite of what C-10 requires of the mode. Declared expectation once
 audit lists the features that would become `Blocked` under the new rules, writes nothing, and exits
 `0`; the `git status --porcelain` line count is identical before and after.
 
-> **Premises**: (1) `080-humanize-run-output` carries an `Implemented`-family claimed status for its bound Feature 062 (verify with `.specify/memory/features.md` before citing); (2) audit mode never writes, including no cache or lock file; (3) the audit's exit code reflects input validity only (C-10). **Carriers are 081d deliverables, not existing**: `tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing` and `tests/fixtures/acceptance-hardening/audit-history/` are both authored in 081d (contract traceability row FR-020).
+> **Premises**: (1) the audit reads `.specify/memory/features.md` as it stands, so whatever it reports is a reading of this repository and neither a long list nor an empty one is by itself a defect (081's own row is `Blocked` today and is not an audit subject); (2) audit mode never writes under the audited root, including no cache or lock file; (3) the audit's exit code reflects input validity only (C-10). **Carriers are 081d deliverables, not existing**: `tests/contract/test_closure_acceptance_check.py::test_audit_writes_nothing` and the **audit-root** fixture `tests/fixtures/acceptance-hardening/audit-history/` (a `.specify/memory/features.md` plus `.specify/specs/<key>/`, the second fixture shape `data-model.md` § Fixture set declares) are both authored in 081d (contract traceability row FR-020).
 
 ---
 

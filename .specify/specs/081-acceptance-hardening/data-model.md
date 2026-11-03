@@ -4,7 +4,7 @@
 
 **Projection surface (SC-009 ④)**: this file is a declared projection of the owner — its value domains may narrow the owner's, never expand them, and it restates no state-transition row set (see § E-8). The uniqueness guard asserts exactly those two properties instead of counting this file's literals as duplicate hits.
 
-**Census**: 10 entities (E-1 … E-10), 30 validation rules (V-1 … V-30), 2 state machines (SM-1 feature status, SM-2 line state), 1 closed reason set (7 values), 2 closed vocabularies (verification status, runtime-stack form).
+**Census**: 10 entities (E-1 … E-10), 32 validation rules (V-1 … V-32), 2 state machines (SM-1 feature status, SM-2 line state), 1 closed reason set (7 values), 2 closed vocabularies (verification status, runtime-stack form).
 
 Every entity below states its **carrier** (the file that physically holds it) and its **parser** (the code that reads it) — the two must be named together, because an entity whose carrier exists but whose parser does not is exactly the "green check that proves nothing" failure mode (Constitution XVI).
 
@@ -81,6 +81,8 @@ Every entity below states its **carrier** (the file that physically holds it) an
 - **V-12**: `status-claims-implemented-but-blocked` fires only when the claimed status is `Implemented` or `Ready for Review` **and** the verdict is `block` — i.e. it is the ARC's deterministic basis, and it can never fire during `Planned → Implemented` (where the claimed status is `Planned`).
 - **V-13**: `--audit-existing` is zero-write and exits `0` whenever inputs are valid, regardless of findings; it MUST NOT block anything and MUST NOT rewrite history.
 - **V-14**: the checker is read-only and stdlib-only; it MUST NOT consult a model, a network, or `.specify/.tmp`.
+- **V-31**: the audit's root is a **repository**, not a spec directory: `--repo <root>` (default = current repository root), registry at `<root>/.specify/memory/features.md`, and `--spec-dir` **rejected** in audit mode rather than ignored (C-02). Each audited feature is judged against the spec directory its own registry row's `Spec Path` cell names, resolved against the same root.
+- **V-32**: a **line's** spec directory comes from the registry row, never from the branch string by construction: the line's `branch` supplies the feature id (leading `\d{3}`), the row with that `ID` supplies `Spec Path`, and the directory is that cell joined to the line's `worktree_path` (the driver gate runs with `cwd=wt`). A branch without a `\d{3}` prefix, a missing row, an empty or `-` `Spec Path`, and a directory that does not exist are input errors naming the offending subject — never a silent skip, never an invented `<cwd>/.specify/specs/<branch>` (GW-03).
 
 ## E-5 — Runtime Stack Row
 
@@ -180,7 +182,10 @@ Findings are never merged across families, never converted, never scored as one 
 
 ## Fixture set (the declarative inputs the rules are proved on)
 
-**Carrier**: `tests/fixtures/acceptance-hardening/<case>/` — each case is a minimal file set (`requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail, a registry row); no case references a real feature directory.
+**Carrier**: `tests/fixtures/acceptance-hardening/<case>/` — two declarative shapes, and each case's `Shape` cell in the table below says which one it is:
+
+- **spec-dir case** (every existing case) — a minimal file set (`requirements.md`, `plan.md`, `tasks.md`, `verification.md`, a feature detail, a registry row), read as one `--spec-dir`.
+- **audit-root case** (`audit-history` only) — a self-contained audit root: a `.specify/memory/features.md` registry plus one or more `.specify/specs/<key>/` directories, each carrying the artifacts its registry row claims. This second shape exists because `--audit-existing` enumerates registry rows across a **repository** root (`--repo <root>`, C-02/C-04) — the mode's input is a tree with a registry in it, so a flat spec-dir case can prove nothing about it. The audit root is still declarative and still self-contained: its `.specify/specs/<key>/` entries are directories **inside the case**, named by the case's own registry rows' `Spec Path` cells; no case references a real feature directory.
 
 **The `Slice` column is what keeps absence readable**: a case whose slice has not landed yet is *not there yet*, not *missing*. 081a's seven cases exist on disk today; 081b adds five (`premise-mutation`, `runtime-gap-mutation`, `runtime-zero-row`, `inherited-mutation`, `inherited-clean`), 081c adds three (`review-implemented-clean`, `review-implemented-blocked`, `expected-artifact-missing`) and 081d adds `audit-history`; all of them are listed here so the table states the intended corpus instead of the current directory listing. A dependency-side case carries, in addition to the `positive` shape, a **dependency feature detail and its `verification.md`** — that is the artifact the extraction reads, and a fixture without it can only prove that a judgement fires, never that extraction discovers rows.
 
@@ -203,4 +208,4 @@ Findings are never merged across families, never converted, never scored as one 
 | `mixed-path` | 081a | an `execution` feature with three SCs: `SC-001` `final` `pass`, `SC-002` `final` `fail`, `SC-003` `supporting` `deferred` (full ladder) | V-11 + Edge Case "final 与 supporting 混合": the reason is `final-path-not-pass: SC-002` (`zero-final-path-pass` is **not** emitted, since one `final` passed), and the lone `supporting` non-`pass` is not a standalone blocking reason |
 | `expr-supporting-only` | 081a | an `expression` feature whose SCs are all `supporting`, one of them `deferred` with the full ladder | V-11's `expression` exemption: the `final`-path rule is vacuous — no `final`-path reason is emitted and the fixture MUST NOT be forced to invent a `final` SC |
 | `execution-without-final` | 081a | an `execution` feature whose SCs are all `supporting` (zero `final`-path SC) | V-1 via `validate-requirements.py` check `path-marker` (an `execution` feature with zero `final`-path SC **fails**), and at the checker layer `final_path.total = 0` so V-11's `zero-final-path-pass` applies |
-| `audit-history` | 081d | an `Implemented` feature that would become `Blocked` under the new rules | `--audit-existing` reports it, writes nothing, exits 0 |
+| `audit-history` | 081d | an **audit-root case** (`.specify/memory/features.md` + `.specify/specs/<key>/`), carrying one `Implemented` feature that would become `Blocked` under the new rules and one that would not | `--audit-existing --repo <case>` reports one affected feature with its claimed status, verdict and reasons, writes nothing under the case, exits `0` — the mode's input is a repository root with a registry, so this is the only case shape that can exercise it |
