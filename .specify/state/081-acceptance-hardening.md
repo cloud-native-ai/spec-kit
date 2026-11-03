@@ -365,3 +365,19 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - review-fix：`pre-analyze-check.py` 改用与 closure checker 相同的 declared-block 解析并把 `repo` 贯通；新增 `resolve_claimed_status()`（spec 目录 detail/registry → 仓库 `features.md`）；两 producer 对「有依赖集但无声明块」判 exit 2；owner + plan skeleton 发布 marker；`—` 与 `(none)` 同为 absent sentinel；`verification.md`/`tasks.md`/`data-model.md` 四族 P2 修正；新增 legs (d2)–(d5)。
 - 复测：plan gate `decision=pass errors=0 advisories=45`（081c/081d 计划路径）；closure `block`/exit 1/`zero-final-path-pass`/`final_path 0/1/0/1/0/0/2`；targeted 8 模块 `145 passed` exit 0；mirror/regen `--check` exit 0。证据：`test-evidence/review-fix-081b-gates.txt`、`review-fix-081b-plan-gate.json`、`tasks-081b-review-fix-tests.txt`。
 - Feature 仍 **`Blocked`**（081b 无 closure 调用点）。下一阶段 = 081b closure（U6 记录）→ 081c。
+
+## 081b closure（2026-11-03 06:50 UTC）
+
+- 切片 081b 关闭：implement 12/12 `[X]`、review P0/P1 全修、review-fix `021f80b0` 已推送 `gitlab/081-acceptance-hardening`。
+- 终态：Feature 081 仍 **`Blocked`**；closure checker `block`/exit 1/`zero-final-path-pass`、`final_path pass=0 blocked=1 partial=1`、tasks 12 closed/0 open；plan gate `pass errors=0`。
+- 载体归档：`tasks-081b.md`、`review-081b.md`、`code-review-081b.md`（081a 的同名载体保留）。
+- 081b 的可复用结论：两个 producer 必须在**真实 plan 形状**上对拍，fixture 的 fixture-local 依赖名与 `feature-detail.md` 会掩盖真实缺陷；声明 marker 与 absent sentinel 必须是文档化字面量，缺失声明必须 exit 2。
+
+## 081c 入口（Phase 3）
+
+- **切片**：081c — US3：review 组合与 ARC（plan § D10 081c 行：`review-feature-quality` 技能、review-template 槽位 `### 2.2`–`### 2.4`、`templates/commands/review.md` 组合改写、ARC、反馈 census 3→4 + 守卫、checker 的 **review** 调用点、FR-013 期望产物分母、IB-004 载体补全为 `task:<T-ID>+test:<path>`）。
+- **断点**：`tasks`（parent requirements/plan 已存在；081b 载体已归档；本轮生成新的 `tasks.md`）。
+- **阶段计划**：`tasks → checklist → analyze → implement → review → closure`。
+- **测试预算**：baseline = 081b review-fix 后的树（targeted 145 passed；全量基线仍取 081a final 39F/7025P/7S，081d 做 feature-level 对照）；closure = 081c review 后。
+- **不做**：081d 的 manage-features / feature-index 词表、`--audit-existing`、driver line-state `blocked` / merge gate、schema-ownership guard、final smoke / 全量基线对照。
+- **状态**：SC-002 可在本切片转为 `pass`（review 第四条件落地）；SC-001 仍 `blocked`（3 处调用点还差 driver closure/merge 一处）。
