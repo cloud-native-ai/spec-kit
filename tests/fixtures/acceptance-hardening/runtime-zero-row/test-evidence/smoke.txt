@@ -1,0 +1,3 @@
+$ python3 -c "print('acceptance-fixture-runtime-zero-row')"
+acceptance-fixture-runtime-zero-row
+exit 0

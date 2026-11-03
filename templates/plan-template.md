@@ -169,6 +169,22 @@ reference the real directories captured above. Explicitly note any new top-level
 |----------------------|---------------------------------------------------|--------|
 | [e.g. `templates/commands/x.md`] | [e.g. `.claude/commands/speckit.x.md`; `.github/prompts/speckit.x.prompt.md`; `.qoder/commands/speckit.x.md`; `.opencode/command/speckit.x.md` — per-tool copies via regen-command-copies.py; NO `.specify/templates/commands/` mirror (retired)] | [e.g. `diff -q` on the pairs touched here, judged against the baseline measured before the edit — "no NEW drift"; regenerated copies contain the edit. Never a pre-written exit code] |
 
+## Execution Premises
+
+Owner of this table's shape, its `Status` and `Decision` value domains and its invalid-row rule: `shared/workflow/acceptance-hardening.md` § Execution Premises — this skeleton carries the column set and nothing else, so a value domain written here would be a second definition.
+
+| ID | Premise | Evidence | Status | Decision |
+|----|---------|----------|--------|----------|
+| [<premise id>] | [<one load-bearing assumption this plan rests on>] | [<path, command or measurement that bears on it>] | [<value from the owner's domain>] | [<value from the owner's domain, where the owner requires it>] |
+
+## Inherited Blockers
+
+Owner of this table's shape, its `Disposition` domain, the `Source row` / `Carrier` / `Carrier slice` grammar and the carrier's eligibility rule: `shared/workflow/acceptance-hardening.md` § Inherited Blockers — this skeleton carries the column set and nothing else, and the dependency set these rows are extracted from MUST be declared in this section.
+
+| # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
+|---|-----------|-------------|---------|---------------|-----------------|
+| [<ordinal>] | [<the extracted dependency record's locator>] | [<value from the owner's domain>] | [<carrier, where the owner requires one>] | [<the slice that carries it>] | [<path plus one line, or the reason the disposition holds>] |
+
 ## Document Structure
 
 <!--
