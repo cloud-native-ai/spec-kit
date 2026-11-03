@@ -1508,10 +1508,27 @@ def get_resource_path() -> Optional[Path]:
     """
     Get the path containing templates/memory/scripts.
     Checks MODULE_DIR first (installed package), then repo root (local dev).
+
+    Precedence is load-bearing: an installed package that ships its own
+    ``templates/`` always wins, so a globally installed CLI can never be
+    silently redirected to whatever repository happens to sit above it. Only
+    when the module directory carries no templates do we consider the
+    development checkout, whose layout is ``<repo>/src/specify_cli/`` — hence
+    ``MODULE_DIR.parent.parent`` for the repository root, the same convention
+    the command/template copy paths below already use.
+
+    Rationale (Feature 081 § T-005): without the fallback a development
+    checkout reports "Local templates not found" even though the working-tree
+    templates are right there, which would leave the working tree — the main
+    deliverable surface of a framework change — uncovered by any smoke test.
     """
 
     if (MODULE_DIR / "templates").exists():
         return MODULE_DIR
+
+    repo_root = MODULE_DIR.parent.parent
+    if (repo_root / "templates").exists():
+        return repo_root
 
     return None
 
