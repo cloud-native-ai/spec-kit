@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Feature 081 (acceptance hardening)**: deterministic acceptance gates for feature-status
+  transitions. New `closure-acceptance-check` engine (`scripts/python/closure-acceptance-check.py`)
+  — four completion conditions judged by one program, `accept`/`block` only, a seven-literal
+  closed reason set, and a read-only `--audit-existing` mode (zero writes under the audited root,
+  one report line per affected feature). Declarative fixture sets under
+  `tests/fixtures/acceptance-hardening/` and the contract suites that pin them: the three gate
+  call sites (implement / review / driver closure-merge), the review composition (four fixed
+  segments plus the Acceptance Reality Check), the line-state machine (the `blocked` value and its
+  eight dispositions), the acceptance schema owner (`shared/workflow/acceptance-hardening.md`) and
+  its schema-ownership guard.
 - `create-pages`: **Hugo Book theme** (`alex-shpak/hugo-book`, pinned `v0.14.0`) as the
   preferred renderer, vendored offline under `docs/themes/book` via
   `scaffold-hugo.py --action theme --fetch`; the built-in layouts remain the fallback.
@@ -23,6 +33,19 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- **Feature 081 (acceptance hardening)**: the three status-transition call sites now run the
+  closure checker — `/speckit.implement` before `Planned → Implemented` (a `block` lands
+  `Blocked`, never `Implemented`), `/speckit.review` before `Implemented → Ready for Review`
+  (four segments in one fixed order plus the Acceptance Reality Check; a `block` refuses the
+  transition with a named condition), and the `sdd-loop-driver`'s closure/merge step, where
+  `integrate-lines.py` defaults its quality gate to the checker through the existing
+  `--gate-cmd` hook (`block` records `closure-blocked` then lands the line `blocked`; input
+  errors record `closure-input-error` and leave the state unchanged). `line-registry.py` admits
+  `blocked` as a first-class line state. The vocabulary owners (`templates/feature-details-template.md`,
+  `templates/feature-index-template.md`, `skills/internal/manage-features/SKILL.md`) and the
+  schema owner align on `Blocked`, with the narrow `Implemented → Blocked` audit-correction
+  exception; the four `blocked` literals are reconciled once in
+  `shared/workflow/acceptance-hardening.md` § Verification Vocabulary.
 - `create-pages`: built-in layouts no longer use `.Site.Language.Locale` (Hugo ≥ 0.158 only),
   which broke every page on older Hugo; `.Site.Language.Lang` is used instead.
 - `docs/` reorganized to the six-type taxonomy (tutorials / concepts / reference / decisions / contribute / tasks + notes, archive).

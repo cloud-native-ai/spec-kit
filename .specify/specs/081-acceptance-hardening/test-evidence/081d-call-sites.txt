@@ -1,0 +1,110 @@
+T016 (a) + (a2) — SC-001's 3/3 refusal and SC-002's three named readings, measured at the final tree
+Feature 081 / slice 081d / row T016 (FR-023, FR-025, SC-001, SC-002)
+Date: 2026-11-03 · branch 081-acceptance-hardening · tree: f29b6178 + this part's CHANGELOG entry (the only tracked delta at run time)
+
+The three call-site invocations are extracted, not retyped — the same mechanical extraction
+`tests/contract/test_gate_wiring_081.py` performs (`python3 scripts/python/closure-acceptance-check.py …`):
+
+  IMPLEMENT site — `skills/internal/implement-feature/SKILL.md` Step 9:
+      python3 scripts/python/closure-acceptance-check.py --spec-dir <REQUIREMENTS_DIR>
+  REVIEW site — `templates/commands/review.md` § The Acceptance Reality Check:
+      python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir> --json
+  DRIVER site — `integrate-lines.py build_gate_cmd(ROOT, <fixture>)` output:
+      python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative
+
+(a) SC-001 — the three call sites refuse the negative fixture, 3/3, one closed-set reason each
+----------------------------------------------------------------------------------------------
+
+(a.1) IMPLEMENT site on tests/fixtures/acceptance-hardening/negative:
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative
+  verdict: block
+  spec_dir: …/tests/fixtures/acceptance-hardening/negative
+  flow_class: execution
+  claimed_status: Planned
+  final_path: pass=0 blocked=1 deferred=1 partial=0 fail=0 unknown=0 total=2
+  reason: zero-final-path-pass
+  exit 1
+  → named reason, verbatim: `zero-final-path-pass`  ([[STR-008]], member of the closed set)
+
+(a.2) REVIEW site on the same fixture (its own ARC invocation, --json):
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative --json
+  { … "verdict": "block", "reasons": [{"code": "zero-final-path-pass", "target": ""}],
+    "final_path": {"blocked": 1, "deferred": 1, "fail": 0, "partial": 0, "pass": 0,
+                   "total": 2, "unknown": 0}, "claimed_status": "Planned", … }
+  exit 1
+  → named reason, verbatim: `zero-final-path-pass`  ([[STR-008]]); every emitted code is inside
+    the checker's own closed set (the carrier asserts membership mechanically).
+
+(a.3) DRIVER site on the same fixture (the command T008's gate builds, run as the gate runs it):
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/negative
+  verdict: block
+  …
+  reason: zero-final-path-pass
+  exit 1
+  → named reason, verbatim: `zero-final-path-pass`  ([[STR-008]])
+
+SC-001 READING: 3/3 refused, 0 accepted; each refusal's reason is the closed-set member
+`zero-final-path-pass`, quoted verbatim from the site's own output. No free-text reason anywhere.
+
+Carrier module at this tree:
+  $ bash scripts/bash/run-tests.sh tests/contract/test_gate_wiring_081.py -v
+  22 passed in 10.63s                                                     exit 0
+  (the three negative legs:
+    test_the_documented_invocation_blocks_the_negative_fixture,
+    test_the_review_call_sites_own_invocation_blocks_the_negative_fixture,
+    test_the_built_gate_command_blocks_the_negative_fixture — all PASSED)
+
+(a2) SC-002 — the three named readings, all three on record
+------------------------------------------------------------
+
+(i) The IMPLEMENT site ACCEPTS the positive fixture:
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/positive
+  verdict: accept
+  flow_class: execution
+  claimed_status: Planned
+  final_path: pass=1 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=1
+  reason: none
+  exit 0
+  → `accept` / exit 0. The positive path is not killed (误拒 0 at this site).
+
+(ii) The REVIEW site's recorded composition run over `review-implemented-clean` — owned by T004,
+     cited here, not re-run (one run, one evidence file, C-08):
+  - record (the run's own artifact):
+      tests/fixtures/acceptance-hardening/review-implemented-clean/review.md
+  - run transcript (commands, exits, segment verdicts):
+      .specify/specs/081-acceptance-hardening/test-evidence/081d-review-site-measurement.txt
+  - what it contains: the four segments executed in the fixed order process → artifact →
+    implementation → code (process pass; artifact pass with coverage 7/7 derived before
+    membership; implementation not-applicable WITH the smoke triple measured — command verbatim,
+    exit 0, evidence path non-empty; code not-applicable on the triage's own printed basis),
+    followed by ARC: verdict `accept`, claimed `Implemented`, comparison `agree`, the seven-key
+    `final_path` record copied verbatim (pass 1 · blocked 0 · deferred 0 · partial 0 · fail 0 ·
+    unknown 0 · total 1), and the fourth `Implemented → Ready for Review` condition judged and
+    passed. Commands and exit codes for every segment are in the transcript; the checker
+    invocation inside it exited 0. NOT a bare checker invocation: the payload is one input the
+    artifact segment consumed.
+
+(iii) The smoke-mutation fixture refuses with [[STR-014]]:
+  $ python3 scripts/python/closure-acceptance-check.py --spec-dir tests/fixtures/acceptance-hardening/smoke-mutation
+  verdict: block
+  flow_class: execution
+  claimed_status: Implemented
+  final_path: pass=1 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=1
+  reason: status-claims-implemented-but-blocked
+  exit 1
+  → a fixture that claims `Implemented` with the smoke record missing is refused: the status
+    MUST read `Blocked`, never `Implemented` (SC-002 (iii), 1/1). Reason verbatim:
+    `status-claims-implemented-but-blocked` ([[STR-014]]).
+
+SC-002 READING: all three named readings measured and on record — (i) accept/exit 0, (ii) the
+recorded four-segment composition run with its produced record, (iii) block/exit 1 with
+[[STR-014]]. None is a reduced measurement standing in for another.
+
+Supporting green at the same tree (the six carrier modules T016's dependencies own):
+  $ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_state_machine.py \
+      tests/contract/test_acceptance_review_composition.py tests/contract/test_closure_acceptance_check.py \
+      tests/contract/test_line_state_blocked.py tests/contract/test_acceptance_premises.py \
+      tests/contract/test_acceptance_schema_ownership.py -q
+  119 passed in 15.09s                                                    exit 0
+  (state machine 17 · review composition 32 · closure checker 23 · line state 10 ·
+   premises 28 · schema ownership 9)

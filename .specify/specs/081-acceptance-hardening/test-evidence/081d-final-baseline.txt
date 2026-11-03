@@ -1,0 +1,129 @@
+T016 (b) + (c) + (d) — the final smoke, the feature-level baseline comparison, the schema guard and the coverage lane
+Feature 081 / slice 081d / row T016 (FR-023, FR-025, SC-008, SC-009)
+Date: 2026-11-03 · branch 081-acceptance-hardening · tree: f29b6178 + this part's CHANGELOG entry (the only tracked delta at run time)
+
+(b) SC-008 — the one smoke command, twice, same exit, evidence refreshed
+-------------------------------------------------------------------------
+  command (verbatim): bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q
+
+  run 1: 1 passed in 1.89s                        exit 0
+  run 2: 1 passed in 1.79s                        exit 0
+  → same exit code twice (2/2). The smoke record's evidence path
+    .specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt
+    was rewritten by run 2 (mtime 17:59) and is byte-identical to the committed version — the
+    smoke module's output is deterministic ("no network, no wall clock"), so the refresh shows
+    as an mtime change, not a diff. The triple recorded in `verification.md`:
+    command = the line above · exit code = 0 · evidence path = the file above.
+    The smoke covers FR-005's three things: `specify init` from the checkout's own templates,
+    the checker on the positive and negative fixtures (accept/exit 0 and block/exit 1 with
+    `zero-final-path-pass`), and `regen-command-copies.py --check` (exit 0).
+
+(c) SC-009 ② — pin re-read first, then the feature-level full-suite comparison
+-------------------------------------------------------------------------------
+  Pin re-read (against test-evidence/plan-runner-pins.txt — all three match verbatim, so the
+  comparison is valid, FR-023 / § D8):
+    .venv/bin/python --version        → Python 3.14.6                  (pin: Python 3.14.6)
+    .venv/bin/python -m pytest --version → pytest 9.2.0                (pin: pytest 9.2.0)
+    git --version                     → git version 2.54.0 (Apple Git-157)  (pin: same)
+
+  THE AUTHORIZED FULL RUN (this slice's single full-suite run, recorded):
+    $ bash scripts/bash/run-tests.sh --names-out \
+        .specify/specs/081-acceptance-hardening/test-evidence/081d-head-failed.txt -q
+    58 failed, 7115 passed, 7 skipped, 4 warnings in 687.61s (0:11:27)     exit 1
+    failed-name list written: 081d-head-failed.txt (58 entries)
+
+  Id-level set difference (comparison unit = failed test id, per SC-009 ②):
+    baseline = .specify/specs/081-acceptance-hardening/baseline-failed.txt (39 ids, plan-stage
+               capture at cb841d90, 2026-11-02)
+    head     = 081d-head-failed.txt (58 ids)
+
+    head − baseline  = 19 ids  (MUST be empty → the limb does NOT hold; the 19 are listed below)
+    baseline − head  = 0 ids   (0 fixed — nothing to list)
+
+  THE 19 NEW FAILURES, LISTED (never silently dropped) AND CLASSIFIED BY INTRODUCING WINDOW:
+
+  Bucket A — tripped by 081b/081c's LATE commits (16 ids; landed AFTER the last recorded
+  full-suite runs — closure-final-run.txt 12:06 — and before 081d wrote any code):
+    1.  tests/contract/test_coaching_wiring_contract.py::test_c3_probe_compiled_face_is_zero_drift
+    2.  tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+    3.  tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+    4.  tests/contract/test_docs_gate_driver.py::test_the_class_branch_lives_in_the_three_declared_files
+    5.  tests/contract/test_expression_gate_wiring.py::test_a6_wiring_inventory_matches_the_frozen_denominator
+    6.  tests/contract/test_flow_class_ledger.py::test_check_reports_79_units_and_zero_gaps
+    7.  tests/contract/test_flow_class_ledger.py::test_ledger_has_79_rows_covering_inventory_bidirectionally
+    8.  tests/contract/test_flow_class_ledger.py::test_templates_and_skills_never_assign_class_key
+    9.  tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured
+   10.  tests/contract/test_humanize_command_surface.py::test_wc14_frozen_surfaces_unchanged
+   11.  tests/contract/test_humanize_command_surface.py::test_wc19_ledgers_unchanged
+   12.  tests/contract/test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers
+   13.  tests/contract/test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts
+   14.  tests/contract/test_run_skills_wiring.py::test_c12_no_duplicate_semantic_skill_dirs
+   15.  tests/contract/test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_75_units
+   16.  tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[checklist]
+
+   causes measured on this tree (each reproduces deterministically, also outside the full run):
+   - census +1 (79→80 units, 52→53 skills, 75→76 embeds, 117→118 objects): the NEW SKILL
+     `skills/internal/review-feature-quality/` landed in 081c's df9bbe0e (15:19), together with
+     its rows in `shared/definitions/flow-class-definitions.md` and `probe-definitions.md`
+     (which trips humanize WC19's registry freeze); every census guard above pins the pre-081c
+     denominators.
+   - `templates/commands/checklist.md` gained a wiring card in 081c's dc72c941 (15:29); the
+     stage-class strip-card guard pins the card's pre-edit bytes.
+   - `tests/contract/test_expression_gate_wiring.py` was extended and
+     `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` gained flow-class references
+     in 081b's 793aff9e (13:38) / 021f80b0 (14:03) — after the 12:06 runs; this trips humanize
+     WC14 (a frozen verification-only suite moved) and docs-gate-driver's three-carrier scatter
+     guard.
+   - ledger_reconciliation: the clause universe grew with 081c's new contract file; the declared
+     coverage numbers predate it.
+
+  Bucket B — tripped by 081d's own part-3 commit (f29b6178, 17:43) — T010's SPEC-MANDATED edit
+  (3 ids; all three name the same introduced sentence):
+   17.  tests/contract/test_coaching_run_contract.py::test_c13_skill_stays_external_and_new_lines_add_no_blocking_gate
+   18.  tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+   19.  tests/contract/test_humanize_command_surface.py::test_wc17_new_line_gate_zero
+
+   cause measured: T010 was obligated (FR-018, tasks.md T010) to add `Blocked` to
+   `skills/internal/manage-features/SKILL.md`'s vocabulary plus the narrow `Implemented →
+   Blocked` audit exception — the exception's own wording ("backward (e.g. `Implemented →
+   Draft`) without explicit user confirmation. One narrow …") is what these three OTHER
+   features' frozen surfaces catch: 078-coaching C-13 scans for new blocking-confirmation
+   phrasing, 080-expression C-5 pins the file's frozen hash (drifted:
+   `skills/internal/manage-features/SKILL.md`), 079-humanize WC17 scans for new blocking
+   confirmation-gate lines. Reconciling those frozen surfaces with this feature's obligation is
+   a cross-feature adjudication outside 081d's rows — recorded as the anomaly surface, not
+   silently repaired.
+
+  SC-009 ② READING: NOT green. 19 new failure ids (listed above), 0 fixed. The comparison is
+  recorded with the same collection command as the baseline, at matching pins.
+
+(d) SC-009 ④ — the schema-ownership guard, and the coverage-lane remainder
+--------------------------------------------------------------------------
+  $ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_schema_ownership.py -v
+  9 passed in 0.13s                                                       exit 0
+  → SC-009 ④ is GREEN: the guard derives its subject mechanically from the owner doc's three
+    | Column | Content | tables, scans templates/ + shared/, finds the column-set hits exactly
+    nowhere outside the owner and its one allowed surface (`templates/plan-template.md`), and
+    carries the four narrowing assertions — (a) data-model.md 0 transition rows, (b) projection
+    domains stay inside the owner's, (c) requirements.md 0 transition rows, (d) the plan skeleton
+    carries 0 owner-domain literals — as their own duties, never as guard exemptions.
+
+  Coverage lane (the named remainder — DoD-8):
+    $ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/081-acceptance-hardening
+    …
+    FR uncovered: 23
+    companion: claimed clauses 0, scanned files 248, clause universe 1517, FR universe 25
+      [clause-uncovered] fail (513) — 513 uncovered, 18 beyond the frozen baseline
+      [fr-uncovered] fail (23) — 2 of 25 FRs cited from citation groups
+      [clause-unparsable] warn (103)
+      [coverage-baseline-delta] fail (18)
+    status: uncovered                                                     exit 1
+
+    → unchanged from T001's red-first reading (2026-11-03): 2 of 25 FRs cited (FR-009, FR-011,
+      the two 081b citation groups), 23 uncovered. The lane is claimable only from citation
+      groups inside this spec's own `contracts/` clause blocks
+      (`scripts/python/clause_extract.py::clause_citations` — the last parenthetical of a block
+      carrying an FR/SC id); 081d owns no `contracts/` edit, so the lane is recorded as a NAMED
+      REMAINDER with its mechanical reason and remedy (add in-block FR citations to this spec's
+      contract clauses in a slice that owns `contracts/`), never marked green and never silently
+      dropped.

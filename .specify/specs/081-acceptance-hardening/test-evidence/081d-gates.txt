@@ -1,0 +1,79 @@
+T015 — documentation and pointers, then the final regeneration sweep (GW-11/GW-12/GW-13/GW-14)
+Feature 081 / slice 081d / row T015 (FR-021, FR-022, FR-024, SC-009 ①③)
+Date: 2026-11-03 · branch 081-acceptance-hardening · part-4 HEAD f29b6178 + this row's CHANGELOG edit
+
+GW-14 — three limbs, each confirmed rather than assumed
+------------------------------------------------------
+
+① CHANGELOG.md carries this feature (SC-009 ③) — LANDED IN THIS ROW:
+    the `[Unreleased]` block gains one `### Added` bullet and one `### Changed` bullet, each
+    headed `Feature 081 (acceptance hardening)`; a `grep -n "081" CHANGELOG.md` hits both.
+    (The entry names the checker engine, the `--audit-existing` mode, the fixture sets, the
+    three call sites, the line state and the vocabulary owners — see the file itself.)
+
+② `docs/reference/commands/review.md` describes four segments plus ARC — CONFIRMED, verbatim:
+    line 24: `## Composition — four segments in one fixed order, plus one check that is not a segment`
+    line 26: "A single invocation runs exactly **four segments in a fixed order** — process →
+              artifact → implementation → code — and then one deterministic check, the Acceptance
+              Reality Check, which is not a segment."
+    line 48: `## The Acceptance Reality Check — a check, not a fifth segment`
+
+③ `.specify/instructions.md` § Key Directories registers the fixture directory — CONFIRMED, verbatim:
+    line 237: "  - `tests/`: `contract/`, `integration/`, `scenarios/`, `unit/`, `fixtures/
+    (declarative fixture sets, one directory per feature — e.g. `fixtures/acceptance-hardening/`)."
+    DISCLOSED SPELLING: the literal string `tests/fixtures/` does not appear; the section lists
+    `fixtures/` as a named child of `tests/` and names `fixtures/acceptance-hardening/` as the
+    example. Directory governance's pointer target
+    (`shared/guidelines/directory-governance.md`: repository root and source directories →
+    `.specify/instructions.md` § Tech Stack & Resources → Key Directories) is satisfied — the
+    new fixture directory is registered where governance requires it — but a reader matching the
+    GW-14 text byte-for-byte should read this disclosed form rather than an invented literal.
+
+Checklist sweep — the fourth condition is reached BY POINTER, no criterion restated
+-----------------------------------------------------------------------------------
+    templates/commands/checklist.md line 44 (the Outputs bullet) verbatim:
+      "Feature status transitions `Implemented → Ready for Review` per the Feature Integration
+       Protocol when applicable; the transition's criteria — the fourth condition included — are
+       owned by `templates/feature-details-template.md` § Canonical Status State Machine, which
+       this command reaches by that pointer and restates nowhere."
+
+Carrier tests for that sweep:
+  $ bash scripts/bash/run-tests.sh tests/contract/test_status_gate_owner.py tests/contract/test_client_guard_sweep.py -q
+  # test runner: .venv/bin/python -m pytest tests/contract/test_status_gate_owner.py tests/contract/test_client_guard_sweep.py -q
+  .........................................................                [100%]
+  57 passed in 10.13s                                                      exit 0
+
+Final regeneration sweep — every edited source has its generated artifact (GW-11/GW-12/GW-13)
+---------------------------------------------------------------------------------------------
+This row's only framework-source edit is `CHANGELOG.md`, which carries no mirror and no per-tool
+copy tree; parts 1–3's mirrors were regenerated in their own parts and committed. The sweep runs
+anyway over the final tree, so a stale mirror could not hide behind that ordering:
+
+  $ python3 scripts/python/regen-command-copies.py
+  Regenerated command copies for 4 tools.                                  exit 0
+  $ python3 scripts/python/sync-mirrors.py
+  Regenerated command copies for 4 tools.
+  ok    templates/ == .specify/templates/ (22 files)
+  ok    skills/external/ == .specify/skills/ (409 files)
+  ok    skills/internal/ == .specify/skills/internal/ (138 files)
+  ok    agents/ == .specify/agents/templates/ (3 files)
+  ok    scripts/ == .specify/scripts/ (119 files)
+  ok    shared/ == .specify/shared/ (62 files)                             exit 0
+
+  $ python3 scripts/python/regen-command-copies.py --check
+  OK: all per-tool command copies match the source templates.              exit 0   ← SC-009 ① leg 1
+  $ python3 scripts/python/sync-mirrors.py --check
+  OK: all per-tool command copies match the source templates.
+  ok    templates/ == .specify/templates/ (22 files)
+  ok    skills/external/ == .specify/skills/ (409 files)
+  ok    skills/internal/ == .specify/skills/internal/ (138 files)
+  ok    agents/ == .specify/agents/templates/ (3 files)
+  ok    scripts/ == .specify/scripts/ (119 files)
+  ok    shared/ == .specify/shared/ (62 files)                             exit 0   ← SC-009 ① leg 2
+
+  $ git status --porcelain   (after the sweep)
+   M CHANGELOG.md
+  → the sweep itself produced zero deltas over the final tree: the mirrors and per-tool copies
+    committed by parts 1–3 are the current sources' exact regenerations, so no `.specify/` copy
+    was hand-edited as a primary change (GW-11/GW-13) and this row's single delta is the
+    CHANGELOG entry itself.

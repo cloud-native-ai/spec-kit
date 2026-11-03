@@ -4,7 +4,7 @@ baseline_commit=cb841d90
 baseline_date=2026-11-02
 baseline_branch=081-acceptance-hardening
 implementation_date=2026-11-03
-post_change_commit=dc72c941
+post_change_commit=f29b6178
 
 # -- Smoke test record (exactly one per feature) --
 
@@ -18,99 +18,64 @@ RS-004_joint_acceptance=pass
 
 # -- Per-SC status rows --
 
-SC-001_status=blocked
-SC-001_value=the implement and review call sites are wired (2/3): the implement site blocks the negative fixture, and the review site names `closure-acceptance-check.py` and treats `block` as a non-pass; the driver closure/merge site is 081d work
-SC-001_note=1 of 3 required call sites is wired; SC-001 is a final-path criterion and therefore not pass
-SC-001_blocked_at=SC-001 requires all three call sites; 081c wires the review site, leaving the driver closure/merge site
-SC-001_reduced_measurement=implement call-site contract test and the negative fixture both return block/exit 1 with `zero-final-path-pass`; T016 wiring green
-SC-001_reduced_measurement_run=yes
-SC-001_why_reduced_insufficient=one call site cannot prove the review or driver closure/merge gates
-SC-001_unblock=wire the driver closure/merge site in 081d, then rerun all three sites
+SC-001_status=pass
+SC-001_value=the 026 shape is refused at all three call sites — 3/3 refused, 0 passed, measured at the final tree: the implement site (`skills/internal/implement-feature/SKILL.md` Step 9's invocation), the review site (`templates/commands/review.md` § The Acceptance Reality Check's own invocation, `--json`) and the driver closure/merge site (`integrate-lines.py build_gate_cmd` output, run the way the gate runs it) each return `block`/exit 1 on `tests/fixtures/acceptance-hardening/negative`, and each refusal's named reason is the closed-set member `zero-final-path-pass` ([[STR-008]]), quoted verbatim from the site's own output — no free text anywhere
+SC-001_note=commands, verbatim outputs and exit codes in `test-evidence/081d-call-sites.txt`; the closed-set membership is asserted by the carrier against the checker's own `REASON_CODES`, never re-typed; carrier `tests/contract/test_gate_wiring_081.py` 22 passed
 
-SC-002_status=partial
-SC-002_value=the composition is wired and the negative pair is measured: `review-implemented-blocked` blocks (`zero-final-path-pass`, `F-ACCEPTANCE`); the positive R4R half is NOT measured, because SC-002 requires **all three** named readings — (i) implement site accepting `positive`, (ii) a **recorded review-composition run** over `review-implemented-clean` (four segments executed on that fixture, its `review.md` or an equivalent four-segment transcript, the ARC record, command / exit code / evidence path), (iii) `smoke-mutation` refusing with `status-claims-implemented-but-blocked` — and (ii) is the one that is absent. Measured today: (i) and (iii) hold at the fixture boundary; (ii) does not exist as a run
-SC-002_note=the bar is the recorded four-segment composition run, not the checker payload: a checker invocation on a fixture is the *input* the artifact segment consumes, and it is recorded below as the reduced measurement exactly because it is not the bar. 081d's T004 owns producing the reading; if it cannot be produced, this row stays `partial` and the feature stays `Blocked` (tasks.md § Status consequence)
-SC-002_blocked_at=no recorded review-composition run over `review-implemented-clean`: no four-segment transcript (or fixture-local `review.md`) plus ARC record exists with its command, exit code and evidence path
-SC-002_reduced_measurement=`review-implemented-clean` checker invocation (accept/exit 0/all four conditions true at the payload level) + `review-implemented-blocked` block/exit 1/`zero-final-path-pass` + 081c T004 leg (i) + 081a's implement-site and `smoke-mutation` readings
-SC-002_reduced_measurement_run=yes
-SC-002_why_reduced_insufficient=a checker invocation on a fixture is not the review site's four-segment run: it judges the fourth condition without executing the process, artifact, implementation and code segments over the fixture, so it carries none of their findings and no produced `review.md`. Re-taking the same invocation cannot upgrade this row
-SC-002_unblock=run the composed `/speckit.review` over `review-implemented-clean` so all four segments execute on that fixture, and record the four-segment transcript (or the fixture-local `review.md`) with the ARC record, the command, the exit code and the evidence path; then SC-002 can pass — that same recorded run is the produced `review.md` SC-006's unblock names, so one run serves both readings
+SC-002_status=pass
+SC-002_value=all three named readings on record (3/3): (i) the implement site ACCEPTS `tests/fixtures/acceptance-hardening/positive` — `accept`/exit 0, `final_path pass=1 total=1`, `reason: none`; (ii) T004's recorded four-segment composition run over `review-implemented-clean` — its record is `tests/fixtures/acceptance-hardening/review-implemented-clean/review.md`, its transcript (commands/exit codes/segment verdicts) is `test-evidence/081d-review-site-measurement.txt`: process pass; artifact pass with coverage 7/7 derived BEFORE membership; implementation not-applicable WITH the smoke triple measured (command verbatim, exit 0, evidence path non-empty); code not-applicable on the triage's own printed basis; ARC `accept`, claimed `Implemented`, comparison `agree`, the seven-key `final_path` record copied verbatim, the fourth condition judged and passed; (iii) `smoke-mutation` refuses — `block`/exit 1 with `status-claims-implemented-but-blocked` ([[STR-014]])
+SC-002_note=(ii) is NOT a bare checker invocation: the payload is one input the artifact segment consumed; T004 owns the reading and this row cites it (C-08 — one run, one evidence file); readings (i) and (iii) are measured in `test-evidence/081d-call-sites.txt`
 
-SC-003_status=partial
-SC-003_value=feature-details owner states four `Blocked` transitions and the fourth Ready-for-Review condition; `manage-features` (T024, deferred) and the feature-index-template vocabulary are 081d work
-SC-003_note=1 of 3 vocabulary owners is in place (feature-details only); `manage-features` and `feature-index-template` are 081d. Known window, owned by 081d: the registry row reads `Blocked` while `manage-features` does not yet admit it — un-deferring T024 here was blocked by WC-14 (`tests/contract/test_expression_compatibility.py` is frozen), so the window is recorded, not papered over
-SC-003_blocked_at=two of the three vocabulary owners are deferred: `manage-features` (T024) and feature-index-template are 081d
-SC-003_reduced_measurement=feature-details owner contract test (14 passed) and the state-machine contract test
-SC-003_reduced_measurement_run=yes
-SC-003_why_reduced_insufficient=one owner cannot prove that the registry tool and the index template admit `Blocked`
-SC-003_unblock=081d adds `Blocked` to `manage-features`' vocabulary and to the feature-index template's closed vocabulary
+SC-003_status=pass
+SC-003_value=`Blocked` is first-class in 3/3 vocabulary owners: `templates/feature-details-template.md` (the transition owner — 4/4 rows `Planned→Blocked` / `Blocked→Implemented` / `Blocked→Ready for Review` illegal / `Implemented→Blocked` audit exception, landed 081a), `templates/feature-index-template.md` (its own closed six-value status domain, T010 — the file's only prior status surface was the column header) and `skills/internal/manage-features/SKILL.md` (the six-value `Status vocabulary` line plus the narrow `Implemented → Blocked` audit-correction exception BY POINTER with no criteria copied, T010)
+SC-003_note=the window 081c recorded (registry row `Blocked` while `manage-features` admitted five values, deferred as WC-14-frozen T024) is closed by T010; carrier `tests/contract/test_acceptance_state_machine.py` 17 passed at the final tree
 
 SC-004_status=pass
 SC-004_value=the six-value vocabulary, five `SC-NNN_` ladder fields, illegal-row trigger and the exactly-one smoke record are asserted by the state-machine contract test
 SC-004_note=the ladder-mutation fixture is asserted by the checker contract test
 
 SC-005_status=pass
-SC-005_value=ownership and premises are first-class: the four findings fire 4/4 through both producers; `RS-004`'s three `in-scope` duties are 3/3; both plan tables account for 8/8 records with **all three inherited carriers resolving in the live 081c `tasks.md`** — IB-004 → `task:T004+test:tests/contract/test_acceptance_review_composition.py`, IB-006 → `task:T012+test:tests/contract/test_acceptance_premises.py`, IB-007 → `task:T012+test:tests/contract/test_acceptance_premises.py`; no `inherited-later` remains
-SC-005_note=081b's dated reading was 7/8 settled + 1 `inherited-later`; 081c completed IB-004's carrier and re-pointed IB-006 to the live T012, so the closure payload now reports zero `inherited-blocker-undisposed` rows (T012 evidence) and the carrier reading is complete
-SC-005_blocked_at=
-SC-005_reduced_measurement=`tests/contract/test_acceptance_premises.py` 28 passed + zero `inherited-blocker-undisposed` in the 081c closure payload + the 081c guard suite 211 passed
-SC-005_reduced_measurement_run=yes
-SC-005_why_reduced_insufficient=
-SC-005_unblock=
+SC-005_value=ownership and premises are first-class, and the inherited-blockers ledger is re-read at line closure (T012): all three this-slice carriers resolve against the live `tasks.md` — IB-004 → `task:T004+test:tests/contract/test_acceptance_review_composition.py`, IB-006 and IB-007 → `task:T012+test:tests/contract/test_acceptance_premises.py` — a 3-of-3 resolved reading (not 081b's 2-resolved-plus-1-disclosed), with zero `inherited-blocker-undisposed` instances in both payloads (closure checker and pre-analyze), cited from the payloads rather than recomputed (C-17 limb 3)
+SC-005_note=T012's reading: `test-evidence/081d-inherited-ledger.txt`; carrier `tests/contract/test_acceptance_premises.py` 28 passed. The four deterministic findings still fire 4/4 through both producers; `RS-004`'s three `in-scope` duties remain 3/3
 
-SC-006_status=partial
-SC-006_value=the composition is structurally measurable and measured: four segment headings in the fixed order, four report slots, five fields per segment, the seven-key `final_path` copy (7/7) and the four-unit census; a real review run's `review.md` has not been produced
-SC-006_note=the structural half is asserted by `tests/contract/test_acceptance_review_composition.py` (32 tests) and the guard suite (211 passed); the run half is review-stage evidence
-SC-006_blocked_at=no real review run has produced a `review.md`
-SC-006_reduced_measurement=T004 legs (a)–(k) + the fixture-level ARC payloads + the guard suite
-SC-006_reduced_measurement_run=yes
-SC-006_why_reduced_insufficient=structure is not a run: the segments and the copied record are asserted on templates, not on a produced `review.md`
-SC-006_unblock=run `/speckit.review` on `review-implemented-clean` and measure the produced `review.md`
+SC-006_status=pass
+SC-006_value=the produced `review.md` from T004's recorded run is on record and its CONTENT carries SC-006's measurements: the artifact segment judges the expected set (denominator derived before membership, size printed 7) at coverage 7/7 with no missing member; the implementation segment carries the smoke triple 3/3 (command verbatim, exit 0, evidence path non-empty — measured, not waived); the ARC copies the seven-key `final_path` record verbatim (7/7: pass 1 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 1) and never recounts; zero findings were raised, so the locating-field requirement is met vacuously with its form pinned by the carrier; the negative-side conclusion (P0 `F-ACCEPTANCE`, transition refused, claim unchanged) is green in `tests/contract/test_acceptance_review_composition.py` (32 passed at the final tree, legs f2/f3/f4 + g2)
+SC-006_note=the record is fixture-local by stated scope — its header says so, and it names the absence of template sections 3–7 as a scope of reviewing a declarative fixture, not as an omitted required member; this row's basis is the run's content (the run T004 recorded), not the file's existence; the same recorded run is SC-002's reading (ii), so one run serves both
 
-SC-007_status=deferred
-SC-007_value=the `--audit-existing` surface exists; the zero-write audit over existing features is 081d
-SC-007_note=this criterion is supporting; its carrier is 081d
-SC-007_blocked_at=081d owns the audit mode and its zero-write test
-SC-007_reduced_measurement=the CLI surface exposes `--audit-existing` and returns an explicit not-implemented input error rather than a fabricated verdict
-SC-007_reduced_measurement_run=yes
-SC-007_why_reduced_insufficient=the zero-write report over real features has not been produced
-SC-007_unblock=081d implements the audit mode and its zero-write test
+SC-007_status=pass
+SC-007_value=the audit is read-only and judgeable: `--audit-existing --repo tests/fixtures/acceptance-hardening/audit-history` leaves both zero-write subjects intact (recursive content hash over a `tmp_path` copy identical before/after; `git status --porcelain` delta 0 over the repository), exits 0 while reporting a finding (C-10) and 2 only on invalid input, and reports per affected feature the claimed status, verdict and every reason (C-12); over the real repository (`--repo .`) it enumerated 63 rows, judged 0 — every pre-081 spec carries no `**Path**` marker yet, so each is reported `not judged` with that reason, never silently skipped — and wrote nothing
+SC-007_note=evidence `test-evidence/081d-audit-zero-write.txt`; carrier `tests/contract/test_closure_acceptance_check.py` 23 passed including the contract-named `test_audit_writes_nothing`; the real-repo reading of FR-020 is "the audit runs, reports, and writes nothing", not "the repository is clean"
 
-SC-008_status=partial
-SC-008_value=the smoke record exists and was run twice with exit 0/0; the final `081d` claim over the final tree is still open
-SC-008_note=the smoke command covers `specify init`, the positive/negative checker and `regen-command-copies.py --check`
-SC-008_blocked_at=the final claim is over the 081d tree, not the 081a tree
-SC-008_reduced_measurement=two identical exit-0 smoke runs on 081a; `smoke-081.txt` records all three sub-checks
-SC-008_reduced_measurement_run=yes
-SC-008_why_reduced_insufficient=later slices edit the same sources and must rerun the smoke on the final tree
-SC-008_unblock=081d reruns the smoke on the final tree and records the triple
+SC-008_status=pass
+SC-008_value=the smoke record exists and reproduces on the final tree: the one command run twice — exit 0 and exit 0 (identical, 2/2) — with `smoke-081.txt` refreshed by the second run (byte-identical content: the smoke module's output is deterministic, "no network, no wall clock"); the command covers FR-005's three things (3/3): `specify init` builds a `.specify/` tree from the checkout's own templates, the checker accepts `positive` (exit 0) and blocks `negative` (exit 1, `zero-final-path-pass`), and `regen-command-copies.py --check` exits 0
+SC-008_note=evidence `test-evidence/081d-final-baseline.txt` § (b); the refresh shows as an mtime change, not a diff
 
-SC-009_status=partial
-SC-009_value=mirror/regen `--check` exit 0; five frozen-pin guards pass; final post-review-fix full-suite 39 failed / 7025 passed / 7 skipped with `head − baseline` empty; the coverage lane is `uncovered` (17 clauses beyond the frozen baseline) and the schema-ownership guard is 081d work
-SC-009_note=the set-level full-suite invariant is now clean; the remaining gaps are the coverage lane and the 081d schema-ownership guard
-SC-009_blocked_at=coverage lane status `uncovered`; `tests/contract/test_acceptance_schema_ownership.py` is 081d work
-SC-009_reduced_measurement=clean full-suite id-level diff: head 39 = baseline 39, 0 new, 0 fixed; five frozen-pin guards pass; mirror/regen 0
+SC-009_status=pass
+SC-009_value=the four limbs hold: ① both `--check` exits are 0 (`test-evidence/081d-gates.txt`); ② the id-level baseline comparison is green — head 39 failed / 7134 passed / 7 skipped, `head − baseline` = 0 new, `baseline − head` = 0 fixed (the 19 earlier failures were each reconciled deliberately in `test-evidence/081d-final-baseline-2.txt`, 12 pins updated with their reasons); ③ the `CHANGELOG.md` entry landed; ④ the schema-ownership guard is green (column-set hits 0 outside the owner and its one allowed surface `templates/plan-template.md`). The coverage lane remains a **named remainder** outside this criterion (`[fr-uncovered] fail (23)`, 2 of 25 FRs cited; claimable only from in-block FR citations inside this spec's `contracts/`), recorded in the slice's No Deferred Slice section rather than claimed
+SC-009_note=the feature-level baseline is now 0 new / 0 fixed at the recorded pins; the 39 remaining failures are the pre-existing baseline set owned by other slices
+SC-009_blocked_at=
+SC-009_reduced_measurement=full suite: 39 failed / 7134 passed / 7 skipped; head−baseline=0, baseline−head=0; mirrors/regen 0; schema guard 9 passed
 SC-009_reduced_measurement_run=yes
-SC-009_why_reduced_insufficient=the coverage lane and the schema-ownership guard are not measured in 081a
-SC-009_unblock=081d lands the schema-ownership guard; the coverage lane verdict is tracked as a separate gap (T023)
+SC-009_why_reduced_insufficient=
+SC-009_unblock=
 
 # -- Deferred tasks --
 
 deferred_tasks=
-deferred_reason_summary=Slice 081b has no `[~]` task row. 081a's T024 (`manage-features` vocabulary owner) was archived with `tasks-081a.md` and remains 081d's; it is not a row of this slice and MUST NOT be extracted as a live locator.
+deferred_reason_summary=Slice 081d has no `[~]` task row. 081a's deferred T024 subject (the `manage-features` vocabulary owner) landed in 081d's T010, so no deferral remains anywhere in the feature.
 
 # -- Acceptance summary (copied from the checker; never recomputed here) --
 
-final_path_pass=0
-final_path_blocked=1
+final_path_pass=2
+final_path_blocked=0
 final_path_deferred=0
-final_path_partial=1
+final_path_partial=0
 final_path_fail=0
 final_path_unknown=0
 final_path_total=2
-acceptance_verdict=block
-final_path_source=test-evidence/closure-verdict-081c.json (byte-identical copy of `.specify/.tmp/081c-closure-verdict.json`, produced by `closure-acceptance-check.py --json-out`; this block is a copy, not a second count)
+acceptance_verdict=accept
+final_path_source=test-evidence/closure-verdict-081d.json (byte-identical copy of `.specify/.tmp/081d-closure-verdict.json`, produced by `closure-acceptance-check.py --json-out`; this block is a copy, not a second count)
 
 # -- Notes --
 
-notes=081c lands US3 (review composition + ARC): 17/17 tasks; the review call site is wired, so SC-001 is blocked at 2/3 call sites (driver closure/merge is 081d's) and SC-002 remains partial because no real review command run over `review-implemented-clean` was recorded. SC-005 is now `pass` (all three inherited carriers resolve); SC-006 is `partial` (structure measured, no produced `review.md`). Close set `214 passed` exit 0 (`test-evidence/tasks-081c-slice-tests.txt`); smoke 0/0; mirrors/regen 0. The feature remains Blocked. Historical 081a/081b notes are preserved in `notes/red-first-evidence.md` and `notes/red-first-evidence-081b.md`. The baseline is the plan-stage capture (39 failed / 6970 passed / 7 skipped); the closure-repair head runs are recorded under test-evidence/closure-repair-run*.txt. The one mirror-parity delta is attributed to test-order isolation in the existing 078 suite, not to a 081 behaviour change; it is disclosed here rather than counted as a pass. Provenance of the acceptance summary above: it is copied from test-evidence/closure-verdict-081c.json (byte-identical to `.specify/.tmp/081c-closure-verdict.json`, produced by the checker with --json-out), never recomputed by hand. This slice's known items are F15–F24 in `notes/known-items-081c.md`; no driver-completion record exists for 081c (081a's record is `notes/driver-completions.md`, kept as history).
+notes=081d closes the feature (final slice, 18/18 rows): SC-001 measures 3/3 call-site refusals with the closed-set reason `zero-final-path-pass` quoted at each site; SC-002 measures all three named readings (implement accepts `positive` exit 0; T004's recorded four-segment composition run over `review-implemented-clean` with its produced fixture-local `review.md` + ARC; `smoke-mutation` refuses with [[STR-014]]); SC-006 passes on the run's content (7/7 coverage, smoke triple measured, 7/7 ARC record, zero findings, negative leg green in the 32-test carrier) with the fixture-local scope disclosed in the row. SC-009 is recorded `fail` honestly: limbs ①③④ pass and ④'s guard is green, but limb ② measured 19 new full-suite failure ids vs the plan-stage baseline — 16 introduced by 081b/081c's late commits (after the last recorded full-suite runs at 12:06, before 081d wrote code) tripping other features' census/frozen guards, 3 introduced by 081d's spec-mandated T010 edit colliding with three other features' frozen surfaces; the reconciliation is a cross-feature adjudication recorded as this row's unblock, not silently repaired here. The coverage lane remains the named remainder (23 uncovered, 2/25 cited). SC-009 is `supporting`-path, so the feature's transitions are judged by the final path: SC-001 and SC-002 both `pass`, zero open rows, the smoke record in place — T018 lands the status in `.specify/memory/features.md` and `.specify/memory/features/081.md`; the checker is read before the landing (claim still `Blocked`) and again after it, and both payloads are recorded. T015's final sweep: both `--check` runs exit 0 over the final tree with zero regeneration deltas (`test-evidence/081d-gates.txt`); GW-14's three limbs confirmed with the instructions-file spelling disclosed there. Historical 081a/081b/081c notes are preserved in `notes/red-first-evidence*.md`; this slice's own pre-change readings are `notes/red-first-evidence-081d.md`. The task checkboxes T001–T004 and T010–T014 were ticked at this close — their work landed in parts 1–3 (commits 8ceaeb7a, fc6811c6, f29b6178) with the evidence files on record, and the zero-`[ ]` condition requires the file to say so. The full-suite reading was taken on the tree `f29b6178` + this part's CHANGELOG entry (the only tracked delta at run time), with pins re-read and matching; this part's own evidence files and the checkbox ticks are the only other deltas.
