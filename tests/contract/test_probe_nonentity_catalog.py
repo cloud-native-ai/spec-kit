@@ -96,7 +96,9 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # pre-067 features (063 evidence/gate objects etc.; the engine-loaded registry
     # already holds 116 at branch point 7f9033ec, errors-free at HEAD).
     # 2026-10-27: Feature 071 adds one skill-wrapup Object (sdd-house-keeping); 116 -> 117.
-    assert internal == 117, (
+    # 2026-11-03: Feature 081c (df9bbe0e) adds one skill-wrapup Object
+    # (skill-review-feature-quality-wrapup, the dogfooding review carrier); 117 -> 118.
+    assert internal == 118, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

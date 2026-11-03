@@ -28,6 +28,7 @@ import json
 import re
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -614,6 +615,34 @@ def channel_section_lines() -> list[str]:
     return lines[start:end]
 
 
+def rounds_section_lines() -> list[str]:
+    """SKILL.md's `## Rounds` section, line-for-line (trailing blank line included).
+
+    The section is the second sanctioned delta on the containment baseline: added
+    by Feature 081c (f892c8a8, 2026-11-03) as the two-round review adjudication
+    with its residue-row rule. It lives outside the pass-enumeration paragraph,
+    so the C-5 allowed-delta enumeration names it explicitly — the containment
+    shape survives: every added line must belong to the paragraph or to this
+    section, and anything else stays red.
+    """
+    lines = read(ANALYZE_SKILL).splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip() == "## Rounds":
+            start = index
+            break
+    assert start is not None, (
+        "the `## Rounds` adjudication section is not declared in "
+        f"{ANALYZE_SKILL.relative_to(ROOT)}"
+    )
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return lines[start:end]
+
+
 def channel_section() -> str:
     """The channel's own level-3 section — the only region this scenario judges."""
     return "\n".join(channel_section_lines())
@@ -1016,8 +1045,12 @@ class TestScenarioBAnalyzeStructuralChannel:
             "heading; the comparison unit is 「existing paragraph / new paragraph」"
         )
 
-        # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only delta is the
-        # enumeration paragraph, and that paragraph now names the new channel.
+        # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only
+        # deltas are the pass-enumeration paragraph and the `## Rounds` section
+        # (the latter added by Feature 081c, f892c8a8, 2026-11-03 — the two-round
+        # adjudication; see rounds_section_lines). The added-line multiset must
+        # equal paragraph-delta ∪ Rounds-section exactly (hunk order is file
+        # order, so the comparison is order-free); any third delta stays red.
         old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
         new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
         removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
@@ -1025,8 +1058,13 @@ class TestScenarioBAnalyzeStructuralChannel:
             "C-5: SKILL.md must change only inside its pass-enumeration paragraph; "
             f"removed {removed_skill!r}"
         )
-        assert added_skill == [line for line in new_paragraph if line not in old_paragraph], (
-            f"C-5: SKILL.md gained a change outside the enumeration paragraph: {added_skill!r}"
+        allowed_added = Counter(
+            [line for line in new_paragraph if line not in old_paragraph]
+            + rounds_section_lines()
+        )
+        assert Counter(added_skill) == allowed_added, (
+            "C-5: SKILL.md gained a change outside the enumeration paragraph and "
+            f"the Rounds section: {sorted(set(added_skill) - set(allowed_added))!r}"
         )
         updated = " ".join(new_paragraph)
         assert "Eight passes" in updated, (

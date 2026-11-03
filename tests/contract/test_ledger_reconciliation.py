@@ -283,9 +283,15 @@ def test_real_owner_declares_the_ledger_version_exactly_once():
 
 
 def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 rows/units —
+    # the review-feature-quality registration grew the ledger and the inventory
+    # together, so all three matched counts move as one. The anti-vacuous floor
+    # stays at its measured 2026-10-24 constants (27/51 -> 39): it is a lower
+    # bound on the inventory side, not a denominator, and 39 still sits below the
+    # real 80 so a truncation keeps firing as a gap.
     proc, record = _check(REPO_ROOT)
     assert proc.returncode == 0, (
-        "the real 79-row ledger must reconcile clean; findings=%r stderr=%r"
+        "the real 80-row ledger must reconcile clean; findings=%r stderr=%r"
         % (None if record is None else record.get("findings"), proc.stderr)
     )
     assert record is not None and record.get("findings") == []
@@ -295,9 +301,9 @@ def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     )
     coverage = _coverage(record)
     _assert_coverage_shape(coverage)
-    assert coverage["inventory_units"] == record["units"] == 79
-    assert coverage["ledger_rows"] == 79
-    assert coverage["matched"] == 79
+    assert coverage["inventory_units"] == record["units"] == 80
+    assert coverage["ledger_rows"] == 80
+    assert coverage["matched"] == 80
     assert coverage["gaps"] == 0
     assert coverage["parse_errors"] == 0
     assert coverage["floor"] == LEDGER_FLOOR == 39

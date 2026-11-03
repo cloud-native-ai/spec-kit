@@ -99,12 +99,18 @@ BASELINE_COMMIT = "c1cd4600"
 # card — in `tasks.md` § Outputs and `implement.md` § Feature Integration, its
 # semantic homes.  The earlier attempt to keep the file byte-equal by moving that
 # line *inside* the card was reverted: it made one document own two features.
+#
+# 2026-11-03 Feature 081c (dc72c941) re-measures `checklist` the same way: the
+# review-gate wiring added one pointer sentence to § Outputs ("the transition's
+# criteria ... are owned by templates/feature-details-template.md § Canonical
+# Status State Machine"), outside the 077 card and in that sentence's semantic
+# home.  The pinned value is again the card strip, not the file's bytes.
 BASELINE_SHA256 = {
     "requirements": "31d0e1b43079a35f87c35029053ecee8557b75a282a5949079e2f90c6701a82b",
     "clarify": "baf687495d7f5bee1befbb61941aa348085148fe047c15360222e0ecab95cb92",
     "plan": "1833be4a713f7b9cc80f6953303428469e095f9f3efb9472dff225ec835f485c",
     "tasks": "08f64367d89b046904112532453eba4323b6faf7b67a4920d20a6200e55d6e9e",
-    "checklist": "54ca213e7c102af6eb8c173854863c1d19de34364001df31825fb7ccea387d8e",
+    "checklist": "f3ca6423354cc0e687586261efc7810faeefaaea560f034edd28e89a17599b69",
     "analyze": "31dc261d9bf76243e4a50af62909dbb0c07fd7aa555ebf6acc0970c2eff8151b",
     "implement": "3282de6a7843ea6eb369046ab5d01df0819b842257bd6bd37f651cc49e9d54a2",
 }

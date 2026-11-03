@@ -367,12 +367,15 @@ def test_a6_wiring_set_is_closed():
 
 
 def test_a6_wiring_inventory_matches_the_frozen_denominator():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 52 -> 53 skills — the
+    # review-feature-quality carrier joins the inventory; the wiring census must
+    # still cover every unit the inventory actually holds.
     templates = sorted(COMMANDS_DIR.glob("*.md"))
     skills = sorted(SKILLS_DIR.glob("external/*/SKILL.md")) + sorted(
         SKILLS_DIR.glob("internal/*/SKILL.md")
     )
     assert len(templates) == 27, "template inventory drifted: %d (expected 27)" % len(templates)
-    assert len(skills) == 52, "skill inventory drifted: %d (expected 52)" % len(skills)
+    assert len(skills) == 53, "skill inventory drifted: %d (expected 53)" % len(skills)
 
 
 # --------------------------------------------------------------------------- #

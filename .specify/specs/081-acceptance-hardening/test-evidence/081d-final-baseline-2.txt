@@ -1,0 +1,131 @@
+T016 (c) continued — the frozen-surface reconciliation of the 19 new failures
+Feature 081 / slice 081d / SC-009 ② second reading (after reconciliation)
+Date: 2026-11-03 · branch 081-acceptance-hardening · tree: f29b6178 + part-4 artifacts
+Predecessor: 081d-final-baseline.txt § (c) — the feature-level comparison that listed
+the 19 (16 bucket A + 3 bucket B) and classified them by introducing window.
+
+THE AUTHORIZED FULL RUN (this slice's single full-suite run after reconciliation)
+----------------------------------------------------------------------------------
+  $ bash scripts/bash/run-tests.sh --names-out \
+      .specify/specs/081-acceptance-hardening/head-failed-2.txt -q
+  39 failed, 7134 passed, 7 skipped, 4 warnings in 593.95s (0:09:53)      exit 1
+  failed-name list written: head-failed-2.txt (39 entries)
+
+Id-level set difference (comparison unit = failed test id, per SC-009 ②):
+  baseline = .specify/specs/081-acceptance-hardening/baseline-failed.txt (39 ids, plan-stage)
+  head     = head-failed-2.txt (39 ids)
+
+  head − baseline  = 0 ids   (0 new — the limb HOLDS)
+  baseline − head  = 0 ids   (0 fixed — the 39 pre-existing reds belong to other
+                              slices and were deliberately not touched)
+
+  pins re-read before the run (plan-runner-pins.txt, all three match verbatim):
+    Python 3.14.6 · pytest 9.2.0 · git 2.54.0
+
+SC-009 ② READING: the same shape as the plan-stage baseline — 39 known reds, 0 new,
+0 fixed. The 19 feature-introduced trips are reconciled below, each with its reason;
+no assertion was deleted and no test was skipped.
+
+THE RECONCILIATION LEDGER — all 19, each run individually first, then dispositioned
+------------------------------------------------------------------------------------
+Every disposition is a LEGITIMATE PIN UPDATE (the census/surface moved because the
+feature legitimately added a skill, a card, a contract, or vocabulary); none was a
+real defect — no implementation change was needed anywhere.
+
+Bucket A — tripped by 081b/081c's late commits (16 ids):
+
+  1.  test_flow_class_ledger.py::test_ledger_has_79_rows_covering_inventory_bidirectionally
+  2.  test_flow_class_ledger.py::test_check_reports_79_units_and_zero_gaps
+  3.  test_flow_class_ledger.py::test_templates_and_skills_never_assign_class_key
+      → census +1: 79→80 units / 52→53 skills. Feature 081c df9bbe0e (15:19) landed
+        `skills/internal/review-feature-quality/` and registered
+        `skill:review-feature-quality` in the owner ledger; the three pins re-measure
+        with dated comments. Test names keep the ids the baseline recorded.
+  4.  test_run_skills_wiring.py::test_c12_no_duplicate_semantic_skill_dirs
+      → roster pin: `review-feature-quality` joins BASELINE_INTERNAL (37→38 internal
+        dirs), dated comment naming df9bbe0e.
+  5.  test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_75_units
+      → embed census: 75→76 units (the new skill ships its own Wrap-up embed);
+        zero-drift property unchanged. Dated comment.
+  6.  test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts
+      → registry census: 117→118 Objects (skill-review-feature-quality-wrapup);
+        the test's own dated stale-pin chain extended (067→071→081c).
+  7.  test_coaching_wiring_contract.py::test_c3_probe_compiled_face_is_zero_drift
+      → same embed census: "76 units, zero drift". Dated comment.
+  8.  test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+      → same ledger census: matched=80. Dated comment.
+  9.  test_expression_gate_wiring.py::test_a6_wiring_inventory_matches_the_frozen_denominator
+      → skill inventory denominator: 52→53. Dated comment.
+ 10.  test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[checklist]
+      → checklist re-measured: 081c dc72c941 (15:29) added one review-gate pointer
+        sentence to § Outputs (outside the 077 card, in its semantic home); the row
+        follows the test's documented legitimate-edit path (same as tasks/implement
+        got for 081a). New pin = f3ca6423… (the card strip, not the file's bytes).
+ 11.  test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured
+      → no direct edit: WC-13 re-reads stage-class pins; passes again once #10 lands.
+ 12.  test_humanize_command_surface.py::test_wc14_frozen_surfaces_unchanged
+      → line-range reconciliation (the file's own WC-18 precedent, 2026-10-31): the
+        clause's subject is 080's own work; five frozen suites legitimately moved
+        after the line closed (081a a2701a4f, 081b 793aff9e, 081c dc72c941). The
+        freeze now compares 35ff11bc..929209e3, in which nothing moved.
+ 13.  test_humanize_command_surface.py::test_wc19_ledgers_unchanged
+      → same line-range shape for the two registries (081c df9bbe0e registered the
+        review-feature-quality rows); the live humanize-row assertions stay
+        worktree-facing and untouched.
+ 14.  test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration
+      → SKILL.md's allowed delta grows by one declared region: 081c f892c8a8 (15:46)
+        added the `## Rounds` two-round adjudication section. The C-5 contract states
+        SKILL.md "carries no closed set" (the containment set it pins belongs to the
+        detection file, whose leg is untouched); the test's own containment now reads
+        paragraph-delta ∪ Rounds-section as an exact multiset — any third delta stays
+        red. Helper rounds_section_lines() added beside channel_section_lines().
+ 15.  test_docs_gate_driver.py::test_the_class_branch_lives_in_the_three_declared_files
+      → fourth carrier registered: 081b 793aff9e's § Execution Premises check reads
+        the plan's declared `**Flow Class**:` line (pre-analyze-check.py
+        flow_class_of) — a sanctioned consumer, not a wiring scatter. The 077
+        three-file split is untouched; the guard still scans every other driver file.
+ 16.  test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers
+      → declared coverage numbers re-measured 79→80 (three legs move as one). The
+        anti-vacuous floor keeps its measured constants (27/51→39): a lower bound,
+        not a denominator, still below the real 80 so truncation stays a gap.
+
+Bucket B — tripped by 081d part-3 f29b6178 itself — T010's FR-018-mandated
+`Blocked` vocabulary + the narrow `Implemented → Blocked` audit exception in
+`skills/internal/manage-features/SKILL.md` (3 ids; all three catch the same line):
+
+ 17.  test_coaching_run_contract.py::test_c13_skill_stays_external_and_new_lines_add_no_blocking_gate
+ 18.  test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+ 19.  test_humanize_command_surface.py::test_wc17_new_line_gate_zero
+
+  The adjudication (cross-feature, stated per the dispatch): the tripping phrase
+  "without explicit user confirmation" is NOT new — it entered the skill at
+  62bbaf7d (2026-10-12) and sits in both features' bases; T010's rewrite merely
+  surfaced it as an added line, and the sentence it heads is a governance rule
+  (never-regress) plus its NARROWING exception — not a new blocking gate. The
+  vocabulary obligation stays intact verbatim; the frozen surfaces are reconciled,
+  not the wording:
+
+  - C-13 (078): the clause's own subject is "new wording introduced by THIS
+    feature", and its executable-judgment owner (identity-and-wiring.contract.md
+    C-8 § New-line gate) records BASE as a re-recordable feature baseline. The diff
+    now measures the 078 line's own range (a7aa0793..8d0e0106, the trunk merge that
+    closed the line): measured 0 matching lines on 2026-11-03.
+  - C-5 (080-expression): the ALLOWED_POST_BASELINE_CHANGES entry restored — first
+    recorded by 081a (a2701a4f), reverted within the hour by 8ce0f006 because WC-14
+    then froze this suite, with the deferral note naming 081d as the entry's owner.
+    Markers re-assert the intended content on the live file ("Blocked",
+    "feature-details-template.md"); the exception's criteria stay in the owner block.
+  - WC-17 (080-humanize): line-range reconciliation mirroring WC-18 — the gate-
+    newline-baseline.txt evidence itself records the principle that tree text
+    belonging to other features must not be counted against this one; the same
+    holds for later features' sanctioned text. The judgment (0 added matching lines
+    on 35ff11bc..929209e3) is appended to that evidence file as a dated addendum.
+
+  No wording of manage-features was changed; the mirror set needs no regeneration
+  (sync-mirrors --check green in the C-8 verification surface above).
+
+AFTER-STATE
+-----------
+  39 failed / 7134 passed / 7 skipped — identical to the plan-stage baseline shape.
+  The 39 remaining reds are the pre-existing baseline pins owned by other slices;
+  they are listed in baseline-failed.txt and were neither fixed nor touched here.

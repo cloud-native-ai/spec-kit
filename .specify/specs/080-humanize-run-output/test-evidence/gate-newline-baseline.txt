@@ -32,3 +32,19 @@ violations (reversible gates still blocking): 0
   描述既有确认行为时用「该动作自身的确认步骤 / 未获答复」等不含上述字面量的表达。
 - 复核命令与本节第 2 段同形；命中即 FR-027 失败，不得以「命中行属于既有资产」豁免
   （新增行全部是本特性写的）。
+
+## 追加判定（2026-11-03，081d 冻结面调和）— 判定窗口改为本特性线自己的区间
+Feature 081 的 T010（f29b6178，FR-018 强制）在 `skills/internal/manage-features/SKILL.md`
+落了 `Blocked` 词表与 `Implemented → Blocked` 审计修正例外；该行携带的
+"without explicit user confirmation" 短语是 62bbaf7d（2026-10-12）既有措辞，改写行
+让它以「新增行」身份重新出现在固定基线扫描里。按本文件「树里已有的阻断式门是其他
+特性的合法资产，不得算到本特性头上」的同一原则，后续特性的合法文案同样不得算到
+080 头上，判定窗口改为本特性线自己的区间（与同契约 WC-18 于 2026-10-31 的调和同形）：
+
+$ git diff 35ff11bc 929209e3 -- templates/commands skills shared templates/*.md | grep '^+' | grep -v '^+++' \
+  | python3 -c '<scan-confirmation-gates.py BLOCKING_RE 判定>'
+blocking_hits=0
+
+即：本特性线自己的新增行与 BLOCKING_PATTERNS 的交集为 0，WC-17 判定维持成立；
+固定基线 35ff11bc 保留为判定起点，929209e3 为本特性线的收束端点。
+测试载体：`tests/contract/test_humanize_command_surface.py::test_wc17_new_line_gate_zero`。

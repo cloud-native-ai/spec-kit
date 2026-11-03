@@ -59,15 +59,23 @@ EFFICIENCY = SKILL_DIR / "references" / "efficiency-model.md"
 # its `=`; `flow_class` without `=` is not a payload key.
 QUARTET_KEYS = ("flow_class=", "source=", "marker=", "error=")
 
-# The class branch may live only in these three files: FR-023's closed wiring
+# The class branch may live only in these carrier files: FR-023's closed wiring
 # surface names the driver skill and its references, and the three-file split is
 # the one T017/T019/T020 assigns (skeleton / slots / hard requirements). Each
 # file is judged by its own marker — the slot owner names the new
 # `selection_basis` value instead of restating the class key.
+#
+# 2026-11-03 (Feature 081b, 793aff9e): `pre-analyze-check.py` becomes the fourth
+# carrier — the § Execution Premises check it gained reads the plan's declared
+# `**Flow Class**:` line (`flow_class_of`) to decide whether premises apply, a
+# sanctioned consumer registered here so the scatter guard keeps scanning every
+# other driver file. The three-file split above is 077's wiring surface and is
+# untouched; this entry records the premise reader, not a wiring scatter.
 CLASS_BRANCH_MARKERS = {
     SKILL_MD: ("flow_class",),
     STAGE_PROMPTS: ("flow_class",),
     EFFICIENCY: ("docs-gate-full",),
+    SKILL_DIR / "scripts" / "pre-analyze-check.py": ("flow_class",),
 }
 CLASS_BRANCH_FILES = tuple(CLASS_BRANCH_MARKERS)
 
@@ -456,7 +464,8 @@ def test_the_stage_chain_and_sentinel_literals_are_untouched():
 
 
 # --------------------------------------------------------------------------- #
-# carrier hygiene — one branch, three files, one operator id
+# carrier hygiene — one branch, declared carriers only, one operator id
+# (three 077 wiring carriers + the 081b premise reader; see CLASS_BRANCH_MARKERS)
 # --------------------------------------------------------------------------- #
 def test_the_class_branch_lives_in_the_three_declared_files():
     for path, markers in CLASS_BRANCH_MARKERS.items():

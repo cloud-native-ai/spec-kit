@@ -9,10 +9,12 @@ that ``tasks.md`` T004 names:
        neutral list / change log); no second classification data file exists
        (Markdown ledger rows, YAML/JSON data, code constants).
 * C-3  the binary values are the only two, keyed by the namespaced class key.
-* C-4  the ledger is a Markdown table with 79 rows, the class key verbatim in the
-       header, and only the two values in the class column.
+* C-4  the ledger is a Markdown table with one row per unit (measured 80 on
+       2026-11-03; 79 at 069a authoring — the census legitimately grew, see the
+       dated note at each pin), the class key verbatim in the header, and only
+       the two values in the class column.
 * C-5  the ledger unit set equals the repository inventory in both directions
-       (27 command templates + 52 skills).
+       (27 command templates + 53 skills since 2026-11-03; 52 before).
 * C-6  the ledger never repeats a unit id.
 * C-7  ``lookup`` marks an unregistered unit as default + fixed marker, and a
        registered one as ledger-sourced with ``marker=null``.
@@ -22,7 +24,8 @@ that ``tasks.md`` T004 names:
        ledger-style row.
 * C-12 the change log keeps the ``date | unit_id | before → after | basis | 依据``
        row form.
-* C-13 ``check`` reports 79 units and zero findings on this repository.
+* C-13 ``check`` reports every unit with zero findings (measured 80 units on
+       2026-11-03; 79 at 069a authoring).
 
 Red-first discipline (Constitution IV): the owner document and the engine do not
 exist yet. Every engine call goes through ``_run``, which asserts the script path
@@ -270,9 +273,15 @@ def test_no_second_classification_data_file():
 # C-4 / C-5 / C-6 — ledger shape, cardinality, and bidirectional coverage
 # --------------------------------------------------------------------------- #
 def test_ledger_has_79_rows_covering_inventory_bidirectionally():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 rows. The new
+    # skill `skills/internal/review-feature-quality/` registered
+    # `skill:review-feature-quality` in the owner's ledger, so the inventory and
+    # the ledger grew together (53 skills, 27 commands unchanged). The name keeps
+    # the 069a id under which this pin was first measured; the assertion is the
+    # same shape: ledger rows == inventory, bidirectionally.
     rows = _ledger_rows()
-    assert len(rows) == 79, (
-        "ledger must carry exactly 79 rows (27 commands + 52 skills); got %d" % len(rows)
+    assert len(rows) == 80, (
+        "ledger must carry exactly 80 rows (27 commands + 53 skills); got %d" % len(rows)
     )
     ids = [row["unit_id"] for row in rows]
     assert len(set(ids)) == len(ids), (
@@ -287,14 +296,14 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
     commands = {unit for unit in ids if unit.startswith("/speckit.")}
     skills = {unit for unit in ids if unit.startswith("skill:")}
     assert len(commands) == 27, "expected 27 command units, got %d" % len(commands)
-    assert len(skills) == 52, "expected 52 skill units, got %d" % len(skills)
+    assert len(skills) == 53, "expected 53 skill units, got %d" % len(skills)
     inventory_commands, inventory_skills = _inventory()
     assert len(inventory_commands) == 27, (
         "inventory self-check: expected 27 templates/commands/*.md, got %d"
         % len(inventory_commands)
     )
-    assert len(inventory_skills) == 52, (
-        "inventory self-check: expected 52 skills/{external,internal}/*/SKILL.md, got %d"
+    assert len(inventory_skills) == 53, (
+        "inventory self-check: expected 53 skills/{external,internal}/*/SKILL.md, got %d"
         % len(inventory_skills)
     )
     expected = inventory_commands | inventory_skills
@@ -335,6 +344,8 @@ def test_first_batch_members_are_registered_as_expression():
 
 
 def test_check_reports_79_units_and_zero_gaps():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 scanned
+    # units, the same census movement as the ledger-row pin above.
     # No --repo: C-5 requires the engine to resolve the repository root itself.
     proc = _run("--action", "check", "--format", "json")
     record = _json(proc)
@@ -344,8 +355,8 @@ def test_check_reports_79_units_and_zero_gaps():
     )
     assert record.get("action") == "check"
     assert record.get("findings") == []
-    assert record.get("units") == 79, (
-        "check must report 79 scanned units; got %r" % record.get("units")
+    assert record.get("units") == 80, (
+        "check must report 80 scanned units; got %r" % record.get("units")
     )
     assert ISO_Z_RE.match(str(record.get("checked_at", ""))), (
         "checked_at must be ISO-8601 Z; got %r" % record.get("checked_at")
@@ -493,9 +504,12 @@ def test_change_log_row_form():
 # C-9 — no class-key assignment in templates or skills (wiring reads the owner)
 # --------------------------------------------------------------------------- #
 def test_templates_and_skills_never_assign_class_key():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 files, the
+    # same census movement as the two pins above (the new review-feature-quality
+    # skill is also scanned for the forbidden literals below).
     paths = sorted(COMMANDS_DIR.glob("*.md")) + sorted(SKILLS_DIR.glob("*/*/SKILL.md"))
-    assert len(paths) == 79, (
-        "expected 27 templates + 52 skills, got %d files" % len(paths)
+    assert len(paths) == 80, (
+        "expected 27 templates + 53 skills, got %d files" % len(paths)
     )
     problems: list[str] = []
     for path in paths:

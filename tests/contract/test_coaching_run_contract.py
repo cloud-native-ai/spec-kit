@@ -34,6 +34,9 @@ SKILL = REPO_ROOT / "skills" / "external" / "coaching-skills" / "SKILL.md"
 #: Feature baseline (immediately before this implement run). C-13 judges the added
 #: lines of ``git diff <base>`` inside the scanner's surface, never a total count.
 FEATURE_BASE = "a7aa0793"
+# The trunk merge that closed the 078 coaching line (2026-10-30 21:08). C-13's
+# diff measures this range only — see the dated note at the test body.
+FEATURE_LINE_HEAD = "8d0e0106"
 
 ARTIFACTS = ("expectation.md", "observation.md", "deviations.md", "improvement-plan.md")
 RUN_DOMAINS = ("success", "partial", "failed")
@@ -481,9 +484,20 @@ def test_c13_skill_stays_external_and_new_lines_add_no_blocking_gate():
     assert re.search(r"governance-kept relay", body, re.IGNORECASE)
     assert re.search(r"subagent never self-approves", body, re.IGNORECASE)
 
+    # 2026-11-03: the diff compares the feature line's own range
+    # (FEATURE_BASE..FEATURE_LINE_HEAD), not the merged trunk. The clause's
+    # subject is "new wording introduced by THIS feature", and the fixed-base
+    # working-tree scan was re-tripped by Feature 081's T010 (f29b6178, FR-018):
+    # its mandated `Implemented → Blocked` audit exception carries the
+    # pre-existing "without explicit user confirmation" phrase (original wording
+    # 62bbaf7d, 2026-10-12) that the rewrite surfaced as an added line. Per the
+    # executable-judgment owner (identity-and-wiring.contract.md C-8 § New-line
+    # gate), BASE is a recorded feature baseline — re-recorded here as the trunk
+    # merge that closed the 078 line. Measured on 2026-11-03: the line's own
+    # range adds zero matching lines.
     diff = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", FEATURE_BASE, "--", "skills", "shared",
-         "templates/commands", "templates"],
+        ["git", "-C", str(REPO_ROOT), "diff", FEATURE_BASE, FEATURE_LINE_HEAD, "--",
+         "skills", "shared", "templates/commands", "templates"],
         capture_output=True,
         text=True,
         check=False,

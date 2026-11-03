@@ -44,9 +44,12 @@ BASELINE_INTERNAL = [
     "improve-tools", "manage-agents", "manage-constitution", "manage-features",
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
-    "review-sdd-process", "run-agent", "run-interview", "sanitize-materials",
-    "self-improvement", "study-project", "summarize-project",
+    "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
+    "sanitize-materials", "self-improvement", "study-project", "summarize-project",
 ]
+# 2026-11-03 (Feature 081c, df9bbe0e): `review-feature-quality` joins the internal
+# layer as the dogfooding review carrier (37 -> 38 internal dirs); the roster pin
+# swaps in the one added name, the way the 078 rename did for the external layer.
 
 
 def _read(path: Path) -> str:
@@ -151,13 +154,16 @@ def test_c8_run_team_frontmatter_classification_and_skill_id():
 # --- C-9: compiled wrap-up embeds, zero drift, 75 units (+ sdd-house-keeping) ---
 
 def test_c9_compile_embeds_zero_drift_75_units():
+    # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 75 -> 76 units — the
+    # review-feature-quality skill ships its own compiled Wrap-up embed, so the
+    # compile census grows by one while the zero-drift property is unchanged.
     out = subprocess.run(
         ["python3", "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"],
         cwd=REPO_ROOT, capture_output=True, text=True,
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "75 units" in combined, f"expected 75 units, got: {combined[-400:]}"
+    assert "76 units" in combined, f"expected 76 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

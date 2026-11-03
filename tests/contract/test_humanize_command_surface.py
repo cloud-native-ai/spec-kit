@@ -1631,6 +1631,16 @@ def _git_added_lines(rev: str, *paths: str) -> list:
             if ln.startswith("+") and not ln.startswith("+++")]
 
 
+def _git_added_lines_between(head: str, base: str, *paths: str) -> list:
+    """Added lines changed between ``base`` and ``head`` (the line's own range)."""
+    out = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", "--no-color", base, head, "--", *paths],
+        capture_output=True, text=True, encoding="utf-8", check=True,
+    )
+    return [ln[1:] for ln in out.stdout.splitlines()
+            if ln.startswith("+") and not ln.startswith("+++")]
+
+
 def _gates_module():
     spec = importlib.util.spec_from_file_location("scan_confirmation_gates", GATES_SCANNER)
     module = importlib.util.module_from_spec(spec)
@@ -1824,11 +1834,21 @@ def test_wc13_stage_class_pin_remeasured():
 
 
 def test_wc14_frozen_surfaces_unchanged():
+    # 2026-11-03: compare the line's own range (base..line head), not the merged
+    # trunk — the same reconciliation WC-18 got on 2026-10-31. The clause's
+    # subject is this feature's own work ("本特性 ... MUST NOT 改它们的名册/计数"),
+    # and five of the nine frozen suites legitimately moved AFTER the line closed:
+    # 081b 793aff9e extended test_expression_gate_wiring.py / test_expression_gates_doc.py,
+    # 081a/081c (a2701a4f, dc72c941) amended test_expression_compatibility.py,
+    # test_migration_distribution.py and test_skill_layer_visibility_guards.py.
+    # A fixed-base scan would count those later lines' sanctioned edits against
+    # this feature forever; the line range keeps the guard judging exactly what
+    # the 080 line itself did to the frozen suites (measured: nothing moved).
     for rel in FROZEN_SURFACES:
         path = REPO_ROOT / rel
         assert path.is_file(), f"frozen surface missing: {rel} (WC-14)"
         assert FUNC_RE.findall(_read(path)), f"{rel} carries no test function (WC-14)"
-        changed = _git_names(BASELINE_COMMIT, rel)
+        changed = _git_names_between(LINE_MERGE_HEAD, BASELINE_COMMIT, rel)
         assert not changed, (
             f"frozen surface {rel} differs from {BASELINE_COMMIT} (WC-14): the roster/count "
             f"of a verification-only suite may not move with this feature"
@@ -1866,8 +1886,19 @@ def test_wc16_command_roster_unchanged():
 
 
 def test_wc17_new_line_gate_zero():
+    # 2026-11-03: compare the line's own range (base..line head), not the merged
+    # trunk — the reconciliation WC-18 got on 2026-10-31, for the same reason the
+    # gate-newline-baseline.txt evidence records: gate text already in the tree is
+    # other features' legitimate property and must not be counted against this
+    # feature; the same holds for text later features legitimately add. Feature
+    # 081's T010 (f29b6178, FR-018) added the `Implemented → Blocked` audit
+    # exception to manage-features/SKILL.md after the line closed; the re-measured
+    # judgment is appended to test-evidence/gate-newline-baseline.txt. The line's
+    # own range adds zero matching lines (measured).
     gates = _gates_module()
-    added = _git_added_lines(BASELINE_COMMIT, *gates.SCAN_DIRS, "templates/*.md")
+    added = _git_added_lines_between(
+        LINE_MERGE_HEAD, BASELINE_COMMIT, *gates.SCAN_DIRS, "templates/*.md"
+    )
     assert added, "no added lines on the scan surface — the diff base or paths are wrong"
     hits = [line[:120] for line in added if gates.BLOCKING_RE.search(line)]
     assert not hits, f"new blocking confirmation-gate lines introduced (WC-17): {hits}"
@@ -1883,7 +1914,16 @@ def test_wc18_no_runtime_surface_added():
 
 
 def test_wc19_ledgers_unchanged():
-    changed = _git_names(
+    # 2026-11-03: the freeze compares the line's own range (base..line head), not
+    # the merged trunk — the WC-18 reconciliation shape. The clause's subject is
+    # this feature ("类别与注册面 MUST 保持不变" = the 080 line changes them not);
+    # Feature 081c (df9bbe0e) legitimately registered the review-feature-quality
+    # rows in both registries after the line closed, and a fixed-base scan would
+    # count that sanctioned registration against 080 forever. The live assertions
+    # below (humanize's own ledger row, no probe unit for the command) stay
+    # worktree-facing and unchanged.
+    changed = _git_names_between(
+        LINE_MERGE_HEAD,
         BASELINE_COMMIT,
         "shared/definitions/flow-class-definitions.md",
         "shared/definitions/probe-definitions.md",

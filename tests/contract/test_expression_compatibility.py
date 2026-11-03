@@ -445,6 +445,20 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "reason": "2026-10-29 Feature 074a wires the pre-dispatch governance probe to sdd-route.py authorize",
         "markers": ("sdd-invocation", "authorize"),
     },
+    "skills/internal/manage-features/SKILL.md": {
+        "reason": (
+            "2026-11-03 Feature 081d lands T010 (f29b6178, FR-018): the status "
+            "vocabulary takes the sixth value `Blocked` and the never-regress rule "
+            "takes the `Implemented → Blocked` audit-correction exception by "
+            "pointer. The entry was first recorded by 081a (a2701a4f) and reverted "
+            "in the same hour (8ce0f006) because WC-14 then froze this suite; the "
+            "deferral note named 081d as the entry's owner. The exception's own "
+            "criteria stay in the owner block "
+            "(templates/feature-details-template.md § Canonical Status State "
+            "Machine); this file pins the pointer, not the criteria."
+        ),
+        "markers": ("Blocked", "feature-details-template.md"),
+    },
     "skills/external/sdd-loop-driver/SKILL.md": {
         "reason": "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)",
         "markers": ("监听签名唯一", "--iter"),
