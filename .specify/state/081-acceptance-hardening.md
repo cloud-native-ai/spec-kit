@@ -381,3 +381,10 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - **测试预算**：baseline = 081b review-fix 后的树（targeted 145 passed；全量基线仍取 081a final 39F/7025P/7S，081d 做 feature-level 对照）；closure = 081c review 后。
 - **不做**：081d 的 manage-features / feature-index 词表、`--audit-existing`、driver line-state `blocked` / merge gate、schema-ownership guard、final smoke / 全量基线对照。
 - **状态**：SC-002 可在本切片转为 `pass`（review 第四条件落地）；SC-001 仍 `blocked`（3 处调用点还差 driver closure/merge 一处）。
+
+## 081c tasks（2026-11-03 06:16 UTC）
+
+- `tasks.md` 14 任务（T001–T014），validate-tasks 0/0，decomposition `proceed`（14 tasks / 25 FR，上限 30/40）。
+- pre-analyze tasks 初次 `fail errors=1`：IB-006 的 `this-slice` 载体指向 081b 已归档的 `T005`。驱动者在 tasks 阶段做 spec-only 载体对账：IB-004 → `task:T004+test:tests/contract/test_acceptance_review_composition.py`、`Carrier slice=this-slice`；IB-006 → `task:T012+test:tests/contract/test_acceptance_premises.py`。复跑 `decision=pass errors=0 advisories=56`；红色读数保留在 `test-evidence/tasks-081c-pre-analyze.txt`。
+- 机制缺陷 F15 记录于 `notes/known-items-081c.md`：`this-slice` 载体不跨 `tasks.md` 归档；两解（显式切片 id 或 `resolved-in-earlier-slice` 读数）留给 schema owner，081c 采用“逐切片重指向”临时规则并测量。
+- 提交：`c38e92b2`（子代理 tasks.md）+ 本次对账提交。下一阶段 = checklist。
