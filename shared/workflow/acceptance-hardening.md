@@ -360,7 +360,7 @@ relative to the spec directory:
 
 ```text
 **Dependency artifacts (declared, never implied)** — the checker reads only the paths in this block:
-- `071`: `.specify/memory/features/071.md`, `.specify/specs/071-review-code-integration/verification.md`
+- `NNN`: `.specify/memory/features/NNN.md`, `.specify/specs/NNN-<slug>/verification.md`
 ```
 
 Only backticked `.md` paths **inside this block** are read; a backticked `.md` token elsewhere in the section (this
