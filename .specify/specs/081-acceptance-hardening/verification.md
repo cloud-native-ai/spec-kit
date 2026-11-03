@@ -4,7 +4,7 @@ baseline_commit=cb841d90
 baseline_date=2026-11-02
 baseline_branch=081-acceptance-hardening
 implementation_date=2026-11-03
-post_change_commit=8ce0f006
+post_change_commit=4c07fdc9
 
 # -- Smoke test record (exactly one per feature) --
 
@@ -96,8 +96,8 @@ SC-009_unblock=081d lands the schema-ownership guard; the coverage lane verdict 
 
 # -- Deferred tasks --
 
-deferred_tasks=T024
-deferred_reason_summary=T024 (the `manage-features` vocabulary owner) is deferred to 081d because WC-14 freezes the C-5 verification suite.
+deferred_tasks=
+deferred_reason_summary=Slice 081b has no `[~]` task row. 081a's T024 (`manage-features` vocabulary owner) was archived with `tasks-081a.md` and remains 081d's; it is not a row of this slice and MUST NOT be extracted as a live locator.
 
 # -- Acceptance summary (copied from the checker; never recomputed here) --
 

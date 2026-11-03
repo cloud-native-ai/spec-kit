@@ -352,6 +352,22 @@ each record. Mandatory in `plan.md` of an `execution`-class feature. Columns, re
 The plan states which dependencies it read, and for each one the basis on which it is included or excluded. An
 implied set is unreadable: nobody can tell whether a row is missing or a dependency was never opened.
 
+**The declaration's marker is fixed, because both the gate and the closure checker read it mechanically.** A plan
+with dependencies carries a paragraph whose first token is the literal
+`**Dependency artifacts (declared, never implied)**`, followed by one bullet per dependency; each bullet names that
+dependency's artifacts in backticks (its feature detail and its `verification.md`), as repo-relative paths or paths
+relative to the spec directory:
+
+```text
+**Dependency artifacts (declared, never implied)** — the checker reads only the paths in this block:
+- `071`: `.specify/memory/features/071.md`, `.specify/specs/071-review-code-integration/verification.md`
+```
+
+Only backticked `.md` paths **inside this block** are read; a backticked `.md` token elsewhere in the section (this
+spec's own `verification.md`, a research note) is never a dependency. A plan with no dependencies writes the exact
+sentence `Dependency set: none`. Any other dependency-set sentence without the block is an **input error**: an
+absent declaration MUST NOT silently disable the fourth finding.
+
 ### The extraction set — closed at three sources
 
 Each dependency yields rows from exactly three places and from nowhere else:
@@ -379,6 +395,10 @@ excludes it is disjoint from the disposition set, which makes the finding unreac
 `Source row` **is the join key**: every disposition row reproduces the extracted locator verbatim, and a locator
 disposed twice is a defective cell (two dispositions for one key). An extracted row with no disposition row of its
 own is an undisposed row.
+
+A disposition row that disposes **nothing** — normally `not-applicable` with no extracted record behind it — writes
+`—` (or the legacy `(none)`) in `Source row`. That sentinel is not a locator and is never joined; any other value
+MUST satisfy the grammar above.
 
 ### `Disposition` — closed over three values, and what each one owes
 

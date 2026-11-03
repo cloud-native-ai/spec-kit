@@ -1,0 +1,13 @@
+=== pre-analyze-check --stage plan (Feature 081 spec dir) ===
+summary: pre-analyze-check: stage=plan decision=pass errors=0 advisories=45 waived=0
+EXIT=0
+payload: test-evidence/review-fix-081b-plan-gate.json
+
+=== closure-acceptance-check (Feature 081 spec dir) ===
+verdict: block
+spec_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/081-acceptance-hardening
+flow_class: execution
+claimed_status: Blocked
+final_path: pass=0 blocked=1 deferred=0 partial=1 fail=0 unknown=0 total=2
+reason: zero-final-path-pass
+EXIT=1

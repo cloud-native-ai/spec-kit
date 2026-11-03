@@ -540,6 +540,60 @@ def test_d_both_producers_name_the_same_instance_for_every_mutation():
 
 
 # --------------------------------------------------------------------------- #
+# (d2) the real-spec shape, the declaration marker, and the absent sentinel
+# --------------------------------------------------------------------------- #
+def test_d2_the_real_spec_dir_emits_no_phantom_inherited_row():
+    """The shape a real plan has — and the two ways the fixtures cannot reproduce it.
+
+    A fixture declares dependency files by fixture-local names and carries a
+    `feature-detail.md`; a real spec dir mentions its own `verification.md` in prose and reads its
+    claimed status from the repository registry. Both producers must agree on the real dir with
+    no fabricated `081:*` row (F1) and with the legal `inherited-later` row accepted (F2).
+    """
+    record = _pre_record(_pre(SPEC))
+    assert record["decision"] == "pass", record["findings"]
+    inherited = [f for f in record["findings"] if f["check"] == "inherited-blocker"]
+    assert not inherited, inherited
+    closure = _closure_instances(SPEC)
+    assert not [r for r in closure if r.startswith("inherited-blocker-undisposed")], closure
+
+
+def test_d3_a_dependency_set_without_the_declaration_block_is_an_input_error(tmp_path):
+    """An absent declaration MUST NOT silently disable the fourth finding (F3)."""
+    target = _copy_fixture("inherited-clean", tmp_path)
+    plan = target / "plan.md"
+    text = plan.read_text(encoding="utf-8")
+    start = text.index("**Dependency artifacts")
+    end = text.index("**Extraction reading**")
+    plan.write_text(text[:start] + text[end:], encoding="utf-8")
+
+    gate = _pre(target)
+    assert gate.returncode == 2, (gate.returncode, gate.stderr)
+    assert "Dependency artifacts" in gate.stderr
+    closure = _closure(target)
+    assert closure.returncode == 2, (closure.returncode, closure.stdout, closure.stderr)
+
+
+def test_d4_a_dash_source_row_is_the_absent_sentinel(tmp_path):
+    """`—` and `(none)` are two spellings of "this row disposes nothing" (F4)."""
+    target = _copy_fixture("positive", tmp_path)
+    _rewrite(target / "plan.md", "| IB-001 | (none) |", "| IB-001 | — |")
+
+    gate = _pre(target)
+    assert gate.returncode == 0, (gate.returncode, gate.stderr, gate.stdout)
+    closure, payload = _closure_payload(target)
+    assert closure.returncode == 0, (closure.returncode, payload)
+
+
+def test_d5_the_declaration_marker_is_published_once_in_the_owner_and_the_skeleton():
+    """The marker is a fixed literal, not an implementation detail (F3)."""
+    marker = "**Dependency artifacts (declared, never implied)**"
+    assert marker in OWNER.read_text(encoding="utf-8")
+    assert marker in PLAN_TEMPLATE.read_text(encoding="utf-8")
+    assert "Dependency set: none" in OWNER.read_text(encoding="utf-8")
+
+
+# --------------------------------------------------------------------------- #
 # (e) pin validity
 # --------------------------------------------------------------------------- #
 class PinMismatch(Exception):

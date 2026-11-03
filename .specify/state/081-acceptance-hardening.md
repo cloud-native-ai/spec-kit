@@ -358,3 +358,10 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - T012：5 模块 `89 passed` exit 0，记录 `test-evidence/tasks-081b-slice-tests.txt`；全量基线对照留给 081d（FR-023）。
 - 测试预算：baseline = 081a final full-suite（39F/7025P/7S）；081b 为切片，按 tasks.md 不做全量 closure run，T012 的 targeted 观测不冒充集合级对照。
 - 12 个任务全部 `[X]`；feature 状态仍 **`Blocked`**（081b 不接调用点，SC-001/SC-002 不动）。下一阶段 = 081b review。
+
+## 081b review + review-fix（2026-11-03 06:40 UTC）
+
+- review（`review.md` / `code-review.md`）：P0=1（F1：依赖声明修复只落在 closure checker，gate 仍扫描任意反引号 `.md`，在 081 自己的 plan 上产出 9 条 `081:*` 幻影行）、P1=2（F2：`inherited-later` 在 gate 不可达，claim 只读 fixture-only 的 `feature-detail.md`；F3：声明 marker 未文档化且缺失时静默返回空集）、P2=4（`—` 哨兵、`post_change_commit`/`deferred_tasks`、EP 范围、fixture census）。
+- review-fix：`pre-analyze-check.py` 改用与 closure checker 相同的 declared-block 解析并把 `repo` 贯通；新增 `resolve_claimed_status()`（spec 目录 detail/registry → 仓库 `features.md`）；两 producer 对「有依赖集但无声明块」判 exit 2；owner + plan skeleton 发布 marker；`—` 与 `(none)` 同为 absent sentinel；`verification.md`/`tasks.md`/`data-model.md` 四族 P2 修正；新增 legs (d2)–(d5)。
+- 复测：plan gate `decision=pass errors=0 advisories=45`（081c/081d 计划路径）；closure `block`/exit 1/`zero-final-path-pass`/`final_path 0/1/0/1/0/0/2`；targeted 8 模块 `145 passed` exit 0；mirror/regen `--check` exit 0。证据：`test-evidence/review-fix-081b-gates.txt`、`review-fix-081b-plan-gate.json`、`tasks-081b-review-fix-tests.txt`。
+- Feature 仍 **`Blocked`**（081b 无 closure 调用点）。下一阶段 = 081b closure（U6 记录）→ 081c。

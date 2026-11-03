@@ -121,7 +121,7 @@ GATE_ROW = re.compile(r"(?m)^\s*[-*]?\s*(GATE-\d+)\b")
 EMPTY_CELLS = ("", "-", "--", "—", "–")
 #: `Source row` values that mean "this row disposes nothing". `(none)` is what the 081a fixtures
 #: write for a feature with no dependency set; it is a sentinel, not a malformed locator.
-ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)")
+ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)", "—", "–", "-", "--")
 #: The closed `Disposition` domain.
 DISPOSITIONS = ("resolved", "inherited", "not-applicable")
 #: The closed `Status` domain of `§ Execution Premises`.
@@ -618,21 +618,72 @@ def check_prose_declarations(body, rel, findings):
 
 # --- § Inherited Blockers ---------------------------------------------------------------------
 
-def declared_dependency_files(section_text, spec_dir):
+def declared_dependency_files(section_text, spec_dir, repo=""):
     """The dependency artifacts the plan's declaration names, resolved and deduplicated.
 
-    The set is declared, never implied: only a backticked `.md` token inside the section is read,
-    so an unopened dependency is visible as a missing row rather than silently assumed away.
+    The set is declared, never implied: only the paths inside the
+    ``**Dependency artifacts (declared, never implied)**`` block are read. A generic backticked
+    `.md` token elsewhere in the section (e.g. this spec's own ``verification.md``) MUST NOT
+    become a dependency; scanning everything is how a feature becomes its own dependency and
+    emits phantom rows.
     """
+    marker = "**Dependency artifacts"
+    start = section_text.find(marker)
+    if start < 0:
+        return []
+    tail = section_text[start:]
+    block_match = re.search(
+        r"^\*\*Dependency artifacts[^\n]*\*\*:?[^\n]*\n(.*?)(?=\n\*\*|\n#{2,}|\Z)",
+        tail, re.S | re.M)
+    if not block_match:
+        return []
+    block = block_match.group(1)
+    spec_root = os.path.abspath(spec_dir)
+    repo_root = os.path.abspath(repo) if repo else \
+        os.path.abspath(os.path.join(spec_root, "..", "..", ".."))
+    own_artifacts = {
+        os.path.join(spec_root, name)
+        for name in ("requirements.md", "plan.md", "tasks.md", "verification.md")
+    }
     found = []
-    for token in BACKTICK.findall(section_text):
+    for token in re.findall(r"`([^`\n]+)`", block):
         token = token.strip()
         if not token.endswith(".md"):
             continue
-        candidate = os.path.normpath(os.path.join(spec_dir, token))
-        if os.path.isfile(candidate) and candidate not in found:
-            found.append(candidate)
+        candidates = []
+        if token.startswith(".specify/"):
+            candidates.append(os.path.join(repo_root, token))
+        else:
+            candidates.append(os.path.join(spec_root, token))
+            candidates.append(os.path.join(repo_root, token))
+        for candidate in candidates:
+            candidate = os.path.normpath(candidate)
+            if not os.path.isfile(candidate):
+                continue
+            if candidate in own_artifacts:
+                continue
+            if candidate not in found:
+                found.append(candidate)
+            break
     return found
+
+
+def require_dependency_declaration(section_text, rel):
+    """A non-empty dependency set MUST carry the declared-artifact block (F3).
+
+    A plan with no dependencies writes the exact sentence ``Dependency set: none``. Any other
+    dependency-set sentence without the block would silently disable finding 4, so it is an input
+    error naming the section rather than an empty extraction set.
+    """
+    if "**Dependency artifacts" in section_text:
+        return
+    if re.search(r"(?i)dependency set\s*:\s*none\b", section_text):
+        return
+    raise InputError(
+        "%s § Inherited Blockers carries a dependency set but no "
+        "`**Dependency artifacts (declared, never implied)**` block: the dependency set is "
+        "declared, never implied, and an absent declaration MUST NOT silently disable the "
+        "fourth finding" % rel)
 
 
 def deferred_locators(text, feature_id):
@@ -682,11 +733,11 @@ def verification_locators(text, feature_id):
     return locators
 
 
-def extracted_dependency_rows(section_text, spec_dir):
+def extracted_dependency_rows(section_text, spec_dir, repo=""):
     """Every row the closed three-source set yields, in declaration order."""
     details = []
     verifications = []
-    for path in declared_dependency_files(section_text, spec_dir):
+    for path in declared_dependency_files(section_text, spec_dir, repo):
         text = read_file(path)
         if VERIFICATION_FIELD.search(text):
             verifications.append(text)
@@ -758,13 +809,56 @@ def carrier_resolves(parsed, tasks_text):
         "in this slice")
 
 
-def later_slice_is_legal(slice_value, plan_text, spec_dir):
+def registry_status(path, key):
+    """The `Status` cell of the registry row filed under `key` (or `key`'s digits)."""
+    wanted = {key}
+    digits = re.match(r"^(\d+)", key)
+    if digits:
+        wanted.add(digits.group(1))
+    for line in read_file(path).splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if not cells or cells[0] not in wanted:
+            continue
+        if len(cells) < 4 or not cells[3].strip():
+            raise InputError("registry row for %s has no Status cell: %s" % (key, path))
+        return cells[3].strip()
+    return None
+
+
+def resolve_claimed_status(spec_dir, repo):
+    """The claimed feature status, from the same carriers the closure checker reads (F2).
+
+    Order: the spec dir's own `feature-detail.md`, its `feature-registry.md`, then the repository
+    registry by the spec directory's key. The old gate read only `feature-detail.md` — a
+    fixture-only filename — so on a real spec dir `inherited-later` was unreachable.
+    """
+    local_detail = os.path.join(spec_dir, "feature-detail.md")
+    if os.path.isfile(local_detail):
+        match = DETAIL_STATUS.search(read_file(local_detail))
+        if not match:
+            raise InputError("feature detail carries no `**Status**:` line: %s" % local_detail)
+        return match.group(1).strip()
+    key = os.path.basename(spec_dir.rstrip(os.sep))
+    local_registry = os.path.join(spec_dir, "feature-registry.md")
+    if os.path.isfile(local_registry):
+        status = registry_status(local_registry, key)
+        if status is not None:
+            return status
+    if repo:
+        repo_registry = os.path.join(repo, ".specify", "memory", "features.md")
+        if os.path.isfile(repo_registry):
+            status = registry_status(repo_registry, key)
+            if status is not None:
+                return status
+    return None
+
+
+def later_slice_is_legal(slice_value, plan_text, spec_dir, repo=""):
     """A later `Carrier slice` is legal only while the parent is `Blocked` and D10 lists it."""
-    detail = os.path.join(spec_dir, "feature-detail.md")
-    if not os.path.isfile(detail):
-        return False
-    match = DETAIL_STATUS.search(read_file(detail))
-    if not match or match.group(1).strip() != "Blocked":
+    if resolve_claimed_status(spec_dir, repo) != "Blocked":
         return False
     try:
         body = section_lines(plan_text, D10_SECTION, "D10", "plan.md")
@@ -774,7 +868,7 @@ def later_slice_is_legal(slice_value, plan_text, spec_dir):
     return bool(re.search(r"(?<!\w)%s(?!\w)" % re.escape(slice_value), section_text))
 
 
-def check_inherited(plan_text, requirements_text, tasks_text, spec_dir, findings):
+def check_inherited(plan_text, requirements_text, tasks_text, spec_dir, repo, findings):
     """Finding 4: an undisposed row, and the `inherited` row whose carrier cannot carry.
 
     One reason for five ways to fail — undisposed, blank carrier, unparseable carrier,
@@ -792,7 +886,8 @@ def check_inherited(plan_text, requirements_text, tasks_text, spec_dir, findings
         return
     anchor = body[0][0] if body else 1
     section_text = "\n".join(line for _, line in body)
-    extracted = extracted_dependency_rows(section_text, spec_dir)
+    require_dependency_declaration(section_text, rel)
+    extracted = extracted_dependency_rows(section_text, spec_dir, repo)
 
     entries = []
     seen = {}
@@ -844,7 +939,7 @@ def check_inherited(plan_text, requirements_text, tasks_text, spec_dir, findings
                     "`gate:<GATE-ID>` — a deferrable `supporting`-path SC is not a carrier"
                     % carrier)
             elif LATER_SLICE.match(entry["slice"]) and later_slice_is_legal(
-                    entry["slice"], plan_text, spec_dir):
+                    entry["slice"], plan_text, spec_dir, repo):
                 if parsed[0] != "test":
                     problems.append(
                         "an `inherited-later` row's `Carrier` is `test:<path>` alone, not %r — "
@@ -886,7 +981,8 @@ def check_ownership(spec_dir, stage, requirements_text, fr, findings,
         if plan_text is not None else {}
     check_runtime(requirements_text, fr, plan_text, premises, tasks_text, repo, findings)
     if plan_text is not None:
-        check_inherited(plan_text, requirements_text, carrier_tasks_text, spec_dir, findings)
+        check_inherited(
+            plan_text, requirements_text, carrier_tasks_text, spec_dir, repo, findings)
 
 
 def apply_waivers(findings, waivers):

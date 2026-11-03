@@ -179,7 +179,7 @@ Owner of this table's shape, its `Status` and `Decision` value domains and its i
 
 ## Inherited Blockers
 
-Owner of this table's shape, its `Disposition` domain, the `Source row` / `Carrier` / `Carrier slice` grammar and the carrier's eligibility rule: `shared/workflow/acceptance-hardening.md` § Inherited Blockers — this skeleton carries the column set and nothing else, and the dependency set these rows are extracted from MUST be declared in this section.
+Owner of this table's shape, its `Disposition` domain, the `Source row` / `Carrier` / `Carrier slice` grammar and the carrier's eligibility rule: `shared/workflow/acceptance-hardening.md` § Inherited Blockers — this skeleton carries the column set and nothing else. The dependency set these rows are extracted from MUST be declared in this section, either as the literal `**Dependency artifacts (declared, never implied)**` block or as the exact sentence `Dependency set: none`.
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|

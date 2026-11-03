@@ -219,7 +219,7 @@ PREMISE_STATUSES = ("verified", "unverified", "falsified")
 
 #: `Source row` values that mean "this row disposes nothing". `(none)` is the sentinel the 081a
 #: fixtures write for a feature with no dependency set; it is not a malformed locator.
-ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)")
+ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)", "—", "–", "-", "--")
 
 #: Statuses the dependency extraction selects on (C-17). `partial` is inside the set on purpose: a
 #: dependency may carry `partial` rows and nothing else, and an extraction set that excluded it
@@ -1060,6 +1060,24 @@ def _verification_locators(text, feature_id):
     return locators
 
 
+def require_dependency_declaration(section_text):
+    """A non-empty dependency set MUST carry the declared-artifact block (F3).
+
+    A plan with no dependencies writes the exact sentence ``Dependency set: none``. Any other
+    dependency-set sentence without the block would silently disable the fourth reason, so it is
+    an input error rather than an empty extraction set.
+    """
+    if "**Dependency artifacts" in section_text:
+        return
+    if re.search(r"(?i)dependency set\s*:\s*none\b", section_text):
+        return
+    raise InputError(
+        "plan.md § Inherited Blockers carries a dependency set but no "
+        "`**Dependency artifacts (declared, never implied)**` block: the dependency set is "
+        "declared, never implied, and an absent declaration MUST NOT silently disable the "
+        "fourth finding")
+
+
 def extracted_dependency_rows(section_text, spec_dir):
     """Every row the closed three-source set yields (C-17), in declaration order.
 
@@ -1200,7 +1218,10 @@ def inherited_reasons(plan, key, spec_dir, tasks_text, claimed_status):
             reasons.append(_reason(
                 R_INHERITED, entry["source"] or "%s:%s" % (key, entry["row"])))
 
-    for locator in extracted_dependency_rows(plan.get("inherited_declaration", ""), spec_dir):
+    declaration = plan.get("inherited_declaration", "")
+    if declaration.strip():
+        require_dependency_declaration(declaration)
+    for locator in extracted_dependency_rows(declaration, spec_dir):
         if locator not in seen:
             reasons.append(_reason(R_INHERITED, locator))
     return reasons
