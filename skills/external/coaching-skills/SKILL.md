@@ -221,6 +221,7 @@ four artifact paths.
 - Expectation skeleton, derivation method and the zero-side-effect declaration:
   [`./references/prompt-templates.md`](./references/prompt-templates.md).
 - Observation, deviation and improvement-plan templates: the same file.
+- Optimization claim protocol and run-status ladder: [`./data-model.md`](./data-model.md).
 
 ## Resource ID
 - Canonical ID: `<SKILL:.specify/skills/coaching-skills/SKILL.md>`

@@ -55,7 +55,7 @@ observation record only. -->
 - No Trainee tool, script or command is executed in this phase.
 - No write inside the Trainee directory.
 - No network or external call.
-- No claim marker is created; the claim protocol belongs to `data-model.md` §
+- No claim marker is created; the claim protocol belongs to `../data-model.md` §
   Optimization claim and to the optimization step only.
 
 ## Trainee Failure Semantics
@@ -204,4 +204,4 @@ Rules for the plan: each entry names a concrete Trainee file and section plus on
 tweak — generic advice is invalid. Each entry cites `D-*` findings or is marked
 `evidence: none`; the plan is still produced when the observation is empty. Both status
 values are recorded once, in `## Run Status`, and the combination rule is owned by
-`data-model.md` § RunStatus — consult it, do not restate it here.
+`../data-model.md` § RunStatus — consult it, do not restate it here.
