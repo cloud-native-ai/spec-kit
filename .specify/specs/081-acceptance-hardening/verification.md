@@ -64,7 +64,7 @@ SC-006_note=this criterion is supporting; its carrier is 081c
 SC-006_blocked_at=081c owns `review-feature-quality`, the review command rewrite and the ARC measurement
 SC-006_reduced_measurement=review-composition contract and the owner doc § Review Composition
 SC-006_reduced_measurement_run=yes
-SC-006_why_reduced_insufficient=no real review run exists to measure the four segments and the three counts
+SC-006_why_reduced_insufficient=no real review run exists to measure the four segments and the seven-key final_path record (7/7; a three-count report would not satisfy the clause)
 SC-006_unblock=081c lands the review composition and runs a review
 
 SC-007_status=deferred
