@@ -7,8 +7,10 @@ that ``tasks.md`` T010 names:
 * C-1  an unrefreshed project keeps its old behaviour: no command template and no
   skill carries a call to one of the new engine actions (``check`` /
   ``delegation`` / ``faces`` / ``isomorphism``), and the shipped file-name sets
-  are unchanged (27 command templates, 52 skills — 51 at the 069b baseline; the
-  2026-10-30 Feature 078 rename swaps one name in place, so the count is unchanged);
+  are unchanged (27 command templates, 53 skills — 51 at the 069b baseline; the
+  2026-10-30 Feature 078 rename swaps one name in place, so the count is
+  unchanged, and 2026-11-03 Feature 081c adds one internal unit — see the roster
+  comment);
 * C-2  a refresh lands every payload from the same release package: the owner and
   the engine travel via ``pyproject.toml`` force-include (``shared`` /
   ``scripts``), the command copies via ``templates``, the skills via
@@ -73,12 +75,17 @@ NEW_ACTION_CALL_RE = re.compile(
 )
 ENGINE_REF = "flow-class-check.py"
 
-# Contract C-1: the frozen pre-change inventory (27 command templates, 52 skills).
+# Contract C-1: the frozen pre-change inventory (27 command templates, 53 skills).
 # 2026-10-30 (Feature 078): the pre-existing external skill unit now named
 # `coaching-skills` was renamed in place (FR-001/FR-018), so the shipped file-name
 # set swaps one name for another and the count stays 52 = 15 external + 37 internal.
 # The retired literal is not repeated here: these rosters are inside A10's closed
 # surface, where SC-006 permits it exactly once (the CLI upgrade-registry entry).
+# 2026-11-03 (Feature 081c, T011): 52 -> 53. The release package ships one more unit —
+# `review-feature-quality`, the artifact and implementation segments' method carrier —
+# so `SKILL_BASELINE` and the pinned length move together. A shipped-set census that
+# kept the old count would fail on a correct tree; dropping the count would make the
+# roster unable to notice a unit that silently stopped shipping.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
@@ -102,13 +109,14 @@ SKILL_BASELINE = frozenset(
         "manage-constitution", "manage-features", "manage-feedback",
         "manage-goal", "manage-history", "manage-instructions", "manage-todo",
         "memory-recall", "memory-record", "research-feature",
+        "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
         "run-team", "sanitize-materials", "self-improvement", "study-project",
         "summarize-project",
     }
 )
 assert len(COMMAND_BASELINE) == 27
-assert len(SKILL_BASELINE) == 52
+assert len(SKILL_BASELINE) == 53
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

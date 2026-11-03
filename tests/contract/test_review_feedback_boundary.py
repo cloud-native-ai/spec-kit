@@ -21,15 +21,16 @@ which owns the feedback mechanism and is cited here rather than redefined:
   judge is parameterised by the duty it reads out of the surfaces, so deleting
   or weakening either surface takes the judgement away instead of leaving a
   green assertion behind.
-* C-58 — in a nested run the unit census is **three**: `/speckit.review`,
-  `skill:review-sdd-process`, `skill:code-review`. Each unit completes its own
-  closing record; the command suppresses neither skill's wrap-up, writes no
-  skill's run determination on its behalf and back-fills none after the fact.
-* C-59 — three records coexist because the entry key is `(unit_id, run_id)`:
+* C-58 — in a nested run the unit census is **four**: `/speckit.review`,
+  `skill:review-sdd-process`, `skill:review-feature-quality`, `skill:code-review`.
+  Each unit completes its own closing record; the command suppresses neither
+  skill's wrap-up, writes no skill's run determination on its behalf and
+  back-fills none after the fact.
+* C-59 — four records coexist because the entry key is `(unit_id, run_id)`:
   within one run the units differ in `unit_id`, so none dedups another and none
   has to be merged or dropped. Driven against the real engine, both for the
   feedback store and for the run-determination session store. The clause MUST
-  NOT be read as "a nested run produces only two entries".
+  NOT be read as "a nested run produces only three entries".
 * C-60 — the predecessor invariants stay in force unchanged (same-commit
   register entry, the introspection step as the legal entry for a framework-wide
   recommendation, `scope: local`, zero automated transmission, target = the
@@ -59,6 +60,25 @@ alphabet and its count identity (C-31…C-44 own them), the merge gate's verdict
 (C-26/C-27, C-46), the gate criteria (C-45…C-53), and the feedback mechanism
 itself (`shared/workflow/feedback-step.md` owns it). A second copy here would be
 the drift this feature exists to remove.
+
+**Deliberate updates, slice 081c / T009 (RC-18 / RC-19).** Two pins in this module
+moved, and neither moved by deletion:
+
+* The **census** (C-58/C-59) used to assert three units — `/speckit.review`,
+  `skill:review-sdd-process`, `skill:code-review` — and three records, one per unit.
+  Why it moved: Feature 081's composition adds a fourth runtime-reachable segment
+  carrier (`skill:review-feature-quality`, the artifact and implementation segments'
+  method owner), so one composed run now reaches four units. The census is a
+  *consequence* of how many carriers run, not a constant, so the roster, the three
+  derived assertions and the two engine-driven record counts move to four together —
+  and the "not two" reading stays forbidden in the same leg.
+* The closed **`CLOSING_ENGINES`** set (C-61) admitted the three wrap-up engines and
+  nothing else. `scripts/python/closure-acceptance-check.py` joins it deliberately,
+  with its reason in the constant's own comment: GW-02 requires the review call site
+  to name that program, so leaving it out would make the required call site and this
+  closed set contradict each other. The set stays closed and still catches a second
+  record type; it is a list of engines this surface may name, not a claim that the
+  closing chain grew.
 """
 from __future__ import annotations
 
@@ -75,12 +95,22 @@ ROOT = Path(__file__).resolve().parents[2]
 REVIEW_CMD = ROOT / "templates" / "commands" / "review.md"
 CODE_SKILL = ROOT / "skills" / "internal" / "code-review" / "SKILL.md"
 PROCESS_SKILL = ROOT / "skills" / "internal" / "review-sdd-process" / "SKILL.md"
+#: The artifact/implementation segment carrier — the fourth census unit (slice 081c, RC-18).
+FEATURE_QUALITY_SKILL = (
+    ROOT / "skills" / "internal" / "review-feature-quality" / "SKILL.md"
+)
 FEEDBACK_STEP = ROOT / ".specify" / "shared" / "workflow" / "feedback-step.md"
 FEEDBACK_UTILS = ROOT / "scripts" / "python" / "feedback-utils.py"
 RUN_DETERMINATION = ROOT / "scripts" / "python" / "run-determination.py"
 
-#: The three units of one composed review run (requirements.md FR-018, C-58).
-UNITS = ("/speckit.review", "skill:review-sdd-process", "skill:code-review")
+#: The four units of one composed review run (requirements.md FR-018, C-58; four since
+#: slice 081c's RC-18 added the segment carrier `skill:review-feature-quality`).
+UNITS = (
+    "/speckit.review",
+    "skill:review-sdd-process",
+    "skill:review-feature-quality",
+    "skill:code-review",
+)
 
 #: The published closing step set, in order — owned by the compiled `## Wrap-up`
 #: faces themselves; restated here only as the expectation a drift must break.
@@ -97,9 +127,21 @@ SKILL_CLOSING_STEPS = COMMAND_CLOSING_STEPS[:5]
 #: The six-level code vocabulary, owned by the code-review skill's own contract.
 CODE_SEVERITIES = ("blocking", "important", "suggestion", "nitpick", "question", "praise")
 
-#: The three wrap-up engines the closing chain may invoke; the compiled marker
-#: comment names `probe-utils.py` as its generator and is not part of the chain.
-CLOSING_ENGINES = {"run-determination.py", "exec-quant.py", "feedback-utils.py"}
+#: The engines the closing chain may invoke; the compiled marker comment names
+#: `probe-utils.py` as its generator and is not part of the chain.
+#:
+#: `closure-acceptance-check.py` was admitted deliberately by slice 081c (T009 / RC-19), not by
+#: relaxing the check: GW-02 requires `templates/commands/review.md` to name that program for its
+#: Acceptance Reality Check, so a closed set without it would make the required call site and this
+#: set contradict each other — the module would be red against a correct implementation. The
+#: program is a *verdict reader*, not a second record type: it writes no feedback entry, no session
+#: record and no run determination, and the census below still pins one record per unit.
+CLOSING_ENGINES = {
+    "run-determination.py",
+    "exec-quant.py",
+    "feedback-utils.py",
+    "closure-acceptance-check.py",
+}
 
 #: The one legitimate feedback destination (FR-020 / C-61).
 CANONICAL_STORE = ".specify/memory/feedback/"
@@ -196,6 +238,11 @@ def _code_skill() -> str:
 
 def _process_skill() -> str:
     return PROCESS_SKILL.read_text(encoding="utf-8")
+
+
+def _feature_quality_skill() -> str:
+    """The fourth unit's face — the segment carrier added by slice 081c (RC-18)."""
+    return FEATURE_QUALITY_SKILL.read_text(encoding="utf-8")
 
 
 def _steps(face: str) -> tuple:
@@ -489,17 +536,17 @@ def test_c57_the_store_itself_cannot_enforce_the_duty():
 
 
 # --------------------------------------------------------------------------- #
-# C-58 / C-59 — three units, three records, one key
+# C-58 / C-59 — four units, four records, one key (three before slice 081c)
 # --------------------------------------------------------------------------- #
 
-def test_c58_the_command_names_the_three_units():
+def test_c58_the_command_names_the_four_units():
     body = _outside_wrap_up(_cmd())
     for unit in UNITS:
         assert unit in body, (
             f"the command MUST name the unit {unit!r} in the per-run census (C-58)"
         )
-    assert _one_of(body, (r"three units", r"unit census[^.]{0,40}three", r"三个单元")), (
-        "the census MUST be stated as three units, not left to inference"
+    assert _one_of(body, (r"four units", r"unit census[^.]{0,40}four", r"四个单元")), (
+        "the census MUST be stated as four units, not left to inference"
     )
 
 
@@ -540,8 +587,10 @@ def test_c58_each_unit_owns_exactly_one_compiled_closing_face():
     faces = {
         "/speckit.review": _cmd(),
         "skill:review-sdd-process": _process_skill(),
+        "skill:review-feature-quality": _feature_quality_skill(),
         "skill:code-review": _code_skill(),
     }
+    assert set(faces) == set(UNITS), "every census unit MUST have a face judged here"
     for unit, text in faces.items():
         assert f'--unit-id "{unit}"' in _flat(text), (
             f"{unit} MUST be the unit id its own face invokes"
@@ -554,7 +603,7 @@ def test_c58_each_unit_owns_exactly_one_compiled_closing_face():
             )
 
 
-def test_c58_run_determination_keeps_three_unit_records_driven(tmp_path):
+def test_c58_run_determination_keeps_four_unit_records_driven(tmp_path):
     ws = _ws(tmp_path)
     run_id = "r20261027T000000Z-us5-c58"
     for unit in UNITS:
@@ -562,9 +611,9 @@ def test_c58_run_determination_keeps_three_unit_records_driven(tmp_path):
         assert out.returncode == 0, f"determine failed for {unit}: {out.stderr[:300]}"
     session = ws / ".specify" / "memory" / "session"
     records = sorted(session.glob("*.md"))
-    assert len(records) == 3, (
-        "one nested run MUST leave three run-determination records, one per unit; "
-        f"found {len(records)}"
+    assert len(records) == len(UNITS), (
+        "one nested run MUST leave one run-determination record per unit; "
+        f"found {len(records)} for {len(UNITS)} units"
     )
     for unit in UNITS:
         hits = [
@@ -574,18 +623,18 @@ def test_c58_run_determination_keeps_three_unit_records_driven(tmp_path):
         ]
         assert len(hits) == 1, f"{unit} MUST own exactly one session record, got {hits!r}"
         body = hits[0].read_text(encoding="utf-8")
-        assert run_id in body, "the three records share the run id"
+        assert run_id in body, "the records share the run id"
 
 
-def test_c59_three_units_one_run_produce_three_entries_driven(tmp_path):
+def test_c59_four_units_one_run_produce_four_entries_driven(tmp_path):
     ws = _ws(tmp_path)
     run_id = "r20261027T000000Z-us5-c59"
     for unit in UNITS:
         out = _record_feedback(ws, unit, run_id, "framework friction: receipt gap")
         assert out.returncode == 0, f"record failed for {unit}: {out.stderr[:300]}"
     entries = sorted((ws / ".specify" / "memory" / "feedback").glob("*.md"))
-    assert len(entries) == 3, (
-        "the (unit_id, run_id) key means three units of one run produce three "
+    assert len(entries) == len(UNITS), (
+        "the (unit_id, run_id) key means four units of one run produce four "
         f"entries; found {len(entries)}"
     )
     seen = set()
@@ -593,7 +642,7 @@ def test_c59_three_units_one_run_produce_three_entries_driven(tmp_path):
         body = path.read_text(encoding="utf-8")
         seen.add(_frontmatter_field(body, "unit_id"))
         assert _frontmatter_field(body, "run_id") == run_id, (
-            "the three entries share one run id"
+            "the four entries share one run id"
         )
         assert _frontmatter_field(body, "scope") == "local"
     assert seen == set(UNITS), f"each unit owns its entry; found {sorted(seen)!r}"
@@ -607,26 +656,28 @@ def test_c59_a_repeated_unit_dedups_only_itself_driven(tmp_path):
     again = _record_feedback(ws, "/speckit.review", run_id, "framework friction")
     assert again.returncode == 0, "a duplicate call stays exit 0, never an error"
     entries = sorted((ws / ".specify" / "memory" / "feedback").glob("*.md"))
-    assert len(entries) == 3, (
-        "re-running one unit MUST NOT create a fourth entry and MUST NOT remove or "
+    assert len(entries) == len(UNITS), (
+        "re-running one unit MUST NOT create a further entry and MUST NOT remove or "
         f"merge another unit's; found {len(entries)}"
     )
 
 
-def test_c59_the_census_is_three_not_two():
+def test_c59_the_census_is_four_not_two_or_three():
     for label, text in (
         ("templates/commands/review.md", _outside_wrap_up(_cmd())),
         ("skills/internal/code-review/SKILL.md", _code_skill()),
     ):
         flat = _flat(text)
-        assert re.search(r"three units|三个单元|unit census[^.]{0,40}three", flat), (
-            f"{label} MUST state the census as three (C-59)"
+        assert re.search(r"four units|四个单元|unit census[^.]{0,40}four", flat), (
+            f"{label} MUST state the census as four (C-59)"
         )
         assert not re.search(
-            r"two units|two records|only two|两个单元|两条记录|只产生两条", flat
+            r"two units|two records|only two|three units|only three|两个单元|三个单元|两条记录"
+            r"|只产生两条|只产生三条",
+            flat,
         ), (
-            f"{label} MUST NOT describe the nested run as two units or two records — "
-            "that reading is the ambiguity C-59 removes"
+            f"{label} MUST NOT describe the nested run as two or three units/records — "
+            "that reading is what C-59 and RC-18 remove"
         )
 
 

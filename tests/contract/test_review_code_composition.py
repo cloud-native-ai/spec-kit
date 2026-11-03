@@ -4,10 +4,11 @@ Pins `contracts/command-orchestration.md` C-1…C-16 against the two source
 templates it governs — `templates/commands/review.md` (the orchestration) and
 `templates/review-template.md` (the report's code-segment subsection):
 
-* C-1/C-2 — exactly two segments in a fixed order, no selector parameter, no
-  third mode and no merged severity vocabulary.
-* C-3/C-4 — the process segment is unconditional; both segments are delegated by
-  runtime path and neither skill's methodology is inlined.
+* C-1/C-2 — four segments in a fixed order (process → artifact → implementation →
+  code), no selector parameter, no fifth mode and no merged severity
+  vocabulary.
+* C-3/C-4 — the process segment is unconditional; every segment is delegated by
+  runtime path and no skill's methodology is inlined.
 * C-5 — failure propagation, including the command-authored minimal report that
   is written when the process skill aborted before `review.md` existed.
 * C-6/C-7 — the three applicability values, each with its mandatory basis or
@@ -33,6 +34,26 @@ What this file deliberately does NOT pin: the base-resolution tiers, the receipt
 grammar, the renderer-selection rule and the gate criteria. Those have their own
 owners and their own contract groups; a second copy here would be the drift this
 feature exists to prevent.
+
+**Deliberate update, slice 081c / T009 (C-1's group only).** What this group used to
+assert: `templates/commands/review.md` declares *exactly two segments* — the literal
+`exactly two segments`, and the marker list `[("1", "process segment"), ("2", "code
+segment")]`. Why the assertion moved: Feature 081's RC-01/RC-03 make the composition
+four segments in one fixed order (process → artifact → implementation → code) and
+forbid the two-segment sentence surviving *anywhere*, so a leg still pinning it would
+have to be made green by keeping the very wording the feature removes. The leg keeps
+its shape — "N segments, one fixed order, announced as exactly N" — and gains the two
+facts RC-03 makes load-bearing: the pre-change wording is absent, and `code-review` is
+still named as the fourth segment. C-2 (no merged vocabulary) and C-4 (no inlined
+methodology) are untouched: the composition they forbid did not move.
+
+Two extractors moved with the report template (T009's second half, F-11):
+`_report_subsection()` now stops at `### 2.2` — before the new slots existed, the
+`### 2.1` extractor ran to the next `## `, so it would have silently swallowed
+`### 2.2`/`### 2.3`/`### 2.4` and judged their content as if it were the code
+segment's; and the placeholder-gloss guard now scans `### 2.2`–`### 2.4` explicitly,
+which it could not do while those slots did not exist. Both are extensions of the same
+guards, not relaxations: the token set checked went from one slot to four.
 """
 from __future__ import annotations
 
@@ -107,26 +128,73 @@ def _cmd() -> str:
 
 
 def _report_subsection() -> str:
-    return _section(REVIEW_TEMPLATE.read_text(encoding="utf-8"), "### 2.1", "## ")
+    """The `### 2.1` code-segment slot, **ending at `### 2.2`**.
+
+    Narrowed deliberately (slice 081c / T009, F-11): while `### 2.1` was the last slot,
+    extracting it to the next `## ` was exact. It no longer is — the artifact,
+    implementation and Acceptance Reality Check slots follow it under the same `## 2`, so
+    the old extractor would have absorbed their tables into the code-segment slot and
+    judged them by C-9/C-10 (exactly what those slots must not be judged by).
+    """
+    return _section(REVIEW_TEMPLATE.read_text(encoding="utf-8"), "### 2.1", "### 2.2")
+
+
+#: The three slots `templates/review-template.md` gained in 081c, each with the heading that
+#: closes it. Their content is owned by the carrier skill and the ARC clause; this module only
+#: checks that their placeholders are glossed, on the same terms `### 2.1` is.
+NEW_SLOTS = (
+    ("### 2.2", "### 2.3"),
+    ("### 2.3", "### 2.4"),
+    ("### 2.4", "## "),
+)
+
+
+def _report_slot(start: str, end: str) -> str:
+    return _section(REVIEW_TEMPLATE.read_text(encoding="utf-8"), start, end)
 
 
 # --------------------------------------------------------------------------- #
-# C-1 / C-2 — two segments, one order, two vocabularies
+# C-1 / C-2 — four segments, one order, two vocabularies
 # --------------------------------------------------------------------------- #
 
-def test_c01_exactly_two_segments_in_a_fixed_order():
+#: The fixed order (RC-01) and the segment names the template's own headings use. The
+#: last member is the pre-existing code segment, which RC-03 forbids replacing.
+SEGMENT_ORDER = (
+    ("1", "process segment"),
+    ("2", "artifact segment"),
+    ("3", "implementation segment"),
+    ("4", "code segment"),
+)
+
+
+def test_c01_exactly_four_segments_in_a_fixed_order():
     body = _cmd()
-    assert _has(body, "exactly two segments"), (
-        "the template MUST declare the composition as exactly two segments"
+    assert _has(body, "exactly four segments"), (
+        "the template MUST declare the composition as exactly four segments"
     )
     assert _has(body, "fixed order"), "the order MUST be stated as fixed"
+    assert not _has(body, "exactly two segments"), (
+        "the pre-change `exactly two segments` wording MUST NOT survive (RC-03): a template "
+        "that keeps it has not rewritten the composition, only appended to it"
+    )
 
     markers = re.findall(
-        r"(?m)^### Segment (\d+) — (process segment|code segment)\b", body
+        r"(?m)^### Segment (\d+) — (process segment|artifact segment|implementation segment"
+        r"|code segment)\b",
+        body,
     )
-    assert markers == [("1", "process segment"), ("2", "code segment")], (
-        "the template MUST declare exactly two segments — process first, code "
-        f"second — and declare no third; found {markers!r}"
+    assert markers == list(SEGMENT_ORDER), (
+        "the template MUST declare exactly four segments — process → artifact → "
+        "implementation → code, in that order, and no fifth; found %r" % (markers,)
+    )
+
+    # RC-03: the code segment stays, and it still names the skill that judges it. A
+    # composition that quietly demotes `code-review` to an appendix would satisfy the
+    # marker list above and fail here.
+    code = _section(body, "### Segment 4", "## ")
+    assert "code-review" in code, (
+        "the fourth segment MUST still be the `code-review` skill (RC-03 forbids replacing "
+        "it); found:\n%s" % code[:400]
     )
 
 
@@ -547,14 +615,20 @@ def test_c05_the_subsection_is_fillable_as_the_whole_minimal_report():
 
 def test_c09_every_placeholder_in_the_subsection_is_glossed():
     body = REVIEW_TEMPLATE.read_text(encoding="utf-8")
-    subsection = _report_subsection()
-    used = sorted(set(re.findall(r"\[([A-Z][A-Z0-9_]+)\]", subsection)))
-    assert used, "the subsection MUST use placeholder tokens rather than prose values"
     glossary = body[body.index("## Placeholder Glossary"):]
-    missing = [t for t in used if t not in glossary]
-    assert not missing, (
-        f"placeholder tokens used in `### 2.1` but absent from the glossary: {missing!r}"
-    )
+    slots = [("### 2.1", _report_subsection())] + [
+        (start, _report_slot(start, end)) for start, end in NEW_SLOTS
+    ]
+    for heading, slot in slots:
+        used = sorted(set(re.findall(r"\[([A-Z][A-Z0-9_]+)\]", slot)))
+        assert used, (
+            f"`{heading}` MUST use placeholder tokens rather than prose values — a slot with "
+            "no placeholder is either a copy of a result or an empty slot"
+        )
+        missing = [t for t in used if t not in glossary]
+        assert not missing, (
+            f"placeholder tokens used in `{heading}` but absent from the glossary: {missing!r}"
+        )
 
 
 def test_c09_existing_top_level_section_numbers_are_stable():

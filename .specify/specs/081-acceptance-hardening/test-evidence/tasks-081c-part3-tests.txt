@@ -1,0 +1,5 @@
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_review_composition.py tests/contract/test_review_code_composition.py tests/contract/test_review_feedback_boundary.py tests/contract/test_client_guard_sweep.py tests/contract/test_status_gate_owner.py tests/contract/test_review_docs_isomorphism.py tests/contract/test_gate_wiring_081.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_expression_compatibility.py tests/contract/test_migration_distribution.py -q
+........................................................................ [ 34%]
+........................................................................ [ 68%]
+...................................................................      [100%]
+211 passed in 9.55s

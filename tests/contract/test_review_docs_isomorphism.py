@@ -7,8 +7,9 @@ the same surface as `templates/commands/review.md`.
 **What "the same surface" means here** — the four things a reader must be able to
 learn from either file, and nothing about prose:
 
-1. the two segments (`process segment` / `code segment`, each accepted under one
-   documented spelling variant so a cosmetic reword does not red this file),
+1. the four segments (`process segment` / `artifact segment` / `implementation
+   segment` / `code segment`, each accepted under one documented spelling variant
+   so a cosmetic reword does not red this file),
 2. the two artifacts (`review.md` / `code-review.md`),
 3. the three applicability values (`run` / `not-applicable` / `not-evaluated` —
    these are shared string literals, so they are compared exactly),
@@ -19,6 +20,17 @@ The comparison is set-based: a **deleted** segment, artifact or value reds it
 because the set difference is non-empty; a reworded sentence does not, because
 prose is never compared. `test_the_comparison_tolerates_a_cosmetic_reword` proves
 that non-brittleness rather than asserting it.
+
+**Deliberate update, slice 081c / T010 (GW-14).** What this module used to assert:
+`SEGMENTS` held **two** concepts (process, code) — the two-segment composition — and
+the equality leg compared those two sets. Why the assertion moved: the command
+template now declares four segments in one fixed order (process → artifact →
+implementation → code) plus the Acceptance Reality Check, so a page still declaring
+two would be the drift this group exists to catch, in the *page's* direction. The
+concepts went from two to four and the equality leg covers all four because it
+compares the whole extracted dict — it gained the two new axes without losing an
+old one. The deletion leg's expectation moved with it: removing one segment now
+leaves the other three declared, instead of leaving one.
 
 Red by construction while the page still describes a process-only review: FR-028
 puts the page in the same change as the template (C-68), and this group stays red
@@ -39,8 +51,12 @@ COMMAND_TEMPLATE = ROOT / "templates" / "commands" / "review.md"
 
 #: Concept → the spellings either side MAY use. A concept counts as declared when
 #: any one spelling is present, so re-wording is tolerated and deletion is not.
+#: Four concepts since slice 081c (GW-14); the two middle ones are the segments the
+#: carrier skill judges (§ Segment A / § Segment B).
 SEGMENTS = {
     "process segment": ("process segment", "process review segment", "process review pass"),
+    "artifact segment": ("artifact segment", "artifact review segment"),
+    "implementation segment": ("implementation segment", "implementation review segment"),
     "code segment": ("code segment", "code-review segment", "code review segment"),
 }
 
@@ -123,7 +139,7 @@ def _mapping_rows(text: str) -> list:
 # the isomorphism, one axis per test so a red run says which axis broke
 # --------------------------------------------------------------------------- #
 
-def test_the_two_segments_are_declared_on_both_sides():
+def test_the_four_segments_are_declared_on_both_sides():
     template = COMMAND_TEMPLATE.read_text(encoding="utf-8")
     page = DOCS_PAGE.read_text(encoding="utf-8")
     missing_from_template = set(SEGMENTS) - _declared_segments(template)
@@ -132,8 +148,8 @@ def test_the_two_segments_are_declared_on_both_sides():
         f"the command template does not declare: {sorted(missing_from_template)!r}"
     )
     assert not missing_from_page, (
-        "the documentation page still describes a process-only review; it does not "
-        f"declare: {sorted(missing_from_page)!r} (C-68, C-71)"
+        "the documentation page does not declare every segment of the composition; it is "
+        f"missing: {sorted(missing_from_page)!r} (C-68, C-71, GW-14)"
     )
 
 
@@ -217,12 +233,17 @@ def test_the_comparison_tolerates_a_cosmetic_reword():
 
 def test_the_comparison_detects_a_deleted_segment():
     page = DOCS_PAGE.read_text(encoding="utf-8")
-    # Start from a page that *does* declare both segments (the post-C-68 shape),
+    # Start from a page that *does* declare all four segments (the post-C-68 shape),
     # then delete one — the extractor has to notice.
-    updated = page + "\n## Segments\n\nThe process segment runs first; the code segment runs second.\n"
+    updated = page + (
+        "\n## Segments\n\nThe process segment runs first, then the artifact segment, "
+        "then the implementation segment, and the code segment runs last.\n"
+    )
     assert _declared_segments(updated) == set(SEGMENTS)
     gutted = re.sub(r"(?i)code[ -]review segment|code segment", "", updated)
-    assert _declared_segments(gutted) == {"process segment"}, (
-        "removing a segment from the page MUST change the declared surface; a group "
-        "that stays green here would not be coverage (C-65)"
+    assert _declared_segments(gutted) == set(SEGMENTS) - {"code segment"}, (
+        "removing one segment from the page MUST drop exactly that concept; a group "
+        "that stays whole here would not be coverage (C-65). It used to expect "
+        "{'process segment'} alone, which is only correct while the composition has "
+        "two segments."
     )

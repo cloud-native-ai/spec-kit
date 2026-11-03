@@ -1,12 +1,14 @@
 # /speckit.review
 
-Critically review the SDD process for the current feature **and** the code delta it produced, and produce two self-contained, improvement-focused artifacts: a process review report for spec-kit maintainers and, when this feature slice delivers code, a code review record.
+Critically review the current feature in four independent segments — the SDD process that produced it, the artifacts it lands, the implementation delta it commits and the code defects that delta contains — and close with one deterministic check of the feature's own claimed status. Two self-contained artifacts come out of it: a review report for spec-kit maintainers and, when this feature slice delivers code, a separate code review record.
 
 ## When to Use
 
-- After `/speckit.implement` completes — to evaluate the SDD process quality and, in the same run, review the code this feature committed
+- After `/speckit.implement` completes — to evaluate the SDD process quality, this slice's artifact set, the implementation delta and, in the same run, the code this feature committed
 - When you want to identify friction, ambiguity, and improvement opportunities in the spec-kit workflow
+- When a slice's artifact set needs judging against what its stage actually required, rather than against what happens to be on disk
 - When you need a pre-merge verdict on this feature slice's committed code delta, with a coverage receipt proving how much of that delta was actually read
+- Before claiming `Implemented → Ready for Review` — the acceptance reality check reads the feature's own counts and refuses a transition they do not support
 - To generate a portable report that can be shared with framework maintainers
 
 ## Syntax
@@ -15,29 +17,41 @@ Critically review the SDD process for the current feature **and** the code delta
 /speckit.review [review criteria or focus areas] [--client-unit custom:<owner>/<name>]
 ```
 
-`[review criteria or focus areas]` is optional — specify quality dimensions or reporting preferences. It guides focus; it never selects one segment over the other.
+`[review criteria or focus areas]` is optional — specify quality dimensions or reporting preferences. It guides focus; it never selects, reorders or skips a segment.
 
 `--client-unit custom:<owner>/<name>` is optional and only affects the code segment's client capture step (below): it names the owning client unit when the run's repository is a client project with more than one external probe object, and adds no command surface of its own. A malformed value (anything not matching `custom:<owner>/<name>`) yields one named skip line naming the expected syntax, zero entries, and does not block or alter the review.
 
-## Composition — two segments, one fixed order
+## Composition — four segments in one fixed order, plus one check that is not a segment
 
-A single invocation runs exactly **two segments in a fixed order**. There is no parallel mode, no single merged report, and no parameter — `$ARGUMENTS` included — that selects one segment over the other.
+A single invocation runs exactly **four segments in a fixed order** — process → artifact → implementation → code — and then one deterministic check, the Acceptance Reality Check, which is not a segment. There is no parallel mode, no single merged report, and no parameter — `$ARGUMENTS` included — that selects, reorders or skips a segment.
 
 1. **The process segment runs first, on every invocation.** No execution class or expression class exempts it, no argument exempts it, an absent code delta does not exempt it, and no earlier segment's outcome exempts it.
-2. **The code segment runs second**, and its applicability is decided by an explicit triage before it starts.
+2. **The artifact segment runs second**, judging the artifact set the slice's stage requires — the expected set, never the ones that happen to exist.
+3. **The implementation segment runs third**, judging this slice's `base..head` delta against `requirements.md` and `tasks.md`.
+4. **The code segment runs fourth**, and its applicability is decided by an explicit triage before it starts.
 
-The two conclusions are never merged: not into one severity system, not into one score, not through a mapping table or a conversion.
+Each segment's judgment object, boundary sentence and severity family are owned by `shared/workflow/acceptance-hardening.md` § Review Composition; this page states the surface and restates none of that content. The four conclusions are never merged: not into one severity system, not into one score, not through a mapping table or a conversion.
 
 ## Segments and their delegation
 
-Each segment is delegated to its existing skill by runtime path. The command orchestrates and points; it inlines neither skill's methodology — no dimension list, no severity definitions, no receipt field list.
+Each segment is delegated to its existing skill by runtime path. The command orchestrates and points; it inlines no skill's methodology — no dimension list, no severity definitions, no receipt field list, no finding-form field list.
 
-| Segment | Skill | Judgment object |
-|---------|-------|-----------------|
-| Process segment | `review-sdd-process` (`.specify/skills/internal/review-sdd-process/SKILL.md`) | the SDD process that produced the feature — process and tooling quality, never the feature's business merits, never the code it produced |
-| Code segment | `code-review` (`.specify/skills/internal/code-review/SKILL.md`) | verifiable defects in this feature slice's committed code delta |
+| # | Segment | Skill (runtime path) | Judgment object |
+|---|---------|----------------------|-----------------|
+| 1 | Process segment | `review-sdd-process` (`.specify/skills/internal/review-sdd-process/SKILL.md`) | the SDD process that produced the feature — process and tooling quality, never the feature's business merits, never the artifacts' content, never the code it produced |
+| 2 | Artifact segment | `review-feature-quality` § Segment A (`.specify/skills/internal/review-feature-quality/SKILL.md`) | the slice's stage artifacts, taken as the expected set — completeness, internal consistency, traceability, dependency and premise ownership, acceptance honesty |
+| 3 | Implementation segment | `review-feature-quality` § Segment B (`.specify/skills/internal/review-feature-quality/SKILL.md`) | this slice's implementation as the range `base..head`, judged against `requirements.md` and `tasks.md` for correctness, scope and regression |
+| 4 | Code segment | `code-review` (`.specify/skills/internal/code-review/SKILL.md`) | verifiable defects in this feature slice's committed code delta |
 
-A process-segment abort does not suppress the code segment: the two judgment objects are independent, the abort is recorded as `not-evaluated` with its reason, and the command itself authors the minimal process report (carrying the code-segment subsection and the abort reason) so the verifiable carrier stays the single `review.md`.
+A process-segment abort suppresses none of the other three: the four judgment objects are independent, the abort is recorded as `not-evaluated` with its reason, and the command itself authors the minimal process report (carrying the code-segment subsection and the abort reason) so the verifiable carrier stays the single `review.md`.
+
+## The Acceptance Reality Check — a check, not a fifth segment
+
+After the four segments, the run executes the closure checker as one deterministic program: it reads the feature's `final_path` record and copies it — verbatim and in full, all seven buckets — into the report's carrier slot `### 2.4`. The record is **copied, never recounted**: the run re-counts no bucket from `verification.md`, narrows the record to no summary and re-derives no part of it, because a second counter at the review site would be a second source of truth for the same counts.
+
+The check then compares the copied record against the feature's claimed status. It refuses the `Implemented → Ready for Review` transition on either of two conditions: the checker's verdict is `block`, which is a non-pass and refuses on its own whatever the claim reads; or the claim is `Implemented`/`Ready for Review` while the record's `pass` bucket is zero, in which case the fixed item `F-ACCEPTANCE` is emitted at `P0`. A refusal names the condition that failed and leaves the claimed status unchanged — `Implemented` stays `Implemented`, `Ready for Review` stays `Ready for Review`.
+
+The check is not delegated: it carries no `Skill` field and no judgment object of its own, and no model judgement substitutes for it.
 
 ## Review object — the committed delta
 
@@ -86,9 +100,9 @@ A code-segment finding keeps its locating form — severity plus file and option
 
 ## Status transition — where the criteria live
 
-This run judges exactly one status transition, `Implemented → Ready for Review`, and states no criterion of its own: the criteria — three conjunctive conditions, the third an existence test over the current `code-review.md` — are owned by `templates/feature-details-template.md` § Canonical Status State Machine, and the transition table in `.specify/shared/workflow/feature-integration.md` cites that owner instead of restating it.
+This run judges exactly one status transition, `Implemented → Ready for Review`, and states no criterion of its own: the criteria — the fourth condition included — are owned by `templates/feature-details-template.md` § Canonical Status State Machine, and the transition table in `.specify/shared/workflow/feature-integration.md` cites that owner instead of restating it.
 
-The transition is judged **once**, after both segments have finished and both artifacts are on disk; the status MUST NOT flip before the code segment completes. A waiver is an explicit user ruling or there is none. Without one, an unattended run halts before the transition, names the failed condition and records `blocking-unresolved` as its refusal literal, leaving the status at `Implemented`.
+The transition is judged **once**, after all four segments have finished and the artifacts are on disk; the status MUST NOT flip before the code segment completes. A waiver is an explicit user ruling or there is none. Without one, an unattended run halts before the transition, names the failed condition and records `blocking-unresolved` as its refusal literal, leaving the status at `Implemented`.
 
 ## Coverage receipt — the only evidence of "the whole diff was read"
 
@@ -104,14 +118,14 @@ The run's human-facing conclusion carries **exactly one capture outcome line**, 
 
 ## Feedback boundary — friction only
 
-A feedback entry records friction of the framework itself — a missing renderer, an ambiguous base, an insufficient non-interactive path, a receipt gap. A code defect found by the code segment MUST NOT be posted as a feedback entry: it stays in `code-review.md`, where its severity, file and line are meaningful. One run has **three** units — this command, `skill:review-sdd-process` and `skill:code-review` — each with its own `unit_id` under one run id, so none dedups or merges another. The closing step set is unchanged, this composition adds no side channel, and nothing is transmitted automatically.
+A feedback entry records friction of the framework itself — a missing renderer, an ambiguous base, an insufficient non-interactive path, a receipt gap. A code defect found by the code segment MUST NOT be posted as a feedback entry: it stays in `code-review.md`, where its severity, file and line are meaningful. One run has **four** units — this command, `skill:review-sdd-process`, `skill:review-feature-quality` and `skill:code-review` — each with its own `unit_id` under one run id, so none dedups, merges or truncates another. Every runtime-reachable segment carrier is a unit, so adding a carrier adds a unit rather than folding it into a neighbour. Each unit completes its own closing record and the command suppresses no skill's wrap-up. The closing step set is unchanged, this composition adds no side channel, and nothing is transmitted automatically.
 
 ## Key Characteristics
 
-- **Composed, not merged** — two judgment objects, two artifacts, two vocabularies, one fixed order
+- **Composed, not merged** — four judgment objects, two artifacts, two vocabularies, one fixed order
 - **Problem-first** — the process segment focuses on what to change, not on what each artifact contains
-- **Evidence-backed** — process findings without quoted excerpts are dropped; code findings carry severity plus location
-- **Honest about scope** — a non-`run` triage, an unread file and an excluded uncommitted change are all disclosed rather than glossed over
+- **Evidence-backed** — process findings without quoted excerpts are dropped; artifact and code findings carry severity plus location
+- **Honest about scope** — a non-`run` triage, a missing expected artifact, an unread file and an excluded uncommitted change are all disclosed rather than glossed over
 
 ## Prerequisites
 

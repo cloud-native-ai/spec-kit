@@ -16,7 +16,7 @@ commit recorded in the state spine), never from a hand-maintained diff.
 * **C-53…C-57** — Feature 071's closed surfaces are preserved verbatim (record
   rotation, receipt/report exit alphabets and the receipt field block, the
   report's code-subsection field list, the review command's six closing
-  steps, the per-run three-unit census); no `/speckit.*` command and no CLI
+  steps, the per-run unit census); no `/speckit.*` command and no CLI
   entry face is added beyond the two authorized faces; the edit surface stays
   the framework sources; the two existing negative assertions are kept
   verbatim and shipped text stays client-neutral;
@@ -32,6 +32,17 @@ commit recorded in the state spine), never from a hand-maintained diff.
 
 Behavioural hat/capture assertions execute inside the disposable client
 project built by `tests/fixtures/client_project.py` (C-58).
+
+**Deliberate update, slice 081c / T009 (RC-19).** The census pin inside
+`test_c53_closing_step_set_and_four_unit_census_verbatim` used to require the sentence
+`一次运行的单元普查为**三个单元**` in `skills/internal/code-review/SKILL.md`, verbatim, with the
+failure message `MUST be preserved verbatim (C-53)`. Why it moved: the same change (RC-18) adds a
+fourth runtime-reachable segment carrier, so the skill's census sentence becomes the four-unit one
+and the pin is re-pinned to it **in the same change** — that is RC-19's whole point, since leaving
+the old pin in place would make a correct implementation red in a module nobody named, and rewording
+the skill while quietly dropping the pin would be the failure the clause names. The guard keeps its
+kind and its strength (a verbatim pin on the census's second carrier, plus the unit ids); only the
+sentence it pins moved, and the closing-step set half is untouched.
 """
 from __future__ import annotations
 
@@ -333,7 +344,7 @@ def test_c53_report_code_subsection_field_list_closed():
     )
 
 
-def test_c53_closing_step_set_and_three_unit_census_verbatim():
+def test_c53_closing_step_set_and_four_unit_census_verbatim():
     template = REVIEW_COMMAND_TEMPLATE.read_text(encoding="utf-8")
     wrapup = re.split(r"(?m)^## Wrap-up\s*$", template)[1]
     wrapup = re.split(r"(?m)^## ", wrapup)[0]
@@ -345,10 +356,19 @@ def test_c53_closing_step_set_and_three_unit_census_verbatim():
         f"drift: {steps!r} (C-53)"
     )
     skill = SKILL_MD.read_text(encoding="utf-8")
-    assert "一次运行的单元普查为**三个单元**" in skill, (
-        "the per-run three-unit census MUST be preserved verbatim (C-53)"
+    # Re-pinned by slice 081c / T009 (RC-19). This assertion used to read the sentence
+    # `一次运行的单元普查为**三个单元**` and require it verbatim. Why it moved: the same
+    # change that adds a fourth runtime-reachable segment carrier rewrites that sentence
+    # (RC-18), and a verbatim pin left behind would make a *correct* implementation red —
+    # so the pin follows the fact it pins, in the same change, and the sentence it now
+    # requires verbatim is the four-unit one. The guard is unchanged in kind: it is still
+    # a verbatim pin on the census's **second carrier** (`skills/internal/code-review/
+    # SKILL.md`), with the same failure message shape.
+    assert "一次运行的单元普查为**四个单元**" in skill, (
+        "the per-run four-unit census MUST be preserved verbatim (C-53)"
     )
-    for unit in ("/speckit.review", "skill:review-sdd-process", "skill:code-review"):
+    for unit in ("/speckit.review", "skill:review-sdd-process",
+                 "skill:review-feature-quality", "skill:code-review"):
         assert unit in skill
     # The single authorized amendment — the step enumeration — reads as five
     # steps with the deterministic capture fifth (owned in detail by C-10).

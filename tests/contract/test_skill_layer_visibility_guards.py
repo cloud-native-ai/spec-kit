@@ -42,6 +42,11 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 # 15 external / 35 internal; only the name changes. The retired literal is kept out
 # of this file on purpose: these rosters sit inside A10's closed surface, where
 # SC-006 permits it exactly once (the CLI upgrade-registry entry).
+# 2026-11-03 (Feature 081c, T011): +1 internal unit — `review-feature-quality`, the artifact
+# and implementation segments' method carrier. It is a new internal unit, so both rosters move
+# together: `INTERNAL_SKILLS` gains it and the nested count 37 -> 38. The pinned count is not
+# decoration: guard 1's exclusion is only meaningful while internal units actually exist, so a
+# census that stopped tracking them would let the guard go green over an empty subtree.
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
@@ -56,7 +61,8 @@ INTERNAL_SKILLS = {
     "improve-tools", "manage-agents", "manage-constitution", "manage-features",
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
-    "review-sdd-process", "run-agent", "run-interview", "sanitize-materials",
+    "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
+    "sanitize-materials",
     "self-improvement", "study-project", "summarize-project",
 }
 
@@ -101,9 +107,9 @@ def test_flat_discovery_surfaces_external_layer_only():
     internal_dir = RUNTIME_SKILLS / "internal"
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
-    # 35 既有 + 057 run-skills/run-team = 37（同任务更新计数契约）
-    assert len(internal_nested) == 37, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 37 — "
+    # 35 既有 + 057 run-skills/run-team = 37，+ 081c review-feature-quality = 38（同任务更新计数契约）
+    assert len(internal_nested) == 38, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 38 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

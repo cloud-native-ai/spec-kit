@@ -124,7 +124,7 @@ FROZEN_COMMANDS = (
     "tools",
 )
 
-# C-1 frozen denominator: 52 skill units, layer-qualified so a layer move or a
+# C-1 frozen denominator: 53 skill units, layer-qualified so a layer move or a
 # rename is a failure rather than a silent re-count.
 #
 # 2026-10-30 (Feature 078): the pre-existing external mental-simulation unit is
@@ -134,6 +134,13 @@ FROZEN_COMMANDS = (
 # retired literal is not written in this file: these four frozen rosters are
 # inside A10's closed surface, where SC-006 permits it exactly once (the CLI
 # upgrade-registry entry), so the hash-manifest handoff below derives it instead.
+# 2026-11-03 (Feature 081c, T011): 52 -> 53 = 15 external + 38 internal. The new
+# unit is `internal/review-feature-quality`, the artifact and implementation
+# segments' method carrier (FR-025 registers it; RC-10 makes it the only home of
+# that method). It is a *non-wiring* skill — it names no engine and no owner
+# document, so the closed wiring surface below needs no entry for it and its
+# `ALLOWED_POST_BASELINE_CHANGES` counterpart has nothing to allow: a new file is
+# not a drifted file, and the 069a hash manifest stays the dated record it is.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -178,6 +185,7 @@ FROZEN_SKILLS = (
     "internal/memory-recall",
     "internal/memory-record",
     "internal/research-feature",
+    "internal/review-feature-quality",
     "internal/review-sdd-process",
     "internal/run-agent",
     "internal/run-interview",

@@ -20,13 +20,23 @@ Red-first (slice 081a, T010): the call site is wired by T016, so this module is 
 its fixture runs stay red until T015 lands the verdict. The red run is recorded in
 ``.specify/specs/081-acceptance-hardening/notes/red-first-evidence.md`` § 1.4.
 
-Scope boundary, stated so the next slice does not read it as a defect: the **review** and **driver**
-call sites are 081c / 081d work. They are asserted *absent* here, with the reason, so a half-wired
-call site cannot appear silently — and so this module's own boundary is checkable rather than
-implied. Those two assertions are expected to be replaced by their slices, not deleted.
+**Slice 081c (T008) flips the review half; it does not delete it.** When this module was written,
+its last section asserted the **review** *and* **driver** call sites absent, because 081a wires the
+implement site only. 081c lands the review site (GW-02), so that half is now asserted in its
+**positive** form — the review command names the checker, treats a `block` verdict as a non-pass,
+and its own documented invocation is extracted and *run* against `negative` and `positive`. What the
+old assertion claimed ("`templates/commands/review.md` does not name the checker") is now false by
+design; replacing it with its positive form is what keeps the boundary checkable, and deleting it
+would have restored the silent half-wiring it exists to prevent.
+
+The **driver** closure/merge call site (GW-03) is still 081d work: it stays asserted *absent* here,
+with its reason kept as data (`REVIEW_DRIVER_DEFERRED`, now shrunk to the driver half alone). 081d
+flips that one in the same way. The review-site assertions of this module are a *wiring* reading;
+they do not re-judge a feature, and the fixture verdicts they drive are the checker's own.
 """
 from __future__ import annotations
 
+import json
 import re
 import shlex
 import subprocess
@@ -56,10 +66,12 @@ INVOCATION = re.compile(r"python3\s+%s[^\n`]*" % re.escape(CHECKER_REL))
 #: part of the wiring assertion.
 OTHER_JUDGES = ("validate-requirements.py", "pre-analyze-check.py", "validate-tasks.py")
 
-#: 081a scope boundary, recorded as data so the absence assertions below carry their reason.
+#: The 081d scope boundary, recorded as data so the remaining absence assertion carries its
+#: reason. 081c (T008) moved the review half to its positive form below; this datum therefore
+#: names the **driver** call site only.
 REVIEW_DRIVER_DEFERRED = (
-    "the review call site (GW-02) is 081c work and the driver closure/merge call site (GW-03) is "
-    "081d work; 081a wires the implement call site only"
+    "the driver closure/merge call site (GW-03) is 081d work; 081a wires the implement call "
+    "site and 081c (this module's own slice) wires the review call site"
 )
 
 
@@ -252,24 +264,165 @@ def test_the_documented_invocation_accepts_the_positive_fixture():
 
 
 # --------------------------------------------------------------------------- #
-# 081a scope boundary — the other two call sites are absent, with a reason
+# 081c / GW-02 — the review call site, now wired (T008 flipped this half)
 # --------------------------------------------------------------------------- #
 
-def test_the_review_and_driver_call_sites_are_still_unwired():
-    """Asserted absent *in this slice*; 081c and 081d replace this assertion with their own.
-
-    The reason is data (`REVIEW_DRIVER_DEFERRED`), not a comment: the review call site is 081c
-    work and the driver closure/merge call site is 081d work, so 081a wires the implement call
-    site only. When either slice lands, this assertion flips to its positive form — deleting it
-    would restore the silent half-wiring it exists to prevent.
-    """
-    assert CHECKER_REL not in REVIEW_CMD.read_text(encoding="utf-8"), (
-        "templates/commands/review.md now names the checker — if 081c landed, replace this "
-        "boundary assertion with its positive form instead of deleting it"
+def _arc_section():
+    """`templates/commands/review.md` § The Acceptance Reality Check — the review site."""
+    text = REVIEW_CMD.read_text(encoding="utf-8")
+    start = re.search(r"(?m)^##\s+The Acceptance Reality Check\s*$", text)
+    assert start, (
+        "templates/commands/review.md no longer carries § The Acceptance Reality Check — the "
+        "review call site has no home left"
     )
+    tail = text[start.end():]
+    nxt = re.search(r"(?m)^##\s", tail)
+    return tail[: nxt.start()] if nxt else tail
+
+
+def _sentences(text):
+    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", re.sub(r"\s+", " ", text)) if s.strip()]
+
+
+def _closed_reason_codes():
+    """The checker's own closed reason set — read from its code, not copied here.
+
+    The owner is `scripts/python/closure-acceptance-check.py` (`REASON_CODES`, whose seven
+    literals `requirements.md` § Shared Strings names STR-008…STR-014). Importing it keeps this
+    module from becoming a second spelling of the set: an eighth code added there is admitted
+    here automatically, and a reason the checker invents is outside it by construction.
+    """
+    import importlib.util
+
+    checker = ROOT / CHECKER_REL
+    spec = importlib.util.spec_from_file_location("closure_acceptance_check", checker)
+    assert spec and spec.loader, "cannot load %s" % checker
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return tuple(module.REASON_CODES)
+
+
+def test_the_review_call_site_names_the_closure_checker():
+    """GW-02: the review site runs the verdict, so it must name the one program that owns it.
+
+    This replaces 081a's absence assertion (`CHECKER_REL not in review.md`), which was true only
+    while the review site was unwired. It stayed a *wiring* assertion: naming the script is the
+    claim, and the two fixture runs below are the evidence.
+    """
+    section = _arc_section()
+    assert CHECKER_REL in section, (
+        "templates/commands/review.md § The Acceptance Reality Check must name `%s` — the review "
+        "site's closure judgement is not optional (GW-02):\n%s" % (CHECKER_REL, section)
+    )
+    _invocation(section, "templates/commands/review.md § The Acceptance Reality Check")
+
+
+def test_the_review_call_site_treats_block_as_a_non_pass():
+    """GW-02's second limb: `block` refuses the transition; it is never a caveat to carry.
+
+    A call site that names the checker and then reads a `block` verdict as advisory is the
+    half-wiring this contract exists to catch, so the sentence that mentions `block` must carry
+    both the non-pass label and the refusal — the two together are the obligation, and either
+    alone would pass a site that only quotes the vocabulary.
+    """
+    section = _arc_section()
+    mentioning = [s for s in _sentences(section) if re.search(r"`block`", s)]
+    assert mentioning, (
+        "§ The Acceptance Reality Check must name the checker's `block` verdict literal — a site "
+        "that never names it cannot have decided what to do with it (GW-02):\n%s" % section
+    )
+    joined = " ".join(mentioning).lower()
+    assert "non-pass" in joined, (
+        "the `block` verdict must be stated as a **non-pass**; found: %r" % (mentioning,)
+    )
+    assert "refus" in joined, (
+        "a `block` verdict must refuse the transition, naming the failed condition (GW-02); "
+        "found: %r" % (mentioning,)
+    )
+    flat = re.sub(r"\s+", " ", section)
+    assert "F-ACCEPTANCE" in flat and re.search(r"`P0`", flat), (
+        "the refusal path must still name the fixed item `F-ACCEPTANCE` at `P0` (RC-15):\n%s"
+        % section
+    )
+
+
+def test_the_review_call_sites_own_invocation_blocks_the_negative_fixture():
+    """The review site's documented command, extracted verbatim and run: it must refuse.
+
+    Extraction rather than a retyped command line is the point — a carrier whose command is only
+    quoted can drift from the one that runs, and no assertion would notice.
+    """
+    invocation = _invocation(_arc_section(), "templates/commands/review.md ARC")
+    fixture = FIXTURES / "negative"
+    assert fixture.is_dir(), "the negative fixture is missing — T003 has not landed"
+    proc = _run_invocation(invocation, fixture)
+    assert proc.returncode == 1, (
+        "the review site's own invocation, run against the 026-shape fixture, must refuse "
+        "(exit 1):\nstdout:\n%s\nstderr:\n%s" % (proc.stdout, proc.stderr)
+    )
+    payload = json.loads(proc.stdout) if proc.stdout.strip().startswith("{") else {}
+    codes = [r.get("code", "") for r in payload.get("reasons", [])]
+    assert codes, (
+        "the refusal must carry at least one named reason (GW-02: 'with a named condition'):\n%s"
+        % (proc.stdout or proc.stderr)
+    )
+    outside = [code for code in codes if code not in _closed_reason_codes()]
+    assert not outside, (
+        "the refusal reasons %r are outside the checker's closed set %r — a call site that "
+        "accepts an invented reason is not reading the owner's verdict (GW-04)"
+        % (outside, list(_closed_reason_codes()))
+    )
+    assert payload.get("verdict") == "block", (
+        "the review site's run must report the `block` verdict it treats as a non-pass; "
+        "measured %r" % (payload.get("verdict"),)
+    )
+
+
+def test_the_review_call_sites_own_invocation_accepts_the_positive_fixture():
+    invocation = _invocation(_arc_section(), "templates/commands/review.md ARC")
+    fixture = FIXTURES / "positive"
+    assert fixture.is_dir(), "the positive fixture is missing — T003 has not landed"
+    proc = _run_invocation(invocation, fixture)
+    assert proc.returncode == 0, (
+        "a complete feature must not be refused by the wired review site:\nstdout:\n%s\n"
+        "stderr:\n%s" % (proc.stdout, proc.stderr)
+    )
+
+
+def test_the_review_call_site_offers_no_second_judgement_source():
+    """GW-04 at the review site: the checker is the verdict; no sibling script, no model call."""
+    section = _arc_section()
+    for other in OTHER_JUDGES:
+        assert other not in section, (
+            "§ The Acceptance Reality Check offers %r as a closure judge; the verdict has exactly "
+            "one source (GW-04)" % other
+        )
+    flat = re.sub(r"\s+", " ", section)
+    assert re.search(r"(?i)(no model judgement|MUST NOT)", flat), (
+        "the review site must forbid substituting a model judgement for the checker (GW-04):"
+        "\n%s" % section
+    )
+
+
+# --------------------------------------------------------------------------- #
+# 081d scope boundary — the driver call site is absent, with its reason
+# --------------------------------------------------------------------------- #
+
+def test_the_driver_call_site_is_still_unwired():
+    """Asserted absent *in 081c*; 081d replaces this assertion with its own.
+
+    What moved in 081c: the review half of this boundary became the positive assertions above,
+    because 081c wired that call site (GW-02). What did not move: the driver closure/merge call
+    site is still 081d's (GW-03), so it stays asserted absent — deleting the assertion would
+    restore the silent half-wiring it exists to prevent. The reason is data
+    (`REVIEW_DRIVER_DEFERRED`), not a comment.
+    """
     if INTEGRATE_LINES.is_file():
         assert CHECKER_REL not in INTEGRATE_LINES.read_text(encoding="utf-8"), (
             "integrate-lines.py now names the checker — if 081d landed, replace this boundary "
             "assertion with its positive form instead of deleting it"
         )
-    assert "081c" in REVIEW_DRIVER_DEFERRED and "081d" in REVIEW_DRIVER_DEFERRED
+    assert "081d" in REVIEW_DRIVER_DEFERRED and "GW-03" in REVIEW_DRIVER_DEFERRED, (
+        "the deferred datum must name the slice and the clause that own the driver call site, "
+        "so the absence above reads as a boundary rather than as an oversight"
+    )
