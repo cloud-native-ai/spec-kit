@@ -156,6 +156,15 @@ the checker cannot emit the reading T010 is instructed to record, and any attemp
 "7/8 settled + 1 `inherited-later`" from a payload would be a hand-computed number the checker
 never produced (C-08 forbids exactly that).
 
+**Why the 89-green suite never saw defect 3**: the fixtures declare their dependencies by
+fixture-local *filenames* — `tests/fixtures/acceptance-hardening/inherited-clean/plan.md` names
+`dependency-feature-901.md` and `dependency-verification-901.md`, which resolve only inside that
+fixture directory. A real plan instead writes bare generic filenames in prose (`requirements.md`,
+`research.md`, `tasks.md`, `verification.md`), and every one of those also resolves under its own
+spec directory. The guard is green against the shape it was written for; the collision only exists
+in the shape a real plan has. That is the "the subject must be able to break" question asked of the
+wrong subject, and it is recorded here rather than fixed here.
+
 **Consequence for T010**: neither half was performed.
 
 - the SC-005 row was **not** rewritten — its evidence is the checker's own reading of the four
