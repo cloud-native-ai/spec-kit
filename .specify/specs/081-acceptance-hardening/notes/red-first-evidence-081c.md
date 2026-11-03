@@ -544,3 +544,103 @@ slice's part boundary falls between the sentence and the pins). Neither module w
 - **No editing of 081a's or 081b's notes.** Their slices' readings stop being true the moment they are "refreshed".
 - **No count that the checker owns.** Wherever a `final_path` bucket appears above it is quoted from a payload; no
   bucket is re-derived here.
+
+---
+
+## 7. T004 — the red-first run of the slice's test carrier
+
+Appended by T004 (the row § 6 reserved this record for). Nothing above was rewritten; § 1–§ 6 are part 1's readings
+and stay dated records of the tree they were taken on.
+
+### 7.1 What was authored
+
+`tests/contract/test_acceptance_review_composition.py` — the slice's single test carrier and the module IB-004's
+carrier resolves to: **32 tests across legs (a)–(k)**, plus one anti-vacuity test for the three judges the green
+tests lean on. Authored **before** T005 (the carrier skill), T006 (the three report slots) and T007 (the command
+rewrite), so its subject is the post-rewrite tree and most legs are red on arrival.
+
+`templates/commands/review.md`, `templates/review-template.md`, `skills/internal/review-feature-quality/`,
+`skills/internal/review-sdd-process/SKILL.md` and `skills/internal/code-review/SKILL.md` were **not** touched: the
+module was written to the rows, not to the current tree. No leg was weakened to make the two-segment template pass —
+where the subject is absent, the leg says so in its own message instead of asserting something weaker.
+
+### 7.2 The measured run
+
+```text
+$ bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition.py -q
+# test runner: .venv/bin/python -m pytest tests/contract/test_acceptance_review_composition.py -q
+FFFFFF..F.F..FFFF..FFFFFFFFFF.F.                                         [100%]
+…
+FAILED tests/contract/test_acceptance_review_composition.py::test_f1_the_arc_copies_the_seven_key_record_and_never_recounts_it
+FAILED tests/contract/test_acceptance_review_composition.py::test_f2_the_refusal_names_the_fixed_item_and_leaves_the_claimed_status
+FAILED tests/contract/test_acceptance_review_composition.py::test_g1_the_three_slots_exist_after_2_1_and_2_1_is_not_renumbered
+FAILED tests/contract/test_acceptance_review_composition.py::test_g2_the_two_review_slots_carry_the_finding_location_fields
+FAILED tests/contract/test_acceptance_review_composition.py::test_g3_every_placeholder_in_the_new_slots_is_glossed
+FAILED tests/contract/test_acceptance_review_composition.py::test_h_the_census_is_four_units_sharing_one_run_id
+FAILED tests/contract/test_acceptance_review_composition.py::test_i1_the_documented_invocation_blocks_the_negative_fixture
+FAILED tests/contract/test_acceptance_review_composition.py::test_i2_the_documented_invocation_accepts_the_positive_fixture
+FAILED tests/contract/test_acceptance_review_composition.py::test_i3_the_clean_case_is_claimed_implemented_and_passes_all_four_conditions
+FAILED tests/contract/test_acceptance_review_composition.py::test_i4_the_blocked_case_refuses_with_zero_final_path_pass
+FAILED tests/contract/test_acceptance_review_composition.py::test_j1_both_report_slots_require_the_line_and_state_the_one_escape
+FAILED tests/contract/test_acceptance_review_composition.py::test_j2_the_method_doc_owns_the_rule_and_no_carrier_makes_line_optional
+FAILED tests/contract/test_acceptance_review_composition.py::test_k2_the_two_dimension_headings_live_only_in_the_carrier
+23 failed, 9 passed in 1.23s
+EXIT=1
+```
+
+| Reading | Value |
+|---|---|
+| command | `bash scripts/bash/run-tests.sh tests/contract/test_acceptance_review_composition.py -q` |
+| exit status | `1` |
+| collected | `32` |
+| failing | `23` |
+| passing | `9` |
+| legs with at least one red test | **all eleven — (a), (b), (c), (d), (e), (f), (g), (h), (i), (j), (k)** |
+
+### 7.3 Per-leg readings, with the real first assertion of each failure
+
+| Leg | Tests | Reading on this tree |
+|---|---|---|
+| (a) | a1, a2, a3 | red ×3 — `found ['1', '2']` (four markers required); `exactly one heading for the Acceptance Reality Check; found 0`; the sweep still finds the pre-change sentence at `docs/reference/commands/review.md:24` **and** `templates/commands/review.md:31` |
+| (b) | b1, b2 | red ×2 — `the template carries 2 `### Segment <n> — …` markers`; `missing subject: skills/internal/review-feature-quality/SKILL.md` |
+| (c) | c1 red, c2/c3 green | `position 2 is delegated to '…code-review/SKILL.md', not to 'review-feature-quality'` — the boundary is not yet pointed to from a segment that exists |
+| (d) | d1, d3 red; d2, d4, d5 green | `position 2 is delegated to …` (no artifact segment yet) |
+| (e) | e1, e2 | red ×2 — `carries no `### Segment 3 — …` section; the positions it does carry are ['1', '2']` |
+| (f) | f1, f2 red; f3, f4 green | `exactly one heading for the Acceptance Reality Check; found 0` |
+| (g) | g1, g2, g3 | red ×3 — `found slots ['### 2.1']`; `no heading matching '2\.2\ Artifact\ Review\ Segment'` |
+| (h) | h | `the feedback boundary does not name the unit 'skill:review-feature-quality'` |
+| (i) | i1–i4 | red ×4 — `names no runnable closure-checker invocation` (T001 § 1.3's measured absence, now asserted as a verdict) |
+| (j) | j1, j2 | `no heading matching …` / `no method doc under skills/internal/review-feature-quality` |
+| (k) | k2 red, k1 green | `'## Segment A — Artifact Review' appears nowhere under skills/internal/review-feature-quality/` |
+
+### 7.4 The nine green tests, and why they are green **now**
+
+Green on this tree is not "a leg weakened": each of these asserts a fact that has already landed, and each goes red
+the moment that fact breaks.
+
+| Test | Subject that already holds |
+|---|---|
+| `c2` | no line in `review.md` / `review-template.md` / the owner pairs a `P0`/`P1`/`P2` token with a code severity, and no score field exists — measured, not described (§ 1.2's reading) |
+| `c3` | `code-review` is still named **and** T003's landed sentence declares it 第四段 / the fourth segment |
+| `d2` | the derivation fragment `declares it owns` occurs once, in the owner, and nowhere in `templates/` / `skills/` / `docs/` |
+| `d4` | the derivation applied to `expected-artifact-missing` reads `6 / 7` with `quickstart.md` as the one absent member — the fixture-side falsification, which does not depend on the template |
+| `d5` | the competing reading reads `6 / 6` = 100 % with zero findings on the same fixture, so (d) discriminates |
+| `f3` | ARC's conjunction fires on `review-implemented-blocked` (`Implemented` + zero `pass`) and **cannot** fire on `negative` (`Planned`) |
+| `f4` | the blocked run leaves `**Status**: Implemented` at `Implemented` — before/after, so a checker that wrote would fail |
+| `k1` | `review-sdd-process/SKILL.md` carries exactly one `- **Judgment object**:` marker, inside `## Input Contract` (T003) |
+| `judges` | the three judges reject near misses: `line (optional)` is caught while `never optional` is not, a three-count summary fails the seven-key record test, and `blocking-unresolved` is not read as `blocking` |
+
+### 7.5 Two interlocks the later rows should read before closing GATE-1
+
+- **`docs/reference/commands/review.md:24` is inside leg (a)'s sweep.** RC-03 forbids the pre-change sentence
+  *anywhere*, and T007's own row scopes its sweep to `templates/`, `docs/`, `shared/`, `skills/`. The docs page
+  therefore has to move with T007 — GW-14's *other* two limbs (CHANGELOG, instructions) are what 081d owns, not this
+  sentence. A T007 that leaves the page untouched keeps leg (a) red and GATE-1 open; that is a coordination fact, not
+  a defect in the leg.
+- **Leg (b) resolves the carrier at its *runtime* path** (`.specify/skills/internal/review-feature-quality/SKILL.md`)
+  and falls back to the source tree only to name the defect. T005's row already carries the mirror obligation, so
+  GATE-1 also waits on `python3 scripts/python/sync-mirrors.py` having run after T005 — a source-only carrier leaves
+  b2 red with a message that names both paths.
+
+**Nothing else was claimed here.** No count was re-derived: the nine green tests report facts measured on this tree,
+and the failing count is pytest's own line, copied verbatim.
