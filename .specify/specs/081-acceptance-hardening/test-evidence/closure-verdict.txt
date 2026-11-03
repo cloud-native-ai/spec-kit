@@ -1,0 +1,8 @@
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening --feature-detail .specify/memory/features/081.md --json
+EXIT=1
+verdict=block
+reasons=[{"code": "zero-final-path-pass", "target": ""}]
+final_path={"blocked": 1, "deferred": 0, "fail": 0, "pass": 0, "total": 2, "unknown": 1}
+tasks={"closed": 22, "deferred": 2, "in_progress": 0, "open": 0}
+claimed_status=Blocked
+# SC-001 is blocked (1 of 3 call sites) and SC-002 is partial (the review-stage leg is 081c); no final-path SC passes.

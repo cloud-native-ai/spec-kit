@@ -138,3 +138,40 @@ zero-open, therefore the `Planned → Blocked` transition licensed by `shared/wo
 § Feature Status ("the tasks are closed and at least one `final`-path criterion is not `pass`") is **not yet
 licensed**. T020 therefore did not run in this part; the feature stays `Planned` until the four pins are
 dispositioned by their owners and T022 is re-run.
+
+### 2.5 Final closure-repair disposition (supersedes 2.2–2.4; the authoritative current result)
+
+The four frozen-pin failures above were dispositioned without weakening any assertion:
+
+- The 081 GATE-4 and closure-verdict lines were moved **inside** the existing 077 stage-class wiring card in
+  `templates/commands/{tasks,implement}.md`, so stripping the card restores the frozen baseline byte for byte.
+- T024 was **deferred to 081d** because WC-14 freezes `tests/contract/test_expression_compatibility.py`, so the
+  C-5 allowlist entry for the `manage-features` edit cannot land in 081a; `manage-features` and C-5 were restored
+  to the baseline. The feature-details owner remains the 081a status-vocabulary carrier.
+- Five frozen-pin guards now pass (`test_c5_non_wiring…`, the two `test_stage_class_wiring` card strips,
+  `test_wc13_stage_class_pin_remeasured`, `test_wc14_frozen_surfaces_unchanged`).
+
+A second full-suite closure-repair run on the restored tree measured:
+
+```text
+$ bash scripts/bash/run-tests.sh --names-out .specify/.tmp/081a-head-failed.txt -q
+40 failed, 7021 passed, 7 skipped, 4 warnings in 616.02s (0:10:16)
+EXIT=1
+```
+
+- `head 失败集 − 基线失败集`: **1 id** — `tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/external/coaching-skills/references/prompt-templates.md->.specify/skills/coaching-skills/references/prompt-templates.md]`.
+  It is a **concurrent-writer artifact**, not an 081 defect: commit `90de4d7f` (coaching-skills) landed at
+  11:19:54 while this run was in flight and changed both the source and its mirror. The parity test observed a
+  transient mismatch; the same test passes in isolation (`1 passed`) and the final files are byte-identical
+  (`sha256 77a9f635…` on both; `sync-mirrors.py --check` exit 0). This run is therefore **invalid as a clean head
+  set**; a fresh full-suite run on the stable tree is the authoritative T022 measurement.
+- `基线失败集 − head 失败集`: **0** (no pre-existing failure was fixed; nothing to enumerate).
+- Pin re-read still matches `plan-runner-pins.txt`: `pytest 9.2.0`, `Python 3.14.6`, `git 2.54.0`.
+
+Because the acceptance unit is the full-suite id-level set, the one flake is **recorded, not erased**: T022 is
+`[~]` deferred (unblock: fix the 078 mirror-parity test isolation, then rerun the full suite and close T022), and
+T024 is `[~]` deferred to 081d. `tasks.md` is now zero-open (22 closed / 2 deferred), `verification.md` records
+SC-001 `blocked` and SC-002 `partial`, and the closure checker returns `block` / exit 1 /
+`zero-final-path-pass`. The feature is therefore **`Blocked`**, never `Implemented`; this is the strict-acceptance
+outcome the feature is built to produce.
+
