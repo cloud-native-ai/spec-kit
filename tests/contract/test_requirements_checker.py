@@ -38,15 +38,29 @@ CMD_SKILL = ROOT / "skills" / "internal" / "create-requirements" / "SKILL.md"
 CLARIFY_TESTS = ROOT / "tests" / "contract" / "test_clarify_semantic_completeness.py"
 
 # C-2: the label set is the pin, never a count (checker-form C-22).
+#
+# Six labels: the five Feature 053 shipped plus `path-marker`, added by Feature 081
+# (`contracts/artifact-schemas.contract.md` AS-02) with its own section at the bottom of this
+# file. The five keep their meanings untouched — 081 adds a label, it does not re-judge an
+# existing one.
 REQUIREMENTS_CHECKS = {
     "id-contiguous",
     "doc-order",
     "ref-resolvable",
     "marker-count",
     "dup-id",
+    "path-marker",
 }
 
+#: The five labels whose meaning and messages Feature 053 owns. Kept as its own set because
+#: tests/contract/test_checker_form.py C-16 checks each of these against 053's own artifacts,
+#: which predate `path-marker` and document nothing about it.
+REQUIREMENTS_CHECKS_053 = REQUIREMENTS_CHECKS - {"path-marker"}
+
 STR_ORDER_BREAK = "ORDER BREAK: {} after {}"
+
+#: Fixtures carrying the two class shapes the marker rule distinguishes (081, T003/T021).
+FIXTURES = ROOT / "tests" / "fixtures" / "acceptance-hardening"
 
 
 def _load():
@@ -88,7 +102,7 @@ GOOD = "# Spec\n\n## Requirements\n\n- **FR-001**: a\n- **FR-002**: b\n\n## Succ
 # C-1 / C-2 / C-3 — the check surface and message form
 # --------------------------------------------------------------------------- #
 
-def test_c01_c02_docstring_enumerates_exactly_the_five_labels():
+def test_c01_c02_docstring_enumerates_exactly_the_pinned_labels():
     mod = _load()
     extracted = set(re.findall(r"^  ([A-Za-z][A-Za-z-]*)\s{2,}", mod.__doc__ or "", re.M))
     assert extracted == REQUIREMENTS_CHECKS
@@ -387,3 +401,143 @@ def test_the_contract_still_has_the_clause_count_this_suite_pins():
     ids = re.findall(r"(?m)^\*\*C-(\d+)\*\*", CONTRACT.read_text(encoding="utf-8"))
     assert len(ids) == 29, f"clause count moved: {len(ids)}"
     assert [int(i) for i in ids] == list(range(1, 30))
+
+
+# --------------------------------------------------------------------------- #
+# Feature 081 — the sixth label `path-marker` (AS-01 … AS-04)
+#
+# Owner of the rule: `shared/workflow/acceptance-hardening.md` § Closure Verdict
+# ("Input contract — the `Path` marker"). This checker reports the format violation; it does not
+# decide whether the feature is acceptable — that is `closure-acceptance-check.py`'s verdict.
+#
+# SCOPE (recorded because it is a judgement, not an accident): the marker is judged on a spec
+# that DECLARES its flow class (`**Flow Class**: execution|expression` in the header block). The
+# declared class is what makes the rule meaningful — V-1's `final >= 1` floor is a class rule, and
+# an undeclared spec is not in the closure system at all (the closure checker cannot even name its
+# class). Judging every requirements.md in the checkout instead would report 70+ pre-existing specs
+# as format violations, which is a migration decision this feature's requirements (~no FR asks for
+# retrofitting) does not make, and it would turn this suite's own 053-subject cases red without
+# telling anyone anything about 053.
+# --------------------------------------------------------------------------- #
+
+DECLARED_HEADER = "# Spec\n\n**Flow Class**: execution\n\n"
+
+
+def _path_findings(stdout):
+    return _findings(stdout, "path-marker")
+
+
+def test_path_marker_missing_marker_fails_with_file_and_line(tmp_path):
+    p = _write(tmp_path, "missing.md", DECLARED_HEADER +
+               "## Success Criteria\n\n"
+               "- **SC-001**: the main flow runs. **Path**: final\n"
+               "- **SC-002**: a hygiene note is written.\n")
+    r = _run([str(p)], expect=1)
+    findings = _path_findings(r.stdout)
+    assert len(findings) == 1, r.stdout
+    assert findings[0].startswith("8: path-marker: "), (
+        "the finding must name the line of the offending criterion: %r" % findings[0]
+    )
+    assert "SC-002" in findings[0], findings[0]
+    assert p.name in findings[0], "the finding must name the file as well as the line"
+
+
+def test_path_marker_second_marker_on_the_same_line_fails(tmp_path):
+    p = _write(tmp_path, "twice.md", DECLARED_HEADER +
+               "## Success Criteria\n\n"
+               "- **SC-001**: formatted as **Path**: final and re-marked **Path**: final\n")
+    r = _run([str(p)], expect=1)
+    findings = _path_findings(r.stdout)
+    assert len(findings) == 1, r.stdout
+    assert "once" in findings[0] or "twice" in findings[0] or "2" in findings[0], findings[0]
+
+
+def test_path_marker_value_outside_the_two_value_domain_fails(tmp_path):
+    p = _write(tmp_path, "value.md", DECLARED_HEADER +
+               "## Success Criteria\n\n"
+               "- **SC-001**: the main flow runs. **Path**: required\n")
+    r = _run([str(p)], expect=1)
+    findings = _path_findings(r.stdout)
+    assert len(findings) == 1, r.stdout
+    assert "required" in findings[0], "the offending value must be named: %r" % findings[0]
+    assert "final" in findings[0] and "supporting" in findings[0], (
+        "the message must name the closed two-value domain: %r" % findings[0]
+    )
+
+
+def test_path_marker_must_be_the_last_token_of_the_line(tmp_path):
+    """AS-01/V-2: `**Path**: final` as the last token, so a deterministic parser can find it."""
+    p = _write(tmp_path, "notlast.md", DECLARED_HEADER +
+               "## Success Criteria\n\n"
+               "- **SC-001**: the main flow runs. **Path**: final, measured twice\n")
+    r = _run([str(p)], expect=1)
+    findings = _path_findings(r.stdout)
+    assert len(findings) == 1, r.stdout
+    assert "last" in findings[0], findings[0]
+
+
+def test_path_marker_complete_document_passes():
+    p = FIXTURES / "positive" / "requirements.md"
+    assert p.is_file(), "the acceptance fixtures are missing — T003 has not landed"
+    r = _run([str(p)], expect=0)
+    assert not _path_findings(r.stdout), r.stdout
+
+
+def test_path_marker_execution_feature_with_zero_final_criteria_fails():
+    """V-1: an `execution` feature with no `final`-path SC has nothing that could accept it."""
+    p = FIXTURES / "execution-without-final" / "requirements.md"
+    assert p.is_file(), "the execution-without-final fixture is missing — T021 has not landed"
+    r = _run([str(p)], expect=1)
+    findings = _path_findings(r.stdout)
+    assert len(findings) == 1, r.stdout
+    assert "execution" in findings[0] and "final" in findings[0], findings[0]
+
+
+def test_path_marker_expression_feature_is_not_forced_to_invent_one():
+    """V-1's other half: the class is declared, so the exemption is mechanical, not a judgement."""
+    p = FIXTURES / "expr-supporting-only" / "requirements.md"
+    assert p.is_file(), "the expr-supporting-only fixture is missing — T021 has not landed"
+    r = _run([str(p)], expect=0)
+    assert not _path_findings(r.stdout), r.stdout
+
+
+def test_path_marker_leaves_the_five_existing_labels_untouched(tmp_path):
+    """AS-02: a sixth label, not a re-judgement of the five that were already there."""
+    p = _write(tmp_path, "gap.md", DECLARED_HEADER +
+               "## Requirements\n\n- **FR-001**: a\n- **FR-003**: b\n\n"
+               "## Success Criteria\n\n"
+               "- **SC-001**: the main flow runs. **Path**: final\n")
+    r = _run([str(p)], expect=1)
+    labels = {m.split(": ", 2)[1] for m in r.stdout.splitlines()
+              if re.match(r"^\d+: [a-z-]+: ", m)}
+    assert labels == {"id-contiguous"}, (
+        "a complete marker set must not change any of 053's verdicts: %r" % (labels,)
+    )
+
+
+def test_path_marker_is_judged_only_on_a_spec_that_declares_its_flow_class():
+    """The scope rule above, asserted instead of asserted-in-prose: 053 predates the marker."""
+    text = (SPEC / "requirements.md").read_text(encoding="utf-8")
+    assert "**Flow Class**" not in text, (
+        "053 now declares a flow class — then this exemption no longer describes the tree"
+    )
+    r = _run([str(SPEC / "requirements.md")], expect=0)
+    assert not _path_findings(r.stdout), r.stdout
+
+
+def test_path_marker_this_features_own_requirements_are_clean():
+    """Dogfooding: the spec that introduces the marker carries it on every SC."""
+    own = ROOT / ".specify" / "specs" / "081-acceptance-hardening" / "requirements.md"
+    r = _run([str(own)], expect=0)
+    assert not _path_findings(r.stdout), r.stdout
+
+
+def test_path_marker_the_label_is_a_real_check_row_not_a_message_suffix(tmp_path):
+    """Every label appears as a `checks` entry (the JSON surface callers read), never only in prose."""
+    p = _write(tmp_path, "clean.md", "# Spec\n\n**Flow Class**: expression\n\n"
+               "## Success Criteria\n\n- **SC-001**: x. **Path**: supporting\n")
+    r = _run([str(p), "--json"], expect=0)
+    payload = json.loads(r.stdout)
+    labels = [c["label"] for c in payload["checks"]]
+    assert labels == list(REQUIREMENTS_CHECKS) or set(labels) == REQUIREMENTS_CHECKS, labels
+    assert "path-marker" in labels

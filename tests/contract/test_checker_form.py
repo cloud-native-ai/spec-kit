@@ -48,7 +48,8 @@ def _sibling_pin(module_file: str, attr: str):
     return getattr(mod, attr)
 
 
-# The five checks US1's checker owns; the canonical pin lives in test_requirements_checker.py.
+# Five of these checks are US1's; `path-marker` was added by Feature 081. The canonical pin lives
+# in test_requirements_checker.py and is read from there rather than copied.
 VR_CHECKS = _sibling_pin("test_requirements_checker.py", "REQUIREMENTS_CHECKS")
 
 NEW_CHECKERS = {
@@ -298,10 +299,17 @@ def test_c15_c18_counter_samples_exist_one_per_new_check():
 
 def test_c16_denominator_owner_is_enumerated_not_typed():
     """C-16 compares the counter-sample list against the NEW label subset; that subset's owner is
-    data-model.md, so the denominator must be enumerable from it rather than typed into a gate."""
+    data-model.md, so the denominator must be enumerable from it rather than typed into a gate.
+
+    One deliberate exemption: `path-marker` is Feature 081's sixth label
+    (`contracts/artifact-schemas.contract.md` AS-02) and is documented in 081's own contract, not
+    in 053's artifacts, which predate it. Exempted by name with that reason instead of back-filled
+    into an earlier feature's specification — a retro-documented label would be a second owner
+    wearing a citation.
+    """
     dm = (SPEC / "data-model.md").read_text(encoding="utf-8")
     assert "标签集" in dm
-    for label in VR_CHECKS:
+    for label in VR_CHECKS - {"path-marker"}:
         assert label in dm or label in (SPEC / "contracts" / "requirements-checker.md").read_text(encoding="utf-8")
 
 

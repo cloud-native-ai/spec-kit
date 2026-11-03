@@ -45,6 +45,7 @@ Consult the project glossary (`.specify/memory/glossary.md`, ambient via the Doc
 **Outputs** (skill-owned):
 
 - A dependency-ordered `tasks.md` filled from `.specify/templates/tasks-template.md`: organized by user story, Constitution-driven tests-mode banner, strict checklist format, runtime-evidence notes at their fixed landing points.
+- The Completion Gate's **`GATE-4`** obligation in its upgraded form (GW-09): every `final`-path success criterion is `pass` **and** the feature's smoke record is present — or an explicit user waiver names that criterion. Owner of the condition set: `.specify/shared/workflow/acceptance-hardening.md` § Gates; the row that physically carries the check is `tasks-template.md` § Completion Gate, so emit it and restate no threshold of your own.
 - Mechanical structural validation: `python3 .specify/scripts/python/validate-tasks.py <path-to-generated-tasks.md>` run on the written file until exit 0 (the invocation instruction stays in the skill; fix every ERROR, adjudicate each WARN).
 - The run report: total/per-story task counts, parallel opportunities, independent test criteria, MVP scope, and the final validator verdict.
 - Feature-list review per the Feature Integration Protocol (the tasks phase MUST review the Feature list — new or invalidated features update `.specify/memory/features.md` and detail files synchronously).

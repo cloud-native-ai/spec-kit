@@ -80,7 +80,7 @@ description: "Task list template for feature implementation"
 - GATE-1: Full test suite has zero NEW failures vs recorded baseline — check: `<this project's test runner>` + `comm -13 baseline current`
 - GATE-2: Every mirror obligation from plan.md verified byte-identical — check: `diff -rq <source> <mirror>`
 - GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' tasks.md` returns 0
-- GATE-4: verification.md lists every SC-NNN with a status — check: grep SC ids against requirements.md
+- GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are all present. A `final`-path criterion in `blocked` / `deferred` / `fail` fails this gate unless an explicit user waiver names that criterion. Condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema
 
 ## Environment Prerequisites
 
@@ -99,6 +99,8 @@ description: "Task list template for feature implementation"
 -->
 
 - <dependency>: <available | partial | unavailable> — probe: `<command>` @ <date>; affected phases/tasks: <phase/task refs or none>
+
+**A13 boundary** (owner: `shared/workflow/acceptance-hardening.md` § Gates — this note is a pointer, not a second rule): this section records **task-generation probe verdicts** only, each with its probe command and an ISO date. A planning-time load-bearing premise belongs to `plan.md` § Execution Premises; a record inherited from a dependency feature belongs to `plan.md` § Inherited Blockers. The same fact written into two of the three carriers is a defect: the second occurrence MUST be converted into a pointer (`see § …`), never kept as a copy.
 
 ## Format: `[ID] [P?] [Story] Description`
 

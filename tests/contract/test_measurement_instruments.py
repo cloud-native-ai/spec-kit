@@ -19,7 +19,10 @@ C-1…C-10 that ``tasks.md`` T017 names:
   ``{not-evaluated, measured}``, and the "unmeasurable part" (script-level checks
   are not exec-quant units) is written down instead of being counted as 0.
 * C-7  ``not-evaluated`` is a verdict, never an SC state: the
-  ``verification-log-template.md`` vocabulary stays the five declared values.
+  ``verification-log-template.md`` vocabulary stays the closed set its owner declares. Feature 081
+  (FR-004 / SV-08, owner ``shared/workflow/acceptance-hardening.md`` § Verification Vocabulary) added the
+  sixth value ``blocked`` to that set, so the pin below reads six; C-7's own content — ``not-evaluated``
+  never being an SC state — is unchanged, because a newly widened closed set does not admit a verdict.
 * C-10 no second baseline store and no new collector.
 
 Red-first (Constitution IV): the record already exists (frozen at planning time),
@@ -52,7 +55,11 @@ SEVEN_FIELDS = (
 )
 VERDICT_VALUES = ("not-evaluated", "measured")
 QUANTITIES = ("gate_calls", "confirmations", "wall_clock")
-SC_STATES = ("pass", "fail", "partial", "deferred", "unknown")
+#: The closed SC-status vocabulary of `templates/verification-log-template.md`. Six values: the five
+#: Feature 053 shipped plus `blocked`, added by Feature 081 (FR-004 / SV-08). The set is the
+#: vocabulary owner's, not this measurement record's — the pin follows the owner rather than
+#: freezing a count that a later feature may legitimately grow.
+SC_STATES = ("pass", "fail", "partial", "blocked", "deferred", "unknown")
 
 # Contract C-3: the closed filter set, frozen before any measurement.
 GATE_UNITS = (
@@ -297,13 +304,21 @@ def test_git_start_channel_is_the_first_commit_not_the_last_touch():
 # --------------------------------------------------------------------------- #
 # C-7 / C-10: vocabulary boundary, no second store, no new collector
 # --------------------------------------------------------------------------- #
-def test_sc_state_vocabulary_stays_five_values():
+def test_sc_state_vocabulary_is_the_closed_declared_set():
+    """C-7: `not-evaluated` is a verdict, never an SC state.
+
+    The count moved deliberately: Feature 081 (FR-004 / SV-08) added the sixth value `blocked` to
+    the vocabulary, and the vocabulary's owner is `shared/workflow/acceptance-hardening.md`, not
+    this record. The assertion that matters here — `not-evaluated` is not an SC state — is
+    unchanged, and it is asserted after the comparison so a widened set cannot smuggle it in.
+    """
     template = VERIFICATION_TEMPLATE.read_text(encoding="utf-8")
     match = re.search(r"`?status`?\s+is one of:\s*([a-z]+(?:\s*\|\s*[a-z]+)+)", template)
     assert match, "verification-log-template.md must declare its SC status vocabulary"
     states = tuple(token.strip() for token in match.group(1).split("|"))
     assert states == SC_STATES, (
-        "the SC vocabulary MUST stay the five declared values (C-7); got %r" % (states,)
+        "the SC vocabulary MUST be the owner's closed set (C-7 + Feature 081 SV-08); got %r"
+        % (states,)
     )
     assert "not-evaluated" not in states, (
         "`not-evaluated` is a verdict, never an SC state (C-7)"

@@ -19,29 +19,31 @@ until it carries a real command, a real exit code and a real failing count.
 | 3 | `tests/contract/test_acceptance_state_machine.py` | `contracts/state-vocabulary.contract.md` SV-03…SV-11 | T009 | `templates/feature-details-template.md` § Canonical Status State Machine and `templates/verification-log-template.md` |
 | 4 | `tests/contract/test_gate_wiring_081.py` | `contracts/gate-wiring.contract.md` GW-01, GW-04 | T010 | the implement call site in `skills/internal/implement-feature/SKILL.md` Step 9 and `shared/workflow/feature-integration.md` § Pre-Status-Flip Gate |
 
-### 1.1 `tests/contract/test_closure_acceptance_check.py` — **pending (written by T007)**
+### 1.1 `tests/contract/test_closure_acceptance_check.py` — **red, written by T007; green expected at T015**
 
 - Command line: `bash scripts/bash/run-tests.sh tests/contract/test_closure_acceptance_check.py -q`
-- Real output: pending
-- Exit status / failing count: pending
+- Real output: `11 failed, 5 passed in 0.65s`; failures are the verdict/fixture assertions that require the full checker (`positive`, `negative`, `ladder-mutation`, `smoke-mutation`, `execution-without-final`, `mixed-path`, `expr-supporting-only`, human output, counts, waive grammar)
+- Exit status / failing count: exit 1 / 11 failed
+- Why red is correct now: T006 landed only the CLI surface; T015 completes the verdict logic.
 
-### 1.2 `tests/contract/test_requirements_checker.py` — `path-marker` cases — **pending (written by T008)**
+### 1.2 `tests/contract/test_requirements_checker.py` — `path-marker` cases — **green after T011**
 
 - Command line: `bash scripts/bash/run-tests.sh tests/contract/test_requirements_checker.py -q`
-- Real output: pending
-- Exit status / failing count: pending
+- Real output: `40 passed in 1.82s`
+- Exit status / failing count: exit 0 / 0 failed
 
-### 1.3 `tests/contract/test_acceptance_state_machine.py` — **pending (written by T009)**
+### 1.3 `tests/contract/test_acceptance_state_machine.py` — **green after T012/T013**
 
 - Command line: `bash scripts/bash/run-tests.sh tests/contract/test_acceptance_state_machine.py -q`
-- Real output: pending
-- Exit status / failing count: pending
+- Real output: `14 passed in 0.07s`
+- Exit status / failing count: exit 0 / 0 failed
 
-### 1.4 `tests/contract/test_gate_wiring_081.py` — **pending (written by T010)**
+### 1.4 `tests/contract/test_gate_wiring_081.py` — **red, written by T010; green expected at T016**
 
 - Command line: `bash scripts/bash/run-tests.sh tests/contract/test_gate_wiring_081.py -q`
-- Real output: pending
-- Exit status / failing count: pending
+- Real output: `7 failed, 1 passed in 0.05s`; failures are the Step-9/pre-status-flip invocation and block/accept assertions that require T016 wiring
+- Exit status / failing count: exit 1 / 7 failed
+- Why red is correct now: the implement call site is wired in T016; T010 authors the assertion first.
 
 ### 1.5 Absence check recorded at T001 (the state a red run requires)
 

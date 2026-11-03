@@ -23,7 +23,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 交付文档 MUST 通过四面门禁（`reader` / `evidence` / `duplicate` / `count` 全部 `pass`）与结构子步（零 finding），判定只读退出码与输出行。
+- **SC-001**: 交付文档 MUST 通过四面门禁（`reader` / `evidence` / `duplicate` / `count` 全部 `pass`）与结构子步（零 finding），判定只读退出码与输出行。**Path**: final
 
 ### Measurement Sources & Collection Methods
 

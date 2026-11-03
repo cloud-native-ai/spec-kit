@@ -28,6 +28,17 @@ least two spaces before each description are load-bearing, not cosmetic):
                   not counted as carrying one
   dup-id          an id defined twice is an error, reported separately from ref-resolvable:
                   the two have opposite remedies (delete one, or add the missing definition)
+  path-marker     every Success Criterion definition line carries `**Path**: final` or
+                  `**Path**: supporting` as its LAST token, exactly once, and an `execution`-class
+                  feature carries at least one `final` path. Owner of the rule: the `## Success
+                  Criteria` `Path` contract in `shared/workflow/acceptance-hardening.md` § Closure
+                  Verdict. Judged only on a spec that DECLARES its flow class
+                  (`**Flow Class**: execution|expression` in the header block): the declared class
+                  is what makes the rule decidable — the `final >= 1` floor is a class rule — and an
+                  undeclared spec is outside the closure system entirely, because the closure
+                  checker cannot even name its class. Applying the marker rule to every
+                  requirements.md in the checkout instead would report the whole existing corpus as
+                  a format violation, which is a migration decision this rule does not contain.
 
 Skeleton criterion (checker-form C-12 — a semantic judgement, so it is written down here
 rather than left to the reader): an artifact is skeleton-only when a requirement row still
@@ -63,7 +74,8 @@ STATUS_UNPARSABLE = "unparsable"
 STATUS_EMPTY = "empty"
 STATUS_SKELETON = "skeleton"
 
-LABELS = ("id-contiguous", "doc-order", "ref-resolvable", "marker-count", "dup-id")
+LABELS = ("id-contiguous", "doc-order", "ref-resolvable", "marker-count", "dup-id",
+          "path-marker")
 
 DEFINITION_RE = re.compile(r"^- \*\*(FR|SC)-(\d+)([a-z]?)\*\*")
 STR_ROW_RE = re.compile(r"^\|\s*`(STR-\d+)`\s*\|")
@@ -74,6 +86,16 @@ MARKER_RE = re.compile(r"(?<!`)\[NEEDS CLARIFICATION:")
 PLACEHOLDER_RE = re.compile(r"\[(?!NEEDS)[A-Z][A-Z_ ]{3,}\]|\[placeholder\]")
 CLARIFICATIONS_HEADING_RE = re.compile(r"^##\s+Clarifications")
 HEADING_RE = re.compile(r"^#{1,6}\s")
+
+# --- the `Path` marker (Feature 081; owner: shared/workflow/acceptance-hardening.md) -------- #
+# The marker is a line attribute, not a second table: both this checker and the closure checker
+# anchor on the definition-line prefix and read the trailing token, so no separate list has to be
+# kept in sync with the Success Criteria rows.
+PATH_MARKER_RE = re.compile(r"\*\*Path\*\*")
+PATH_TOKEN_RE = re.compile(r"\*\*Path\*\*\s*:\s*(\S+)\s*$")
+FLOW_CLASS_RE = re.compile(r"^\*\*Flow Class\*\*\s*:\s*(\S+)\s*$")
+PATH_VALUES = ("final", "supporting")
+EXECUTION_CLASS = "execution"
 
 
 class Finding:
@@ -263,6 +285,83 @@ def check_marker_count(raw_lines):
     return findings
 
 
+def _flow_class(lines):
+    """The spec's declared flow class, or None when it declares none.
+
+    Read from the header block's `**Flow Class**: <value>` line. Declaration only: this checker
+    never infers a class from the content, because the closure rule's exemption is mechanical
+    (`expression` is exempt from the `final >= 1` floor) and an inferred class would make the
+    exemption a judgement call.
+    """
+    for line in lines:
+        m = FLOW_CLASS_RE.match(line)
+        if m:
+            return m.group(1)
+    return None
+
+
+def check_path_marker(lines, defs, name):
+    """Every SC definition line carries exactly one `**Path**` marker, as its last token."""
+    findings = []
+    if _flow_class(lines) is None:
+        return findings  # outside the closure system — see this label's docstring scope note
+    sc_rows = [(n, ln, lines[ln - 1]) for prefix, digits, n, suffix, ln in defs
+               if prefix == "SC" and not suffix and len(digits) == 3]
+    has_final = False
+    # A marker that could not be read leaves its criterion's path unknown, so the class rule's
+    # input is incomplete. Emitting the derived class finding as well would report one root cause
+    # twice and point the author at the wrong line.
+    parsed_cleanly = True
+    for n, ln, line in sc_rows:
+        label = "SC-%03d" % n
+        occurrences = len(PATH_MARKER_RE.findall(line))
+        if occurrences == 0:
+            parsed_cleanly = False
+            findings.append(Finding(
+                ln, "path-marker",
+                "%s in %s carries no `**Path**` marker — every success criterion states whether "
+                "it proves the feature's main user journey (`**Path**: final`) or is supporting "
+                "evidence (`**Path**: supporting`), written as the last token of its line"
+                % (label, name)))
+            continue
+        if occurrences > 1:
+            parsed_cleanly = False
+            findings.append(Finding(
+                ln, "path-marker",
+                "%s in %s carries %d `**Path**` markers — the marker occurs exactly once per "
+                "line; a second one is a defect, not a choice"
+                % (label, name, occurrences)))
+            continue
+        token = PATH_TOKEN_RE.search(line)
+        if token is None:
+            parsed_cleanly = False
+            findings.append(Finding(
+                ln, "path-marker",
+                "%s in %s carries its `**Path**` marker somewhere other than the last token — "
+                "write `**Path**: final` or `**Path**: supporting` at the end of the line, so a "
+                "parser needs no sentence analysis" % (label, name)))
+            continue
+        value = token.group(1)
+        if value not in PATH_VALUES:
+            parsed_cleanly = False
+            findings.append(Finding(
+                ln, "path-marker",
+                "%s in %s declares `**Path**: %s`, outside the closed two-value domain (`final` / "
+                "`supporting`); the value decides whether the criterion can refuse a verdict, so "
+                "a third value has no meaning to fall back on" % (label, name, value)))
+            continue
+        if value == "final":
+            has_final = True
+    if sc_rows and parsed_cleanly and not has_final and _flow_class(lines) == EXECUTION_CLASS:
+        findings.append(Finding(
+            sc_rows[0][1], "path-marker",
+            "%s declares `**Flow Class**: execution` but no success criterion is on the `final` "
+            "path — an `execution` feature MUST carry at least one `final`-path criterion, "
+            "otherwise it has nothing that could make it acceptable however honest its "
+            "`supporting` rows are" % name))
+    return findings
+
+
 def _skeleton(raw_lines, lines, defs):
     """Skeleton = the template was never filled in. Two shapes, both narrow on purpose so a real
     spec is never mistaken for one: a placeholder inside the first few lines (the title/header
@@ -307,6 +406,7 @@ def validate(path):
         "dup-id": check_dup_id(defs),
         "ref-resolvable": check_ref_resolvable(raw_lines, lines, defs, str_rows),
         "marker-count": check_marker_count(raw_lines),
+        "path-marker": check_path_marker(lines, defs, p.name),
     }
     findings = [f for label in LABELS for f in buckets[label]]
     checks = [{"label": label, "status": "fail" if buckets[label] else "pass",
