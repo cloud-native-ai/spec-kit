@@ -1,0 +1,164 @@
+# Checklist probes — Feature 081 / slice 081b (checklist stage, 2026-11-03)
+# All probes are read-only w.r.t. tracked files. Two probes (P6/P7/P8) ran against a
+# throwaway copy under .specify/.tmp/081b-probe/ which was deleted after the run; the
+# repo tree was not modified. Every command below was run from the repository root.
+
+## P1 — mirror and per-tool-copy parity (DoD-1 / GATE-3 claims)
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (136 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+rc=0
+# tasks.md:50 claims "shared 62 files, scripts 119 files" -> matches.
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+
+## P2 — T004's stated measurement (`templates/commands/plan.md` needs no pointer)
+$ grep -n "Execution Premises\|Inherited Blockers" templates/commands/plan.md
+(no output) rc=1
+$ grep -n "Execution Premises\|Inherited Blockers" templates/plan-template.md
+(no output) rc=1
+# -> the command template really has zero hits, and the plan template has no skeleton yet
+#    (081b has not run; T004 is this slice's row).
+
+$ grep -n "^## \|^### " templates/plan-template.md | sed -n '1,20p'
+9:## Summary
+13:## Technical Context
+31:## Constitution Check
+62:## Decision Tensions
+82:## Project Structure
+84:### Documentation (this spec)
+108:### Source Code (repository root)
+144:### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
+172:## Document Structure
+...
+# -> T004's insertion point ("after `### Mirror Obligations` and before `## Document Structure`")
+#    resolves to lines 144..172 of the current template.
+
+$ grep -n "^## \|^### " skills/internal/create-plan/SKILL.md
+10:## Goal ... 298:## Boundaries 315:## Wrap-up
+# -> no plan-section enumeration, so T004's claim "the skeleton heading is itself the trigger"
+#    is consistent with the skill: it delegates in-place template fill.
+
+## P3 — feature status (GATE-6 claim)
+$ awk -F'|' '$2 ~ /^ *081 *$/ {print "col5=["$5"]"}' .specify/memory/features.md
+col5=[ Blocked ]
+$ grep -n '^\*\*Status\*\*' .specify/memory/features/081.md
+6:**Status**: Blocked
+
+## P4 — closure checker on this spec tree (baseline, before the slice runs)
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/081-acceptance-hardening --json
+  verdict: block
+  reasons: [{"code": "zero-final-path-pass", "target": ""}]
+  final_path: {"blocked": 1, "deferred": 0, "fail": 0, "partial": 1, "pass": 0, "total": 2, "unknown": 0}
+  smoke: present=true, exit_code=0, records=1
+rc=1
+# -> exactly one reason, and it is the expected `final`-path one (SC-001 blocked, SC-002 partial).
+#    No runtime/inherited reason is emitted today (see P6/P8 for why that is not evidence of health).
+
+## P5 — pre-analyze gate on this spec tree
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/081-acceptance-hardening --stage plan --repo .
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=62 waived=0
+summary: {"errors": 0, "advisories": 62, "waived": 0, "fr": 25, "sc": 9, "tasks": 12, "clauses": 66, "files": 14}
+rc=0
+# -> 12 task rows (T001..T012) and 66 contract clauses resolve; the 62 advisories are all
+#    `missing-path` for deliverables later slices create (e.g. tests/contract/test_acceptance_premises.py,
+#    tests/contract/test_acceptance_review_composition.py, skills/internal/review-feature-quality/).
+
+## P6 — PROBE: empty runtime-stack table (zero rows) against the closure checker
+$ cp -R .specify/specs/081-acceptance-hardening .specify/.tmp/081b-probe/081-acceptance-hardening
+$ # delete the four `| RS-00N |` table rows from the copy's requirements.md, keep the heading
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/.tmp/081b-probe/081-acceptance-hardening --json
+  verdict: block
+  reasons: [{"code": "zero-final-path-pass", "target": ""}]
+  final_path: {"blocked": 1, "deferred": 0, "fail": 0, "partial": 1, "pass": 0, "total": 2, "unknown": 0}
+# -> ZERO runtime-stack rows produced NO `runtime-dependency-not-owned` reason. FR-012 lists
+#    "运行时栈行缺失或为空" as one of the four findings, so today the class cannot fire on the
+#    "no rows at all" shape; only an empty *cell* inside an existing row is reachable.
+
+## P7 — PROBE: runtime-stack section heading removed
+$ # same copy, heading '### Runtime Stack & Dependency Ownership' renamed
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/.tmp/081b-probe/081-acceptance-hardening --json
+rc=2
+closure-acceptance-check: input error: .../requirements.md carries no § Runtime Stack & Dependency Ownership
+# -> absent section = exit 2 (input error), while FR-012 calls the same fact a *finding*.
+#    The two shapes of one requirement therefore land in two different outcomes, neither of them the finding.
+
+## P8 — PROBE: `inherited` carrier that does not resolve
+$ # same copy, IB-004's carrier rewritten to `tests/contract/no-such-module.py`
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/.tmp/081b-probe/081-acceptance-hardening --json
+  verdict: block
+  reasons: [{"code": "zero-final-path-pass", "target": ""}]
+# -> no `inherited-blocker-undisposed` reason. The shipped producer judges only a BLANK carrier
+#    (closure-acceptance-check.py:799-815); carrier resolution is what T008 adds. Once added,
+#    plan.md:232 (IB-004 -> tests/contract/test_acceptance_review_composition.py, absent today)
+#    is the row it will fire on.
+
+$ rm -rf .specify/.tmp/081b-probe
+$ git status --porcelain
+ M .specify/state/081-acceptance-hardening.md
+?? .specify/specs/081-acceptance-hardening/test-evidence/081a-test-budget.jsonl
+# -> the probe left no trace in the tree (the two lines above pre-date this stage).
+
+## P9 — where findings ②/③ would have to be judged
+$ sed -n '69,74p' skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+STAGES = {
+    "requirements": ("requirements.md",),
+    "plan": ("requirements.md", "plan.md"),
+    "tasks": ("requirements.md", "plan.md", "tasks.md"),
+}
+# -> at `--stage requirements` neither tasks.md nor verification.md is an input, yet T007 assigns
+#    findings 1 and 2 (which absorb duties ② and ③) to `G-req-clarity`, the requirements-stage row.
+
+$ grep -n "class\|flow" skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+76:class InputError(Exception):
+# -> the pre-analyze gate has no flow-class reader at all, while the closure checker does
+#    (closure-acceptance-check.py:124-126, :421-484). The fixtures declare `**Flow Class**: expression`
+#    (tests/fixtures/acceptance-hardening/expr-supporting-only/requirements.md:14) and carry a
+#    `not-required` runtime row (:39), which is legal only for that class.
+
+## P10 — carrier cells are prose, and the shipped locator regex cannot match them
+$ grep -n "SOURCE_LOCATOR_RE = " scripts/python/closure-acceptance-check.py
+185:SOURCE_LOCATOR_RE = re.compile(r"^\S+:\S+$")
+$ sed -n '232p;234p;235p' .specify/specs/081-acceptance-hardening/plan.md   (Carrier cells)
+232: ... **081c 的必做测试模块 `tests/contract/test_acceptance_review_composition.py`**（RC-01/RC-17 …）
+234: ... **081b 的必做测试模块 `tests/contract/test_acceptance_premises.py`**（四类发现经 …）
+235: ... **081b 的必做测试模块 `tests/contract/test_acceptance_premises.py`**（同一模块逐行复跑 …）+ …
+# -> every cell contains spaces, so `^\S+:\S+$` never matches and the emitted locator falls back to
+#    `<this feature's key>:<IB row>` (closure-acceptance-check.py:811), i.e. the consumer's key rather
+#    than the dependency's, and no field exists to join a disposition to an extracted dependency row.
+
+## P11 — inherited-blocker evidence lines re-measured
+$ grep -n "_status=partial" .specify/specs/071*/verification.md .specify/specs/077*/verification.md
+071:66 SC-001_status=partial / 071:86 SC-006_status=partial
+077:77 SC-002_status=partial / 077:89 SC-005_status=partial / 077:101 SC-008_status=partial
+$ grep -n "deferred_tasks=" .specify/specs/071*/verification.md .specify/specs/077*/verification.md
+071:96 deferred_tasks=   /   077:107 deferred_tasks=
+$ grep -rln "^## Deferred" .specify/memory/features/
+(no output)
+# -> plan.md:229-236's eight dispositions rest on these readings, and every one of them reproduces.
+#    Note the shape mismatch for CHK017: all five disposed rows are `partial`, while C-17 tells the
+#    checker to extract `blocked`/`deferred` status rows.
+
+## P12 — pins recorded, not invented
+$ cat .specify/specs/081-acceptance-hardening/test-evidence/plan-runner-pins.txt
+pytest --version  => pytest 9.2.0
+python --version  => Python 3.14.6
+git --version     => git version 2.54.0 (Apple Git-157)
+$ grep -n "requires-python" pyproject.toml
+5:requires-python = ">=3.8"
+# -> RS-001's pin is `>=3.8`, EP-001's premise is "Python >= 3.10", and tasks.md:49 probed the
+#    system runner at 3.9.6: three floors for one runtime capability, none reconciled.
+
+## P13 — FR -> premise citation
+$ grep -c "EP-0" .specify/specs/081-acceptance-hardening/requirements.md
+0
+# -> FR-010's second clause ("每条依赖运行时能力的 FR MUST 引用一个 premise ID") has zero carriers,
+#    while contracts/artifact-schemas.contract.md:39 maps FR-010 / AS-11 to the 081b test module.
