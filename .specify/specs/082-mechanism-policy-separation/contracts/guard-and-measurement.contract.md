@@ -2,7 +2,9 @@
 
 **Status**: designed（本阶段）；`/speckit.implement` 按本契约先写测试、再改元技能（Constitution IV）。
 
-**边界**：本契约**不引入**新的确定性门禁脚本（C8 / FR-016）。它定义的是**既有 pytest 契约测试**与**既有命令**的组合，用来让 SC-001…SC-005 可复算。任何新增脚本的提议必须先在 `plan.md` § Design Decisions D2 里推翻「零新脚本」的结论。
+**边界**：本契约**不引入**新的确定性门禁脚本（C8 / FR-016）。它定义的是**既有 pytest 契约测试**与**既有命令**的组合，用来让 SC-001…SC-009 可复算。任何新增脚本的提议必须先在 `plan.md` § Design Decisions D2 / § D11 里推翻「零新脚本」的结论。
+
+**两段结构（scope update，2026-11-05）**：GM-01…GM-09 是机制/策略侧（SC-001…SC-005），原文未改一行；GM-10…GM-14 是技能引用侧（SC-006…SC-009），按 `plan.md` § Measurement Plan 追加。两侧共用同一条纪律：可判定的形态进 pytest，不可判定的语义落 `test-evidence/` 的样本记录（GM-02）。**编号不重排**——重排会让已提交的 `skill-wiring.contract.md` / `data-model.md` 的交叉引用静默指错。
 
 ## GM-01 — 契约测试清单（六个模块，全部在 `tests/contract/`）
 
@@ -30,15 +32,15 @@
 |---|---|---|---|
 | 1 | 基线参照物 | [[STR-002]] = `3ffeb26e`（实现起点提交，`aaee504c` 的祖先；本仓 `base_sha`） | 测试读取 `git ls-tree -r 3ffeb26e -- skills/ templates/commands/`，MUST NOT 从变量读一个「当前」「最新」 |
 | 2 | 比较单元 | **按产物类**两族：`skills/`（技能资产：`SKILL.md` + `references/` + `scripts/` + `assets/`）与 `templates/commands/`（命令模板） | 单元 = 框架**源**路径；`.specify/` 是生成镜像，由 `sync-mirrors.py --check` 单独判（GM-06） |
-| 3 | 允许差异集来源 | **一条封闭登记表，路径的唯一落点是 `data-model.md` § GM-03 允许差异集**（比较单元内 6 条：2 新增 + 4 改写；单元外 6 条为本实现期新增测试模块），并由 owner 成员表交叉核对（`included` 恰 3）；MUST NOT 使用「其余 / 叶子 / 未受影响」一类聚合词，也 MUST NOT 在本文件再抄一份路径清单 | 守卫断言：成员表 `included` 集合 == 允许差异集的流程子集；差集为空 |
+| 3 | 允许差异集来源 | **一条封闭登记表，路径的唯一落点是 `data-model.md` § GM-03 允许差异集**（比较单元内 **8** 条：三个新增 + 五个改写；单元外 10 条为本实现期新增测试模块与矩阵 fixture，见该节第 9–18 行），并由 owner 成员表交叉核对（`included` 恰 3）；MUST NOT 使用「其余 / 叶子 / 未受影响」一类聚合词，也 MUST NOT 在本文件再抄一份路径清单 | 守卫断言：成员表 `included` 集合 == 允许差异集的流程子集；差集为空 |
 | 4 | 补集断言 + 结构不变量 | 补集 = 基线路径集 − 允许差异路径集 − 新增路径；断言为（a）补集内**每个**路径在 HEAD 的内容与基线逐字节相等（`git cat-file blob <base>:<path>` vs 工作树读取），（b）路径集相等（`git diff --name-status 3ffeb26e..HEAD -- skills/ templates/commands/` 的行只落在允许集内） | 两侧都在：字节侧与路径集侧 |
 | 5 | 未定义聚合词清零 | 本契约与 `data-model.md` MUST NOT 出现「其余 / 其它 / 未受影响 / untouched / everything else」作为比较范围的表述 | 契约测试扫这两个文件 |
 
-**允许差异集**：封闭的 12 条路径登记在 `data-model.md` § GM-03 允许差异集（单一路径落点）；其中落在比较单元内的 6 条 = `create-skills` 一条新增引用文档、三个纳入元技能的 `SKILL.md` 改写、`improve-skills` 与 `merge-skills` 各一份 `references/` 改写。本文件 MUST NOT 重复这份路径清单（One Source of Truth）。
+**允许差异集**：封闭的 18 条路径登记在 `data-model.md` § GM-03 允许差异集（单一路径落点）；其中落在比较单元内的 **8** 条 = `create-skills` 一条新增引用文档、五个消费方的 `SKILL.md`（`create-skills` / `improve-skills` / `merge-skills` / `coaching-skills` / `run-skills`）、`improve-skills` 与 `merge-skills` 各一份 `references/` 改写；其余 10 条落在比较单元之外（`tests/` 下的 11 个新模块与 1 份矩阵 fixture，按 `data-model.md` § GM-03 第 9–18 行的登记形态）。本文件 MUST NOT 重复这份路径清单（One Source of Truth）。**本轮变更（SU-01）**：要件 3 的原值「单元内 6 条」写于「`coaching-skills` / `run-skills` 零改动」仍成立时，该前提被 FR-026 证伪，故按 `data-model.md` 的实测登记值改为 8。
 
 ## GM-04 — SC-003 的**比较单元规模**（实测，非预设）
 
-本阶段实测（`test-evidence/plan2026-11-05-baseline.txt`）：基线 `3ffeb26e` 的 `skills/` + `templates/commands/` 共 **575** 个文件（`skills/` 548 + `templates/commands/` 27），`.pyc` 不计；工作树同区 `git status --porcelain` 为空，即当前零差异。
+本阶段实测（`test-evidence/plan2026-11-05-baseline.txt`）：基线 `3ffeb26e` 的 `skills/` + `templates/commands/` 共 **575** 个文件（`skills/` 548 + `templates/commands/` 27），`.pyc` 不计；工作树同区 `git status --porcelain` 为空，即当前零差异。**scope update 复核（2026-11-05）**：`compared=575` 与 `complement=570 / allowed_in_unit=5 / frozen_mismatches=0` 在本轮复跑中不变（`plan.md` § Post-Generation Quality Gate 的 S4 行）；`allowed_in_unit` 的上限随允许差异集扩到 12 行而变（见 GM-03 要件 3），但**比较单元规模 575 不动**——它只由基线路径集决定。
 
 - 断言 MUST 报告被比较的文件数（575 形态），MUST NOT 只报告「无差异」——一个比较了 0 个文件的守卫会永远绿（Constitution XVI 的「绿是声明不是证据」）。
 - 守卫 MUST 自带反向用例：在 `tmp_path` 造一个「补集内文件被改一个字节」的假工作树，断言守卫转红（GM-07）。
@@ -75,15 +77,95 @@
 - 判据：改动后 2/2 误置被点名（含文件与位置），2/2 正确样本零误报；改动前同流程对正确样本同样零误报（基线）。
 - 记录 MUST 含：宿主名 + 版本原文、两次运行的输入草稿路径、输出原文、逐样本 verdict 表。
 
+## GM-10 — 技能引用侧的测量纪律（SC-006…SC-009 的共同前提）
+
+第二段（技能引用归一化）的四条 SC 有一条与第一段不同的性质：它们**全部可判**——不需要模型判断「这段内容归哪一层」，只需要一台机器对给定输入复算归一化结果。因此本段的纪律是把 GM-01…GM-02 的分配原则按同一判据落到引用侧：
+
+| # | 纪律 | 落点 |
+|---|---|---|
+| 1 | 可判定的形态与结果 MUST 进 pytest，MUST NOT 落成 `test-evidence/` 的人工记录 | GM-11 的六个模块 |
+| 2 | 唯一可执行实现是 `tests/contract/skill_reference_matrix.py`（stdlib-only 纯函数），MUST NOT 在元技能运行时被调用；执行期归一化仍按 owner 正文现场进行（D11） | GR-03 / plan.md § D11 |
+| 3 | 期望值的唯一来源是 `tests/fixtures/skill-reference/normalization-matrix.json`；MUST NOT 在测试里内联第二份期望表 | GM-13 |
+| 4 | 「owner 正文所规定的过程可被机器逐行复现」与「每个宿主执行体确实照做」是两条不同断言，前者由矩阵复算证明，后者只有 SC-002 式的宿主实录能证明 | plan.md § Measurement Plan 的「测试 vs 运行」缺口段 |
+| 5 | 本段 MUST NOT 新增确定性门禁脚本（C8 / FR-016）；任何新增提议须先推翻 D2 / D11 | 本契约边界段 |
+
+- **为何不需要宿主实录**：本段的判定对象是字符串变换，不是语义归类；矩阵复算与现场执行使用同一份 owner 正文规则，故复算成立即等价于过程成立（GM-02 同一判据的反面用法）。
+- **编号封闭**：GM-10…GM-14 五条覆盖本段全部测量面；新增第六条须先改 `plan.md` § Measurement Plan，MUST NOT 就地追加。
+
+## GM-11 — 技能引用侧的契约测试清单（五个模块 + 一个测试辅助）
+
+全部在 `tests/contract/`；前六个模块共同承载 SC-006…SC-009 的可判部分，并兑现 GM-07 的「每个模块至少一条反例断言」。
+
+| 模块 | 守护对象 | 主要断言 | SC |
+|---|---|---|---|
+| `skill_reference_matrix.py` | 归一化的**唯一可执行实现**（stdlib-only 纯函数，**不是** pytest 模块，被其余五个 import；D11） | 输入 = (原始串, 形态) → 输出 = 三值之一 + 归一化标识 + 成对报告字段；模块顶层 MUST NOT 有断言或 I/O | — |
+| `test_skill_reference_grammar.py` | owner 章节形态（GR-01…GR-06 / GR-08 的文本面） | 头部所有权两列表齐备；`§ Accepted forms` 六行与 `data-model.md` E-8 字面相等；`§ Normalization` 步集与 NP-1…NP-8 一一对应且 NP-3/NP-4 先于 NP-6；输出恰三值；两轮大小写匹配与多命中关闭 | SC-006 形态前置 |
+| `test_skill_reference_matrix.py` | SC-006 矩阵复算 | 逐行比对 `expect` 的判定类与「原始 + 归一化」成对形态；**分母 = fixture 行数（≥ 12）**，任一行不匹配即失败（GM-13） | SC-006 |
+| `test_skill_reference_consumers.py` | SC-007 五消费方接线 + 包含性扫描 | 每份 `SKILL.md` **恰一条**指向 [[STR-004]] 源路径的引用；`.specify/shared/definitions/` 前缀串零命中；全仓扫描除 owner 外零份复制（GM-12 五要件） | SC-007 |
+| `test_skill_reference_command_surface.py` | SC-008 命令面消歧 | 正例 ≥ 2 行（`speckit.skills` / `/speckit.skills`）判定 `command-surface` 且指向命令模板；**负例 ≥ 1 行**（与命令同形但不是命令的名字）证明判定不是「带点/带斜杠一律当命令」 | SC-008 |
+| `test_skill_reference_failures.py` | SC-009 失败语义 | 四类失败各一条断言；每条同时断言报告含原始与归一化标识；四类 `failure_class` **互斥**（越界不得报成零命中） | SC-009 |
+
+- **红先行形态**：五个 pytest 模块在 owner 定稿与五份接线落地前 MUST 以「artifact missing」红，MUST NOT 以 import error 或 collection error 红（与 GM-01 同一约定）。
+- **模块集封闭**：五个 pytest 模块 + 一个测试辅助，任何第六个 pytest 模块或第七个辅助文件都必须先推翻 `plan.md` § D11。
+- **反例落法**：每个模块在 `tmp_path` 内**字符串级**注入破坏（把归一化步骤换序、删一行接受形式、把一个 `expect` 改一值、把一条源路径引用改回镜像路径）并复用同一断言函数；MUST NOT 用 `skip` / `xfail` / 注释掉测试来「表示」判别力（GM-07 原文）。
+
+## GM-12 — SC-007 包含性扫描的五要件
+
+SC-007 的第二半（「除 owner 以外零份」）是一条包含性声明，按 `.specify/shared/guidelines/closed-set-claims.md` 逐要件落成：
+
+| # | 要件 | 本特性的取值 | 断言形态 |
+|---|---|---|---|
+| 1 | 基线参照物 | [[STR-002]] = `3ffeb26e`（与 GM-03 同一个，MUST NOT 另钉第二个基线） | 扫描器对「基线存在性」只用于定位历史命中，不用于断言当前内容；当前内容由文件读取 |
+| 2 | 比较单元 | `skills/**/SKILL.md`（框架源树；镜像层 `.specify/skills/**` **不计入**分母，由 `sync-mirrors.py --check` 另证一致） | 分母 MUST 被报出（`scanned=<N> skills/**`），MUST NOT 只报「零命中」 |
+| 3 | 允许差异集来源 | **三类且仅三类**（`requirements.md` § SC-007 Source）：① owner 自身 `shared/definitions/skill-reference-definitions.md`；② owner 的生成镜像 `.specify/shared/definitions/skill-reference-definitions.md`；③ 既有测试里以字面量钉住的 fixture 行（`tests/fixtures/skill-reference/`）。差异集**不是**本契约的私有清单，MUST NOT 在此再抄一份路径 | 扫描器把三类写成具名常量并在报告里逐类打印计数 |
+| 4 | 补集断言 + 结构不变量 | 补集 = 比较单元 − 允许差异集；断言为「补集内零命中归一化步骤字面与四类失败名」。结构不变量：五份消费方各**恰一条** owner 源路径引用（SR-01…SR-06） | 两侧都在：命中计数 + 每份接线条数 |
+| 5 | 未定义聚合词清零 | 本契约与 `data-model.md` / `contracts/skill-reference.contract.md` MUST NOT 出现「其余 / 其它 / 未受影响 / untouched / everything else」作为**比较范围**的表述 | 契约测试扫这三份文件 |
+
+- 扫描 MUST 报出**命中路径与行号**（SC-007 的原文要求）；只报总数 = 不可定位的结论。
+- 扫描 MUST NOT 把「镜像层」算成第二个命中：dev 规范层与其安装镜像的同名命中是一处（GR-05(c) 的同一判据）。
+
+## GM-13 — SC-006 的矩阵复算与分母
+
+- 矩阵 fixture 的唯一落点是 `tests/fixtures/skill-reference/normalization-matrix.json`（`data-model.md` § GM-03 第 9 行的同一路径；本契约 MUST NOT 再抄一份路径清单）。
+- **分母 = fixture 行数**，下限 ≥ 12（SC-006 原文）；起点 = clarify 的 14 行探针（`test-evidence/clarify-scope-update-fixture.json`），扩展覆盖六种接受形式、大小写变体、包裹引号、`/` 与 `@` 前缀变形、`SKILL.md` 路径、目录路径、零命中、路径越界、两层不同命中。
+- 运行 MUST 打印 `rows=N matched=N failed=0` 形态的计数；**任一行不匹配即失败**，MUST NOT 以「其余项通过」结案（SC-006 末句）。
+- 每行 MUST 同时携带 `raw` 与 `expect.normalized`（成对），并有 `expect.outcome` ∈ {`command-surface`, `skill`, `failure`}；`failure` 行 MUST 携带 `failure_class` ∈ E-10 的四值。
+- 矩阵 MUST 按 `surface` / `normalize` / `failure` 三段组织（SC-008 与 SC-009 各自读自己的子段），分段 MUST NOT 让某行同时属于两段。
+- 复算方式 = 同一 fixture + 同一 `skill_reference_matrix.py` 重跑，逐项结果相等。
+
+## GM-14 — 镜像、命令副本与被改技能的收口计数
+
+- 引用侧的镜像面由 `sync-mirrors.py` 覆盖：owner 镜像 + 五份 `SKILL.md` 镜像一起再生成，`--check` MUST exit 0（基线实测六对全 `ok`；本轮 `shared/` 由 62 → 63，`plan.md` § Mirror Obligations）。MUST NOT 把任何文件计数钉进断言。
+- `regen-command-copies.py --check` MUST exit 0 且命令副本**零变化**：这是 SW-06 / FR-011 的机械证据，也是 SC-008 的标杆（`/speckit.skills` 仍是命令面）不受本特性影响的事实依据。
+- **「测试 vs 运行」缺口（显式披露，MUST NOT 留白）**：`skill_reference_matrix.py` 是**测试侧**的可执行实现；元技能执行时仍按 owner 正文**现场**归一化。因此 SC-006…SC-009 证明的是「owner 正文所规定的过程可以被一台机器逐行复现且结果一致」，**不**证明每个宿主执行体真的照做了。第二个能力**没有**被排进宿主实录（GM-09）的测量面——它不需要模型判断。若将来要把引用侧纳入宿主实录，那是一次新的测量面决策，MUST NOT 由本契约默许。
+- **被改技能的体积计数**沿用 GM-01 / EP-003 的同一条形态：每个被改 `SKILL.md` 记录 `skill-shape.py` 的 before / after `est_tokens_controllable` 与 delta；`references/` 文件不计（它们不在 5000 预算的判据面内）。
+
+## 引用侧与机制/策略侧的合流点
+
+- 两份允许差异集**共用一张表**（`data-model.md` § GM-03），MUST NOT 出现「按能力各开一张」的第二份（SC-003 的分母唯一）。
+- `coaching-skills` / `run-skills` 在 GM-03 的逐字节断言里**失效**（它们被引用接线改写）；补偿判据是 SW-05 的机制/策略字面零命中（GM-01 的 `test_mechanism_policy_guard.py`）与 GM-12 的接线条数断言（`test_skill_reference_consumers.py`）各断言一半。
+- 两侧的测试模块都落在 `tests/contract/`，`tests/` **不在**比较单元内，故模块数量的增长不影响 SC-003 的分母（`data-model.md` § GM-03 第 10–18 行登记为「否」）。
+
 ## 可追溯性
 
 | FR / SC | 条款 |
 |---|---|
-| FR-011 | GM-03（允许差异集封闭）、GM-06 |
-| FR-015 | GM-03（要件 5）、GM-01（`test_mechanism_policy_ownership.py`） |
-| FR-016 | GM-01（零新脚本）、GM-03（不新增第二套分类文件） |
+| FR-011 | GM-03（允许差异集封闭）、GM-06、GM-14 |
+| FR-015 | GM-03（要件 5）、GM-01（`test_mechanism_policy_ownership.py`）、GM-12（要件 5） |
+| FR-016 | GM-01（零新脚本）、GM-03（不新增第二套分类文件）、GM-11（模块集封闭） |
+| FR-019 | GM-11（`test_skill_reference_grammar.py` 的 owner 章节断言）+ `contracts/skill-reference.contract.md` GR-01 |
+| FR-021 | GM-13（确定性顺序的矩阵复算） |
+| FR-025 | GM-11 / GM-13（成对形态是矩阵每行的必填字段） |
+| FR-026 | GM-12（要件 2 / 4）、GM-11（`test_skill_reference_consumers.py`） |
+| FR-028 | GM-14（镜像再生成 + `--check`） |
+| FR-029 | GM-11（模块集封闭）、GM-14（命令副本零变化） |
+| FR-030 | GM-13（三值封闭 + 四类失败互斥） |
 | SC-001 | GM-01（`test_mechanism_policy_decidability.py`）+ `test-evidence/sc-001-*.txt` |
 | SC-002 | GM-09 |
 | SC-003 | GM-03, GM-04, GM-07 |
 | SC-004 | GM-05, GM-07 |
 | SC-005 | GM-01 + `test-evidence/sc-005-*.txt` |
+| SC-006 | GM-11, GM-13 |
+| SC-007 | GM-11, GM-12 |
+| SC-008 | GM-11（正负例成对） |
+| SC-009 | GM-11（`test_skill_reference_failures.py`）、GM-13（`failure` 子段） |

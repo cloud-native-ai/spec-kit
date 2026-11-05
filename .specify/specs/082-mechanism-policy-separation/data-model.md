@@ -1,10 +1,10 @@
-# Data Model — 082 机制/策略分离（Mechanism–Policy Separation）
+# Data Model — 082 机制/策略分离与技能引用归一化（Mechanism–Policy Separation & Skill-Reference Normalization）
 
-**Owner boundary**: 本文件定义本特性引入的**实体、字段、校验规则与状态转移**；「两层是什么、怎么判」的**语义权威**是 `shared/definitions/mechanism-policy-definitions.md`（下称 owner，[[STR-003]]）。两者冲突时 owner 胜，本文件为陈旧。
+**Owner boundary**: 本文件定义本特性引入的**实体、字段、校验规则与状态转移**；能力一（机制/策略分离）的**语义权威**是 `shared/definitions/mechanism-policy-definitions.md`（[[STR-003]]），能力二（技能引用归一化）的**语义权威**是 `shared/definitions/skill-reference-definitions.md`（[[STR-004]]）。两者冲突时 owner 胜，本文件为陈旧。
 
-**投影面**：本文件是 owner 的**形态投影**——可以收窄 owner 的值域，MUST NOT 扩大；它不复述 owner 的判据表、症状表或提示骨架，只把它们变成可断言的字段。
+**投影面**：本文件是两份 owner 的**形态投影**——可以收窄 owner 的值域，MUST NOT 扩大；它不复述 owner 的判据表、症状表、提示骨架、接受形式清单或失败语义表，只把它们变成可断言的字段。
 
-**Census**: 7 个实体（E-1 … E-7）、21 条校验规则（V-1 … V-21）、1 个封闭谓词（C1）、1 个封闭成员表（3 / 2 / 1）、1 个封闭允许差异集（9 条路径登记，其中属比较单元者 6）、2 条状态转移（SM-1 作者侧判定、SM-2 消费侧检查）。
+**Census**: 10 个实体（E-1 … E-10；E-1…E-7 属能力一，E-8…E-10 属能力二）、34 条校验规则（V-1 … V-34）、1 个封闭谓词（C1）、1 个封闭成员表（3 / 2 / 1）、1 个封闭允许差异集（18 条路径登记，其中属比较单元者 8）、3 条状态转移（SM-1 作者侧判定、SM-2 消费侧检查、SM-3 引用归一化）。
 
 每个实体都同时给出 **carrier**（物理承载它的文件）与 **consumer**（读它的契约/测试）——只有 carrier 而没有 consumer 的实体，正是「绿了但什么都没证明」的失效面（Constitution XVI）。
 
@@ -140,6 +140,85 @@
 - **V-21**: `answer` 出现第四值（如「视情况」）= 判据不可判定，判红；`待澄清` 只用于 requirements § Edge Cases 第一条的「拆不开」情形，且 MUST 附「为什么两个方向都成立」一句。
 - **题集规模**: ≥ 12 条；`边界情形` 至少含：脚本 `--out <dir>`（策略）、模板标题（机制）、`.specify/` 笔记里的算法分支（机制）、一句双语表述（不构成机制内容）。
 
+## E-8 — 技能引用（Skill Reference）
+
+**Carrier**: `shared/definitions/skill-reference-definitions.md` § Accepted forms（框架源；镜像 `.specify/shared/definitions/` 由 `sync-mirrors.py` 生成，MUST NOT 手改）
+**Consumer**: `tests/contract/test_skill_reference_grammar.py`（字段域与 form 集合的字面断言）、`test_skill_reference_consumers.py`（源路径坐标与接线条数）；五个消费方（SR-01…SR-06）的输入段
+
+| 字段 | 域 | 规则 |
+|---|---|---|
+| `raw` | 非空字符串（允许首尾空白与一层包裹引号） | 逐字保留，作为**成对报告**的原始半（V-22；FR-025） |
+| `form` | 封闭接受形式之一（见下表） | 每个形式一个示例 + 一句含义，形式集合只由 owner 修订增长（V-23；FR-020） |
+| `labelled_prefix` | `skill:`（[[STR-005]]），至多一层 | 剥一次，不递归（V-24） |
+| `symbol_prefix` | `/` 或 `@`，至多一段 | `@/` 组合也算**一段**（V-24） |
+| `suffix` | `SKILL.md` / 尾 `/` | 剥一次；`.md`（非 `SKILL.md`）**不剥**（V-25） |
+| `normalized` | 名称 或 路径 | MUST 不含已剥掉的前缀/后缀（V-26；FR-021） |
+
+**封闭接受形式集合**（六项，与 fixture 的 `forms` 对象一一对应）：
+
+| form | 示例 | 含义 |
+|---|---|---|
+| bare name | `improve-skills` | 技能目录名 / frontmatter `name` |
+| slash reference | `/improve-skills` | **斜杠命令面**标记；不是「直接执行它」的指令（FR-023(a)） |
+| at reference | `@merge-skills` | At 提及面 |
+| labelled reference | `skill:merge-skills` | 带标签（[[STR-005]]）的同义写法 |
+| canonical path | `skills/external/merge-skills/SKILL.md` | 以 `SKILL.md` 结尾的路径 |
+| directory path | `skills/external/merge-skills`（可带尾 `/`） | 技能目录路径 |
+
+- **V-22**: `raw` MUST 与 `normalized` 成对出现在消费方报告里，缺一即「未报告」（FR-025）；只报 `normalized` 判红。
+- **V-23**: 六个形式缺一即判红；新增形式**必须**走一次 owner 修订，MUST NOT 由某个消费方就地扩展（FR-019 唯一 owner + FR-029）。
+- **V-24**: 标签与前缀各**至多剥一层**；`skill:skill:x`、`@@x` 属失败面而非「多剥几次」。
+- **V-25**: `SKILL.md` 与尾 `/` 剥一次；`.md` 不剥——`my-draft.md` 的分歧（fixture R14）由此单点收敛到一条规则，不再是两个读法（见 § SM-3 与 plan.md § D12 residue 表）。
+- **V-26**: `normalized` 里出现被剥掉的前缀/后缀 = 把剥离留给下游再猜（FR-021 反例），判红。
+
+## E-9 — 归一化结果（Normalized Reference）
+
+**Carrier**: owner § Normalization + § Failure semantics
+**Consumer**: `tests/contract/skill_reference_matrix.py` + `tests/contract/test_skill_reference_matrix.py`（读 `tests/fixtures/skill-reference/normalization-matrix.json`）；SC-006 的第三方复算
+
+| 字段 | 域 | 规则 |
+|---|---|---|
+| `outcome` | `command-surface` / `skill` / `failure` | **封闭三值**，无第四值（V-27；FR-030） |
+| `payload` | `command-surface` → 命令名；`skill` → 名称 或 路径+层级；`failure` → 失败类 + 必需报告项 | 与 `outcome` 一一对应（V-28） |
+| `by_ladder` | `skill` 的名字通道才需要 | 名字落成路径是**位置阶梯**的事（FR-022），不是归一化的第二个结果（V-29） |
+| `case_pass` | `exact` / `insensitive` | 先精确、零命中才不分大小写；不分大小写多命中即失败（V-30） |
+
+**确定性管线（NP-1 … NP-8，顺序不可交换）**——这是 clarify 裁决 (1) 的归一化顺序的字段化投影：
+
+| 步 | 动作 | 失败面 |
+|---|---|---|
+| NP-1 | 形态判定：是不是一次调用（`/speckit.*` 等 cli 形态先分流） | 不进入技能解析 |
+| NP-2 | 去首尾空白 + 去一层配对包裹引号 | 未配对引号 → 失败 |
+| NP-3 | 剥一段 `skill:` 标签 | — |
+| NP-4 | 剥一段 `@` 或 `/` 前缀（含 `@/name`，剥后不得只剩空串） | — |
+| NP-5 | 剥 `SKILL.md` 或尾 `/`（`.md` 不剥） | — |
+| NP-6 | 通道判定：含 `/` → path 通道，否则 name 通道 | 残留可疑形态（`..` 相对片段）→ 失败 |
+| NP-7 | 命中判定（name 通道按 E-8 case 规则；path 通道对位置阶梯） | 零命中 / 越界 / 不可读 / 双层同名 → 失败（E-10） |
+| NP-8 | 输出恰三值之一 + 与原始引用成对报告 | 第四值 = 判红 |
+
+- **V-27**: 出现三值之外的任何结果（例如「原样返回，下游再猜」）= FR-030 被破，判红。R10 的读数（`classes=2`、`closed_three_way=False`）是这条规则的**反例证据**：现顺序连失败都表达不出来。
+- **V-28**: `command-surface` 的 `payload` 是**命令名**（不是技能路径）；`skill` 的 `payload` 是名称或路径+层级；`failure` 的 `payload` 必须含该失败类的**全部必需报告项**（E-10）。
+- **V-29**: 把「这个标识该在哪个目录找」写进归一化结果 = 内联位置阶梯（破 FR-022），判红；`by_ladder` 只允许出现一个**指向**该阶梯的引用。
+- **V-30**: `case_pass=insensitive` 且命中 ≥ 2 = 「两个不同层同名」失败，MUST NOT 任选其一（clarify 裁决 (1) 条目 9）。
+- **NP 顺序不变量**: NP-3/NP-4 MUST 先于 NP-6。R05（`speckit.skills`）与 R06（`speckit.skills/SKILL.md`）今天分属 NAME/PATH，就是 NP-6 抢在 NP-5 之前的后果；换序后两者**都**归 `command-surface`（SU-03 的闭合方式）。
+
+## E-10 — 失败类（Failure Class）
+
+**Carrier**: owner § Failure semantics（四行表）
+**Consumer**: `test_skill_reference_grammar.py`（表形态 + 逐项报告项）、`test_skill_reference_failures.py`（四类互斥与成对报告）、`test_skill_reference_matrix.py`（失败行复算）
+
+| failure class | 条件 | 必需报告项 |
+|---|---|---|
+| zero-hit | 归一化后无命中 | 原始输入、归一化形、已搜索的全部坐标 |
+| out-of-ladder | 路径落在已知位置之外 | 该路径 + 已知位置集 |
+| unreadable | 目录无可读 `SKILL.md` 或 frontmatter 无效 | 路径 + 缺陷 |
+| dual-layer | 两个**不同层**同名命中 | 两个候选路径（MUST NOT 挑最近的一个） |
+
+- **V-31**: 四类缺一即判红；每类的**必需报告项**必须逐项可核对（不是「报个错」）。
+- **V-32**: 失败 MUST 关闭（停住），MUST NOT 降级为「先试一个」；consumer 侧发现「先试」措辞即判红（FR-024 末句）。
+- **V-33**: 「同名两处」只在**不同层**时才算两处；dev 规范层与其安装镜像的同名命中算一处（FR-023(c)）。因此 `dual-layer` 断言 MUST 用两个不同层的 fixture 行，不能拿「源 + 镜像」当反例。
+
+
 ## 状态转移
 
 **SM-1 — 作者侧判定（元技能内）**
@@ -164,28 +243,48 @@
 
 不变量：从 `checking` 出发的两条停止边 MUST NOT 留下任何副作用；`error` MUST NOT 退化成为 `ask`（两者措辞与后续动作不同）。
 
+**SM-3 — 引用归一化（元技能内部，NP-1 … NP-8）**
+
+| From | To | 触发 | 产物 |
+|---|---|---|---|
+| `received` | `command-surface` | NP-8 判定归一化名落在 `/speckit.*` 命名空间 | 命令面报告（指向该命令），**不进技能解析** |
+| `received` | `skill` | NP-7 命中且 NP-8 判定为技能 | 名称（+ 名称通道时交给位置阶梯）+ 成对报告 |
+| `received` | `failure` | NP-6/NP-7 命中任一失败类 | 失败类 + 该类的全部必需报告项；**停住** |
+| `failure` | `received` | 用户改写成另一个可解析的引用 | 重新归一化，MUST NOT 复用上一次的失败结论 |
+
+不变量：从 `received` 出发恰有**三条**出边，没有第四条（FR-030）；`skill` MUST NOT 携带「该去哪个目录找」的结论（那是位置阶梯的产物，FR-022）；`failure` MUST NOT 有「先试一个」的恢复边（V-32）。
+
 ## GM-03 — 允许差异集（SC-003 封闭集声明，供给 `contracts/guard-and-measurement.contract.md` 要件 3）
 
 | # | 路径 | 类别 | 属比较单元 |
 |---|---|---|---|
-| 1 | `skills/external/create-skills/SKILL.md` | 改写（SW-01） | 是 |
+| 1 | `skills/external/create-skills/SKILL.md` | 改写（SW-01；能力二为接线 SR-02） | 是 |
 | 2 | `skills/external/create-skills/references/mechanism-policy-check.md` | 新增（SW-01） | 是 |
-| 3 | `skills/external/improve-skills/SKILL.md` | 改写（SW-02） | 是 |
+| 3 | `skills/external/improve-skills/SKILL.md` | 改写（SW-02；能力二为接线 SR-03） | 是 |
 | 4 | `skills/external/improve-skills/references/loop-playbook.md` | 改写（SW-02 批量说明） | 是 |
-| 5 | `skills/external/merge-skills/SKILL.md` | 改写（SW-03） | 是 |
+| 5 | `skills/external/merge-skills/SKILL.md` | 改写（SW-03；能力二为接线 SR-04） | 是 |
 | 6 | `skills/external/merge-skills/references/provenance-record.md` | 改写（SW-03） | 是 |
-| 7 | `tests/contract/test_mechanism_policy_owner_doc.py` | 新增 | 否（`tests/` 不在单元内） |
-| 8 | `tests/contract/test_mechanism_policy_ownership.py` | 新增 | 否 |
-| 9 | `tests/contract/test_mechanism_policy_skill_wiring.py` | 新增 | 否 |
-| 10 | `tests/contract/test_mechanism_policy_guard.py` | 新增 | 否 |
-| 11 | `tests/contract/test_mechanism_policy_missing_policy.py` | 新增 | 否 |
-| 12 | `tests/contract/test_mechanism_policy_decidability.py` | 新增 | 否 |
+| 7 | `skills/external/coaching-skills/SKILL.md` | 改写（SR-06，仅引用接线） | 是 |
+| 8 | `skills/internal/run-skills/SKILL.md` | 改写（SR-01，仅引用接线） | 是 |
+| 9 | `tests/fixtures/skill-reference/normalization-matrix.json` | 新增（SC-006 矩阵，D13） | 否（`tests/` 不在单元内） |
+| 10 | `tests/contract/test_mechanism_policy_owner_doc.py` | 新增 | 否 |
+| 11 | `tests/contract/test_mechanism_policy_ownership.py` | 新增 | 否 |
+| 12 | `tests/contract/test_mechanism_policy_skill_wiring.py` | 新增 | 否 |
+| 13 | `tests/contract/test_mechanism_policy_guard.py` | 新增 | 否 |
+| 14 | `tests/contract/test_mechanism_policy_missing_policy.py` | 新增 | 否 |
+| 15 | `tests/contract/test_mechanism_policy_decidability.py` | 新增 | 否 |
+| 16 | `tests/contract/skill_reference_matrix.py` | 新增（测试辅助，非门禁脚本） | 否 |
+| 17 | `tests/contract/test_skill_reference_matrix.py` | 新增（SC-006） | 否 |
+| 18 | `tests/contract/{test_skill_reference_grammar,test_skill_reference_consumers,test_skill_reference_command_surface,test_skill_reference_failures}.py` | 新增（GR 形态、SC-007、SC-008、SC-009） | 否 |
 
-登记表在**比较单元内**的条目恰为第 1–6 行（6 条：2 条新增 + 4 条改写），`contracts/guard-and-measurement.contract.md` GM-03 只陈述这个数，MUST NOT 再逐条列举路径——本表是允许差异集路径的唯一落点。第 7–12 行是同一实现期落在比较单元之外的新增路径，列出是为了让「新增路径」一侧也可逐条核对，它们不参与字节相等断言。
+登记表在**比较单元内**的条目恰为第 1–8 行（2 条新增 + 6 条改写），第 9–18 行是落在比较单元之外（`tests/`）的新增路径，列出是为了让「新增路径」一侧也可逐条核对，它们不参与字节相等断言。第 18 行登记的是**一组**文件（五个引用侧模块中的四个 pytest 模块；第五个 `test_skill_reference_matrix.py` 已在第 17 行单列），契约侧只陈述「技能引用测试组」这一数，路径细节以本表与 plan.md § Project Structure 为准。
 
-**结构不变量**（两条）：
+**结构不变量**（三条）：
 1. `included` 成员的技能目录 = 允许差异集中 `skills/external/<member>/` 前缀的路径集合的父目录集合（V-19）。
-2. `excluded` 成员（`coaching-skills`、`run-skills`）在允许集里 MUST 零命中——它们的每一条路径都落在补集，因此逐字节断言覆盖它们。
+2. `excluded` 成员（`coaching-skills`、`run-skills`）的**行为**零变化，但**引用坐标**被改写（第 7、8 行）：它们仍在允许集里，因此逐字节相等断言对它们**失效**——补偿判据是 SW-05 的「机制/策略判定字面零命中」（且 SW-05 本身按 SU-01 收紧为可判形态）+ 接线行只声明参数（V-34）。
+3. 能力一的允许集与能力二的允许集**共用同一张表**：一张表、一个分母，MUST NOT 出现「按能力各开一张允许集」的第二份（SC-003 的分母唯一）。
+
+- **V-34**: `coaching-skills` / `run-skills` 的改写 MUST 限于引用串改写与「按 owner 归一化并披露」的接线句；出现判据表 / 症状表 / 失败表的任何一行即判红（C9：两个能力的 owner 互不复制）。
 
 ## 实体关系
 
@@ -196,4 +295,11 @@ E-1 Principle ──owns──▶ E-2 Layer Judgement ──derives──▶ E-4
      ├──owns──▶ E-5 Missing-Policy Prompt ──consumed-by──▶ (元技能/元命令 SW-04)
      ├──owns──▶ E-6 Membership ──cross-checked-with──▶ GM-03 允许差异集 (SC-003)
      └──owns──▶ E-7 Decidability Sample ──measures──▶ SC-001 / SC-005
+
+E-8 Skill Reference ──normalized-by──▶ E-9 Normalized Reference ──three-way──┬─▶ command-surface
+     │                          │                                             ├─▶ skill ──(position ladder, FR-022)──▶ 路径
+     │                          └─────────fails-as──▶ E-10 Failure Class ─────┴─▶ failure（关闭，无降级边）
+     └──cited-by──▶ (五个消费方 SR-01…SR-06，各自只声明自己的参数)
+
+E-7 (能力一) ──与── E-9 (能力二) 共享 C1 的范围判据，但两份 owner MUST NOT 互相复制（C9）
 ```

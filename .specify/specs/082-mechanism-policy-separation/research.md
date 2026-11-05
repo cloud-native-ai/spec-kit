@@ -1,6 +1,6 @@
 # Research — 082 机制/策略分离（Phase 0 实测与设计探针）
 
-**结论先行**：R1–R7 全部是 2026-11-05 在本仓的实测，没有一条从记忆或上一阶段的散文继承；R8 是两处**可判定的语义测试运行**（不是断言），R9 是 decision-tension 的门槛判定。
+**结论先行**：R1–R9 是第一个能力（机制/策略分离）的证据，R10–R15 是第二个能力（技能引用归一化）的证据；全部是 2026-11-05 在本仓的实测，没有一条从记忆或上一阶段的散文继承。R8 是两处**可判定的语义测试运行**（不是断言），R9 与 R15 是 decision-tension 的门槛判定，R10 是**程序输出**而非阅读。
 
 ## R1 — 运行器与依赖实测（EP-001 的证据）
 
@@ -123,7 +123,94 @@ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -p no:cacheprovider \
 
 `plan.md` § Decision Tensions 因此写 **T-001 … T-003** 三条记录（载体、接线形态、零脚本+零命令面）。
 
+## R10 — 归一化顺序的探针读数（第二能力的起点，FR-021/FR-030 的证据）
+
+**这不是一次阅读，是一次程序输出**。本阶段对 clarify 裁决 (1) 主张的「现行顺序无法产生三值输出」做了可复算的复现：探针按 owner 文档**今天写明的步骤**（其 steps 1–5）对 14 行 fixture 逐行分类。
+
+| 项 | 值 |
+|---|---|
+| fixture | `test-evidence/clarify-scope-update-fixture.json`，id `FIXTURE-PROBE-01`，14 行 |
+| 逐字捕获 | `test-evidence/clarify-scope-update-fixture-probe.txt` |
+| owner 文档被读时的 sha256 前缀 | `28432cd08257`（**只读**，本次运行未写入） |
+| 读数 | `rows=14 current_unique_outcome_classes=2 (NAME,PATH) closed_three_way=False disagreements=none` |
+
+**发现（三条，各对应 FR-030 / SC-006 的一个缺口）**：
+
+1. **结果类只有两个**（NAME、PATH）——FAILURE 在现行过程中**不可表达**；失败由位置阶梯与信任边界两份别的文档在下游决定，这正是 FR-030 禁止的「第四种结果」。
+2. **R05 vs R06 同一命令名分属两类**：`speckit.skills` → NAME，`speckit.skills/SKILL.md` → PATH。这是「通道判定先于剥离」的直接后果（plan.md § D12 residue 表第 1 行）。
+3. **R14 `my-draft.md` → NAME `"my-draft.md"`**，而 `run-skills` 明说名字可省略扩展名——同一输入的两种合法读法，属 § D12 residue 表第 3 行，归属 requirements 已裁的扩展名条款，不是类错误。
+
+**结论**：TARGET 顺序（判别 → 去空白/包裹引号 → 剥 `skill:` 与一段 `@`/`/` 前缀 → 剥 `SKILL.md`/尾 `/` → 通道判定 → 三值）**不是偏好，是被这两个可复算读数逼出来的**；13 行现有期望与 TARGET 的差集即为 implement 期断言集的第一批行（SC-006 要求 ≥ 12 行，fixture 给 14 行）。探针脚本本身在仓外（scratch），**不进入交付面**——被提交的是 fixture 与逐字捕获，复算因此可做（同 fixture + 同顺序 = 同表）。
+
+## R11 — 消费方引用坐标的实测（SR-05 / GR-08 的分母）
+
+clarify 裁决 ②（source-canonical）要改的是「引用串的写法」，因此分母必须是**当前存在的引用串**，不是「大概有几处」。全仓检索 `skill-reference-definitions`（排除 `.git`）后按坐标去重：
+
+| 文件（源树） | 行 | 引用串里的路径口径 |
+|---|---|---|
+| `skills/external/create-skills/SKILL.md` | 35 | `.specify/shared/definitions/…`（镜像） |
+| `skills/external/improve-skills/SKILL.md` | 20 | 镜像 |
+| `skills/external/merge-skills/SKILL.md` | 27 | 镜像 |
+| `skills/external/coaching-skills/SKILL.md` | 26 | 镜像 |
+| `skills/external/coaching-skills/SKILL.md` | 48 | 镜像 |
+| `skills/external/coaching-skills/SKILL.md` | 67 | 镜像（§ Nested） |
+| `skills/internal/run-skills/SKILL.md` | 16 | 镜像 |
+| `skills/internal/run-skills/SKILL.md` | 24 | 镜像 |
+
+**合计 8 处引用串，全部是镜像路径**，分布在 5 份源 `SKILL.md`；镜像侧（`.specify/skills/…`）同样 8 处，但镜像由 `sync-mirrors.py` 生成（`--check` 本阶段复跑 rc=0），**改源即改镜像，不得手改镜像**（FR-028）。`coaching-skills` 的 § Nested 行（67）是同一替换的一次，不是额外规则——它仍在「8 处」之内。
+
+**结论**：SR-05 / GR-08 的验收可逐坐标核对（8 行，行号会因编辑漂移，因此契约写的是**文件 + 引用串内容**而不是行号）；本阶段**不触碰**这五份未提交文件（派发边界），执行留 implement（plan.md § D11 已披露 test-vs-run 的落差）。
+
+## R12 — 第二能力的测试载体：零命中（SC-006…SC-009 的现状）
+
+```
+grep -rl 'skill-reference' tests/   →  0 files
+```
+
+`tests/fixtures/` 下现有 12 个 fixture 目录（`acceptance-hardening/`、`bilingual/`、`coaching/`、`docs_command/`、`expression_line/`、`flow_class/`、`humanize/`、`sanitize/`、`sdd_loop_efficiency/`、`skill-layout/`、`teams/`、`todo-workspaces/`），**没有一个承载引用归一化矩阵**；`tests/contract/` 下与技能相关的既有测试（如 `test_run_skills_wiring.py`、`test_skill_layer_visibility_guards.py`、`test_expression_compatibility.py`）都不加载此类 fixture。
+
+**结论**：SC-006 的「真实仓内位置」不能靠复用既有目录**宣称**满足——必须新增一个目录（plan.md § D13：`tests/fixtures/skill-reference/`，成为第 12 个既有 `tests/fixtures/` 兄弟目录，**不是新根**，FR-029/C4 不受影响）。同一读数也是 FR-027「核验/补齐」里最硬的一条缺口：现有实现**没有断言**。
+
+## R13 — 五个消费方的接线落点（FR-026 的实现坐标）
+
+逐份读工作树中的未提交实现，接线落点与「是否复制了语法」如下（读的是**当前状态**，不是承诺）：
+
+| 消费方 | 接线落点 | 只声明自己参数？ |
+|---|---|---|
+| `run-skills` | § Input Contract（输入段）+ § 1 第 0 步（归一化先于位置阶梯） | 是（第 0 步只调 owner，不重述顺序） |
+| `create-skills` | 输入解析段（skill name 定义行） | 是，且写明「新建时是**命名**而非解析」 |
+| `improve-skills` | § Input Contract | 是 |
+| `merge-skills` | § Input Contract | 是 |
+| `coaching-skills` | § Inputs + § Nested | 是 |
+
+**发现**：五份都**没有**复制接受形式清单或失败表，因此 FR-026 的「MUST NOT 复制」当前成立；但五份都引用**镜像**路径（R11），与 clarify 裁决 ② 冲突——这是 plan 必须落地、implement 执行的唯一实质缺口（SU-02 → SR-05 / GR-08 / T-004）。另一处需核验的落点漂移：`run-skills` 第 0 步把「剥前缀/后缀」自述了一遍（与 owner 的归一化顺序构成**第二份散文**），FR-026 允许它「声明自己的参数」，但不允许它成为第二 owner——implement 核验时 MUST 把该句收敛为「按 owner 归一化并披露」，否则 FR-019（唯一 owner）在文字层被破。
+
+## R14 — 源路径 vs 镜像路径：取舍的可判别证据（T-004）
+
+用一个**行为差**而不是偏好来判定：在框架源仓内，`skills/external/create-skills/` 与 `shared/definitions/` 的**相对拓扑**与安装后 `.specify/skills/…` 与 `.specify/shared/…` 的拓扑相同，因此「相对框架根解析」在两种模式下都成立；而绝对化的 `.specify/…` 在源树里指向一份**再生成副本**（本次并发实现两侧 `cmp` 相同，只因刚跑过 `sync-mirrors`）。
+
+| 判别项 | 引用镜像路径 | 引用源路径 |
+|---|---|---|
+| 源仓内读到旧文的条件 | 改源后忘记重生成 → **会** | 不会 |
+| standalone 部署（无 `.specify/`） | 路径不存在 | 相对框架根成立 |
+| 与 SC-007 的分母冲突 | 有（把生成物当被引用坐标） | 无 |
+
+**结论**：三条判别项一致指向源路径 → T-004 写入 plan（含 revision trigger：若某消费方确实需要「以安装根为锚的绝对坐标」，须由一次明确裁决引入，而不是让五份文件各写一种拼写）。本阶段该判定的**执行**受派发边界限制（不改那五份未提交文件），故 EP-007 记 `unverified` 并写明闭合任务。
+
+## R15 — 第二能力的 Decision Tension 门槛
+
+同一份承重门槛（`.specify/shared/guidelines/decision-tension.md` § 承重门槛）对第二个能力复判：
+
+- **不可逆**：文本改动 + fixture 目录，可回滚 → 不成立。
+- **跨团队**：五份消费方都是分发给下游项目的元技能，归一化是它们的公共前置 → **成立**。
+- **高爆炸半径**：归一化错一个类，等于把用户的一条命令误当技能解析（或反之） → **成立**。
+- **触及宪法 MUST**：Principle XIV（一源：引用文法唯一 owner）、XVII（目录治理：fixture 目录落位）、XI（两顶帽子：源 vs 镜像）→ **成立**。
+
+三门槛成立 → 第二条记录 **T-004**（不新增记录数以外的张力：SU-03 的 `speckit.skills` 分类冲突由「先剥后判」闭合，属**纠正**而非判定，见 plan.md § Scope Update Record）。
+
 ## 未决与交下一阶段
 
 - 三个「分母待定」项（SC-001 题集 / SC-002 样本集 / SC-005 读者样本）在本阶段被**落成 owner 附录的封闭题集**（E-7）——分母不再是「待定」，而是「由 owner 附录给出，数量 ≥ 12，implement 期冻结」。requirements checklist 记录的缺口由此关闭。
 - `improve-skills` 的 `skill-shape.py` 结果只能在实现后测（现在测的是改动前），因此 EP-003 状态记 `unverified` 并写明由哪个任务闭合。
+- 第二能力的**执行面**在本阶段只做到「读 + 判 + 记」，未落笔：R11 的 8 处引用串改写（SR-05 / GR-08）、R13 的 `run-skills` 第 0 步散文收敛、SC-006…SC-009 的断言（R12 的零命中）都归 implement，派发边界不允许本阶段改那五份未提交的并发实现文件。因此 EP-007 记 `unverified`，闭合点写在 `quickstart.md` § S11 / § S12。
+- 探针（R10）的脚本留在仓外 scratch：本阶段**不新增门禁脚本**（D11 / FR-029）；被提交的是 fixture + 逐字捕获，复算靠「同 fixture + 同顺序 = 同表」。若 implement 要把同一张表变成可执行断言，那是 SC-006 的测试载体（`tests/contract/skill_reference_matrix.py` + 矩阵测试），不是新门禁。

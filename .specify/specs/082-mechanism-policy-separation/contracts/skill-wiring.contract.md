@@ -38,10 +38,14 @@
 - 检查 MUST 是**读-判-停**三步，检查本身 MUST NOT 写入任何路径（含创建目录、写临时文件）；缺策略时 MUST 停在原地，不留半成品。
 - 「策略缺失」与「环境错误」的措辞 MUST 可区分（FR-007），且判定 MUST NOT 把环境错误报成策略缺失。
 
-## SW-05 — `coaching-skills` 与 `run-skills`：正文零改动
+## SW-05 — `coaching-skills` 与 `run-skills`：机制/策略判定零加载（`excluded` 成员）
 
-- 两者 MUST NOT 被本特性改动；其排除理由 MUST 只写在 owner 的成员表行里（FR-014 / A7）。
-- 守卫 MUST 以基线提交（[[STR-002]] = `3ffeb26e`）逐字节比较这两个技能的 `SKILL.md` 与 `references/`。
+> **按 SU-01 收紧（2026-11-05，scope update）**。原文「正文零改动 + 以基线逐字节比较」在第二个能力并入后自相矛盾：FR-026 点名五个消费方含这两者，而引用归一化接线必然改这两份文件。**谓词未被翻转**——C1 判的是「要不要加载机制/策略判定」，从不判「文件能否被另一条 FR 改」。收窄后的可判形态如下。
+
+- 两者的**机制/策略侧** MUST 零加载：`SKILL.md` 与 `references/` 中 MUST NOT 出现判据句、误置症状、失败表行或 owner 引用（字面零命中：`mechanism-policy-definitions`、`Mechanism / policy separation`、`mechanism-in-policy`、`policy-in-mechanism`）。
+- 两者**允许**的改动只有两种：① 引用坐标改写（`SR-01` / `SR-06`，把镜像路径改为源路径）；② 一行「按 owner 归一化并披露」的接线句（MUST NOT 自述归一化顺序，见 FR-019 唯一 owner）。
+- 排除理由 MUST 只写在 owner 成员表行里（FR-014 / A7），MUST NOT 在技能正文里复述。
+- 守卫形态：不再用逐字节相等（该断言对第 7、8 号允许路径失效），改为 **① 机制/策略字面零命中（grep 级，可复算）+ ② 与基线的差异行必须全部落在上述两种允许改动内**（`test_mechanism_policy_guard.py` 断言 ①，`test_skill_reference_consumers.py` 断言 ② 的一半——接线条数与源路径口径，见 `contracts/skill-reference.contract.md` SR-01 / SR-06 与 GM-11 / GM-12）。
 
 ## SW-06 — `/speckit.skills` 命令面
 
@@ -55,8 +59,10 @@
 
 ## SW-08 — 镜像义务
 
-- 三个元技能的 `SKILL.md` 与 `create-skills` 的 `references/mechanism-policy-check.md` MUST 先改框架源（`skills/external/…`），再经 `python3 scripts/python/sync-mirrors.py` 落到 `.specify/skills/…`；MUST NOT 手改镜像。
-- 同一提交内 MUST 跑 `--check` 并记录输出（判据是「无新增漂移」，基线已在 `test-evidence/plan2026-11-05-baseline.txt` 实测）。
+- **两份 owner 文档**（`shared/definitions/mechanism-policy-definitions.md` 与 `shared/definitions/skill-reference-definitions.md`）与**五个消费方**的 `SKILL.md`（`create-skills`、`improve-skills`、`merge-skills`、`coaching-skills`、`run-skills`）以及 `create-skills` 的 `references/mechanism-policy-check.md` MUST 先改框架源（`skills/…`、`shared/…`），再经 `python3 scripts/python/sync-mirrors.py` 落到 `.specify/…`；MUST NOT 手改镜像（FR-028）。
+- 同一提交内 MUST 跑 `--check` 并记录输出（判据是「无新增漂移」，基线已在 `test-evidence/plan2026-11-05-baseline.txt` 实测；本阶段复跑为 `shared/ == .specify/shared/ (63 files)`、全项 ok）。
+- **覆盖面自 3 份扩到 5 份 + 2 份 owner**：`coaching-skills` 与 `run-skills` 的引用坐标改写（SR-01 / SR-06）同样 MUST 走再生成，MUST NOT 只改源而让镜像落后——这正是 EP-007(b) 的判别点。
+- 引用坐标口径：消费方引用**框架源路径**（`shared/definitions/skill-reference-definitions.md`），MUST NOT 引用镜像路径（T-004 / SU-02）；镜像继续由脚本生成，`--check` 只证明一致，不把镜像变成被引用坐标。
 
 ## 可追溯性
 
@@ -71,3 +77,5 @@
 | FR-016 | SW-07 | `tests/contract/test_mechanism_policy_guard.py` |
 | SC-002 | SW-01, SW-02 | `test-evidence/sc-002-*.txt`（宿主实录） |
 | SC-004 | SW-04 | `tests/contract/test_mechanism_policy_missing_policy.py` |
+
+**跨能力行**：FR-026（五个消费方接线）与 SC-007 的接线断言落在 `contracts/skill-reference.contract.md` 的 SR-01…SR-06；本文件的 SW-05 只陈述**机制/策略侧的收紧形态**，两者 MUST NOT 互相替代（C9）。
