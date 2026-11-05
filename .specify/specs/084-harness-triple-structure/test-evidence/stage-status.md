@@ -585,3 +585,105 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-
 
 **本阶段未修改任何制品、未勾选任何任务行、未提交、未 push；R2-01／R2-02 两条 HIGH 的修复归属已点名
 （feature 详情文件 / plan-or-requirements 的裁定），修平动作留给对应命令。**
+
+## plan reopen（2026-11-05，路径 A：8 条 `engine side = none` 的事实移出名册）
+
+```yaml
+stage: plan
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: "docs-only（TB-06）＋ 一处定向守卫：本阶段写入 .specify/memory/，按 analyze round 2 § Systemic observations 2 的结论追加 tests/contract/test_expression_compatibility.py（`.specify/memory/` 的守卫集不属本特性自身测试面，任何写该目录的阶段都该跑）"
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md
+  - .specify/specs/084-harness-triple-structure/requirements.md
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/memory/features/084.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/plan-reopen-pathA-gates-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/plan-reopen-pathA-targeted-run.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+command: python3 -m pytest -q tests/contract/test_expression_compatibility.py
+rc: 0
+passed: 16
+failed: 0
+new_failures: "0 —— 该文件在本轮改动后 16 passed；守卫腿 test_c2_no_project_side_classification_store 未命中本轮新增文本（新增段落不含 `flow_class: <value>` 赋值形态）"
+baseline_compare: "none available at this stage（baseline 槽位归 implement 起点）"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/plan-reopen-pathA-targeted-run.txt
+base_commit: d23490c3
+```
+
+## Why `not-run-docs-only`（plan reopen）
+
+本轮是 **用户裁定的 substantive reopen（路径 A）**：改的是契约名册、范围表、任务行与 feature 记录，没有一行落在
+`tests/`、`scripts/`、`skills/**/scripts/`、`src/` 或夹具，`targeted-set-v1` 的输入仍全部落在 `test_roots` 之外，故按
+`.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` **TB-06** 记 `not-run-docs-only`。唯一的例外是那一处
+定向守卫：本轮第一次把内容写进 `.specify/memory/`（`features/084.md`），而 analyze round 2 已经证明该目录的守卫测试
+不属任何阶段的门禁集（R2-01 就是这样漏过去的），所以主动补跑一次并留读数。
+
+## 逐条处置（8 条事实的移出与排除理由）
+
+| # | fact | 批次 | 单元（失去该事实的候选载体） | 处置 |
+|---|------|------|------------------------------|------|
+| 1 | `analyze-severity-values` | 2 | `templates/commands/analyze.md`；`skills/internal/analyze-artifacts/SKILL.md` | 移出 in-scope；两条事实落 2 个排除单元 |
+| 2 | analysis finding-channel set | 2 | 同上 | 同上 |
+| 3 | `review-segment-sequence` | 2 | `templates/commands/review.md`；`skills/internal/review-sdd-process/SKILL.md` | 移出 in-scope，**不写排除行**：该单元组仍持有 in-scope 的 `ARC verdict mapping`（`closure-acceptance-check.py`） |
+| 4 | `self-improvement-stage-sequence` | 2 | `skills/internal/self-improvement/SKILL.md`（`self-improvement-workflow.md` 实测 0 条引擎路径引用 ⇒ 不入候选屏幕） | 移出 in-scope；两条事实落 1 个排除单元 |
+| 5 | track-to-executor mapping | 2 | 同上 | 同上 |
+| 6 | `improvement-track-values` | 2 | `improve-agent/`、`improve-team/`、`improve-tools/`、`skills/external/improve-docs/`、`improve-skills/` 五个 SKILL.md | 移出 in-scope；两条事实落 5 个排除单元 |
+| 7 | changed-asset-category mapping | 2 | 同上 | 同上 |
+| 8 | `history-categories` | 3 | `skills/internal/manage-history/SKILL.md` | 移出 in-scope，**不写排除行**：该单元仍持有 in-scope 的 `history-manifest-schema`（`history-utils.py`） |
+
+**排除文件行数 = 8**（2 analyze + 1 self-improvement + 5 improve），与「8 条事实」是两个不同的量：排除行按**单元**
+写（FR-002 + FR-005 + `data-model.md` E-2），一个单元 MUST NOT 既被声明覆盖又被排除行点名（E-2 **R-4**；E-5 把该矛盾
+判为 finding）。第 3、8 条事实因此零行，其「未迁移」由 `contracts/migration-batches.contract.md`
+§ Facts outside the roster 与 `features/084.md` § Latest Review 记录，而不是沉默删除。
+
+**为什么不选路径 B**：把 FR-006 (i) 改成「迁移后可成立」会让判据自我证成——迁移自己制造自己的理由——而 clarify A2
+的收窄正是为消灭这个机制。故本条按 FR-006 的 disposition 子句（「任一不成立即留在原处」）走排除侧。
+
+## C-044／C-045 删除后剩余行
+
+- **批 2（C-044）余 7 行，全部有今日引擎侧**：`expression-gate-faces`、`expression-stage-operator-table`、
+  `ARC verdict mapping`、`driver-stage-sequence`、`driver-gate-roster`、`driver-completion-sentinels`、
+  `driver-stage-artifacts`。
+- **批 3（C-045）余 7 行，全部有今日引擎侧**：`memory-types`、`memory-retention-thresholds`、
+  `history-manifest-schema`、`probe-class-values`、`probe-object-binding-map`、`quant-record-schema`、
+  `trigger-state-schema`。
+- **条款编号未动**：删除的是表行，不是条款；`C-044`／`C-045` 两条仍在，C-044／C-045 的 `none` 语义段改成「本表每行今天都有引擎侧，无读取点的事实归 § Facts outside the roster」。五份契约仍 12+13+16+10+8 = **59** 条，全部 `md-bold-closed`。
+
+## 旧 in-scope 引用扫描（本轮改动的自检）
+
+| 扫描 | 命令 | 读数 |
+|------|------|------|
+| 8 个 fact slug 在移出小节之外的出现 | `grep -n` 八个 slug × `*.md contracts/*.md` | 仅 `requirements.md:203` 的日期化复核段点名（属记录，不是名册行）；契约内只在 § Facts outside the roster 出现 |
+| 残留的 `in-scope（批 2／批 3）` 行 | `grep -n "in-scope（批 2\|in-scope（批 3" requirements.md` | 6 行：expression-gates、review（标注「仅 ARC 判定」）、memory、manage-history（标注「仅 `history-manifest-schema`」）、sdd-loop-driver、probe；无一行仍把移出的 8 条事实算作 in-scope |
+| tasks 的旧措辞 | `grep -n "mapping-shaped sets\|record schemas:" tasks.md` | 只剩 T016 的 `Migrate batch 3's record schemas:` 标题行；`mapping-shaped sets`（旧 T015 的措辞）0 命中 |
+| 契约内 `none` 语义的旧读法 | `grep -n "read point is created at migration\|is a reading, not a gap\|none\` again" contracts/migration-batches.contract.md` | 0 命中（路径 B 的自我证成措辞已消失，改为「今天没有读取点即不 in-scope」） |
+| plan-owned 四份对这 8 条事实的引用 | `grep -n` 八个 slug × `plan.md data-model.md feature-ref.md quickstart.md research.md` | 0 命中于五份中的前四份 ⇒ 没有「in-scope 主张」或「批次条数」需要订正，四份 plan-owned 文本**本轮零改动**；`research.md` 与本轮的 `none` 实测无关（它只在 § R1 用 `none` 一词描述依赖表），其日期化读数按简报保留 |
+
+## Bases verified（plan reopen）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| requirements 校验 | `python3 scripts/python/validate-requirements.py …/requirements.md` | `status: ok`、`0 error(s), 0 warning(s)`、exit 0 |
+| tasks 校验 | `python3 scripts/python/validate-tasks.py …/tasks.md` | `PASS`、`0 error(s), 0 warning(s)`、exit 0 |
+| 决策张力 | `python3 scripts/python/validate-decision-tensions.py --spec …` | `status: ok`、六个 label 全 pass、exit 0 |
+| 拆解门（plan） | `decomposition-check.py --mode plan --requirements …` | `proceed`，`fr_count 19` ≤ 30，`reasons=[]` |
+| 拆解门（tasks） | `decomposition-check.py --mode tasks --requirements … --tasks …` | `proceed`，`task_count 31` ≤ 40（任务总数未变） |
+| 前置门（plan） | `pre-analyze-check.py --spec-dir … --stage plan --repo …` | `decision=pass`、`errors=0`、`advisories=84`、`waived=0`、exit 0 |
+| 条款解析 | `clause_extract.py` × 五契约 | 12 + 13 + 16 + 10 + 8 = **59**，五份全 `md-bold-closed` |
+| 覆盖会计 | `account-clause-coverage.py --spec-dir …`（不加 `--freeze`） | `claimed clauses 0`、`0 of 19` FRs、`59 beyond the frozen baseline`、`status: uncovered`、**exit 1**（与本轮改动前同读数） |
+| `.specify/memory/` 守卫 | `python3 -m pytest -q tests/contract/test_expression_compatibility.py` | `16 passed`、exit 0 |
+| 081 冻结面 | `git diff --stat d23490c3 -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py scripts/python/validate-requirements.py scripts/python/closure-acceptance-check.py shared/workflow/acceptance-hardening.md` | 空输出 ⇒ 零 diff |
+
+**advisories 由 82 → 84 的原因（两条，均为计划路径）**：新增段落点到两个尚不存在的路径
+`shared/declarations/exclusions/no-machine-fact.yaml`（`requirements.md:203`、`contracts/migration-batches.contract.md:123`），
+`missing-path` 按既有口径记 advisory，不是 error。
+
+## 本轮不处置
+
+- **R2-03（MEDIUM，tasks banner 的旧前提）**：不在本次授权范围（用户裁定只走路径 A）；`tasks.md:11` 与 `tasks.md:204`
+  仍以「五份契约用 `DS/HC/SR/MB/DM` 编号」为由解释 `[green:]` 未启用，而实测已是 `C-001…C-059`。留给 analyze round 3
+  或一次独立的 tasks 修复。
+- **R2-04（LOW，历史提交信息 `DN`）**：历史不可改，不处置。
+- **框架观察（`pre-analyze-check.py` 的 `CLAUSE_DEF` 认不出 `C-<digits>`）**：不属本特性。
+

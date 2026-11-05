@@ -40,36 +40,30 @@ diff (measured at plan time: 40 and 37 collected tests, `research.md` § R7).
   reading, not a failure. The exit-0 criterion therefore reads "zero `[[STR-013]]` findings", never "zero `pending`".
 - **C-044** Batch 2 — mappings and ordered operator tables (they decide accept/reject). Each row names **both** sides as
   they stand today: the engine side is the constant or read point that step 3 of `C-047` replaces with a read through the
-  shared entry (`C-052`…`C-059`), so no row's engine side has to be discovered by `grep` at edit time. `none` is a
-  reading, not a gap in the roster: it means the row has **no** engine-side copy today, so step 3 of `C-047` creates the
-  read point in the consumer the row names and `C-050`'s `note` records the correction. File:line readings are as
-  measured on 2026-11-05; the constant names are the stable part, the line numbers move.
+  shared entry (`C-052`…`C-059`), so no row's engine side has to be discovered by `grep` at edit time. **Every row in
+  this table has a live engine side today** — that is now a membership condition of the roster, not a coincidence: a fact
+  with no engine read point today fails FR-006 (i) on the tree and is not in scope (it is recorded in § Facts outside the
+  roster (`no-machine-fact`) below, never migrated for symmetry). File:line readings are as measured on 2026-11-05; the
+  constant names are the stable part, the line numbers move.
 
   | `<fact-slug>` | engine side (constant or read point today) | carrier side |
   |--------------|-------------------------------------------|--------------|
   | `expression-gate-faces` | `scripts/python/flow-class-check.py` — `FACES_SECTION_KEYWORD = "六面"` / `FACES_EXPECTED = 6`, the gate owner's § 六面 row-count check | `shared/workflow/expression-gates.md` |
   | `expression-stage-operator-table` | `scripts/python/flow-class-check.py` — the operator-table header tuple `required = ("阶段", GATE_ID_COLUMN, "执行算子", "对应面", "阻断级别")` | `shared/workflow/expression-gates.md` |
-  | `analyze-severity-values` | `none` — no engine constant carries the severity scale; the only `severity` domain in code is `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`'s two-value `error` / `advisory`, a different axis, so this row's read point is created at migration | `templates/commands/analyze.md`; `skills/internal/analyze-artifacts/` (`references/detection-and-severity.md`) |
-  | analysis finding-channel set | `none` — the finding classes exist only in the two carriers. The nearest label set in code is `scripts/python/account-clause-coverage.py`'s `clause-uncovered` / `fr-uncovered` channels (its `{"label": …}` rows), a narrower set read there and **not** re-declared by this row | same two carriers |
-  | `review-segment-sequence` | `none` — the four-segment sequence is written by the prose carriers; `skills/internal/code-review/scripts/git-delta-review.sh` owns only the code segment's four-value verdict vocabulary (`pass` / `blocked` / `not-applicable` / `not-evaluated`) and does not enumerate the sequence | `templates/review-template.md` |
-  | ARC verdict mapping | `scripts/python/closure-acceptance-check.py` — `final_path_counts()` (six status buckets plus the total) and the comparison `verdict` (`"block" if blocking else "accept"`); the template's `[ARC_*]` placeholders are copied from `--json` verbatim, never recomputed | `templates/review-template.md` |
-  | `self-improvement-stage-sequence` | `none` — measured: `Bootstrap` / `Operationalize` / `Optimize` appear in no `.py` and no `.sh`; the sequence exists only in the carriers | `shared/workflow/self-improvement-workflow.md`; `shared/definitions/self-improvement-definitions.md`; `skills/internal/self-improvement/` |
-  | track-to-executor mapping | `none` — same measurement; no engine maps a track to an executor | same three carriers |
-  | `improvement-track-values` | `none` — the improve-\* skill scripts (`skills/external/improve-skills/scripts/redline-check.py`, `skill-shape.py`) carry no track vocabulary | `skills/internal/improve-agent/`, `improve-team/`, `improve-tools/`; `skills/external/improve-docs/`, `improve-skills/` |
-  | changed-asset-category mapping | `none` — no engine classifies a changed asset into a category | same five carriers |
+  | ARC verdict mapping | `scripts/python/closure-acceptance-check.py` — `final_path_counts()` (six status buckets plus the total) and the comparison `verdict` (`"block" if blocking else "accept"`); the template's `[ARC_*]` placeholders are copied from `--json` verbatim, never recomputed | `templates/review-template.md`; `templates/commands/review.md` § 2.4 carrier slot |
   | `driver-stage-sequence` | `skills/external/sdd-loop-driver/scripts/loop-state.py` — the `STAGE_ARTIFACTS` key order: `requirements`, `clarify`, `plan`, `tasks`, `checklist`, `analyze`, `implement`, `review` | `skills/external/sdd-loop-driver/SKILL.md` |
   | `driver-gate-roster` | `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` — the check-name literals at its `add(findings, "<name>", …)` call sites (`dangling-id`, `blocked-by`, `missing-path`, `external-clause`, `duplicate-id`, `count-claim`), plus `STAGES` for the per-stage file requirement | same carrier |
   | `driver-completion-sentinels` | `loop-state.py` — `sentinel_literal()`, which renders `<STAGE>-DONE`, plus the `sentinel` keys in `STATUS_FIELDS` / `LOG_FIELDS` | same carrier |
   | `driver-stage-artifacts` | `loop-state.py` — `STAGE_ARTIFACTS` itself (`artifacts` / `owned_paths` / `commit_required` / `no_change_allowed` per stage), and `IMPLEMENT_CODE_PATHSPEC` for implement's code pathspec | same carrier |
 
-- **C-045** Batch 3 — record schemas (they change evidence shape only). Same two-sided reading as `C-044`; `none` again
-  means no engine-side copy exists today.
+- **C-045** Batch 3 — record schemas (they change evidence shape only). Same two-sided reading as `C-044` and the same
+  membership condition: every row here has a live engine side today; a record fact that measured `none` on 2026-11-05 is
+  recorded in § Facts outside the roster instead of being migrated.
 
   | `<fact-slug>` | engine side (constant or read point today) | carrier side |
   |--------------|-------------------------------------------|--------------|
   | `memory-types` | `scripts/python/memory-utils.py` — `SCOPES = ("session", "knowledge")` | the memory skills (`skills/internal/memory-record/`, `memory-recall/`) |
   | `memory-retention-thresholds` | `scripts/python/record-retention.py` — `DEFAULT_GRACE_DAYS = 30` and the `STORES` roster. `memory-utils.py`'s `prune` carries no default of its own (it requires `--max-entries` / `--max-age-days`), which is why the threshold's engine side is the retention engine, not the memory store | same two skills |
-  | `history-categories` | `none` — measured: the five category names are in no `.py` and no `.sh`; `scripts/python/history-utils.py` writes the record store without enumerating categories | `skills/internal/manage-history/SKILL.md` |
   | `history-manifest-schema` | `scripts/python/history-utils.py` — `_manifest_path()` (`.manifest.json`), `read_manifest()` / `write_manifest()`, and the `sessions` key set the incremental read builds | `skills/internal/manage-history/` |
   | `probe-class-values` | `scripts/python/probe-utils.py` — `_PROBE_KINDS`, `_CLASS_FIELDS`, `HANDLER_KINDS`, `HANDLER_MODES`, `LIFECYCLE_POINTS`, `BINDING_SCOPES` | `shared/definitions/probe-definitions.md` |
   | `probe-object-binding-map` | `scripts/python/probe-utils.py` — `_OBJECT_FIELDS`, `PROBE_MAP_NAME`, and the catalog heading/entry parsers (`_CATALOG_HEADING`, `_CATALOG_ENTRY_RE`) | `shared/definitions/probe-definitions.md` |
@@ -98,6 +92,54 @@ diff (measured at plan time: 40 and 37 collected tests, `research.md` § R7).
 - **C-051** Nothing in this contract authorises a change to a frozen gate's criteria or exit codes. If a batch row
   cannot be migrated without such a change, the row stops and returns to the spec — it does not get a local exception.
 
+## Facts outside the roster — `no-machine-fact`（路径 A，2026-11-05）
+
+**What this section is.** The eight facts below were in the `C-044` / `C-045` tables until 2026-11-05. They left the
+roster, and this table is where they are recorded. It is not a clause — the clause count stays 59 (`C-001`…`C-059`), and
+nothing here adds a value, a domain or a ninth reason.
+
+**Why they left — the reason is `no-machine-fact`（[[STR-006]]）.** FR-006 (i) is evaluated **on today's tree**: 「存在一个
+确定性引擎，其判决结果随该取值改变而改变」, and FR-006's own disposition clause reads 「任一不成立即留在原处」. Each row below
+measured `none` — no deterministic engine's judgement changes when the value changes. The competing reading ("the read point
+is created during migration") is explicitly **not** available to this feature: it would make the criterion vacuous, since
+the migration would manufacture its own justification — precisely the mechanism the clarify narrowing A2 removed
+(`requirements.md` § Assumptions A2). Authority for the adjudication:
+`test-evidence/analyze-report-round2-2026-11-05.md` § R2-02 (HIGH) plus the user's path-A decision of 2026-11-05 recorded in
+`.specify/state/084-harness-triple-structure.md` § 用户裁定. All eight keep their carriers as they are: these facts were
+never two-faced with an engine, so no pointer is created and no literal is deleted.
+
+| `<fact-slug>` | batch | unit (the candidate carrier whose roster row drops) | carrier side (keeps the literal) | anchor (in-tree evidence of no engine read point) |
+|---------------|-------|--------------------------------------------|----------------------------------|---------------------------------------------------|
+| `analyze-severity-values` | 2 | `templates/commands/analyze.md`; `skills/internal/analyze-artifacts/SKILL.md` | `skills/internal/analyze-artifacts/references/detection-and-severity.md` § Severity assignment; the severity column of `templates/commands/analyze.md` § Wrap-up | no `.py` carries the severity scale: `grep -rn "CRITICAL\|severity" scripts/python/*.py` returns verdict-producing consumers only, and `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`'s two-value `error` / `advisory` is a different axis, not this scale |
+| analysis finding-channel set | 2 | same two units | same carriers (§ The eight passes) | the finding classes exist only in the two carriers; the nearest label set in code is `scripts/python/account-clause-coverage.py`'s `clause-uncovered` / `fr-uncovered` channels (`{"label": …}` rows), a **narrower** set read there and not this row's |
+| `review-segment-sequence` | 2 | `templates/commands/review.md`; `skills/internal/review-sdd-process/SKILL.md`（两个单元仍 in-scope，理由见下：ARC 判定留在 `C-044`） | `templates/review-template.md` § 2.1–2.4; `shared/workflow/acceptance-hardening.md` § Review Composition (the order's owner) | `skills/internal/code-review/scripts/git-delta-review.sh` owns only the code segment's four-value verdict vocabulary (`pass` / `blocked` / `not-applicable` / `not-evaluated`) and enumerates no sequence; no engine reads a segment order |
+| `self-improvement-stage-sequence` | 2 | `skills/internal/self-improvement/SKILL.md` | `shared/workflow/self-improvement-workflow.md` § Standard Flow (SI-0…SI-7); `shared/definitions/self-improvement-definitions.md` § Self-Improvement Loop | `Bootstrap` / `Operationalize` / `Optimize` appear in no `.py` and no `.sh` (measured 2026-11-05) |
+| track-to-executor mapping | 2 | `skills/internal/self-improvement/SKILL.md` | same two prose carriers (§ SI-4 Route to the Canonical Improver) | same measurement; no engine maps a track to an executor |
+| `improvement-track-values` | 2 | `skills/internal/improve-agent/SKILL.md`; `improve-team/SKILL.md`; `improve-tools/SKILL.md`; `skills/external/improve-docs/SKILL.md`; `improve-skills/SKILL.md` | those five carriers' § Target Classification | the improve-\* skill scripts (`skills/external/improve-skills/scripts/redline-check.py`, `skill-shape.py`) carry no track vocabulary |
+| changed-asset-category mapping | 2 | same five units | same five carriers | no engine classifies a changed asset into a category |
+| `history-categories` | 3 | `skills/internal/manage-history/SKILL.md`（该单元仍 in-scope，理由见下：`history-manifest-schema` 留在 `C-045`） | `skills/internal/manage-history/SKILL.md` § Step 3 Distill / § Step 4 Theme Aggregation | the five category names are in no `.py` and no `.sh`; `scripts/python/history-utils.py` writes the record store and its manifest without enumerating categories |
+
+**Fact rows and unit rows are two different quantities — never converted into one another.** The file the implement stage
+writes is `shared/declarations/exclusions/no-machine-fact.yaml`, whose rows are `unit` / `carrier` / `anchor` keys
+(`requirements.md` FR-005, `data-model.md` E-2). Two rules decide the row count, and both are the model's, not this table's:
+
+1. **An exclusion row is owed by a unit**（FR-002）, and a unit is **never** both declared and excluded（`data-model.md` E-2
+   **R-4**: exactly one disposition per unit; E-5 resolves a contradictory pair to a *finding*, never to file order）.
+2. **`carrier` is what the unit does reach** — the deterministic engine its text actually calls — not the markdown that
+   carries the fact. That engine is located by `grep` when the row is written; this table does not pre-assert it.
+
+Measured against those two rules on 2026-11-05, the eight facts above land on **eight excluded units** — two for the analyze
+pair, one for the self-improvement pair, five for the improve pair — so `no-machine-fact.yaml` carries **8 rows**. The
+remaining **two facts contribute no row**: `review-segment-sequence` and `history-categories` sit on a unit group that keeps
+an in-scope fact (`ARC verdict mapping` in `C-044`; `history-manifest-schema` in `C-045`), so those units stay in scope and
+a `no-machine-fact` row for them would be the one state R-4 forbids. Their removal is recorded **here** and in
+`.specify/memory/features/084.md` § Latest Review — an absent migration, not a silent deletion.
+
+**The counts are readings, not commitments.** 8 facts / 8 units is a 2026-11-05 measurement on the tree at `d23490c3`. The
+implement stage re-runs screen S and the anchor greps before writing the file and records the count it measured; a unit that
+the screen no longer yields is dropped from the file, and a fact whose anchor grep returns a live engine read point moves
+**back** into `C-044` / `C-045` rather than staying excluded.
+
 ## Verification (route (b), per reading)
 
 Every reading above is measured at implement time, not now: the declarations do not exist on this branch. Premises to
@@ -108,4 +150,5 @@ re-measure rather than inherit:
 | fidelity to today's faces | `grep -n "DEFAULT_THRESHOLD\|SEVEN_STATES\|LANE_NAMES\|CLASS_VALUES\|BASIS_VALUES\|FLOW_TYPE_VALUES\|REQUIRED_LEDGER_COLUMNS\|NEUTRAL_CATEGORIES\|PATH_VALUES" scripts/python/*.py` | the file:line readings in `research.md` § R5 are from this branch at `171c2ff8`; re-read before editing, they move |
 | residual literals (b) | `python3 scripts/python/doc-consistency-check.py --action verify --faces duplicate --spec-dir .specify/specs/084-harness-triple-structure` | runs today (measured: duplicate pass, zero findings) and reuses `duplicate-fact`; it reads `--spec-dir` formal files, so the carriers it can judge are the spec's, not the whole repo — the whole-repo reading is the checker's own `verify` action |
 | zero new failures (e) | `bash scripts/bash/run-tests.sh --names-out <file> -q` then an id-level difference against the implement-start baseline | the runner resolves `python3` (measured); the baseline is taken at implement start, not inherited from this plan |
+| the excluded facts still have no engine read point | the anchor `grep` in each row of § Facts outside the roster, plus `grep -rln "Bootstrap\|Operationalize\|Optimize" --include=*.py --include=*.sh scripts/ skills/` | today's readings are in that table's anchor column (all zero hits); the exclusion file may be written only after a re-run, and a hit moves that row back into `C-044` / `C-045` instead of being excluded |
 | the 081 acceptance files are untouched | `git diff --stat 171c2ff8 -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` | empty output is the pass criterion; collected counts today are 40 and 37 |
