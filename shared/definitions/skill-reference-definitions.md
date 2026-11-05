@@ -1,30 +1,10 @@
 # Skill Reference Definitions
 
-**Single source of truth** for **how a framework entry names a Skill**. Every meta-skill
-that takes "a skill" as its target — `run-skills` (run it), `create-skills` (name a new
-one), `improve-skills` (edit it), `merge-skills` (merge from/to), `coaching-skills`
-(coach it) — normalizes its input by this file before resolving.
+**Single source of truth** (唯一真源) for **how a framework entry names a Skill**; `run-skills`, `create-skills`, `improve-skills`, `merge-skills` and `coaching-skills` normalize their input by this file before resolving.
 
-**What this file owns** (four fact groups; each has a landing section below):
+**This file owns** four fact groups; each has a landing section below: the closed set of accepted forms (§ Accepted forms); **the normalization order** and the output shape (§ Normalization); **the disambiguation rules** (§ Disambiguation rules); **the failure semantics** (§ Failure semantics).
 
-| # | Fact | Landing section |
-|---|------|-----------------|
-| F-1 | The closed set of accepted forms | § Accepted forms |
-| F-2 | The normalization order and the output shape | § Normalization |
-| F-3 | The disambiguation rules | § Disambiguation rules |
-| F-4 | The failure semantics | § Failure semantics |
-
-**What this file does not own** (reach the owner, never restate it):
-
-| Topic | Owner |
-|-------|-------|
-| Which location wins when a name is resolved | `skills/internal/run-skills/SKILL.md` § 1 (the position ladder) |
-| How the `.specify/` mirror is generated | `scripts/python/sync-mirrors.py` |
-
-**Reference discipline**: consumers MUST reference this file by its **framework-source**
-path and MUST NOT copy the accepted-form list, the normalization order or the failure
-table. The `.specify/` copy is a generated mirror, never the reference target. No other
-location may become a second owner of this grammar.
+**This file does not own** (reach the owner, never restate it): **the position ladder** — which location wins when a name is resolved — → `skills/internal/run-skills/SKILL.md` § 1（the position ladder）; `scripts/python/sync-mirrors.py` owns **mirror generation**.
 
 ## Accepted forms
 
@@ -44,8 +24,9 @@ Every example above MUST have a row with an expected output in the normalization
 ## Normalization
 
 Deterministic and non-interactive: the same input yields the same output, no context state
-is consulted, no network is touched, no question is asked. **The step order is not
-exchangeable** — in particular NP-3 and NP-4 run *before* NP-6.
+is consulted, no network is touched, no question is asked. The steps are written as one
+numbered table so that the order they state is the order that runs. **The step order is
+not exchangeable** — in particular NP-3 and NP-4 run *before* NP-6.
 
 | Step | Action |
 |------|--------|
@@ -148,4 +129,5 @@ unreachable in the cli form". Do not invent a syntax to rescue it.
 | date | change | basis |
 |------|--------|-------|
 | 2026-11-05 | Normalization order rewritten to NP-1…NP-8 (form determination → trim/quote → `skill:` → `@`//` → `SKILL.md`// → channel → hit → output), with NP-3/NP-4 ahead of NP-6 so `@/name`, `skill:/name` and both spellings of a dotted command converge; the three-value output made closed (the prior procedure could express only NAME/PATH); the `cli`-form `@name` ruling added. | 082 `requirements.md` FR-021 / FR-023 / FR-030, clarify decision (1), `research.md` § R10 (probe: 14 rows, 2 outcome classes) |
-| 2026-11-05 | Head ownership declaration completed (four owned fact groups with landing sections; the two not-owned facts with owner paths); consumers' reference target fixed to the framework-source path. | FR-019, FR-022, FR-028 |
+| 2026-11-05 | § Normalization states the step table's order as the order that runs, closing the gap between "not exchangeable" and the table it governs (no rule changed; the table already ran NP-1 → NP-8 with NP-3/NP-4 before NP-6). | FR-021, GR-03 |
+| 2026-11-05 | Head ownership declaration completed (four owned fact groups with landing sections; the two not-owned facts with owner paths); consumers' reference target fixed to the framework-source path; the head now declares itself by the literal `single source of truth`. | FR-019, FR-022, FR-028 |
