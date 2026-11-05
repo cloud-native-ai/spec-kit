@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T034-T038 (part 7 of 10)
+- **part_scope**: T039-T043 (part 8 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,6 +24,7 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
+- **part_checkpoint** (implement part 8/10): `part_scope=T039-T043` — **done**; commit `2a525047` (3 files: the new contract module, the red-first evidence append, the E3 row). T039-T043 all `[X]` in tasks.md, no `[>]` held; 10 unchecked rows remain (T044+, and T053 which is P10), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-8.md`. Targeted-set-v1: new module 8 passed rc 0; `test_glossary_mechanism.py` 12 passed rc 0 (file unmodified, `git diff --stat` empty); parity subset 3 passed / 759 deselected rc 0; red-leg driver 10 PASS / 0 FAIL rc 0. Store byte-identical (`21482f64…`, 161 entries) — the engine write was idempotent. Next part (P9 T044-T047) is driver-dispatched; this run MUST NOT start T044+.
 - **part_checkpoint** (implement part 7/10): `part_scope=T034-T038` — **done**; commit `1d0746d4` (7 files, 741+/5-) + `1d15960f` (heading fix). T034-T038 all `[X]` in tasks.md, no `[>]` held; 15 unchecked rows remain (T039+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-7.md`. Next part (P8 T039-T043) is driver-dispatched; this run MUST NOT start T039+.
 - **part_checkpoint** (implement part 6/10): `part_scope=T029-T033` — **done**; commit `e88cebc2` (12 files, 1272+/8-). T029-T033 all `[X]` in tasks.md, no `[>]` held; 20 unchecked rows remain (T034+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-6.md`. Next part (P7 T034-T038) is driver-dispatched; this run MUST NOT start T034+.
 - **part_checkpoint** (implement part 5/10): `part_scope=T024-T028` — **done**; commit `02fd6db5`. E3 row in `test-evidence/implement-part-5.md`.
@@ -408,6 +409,49 @@ between readings, not a single consistent correction):
 - The `shared` pair is **65 files before and after** T030/T031: 62 pre-existing files + 3 mirrors already present (untracked) from the plan stage. T030 only version-controls the 3 source documents; it does not add 3 new mirror files. The task's `65 → 68` prediction was wrong; the task text is corrected.
 - The operative C-22/C-23 evidence stands: `sync-mirrors.py --check` exit 0 (six `ok` pairs), three `cmp` pairs byte-identical, no MISS/DIFF. Part 6's targeted set: distribution 4 passed; mirror parity 766 passed; migration+constitution 31 passed.
 - Next: P7 T034-T038 (docs link guard, docs page, distribution probe, M-5/M-6).
+
+## Part 8 record（implement T039-T043，2026-11-05）
+
+- **part_scope**: `T039-T043` (part 8 of 10) — **done**
+- **checkpoint**: `part8` — commit `2a525047` (3 files: `tests/contract/test_self_explanatory_glossary.py`,
+  `notes/red-first-evidence.md` § Part 8, `test-evidence/implement-part-8.md`); stage_base `35a2948b`
+- **rows closed**: T039, T040, T041, T042, T043 all `[X]` in `tasks.md`; 10 unchecked rows remain
+  (T044-T052 plus T053), by design. No `[>]` held. T053 (C-34) stays in P10 as the part brief directs.
+- **targeted-set-v1 result** (no second full suite; E2's 26 failed / 7156 passed / 1 skipped stands):
+  - `python3 -m pytest tests/contract/test_self_explanatory_glossary.py -q` → **rc 0, 8 passed**
+    (C-29 entry fields; C-30 no-second-canonical + variants-cell + engine validate; C-32 owner path;
+    C-22/C-24 parametrized over the three documents)
+  - `python3 -m pytest tests/contract/test_glossary_mechanism.py -q` → **rc 0, 12 passed**, file
+    unmodified (`git diff --stat` empty) — the C-31 mechanism guard
+  - `python3 -m pytest tests/contract/test_mirror_parity_suite.py -q -k 'self-explanatory or
+    best-practice-optimization'` → **rc 0, 3 passed / 759 deselected**
+  - `python3 .specify/.tmp/082-part8/red_legs.py` (M-1…M-5 + three controls, copies only) →
+    **rc 0, 10 PASS / 0 FAIL**
+  - **new_failures**: none
+- **E3 pointer**: `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-8.md`;
+  transcript in `notes/red-first-evidence.md` § Part 8 (M-1…M-5 verbatim, the idempotent-write
+  transcript, the closed pair table for R-3 and R-6).
+- **last_verdict**: implement part 8 done — the glossary row is guarded by eight assertions whose
+  redness is observed through five mutation legs rather than asserted (row parsing by engine index,
+  never substring search, because the retired name legitimately lives in the variants cell). T043's
+  write went **through the engine**: `detect-conflict` was run first and reported the term colliding
+  with itself, `--action add` then replaced in place and left the store byte-identical
+  (`21482f64…`, 161 entries, empty `git diff`) — no hand edit, no second row. Two in-passing
+  corrections disclosed (the invented `dirname->dirname` pair id replaced by prefix matching against
+  the engine's own `MIRROR_PAIRS` vocabulary; the M-5 leg's copy roots re-sited so the leg reaches
+  the byte-identity arm). No plan-owned artifact touched (`PLAN-EDIT: none`). No Completion Gate, no
+  Feature status flip, no implement Feedback/Wrap-up, no push.
+- **adjacent finding, recorded not acted on**: `glossary-utils.py --action detect-conflict` does not
+  exclude the existing entry from its own collision sweep (an already-present term reports
+  `same-term-diff-meaning` against itself), while `action_add` does — which is why the write
+  succeeded. Both behaviours are left untouched: no engine edit is in this part's scope and neither
+  produced a defect here. Whether `detect-conflict` should suppress the self-collision is the engine
+  owner's decision.
+- **next_step**: driver dispatches implement part 9 (P9 `T044-T047`: the status-persistence row C-33,
+  the unchanged-mechanism-suite verification, the `/speckit.improve` not-wired check, and the
+  name-consistency final sweep). This run MUST NOT start T044+.
+- **stage_commits** (append): … → 1d0746d4 (implement part 7) → 1d15960f (part 7 evidence heading fix)
+  → **2a525047 (implement part 8)**
 
 ## Part 7 record（implement T034-T038，2026-11-05）
 
