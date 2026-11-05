@@ -82,7 +82,7 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
 - **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
 - **last_verdict**: implement part 3 done (`2161ac40`) — US1 surface complete: template principle (part 2), generator mandate entry (T013), both mirrors byte-identical (T014), live constitution XIX with MINOR bump 1.15.0→1.16.0 and a Sync Impact Report naming this amendment's principle (T017), carrier watchlist + three counts raised together 18/19/11 (T016). US1 subset 12 passed rc 0; carrier 19 passed rc 0; both mutation legs M-1/M-2 PASS with anti-vacuity companions and a sha256 unchanged-repository proof (T018). Five collateral guards pinned values this landing moved and were repaired in passing (x13/x15/x18/x5/x6 of `test_fast_fail_discipline.py`), each disclosed with its reason; none weakened, each keeps its own subject. No plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified). No Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up, no push.
 - **next_step**: driver adjudicates the part-4 held-open C-18 reading, then dispatches implement part 5 (P5 `T024-T028`: live reconcile, symlink check, mirror sync, M-3/M-4 mutation legs). Part 4 stopped at the part boundary by design; C-15's green (`test_c1_live_instructions_carry_all_template_sections`) and C-21's red/green pairing both close at T024.
-- **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3) → part 4 (T019-T023; hash recorded in the part-4 checkpoint commit line below)
+- **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3) → 567834e2 (implement part 4)
 
 <!-- The first "gates" key above is a preserved historical section; the canonical list follows. -->
 
@@ -252,7 +252,7 @@ between readings, not a single consistent correction):
 ## Implement part 3 checkpoint
 
 - **part_scope**: T013-T018 — done; T013-T018 all `[X]` in tasks.md; no `[>]` held; 35 unchecked rows remain (T019-T053), untouched by this part.
-- **commit**: `2161ac40` (9 files, 409+/26-).
+- **commit**: `567834e2` (8 files, 475+/10-).
 - **artifacts**:
   - `skills/internal/manage-constitution/SKILL.md` + `.specify/skills/internal/manage-constitution/SKILL.md` — MUST-include list 10 → 11 (T013/T014)
   - `.specify/memory/constitution.md` — Principle XIX, `**Version**:` 1.15.0 → 1.16.0, Sync Impact Report prepended (T017)
