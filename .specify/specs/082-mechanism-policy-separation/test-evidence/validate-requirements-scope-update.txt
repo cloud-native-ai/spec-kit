@@ -1,0 +1,13 @@
+# Validator output — 082 requirements scope update (verbatim)
+# captured: 2026-11-05T04:18:04Z
+file: .specify/specs/082-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 292 lines, 39 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+rc=0

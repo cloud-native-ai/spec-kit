@@ -1,7 +1,8 @@
-# Specification Quality Checklist: 机制/策略分离（Mechanism–Policy Separation）
+# Specification Quality Checklist: 元技能治理：机制/策略分离与技能引用归一化（Meta-Skill Governance: Mechanism–Policy Separation & Skill Reference Grammar）
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-11-05
+**Updated**: 2026-11-05（scope update：并入「技能引用语法与归一化」第二能力；新增判定项见 § Scope Update 2026-11-05）
 **Feature**: `.specify/specs/082-mechanism-policy-separation/requirements.md`
 
 ## Content Quality
@@ -30,7 +31,44 @@
 - [x] Feature meets measurable outcomes defined in Success Criteria (with the gap recorded under Notes — SC-003)
 - [x] No implementation details leak into specification
 
+## Scope Update 2026-11-05 — 第二能力（技能引用语法与归一化）
+
+> 判定对象是本轮 scope update 的增量部分（US5 / FR-019…FR-030 / SC-006…SC-009 / A11 / C9 / C10 / STR-004 / STR-005）。上一节的既有判定项对 082a 仍然成立，本节不重复。
+
+### 新增可测性
+
+- [x] US5 至少 3 个 Given/When/Then，且分别覆盖 bare name、引用形式归一化、`/speckit.*` 命令面消歧、失败语义四类（实测：4 个场景，四类各覆盖一次）
+- [x] 每条新增 FR 可判定（判据不落在「看得出来」上）：FR-019…FR-030 每条都指向一个可读的产物位置或一条可跑的断言
+- [x] 每条新增 SC 带 `**Path**:` 标注且已给 Measurement Source（SC-006 final / SC-007 final / SC-008 final / SC-009 final，四条均有 Source 行）
+- [x] 新增 SC 的分母可机械取得（SC-006 ≥ 12 行 fixture；SC-007 五份接线 + 全仓扫描；SC-008 ≥ 1 正例 + ≥ 1 负例；SC-009 四类各一条），不存在「基数待定」的缺口
+
+### 一源与封闭清单
+
+- [x] 新 owner 文档唯一，且本规格**不复制**其文法（§ Functional Requirements F 组的引导段明写「只要求它拥有什么，不复述其表行」）
+- [x] 五个消费方的接线义务写成「只声明自己的参数 + 路径引用」，MUST NOT 复制清单/顺序/失败表（FR-026）
+- [x] SC-007 是包含性声明（「除 owner 以外零份」），已按 `closed-set-claims` 五要件在 Source 行写出：基线参照物、比较单元、允许差异集来源（owner / 生成镜像 / 既有测试字面量三类）、补集断言与结构不变量、未定义聚合词清零
+- [x] Shared Strings 只登记被逐字消费的字面量；`/`、`@`、`SKILL.md`、`/speckit.*` 不登记（C10 给出理由）
+
+### 边界与不自相矛盾
+
+- [x] 两个能力的 owner 不互复制（C9），且与既有 owner 的边界写明（机制/策略 vs 引用文法 vs 位置阶梯三方各有所属）
+- [x] 位置阶梯的唯一 owner 仍是 `skills/internal/run-skills/SKILL.md` § 1（FR-022 明写路径引用、禁止内联/新增位置）
+- [x] 「零新增」与既有边界一致：零新命令、零新门禁脚本、零新目录根、零新环境变量（FR-029 对 C4 / C8 / FR-016 的引用而非重述）
+- [x] 对并发实现的处置写清「起点 + 核验补齐 + 不推倒重写」（A11 / FR-027），且 `.specify/` 镜像的生成物身份写清（FR-028）
+- [x] `Related Feature` 的 Feature ID 未变，名称的**落地改名**明确标为 clarify 的义务，本阶段不改注册表（避免「已完成」的假象）
+
+### 已知缺口（如实记录，不掩盖）
+
+- [ ] **SC-006…SC-009 的复算载体此刻不存在**：全仓 `tests/` 对 `skill-reference` 的检索零命中，即该能力目前没有任何机器断言。四条的 `**Path**: final` 是**要求**（该状态须在实现完成后成立），不是当前读数。这与 082a 的 SC-001/SC-002/SC-005 属同一类"可测但载体待落"，已在 § Notes 记为本阶段的真实缺口。
+- [ ] **owner 文档（起点实现）自身的归一化顺序与其接受形式表互相矛盾**：步骤 2 把任何含 `/` 的值判为路径，于是以 `/` 开头的斜杠引用永远走不到步骤 3 的剥前缀，`@/name` 无规则可归一，且步骤 5 的产物不是 FR-030 要求的三值封闭判定。逐条证据见 `test-evidence/requirements-scope-update-concurrent-impl-readout.txt` § 3。本规格以 FR-021 / FR-030 / SC-006 把这一矛盾变成可选性要求；**它没有被本阶段修复**（改造未提交的用户工作 + 在多种读法间选择，越出本阶段范围），故本条判为**未闭合**，随回传的 ANOMALY 行上送。
+- [ ] **五处消费者引用的是镜像路径、本规格引用的是源路径**：两者内容今日逐字节相同（`cmp` 一致、`sync-mirrors.py --check` rc=0），但「消费者该写哪一种」没有 owner 裁决。本阶段不改任何一侧，作为 clarify 的裁决点登记（readout § 5）。
+
 ## Notes
+
+- **本次 scope update 的实测读数（2026-11-05，取自实跑而非手写）**：`validate-requirements.py` → `status: ok`、`scanned: 292 lines, 39 definition rows, 5 shared strings`、`0 error(s), 0 warning(s)`、rc=0（逐字存于 `test-evidence/validate-requirements-scope-update.txt`）；`pre-analyze-check.py --stage requirements` → `decision=pass`、`errors=0`、`advisories=52`、`fr=30`、`sc=9`；`decomposition-check.py --mode plan` → `decision=proceed`、`fr_count=30`、`fr_ceiling=30`（**零余量**）。四处逐字输出同存于 `test-evidence/requirements-scope-update-gates.txt`。本清单**不手抄 FR / SC 计数**：以该次运行的 `fr` / `sc` 字段为准。
+- **零余量触发的结构变化（已落地，非计划）**：30 = 30，故不再新增第二个不切片的计划；`plan.md` 追加了 § Scope Snapshot 与 § Slice 082b 两节把第二个能力登记为切片 `082b-skill-reference-grammar`，`feature-ref.md` 追加了 § Slices 表。**082a 的既有计划内容（D1–D10、T-001–T-003、EP-001…EP-006、Measurement Plan）未被改动**。
+- **本次修掉的两处计数漂移（disclosed，纠正而非改判据）**：FR/SC 总数变化后，`pre-analyze-check` 以 exit 2 报 `count-claim`（`plan.md` 第 16 行与 `feature-ref.md` 第 16 行把旧总数写成了当前事实）。两处改成指向 validator / decomposition 的实测输出，而不是写入一个新数字——按 `token-efficiency` 与 one-source-of-truth 的口径，规格产物的计数不应有第二个手写所有者。
+- **上一轮（082a 建立时）的确定性 checker 记录（历史，未改）**：
 
 - **Deterministic checker（所有计数的唯一权威）**：`python3 scripts/python/validate-requirements.py .specify/specs/082-mechanism-policy-separation/requirements.md` → `status: ok`；`id-contiguous` / `doc-order` / `ref-resolvable` / `marker-count` / `dup-id` / `path-marker` 全 pass；`scanned: 211 lines, 23 definition rows, 3 shared strings`；`0 error(s), 0 warning(s)`；exit 0。逐字输出存于 `test-evidence/validate-requirements.txt`，本清单**不手抄任何计数**：23 个定义行 = 18 条 FR + 10 条 SC 中的定义行，拆分口径以该次运行的分项 pass 计数为准。
 - **本 pass 修掉的两类问题（disclosed，非掩盖）**：① validator 的 4 条 `ref-resolvable`（2 条 error + 2 条 warning）——FR-001 / FR-017 的 `[[STR-001]]` / `[[STR-003]]` 被反引号包裹，落在代码 span 内故未被识别为引用；去掉外侧反引号后双向检查归零。② **同一判据的两处同文本枚举**：FR-001 原句把「机制侧=逻辑/算法/步骤/判定规则/可复用方法、策略侧=配置/输入/输出/运行环境绑定/目标目录/交付物落点」写进正文，而 § Terminology 有逐字相同的表；§ Assumptions A2 与 § Constraints C6 已明写后者是 dated record、owner 定稿后本规格不再更新，两处同步即为 FR-015 所禁的「复制 owner 内容」。已把枚举从 FR-001 移出、改由其判据段（§ Terminology 的「换掉运行环境要不要改」）与 FR-002(a) 派生，记录于 § Assumptions A10。此为纠正而非改判据：判据字句、Shared Strings 三行的值与 `Consumed by` 单元格、`Related Feature` 均未改动。

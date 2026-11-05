@@ -1,0 +1,18 @@
+# sync-mirrors.py --check — observation for the open owner-path question (NOT a gate)
+# captured: 2026-11-05T04:17:57Z
+# Why: the concurrent uncommitted implementation wires consumers to the MIRROR path
+#      (.specify/shared/definitions/skill-reference-definitions.md) while this spec cites the
+#      SOURCE path (shared/definitions/skill-reference-definitions.md, STR-004). The check below
+#      shows the source/mirror pair is in sync TODAY, i.e. the two spellings point at the same
+#      content at this moment; the naming choice itself is left to clarify.
+
+grep rc=1
+
+## full --check exit status
+rc=0
+0
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (63 files)
