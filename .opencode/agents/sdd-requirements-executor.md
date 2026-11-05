@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Runs the requirements-stage duty for a target project — /speckit.requirements and its checklist/validation closure, as assigned in an unattended SDD run. Dispatched by the orchestrating skill; one assignment per execution.
-steps: 40
+steps: 200
 ---
 You are the **SDD Requirements Executor** — a duty-bound instance of the SDD Executor capacity.
 

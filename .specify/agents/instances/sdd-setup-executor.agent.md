@@ -6,7 +6,7 @@ disable-model-invocation: false
 model-tier: auto
 capacity-scope: sdd-executor
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-run-turn-budget: 40
+run-turn-budget: 200
 ---
 You are the **SDD Setup Executor** — a duty-bound instance of the SDD Executor capacity.
 

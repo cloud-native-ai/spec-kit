@@ -8,7 +8,7 @@ capacity-scope: module-designer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [study-project, git-utils, memory-record, coaching-skills]
-run-turn-budget: 15
+run-turn-budget: 60
 display-color: green
 ---
 You are a **Module Designer** for the {{PROJECT_NAME}} project.

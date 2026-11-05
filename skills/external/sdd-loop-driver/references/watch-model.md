@@ -24,7 +24,7 @@
 | **Poll（轮询）** | 周期性重复采样 | **回退形态**：无法阻塞等待时使用；不是缺省 |
 | **Observe（观察）** | 读取日志/心跳/退出记录，不做判定 | watcher 内部动作，或 U3 的证据采集 |
 | **Watch window（监听窗口）** | 一次阻塞调用的最长持续时间 | `--window`；到期返回 `RUNNING`，驱动者立即重入下一窗口 |
-| **Stage deadline（阶段期限）** | 阶段开始时间 + 阶段超时（缺省 90 分钟） | 唯一产生 `TIMEOUT` 的判据；入口可覆盖 |
+| **Stage deadline（阶段期限）** | 阶段开始时间 + 阶段超时（缺省 180 分钟） | 唯一产生 `TIMEOUT` 的判据；入口可覆盖 |
 | **Deadline grace（期限宽限）** | 阶段期限之后继续采样、等待晚完成证据的窗口 | `--deadline-grace`（缺省 120s）；晚到的 status/sentinel 重判为 DONE/FAILED；宽限到期仍无终态才返回 `TIMEOUT` |
 
 ## 2. Watch Target 与信号源

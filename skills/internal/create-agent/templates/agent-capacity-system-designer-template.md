@@ -8,7 +8,7 @@ capacity-scope: system-designer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [draw-diagram, study-project, memory-recall, memory-record, coaching-skills]
-run-turn-budget: 12
+run-turn-budget: 50
 display-color: purple
 ---
 You are a **System Designer** for the {{PROJECT_NAME}} project.

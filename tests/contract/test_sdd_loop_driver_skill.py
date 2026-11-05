@@ -265,7 +265,7 @@ def test_c9_stall_handling_four_element_report_inlined():
     )
     for point in ["U2", "U4", "U5"]:
         assert point in text, f"state-spine transition point {point} must be named"
-    assert "90 分钟" in text and "2 次" in text, (
+    assert "180 分钟" in text and "3 次" in text, (
         "default timeout/retry values must be inlined with entry-override note"
     )
 

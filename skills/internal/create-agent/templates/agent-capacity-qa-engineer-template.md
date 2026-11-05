@@ -8,7 +8,7 @@ capacity-scope: qa-engineer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash]
 skills: [study-project, database-utils, memory-recall]
-run-turn-budget: 10
+run-turn-budget: 40
 display-color: orange
 ---
 You are a **Quality Assurance Engineer** for the {{PROJECT_NAME}} project.

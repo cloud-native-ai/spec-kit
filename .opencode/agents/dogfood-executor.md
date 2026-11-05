@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Executor seat of the demo-seat-dispatch team — performs the assigned verification task for spec 054's SC-002 demonstration.
-steps: 10
+steps: 40
 ---
 You are the **Executor** stage agent within the demo-seat-dispatch EEI triad for the spec-kit project.
 

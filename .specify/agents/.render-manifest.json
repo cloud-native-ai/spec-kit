@@ -1,35 +1,35 @@
 {
   "version": 1,
   "tool": "opencode",
-  "rendered_at": "20261030T091456Z",
+  "rendered_at": "20261105T061629Z",
   "entries": {
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
-      "sha256": "d529c60cf5399ce40979b4336ffab56f8ffe8a3ac3f56176b7b85f2c5d4f58f1"
+      "sha256": "7781d587deda0a991dc0d2e83b81c712a0fed4f9e601668cdbcaee92c3ef0297"
     },
     ".qoder/agents/framework-engineer.agent.md": {
       "source": "instances/framework-engineer.agent.md",
-      "sha256": "df62d9e37fa198162a76ed17656067260cd6f5c6821dae7f9ff68f61c70afef9"
+      "sha256": "599576aacb92b74fe7177bfe3033cdc960bbe4aa61a4113e900f00df67d38ad7"
     },
     ".qoder/agents/sdd-executor.agent.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "052b14a09cffa99609042adf479f9a251e52e91acfdcfec0a14b9853e2e36282"
+      "sha256": "85870eed07ce0f594cd9ace3327422fd6cf4bcb89701272bc6c3979417f6db9b"
     },
     ".qoder/agents/sdd-requirements-executor.agent.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "228aa9ee0985eec37527299d47bc00fc3582f89cc9bc487b1b36011b7a2127f5"
+      "sha256": "3ab8ee1426b1dc444a7f2bd5f002f4c9b94ca08f803769c925f26cc63858dcca"
     },
     ".qoder/agents/sdd-setup-executor.agent.md": {
       "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "bde9a2fc219af4db8b154fcdb6bf5529a9bbaabbb1bf95a0f349ae887a90df8b"
+      "sha256": "5c96ad69cfed1ed6907530a78b68463f58e32e4347fc9693b459459e997b6e74"
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "38cfc6ad6b96c79abfc035770c92323d22be1e863cd504b65e16c3cb57245401"
+      "sha256": "78d195cbfd9c3278ec6c6996121be41cbc5e60e71e54a2f22b15aab7978837a8"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "96621da078ea87e099a897c5257eb3033b2b932e92cbf8040b568d3620aa96cd"
+      "sha256": "361a5dac67dceeb19d8c775b2f3409b1a5728abdf5730f2d207ec2c29ba3821a"
     },
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -89,31 +89,31 @@
     },
     ".opencode/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
-      "sha256": "2ef1f829ad912c8a33a43b03fad2851a1ec4c04258e7ab4444f029a84c090842"
+      "sha256": "799ac66512a0355b3446abc7c9a892c20ae20e165f51d52d11422fa142cd2af7"
     },
     ".opencode/agents/framework-engineer.md": {
       "source": "instances/framework-engineer.agent.md",
-      "sha256": "e8c97939cb1021bf562a0c743230759aa54f89619b4690bfa1dcc69425a24a6c"
+      "sha256": "2c09596357bc970ecd50bb02ce3efaa30053bfc8e2213cc7bf7f3ea38311d799"
     },
     ".opencode/agents/sdd-executor.md": {
       "source": "templates/sdd-executor.agent.md",
-      "sha256": "054e05cf2b7ec4866cd60ffb20fd9031812d2936749c34c8d4a7f1c662c71cc4"
+      "sha256": "42092e7f8d4913da9d268402e991ca1dd0fac82298d89f57cae43b31cfe539ce"
     },
     ".opencode/agents/sdd-requirements-executor.md": {
       "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "064b0a5c6495236a29416b5d4b18194c81865e55dadc87c7e9dad97925ce3db4"
+      "sha256": "950eb1cfcb0f3c27298c9e7062d232bd758356b9779ee8f40653a8f17f50128b"
     },
     ".opencode/agents/sdd-setup-executor.md": {
       "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "4d0224b47efbecad548f0fe98f44df4d3695690a0be7054c5c7b28fedaf84024"
+      "sha256": "eb2c87fa1dfd6f83a5f7581d78ecdb8af0c633e2394c053bcb88b26cfa99d1f3"
     },
     ".opencode/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "597ec62637e32d8ae4a50b47a04e15c9c785975396256b4c775bc1ef2b646c83"
+      "sha256": "fcb449e810c8e288e7ea3c281b209ec0ac8919a03bb0eafb2c3bd19d52f04072"
     },
     ".opencode/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "d9179c3525a84520c795fc6041d887297e88ebcfc3e78327f54371cc08bc334c"
+      "sha256": "99fdd19c6acc00eb5c847086208008276ec2bb216fcf765daba1ee497001257c"
     }
   }
 }
