@@ -82,7 +82,7 @@ Single project, framework-source layout: `shared/`, `scripts/`, `templates/`, `s
 
 ---
 
-## Phase 3: User Story 1 - 一条事实只有一个机器读得到的定义点 (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - 一条事实只有一个机器读得到的定义点 (Priority: P1)
 
 **Goal**: the original pain — a value that today lives in an engine constant **and** in prose — ends up in exactly one declaration, with the engine reading it and the prose pointing at it. One fact, end to end, is the whole story; the remaining batch-1 facts follow it in US2 because they are closed sets read by gates.
 
