@@ -1,0 +1,110 @@
+# clarify 裁定机械读数（2026-11-05，/speckit.clarify Mode A，零提问）
+
+所有条目为本轮实际执行的命令与其原始输出；未执行过的命令不出现在本文件里。
+
+## A1 类别解析（execution / source=declaration）
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"
+unit_id: spec:084-harness-triple-structure
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0
+
+## A3 两份既有名册的实测规模（台账 80 行，不是原文的 79）
+$ awk 'NR>=127 && NR<224' shared/definitions/flow-class-definitions.md | grep -cE '^\| (/speckit\.|skill:)'   # § 逐流程台账 自身节界内的单元行
+80
+$ grep -cE '^\| (/speckit\.|skill:)' shared/definitions/flow-class-definitions.md   # 全文含 § 类中立清单 的 5 行
+85
+$ awk 'NR>=224 && NR<238' shared/definitions/flow-class-definitions.md | grep -cE '^\| (skill:|/speckit)'   # 类中立清单内技能行（不在台账内）
+5
+$ ls templates/commands/*.md | wc -l
+27
+$ ls skills/external/*/SKILL.md skills/internal/*/SKILL.md | wc -l
+53
+$ ls shared/workflow/*.md | wc -l   # 候选屏幕 S 的第三类载体，台账不覆盖类别
+19
+# 对账：27 + 53 = 80 = 台账单元行；85 - 5（类中立清单）= 80。原文「79 行台账」与三者均不符，故订正为 80。
+
+## A4 镜像映射已存在（无需新机制）
+$ grep -n "\"shared\", \".specify/shared\"" scripts/python/sync-mirrors.py
+88:    ("shared", ".specify/shared", False, set()),
+$ grep -rn "shared/declarations" shared/ templates/   # 零命中 → 该目录尚无 owner
+(above: no output = zero hits)
+
+## A5 既有子集解析先例与依赖面（无 YAML 库）
+$ grep -n "def parse_yaml_subset" scripts/python/execution-config.py
+136:def parse_yaml_subset(path: Path) -> Dict[str, Any]:
+$ grep -n "def parse_gate" scripts/python/gate-check.py
+48:def parse_gate(text: str) -> dict[str, list[str]]:
+$ sed -n "/^dependencies/,/^]/p" pyproject.toml
+dependencies = [
+    "typer",
+    "rich",
+    "httpx[socks]",
+    "platformdirs",
+    "readchar",
+    "truststore>=0.10.4; python_version >= '3.10'",
+]
+
+## A7 七态枚举三面重复（必须迁）与五维表零判决型消费者（不迁）
+$ grep -n "七态 evidenceState 不可重定义" shared/guidelines/better-harness.md
+50:2. **七态 evidenceState 不可重定义**：`Present / Wired / Exercised / Outcome-supported / Missing / Unobserved / Not applicable`（定义见 `.specify/skills/internal/collect-evidence/references/evidence-discipline.md`）。
+$ grep -n "SEVEN_STATES" scripts/python/evidence-utils.py
+23:SEVEN_STATES = (
+$ ls skills/internal/collect-evidence/references/
+evidence-contract.md
+evidence-discipline.md
+$ grep -rn "Change Validation|五维|five-dimension" scripts/ skills/*/*/scripts/   # 零命中
+(above: no output = zero hits)
+
+## A8(a) Path 取值域的三处实体（机器消费 ∧ 跨面）
+$ grep -n "PATH_VALUES" scripts/python/validate-requirements.py
+98:PATH_VALUES = ("final", "supporting")
+346:        if value not in PATH_VALUES:
+$ grep -n "outside the closed set final / supporting\|if value not in (\"final\", \"supporting\")" scripts/python/closure-acceptance-check.py
+505:        if value not in ("final", "supporting"):
+$ grep -n "Input contract — the .Path. marker" shared/workflow/acceptance-hardening.md
+242:### Input contract — the `Path` marker
+$ grep -rn "PATH_VALUES" tests/   # 零命中 → 既有测试不钉该常量
+(above: no output = zero hits)
+
+## A8(b) 六个检查项标签集被一条 081 验收测试钉住（迁出即改写它）
+$ grep -n "pinned label set" scripts/python/validate-requirements.py
+8:Checks (this enumeration IS the pinned label set — the house pin extracts it from this
+$ grep -n "test_c01_c02_docstring_enumerates_exactly_the_pinned_labels" tests/contract/test_requirements_checker.py
+105:def test_c01_c02_docstring_enumerates_exactly_the_pinned_labels():
+$ sed -n "105,108p" tests/contract/test_requirements_checker.py
+def test_c01_c02_docstring_enumerates_exactly_the_pinned_labels():
+    mod = _load()
+    extracted = set(re.findall(r"^  ([A-Za-z][A-Za-z-]*)\s{2,}", mod.__doc__ or "", re.M))
+    assert extracted == REQUIREMENTS_CHECKS
+$ grep -n "path-marker. is Feature 081" tests/contract/test_checker_form.py
+304:    One deliberate exemption: `path-marker` is Feature 081's sixth label
+
+## Feature 绑定：四个候选在注册表中的存在与状态
+$ grep -nE "^\| (053|055|069|081) " .specify/memory/features.md | cut -c1-40
+62:| 053 | 机器可判定的制品命题(Machine-Decidable 
+63:| 055 | 冲突无关的 Feedback/Memory 存储(Conf
+78:| 069 | 执行/表达二元分类与文档型 SDD 同构 | 引入贯穿全部
+89:| 081 | 更严格的验收与产物审查（Stricter Acceptan
+
+## 注册表计数（header 与行同趟重算）
+$ grep -cE "^\| [0-9]{3} \|" .specify/memory/features.md
+77
+$ sed -n "4p" .specify/memory/features.md
+**Total Features**: 77
+$ ls .specify/memory/features/084.md
+.specify/memory/features/084.md
+
+## 附：TB-05 (a) 「模块 stem」子句误用于 markdown 的退化读数（旁证，不记账）
+
+本阶段 `changed_paths` 全为文档，按 TB-06 记 `not-run-docs-only`，不产生 `selected_paths[]`。
+下列读数只用于说明「为什么不把该子句套用到 markdown 上」，不作为定向集执行、不消耗预算槽位。
+
+$ CAND=$(find tests/unit tests/contract tests/integration tests/scenarios -type f -name 'test_*.py' | LC_ALL=C sort)
+$ printf '%s\n' "$CAND" | xargs -r grep -lF -e 'requirements' | wc -l   # requirements.md 的 stem
+118
+$ # 结论：stem `requirements` 命中的文件数远大于任何合理的定向集；文档改动用 TB-06 的 not-run-docs-only 分支。
