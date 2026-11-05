@@ -24,8 +24,8 @@ Goal anchor (Constitution Principle XIII — Better-Harness): consolidating two 
 
 Resolve two skills and one relationship before editing:
 
-- **Source skill** (merged *from*, then decommissioned): identify by `skill_id`, frontmatter `name`, canonical path, or directory. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
-- **Target skill** (merged *into*, survives and grows): identify the same way. It MUST already exist; if the user names a non-existent target, this is not a merge — redirect to `create-skills`.
+- **Source skill** (merged *from*, then decommissioned): identify by `skill_id`, frontmatter `name`, canonical path, directory, or a reference form (`/name`, `@name`, `skill:name`) normalized per `.specify/shared/definitions/skill-reference-definitions.md`. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
+- **Target skill** (merged *into*, survives and grows): identify the same way (reference forms included). It MUST already exist; if the user names a non-existent target, this is not a merge — redirect to `create-skills`.
 - **Merge intent**: full absorption (source disappears) is the default. If the user wants the source to keep existing, that is not this skill — route to `improve-skills` (borrow one capability) instead.
 
 If either skill cannot be resolved uniquely, or source and target resolve to the same skill, ask **one** targeted clarification before touching any file. Never guess the direction — merging A→B and B→A produce opposite decommission targets.
@@ -98,6 +98,8 @@ Make the target's metadata reflect its grown scope, and commit what the merge pr
 ### 7. Decommission the source as an independent skill
 
 A merge that leaves the source wired still has two skills competing for the same triggers. Remove the source's **independent existence**, scoped by the Phase-1 classification:
+
+**Both layers before the decommission**: the actions below delete and rewrite wiring, so read the policy items this decommission depends on (which source, which landing point the retired name moves to), judge each one, and stop on any that is unstaked — the owner's read-judge-stop check, § Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`. Run it **before** the first destructive action: a missing policy stops with every file still in place and no half-decommissioned source. **Policy missing** (the user never said which landing point the retired name takes) and **environment error** (named but unreadable) are different wordings with different follow-ups — never report one as the other.
 
 - **Form carriers**: once Phase 5 passes, remove any raw source files that were staged into the target (prefer `git rm` — recoverable via history).
 - **Wiring & registration cleanup** (host-specific — **delegate, do not hardcode paths**): symlinks in agent load directories, registry rows, database records, and topology docs that made the source independently discoverable. In an environment with an agent-management skill/scripts (e.g. a `manage-agents`/`profiles-agents` front door), delegate this cleanup to it rather than reinventing per-agent paths.

@@ -10,8 +10,8 @@ unrefreshed form has no call sites at all):
 * **C-1 zero new commands** — ``templates/commands/`` holds exactly the frozen
   27 command templates (count *and* name set), and no command file exists below
   a subdirectory; ``skills/{external,internal}/*/SKILL.md`` holds exactly the
-  frozen 52 skill units (51 at the 069a baseline; 2026-10-30 Feature 078 renames
-  one of them in place, so the count is unchanged).
+  frozen 54 skill units (51 at the 069a baseline; the dated notes above the
+  roster record every sanctioned movement).
 * **C-2 zero project-side storage** — nothing under ``.specify/memory/`` is a
   second classification store (no classification-named file, no ledger-style
   row, no ``flow_class`` assignment).
@@ -124,7 +124,7 @@ FROZEN_COMMANDS = (
     "tools",
 )
 
-# C-1 frozen denominator: 53 skill units, layer-qualified so a layer move or a
+# C-1 frozen denominator: 54 skill units, layer-qualified so a layer move or a
 # rename is a failure rather than a silent re-count.
 #
 # 2026-10-30 (Feature 078): the pre-existing external mental-simulation unit is
@@ -141,6 +141,11 @@ FROZEN_COMMANDS = (
 # document, so the closed wiring surface below needs no entry for it and its
 # `ALLOWED_POST_BASELINE_CHANGES` counterpart has nothing to allow: a new file is
 # not a drifted file, and the 069a hash manifest stays the dated record it is.
+# 2026-11-05 (improve-skills ssh-utils): 53 -> 54 = 16 external + 38 internal. The
+# new unit is `external/ssh-utils`, the SSH transport owner extracted out of
+# `sdd-project-setup` (fixed `-o RemoteCommand=none`, quoting, stdin script push,
+# `su` wrapping, exit-code propagation). It names no engine and no owner document
+# in C-5's closed wiring surface, so only the roster moves.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -157,6 +162,7 @@ FROZEN_SKILLS = (
     "external/sdd-house-keeping",
     "external/sdd-loop-driver",
     "external/sdd-project-setup",
+    "external/ssh-utils",
     "internal/analyze-artifacts",
     "internal/archive-session",
     "internal/clarify-artifact",
@@ -560,8 +566,9 @@ ALLOWED_POST_BASELINE_CHANGES = {
     # legitimately gained their Directory Governance segments; each entry carries
     # the needles its change must contain.
     "skills/external/sdd-project-setup/SKILL.md": {
-        "reason": "2026-10-27 Directory Governance (Hard Requirements 10-11)",
-        "markers": ("目标项目治理优先", "目录创建限于规范落点"),
+        "reason": ("2026-10-27 Directory Governance (Hard Requirements 10-11); "
+                   "2026-11-05 delegates SSH transport to ssh-utils (Hard Requirement 15)"),
+        "markers": ("目标项目治理优先", "目录创建限于规范落点", "ssh-utils", "RemoteCommand=none"),
     },
     "skills/internal/manage-constitution/SKILL.md": {
         "reason": "2026-10-27 Directory Governance MUST-include entry (Principle XVII)",

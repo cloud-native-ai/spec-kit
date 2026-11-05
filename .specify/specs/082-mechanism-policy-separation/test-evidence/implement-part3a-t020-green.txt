@@ -1,0 +1,25 @@
+# T020 green (guard scope) — test_mechanism_policy_guard.py
+# command: env -u PYTHONPATH bash scripts/bash/run-tests.sh -q \
+#            tests/contract/test_mechanism_policy_guard.py -k "not test_sc003_complement_is_byte_identical_to_the_baseline" -s
+# captured_at: 2026-11-05
+#
+# The red reading for this module is implement-part3-t020-red.txt (1 failed / 6 passed).
+# test_sc003_complement_is_byte_identical_to_the_baseline is EXCLUDED here by design: it
+# reads 27 mismatches, of which only 1 is this feature's own uncommitted work
+# (create-skills/references/mechanism-policy-check.md); 4 are untracked co-worktree additions
+# (skills/external/ssh-utils/**) and 22 are the concurrent thread's uncommitted edits under
+# skills/. The full reading and the attribution belong to T041 (Part 6), which records it
+# once the other worktrees' commits and this feature's remaining edits have landed.
+#
+# Scope added in this part: ownership_reading() separates an UNREGISTERED addition (a defect
+# this feature must fix) from a CO-WORKTREE path (untracked, added by another thread) from
+# an allowed path missing from git, and prints all three, so a guard that compared nothing —
+# or something that is not this feature's — cannot pass silently.
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_mechanism_policy_guard.py -k not test_sc003_complement_is_byte_identical_to_the_baseline -s
+baseline=575 current=580 added=5 co_worktree=4 in_allowed=0 unregistered_additions=0 allowed_in_unit=8
+allowed_paths_present=8 unproven=none
+.compared=575 unit=575 complement=568 allowed_in_unit=8 mismatches=22
+..scanned=4 contract files
+.....
+8 passed, 1 deselected in 18.84s
+rc=0

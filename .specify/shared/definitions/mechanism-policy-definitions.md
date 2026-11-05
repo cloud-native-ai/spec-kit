@@ -18,13 +18,13 @@
 
 | 主题 | 所有者 |
 |------|--------|
-| 一个目录能否存在、叫什么、在哪登记 | `.specify/shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 3 登记义务） |
-| 「机制 vs 问题」的修复方向 | `.specify/shared/definitions/dogfooding-definitions.md` § 1 |
+| 一个目录能否存在、叫什么、在哪登记 | `shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 3 登记义务） |
+| 「机制 vs 问题」的修复方向 | `shared/definitions/dogfooding-definitions.md` § 1 |
 | 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | `skills/external/create-skills/SKILL.md` § 2 |
-| 运行期根的登记与生命周期 | `.specify/shared/guidelines/directory-governance.md` § 5 |
-| 引用纪律本身（什么算一次合法重复） | `.specify/shared/guidelines/one-source-of-truth.md` |
-| 双语表述的方向、形态与覆盖面 | bilingual-expression 指南（见 § Boundaries 的同一行） |
-| 临时目录的受制裁根与清理 | `.specify/shared/guidelines/temp-directory-discipline.md` |
+| 运行期根的登记与生命周期 | `shared/guidelines/directory-governance.md` § 5 |
+| 引用纪律本身（什么算一次合法重复） | 只源真指南（见 § Boundaries 的同一行） |
+| 双语的方向、形态与覆盖面 | 双语表述指南（见 § Boundaries 的同一行） |
+| 临时目录的受制裁根与清理 | 临时目录纪律指南（见 § Boundaries 的同一行） |
 
 > 本节是 C2 的机械形态：`dogfooding-definitions.md` § 1 与本文件**共享「机制」一词、事实不同**——那里判「一次缺陷该修实例还是修机制」，这里判「一段内容该住机制侧还是运行环境侧」。本文件不重述对方定义。
 
@@ -136,9 +136,9 @@
 - **机制 → 技能资产**：技能定义本体，及其 `references/`、`scripts/` 的逻辑、`assets/` 中随技能分发的模板。
 - **策略 → 运行环境**：用户指定的目录、当前工作目录、`.specify/` 侧、输入来源、输出落点与形态、运行模式绑定。
 
-**与目录治理的关系是引用，不是复制**：一个目录能否存在、叫什么、在哪登记，归 `.specify/shared/guidelines/directory-governance.md`；本文件只回答「内容住哪一层」。因此本文件**不含**目录命名正则、注册义务句或运行期根清单，也 MUST NOT 新增环境变量、配置键或目录根——这些是本文件的边界，不是它的省略。
+**与目录治理的关系是引用，不是复制**：一个目录能否存在、叫什么、在哪登记，归 `shared/guidelines/directory-governance.md`；本文件只回答「内容住哪一层」。因此本文件**不含**目录命名正则、注册义务句或运行期根清单，也 MUST NOT 新增环境变量、配置键或目录根——这些是本文件的边界，不是它的省略。
 
-**边界情形：把状态写到 `.specify/state/`**——**动作的规则**属机制（产生状态的那一步与其格式），**落根**属策略，且该根由 `.specify/shared/guidelines/directory-governance.md` § 5 登记。本文件 MUST NOT 成为第二个根的声明处。
+**边界情形：把状态写到 `.specify/state/`**——**动作的规则**属机制（产生状态的那一步与其格式），**落根**属策略，且该根由 `shared/guidelines/directory-governance.md` § 5 登记。本文件 MUST NOT 成为第二个根的声明处。
 
 ## Consumption Contract
 
@@ -226,11 +226,11 @@
 
 | 相邻 owner | 它拥有的事实 | 本文的回答 |
 |-----------|-------------|-----------|
-| `shared/definitions/dogfooding-definitions.md` § 1 | 「机制 vs 问题」的修复方向（修实例还是修载体） | 本文判「内容该住哪一侧」；「机制」一词在两处指向不同事实 |
+| `shared/definitions/dogfooding-definitions.md` § 1 | 问题修复与机制修复的分野（修实例还是修载体） | 本文判「内容该住哪一侧」；「机制」一词在两处指向不同事实 |
 | `shared/guidelines/directory-governance.md`（§ 2 目录映射、§ 5 运行期根） | 一个目录能否存在、叫什么、在哪登记；运行期根 | 本文只说内容归属，目录的存在与登记归它 |
 | `skills/external/create-skills/SKILL.md` § 2 | 资源侧与运行环境侧两个路径占位符的取值来源与书写约定 | 本文只说「资源侧 vs 运行环境侧」，占位符怎么取值归它 |
 | `shared/guidelines/one-source-of-truth.md` | 引用纪律本身（什么算一次合法重复） | 本文的「路径引用、不复制」遵守它，不重述它 |
-| bilingual-expression 指南（路径见文首 § 不在本文件「双语表述」行，只此一次） | 双语的方向、形态与覆盖面 | 本文的两个 canonical 词按它写，不重述其规则 |
+| `shared/guidelines/bilingual-expression.md` | 双语的方向、形态与覆盖面 | 本文的两个 canonical 词按它写，不重述其规则 |
 | `shared/guidelines/temp-directory-discipline.md` | 临时根与清理 | 本文只判临时物的内容属于哪一层，临时根归它 |
 
 本节的断言是「本文不含这些 owner 的规则字面」——具体枚举由 `tests/contract/test_mechanism_policy_ownership.py` 承担。
@@ -287,9 +287,10 @@ def normalize(raw): 去掉首尾空白，再剥一层包裹引号
 
 **S-07（边界：模板标题）**
 
-```text
+````text
 ## Requirements
-```
+````
+
 答案：机制。依据：标题是产物的形状，与哪个运行环境无关。
 
 **S-08（边界：`.specify/` 笔记里的算法分支）**
@@ -320,14 +321,14 @@ def normalize(raw): 去掉首尾空白，再剥一层包裹引号
 ```text
 | merge-skills | included | 产出合并后的目标技能 |
 ```
-答案：机制。依据：裁定依据是谓词，与运行环境无关。
+答案：机制。依据：裁定依据是谓词，谓词不随运行环境而变。
 
 **S-12（同一段落同时含两层）**
 
 ```text
 重新生成镜像，然后把结果写进项目里。
 ```
-答案：待澄清。依据：「重新生成镜像」换环境仍成立（机制），「写进项目里」随环境而变（策略）；两判都成立，须问清「项目」指哪个落点。
+答案：待澄清。依据：「重新生成镜像」换掉运行环境仍成立（机制），「写进项目里」随运行环境而变（策略）；两判都成立，须问清「项目」指哪个落点。
 
 **S-13（边界：运行模式绑定）**
 
@@ -341,7 +342,7 @@ def normalize(raw): 去掉首尾空白，再剥一层包裹引号
 ```text
 从用户粘在对话里的那份清单读取条目。
 ```
-答案：策略。依据：这次读哪一份由运行环境决定。
+答案：策略。依据：这次读哪一份随运行环境而变，不是一个固定的输入来源。
 
 ## Change Log
 

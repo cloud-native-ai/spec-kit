@@ -55,8 +55,8 @@ Distill a reusable Skill from the current conversation history:
 
 - **skill name** determines `SKILL_HOME`. Example: `name = "testing"` → `SKILL_HOME = <skills-root>/testing/` (root resolved per Step 0: `.specify/skills/` in a Spec Kit project; the project `skills/` root or the host skills directory otherwise).
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
+- **Both layers before any write**: read the policy items this creation needs (where the new skill's runtime inputs come from, where its outputs land), then judge them with the owner's read-judge-stop check (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`), and stop on any item that has no value or two readings. A policy item the user did not state is **missing**, not a default to be invented. This check runs **before** the writability touch-test below and before the first file of § 3 — the touch-test writes a probe file, so a stop leaves no half product behind. **Policy missing** vs **environment error** are different wordings with different follow-ups (the user never said which one / the user named it but the path cannot be read): never report one as the other. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to `shared/definitions/skill-reference-definitions.md` and is not restated here.
 - **Writability pre-flight (fail fast)**: before drafting any content, touch-test the parent directory of `SKILL_HOME` (e.g. `mkdir -p "$SKILL_HOME" && touch "$SKILL_HOME/.wtest" && rm "$SKILL_HOME/.wtest"`). The host skills directory may be root-owned in some environments (container-created leftovers); report an unwritable target up front with the `sudo chown -R $USER <dir>` remedy instead of discovering it at the first write.
-- **Both layers before any write**: a policy item this creation needs (where the new skill's runtime inputs come from, where its outputs land) that the user did not state is **missing**, not a default to be invented — run the owner's read-judge-stop check before the touch-test above and before the first file of § 3. The check and its prompt shape are owned by `shared/definitions/mechanism-policy-definitions.md` § Consumption Contract: **policy missing** (the user never said which one) stops and asks, while an **environment error** (the user named it but the path cannot be read) stops and reports the value that could not be read plus the recovery step — the two use different wording, so never report one as the other. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to `shared/definitions/skill-reference-definitions.md` and is not restated here.
 
 Storage location options (`SKILL_HOME`) — the root is an **input resolved per Step 0**, never a hard dependency:
 - `.specify/skills/<name>/` — project-level primary **in Spec Kit project mode** (optional integration; when present it is the natural root for a Spec Kit project)
@@ -182,7 +182,7 @@ Pure utility skills (deterministic script wrappers) may substitute a smoke invoc
 
 Applies only when creating a **new** Skill **in Spec Kit project mode** — in standalone mode skip this step (no built-in role agents exist). Wire it into the built-in role agents so they prefer it for role-relevant work, following the Skill Enablement convention (the `## Skill Enablement` section pattern on the built-in role agents under `.specify/agents/templates/`).
 
-Before the first edit below, re-run the owner's read-judge-stop check over the new skill's policy items (`shared/definitions/mechanism-policy-definitions.md` § Consumption Contract): this step writes into agent definitions, so a missing policy stops here with no file touched.
+**Before the first edit of § 7 and of § 8**, re-run the owner's read-judge-stop check over this creation's policy items — read them, judge each one, stop on any that is unstaked (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`). Both steps write (agent definitions here, the report there), so a missing policy stops here first with no file touched and no half-written report; a policy that is named but unreadable is the **environment error** class and reports that value, never the **policy missing** class.
 
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`, `create-tools`, `improve-tools`). Normal user-created Skills proceed.
 2. **Analyze**: read the 7 built-in role agents from `.specify/agents/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) and judge each agent's role against the new Skill's capability + trigger keywords.
@@ -195,7 +195,7 @@ Before the first edit below, re-run the owner's read-judge-stop check over the n
 
 ### 8. Report completion
 
-Run the owner's read-judge-stop check once more before writing the report (`shared/definitions/mechanism-policy-definitions.md` § Consumption Contract) — a policy item that turned out missing during Step 6 is stopped here, not reported as a completed creation.
+Before writing the report, re-read this creation's policy items and judge them once more — the same read-judge-stop check, § Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`. A policy item that turned out missing during Step 6 stops here rather than being reported as a completed creation, so a stop leaves no half-written report behind. Keep the two classes apart: **policy missing** (Step 6 never settled the item) versus **environment error** (an item was named but its value could not be read) — never report one as the other.
 
 Summarize:
 - Detected runtime mode (Spec Kit project vs standalone) and which Spec-Kit-specific steps were skipped
@@ -212,6 +212,7 @@ Summarize:
 - **High freedom**: Text strategies for multi-path problems
 - **Medium freedom**: Pseudocode / parameterized scripts for configurable primary paths
 - **Low freedom**: Fixed scripts / steps for high-risk error-prone operations
+- **Implement landing point**: which directory the new Skill lands in, and where its runtime inputs and outputs come from, are policy inputs the caller supplies. Ask for a landing point and offer the ready options; never bake one into the Skill's mechanism (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`).
 
 ### Discoverable Descriptions
 

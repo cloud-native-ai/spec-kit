@@ -30,11 +30,13 @@ PROBE_DEFS_MIRROR = REPO_ROOT / ".specify" / "shared" / "definitions" / "probe-d
 # `coaching-skills` was renamed in place (FR-001/FR-018); the roster swaps that one
 # name, so the external layer is still 15 and the retired literal is not repeated
 # here (A10's closed surface allows it exactly once — the CLI upgrade registry).
+# Updated 2026-11-05 (improve-skills ssh-utils): the external `ssh-utils` transport
+# unit joins the roster (15 -> 16).
 BASELINE_EXTERNAL = [
     "coaching-skills", "create-docs", "create-pages", "create-skills", "database-utils",
     "document-utils", "draw-diagram", "git-utils", "humanize", "improve-docs",
     "improve-skills", "merge-skills", "sdd-house-keeping", "sdd-loop-driver",
-    "sdd-project-setup",
+    "sdd-project-setup", "ssh-utils",
 ]
 BASELINE_INTERNAL = [
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -154,6 +156,9 @@ def test_c8_run_team_frontmatter_classification_and_skill_id():
 # --- C-9: compiled wrap-up embeds, zero drift, 75 units (+ sdd-house-keeping) ---
 
 def test_c9_compile_embeds_zero_drift_75_units():
+    # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
+    # the ssh-utils skill ships its own compiled Wrap-up embed, so the compile
+    # census grows by one while the zero-drift property is unchanged.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 75 -> 76 units — the
     # review-feature-quality skill ships its own compiled Wrap-up embed, so the
     # compile census grows by one while the zero-drift property is unchanged.
@@ -163,7 +168,7 @@ def test_c9_compile_embeds_zero_drift_75_units():
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "76 units" in combined, f"expected 76 units, got: {combined[-400:]}"
+    assert "77 units" in combined, f"expected 77 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

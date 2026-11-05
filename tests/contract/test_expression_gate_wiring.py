@@ -328,8 +328,8 @@ def test_a5_no_class_key_assignment_or_ledger_row():
 # --------------------------------------------------------------------------- #
 # W1…W4 (069a) plus the seven stage templates 077 wires. The roster is the ONLY
 # thing 077 widens here: `test_a6_wiring_inventory_matches_the_frozen_denominator`
-# below pins the denominator (27 templates / 52 skills) and MUST NOT move, so a
-# new template or skill still has to be justified rather than absorbed.
+# below pins the denominator (27 templates / 54 skills since 2026-11-05) and MUST
+# NOT move, so a new template or skill still has to be justified rather than absorbed.
 WIRED_TEMPLATE_NAMES = (
     "docs.md",
     "humanize.md",
@@ -367,6 +367,9 @@ def test_a6_wiring_set_is_closed():
 
 
 def test_a6_wiring_inventory_matches_the_frozen_denominator():
+    # Stale-pin update (2026-11-05, improve-skills ssh-utils): 53 -> 54 skills —
+    # the ssh-utils transport unit joins the inventory; the wiring census must
+    # still cover every unit the inventory actually holds.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 52 -> 53 skills — the
     # review-feature-quality carrier joins the inventory; the wiring census must
     # still cover every unit the inventory actually holds.
@@ -375,7 +378,7 @@ def test_a6_wiring_inventory_matches_the_frozen_denominator():
         SKILLS_DIR.glob("internal/*/SKILL.md")
     )
     assert len(templates) == 27, "template inventory drifted: %d (expected 27)" % len(templates)
-    assert len(skills) == 53, "skill inventory drifted: %d (expected 53)" % len(skills)
+    assert len(skills) == 54, "skill inventory drifted: %d (expected 54)" % len(skills)
 
 
 # --------------------------------------------------------------------------- #

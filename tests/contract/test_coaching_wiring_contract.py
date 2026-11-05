@@ -344,11 +344,13 @@ def test_c6_the_old_mirror_directory_is_gone_and_the_new_one_exists():
 
 
 def test_c3_probe_compiled_face_is_zero_drift():
+    # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
+    # the ssh-utils Wrap-up embed joins the compiled face.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 75 -> 76 units — the
     # review-feature-quality skill's own Wrap-up embed joins the compiled face.
     proc = _run("scripts/python/probe-utils.py", "--action", "compile-embeds", "--check")
     assert proc.returncode == 0, proc.stdout + proc.stderr
-    assert "76 units, zero drift" in proc.stdout
+    assert "77 units, zero drift" in proc.stdout
 
 
 def test_c3_mirrors_and_command_copies_are_zero_drift():
@@ -432,7 +434,9 @@ def test_c8_the_verification_surface_runs_green():
     }
     failing = {name: proc.returncode for name, proc in checks.items() if proc.returncode != 0}
     assert not failing, f"verification surface not green: {failing}"
+    # Stale-pin update (2026-11-05, improve-skills ssh-utils): matched=80 -> 81 —
+    # the ssh-utils registration grows the ledger and inventory together.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): matched=79 -> 80 — the
     # review-feature-quality registration grows the ledger and inventory together.
-    assert "matched=80" in checks["flow-class check"].stdout
+    assert "matched=81" in checks["flow-class check"].stdout
     assert "zero drift" in checks["probe compile"].stdout

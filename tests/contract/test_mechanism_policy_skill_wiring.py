@@ -410,33 +410,6 @@ def test_sw04_wiring_points_name_the_owner_contract(rel: Path):
     assert not problems, "SW-04 violations in %s:\n- %s" % (rel, "\n- ".join(problems))
 
 
-def test_sw04_create_skills_preflight_precedes_the_writes():
-    text = _read(REPO_ROOT / CREATE_REL)
-    preflight = text.index("Writability pre-flight")
-    section7 = text.index("### 7. Propagate the Skill")
-    section8 = text.index("### 8. Report completion")
-    wiring = [i for i in re.finditer(re.escape(CONSUMPTION_ANCHOR), text)]
-    assert wiring, "artifact missing: create-skills carries no %r reference" % CONSUMPTION_ANCHOR
-    assert any(preflight <= w.start() <= section7 for w in wiring), (
-        "the pre-flight (§ 2) carries no Consumption Contract reference — a missing policy "
-        "must stop before the first write"
-    )
-    assert any(w.start() < section8 for w in wiring), (
-        "no Consumption Contract reference precedes § 8's report"
-    )
-
-
-def test_sw04_improve_skills_edit_precedes_the_edit_step():
-    text = _read(REPO_ROOT / IMPROVE_REL)
-    edit = text.index("7. **Update the Skill for the next execution**")
-    wiring = [m.start() for m in re.finditer(re.escape(CONSUMPTION_ANCHOR), text)]
-    assert wiring, "artifact missing: improve-skills carries no %r reference" % CONSUMPTION_ANCHOR
-    assert min(wiring) < edit, (
-        "the Consumption Contract reference sits after § 7's edit — the check must precede "
-        "the side effect"
-    )
-
-
 def test_sw04_negative_case_restating_the_prompt_turns_red(tmp_path):
     text = _read(REPO_ROOT / CREATE_REL)
     broken_text = text + "\n\n需要你确认：<策略项的可读名字>\n"
@@ -459,3 +432,486 @@ def test_sw04_negative_case_unpinned_anchor_turns_red(tmp_path):
     assert any("without the owner path" in p for p in problems), (
         "the negative case did not turn the owner-path assertion red"
     )
+
+
+# --------------------------------------------------------------------------- #
+# SW-04 side-effect-before-check legs (T017) — one scenario table drives both
+# the positive assertions and the ordering negative case, so a reordering that
+# cannot be detected by the table cannot be asserted by it either.
+# --------------------------------------------------------------------------- #
+READ_ANCHORS = ("read", "读")
+JUDGE_ANCHORS = ("judge", "判")
+STOP_ANCHORS = ("stop", "停")
+NO_PRODUCT_ANCHORS = ("no half", "no file touched", "no half-edited", "无半成品", "不留半成品")
+ENV_ERROR_ANCHORS = ("environment error", "环境错误")
+
+# ``block_start`` marks where a wiring point's text begins when it is not a
+# standalone paragraph; ``side_effect`` is the first line of the step whose write
+# the point guards. For a wiring point that sits *inside* a numbered step, the
+# side effect is the first writing line **after** the point within that step — the
+# step heading itself is not a write; a check placed above a *message* bullet (one that
+# only states what the check runs before) still has no write between it and the write it
+# guards — the probe command itself lives in the message, never in the check's own bullet.
+# ``owning_heading`` pins the step the check must sit inside (SW-04 step scope).
+WIRING_SCENARIOS = (
+    {
+        "rel": CREATE_REL,
+        "name": "create-skills § 2 writability pre-flight",
+        "block_start": "**Both layers before any write**",
+        "side_effect": "- **Writability pre-flight (fail fast)**:",
+        "owning_heading": "### 2. Determine SKILL_HOME and metadata",
+        "side_effect_name": "the pre-flight probe write",
+    },
+    {
+        "rel": CREATE_REL,
+        "name": "create-skills § 7 propagate",
+        "block_start": "**Before the first edit of § 7 and of § 8**",
+        "side_effect": "1. **Guard**:",
+        "owning_heading": "### 7. Propagate the Skill",
+        "side_effect_name": "§ 7's first edit step",
+    },
+    {
+        "rel": CREATE_REL,
+        "name": "create-skills § 8 report completion",
+        "block_start": "Before writing the report, re-read this creation's policy items",
+        "side_effect": "Summarize:",
+        "owning_heading": "### 8. Report completion",
+        "side_effect_name": "§ 8's report write",
+    },
+    {
+        "rel": IMPROVE_REL,
+        "name": "improve-skills § 7 edit",
+        "block_start": "**Both layers before the first edit**",
+        "side_effect": "- Edit `SKILL.md` to make the improved behavior executable",
+        "owning_heading": "7. **Update the Skill for the next execution**",
+        "side_effect_name": "§ 7's first edit line",
+    },
+    {
+        "rel": MERGE_REL,
+        "name": "merge-skills § 7 decommission",
+        "block_start": "**Both layers before the decommission**",
+        "side_effect": "- **Form carriers**:",
+        "owning_heading": "### 7. Decommission the source as an independent skill",
+        "side_effect_name": "§ 7's first destructive action",
+    },
+)
+
+
+# A block ends at a blank line, the next list item / numbered step, or a heading
+# — never at an inline-code span (`` \"$SKILL_HOME\" `` is not a line opening).
+BLOCK_BOUNDARIES = (
+    r"\n[ \t]*\n",
+    r"\n[ \t]*[-*] \S",
+    r"\n\d+\. ",
+    r"\n#{2,6} ",
+)
+
+
+def _block_end(text: str, block: str) -> int:
+    """Offset just past ``block``'s last non-blank line (a block cut at a blank line omits it).
+
+    Using the raw block length would leave the newline that closes the paragraph inside the
+    scan window, and a paragraph opener such as ``Summarize:`` on the next line would read as
+    a stray reading line.
+    """
+    start = text.index(block)
+    return start + len(block.rstrip())
+
+
+def _block_at(text: str, anchor: str) -> str:
+    """Return the block containing ``anchor``: a paragraph, a list item or one step line.
+
+    The block is what the wiring point itself says, so the ordering assertion
+    measures the check's own text and never its neighbours': it begins at the
+    anchor's line (or at the enclosing list item) and ends at the next blank line,
+    list item or numbered step.
+    """
+    start = text.index(anchor)
+    line_start = text.rfind("\n", 0, start) + 1
+    prev_line = text.rfind("\n", 0, line_start - 1)
+    prev_line_start = prev_line + 1 if prev_line != -1 else 0
+    prev_text = text[prev_line_start:line_start].strip()
+    if prev_text.startswith("- ") or prev_text.startswith("* "):
+        line_start = prev_line_start
+    elif prev_text and not prev_text.startswith("#"):
+        # a soft-wrapped paragraph line: walk up to its first line
+        while prev_text and not prev_text.startswith(("- ", "* ")) and not re.match(r"^\d+\. ", prev_text):
+            line_start = prev_line_start
+            prev_line = text.rfind("\n", 0, line_start - 1)
+            if prev_line == -1:
+                line_start = 0
+                break
+            prev_line_start = prev_line + 1
+            prev_text = text[prev_line_start:line_start].strip()
+    para_end = len(text)
+    for pattern in BLOCK_BOUNDARIES:
+        m = re.search(pattern, text[start:])
+        if m:
+            para_end = min(para_end, start + m.start())
+    return text[line_start:para_end]
+
+
+def _any_anchor(paragraph: str, anchors: tuple) -> bool:
+    low = paragraph.lower()
+    return any(a in low for a in anchors)
+
+
+def _structure(text: str) -> "tuple[int, int]":
+    """Return ``(fence_end, structural_end)``: the length of the frontmatter fence and of a
+    structural prelude (headings, tables, code fences) that a still-unwritten body may open with.
+
+    Only these two regions may precede the first side effect without violating SW-04. Every
+    other earlier point is a body location, and a check placed there is misplaced: e.g. the
+    § 2 *bullet* that states the rule sits before § 2's own probe-write bullet, while the
+    rule's own wording says the check runs **before the writability touch-test** — a check
+    asserted at the bullet would pass text that no longer exhibits the contract.
+    """
+    fence_end = 0
+    lines = text.splitlines(keepends=True)
+    if lines and lines[0].strip() == "---":
+        offset = len(lines[0])
+        for line in lines[1:]:
+            offset += len(line)
+            if line.strip() == "---":
+                fence_end = offset
+                break
+    pos = fence_end
+    in_fence = False
+    structural_end = fence_end
+    for line in text[fence_end:].splitlines(keepends=True):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            pos += len(line)
+            structural_end = pos
+            continue
+        if in_fence:
+            pos += len(line)
+            structural_end = pos
+            continue
+        if not stripped or re.match(r"^#{1,6}\s", stripped) or stripped.startswith("|"):
+            pos += len(line)
+            structural_end = pos
+            continue
+        break
+    return fence_end, structural_end
+
+
+def assert_wiring_point_matches_contract(path: Path, anchor: str) -> list[str]:
+    """Assert one wiring point carries the owner's read-judge-stop shape and wording split.
+
+    Returns the list of violations; the side-effect ordering lives in
+    ``assert_wiring_precedes_side_effect`` so each failure names its own cause.
+    """
+    text = _read(path)
+    problems: list[str] = []
+    if anchor not in text:
+        return ["artifact missing: the wiring point %r is absent" % anchor]
+    paragraph = _block_at(text, anchor)
+    if OWNER_LITERAL not in paragraph:
+        problems.append(
+            "wiring point %r does not name the owner's Consumption Contract by path (%r) "
+            "— a path reference is the only permitted form" % (anchor, OWNER_LITERAL)
+        )
+    for marker in PROMPT_WORDING_MARKERS:
+        if marker in paragraph:
+            problems.append(
+                "wiring point %r restates the owner's prompt wording (%r) — the consumer "
+                "points at the shape, it never carries it" % (anchor, marker)
+            )
+    if not _any_anchor(paragraph, READ_ANCHORS):
+        problems.append("wiring point %r states no read step — read-judge-stop is a three-step form" % anchor)
+    if not _any_anchor(paragraph, JUDGE_ANCHORS):
+        problems.append("wiring point %r states no judge step — read-judge-stop is a three-step form" % anchor)
+    if not _any_anchor(paragraph, STOP_ANCHORS):
+        problems.append("wiring point %r states no stop step — read-judge-stop is a three-step form" % anchor)
+    if not _any_anchor(paragraph, NO_PRODUCT_ANCHORS):
+        problems.append(
+            "wiring point %r does not say the stop leaves no half product (SW-04 / FR-008)" % anchor
+        )
+    if not re.search(r"before", paragraph, re.IGNORECASE):
+        problems.append(
+            "wiring point %r contains no ordering word — read-judge-stop MUST sit before the "
+            "side effect, and the point itself must say so (SW-04)" % anchor
+        )
+    if not _any_anchor(paragraph, ENV_ERROR_ANCHORS):
+        problems.append(
+            "wiring point %r names no environment-error class, so the two error wordings are "
+            "not distinguishable there (FR-007)" % anchor
+        )
+    return problems
+
+
+GLOBAL_SIDE_EFFECTS = ("**Writability pre-flight (fail fast)**", "Never narrate the document's own history")
+
+
+def assert_wiring_precedes_side_effect(path: Path, anchor: str, side_effect: str) -> list[str]:
+    """Assert the wiring point is the **last** thing before the side effect it guards.
+
+    1. The point must sit inside the step it guards (between that step's heading and the
+       next heading of the same or a higher level) — a check parked in an earlier step
+       precedes the side effect but no longer guards it.
+    2. No other side-effect marker named in the same scenario block may sit between the
+       point and its side effect.
+    3. Every writing line between the point and the side effect must belong to the
+       frontmatter fence, a structural prelude (heading / table / code fence), or the
+       point's own paragraph — a check preceded by a write is not "before the write".
+    """
+    text = _read(path)
+    if anchor not in text:
+        return ["artifact missing: the wiring point %r is absent" % anchor]
+    if side_effect not in text:
+        return ["artifact missing: the side-effect anchor %r is absent" % side_effect]
+    problems: list[str] = []
+    paragraph = _block_at(text, anchor)
+    check_start = text.index(paragraph)
+    check_end = _block_end(text, paragraph)
+    effect_at = text.index(side_effect)
+    if check_end > effect_at:
+        return [
+            "the wiring point %r (ends at offset %d) sits at or after its side effect %r "
+            "(offset %d) — the check must precede every write" % (anchor, check_end, side_effect, effect_at)
+        ]
+
+    headings = [
+        (m.start(), len(m.group(1)))
+        for m in re.finditer(r"^(#{2,6})\s.+$", text, re.MULTILINE)
+    ]
+    step_start = 0
+    step_level = 2
+    for offset, level in headings:
+        if offset <= effect_at:
+            step_start, step_level = offset, level
+        else:
+            break
+    if check_end < step_start:
+        problems.append(
+            "the wiring point %r (offset %d) sits before the heading of the step it guards "
+            "(offset %d) — a check parked in an earlier step precedes the write but no longer "
+            "guards it (SW-04 places the check inside the step whose side effect it precedes)"
+            % (anchor, check_start, step_start)
+        )
+    step_end = len(text)
+    for offset, level in headings:
+        if offset > effect_at and level <= step_level:
+            step_end = offset
+            break
+    own_paragraph = _block_at(text, anchor)
+    for marker in GLOBAL_SIDE_EFFECTS:
+        at = text.find(marker)
+        while at != -1:
+            between_anchor_and_effect = check_end < at < effect_at
+            inside_own_paragraph = text.index(own_paragraph) <= at < check_end
+            if between_anchor_and_effect and not inside_own_paragraph:
+                problems.append(
+                    "side effect %r sits between the wiring point %r and its side effect %r "
+                    "— the point must sit directly before the write it guards" % (marker, anchor, side_effect)
+                )
+            at = text.find(marker, at + 1)
+
+    fence_end, structural_end = _structure(text)
+    body = text[check_end:effect_at]
+    written: list[str] = []
+    for line in body.splitlines():
+        line_at = text.index(line, check_end) if line else check_end
+        if not line.strip() or line_at < structural_end:
+            continue
+        written.append(line.strip())
+    if written:
+        problems.append(
+            "reading lines sit between the wiring point %r and its side effect %r (%r) — the "
+            "check must be the last thing before the write, not merely before it somewhere"
+            % (anchor, side_effect, written[0][:90])
+        )
+    return problems
+
+
+def _owning_step(text: str, offset: int) -> int:
+    """Offset of the heading of the step containing ``offset``."""
+    start = 0
+    for m in re.finditer(r"^(#{2,6})\s.+$", text, re.MULTILINE):
+        if m.start() <= offset:
+            start = m.start()
+        else:
+            break
+    return start
+
+
+def assert_wiring_sits_in_its_step(path: Path, anchor: str, heading, side_effect: str) -> list[str]:
+    """Assert the point sits inside the step it guards, not in an earlier step that precedes the write.
+
+    ``heading`` pins the step exactly (a heading literal); without it the point must at least
+    sit inside the step that contains its side effect. Both forms run on the live tree.
+    """
+    text = _read(path)
+    if anchor not in text:
+        return ["artifact missing: the wiring point %r is absent" % anchor]
+    problems: list[str] = []
+    offset = text.index(anchor)
+    step = _owning_step(text, offset)
+    if heading:
+        expected = text.find(heading)
+        if expected == -1:
+            return ["artifact missing: the step heading %r is absent" % heading]
+        if step != expected:
+            problems.append(
+                "the wiring point %r sits in the step starting at offset %d, not in %r — a "
+                "check parked in an earlier step precedes every write without guarding one"
+                % (anchor, step, heading)
+            )
+    if side_effect in text:
+        effect_step = _owning_step(text, text.index(side_effect))
+        if offset < effect_step:
+            problems.append(
+                "the wiring point %r sits before the heading of the step it guards (offset %d)"
+                % (anchor, effect_step)
+            )
+    return problems
+
+
+def _variant_root(tmp_path, rel: Path) -> Path:
+    """A ``tmp_path`` tree holding ``rel``'s current content; sibling anchors keep resolving."""
+    copy = tmp_path / rel
+    copy.parent.mkdir(parents=True, exist_ok=True)
+    copy.write_text(_read(REPO_ROOT / rel), encoding="utf-8")
+    return copy
+
+
+def _move_block_below(path: Path, anchor: str, below: str) -> None:
+    """Move ``anchor``'s paragraph to just after the line carrying ``below`` (in place)."""
+    text = _read(path)
+    paragraph = _block_at(text, anchor)
+    without = text.replace(paragraph, "", 1)
+    assert without != text, "artifact missing: the wiring paragraph could not be lifted out"
+    effect_at = without.index(below)
+    line_end = without.index("\n", effect_at) + 1
+    path.write_text(without[:line_end] + paragraph + "\n" + without[line_end:], encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    "scenario",
+    list(WIRING_SCENARIOS),
+    ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+)
+def test_sw04_wiring_point_shape_and_ordering(scenario):
+    path = REPO_ROOT / scenario["rel"]
+    problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+    problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+    assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+        scenario["rel"], scenario["name"], "\n- ".join(problems)
+    )
+
+
+def test_sw04_negative_case_reordering_a_wiring_point_turns_red(tmp_path):
+    """Move improve-skills' § 7 check below its first edit line; the ordering assertion must go red."""
+    scenario = next(s for s in WIRING_SCENARIOS if s["name"] == "improve-skills § 7 edit")
+    broken = _variant_root(tmp_path, scenario["rel"])
+    _move_block_below(broken, scenario["block_start"], scenario["side_effect"])
+    problems = assert_wiring_precedes_side_effect(broken, scenario["block_start"], scenario["side_effect"])
+    assert any("sits at or after its side effect" in p for p in problems), (
+        "the negative case did not turn the ordering assertion red: %s" % problems
+    )
+    shape = assert_wiring_point_matches_contract(broken, scenario["block_start"])
+    assert not shape, "the reordered copy must keep the paragraph's shape intact:\n- %s" % "\n- ".join(shape)
+
+
+def test_sw04_negative_case_check_parked_in_an_earlier_step_turns_red(tmp_path):
+    """Lift create-skills' § 7 check into § 2 — before every write, yet no longer guarding § 7."""
+    scenario = next(s for s in WIRING_SCENARIOS if s["name"] == "create-skills § 7 propagate")
+    broken = _variant_root(tmp_path, scenario["rel"])
+    text = _read(broken)
+    paragraph = _block_at(text, scenario["block_start"])
+    earlier = _block_at(text, "**Both layers before any write**")
+    parked = text.replace(paragraph, "", 1).replace(earlier, earlier + "\n" + paragraph, 1)
+    broken.write_text(parked, encoding="utf-8")
+    problems = assert_wiring_sits_in_its_step(
+        broken, scenario["block_start"], scenario["owning_heading"], scenario["side_effect"]
+    )
+    assert any("not in" in p or "before the heading of the step it guards" in p for p in problems), (
+        "a check parked in an earlier step still precedes the write — only the step-scope "
+        "assertion can catch it, and it did not: %s" % problems
+    )
+
+
+def test_sw04_negative_case_a_later_write_between_check_and_side_effect_turns_red(tmp_path):
+    """Create-skills' § 2 check before its own step is fine; a § 7 check after § 2's probe write is not."""
+    scenario = next(s for s in WIRING_SCENARIOS if s["name"] == "create-skills § 8 report completion")
+    broken = _variant_root(tmp_path, scenario["rel"])
+    text = _read(broken)
+    paragraph = _block_at(text, scenario["block_start"])
+    without = text.replace(paragraph, "", 1)
+    after_write = without.index("**Writability pre-flight (fail fast)**")
+    line_end = without.index("\n", after_write) + 1
+    broken.write_text(without[:line_end] + paragraph + "\n" + without[line_end:], encoding="utf-8")
+    problems = assert_wiring_precedes_side_effect(broken, scenario["block_start"], scenario["side_effect"])
+    assert any("sits between the wiring point" in p or "reading lines sit between" in p for p in problems), (
+        "a check separated from its write by another write still passed the ordering assertion: %s"
+        % problems
+    )
+
+
+def test_sw04_missing_policy_and_environment_error_wordings_are_distinguishable():
+    """The owner keeps the two classes on separate rows; every wiring point names both."""
+    owner_text = _read(OWNER)
+    table = _section(owner_text, "两类判定的区分")
+    rows = [r for r in _table_rows(table) if "策略缺失" in r or "环境错误" in r]
+    assert len(rows) == 2, "the owner's two-class table must keep exactly two ruled rows, found %d" % len(rows)
+    missing_row = next(r for r in rows if "策略缺失" in r)
+    env_row = next(r for r in rows if "环境错误" in r)
+    assert "缺的是" in missing_row, "the missing-policy row lost its wording"
+    assert "取不到" in env_row, "the environment-error row lost its wording"
+    assert missing_row != env_row, "the two classes must not collapse into one wording (FR-007)"
+    for scenario in WIRING_SCENARIOS:
+        paragraph = _block_at(_read(REPO_ROOT / scenario["rel"]), scenario["block_start"])
+        assert _any_anchor(paragraph, ENV_ERROR_ANCHORS), (
+            "%s names only one class — the two wordings must stay distinguishable there" % scenario["name"]
+        )
+
+
+def test_sw04_o2_design_principle_separates_the_two_layers():
+    """create-skills' § Design Principles must not hand a reusable mechanism a run-environment default.
+
+    § OD-06 / SW-04: the same rule read from the mechanism side says a principle is stated as
+    the reusable form, and a landing point / default is a *policy input* the caller supplies —
+    not part of the principle. A principle that names where artifacts land invites every
+    future skill body to hard-code that landing point.
+    """
+    problems = assert_o2_design_principle(_read(REPO_ROOT / CREATE_REL))
+    assert not problems, "SW-04 / OD-06 violations:\n- " + "\n- ".join(problems)
+
+
+def assert_o2_design_principle(text: str) -> list[str]:
+    """Return every way ``text``'s § Design Principles hands the mechanism a run-environment default."""
+    section = _section(text, "Design Principles")
+    problems: list[str] = []
+    if "under `skills/` by default" in section:
+        problems.append(
+            "the 'Manage Degrees of Freedom' principle names a default landing point — that is a "
+            "policy value living in the mechanism side (§ OD-06 § Consumption Contract)"
+        )
+    if "landing point" not in section:
+        problems.append(
+            "the principle says nothing about where a landing point comes from — the two layers "
+            "are not separated at the design level"
+        )
+    return problems
+
+
+def test_sw04_negative_case_a_default_landing_point_in_the_principle_turns_red(tmp_path):
+    text = _read(REPO_ROOT / CREATE_REL)
+    assert "Implement landing point" in text, "artifact missing: the principle line is absent"
+    broken = tmp_path / "SKILL.md"
+    broken.write_text(
+        text.replace("Implement landing point", "Land somewhere under `skills/` by default", 1),
+        encoding="utf-8",
+    )
+    problems = assert_o2_design_principle(broken.read_text(encoding="utf-8"))
+    assert any("default landing point" in p for p in problems), (
+        "the negative case did not turn the principle assertion red: %s" % problems
+    )
+
+
+def test_sw04_merge_skills_decommission_is_reachable():
+    """The merge-skills leg exists (empty literals still pass, an absent body does not)."""
+    path = REPO_ROOT / MERGE_REL
+    _read(path)

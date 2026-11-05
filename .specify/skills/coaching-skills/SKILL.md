@@ -1,7 +1,7 @@
 ---
 name: coaching-skills
 description: |
-  Coach another Skill (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md, observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee-name|trainee-path> <work>`.
+  Coach another Skill (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md, observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee-reference|trainee-path> <work>`.
 skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"
 classification: external
 ---
@@ -18,9 +18,20 @@ real work is the primary result; optimizing the Trainee is secondary.
 
 ## Inputs
 
-Invocation: `coaching-skills <trainee-name|trainee-path> <work>`.
+Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
 
-- Exactly two positional parameters: `<trainee-name|trainee-path>` and `<work>`.
+- Exactly two positional parameters: the Trainee reference and `<work>`.
+- The Trainee reference may be a name, `/name`, `@name`, `skill:name`, a canonical
+  `SKILL.md` path, or a skill directory — normalize it before the ladder per
+  `.specify/shared/definitions/skill-reference-definitions.md`. A leading `/` names the
+  Trainee's slash-command surface; it is **never** an instruction to invoke that
+  skill directly instead of running this loop.
+- **Meta-skill Trainees are in scope.** When the Trainee itself operates on other
+  skills (`improve-skills`, `merge-skills`, `create-skills`, `run-skills`), `<work>` is
+  normally a skill-engineering request ("optimize skill X", "merge A into B"); its
+  primary artifact is the changed target-skill file set or the Trainee's run report.
+  Such a request MUST NOT be reclassified as "not a real work item", and the coach
+  MUST NOT execute the Trainee's steps itself in its place.
 - `<work>` MUST be non-empty and enters the run and the dispatch payload verbatim;
   never rewrite, summarize, or re-scope it.
 - A missing or empty parameter fails closed and names the missing parameter; never
@@ -33,10 +44,13 @@ Invocation: `coaching-skills <trainee-name|trainee-path> <work>`.
 Reuse the `run-skills` position ladder, with no second resolution rule: canonical
 internal → canonical external → installed internal → installed external.
 
+- Normalize the reference first (`skill:` label, leading `/` or `@`, trailing `/SKILL.md`
+  or `/` stripped) per `.specify/shared/definitions/skill-reference-definitions.md`; report both
+  the raw and the normalized form in the run output.
 - A source hit and its installed mirror hit are one hit for the same skill; only two
   distinct layers carrying the same name are two hits.
 - Two hits: fail closed naming both candidate paths; never pick the nearest.
-- Zero hits: fail closed naming the resolved identifier and the searched coordinates.
+- Zero hits: fail closed naming the raw and normalized identifier and the searched coordinates.
 - Reject before the expectation phase when the directory has no readable `SKILL.md`
   or its frontmatter is invalid.
 - Reject a target that resolves to `coaching-skills` itself: recursion depth is 1 and
@@ -46,6 +60,34 @@ internal → canonical external → installed internal → installed external.
 - Read the Trainee's `SKILL.md` and the reference files it needs; change nothing and
   trigger no Trainee side effect in this phase.
 
+## Nested (chain) runs
+
+A Trainee may itself be a meta-skill whose own target is the skill actually changed —
+`coaching-skills improve-skills 优化 X` is caller → Trainee → **subject**. Supported per
+`.specify/shared/definitions/skill-reference-definitions.md` § Nested, with four duties here:
+
+- **The Trainee resolves the subject, not the coach.** The subject reference stays inside
+  `<work>` byte-for-byte; resolving, normalizing or rewriting it in this run is a contract
+  violation — it would pre-digest the work.
+- **Expectation and verdict target the subject.** `OC-1` names the changed **subject** file
+  set (or the Trainee's own run report), not the Trainee's files; record
+  `chain: <caller> → <trainee> → <subject>` and each hop's resolved absolute path in
+  `expectation.md` and `observation.md`.
+- **The write lock follows the subject**, per `data-model.md` § Optimization claim: two
+  runs coaching different meta-trainees at the same subject still serialize.
+- **Depth is counted per perspective, in dispatch edges**: this run owns exactly one edge
+  (coach → Trainee); the Trainee owns its own single edge (Trainee → subject) and MUST NOT
+  open a second one. A Trainee whose flow would itself dispatch a further coaching/agent
+  run stops and reports `depth-exceeded`; the coach never opens a second dispatch to
+  compensate.
+- **Claim before dispatch when the write rides inside it**: a nested run's subject is
+  written during the dispatch, so the claim is taken before dispatching (see
+  `data-model.md` § Optimization claim) — taking it after the plan would guard a write
+  that already happened.
+- **Guards**: subject == this skill → fail closed before the expectation (never write the
+  running skill from inside its own run); Trainee cannot resolve the subject → record an
+  `observation-gap` plus a deviation, never substitute the coach's own resolution.
+
 ## Preflight
 
 Run these checks in order before writing any artifact:
@@ -53,7 +95,9 @@ Run these checks in order before writing any artifact:
 1. both positional parameters are present and `<work>` is non-empty;
 2. exactly one Trainee hit resolves from the ladder, with valid frontmatter and a
    target other than this skill;
-3. the run directory does not already exist (see § Run Identity).
+3. when the Trainee is a meta-skill, `<work>` names an identifiable subject to operate on;
+   if it does not, ask one targeted clarification and stop (never pick the subject);
+4. the run directory does not already exist (see § Run Identity).
 
 Any failure stops the run before the expectation phase and names what failed and
 where it was searched. A run that passes preflight proceeds to write the expectation;
@@ -109,12 +153,13 @@ The payload is a closed field set; anything not listed below is forbidden.
 | Field | Content | Rule |
 |-------|---------|------|
 | `trainee` | resolved identifier, resolved path, layer | the exact path this run resolved; no alternatives offered |
+| `workdir` | the project root the Trainee must treat as `${SKILL_WORKDIR}` | a subagent does not inherit this conversation's cwd; omitting it leaves every `.specify/...` reference ambiguous |
 | `work` | `<work>` verbatim | byte-for-byte the second positional parameter |
 | `instruction` | "Follow the Trainee's own `SKILL.md` as the highest execution guidance" | never replaced by a coach-authored procedure |
-| `return-contract` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state | powers `self-report` when host events are unavailable |
+| `return-contract` | step-by-step actions, tool calls, state changes, artifacts, elapsed time, terminal state — plus, when the Trainee is a meta-skill: `subject {ref, path}`, the subject's changed files, and the claim taken or skipped | powers `self-report` when host events are unavailable |
 | `anomaly-line` | "State one explicit anomaly line on return; state `none` when there is none" | silence is not read as clean |
 | `fast-fail-clause` | the dispatcher's anomaly discipline | injected at dispatch time; a subagent does not inherit this conversation |
-| `confirmation-relay` | "If the Trainee flow reaches a destructive step, stop and report it back instead of approving it yourself" | the answer comes from the user; the subagent never self-approves |
+| `confirmation-relay` | "If the Trainee flow reaches a destructive step **or needs a targeted clarification**, stop and report it back instead of approving or guessing" | the answer comes from the user; the subagent never self-approves and never substitutes a guess |
 
 The payload MUST NOT contain:
 
