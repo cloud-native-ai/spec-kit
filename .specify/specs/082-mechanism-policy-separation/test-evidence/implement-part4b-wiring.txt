@@ -1,0 +1,25 @@
+== skill-reference reference coordinates (live source tree) ==
+skills/internal/run-skills/SKILL.md              source-lines=[16, 24] mirror-lines=[16, 24]
+skills/external/create-skills/SKILL.md           source-lines=[35, 58] mirror-lines=[35]
+skills/external/improve-skills/SKILL.md          source-lines=[20] mirror-lines=[]
+skills/external/merge-skills/SKILL.md            source-lines=[27] mirror-lines=[27]
+skills/external/coaching-skills/SKILL.md         source-lines=[26, 49, 69] mirror-lines=[26, 49, 69]
+
+== mechanism/policy literals in the two excluded members (SW-05) ==
+skills/internal/run-skills/SKILL.md              hits={}
+skills/external/coaching-skills/SKILL.md         hits={}
+
+== merge-skills landings ==
+merge-skills contains '**`Source`**'                                          True
+merge-skills contains '**`Target`**'                                          True
+merge-skills contains "whether the merge changes the two layers' distribution" True
+merge-skills contains '§ Misplacement Symptoms'                               True
+merge-skills contains '`Mechanism / policy separation` item'                  True
+merge-skills contains '§ Consumption Contract'                                True
+merge-skills contains 'shared/definitions/mechanism-policy-definitions.md'    True
+
+== run-skills § 1 ladder + trust-boundary byte-identity vs HEAD ==
+baseline region = 9 lines; working region = 9 lines; byte-identical=True
+
+== coaching-skills § Improvement Plan / Optimization channel sentence unchanged ==
+channel sentence present: True

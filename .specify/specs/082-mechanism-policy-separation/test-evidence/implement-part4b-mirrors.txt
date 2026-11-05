@@ -1,0 +1,13 @@
+2026-11-05T09:41:43Z python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (414 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (64 files)
+rc=0
+
+2026-11-05T09:41:43Z python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0

@@ -1,0 +1,31 @@
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_skill_reference_failures.py
+.....FF                                                                  [100%]
+=================================== FAILURES ===================================
+__________________ test_gr06_owner_states_each_exclusion_pair __________________
+
+    def test_gr06_owner_states_each_exclusion_pair():
+        _, text = _owner_text(REPO_ROOT)
+        problems = assert_owner_states_exclusions(text)
+>       assert not problems, "GR-06 owner violations:\n- " + "\n- ".join(problems)
+E       AssertionError: GR-06 owner violations:
+E         - out-of-ladder / zero-hit: the owner states no exclusion naming both
+E       assert not ['out-of-ladder / zero-hit: the owner states no exclusion naming both']
+
+tests/contract/test_skill_reference_failures.py:304: AssertionError
+_________ test_gr06_negative_case_relabelled_owner_sentence_turns_red __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-268/test_gr06_negative_case_relabe0')
+
+    def test_gr06_negative_case_relabelled_owner_sentence_turns_red(tmp_path):
+        """Relabel one class in a `tmp_path` copy of the owner; the rule must go red."""
+        _, text = _owner_text(REPO_ROOT)
+        before = assert_owner_states_exclusions(text)
+>       assert not before, "the negative case needs a green owner: %r" % before
+E       AssertionError: the negative case needs a green owner: ['out-of-ladder / zero-hit: the owner states no exclusion naming both']
+E       assert not ['out-of-ladder / zero-hit: the owner states no exclusion naming both']
+
+tests/contract/test_skill_reference_failures.py:311: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_skill_reference_failures.py::test_gr06_owner_states_each_exclusion_pair
+FAILED tests/contract/test_skill_reference_failures.py::test_gr06_negative_case_relabelled_owner_sentence_turns_red
+2 failed, 5 passed in 0.06s

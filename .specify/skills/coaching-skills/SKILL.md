@@ -21,11 +21,12 @@ real work is the primary result; optimizing the Trainee is secondary.
 Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
 
 - Exactly two positional parameters: the Trainee reference and `<work>`.
-- The Trainee reference may be a name, `/name`, `@name`, `skill:name`, a canonical
-  `SKILL.md` path, or a skill directory — normalize it before the ladder per
-  `.specify/shared/definitions/skill-reference-definitions.md`. A leading `/` names the
-  Trainee's slash-command surface; it is **never** an instruction to invoke that
-  skill directly instead of running this loop.
+- **`Trainee`**: the Trainee reference. Its accepted forms, normalization order,
+  disambiguation rules and failure semantics are owned by
+  `.specify/shared/definitions/skill-reference-definitions.md` — reach them there, and
+  report the raw and the normalized identifier plus the decision class. A leading `/`
+  names the Trainee's slash-command surface; it is **never** an instruction to invoke
+  that skill directly instead of running this loop.
 - **Meta-skill Trainees are in scope.** When the Trainee itself operates on other
   skills (`improve-skills`, `merge-skills`, `create-skills`, `run-skills`), `<work>` is
   normally a skill-engineering request ("optimize skill X", "merge A into B"); its
@@ -44,9 +45,10 @@ Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
 Reuse the `run-skills` position ladder, with no second resolution rule: canonical
 internal → canonical external → installed internal → installed external.
 
-- Normalize the reference first (`skill:` label, leading `/` or `@`, trailing `/SKILL.md`
-  or `/` stripped) per `.specify/shared/definitions/skill-reference-definitions.md`; report both
-  the raw and the normalized form in the run output.
+- Normalize the `Trainee` reference first, by
+  `.specify/shared/definitions/skill-reference-definitions.md` (the order and the failure
+  semantics live there, not here); report the raw identifier, the normalized identifier and
+  the decision class in the run output.
 - A source hit and its installed mirror hit are one hit for the same skill; only two
   distinct layers carrying the same name are two hits.
 - Two hits: fail closed naming both candidate paths; never pick the nearest.
