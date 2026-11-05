@@ -124,6 +124,23 @@ PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
 # declaration is unreadable; the labelled `PATH_VALUES_LABEL` is emitted in that case.
 PASS_PATH = PATH_VALUES[0] if PATH_VALUES else "final"
 
+
+def _declared_flow_classes():
+    """`(values, label)` for the `flow-class-classes` closed set; `((), <STR-014>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()),
+            "flow-class-classes")["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label("flow-class-classes")
+
+
+FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
+
 # --- the `ARC verdict mapping` (batch 2; owner: the declaration layer) ------------------------ #
 # Feature 084 moved the `final_path` record's key set and the verdict's value set out of this
 # engine: they live in `shared/declarations/facts/arc-verdict-mapping.yaml` and are read here
@@ -217,17 +234,18 @@ LADDER_FIELDS = (
     "why_reduced_insufficient",
     "unblock",
 )
-SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path")
+SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path", "smoke_comparison")
 #: `final_path` is a closed count record (C-08): six status buckets plus the total. The set is the
 #: owner doc's (`§ Closure Verdict`), and since feature 084 its machine-read copy is the declaration
 #: `shared/declarations/facts/arc-verdict-mapping.yaml` — read above as `FINAL_PATH_BUCKETS` /
 #: `FINAL_PATH_TOTAL_KEY`, never spelled here again. `unknown` means *no status row exists*, while
 #: `partial` is a measured status and is therefore counted as itself.
 
-FLOW_CLASSES = ("execution", "expression")
-#: An undeclared class degrades to `execution` — the strict side. 077 FR-004 owns the default, and
-#: the `expression` exemption is mechanical: it is read from the declaration, never inferred.
-DEFAULT_FLOW_CLASS = "execution"
+#: An undeclared class degrades to the declaration's member 0 (`execution`) — the strict side.
+#: 077 FR-004 owns the default, and the `expression` exemption is mechanical: it is read from the
+#: declaration, never inferred. The literal fallback is the FR-012 compatibility value only when the
+#: declaration is unreadable; `FLOW_CLASSES_LABEL` is emitted in that case.
+DEFAULT_FLOW_CLASS = FLOW_CLASSES[0] if FLOW_CLASSES else "execution"
 
 #: Claimed statuses that assert the feature is already implemented. V-12: the claimed-but-blocked
 #: reason can only fire for one of these, so a `Planned → Implemented` run never emits it.
@@ -860,6 +878,9 @@ def evaluate_smoke(verification, repo):
         "evidence_path": evidence[0] if evidence else "",
         "evidence_exists": False,
     }
+    comparison = smoke.get("smoke_comparison", [])
+    if comparison:
+        detail["comparison"] = comparison[0]
     if len(commands) != 1 or len(exits) != 1 or len(evidence) != 1:
         return False, detail
     if exits[0].strip() != "0":
@@ -1775,6 +1796,9 @@ def main(argv=None):
         print(PATH_VALUES_LABEL, file=sys.stderr)
         print("closure-acceptance-check: the shared read entry is absent; the `Path` membership "
               "test is skipped for this run", file=sys.stderr)
+    # FR-012: an unreadable flow-class declaration is labelled, never silently defaulted.
+    if FLOW_CLASSES_LABEL:
+        print(FLOW_CLASSES_LABEL, file=sys.stderr)
 
     # FR-012 / FR-013: the `final_path` key set and the verdict values are declaration-layer facts
     # too. An unreadable declaration keeps this run going on the labelled compatibility value — it

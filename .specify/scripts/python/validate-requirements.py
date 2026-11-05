@@ -139,6 +139,8 @@ def _declared_flow_classes():
 
 FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
 EXECUTION_CLASS = FLOW_CLASSES[0] if FLOW_CLASSES else "execution"
+if FLOW_CLASSES_LABEL:
+    sys.stderr.write("%s\n" % FLOW_CLASSES_LABEL)
 
 
 class DomainUnavailable(Exception):

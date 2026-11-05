@@ -15,6 +15,7 @@ statement:
 consumers:
   - scripts/python/flow-class-check.py
   - scripts/python/validate-requirements.py
+  - scripts/python/closure-acceptance-check.py
   - skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
 former_carriers:
   - shared/definitions/flow-class-definitions.md

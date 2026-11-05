@@ -67,13 +67,13 @@ verdict=pass
 # -- Success Criteria evaluation --
 
 SC-001_status=pass
-SC-001_value=candidates 83 / in-scope 13 / excluded 70 / unclassified 0; coverage exit 0; verify exit 0 with 0 findings; two consecutive coverage runs byte-identical (sha256 f9cd934a…3473, 47 ms / 44 ms); no declaration outside the candidate set; consumer consistency declarations→carriers 28/28 and carriers→declarations 16/16
+SC-001_value=candidates 83 / in-scope 13 / excluded 70 / unclassified 0; coverage exit 0; verify exit 0 with 0 findings; two consecutive coverage runs byte-identical (sha256 f9cd934a…3473, 47 ms / 44 ms); no declaration outside the candidate set; consumer consistency declarations→carriers 31/31 and carriers→declarations 16/16
 SC-001_note=all four limbs read on the final tree after T032: (i) determinism holds; (ii) zero `unclassified-candidate:`; (iii) zero orphan declaration; (iv) bidirectional consumer consistency. Fast deterministic readings, not test suites; evidence in test-evidence/t032-classification-readings-2026-11-05.txt
 SC-001_evidence=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
 SC-001_verified_at=2026-11-05 (T032 classification slice, commit 94d9db33)
 
 SC-002_status=pass
-SC-002_value=declarations 23; consistency declarations→carriers 28/28, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 70 exclusion rows (13 in-scope / 70 excluded / 0 unclassified); residual `duplicate` face pass / 0 findings; contract module 68 passed
+SC-002_value=declarations 23; consistency declarations→carriers 31/31, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 70 exclusion rows (13 in-scope / 70 excluded / 0 unclassified); residual `duplicate` face pass / 0 findings; contract module 68 passed
 SC-002_note=all three segments read on the final tree: declaration side, state side (coverage/verify) and the residual `duplicate` face; the contract module (`tests/contract/test_harness_triple_structure.py`) passed 68/68 under the user-authorized final test budget
 SC-002_evidence=.specify/specs/084-harness-triple-structure/test-evidence/final-contract-module.txt; .specify/specs/084-harness-triple-structure/test-evidence/final-duplicate-face.txt; .specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
 SC-002_verified_at=2026-11-05 (final test budget)
