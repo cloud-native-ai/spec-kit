@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T044-T047 (part 9 of 10)
+- **part_scope**: T048-T053 (part 10a of 10; the Completion Gate, the Feature status flip and the implement wrap-up are part 10b)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,6 +24,7 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
+- **part_checkpoint** (implement part 10a/10): `part_scope=T048-T053` — **done**; commit `7037138b` (6 files, 623+/10-: `features/082.md` tasks entry, `notes/quickstart-run.md` § T049 + § T052, `notes/red-first-evidence.md` § T051, `tasks.md` six rows `[ ]`→`[X]`, the new `test-evidence/implement-part-10a.md`, and `tests/contract/test_self_explanatory_glossary.py` carrying T053's C-34 assertions from the part-9 hand-off). T048-T053 all `[X]`; **GATE-3 measured 0** (`grep -cE '^- \[[ >]\]'` → `0`, `grep` rc 1 = the wanted absence; 53 `[X]` rows). E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-10a.md`. Targeted-set-v1: `sync-mirrors.py --check` rc 0 (six `ok` pairs, `shared` 65 files); `regen-command-copies.py --check` rc 0 `OK:`; six `cmp -s` IDENTICAL; generator `within` (`Instructions size: 33357 B (budget 34816 B, 1459 B headroom)`, rc 0) with `wc -c` 33357 and the constant 34816 on both trees; `scan-confirmation-gates.py --json` `total=27` / `violations=[]`; glossary carrier **14 passed** rc 0 (was 10). **GATE-1 PASS** (trio 37 passed rc 0; extended four-guard + baseline set 821 passed / 1 failed, that failure `test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged` is IN `baseline-failed.txt` (`grep -c` = 1) so `comm -13` is empty; the four feature modules 798 passed rc 0). **GATE-2 PASS** (ten plan rows resolve; six `ok`/IDENTICAL pairs, `regen` `OK:` plus an empty `git diff --stat -- templates/commands/`; rows 9-10 `not applicable` by the table's own text). **GATE-3 PASS**. **GATE-4 DEFERRED to 10b** — it judges `verification.md`, which does not exist and is created by the wrap-up this part must not run; its result is asserted nowhere. `validate-tasks.py` rc 0 (0 errors / 34 warnings, all adjudicated). `features.md` 082 status stays **`Planned`** (status column read = `Planned`; `git diff` empty). PLAN-EDIT: none. **The brief's T052 wording asks for four gates; GATE-4 cannot run without fabricating `verification.md`, so three run and one is deferred — recorded, not silently dropped.** No Completion Gate completion, no Feature status flip, no implement wrap-up, no `verification.md`, no push. Next part (10b) is driver-dispatched and owns the Completion Gate, the `Planned → Implemented` flip and the wrap-up.
 - **part_checkpoint** (implement part 9/10): `part_scope=T044-T047` — **done**; commit `32fc3e70` (5 files, 333+/5-: the carrier's two new C-33 assertions, the T044/T046 note sections, the T047 quickstart-run section, tasks.md rows, the E3 file). T044-T047 all `[X]` in tasks.md, no `[>]` held; 6 unchecked rows remain (T048-T052 plus T053 which is P10), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-9.md`. Targeted-set-v1: carrier 10 passed rc 0 (was 8); `test_glossary_mechanism.py` 12 passed rc 0 with `git diff --stat --exit-code` = 0 (file unmodified); `improve.md` diff empty and `grep -c 'best-practice-optimization'` = 0 (`grep` rc 1 = wanted absence); the two T047 name sweeps rc 0 with per-file ≥ 1 on all eight counts; C-33 red-leg driver 7 PASS / 0 FAIL rc 0 on copies. Store byte-identical (`21482f64…`, 161 entries, empty `git diff`). Next part (P10 T048-T053) is driver-dispatched; this run MUST NOT start T048+ or T053.
 - **part_checkpoint** (implement part 8/10): `part_scope=T039-T043` — **done**; commit `2a525047` (3 files: the new contract module, the red-first evidence append, the E3 row). T039-T043 all `[X]` in tasks.md, no `[>]` held; 10 unchecked rows remain (T044+, and T053 which is P10), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-8.md`. Targeted-set-v1: new module 8 passed rc 0; `test_glossary_mechanism.py` 12 passed rc 0 (file unmodified, `git diff --stat` empty); parity subset 3 passed / 759 deselected rc 0; red-leg driver 10 PASS / 0 FAIL rc 0. Store byte-identical (`21482f64…`, 161 entries) — the engine write was idempotent. Next part (P9 T044-T047) is driver-dispatched; this run MUST NOT start T044+.
 - **part_checkpoint** (implement part 7/10): `part_scope=T034-T038` — **done**; commit `1d0746d4` (7 files, 741+/5-) + `1d15960f` (heading fix). T034-T038 all `[X]` in tasks.md, no `[>]` held; 15 unchecked rows remain (T039+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-7.md`. Next part (P8 T039-T043) is driver-dispatched; this run MUST NOT start T039+.
@@ -85,7 +86,8 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
 | evidence_ptr | `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md`; red/green pairing and the M-1/M-2 transcripts in `notes/red-first-evidence.md`; mirror and count measurements in `notes/pre-change-measurements.md` |
 
 - **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
-- **last_verdict**: implement part 3 done (`2161ac40`) — US1 surface complete: template principle (part 2), generator mandate entry (T013), both mirrors byte-identical (T014), live constitution XIX with MINOR bump 1.15.0→1.16.0 and a Sync Impact Report naming this amendment's principle (T017), carrier watchlist + three counts raised together 18/19/11 (T016). US1 subset 12 passed rc 0; carrier 19 passed rc 0; both mutation legs M-1/M-2 PASS with anti-vacuity companions and a sha256 unchanged-repository proof (T018). Five collateral guards pinned values this landing moved and were repaired in passing (x13/x15/x18/x5/x6 of `test_fast_fail_discipline.py`), each disclosed with its reason; none weakened, each keeps its own subject. No plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified). No Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up, no push.
+- **last_verdict**: implement part 10a done (`7037138b`) — the polish band T048-T053 is closed with zero unchecked rows; GATE-1 / GATE-2 / GATE-3 PASS (37 passed trio, six `ok`+IDENTICAL mirror pairs, `grep -cE '^- \[[ >]\]'` = 0), GATE-4 **deferred to part 10b** because it judges a `verification.md` this part must not create. `sync-mirrors.py --check` rc 0, `regen-command-copies.py --check` rc 0, generator `within` at 33357 B / 34816 B (1459 B headroom; the 32768 → 34816 / 33357 B / reason 三件套 is in the commit message), gate total 27 unchanged since T002, glossary carrier 14 passed, `validate-tasks.py` rc 0 (0 errors / 34 adjudicated warnings), `features.md` 082 still `Planned`. One factual correction disclosed: the generator never prints the `BUDGET … within` token (only an `info` line with headroom), so no such transcript is quoted. No plan-owned artifact touched (`PLAN-EDIT: none`). No Completion Gate completion, no Feature status flip, no implement Feedback/Wrap-up, no `verification.md`, no push.
+- **last_verdict** (previous, part 3): implement part 3 done (`2161ac40`) — US1 surface complete: template principle (part 2), generator mandate entry (T013), both mirrors byte-identical (T014), live constitution XIX with MINOR bump 1.15.0→1.16.0 and a Sync Impact Report naming this amendment's principle (T017), carrier watchlist + three counts raised together 18/19/11 (T016). US1 subset 12 passed rc 0; carrier 19 passed rc 0; both mutation legs M-1/M-2 PASS with anti-vacuity companions and a sha256 unchanged-repository proof (T018). Five collateral guards pinned values this landing moved and were repaired in passing (x13/x15/x18/x5/x6 of `test_fast_fail_discipline.py`), each disclosed with its reason; none weakened, each keeps its own subject. No plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified). No Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up, no push.
 - **next_step**: driver adjudicates the part-4 held-open C-18 reading, then dispatches implement part 5 (P5 `T024-T028`: live reconcile, symlink check, mirror sync, M-3/M-4 mutation legs). Part 4 stopped at the part boundary by design; C-15's green (`test_c1_live_instructions_carry_all_template_sections`) and C-21's red/green pairing both close at T024.
 - **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3) → 567834e2 (implement part 4)
 
@@ -538,3 +540,56 @@ between readings, not a single consistent correction):
 - **next_step**: driver dispatches implement part 8 (P8, starting at `T039` — the US4 glossary rows).
   This run MUST NOT start T039+.
 - **stage_commits** (append): … → e88cebc2 (implement part 6) → 1d0746d4 (implement part 7) → **1d15960f (part 7 evidence heading fix)**
+
+## Part 10a record（implement T048-T053，2026-11-05）
+
+- **part_scope**: `T048-T053` (part 10a of 10) — **done**
+- **checkpoint**: `part10a` — commit `7037138b` (6 files, 623+/10-); stage_base `e3d70068`
+- **rows closed**: T048, T049, T050, T051, T052, T053 all `[X]`; **zero** unchecked rows remain
+  (GATE-3 measured 0). No `[>]` held.
+- **targeted-set-v1 result** (no second full suite; E2's 26 failed / 7156 passed / 1 skipped stands):
+  - `python3 scripts/python/sync-mirrors.py --check` → **rc 0**, six `ok` pairs (`shared` 65 files)
+  - `python3 scripts/python/regen-command-copies.py --check` → **rc 0**, `OK: all per-tool command
+    copies match the source templates.`
+  - six `cmp -s <source> .specify/<source>` → **all IDENTICAL**
+  - `bash scripts/bash/generate-instructions.sh` → **rc 0**, `Instructions size: 33357 B (budget
+    34816 B, 1459 B headroom)` = `within`; `wc -c` 33357; constant 34816 on **both** trees
+  - `python3 scripts/python/scan-confirmation-gates.py --json` → **total 27**, `violations: []`
+  - `python3 -m pytest tests/contract/test_self_explanatory_glossary.py -q` → **rc 0, 14 passed**
+  - **new_failures**: none
+- **GATE-1**: **PASS** — the named trio 37 passed rc 0; the extended four-guard + baseline set
+  821 passed / 1 failed, where that one failure
+  (`test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged`) is in
+  `baseline-failed.txt` (`grep -c` = 1), so `comm -13` leaves nothing over; the four feature modules
+  798 passed rc 0.
+- **GATE-2**: **PASS** — all ten `plan.md` § Mirror Obligations rows resolve (six `ok`/IDENTICAL
+  pairs; `regen` `OK:` plus an empty `git diff --stat -- templates/commands/`; rows 9–10
+  `not applicable` by the table's own text).
+- **GATE-3**: **PASS** — `grep -cE '^- \[[ >]\]'` → `0` (read 6 before this part's closures).
+- **GATE-4**: **DEFERRED to part 10b** — it judges `verification.md`, which does not exist yet and is
+  created by the implement wrap-up this part MUST NOT run. Its result is asserted nowhere; writing
+  that file here would manufacture the evidence the row asks a later step to produce honestly.
+- **`validate-tasks.py`**: rc 0 — `PASS (with warnings): 0 error(s), 34 warning(s)`; the warnings are
+  the three already-adjudicated classes (32 → 34 during the tasks stage's own `94e8c30d` repair, not
+  in this part).
+- **E3 pointer**: `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-10a.md`;
+  transcripts in `notes/quickstart-run.md` § T049 and § T052, and `notes/red-first-evidence.md` § T051.
+- **last_verdict**: implement part 10a done (`7037138b`) — the polish band closes. T048's mirror total
+  is checked against the plan's ten rows rather than against the engine's exit code alone (six `ok`
+  pairs, six `cmp` IDENTICAL, `regen` unchanged with an empty diff over `templates/commands/`). T049
+  carries the 三件套 into both the note and the commit message: 32768 → 34816, measured 33357 B, reason
+  = the US2 section, 1459 B headroom (33792 would leave 435 B < the 1024 B rule). **One factual
+  correction worth naming**: the generator computes the verdict token `"within"` internally and never
+  prints it — only an `info` line with a positive headroom figure — so the evidence records that shape
+  instead of quoting a `BUDGET: … within` line that no command emits. T050 appended the tasks-stage
+  entry to `features/082.md` and left `features.md` at `Planned` (measured, `git diff` empty). T051
+  re-executed all four green halves in this part rather than citing earlier pastes, and states plainly
+  that R-2a's red is the plan stage's B-1 reading, not this run's. T053's C-34 carrier arrived from the
+  part-9 hand-off **unmodified** (14 passed: 10 carried + 4 C-34 assertions) — verified and closed, not
+  rewritten. No plan-owned artifact touched (`PLAN-EDIT: none`). No Completion Gate completion, no
+  Feature status flip, no implement Feedback/Wrap-up, no `verification.md`, no push.
+- **next_step**: driver dispatches implement part 10b (the Completion Gate, the `Planned →
+  Implemented` flip, `verification.md` with GATE-4, the implement wrap-up). This run MUST NOT run any
+  of them.
+- **stage_commits** (append): … → 2a525047 (implement part 8) → 32fc3e70 (implement part 9) →
+  **7037138b (implement part 10a)**
