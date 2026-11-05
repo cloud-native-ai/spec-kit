@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T029-T033 (part 6 of 10)
+- **part_scope**: T034-T038 (part 7 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,6 +24,7 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
+- **part_checkpoint** (implement part 7/10): `part_scope=T034-T038` — **done**; commit `1d0746d4` (7 files, 741+/5-) + `1d15960f` (heading fix). T034-T038 all `[X]` in tasks.md, no `[>]` held; 15 unchecked rows remain (T039+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-7.md`. Next part (P8 T039-T043) is driver-dispatched; this run MUST NOT start T039+.
 - **part_checkpoint** (implement part 6/10): `part_scope=T029-T033` — **done**; commit `e88cebc2` (12 files, 1272+/8-). T029-T033 all `[X]` in tasks.md, no `[>]` held; 20 unchecked rows remain (T034+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-6.md`. Next part (P7 T034-T038) is driver-dispatched; this run MUST NOT start T034+.
 - **part_checkpoint** (implement part 5/10): `part_scope=T024-T028` — **done**; commit `02fd6db5`. E3 row in `test-evidence/implement-part-5.md`.
 - **part_checkpoint** (implement part 3/10): `part_scope=T013-T018` — **done**; commit `2161ac40` (9 files, 409+/26-). T013-T018 all `[X]` in tasks.md, no `[>]` held; 35 unchecked rows remain (T019+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md`. Next part (P4 T019-T023) is driver-dispatched; this run MUST NOT start T019+.
@@ -407,3 +408,45 @@ between readings, not a single consistent correction):
 - The `shared` pair is **65 files before and after** T030/T031: 62 pre-existing files + 3 mirrors already present (untracked) from the plan stage. T030 only version-controls the 3 source documents; it does not add 3 new mirror files. The task's `65 → 68` prediction was wrong; the task text is corrected.
 - The operative C-22/C-23 evidence stands: `sync-mirrors.py --check` exit 0 (six `ok` pairs), three `cmp` pairs byte-identical, no MISS/DIFF. Part 6's targeted set: distribution 4 passed; mirror parity 766 passed; migration+constitution 31 passed.
 - Next: P7 T034-T038 (docs link guard, docs page, distribution probe, M-5/M-6).
+
+## Part 7 record（implement T034-T038，2026-11-05）
+
+- **part_scope**: `T034-T038` (part 7 of 10) — **done**
+- **checkpoint**: `part7` — commits `1d0746d4` (7 files, 741+/5-, the part's artifacts) and `1d15960f` (1 line, the evidence heading typo); stage_base `e5d0ae87`
+- **rows closed**: T034, T035, T036, T037, T038 all `[X]` in `tasks.md`; 15 unchecked rows remain
+  (T039+), by design. No `[>]` held.
+- **targeted-set-v1 result** (no second full suite; E2's 26 failed / 7156 passed / 1 skipped stands):
+  - `python3 -m pytest tests/contract/test_self_explanatory_distribution.py -q` → **rc 0, 9 passed**
+    (4 inherited from part 6 + 5 new: C-27 floor, C-27 resolution, C-27 anti-vacuity, C-27
+    no-owner-body, M-6 leg)
+  - `python3 scripts/python/sync-mirrors.py --check` → **rc 0**, six `ok` pairs, `shared` 65 files
+  - `python3 .specify/.tmp/082-part7/m56.py` (M-5 / M-6 driver, copies only) → **rc 0, 13 PASS /
+    0 FAIL**
+  - companion: `test_mirror_parity_suite.py -k "self_explanatory or …"` → 3 passed rc 0 (the same
+    three derived parameters part 6 recorded; the suite is unedited)
+  - **new_failures**: none
+- **E3 pointer**: `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-7.md`;
+  transcripts in `notes/pre-change-measurements.md` § Part 7 (T035 review table, C-27 measurements),
+  `notes/quickstart-run.md` § Part 7 (T036-a ambient probe / T036-b editable-install reading), and
+  `notes/red-first-evidence.md` § Part 7 (M-5 / M-6 verbatim + the new R-5 pair, CLOSED).
+- **last_verdict**: implement part 7 done (`1d0746d4` + `1d15960f`) — C-27 is guarded by four assertions inside the
+  existing distribution module (no new link-checking engine, FR-012), and both mutation legs are
+  proven on copies with the real subjects digest-identical afterwards. The docs page arrived in
+  version control as a pointer page (pointer-page form measured: 0 of 13 sentences copied from the
+  owner, 0 owner headings; the only addition is the two-line retired-name note). T036 records both
+  distribution readings and the measured cause of the ambient probe's negative result (installed CLI
+  built from `26731b67`, 271 commits behind, ancestor of the commit that introduced the documents),
+  together with the alternative reading that distributes all three (`pip install -e` → 65-file tree).
+  Two in-passing corrections disclosed (the anti-vacuity sample naming a real file; a wrong
+  expectation inside that same test, found by running it). No plan-owned artifact touched
+  (`PLAN-EDIT: none`). No Completion Gate, no Feature status flip, no implement Feedback/Wrap-up,
+  no push.
+- **C-27 allow-list**: `C27_MIRROR_EXEMPTIONS` is **empty by measurement** — all three page pointers
+  live under `shared/`, which is one of the engine's pairs. The exempt case stays decidable: any
+  extracted path outside every engine source dir is reported as "belongs to no mirror pair, and it is
+  not in C27_MIRROR_EXEMPTIONS", so a future docs-internal link fails loudly and forces an explicit
+  entry with its one-line reason. Writing speculative entries would have created a second truth about
+  which paths may skip the mirror check.
+- **next_step**: driver dispatches implement part 8 (P8, starting at `T039` — the US4 glossary rows).
+  This run MUST NOT start T039+.
+- **stage_commits** (append): … → e88cebc2 (implement part 6) → 1d0746d4 (implement part 7) → **1d15960f (part 7 evidence heading fix)**
