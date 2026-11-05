@@ -98,7 +98,9 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # 2026-10-27: Feature 071 adds one skill-wrapup Object (sdd-house-keeping); 116 -> 117.
     # 2026-11-03: Feature 081c (df9bbe0e) adds one skill-wrapup Object
     # (skill-review-feature-quality-wrapup, the dogfooding review carrier); 117 -> 118.
-    assert internal == 118, (
+    # 2026-11-05: improve-skills adds one skill-wrapup Object
+    # (skill-ssh-utils-wrapup, the SSH transport owner); 118 -> 119.
+    assert internal == 119, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

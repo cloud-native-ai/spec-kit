@@ -96,6 +96,7 @@
 | skill-document-utils-wrapup | skill-wrapup | skill:document-utils | wrap-up |
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
 | skill-git-utils-wrapup | skill-wrapup | skill:git-utils | wrap-up |
+| skill-ssh-utils-wrapup | skill-wrapup | skill:ssh-utils | wrap-up |
 | skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up |
 | skill-sdd-loop-driver-cli-profile | skill-wrapup | skill:sdd-loop-driver | wrap-up |
 | gate-git-workflow-tiered-mode | skill-gate | skill:git-utils | gate-git-workflow-tiered-mode |

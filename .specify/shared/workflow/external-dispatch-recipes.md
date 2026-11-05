@@ -13,6 +13,8 @@ Operational recipes for driving an **external subagent** (Mode 3 in [`subagent-d
 
 Both topologies support parallel lines: one connection/process per line, each line tracked with its own task entry (e.g. TaskCreate/TaskUpdate) so the orchestrator never conflates their states.
 
+**SSH transport owner**: concrete option sets, quoting, stdin script push and exit-code propagation are owned by the `ssh-utils` skill (`scripts/ssh-exec.py`). Every non-interactive ssh invocation MUST carry `-o RemoteCommand=none` — a host whose ssh_config presets `RemoteCommand` otherwise rejects the command line with `Cannot execute command-line and remote command`. The recipes below show the topology shape; prefer the wrapper when executing.
+
 > **SDD-driving skills boundary**: for `sdd-project-setup`, `sdd-house-keeping` and `sdd-loop-driver`, the **local** topology defaults to the orchestrator / host native subagent and MUST NOT launch `qodercli` locally. The local external-CLI variant in Recipe 5 is for consumers that explicitly choose external dispatch; it is not the SDD local default. The **remote** topology is `ssh <alias>` → `su - <run-user>` → `cd <project-dir>` → subagent CLI; the CLI default is the execution-config defaults layer (`templates/execution-config-defaults.yaml`, `cli: qodercli`). The **only local exception** is the bounded read-only validation/detection fan-out (`/speckit.analyze` §5.5, `objective-analysis-gate.md`): it is worker dispatch, not stage dispatch, and selects External per `subagent-definitions.md` § Mode Selection (Recipe 7).
 
 ## Recipe 1 — Breakpoint Probe (断点探测)
@@ -31,7 +33,7 @@ Read the three signals together (branch name, recent commits, spec directory con
 Each stage gets a complete instruction file written to the remote host via heredoc, one file per line and stage:
 
 ```bash
-ssh <alias> "cat > /home/<run-user>/prompt-<line>-<stage>.md" <<'EOF'
+ssh -o RemoteCommand=none <alias> "cat > /home/<run-user>/prompt-<line>-<stage>.md" <<'EOF'
 <prompt body>
 EOF
 ```
@@ -62,7 +64,7 @@ Derive the next stage's runner from the previous one with a one-line `sed` filen
 Run the stage in the background with its output streamed to a local log, then poll:
 
 ```bash
-ssh <alias> "su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh'" \
+ssh -o RemoteCommand=none <alias> "su - <run-user> -c 'bash /home/<run-user>/run-<line>-<stage>.sh'" \
   > ~/tmp/<project>/<line>-<stage>.log 2>&1 &     # background; one ssh stream per line
 
 tail -N ~/tmp/<project>/<line>-<stage>.log        # poll until the sentinel line appears

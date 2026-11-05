@@ -57,6 +57,7 @@ HANDOFF      调 sdd-house-keeping H0–H4；H4 三条件成立才返回 ready�
 
 - **前置检查（五族）与失败处置链**：权威落点 `skills/internal/run-agent/references/dispatch-preflight.md`。
 - **通用远端命令形态**：`shared/workflow/external-dispatch-recipes.md`。
+- **SSH 传输 owner**：`ssh-utils`（`scripts/ssh-exec.py`，固定 `-o RemoteCommand=none`、引号、stdin 脚本推送、su 包装与退出码）；setup 的远端命令一律经其执行。
 - **治理命令的子代理派发**：本地由编排者直执或宿主**原生子代理**承载（不启动 `qodercli`）；远端经 run-agent 派发外部 agent CLI。
 - **指令体积预算**：预算常量 owner 是 `scripts/bash/generate-instructions.sh` 的 `INSTRUCTIONS_BUDGET_BYTES`；R1/R2 owner 是 `manage-instructions`；R3 归 house-keeping H2。
 

@@ -7,9 +7,10 @@ that ``tasks.md`` T010 names:
 * C-1  an unrefreshed project keeps its old behaviour: no command template and no
   skill carries a call to one of the new engine actions (``check`` /
   ``delegation`` / ``faces`` / ``isomorphism``), and the shipped file-name sets
-  are unchanged (27 command templates, 53 skills — 51 at the 069b baseline; the
+  are unchanged (27 command templates, 54 skills — 51 at the 069b baseline; the
   2026-10-30 Feature 078 rename swaps one name in place, so the count is
-  unchanged, and 2026-11-03 Feature 081c adds one internal unit — see the roster
+  unchanged, 2026-11-03 Feature 081c adds one internal unit, and 2026-11-05
+  improve-skills adds the external `ssh-utils` transport unit — see the roster
   comment);
 * C-2  a refresh lands every payload from the same release package: the owner and
   the engine travel via ``pyproject.toml`` force-include (``shared`` /
@@ -86,6 +87,9 @@ ENGINE_REF = "flow-class-check.py"
 # so `SKILL_BASELINE` and the pinned length move together. A shipped-set census that
 # kept the old count would fail on a correct tree; dropping the count would make the
 # roster unable to notice a unit that silently stopped shipping.
+# 2026-11-05 (improve-skills ssh-utils): 53 -> 54. The external `ssh-utils` unit is the
+# SSH transport owner extracted from `sdd-project-setup`; it ships in the same wheel
+# through the same hatch staging step, so the roster and length move together again.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
@@ -100,7 +104,7 @@ SKILL_BASELINE = frozenset(
         "create-docs", "create-pages", "create-skills", "database-utils",
         "document-utils", "draw-diagram", "git-utils", "humanize",
         "improve-docs", "improve-skills", "merge-skills", "sdd-house-keeping",
-        "sdd-loop-driver", "sdd-project-setup", "coaching-skills", "analyze-artifacts",
+        "sdd-loop-driver", "sdd-project-setup", "ssh-utils", "coaching-skills", "analyze-artifacts",
         "archive-session", "clarify-artifact", "code-review",
         "collect-evidence", "create-agent", "create-checklist", "create-plan",
         "create-requirements", "create-tasks", "create-team", "create-tools",
@@ -116,7 +120,7 @@ SKILL_BASELINE = frozenset(
     }
 )
 assert len(COMMAND_BASELINE) == 27
-assert len(SKILL_BASELINE) == 53
+assert len(SKILL_BASELINE) == 54
 
 # Contract C-2: the four payload classes and where the release package carries them.
 FORCE_INCLUDE_EXPECTED = {

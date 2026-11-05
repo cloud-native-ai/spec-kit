@@ -47,10 +47,10 @@ python3 <skill>/scripts/mechanism-inventory.py --project <project-dir> --json
 python3 <skill>/scripts/logical-framework.py --project <project-dir> --json
 ```
 
-远端：
-`ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <project-dir>'" < <skill>/scripts/mechanism-inventory.py`
-`ssh <alias> "su - <run-user> -c 'cd <project-dir> && python3 - --project <project-dir> --json'" < <skill>/scripts/logical-framework.py`
-（只读，无副作用）。通用远端命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md`。
+远端（SSH 传输 owner：`ssh-utils`；`<ssh-utils>` 为其技能目录）：
+`python3 <ssh-utils>/scripts/ssh-exec.py --host <alias> --user <run-user> --cwd <project-dir> --script <skill>/scripts/mechanism-inventory.py --script-arg=--project --script-arg=<project-dir> --json`
+`python3 <ssh-utils>/scripts/ssh-exec.py --host <alias> --user <run-user> --cwd <project-dir> --script <skill>/scripts/logical-framework.py --script-arg=--project --script-arg=<project-dir> --json`
+拓扑形态仍是 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；`ssh-exec.py` 固定带 `-o RemoteCommand=none`（主机预置 `RemoteCommand` 时裸 ssh 会与命令行冲突）。通用远端命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md`。
 
 逻辑矩阵：required（instructions / features / docs）、recommended（goals / glossary / register /
 knowledge）、conditional（agents / teams）。退出码 `0` required 全 ok；`1` required 缺口；`2` 非
@@ -74,7 +74,7 @@ PATH `python3`（`python`）→ 系统 bin 目录最高版 `python3*`。失败�
 - **ensure**：`command -v specify` 在位 → 跳过安装。
 - **install**：委托仓根 `install.sh`（三源回退、`specify check` 终验、退出码 0/2/3/5）；非 0 一律
   视为安装未完成，按码处置不重试盲跑。
-- 远端：以上判定与安装经 `ssh <alias> "su - <run-user> -c '...'"` 在执行侧运行。
+- 远端：以上判定与安装经 `ssh-utils` 的 `ssh-exec.py --host <alias> --user <run-user> --cwd <project-dir> --cmd '...'` 在执行侧运行（拓扑形态 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；包装器固定 `-o RemoteCommand=none`）。
 
 ### S2-2 项目 init / 刷新
 
@@ -109,11 +109,17 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 **Carrier**：本地由编排者/宿主原生子代理在**当前项目**执行；远端每个命令经 run-agent 在
 `<project-dir>` 下执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；subagent CLI 缺省
 取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。MUST NOT 在本地启动
-`qodercli` 作为子代理。
+`qodercli` 作为子代理。底层 SSH 传输一律经 `ssh-utils`，见下节。
 
 S2.5 完成后，**首次 goal/agents/team 不得悬空**：目标项目若仍缺 goal 且用户未明确要求跳过，
 setup 必须在 handoff 前完成或把 `bootstrap-gap: goal` 写入 handoff 凭证，由 house-keeping H3
 回交 setup；house-keeping 不静默跳过。
+
+## SSH 传输约定（owner: ssh-utils）
+
+- 任何远端命令 MUST 经 `ssh-utils/scripts/ssh-exec.py`；它固定带 `-o RemoteCommand=none`。目标主机可能在 ssh_config 预置 `RemoteCommand`，裸 `ssh <alias> "..."` 会报 `Cannot execute command-line and remote command`——这是配置冲突，不是安全拦截。
+- 传输失败先跑 `ssh-exec.py --host <alias> --check`：`remotecommand` 非 `none` 即证实该冲突；认证/引号/su/超时按 `ssh-utils/references/pitfalls.md` 分诊。
+- `--user` 包装为 `su - <run-user> -c '...'`；`--cwd` 负责 `cd <project-dir>`；脚本用 `--script` 经 stdin 推送，不落远端临时文件；退出码原样传播（`124` 本地超时、`255` 传输失败）。
 
 ## HANDOFF（bootstrap → house-keeping）
 
