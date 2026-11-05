@@ -1,0 +1,13 @@
+slots=baseline:1 closure:1 reruns=0 exceptions=0 unknown=6 environment_failures=0
+stages=6 complete=0
+status=fail
+reason=row 1: missing purpose
+reason=row 1: missing trigger
+reason=row 1: missing at
+reason=clarify: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=plan: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=tasks: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=checklist: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=analyze: stage evidence file missing; counted in the completeness denominator (unknown)
+reason=review: stage evidence file missing; counted in the completeness denominator (unknown)
+# audit rc=1
