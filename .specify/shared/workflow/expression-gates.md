@@ -22,6 +22,14 @@
 | 事实一致性 | fact-consistency | `shared/guidelines/one-source-of-truth.md`（整文件即判据，无单章节锚） |
 | 评审 | review | `skills/internal/review-sdd-process/SKILL.md` § Workflow + `templates/review-template.md` |
 
+**机器可读的两处取值归声明层（Feature 084 批 2）**：本文件的**六面行数与表内列集**是机器读得到的值，单一 owner 是
+`shared/declarations/facts/expression-gate-faces.yaml#/statement`（`section_keyword` + `expected`）与
+`shared/declarations/facts/expression-stage-operator-table.yaml#/statement`（五个列名，有序）；引擎
+`scripts/python/flow-class-check.py` 经共享读取入口读这两处，本文件保留的是**判据**——表必须落在哪个章节、哪些列必须
+在场、为何顺序是值的一部分——不另持一份列集副本。上面第 6 行的行数与本节表头因此是**指针化后的遗留陈述**：
+`tests/contract/test_expression_gates_doc.py` 以逐字断言钉住 `面数 = 6`，故该数字在本文件保留到该钉被其所有者复核为止，
+归属仍以声明为准。
+
 ## 阶段算子表
 
 八个阶段各至少一行：阶段、算子 id、执行算子（可执行入口或点名的既有流程）、对应面、阻断级别。任一阶段无算子即失败；算子行不得是空表头行。

@@ -15,18 +15,31 @@ Exit codes:
   1 = fail (at least one blocking finding)
   2 = input or parse error
 
-Standard library only, Python >= 3.8. The gate owns no framework dependency: it runs on the spec
-tree it is pointed at and reads no framework runtime module — with one documented exception, the
-declaration layer's read entry (``scripts/python/declaration_reader.py``), which it locates by
-walking up from its own resolved path for the gate roster (Feature 084 / `C-044`). A project that
-never received the layer keeps evaluating: the absent read is labelled and the inline roster stands
-(FR-012).
+Standard library only, Python >= 3.8. The gate judges the spec tree it is pointed at with its own
+code and adds no framework runtime dependency. Feature 084 accounts for the two deviations from
+that self-containment by name instead of leaving them implicit:
+
+* **One module import — the shared read entry** (``scripts/python/declaration_reader.py``). It is
+  located by walking up from this file's own resolved path and supplies the gate roster (`C-044`).
+  A project that never received the layer keeps evaluating: the absent read is labelled and the
+  inline roster stands (FR-012).
+* **One subprocess call — the judging engine** (``scripts/python/harness-triple-check.py``). It runs
+  only when ``--triple-structure`` is passed, once per run, and each finding line it prints is
+  forwarded verbatim under the single check name ``triple-structure``. The flag defaults **off** by
+  measurement rather than taste: an existing 081 assertion closes the set of finding *names* a stage
+  run may produce, so a default-on delegation would turn it red (plan D8 / `T-003`). Off is the
+  shape that keeps both properties true — the gate still runs with no layer present, and 081's
+  closed set does not move.
+
+Neither deviation changes what the default run does: without ``--triple-structure`` the gate emits
+exactly the finding names it emitted before.
 """
 
 import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 
@@ -182,6 +195,84 @@ def declared_check(key):
         _LABELLED.add(note)
         sys.stderr.write("pre-analyze-check: %s\n" % note)
     return key
+
+
+# ---------------------------------------------------------------------------
+# Opt-in delegation: the declaration layer's judging engine
+# (Feature 084 / `C-040`, plan D8, decision tension `T-003`)
+#
+# `--triple-structure` asks the layer's own engine once for `verify` and forwards every finding line
+# it prints **verbatim** under one check name. The flag defaults **off**: an existing 081 assertion
+# (`tests/contract/test_acceptance_premises.py`) closes the finding *names* a stage run may produce
+# to the four `GW-07` classes below, so a default-on delegation would turn that assertion red.
+#
+# The forwarded name is deliberately **not** a member of `driver-gate-roster`'s `checks`. That set is
+# this gate's own closed vocabulary (`C-044`); a delegated finding is another engine's verdict passed
+# through, not a seventh judgement of this gate. Routing it through `declared_check()` would both
+# claim roster membership and print a "not in the declared roster" label on every flagged run, which
+# would empty the honest `FR-012` label of its meaning. It is a local constant of a vocabulary this
+# file does not own — the same shape as the four `GW-07` names below.
+CHECK_TRIPLE_STRUCTURE = "triple-structure"
+TRIPLE_CHECK_REL = os.path.join("scripts", "python", "harness-triple-check.py")
+
+#: The engine prints one finding per line behind this prefix (its own text format, `C-038`).
+FINDING_LINE = "finding: "
+
+
+def triple_structure_entry():
+    """The judging engine belonging to *this* copy of the gate, walked up from this file.
+
+    Same three-copy rule as `declaration_entry()`: the framework source, this repository's mirror
+    and a client project's `.specify/` copy each resolve to their own layer, because the nearest
+    ancestor carrying `scripts/python/harness-triple-check.py` is that copy's own. Read-only; the
+    walk stops at the filesystem root and returns `None` when no copy carries the engine.
+    """
+    here = os.path.dirname(os.path.realpath(__file__))
+    while here:
+        candidate = os.path.join(here, TRIPLE_CHECK_REL)
+        if os.path.isfile(candidate):
+            return candidate
+        parent = os.path.dirname(here)
+        if parent == here:
+            return None
+        here = parent
+    return None
+
+
+def delegate_triple_structure(repo, findings):
+    """Ask the layer's engine once (`verify`) and forward each finding line verbatim.
+
+    One call, one check name (`C-040`: two call sites, no new stage). An engine that cannot judge —
+    exit 2, the layer is absent from the tree under judgement — is surfaced as a labelled note on
+    stderr and is **not** turned into a finding: degradation is neither a pass nor a fifth finding
+    class (plan D7). The forwarded line keeps its own text; this gate neither rewraps nor re-words
+    it, so the layer's vocabulary stays the layer's.
+    """
+    engine = triple_structure_entry()
+    if engine is None:
+        label_absent(TRIPLE_CHECK_REL)
+        return 0
+    command = [sys.executable, engine, "--action", "verify"]
+    if repo:
+        command.extend(["--repo", repo])
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True)
+    except OSError as exc:
+        sys.stderr.write("pre-analyze-check: %s: %s\n" % (TRIPLE_CHECK_REL, exc))
+        return 0
+    forwarded = 0
+    for line in completed.stdout.splitlines():
+        if not line.startswith(FINDING_LINE):
+            continue
+        # `line == 0` and the engine path as `path`: a forwarded finding has no line of its own in
+        # this tree, and the pair keeps a `--waive CHECK:REL_PATH:LINE` key writable.
+        add(findings, CHECK_TRIPLE_STRUCTURE, "error", TRIPLE_CHECK_REL, 0,
+            line[len(FINDING_LINE):])
+        forwarded += 1
+    if completed.returncode == 2:
+        note = completed.stderr.strip() or "%s: input error" % TRIPLE_CHECK_REL
+        sys.stderr.write("pre-analyze-check: %s\n" % note)
+    return forwarded
 
 
 # --- ownership / premise findings (081b) ----------------------------------------------------
@@ -1150,6 +1241,10 @@ def run(args):
         carrier_tasks_text=carrier_tasks,
     )
 
+    # Opt-in, default off (Feature 084 / D8): one delegation, then the verdict above is unchanged.
+    if args.triple_structure:
+        delegate_triple_structure(repo, findings)
+
     waivers = set(args.waive or [])
     waived = apply_waivers(findings, waivers)
     blocking = [f for f in findings
@@ -1186,6 +1281,13 @@ def main(argv=None):
                         help="treat missing-path advisories as blocking")
     parser.add_argument("--waive", action="append", default=[],
                         metavar="CHECK:REL_PATH:LINE")
+    parser.add_argument("--triple-structure", action="store_true",
+                        help="opt-in (default off): delegate once to the declaration layer's "
+                             "judging engine (scripts/python/harness-triple-check.py --action "
+                             "verify) and forward each of its finding lines verbatim under the "
+                             "single check name triple-structure. Off by measurement: an existing "
+                             "081 assertion closes the finding-name set a stage run may produce "
+                             "(plan D8 / T-003, Feature 084 C-040)")
     parser.add_argument("--json-out", default="")
     args = parser.parse_args(argv)
 

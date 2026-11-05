@@ -1,0 +1,89 @@
+$ python3 scripts/python/sync-mirrors.py --write
+Regenerated command copies for 4 tools.
+Fixed drift:
+  .github/prompts/speckit.history.prompt.md
+  .github/prompts/speckit.review.prompt.md
+  .claude/commands/speckit.history.md
+  .claude/commands/speckit.review.md
+  .opencode/command/speckit.history.md
+  .opencode/command/speckit.review.md
+  .qoder/commands/speckit.history.md
+  .qoder/commands/speckit.review.md
+DIFF  .specify/templates/review-template.md
+sync  templates/ -> .specify/templates/ (1 files)
+DIFF  .specify/skills/sdd-loop-driver/SKILL.md
+DIFF  .specify/skills/sdd-loop-driver/references/efficiency-model.md
+DIFF  .specify/skills/sdd-loop-driver/references/state-awareness.md
+DIFF  .specify/skills/sdd-loop-driver/scripts/loop-state.py
+DIFF  .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py
+sync  skills/external/ -> .specify/skills/ (5 files)
+DIFF  .specify/skills/internal/collect-evidence/SKILL.md
+DIFF  .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+DIFF  .specify/skills/internal/manage-history/SKILL.md
+DIFF  .specify/skills/internal/memory-recall/SKILL.md
+DIFF  .specify/skills/internal/memory-record/SKILL.md
+DIFF  .specify/skills/internal/review-sdd-process/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (6 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+MISS  .specify/scripts/python/declaration_reader.py
+MISS  .specify/scripts/python/harness-triple-check.py
+DIFF  .specify/scripts/python/closure-acceptance-check.py
+DIFF  .specify/scripts/python/evidence-utils.py
+DIFF  .specify/scripts/python/exec-quant.py
+DIFF  .specify/scripts/python/feedback-utils.py
+DIFF  .specify/scripts/python/flow-class-check.py
+DIFF  .specify/scripts/python/history-utils.py
+DIFF  .specify/scripts/python/memory-utils.py
+DIFF  .specify/scripts/python/probe-utils.py
+DIFF  .specify/scripts/python/record-retention.py
+DIFF  .specify/scripts/python/trigger-utils.py
+DIFF  .specify/scripts/python/validate-requirements.py
+sync  scripts/ -> .specify/scripts/ (13 files)
+MISS  .specify/shared/declarations/contract.yaml
+MISS  .specify/shared/declarations/exclusions/no-harness-asset.yaml
+MISS  .specify/shared/declarations/exclusions/no-machine-fact.yaml
+MISS  .specify/shared/declarations/facts/arc-verdict-mapping.yaml
+MISS  .specify/shared/declarations/facts/driver-completion-sentinels.yaml
+MISS  .specify/shared/declarations/facts/driver-gate-roster.yaml
+MISS  .specify/shared/declarations/facts/driver-stage-artifacts.yaml
+MISS  .specify/shared/declarations/facts/driver-stage-sequence.yaml
+MISS  .specify/shared/declarations/facts/evidence-lanes.yaml
+MISS  .specify/shared/declarations/facts/evidence-seven-states.yaml
+MISS  .specify/shared/declarations/facts/expression-gate-faces.yaml
+MISS  .specify/shared/declarations/facts/expression-stage-operator-table.yaml
+MISS  .specify/shared/declarations/facts/feedback-prompt-threshold.yaml
+MISS  .specify/shared/declarations/facts/flow-class-basis.yaml
+MISS  .specify/shared/declarations/facts/flow-class-classes.yaml
+MISS  .specify/shared/declarations/facts/flow-class-document-types.yaml
+MISS  .specify/shared/declarations/facts/flow-class-ledger-columns.yaml
+MISS  .specify/shared/declarations/facts/flow-class-neutral-categories.yaml
+MISS  .specify/shared/declarations/facts/history-manifest-schema.yaml
+MISS  .specify/shared/declarations/facts/memory-retention-thresholds.yaml
+MISS  .specify/shared/declarations/facts/memory-types.yaml
+MISS  .specify/shared/declarations/facts/probe-class-values.yaml
+MISS  .specify/shared/declarations/facts/probe-object-binding-map.yaml
+MISS  .specify/shared/declarations/facts/quant-record-schema.yaml
+MISS  .specify/shared/declarations/facts/success-criterion-path-values.yaml
+MISS  .specify/shared/declarations/facts/trigger-state-schema.yaml
+MISS  .specify/shared/definitions/harness-triple-definitions.md
+DIFF  .specify/shared/definitions/flow-class-definitions.md
+DIFF  .specify/shared/definitions/framework-map.md
+DIFF  .specify/shared/definitions/probe-definitions.md
+DIFF  .specify/shared/guidelines/better-harness.md
+DIFF  .specify/shared/guidelines/proactive-trigger.md
+DIFF  .specify/shared/workflow/acceptance-hardening.md
+DIFF  .specify/shared/workflow/evidence-step.md
+DIFF  .specify/shared/workflow/expression-gates.md
+DIFF  .specify/shared/workflow/feedback-step.md
+sync  shared/ -> .specify/shared/ (36 files)
+[exit=0]
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (89 files)
+[exit=0]

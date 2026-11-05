@@ -68,6 +68,16 @@ import re
 import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import declaration_reader  # noqa: E402  (the declaration layer's one read entry)
+except ImportError:  # pragma: no cover - only a tree that ships the checker without its sibling
+    # C-052 ships the read entry beside every engine, so this shape is not a smaller payload — it is
+    # a payload that does not exist. The guard exists so such a tree degrades on the `STR-014` label
+    # (below) instead of dying on a traceback, which is what FR-013 forbids.
+    declaration_reader = None
+
 EXIT_ACCEPT = 0
 EXIT_BLOCK = 1
 EXIT_INPUT = 2
@@ -75,6 +85,92 @@ EXIT_INPUT = 2
 #: Inputs the check cannot run without (C-02). Missing any of them is an input error, never a
 #: `block`: the artifact is incomplete, which is a different fact from the feature failing.
 REQUIRED_INPUTS = ("requirements.md", "plan.md", "tasks.md", "verification.md")
+
+# --- the `Path` closed set (batch 1 row 9; owner: the declaration layer) ---------------------- #
+# Feature 084 moved this two-member domain out of the checker: the members and their order live in
+# `shared/declarations/facts/success-criterion-path-values.yaml`, read here through the shared read
+# entry. The refusal text below is unchanged — it still names the two members, and an out-of-domain
+# marker is still an input error (`InputError`), never a `block` (V-3 / AS-04).
+#
+# Two degradations, deliberately different, and the difference is about what the tree is:
+#   * **read entry present, layer/fact missing** (a legacy project): an input error naming the
+#     absent declaration — the same exit-2 shape an unparseable marker already takes (D7).
+#   * **read entry absent** (a tree carrying the checker without the sibling C-052 ships beside it):
+#     a shape no project has, so the run keeps its other judgements, skips only the membership test
+#     and puts `PATH_VALUES_LABEL` on stderr — never a traceback and never a clean pass (FR-013).
+PATH_FACT = "success-criterion-path-values"
+#: True when the module itself is missing, not merely the declaration it would read.
+READER_ABSENT = declaration_reader is None
+
+
+def _declared_path_values():
+    """`(values, label)` for the `Path` closed set; `((), <STR-014 instance>)` when unreadable."""
+    if declaration_reader is None:
+        return (), "declaration-absent: %s" % PATH_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), PATH_FACT)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label(PATH_FACT)
+
+
+PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+
+# --- the `ARC verdict mapping` (batch 2; owner: the declaration layer) ------------------------ #
+# Feature 084 moved the `final_path` record's key set and the verdict's value set out of this
+# engine: they live in `shared/declarations/facts/arc-verdict-mapping.yaml` and are read here
+# through the same shared read entry. The criteria below are untouched — which conditions produce a
+# `block` is the owner doc's judgement, and C-051 forbids a migration from moving a frozen gate's
+# criteria or exit codes.
+ARC_FACT = "arc-verdict-mapping"
+#: The FR-012 compatibility value, consulted **only** when the declaration is unreadable (a legacy
+#: project, or a tree whose read entry is missing). On a tree that carries the declaration this tuple
+#: is never used: taking it as well would be the double read FR-012 forbids.
+ARC_FALLBACK_BUCKETS = ("pass", "blocked", "deferred", "partial", "fail", "unknown")
+ARC_FALLBACK_TOTAL_KEY = "total"
+ARC_FALLBACK_UNKNOWN_KEY = "unknown"
+ARC_FALLBACK_VERDICTS = ("accept", "block")
+
+
+def _declared_arc_mapping():
+    """`(buckets, total_key, unknown_key, verdicts, label)`; the labelled compatibility value when
+    the declaration is unreadable."""
+    fallback = (ARC_FALLBACK_BUCKETS, ARC_FALLBACK_TOTAL_KEY, ARC_FALLBACK_UNKNOWN_KEY,
+                ARC_FALLBACK_VERDICTS, "declaration-absent: %s" % ARC_FACT)
+    if declaration_reader is None:
+        return fallback
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), ARC_FACT)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict):
+            raise ValueError("statement is not a mapping")
+        buckets = statement.get("final_path_buckets")
+        verdicts = statement.get("verdicts")
+        total_key = str(statement.get("final_path_total_key", "")).strip()
+        unknown_key = str(statement.get("final_path_unknown_key", "")).strip()
+        if (not isinstance(buckets, list) or not buckets
+                or not isinstance(verdicts, list) or len(verdicts) != 2
+                or not total_key or unknown_key not in [str(value) for value in buckets]):
+            raise ValueError("statement is not the declared mapping shape")
+        return (tuple(str(value) for value in buckets), total_key, unknown_key,
+                (str(verdicts[0]), str(verdicts[1])), None)
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return fallback
+
+
+(FINAL_PATH_BUCKETS, FINAL_PATH_TOTAL_KEY, FINAL_PATH_UNKNOWN_KEY, ARC_VERDICTS,
+ ARC_LABEL) = _declared_arc_mapping()
+VERDICT_ACCEPT, VERDICT_BLOCK = ARC_VERDICTS
+#: The bucket a `final`-path criterion passes into. This word belongs to the **status vocabulary**
+#: (`§ Verification Vocabulary`, which feature 084 does not migrate) and the count record is keyed by
+#: the declared buckets, so this names the same value from the status side rather than re-spelling
+#: the bucket set.
+FINAL_PATH_PASS_BUCKET = "pass"
 
 # --- the closed reason set -------------------------------------------------------------------
 # The seven templates are owned by `requirements.md` § Shared Strings (STR-008…STR-014) and by the
@@ -119,9 +215,10 @@ LADDER_FIELDS = (
 )
 SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path")
 #: `final_path` is a closed count record (C-08): six status buckets plus the total. The set is the
-#: owner doc's (`§ Closure Verdict`), not this file's: `unknown` means *no status row exists*,
-#: while `partial` is a measured status and is therefore counted as itself.
-FINAL_PATH_BUCKETS = ("pass", "blocked", "deferred", "partial", "fail", "unknown")
+#: owner doc's (`§ Closure Verdict`), and since feature 084 its machine-read copy is the declaration
+#: `shared/declarations/facts/arc-verdict-mapping.yaml` — read above as `FINAL_PATH_BUCKETS` /
+#: `FINAL_PATH_TOTAL_KEY`, never spelled here again. `unknown` means *no status row exists*, while
+#: `partial` is a measured status and is therefore counted as itself.
 
 FLOW_CLASSES = ("execution", "expression")
 #: An undeclared class degrades to `execution` — the strict side. 077 FR-004 owns the default, and
@@ -502,7 +599,15 @@ def parse_requirements(path):
                 % (path, number, sc_id)
             )
         value = last.group(1).strip()
-        if value not in ("final", "supporting"):
+        if not PATH_VALUES and not READER_ABSENT:
+            # FR-012 / FR-013 / D7: a legacy project (the read entry is here, the declaration is not)
+            # cannot be judged on this rule, so the run stops on the input-error path with the absent
+            # label — never a silent pass and never a `block`.
+            raise InputError(
+                "%s: the `Path` closed set cannot be read from the declaration layer (%s)"
+                % (path, PATH_VALUES_LABEL)
+            )
+        if PATH_VALUES and value not in PATH_VALUES:
             raise InputError(
                 "%s:%d %s declares `**Path**: %s`, outside the closed set final / supporting"
                 % (path, number, sc_id, value)
@@ -806,13 +911,13 @@ def final_path_counts(criteria, statuses):
     pass.
     """
     counts = {bucket: 0 for bucket in FINAL_PATH_BUCKETS}
-    counts["total"] = 0
+    counts[FINAL_PATH_TOTAL_KEY] = 0
     for sc_id, path in criteria.items():
         if path != "final":
             continue
-        counts["total"] += 1
+        counts[FINAL_PATH_TOTAL_KEY] += 1
         value = _first_status(statuses, sc_id)
-        counts[value if value in FINAL_PATH_BUCKETS else "unknown"] += 1
+        counts[value if value in FINAL_PATH_BUCKETS else FINAL_PATH_UNKNOWN_KEY] += 1
     return counts
 
 
@@ -826,12 +931,12 @@ def final_path_reasons(flow_class, criteria, statuses, counts):
     """
     if flow_class != "execution":
         return []
-    if counts["total"] == 0 or counts["pass"] == 0:
+    if counts[FINAL_PATH_TOTAL_KEY] == 0 or counts[FINAL_PATH_PASS_BUCKET] == 0:
         return [_reason(R_ZERO_FINAL_PASS)]
     return [
         _reason(R_FINAL_PATH_NOT_PASS, sc_id)
         for sc_id in sorted(criteria)
-        if criteria[sc_id] == "final" and _first_status(statuses, sc_id) != "pass"
+        if criteria[sc_id] == "final" and _first_status(statuses, sc_id) != FINAL_PATH_PASS_BUCKET
     ]
 
 
@@ -1331,7 +1436,7 @@ def judge_spec(resolved, claimed_status, claimed_source, waivers, key):
     blocking, waived = apply_waivers(reasons, waivers, key)
 
     return {
-        "verdict": "block" if blocking else "accept",
+        "verdict": VERDICT_BLOCK if blocking else VERDICT_ACCEPT,
         "reasons": blocking,
         "waived": waived,
         "final_path": counts,
@@ -1539,7 +1644,7 @@ def run_audit(args):
         if row["status"] in AUDIT_FAMILY
     ]
     judged = [f for f in features if f["verdict"] is not None]
-    affected = [f for f in judged if f["verdict"] == "block"]
+    affected = [f for f in judged if f["verdict"] == VERDICT_BLOCK]
     return {
         "mode": "audit",
         "repo": str(repo),
@@ -1596,7 +1701,8 @@ def render_human(record):
         "flow_class: %s" % record["flow_class"],
         "claimed_status: %s" % record["claimed_status"],
         "final_path: " + " ".join(
-            "%s=%d" % (bucket, counts[bucket]) for bucket in FINAL_PATH_BUCKETS + ("total",)
+            "%s=%d" % (bucket, counts[bucket])
+            for bucket in FINAL_PATH_BUCKETS + (FINAL_PATH_TOTAL_KEY,)
         ),
     ]
     for reason in record["reasons"]:
@@ -1658,6 +1764,23 @@ def main(argv=None):
                         help="remove one reason from the blocking set, counting it as waived")
     args = parser.parse_args(argv)
 
+    # FR-012 / FR-013: the `Path` domain is a declaration-layer fact. When the read entry itself is
+    # missing the label goes on the run's output before any verdict, so the degradation is visible
+    # rather than read as a clean domain check; the legacy-project case raises below instead.
+    if PATH_VALUES_LABEL and READER_ABSENT:
+        print(PATH_VALUES_LABEL, file=sys.stderr)
+        print("closure-acceptance-check: the shared read entry is absent; the `Path` membership "
+              "test is skipped for this run", file=sys.stderr)
+
+    # FR-012 / FR-013: the `final_path` key set and the verdict values are declaration-layer facts
+    # too. An unreadable declaration keeps this run going on the labelled compatibility value — it
+    # never raises, and it never reads as a clean pass.
+    if ARC_LABEL:
+        print(ARC_LABEL, file=sys.stderr)
+        print("closure-acceptance-check: the `ARC verdict mapping` is unreadable; this run uses the "
+              "labelled compatibility value for the `final_path` record and the verdict",
+              file=sys.stderr)
+
     try:
         record = run(args)
     except InputError as exc:
@@ -1670,7 +1793,7 @@ def main(argv=None):
         emit(record, args, EXIT_ACCEPT)
         return EXIT_ACCEPT
 
-    exit_code = EXIT_ACCEPT if record["verdict"] == "accept" else EXIT_BLOCK
+    exit_code = EXIT_ACCEPT if record["verdict"] == VERDICT_ACCEPT else EXIT_BLOCK
     emit(record, args, exit_code)
     return exit_code
 

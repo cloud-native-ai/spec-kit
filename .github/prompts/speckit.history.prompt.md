@@ -16,7 +16,8 @@ The executable core of this command is the **`manage-history`** skill (`.specify
 
 - **Inputs**: the `$ARGUMENTS` parameters processed above, plus the JSON output of the frontmatter `scripts:` entry (`.specify/scripts/bash/collect-history.sh --json`, the collect-history locate step) identifying tool, session store, session count, and the manifest path; `--full` for a full reprocess; optional theme/date-range/topic narrowing.
 - **How to call**: read the skill and follow its Workflow (Steps 1–6) — tool & project identification with the support/empty-store gates, clean-session extraction (trivial sessions skipped, never silently), five-dimension distillation (decisions & rationale / reusable lessons / open TODOs / key interaction flows / user↔model conflicts), theme aggregation with incremental merge, manifest update, run report.
-- **Outputs**: the `.specify/history/` document set (`README.md` index, `00-cross-cutting-lessons.md`, one `NN-<theme-slug>.md` per theme) plus `.manifest.json`, and the run report (distilled vs skipped sessions with reasons, themes created/updated, output location).
+- **Outputs**: the `.specify/history/` document set (`README.md` index, `00-cross-cutting-lessons.md`, one `NN-<theme-slug>.md` per theme) plus the incremental manifest, and the run report (distilled vs skipped sessions with reasons, themes created/updated, output location).
+- **The manifest's schema is not stated here**: its file name, its top-level keys and its per-session entry key are owned by `.specify/shared/declarations/facts/history-manifest-schema.yaml#/statement`, read by `.specify/scripts/python/history-utils.py`. This template names the manifest by its role (the incremental tracking record) and reaches its shape by that pointer.
 - **Safety rules** are owned by the skill: read-only on the session store, no verbatim dumps, no silent truncation, unsupported tools stop cleanly.
 
 ## Wrap-up

@@ -26,7 +26,7 @@ Search the project memory store and surface the most relevant entries so the cur
    ```bash
    python3 "${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py" \
      --action recall \
-     --scope <session|knowledge|all> \
+     --scope <one member of the declared set, or all> \
      --query "<key terms>" \
      --tags "<optional,tags>" \
      --feature "<optional-feature-key>" \
@@ -39,7 +39,13 @@ Search the project memory store and surface the most relevant entries so the cur
 5. If nothing relevant is found, proceed without memory and rely on the current spec/plan.
 
 ## Related actions
-- `--action list --scope <session|knowledge|all> --limit N` — browse the most recent entries without a query.
+
+The scope domain — the closed set `--scope` accepts, plus `all` as its expansion — is a machine fact
+owned by `shared/declarations/facts/memory-types.yaml#/statement` and read by
+`scripts/python/memory-utils.py`; this skill states which action answers which question, not the
+member set.
+
+- `--action list --scope <one member of the declared set, or all> --limit N` — browse the most recent entries without a query.
 - `--action prune --scope session --max-entries N` / `--max-age-days D` — keep short-term memory bounded.
 - `--action reindex --scope all` — rebuild `index.json` from files if an index is lost or stale.
 

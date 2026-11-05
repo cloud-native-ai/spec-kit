@@ -30,8 +30,10 @@ references/stage-prompts.md § Stall Handling.
 
 Thresholds and evidence semantics mirror `watch-target.sh` (R-03/R-05): the
 four-piece files are space envelopes, the sentinel is the last non-empty log
-line == "<STAGE>-DONE", and watcher verdict codes (10-16) are data recorded in
-watch_verdict.exit_code, never reused as this CLI's code.
+line == the render of the declaration-layer fact `driver-completion-sentinels`
+(`shared/declarations/facts/driver-completion-sentinels.yaml#/statement`), and
+watcher verdict codes (10-16) are data recorded in watch_verdict.exit_code,
+never reused as this CLI's code.
 
 Exit codes: 0 / 1 / 2 only (see --help).
 
@@ -82,13 +84,124 @@ FORMS_065A = [
 ]
 
 # ---------------------------------------------------------------------------
+# Declaration layer (Feature 084, batch 2 rows of C-044)
+#
+# Four values this engine used to spell inline are declaration-layer facts:
+#
+#   driver-stage-sequence       shared/declarations/facts/driver-stage-sequence.yaml#/statement
+#   driver-stage-artifacts      shared/declarations/facts/driver-stage-artifacts.yaml#/statement
+#   driver-completion-sentinels shared/declarations/facts/driver-completion-sentinels.yaml#/statement
+#
+# All three are read through the one shared entry (`scripts/python/declaration_reader.py`), so editing
+# a declaration changes this engine's behaviour with no edit here, and a second copy of any of these
+# values in this file is the defect the layer exists to make impossible (`C-047` steps 3–5).
+#
+# Degradation (`FR-012` / `C-049`): this engine is read-only and MUST NOT raise on a layer it cannot
+# read — a project that never received the declarations keeps evaluating. The absent fact is
+# therefore *labelled* on stderr and the pre-migration table/render/order stands; a degraded read is
+# never silent and never a pass.
+# ---------------------------------------------------------------------------
+
+READ_ENTRY_REL = Path("scripts") / "python" / "declaration_reader.py"
+STAGE_SEQUENCE_FACT = "driver-stage-sequence"
+STAGE_ARTIFACTS_FACT = "driver-stage-artifacts"
+SENTINEL_FACT = "driver-completion-sentinels"
+
+
+def declaration_entry():
+    """The declaration layer's read entry, located from this file's own resolved path.
+
+    The engine exists in three physical copies — the framework source, this repository's mirror and a
+    client project's `.specify/` — so the walk resolves each copy to its **own** layer: the nearest
+    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+    and a nested tree cannot misdirect it. Read-only: nothing is written, and the import happens only
+    once, at module load.
+    """
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / READ_ENTRY_REL
+        if candidate.is_file():
+            directory = str(candidate.parent)
+            if directory not in sys.path:
+                sys.path.insert(0, directory)
+            import declaration_reader
+            return declaration_reader
+    return None
+
+
+DECLARATIONS = declaration_entry()
+_LABELLED_FACTS = set()
+
+
+def label_absent(slug):
+    """Print the `STR-014` instance for a fact this engine could not read, once per slug.
+
+    The text comes from the layer's own `absent_label` so no second copy of the code is spelled here;
+    with the layer itself unreachable the note degrades to free text, which is all that path can
+    honestly report (`FR-013` lets the degraded wording be free).
+    """
+    if slug in _LABELLED_FACTS:
+        return
+    _LABELLED_FACTS.add(slug)
+    if DECLARATIONS is not None:
+        note = DECLARATIONS.absent_label(slug)
+    else:
+        note = "declaration layer unreachable: %s" % slug
+    sys.stderr.write("loop-state: %s\n" % note)
+
+
+def declared_statement(slug):
+    """`statement` of one fact declaration, or `None` when unreadable (labelled, never raised)."""
+    if DECLARATIONS is None:
+        label_absent(slug)
+        return None
+    try:
+        return DECLARATIONS.load_fact(
+            DECLARATIONS.find_repo(Path(__file__).resolve()), slug)["body"].get("statement")
+    except (DECLARATIONS.DeclarationError, TypeError, ValueError):
+        label_absent(slug)
+        return None
+
+
+def declared_sequence(slug):
+    """`statement` as an ordered sequence; an unreadable or malformed one is empty, and labelled."""
+    values = declared_statement(slug)
+    if not isinstance(values, list) or not values:
+        label_absent(slug)
+        return ()
+    return tuple(str(value) for value in values)
+
+
+def declared_mapping(slug):
+    """`statement` as a mapping; an unreadable or malformed one is empty, and labelled."""
+    values = declared_statement(slug)
+    if not isinstance(values, dict) or not values:
+        label_absent(slug)
+        return {}
+    return dict(values)
+
+
+#: The driver's stage order and the sentinel's shape. An empty read is `FR-012`'s compatibility path
+#: (labelled above), which the two consumers below honour instead of substituting a second copy.
+STAGE_SEQUENCE = declared_sequence(STAGE_SEQUENCE_FACT)
+SENTINEL_SHAPE = declared_mapping(SENTINEL_FACT)
+SENTINEL_PATTERN = str(SENTINEL_SHAPE.get("pattern") or "").strip()
+SENTINEL_TRANSFORM = str(SENTINEL_SHAPE.get("transform") or "").strip().lower()
+
+
+# ---------------------------------------------------------------------------
 # Stage artifact map (C-50/C-51/C-52)
 #
-# Runtime owner of "stage -> artifacts[] / owned_paths[] / commit_required /
-# no_change_allowed". Paths are relative to the resolved spec_dir; implement
-# expresses completeness through code/test commit evidence and has no file
-# artifact. references/state-awareness.md §Stage Artifact Map mirrors this table
-# item by item (contract test pins the five dimensions).
+# The value is "stage -> artifacts[] / owned_paths[] / commit_required / no_change_allowed",
+# owned by the `driver-stage-artifacts` declaration and read through the shared entry. Paths are
+# relative to the resolved spec_dir; implement expresses completeness through code/test commit
+# evidence and has no file artifact. references/state-awareness.md §Stage Artifact Map mirrors the
+# effective table item by item (contract test pins the five dimensions).
+#
+# The literal below is `FR-012`'s compatibility value: it is used only when the declaration cannot be
+# read (labelled on stderr), and it also stays the greppable assignment the isomorphism contract test
+# parses for the roster owner's stage keys — so it MUST keep its literal shape even though the
+# declaration is the authority. Its **order** is the `driver-stage-sequence` declaration's, applied
+# below; the order is never this literal's own claim.
 # ---------------------------------------------------------------------------
 
 IMPLEMENT_CODE_PATHSPEC = [
@@ -146,6 +259,89 @@ STAGE_ARTIFACTS = {
         "no_change_allowed": False,
     },
 }
+
+# ---------------------------------------------------------------------------
+# The map's authority: the `driver-stage-artifacts` declaration, when it is readable.
+#
+# A declared row is used only if it is a *complete* four-dimension row and the declared stage set
+# matches the literal's — a half-row or a tenth stage would change what "complete" means for a live
+# snapshot, so either one is reported and the literal stands rather than being half-overwritten.
+# `commit_required` / `no_change_allowed` are compared by identity downstream (`is True` / `is False`
+# in the envelope and in 065's contract test), so the declared scalars are coerced to real booleans
+# here: the declaration spells them as `true` / `false` and the subset parser hands back strings.
+# ---------------------------------------------------------------------------
+
+_FLAG_VALUES = {"true": True, "yes": True, "false": False, "no": False}
+
+
+def declared_flag(value):
+    """One declared boolean as a real `bool`, or `None` when the value is not a boolean."""
+    if isinstance(value, bool):
+        return value
+    flag = _FLAG_VALUES.get(str(value).strip().lower())
+    return flag
+
+
+def declared_artifact_row(value):
+    """One declared stage row normalized to the table's four dimensions, or `None` when malformed."""
+    if not isinstance(value, dict):
+        return None
+    row = {}
+    for key in ("artifacts", "owned_paths"):
+        item = value.get(key)
+        if not isinstance(item, list):
+            return None
+        row[key] = [str(entry) for entry in item]
+    for key in ("commit_required", "no_change_allowed"):
+        flag = declared_flag(value.get(key))
+        if flag is None:
+            return None
+        row[key] = flag
+    return row
+
+
+def apply_declared_artifacts():
+    """`(rows, code_pathspec)` — the declaration's when it is usable, the literal's otherwise."""
+    statement = declared_mapping(STAGE_ARTIFACTS_FACT)
+    declared = statement.get("stages")
+    if not isinstance(declared, dict) or not declared:
+        return STAGE_ARTIFACTS, IMPLEMENT_CODE_PATHSPEC
+    rows = {}
+    for stage, value in declared.items():
+        row = declared_artifact_row(value)
+        if row is None:
+            sys.stderr.write(
+                "loop-state: %s: stage %r is not a complete four-dimension row; "
+                "the inline table stands\n" % (STAGE_ARTIFACTS_FACT, stage))
+            return STAGE_ARTIFACTS, IMPLEMENT_CODE_PATHSPEC
+        rows[str(stage)] = row
+    if set(rows) != set(STAGE_ARTIFACTS):
+        sys.stderr.write(
+            "loop-state: %s names %d stage(s) (%s) but this engine carries %d (%s); "
+            "the inline table stands\n"
+            % (STAGE_ARTIFACTS_FACT, len(rows), ", ".join(sorted(rows)),
+               len(STAGE_ARTIFACTS), ", ".join(sorted(STAGE_ARTIFACTS))))
+        return STAGE_ARTIFACTS, IMPLEMENT_CODE_PATHSPEC
+    pathspec = statement.get("implement_code_pathspec")
+    if not isinstance(pathspec, list) or not pathspec:
+        pathspec = IMPLEMENT_CODE_PATHSPEC
+    return rows, [str(entry) for entry in pathspec]
+
+
+STAGE_ARTIFACTS, IMPLEMENT_CODE_PATHSPEC = apply_declared_artifacts()
+
+# The declared stage sequence orders the rows above; with today's declarations the order is unchanged
+# (both faces named the same eight stages in the same order on 2026-11-05), so this is the ordering
+# the table always had, now taken from its owner. A key set that does not match the declaration is a
+# wiring defect and says so instead of being swallowed — the engine still evaluates on the order it
+# carries, because a read-only snapshot may not invent a stage the table has no row for.
+if STAGE_SEQUENCE and set(STAGE_SEQUENCE) == set(STAGE_ARTIFACTS):
+    STAGE_ARTIFACTS = {stage: STAGE_ARTIFACTS[stage] for stage in STAGE_SEQUENCE}
+elif STAGE_SEQUENCE:
+    sys.stderr.write(
+        "loop-state: %s names %d stage(s) (%s) but STAGE_ARTIFACTS carries %d (%s); order not applied\n"
+        % (STAGE_SEQUENCE_FACT, len(STAGE_SEQUENCE), ", ".join(STAGE_SEQUENCE),
+           len(STAGE_ARTIFACTS), ", ".join(STAGE_ARTIFACTS)))
 
 # ---------------------------------------------------------------------------
 # Derived loop_state mapping — MIRROR of requirements.md FR-004 (the single
@@ -623,9 +819,21 @@ def resolve_thresholds(args, watch_script):
 # ---------------------------------------------------------------------------
 
 def sentinel_literal(stage):
+    """The completion sentinel for `stage`, rendered from the `driver-completion-sentinels` fact.
+
+    The template and the stage-name transform are the declaration's (`pattern` / `transform`), so the
+    literal exists once in the repository. The fallback below is `FR-012`'s compatibility path, taken
+    only when the declaration cannot be read at all — and that read has already been labelled on
+    stderr by :func:`declared_mapping`, so it is a degraded reading, never a silent second definition.
+    """
     if not stage:
         return None
-    return "%s-DONE" % str(stage).upper()
+    name = str(stage)
+    if SENTINEL_TRANSFORM == "uppercase":
+        name = name.upper()
+    if SENTINEL_PATTERN:
+        return SENTINEL_PATTERN.replace("{stage}", name)
+    return "%s-DONE" % name.upper()
 
 
 def four_piece_paths(state_dir, line_id, stage):

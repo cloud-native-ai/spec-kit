@@ -1,0 +1,94 @@
+# Exclusion records — reason `no-machine-fact` (requirements.md FR-002 / FR-005; data-model.md E-2).
+#
+# One row per **unit** whose last in-scope fact left the roster
+# (contracts/migration-batches.contract.md § Facts outside the roster). The rows are the unit-level
+# records; the fact-level record for the same removal lives in that contract section and in
+# `.specify/memory/features/084.md` § Latest Review — an absent migration, never a silent deletion.
+#
+# `carrier` is the deterministic engine the unit's text actually calls (located by `grep` at write
+# time), never the markdown that carried the fact. `anchor` is the resolvable in-tree location where
+# the fact still lives as prose — the reason's evidence: the value is written down here and in no
+# engine. The absence measurement for each row is recorded in the comment above it.
+#
+# Re-measured 2026-11-05 (implement, part 3) before writing this file, per the contract's
+# § Verification row "the excluded facts still have no engine read point":
+#   grep -rln "Bootstrap\|Operationalize\|Optimize" --include=*.py --include=*.sh scripts/ skills/   -> 0 hits
+#   grep -rn "improvement-track\|changed-asset" --include=*.py --include=*.sh .                      -> 0 hits
+#   grep -rn "CRITICAL\|severity" scripts/python/*.py                                                -> severity of OTHER axes only
+#                                                                                                       (error/advisory, record tags), no
+#                                                                                                       CRITICAL/HIGH/MEDIUM/LOW scale
+#   grep -rn "clause-uncovered\|fr-uncovered" scripts/python/*.py                                    -> account-clause-coverage.py:
+#                                                                                                       a NARROWER two-label set, not
+#                                                                                                       this row's finding classes
+# Count measured at write time: 8 rows. Re-measured 2026-11-05 (implement, part 5) with the two
+# US4 rows appended for the units that never held a machine-consumed fact at all: **10 rows**. Two
+# facts of the same roster contribute no row —
+# `review-segment-sequence` and `history-categories` — because their unit groups keep an in-scope
+# fact (`arc-verdict-mapping`, `history-manifest-schema`); a row for them would be the both-declared-
+# and-excluded state data-model.md E-2 R-4 forbids.
+
+# `analyze-severity-values` + `analysis finding-channel set` — 2 units, 2 facts.
+# Engine the unit calls: account-clause-coverage.py (the nearest label set in code; a narrower set).
+- unit: templates/commands/analyze.md
+  carrier: scripts/python/account-clause-coverage.py
+  anchor: templates/commands/analyze.md#Wrap-up
+
+- unit: skills/internal/analyze-artifacts/SKILL.md
+  carrier: scripts/python/account-clause-coverage.py
+  anchor: skills/internal/analyze-artifacts/references/detection-and-severity.md#Severity assignment
+
+# `self-improvement-stage-sequence` + `track-to-executor mapping` — 1 unit, 2 facts.
+# Engine the unit calls: feedback-utils.py (the improvement record's engine); no engine reads a stage
+# sequence or maps a track to an executor.
+- unit: skills/internal/self-improvement/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: shared/workflow/self-improvement-workflow.md#Standard Flow
+
+# `improvement-track-values` + `changed-asset-category mapping` — 5 units, 2 facts.
+# Engine each unit calls: the record engine nearest its subject. Roster correction: the contract's
+# anchor column names "§ Target Classification" for all five, which measured true only for
+# improve-agent; the other four name the same fact in the classification step of their own § Workflow
+# or refinement map. Their own measured section is the anchor, recorded rather than re-pointed.
+- unit: skills/internal/improve-agent/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/improve-agent/SKILL.md#Target Classification
+
+- unit: skills/internal/improve-team/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/improve-team/SKILL.md#Refinement Map (examples)
+
+- unit: skills/internal/improve-tools/SKILL.md
+  carrier: scripts/python/tools-utils.py
+  anchor: skills/internal/improve-tools/SKILL.md#Classify the improvement
+
+- unit: skills/external/improve-docs/SKILL.md
+  carrier: scripts/python/sync-mirrors.py
+  anchor: skills/external/improve-docs/SKILL.md#3. Classify the improvement
+
+- unit: skills/external/improve-skills/SKILL.md
+  carrier: skills/external/improve-skills/scripts/skill-shape.py
+  anchor: skills/external/improve-skills/SKILL.md#Organize improvement items
+
+# --- US4 rows (tasks.md T020 / T023), appended 2026-11-05, existing rows untouched ---
+
+# D2 unsatisfied, and the boundary sample requirements.md § Edge Cases 末条 names: this unit ships a
+# `.yaml` of its own — `templates/project-input.template.yaml` — but it is the **input form** the
+# skill reads from the user, not a machine-consumed value domain. It cannot be mistaken for a
+# declaration fact because the reader only ever opens files under `shared/declarations/`; the
+# assertion is about the reader's input face, not about the template's shape, so no "is this really
+# an input template" judgement is introduced here.
+# This single row is also T023's retirement of screen S's accepted conservative side: the unit
+# enters the candidate set by a text test and leaves it by one record — never by a second mechanism.
+# Engine the unit does reach: its own loader/validator/query engine (`SKILL.md` § 本技能脚本清单).
+- unit: skills/internal/summarize-project/SKILL.md
+  carrier: skills/internal/summarize-project/scripts/project-db.py
+  anchor: skills/internal/summarize-project/SKILL.md#项目信息输入模型
+
+# D2 unsatisfied: the deliverable is rewritten prose — no engine's verdict changes with a value this
+# unit carries. The scope table's generic carrier cell (`同目录 scripts/`) has no object here: the
+# skill ships no `scripts/` directory, so the measured carrier is the deterministic program its
+# workflow does call — the fidelity comparer under `tests/fixtures/humanize/`
+# (`SKILL.md` § Evaluation hooks, `--input` / `--output`, exit 0 = 通过).
+- unit: skills/external/humanize/SKILL.md
+  carrier: tests/fixtures/humanize/diff_protected.py
+  anchor: skills/external/humanize/SKILL.md#Overview

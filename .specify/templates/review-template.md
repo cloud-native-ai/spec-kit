@@ -141,6 +141,12 @@ line-addressable, and an omission MUST name why in the row's own reason cell.
 > clause nor the feedback unit census: both are owned by `shared/workflow/acceptance-hardening.md` § Review
 > Composition, and the record's key set, its closure and its bucket meanings are owned by that file's
 > § Closure Verdict § `final_path` counts, computed once. Nothing here is recomputed, re-counted or narrowed.
+>
+> The record's **key set** (six buckets plus the total) and the checker's two **verdict** values are
+> machine facts: their single owner is `shared/declarations/facts/arc-verdict-mapping.yaml#/statement`,
+> read by `scripts/python/closure-acceptance-check.py` through the shared read entry. The seven
+> `[ARC_*]` slot names below are this template's rendering surface — a slot cannot exist without its
+> name — so they stay; the set they enumerate is not owned here.
 
 | Field | Value | Source |
 |-------|-------|--------|

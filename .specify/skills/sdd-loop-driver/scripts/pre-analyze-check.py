@@ -15,14 +15,31 @@ Exit codes:
   1 = fail (at least one blocking finding)
   2 = input or parse error
 
-Standard library only, Python >= 3.8. Self-contained; never reads the
-framework runtime scripts tree.
+Standard library only, Python >= 3.8. The gate judges the spec tree it is pointed at with its own
+code and adds no framework runtime dependency. Feature 084 accounts for the two deviations from
+that self-containment by name instead of leaving them implicit:
+
+* **One module import — the shared read entry** (``scripts/python/declaration_reader.py``). It is
+  located by walking up from this file's own resolved path and supplies the gate roster (`C-044`).
+  A project that never received the layer keeps evaluating: the absent read is labelled and the
+  inline roster stands (FR-012).
+* **One subprocess call — the judging engine** (``scripts/python/harness-triple-check.py``). It runs
+  only when ``--triple-structure`` is passed, once per run, and each finding line it prints is
+  forwarded verbatim under the single check name ``triple-structure``. The flag defaults **off** by
+  measurement rather than taste: an existing 081 assertion closes the set of finding *names* a stage
+  run may produce, so a default-on delegation would turn it red (plan D8 / `T-003`). Off is the
+  shape that keeps both properties true — the gate still runs with no layer present, and 081's
+  closed set does not move.
+
+Neither deviation changes what the default run does: without ``--triple-structure`` the gate emits
+exactly the finding names it emitted before.
 """
 
 import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 
@@ -71,6 +88,192 @@ STAGES = {
     "plan": ("requirements.md", "plan.md"),
     "tasks": ("requirements.md", "plan.md", "tasks.md"),
 }
+
+# ---------------------------------------------------------------------------
+# Declaration layer (Feature 084, batch 2 row `driver-gate-roster` of C-044)
+#
+# This gate's roster — the six check names its findings carry and the per-stage file requirement —
+# used to be spelled here: at every `add(findings, "<name>", …)` call site and in the `STAGES` table
+# above. It has one owner now,
+# `shared/declarations/facts/driver-gate-roster.yaml#/statement`, read through the one shared entry
+# (`scripts/python/declaration_reader.py`), so a name changed in the declaration changes what this
+# gate emits with no edit here (`C-047` steps 3–5).
+#
+# What stays local is the *selection*, not the value: a call site knows which check applies at that
+# judgement and takes the rendering from the roster. Deleting a name from the roster therefore does
+# not silence a check — the call site's own key is emitted and the absence is labelled (FR-012).
+#
+# Degradation (`FR-012` / `C-049`): a project that never received the layer keeps evaluating. The
+# read is *labelled* on stderr and the pre-migration roster above stands; a degraded read is never
+# silent and never a pass.
+# ---------------------------------------------------------------------------
+
+READ_ENTRY_REL = os.path.join("scripts", "python", "declaration_reader.py")
+GATE_ROSTER_FACT = "driver-gate-roster"
+
+
+def declaration_entry():
+    """The declaration layer's read entry, located from this file's own resolved path.
+
+    This engine exists in three physical copies — the framework source, this repository's mirror and
+    a client project's `.specify/` — so the walk resolves each copy to its **own** layer: the nearest
+    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+    and a nested tree cannot misdirect it. Read-only: nothing is written, and the import happens only
+    once, at module load.
+    """
+    here = os.path.dirname(os.path.realpath(__file__))
+    while here:
+        candidate = os.path.join(here, READ_ENTRY_REL)
+        if os.path.isfile(candidate):
+            directory = os.path.dirname(candidate)
+            if directory not in sys.path:
+                sys.path.insert(0, directory)
+            import declaration_reader
+            return declaration_reader
+        parent = os.path.dirname(here)
+        if parent == here:
+            return None
+        here = parent
+    return None
+
+
+DECLARATIONS = declaration_entry()
+_LABELLED = set()
+
+
+def label_absent(slug):
+    """Print the `STR-014` instance for a roster this engine could not read, once per slug."""
+    if slug in _LABELLED:
+        return
+    _LABELLED.add(slug)
+    if DECLARATIONS is not None:
+        note = DECLARATIONS.absent_label(slug)
+    else:
+        note = "declaration layer unreachable: %s" % slug
+    sys.stderr.write("pre-analyze-check: %s\n" % note)
+
+
+def declared_mapping(slug):
+    """`statement` of one fact declaration as a mapping; an unreadable one is empty and labelled."""
+    if DECLARATIONS is None:
+        label_absent(slug)
+        return {}
+    try:
+        values = DECLARATIONS.load_fact(
+            DECLARATIONS.find_repo(__file__), slug)["body"].get("statement")
+    except (DECLARATIONS.DeclarationError, TypeError, ValueError):
+        label_absent(slug)
+        return {}
+    if not isinstance(values, dict) or not values:
+        label_absent(slug)
+        return {}
+    return dict(values)
+
+
+GATE_ROSTER = declared_mapping(GATE_ROSTER_FACT)
+
+#: The declared check-name set, looked up by the key a call site names.
+CHECK_ROSTER = {str(name): str(name) for name in (GATE_ROSTER.get("checks") or ())}
+
+#: The per-stage file requirement, taken from the declaration when it is readable. `--stage`'s
+#: choices and the per-stage input check both derive from this table, so a stage added to the
+#: declaration becomes selectable with no edit here. The literal above is the FR-012 fallback.
+_DECLARED_STAGES = {}
+for _stage, _inputs in (GATE_ROSTER.get("stages") or {}).items():
+    if isinstance(_inputs, list) and _inputs:
+        _DECLARED_STAGES[str(_stage)] = tuple(str(value) for value in _inputs)
+if _DECLARED_STAGES:
+    STAGES = _DECLARED_STAGES
+
+
+def declared_check(key):
+    """The roster's rendering of one check name, or the call site's own key when it is absent."""
+    if key in CHECK_ROSTER:
+        return CHECK_ROSTER[key]
+    note = "%s: check name %r is not in the declared roster" % (GATE_ROSTER_FACT, key)
+    if note not in _LABELLED:
+        _LABELLED.add(note)
+        sys.stderr.write("pre-analyze-check: %s\n" % note)
+    return key
+
+
+# ---------------------------------------------------------------------------
+# Opt-in delegation: the declaration layer's judging engine
+# (Feature 084 / `C-040`, plan D8, decision tension `T-003`)
+#
+# `--triple-structure` asks the layer's own engine once for `verify` and forwards every finding line
+# it prints **verbatim** under one check name. The flag defaults **off**: an existing 081 assertion
+# (`tests/contract/test_acceptance_premises.py`) closes the finding *names* a stage run may produce
+# to the four `GW-07` classes below, so a default-on delegation would turn that assertion red.
+#
+# The forwarded name is deliberately **not** a member of `driver-gate-roster`'s `checks`. That set is
+# this gate's own closed vocabulary (`C-044`); a delegated finding is another engine's verdict passed
+# through, not a seventh judgement of this gate. Routing it through `declared_check()` would both
+# claim roster membership and print a "not in the declared roster" label on every flagged run, which
+# would empty the honest `FR-012` label of its meaning. It is a local constant of a vocabulary this
+# file does not own — the same shape as the four `GW-07` names below.
+CHECK_TRIPLE_STRUCTURE = "triple-structure"
+TRIPLE_CHECK_REL = os.path.join("scripts", "python", "harness-triple-check.py")
+
+#: The engine prints one finding per line behind this prefix (its own text format, `C-038`).
+FINDING_LINE = "finding: "
+
+
+def triple_structure_entry():
+    """The judging engine belonging to *this* copy of the gate, walked up from this file.
+
+    Same three-copy rule as `declaration_entry()`: the framework source, this repository's mirror
+    and a client project's `.specify/` copy each resolve to their own layer, because the nearest
+    ancestor carrying `scripts/python/harness-triple-check.py` is that copy's own. Read-only; the
+    walk stops at the filesystem root and returns `None` when no copy carries the engine.
+    """
+    here = os.path.dirname(os.path.realpath(__file__))
+    while here:
+        candidate = os.path.join(here, TRIPLE_CHECK_REL)
+        if os.path.isfile(candidate):
+            return candidate
+        parent = os.path.dirname(here)
+        if parent == here:
+            return None
+        here = parent
+    return None
+
+
+def delegate_triple_structure(repo, findings):
+    """Ask the layer's engine once (`verify`) and forward each finding line verbatim.
+
+    One call, one check name (`C-040`: two call sites, no new stage). An engine that cannot judge —
+    exit 2, the layer is absent from the tree under judgement — is surfaced as a labelled note on
+    stderr and is **not** turned into a finding: degradation is neither a pass nor a fifth finding
+    class (plan D7). The forwarded line keeps its own text; this gate neither rewraps nor re-words
+    it, so the layer's vocabulary stays the layer's.
+    """
+    engine = triple_structure_entry()
+    if engine is None:
+        label_absent(TRIPLE_CHECK_REL)
+        return 0
+    command = [sys.executable, engine, "--action", "verify"]
+    if repo:
+        command.extend(["--repo", repo])
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True)
+    except OSError as exc:
+        sys.stderr.write("pre-analyze-check: %s: %s\n" % (TRIPLE_CHECK_REL, exc))
+        return 0
+    forwarded = 0
+    for line in completed.stdout.splitlines():
+        if not line.startswith(FINDING_LINE):
+            continue
+        # `line == 0` and the engine path as `path`: a forwarded finding has no line of its own in
+        # this tree, and the pair keeps a `--waive CHECK:REL_PATH:LINE` key writable.
+        add(findings, CHECK_TRIPLE_STRUCTURE, "error", TRIPLE_CHECK_REL, 0,
+            line[len(FINDING_LINE):])
+        forwarded += 1
+    if completed.returncode == 2:
+        note = completed.stderr.strip() or "%s: input error" % TRIPLE_CHECK_REL
+        sys.stderr.write("pre-analyze-check: %s\n" % note)
+    return forwarded
+
 
 # --- ownership / premise findings (081b) ----------------------------------------------------
 # The four `check` names are fixed by `contracts/gate-wiring.contract.md` GW-07, so a waiver key
@@ -237,12 +440,12 @@ def check_references(files, fr, sc, clauses, findings, spec_dir):
             for match in FR_REF.finditer(line):
                 key = "FR-" + match.group(1)
                 if key not in fr:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references %s which is not defined" % key)
             for match in SC_REF.finditer(line):
                 key = "SC-" + match.group(1)
                 if key not in sc:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references %s which is not defined" % key)
             if not has_clauses:
                 continue
@@ -252,10 +455,10 @@ def check_references(files, fr, sc, clauses, findings, spec_dir):
                 if prefix in NON_CLAUSE_PREFIXES or key in clauses:
                     continue
                 if prefix in local_prefixes:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references contract clause %s which is not defined" % key)
                 else:
-                    add(findings, "external-clause", "advisory", rel, number,
+                    add(findings, declared_check("external-clause"), "advisory", rel, number,
                         "references contract clause %s from an external namespace" % key)
 
 
@@ -268,11 +471,11 @@ def check_blocked_by(spec_dir, tasks, findings):
             for token in match.group(1).split(","):
                 token = token.strip()
                 if not token or not TASK_TOKEN.match(token):
-                    add(findings, "blocked-by", "advisory", "tasks.md", number,
+                    add(findings, declared_check("blocked-by"), "advisory", "tasks.md", number,
                         "non-concrete blockedBy token %r" % token)
                     continue
                 if token not in tasks:
-                    add(findings, "blocked-by", "error", "tasks.md", number,
+                    add(findings, declared_check("blocked-by"), "error", "tasks.md", number,
                         "blockedBy target %s is not defined" % token)
 
 
@@ -299,7 +502,7 @@ def check_counts(files, fr, sc, tasks, findings, spec_dir):
                         continue
                     claimed = int(match.group(1))
                     if claimed != expected:
-                        add(findings, "count-claim", "error", rel, number,
+                        add(findings, declared_check("count-claim"), "error", rel, number,
                             "claims %d %s but the artifacts define %d"
                             % (claimed, kind, expected))
 
@@ -321,7 +524,7 @@ def check_paths(files, findings, spec_dir, repo):
                     continue
                 if os.path.exists(os.path.join(repo, token)):
                     continue
-                add(findings, "missing-path", "advisory", rel, number,
+                add(findings, declared_check("missing-path"), "advisory", rel, number,
                     "path does not exist under the repo: %s" % token)
 
 
@@ -1009,7 +1212,7 @@ def run(args):
     fr, sc, tasks, clauses, duplicates = definitions(files, spec_dir)
     findings = []
     for path, number, key, first in duplicates:
-        add(findings, "duplicate-id", "error", os.path.relpath(path, spec_dir),
+        add(findings, declared_check("duplicate-id"), "error", os.path.relpath(path, spec_dir),
             number, "duplicates %s first defined at %s:%d"
             % (key, os.path.relpath(first[0], spec_dir), first[1]))
     check_references(files, fr, sc, clauses, findings, spec_dir)
@@ -1037,6 +1240,10 @@ def run(args):
         repo=repo,
         carrier_tasks_text=carrier_tasks,
     )
+
+    # Opt-in, default off (Feature 084 / D8): one delegation, then the verdict above is unchanged.
+    if args.triple_structure:
+        delegate_triple_structure(repo, findings)
 
     waivers = set(args.waive or [])
     waived = apply_waivers(findings, waivers)
@@ -1074,6 +1281,13 @@ def main(argv=None):
                         help="treat missing-path advisories as blocking")
     parser.add_argument("--waive", action="append", default=[],
                         metavar="CHECK:REL_PATH:LINE")
+    parser.add_argument("--triple-structure", action="store_true",
+                        help="opt-in (default off): delegate once to the declaration layer's "
+                             "judging engine (scripts/python/harness-triple-check.py --action "
+                             "verify) and forward each of its finding lines verbatim under the "
+                             "single check name triple-structure. Off by measurement: an existing "
+                             "081 assertion closes the finding-name set a stage run may produce "
+                             "(plan D8 / T-003, Feature 084 C-040)")
     parser.add_argument("--json-out", default="")
     args = parser.parse_args(argv)
 

@@ -1673,3 +1673,58 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/t018-cov
 ```
 
 **Why `waived-by-user`**：用户于 2026-11-05 明确指示「后续步骤跳过所有测试」。T017 的三条 US2 读数、T018 的确定性对比、T019 的 scratch-tree 证明均属测试型读数，未在指示后执行；T018 在指示前已产出的两次 coverage 捕获保留为历史证据，但不作为任何 SC 的 `pass`。本段交付的是事实/引擎/carrier/排除记录的代码面；测试与测试型读数整体记 `waived-by-user`，绝不记 `pass`。
+
+## implement（Part 5，T020–T031，2026-11-05，用户测试豁免）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "user-test-waiver (2026-11-05) —— 不跑 pytest／全量／定向／smoke／scratch-tree 证明；只执行派发简报明确允许的**秒级确定性**命令：`sync-mirrors.py`（写 + `--check`，两次）、`harness-triple-check.py` 的 `coverage`／`verify`、`validate-tasks.py`、`pre-analyze-check.py`（带与不带 `--triple-structure`）、`git diff`／`git status`／`grep`／`ls|wc`。测试型读数（T021–T023、T027(e)／T028(e)、T029 的两条 collect 计数与 `comm -13`、T030、T031）一律未执行"
+changed_paths:
+  - shared/declarations/exclusions/no-harness-asset.yaml            # NEW — T020，2 行
+  - shared/declarations/exclusions/no-machine-fact.yaml             # T020，追加 2 行（8 → 10）
+  - skills/external/sdd-loop-driver/scripts/pre-analyze-check.py    # T024 — `--triple-structure` + docstring 订正
+  - docs/concepts/harness-triple-structure.md                       # NEW — T025
+  - CHANGELOG.md                                                    # T025 — 084 条目
+  - ".specify/shared/**（36 文件同步 + declarations 子树 + owner 文档）, .specify/scripts/python/**（10 改 + 2 新）, .specify/skills/**（11 改）, .specify/templates/review-template.md, 8 个 per-tool 命令副本（.claude/.github/.opencode/.qoder × history|review）—— 全部由 T026 的 `sync-mirrors.py --write` 生成，无一手改"
+  - .specify/specs/084-harness-triple-structure/{tasks.md, verification.md, test-evidence/implement-part5-readings-2026-11-05.txt, test-evidence/t026-mirror-projection-run{1,2}-2026-11-05.txt}
+passed: 0
+failed: 0
+new_failures: waived-by-user
+baseline: "E2 `slot=baseline`（seq 1：25F／7151P／4S；比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名）。本段未跑任何测试，`new_failures` 因此是 `waived-by-user`，不是 0"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implement-part5-readings-2026-11-05.txt
+```
+
+**Why `ran` and not `not-run-docs-only`**：本段改的是可执行面（门宿主新增一个参数与一次委托）、声明层数据（两条排除文件）与文档面，并且所有被点名的秒级读数都真实执行、逐字落盘。落 `not-run-docs-only` 会把「没有测试」误写成「没有执行」。
+
+## 本段五条读数（命令 + 实测；全文 `implement-part5-readings-2026-11-05.txt`）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| T020 落盘且可判 | `harness-triple-check.py --action coverage --repo .` | `candidates: 83`；in-scope 13 ／ excluded **12** ／ unclassified 58；`exclusion-anchor-unresolvable` **0**；单元重名 0（引擎对重名是 exit 2 输入错误，本次 exit 1） |
+| SC-001(i) 确定性 | 同一棵树连跑两次 coverage，`cmp` + `sha256sum` | 两次逐字节一致（`70f6dbf5…b483`），44 ms ／ 42 ms，`stdout_bytes 10685` |
+| SC-002 声明侧／状态侧 | `--action verify --repo .` | `declarations: 23`；`consistency-declarations-to-carriers: 28/28`；`consistency-carriers-to-declarations: 16/16`；`third-layer-missing` 0 ／ `duplicated-fact-literal` 0 ／ `declaration-outside-subset` 0；`pending: 0` |
+| T024 默认关闭 | `pre-analyze-check.py --stage tasks --repo .` | exit 0；finding 名集合 `['missing-path']`（3 条 advisory、0 error）——`triple-structure` 名不出现 |
+| T024 开启一次委托 | 同命令 + `--triple-structure` | exit 1；**58** 条逐字转发的 `triple-structure` finding（`unclassified-candidate: …` 原文），宿主自身那 3 条逐条不变；`git status` 前后无差异（C-039 零写） |
+| T026 镜像投影 | `sync-mirrors.py --write` → `--check` → 再 `--write` | 首次写：36 个 `shared/` 文件 + scripts/skills 镜像同步；`--check` exit 0，六对全 `ok`（templates 22／skills-external 409／skills-internal 138／agents 3／scripts 121／shared 89）；二次写只打印 `Regenerated command copies for 4 tools`，工作树零变化 |
+| T027(c) 内联常量 | `grep -rn "<九个常量名>" --include=*.py scripts/ skills/` | 命中的全是 `*_FACT`／`*_LABEL` 绑定与 `declared_sequence()` 赋值，无第二份字面量表；第九行第二副本 `grep -n '"final", "supporting"' scripts/python/closure-acceptance-check.py` → exit 1（无内联元组） |
+| T029 秒级腿 | `git diff 4b65517c -- pyproject.toml`；`git diff --stat 4b65517c -- tests/contract/test_{requirements_checker,checker_form}.py` | 两条均空输出 |
+
+## 本段的四处披露（都是纠正或如实上报，不是就地修平）
+
+1. **per-tool 命令副本由本段再生，plan 的镜像表该行已过时（订正，非裁定）**：`plan.md` § Mirror Obligations 写「no command template is edited by this feature」，但 Part 3 的 `98288d45` 实际改了 `templates/commands/review.md`（§ 2.4 ARC 指针）与 `templates/commands/history.md`（manifest 指针）；两者的 per-tool 副本因此陈旧。同一行末尾已写下处置：「if a later slice edits a command template it MUST regenerate the per-tool copies」。T026 的 `sync-mirrors.py --write` 正是该处置，生成的 8 个副本改动就是那 4 行指针 —— 按既有条文执行，未改 plan、无 PLAN-EDIT。
+2. **`shared/definitions/*.md` 计数由 12 变 13（移动的计数如实上报）**：新增的是 owner 文档 `harness-triple-definitions.md`。该目录**不在**候选屏幕的三面内（`C-030` 排除 `shared/definitions/*.md`），候选面仍 27 + 53 + 19 = **99**，与 T001(c) 基线逐项相同。
+3. **T029 的「特性状态取值数」没有基线（不可测，而非「未变」）**：T001(c) 只冻结了四个候选面计数，该腿的基线从未采集；T029 整体在豁免下未执行，此处只作如实记录，不构造一个事后基线。
+4. **门宿主的转发名不进 roster（判断，已在代码注释里写明理由）**：`triple-structure` 是本地常量，不经 `declared_check()`。理由是 `driver-gate-roster#/statement/checks` 是这个门**自己**的六名封闭集（`C-044`），委托来的 finding 是另一台引擎的判决转发，不是第七个判断；若经 `declared_check()`，每次带 flag 运行都会打印「不在声明名册里」的降级标注，那条 `FR-012` 标注就失去意义。与该文件既有的四个 `GW-07` 名字同一形态。
+
+## Bases verified（implement Part 5 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| plan-owned 零触碰 | `git diff --stat HEAD -- .specify/specs/084-harness-triple-structure/{plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}` | 空输出 ⇒ 无 PLAN-EDIT |
+| 依赖面未动 | `git diff 4b65517c -- pyproject.toml` | 空输出 |
+| 081 验收面未动 | `git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` | 空输出 |
+| 镜像不手改 | 唯一写入 `.specify/` 镜像的命令是 T026 的 `sync-mirrors.py --write`；`grep`／`edit` 未落任何 `.specify/{shared,scripts,skills,templates}/` 文件 | 见 §T026 行 |
+| 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/session/**`、`.specify/memory/exec-quant/**`、`.specify/memory/feedback/**`、`.specify/state/**` |
+| 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |

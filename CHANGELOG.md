@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Feature 084 (harness triple structure)**: harness processes move from a two-layer
+  `markdown + script` carrier to a three-layer `markdown + yaml + script` one. New declaration layer
+  `shared/declarations/` — `contract.yaml` owning every machine-read value domain, one
+  `facts/<fact-slug>.yaml` per fact (path is identity), and one `exclusions/<reason>.yaml` per
+  out-of-scope reason — plus one stdlib-only shared read entry
+  (`scripts/python/declaration_reader.py`) and one read-only judging engine
+  (`scripts/python/harness-triple-check.py`, `coverage` / `verify` / `lookup`). Engines that used to
+  inline a value as a tuple constant now read it from the declaration; the prose owners keep the
+  criteria and gain pointers. The discipline, its scope criteria and its non-goals are owned by
+  `shared/definitions/harness-triple-definitions.md`; the engine reaches an existing gate host
+  behind an opt-in flag, so no gate stage, criterion or exit code moves.
 - **Feature 081 (acceptance hardening)**: deterministic acceptance gates for feature-status
   transitions. New `closure-acceptance-check` engine (`scripts/python/closure-acceptance-check.py`)
   — four completion conditions judged by one program, `accept`/`block` only, a seven-literal

@@ -4,7 +4,9 @@
 它拥有：**判据、两个取值、判定依据（`basis`）、边界例、命名空间、逐流程台账、类中立封闭清单、变更记录、同构映射（8 阶段 × 3 面）、不可同构边界**。
 其他任何位置（命令模板、技能、契约、测试、门户文档）MUST 以「路径 + 章节锚」引用本文件，MUST NOT 复制判据句或取值定义，MUST NOT 以表格 / YAML / JSON / 代码常量的形式再声明一份「流程单元 → 类别」的映射；仓库中 MUST NOT 出现第二份分类数据文件。
 
-**机器键**: `flow_class`（[[STR-003]]）。取值只有两个：`execution`（[[STR-001]]）与 `expression`（[[STR-002]]）。
+**机器键**: `flow_class`（[[STR-003]]）。**取值域的成员与次序不在本文件**——它们由声明层
+`shared/declarations/facts/flow-class-classes.yaml#/statement`（`kind: closed-set`，有序：成员 0 是未声明单元的缺省类别）
+单一拥有；父规格 069 的 `[[STR-001]]` / `[[STR-002]]` 登记的是这两个字面量的语义，本节只引用语义、不重列取值。
 四个共享字面量（`[[STR-001]]` / `[[STR-002]]` / `[[STR-003]]` / `[[STR-004]]`）的登记处是**父规格 069 的 § Shared Strings**——父规格是这些字面量的语义 owner，069a 与 069b 的表是同源投影；本文引用其语义，不另立第二张字面量表。
 
 **覆盖范围**: 框架内全部流程单元——命令模板（`templates/commands/*.md` → `/speckit.<stem>`）与技能（`skills/{external,internal}/*/SKILL.md` → `skill:<dir-name>`）。
@@ -40,11 +42,12 @@
 
 ### 判定依据 `basis`
 
-| 取值 | 含义 |
-|------|------|
-| `behavior-oracle` | 判定由机器可观测的事实给出：运行行为、生成物可用性、脚本退出码、可对回制品的核验结论 |
-| `reader-oracle` | 判定只能由读者给出：读懂与否、是否与外部事实相符 |
-| `mixed-oracle` | 两种 oracle 都是最终判定所必需；类别取 `execution`，规范条款归 069b |
+`basis` 的**取值域**（成员与次序）由 `shared/declarations/facts/flow-class-basis.yaml#/statement`
+单一拥有（有序：成员 2 即 mixed-oracle，见下条不变量）。本节只保留各取值**含义**——含义是本文件的判据：
+
+- 机器可观测事实给出的判定（运行行为、生成物可用性、脚本退出码、可对回制品的核验结论）。
+- 只能由读者给出的判定（读懂与否、是否与外部事实相符）。
+- 两种 oracle 都是最终判定所必需；类别取 `execution`（原文 `mixed-oracle`），规范条款归 069b。
 
 `basis` 是台账每行的必选列，也是 `lookup` 输出的一部分；它不是第三个类别，不改写任何取值。
 
@@ -132,7 +135,9 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-5）。
 
 一行一个流程单元，首格是单元 id（命令 `/speckit.<stem>`，技能 `skill:<dir-name>`）；列按**表头名**解析，解析器 MUST NOT 猜列。
-列头逐字取机器键 `flow_class`；`basis` 取本节上文的三值；`neutral` 只允许留空或 `yes`（`yes` 仅用于 § 类中立清单 中的技能）；`notes` 是该行的判定要点，不复述判据正文。
+**必填列集合（含列序）**由 `shared/declarations/facts/flow-class-ledger-columns.yaml#/statement` 单一拥有（有序算子表）；
+本节只保留列语义：`flow_class` 列逐字取机器键，`basis` 取 § 判定依据 所述取值域的成员，`neutral` 只允许留空或 `yes`
+（`yes` 仅用于 § 类中立清单 中的技能），`notes` 是该行的判定要点、不复述判据正文（`notes` 不是必填列）。
 `mixed-oracle` 行一律取 `execution`（父 069 §Edge Cases 首条；规范条款见 `.specify/specs/069b-isomorphism-migration-metrics/contracts/ledger-reconciler.md` C-7），行内 `notes` 保留父指针。
 
 | unit_id | flow_class | basis | neutral | notes |
@@ -224,6 +229,8 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 ## 类中立清单
 
 类中立是**封闭清单**：登记「承载调用方产物、没有自己的交付物」的共享技能，用来豁免「命令与其委托技能 MUST 同类」这一条约束。
+`category` 列的取值域由 `shared/declarations/facts/flow-class-neutral-categories.yaml#/statement` 单一拥有（引擎以它作成员测试），
+本节的表只登记「哪个技能属于哪一类」与理由。
 类中立**不改变**该单元自身的类别键（仍是一个二值），也**不豁免任何门禁**——门禁是否执行只由门禁 owner 的调用点表决定。
 清单外出现 `neutral: yes` 即缺陷；清单内条目 MUST 存在于技能清单且台账该行为 `neutral: yes`。
 
@@ -259,7 +266,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 本节是 `flow_class` 的**从属属性**：它只在 `expression` 线上细分「这是什么文档」，不改变两值判据、不改门禁算子集，也不在 § 逐流程台账 里增行。取值集扩展是本文件的 owner 修订，MUST NOT 由消费方就地增删。
 
 - **载体与文法**：与类别同一条声明区、`**Flow Type**: <type>` 单行；位置、重复 / 错位 / 形态判定复用类别行的规则（实现入口 `scripts/python/flow-class-check.py` 的 `parse_spec_flow_type`）。
-- **封闭取值**：`technique-document`（技术文档）/ `user-manual`（用户手册）/ `reference`（参考手册）/ `runbook`（运维手册）/ `design-note`（设计说明）/ `-`（未细分）。新增类型 MUST 走本文件修订。
+- **封闭取值**：取值域（成员与次序，含未细分的 `-`）由 `shared/declarations/facts/flow-class-document-types.yaml#/statement` 单一拥有；本节只声明各取值的**含义**（技术文档 / 用户手册 / 参考手册 / 运维手册 / 设计说明 / 未细分）。新增类型 MUST 同趟修订该声明与本文件 § 文档类型。
 - **类约束**：`expression` 可带任一取值或 `-`；`execution` 只允许 `-`（文档类型对执行类无意义），违者 `flow-type-mismatch`（退出码 1）。
 - **缺省**：该行可以缺失——缺失记 `flow_type: null`，不构成缺陷；作者显式写 `-` 与缺失的区别只在记录（`null` vs `"-"`），门禁等价。
 - **解析与消费**：同一引擎的同一 `lookup`，记录多一个 `flow_type` 字段；消费方（阶段命令模板、驱动派发载荷）以路径引用本节，MUST NOT 复制取值集。

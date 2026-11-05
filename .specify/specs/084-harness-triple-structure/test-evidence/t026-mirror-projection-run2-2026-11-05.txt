@@ -1,0 +1,47 @@
+$ python3 scripts/python/sync-mirrors.py --write   # second projection: must change nothing
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (89 files)
+[exit=0]
+
+$ git status --porcelain -- .specify/shared .specify/scripts .specify/skills .specify/templates .specify/agents
+ M .specify/scripts/python/closure-acceptance-check.py
+ M .specify/scripts/python/evidence-utils.py
+ M .specify/scripts/python/exec-quant.py
+ M .specify/scripts/python/feedback-utils.py
+ M .specify/scripts/python/flow-class-check.py
+ M .specify/scripts/python/history-utils.py
+ M .specify/scripts/python/memory-utils.py
+ M .specify/scripts/python/probe-utils.py
+ M .specify/scripts/python/record-retention.py
+ M .specify/scripts/python/trigger-utils.py
+ M .specify/scripts/python/validate-requirements.py
+ M .specify/shared/definitions/flow-class-definitions.md
+ M .specify/shared/definitions/framework-map.md
+ M .specify/shared/definitions/probe-definitions.md
+ M .specify/shared/guidelines/better-harness.md
+ M .specify/shared/guidelines/proactive-trigger.md
+ M .specify/shared/workflow/acceptance-hardening.md
+ M .specify/shared/workflow/evidence-step.md
+ M .specify/shared/workflow/expression-gates.md
+ M .specify/shared/workflow/feedback-step.md
+ M .specify/skills/internal/collect-evidence/SKILL.md
+ M .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+ M .specify/skills/internal/manage-history/SKILL.md
+ M .specify/skills/internal/memory-recall/SKILL.md
+ M .specify/skills/internal/memory-record/SKILL.md
+ M .specify/skills/internal/review-sdd-process/SKILL.md
+ M .specify/skills/sdd-loop-driver/SKILL.md
+ M .specify/skills/sdd-loop-driver/references/efficiency-model.md
+ M .specify/skills/sdd-loop-driver/references/state-awareness.md
+ M .specify/skills/sdd-loop-driver/scripts/loop-state.py
+ M .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py
+ M .specify/templates/review-template.md
+?? .specify/scripts/python/declaration_reader.py
+?? .specify/scripts/python/harness-triple-check.py
+?? .specify/shared/declarations/
+?? .specify/shared/definitions/harness-triple-definitions.md

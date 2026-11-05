@@ -20,7 +20,9 @@
 #   grep -rn "clause-uncovered\|fr-uncovered" scripts/python/*.py                                    -> account-clause-coverage.py:
 #                                                                                                       a NARROWER two-label set, not
 #                                                                                                       this row's finding classes
-# Count measured at write time: 8 rows. Two facts of the same roster contribute no row —
+# Count measured at write time: 8 rows. Re-measured 2026-11-05 (implement, part 5) with the two
+# US4 rows appended for the units that never held a machine-consumed fact at all: **10 rows**. Two
+# facts of the same roster contribute no row —
 # `review-segment-sequence` and `history-categories` — because their unit groups keep an in-scope
 # fact (`arc-verdict-mapping`, `history-manifest-schema`); a row for them would be the both-declared-
 # and-excluded state data-model.md E-2 R-4 forbids.
@@ -66,3 +68,27 @@
 - unit: skills/external/improve-skills/SKILL.md
   carrier: skills/external/improve-skills/scripts/skill-shape.py
   anchor: skills/external/improve-skills/SKILL.md#Organize improvement items
+
+# --- US4 rows (tasks.md T020 / T023), appended 2026-11-05, existing rows untouched ---
+
+# D2 unsatisfied, and the boundary sample requirements.md § Edge Cases 末条 names: this unit ships a
+# `.yaml` of its own — `templates/project-input.template.yaml` — but it is the **input form** the
+# skill reads from the user, not a machine-consumed value domain. It cannot be mistaken for a
+# declaration fact because the reader only ever opens files under `shared/declarations/`; the
+# assertion is about the reader's input face, not about the template's shape, so no "is this really
+# an input template" judgement is introduced here.
+# This single row is also T023's retirement of screen S's accepted conservative side: the unit
+# enters the candidate set by a text test and leaves it by one record — never by a second mechanism.
+# Engine the unit does reach: its own loader/validator/query engine (`SKILL.md` § 本技能脚本清单).
+- unit: skills/internal/summarize-project/SKILL.md
+  carrier: skills/internal/summarize-project/scripts/project-db.py
+  anchor: skills/internal/summarize-project/SKILL.md#项目信息输入模型
+
+# D2 unsatisfied: the deliverable is rewritten prose — no engine's verdict changes with a value this
+# unit carries. The scope table's generic carrier cell (`同目录 scripts/`) has no object here: the
+# skill ships no `scripts/` directory, so the measured carrier is the deterministic program its
+# workflow does call — the fidelity comparer under `tests/fixtures/humanize/`
+# (`SKILL.md` § Evaluation hooks, `--input` / `--output`, exit 0 = 通过).
+- unit: skills/external/humanize/SKILL.md
+  carrier: tests/fixtures/humanize/diff_protected.py
+  anchor: skills/external/humanize/SKILL.md#Overview

@@ -1,0 +1,163 @@
+# 084 implement part 5 — deterministic readings (no pytest), 2026-11-05
+
+## (1) coverage determinism — two consecutive runs, same tree
+$ python3 scripts/python/harness-triple-check.py --action coverage --repo .   # run1
+exit=1  duration_ms=44  stdout_bytes=10685  stderr_bytes=0
+  # harness-triple-check — coverage
+  candidates: 83
+  pending: 0
+  unclassified: 58
+  findings: 58
+
+$ python3 scripts/python/harness-triple-check.py --action coverage --repo .   # run2
+exit=1  duration_ms=42  stdout_bytes=10685  stderr_bytes=0
+  # harness-triple-check — coverage
+  candidates: 83
+  pending: 0
+  unclassified: 58
+  findings: 58
+
+$ cmp /tmp/084-readings/cov1.txt /tmp/084-readings/cov2.txt  (byte comparison of the two runs)
+identical: yes
+$ sha256sum of both runs
+70f6dbf5f54045f3e1add0f40c78f0f9df988a9db1c5f654bc9dc38b0562b483  /tmp/084-readings/cov1.txt
+70f6dbf5f54045f3e1add0f40c78f0f9df988a9db1c5f654bc9dc38b0562b483  /tmp/084-readings/cov2.txt
+
+### per-state counts (run2)
+excluded: 12
+in-scope: 13
+unclassified: 58
+unclassified-candidate findings: 58
+exclusion-anchor-unresolvable findings: 0
+
+### excluded units and their reasons (all 12 rows)
+  skills/external/database-utils/SKILL.md                 reason: no-harness-asset
+  skills/external/draw-diagram/SKILL.md                   reason: no-harness-asset
+  skills/external/humanize/SKILL.md                       reason: no-machine-fact
+  skills/external/improve-docs/SKILL.md                   reason: no-machine-fact
+  skills/external/improve-skills/SKILL.md                 reason: no-machine-fact
+  skills/internal/analyze-artifacts/SKILL.md              reason: no-machine-fact
+  skills/internal/improve-agent/SKILL.md                  reason: no-machine-fact
+  skills/internal/improve-team/SKILL.md                   reason: no-machine-fact
+  skills/internal/improve-tools/SKILL.md                  reason: no-machine-fact
+  skills/internal/self-improvement/SKILL.md               reason: no-machine-fact
+  skills/internal/summarize-project/SKILL.md              reason: no-machine-fact
+  templates/commands/analyze.md                           reason: no-machine-fact
+
+## (2) verify action — declarations, consistency both ways, residual literals
+$ python3 scripts/python/harness-triple-check.py --action verify --repo .
+exit=1
+  # harness-triple-check — verify
+  declarations: 23
+  candidates: 83
+  consistency-declarations-to-carriers: 28/28
+  consistency-carriers-to-declarations: 16/16
+  residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+  findings: 58
+  finding: unclassified-candidate: shared/workflow/external-dispatch-recipes.md
+  --- finding classes (name: count)
+       58 unclassified-candidate
+  --- third-layer-missing / duplicated-fact-literal / declaration-outside-subset / exclusion-anchor-unresolvable hits
+  third-layer-missing                 0
+  duplicated-fact-literal             0
+  declaration-outside-subset          0
+  exclusion-anchor-unresolvable       0
+
+## (3) batch-1 inline constants — the literal must survive only in the declaration layer
+$ grep -rn "DEFAULT_THRESHOLD\|SEVEN_STATES\|LANE_NAMES\|CLASS_VALUES\|BASIS_VALUES\|FLOW_TYPE_VALUES\|REQUIRED_LEDGER_COLUMNS\|NEUTRAL_CATEGORIES\|PATH_VALUES" --include=*.py scripts/ skills/
+scripts/python/flow-class-check.py:116:CLASS_VALUES, CLASS_VALUES_LABEL = declared_sequence("flow-class-classes")
+scripts/python/flow-class-check.py:117:BASIS_VALUES, BASIS_VALUES_LABEL = declared_sequence("flow-class-basis")
+scripts/python/flow-class-check.py:118:NEUTRAL_CATEGORIES, NEUTRAL_CATEGORIES_LABEL = declared_sequence("flow-class-neutral-categories")
+scripts/python/flow-class-check.py:119:REQUIRED_LEDGER_COLUMNS, LEDGER_COLUMNS_LABEL = declared_sequence("flow-class-ledger-columns")
+scripts/python/flow-class-check.py:165:EXECUTION, EXPRESSION = CLASS_VALUES if len(CLASS_VALUES) == 2 else (None, None)
+scripts/python/flow-class-check.py:166:MIXED_ORACLE = BASIS_VALUES[2] if len(BASIS_VALUES) > 2 else None
+scripts/python/flow-class-check.py:188:# ``REQUIRED_LEDGER_COLUMNS`` is NOT defined here: feature 084 batch 1 row 7 moved the ledger's
+scripts/python/flow-class-check.py:392:        if record.get("category", "") not in NEUTRAL_CATEGORIES:
+scripts/python/flow-class-check.py:426:    missing_columns = [c for c in REQUIRED_LEDGER_COLUMNS if c not in names]
+scripts/python/flow-class-check.py:493:    if record.get("basis", "").strip() not in BASIS_VALUES:
+scripts/python/flow-class-check.py:496:            BASIS_VALUES,
+scripts/python/flow-class-check.py:602:        if row[CLASS_KEY] not in CLASS_VALUES:
+scripts/python/flow-class-check.py:608:                    % (CLASS_KEY, row[CLASS_KEY], CLASS_VALUES),
+scripts/python/flow-class-check.py:631:        values = {row[CLASS_KEY] for row in group if row[CLASS_KEY] in CLASS_VALUES}
+scripts/python/flow-class-check.py:898:    value outside ``CLASS_VALUES``, a duplicated row, or two rows that disagree.
+scripts/python/flow-class-check.py:954:FLOW_TYPE_VALUES, FLOW_TYPE_LABEL = declared_sequence("flow-class-document-types")
+scripts/python/flow-class-check.py:955:FLOW_TYPE_NONE = FLOW_TYPE_VALUES[-1] if FLOW_TYPE_VALUES else None
+scripts/python/flow-class-check.py:1098:        if match.group(1) not in CLASS_VALUES:
+scripts/python/flow-class-check.py:1104:                "reason": "outside the closed set (%s)" % ", ".join(CLASS_VALUES),
+scripts/python/flow-class-check.py:1174:        if value not in FLOW_TYPE_VALUES:
+scripts/python/flow-class-check.py:1180:                "reason": "outside the closed set (%s)" % ", ".join(FLOW_TYPE_VALUES),
+scripts/python/flow-class-check.py:1388:    if row[CLASS_KEY] not in CLASS_VALUES:
+scripts/python/flow-class-check.py:1393:            % (unit_id, row[CLASS_KEY], CLASS_VALUES),
+scripts/python/flow-class-check.py:2235:        if row[CLASS_KEY] in CLASS_VALUES:
+scripts/python/flow-class-check.py:2747:    labels = [label for label in (CLASS_VALUES_LABEL, BASIS_VALUES_LABEL, NEUTRAL_CATEGORIES_LABEL,
+scripts/python/validate-requirements.py:122:PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+scripts/python/validate-requirements.py:345:    if not PATH_VALUES:
+scripts/python/validate-requirements.py:349:        raise DomainUnavailable(PATH_VALUES_LABEL)
+scripts/python/validate-requirements.py:387:        if value not in PATH_VALUES:
+scripts/python/closure-acceptance-check.py:100:#     and puts `PATH_VALUES_LABEL` on stderr — never a traceback and never a clean pass (FR-013).
+scripts/python/closure-acceptance-check.py:121:PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+scripts/python/closure-acceptance-check.py:602:        if not PATH_VALUES and not READER_ABSENT:
+scripts/python/closure-acceptance-check.py:608:                % (path, PATH_VALUES_LABEL)
+scripts/python/closure-acceptance-check.py:610:        if PATH_VALUES and value not in PATH_VALUES:
+scripts/python/closure-acceptance-check.py:1770:    if PATH_VALUES_LABEL and READER_ABSENT:
+scripts/python/closure-acceptance-check.py:1771:        print(PATH_VALUES_LABEL, file=sys.stderr)
+scripts/python/evidence-utils.py:26:SEVEN_STATES_FACT = "evidence-seven-states"
+scripts/python/evidence-utils.py:51:SEVEN_STATES, SEVEN_STATES_LABEL = declared_sequence(SEVEN_STATES_FACT)
+scripts/python/evidence-utils.py:52:LANE_NAMES, LANE_NAMES_LABEL = declared_sequence(LANES_FACT)
+scripts/python/evidence-utils.py:551:    if not LANE_NAMES:
+scripts/python/evidence-utils.py:555:        raise CliError(f"{LANE_NAMES_LABEL}: the lane roster cannot be read from the declaration layer")
+scripts/python/evidence-utils.py:556:    requested = LANE_NAMES if args.lanes in (None, "", "all") else tuple(
+scripts/python/evidence-utils.py:559:        if lane not in LANE_NAMES:
+scripts/python/evidence-utils.py:574:    for lane in LANE_NAMES:
+  (hits above; a constant name appearing here is a second copy)
+  exit code of that grep: 0
+$ grep -n "final\", \"supporting\"" scripts/python/closure-acceptance-check.py   # the ninth row second copy
+  grep exit=1 (1 = no inline tuple left)
+
+## (4) SC-006 non-goal legs that are seconds-level (no pytest leg — waived-by-user)
+$ git diff 4b65517c -- pyproject.toml
+  (empty output above = byte-identical dependency list) exit=0
+$ git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py
+  (empty output above = 081 acceptance surface untouched)
+$ python3 -m pytest --collect-only -q …  -> NOT RUN (user test waiver, 2026-11-05); the two collect counts (40 / 37) are not re-read
+
+### candidate-surface counts, against notes/pre-change-measurements.md § (c)
+  ls templates/commands/*.md | wc -l       27   (baseline 27)
+  ls skills/{external,internal}/*/SKILL.md | wc -l 53   (baseline 53)
+  ls shared/workflow/*.md | wc -l          19   (baseline 19)
+  ls shared/definitions/*.md | wc -l       13   (baseline 12)
+  feature-status value count: NOT READ — T001(c) recorded no baseline for it (disclosed in the E3 row); T029 is waived-by-user
+
+## (5) gate-host delegation — the opt-in flag (T024), read on this tree
+$ pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage tasks --repo .            # default (off)
+  exit=0
+  finding names: ['missing-path']
+  summary: {'errors': 0, 'advisories': 3, 'waived': 0, 'fr': 19, 'sc': 6, 'tasks': 31, 'clauses': 0, 'files': 14}
+  -> the name 'triple-structure' is absent, so the emitted name set is the gate's own:
+      ['missing-path'] ⊂ driver-gate-roster#/statement/checks
+
+$ pre-analyze-check.py … --triple-structure                                                                 # opt-in (on)
+  exit=1
+  finding names: ['missing-path', 'triple-structure']
+  forwarded findings under the one name: 58
+  first three, verbatim: ['unclassified-candidate: shared/workflow/external-dispatch-recipes.md', 'unclassified-candidate: shared/workflow/feature-integration.md', 'unclassified-candidate: shared/workflow/glossary.md']
+  path/line of a forwarded finding: scripts/python/harness-triple-check.py 0
+  summary: {'errors': 58, 'advisories': 3, 'waived': 0, 'fr': 19, 'sc': 6, 'tasks': 31, 'clauses': 0, 'files': 14}
+
+### the two runs side by side (same tree, one flag apart)
+  off findings: 3 (advisories 3, errors 0)
+  on  findings: 61 (advisories 3, errors 58) = the same 3 own findings + 58 forwarded
+  the host's own findings are identical in both runs: True
+  -> off restores the pre-084 finding-name set exactly; on adds one name and nothing else moves
+
+## (6) post-tick validators and the zero-write leg of the delegation
+$ python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md
+  PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+  exit=0
+$ grep -cE "^- \[[ >]\]" .specify/specs/084-harness-triple-structure/tasks.md   # GATE-7
+  0
+$ pre-analyze-check.py --spec-dir … --stage tasks --repo .   # post-tick, default off
+  exit=0
+  pre-analyze-check: stage=tasks decision=pass errors=0 advisories=3 waived=0
+$ git status --porcelain > before ; pre-analyze-check.py … --triple-structure ; git status --porcelain > after ; diff
+  no tree change (C-039): the delegated run writes nothing

@@ -31,6 +31,77 @@ from typing import Any, Dict, List, Optional, Tuple
 FEEDBACK_SUBDIR = Path(".specify") / "memory" / "feedback"
 EXTERNAL_PROBES_DIRNAME = "probes"
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+# --------------------------------------------------------------------------- #
+# The registry's value domains — declaration-layer facts (Feature 084, batch 3; C-045)
+# --------------------------------------------------------------------------- #
+# `probe-class-values` owns the two probe kinds, the class-field roster and the four handler/binding
+# closed sets; `probe-object-binding-map` owns the object-field roster, the derived map's file name
+# and the two tokens the non-entity catalog chapter is parsed by. Both live under
+# `shared/declarations/facts/` and are read here through the shared read entry, so neither roster is
+# spelled in this engine again. The `_FALLBACK` values below are the **FR-012 compatibility value**
+# for a tree with no declaration layer; when the declaration is readable they are never consulted.
+PROBE_CLASS_FACT = "probe-class-values"
+PROBE_OBJECT_FACT = "probe-object-binding-map"
+_PROBE_CLASS_FALLBACK = {
+    "probe_kinds": ["internal", "external"],
+    "class_fields": ["class_id", "kind", "collection", "target_slice", "processing", "insertion_type"],
+    "handler_kinds": ["engine", "agent", "gate"],
+    "handler_modes": ["non-blocking", "blocking"],
+    "lifecycle_points": ["wrap-up", "situation", "phase-boundary", "confirm-gate"],
+    "binding_scopes": ["complex-commands", "skills", "all"],
+}
+_PROBE_OBJECT_FALLBACK = {
+    "object_fields": ["object_id", "class_id", "unit", "lifecycle_point"],
+    "probe_map_file": "probe-map.md",
+    "catalog_heading": "非实体 probe 目录",
+    "catalog_entry_pattern": r"^- `([^`]+)` — .+$",
+}
+
+
+def _declared_statement(slug, fallback):
+    """`(statement, label)` for one mapping-shaped fact; `(fallback, <STR-014 instance>)` if unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict) or not statement:
+            raise ValueError("statement is not a non-empty mapping")
+        return dict(statement), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return dict(fallback), declaration_reader.absent_label(slug)
+
+
+def _declared_roster(statement, key, fallback):
+    """One closed roster from a declared statement, falling back per key rather than per fact."""
+    values = statement.get(key)
+    if not isinstance(values, list) or not values:
+        values = fallback[key]
+    return tuple(str(value) for value in values)
+
+
+def _declared_text(statement, key, fallback):
+    text = str(statement.get(key) or "").strip()
+    return text or str(fallback[key])
+
+
+_PROBE_CLASSES, PROBE_CLASS_LABEL = _declared_statement(PROBE_CLASS_FACT, _PROBE_CLASS_FALLBACK)
+_PROBE_OBJECTS, PROBE_OBJECT_LABEL = _declared_statement(PROBE_OBJECT_FACT, _PROBE_OBJECT_FALLBACK)
+PROBE_KINDS = _declared_roster(_PROBE_CLASSES, "probe_kinds", _PROBE_CLASS_FALLBACK)
+CLASS_FIELDS = _declared_roster(_PROBE_CLASSES, "class_fields", _PROBE_CLASS_FALLBACK)
+HANDLER_KINDS = _declared_roster(_PROBE_CLASSES, "handler_kinds", _PROBE_CLASS_FALLBACK)
+HANDLER_MODES = _declared_roster(_PROBE_CLASSES, "handler_modes", _PROBE_CLASS_FALLBACK)
+LIFECYCLE_POINTS = _declared_roster(_PROBE_CLASSES, "lifecycle_points", _PROBE_CLASS_FALLBACK)
+BINDING_SCOPES = _declared_roster(_PROBE_CLASSES, "binding_scopes", _PROBE_CLASS_FALLBACK)
+OBJECT_FIELDS = _declared_roster(_PROBE_OBJECTS, "object_fields", _PROBE_OBJECT_FALLBACK)
+PROBE_MAP_NAME = _declared_text(_PROBE_OBJECTS, "probe_map_file", _PROBE_OBJECT_FALLBACK)
+CATALOG_HEADING = _declared_text(_PROBE_OBJECTS, "catalog_heading", _PROBE_OBJECT_FALLBACK)
+CATALOG_ENTRY_RE = re.compile(_declared_text(_PROBE_OBJECTS, "catalog_entry_pattern",
+                                            _PROBE_OBJECT_FALLBACK))
+
 _UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$")
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
 
@@ -131,13 +202,9 @@ def ensure_feedback_dir(workspace_root: Path) -> Path:
 PROBE_DEFS_REL = Path(".specify") / "shared" / "definitions" / "probe-definitions.md"
 _PROBE_ID_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 _CUSTOM_UNIT_RE = re.compile(r"^custom:[a-z0-9._/-]+$")
-_PROBE_KINDS = ("internal", "external")
-_CLASS_FIELDS = ("class_id", "kind", "collection", "target_slice",
-                 "processing", "insertion_type")
-_OBJECT_FIELDS = ("object_id", "class_id", "unit", "lifecycle_point")
+# The value rosters this section reads (`probe_kinds`, `class_fields`, `object_fields`, the catalog
+# tokens) are derived at the top of this file from their declaration; no tuple is spelled here.
 _SCRIPT_UNIT_RE = re.compile(r"^scripts/(?:bash|python)/[a-z0-9][a-z0-9._-]*\.(?:py|sh)$")
-_CATALOG_HEADING = "非实体 probe 目录"
-_CATALOG_ENTRY_RE = re.compile(r"^- `([^`]+)` — .+$")
 
 
 def _catalog_entries(text: str) -> List[Tuple[str, str]]:
@@ -149,7 +216,7 @@ def _catalog_entries(text: str) -> List[Tuple[str, str]]:
     lines = text.splitlines()
     start = None
     for i, line in enumerate(lines):
-        if line.strip() == f"## {_CATALOG_HEADING}":
+        if line.strip() == f"## {CATALOG_HEADING}":
             start = i + 1
             break
     if start is None:
@@ -158,7 +225,7 @@ def _catalog_entries(text: str) -> List[Tuple[str, str]]:
     for line in lines[start:]:
         if line.strip().startswith("## "):
             break
-        m = _CATALOG_ENTRY_RE.match(line.strip())
+        m = CATALOG_ENTRY_RE.match(line.strip())
         if m:
             out.append((m.group(1), line.strip()))
     return out
@@ -205,7 +272,7 @@ def _load_external_probes(workspace_root: Path,
         return out
     for path in sorted(probes_dir.glob("*.md")):
         meta, _body = parse_frontmatter(path.read_text(encoding="utf-8"))
-        obj = {f: str(meta.get(f, "")).strip() for f in _OBJECT_FIELDS}
+        obj = {f: str(meta.get(f, "")).strip() for f in OBJECT_FIELDS}
         if not obj["object_id"]:
             errors.append(f"external probe {path.name}: missing object_id")
             continue
@@ -233,7 +300,7 @@ def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
         seen_classes = set()
         for c in classes:
             cid = c.get("class_id", "")
-            for field in _CLASS_FIELDS:
+            for field in CLASS_FIELDS:
                 if not c.get(field, "").strip():
                     errors.append(f"class '{cid or '?'}': field '{field}' must be non-empty")
             if not _PROBE_ID_RE.match(cid):
@@ -241,7 +308,7 @@ def load_probe_registry(workspace_root: Path) -> Dict[str, Any]:
             if cid in seen_classes:
                 errors.append(f"class '{cid}': duplicate class_id")
             seen_classes.add(cid)
-            if c.get("kind", "") not in _PROBE_KINDS:
+            if c.get("kind", "") not in PROBE_KINDS:
                 errors.append(f"class '{cid}': kind must be one of internal|external")
         class_ids = {c.get("class_id", "") for c in classes}
         class_slice = {c.get("class_id", ""): c.get("target_slice", "") for c in classes}
@@ -424,8 +491,6 @@ def action_probes(args: argparse.Namespace) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Probe map (migrated verbatim)
 # --------------------------------------------------------------------------- #
-PROBE_MAP_NAME = "probe-map.md"
-
 
 def _map_slug(name: str) -> str:
     """Deterministic Mermaid node id: keep [a-zA-Z0-9_] only."""
@@ -612,10 +677,6 @@ def action_probe_inject(args: argparse.Namespace) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 # Handler / HandlerBinding (NEW — requirement 056 US2, [C2])
 # --------------------------------------------------------------------------- #
-HANDLER_KINDS = ("engine", "agent", "gate")
-HANDLER_MODES = ("non-blocking", "blocking")
-LIFECYCLE_POINTS = ("wrap-up", "situation", "phase-boundary", "confirm-gate")
-BINDING_SCOPES = ("complex-commands", "skills", "all")
 _SELECTOR_RE = re.compile(r"^@point:([a-z-]+)$")
 _HEADING_RE = re.compile(r"^## (.+)$", re.MULTILINE)
 _ORDER_RE = re.compile(r"-?\d+")
@@ -1409,6 +1470,11 @@ _ACTIONS = {
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    # FR-012 / FR-013: a tree without the declaration layer keeps working on the labelled
+    # compatibility value — the label is a reading of the wiring, never a pass.
+    for label in (PROBE_CLASS_LABEL, PROBE_OBJECT_LABEL):
+        if label:
+            print(label, file=sys.stderr)
     try:
         payload = _ACTIONS[args.action](args)
     except FeedbackError as exc:

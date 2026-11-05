@@ -1,0 +1,35 @@
+# Exclusion records — reason `no-harness-asset` (requirements.md FR-002 / FR-005; data-model.md E-2).
+#
+# One row per candidate unit that fails **D1** (FR-002's asset side): its acceptance deliverable
+# contains no item named by `shared/guidelines/better-harness.md` § 消费者清单 — no evidence record,
+# no feedback / learning record, no gate verdict on someone else's artifact, and no change to
+# `skills/`, `agents/`, `teams/`, `tools/`, `docs/`, the constitution or the instructions.
+#
+# `carrier` is the engine or asset the unit does reach (data-model.md E-2). `anchor` is the
+# resolvable in-tree evidence for the reason: the section that states what the unit delivers.
+#
+# Re-measured 2026-11-05 (implement, part 5) before writing this file, per
+# `contracts/migration-batches.contract.md` § Verification ("the excluded facts still have no
+# engine read point") read for the asset side instead:
+#   draw-diagram   — Step 4 accepts the run against the LDM and the delivery contract and reports
+#                    products (HTML + source + image); no evidence/feedback record is produced and
+#                    no `skills/`, `agents/`, `teams/`, `tools/`, `docs/` or governance file is edited.
+#   database-utils — read-only querying of MySQL/PostgreSQL protocol databases; the deliverable is
+#                    a query result, and the skill writes nothing outside its own config file.
+# Count measured at write time: 2 rows, one file (the two remaining closed reasons carry no row —
+# a reason file that would be empty MUST NOT be created to satisfy the shape).
+
+# D1 unsatisfied: the deliverable is a diagram package, not a harness asset.
+# Engine the unit does reach: its six engine layers are selected per run, so the one deterministic
+# framework engine the unit's text invokes unconditionally is the feedback record it writes for
+# itself (`SKILL.md` § Self-Improvement Contract, `python3 …/.specify/scripts/python/feedback-utils.py
+# --action record`). A row names one carrier; this is that one, measured with `grep -n`.
+- unit: skills/external/draw-diagram/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/external/draw-diagram/SKILL.md#Step 4: 验收与回报
+
+# D1 unsatisfied: the deliverable is a query result over a configured database.
+# Engine the unit does reach: its own dispatcher, `scripts/query.py` (`SKILL.md` § Usage).
+- unit: skills/external/database-utils/SKILL.md
+  carrier: skills/external/database-utils/scripts/query.py
+  anchor: skills/external/database-utils/SKILL.md#Overview
