@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-27T07:03:24Z"
 summary: "analyze stage on Feature 071: read-only cross-artifact analysis over requirements/plan/research/data-model/contracts/quickstart/feature-ref/tasks plus the live framework sources, consuming all 27 unch"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

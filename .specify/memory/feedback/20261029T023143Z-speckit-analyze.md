@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-29T02:31:43Z"
 summary: "Read-only cross-artifact analysis of slice 074a: 14 findings (0 CRITICAL / 3 HIGH / 8 MEDIUM / 3 LOW); 14/14 checklist fail items adjudicated (10 raised, 4 dispositioned covered-by); clause coverage 4"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

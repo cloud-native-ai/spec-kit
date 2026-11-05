@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "082-self-explanatory-integration"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T06:38:20Z"
 summary: "Implement part 10b (final): Completion Gate re-validated green (GATE-1/2/3 from part 10a, GATE-4 measured here), verification.md landed with 9 SC blocks + 10 bound evidence records, closure verdict ac"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

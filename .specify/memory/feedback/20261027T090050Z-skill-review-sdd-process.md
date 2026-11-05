@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T09:00:50Z"
 summary: "Produced the process report for Feature 071 from a different session and a different author than the artifacts under review: context capture with commit-reachability verification, the timeline reconst"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

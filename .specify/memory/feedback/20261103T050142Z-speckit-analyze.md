@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-03T05:01:42Z"
 summary: "081b analyze over the US2 artifact set: 18 checklist FAILs dispositioned (7 P1 confirmed HIGH, CHK020 downgraded to MEDIUM by its validator), 5 new findings raised (signed-contract contract-path oblig"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

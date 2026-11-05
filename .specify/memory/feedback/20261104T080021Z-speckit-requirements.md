@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-04T08:00:21Z"
 summary: "Requirements spec created for 082-self-explanatory-integration. Deterministic checker: 0 errors, 0 warnings (171 lines, 20 definition rows, 3 shared strings). Checklist: all items pass. Flow-class loo"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

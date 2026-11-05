@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T09:00:46Z"
 summary: "review stage on Feature 071: ran both segments in the fixed order — process segment (review.md: 8 findings, P0 0 / P1 4 / P2 4, REC-071-01..08 registered in the same commit) then code segment (triage="
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

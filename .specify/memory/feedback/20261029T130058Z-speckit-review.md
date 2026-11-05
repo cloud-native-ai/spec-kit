@@ -8,9 +8,11 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "076"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T13:00:58Z"
 summary: "review #1 denied on 1 blocking (owner lacked its validator grammar) + 5 P1; review-fix 1298aef7 closed them; review #2 confirmed 0 blocking and advanced Implemented -> Ready for Review; F13 (P1) then "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-24T15:14:52Z"
 summary: "069a slice review: the two shipped gate entry points fail when executed as written (W1/W3 verifier exits 2; client-shape class lookup exits 2 owner-unavailable); SC-002 pass and checklist 40/40 overst"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

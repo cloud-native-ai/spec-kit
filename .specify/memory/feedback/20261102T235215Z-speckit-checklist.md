@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-11-02T23:52:15Z"
 summary: "Ran /speckit.checklist unattended for slice 081a: read brief + requirements/plan/tasks/contracts, verified every claim mechanically (P1-P11 probes), produced checklists/acceptance-2026-11-03.md with 3"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

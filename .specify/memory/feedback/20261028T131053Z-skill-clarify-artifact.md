@@ -8,9 +8,11 @@ probe: "skill-clarify-artifact-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "074-goal-team-sdd-unification"
+disposition: "ignored"
 partial: false
 created: "2026-10-28T13:10:53Z"
 summary: "clarify-artifact Mode A executed. Detection was delegated under the same-author gate; five closed questions were batched 4+1, each with consequence previews; three residual conflicts were corrected in"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

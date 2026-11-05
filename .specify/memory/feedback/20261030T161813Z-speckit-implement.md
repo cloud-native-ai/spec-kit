@@ -8,9 +8,12 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
+disposition: "processed"
 partial: false
 created: "2026-10-30T16:18:13Z"
 summary: "Part 5/5 (T033–T036) closed the feature: the T036 WC-05…WC-20 group and the clause↔test map judge are green (17 passed), the nine frozen surfaces and the 38 frozen-verification files are byte-identica"
+introspection_ref: "introspection-20261105T080109Z#F-01"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-01"
 ---
 
 ## Review

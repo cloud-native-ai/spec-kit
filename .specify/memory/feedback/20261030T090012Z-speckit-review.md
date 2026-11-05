@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
 feature_id: "078"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T09:00:12Z"
 summary: "record-only repair of the five P1 review findings: A10 now names the 20th hand-edited source (sanitize-utils LEGACY_SKILL_NAMES) with the allowed difference set unchanged; feature status and baseline "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

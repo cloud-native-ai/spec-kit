@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T05:07:29Z"
 summary: "analyze on slice 074b: read-only pass over requirements/plan/contracts/data-model/tasks/checklists; 14 findings (2 HIGH, 7 MEDIUM, 5 LOW) with 13 checklist items adjudicated (11 real, 2 covered-by); n"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-03T03:45:55Z"
 summary: "Read-only review of Feature 081 slice 081a (Blocked). Process, code delta f9f6d4f3..d0186dc5 and artifact/implementation review all completed in-agent; 90de4d7f identified as concurrent non-081 work a"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

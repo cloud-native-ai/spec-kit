@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T06:57:31Z"
 summary: "process segment of a doc-heavy slice: five P1/P2 findings are structural (surface claims, shared ids, parent verification), one P0 is command plumbing"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

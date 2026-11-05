@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "072-client-self-improvement"
 feature_id: "072"
+disposition: "processed"
 partial: false
 created: "2026-10-27T09:18:44Z"
 summary: "Unattended requirements stage for a new feature: derived the number with the project script (072, branch switch suppressed so the run stays on the spine's branch and the worktree is not moved), read t"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

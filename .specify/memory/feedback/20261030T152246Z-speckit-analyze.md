@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
 feature_id: "062"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T15:22:46Z"
 summary: "Analyze r3 of 079-humanize-run-output: read-only cross-artifact consistency across requirements/plan/data-model/5 contracts/quickstart/tasks/2 checklists/Feature 062/constitution/instructions at stage"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T13:22:35Z"
 summary: "072 code segment: base 8ab5e5a9 (feature-first-commit)..5336c057, receipt 111/28/83/0, verdict not-evaluated (legal skips), gate allow (0 blocking/important; 1 suggestion/1 question/1 praise); capture"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

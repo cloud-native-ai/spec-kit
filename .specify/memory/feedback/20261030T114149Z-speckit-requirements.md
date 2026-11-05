@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
+disposition: "processed"
 partial: false
 created: "2026-10-30T11:41:49Z"
 summary: "Requirements-fix stage of 079-humanize-run-output (analyze loop 1/1): rewrote requirements.md only (30 FR unchanged, 10 SC unchanged, 5 new Shared Strings), closing H-01..H-04 and M-01/M-02/M-05/M-06/"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

@@ -8,9 +8,11 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-bilingual-expression"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T12:25:59Z"
 summary: "078 closure-repair round: 3 new closure full-suite failures root-caused and fixed (owner-doc runtime refs C-57; ambient [[STR-001]] token replaced by literal shared/guidelines/bilingual-expression.md "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

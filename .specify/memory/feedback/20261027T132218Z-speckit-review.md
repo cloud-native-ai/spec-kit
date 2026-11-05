@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T13:22:18Z"
 summary: "072 review run (unattended): process segment review.md (P0 0/P1 1/P2 3) + code segment code-review.md (triage=run, gate=allow, verdict not-evaluated on legal skips) + REC-072-01..04 registered + Imple"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

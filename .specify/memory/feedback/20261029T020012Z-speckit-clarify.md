@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T02:00:12Z"
 summary: "Clarify Mode A on slice 074a-authorized-routing (explicit target override; branch resolves to parent 074). Same-author gate did not fire: the artifact predates this session (commit c5e4c662a, prior di"
+introspection_ref: "introspection-20261105T080109Z#F-09"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-09"
 ---
 
 ## Review

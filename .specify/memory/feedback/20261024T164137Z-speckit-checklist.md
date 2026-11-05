@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "069b-isomorphism-migration-metrics"
 feature_id: "069"
+disposition: "ignored"
 partial: false
 created: "2026-10-24T16:41:37Z"
 summary: "069b checklist run: 36 items (35 [x] / 1 [ ] with verify-in-implementation). Found and fixed cross-artifact defects a presence-absence gate cannot catch: a duplicate ledger-version kind outside the cl"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

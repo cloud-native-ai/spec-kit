@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-bilingual-expression"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T10:30:34Z"
 summary: "implement part 1/4 wrap-up record for 078-bilingual-expression"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

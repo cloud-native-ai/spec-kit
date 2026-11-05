@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "074-goal-team-sdd-unification"
+disposition: "ignored"
 partial: false
 created: "2026-10-28T13:10:50Z"
 summary: "Clarify Mode A on 074. Same-author gate held; the coverage scan was delegated to a fresh-context read-only agent, producing 8 material candidates. Five were ratified (Feature 074, routing owner doc, p"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

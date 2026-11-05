@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T03:08:23Z"
 summary: "Clarify Mode A completed for 082-self-explanatory-integration. Same-author coverage scan delegated to a fresh-context read-only subagent: 8 material findings; 4 factual corrections landed directly, 4 "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

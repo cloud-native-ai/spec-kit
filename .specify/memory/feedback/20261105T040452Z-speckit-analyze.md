@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T04:04:52Z"
 summary: "analyze read-only: 7 CRITICAL/HIGH candidates validated (1 confirm of the already-MEDIUM-capped H-01, 4 downgrade, 2 reject); 7 CHK Gap items all raised or dispositioned; gates must be read after appl"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

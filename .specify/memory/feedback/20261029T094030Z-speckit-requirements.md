@@ -8,9 +8,11 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "076"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T09:40:30Z"
 summary: "requirements stage passed: 26 FR / 8 SC / 5 user stories; validate-requirements exit 0; quality checklist 16/16; decomposition proceed (26<=30); pre-analyze pass (2 expected advisories: the owner file"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

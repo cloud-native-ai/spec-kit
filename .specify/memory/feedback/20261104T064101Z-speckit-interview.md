@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-interview-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-04T06:41:01Z"
 summary: "Interview completed and user-confirmed: Special mode on 不言自明 (Self-explanatory); 24 decisions (23 settled, 1 deferred), three artifacts written; no retractions."
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

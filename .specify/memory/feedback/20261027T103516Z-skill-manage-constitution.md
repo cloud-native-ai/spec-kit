@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-manage-constitution-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T10:35:16Z"
 summary: "v1.14.0 MINOR amendment landed (Principle XVII Directory Governance) across live constitution, template, generator skill, ambient pointer and a new owner doc; focused contract tests green; remaining s"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

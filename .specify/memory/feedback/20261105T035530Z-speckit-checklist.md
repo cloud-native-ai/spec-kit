@@ -8,9 +8,12 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature_id: "082"
+disposition: "processed"
 partial: false
 created: "2026-11-05T03:55:30Z"
 summary: "Checklist stage completed cleanly: 36-item requirements-quality checklist written to a new dated file (existing checklists/requirements.md untouched), all items traceable and in question form, committ"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

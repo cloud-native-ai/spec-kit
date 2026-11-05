@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-24T04:20:52Z"
 summary: "requirements 阶段按要求完成 069 规格（35 FR / 10 SC / 2 STR，validator 0 error 0 warning），但过程中撞到两处流程摩擦：create-new-requirements.sh 的依赖检查在未设 CWS_LIB_BASH_HOME 时直接 exit 1 且提示不给获取途径；requirements 模板明确把 Feature 绑定推迟到 "
+introspection_ref: "introspection-20261105T080109Z#F-08"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-08"
 ---
 
 ## Review

@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-30T05:23:11Z"
 summary: "078 requirements 落地：27 FR / 9 SC / 9 STR；checker 0 error；decomposition proceed；pre-analyze pass（1 条已知 advisory：目标路径实现前不存在）。"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

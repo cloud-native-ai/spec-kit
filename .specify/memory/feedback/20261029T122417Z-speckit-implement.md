@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "076"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T12:24:17Z"
 summary: "implement stage passed: 27/27 tasks closed across 4 parts; 8/8 SC pass with sha256-bound evidence; 66 feature contract tests + 70 neighbour guards green; zero new commands/deps/processes; mirrors byte"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

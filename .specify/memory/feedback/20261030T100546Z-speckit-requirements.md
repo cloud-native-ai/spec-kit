@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T10:05:46Z"
 summary: "079 requirements：29 FR / 8 SC / 9 STR；checker 0 error；decomposition proceed；pre-analyze pass（0 advisory）。"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

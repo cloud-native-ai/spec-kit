@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "082-self-explanatory-integration"
 feature_id: "082"
+disposition: "processed"
 partial: false
 created: "2026-11-05T07:04:50Z"
 summary: "Unattended SDD line 082-self-explanatory-integration completed through review and merged to master. Feature 082 = Ready for Review; review P0=0 / P1=1 fixed / P2=4; closure full suite 25 failed / 7198"
+introspection_ref: "introspection-20261105T080109Z#F-01"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-01"
 ---
 
 ## Review

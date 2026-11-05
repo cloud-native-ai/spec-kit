@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "082-self-explanatory-integration"
 feature_id: "082"
+disposition: "processed"
 partial: false
 created: "2026-11-05T06:53:41Z"
 summary: "review 续段：四段 + ARC 全跑；代码段 pass（blocking 0 / gate allow），过程段 0 P0 / 1 P1 / 4 P2，产物段 pass 7/7，实现段 pass，ARC accept（4/4/0）；两条 IMPORTANT 逐条应答（a7 pin 前提被实测推翻但 head 确为红→修复；M-N 复用→改 G-1..G-5），QUESTION 已答，SUGG"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

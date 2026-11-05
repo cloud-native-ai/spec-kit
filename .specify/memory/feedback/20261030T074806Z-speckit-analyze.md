@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
+disposition: "processed"
 partial: false
 created: "2026-10-30T07:48:06Z"
 summary: "analyze rerun r3 (human-authorized verification after the H-04 design repair): H-04 core closed (single-owner claim protocol, atomic O_CREAT|O_EXCL create, no scan-then-create) and M-11 closed (confli"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "077"
+disposition: "processed"
 partial: false
 created: "2026-10-29T17:19:08Z"
 summary: "clarify round 1: eight rulings ratified (declaration syntax and location, seven-command wiring, spec: key family, Document Structure contract, expression implement evidence, driver slot substitution, "
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

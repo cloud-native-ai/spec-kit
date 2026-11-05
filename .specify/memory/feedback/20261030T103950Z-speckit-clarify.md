@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-30T10:39:50Z"
 summary: "079 clarify Mode A：24 条发现（20 条 owner 事实修正 + 4 条问答）；确认缺失 fail-closed、--output 完整报告、报告语言指令优先、Feature 062 改名绑定；三条检查全绿。"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review
