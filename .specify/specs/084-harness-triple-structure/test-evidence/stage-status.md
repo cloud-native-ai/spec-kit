@@ -252,3 +252,48 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/checklis
 「改 `requirements.md`」之间做选择，属 `/speckit.analyze` 的裁决面，不在本阶段范围内。
 
 
+
+## analyze（2026-11-05）
+
+```yaml
+stage: analyze
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/test-evidence/analyze-report-2026-11-05.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/account-clause-coverage.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-report-2026-11-05.md
+```
+
+## Why `not-run-docs-only`（analyze）
+
+`/speckit.analyze` 是**只读质量门**：它不修改任何制品，本阶段的写面只有证据文件与 Wrap-up 记账。改动面全部
+落在 `test-evidence/` 之下，没有一行落在 `tests/unit`、`tests/contract`、`tests/integration`、`tests/scenarios`，
+也没有触碰 `scripts/`、`skills/**/scripts/`、`src/`、夹具或 `templates/*.yaml`。因此 `targeted-set-v1`
+（`stage_base=9abb10fb`）的输入全部落在 `test_roots` 之外、与夹具无关，得空集属**预期形态**，按判据 owner
+`.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` **TB-06** 记 `not-run-docs-only` 而非
+`empty-selection-escalated`；缩减字段集即本行六项（`stage`、`row_type=stage-status`、`status`、`selection_basis`、
+`changed_paths[]`、`evidence_ptr`）。运行字段（`selected_paths[]`、`sufficiency`、`rc`、`passed`/`failed`、
+`new_failures[]`、比较基线）不适用且 MUST NOT 报 `unknown`。
+
+本阶段确实**执行**了若干只读程序（前置脚本、类别读取、条款/FR 覆盖核算、决策张力校验、`duplicate` 面两种
+调用形态、门禁脚本测试面并集重算、081 冻结面 `git diff`），另派发了四个只读验证子代理。它们都不读 `tests/` 的
+用例选择面、不消耗测试槽位、不产生测试结果，故不触发定向集，也不是一次测试运行；读数与命令见报告
+§ Evidence pointers。
+
+## Bases verified（analyze）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 前置与产物齐备 | `bash scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks` | `REQUIREMENTS_DIR` 解析到本 spec；`AVAILABLE_DOCS` 含 contracts/、checklists/、tasks.md | 本行即读数 |
+| 类别（本阶段唯一一次读取） | `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"` | `flow_class: execution` / `flow_type: -` / `source: declaration` / exit 0 ⇒ 非表达类，门禁集逐字不变 | 本行即读数 |
+| 条款/FR 覆盖（固定只读步，MUST NOT `--freeze`） | `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure` | `claimed clauses 0`；`0 of 19` FRs cited；`status: baseline-missing`（533 errors）⇒ 阶段可见问题 + 修复归属 `/speckit.tasks` | `test-evidence/account-clause-coverage.txt` |
+| 决策张力记录 | `python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/084-harness-triple-structure --json` | `status: ok`，六个 label 全 `pass`/count 0 | 本行即读数 |
+| 只读性（无制品改动） | `git status --porcelain` 前后各一次 | 两次逐行相同（18 行）⇒ 验证波零写入 | 本行即读数；报告 § Validation wave |
+| 081 冻结面 | `git diff --stat 3ffeb26e -- shared/workflow/acceptance-hardening.md .specify/shared/workflow/acceptance-hardening.md tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py scripts/python/validate-requirements.py scripts/python/closure-acceptance-check.py` | 空输出 ⇒ 本分支零改动 | 本行即读数 |
+| PLAN CONSTRAINT（零改动） | `git diff --stat 9abb10fb -- requirements.md tasks.md plan.md data-model.md contracts/ quickstart.md research.md feature-ref.md` | 空输出 ⇒ 无 `PLAN-EDIT` | 本行即读数 |
+
+**本阶段未修改任何制品、未勾选任何任务行、未提交、未 push；F-01／F-02／F-03 三条 CRITICAL/HIGH 的修复归属已点名
+（requirements / plan / requirements），修平动作留给对应命令。**
