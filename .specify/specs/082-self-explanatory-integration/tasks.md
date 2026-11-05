@@ -74,7 +74,7 @@
 
 - [ ] T004 只读复核三份 owner 文档在框架源中存在且非空(实测 `shared/definitions/self-explanatory-definitions.md` 4508 B / 7 个 `## ` 标题;`shared/guidelines/self-explanatory.md` 6271 B / 10 个;`shared/workflow/best-practice-optimization.md` 4613 B / 8 个),并把三条 `ls -l` 输出写入 `notes/pre-change-measurements.md`;内容不在本特性范围,缺失即上送而非新建。指向: `shared/definitions/self-explanatory-definitions.md` [green: contracts/mirror-distribution.contract.md#C-22]
 - [ ] T005 复核镜像引擎的枚举形态(与 T004 写同一个 `notes/pre-change-measurements.md`,故不带 [P]) `python3 scripts/python/sync-mirrors.py --check`(实测退出 0,`shared/ == .specify/shared/` 为 `ok`、65 文件)并把输出粘入 `notes/pre-change-measurements.md`;同时记录 `shared` 对是**非 strict** 对(镜像独有文件只报 note,见 plan § Mirror Obligations fact 1) [green: contracts/mirror-distribution.contract.md#C-25]
-- [ ] T006 [blockedBy: T001] Red-first 取证:introducing 任何制品之前先运行 `python3 -m pytest tests/contract/test_constitution_double_landing.py tests/contract/test_instructions_section_propagation.py -q`,把输出(预期:因 `STR-001` 尚不存在而失败,或对既有断言为空真)连同退出码写入 `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md` [green: contracts/constitution-double-landing.contract.md#C-1]
+- [ ] T006 [blockedBy: T001] Red-first 取证：先创建 `tests/contract/test_self_explanatory_constitution.py` 的最小断言（模板标题集合含 `Self-Explanatory Structure (不言自明)`），运行 `python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q`，确认它因标题尚不存在而失败；把命令、真实失败输出与退出码写入 `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md`。不得把既有 `test_constitution_double_landing.py` / `test_instructions_section_propagation.py` 的通过当作红旗——它们不引用 STR-001。 [green: contracts/constitution-double-landing.contract.md#C-1]
 
 **Checkpoint**: 前提齐备且红旗取证已留痕;可以并行开工 P1 的三个故事(镜像、宪章、instructions 互不写同一文件)。
 
@@ -90,7 +90,7 @@
 
 > **NOTE: 先写测试、确认它红,再改制品**。C-1/C-3/C-4 的断言写在一个新模块里,避免改写既有文件的加载期常量(C-5/C-7/C-8/C-9 的计数常量在 T016 才动)。
 
-- [ ] T007 [P] [US1] 新建 `tests/contract/test_self_explanatory_constitution.py`,实现 C-1/C-3/C-4:模板标题集合含 `STR-001`、标题匹配器对合成名册(一个本仓从未用过的罗马数字)仍命中、任何测试/模板行不钉具体数字 [green: contracts/constitution-double-landing.contract.md#C-3]
+- [ ] T007 [P] [US1] 扩展 T006 已创建的 `tests/contract/test_self_explanatory_constitution.py`,实现 C-1/C-3/C-4:模板标题集合含 `STR-001`、标题匹配器对合成名册(一个本仓从未用过的罗马数字)仍命中、任何测试/模板行不钉具体数字 [green: contracts/constitution-double-landing.contract.md#C-3]
 - [ ] T008 [P] [US1] 在同一新模块实现 C-2/C-6 的结构检查器:claim 句以冒号结尾、3–6 条含 `MUST` 的逻辑 bullet、物理行 < 100 字符、`Rationale:` 前恰好一个空行且 1–4 句、五条内容义务逐条命中、正文含 `STR-004` 且声明「引用不复述」、框架源路径 `STR-002` 仅作 owner 位置出现 [green: contracts/constitution-double-landing.contract.md#C-6]
 - [ ] T009 [P] [US1] 在同一新模块实现 C-7 的双侧集合判定:每个观察名单标题同时在模板标题集与生成器必含名单的名字集里(集合成员、非子串) [green: contracts/constitution-double-landing.contract.md#C-7]
 - [ ] T010 [P] [US1] 在同一新模块实现 C-20 的否定断言:从 `shared/definitions/self-explanatory-definitions.md` 与 `.specify/shared/definitions/self-explanatory-definitions.md` 两侧解析 owner 的 `##` 标题,断言其中**没有一条**出现在 `templates/constitution-template.md` 或 `templates/instructions-template.md` 内;同时实现 C-21 的摘要上限(小节正文剥离指针行后按房式句界计数 ≤ 2 句)——两条条款同属「reference, not copy」的机器可判形态,且同为单一新模块内的读断言,故由本行一并认领 [green: contracts/mirror-distribution.contract.md#C-20] [green: contracts/mirror-distribution.contract.md#C-21]
@@ -118,7 +118,7 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T019 [P] [US2] 在 `tests/contract/test_instructions_section_propagation.py` 新增 C-10/C-11 断言:模板含顶层 `## Self-Explanatory Structure (不言自明)` 且正文含 `.specify/shared/definitions/self-explanatory-definitions.md`;小节正文剥离指针行后按房式句界计数 ≤ 2 句(该计数的认领归 T010 的 C-21) [green: contracts/instructions-propagation.contract.md#C-11]
+- [ ] T019 [P] [US2] 在 `tests/contract/test_instructions_section_propagation.py` 新增 C-10/C-11 断言:模板含顶层 `## Self-Explanatory Structure (不言自明)` 且正文含 `.specify/shared/definitions/self-explanatory-definitions.md`；句数上限由 T010 的 C-21 断言，本行不重复实现 [green: contracts/instructions-propagation.contract.md#C-11]
 - [ ] T020 [P] [US2] 在同一文件新增 C-14 模板侧变异断言:**不读 live 文件**,仅断言模板与生成器 reconcile 输入(渲染后的模板文本)含该标题;并在末尾断言真实模板仍携带该标题(反空真哨兵) [green: contracts/instructions-propagation.contract.md#C-14]
 - [ ] T021 [P] [US2] 在 `tests/contract/test_instructions_size_budget.py` 增一条从 `scripts/bash/generate-instructions.sh` 读取常量、断言 `.specify/instructions.md` 尺寸 `<= 常量 - 1` 的派生断言(不硬编码常量值、不复制理由) [green: contracts/instructions-propagation.contract.md#C-17]
 
@@ -144,7 +144,7 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T029 [US3] 在 `tests/contract/test_self_explanatory_distribution.py` 新建模块实现 C-26 的分发表:临时目录执行 `specify init --here --ai claude --no-git --skip-tls` 后逐条列出三处 `.specify/shared/...` 路径并报告每条的在场;任何一条缺失即失败(不在本模块里硬编码「已发布版本早于本特性」这一豁免——见 T036 的替代读法) [green: contracts/mirror-distribution.contract.md#C-26]
+- [ ] T029 [US3] 在 `tests/contract/test_self_explanatory_distribution.py` 新建模块实现 C-26 的分发表：在临时目录创建 venv，执行 `python3 -m venv .venv && . .venv/bin/activate && python3 -m pip install -e "$(git rev-parse --show-toplevel)"`（记录命令与退出码），再执行 `specify init --here --ai claude --no-git --skip-tls`，逐条列出三处 `.specify/shared/...` 路径并报告每条的在场；任何一条缺失即失败。不得使用已发布 CLI 的陈旧资源作为豁免；若 venv/editable install 不可用，返回 `ANOMALY: <一句话事实>`。 [green: contracts/mirror-distribution.contract.md#C-26]
 
 ### Implementation for User Story 3
 
