@@ -18,13 +18,38 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+# Feature 084, batch 1 rows 2-3: the evidenceState closed set and the lane closed set are
+# declaration-layer facts. This engine carries no copy of either — it reads
+# `shared/declarations/facts/evidence-seven-states.yaml` and `.../evidence-lanes.yaml` through the
+# shared read entry, and a project without the layer is labelled rather than served from a tuple
+# (FR-012 / C-049).
+SEVEN_STATES_FACT = "evidence-seven-states"
+LANES_FACT = "evidence-lanes"
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+
+def declared_sequence(slug):
+    """`(values, label)` for one closed-set fact; `([], <STR-014 instance>)` when it cannot be read."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label(slug)
+
+
 SCHEMA_VERSION = 1
 FINDINGS_KIND = "speckit.evidence-findings"
-SEVEN_STATES = (
-    "Present", "Wired", "Exercised", "Outcome-supported",
-    "Missing", "Unobserved", "Not applicable",
-)
-LANE_NAMES = ("session", "project", "assets", "runs", "feedback")
+# The names stay module attributes because consumers and the probe registry read them as such
+# (tests/contract/test_probe_registry_umbrella.py); only their **value** moved to the layer.
+SEVEN_STATES, SEVEN_STATES_LABEL = declared_sequence(SEVEN_STATES_FACT)
+LANE_NAMES, LANE_NAMES_LABEL = declared_sequence(LANES_FACT)
 NODE_LANES = ("session", "project", "assets")
 LANE_AVAILABLE = "available"
 LANE_PARTIAL = "partial"
@@ -523,6 +548,11 @@ def action_collect(args) -> dict:
     root = resolve_workspace_root(args.workspace_root)
     if not TARGET_RE.match(args.target or ""):
         raise CliError(f"invalid --target: {args.target!r} (expected skill:<name>, /speckit.<cmd>, or project)")
+    if not LANE_NAMES:
+        # The lane set is a declaration-layer fact and the layer is unreadable here. Collecting an
+        # empty lane set would exit 0 and read as a pass (FR-012 / C-049), so the run stops with the
+        # `declaration-absent` label instead of inventing a lane roster from memory.
+        raise CliError(f"{LANE_NAMES_LABEL}: the lane roster cannot be read from the declaration layer")
     requested = LANE_NAMES if args.lanes in (None, "", "all") else tuple(
         lane.strip() for lane in args.lanes.split(",") if lane.strip())
     for lane in requested:

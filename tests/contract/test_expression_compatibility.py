@@ -437,6 +437,20 @@ def test_c1_skill_inventory_is_frozen():
 # and `test_coverage_receipt.py`; this entry records the drift, it does not
 # authorize any other.
 ALLOWED_POST_BASELINE_CHANGES = {
+    "skills/internal/collect-evidence/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 084 batch 1 (rows 2-3, C-042/C-047): the evidence "
+            "closed sets move to the declaration layer, so this carrier's lane roster "
+            "and its seven-state re-listing become pointers "
+            "(`shared/declarations/facts/*.yaml#/statement`) and the restated values "
+            "are deleted (FR-018). The historical 069a hash manifest stays the dated "
+            "record it is; this entry records the drift and authorizes nothing else."
+        ),
+        "markers": (
+            "shared/declarations/facts/evidence-lanes.yaml#/statement",
+            "shared/declarations/facts/evidence-seven-states.yaml#/statement",
+        ),
+    },
     "skills/internal/create-team/SKILL.md": {
         "reason": "2026-10-29 Feature 074b adds the mandatory `## Nested SDD Runs` report section (report contract)",
         "markers": ("## Nested SDD Runs", "Nested SDD Runs section"),
@@ -854,11 +868,22 @@ def _client_shape(tmp_path: Path) -> Path:
     owner at ``.specify/shared/definitions/`` and the skill at the flattened
     ``.specify/skills/create-docs/``. No source tree, no ``templates/``, no
     top-level ``skills/``.
+
+    2026-11-05 Feature 084 (FR-013 / C-013…C-018): a refreshed client also ships
+    the declaration layer — ``.specify/scripts/python/declaration_reader.py`` and
+    the ``.specify/shared/declarations/`` tree — because the engine now reads its
+    closed sets through the shared entry instead of carrying them inline. The two
+    legs below therefore model the post-084 payload; the absent-owner leg still
+    models a *missing owner*, not a missing layer.
     """
     client = tmp_path / "client"
     engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
     engine.parent.mkdir(parents=True)
     shutil.copy2(REPO_ROOT / "scripts" / "python" / "flow-class-check.py", engine)
+    shutil.copy2(REPO_ROOT / "scripts" / "python" / "declaration_reader.py",
+                 engine.parent / "declaration_reader.py")
+    shutil.copytree(REPO_ROOT / "shared" / "declarations",
+                    client / ".specify" / "shared" / "declarations")
     owner = client / ".specify" / CLASS_OWNER
     owner.parent.mkdir(parents=True)
     shutil.copy2(REPO_ROOT / CLASS_OWNER, owner)
@@ -1020,6 +1045,21 @@ def test_c6_feedback_step_declares_orthogonal_axes():
     )
 
 
+#: C-6's one amendment pocket. C-6 scopes "loses nothing" to *the complexity criterion and the
+#: red-line paragraphs*; this register names any line a later feature removed from
+#: ``shared/workflow/feedback-step.md`` and the additions that replaced it. A removal that is not
+#: listed here still fails the pin — the register records drift, it does not license it.
+C6_LATER_REMOVALS = {
+    "2026-11-05 Feature 084 batch 1 row 1 (C-042 / C-047 step 4 / FR-018)": (
+        "- The engine store lives at `.specify/memory/feedback/`; threshold defaults to `10`",
+        "  (`--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`).",
+    ),
+}
+
+#: The additions that came with the removals above (the released pointer block).
+C6_LATER_ADDITIONS = 5
+
+
 def test_c6_feedback_step_edit_is_additive_single_line():
     proc = _git("diff", "-U0", PRE_CHANGE_HEAD, "--", "shared/workflow/feedback-step.md")
     assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
@@ -1032,21 +1072,36 @@ def test_c6_feedback_step_edit_is_additive_single_line():
             removed.append(line)
         elif line.startswith("+") and line[1:].strip():
             added.append(line[1:])
-    assert not removed, (
+    declared_removals = {
+        text for texts in C6_LATER_REMOVALS.values() for text in texts
+    }
+    undeclared = [line for line in removed if line[1:] not in declared_removals]
+    assert not undeclared, (
         "C-6: the existing complexity criterion and red-line paragraphs must stay "
-        "byte-identical — removed lines: %r" % removed
+        "byte-identical — undeclared removed lines: %r (declared: %r)"
+        % (undeclared, sorted(declared_removals))
     )
     # 2026-10-28 trunk fix(sdd-loop-driver): a six-line additive "Feature
-    # attribution" block joined the one 069a pointer line. The pin keeps its
-    # additive-only intent: no existing line may be removed, and the additions
-    # are exactly the pointer plus that block.
-    assert len(added) == 7, (
-        "C-6: the 069a pointer plus the 2026-10-28 feature-attribution block are "
-        "the only additive lines; found %d: %r" % (len(added), added)
+    # attribution" block joined the one 069a pointer line. 2026-11-05 Feature 084
+    # batch 1 replaces the two threshold-default lines with a five-line pointer
+    # block (see ``C6_LATER_REMOVALS``): the additions are the pointer, that block
+    # and this migration's block, and nothing else.
+    expected_added = 7 + C6_LATER_ADDITIONS
+    assert len(added) == expected_added, (
+        "C-6: the 069a pointer, the 2026-10-28 feature-attribution block and the "
+        "2026-11-05 084 pointer block are the only additive lines; found %d: %r"
+        % (len(added), added)
     )
     assert CLASS_OWNER in added[0], (
         "the first added line must point at %s: %r" % (CLASS_OWNER, added[0])
     )
     assert any("**Feature attribution.**" in line for line in added), (
         "the 2026-10-28 feature-attribution addition must be present: %r" % added
+    )
+    assert any(
+        "shared/declarations/facts/feedback-prompt-threshold.yaml#/statement" in line
+        for line in added
+    ), (
+        "a declared removal must be replaced by the pointer that supersedes it: %r"
+        % added
     )

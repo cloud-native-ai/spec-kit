@@ -984,3 +984,358 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implemen
 | 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集只含 reader / checker / `tasks.md` / 本行 / 四件证据；`.specify/memory/**`、`.specify/state/**` 不提交 |
 | 不 push | `git log --oneline -1` 本地提交 | 未执行任何 push |
 
+
+## implement（Part 2a，T008–T012 收口，2026-11-05）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1@stage_base=3ad6a85c —— 三个子句：(a) 本段改动面 11 个 token（`scripts/python/{feedback-utils,evidence-utils,flow-class-check,declaration_reader}.py`、`shared/declarations/`、`shared/workflow/{feedback-step,evidence-step}.md`、`shared/definitions/flow-class-definitions.md`、`shared/guidelines/better-harness.md`、`skills/internal/collect-evidence/`、`docs/reference/skills/feedback.md`）在 `tests/{contract,integration,unit,scenarios}/test_*.py` 上做文本命中，得 87 个文件；(b) 补 5 个直接 import 迁移引擎而不点名路径的模块（`test_feedback_utils.py`、`test_feedback_threshold.py`、`test_feedback_dedup.py`、`test_feedback_probe_entry_schema.py`、`test_docs_utils_cli.py`），得 92 文件的独立选择集，作为 discovery 轮全量捕获（`implement-part2a-closure-targeted-run-2026-11-05.txt`，27F/2095P）；(c) 终树读数改用 attempt 1 的 235 文件集（`implement-part2a-targeted-set.txt`），使轮间可比，并已机械核对 92 集是其真子集（`small - big = ∅`）"
+changed_paths[]:
+  - shared/declarations/facts/evidence-lanes.yaml
+  - shared/declarations/facts/evidence-seven-states.yaml
+  - shared/declarations/facts/feedback-prompt-threshold.yaml
+  - shared/declarations/facts/flow-class-basis.yaml
+  - shared/declarations/facts/flow-class-classes.yaml
+  - shared/declarations/facts/flow-class-document-types.yaml
+  - shared/declarations/facts/flow-class-ledger-columns.yaml
+  - shared/declarations/facts/flow-class-neutral-categories.yaml
+  - scripts/python/declaration_reader.py
+  - scripts/python/evidence-utils.py
+  - scripts/python/feedback-utils.py
+  - scripts/python/flow-class-check.py
+  - shared/definitions/flow-class-definitions.md
+  - shared/guidelines/better-harness.md
+  - shared/workflow/evidence-step.md
+  - shared/workflow/feedback-step.md
+  - skills/internal/collect-evidence/SKILL.md
+  - skills/internal/collect-evidence/references/evidence-discipline.md
+  - docs/reference/skills/feedback.md
+  - tests/contract/test_compile_embeds.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_store_state_protocol.py
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/us1-single-definition-point.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-targeted-set.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-targeted-run-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-targeted-run-r2-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-closure-targeted-run-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-closure-targeted-run-r2-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-mirror-parity-supplemental-2026-11-05.txt
+selected_paths[]:
+  - tests/contract/test_acceptance_review_composition.py
+  - tests/contract/test_acceptance_schema_ownership.py
+  - tests/contract/test_acceptance_state_machine.py
+  - tests/contract/test_agent_chain_guards.py
+  - tests/contract/test_agent_dispatch_mechanism.py
+  - tests/contract/test_agent_env_config_contract.py
+  - tests/contract/test_agent_skill_enablement.py
+  - tests/contract/test_agent_specific_config_skills.py
+  - tests/contract/test_baseline_preflight_contract.py
+  - tests/contract/test_clarify_semantic_completeness.py
+  - tests/contract/test_clause_coverage.py
+  - tests/contract/test_cleanup_obsolete_assets.py
+  - tests/contract/test_client_armed_state.py
+  - tests/contract/test_client_capture.py
+  - tests/contract/test_client_guard_sweep.py
+  - tests/contract/test_client_improve_loop.py
+  - tests/contract/test_client_metrics.py
+  - tests/contract/test_client_package_exclusion.py
+  - tests/contract/test_coaching_dispatch_contract.py
+  - tests/contract/test_coaching_expectation_contract.py
+  - tests/contract/test_coaching_observation_contract.py
+  - tests/contract/test_coaching_run_contract.py
+  - tests/contract/test_coaching_wiring_contract.py
+  - tests/contract/test_code_review_skill_contract.py
+  - tests/contract/test_compile_embeds.py
+  - tests/contract/test_compile_propagation_order.py
+  - tests/contract/test_compile_reconcile_guards.py
+  - tests/contract/test_confirmation_gates_sweep.py
+  - tests/contract/test_constitution_double_landing.py
+  - tests/contract/test_criterion_subject.py
+  - tests/contract/test_decision_tension_contract.py
+  - tests/contract/test_delegation_classes.py
+  - tests/contract/test_derive_command_surface.py
+  - tests/contract/test_directory_governance.py
+  - tests/contract/test_doc_consistency_checker.py
+  - tests/contract/test_docs_command_template.py
+  - tests/contract/test_docs_gate_driver.py
+  - tests/contract/test_docs_step_injection.py
+  - tests/contract/test_docs_target_structure_declaration.py
+  - tests/contract/test_docs_utils_cli.py
+  - tests/contract/test_document_structure_gate.py
+  - tests/contract/test_dogfooding_practice.py
+  - tests/contract/test_engine_face_contract.py
+  - tests/contract/test_evidence_binding_contract.py
+  - tests/contract/test_evidence_findings_schema.py
+  - tests/contract/test_evidence_step_conformance.py
+  - tests/contract/test_evidence_utils_cli.py
+  - tests/contract/test_exec_quant_aggregate.py
+  - tests/contract/test_exec_quant_channel_boundary.py
+  - tests/contract/test_exec_quant_channel_compat.py
+  - tests/contract/test_exec_quant_engine.py
+  - tests/contract/test_export_skill_rework.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_expression_faces.py
+  - tests/contract/test_expression_gate_wiring.py
+  - tests/contract/test_expression_gates_doc.py
+  - tests/contract/test_fast_fail_discipline.py
+  - tests/contract/test_feedback_command_classification.py
+  - tests/contract/test_feedback_command_template.py
+  - tests/contract/test_feedback_entry_schema.py
+  - tests/contract/test_feedback_exec_quant_payload.py
+  - tests/contract/test_feedback_intake_exec_quant.py
+  - tests/contract/test_feedback_introspection_engine.py
+  - tests/contract/test_feedback_introspection_report.py
+  - tests/contract/test_feedback_mechanism_boundary.py
+  - tests/contract/test_feedback_probe_cli.py
+  - tests/contract/test_feedback_probe_entry_schema.py
+  - tests/contract/test_feedback_probe_registry.py
+  - tests/contract/test_feedback_skill_conformance.py
+  - tests/contract/test_feedback_step_reference_form.py
+  - tests/contract/test_feedback_two_path_routing.py
+  - tests/contract/test_feedback_utils_cli.py
+  - tests/contract/test_flat_internal_skill_migration.py
+  - tests/contract/test_flow_class_correctness.py
+  - tests/contract/test_flow_class_ledger.py
+  - tests/contract/test_flow_class_spec_declaration.py
+  - tests/contract/test_focus_target_resolution.py
+  - tests/contract/test_gate_wiring_081.py
+  - tests/contract/test_git_workflow_instructions_block.py
+  - tests/contract/test_glossary_mechanism.py
+  - tests/contract/test_goal_migration.py
+  - tests/contract/test_goal_targets_engine.py
+  - tests/contract/test_green_point_claim.py
+  - tests/contract/test_handler_registry.py
+  - tests/contract/test_handoff_chain.py
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_hermes_init_contract.py
+  - tests/contract/test_hidden_edge_two_cycle.py
+  - tests/contract/test_hugo_scaffold_contract.py
+  - tests/contract/test_humanize_command_surface.py
+  - tests/contract/test_improve_team_presence.py
+  - tests/contract/test_instructions_size_budget.py
+  - tests/contract/test_isomorphism_map.py
+  - tests/contract/test_knowledge_promotion.py
+  - tests/contract/test_ledger_reconciliation.py
+  - tests/contract/test_lifecycle_detach_reattach.py
+  - tests/contract/test_line_envelope_contract.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_measurement_instruments.py
+  - tests/contract/test_merge_provenance_gate.py
+  - tests/contract/test_migration_distribution.py
+  - tests/contract/test_nested_run_report.py
+  - tests/contract/test_nested_sdd_invocation.py
+  - tests/contract/test_neutrality_budget.py
+  - tests/contract/test_no_nested_skills.py
+  - tests/contract/test_no_organize_agents_refs.py
+  - tests/contract/test_no_retired_draw_skill_refs.py
+  - tests/contract/test_non_regression_064.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_objective_analysis_gate.py
+  - tests/contract/test_phase2_bindings.py
+  - tests/contract/test_portable_skill_creation.py
+  - tests/contract/test_premise_carrier_contract.py
+  - tests/contract/test_probe_engine_action_sets.py
+  - tests/contract/test_probe_registry_umbrella.py
+  - tests/contract/test_problem_solving_naming.py
+  - tests/contract/test_project_custom_template.py
+  - tests/contract/test_record_retention_engine.py
+  - tests/contract/test_registry_completeness.py
+  - tests/contract/test_render_evidence_geometry.py
+  - tests/contract/test_reproduction_fidelity_readback.py
+  - tests/contract/test_requirements_checker.py
+  - tests/contract/test_requirements_convention_entry_points.py
+  - tests/contract/test_resource_id_generation.py
+  - tests/contract/test_resource_id_resolution.py
+  - tests/contract/test_review_code_composition.py
+  - tests/contract/test_review_docs_isomorphism.py
+  - tests/contract/test_review_feedback_boundary.py
+  - tests/contract/test_review_p1_checklist_governance.py
+  - tests/contract/test_review_p1_recheck_waiver.py
+  - tests/contract/test_review_p1_review_loop.py
+  - tests/contract/test_run_checks.py
+  - tests/contract/test_run_determination_engine.py
+  - tests/contract/test_run_determination_passive_wiring.py
+  - tests/contract/test_run_skills_wiring.py
+  - tests/contract/test_runtime_mode_gate.py
+  - tests/contract/test_sanitize_renumber_lane.py
+  - tests/contract/test_sanitize_retention_lane.py
+  - tests/contract/test_sanitize_template.py
+  - tests/contract/test_scan_confirmation_gates.py
+  - tests/contract/test_sdd_carrier_contract.py
+  - tests/contract/test_sdd_compat_containment.py
+  - tests/contract/test_sdd_diffusion.py
+  - tests/contract/test_sdd_house_keeping_skill.py
+  - tests/contract/test_sdd_invocation_governance.py
+  - tests/contract/test_sdd_loop_driver_cli_profiles.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_gates.py
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/contract/test_sdd_loop_driver_watch_iteration.py
+  - tests/contract/test_sdd_loop_driver_wp_coordination.py
+  - tests/contract/test_sdd_loop_driver_wp_preset.py
+  - tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+  - tests/contract/test_sdd_project_setup_skill.py
+  - tests/contract/test_sdd_routing_definitions.py
+  - tests/contract/test_sdd_three_skill_contract.py
+  - tests/contract/test_seat_instantiation_flow.py
+  - tests/contract/test_self_improvement_conformance.py
+  - tests/contract/test_shared_reference_directory.py
+  - tests/contract/test_shared_reference_rewrite.py
+  - tests/contract/test_shipped_surface_client_neutrality.py
+  - tests/contract/test_single_agent_purity.py
+  - tests/contract/test_single_conceptual_model.py
+  - tests/contract/test_skill_install_layout_contract.py
+  - tests/contract/test_skill_layer_visibility_guards.py
+  - tests/contract/test_skill_verification_discriminability.py
+  - tests/contract/test_skills_symlink_regression.py
+  - tests/contract/test_stage_class_wiring.py
+  - tests/contract/test_status_gate_owner.py
+  - tests/contract/test_store_state_protocol.py
+  - tests/contract/test_summarize_project_prompt_assets.py
+  - tests/contract/test_summary_trigger.py
+  - tests/contract/test_summary_writeset.py
+  - tests/contract/test_sync_mirrors_only.py
+  - tests/contract/test_teaching_surfaces.py
+  - tests/contract/test_team_command_routing.py
+  - tests/contract/test_token_efficiency_discipline.py
+  - tests/contract/test_token_efficiency_feedback.py
+  - tests/contract/test_token_efficiency_gates.py
+  - tests/contract/test_tools_command_routing.py
+  - tests/contract/test_tools_inventory_ownership.py
+  - tests/contract/test_trigger_engine.py
+  - tests/contract/test_trigger_seed_derivation.py
+  - tests/contract/test_upgrade_end_state.py
+  - tests/contract/test_user_facing_comprehension_pointers.py
+  - tests/contract/test_validate_tasks_parallel_safety.py
+  - tests/contract/test_validation_carrier_contract.py
+  - tests/contract/test_workspace_isolation_contract.py
+  - tests/contract/test_wrap_up_line_budget.py
+  - tests/contract/test_wrap_up_wording_gate_safe.py
+  - tests/integration/test_agents_creation.py
+  - tests/integration/test_evidence_compare_verdict.py
+  - tests/integration/test_evidence_python_lanes.py
+  - tests/integration/test_expression_line_pilot.py
+  - tests/integration/test_feedback_command_record.py
+  - tests/integration/test_feedback_dedup.py
+  - tests/integration/test_feedback_exec_quant_channel.py
+  - tests/integration/test_feedback_partial.py
+  - tests/integration/test_feedback_selective_triggering.py
+  - tests/integration/test_feedback_skill_record.py
+  - tests/integration/test_feedback_threshold.py
+  - tests/integration/test_goal_reference.py
+  - tests/integration/test_persistent_agent_lifecycle.py
+  - tests/integration/test_resource_id_resolution.py
+  - tests/integration/test_sanitize_us1.py
+  - tests/integration/test_sanitize_us2.py
+  - tests/integration/test_sanitize_us3.py
+  - tests/integration/test_sdd_house_keeping_flow.py
+  - tests/integration/test_session_kill_reattach.py
+  - tests/integration/test_shared_dir_install.py
+  - tests/integration/test_skill_install_layout_integration.py
+  - tests/integration/test_skills_resource_ids.py
+  - tests/integration/test_worktree_integration_queue.py
+  - tests/integration/test_zero_sdd_workflow_references.py
+  - tests/unit/test_feedback_exec_quant_payload.py
+  - tests/unit/test_feedback_intake_exec_quant.py
+  - tests/unit/test_feedback_package.py
+  - tests/unit/test_feedback_utils.py
+  - tests/unit/test_flow_class_check.py
+  - tests/unit/test_flow_class_spec_key.py
+  - tests/unit/test_isomorphism_checker.py
+  - tests/unit/test_reconciler_extensions.py
+  - tests/unit/test_record_retention_helpers.py
+  - tests/unit/test_renumber_engine.py
+  - tests/unit/test_resource_id_helpers.py
+  - tests/unit/test_rewrite_paths_skill_layers.py
+  - tests/unit/test_sanitize_checks_index.py
+  - tests/unit/test_sanitize_checks_migration.py
+  - tests/unit/test_sanitize_checks_mirror.py
+  - tests/unit/test_sanitize_checks_refs.py
+  - tests/unit/test_sanitize_semantic.py
+  - tests/unit/test_skills_utils_layout.py
+  - tests/unit/test_tier_classification.py
+  - tests/unit/test_two_layer_skills_copy.py
+  - tests/unit/test_workspace_root_resolution.py
+sufficiency: "235 个文件、4368 收集 → 4346 passed / 21 failed / 1 skipped（196 s）；attempt 1 同一集合的终树读数为 4333 passed / 34 failed（`implement-part2a-targeted-run-r2-2026-11-05.txt`），差集的 13 个 id 全部是本段修好的「引擎已改、夹具未带 `declaration_reader.py`」一类，逐条见下方 § 13 条夹具修复。集合的三个子句各有贡献：(a) 直接命中三个迁移引擎与其载体，并经 `evidence-utils`、`feedback` 这类通用 stem 过度选择（`test_coaching_wiring_contract.py`、`test_compile_*` 就是这样进来的，而它们恰好带出 13 条真读数）；(b) 引擎以 import 形式被使用的模块，文本命中抓不到，只能手工补；(c) 与 attempt 1 同集，保证轮间可比。**集合到不了的地方如实写明**：镜像对测试（`test_mirror_parity_suite.py`、`test_scripts_distribution_parity.py`）不在 `selected_paths[]` 内，本轮以披露式补充运行取得读数（`implement-part2a-mirror-parity-supplemental-2026-11-05.txt`，23F/752P），MUST NOT 并入本行计数"
+command: "python3 -m pytest -q <上列 235 个文件>"
+rc: 1
+passed: 4346
+failed: 21
+skipped: 1
+new_failures:
+  - "tests/contract/test_coaching_wiring_contract.py::test_c3_mirrors_and_command_copies_are_zero_drift —— `sync-mirrors.py --check` exit 2 —— 本段改的 5 个镜像对未投影（T026 所有物）"
+  - "tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green —— 同一原因：验证面里 `mirrors` 一项红（同一条 drift 读数）"
+  - "tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order —— 同一原因：canonical 链第 3 步 `sync --check` 红"
+  - "tests/contract/test_dogfooding_practice.py::test_c4_engine_mirror_untouched —— `scripts/python/feedback-utils.py` 与其镜像字节不同 —— 同一原因"
+  - "tests/contract/test_evidence_step_conformance.py::TestEvidenceStepConvention::test_mirrored_to_source_side —— `shared/workflow/evidence-step.md` 与其镜像不同 —— 同一原因"
+  - "tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical —— 三个镜像对（`flow-class-check.py`、`flow-class-definitions.md`、`feedback-step.md`）—— 同一原因"
+  - "tests/contract/test_non_regression_064.py::test_ng_08_mirror_no_new_drift —— `shared/definitions` 的 drift 集新增两个文件名 —— 同一原因"
+  - "tests/contract/test_sdd_loop_driver_wrapup_accounting.py::test_runtime_mirrors_match_sources[src2-dst2] —— `shared/workflow/feedback-step.md` 镜像陈旧 —— 同一原因"
+  - "tests/contract/test_self_improvement_conformance.py::test_c10_runtime_skill_mirrors_are_current —— `internal/collect-evidence` 技能镜像陈旧 —— 同一原因"
+  - "tests/contract/test_sync_mirrors_only.py::TestOnlyScoping::test_only_file_scopes_check_to_its_pair —— `--only scripts/python/feedback-utils.py` 读到 DIFF —— 同一原因"
+  - "tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean —— `sync-mirrors --check` exit 2 —— 同一原因（`baseline-reading-2026-11-05.md` 已把该 id 归为「T026 之前按构造为红」）"
+baseline: "E2 `slot=baseline` 行（状态脊 `<!-- test-budget:begin -->` 的 `seq:1`：25F / 7151P / 4S，比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名，另 2 条镜像为在途）。本行按该 23 名做 `comm -23` 差额，得 11 条，无一落在迁移本身"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implement-part2a-closure-targeted-run-r2-2026-11-05.txt（终树读数，完整 stdout + rc；discovery 轮见 implement-part2a-closure-targeted-run-2026-11-05.txt，attempt 1 的两轮见 implement-part2a-targeted-run-2026-11-05.txt 与 ...-r2-...）
+```
+
+## Why `ran`
+
+本段改的是可执行面：三个引擎的读取路径换成共享入口、8 个新声明、4 个载体从复述改指针、3 个测试模块的
+夹具补齐读取入口。这些都不是文档整理，落 `not-run-docs-only` 就是假绿。两轮读数都在本文件对应行的
+`evidence_ptr` 里：**discovery 轮**（92 文件独立选择集，27F/2095P）先把失败面暴露出来，**终树轮**
+（235 文件集，21F/4346P）是修完夹具后的读数，谁都不替代谁。
+
+## 13 条夹具修复（本段唯一的代码侧修复，且是纠正而非裁定）
+
+**症状**：`test_compile_embeds` 3 条、`test_compile_reconcile_guards` 7 条、`test_engine_face_contract`
+3 条，共 13 个 id，症状一律是 `json.decoder.JSONDecodeError: Expecting value: line 1 column 1`
+（被测引擎的 stdout 为空）。**根因一行**：`tests/contract/test_compile_embeds.py` 的 `_ENGINE_COPIES`
+把 `feedback-utils.py` 拷进沙盒 workspace 却没带 `declaration_reader.py`，于是：
+
+```text
+error: handler 'h-feedback-record': engine scripts/python/feedback-utils.py --action args-manifest failed
+(rc=1): ModuleNotFoundError: No module named 'declaration_reader'
+```
+
+**修法**：把读取入口加进该夹具的引擎拷贝清单，并注明它属于 payload 的一部分。**为什么是纠正**：同一个
+读法已被工作树里两处同形修复确立（`test_store_state_protocol.py` 的 fixture repo、
+`test_expression_compatibility.py` 的 `_client_shape`，都是「夹具要带兄弟模块」），改动局部、可逆、未
+证伪任何下游前提；断言一句没改、没有 `skip`、也没有放宽比较。**为什么不是改引擎**：
+`declaration_reader.py` 与引擎同目录分发（C-052 / FR-013），一棵「有引擎没读取入口」的树不是更小的
+payload，而是不存在的 payload；让引擎对缺失的兄弟模块静默降级，会把 `[[STR-014]]` 的语义与「模块缺失」
+混成一件事。
+
+## T010 的三条读数（逐字见 `test-evidence/us1-single-definition-point.txt`）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| lookup 点出 slug | `harness-triple-check.py --action lookup --unit-id shared/workflow/feedback-step.md` | `disposition: in-scope`、`state: complete`、`fact: feedback-prompt-threshold kind=threshold`；exit **1**（引擎聚合码，80 条 `unclassified-candidate` 全属批次 2/3） |
+| verify | `harness-triple-check.py --action verify` | 8 declarations / 83 candidates、前向 `9/9`、后向 `4/4`、0 条 finding 点名该 unit、0 条 `no-read-point`；exit **1** |
+| duplicate face | `doc-consistency-check.py --action verify --faces duplicate --owner-path shared/workflow/feedback-step.md --spec-dir ...` | `duplicate=pass`、`files_scanned: 14`、`findings: 0`；exit **0** |
+
+verify 的 exit=1 要明写而不是含混过去：T010 所属的 US1 Independent Test 原文写「`--action verify` exits 0
+for it」。按 **unit** 读，这句今天成立——该 unit 没有任何 finding，`state: complete`，两个方向的计分都
+满；按 **树** 读，它要等到批次 2/3 与排除层落地之后，C-043 正是把这两者分开：exit-0 的判据是
+`[[STR-013]]` 的条数，今天有 80 条，全部属于本段不迁的单元。本行记的是实测的 `1`，不是希望中的 `0`。
+
+## 未做的两件事（边界明写）
+
+1. **镜像不手改**：`sync-mirrors.py --check` 报出的 DIFF/MISS 全部留给 T026 的
+   `sync-mirrors.py --write`。本行 `new_failures` 的 11 条全部落在这一类；披露式补充运行（镜像对
+   23F/752P）只是把该类读数钉死，不构成修它的授权（FF-12：手工投影＝戴错帽子）。
+2. **不跑全量**：本段沿用 E2 那一次全量基线，只有定向集。
+
+## Bases verified（implement Part 2a 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| 任务清单可解析 | `python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md` | `PASS`，`0 error(s), 0 warning(s)`，exit 0；T008–T012 已勾，仍开放 19 行（T013 起） |
+| plan-owned 零触碰 | `git diff --stat 3ad6a85c -- {plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}` | 空输出（本段无 PLAN-EDIT，故无 PLAN-EDIT 声明） |
+| 依赖面未动 | `git diff --stat 4b65517c -- pyproject.toml` | 空输出 |
+| 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**` 与 `.specify/state/**` |
+| 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |

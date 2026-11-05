@@ -16,7 +16,9 @@ script's own directory is ``sys.path[0]``) and callable for humans:
     python3 scripts/python/declaration_reader.py --action get --fact <fact-slug> --repo .
 
 Functions: :func:`load_contract`, :func:`load_fact`, :func:`load_facts`, :func:`load_exclusions`,
-:func:`normalize_path`.
+:func:`normalize_path`, plus the two helpers a consumer engine needs to reach the layer at all:
+:func:`find_repo` (the root that holds it, in whichever of the three copies this invocation lives) and
+:func:`absent_label` (the `STR-014` instance a degraded read prints).
 
 **Error discipline (C-055/C-056).** Every failure raises one typed error, :class:`DeclarationError`. When
 the failing input is a *finding* the error carries the finding template id (`STR-010` for a construct
@@ -55,6 +57,11 @@ READ_ENTRY = "declaration_reader"
 #: `requirements.md` § Shared Strings and is rendered by the caller.
 SUBSET_FINDING = "STR-010"
 ABSENT_FINDING = "STR-014"
+
+#: The absent-declaration **code** (`STR-014`'s instance form). A consumer engine labels its degraded
+#: read with :func:`absent_label` instead of re-spelling the text, the way `harness-triple-check.py`
+#: carries the six finding codes next to the owner's name.
+ABSENT_CODE = "declaration-absent"
 
 #: Constructs that are outside the subset, with the reason the refusal names.
 _FORBIDDEN_FLOW = ("[", "{")
@@ -98,6 +105,40 @@ def normalize_path(value):
     if text.startswith(MIRROR_PREFIX):
         return text[len(MIRROR_PREFIX):]
     return text
+
+
+def absent_label(slug):
+    """The `STR-014` instance a consumer engine prints when the declaration for ``slug`` is absent.
+
+    One rendering, here, so five engines do not each spell the label: the template text is owned by
+    `requirements.md` § Shared Strings, and this function is the only place the code is concatenated
+    with its argument. The label is a **reading of the wiring**, never a pass (FR-012 / C-049).
+    """
+    return "%s: %s" % (ABSENT_CODE, slug)
+
+
+def find_repo(start=None):
+    """The repository root that holds the layer, walking up from ``start`` (a file or a directory).
+
+    Every engine this feature touches exists in three physical copies — the framework source, this
+    repository's byte-identical mirror, and a client project's ``.specify/`` copy — so the root is the
+    nearest ancestor holding ``shared/declarations`` (source form) or ``.specify/shared/declarations``
+    (mirror form), in that order per :func:`layer_dir`. This is a **read-only** lookup: nothing is
+    written, so a nested tree next to a copy cannot misdirect a write the way a workspace-state
+    resolution can. When no ancestor holds a layer the nearest root-shaped ancestor is returned and
+    :func:`layer_dir` raises the degraded error, which is the caller's exit-2 label (C-056).
+    """
+    here = Path(start) if start is not None else Path(__file__)
+    here = here.resolve()
+    anchor = here if here.is_dir() else here.parent
+    for parent in (anchor, ) + tuple(anchor.parents):
+        for candidate in (parent / DECLARATIONS_DIR, parent / DECLARATIONS_MIRROR):
+            if candidate.is_dir():
+                return parent
+    for parent in (anchor, ) + tuple(anchor.parents):
+        if (parent / "scripts" / "python").is_dir():
+            return parent
+    return anchor
 
 
 # --------------------------------------------------------------------------- #

@@ -23,6 +23,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 _REGISTRY = REPO_ROOT / "shared" / "definitions" / "probe-definitions.md"
 _ENGINE_COPIES = (
     "probe-utils.py",
+    # 2026-11-05 Feature 084 batch 1: `feedback-utils.py` now reads its prompt threshold through the
+    # declaration layer's single read entry (T009 / FR-009), so the payload the sandbox workspace
+    # models carries the reader beside the engines — a workspace holding an engine without it would
+    # be a payload that never ships, not a smaller one.
+    "declaration_reader.py",
     "feedback-utils.py",
     "scan-confirmation-gates.py",
     "run-determination.py",

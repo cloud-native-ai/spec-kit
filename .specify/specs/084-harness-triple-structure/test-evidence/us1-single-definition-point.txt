@@ -1,0 +1,255 @@
+# US1 — one definition point (T010)
+
+Captured 2026-11-05 on branch `084-harness-triple-structure`, HEAD `3ad6a85c` plus the uncommitted
+batch-1 migration of T008–T012 (8 declarations under `shared/declarations/facts/`, the three engines
+reading them, the carriers pointing at them). Every line below is the command's own stdout; nothing is
+paraphrased, and an exit code is recorded as the process produced it.
+
+## Reading 1 — `lookup` names the slug
+
+```console
+$ python3 scripts/python/harness-triple-check.py --action lookup --unit-id shared/workflow/feedback-step.md
+# harness-triple-check — lookup
+unit: shared/workflow/feedback-step.md
+disposition: in-scope
+state: complete
+fact: feedback-prompt-threshold kind=threshold
+findings: 80
+finding: unclassified-candidate: shared/workflow/acceptance-hardening.md
+finding: unclassified-candidate: shared/workflow/expression-gates.md
+finding: unclassified-candidate: shared/workflow/external-dispatch-recipes.md
+finding: unclassified-candidate: shared/workflow/feature-integration.md
+finding: unclassified-candidate: shared/workflow/glossary.md
+finding: unclassified-candidate: skills/external/coaching-skills/SKILL.md
+finding: unclassified-candidate: skills/external/create-docs/SKILL.md
+finding: unclassified-candidate: skills/external/create-pages/SKILL.md
+finding: unclassified-candidate: skills/external/create-skills/SKILL.md
+finding: unclassified-candidate: skills/external/database-utils/SKILL.md
+finding: unclassified-candidate: skills/external/document-utils/SKILL.md
+finding: unclassified-candidate: skills/external/draw-diagram/SKILL.md
+finding: unclassified-candidate: skills/external/git-utils/SKILL.md
+finding: unclassified-candidate: skills/external/humanize/SKILL.md
+finding: unclassified-candidate: skills/external/improve-docs/SKILL.md
+finding: unclassified-candidate: skills/external/improve-skills/SKILL.md
+finding: unclassified-candidate: skills/external/merge-skills/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-house-keeping/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-loop-driver/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-project-setup/SKILL.md
+finding: unclassified-candidate: skills/internal/analyze-artifacts/SKILL.md
+finding: unclassified-candidate: skills/internal/archive-session/SKILL.md
+finding: unclassified-candidate: skills/internal/clarify-artifact/SKILL.md
+finding: unclassified-candidate: skills/internal/code-review/SKILL.md
+finding: unclassified-candidate: skills/internal/create-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/create-checklist/SKILL.md
+finding: unclassified-candidate: skills/internal/create-plan/SKILL.md
+finding: unclassified-candidate: skills/internal/create-requirements/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tasks/SKILL.md
+finding: unclassified-candidate: skills/internal/create-team/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tools/SKILL.md
+finding: unclassified-candidate: skills/internal/derive-architecture/SKILL.md
+finding: unclassified-candidate: skills/internal/implement-feature/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-team/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-tools/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-agents/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-constitution/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-features/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-feedback/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-goal/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-history/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-instructions/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-todo/SKILL.md
+finding: unclassified-candidate: skills/internal/memory-recall/SKILL.md
+finding: unclassified-candidate: skills/internal/memory-record/SKILL.md
+finding: unclassified-candidate: skills/internal/research-feature/SKILL.md
+finding: unclassified-candidate: skills/internal/review-feature-quality/SKILL.md
+finding: unclassified-candidate: skills/internal/review-sdd-process/SKILL.md
+finding: unclassified-candidate: skills/internal/run-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/run-interview/SKILL.md
+finding: unclassified-candidate: skills/internal/run-skills/SKILL.md
+finding: unclassified-candidate: skills/internal/run-team/SKILL.md
+finding: unclassified-candidate: skills/internal/sanitize-materials/SKILL.md
+finding: unclassified-candidate: skills/internal/self-improvement/SKILL.md
+finding: unclassified-candidate: skills/internal/study-project/SKILL.md
+finding: unclassified-candidate: skills/internal/summarize-project/SKILL.md
+finding: unclassified-candidate: templates/commands/analyze.md
+finding: unclassified-candidate: templates/commands/checklist.md
+finding: unclassified-candidate: templates/commands/clarify.md
+finding: unclassified-candidate: templates/commands/derive.md
+finding: unclassified-candidate: templates/commands/docs.md
+finding: unclassified-candidate: templates/commands/feedback.md
+finding: unclassified-candidate: templates/commands/goal.md
+finding: unclassified-candidate: templates/commands/history.md
+finding: unclassified-candidate: templates/commands/implement.md
+finding: unclassified-candidate: templates/commands/improve.md
+finding: unclassified-candidate: templates/commands/instructions.md
+finding: unclassified-candidate: templates/commands/interview.md
+finding: unclassified-candidate: templates/commands/plan.md
+finding: unclassified-candidate: templates/commands/requirements.md
+finding: unclassified-candidate: templates/commands/research.md
+finding: unclassified-candidate: templates/commands/review.md
+finding: unclassified-candidate: templates/commands/sanitize.md
+finding: unclassified-candidate: templates/commands/session.md
+finding: unclassified-candidate: templates/commands/skills.md
+finding: unclassified-candidate: templates/commands/tasks.md
+finding: unclassified-candidate: templates/commands/team.md
+finding: unclassified-candidate: templates/commands/todo.md
+finding: unclassified-candidate: templates/commands/tools.md
+
+```
+```
+exit: 1
+```
+
+The unit is `disposition: in-scope`, `state: complete`, and the fact it is judged on is named by slug and
+kind (`feedback-prompt-threshold kind=threshold`) — the pointer points at a declaration the engine can
+actually reach. The exit code is the engine's aggregate (C-036: any finding ⇒ `1`); the 80 findings are
+`unclassified-candidate` rows for units of batches 2 and 3, none of them this unit.
+
+## Reading 2 — `verify`
+
+```console
+$ python3 scripts/python/harness-triple-check.py --action verify
+# harness-triple-check — verify
+declarations: 8
+candidates: 83
+consistency-declarations-to-carriers: 9/9
+consistency-carriers-to-declarations: 4/4
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 80
+finding: unclassified-candidate: shared/workflow/acceptance-hardening.md
+finding: unclassified-candidate: shared/workflow/expression-gates.md
+finding: unclassified-candidate: shared/workflow/external-dispatch-recipes.md
+finding: unclassified-candidate: shared/workflow/feature-integration.md
+finding: unclassified-candidate: shared/workflow/glossary.md
+finding: unclassified-candidate: skills/external/coaching-skills/SKILL.md
+finding: unclassified-candidate: skills/external/create-docs/SKILL.md
+finding: unclassified-candidate: skills/external/create-pages/SKILL.md
+finding: unclassified-candidate: skills/external/create-skills/SKILL.md
+finding: unclassified-candidate: skills/external/database-utils/SKILL.md
+finding: unclassified-candidate: skills/external/document-utils/SKILL.md
+finding: unclassified-candidate: skills/external/draw-diagram/SKILL.md
+finding: unclassified-candidate: skills/external/git-utils/SKILL.md
+finding: unclassified-candidate: skills/external/humanize/SKILL.md
+finding: unclassified-candidate: skills/external/improve-docs/SKILL.md
+finding: unclassified-candidate: skills/external/improve-skills/SKILL.md
+finding: unclassified-candidate: skills/external/merge-skills/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-house-keeping/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-loop-driver/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-project-setup/SKILL.md
+finding: unclassified-candidate: skills/internal/analyze-artifacts/SKILL.md
+finding: unclassified-candidate: skills/internal/archive-session/SKILL.md
+finding: unclassified-candidate: skills/internal/clarify-artifact/SKILL.md
+finding: unclassified-candidate: skills/internal/code-review/SKILL.md
+finding: unclassified-candidate: skills/internal/create-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/create-checklist/SKILL.md
+finding: unclassified-candidate: skills/internal/create-plan/SKILL.md
+finding: unclassified-candidate: skills/internal/create-requirements/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tasks/SKILL.md
+finding: unclassified-candidate: skills/internal/create-team/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tools/SKILL.md
+finding: unclassified-candidate: skills/internal/derive-architecture/SKILL.md
+finding: unclassified-candidate: skills/internal/implement-feature/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-team/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-tools/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-agents/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-constitution/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-features/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-feedback/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-goal/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-history/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-instructions/SKILL.md
+finding: unclassified-candidate: skills/internal/manage-todo/SKILL.md
+finding: unclassified-candidate: skills/internal/memory-recall/SKILL.md
+finding: unclassified-candidate: skills/internal/memory-record/SKILL.md
+finding: unclassified-candidate: skills/internal/research-feature/SKILL.md
+finding: unclassified-candidate: skills/internal/review-feature-quality/SKILL.md
+finding: unclassified-candidate: skills/internal/review-sdd-process/SKILL.md
+finding: unclassified-candidate: skills/internal/run-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/run-interview/SKILL.md
+finding: unclassified-candidate: skills/internal/run-skills/SKILL.md
+finding: unclassified-candidate: skills/internal/run-team/SKILL.md
+finding: unclassified-candidate: skills/internal/sanitize-materials/SKILL.md
+finding: unclassified-candidate: skills/internal/self-improvement/SKILL.md
+finding: unclassified-candidate: skills/internal/study-project/SKILL.md
+finding: unclassified-candidate: skills/internal/summarize-project/SKILL.md
+finding: unclassified-candidate: templates/commands/analyze.md
+finding: unclassified-candidate: templates/commands/checklist.md
+finding: unclassified-candidate: templates/commands/clarify.md
+finding: unclassified-candidate: templates/commands/derive.md
+finding: unclassified-candidate: templates/commands/docs.md
+finding: unclassified-candidate: templates/commands/feedback.md
+finding: unclassified-candidate: templates/commands/goal.md
+finding: unclassified-candidate: templates/commands/history.md
+finding: unclassified-candidate: templates/commands/implement.md
+finding: unclassified-candidate: templates/commands/improve.md
+finding: unclassified-candidate: templates/commands/instructions.md
+finding: unclassified-candidate: templates/commands/interview.md
+finding: unclassified-candidate: templates/commands/plan.md
+finding: unclassified-candidate: templates/commands/requirements.md
+finding: unclassified-candidate: templates/commands/research.md
+finding: unclassified-candidate: templates/commands/review.md
+finding: unclassified-candidate: templates/commands/sanitize.md
+finding: unclassified-candidate: templates/commands/session.md
+finding: unclassified-candidate: templates/commands/skills.md
+finding: unclassified-candidate: templates/commands/tasks.md
+finding: unclassified-candidate: templates/commands/team.md
+finding: unclassified-candidate: templates/commands/todo.md
+finding: unclassified-candidate: templates/commands/tools.md
+
+```
+```
+exit: 1
+```
+
+Read at unit level, the verdict for US1 is green and this is not a soft claim — it is measured:
+
+- `consistency-declarations-to-carriers: 9/9` and `consistency-carriers-to-declarations: 4/4`: both
+  directions matched for every batch-1 fact, so no one-sided green.
+- Of the 80 findings, **zero** name `shared/workflow/feedback-step.md` (checked over the same run's
+  `--format json` payload), and there is **zero** `no-read-point` finding — the two classes that would
+  say the unit's declaration or its read point is missing.
+- The aggregate exit stays `1` because the candidate set is 83 units and 80 of them belong to batches
+  2 and 3, which this row does not migrate. C-043 fixes that distinction rather than leaving it to
+  interpretation: a `pending`/`unclassified` unit is "a reading, not a failure", and the exit-0
+  criterion is about `[[STR-013]]` findings on a tree whose roster is complete.
+
+So the US1 acceptance sentence "`--action verify` exits 0 for it" is satisfied in its per-unit sense
+today and in its aggregate sense only once the later batches and the exclusion layer land. The aggregate
+reading is recorded as `1`, not written up as `0`.
+
+## Reading 3 — the reused `duplicate` face: zero `duplicate-fact` hits
+
+```console
+$ python3 scripts/python/doc-consistency-check.py --action verify --faces duplicate \
+    --owner-path shared/workflow/feedback-step.md \
+    --spec-dir .specify/specs/084-harness-triple-structure
+doc-consistency-check: verify
+checked_at: 2026-11-05T12:19:32Z
+faces: duplicate=pass
+files_scanned: 14
+findings: 0
+
+```
+```
+exit: 0
+```
+
+`duplicate=pass`, `files_scanned: 14`, `findings: 0` — the carrier's text is not copied anywhere on the
+scanned surface, so the threshold's single definition point holds from the carrier side too. The same
+face re-run with `--format json` reports `"faces": {"duplicate": "pass"}, "findings": []`.
+
+## The pointer the readings are about
+
+`shared/workflow/feedback-step.md` carries, and no longer restates:
+
+```text
+- The engine store lives at `.specify/memory/feedback/`; the threshold's default **value** is owned by
+  `shared/declarations/facts/feedback-prompt-threshold.yaml#/statement` — this carrier states no number
+  of its own. `--threshold` and `SPECKIT_FEEDBACK_THRESHOLD` still override it, and a project whose
+  declaration layer is absent gets `declaration-absent: feedback-prompt-threshold` on the engine's output
+```
+
+`former_carriers` names both carriers that used to spell the literal (`shared/workflow/feedback-step.md`,
+`docs/reference/skills/feedback.md`), and `consumers` names the engine (`scripts/python/feedback-utils.py`).

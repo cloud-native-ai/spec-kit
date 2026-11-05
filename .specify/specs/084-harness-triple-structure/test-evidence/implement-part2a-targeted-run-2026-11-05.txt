@@ -1,0 +1,1395 @@
+# test runner: python3 -m pytest -q tests/contract/test_acceptance_review_composition.py tests/contract/test_acceptance_schema_ownership.py tests/contract/test_acceptance_state_machine.py tests/contract/test_agent_chain_guards.py tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_agent_env_config_contract.py tests/contract/test_agent_skill_enablement.py tests/contract/test_agent_specific_config_skills.py tests/contract/test_baseline_preflight_contract.py tests/contract/test_clarify_semantic_completeness.py tests/contract/test_clause_coverage.py tests/contract/test_cleanup_obsolete_assets.py tests/contract/test_client_armed_state.py tests/contract/test_client_capture.py tests/contract/test_client_guard_sweep.py tests/contract/test_client_improve_loop.py tests/contract/test_client_metrics.py tests/contract/test_client_package_exclusion.py tests/contract/test_coaching_dispatch_contract.py tests/contract/test_coaching_expectation_contract.py tests/contract/test_coaching_observation_contract.py tests/contract/test_coaching_run_contract.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_code_review_skill_contract.py tests/contract/test_compile_embeds.py tests/contract/test_compile_propagation_order.py tests/contract/test_compile_reconcile_guards.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_constitution_double_landing.py tests/contract/test_criterion_subject.py tests/contract/test_decision_tension_contract.py tests/contract/test_delegation_classes.py tests/contract/test_derive_command_surface.py tests/contract/test_directory_governance.py tests/contract/test_doc_consistency_checker.py tests/contract/test_docs_command_template.py tests/contract/test_docs_gate_driver.py tests/contract/test_docs_step_injection.py tests/contract/test_docs_target_structure_declaration.py tests/contract/test_docs_utils_cli.py tests/contract/test_document_structure_gate.py tests/contract/test_dogfooding_practice.py tests/contract/test_engine_face_contract.py tests/contract/test_evidence_binding_contract.py tests/contract/test_evidence_findings_schema.py tests/contract/test_evidence_step_conformance.py tests/contract/test_evidence_utils_cli.py tests/contract/test_exec_quant_aggregate.py tests/contract/test_exec_quant_channel_boundary.py tests/contract/test_exec_quant_channel_compat.py tests/contract/test_exec_quant_engine.py tests/contract/test_export_skill_rework.py tests/contract/test_expression_compatibility.py tests/contract/test_expression_faces.py tests/contract/test_expression_gate_wiring.py tests/contract/test_expression_gates_doc.py tests/contract/test_fast_fail_discipline.py tests/contract/test_feedback_command_classification.py tests/contract/test_feedback_command_template.py tests/contract/test_feedback_entry_schema.py tests/contract/test_feedback_exec_quant_payload.py tests/contract/test_feedback_intake_exec_quant.py tests/contract/test_feedback_introspection_engine.py tests/contract/test_feedback_introspection_report.py tests/contract/test_feedback_mechanism_boundary.py tests/contract/test_feedback_probe_cli.py tests/contract/test_feedback_probe_entry_schema.py tests/contract/test_feedback_probe_registry.py tests/contract/test_feedback_skill_conformance.py tests/contract/test_feedback_step_reference_form.py tests/contract/test_feedback_two_path_routing.py tests/contract/test_feedback_utils_cli.py tests/contract/test_flat_internal_skill_migration.py tests/contract/test_flow_class_correctness.py tests/contract/test_flow_class_ledger.py tests/contract/test_flow_class_spec_declaration.py tests/contract/test_focus_target_resolution.py tests/contract/test_gate_wiring_081.py tests/contract/test_git_workflow_instructions_block.py tests/contract/test_glossary_mechanism.py tests/contract/test_goal_migration.py tests/contract/test_goal_targets_engine.py tests/contract/test_green_point_claim.py tests/contract/test_handler_registry.py tests/contract/test_handoff_chain.py tests/contract/test_harness_triple_structure.py tests/contract/test_hermes_init_contract.py tests/contract/test_hidden_edge_two_cycle.py tests/contract/test_hugo_scaffold_contract.py tests/contract/test_humanize_command_surface.py tests/contract/test_improve_team_presence.py tests/contract/test_instructions_size_budget.py tests/contract/test_isomorphism_map.py tests/contract/test_knowledge_promotion.py tests/contract/test_ledger_reconciliation.py tests/contract/test_lifecycle_detach_reattach.py tests/contract/test_line_envelope_contract.py tests/contract/test_loop_state_contract.py tests/contract/test_measurement_instruments.py tests/contract/test_merge_provenance_gate.py tests/contract/test_migration_distribution.py tests/contract/test_nested_run_report.py tests/contract/test_nested_sdd_invocation.py tests/contract/test_neutrality_budget.py tests/contract/test_no_nested_skills.py tests/contract/test_no_organize_agents_refs.py tests/contract/test_no_retired_draw_skill_refs.py tests/contract/test_non_regression_064.py tests/contract/test_non_regression_070.py tests/contract/test_objective_analysis_gate.py tests/contract/test_phase2_bindings.py tests/contract/test_portable_skill_creation.py tests/contract/test_premise_carrier_contract.py tests/contract/test_probe_engine_action_sets.py tests/contract/test_probe_registry_umbrella.py tests/contract/test_problem_solving_naming.py tests/contract/test_project_custom_template.py tests/contract/test_record_retention_engine.py tests/contract/test_registry_completeness.py tests/contract/test_render_evidence_geometry.py tests/contract/test_reproduction_fidelity_readback.py tests/contract/test_requirements_checker.py tests/contract/test_requirements_convention_entry_points.py tests/contract/test_resource_id_generation.py tests/contract/test_resource_id_resolution.py tests/contract/test_review_code_composition.py tests/contract/test_review_docs_isomorphism.py tests/contract/test_review_feedback_boundary.py tests/contract/test_review_p1_checklist_governance.py tests/contract/test_review_p1_recheck_waiver.py tests/contract/test_review_p1_review_loop.py tests/contract/test_run_checks.py tests/contract/test_run_determination_engine.py tests/contract/test_run_determination_passive_wiring.py tests/contract/test_run_skills_wiring.py tests/contract/test_runtime_mode_gate.py tests/contract/test_sanitize_renumber_lane.py tests/contract/test_sanitize_retention_lane.py tests/contract/test_sanitize_template.py tests/contract/test_scan_confirmation_gates.py tests/contract/test_sdd_carrier_contract.py tests/contract/test_sdd_compat_containment.py tests/contract/test_sdd_diffusion.py tests/contract/test_sdd_house_keeping_skill.py tests/contract/test_sdd_invocation_governance.py tests/contract/test_sdd_loop_driver_cli_profiles.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_loop_driver_watch_iteration.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/contract/test_sdd_loop_driver_wp_preset.py tests/contract/test_sdd_loop_driver_wrapup_accounting.py tests/contract/test_sdd_project_setup_skill.py tests/contract/test_sdd_routing_definitions.py tests/contract/test_sdd_three_skill_contract.py tests/contract/test_seat_instantiation_flow.py tests/contract/test_self_improvement_conformance.py tests/contract/test_shared_reference_directory.py tests/contract/test_shared_reference_rewrite.py tests/contract/test_shipped_surface_client_neutrality.py tests/contract/test_single_agent_purity.py tests/contract/test_single_conceptual_model.py tests/contract/test_skill_install_layout_contract.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_skill_verification_discriminability.py tests/contract/test_skills_symlink_regression.py tests/contract/test_stage_class_wiring.py tests/contract/test_status_gate_owner.py tests/contract/test_store_state_protocol.py tests/contract/test_summarize_project_prompt_assets.py tests/contract/test_summary_trigger.py tests/contract/test_summary_writeset.py tests/contract/test_sync_mirrors_only.py tests/contract/test_teaching_surfaces.py tests/contract/test_team_command_routing.py tests/contract/test_token_efficiency_discipline.py tests/contract/test_token_efficiency_feedback.py tests/contract/test_token_efficiency_gates.py tests/contract/test_tools_command_routing.py tests/contract/test_tools_inventory_ownership.py tests/contract/test_trigger_engine.py tests/contract/test_trigger_seed_derivation.py tests/contract/test_upgrade_end_state.py tests/contract/test_user_facing_comprehension_pointers.py tests/contract/test_validate_tasks_parallel_safety.py tests/contract/test_validation_carrier_contract.py tests/contract/test_workspace_isolation_contract.py tests/contract/test_wrap_up_line_budget.py tests/contract/test_wrap_up_wording_gate_safe.py tests/integration/test_agents_creation.py tests/integration/test_evidence_compare_verdict.py tests/integration/test_evidence_python_lanes.py tests/integration/test_expression_line_pilot.py tests/integration/test_feedback_command_record.py tests/integration/test_feedback_dedup.py tests/integration/test_feedback_exec_quant_channel.py tests/integration/test_feedback_partial.py tests/integration/test_feedback_selective_triggering.py tests/integration/test_feedback_skill_record.py tests/integration/test_feedback_threshold.py tests/integration/test_goal_reference.py tests/integration/test_persistent_agent_lifecycle.py tests/integration/test_resource_id_resolution.py tests/integration/test_sanitize_us1.py tests/integration/test_sanitize_us2.py tests/integration/test_sanitize_us3.py tests/integration/test_sdd_house_keeping_flow.py tests/integration/test_session_kill_reattach.py tests/integration/test_shared_dir_install.py tests/integration/test_skill_install_layout_integration.py tests/integration/test_skills_resource_ids.py tests/integration/test_worktree_integration_queue.py tests/integration/test_zero_sdd_workflow_references.py tests/unit/test_feedback_exec_quant_payload.py tests/unit/test_feedback_intake_exec_quant.py tests/unit/test_feedback_package.py tests/unit/test_feedback_utils.py tests/unit/test_flow_class_check.py tests/unit/test_flow_class_spec_key.py tests/unit/test_isomorphism_checker.py tests/unit/test_reconciler_extensions.py tests/unit/test_record_retention_helpers.py tests/unit/test_renumber_engine.py tests/unit/test_resource_id_helpers.py tests/unit/test_rewrite_paths_skill_layers.py tests/unit/test_sanitize_checks_index.py tests/unit/test_sanitize_checks_migration.py tests/unit/test_sanitize_checks_mirror.py tests/unit/test_sanitize_checks_refs.py tests/unit/test_sanitize_semantic.py tests/unit/test_skills_utils_layout.py tests/unit/test_tier_classification.py tests/unit/test_two_layer_skills_copy.py tests/unit/test_workspace_root_resolution.py
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+...................F.................................................... [  8%]
+.........................................F....F......................... [  9%]
+..............F.FF.FFFFFFF.F.F.......................................... [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 18%]
+..................F.....F.F.F..........................................F [ 19%]
+..........F............................................................. [ 21%]
+..........s............................................................. [ 23%]
+..........................F.....FFF....F................................ [ 24%]
+........................................................................ [ 26%]
+...........................................F............................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+...............................................................F..F..... [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+....F............................F...................................... [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+......................................F................................. [ 72%]
+........................................................................ [ 74%]
+...................................F.................................... [ 75%]
+................F.....F...F............................................. [ 77%]
+........................................................................ [ 79%]
+.....................F.................................................. [ 80%]
+........................................................................ [ 82%]
+...F......................................................F............. [ 84%]
+........................................................F............... [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+................................................                         [100%]
+=================================== FAILURES ===================================
+___ test_c42_threshold_combination_rule_unchanged_and_metrics_never_feed_it ____
+
+    def test_c42_threshold_combination_rule_unchanged_and_metrics_never_feed_it():
+        source = ENGINE_SRC.read_text(encoding="utf-8")
+>       assert re.search(r"def should_prompt\(count: int, threshold: int\) -> bool:\n"
+                         r"    return count >= threshold\n", source), (
+            "C-42: the threshold predicate stays count >= threshold — the existing "
+            "combination rule (both the threshold hold AND the run-determination "
+            "verdict hold → notice) must not be re-shaped by this feature"
+        )
+E       AssertionError: C-42: the threshold predicate stays count >= threshold — the existing combination rule (both the threshold hold AND the run-determination verdict hold → notice) must not be re-shaped by this feature
+E       assert None
+E        +  where None = <function search at 0x7f5cd6d96700>('def should_prompt\\(count: int, threshold: int\\) -> bool:\\n    return count >= threshold\\n', '#!/usr/bin/env python3\n"""Feedback-as-files engine for Spec Kit.\n\nPersists local, unit-scoped feedback entries pro...print(render_text(args.action, payload))\n    return 0\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n')
+E        +    where <function search at 0x7f5cd6d96700> = re.search
+
+tests/contract/test_client_metrics.py:300: AssertionError
+______________ test_c3_mirrors_and_command_copies_are_zero_drift _______________
+
+    def test_c3_mirrors_and_command_copies_are_zero_drift():
+        mirrors = _run("scripts/python/sync-mirrors.py", "--check")
+        copies = _run("scripts/python/regen-command-copies.py", "--check")
+>       assert mirrors.returncode == 0, mirrors.stdout + mirrors.stderr
+E       AssertionError: OK: all per-tool command copies match the source templates.
+E         ok    templates/ == .specify/templates/ (22 files)
+E         ok    skills/external/ == .specify/skills/ (409 files)
+E         DIFF  .specify/skills/internal/collect-evidence/SKILL.md
+E         DIFF  .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+E         ok    agents/ == .specify/agents/templates/ (3 files)
+E         MISS  .specify/scripts/python/declaration_reader.py
+E         MISS  .specify/scripts/python/harness-triple-check.py
+E         DIFF  .specify/scripts/python/evidence-utils.py
+E         DIFF  .specify/scripts/python/feedback-utils.py
+E         DIFF  .specify/scripts/python/flow-class-check.py
+E         MISS  .specify/shared/declarations/contract.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-lanes.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-seven-states.yaml
+E         MISS  .specify/shared/declarations/facts/feedback-prompt-threshold.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-basis.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-classes.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-document-types.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-ledger-columns.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-neutral-categories.yaml
+E         MISS  .specify/shared/definitions/harness-triple-definitions.md
+E         DIFF  .specify/shared/definitions/flow-class-definitions.md
+E         DIFF  .specify/shared/definitions/framework-map.md
+E         DIFF  .specify/shared/guidelines/better-harness.md
+E         DIFF  .specify/shared/workflow/evidence-step.md
+E         DIFF  .specify/shared/workflow/feedback-step.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', 'scripts/python/sync-mirrors.py', '--check'], returncode=2, stdout='OK: all...y/shared/workflow/feedback-step.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_coaching_wiring_contract.py:357: AssertionError
+_________________ test_c8_the_verification_surface_runs_green __________________
+
+    def test_c8_the_verification_surface_runs_green():
+        checks = {
+            "flow-class check": _run("scripts/python/flow-class-check.py", "--action", "check"),
+            "probe registry": _run("scripts/python/probe-utils.py", "--action", "probes", "--validate"),
+            "probe compile": _run(
+                "scripts/python/probe-utils.py", "--action", "compile-embeds", "--check"
+            ),
+            "mirrors": _run("scripts/python/sync-mirrors.py", "--check"),
+            "command copies": _run("scripts/python/regen-command-copies.py", "--check"),
+            "gate summary": _run("scripts/python/scan-confirmation-gates.py", "--summary"),
+        }
+        failing = {name: proc.returncode for name, proc in checks.items() if proc.returncode != 0}
+>       assert not failing, f"verification surface not green: {failing}"
+E       AssertionError: verification surface not green: {'mirrors': 2}
+E       assert not {'mirrors': 2}
+
+tests/contract/test_coaching_wiring_contract.py:434: AssertionError
+_______________________ test_compile_embeds_determinism ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_compile_embeds_determinis0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd493bed0>
+
+    @pytest.mark.contract
+    def test_compile_embeds_determinism(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc1, p1 = _run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________________ test_compile_embeds_check_clean_and_drift ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_compile_embeds_check_clea0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd4ddf410>
+
+    @pytest.mark.contract
+    def test_compile_embeds_check_clean_and_drift(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________________ test_compiled_form_contract __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_compiled_form_contract0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd47b4d90>
+
+    @pytest.mark.contract
+    def test_compiled_form_contract(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________ test_propagation_chain_is_green_in_canonical_order ______________
+
+    def test_propagation_chain_is_green_in_canonical_order():
+        # Step 1 — compile: the compiled faces match the registry (nothing to migrate).
+        rc = probe_utils.main(["--action", "compile-embeds", "--check", "--format", "json"])
+        assert rc == 0, (
+            "step 1 (compile --check) red: the compiled faces drifted from the registry — "
+            "run probe-utils.py --action compile-embeds BEFORE regen/sync"
+        )
+        # Step 2 — regen: per-tool copies match the (compiled) source templates.
+        proc = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "regen-command-copies.py"),
+             "--check"], capture_output=True, text=True, check=False)
+        assert proc.returncode == 0, (
+            "step 2 (regen --check) red: per-tool copies drifted from the compiled "
+            "templates — run regen-command-copies.py after every compile-embeds"
+        )
+        # Step 3 — sync: the .specify mirrors match the sources.
+        proc = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
+             "--check"], capture_output=True, text=True, check=False)
+>       assert proc.returncode == 0, (
+            "step 3 (sync --check) red: .specify mirrors drifted from the sources — run "
+            "sync-mirrors.py after regen"
+        )
+E       AssertionError: step 3 (sync --check) red: .specify mirrors drifted from the sources — run sync-mirrors.py after regen
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py',...y/shared/workflow/feedback-step.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_compile_propagation_order.py:83: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{
+  "ok": true,
+  "check": true,
+  "units": 76,
+  "structural": [],
+  "drift": []
+}
+________________ test_orphan_handler_line_is_structural_exit_2 _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_orphan_handler_line_is_st0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd4bc8050>
+
+    @pytest.mark.contract
+    def test_orphan_handler_line_is_structural_exit_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+________________ test_missing_handler_line_is_structural_exit_2 ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_missing_handler_line_is_s0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd2974ed0>
+
+    @pytest.mark.contract
+    def test_missing_handler_line_is_structural_exit_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________ test_stale_render_after_registry_change_is_exit_1 _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_stale_render_after_regist0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd297d050>
+
+    @pytest.mark.contract
+    def test_stale_render_after_registry_change_is_exit_1(tmp_path, capsys):
+        """The lifecycle's exit-1 leg: a registry edit makes the artifact a stale render —
+        regenerable, recompile fixes it; it must NOT be classified structural."""
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________________ test_illegal_action_exits_2_naming_handler __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_illegal_action_exits_2_na0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd2c69a10>
+
+    @pytest.mark.contract
+    def test_illegal_action_exits_2_naming_handler(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________________ test_order_conflict_exits_2 __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_order_conflict_exits_20')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd2ad9050>
+
+    @pytest.mark.contract
+    def test_order_conflict_exits_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________________ test_wording_hit_refuses_the_write ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_wording_hit_refuses_the_w0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd294b5d0>
+
+    @pytest.mark.contract
+    def test_wording_hit_refuses_the_write(tmp_path, capsys):
+        # A registry whose rendered line would carry blocking wording: the sandbox owner
+        # gains a lowercase blocking heading, an agent handler anchors on it.
+        registry = REGISTRY_TEXT.replace(
+            "| h-run-determination | engine | determine | non-blocking | 10 | "
+            "scripts/python/run-determination.py |",
+            "| h-run-determination | engine | determine | non-blocking | 10 | "
+            "scripts/python/run-determination.py |\n"
+            "| h-stop-and-confirm | agent | stop and confirm the draft | non-blocking "
+            "| 25 | shared/workflow/feedback-step.md |")
+        # Anchor at the table header separator: inserting mid-row (substring inside a
+        # row carrying a 覆盖说明 cell) would corrupt the row's cells.
+        registry = registry.replace(
+            "| handler_id | selector | scope | 覆盖说明 |\n"
+            "|------------|----------|-------|----------|",
+            "| handler_id | selector | scope | 覆盖说明 |\n"
+            "|------------|----------|-------|----------|\n"
+            "| h-stop-and-confirm | @point:wrap-up | all | wording-gate drill row |")
+        ws = CE._build_workspace(tmp_path, registry)
+        owner = ws / "shared" / "workflow" / "feedback-step.md"
+        owner.write_text(
+            owner.read_text(encoding="utf-8")
+            + "\n## stop and confirm the draft\n\nDrill heading.\n",
+            encoding="utf-8")
+        rc = probe_utils.main(["--action", "compile-embeds",
+                               "--workspace-root", str(ws)])
+        assert rc == 2, "generated wording hitting BLOCKING_PATTERNS must refuse (exit 2)"
+        err = capsys.readouterr().err
+>       assert "wording gate" in err, f"the refusal must name the wording gate: {err}"
+E       AssertionError: the refusal must name the wording gate: error: handler 'h-feedback-record': engine scripts/python/feedback-utils.py --action args-manifest failed (rc=1): Traceback (most recent call last):
+E           File "/tmp/pytest-of-agent/pytest-81/test_wording_hit_refuses_the_w0/ws/scripts/python/feedback-utils.py", line 90, in <module>
+E             import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+E             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E         ModuleNotFoundErro
+E         
+E       assert 'wording gate' in "error: handler 'h-feedback-record': engine scripts/python/feedback-utils.py --action args-manifest failed (rc=1): Tra...n_reader  # noqa: E402  (import follows the sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundErro\n"
+
+tests/contract/test_compile_reconcile_guards.py:182: AssertionError
+________________________ test_clean_tree_check_is_green ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_clean_tree_check_is_green0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd291a810>
+
+    @pytest.mark.contract
+    def test_clean_tree_check_is_green(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+_______________________ test_c4_engine_mirror_untouched ________________________
+
+    def test_c4_engine_mirror_untouched():
+>       assert ENGINE_SRC.read_bytes() == ENGINE_MIRROR.read_bytes(), "feedback-utils.py mirrors diverged"
+E       AssertionError: feedback-utils.py mirrors diverged
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 3965 diff: b'#' != b'F'
+E         Use -v to get more diff
+
+tests/contract/test_dogfooding_practice.py:273: AssertionError
+____________ test_c20_face_renders_required_and_source_placeholders ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_c20_face_renders_required0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd2755390>
+
+    @pytest.mark.contract
+    def test_c20_face_renders_required_and_source_placeholders(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_______________ test_c20_convention_line_rendered_once_verbatim ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_c20_convention_line_rende0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd2806a50>
+
+    @pytest.mark.contract
+    def test_c20_convention_line_rendered_once_verbatim(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_____________ test_c21_rendered_flags_are_exactly_the_manifest_set _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_c21_rendered_flags_are_ex0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f5cd27dc110>
+
+    @pytest.mark.contract
+    def test_c21_rendered_flags_are_exactly_the_manifest_set(tmp_path, capsys):
+        """Bidirectional C-21 pin: per (engine, action) the rendered flag set is
+        exactly the manifest's required ∪ source (minus the identity pair the base
+        call line already carries with real values) — nothing extra (a non-accepted
+        argument never renders), nothing missing."""
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:152: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5cd60da6d0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_ TestCF13FeedbackPackageExclusion.test_package_zip_contains_no_evidence_paths _
+
+self = <contract.test_evidence_findings_schema.TestCF13FeedbackPackageExclusion object at 0x7f5cd3e20950>
+artifacts = {'findings': {'schemaVersion': 1, 'kind': 'speckit.evidence-findings', 'target': 'project', 'runId': 'ev-20261105-1205...ir': PosixPath('/tmp/pytest-of-agent/pytest-81/evidence0/ws/.specify/memory/evidence/ev-20261105-120505-project'), ...}
+
+    def test_package_zip_contains_no_evidence_paths(self, artifacts):
+        workspace = artifacts["workspace"]
+        feedback_utils = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+        subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "reindex",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        result = subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "package", "--all",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        assert result.returncode == 0, result.stderr
+        packages_dir = workspace / ".specify" / "memory" / "feedback" / "packages"
+        zips = sorted(packages_dir.glob("feedback-*.zip"))
+>       assert zips, "package produced no zip in the isolated workspace"
+E       AssertionError: package produced no zip in the isolated workspace
+E       assert []
+
+tests/contract/test_evidence_findings_schema.py:223: AssertionError
+___________ TestEvidenceStepConvention.test_mirrored_to_source_side ____________
+
+self = <contract.test_evidence_step_conformance.TestEvidenceStepConvention object at 0x7f5cd3e2a850>
+
+    def test_mirrored_to_source_side(self):
+        assert EVIDENCE_STEP_SRC.is_file(), "shared/workflow mirror missing"
+>       assert EVIDENCE_STEP.read_bytes() == EVIDENCE_STEP_SRC.read_bytes()
+E       AssertionError: assert b'# Canonical...xe3\x80\x82\n' == b'# Canonical...xe3\x80\x82\n'
+E         
+E         At index 4208 diff: b's' != b'N'
+E         Use -v to get more diff
+
+tests/contract/test_evidence_step_conformance.py:94: AssertionError
+______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
+
+    def test_c5_non_wiring_files_keep_their_frozen_hashes():
+        manifest = _hash_manifest()
+        templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+        skills = [rel for rel in manifest if rel.startswith("skills/")]
+        assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+        assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+        assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+        assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+            "the manifest is the NON-wiring complement; it still lists a wiring template"
+        )
+        assert not any(rel in WIRING_SKILLS for rel in skills), (
+            "the manifest is the NON-wiring complement; it still lists a wiring skill"
+        )
+    
+        # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+        # the register above, then re-asserted on content at its new path — the
+        # manifest entry itself stays untouched as 069a's dated record.
+        retired = _retired_skill_register(manifest)
+    
+        drifted: list[str] = []
+        missing: list[str] = []
+        for rel, expected in sorted(manifest.items()):
+            if rel in retired:
+                continue
+            path = REPO_ROOT / rel
+            if not path.is_file():
+                missing.append(rel)
+                continue
+            if _sha256(path) != expected:
+                if rel in ALLOWED_POST_BASELINE_CHANGES:
+                    continue
+                drifted.append(rel)
+        assert not missing, (
+            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+        )
+>       assert not drifted, (
+            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "feedback-step pointer). drifted: %r" % drifted
+        )
+E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/internal/collect-evidence/SKILL.md']
+E       assert not ['skills/internal/collect-evidence/SKILL.md']
+
+tests/contract/test_expression_compatibility.py:668: AssertionError
+______________________ test_c7_mirrors_are_byte_identical ______________________
+
+    def test_c7_mirrors_are_byte_identical():
+        problems: list[str] = []
+        for source_rel, mirror_rel in sorted(MIRROR_PAIRS.items()):
+            source = REPO_ROOT / source_rel
+            mirror = REPO_ROOT / mirror_rel
+            assert source.is_file(), "owned source missing: %s" % source_rel
+            if not mirror.is_file():
+                if source_rel not in NEW_PAYLOAD_SOURCES:
+                    problems.append("%s — mirror disappeared" % mirror_rel)
+                continue
+            if source.read_bytes() != mirror.read_bytes():
+                problems.append("%s — mirror differs from %s" % (mirror_rel, source_rel))
+>       assert not problems, (
+            "C-7: mirrors are projections of the framework source, never hand-edited "
+            "(absence is tolerated only for the four new payloads until T033):\n- "
+            + "\n- ".join(problems)
+        )
+E       AssertionError: C-7: mirrors are projections of the framework source, never hand-edited (absence is tolerated only for the four new payloads until T033):
+E         - .specify/scripts/python/flow-class-check.py — mirror differs from scripts/python/flow-class-check.py
+E         - .specify/shared/definitions/flow-class-definitions.md — mirror differs from shared/definitions/flow-class-definitions.md
+E         - .specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md
+E       assert not ['.specify/scripts/python/flow-class-check.py — mirror differs from scripts/python/flow-class-check.py', '.specify/sha...ss-definitions.md', '.specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md']
+
+tests/contract/test_expression_compatibility.py:840: AssertionError
+___________ test_c4_refreshed_client_shape_reads_the_delivered_owner ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_c4_refreshed_client_shape0')
+
+    def test_c4_refreshed_client_shape_reads_the_delivered_owner(tmp_path):
+        """C-4's refreshed state: the class must resolve from ``.specify/shared/…``.
+    
+        The shipped defect looked one directory too high (``<proj>/shared/…``), so
+        every client call degraded to ``owner-unavailable`` + the default class.
+        """
+        client = _client_shape(tmp_path)
+        engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
+    
+        for extra in ([], ["--repo", str(client)]):
+            proc = _lookup(engine, "--unit-id", "/speckit.docs", *extra, cwd=client)
+>           assert proc.returncode == 0, (
+                "a refreshed client project must resolve its owner (args=%r); "
+                "stderr=%r" % (extra, proc.stderr)
+            )
+E           AssertionError: a refreshed client project must resolve its owner (args=[]); stderr='Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-81/test_c4_refreshed_client_shape0/client/.specify/scripts/python/flow-class-check.py", line 100, in <module>\n    import declaration_reader  # noqa: E402  (import follows the sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n'
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/usr/bin/python3', '/tmp/pytest-of-agent/pytest-81/test_c4_refreshed_client_shape0/client/.spe...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_expression_compatibility.py:893: AssertionError
+_________ test_c4_client_shape_still_degrades_when_the_owner_is_absent _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_c4_client_shape_still_deg0')
+
+    def test_c4_client_shape_still_degrades_when_the_owner_is_absent(tmp_path):
+        """Negative control: the fix must not turn a missing owner into a green read."""
+        client = _client_shape(tmp_path)
+        (client / ".specify" / CLASS_OWNER).unlink()
+        engine = client / ".specify" / "scripts" / "python" / "flow-class-check.py"
+        proc = _lookup(engine, "--unit-id", "/speckit.docs", cwd=client)
+>       assert proc.returncode == 2, "a genuinely absent owner is still exit 2"
+E       AssertionError: a genuinely absent owner is still exit 2
+E       assert 1 == 2
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '/tmp/pytest-of-agent/pytest-81/test_c4_client_shape_still_deg0/client/.spe...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_expression_compatibility.py:913: AssertionError
+______________ test_c6_feedback_step_edit_is_additive_single_line ______________
+
+    def test_c6_feedback_step_edit_is_additive_single_line():
+        proc = _git("diff", "-U0", PRE_CHANGE_HEAD, "--", "shared/workflow/feedback-step.md")
+        assert proc.returncode == 0, "git diff failed: %r" % proc.stderr
+        removed: list[str] = []
+        added: list[str] = []
+        for line in proc.stdout.splitlines():
+            if line.startswith("---") or line.startswith("+++"):
+                continue
+            if line.startswith("-"):
+                removed.append(line)
+            elif line.startswith("+") and line[1:].strip():
+                added.append(line[1:])
+>       assert not removed, (
+            "C-6: the existing complexity criterion and red-line paragraphs must stay "
+            "byte-identical — removed lines: %r" % removed
+        )
+E       AssertionError: C-6: the existing complexity criterion and red-line paragraphs must stay byte-identical — removed lines: ['-- The engine store lives at `.specify/memory/feedback/`; threshold defaults to `10`', '-  (`--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`).']
+E       assert not ['-- The engine store lives at `.specify/memory/feedback/`; threshold defaults to `10`', '-  (`--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`).']
+
+tests/contract/test_expression_compatibility.py:1035: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1853: AssertionError
+_____________________ test_lc_07_identity_ok_mismatch_dead _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_lc_07_identity_ok_mismatc0')
+
+    def test_lc_07_identity_ok_mismatch_dead(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        entry = _register(reg, project)
+        four = four_piece(tmp_path / "rt", entry["line_id"], entry["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", entry["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        ok = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
+>       assert ok["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:241: AssertionError
+______________________ test_lc_10_11_12_snapshot_branches ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_lc_10_11_12_snapshot_bran0')
+
+    def test_lc_10_11_12_snapshot_branches(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        line = _register(reg, project)
+        four = four_piece(tmp_path / "rt", line["line_id"], line["run_id"], stage="plan", sentinel=True)
+        engine_json(
+            "update", "--line-id", line["line_id"], "--stage", "plan",
+            "--runner-pid", "999999", "--runner-start-token", "0",
+            "--cli-pid", "999999", "--cli-start-token", "0",
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        done = engine_json("verify-identity", "--line-id", line["line_id"], reg=reg)
+        assert done["branch_hint"] == "done"
+    
+        running_line = _register(reg, project)
+        four2 = four_piece(tmp_path / "rt2", running_line["line_id"], running_line["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", running_line["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four2["prompt_meta"]), "--status-path", str(four2["status"]),
+            "--log-path", str(four2["log"]), "--heartbeat-path", str(four2["heartbeat"]), reg=reg,
+        )
+        running = engine_json("verify-identity", "--line-id", running_line["line_id"], reg=reg)
+>       assert running["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:315: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+________________________ test_ng_08_mirror_no_new_drift ________________________
+
+    def test_ng_08_mirror_no_new_drift():
+        skill = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
+             "--check", "--only", "skills/external/sdd-loop-driver"],
+            capture_output=True, text=True,
+        )
+        assert skill.returncode == 0, skill.stdout + skill.stderr
+        probe = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
+             "--check", "--only", "shared/definitions/probe-definitions.md"],
+            capture_output=True, text=True,
+        )
+        assert probe.returncode == 0, probe.stdout + probe.stderr
+        shared = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "scripts" / "python" / "sync-mirrors.py"),
+             "--check", "--only", "shared/definitions"],
+            capture_output=True, text=True,
+        )
+        diffs = {
+            Path(line.split()[-1]).name
+            for line in shared.stdout.splitlines() if line.startswith("DIFF")
+        }
+>       assert diffs == set(), f"shared/definitions drift changed: {sorted(diffs)}"
+E       AssertionError: shared/definitions drift changed: ['flow-class-definitions.md', 'framework-map.md']
+E       assert {'flow-class-...ework-map.md'} == set()
+E         
+E         Extra items in the left set:
+E         'framework-map.md'
+E         'flow-class-definitions.md'
+E         Use -v to get more diff
+
+tests/contract/test_non_regression_064.py:147: AssertionError
+_____________________ test_c22_watch_target_hook_selftest ______________________
+
+    def test_c22_watch_target_hook_selftest():
+        script = SKILL_DIR / "scripts" / "watch-target.sh"
+        result = subprocess.run(
+            ["bash", str(script), "--self-test"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        combined = result.stdout + result.stderr
+>       assert result.returncode == 0, f"self-test failed:\n{combined[-1200:]}"
+E       AssertionError: self-test failed:
+E         mkdir: cannot create directory ‘/home/agent/tmp/spec-kit’: Permission denied
+E         mktemp: failed to create directory via template ‘/home/agent/tmp/spec-kit/watch-target-selftest.XXXXXX’: No such file or directory
+E         SELF-TEST: cannot create temp dir
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/watc...home/agent/tmp/spec-kit/watch-target-selftest.XXXXXX’: No such file or directory\nSELF-TEST: cannot create temp dir\n').returncode
+
+tests/contract/test_sdd_loop_driver_skill.py:546: AssertionError
+________________ test_runtime_mirrors_match_sources[src2-dst2] _________________
+
+src = PosixPath('/storage/project/cloud-native-ai/spec-kit/shared/workflow/feedback-step.md')
+dst = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/workflow/feedback-step.md')
+
+    @pytest.mark.contract
+    @pytest.mark.parametrize(
+        "src,dst",
+        [
+            (PROMPTS, PROMPTS_MIRROR),
+            (SKILL, SKILL_MIRROR_FILE),
+            (FEEDBACK_STEP, FEEDBACK_STEP_MIRROR),
+        ],
+    )
+    def test_runtime_mirrors_match_sources(src: Path, dst: Path):
+>       assert src.read_bytes() == dst.read_bytes(), (
+            f"{src.relative_to(ROOT)} drifted from {dst.relative_to(ROOT)}; "
+            "run scripts/python/sync-mirrors.py --write"
+        )
+E       AssertionError: shared/workflow/feedback-step.md drifted from .specify/shared/workflow/feedback-step.md; run scripts/python/sync-mirrors.py --write
+E       assert b'# Canonical...nt default.\n' == b'# Canonical...HRESHOLD`).\n'
+E         
+E         At index 24817 diff: b'e' != b'r'
+E         Use -v to get more diff
+
+tests/contract/test_sdd_loop_driver_wrapup_accounting.py:135: AssertionError
+__________________ test_c10_runtime_skill_mirrors_are_current __________________
+
+    def test_c10_runtime_skill_mirrors_are_current():
+        for source in sorted((ROOT / "skills").glob("*/*/SKILL.md")):
+            name, layer = source.parent.name, source.parent.parent.name
+            rel = f"{layer}/{name}" if layer == "internal" else name
+            mirror = ROOT / ".specify/skills" / rel / "SKILL.md"
+            assert mirror.is_file(), f"missing Skill mirror: {rel}"
+>           assert source.read_bytes() == mirror.read_bytes(), f"Skill mirror drift: {rel}"
+E           AssertionError: Skill mirror drift: internal/collect-evidence
+E           assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E             
+E             At index 1831 diff: b'h' != b'e'
+E             Use -v to get more diff
+
+tests/contract/test_self_improvement_conformance.py:159: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/review-feature-quality/SKILL.md', 'skills/internal/review-feature-quality/references/artifact-and-implementation-review.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/manage-feedback/references/path-a-digest.md', 'skills/internal/implement-feature/SKILL.md', 'skills/external/sdd-loop-driver/references/dispatch-recipes.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/external/create-docs/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md']
+E       assert not ['skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/review-feature-qua...mplementation-review.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/memory-record/SKILL.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:103: AssertionError
+___________ test_shipped_surface_has_no_framework_runtime_references ___________
+
+    @pytest.mark.contract
+    def test_shipped_surface_has_no_framework_runtime_references():
+        violations = []
+        for root_name in SHIPPED_ROOTS:
+            for path in (REPO_ROOT / root_name).rglob("*"):
+                if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".yaml", ".yml", ".json"}:
+                    continue
+                rel = path.relative_to(REPO_ROOT).as_posix()
+                text = path.read_text(encoding="utf-8", errors="replace")
+                for pattern in BANNED_PATTERNS:
+                    for m in pattern.finditer(text):
+                        line = text[: m.start()].count("\n") + 1
+                        snippet = text.splitlines()[line - 1].strip()[:90]
+                        violations.append(f"{rel}:{line}: {snippet}")
+        fresh = [v for v in violations
+                 if v.split(":")[0] not in KNOWN_DEBT]
+>       assert not fresh, (
+            "shipped (client-visible) files reference the framework project's own "
+            "runtime artifacts; rewrite from the client-project perspective:\n"
+            + "\n".join(fresh[:15])
+        )
+E       AssertionError: shipped (client-visible) files reference the framework project's own runtime artifacts; rewrite from the client-project perspective:
+E         shared/definitions/flow-class-definitions.md:253: | 2026-10-30 | skill:coaching-skills | execution → execution | behavior-oracle | Feature 0
+E         shared/definitions/flow-class-definitions.md:89: 一张表把「代码是以计算机语言写的文档、文档是以人类语言写的代码」落成可逐行核对的对应。行集是八阶段名册（owner：`skills/external/sdd-loop-driver
+E         shared/definitions/flow-class-definitions.md:259: - **声明单位是特性线**：一条 spec 目录声明自己的类别，载体是该线 `requirements.md` 头部区（`## Related Feature` 之前）**至多一
+E         skills/external/sdd-loop-driver/scripts/wp-report.py:2: """Coordination report and metrics for Feature 070 Work Packages.
+E         skills/external/sdd-loop-driver/scripts/wp-report.py:851: description="Derive a Feature 070 stage coordination report from the spine."
+E         skills/external/sdd-loop-driver/scripts/loop-state.py:3: """loop-state.py — read-only loop state snapshot engine (Feature 065 / Slice 065a).
+E         skills/external/sdd-loop-driver/scripts/loop-state.py:2871: description="Read-only loop state snapshot engine (Feature 065 / slice "
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:23: Ownership and read access are projections inside the line's existing Ownership Manifest (F
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:95: The ledger `dispatch` event for an implement package carries the 067 fields in addition to
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:275: The preset's provenance records that its shape derives from the Feature 070 measured basel
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:311: This layer adds pre-U4 steps only. It does not change stage sentinel literals, the stage c
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:349: - **FN-11 (064)** — Feature 064's line registry, envelopes, worktree-per-write-line, Owner
+E         skills/external/sdd-loop-driver/references/decomposition-model.md:350: - **FN-12 (067)** — Feature 067's part brief, bounded part size, dispatch log, and test ec
+E       assert not ['shared/definitions/flow-class-definitions.md:253: | 2026-10-30 | skill:coaching-skills | execution → execution | beh...ver/scripts/loop-state.py:3: """loop-state.py — read-only loop state snapshot engine (Feature 065 / Slice 065a).', ...]
+
+tests/contract/test_shipped_surface_client_neutrality.py:62: AssertionError
+_ TestTwoBranchMerge.test_branch_merge_yields_zero_conflicts_and_both_entries __
+
+self = <contract.test_store_state_protocol.TestTwoBranchMerge object at 0x7f5cd330d090>
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-81/test_branch_merge_yields_zero_0')
+
+    def test_branch_merge_yields_zero_conflicts_and_both_entries(self, tmp_path):
+        import shutil
+        import time
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        scripts_dir = repo / "scripts/python"
+        scripts_dir.mkdir(parents=True)
+        shutil.copy(Path(fu.__file__), scripts_dir / "feedback-utils.py")
+        # feedback-utils imports its sibling probe-utils at module load (056
+        # engine split) — the fixture repo must carry the pair, not the lone file.
+        shutil.copy(Path(fu.__file__).parent / "probe-utils.py",
+                    scripts_dir / "probe-utils.py")
+        (repo / ".specify").mkdir()
+        # Entry filenames carry second granularity: two branches recording
+        # the SAME unit within the same wall-clock second collide on the
+        # filename itself (a pre-existing property, unchanged by req 055).
+        # Cross the boundary so each record lands in its own second — the
+        # realistic multi-branch scenario this feature closes.
+        self._git(repo, "init", "-q")
+        self._git(repo, "config", "user.email", "t@example.com")
+        self._git(repo, "config", "user.name", "T")
+        self._git(repo, "checkout", "-q", "-b", "main")
+>       self._record_on_branch(repo, "base-run")
+
+tests/contract/test_store_state_protocol.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <contract.test_store_state_protocol.TestTwoBranchMerge object at 0x7f5cd330d090>
+repo = PosixPath('/tmp/pytest-of-agent/pytest-81/test_branch_merge_yields_zero_0/repo')
+run_id = 'base-run'
+
+    def _record_on_branch(self, repo: Path, run_id: str) -> None:
+        p = subprocess.run(
+            [sys.executable, str(repo / "scripts/python/feedback-utils.py"),
+             "--action", "record", "--workspace-root", str(repo),
+             "--unit-id", "/speckit.plan", "--unit-type", "command",
+             "--run-id", run_id, "--review", "r", "--points", "- p"],
+            capture_output=True, text=True)
+>       assert p.returncode == 0, p.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/tmp/pytest-of-agent/pytest-81/test_branch_merge_yields_zero_0/repo/scripts/python/feedback-utils.py", line 90, in <module>
+E             import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+E             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E         ModuleNotFoundError: No module named 'declaration_reader'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '/tmp/pytest-of-agent/pytest-81/test_branch_merge_yields_zero_0/repo/script...e sys.path entry above)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'declaration_reader\'\n').returncode
+
+tests/contract/test_store_state_protocol.py:289: AssertionError
+___________ TestOnlyScoping.test_only_file_scopes_check_to_its_pair ____________
+
+self = <contract.test_sync_mirrors_only.TestOnlyScoping object at 0x7f5cd31847d0>
+
+    def test_only_file_scopes_check_to_its_pair(self):
+        proc = _run("--only", "scripts/python/feedback-utils.py", "--check")
+>       assert proc.returncode == 0, proc.stdout + proc.stderr
+E       AssertionError: scope --only: scripts/python/feedback-utils.py
+E         DIFF  .specify/scripts/python/feedback-utils.py
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', 'scripts/python/sync-mirrors.py', '--only', 'scripts/python/feedback-utils....y/scripts/python/feedback-utils.py\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_sync_mirrors_only.py:29: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+_______________________ test_c2_sync_mirrors_check_clean _______________________
+
+    def test_c2_sync_mirrors_check_clean():
+        proc = subprocess.run(
+            [sys.executable, str(SYNC_MIRRORS), "--check"], cwd=ROOT,
+            capture_output=True, text=True,
+        )
+>       assert proc.returncode == 0, f"sync-mirrors --check exit {proc.returncode}:\n{proc.stdout[-1500:]}"
+E       AssertionError: sync-mirrors --check exit 2:
+E         (22 files)
+E         ok    skills/external/ == .specify/skills/ (409 files)
+E         DIFF  .specify/skills/internal/collect-evidence/SKILL.md
+E         DIFF  .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+E         ok    agents/ == .specify/agents/templates/ (3 files)
+E         MISS  .specify/scripts/python/declaration_reader.py
+E         MISS  .specify/scripts/python/harness-triple-check.py
+E         DIFF  .specify/scripts/python/evidence-utils.py
+E         DIFF  .specify/scripts/python/feedback-utils.py
+E         DIFF  .specify/scripts/python/flow-class-check.py
+E         MISS  .specify/shared/declarations/contract.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-lanes.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-seven-states.yaml
+E         MISS  .specify/shared/declarations/facts/feedback-prompt-threshold.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-basis.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-classes.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-document-types.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-ledger-columns.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-neutral-categories.yaml
+E         MISS  .specify/shared/definitions/harness-triple-definitions.md
+E         DIFF  .specify/shared/definitions/flow-class-definitions.md
+E         DIFF  .specify/shared/definitions/framework-map.md
+E         DIFF  .specify/shared/guidelines/better-harness.md
+E         DIFF  .specify/shared/workflow/evidence-step.md
+E         DIFF  .specify/shared/workflow/feedback-step.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py',...y/shared/workflow/feedback-step.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_trigger_engine.py:220: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+tests/contract/test_evidence_utils_cli.py::TestCE3Doctor::test_node_block
+  /home/agent/.local/lib/python3.11/site-packages/_pytest/fixtures.py:1392: PytestRemovedIn10Warning: Class-scoped fixtures defined as instance methods are deprecated.
+  Instance attributes set in the 'doctor' fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use a @classmethod decorator below @pytest.fixture and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_client_metrics.py::test_c42_threshold_combination_rule_unchanged_and_metrics_never_feed_it
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c3_mirrors_and_command_copies_are_zero_drift
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_determinism
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_check_clean_and_drift
+FAILED tests/contract/test_compile_embeds.py::test_compiled_form_contract - j...
+FAILED tests/contract/test_compile_propagation_order.py::test_propagation_chain_is_green_in_canonical_order
+FAILED tests/contract/test_compile_reconcile_guards.py::test_orphan_handler_line_is_structural_exit_2
+FAILED tests/contract/test_compile_reconcile_guards.py::test_missing_handler_line_is_structural_exit_2
+FAILED tests/contract/test_compile_reconcile_guards.py::test_stale_render_after_registry_change_is_exit_1
+FAILED tests/contract/test_compile_reconcile_guards.py::test_illegal_action_exits_2_naming_handler
+FAILED tests/contract/test_compile_reconcile_guards.py::test_order_conflict_exits_2
+FAILED tests/contract/test_compile_reconcile_guards.py::test_wording_hit_refuses_the_write
+FAILED tests/contract/test_compile_reconcile_guards.py::test_clean_tree_check_is_green
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_dogfooding_practice.py::test_c4_engine_mirror_untouched
+FAILED tests/contract/test_engine_face_contract.py::test_c20_face_renders_required_and_source_placeholders
+FAILED tests/contract/test_engine_face_contract.py::test_c20_convention_line_rendered_once_verbatim
+FAILED tests/contract/test_engine_face_contract.py::test_c21_rendered_flags_are_exactly_the_manifest_set
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_evidence_step_conformance.py::TestEvidenceStepConvention::test_mirrored_to_source_side
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+FAILED tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical
+FAILED tests/contract/test_expression_compatibility.py::test_c4_refreshed_client_shape_reads_the_delivered_owner
+FAILED tests/contract/test_expression_compatibility.py::test_c4_client_shape_still_degrades_when_the_owner_is_absent
+FAILED tests/contract/test_expression_compatibility.py::test_c6_feedback_step_edit_is_additive_single_line
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_non_regression_064.py::test_ng_08_mirror_no_new_drift
+FAILED tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+FAILED tests/contract/test_sdd_loop_driver_wrapup_accounting.py::test_runtime_mirrors_match_sources[src2-dst2]
+FAILED tests/contract/test_self_improvement_conformance.py::test_c10_runtime_skill_mirrors_are_current
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+FAILED tests/contract/test_store_state_protocol.py::TestTwoBranchMerge::test_branch_merge_yields_zero_conflicts_and_both_entries
+FAILED tests/contract/test_sync_mirrors_only.py::TestOnlyScoping::test_only_file_scopes_check_to_its_pair
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+40 failed, 4327 passed, 1 skipped, 2 warnings in 192.51s (0:03:12)
+# failed-name list written: .specify/.tmp/084-impl-p2a/head-failed.txt (40 entries)

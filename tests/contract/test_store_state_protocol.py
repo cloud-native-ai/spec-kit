@@ -300,6 +300,13 @@ class TestTwoBranchMerge:
         # engine split) — the fixture repo must carry the pair, not the lone file.
         shutil.copy(Path(fu.__file__).parent / "probe-utils.py",
                     scripts_dir / "probe-utils.py")
+        # 2026-11-05 Feature 084 batch 1 (row 1) adds a second module-load sibling:
+        # the prompt threshold is a declaration-layer fact, read through the shared
+        # entry (``scripts/python/declaration_reader.py``). Same rule as the pair
+        # above — the fixture repo carries the sibling, and the absent declaration
+        # layer is the degraded path this scratch repo exercises on purpose.
+        shutil.copy(Path(fu.__file__).parent / "declaration_reader.py",
+                    scripts_dir / "declaration_reader.py")
         (repo / ".specify").mkdir()
         # Entry filenames carry second granularity: two branches recording
         # the SAME unit within the same wall-clock second collide on the

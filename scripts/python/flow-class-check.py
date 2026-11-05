@@ -88,15 +88,42 @@ from pathlib import Path
 # Contract constants (literals are pinned copies of requirements.md § Shared Strings)
 # --------------------------------------------------------------------------- #
 CLASS_KEY = "flow_class"            # [[STR-003]]
-EXECUTION = "execution"             # [[STR-001]]
-EXPRESSION = "expression"           # [[STR-002]]
-DEFAULT_CLASS = EXECUTION
 DEFAULT_MARKER = "未声明·按默认"    # [[STR-004]]
 
-CLASS_VALUES = (EXECUTION, EXPRESSION)
-BASIS_VALUES = ("behavior-oracle", "reader-oracle", "mixed-oracle")
-MIXED_ORACLE = "mixed-oracle"
-NEUTRAL_CATEGORIES = ("memory", "feedback", "evidence", "session")
+# Feature 084, batch 1 rows 4-8: the five closed sets this engine compares against are
+# declaration-layer facts (`shared/declarations/facts/flow-class-*.yaml`). The engine carries no copy of
+# them — it reads each through the shared read entry, so adding one legal member to a declaration makes
+# the gate accept it with no script edit (FR-007 (c), US2 acceptance 2) and a second tuple anywhere is
+# the finding these reads exist to make impossible.
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+
+def declared_sequence(slug):
+    """`(values, label)` for one closed-set / table fact; `((), <STR-014 instance>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label(slug)
+
+
+CLASS_VALUES, CLASS_VALUES_LABEL = declared_sequence("flow-class-classes")
+BASIS_VALUES, BASIS_VALUES_LABEL = declared_sequence("flow-class-basis")
+NEUTRAL_CATEGORIES, NEUTRAL_CATEGORIES_LABEL = declared_sequence("flow-class-neutral-categories")
+REQUIRED_LEDGER_COLUMNS, LEDGER_COLUMNS_LABEL = declared_sequence("flow-class-ledger-columns")
+
+#: The declared class axis is ordered and `mixed-oracle` is its third member; both facts are ordered
+#: closed sets, so the positions below are the declaration's, never a re-spelled name. An empty read
+#: (unreadable layer) leaves these ``None`` and the CLI refuses to judge (see :func:`main`).
+EXECUTION, EXPRESSION = CLASS_VALUES if len(CLASS_VALUES) == 2 else (None, None)
+MIXED_ORACLE = BASIS_VALUES[2] if len(BASIS_VALUES) > 2 else None
+DEFAULT_CLASS = EXECUTION
 
 # Anti-vacuous floors: measured constants (2026-10-24), never derived at runtime.
 FLOOR_COMMANDS = 27
@@ -117,7 +144,11 @@ SKILL_LAYERS = ("external", "internal")
 
 LEDGER_SECTION_KEYWORD = "逐流程台账"
 NEUTRAL_SECTION_KEYWORD = "类中立清单"
-REQUIRED_LEDGER_COLUMNS = ("unit_id", CLASS_KEY, "basis", "neutral")
+# ``REQUIRED_LEDGER_COLUMNS`` is NOT defined here: feature 084 batch 1 row 7 moved the ledger's
+# required column set to ``shared/declarations/facts/flow-class-ledger-columns.yaml`` and the read at
+# the top of this module binds the same ordered tuple the header check compared before (T012). A
+# local re-assignment would shadow that read and put the second copy back — this module refuses to
+# judge when the read is empty (see :func:`main`), so no local fallback belongs here either.
 REQUIRED_NEUTRAL_COLUMNS = ("unit_id", "category", "rationale")
 
 UNIT_ID_RE = re.compile(r"^(?:/speckit\.[a-z0-9][a-z0-9-]*|skill:[a-z0-9][a-z0-9-]*)$")
@@ -878,15 +909,9 @@ DECLARATION_ABSENT = "declaration-absent"
 # closed-set and only meaningful for ``expression`` lines; an ``execution`` line
 # may carry only the explicit ``-``. Extending the set is an owner revision.
 FLOW_TYPE_KEY = "flow_type"
-FLOW_TYPE_NONE = "-"
-FLOW_TYPE_VALUES = (
-    "technique-document",
-    "user-manual",
-    "reference",
-    "runbook",
-    "design-note",
-    FLOW_TYPE_NONE,
-)
+#: Feature 084, batch 1 row 6: the document-type closed set is declared; `-` is its last member.
+FLOW_TYPE_VALUES, FLOW_TYPE_LABEL = declared_sequence("flow-class-document-types")
+FLOW_TYPE_NONE = FLOW_TYPE_VALUES[-1] if FLOW_TYPE_VALUES else None
 FLOW_TYPE_LINE_RE = re.compile(r"^\*\*Flow Type\*\*: ([^\s]+)$")
 FLOW_TYPE_PROBE_RE = re.compile(r"^\s*\*\*\s*flow\s+type\s*\*\*", re.IGNORECASE)
 
@@ -2661,6 +2686,19 @@ def main(argv=None) -> int:
     repo = Path(args.repo).expanduser().resolve() if args.repo else find_repo_root()
     if not repo.is_dir():
         print("repository root is not a directory: %s" % repo, file=sys.stderr)
+        return 2
+
+    # Feature 084 / FR-012: the closed sets this engine compares against are declarations. A project
+    # whose layer is missing cannot be judged — and MUST NOT be judged against values this script no
+    # longer carries — so the degradation is an explicit exit-2 label naming each unreadable fact,
+    # never a traceback and never a green verdict (C-049).
+    labels = [label for label in (CLASS_VALUES_LABEL, BASIS_VALUES_LABEL, NEUTRAL_CATEGORIES_LABEL,
+                                 LEDGER_COLUMNS_LABEL, FLOW_TYPE_LABEL) if label]
+    if labels:
+        for label in labels:
+            print(label, file=sys.stderr)
+        print("flow-class-check: refusing to judge against an absent closed set "
+              "(declaration layer unreadable)", file=sys.stderr)
         return 2
 
     if args.action == "lookup":

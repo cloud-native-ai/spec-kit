@@ -122,8 +122,10 @@ The canonical Reflect step (`.specify/shared/workflow/feedback-step.md`) include
 
 ## Threshold behavior
 
-Entries accumulate across runs. The threshold defaults to **10** (overridable via
-`--threshold` or `SPECKIT_FEEDBACK_THRESHOLD`). Only an **explicit** `--threshold`
+Entries accumulate across runs. The threshold's default value is owned by
+`shared/declarations/facts/feedback-prompt-threshold.yaml#/statement` (this page states no number of its
+own; the framework source form is the one to read), and it is overridable via
+`--threshold` or `SPECKIT_FEEDBACK_THRESHOLD`. Only an **explicit** `--threshold`
 that differs from the stored value is persisted — into `state/threshold.json`
 (req 055; env/CLI resolution stays ephemeral). When
 `count_since_submission >= threshold`, `record`/`status` return `should_prompt: true`,

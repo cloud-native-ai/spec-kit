@@ -1,0 +1,495 @@
+# test runner: python3 -m pytest -q tests/contract/test_mirror_parity_suite.py tests/contract/test_scripts_distribution_parity.py
+# disclosed supplemental run — NOT part of selected_paths[]
+# start_epoch: 1793881229
+# end_epoch: 1793881230
+# exit_status: 1
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 27%]
+........................................................................ [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 55%]
+.........F.F............................................................ [ 65%]
+........................................................................ [ 74%]
+........................................................................ [ 83%]
+............F..F..FF...F........................FFFFFFFFF....FF.F......F [ 92%]
+..............................F....F..................F                  [100%]
+=================================== FAILURES ===================================
+_ test_mirror_file_byte_identical[skills/internal/collect-evidence/SKILL.md->.specify/skills/internal/collect-evidence/SKILL.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/internal'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal'), PosixPath('collect-evidence/SKILL.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/internal/collect-evidence/SKILL.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'---\nname: ...ints here)"\n' == b'---\nname: ...ints here)"\n'
+E         
+E         At index 1831 diff: b'h' != b'e'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[skills/internal/collect-evidence/references/evidence-discipline.md->.specify/skills/internal/collect-evidence/references/evidence-discipline.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/internal'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal'), PosixPath('collect-evidence/references/evidence-discipline.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/skills/internal/collect-evidence/references/evidence-discipline.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Evidence ...xe3\x80\x82\n' == b'# Evidence ...xe3\x80\x82\n'
+E         
+E         At index 226 diff: b'(' != b'\xe3'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[scripts/python/declaration_reader.py->.specify/scripts/python/declaration_reader.py] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts'), PosixPath('python/declaration_reader.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/scripts/python/declaration_reader.py (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts/python/declaration_reader.py').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[scripts/python/evidence-utils.py->.specify/scripts/python/evidence-utils.py] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts'), PosixPath('python/evidence-utils.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/scripts/python/evidence-utils.py (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 554 diff: b'#' != b'S'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[scripts/python/feedback-utils.py->.specify/scripts/python/feedback-utils.py] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts'), PosixPath('python/feedback-utils.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/scripts/python/feedback-utils.py (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 3965 diff: b'#' != b'F'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[scripts/python/flow-class-check.py->.specify/scripts/python/flow-class-check.py] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts'), PosixPath('python/flow-class-check.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/scripts/python/flow-class-check.py (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'#!/usr/bin/...xit(main())\n' == b'#!/usr/bin/...xit(main())\n'
+E         
+E         At index 5224 diff: b'D' != b'E'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[scripts/python/harness-triple-check.py->.specify/scripts/python/harness-triple-check.py] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/scripts'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts'), PosixPath('python/harness-triple-check.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/scripts/python/harness-triple-check.py (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/scripts/python/harness-triple-check.py').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/contract.yaml->.specify/shared/declarations/contract.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/contract.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/contract.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/contract.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/evidence-lanes.yaml->.specify/shared/declarations/facts/evidence-lanes.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/evidence-lanes.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/evidence-lanes.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/evidence-lanes.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/evidence-seven-states.yaml->.specify/shared/declarations/facts/evidence-seven-states.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/evidence-seven-states.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/evidence-seven-states.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/evidence-seven-states.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/feedback-prompt-threshold.yaml->.specify/shared/declarations/facts/feedback-prompt-threshold.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/feedback-prompt-threshold.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/feedback-prompt-threshold.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/feedback-prompt-threshold.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/flow-class-basis.yaml->.specify/shared/declarations/facts/flow-class-basis.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/flow-class-basis.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-basis.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-basis.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/flow-class-classes.yaml->.specify/shared/declarations/facts/flow-class-classes.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/flow-class-classes.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-classes.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-classes.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/flow-class-document-types.yaml->.specify/shared/declarations/facts/flow-class-document-types.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/flow-class-document-types.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-document-types.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-document-types.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/flow-class-ledger-columns.yaml->.specify/shared/declarations/facts/flow-class-ledger-columns.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/flow-class-ledger-columns.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-ledger-columns.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-ledger-columns.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/declarations/facts/flow-class-neutral-categories.yaml->.specify/shared/declarations/facts/flow-class-neutral-categories.yaml] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('declarations/facts/flow-class-neutral-categories.yaml'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-neutral-categories.yaml (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/declarations/facts/flow-class-neutral-categories.yaml').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/definitions/flow-class-definitions.md->.specify/shared/definitions/flow-class-definitions.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('definitions/flow-class-definitions.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/shared/definitions/flow-class-definitions.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Flow Clas...xe3\x80\x82\n' == b'# Flow Clas...xe3\x80\x82\n'
+E         
+E         At index 800 diff: b'*' != b'\xe5'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[shared/definitions/framework-map.md->.specify/shared/definitions/framework-map.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('definitions/framework-map.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/shared/definitions/framework-map.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b"# Spec Kit ...workflow/`.\n" == b"# Spec Kit ...workflow/`.\n"
+E         
+E         At index 3786 diff: b'D' != b'F'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[shared/definitions/harness-triple-definitions.md->.specify/shared/definitions/harness-triple-definitions.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('definitions/harness-triple-definitions.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/harness-triple-definitions.md (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared/definitions/harness-triple-definitions.md').is_file
+
+tests/contract/test_mirror_parity_suite.py:80: AssertionError
+_ test_mirror_file_byte_identical[shared/guidelines/better-harness.md->.specify/shared/guidelines/better-harness.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('guidelines/better-harness.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/shared/guidelines/better-harness.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Better Ha...7\x8e\xb0 |\n' == b'# Better Ha...7\x8e\xb0 |\n'
+E         
+E         At index 4840 diff: b'\xe6' != b'`'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[shared/workflow/evidence-step.md->.specify/shared/workflow/evidence-step.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('workflow/evidence-step.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/shared/workflow/evidence-step.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Canonical...xe3\x80\x82\n' == b'# Canonical...xe3\x80\x82\n'
+E         
+E         At index 4208 diff: b'N' != b's'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+_ test_mirror_file_byte_identical[shared/workflow/feedback-step.md->.specify/shared/workflow/feedback-step.md] _
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/shared'), PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/shared'), PosixPath('workflow/feedback-step.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+        assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+>       assert (src / rel).read_bytes() == mirror.read_bytes(), (
+            f"mirror drift: {mirror.relative_to(REPO_ROOT)} "
+            "(engine compare_pair DIFF; sync fix owned by 067 T023)"
+        )
+E       AssertionError: mirror drift: .specify/shared/workflow/feedback-step.md (engine compare_pair DIFF; sync fix owned by 067 T023)
+E       assert b'# Canonical...nt default.\n' == b'# Canonical...HRESHOLD`).\n'
+E         
+E         At index 24817 diff: b'e' != b'r'
+E         Use -v to get more diff
+
+tests/contract/test_mirror_parity_suite.py:81: AssertionError
+___ TestScriptsDistributionParity.test_repo_has_no_orphan_or_drifted_scripts ___
+
+self = <contract.test_scripts_distribution_parity.TestScriptsDistributionParity object at 0x7faad2042810>
+
+    def test_repo_has_no_orphan_or_drifted_scripts(self):
+        """The live gate: every .specify/scripts file has a canonical source."""
+        result = subprocess.run(
+            [sys.executable, str(ENGINE), "--check"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+>       assert result.returncode == 0, (
+            "sync-mirrors.py --check failed.\n"
+            "An ORPHAN line means a mirror-only file that `specify init` can never "
+            "distribute: either add the canonical source (e.g. scripts/bash/<name>.sh) "
+            "or delete the mirror copy.\n"
+            "A DIFF/MISS line means the mirror drifted: run "
+            "`python3 scripts/python/sync-mirrors.py --write`.\n\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: sync-mirrors.py --check failed.
+E         An ORPHAN line means a mirror-only file that `specify init` can never distribute: either add the canonical source (e.g. scripts/bash/<name>.sh) or delete the mirror copy.
+E         A DIFF/MISS line means the mirror drifted: run `python3 scripts/python/sync-mirrors.py --write`.
+E         
+E         stdout:
+E         OK: all per-tool command copies match the source templates.
+E         ok    templates/ == .specify/templates/ (22 files)
+E         ok    skills/external/ == .specify/skills/ (409 files)
+E         DIFF  .specify/skills/internal/collect-evidence/SKILL.md
+E         DIFF  .specify/skills/internal/collect-evidence/references/evidence-discipline.md
+E         ok    agents/ == .specify/agents/templates/ (3 files)
+E         MISS  .specify/scripts/python/declaration_reader.py
+E         MISS  .specify/scripts/python/harness-triple-check.py
+E         DIFF  .specify/scripts/python/evidence-utils.py
+E         DIFF  .specify/scripts/python/feedback-utils.py
+E         DIFF  .specify/scripts/python/flow-class-check.py
+E         MISS  .specify/shared/declarations/contract.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-lanes.yaml
+E         MISS  .specify/shared/declarations/facts/evidence-seven-states.yaml
+E         MISS  .specify/shared/declarations/facts/feedback-prompt-threshold.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-basis.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-classes.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-document-types.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-ledger-columns.yaml
+E         MISS  .specify/shared/declarations/facts/flow-class-neutral-categories.yaml
+E         MISS  .specify/shared/definitions/harness-triple-definitions.md
+E         DIFF  .specify/shared/definitions/flow-class-definitions.md
+E         DIFF  .specify/shared/definitions/framework-map.md
+E         DIFF  .specify/shared/guidelines/better-harness.md
+E         DIFF  .specify/shared/workflow/evidence-step.md
+E         DIFF  .specify/shared/workflow/feedback-step.md
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E         stderr:
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py',...y/shared/workflow/feedback-step.md\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_scripts_distribution_parity.py:80: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/collect-evidence/SKILL.md->.specify/skills/internal/collect-evidence/SKILL.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/collect-evidence/references/evidence-discipline.md->.specify/skills/internal/collect-evidence/references/evidence-discipline.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/declaration_reader.py->.specify/scripts/python/declaration_reader.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/evidence-utils.py->.specify/scripts/python/evidence-utils.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/feedback-utils.py->.specify/scripts/python/feedback-utils.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/flow-class-check.py->.specify/scripts/python/flow-class-check.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/harness-triple-check.py->.specify/scripts/python/harness-triple-check.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/contract.yaml->.specify/shared/declarations/contract.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/evidence-lanes.yaml->.specify/shared/declarations/facts/evidence-lanes.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/evidence-seven-states.yaml->.specify/shared/declarations/facts/evidence-seven-states.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/feedback-prompt-threshold.yaml->.specify/shared/declarations/facts/feedback-prompt-threshold.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/flow-class-basis.yaml->.specify/shared/declarations/facts/flow-class-basis.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/flow-class-classes.yaml->.specify/shared/declarations/facts/flow-class-classes.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/flow-class-document-types.yaml->.specify/shared/declarations/facts/flow-class-document-types.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/flow-class-ledger-columns.yaml->.specify/shared/declarations/facts/flow-class-ledger-columns.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/facts/flow-class-neutral-categories.yaml->.specify/shared/declarations/facts/flow-class-neutral-categories.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/flow-class-definitions.md->.specify/shared/definitions/flow-class-definitions.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/framework-map.md->.specify/shared/definitions/framework-map.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/harness-triple-definitions.md->.specify/shared/definitions/harness-triple-definitions.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/guidelines/better-harness.md->.specify/shared/guidelines/better-harness.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/workflow/evidence-step.md->.specify/shared/workflow/evidence-step.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/workflow/feedback-step.md->.specify/shared/workflow/feedback-step.md]
+FAILED tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+23 failed, 752 passed, 1 warning in 1.07s

@@ -476,3 +476,179 @@ def test_the_shared_read_entry_is_the_only_subset_parser():
         % sorted(found - {SHARED_READ_ENTRY} - set(GRANDFATHERED)))
     for path, reason in GRANDFATHERED.items():
         assert "N4" in reason, "%s is allowlisted without its N4 reason" % path
+
+
+# --------------------------------------------------------------------------- #
+# migration legs (T008–T014): one declaration, one read point, one pointer
+# --------------------------------------------------------------------------- #
+#: The facts T008–T014 migrate, each with the three things C-047's steps 3–5 leave behind: an engine
+#: that holds a locatable read point and no longer declares the value itself, carriers that point at the
+#: declaration, and one declaration file. The rows are the *reading*, not a second roster: the roster is
+#: `contracts/migration-batches.contract.md` C-042 / C-044, and this table quotes the slugs it names.
+#:
+#: `inline` holds the source patterns that MUST be gone once the fact is declared. They are the engine
+#: side's former shape, so a re-introduced copy fails here instead of drifting silently (C-048 (c)).
+MIGRATED = {
+    "feedback-prompt-threshold": {
+        "kind": "threshold",
+        "engines": ["scripts/python/feedback-utils.py"],
+        "carriers": ["shared/workflow/feedback-step.md"],
+        "inline": [r"^DEFAULT_THRESHOLD\s*="],
+    },
+    "evidence-seven-states": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/evidence-utils.py"],
+        "carriers": ["skills/internal/collect-evidence/references/evidence-discipline.md",
+                     "shared/guidelines/better-harness.md"],
+        "inline": [r"^SEVEN_STATES\s*="],
+    },
+    "evidence-lanes": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/evidence-utils.py"],
+        "carriers": ["shared/workflow/evidence-step.md",
+                     "skills/internal/collect-evidence/SKILL.md"],
+        "inline": [r"^LANE_NAMES\s*="],
+    },
+    "flow-class-classes": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/definitions/flow-class-definitions.md"],
+        "inline": [r"^CLASS_VALUES\s*="],
+    },
+    "flow-class-basis": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/definitions/flow-class-definitions.md"],
+        "inline": [r"^BASIS_VALUES\s*="],
+    },
+    "flow-class-document-types": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/definitions/flow-class-definitions.md"],
+        "inline": [r"^FLOW_TYPE_VALUES\s*="],
+    },
+    "flow-class-ledger-columns": {
+        "kind": "ordered-operator-table",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/definitions/flow-class-definitions.md"],
+        "inline": [r"^REQUIRED_LEDGER_COLUMNS\s*="],
+    },
+    "flow-class-neutral-categories": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/definitions/flow-class-definitions.md"],
+        "inline": [r"^NEUTRAL_CATEGORIES\s*="],
+    },
+    "success-criterion-path-values": {
+        "kind": "closed-set",
+        "engines": ["scripts/python/validate-requirements.py",
+                    "scripts/python/closure-acceptance-check.py"],
+        "carriers": ["shared/workflow/acceptance-hardening.md",
+                     "templates/commands/requirements.md",
+                     "skills/internal/create-requirements/SKILL.md"],
+        "inline": [r"^PATH_VALUES\s*=", r'^\s*if value not in \("final", "supporting"\)'],
+    },
+    "expression-gate-faces": {
+        "kind": "mapping",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/workflow/expression-gates.md"],
+        "inline": [r"^FACES_EXPECTED\s*="],
+    },
+    "expression-stage-operator-table": {
+        "kind": "ordered-operator-table",
+        "engines": ["scripts/python/flow-class-check.py"],
+        "carriers": ["shared/workflow/expression-gates.md"],
+        "inline": [r'^    required = \("阶段"'],
+    },
+    "driver-stage-sequence": {
+        "kind": "ordered-operator-table",
+        "engines": ["skills/external/sdd-loop-driver/scripts/loop-state.py"],
+        "carriers": ["skills/external/sdd-loop-driver/SKILL.md"],
+        "inline": [],
+    },
+    "driver-stage-artifacts": {
+        "kind": "mapping",
+        "engines": ["skills/external/sdd-loop-driver/scripts/loop-state.py"],
+        "carriers": ["skills/external/sdd-loop-driver/references/dispatch-recipes.md"],
+        "inline": [],
+    },
+    "driver-completion-sentinels": {
+        "kind": "mapping",
+        "engines": ["skills/external/sdd-loop-driver/scripts/loop-state.py"],
+        "carriers": ["skills/external/sdd-loop-driver/SKILL.md"],
+        "inline": [r'^    return "%s-DONE" % str\(stage\)\.upper\(\)'],
+    },
+    "driver-gate-roster": {
+        "kind": "mapping",
+        "engines": ["skills/external/sdd-loop-driver/scripts/pre-analyze-check.py"],
+        "carriers": ["skills/external/sdd-loop-driver/references/dispatch-recipes.md"],
+        "inline": [],
+    },
+}
+
+#: The rows above this part has actually migrated: C-042 rows 1–8, closed by T008–T012. The roster's
+#: remaining rows keep their shape in ``MIGRATED`` but are deliberately **not asserted yet** —
+#: ``success-criterion-path-values`` is T013's, batch 2 is T014–T015's and batch 3 is T016's. C-046 (and
+#: DoD-5 after it) makes each batch independently acceptable: "an unfinished batch k+1 MUST NOT be
+#: reported as a failure of batch k". A leg parametrized over an un-migrated row would report exactly
+#: that — a red id owned by a task that has not run — so the parametrization reads this tuple and each
+#: later task appends its slugs as it closes them.
+MIGRATED_SO_FAR = (
+    "feedback-prompt-threshold",
+    "evidence-seven-states",
+    "evidence-lanes",
+    "flow-class-classes",
+    "flow-class-basis",
+    "flow-class-document-types",
+    "flow-class-ledger-columns",
+    "flow-class-neutral-categories",
+)
+
+
+@pytest.mark.parametrize("slug", sorted(MIGRATED_SO_FAR))
+def test_a_migrated_fact_has_one_declaration_with_the_required_keys(slug):
+    """C-047 step 2 / C-003 / C-004 — one file, the slug as identity, the required keys present."""
+    row = MIGRATED[slug]
+    path = ROOT / "shared" / "declarations" / "facts" / (slug + ".yaml")
+    assert path.is_file(), "no declaration for %s" % slug
+    text = path.read_text(encoding="utf-8")
+    assert re.search(r"^fact:\s*%s$" % re.escape(slug), text, re.M), (
+        "%s: the `fact:` key must equal the file stem" % slug)
+    assert re.search(r"^kind:\s*%s$" % re.escape(row["kind"]), text, re.M), (
+        "%s: kind must be declared as %s" % (slug, row["kind"]))
+    for key in ("statement", "consumers", "former_carriers"):
+        assert re.search(r"^%s:" % key, text, re.M), "%s: missing required key %s" % (slug, key)
+
+
+@pytest.mark.parametrize("slug", sorted(MIGRATED_SO_FAR))
+def test_a_migrated_fact_keeps_a_locatable_read_point_and_drops_the_inline_copy(slug):
+    """C-047 step 3 / C-048 (c) — the engine names the read entry and the slug; the constant is gone."""
+    row = MIGRATED[slug]
+    for engine in row["engines"]:
+        text = (ROOT / engine).read_text(encoding="utf-8")
+        assert "declaration_reader" in text, "%s does not read through the shared entry" % engine
+        assert slug in text, "%s does not name the fact it reads (%s)" % (engine, slug)
+        for pattern in row["inline"]:
+            assert not re.search(pattern, text, re.M), (
+                "%s still declares %s inline (%s)" % (engine, slug, pattern))
+
+
+@pytest.mark.parametrize("slug", sorted(MIGRATED_SO_FAR))
+def test_a_migrated_fact_carrier_points_at_the_declaration(slug):
+    """C-047 step 4 — the carrier reaches the value by `<path>#/<key-path>`, it does not restate it."""
+    row = MIGRATED[slug]
+    pointer = "shared/declarations/facts/%s.yaml#/" % slug
+    for carrier in row["carriers"]:
+        text = (ROOT / carrier).read_text(encoding="utf-8")
+        assert pointer in text, "%s carries no pointer to %s" % (carrier, slug)
+
+
+def test_the_declaration_layer_parses_without_an_input_error():
+    """The whole layer must stay schema- and subset-clean as rows land (C-004 / C-008).
+
+    Exit 0 and 1 are both readings about *dispositions* (a tree with unmigrated units exits 1, C-043);
+    exit 2 is the layer itself being unreadable, which no migration row may cause.
+    """
+    rc, out, err = run(ROOT, "--action", "coverage")
+    assert rc in (0, 1), "the declaration layer is not readable\n%s\n%s" % (out, err)
+    assert "input-error" not in err, err

@@ -25,7 +25,7 @@ classification: internal
 从用户输入解析:
 
 - **目标单元**(必填):`skill:<name>` / `/speckit.<cmd>` / `project`(整仓;缺省值)
-- **泳道**:`session,project,assets,runs,feedback` 的子集或 `all`(缺省 all)
+- **泳道**:`shared/declarations/facts/evidence-lanes.yaml#/statement` 所列泳道的子集,或 `all`(缺省 all;成员与次序由该声明单一拥有,本行不重列)
 - **时间窗**:`--since/--until`(ISO 8601,可缺省)
 - **深度**:`quick|normal`(缺省 normal;normal 含依赖治理信号)
 - **平台**:`qoder|codex|claude|...`(缺省 qoder;影响 session/assets 泳道)
@@ -45,7 +45,7 @@ python3 .specify/scripts/python/evidence-utils.py --action collect \
   --target <unit-id> --lanes <lanes> [--since ... --until ...] [--depth ...] [--platform ...]
 ```
 
-呈现采集结果:run 目录路径、各泳道状态(available/partial/unavailable)、证据条数、findingsDigest,以及**按 evidenceState 分布的摘要**(七态各多少条)。单泳道失败是显式降级而非错误——manifest 中带 reason,照常继续。
+呈现采集结果:run 目录路径、各泳道状态(available/partial/unavailable)、证据条数、findingsDigest,以及**按 evidenceState 分布的摘要**(每个 declared state 各多少条;状态成员由 `shared/declarations/facts/evidence-seven-states.yaml#/statement` 单一拥有,语义由 `references/evidence-discipline.md` 拥有)。单泳道失败是显式降级而非错误——manifest 中带 reason,照常继续。
 
 复用场景:目标单元 7 天内已有证据时可先 `--action latest`;返回 `stale: true` 时必须向用户转述超龄警告,由用户决定复用或重采。
 
