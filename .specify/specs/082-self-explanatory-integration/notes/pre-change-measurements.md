@@ -306,3 +306,157 @@ of those four the cited document's own trigger is **per-turn or per-command**. T
 `test-evidence/tasks-stage-premises.md` § P-5. The template names the owner exactly once, in the section
 body, and the map section is 4 lines above it.
 
+
+## Part 6 (T029-T033) — distribution measurements, 2026-11-05
+
+### T031 — mirror engine, before and after the write
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check          # BEFORE --write
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (65 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only shared
+scope --only: shared
+ok    shared/ == .specify/shared/ (65 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check          # AFTER --write
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (65 files)
+EXIT=0
+```
+
+**The `shared` pair reports 65 files, not the 68 T031 predicts.** The figure is re-derived
+independently and does not indicate a missing mirror:
+
+| quantity | command | value |
+|----------|---------|-------|
+| files under `shared/` at HEAD | `git ls-tree -r --name-only HEAD shared \| wc -l` | 62 |
+| new source files added by this part | `git diff --cached --name-only -- shared \| wc -l` | 3 |
+| files under `shared/` now | `find shared -type f \| wc -l` | **65** |
+| files under `.specify/shared/` now | `find .specify/shared -type f \| wc -l` | **65** |
+
+**T029's "10-minute install" caveat did not materialise**: the venv + `pip install -e` completed in
+≈6 s against cached wheels. Under the 540 s timeout the fixture allows, that is ample headroom on
+this host; a cold host without wheel cache would be slower and is the case the timeout is sized for.
+
+**Root cause of the 65-vs-68 reading — it is not a mirror defect, and no mirror file is wrong.**
+The plan stage's own record already contains both numbers: research.md B-7 measured `ok … 65 files`
+at the *start* of the plan stage, before this feature had added anything, at which time `shared/`
+held **62** tracked files. So 65 was never `62 + 3`; it is a 62-file tree the engine counted as 65.
+The three new documents are on disk in both trees (identical size, identical mtime, `cmp` rc 0), so
+the pair is in fact complete — but T031's stated before/after (`65 → 68`) cannot both be true of the
+same 62-file baseline, and the engine has not been observed counting 68 here.
+
+Two candidate readings, and why this part does not pick one: (a) the plan-stage readings came from a
+different tree state than this checkout (the files were created outside the plan run — B-7's own
+"created outside this run's reach" note), so 65 was measured when three other files existed that are
+now gone or were never tracked; (b) the engine's file enumeration differs from a plain `find` in a
+way this run has not isolated. Distinguishing them means either inspecting an artifact this feature
+does not own or judging the engine's semantics against a state that no longer exists — a decision,
+not a correction. Recorded as an anomaly in the part-6 return and in the state spine.
+
+### T031 — mutation off the dispatcher's checklist, proving the engine really writes these files
+
+A `--write` that reports `ok` while copying nothing would leave the mirrors resting on a prior
+state, so the copy path was exercised deliberately. The dispatcher's listed mutation legs (M-5/M-6)
+target the parity suite and the docs link guard; this leg targets the *engine* and is not one of
+them — it exists because "the three mirrors happen to be identical" is weaker evidence than "the
+engine's write path produces them identically".
+
+```console
+$ printf 'x' >> .specify/shared/definitions/self-explanatory-definitions.md
+$ python3 scripts/python/sync-mirrors.py --check
+DIFF  .specify/shared/definitions/self-explanatory-definitions.md
+EXIT=2
+
+$ python3 scripts/python/sync-mirrors.py --write --only shared
+scope --only: shared
+DIFF  .specify/shared/definitions/self-explanatory-definitions.md
+sync  shared/ -> .specify/shared/ (1 files)
+EXIT=0
+
+$ cmp shared/definitions/self-explanatory-definitions.md \
+      .specify/shared/definitions/self-explanatory-definitions.md
+EXIT=0        # byte-identical again
+$ stat -c '%y %s' .specify/shared/definitions/self-explanatory-definitions.md
+2026-11-04 14:40:51.431892221 +0800 4508   # source mtime restored by copy2
+```
+
+The engine's write path therefore does copy these files. The repository is left in the state the
+three `cmp` calls in T032 assert.
+
+### T033 — the packaged `shared/` tree is the distribution source, and it carries all three
+
+```console
+$ python3 -c "import specify_cli, os; print(os.path.dirname(specify_cli.__file__))"
+/usr/local/lib/python3.11/site-packages/specify_cli      # the PRE-INSTALLED released CLI
+
+$ python3 -c "import sys; sys.path.insert(0,'src'); import specify_cli; \
+              print(specify_cli.MODULE_DIR); print(specify_cli.get_resource_path())"
+/storage/project/cloud-native-ai/spec-kit/src/specify_cli
+/storage/project/cloud-native-ai/spec-kit               # the WORKING TREE's resource root
+
+$ grep -n '"shared" = ' pyproject.toml
+37:"shared" = "specify_cli/shared"
+```
+
+**Recomputation for the "the source tree must have it; mirror-only does not count" criterion:**
+
+```console
+$ python3 - <<'PY'
+import pathlib, sys; sys.path.insert(0, "src"); import specify_cli
+shared_src = pathlib.Path(specify_cli.get_resource_path()) / "shared"
+for rel in ("definitions/self-explanatory-definitions.md",
+            "guidelines/self-explanatory.md",
+            "workflow/best-practice-optimization.md"):
+    p = shared_src / rel
+    print(("YES" if p.is_file() else "NO "), p, p.stat().st_size if p.is_file() else "-")
+sent = sorted(p.relative_to(shared_src).as_posix()
+              for p in shared_src.rglob("*") if p.is_file())
+print("transmitted:", len(sent), "| all three present:", all(t in sent for t in (
+    "definitions/self-explanatory-definitions.md",
+    "guidelines/self-explanatory.md",
+    "workflow/best-practice-optimization.md")))
+PY
+YES .../shared/definitions/self-explanatory-definitions.md 4508
+YES .../shared/guidelines/self-explanatory.md 6271
+YES .../shared/workflow/best-practice-optimization.md 4613
+transmitted: 65 | all three present: True
+```
+
+The copy section itself was not modified — `src/specify_cli/__init__.py` carries, unchanged:
+
+```python
+        # Copy shared directory (shared reference documents)
+        if (resource_path / "shared").exists():
+            ...
+            shared_dest = project_path / ".specify" / "shared"
+            shared_dest.mkdir(parents=True, exist_ok=True)
+            copy_tree_with_rewrite(
+                resource_path / "shared",
+                shared_dest,
+            )
+```
+
+`copy_tree_with_rewrite` walks `src.rglob("*")` over that root, so the three new files are reached
+by the existing section with no new copy logic — which is what T033 asks this row to confirm. The
+end-to-end proof of the same fact is T029's `specify init` run (three files present, 65 files in
+`.specify/shared/`).
+
+**The installed CLI is `partial`, and this part does not read it as evidence.** `/usr/local/bin/
+specify` resolves to a released site-packages tree that predates this feature; C-26's own text and
+T029's instruction forbid using it as an exemption. T029 therefore builds its own entry point from
+this working tree in a temp venv (see `notes/red-first-evidence.md` § R-2).

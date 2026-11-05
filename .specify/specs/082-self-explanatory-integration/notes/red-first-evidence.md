@@ -64,7 +64,7 @@ replacement red.
 | Pair | Red captured | Green expected at | Status in part 1 |
 |------|--------------|-------------------|------------------|
 | R-1 C-1 template carries the principle | yes (above) | T015 (US1) | **CLOSED** — see R-1-GREEN below |
-| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | NOT STARTED |
+| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | CLOSED in part 6 — see § R-2 (row kept as the historical snapshot of this part) |
 | R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
 
 The closing pass is `tasks.md` T051, which owns the pairing cleanup. This file is the fixed landing
@@ -207,7 +207,7 @@ green for the wrong reason.
 
 | Pair | Red captured | Green expected at | Status |
 |------|--------------|-------------------|--------|
-| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | NOT STARTED |
+| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | CLOSED in part 6 — see § R-2 (row kept as the historical snapshot of this part) |
 | R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
 | C-21 instructions summary | declared red (part 2) | T024 (US2) | OPEN — green belongs to T024 |
 | R-4 C-10/C-11/C-14 | this section | T024's reconcile / T027's M-3 | RED CAPTURED |
@@ -335,8 +335,106 @@ parts", not as "the reconcile turned it green". The command and output are in
 | R-1 C-1 template carries the principle | yes (part 1) | T015 (US1) | CLOSED |
 | C-21 instructions summary | yes (part 4) | T024 (US2) | **CLOSED** (this part) |
 | R-4 C-10/C-11/C-14 | yes (part 4) | T024's reconcile / T027's M-3 | **CLOSED** — C-10/C-11/C-14 green at part 4 after T022, M-3 now proves the template side can go red |
-| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | NOT STARTED |
+| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | CLOSED in part 6 — see § R-2 (row kept as the historical snapshot of this part) |
 | R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
 
 T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.
 
+
+## R-2 — the distribution chain, red then green (part 6, T029-T031)
+
+R-2 was carried as `NOT STARTED` through five parts because its subject (the documents reaching a
+client project) only became testable once T030 tracked the sources. It splits into three assertions
+that each need their own red and green — a presence check that was never red proves as little as a
+mirror `cmp` that was never run.
+
+### R-2a — the mirror pair: RED was measured by the plan stage, GREEN by this part
+
+The RED half is not this run's own transcript, and is not presented as such. research.md B-1 records
+the stage-start reading of the same command:
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check          # plan-stage B-1, before the mirrors existed
+MISS  .specify/shared/definitions/self-explanatory-definitions.md
+MISS  .specify/shared/guidelines/self-explanatory.md
+MISS  .specify/shared/workflow/best-practice-optimization.md
+EXIT=2
+```
+
+The GREEN half, this part:
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check
+ok    shared/ == .specify/shared/ (65 files)
+EXIT=0
+```
+
+The pair is closed on the same three subjects: the three `MISS` lines B-1 recorded are exactly the
+three `cmp rc=0` pairs of T032. The engine-level red was additionally re-created by this part (`printf
+'x' >>` one mirror → `DIFF` + `EXIT=2` → `--write` → `sync … (1 files)` → `cmp rc=0`); that transcript
+is in `notes/pre-change-measurements.md` § "T031 — mutation off the dispatcher's checklist".
+
+### R-2b — C-26's distribution assertion: red proven by removal, green by construction
+
+`test_self_explanatory_distribution.py` judges C-26 in two layers (the entry point's resource root;
+`specify init` into a temp project). Both were made to go red on their own subject:
+
+```console
+$ mv shared/workflow/best-practice-optimization.md /tmp/<scratch>/hidden.md   # one document removed
+$ python3 -m pytest tests/contract/test_self_explanatory_distribution.py -q
+FAILED …::test_c26_specify_init_distributes_the_three_documents
+FAILED …::test_c26_entry_point_resource_root_carries_the_three_documents
+2 failed, 2 passed
+EXIT=1
+
+  AssertionError: the entry point's resource root does not carry:
+    .specify/shared/workflow/best-practice-optimization.md
+    layout: editable install (resource root == MODULE_DIR.parent.parent, the repo root)
+
+$ mv /tmp/<scratch>/hidden.md shared/workflow/best-practice-optimization.md
+$ sha256sum -c before.sha256 && diff -r shared /tmp/<scratch>/shared-copy
+3 OK / diff empty → TREE-RESTORED-IDENTICAL
+$ python3 -m pytest tests/contract/test_self_explanatory_distribution.py -q
+4 passed
+EXIT=0
+```
+
+The red names the one document that was removed, and the third assertion
+(`test_c26_an_absent_document_fails_this_clause`) is an anti-vacuity companion: it asserts the
+presence check reports exactly the missing entry, so a typo in the subject list or an always-true
+file test cannot keep C-26 green on a broken tree.
+
+Two things the red exposed, both repaired in passing and disclosed:
+
+1. **A wrong premise in this part's own first attempt.** Layer 3 initially skipped (reporting
+   `ANOMALY:`) when the editable install's resource root differed from `MODULE_DIR`. The measured
+   layout is that an editable install leaves `specify_cli.__file__` under `<repo>/src/` while the
+   build materialises `<repo>/src/specify_cli/{templates,shared,…}` as a sibling, so
+   `get_resource_path()` returns `MODULE_DIR.parent.parent`. Skipping made the strongest layer
+   unjudged on the very host that runs the suite; the two-layout branch replaces it, and a third
+   value still fails rather than skips.
+2. **`importlib` by-path loading does not work for this module.** `src/specify_cli/__init__.py`
+   carries package-relative imports (`from . import _provenance`), so the by-path idiom used by the
+   mirror-parity suite raises `ModuleNotFoundError` here. The module uses the `sys.path` + plain
+   `import specify_cli` idiom that `test_upgrade_end_state.py` already established, and asserts the
+   import really came from this working tree.
+
+### R-2 status
+
+| half | subject | RED | GREEN | verdict |
+|------|---------|-----|-------|---------|
+| R-2a | the three mirror pairs exist and are byte-identical | B-1's three `MISS` lines (`EXIT=2`) + this part's `DIFF` reconstruction | T031/T032 (`EXIT=0`, `cmp rc=0` ×3) | CLOSED |
+| R-2b | C-26 — `specify init` distributes the three documents | removal transcript above (2 failed) | `4 passed` | CLOSED |
+
+## Pairs after part 6
+
+| Pair | Red captured | Green expected at | Status |
+|------|--------------|-------------------|--------|
+| R-1 C-1 template carries the principle | yes (part 1) | T015 (US1) | CLOSED |
+| C-21 instructions summary | yes (part 4) | T024 (US2) | CLOSED |
+| R-4 C-10/C-11/C-14 | yes (part 4) | T024 / T027 | CLOSED |
+| R-2 C-24 mirror byte parity | B-1 (plan stage) + this part's DIFF | T031/T032 | **CLOSED** (this part) |
+| R-2b C-26 distribution | this part's removal leg | T029 | **CLOSED** (this part) |
+| R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
+
+T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.

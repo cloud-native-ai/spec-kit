@@ -53,3 +53,62 @@
 [2026-11-05 13:59:49][529137][INFO]Updating symlinks for AI tools...
 success Instructions generated/updated at .specify/instructions.md
 ```
+
+## Part 6 (T032) — pairwise byte comparison of the three new mirror pairs
+
+Recorded verbatim, each command followed by its runtime exit code. `cmp` prints nothing and exits 0
+when the two files are identical.
+
+```console
+$ cmp shared/definitions/self-explanatory-definitions.md \
+      .specify/shared/definitions/self-explanatory-definitions.md
+rc=0
+$ cmp shared/guidelines/self-explanatory.md \
+      .specify/shared/guidelines/self-explanatory.md
+rc=0
+$ cmp shared/workflow/best-practice-optimization.md \
+      .specify/shared/workflow/best-practice-optimization.md
+rc=0
+```
+
+All three exit codes are 0: the three source/mirror pairs are byte-identical.
+
+Independently of `cmp`, the whole pair was compared file-by-file with `filecmp.cmp(..., shallow=False)`
+(no mtime shortcut), which found `missing_in_dst: []`, `extra_in_dst: []`, `differing: []` across
+65 source files and 65 mirror files — i.e. the three new documents are identical **and** nothing
+else in the pair drifted.
+
+## Part 6 (T029) — `specify init` from a venv built on this working tree
+
+```console
+$ python3 -m venv .venv                                          # temp dir, rc=0
+$ .venv/bin/python -m pip install -e "$(git rev-parse --show-toplevel)"
+Successfully installed specify-cli-0.0.22 … rc=0
+$ .venv/bin/python -c "import specify_cli, os; print(os.path.dirname(specify_cli.__file__))"
+/storage/project/cloud-native-ai/spec-kit/src/specify_cli
+
+$ cd client && ../.venv/bin/specify init --here --ai claude --no-git --skip-tls \
+      --ignore-agent-tools
+   ok Using local templates: shared copied
+Project ready.
+rc=0
+
+$ for p in .specify/shared/definitions/self-explanatory-definitions.md \
+           .specify/shared/guidelines/self-explanatory.md \
+           .specify/shared/workflow/best-practice-optimization.md; do
+    test -f "$p" && echo "PRESENT $p $(wc -c <"$p") B" || echo "MISSING $p"
+  done
+PRESENT .specify/shared/definitions/self-explanatory-definitions.md 4553 B
+PRESENT .specify/shared/guidelines/self-explanatory.md 6298 B
+PRESENT .specify/shared/workflow/best-practice-optimization.md 4703 B
+```
+
+The client copies are 45 B / 27 B / 90 B longer than their sources: `copy_tree_with_rewrite` rewrites
+source-form path prefixes (`shared/...` → `.specify/shared/...`) on the way, which is the expected
+transformation, not corruption — the receiving project's references must point at its own runtime
+tree. `.specify/shared/` in the client holds 65 files, matching the source tree.
+
+`--ignore-agent-tools` was added to the dispatcher's flags because this host has no `claude` agent
+CLI and `init` aborts on that check before reaching the copy step; without it the run would fail for
+a reason unrelated to distribution. The three flags the brief mandates (`--here`, `--no-git`,
+`--skip-tls`) are all present.
