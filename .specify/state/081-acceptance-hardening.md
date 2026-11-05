@@ -445,3 +445,9 @@ last_verdict: implement 081b part 3/3 HALTED @8a4e7c7c (T011 smoke 0/0; T010 che
 - Feature 081 状态：`Ready for Review`（registry + detail 一致）；SC-001/SC-002 均为 `pass`。
 - 合并：`081-acceptance-hardening` 以 **fast-forward** 合入 `master` 并推送 `gitlab/master`（`d4d60aeb`）；工作树干净。
 - 本特性（081a–081d）关闭：Phase 1–4 的更严格验收框架改进全部落地。
+
+## 081 最终验收与分支退役（2026-11-04）
+
+- 状态：`Ready for Review → Completed`（Human/governance；用户显式指令），registry `features.md` 与 detail `features/081.md` 同步。
+- 合并：`081-acceptance-hardening` 以 fast-forward 合入 `master` 并推送 `gitlab/master`。
+- 分支清理：删除本地 `081-acceptance-hardening` 与远端 `gitlab/081-acceptance-hardening`。
