@@ -8,7 +8,7 @@
 
 **Tests Mode**: ON — Constitution Principle IV "Test-First & Contract-Driven Implementation" is MUST-level ("Pure functions/utilities MUST have unit tests"; "Critical flows MUST have automated regression coverage"), and `plan.md` § D10 fixes the test surface by name (`tests/contract/test_harness_triple_structure.py` plus `tests/fixtures/harness-triple-structure/`). The **template-only gate does not apply**: Principle VII's "template-only features … judge Test-First as Partial (justified)" is scoped to features with **no executable runtime code**, and this feature ships two new stdlib-only Python modules and migrates five engines — every clause here has something to run against.
 
-**Green-point tags (`[green: <contract>#<clause>]`) are not used in this file, and the reason is measured rather than stylistic**: the five contract documents name their clauses `DS-nn` / `HC-nn` / `SR-nn` / `MB-nn` / `DM-nn`, while the clause-syntax owner (`scripts/python/clause_extract.py`, whose ids are the `C-\d+` form) classifies all five as `form_of → md-none` (measured on this branch 2026-11-05: `md-none` for each of the five, `resolvable(...) == False` for every id family). A tag on such a contract is a hard `green-dangling` ERROR, not a claim anyone can honour. Traceability therefore travels in § Traceability below — one row per task, naming the exact clause ids and the carrier — so the clause partition is stated once, not twice.
+**Green-point tags (`[green: <contract>#<clause>]`) are optional by the tasks template and are not used in this file**: the five contract documents now name their clauses `C-001…C-059` and parse as `md-bold-closed` (renumbered in `9284c789`), so the earlier `md-none` premise no longer holds. The clause partition is stated once in § Traceability below — one row per task, naming the exact clause ids and the carrier — and the coverage lane's `0/19 FRs cited from citation groups` reading is a known, non-blocking consequence of the optional tag being unused (analyze round 2 § 5.1), not a parse failure.
 
 **Organization**: four user stories in the priority order `requirements.md` gives them (US1 P1, US2 P1, US3 P2, US4 P2). Setup freezes the readings everything is compared against; Foundational builds the layer, the reader, the checker and their red-first test module; the story phases consume them; the Polish phase takes the feature-level readings and never invents a mechanism.
 
@@ -201,7 +201,7 @@ Single project, framework-source layout: `shared/`, `scripts/`, `templates/`, `s
 
 ## Traceability
 
-Every row's requirement and success-criterion references, and the contract clause or carrier that answers them. A clause is green only when the row's carrier is green; the clause partition here is the file's single statement of it (the measured reason the `[green:]` tag is unusable on these contracts is in the banner).
+Every row's requirement and success-criterion references, and the contract clause or carrier that answers them. A clause is green only when the row's carrier is green; the clause partition here is the file's single statement of it (the `[green:]` tag is optional and unused; the renumbered `C-001…C-059` contracts parse as `md-bold-closed`).
 
 | Row | FR | SC | Contract clauses / evidence carrier |
 |---|---|---|---|
