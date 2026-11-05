@@ -22,7 +22,7 @@
 - DoD-6: glossary 登记 `STR-003`（`origin=auto` / `status=proposed`）,退役名只作变体
 - DoD-7: 本特性未触碰任何 plan-owned 制品（`plan.md` / `research.md` / `data-model.md` / `contracts/` / `quickstart.md` / `feature-ref.md`）,也未接线 `/speckit.improve`（`OI-082-01`）
 
-**DoD Status**: pending
+**DoD Status**: done
 
 ## Completion Gate
 
