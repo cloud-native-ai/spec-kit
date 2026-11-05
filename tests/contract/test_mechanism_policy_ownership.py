@@ -1,7 +1,7 @@
-"""Contract tests for Feature 082 US4 — one owner, a closed membership table, no copied rules.
+"""Contract tests for Feature 083 US4 — one owner, a closed membership table, no copied rules.
 
 Owns the *ownership* face of
-``.specify/specs/082-mechanism-policy-separation/contracts/owner-document.contract.md``
+``.specify/specs/083-mechanism-policy-separation/contracts/owner-document.contract.md``
 (OD-07 / OD-08) and the cross-check ``data-model.md`` § GM-03 row V-19 names. The
 membership ruling itself lives in ``shared/definitions/mechanism-policy-definitions.md``
 (the owner); this module only asserts that the ruling is **closed**, **recomputable by a
@@ -32,8 +32,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 OWNER_REL = Path("shared/definitions/mechanism-policy-definitions.md")
-REQUIREMENTS_REL = Path(".specify/specs/082-mechanism-policy-separation/requirements.md")
-DATA_MODEL_REL = Path(".specify/specs/082-mechanism-policy-separation/data-model.md")
+REQUIREMENTS_REL = Path(".specify/specs/083-mechanism-policy-separation/requirements.md")
+DATA_MODEL_REL = Path(".specify/specs/083-mechanism-policy-separation/data-model.md")
 
 
 # --------------------------------------------------------------------------- #

@@ -1,7 +1,7 @@
-"""Contract tests for Feature 082 US3 — consumption-side stop (T016).
+"""Contract tests for Feature 083 US3 — consumption-side stop (T016).
 
 Owns the SC-004 mechanised face that
-``.specify/specs/082-mechanism-policy-separation/contracts/guard-and-measurement.contract.md``
+``.specify/specs/083-mechanism-policy-separation/contracts/guard-and-measurement.contract.md``
 GM-05 and ``quickstart.md`` S6 name. The subject is **the owner's contract text plus
 a filesystem snapshot** — never an AI's behaviour (GM-02).
 

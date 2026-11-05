@@ -329,7 +329,7 @@ def _str_allowed_paths() -> set[Path]:
         REPO_ROOT / SELF_REL,
         AMBIENT_TEMPLATE,
         REPO_ROOT / ".specify" / "templates" / "instructions-template.md",
-        # 2026-11-05 (Feature 082): the mechanism/policy owner cites this owner's path in
+        # 2026-11-05 (Feature 083): the mechanism/policy owner cites this owner's path in
         # its boundary table (the two canonical terms are written per the bilingual rule),
         # and tests/contract/test_mechanism_policy_ownership.py asserts that boundary row.
         # The owner document's Shared Strings protocol (C-03) requires a new consumer to

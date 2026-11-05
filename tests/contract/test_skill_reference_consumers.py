@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US5 — the five consumers (T027).
+"""Contract tests for Feature 083 US5 — the five consumers (T027).
 
 Owns two halves of SC-007 (``contracts/skill-reference.contract.md`` SR-01 … SR-06
 and ``contracts/guard-and-measurement.contract.md`` GM-12):
@@ -87,7 +87,7 @@ _DEFINITION_LIST_RE = re.compile(r":\s*`[^`]+`")
 
 #: GM-12 要件 4 — the owner table's own row set, read at call time (the owner is the
 #: table, not this module).
-DATAMODEL_REL = Path(".specify/specs/082-mechanism-policy-separation/data-model.md")
+DATAMODEL_REL = Path(".specify/specs/083-mechanism-policy-separation/data-model.md")
 
 
 def _read(path: Path) -> str:

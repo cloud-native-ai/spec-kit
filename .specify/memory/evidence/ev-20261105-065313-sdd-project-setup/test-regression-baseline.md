@@ -7,7 +7,7 @@ Run date: 2026-11-05. Target: `skill:sdd-project-setup` → new sibling `skill:s
 - Full contract suite captured once: `.specify/.tmp/ssh-utils-test/contract-full.log`
   (5728 passed, 23 failed before the loop's count-pin fixes).
 - Baseline worktree created at `HEAD` (`git worktree add --detach`), seeded with the
-  unrelated pre-existing working-tree changes (the concurrent Feature 082
+  unrelated pre-existing working-tree changes (the concurrent Feature 083
   skill-reference wiring and agent render changes) and **without** this loop's files.
 - The same failing test ids were re-run in both trees.
 

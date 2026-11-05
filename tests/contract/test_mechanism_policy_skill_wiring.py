@@ -1,7 +1,7 @@
-"""Contract tests for Feature 082 US1/US2 — meta-skill wiring (T009, T013).
+"""Contract tests for Feature 083 US1/US2 — meta-skill wiring (T009, T013).
 
 Owns the *wiring* face of
-``.specify/specs/082-mechanism-policy-separation/contracts/skill-wiring.contract.md``
+``.specify/specs/083-mechanism-policy-separation/contracts/skill-wiring.contract.md``
 that ``tasks.md`` T009 / T013 / T017 name. The judgement criteria themselves belong
 to ``shared/definitions/mechanism-policy-definitions.md`` (the owner); this module
 only pins that each consumer **points at** the owner from the right place, once,

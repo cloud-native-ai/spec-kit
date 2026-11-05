@@ -1,7 +1,7 @@
-"""Contract tests for Feature 082 US1 — owner-document form (T010).
+"""Contract tests for Feature 083 US1 — owner-document form (T010).
 
 Owns the OD-02…OD-06 and OD-09 legs of
-``.specify/specs/082-mechanism-policy-separation/contracts/owner-document.contract.md``
+``.specify/specs/083-mechanism-policy-separation/contracts/owner-document.contract.md``
 that ``tasks.md`` T010 names. The remaining owner legs (OD-01 / OD-07 / OD-08 /
 OD-10 and the mirror byte-equality) belong to ``test_mechanism_policy_owner_doc.py``
 as sequenced by GM-01; this module is the US1 half only, so the two never assert

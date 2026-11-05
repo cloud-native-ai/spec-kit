@@ -2443,27 +2443,27 @@
           "ecosystem": "python"
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
           "role": "manifest",
           "ecosystem": "python"
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
           "role": "manifest",
           "ecosystem": "python"
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
           "role": "manifest",
           "ecosystem": "python"
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
           "role": "manifest",
           "ecosystem": "python"
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
           "role": "manifest",
           "ecosystem": "python"
         },
@@ -2579,7 +2579,7 @@
           "stale": false
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
           "role": "manifest",
           "ecosystem": "python",
           "lastTouchedAt": "2026-11-05T12:20:58+08:00",
@@ -2587,7 +2587,7 @@
           "stale": false
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
           "role": "manifest",
           "ecosystem": "python",
           "lastTouchedAt": "2026-11-05T12:20:58+08:00",
@@ -2595,7 +2595,7 @@
           "stale": false
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
           "role": "manifest",
           "ecosystem": "python",
           "lastTouchedAt": "2026-11-05T12:20:58+08:00",
@@ -2603,7 +2603,7 @@
           "stale": false
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
           "role": "manifest",
           "ecosystem": "python",
           "lastTouchedAt": "2026-11-05T12:20:58+08:00",
@@ -2611,7 +2611,7 @@
           "stale": false
         },
         {
-          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "path": ".specify/specs/083-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
           "role": "manifest",
           "ecosystem": "python",
           "lastTouchedAt": "2026-11-05T11:42:17+08:00",

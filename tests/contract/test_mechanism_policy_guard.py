@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US4 — the SC-003 closed-set drift guard (T020).
+"""Contract tests for Feature 083 US4 — the SC-003 closed-set drift guard (T020).
 
 SC-003 says: "运行本特性之后，`skills/` 与 `templates/commands/` 下**只**有允许差异集内的
 路径发生变化". That is a **containment claim** and MUST be decidable
@@ -56,8 +56,8 @@ UNIT_ROOTS = ("skills", "templates/commands")
 # made. Every uncommitted path must still be registered (the working-tree loop below), and
 # every registered new path must either be tracked or be this guard's own negative-case copy.
 # 
-DATA_MODEL_REL = Path(".specify/specs/082-mechanism-policy-separation/data-model.md")
-CONTRACTS_DIR = REPO_ROOT / ".specify/specs/082-mechanism-policy-separation/contracts"
+DATA_MODEL_REL = Path(".specify/specs/083-mechanism-policy-separation/data-model.md")
+CONTRACTS_DIR = REPO_ROOT / ".specify/specs/083-mechanism-policy-separation/contracts"
 
 # Requirement 5: aggregate words that would turn the claim back into prose if used as a
 # comparison scope. A word inside a *negation* ("must not use 'rest'") is quoting the rule,
@@ -136,12 +136,18 @@ def _blob(path: str, cwd: Path) -> bytes | None:
     return proc.stdout if proc.returncode == 0 else None
 
 
-def feature_commits(cwd: Path = REPO_ROOT) -> list[str]:
-    """Commits that belong to this feature (the repo's ``(082)`` commit convention).
+FEATURE_SCOPE_RE = re.compile(r"\((?:082|083)\)", re.IGNORECASE)
 
-    Other work lines (``feat(ssh-utils)``, ``chore(framework)``, …) are *absorbed*
-    into the branch but are not this feature's changes; the SC-003 containment
-    claim measures the feature's commits, never unrelated concurrent work.
+
+def feature_commits(cwd: Path = REPO_ROOT) -> list[str]:
+    """Commits that belong to this feature (the repo's ``(082)``/``(083)`` convention).
+
+    The feature was renumbered from 082 to 083 after the remote line claimed 082;
+    both exact scopes are this feature's own. Other work lines (``feat(ssh-utils)``,
+    ``chore(framework)``, ``feat(082-self-explanatory-integration)``, …) are
+    *absorbed* into the branch but are not this feature's changes; the SC-003
+    containment claim measures the feature's commits, never unrelated concurrent
+    work.
     """
     proc = subprocess.run(
         ["git", "log", "--format=%H%x09%s", "%s..HEAD" % BASELINE],
@@ -155,7 +161,7 @@ def feature_commits(cwd: Path = REPO_ROOT) -> list[str]:
         if "\t" not in line:
             continue
         sha, subject = line.split("\t", 1)
-        if "082" in subject:
+        if FEATURE_SCOPE_RE.search(subject):
             commits.append(sha)
     return commits
 
@@ -533,7 +539,7 @@ def _fake_tree(tmp_path: Path) -> Path:
     (tree / "skills/external/a/SKILL.md").write_text("a\n", encoding="utf-8")
     (tree / "skills/external/b/SKILL.md").write_text("b\n", encoding="utf-8")
     (tree / "templates/commands/x.md").write_text("x\n", encoding="utf-8")
-    (tree / ".specify/specs/082-mechanism-policy-separation").mkdir(parents=True)
+    (tree / ".specify/specs/083-mechanism-policy-separation").mkdir(parents=True)
     (tree / DATA_MODEL_REL).write_text(
         "## GM-03 — 允许差异集\n\n"
         "| # | 路径 | 类别 | 属比较单元 |\n|---|---|---|---|\n"

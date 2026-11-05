@@ -1,0 +1,59 @@
+# T039 — the three registration lines
+
+Captured 2026-11-05 during implement Part 5.
+
+## 1. Glossary — one entry
+
+`.specify/memory/glossary.md` gains one row (origin `user`, status `proposed`), appended after
+the last existing row; no other glossary line was edited:
+
+```
+| 机制/策略分离 (Mechanism–Policy Separation) | mechanism–policy separation, 机制策略分离, 能力/职责分离 | 元技能治理原则:机制层(逻辑/算法/步骤,归档于技能定义本体及其 references/scripts/assets)与策略层(配置/输入/输出,归档于具体运行环境)语义上必须可分,执行前两层信息须同时具备,缺失时提示而非以默认值顶替;判据/成员/消费契约真源 shared/definitions/mechanism-policy-definitions.md(Feature 083) | user | proposed |
+```
+
+## 2. Framework map — the existing shared-definitions row only
+
+T039's text says `framework-map.md` has no framework-source counterpart. **Measured: it does.**
+`shared/definitions/framework-map.md` exists and `.specify/shared/definitions/framework-map.md`
+is its generated mirror (byte-identical before this edit, one of the `shared` MIRROR_PAIRS) —
+so hand-editing only the `.specify/` copy would have created mirror drift and failed T036's
+second `--check`. Correction taken (single reading: mirrors are generated, never hand-edited):
+
+- edited the framework source `shared/definitions/framework-map.md` — the **existing**
+  `Shared definitions & conventions` row gains both owner file names; no new row, no new
+  directory;
+- regenerated the mirror with `python3 scripts/python/sync-mirrors.py --only shared --write`;
+- `python3 scripts/python/sync-mirrors.py --check` → every pair `ok` (shared 64 files), rc=0.
+
+Row after the edit:
+
+```
+| Shared definitions & conventions | `.specify/shared/` | canonical concept docs — e.g. agent taxonomy (`definitions/agent-definitions.md`), subagent modes (`definitions/subagent-definitions.md`), tool definitions, workflow conventions; Feature 083's two meta-skill owners (`definitions/mechanism-policy-definitions.md`, `definitions/skill-reference-definitions.md`) |
+```
+
+## 3. CHANGELOG — one entry
+
+`CHANGELOG.md` `## [Unreleased]` → `### Added` gains one bullet naming the two owners, the
+meta-skill judgement and reference lines, the eleven contract modules and the matrix fixture.
+No existing bullet was edited.
+
+## In-passing repair disclosed — Feature 079's STR-001 drift guard
+
+Running the neighbor set surfaced `test_bilingual_expression.py::test_drift_str_literal_unique_consumers`
+red (not in the E2 baseline; introduced by Part 3's 083 artifacts, which the earlier targeted
+sets did not select):
+
+```
+STR literals escaped their unique consumption points:
+['STR-001 consumed at shared/definitions/mechanism-policy-definitions.md',
+ 'STR-001 consumed at tests/contract/test_mechanism_policy_ownership.py']
+```
+
+`STR-001` is the literal `shared/guidelines/bilingual-expression.md`. The bilingual owner's own
+Shared Strings protocol (C-03, `shared/guidelines/bilingual-expression.md` line 7) says a new
+consumer MUST update the guard whitelist before writing the literal. The two 083 artifacts are
+legitimate consumers: the owner's boundary table cites the bilingual owner by path (and declares
+it does not restate it), and `test_mechanism_policy_ownership.py` asserts that boundary row.
+Repair = register both paths in `_str_allowed_paths()` with a dated comment; no assertion was
+deleted or weakened. Re-run: `test_bilingual_expression.py` + `test_glossary_mechanism.py` +
+`test_directory_governance.py` → 49 passed.

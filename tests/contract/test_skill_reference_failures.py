@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US5 — SC-009 failure semantics (T029).
+"""Contract tests for Feature 083 US5 — SC-009 failure semantics (T029).
 
 One assertion per failure class, each also asserting the paired report carries both
 the **raw** and the **normalized** identifier (FR-025), plus the mutual-exclusion

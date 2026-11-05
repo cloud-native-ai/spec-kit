@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US5 — SC-006 matrix recomputation (T026).
+"""Contract tests for Feature 083 US5 — SC-006 matrix recomputation (T026).
 
 Every row of ``tests/fixtures/skill-reference/normalization-matrix.json`` is
 recomputed through ``tests/contract/skill_reference_matrix.py`` and compared with

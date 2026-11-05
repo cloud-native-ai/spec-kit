@@ -1,0 +1,130 @@
+# Gate run — 083 requirements scope update (skill reference grammar folded in)
+# captured: 2026-11-05T04:17:53Z
+# stage_base: 58d3dc5b
+
+## validate-requirements.py
+file: .specify/specs/083-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 292 lines, 39 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+rc=0
+
+## pre-analyze-check.py --stage requirements --repo .
+rc=0
+
+findings:
+  advisory missing-path requirements.md:37 path does not exist under the repo: .specify/shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path requirements.md:248 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path requirements.md:275 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:13 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:15 path does not exist under the repo: skills/external/create-skills/references/mechanism-policy-check.md
+  advisory missing-path plan.md:51 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:51 path does not exist under the repo: skills/external/create-skills/references/mechanism-policy-check.md
+  advisory missing-path plan.md:55 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:75 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:172 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:172 path does not exist under the repo: .specify/shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:173 path does not exist under the repo: skills/external/create-skills/references/mechanism-policy-check.md
+  advisory missing-path plan.md:174 path does not exist under the repo: .specify/templates/commands/
+  advisory missing-path plan.md:210 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:306 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path plan.md:335 path does not exist under the repo: tests/contract/test_mechanism_policy_guard.py
+  advisory missing-path plan.md:336 path does not exist under the repo: tests/contract/test_mechanism_policy_missing_policy.py
+  advisory missing-path data-model.md:3 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path data-model.md:13 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path data-model.md:14 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path data-model.md:20 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path data-model.md:172 path does not exist under the repo: skills/external/create-skills/references/mechanism-policy-check.md
+  advisory missing-path data-model.md:177 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path data-model.md:178 path does not exist under the repo: tests/contract/test_mechanism_policy_ownership.py
+  advisory missing-path data-model.md:179 path does not exist under the repo: tests/contract/test_mechanism_policy_skill_wiring.py
+  advisory missing-path data-model.md:180 path does not exist under the repo: tests/contract/test_mechanism_policy_guard.py
+  advisory missing-path data-model.md:181 path does not exist under the repo: tests/contract/test_mechanism_policy_missing_policy.py
+  advisory missing-path data-model.md:182 path does not exist under the repo: tests/contract/test_mechanism_policy_decidability.py
+  advisory missing-path feature-ref.md:21 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path feature-ref.md:22 path does not exist under the repo: skills/external/create-skills/references/mechanism-policy-check.md
+  advisory missing-path contracts/guard-and-measurement.contract.md:50 path does not exist under the repo: tests/contract/test_mechanism_policy_missing_policy.py
+  advisory missing-path contracts/owner-document.contract.md:4 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path contracts/owner-document.contract.md:4 path does not exist under the repo: .specify/shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path contracts/owner-document.contract.md:86 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path contracts/owner-document.contract.md:89 path does not exist under the repo: tests/contract/test_mechanism_policy_ownership.py
+  advisory missing-path contracts/owner-document.contract.md:90 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path contracts/owner-document.contract.md:93 path does not exist under the repo: tests/contract/test_mechanism_policy_skill_wiring.py
+  advisory missing-path contracts/owner-document.contract.md:94 path does not exist under the repo: tests/contract/test_mechanism_policy_skill_wiring.py
+  advisory missing-path contracts/owner-document.contract.md:95 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path contracts/owner-document.contract.md:97 path does not exist under the repo: tests/contract/test_mechanism_policy_ownership.py
+  advisory missing-path contracts/owner-document.contract.md:99 path does not exist under the repo: tests/contract/test_mechanism_policy_owner_doc.py
+  advisory missing-path contracts/skill-wiring.contract.md:4 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path contracts/skill-wiring.contract.md:65 path does not exist under the repo: tests/contract/test_mechanism_policy_skill_wiring.py
+  advisory missing-path contracts/skill-wiring.contract.md:67 path does not exist under the repo: tests/contract/test_mechanism_policy_guard.py
+  advisory missing-path contracts/skill-wiring.contract.md:68 path does not exist under the repo: tests/contract/test_mechanism_policy_skill_wiring.py
+  advisory missing-path contracts/skill-wiring.contract.md:71 path does not exist under the repo: tests/contract/test_mechanism_policy_guard.py
+  advisory missing-path contracts/skill-wiring.contract.md:73 path does not exist under the repo: tests/contract/test_mechanism_policy_missing_policy.py
+  advisory missing-path checklists/requirements.md:38 path does not exist under the repo: shared/definitions/mechanism-policy-definitions.md
+  advisory missing-path checklists/requirements.md:38 path does not exist under the repo: skills/external/...
+  advisory missing-path checklists/requirements.md:38 path does not exist under the repo: shared/guidelines/...
+  advisory missing-path checklists/requirements.md:42 path does not exist under the repo: skills/external/...
+  advisory missing-path checklists/requirements.md:42 path does not exist under the repo: shared/guidelines/...
+summary: {"advisories": 52, "clauses": 0, "errors": 0, "files": 10, "fr": 30, "sc": 9, "tasks": 0, "waived": 0}
+
+## decomposition-check.py --mode plan
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 30, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T04:17:54Z"}
+rc=0
+
+## flow-class-check.py --action lookup
+unit_id: spec:083-mechanism-policy-separation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0
+
+## sync-mirrors.py --check (scope observation only; NOT a gate for this stage)
+# Observed: exit 0 — the working tree's source/mirror pairs are IN SYNC, including
+# shared/ == .specify/shared/ (63 files), i.e. the concurrent implementation's
+# skill-reference-definitions.md exists in both copies with identical content.
+# Detail: requirements-scope-update-mirror-observation.txt
+# FINAL gate run (after checklist edits) — 083 requirements scope update
+# captured: 2026-11-05T04:19:50Z
+
+## validate-requirements.py
+file: .specify/specs/083-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 292 lines, 39 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+rc=0
+
+## pre-analyze-check.py --stage requirements --repo .
+rc=0
+# NOTE (disclosed): the shell helper that produced this block errored on its first attempt
+# (a pipe-to-python quoting slip). Replaced by the decode result below — no tool output was altered.
+decision=pass errors=0 advisories=52 waived=0 fr=30 sc=9 tasks=0 clauses=0 files=10
+finding classes: all 52 findings are 'missing-path'; zero findings of any other check
+
+## decomposition-check.py --mode plan
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 30, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T04:19:51Z"}
+rc=0
+
+## flow-class-check.py --action lookup
+unit_id: spec:083-mechanism-policy-separation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0

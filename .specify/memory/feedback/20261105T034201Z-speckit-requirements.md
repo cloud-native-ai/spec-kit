@@ -7,7 +7,7 @@ scope: "local"
 probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 partial: false
 created: "2026-11-05T03:42:01Z"
 summary: "082 requirements: user entry distilled into a mechanism/policy separation principle for the meta-layer (create-skills/improve-skills/merge-skills/coaching-skills routed by a single predicate); 18 FR /"

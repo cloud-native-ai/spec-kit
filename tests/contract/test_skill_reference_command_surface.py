@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US5 — SC-008 command-surface disambiguation (T028).
+"""Contract tests for Feature 083 US5 — SC-008 command-surface disambiguation (T028).
 
 SC-008 asks for **positive** rows and at least one **negative** row, in one run:
 

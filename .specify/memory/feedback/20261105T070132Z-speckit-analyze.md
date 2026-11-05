@@ -2,20 +2,20 @@
 id: "20261105T070132Z-speckit-analyze"
 unit_id: "/speckit.analyze"
 unit_type: "command"
-run_id: "082-mechanism-policy-separation-analyze2-20261105"
+run_id: "083-mechanism-policy-separation-analyze2-20261105"
 scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 feature_id: "082"
 partial: false
 created: "2026-11-05T07:01:32Z"
-summary: "Analyze round 2 (read-only re-check) on Feature 082 after the repair commit 974db180: both reported HIGH clusters are measurably closed (Decision Tensions validates 0 error/0 HIGH with the section in "
+summary: "Analyze round 2 (read-only re-check) on Feature 083 after the repair commit 974db180: both reported HIGH clusters are measurably closed (Decision Tensions validates 0 error/0 HIGH with the section in "
 ---
 
 ## Review
-Analyze round 2 (read-only re-check) on Feature 082 after the repair commit 974db180: both reported HIGH clusters are measurably closed (Decision Tensions validates 0 error/0 HIGH with the section in the mandated position and four expected_sacrifice rows each bound to one SC source; coverage-baseline.txt frozen with 513 names and clause-uncovered pass). The re-check did not close the round clean: the repair's own evidence file records a red coverage reading without its rc, validate-requirements still returns rc=1 on SC-005's path marker (left OPEN by the brief), and two new MEDIUMs appear — tasks.md carries no explicit FR anchors for FR-020/021/022/023/024/030 and the owner-count wording differs between E-8 and GR-01.
+Analyze round 2 (read-only re-check) on Feature 083 after the repair commit 974db180: both reported HIGH clusters are measurably closed (Decision Tensions validates 0 error/0 HIGH with the section in the mandated position and four expected_sacrifice rows each bound to one SC source; coverage-baseline.txt frozen with 513 names and clause-uncovered pass). The re-check did not close the round clean: the repair's own evidence file records a red coverage reading without its rc, validate-requirements still returns rc=1 on SC-005's path marker (left OPEN by the brief), and two new MEDIUMs appear — tasks.md carries no explicit FR anchors for FR-020/021/022/023/024/030 and the owner-count wording differs between E-8 and GR-01.
 
 ## Optimization Points
 - ## Optimization Points

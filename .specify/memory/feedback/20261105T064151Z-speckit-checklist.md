@@ -7,7 +7,7 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 partial: false
 created: "2026-11-05T06:41:51Z"
 summary: "082 checklist: 89 CHK items across 14 sections; structural self-check PASS; G-checklist-duplicate pass (13 files); validate-requirements ok; flow-class execution/declaration. Disclosed: 40-item soft c"

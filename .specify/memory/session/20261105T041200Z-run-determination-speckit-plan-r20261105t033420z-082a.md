@@ -2,7 +2,7 @@
 id: "20261105T041200Z-run-determination-speckit-plan-r20261105t033420z-082a"
 scope: "session"
 source: "/speckit.plan"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 tags: ["run-determination", "r20261105t033420z-082a"]
 title: "run-determination /speckit.plan r20261105T033420Z-082a"
 created: "2026-11-05T04:12:00Z"
@@ -18,7 +18,7 @@ summary: "/speckit.plan run=r20261105T033420Z-082a token=not_evaluated elapsed=n
   "unit_id": "/speckit.plan",
   "unit_type": "command",
   "run_id": "r20261105T033420Z-082a",
-  "feature": "082-mechanism-policy-separation",
+  "feature": "083-mechanism-policy-separation",
   "feature_id": null,
   "determined_at": "2026-11-05T04:12:00Z",
   "settled_at": null,

@@ -1,0 +1,350 @@
+083 closure gates — GATE-1 … GATE-7, pre-analyze-check, validate-tasks (T051)
+================================================================================
+
+Date        : 2026-11-05 (Asia/Shanghai)
+HEAD        : 28662977fab2d8cae60e7f2c2e369df0d984affd
+Host        : macOS 25.6.0 / arm64; Python 3.14.6 (`.venv/bin/python -V`); pytest 9.2.0
+Runner      : `env -u PYTHONPATH bash scripts/bash/run-tests.sh` (the `-u PYTHONPATH` prefix is
+              required on this host, research.md § R1)
+Temp root   : `.specify/.tmp/sc-004/gates/` — the sanctioned, `.gitignore`-matched root. GATE-2's
+              literal `--names-out /tmp/083-head-names.txt` was pointed at this root instead;
+              bare `/tmp` is forbidden by `.specify/shared/guidelines/temp-directory-discipline.md`.
+              The substitution changes only where the names file is written, never what is measured.
+
+Each gate below was run in its turn; its command, its exit code and its output are pasted
+verbatim. Where a gate's literal predicate needed a recomputation, the recomputation is pasted
+too and its difference is computed as a **set difference against the recorded baseline**, never
+as an absolute all-green claim.
+
+## GATE-1 — the eleven new contract modules are green
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q \
+    tests/contract/test_mechanism_policy_owner_doc.py \
+    tests/contract/test_mechanism_policy_ownership.py \
+    tests/contract/test_mechanism_policy_skill_wiring.py \
+    tests/contract/test_mechanism_policy_guard.py \
+    tests/contract/test_mechanism_policy_missing_policy.py \
+    tests/contract/test_mechanism_policy_decidability.py \
+    tests/contract/test_skill_reference_grammar.py \
+    tests/contract/test_skill_reference_matrix.py \
+    tests/contract/test_skill_reference_consumers.py \
+    tests/contract/test_skill_reference_command_surface.py \
+    tests/contract/test_skill_reference_failures.py
+exit_code = 0
+
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py
+........................................................................ [ 72%]
+............................                                             [100%]
+100 passed in 43.44s
+----- END VERBATIM -----
+
+**Reading**: 100 passed, 0 failed, exit 0. All eleven modules exist and are green; the eleven
+negative cases (GM-07) are inside the same count.
+
+## GATE-2 — targeted-set failure names are a subset of the recorded baseline
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q \
+    --names-out .specify/.tmp/sc-004/gates/gate2-names.txt \
+    tests/contract/test_merge_provenance_gate.py \
+    tests/contract/test_expression_compatibility.py \
+    tests/contract/test_one_source_of_truth.py \
+    tests/contract/test_bilingual_expression.py \
+    tests/contract/test_token_efficiency_gates.py \
+    tests/contract/test_feedback_skill_conformance.py \
+    tests/contract/test_mirror_parity_suite.py \
+    tests/contract/test_glossary_mechanism.py \
+    tests/contract/test_instructions_section_propagation.py \
+    tests/contract/test_skill_layer_visibility_guards.py \
+    tests/contract/test_directory_governance.py \
+    tests/contract/test_portable_skill_creation.py
+exit_code = 0
+
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_merge_provenance_gate.py tests/contract/test_expression_compatibility.py tests/contract/test_one_source_of_truth.py tests/contract/test_bilingual_expression.py tests/contract/test_token_efficiency_gates.py tests/contract/test_feedback_skill_conformance.py tests/contract/test_mirror_parity_suite.py tests/contract/test_glossary_mechanism.py tests/contract/test_instructions_section_propagation.py tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_directory_governance.py tests/contract/test_portable_skill_creation.py
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+........................................................................ [ 56%]
+........................................................................ [ 64%]
+........................................................................ [ 72%]
+........................................................................ [ 80%]
+........................................................................ [ 88%]
+........................................................................ [ 96%]
+...................................                                      [100%]
+899 passed in 10.90s
+# failed-name list written: .specify/.tmp/sc-004/gates/gate2-names.txt (       0 entries)
+----- END VERBATIM -----
+
+$ comm -13 <(sort .specify/specs/083-mechanism-policy-separation/baseline-failed.txt) \
+           <(sort .specify/.tmp/sc-004/gates/gate2-names.txt)
+exit_code = 0
+output: (empty)
+
+**Reading**: the 12 modules named by `test-evidence/plan2026-11-05-baseline.txt` produce **0**
+failing names on this tree. Set difference against the recorded baseline:
+
+- Recorded baseline = `.specify/specs/083-mechanism-policy-separation/baseline-failed.txt`, the
+  implement-start full-suite capture (E2: `24 failed, 7157 passed, 7 skipped`) with its 24-entry
+  failed-name list.
+- Head failed-name set = ∅ → `head − baseline = ∅`. The difference is empty by set arithmetic,
+  not by an "all green" claim.
+- The plan-stage baseline's one contaminated failure
+  (`test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`) is now
+  green because T038 registered this feature's five frozen-hash points; it is a strict subset
+  relation, not an absorbed failure.
+- No pre-existing failure sits in this 12-module set any more, so nothing had to be attributed as
+  red-and-left-red; the empty difference is the whole reading.
+
+## GATE-3 — no new drift on either regeneration entry
+
+$ python3 scripts/python/sync-mirrors.py --check
+exit_code = 0
+----- BEGIN VERBATIM -----
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (414 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (64 files)
+----- END VERBATIM -----
+
+$ python3 scripts/python/regen-command-copies.py --check
+exit_code = 0
+----- BEGIN VERBATIM -----
+OK: all per-tool command copies match the source templates.
+----- END VERBATIM -----
+
+**Reading**: six source/mirror pairs all `ok`, zero new drift; zero changed command copies. The
+file counts are printed as measured, never asserted (`shared` 64 after this feature's two owner
+documents; `skills/external` 414).
+
+## GATE-4 — every changed path inside SC-003's comparison unit is registered
+
+$ git diff --name-status 3ffeb26e..HEAD -- skills/ templates/commands/
+exit_code = 0
+
+----- BEGIN VERBATIM -----
+M	skills/external/coaching-skills/SKILL.md
+M	skills/external/coaching-skills/data-model.md
+M	skills/external/coaching-skills/references/prompt-templates.md
+M	skills/external/create-skills/SKILL.md
+A	skills/external/create-skills/references/mechanism-policy-check.md
+M	skills/external/improve-skills/SKILL.md
+M	skills/external/improve-skills/references/loop-playbook.md
+M	skills/external/merge-skills/SKILL.md
+M	skills/external/merge-skills/references/provenance-record.md
+M	skills/external/sdd-loop-driver/SKILL.md
+M	skills/external/sdd-loop-driver/references/dispatch-recipes.md
+M	skills/external/sdd-loop-driver/references/efficiency-model.md
+M	skills/external/sdd-loop-driver/references/stage-prompts.md
+M	skills/external/sdd-loop-driver/references/watch-model.md
+M	skills/external/sdd-loop-driver/scripts/admission-check.py
+M	skills/external/sdd-loop-driver/scripts/decomposition-check.py
+M	skills/external/sdd-loop-driver/scripts/loop-state.py
+M	skills/external/sdd-project-setup/SKILL.md
+M	skills/external/sdd-project-setup/references/setup-recipes.md
+A	skills/external/ssh-utils/SKILL.md
+A	skills/external/ssh-utils/references/pitfalls.md
+A	skills/external/ssh-utils/references/recipes.md
+A	skills/external/ssh-utils/scripts/ssh-exec.py
+M	skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md
+M	skills/internal/create-agent/templates/agent-capacity-module-designer-template.md
+M	skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md
+M	skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md
+M	skills/internal/create-agent/templates/agent-capacity-system-designer-template.md
+M	skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md
+M	skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md
+M	skills/internal/create-agent/templates/agent-project-custom-template.md
+M	skills/internal/create-team/templates/agents/agent-team-supervisor-template.md
+M	skills/internal/run-agent/SKILL.md
+M	skills/internal/run-skills/SKILL.md
+----- END VERBATIM -----
+
+$ for p in $(git diff --name-only 3ffeb26e..HEAD -- skills/ templates/commands/); do
+    n=$(git log --format=%s 3ffeb26e..HEAD -- "$p" | grep -c '083')
+    printf '%s\t082_commits=%s\n' "$p" "$n"
+  done
+exit_code = 0
+
+----- BEGIN VERBATIM (the 10 paths that carry at least one 083 commit) -----
+skills/external/coaching-skills/SKILL.md	083_commits=3
+skills/external/coaching-skills/data-model.md	083_commits=1
+skills/external/coaching-skills/references/prompt-templates.md	083_commits=1
+skills/external/create-skills/SKILL.md	083_commits=4
+skills/external/create-skills/references/mechanism-policy-check.md	083_commits=1
+skills/external/improve-skills/SKILL.md	083_commits=2
+skills/external/improve-skills/references/loop-playbook.md	083_commits=1
+skills/external/merge-skills/SKILL.md	083_commits=3
+skills/external/merge-skills/references/provenance-record.md	083_commits=1
+skills/internal/run-skills/SKILL.md	083_commits=3
+----- END VERBATIM -----
+
+24 of the 34 raw-diff paths carry **no** 083 commit (count printed by the same loop:
+`grep -c '083_commits=0'` → `24`). They are the absorbed concurrent work lines
+(`chore(framework)` calibration + `feat(ssh-utils)` / `feat(sdd-project-setup)`), which this
+branch contains but this feature does not own.
+
+$ .venv/bin/python - <<'PY'   # parser = test_mechanism_policy_guard.registered_allowed_set()
+  import re, subprocess, sys; from pathlib import Path
+  sys.path.insert(0, "tests/contract"); import test_mechanism_policy_guard as guard
+  data_model = Path(".specify/specs/083-mechanism-policy-separation/data-model.md").read_text(encoding="utf-8")
+  registered, _outside = guard.registered_allowed_set(data_model)
+  def lines(*args): return subprocess.run(list(args), capture_output=True, text=True).stdout
+  raw = [ln.split("\t")[-1] for ln in lines("git", "diff", "--name-status", "3ffeb26e..HEAD", "--", "skills/", "templates/commands/").splitlines() if ln.strip()]
+  attributed = [p for p in raw if any("083" in s for s in lines("git", "log", "--format=%s", "3ffeb26e..HEAD", "--", p).splitlines())]
+  m = re.search(r"^## GM-03 .*$", data_model, re.M); body = data_model[m.end():]
+  nxt = re.search(r"^## ", body, re.M); body = body[: nxt.start()] if nxt else body
+  rows_1_8 = set()
+  for line in body.splitlines():
+      cells = [c.strip() for c in line.strip().strip("|").split("|")]
+      if len(cells) >= 4 and cells[0].isdigit() and 1 <= int(cells[0]) <= 8:
+          rows_1_8.update(re.findall(r"`([^`]+)`", cells[1]))
+  print("raw_diff_paths=%d" % len(raw)); print("083_attributed_paths=%d" % len(attributed))
+  print("registered_allowed_in_unit=%d" % len(registered))
+  print("attributed_minus_registered=%s" % sorted(set(attributed) - registered))
+  print("registered_minus_attributed=%s" % sorted(registered - set(attributed)))
+  print("attributed_minus_rows_1_8=%s" % sorted(set(attributed) - rows_1_8))
+  print("raw_minus_registered=%d" % len(set(raw) - registered)); print("raw_not_083=%d" % len(set(raw) - set(attributed)))
+PY
+exit_code = 0
+
+----- BEGIN VERBATIM -----
+raw_diff_paths=34
+083_attributed_paths=10
+registered_allowed_in_unit=10
+attributed_minus_registered=[]
+registered_minus_attributed=[]
+attributed_minus_rows_1_8=['skills/external/coaching-skills/data-model.md', 'skills/external/coaching-skills/references/prompt-templates.md']
+raw_minus_registered=24
+raw_not_083=24
+----- END VERBATIM -----
+
+**Reading — PASS with a named disclosure**:
+
+- The gate's subject is "every changed path inside SC-003's comparison unit is registered".
+  Measured: the 083-attributed changed-path set and the registered in-unit allowed set are the
+  **same 10 paths**; both differences are empty. The guard's own committed-path assertion
+  (`committed change … lies outside the registered allowed set (GATE-4)`) is part of GATE-1's
+  green.
+- **Disclosure 1 — the literal "rows 1–8" is stale.** `data-model.md` § GM-03 registers **10**
+  in-unit paths: rows 1–8 plus rows 19–20 (the two absorbed coaching skill-reference files,
+  added by the user-ratified CL-04 absorption, 2026-11-05). The recomputation prints the two
+  extra paths as `attributed_minus_rows_1_8`; they are registered, and GM-03 要件 3 (the single
+  landing point for the allowed-difference set) names 10. The owning definition is met; the
+  gate text's parenthetical still names the pre-absorption subset.
+- **Disclosure 2 — the raw diff is broader than this feature.** 24 of the 34 paths carry no 083
+  commit; they are another work line's delivered work on the same branch. They are attributed,
+  not absorbed into this feature's verdict, exactly as T041 § 5 recorded.
+- No plan-owned artifact was edited to make this reading; the two disclosures are written here
+  instead.
+
+## GATE-5 — no `[ ]` or `[>]` task rows remain
+
+Reading at T051 execution time (T049–T052 are still open rows at that moment, by construction):
+
+$ grep -cE '^- \[[ >]\]' .specify/specs/083-mechanism-policy-separation/tasks.md
+exit_code = 0
+output: `4` (T049, T050, T051, T052)
+
+Closing reading, taken after T049–T052 were marked `[x]` and before this file's commit:
+
+$ grep -cE '^- \[[ >]\]' .specify/specs/083-mechanism-policy-separation/tasks.md
+exit_code = 1   (grep's "no lines selected" status — the desired outcome)
+output: `0`
+
+**Reading**: the closing count is **0**; the earlier `4` is the same file mid-run and is kept so
+the reading is not presented as if the gate ran after the fact.
+
+## GATE-6 — the mechanism/policy judgement did not leak into the excluded members
+
+$ grep -rcE 'mechanism-policy-definitions|Mechanism / policy separation|mechanism-in-policy|policy-in-mechanism' \
+    skills/external/coaching-skills skills/internal/run-skills
+exit_code = 1   (every line is a `:0` count; grep exits 1 when nothing matched)
+
+----- BEGIN VERBATIM -----
+skills/external/coaching-skills/references/prompt-templates.md:0
+skills/external/coaching-skills/SKILL.md:0
+skills/external/coaching-skills/data-model.md:0
+skills/internal/run-skills/SKILL.md:0
+----- END VERBATIM -----
+
+**Reading**: every listed file reports **0**; the scanned file count is **4** (the two excluded
+members' `SKILL.md` plus `coaching-skills/data-model.md` and
+`coaching-skills/references/prompt-templates.md`). The recursive form is the same denominator as
+T027's `skills/**/SKILL.md` scan widened to these members' own `references/` (scope owner:
+`contracts/skill-wiring.contract.md` SW-05). Zero, with the denominator printed.
+
+## GATE-7 — the skill reference is sourced from the framework root, never the mirror
+
+$ shopt -s globstar; grep -rc '\.specify/shared/definitions/skill-reference-definitions\.md' \
+    skills/**/SKILL.md skills/internal/run-skills/SKILL.md | sort -u
+exit_code = 0
+(all lines are `:0`; `grep -v ':0$'` selects nothing)
+----- BEGIN VERBATIM (non-zero rows) -----
+(none)
+----- END VERBATIM -----
+scanned SKILL.md files = 54 (after `sort -u`; `run-skills` is named twice by the command and
+counted once)
+
+Per-consumer framework-source reference count
+(`grep -o 'shared/definitions/skill-reference-definitions\.md' <file> | wc -l`):
+
+----- BEGIN VERBATIM -----
+skills/internal/run-skills/SKILL.md	1
+skills/external/create-skills/SKILL.md	1
+skills/external/improve-skills/SKILL.md	1
+skills/external/merge-skills/SKILL.md	1
+skills/external/coaching-skills/SKILL.md	1
+----- END VERBATIM -----
+
+**Reading**: zero mirror-path references across 54 `SKILL.md` files; each of the five consumers
+carries **exactly one** framework-source reference.
+
+## pre-analyze-check (tasks stage)
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/083-mechanism-policy-separation --stage tasks --repo .
+exit_code = 0
+
+----- BEGIN VERBATIM (decision line; the JSON findings list follows it) -----
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=10 waived=0
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 307, "message": "path does not exist under the repo: skills/external/foo"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 114, "message": "path does not exist under the repo: shared/definitions/..."}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 114, "message": "path does not exist under the repo: .specify/shared/definitions/..."}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 207, "message": "path does not exist under the repo: .specify/templates/commands/"}, {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 245, "message": "path does not exist under the repo: skills/sdd-loop-driver/references/dispatch-recipes.md"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 69, "message": "path does not exist under the repo: skills/external/foo"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 82, "message": "path does not exist under the repo: skills/external/..."}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 82, "message": "path does not exist under the repo: shared/guidelines/..."}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 86, "message": "path does not exist under the repo: skills/external/..."}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 86, "message": "path does not exist under the repo: shared/guidelines/..."}], "summary": {"errors": 0, "advisories": 10, "waived": 0, "fr": 30, "sc": 9, "tasks": 52, "clauses": 0, "files": 13}, "checked_at": "2026-11-05T10:51:50Z"}
+----- END VERBATIM -----
+
+**Reading**: `decision=pass`, `errors=0`; the 10 advisories are pre-existing placeholder-shaped
+paths (`skills/external/foo`, `...` ellipses) inside requirements/plan/checklist prose, not paths
+this stage created or needs.
+
+## validate-tasks
+
+$ python3 scripts/python/validate-tasks.py .specify/specs/083-mechanism-policy-separation/tasks.md
+exit_code = 0
+
+----- BEGIN VERBATIM -----
+PASS: .specify/specs/083-mechanism-policy-separation/tasks.md — 0 error(s), 0 warning(s)
+----- END VERBATIM -----
+
+Closing re-run, after T049–T052 were marked `[x]` (same command):
+
+$ python3 scripts/python/validate-tasks.py .specify/specs/083-mechanism-policy-separation/tasks.md
+exit_code = 0
+output: `PASS: .specify/specs/083-mechanism-policy-separation/tasks.md — 0 error(s), 0 warning(s)`
+
+## Summary
+
+| Gate | exit code | reading |
+|---|---|---|
+| GATE-1 | 0 | 100 passed, 0 failed (eleven modules + negative cases) |
+| GATE-2 | 0 | 899 passed; failed-name set ∅; `head − baseline = ∅` against the 24-entry E2 baseline |
+| GATE-3 | 0 / 0 | six mirror pairs `ok`; zero changed command copies |
+| GATE-4 | 0 | PASS with two disclosures: 083-attributed set == registered set (10 == 10, both differences empty); literal "rows 1–8" is stale (GM-03 registers 10: rows 1–8 + 19–20); raw diff carries 24 non-083 paths from absorbed work lines |
+| GATE-5 | 0 → 1 | 4 open rows at T051 time (by construction); **0** after T049–T052 closed |
+| GATE-6 | 1 (no match) | 0 hits in each of 4 scanned files |
+| GATE-7 | 0 | 0 mirror-path references in 54 `SKILL.md` files; each of the 5 consumers has exactly 1 source-path reference |
+| pre-analyze-check | 0 | `decision=pass errors=0 advisories=10` |
+| validate-tasks | 0 | `0 error(s), 0 warning(s)` |

@@ -1,4 +1,4 @@
-"""Contract tests for Feature 082 US4 — the worked-example set is decidable and single (T021).
+"""Contract tests for Feature 083 US4 — the worked-example set is decidable and single (T021).
 
 Owns ``data-model.md`` § E-7 (the ``Decidability Sample`` entity) against the owner's
 ``## Worked Examples`` section. The examples themselves live in
@@ -29,8 +29,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 OWNER_REL = Path("shared/definitions/mechanism-policy-definitions.md")
-DATA_MODEL_REL = Path(".specify/specs/082-mechanism-policy-separation/data-model.md")
-CONTRACTS_DIR = REPO_ROOT / ".specify/specs/082-mechanism-policy-separation/contracts"
+DATA_MODEL_REL = Path(".specify/specs/083-mechanism-policy-separation/data-model.md")
+CONTRACTS_DIR = REPO_ROOT / ".specify/specs/083-mechanism-policy-separation/contracts"
 
 CLOSED_ANSWERS = ("机制", "策略", "待澄清")
 MIN_ITEMS = 12

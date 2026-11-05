@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Feature 082 (meta-skill governance: mechanism/policy separation + skill-reference
+- **Feature 083 (meta-skill governance: mechanism/policy separation + skill-reference
   normalization)**: two framework owners — `shared/definitions/mechanism-policy-definitions.md`
   (boundary test, misplacement symptoms, archival rules, consumption contract, meta-layer
   membership) and `shared/definitions/skill-reference-definitions.md` (accepted forms,

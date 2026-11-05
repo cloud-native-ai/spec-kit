@@ -2,7 +2,7 @@
 id: "20261105T064151Z-run-determination-speckit-checklist-r20261105t033420z-082a"
 scope: "session"
 source: "/speckit.checklist"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 tags: ["run-determination", "r20261105t033420z-082a"]
 title: "run-determination /speckit.checklist r20261105T033420Z-082a"
 created: "2026-11-05T06:41:51Z"
@@ -18,7 +18,7 @@ summary: "/speckit.checklist run=r20261105T033420Z-082a token=not_evaluated elap
   "unit_id": "/speckit.checklist",
   "unit_type": "command",
   "run_id": "r20261105T033420Z-082a",
-  "feature": "082-mechanism-policy-separation",
+  "feature": "083-mechanism-policy-separation",
   "feature_id": null,
   "determined_at": "2026-11-05T06:41:51Z",
   "settled_at": null,

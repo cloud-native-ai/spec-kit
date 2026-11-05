@@ -7,7 +7,7 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 feature_id: "082"
 partial: false
 created: "2026-11-05T06:45:32Z"

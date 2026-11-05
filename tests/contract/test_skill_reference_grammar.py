@@ -1,7 +1,7 @@
-"""Contract tests for Feature 082 US5 — the owner's grammar (T025).
+"""Contract tests for Feature 083 US5 — the owner's grammar (T025).
 
 Owns the GR-01 … GR-06 text legs of
-``.specify/specs/082-mechanism-policy-separation/contracts/skill-reference.contract.md``
+``.specify/specs/083-mechanism-policy-separation/contracts/skill-reference.contract.md``
 against ``shared/definitions/skill-reference-definitions.md`` (GR-08's reference
 coordinate: the framework-source path, never the generated mirror).
 
@@ -31,7 +31,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OWNER_REL = Path("shared/definitions/skill-reference-definitions.md")
-DATAMODEL_REL = Path(".specify/specs/082-mechanism-policy-separation/data-model.md")
+DATAMODEL_REL = Path(".specify/specs/083-mechanism-policy-separation/data-model.md")
 
 #: § Normalization — the eight steps, in the only order the owner may state.
 NORMALIZATION_STEPS = tuple("NP-%d" % i for i in range(1, 9))

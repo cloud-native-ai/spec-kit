@@ -1,0 +1,20 @@
+# Targeted test run (probe) — 083 requirements scope update
+# captured: 2026-11-05T04:18:40Z
+# Purpose: NOT the E3 slot. This is the OBSERVATION that justifies E3 status=not-run-docs-only:
+#   the stage's own diff is spec prose only, and the only test that reacts to the working tree
+#   reacts to the UNCOMMITTED concurrent implementation, not to this stage.
+# command: .venv/bin/python -m pytest -q -p no:cacheprovider -p no:platformdirs <paths>
+# note: '-p no:platformdirs' is required in this environment; the venv resolves platformdirs
+#       4.10.0 from /Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib, whose
+#       pytest plugin entry point is missing -> 'ModuleNotFoundError: platformdirs.pytest_plugin'.
+#       scripts/bash/run-tests.sh hits the same error here. Disclosed, not repaired (environment).
+
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+1 failed, 89 passed, 1 warning in 4.98s
+rc=1

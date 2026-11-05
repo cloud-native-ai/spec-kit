@@ -1,0 +1,47 @@
+verdict: accept
+spec_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/083-mechanism-policy-separation
+flow_class: execution
+claimed_status: Ready for Review
+final_path: pass=8 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=8
+reason: none
+# closure-check rc=0
+# --- same judgement with --json (smoke + completion_conditions payload) ---
+{
+  "claimed_status": "Ready for Review",
+  "claimed_status_source": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 8,
+    "total": 8,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/083-mechanism-policy-separation/test-evidence/final-gates.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/083-mechanism-policy-separation",
+  "tasks": {
+    "closed": 52,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+# closure-check-json rc=0

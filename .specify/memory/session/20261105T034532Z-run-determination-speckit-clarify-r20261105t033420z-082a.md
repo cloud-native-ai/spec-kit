@@ -2,7 +2,7 @@
 id: "20261105T034532Z-run-determination-speckit-clarify-r20261105t033420z-082a"
 scope: "session"
 source: "/speckit.clarify"
-feature: "082-mechanism-policy-separation"
+feature: "083-mechanism-policy-separation"
 tags: ["run-determination", "r20261105t033420z-082a"]
 title: "run-determination /speckit.clarify r20261105T033420Z-082a"
 created: "2026-11-05T03:45:32Z"
@@ -18,7 +18,7 @@ summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapse
   "unit_id": "/speckit.clarify",
   "unit_type": "command",
   "run_id": "r20261105T033420Z-082a",
-  "feature": "082-mechanism-policy-separation",
+  "feature": "083-mechanism-policy-separation",
   "feature_id": null,
   "determined_at": "2026-11-05T03:45:32Z",
   "settled_at": null,

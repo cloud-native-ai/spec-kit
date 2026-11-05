@@ -2,14 +2,14 @@
 id: "20261105T070114Z-run-determination-speckit-analyze-082-mechanism-policy-separ"
 scope: "session"
 source: "/speckit.analyze"
-feature: "082-mechanism-policy-separation"
-tags: ["run-determination", "082-mechanism-policy-separation-analyze2-20261105"]
-title: "run-determination /speckit.analyze 082-mechanism-policy-separation-analyze2-20261105"
+feature: "083-mechanism-policy-separation"
+tags: ["run-determination", "083-mechanism-policy-separation-analyze2-20261105"]
+title: "run-determination /speckit.analyze 083-mechanism-policy-separation-analyze2-20261105"
 created: "2026-11-05T07:01:14Z"
-summary: "/speckit.analyze run=082-mechanism-policy-separation-analyze2-20261105 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.analyze run=083-mechanism-policy-separation-analyze2-20261105 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated"
 ---
 
-/speckit.analyze run=082-mechanism-policy-separation-analyze2-20261105 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated
+/speckit.analyze run=083-mechanism-policy-separation-analyze2-20261105 token=not_evaluated elapsed=regressed artifact=not_evaluated satisfaction=not_evaluated
 
 ```json
 {
@@ -17,8 +17,8 @@ summary: "/speckit.analyze run=082-mechanism-policy-separation-analyze2-20261105
   "schema_version": 1,
   "unit_id": "/speckit.analyze",
   "unit_type": "command",
-  "run_id": "082-mechanism-policy-separation-analyze2-20261105",
-  "feature": "082-mechanism-policy-separation",
+  "run_id": "083-mechanism-policy-separation-analyze2-20261105",
+  "feature": "083-mechanism-policy-separation",
   "feature_id": "082",
   "determined_at": "2026-11-05T07:01:14Z",
   "settled_at": null,
@@ -126,7 +126,7 @@ summary: "/speckit.analyze run=082-mechanism-policy-separation-analyze2-20261105
     "red_state_input": "caller-declaration"
   },
   "change_point": {
-    "id": "cp-082-mechanism-policy-separation-analyze2-20261105",
+    "id": "cp-083-mechanism-policy-separation-analyze2-20261105",
     "clean": false,
     "findings": [
       {
