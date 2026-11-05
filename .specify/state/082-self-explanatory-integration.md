@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T013-T018 (part 3 of 10)
+- **part_scope**: T019-T023 (part 4 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -81,8 +81,8 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
 
 - **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
 - **last_verdict**: implement part 3 done (`2161ac40`) — US1 surface complete: template principle (part 2), generator mandate entry (T013), both mirrors byte-identical (T014), live constitution XIX with MINOR bump 1.15.0→1.16.0 and a Sync Impact Report naming this amendment's principle (T017), carrier watchlist + three counts raised together 18/19/11 (T016). US1 subset 12 passed rc 0; carrier 19 passed rc 0; both mutation legs M-1/M-2 PASS with anti-vacuity companions and a sha256 unchanged-repository proof (T018). Five collateral guards pinned values this landing moved and were repaired in passing (x13/x15/x18/x5/x6 of `test_fast_fail_discipline.py`), each disclosed with its reason; none weakened, each keeps its own subject. No plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified). No Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up, no push.
-- **next_step**: driver dispatches implement part 4 (P4 `T019-T023`, US2 tests + first implementation). Part 3 stopped at the part boundary by design; C-21's red/green pairing lands at T024 and is NOT closed here.
-- **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3)
+- **next_step**: driver adjudicates the part-4 held-open C-18 reading, then dispatches implement part 5 (P5 `T024-T028`: live reconcile, symlink check, mirror sync, M-3/M-4 mutation legs). Part 4 stopped at the part boundary by design; C-15's green (`test_c1_live_instructions_carry_all_template_sections`) and C-21's red/green pairing both close at T024.
+- **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3) → part 4 (T019-T023; hash recorded in the part-4 checkpoint commit line below)
 
 <!-- The first "gates" key above is a preserved historical section; the canonical list follows. -->
 
@@ -113,6 +113,7 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
   - 2026-11-05 implement part 1: done — commit 94caea76; T001-T006 closed; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal belongs to the NEW module while both pre-existing suites stay green.
   - 2026-11-05 implement part 2: done — commits 171d4bcc + 8daf6b65; T007-T012 closed; template principle XVIII landed; US1 subset 12 passed with C-7 mandate side and C-21 declared expected-red.
   - 2026-11-05 implement part 3: done — commit 2161ac40; T013-T018 closed; US1 surface complete on all three surfaces; mutation legs M-1/M-2 PASS.
+  - 2026-11-05 implement part 4: done with one held-open clause — T019-T022 closed (C-10/C-11/C-14/C-17 carriers + template section, C-21 green); T023's budget raise applied and recorded but its C-18 claim awaits the driver's reading choice (34816 vs 33792); one new and attributable failure, the deferred T024 live reconcile.
 
 ## Analyze-stage upsends (need driver adjudication before implement)
 
@@ -265,3 +266,74 @@ between readings, not a single consistent correction):
 - **gate budget**: `scan-confirmation-gates.py --json` total = 27, unchanged from T002 — C-8 held.
 - **no plan-owned edits** (PLAN-EDIT none); no Completion Gate, no Feature status flip, no implement Feedback/Wrap-up, no push.
 - **next**: P4 T019-T023 (US2 tests + instructions template section). C-21's green is T024's and is NOT closed here.
+
+- 2026-11-05 implement part 3: 2161ac40; part 4 T019-T023 starts.
+
+## Implement part 4 checkpoint（2026-11-05）
+
+- **part_scope**: T019-T023 — T019/T020/T021/T022 `[X]`; **T023 `[X]` with a held-open clause
+  marker** (C-18 not proven, see the anomaly below). 30 task rows remain unchecked (`[ ]` or
+  `[>]`): T024-T053, untouched by this part. Grep check at part end: `grep -cE '^- \[[ >]\]'` = 30.
+- **artifacts**:
+  - `tests/contract/test_instructions_section_propagation.py` — new C-10 / C-11 / C-14 tests plus the
+    `_generator_substitutions()` / `_render()` anti-drift companion; module docstring records the
+    clause mapping and the isolation note (the guard renders the framework-source template rather
+    than calling the generator, which renders from `.specify/templates/`).
+  - `tests/contract/test_instructions_size_budget.py` — new `test_c17_real_tree_live_size_is_within_the_raised_budget`,
+    budget derived via the existing `_budget_bytes()`, no literal.
+  - `templates/instructions-template.md` — `## Self-Explanatory Structure (不言自明)` inserted between
+    `## Grounded Naming` and `## Bilingual Expression (双语表述)`; no existing section moved.
+    Body = 1 summary sentence + 1 pointer line to `.specify/shared/definitions/self-explanatory-definitions.md`; 618 B.
+  - `scripts/bash/generate-instructions.sh` — `INSTRUCTIONS_BUDGET_BYTES` 32768 → 34816, with the
+    old/new value, measured size (33357 B), reason and magnitude rule in the comment above it.
+  - `notes/red-first-evidence.md` — § R-4 (red capture + ordering note) and the C-21 shape finding.
+  - `test-evidence/implement-part-4.md` — E3 stage-status row, red/green capture, measurements table.
+- **targeted set** (the three commands the brief names): `test_self_explanatory_constitution.py`
+  rc 0 / 13 passed; `test_instructions_section_propagation.py` **rc 1** / 5 passed 1 failed;
+  `test_instructions_size_budget.py` rc 0 / 13 passed.
+- **the single failure is the deferred obligation, not a regression**:
+  `test_c1_live_instructions_carry_all_template_sections` reports the missing section in
+  `.specify/instructions.md`. It passed at `2161ac40` (checked with `git show HEAD:…`), and it closes
+  at T024, which owns the live reconcile. Confirmation run with only that case deselected:
+  4 carriers, **50 passed / 1 deselected**, so no other guard moved.
+- **C-21 turned green after T022**, as the brief predicted, and it did so only after an in-passing
+  repair: the C-21 carrier strips every line containing the pointer path before counting sentences,
+  so a section whose summary and pointer share a line counts as **zero** sentences. The first draft
+  did exactly that and went red on a real defect (not an expected-red). Repaired to one summary
+  sentence + pointer on its own line; the dropped second sentence also restated owner rules, so the
+  short body is the correct shape rather than a budget concession. Transcript in `notes/red-first-evidence.md`.
+- **in-passing repairs**: (1) the C-21 section shape above; (2) the R-4 open-pairs table duplicated
+  the one already in the file, so the older copy was removed and a single table kept.
+- **no plan-owned edits** (`PLAN-EDIT: none`); `requirements.md` / `plan.md` / `data-model.md` /
+  `contracts/` / `quickstart.md` / `research.md` / `feature-ref.md` unmodified.
+- **no** Completion Gate, **no** Feature status flip, **no** implement Feedback/Wrap-up, **no** push,
+  **no** mirror sync and **no** live reconcile (both are part 5).
+
+### Part 4 held-open item（需编排者裁定）
+
+- **C-18 / T023 — the raise magnitude has two compliant readings.** The applied constant is 34816.
+  Under the T-001 rule as written — the smallest multiple of 1024 leaving at least 1024 B of
+  headroom under the `over` verdict (`size >= budget`) — the candidates compute, against the
+  measured 33357 B post-injection size, as: **32768** over by 590; **33792** within with 434 B
+  headroom (i.e. the rule's literal arithmetic would pick 33792, not 34816); **34816** within with
+  1458 B headroom.
+  The second reading depends on the section body's own size, which is not yet frozen that tightly:
+  with the body re-cut to one shorter sentence the injection lands at 33233 B and **33792 then
+  leaves 558 B**, still compliant under either reading.
+  Reading A = keep 34816 (headroom measured against the section as it stands, at the cost of one
+  extra 1024 B over the literal minimum). Reading B = set 33792 (the literal minimum against the
+  measured size, with 434 B headroom).
+  This is a choice between readings, not a correction, so it is surfaced rather than settled:
+  **T023's `[green:] C-18` claim is NOT proven** until the orchestrator picks one. Both readings
+  satisfy the hard constraint (a multiple of 1024, at least 1024 B of headroom under one of the two
+  sizes named here), and the value has exactly one owner, so switching is a one-line change plus this
+  comment.
+- **last_verdict**: implement part 4 done with one held-open clause — T019/T020/T021/T022 closed with
+  red-first capture and green after landing; T023's raise applied and recorded but its C-18 claim
+  awaits the reading above. One new failure in the targeted set, named and attributable to the
+  deferred T024 reconcile.
+
+- 2026-11-05 implement part 4: see the checkpoint above; next is P5 T024-T028 (live reconcile,
+  symlink check, mirror sync, M-3/M-4). The C-18 reading must be adjudicated before part 5 lands the
+  mirrors, because T026 mirrors `generate-instructions.sh` and re-syncing after a second edit would
+  touch the same file twice.

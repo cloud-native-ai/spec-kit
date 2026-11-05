@@ -35,7 +35,22 @@ TARGET_DIR=".specify"
 # back into /speckit.instructions by hand. This constant is the ONLY definition
 # of the number: the command template references the script's report and never
 # restates the value.
-INSTRUCTIONS_BUDGET_BYTES=32768
+#
+# Raise record (Feature 082, T023 — instructions-propagation contract C-18):
+#   old value: 32768
+#   new value: 34816
+#   measured live size after injection: 33357 B (this repository, after the
+#     `## Self-Explanatory Structure (不言自明)` section was reconciled in;
+#     32739 B before it, so the section costs 618 B)
+#   reason: the new ambient section. Its pointer keeps the section at summary
+#     length, but the file had only 29 B of headroom against the old budget, so
+#     any section at all would have crossed it. No existing section was trimmed
+#     to make room: the instruction file belongs to its project.
+#   rule: the smallest multiple of 1024 that leaves at least 1024 B of headroom
+#     under the generator's `over` verdict, which fires at `size >= budget` —
+#     i.e. the smallest N*1024 with (N*1024 - 1) - 33357 >= 1024. 33792 fails
+#     (-566 B, still over); 34816 leaves 1458 B and is the first that passes.
+INSTRUCTIONS_BUDGET_BYTES=34816
 
 mkdir -p "$TARGET_DIR"
 

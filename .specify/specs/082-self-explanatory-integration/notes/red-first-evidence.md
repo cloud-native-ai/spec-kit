@@ -166,10 +166,70 @@ Both legs therefore satisfy the contract's three requirements: the clause goes *
 mutation, the anti-vacuity companion proves the real file carries the subject, and the repository
 files are byte-identical afterwards (sha256 before and after).
 
-## Pairs still open after this part
+## R-4 — US2 template-side section (T019/T020), red captured 2026-11-05
+
+Commands run **before** T022/T023 touched any artifact, from the repository root:
+
+```text
+$ python3 -m pytest tests/contract/test_instructions_section_propagation.py -q
+FAILED tests/contract/test_instructions_section_propagation.py::test_c10_template_carries_the_section_and_its_runtime_pointer
+FAILED tests/contract/test_instructions_section_propagation.py::test_c11_section_is_summary_plus_pointer_not_a_copy
+FAILED tests/contract/test_instructions_section_propagation.py::test_c14_template_side_presence_survives_rendering
+3 failed, 3 passed in 1.67s
+EXIT=1
+
+$ python3 -m pytest tests/contract/test_instructions_size_budget.py -q
+13 passed in 6.46s
+EXIT=0
+```
+
+Where each red comes from, and why it is the right one:
+
+- C-10 / C-11 fail at `_section_body` → `AssertionError: no '## Self-Explanatory Structure
+  (不言自明)' section on the surface under test` — the artifact is absent, not the assertion
+  mis-written. The owner files themselves exist and are byte-identical, so C-11's precondition
+  holds and the failure is attributable to the missing section alone.
+- C-14 fails at its first line with the message it exists to produce: the template lost the
+  heading. That is the template-side assertion firing, which is what the contract's mutation leg
+  (M-3) must be able to do; it is not a live-file red.
+- The C-14 anti-drift companion (`..._rendered_template_matches_the_generator_substitution_set`)
+  and C-17 pass at red time **by design** — both guard inherited surfaces that this feature does
+  not move. Their being green here is the control: the red is confined to the three assertions
+  whose subject is the missing artifact.
+
+Note on clause ordering (disclosed, not an anomaly): C-17's assertion is a real-tree measurement,
+so it is green before and after T022/T023 — the new section adds bytes to the live file only at
+T024. Its discriminating evidence is therefore the derived-value rule, not a red/green pair at
+this part. A budget literal in the test would not have made it red either; it would have made it
+green for the wrong reason.
+
+## Pairs still open after part 4
 
 | Pair | Red captured | Green expected at | Status |
 |------|--------------|-------------------|--------|
 | R-2 C-24 mirror byte parity | — | T031/T032 (US3) | NOT STARTED |
 | R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
 | C-21 instructions summary | declared red (part 2) | T024 (US2) | OPEN — green belongs to T024 |
+| R-4 C-10/C-11/C-14 | this section | T024's reconcile / T027's M-3 | RED CAPTURED |
+
+## Part 4 shape finding — the section's summary must be ONE sentence (disclosed repair)
+
+The C-21 carrier (`test_self_explanatory_constitution.py`) removes **every line containing the
+pointer path** before counting sentences. My first draft put summary sentences and the pointer on
+the same physical line, so the whole paragraph was removed and C-21 failed with "the section
+carries no summary at all". Measured, not guessed:
+
+```text
+body   = "\nCorrectness makes …. Full definitions …: `.specify/…-definitions.md` (do NOT restate …).\n"
+pointer_lines = [that entire line]        # → summary became empty → C-21 red on a REAL defect
+```
+
+Repaired by giving the section the shape C-21 exists to enforce: **one summary sentence**, a blank
+line, then the pointer on its own line. Two summary sentences on separate lines would also satisfy
+C-21, but the earlier draft's *second* sentence was not a summary — it restated rules the owner
+already owns, which is the very duplication C-20/C-21 exist to prevent. So the short body is the
+correct shape, not a budget concession. Final section body is 1 summary sentence + 1 pointer line,
+618 B.
+
+This is an in-passing correction (one reading consistent with the contract's intent, local,
+reversible), not a decision: disclosed here and in the part-4 checkpoint.
