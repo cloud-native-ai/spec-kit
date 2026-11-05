@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feature 081 · 更严格的验收与产物审查 — 最终成果</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --muted: #5b6472;
+    --line: #e3e7ed;
+    --accent: #1f6feb;
+    --ok: #1a7f37;
+    --ok-bg: #e8f5ec;
+    --warn: #9a6700;
+    --warn-bg: #fff4d6;
+    --code: #f0f3f7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 20px 64px;
+    background: var(--bg); color: var(--ink);
+    font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  header.hero {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 34px 36px; margin-bottom: 22px;
+    box-shadow: 0 12px 30px rgba(31, 36, 48, .06);
+  }
+  .eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 10px 0 12px; font-size: 30px; line-height: 1.3; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--muted); font-size: 13.5px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); border: 1px solid #c6e7d0; }
+  .pill.neutral { color: var(--muted); background: #f1f3f6; border: 1px solid var(--line); }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); border: 1px solid #f0dca6; }
+  section.card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px 28px; margin-bottom: 18px;
+  }
+  h2 { margin: 0 0 14px; font-size: 20px; }
+  h3 { margin: 22px 0 8px; font-size: 15.5px; }
+  p { margin: 8px 0; }
+  .lead { font-size: 16px; color: #2b3240; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; background: #fafbfc; }
+  tr:last-child td { border-bottom: none; }
+  code {
+    background: var(--code); border: 1px solid var(--line); border-radius: 5px;
+    padding: 1px 6px; font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 14px 0 4px; }
+  .metric { background: #fafbfc; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .metric .k { color: var(--muted); font-size: 12.5px; margin-bottom: 4px; }
+  .metric .v { font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+  .metric .v.ok { color: var(--ok); }
+  .metric .v.warn { color: var(--warn); }
+  ul { margin: 8px 0 4px; padding-left: 20px; }
+  li { margin: 5px 0; }
+  .note { color: var(--muted); font-size: 13.5px; }
+  .divider { height: 1px; background: var(--line); margin: 20px 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  footer { color: var(--muted); font-size: 12.5px; text-align: center; margin-top: 26px; }
+  @media (max-width: 640px) {
+    body { padding: 22px 12px 40px; }
+    header.hero { padding: 24px 20px; }
+    section.card { padding: 18px 16px; }
+    h1 { font-size: 24px; }
+    th, td { padding: 8px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">spec-kit · Feature 081 · Final Report</div>
+    <h1>更严格的验收与产物审查</h1>
+    <p class="lead">把 <code>Implemented</code> 从「任务勾完」收紧为「每条 final 路径 SC 为 pass + 最小 smoke 记录在案」，并把 review 从两段改为四段 + 一次确定性验收现实检查。</p>
+    <div class="meta">
+      <span class="pill ok">✓ Ready for Review</span>
+      <span class="pill neutral">closure: accept</span>
+      <span class="pill neutral">final_path 2 / 2</span>
+      <span>2026-11-03 · master @ 506adf88</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>结论先行</h2>
+    <div class="grid">
+      <div class="metric"><div class="k">闭环判定</div><div class="v ok">accept · exit 0</div><div class="note">无 reason；final_path 2/2 pass</div></div>
+      <div class="metric"><div class="k">全量测试</div><div class="v ok">0 new / 0 fixed</div><div class="note">39 failed · 7134 passed · 7 skipped（39 为既有基线）</div></div>
+      <div class="metric"><div class="k">final smoke</div><div class="v ok">0 / 0</div><div class="note">同一命令两次；证据文件 byte-identical</div></div>
+      <div class="metric"><div class="k">镜像与副本</div><div class="v ok">exit 0</div><div class="note">mirrors / per-tool copies 两个 --check</div></div>
+    </div>
+    <p class="note">39 个失败归其他切片；本特性用 id 级集合差证明「0 新增」，不以「全仓测试」这类聚合词替代。</p>
+  </section>
+
+  <section class="card">
+    <h2>四个切片</h2>
+    <table>
+      <thead><tr><th style="width:92px">切片</th><th>交付</th></tr></thead>
+      <tbody>
+        <tr><td><strong>081a</strong></td><td><code>Blocked</code> 一等状态与四条转移；verification 词表与五字段测量阶梯；<code>closure-acceptance-check.py</code>（accept/block + 封闭原因集 + <code>final_path</code> 六桶）；smoke 硬条件；implement 调用点。</td></tr>
+        <tr><td><strong>081b</strong></td><td>Runtime Stack &amp; Dependency Ownership / Execution Premises / Inherited Blockers 三张强制表；四类确定性发现；两个 producer 在<strong>真实 plan 形状</strong>上对拍。</td></tr>
+        <tr><td><strong>081c</strong></td><td>四段 review + ARC；<code>review-feature-quality</code> 技能；review-template 槽位 <code>### 2.2</code>–<code>### 2.4</code>；review 调用点；用新组合对自身做 dogfooding 评审。</td></tr>
+        <tr><td><strong>081d</strong></td><td><code>--audit-existing</code> 零写审计；driver line-state <code>blocked</code> 八项处置；driver closure/merge 调用点（<code>closure-blocked</code> / <code>closure-input-error</code> 分置）；两处词表；schema-ownership guard；CHANGELOG；feature 级读数与状态落地。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Dogfooding：新 review 评审自己</h2>
+    <p>081c 首次用「过程 → 产物 → 实现 → 代码 + ARC」评审自身，发现 P0=1（report slot 前言与 findings 表互相否定）、P1=4（analyze round-2 只裁 C/H、FR-015 追溯指向错误夹具、severity 定义两套、覆盖率回执无步骤产出）。P0/P1 全部修复后重跑；081d 最终评审 P0=0、P1=3（实现阶段代做 R4R 翻转、SC-009 两处矛盾陈述、detail 当前位过时），三条 P1 亦修复，ARC 读 <code>agree</code>。</p>
+    <div class="divider"></div>
+    <h3>本轮新增的硬约束</h3>
+    <ul>
+      <li>final 路径 SC 全 pass 才可 <code>Implemented</code>；<code>Blocked</code> 是合法中间态，不允许用它冒充完成。</li>
+      <li>review 必须审实现与各阶段产物本身，不再只做流程回顾；ARC 只抄 checker 的七键记录，不重算。</li>
+      <li>运行时依赖、执行前提、继承 blocker 是结构化一等产物；「外部提供」必须写成表行 + pin + 联合验收。</li>
+      <li>两个 producer（gate 与 closure checker）必须在真实 spec 形状上对拍，fixture 形状不能替代。</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>证据索引</h2>
+    <table>
+      <thead><tr><th>证据</th><th>位置（仓库相对路径）</th></tr></thead>
+      <tbody>
+        <tr><td>状态脊</td><td><code>.specify/state/081-acceptance-hardening.md</code></td></tr>
+        <tr><td>验收日志</td><td><code>.specify/specs/081-acceptance-hardening/verification.md</code></td></tr>
+        <tr><td>最终评审</td><td><code>.specify/specs/081-acceptance-hardening/review.md</code></td></tr>
+        <tr><td>闭环载荷</td><td><code>.specify/specs/081-acceptance-hardening/test-evidence/closure-verdict-081d.json</code></td></tr>
+        <tr><td>基线对照</td><td><code>.specify/specs/081-acceptance-hardening/test-evidence/081d-final-baseline-2.txt</code></td></tr>
+        <tr><td>特性登记</td><td><code>.specify/memory/features/081.md</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>剩余具名缺口（未计 pass）</h2>
+    <ul>
+      <li><span class="pill warn">named remainder</span> 覆盖率车道 <code>[fr-uncovered] fail (23)</code>：25 条 FR 中仅 2 条从 citation group 引用；已记录，未冒充绿色。补齐需拥有 <code>contracts/</code> 的切片在条款块内引用 FR。</li>
+      <li><span class="pill neutral">baseline</span> 39 个既有失败归其他切片，不在本特性的允许差异集内。</li>
+    </ul>
+  </section>
+
+  <footer>
+    spec-kit · Feature 081 · 生成于 2026-11-03 · 代码与全部证据：<a href="https://code.alibaba-inc.com/cloud-native-ai/spec-kit">code.alibaba-inc.com/cloud-native-ai/spec-kit</a>
+  </footer>
+
+</div>
+</body>
+</html>
