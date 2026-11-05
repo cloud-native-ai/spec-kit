@@ -76,7 +76,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 **上游效率门（2026-10-21 增补）**：
 
-- **大特性拆分门**：plan 入口 FR >30 或 tasks U4 任务 >40 时判 `split-required`，驱动必须先拆成各自落入区间（8–30 FR / 10–40 任务）的切片，再逐条走完整链（`scripts/decomposition-check.py`）。
+- **大特性拆分门**：plan 入口 FR >30 或 tasks U4 任务 >60 时判 `split-required`，驱动必须先拆成各自落入区间（8–30 FR / 10–60 任务）的切片，再逐条走完整链（`scripts/decomposition-check.py`）。
 - **确定性预检**：requirements/plan/tasks 的 U4 在派发下一阶段前运行 `scripts/pre-analyze-check.py`，机械拦截重复/悬空 ID、`blockedBy` 断链、计数声明漂移与死路径；机械项不再留到 analyze。
 - **跨特性重叠预检**：clarify U4 运行 `scripts/overlap-check.py` 比较同级特性的共享交付路径（`same-path`/`nested-path`），重叠必须先完成归属裁决并写入两条线状态脊，才能派发 plan。
 - **Wrap-up 记账核验**：U4 校验该阶段 unit-id 的 run-determination 与 feedback 记录；有特性上下文时条目须带 `--feature`；阶段返回 `WRAPUP-DEFERRED` 时驱动者补跑三步后再放行（owner：`references/stage-prompts.md` § Independent Verification）。

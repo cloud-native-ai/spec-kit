@@ -112,7 +112,7 @@ def test_count_claim_mismatch_fails(tmp_path):
 def test_ranges_and_examples_are_not_claims(tmp_path):
     spec = _spec(
         tmp_path,
-        plan_extra="\nMedium band: 8–30 FR and 10–40 tasks.\n",
+        plan_extra="\nMedium band: 8–30 FR and 10–60 tasks.\n",
         requirement_extra="1. **Given** a feature with 12 FR, **When** planned.\n")
     proc = _run(spec)
     assert proc.returncode == 0, proc.stdout + proc.stderr

@@ -90,7 +90,7 @@ def test_fl_03_criteria_table_pinned():
     assert "`^- \\[[ xX>~]\\] T[0-9]{3}`" in requirements
     source = _text(SKILL_DIR / "scripts" / "admission-check.py")
     assert "FR_MIN = 8" in source and "FR_MAX = 30" in source
-    assert "TASK_MIN = 10" in source and "TASK_MAX = 40" in source
+    assert "TASK_MIN = 10" in source and "TASK_MAX = 60" in source
     assert "数据模型" in efficiency or "lines.manifest" in efficiency
 
 
