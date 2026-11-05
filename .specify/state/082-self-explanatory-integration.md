@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T019-T023 (part 4 of 10)
+- **part_scope**: T029-T033 (part 6 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,6 +24,8 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
+- **part_checkpoint** (implement part 6/10): `part_scope=T029-T033` — **done**; commit `e88cebc2` (12 files, 1272+/8-). T029-T033 all `[X]` in tasks.md, no `[>]` held; 20 unchecked rows remain (T034+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-6.md`. Next part (P7 T034-T038) is driver-dispatched; this run MUST NOT start T034+.
+- **part_checkpoint** (implement part 5/10): `part_scope=T024-T028` — **done**; commit `02fd6db5`. E3 row in `test-evidence/implement-part-5.md`.
 - **part_checkpoint** (implement part 3/10): `part_scope=T013-T018` — **done**; commit `2161ac40` (9 files, 409+/26-). T013-T018 all `[X]` in tasks.md, no `[>]` held; 35 unchecked rows remain (T019+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md`. Next part (P4 T019-T023) is driver-dispatched; this run MUST NOT start T019+.
 
 ## E2 baseline row (implement, seq=1)
@@ -352,3 +354,56 @@ between readings, not a single consistent correction):
 - **live reconcile**: second run rc 0 and idempotent; `Instructions size: 33357 B (budget 34816 B, 1459 B headroom)`; symlinks remain links to `.specify/instructions.md`; mirrors byte-identical.
 - **no plan-owned edits**; no Completion Gate, no Feature status flip, no implement Feedback/Wrap-up; not pushed.
 - **next**: P6 T029-T033 (distribution test with venv/editable install, source-doc add, mirror write/compare, source-tree confirmation).
+
+## Part 6 record（implement T029-T033，2026-11-05）
+
+- **part_scope**: `T029-T033` (part 6 of 10) — **done**
+- **commit**: `e88cebc2` (12 files, 1272+/8-); stage_base `02fd6db5`
+- **rows closed**: T029, T030, T031, T032, T033 all `[X]` in `tasks.md`; 20 unchecked rows remain
+  (T034+), by design. No `[>]` held.
+- **targeted-set-v1 result** (no second full suite; E2's 26 failed / 7156 passed / 1 skipped stands):
+  - `python3 -m pytest tests/contract/test_self_explanatory_distribution.py -q` → **rc 0, 4 passed**
+  - `python3 scripts/python/sync-mirrors.py --check` → **rc 0**, six `ok` pairs, `shared` 65 files
+  - three `cmp` calls (T032) → **rc 0 / 0 / 0**
+  - companion: `test_mirror_parity_suite.py` (derives its params from `MIRROR_PAIRS`; the three new
+    sources appeared without an edit — exactly 3 matched node ids, each naming its own
+    `source->mirror` pair) + `test_scripts_distribution_parity.py` → 766 passed rc 0;
+    `test_migration_distribution.py` + `test_self_explanatory_constitution.py` → 31 passed rc 0
+  - **new_failures**: none
+- **E3 pointer**: `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-6.md`;
+  transcripts in `notes/pre-change-measurements.md` § Part 6, `notes/quickstart-run.md` § Part 6,
+  and `notes/red-first-evidence.md` § R-2 (R-2a / R-2b, both CLOSED).
+- **last_verdict**: implement part 6 done (`e88cebc2`) — US3's distribution chain is closed end to
+  end. The three owner documents are version-controlled sources (three `A`), mirrored byte-identically
+  (`cmp` rc 0 ×3, whole-pair `filecmp.cmp(shallow=False)` sweep `missing=[] extra=[] differing=[]`),
+  and reach a client project through `specify init` run from an entry point this run built itself
+  (temp venv + `pip install -e`; all three `.specify/shared/...` paths present, `.specify/shared/`
+  holds 65 files). C-26's guard went red on its own subject by removal (2 failed, naming the removed
+  document) and green after restore (4 passed), with a third anti-vacuity companion and a
+  `sha256 -c` + `diff -r` proof that the repository was unchanged. The mirror engine's write path was
+  exercised rather than assumed (`DIFF` → `sync … (1 files)` → byte-identical). Two in-passing
+  corrections disclosed (the resource-root two-layout repair replacing a skip; the `sys.path` import
+  idiom replacing by-path loading). No plan-owned artifact touched (`PLAN-EDIT: none`). No Completion
+  Gate, no Feature status flip, no implement Feedback/Wrap-up, no push.
+- **next_step**: driver dispatches implement part 7 (P7 `T034-T038`: docs link guard C-27 in the same
+  new module, the read-only page review T035, the distribution-probe rewrite T036, and mutation legs
+  M-5/M-6). This run MUST NOT start T034+.
+- **RESOLVED (driver, 2026-11-05T06:07:38Z) — T031's `65 → 68` file count.** T031's task text predicts
+  the `shared` pair grows from 65 to 68; measured **65 before and 65 after**. No mirror file is
+  missing: 62 files tracked at HEAD + 3 new sources = 65, both trees hold 65, and all three pairs are
+  byte-identical. research.md B-7's own `ok … (65 files)` reading was taken at the start of the plan
+  stage against that same 62-file `shared/`, so `65 + 3 = 68` does not describe this baseline. Two
+  readings remain open — (a) the plan-stage readings describe a tree state this checkout no longer
+  has (B-7 records the three files were created outside that run's reach), or (b) the engine's file
+  enumeration differs from `find` in a way this run has not isolated. Picking one is a decision
+  (it needs an artifact this feature does not own, or a judgement about engine semantics), so it is
+  surfaced. **C-23's own obligation is met on the reading that applies** (keep exit 0 with no `MISS`
+  and no `DIFF`), and C-22's byte identity is proven; only T031's parenthetical arithmetic is
+  unresolved.
+- **stage_commits** (append): … → 02fd6db5 (implement part 5) → **e88cebc2 (implement part 6)**
+
+## T031 arithmetic resolution（2026-11-05T06:07:38Z）
+
+- The `shared` pair is **65 files before and after** T030/T031: 62 pre-existing files + 3 mirrors already present (untracked) from the plan stage. T030 only version-controls the 3 source documents; it does not add 3 new mirror files. The task's `65 → 68` prediction was wrong; the task text is corrected.
+- The operative C-22/C-23 evidence stands: `sync-mirrors.py --check` exit 0 (six `ok` pairs), three `cmp` pairs byte-identical, no MISS/DIFF. Part 6's targeted set: distribution 4 passed; mirror parity 766 passed; migration+constitution 31 passed.
+- Next: P7 T034-T038 (docs link guard, docs page, distribution probe, M-5/M-6).
