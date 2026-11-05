@@ -1272,7 +1272,9 @@ file.284.reason=size-guard-focus-not-reviewed
 
 ### 未提交范围（未评审）
 
-同 round 1：既有未提交的 `session/…-081a.md`（已修改）与 `memory/` 下未跟踪记录在本次切片之外，未提交、
-未还原，本记录不对其给任何结论。本轮新增未提交面只有本篇记录、`review-r1.md`（round 1 报告归档）、
-`review.md`（round 2 报告）、`test-evidence/review-round2-smoke-2026-11-06.txt` 与 `stage-status.md` 的
-round 2 行。
+同 round 1 的边界：本轮自己的产出面是 `review.md`（重写）、`review-r1.md`（round 1 报告归档）、本记录
+（轮转后重写）、`code-review-20261105T160943Z.md`（round 1 代码段归档）、
+`test-evidence/review-round2-smoke-2026-11-06.txt`、`test-evidence/stage-status.md` 的 round 2 行、
+`.specify/memory/features/084.md` 的 `## Latest Review` 条目与 `.specify/memory/register.md` 的
+`REC-084-09…11` 三行；既有已修改的 `session/20261102T231648Z-…-081a.md` 与 `.specify/memory/` 下既有未跟踪
+记录在本切片之外，未提交、未还原，本记录不对其给任何结论。
