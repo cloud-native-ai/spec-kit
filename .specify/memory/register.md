@@ -139,3 +139,4 @@
 | REC-084-09 | 验证日志的每个槽位必须点名读它的程序；无读者的槽位要么删，要么接进授予该记录的 checker（新增 `smoke_comparison` 槽位即反例） | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-09（N3） | open |
 | REC-084-10 | 修复轮必须按 finding 自己枚举的站点逐点给出 closure 表（站点 → 提交 → 读数），下一轮读表而不是读提交标题 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-10（N1） | open |
 | REC-084-11 | 评审收尾必须断言两个法定载体都存在且带本轮身份（报告 § 2.1 + 特性详情 `## Latest Review` 条目），缺席即红 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-11（N2） | open |
+| REC-084-12 | `targeted-set-v1` 增加**形态腿**：改动某个引擎时，同时选中把该引擎 `shutil.copy2` 进构造树的测试文件；且任一阶段的定向运行 MUST 留下捕获证据（命令行／退出码／完整输出），只在提交信息里报告通过数不算读数 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-12（N2；目标 `contracts/test-budget.md` TB-05 + `skills/sdd-loop-driver/references/efficiency-model.md` § 2.3） | open |

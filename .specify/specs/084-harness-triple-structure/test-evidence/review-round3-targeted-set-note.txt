@@ -1,0 +1,20 @@
+# targeted-set-v1 (efficiency-model §2.3) — review round 3, 2026-11-06
+# stage_base=e1f59096 (state spine stage_base_commit)
+# changed_paths source: git show --name-only --format= e1f59096 (9 paths; code paths used for selection: scripts/python/closure-acceptance-check.py, scripts/python/validate-requirements.py, shared/declarations/facts/flow-class-classes.yaml + their .specify/ mirror copies)
+# clause (a) fired per changed code path (path or module stem, grep -lF); clause (b) added the feature deliverable contract test (short name harness-triple-structure) — already in the set; spec-dir markdown paths excluded from selection (not an executable surface; the generic stem 'verification' would swamp the set)
+# command: pytest -q $(cat .specify/specs/084-harness-triple-structure/test-evidence/review-round3-targeted-set.txt)
+
+tests/contract/test_acceptance_premises.py
+tests/contract/test_acceptance_review_composition.py
+tests/contract/test_checker_form.py
+tests/contract/test_clarify_semantic_completeness.py
+tests/contract/test_closure_acceptance_check.py
+tests/contract/test_expression_gates_doc.py
+tests/contract/test_gate_wiring_081.py
+tests/contract/test_harness_triple_structure.py
+tests/contract/test_measurement_instruments.py
+tests/contract/test_neutrality_budget.py
+tests/contract/test_requirements_checker.py
+tests/contract/test_review_feedback_boundary.py
+tests/integration/test_acceptance_smoke.py
+tests/integration/test_expression_line_pilot.py

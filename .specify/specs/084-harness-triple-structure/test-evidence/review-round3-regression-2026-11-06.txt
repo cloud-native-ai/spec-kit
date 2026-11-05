@@ -1,0 +1,42 @@
+# 084 review round 3 — regression causality reading (2026-11-06)
+# shape: a tree carrying scripts/python/closure-acceptance-check.py WITHOUT its sibling declaration_reader.py
+#        (the shape tests/contract/test_gate_wiring_081.py::_make_line_repo builds at line 543,
+#         and the shape FR-013 forbids from dying on a traceback — see the module's READER_ABSENT comment)
+# scratch root: .specify/.tmp/review-r3-causal (git-ignored; removed at the end of this run)
+
+## A. HEAD e1f59096
+$ cp scripts/python/closure-acceptance-check.py .specify/.tmp/review-r3-causal/scripts/python/
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir> --json
+rc=1  stdout_bytes=0
+--- stderr (verbatim) ---
+Traceback (most recent call last):
+  File "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r3-causal/scripts/python/closure-acceptance-check.py", line 131, in _declared_flow_classes
+    body = declaration_reader.load_fact(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'load_fact'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r3-causal/scripts/python/closure-acceptance-check.py", line 142, in <module>
+    FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r3-causal/scripts/python/closure-acceptance-check.py", line 138, in _declared_flow_classes
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'DeclarationError'
+
+## B. the commit's own parent e0453f9e, same shape, same command
+$ git show e0453f9e:scripts/python/closure-acceptance-check.py > .../closure-acceptance-check.py
+rc=2 (input error, not a crash)
+--- stderr (verbatim) ---
+declaration-absent: success-criterion-path-values
+closure-acceptance-check: the shared read entry is absent; the `Path` membership test is skipped for this run
+declaration-absent: arc-verdict-mapping
+closure-acceptance-check: the `ARC verdict mapping` is unreadable; this run uses the labelled compatibility value for the `final_path` record and the verdict
+closure-acceptance-check: input error: cannot determine the claimed feature status for /storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure: no --feature-detail / --feature-registry was given, the spec dir carries no feature-detail.md or feature-registry.md, and /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r3-causal/.specify/memory/features.md has no row for '084-harness-triple-structure'
+
+## C. contract-test consequence at HEAD (targeted set, tests/contract/test_gate_wiring_081.py)
+FAILED tests/contract/test_gate_wiring_081.py::test_a_block_lands_blocked_after_the_record   (detail no longer names zero-final-path-pass; it carries the AttributeError traceback)
+FAILED tests/contract/test_gate_wiring_081.py::test_a_passing_line_merges_and_records_merged   (a passing feature is refused: closure-blocked on the traceback)
+Both ids are absent from .specify/specs/084-harness-triple-structure/test-evidence/baseline-pre-existing-failed.txt (23 pre-existing ids) => NEW failures, not baseline.

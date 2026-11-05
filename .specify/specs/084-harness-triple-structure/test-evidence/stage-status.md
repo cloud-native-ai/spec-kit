@@ -1849,3 +1849,76 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/review.md
 1. **Feature 状态仍未翻转，且拒绝依据与 round 1 不同**：本轮 ARC 是 `accept`，拒绝来自状态机条件 (c)——当前 `code-review.md` 含 1 条 `blocking`（`closure-acceptance-check.py:227` 的 `flow-class-classes` 内联副本）；`features.md` 与 `features/084.md` 的状态列保持 `Implemented`，未写回、未降级，拒绝字面量 `blocking-unresolved` 记在 `review.md` § 2.1 与 § Status Transition。两个门读的是不同工件，故分开报告而不是折算成一句。
 2. **本轮判读面是修复提交，不是整个 delta**：`0bd4c622..e0453f9e` 只触碰 15 条路径，回执的 5 条 `reviewed` 就是其去重后的源码面；其余 279 条按 `size-guard-focus-not-reviewed` 跳过（相对 round 1 逐字节未变），跳过不计覆盖信用。round 1 的 39 条 judged 读数在其归档 `code-review-20261105T160943Z.md` 内，本行不对它们给新结论。
 3. **两处由修复轮自身引入的状态已如实记为本轮 P1**：`verification.md` SC-001 记录的 `28/28` 被修复提交自己的 `consumers` 修改推到 `30/30`（同一行 limb (iii) 的「引用它的一方确实被点名」被 `closure-acceptance-check.py` 证伪）；round 1 的第二个法定载体——`features/084.md` 的 `## Latest Review` 评审条目——当时没有写，本轮补写（本轮结论落在报告 § 2.1 与本条目两处）。这两条都不是「顺手修平」：SC-001 那一行归 implement，本阶段只记录读数与归属。
+
+## review round 3（四段 + Acceptance Reality Check，2026-11-06）
+
+```yaml
+stage: review
+row_type: stage-status
+attempt: 3
+status: ran
+selection_basis: "targeted-set-v1 —— 输入取修复提交 `e1f59096` 的 9 条路径（`git show --name-only --format= e1f59096`）。(a) 逐个改动代码路径按「仓库相对路径或其模块 stem」`grep -lF` 选择：closure-acceptance-check → 8 命中、validate-requirements → 9 命中、flow-class-classes → 1 命中；(b) 交付物契约测试按本特性短名 `harness-triple-structure` 命中 1 个（已在集中）；(c) 夹具变更 0 命中。spec 目录下的 markdown 路径不参与选择（非可执行面；`verification` 这类通用 stem 会把集合淹没成 39 个文件），该取舍记在 `review-round3-targeted-set-note.txt`"
+selected_paths:
+  - tests/contract/test_acceptance_premises.py
+  - tests/contract/test_acceptance_review_composition.py
+  - tests/contract/test_checker_form.py
+  - tests/contract/test_clarify_semantic_completeness.py
+  - tests/contract/test_closure_acceptance_check.py
+  - tests/contract/test_expression_gates_doc.py
+  - tests/contract/test_gate_wiring_081.py
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_measurement_instruments.py
+  - tests/contract/test_neutrality_budget.py
+  - tests/contract/test_requirements_checker.py
+  - tests/contract/test_review_feedback_boundary.py
+  - tests/integration/test_acceptance_smoke.py
+  - tests/integration/test_expression_line_pilot.py
+sufficiency: "对改动代码面充分：五个源码/事实路径的每一处引用面都有至少一个契约模块覆盖，且本集合命中了复现「有引擎、无兄弟读取入口」部署形态的唯一模块（`test_gate_wiring_081.py`）。但它不是形态守卫：该模块之所以被选中，只是因为 (a) 子句按字面路径命中，而修复轮自己的集合显然缺了这一腿——这正是本轮 finding N2 与 REC-084-12 的内容。定向集自身不能证明「没有其它未选中的形态」"
+command: "python3 -m pytest -q <上列 14 个文件>"
+rc: 1
+passed: 356
+failed: 4
+new_failures: "2 —— `tests/contract/test_gate_wiring_081.py::test_a_block_lands_blocked_after_the_record` 与 `::test_a_passing_line_merges_and_records_merged`；按 `comm -13` 对 `.specify/specs/084-harness-triple-structure/test-evidence/baseline-pre-existing-failed.txt`（23 个 id）比较得出。另 2 条在基线集内（`test_e_a_stale_pin…` 陈旧 pin；`test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom` 27 > 23.25）。两条新失败同因：`_declared_flow_classes()` 缺 `declaration_reader is None` 守卫"
+baseline_compare: "comm -13 <(baseline-pre-existing-failed.txt 的 23 个 id) <(本轮 FAILED 行) → 2 个新增 id（见 new_failures）"
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/review.md
+  - .specify/specs/084-harness-triple-structure/review-r2.md
+  - .specify/specs/084-harness-triple-structure/code-review.md
+  - .specify/specs/084-harness-triple-structure/code-review-20261105T162652Z.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-targeted-2026-11-06.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-targeted-set.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-targeted-set-note.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-smoke-2026-11-06.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-gates-2026-11-06.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round3-regression-2026-11-06.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+  - .specify/memory/features/084.md
+  - .specify/memory/register.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/review-round3-targeted-2026-11-06.txt
+```
+
+## Why `ran`（review round 3）
+
+本阶段的判读面包含可执行面：修复提交改了 `scripts/python/closure-acceptance-check.py`、
+`scripts/python/validate-requirements.py` 与 `shared/declarations/facts/flow-class-classes.yaml`（各带 `.specify/` 镜像）。
+因此 `targeted-set-v1` 的选择集非空，E3 行按 `status=ran` 记全字段。派发简报只授权定向集，不消耗也不预支 `closure` 槽位。
+
+## review round 3 的七条读数（命令 + 实测）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| 定向集 | `python3 -m pytest -q <14 文件>` | **`4 failed, 356 passed`**，15.50 s；两条新增失败（`test_gate_wiring_081.py` 的两条门接线腿），两条基线失败；证据 `test-evidence/review-round3-targeted-2026-11-06.txt` |
+| 回归归因（差分） | 同一「有引擎、无 `declaration_reader.py`」树，分别跑 HEAD 与父提交 | HEAD：`rc=1`、`stdout_bytes=0`、`AttributeError: 'NoneType' object has no attribute 'load_fact'`；父提交 `e0453f9e`：`rc=2`、三条 `declaration-absent:` 标注、无 traceback ⇒ 崩溃由 `e1f59096` 引入；证据 `test-evidence/review-round3-regression-2026-11-06.txt` |
+| ARC（判定条件的主人） | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` | `verdict: accept`（exit 0）；`claimed_status: Implemented`；`final_path` = pass 2／blocked 0／deferred 0／partial 0／fail 0／unknown 0／total 2；四条 `completion_conditions` 全 true；`reasons: []`；`smoke` 四字段齐（新增 `comparison` 已读出）；`tasks` = closed 32／deferred 0／open 0 |
+| smoke 三件（复跑，定向） | `python3 scripts/python/harness-triple-check.py --action coverage` ×2 + `cmp` + `sha256sum` | 两次 exit 0、逐字节一致、`sha256 f9cd934a…b13473`（与 round 1／round 2 同值）；证据 `test-evidence/review-round3-smoke-2026-11-06.txt` |
+| verify（双向一致） | `python3 scripts/python/harness-triple-check.py --action verify` | exit 0；`consistency-declarations-to-carriers: 31/31`、`consistency-carriers-to-declarations: 16/16`、`findings: 0`；`residual-literals` 仍是常数字符串（round 2 `important` #2 未处置） |
+| 镜像 | `python3 scripts/python/sync-mirrors.py --check` | exit 0，六对全 `ok`（templates 22／skills-external 409／skills-internal 138／agents 3／scripts 121／shared 89） |
+| 代码段回执 | `git-delta-review.sh receipt --review-file …/code-review.md --spec …` | `changed 289 / judged 5 / skipped 284 / gap 0`；`renderer: text`；`segment: blocked`（1 条 `[blocking]`）；`report --summary --file` exit 1、`blocking_entries=1`、`gate=deny` |
+
+非目标面同 round 2：`git diff --stat 4b65517c -- pyproject.toml` 与 `git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` 均空输出。
+
+## review round 3 的三处披露
+
+1. **Feature 状态仍未翻转，拒绝条件是 (c)，且这次是一条新缺陷**：`code-review.md` 含 1 条 `blocking`（`closure-acceptance-check.py:138`：`_declared_flow_classes()` 缺 `declaration_reader is None` 守卫，在「树里只有引擎」的形态下模块导入即 `AttributeError`，exit 1 且 stdout 为空），`gate=deny`，故 `features.md` 与 `features/084.md` 保持 `Implemented`，拒绝字面量 `blocking-unresolved` 记在 `review.md` § 2.1 与 § Status Transition。round 2 那条 `blocking` 确实已关闭——同一轮里「一处关闭、一处新增」两件事同时成立，报告分开写。
+2. **ARC 与实现段读的是不同工件，故分开报告**：ARC `verdict: accept`（四条件全 true），而实现段因 2 条新增失败判 `blocked`。ARC 看不到这个缺陷，因为 C-033 只走声明点名的一方，而该形态根本没有声明。
+3. **定向集第一次把形态复现模块带上，而这一次是它自己救的本轮**：`test_gate_wiring_081.py` 之所以进入本轮集合，是 `targeted-set-v1` (a) 子句按字面路径命中的结果；修复轮自己的运行缺了这一腿（本轮 finding N2）。E3 的 `sufficiency` 字段因此明写「不足以作形态守卫」，不把一次命中当成判据已覆盖。

@@ -1,0 +1,63 @@
+# 084 review round 3 — gate readings (2026-11-06)
+
+## harness-triple-check.py --action verify
+$ python3 scripts/python/harness-triple-check.py --action verify   -> exit 0
+# harness-triple-check — verify
+declarations: 23
+candidates: 83
+consistency-declarations-to-carriers: 31/31
+consistency-carriers-to-declarations: 16/16
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 0
+
+## sync-mirrors.py --check
+$ python3 scripts/python/sync-mirrors.py --check   -> exit 0
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (89 files)
+
+## closure-acceptance-check.py --spec-dir <spec-dir> --json
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json   -> exit 0
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 2,
+    "total": 2,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "python3 scripts/python/harness-triple-check.py --action coverage",
+    "comparison": "byte-identical with .specify/specs/084-harness-triple-structure/test-evidence/smoke-run2-2026-11-05.txt (cmp exit 0)",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/084-harness-triple-structure/test-evidence/smoke-run1-2026-11-05.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure",
+  "tasks": {
+    "closed": 32,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}

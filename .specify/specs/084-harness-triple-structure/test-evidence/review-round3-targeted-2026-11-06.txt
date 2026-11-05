@@ -1,0 +1,132 @@
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..................F..................................................... [ 20%]
+........................................................................ [ 40%]
+...........................F.F.......................................... [ 60%]
+..............................................F......................... [ 80%]
+........................................................................ [100%]
+=================================== FAILURES ===================================
+_____ test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it ______
+
+    def test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it():
+        """The pin is valid only while re-reading it reproduces it — and a mismatch is exit-2 class."""
+        for tool, reading in _live_readings().items():
+            assert reading, "%s produced no reading; a pin comparison on nothing proves nothing" % tool
+>           assert _assert_pin(tool, reading)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_acceptance_premises.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'git', reading = 'git version 2.43.7'
+
+    def _assert_pin(tool, reading):
+        """Compare one reading against its recorded pin; a difference is an input error."""
+        pins = _pins()
+        if tool not in pins:
+            raise PinMismatch("no recorded pin for %r in %s" % (tool, PINS))
+        if reading.strip() != pins[tool].strip():
+>           raise PinMismatch(
+                "%s reads %r but %s records %r — the comparison is invalid (input error, exit 2), "
+                "which is not a new failure" % (tool, reading.strip(), PINS.name, pins[tool].strip())
+            )
+E           contract.test_acceptance_premises.PinMismatch: git reads 'git version 2.43.7' but plan-runner-pins.txt records 'git version 2.54.0 (Apple Git-157)' — the comparison is invalid (input error, exit 2), which is not a new failure
+
+tests/contract/test_acceptance_premises.py:627: PinMismatch
+_________________ test_a_block_lands_blocked_after_the_record __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0')
+
+    def test_a_block_lands_blocked_after_the_record(tmp_path):
+        """GW-03's verdict, on a real line: the failed result is recorded, then the line lands blocked.
+    
+        GATE-5 reads this leg: the gate is the default (no `--gate-cmd` given), the fixture blocks,
+        the line carries `integration_result.status=failed` with the `closure-blocked` reason, its
+        state is `blocked` — and no `--result merged` follows, because a `blocked` line is
+        structurally out of the integration queue (A6 item 5).
+        """
+        repo, wt = _make_line_repo(tmp_path, "neg", "081-neg",
+                                   spec_cell=".specify/specs/081-neg/requirements.md", fixture="negative")
+        reg = tmp_path / "reg"
+        reg.mkdir()
+        line_id = _register_line(reg, repo, wt, "081-neg")
+        proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+    
+        assert proc.returncode != 0, "a blocked feature must refuse the merge:\n%s" % proc.stdout
+        row = _result_for(summary, line_id)
+        assert row["status"] == "failed" and row["reason"] == "closure-blocked", (
+            "the block must be recorded with the closure reason, not the override's `quality-gate`: "
+            "%r" % (row,)
+        )
+>       assert "zero-final-path-pass" in row.get("detail", ""), (
+            "the recorded refusal must name what failed, not merely that it failed: %r" % (row,)
+        )
+E       AssertionError: the recorded refusal must name what failed, not merely that it failed: {'archive_calls': 0, 'detail': 'Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0/wt-neg/scripts/python/closure-acceptance-check.py", line 131, in _declared_flow_classes\n    body = declaration_reader.load_fact(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: \'NoneType\' object has no attribute \'load_fact\'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0/wt-neg/scripts/python/closure-acceptance-check.py", line 142, in <module>\n    FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()\n                                       ^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0/wt-neg/scripts/python/closure-acceptance-check.py", line 138, in _declared_flow_classes\n    except (declaration_reader.DeclarationError, TypeError, ValueError):\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: \'NoneType\' object has no attribute \'DeclarationError\'', 'line_id': 'line081-20261105T162528Z-557f', 'reason': 'closure-blocked', 'status': 'failed'}
+E       assert 'zero-final-path-pass' in 'Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0/wt-neg/sc...        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: \'NoneType\' object has no attribute \'DeclarationError\''
+E        +  where 'Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-194/test_a_block_lands_blocked_aft0/wt-neg/sc...        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: \'NoneType\' object has no attribute \'DeclarationError\'' = <built-in method get of dict object at 0x7f98d59a8ac0>('detail', '')
+E        +    where <built-in method get of dict object at 0x7f98d59a8ac0> = {'archive_calls': 0, 'detail': 'Traceback (most recent call last):\n  File "/tmp/pytest-of-agent/pytest-194/test_a_blo...t has no attribute \'DeclarationError\'', 'line_id': 'line081-20261105T162528Z-557f', 'reason': 'closure-blocked', ...}.get
+
+tests/contract/test_gate_wiring_081.py:612: AssertionError
+________________ test_a_passing_line_merges_and_records_merged _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-194/test_a_passing_line_merges_and0')
+
+    def test_a_passing_line_merges_and_records_merged(tmp_path):
+        """The positive side of the same gate: a passing feature merges and is recorded merged.
+    
+        Without this leg the negative leg could pass for the wrong reason — a pipeline that cannot
+        merge at all also refuses. Here the gate passes, the merge lands on trunk, and the record
+        carries `merged` with the real commit.
+        """
+        repo, wt = _make_line_repo(tmp_path, "pos", "081-pos",
+                                   spec_cell=".specify/specs/081-pos/requirements.md", fixture="positive")
+        reg = tmp_path / "reg"
+        reg.mkdir()
+        line_id = _register_line(reg, repo, wt, "081-pos")
+        proc, summary = _run_integrator(tmp_path, repo, reg, line_id)
+    
+>       assert proc.returncode == 0, "a passing feature must merge:\n%s%s" % (proc.stdout, proc.stderr)
+E       AssertionError: a passing feature must merge:
+E         {"archive_calls": 0, "failed": 1, "mirror_calls": 0, "ok": false, "results": [{"archive_calls": 0, "detail": "Traceback (most recent call last):\n  File \"/tmp/pytest-of-agent/pytest-194/test_a_passing_line_merges_and0/wt-pos/scripts/python/closure-acceptance-check.py\", line 131, in _declared_flow_classes\n    body = declaration_reader.load_fact(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'load_fact'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/tmp/pytest-of-agent/pytest-194/test_a_passing_line_merges_and0/wt-pos/scripts/python/closure-acceptance-check.py\", line 142, in <module>\n    FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()\n                                       ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/pytest-of-agent/pytest-194/test_a_passing_line_merges_and0/wt-pos/scripts/python/closure-acceptance-check.py\", line 138, in _declared_flow_classes\n    except (declaration_reader.DeclarationError, TypeError, ValueError):\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'DeclarationError'", "line_id": "line081-20261105T162528Z-3940", "reason": "closure-blocked", "status": "failed"}], "trunk": "main"}
+E         
+E       assert 3 == 0
+E        +  where 3 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/...d": "line081-20261105T162528Z-3940", "reason": "closure-blocked", "status": "failed"}], "trunk": "main"}\n', stderr='').returncode
+
+tests/contract/test_gate_wiring_081.py:675: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_gate_wiring_081.py::test_a_block_lands_blocked_after_the_record
+FAILED tests/contract/test_gate_wiring_081.py::test_a_passing_line_merges_and_records_merged
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+4 failed, 356 passed, 1 warning in 15.50s
+Command exited with non-zero status 1
+elapsed=15.82s
