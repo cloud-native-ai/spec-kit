@@ -2,7 +2,7 @@
 
 - **line_id**: 082-self-explanatory-integration
 - **run_id**: r20261105T032102Z-c139
-- **state**: running
+- **state**: done
 - **current_stage**: implement (complete — Feature 082 `Implemented`; next stage is driver-dispatched review)
 - **part_scope**: T048-T053 (part 10b of 10 — final; the Completion Gate, `verification.md`, GATE-4, the Feature status flip and the implement wrap-up)
 - **attempts**: 1
@@ -723,3 +723,17 @@ between readings, not a single consistent correction):
 - **next_step**: human/governance `Ready for Review → Completed`, then the local merge; the
   REC-… ids coined in `review.md` are registered in `.specify/memory/register.md` in the same
   commit as the report.
+
+## test-budget ledger (JSONL)
+
+<!-- test-budget:begin -->
+{"seq": 1, "slot": "baseline", "stage": "implement", "selection_basis": "full-suite", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/082-self-explanatory-integration/baseline-failed.txt", "rc": 1, "passed": 7156, "failed": 26, "skipped": 1, "duration_s": 387.0, "failed_names_path": ".specify/specs/082-self-explanatory-integration/baseline-failed.txt", "evidence_ptr": ".specify/specs/082-self-explanatory-integration/baseline-failed.txt; raw log .specify/specs/082-self-explanatory-integration/notes/baseline-full-suite-20261105.log (untracked, *.log)", "merge_source": "na", "merged_at": "na", "purpose": "baseline", "trigger": "implement-start", "at": "2026-11-05T04:31:00Z"}
+{"seq": 2, "slot": "closure", "stage": "review", "selection_basis": "full-suite", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/082-self-explanatory-integration/final-failed.txt", "rc": 1, "passed": 7198, "failed": 25, "skipped": 1, "duration_s": 394.95, "failed_names_path": ".specify/specs/082-self-explanatory-integration/final-failed.txt", "evidence_ptr": ".specify/specs/082-self-explanatory-integration/test-evidence/final-suite-20261105.txt", "baseline_compare": "comm -13 sorted(baseline-failed.txt) sorted(final-failed.txt) → empty; fixed: tests/contract/test_spec_feature_binding_integrity.py::test_c2_active_spec_feature_bindings_resolve", "merge_source": "na", "merged_at": "na", "purpose": "closure", "trigger": "review-passed", "at": "2026-11-05T06:57:00Z"}
+<!-- test-budget:end -->
+
+## U6 closure record（2026-11-05T07:03:54Z）
+
+- **review**: complete — `review.md` + `code-review.md`; P0=0 / P1=1 fixed / P2=4; Feature 082 = `Ready for Review`; REC-T1/C1/A1/W1/W2 registered.
+- **closure full suite**: 25 failed / 7198 passed / 1 skipped (394.95s); baseline 26; `comm -13` (sorted) empty; one baseline red fixed (`test_c2_active_spec_feature_bindings_resolve`).
+- **test-budget audit**: `baseline:1 closure:1`, `stages=6 complete=6`, `status=ok`.
+- **merge**: local `master` merge pending; no push; branch deletion only after `git branch -d` proves merged; line registry deregister after merge.
