@@ -58,9 +58,9 @@
 
 **Purpose**: 冻结阶段基线,并把本阶段要产出的运行期证据落点建好。本特性没有需要初始化的项目骨架(仓库已是框架源),故 Setup 只承担「先量后改」的前提复位。
 
-- [ ] T001 [P] 在 `.specify/specs/082-self-explanatory-integration/notes/` 建目录并冻结运行期证据落点(red-first-evidence / quickstart-run / pre-change-measurements 三个空占位不预写内容),该目录是后续证据行的固定落点 [green: contracts/mirror-distribution.contract.md#C-23]
-- [ ] T002 [P] 重取改动前基线并写入 `.specify/specs/082-self-explanatory-integration/notes/pre-change-measurements.md`: `wc -c .specify/instructions.md`(实测 32739)、`grep -n '^INSTRUCTIONS_BUDGET_BYTES=' scripts/bash/generate-instructions.sh`(实测 `38:INSTRUCTIONS_BUDGET_BYTES=32768`)、`grep -cE '^### [IVXLC0-9]+\. ' templates/constitution-template.md .specify/memory/constitution.md`(实测 17 / 18)、live 宪章版本行与 `python3 scripts/python/scan-confirmation-gates.py --json` 的 `total`(实测 27),每条附命令、输出与 2026-11-05 日期
-- [ ] T003 冻结条款覆盖基线: `python3 scripts/python/account-clause-coverage.py .specify/specs/082-self-explanatory-integration --freeze > .specify/specs/082-self-explanatory-integration/coverage-baseline.txt` [green: contracts/constitution-double-landing.contract.md#C-9]
+- [X] T001 [P] 在 `.specify/specs/082-self-explanatory-integration/notes/` 建目录并冻结运行期证据落点(red-first-evidence / quickstart-run / pre-change-measurements 三个空占位不预写内容),该目录是后续证据行的固定落点 [green: contracts/mirror-distribution.contract.md#C-23]
+- [X] T002 [P] 重取改动前基线并写入 `.specify/specs/082-self-explanatory-integration/notes/pre-change-measurements.md`: `wc -c .specify/instructions.md`(实测 32739)、`grep -n '^INSTRUCTIONS_BUDGET_BYTES=' scripts/bash/generate-instructions.sh`(实测 `38:INSTRUCTIONS_BUDGET_BYTES=32768`)、`grep -cE '^### [IVXLC0-9]+\. ' templates/constitution-template.md .specify/memory/constitution.md`(实测 17 / 18)、live 宪章版本行与 `python3 scripts/python/scan-confirmation-gates.py --json` 的 `total`(实测 27),每条附命令、输出与 2026-11-05 日期
+- [X] T003 冻结条款覆盖基线: `python3 scripts/python/account-clause-coverage.py .specify/specs/082-self-explanatory-integration --freeze > .specify/specs/082-self-explanatory-integration/coverage-baseline.txt` [green: contracts/constitution-double-landing.contract.md#C-9]
 
 **Checkpoint**: 基线已冻结;后续任一「改动前/改动后」断言都可对照本阶段的三份记录。
 
@@ -72,9 +72,9 @@
 
 **⚠️ CRITICAL**: 本阶段完成前不得开始任何用户故事。
 
-- [ ] T004 只读复核三份 owner 文档在框架源中存在且非空(实测 `shared/definitions/self-explanatory-definitions.md` 4508 B / 7 个 `## ` 标题;`shared/guidelines/self-explanatory.md` 6271 B / 10 个;`shared/workflow/best-practice-optimization.md` 4613 B / 8 个),并把三条 `ls -l` 输出写入 `notes/pre-change-measurements.md`;内容不在本特性范围,缺失即上送而非新建。指向: `shared/definitions/self-explanatory-definitions.md` [green: contracts/mirror-distribution.contract.md#C-22]
-- [ ] T005 复核镜像引擎的枚举形态(与 T004 写同一个 `notes/pre-change-measurements.md`,故不带 [P]) `python3 scripts/python/sync-mirrors.py --check`(实测退出 0,`shared/ == .specify/shared/` 为 `ok`、65 文件)并把输出粘入 `notes/pre-change-measurements.md`;同时记录 `shared` 对是**非 strict** 对(镜像独有文件只报 note,见 plan § Mirror Obligations fact 1) [green: contracts/mirror-distribution.contract.md#C-25]
-- [ ] T006 [blockedBy: T001] Red-first 取证：先创建 `tests/contract/test_self_explanatory_constitution.py` 的最小断言（模板标题集合含 `Self-Explanatory Structure (不言自明)`），运行 `python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q`，确认它因标题尚不存在而失败；把命令、真实失败输出与退出码写入 `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md`。不得把既有 `test_constitution_double_landing.py` / `test_instructions_section_propagation.py` 的通过当作红旗——它们不引用 STR-001。 [green: contracts/constitution-double-landing.contract.md#C-1]
+- [X] T004 只读复核三份 owner 文档在框架源中存在且非空(实测 `shared/definitions/self-explanatory-definitions.md` 4508 B / 7 个 `## ` 标题;`shared/guidelines/self-explanatory.md` 6271 B / 10 个;`shared/workflow/best-practice-optimization.md` 4613 B / 8 个),并把三条 `ls -l` 输出写入 `notes/pre-change-measurements.md`;内容不在本特性范围,缺失即上送而非新建。指向: `shared/definitions/self-explanatory-definitions.md` [green: contracts/mirror-distribution.contract.md#C-22]
+- [X] T005 复核镜像引擎的枚举形态(与 T004 写同一个 `notes/pre-change-measurements.md`,故不带 [P]) `python3 scripts/python/sync-mirrors.py --check`(实测退出 0,`shared/ == .specify/shared/` 为 `ok`、65 文件)并把输出粘入 `notes/pre-change-measurements.md`;同时记录 `shared` 对是**非 strict** 对(镜像独有文件只报 note,见 plan § Mirror Obligations fact 1) [green: contracts/mirror-distribution.contract.md#C-25]
+- [X] T006 [blockedBy: T001] Red-first 取证：先创建 `tests/contract/test_self_explanatory_constitution.py` 的最小断言（模板标题集合含 `Self-Explanatory Structure (不言自明)`），运行 `python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q`，确认它因标题尚不存在而失败；把命令、真实失败输出与退出码写入 `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md`。不得把既有 `test_constitution_double_landing.py` / `test_instructions_section_propagation.py` 的通过当作红旗——它们不引用 STR-001。 [green: contracts/constitution-double-landing.contract.md#C-1]
 
 **Checkpoint**: 前提齐备且红旗取证已留痕;可以并行开工 P1 的三个故事(镜像、宪章、instructions 互不写同一文件)。
 
