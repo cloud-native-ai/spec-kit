@@ -1,0 +1,9 @@
+fact: flow-class-classes
+kind: closed-set
+statement:
+  - execution
+  - expression
+consumers:
+  - scripts/python/flow-class-check.py
+former_carriers: []
+note: fixture value — branch B's single added fact file.

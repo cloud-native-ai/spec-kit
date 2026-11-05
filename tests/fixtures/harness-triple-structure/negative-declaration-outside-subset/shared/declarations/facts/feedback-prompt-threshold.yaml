@@ -1,0 +1,8 @@
+fact: feedback-prompt-threshold
+kind: threshold
+statement: [first-member, second-member]
+consumers:
+  - scripts/python/feedback-utils.py
+  - shared/workflow/feedback-step.md
+former_carriers: []
+note: fixture value — the statement uses a flow sequence, which is outside the allowed subset.

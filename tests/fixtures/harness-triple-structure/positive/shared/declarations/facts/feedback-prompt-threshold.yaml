@@ -1,0 +1,8 @@
+fact: feedback-prompt-threshold
+kind: threshold
+statement: 10
+consumers:
+  - scripts/python/feedback-utils.py
+  - shared/workflow/feedback-step.md
+former_carriers: []
+note: fixture value — the engine side wins by the authority order, nothing had drifted.

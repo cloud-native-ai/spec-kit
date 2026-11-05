@@ -1,0 +1,3 @@
+- unit: skills/internal/humanize/SKILL.md
+  carrier: skills/internal/humanize/scripts/rewrite.py
+  anchor: shared/definitions/absent-anchor.md#Nowhere

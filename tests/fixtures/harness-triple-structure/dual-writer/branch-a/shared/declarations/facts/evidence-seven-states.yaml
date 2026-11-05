@@ -1,0 +1,10 @@
+fact: evidence-seven-states
+kind: closed-set
+statement:
+  - Present
+  - Wired
+  - Exercised
+consumers:
+  - scripts/python/evidence-utils.py
+former_carriers: []
+note: fixture value — branch A's single added fact file.

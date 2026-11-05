@@ -1,0 +1,3 @@
+- unit: skills/internal/summarize-project/SKILL.md
+  carrier: skills/internal/summarize-project/scripts/summarize.py
+  anchor: skills/internal/summarize-project/SKILL.md#Note

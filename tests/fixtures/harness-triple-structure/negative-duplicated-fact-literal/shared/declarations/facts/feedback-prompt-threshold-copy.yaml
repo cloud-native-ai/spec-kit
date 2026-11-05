@@ -1,0 +1,7 @@
+fact: feedback-prompt-threshold
+kind: threshold
+statement: 10
+consumers:
+  - scripts/python/feedback-utils.py
+former_carriers: []
+note: fixture value — a second file claiming the same floor, which is the duplicate this tree proves.

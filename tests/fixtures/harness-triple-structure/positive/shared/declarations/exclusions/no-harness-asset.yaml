@@ -1,0 +1,3 @@
+- unit: skills/external/draw-diagram/SKILL.md
+  carrier: skills/external/draw-diagram/scripts/render_asset.py
+  anchor: skills/external/draw-diagram/SKILL.md#Purpose

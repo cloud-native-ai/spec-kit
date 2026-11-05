@@ -1,0 +1,399 @@
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFFFFFFF.FFFFFFFFFF                                                    [100%]
+=================================== FAILURES ===================================
+________________________ test_positive_tree_reads_clean ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_positive_tree_reads_clean0')
+
+    def test_positive_tree_reads_clean(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        rc, out, err = run(tree, "--action", "coverage")
+>       assert rc == 0, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:161: AssertionError
+__________________ test_verify_is_clean_on_the_positive_tree ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_verify_is_clean_on_the_po0')
+
+    def test_verify_is_clean_on_the_positive_tree(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        rc, out, err = run(tree, "--action", "verify")
+>       assert rc == 0, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:183: AssertionError
+________________________ test_coverage_is_deterministic ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_coverage_is_deterministic0')
+
+    def test_coverage_is_deterministic(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        first_run = run(tree, "--action", "coverage")
+        second_run = run(tree, "--action", "coverage")
+>       assert first_run[0] == second_run[0] == 0
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:200: AssertionError
+______________________ test_lookup_answers_both_selectors ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_lookup_answers_both_selec0')
+
+    def test_lookup_answers_both_selectors(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        rc, out, err = run(tree, "--action", "lookup", "--unit-id", "shared/workflow/feedback-step.md")
+>       assert rc == 0, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:207: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-009] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve0')
+reason = 'STR-009', fixture = 'negative-third-layer-missing', action = 'verify'
+extra_argv = (), args = ('shared/workflow/feedback-step.md',)
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-009)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-010] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve1')
+reason = 'STR-010', fixture = 'negative-declaration-outside-subset'
+action = 'verify', extra_argv = ()
+args = ('shared/declarations/facts/feedback-prompt-threshold.yaml',)
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-010)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-011] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve2')
+reason = 'STR-011', fixture = 'negative-duplicated-fact-literal'
+action = 'verify', extra_argv = ()
+args = ('feedback-prompt-threshold', 'shared/declarations/facts/feedback-prompt-threshold-copy.yaml')
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-011)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-012] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve3')
+reason = 'STR-012', fixture = 'negative-exclusion-anchor-unresolvable'
+action = 'verify', extra_argv = ()
+args = ('skills/internal/humanize/SKILL.md',)
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-012)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-013] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve4')
+reason = 'STR-013', fixture = 'negative-unclassified-candidate'
+action = 'coverage', extra_argv = (), args = ('shared/workflow/gate-roster.md',)
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-013)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_each_reason_is_emitted_verbatim[STR-014] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_each_reason_is_emitted_ve5')
+reason = 'STR-014', fixture = 'negative-declaration-absent', action = 'lookup'
+extra_argv = ('--fact', 'feedback-prompt-threshold')
+args = ('feedback-prompt-threshold',)
+
+    @pytest.mark.parametrize(
+        "reason, fixture, action, extra_argv, args",
+        REASON_CASES,
+        ids=[case[0] for case in REASON_CASES],
+    )
+    def test_each_reason_is_emitted_verbatim(tmp_path, reason, fixture, action, extra_argv, args):
+        tree = make_tree(tmp_path, fixture)
+        rc, out, err = run(tree, "--action", action, *extra_argv)
+        expected = instance(reason, *args)
+>       assert rc == 1, "a finding exits 1 (%s)\n%s%s" % (reason, out, err)
+E       AssertionError: a finding exits 1 (STR-014)
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:254: AssertionError
+________________ test_exit_codes_are_closed_at_zero_one_and_two ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_exit_codes_are_closed_at_0')
+
+    def test_exit_codes_are_closed_at_zero_one_and_two(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+>       assert run(tree, "--action", "coverage")[0] == 0
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:268: AssertionError
+____________ test_subset_violation_is_rejected_rather_than_patched _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_subset_violation_is_rejec0')
+
+    def test_subset_violation_is_rejected_rather_than_patched(tmp_path):
+        tree = make_tree(tmp_path, "negative-declaration-outside-subset")
+        rc, out, err = run(tree, "--action", "verify")
+>       assert rc == 1, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:281: AssertionError
+_____________ test_coverage_reads_three_states_without_turning_red _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_coverage_reads_three_stat0')
+
+    def test_coverage_reads_three_states_without_turning_red(tmp_path):
+        complete_tree = make_tree(tmp_path, "positive")
+        rc, out, err = run(complete_tree, "--action", "coverage")
+>       assert rc == 0, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:295: AssertionError
+__________ test_a_unit_named_by_a_declaration_and_a_row_is_a_finding ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_a_unit_named_by_a_declara0')
+
+    def test_a_unit_named_by_a_declaration_and_a_row_is_a_finding(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        (tree / "shared" / "declarations" / "exclusions" / "no-machine-fact.yaml").write_text(
+            "- unit: shared/workflow/feedback-step.md\n"
+            "  carrier: scripts/python/feedback-utils.py\n"
+            "  anchor: shared/workflow/feedback-step.md#Feedback step\n",
+            encoding="utf-8",
+        )
+        rc, out, err = run(tree, "--action", "coverage")
+>       assert rc == 1, "one unit, two dispositions, must never resolve by file order\n" + out + err
+E       AssertionError: one unit, two dispositions, must never resolve by file order
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 1
+
+tests/contract/test_harness_triple_structure.py:323: AssertionError
+______________ test_dual_writer_fact_files_land_on_distinct_paths ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_dual_writer_fact_files_la0')
+
+    def test_dual_writer_fact_files_land_on_distinct_paths(tmp_path):
+        base = make_tree(tmp_path, "positive")
+        branch_a = tmp_path / "branch-a"
+        branch_b = tmp_path / "branch-b"
+        shutil.copytree(base, branch_a)
+        shutil.copytree(base, branch_b)
+        overlay(branch_a, "dual-writer/branch-a")
+        overlay(branch_b, "dual-writer/branch-b")
+    
+        added_a = {p.relative_to(branch_a) for p in branch_a.rglob("*.yaml")
+                   if not (base / p.relative_to(branch_a)).exists()}
+        added_b = {p.relative_to(branch_b) for p in branch_b.rglob("*.yaml")
+                   if not (base / p.relative_to(branch_b)).exists()}
+    
+        assert len(added_a) == 1 and len(added_b) == 1, (added_a, added_b)
+        assert added_a.isdisjoint(added_b), (
+            "two branches adding one fact file each must not write the same path: %s vs %s"
+            % (added_a, added_b))
+    
+        for tree in (branch_a, branch_b):
+            rc, out, err = run(tree, "--action", "coverage")
+>           assert rc == 0, "%s must exit 0 after the merge\n%s%s" % (tree.name, out, err)
+E           AssertionError: branch-a must exit 0 after the merge
+E             /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E             
+E           assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:351: AssertionError
+_______ test_an_appended_exclusion_row_never_reorders_the_existing_rows ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_an_appended_exclusion_row0')
+
+    def test_an_appended_exclusion_row_never_reorders_the_existing_rows(tmp_path):
+        tree = make_tree(tmp_path, "positive")
+        exclusions = tree / "shared" / "declarations" / "exclusions" / "no-machine-fact.yaml"
+        exclusions.write_text(
+            "- unit: skills/external/draw-diagram/SKILL.md\n"
+            "  carrier: skills/external/draw-diagram/scripts/render_asset.py\n"
+            "  anchor: skills/external/draw-diagram/SKILL.md#Purpose\n",
+            encoding="utf-8",
+        )
+        before = exclusions.read_text(encoding="utf-8").splitlines()
+>       assert run(tree, "--action", "coverage")[0] == 0
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:364: AssertionError
+___________________ test_a_legacy_project_degrades_to_exit_2 ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_a_legacy_project_degrades0')
+
+    def test_a_legacy_project_degrades_to_exit_2(tmp_path):
+        tree = make_tree(tmp_path, "legacy-project")
+        rc, out, err = run(tree, "--action", "coverage")
+        combined = out + err
+        assert rc == 2, "a project without the declaration layer is an input error\n" + combined
+>       assert shared_strings()["STR-002"] in combined, (
+            "the label must name the missing directory %r\n%s"
+            % (shared_strings()["STR-002"], combined))
+E       AssertionError: the label must name the missing directory '.specify/shared/declarations/'
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert '.specify/shared/declarations/' in "/usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory\n"
+
+tests/contract/test_harness_triple_structure.py:395: AssertionError
+_______ test_the_boundary_unit_is_a_candidate_and_is_retired_by_its_row ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-45/test_the_boundary_unit_is_a_ca0')
+
+    def test_the_boundary_unit_is_a_candidate_and_is_retired_by_its_row(tmp_path):
+        tree = make_tree(tmp_path, "screen-boundary")
+        unit = "skills/internal/summarize-project/SKILL.md"
+        rc, out, err = run(tree, "--action", "coverage")
+>       assert rc == 0, out + err
+E       AssertionError: /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 == 0
+
+tests/contract/test_harness_triple_structure.py:406: AssertionError
+_______________ test_a_run_leaves_the_judged_tree_byte_identical _______________
+
+    def test_a_run_leaves_the_judged_tree_byte_identical():
+        def porcelain() -> str:
+            return subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"],
+                                  capture_output=True, text=True).stdout
+    
+        before = porcelain()
+        rc, out, err = run(ROOT, "--action", "coverage")
+>       assert rc in (0, 1), "the repository tree itself must be judgeable\n" + out + err
+E       AssertionError: the repository tree itself must be judgeable
+E         /usr/bin/python3: can't open file '/storage/project/cloud-native-ai/spec-kit/scripts/python/harness-triple-check.py': [Errno 2] No such file or directory
+E         
+E       assert 2 in (0, 1)
+
+tests/contract/test_harness_triple_structure.py:427: AssertionError
+_____________ test_the_shared_read_entry_is_the_only_subset_parser _____________
+
+    def test_the_shared_read_entry_is_the_only_subset_parser():
+        found = set()
+        for base in ("scripts", "skills"):
+            for path in sorted((ROOT / base).rglob("*.py")):
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except (UnicodeDecodeError, OSError):
+                    continue
+                if PARSER_SHAPED.search(text):
+                    found.add(path.relative_to(ROOT).as_posix())
+    
+        # Anti-vacuous sentinel: the detector must see the shared read entry, or the empty set below
+        # would mean "the search is blind", not "there is one parser".
+>       assert "scripts/python/declaration_reader.py" in found, (
+            "the boundary detector did not see the shared read entry; it is searching for the wrong shape")
+E       AssertionError: the boundary detector did not see the shared read entry; it is searching for the wrong shape
+E       assert 'scripts/python/declaration_reader.py' in {'scripts/python/execution-config.py', 'scripts/python/gate-check.py'}
+
+tests/contract/test_harness_triple_structure.py:458: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_harness_triple_structure.py::test_positive_tree_reads_clean
+FAILED tests/contract/test_harness_triple_structure.py::test_verify_is_clean_on_the_positive_tree
+FAILED tests/contract/test_harness_triple_structure.py::test_coverage_is_deterministic
+FAILED tests/contract/test_harness_triple_structure.py::test_lookup_answers_both_selectors
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-009]
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-010]
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-011]
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-012]
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-013]
+FAILED tests/contract/test_harness_triple_structure.py::test_each_reason_is_emitted_verbatim[STR-014]
+FAILED tests/contract/test_harness_triple_structure.py::test_exit_codes_are_closed_at_zero_one_and_two
+FAILED tests/contract/test_harness_triple_structure.py::test_subset_violation_is_rejected_rather_than_patched
+FAILED tests/contract/test_harness_triple_structure.py::test_coverage_reads_three_states_without_turning_red
+FAILED tests/contract/test_harness_triple_structure.py::test_a_unit_named_by_a_declaration_and_a_row_is_a_finding
+FAILED tests/contract/test_harness_triple_structure.py::test_dual_writer_fact_files_land_on_distinct_paths
+FAILED tests/contract/test_harness_triple_structure.py::test_an_appended_exclusion_row_never_reorders_the_existing_rows
+FAILED tests/contract/test_harness_triple_structure.py::test_a_legacy_project_degrades_to_exit_2
+FAILED tests/contract/test_harness_triple_structure.py::test_the_boundary_unit_is_a_candidate_and_is_retired_by_its_row
+FAILED tests/contract/test_harness_triple_structure.py::test_a_run_leaves_the_judged_tree_byte_identical
+FAILED tests/contract/test_harness_triple_structure.py::test_the_shared_read_entry_is_the_only_subset_parser
+20 failed, 1 passed, 1 warning in 0.41s
