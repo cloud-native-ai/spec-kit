@@ -1,0 +1,268 @@
+checklist-stage deterministic self-check
+date: 2026-11-05
+file: .specify/specs/084-harness-triple-structure/checklists/layer-criteria-2026-11-05.md
+command: python3 .specify/.tmp/084-checklist/checklist_selfcheck.py
+
+[1] item set
+items: 38 (soft cap 40)
+ids contiguous from CHK001: True (first CHK001, last CHK038)
+duplicate ids: 0
+state marks: open=38 checked=0 claimed=0
+
+[2] form rules
+traceable items: 38/38 = 100% (floor 80%)
+items carrying a Gap/Ambiguity/Conflict marker: 21
+items ending in a question + quality-dimension bracket: 38/38
+prohibited openers (Verify/Test/Confirm/Check + behaviour): 0
+
+[3] non-overwrite of the earlier checklist
+git status --porcelain .specify/specs/084-harness-triple-structure/checklists/requirements.md -> <empty> (untouched)
+earlier checklist: .specify/specs/084-harness-triple-structure/checklists/requirements.md (7417 bytes, tracked and unmodified)
+checklists/ members: ['layer-criteria-2026-11-05.md', 'requirements.md']
+
+[4] premises the checklist cites, re-derived here (not inherited)
+  (a) placeholder count per shared-string reason template (requirements.md § Shared Strings):
+      STR-001: 0 placeholder(s) — shared/declarations/
+      STR-002: 0 placeholder(s) — .specify/shared/declarations/
+      STR-003: 0 placeholder(s) — scripts/python/harness-triple-check.py
+      STR-004: 0 placeholder(s) — complete
+      STR-005: 0 placeholder(s) — pending
+      STR-006: 0 placeholder(s) — no-machine-fact
+      STR-007: 0 placeholder(s) — no-harness-asset
+      STR-008: 0 placeholder(s) — by-owner-decree
+      STR-009: 1 placeholder(s) — third-layer-missing: <unit>
+      STR-010: 1 placeholder(s) — declaration-outside-subset: <path>
+      STR-011: 2 placeholder(s) — duplicated-fact-literal: <fact>@<path>
+      STR-012: 1 placeholder(s) — exclusion-anchor-unresolvable: <unit>
+      STR-013: 1 placeholder(s) — unclassified-candidate: <unit>
+      STR-014: 1 placeholder(s) — declaration-absent: <fact>
+      form-rule sentence: **封闭原因集的形态规则（本表即其 owner）**：六个原因里四条带一个占位符（`STR-009` 的 `<unit>`、`STR-010` 的 `<path>`、`STR-012` 的 `<unit>`、`STR-014` 的 `<fact>`），一条带两个（`STR-011` 的 `<fact>` 与 `<path>`，以 `@` 连接），一条无占位符（`STR-013` 只有一个 `<unit>`）。**实例形态** = 模板原文，把每个 `<…>` 就地替换为对应取值，分隔符 `": "`、`"@"` 与其余字符**逐字节不变**。参数语法：`<unit>` = 该单元的 markdown 载体仓库相对路径；`<path>` = 声明文件的仓库相对路径；`<fact>` = 事实 slug（等于其声明文件名去掉 `.yaml`）。消费方（引擎发射、契约测试断言、夹具期望值）MUST 按此形态判定成员资格，MUST NOT 发明第三套写法或第二条成员规则。
+
+  (b) requirement-id namespace vs downstream citations:
+      requirements.md defines: FR-001..FR-019 (19 ids)
+      tasks.md cites 20 distinct FR ids; not defined in requirements.md: ['FR-023']
+      occurrences of FR-023 in tasks.md: 2
+
+  (c) frozen-gate roster as four different texts state it:
+      FR-010: 5 script(s) ['validate-requirements.py', 'validate-tasks.py', 'gate-check.py', 'flow-class-check.py', 'doc-consistency-check.py'] | wording: 四个
+      FR-019: 0 script(s) [] | wording: 四个
+      N5: 4 script(s) ['validate-requirements.py', 'validate-tasks.py', 'gate-check.py', 'flow-class-check.py'] | wording: n/a
+      SC-006: 5 script(s) ['validate-requirements.py', 'validate-tasks.py', 'gate-check.py', 'flow-class-check.py', 'closure-acceptance-check.py'] | wording: 五个
+      SC-006 Source: 0 script(s) [] | wording: 四个
+
+  (d) carriers that reference an engine but sit outside FR-004's three surfaces:
+      templates/review-template.md:148: | `final_path` record, copied verbatim (7/7) | pass [ARC_PASS] · blocked [ARC_BLOCKED] · d
+
+  (e) the asset list D1 points at:
+      shared/guidelines/better-harness.md sections: ['## Harness 是什么，"Better" 是什么', '## Feedforward 与 Feedback 回路', '## Agent Work Loop 五维目标模型 → Spec Kit 机制映射', '## 证据纪律（改进断言的红线）', '## 改进轨道（从证据选择策略）', '## 边界（本文件不做什么）', '## 消费者清单']
+      '消费者清单' present: True
+
+  (f) the reused duplicate face reports different readings per invocation scope:
+      --spec-dir only           -> rc=0
+        faces: duplicate=pass
+        files_scanned: 14
+        findings: 0
+      --path + --owner-path     -> rc=1
+        faces: duplicate=fail
+        files_scanned: 15
+        findings: 2
+
+[5] verdict
+  item count within cap; ids contiguous and unique; 100% traceable; every item question-form;
+  no prohibited opener; earlier checklists/requirements.md untouched; all cited premises re-derived.
+status: ok
+
+[6] appendix — the self-check program, verbatim
+    (the scratch copy lived at .specify/.tmp/084-checklist/checklist_selfcheck.py — a sanctioned
+     temp root matched by .specify/.gitignore — and was torn down after this run, so the program
+     below is the re-runnable record: save it anywhere under the repo and run it with python3)
+
+#!/usr/bin/env python3
+"""Deterministic self-check for the 084 checklist stage (docs-only).
+
+Judges the checklist artifact against the create-checklist skill's own rules and
+re-derives, mechanically, every premise the checklist cites. Prints one report;
+the caller redirects it into test-evidence/checklist-self-check.txt.
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[3]
+SPEC = REPO / ".specify/specs/084-harness-triple-structure"
+CHK = SPEC / "checklists/layer-criteria-2026-11-05.md"
+REQ = SPEC / "requirements.md"
+TASKS = SPEC / "tasks.md"
+OLD = SPEC / "checklists/requirements.md"
+
+
+def run(*cmd, cwd=REPO):
+    p = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True)
+    return p.returncode, p.stdout + p.stderr
+
+
+def main() -> int:
+    text = CHK.read_text(encoding="utf-8")
+    items = re.findall(r"^- \[(.)\] (CHK\d+) - (.+)$", text, re.M)
+    ids = [i[1] for i in items]
+    bodies = [i[2] for i in items]
+    failures = []
+
+    print("checklist-stage deterministic self-check")
+    print("date: 2026-11-05")
+    print(f"file: {CHK.relative_to(REPO)}")
+    print(f"command: python3 {Path(__file__).relative_to(REPO)}")
+    print()
+
+    print("[1] item set")
+    print(f"items: {len(items)} (soft cap 40)")
+    contiguous = ids == ["CHK%03d" % n for n in range(1, len(ids) + 1)]
+    print(f"ids contiguous from CHK001: {contiguous} (first {ids[0]}, last {ids[-1]})")
+    if not contiguous:
+        failures.append("ids not contiguous")
+    dups = len(ids) - len(set(ids))
+    print(f"duplicate ids: {dups}")
+    if dups:
+        failures.append("duplicate ids")
+    open_marks = {m: sum(1 for i in items if i[0] == m) for m in (" ", "x", ">")}
+    print(f"state marks: open={open_marks[' ']} checked={open_marks['x']} claimed={open_marks['>']}")
+    print()
+
+    print("[2] form rules")
+    traceable = [b for b in bodies if ("Req §" in b or "Non-Goals" in b)]
+    print(f"traceable items: {len(traceable)}/{len(bodies)} = {100 * len(traceable) // len(bodies)}% (floor 80%)")
+    if len(traceable) * 5 < len(bodies) * 4:
+        failures.append("traceability below 80%")
+    marked = [
+        b
+        for b in bodies
+        if re.search(r"\b(Gap|Ambiguity|Conflict|Coverage|Dependency|Assumption)\b(?=[,\]])", b)
+    ]
+    print(f"items carrying a Gap/Ambiguity/Conflict marker: {len(marked)}")
+    dims = [b for b in bodies if re.search(r"？\s*\[[A-Za-z]", b)]
+    print(f"items ending in a question + quality-dimension bracket: {len(dims)}/{len(bodies)}")
+    if len(dims) != len(bodies):
+        failures.append("item not in question+bracket form")
+    prohibited = [i for i, b in zip(ids, bodies) if re.match(r"(Verify|Test|Confirm|Check)\b", b)]
+    print(f"prohibited openers (Verify/Test/Confirm/Check + behaviour): {len(prohibited)}")
+    if prohibited:
+        failures.append("prohibited opener")
+    print()
+
+    print("[3] non-overwrite of the earlier checklist")
+    rc, out = run("git", "status", "--porcelain", "--", str(OLD.relative_to(REPO)))
+    print(f"git status --porcelain {OLD.relative_to(REPO)} -> {'<empty> (untouched)' if not out.strip() else out.strip()}")
+    print(f"earlier checklist: {OLD.relative_to(REPO)} ({OLD.stat().st_size} bytes, tracked and unmodified)")
+    print(f"checklists/ members: {sorted(p.name for p in OLD.parent.iterdir())}")
+    print()
+
+    print("[4] premises the checklist cites, re-derived here (not inherited)")
+    req = REQ.read_text(encoding="utf-8")
+    rows = re.findall(r"^\| `?(STR-\d+)`? \| `([^`]+)`", req, re.M)
+    print("  (a) placeholder count per shared-string reason template (requirements.md § Shared Strings):")
+    counts = {}
+    for sid, val in rows:
+        n = len(re.findall(r"<[^>]+>", val))
+        counts[sid] = n
+        print(f"      {sid}: {n} placeholder(s) — {val}")
+    form_rule = [ln for ln in req.splitlines() if "无占位符" in ln]
+    print(f"      form-rule sentence: {form_rule[0].strip() if form_rule else '<not found>'}")
+    if counts.get("STR-013", 0) != 1:
+        failures.append("STR-013 placeholder premise drifted")
+
+    print()
+    print("  (b) requirement-id namespace vs downstream citations:")
+    req_ids = sorted(set(re.findall(r"\*\*(FR-\d{3})\*\*", req)))
+    task_ids = sorted(set(re.findall(r"FR-\d{3}", TASKS.read_text(encoding="utf-8"))))
+    dangling = [i for i in task_ids if i not in req_ids]
+    print(f"      requirements.md defines: {req_ids[0]}..{req_ids[-1]} ({len(req_ids)} ids)")
+    print(f"      tasks.md cites {len(task_ids)} distinct FR ids; not defined in requirements.md: {dangling}")
+    print(f"      occurrences of FR-023 in tasks.md: {TASKS.read_text(encoding='utf-8').count('FR-023')}")
+
+    print()
+    print("  (c) frozen-gate roster as four different texts state it:")
+    for label, pat in (
+        ("FR-010", r"^- \*\*FR-010\*\*:.*$"),
+        ("FR-019", r"^- \*\*FR-019\*\*:.*$"),
+        ("N5", r"^- \*\*N5 .*$"),
+        ("SC-006", r"^- \*\*SC-006\*\*:.*$"),
+        ("SC-006 Source", r"^- \*\*SC-006 Source\*\*:.*$"),
+    ):
+        m = re.search(pat, req, re.M)
+        line = m.group(0) if m else "<not found>"
+        names = re.findall(r"`([a-z-]+\.py)`", line)
+        print(f"      {label}: {len(names)} script(s) {names} | wording: {'四个' if '四个' in line else ('五个' if '五个' in line else 'n/a')}")
+
+    print()
+    print("  (d) carriers that reference an engine but sit outside FR-004's three surfaces:")
+    rt = REPO / "templates/review-template.md"
+    hits = [
+        (n, ln.strip()[:90])
+        for n, ln in enumerate(rt.read_text(encoding="utf-8").splitlines(), 1)
+        if re.search(r"scripts/python/[a-z-]+\.py", ln)
+    ]
+    for n, ln in hits[:3]:
+        print(f"      templates/review-template.md:{n}: {ln}")
+
+    print()
+    print("  (e) the asset list D1 points at:")
+    bh = REPO / "shared/guidelines/better-harness.md"
+    secs = [
+        (n, ln.strip())
+        for n, ln in enumerate(bh.read_text(encoding="utf-8").splitlines(), 1)
+        if ln.startswith("## ")
+    ]
+    print(f"      shared/guidelines/better-harness.md sections: {[s for _, s in secs]}")
+    print(f"      '消费者清单' present: {any('消费者清单' in s for _, s in secs)}")
+
+    print()
+    print("  (f) the reused duplicate face reports different readings per invocation scope:")
+    rc1, out1 = run(
+        "python3",
+        ".specify/scripts/python/doc-consistency-check.py",
+        "--action",
+        "verify",
+        "--faces",
+        "duplicate",
+        "--spec-dir",
+        ".specify/specs/084-harness-triple-structure",
+    )
+    print(f"      --spec-dir only           -> rc={rc1}")
+    for line in out1.strip().splitlines():
+        if line.startswith(("faces:", "files_scanned:", "findings:")):
+            print(f"        {line}")
+    rc2, out2 = run(
+        "python3",
+        ".specify/scripts/python/doc-consistency-check.py",
+        "--action",
+        "verify",
+        "--faces",
+        "duplicate",
+        "--spec-dir",
+        ".specify/specs/084-harness-triple-structure",
+        "--path",
+        "shared/workflow/feedback-step.md",
+        "--owner-path",
+        "scripts/python/feedback-utils.py",
+    )
+    print(f"      --path + --owner-path     -> rc={rc2}")
+    for line in out2.strip().splitlines():
+        if line.startswith(("faces:", "files_scanned:", "findings:")):
+            print(f"        {line}")
+
+    print()
+    print("[5] verdict")
+    if failures:
+        for f in failures:
+            print(f"  FAIL: {f}")
+        print("status: fail")
+        return 1
+    print("  item count within cap; ids contiguous and unique; 100% traceable; every item question-form;")
+    print("  no prohibited opener; earlier checklists/requirements.md untouched; all cited premises re-derived.")
+    print("status: ok")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

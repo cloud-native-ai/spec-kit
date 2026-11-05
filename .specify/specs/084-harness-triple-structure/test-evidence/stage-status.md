@@ -207,4 +207,48 @@ research.md / feature-ref.md，故无 `PLAN-EDIT` 声明。
    会以 `green-dangling` 报错；本阶段按可选面不启用，并在 `tasks.md` 横幅与 § Traceability 各陈述一次理由与替代载体。
    契约 id 方案是 plan-owned 产物，改它属 substantive，故只登记不修改。
 
+## checklist（2026-11-05）
+
+```yaml
+stage: checklist
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/checklists/layer-criteria-2026-11-05.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/checklist-self-check.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/flow-class-lookup-checklist.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/checklist-self-check.txt
+```
+
+## Why `not-run-docs-only`（checklist）
+
+本阶段新增一件**需求质量清单**（`checklists/layer-criteria-2026-11-05.md`）与三件证据文件：改动面全是 markdown，
+没有一行落在 `tests/unit`、`tests/contract`、`tests/integration`、`tests/scenarios`，也没有触碰 `scripts/`、
+`skills/**/scripts/`、`src/`、`tests/` 的夹具或 `templates/*.yaml`。因此 `targeted-set-v1`（`stage_base=8ed70a87`）
+的输入全部落在 `test_roots` 之外、与夹具无关，得空集属**预期形态**，按判据 owner
+`.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` **TB-06** 记 `not-run-docs-only` 而非
+`empty-selection-escalated`；缩减字段集即本行六项（`stage`、`row_type=stage-status`、`status`、`selection_basis`、
+`changed_paths[]`、`evidence_ptr`）。运行字段（`selected_paths[]`、`sufficiency`、`rc`、`passed`/`failed`、
+`new_failures[]`、比较基线）不适用且 MUST NOT 报 `unknown`。
+
+本阶段确实**执行**了一个程序——清单自检程序（条目数／编号连续／可追溯比例／禁用开头／重复编号／未覆盖既有清单，
+外加它将清单引用的每一条前提重新推导一遍）。它不读 `tests/`、不选测试、不消耗测试槽位，故不触发定向集，
+也不是一次测试运行；逐字输出与程序全文见 `checklist-self-check.txt`。
+
+## Bases verified（checklist）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 清单形态 | `python3 <清单自检程序>`（程序全文随证据归档） | `status: ok`；38 条；`CHK001..CHK038` 连续、无重复；可追溯 38/38 = 100%（下限 80%）；38/38 为「问句 + 质量维度括号」形态；禁用开头 0；既有 `checklists/requirements.md` 未被覆盖（`git status --porcelain` 为空，7417 bytes） | `test-evidence/checklist-self-check.txt` § 1–3、§ 6 |
+| 清单引用的每条前提（重新推导，不继承） | 同上 § 4(a)–(f) | 六条原因模板各带 1 个占位符（`STR-011` 带 2 个）而形态规则称「一条无占位符」；(b) `tasks.md` 引用的 20 个 FR id 中 `FR-023` 不在 `requirements.md` 的 `FR-001..FR-019` 内（2 处命中）；(c) 既有门禁脚本集合在 FR-010／FR-019／N5／SC-006 四处给出口径不一（5／4／4／5，且成员不同）；(d) `templates/review-template.md:148` 引用 `scripts/python/closure-acceptance-check.py` 而该载体不在 FR-004 的三面之内；(e) `better-harness.md` § 消费者清单 存在于第 73 行；(f) 同一棵树上 `duplicate` 面两种调用面读数不同（14 文件/0 finding vs 15 文件/2 finding） | `test-evidence/checklist-self-check.txt` § 4 |
+| 类别（本阶段唯一一次读取） | `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"` | `flow_class: execution` / `flow_type: -` / `source: declaration` / `marker: null` / exit 0 ⇒ 非表达类，本阶段门禁集逐字不变、零新增阻断项、零新增必填章节 | `test-evidence/flow-class-lookup-checklist.txt` |
+| PLAN CONSTRAINT（零改动） | `git diff --stat 8ed70a87 -- requirements.md tasks.md plan.md data-model.md contracts/ quickstart.md research.md feature-ref.md` | 空输出、exit 0 ⇒ 无 `PLAN-EDIT`，也没有回改需求或任务 | 本行即读数（命令与基线写明，输出为空） |
+| 非规格产物面 | `git status --porcelain -- .specify/specs/084-harness-triple-structure` | 本阶段只新增 3 个未跟踪文件（清单 + 两份证据），`requirements.md`、`tasks.md` 与 plan-owned 全部未动 | 本行即读数 |
+
+**本阶段未新增门禁、未新增阶段、未创建或修改任何 plan-owned 产物、未勾选任何任务行、未改写既有清单**。
+清单里的跨产物分歧（`FR-023` 引用缺失、既有门禁集合口径不一）**只登记不修平**：修平要在「改 `tasks.md`」与
+「改 `requirements.md`」之间做选择，属 `/speckit.analyze` 的裁决面，不在本阶段范围内。
+
 

@@ -1,0 +1,8 @@
+unit_id: spec:084-harness-triple-structure
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+RC=0
