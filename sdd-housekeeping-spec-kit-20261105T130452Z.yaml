@@ -1,0 +1,64 @@
+target:
+  mode: local
+  project_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+  alias: null
+  run_user: null
+mode: check
+inventory:
+  physical_before: complete
+  logical_before: ready
+  physical_after: complete
+  logical_after: ready
+actions:
+  - command: "/speckit.sanitize check (materials)"
+    status: executed
+    reason: "2492 pending findings (2491 dead-reference / 1 high stale-residue); check only, no apply; store at .specify/memory (sanitize engine)"
+  - command: "/speckit.sanitize --lane retention check"
+    status: executed
+    reason: "696 scanned / 0 eligible / 696 unreceipted blocked; plan 0 items; plan file .specify/memory/retention/plans/20261105T130456214498Z-retention-plan.json; no apply"
+  - command: "/speckit.feature"
+    status: existing
+    reason: "78 features / 78 detail files; Total 78; no drift detected"
+  - command: "/speckit.instructions"
+    status: existing
+    reason: "compat symlinks intact (AGENTS/CLAUDE/QODER/.github copilot); instructions 288 lines; no BUDGET over observed"
+  - command: "/speckit.docs"
+    status: skipped
+    reason: "docs 93 md files; root entry absent (docs/index.md / docs/_index.md) — candidate for create-docs reconcile"
+  - command: "/speckit.history"
+    status: skipped
+    reason: "check mode; H3 strengthen by need; .specify/history manifest dated 2026-08-15 is behind the recent sessions"
+  - command: "/speckit.docs (deepen)"
+    status: skipped
+    reason: "depends on a history refresh"
+  - command: "/speckit.research"
+    status: skipped
+    reason: "no missing/expired research trigger"
+  - command: "/speckit.feature (generate)"
+    status: skipped
+    reason: "registry dense (78)"
+sanitize_retention:
+  scanned: 696
+  eligible: 0
+  blocked: 696
+  removed: null
+  remaining: null
+  ledger: null
+unprocessed:
+  - "materials: 2492 pending (2491 dead-reference / 1 high stale-residue); run cleanup mode to process"
+  - "hook health: 8 vendor-managed findings unresolved (check only, not auto-fixed)"
+  - "docs root entry absent (docs/index.md / docs/_index.md)"
+  - "history manifest 2026-08-15 behind the recent sessions; run /speckit.history"
+candidates:
+  features:
+    - "083-mechanism-policy-separation — Ready for Review"
+    - "082-self-explanatory-integration — Ready for Review"
+    - "079-humanize-run-output — Ready for Review"
+    - "036 / 068 / 071 / 072 / 074 / 076 / 077 — Ready for Review"
+    - "023 / 024 / 033 / 034 / 035 — Draft"
+    - "065 — Planned"
+    - "048 — Relocated"
+  feedback:
+    - "264 entries since submission (threshold 10); should_prompt=true — manual /speckit.feedback digest/submission"
+  todos: []
+suggestion: "候选工作为建议而非强制；如需 SDD 全流程推进可调用 sdd-loop-driver（可选）。优先候选：083/082 的 Ready for Review 收尾、264 条 feedback 的消化/上送、2492 条 materials 的 cleanup、history 增量蒸馏与 docs 根入口。"

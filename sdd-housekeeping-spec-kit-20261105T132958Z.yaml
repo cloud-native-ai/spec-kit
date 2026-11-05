@@ -1,0 +1,70 @@
+target:
+  mode: local
+  project_dir: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
+  alias: null
+  run_user: null
+mode: cleanup
+inventory:
+  physical_before: complete
+  logical_before: ready
+  physical_after: complete
+  logical_after: ready
+actions:
+  - command: "/speckit.sanitize (materials cleanup)"
+    status: executed
+    reason: "2,495 dead-reference findings + 1 stale residue. Stale residue .specify/tools archived to .specify/archive/tools under the user's explicit cleanup request. 1,023 findings repaired by verified exact-token edits (296 files, 1,453 substitutions); 1,521 findings adjudicated as historical-record / example / placeholder / scanner-artifact references and dismissed state-only. Re-scan raised 49 equivalent findings, dismissed under the same adjudication. Ledger: 2,544 resolved / 0 pending."
+  - command: "/speckit.sanitize --lane retention"
+    status: executed
+    reason: "696 scanned / 0 eligible / 696 blocked (no receipts, no promotions, open feedback); plan 0 items; no apply"
+  - command: "/speckit.feature"
+    status: existing
+    reason: "78 features / 78 detail files; no drift detected"
+  - command: "/speckit.instructions"
+    status: existing
+    reason: "compat symlinks intact; instructions 288 lines; no BUDGET over observed"
+  - command: "/speckit.docs"
+    status: skipped
+    reason: "docs 93 md files; root entry absent; docs-tree drift remains a /speckit.docs candidate (2 dead test links in docs/concepts/overview.md delegated)"
+  - command: "/speckit.history"
+    status: skipped
+    reason: ".specify/history manifest dated 2026-08-15 is behind recent sessions; H3 candidate"
+  - command: "/speckit.research"
+    status: skipped
+    reason: "no missing/expired research trigger"
+sanitize_materials:
+  initial_dead_references: 2495
+  initial_stale_residue: 1
+  repaired_resolved: 1023
+  dismissed: 1521
+  new_equivalent_findings: 49
+  ledger_total_resolved: 2544
+  ledger_pending: 0
+  files_changed: 296
+  substitutions: 1453
+  stale_residue_archive: ".specify/tools -> .specify/archive/tools"
+sanitize_retention:
+  scanned: 696
+  eligible: 0
+  blocked: 696
+  removed: null
+  remaining: null
+  ledger: null
+unprocessed:
+  - "1,521 dismissed findings are historical/prose/scanner-artifact references; a future full scan re-detects them unless the engine anchors its path regex (it currently matches agents/<file> inside .opencode/agents/<file>, truncates at <placeholders>, and swallows trailing sentence periods)"
+  - "hook health: 8 vendor-managed findings unresolved (check only, not auto-fixed)"
+  - "docs root entry absent (docs/index.md / docs/_index.md); 2 dead test links in docs/concepts/overview.md delegated to /speckit.docs"
+  - "history manifest 2026-08-15 behind the recent sessions; run /speckit.history"
+  - "retention: 696 blocked (open feedback / unsettled run-determination / needs-promotion / no-carrier)"
+candidates:
+  features:
+    - "083-mechanism-policy-separation — Ready for Review"
+    - "082-self-explanatory-integration — Ready for Review"
+    - "079-humanize-run-output — Ready for Review"
+    - "036 / 068 / 071 / 072 / 074 / 076 / 077 — Ready for Review"
+    - "023 / 024 / 033 / 034 / 035 — Draft"
+    - "065 — Planned"
+    - "048 — Relocated"
+  feedback:
+    - "264 entries since submission (threshold 10); manual /speckit.feedback digest/submission"
+  todos: []
+suggestion: "候选工作为建议而非强制；优先候选：083/082 的 Ready for Review 收尾、264 条 feedback 的消化/上送、history 增量蒸馏、docs 根入口与 2 条文档死链、预留的 sanitize 正则锚定改进。materials cleanup 已完成（2,544 resolved / 0 pending）。"
