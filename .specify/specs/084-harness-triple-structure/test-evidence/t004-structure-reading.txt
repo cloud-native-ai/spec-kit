@@ -1,0 +1,96 @@
+# T004 — the owner document's structure reading
+
+**Task**: `tasks.md` T004 (FR-001, FR-018, plan § Document Structure)
+**Subject**: `shared/definitions/harness-triple-definitions.md` (new; framework source, mirrored by T026)
+**Date**: 2026-11-05 · **HEAD at the time of the reading**: `9657885f` + this segment's working tree
+
+## 1. The engine reading (as instructed, verbatim)
+
+```bash
+python3 scripts/python/doc-consistency-check.py --action structure \
+  --spec-dir .specify/specs/084-harness-triple-structure \
+  --path shared/definitions/harness-triple-definitions.md
+```
+
+```text
+doc-consistency-check: structure
+checked_at: 2026-11-05T11:23:56Z
+class=execution source=declaration
+status: not-applicable
+two-way: not-run
+files_scanned: 2
+not-applicable: 结构门禁只适用于表达类；已检视 2 个文件，未做结构判定
+exit code: 0
+```
+
+The `--format json` form of the same run:
+
+```text
+class= execution  status= not-applicable  two_way= not-run  findings= 0  files_scanned= 2
+exit code: 0
+```
+
+**The reading does not match the row's prediction, and the reading is what stands.** `tasks.md` T004
+expects "the chapter tree compared both ways, `chapter-unexpected` empty". The engine owns that
+comparison behind a class condition — `structure_report()` runs the two-way chapter comparison only when
+the spec resolves to `expression` — and 084 declares `Flow Class: execution` in `requirements.md`, so the
+engine declines with its own sentence instead of judging. `plan.md` § Document Structure anticipated the
+class condition for **producing** the section; it did not anticipate that the same condition also gates
+**checking** it.
+
+Nothing was re-pointed to make the prediction come true, and no second judging mechanism was introduced:
+`FR-010`/`N5` forbid changing a frozen gate's criteria, and inventing a parallel structure checker would
+be exactly the "one rule, two implementations" defect this feature removes. What is recorded below is an
+**inventory**, not a verdict.
+
+## 2. Chapter-name inventory (a reading, explicitly not a verdict)
+
+```bash
+grep -n '^## ' shared/definitions/harness-triple-definitions.md
+```
+
+```text
+20:## 本文档的地位与读者
+31:## 三层各自拥有什么
+51:## 归 yaml 的判据
+74:## 候选屏幕 S 与流程单元
+96:## 范围判据与排除理由的语义
+123:## 迁移时的权威取值顺序
+139:## 非目标
+```
+
+```bash
+# the plan-owned tree, extracted from the `### Chapter Tree` table's 节名 column
+awk '/^### Chapter Tree/{f=1;next} f&&/^#/{exit} f&&/^\|/{print}' \
+  .specify/specs/084-harness-triple-structure/plan.md | tail -n +3 | cut -d'|' -f2
+```
+
+```text
+本文档的地位与读者
+三层各自拥有什么
+归 yaml 的判据
+候选屏幕 S 与流程单元
+范围判据与排除理由的语义
+迁移时的权威取值顺序
+非目标
+```
+
+Set comparison (`sort` both sides, `diff`):
+
+```text
+(no output)  — IDENTICAL-SETS   plan=7  doc=7
+```
+
+Both directions therefore hold **as an inventory**: every planned top-level chapter appears in the
+delivered document, and the delivered document carries no eighth top-level chapter. The document also
+carries no `##` heading outside the tree, which is the mechanical content of `chapter-unexpected` for
+this file.
+
+## 3. What is left for a later stage
+
+- The engine's own two-way verdict cannot be obtained on this spec by construction (class condition).
+  A stage that needs a machine verdict for an **execution-class** owner document must decide whether the
+  class condition or the row's expectation is the thing to change — that is a plan/gate-owner question,
+  not an implement-side repair, and it is not answered here.
+- T025 (the `docs/` pointer page) does not depend on this reading: it depends on the owner document
+  existing and on the value domains staying unrepeated.
