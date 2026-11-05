@@ -3,7 +3,8 @@
 - **line_id**: 082-self-explanatory-integration
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
-- **current_stage**: analyze
+- **current_stage**: implement
+- **part_scope**: T001-T006 (part 1 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -18,12 +19,52 @@
   - pre-analyze requirements: pass (errors=0, advisories=11 — mirror paths expected to be created by implement)
   - pre-analyze tasks: pass (errors=0, advisories=14)
   - flow-class lookup: execution / - / exit 0
-- **decomposition**: plan=single-package (one coherent plan artifact; 12 FR); tasks=off
+- **decomposition**: plan=single-package; tasks=off; implement=parts (10; ≤8 tasks each): P1 T001-T006, P2 T007-T012, P3 T013-T018, P4 T019-T023, P5 T024-T028, P6 T029-T033, P7 T034-T038, P8 T039-T043, P9 T044-T047, P10 T048-T053
 - **plan_constraint**: active since 2026-11-05T03:30:36Z; plan_commit=2f6b8bbb; approved_baseline_commit=2f6b8bbb
-- **stage_started_at**: 2026-11-05T03:53:00Z
+- **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
-- **last_verdict**: analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; two upsends require driver adjudication before implement: U1-a T006's red-first expectation is factually false (both named suites pass, 21 passed, verified this run), U1-b C-26/T029 hard-fail against the installed entry point with no reinstatement step in the tasks file; evidence at `test-evidence/analyze-stage-checks.md`
+- **part_checkpoint** (implement part 1/10): `part_scope=T001-T006` — done; commit `94caea76` (7 files, 268+/7-); T001-T006 all `[X]` in tasks.md, no `[>]` held. E2 baseline row + E3 stage-status row below. Next part (P2 T007-T012) is driver-dispatched; this run MUST NOT start T007+.
+
+## E2 baseline row (implement, seq=1)
+
+| field | value |
+|-------|-------|
+| seq | 1 |
+| slot | baseline |
+| stage | implement |
+| selection_basis | full-suite |
+| command | `bash scripts/bash/run-tests.sh --names-out .specify/specs/082-self-explanatory-integration/baseline-failed.txt` |
+| rc | 1 |
+| passed | 7156 |
+| failed | 26 |
+| skipped | 1 |
+| duration | 387.00s (wall 389s) |
+| failed_names_path | `.specify/specs/082-self-explanatory-integration/baseline-failed.txt` (26 entries, sorted) |
+| evidence_ptr | `.specify/specs/082-self-explanatory-integration/baseline-failed.txt`; raw full log preserved at `.specify/specs/082-self-explanatory-integration/notes/baseline-full-suite-20261105.log` (untracked — matched by `.gitignore:37 *.log`) |
+| merge_source | na |
+| merged_at | na |
+
+Consumption note: this is the single full-suite run of the implement stage (TEST BUDGET). A second full suite MUST NOT be run in implement; intermediate verification uses targeted-set-v1. The 26 failures are the inherited baseline, not this feature's regressions — name-level comparison for any later part is `LC_ALL=C comm -13 baseline-failed.txt <current-names>`.
+
+## E3 stage-status row (implement part 1)
+
+| field | value |
+|-------|-------|
+| stage | implement |
+| part_scope | T001-T006 |
+| status | red-first-captured |
+| commands | `python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q` → **exit 1**, 1 failed (C-1: template missing the principle; subject absent, assertion sound) |
+| control_command | `python3 -m pytest tests/contract/test_constitution_double_landing.py tests/contract/test_instructions_section_propagation.py -q` → **exit 0**, 21 passed 1.68s |
+| evidence_ptr | `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md` (R-1 RED + not-the-red control + pending-pair table) |
+| claims_verified | T002 baselines re-measured (32739 B / `38:INSTRUCTIONS_BUDGET_BYTES=32768` / 17,18 / live v1.15.0 / gates total 27) — all match tasks.md; T003 coverage re-freeze delta = provenance header only (513 names unchanged); T004 three owner docs present 4508/6271/4613 B with 7/10/8 headings; T005 `sync-mirrors.py --check` exit 0, six `ok` pairs, `shared` 65 files |
+| unproven | R-1's green half (T015), R-2 (T031/T032), R-3 (T043) — recorded as OPEN, not as closed |
+
+- **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
+- **last_verdict**: implement part 1 PASS — T001-T006 closed with evidence; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal is real and belongs to the NEW module (exit 1) while both pre-existing suites stay green (exit 0, 21 passed), which confirms the analyze-stage repair of T006 rather than re-contradicting it; no plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified); no Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up (out of scope for this part); no push.
+- **next_step**: driver dispatches implement part 2 (P2 `T007-T012`, US1 tests + first implementation). Part 1 stopped at the part boundary by design.
+- **stage_commits**: 94caea76 (implement part 1)
+- **gates**:
 - **artifacts**:
   - .specify/specs/082-self-explanatory-integration/checklists/requirements-quality-20261105.md (36 items: Completeness 8 / Clarity 7 / Consistency 3 / Traceability 4 / Scenario-EdgeCase 4 / NonFunctional 4 / Dependencies 3 / Ambiguity 3)
   - .specify/specs/082-self-explanatory-integration/test-evidence/checklist-stage-checks.md (E-1 inputs, E-2 baselines, E-3 invariant parse, E-4 E3 stage-status row)
@@ -140,3 +181,22 @@ between readings, not a single consistent correction):
 - **现象**: `create-checklist` SKILL 与 `templates/commands/checklist.md` 都只写“读 `requirements.md` + `plan.md`/`tasks.md` 做缺口发现”，未要求核对 `requirements.md` 与 `contracts/` 之间的条款级对应；本阶段发现 `requirements.md` 对 C-20 摘要上限、C-21 句数上限、C-12 小节位置三处义务完全沉默。
   **框架位置**: `.specify/skills/internal/create-checklist/SKILL.md` § 4 Load feature context 的表。
   **影响**: 缺口发现若只读 plan/tasks，会漏掉“契约比需求更细”这一最常见缺口形态；建议在输入表中加一行 `contracts/`（仅用于发现需求遗漏）。
+
+## Implement Part Plan（2026-11-05T04:07:42Z）
+
+- P1 T001-T006 — setup + foundational + red-first; **baseline full suite here**.
+- P2 T007-T012 — US1 tests/first implementation.
+- P3 T013-T018 — US1 remaining.
+- P4 T019-T023 — US2 tests/first implementation.
+- P5 T024-T028 — US2 remaining.
+- P6 T029-T033 — US3 tests/first implementation (venv + editable install for distribution).
+- P7 T034-T038 — US3 remaining.
+- P8 T039-T043 — US4 tests/first implementation.
+- P9 T044-T047 — US4 remaining.
+- P10 T048-T053 — polish + Completion Gate + implement wrap-up + `IMPLEMENT-DONE`.
+
+## Analyze Adjudication（2026-11-05T04:07:42Z）
+
+- CRITICAL=0 / HIGH=0 → analyze gate open; checklist accountability 36/36.
+- U1-a (T006 red-first premise) and U1-b (T029 distribution entry point) repaired in tasks.md commit 94e8c30d; re-validated: validate-tasks 0 errors / 31 adjudicated warnings, pre-analyze tasks pass, decomposition proceed.
+- Plan-owned MEDIUM findings (C-20/C-21 placement, count drift, FR-004 budget-rule gap, etc.) are carried to review; implement MUST NOT edit plan-owned artifacts or requirements.md.
