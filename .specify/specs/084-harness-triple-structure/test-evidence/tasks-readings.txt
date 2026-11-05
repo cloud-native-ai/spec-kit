@@ -1,0 +1,142 @@
+# Tasks-stage readings for 084 — re-measured at generation time
+
+**Date**: 2026-11-05 | **Branch**: `084-harness-triple-structure` @ `4b65517c` (stage base)
+**Why this file exists**: every count and `file:line` that `tasks.md` cites is a **premise**, and a premise is a hypothesis until it is re-measured. The commands below were actually run at task-generation time and their output is pasted verbatim. A printed re-derivation command that was never executed is a claim, not a measurement — and it is the route by which a wrong number enters `tasks.md` and is then inherited as fact by every downstream row.
+
+Note on the division of labour: the **implement-stage** re-capture obligations live in `tasks.md` (rows T001, T002, T027, T028, T029). This file records what the **tasks stage itself** measured, so the driver's U4 can read the premises without re-running them blind.
+
+---
+
+## A — Mirror baseline (unmodified tree)
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+```
+
+Output (verbatim, exit 0):
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+```
+
+Reading: six pairs `ok`, zero pre-change drift. This is why `tasks.md`'s mirror criterion is "no **NEW** drift against the recorded baseline" rather than a bare "all green" written before the run.
+
+## B — The 081 acceptance surface has not moved (A8(a)'s premise)
+
+```bash
+git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py
+```
+
+Output: **empty**, exit 0.
+
+```bash
+python3 -m pytest --collect-only -q tests/contract/test_requirements_checker.py   # → 40 tests collected
+python3 -m pytest --collect-only -q tests/contract/test_checker_form.py           # → 37 tests collected
+```
+
+Reading: both the zero-diff and the 40/37 collect counts that `plan.md` § EP-005 recorded are still true at `4b65517c`. `tasks.md` GATE-5 re-reads exactly this pair.
+
+## C — `pyproject.toml` is untouched (SC-006's premise)
+
+```bash
+git diff --name-only 4b65517c -- pyproject.toml
+```
+
+Output: **empty**, exit 0.
+
+## D — Candidate surface sizes (the screen's input face today)
+
+```bash
+ls templates/commands/*.md | wc -l                                   # 27
+ls skills/external/*/SKILL.md skills/internal/*/SKILL.md | wc -l     # 53
+ls shared/workflow/*.md | wc -l                                      # 19
+ls shared/definitions/*.md | wc -l                                   # 12
+```
+
+Reading: 27 + 53 + 19 = 99 unit carriers; the fourth group is the fact-owner surface and is explicitly not a unit. These are readings, not constants: `tasks.md` embeds none of them as an expectation, and the implementation MUST NOT hard-code them.
+
+## E — The nine batch-1 constants, located on this tree
+
+```bash
+grep -n "DEFAULT_THRESHOLD\|SEVEN_STATES\|LANE_NAMES\|CLASS_VALUES\|BASIS_VALUES\|FLOW_TYPE_VALUES\|REQUIRED_LEDGER_COLUMNS\|NEUTRAL_CATEGORIES\|PATH_VALUES" scripts/python/*.py
+```
+
+Output: 30 hits. The **definition** set (the nine the migration edits) is verbatim:
+
+```text
+scripts/python/evidence-utils.py:23:SEVEN_STATES = (
+scripts/python/evidence-utils.py:27:LANE_NAMES = ("session", "project", "assets", "runs", "feedback")
+scripts/python/feedback-utils.py:93:DEFAULT_THRESHOLD = 10
+scripts/python/flow-class-check.py:96:CLASS_VALUES = (EXECUTION, EXPRESSION)
+scripts/python/flow-class-check.py:97:BASIS_VALUES = ("behavior-oracle", "reader-oracle", "mixed-oracle")
+scripts/python/flow-class-check.py:99:NEUTRAL_CATEGORIES = ("memory", "feedback", "evidence", "session")
+scripts/python/flow-class-check.py:120:REQUIRED_LEDGER_COLUMNS = ("unit_id", CLASS_KEY, "basis", "neutral")
+scripts/python/flow-class-check.py:882:FLOW_TYPE_VALUES = (
+scripts/python/validate-requirements.py:98:PATH_VALUES = ("final", "supporting")
+```
+
+The remaining 21 hits are **usage** sites, not definitions — the trap this row defuses: the count to compare against during migration is the nine-line definition set, and reading the 30 as "nine facts plus 21 more copies" would over-report drift.
+
+The `Path` domain's second face is verified separately, because it is an inline tuple rather than a named constant:
+
+```bash
+grep -n '"final", "supporting"' scripts/python/validate-requirements.py scripts/python/closure-acceptance-check.py
+# scripts/python/validate-requirements.py:98   (named constant, first face)
+# scripts/python/closure-acceptance-check.py:505   `if value not in ("final", "supporting"):`
+```
+
+## F — Contract clause forms (why `[green:]` is unusable on this feature's contracts)
+
+```bash
+python3 -c "<clause_extract.form_of / resolvable over .specify/specs/084-harness-triple-structure/contracts/*.md>"
+```
+
+Output (verbatim):
+
+```text
+declaration-schema.contract.md -> md-none | DS-01 resolvable: False | HC-01: False | MB-01: False | DM-01: False | SR-01: False
+distribution-and-mirror.contract.md -> md-none | DS-01 resolvable: False | HC-01: False | MB-01: False | DM-01: False | SR-01: False
+harness-triple-check.contract.md -> md-none | DS-01 resolvable: False | HC-01: False | MB-01: False | DM-01: False | SR-01: False
+migration-batches.contract.md -> md-none | DS-01 resolvable: False | HC-01: False | MB-01: False | DM-01: False | SR-01: False
+shared-reader.contract.md -> md-none | DS-01 resolvable: False | HC-01: False | MB-01: False | DM-01: False | SR-01: False
+```
+
+Corroborating reading from a different engine (the coverage accountant, § G): `[clause-unparsable] warn (108) — 108 files yield no clause id under the owner's forms`.
+
+Reading: the clause-syntax owner recognizes the `C-\d+` id form; these contracts use `DS/HC/SR/MB/DM`. A `[green: contracts/<name>.md#DS-01]` claim would therefore be a **`green-dangling` ERROR** in `validate-tasks.py`, not a claim anyone can honour. `tasks.md` consequently emits no `[green:]` tag and carries the clause partition in its § Traceability table — one statement of the partition, not two. This is a measured constraint on the tasks surface, not a preference; changing it would require re-id'ing a plan-owned contract, which is out of this stage's scope (declared, not silently repaired).
+
+## G — Coverage accountant's starting reading (the FR/clause lanes)
+
+```bash
+python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure
+```
+
+Output (verbatim, tail):
+
+```text
+FR uncovered: 19
+
+ERROR frozen baseline not found: .specify/specs/084-harness-triple-structure/coverage-baseline.txt — an absent baseline is NOT an empty exemption list, so this run cannot judge the delta; freeze it with `account-clause-coverage.py .specify/specs/084-harness-triple-structure --freeze > .specify/specs/084-harness-triple-structure/coverage-baseline.txt`
+companion (must be non-empty on a green run): claimed clauses 0, scanned files 253, clause universe 1517, FR universe 19
+  [clause-uncovered] fail (513) — 513 uncovered, 513 beyond the frozen baseline
+  [fr-uncovered] fail (19) — 0 of 19 FRs cited from citation groups
+  [clause-unparsable] warn (108) — 108 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (513) — baseline holds 0 names; 0 uncovered items are baseline-internal and do not block
+533 error(s), 0 warning(s)
+status: baseline-missing
+```
+
+Reading, stated plainly rather than rounded up: the FR lane starts at **0 of 19** cited from citation groups and the baseline does not exist yet, so this run cannot judge a delta. `tasks.md` T002 freezes the baseline at implement start; T027/T028 take the migration readings; no row in `tasks.md` claims this lane green, and this file does not either. The lane's starting state is recorded so a later run can tell movement from wishful reading.
+
+---
+
+## What this file deliberately does **not** contain
+
+- No pass/fail verdict about the feature: this is a docs-only stage, and every executable reading belongs to the implement stage (`tasks.md` T027…T031).
+- No restatement of the toolchain pins: they are owned by `requirements.md` § Runtime Stack & Dependency Ownership and `plan.md` § Execution Premises (EP-001), which were verified at plan time on this branch. Restating them here would create the second copy this feature exists to remove.

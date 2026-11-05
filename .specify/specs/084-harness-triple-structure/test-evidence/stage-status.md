@@ -160,3 +160,51 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/pre-anal
 **本阶段未新增门禁、未新增阶段、未改变任何既有门禁的判据与退出码**；`pre-analyze-check` 的 `--stage` 取值域与
 `plan` 行既有算子逐字不变（派发要求里的「门禁调用点」是交付设计，不是本阶段已生效的调用）。
 
+## tasks（2026-11-05）
+
+```yaml
+stage: tasks
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/validate-tasks.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/decomposition-tasks.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/tasks-readings.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/decomposition-tasks.txt
+```
+
+## Why `not-run-docs-only`（tasks）
+
+本阶段只产出一份任务清单（`tasks.md`）与三份证据文件：没有一行改动落在 `tests/unit`、`tests/contract`、
+`tests/integration`、`tests/scenarios`，也没有触碰 `scripts/`、`skills/**/scripts/`、`src/`、`tests/` 夹具、`templates/*.yaml`。
+因此 `targeted-set-v1`（`stage_base=4b65517c`）输入全部落在 `test_roots` 之外、且不涉及夹具，得空集属预期形态，按 TB-06
+记 `not-run-docs-only` 而非 `empty-selection-escalated`；运行字段（`selected_paths[]`、`sufficiency`、`rc`、
+`passed`/`failed`、`new_failures[]`、比较基线）不适用且 MUST NOT 报 `unknown`。判据 owner 与六项缩减字段集同 requirements/clarify/plan 三行的引用。
+
+## Bases verified (tasks)
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 任务清单结构 | `python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md` | `PASS`，`0 error(s), 0 warning(s)`，exit 0；31 行任务、ID 唯一、`blockedBy` 全部指向更早行、8 个 `[P]` 分属四对路径不相交的行、四个故事相各自恰一个 `[USn]`、非故事相零 `[US`、DoD 段零 checkbox | `test-evidence/validate-tasks.txt` |
+| 拆解门（tasks 模式） | `python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements <req> --tasks <tasks>` | `decision=proceed`，`fr_count=19 ≤ 30`，`task_count=31 ≤ 40`，exit 0 | `test-evidence/decomposition-tasks.txt` |
+| 前提复测（生成期实测，非继承） | 见证据文件 A–G 节：镜像基线、081 零差异与 40/37 收集数、`pyproject.toml` 零差异、候选面 27/53/19/12、九个批 1 常量的 `file:line`、`Path` 域的第二处内联元组 | 全部与 `plan.md` / `research.md` 的读数一致；本轮另得两条**新**读数（见下） | `test-evidence/tasks-readings.txt` |
+| 契约条款形态 | `clause_extract.form_of` 对五份契约 | 五份全 `md-none`、各 id 族 `resolvable=False` ⇒ `[green:]` 标签在本特性必为 `green-dangling` 错误，故整份 tasks 不启用该标签，条款分区由 § Traceability 承载（逐字输出见证据 F 节） | `test-evidence/tasks-readings.txt` § F |
+| 覆盖率账本起点 | `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure` | `status: baseline-missing`；`[fr-uncovered] fail (19) — 0 of 19 FRs cited from citation groups`；`[clause-unparsable] warn (108)`。起点如实记录，不由本阶段冻结基线（冻结是 T002 的 implement 动作） | `test-evidence/tasks-readings.txt` § G |
+
+**本阶段未新增门禁、未新增阶段、未创建任何 plan-owned 产物、未勾选任何任务行**；`tasks.md` 交付 31 行全 `[ ]`，
+`plan_constraint=active`（`plan_commit=4b65517c`）下未改动 plan.md / data-model.md / contracts/ / quickstart.md /
+research.md / feature-ref.md，故无 `PLAN-EDIT` 声明。
+
+**两处自纠（纠正而非裁定，已披露）**：
+
+1. **T001 的复算命令形态**：初稿写 `grep -n "…" scripts/python/`（对目录 grep 会报 `Is a directory` 并返回 0 行），
+   实跑即失败；改为 `scripts/python/*.py` 后同一条命令返回 30 行（9 条定义 + 21 处使用点），并把「比较对象是 9 条定义
+   而非 30 条命中」写进该行。这正是「打印了复算命令却从未执行」那个陷阱，本轮由实跑发现并当场修正。
+2. **`[green:]` 标签的可用性**：不是风格选择，而是实测约束（五份契约 `md-none`）。若照模板惯例挂标签，`validate-tasks.py`
+   会以 `green-dangling` 报错；本阶段按可选面不启用，并在 `tasks.md` 横幅与 § Traceability 各陈述一次理由与替代载体。
+   契约 id 方案是 plan-owned 产物，改它属 substantive，故只登记不修改。
+
+

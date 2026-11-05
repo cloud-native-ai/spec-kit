@@ -1,0 +1,25 @@
+# validate-tasks.py — verbatim output (tasks stage, 084)
+
+Command:
+
+```bash
+python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md
+```
+
+Output (stdout, verbatim):
+
+```text
+PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+```
+
+Exit code: `0`
+
+## Reading of the verdict
+
+- `row-format` — 31 rows, every one a single line; no wrapped continuation line.
+- `id-unique` — T001…T031, no duplicates.
+- `blockedBy` — every reference resolves to an earlier row; zero forward references, so zero warnings.
+- `parallel-safe` — 8 `[P]` rows form four path-disjoint pairs (T001/T002, T004/T005, T011/T012, T024/T025); zero write-target overlaps.
+- `story-labels` — 16 rows inside the four User Story phases carry exactly one `[USn]`; the 15 rows in Setup / Foundational / Polish carry none.
+- `dod-format` — the `## Definition of Done` section uses only `- DoD-N:`; zero checkbox-syntax lines.
+- The four `green-*` faces are silent **by construction, not by omission**: this feature's contracts name their clauses `DS/HC/SR/MB/DM`, which the clause-syntax owner classifies as `md-none` (see `tasks-readings.txt` § F), so no `[green:]` claim is emitted anywhere in the file — a tag would be a `green-dangling` ERROR.

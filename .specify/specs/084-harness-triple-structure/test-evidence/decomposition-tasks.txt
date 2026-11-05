@@ -1,0 +1,25 @@
+# decomposition-check.py --mode tasks — verbatim output (084)
+
+Command:
+
+```bash
+python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py \
+  --mode tasks \
+  --requirements .specify/specs/084-harness-triple-structure/requirements.md \
+  --tasks .specify/specs/084-harness-triple-structure/tasks.md
+```
+
+Output (stdout, verbatim, one line):
+
+```json
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 19, "task_count": 31, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T08:33:24Z"}
+```
+
+Exit code: `0`
+
+## Reading
+
+- `fr_count` = 19 against the ceiling of 30 — the requirements stage's FR count, unchanged by this stage (no FR was added or removed here).
+- `task_count` = 31 against the ceiling of 40 — the gate reads `^- [x] TNNN` rows; the row count here is the same 31 that `grep -cE '^- \[[ xX>~]\] T[0-9]{3}'` reports.
+- `decision` = `proceed`: no slice split. This matches `plan.md` § D13's `single-package` decision rather than re-deciding it.
+- Trap noted for a later reader: counting *lines* in `tasks.md` yields 252, which is not the gate's unit — the gate counts task rows, and a row is one line by construction, so the two agree only for this file's row shape, not as a general rule.
