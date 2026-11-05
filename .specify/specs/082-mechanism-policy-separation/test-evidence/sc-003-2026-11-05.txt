@@ -212,3 +212,89 @@ allowed_in_unit=10`, and `allowed_paths_present=10 unproven=none`.
   this branch. They are outside SC-003's subject by the criterion's own wording
   ("成员表之外的既有技能" as *this feature* leaves them); the guard reports their
   additions rather than swallowing them.
+
+---
+
+## 10. The complement reading for the mechanism/policy side (T050, 2026-11-05)
+
+T050 closes the measurement set: **one real run** of `test_mechanism_policy_guard.py`
+alongside `test_mechanism_policy_ownership.py`, showing the allowed-difference set matches the
+`included` member set **with an empty difference**. Appended here so both SC-003 readings
+(T041's complement/byte reading and T050's ownership cross-check) sit in one place.
+
+### 10.1 The run (verbatim)
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_ownership.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_ownership.py
+compared=575 unit=575 complement=566 allowed_in_unit=10 allowed_in_baseline=9 frozen_mismatches=0
+.baseline=575 current=580 added=5 co_worktree=4 in_allowed=0 unregistered_additions=0 allowed_in_unit=10
+allowed_paths_present=10 unproven=none
+.compared=575 unit=575 complement=566 allowed_in_unit=10 allowed_in_baseline=9 frozen_mismatches=0
+.compared=575 unit=575 complement=566 allowed_in_unit=10 allowed_in_baseline=9 frozen_mismatches=0
+..scanned=4 contract files
+..................
+23 passed in 44.15s
+----- END VERBATIM -----
+
+The reading line is the same as § 1 (`compared=575 unit=575 complement=566
+allowed_in_unit=10 allowed_in_baseline=9 frozen_mismatches=0`): the guard's byte/path face has
+not moved since T041. The ownership module's V-19 assertion is part of the same 23 passed.
+
+### 10.2 The set difference, recomputed with both modules' own parsers (verbatim)
+
+The two sets are produced by the modules themselves — `registered_allowed_set()` in
+`test_mechanism_policy_guard.py` parses `data-model.md` § GM-03; `parse_membership()` in
+`test_mechanism_policy_ownership.py` parses the owner's membership table. Neither list is
+hand-copied.
+
+$ .venv/bin/python - <<'PY'
+  import sys; from pathlib import Path
+  sys.path.insert(0, "tests/contract")
+  import test_mechanism_policy_guard as guard
+  import test_mechanism_policy_ownership as ownership
+  data_model = Path(".specify/specs/082-mechanism-policy-separation/data-model.md").read_text(encoding="utf-8")
+  owner = Path("shared/definitions/mechanism-policy-definitions.md").read_text(encoding="utf-8")
+  allowed_in_unit, allowed_outside = guard.registered_allowed_set(data_model)
+  groups = ownership.parse_membership(owner)
+  included = {cells[0].strip("` ") for cells in groups.get("included", [])}
+  excluded = {cells[0].strip("` ") for cells in groups.get("excluded", [])}
+  allowed_dirs = {p.split("/")[2] for p in allowed_in_unit if p.startswith(("skills/external/", "skills/internal/"))}
+  implied = allowed_dirs - excluded
+  print("allowed_in_unit=%d allowed_outside=%d" % (len(allowed_in_unit), len(allowed_outside)))
+  print("allowed_paths=%s" % sorted(allowed_in_unit))
+  print("allowed_skill_dirs=%s" % sorted(allowed_dirs))
+  print("included=%s excluded=%s" % (sorted(included), sorted(excluded)))
+  print("implied_included_after_excluded_subtracted=%s" % sorted(implied))
+  print("included_minus_implied=%s" % sorted(included - implied))
+  print("implied_minus_included=%s" % sorted(implied - included))
+  print("difference_is_empty=%s" % (included == implied))
+PY
+
+----- BEGIN VERBATIM -----
+allowed_in_unit=10 allowed_outside=10
+allowed_paths=['skills/external/coaching-skills/SKILL.md', 'skills/external/coaching-skills/data-model.md', 'skills/external/coaching-skills/references/prompt-templates.md', 'skills/external/create-skills/SKILL.md', 'skills/external/create-skills/references/mechanism-policy-check.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/improve-skills/references/loop-playbook.md', 'skills/external/merge-skills/SKILL.md', 'skills/external/merge-skills/references/provenance-record.md', 'skills/internal/run-skills/SKILL.md']
+allowed_skill_dirs=['coaching-skills', 'create-skills', 'improve-skills', 'merge-skills', 'run-skills']
+included=['create-skills', 'improve-skills', 'merge-skills'] excluded=['coaching-skills', 'run-skills']
+implied_included_after_excluded_subtracted=['create-skills', 'improve-skills', 'merge-skills']
+included_minus_implied=[]
+implied_minus_included=[]
+difference_is_empty=True
+----- END VERBATIM -----
+
+### 10.3 The reading
+
+- `allowed_in_unit=10` / `allowed_outside=10` — the GM-03 table's two families; the first is
+  the comparison unit's registered allowed set, the second is the `tests/` paths outside it.
+- The allowed set involves **five** skill directories
+  (`coaching-skills` / `create-skills` / `improve-skills` / `merge-skills` / `run-skills`);
+  the owner's membership table rules **two** of them `excluded` and **three** `included`.
+- `included − (allowed skill dirs − excluded)` = `[]` and the reverse difference = `[]`;
+  `difference_is_empty=True`. The allowed-difference set therefore **matches the `included`
+  member set once the excluded members' reference-coordinate rewrites are subtracted** — the
+  V-19 form of the cross-check, not "the allowed set contains only included members".
+  The excluded members are present in the allowed set by design (rows 7/8/19/20 are their
+  reference-coordinate rewrites; SW-05 / GM-03 结构不变量 2), so subtracting them is required
+  rather than optional.
+- Both readings above came from one run command (10.1) and one recomputation (10.2) on the
+  same tree; recomputing is re-running those two commands.
