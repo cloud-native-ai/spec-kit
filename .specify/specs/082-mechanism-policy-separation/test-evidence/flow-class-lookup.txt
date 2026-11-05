@@ -1,0 +1,12 @@
+# flow-class lookup — 082-mechanism-policy-separation
+# captured: 2026-11-05T03:39:01Z (UTC)
+# cmd: python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:082-mechanism-policy-separation"
+---
+unit_id: spec:082-mechanism-policy-separation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0

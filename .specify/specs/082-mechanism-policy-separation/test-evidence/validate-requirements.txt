@@ -1,0 +1,17 @@
+# requirements 阶段确定性校验 — 082-mechanism-policy-separation
+# captured: 2026-11-05T03:39:19Z (UTC)
+# cmd: python3 scripts/python/validate-requirements.py .specify/specs/082-mechanism-policy-separation/requirements.md
+# stage_base: 3ffeb26e
+# note: this run is the stamping run — the checklist pass/fail below derives from it
+---
+file: .specify/specs/082-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 199 lines, 23 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+rc=0
