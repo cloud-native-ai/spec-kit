@@ -1,0 +1,2679 @@
+{
+  "projectProfile": {
+    "schemaVersion": 1,
+    "kind": "project-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "projectInfo": {
+      "name": "🌱 Spec Kit",
+      "description": "",
+      "readmeTitle": "🌱 Spec Kit",
+      "evidence": [
+        "README.md:h1"
+      ],
+      "primaryLanguages": [
+        {
+          "language": "python",
+          "sourceFiles": 213,
+          "testFiles": 411
+        },
+        {
+          "language": "javascript",
+          "sourceFiles": 150,
+          "testFiles": 14
+        },
+        {
+          "language": "typescript",
+          "sourceFiles": 0,
+          "testFiles": 1
+        }
+      ],
+      "frameworks": [],
+      "sourceFiles": 363,
+      "testFiles": 426,
+      "measuredSourceLines": null,
+      "sourceLineStatus": "skipped",
+      "sourceLineMethod": "not measured by default; use --measure-source-lines to count tracked readable primary source files only",
+      "sourceRoots": [
+        {
+          "path": ".specify",
+          "files": 180
+        },
+        {
+          "path": "scripts",
+          "files": 101
+        },
+        {
+          "path": "skills",
+          "files": 79
+        },
+        {
+          "path": "src",
+          "files": 3
+        }
+      ],
+      "entryCandidates": [
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+          "language": "javascript",
+          "score": 65
+        },
+        {
+          "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+          "language": "javascript",
+          "score": 65
+        }
+      ],
+      "manifests": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "kind": "python",
+          "scripts": []
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "build",
+            "start"
+          ]
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "start"
+          ]
+        },
+        {
+          "path": "pyproject.toml",
+          "kind": "toml",
+          "scripts": []
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "kind": "node",
+          "scripts": []
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "kind": "python",
+          "scripts": []
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "kind": "node",
+          "scripts": [
+            "build",
+            "start"
+          ]
+        }
+      ]
+    },
+    "agentInstructions": {
+      "count": 1,
+      "rootCount": 1,
+      "nestedCount": 0,
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "scope": "."
+        }
+      ],
+      "status": "thin",
+      "suggestedMinimum": 2,
+      "suggestedAdditional": 1,
+      "sourceFilesPerInstruction": 363,
+      "sourceFilesUnderNestedInstructions": 0,
+      "nestedSourceFileCoveragePercent": 0,
+      "suggestedScopes": [
+        {
+          "path": ".specify/scripts",
+          "sourceFiles": 101
+        },
+        {
+          "path": ".specify/skills",
+          "sourceFiles": 79
+        },
+        {
+          "path": "skills/external",
+          "sourceFiles": 68
+        },
+        {
+          "path": "scripts/js",
+          "sourceFiles": 66
+        },
+        {
+          "path": "scripts/python",
+          "sourceFiles": 35
+        },
+        {
+          "path": "skills/internal",
+          "sourceFiles": 11
+        },
+        {
+          "path": "src/specify_cli",
+          "sourceFiles": 2
+        },
+        {
+          "path": "src",
+          "sourceFiles": 1
+        }
+      ],
+      "reasons": [
+        "root AGENTS.md present",
+        "AGENTS.md count 1 is below suggested minimum 2 for source scale",
+        "large source tree has no nested AGENTS.md coverage"
+      ]
+    },
+    "languages": [
+      {
+        "language": "python",
+        "files": 624,
+        "sourceFiles": 213,
+        "testFiles": 411,
+        "roots": [
+          {
+            "name": "tests/contract",
+            "count": 264
+          },
+          {
+            "name": "tests/integration",
+            "count": 78
+          },
+          {
+            "name": ".specify/skills",
+            "count": 70
+          },
+          {
+            "name": "skills/external",
+            "count": 59
+          },
+          {
+            "name": "tests/unit",
+            "count": 55
+          },
+          {
+            "name": ".specify/scripts",
+            "count": 35
+          },
+          {
+            "name": "scripts/python",
+            "count": 35
+          },
+          {
+            "name": "skills/internal",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "language": "javascript",
+        "files": 164,
+        "sourceFiles": 150,
+        "testFiles": 14,
+        "roots": [
+          {
+            "name": ".specify/scripts",
+            "count": 66
+          },
+          {
+            "name": "scripts/js",
+            "count": 66
+          },
+          {
+            "name": "tests/js",
+            "count": 14
+          },
+          {
+            "name": ".specify/skills",
+            "count": 9
+          },
+          {
+            "name": "skills/external",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "language": "typescript",
+        "files": 1,
+        "sourceFiles": 0,
+        "testFiles": 1,
+        "roots": [
+          {
+            "name": "tests/fixtures",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "manifests": [
+      {
+        "path": ".specify/scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "build",
+          "start"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      },
+      {
+        "path": "pyproject.toml",
+        "kind": "toml",
+        "scripts": []
+      },
+      {
+        "path": "scripts/js/better-harness/package.json",
+        "kind": "node",
+        "scripts": []
+      },
+      {
+        "path": "skills/external/database-utils/requirements.txt",
+        "kind": "python",
+        "scripts": []
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "build",
+          "start"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+        "kind": "node",
+        "scripts": [
+          "start"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "sourceRoots": [
+      {
+        "path": ".specify",
+        "files": 180
+      },
+      {
+        "path": "scripts",
+        "files": 101
+      },
+      {
+        "path": "skills",
+        "files": 79
+      },
+      {
+        "path": "src",
+        "files": 3
+      }
+    ],
+    "entryCandidates": [
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/server.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": ".specify/skills/draw-diagram/references/types/mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-customize/providers/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/agent-lint/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/coding-agent-practices/asset-eval/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "scripts/js/better-harness/session-analysis/index.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/server.mjs",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      },
+      {
+        "path": "skills/external/draw-diagram/references/types/mermaid/server/server.js",
+        "language": "javascript",
+        "score": 65,
+        "reasons": [
+          "entrypoint naming convention"
+        ]
+      }
+    ],
+    "corePathHints": [],
+    "totals": {
+      "trackedFiles": 5782,
+      "trackedFilesBeforeFilters": 5782,
+      "sourceFiles": 363,
+      "testFiles": 426,
+      "generatedOrDependencyFiles": 37,
+      "sourceLines": null,
+      "sourceLineMeasurement": "skipped",
+      "readableSourceFiles": 0,
+      "unreadableSourceFiles": 0
+    }
+  },
+  "gitHistoryProfile": {
+    "schemaVersion": 1,
+    "kind": "git-history-profile",
+    "status": "ok",
+    "repoRoot": ".",
+    "filters": {
+      "ignorePatterns": [],
+      "ignoredCount": 0,
+      "ignoredSample": []
+    },
+    "range": {
+      "maxCommits": 500,
+      "analyzedCommits": 500,
+      "newest": "32389f8",
+      "oldest": "01275c5"
+    },
+    "confidence": {
+      "confidence": "low",
+      "reasons": [
+        "history span is only 12 days",
+        "bounded at maxCommits=500"
+      ]
+    },
+    "historyWindows": [
+      {
+        "days": 30,
+        "since": "2026-10-06T06:53:15.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "recent-hotspots",
+        "interpretation": "recent window for spotting recent hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 2772,
+            "deleted": 91,
+            "churn": 2863,
+            "lastTouched": "6c519ae"
+          },
+          {
+            "path": ".specify/scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 2764,
+            "deleted": 83,
+            "churn": 2847,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 6,
+            "added": 50,
+            "deleted": 9,
+            "churn": 59,
+            "lastTouched": "9b51cdf"
+          },
+          {
+            "path": ".specify/scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": "scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": ".specify/scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": "scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "550539d"
+          },
+          {
+            "path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 1950,
+            "deleted": 72,
+            "churn": 2022,
+            "lastTouched": "2606e1f"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 76,
+            "added": 100,
+            "deleted": 87,
+            "churn": 187,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/specs/081-acceptance-hardening/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 30,
+            "added": 1154,
+            "deleted": 359,
+            "churn": 1513,
+            "lastTouched": "00d3ab3"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/notes/red-first-evidence.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 20,
+            "added": 590,
+            "deleted": 0,
+            "churn": 590,
+            "lastTouched": "2606e1f"
+          },
+          {
+            "path": "tests/contract/test_expression_compatibility.py",
+            "language": "python",
+            "role": "test",
+            "supporting": true,
+            "commits": 18,
+            "added": 1084,
+            "deleted": 30,
+            "churn": 1114,
+            "lastTouched": "c3a8f32"
+          },
+          {
+            "path": ".specify/specs/074a-authorized-routing/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 313,
+            "deleted": 42,
+            "churn": 355,
+            "lastTouched": "a981554"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 482,
+            "deleted": 63,
+            "churn": 545,
+            "lastTouched": "5749531"
+          },
+          {
+            "path": ".specify/state/077-doc-sdd-integration.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 274,
+            "deleted": 60,
+            "churn": 334,
+            "lastTouched": "038f614"
+          },
+          {
+            "path": ".specify/state/081-acceptance-hardening.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 15,
+            "added": 477,
+            "deleted": 24,
+            "churn": 501,
+            "lastTouched": "d0186dc"
+          },
+          {
+            "path": ".specify/specs/069a-flow-classification-docs-gates/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 479,
+            "deleted": 170,
+            "churn": 649,
+            "lastTouched": "abc49b6"
+          },
+          {
+            "path": ".specify/specs/074b-nested-governance/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 283,
+            "deleted": 27,
+            "churn": 310,
+            "lastTouched": "61496b8"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 34
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 32
+          },
+          {
+            "path": "skills/external",
+            "commits": 12
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 6
+          }
+        ]
+      },
+      {
+        "days": 90,
+        "since": "2026-08-07T06:53:15.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "sustained-hotspots",
+        "interpretation": "sustained window for spotting sustained hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 2772,
+            "deleted": 91,
+            "churn": 2863,
+            "lastTouched": "6c519ae"
+          },
+          {
+            "path": ".specify/scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 2764,
+            "deleted": 83,
+            "churn": 2847,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 6,
+            "added": 50,
+            "deleted": 9,
+            "churn": 59,
+            "lastTouched": "9b51cdf"
+          },
+          {
+            "path": ".specify/scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": "scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": ".specify/scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": "scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "550539d"
+          },
+          {
+            "path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 1950,
+            "deleted": 72,
+            "churn": 2022,
+            "lastTouched": "2606e1f"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 76,
+            "added": 100,
+            "deleted": 87,
+            "churn": 187,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/specs/081-acceptance-hardening/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 30,
+            "added": 1154,
+            "deleted": 359,
+            "churn": 1513,
+            "lastTouched": "00d3ab3"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/notes/red-first-evidence.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 20,
+            "added": 590,
+            "deleted": 0,
+            "churn": 590,
+            "lastTouched": "2606e1f"
+          },
+          {
+            "path": "tests/contract/test_expression_compatibility.py",
+            "language": "python",
+            "role": "test",
+            "supporting": true,
+            "commits": 18,
+            "added": 1084,
+            "deleted": 30,
+            "churn": 1114,
+            "lastTouched": "c3a8f32"
+          },
+          {
+            "path": ".specify/specs/074a-authorized-routing/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 313,
+            "deleted": 42,
+            "churn": 355,
+            "lastTouched": "a981554"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 482,
+            "deleted": 63,
+            "churn": 545,
+            "lastTouched": "5749531"
+          },
+          {
+            "path": ".specify/state/077-doc-sdd-integration.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 274,
+            "deleted": 60,
+            "churn": 334,
+            "lastTouched": "038f614"
+          },
+          {
+            "path": ".specify/state/081-acceptance-hardening.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 15,
+            "added": 477,
+            "deleted": 24,
+            "churn": 501,
+            "lastTouched": "d0186dc"
+          },
+          {
+            "path": ".specify/specs/069a-flow-classification-docs-gates/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 479,
+            "deleted": 170,
+            "churn": 649,
+            "lastTouched": "abc49b6"
+          },
+          {
+            "path": ".specify/specs/074b-nested-governance/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 283,
+            "deleted": 27,
+            "churn": 310,
+            "lastTouched": "61496b8"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 34
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 32
+          },
+          {
+            "path": "skills/external",
+            "commits": 12
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 6
+          }
+        ]
+      },
+      {
+        "days": 180,
+        "since": "2026-05-09T06:53:15.000Z",
+        "analyzedCommits": 500,
+        "trendLabel": "legacy-or-long-range-hotspots",
+        "interpretation": "long-range window for spotting legacy or long range hotspots from bounded git history.",
+        "hotFiles": [
+          {
+            "path": "scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 8,
+            "added": 2772,
+            "deleted": 91,
+            "churn": 2863,
+            "lastTouched": "6c519ae"
+          },
+          {
+            "path": ".specify/scripts/python/flow-class-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 2764,
+            "deleted": 83,
+            "churn": 2847,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "scripts/python/closure-acceptance-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 7,
+            "added": 1835,
+            "deleted": 156,
+            "churn": 1991,
+            "lastTouched": "544c2cd"
+          },
+          {
+            "path": "src/specify_cli/__init__.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 6,
+            "added": 50,
+            "deleted": 9,
+            "churn": 59,
+            "lastTouched": "9b51cdf"
+          },
+          {
+            "path": ".specify/scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": "scripts/python/validate-decision-tensions.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 5,
+            "added": 680,
+            "deleted": 24,
+            "churn": 704,
+            "lastTouched": "c69dbb8"
+          },
+          {
+            "path": ".specify/scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": "scripts/python/doc-consistency-check.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 4,
+            "added": 1803,
+            "deleted": 74,
+            "churn": 1877,
+            "lastTouched": "550539d"
+          },
+          {
+            "path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+            "language": "python",
+            "role": "source",
+            "supporting": false,
+            "commits": 3,
+            "added": 1950,
+            "deleted": 72,
+            "churn": 2022,
+            "lastTouched": "2606e1f"
+          }
+        ],
+        "supportingHotFiles": [
+          {
+            "path": ".specify/memory/features.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 76,
+            "added": 100,
+            "deleted": 87,
+            "churn": 187,
+            "lastTouched": "f24c7b6"
+          },
+          {
+            "path": ".specify/specs/081-acceptance-hardening/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 30,
+            "added": 1154,
+            "deleted": 359,
+            "churn": 1513,
+            "lastTouched": "00d3ab3"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/notes/red-first-evidence.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 20,
+            "added": 590,
+            "deleted": 0,
+            "churn": 590,
+            "lastTouched": "2606e1f"
+          },
+          {
+            "path": "tests/contract/test_expression_compatibility.py",
+            "language": "python",
+            "role": "test",
+            "supporting": true,
+            "commits": 18,
+            "added": 1084,
+            "deleted": 30,
+            "churn": 1114,
+            "lastTouched": "c3a8f32"
+          },
+          {
+            "path": ".specify/specs/074a-authorized-routing/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 17,
+            "added": 313,
+            "deleted": 42,
+            "churn": 355,
+            "lastTouched": "a981554"
+          },
+          {
+            "path": ".specify/specs/070-subagent-task-teams/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 482,
+            "deleted": 63,
+            "churn": 545,
+            "lastTouched": "5749531"
+          },
+          {
+            "path": ".specify/state/077-doc-sdd-integration.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 16,
+            "added": 274,
+            "deleted": 60,
+            "churn": 334,
+            "lastTouched": "038f614"
+          },
+          {
+            "path": ".specify/state/081-acceptance-hardening.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 15,
+            "added": 477,
+            "deleted": 24,
+            "churn": 501,
+            "lastTouched": "d0186dc"
+          },
+          {
+            "path": ".specify/specs/069a-flow-classification-docs-gates/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 479,
+            "deleted": 170,
+            "churn": 649,
+            "lastTouched": "abc49b6"
+          },
+          {
+            "path": ".specify/specs/074b-nested-governance/tasks.md",
+            "language": null,
+            "role": "documentation",
+            "supporting": true,
+            "commits": 13,
+            "added": 283,
+            "deleted": 27,
+            "churn": 310,
+            "lastTouched": "61496b8"
+          }
+        ],
+        "hotPaths": [
+          {
+            "path": "scripts/python",
+            "commits": 34
+          },
+          {
+            "path": ".specify/scripts",
+            "commits": 32
+          },
+          {
+            "path": "skills/external",
+            "commits": 12
+          },
+          {
+            "path": ".specify/skills",
+            "commits": 8
+          },
+          {
+            "path": "src/specify_cli",
+            "commits": 6
+          }
+        ]
+      }
+    ],
+    "languageTouchCounts": [
+      {
+        "language": "python",
+        "touches": 113
+      }
+    ],
+    "hotFiles": [
+      {
+        "path": "scripts/python/flow-class-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 8,
+        "added": 2772,
+        "deleted": 91,
+        "churn": 2863,
+        "lastTouched": "6c519ae"
+      },
+      {
+        "path": ".specify/scripts/python/flow-class-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 2764,
+        "deleted": 83,
+        "churn": 2847,
+        "lastTouched": "f24c7b6"
+      },
+      {
+        "path": ".specify/scripts/python/closure-acceptance-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 1835,
+        "deleted": 156,
+        "churn": 1991,
+        "lastTouched": "544c2cd"
+      },
+      {
+        "path": "scripts/python/closure-acceptance-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 7,
+        "added": 1835,
+        "deleted": 156,
+        "churn": 1991,
+        "lastTouched": "544c2cd"
+      },
+      {
+        "path": "src/specify_cli/__init__.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 6,
+        "added": 50,
+        "deleted": 9,
+        "churn": 59,
+        "lastTouched": "9b51cdf"
+      },
+      {
+        "path": ".specify/scripts/python/validate-decision-tensions.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 680,
+        "deleted": 24,
+        "churn": 704,
+        "lastTouched": "c69dbb8"
+      },
+      {
+        "path": "scripts/python/validate-decision-tensions.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 5,
+        "added": 680,
+        "deleted": 24,
+        "churn": 704,
+        "lastTouched": "c69dbb8"
+      },
+      {
+        "path": ".specify/scripts/python/doc-consistency-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 1803,
+        "deleted": 74,
+        "churn": 1877,
+        "lastTouched": "f24c7b6"
+      },
+      {
+        "path": "scripts/python/doc-consistency-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 4,
+        "added": 1803,
+        "deleted": 74,
+        "churn": 1877,
+        "lastTouched": "550539d"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/wp-gate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 1950,
+        "deleted": 72,
+        "churn": 2022,
+        "lastTouched": "2606e1f"
+      },
+      {
+        "path": ".specify/scripts/python/bilingual-expression-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 640,
+        "deleted": 4,
+        "churn": 644,
+        "lastTouched": "840153f"
+      },
+      {
+        "path": "scripts/python/bilingual-expression-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 3,
+        "added": 640,
+        "deleted": 4,
+        "churn": 644,
+        "lastTouched": "d4429e3"
+      },
+      {
+        "path": ".specify/scripts/python/sdd-route.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 1056,
+        "deleted": 11,
+        "churn": 1067,
+        "lastTouched": "6d2631e"
+      },
+      {
+        "path": "scripts/python/sdd-route.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 1056,
+        "deleted": 11,
+        "churn": 1067,
+        "lastTouched": "6d2631e"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 759,
+        "deleted": 21,
+        "churn": 780,
+        "lastTouched": "793aff9"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/pre-analyze-check.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 759,
+        "deleted": 21,
+        "churn": 780,
+        "lastTouched": "793aff9"
+      },
+      {
+        "path": ".specify/scripts/python/validate-falsification-quartet.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 254,
+        "deleted": 4,
+        "churn": 258,
+        "lastTouched": "3c1a288"
+      },
+      {
+        "path": "scripts/python/validate-falsification-quartet.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 254,
+        "deleted": 4,
+        "churn": 258,
+        "lastTouched": "3c1a288"
+      },
+      {
+        "path": ".specify/scripts/python/validate-requirements.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 108,
+        "deleted": 7,
+        "churn": 115,
+        "lastTouched": "c9dc8ce"
+      },
+      {
+        "path": "scripts/python/validate-requirements.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 108,
+        "deleted": 7,
+        "churn": 115,
+        "lastTouched": "c9dc8ce"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/line-registry.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 67,
+        "deleted": 6,
+        "churn": 73,
+        "lastTouched": "318ad7a"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/line-registry.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 67,
+        "deleted": 6,
+        "churn": 73,
+        "lastTouched": "318ad7a"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/check-063-overlap.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 4,
+        "deleted": 4,
+        "churn": 8,
+        "lastTouched": "e24a174"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/check-063-overlap.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 4,
+        "deleted": 4,
+        "churn": 8,
+        "lastTouched": "e24a174"
+      },
+      {
+        "path": ".specify/scripts/python/sanitize-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 2,
+        "deleted": 2,
+        "churn": 4,
+        "lastTouched": "012a294"
+      },
+      {
+        "path": "scripts/python/sanitize-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 2,
+        "added": 2,
+        "deleted": 2,
+        "churn": 4,
+        "lastTouched": "012a294"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/wp-gate.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 1878,
+        "deleted": 0,
+        "churn": 1878,
+        "lastTouched": "819963b"
+      },
+      {
+        "path": ".specify/scripts/python/record-retention.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 1129,
+        "deleted": 0,
+        "churn": 1129,
+        "lastTouched": "89ae992"
+      },
+      {
+        "path": "scripts/python/record-retention.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 1129,
+        "deleted": 0,
+        "churn": 1129,
+        "lastTouched": "89ae992"
+      },
+      {
+        "path": ".specify/scripts/python/renumber-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 1122,
+        "deleted": 0,
+        "churn": 1122,
+        "lastTouched": "012a294"
+      },
+      {
+        "path": "scripts/python/renumber-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 1122,
+        "deleted": 0,
+        "churn": 1122,
+        "lastTouched": "012a294"
+      },
+      {
+        "path": ".specify/skills/sdd-loop-driver/scripts/wp-report.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 883,
+        "deleted": 0,
+        "churn": 883,
+        "lastTouched": "819963b"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/scripts/wp-report.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 883,
+        "deleted": 0,
+        "churn": 883,
+        "lastTouched": "d107e4f"
+      },
+      {
+        "path": ".specify/scripts/python/feedback-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 301,
+        "deleted": 4,
+        "churn": 305,
+        "lastTouched": "9928cdf"
+      },
+      {
+        "path": "scripts/python/feedback-utils.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 301,
+        "deleted": 4,
+        "churn": 305,
+        "lastTouched": "9928cdf"
+      },
+      {
+        "path": ".specify/skills/sdd-house-keeping/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 220,
+        "deleted": 0,
+        "churn": 220,
+        "lastTouched": "89ae992"
+      },
+      {
+        "path": "skills/external/sdd-house-keeping/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 220,
+        "deleted": 0,
+        "churn": 220,
+        "lastTouched": "89ae992"
+      },
+      {
+        "path": ".specify/skills/sdd-project-setup/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 217,
+        "deleted": 0,
+        "churn": 217,
+        "lastTouched": "89ae992"
+      },
+      {
+        "path": "skills/external/sdd-project-setup/scripts/logical-framework.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 217,
+        "deleted": 0,
+        "churn": 217,
+        "lastTouched": "1742ccf"
+      },
+      {
+        "path": ".specify/scripts/python/scan-temp-usage.py",
+        "language": "python",
+        "role": "source",
+        "supporting": false,
+        "commits": 1,
+        "added": 179,
+        "deleted": 0,
+        "churn": 179,
+        "lastTouched": "5b13564"
+      }
+    ],
+    "supportingHotFiles": [
+      {
+        "path": ".specify/memory/features.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 76,
+        "added": 100,
+        "deleted": 87,
+        "churn": 187,
+        "lastTouched": "f24c7b6"
+      },
+      {
+        "path": ".specify/specs/081-acceptance-hardening/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 30,
+        "added": 1154,
+        "deleted": 359,
+        "churn": 1513,
+        "lastTouched": "00d3ab3"
+      },
+      {
+        "path": ".specify/specs/070-subagent-task-teams/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 20,
+        "added": 590,
+        "deleted": 0,
+        "churn": 590,
+        "lastTouched": "2606e1f"
+      },
+      {
+        "path": "tests/contract/test_expression_compatibility.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 18,
+        "added": 1084,
+        "deleted": 30,
+        "churn": 1114,
+        "lastTouched": "c3a8f32"
+      },
+      {
+        "path": ".specify/specs/074a-authorized-routing/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 17,
+        "added": 313,
+        "deleted": 42,
+        "churn": 355,
+        "lastTouched": "a981554"
+      },
+      {
+        "path": ".specify/specs/070-subagent-task-teams/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 16,
+        "added": 482,
+        "deleted": 63,
+        "churn": 545,
+        "lastTouched": "5749531"
+      },
+      {
+        "path": ".specify/state/077-doc-sdd-integration.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 16,
+        "added": 274,
+        "deleted": 60,
+        "churn": 334,
+        "lastTouched": "038f614"
+      },
+      {
+        "path": ".specify/state/081-acceptance-hardening.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 15,
+        "added": 477,
+        "deleted": 24,
+        "churn": 501,
+        "lastTouched": "d0186dc"
+      },
+      {
+        "path": ".specify/specs/069a-flow-classification-docs-gates/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 479,
+        "deleted": 170,
+        "churn": 649,
+        "lastTouched": "abc49b6"
+      },
+      {
+        "path": ".specify/specs/074b-nested-governance/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 283,
+        "deleted": 27,
+        "churn": 310,
+        "lastTouched": "61496b8"
+      },
+      {
+        "path": ".specify/memory/features/074.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 109,
+        "deleted": 13,
+        "churn": 122,
+        "lastTouched": "7831bb4"
+      },
+      {
+        "path": ".specify/memory/register.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 13,
+        "added": 88,
+        "deleted": 19,
+        "churn": 107,
+        "lastTouched": "8fe3228"
+      },
+      {
+        "path": ".specify/specs/081-acceptance-hardening/verification.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 12,
+        "added": 221,
+        "deleted": 140,
+        "churn": 361,
+        "lastTouched": "b0609f3"
+      },
+      {
+        "path": ".specify/shared/workflow/acceptance-hardening.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 760,
+        "deleted": 51,
+        "churn": 811,
+        "lastTouched": "544c2cd"
+      },
+      {
+        "path": "shared/workflow/acceptance-hardening.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 760,
+        "deleted": 51,
+        "churn": 811,
+        "lastTouched": "544c2cd"
+      },
+      {
+        "path": ".specify/specs/071-review-code-integration/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 511,
+        "deleted": 107,
+        "churn": 618,
+        "lastTouched": "398ab79"
+      },
+      {
+        "path": ".specify/specs/081-acceptance-hardening/plan.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 478,
+        "deleted": 113,
+        "churn": 591,
+        "lastTouched": "ea058fa"
+      },
+      {
+        "path": ".specify/specs/081-acceptance-hardening/requirements.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 360,
+        "deleted": 89,
+        "churn": 449,
+        "lastTouched": "11289d5"
+      },
+      {
+        "path": ".specify/specs/072-client-self-improvement/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 394,
+        "deleted": 29,
+        "churn": 423,
+        "lastTouched": "e39afe8"
+      },
+      {
+        "path": "shared/definitions/flow-class-definitions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 302,
+        "deleted": 29,
+        "churn": 331,
+        "lastTouched": "e39cb05"
+      },
+      {
+        "path": "templates/instructions-template.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 10,
+        "added": 146,
+        "deleted": 114,
+        "churn": 260,
+        "lastTouched": "5b13564"
+      },
+      {
+        "path": ".specify/specs/070-subagent-task-teams/test-evidence/implement-stage-status.jsonl",
+        "language": null,
+        "role": "test",
+        "supporting": true,
+        "commits": 10,
+        "added": 12,
+        "deleted": 0,
+        "churn": 12,
+        "lastTouched": "2606e1f"
+      },
+      {
+        "path": "tests/contract/test_humanize_command_surface.py",
+        "language": "python",
+        "role": "test",
+        "supporting": true,
+        "commits": 9,
+        "added": 1810,
+        "deleted": 18,
+        "churn": 1828,
+        "lastTouched": "a3c331b"
+      },
+      {
+        "path": ".specify/specs/079-humanize-run-output/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 464,
+        "deleted": 92,
+        "churn": 556,
+        "lastTouched": "d0cb301"
+      },
+      {
+        "path": ".specify/specs/076-decision-tension-contract/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 418,
+        "deleted": 68,
+        "churn": 486,
+        "lastTouched": "920e0f8"
+      },
+      {
+        "path": ".specify/specs/069b-isomorphism-migration-metrics/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 382,
+        "deleted": 57,
+        "churn": 439,
+        "lastTouched": "84dd63e"
+      },
+      {
+        "path": ".specify/specs/074a-authorized-routing/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 423,
+        "deleted": 3,
+        "churn": 426,
+        "lastTouched": "d5129ef"
+      },
+      {
+        "path": ".specify/state/076-decision-tension-contract.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 293,
+        "deleted": 36,
+        "churn": 329,
+        "lastTouched": "80d2669"
+      },
+      {
+        "path": ".specify/instructions.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 174,
+        "deleted": 142,
+        "churn": 316,
+        "lastTouched": "5b13564"
+      },
+      {
+        "path": ".specify/templates/instructions-template.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 135,
+        "deleted": 103,
+        "churn": 238,
+        "lastTouched": "5b13564"
+      },
+      {
+        "path": ".specify/memory/features/077.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 141,
+        "deleted": 11,
+        "churn": 152,
+        "lastTouched": "63848d3"
+      },
+      {
+        "path": ".specify/specs/072-client-self-improvement/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 90,
+        "deleted": 20,
+        "churn": 110,
+        "lastTouched": "b5a2011"
+      },
+      {
+        "path": ".specify/memory/features/069.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 9,
+        "added": 53,
+        "deleted": 25,
+        "churn": 78,
+        "lastTouched": "01275c5"
+      },
+      {
+        "path": ".specify/specs/072-client-self-improvement/test-evidence/implement-stage-status.jsonl",
+        "language": null,
+        "role": "test",
+        "supporting": true,
+        "commits": 9,
+        "added": 9,
+        "deleted": 0,
+        "churn": 9,
+        "lastTouched": "b5a2011"
+      },
+      {
+        "path": ".specify/specs/077-doc-sdd-integration/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 409,
+        "deleted": 65,
+        "churn": 474,
+        "lastTouched": "ab288aa"
+      },
+      {
+        "path": ".specify/specs/078-coaching-skills/tasks.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 397,
+        "deleted": 57,
+        "churn": 454,
+        "lastTouched": "c11d1aa"
+      },
+      {
+        "path": ".specify/specs/074b-nested-governance/notes/red-first-evidence.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 429,
+        "deleted": 3,
+        "churn": 432,
+        "lastTouched": "aa7979f"
+      },
+      {
+        "path": ".specify/specs/077-doc-sdd-integration/requirements.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 338,
+        "deleted": 75,
+        "churn": 413,
+        "lastTouched": "63848d3"
+      },
+      {
+        "path": "skills/external/sdd-loop-driver/references/decomposition-model.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 368,
+        "deleted": 14,
+        "churn": 382,
+        "lastTouched": "7d6ba29"
+      },
+      {
+        "path": ".specify/specs/081-acceptance-hardening/data-model.md",
+        "language": null,
+        "role": "documentation",
+        "supporting": true,
+        "commits": 8,
+        "added": 272,
+        "deleted": 61,
+        "churn": 333,
+        "lastTouched": "ea058fa"
+      }
+    ],
+    "hotPaths": [
+      {
+        "path": "scripts/python",
+        "commits": 34
+      },
+      {
+        "path": ".specify/scripts",
+        "commits": 32
+      },
+      {
+        "path": "skills/external",
+        "commits": 12
+      },
+      {
+        "path": ".specify/skills",
+        "commits": 8
+      },
+      {
+        "path": "src/specify_cli",
+        "commits": 6
+      }
+    ],
+    "supportingHotPaths": [
+      {
+        "path": ".specify/specs",
+        "commits": 2279
+      },
+      {
+        "path": ".specify/memory",
+        "commits": 614
+      },
+      {
+        "path": "tests/contract",
+        "commits": 208
+      },
+      {
+        "path": "tests/fixtures",
+        "commits": 168
+      },
+      {
+        "path": ".specify/skills",
+        "commits": 114
+      },
+      {
+        "path": "skills/external",
+        "commits": 75
+      },
+      {
+        "path": ".specify/shared",
+        "commits": 66
+      },
+      {
+        "path": "skills/internal",
+        "commits": 59
+      },
+      {
+        "path": ".specify/state",
+        "commits": 55
+      },
+      {
+        "path": "templates/commands",
+        "commits": 34
+      },
+      {
+        "path": ".claude/commands",
+        "commits": 31
+      },
+      {
+        "path": ".github/prompts",
+        "commits": 31
+      },
+      {
+        "path": ".opencode/command",
+        "commits": 31
+      },
+      {
+        "path": "templates",
+        "commits": 28
+      },
+      {
+        "path": ".specify/templates",
+        "commits": 27
+      },
+      {
+        "path": "shared/definitions",
+        "commits": 26
+      },
+      {
+        "path": "shared/workflow",
+        "commits": 26
+      },
+      {
+        "path": "docs/reference",
+        "commits": 24
+      },
+      {
+        "path": "tests/unit",
+        "commits": 22
+      },
+      {
+        "path": "shared/guidelines",
+        "commits": 17
+      },
+      {
+        "path": "tests/integration",
+        "commits": 13
+      },
+      {
+        "path": ".specify",
+        "commits": 10
+      },
+      {
+        "path": ".specify/agents",
+        "commits": 4
+      },
+      {
+        "path": ".",
+        "commits": 2
+      },
+      {
+        "path": "agents",
+        "commits": 2
+      },
+      {
+        "path": ".claude/agents",
+        "commits": 1
+      },
+      {
+        "path": ".github/agents",
+        "commits": 1
+      },
+      {
+        "path": ".opencode/agents",
+        "commits": 1
+      },
+      {
+        "path": ".specify/scripts",
+        "commits": 1
+      },
+      {
+        "path": "docs/decisions",
+        "commits": 1
+      }
+    ],
+    "coChangePaths": [
+      {
+        "paths": [
+          ".specify/scripts",
+          "scripts/python"
+        ],
+        "commits": 29
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "skills/external"
+        ],
+        "commits": 7
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          ".specify/skills"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "skills/external"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/scripts",
+          "src/specify_cli"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          ".specify/skills",
+          "scripts/python"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "skills/external"
+        ],
+        "commits": 3
+      },
+      {
+        "paths": [
+          "scripts/python",
+          "src/specify_cli"
+        ],
+        "commits": 3
+      }
+    ]
+  },
+  "dependencyGovernance": {
+    "schemaVersion": "1.0.0",
+    "kind": "dependency-governance",
+    "status": "ok",
+    "repoRoot": ".",
+    "analyzerVersion": "v5",
+    "elapsedMs": 177.04,
+    "source": {
+      "fileListStrategy": "git-ls-files",
+      "fileCount": 5782,
+      "staleDays": 180,
+      "now": "2026-11-05T06:53:15.669Z"
+    },
+    "summary": {
+      "ecosystemCount": 2,
+      "ecosystems": [
+        "node",
+        "python"
+      ],
+      "manifestCount": 18,
+      "lockfileCount": 2,
+      "dependencyFileCount": 20,
+      "staleDependencyFiles": [],
+      "updateAutomation": {
+        "count": 0,
+        "files": []
+      },
+      "auditSignals": {
+        "count": 0,
+        "files": []
+      },
+      "alertEvidence": {
+        "status": "unverified",
+        "count": 0,
+        "files": []
+      },
+      "findings": [
+        {
+          "id": "dependency-update-automation-missing",
+          "severity": "Medium",
+          "evidenceStrength": "Static configuration evidence",
+          "title": "No dependency update automation config found",
+          "passCheck": "Add or cite Dependabot, Renovate, Snyk, or an equivalent host-native dependency update workflow."
+        }
+      ],
+      "riskLevel": "medium"
+    },
+    "files": {
+      "manifests": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": ".specify/specs/071-review-code-integration/test-evidence/requirements-remediation-validate.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/074b-nested-governance/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/078-coaching-skills/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/080-humanize-run-output/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node"
+        }
+      ],
+      "lockfiles": [
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node"
+        }
+      ],
+      "dependency": [
+        {
+          "path": ".specify/scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 98,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-06-18T17:32:03+08:00",
+          "lastTouchedAgeDays": 139,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        },
+        {
+          "path": ".specify/skills/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/071-review-code-integration/test-evidence/requirements-remediation-validate.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-27T15:13:09+08:00",
+          "lastTouchedAgeDays": 8,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/074b-nested-governance/test-evidence/requirements-checks.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-29T12:31:04+08:00",
+          "lastTouchedAgeDays": 7,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/078-coaching-skills/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-30T14:24:07+08:00",
+          "lastTouchedAgeDays": 6,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/080-humanize-run-output/test-evidence/requirements-fix-status.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-31T14:07:12+08:00",
+          "lastTouchedAgeDays": 5,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-concurrent-impl-readout.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T12:20:58+08:00",
+          "lastTouchedAgeDays": 0,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T12:20:58+08:00",
+          "lastTouchedAgeDays": 0,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-mirror-observation.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T12:20:58+08:00",
+          "lastTouchedAgeDays": 0,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-scope-update-probe-tests.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T12:20:58+08:00",
+          "lastTouchedAgeDays": 0,
+          "stale": false
+        },
+        {
+          "path": ".specify/specs/082-mechanism-policy-separation/test-evidence/requirements-u4-gates.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-11-05T11:42:17+08:00",
+          "lastTouchedAgeDays": 0,
+          "stale": false
+        },
+        {
+          "path": "pyproject.toml",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-08-24T14:25:31+08:00",
+          "lastTouchedAgeDays": 73,
+          "stale": false
+        },
+        {
+          "path": "scripts/js/better-harness/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-07-29T15:30:42+08:00",
+          "lastTouchedAgeDays": 98,
+          "stale": false
+        },
+        {
+          "path": "skills/external/database-utils/requirements.txt",
+          "role": "manifest",
+          "ecosystem": "python",
+          "lastTouchedAt": "2026-10-11T10:36:48+08:00",
+          "lastTouchedAgeDays": 25,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/excalidraw/scripts/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package-lock.json",
+          "role": "lockfile",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        },
+        {
+          "path": "skills/external/draw-diagram/references/types/mermaid/server/package.json",
+          "role": "manifest",
+          "ecosystem": "node",
+          "lastTouchedAt": "2026-10-12T22:12:51+08:00",
+          "lastTouchedAgeDays": 23,
+          "stale": false
+        }
+      ]
+    },
+    "availableVersions": [
+      "v1",
+      "v2",
+      "v3",
+      "v4",
+      "v5"
+    ]
+  }
+}
