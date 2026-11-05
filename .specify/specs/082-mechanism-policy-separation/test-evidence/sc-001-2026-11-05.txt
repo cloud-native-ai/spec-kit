@@ -1,0 +1,224 @@
+SC-001 — double-judge decidability reading (T046)
+================================================================================
+
+Criterion   : requirements.md SC-001 — for N pieces of content, two independent judges
+              decide using the owner document alone and their verdicts agree 100%;
+              a disagreement is a decidability finding about the owner, not a judge error.
+Carrier     : this file (the criterion is a human/model sample, GM-02 — it MUST NOT be
+              turned into a pytest assertion); the set's parseability is guarded by
+              tests/contract/test_mechanism_policy_decidability.py.
+
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : Qoder CLI 1.1.83 (macOS 25.6.0 / arm64); model = the CLI's default, not pinned by this reading
+Protocol    : fresh-context read-only — a separate non-interactive process per respondent,
+              no session persistence (`--no-session-persistence`), the only built-in tool is
+              `Read` (`--tools Read`), working directory outside the repository so no project
+              instruction file (AGENTS.md / .specify/instructions.md) is in scope.
+Owner copy  : shared/definitions/mechanism-policy-definitions.md with the answer-key section
+              (`## Worked Examples`) removed — sha256 c49fce7767ef97b88befbb6275fae4700acf8f6a5fabf4aec9ed92b88a8747f3
+              The normative body (§ Terminology / § Boundary Test / § Misplacement Symptoms /
+              § Archival Rules / § Consumption Contract / § Meta-layer Membership /
+              § Boundaries / § Change Log) is given in full.
+Question set: the owner's own 14 samples S-01…S-14, re-labelled Q-01…Q-14 in a fixed
+              deterministic shuffle (seed 8211) so the section labels ("机制侧" /
+              "策略误置" …) cannot leak the answer. Snapshot sha256 9e8926b0d364c63c67870f1458c91bb7850891efd4c79affcc52c945baa03aaa
+              Denominator = 14 = the owner appendix's own count; this is the ONLY question
+              set (SC-001 and SC-005 share it; no second set exists).
+
+
+## 1. The two judge invocations (verbatim prompts)
+
+Judge A (cwd = a directory holding only `owner.md` and `questions.md`):
+
+    qodercli -p --no-session-persistence --tools Read --permission-mode default \
+      "读 owner.md（一份完整的规范文档）和 questions.md。只用 owner.md 的内容判断每个问题中的
+       片段属于哪一层。每题只能给出一个答案，取值必须是 机制、策略、待澄清 之一。输出格式：
+       每题一行，形如 Q-01: 机制 。不要解释，不要读写其它文件。"
+
+Judge B (a second, independent process; its own copy of the two files):
+
+    qodercli -p --no-session-persistence --tools Read --permission-mode default \
+      "你是判定者 B。请阅读 owner.md（规范文档全文）与 questions.md。判断 questions.md 中
+       每个片段应归入哪一层，依据只能来自 owner.md。每题给一个答案，取值必须是 机制、策略、
+       待澄清。每题一行，格式为 Q-01: 机制 。不写解释，不读其它文件。"
+
+Neither prompt names the three values' definitions, gives an example answer, or mentions
+which layer is common — the only input that carries meaning is the owner document.
+
+## 2. The set snapshot (verbatim, identical for both judges)
+
+# Question set snapshot (owner § Worked Examples, 14 items)
+
+### Q-01
+
+```text
+| merge-skills | included | 产出合并后的目标技能 |
+```
+
+### Q-02
+
+```text
+## Requirements
+```
+
+### Q-03
+
+```text
+def normalize(raw): 去掉首尾空白，再剥一层包裹引号
+```
+
+### Q-04
+
+```text
+<!-- SKILL.md 正文 -->
+输出固定写到 /Users/alice/work/reports。
+```
+
+### Q-05
+
+```text
+# .specify/notes/TODO.md
+若 A 不满足则跳过 B；否则继续到 C。
+```
+
+### Q-06
+
+```text
+重新生成镜像，然后把结果写进项目里。
+```
+
+### Q-07
+
+```text
+机制 (Mechanism)——换掉运行环境仍然成立的那部分内容。
+```
+
+### Q-08
+
+```text
+先精确匹配技能名；只有零命中时才做一次不分大小写的比较。
+```
+
+### Q-09
+
+```text
+<!-- references/report.md -->
+默认输出到 reports/ 目录。
+```
+
+### Q-10
+
+```text
+项目模式下走完整流程，独立模式下跳过传播步骤。
+```
+
+### Q-11
+
+```text
+从用户粘在对话里的那份清单读取条目。
+```
+
+### Q-12
+
+```text
+把生成的报告写到用户本次指定的交付目录。
+```
+
+### Q-13
+
+```text
+report.py --out <dir>
+```
+
+### Q-14
+
+```text
+# 某用户目录下的 NOTES.md
+发布日期前必须先跑一遍完整性检查，再跑发布步骤。
+```
+
+
+## 3. Judge A's verdict set (verbatim)
+
+Q-01: 机制
+Q-02: 机制
+Q-03: 机制
+Q-04: 策略
+Q-05: 机制
+Q-06: 待澄清
+Q-07: 机制
+Q-08: 机制
+Q-09: 策略
+Q-10: 策略
+Q-11: 策略
+Q-12: 策略
+Q-13: 策略
+Q-14: 机制
+
+## 4. Judge B's verdict set (verbatim)
+
+Q-01: 机制
+Q-02: 机制
+Q-03: 机制
+Q-04: 策略
+Q-05: 机制
+Q-06: 待澄清
+Q-07: 机制
+Q-08: 机制
+Q-09: 策略
+Q-10: 策略
+Q-11: 策略
+Q-12: 策略
+Q-13: 策略
+Q-14: 机制
+
+## 5. Scoring (both verdicts against the owner's own answers)
+
+The answer key is the owner's § Worked Examples answers, withheld from both judges and
+used only here.
+
+qid  sid   key    judgeA   judgeB   agree
+Q-01 S-11  机制    机制     机制     yes
+Q-02 S-07  机制    机制     机制     yes
+Q-03 S-06  机制    机制     机制     yes
+Q-04 S-04  策略    策略     策略     yes
+Q-05 S-08  机制    机制     机制     yes
+Q-06 S-12  待澄清  待澄清   待澄清   yes
+Q-07 S-09  机制    机制     机制     yes
+Q-08 S-01  机制    机制     机制     yes
+Q-09 S-10  策略    策略     策略     yes
+Q-10 S-13  策略    策略     策略     yes
+Q-11 S-14  策略    策略     策略     yes
+Q-12 S-02  策略    策略     策略     yes
+Q-13 S-05  策略    策略     策略     yes
+Q-14 S-03  机制    机制     机制     yes
+
+## 6. The reading
+
+    judges_agree = 14 / 14 = 100.0 %
+
+Both judges answered the identical value on every one of the 14 items, which is SC-001's
+criterion ("结论一致率达到 100%"). Agreement is not scored against the key — the key is
+printed only so a reader can see that the agreement is also correct, not agreement on a
+common misreading.
+
+## 7. Decidability findings
+
+None between the two judges. No item produced divergent verdicts, so no item is reported
+as undecidable. The boundary case (Q-06 / S-12, the paragraph that carries both layers)
+was answered `待澄清` by both judges independently, which is the one value the owner's
+§ Boundary Test reserves for "两个方向都成立" — the case that a prose-only reading is most
+likely to collapse.
+
+SC-001's criterion is agreement between two judges, and that is 100%. The separate
+SC-005 reading on the same set (a third, uninvolved reader) is recorded in
+`sc-005-2026-11-05.txt` and did produce one divergence from the owner's own answer;
+that is a reading about a reader, not a second-judge disagreement, and it is not folded
+into this criterion's rate.
+
+## 8. Recomputing this reading
+
+Re-run the two invocations of § 1 against the two files whose sha256 are quoted in the
+header. The set is frozen by the snapshot; the owner copy is frozen by its hash; the
+prompts are quoted verbatim. A different model or a later owner revision would produce a
+new reading, which is what "one sample run" means here — it is evidence, not a gate.

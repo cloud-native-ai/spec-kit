@@ -23,9 +23,13 @@ implements the five declaration requirements from
                                                   wording used as a comparison scope
 =====  =========================================  =====================================
 
-Every reading prints a ``compared=<N> complement=<N> allowed_in_unit=<N> mismatches=<N>``
-line, so a guard that compared nothing (an empty unit, a missing baseline) cannot pass
-silently — the count is the evidence, and a zero denominator is itself a failure.
+Every reading prints a
+``compared=<N> unit=<N> complement=<N> allowed_in_unit=<N> allowed_in_baseline=<N>
+frozen_mismatches=<N>`` line, so a guard that compared nothing (an empty unit, a missing
+baseline) cannot pass silently — the count is the evidence, and a zero denominator is
+itself a failure. ``allowed_in_baseline`` is the part of the registered allowed set the
+baseline really carries, which makes ``complement = unit - allowed_in_baseline`` close
+arithmetically on the printed fields alone.
 
 The full green reading belongs to T041 (Part 6); this row lands the guard and its
 negative cases only.
@@ -238,6 +242,7 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
         )
 
     complement = [rel for rel in base if rel not in allowed_in_unit]
+    allowed_in_baseline = [rel for rel in allowed_in_unit if rel in base_set]
     mismatches = [rel for rel in complement if rel in changed and rel in feature_paths]
     for rel in mismatches:
         problems.append(
@@ -275,6 +280,7 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
         "complement": len(complement),
         "complement_size": len(complement),
         "allowed_in_unit": len(allowed_in_unit),
+        "allowed_in_baseline": len(allowed_in_baseline),
         "mismatches": len(mismatches),
         "changed": changed,
         "committed": committed_paths,
@@ -285,12 +291,24 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
 
 
 def reading_line(reading: dict) -> str:
-    return "compared=%d unit=%d complement=%d allowed_in_unit=%d mismatches=%d" % (
-        reading["compared"],
-        reading["unit"],
-        reading["complement"],
-        reading["allowed_in_unit"],
-        reading["mismatches"],
+    """The one line every SC-003 reading is judged from, recomputable on its own.
+
+    ``allowed_in_baseline`` is the fraction of the allowed set the baseline actually
+    carries, so ``complement == unit - allowed_in_baseline`` closes arithmetically on
+    the pasted fields; ``frozen_mismatches`` is the complement's own difference count
+    (the frozen set is the complement — every path outside the registered allowed set).
+    """
+    return (
+        "compared=%d unit=%d complement=%d allowed_in_unit=%d allowed_in_baseline=%d "
+        "frozen_mismatches=%d"
+        % (
+            reading["compared"],
+            reading["unit"],
+            reading["complement"],
+            reading["allowed_in_unit"],
+            reading["allowed_in_baseline"],
+            reading["mismatches"],
+        )
     )
 
 
@@ -425,6 +443,29 @@ def test_sc003_both_families_are_inside_the_comparison_unit():
 # --------------------------------------------------------------------------- #
 # requirement 3 — the allowed set is parsed from its single landing point
 # --------------------------------------------------------------------------- #
+def test_sc003_reading_line_is_recomputable_from_its_own_fields():
+    """The enclosed count argument must close arithmetically on the printed fields.
+
+    ``complement`` is the baseline paths minus the allowed paths that the baseline
+    actually carries; printing ``allowed_in_unit`` without the in-baseline part leaves
+    a reader unable to check ``complement`` without re-running the parser. The two
+    counts side by side are what makes the pasted line recomputable on its own.
+    """
+    reading = compare_working_tree()
+    line = reading_line(reading)
+    print(line)
+    fields = dict(part.split("=", 1) for part in line.split())
+    for key in ("compared", "unit", "complement", "allowed_in_unit",
+                "allowed_in_baseline", "frozen_mismatches"):
+        assert key in fields, "the reading line carries no %r: %s" % (key, line)
+    assert int(fields["compared"]) == int(fields["unit"]), (
+        "the line compares %s of its %s baseline paths — the compared count is not the "
+        "unit's own size" % (fields["compared"], fields["unit"]))
+    assert int(fields["complement"]) == int(fields["unit"]) - int(fields["allowed_in_baseline"]), (
+        "complement=unit-allowed_in_baseline does not close on the printed fields: %s" % line)
+    assert int(fields["frozen_mismatches"]) == 0, line
+
+
 def test_gm03_allowed_set_parses_to_eight_in_unit_rows():
     inside, outside = registered_allowed_set((REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8"))
     assert len(inside) == 10, (
@@ -614,6 +655,7 @@ def compare_working_tree_in(tree: Path, baseline: str) -> dict:
     for rel in sorted(set(current) - set(base)):
         problems.append("%r is new inside the comparison unit" % rel)
     complement = [rel for rel in base if rel not in allowed_in_unit]
+    allowed_in_baseline = [rel for rel in allowed_in_unit if rel in set(base)]
     mismatches = [rel for rel in complement if rel in changed]
     for rel in mismatches:
         problems.append("%r differs from the baseline but is not registered" % rel)
@@ -622,6 +664,7 @@ def compare_working_tree_in(tree: Path, baseline: str) -> dict:
         "unit": len(base),
         "complement": len(complement),
         "allowed_in_unit": len(allowed_in_unit),
+        "allowed_in_baseline": len(allowed_in_baseline),
         "mismatches": len(mismatches),
         "changed": changed,
         "committed": [],

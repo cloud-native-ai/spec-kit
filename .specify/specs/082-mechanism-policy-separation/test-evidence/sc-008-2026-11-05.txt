@@ -1,0 +1,103 @@
+SC-008 — command-surface disambiguation reading (T042)
+================================================================================
+
+Criterion   : requirements.md SC-008 — a command name fed in as "the Skill to operate
+              on" is reported as the command surface and points at its command, enters
+              Skill resolution zero times, and is forced-executed zero times; at least
+              one negative row proves the ruling is not "anything with a dot or a slash
+              is a command".
+Carrier     : tests/contract/test_skill_reference_command_surface.py
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : macOS 25.6.0 / arm64
+Interpreter : Python 3.14.6 ; pytest 9.2.0 ; git version 2.54.0 (Apple Git-157)
+HEAD        : 88be07141e2feb8902492e2dd357a1c8c97bed19
+Fixture     : tests/fixtures/skill-reference/normalization-matrix.json (row set frozen)
+Implementn : tests/contract/skill_reference_matrix.py (the single executable)
+
+## 1. The run (verbatim, one run, positives and negatives together)
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_skill_reference_command_surface.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_skill_reference_command_surface.py
+R01 raw='speckit.skills' -> command-surface 'templates/commands/skills.md'
+R02 raw='/speckit.skills' -> command-surface 'templates/commands/skills.md'
+R03 raw='speckit.skills/SKILL.md' -> command-surface 'templates/commands/skills.md'
+R04 raw='speckit.skills' -> command-surface 'templates/commands/skills.md'
+R05 raw='speckit.nosuchcommand' -> command-surface 'templates/commands/nosuchcommand.md'
+R06 raw='skills/external/create-docs/SKILL.md' -> skill '-'
+R07 raw='create-docs' -> failure '-'
+R08 raw='humanize' -> failure '-'
+R09 raw='/improve-skills' -> failure '-'
+R10 raw='@merge-skills' -> failure '-'
+R11 raw='@/merge-skills' -> failure '-'
+R12 raw='skill:/merge-skills' -> failure '-'
+R13 raw='skill:improve-skills' -> failure '-'
+R14 raw='skills/external/merge-skills/SKILL.md' -> skill '-'
+R15 raw='skills/external/merge-skills/' -> skill '-'
+R16 raw='skills/external/merge-skills' -> skill '-'
+R17 raw='.specify/skills/humanize' -> skill '-'
+R18 raw='  "/improve-skills"  ' -> failure '-'
+R19 raw='SCRATCH-HELPER' -> failure '-'
+R20 raw='my-draft.md' -> failure '-'
+R21 raw='improve-skills' -> failure '-'
+R22 raw='no-such-skill-xyz' -> failure '-'
+R23 raw='../../etc/passwd' -> failure '-'
+R24 raw='docs/reference/skills/sdd-loop-driver.md' -> failure '-'
+R25 raw='skills/external/ghost-skill' -> failure '-'
+R26 raw='skills/external/hollow-skill' -> failure '-'
+R27 raw='twin-skill' -> failure '-'
+R28 raw='@merge-skills' -> failure '-'
+R29 raw='"improve-skills' -> failure '-'
+R30 raw='skill:skill:merge-skills' -> failure '-'
+...
+3 passed in 0.07s
+----- END VERBATIM -----
+
+## 2. The positives (SC-008's first half)
+
+The assertion requires at least two positive rows, that both the bare form and the
+slash form are present, that each positive's `command_target` equals its own name's
+command template, and that no command-surface result entered Skill resolution.
+
+| row | raw | form | outcome | command target |
+|---|---|---|---|---|
+| R01 | `speckit.skills` | bare name | `command-surface` | `templates/commands/skills.md` |
+| R02 | `/speckit.skills` | slash reference | `command-surface` | `templates/commands/skills.md` |
+| R03 | `speckit.skills/SKILL.md` | canonical path | `command-surface` | `templates/commands/skills.md` |
+| R04 | `speckit.skills` (cli operation) | cli | `command-surface` | `templates/commands/skills.md` |
+
+Four positives, four times the same command target: the bare form, the slash form, the
+`SKILL.md`-suffixed form and the CLI-operation form converge on one identifier and one
+command. `enters_skill_resolution=false` is asserted per positive row, so "reported as
+a command" and "never resolved as a Skill" are the same assertion.
+
+## 3. The negative rows (SC-008's second half)
+
+| row | raw | what a wrong reading would say | actual | why the actual is right |
+|---|---|---|---|---|
+| R06 | `skills/external/create-docs/SKILL.md` | "it has slashes, therefore a command" | `skill` → `skills/external/create-docs` | it is a Skill path; the name channel is decided by the `/speckit.*` set, not by the separator |
+| R07 | `create-docs` | "it is a name, therefore a command" | `failure` (`dual-layer`) | nothing about a dot-free bare name is command-shaped; the live tree carries it in two layers, which is a failure, never a command |
+| R05 | `speckit.nosuchcommand` | "the command does not exist, therefore not a command" | `command-surface` → `templates/commands/nosuchcommand.md` | the ruling follows the namespace, not the file: an in-namespace name is a command even when the template is absent |
+| R20 | `my-draft.md` | "it has a dot, therefore a command" | `failure` | the dot is not a command marker (the module asserts a dotted, slash-free negative row exists) |
+
+R06 is the row that falsifies "a slash means a command"; R20 falsifies "a dot means a
+command"; R05 is the boundary case that shows the namespace, not the string's shape or
+the file's existence, is the criterion; R07 shows a plain name is never promoted to a
+command just because it is a name.
+
+## 4. Recomputing this reading
+
+- Denominator: the matrix fixture's own rows (30). The module prints every row it
+  judged, not only the surface segment, so a row that silently changed class would be
+  visible here without re-running the fixture.
+- `3 passed` = the positive/negative assertion, the flipped-positive negative case and
+  the negative-row-ruled-command negative case. The two `tmp_path` cases are the
+  guard's own discriminating power (GM-07): relabelling a positive row as `skill`, or a
+  negative row as `command-surface`, turns the same assertion red.
+
+## 5. Disclosure
+
+`speckit.skills` is a command-surface row by its namespace, not by the existence of
+`templates/commands/skills.md`. R05 is deliberately a name with **no** template: it
+records that the ruling does not depend on the file, which is why the module checks the
+target's existence only for the row whose target must exist (`/speckit.skills`).

@@ -181,13 +181,37 @@ def test_sc006_fixture_is_three_disjoint_segments_of_at_least_twelve_rows():
         % sorted({row["segment"] for row in rows}))
 
 
-def test_sc006_every_row_recomputes(capsys, tmp_path):
+def row_reading(module, row: dict, tmp_root: Path) -> str:
+    """One matrix row's own reading: what the implementation said and what was expected."""
+    result = _recompute_row(module, row, tmp_root)
+    expect = row["expect"]
+    verdict = "ok" if (
+        result.get("outcome") == expect["outcome"]
+        and result.get("normalized") == expect["normalized"]
+    ) else "MISMATCH"
+    return (
+        "row %s segment=%s raw=%r outcome=%s normalized=%r expected=%s/%r %s"
+        % (row["id"], row["segment"], row["raw"], result.get("outcome"),
+           result.get("normalized"), expect["outcome"], expect["normalized"], verdict)
+    )
+
+
+def test_sc006_every_row_recomputes(tmp_path):
     matrix = _load_matrix(REPO_ROOT / MATRIX_REL)
     command_surfaces: list[str] = []
     rows, matched, problems = recompute(matrix, tmp_path, command_surfaces=command_surfaces)
     assert "templates/commands/skills.md" in command_surfaces, (
         "no command-surface row pointed at templates/commands/skills.md: %r"
         % command_surfaces)
+    row_lines = [row_reading(_helper(), row, tmp_path) for row in matrix["rows"]]
+    for line in row_lines:
+        print(line)
+    assert len(row_lines) == rows, (
+        "the run printed %d per-row reading(s) for %d matrix row(s) — a total without "
+        "its rows is not recomputable" % (len(row_lines), rows))
+    printed_ids = [line.split()[1] for line in row_lines]
+    assert printed_ids == [row["id"] for row in matrix["rows"]], (
+        "the per-row readings name %r, not the matrix's own row order" % printed_ids)
     reading = "rows=%d matched=%d failed=%d" % (rows, matched, len(problems))
     print(reading)
     assert rows >= MIN_ROWS, reading

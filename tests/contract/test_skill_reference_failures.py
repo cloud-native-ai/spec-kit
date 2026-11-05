@@ -141,20 +141,24 @@ def test_sc009_one_assertion_per_failure_class(capsys, tmp_path):
 
 def test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit(tmp_path):
     problems, reports = check_failures(cases(), tmp_path)
+    actual = reports["out-of-ladder"].get("failure_class")
+    print("exclusion[out-of-ladder->zero-hit] actual=%s forbidden_seen=%s"
+          % (actual, str(actual == "zero-hit").lower()))
     # Both halves are load-bearing: the input must *be* judged (a missing class is a
     # different defect), and it must not land on the other class of its pair.
-    assert reports["out-of-ladder"].get("failure_class") == "out-of-ladder", (
-        "the exclusion pair was not exercised: the input closed as %r"
-        % reports["out-of-ladder"].get("failure_class"))
+    assert actual == "out-of-ladder", (
+        "the exclusion pair was not exercised: the input closed as %r" % actual)
     assert not any("out-of-ladder was reported as 'zero-hit'" in p for p in problems), (
         "an out-of-ladder input was reported as zero-hit")
 
 
 def test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder(tmp_path):
     problems, reports = check_failures(cases(), tmp_path)
-    assert reports["unreadable"].get("failure_class") == "unreadable", (
-        "the exclusion pair was not exercised: the input closed as %r"
-        % reports["unreadable"].get("failure_class"))
+    actual = reports["unreadable"].get("failure_class")
+    print("exclusion[unreadable->out-of-ladder] actual=%s forbidden_seen=%s"
+          % (actual, str(actual == "out-of-ladder").lower()))
+    assert actual == "unreadable", (
+        "the exclusion pair was not exercised: the input closed as %r" % actual)
     assert not any("unreadable was reported as 'out-of-ladder'" in p for p in problems), (
         "an unreadable directory was reported as out-of-ladder")
 

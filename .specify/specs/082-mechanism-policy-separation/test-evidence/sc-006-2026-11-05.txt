@@ -1,0 +1,107 @@
+SC-006 — normalization-matrix recomputation reading (T043)
+================================================================================
+
+Criterion   : requirements.md SC-006 — a fixed fixture of ≥ 12 inputs is recomputed
+              row by row through the deterministic implementation and matches each row's
+              declared expectation (decision class + the paired "raw + normalized"
+              shape) 100%; any single mismatch fails, never "the rest passed".
+Carrier     : tests/contract/test_skill_reference_matrix.py
+Fixture     : tests/fixtures/skill-reference/normalization-matrix.json (the denominator)
+Implementn : tests/contract/skill_reference_matrix.py (test-only, stdlib only)
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : macOS 25.6.0 / arm64
+Interpreter : Python 3.14.6 ; pytest 9.2.0 ; git version 2.54.0 (Apple Git-157)
+HEAD        : 88be07141e2feb8902492e2dd357a1c8c97bed19
+
+## 1. The run (verbatim) — per-row readings, then the total
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_skill_reference_matrix.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_skill_reference_matrix.py
+.row R01 segment=surface raw='speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R02 segment=surface raw='/speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R03 segment=surface raw='speckit.skills/SKILL.md' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R04 segment=surface raw='speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R05 segment=surface raw='speckit.nosuchcommand' outcome=command-surface normalized='speckit.nosuchcommand' expected=command-surface/'speckit.nosuchcommand' ok
+row R06 segment=surface raw='skills/external/create-docs/SKILL.md' outcome=skill normalized='skills/external/create-docs' expected=skill/'skills/external/create-docs' ok
+row R07 segment=surface raw='create-docs' outcome=failure normalized='create-docs' expected=failure/'create-docs' ok
+row R08 segment=normalize raw='humanize' outcome=failure normalized='humanize' expected=failure/'humanize' ok
+row R09 segment=normalize raw='/improve-skills' outcome=failure normalized='improve-skills' expected=failure/'improve-skills' ok
+row R10 segment=normalize raw='@merge-skills' outcome=failure normalized='merge-skills' expected=failure/'merge-skills' ok
+row R11 segment=normalize raw='@/merge-skills' outcome=failure normalized='merge-skills' expected=failure/'merge-skills' ok
+row R12 segment=normalize raw='skill:/merge-skills' outcome=failure normalized='merge-skills' expected=failure/'merge-skills' ok
+row R13 segment=normalize raw='skill:improve-skills' outcome=failure normalized='improve-skills' expected=failure/'improve-skills' ok
+row R14 segment=normalize raw='skills/external/merge-skills/SKILL.md' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R15 segment=normalize raw='skills/external/merge-skills/' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R16 segment=normalize raw='skills/external/merge-skills' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R17 segment=normalize raw='.specify/skills/humanize' outcome=skill normalized='.specify/skills/humanize' expected=skill/'.specify/skills/humanize' ok
+row R18 segment=normalize raw='  "/improve-skills"  ' outcome=failure normalized='improve-skills' expected=failure/'improve-skills' ok
+row R19 segment=normalize raw='SCRATCH-HELPER' outcome=skill normalized='SCRATCH-HELPER' expected=skill/'SCRATCH-HELPER' ok
+row R20 segment=normalize raw='my-draft.md' outcome=skill normalized='my-draft.md' expected=skill/'my-draft.md' ok
+row R21 segment=normalize raw='improve-skills' outcome=failure normalized='improve-skills' expected=failure/'improve-skills' ok
+row R22 segment=failure raw='no-such-skill-xyz' outcome=failure normalized='no-such-skill-xyz' expected=failure/'no-such-skill-xyz' ok
+row R23 segment=failure raw='../../etc/passwd' outcome=failure normalized='../../etc/passwd' expected=failure/'../../etc/passwd' ok
+row R24 segment=failure raw='docs/reference/skills/sdd-loop-driver.md' outcome=failure normalized='docs/reference/skills/sdd-loop-driver.md' expected=failure/'docs/reference/skills/sdd-loop-driver.md' ok
+row R25 segment=failure raw='skills/external/ghost-skill' outcome=failure normalized='skills/external/ghost-skill' expected=failure/'skills/external/ghost-skill' ok
+row R26 segment=failure raw='skills/external/hollow-skill' outcome=failure normalized='skills/external/hollow-skill' expected=failure/'skills/external/hollow-skill' ok
+row R27 segment=failure raw='twin-skill' outcome=failure normalized='twin-skill' expected=failure/'twin-skill' ok
+row R28 segment=failure raw='@merge-skills' outcome=failure normalized='merge-skills' expected=failure/'merge-skills' ok
+row R29 segment=failure raw='"improve-skills' outcome=failure normalized='"improve-skills' expected=failure/'"improve-skills' ok
+row R30 segment=failure raw='skill:skill:merge-skills' outcome=failure normalized='skill:merge-skills' expected=failure/'skill:merge-skills' ok
+rows=30 matched=30 failed=0
+..
+3 passed in 0.05s
+----- END VERBATIM -----
+
+## 2. The reading line and its denominator
+
+    rows=30 matched=30 failed=0
+
+- `rows` is the fixture's own row count, not a number typed into the module or into
+  this file: the module iterates `matrix["rows"]` and prints its length. The frozen
+  lower bound is `MIN_ROWS = 12` (SC-006 / GM-13); the fixture carries 30.
+- `matched` counts rows with **zero** discrepancies. A row with any problem is not
+  matched, so `matched=rows` is the only passing shape; a mismatch also fails naming
+  the row.
+- `failed` counts discrepancies, not rows-with-discrepancies, so it cannot be
+  recomputed from `rows - matched` alone.
+
+## 3. What each row is compared on
+
+Per row: the decision class (`outcome`), the normalized identifier, and
+`decision_class == outcome`; for failure rows also `failure_class` plus every required
+report item (`raw`, `normalized`, …); for the dual-layer and case rows `layer` /
+`case_pass`; for command-surface rows the `command_target` and the zero-entry into
+Skill resolution. Structural rules are checked for every row whatever its expectation
+says: segment membership in {surface, normalize, failure}, outcome membership in the
+closed three, failure-segment rows closing as `failure`, command-surface rows naming a
+target, failure reports carrying both halves of the pair.
+
+## 4. Segment census (derived from the rows above, not from a constant)
+
+| segment | rows | ids |
+|---|---|---|
+| surface | 7 | R01–R07 |
+| normalize | 14 | R08–R21 |
+| failure | 9 | R22–R30 |
+| total | 30 | R01–R30 |
+
+7 + 14 + 9 = 30 = `rows`. Each id belongs to exactly one segment (asserted separately).
+
+## 5. Recomputing this reading
+
+- Re-run the same fixture through the same implementation: the command in § 1.
+- The negative case in the same run mutates **one** `normalize` row's expected
+  normalization in memory and asserts `matched == rows - 1` with that row named — i.e.
+  a single changed expectation cannot pass as "the rest passed". `3 passed` in § 1 is
+  the population assertion (three disjoint segments, ≥ 12 rows, unique ids), the
+  recomputation itself, and that negative case.
+
+## 6. Disclosure
+
+- The `live` rows read the current tree's layer distribution; that is why two names
+  (`create-docs`, `humanize`) close as `dual-layer` failures rather than as `skill`.
+  The criterion is the layer, never the path literal (§ Disambiguation rules (c)), so a
+  future tree that removes one copy changes these rows' *outcome class* and must
+  change the fixture in the same commit — the module would go red otherwise, which is
+  the intended behaviour.

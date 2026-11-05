@@ -134,7 +134,26 @@ def assert_consumer_wiring(paths) -> list[str]:
     return problems
 
 
+def consumer_reading(path: Path) -> str:
+    """One consumer's own reading: the single owner reference, with its line number."""
+    text = _read(path)
+    refs = owner_reference_lines(text)
+    mirrors = mirror_reference_lines(text)
+    return "consumer %s source_refs=%d lines=%s mirror_refs=%d" % (
+        path, len(refs), refs if refs else "none", len(mirrors))
+
+
 def test_sr01_to_sr06_each_consumer_cites_the_source_owner_once():
+    readings = [consumer_reading(REPO_ROOT / relative) for relative in CONSUMERS]
+    for line in readings:
+        print(line)
+    assert len(readings) == len(CONSUMERS), (
+        "the run produced %d per-consumer reading(s) for %d consumer(s) — a claim of "
+        "'exactly one reference each' needs every consumer's own line"
+        % (len(readings), len(CONSUMERS)))
+    for reading, relative in zip(readings, CONSUMERS):
+        assert relative in reading, (
+            "the per-consumer readings are not in the consumer's own order: %r" % readings)
     problems = assert_consumer_wiring(REPO_ROOT / p for p in CONSUMERS)
     assert not problems, "SC-007 wiring violations:\n- " + "\n- ".join(problems)
 

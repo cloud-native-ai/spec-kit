@@ -1,0 +1,117 @@
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_mechanism_policy_guard.py::test_sc003_reading_line_is_recomputable_from_its_own_fields tests/contract/test_skill_reference_matrix.py::test_sc006_every_row_recomputes tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_each_consumer_cites_the_source_owner_once tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_sc003_reading_line_is_recomputable_from_its_own_fields __________
+
+    def test_sc003_reading_line_is_recomputable_from_its_own_fields():
+        """The enclosed count argument must close arithmetically on the printed fields.
+    
+        ``complement`` is the baseline paths minus the allowed paths that the baseline
+        actually carries; printing ``allowed_in_unit`` without the in-baseline part leaves
+        a reader unable to check ``complement`` without re-running the parser. The two
+        counts side by side are what makes the pasted line recomputable on its own.
+        """
+        reading = compare_working_tree()
+        line = reading_line(reading)
+        print(line)
+        fields = dict(part.split("=", 1) for part in line.split())
+        for key in ("compared", "unit", "complement", "allowed_in_unit",
+                    "allowed_in_baseline", "frozen_mismatches"):
+>           assert key in fields, "the reading line carries no %r: %s" % (key, line)
+E           AssertionError: the reading line carries no 'allowed_in_baseline': compared=575 unit=575 complement=566 allowed_in_unit=10 mismatches=0
+E           assert 'allowed_in_baseline' in {'compared': '575', 'unit': '575', 'complement': '566', 'allowed_in_unit': '10', ...}
+
+tests/contract/test_mechanism_policy_guard.py:442: AssertionError
+----------------------------- Captured stdout call -----------------------------
+compared=575 unit=575 complement=566 allowed_in_unit=10 mismatches=0
+_______________________ test_sc006_every_row_recomputes ________________________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x1095aaf90>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-288/test_sc006_every_row_recompute0')
+
+    def test_sc006_every_row_recomputes(capsys, tmp_path):
+        matrix = _load_matrix(REPO_ROOT / MATRIX_REL)
+        command_surfaces: list[str] = []
+        rows, matched, problems = recompute(matrix, tmp_path, command_surfaces=command_surfaces)
+        assert "templates/commands/skills.md" in command_surfaces, (
+            "no command-surface row pointed at templates/commands/skills.md: %r"
+            % command_surfaces)
+        reading = "rows=%d matched=%d failed=%d" % (rows, matched, len(problems))
+        print(reading)
+        out = capsys.readouterr().out
+        row_lines = [ln for ln in out.splitlines() if ln.startswith("row ")]
+>       assert len(row_lines) == rows, (
+            "the run printed %d per-row reading(s) for %d matrix row(s) — a total without "
+            "its rows is not recomputable" % (len(row_lines), rows))
+E       AssertionError: the run printed 0 per-row reading(s) for 30 matrix row(s) — a total without its rows is not recomputable
+E       assert 0 == 30
+E        +  where 0 = len([])
+
+tests/contract/test_skill_reference_matrix.py:195: AssertionError
+_________ test_sr01_to_sr06_each_consumer_cites_the_source_owner_once __________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x10957df90>
+
+    def test_sr01_to_sr06_each_consumer_cites_the_source_owner_once(capsys):
+        problems = assert_consumer_wiring(REPO_ROOT / p for p in CONSUMERS)
+        out = capsys.readouterr().out
+        readings = [ln for ln in out.splitlines() if ln.startswith("consumer ")]
+>       assert len(readings) == len(CONSUMERS), (
+            "the run printed %d per-consumer reading(s) for %d consumer(s) — a claim of "
+            "'exactly one reference each' needs every consumer's own line"
+            % (len(readings), len(CONSUMERS)))
+E       AssertionError: the run printed 0 per-consumer reading(s) for 5 consumer(s) — a claim of 'exactly one reference each' needs every consumer's own line
+E       assert 0 == 5
+E        +  where 0 = len([])
+E        +  and   5 = len(('skills/internal/run-skills/SKILL.md', 'skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md', 'skills/external/coaching-skills/SKILL.md'))
+
+tests/contract/test_skill_reference_consumers.py:141: AssertionError
+__________ test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit ___________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x10957e850>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-288/test_sc009_mutual_exclusion_ou0')
+
+    def test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit(capsys, tmp_path):
+        problems, reports = check_failures(cases(), tmp_path)
+        # Both halves are load-bearing: the input must *be* judged (a missing class is a
+        # different defect), and it must not land on the other class of its pair.
+        assert reports["out-of-ladder"].get("failure_class") == "out-of-ladder", (
+            "the exclusion pair was not exercised: the input closed as %r"
+            % reports["out-of-ladder"].get("failure_class"))
+        assert not any("out-of-ladder was reported as 'zero-hit'" in p for p in problems), (
+            "an out-of-ladder input was reported as zero-hit")
+        out = capsys.readouterr().out
+>       assert "exclusion[out-of-ladder->zero-hit] actual=out-of-ladder " \
+               "forbidden_seen=false" in out, (
+            "the mutual-exclusion assertion printed no reading for its own pair: %r" % out)
+E       AssertionError: the mutual-exclusion assertion printed no reading for its own pair: ''
+E       assert 'exclusion[out-of-ladder->zero-hit] actual=out-of-ladder forbidden_seen=false' in ''
+
+tests/contract/test_skill_reference_failures.py:152: AssertionError
+_________ test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder __________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x1095d63f0>
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-288/test_sc009_mutual_exclusion_un0')
+
+    def test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder(capsys, tmp_path):
+        problems, reports = check_failures(cases(), tmp_path)
+        assert reports["unreadable"].get("failure_class") == "unreadable", (
+            "the exclusion pair was not exercised: the input closed as %r"
+            % reports["unreadable"].get("failure_class"))
+        assert not any("unreadable was reported as 'out-of-ladder'" in p for p in problems), (
+            "an unreadable directory was reported as out-of-ladder")
+        out = capsys.readouterr().out
+>       assert "exclusion[unreadable->out-of-ladder] actual=unreadable " \
+               "forbidden_seen=false" in out, (
+            "the mutual-exclusion assertion printed no reading for its own pair: %r" % out)
+E       AssertionError: the mutual-exclusion assertion printed no reading for its own pair: ''
+E       assert 'exclusion[unreadable->out-of-ladder] actual=unreadable forbidden_seen=false' in ''
+
+tests/contract/test_skill_reference_failures.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_mechanism_policy_guard.py::test_sc003_reading_line_is_recomputable_from_its_own_fields
+FAILED tests/contract/test_skill_reference_matrix.py::test_sc006_every_row_recomputes
+FAILED tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_each_consumer_cites_the_source_owner_once
+FAILED tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit
+FAILED tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder
+5 failed in 12.57s
