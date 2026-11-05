@@ -42,10 +42,10 @@
 
 > **按 SU-01 收紧（2026-11-05，scope update）**。原文「正文零改动 + 以基线逐字节比较」在第二个能力并入后自相矛盾：FR-026 点名五个消费方含这两者，而引用归一化接线必然改这两份文件。**谓词未被翻转**——C1 判的是「要不要加载机制/策略判定」，从不判「文件能否被另一条 FR 改」。收窄后的可判形态如下。
 
-- 两者的**机制/策略侧** MUST 零加载：`SKILL.md` 与 `references/` 中 MUST NOT 出现判据句、误置症状、失败表行或 owner 引用（字面零命中：`mechanism-policy-definitions`、`Mechanism / policy separation`、`mechanism-in-policy`、`policy-in-mechanism`）。
+- 两者的**机制/策略侧** MUST 零加载。**扫描面（M-08 对齐后）与 GATE-6 / tasks T027 同一条**：`skills/**/SKILL.md`（递归，含 `skills/external/coaching-skills/` 与 `skills/internal/run-skills/`），**外加这两个技能目录下的 `references/**`（递归）**——后者是 GATE-6 之外的加严面，理由是它们同属这两份技能的可加载正文、且 `improve-skills` 侧的 `references/` 在 GM-03 第 4、6 行被改写，故「只有 `SKILL.md` 被扫、`references/` 无人扫」会留下无人负责的缝。其余技能的 `references/` **不**在本条扫描面内（它们不在 SW-05 的 `excluded` 成员范围，由能力一的 SW-01…SW-03 各自承担）。命中判定为**字面零命中**：`mechanism-policy-definitions`、`Mechanism / policy separation`、`mechanism-in-policy`、`policy-in-mechanism`。扫描 MUST 报出被扫文件数与命中路径行号，MUST NOT 只报「零命中」。
 - 两者**允许**的改动只有两种：① 引用坐标改写（`SR-01` / `SR-06`，把镜像路径改为源路径）；② 一行「按 owner 归一化并披露」的接线句（MUST NOT 自述归一化顺序，见 FR-019 唯一 owner）。
 - 排除理由 MUST 只写在 owner 成员表行里（FR-014 / A7），MUST NOT 在技能正文里复述。
-- 守卫形态：不再用逐字节相等（该断言对第 7、8 号允许路径失效），改为 **① 机制/策略字面零命中（grep 级，可复算）+ ② 与基线的差异行必须全部落在上述两种允许改动内**（`test_mechanism_policy_guard.py` 断言 ①，`test_skill_reference_consumers.py` 断言 ② 的一半——接线条数与源路径口径，见 `contracts/skill-reference.contract.md` SR-01 / SR-06 与 GM-11 / GM-12）。
+- 守卫形态：不再用逐字节相等（该断言对第 7、8 号允许路径失效），改为 **① 机制/策略字面零命中（grep 级，可复算）+ ② 与基线的差异行必须全部落在上述两种允许改动内**（`test_mechanism_policy_guard.py` 断言 ①，`test_skill_reference_consumers.py` 断言 ② 的一半——接线条数与源路径口径，见 `contracts/skill-reference.contract.md` SR-01 / SR-06 与 GM-11 / GM-12）。**owner 唯一**：① 的持有点是 tasks T020，② 的持有点是 tasks T027；两者 MUST NOT 在同一个断言上重复，也 MUST NOT 互相推诿（见 `guard-and-measurement.contract.md` § 引用侧与机制/策略侧的合流点）。
 
 ## SW-06 — `/speckit.skills` 命令面
 

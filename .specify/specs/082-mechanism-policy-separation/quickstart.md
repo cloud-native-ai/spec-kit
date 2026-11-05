@@ -197,12 +197,12 @@ python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py \
 
 | 命令 | 读数 |
 |---|---|
-| `pre-analyze-check.py --stage plan` | `decision=pass errors=0 advisories=81 waived=0` |
+| `pre-analyze-check.py --stage plan` | `decision=pass errors=0 advisories=127 waived=0`（2026-11-05 repair pass 逐字复跑；`tasks.md` 落地后读数由 97 升至 127，增量全部是 `missing-path` advisory，指向本计划声明为 to-be-created 的路径） |
 | `validate-requirements.py` | `status: ok`、`39 definition rows`、`0 error(s), 0 warning(s)`、六项检查全 `pass` |
 | `decomposition-check.py --mode plan` | `{"decision": "proceed", "measured": {"fr_count": 30, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": []}` |
-| `overlap-check.py` | `overlaps=12 decision=overlap`（3 条 `shared/workflow/glossary.md` + 9 条三份 SKILL.md；全部为历史已完成重叠，按状态脊 § Overlap adjudication 记录） |
+| `overlap-check.py` | `overlaps=18 decision=overlap`（2026-11-05 复跑；`same-path` 18 条 = `shared/workflow/glossary.md` 3 条 + 五份 `SKILL.md` 15 条，全部是与既有特性（`059` / `062` / `063` / `078` / `029` / `044` / `051` / `057`）的**历史已完成重叠**，按状态脊 § Overlap adjudication 记录；逐条原文见 `test-evidence/analyze-repair-gates.txt`。两份新 owner 文档与三份 `references/` 无任何重叠） |
 
-**判据**：门 1 `decision=pass` 且 `errors=0`（advisory 允许——81 条全部是 `missing-path`，逐条指向本计划声明为 to-be-created 的产物或在 `checklists/requirements.md` 里的占位写法）；门 2 `status ok`；门 3 `decision=proceed` 且 `fr_count=30` / `fr_ceiling=60`；门 4 的 `overlap` 不得含 `shared/workflow/glossary.md` 以外的**新**交付路径（`skill-reference.contract.md` 的 SR 组不新增交付路径行）。
+**判据**：门 1 `decision=pass` 且 `errors=0`（advisory 允许——**本轮读数 127 条**，全部是 `missing-path`，逐条指向本计划声明为 to-be-created 的产物或在 `checklists/requirements.md` 里的占位写法）；门 2 `status ok`；门 3 `decision=proceed` 且 `fr_count=30` / `fr_ceiling=60`；门 4 的 `overlap` 不得含 `shared/workflow/glossary.md` 以外的**新**交付路径（`skill-reference.contract.md` 的 SR 组不新增交付路径行）。
 
 **Premises**：本仓 `.specify/skills/sdd-loop-driver/` 已安装（镜像自 `skills/external/sdd-loop-driver/`）；`validate-requirements.py` 的计数字面以那次运行为准（本文件不手抄 FR / SC 计数）；overlap 检查对**已完成的**历史特性的交付面也计入比较（081 复跑同样报 29 条），故 `clear` 在「新特性修改既有共享文件」这一常态下不可达。
 

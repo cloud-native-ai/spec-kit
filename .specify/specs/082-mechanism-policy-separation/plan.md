@@ -6,7 +6,7 @@
 
 > **scope update 的处置（2026-11-05 plan 更新）**：本文件在 `58d3dc5b` 上**增量更新**，把第二个能力「技能引用归一化」纳入同一个计划。
 > - **被撤回的早改**：不再有 `082a` / `082b` 两个切片。原 `## Scope Snapshot` 与 `## Slice 082b` 两节（工作树里未提交的早改，写于 FR 上限仍为 30 时）被替换为 § Decomposition & Ceiling 的单包结论；撤回依据是 clarify 裁决 ③（30 FR < 60 上限，切片前提消失）与 `decomposition-check.py --mode plan` 的实测读数（见 § Scope Update Record）。
-> - **被改写的既有行**：凡是「`coaching-skills` / `run-skills` 零改动」「允许差异集 6 条」「四个技能文件」，以及 FR / SC 的**前值**计数（见 § Scope Update Record 的变更台账）表述都已被第二能力证伪，本次逐条改写并在 § Scope Update Record 的 `SU-nn` 行披露。**D1–D7、T-001–T-003、EP-001–EP-006 的内容未被改写**，只做复核。
+> - **被改写的既有行**：凡是「`coaching-skills` / `run-skills` 零改动」「允许差异集 6 条」「四个技能文件」，以及 FR / SC 的**前值**计数（见 § Scope Update Record 的变更台账）表述都已被第二能力证伪，本次逐条改写并在 § Scope Update Record 的 `SU-nn` 行披露。**D1–D7、T-001–T-003、EP-001–EP-006 的内容未被改写**，只做复核。本轮 repair（M3，2026-11-05）对 D2 / D6 / D7 / D13 的计数表述做了与实测对齐的更正，逐条记在 § Delivery Review 的 DC-008。
 
 ## Summary
 
@@ -58,7 +58,7 @@
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 两个新 owner：`shared/definitions/mechanism-policy-definitions.md`（[[STR-003]]）与 `shared/definitions/skill-reference-definitions.md`（[[STR-004]]），其余位置只带路径 + 章节锚；两份 owner 互不复制（C9 / GR-09）；「不复制」边界逐个落成机械断言（`contracts/owner-document.contract.md` OD-08 + `test_mechanism_policy_ownership.py`；`contracts/skill-reference.contract.md` GR-03 + `test_skill_reference_consumers.py` 的**包含性扫描**）；允许差异集只有 `data-model.md` § GM-03 / § GM-11 两个路径落点，两份测量契约只陈述计数（GM-03 要件 3）；`§ Decision Tensions` 的表格形态不在此复制 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | owner § Consumption Contract 的提示形态是可复制的骨架（三行字段 + 一个示例），字段名用**用户可识别的名字**而不是内部变量名（OD-06）；引用归一化的报告形态同时给**原始写法**、**归一化后的标识**与**判定类**（FR-025 / FR-030），使用者能直接看出「我写的东西被读成了什么」；面向人的产出按 `shared/guidelines/user-facing-comprehension.md` 写作；机读字面量（`included` / `excluded` / `command-surface` / `skill` / `failure`）原样英文，翻译只发生在人的一侧 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 判定是二值（机制 / 策略；命令面 / 技能标识 / 失败），MUST NOT 引入严重度或「视情况」中间层（OD-02 / V-5 / FR-030）；本文件在 `58d3dc5b` 的 plan 里把 `test-evidence/plan-baseline.txt`（上一 attempt 未落盘）就地纠正（DC-001）；本轮把第二能力并入时发现的三处**已记录预期不符**均按二分流处置并逐条披露（§ Scope Update Record：SU-01 范围矛盾→纠正、SU-02 镜像路径→纠正、SU-03 分类冲突→**裁决缺失**，作为 EP-007 记 `verified`） |
-| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | **不新增任何目录根**（C4 / FR-029）：两份 owner 进既有 `shared/definitions/`，引用文档进既有 `skills/external/create-skills/references/`，测试进既有 `tests/contract/`；新增的 `tests/fixtures/skill-reference/` 是 `tests/fixtures/` 下第 12 个按特性命名的夹具目录（既有先例 `tests/fixtures/acceptance-hardening/`，同根实测共 12 个），属既有根下的新子目录，按 `.specify/shared/guidelines/directory-governance.md` 的「既有根下的特性夹具」形态登记理由（D13），**不新增目录根、不改 `directory-governance.md` § 2 目录图**；`framework-map.md` 只需给既有 `definitions/` 行补一个文件名（D9），临时产物落 `.specify/.tmp/` |
+| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | **不新增任何目录根**（C4 / FR-029）：两份 owner 进既有 `shared/definitions/`，引用文档进既有 `skills/external/create-skills/references/`，测试进既有 `tests/contract/`；新增的 `tests/fixtures/skill-reference/` 是 `tests/fixtures/` 下第 13 个按特性命名的夹具目录（既有先例 `tests/fixtures/acceptance-hardening/`；同根 `ls -d tests/fixtures/*/` 实测已有 12 个，新目录加入后为 13 个），属既有根下的新子目录，按 `.specify/shared/guidelines/directory-governance.md` 的「既有根下的特性夹具」形态登记理由（D13），**不新增目录根、不改 `directory-governance.md` § 2 目录图**；`framework-map.md` 只需给既有 `definitions/` 行补一个文件名（D9），临时产物落 `.specify/.tmp/` |
 | XVIII | Grounded Naming | ✅ Pass | 名字全部来自已记录来源：用户原话逐字给出 `Mechanism–Policy Separation` / `机制/策略分离`（[[STR-003]]）与「技能引用归一化」；第二个 owner 的文件名 `skill-reference-definitions.md` 由并发实现给出并在 clarify 裁决 ② 中以 [[STR-004]] 落定（用户裁定 + 最近同族先例）；测试模块 `test_skill_reference_*` 与既有 `test_mechanism_policy_*` 同族；不新造第三套名字（A2 / FR-018） |
 
 **Gates Status**: ✅ All gates pass — no Fail, no Partial, no Complexity Tracking row.
@@ -66,34 +66,6 @@
 **Re-check after Phase 1**: 2026-11-05（`58d3dc5b` 的 plan 收尾），重跑于已落地的 Phase 1 产物（`research.md`、`data-model.md`、`contracts/` ×3、`quickstart.md`、`feature-ref.md`）——18 行保持 ✅ Pass。行 **IV**（模块的「红先行形态」由 GM-01 钉死 + GM-07 反例断言）与 **XIV**（九个 N-xx 边界从散文变成机械断言）的证据有移动。
 
 **Re-check after the scope update（2026-11-05，本文件）**: 逐条重读 18 行，**无一行翻转为 Fail / Partial**。证据有移动的行：I / II / III / IV / V / VI / VIII / IX / X / XI / XII / XIII / XIV / XV / XVII / XVIII（计数从 18 FR / 5 SC / 6 模块变为 30 FR / 9 SC / 11 模块；两份 owner；五消费方；新增夹具子目录）。结论未动、表述更明确的两行：**VII**（仍只推进到 plan）与 **XVI**（二值判定经 FR-030 的三值封闭后仍是二分流：命令面/技能标识走「正常继续」、失败走「关闭」，没有中间层）。没有任何行需要 Complexity Tracking。
-
-## Scope Update Record (2026-11-05, plan 更新)
-
-本节的用途：逐条记录 plan 更新阶段**实测到的「与已记录预期不符」**及其二分流处置（`.specify/shared/guidelines/fast-fail.md`），以及本阶段对既有行的**变更台账**。没有任何一条被静默修平。
-
-### 二分流处置（纠正 / 裁定）
-
-| ID | 发现了什么 | 判定 | 处置 |
-|----|-----------|------|------|
-| SU-01 | 第二个能力并入后，plan 里「`coaching-skills` / `run-skills` **零改动**」「允许差异集 **6** 条」与 FR-026（五个消费方 MUST 接线）**直接矛盾**——按旧文字实现，五个消费方中两个不许动，SC-007 必失败 | **纠正**：恰有一种读法与已记录意图一致——C1 谓词裁的是「要不要加载机制/策略判定」，从不裁「文件能不能被另一条 FR 改」；requirements 的 `§ Constraints C1` 表与 FR-026 在同一份文件里并存，唯一自洽读法是两者按不同面各管一段 | 改写 SW-05 的可判形态为「机制/策略判定字面零命中」；允许差异集由「单元内 6 条」扩到 `data-model.md` § GM-03 登记的 **8 条（单元内）/ 18 条（登记表全量）**；冻结哈希登记面 +2 行（D7） |
-| SU-02 | 五个消费方与 `coaching-skills` § Nested 的 **8 处**引用串写的是 `.specify/shared/definitions/skill-reference-definitions.md`（镜像路径），而本规格以源路径 [[STR-004]] 引用 | **纠正**：clarify 裁决 ② 已把口径裁成 source-canonical，且裁决本身给出了理由与影响面（8 处）；这是「已记录意图 vs 工作树产物」的偏差，不是两种读法之间的选择 | 不改工作树（派发边界）；写进 SR-05 / GR-08 / D11 / T-004 与 `data-model.md` E-13，由 implement 执行替换并由 SC-007 的扫描项核对 |
-| SU-03 | `speckit.skills` → NAME 与 `speckit.skills/SKILL.md` → PATH 的**分类冲突**在 owner 侧怎么解，规格只给了约束（FR-030 三值、§ Edge Cases 一条）而未给解法 | **不是纠正**：可在多种解法间取舍（新增「命令面」通道 / 在 name 通道后置命中 / 把带后缀写法移出接受形式）。本阶段选择「剥前缀与后缀先于通道判定」并说明为何它不引入第四值 | 记为 D12 的第一行 + GR-04；此外把「安装态下源路径能否解析到镜像」这一条**无法在本阶段实测**的前提显式记作 EP-007(a) `unverified`，并给出闭合任务（SR-05） |
-| SU-04 | plan 与 `feature-ref.md` 里的 `082a` / `082b` 切片（未提交早改）写于 FR 上限 = 30 时，而本轮 `decomposition-check.py --mode plan` 实测 `fr_ceiling=60` | **纠正**：clarify 裁决 ③ 已裁定撤回，且判据可从实测复现 | 删除 `## Scope Snapshot` / `## Slice 082b` 两节，改写为 § Decomposition & Ceiling 与 D8 的单包结论；`feature-ref.md` § Slices 同趟改 |
-| SU-05 | `feature-ref.md` 的交付声明里有 `shared/workflow/glossary.md` 的裸路径 token，使 overlap 检查把它算作交付面（3 条重叠来自它） | **纠正**：clarify U4 的 overlap 裁决明写「082 只按 glossary 协议新增一行，**不作为交付面**」；但记录该裁决本身必须点名此文件，而 `overlap-check.py` 按 token 识别路径，故 token **无法移除**（移除即无法记录裁决）。故处置从「移除 token」改为「如实登记残留」 | `feature-ref.md` 把它移出「改写框架源」交付清单、改述为**共享注册表的登记义务**，并**明写**「本行不声称已移除该 token」；复跑 overlap 得 **18 条**（3 glossary + 4 `run-skills` + 三份 SKILL.md 各 3 + 2 `coaching-skills`），全部对**已完成**特性的历史交付面，按状态脊 § Overlap adjudication 原样记录，不为追求 `clear` 删掉真实交付路径 |
-
-### 变更台账（既有 → 本轮）
-
-| 面 | `58d3dc5b` 时的值 | 本轮值 | 依据 |
-|---|---|---|---|
-| 用户故事 | 4（US1–US4） | 5（+US5） | requirements scope update |
-| FR / SC | 18 / 5 | 30 / 9 | `validate-requirements.py` 实测（本文件不手抄） |
-| owner 文档 | 1 | 2 | FR-019 / C9 |
-| 契约测试模块 | 6 | 11（+5 引用侧） | SC-006…SC-009 |
-| 允许差异集（比较单元内） | 6 | 8（`data-model.md` § GM-03 第 1–8 行：`create-skills` 的 1 条新增引用文档 + 五个消费方 `SKILL.md` + `improve-skills` / `merge-skills` 各 1 份 `references/`；登记表共 18 行，其余 10 行落在 `tests/`、本就不属比较单元） | `data-model.md` § GM-03（单一路径落点）；`contracts/guard-and-measurement.contract.md` GM-03 要件 3 / GM-12 只陈述计数 |
-| 自然任务估计 | ≈ 21 | ≈ 36 | D8 |
-| 切片 | `082a` / `082b` | `single-package` | SU-04 / clarify ③ |
-| 执行前提 | EP-001…EP-006 | EP-001…EP-007（+ EP-007，其中 (a) 记 `unverified`） | 本文件 § Execution Premises |
-| 承重决策 | T-001…T-003 | T-001…T-004（+ T-004 源路径口径） | clarify ② |
 
 ## Decision Tensions
 
@@ -111,7 +83,7 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
   - pole_a: 判据只有一份——四份副本必然漂移，而漂移在「作者走了哪条路」这种只落产物不落日志的流程里不可见（Principle XIV 的失效面）。
   - pole_b: 判定必须能在不打开另一个文件的前提下**可执行地**开始——纯指针会让元技能的执行者跳过判定。
 - **discriminating_evidence**: 对同一段误置样本，让执行者在「只读到元技能那一行」的条件下判定；结果二值：执行者能说出该去哪个文件看判据并给出可定位结论 / 执行者因信息不足直接放行。
-- **expected_sacrifice**: 三个被改 `SKILL.md` 的 `skill-shape.py` 已全部 exit 10（≈5354 / 5584 / 5096 可控 tokens vs 5000 预算），本决策的「一行」形态是唯一不把体积债务进一步恶化的写法；代价是每次判定多一次读盘。
+- **expected_sacrifice**: SC-002 Source ↓ 三个被改 `SKILL.md` 的 `skill-shape.py` 已全部 exit 10（≈5354 / 5584 / 5096 可控 tokens vs 5000 预算），本决策的「一行」形态是唯一不把体积债务进一步恶化的写法；代价是每次判定多一次读盘。
 - **revision_trigger**: 连续两个下游项目的元技能流程出现「执行者没打开 owner 就给了通过判定」≥ 2 次 → 重开，评估把最小判据（一句话，不含成员表）内联进 `create-skills` § 6。
 
 ### T-002 — 作者侧判定挂在既有校验步骤，不抽成确定性脚本
@@ -122,7 +94,7 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
   - pole_a: 判定必须覆盖**语义**面——「可复用逻辑是否住在运行环境的说明里」无法用正则判定，`research.md` § R7 实测的唯一载体是模型/人（GM-02）。
   - pole_b: 本特性 MUST NOT 新增第二套门禁或第二个检查器（C8 / FR-016 的「不新增」边界是 SC-003 与零新机器的共同前提）。
 - **discriminating_evidence**: 拿 US1 场景 2 的机制误置样本（判定规则写在一份运行说明里）跑一个正则检查器，看它能否点名该行；结果二值：能（脚本方案成立）/ 不能（脚本只覆盖策略误置一侧，US1 场景 2 未覆盖）。
-- **expected_sacrifice**: SC-002 的检出率只能靠宿主实录测量（证据而非测试），不能靠一次 pytest 断言；`research.md` § R7 已把这条代价记为该决策的直接后果。
+- **expected_sacrifice**: SC-002 Source ↓ 该检出率只能靠宿主实录测量（证据而非测试），不能靠一次 pytest 断言；`research.md` § R7 已把这条代价记为该决策的直接后果。
 - **revision_trigger**: 三个元技能的判定在宿主实录里对「策略误置」侧出现 ≥ 2 次漏检且均由同一个可正则化形态造成 → 重开，评估只把该侧抽成确定性预览器（不成为门禁，只产出候选清单）。
 
 ### T-003 — 「零新增命令面」压过「给作者一条直接可调的入口」
@@ -133,7 +105,7 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
   - pole_a: 命令面每加一条，就有第二套入口需要与元技能保持一致，一致性本身要一条守卫（C1 的「不新增第二套判定」）。
   - pole_b: 原则必须能在**真实创建/改进路径上自动生效**，而不是依赖作者记得去调一个命令（A7：对既有技能零回溯改造，元流程是唯一自动通道）。
 - **discriminating_evidence**: 统计一个真实创建流程里判定被触发的时机；结果二值：判定在作者仍在改技能的上下文里就触发（收尾点足够早）/ 作者需要在草稿写完后另行调用才触发（收尾点太晚，需新入口）。
-- **expected_sacrifice**: SC-003 的封闭因此可以覆盖全部 27 个命令模板（逐字节），代价是没有一条「作者主动自查」的便捷路径；作者侧的自查入口留给 `improve-skills` 的对账通道。
+- **expected_sacrifice**: SC-003 Source ↓ 该封闭因此可以覆盖全部 27 个命令模板（逐字节），代价是没有一条「作者主动自查」的便捷路径；作者侧的自查入口留给 `improve-skills` 的对账通道。
 - **revision_trigger**: 连续两个下游项目报告「提交前无法自查、只能等元流程收尾」并因此返工 ≥ 2 次 → 重开，评估给 `/speckit.skills` 增加一个只读 `check` 意图（仍不新增命令）。
 
 ### T-004 — 消费方引用**源路径**，不引用 `.specify/` 镜像路径
@@ -144,7 +116,7 @@ Fields: `decision`, `antithesis`, `binding_constraints` (with `pole_a` and `pole
   - pole_a: 镜像由 `sync-mirrors.py` 生成，改源后忘记再生成就会读到旧文；正文引用镜像等于把「读到的是哪一版」交给一次人为记得的再生成（本次并发起点正是这个状态：两边逐字节相同，只因为刚生成过）。SC-007 的允许差异集把「生成镜像」定义为**产物面**而非**坐标面**，两者一旦混成同一串文字就不可区分。
   - pole_b: 引用必须在本仓的**源码树**里可解析，否则框架源内的读者与守卫（`pre-analyze-check.py` 的 missing-path、`test_skill_reference_consumers.py`）会读到一条指向生成物的坐标。
 - **discriminating_evidence**: 在**安装态**（仅 `.specify/`，无 `shared/` 源根）跑一次五个消费方的引用解析；结果二值：五处引用都能解析到 owner（镜像路径方案成立）/ 全部落空（源路径方案不可直接移植，需要相对框架根解析）。**本计划已给出二值判定的立场**：clarify 裁决 ② 明写 standalone 与安装态下「消费方**不改写引用**、以相对框架根解析」，故本条的证据面是「相对框架根能否把源路径解析到安装镜像」——这一条**尚未实测**，交 implement 期由 SR-05 的断言与一次安装态实跑给出（§ EP-007）。
-- **expected_sacrifice**: 安装态读者多一跳心智（源路径 → 框架根 → 镜像），且本仓的 five-file 改写必须同时改掉并发起点里的 8 处镜像路径串——这一步是纯文本替换，可逆，且被 SC-007 的扫描项钉住。
+- **expected_sacrifice**: SC-007 Source ↓ 安装态读者多一跳心智（源路径 → 框架根 → 镜像），且本仓的 five-file 改写必须同时改掉并发起点里的 8 处镜像路径串——这一步是纯文本替换，可逆，且被该扫描项钉住。
 - **revision_trigger**: 若安装态实跑证明「相对框架根」无法把源路径解析到镜像（SR-05 断言失败），或连续两个下游项目报告「技能正文里的引用在安装态打不开」≥ 2 次 → 重开，评估改为「owner 文档在两处各留一个坐标行，且由 `sync-mirrors.py` 生成第二行」（仍不新增手写第二 owner）。
 
 ## Project Structure
@@ -192,7 +164,7 @@ skills/
 tests/
 ├── contract/
 │   ├── test_mechanism_policy_owner_doc.py        # NEW — OD-01…OD-10 形态 + owner 镜像逐字节（GM-01）
-│   ├── test_mechanism_policy_ownership.py        # NEW — 一源与九个邻接边界（FR-015 / OD-08 + FR-004）
+│   ├── test_mechanism_policy_ownership.py        # NEW — 一源与六个邻接 owner 的边界（FR-015 / OD-08：dogfooding / directory-governance / create-skills § 2 / one-source-of-truth / bilingual-expression / temp-directory-discipline）
 │   ├── test_mechanism_policy_skill_wiring.py     # NEW — SW-01…SW-03 的位置、唯一性、owner 引用、通过分支
 │   ├── test_mechanism_policy_guard.py            # NEW — SC-003 逐字节封闭集（GM-03 五要件 + GM-07 反例）
 │   ├── test_mechanism_policy_missing_policy.py   # NEW — SC-004 零写入 + 补齐后逐字节一致（GM-05 主面）
@@ -235,6 +207,47 @@ Baseline measured **before** any edit on this branch (2026-11-05, `research.md` 
 | `templates/commands/**`（**本特性零改动**） | `.claude/commands/speckit.*.md`、`.github/prompts/speckit.*.prompt.md`、`.qoder/commands/speckit.*.md`、`.opencode/command/speckit.*.md`（`regen-command-copies.py` 的按工具副本；`.specify/templates/commands/` 已退役） | `python3 scripts/python/regen-command-copies.py --check` → exit 0（本特性预期**零变化**）。这条义务的用途正是**证明**命令面零改动（SW-06），而不是等它漂移 |
 | `tests/**`、`CHANGELOG.md`、`.specify/memory/glossary.md`、`.specify/shared/definitions/framework-map.md` | 无镜像（`tests/` 不在 `MIRROR_PAIRS`；`glossary.md` 与 `.specify/shared/definitions/framework-map.md` 是**本仓的项目运行时产物**，无框架源对） | n/a。注意后者：`framework-map.md` 只存在于 `.specify/shared/definitions/`，**没有** `shared/definitions/framework-map.md` 源文件，因此它是一条「只在此处」的登记行，不是镜像漂移 |
 
+## Scope Update Record (2026-11-05, plan 更新)
+
+本节的用途：逐条记录 plan 更新阶段**实测到的「与已记录预期不符」**及其二分流处置（`.specify/shared/guidelines/fast-fail.md`），以及本阶段对既有行的**变更台账**。没有任何一条被静默修平。
+
+### 二分流处置（纠正 / 裁定）
+
+| ID | 发现了什么 | 判定 | 处置 |
+|----|-----------|------|------|
+| SU-01 | 第二个能力并入后，plan 里「`coaching-skills` / `run-skills` **零改动**」「允许差异集 **6** 条」与 FR-026（五个消费方 MUST 接线）**直接矛盾**——按旧文字实现，五个消费方中两个不许动，SC-007 必失败 | **纠正**：恰有一种读法与已记录意图一致——C1 谓词裁的是「要不要加载机制/策略判定」，从不裁「文件能不能被另一条 FR 改」；requirements 的 `§ Constraints C1` 表与 FR-026 在同一份文件里并存，唯一自洽读法是两者按不同面各管一段 | 改写 SW-05 的可判形态为「机制/策略判定字面零命中」；允许差异集由「单元内 6 条」扩到 `data-model.md` § GM-03 登记的 **8 条（单元内）/ 18 条（登记表全量）**；冻结哈希登记面 +2 行（D7） |
+| SU-02 | 五个消费方与 `coaching-skills` § Nested 的 **8 处**引用串写的是 `.specify/shared/definitions/skill-reference-definitions.md`（镜像路径），而本规格以源路径 [[STR-004]] 引用 | **纠正**：clarify 裁决 ② 已把口径裁成 source-canonical，且裁决本身给出了理由与影响面（8 处）；这是「已记录意图 vs 工作树产物」的偏差，不是两种读法之间的选择 | 不改工作树（派发边界）；写进 SR-05 / GR-08 / D11 / T-004 与 `data-model.md` E-8 / E-9，由 implement 执行替换并由 SC-007 的扫描项核对 |
+| SU-03 | `speckit.skills` → NAME 与 `speckit.skills/SKILL.md` → PATH 的**分类冲突**在 owner 侧怎么解，规格只给了约束（FR-030 三值、§ Edge Cases 一条）而未给解法 | **不是纠正**：可在多种解法间取舍（新增「命令面」通道 / 在 name 通道后置命中 / 把带后缀写法移出接受形式）。本阶段选择「剥前缀与后缀先于通道判定」并说明为何它不引入第四值 | 记为 D12 的第一行 + GR-04；此外把「安装态下源路径能否解析到镜像」这一条**无法在本阶段实测**的前提显式记作 EP-007(a) `unverified`，并给出闭合任务（SR-05） |
+| SU-04 | plan 与 `feature-ref.md` 里的 `082a` / `082b` 切片（未提交早改）写于 FR 上限 = 30 时，而本轮 `decomposition-check.py --mode plan` 实测 `fr_ceiling=60` | **纠正**：clarify 裁决 ③ 已裁定撤回，且判据可从实测复现 | 删除 `## Scope Snapshot` / `## Slice 082b` 两节，改写为 § Decomposition & Ceiling 与 D8 的单包结论；`feature-ref.md` § Slices 同趟改 |
+| SU-05 | `feature-ref.md` 的交付声明里有 `shared/workflow/glossary.md` 的裸路径 token，使 overlap 检查把它算作交付面（3 条重叠来自它） | **纠正**：clarify U4 的 overlap 裁决明写「082 只按 glossary 协议新增一行，**不作为交付面**」；但记录该裁决本身必须点名此文件，而 `overlap-check.py` 按 token 识别路径，故 token **无法移除**（移除即无法记录裁决）。故处置从「移除 token」改为「如实登记残留」 | `feature-ref.md` 把它移出「改写框架源」交付清单、改述为**共享注册表的登记义务**，并**明写**「本行不声称已移除该 token」；复跑 overlap 得 **18 条**（3 glossary + 4 `run-skills` + 三份 SKILL.md 各 3 + 2 `coaching-skills`），全部对**已完成**特性的历史交付面，按状态脊 § Overlap adjudication 原样记录，不为追求 `clear` 删掉真实交付路径 |
+
+### 变更台账（既有 → 本轮）
+
+| 面 | `58d3dc5b` 时的值 | 本轮值 | 依据 |
+|---|---|---|---|
+| 用户故事 | 4（US1–US4） | 5（+US5） | requirements scope update |
+| FR / SC | 18 / 5 | 30 / 9 | `validate-requirements.py` 实测（本文件不手抄） |
+| owner 文档 | 1 | 2 | FR-019 / C9 |
+| 契约测试模块 | 6 | 11（+5 引用侧） | SC-006…SC-009 |
+| 允许差异集（比较单元内） | 6 | 8（`data-model.md` § GM-03 第 1–8 行：`create-skills` 的 1 条新增引用文档 + 五个消费方 `SKILL.md` + `improve-skills` / `merge-skills` 各 1 份 `references/`；登记表共 18 行，其余 10 行落在 `tests/`、本就不属比较单元） | `data-model.md` § GM-03（单一路径落点）；`contracts/guard-and-measurement.contract.md` GM-03 要件 3 / GM-12 只陈述计数 |
+| 自然任务估计 | ≈ 21 | ≈ 36 | D8 |
+| 切片 | `082a` / `082b` | `single-package` | SU-04 / clarify ③ |
+| 执行前提 | EP-001…EP-006 | EP-001…EP-007（+ EP-007，其中 (a) 记 `unverified`） | 本文件 § Execution Premises |
+| 承重决策 | T-001…T-003 | T-001…T-004（+ T-004 源路径口径） | clarify ② |
+
+## Clarifications（本阶段裁定，2026-11-05 repair pass）
+
+> 本节的裁定对象是 analyze 门（Fail；CRITICAL=0 / HIGH=2 已在本轮修复）之后残留的两条 **MEDIUM**。每条给出裁定结果、唯一 owner 与不许出现的写法；裁定本身不改任何 FR / SC / 模块清单。
+
+| ID | 问题 | 裁定 | Owner（唯一） | 禁止写法 | 依据 |
+|----|------|------|---------------|----------|------|
+| **CL-01** | 技能引用归一化的**失败类数**：`contracts/guard-and-measurement.contract.md` GM-12 要件 3/4 一度写「三类允许」，而 `requirements.md` FR-024 给出**四类**（零命中 / 越界路径 / 不可读 / 两层同名） | **四类**。失败语义的唯一 owner 是 FR-024；GM-12 要件 3 的「允许差异集来源」三类是**另一件事**（允许的重复落在哪里），与失败类数无关，两者不得合并表述 | `requirements.md` FR-024（失败类）；`data-model.md` E-10 / V-31（四值）；`contracts/skill-reference.contract.md` GR-05（失败语义表） | 契约或 data-model 中「三类失败」「三个失败类」「三种失败」一类表述；把 GM-12 的允许差异三类误读为失败类 | requirements FR-024 的四条条件各带必需报告项；SC-009 的「四类各一条」已可判 |
+| **CL-02** | `checklists/` 下 89 个未勾选的 `[ ]` 项是否构成本阶段的阻塞 | **不构成**。checklist 的条目是**问题项**（供人回答），不是 pass/fail 判定；清单文件的存在与形态是 checklist 阶段的产物判据，**清单项的满足判定由 implement 阶段的 checklist 豁免门接管**（`skills/sdd-loop-driver/references/dispatch-recipes.md` 的 checklist 门：产物 = 新增清单文件，满足判定不在本门裁决） | `shared/workflow/acceptance-hardening.md` § Gates（门与豁免的记录形态）；门的行为 owner 为 `dispatch-recipes.md` 的 checklist 门条目 | 给 checklist 项补 `disposition:` 字段；把未勾选项数写成 analyze 或 plan 的 Fail 依据；为「清单未勾完」造 waiter | `tasks.md` 的 GATE / DoD 不含「checklist 全勾」；`pre-analyze-check.py` 的 summary 也不含 checklist 计数 |
+
+| **CL-03** | `account-clause-coverage.py` 的 FR citation groups 为 0（`fr-uncovered 30`） | **不阻塞本门**：四份 contracts 声明 `md-none` 条款形态，accountant 无法从条款 citation group 取 FR；FR 覆盖由 plan § Delivery Review 的 DR-001 逐条映射与 tasks 的每行交付面人工核验（30/30 已逐条确认），MUST NOT 为刷绿伪造 citation group 或改契约条款形态；`coverage-baseline.txt` 已冻结，`clause-uncovered` 为 pass（0 beyond baseline） | `requirements.md` FR-001…FR-030；`plan.md` § Delivery Review；`tasks.md` 的每行交付面 | 把 `fr-uncovered 30` 读成特性未覆盖；为它造第二份覆盖表；重新 freeze baseline | 30 条 FR 各自在 tasks 与 plan DR-001 有落点；`account-clause-coverage` 的 `clause-uncovered` 为 pass |
+
+**与既有披露的关系**：CL-01 是 analyze 门之后的残留计数冲突，修正在契约侧（`contracts/guard-and-measurement.contract.md` GM-12），披露记 `DC-009`；CL-02 不给 checklist 造新状态，也不改 `checklists/` 任何文件——「禁止写法」一列已把这一点写成禁止项。
+
 ## Execution Premises
 
 Owner of this table's shape, its `Status` and `Decision` value domains and its invalid-row rule: `shared/workflow/acceptance-hardening.md` § Execution Premises — this section carries the column set and the values only.
@@ -275,7 +288,7 @@ Owner of this table's shape, its `Disposition` domain (`resolved | inherited | n
 
 `research.md` § R7 逐个判定逐条列出载体，七项里五项有既有确定性载体（pytest / git / 两个既有技能脚本），一项（语义判定）本来就不该被正则化（GM-02），一项（`references/` 的定位方法）是文本。**因此 A6 的「若 plan 证明书面判定不可判定，再决定是否抽成确定性脚本」在这个计划里的答案是：需要模型判断的那一半不可正则化，可正则化的那一半已被 GM-07 的反例断言覆盖在测试里。** 结论：不新增脚本。
 
-这条决策的可判定形态：六个新契约模块全部是 `tests/contract/` 下既有的 pytest 模块形态，不引入 `scripts/` 下的任何新文件；GM-01 的清单是封闭的（六个），任何第七个模块或任何新脚本都必须先推翻本节。
+这条决策的可判定形态：11 个新契约模块全部是 `tests/contract/` 下既有的 pytest 模块形态，不引入 `scripts/` 下的任何新文件；两份清单各自封闭（GM-01 六个机制/策略模块、GM-11 五个引用侧模块 + 一个 test-only 辅助），任何第十二个模块、任何新辅助文件或任何新脚本都必须先推翻本节。
 
 ### D3 — 成员谓词与封闭集
 
@@ -300,11 +313,13 @@ Owner of this table's shape, its `Disposition` domain (`resolved | inherited | n
 
 ### D5 — 消费侧提示形态 owner 化，元技能只引用，不回溯改造
 
-FR-006 要求「形态 owner 唯一，其余位置以路径引用」。落点 = owner § Consumption Contract（OD-06）；接线点 = SW-04 的四处「即将执行副作用之前」（`create-skills` § 2 writability pre-flight 与 § 7/§ 8 写入之前、`improve-skills` § 7 编辑之前、`merge-skills` § 7 decommission 之前）。被否决的方案：为每个命令写一份提示模板——那既违反 FR-015（复制形态）也违反 FR-011（命令面零改动）。对既有 15 个 external / 38 个 internal 技能的正文：**零改动**（A7 / FR-011 / SC-003）。
+FR-006 要求「形态 owner 唯一，其余位置以路径引用」。落点 = owner § Consumption Contract（OD-06）；接线点 = SW-04 的**五处**「即将执行副作用之前」——`create-skills` 三处（§ 2 writability pre-flight、§ 7 写入之前、§ 8 报告前的写入）、`improve-skills` § 7 编辑之前、`merge-skills` § 7 decommission 之前（D6 与 SW-04 的「四处 / 四处」口径由此统一为**五处**，见 DC-008）。被否决的方案：为每个命令写一份提示模板——那既违反 FR-015（复制形态）也违反 FR-011（命令面零改动）。对既有 15 个 external / 38 个 internal 技能的正文：**零改动**（A7 / FR-011 / SC-003）。
 
-### D6 — 六个契约测试模块 + 夹具；SC-001 / SC-005 的人工样本记录在 test-evidence
+### D6 — 机制/策略侧的六个契约测试模块不建声明式夹具；SC-001 / SC-005 的人工样本记录在 test-evidence
 
-模块清单与断言面 = GM-01（封闭的六个，各对应一条契约条款组）。夹具策略：**不新建 `tests/fixtures/` 子目录**——`test_mechanism_policy_missing_policy.py` 用 pytest 既有 `tmp_path` 就地造「假技能 + 假运行目录」，`test_mechanism_policy_guard.py` 用 `tmp_path` 复制补集内一个文件并注入一字节破坏来断言转红（GM-07）。被否决的方案：在 `tests/fixtures/` 下新建 `mechanism-policy/` 声明式夹具集——那是「第一个新种类目录」，按 Principle XVII 要同趟登记目录图，而本特性的夹具全部是一次性的最小树、没有跨模块复用价值，登记一个只用一次的目录是净负担。
+模块清单与断言面 = GM-01（封闭的六个，各对应一条契约条款组）。夹具策略：**机制/策略侧的六个模块不新建 `tests/fixtures/` 子目录**——`test_mechanism_policy_missing_policy.py` 用 pytest 既有 `tmp_path` 就地造「假技能 + 假运行目录」，`test_mechanism_policy_guard.py` 用 `tmp_path` 复制补集内一个文件并注入一字节破坏来断言转红（GM-07）。被否决的方案：在 `tests/fixtures/` 下新建 `mechanism-policy/` 声明式夹具集——那是「第一个新种类目录」，按 Principle XVII 要同趟登记目录图，而这一侧的夹具全部是一次性的最小树、没有跨模块复用价值，登记一个只用一次的目录是净负担。
+
+**引用侧**是另一件事，不属本节：SC-006 的矩阵是**跨模块复用的期望值表且本身就是分母**（`test_skill_reference_matrix.py` 与 `test_skill_reference_failures.py` 读同一份文件），故它落 `tests/fixtures/skill-reference/normalization-matrix.json`，由 **D13** 登记理由。本节的「不用夹具」结论只覆盖机制/策略侧的六个模块。
 
 人工样本（双判定者 SC-001、读者作答 SC-005、宿主实录 SC-002 / SC-004 支撑面）落 `test-evidence/`，**不入 pytest**——它们判的是模型/人的行为，不是形态（GM-02）。
 
@@ -319,7 +334,7 @@ FR-006 要求「形态 owner 唯一，其余位置以路径引用」。落点 = 
 
 **scope update 的冻结面追加清单（恰 5 行，封闭）**：`skills/external/{create-skills,improve-skills,merge-skills,coaching-skills}/SKILL.md` 四行新增（`reason` 注明所属 FR 组，`markers` 取该技能新接线里**唯一的**字面：`shared/definitions/mechanism-policy-definitions.md` 或 `shared/definitions/skill-reference-definitions.md`，视该技能实际加载哪一侧而定）+ 上面第 2 条的**更新**一行 = 5 处登记面。`references/*.md` 与 `create-skills/references/mechanism-policy-check.md` 不在冻结清单内（清单只覆盖 `SKILL.md` 与已登记的少数文件），无需追加；这一点由 `test_mechanism_policy_guard.py` 与 `test_skill_reference_consumers.py` 的逐字节断言覆盖（它们落在 GM-03 / GM-11 的允许差异集内，属**允许变化**而非冻结）。`WIRING_SKILLS`（`create-docs` / `humanize`）与哈希清单本身 MUST NOT 改动。
 
-六条 `references/` 的层归属：`loop-playbook.md`（`improve-skills`）与 `provenance-record.md`（`merge-skills`）**不在**该模块的冻结哈希清单内（清单只覆盖 `SKILL.md` 与已登记的少数文件），因此不需要追加行；这一点由 `test_mechanism_policy_guard.py` 的逐字节断言覆盖（它们落在 GM-03 的允许差异集内，属**允许变化**而非冻结）。
+两份 `references/` 的层归属：`loop-playbook.md`（`improve-skills`）与 `provenance-record.md`（`merge-skills`）**不在**该模块的冻结哈希清单内（清单只覆盖 `SKILL.md` 与已登记的少数文件），因此不需要追加行；这一点由 `test_mechanism_policy_guard.py` 的逐字节断言覆盖（它们落在 GM-03 的允许差异集内，属**允许变化**而非冻结）。
 
 ### D8 — 单包交付（估算 ≈ 36 任务 ≤ 80；不切片）
 
@@ -330,7 +345,7 @@ FR-006 要求「形态 owner 唯一，其余位置以路径引用」。落点 = 
 | Foundational B：技能引用 owner 定稿（GR-01…GR-10；起点已在工作树，按裁决 ① 修正顺序 + 补齐三处残留） | 3 |
 | US1（`create-skills` § 6 + `references/mechanism-policy-check.md`） | 2 |
 | US2（`improve-skills` § 2/§ 3 + `references/loop-playbook.md`） | 2 |
-| US3（消费侧提示形态接线四处 + owner § Consumption Contract 复核） | 2 |
+| US3（消费侧提示形态接线五处 + owner § Consumption Contract 复核） | 2 |
 | US4（成员表 + 谓词 + 排除理由 + 命令面接线位） | 1 |
 | US5（五个消费方的引用接线 5 处 + 8 处镜像路径串改为源路径） | 4 |
 | 11 个契约测试模块（6 + 5；含 GM-07 每模块一条反例断言）、1 份矩阵 fixture、矩阵驱动源 `tests/contract/skill_reference_matrix.py` | 12 |
@@ -370,7 +385,7 @@ owner 文档当前六步顺序的缺陷已被 14 行探针钉住（`test-evidenc
 
 ### D13 — 矩阵夹具落 `tests/fixtures/skill-reference/`（既有根下的新子目录，登记理由）
 
-`tests/fixtures/` 下已有 11 个按特性命名的夹具目录（`acceptance-hardening/`、`bilingual/`、`coaching/`、`docs_command/`、`expression_line/`、`flow_class/`、`humanize/`、`sanitize/`、`sdd_loop_efficiency/`、`skill-layout/`、`teams/`、`todo-workspaces/`），本计划的 `skill-reference/` 是第 12 个，属**既有根下的新子目录**，不新增目录根（FR-029 / Principle XVII）。为什么不能像 D6 那样用 `tmp_path` 就地造：SC-006 的**分母就是这份矩阵本身**（FR-030 要求「真实仓内位置」，MUST NOT 以散文或一次性运行记录冒充），而它同时被两个模块读（矩阵复算与失败语义断言），一次性构造成本高于一份受版本控制的 JSON。被否决的方案：把矩阵塞进 `data-model.md`（判据形态与夹具数据混在一份文档里，且 JSON 才是可逐行复算的载体）。
+`tests/fixtures/` 下已有 **12** 个按特性命名的夹具目录（`ls -d tests/fixtures/*/` 实测，2026-11-05：`acceptance-hardening/`、`bilingual/`、`coaching/`、`docs_command/`、`expression_line/`、`flow_class/`、`humanize/`、`sanitize/`、`sdd_loop_efficiency/`、`skill-layout/`、`teams/`、`todo-workspaces/`；`__pycache__` 不计），本计划的 `skill-reference/` 是第 **13** 个，属**既有根下的新子目录**，不新增目录根（FR-029 / Principle XVII）。为什么不能像 D6 那样用 `tmp_path` 就地造：SC-006 的**分母就是这份矩阵本身**（FR-030 要求「真实仓内位置」，MUST NOT 以散文或一次性运行记录冒充），而它同时被两个模块读（矩阵复算与失败语义断言），一次性构造成本高于一份受版本控制的 JSON。被否决的方案：把矩阵塞进 `data-model.md`（判据形态与夹具数据混在一份文档里，且 JSON 才是可逐行复算的载体）。
 
 ### D14 — 证据与测量：三个 SC 的载体重排，一个不新增
 
@@ -444,7 +459,7 @@ Research 以独立文件记录（超出内联阈值且携带环境实测）：[`
 | 场景 | 覆盖 | 实测结果 |
 |------|------|----------|
 | S3（复跑） | EP-005 / GM-06 | `sync-mirrors.py --check` 六对全 `ok`、`shared/` **63**（并发 owner 镜像已生成且 `cmp` 通过）；`regen-command-copies.py --check` rc 0 |
-| S9（复跑） | 本阶段门 | `pre-analyze-check.py --stage plan` → `decision=pass, errors=0`（advisories=97，全部为 missing-path 的 to-be-created 产物，允许）；`decomposition-check.py --mode plan` → `proceed, fr_count=30, fr_ceiling=60`；`overlap-check.py --repo .` → 18 条，全部 `same-path`、全部对已完成特性（3 条 `shared/workflow/glossary.md`〔029 / 044 / 051〕+ 4 条 `skills/internal/run-skills/SKILL.md`〔057 / 059 / 062 / 063〕+ 三份 `SKILL.md` 各 3 条〔059 / 062 / 063〕+ 2 条 `skills/external/coaching-skills/SKILL.md`〔078〕），按状态脊 § Overlap adjudication 原样记录，不删真实交付路径；`validate-requirements.py` → `status ok`。逐字输出与逐路径分解：`test-evidence/plan-scope-update-gates.txt` |
+| S9（复跑） | 本阶段门 | `pre-analyze-check.py --stage plan` → `decision=pass, errors=0`（advisories=127，全部为 missing-path 的 to-be-created 产物，允许；tasks.md 落地后的 repair pass 复跑读数，见 quickstart S9）；`decomposition-check.py --mode plan` → `proceed, fr_count=30, fr_ceiling=60`；`overlap-check.py --repo .` → 18 条，全部 `same-path`、全部对已完成特性（3 条 `shared/workflow/glossary.md`〔029 / 044 / 051〕+ 4 条 `skills/internal/run-skills/SKILL.md`〔057 / 059 / 062 / 063〕+ 三份 `SKILL.md` 各 3 条〔059 / 062 / 063〕+ 2 条 `skills/external/coaching-skills/SKILL.md`〔078〕），按状态脊 § Overlap adjudication 原样记录，不删真实交付路径；`validate-requirements.py` → `status ok`。逐字输出与逐路径分解：`test-evidence/plan-scope-update-gates.txt` |
 | S10 — 归一化顺序探针的读数复核 | D12 / § R10 | 直接消费 clarify 已落盘的 `test-evidence/clarify-scope-update-fixture-probe.txt`（14 行、两类输出），本阶段**不重跑探针代码**（其时的一次性脚本不在仓内）；改用「读其逐行输出 + 与声明顺序逐条对账」的静态复核，结论一致：当前六步顺序产生 NAME / PATH 两类，无法产生 FR-030 的第三值 |
 | S13 — 五消费方的引用坐标实测 | SU-02 / GR-08 | `git diff` 实测 5 份 `SKILL.md` 共 **8 处** `skill-reference-definitions.md` 引用串，**全部**是 `.specify/` 镜像路径；`cmp shared/definitions/skill-reference-definitions.md .specify/shared/definitions/skill-reference-definitions.md` 一致（说明只是引用坐标错，内容未漂移） |
 | S14 — 引用侧测试现状 | SC-006…SC-009 | 全仓对 `skill-reference` 的检索在 `tests/` 下**零命中** → 引用侧测试**尚不存在**，属本计划的真正新增工作量（不是「核验已有测试」） |
@@ -460,7 +475,7 @@ Backfilled after the artifacts landed; every count below is read from the files,
 | Data model | [`data-model.md`](./data-model.md) | 10 实体（E-1 Principle … E-7 Decidability Sample；E-8 Skill Reference … E-10 Failure Class）/ 34 条校验规则（V-1…V-34）/ 2 个封闭谓词（C1 元层、C2 引用接受形式）/ 1 张封闭成员表（`included` 3 / `excluded` 2 / `command-surface` 1）/ 3 条状态转移（SM-1 / SM-2 / SM-3）/ GM-03 允许差异集 18 行（其中属比较单元者 **8**：2 新增 + 6 改写；其余 10 行落在 `tests/`）/ 1 条归一化管线（NP-1…NP-8） |
 | Contracts | [`contracts/`](./contracts/) | 4 份：`owner-document.contract.md`（OD-01…OD-10 + DR-001 追溯）、`skill-wiring.contract.md`（SW-01…SW-08 + 追溯，SW-05 已按 SU-01 收紧）、`skill-reference.contract.md`（GR-01…GR-10 + SR-01…SR-06 + 追溯）、`guard-and-measurement.contract.md`（GM-01…GM-09 机制/策略侧 + GM-10…GM-14 引用侧 + 追溯） |
 | Quickstart | [`quickstart.md`](./quickstart.md) | 14 个场景（S1–S14）；`run` 10 / `deferred` 6（S1–S4 / S9 / S10 / S13 / S14 共 8 个整段 `run`，S5 前后各半计 2，合计 10；S6 / S7 / S8 / S11 / S12 共 5 个整段 `deferred` + S5 的 after 半 = 6。S10 / S13 / S14 为本轮新跑，S11 / S12 为本轮新增的 `deferred`；每节含命令逐字、判据与 Premises） |
-| Feature reference | [`feature-ref.md`](./feature-ref.md) | Feature 082 绑定（完整名：元技能治理：机制/策略分离与技能引用归一化）+ 交付面（新增 3〔2 owner + 1 技能自有资源〕+ 改写 9 + 新增测试 11 + 矩阵 fixture 1 = 24；另列计划期义务 3 / 再生成入口 2 / 明确不新增 7 类）+ 5 行冻结登记面 + 单包 `Slices` + `glossary.md` 非交付面的 overlap 注记 |
+| Feature reference | [`feature-ref.md`](./feature-ref.md) | Feature 082 绑定（完整名：元技能治理：机制/策略分离与技能引用归一化）+ 交付面（新增 3〔2 owner + 1 技能自有资源〕+ 改写 7 + 新增测试 11 + 矩阵 fixture 1 = 22；另列计划期义务 3 / 再生成入口 2 / 明确不新增 7 类）+ 5 行冻结登记面 + 单包 `Slices` + `glossary.md` 非交付面的 overlap 注记 |
 | Research | [`research.md`](./research.md) | R1–R9（机制/策略；R3 由 plan 补测了冻结清单的排除成员位置，结论落在 D7）+ R10–R15（技能引用，scope update 新增；R10 归一化顺序探针读数、R11 引用坐标、R12 测试现状、R13 消费方接线点、R14 镜像口径、R15 承重门槛） |
 
 **Drift from the Phase 0 expectation**: 一处已披露的纠正——`research.md` / `contracts/skill-wiring.contract.md` / `contracts/guard-and-measurement.contract.md` 把基线证据路径写成 `test-evidence/plan-baseline.txt`，而该文件在上一 attempt 的 turn budget 耗尽时**未曾落盘**（`ls test-evidence/` 实测无此文件）。本阶段把它就地纠正为本阶段实际写入的 `test-evidence/plan2026-11-05-baseline.txt`（见 DC-001），并把 S2 的基线重新实跑一次以保证该文件与其引用一致。
