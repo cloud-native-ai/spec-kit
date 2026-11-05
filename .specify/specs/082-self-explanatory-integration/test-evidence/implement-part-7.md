@@ -75,7 +75,7 @@ EXIT=0
 | T037 | C-24 | M-5 on a copied mirror tree: one byte flipped → `compare_pair` returns the differing pair → the parity suite's byte-identity assertion raises naming `source->mirror`; real pair sha256 unchanged | green — leg PASS, isolation asserted |
 | T038 | C-28 face / C-27 | M-6 on a copied page: `STR-002` pointer deleted → extraction loses it → `unresolved_docs_page_paths` reports the mutated path → the guard's own `assert not problems` goes red; real page and all of `docs/concepts/` digest-identical | green — leg PASS |
 
-## The docs `db`-link decision, stated rather than hidden
+## The C-27 mirror-exemption decision, stated rather than hidden
 
 C-27's contract text requires that a path with no mirror be "asserted in the source tree only, and the
 exclusion … written in the guard as an explicit allow-list with a one-line reason". The allow-list is
