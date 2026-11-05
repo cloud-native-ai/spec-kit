@@ -1,0 +1,14 @@
+REVIEW — smoke and targeted set re-run after the in-review P0/P1 repairs
+Date        : 2026-11-05T19:06:47+08:00
+HEAD at run : 6785e8de59a97d862f977e0383c316b665989e3f
+Host        : Darwin 25.6.0 arm64
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py
+........................................................................ [ 70%]
+..............................                                           [100%]
+102 passed in 42.06s
+----- END VERBATIM -----
+exit=0
+elapsed_seconds=43

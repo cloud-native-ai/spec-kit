@@ -17,7 +17,7 @@
     "form": "one of the six accepted forms, or 'cli' for the NP-1 operation form",
     "operation": "invocation | cli (NP-1; default invocation)",
     "repo_root": "live | scratch | none — where NP-7 reads; 'scratch' rows are materialised under tmp_path by the module that reads them",
-    "scratch": "scratch rows only: {layer: {skill-name: {frontmatter, body}}, unreadable: [skill-name]}",
+    "scratch": "scratch rows only: {layer: {skill-name: {frontmatter, body}}, unreadable: [skill-name], dirs?: {layer: directory}} — dirs overrides the layer directory for one row",
     "exercises": "the form or variation this row is here to prove",
     "expect": "the closed three-valued expectation, paired with the raw identifier"
   },
@@ -114,16 +114,11 @@
       "form": "bare name",
       "operation": "invocation",
       "repo_root": "live",
-      "exercises": "NEGATIVE (SC-008): a dot-free bare name carrying no slash; nothing about it is command-shaped. The live tree carries it in both layers, so it closes as dual-layer — a failure, never a command",
+      "exercises": "NEGATIVE (SC-008): a dot-free bare name carrying no slash; nothing about it is command-shaped. The live tree carries the same Skill at both the source and its installed mirror, which § Disambiguation rules (c) counts as ONE hit — so it settles as a skill, never a command",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "create-docs",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -133,16 +128,11 @@
       "form": "bare name",
       "operation": "invocation",
       "repo_root": "live",
-      "exercises": "bare name; in the live tree both layers carry it, and § Disambiguation rules (c) says the criterion is the layer — so this closes as dual-layer. The row that proves source-plus-mirror is one hit is R17 (one Skill, two paths, one layer named)",
+      "exercises": "bare name; the live tree carries the same Skill at both the source and its installed mirror, and § Disambiguation rules (c) makes those two paths ONE hit (the layer, not the path literal) — so this settles as a skill",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "humanize",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -152,16 +142,11 @@
       "form": "slash reference",
       "operation": "invocation",
       "repo_root": "live",
-      "exercises": "a leading / marks the slash-command surface, not 'invoke it instead'; NP-4 strips it before NP-6 sees the slash. The prefix cost is the whole point: read as a path this input could never reach a name hit",
+      "exercises": "a leading / marks the slash-command surface, not 'invoke it instead'; NP-4 strips it before NP-6 sees the slash, and the source-plus-mirror hit is one, so this settles as a skill",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "improve-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -171,16 +156,11 @@
       "form": "at reference",
       "operation": "invocation",
       "repo_root": "live",
-      "exercises": "at reference in the invocation form",
+      "exercises": "at reference in the invocation form; the source-plus-mirror hit is one (FR-023(c)), so this settles as a skill",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "merge-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -192,14 +172,9 @@
       "repo_root": "live",
       "exercises": "prefix deformation: @/name counts as ONE prefix segment (NP-4); without that rule the residual keeps a slash and is read as a path",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "merge-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -211,14 +186,9 @@
       "repo_root": "live",
       "exercises": "label plus slash: NP-3 then NP-4 run before NP-6, so the slash after the label is a prefix, not a path",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "merge-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -230,14 +200,9 @@
       "repo_root": "live",
       "exercises": "labelled reference without a slash",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "improve-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -309,14 +274,9 @@
       "repo_root": "live",
       "exercises": "wrapping quotes and surrounding whitespace (NP-2): the quotes are paired and disappear from the normalized identifier",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "improve-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -369,14 +329,9 @@
       "repo_root": "live",
       "exercises": "the same identifier as R09 in the cli operation form: the two forms differ only in failure reachability, not in the identifier — same outcome class and same normalized value as R09",
       "expect": {
-        "outcome": "failure",
+        "outcome": "skill",
         "normalized": "improve-skills",
-        "failure_class": "dual-layer",
-        "report_items": [
-          "raw",
-          "normalized",
-          "candidate_paths"
-        ]
+        "layer": "dev-canonical"
       }
     },
     {
@@ -512,9 +467,12 @@
             }
           }
         },
-        "unreadable": []
+        "unreadable": [],
+        "dirs": {
+          "dev-canonical": "skills/internal"
+        }
       },
-      "exercises": "dual-layer: the same name in TWO genuinely different layers — never a source-and-mirror pair of one Skill",
+      "exercises": "dual-layer: the same name in TWO genuinely different layers, never a source-and-mirror pair (a mirror pair is one hit — FR-023(c) / V-33). The dev-canonical hit lives under skills/internal, whose mirror is .specify/skills/internal; the installed hit under .specify/skills is therefore a different layer, not its mirror",
       "expect": {
         "outcome": "failure",
         "normalized": "twin-skill",
@@ -526,7 +484,7 @@
         ],
         "candidate_paths": [
           ".specify/skills/twin-skill/SKILL.md",
-          "skills/external/twin-skill/SKILL.md"
+          "skills/internal/twin-skill/SKILL.md"
         ]
       }
     },

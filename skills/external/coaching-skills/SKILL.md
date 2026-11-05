@@ -1,7 +1,7 @@
 ---
 name: coaching-skills
 description: |
-  Coach another Skill (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md, observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee-reference|trainee-path> <work>`.
+  Coach another Skill (the Trainee) through one real work item: state the expected outcome and process efficiency first, dispatch exactly one subagent to execute the Trainee's own SKILL.md, observe what actually happens, then report the deviations and a micro-adjustment plan. Use this when the user mentions ["教练", "陪练", "观察执行", "预期 vs 实际", "执行偏差", "微调建议", "coaching"], or invokes it as `coaching-skills <trainee-name|trainee-path> <work>`.
 skill_id: "<SKILL:.specify/skills/coaching-skills/SKILL.md>"
 classification: external
 ---
@@ -18,7 +18,7 @@ real work is the primary result; optimizing the Trainee is secondary.
 
 ## Inputs
 
-Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
+Invocation: `coaching-skills <trainee-name|trainee-path> <work>`.
 
 - Exactly two positional parameters: the Trainee reference and `<work>`.
 - **`Trainee`**: the Trainee reference. Its accepted forms, normalization order,

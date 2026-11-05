@@ -179,6 +179,14 @@ def test_sc006_fixture_is_three_disjoint_segments_of_at_least_twelve_rows():
     assert {row["segment"] for row in rows} == set(SEGMENTS), (
         "the segments present are %r, not the three disjoint ones"
         % sorted({row["segment"] for row in rows}))
+    # SC-006 names the six accepted forms as coverage the matrix owns; a matrix that
+    # lost a whole form's rows would still clear MIN_ROWS, so the form set is asserted.
+    forms = {row["form"] for row in rows}
+    missing_forms = set(_helper().FORMS) - forms
+    assert not missing_forms, (
+        "the matrix carries no row for accepted form(s) %r — SC-006 names the six forms"
+        % sorted(missing_forms)
+    )
 
 
 def row_reading(module, row: dict, tmp_root: Path) -> str:

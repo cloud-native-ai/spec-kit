@@ -14,7 +14,7 @@ implements the five declaration requirements from
 2      comparison unit                            both product families, path by path:
                                                   ``skills/**`` and ``templates/commands/**``
 3      allowed-difference set source              parsed out of ``data-model.md`` § GM-03
-                                                  rows 1–8 — the single path landing point,
+                                                  rows 1–8 + 19–20 — the single path landing point,
                                                   never copied into this module
 4      complement assertion + invariants          complement byte-identical to the baseline;
                                                   only registered in-unit paths moved
@@ -102,7 +102,11 @@ def working_tree_paths(cwd: Path = REPO_ROOT) -> list[str]:
 
 
 def registered_allowed_set(data_model_text: str) -> tuple[set, set]:
-    """Parse GM-03 into (inside-unit, outside-unit) allowed paths. Rows 1–8 / 9–18."""
+    """Parse GM-03 into (inside-unit, outside-unit) allowed paths.
+
+    In-unit rows are 1–8 + 19–20 (the two absorbed coaching files); 9–18 are the
+    out-of-unit new test paths.
+    """
     m = re.search(r"^## GM-03 .*$", data_model_text, re.MULTILINE)
     assert m, "artifact missing: data-model.md carries no GM-03 section"
     body = data_model_text[m.end():]
@@ -229,7 +233,7 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
         if rel in feature_paths:
             problems.append(
                 "%r is new inside the comparison unit — new paths are allowed only when "
-                "registered (GM-03 rows 1–8)" % rel
+                "registered (GM-03 in-unit rows 1–8 + 19–20)" % rel
             )
             continue
         if rel in tracked:
@@ -247,7 +251,7 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
     for rel in mismatches:
         problems.append(
             "%r differs from the baseline blob but is not registered in data-model.md § GM-03 "
-            "rows 1–8 — the containment claim is false for the complement" % rel
+            "in-unit rows 1–8 + 19–20 — the containment claim is false for the complement" % rel
         )
 
     unregistered_changed = [
@@ -415,7 +419,7 @@ def test_sc003_unregistered_additions_are_absent_and_co_worktree_paths_are_repor
     )
     assert reading["current"] > 0 and reading["baseline"] > 0, "empty comparison unit"
     assert not reading["unregistered_additions"], (
-        "tracked paths inside the comparison unit are new and not registered in GM-03 rows 1–8: %s"
+        "tracked paths inside the comparison unit are new and not registered in GM-03 in-unit rows 1–8 + 19–20: %s"
         % reading["unregistered_additions"]
     )
     # A co-worktree path that *is* in the allowed set would be a path this feature claims but
@@ -466,7 +470,7 @@ def test_sc003_reading_line_is_recomputable_from_its_own_fields():
     assert int(fields["frozen_mismatches"]) == 0, line
 
 
-def test_gm03_allowed_set_parses_to_eight_in_unit_rows():
+def test_gm03_allowed_set_parses_to_ten_in_unit_rows():
     inside, outside = registered_allowed_set((REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8"))
     assert len(inside) == 10, (
         "GM-03 in-unit rows must register the allowed set (8 feature paths + 2 absorbed "

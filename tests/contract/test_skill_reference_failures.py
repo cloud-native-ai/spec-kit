@@ -39,8 +39,15 @@ def _helper(path=None):
 
 
 def _scratch_two_layers(root: Path, name: str = "twin-skill") -> Path:
-    """Two **different** layers carrying the same name (dev-canonical + installed)."""
-    for layer_dir in ("skills/external", ".specify/skills"):
+    """Two **different** layers carrying the same name (dev-canonical + installed).
+
+    The dev-canonical hit lives under ``skills/internal``, whose mirror is
+    ``.specify/skills/internal``; the installed hit under ``.specify/skills`` is therefore a
+    different layer, not its mirror. A source-and-mirror pair (``skills/external`` +
+    ``.specify/skills``) is ONE hit and must never be used as the dual-layer fixture
+    (GR-05(c) / V-33).
+    """
+    for layer_dir in ("skills/internal", ".specify/skills"):
         target = root / layer_dir / name
         target.mkdir(parents=True, exist_ok=True)
         (target / "SKILL.md").write_text(

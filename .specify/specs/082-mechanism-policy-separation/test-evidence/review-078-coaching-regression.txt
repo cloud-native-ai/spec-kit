@@ -1,0 +1,12 @@
+REVIEW — the two 078 coaching C1 reds and the frozen-hash module after the parameter-name repair
+Date        : 2026-11-05T19:07:38+08:00
+HEAD at run : 6785e8de59a97d862f977e0383c316b665989e3f
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold tests/contract/test_coaching_run_contract.py::test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work tests/contract/test_expression_compatibility.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold tests/contract/test_coaching_run_contract.py::test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work tests/contract/test_expression_compatibility.py
+..................                                                       [100%]
+18 passed in 1.18s
+----- END VERBATIM -----
+exit=0
+elapsed_seconds=2

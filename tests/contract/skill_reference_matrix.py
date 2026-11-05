@@ -19,7 +19,10 @@ Discipline carried here:
 * a pure function from ``(raw string, form)`` to the closed three-valued outcome with the
   normalized identifier and the paired-report fields;
 * **no assertions and no I/O at module level** — the filesystem is read only when a caller
-  passes ``repo_root``, and nothing is written ever.
+  passes ``repo_root``, and nothing is written ever;
+* **a dev-canonical hit and its installed mirror are one hit** (FR-023(c) / V-33): the
+  installed path is dropped when the same name exists at its source counterpart, so only
+  two *different* layers left after that collapse can close as ``dual-layer``.
 
 Step order (owner § Normalization; **not exchangeable** — NP-3 / NP-4 run before NP-6):
 form determination → trim/quote → ``skill:`` → ``@``// → ``SKILL.md``// → channel → hit →
@@ -84,6 +87,14 @@ KNOWN_LOCATIONS = (
 #: a source directory and its ``.specify/`` mirror are two layers).
 LAYERS = ("dev-canonical", "installed")
 
+#: § Disambiguation rules (c) / V-33 — an installed path whose **source counterpart** exists
+#: is the same Skill seen through its mirror, so the pair is one hit. Mirrors are declared by
+#: ``scripts/python/sync-mirrors.py`` (``MIRROR_PAIRS``); no second mirror table exists here.
+MIRROR_COUNTERPARTS = (
+    (".specify/skills/internal/", "skills/internal/"),
+    (".specify/skills/", "skills/external/"),
+)
+
 _LABEL_RE = re.compile(r"^skill:")
 _QUOTE_PAIRS = (('"', '"'), ("'", "'"))
 #: A dotted name in the ``/speckit.*`` namespace. No other character-class assertion is
@@ -117,14 +128,19 @@ def materialize_scratch(scratch, root):
     """Materialize a row's ``scratch`` block under ``root`` and return ``root``.
 
     ``{"layer": {<layer>: {<name>: {"frontmatter": bool, "body": str}}}, "unreadable": [...]}``
-    writes ``<LAYER_DIRS[layer]>/<name>/SKILL.md``; a name whose ``frontmatter`` is false gets
-    a body with no frontmatter so that NP-7 reads it as ``unreadable``. This writer exists so
-    that the case-insensitive, dual-layer and unreadable rows are decided by the fixture,
-    never by whatever the live tree happens to contain today.
+    writes ``<dirs[layer]>/<name>/SKILL.md``; a name whose ``frontmatter`` is false gets
+    a body with no frontmatter so that NP-7 reads it as ``unreadable``. An optional
+    ``"dirs"`` block overrides :data:`LAYER_DIRS` for one row, which is how a genuine
+    ``dual-layer`` fixture is built from two layers that are **not** a source/mirror
+    pair (a mirror pair is one hit — FR-023(c) / V-33). This writer exists so that the
+    case-insensitive, dual-layer and unreadable rows are decided by the fixture, never
+    by whatever the live tree happens to contain today.
     """
+    dirs = dict(LAYER_DIRS)
+    dirs.update(scratch.get("dirs") or {})
     for layer, skills in (scratch.get("layer") or {}).items():
         for name, spec in skills.items():
-            target = Path(root) / LAYER_DIRS[layer] / name
+            target = Path(root) / dirs[layer] / name
             target.mkdir(parents=True, exist_ok=True)
             body = spec.get("body") or ""
             if spec.get("frontmatter"):
@@ -344,6 +360,20 @@ def _name_candidates(name, repo_root, insensitive=False):
     return hits
 
 
+def _is_mirror_of_present_source(hit, hit_set):
+    """Is ``hit`` an installed path whose dev-canonical counterpart is also a hit?"""
+    for installed_prefix, source_prefix in MIRROR_COUNTERPARTS:
+        if hit.startswith(installed_prefix):
+            return (source_prefix + hit[len(installed_prefix):]) in hit_set
+    return False
+
+
+def _collapse_mirror_pairs(hits):
+    """A dev-canonical hit and its installed mirror are **one** hit (FR-023(c) / V-33)."""
+    hit_set = set(hits)
+    return [hit for hit in hits if not _is_mirror_of_present_source(hit, hit_set)]
+
+
 def _hit_plane(residual, repo_root):
     """Path channel: the trust boundary first, then the directory, then readability."""
     if any(segment == ".." for segment in residual.split("/")):
@@ -446,6 +476,8 @@ def normalize(raw, form="bare name", operation="invocation", repo_root=None):
         # Second pass, only on zero hits: one case-insensitive comparison.
         case_pass = "insensitive"
         hits = _name_candidates(text, repo_root, insensitive=True)
+    # NP-7 before the layer test: a source/mirror pair is one hit, never two (FR-023(c)).
+    hits = _collapse_mirror_pairs(hits)
     if not hits:
         return failure(raw, text, "zero-hit", searched_coordinates=found)
 
@@ -455,6 +487,7 @@ def normalize(raw, form="bare name", operation="invocation", repo_root=None):
     if len(by_layer) > 1:
         return failure(raw, text, "dual-layer",
                        candidate_paths=sorted(hit for group in by_layer.values() for hit in group))
-    located = sorted(next(iter(by_layer.values())))[0]
+    # One layer: the ladder order decides which location is named (FR-022), never a sort.
+    located = next(iter(by_layer.values()))[0]
     # Two hits inside one layer are one hit (FR-023(c)); the layer is the criterion.
     return skill(raw, text, channel, located, case_pass=case_pass, operation=operation)

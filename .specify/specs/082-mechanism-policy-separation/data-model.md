@@ -279,7 +279,7 @@
 | 19 | `skills/external/coaching-skills/data-model.md` | 改写（技能引用的 coaching 数据模型；吸收的并发改造，随 082b 并入） | 是 |
 | 20 | `skills/external/coaching-skills/references/prompt-templates.md` | 改写（技能引用的 coaching 提示模板；吸收的并发改造，随 082b 并入） | 是 |
 
-登记表在**比较单元内**的条目恰为第 1–8 行（**1 条新增 + 7 条改写**：新增只有第 2 行的 `references/mechanism-policy-check.md`，其余七行都是改写），第 9–18 行是落在比较单元之外（`tests/`）的新增路径，列出是为了让「新增路径」一侧也可逐条核对，它们不参与字节相等断言。**本条与第 9–18 行的条数以本表行为准**：任何引用本节的地方 MUST NOT 手抄一个与表不符的总数（M3 repair 2026-11-05 改，原正文「2 新增 + 6 改写」与行不符）。第 18 行登记的是**一组**文件（五个引用侧模块中的四个 pytest 模块；第五个 `test_skill_reference_matrix.py` 已在第 17 行单列），契约侧只陈述「技能引用测试组」这一数，路径细节以本表与 plan.md § Project Structure 为准。
+登记表在**比较单元内**的条目恰为第 1–8 行与第 19–20 行，共 **10 条**（**1 条新增 + 9 条改写**：新增只有第 2 行的 `references/mechanism-policy-check.md`，其余九行都是改写，其中第 19–20 行是吸收的并发改造），第 9–18 行是落在比较单元之外（`tests/`）的新增路径，列出是为了让「新增路径」一侧也可逐条核对，它们不参与字节相等断言。**本条与第 9–18 行、第 19–20 行的条数以本表行为准**：任何引用本节的地方 MUST NOT 手抄一个与表不符的总数（M3 repair 2026-11-05 改，原正文「2 新增 + 6 改写」与行不符；2026-11-05 review 改，原正文「第 1–8 行」漏掉第 19–20 行的两条 in-unit 吸收路径）。第 18 行登记的是**一组**文件（五个引用侧模块中的四个 pytest 模块；第五个 `test_skill_reference_matrix.py` 已在第 17 行单列），契约侧只陈述「技能引用测试组」这一数，路径细节以本表与 plan.md § Project Structure 为准。
 
 **结构不变量**（三条）：
 1. `included` 成员的技能目录 = 允许差异集中 `skills/external/<member>/` 前缀的路径集合的父目录集合（V-19）。

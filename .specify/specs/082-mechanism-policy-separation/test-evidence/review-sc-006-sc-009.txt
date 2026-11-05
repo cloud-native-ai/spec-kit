@@ -1,0 +1,49 @@
+REVIEW — SC-006 / SC-009 re-measurement after the mirror-collapse repair
+Date        : 2026-11-05T19:07:34+08:00
+HEAD at run : 6785e8de59a97d862f977e0383c316b665989e3f
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_failures.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_failures.py
+.row R01 segment=surface raw='speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R02 segment=surface raw='/speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R03 segment=surface raw='speckit.skills/SKILL.md' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R04 segment=surface raw='speckit.skills' outcome=command-surface normalized='speckit.skills' expected=command-surface/'speckit.skills' ok
+row R05 segment=surface raw='speckit.nosuchcommand' outcome=command-surface normalized='speckit.nosuchcommand' expected=command-surface/'speckit.nosuchcommand' ok
+row R06 segment=surface raw='skills/external/create-docs/SKILL.md' outcome=skill normalized='skills/external/create-docs' expected=skill/'skills/external/create-docs' ok
+row R07 segment=surface raw='create-docs' outcome=skill normalized='create-docs' expected=skill/'create-docs' ok
+row R08 segment=normalize raw='humanize' outcome=skill normalized='humanize' expected=skill/'humanize' ok
+row R09 segment=normalize raw='/improve-skills' outcome=skill normalized='improve-skills' expected=skill/'improve-skills' ok
+row R10 segment=normalize raw='@merge-skills' outcome=skill normalized='merge-skills' expected=skill/'merge-skills' ok
+row R11 segment=normalize raw='@/merge-skills' outcome=skill normalized='merge-skills' expected=skill/'merge-skills' ok
+row R12 segment=normalize raw='skill:/merge-skills' outcome=skill normalized='merge-skills' expected=skill/'merge-skills' ok
+row R13 segment=normalize raw='skill:improve-skills' outcome=skill normalized='improve-skills' expected=skill/'improve-skills' ok
+row R14 segment=normalize raw='skills/external/merge-skills/SKILL.md' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R15 segment=normalize raw='skills/external/merge-skills/' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R16 segment=normalize raw='skills/external/merge-skills' outcome=skill normalized='skills/external/merge-skills' expected=skill/'skills/external/merge-skills' ok
+row R17 segment=normalize raw='.specify/skills/humanize' outcome=skill normalized='.specify/skills/humanize' expected=skill/'.specify/skills/humanize' ok
+row R18 segment=normalize raw='  "/improve-skills"  ' outcome=skill normalized='improve-skills' expected=skill/'improve-skills' ok
+row R19 segment=normalize raw='SCRATCH-HELPER' outcome=skill normalized='SCRATCH-HELPER' expected=skill/'SCRATCH-HELPER' ok
+row R20 segment=normalize raw='my-draft.md' outcome=skill normalized='my-draft.md' expected=skill/'my-draft.md' ok
+row R21 segment=normalize raw='improve-skills' outcome=skill normalized='improve-skills' expected=skill/'improve-skills' ok
+row R22 segment=failure raw='no-such-skill-xyz' outcome=failure normalized='no-such-skill-xyz' expected=failure/'no-such-skill-xyz' ok
+row R23 segment=failure raw='../../etc/passwd' outcome=failure normalized='../../etc/passwd' expected=failure/'../../etc/passwd' ok
+row R24 segment=failure raw='docs/reference/skills/sdd-loop-driver.md' outcome=failure normalized='docs/reference/skills/sdd-loop-driver.md' expected=failure/'docs/reference/skills/sdd-loop-driver.md' ok
+row R25 segment=failure raw='skills/external/ghost-skill' outcome=failure normalized='skills/external/ghost-skill' expected=failure/'skills/external/ghost-skill' ok
+row R26 segment=failure raw='skills/external/hollow-skill' outcome=failure normalized='skills/external/hollow-skill' expected=failure/'skills/external/hollow-skill' ok
+row R27 segment=failure raw='twin-skill' outcome=failure normalized='twin-skill' expected=failure/'twin-skill' ok
+row R28 segment=failure raw='@merge-skills' outcome=failure normalized='merge-skills' expected=failure/'merge-skills' ok
+row R29 segment=failure raw='"improve-skills' outcome=failure normalized='"improve-skills' expected=failure/'"improve-skills' ok
+row R30 segment=failure raw='skill:skill:merge-skills' outcome=failure normalized='skill:merge-skills' expected=failure/'skill:merge-skills' ok
+rows=30 matched=30 failed=0
+..zero-hit -> zero-hit report={'searched_coordinates': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': 'no-such-skill-xyz', 'normalized': 'no-such-skill-xyz'}
+out-of-ladder -> out-of-ladder report={'path': '../../etc/passwd', 'known_locations': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': '../../etc/passwd', 'normalized': '../../etc/passwd'}
+unreadable -> unreadable report={'path': 'skills/external/hollow-skill', 'defect': 'frontmatter: missing opening ---', 'raw': 'skills/external/hollow-skill', 'normalized': 'skills/external/hollow-skill'}
+dual-layer -> dual-layer report={'candidate_paths': ['.specify/skills/twin-skill/SKILL.md', 'skills/internal/twin-skill/SKILL.md'], 'raw': 'twin-skill', 'normalized': 'twin-skill'}
+.exclusion[out-of-ladder->zero-hit] actual=out-of-ladder forbidden_seen=false
+.exclusion[unreadable->out-of-ladder] actual=unreadable forbidden_seen=false
+.....
+10 passed in 0.11s
+----- END VERBATIM -----
+exit=0
+elapsed_seconds=1

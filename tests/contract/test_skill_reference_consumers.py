@@ -390,3 +390,68 @@ def test_sc007_permitted_classes_are_named_constants_counted_separately():
         "the scan counts %r, not the three permitted classes" % sorted(scan["permitted"]))
     assert sum(scan["permitted"].values()) == sum(
         1 for hit in scan["hits"] if hit[3] != "unpermitted")
+
+
+# --------------------------------------------------------------------------- #
+# SW-05 — the excluded members carry no mechanism/policy judgement literal
+# --------------------------------------------------------------------------- #
+#: The excluded members whose mechanism/policy-side body must stay unchanged
+#: (contracts/skill-wiring.contract.md SW-05).
+SW05_SKILL_DIRS = ("skills/external/coaching-skills", "skills/internal/run-skills")
+
+#: SW-05's closed literal set: the owner path, the judgement heading and the two
+#: symptom-table names a copied judgement would carry.
+SW05_LITERALS = (
+    "mechanism-policy-definitions",
+    "Mechanism / policy separation",
+    "mechanism-in-policy",
+    "policy-in-mechanism",
+)
+
+
+def sw05_files(root: Path) -> list[Path]:
+    """The excluded members' own bodies: `SKILL.md` plus every file under their dirs."""
+    files: list[Path] = []
+    for relative in SW05_SKILL_DIRS:
+        directory = root / relative
+        assert directory.is_dir(), "artifact missing: %s" % directory
+        files.extend(sorted(path for path in directory.rglob("*.md") if path.is_file()))
+    return files
+
+
+def sw05_hits(files) -> tuple[int, list[tuple[str, int, str]]]:
+    scanned = 0
+    hits: list[tuple[str, int, str]] = []
+    for path in files:
+        scanned += 1
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            for literal in SW05_LITERALS:
+                if literal in line:
+                    hits.append((str(path), number, literal))
+    return scanned, hits
+
+
+def test_sw05_excluded_members_carry_no_mechanism_policy_literal():
+    files = sw05_files(REPO_ROOT)
+    scanned, hits = sw05_hits(files)
+    print("scanned=%d excluded-member file(s)" % scanned)
+    for path, number, literal in hits:
+        print("hit %s:%d literal=%r" % (path, number, literal))
+    assert scanned >= 4, (
+        "only %d excluded-member file(s) scanned — the denominator lost the two SKILL.md "
+        "files or the coaching references" % scanned)
+    assert not hits, (
+        "SW-05: the excluded members carry the mechanism/policy judgement literal(s) %r — "
+        "their bodies must stay on the reference-wiring side only" % hits)
+
+
+def test_sw05_negative_case_a_leaked_literal_turns_red(tmp_path):
+    source = REPO_ROOT / SW05_SKILL_DIRS[0] / "SKILL.md"
+    target = tmp_path / SW05_SKILL_DIRS[0] / "SKILL.md"
+    target.parent.mkdir(parents=True)
+    target.write_text(
+        _read(source) + "\nJudgement: `Mechanism / policy separation`.\n", encoding="utf-8")
+    scanned, hits = sw05_hits([target])
+    assert scanned == 1 and any(
+        literal == "Mechanism / policy separation" for _, _, literal in hits), (
+        "the SW-05 scan did not turn red on a leaked judgement literal: %r" % hits)
