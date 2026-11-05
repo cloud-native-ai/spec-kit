@@ -121,11 +121,20 @@ adjudication row is backed.
 
 ## R7 — The zero-new-failure surface (measured, not assumed)
 
-Selection rule: test files that reference any of the five frozen gate scripts. Command and result are in
-`plan-readings.txt` § R10 → **39** files. Two of them are the 081 acceptance files whose assertions must not move:
-`tests/contract/test_requirements_checker.py` collects **40** tests, `tests/contract/test_checker_form.py` collects
-**37**. This is a *collect* reading, not a run: the plan stage is docs-only, and the full baseline belongs to the
-implement stage's own budget.
+Selection rule: test files that reference any of the five frozen gate scripts — `validate-requirements`,
+`validate-tasks`, `gate-check`, `flow-class-check`, `closure-acceptance-check` (SC-006's zero-diff side). Command and
+result: `test-evidence/f07-test-file-readings.txt` § A → **38** files, with the 38 names listed. Two of them are the 081
+acceptance files whose assertions must not move: `tests/contract/test_requirements_checker.py` collects **40** tests,
+`tests/contract/test_checker_form.py` collects **37**. This is a *collect* reading, not a run: the plan stage is
+docs-only, and the full baseline belongs to the implement stage's own budget.
+
+**Correction (plan-repair pass, analyze finding F-07)**: this section previously read **39**, pointing at
+`plan-readings.txt` § R10, whose command had its membership elided as `<five script names>`. 39 is the **six**-name union
+(the five above plus `doc-consistency-check`) and no five-name set reproduces it; the same command over the pre-repair
+five-name set reads 35. All three readings, their verbatim commands, their file lists and the arithmetic that relates
+them are in `f07-test-file-readings.txt`; the number this plan uses is 38. `plan-readings.txt` § R10 is a dated reading
+and is left as it was taken.
+
 
 ## R8 — Mirror baseline before any edit
 

@@ -9,12 +9,12 @@
 
 | Feature-level statement (`features/084.md` § Key Changes) | Where this plan carries it |
 |---|---|
-| 1. New YAML declaration layer `shared/declarations/` | `contracts/declaration-schema.contract.md` (DS-01…DS-12); `data-model.md` E-1/E-2/E-3 |
-| 2. New judging engine with three actions | `contracts/harness-triple-check.contract.md` (HC-01…HC-16); `data-model.md` E-8/E-10 |
-| 3. Range and coverage criteria recomputed on the tree | `contracts/harness-triple-check.contract.md` HC-05/HC-06; `data-model.md` E-4/E-5/E-6 |
-| 4. Three migration batches, each independently acceptable | `contracts/migration-batches.contract.md` (MB-01…MB-10) — the first roster the spec asked the plan for |
-| 5. Owner documents become pointers, criteria stay | `contracts/migration-batches.contract.md` MB-06/§ Verification; `plan.md` § Mirror Obligations for the copies |
-| 6. Distribution and bounded compatibility | `contracts/distribution-and-mirror.contract.md` (DM-01…DM-13) — the asset roster and upgrade actions the spec asked the plan for |
+| 1. New YAML declaration layer `shared/declarations/` | `contracts/declaration-schema.contract.md` (C-001…C-012); `data-model.md` E-1/E-2/E-3 |
+| 2. New judging engine with three actions | `contracts/harness-triple-check.contract.md` (C-026…C-041); `data-model.md` E-8/E-10 |
+| 3. Range and coverage criteria recomputed on the tree | `contracts/harness-triple-check.contract.md` C-030/C-031; `data-model.md` E-4/E-5/E-6 |
+| 4. Three migration batches, each independently acceptable | `contracts/migration-batches.contract.md` (C-042…C-051) — the first roster the spec asked the plan for |
+| 5. Owner documents become pointers, criteria stay | `contracts/migration-batches.contract.md` C-047/§ Verification; `plan.md` § Mirror Obligations for the copies |
+| 6. Distribution and bounded compatibility | `contracts/distribution-and-mirror.contract.md` (C-013…C-025) — the asset roster and upgrade actions the spec asked the plan for |
 
 ## Status movement this plan is responsible for
 
@@ -23,7 +23,7 @@
 stays `Completed`; the only reference to it here is the A8(a) hard constraint (its acceptance tests move by zero).
 
 The two list deliverables that `features/084.md` § Status Tracking names as the `Planned` precondition are landed here:
-the first migration roster (`contracts/migration-batches.contract.md` § MB-01) and the `specify init` asset roster with
+the first migration roster (`contracts/migration-batches.contract.md` C-042) and the `specify init` asset roster with
 its upgrade actions (`contracts/distribution-and-mirror.contract.md` § A).
 
 ## Delivery surface (what the Feature row must report when the work lands)

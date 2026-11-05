@@ -6,33 +6,33 @@ read entry is the mechanism that makes a second implementation visible as a defe
 
 ## Clauses
 
-- **SR-01** The read entry is one module, `scripts/python/declaration_reader.py`, standard library only, Python
+- **C-052** The read entry is one module, `scripts/python/declaration_reader.py`, standard library only, Python
   `>= 3.8`. `pyproject.toml`'s `dependencies` MUST NOT gain any YAML library (the list is compared byte-for-byte against
   the baseline at closure).
-- **SR-02** It is both importable and callable. Every sibling engine is invoked as `python3 scripts/python/<name>.py`
+- **C-053** It is both importable and callable. Every sibling engine is invoked as `python3 scripts/python/<name>.py`
   (and, in a client project, as `python3 .specify/scripts/python/<name>.py`), so the script's own directory is
   `sys.path[0]` and a bare `import declaration_reader` resolves without path games. The CLI form exists for humans and
   for the contract test only.
-- **SR-03** It owns the entire YAML-subset grammar of `contracts/declaration-schema.contract.md` DS-08, the parsing of
+- **C-054** It owns the entire YAML-subset grammar of `contracts/declaration-schema.contract.md` C-008, the parsing of
   `contract.yaml`, the loading of one fact, and the loading of the exclusion rows. No other file in the repository
   parses declaration YAML.
-- **SR-04** Public functions (names fixed so a consumer's read point is greppable):
+- **C-055** Public functions (names fixed so a consumer's read point is greppable):
   `load_contract(repo)`, `load_fact(repo, slug)`, `load_facts(repo)`, `load_exclusions(repo)`,
   `normalize_path(value)`.
   Each raises a single typed error carrying the finding template id when the input is invalid; the caller maps it to the
   exit code. No function prints.
-- **SR-05** Degradation: when `<repo>/shared/declarations/` does not exist, the module signals the degraded state through
+- **C-056** Degradation: when `<repo>/shared/declarations/` does not exist, the module signals the degraded state through
   that same typed error (never through an exception type of its own invention), and the caller turns it into the exit-2
   label. A consumer MUST NOT crash on a legacy client project.
-- **SR-06** `normalize_path()` strips exactly one optional leading `.specify/` and returns a repo-relative value. This is
+- **C-057** `normalize_path()` strips exactly one optional leading `.specify/` and returns a repo-relative value. This is
   the single place where the three-copy problem (`research.md` § R3) is solved; a consumer that normalizes paths itself
   is a second implementation.
-- **SR-07** A boundary guard test asserts, mechanically, that the module is the only file under `scripts/` and
+- **C-058** A boundary guard test asserts, mechanically, that the module is the only file under `scripts/` and
   `skills/` that implements a subset parser (the assertion is a search for a parser-shaped function or a duplicated
   subset marker, not a semantic review). The pre-existing inline parsers `scripts/python/execution-config.py`
   (`parse_yaml_subset`) and `scripts/python/gate-check.py` (`parse_gate`) are grandfathered by an explicit allowlist in
   that guard, with the reason "registered under § Non-Goals N4, not touched by this feature".
-- **SR-08** The module and the checker are mirrored together (`scripts/ → .specify/scripts/`, the strict pair): a source
+- **C-059** The module and the checker are mirrored together (`scripts/ → .specify/scripts/`, the strict pair): a source
   file without its mirror is drift, and this pair fails on a mirror-only extra file.
 
 ## Sibling-precedent note (Grounded Naming)

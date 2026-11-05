@@ -12,9 +12,9 @@ today (batch 1); a mapping or ordered operator table decides accept/reject, so c
 rubber stamp (batch 2); a record schema only changes the shape of what gets recorded (batch 3). Each batch is closed by
 its own readings, so a stalled batch leaves the previous ones complete rather than half-migrated.
 
-## MB-01 — Batch 1: facts already duplicated across faces (drift risk exists today)
+## Batch 1 — facts already duplicated across faces (drift risk exists today)
 
-- **MB-01** Batch 1 is the roster below: nine facts whose value already exists twice — once as an engine constant and
+- **C-042** Batch 1 is the roster below: nine facts whose value already exists twice — once as an engine constant and
   once as prose in a carrier — so the drift this feature removes is present today rather than hypothetical.
   Each row: slug · kind · the engine side that defines it today · the carrier(s) that re-state it.
 
@@ -35,45 +35,67 @@ the judgement prose, refusal message, exit-code meaning and member set stay byte
 `tests/contract/test_requirements_checker.py` and `tests/contract/test_checker_form.py` at zero new failures and zero
 diff (measured at plan time: 40 and 37 collected tests, `research.md` § R7).
 
-- **MB-02** Batch 1 is the only batch that must land before the coverage action can exit 0 on the main tree: the
-  units in `MB-01` are in scope by construction, and until each has a declaration the unit reads `pending` — which is a
+- **C-043** Batch 1 is the only batch that must land before the coverage action can exit 0 on the main tree: the
+  units in `C-042` are in scope by construction, and until each has a declaration the unit reads `pending` — which is a
   reading, not a failure. The exit-0 criterion therefore reads "zero `[[STR-013]]` findings", never "zero `pending`".
-- **MB-03** Batch 2 — mappings and ordered operator tables (they decide accept/reject): `expression-gate-faces` and
-  `expression-stage-operator-table` (`shared/workflow/expression-gates.md` ↔ `scripts/python/flow-class-check.py` own
-  the operator-table header check); `analyze-severity-values` and the analysis finding-channel set
-  (`templates/commands/analyze.md` + `skills/internal/analyze-artifacts/`); `review-segment-sequence` and the ARC verdict
-  mapping (`templates/review-template.md` ↔ the review engine); `self-improvement-stage-sequence` and the
-  track-to-executor mapping (`shared/workflow/self-improvement-workflow.md`,
-  `shared/definitions/self-improvement-definitions.md`, `skills/internal/self-improvement/`);
-  `improvement-track-values` and the changed-asset-category mapping (`skills/internal/improve-agent|improve-team|improve-tools/`,
-  `skills/external/improve-docs|improve-skills/`); `driver-stage-sequence`, `driver-gate-roster`,
-  `driver-completion-sentinels`, `driver-stage-artifacts` (`skills/external/sdd-loop-driver/SKILL.md`).
-- **MB-04** Batch 3 — record schemas (they change evidence shape only): `memory-types` and
-  `memory-retention-thresholds` (`scripts/python/memory-utils.py` ↔ the memory skills); `history-categories` and
-  `history-manifest-schema` (`scripts/python/history-utils.py` ↔ `skills/internal/manage-history/`); `probe-class-values`,
-  `probe-object-binding-map`, `quant-record-schema`, `trigger-state-schema` (`shared/definitions/probe-definitions.md`
-  ↔ `scripts/python/probe-utils.py`, `exec-quant.py`, `trigger-utils.py`).
-- **MB-05** A batch is **independently acceptable**: closing batch k requires only batch k's rows to satisfy the
+- **C-044** Batch 2 — mappings and ordered operator tables (they decide accept/reject). Each row names **both** sides as
+  they stand today: the engine side is the constant or read point that step 3 of `C-047` replaces with a read through the
+  shared entry (`C-052`…`C-059`), so no row's engine side has to be discovered by `grep` at edit time. `none` is a
+  reading, not a gap in the roster: it means the row has **no** engine-side copy today, so step 3 of `C-047` creates the
+  read point in the consumer the row names and `C-050`'s `note` records the correction. File:line readings are as
+  measured on 2026-11-05; the constant names are the stable part, the line numbers move.
+
+  | `<fact-slug>` | engine side (constant or read point today) | carrier side |
+  |--------------|-------------------------------------------|--------------|
+  | `expression-gate-faces` | `scripts/python/flow-class-check.py` — `FACES_SECTION_KEYWORD = "六面"` / `FACES_EXPECTED = 6`, the gate owner's § 六面 row-count check | `shared/workflow/expression-gates.md` |
+  | `expression-stage-operator-table` | `scripts/python/flow-class-check.py` — the operator-table header tuple `required = ("阶段", GATE_ID_COLUMN, "执行算子", "对应面", "阻断级别")` | `shared/workflow/expression-gates.md` |
+  | `analyze-severity-values` | `none` — no engine constant carries the severity scale; the only `severity` domain in code is `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py`'s two-value `error` / `advisory`, a different axis, so this row's read point is created at migration | `templates/commands/analyze.md`; `skills/internal/analyze-artifacts/` (`references/detection-and-severity.md`) |
+  | analysis finding-channel set | `none` — the finding classes exist only in the two carriers. The nearest label set in code is `scripts/python/account-clause-coverage.py`'s `clause-uncovered` / `fr-uncovered` channels (its `{"label": …}` rows), a narrower set read there and **not** re-declared by this row | same two carriers |
+  | `review-segment-sequence` | `none` — the four-segment sequence is written by the prose carriers; `skills/internal/code-review/scripts/git-delta-review.sh` owns only the code segment's four-value verdict vocabulary (`pass` / `blocked` / `not-applicable` / `not-evaluated`) and does not enumerate the sequence | `templates/review-template.md` |
+  | ARC verdict mapping | `scripts/python/closure-acceptance-check.py` — `final_path_counts()` (six status buckets plus the total) and the comparison `verdict` (`"block" if blocking else "accept"`); the template's `[ARC_*]` placeholders are copied from `--json` verbatim, never recomputed | `templates/review-template.md` |
+  | `self-improvement-stage-sequence` | `none` — measured: `Bootstrap` / `Operationalize` / `Optimize` appear in no `.py` and no `.sh`; the sequence exists only in the carriers | `shared/workflow/self-improvement-workflow.md`; `shared/definitions/self-improvement-definitions.md`; `skills/internal/self-improvement/` |
+  | track-to-executor mapping | `none` — same measurement; no engine maps a track to an executor | same three carriers |
+  | `improvement-track-values` | `none` — the improve-\* skill scripts (`skills/external/improve-skills/scripts/redline-check.py`, `skill-shape.py`) carry no track vocabulary | `skills/internal/improve-agent/`, `improve-team/`, `improve-tools/`; `skills/external/improve-docs/`, `improve-skills/` |
+  | changed-asset-category mapping | `none` — no engine classifies a changed asset into a category | same five carriers |
+  | `driver-stage-sequence` | `skills/external/sdd-loop-driver/scripts/loop-state.py` — the `STAGE_ARTIFACTS` key order: `requirements`, `clarify`, `plan`, `tasks`, `checklist`, `analyze`, `implement`, `review` | `skills/external/sdd-loop-driver/SKILL.md` |
+  | `driver-gate-roster` | `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` — the check-name literals at its `add(findings, "<name>", …)` call sites (`dangling-id`, `blocked-by`, `missing-path`, `external-clause`, `duplicate-id`, `count-claim`), plus `STAGES` for the per-stage file requirement | same carrier |
+  | `driver-completion-sentinels` | `loop-state.py` — `sentinel_literal()`, which renders `<STAGE>-DONE`, plus the `sentinel` keys in `STATUS_FIELDS` / `LOG_FIELDS` | same carrier |
+  | `driver-stage-artifacts` | `loop-state.py` — `STAGE_ARTIFACTS` itself (`artifacts` / `owned_paths` / `commit_required` / `no_change_allowed` per stage), and `IMPLEMENT_CODE_PATHSPEC` for implement's code pathspec | same carrier |
+
+- **C-045** Batch 3 — record schemas (they change evidence shape only). Same two-sided reading as `C-044`; `none` again
+  means no engine-side copy exists today.
+
+  | `<fact-slug>` | engine side (constant or read point today) | carrier side |
+  |--------------|-------------------------------------------|--------------|
+  | `memory-types` | `scripts/python/memory-utils.py` — `SCOPES = ("session", "knowledge")` | the memory skills (`skills/internal/memory-record/`, `memory-recall/`) |
+  | `memory-retention-thresholds` | `scripts/python/record-retention.py` — `DEFAULT_GRACE_DAYS = 30` and the `STORES` roster. `memory-utils.py`'s `prune` carries no default of its own (it requires `--max-entries` / `--max-age-days`), which is why the threshold's engine side is the retention engine, not the memory store | same two skills |
+  | `history-categories` | `none` — measured: the five category names are in no `.py` and no `.sh`; `scripts/python/history-utils.py` writes the record store without enumerating categories | `skills/internal/manage-history/SKILL.md` |
+  | `history-manifest-schema` | `scripts/python/history-utils.py` — `_manifest_path()` (`.manifest.json`), `read_manifest()` / `write_manifest()`, and the `sessions` key set the incremental read builds | `skills/internal/manage-history/` |
+  | `probe-class-values` | `scripts/python/probe-utils.py` — `_PROBE_KINDS`, `_CLASS_FIELDS`, `HANDLER_KINDS`, `HANDLER_MODES`, `LIFECYCLE_POINTS`, `BINDING_SCOPES` | `shared/definitions/probe-definitions.md` |
+  | `probe-object-binding-map` | `scripts/python/probe-utils.py` — `_OBJECT_FIELDS`, `PROBE_MAP_NAME`, and the catalog heading/entry parsers (`_CATALOG_HEADING`, `_CATALOG_ENTRY_RE`) | `shared/definitions/probe-definitions.md` |
+  | `quant-record-schema` | `scripts/python/exec-quant.py` — `SCHEMA_VERSION`, `PROVENANCES`, `UNIT_TYPES`, `RESOLUTIONS`, `AGENT_RESOLUTIONS`, `CONFIG_FIELDS`, `ARG_MANIFEST` | `shared/definitions/probe-definitions.md` |
+  | `trigger-state-schema` | `scripts/python/trigger-utils.py` — `SCHEMA_VERSION`, `DEFAULT_CONFIG`, `ACTIONS`, `RESPONSES`, `THRESHOLD_DEFAULT` | `shared/definitions/probe-definitions.md` |
+- **C-046** A batch is **independently acceptable**: closing batch k requires only batch k's rows to satisfy the
   per-fact procedure below, plus "zero new failures" on the existing gate tests. Nothing in batch k depends on batch k+1,
   and an unfinished batch k+1 MUST NOT be reported as a failure of batch k.
-- **MB-06** Per-fact procedure (identical for all three batches, in this order): (1) pick the value by the authority
+- **C-047** Per-fact procedure (identical for all three batches, in this order): (1) pick the value by the authority
   order owned by `shared/definitions/harness-triple-definitions.md`, recording a correction in `note` when the faces had
   already drifted; (2) write `facts/<fact-slug>.yaml`; (3) replace the engine's inline constant with a call through the
   shared read entry; (4) replace the carrier's value restatement with a pointer (`<path>#/<key-path>`); (5) fill
   `former_carriers` with every carrier that used to spell the literal; (6) run `verify` plus the batch readings below and
   record them in the evidence directory.
-- **MB-07** Per-batch acceptance, five readings, each mechanical: (a) every fact of the batch has exactly one declaration
+- **C-048** Per-batch acceptance, five readings, each mechanical: (a) every fact of the batch has exactly one declaration
   passing subset + required keys; (b) the carrier side has zero `duplicate-fact` hits for that fact; (c) the engine
   reaches the value through the shared read entry and its inline constant is gone (`grep` for the literal returns only
   the declaration); (d) `coverage` on the migrated tree reports zero `[[STR-013]]` and zero `[[STR-011]]` for the batch's
   units, while unmigrated units stay `pending` without turning red; (e) the existing gate tests show zero new failures.
-- **MB-08** Compatibility is bounded: while a fact is unmigrated its engine may read its inline value, but the output
+- **C-049** Compatibility is bounded: while a fact is unmigrated its engine may read its inline value, but the output
   line MUST carry the `[[STR-014]]` label; once the declaration exists the inline value MUST be deleted (no double read).
   At feature closure the in-scope set has zero `pending` (`SC-002`), so the compatibility path cannot outlive this feature.
-- **MB-09** A fact whose faces disagree is **not** resolved by picking a side silently: the batch procedure takes the
+- **C-050** A fact whose faces disagree is **not** resolved by picking a side silently: the batch procedure takes the
   authority-ordered value and the declaration's `note` records which face was corrected. A batch row that cannot name
   the corrected face is incomplete, not "close enough".
-- **MB-10** Nothing in this contract authorises a change to a frozen gate's criteria or exit codes. If a batch row
+- **C-051** Nothing in this contract authorises a change to a frozen gate's criteria or exit codes. If a batch row
   cannot be migrated without such a change, the row stops and returns to the spec — it does not get a local exception.
 
 ## Verification (route (b), per reading)

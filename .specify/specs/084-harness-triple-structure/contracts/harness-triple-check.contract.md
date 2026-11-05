@@ -7,52 +7,52 @@ the judging algorithm** only.
 
 ## Clauses
 
-- **HC-01** The engine is one file, `scripts/python/harness-triple-check.py`, standard library only, Python `>= 3.8`,
+- **C-026** The engine is one file, `scripts/python/harness-triple-check.py`, standard library only, Python `>= 3.8`,
   and **read-only**: it opens no write point of any kind. Its only outputs are stdout/stderr and, when asked, one JSON
   report path given by `--json-out`.
-- **HC-02** It takes exactly three actions, selected by `--action`: `coverage`, `verify`, `lookup`. Any other value is
+- **C-027** It takes exactly three actions, selected by `--action`: `coverage`, `verify`, `lookup`. Any other value is
   an input error (exit 2). No action runs checks belonging to another action.
-- **HC-03** Common argument: `--repo <path>` (default: the repository root resolved from the script's own location by
+- **C-028** Common argument: `--repo <path>` (default: the repository root resolved from the script's own location by
   walking up to the directory that contains `scripts/python/`, never by matching a bare `.specify` component).
   `--format text|json` and `--json-out <path>` are available on all three actions.
-- **HC-04** **`--action coverage`** recomputes the candidate set on the tree and prints, per candidate: the unit path,
+- **C-029** **`--action coverage`** recomputes the candidate set on the tree and prints, per candidate: the unit path,
   its disposition (in-scope / excluded-with-reason / unclassified), and — for an in-scope unit — the completeness state
   with the facts it is judged on. It is deterministic: two consecutive runs on one tree print byte-identical output.
-- **HC-05** Candidate screen: a unit carrier is one of `templates/commands/*.md`, `skills/{external,internal}/*/SKILL.md`,
+- **C-030** Candidate screen: a unit carrier is one of `templates/commands/*.md`, `skills/{external,internal}/*/SKILL.md`,
   `shared/workflow/*.md`. A carrier enters the candidate set when its text contains a reference to a framework-internal
   deterministic engine — a token of the form `scripts/python/<name>.py` or `skills/<layer>/<name>/scripts/<file>`.
   `shared/definitions/*.md` is not a unit and gets no disposition. The screen is a text test on purpose; its
   conservative side is accepted and retired by an exclusion row, never by a second "does it really call it" judgement.
-- **HC-06** Disposition derivation order is fixed: a declaration naming the unit's carrier path (in `consumers` or
+- **C-031** Disposition derivation order is fixed: a declaration naming the unit's carrier path (in `consumers` or
   `former_carriers`) ⇒ in-scope; else an exclusion row naming the unit ⇒ that reason; else `[[STR-013]]`. A unit named by
   both a declaration and an exclusion row is reported as a finding, never resolved by precedence of file order.
-- **HC-07** **`--action verify`** judges declaration completeness only: subset conformance, required keys, duplicate
+- **C-032** **`--action verify`** judges declaration completeness only: subset conformance, required keys, duplicate
   declarations, exclusion-row shape and anchor resolvability, coverage of the candidate set, both-direction consistency
   between declarations and carriers, and residual literals via the reused `duplicate-fact` reading. It MUST NOT re-judge
   any criterion already owned by `validate-requirements.py`, `validate-tasks.py`, `gate-check.py`, `flow-class-check.py`
   or `doc-consistency-check.py`.
-- **HC-08** Both-direction consistency (part of `verify` and of the coverage reading): every path in a fact's
+- **C-033** Both-direction consistency (part of `verify` and of the coverage reading): every path in a fact's
   `consumers` is actually referenced by that fact's carrier or engine side, and every carrier that references the fact
   is named in `consumers`. The two directions are counted separately so a one-sided green cannot pass.
-- **HC-09** **`--action lookup`** answers one question without reading raw declarations: `--unit-id <carrier path>`
+- **C-034** **`--action lookup`** answers one question without reading raw declarations: `--unit-id <carrier path>`
   prints that unit's disposition plus the slugs and kinds of the facts it is judged on; `--fact <slug>` prints that
   fact's declaration summary (kind, consumers, former carriers, completeness verdict). Exactly one of the two selectors
   is required; both or neither is an input error.
-- **HC-10** Findings are the closed six of `requirements.md` FR-017, each emitted **verbatim from its template** after
+- **C-035** Findings are the closed six of `requirements.md` FR-017, each emitted **verbatim from its template** after
   placeholder substitution; the instance form (separator characters, argument grammar) is owned by that file's § Shared
   Strings and MUST NOT be re-spelled here or in a consumer.
-- **HC-11** Exit codes: `0` no finding; `1` at least one finding; `2` input error or degraded wiring. A finding is never
+- **C-036** Exit codes: `0` no finding; `1` at least one finding; `2` input error or degraded wiring. A finding is never
   downgraded to a note and never batched into a single "N problems" line.
-- **HC-12** Degraded wiring: when the declaration layer is absent from the tree under judgement (the legacy client
+- **C-037** Degraded wiring: when the declaration layer is absent from the tree under judgement (the legacy client
   project case), the engine prints an explicit exit-2 input-error label naming the missing directory and MUST NOT raise,
   MUST NOT print a traceback, and MUST NOT exit 0.
-- **HC-13** No model judgement, no network, no subprocess, no environment-dependent branch: the same tree and the same
+- **C-038** No model judgement, no network, no subprocess, no environment-dependent branch: the same tree and the same
   declaration set always produce the same verdict. Time, hostname, user and locale MUST NOT appear in the output.
-- **HC-14** The engine never writes into the tree it judges, and never rewrites a declaration. A run leaves the tree
+- **C-039** The engine never writes into the tree it judges, and never rewrites a declaration. A run leaves the tree
   byte-identical (checked by comparing a git-status reading before and after in the test module).
-- **HC-15** Call sites are exactly two — the gate host's opt-in delegation and the contract test (`data-model.md`
+- **C-040** Call sites are exactly two — the gate host's opt-in delegation and the contract test (`data-model.md`
   § E-10). No new stage, no new driver phase, no scheduled job.
-- **HC-16** Every finding has a negative fixture that asserts exit code plus the verbatim instance, and every action has
+- **C-041** Every finding has a negative fixture that asserts exit code plus the verbatim instance, and every action has
   at least one positive fixture asserting exit 0 with zero findings. A fixture without its expected pair is not a
   fixture.
 

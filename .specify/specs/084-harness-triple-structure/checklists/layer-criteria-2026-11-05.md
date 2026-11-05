@@ -69,7 +69,7 @@
 
 - [ ] CHK036 - 被复用的 `duplicate` 面的**调用面**是否被固定在需求里，使「零命中」在两位复核者手里是同一个读数——实测同一棵树上只给 `--spec-dir` 得「扫 14 个文件、0 条 finding」，再加 `--path` + `--owner-path` 得「扫 15 个文件、2 条 finding」（2026-11-05 读数，命令见证据文件 § 4(f)）？[Clarity, Measurability, Req §FR-007(b), Req §FR-010]
 - [ ] CHK037 - 需求编号命名空间是否在 FR-019 闭合——下游 `tasks.md` 有两处引用 `FR-023`，而本规格只定义到 FR-019：这是规格缺了一组需求，还是引用越界？[Traceability, Gap, Req §Requirements]
-- [ ] CHK038 - 「`scripts/` 与 `skills/` 下只允许一个子集解析器、两个既有解析器在白名单内」这条边界守卫是否可追溯到某条 FR（今天只出现在 plan 契约 SR-07），使它在需求层也有验收面？[Traceability, Gap, Req §FR-009, Req §FR-019]
+- [ ] CHK038 - 「`scripts/` 与 `skills/` 下只允许一个子集解析器、两个既有解析器在白名单内」这条边界守卫是否可追溯到某条 FR（今天只出现在 plan 契约 C-058），使它在需求层也有验收面？[Traceability, Gap, Req §FR-009, Req §FR-019]
 
 ## Notes
 

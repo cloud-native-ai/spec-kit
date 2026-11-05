@@ -103,7 +103,7 @@ instances; `lookup` prints one unit's or one fact's summary.
 
 ## S6 — Migrating one batch-1 fact, end to end（Route (b)）
 
-Worked on `feedback-prompt-threshold`, the smallest row of `contracts/migration-batches.contract.md` MB-01.
+Worked on `feedback-prompt-threshold`, the smallest row of `contracts/migration-batches.contract.md` C-042.
 
 1. **Read today's two faces** before touching anything:
    `grep -n "DEFAULT_THRESHOLD" scripts/python/feedback-utils.py` and
@@ -111,7 +111,7 @@ Worked on `feedback-prompt-threshold`, the smallest row of `contracts/migration-
    this branch and move with any edit.
 2. **Write the declaration** `shared/declarations/facts/feedback-prompt-threshold.yaml` — kind `threshold`,
    `consumers: [scripts/python/feedback-utils.py, shared/workflow/feedback-step.md]`,
-   `former_carriers: [shared/workflow/feedback-step.md]`. Premise: the file passes the subset (schema DS-08).
+   `former_carriers: [shared/workflow/feedback-step.md]`. Premise: the file passes the subset (schema C-008).
 3. **Delete the engine's inline constant and read through the shared entry** — premise: `import declaration_reader`
    resolves because the script's own directory is `sys.path[0]` under `python3 scripts/python/<name>.py`.
 4. **Turn the carrier's literal into a pointer** — premise: the reused `duplicate-fact` reading, run as

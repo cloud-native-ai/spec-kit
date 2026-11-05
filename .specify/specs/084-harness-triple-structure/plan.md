@@ -54,21 +54,21 @@ document order, no annotation on any principle heading):
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every clause in `contracts/` cites the FR it implements; `feature-ref.md` maps Feature 084's six key changes onto contracts; no design element lacks an FR (the two list deliverables are the spec's A9/FR-011). |
 | II | Feature-Centric Development | ✅ Pass | Bound Feature 084 already carries the index row; this plan advances `Draft → Planned` only (`feature-ref.md` § Status movement) and leaves Feature 081 at `Completed`. |
 | III | Intent-Driven Development | ✅ Pass | The layer's intent is written once, as chapter names of the owner document (`## Document Structure` § Chapter Tree), not restated per contract; each contract addresses one question. |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | Every contract clause names the fixture or test that proves it (`contracts/harness-triple-check.contract.md` HC-16, `contracts/declaration-schema.contract.md` § Verification); six negative fixtures and one positive per action are declared before implementation. |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | Every contract clause names the fixture or test that proves it (`contracts/harness-triple-check.contract.md` C-041, `contracts/declaration-schema.contract.md` § Verification); six negative fixtures and one positive per action are declared before implementation. |
 | V | AI Agent Integration Standards | ✅ Pass | No agent roster, tier, or config is touched: `AGENT_CONFIG` / `_ASSISTANT_TIERS` unchanged; per-tool copies untouched (the command templates are not edited). |
 | VI | Continuous Quality & Observability | ✅ Pass | Verdicts are produced by program output, not prose (SC-003's rule); the one known-bad environment fact is recorded as `EP-002` with a decision instead of being waived; no `.bak`/`.orig` copies are part of the design. |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | `Draft → Planned` is the ceiling here; no status regression; the two `Planned` preconditions named in `features/084.md` are landed (`contracts/migration-batches.contract.md`, `contracts/distribution-and-mirror.contract.md`); decomposition gate read at plan entry. |
-| VIII | Code as the Single Source of Truth | ✅ Pass | The migration's authority order is code > generated > authored (`contracts/migration-batches.contract.md` MB-06); every "today" claim rests on a file:line reading (`research.md` § R5), not on a document's word. |
-| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | No configuration system, no evaluation engine, no scheduler, no second gate (Non-Goals N1/N2 map to `contracts/declaration-schema.contract.md` DS-08 and `contracts/harness-triple-check.contract.md` HC-15); the engine is a read-only script with three actions. |
-| X | Documentation Naming & Location Conventions | ✅ Pass | New documents are lowercase kebab-case at semantic paths (`shared/definitions/harness-triple-definitions.md`); no reserved ALL-CAPS name is used; the `docs/` entry is a pointer page (DM-13). |
+| VIII | Code as the Single Source of Truth | ✅ Pass | The migration's authority order is code > generated > authored (`contracts/migration-batches.contract.md` C-047); every "today" claim rests on a file:line reading (`research.md` § R5), not on a document's word. |
+| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | No configuration system, no evaluation engine, no scheduler, no second gate (Non-Goals N1/N2 map to `contracts/declaration-schema.contract.md` C-008 and `contracts/harness-triple-check.contract.md` C-040); the engine is a read-only script with three actions. |
+| X | Documentation Naming & Location Conventions | ✅ Pass | New documents are lowercase kebab-case at semantic paths (`shared/definitions/harness-triple-definitions.md`); no reserved ALL-CAPS name is used; the `docs/` entry is a pointer page (C-025). |
 | XI | Dogfooding (Self-Application) | ✅ Pass | Two Hats honoured: every change lands in framework sources and reaches `.specify/` only through `sync-mirrors.py` (`## Mirror Obligations`); the gate host's docstring is corrected with its code, so documentation and mechanism do not diverge (Mechanism Fix, not instance patch). |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | Reuses `sync-mirrors.py`, `doc-consistency-check.py` (duplicate face), `specify init`, `run-tests.sh`; ten Tool records exist and none covers "judge a declaration layer", so writing the two scripts is the expected outcome rather than a shortcut. |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | The feature strengthens Change Validation (machine verdicts over prose) and Learning Capture (record schemas in batch 3) and says so instead of inventing categories; A7 applies the same rule to `better-harness.md` itself (seven-state enumeration migrates, five-dimension table stays). |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | `contract.yaml` is the single owner of value domains (E-3, R-5); markdown owners keep criteria and gain pointers (FR-018); the only duplicates are the generated mirror and dated readings in `research.md`/`test-evidence/`. |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | The six reason templates name the unit, path, or fact the reader must act on (`requirements.md` § Shared Strings form rule), so a failure line is actionable without opening the plan; plan artifacts carry context and reach everything else by path. |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | One mid-plan discovery is recorded rather than patched: `EP-002` is `falsified` with `resolve-in-scope`, and the gate host's closed four-name finding set is preserved by making the delegation opt-in (D8) instead of editing an 081 assertion. |
-| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `shared/declarations/` and its two subdirectories are registered in `shared/definitions/framework-map.md` in the same change (DS-11, DM-11); names are kebab-case; the plan's own scratch used `.specify/.tmp/` and was deleted. |
-| XVIII | Grounded Naming | ✅ Pass | Names imitate the closest siblings (Grounded Naming order 3): `harness-triple-check.py` ← `closure-acceptance-check.py`, `declaration_reader.py` ← `clause_extract.py` (the importable-module precedent); fact slugs are grounded names, not a new numbering namespace (DS-03). |
+| XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | `shared/declarations/` and its two subdirectories are registered in `shared/definitions/framework-map.md` in the same change (C-011, C-023); names are kebab-case; the plan's own scratch used `.specify/.tmp/` and was deleted. |
+| XVIII | Grounded Naming | ✅ Pass | Names imitate the closest siblings (Grounded Naming order 3): `harness-triple-check.py` ← `closure-acceptance-check.py`, `declaration_reader.py` ← `clause_extract.py` (the importable-module precedent); fact slugs are grounded names, not a new numbering namespace (C-003). |
 
 **Gates Status**: ✅ All eighteen principles pass; no violation needs a Complexity Tracking row. The two items that could
 have read as violations are resolved inside the design instead: the gate host's stated self-containment (delegation is
@@ -77,7 +77,7 @@ decision, `EP-002`).
 
 **Re-check after Phase 1**: 2026-11-05. Re-read against the landed design artifacts rather than the intent, three rows
 changed their evidence and none changed its verdict — IV points at the fixture roster in `data-model.md` § Fixture set;
-XIV points at `contracts/declaration-schema.contract.md` DS-02 (the contract is not a second copy); XVIII points at the
+XIV points at `contracts/declaration-schema.contract.md` C-002 (the contract is not a second copy); XVIII points at the
 naming note in `contracts/shared-reader.contract.md`. No row regressed to Partial, so Complexity Tracking stays `N/A`.
 
 ## Decision Tensions
@@ -96,7 +96,7 @@ identifier `T-NNN`. Each of the four records below runs `expected_sacrifice` aga
   - pole_a: 一条事实在仓库内只允许存在一份取值，改一处必须让所有面同时生效（否则特性要消灭的漂移仍在）。
   - pole_b: 引擎拿到的取值必须在提交前就可静态检查，坏声明不能等到运行期才暴露。
 - **discriminating_evidence**: 在一棵只有声明层的树上改一个取值，不跑任何构建步骤，直接运行消费引擎与 checker；结果二值：读到新值 / 仍读到旧值。
-- **expected_sacrifice**: SC-001 Source ↓ 每次 coverage／verify 都要现解析声明（DS-12 禁止缓存文件），单次运行耗时随声明条数线性上升，该次运行记录的耗时读数会高于生成方案。
+- **expected_sacrifice**: SC-001 Source ↓ 每次 coverage／verify 都要现解析声明（C-012 禁止缓存文件），单次运行耗时随声明条数线性上升，该次运行记录的耗时读数会高于生成方案。
 - **revision_trigger**: coverage 在候选集上的单次运行耗时连续两次超过 5 秒，或出现「声明已改、引擎仍读旧值」的实测漂移 ≥1 次 → 重开，改为构建期生成 + 声明为源的过渡形态。
 
 ### T-002 — 单元处置由声明反投影派生，不建聚合台账
@@ -268,7 +268,7 @@ would poison the join key this table exists to protect.
 
 **Readings**: 0 extracted records, 0 disposition rows needed, 1 dependency declared with its artifacts named. The
 constraint 081 imposes is carried as a **design obligation**, not as an undisposed row: `contracts/migration-batches.contract.md`
-MB-01 row 9 (the `Path` value set) plus the zero-diff reading on 081's two acceptance files (`EP-003`, `EP-005`), which
+C-042 row 9 (the `Path` value set) plus the zero-diff reading on 081's two acceptance files (`EP-003`, `EP-005`), which
 the closure verdict re-reads.
 
 ## Document Structure
@@ -314,7 +314,7 @@ having followed this feature's planning run.
 | 候选屏幕今天覆盖 27 个命令模板、53 个 SKILL.md、19 个工作流文档，且 `shared/definitions/*.md` 不是单元 | 实测 | 2026-11-05 | `test-evidence/plan-readings.txt` § R7 |
 | PATH 上的控制台入口分发安装态快照（55 个 md），源检出路由分发工作树（62 个 md，含五个子目录） | 实测 | 2026-11-05 | `test-evidence/plan-readings.txt` § R5/R6；`test-evidence/specify-init-source-route.txt` |
 | 写入 `shared/` 的新子目录会随既有递归拷贝到达客户项目，无需新资产清单代码 | 实测 | 2026-11-05 | `research.md` § R2 |
-| 五个冻结门禁脚本的既有测试文件集合为 39 个文件，其中两个 081 验收文件分别收集 40 / 37 个用例 | 实测 | 2026-11-05 | `test-evidence/plan-readings.txt` § R10/R11 |
+| SC-006 的「零 diff 侧」五脚本（`validate-requirements`、`validate-tasks`、`gate-check`、`flow-class-check`、`closure-acceptance-check`）被 **38** 个测试文件引用；其中两个 081 验收文件分别收集 40 / 37 个用例 | 实测 | 2026-11-05 | `test-evidence/f07-test-file-readings.txt` § A/§ D（逐字命令 + 38 个文件名）、§ E（081 的收集数读自 `test-evidence/plan-readings.txt` § R11） |
 | 复制到客户项目时源形式路径会被重写为 `.specify/` 形式，故声明路径必须两形式可解析 | 实测 | 2026-11-05 | `research.md` § R3（`rewrite_paths()` 与 `copy_tree_with_rewrite()` 的实际行为） |
 | 表达类与执行类对本章节的产出义务不同：表达类必产、执行类不被要求 | 引用 | 2026-11-05 | `templates/plan-template.md` § Document Structure（判据 owner 为 `scripts/python/doc-consistency-check.py` 的常量集） |
 
@@ -343,20 +343,20 @@ owner becomes its declaration file `shared/declarations/facts/<fact-slug>.yaml`,
 Each decision names the artifact that owns its detail; nothing here is a second definition.
 
 - **D1 — Layer layout**: `shared/declarations/` holds exactly `contract.yaml`, `facts/`, `exclusions/`
-  (`contracts/declaration-schema.contract.md` DS-01). Reason: path-is-identity kills the second numbering namespace and
+  (`contracts/declaration-schema.contract.md` C-001). Reason: path-is-identity kills the second numbering namespace and
   gives the dual-writer property for free.
 - **D2 — `contract.yaml` scope**: it owns schema id, subset id, five kinds, two completeness states, three exclusion
   reasons, three exit codes, required key sets and the gate-call-site roster (E-3). Reason: the contract that carries a
   closed set MUST NOT become a second copy of it, so every other document points here.
 - **D3 — One parser**: `scripts/python/declaration_reader.py`, importable because every consumer is invoked as
   `python3 scripts/python/<name>.py` (so `sys.path[0]` is that directory) — sibling precedent `clause_extract.py`
-  (`contracts/shared-reader.contract.md` SR-01…SR-08).
+  (`contracts/shared-reader.contract.md` C-052…C-059).
 - **D4 — Engine surface**: one file, three actions (`coverage` / `verify` / `lookup`), `--repo`, `--format`,
-  `--json-out`; `lookup` takes `--unit-id` or `--fact` (`contracts/harness-triple-check.contract.md` HC-01…HC-09).
+  `--json-out`; `lookup` takes `--unit-id` or `--fact` (`contracts/harness-triple-check.contract.md` C-026…C-034).
   Reason: FR-016 fixes the three actions; the `--fact` selector is what lets a consumer ask for one value without
   reading raw declarations.
 - **D5 — Candidate screen S**: recomputed by text over three carrier surfaces, `shared/definitions/*.md` excluded
-  (HC-05). Reason: a list would be a third roster competing with two existing ones; a text test's conservative side is
+  (C-030). Reason: a list would be a third roster competing with two existing ones; a text test's conservative side is
   retired by an exclusion row.
 - **D6 — Disposition and completeness**: reverse projection in a fixed order, three states, and a **textual** definition
   of "locatable read point" (`data-model.md` E-5/E-6, R-6). Reason: the false-green failure this feature exists to
@@ -370,12 +370,19 @@ Each decision names the artifact that owns its detail; nothing here is a second 
   turning the delegation on by default would make an 081 assertion go red, which FR-018 forbids. The host's docstring is
   corrected in the same change (T-003 records the trade-off).
 - **D9 — Three batches, each independently acceptable**, with the first roster named in
-  `contracts/migration-batches.contract.md` MB-01…MB-10. The `Path` value set (081's surface) is batch-1 row 9 with a
+  `contracts/migration-batches.contract.md` C-042…C-051. The `Path` value set (081's surface) is batch-1 row 9 with a
   zero-diff obligation.
 - **D10 — Test surface**: `tests/contract/test_harness_triple_structure.py` plus
   `tests/fixtures/harness-triple-structure/` (one directory per feature, one fixture per reason plus positives,
-  `data-model.md` § Fixture set). Zero-new-failure selection basis: the 39 test files that reference the five frozen gate
-  scripts (`EP-005`, `research.md` § R7) — a rule, not a snapshot list.
+  `data-model.md` § Fixture set). Zero-new-failure selection basis: the test files that reference the five frozen gate
+  scripts — named once here, measured today at **38** files — `validate-requirements`, `validate-tasks`, `gate-check`,
+  `flow-class-check`, `closure-acceptance-check` (this is SC-006's zero-diff side; the reading, its verbatim command and
+  the 38 file names are `test-evidence/f07-test-file-readings.txt` § A). It is a rule, not a snapshot list: implement
+  start re-measures it and compares as a name-level set difference. **Two older numbers are recorded with their
+  provenance, never reused**: `35` is the same command over the five-name set as it read at analyze time
+  (`doc-consistency-check` in place of `closure-acceptance-check`, `f07-test-file-readings.txt` § B), and `39` — the
+  figure this plan carried before the repair — is the **six**-name union of the two sets (§ C), which is why no
+  five-name set ever reproduced it.
 - **D11 — Distribution rides the existing copy**; no `src/` change is expected, and the reading is taken on the source
   route (`EP-002` records why). The asset roster and upgrade actions are
   `contracts/distribution-and-mirror.contract.md` § A.
@@ -408,7 +415,7 @@ Backfilled after the artifacts landed (never pre-written).
 | Artifact | Path | Count / Scope |
 |----------|------|---------------|
 | Data model | `data-model.md` | 10 entities (E-1…E-10) + 6 fixture families |
-| Contracts | `contracts/` | 5 files: `declaration-schema` (DS-01…DS-12), `harness-triple-check` (HC-01…HC-16), `shared-reader` (SR-01…SR-08), `migration-batches` (MB-01…MB-10), `distribution-and-mirror` (DM-01…DM-13) |
+| Contracts | `contracts/` | 5 files: `declaration-schema` (C-001…C-012), `harness-triple-check` (C-026…C-041), `shared-reader` (C-052…C-059), `migration-batches` (C-042…C-051), `distribution-and-mirror` (C-013…C-025) |
 | Quickstart | `quickstart.md` | 8 scenarios (S1…S8): 4 executed with pasted output, 4 route (b) with per-example premises |
 | Research | `research.md` | 10 sections (R1…R10) |
 | Feature reference | `feature-ref.md` | bound Feature 084; status movement `Draft → Planned`; the two `Planned` preconditions |

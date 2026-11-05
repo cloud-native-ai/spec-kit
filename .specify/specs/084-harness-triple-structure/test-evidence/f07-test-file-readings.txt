@@ -1,0 +1,128 @@
+# F-07 — the zero-new-failure test-file reading, re-measured with the names spelled out
+#
+# Why this file exists: `plan-readings.txt` § R10 recorded the command with its membership elided
+# (`grep -rlE "<five script names>" tests/ --include="*.py"`) and the value 39. No five-name set
+# reproduces 39, so the reading was not reproducible (analyze finding F-07, MEDIUM). This file
+# records the command verbatim and the three readings that follow from three different name sets,
+# so the number can be re-derived instead of inherited.
+#
+# Repo state: branch 084-harness-triple-structure, read at the plan-repair run on 2026-11-05.
+# Working directory for every command: the repository root.
+#
+# The rule the number serves (unchanged by this repair): the selection basis is
+# "the test files that reference the five frozen gate scripts", re-measured at implement start and
+# compared as a NAME-LEVEL set difference against an id-level baseline — not a snapshot list.
+
+## A — SC-006's five (the "zero diff" side): 38 test files
+
+$ grep -rlE --include=*.py "validate-requirements|validate-tasks|gate-check|flow-class-check|closure-acceptance-check" tests/ | sort | wc -l
+38
+
+  tests/contract/test_acceptance_premises.py
+  tests/contract/test_acceptance_review_composition.py
+  tests/contract/test_checker_form.py
+  tests/contract/test_clarify_semantic_completeness.py
+  tests/contract/test_clause_coverage.py
+  tests/contract/test_closure_acceptance_check.py
+  tests/contract/test_coaching_wiring_contract.py
+  tests/contract/test_delegation_classes.py
+  tests/contract/test_doc_consistency_checker.py
+  tests/contract/test_document_structure_gate.py
+  tests/contract/test_expression_compatibility.py
+  tests/contract/test_expression_faces.py
+  tests/contract/test_expression_gates_doc.py
+  tests/contract/test_expression_gate_wiring.py
+  tests/contract/test_flow_class_correctness.py
+  tests/contract/test_flow_class_ledger.py
+  tests/contract/test_flow_class_spec_declaration.py
+  tests/contract/test_gate_wiring_081.py
+  tests/contract/test_green_point_claim.py
+  tests/contract/test_isomorphism_map.py
+  tests/contract/test_ledger_reconciliation.py
+  tests/contract/test_measurement_instruments.py
+  tests/contract/test_migration_distribution.py
+  tests/contract/test_mirror_root_guard.py
+  tests/contract/test_neutrality_budget.py
+  tests/contract/test_objective_analysis_gate.py
+  tests/contract/test_probe_nonentity_catalog.py
+  tests/contract/test_requirements_checker.py
+  tests/contract/test_review_feedback_boundary.py
+  tests/contract/test_sdd_compat_containment.py
+  tests/contract/test_stage_class_wiring.py
+  tests/contract/test_validate_tasks_parallel_safety.py
+  tests/integration/test_acceptance_smoke.py
+  tests/integration/test_expression_line_pilot.py
+  tests/unit/test_flow_class_check.py
+  tests/unit/test_flow_class_spec_key.py
+  tests/unit/test_isomorphism_checker.py
+  tests/unit/test_reconciler_extensions.py
+
+## B — the pre-repair FR-010 five (the "must not re-judge" side as it read at analyze time): 35 files
+
+$ grep -rlE --include=*.py "validate-requirements|validate-tasks|gate-check|flow-class-check|doc-consistency-check" tests/ | sort | wc -l
+35
+
+  tests/contract/test_checker_form.py
+  tests/contract/test_clarify_semantic_completeness.py
+  tests/contract/test_clause_coverage.py
+  tests/contract/test_coaching_wiring_contract.py
+  tests/contract/test_delegation_classes.py
+  tests/contract/test_doc_consistency_checker.py
+  tests/contract/test_document_structure_gate.py
+  tests/contract/test_expression_compatibility.py
+  tests/contract/test_expression_faces.py
+  tests/contract/test_expression_gates_doc.py
+  tests/contract/test_expression_gate_wiring.py
+  tests/contract/test_flow_class_correctness.py
+  tests/contract/test_flow_class_ledger.py
+  tests/contract/test_flow_class_spec_declaration.py
+  tests/contract/test_gate_wiring_081.py
+  tests/contract/test_green_point_claim.py
+  tests/contract/test_isomorphism_map.py
+  tests/contract/test_ledger_reconciliation.py
+  tests/contract/test_measurement_instruments.py
+  tests/contract/test_migration_distribution.py
+  tests/contract/test_mirror_root_guard.py
+  tests/contract/test_neutrality_budget.py
+  tests/contract/test_objective_analysis_gate.py
+  tests/contract/test_probe_nonentity_catalog.py
+  tests/contract/test_requirements_checker.py
+  tests/contract/test_review_feedback_boundary.py
+  tests/contract/test_sdd_compat_containment.py
+  tests/contract/test_stage_class_wiring.py
+  tests/contract/test_validate_tasks_parallel_safety.py
+  tests/integration/test_expression_line_pilot.py
+  tests/unit/test_doc_consistency_rules.py
+  tests/unit/test_flow_class_check.py
+  tests/unit/test_flow_class_spec_key.py
+  tests/unit/test_isomorphism_checker.py
+  tests/unit/test_reconciler_extensions.py
+
+## C — the six-name union: 39 files
+
+$ grep -rlE --include=*.py "validate-requirements|validate-tasks|gate-check|flow-class-check|closure-acceptance-check|doc-consistency-check" tests/ | sort | wc -l
+39
+
+  The 39-name list is A ∪ B: A (38) plus `tests/unit/test_doc_consistency_rules.py`, which reaches
+  `doc-consistency-check` but not the five script names of A.
+
+## D — how the three numbers relate (the arithmetic, so it is checkable)
+
+- A (38) = B (35) + 4 - 1: A adds `tests/contract/test_acceptance_premises.py`,
+  `tests/contract/test_acceptance_review_composition.py`, `tests/contract/test_closure_acceptance_check.py`
+  and `tests/integration/test_acceptance_smoke.py` (the four files that reach `closure-acceptance-check`),
+  and drops `tests/unit/test_doc_consistency_rules.py` (the one file that reaches `doc-consistency-check`
+  and nothing else).
+- C (39) = A ∪ B.
+- The plan stage's recorded `39` was therefore the six-name union, while the sentence around it said
+  "the five frozen gate scripts": the number and its stated membership disagreed. `38` is the reading of
+  the five-name set the requirements settled on (SC-006's zero-diff side, FR-010's (二) set), and it is
+  the reading this plan uses.
+
+## E — what does NOT change
+
+The selection *rule* is untouched: reference the five names above, re-measure at implement start, and
+compare as an id-level difference against the baseline captured there (T001 of `tasks.md`); two of the
+38 are 081's acceptance files whose collect counts are pinned separately (40 and 37,
+`plan-readings.txt` § R11). No snapshot list is frozen by this repair, and neither `research.md` § R7
+nor `plan.md` § D10/§ Evidence List now claims a count without its membership.

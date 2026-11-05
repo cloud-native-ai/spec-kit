@@ -359,3 +359,90 @@ E-01（`coverage-baseline.txt` 冻结 → tasks）、F-09（任务行 tag → ta
 
 **本轮未修改 plan-owned 产物、未修改 `tasks.md`、未勾选任何任务行、未改 Feature 注册表、未新增 FR/SC 编号；
 F-01 的 CRITICAL 修复是文本级「一次枚举 + 指针」，不是新增机制。**
+
+
+## plan 修复（2026-11-05，analyze 回环 round 1）
+
+```yaml
+stage: plan
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/contracts/declaration-schema.contract.md
+  - .specify/specs/084-harness-triple-structure/contracts/distribution-and-mirror.contract.md
+  - .specify/specs/084-harness-triple-structure/contracts/harness-triple-check.contract.md
+  - .specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md
+  - .specify/specs/084-harness-triple-structure/contracts/shared-reader.contract.md
+  - .specify/specs/084-harness-triple-structure/plan.md
+  - .specify/specs/084-harness-triple-structure/research.md
+  - .specify/specs/084-harness-triple-structure/feature-ref.md
+  - .specify/specs/084-harness-triple-structure/quickstart.md
+  - .specify/specs/084-harness-triple-structure/requirements.md
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/specs/084-harness-triple-structure/checklists/layer-criteria-2026-11-05.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/clause-extract-5-contracts.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/f07-test-file-readings.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/pre-analyze-plan-repair.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/decomposition-plan-repair.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/validate-decision-tensions-repair.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/validate-requirements-repair.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/clause-extract-5-contracts.txt
+base_commit: fd84ed63
+```
+
+## Why `not-run-docs-only`（plan 修复）
+
+本轮是 analyze 门对 F-02 的**显式 substantive reopen**（驱动者授权），改动面只有五份契约、六份 plan 阶段文本与
+五份证据文件：没有一行落在 `tests/`、`scripts/`、`skills/**/scripts/`、`src/` 或夹具。因此 `targeted-set-v1` 的输入
+全部落在 `test_roots` 之外，按判据 owner `.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` **TB-06**
+记 `not-run-docs-only`。
+
+## 逐条处置（只处置 plan-owned findings）
+
+| Finding | 原严重度 | 处置 | 落点 |
+|---|---|---|---|
+| F-02 | HIGH | **条款 id 重编号为规范形态 `md-bold-closed`**：59 条按文件与出现顺序确定性映射为 `C-001…C-059`（表见下节），所有规范性引用同步；`distribution-and-mirror` 的 `**DM-01 Asset roster**` 式「标签在粗体内」写法改为 `**C-013** Asset roster`，使每条标记都是 `**C-NNN**`。语义零改动 | 五份 `contracts/*.contract.md`、`plan.md`、`research.md`（引用侧）、`feature-ref.md`、`quickstart.md`、`requirements.md`、`tasks.md`、`checklists/layer-criteria-2026-11-05.md` |
+| F-07 | MEDIUM | **读数可复现化**：把「五个冻结门禁脚本」逐字写进 `plan.md` D10 与 § Evidence List，读数取 SC-006 零 diff 侧五个 ⇒ **38** 个测试文件；另两个读数连来源一起记录——35 = 同一条命令在 analyze 时的五名集（`doc-consistency-check` 顶替 `closure-acceptance-check`），39 = 六名并集（正是修复前 `plan.md` 所写的数）。逐字命令、三个名单清单与三者算术落新证据文件；`research.md` § R7 同步订正并注明 `plan-readings.txt` § R10 是日期化读数、不回改 | `plan.md` § D10 + § Evidence List、`research.md` § R7、`test-evidence/f07-test-file-readings.txt` |
+| C-01 | MEDIUM | **批 2／批 3 逐行补 engine side**：`C-044`／`C-045` 改为与 `C-042` 同形的两列表格（engine side ｜ carrier side），一行一事实；有引擎侧的写常量名或读取点（`flow-class-check.py` 的 `FACES_EXPECTED`／表头 `required`、`closure-acceptance-check.py` 的 `final_path_counts()`／`verdict`、`loop-state.py` 的 `STAGE_ARTIFACTS`／`sentinel_literal()`、`memory-utils.py` 的 `SCOPES`、`record-retention.py` 的 `DEFAULT_GRACE_DAYS`／`STORES`、`history-utils.py` 的 manifest 读写、`probe-utils.py` 的字段元组、`exec-quant.py`／`trigger-utils.py` 的 schema 常量），确无引擎侧的写 `none` 并给实测理由。批次划分与验收规则未动 | `contracts/migration-batches.contract.md` C-044／C-045 |
+
+### F-02 的确定性映射（按文件与出现顺序）
+
+| 契约文件 | 旧 id | 新 id | 条款数 |
+|---|---|---|---|
+| `declaration-schema.contract.md` | `DS-01…DS-12` | `C-001…C-012` | 12 |
+| `distribution-and-mirror.contract.md` | `DM-01…DM-13` | `C-013…C-025` | 13 |
+| `harness-triple-check.contract.md` | `HC-01…HC-16` | `C-026…C-041` | 16 |
+| `migration-batches.contract.md` | `MB-01…MB-10` | `C-042…C-051` | 10 |
+| `shared-reader.contract.md` | `SR-01…SR-08` | `C-052…C-059` | 8 |
+| **合计** | — | `C-001…C-059` | **59** |
+
+`migration-batches.contract.md` 的章节标题 `## MB-01 — Batch 1: …` 改为 `## Batch 1 — …`：标题若带条款 id，同一份
+契约内该 id 会出现两次（章节 + 条款行），违反语法 owner § 1 的「id 在同一份契约内 MUST 唯一」。`feature-ref.md` 里
+指向该章节的 `§ MB-01` 随之改为指向条款 `C-042`（批 1 名单即该条款）。
+
+## 本轮不处置（非 plan-owned，已在 analyze 报告点名归属）
+
+F-05（`tasks.md`／`checklists/` 的 `FR-023` → tasks）、E-01（`coverage-baseline.txt` 冻结 → tasks）、
+F-09（任务行 tag → tasks）、G-01（特性详情文件的阶段记录 → feature）。三处 `tasks.md` 改动仅限条款 id 的机械替换。
+
+## Bases verified（plan 修复）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 条款形态（五份契约各一次） | `python3 scripts/python/clause_extract.py .specify/specs/084-harness-triple-structure/contracts/*.contract.md` | 五份全 `form=md-bold-closed`；条款数 12／13／16／10／8 = **59**，id 连续 `C-001…C-059`，exit 0（修复前同一命令为五份全 `form=md-none` `clauses=0`） | `test-evidence/clause-extract-5-contracts.txt` |
+| 旧 id 残留扫描 | `grep -rnE "\b(DS\|HC\|SR\|MB\|DM)-[0-9]+\b" contracts/ plan.md data-model.md quickstart.md research.md feature-ref.md requirements.md tasks.md checklists/layer-criteria-2026-11-05.md` | **零命中**（exit 1）。日期化读数 `analyze-report-2026-11-05.md`／`stage-status.md`／`plan-readings.txt`／`tasks-readings.txt` 按派发要求不回改，它们保留当时的 id | 本行即读数 |
+| 前置门（analysis 前） | `python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage plan --repo <repo>` | `decision=fail`、`errors=5`、`advisories=82`。五条 error 全是 `dangling-id`：`FR-023` 在 `tasks.md:62`／`tasks.md:208`／`checklists/layer-criteria-2026-11-05.md:71/79/82`——**与本轮改动无关**：把 `HEAD`（`fd84ed63`）的 spec 目录用 `git archive` 拉到 `.specify/.tmp/084-head-check2/` 后跑同一命令，产出的 **error 集与本轮逐条相同**（同为那 5 条，同路径同行号；对称差里没有任何 `dangling-id` 行），归属 F-05（tasks-owned） | `test-evidence/pre-analyze-plan-repair.txt`；HEAD 对照读数在本行记录，临时目录已回收 |
+| 该门两条 advisory 差的成因（逐条比对，不猜） | 同上两条命令的 findings 做 `(check, path, line, message)` 对称差 | 净差 −3，逐条归因：① `tasks.md:249` 的 `external-clause`（`FF-12`）消失——`summary.clauses` 由 `59` 掉到 `0` 后该检查整体跳过；②③ `requirements.md:146`／`tasks.md:62` 那两条 `missing-path`（spec 目录内的 `notes/pre-change-measurements.md`）消失——**是对照跑法的产物，不是修复的产物**：该检查对 `spec_rel` 前缀下的路径按设计跳过，HEAD 对照用的是临时 spec 目录，其 `spec_rel` 不同故未跳过；另有一条 `missing-path`（`contracts/migration-batches.contract.md`）由第 60 行移到第 82 行，即 C-044／C-045 增表带来的行位移 | 本行即读数 |
+| 该门对本特性条款的覆盖读数 | 同上 JSON 的 `summary.clauses` | `59`（HEAD）→ **`0`**（本轮后）。原因是门宿主 `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` 的 `CLAUSE_DEF = r"^- \*\*([A-Z]{2,4}-\d{2})\b"` 只认 2–4 个字母的前缀，规范形态 `C-001` 的前缀是单字母 `C`，故一条都抽不到。**这是门宿主既有口径对规范形态的覆盖缺口**（081 的 `C-` 形契约同样抽不到），不是本轮引入的失败，也不在本次授权范围内修（门宿主的改动属 T024 的 opt-in 委派行） | 本行即读数（数字取自两个 JSON 的 `summary.clauses`） |
+| 拆解门 | `python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/084-harness-triple-structure/requirements.md` | `decision=proceed`，`fr_count=19` ≤ 30，`reasons=[]`，exit 0 | `test-evidence/decomposition-plan-repair.txt` |
+| 决策张力记录形态 | `python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/084-harness-triple-structure` | `status: ok`，六判项全 `pass (0)`，`scanned: 434 lines, 4 record(s)`，`channel: value_domain=HIGH-or-0, high=0`，exit 0 | `test-evidence/validate-decision-tensions-repair.txt` |
+| 规格自校验 | `python3 scripts/python/validate-requirements.py .specify/specs/084-harness-triple-structure/requirements.md` | `status: ok`，六判项全 `pass (0)`，`scanned: 282 lines, 25 definition rows, 14 shared strings`，exit 0（`requirements.md` 本轮只做 id 机械替换） | `test-evidence/validate-requirements-repair.txt` |
+| 任务清单仍可解析 | `python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md` | `PASS`，`0 error(s), 0 warning(s)`，exit 0（`tasks.md` 本轮只做 id 机械替换，未改任务内容） | 本行即读数 |
+| F-07 读数可复现 | `grep -rlE --include=*.py "<五名>" tests/ \| sort \| wc -l` 与两个对照集 | 38（SC-006 零 diff 侧五名）／35（analyze 时五名）／39（六名并集）；38 的 38 个文件名逐行在证据文件内 | `test-evidence/f07-test-file-readings.txt` |
+| 临时目录已回收 | `rm -rf .specify/.tmp/084-head-check2` | 修复前的 HEAD 对照副本与两份 JSON 读数用完即删，`.specify/.tmp/` 下无残留 | 本行即读数 |
+
+**本轮未改 FR/SC 内容、未改阶段序列、未改门禁判据或退出码、未改批次划分与验收规则、未改 Feature 注册表状态、
+未勾选任何任务行；F-02 是「形态归一 + 引用同步」，不是设计改写。**
+
