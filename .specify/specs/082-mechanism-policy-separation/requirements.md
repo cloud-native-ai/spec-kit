@@ -154,15 +154,27 @@
 - **误置 (Misplacement)**：两层内容落到对侧归档面的状态。两类症状（机制误置、策略误置），见 FR-002(b)。
 - **元层成员表 (Meta-layer Membership)**：按 C1 谓词判定的封闭技能/命令集合 + 排除理由。它是裁定结果，不是新注册表——落点见 C6。
 
+### Runtime Stack & Dependency Ownership（082 自身的运行时栈表）
+
+本特性交付的运行时能力是框架自身的镜像/命令副本再生成（RS-004，`in-scope`）；其余四项由外部供给、本仓只消费，按 FR-009 的判据记 `signed-contract`——它们是 SC-002 的独立复算与 SC-003 的漂移守卫得以执行的运行时前提，不以散文声明替代表行。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | Python 3 解释器（运行契约测试与任何确定性检查） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不新增 pin） | `pyproject.toml` | 本特性新增/改动的守卫测试在 `>=3.8` 解释器上通过，且新增脚本 stdlib-only（静态 import 清单为空） | FR-010, FR-016 | EP-001 |
+| RS-002 | pytest（守卫测试运行器） | signed-contract | pytest 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 原文记录进 test-evidence | `scripts/bash/run-tests.sh` | 基线差集为空（`head 失败集 − 基线失败集`）且新增守卫测试全绿 | FR-010, FR-016 | EP-001 |
+| RS-003 | `git`（SC-003 的逐字节比较与漂移守卫） | signed-contract | git 上游（本仓只消费） | 无声明 pin；执行时以 `git --version` 原文记录进 test-evidence | `scripts/bash/common.sh` | `git diff --stat [[STR-002]]..HEAD -- skills/ templates/commands/` 与逐字节比较可复现；审计前后 `git status --porcelain` 增量为空 | FR-015, FR-016 | EP-001 |
+| RS-004 | 本仓的镜像与命令副本再生成（`sync-mirrors.py` / `regen-command-copies.py`） | in-scope | 本仓 `scripts/python/` | 仓内 commit（同一次提交） | `scripts/python/sync-mirrors.py` | `python3 scripts/python/sync-mirrors.py --check` 与 `python3 scripts/python/regen-command-copies.py --check` 均 exit 0 | FR-016 | EP-001 |
+| RS-005 | 受支持的 agent 宿主（加载并执行元技能流程，用于 SC-002 的检出/误报测量） | signed-contract | 各受支持 agent 工具上游（本仓只消费） | 无声明 pin；执行时以宿主名 + 版本原文记录进 test-evidence | `docs/reference/cli/supported-agent-tools.md` | 同一误置样本在改动前/后各执行一次纳入的元技能流程，检出记录与误报记录原文落 test-evidence；宿主与版本同趟记录 | FR-012, FR-013 | EP-002 |
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**：对给定的 N 条待判定内容（机制/策略混合样本），由**两位独立判定者**仅凭 owner 文档判定，结论一致率达到 100%（分歧即判据不可判定）。**Path**: final
-- **SC-002**：被纳入的元技能（成员表全量）在创建/改进流程中，对「故意误置样本」的检出率为 100%，对「正确分层样本」的误报数为 0。**Path**: final
-- **SC-003**：成员表之外的全部既有技能与全部既有命令模板，其正文相对本特性基线提交 [[STR-002]] **逐字节未变**；比较口径与允许差异集按 `.specify/shared/guidelines/closed-set-claims.md` 的五要件声明（允许差异集按产物类声明并配漂移守卫）。**Path**: final
-- **SC-004**：策略缺失时，零个文件被写到任何路径（副作用前停止）；补齐策略后同一输入产出与改动前逐字节一致。**Path**: final
-- **SC-005**：一个未参与本特性的读者，仅凭 owner 文档能正确回答「这段内容该归哪一层」不少于 owner 文档附录给出的全部样例。**Path**: supporting
+- **SC-001**: 对给定的 N 条待判定内容（机制/策略混合样本），由**两位独立判定者**仅凭 owner 文档判定，结论一致率达到 100%（分歧即判据不可判定）。**Path**: final
+- **SC-002**: 被纳入的元技能（成员表全量）在创建/改进流程中，对「故意误置样本」的检出率为 100%，对「正确分层样本」的误报数为 0。**Path**: final
+- **SC-003**: 成员表之外的全部既有技能与全部既有命令模板，其正文相对本特性基线提交 [[STR-002]] **逐字节未变**；比较口径与允许差异集按 `.specify/shared/guidelines/closed-set-claims.md` 的五要件声明（允许差异集按产物类声明并配漂移守卫）。**Path**: final
+- **SC-004**: 策略缺失时，零个文件被写到任何路径（副作用前停止）；补齐策略后同一输入产出与改动前逐字节一致。**Path**: final
+- **SC-005**: 一个未参与本特性的读者，仅凭 owner 文档能正确回答「这段内容该归哪一层」不少于 owner 文档附录给出的全部样例。**Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
