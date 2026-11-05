@@ -2,9 +2,10 @@
 
 Implements the glossary clauses of
 ``.specify/specs/082-self-explanatory-integration/contracts/glossary-integration.contract.md``
-(C-29, C-30, C-32, C-33) and the enumeration clause of
+(C-29, C-30, C-32, C-33, C-34) and the enumeration clause of
 ``contracts/mirror-distribution.contract.md`` that this module co-owns (C-22 / C-24, claimed
-together with C-26 by T029's distribution module).
+together with C-26 by T029's distribution module). C-20's version of the third-form claim is
+T010's; this module claims only the naming face (C-34).
 
 Why a separate module from ``test_glossary_mechanism.py``
 --------------------------------------------------------
@@ -39,6 +40,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -59,6 +61,15 @@ RETIRED_NAME = "望文生义"
 OWNER_SOURCE = ROOT / "shared" / "definitions" / "self-explanatory-definitions.md"
 # `STR-002` — the framework-source owner path the meaning cell must reach (C-32).
 OWNER_PATH = "shared/definitions/self-explanatory-definitions.md"
+
+# `STR-001` — the identical string in the constitution template, the constitution generator's
+# MUST-include list and the live constitution; and the head of the feature's document titles.
+IDENTIFIER = "Self-Explanatory Structure (不言自明)"
+# The bare Chinese form, in its own parentheses. STR-003 is `不言自明 (Self-explanatory)`, so the
+# relation between the two shared strings is "same concept, bracket languages swapped, head noun
+# kept in one and dropped in the other" — see the docstring of the test that pins it.
+CJK_TERM = "不言自明"
+EN_HEAD_NOUN = "Structure"
 
 # C-22 / C-24: the three documents this feature adds, as engine-derived `source->mirror` pairs.
 REQUIRED_MIRROR_PAIRS = (
@@ -234,12 +245,178 @@ def test_c32_meaning_cell_names_an_existing_repository_relative_path():
 
 def _repo_relative_paths(text: str):
     """Repository-relative file paths written in ``text`` (a path with an extension, no scheme)."""
-    import re
-
     return [
         m.group(0).strip(".,;:")
         for m in re.finditer(r"(?<![\w/.-])(?:[\w.-]+/)+[\w.-]+\.[A-Za-z0-9]+", text)
     ]
+
+
+# --- C-34: term discovery is not a second vocabulary -----------------------------------------
+
+# The document set C-34 quantifies over: "no document added by this feature". All four are feature
+# artifacts (created or amended under this key), so a third form introduced anywhere else — a
+# guideline, a contract, prose — does not escape the sweep.
+FEATURE_DOCUMENTS = (
+    ROOT / "shared" / "definitions" / "self-explanatory-definitions.md",
+    ROOT / "shared" / "guidelines" / "self-explanatory.md",
+    ROOT / "shared" / "workflow" / "best-practice-optimization.md",
+    ROOT / "docs" / "concepts" / "self-explanatory.md",
+)
+
+# C-34's own examples of a competing canonical form, as regexes. Each is a *form*, not a string
+# list: a synonym table would go stale the moment somebody invents the next variant.
+THIRD_FORM_PATTERNS = (
+    # `Self-explanatory Structures` — the English head noun pluralized.
+    r"Self-[Ee]xplanatory\s+Structures\b",
+    # The identifier deliberately truncated, i.e. the bracket language dropped rather than absent.
+    r"Self-[Ee]xplanatory\s+Structure\s*\((?!不言自明\))",
+    r"Self-[Ee]xplanatory\s+Structure\s*\(without\b",
+    # A second English canonical that drops `Structure`/`自明` entirely.
+    r"\bSelf-[Ee]xplanatory\s*(?:Principle|Concept|Doctrine)\b",
+    # `望文生义` used as the *current* name. Its plain occurrences are the documented naming
+    # history, so only the three promoting shapes count: it as a heading, it presented as the
+    # approved/current name, or it presented as a translation of the English term.
+    r"^#{1,6}\s*望文生义",
+    r"望文生义[^，。；]{0,8}(?:为|是)(?:中文)?(?:规范|标准|正式|current|official)名",
+    r"(?:中文|规范|标准|正式)名(?:为|是|：|:)\s*望文生义",
+    r"望文生义[^，。；]{0,6}(?:译作|译为|translat)",
+)
+
+
+def _canonical_entry():
+    """The registered canonical entry, read through the engine's own table grammar (STR-003)."""
+    rc, payload, stderr = run_engine("--action", "list")
+    assert rc == 0, f"glossary-utils.py --action list exited {rc}: {payload} {stderr}"
+    hits = [e for e in payload["entries"] if e["canonical"] == CANONICAL]
+    assert len(hits) == 1, f"expected exactly one canonical row for {CANONICAL!r}, got {hits!r}"
+    return hits[0]
+
+
+def test_c34_str001_and_str003_share_the_same_identifier():
+    """STR-001 and STR-003 must reach the *same concept*, differing only by the language projection.
+
+    C-34's "shared portion" is not string equality: the two ratified forms carry different bracket
+    languages by design (``STR-001`` = ``Self-Explanatory Structure (不言自明)``, ``STR-003`` =
+    ``不言自明 (Self-explanatory)``), so the shareable portion is what the two bracket spans point
+    at. Both spans are stripped, both are asserted to be each other's translation, and the English
+    head noun must survive on the identifier side — that is what keeps STR-003 a *projection* of
+    the identifier rather than an independently coined term.
+    """
+    entry = _canonical_entry()
+    canonical = entry["canonical"]
+
+    span_pattern = re.compile(r"\s*[（(]\s*([^）)]+?)\s*[）)]\s*")
+    ident_head = span_pattern.sub("", IDENTIFIER).strip()
+    gloss_head = span_pattern.sub("", canonical).strip()
+    ident_span = span_pattern.search(IDENTIFIER)
+    gloss_span = span_pattern.search(canonical)
+    assert ident_span is not None and gloss_span is not None, (
+        f"one of the two ratified forms lost its bracket span: STR-001={IDENTIFIER!r}, "
+        f"STR-003={canonical!r}"
+    )
+
+    assert ident_head == "Self-Explanatory " + EN_HEAD_NOUN, (
+        f"STR-001's English head is {ident_head!r}, expected 'Self-Explanatory {EN_HEAD_NOUN}'"
+    )
+    assert ident_span.group(1) == CJK_TERM, (
+        f"STR-001's bracket span is {ident_span.group(1)!r}; the feature's identifier carries the "
+        f"Chinese form {CJK_TERM!r}"
+    )
+    assert gloss_head == CJK_TERM, (
+        f"STR-003's head is {gloss_head!r}, so the glossary row no longer leads with {CJK_TERM!r} — "
+        "the two shared strings have drifted apart"
+    )
+    assert gloss_span.group(1).lower() == ("self-explanatory"), (
+        f"STR-003's bracket span is {gloss_span.group(1)!r}, not the English form of {CJK_TERM!r}"
+    )
+    # The two heads name the same concept and the two spans are each other's translation; an
+    # earlier reference of STR-003, should one ever be written, is a strict substring of STR-001's
+    # head — that containment is the mechanical test for "same identifier, one projection".
+    assert gloss_head in IDENTIFIER, (
+        f"{gloss_head!r} (STR-003's head) is not contained in STR-001 {IDENTIFIER!r}"
+    )
+    assert EN_HEAD_NOUN not in canonical, (
+        f"STR-003 {canonical!r} repeats the English head noun {EN_HEAD_NOUN!r}; the projection is "
+        "one-directional (STR-003 is a rendering of the identifier, not a second identifier)"
+    )
+
+
+def test_c34_document_titles_use_the_identifier():
+    """Every feature document that names the concept concisely uses STR-001's form, not a variant."""
+    titled = []
+    for path in FEATURE_DOCUMENTS:
+        for lineno, line in enumerate(read(path).splitlines(), start=1):
+            if not line.startswith("#"):
+                continue
+            if CJK_TERM in line or re.search(r"[Ss]elf-[Ee]xplanatory", line):
+                titled.append((f"{path.relative_to(ROOT).as_posix()}:{lineno}", line))
+    assert titled, "no feature document names the concept, so this sweep proves nothing"
+    offenders = [
+        f"{location}: {line.strip()[:120]!r}"
+        for location, line in titled
+        if CJK_TERM not in line or re.search(r"Self-[Ee]xplanatory\s+Structures\b", line)
+    ]
+    assert not offenders, (
+        f"a feature document title does not carry the identifier's Chinese span {CJK_TERM!r} (or "
+        "pluralizes the English head noun), i.e. it presents a form the identifier does not:\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def test_c34_feature_documents_introduce_no_third_form():
+    """No document this feature adds carries a competing canonical form (C-34's second half)."""
+    assert all(path.is_file() for path in FEATURE_DOCUMENTS), (
+        "a feature document is missing: "
+        + str([str(p.relative_to(ROOT)) for p in FEATURE_DOCUMENTS if not p.is_file()])
+    )
+    findings = []
+    for path in FEATURE_DOCUMENTS:
+        for lineno, line in enumerate(read(path).splitlines(), start=1):
+            for pattern in THIRD_FORM_PATTERNS:
+                for match in re.finditer(pattern, line, flags=re.MULTILINE):
+                    findings.append(
+                        f"{path.relative_to(ROOT).as_posix()}:{lineno}: {match.group(0)!r} "
+                        f"(pattern {pattern!r}) — {line.strip()[:120]!r}"
+                    )
+    assert not findings, (
+        "a document this feature adds introduces a third canonical form; the discovered term must "
+        "not become a second vocabulary (C-34):\n  " + "\n  ".join(findings)
+    )
+
+
+def test_c34_the_retired_name_keeps_its_documented_disposition():
+    """`望文生义` survives only as naming history — never as a heading, a current name, a row.
+
+    This is the anti-vacuity companion of ``test_c34_feature_documents_introduce_no_third_form``:
+    that test's patterns would pass trivially if the retired name had disappeared altogether, and
+    the naming history is part of the definition's provenance (STR-002 § 命名史). Both directions
+    are therefore asserted — the name is still recorded, and it is recorded in no promoting shape.
+    """
+    canonical = _canonical_entry()
+    assert RETIRED_NAME in canonical["variants"], (
+        f"{RETIRED_NAME!r} is not the canonical entry's variant (variants={canonical['variants']!r})"
+    )
+    rows = parsed_rows()
+    index, _entry = canonical_row(rows)
+    misplaced = [
+        (i, e["canonical"])
+        for i, e in enumerate(rows)
+        if i != index and RETIRED_NAME in e["canonical"]
+    ]
+    assert not misplaced, (
+        f"the retired name is a canonical cell of another row: {misplaced} — C-30/C-34 allow it "
+        "as a variant only"
+    )
+    recorded = []
+    for path in FEATURE_DOCUMENTS:
+        for lineno, line in enumerate(read(path).splitlines(), start=1):
+            if RETIRED_NAME not in line:
+                continue
+            recorded.append(f"{path.relative_to(ROOT).as_posix()}:{lineno}: {line.strip()[:120]}")
+    assert recorded, (
+        f"no document this feature adds records the retired name {RETIRED_NAME!r} at all; without "
+        "it the third-form sweep above proves nothing"
+    )
 
 
 # --- C-22 / C-24: the engine's enumeration already covers the three new documents ----------

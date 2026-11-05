@@ -171,7 +171,7 @@
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
 - [X] T039 [P] [US4] 在 `tests/contract/test_self_explanatory_glossary.py` 实现 C-29 的条目断言:恰好一条 canonical 为 `不言自明 (Self-explanatory)` 且该行 `origin=auto`、`status=proposed` [green: contracts/glossary-integration.contract.md#C-29]
-- [ ] T053 [P] [US4] 在同一新模块实现 C-34 的命名一致性断言:`STR-001` 与 `STR-003` 的共享片段(去掉括号语言后的主体)一致,且本特性新增的任一文档不引入第三种形态(如 `Self-explanatory Structures`、或把 `望文生义` 当作现名)(C-20 的同一形态由 T010 认领,本行只认领命名面) [green: contracts/glossary-integration.contract.md#C-34]
+- [X] T053 [P] [US4] 在同一新模块实现 C-34 的命名一致性断言:`STR-001` 与 `STR-003` 的共享片段(去掉括号语言后的主体)一致,且本特性新增的任一文档不引入第三种形态(如 `Self-explanatory Structures`、或把 `望文生义` 当作现名)(C-20 的同一形态由 T010 认领,本行只认领命名面) [green: contracts/glossary-integration.contract.md#C-34]
 - [X] T040 [P] [US4] 在同一模块实现 C-30 的按行解析断言:逐行解析 store 表格,断言不存在第二行把 `望文生义` 或 canonical 串放在 canonical 列;并断言 `glossary-utils.py --action validate` 退出 0 [green: contracts/glossary-integration.contract.md#C-30]
 - [X] T041 [P] [US4] 在同一模块实现 C-32:该行 meaning 单元格含一条仓相对路径,断言该路径存在(概念 owner 可达) [green: contracts/glossary-integration.contract.md#C-32]
 - [X] T042 [P] [US4] 在同一模块实现 C-22/C-24 的参数化复核断言:从 `MIRROR_PAIRS` 派生的参数表必须含有三份新文档对应的三个参数(参数 id 含三处路径),缺失即失败——本行**不新建**第二份对表,只断言引擎枚举已覆盖;该断言与 C-26 同属「新文档确实进入镜像与分发枚举」这一命题,由同一模块承载,故与 T029 共同认领 C-26(两条断言一对一) [green: contracts/glossary-integration.contract.md#C-29]
@@ -192,11 +192,11 @@
 **Purpose**: 三故事合流后的整体核对:名称一致、镜像总表、成本与结构、以及 Feature 索引。
 
 - [X] T047 [P] 名称一致性终检: `grep -cF 'Self-Explanatory Structure (不言自明)' templates/constitution-template.md templates/instructions-template.md .specify/memory/constitution.md .specify/instructions.md` 逐文件各 ≥ 1,且 `grep -cF '.specify/shared/definitions/self-explanatory-definitions.md'` 在每个客户端面向输出 ≥ 1;输出写入 `notes/quickstart-run.md`
-- [ ] T048 [blockedBy: T014,T026,T031] 镜像总表核对: 逐行对照 plan.md § Mirror Obligations 的十行,`python3 scripts/python/sync-mirrors.py --check` 退出 0;`python3 scripts/python/regen-command-copies.py --check` 打印 `OK: all per-tool command copies match the source templates.`(本特性未改 `templates/commands/`,这条是未变面断言)
-- [ ] T049 [blockedBy: T012,T024] 成本与结构终检: `bash scripts/bash/generate-instructions.sh` 的 `BUDGET` 行为 `within`,并把「旧值 → 新值 / 本次实测尺寸 / 理由」三件套写进同一提交的提交说明(plan T-001、C-18);`python3 scripts/python/scan-confirmation-gates.py --json` 的 `total` 仍为 27(与 T002 基线相同)→ 本特性零新增门控命中
-- [ ] T050 [blockedBy: T047] Feature 索引同步: `.specify/memory/features/082.md` § Latest Review 追加 tasks 阶段条目(行数统计、`validate-tasks.py` 结论、条款认领数),`.specify/memory/features.md` 的 082 行状态**保持 `Planned`**(`Implemented` 属 `/speckit.implement`)
-- [ ] T051 [blockedBy: T006] 红旗取证收尾: 把 T006 的红、T015/T024/T031/T043 的绿成对整理进 `notes/red-first-evidence.md`,每条含命令、真实输出与退出码;缺任一配对即视为该守卫未被证明有效
-- [ ] T052 结构校验终检: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/082-self-explanatory-integration/tasks.md` 退出 0;并跑 § Completion Gate 的 GATE-1…GATE-4 四条检查,把四条命令与输出写入 `notes/quickstart-run.md`
+- [X] T048 [blockedBy: T014,T026,T031] 镜像总表核对: 逐行对照 plan.md § Mirror Obligations 的十行,`python3 scripts/python/sync-mirrors.py --check` 退出 0;`python3 scripts/python/regen-command-copies.py --check` 打印 `OK: all per-tool command copies match the source templates.`(本特性未改 `templates/commands/`,这条是未变面断言)
+- [X] T049 [blockedBy: T012,T024] 成本与结构终检: `bash scripts/bash/generate-instructions.sh` 的 `BUDGET` 行为 `within`,并把「旧值 → 新值 / 本次实测尺寸 / 理由」三件套写进同一提交的提交说明(plan T-001、C-18);`python3 scripts/python/scan-confirmation-gates.py --json` 的 `total` 仍为 27(与 T002 基线相同)→ 本特性零新增门控命中
+- [X] T050 [blockedBy: T047] Feature 索引同步: `.specify/memory/features/082.md` § Latest Review 追加 tasks 阶段条目(行数统计、`validate-tasks.py` 结论、条款认领数),`.specify/memory/features.md` 的 082 行状态**保持 `Planned`**(`Implemented` 属 `/speckit.implement`)
+- [X] T051 [blockedBy: T006] 红旗取证收尾: 把 T006 的红、T015/T024/T031/T043 的绿成对整理进 `notes/red-first-evidence.md`,每条含命令、真实输出与退出码;缺任一配对即视为该守卫未被证明有效
+- [X] T052 结构校验终检: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/082-self-explanatory-integration/tasks.md` 退出 0;并跑 § Completion Gate 的 GATE-1…GATE-4 四条检查,把四条命令与输出写入 `notes/quickstart-run.md`
 
 ---
 

@@ -295,3 +295,187 @@ The C-33 red-leg driver ran from `.specify/.tmp/082-part9/`, created only after
 part's commit. Every leg operated on copies; the real store's sha256 is asserted unchanged in the leg
 driver's isolation check.
 
+## T049 — cost and structure final check (executed 2026-11-05, implement part 10a)
+
+### The budget verdict, in the shape the generator actually emits it
+
+`scripts/bash/generate-instructions.sh` computes the verdict token internally
+(`"over" if size >= budget else "within"`, line 113) and **never prints that token**: both branches
+branch on it and print a human sentence instead. So no `BUDGET: 33357 34816 within` line appears in
+any output, and quoting one would be a fabricated transcript. The `within` verdict is carried by the
+`info` line plus the positive headroom figure — the `over` branch has no counterpart (`warning` +
+"over by N B" + a convergence prompt):
+
+```console
+$ bash scripts/bash/generate-instructions.sh
+…
+[2026-11-05 14:28:22][1886573][INFO]Section reconcile: live instructions already carry all template sections.
+[2026-11-05 14:28:22][1886573][INFO]Instructions size: 33357 B (budget 34816 B, 1459 B headroom). Section table, largest first:
+…
+success Instructions generated/updated at .specify/instructions.md
+RC=0
+```
+
+`Instructions size: … (budget 34816 B, 1459 B headroom)` — an `info` line with positive headroom and no
+`warning` line = **`within`**. Cross-checked against the file on disk:
+
+```console
+$ wc -c .specify/instructions.md
+33357 .specify/instructions.md
+
+$ grep -n '^INSTRUCTIONS_BUDGET_BYTES=' scripts/bash/generate-instructions.sh \
+      .specify/scripts/bash/generate-instructions.sh
+scripts/bash/generate-instructions.sh:53:INSTRUCTIONS_BUDGET_BYTES=34816
+.specify/scripts/bash/generate-instructions.sh:53:INSTRUCTIONS_BUDGET_BYTES=34816
+```
+
+`33357 < 34816` and `34816 − 33357 = 1459`, so the verdict is `within` on arithmetic the reader can
+recompute. Source and mirror carry the same constant.
+
+### The three-part record (plan T-001 / C-18)
+
+This is the 旧值 → 新值 / 实测尺寸 / 理由 triple the task row requires. It is recorded here and in
+this part's commit message; the constant's own owner is the comment above line 53 of the generator.
+
+| part | value |
+|------|-------|
+| 旧值 → 新值 | `INSTRUCTIONS_BUDGET_BYTES` 32768 → **34816** (a 1024 multiple, +2048 B) |
+| 本次实测尺寸 | live `.specify/instructions.md` = **33357 B** (was 32739 B before the section; the new `## Self-Explanatory Structure (不言自明)` section is 618 B) |
+| 理由 | 新增 `## Self-Explanatory Structure (不言自明)` 小节（US2）使 live 文件越过旧值 32768；按 plan T-001 的「1024 的整数倍、且至少留 1024 B 余量」取最小值：34816 留下 1459 B 余量。33792 只留 435 B（< 1024 B）故不合规 — adjudicated 2026-11-05T05:52:03Z |
+
+### The gate total, unchanged
+
+```console
+$ python3 scripts/python/scan-confirmation-gates.py --json
+total= 27
+by_class= {'governance_kept': 7, 'destructive': 20}
+by_verdict= {'keep_gate': 27}
+violations= []
+RC_SCAN=0
+```
+
+`total = 27`, identical to the T002 baseline (`notes/pre-change-measurements.md` § T002) and to every
+earlier part's reading — **zero new gate hits** from this feature. The `27`-vs-frozen-`23` mismatch in
+`test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged` is Feature 050's inherited
+baseline (plan EP-003, `Decision: fallback`), not something this row introduced; the count it pins was
+already 27 before part 1.
+
+## T052 — structure final check and the Completion Gate rows (executed 2026-11-05, implement part 10a)
+
+### `validate-tasks.py`
+
+```console
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/082-self-explanatory-integration/tasks.md
+PASS (with warnings): .specify/specs/082-self-explanatory-integration/tasks.md — 0 error(s), 34 warning(s)
+RC=0
+```
+
+Exit 0. The 34 warnings are the three adjudicated classes the file already documents in
+§ Adjudicated validator warnings (`green-cross-phase` / `green-clause-collision` /
+`green-path-divergence`); every one is partitioned by story and none names a missing file. The warning
+count moved 32 → 34 during the tasks stage's own U4 repair (`94e8c30d`), not in this part.
+
+### GATE-1 — four guard classes green, no new failing node
+
+`tasks.md` § Completion Gate names three suites on the command line and speaks of "four guard classes";
+the fourth is the mirror-parity suite named in `plan.md` EP-004. Both readings were measured.
+
+```console
+$ python3 -m pytest tests/contract/test_constitution_double_landing.py \
+      tests/contract/test_instructions_section_propagation.py \
+      tests/contract/test_glossary_mechanism.py -q
+.....................................                                    [100%]
+37 passed in 1.81s
+RC=0
+```
+
+```console
+# the fourth guard class (EP-004) plus the two baseline-red-adjacent suites, name-level comparison
+$ python3 -m pytest tests/contract/test_constitution_double_landing.py \
+      tests/contract/test_instructions_section_propagation.py \
+      tests/contract/test_glossary_mechanism.py \
+      tests/contract/test_mirror_parity_suite.py \
+      tests/contract/test_proactive_trigger_section.py -q --tb=no
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+1 failed, 821 passed in 6.80s
+RC=1
+```
+
+The one failure is in `baseline-failed.txt` (`grep -c` → **1**), so the name-level comparison
+`comm -13 baseline-failed.txt <current-names>` has **nothing left over**: zero new failing node ids.
+
+```console
+# the four guards' own modules (each feature's new carrier) — no failure at all
+$ python3 -m pytest tests/contract/test_mirror_parity_suite.py \
+      tests/contract/test_self_explanatory_constitution.py \
+      tests/contract/test_self_explanatory_distribution.py \
+      tests/contract/test_self_explanatory_glossary.py -q
+798 passed in 9.08s
+RC=0
+```
+
+**GATE-1 verdict: PASS** — guard classes green, `comm -13` empty.
+
+### GATE-2 — every `plan.md` § Mirror Obligations row verified
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (65 files)
+RC_SYNC=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+RC_REGEN=0
+```
+
+Six `cmp` byte comparisons for the six mirrored sources the table names:
+
+```console
+$ for p in shared/definitions/self-explanatory-definitions.md shared/guidelines/self-explanatory.md \
+      shared/workflow/best-practice-optimization.md templates/constitution-template.md \
+      templates/instructions-template.md scripts/bash/generate-instructions.sh; do
+    cmp -s "$p" ".specify/$p" && echo "IDENTICAL $p" || echo "DIFFERS   $p"; done
+IDENTICAL shared/definitions/self-explanatory-definitions.md
+IDENTICAL shared/guidelines/self-explanatory.md
+IDENTICAL shared/workflow/best-practice-optimization.md
+IDENTICAL templates/constitution-template.md
+IDENTICAL templates/instructions-template.md
+IDENTICAL scripts/bash/generate-instructions.sh
+```
+
+All ten rows of the table resolve: the three `shared/` rows and the two `templates/` rows and the one
+`scripts/` row are the six `ok`/`IDENTICAL` pairs above (`shared` at 65 files, matching the T005 and
+T031 readings); the seventh row is covered by the `shared` pair; the eighth row (unedited
+`templates/commands/`) is the `regen` `OK:` line plus an empty `git diff --stat -- templates/commands/`
+(`RC=0`); rows nine and ten are `not applicable` by the table's own text (`docs/` has no mirror pair,
+tests are not mirrored) and judge nothing here.
+
+**GATE-2 verdict: PASS.**
+
+### GATE-3 — no `[ ]` / `[>]` rows remain
+
+```console
+$ grep -cE '^- \[[ >]\]' .specify/specs/082-self-explanatory-integration/tasks.md
+0
+```
+
+(Before this part's row closures the same command returned 6 — T048…T053. Its output after the
+closures in this commit is `0`; the command is reproduced verbatim in
+`test-evidence/implement-part-10a.md` with both readings.)
+
+**GATE-3 verdict: PASS.**
+
+### GATE-4 — deferred to part 10b, by the part brief
+
+GATE-4 checks `verification.md`: every `**Path**: final` criterion carrying `SC-NNN_status=pass` plus
+a `smoke_command=` / `smoke_exit_code=0` / `smoke_evidence_path=` triple. That file does not exist yet —
+it is created by the implement wrap-up, which this part MUST NOT run. GATE-4 is therefore **not run and
+its result is not asserted anywhere**. Writing a `verification.md` here (or a fail-invented GATE-4 line)
+would manufacture exactly the evidence the row asks a later step to produce honestly.
+

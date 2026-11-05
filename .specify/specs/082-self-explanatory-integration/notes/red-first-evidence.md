@@ -611,3 +611,90 @@ No hand edit, no second row: the file is byte-identical before and after, and th
 | R-3 C-29/C-30/C-32 glossary entry | M-1 / M-2 / M-3 (this part) | T039 / T040 / T041 (this part) | CLOSED (this part) |
 | R-6 C-22/C-24 mirror enumeration + byte identity | M-4 / M-5 (this part) | T042 (this part) | CLOSED (this part) |
 
+---
+
+# T051 — red-flag evidence wrap-up (implement part 10a, 2026-11-05)
+
+The closing pass `tasks.md` T051 owns. It collects the four pairs the row names — T006's red against
+T015/T024/T031/T043's green — into one table, **re-running each green here** rather than citing an
+earlier part's paste, so every row of the table is backed by a command executed in this part with its
+real output and exit code. Where the red half was produced by an earlier part or by the plan stage,
+that is stated as such; no transcript is presented as this run's own when it is not.
+
+## The four pairs
+
+| # | Red (T006 or the row that captured it) | Green (this row's re-run) | Verdict |
+|---|---------------------------------------|--------------------------|---------|
+| R-1 | T006, part 1: `test_c1_template_carries_the_principle` — `1 failed in 0.05s`, `EXIT=1`, "missing the principle titled 'Self-Explanatory Structure (不言自明)'" (17 titles present) | T015, re-run below: same node id `1 passed`, `EXIT=0` | **CLOSED** |
+| C-21 | part 4: "the section carries no summary at all" (the pointer shared a line with the summary) | T024, re-run below: `-k c21` → `1 passed, 12 deselected`, `EXIT=0` | **CLOSED** |
+| R-2a | plan stage B-1: `sync-mirrors.py --check` → three `MISS` lines, `EXIT=2` | T031, re-run below: `ok shared/ == .specify/shared/ (65 files)`, `RC=0` | **CLOSED** |
+| R-3 | part 8 M-1/M-2/M-3 (mutated copies) | T043, re-run below: engine `--action list` reports the entry at index 160 with `origin=auto`, `status=proposed`, `RC=0` | **CLOSED** |
+
+## The green halves, re-executed in this part
+
+```console
+# R-1 GREEN — T015's assertion, by node id (the red's own subject, exactly)
+$ python3 -m pytest tests/contract/test_self_explanatory_constitution.py::test_c1_template_carries_the_principle -q
+.                                                                        [100%]
+1 passed in 0.04s
+RC=0
+
+# R-1 GREEN — the full US1 subset T015 specifies
+$ python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q -k 'not c21'
+............                                                             [100%]
+12 passed, 1 deselected in 0.06s
+RC=0
+
+# C-21 GREEN — T024's pairing assertion
+$ python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q -k c21
+.                                                                        [100%]
+1 passed, 12 deselected in 0.04s
+RC=0
+
+# R-2a GREEN — T031's mirror reading
+$ python3 scripts/python/sync-mirrors.py --check
+ok    shared/ == .specify/shared/ (65 files)
+RC=0
+
+# R-3 GREEN — T043's entry, read through the store's own engine
+$ python3 scripts/python/glossary-utils.py --action list   # canonical row only
+count= 161
+160 {'canonical': '不言自明 (Self-explanatory)', 'variants': ['望文生义'],
+     'meaning': '…;真源 shared/definitions/self-explanatory-definitions.md',
+     'origin': 'auto', 'status': 'proposed'}
+RC=0
+```
+
+## What each pair actually proves, and what it does not
+
+- **R-1** is the only pair where one assertion verifiably went red **and then** green on its own
+  subject: the part-1 transcript's assertion is the same node id re-run here, and the difference is the
+  artifact T011 landed. Attribution was decided before any edit (the subject was missing; the assertion
+  extracts `### <numeral>. <title>` lines and tests set membership, so it is not a fragile string
+  match).
+- **C-21** is a red-then-green on the same assertion across parts, but its green arrived at **T022**
+  (the section's shape repair), not at T024's live reconcile. T024's contribution is that the section
+  now exists on the live surface too. Recorded this way rather than as "the reconcile turned it green",
+  which would overstate the measurement.
+- **R-2a**'s red is the **plan stage's** B-1 reading, not this run's. It is closed on the same three
+  subjects: the three `MISS` paths are exactly the three pairs T032 byte-compared. The engine-level red
+  was additionally re-created inside part 6 (`printf 'x' >>` a mirror → `DIFF`/`EXIT=2` → `--write` →
+  `cmp rc=0`), transcript in `notes/pre-change-measurements.md`.
+- **R-3**'s red is part 8's M-1/M-2/M-3 legs on **copies** — the entry already existed when part 8
+  opened (the engine wrote it during the plan stage), so no "subject absent" red was available. The
+  green re-run above reads the real store, and the entry is unambiguous: entry index 160 of 161,
+  `origin=auto`, `status=proposed`.
+
+**None of the four is closed without a command.** The three pairs that needed a mutation to show
+redness (R-3, R-5, R-6) carry their leg transcript in the part 7 / part 8 sections above; this table
+adds no new claim beyond re-confirming each green against the tree as it stands at `e3d70068`.
+
+## The pairs that are not in T051's list, and why they still appear above
+
+R-4 (C-10/C-11/C-14), R-5 (C-27) and R-6 (C-22/C-24 mirror enumeration) were closed by earlier parts
+and are retained in the part-scoped tables above rather than dropped — their subjects are still
+guarded, and the part-10a GATE-1 run (37 passed for the three named suites; 798 passed across the four
+guards' own modules) exercises all of them. T051 names T006/T015/T024/T031/T043 because those are the
+four the Feature's red-first obligation rests on; the others are the mutation legs that prove their
+guards can go red.
+
