@@ -1811,3 +1811,41 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/review.md
 1. **Feature 状态未翻转，这是结论而不是省略**：ARC 的 verdict 是 `block`（条件④ smoke 记录的机器可读形态不成立），且当前 `code-review.md` 含 2 条 `blocking`。两条路径各自独立拒绝 `Implemented → Ready for Review`，故 `features.md` 与 `features/084.md` 保持 `Implemented`，本阶段不写回任何状态值，也不降级（refusal 不是 downgrade）。
 2. **P0 的验证路径较弱且已披露**：本拓扑无子代理派发能力，三条 P0 按 `review-sdd-process` § 5 的 subagent-unavailable 回退走「直接重读」，每条在报告里带 `(validated: direct re-read, subagent unavailable)`。
 3. **代码段回执的跳过不是遗漏**：`judged 39 / skipped 237` 是按类声明的（`.specify/*` 与四个工具命令副本 = `generated`（已由 `sync-mirrors --check` 证明逐字节同源）；`tests/*`、四个未逐行读完的引擎、以及 `*.md` = 各自法定理由）。首轮 `receipt` 默认把 276 件全记 `reviewed`，那是工具默认值而非本轮的读数，故按实际读过的面重写一次；改写动作本身记在此处，不隐藏。
+
+## review round 2（四段 + Acceptance Reality Check，2026-11-06）
+
+```yaml
+stage: review
+row_type: stage-status
+attempt: 2
+status: not-run-docs-only
+selection_basis: "review 面无 pytest 槽位：本阶段只落两份评审记录（`review.md` 重写 + `review-r1.md` 归档、`code-review.md` 轮转后重写）、秒级确定性读数（closure checker、harness-triple-check coverage ×2 + cmp、sync-mirrors --check、三处 git diff）与一次定向集复核；按派发简报的测试预算，closure 全量槽位在 review 之后由驱动执行，本阶段不消费也不预支它"
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/review.md
+  - .specify/specs/084-harness-triple-structure/review-r1.md
+  - .specify/specs/084-harness-triple-structure/code-review.md
+  - .specify/specs/084-harness-triple-structure/code-review-20261105T160943Z.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-round2-smoke-2026-11-06.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+  - .specify/memory/features/084.md
+  - .specify/memory/register.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/review.md
+```
+
+## review round 2 的七条读数（命令 + 实测）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| ARC（判定条件的主人） | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` | `verdict: accept`（exit 0）；`claimed_status: Implemented`；`final_path` = pass 2／blocked 0／deferred 0／partial 0／fail 0／unknown 0／total 2；四条 `completion_conditions` 全 true；`reasons: []`；`smoke.evidence_exists: true` / `exit_code: "0"` / `records: 1`；`tasks` = closed 32／deferred 0／open 0 |
+| smoke 三件（复跑，定向） | `python3 scripts/python/harness-triple-check.py --action coverage` ×2 + `cmp` + `sha256sum` | 两次 exit 0、逐字节一致、`sha256 f9cd934a…3473`（与 round 1 同值）；`candidates 83 / pending 0 / unclassified 0 / findings 0`；证据 `test-evidence/review-round2-smoke-2026-11-06.txt`（两次完整 stdout） |
+| verify（双向一致） | `python3 scripts/python/harness-triple-check.py --action verify` | exit 0；`declarations 23`；`consistency-declarations-to-carriers: 30/30`（round 1 为 28/28，因修复提交给 `flow-class-classes` 补了两个 consumers）；`consistency-carriers-to-declarations: 16/16`；`findings: 0` |
+| 镜像 | `python3 scripts/python/sync-mirrors.py --check` | exit 0，六对全 `ok`（templates 22／skills-external 409／skills-internal 138／agents 3／scripts 121／shared 89） |
+| 非目标 | `git diff --stat 4b65517c -- pyproject.toml`；`git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` | 两条均空输出 |
+| 代码段回执 | `git-delta-review.sh receipt --review-file …/code-review.md --spec …` | `changed 284 / judged 5 / skipped 279 / gap 0`；`renderer: text`；`segment: blocked`（1 条 `[blocking]`）；`report --summary --file` exit 1、`blocking_entries=1`、`gate=deny` |
+| 修复提交的定向集（复核，不重跑全量） | 读 `test-evidence/review-fix-targeted-tests-2026-11-05.txt` 尾部 | `2 failed, 219 passed`，两条失败均在 23-name implement-start 基线集内（`test_e_a_stale_pin…` 陈旧 pin；`test_c22_watch_target_hook_selftest` 为 `cannot create temp dir` 权限），无新增失败 |
+
+## review round 2 的三处披露
+
+1. **Feature 状态仍未翻转，且拒绝依据与 round 1 不同**：本轮 ARC 是 `accept`，拒绝来自状态机条件 (c)——当前 `code-review.md` 含 1 条 `blocking`（`closure-acceptance-check.py:227` 的 `flow-class-classes` 内联副本）；`features.md` 与 `features/084.md` 的状态列保持 `Implemented`，未写回、未降级，拒绝字面量 `blocking-unresolved` 记在 `review.md` § 2.1 与 § Status Transition。两个门读的是不同工件，故分开报告而不是折算成一句。
+2. **本轮判读面是修复提交，不是整个 delta**：`0bd4c622..e0453f9e` 只触碰 15 条路径，回执的 5 条 `reviewed` 就是其去重后的源码面；其余 279 条按 `size-guard-focus-not-reviewed` 跳过（相对 round 1 逐字节未变），跳过不计覆盖信用。round 1 的 39 条 judged 读数在其归档 `code-review-20261105T160943Z.md` 内，本行不对它们给新结论。
+3. **两处由修复轮自身引入的状态已如实记为本轮 P1**：`verification.md` SC-001 记录的 `28/28` 被修复提交自己的 `consumers` 修改推到 `30/30`（同一行 limb (iii) 的「引用它的一方确实被点名」被 `closure-acceptance-check.py` 证伪）；round 1 的第二个法定载体——`features/084.md` 的 `## Latest Review` 评审条目——当时没有写，本轮补写（本轮结论落在报告 § 2.1 与本条目两处）。这两条都不是「顺手修平」：SC-001 那一行归 implement，本阶段只记录读数与归属。

@@ -136,3 +136,6 @@
 | REC-084-06 | `validate-tasks.py` 增加载体存在性判据（`[X]` 行具名路径缺失即红，除非行内有 `waived-by-user` 记号），并要求报告从 checker JSON 派生计数而非复述数字 | `.specify/specs/084-harness-triple-structure/review.md` § 5.3 REC-084-06（F2、F3、F10、F12） | open |
 | REC-084-07 | 把「冻结的封闭集阻断新 finding 名」这一形态写进过程评审技能，并要求封闭集指向自己的增长程序（本特性已提供 `shared/declarations/facts/driver-gate-roster.yaml`） | `.specify/specs/084-harness-triple-structure/review.md` § 5.4 REC-084-07（F4） | open |
 | REC-084-08 | `git-delta-review.sh` 帮助文本删除手维护的步骤编号，改指向技能里的封闭枚举（现为五步） | `.specify/specs/084-harness-triple-structure/review.md` § 5.5 REC-084-08（F7） | open |
+| REC-084-09 | 验证日志的每个槽位必须点名读它的程序；无读者的槽位要么删，要么接进授予该记录的 checker（新增 `smoke_comparison` 槽位即反例） | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-09（N3） | open |
+| REC-084-10 | 修复轮必须按 finding 自己枚举的站点逐点给出 closure 表（站点 → 提交 → 读数），下一轮读表而不是读提交标题 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-10（N1） | open |
+| REC-084-11 | 评审收尾必须断言两个法定载体都存在且带本轮身份（报告 § 2.1 + 特性详情 `## Latest Review` 条目），缺席即红 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-11（N2） | open |

@@ -1,8 +1,14 @@
-# Specification-Driven Development (SDD) Process Review Report: Harness 三重结构（markdown + yaml + script）
+# Specification-Driven Development (SDD) Process Review Report: Harness 三重结构（markdown + yaml + script）— review round 2
 
 > **Audience**: spec-kit framework maintainers.
 > **Purpose**: Identify concrete problems and improvement targets in spec-kit templates, command prompts, automation, and workflow as exposed by this feature's SDD lifecycle.
 > **Intentionally problem-first**: this report omits long narrative summaries of artifact contents. If a sentence describes the feature instead of identifying a process gap, it does not belong here.
+>
+> **This is round 2 of the review of Feature 084.** Round 1's report is archived at
+> `review-r1.md` in this directory (rotation per `shared/workflow/acceptance-hardening.md` § Review
+> Composition § Records and rotation; the slice id here is the review round, so the archive keeps the
+> content's own round marker instead of a feature-slice letter that this feature does not have). Round
+> 2's delta is the fix commit `e0453f9e`; round 2's first duty is to close or retain every round-1 item.
 
 ## 0. Portable Project Context (Self-Contained Snapshot)
 
@@ -11,82 +17,104 @@
 | Requirement ID | 084 |
 | Requirement Key | 084-harness-triple-structure |
 | Requirement Name | Harness 三重结构（markdown + yaml + script） |
-| Related Feature | 084 Harness 三重结构（markdown + yaml + script） |
 | Repository | spec-kit (`git rev-parse --show-toplevel` → `/storage/project/cloud-native-ai/spec-kit`) |
 | Repository URL | `(no publishable HTTPS remote)` — remotes are `gitee`/`github`/`gitlab` (SSH) plus `origin` = `git@github.com:github/spec-kit.git` (upstream; it does not contain these commits) |
-| Reachability of COMMIT_SHA | **UNRESOLVABLE**: `git branch -r --contains HEAD` is empty — the branch was never pushed. Every citation in this report is an absolute path plus `git show 03a19487:<path>` recovery |
+| Reachability of COMMIT_SHA | **UNRESOLVABLE**: `git branch -r --contains HEAD` is empty — the branch was never pushed. Every citation is an absolute path plus `git show e0453f9e:<path>` recovery |
 | Branch | `084-harness-triple-structure` |
-| Commit SHA | `03a19487e4ceb668e27ef1a4554aff82e4dc8a4c` (short: `03a19487`) |
+| Commit SHA | `e0453f9e634702d78f20e418af8242cdb1b84a49` (short: `e0453f9e`) — the review round-2 `HEAD`, fixed for the run |
 | Repo Root (absolute) | `/storage/project/cloud-native-ai/spec-kit` |
-| Review Date | 2026-11-05 |
+| Review Date | 2026-11-06 |
 | Reviewer (Agent) | SDD Executor (fresh dispatch; same-author detection delegated per `shared/workflow/objective-analysis-gate.md`) |
 | Environment | Linux, bash, CPython 3.11.13, `pytest 9.2.0` pin (EP-001), no subagent-dispatch capability in this topology |
-| spec-kit Source Snapshot | this repository at `03a19487` (self-hosting: `.specify/` is the same flow every client project runs) |
+| spec-kit Source Snapshot | this repository at `e0453f9e` (self-hosting: `.specify/` is the same flow every client project runs) |
+| Round-1 record | `review.md` at `03a19487` → archived as `review-r1.md` (43294 B); its code segment → `code-review-20261105T160943Z.md` |
 
 ### Artifact Inventory
 
 | Artifact | Lines | Absolute Path | One-line Summary |
 |----------|------:|---------------|------------------|
 | requirements.md | 285 | `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/requirements.md` | 19 FR / 6 SC / 14 STR, A1–A10 adjudications, scope criteria D1∧D2 |
-| plan.md | 434 | `…/084-harness-triple-structure/plan.md` | 18/18 Constitution Check, 4 decision tensions, EP-001…EP-007, D1–D13, Project Structure |
-| tasks.md | 261 | `…/084-harness-triple-structure/tasks.md` | 32 rows (all `[X]`), 7 phases, GATE-1…7, § Traceability 32 rows |
-| verification.md | 133 | `…/084-harness-triple-structure/verification.md` | baseline block, one smoke record, six SC status rows, joint-acceptance rows |
+| plan.md | 434 | `…/084-harness-triple-structure/plan.md` | 18/18 Constitution Check, 4 decision tensions, EP-001…EP-007, D1–D13 |
+| tasks.md | 262 | `…/084-harness-triple-structure/tasks.md` | 32 rows (all `[X]`), 7 phases, GATE-1…7, `**DoD Status**: green-with-void` |
+| verification.md | 134 | `…/084-harness-triple-structure/verification.md` | baseline block, one machine-readable smoke record, six SC status rows, joint-acceptance rows |
 | contracts/ (5 files) | 426 | `…/084-harness-triple-structure/contracts/` | C-001…C-059, `md-bold-closed` (verified: 12+13+16+10+8 = 59) |
 | data-model.md | 169 | `…/084-harness-triple-structure/data-model.md` | E-1…E-10 + six fixture families |
 | quickstart.md | 152 | `…/084-harness-triple-structure/quickstart.md` | S1…S8 (4 measured, 4 route-(b)) |
 | research.md | 157 | `…/084-harness-triple-structure/research.md` | R1–R10 measured readings |
 | feature-ref.md | 42 | `…/084-harness-triple-structure/feature-ref.md` | bound Feature 084 + status movement |
-| code-review.md | 370 | `…/084-harness-triple-structure/code-review.md` | this run's code segment record (2 blocking, 2 important, 2 suggestion, 1 nitpick, 1 praise) |
+| code-review.md | this run | `…/084-harness-triple-structure/code-review.md` | round-2 code segment record (1 blocking, 4 important, 2 suggestion, 2 praise) |
+| review-r1.md | 43294 B | `…/084-harness-triple-structure/review-r1.md` | round-1 report, archived by this run |
+| code-review-20261105T160943Z.md | 64141 B | `…/084-harness-triple-structure/code-review-20261105T160943Z.md` | round-1 code record, archived by `git-delta-review.sh start` |
 
-## 1. Process Execution Timeline
+## 1. Process Execution Timeline (round-1 close → round-2 open)
 
 | # | Step / Event | Evidence (commit SHA, file, or quoted excerpt) | Deviation from prescribed flow? |
 |---|--------------|------------------------------------------------|---------------------------------|
-| 1 | requirements attempt 1 exhausted its 40-turn budget with a scaffold only | state spine § U5 重试记录; branch created, template unfilled | **Yes** — retried as attempt 2 under a 120-turn executor |
-| 2 | requirements / clarify / plan / tasks / checklist | `a94c3945` → `cd446a6e` → `171c2ff8` → `4b65517c` → `5dc5919a`/`8ed70a87` → `9abb10fb` | No |
-| 3 | analyze round 1: 1 CRITICAL + 2 HIGH | `test-evidence/analyze-report-2026-11-05.md`; fixes `fd84ed63`/`9284c789`/`2b18485e` | No — one bounded loop as prescribed |
-| 4 | analyze round 2: still HIGH (R2-02) → **U5 halt** | `test-evidence/analyze-report-round2-2026-11-05.md`; spine § U5 停线上送 | No — the halt is the prescribed disposition |
-| 5 | user ruling **path A** → plan reopen (substantive) + analyze round 3 green | `ba141671`, `b1b19e93`; `analyze-report-round3-2026-11-05.md` | Deviation **authorized by explicit user ruling** |
-| 6 | implement Part 1–2d (5 dispatches, one partial at 120 turns) | `e3e0af68`…`3f4d9b1b`, `1da7a88d` | **Yes** — attempt 1 stopped at T012, re-split into 2a/2b |
-| 7 | user test waiver 2026-11-05: no pytest, no smoke, no scratch proofs | spine § 最终状态; `tasks.md` § Notes 202-205 | Deviation **authorized by explicit user ruling** |
-| 8 | Part 4/5 closed T020–T031 under the waiver; Feature → `Blocked` | `1e4ca01e`; `verification.md` header (pre-`03a19487`) | No — `Blocked` was the honest landing |
-| 9 | classification slice T032: 58 unclassified → 0 | `94d9db33`, `e185da6c`; `t032-classification-readings-2026-11-05.txt` | No — follows user path A |
-| 10 | user-authorized final test budget: contract module 68 passed, residual face pass, smoke twice | `03a19487`; `final-contract-module.txt`, `final-duplicate-face.txt`, `smoke-run1/2-2026-11-05.txt` | No |
-| 11 | Feature flipped `Blocked → Implemented` in the **same** commit | `03a19487` diff: `features.md` `\| Blocked \|` → `\| Implemented \|` | **Yes** — condition ④ was asserted from prose; the owner checker reports it unsatisfied (F1) |
+| 1 | round 1 judged 3 P0 / 7 P1 / 6 P2 and refused the flip | `review-r1.md` § 2.4: `final_path` pass 2 / blocked 0; `completion_conditions.smoke_record_pass: false`; `verdict: block`; segment verdicts `blocked` ×3 | No — the refusal is the prescribed disposition |
+| 2 | round-1 code segment carried 2 `blocking` | `code-review-20261105T160943Z.md` § Review 意见: `closure-acceptance-check.py:223` and `:916` | No |
+| 3 | fix commit `e0453f9e` "resolve the review blocking and P0 findings" — 15 paths, +233 −21 | `git show --stat e0453f9e` | **Yes** — see N1: two of the three sites the blocking item named were fixed, the third was not, and the message claims the item resolved |
+| 4 | targeted test set after the fix: 219 passed / 2 failed | `test-evidence/review-fix-targeted-tests-2026-11-05.txt` (tail: `2 failed, 219 passed`), both failures in the 23-name implement-start baseline set (`test_e_a_stale_pin…` = stale pin, `test_c22_watch_target_hook_selftest` = `cannot create temp dir` permission) | No — no new failure |
+| 5 | ARC re-read: `verdict: accept`, all four completion conditions true | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` (exit 0), copied into § 2.4 | No — this is the machine's answer, not the run's prose |
+| 6 | round 2 dispatched against `e0453f9e` | state spine `stage_base_commit: e0453f9e`, `attempt: 2` | No |
+
+## 2A. Round-1 Closure Ledger (round 2's first duty)
+
+| Round-1 item | Severity then | Round-1 location | Round-2 reading | Owner stage of what remains |
+|---|---|---|---|---|
+| **F1** implement gate asserted completion condition ④ from prose | P0 | `verification.md:55-56` | **Closed on the artifact side, and the mechanism closed with it**: the smoke block is now three literal values (`smoke_exit_code=0`, one `smoke_evidence_path`, `smoke_comparison`), `evaluate_smoke()` reads the same file, and `smoke_record_pass` is `true`. `templates/commands/implement.md:56` already required the closure verdict since `da5e4480` (081a) and is not in this delta, so the remaining gap was never a missing instruction — it was a log the checker could not parse, which is exactly what F8 repaired | — |
+| **F8** smoke record not machine-parseable | P0 | `verification.md:54-57` | **Closed**: three fields carry no annotation; `smoke.evidence_exists: true`, `smoke.exit_code: "0"`, `records: 1` | — |
+| **F9** one `features.md` row carried two statuses | P0 | `features.md:90` | **Closed**: the narrative now ends `final 测试预算后已翻到 \`Implemented\``, matching the column | — |
+| **F2** two closed rows name evidence carriers that do not exist | P1 | `tasks.md:31`, `tasks.md:166` | **Open, unchanged** — `ls test-evidence/head-failed.txt notes/quickstart-run.md` still returns two `No such file`; the fix commit edited `tasks.md` (the DoD line) without touching either row | implement (`tasks.md` rows) → see N4 |
+| **F3** one count drifted across four surfaces | P1 | `verification.md:91` | **Closed where round 1 named it** (SC-004 now reads 70 = 38 + 32) and **re-opened one file over**: SC-001 still records `28/28` while the fix's own consumers edit moved the live reading to `30/30` | implement (`verification.md`) → see N5 |
+| **F10** a `pass` row rested on a stale reading | P1 | `verification.md:91` | Closed with F3's rewrite; **the same class recurred in SC-001** (N5) | implement |
+| **F11** `verification.md` contradicted itself about status | P1 | `verification.md:132` | **Closed**: `notes_feature_status=Implemented` matches the header | — |
+| **F12** the baseline datum was labelled "implement start" but was a Part-3 commit | P1 | `verification.md:21` | **Closed**: `baseline_commit=9657885f`, whose successor `e3e0af68` is literally `chore(084): freeze the implement-start readings and the coverage baseline`; the sibling field `post_change_commit` was not re-read (N6) | — / N6 |
+| **F14** the delta does not deliver one machine-read copy for two declared closed sets | P1 | `closure-acceptance-check.py:223`, `pre-analyze-check.py:332`, `validate-requirements.py:99`, `:916/939/1347` | **Half closed**: `success-criterion-path-values` is fully migrated (`PASS_PATH` derived in both engines, three branch literals gone); `flow-class-classes` moved two engines onto the declaration and left the third (round-1's own first-named site) as an inline tuple | implement → see N1 / code segment |
+| **F15** the two-run claim had no legal carrier | P1 | `tasks.md:129`, `verification.md:56` | **Closed in form, not in force**: the template gained `smoke_comparison`, no program reads it | plan/template → see N3 |
+| **F4** the new delegation could not be default-on | P2 | `pre-analyze-check.py` docstring | **Open by decision** — the flag is still off by default and the docstring still names the 081 closed assertion as the reason | framework recommendation REC-084-07 |
+| **F5** a contract clause asks `verify` for a reading another clause forbids | P2 | `contracts/harness-triple-check.contract.md` C-032 / C-038 | **Open** — `verify` still prints `residual_literals: "delegated: …"` (`harness-triple-check.py:441`); the contract was not touched by the fix | plan (C-032) → REC-084-03 |
+| **F6** same-author detection could not be delegated | P2 | objective-analysis-gate fallback | **Open** — same topology, same weaker evidence path, disclosed here again | framework recommendation REC-084-04 |
+| **F7** the code-review help states four steps, its skill states five | P2 | `git-delta-review.sh` help | **Open** — the help still reads `NON-INTERACTIVE PATH (four steps, … — four, never three)` while `SKILL.md` § 非交互路径 says 五步 | framework recommendation REC-084-08 |
+| **F13** `DoD Status: pending` beside an `Implemented` feature | P2 | `tasks.md:26` | **Closed in form, mis-resolved in vocabulary**: `green-with-void` is defined for a row whose premise measured false, and the annotation itself says these rows are *user-waived*, not falsified | template → see N7 |
+| **F16** the client-project limbs of SC-005 never ran | P2 | `verification.md:95-102` | **Open, under the user's test waiver** — no scratch-tree `specify init` reading exists; the mirror limb is green | user waiver (residual risk, not a defect) |
+
+**Round 1 dispositions that need no action**: F6's weaker P0 evidence path is disclosed again in § 7; F16 stays residual risk under the explicit user waiver, which is the user's ruling and not an agent's.
 
 ## 2. Findings Summary
 
 | Severity | Count | Definition |
 |----------|------:|------------|
-| P0 | 3 | Blocks correct use of spec-kit, or creates silent corruption risk. Fix before next spec. |
-| P1 | 7 | Recurring friction across specs. Fix when convenient — currently every spec writer pays the toll. |
-| P2 | 6 | Quality-of-life. Compounding gains across many specs. |
+| P0 | 0 | Blocks correct use of spec-kit, or creates silent corruption risk. Fix before next spec. |
+| P1 | 5 | Recurring friction across specs. Fix when convenient — currently every spec writer pays the toll. |
+| P2 | 2 | Quality-of-life. Compounding gains across many specs. |
 
 | Category | Count |
 |----------|------:|
-| Template | 4 |
-| Command Prompt | 1 |
-| Automation / Scripts | 1 |
-| Workflow | 6 |
-| Documentation | 4 |
+| Template | 2 |
+| Command Prompt | 0 |
+| Automation / Scripts | 0 |
+| Workflow | 3 |
+| Documentation | 2 |
+
+Round 1's P0 count (3) is zero this round: the three acceptance-honesty states it named are now machine-readable and read `accept` by the owner program. The five P1s are therefore *not* a regression — four of them are round-1 items that survived, plus one instance of the same drift class created by the fix itself.
 
 ### 2.1 Code Segment (Verdict and Pointers)
 
 | Field | Value | Source |
 |-------|-------|--------|
 | Base commit | `3ffeb26e4880f134f7a5e220ecbffb869f165632` | the resolved diff base |
-| Head commit | `03a19487e4ceb668e27ef1a4554aff82e4dc8a4c` | the run-start `HEAD`, fixed for the run |
-| Base source | `feature-first-commit` | the resolution tier `git-delta-review.sh base` reported |
+| Head commit | `e0453f9e634702d78f20e418af8242cdb1b84a49` | the run-start `HEAD`, fixed for the run |
+| Base source | `feature-first-commit` | the resolution tier `git-delta-review.sh base --spec …` reported |
 | Renderer mode | `renderer: text` | the code record's header marker |
-| Changed / judged / skipped / gap files | 276 / 39 / 237 / 0 | copied field by field from the record's coverage receipt block |
-| Segment verdict | `blocked` | the record carries 2 `blocking` entries |
-| Gate verdict | `blocking-unresolved` | `report --summary --file …` exits 1 with 2 `[blocking]` |
+| Changed / judged / skipped / gap files | 284 / 5 / 279 / 0 | copied field by field from the record's coverage receipt block |
+| Segment verdict | `blocked` | the record carries 1 `blocking` entry |
+| Gate verdict | `blocking-unresolved` | `report --summary --file …` exits 1 with `blocking_entries=1`, `gate=deny` |
 | Reason, when one applies | none | a `blocked` verdict needs no basis line |
-| Uncommitted scope | disclosed, never concluded over: this run adds only `code-review.md` and `test-evidence/review-smoke-2026-11-05.txt`; a pre-existing modified run record `session/20261102T231648Z-…-081a.md` and pre-existing untracked `memory/` records are outside the slice and were left untouched | same sentence in [`.specify/specs/084-harness-triple-structure/code-review.md`](/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/code-review.md) |
+| Uncommitted scope | disclosed, never concluded over: this run adds `review.md`, `review-r1.md`, `code-review.md` (rewritten after rotation), `test-evidence/review-round2-smoke-2026-11-06.txt`, the `stage-status.md` round-2 row and the register rows; a pre-existing modified run record `session/20261102T231648Z-…-081a.md` and pre-existing untracked `memory/` records are outside the slice and were left untouched | the same sentence in [`code-review.md`](/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/code-review.md) |
 | Record | `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/code-review.md` | written (triage `run`) |
-| Archive | `none` | first run for this slice |
+| Archive | `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/code-review-20261105T160943Z.md` | round 1's record, rotated by `start` |
 
-Six-level counts in the record: `blocking` 2 · `important` 2 · `suggestion` 2 · `nitpick` 1 · `question` 0 · `praise` 1. The two `blocking` entries are: (1) the declared closed set `flow-class-classes` still has an inline copy in three engines the declaration does not name as consumers, and (2) `success-criterion-path-values` is read for the membership verdict while three comparison sites re-spell its member `final`. The two `important` entries are the FR-012 fallback-vs-delete split and `verify`'s non-reading `residual_literals` field. The findings themselves are read there; this subsection carries the verdict and the pointers only.
+Six-level counts in the record: `blocking` 1 · `important` 4 · `suggestion` 2 · `nitpick` 0 · `question` 0 · `praise` 2. The `blocking` entry is the surviving inline copy of the declared closed set `flow-class-classes` in `scripts/python/closure-acceptance-check.py:227` — round 1's blocking #1, two of whose three sites the fix migrated. The four `important` entries are the two retained round-1 items (the FR-012 fallback-vs-delete split, and `verify`'s non-reading `residual_literals`), the new `smoke_comparison` slot with no reader, and the unlabelled class-axis degradation the fix introduced. The findings themselves are read there; this subsection carries the verdict and the pointers only.
 
 ### 2.2 Artifact Review Segment
 
@@ -95,410 +123,253 @@ Six-level counts in the record: `blocking` 2 · `important` 2 · `suggestion` 2 
 | Expected set (denominator) | requirements.md, plan.md, tasks.md, contracts/, data-model.md, quickstart.md, verification.md, research.md, feature-ref.md | derived: the standard spec-stage set ∪ `plan.md` § Project Structure § Documentation (which declares `research.md` and `feature-ref.md` in addition) — **9 members** |
 | Coverage line | 9 / 9 | present members / expected members |
 | Missing members | none | — |
-| Segment verdict | `blocked` | two `P0` acceptance-honesty findings |
+| Segment verdict | `blocked` | two P1 acceptance-honesty findings plus one P2 status-vocabulary misuse |
 
 | Severity | Artifact path | Line | Why the line is absent | Finding |
 |----------|---------------|------|------------------------|---------|
-| P0 | `.specify/specs/084-harness-triple-structure/verification.md` | 55 | none | Smoke record is not machine-parseable, so the feature's `Implemented` claim does not survive its own checker (F8) |
-| P0 | `.specify/memory/features.md` | 90 | none | One row carries two statuses for one feature: `Implemented` in the column, `Blocked` at the end of its own narrative (F9) |
-| P1 | `.specify/specs/084-harness-triple-structure/verification.md` | 91 | none | `SC-004_status=pass` rests on a stale 12-row reading while the same file's SC-002 says 70 rows (F10) |
-| P1 | `.specify/specs/084-harness-triple-structure/verification.md` | 132 | none | `notes_feature_status=Blocked` contradicts the file's own header (`Implemented`) (F11) |
-| P1 | `.specify/specs/084-harness-triple-structure/verification.md` | 21 | none | The datum labelled "recorded at implement start" is a Part-3 commit, so the comparison anchors SC-005/SC-006 rest on cannot be trusted (F12) |
-| P2 | `.specify/specs/084-harness-triple-structure/tasks.md` | 26 | none | `DoD Status: pending` with all 32 rows `[X]` and the feature `Implemented`; no surface reconciles the two (F13) |
+| P1 | `.specify/specs/084-harness-triple-structure/tasks.md` | 166 | none | Two `[X]` rows still name carriers that do not exist (round-1 F2, untouched) — N4 |
+| P1 | `.specify/specs/084-harness-triple-structure/verification.md` | 70 | none | `SC-001_status=pass` records `28/28` while the live reading after this very fix is `30/30`, and limb (iii)'s "引用它的一方确实被点名" is falsified by an engine that is not named — N5 |
+| P2 | `.specify/specs/084-harness-triple-structure/verification.md` | 39 | none | `post_change_commit=98288d45` names a Part-3 commit that never touched this file — N6 |
+| P2 | `.specify/specs/084-harness-triple-structure/tasks.md` | 26 | none | `green-with-void` used for a user waiver rather than a falsified premise — N7 |
 
 ### 2.3 Implementation Review Segment
 
 | Field | Value | Source |
 |-------|-------|--------|
 | Base commit | `3ffeb26e4880f134f7a5e220ecbffb869f165632` | the resolved diff base |
-| Head commit | `03a19487e4ceb668e27ef1a4554aff82e4dc8a4c` | the run-start `HEAD`, fixed for the run |
-| Base source | `feature-first-commit` | as the code skill's `git-delta-review.sh` reported it |
+| Head commit | `e0453f9e634702d78f20e418af8242cdb1b84a49` | the run-start `HEAD`, fixed for the run |
+| Base source | `feature-first-commit` | the resolution tier `git-delta-review.sh base` reported |
 | Smoke command | `python3 scripts/python/harness-triple-check.py --action coverage` (run twice, byte-compared) | recorded verbatim |
 | Smoke exit code | `0` | the integer the command returned, both runs |
-| Smoke evidence path | `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/test-evidence/review-smoke-2026-11-05.txt` | exists, non-empty; holds both runs, the `cmp` exit and the two sha256 values |
-| Scope and regression verdict | scope clean (no work without a row); regression clean on the surfaces that were read — `sync-mirrors.py --check` exit 0 with six pairs `ok` (templates 22 / skills-external 409 / skills-internal 138 / agents 3 / scripts 121 / shared 89), `git diff 4b65517c -- pyproject.toml` empty, `git diff -​-stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` empty | the segment's own reading |
-| Segment verdict | `blocked` | the delta does not deliver the property its requirements state (F14) |
+| Smoke evidence path | `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/test-evidence/review-round2-smoke-2026-11-06.txt` | exists, non-empty; holds both runs' full stdout, both exit codes, the `cmp` exit and both sha256 values (`f9cd934a…3473`, identical) |
+| Scope and regression verdict | scope clean (the fix touches 15 paths, all inside the feature's own surfaces); regression clean on the surfaces that were read — `sync-mirrors.py --check` exit 0 with six pairs `ok` (templates 22 / skills-external 409 / skills-internal 138 / agents 3 / scripts 121 / shared 89), `git diff 4b65517c -- pyproject.toml` empty, targeted set 219 passed / 2 failed with both failures in the 23-name baseline | the segment's own reading |
+| Segment verdict | `blocked` | the delta still does not deliver SC-002's one-machine-read-copy property for one of its two declared closed sets |
 
 | Severity | Diff path | Line | Why the line is absent | Finding |
 |----------|-----------|------|------------------------|---------|
-| P1 | `scripts/python/closure-acceptance-check.py` | 223 | none | The delta does not deliver "one machine-read copy" for two declared closed sets; the detail and the two extra files are in `code-review.md` (F14) |
-| P1 | `.specify/specs/084-harness-triple-structure/verification.md` | 56 | none | The two-run byte-identity claim SC-001 (i) requires has no legal carrier in the log format, so the implementer overloaded the evidence path (F15) |
-| P2 | `.specify/specs/084-harness-triple-structure/tasks.md` | 165 | none | The distribution limb (T030) and the legacy-degradation limb (T022) were never read, so client-project behaviour is unverified (F16) |
+| P1 | `scripts/python/closure-acceptance-check.py` | 227 | none | The delta migrates two engines for `flow-class-classes` and leaves the third holding the pair; the detail is in `code-review.md` — N1 |
 
 ### 2.4 Acceptance Reality Check
 
 | Field | Value | Source |
 |-------|-------|--------|
 | Claimed status (read, never written) | `Implemented` | `features.md` row 084 and `features/084.md` `**Status**` |
-| `final_path` record, copied verbatim (7/7) | pass 2 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 2 | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` (exit 1), never recomputed here |
-| Comparison verdict | `refused` | the checker's verdict is `block` while the claim is `Implemented` |
-| Failed condition, on refusal | completion condition ④ `smoke_record_pass = false` — the checker reports `evidence_exists: false` and `exit_code: "0 (both runs)"`; its reason record is `status-claims-implemented-but-blocked` | `completion_conditions.smoke_record_pass` and `reasons[0].code` in the same JSON |
+| `final_path` record, copied verbatim (7/7) | pass 2 · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total 2 | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` (exit 0), never recomputed here |
+| Comparison verdict | `agree` | the checker's verdict is `accept` and the claim is `Implemented` |
+| Failed condition, on refusal | none — no refusal fires on this record | `completion_conditions` reads `every_final_path_pass: true`, `no_open_rows: true`, `smoke_record_pass: true`, `status_row_per_criterion: true`; `reasons: []` |
 | Fixed item, on refusal | none | `F-ACCEPTANCE` fires only when the `pass` bucket reads zero; here it reads 2 |
 
-**The transition is refused and the status stays `Implemented`.** A refusal is not a downgrade: no surface is written back, and the feature is not presented as having completed review. The user's test waiver for the *test* budget does not lift this refusal — it is recorded here as residual risk and the item still fires.
+**ARC does not refuse this round.** The run's refusal comes from the status machine's third condition instead (§ Status Transition) — a different gate reading a different artifact, and collapsing the two into one sentence would hide which one fired.
+
+## Status Transition — refused, and the condition is named
+
+The transition judged here is `Implemented → Ready for Review`, whose four conjunctive conditions are owned by `templates/feature-details-template.md` § Canonical Status State Machine and are cited here, not restated.
+
+| Condition | Reading | Verdict |
+|---|---|---|
+| (a) every deferred (`[~]`) task resolved or explicitly waived | `tasks.md`: `closed 32 / deferred 0 / open 0` (the checker's own `tasks` block) | satisfied |
+| (b) review evidence produced | this report + `code-review.md`, both on disk | satisfied |
+| (c) the current code-segment record contains no `blocking` entry | `code-review.md` carries **1** `blocking` entry (`closure-acceptance-check.py:227`); `report --summary --file` exits 1 with `gate=deny` | **FAILS** |
+| (d) no `final`-path criterion in `blocked` / `deferred` / `fail` without a user waiver | `final_path`: 2 `pass`, 0 in every non-pass bucket | satisfied |
+
+**The refusal literal is `blocking-unresolved`, the failed condition is (c), and the status stays `Implemented`.** No surface is written back: `features.md` and `features/084.md` are untouched by this run, because a refusal is not a downgrade and this feature admits no `Implemented → Ready for Review` shortcut through one. Round 2's own artifacts land on the two verifiable carriers — this report's § 2.1 and the `## Latest Review` entry this run adds to `features/084.md` — and neither of them states a new status.
 
 ## 3. Findings (Problems & Improvement Targets)
 
-### F1 — The implement gate asserted completion condition ④ from prose, not from the checker that owns it
+### N1 — A fix round's closure is asserted from the commit message, not read from the finding's own site list
 
-- **Severity**: P0 (validated: direct re-read, subagent unavailable)
+- **Severity**: P1 (validated: direct re-read, subagent unavailable)
 - **Category**: Workflow
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/verification.md` lines 55–56; owner check `scripts/python/closure-acceptance-check.py`
-- **Evidence** (verbatim quote):
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/scripts/python/closure-acceptance-check.py:227`; the claiming artifact is `git log -1 e0453f9e` — `fix(084): resolve the review blocking and P0 findings`
+- **Evidence** (verbatim quote, from the module):
 
   ```
-  smoke_exit_code=0 (both runs)
-  smoke_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/smoke-run1-2026-11-05.txt; .specify/specs/084-harness-triple-structure/test-evidence/smoke-run2-2026-11-05.txt (byte-identical, cmp exit 0)
+  FLOW_CLASSES = ("execution", "expression")
   ```
 
-  against the checker's own reading of the same file:
+  against the declaration that owns that set:
 
   ```
-  "completion_conditions": { "smoke_record_pass": false, ... }
-  "reasons": [ { "code": "status-claims-implemented-but-blocked", "target": "" } ]
-  "verdict": "block"
+  consumers:
+    - scripts/python/flow-class-check.py
+    - scripts/python/validate-requirements.py
+    - skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
   ```
 
-- **Why it's a problem**: the four conditions of `Planned → Implemented` are machine facts with a single program that answers them. The run wrote them into prose, believed the prose, and flipped the status. The smoke *did* run and did pass (this review reproduced it: two runs, exit 0, `sha256 f9cd934a…3473` on both) — which makes the failure worse, not better: a true fact recorded in an unreadable shape produced a false status, and nothing in the flow went red.
-- **Proposed fix**: `templates/commands/implement.md` § status flip MUST route through `python3 scripts/python/closure-acceptance-check.py --spec-dir <spec> --json` and copy its `verdict`; a prose self-assessment MUST NOT be the input. The copy slot is the verification log's smoke block.
+  and against round 1's own sentence, which named this site **first**:
 
-### F2 — Two closed task rows name evidence carriers that do not exist
+  ```
+  FLOW_CLASSES = ("execution", "expression") here (223) and at skills/external/sdd-loop-driver/scripts/pre-analyze-check.py:332, plus EXECUTION_CLASS = "execution" at scripts/python/validate-requirements.py:99
+  ```
 
-- **Severity**: P1
+- **Why it's a problem**: the second and third sites were changed and their engines added to `consumers:`; the first was left byte-identical. Nothing in the flow reads a fix round against the finding's own enumeration, so a commit message is the only place the claim lives — and the claim is false. The consequence is not stylistic: `grep -n 'flow-class-classes' scripts/python/closure-acceptance-check.py` returns no hit, so add one member to the declaration alone and `flow-class-check.py`, `validate-requirements.py` and `pre-analyze-check.py` accept a `**Flow Class**` value this engine still refuses with `InputError` at 581 — US2 acceptance scenario 2 (`只改声明文件 -> 门禁立刻接受新取值`) falsified for one engine, and `harness-triple-check.py --action verify` reports `findings: 0` on the tree because C-033's bidirectional reading only walks the parties the declaration already names.
+- **Proposed fix**: a review-fix commit carries one reading per site the finding enumerated (a site → commit → reading table), and the review's round-2 check reads that table instead of the commit message. Framework shape: `skills/internal/review-sdd-process/SKILL.md` § 5 gains the obligation; `templates/commit-template.md` gains the slot. This is REC-084-10.
+
+### N2 — Round 1's second legal carrier was never written
+
+- **Severity**: P1 (validated: direct re-read, subagent unavailable)
 - **Category**: Workflow
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/tasks.md` lines 31 and 166
-- **Evidence** (verbatim quote):
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/memory/features/084.md` `## Latest Review` (the section that should hold the review-record entry)
+- **Evidence** (verbatim quote — the section's entries, in order):
 
   ```
-  - GATE-2: … check: `bash scripts/bash/run-tests.sh --names-out .specify/specs/084-harness-triple-structure/test-evidence/head-failed.txt -q`, then `comm -13 <implement-start baseline> head-failed.txt` prints nothing
+  - **2026-11-05 clarify（`/speckit.clarify` Mode A，无人值守、零提问）** …
+  - **2026-11-05 tasks（`/speckit.tasks`，`5dc5919a` + `8ed70a87`）** …
+  - **2026-11-05 checklist（`/speckit.checklist`，`9abb10fb`）** …
+  - **2026-11-05 analyze round 1 回环修复（驱动者授权，三提交）** …
+  - **2026-11-05 plan reopen（路径 A，用户裁定；…）** …
+  - **2026-11-05 implement（`/speckit.implement` 最后一段 T020–T031，用户测试豁免）：** …
   ```
 
-  ```
-  - [X] T031 … Run `quickstart.md`'s S5–S8 on the final tree and record the real output in `notes/quickstart-run.md`
-  ```
+  `grep -n 'speckit.review' .specify/memory/features/084.md` → no hit.
+- **Why it's a problem**: `templates/commands/review.md` § Output and placement names two verifiable carriers for the two segment conclusions — the report's code subsection *and* the bound feature detail's `## Latest Review` review-record entry. Round 1 wrote one. The feature side therefore shows a chain that ends at `implement`, and a reader who starts from the feature (the entry point the index points at) sees no review at all — including no refusal. A carrier obligation with no check is how a run can be complete and invisible at once.
+- **Proposed fix**: the review's closing steps assert both carriers exist and carry the run's identity (a deterministic check: the feature detail has a `## Latest Review` entry whose date/run id matches this run); a missing entry is a red step, not silence. This is REC-084-11.
 
-  `ls .specify/specs/084-harness-triple-structure/notes/` returns only `pre-change-measurements.md` and `red-first-evidence.md`; `test-evidence/head-failed.txt` does not exist.
-- **Why it's a problem**: a `[X]` row whose named carrier is absent is indistinguishable from a row closed by assertion. The waiver is recorded honestly in § Notes, but the row state itself does not carry it, so the *only* machine-readable signal (the `[X]`) says "done".
-- **Proposed fix**: give `validate-tasks.py` (or the implement gate) a carrier-existence leg: a row that names a repo-relative output path MUST have that path present when it is `[X]`, or carry an explicit `waived-by-user` token in the row.
+### N3 — The new smoke slot ships without a reader
 
-### F3 — One count drifted across four surfaces inside the feature that removes drift
-
-- **Severity**: P1
-- **Category**: Workflow
-- **Location**: `verification.md` line 91, `.specify/memory/features/084.md` § Latest Review (implement entry), `.specify/memory/features.md` line 90, `tasks.md` line 203
-- **Evidence** (verbatim quote):
-
-  ```
-  SC-004_value=12 exclusion rows in 2 reason files (`no-machine-fact` 10 rows, `no-harness-asset` 2 rows); `by-owner-decree` 0 rows …
-  ```
-
-  against the same file's SC-002 row and the tree:
-
-  ```
-  SC-002_value=… 70 exclusion rows (13 in-scope / 70 excluded / 0 unclassified) …
-  ```
-
-  ```
-  $ grep -c "^- unit:" shared/declarations/exclusions/*.yaml
-  shared/declarations/exclusions/no-harness-asset.yaml:32
-  shared/declarations/exclusions/no-machine-fact.yaml:38
-  ```
-
-- **Why it's a problem**: T032 appended 58 rows after those three surfaces were written, and only `verification.md`'s SC-002 was updated. The feature's own thesis is that a value restated in several places drifts and nobody notices — and its own records demonstrate it. SC-004 is still `pass` on the stale number.
-- **Proposed fix**: derive the count in the report (`harness-triple-check.py --action coverage` already prints `excluded`) and let every prose surface point at that reading instead of restating a number.
-
-### F4 — The new delegation cannot be default-on because an existing closed assertion forbids a new finding name
-
-- **Severity**: P2
-- **Category**: Automation
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` (module docstring, `--triple-structure`)
-- **Evidence** (verbatim quote):
-
-  ```
-  * **One subprocess call — the judging engine** (``scripts/python/harness-triple-check.py``). It runs
-    only when ``--triple-structure`` is passed, once per run, and each finding line it prints is
-    forwarded verbatim under the single check name ``triple-structure``. The flag defaults **off** by
-    measurement rather than taste: an existing 081 assertion closes the set of finding *names* a stage
-    run may produce, so a default-on delegation would turn it red (plan D8 / `T-003`).
-  ```
-
-- **Why it's a problem**: a gate that should catch the feature's regressions cannot be reached without an opt-in flag nobody passes, because a *closed set* in an older test forbids growth. Closing a set is the right move; closing it so that later stages cannot add a name is a treadmill that every future gate improvement will hit.
-- **Proposed fix**: let the closed set name its growth procedure (a declared roster, which this very feature now provides as `driver-gate-roster`) instead of a literal tuple in `tests/contract/test_acceptance_premises.py`, then default the delegation on.
-
-### F5 — A contract clause asks `verify` for a reading another clause forbids it to perform
-
-- **Severity**: P2
+- **Severity**: P1 (validated: direct re-read, subagent unavailable)
 - **Category**: Template
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/contracts/harness-triple-check.contract.md` C-032 and C-038
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/templates/verification-log-template.md:65` (and its mirror `.specify/templates/verification-log-template.md:65`)
 - **Evidence** (verbatim quote):
 
   ```
-  - **C-032** **`--action verify`** judges declaration completeness only: … and residual literals via the reused `duplicate-fact` reading.
+  smoke_comparison     optional: a repo-relative comparison transcript (e.g. the second run's evidence)
+                       when the smoke is a determinism comparison; the three fields above MUST carry
+                       no annotation — a value the checker parses is a literal
   ```
 
-  ```
-  - **C-038** No model judgement, no network, no subprocess, no environment-dependent branch …
-  ```
-
-  and the implementation's answer, `scripts/python/harness-triple-check.py:440`:
+  against the checker's own field tuple:
 
   ```
-  "residual_literals": "delegated: doc-consistency-check.py --faces duplicate "
-                       "(this engine opens no subprocess and never re-scans)",
+  SMOKE_FIELDS = ("smoke_command", "smoke_exit_code", "smoke_evidence_path")
   ```
 
-- **Why it's a problem**: the two clauses cannot both hold in one runtime. The implementer chose the clause that yields a green and documented the choice — honest, but `verify` now exits 0 having printed a constant where a reading was promised, which is the "green that would not go red" shape.
-- **Proposed fix**: drop the residual-literal conjunct from C-032 and name the separate `doc-consistency-check.py` run as that fact's carrier, or add an explicit `residual-literals: not-evaluated` state so a green cannot be over-read. Whichever is chosen, pin it in the contract so the next implementer does not choose again.
+  and `grep -rn smoke_comparison --include=*.py .` → zero hits.
+- **Why it's a problem**: round 1's F15 said the two-run claim had no legal carrier; the fix produced one that no program consults, so a fabricated or stale comparison path passes condition ④ exactly as a true one does. This is the same "a slot that would not go red" shape as F8 one level down: F8 made the three parsed fields literal; the fourth field carries the very claim (byte identity) that the run cannot otherwise prove, and it is the one nobody parses. A template that adds a slot without naming its reader teaches the next implementer to improvise in a fixed grammar again.
+- **Proposed fix**: a template slot MUST name its reader in the slot's own line, and where the field exists the checker resolves it as an existence test (or the slot becomes mandatory for a feature whose smoke is a comparison). This is REC-084-09.
 
-### F6 — Same-author detection could not be delegated in this topology
+### N4 — A closed row whose named carrier is absent is still indistinguishable from a closed row
 
-- **Severity**: P2
+- **Severity**: P1 (validated: direct re-read, subagent unavailable)
 - **Category**: Workflow
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/shared/workflow/objective-analysis-gate.md` (rule 7 fallback) vs the local dispatch topology
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/tasks.md:31` (GATE-2) and `:166` (T031)
 - **Evidence** (verbatim quote):
 
   ```
-  * **Subagent-unavailable fallback**: if the validation subagent dispatch fails twice in a
-    row (upstream error), a direct evidence re-read by the reviewing agent MAY substitute;
+  - GATE-2: Zero new failures on the five frozen gate scripts' existing tests, read at id level — check: `bash scripts/bash/run-tests.sh --names-out .specify/specs/084-harness-triple-structure/test-evidence/head-failed.txt -q`, then `comm -13 <implement-start baseline> head-failed.txt` prints nothing …
   ```
-  (`.specify/skills/internal/review-sdd-process/SKILL.md` § 5 — the applicable fallback shape)
-- **Why it's a problem**: the artifacts under review were produced by the same agent lineage that reviews them, and the topology has no dispatch. The gate's own escape hatch was used, and every P0 in this report therefore carries "(validated: direct re-read, subagent unavailable)". That is weaker evidence than the gate intends, and it is invisible unless this line is read.
-- **Proposed fix**: make the fallback visible on the report itself (a required field in `templates/review-template.md` § Findings Summary: `P0 validation path: subagent | direct re-read`), so a reader can weight the P0s without reading the skill.
 
-### F7 — The code-review skill states a five-step path; its own script help states four
+  ```
+  - [X] T031 [blockedBy: T027,T028,T030] (SC-001…SC-006, quickstart S5–S8) Run `quickstart.md`'s S5–S8 on the final tree and record the real output in `notes/quickstart-run.md` …
+  ```
 
-- **Severity**: P2
+  `ls .specify/specs/084-harness-triple-structure/notes/` → `pre-change-measurements.md`, `red-first-evidence.md`; `ls …/test-evidence/head-failed.txt` → `No such file or directory`.
+- **Why it's a problem**: unchanged since round 1, and the fix commit touched this very file — it edited the DoD line and left both rows. The only machine-readable signal on a row is its `[X]`; a row that promises an output path which does not exist reads "done" to every program and to every reader who does not `ls`. Under the user's test waiver the honest row state is a waiver token, not a tick.
+- **Proposed fix**: REC-084-06 as written (a carrier-existence leg in `validate-tasks.py`, or an explicit `waived-by-user` token on the row). Round 2 adds the datum that the fix round passed over it while editing the same file.
+
+### N5 — A `pass` row records a count the tree no longer reads, and one of its limbs is falsified
+
+- **Severity**: P1 (validated: direct re-read, subagent unavailable)
 - **Category**: Documentation
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal/code-review/scripts/git-delta-review.sh` (help text) vs `SKILL.md` § 非交互路径
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/verification.md:70`
 - **Evidence** (verbatim quote):
 
   ```
-    NON-INTERACTIVE PATH (four steps, in this order — four, never three):
-      1. base      resolve the range: base= head= base_source=
-      2. start     record creation and rotation (required from the second run on)
-      3. note      append opinions (repeatable, one call per opinion)
+  SC-001_value=… consumer consistency declarations→carriers 28/28 and carriers→declarations 16/16
   ```
 
-  while `SKILL.md` says「**非交互路径（Agent / CI：五步，不是四步）**」 and step 5 is `capture`. `capture` exists in the same script (`cmd_capture`, line 1277).
-- **Why it's a problem**: the help text is the surface an agent or a maintainer reads first when a step fails, and it contradicts the owner. This is pre-existing (the slice does not touch this script) but it is the exact defect class the slice removes: one fact, two surfaces, no reader notices.
-- **Proposed fix**: regenerate the help's step list from the same closed enumeration the skill uses, or delete the numbered list from the help and point at the skill section.
-
-### F8 — The smoke record has no machine-parseable shape, so condition ④ cannot be read
-
-- **Severity**: P0 (validated: direct re-read, subagent unavailable)
-- **Category**: Template
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/verification.md` lines 54–57
-- **Evidence** (verbatim quote):
+  against the live reading on the same tree, after the fix:
 
   ```
-  smoke_command=python3 scripts/python/harness-triple-check.py --action coverage (run twice)
-  smoke_exit_code=0 (both runs)
-  smoke_evidence_path=.specify/specs/…/smoke-run1-2026-11-05.txt; .specify/specs/…/smoke-run2-2026-11-05.txt (byte-identical, cmp exit 0)
+  consistency-declarations-to-carriers: 30/30
+  consistency-carriers-to-declarations: 16/16
   ```
 
-- **Why it's a problem**: the owner says `smoke_exit_code` is `0` and `smoke_evidence_path` is *a repo-relative path to a file that exists and is non-empty*. Both values here are annotated prose. `evaluate_smoke()` compares `exits[0].strip() != "0"` and resolves the path with `Path(rel).is_file()`; both fail, so `smoke_record_pass=false` and the whole feature is `block`. The template gives no slot for "two runs compared byte for byte", which is what SC-001 (i) actually requires — so the implementer improvised inside a field whose grammar is fixed.
-- **Proposed fix**: add a `smoke_comparison=` field (or let `smoke_evidence_path` name one comparison transcript) to `templates/verification-log-template.md`, and state in the template that the three smoke values may contain no annotation.
-
-### F9 — One features.md row carries two statuses for one feature
-
-- **Severity**: P0 (validated: direct re-read, subagent unavailable)
-- **Category**: Workflow
-- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/memory/features.md` line 90
-- **Evidence** (verbatim quote, from the same physical line):
+  and against the criterion's own limb (iii):
 
   ```
-  | 084 | Harness 三重结构（markdown + yaml + script） | … | Implemented | .specify/memory/features/084.md | …
+  (iii) 每条事实声明的 `consumers` 与载体侧引用**双向一致**——声明点名的一方确实引用它、引用它的一方确实被点名（N/N…）
   ```
 
-  ```
-  … ⇒ 状态机条件 (3)(4) 不成立，故落 `Blocked`，不写 `Implemented`|
-  ```
+- **Why it's a problem**: two defects in one row. The count is stale — the fix added two consumers and only the declaration was updated, so the row records a number that moved *because of the fix itself*. And limb (iii)'s second half ("引用它的一方确实被点名") is false on the tree: `closure-acceptance-check.py` references the `flow-class-classes` value and is not named. The program that awards this row cannot see either defect — it compares the parties the declaration lists (`harness-triple-check.py:345-368` iterates `consumers`), so an unnamed reader is invisible by construction. This is round 1's F3/F10 class recurring inside the commit that was repairing it, which is the strongest available evidence that a restated count in prose is not a reading.
+- **Proposed fix**: the row's value is a pointer to the run's output (`harness-triple-check.py --action verify`) instead of a restated pair, and limb (iii) is measured by the derived roster REC-084-03 proposes (grep each fact's values across `scripts/` + `skills/`, fail on a hit outside `consumers`).
 
-- **Why it's a problem**: `03a19487` changed the `Status` column and left the `Last Updated` narrative untouched, so the row asserts both. A reader — or a program that greps the narrative — gets whichever value it looks at first. This is the state the feature's own thesis calls impossible to drift.
-- **Proposed fix**: the flip commit must rewrite the narrative in the same edit; `validate-features`-style check (or a contract test) should assert that a row's narrative ends with the same status the column carries.
+### N6 — `post_change_commit` names a commit that never touched the file
 
-### F10 — A `pass` row rests on a stale reading
-
-- **Severity**: P1
+- **Severity**: P2 (validated: direct re-read, subagent unavailable)
 - **Category**: Documentation
-- **Location**: `verification.md` line 91
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/verification.md:39`
 - **Evidence** (verbatim quote):
-
-  ```
-  SC-004_status=pass
-  SC-004_value=12 exclusion rows in 2 reason files (`no-machine-fact` 10 rows, `no-harness-asset` 2 rows); `by-owner-decree` 0 rows …
-  ```
-
-- **Why it's a problem**: the reading was true when T020 closed and false after T032 wrote 58 more rows. Nothing re-read the row, and `pass` is the value an acceptance reader trusts. The criterion's own mechanical limbs still hold on the final tree (70 rows, all reasons in the closed set, all 70 anchors resolving, 0 `exclusion-anchor-unresolvable` per this run's coverage), so the *verdict* is right and the *value* is wrong — the most misleading of the two failures.
-- **Proposed fix**: a `pass` row whose value names a count MUST carry the command that produced it and the commit it was read at, and the implement gate should re-read any row whose `SC-*_verified_at` predates `HEAD`.
-
-### F11 — verification.md contradicts itself about the feature's status
-
-- **Severity**: P1
-- **Category**: Documentation
-- **Location**: `verification.md` line 132 vs lines 10–16
-- **Evidence** (verbatim quote):
-
-  ```
-  notes_feature_status=Blocked — reason `test-waiver: final-path evidence waived-by-user`. Conditions (3) and (4) of `Planned → Implemented` fail: SC-001 and SC-002 are `final`-path rows that are not `pass`, and the smoke record was not run.
-  ```
-
-  against the same file's header, rewritten in `03a19487`:
-
-  ```
-  Consequence: the feature is **`Implemented`**. … The smoke record is complete (two byte-identical coverage runs, exit 0).
-  ```
-
-- **Why it's a problem**: `03a19487` updated the header and the smoke block but left the notes line at the pre-flip reading, so the file states both. This is precisely where a later auditor looks for "what did the run think at the end".
-- **Proposed fix**: same as F9 — a status flip is one edit across every surface that states it, and the surfaces should be enumerable (the feature detail, the index row, the log's notes line).
-
-### F12 — The baseline datum is labelled "implement start" but is a Part-3 commit
-
-- **Severity**: P1
-- **Category**: Documentation
-- **Location**: `verification.md` lines 21 and 39
-- **Evidence** (verbatim quote):
-
-  ```
-  # -- Baseline (recorded at implement start, before any work changed the tree) --
-  baseline_commit=98288d45
-  ```
 
   ```
   post_change_commit=98288d45 (this segment's commit is the one carrying these files; recorded here as the parent-inclusive working tree)
   ```
 
-  `git log --oneline` shows `98288d45 feat(084): migrate the ARC and record-schema facts (T015-T019)` — Part 3, not implement start.
-- **Why it's a problem**: SC-005 and SC-006 both say "relative to the baseline captured in `notes/pre-change-measurements.md`" and this block is the log's copy of that anchor. A baseline that is silently a mid-implement commit makes every "no NEW drift" claim vacuous, and no reader can tell without cross-checking git.
-- **Proposed fix**: the baseline block's commit should be copied mechanically from the state spine's `E2` slot (T001's tree), and a mismatch between the label and the commit's position in the branch should fail a check.
+  `git show --stat 98288d45 -- .specify/specs/084-harness-triple-structure/verification.md` → empty; `git log --oneline -- verification.md` → `e0453f9e`, `03a19487`, `e185da6c`, `1e4ca01e`.
+- **Why it's a problem**: round 1 repaired the sibling `baseline_commit` and left this one. The field's parenthetical asserts that `98288d45` carries these files, which the file's own history contradicts, and `98288d45` is a Part-3 commit. An anchor field that points at the wrong commit is the same defect class as F12 — a datum a later reader would cross-check git to discover is wrong.
+- **Proposed fix**: derive the field from `git log -1 --format=%h -- <file>` at write time, or drop the field in favour of the baseline pair the checker actually reads.
 
-### F13 — `DoD Status: pending` survives a fully closed, `Implemented` feature
+### N7 — `green-with-void` is used for a user waiver, which is not what the token means
 
-- **Severity**: P2
+- **Severity**: P2 (validated: direct re-read, subagent unavailable)
 - **Category**: Template
-- **Location**: `tasks.md` line 26
+- **Location**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/tasks.md:26` and `:202`; the token's owner is `.specify/templates/tasks-template.md:52`
 - **Evidence** (verbatim quote):
 
   ```
-  **DoD Status**: pending
+  **DoD Status**: green-with-void
   ```
 
-  with `grep -cE '^- \[[ OX]\]'`-style reading of the same file: 32 rows, all `[X]`, and `features.md` = `Implemented`.
-- **Why it's a problem**: under the test waiver the DoD rows genuinely are not satisfied (DoD-4's "zero new failures", DoD-7's distribution reading), so `pending` is honest — but nothing links that value to the status machine, so a feature can be `Implemented` while its own DoD block says it is not. One of the two values must be wrong, and the reader has no rule to decide which.
-- **Proposed fix**: state in `templates/tasks-template.md` whether `DoD Status` is an input to the status machine; if it is not, say so where the status rows are defined, so the divergence is a documented one instead of a contradiction.
-
-### F14 — The delta does not deliver one machine-read copy for two declared closed sets
-
-- **Severity**: P1
-- **Category**: Template
-- **Location**: `scripts/python/closure-acceptance-check.py:223`, `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py:332`, `scripts/python/validate-requirements.py:99`, `scripts/python/closure-acceptance-check.py:916/939/1347`, `scripts/python/validate-requirements.py:395`
-- **Evidence** (verbatim quote):
-
   ```
-  FLOW_CLASSES = ("execution", "expression")
-  ```
-  (two engines, neither named in `shared/declarations/facts/flow-class-classes.yaml`, whose `consumers:` list is exactly `scripts/python/flow-class-check.py`)
-
-  ```
-  if path != "final":
-  ```
-  ```
-  if criteria[sc_id] == "final" and _first_status(statuses, sc_id) != FINAL_PATH_PASS_BUCKET
-  ```
-  (three sites in an engine that the `success-criterion-path-values.yaml` `consumers:` list *does* name)
-
-- **Why it's a problem**: migration contract C-042/C-044 enumerate a fact's carrier and *one* engine side, and T012's row literally instructs "delete `CLASS_VALUES` … from `scripts/python/flow-class-check.py`". Enumerating by carrier makes the roster complete-looking while three engines keep the same value; reading the declaration for the membership verdict while re-spelling the member at the branch sites makes the read cosmetic. Add one legal member to `flow-class-classes.yaml` and `flow-class-check.py` accepts it while two gates still refuse it — falsifying US2 acceptance scenario 2 and SC-002's property, and nothing in the tree measures it (the contract module asserts membership rejection, not the absence of surviving literals; the tests that would have noticed were waived).
-- **Proposed fix**: derive the migration roster by `grep` over each fact's *values* across `scripts/` + `skills/` (the roster row then lists every hit, not the one the plan author remembered), and add a leg to `harness-triple-check.py --action verify` that fails when a declared fact's member literal appears in an engine that is not in `consumers`.
-
-### F15 — The two-run claim SC-001 (i) requires has no legal carrier
-
-- **Severity**: P1
-- **Category**: Command Prompt
-- **Location**: `tasks.md` line 129 (T018) and `verification.md` line 56
-- **Evidence** (verbatim quote):
-
-  ```
-  - [X] T018 … capturing the full stdout/stderr, exit code and duration of **both** runs (single-run evidence discipline: the record is the evidence, a re-run is not): the two runs are byte-identical
+  - **DoD Status `green-with-void`**: the void rows are the user-waived scratch-tree limbs (T022/T030) and the closure full-suite leg, not a premise that measured false. …
   ```
 
-  while the log format offers exactly one `smoke_command` / `smoke_exit_code` / `smoke_evidence_path` triple.
-
-- **Why it's a problem**: the requirement (determinism, proven by comparing two runs) and the carrier (one three-field record) are one field short, so every implementer of this requirement will improvise in the same place and break the same parse. The report's own P0 (F8) is what that looks like downstream.
-- **Proposed fix**: name a second evidence path per comparison in the plan/tasks row *and* give the log a field for it (F8's fix), so the requirement has one legal encoding.
-
-### F16 — The client-project limbs of SC-005 never ran
-
-- **Severity**: P2
-- **Category**: Workflow
-- **Location**: `verification.md` lines 95–102 (SC-005) and `tasks.md` line 165 (T030)
-- **Evidence** (verbatim quote):
-
-  ```
-  SC-005_why_reduced_insufficient=mirrors prove the framework source and this repo's `.specify/` copy agree; they say nothing about what a *client project* receives from `specify init`, which is the limb the criterion names
-  ```
-
-- **Why it's a problem**: the feature's whole point is that a *client project* receives the layer and degrades honestly without it. Both readings are scratch-tree proofs and both were waived, so the only thing this feature changed for clients (`specify init` distribution and the degraded path) has zero measured evidence — and the row that says so is buried under a `partial`. This review confirmed the six mirror pairs are identical (`sync-mirrors.py --check` exit 0) and that the degraded path is *absent* from the source readings, which does not substitute.
-- **Proposed fix**: treat the distribution limb as its own criterion with its own `Path: final` if it matters (it does — it is the product's only client-facing change), instead of folding it into a `supporting` row that can be `partial` forever.
+- **Why it's a problem**: the token's own definition — cited in this repo's earlier uses (`076`, `050`'s proposal) — is a row **whose premise is measurably false**, i.e. `void`. The annotation here states in the same sentence that these rows are *not* a false premise; they are unmet readings under an explicit user waiver. So the DoD block now uses the vocabulary's escape hatch for a case the vocabulary does not cover, which launders a waiver into a green. The honest resolution is either a third token (`green-with-waiver`, owned by the template) or `pending` plus a waiver annotation — and round 1's F13 asked exactly which of the two values is wrong; the answer supplied is a third reading of the escape token.
+- **Proposed fix**: the template's `DoD Status` domain gains the waiver case explicitly (or states that a waived row is `pending` + annotation and does not feed the status machine), so a feature cannot be `Implemented` while its DoD block reports a status the domain never defined.
 
 ## 4. What Worked — Preserve (Brief)
 
-- The `Blocked` landing at `1e4ca01e`: the run wrote `Blocked` and said "no test evidence", instead of rounding a waived suite up to a pass.
-- `test-evidence/` as the run's own archive: 32 transcripts with commands, exit codes and durations, so this review could re-read rather than re-run.
-- The U5 halt at analyze round 2 and the escalation with two named paths — the loop stopped at the quality gate rather than choosing a reading for the user.
-- `analyze`'s enumerated findings with per-round reports retained (three rounds, all on disk) — the loop's history is reconstructible.
-- The declaration layer's own error discipline: `DeclarationError` carrying a finding id, `absent_label()` as the one rendering of `STR-014`, and `flow-class-check.py`'s refusal to judge against an absent closed set (exit 2 with the labels) instead of running on an empty tuple.
-- `harness-triple-check.py`'s determinism is real: two consecutive `coverage` runs are byte-identical (`sha256 f9cd934a…3473`, reproduced by this review), and `--action coverage` exits 0 with `candidates 83 / unclassified 0 / findings 0`.
+- The fix commit's ARC re-read is machine-derived, not narrated: `verdict: accept` with all four completion conditions true, and the round-2 review reproduced it independently (`test-evidence/review-fix-closure-2026-11-05.txt` is the same JSON).
+- The `success-criterion-path-values` migration is now the shape the other axis needs: one derived value (`PASS_PATH = PATH_VALUES[0] if PATH_VALUES else "final"`) and four branch sites comparing against it, with `grep '"final"'` reduced to the labelled fallback.
+- `pre-analyze-check.py`'s new `declared_sequence()` degrades **loudly** on the read failure path (`label_absent` before the fallback) — FR-012's second half done right, which makes the silent sibling in `validate-requirements.py` a defect rather than a style choice.
+- The smoke record became parseable in one edit without touching the checker's criteria: the three fields went literal, the checker's existing `evaluate_smoke()` read them, and the fourth claim got its own slot instead of being crammed into a parsed field.
+- Round 1's own record was complete enough to be *replayed*: every closure decision in § 2A was made by re-running a named command from the round-1 text, never by recalling it.
+- Determinism is reproducible across rounds: two consecutive `coverage` runs today produce `sha256 f9cd934a…3473`, the same value as the round-1 smoke — the pass is about the tree, not about the run.
 
 ## 5. spec-kit / SDD Improvement Recommendations
 
-### 5.1 Template Improvements
+**New this round.** Each is registered in `.specify/memory/register.md` in the same commit as this report.
 
-- **REC-084-01** — Target: `templates/verification-log-template.md` (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/templates/verification-log-template.md`). Change: add a `smoke_comparison=` field (or let `smoke_evidence_path` name one comparison transcript) and state that `smoke_command` / `smoke_exit_code` / `smoke_evidence_path` values carry no annotation. Source: F8, F15. Expected impact: completion condition ④ becomes readable for any feature whose smoke is a determinism comparison, and the improvised-in-a-fixed-grammar failure cannot recur.
-- **REC-084-02** — Target: `templates/tasks-template.md` (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/templates/tasks-template.md`). Change: state whether `DoD Status` feeds the status machine; if not, say so at the status-row definition, and require a `[X]` row that names an output path to carry that path's existence check. Source: F13, F2. Expected impact: `pending` and `Implemented` stop coexisting silently, and a closed row with a missing carrier becomes a failing assertion.
-- **REC-084-03** — Target: `templates/plan.md` § contract guidance (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/templates/plan.md`). Change: a migration contract may not conjoin a "must judge X" clause with a "must not call the thing that judges X" clause; require the roster to be derived by `grep` over each fact's values across `scripts/` and `skills/`, listing every hit. Source: F5, F14. Expected impact: unsatisfiable contract conjuncts and carrier-only rosters stop being written.
-- **REC-084-04** — Target: `templates/review-template.md` § Findings Summary (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/templates/review-template.md`). Change: add a required `P0 validation path:` field with the closed values `subagent` / `direct re-read`, so the same-author fallback is visible on the report instead of only in the skill. Source: F6. Expected impact: a reader can weight P0 findings without knowing the review skill's fallback rules.
+- **REC-084-09** — Target: `templates/verification-log-template.md` (absolute: `/storage/project/cloud-native-ai/spec-kit/templates/verification-log-template.md`). Change: a slot line MUST name the program that reads it; a slot with no reader is either deleted or wired into the checker that awards the record. Source: N3. Expected impact: "the slot exists" stops being mistaken for "the claim is checked", which is the feature's own false-green red line applied to its own template.
+- **REC-084-10** — Target: `.specify/skills/internal/review-sdd-process/SKILL.md` § 5 + `templates/commit-template.md` (absolute paths under the same root). Change: a fix round that answers review findings carries a per-site closure table (finding → its enumerated sites → the commit that touched each → the reading), and the next round reads that table instead of the commit subject. Source: N1. Expected impact: "resolve the review findings" becomes a falsifiable claim; the round-1 shape (two of three sites, message says resolved) cannot recur silently.
+- **REC-084-11** — Target: `templates/commands/review.md` § Output and placement (absolute: `/storage/project/cloud-native-ai/spec-kit/templates/commands/review.md`). Change: the closing steps assert both verifiable carriers exist and carry this run's identity — the report's § 2.1 and the feature detail's `## Latest Review` entry — and a missing carrier is a red step. Source: N2. Expected impact: a run cannot be complete and invisible from the feature side, and the refusal verdict reaches the reader who starts at the index.
 
-### 5.2 Command Prompt Improvements
-
-- **REC-084-05** — Target: `templates/commands/implement.md` (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/templates/commands/implement.md`). Change: before any status flip, run `closure-acceptance-check.py --spec-dir <spec> --json` and copy its `verdict`; a prose reading MUST NOT be the input, and the flip commit MUST rewrite every surface that states the status in the same edit. Source: F1, F9, F11. Expected impact: the status machine becomes a machine reading end to end, and one fact stops having two values in one row.
-
-### 5.3 Automation / Script Improvements
-
-- **REC-084-06** — Target: `scripts/python/validate-tasks.py` (absolute: `/storage/project/cloud-native-ai/spec-kit/scripts/python/validate-tasks.py`) and the implement gate's reading of it. Change: add a carrier-existence leg — a `[X]` row naming a repo-relative output path fails when the path is absent, unless the row carries an explicit `waived-by-user` token — and have the review/verification reports derive counts (`excluded`, `pending`) from the checker's JSON instead of restating numbers. Source: F2, F3, F10, F12. Expected impact: closed-by-assertion rows and stale counts become red checks rather than reader vigilance.
-
-### 5.4 Workflow Improvements
-
-- **REC-084-07** — Target: `.specify/skills/internal/review-sdd-process/SKILL.md` § 5 (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal/review-sdd-process/SKILL.md`). Change: name the "gate that cannot grow" pattern explicitly (closed set in an older test blocking a new finding name) and require the closed set to point at its growth procedure — which this feature now provides as `shared/declarations/facts/driver-gate-roster.yaml`. Source: F4. Expected impact: future gate improvements are not forced behind off-by-default flags.
-
-### 5.5 Documentation Improvements
-
-- **REC-084-08** — Target: `.specify/skills/internal/code-review/scripts/git-delta-review.sh` help text (absolute: `/storage/project/cloud-native-ai/spec-kit/.specify/skills/internal/code-review/scripts/git-delta-review.sh`). Change: delete the hand-maintained numbered step list from the help and point at the skill's closed enumeration (now five steps). Source: F7. Expected impact: one owner for the step count.
+**Round-1 recommendations, unchanged status** (registered, still `open`, none withdrawn): REC-084-01 (partially delivered by the `smoke_comparison` slot — delivered in form only, see N3), REC-084-02 (F13/F2 — still the right fix, N4/N7 show the need), REC-084-03 (F5/F14 — still the right fix, N1 shows the need), REC-084-04 (F6), REC-084-05 (F1/F9/F11 — the artifact side is closed; the "copy the verdict" wording is still absent from `templates/commands/implement.md:56`, which says run it and does not say paste it), REC-084-06 (F2/F3/F10/F12), REC-084-07 (F4), REC-084-08 (F7).
 
 ## 6. Priority Roadmap
 
 | Priority | Recommendation | Target File / Subsystem | Source Finding(s) |
 |----------|----------------|--------------------------|-------------------|
-| P0 | REC-084-05 — Machine-read status flip | `templates/commands/implement.md` | F1, F9, F11 |
-| P0 | REC-084-01 — A legal carrier for a comparison smoke | `templates/verification-log-template.md` | F8, F15 |
-| P1 | REC-084-02 — `DoD Status` ownership + carrier existence on a `[X]` row | `templates/tasks-template.md` | F13, F2 |
-| P1 | REC-084-03 — Derived migration rosters, no unsatisfiable contract conjuncts | `templates/plan.md` | F5, F14 |
-| P1 | REC-084-06 — Carrier-existence leg + derived counts in the checker | `scripts/python/validate-tasks.py` | F2, F3, F10, F12 |
-| P2 | REC-084-04 — Visible P0 validation path | `templates/review-template.md` | F6 |
-| P2 | REC-084-07 — Growth procedure instead of a frozen finding-name set | `skills/internal/review-sdd-process/SKILL.md` | F4 |
-| P2 | REC-084-08 — One owner for the non-interactive step count | `skills/internal/code-review/scripts/git-delta-review.sh` | F7 |
+| P1 | Fix the surviving `flow-class-classes` copy (`closure-acceptance-check.py`) or record why the engine is out of the roster | `scripts/python/closure-acceptance-check.py` | N1 (code blocking) |
+| P1 | Per-site closure table for review-fix rounds | `skills/internal/review-sdd-process/SKILL.md` § 5; `templates/commit-template.md` | N1 (REC-084-10) |
+| P1 | Both review carriers asserted at closing | `templates/commands/review.md` | N2 (REC-084-11) |
+| P1 | Slot-with-a-reader rule for the verification log | `templates/verification-log-template.md` | N3 (REC-084-09) |
+| P1 | Carrier existence on a `[X]` row | `scripts/python/validate-tasks.py` | N4 (REC-084-06) |
+| P1 | Derive SC rows / the consumer roster instead of restating counts | `scripts/python/harness-triple-check.py`, `verification.md` | N5 (REC-084-03, REC-084-06) |
+| P2 | `post_change_commit` derived or dropped | `templates/verification-log-template.md` | N6 |
+| P2 | `DoD Status` domain names the waiver case | `templates/tasks-template.md` | N7 (REC-084-02) |
 
 ## 7. Self-Containment Check
 
-- [x] Every `REC-…` target is repo-relative (primary), with an absolute path only as a parenthetical supplement; targets with no repo-relative form are marked `external` with a reason. (No target was `external` this run.)
+- [x] Every `REC-…` target is repo-relative (primary), with an absolute path only as a parenthetical supplement; no target is `external`.
 - [x] Every finding in Section 3 has a quoted excerpt that lets the reader judge the problem without opening the source file.
-- [x] No bullet says "see attached", "as discussed earlier", or otherwise references context outside this document.
+- [x] No bullet says "see attached", "as discussed earlier", or otherwise references context outside this document (round 1's report is reached by the repo-relative path `review-r1.md` in the same directory).
 - [x] No placeholder tokens (`[...]`) remain anywhere in the report.
 - [x] Section 4 is short and bullet-only — no multi-paragraph narrative summaries leaked back in.
 - [x] Section 5 recommendations each cite an exact target file in the spec-kit repo and at least one source finding ID.
-- [x] **P0 validation status**: three P0 findings were raised (F1, F8, F9). None was validated by an independent read-only subagent — this topology has no dispatch capability, and the declared fallback was used. Each P0 was validated by a direct mechanical re-read at diagnosis time: F1 and F8 from one `closure-acceptance-check.py --json` run (`smoke_record_pass=false`, `verdict=block`, `reasons[0].code=status-claims-implemented-but-blocked`); F9 from the single `features.md` line 90 that reads both values. Each row therefore carries `(validated: direct re-read, subagent unavailable)` and the weaker evidence path is disclosed rather than hidden.
-
----
+- [x] **P0 validation status**: **no P0 was raised this round** (round 1 raised three; all three are closed by machine-readable state, see § 2A). The five P1 findings were validated by direct mechanical re-read — each cites a command whose output is quoted — and none was validated by an independent read-only subagent: this topology has no dispatch capability and the declared fallback (`skills/internal/review-sdd-process/SKILL.md` § 5) was used. The weaker evidence path is disclosed rather than hidden; REC-084-04 would put it on the report's own face.
+- [x] **Round-level honesty**: this run refuses the status transition on condition (c) and states that ARC, by contrast, reads `accept`. The two gates are reported separately because they read different artifacts.
 
 ## 8. Feedback
 
-Please share the contents of this document with the spec-kit framework developers.
+Framework friction worth posting as feedback (one entry per unit, four units — `/speckit.review`, `skill:review-sdd-process`, `skill:review-feature-quality`, `skill:code-review`): the round-2 run had no way to tell which of round 1's archived records the merge gate reads, and the rotation rule's slice id has no defined value for a same-slice re-review (`review-r1.md` was chosen by this run and the choice is stated in the header). No code defect from `code-review.md` is posted here — per `templates/commands/review.md` § Feedback boundary those stay in that record with their severity, file and line.
