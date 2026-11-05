@@ -576,7 +576,12 @@ MIGRATED = {
     "driver-stage-artifacts": {
         "kind": "mapping",
         "engines": ["skills/external/sdd-loop-driver/scripts/loop-state.py"],
-        "carriers": ["skills/external/sdd-loop-driver/references/dispatch-recipes.md"],
+        #: Measured 2026-11-05 (T014): C-044's carrier column says `same carrier` (SKILL.md), but
+        #: SKILL.md § References declares that it only cites the references' sections and never
+        #: restates their tables — the table lives in `references/state-awareness.md`
+        #: § Stage Artifact Map, so that is the carrier the pointer lands in. The mirror table stays:
+        #: `tests/contract/test_loop_state_contract.py` pins it to the engine row by row.
+        "carriers": ["skills/external/sdd-loop-driver/references/state-awareness.md"],
         "inline": [],
     },
     "driver-completion-sentinels": {
@@ -588,16 +593,21 @@ MIGRATED = {
     "driver-gate-roster": {
         "kind": "mapping",
         "engines": ["skills/external/sdd-loop-driver/scripts/pre-analyze-check.py"],
-        "carriers": ["skills/external/sdd-loop-driver/references/dispatch-recipes.md"],
+        #: Measured 2026-11-05 (T014), same correction as `driver-stage-artifacts`: the check-name
+        #: table is in `references/efficiency-model.md` § 6.2, not in SKILL.md or the recipes.
+        "carriers": ["skills/external/sdd-loop-driver/references/efficiency-model.md"],
         "inline": [],
     },
 }
 
 #: The rows above this part has actually migrated: C-042 rows 1–8 and batch 2's `Path` fact, closed by
-#: T008–T013, plus T014's two `driver-*` rows that reach their read point today (`driver-stage-sequence`,
-#: `driver-completion-sentinels`). The roster's remaining rows keep their shape in ``MIGRATED`` but are
-#: deliberately **not asserted yet** — batch 2's `ARC verdict mapping` is T015's, the rest of the
-#: `driver-*` group is T014's unfinished half and batch 3 is T016's. C-046 (and
+#: T008–T013, plus **all six** of T014's batch-2 rows — `expression-gate-faces`,
+#: `expression-stage-operator-table`, `driver-stage-sequence`, `driver-completion-sentinels`,
+#: `driver-gate-roster`, `driver-stage-artifacts` — which T014's closing part appends together: the two
+#: expression rows were migrated by T014's first part but their slugs never joined this tuple, and a
+#: slug that is absent here is a row whose three legs nothing runs. The roster's remaining row keeps
+#: its shape in ``MIGRATED`` but is deliberately **not asserted yet** — batch 2's `ARC verdict mapping`
+#: is T015's, and batch 3 is T016's. C-046 (and
 #: DoD-5 after it) makes each batch independently acceptable: "an unfinished batch k+1 MUST NOT be
 #: reported as a failure of batch k". A leg parametrized over an un-migrated row would report exactly
 #: that — a red id owned by a task that has not run — so the parametrization reads this tuple and each
@@ -612,8 +622,12 @@ MIGRATED_SO_FAR = (
     "flow-class-ledger-columns",
     "flow-class-neutral-categories",
     "success-criterion-path-values",
+    "expression-gate-faces",
+    "expression-stage-operator-table",
     "driver-stage-sequence",
     "driver-completion-sentinels",
+    "driver-gate-roster",
+    "driver-stage-artifacts",
 )
 
 

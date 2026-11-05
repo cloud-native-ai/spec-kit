@@ -1,0 +1,144 @@
+# implement Part 2d — closure readings (attribution / verify / engine read points), captured 2026-11-05
+# Every command below ran at HEAD f64cde10 + this part's working tree — the exact tree this part commits.
+# Each run wrote its complete stdout/stderr at execution time; the two pytest logs are the two sibling
+# records named in §1, so no reading here derives from a pipeline that discarded its own output.
+
+## 1. targeted runs — command, exit code, measured duration, full log
+
+### 1A. twelve files = the E3 row's `selected_paths[]` (Part 2c's set, re-run for comparability)
+
+$ python3 -m pytest tests/contract/test_sdd_loop_driver_skill.py tests/unit/test_loop_state_engine.py \
+    tests/contract/test_harness_triple_structure.py tests/contract/test_isomorphism_map.py \
+    tests/contract/test_loop_state_contract.py tests/contract/test_expression_compatibility.py \
+    tests/contract/test_non_regression_070.py tests/contract/test_sdd_loop_driver_gates.py \
+    tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_sdd_loop_driver_wp_model.py \
+    tests/contract/test_sdd_loop_driver_wp_coordination.py tests/unit/test_pre_analyze_check.py -q
+rc=1    13 failed / 461 passed / 0 skipped    13 720 ms
+log: implement-part2d-closure-targeted-set-2026-11-05.txt
+# Same 13 ids and the same counts as attempt 1's record of this set
+# (implement-part2d-targeted-set-2026-11-05.txt, 13.43 s) — the closure run re-establishes the row's
+# numbers on the tree being committed instead of inheriting them.
+
+### 1B. four files = the dispatch brief's own minimum set (test_expression_compatibility.py excluded)
+
+$ python3 -m pytest tests/contract/test_sdd_loop_driver_skill.py tests/unit/test_loop_state_engine.py \
+    tests/contract/test_isomorphism_map.py tests/contract/test_harness_triple_structure.py -q
+rc=1    11 failed / 167 passed / 0 skipped    7 558 ms
+log: implement-part2d-closure-brief-set-2026-11-05.txt
+
+# Reconciliation of the three counts in play — they are three sets, not three states of one tree:
+#   brief's 11F / 167P  = this four-file set (178 tests)
+#   attempt 1's 12F / 182P = the five named files: the four above + test_expression_compatibility.py
+#                            (194 tests; the 16-test delta is 15 pass + the red test_c7)
+#   this row's 13F / 461P = the twelve files above (+ test_loop_state_contract.py,
+#                            test_pre_analyze_check.py, test_non_regression_070.py,
+#                            test_sdd_loop_driver_{gates,efficiency,wp_model,wp_coordination}.py)
+# No reading is contradicted: every set's failure list is the same class breakdown, largest set below.
+
+## 2. mechanical attribution — program, not eye
+
+# Inputs: the `FAILED <id>` lines of each record, the E2 comparison set
+# (test-evidence/baseline-pre-existing-failed.txt, 23 names) and the registered mirror-class ids
+# (test_c7 / test_c18 / test_di_05 — Part 2b and Part 2c `new_failures`). Classification:
+
+record                                       summary                          failed  baseline  mirror  NEW
+implement-part2d-closure-targeted-set        13 failed / 461 passed             13       10        3      0
+implement-part2d-closure-brief-set           11 failed / 167 passed             11       10        1      0
+implement-part2d-targeted-run (attempt 1)    12 failed / 182 passed             12       10        2      0
+implement-part2d-targeted-set (attempt 1)    13 failed / 461 passed             13       10        3      0
+
+# The three mirror-class ids in the twelve-file set:
+#   tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift
+#   tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical
+#   tests/contract/test_sdd_loop_driver_efficiency.py::test_di_05_delivery_and_mirror
+# The ten baseline ids in the twelve-file set:
+#   tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+#   tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+#   tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+#   tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+#   tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+#   tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+#   tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+#   tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+#   tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+#   tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+# Nine of the ten are the same DEAD/ANOMALY-versus-RUNNING branch on a live pid (the E2 baseline defect,
+# frozen before this feature started); test_c22 is the environment's unwritable temp root
+# (`mkdir: cannot create directory '/home/agent/tmp/spec-kit': Permission denied`) — also in the baseline.
+# => new_failures = 0 in all four records.
+
+## 3. `verify` — C-048 (a) schema, (c) read point, both-direction consistency
+
+$ python3 scripts/python/harness-triple-check.py --action verify ; echo rc=$?
+declarations: 15            # 13 before this part + driver-gate-roster + driver-stage-artifacts
+candidates: 83
+consistency-declarations-to-carriers: 17/17    # 15/15 before; +1 per new fact
+consistency-carriers-to-declarations: 10/10
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 76                # all `unclassified-candidate`; C-043 makes the un-migrated remainder a reading
+rc=1
+
+# Composition checked mechanically: 76 lines match `finding: unclassified-candidate`, and the set
+# difference (all `finding:` lines minus those) is empty — so zero `third-layer-missing` (the Part 2c
+# reading was cleared at f64cde10 and stays cleared), zero `duplicated-fact-literal`, zero
+# `declaration-outside-subset`: the three codes a row of this batch could raise.
+# Bound worth stating: that duplicate reading is spec-dir scoped (contract
+# `migration-batches.contract.md` line 151), so it certifies the spec's formal files, not a whole-repo
+# carrier. §5 below uses a direct grep where the boundary matters.
+
+## 4. engine read points — the declaration is what the engines evaluate
+
+$ python3 - <<'PY'   # both modules loaded the way the driver loads them
+pre-analyze-check: driver-gate-roster: check name 'ghost-check' is not in the declared roster
+GATE_ROSTER checks: ['dangling-id', 'external-clause', 'blocked-by', 'count-claim', 'missing-path', 'duplicate-id']
+GATE_ROSTER stages: ['requirements', 'plan', 'tasks']
+declared_check('dangling-id'): dangling-id
+unknown key fallback: ghost-check          # labelled on stderr, never silent, never a traceback
+STAGE_ARTIFACTS keys: ['requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review']
+plan row: {'artifacts': ['plan.md', 'data-model.md', 'contracts/', 'quickstart.md', 'feature-ref.md'],
+           'owned_paths': ['research.md'], 'commit_required': True, 'no_change_allowed': False}
+IMPLEMENT_CODE_PATHSPEC: ['src/', 'skills/', 'scripts/', 'tests/', 'templates/', 'agents/']
+STAGE_SEQUENCE: ('requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review')
+PY
+
+# `commit_required` / `no_change_allowed` arrive as bool (the declaration spells them `true`/`false`,
+# the row carries Python bools), `plan` picks up the conditional `owned_paths: [research.md]` that the
+# engine's own literal does not carry out of the box, and the key order is the declared sequence.
+
+$ grep -n "READ_ENTRY_REL\|GATE_ROSTER_FACT" skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+98:READ_ENTRY_REL = os.path.join("scripts", "python", "declaration_reader.py")
+99:GATE_ROSTER_FACT = "driver-gate-roster"
+$ grep -n "READ_ENTRY_REL\|STAGE_ARTIFACTS_FACT" skills/external/sdd-loop-driver/scripts/loop-state.py
+105:READ_ENTRY_REL = Path("scripts") / "python" / "declaration_reader.py"
+107:STAGE_ARTIFACTS_FACT = "driver-stage-artifacts"
+$ grep -n "^STAGE_ARTIFACTS = {" skills/external/sdd-loop-driver/scripts/loop-state.py
+211:STAGE_ARTIFACTS = {
+# The literal table stays on purpose: it is FR-012's degradation value AND the assignment
+# `tests/contract/test_isomorphism_map.py` statically parses (`^STAGE_ARTIFACTS\s*=\s*\{`). The
+# declaration is the authority; the literal is the labelled fallback.
+
+## 5. the residual this part did NOT touch — a carrier restatement still in the tree
+
+$ grep -n "阶段链固定顺序" skills/external/sdd-loop-driver/references/dispatch-recipes.md
+154:- 阶段链固定顺序：`requirements → clarify → plan → tasks → checklist → analyze → implement → review`…；
+     每阶段完成哨兵 = 大写阶段名 + `-DONE`（如 `PLAN-DONE`、`CHECKLIST-DONE`、`ANALYZE-DONE`）
+
+$ grep -n "STAGE_CHAIN in text" tests/contract/test_sdd_loop_driver_skill.py
+185:    assert STAGE_CHAIN in text, "stage chain literal must be inlined"
+
+# This line spells two of T014's six facts verbatim (`driver-stage-sequence`,
+# `driver-completion-sentinels`), and neither declaration lists that file in `former_carriers`.
+# `tests/contract/test_sdd_loop_driver_skill.py::test_c5` reads that exact file and asserts the chain
+# literal is inlined, so turning it into a pointer turns a frozen test red — `C-051` forbids a batch
+# row from buying that with a local exception. Which of the two readings stands (this is a sanctioned
+# test-pinned duplicate, or it is an un-migrated carrier face that returns to the spec) is not a call
+# this stage can make; it is recorded open in `stage-status.md` § 开着的判定 and in the return line.
+
+## 6. surfaces this part must not touch — measured empty
+
+$ git diff --stat HEAD -- .specify/specs/084-harness-triple-structure/{plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}
+(empty)     # no plan-owned touch => no PLAN-EDIT declaration owed
+$ git status --porcelain -- .specify/skills .specify/shared .specify/scripts
+(empty)     # mirrors are projections (T026); nothing hand-edited
+$ git diff --stat 4b65517c -- pyproject.toml
+(empty)     # dependency surface unchanged

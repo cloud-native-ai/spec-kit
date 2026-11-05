@@ -1,0 +1,191 @@
+# implement Part 2d — T014 readings (verify / coverage / read points / engine behaviour / gate diff)
+# captured 2026-11-05, single run per command; filtered views below derive from these records.
+
+## 1. verify — whole tree (C-048 (a) schema, (c) read point, both-direction consistency)
+
+$ python3 scripts/python/harness-triple-check.py --action verify ; echo rc=$?
+
+# harness-triple-check — verify
+declarations: 15            # 13 before this part + driver-gate-roster + driver-stage-artifacts
+candidates: 83
+consistency-declarations-to-carriers: 17/17    # 15/15 before; +1 per new fact
+consistency-carriers-to-declarations: 10/10
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 76                # all `unclassified-candidate` (the un-migrated units of batch 2's remainder
+                            # and batch 3 — C-043 makes that a reading, not a failure of this batch)
+rc=1
+
+# zero `third-layer-missing`, zero `duplicated-fact-literal`, zero `declaration-outside-subset`
+# (the three codes a migrated row of this batch could raise). The one `third-layer-missing` recorded
+# in Part 2c's reading (create-requirements) was cleared at f64cde10 and is still absent.
+
+## 2. coverage — byte-identical before and after this part
+
+$ python3 scripts/python/harness-triple-check.py --action coverage > /tmp/cov-before.txt   # at f64cde10 + worktree
+$ ...write the two declarations and the two engine read points...
+$ python3 scripts/python/harness-triple-check.py --action coverage > /tmp/cov-after.txt
+$ diff /tmp/cov-before.txt /tmp/cov-after.txt ; echo rc=$?
+(no output)
+rc=0
+
+# candidates 83 / pending 0 / unclassified 76 both times, and the driver row is unchanged:
+unit: skills/external/sdd-loop-driver/SKILL.md
+disposition: in-scope
+state: complete
+fact: driver-completion-sentinels
+fact: driver-stage-sequence
+
+# Why no unit moved: a unit is one of the three markdown surfaces the candidate screen reads
+# (templates/commands/*.md, skills/{external,internal}/*/SKILL.md, shared/workflow/*.md). This part's
+# `former_carriers` are two `references/` files and its `consumers` are two engine scripts, so no
+# candidate unit gains or loses a disposition — which is the intended shape for a fact whose carrier
+# is a skill-internal reference rather than a command carrier.
+
+## 3. engine read points (C-048 (c)) — greppable `declaration_reader` + the fact slug
+
+$ grep -n "READ_ENTRY_REL\|GATE_ROSTER_FACT" skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+98:READ_ENTRY_REL = os.path.join("scripts", "python", "declaration_reader.py")
+99:GATE_ROSTER_FACT = "driver-gate-roster"
+113:        candidate = os.path.join(here, READ_ENTRY_REL)
+160:GATE_ROSTER = declared_mapping(GATE_ROSTER_FACT)
+180:    note = "%s: check name %r is not in the declared roster" % (GATE_ROSTER_FACT, key)
+
+$ grep -n "READ_ENTRY_REL\|STAGE_ARTIFACTS_FACT" skills/external/sdd-loop-driver/scripts/loop-state.py
+105:READ_ENTRY_REL = Path("scripts") / "python" / "declaration_reader.py"
+107:STAGE_ARTIFACTS_FACT = "driver-stage-artifacts"
+121:        candidate = parent / READ_ENTRY_REL
+305:    statement = declared_mapping(STAGE_ARTIFACTS_FACT)
+
+## 4. residual literals — what is left in the two engines and why
+
+$ grep -c '"dangling-id"\|"blocked-by"\|"count-claim"\|"missing-path"\|"duplicate-id"\|"external-clause"' \
+    skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+9        # exactly the nine `declared_check("<name>")` call sites: the *key* a call site selects,
+        # never an emitted literal — the rendering comes from the declaration (probe 5b below).
+$ grep -n 'add(findings, "' skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
+(no output)   # zero bare-literal call sites
+
+$ grep -n "^STAGE_ARTIFACTS = {" skills/external/sdd-loop-driver/scripts/loop-state.py
+211:STAGE_ARTIFACTS = {
+# The literal table stays on purpose and is labelled as such in place: it is FR-012's compatibility
+# value for a project with no declaration layer, AND it is the assignment
+# `tests/contract/test_isomorphism_map.py` statically parses for the roster owner's stage keys
+# (`^STAGE_ARTIFACTS\s*=\s*\{` plus the four-space `"stage": {` rows). Deleting it would turn that
+# 069b leg red without any of this batch's facts being safer, so the declaration is the authority and
+# the literal is the labelled fallback.
+
+## 5. engine behaviour — the declaration is what the engines evaluate
+
+$ python3 - <<'PY'   # loop-state.py, four probes on the loaded module
+1) a legal edit in the declaration (review.commit_required: "false") reaches the effective table:
+   declared edit applied: True pathspec: ['src/']
+2) a ninth stage in the declaration is refused and the literal stands:
+   loop-state: driver-stage-artifacts names 9 stage(s) (analyze, checklist, clarify, implement, merge, plan,
+   requirements, review, tasks) but this engine carries 8 (...); the inline table stands
+   ninth stage refused: True
+3) a half row (tasks without owned_paths) is refused:
+   loop-state: driver-stage-artifacts: stage 'tasks' is not a complete four-dimension row; the inline table stands
+   half row refused: True
+4) an unreadable declaration falls back to the literal, labelled:
+   absent declaration -> literal: ['plan.md', 'data-model.md', 'contracts/', 'quickstart.md', 'feature-ref.md']
+
+$ python3 - <<'PY'   # pre-analyze-check.py, three probes
+roster size: 6 stages: ['requirements', 'plan', 'tasks']
+declared_check ok: dangling-id
+declared name wins: dangling-id-v2        # roster edited to render a different literal
+absent key falls back: ghost-check        # labelled: driver-gate-roster: check name 'ghost-check' is not in the declared roster
+degraded mapping: {}                       # labelled: declaration layer unreachable: driver-gate-roster
+degraded check: count-claim
+
+## 6. gate output unchanged (criteria / exit codes / literals), measured on this feature's spec dir
+
+$ python3 <HEAD copy of pre-analyze-check.py> --spec-dir .specify/specs/084-harness-triple-structure \
+    --stage <requirements|plan|tasks> --repo .
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir ... --stage ... --repo .
+
+requirements  old rc=0  new rc=0  stdout identical  stderr identical
+plan          old rc=0  new rc=0  stdout identical  stderr identical
+tasks         old rc=0  new rc=0  stdout identical  stderr identical
+# the new run's findings carry the declared names: 10 x "check": "missing-path", 0 errors, 10 advisories
+
+## 7. targeted tests (C-048 (e)) — zero new failures, six new passing cases
+
+### 7a. the five files the dispatch names (minimum set)
+
+$ python3 -m pytest tests/contract/test_sdd_loop_driver_skill.py tests/unit/test_loop_state_engine.py \
+    tests/contract/test_isomorphism_map.py tests/contract/test_harness_triple_structure.py \
+    tests/contract/test_expression_compatibility.py -q
+12 failed, 182 passed, 1 warning in 7.50s
+# full log: test-evidence/implement-part2d-targeted-run-2026-11-05.txt
+
+# The comparison object is not the previous run itself: the same five files were run in a detached
+# worktree at f64cde10 (`git worktree add .specify/.tmp/t014-head --detach HEAD`, removed afterwards):
+12 failed, 170 passed, 1 warning in 8.00s
+# The twelve failing ids are the same twelve — 8 pre-existing in the implement-start baseline
+# (tests/unit/test_loop_state_engine.py) plus test_c22 (baseline) plus test_c18 (mirror drift on
+# SKILL.md, introduced by Part 2c and owed to T026's mirror projection) plus test_c7 (mirror drift on
+# four batch-1 pairs, likewise T026's). 182 - 170 = 12 = the six T014 slugs this part leaves in
+# MIGRATED_SO_FAR x the three parametrized legs of test_harness_triple_structure.py
+# (`*_has_one_declaration_with_the_required_keys`, `*_keeps_a_locatable_read_point_and_drops_the_inline_copy`,
+# `*_carrier_points_at_the_declaration`). No pre-existing leg turned red.
+
+### 7b. Part 2c's twelve-file set, re-run for comparability (it adds the two files this part edits
+#        engines inside: test_loop_state_contract.py and test_pre_analyze_check.py)
+
+$ python3 -m pytest <Part 2c's 12 files> -q
+13 failed, 461 passed, 1 warning in 13.43s
+# full log: test-evidence/implement-part2d-targeted-set-2026-11-05.txt
+# Part 2c recorded 13 failed / 449 passed on the same 12 files; the thirteen failing ids are the same
+# thirteen (10 in the E2 baseline set, `test_c18_mirror_pair_no_drift`, `test_c7_mirrors_are_byte_identical`,
+# `test_di_05_delivery_and_mirror`), and 461 - 449 = 12 is the same twelve new parametrized cases.
+# `test_di_05_delivery_and_mirror` names this part's four files inside a drift list that already held
+# Part 2c's: SKILL.md, references/efficiency-model.md, references/state-awareness.md,
+# scripts/loop-state.py, scripts/pre-analyze-check.py — the same class with the same owner (T026's
+# `sync-mirrors.py --write`), not repaired in place because the dispatch forbids editing `.specify/`.
+
+$ python3 -m pytest tests/contract/test_harness_triple_structure.py -q
+68 passed, 1 warning in 1.10s
+
+
+## 8. roster corrections recorded (C-050) — carrier face, both rows
+
+C-044's carrier column (and T014's row text) name `skills/external/sdd-loop-driver/SKILL.md` and
+`references/dispatch-recipes.md` for the four driver facts. Measured on 2026-11-05:
+- `driver-stage-sequence` / `driver-completion-sentinels`: the manual's frontmatter and § References
+  (already pointed at their declarations in Part 2c), while the stage-chain and `<STAGE>-DONE`
+  literals stay in `references/dispatch-recipes.md` (pinned byte-for-byte by
+  `test_sdd_loop_driver_skill.py::test_c5` — the known residual, not touched here).
+- `driver-gate-roster`: the check-name table is `references/efficiency-model.md` § 6.2; SKILL.md
+  § References states it only cites the references' sections and never restates their tables.
+- `driver-stage-artifacts`: the four-dimension table is `references/state-awareness.md`
+  § Stage Artifact Map; the same SKILL.md clause applies.
+Both facts' `note` carries the correction; `tests/contract/test_harness_triple_structure.py`'s
+`MIGRATED` rows now name the measured carriers instead of the recipes.
+
+Second correction, carrier content: `efficiency-model.md` § 6.2 names five of the six checks —
+`external-clause` is absent while the engine emits it (advisory). Authority order is code > authored,
+so the six-member value stands and the carrier face is recorded as the corrected one. The table's
+criteria stay (they are the gate's documentation); the pointer line above it now names the
+declaration as the owner of the name set and of the per-stage file requirement.
+
+## 9. one correction inside this part's own test surface (disclosed, not silent)
+
+`MIGRATED_SO_FAR` in `tests/contract/test_harness_triple_structure.py` is the tuple that decides which
+migrated facts the three C-047 legs actually run over; its own comment says "each later task appends
+its slugs as it closes them". T014 is closed here, and its six rows are `expression-gate-faces`,
+`expression-stage-operator-table`, `driver-stage-sequence`, `driver-completion-sentinels`,
+`driver-gate-roster`, `driver-stage-artifacts`. Part 2c appended two of them; the two expression rows
+were migrated by T014's first part but their slugs never joined the tuple — i.e. two migrated rows
+whose legs nothing ran. All four remaining slugs are appended here, and the three legs were re-checked
+against the tree before appending (declaration present with `fact`/`kind`/`statement`/`consumers`/
+`former_carriers`; engine text carries `declaration_reader` and the slug; the declared inline pattern
+is gone; carrier carries `<path>#/`):
+
+expression-gate-faces            file True fact True kind True keys True | reader True slug True no inline True | pointer True
+expression-stage-operator-table  file True fact True kind True keys True | reader True slug True no inline True | pointer True
+$ python3 -m pytest tests/contract/test_harness_triple_structure.py -q
+68 passed, 1 warning in 1.10s        # 62 before the two extra slugs; +6 legs, all green
+
+# Read as a correction, not a decision: one reading (the tuple's own instruction), local to a test
+# tuple, reversible, and it falsifies no downstream premise — a slug that fails its legs would have
+# turned red here rather than in T015/T016.

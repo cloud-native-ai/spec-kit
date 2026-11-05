@@ -1,0 +1,348 @@
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+...............F.......F....FFF..........F....................FFFF...... [ 15%]
+.....F.................................................................. [ 30%]
+.......................................................................F [ 45%]
+.....................................................................F.. [ 60%]
+........................................................................ [ 75%]
+........................................................................ [ 91%]
+..........................................                               [100%]
+=================================== FAILURES ===================================
+________________________ test_c18_mirror_pair_no_drift _________________________
+
+    def test_c18_mirror_pair_no_drift():
+        src = SKILL_DIR
+        dst = REPO_ROOT / ".specify" / "skills" / "sdd-loop-driver"
+        assert dst.exists(), "runtime mirror missing — sync-mirrors --write not run"
+        for rel in MIRROR_FILES + CLI_PROFILE_RELS:
+>           assert filecmp.cmp(src / rel, dst / rel, shallow=False), (
+                f"mirror drift on {rel}"
+            )
+E           AssertionError: mirror drift on SKILL.md
+E           assert False
+E            +  where False = <function cmp at 0x7fbb90e52520>((PosixPath('/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver') / 'SKILL.md'), (PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/skills/sdd-loop-driver') / 'SKILL.md'), shallow=False)
+E            +    where <function cmp at 0x7fbb90e52520> = filecmp.cmp
+
+tests/contract/test_sdd_loop_driver_skill.py:389: AssertionError
+_____________________ test_c22_watch_target_hook_selftest ______________________
+
+    def test_c22_watch_target_hook_selftest():
+        script = SKILL_DIR / "scripts" / "watch-target.sh"
+        result = subprocess.run(
+            ["bash", str(script), "--self-test"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        combined = result.stdout + result.stderr
+>       assert result.returncode == 0, f"self-test failed:\n{combined[-1200:]}"
+E       AssertionError: self-test failed:
+E         mkdir: cannot create directory ‘/home/agent/tmp/spec-kit’: Permission denied
+E         mktemp: failed to create directory via template ‘/home/agent/tmp/spec-kit/watch-target-selftest.XXXXXX’: No such file or directory
+E         SELF-TEST: cannot create temp dir
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/scripts/watc...home/agent/tmp/spec-kit/watch-target-selftest.XXXXXX’: No such file or directory\nSELF-TEST: cannot create temp dir\n').returncode
+
+tests/contract/test_sdd_loop_driver_skill.py:546: AssertionError
+_________________ test_state_dir_falls_back_to_runtime_dir_env _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_state_dir_falls_back_to_r0')
+
+    def test_state_dir_falls_back_to_runtime_dir_env(tmp_path):
+        """R-02 level 3: with no --state-dir and no Registry `status_path`, the
+        `SPECIFY_LINE_RUNTIME_DIR` convention the runner writes to is used, so the
+        four-piece evidence is still found instead of leaving `state_dir` null."""
+        ws = Workspace(tmp_path)  # no registry entry -> level 2 cannot fire
+        ws.write_spine(state="running")
+        pid = ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws, state_dir=False)  # --spine stays explicit
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["paths"]["state_dir"] == str(ws.state_dir)
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:408: AssertionError
+_________ test_state_dir_falls_back_to_home_when_runtime_env_is_absent _________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_state_dir_falls_back_to_h0')
+
+    def test_state_dir_falls_back_to_home_when_runtime_env_is_absent(tmp_path):
+        """R-02 level 4: with no --state-dir, no Registry and no
+        `SPECIFY_LINE_RUNTIME_DIR`, `$HOME` is the last resort. The fixture points
+        HOME at a temp dir, so the real home is neither read nor written."""
+        ws = Workspace(tmp_path)  # no registry entry
+        ws.write_spine(state="running")
+        home_pid = ws.home / ("pid-%s-%s" % (ws.line, ws.stage))
+        home_pid.write_text(
+            "pid=%d start=424242 at=%d line=%s stage=%s event=pid\n"
+            % (os.getpid(), NOW, ws.line, ws.stage), encoding="utf-8")
+        (ws.home / ("heartbeat-%s-%s.log" % (ws.line, ws.stage))).write_text(
+            "at=%d line=%s stage=%s event=heartbeat\n" % (NOW, ws.line, ws.stage),
+            encoding="utf-8")
+    
+        env = _snap_json(ws, state_dir=False, unset=["SPECIFY_LINE_RUNTIME_DIR"])
+    
+        assert env["paths"]["state_dir"] == str(ws.home)
+        assert env["paths"]["state_dir"] != str(Path.home()), "real home must stay out"
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(home_pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:431: AssertionError
+__________________ test_missing_registry_continues_evaluation __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_missing_registry_continue0')
+
+    def test_missing_registry_continues_evaluation(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine(state="running")
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["registry"]["stage"] is None
+        assert env["spine"]["status"] == "present"
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:445: AssertionError
+_________________ test_sentinel_must_be_the_last_nonempty_line _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_sentinel_must_be_the_last0')
+
+    def test_sentinel_must_be_the_last_nonempty_line(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine()
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "", "still working"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:632: AssertionError
+___________________ test_derived_dead_no_signal_and_running ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_derived_dead_no_signal_an0')
+
+    def test_derived_dead_no_signal_and_running(tmp_path):
+        """FR-004 rules (4), (6), (7)."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert env["loop_state_reason"] == "dead-no-exit-record"
+        assert env["recovery_action"] == "retry"
+    
+        (ws.state_dir / ("pid-%s-%s" % (ws.line, ws.stage))).unlink()
+        env = _snap_json(ws)
+        assert env["loop_state"] == "NO_SIGNAL"
+        assert env["loop_state_reason"] == "no-signal"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1073: AssertionError
+_______ test_derived_deadline_overrun_with_live_process_is_timeout_watch _______
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_derived_deadline_overrun_0')
+
+    def test_derived_deadline_overrun_with_live_process_is_timeout_watch(tmp_path):
+        """FR-004 rule (5) + IA-17: a live TIMEOUT is watched, never killed."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 900, deadline=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+>       assert env["loop_state"] == "TIMEOUT"
+E       AssertionError: assert 'DEAD' == 'TIMEOUT'
+E         
+E         - TIMEOUT
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1086: AssertionError
+____________ test_unwatched_detector_positive_expired_and_negative _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_unwatched_detector_positi0')
+
+    def test_unwatched_detector_positive_expired_and_negative(tmp_path):
+        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
+        # cases anchor to call time instead of module-import NOW. NOW binds at
+        # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
+        # marker already sits past its own 300 s window and the "fresh" branch becomes
+        # unreachable. Assertions and branch coverage are unchanged.
+        now = int(time.time())
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=now - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1114: AssertionError
+____________________ test_dead_no_exit_record_is_never_done ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_dead_no_exit_record_is_ne0')
+
+    def test_dead_no_exit_record_is_never_done(tmp_path):
+        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert _find(env, "dead-no-exit-record")
+        assert env["recovery_action"] != "verify"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert _find(env, "dead-no-exit-record") == [], (
+            "a live process must not be reported as dead-no-exit-record"
+        )
+E       AssertionError: a live process must not be reported as dead-no-exit-record
+E       assert [{'form': 'de...tor': '065a'}] == []
+E         
+E         Left contains one more item: {'form': 'dead-no-exit-record', 'detail': 'pid record exists, the process is gone and no exit record was written', 'ev...test-of-agent/pytest-184/test_dead_no_exit_record_is_ne0/state/demo-line/status-demo-line-tasks'}], 'detector': '065a'}
+E         Use -v to get more diff
+
+tests/unit/test_loop_state_engine.py:1146: AssertionError
+________ test_trailing_anomaly_line_with_live_process_is_watch_not_done ________
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-184/test_trailing_anomaly_line_wit0')
+
+    def test_trailing_anomaly_line_with_live_process_is_watch_not_done(tmp_path):
+        """FR-004 sentinel rule: an earlier sentinel followed by ANOMALY: is not DONE."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "ANOMALY: subagent returned malformed tasks"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+        assert env["evidence"]["log"]["anomaly"] is True
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'ANOMALY' == 'RUNNING'
+E         
+E         - RUNNING
+E         + ANOMALY
+
+tests/unit/test_loop_state_engine.py:1445: AssertionError
+______________________ test_c7_mirrors_are_byte_identical ______________________
+
+    def test_c7_mirrors_are_byte_identical():
+        problems: list[str] = []
+        for source_rel, mirror_rel in sorted(MIRROR_PAIRS.items()):
+            source = REPO_ROOT / source_rel
+            mirror = REPO_ROOT / mirror_rel
+            assert source.is_file(), "owned source missing: %s" % source_rel
+            if not mirror.is_file():
+                if source_rel not in NEW_PAYLOAD_SOURCES:
+                    problems.append("%s — mirror disappeared" % mirror_rel)
+                continue
+            if source.read_bytes() != mirror.read_bytes():
+                problems.append("%s — mirror differs from %s" % (mirror_rel, source_rel))
+>       assert not problems, (
+            "C-7: mirrors are projections of the framework source, never hand-edited "
+            "(absence is tolerated only for the four new payloads until T033):\n- "
+            + "\n- ".join(problems)
+        )
+E       AssertionError: C-7: mirrors are projections of the framework source, never hand-edited (absence is tolerated only for the four new payloads until T033):
+E         - .specify/scripts/python/flow-class-check.py — mirror differs from scripts/python/flow-class-check.py
+E         - .specify/shared/definitions/flow-class-definitions.md — mirror differs from shared/definitions/flow-class-definitions.md
+E         - .specify/shared/workflow/expression-gates.md — mirror differs from shared/workflow/expression-gates.md
+E         - .specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md
+E       assert not ['.specify/scripts/python/flow-class-check.py — mirror differs from scripts/python/flow-class-check.py', '.specify/sha...pression-gates.md', '.specify/shared/workflow/feedback-step.md — mirror differs from shared/workflow/feedback-step.md']
+
+tests/contract/test_expression_compatibility.py:863: AssertionError
+________________________ test_di_05_delivery_and_mirror ________________________
+
+    def test_di_05_delivery_and_mirror():
+        docs = _text(DOCS_PAGE)
+        assert "运行效率优化" in docs
+        check = _run([REPO_ROOT / "scripts" / "python" / "sync-mirrors.py",
+                      "--check", "--only", "skills/external/sdd-loop-driver"])
+>       assert check.returncode == 0, check.stdout + check.stderr
+E       AssertionError: scope --only: skills/external/sdd-loop-driver
+E         DIFF  .specify/skills/sdd-loop-driver/SKILL.md
+E         DIFF  .specify/skills/sdd-loop-driver/references/efficiency-model.md
+E         DIFF  .specify/skills/sdd-loop-driver/references/state-awareness.md
+E         DIFF  .specify/skills/sdd-loop-driver/scripts/loop-state.py
+E         DIFF  .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py
+E         DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/sync-mirrors.py',...river/scripts/pre-analyze-check.py\nDRIFT detected — run: python3 scripts/python/sync-mirrors.py --write\n', stderr='').returncode
+
+tests/contract/test_sdd_loop_driver_efficiency.py:633: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift
+FAILED tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+FAILED tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+FAILED tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+FAILED tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+FAILED tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+FAILED tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+FAILED tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+FAILED tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+FAILED tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical
+FAILED tests/contract/test_sdd_loop_driver_efficiency.py::test_di_05_delivery_and_mirror
+13 failed, 461 passed, 1 warning in 13.43s

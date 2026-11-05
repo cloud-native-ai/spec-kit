@@ -332,6 +332,8 @@ analyze 是跨产物一致性的最后防线，不是第一次检查。requireme
 
 ### 6.2 检查项
 
+> **检查名封闭集与每阶段必需文件集的 owner 是 `shared/declarations/facts/driver-gate-roster.yaml#/statement`**（`checks` / `stages`），引擎经共享读取入口取用；下表只描述各判据的内容与严重度，不复述该集合的所有权，新增/改名以声明为准。
+
 | 检查 | 判据 | 严重度 |
 |------|------|--------|
 | `duplicate-id` | FR/SC 在 requirements.md 内、契约条款在 `contracts/` 内、任务在 tasks.md 内重复定义 | error |

@@ -15,8 +15,12 @@ Exit codes:
   1 = fail (at least one blocking finding)
   2 = input or parse error
 
-Standard library only, Python >= 3.8. Self-contained; never reads the
-framework runtime scripts tree.
+Standard library only, Python >= 3.8. The gate owns no framework dependency: it runs on the spec
+tree it is pointed at and reads no framework runtime module — with one documented exception, the
+declaration layer's read entry (``scripts/python/declaration_reader.py``), which it locates by
+walking up from its own resolved path for the gate roster (Feature 084 / `C-044`). A project that
+never received the layer keeps evaluating: the absent read is labelled and the inline roster stands
+(FR-012).
 """
 
 import argparse
@@ -71,6 +75,114 @@ STAGES = {
     "plan": ("requirements.md", "plan.md"),
     "tasks": ("requirements.md", "plan.md", "tasks.md"),
 }
+
+# ---------------------------------------------------------------------------
+# Declaration layer (Feature 084, batch 2 row `driver-gate-roster` of C-044)
+#
+# This gate's roster — the six check names its findings carry and the per-stage file requirement —
+# used to be spelled here: at every `add(findings, "<name>", …)` call site and in the `STAGES` table
+# above. It has one owner now,
+# `shared/declarations/facts/driver-gate-roster.yaml#/statement`, read through the one shared entry
+# (`scripts/python/declaration_reader.py`), so a name changed in the declaration changes what this
+# gate emits with no edit here (`C-047` steps 3–5).
+#
+# What stays local is the *selection*, not the value: a call site knows which check applies at that
+# judgement and takes the rendering from the roster. Deleting a name from the roster therefore does
+# not silence a check — the call site's own key is emitted and the absence is labelled (FR-012).
+#
+# Degradation (`FR-012` / `C-049`): a project that never received the layer keeps evaluating. The
+# read is *labelled* on stderr and the pre-migration roster above stands; a degraded read is never
+# silent and never a pass.
+# ---------------------------------------------------------------------------
+
+READ_ENTRY_REL = os.path.join("scripts", "python", "declaration_reader.py")
+GATE_ROSTER_FACT = "driver-gate-roster"
+
+
+def declaration_entry():
+    """The declaration layer's read entry, located from this file's own resolved path.
+
+    This engine exists in three physical copies — the framework source, this repository's mirror and
+    a client project's `.specify/` — so the walk resolves each copy to its **own** layer: the nearest
+    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+    and a nested tree cannot misdirect it. Read-only: nothing is written, and the import happens only
+    once, at module load.
+    """
+    here = os.path.dirname(os.path.realpath(__file__))
+    while here:
+        candidate = os.path.join(here, READ_ENTRY_REL)
+        if os.path.isfile(candidate):
+            directory = os.path.dirname(candidate)
+            if directory not in sys.path:
+                sys.path.insert(0, directory)
+            import declaration_reader
+            return declaration_reader
+        parent = os.path.dirname(here)
+        if parent == here:
+            return None
+        here = parent
+    return None
+
+
+DECLARATIONS = declaration_entry()
+_LABELLED = set()
+
+
+def label_absent(slug):
+    """Print the `STR-014` instance for a roster this engine could not read, once per slug."""
+    if slug in _LABELLED:
+        return
+    _LABELLED.add(slug)
+    if DECLARATIONS is not None:
+        note = DECLARATIONS.absent_label(slug)
+    else:
+        note = "declaration layer unreachable: %s" % slug
+    sys.stderr.write("pre-analyze-check: %s\n" % note)
+
+
+def declared_mapping(slug):
+    """`statement` of one fact declaration as a mapping; an unreadable one is empty and labelled."""
+    if DECLARATIONS is None:
+        label_absent(slug)
+        return {}
+    try:
+        values = DECLARATIONS.load_fact(
+            DECLARATIONS.find_repo(__file__), slug)["body"].get("statement")
+    except (DECLARATIONS.DeclarationError, TypeError, ValueError):
+        label_absent(slug)
+        return {}
+    if not isinstance(values, dict) or not values:
+        label_absent(slug)
+        return {}
+    return dict(values)
+
+
+GATE_ROSTER = declared_mapping(GATE_ROSTER_FACT)
+
+#: The declared check-name set, looked up by the key a call site names.
+CHECK_ROSTER = {str(name): str(name) for name in (GATE_ROSTER.get("checks") or ())}
+
+#: The per-stage file requirement, taken from the declaration when it is readable. `--stage`'s
+#: choices and the per-stage input check both derive from this table, so a stage added to the
+#: declaration becomes selectable with no edit here. The literal above is the FR-012 fallback.
+_DECLARED_STAGES = {}
+for _stage, _inputs in (GATE_ROSTER.get("stages") or {}).items():
+    if isinstance(_inputs, list) and _inputs:
+        _DECLARED_STAGES[str(_stage)] = tuple(str(value) for value in _inputs)
+if _DECLARED_STAGES:
+    STAGES = _DECLARED_STAGES
+
+
+def declared_check(key):
+    """The roster's rendering of one check name, or the call site's own key when it is absent."""
+    if key in CHECK_ROSTER:
+        return CHECK_ROSTER[key]
+    note = "%s: check name %r is not in the declared roster" % (GATE_ROSTER_FACT, key)
+    if note not in _LABELLED:
+        _LABELLED.add(note)
+        sys.stderr.write("pre-analyze-check: %s\n" % note)
+    return key
+
 
 # --- ownership / premise findings (081b) ----------------------------------------------------
 # The four `check` names are fixed by `contracts/gate-wiring.contract.md` GW-07, so a waiver key
@@ -237,12 +349,12 @@ def check_references(files, fr, sc, clauses, findings, spec_dir):
             for match in FR_REF.finditer(line):
                 key = "FR-" + match.group(1)
                 if key not in fr:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references %s which is not defined" % key)
             for match in SC_REF.finditer(line):
                 key = "SC-" + match.group(1)
                 if key not in sc:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references %s which is not defined" % key)
             if not has_clauses:
                 continue
@@ -252,10 +364,10 @@ def check_references(files, fr, sc, clauses, findings, spec_dir):
                 if prefix in NON_CLAUSE_PREFIXES or key in clauses:
                     continue
                 if prefix in local_prefixes:
-                    add(findings, "dangling-id", "error", rel, number,
+                    add(findings, declared_check("dangling-id"), "error", rel, number,
                         "references contract clause %s which is not defined" % key)
                 else:
-                    add(findings, "external-clause", "advisory", rel, number,
+                    add(findings, declared_check("external-clause"), "advisory", rel, number,
                         "references contract clause %s from an external namespace" % key)
 
 
@@ -268,11 +380,11 @@ def check_blocked_by(spec_dir, tasks, findings):
             for token in match.group(1).split(","):
                 token = token.strip()
                 if not token or not TASK_TOKEN.match(token):
-                    add(findings, "blocked-by", "advisory", "tasks.md", number,
+                    add(findings, declared_check("blocked-by"), "advisory", "tasks.md", number,
                         "non-concrete blockedBy token %r" % token)
                     continue
                 if token not in tasks:
-                    add(findings, "blocked-by", "error", "tasks.md", number,
+                    add(findings, declared_check("blocked-by"), "error", "tasks.md", number,
                         "blockedBy target %s is not defined" % token)
 
 
@@ -299,7 +411,7 @@ def check_counts(files, fr, sc, tasks, findings, spec_dir):
                         continue
                     claimed = int(match.group(1))
                     if claimed != expected:
-                        add(findings, "count-claim", "error", rel, number,
+                        add(findings, declared_check("count-claim"), "error", rel, number,
                             "claims %d %s but the artifacts define %d"
                             % (claimed, kind, expected))
 
@@ -321,7 +433,7 @@ def check_paths(files, findings, spec_dir, repo):
                     continue
                 if os.path.exists(os.path.join(repo, token)):
                     continue
-                add(findings, "missing-path", "advisory", rel, number,
+                add(findings, declared_check("missing-path"), "advisory", rel, number,
                     "path does not exist under the repo: %s" % token)
 
 
@@ -1009,7 +1121,7 @@ def run(args):
     fr, sc, tasks, clauses, duplicates = definitions(files, spec_dir)
     findings = []
     for path, number, key, first in duplicates:
-        add(findings, "duplicate-id", "error", os.path.relpath(path, spec_dir),
+        add(findings, declared_check("duplicate-id"), "error", os.path.relpath(path, spec_dir),
             number, "duplicates %s first defined at %s:%d"
             % (key, os.path.relpath(first[0], spec_dir), first[1]))
     check_references(files, fr, sc, clauses, findings, spec_dir)
