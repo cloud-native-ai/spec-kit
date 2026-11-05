@@ -328,7 +328,7 @@ between readings, not a single consistent correction):
   satisfy the hard constraint (a multiple of 1024, at least 1024 B of headroom under one of the two
   sizes named here), and the value has exactly one owner, so switching is a one-line change plus this
   comment.
-- **last_verdict**: implement part 4 done; T023/T024-T026 adjudicated — 34816 is the minimum compliant budget (33792 leaves 435 B < 1024 B); T026 mirror precedes T024 live rebuild; part 5 starts — T019/T020/T021/T022 closed with
+- **last_verdict**: implement part 5 done — T024-T028 [X]; targeted set 32 passed; live instructions 33357 B / budget 34816 (1459 B headroom); mirrors identical; symlinks intact; M-3/M-4 pass; C-21 closed; part 6 starts — 34816 is the minimum compliant budget (33792 leaves 435 B < 1024 B); T026 mirror precedes T024 live rebuild; part 5 starts — T019/T020/T021/T022 closed with
   red-first capture and green after landing; T023's raise applied and recorded but its C-18 claim
   awaits the reading above. One new failure in the targeted set, named and attributable to the
   deferred T024 reconcile.
@@ -343,3 +343,12 @@ between readings, not a single consistent correction):
 - **T023**: 34816 is the minimum compliant value under the written rule (1024 multiple and at least 1024 B headroom): 34816 − 33357 = 1459 B. 33792 leaves 435 B (or 558 B under the shorter body) and is **not** compliant. The landed 34816 stands; T023's `[green:] C-18` is proven; HELD-OPEN removed.
 - **T024/T026 order**: the generator reads `.specify/templates/instructions-template.md` and `.specify/scripts/bash/generate-instructions.sh`, so T026 (mirror sync) MUST run before T024 (live rebuild). T024 now depends on T023,T026; T026 depends on T022,T023. The file order remains ascending; the blockedBy graph is authoritative.
 - **tasks gates**: validate-tasks 0 errors / 34 adjudicated warnings; pre-analyze tasks pass; decomposition proceed (53 ≤ 60).
+
+## Implement part 5 checkpoint（2026-11-05T06:00:24Z）
+
+- **part_scope**: T024-T028 — done; all `[X]`.
+- **artifacts**: `.specify/instructions.md` (33357 B, section at line 89), instruction-template + generator mirrors, notes (`quickstart-run.md`, `red-first-evidence.md`, `pre-change-measurements.md`), `test-evidence/tasks-stage-premises.md` (T028 C-19 decision), `test-evidence/implement-part-5.md`.
+- **targeted set**: propagation 6 + constitution 13 + size budget 13 = 32 passed; no new failures; baseline 26 inherited unchanged.
+- **live reconcile**: second run rc 0 and idempotent; `Instructions size: 33357 B (budget 34816 B, 1459 B headroom)`; symlinks remain links to `.specify/instructions.md`; mirrors byte-identical.
+- **no plan-owned edits**; no Completion Gate, no Feature status flip, no implement Feedback/Wrap-up; not pushed.
+- **next**: P6 T029-T033 (distribution test with venv/editable install, source-doc add, mirror write/compare, source-tree confirmation).

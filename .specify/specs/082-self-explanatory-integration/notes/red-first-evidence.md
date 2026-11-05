@@ -233,3 +233,110 @@ correct shape, not a budget concession. Final section body is 1 summary sentence
 
 This is an in-passing correction (one reading consistent with the contract's intent, local,
 reversible), not a decision: disclosed here and in the part-4 checkpoint.
+
+---
+
+# Part 5 (T024-T028) — M-3 / M-4, and the C-21 pair
+
+**Captured**: 2026-11-05 | **Base commit**: `5f267f22` | **part_scope**: `T024-T028`
+**Scratch root**: `.specify/.tmp/082-part5/` (git-ignored, checked with `git check-ignore` before the
+first write; removed after the run)
+
+Both legs call the carrier's **own** functions (`carrier._section_body`, `carrier._render`,
+`carrier._generator_substitutions`) and the **real** mirrored generator — neither is a paraphrase of the
+assertion it is meant to break.
+
+## M-3 — deleting the section from a COPY of the template
+
+```console
+$ python3 .specify/.tmp/082-part5/m34.py
+MUTATION LEGS M-3 / M-4 — part 5 (T027)
+==============================================================================
+
+[M-3] delete the section from a COPY of the template
+[PASS] M-3 mutation took effect (copy differs, heading gone)
+        28930 -> 28311 bytes
+[PASS] M-3 C-14 template-side presence turns False
+        present=False
+[PASS] M-3 C-10 section lookup turns red
+        AssertionError: no '## Self-Explanatory Structure (不言自明)' section on the surface under test; t...
+[PASS] M-3 rendered reconcile input lacks the heading
+```
+
+The C-10 leg re-uses `carrier._section_body` against the mutated text, so the leg exercises the actual
+matcher rather than a re-typed assertion. The rendered-reconcile leg uses `carrier._render`, whose
+placeholder set is itself pinned to the generator by `test_c14_rendered_template_matches_the_generator_substitution_set`.
+
+## M-4 — the generator on a fixture with no template section
+
+```console
+[M-4] generator on a fixture whose template has NO section injects nothing
+[PASS] M-4 generator exits 0
+[PASS] M-4 zero injection of the absent section
+        INJECTED list has 33 sections, none of them the subject
+[PASS] M-4 live fixture did not gain the section
+        live=28188 B
+[PASS] M-4 counter-check: the reconcile DID run and DID inject other sections
+        the same run injected the other template sections
+[PASS] M-4 pre-existing content preserved
+        custom section and overview both intact
+[PASS] M-4 anti-vacuity: the same generator DOES inject it once the template carries it
+        Injected missing template section(s): Documentation Map, Proacti...
+[PASS] M-4 anti-vacuity: pre-existing content preserved when injecting
+
+[anti-vacuity] the repository was never the subject
+[PASS] real template still carries the heading
+        present=True; 28930 bytes
+[PASS] all four repository files byte-identical after the legs
+        template=44ea5381d660 generator=e8c46c498a75
+==============================================================================
+VERDICT: PASS — M-3 turns C-14 and C-10 red on a copy; M-4 shows zero injection, with its
+         anti-vacuity companion injecting on the same fixture; the repository is untouched
+EXIT=0
+```
+
+### What the first two attempts measured, and why they were wrong
+
+Disclosed rather than quietly fixed, because a mutation leg that passes for the wrong reason is the
+defect this whole section exists to prevent. Two distinct mistakes were made and are recorded here:
+
+1. **Attempt 1 — assertion wider than its subject.** The leg asserted "no `INJECTED` line at all". The
+   fixture's live file carried none of the template's sections, so the generator legitimately injected
+   the other 33 and the leg failed. The subject is **the section**, so the assertion was narrowed to
+   "the absent section never appears in the INJECTED list", with a counter-check that the reconcile did
+   run and did inject the others (otherwise the silence would prove nothing).
+2. **Attempt 2 — a vacuous anti-vacuity.** The positive-control half reused the same live file after the
+   first half had filled it in, so every template heading was already present and the generator became a
+   byte-for-byte no-op: the second half "passed" without ever exercising an injection. Repaired by
+   re-seeding the live file before **each** half, so the two halves differ in exactly one variable —
+   whether the template carries the section. (The US2 carrier avoids the same trap the same way: its C-2
+   fixture writes a live file that differs from its template.)
+
+Both mistakes were found by the legs failing, not by review — the transcript order above is the order
+they ran.
+
+## The C-21 pair, closed
+
+| half | where | verdict |
+|------|-------|---------|
+| RED | part 4, before the section had its final shape | "the section carries no summary at all" — a real defect: the pointer shared a line with the summary and the carrier strips pointer lines before counting |
+| GREEN | this part, `-k c21` | `1 passed, 12 deselected` — `EXIT=0` |
+
+Recorded honestly: C-21's subject is the **template** section, so the green arrived at T022 (after the
+shape repair), not at T024's live reconcile. T024's contribution to the pair is that the section now
+exists on the live surface as well — the pair is closed as "red then green on the same assertion across
+parts", not as "the reconcile turned it green". The command and output are in
+`notes/quickstart-run.md` § "T024 — the C-21 pairing".
+
+## Pairs after part 5
+
+| Pair | Red captured | Green expected at | Status |
+|------|--------------|-------------------|--------|
+| R-1 C-1 template carries the principle | yes (part 1) | T015 (US1) | CLOSED |
+| C-21 instructions summary | yes (part 4) | T024 (US2) | **CLOSED** (this part) |
+| R-4 C-10/C-11/C-14 | yes (part 4) | T024's reconcile / T027's M-3 | **CLOSED** — C-10/C-11/C-14 green at part 4 after T022, M-3 now proves the template side can go red |
+| R-2 C-24 mirror byte parity | — | T031/T032 (US3) | NOT STARTED |
+| R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
+
+T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.
+

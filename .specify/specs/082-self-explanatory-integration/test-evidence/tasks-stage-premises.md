@@ -86,3 +86,73 @@ evidence rather than report "clean".
 no test selection is owed. The `E-3 stage-status` row lives in `plan-stage-checks.md` (plan) and is
 restated by the implement stage's own evidence row; this file records the premise re-measurement the
 generation owed.
+
+---
+
+# P-5 — C-19 Documentation Map decision (appended by implement part 5, T028, 2026-11-05)
+
+**Obligation**: `contracts/instructions-propagation.contract.md` § C-19. The clause has an "if"
+branch (the map gains or should gain a row → the row MUST point at `STR-004`, the runtime path) and an
+"else" branch (no row → satisfied by **the recorded decision not to add one**). T028's `[green:]`
+claim is satisfied on the else branch, and this section is the record.
+
+**Decision: `templates/instructions-template.md` § Documentation Map gains NO row for the owner
+document. The owner is reachable through the section's pointer.**
+
+## The measurement the decision rests on
+
+```console
+$ rows in the Documentation Map: 10
+$ grep -n 'self-explanatory-definitions.md' templates/instructions-template.md
+81:Full discipline — definitions, practice steps and the ceiling/floor rule — lives in `.specify/shared/definitions/self-explanatory-definitions.md` (do NOT copy its rules; reference the file).
+```
+
+- The owner appears **exactly once** in the template, in the `## Self-Explanatory Structure (不言自明)`
+  body — which is the `STR-004` runtime path, so the pointer requirement is met there.
+- The map section ends ~4 lines above that section; both live in the ambient chain every `/speckit.*`
+  command loads, so "reachable through the section's pointer" is a literal reachability claim, not a
+  hope.
+- Three owner documents exist for this concept (`shared/definitions/self-explanatory-definitions.md`,
+  `shared/guidelines/self-explanatory.md`, `shared/workflow/best-practice-optimization.md`) but they
+  are **one concept's** definition/practice/workflow trio, not three independent topics. A row-per-document
+  reading would add three rows for one concept; a one-row reading would have to choose which document
+  the "Location" cell names, and C-19 admits only the definition document's runtime path. Both readings
+  buy the reader nothing the pointer line does not already give.
+
+## Why the map's four precedents do not require a row here
+
+Four existing rows cite an ambient discipline owner in the same `shared/` tree —
+`**Confirmation Gates**`, `**Objective Analysis**`, `**Critique and Self-Critique**`, `**TODO-in-Context**`.
+The distinguishing property is the **trigger**, not the tree:
+
+- those four govern an action that fires on **every** turn or **every** command (confirm before acting;
+  detect same-author; critique before proposing; perceive markers at a code location);
+- this owner's own trigger (`shared/guidelines/self-explanatory.md` § 1 何时应用) is **conditional**: the
+  user points at a name/path/structure, or a request uses 优化 / 改进 / 不满足要求 wording and the flow
+  surfaces the practice as a *candidate*.
+
+A map row is a standing instruction to consult a document. Adding one for a conditionally-triggered
+practice would tell every reader to consult it unconditionally — and would cost every client project's
+instruction chain a row, against a budget this feature had to raise once already.
+
+## Two layers answer the completeness question differently — both recorded
+
+- `checklists/requirements-quality-20261105.md` item **CHK001** asks whether `requirements.md` states
+  the row decision. It does **not**, so on the requirements-text layer the row obligation is
+  **unspecified**. Per that checklist's own E-6 note, that is a requirement-text gap whose repair
+  belongs to a future requirements revision — and `requirements.md` is out of this feature's edit scope
+  (PLAN-EDIT none). It is disclosed here rather than silently treated as answered.
+- On the artifact layer the question is decidable and is decided: **no row**, `STR-004` satisfied by the
+  section pointer. That is the layer C-19 governs, and the one this record closes.
+
+The two layers are stated together on purpose: a reader who opens only `requirements.md` will not find
+the rule, and a reader who opens only this record will not learn that the requirement text is silent.
+
+## Consequence for the guards
+
+No guard is added or changed by this decision: C-19's else branch is satisfied by a record, not by an
+assertion, and a test asserting the *absence* of a map row would freeze a decision the contract leaves
+open. The US2 carrier already asserts the pointer (`test_c10_template_carries_the_section_and_its_runtime_pointer`)
+and the no-copy obligation (`test_c11_…`, C-20's parametrised twin); between them the reader-facing
+guarantee C-19 protects is covered without a new pin.
+

@@ -241,3 +241,68 @@ $ python3 scripts/python/scan-confirmation-gates.py --json | python3 -c "import 
 27 is the same total measured at T002 (part 1). The new principle block, the instruction surface it
 will gain in T022, and the mandate entry produced **zero** new blocking hits — which is the C-8
 obligation, and the reason the frozen-baseline guards did not move on this feature's account.
+
+---
+
+# Implement part 5 measurements — T024-T028 (appended 2026-11-05)
+
+**Base commit**: `5f267f22` | **part_scope**: `T024-T028`
+
+The live-reconcile transcript, the idempotence run, the C-21 pairing and the T026 mirror transcript
+live in `notes/quickstart-run.md` (that file is T024's designated landing point). Only the
+measurements whose landing point is **this** file appear below.
+
+## T025 — compatibility links (four commands + resolution)
+
+```console
+$ test -L CLAUDE.md && test -L QODER.md && test -L AGENTS.md
+EXIT=0
+
+$ readlink on all eight links the generator maintains
+CLAUDE.md: L=yes -> .specify/instructions.md | resolves=yes
+QODER.md: L=yes -> .specify/instructions.md | resolves=yes
+AGENTS.md: L=yes -> .specify/instructions.md | resolves=yes
+HERMES.md: L=yes -> .specify/instructions.md | resolves=yes
+.github/copilot-instructions.md: L=yes -> ../.specify/instructions.md | resolves=yes
+.qoder/project_rules.md: L=yes -> ../.specify/instructions.md | resolves=yes
+.claude/project_rules.md: L=yes -> ../.specify/instructions.md | resolves=yes
+.opencode/instructions.md: L=yes -> ../.specify/instructions.md | resolves=yes
+```
+
+Four commands were run as the row specifies (three `test -L` plus the `readlink` resolution) and the
+four tool-directory links were added because C-16 names them as part of the same obligation. No link
+was rewritten as a copy; the row's stop condition did not fire, so nothing was hand-rebuilt.
+
+## T027 — mutation legs M-3 / M-4
+
+Full transcript in `notes/red-first-evidence.md` § "Part 5 — mutation legs M-3 / M-4". Scratch root:
+`.specify/.tmp/082-part5/` (verified against `.specify/.gitignore:30 .tmp/` with `git check-ignore`
+**before** the first write, per `shared/guidelines/temp-directory-discipline.md` § 3), removed after
+the run. The legs' anti-vacuity sentinels report the four repository files unchanged:
+`template=44ea5381d660`, `generator=e8c46c498a75` before and after.
+
+## T028 — the C-19 measurement this decision rests on
+
+```console
+$ python3 - <<'PY'   # count Documentation Map rows and locate the owner
+...
+rows: 10
+shared/definitions/self-explanatory-definitions.md: in map=False rows=[]
+shared/guidelines/self-explanatory.md:              in map=False rows=[]
+shared/workflow/best-practice-optimization.md:      in map=False rows=[]
+precedent row: **Confirmation Gates**   -> `.specify/shared/guidelines/confirmation-gates.md`
+precedent row: **Objective Analysis**   -> `.specify/shared/workflow/objective-analysis-gate.md`
+precedent row: **Critique and Self-Critique** -> `docs/concepts/critique-and-self-critique.md` + `.specify/shared/guidelines/critique-and-self-critique.md`
+precedent row: **TODO-in-Context**      -> `.specify/shared/guidelines/todo-in-context.md`
+PY
+
+$ grep -n 'self-explanatory-definitions.md' templates/instructions-template.md
+81:Full discipline — definitions, practice steps and the ceiling/floor rule — lives in `.specify/shared/definitions/self-explanatory-definitions.md` (do NOT copy its rules; reference the file).
+```
+
+The map has 10 rows; four of them are the precedent for an ambient discipline owner, and in every one
+of those four the cited document's own trigger is **per-turn or per-command**. The owner's own trigger
+(`shared/guidelines/self-explanatory.md` § 1 何时应用) is narrower — see the recorded decision in
+`test-evidence/tasks-stage-premises.md` § P-5. The template names the owner exactly once, in the section
+body, and the map section is 4 lines above it.
+
