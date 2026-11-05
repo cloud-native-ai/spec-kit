@@ -36,7 +36,7 @@ def test_plan_at_ceiling_proceeds(tmp_path):
     assert record["decision"] == "proceed"
     assert record["measured"] == {
         "fr_count": 30, "task_count": None,
-        "fr_ceiling": 30, "task_ceiling": 40,
+        "fr_ceiling": 30, "task_ceiling": 60,
     }
 
 
@@ -51,7 +51,7 @@ def test_plan_above_ceiling_requires_split(tmp_path):
 
 def test_tasks_at_ceiling_proceeds(tmp_path):
     req = _req(tmp_path / "requirements.md", 30)
-    tasks = _tasks(tmp_path / "tasks.md", 40)
+    tasks = _tasks(tmp_path / "tasks.md", 60)
     proc = _run("--mode", "tasks", "--requirements", str(req), "--tasks", str(tasks))
     assert proc.returncode == 0, proc.stderr
     assert json.loads(proc.stdout)["decision"] == "proceed"
@@ -59,23 +59,23 @@ def test_tasks_at_ceiling_proceeds(tmp_path):
 
 def test_task_rows_above_ceiling_requires_split(tmp_path):
     req = _req(tmp_path / "requirements.md", 10)
-    tasks = _tasks(tmp_path / "tasks.md", 41)
+    tasks = _tasks(tmp_path / "tasks.md", 61)
     proc = _run("--mode", "tasks", "--requirements", str(req), "--tasks", str(tasks))
     assert proc.returncode == 1, proc.stderr
     record = json.loads(proc.stdout)
     assert record["decision"] == "split-required"
-    assert "task rows=41" in record["reasons"][0]
+    assert "task rows=61" in record["reasons"][0]
 
 
 def test_wide_task_markers_count(tmp_path):
     req = _req(tmp_path / "requirements.md", 10)
     tasks = tmp_path / "tasks.md"
     lines = ["# Tasks"] + ["- [%s] T%03d row" % ("x" if i % 2 else ">", i)
-                           for i in range(1, 42)]
+                           for i in range(1, 62)]
     tasks.write_text("\n".join(lines) + "\n", encoding="utf-8")
     proc = _run("--mode", "tasks", "--requirements", str(req), "--tasks", str(tasks))
     assert proc.returncode == 1
-    assert json.loads(proc.stdout)["measured"]["task_count"] == 41
+    assert json.loads(proc.stdout)["measured"]["task_count"] == 61
 
 
 def test_tasks_mode_requires_tasks_file(tmp_path):

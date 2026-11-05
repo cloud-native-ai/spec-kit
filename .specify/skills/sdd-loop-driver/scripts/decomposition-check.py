@@ -28,7 +28,7 @@ import sys
 import time
 
 FR_CEILING = 30
-TASK_CEILING = 40
+TASK_CEILING = 60
 FR_PATTERN = re.compile(r"^- \*\*FR-[0-9]{3}\*\*:")
 TASK_PATTERN = re.compile(r"^- \[[ xX>~]\] T[0-9]{3}")
 

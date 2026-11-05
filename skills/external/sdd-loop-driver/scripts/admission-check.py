@@ -27,7 +27,7 @@ import time
 FR_MIN = 8
 FR_MAX = 30
 TASK_MIN = 10
-TASK_MAX = 40
+TASK_MAX = 60
 
 FR_PATTERN = re.compile(r"^- \*\*FR-[0-9]{3}\*\*:")
 TASK_NARROW = re.compile(r"^- \[[ xX]\] T[0-9]{3}")

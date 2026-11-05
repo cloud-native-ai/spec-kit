@@ -128,7 +128,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 2. **两槽位测试预算**：每线仅 implement 起点与 review 后两次全量，其余用定向集留证。
 3. **Plan 只小修**：`PLAN-EDIT:` 声明；实质改动按两分支处置。
 4. **进度与脱离**：runner 默认 stream-json + live log；本地与远端均脱离，`--once` 只核验不重派。
-5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >40 任务判 `split-required`。
+5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >60 任务判 `split-required`。
 6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`。
 7. **跨特性重叠预检**：clarify U4 跑 `overlap-check.py`，先裁决归属再派发 plan。
 

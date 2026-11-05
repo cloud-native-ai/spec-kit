@@ -65,7 +65,7 @@ def test_decomposition_ceilings_match_fast_lane_limits():
     admission = _text(SCRIPTS / "admission-check.py")
     decomposition = _text(SCRIPTS / "decomposition-check.py")
     assert _constant(decomposition, "FR_CEILING") == _constant(admission, "FR_MAX") == 30
-    assert _constant(decomposition, "TASK_CEILING") == _constant(admission, "TASK_MAX") == 40
+    assert _constant(decomposition, "TASK_CEILING") == _constant(admission, "TASK_MAX") == 60
 
 
 @pytest.mark.contract
