@@ -27,6 +27,11 @@ Do not store anything derivable from project state: code, architecture, file lay
 The recording obligation and the repeated-emphasis promotion trigger are owned by `shared/guidelines/knowledge-promotion.md`; this skill owns the write mechanics.
 
 ## Choosing scope
+The scope domain is a machine fact, not this skill's: the closed set `--scope` accepts (and the order
+`--scope all` expands in) is owned by `shared/declarations/facts/memory-types.yaml#/statement` and read
+by `scripts/python/memory-utils.py`. What follows is the **judgement** for picking one member — which
+scope a given takeaway belongs in — and it is the only thing owned here.
+
 - `session` — short-term / working memory for the current effort (progress, in-flight state, ephemeral context). Append-only; safe to prune later.
 - `knowledge` — long-term / distilled memory that stays useful across sessions (stable preferences, conventions, lasting decisions). Upserted by title slug, so re-recording the same subject updates it.
 
@@ -38,13 +43,14 @@ For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so
    - `skill:<skill-name>` for skill-driven work (e.g. `skill:study-project`).
    The engine rejects any other source, so this is a hard boundary — never fabricate a source to force a write.
 2. Distill the takeaway into a concise title and a few lines of content.
-3. Pick the scope (`session` vs `knowledge`) using the guidance above.
+3. Pick the scope — one member of the set `shared/declarations/facts/memory-types.yaml#/statement`
+   owns — using the judgement above.
    - For a user emphasis, first check prior occurrences with `memory-utils.py --action recall --scope all --tags "key:<ascii-slug>" --format json`. If this is the second occurrence, follow `shared/guidelines/knowledge-promotion.md` § 2 — do not stop after recording.
 4. Run the shared engine from the project root:
    ```bash
    python3 "${SKILL_WORKDIR}/.specify/scripts/python/memory-utils.py" \
      --action record \
-     --scope <session|knowledge> \
+     --scope <the chosen scope> \
      --source "</speckit.command|skill:name>" \
      --title "<concise title>" \
      --tags "<comma,separated,tags>" \

@@ -1640,3 +1640,36 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implemen
 | 镜像不手改 | `git status --porcelain -- .specify/skills .specify/shared .specify/scripts` | 空输出（本段未写任何 `.specify/` 镜像；`.specify/` 下的 084 证据与任务行不属镜像） |
 | 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**` 与 `.specify/state/**` |
 | 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |
+
+## implement（Part 3，T015–T019，2026-11-05，用户测试豁免）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: waived-by-user
+selection_basis: user-test-waiver
+changed_paths:
+  - scripts/python/closure-acceptance-check.py
+  - scripts/python/memory-utils.py
+  - scripts/python/record-retention.py
+  - scripts/python/history-utils.py
+  - scripts/python/probe-utils.py
+  - scripts/python/exec-quant.py
+  - scripts/python/trigger-utils.py
+  - shared/declarations/facts/arc-verdict-mapping.yaml
+  - shared/declarations/facts/memory-types.yaml
+  - shared/declarations/facts/memory-retention-thresholds.yaml
+  - shared/declarations/facts/history-manifest-schema.yaml
+  - shared/declarations/facts/probe-class-values.yaml
+  - shared/declarations/facts/probe-object-binding-map.yaml
+  - shared/declarations/facts/quant-record-schema.yaml
+  - shared/declarations/facts/trigger-state-schema.yaml
+  - shared/declarations/exclusions/no-machine-fact.yaml
+baseline: E2 seq=1
+passed: 0
+failed: 0
+new_failures: waived-by-user
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/t018-coverage-run1-2026-11-05.txt
+```
+
+**Why `waived-by-user`**：用户于 2026-11-05 明确指示「后续步骤跳过所有测试」。T017 的三条 US2 读数、T018 的确定性对比、T019 的 scratch-tree 证明均属测试型读数，未在指示后执行；T018 在指示前已产出的两次 coverage 捕获保留为历史证据，但不作为任何 SC 的 `pass`。本段交付的是事实/引擎/carrier/排除记录的代码面；测试与测试型读数整体记 `waived-by-user`，绝不记 `pass`。

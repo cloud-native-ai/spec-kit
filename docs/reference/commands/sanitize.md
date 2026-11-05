@@ -32,7 +32,7 @@ python3 .specify/scripts/python/record-retention.py --action plan --workspace-ro
 python3 .specify/scripts/python/record-retention.py --action apply --plan <plan.json> --workspace-root . --format json
 ```
 
-The lane covers four stores: `exec-quant` records, `feedback` entries, `run-determination` session records, and free-form session notes. A raw record is deleted only when a retention receipt covers it and the default 30-day grace has elapsed. Never retired: open feedback, unsettled run-determination records, unreadable exec-quant records, and session notes without a promotion/ephemeral decision.
+The lane's store roster and its default grace are machine facts owned by `shared/declarations/facts/memory-retention-thresholds.yaml#/statement` and read by `scripts/python/record-retention.py`; this page states the lane's judgement, not the values. A raw record is deleted only when a retention receipt covers it and the declared grace has elapsed. Never retired: open feedback, unsettled run-determination records, unreadable exec-quant records, and session notes without a promotion/ephemeral decision.
 
 Retention artifacts are durable evidence under `.specify/memory/retention/`:
 

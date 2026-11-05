@@ -23,21 +23,54 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
 KIND = "speckit.record-retention"
 SCHEMA_VERSION = 1
 RETENTION_REL = Path(".specify") / "memory" / "retention"
-DEFAULT_GRACE_DAYS = 30
+
+#: Feature 084, batch 3 (C-045): the default grace window and the store roster are one
+#: declaration-layer fact. The two `_FALLBACK` values below are the **FR-012 compatibility value** for
+#: a tree with no declaration layer; when the declaration is readable they are never consulted.
+RETENTION_FACT = "memory-retention-thresholds"
+DEFAULT_GRACE_DAYS_FALLBACK = 30
+STORES_FALLBACK = ("exec-quant", "feedback", "run-determination", "session-note")
+
+
+def declared_mapping(slug):
+    """`(statement, label)` for one mapping-shaped fact; `({}, <STR-014 instance>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict) or not statement:
+            raise ValueError("statement is not a non-empty mapping")
+        return dict(statement), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return {}, declaration_reader.absent_label(slug)
+
+
+_RETENTION_DECLARED, RETENTION_LABEL = declared_mapping(RETENTION_FACT)
+try:
+    DEFAULT_GRACE_DAYS = int(str(_RETENTION_DECLARED.get("grace_days", "")).strip())
+except (TypeError, ValueError):
+    DEFAULT_GRACE_DAYS = DEFAULT_GRACE_DAYS_FALLBACK
+_DECLARED_STORES = _RETENTION_DECLARED.get("stores")
+STORES = (tuple(str(value) for value in _DECLARED_STORES)
+          if isinstance(_DECLARED_STORES, list) and _DECLARED_STORES else STORES_FALLBACK)
+if not _RETENTION_DECLARED:
+    DEFAULT_GRACE_DAYS = DEFAULT_GRACE_DAYS_FALLBACK
+    STORES = STORES_FALLBACK
 
 STORE_EXEC_QUANT = "exec-quant"
 STORE_FEEDBACK = "feedback"
 STORE_RUN_DETERMINATION = "run-determination"
 STORE_SESSION_NOTE = "session-note"
-STORES = (
-    STORE_EXEC_QUANT,
-    STORE_FEEDBACK,
-    STORE_RUN_DETERMINATION,
-    STORE_SESSION_NOTE,
-)
+# `STORES` is derived from the declaration above, not spelled here: the four names below are the
+# per-store dispatch keys the retention lifecycle addresses (they select a store's entry builder),
+# while the roster's membership is the declared value.
 
 STATUS_ELIGIBLE = "eligible"
 STATUS_TOO_YOUNG = "too-young"

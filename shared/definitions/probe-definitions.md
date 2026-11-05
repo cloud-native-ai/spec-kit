@@ -17,6 +17,21 @@
 > 切片 Class 的 Object 单元为引擎脚本路径); external ids carry the `ext-`
 > prefix and `custom:` units. Validate with `--action probes --validate`.
 
+## 机器可读取值(三重结构,Feature 084)
+
+本文件拥有 probe 注册表的**行与判据**;它的**取值域**不在这里,而在 `shared/declarations/`
+的声明层,由引擎经 `scripts/python/declaration_reader.py` 读取:
+
+| 取值域 | owner 指针 | 读取者 |
+|--------|-----------|--------|
+| probe kind 域、Class 字段序、handler 的 kind/mode 域、lifecycle point 域、binding scope 域 | `shared/declarations/facts/probe-class-values.yaml#/statement` | `scripts/python/probe-utils.py` |
+| Object 字段序、派生 `probe-map` 的文件名、「非实体 probe 目录」章的解析标题与条目形态 | `shared/declarations/facts/probe-object-binding-map.yaml#/statement` | `scripts/python/probe-utils.py` |
+| `exec-quant` 记录的 schema(版本、受控词表、11 个 config 字段、逐动作参数清单) | `shared/declarations/facts/quant-record-schema.yaml#/statement` | `scripts/python/exec-quant.py` |
+
+本文件因此只保留:Class 行(Object 的归属与锚点)、Object 行、五条不变式,以及「派生视图
+MUST 由本文件重建」这条判据。表头与目录章的形态是解析面——它必须写在文件里才能被解析——
+但**成员集合**的 owner 是上表的声明,不是本文件。
+
 ## Slices
 
 - commands — 框架命令模板域

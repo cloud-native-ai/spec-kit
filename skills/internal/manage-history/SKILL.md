@@ -15,6 +15,8 @@ This skill owns the executable core of `/speckit.history`: Steps 1–6 (tool ide
 
 Canonical extraction source: `templates/commands/history.md` § Steps 1–6 and § Safety Rules. Content moved here verbatim in substance. Long-form reference (owner of the conceptual model): `docs/reference/commands/history.md`.
 
+**The manifest's schema is a machine fact, not this skill's.** Its file name, its three top-level keys (one of which is the per-session map the incremental read addresses) and the per-session entry key are owned by `shared/declarations/facts/history-manifest-schema.yaml#/statement`, and `scripts/python/history-utils.py` reads them from there; this skill describes the manifest's *role* (which sessions were already distilled) and reaches its shape by that pointer instead of restating it. The five distillation categories this skill names are **not** a machine fact (no engine reads them) and stay here as prose — their non-migration is recorded in `contracts/migration-batches.contract.md` § Facts outside the roster, not as an exclusion row, because this unit is in scope for the manifest schema.
+
 ## Input Contract
 
 - **Precondition**: the current tool has some conversation history for this project — this skill distills the past; it does not create it. No history → Step 1's gate reports and stops.

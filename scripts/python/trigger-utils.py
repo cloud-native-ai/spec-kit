@@ -60,15 +60,89 @@ SEED_CANDIDATES = (
 )
 FEEDBACK_ENGINE = Path(".specify") / "scripts" / "python" / "feedback-utils.py"
 
-SCHEMA_VERSION = 1
-DEFAULT_CONFIG = {
-    "enabled": True,
-    "threshold": 3,
-    "telemetryWindow": 200,
-    "probeBudgetPct": 20,
-    "minSample": 5,
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+# --------------------------------------------------------------------------- #
+# The state file's schema — a declaration-layer fact (Feature 084, batch 3; C-045)
+# --------------------------------------------------------------------------- #
+# The schema version, the default config, the closed action/response sets and the default threshold are
+# owned by `shared/declarations/facts/trigger-state-schema.yaml#/statement` and read here through the
+# shared read entry, so none of them is spelled in this engine again. The `_TRIGGER_FALLBACK` mapping
+# below is the **FR-012 compatibility value** for a tree with no declaration layer; when the
+# declaration is readable it is never consulted (no double read).
+TRIGGER_FACT = "trigger-state-schema"
+_TRIGGER_FALLBACK = {
+    "schema_version": 1,
+    "default_config": {"enabled": True, "threshold": 3, "telemetryWindow": 200,
+                       "probeBudgetPct": 20, "minSample": 5},
+    "actions": ["init", "assess", "record", "record-manual", "status", "rules", "reset", "config",
+                "tune", "tune-apply", "rotate"],
+    "responses": ["accepted", "declined", "ignored"],
+    "threshold_default": 3,
 }
-THRESHOLD_DEFAULT = 3
+
+
+def _declared_trigger_schema():
+    """`(statement, label)`; the labelled compatibility value when the declaration is unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), TRIGGER_FACT)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict) or not statement:
+            raise ValueError("statement is not a non-empty mapping")
+        return dict(statement), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return dict(_TRIGGER_FALLBACK), declaration_reader.absent_label(TRIGGER_FACT)
+
+
+def _declared_roster(statement, key):
+    """One closed roster from the declared statement; the fallback roster when the key is unusable."""
+    values = statement.get(key)
+    if not isinstance(values, list) or not values:
+        values = _TRIGGER_FALLBACK[key]
+    return tuple(str(value) for value in values)
+
+
+_TRIGGER_SCHEMA, TRIGGER_LABEL = _declared_trigger_schema()
+try:
+    SCHEMA_VERSION = int(_TRIGGER_SCHEMA.get("schema_version"))
+except (TypeError, ValueError):
+    SCHEMA_VERSION = int(_TRIGGER_FALLBACK["schema_version"])
+try:
+    THRESHOLD_DEFAULT = int(str(_TRIGGER_SCHEMA.get("threshold_default")).strip())
+except (TypeError, ValueError):
+    THRESHOLD_DEFAULT = int(_TRIGGER_FALLBACK["threshold_default"])
+
+
+def _coerce_like(value, sample):
+    """One declared scalar as the type its fallback twin has (the subset parser yields strings)."""
+    text = str(value).strip()
+    if isinstance(sample, bool):
+        return text.lower() in ("true", "1", "yes")
+    if isinstance(sample, int):
+        try:
+            return int(text)
+        except (TypeError, ValueError):
+            return sample
+    return text
+
+
+_declared_config = _TRIGGER_SCHEMA.get("default_config")
+if isinstance(_declared_config, dict) and _declared_config:
+    # Key order and types come from the fallback record (the seed's shape); the values come from the
+    # declaration, so a changed seed value lands here without an engine edit.
+    DEFAULT_CONFIG = {}
+    for key, sample in _TRIGGER_FALLBACK["default_config"].items():
+        DEFAULT_CONFIG[key] = _coerce_like(_declared_config[key], sample) \
+            if key in _declared_config else sample
+    for key in sorted(set(_declared_config) - set(_TRIGGER_FALLBACK["default_config"])):
+        DEFAULT_CONFIG[key] = _declared_config[key]
+else:
+    DEFAULT_CONFIG = dict(_TRIGGER_FALLBACK["default_config"])
+#: The clamp floor and the environment override name are this engine's own wiring, not the fact: the
+#: declaration owns the default threshold, the floor is a guard against a caller-set value of 0/1.
 THRESHOLD_FLOOR = 2
 THRESHOLD_ENV = "SPECKIT_TRIGGER_THRESHOLD"
 
@@ -78,13 +152,10 @@ PAYLOAD_MAX_LINES = 60
 PAYLOAD_MAX_CHARS = 2000
 STATUS_TEXT_MAX_LINES = 30
 
-# C-9: closed action enumeration.
-ACTIONS = (
-    "init", "assess", "record", "record-manual", "status", "rules",
-    "reset", "config", "tune", "tune-apply", "rotate",
-)
-
-RESPONSES = ("accepted", "declined", "ignored")
+# C-9: the closed action enumeration and the closed response set are derived from their declaration
+# above; no tuple is spelled here.
+ACTIONS = _declared_roster(_TRIGGER_SCHEMA, "actions")
+RESPONSES = _declared_roster(_TRIGGER_SCHEMA, "responses")
 PROPOSAL_KINDS = ("tighten", "suppress", "add-rule", "extend-vocabulary")
 PROPOSAL_STATES = ("proposed", "ratified", "applied", "rejected")
 RULE_STATES = ("active", "suppressed", "promoted")
@@ -1464,6 +1535,10 @@ def main(argv=None) -> int:
         return EXIT_USAGE
 
     root = resolve_root(args.workspace)
+    # FR-012 / FR-013: a tree without the declaration layer keeps working on the labelled
+    # compatibility value — the label is a reading of the wiring, never a pass.
+    if TRIGGER_LABEL:
+        print(TRIGGER_LABEL, file=sys.stderr)
     handler = HANDLERS.get(args.action)
     if handler is None:  # pragma: no cover - argparse choices already guard this
         emit(envelope(args.action, root, ["identifier-malformed"], [], [], [], {}),

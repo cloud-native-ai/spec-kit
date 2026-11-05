@@ -182,7 +182,10 @@ category), top 3 recommendations.
   the Acceptance Reality Check, which is a deterministic check and not a fifth segment. The order,
   the per-segment boundary sentences and the artifact segment's denominator rule are owned by
   `shared/workflow/acceptance-hardening.md` § Review Composition; this skill **cites** that section
-  and describes no composition of its own. It carries the **process** segment and only that one: the
+  and describes no composition of its own. The Acceptance Reality Check's count record and verdict
+  values are machine facts owned by `shared/declarations/facts/arc-verdict-mapping.yaml#/statement`;
+  this skill reaches them by that pointer and never restates the bucket or verdict sets. It carries
+  the **process** segment and only that one: the
   artifact and implementation segments judge the slice's artifacts and its `base..head` delta against
   requirements and tasks, the code segment judges a committed code delta, and a clean process review
   is no substitute for any of the three. The process segment's judgment object stays **single** — see

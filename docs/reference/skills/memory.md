@@ -57,9 +57,13 @@ engine enforces the boundary: every `record` must carry a `--source` of the form
 records and deletes them only after a durable carrier exists. Run-determination records
 are retired only when `settled_at` is present; free-form session notes need a promotion
 decision first (a `knowledge/` entry, a `.specify/history/` entry, or an explicit
-`ephemeral` label). The default grace after the receipt is 30 days. `prune` remains the
-low-level age/count bound; it does not perform the promotion/receipt gate and should not
-be used as the primary retention path.
+`ephemeral` label). The default grace after the receipt, and the closed store roster a retention
+run may scan, are machine facts owned by
+`shared/declarations/facts/memory-retention-thresholds.yaml#/statement` and read by
+`scripts/python/record-retention.py`; this page states the judgement (what is retired, and what is
+never retired) and reaches the numbers by that pointer. `prune` remains the low-level age/count
+bound; it does not perform the promotion/receipt gate and should not be used as the primary
+retention path.
 
 Each entry is a Markdown file with YAML frontmatter (`id, scope, source, feature, tags,
 title, created, session_id, summary`) plus a body. Conflict-free store discipline

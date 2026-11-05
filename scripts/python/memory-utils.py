@@ -34,7 +34,32 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-SCOPES = ("session", "knowledge")
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+#: Feature 084, batch 3 (contracts/migration-batches.contract.md C-045): the scope closed set is a
+#: declaration-layer fact, read through the shared read entry. The tuple below is the **FR-012
+#: compatibility value** for a tree with no declaration layer; when the declaration is readable it is
+#: the declaration's value that is used and this one is never consulted (no double read).
+MEMORY_TYPES_FACT = "memory-types"
+SCOPES_FALLBACK = ("session", "knowledge")
+
+
+def declared_sequence(slug, fallback):
+    """`(values, label)` for one closed-set / table fact; `(fallback, <STR-014 instance>)` if unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return fallback, declaration_reader.absent_label(slug)
+
+
+SCOPES, SCOPES_LABEL = declared_sequence(MEMORY_TYPES_FACT, SCOPES_FALLBACK)
 MEMORY_SUBDIR = Path(".specify") / "memory"
 # Legacy per-scope index (pre-055): read-only fallback, retired on first
 # mutating action.
@@ -545,6 +570,10 @@ _ACTIONS = {
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    # FR-012 / FR-013: a tree without the declaration layer keeps working on the labelled
+    # compatibility value — the label is a reading of the wiring, never a pass.
+    if SCOPES_LABEL:
+        print(SCOPES_LABEL, file=sys.stderr)
     try:
         payload = _ACTIONS[args.action](args)
     except MemoryError as exc:

@@ -21,8 +21,63 @@ import glob
 import json
 import os
 import re
+import sys
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+import declaration_reader  # noqa: E402  (import follows the sys.path entry above)
+
+# --------------------------------------------------------------------------- #
+# The manifest schema — a declaration-layer fact (Feature 084, batch 3; C-045)
+# --------------------------------------------------------------------------- #
+# The file name the incremental read and write agree on, the three top-level keys of a fresh record
+# and the per-session entry key are owned by
+# `shared/declarations/facts/history-manifest-schema.yaml#/statement` and read here through the shared
+# read entry, so none of them is spelled in this engine again. The `_FALLBACK` values below are the
+# **FR-012 compatibility value** for a tree with no declaration layer; when the declaration is
+# readable they are never consulted (no double read).
+MANIFEST_FACT = "history-manifest-schema"
+_MANIFEST_FALLBACK = {
+    "manifest_file": ".manifest.json",
+    "manifest_keys": ["version", "tool", "sessions"],
+    "sessions_key": "sessions",
+    "session_entry_keys": ["processed_at"],
+    "schema_version": 1,
+}
+
+
+def _declared_manifest_schema():
+    """`(statement, label)`; the labelled compatibility value when the declaration is unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), MANIFEST_FACT)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict) or not statement:
+            raise ValueError("statement is not a non-empty mapping")
+        keys = statement.get("manifest_keys")
+        entry_keys = statement.get("session_entry_keys")
+        if not isinstance(keys, list) or not keys or not isinstance(entry_keys, list) or not entry_keys:
+            raise ValueError("statement does not carry the manifest key rosters")
+        return dict(statement), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return dict(_MANIFEST_FALLBACK), declaration_reader.absent_label(MANIFEST_FACT)
+
+
+_MANIFEST_SCHEMA, MANIFEST_LABEL = _declared_manifest_schema()
+MANIFEST_FILE = str(_MANIFEST_SCHEMA.get("manifest_file") or _MANIFEST_FALLBACK["manifest_file"])
+MANIFEST_KEYS = tuple(str(key) for key in
+                      (_MANIFEST_SCHEMA.get("manifest_keys") or _MANIFEST_FALLBACK["manifest_keys"]))
+SESSIONS_KEY = str(_MANIFEST_SCHEMA.get("sessions_key") or _MANIFEST_FALLBACK["sessions_key"])
+SESSION_ENTRY_KEYS = tuple(
+    str(key) for key in (_MANIFEST_SCHEMA.get("session_entry_keys")
+                         or _MANIFEST_FALLBACK["session_entry_keys"]))
+MANIFEST_SCHEMA_VERSION = int(_MANIFEST_SCHEMA.get("schema_version")
+                              or _MANIFEST_FALLBACK["schema_version"])
+#: The three keys' seed values: `version` carries the schema version, the other two start empty. Keyed
+#: by the declared roster, so a key added to the declaration is written here without an engine edit.
+MANIFEST_SEED_VALUES = {"version": MANIFEST_SCHEMA_VERSION, "tool": None, "sessions": {}}
 
 
 # --------------------------------------------------------------------------- #
@@ -206,7 +261,12 @@ def parse_session(path: Path) -> Dict[str, object]:
 # --------------------------------------------------------------------------- #
 
 def _manifest_path(output_dir: Path) -> Path:
-    return output_dir / ".manifest.json"
+    return output_dir / MANIFEST_FILE
+
+
+def _empty_manifest() -> Dict[str, object]:
+    """A fresh manifest record: one entry per declared top-level key, in the declared order."""
+    return {key: MANIFEST_SEED_VALUES.get(key) for key in MANIFEST_KEYS}
 
 
 def read_manifest(output_dir: Path) -> Dict[str, object]:
@@ -216,7 +276,7 @@ def read_manifest(output_dir: Path) -> Dict[str, object]:
             return json.loads(p.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             pass
-    return {"version": 1, "tool": None, "sessions": {}}
+    return _empty_manifest()
 
 
 def write_manifest(output_dir: Path, manifest: Dict[str, object]) -> None:
@@ -390,7 +450,7 @@ def action_manifest_update(args) -> Dict[str, object]:
     manifest = read_manifest(output_dir)
     if manifest.get("tool") is None:
         manifest["tool"] = args.tool
-    sessions = manifest.setdefault("sessions", {})
+    sessions = manifest.setdefault(SESSIONS_KEY, {})
 
     sids: List[str] = []
     if args.sids:
@@ -401,8 +461,12 @@ def action_manifest_update(args) -> Dict[str, object]:
         )
 
     now = _now_iso()
+    # `now` fills the declared per-session entry key (`processed_at`); `last_run` is a run-level
+    # bookkeeping field the manifest-update action maintains beside the record, not part of the
+    # three-key seed the schema describes.
+    entry_time_key = SESSION_ENTRY_KEYS[0]
     for sid in sids:
-        sessions[sid] = {"processed_at": now}
+        sessions[sid] = {entry_time_key: now}
     manifest["last_run"] = now
     write_manifest(output_dir, manifest)
     return {
@@ -443,6 +507,10 @@ _DISPATCH = {
 
 def main() -> None:
     args = _build_parser().parse_args()
+    # FR-012 / FR-013: a tree without the declaration layer keeps working on the labelled
+    # compatibility value — the label is a reading of the wiring, never a pass.
+    if MANIFEST_LABEL:
+        print(MANIFEST_LABEL, file=sys.stderr)
     result = _DISPATCH[args.action](args)
     print(json.dumps(result, ensure_ascii=False))
 
