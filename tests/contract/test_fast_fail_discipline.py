@@ -713,16 +713,45 @@ def test_a6_not_inside_three_section_window():
 
 
 def test_a7_section_counts_20_to_21_and_21_to_22():
-    """C-7: top-level counts -- template 31, live 32. Stale-pin update (2026-10-30):
-    feature 078 bilingual-expression adds one ambient section (the Bilingual
-    Expression pointer); earlier updates: slice 074b adds one ambient section
-    (the SDD routing pointer) on top of the Closed-Set Claims amendment's one
-    (2026-10-27) and the Grounded Naming amendment's two; the pin had already
-    drifted to 28/29 via pre-067 instructions-section additions."""
+    """C-7: top-level counts -- template 32, live 33.
+
+    Stale-pin update (2026-11-05, Feature 082 T022): the Self-Explanatory Structure
+    amendment adds one ambient `##` section to the template, and T024's reconcile
+    carries it into the live file (31/32 -> 32/33). Earlier updates: feature 078
+    bilingual-expression adds one ambient section (the Bilingual Expression
+    pointer); slice 074b adds one ambient section (the SDD routing pointer) on top
+    of the Closed-Set Claims amendment's one (2026-10-27) and the Grounded Naming
+    amendment's two; the pin had already drifted to 28/29 via pre-067
+    instructions-section additions.
+
+    This pin went stale twice in a row before, and both times the tree was green
+    while the *guard* was red on nothing (078's closure-repair 4e23dad2 fixed the
+    30/31 -> 31/32 drift; this repair fixes 31/32 -> 32/33). The stale pin is not
+    self-detecting, so the delta pairing below is stated explicitly: a change that
+    adds or removes a `##` section MUST raise or lower `TPL_EXPECTED` /
+    `LIVE_EXPECTED` in the same commit.
+    """
+    TPL_EXPECTED = 32  # .specify/specs/082-self-explanatory-integration: +1 for STR-001 at T022
+    LIVE_EXPECTED = 33  # the reconcile at T024 carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
-    assert tpl == 31, f"C-7: template has {tpl} top-level sections; expected 31"
-    assert live == 32, f"C-7: live file has {live} top-level sections; expected 32"
+    assert tpl == TPL_EXPECTED, (
+        f"C-7: template has {tpl} top-level sections; expected {TPL_EXPECTED} "
+        f"(the template changed by {tpl - TPL_EXPECTED}: raise TPL_EXPECTED in the "
+        f"commit that adds the section)"
+    )
+    assert live == LIVE_EXPECTED, (
+        f"C-7: live file has {live} top-level sections; expected {LIVE_EXPECTED} "
+        f"(the live file changed by {live - LIVE_EXPECTED}: raise LIVE_EXPECTED in the "
+        f"commit that adds the section)"
+    )
+    # The live file is normally the template plus one extra `## Recurring Operational
+    # Lessons`, so the pair moves together. Asserting the offset keeps the two pins from
+    # drifting apart silently, which is how a stale pin survives a green tree.
+    assert live - tpl == LIVE_EXPECTED - TPL_EXPECTED, (
+        f"C-7: live minus template is {live - tpl}, expected {LIVE_EXPECTED - TPL_EXPECTED}; "
+        f"the two counts moved independently"
+    )
     tpl_set = {l for l in _lines(INSTR) if l.startswith("## ")}
     live_set = {l for l in _lines(INSTR_LIVE) if l.startswith("## ")}
     assert tpl_set <= live_set, f"C-7: template sections missing from live: {sorted(tpl_set - live_set)}"
@@ -1115,24 +1144,49 @@ def test_x12_principle_block_project_neutral():
 
 
 def test_x13_double_landing_three_count_pins():
-    """C-13: the three count pins were raised in the same batch. Stale-pin update
-    (2026-10-27): the Directory Governance amendment moved template 15 -> 16, live
-    16 -> 17, and command 8 -> 9 in one landing. (2026-11-05, Feature 082): template
-    17 -> 18, live 18 -> 19, command 10 -> 11, all in T016."""
+    """C-13: the three count pins were raised in the same batch.
+
+    Stale-pin update (2026-10-27): the Directory Governance amendment moved template
+    15 -> 16, live 16 -> 17, and command 8 -> 9 in one landing.
+    (2026-11-05, Feature 082 review repair): template 17 -> 18, live 18 -> 19,
+    command 10 -> 11, all in T016.
+
+    The expected values are **derived from the artifacts they describe**, not restated as
+    numerals here. `.specify/specs/082-self-explanatory-integration/contracts/
+    constitution-double-landing.contract.md#C-5` already owns the proposition "the three
+    surfaces agree on one count"; a literal in this file was a second-order copy of that
+    fact, and the A4 assumption this feature lands ("MUST NOT hardcode the template numeral")
+    applies to its derived counts as well. Deriving them here means the next amendment does
+    not have to edit a pin inside a foreign feature's guard.
+    """
     src = _text(DOUBLE_LANDING_TEST)
-    for name, want in (("TEMPLATE_COUNT", 18), ("LIVE_COUNT", 19), ("COMMAND_COUNT", 11)):
+    # The three pins in the double-landing guard, and what each one must equal. Every
+    # expected value is measured from the artifact the pin is about:
+    #   template  -> the template's own `### <numeral>. <title>` roster
+    #   live      -> the live constitution's own roster
+    #   command   -> the generator skill's `- **MUST include**` sub-entry block
+    template_n = len(PRINCIPLE_RE.findall(_text(CONST_TPL)))
+    live_n = len(PRINCIPLE_RE.findall(_text(CONST_LIVE)))
+    m_block = re.search(r"^- \*\*MUST include\*\*.*?(?=^- )", _text(CONST_SKILL), re.M | re.S)
+    assert m_block, "C-13: the skill lost its `- **MUST include**` mandatory-principles block"
+    command_n = len(re.findall(r"^  - \*\*(.+?)\*\* —", m_block.group(0), re.M))
+    # Anti-vacuity: a derivation that returned 0 would make the comparison below meaninglessly
+    # true for a guard whose pins had also gone to 0.
+    assert template_n > 0 and live_n > 0 and command_n > 0, (
+        f"C-13: a derived count is zero (template={template_n}, live={live_n}, "
+        f"command={command_n}); the derivation, not the pins, is what broke"
+    )
+    for name, want in (
+        ("TEMPLATE_COUNT", template_n),
+        ("LIVE_COUNT", live_n),
+        ("COMMAND_COUNT", command_n),
+    ):
         m = re.search(rf"^{name} = (\d+)", src, re.M)
         assert m, f"C-13: {name} not found in the guard"
-        assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
-    # and the counts are true of the artifacts, not just of the pins
-    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 18, "C-13: the template does not actually hold 18"
-    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 19, "C-13: the live constitution does not hold 19"
-    # S3 re-point: the command list became the generator skill's MUST-include
-    # sub-entry block (same block extraction the double-landing guard uses).
-    m = re.search(r"^- \*\*MUST include\*\*.*?(?=^- )", _text(CONST_SKILL), re.M | re.S)
-    assert m, "C-13: the skill lost its `- **MUST include**` mandatory-principles block"
-    entries = re.findall(r"^  - \*\*(.+?)\*\* —", m.group(0), re.M)
-    assert len(entries) == 11, "C-13: the skill's MUST-include list does not actually hold 11 entries"
+        assert int(m.group(1)) == want, (
+            f"C-13: {name} is {m.group(1)}; the artifact it describes holds {want} "
+            f"(raise the pin in the amendment that lands the count)"
+        )
 
 
 def test_x14_min_version_floor_semantics():

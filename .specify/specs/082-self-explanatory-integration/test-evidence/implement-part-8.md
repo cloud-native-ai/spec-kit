@@ -24,7 +24,7 @@
 | passed / failed | 8 passed / 0 failed (new module); 12 passed / 0 failed (mechanism suite); 3 passed / 759 deselected (parity subset); 10 PASS / 0 FAIL (red-leg driver) |
 | new_failures | none in the selected set |
 | baseline | `.specify/specs/082-self-explanatory-integration/baseline-failed.txt` (26 entries) — no entry in the selected set appears there (0 matches for `glossary`, `self_explanatory`, `mirror_parity`), so no comparison was triggered |
-| evidence_ptr | `notes/red-first-evidence.md` § Part 8 (M-1…M-5 verbatim, the idempotent-write transcript, the closed pair table) |
+| evidence_ptr | `notes/red-first-evidence.md` § Part 8 (legs **G-1…G-5** verbatim, the idempotent-write transcript, the closed pair table). The runner's own output lines still carry the tokens `M-1…M-5`; that file's § Part 8 opens with the mapping table between those tokens and the `G-1…G-5` ids — the transcript is kept verbatim rather than re-run to relabel it |
 
 ### Command output, verbatim
 

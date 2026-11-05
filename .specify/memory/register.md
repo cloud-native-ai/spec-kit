@@ -129,3 +129,8 @@
 | REC-080-08 | 红先行增加「该测试能否转绿」自检与红因枚举，禁止用临时移出实现文件重建红态 | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-08（F6） | open |
 | REC-080-09 | 一份 verification 只允许一个 SC 判定源：收口表不得用自然语言重述状态，须从 canonical 块派生或只留证据指针 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-09（F2） | open |
 | REC-080-10 | 扩展改变 Feature 定位时强制同步 `## Overview`，或声明「保留原始定位，扩展见 Key Changes」 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-10（F12） | open |
+| REC-T1 | review code subsection must fail loudly on a missing receipt block and point at the recovery command | `.specify/specs/082-self-explanatory-integration/review.md` § 5.1 REC-T1 | open |
+| REC-C1 | Completion Gate's test set must be derived from the delta: every touched file's guard modules, with the derivation printed | `.specify/specs/082-self-explanatory-integration/review.md` § 5.2 REC-C1 | open |
+| REC-A1 | a checkpoint whose spine delta is empty must exit non-zero; a closure commit must carry the spine write for the part it closes | `.specify/specs/082-self-explanatory-integration/review.md` § 5.3 REC-A1 | open |
+| REC-W1 | Completion Gate must state that its verdict is relative to the measured set and require delta guard coverage | `.specify/specs/082-self-explanatory-integration/review.md` § 5.4 REC-W1 | open |
+| REC-W2 | state-spine per-part checkpoint contract must survive the last part; `stage_base` is the sanctioned fallback when commit order cannot reconstruct attribution | `.specify/specs/082-self-explanatory-integration/review.md` § 5.4 REC-W2 | open |

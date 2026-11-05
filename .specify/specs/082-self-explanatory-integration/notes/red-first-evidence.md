@@ -234,6 +234,22 @@ correct shape, not a budget concession. Final section body is 1 summary sentence
 This is an in-passing correction (one reading consistent with the contract's intent, local,
 reversible), not a decision: disclosed here and in the part-4 checkpoint.
 
+## C-21 red — which run produced it, and why no contract mutation table names it
+
+The C-21 instructions-summary pair is the one red in this file that **no mutation leg produced** and
+that **no contract mutation table owns**. Both facts are stated here so a reader does not go looking
+for a leg that does not exist:
+
+| question | answer |
+|----------|--------|
+| Which run produced the red? | the **part-4 build run** of `tests/contract/test_self_explanatory_constitution.py`, on the real template, when T022's first section draft shared a line between the summary and the pointer. It is a real-tree red on a real defect, not a mutation on a copy |
+| Which clause does it belong to? | `contracts/instructions-propagation.contract.md` — the clause is **C-14**'s subject family (template-side carriage, lines 43-48 of that contract). The `C-21` token is the **carrier's test name** (`test_c21_*` in `test_self_explanatory_constitution.py`), not a clause id of the instructions contract; the contract's own clause list stops at C-19 |
+| Why is it not in that contract's mutation table? | the table (`:85-88`) owns `M-3`/`M-4` only. C-14's mutation leg `M-3` deletes the section from a copy; the C-21 red was produced by drafting the section **wrongly** in the real template, which no leg was specified to do. The table's scope is "copy-only mutations", so this red sits outside it by construction |
+| Is the gap a defect? | a **recorded insufficiency, not a repair made here**: naming the C-21 red in the contract's mutation table would edit a **plan-owned** artifact (`contracts/` is plan-owned for this feature), so it is reported as a review finding instead (see `review.md` F-2). What was repairable in this file — the `M-N` id collision — is repaired above |
+
+The green half is T024's run (`-k c21` → `1 passed, 12 deselected`, `EXIT=0`), re-executed in
+part 10a and quoted above; the red half is the part-4 build transcript in § "Part 4 shape finding".
+
 ---
 
 # Part 5 (T024-T028) — M-3 / M-4, and the C-21 pair
@@ -531,8 +547,8 @@ is recorded so the byte counts are reproducible rather than mysterious.
 | R-2 C-24 mirror byte parity | B-1 (plan stage) + part 6's DIFF | T031/T032 | CLOSED (part 6) |
 | R-2b C-26 distribution | part 6's removal leg | T029 | CLOSED (part 6) |
 | **R-5 C-27 docs links** | **M-6 (this part)** | **T034 (this part)** | **CLOSED (this part)** |
-| R-3 C-31 glossary entry | **M-1 / M-2 (part 8)** | **T039/T040 (part 8)** | **CLOSED (part 8)** |
-| R-6 C-22/C-24 mirror-enumeration | **M-4 / M-5 (part 8)** | **T042 (part 8)** | **CLOSED (part 8)** |
+| R-3 C-31 glossary entry | **G-1 / G-2 (part 8)** | **T039/T040 (part 8)** | **CLOSED (part 8)** |
+| R-6 C-22/C-24 mirror-enumeration | **G-4 / G-5 (part 8)** | **T042 (part 8)** | **CLOSED (part 8)** |
 
 R-5 is new in this part: C-27 had no carrier before T034, so its red had to be produced by the mutation
 leg rather than inherited from an earlier part. M-6 is that red, and the guard's green on the real page
@@ -545,6 +561,34 @@ T051 owns the final consolidation. Nothing above is marked closed without the co
 
 **Part scope**: `T039-T043` (implement part 8 of 10) | **Stage base**: `35a2948b` | **Runner**:
 `.specify/.tmp/082-part8/red_legs.py` (git-ignored scratch; the transcript below is the durable copy)
+
+**Leg id family — part-8 legs are `G-1..G-5`, not `M-1..M-6`.** The `M-N` ids are owned by the four
+contracts' mutation tables, each covering exactly one document:
+
+| Id family | Owner | Table |
+|-----------|-------|-------|
+| `M-1`, `M-2` | `contracts/constitution-double-landing.contract.md:103-104` | principle block / mandate entry |
+| `M-3`, `M-4` | `contracts/instructions-propagation.contract.md:87-88` | template section / generator non-injection |
+| `M-5`, `M-6` | `contracts/mirror-distribution.contract.md:93-94` | one-byte mirror drift / docs pointer removal |
+
+This part's legs mutate a **different** subject — the glossary store and the mirror enum — and three of
+them reuse a number the contracts already spend on a different assertion (`M-1`, `M-2`, `M-4`, `M-5`
+all appear in a contract table above). Ids are therefore re-coined here as `G-1..G-5` so a reader
+tracing "which contract leg proves which guard" follows one row and not two:
+
+| Part-8 id | Mutation (on a copy) | Contract clause it proves | Not to be confused with |
+|-----------|----------------------|---------------------------|-------------------------|
+| `G-1` | second row with the retired name in the **canonical** column | `contracts/glossary-integration.contract.md` C-30 | — |
+| `G-2` | duplicate of the canonical string in the canonical column | same, C-29 + C-30 (two assertions, one mutation) | — |
+| `G-3` | canonical row's owner path replaced with an absent path | same, C-32 | — |
+| `G-4` | `MIRROR_PAIRS` emptied on the loaded engine module | `contracts/mirror-distribution.contract.md` C-22 parameter presence | **not** the contract's `M-4` (generator non-injection, a different file) |
+| `G-5` | mirror copy's first byte changed under one root | `contracts/mirror-distribution.contract.md` C-22 byte identity / C-24 | **not** the contract's `M-5` (which mutates a file *inside the real tree's mirror tree*, this one mutates a single-document copy root) |
+
+The runner script itself still prints the old `M-N` tokens: `.specify/.tmp/082-part8/red_legs.py` is
+git-ignored scratch and was not re-run for a cosmetic rename, so the transcript below is preserved
+verbatim (evidence integrity) and this table is the mapping between its tokens and the ids used from
+here on. Re-running the runner to relabel its output would have replaced captured evidence with a
+re-execution, which the single-run evidence discipline forbids.
 
 The glossary entry already existed when this part opened (written by the engine during the plan
 stage), so no assertion here could capture a "subject is absent" red the way R-1 did. The red is
@@ -574,11 +618,11 @@ EXIT=0
 
 | Leg | Mutation (on a copy) | Red it produces |
 |-----|----------------------|-----------------|
-| M-1 | a new row with `望文生义` in the **canonical** column, inserted right after the canonical row | `test_c30_...` names the offending entry index and value — the row parse distinguishes the defect from the legitimate occurrence of the same string in the variants cell, which a substring search could not |
-| M-2 | a new row duplicating the **canonical string** in the canonical column | `test_c29_...` reports "found 2" with both indices; `test_c30_...` reports the second row. Two assertions, one mutation, as C-29 and C-30 require |
-| M-3 | the canonical row's owner path replaced with `shared/definitions/absent-by-construction.md` | `test_c32_...` fails on the named-path arm (the owner is unreachable), not on the "no path found" arm |
-| M-4 | `MIRROR_PAIRS` emptied on the loaded engine module | the C-22 parameter-presence assertion fails with "found 0" owning pairs — i.e. with no enumeration a document has no mirror parameter at all |
-| M-5 | both sides copied under one root, then the **mirror** copy's first byte changed | the byte-identity assertion fails naming `source->mirror`, which is the node-id form C-24 requires; the copy root carries exactly one document so the leg reaches the byte arm rather than the enumeration arm |
+| G-1 | a new row with `望文生义` in the **canonical** column, inserted right after the canonical row | `test_c30_...` names the offending entry index and value — the row parse distinguishes the defect from the legitimate occurrence of the same string in the variants cell, which a substring search could not |
+| G-2 | a new row duplicating the **canonical string** in the canonical column | `test_c29_...` reports "found 2" with both indices; `test_c30_...` reports the second row. Two assertions, one mutation, as C-29 and C-30 require |
+| G-3 | the canonical row's owner path replaced with `shared/definitions/absent-by-construction.md` | `test_c32_...` fails on the named-path arm (the owner is unreachable), not on the "no path found" arm |
+| G-4 | `MIRROR_PAIRS` emptied on the loaded engine module | the C-22 parameter-presence assertion fails with "found 0" owning pairs — i.e. with no enumeration a document has no mirror parameter at all |
+| G-5 | both sides copied under one root, then the **mirror** copy's first byte changed | the byte-identity assertion fails naming `source->mirror`, which is the node-id form C-24 requires; the copy root carries exactly one document so the leg reaches the byte arm rather than the enumeration arm |
 | isolation | — | the real store digest is unchanged after all legs |
 
 ### The engine's idempotent write (T043)
@@ -608,8 +652,8 @@ No hand edit, no second row: the file is byte-identical before and after, and th
 
 | Pair | Red captured | Green expected at | Status |
 |------|--------------|-------------------|--------|
-| R-3 C-29/C-30/C-32 glossary entry | M-1 / M-2 / M-3 (this part) | T039 / T040 / T041 (this part) | CLOSED (this part) |
-| R-6 C-22/C-24 mirror enumeration + byte identity | M-4 / M-5 (this part) | T042 (this part) | CLOSED (this part) |
+| R-3 C-29/C-30/C-32 glossary entry | G-1 / G-2 / G-3 (this part) | T039 / T040 / T041 (this part) | CLOSED (this part) |
+| R-6 C-22/C-24 mirror enumeration + byte identity | G-4 / G-5 (this part) | T042 (this part) | CLOSED (this part) |
 
 ---
 
@@ -628,7 +672,7 @@ that is stated as such; no transcript is presented as this run's own when it is 
 | R-1 | T006, part 1: `test_c1_template_carries_the_principle` — `1 failed in 0.05s`, `EXIT=1`, "missing the principle titled 'Self-Explanatory Structure (不言自明)'" (17 titles present) | T015, re-run below: same node id `1 passed`, `EXIT=0` | **CLOSED** |
 | C-21 | part 4: "the section carries no summary at all" (the pointer shared a line with the summary) | T024, re-run below: `-k c21` → `1 passed, 12 deselected`, `EXIT=0` | **CLOSED** |
 | R-2a | plan stage B-1: `sync-mirrors.py --check` → three `MISS` lines, `EXIT=2` | T031, re-run below: `ok shared/ == .specify/shared/ (65 files)`, `RC=0` | **CLOSED** |
-| R-3 | part 8 M-1/M-2/M-3 (mutated copies) | T043, re-run below: engine `--action list` reports the entry at index 160 with `origin=auto`, `status=proposed`, `RC=0` | **CLOSED** |
+| R-3 | part 8 G-1/G-2/G-3 (mutated copies) | T043, re-run below: engine `--action list` reports the entry at index 160 with `origin=auto`, `status=proposed`, `RC=0` | **CLOSED** |
 
 ## The green halves, re-executed in this part
 

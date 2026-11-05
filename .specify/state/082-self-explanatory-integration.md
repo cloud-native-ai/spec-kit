@@ -653,3 +653,73 @@ between readings, not a single consistent correction):
 - **smoke**: `.specify/specs/082-self-explanatory-integration/test-evidence/smoke-20261105.txt` (2321 B, sha256 19fdfbbd…), command covers the four feature guard modules; 42 passed twice, rc 0.
 - **wrap-up**: session 20261105T063813Z-run-determination-speckit-implement-r20261105t032102z-c139.md; exec-quant 20261105T063815894632Z-d9e6df67.json; feedback 20261105T063820Z-speckit-implement.md.
 - **next**: review stage (four segments + ARC); closure full suite after review; local merge; no push.
+
+## Review record（2026-11-05，续段）
+
+- **stage**: review (continuation). Code segment had already run and is carried by
+  `.specify/specs/082-self-explanatory-integration/code-review.md` (base `2f6b8bbb` →
+  head `b2880fa0`, `renderer: text`); this run completed process + artifact + implementation +
+  ARC, the answers owed to the code segment's items, the status gate and wrap-up.
+- **review artifacts**:
+  - `review.md` — the four segments + ARC (`§ 2.1`…`§ 2.4`), findings `F1`…`F5`,
+    § 3.5 answering two `important`, one `question`, one `suggestion`.
+  - `code-review.md` — **gained the coverage-receipt block the template mandates**
+    (`changed 69 / judged 69 / skipped 0 / gap 0`; written by
+    `git-delta-review.sh receipt --review-file … --spec …`, not by prose). The record's
+    `blocking_entries=0` / `gate=allow` reading is unchanged.
+  - `test-evidence/review-stage-checks.md` — this stage's two targeted runs + the baseline
+    cross-check.
+  - `notes/red-first-evidence.md` — part-8 legs re-coined `G-1..G-5` with an ownership table;
+    a new § "C-21 red — which run produced it" states the part-4 build red belongs to C-14, and
+    that naming it in the instructions contract's mutation table is plan-owned (finding F-3).
+  - `test-evidence/implement-part-8.md` — `evidence_ptr` now names the `G-1..G-5` ids and the
+    token-mapping bridge.
+- **P0 / P1 / P2 counts** (process segment): **0 / 1 / 4**. P0 = 0, so the P0 independent-
+  validation pass is vacuously satisfied. F1 (a guard red never reached any gate) = P1;
+  F2 (guard expected values copied as literals) / F3 (a contract's mutation table does not own
+  the red proving its clause) / F4 (status flip and its closure in different commits) /
+  F5 (gate input set not derived from the delta's blast radius) = P2 each. Category split:
+  Workflow 3 / Command Prompt 1 / Automation 1 / Template 0 / Documentation 0.
+- **code-segment item dispositions**:
+  - IMPORTANT #1 (`a7` count pin) — premise **disagreed** (a7 was GREEN at base `2f6b8bbb`: pin
+    31/32 == artifact 31/32; `baseline-failed.txt` and the baseline suite log contain no `a7`;
+    the `878c03ab` red was repaired by Feature 078's `4e23dad2`), outcome **agreed and repaired**:
+    the delta moved the counts to 32/33 and left the pin red at head (`assert 32 == 31`);
+    pin raised + offset assertion added, mutation-verified, template restored byte-identical
+    (`sha256 44ea5381d660…`).
+  - IMPORTANT #2 (`M-1..M-6` re-use) — **agreed and repaired** for the non-plan-owned half
+    (`G-1..G-5`); the contract-table half is plan-owned and recorded as F-3.
+  - QUESTION (`features.md` delta hygiene) — **answered**, no repair: per-part `stage_base`
+    in every evidence file keeps the timeline recoverable; residue recorded as F-4.
+  - SUGGESTION (`test_x13` hard-coded counts) — **agreed and repaired**: derived from artifacts
+    with a non-zero anti-vacuity guard, mutation-verified.
+- **targeted verification** (no full suite — TEST BUDGET):
+  `test_fast_fail_discipline.py + test_constitution_double_landing.py +
+  test_instructions_section_propagation.py` → **128 passed / 1 failed**, the failure being
+  `test_g9_total_equals_frozen_baseline`, enumerated in `baseline-failed.txt` (EP-003, inherited);
+  the four guard classes + budget carrier → **55 passed**; the recorded smoke command re-run →
+  **42 passed, rc 0**.
+- **ARC**: `final_path` copied from
+  `python3 scripts/python/closure-acceptance-check.py --spec-dir … --json` —
+  pass **4** · blocked 0 · deferred 0 · partial 0 · fail 0 · unknown 0 · total **4**;
+  verdict `accept`; claimed status `Implemented` at read time → comparison `agree`.
+- **status gate**: **PASSED** — (a) 0 `[~]` rows (and 0 open rows); (b) review evidence exists
+  (`review.md` + `code-review.md`); (c) `code-review.md` carries no `blocking` entry
+  (`blocking_entries=0`); (d) no `final`-path criterion sits in blocked/deferred/fail
+  (`pass 4 / total 4 / unknown 0`). Every `important` item answered (§ 3.5).
+- **feature status**: `Implemented → Ready for Review` landed on **both** status surfaces after the
+  gate passed (`features.md` 082 row status cell; `features/082.md` `**Status**` + the § Status
+  Tracking `(current)` marker moved). Binding integrity re-verified afterwards
+  (`test_spec_feature_binding_integrity.py` → 2 passed) and the closure checker still reads
+  `accept` with `claimed_status: Ready for Review`.
+- **PLAN-EDIT**: none — no `plan.md` / `data-model.md` / `contracts/` / `quickstart.md` /
+  `research.md` / `feature-ref.md` / `requirements.md` file was modified by this run.
+- **wrap-up pointers**: run-determination
+  `.specify/memory/session/20261105T065334Z-run-determination-speckit-review-r20261105t070000z-082rev.md`;
+  exec-quant `.specify/memory/exec-quant/records/20261105T065337371729Z-80e46c22.json`;
+  feedback `.specify/memory/feedback/20261105T065341Z-speckit-review.md`.
+- **last_verdict**: review **complete** — code `pass` / process `0 P0` / artifact `pass` /
+  implementation `pass` / ARC `accept`; Feature `Ready for Review`; no merge, no push.
+- **next_step**: human/governance `Ready for Review → Completed`, then the local merge; the
+  REC-… ids coined in `review.md` are registered in `.specify/memory/register.md` in the same
+  commit as the report.
