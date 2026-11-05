@@ -32,7 +32,7 @@ State the detected mode briefly in the final report.
 
 Parse `skill name` and `description` from the user input:
 
-- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
+- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. A reference form is accepted — `/name`, `@name`, `skill:name` normalize to the bare name per `.specify/shared/definitions/skill-reference-definitions.md` (a new skill is **named**, not resolved). When inventing a name, prefer lowercase kebab-case (for example, `api-testing`) unless the user explicitly needs another valid form.
 - **description**: A capability summary plus trigger keyword list. Format: `This skill can <capability>. Use this when the user mentions [ "keyword1", "keyword2", ... ]`. **No-workflow-summary rule**: the description MUST NOT summarize the workflow steps or body content — an agent that sees a workflow summary in the description will skip loading the body and execute a degraded version. Capability + triggers only.
 
 If the input contains only a valid name and the Skill already exists at the detected mode's skills root (`.specify/skills/<name>/SKILL.md` in a Spec Kit project; `<skills-root>/<name>/SKILL.md` otherwise), redirect to `improve-skills` rather than creating a duplicate.
@@ -56,6 +56,7 @@ Distill a reusable Skill from the current conversation history:
 - **skill name** determines `SKILL_HOME`. Example: `name = "testing"` → `SKILL_HOME = <skills-root>/testing/` (root resolved per Step 0: `.specify/skills/` in a Spec Kit project; the project `skills/` root or the host skills directory otherwise).
 - **description** must include keywords and trigger scenarios; avoid vague descriptions.
 - **Writability pre-flight (fail fast)**: before drafting any content, touch-test the parent directory of `SKILL_HOME` (e.g. `mkdir -p "$SKILL_HOME" && touch "$SKILL_HOME/.wtest" && rm "$SKILL_HOME/.wtest"`). The host skills directory may be root-owned in some environments (container-created leftovers); report an unwritable target up front with the `sudo chown -R $USER <dir>` remedy instead of discovering it at the first write.
+- **Both layers before any write**: a policy item this creation needs (where the new skill's runtime inputs come from, where its outputs land) that the user did not state is **missing**, not a default to be invented — run the owner's read-judge-stop check before the touch-test above and before the first file of § 3; `shared/definitions/mechanism-policy-definitions.md` § Consumption Contract owns the check and the prompt shape (name the item, say why this step needs it, offer one way to supply it), and the environment-error branch is stated there too. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to `shared/definitions/skill-reference-definitions.md` and is not restated here.
 
 Storage location options (`SKILL_HOME`) — the root is an **input resolved per Step 0**, never a hard dependency:
 - `.specify/skills/<name>/` — project-level primary **in Spec Kit project mode** (optional integration; when present it is the natural root for a Spec Kit project)
@@ -165,6 +166,7 @@ Minimum checks:
 - [ ] Standalone mode only: format is consistent with sibling skills in the host directory, and no `.specify/**` path is referenced
 - [ ] Spec Kit project mode: **run the existing skill-conformance contract suite** (`pytest tests/contract/ -q -k "skill or runtime_mode"`) before reporting completion — new skills are subject to ALL pre-existing conformance contracts (runtime-mode gate, feedback-section shape); a later full-suite regression is the wrong place to discover a miss. **Fallback**: if the project has no `tests/` or `tests/contract/` directory, the suite is not applicable — verify conformance via the manual checklist items above (frontmatter / Feedback section / registry / size) and state "contract suite not applicable" explicitly in the completion report; do not spin on the missing suite or report it as a failure
 - [ ] Spec Kit project mode: **attribute every red before reporting it** — when that suite is red, re-run it with `--tb=line` (`pytest tests/contract/ --tb=line -k "skill or runtime_mode"`) and read, per failing assertion, **which skill it names**; then split the failures into **pre-existing debt** (skills this run never touched — an unsynced `.specify/skills/**` mirror is the common case) and **this new Skill's regression**. Quote the attribution command and that split in the completion report. A bare pass/fail count attributes nothing: while several skills of one family are edited in parallel, an unattributed red cannot be routed back to its author
+- [ ] **Mechanism / policy separation**: for each added line, answer the boundary test — does the skill body or `references/` hard-code an environment path, a user directory name or a default output location (policy written into the mechanism), or does reusable logic (a rule, a step order, a branch) live in the run-environment notes instead (mechanism left in the policy side)? Continue to judge the other side after a hit; on a hit name the file and the line or quoted sentence, and refuse to report completion until it is corrected. Judgement method: [mechanism-policy-check.md](./references/mechanism-policy-check.md); criteria owner: `shared/definitions/mechanism-policy-definitions.md` § Misplacement Symptoms
 
 ### 6.5 Pressure Test (RED-GREEN)
 
@@ -180,6 +182,8 @@ Pure utility skills (deterministic script wrappers) may substitute a smoke invoc
 
 Applies only when creating a **new** Skill **in Spec Kit project mode** — in standalone mode skip this step (no built-in role agents exist). Wire it into the built-in role agents so they prefer it for role-relevant work, following the Skill Enablement convention (the `## Skill Enablement` section pattern on the built-in role agents under `.specify/agents/templates/`).
 
+Before the first edit below, re-run the owner's read-judge-stop check over the new skill's policy items (`shared/definitions/mechanism-policy-definitions.md` § Consumption Contract): this step writes into agent definitions, so a missing policy stops here with no file touched.
+
 1. **Guard**: skip if the new Skill is non-declarable (reference-only/meta: `create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `create-team`, `improve-team`, `create-tools`, `improve-tools`). Normal user-created Skills proceed.
 2. **Analyze**: read the 7 built-in role agents from `.specify/agents/templates/` (`requirements-analyst`, `system-designer`, `module-designer`, `test-engineer`, `qa-engineer`, `knowledge-manager`, `ux-analyst`) and judge each agent's role against the new Skill's capability + trigger keywords.
 3. **Match**: pick the agents whose role operations the Skill covers; draft a one-line "when to use" per match. If none match, report "no role-relevant agents" and skip edits (no forced use).
@@ -190,6 +194,8 @@ Applies only when creating a **new** Skill **in Spec Kit project mode** — in s
 **Invariants**: use the canonical slug; it MUST resolve to an installed `.specify/skills/<slug>/SKILL.md`; never add a non-declarable slug; preserve all existing frontmatter. Generator templates (`agent-capacity-*-template.md`) are intentionally NOT updated — a later regeneration would drop the added Skill.
 
 ### 8. Report completion
+
+Run the owner's read-judge-stop check once more before writing the report (`shared/definitions/mechanism-policy-definitions.md` § Consumption Contract) — a policy item that turned out missing during Step 6 is stopped here, not reported as a completed creation.
 
 Summarize:
 - Detected runtime mode (Spec Kit project vs standalone) and which Spec-Kit-specific steps were skipped
