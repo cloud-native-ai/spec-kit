@@ -543,9 +543,16 @@ MIGRATED = {
         "kind": "closed-set",
         "engines": ["scripts/python/validate-requirements.py",
                     "scripts/python/closure-acceptance-check.py"],
+        #: The roster (`C-042` row 9) also names `skills/internal/create-requirements/SKILL.md`.
+        #: That unit cannot carry a pointer today: 069a's dated record
+        #: (`.specify/specs/069a-*/notes/pre-change-file-hashes.txt`, whose doctrine is "this manifest is a
+        #: dated record and is not rewritten") freezes that file's bytes, and
+        #: `tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`
+        #: reads it — so pointing the unit there and keeping that leg green are mutually exclusive. The
+        #: assertion below covers the carriers that can point; the third unit's disposition is handed back
+        #: rather than settled by narrowing the fact.
         "carriers": ["shared/workflow/acceptance-hardening.md",
-                     "templates/commands/requirements.md",
-                     "skills/internal/create-requirements/SKILL.md"],
+                     "templates/commands/requirements.md"],
         "inline": [r"^PATH_VALUES\s*=", r'^\s*if value not in \("final", "supporting"\)'],
     },
     "expression-gate-faces": {
@@ -602,6 +609,7 @@ MIGRATED_SO_FAR = (
     "flow-class-document-types",
     "flow-class-ledger-columns",
     "flow-class-neutral-categories",
+    "success-criterion-path-values",
 )
 
 

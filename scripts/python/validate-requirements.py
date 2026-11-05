@@ -63,6 +63,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import clause_extract  # noqa: E402  (one implementation of the code-span/fence rules)
+import declaration_reader  # noqa: E402  (the declaration layer's one read entry, same directory)
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -95,8 +96,43 @@ HEADING_RE = re.compile(r"^#{1,6}\s")
 PATH_MARKER_RE = re.compile(r"\*\*Path\*\*")
 PATH_TOKEN_RE = re.compile(r"\*\*Path\*\*\s*:\s*(\S+)\s*$")
 FLOW_CLASS_RE = re.compile(r"^\*\*Flow Class\*\*\s*:\s*(\S+)\s*$")
-PATH_VALUES = ("final", "supporting")
 EXECUTION_CLASS = "execution"
+
+#: Feature 084, batch 1 row 9: the `Path` closed set is a declaration-layer fact
+#: (`shared/declarations/facts/success-criterion-path-values.yaml`). This checker carries no copy of
+#: the member set — it reads it through the shared read entry, so a third value added to the
+#: declaration changes what this rule refuses with no edit here, and a second tuple anywhere is the
+#: defect the declaration exists to make impossible.
+PATH_FACT = "success-criterion-path-values"
+
+
+def _declared_path_values():
+    """`(values, label)` for the `Path` closed set; `((), <STR-014 instance>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), PATH_FACT)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label(PATH_FACT)
+
+
+PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+
+
+class DomainUnavailable(Exception):
+    """The `Path` closed set cannot be read, so the `path-marker` rule cannot be judged.
+
+    Raised only when the artifact declares a flow class — a spec outside the closure system never
+    needs the domain, so its judgement is unaffected by a missing declaration layer (FR-012). The
+    caller renders :attr:`label` and maps it to an input error: a degraded read is never a pass.
+    """
+
+    def __init__(self, label):
+        super().__init__(label)
+        self.label = label
 
 
 class Finding:
@@ -306,6 +342,11 @@ def check_path_marker(lines, defs, name):
     findings = []
     if _flow_class(lines) is None:
         return findings  # outside the closure system — see this label's docstring scope note
+    if not PATH_VALUES:
+        # FR-012 / FR-013: the member set is a declaration and the layer is unreadable here. Judging
+        # against an empty domain would refuse every value (a false red); skipping the rule would read
+        # as a pass. The run therefore stops on the `declaration-absent` label, never on a traceback.
+        raise DomainUnavailable(PATH_VALUES_LABEL)
     sc_rows = [(n, ln, lines[ln - 1]) for prefix, digits, n, suffix, ln in defs
                if prefix == "SC" and not suffix and len(digits) == 3]
     has_final = False
@@ -425,7 +466,16 @@ def main(argv=None) -> int:
     parser.add_argument("--json", action="store_true", help="machine-readable output")
     args = parser.parse_args(argv if argv is not None else sys.argv[1:])
 
-    status, findings, checks, scanned = validate(args.path)
+    try:
+        status, findings, checks, scanned = validate(args.path)
+    except DomainUnavailable as absent:
+        # FR-012 / FR-013: the value domain this run would judge against is a declaration and the
+        # layer is unreadable, so the verdict is an input error carrying the absent label — free
+        # text, not a seventh label, and never a green result.
+        print(absent.label, file=sys.stderr)
+        print("validate-requirements: refusing to judge the `path-marker` rule against an absent "
+              "closed set (declaration layer unreadable)", file=sys.stderr)
+        return EXIT_INPUT
     errors = sum(1 for f in findings if f.severity == "error")
     warnings = sum(1 for f in findings if f.severity == "warning")
 

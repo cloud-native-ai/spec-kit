@@ -25,6 +25,7 @@ Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user
   - **判文档类型（`**Flow Type**`）**：仅 `expression` 线需要，取值取 owner § 文档类型 的封闭集（本卡不列举）；`execution` 线写 `-`。拿不准时写 `-`（未细分），MUST NOT 发明新取值。
   - **写入与留痕**：两行写在 `**Status**:` 之后、`**Input**:` 之前；在 `## Assumptions` 记一句判定理由（按什么 oracle 判为 `expression` / 为什么是该类型）。用户显式指定类别或类型时以用户为准，MUST NOT 静默改判。
   - **判错的处置**：判定之后任何阶段发现类别不符，改声明行并按新类别重跑该阶段门禁（re-baseline），MUST NOT 只改门禁不改声明。
+  - **写成功标准时的 `Path` 取值域**：成功标准定义行尾部 `**Path**` 的成员集只有一处 owner —— `.specify/shared/declarations/facts/success-criterion-path-values.yaml#/statement`；判据（位置、唯一性、`execution` 类的 `final` 下限、拒绝模板与退出码语义）归 `.specify/shared/workflow/acceptance-hardening.md` § Closure Verdict。本模板与委派技能引用这两处，不复制成员集，也不另写一套判定。
 
 ## Glossary
 

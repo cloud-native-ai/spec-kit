@@ -1339,3 +1339,128 @@ for it」。按 **unit** 读，这句今天成立——该 unit 没有任何 fin
 | 依赖面未动 | `git diff --stat 4b65517c -- pyproject.toml` | 空输出 |
 | 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**` 与 `.specify/state/**` |
 | 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |
+
+## implement（Part 2b，T013–T014 有界收口，2026-11-05）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1@stage_base=16dcbdf2 —— 29 个文件，四个来源：(a) 本段改动面直接命中（`scripts/python/{flow-class-check,validate-requirements,closure-acceptance-check}.py`、`shared/declarations/facts/`、`shared/workflow/{expression-gates,acceptance-hardening}.md`、`templates/commands/requirements.md`）；(b) 081 的两个验收文件与 closure 面（T013 行自带硬约束）；(c) flow-class / driver / gate-owner 相关契约与单元测试（`test_isomorphism_map`、`test_loop_state_contract`、`test_sdd_loop_driver_skill`、`test_acceptance_premises`、`test_non_regression_070` 等）；(d) 载体模板改动后的四处生成副本同步守卫（`test_run_checks`、`test_user_facing_comprehension_pointers`、`test_fast_fail_discipline`、`test_humanize_command_surface`）——第一轮 25 文件读数里 `regen-command-copies.py --check` 的 drift 就是被这一组抓出来的。集合逐行见 `test-evidence/implement-part2b-targeted-set.txt`"
+selected_paths:
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_requirements_checker.py
+  - tests/contract/test_checker_form.py
+  - tests/contract/test_closure_acceptance_check.py
+  - tests/contract/test_gate_wiring_081.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_expression_faces.py
+  - tests/contract/test_expression_gates_doc.py
+  - tests/contract/test_expression_gate_wiring.py
+  - tests/contract/test_isomorphism_map.py
+  - tests/contract/test_flow_class_correctness.py
+  - tests/contract/test_flow_class_ledger.py
+  - tests/contract/test_flow_class_spec_declaration.py
+  - tests/contract/test_stage_class_wiring.py
+  - tests/contract/test_ledger_reconciliation.py
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_acceptance_premises.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_gates.py
+  - tests/unit/test_flow_class_check.py
+  - tests/unit/test_isomorphism_checker.py
+  - tests/unit/test_pre_analyze_check.py
+  - tests/unit/test_loop_state_engine.py
+  - tests/contract/test_run_checks.py
+  - tests/contract/test_user_facing_comprehension_pointers.py
+  - tests/contract/test_fast_fail_discipline.py
+  - tests/contract/test_humanize_command_surface.py
+sufficiency: "29 个文件、923 收集 → 909 passed / 14 failed / 0 skipped（37 s，终树读数；同一集合的首轮为 659 passed / 13 failed，差异全部来自第 (d) 组补入的 4 个文件与随后的一次生成副本同步）。四个来源各有贡献：(a) 直接覆盖本段改动的四个可执行面与四个载体；(b) 081 的两个验收文件同时承担 T013 的「零改动 + 零新增失败」硬约束；(c) driver / gate-owner 面把「驱动事实未迁移」写成读数而不是印象；(d) 补入后立刻抓出一次真实回归——载体模板改动后四处 per-tool 副本未重新生成，`regen-command-copies.py --check` exit 1。**集合到不了的地方如实写明**：镜像对测试（`test_mirror_parity_suite.py`、`test_scripts_distribution_parity.py`）与本段无关（镜像投影属 T026），未纳入；全量套件按预算不跑，E2 的 25F/7151P 仍是唯一全量读数"
+command: "python3 -m pytest -q <上列 29 个文件>"
+rc: 1
+passed: 909
+failed: 14
+skipped: 0
+new_failures:
+  - "tests/contract/test_flow_class_ledger.py::test_no_second_classification_data_file —— `shared/declarations/facts/flow-class-ledger-columns.yaml: data file mentions the class key 'flow_class'`。**不是本段引入**：该声明由 T012（Part 2a）产出、随 `16dcbdf2` 入库，而该测试的扫描面是 `git ls-files`（被跟踪文件）——文件在 Part 2a 自己的读数轮里还是未跟踪状态，故当时不可见，入库后才被判到。两类修法都被封：改声明会抹掉台账列名（引擎按名列比对），改守卫要动 `tests/contract/test_flow_class_ledger.py`（SC-006 的零 diff 侧）。按 FF-11 上送，不就地修平"
+  - "tests/contract/test_expression_compatibility.py::test_c7_mirrors_are_byte_identical —— `flow-class-check.py` / `flow-class-definitions.md` / `expression-gates.md` / `feedback-step.md` 四个镜像对未投影，T026 的所有物（Part 2a 的 E3 行已按「镜像类」整类归因）"
+baseline: "E2 `slot=baseline` 行（状态脊 `<!-- test-budget:begin -->` 的 `seq:1`：25F / 7151P / 4S；比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名，另 2 条镜像为在途）。本行 14 条失败里 12 条在该 23 名集内（`test_c22_watch_target_hook_selftest`、`test_e_a_stale_pin…`、`test_g9_total_equals_frozen_baseline`、9 条 `unit/test_loop_state_engine.py`），1 条属 T026 的镜像类，1 条是上面归因给 T012 的新增读数 ⇒ **本段引入的新失败 0 条**"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implement-part2b-targeted-run-2026-11-05.txt
+```
+
+## Why `ran`
+
+本段改的是可执行面与载体：两个引擎的内联取值被删除并改经共享读取入口、两件批 2 声明落盘、一个载体加指针、
+084 自己的契约模块收窄一条腿。落 `not-run-docs-only` 就是假绿，故实跑定向集并按 E2 做名字级比较。
+
+## T013 收口读数（逐条，命令 + 实测）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| 081 冻结面零 diff | `git diff --stat HEAD -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` | **空输出**、exit 0（`HEAD = 16dcbdf2`） |
+| 081 验收可收集且零新增失败 | `python3 -m pytest tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py --collect-only -q`；`… -q` | 收集 **77**（40 + 37，与 `research.md` § R7 的读数逐字一致）；运行 **77 passed** |
+| 引擎侧内联副本已删除（两处） | `grep -n "PATH_VALUES" scripts/python/*.py` | `validate-requirements.py` 只剩读取后的绑定与注释，`closure-acceptance-check.py` 只剩读取后的绑定；**无任何 `PATH_VALUES = ("final", "supporting")` 形态** |
+| 成员集仍是两个 | `harness-triple-check.py --action lookup --unit-id skills/internal/create-requirements/SKILL.md` | `fact: success-criterion-path-values kind=closed-set`；声明 `statement` 两条，未增未减 |
+| 载体指针（两件） | `grep` 声明路径 + `#/` | `shared/workflow/acceptance-hardening.md` 与 `templates/commands/requirements.md` 各一处指针 |
+| 判据散文 byte-identical | `git diff HEAD -- shared/workflow/acceptance-hardening.md` | 只有**新增**的一段指针；§ Closure Verdict 的判定散文、拒绝模板、退出码语义零改动（`test_closure_acceptance_check.py` 100 passed 中已覆盖） |
+| 标签集不迁 | `git diff HEAD -- scripts/python/validate-requirements.py` | docstring 的六项枚举未动（081 的 `test_c01_c02_docstring_enumerates_exactly_the_pinned_labels` 绿） |
+
+## T014 收口读数
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| `expression-stage-operator-table` 引擎侧位置式解析 | `grep -n 'required = (' scripts/python/flow-class-check.py` | 只剩 `required = (STEP_COLUMN, GATE_ID_COLUMN, OPERATOR_COLUMN, FACE_COLUMN, LEVEL_COLUMN)`；五个列名只在声明里各出现一次 |
+| 表头检查语义不变 | `python3 scripts/python/flow-class-check.py --action isomorphism` | `stages: 8`、`gates: 6`、`findings: []`、exit 0（与改动前同读数）；拒绝消息模板与 `GateOwnerError` → exit 2 的映射未动 |
+| `expression-gate-faces` 引擎侧副本已删除 | `grep -n 'FACES_SECTION_KEYWORD = \|FACES_EXPECTED = ' scripts/python/flow-class-check.py`；`grep -rn '"六面"' scripts/python/*.py` | 前者只剩从声明派生的绑定；后者**零命中**（模块级重复赋值 `FACES_SECTION_KEYWORD = "六面"` / `FACES_EXPECTED = 6` 已删除——它与文件顶部的声明读取同值，留着就会把读取变成死代码） |
+| 缺层不判 | 声明缺席时的降级 | `FACES_DECLARED_LABEL` / `OPERATOR_COLUMNS_LABEL` 进入 `main` 的拒绝清单：读不到即 exit 2 + `[[STR-014]]` 实例，绝不在空值上「判成绿」 |
+| 载体指针 | `grep` 声明路径 + `#/` | `shared/workflow/expression-gates.md` 新增一段指针（两件声明各一处键路径） |
+| **未完成**：`面数 = 6` 仍在本载体 | `grep -n "面数 = 6" shared/workflow/expression-gates.md` | 命中。`tests/contract/test_expression_gates_doc.py:239` 逐字断言该串，而它属 SC-006 的零 diff 侧 ⇒ 删字面量与零新增失败互斥。本段保留字面量、加指针并把两者的从属关系写进文档 |
+| **未完成**：四条 `driver-*` 事实 | 见下节 | 未写声明、未改载体、未改引擎 |
+
+## 四条 `driver-*` 事实为何未迁移（读数，不是印象）
+
+| 事实 | 阻断它的已记录断言 | 读数 |
+|---|---|---|
+| `driver-stage-sequence` | `tests/contract/test_isomorphism_map.py::test_stage_set_equals_the_roster_owner` 用 `^STAGE_ARTIFACTS\s*=\s*\{` **静态解析** `loop-state.py` | 该文件在 SC-006 的 38 文件零失败集内；把 `STAGE_ARTIFACTS` 改成声明派生即得 `roster == []` → 该腿必红 |
+| `driver-stage-artifacts` | 同上，另加 `tests/contract/test_loop_state_contract.py::test_stage_artifacts_match_reference_five_dimensions`（引擎表 ↔ `state-awareness.md` §Stage Artifact Map 五维逐项） | 载体面是 `references/state-awareness.md` 的镜像表，删表即该腿必红 |
+| `driver-completion-sentinels` | `loop-state.py` 的 `sentinel_literal()` 体 + `tests/contract/test_sdd_loop_driver_skill.py::test_c5_stage_chain_and_sentinel_literals`（`"-DONE"` / `"PLAN-DONE"` 必须**内联**在 `dispatch-recipes.md`） | 载体复述被逐字钉住，改指针即该腿必红 |
+| `driver-gate-roster` | 判据面：六个 `check` 名只是消息前缀，改名不改变任何判决 | 按 clarify A2 收窄后的 FR-006 (i)（「判决结果随取值改变」）该行不成立，与路径 A 移出的八行同类；`STAGES` 一面成立而 `check` 名一面不成立，行需重新裁决 |
+
+三者共同点：要迁移就必须改动「既有测试」，而这些测试恰在 SC-006 的零 diff / 零新增失败侧；`C-051` 对同形情形的
+处置是「该行停下、回规格，不取本地例外」。故本段**不写**这四条声明——写了而没有读取点，正是 FR-007 的
+`[[STR-009]]` 假绿形态，且会让 `harness-triple-check --action verify` 报出四条不存在的读取点。
+
+## 未勾选的任务行与理由
+
+- **T013 未勾**：八条腿里七条实测成立（见上表），第八条「point `skills/internal/create-requirements/SKILL.md`」
+  无法与既有门共存——069a 的日期化记录 `.specify/specs/069a-*/notes/pre-change-file-hashes.txt` 冻结该文件字节
+  （其自有教条为「dated record and is not rewritten」），`test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`
+  读它，而该测试在零 diff 侧。本轮把上一轮该文件的指针改动**回退**（恢复冻结字节），并把 084 自己的契约模块里
+  这条事实的 `carriers` 收窄到两个真正带指针的载体（收窄的注释逐字写明原因与上送形态）。该单元今天的读数是
+  `in-scope / pending / third-layer-missing`——缺读取点被封闭原因集点名，不是静默通过。
+- **T014 未勾**：六条事实里两条的引擎侧已删副本（上表），四条 `driver-*` 按上节停在规格裁决点。
+- 勾选属 `/speckit.implement` 的任务行状态，两行都缺腿，故**不勾**；缺口与可选处置见回传 ANOMALY 行。
+
+## Bases verified（implement Part 2b 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| plan-owned 零触碰 | `git diff --stat 16dcbdf2 -- {plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}` | 空输出 ⇒ 无 PLAN-EDIT |
+| 依赖面未动 | `git diff --stat 4b65517c -- pyproject.toml` | 空输出 |
+| 镜像不手改 | `git status --porcelain -- .specify/` | 本段未写任何 `.specify/` 镜像；(`.specify/` 下的 spec 证据与运行时记录不属镜像) |
+| 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**` 与 `.specify/state/**` |
+| 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |
+
+## 本段修掉的三处上一轮遗留（都是纠正，逐条披露）
+
+| # | 症状（首次读到的红） | 根因一行 | 修法 | 为何是纠正而非裁定 |
+|---|---|---|---|---|
+| 1 | `test_stage_class_wiring.py` 的 7 条 `[requirements]` 腿全红：`the block must be followed by a section heading, got '### 成功标准取值指针'` | 上一轮把指针写成**新的三级标题**插在 077 的类别卡与 `## Glossary` 之间，既破坏了卡的边界形态，又让「剥卡恢复基线字节」这条腿拿到不在卡内的内容 | 把指针收进卡内，改成该卡最后一条 `- **…**` 子弹；同时恢复被顺手删掉的 `## Glossary` 后空行 | 同一读法在仓内两处先例已确立（081/081c 对 `tasks`、`checklist` 的处理都是「把新行放进它的语义归属处、并保住卡的边界」），改动局部、可逆、断言一句未改 |
+| 2 | `test_run_checks.py::test_c27…` 与 `test_user_facing_comprehension_pointers.py::test_c14…`：`regen-command-copies.py --check` exit 1，四处 per-tool 副本 drift | 上一条的载体改动落在 `templates/commands/requirements.md`，而四处生成副本没有跟着重新生成 | `python3 scripts/python/regen-command-copies.py`（生成器自身，非手改） | 镜像/副本的教条是「生成而非手写」（FF-12 的反面），生成器是唯一合法写者 |
+| 3 | `test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes`：`drifted: ['skills/internal/create-requirements/SKILL.md']` | 上一轮为 T013 的载体指针改了该文件，而 069a 的日期化记录冻结它 | 回退该文件到 `HEAD`；把 084 契约模块里这条事实的 `carriers` 收窄到两个真带指针的载体（注释写明原因与上送形态） | 回退**不是**裁定本身：两种读法（「069a 记录可重测」vs「记录不可改写」）未由本层选边，故该单元今天如实读作 `in-scope / pending / third-layer-missing`，并把选择权交回 |
+
+第 3 条同时改写了 `success-criterion-path-values.yaml` 的 `note`：原文称该单元「gain the pointer without losing a literal」，
+那是上一轮的预期而非实测——该文件在迁移前对 `final|supporting|Path` 零命中，且现在也没有指针。note 改为实测读数 +
+冻结事实 + 「该单元的处置仍然开放」。

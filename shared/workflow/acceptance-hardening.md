@@ -249,6 +249,12 @@ exempt and MUST NOT be forced to invent one. A missing marker, a second `**Path*
 outside the two-value domain is a format violation reported with file and line — and a marker that cannot be
 parsed makes the closure check an **input error** (exit `2`), never a `block`.
 
+**The two members are declared, not restated.** `final` / `supporting` are machine-read values, so their single
+home is `shared/declarations/facts/success-criterion-path-values.yaml#/statement`; both checkers read that
+declaration through the shared read entry. This section keeps the rule they apply — the marker's position, the
+one-`final` floor, the refusal template and the exit-code meaning above — and carries no second copy of the
+member set.
+
 ### When the judgement runs
 
 At the **feature line's closure**. One line carries a feature's whole slice set, so the verdict runs once, when

@@ -118,6 +118,47 @@ BASIS_VALUES, BASIS_VALUES_LABEL = declared_sequence("flow-class-basis")
 NEUTRAL_CATEGORIES, NEUTRAL_CATEGORIES_LABEL = declared_sequence("flow-class-neutral-categories")
 REQUIRED_LEDGER_COLUMNS, LEDGER_COLUMNS_LABEL = declared_sequence("flow-class-ledger-columns")
 
+
+def declared_mapping(slug):
+    """`(mapping, label)` for one mapping-shaped fact; `({}, <STR-014 instance>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), slug)["body"]
+        statement = body.get("statement")
+        if not isinstance(statement, dict) or not statement:
+            raise ValueError("statement is not a non-empty mapping")
+        return dict(statement), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return {}, declaration_reader.absent_label(slug)
+
+
+#: Feature 084, batch 2: the six-face gate's shape (section keyword + closed row count) and the
+#: stage-operator table's header. Both are declarations; the engine carries no copy of either, and a
+#: value read as empty leaves the corresponding check refusing to judge (see :func:`main`).
+FACES_DECLARED, FACES_DECLARED_LABEL = declared_mapping("expression-gate-faces")
+OPERATOR_COLUMNS, OPERATOR_COLUMNS_LABEL = declared_sequence("expression-stage-operator-table")
+FACES_SECTION_KEYWORD = FACES_DECLARED.get("section_keyword")
+try:
+    FACES_EXPECTED = int(str(FACES_DECLARED.get("expected", "")).strip())
+except (TypeError, ValueError):
+    FACES_EXPECTED = None
+#: A file that parsed but does not carry a usable pair is as unjudgeable as an absent one: the gate
+#: would otherwise compare a row count against `None`, which reads as a shape finding rather than as
+#: the `[[STR-014]]` degradation it is.
+if not FACES_SECTION_KEYWORD or FACES_EXPECTED is None:
+    FACES_DECLARED_LABEL = FACES_DECLARED_LABEL or declaration_reader.absent_label(
+        "expression-gate-faces")
+
+#: The operator table's columns, by position. A header that does not match this tuple is a gate-owner
+#: error, and every row is then resolved by position — so the five column names exist once, in
+#: `shared/declarations/facts/expression-stage-operator-table.yaml`, not again in this file.
+if len(OPERATOR_COLUMNS) == 5:
+    STEP_COLUMN, GATE_ID_COLUMN, OPERATOR_COLUMN, FACE_COLUMN, LEVEL_COLUMN = OPERATOR_COLUMNS
+else:
+    STEP_COLUMN = GATE_ID_COLUMN = OPERATOR_COLUMN = FACE_COLUMN = LEVEL_COLUMN = None
+    OPERATOR_COLUMNS_LABEL = OPERATOR_COLUMNS_LABEL or declaration_reader.absent_label(
+        "expression-stage-operator-table")
+
 #: The declared class axis is ordered and `mixed-oracle` is its third member; both facts are ordered
 #: closed sets, so the positions below are the declaration's, never a re-spelled name. An empty read
 #: (unreadable layer) leaves these ``None`` and the CLI refuses to judge (see :func:`main`).
@@ -1400,7 +1441,10 @@ STATUS_VALUES = (ENFORCED, DECLARED_UNENFORCED)
 # unknown, non-blocking or stage/face-mismatched reference is a finding. Free-text
 # semantics stay with the review face (C-10) — the checker never claims to judge
 # whether the 24 cells *mean* what they cite.
-GATE_ID_COLUMN = "算子 id"
+# ``GATE_ID_COLUMN`` is NOT defined here: feature 084 batch 2 moved the operator table's column set
+# to ``shared/declarations/facts/expression-stage-operator-table.yaml`` and the positional read at the
+# top of this module binds member 1 to that name (T014). A local re-assignment would put the second
+# copy back.
 GATE_REF_PREFIX = "gate:"
 GATE_REF_COLUMN = "强制门禁引用"
 
@@ -1515,7 +1559,12 @@ def parse_gate_owner(repo: Path) -> GateOwner:
     if operator_table is None:
         raise GateOwnerError("gate owner § 阶段算子表 has no parseable table")
     op_header, op_rows = operator_table
-    required = ("阶段", GATE_ID_COLUMN, "执行算子", "对应面", "阻断级别")
+    # The five column names are NOT spelled here: feature 084 batch 2 moved them to
+    # `shared/declarations/facts/expression-stage-operator-table.yaml`, and the positional read at the
+    # top of this module binds them in declaration order. The check keeps its shape — each required
+    # column must be present in the header, and every row is then resolved by column name — so the
+    # refusal message and the exit code are unchanged.
+    required = (STEP_COLUMN, GATE_ID_COLUMN, OPERATOR_COLUMN, FACE_COLUMN, LEVEL_COLUMN)
     missing = [column for column in required if column not in op_header]
     if missing:
         raise GateOwnerError(
@@ -1542,10 +1591,10 @@ def parse_gate_owner(repo: Path) -> GateOwner:
         operators.append(
             {
                 "id": gate_id,
-                "stage": record["阶段"].strip("` "),
-                "face": record["对应面"].strip("` "),
-                "blocking": record["阻断级别"].strip("` ").lower() == "blocking",
-                "operator": record["执行算子"],
+                "stage": record[STEP_COLUMN].strip("` "),
+                "face": record[FACE_COLUMN].strip("` "),
+                "blocking": record[LEVEL_COLUMN].strip("` ").lower() == "blocking",
+                "operator": record[OPERATOR_COLUMN],
             }
         )
     return GateOwner(faces, operators)
@@ -2376,8 +2425,11 @@ def action_delegation(repo: Path, output_format: str) -> int:
 # --------------------------------------------------------------------------- #
 # 069b: six-face bindings (contract contracts/ledger-reconciler.md C-11 / C-12)
 # --------------------------------------------------------------------------- #
-FACES_SECTION_KEYWORD = "六面"
-FACES_EXPECTED = 6
+# ``FACES_SECTION_KEYWORD`` / ``FACES_EXPECTED`` are NOT assigned here: feature 084 batch 2 moved the
+# six-face gate's shape to ``shared/declarations/facts/expression-gate-faces.yaml`` and the read at the
+# top of this module binds them (T014). A local re-assignment would shadow that read and put the second
+# copy back — this module refuses to judge when the read is empty (see :func:`main`), so no local
+# fallback belongs here either.
 FACE_ID_COLUMN = "face id"
 FACE_POINTER_COLUMN = "owner_pointer"
 
@@ -2693,7 +2745,8 @@ def main(argv=None) -> int:
     # longer carries — so the degradation is an explicit exit-2 label naming each unreadable fact,
     # never a traceback and never a green verdict (C-049).
     labels = [label for label in (CLASS_VALUES_LABEL, BASIS_VALUES_LABEL, NEUTRAL_CATEGORIES_LABEL,
-                                 LEDGER_COLUMNS_LABEL, FLOW_TYPE_LABEL) if label]
+                                 LEDGER_COLUMNS_LABEL, FLOW_TYPE_LABEL,
+                                 FACES_DECLARED_LABEL, OPERATOR_COLUMNS_LABEL) if label]
     if labels:
         for label in labels:
             print(label, file=sys.stderr)

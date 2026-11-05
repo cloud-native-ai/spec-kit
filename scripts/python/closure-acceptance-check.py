@@ -68,6 +68,16 @@ import re
 import sys
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import declaration_reader  # noqa: E402  (the declaration layer's one read entry)
+except ImportError:  # pragma: no cover - only a tree that ships the checker without its sibling
+    # C-052 ships the read entry beside every engine, so this shape is not a smaller payload — it is
+    # a payload that does not exist. The guard exists so such a tree degrades on the `STR-014` label
+    # (below) instead of dying on a traceback, which is what FR-013 forbids.
+    declaration_reader = None
+
 EXIT_ACCEPT = 0
 EXIT_BLOCK = 1
 EXIT_INPUT = 2
@@ -75,6 +85,40 @@ EXIT_INPUT = 2
 #: Inputs the check cannot run without (C-02). Missing any of them is an input error, never a
 #: `block`: the artifact is incomplete, which is a different fact from the feature failing.
 REQUIRED_INPUTS = ("requirements.md", "plan.md", "tasks.md", "verification.md")
+
+# --- the `Path` closed set (batch 1 row 9; owner: the declaration layer) ---------------------- #
+# Feature 084 moved this two-member domain out of the checker: the members and their order live in
+# `shared/declarations/facts/success-criterion-path-values.yaml`, read here through the shared read
+# entry. The refusal text below is unchanged — it still names the two members, and an out-of-domain
+# marker is still an input error (`InputError`), never a `block` (V-3 / AS-04).
+#
+# Two degradations, deliberately different, and the difference is about what the tree is:
+#   * **read entry present, layer/fact missing** (a legacy project): an input error naming the
+#     absent declaration — the same exit-2 shape an unparseable marker already takes (D7).
+#   * **read entry absent** (a tree carrying the checker without the sibling C-052 ships beside it):
+#     a shape no project has, so the run keeps its other judgements, skips only the membership test
+#     and puts `PATH_VALUES_LABEL` on stderr — never a traceback and never a clean pass (FR-013).
+PATH_FACT = "success-criterion-path-values"
+#: True when the module itself is missing, not merely the declaration it would read.
+READER_ABSENT = declaration_reader is None
+
+
+def _declared_path_values():
+    """`(values, label)` for the `Path` closed set; `((), <STR-014 instance>)` when unreadable."""
+    if declaration_reader is None:
+        return (), "declaration-absent: %s" % PATH_FACT
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), PATH_FACT)["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label(PATH_FACT)
+
+
+PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
 
 # --- the closed reason set -------------------------------------------------------------------
 # The seven templates are owned by `requirements.md` § Shared Strings (STR-008…STR-014) and by the
@@ -502,7 +546,15 @@ def parse_requirements(path):
                 % (path, number, sc_id)
             )
         value = last.group(1).strip()
-        if value not in ("final", "supporting"):
+        if not PATH_VALUES and not READER_ABSENT:
+            # FR-012 / FR-013 / D7: a legacy project (the read entry is here, the declaration is not)
+            # cannot be judged on this rule, so the run stops on the input-error path with the absent
+            # label — never a silent pass and never a `block`.
+            raise InputError(
+                "%s: the `Path` closed set cannot be read from the declaration layer (%s)"
+                % (path, PATH_VALUES_LABEL)
+            )
+        if PATH_VALUES and value not in PATH_VALUES:
             raise InputError(
                 "%s:%d %s declares `**Path**: %s`, outside the closed set final / supporting"
                 % (path, number, sc_id, value)
@@ -1657,6 +1709,14 @@ def main(argv=None):
     parser.add_argument("--waive", action="append", default=[], metavar="CODE:TARGET",
                         help="remove one reason from the blocking set, counting it as waived")
     args = parser.parse_args(argv)
+
+    # FR-012 / FR-013: the `Path` domain is a declaration-layer fact. When the read entry itself is
+    # missing the label goes on the run's output before any verdict, so the degradation is visible
+    # rather than read as a clean domain check; the legacy-project case raises below instead.
+    if PATH_VALUES_LABEL and READER_ABSENT:
+        print(PATH_VALUES_LABEL, file=sys.stderr)
+        print("closure-acceptance-check: the shared read entry is absent; the `Path` membership "
+              "test is skipped for this run", file=sys.stderr)
 
     try:
         record = run(args)
