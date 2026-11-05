@@ -1,0 +1,19 @@
+# decomposition-check.py --mode tasks — verbatim output (tasks repair, 084)
+
+Command:
+
+```bash
+python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/084-harness-triple-structure/requirements.md --tasks .specify/specs/084-harness-triple-structure/tasks.md
+```
+
+Output (stdout+stderr, verbatim):
+
+```text
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 19, "task_count": 31, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T09:15:45Z"}
+```
+
+Exit code: `0`
+
+## Reading
+
+- Unchanged from the tasks stage: `fr_count=19` (≤ 30) and `task_count=31` (≤ 40), `reasons=[]`, so no slice split is forced — the repair added FR tags, not tasks or FRs.

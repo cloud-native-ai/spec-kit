@@ -446,3 +446,78 @@ F-09（任务行 tag → tasks）、G-01（特性详情文件的阶段记录 →
 **本轮未改 FR/SC 内容、未改阶段序列、未改门禁判据或退出码、未改批次划分与验收规则、未改 Feature 注册表状态、
 未勾选任何任务行；F-02 是「形态归一 + 引用同步」，不是设计改写。**
 
+## tasks 修复（2026-11-05，analyze 回环 round 1）
+
+```yaml
+stage: tasks
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/specs/084-harness-triple-structure/checklists/layer-criteria-2026-11-05.md
+  - .specify/specs/084-harness-triple-structure/coverage-baseline.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+  - .specify/memory/features.md
+  - .specify/memory/features/084.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/pre-analyze-plan-tasks-repair.txt
+stage_base: 9284c789
+```
+
+## Why `not-run-docs-only`（tasks 修复）
+
+改动面是五件 markdown／文本产物加证据：`tasks.md`（四条标签）、`checklists/layer-criteria-2026-11-05.md`（三处
+机械替换 + 一条 Note 补记）、`coverage-baseline.txt`（本阶段的冻结交付物，515 行文本）、`features.md` 的 084 行与
+`features/084.md`（阶段记录与路径登记）。没有一行落在 `tests/`、`scripts/`、`skills/**/scripts/`、`src/`、
+`templates/*.yaml` 或夹具上，因此 `targeted-set-v1`（`stage_base=9284c789`）的输入全部落在 `test_roots` 之外、
+与夹具无关，得空集属**预期形态**，按判据 owner `.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md`
+**TB-06** 记 `not-run-docs-only`；缩减字段集即本行六项，运行字段（`selected_paths[]`、`sufficiency`、`rc`、
+`passed`/`failed`、`new_failures[]`、比较基线）不适用且 MUST NOT 报 `unknown`。本轮确实**执行**了五个只读程序
+（`validate-tasks`、`decomposition-check --mode tasks`、`pre-analyze-check` 两阶段、`account-clause-coverage`
+加一次 `--freeze`）与一次类别读取，它们都不读 `tests/` 的用例选择面、不产生测试结果。
+
+## 逐条处置（tasks-owned findings + G-01）
+
+| Finding | 原严重度 | 处置 | 落点 |
+|---|---|---|---|
+| F-05 | MEDIUM | **按裁决把越界引用改指 `FR-011, FR-018`**：T001 行标签与 § Traceability 的 T001 单元格各一处；任务内容、任务数（31）、FR 数（19）与「19 条 FR 全被点名」的覆盖声明都不变 | `tasks.md` T001 行 + § Traceability T001 行 |
+| F-05 的清单侧残留 | MEDIUM（同一缺陷） | **同一越界引用的三处机械残留一并收口**：CHK037 去掉悬空 id 但保留「编号空间能否被机械复核」的质量问题语义；两条 Note 如实记下裁决与原 id 的去向（原 id 的逐字读数指向日期化证据 `analyze-report-2026-11-05.md` § F-05，注文本身不带该字面量，以守住「规范性与清单文件零命中」） | `checklists/layer-criteria-2026-11-05.md` CHK037 + 两条 Note |
+| E-01 | MEDIUM | **本阶段行使自己的冻结职责**：`--freeze` 产出 `coverage-baseline.txt`（2 行 header + 513 个码点排序名，`base-sha: 9284c789e154`，`files: 248 (parsed 145 + named 103)`）；随后不带 `--freeze` 复跑，`status: baseline-missing`／exit 2 消失，读数变为 `status: uncovered`／exit 1（覆盖判决，不是输入错误）。同一命令跑两次输出逐字节相同，故 implement 阶段 T002 的重跑是幂等的 | `coverage-baseline.txt`、`test-evidence/coverage-baseline-freeze.txt`、`test-evidence/account-clause-coverage-tasks.txt` |
+| F-09 | LOW | **两行标签补齐 `FR-008`**（T005、T006），与 § Traceability 一致；任务内容一字未动，覆盖声明里「FR-008 有意由两行各承一次」的写法因此与行标签自洽 | `tasks.md` T005、T006 |
+| G-01 | LOW | **阶段记录补齐**：`features/084.md` § Latest Review 追加 tasks（`5dc5919a` + `8ed70a87`）、checklist（`9abb10fb`）、analyze 回环修复三提交三条带日期记录；§ Related Files 登记 `checklists/layer-criteria-2026-11-05.md`；`§ MB-01` 悬空指针改指 `C-042`。`features.md` 的 084 行两处机械订正（`59 条款 DS·HC·SR·MB·DM` → `59 条款 C-001…C-059`；`§ MB-01` → `C-042`），行结构、`Total Features` 与其它 76 行未动 | `features/084.md`、`features.md` |
+
+### 一处口径判断（就地纠正，已在回传披露）
+
+派发简报要求 Note 里如实说明「原 FR-023 已按 F-05 裁决改为 FR-011, FR-018」，同时又要求清单文件对该 id
+零命中。两条在字面上冲突，按「日期化证据保留历史」这条既有口径收口：Note 写「原引用已按裁决改为
+`FR-011, FR-018`」并指向 `analyze-report-2026-11-05.md` § F-05（该文件保留原 id 的逐字读数），
+清单正文不出现该字面量。
+
+## 本轮不处置（已在 analyze 报告点名，或超出本次授权）
+
+- **`uncovered beyond baseline: 59` 与 `FR claimed: 0`**：那 59 条正是本特性自己的 `C-001…C-059`，未被认领的原因
+  是 `tasks.md` 全文没有任何 `[green:]` 声明。analyze 报告已在 F-02 行裁定「[green:] 未使用本身不是缺陷（模板里
+  该标签可选），它是症状」，故本轮不动任务行、不新增声明面。
+- **T002 的内容**：它仍写着 implement 阶段重跑 `--freeze`；基线已在 tasks 阶段冻结，故该行在实现期退化为一次
+  幂等复核，任务语义无需改动（改它属任务内容改写，不在本次授权内）。
+- **plan-owned 与 requirements**：零改动（`git diff --stat 9284c789 -- requirements.md plan.md data-model.md
+  contracts/ quickstart.md research.md feature-ref.md` 空输出）。
+- **未勾选任何任务行**：31 行仍全为 `[ ]`；`Implemented` 归 `/speckit.implement`。
+
+## Bases verified（tasks 修复）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 任务清单可解析 | `python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md` | `PASS`，`0 error(s), 0 warning(s)`，exit 0 | `test-evidence/validate-tasks-repair.txt` |
+| 拆解门 | `python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements ... --tasks ...` | `decision=proceed`，`fr_count=19` ≤ 30、`task_count=31` ≤ 40，`reasons=[]`，exit 0 | `test-evidence/decomposition-tasks-repair.txt` |
+| 前置门（analysis 前，requirements） | `python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir ... --stage requirements --repo <repo>` | **`decision=pass`、`errors=0`**、`advisories=82`、`waived=0`，exit 0（修复前同一命令为 `fail`／5 条 `dangling-id`） | `test-evidence/pre-analyze-requirements-repair.txt` |
+| 前置门（analysis 前，plan） | 同上，`--stage plan` | **`decision=pass`、`errors=0`**、`advisories=82`、`waived=0`，exit 0（修复前同 `test-evidence/pre-analyze-plan-repair.txt` 所记 `fail`／5） | `test-evidence/pre-analyze-plan-tasks-repair.txt` |
+| 覆盖核算（冻结后） | `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure` | `baseline: … (513 names)`（不再是 `0 names, MISSING`）；`baseline-internal existing uncovered: 513`；`uncovered beyond baseline: 59`；`status: uncovered`、`78 error(s)`、exit 1（判决态，非输入错误） | `test-evidence/account-clause-coverage-tasks.txt` |
+| 基线冻结 | `python3 scripts/python/account-clause-coverage.py --spec-dir ... --freeze > .../coverage-baseline.txt` | exit 0；515 行 = 2 header + **513 names**；`base-sha: 9284c789e154`；`files: 248 (parsed 145 + named 103)`；重跑 + `diff` 逐字节相同 | `test-evidence/coverage-baseline-freeze.txt` |
+| 越界 id 残留扫描（规范性与清单文件） | `grep -rn "FR-023" .specify/specs/084-harness-triple-structure/ \| grep -v "/test-evidence/"` | **零命中**（exit 1）。剩余命中只在 `test-evidence/` 的日期化证据（`analyze-report-2026-11-05.md`、`checklist-self-check.txt`、`validate-requirements.txt`、`pre-analyze-plan-repair.txt` 及本文件）。`.specify/memory/features.md` 的那一处 `FR-023` 属 **081** 自己的需求编号，与 084 无关，按「不改任何其它 Feature 行」保留 | 本行即读数 |
+| 类别（本阶段唯一一次读取） | `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"` | `flow_class: execution` / `flow_type: -` / `source: declaration` / `marker: null`，exit 0 ⇒ 非表达类，门禁集逐字不变、零新增阻断项 | 本行即读数 |
+| Feature 索引一致性 | `grep -c "^| 0" .specify/memory/features.md` 与 `grep -n "Total Features"` | 77 行 = `Total Features: 77`，均未变；084 行只做两处机械订正 | 本行即读数 |
+| 越界改动检查 | `git status --porcelain -- .specify/specs/084-harness-triple-structure .specify/memory/features.md .specify/memory/features/084.md` | 4 件改动（`tasks.md`、清单、`features.md`、`features/084.md`）+ 1 件新增（`coverage-baseline.txt`）+ 6 件证据；plan-owned、`requirements.md`、其它 Feature 行、`.specify/state/` 与运行时记录均未纳入 | 本行即读数 |
+
+**本轮未改任务内容与任务数、未改 FR/SC 语义、未改阶段序列、未改门禁判据或退出码、未勾选任何任务行、未 push；
+`coverage-baseline.txt` 是「记录」而非聚合处理状态，一条事实一个文件，双写者只会产生不同路径或零路径。**

@@ -1,0 +1,32 @@
+# coverage-baseline freeze — verbatim record (tasks repair, 084)
+
+Command:
+
+```bash
+python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure --freeze > .specify/specs/084-harness-triple-structure/coverage-baseline.txt
+```
+
+Output (verbatim header + determinism check):
+
+```text
+$ python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure --freeze > .specify/specs/084-harness-triple-structure/coverage-baseline.txt
+[exit 0]
+
+# first three lines of the frozen file, verbatim:
+# coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
+# frozen-from: .specify/specs/*/contracts/* excluding 084-harness-triple-structure | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 9284c789e154 | files: 248 (parsed 145 + named 103)
+003-speckit-agents-command/contracts/agents-command.openapi.yaml#post
+
+# name lines (non-comment): 513
+# total lines: 515
+
+$ python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure --freeze | diff - <the frozen file>
+[exit 0] (no output — byte-identical)
+```
+
+## Reading
+
+- The frozen file is a **record**, not an aggregate processing state: one header line set plus 513 codepoint-sorted names, written once by this stage and compared by later runs with `LC_ALL=C comm -13`.
+- `base-sha: 9284c789e154` is the tasks-stage HEAD at freeze time (the plan repair), `files: 248 (parsed 145 + named 103)` is the corpus outside this spec dir.
+- Re-running `--freeze` on the same tree reproduces the file byte for byte, so implement-stage T002's re-run is idempotent as long as no other feature's contracts change.
+- The corpus deliberately **excludes** this spec dir: the 59 clauses this feature adds are not "pre-existing uncovered", they are the delta a later stage must claim.

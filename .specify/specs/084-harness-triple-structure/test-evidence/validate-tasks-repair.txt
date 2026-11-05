@@ -1,0 +1,20 @@
+# validate-tasks.py — verbatim output (tasks repair, 084)
+
+Command:
+
+```bash
+python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md
+```
+
+Output (stdout+stderr, verbatim):
+
+```text
+PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+```
+
+Exit code: `0`
+
+## Reading
+
+- `0 error(s), 0 warning(s)`: the four repair edits (T001 row tag, § Traceability T001 cell, T005 and T006 row tags) changed tag lists only — row count, ids, `blockedBy` graph and `[P]` pairs are untouched.
+- The four `green-*` faces stay silent for the same reason as at the tasks stage: no `[green:]` claim is emitted anywhere in the file, so there is nothing to dangle.

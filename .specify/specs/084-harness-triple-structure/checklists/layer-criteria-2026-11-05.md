@@ -68,7 +68,7 @@
 ## 八、跨产物一致性与可追溯性
 
 - [ ] CHK036 - 被复用的 `duplicate` 面的**调用面**是否被固定在需求里，使「零命中」在两位复核者手里是同一个读数——实测同一棵树上只给 `--spec-dir` 得「扫 14 个文件、0 条 finding」，再加 `--path` + `--owner-path` 得「扫 15 个文件、2 条 finding」（2026-11-05 读数，命令见证据文件 § 4(f)）？[Clarity, Measurability, Req §FR-007(b), Req §FR-010]
-- [ ] CHK037 - 需求编号命名空间是否在 FR-019 闭合——下游 `tasks.md` 有两处引用 `FR-023`，而本规格只定义到 FR-019：这是规格缺了一组需求，还是引用越界？[Traceability, Gap, Req §Requirements]
+- [ ] CHK037 - 需求编号命名空间是否在 FR-019 闭合——下游 `tasks.md` 原有两处落到未定义编号的引用（analyze F-05 已裁定为引用越界、不是规格缺口，原引用改指 `FR-011, FR-018`）：这类越界引用能否在每阶段末尾被机械复核，而不是靠读者逐一比对编号空间？[Traceability, Gap, Req §Requirements]
 - [ ] CHK038 - 「`scripts/` 与 `skills/` 下只允许一个子集解析器、两个既有解析器在白名单内」这条边界守卫是否可追溯到某条 FR（今天只出现在 plan 契约 C-058），使它在需求层也有验收面？[Traceability, Gap, Req §FR-009, Req §FR-019]
 
 ## Notes
@@ -76,10 +76,10 @@
 - **本轮的意图默认值（无人值守，未访谈）**：Depth = Standard · Audience = Reviewer · Focus = 派发简报点名的四个高风险簇——(1) D1∧D2 判据与候选屏幕 S 的可判定性／可重算性；(2) 三批迁移的独立可验收性与并发安全；(3) `complete`／`pending` 与封闭原因集、081 冻结面零改动；(4) Two Hats 镜像路径与非目标 N1–N7。三个意图问题被跳过，因为派发简报已经固定了范围、深度与读者；没有用户自定条目被并入。
 - **可追溯性**：38/38 条（100%）带至少一个 `Req §…` 锚或 `Non-Goals` 锚，两种算法都在 80% 下限之上；其中 21 条另带 `[Gap]`／`[Ambiguity]`／`[Conflict]`／`[Coverage]`／`[Dependency]` 标记，其余 17 条是锚在所受判需求上的清晰度、完整性或可测量性提问。全部 38 条为问句形态，无一以「Verify／Test／Confirm／Check + 实现行为」开头。
 - **同作者缺口发现的方法学限制**：本技能的规范做法是把缺口发现委派给新鲜上下文的只读子代理，因为本规格与本清单出自同一条运行线，作者盲点会按同样方式复现。本执行拓扑**无法派发子代理**（无该工具），故按 `.specify/shared/workflow/objective-analysis-gate.md` 规则 7 降级为**单上下文受限直读**，并在此明示：这不是覆盖性的主张，`/speckit.analyze`（只读、独立上下文）应复核本清单未命中的缺口。
-- **本清单的推理只用已产出的产物**：所有被引用的读数都在本轮实跑中取得（`duplicate` 面的两种调用面、`templates/review-template.md` 的引擎引用行、六条原因模板的占位符计数、`tasks.md` 中 `FR-023` 的两处命中、`better-harness.md` § 消费者清单 的存在），逐字输出见 `../test-evidence/checklist-self-check.txt`；未凭记忆断言任何计数。
+- **本清单的推理只用已产出的产物**：所有被引用的读数都在本轮实跑中取得（`duplicate` 面的两种调用面、`templates/review-template.md` 的引擎引用行、六条原因模板的占位符计数、`tasks.md` 中原有两处落到未定义编号的命中、`better-harness.md` § 消费者清单 的存在），逐字输出见 `../test-evidence/checklist-self-check.txt`；未凭记忆断言任何计数。其中「两处命中」的原 id 在 `requirements.md` 未定义、已按 F-05 裁决改指 `FR-011, FR-018`，逐字读数保留在日期化证据 `../test-evidence/analyze-report-2026-11-05.md` § F-05。
 - **PLAN CONSTRAINT 已遵守**：本轮没有读取或修改任何 plan-owned 产物（`plan.md`、`data-model.md`、`contracts/`、`quickstart.md`、`research.md`、`feature-ref.md`），也没有触碰 `requirements.md` 与 `tasks.md`；本清单只新增一个文件加证据。任何"需要改 plan"的结论都写成提问，而不是编辑。
 - **若只能回答三条，先答这三条**：CHK021（既有门禁脚本的成员在四份文本里给出四/五两种集合——这是本特性"封闭集只应存在一份"主张的对内反例）、CHK011（封闭原因集的形态规则自相矛盾，而 SC-003 要求逐字判定）、CHK012（降级标注与 finding 的退出码未决，FR-012／FR-013／FR-017 三者读法不同）。
-- **两条疑似越界的事实，交 analyze 裁决而非在本阶段修平**：CHK037 的 `FR-023` 引用缺失与 CHK021 的门禁集合分歧，都需要在"改 `tasks.md`／改 `requirements.md`"之间做选择；本轮只登记，不修改任何非本阶段产物。
+- **两条疑似越界的事实，交 analyze 裁决而非在本阶段修平**：CHK037 的悬空需求编号引用与 CHK021 的门禁集合分歧，都需要在"改 `tasks.md`／改 `requirements.md`"之间做选择；本轮只登记，不修改任何非本阶段产物。**analyze F-05 的裁决已落地（2026-11-05 tasks 修复）**：越界引用被判为「引用越界、非规格缺口」，原引用已按裁决改为 `FR-011, FR-018`（`tasks.md` 的 T001 行与 § Traceability 的 T001 行各一处），本清单对应三处同步，原 id 的逐字读数保留在日期化证据 `../test-evidence/analyze-report-2026-11-05.md` § F-05。
 - **判定状态**：每条前面的 `[ ]` 就是它的判定位——未勾选 = 尚未由复核者判定。勾选只在需求文本本身回答了该问题时进行；答「否」按 `.specify/skills/internal/create-checklist/SKILL.md` 第 5 步的复核形态，在**新**的 `recheck-<date>-<topic>.md` 里逐条引用它回答的那行需求（逐字 + 锚），本文件不被就地刷新。
 - **类别读取（本阶段唯一一次）**：`python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"` → `flow_class: execution` / `flow_type: -` / `source: declaration` / `marker: null` / exit 0，故本阶段门禁集逐字不变、零新增阻断项。
 - **确定性自检**：条目数、CHK 编号连续、可追溯比例、禁用开头、重复编号、既有 `requirements.md` 清单未被覆盖，均由一段内联检查程序判定，逐字输出存 `../test-evidence/checklist-self-check.txt`；阶段测试预算读数是 `../test-evidence/stage-status.md` 的 checklist 行。
