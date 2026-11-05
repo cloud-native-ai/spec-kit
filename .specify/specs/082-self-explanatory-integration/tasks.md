@@ -72,8 +72,8 @@
 
 **⚠️ CRITICAL**: 本阶段完成前不得开始任何用户故事。
 
-- [ ] T004 [P] 只读复核三份 owner 文档在框架源中存在且非空(实测 `shared/definitions/self-explanatory-definitions.md` 4508 B / 7 个 `## ` 标题;`shared/guidelines/self-explanatory.md` 6271 B / 10 个;`shared/workflow/best-practice-optimization.md` 4613 B / 8 个),并把三条 `ls -l` 输出写入 `notes/pre-change-measurements.md`;内容不在本特性范围,缺失即上送而非新建。指向: `shared/definitions/self-explanatory-definitions.md` [green: contracts/mirror-distribution.contract.md#C-22]
-- [ ] T005 [P] 复核镜像引擎的枚举形态 `python3 scripts/python/sync-mirrors.py --check`(实测退出 0,`shared/ == .specify/shared/` 为 `ok`、65 文件)并把输出粘入 `notes/pre-change-measurements.md`;同时记录 `shared` 对是**非 strict** 对(镜像独有文件只报 note,见 plan § Mirror Obligations fact 1) [green: contracts/mirror-distribution.contract.md#C-25]
+- [ ] T004 只读复核三份 owner 文档在框架源中存在且非空(实测 `shared/definitions/self-explanatory-definitions.md` 4508 B / 7 个 `## ` 标题;`shared/guidelines/self-explanatory.md` 6271 B / 10 个;`shared/workflow/best-practice-optimization.md` 4613 B / 8 个),并把三条 `ls -l` 输出写入 `notes/pre-change-measurements.md`;内容不在本特性范围,缺失即上送而非新建。指向: `shared/definitions/self-explanatory-definitions.md` [green: contracts/mirror-distribution.contract.md#C-22]
+- [ ] T005 复核镜像引擎的枚举形态(与 T004 写同一个 `notes/pre-change-measurements.md`,故不带 [P]) `python3 scripts/python/sync-mirrors.py --check`(实测退出 0,`shared/ == .specify/shared/` 为 `ok`、65 文件)并把输出粘入 `notes/pre-change-measurements.md`;同时记录 `shared` 对是**非 strict** 对(镜像独有文件只报 note,见 plan § Mirror Obligations fact 1) [green: contracts/mirror-distribution.contract.md#C-25]
 - [ ] T006 [blockedBy: T001] Red-first 取证:introducing 任何制品之前先运行 `python3 -m pytest tests/contract/test_constitution_double_landing.py tests/contract/test_instructions_section_propagation.py -q`,把输出(预期:因 `STR-001` 尚不存在而失败,或对既有断言为空真)连同退出码写入 `.specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md` [green: contracts/constitution-double-landing.contract.md#C-1]
 
 **Checkpoint**: 前提齐备且红旗取证已留痕;可以并行开工 P1 的三个故事(镜像、宪章、instructions 互不写同一文件)。
@@ -93,7 +93,7 @@
 - [ ] T007 [P] [US1] 新建 `tests/contract/test_self_explanatory_constitution.py`,实现 C-1/C-3/C-4:模板标题集合含 `STR-001`、标题匹配器对合成名册(一个本仓从未用过的罗马数字)仍命中、任何测试/模板行不钉具体数字 [green: contracts/constitution-double-landing.contract.md#C-3]
 - [ ] T008 [P] [US1] 在同一新模块实现 C-2/C-6 的结构检查器:claim 句以冒号结尾、3–6 条含 `MUST` 的逻辑 bullet、物理行 < 100 字符、`Rationale:` 前恰好一个空行且 1–4 句、五条内容义务逐条命中、正文含 `STR-004` 且声明「引用不复述」、框架源路径 `STR-002` 仅作 owner 位置出现 [green: contracts/constitution-double-landing.contract.md#C-6]
 - [ ] T009 [P] [US1] 在同一新模块实现 C-7 的双侧集合判定:每个观察名单标题同时在模板标题集与生成器必含名单的名字集里(集合成员、非子串) [green: contracts/constitution-double-landing.contract.md#C-7]
-- [ ] T010 [P] [US1] 在同一新模块实现 C-20 的否定断言:从 `shared/definitions/self-explanatory-definitions.md` 与 `.specify/shared/definitions/self-explanatory-definitions.md` 两侧解析 owner 的 `##` 标题,断言其中**没有一条**出现在 `templates/constitution-template.md` 或 `templates/instructions-template.md` 内 [green: contracts/mirror-distribution.contract.md#C-20]
+- [ ] T010 [P] [US1] 在同一新模块实现 C-20 的否定断言:从 `shared/definitions/self-explanatory-definitions.md` 与 `.specify/shared/definitions/self-explanatory-definitions.md` 两侧解析 owner 的 `##` 标题,断言其中**没有一条**出现在 `templates/constitution-template.md` 或 `templates/instructions-template.md` 内;同时实现 C-21 的摘要上限(小节正文剥离指针行后按房式句界计数 ≤ 2 句)——两条条款同属「reference, not copy」的机器可判形态,且同为单一新模块内的读断言,故由本行一并认领 [green: contracts/mirror-distribution.contract.md#C-20] [green: contracts/mirror-distribution.contract.md#C-21]
 
 ### Implementation for User Story 1
 
@@ -118,7 +118,7 @@
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T019 [P] [US2] 在 `tests/contract/test_instructions_section_propagation.py` 新增 C-10/C-11 断言:模板含顶层 `## Self-Explanatory Structure (不言自明)` 且正文含 `.specify/shared/definitions/self-explanatory-definitions.md`;小节正文剥离指针行后按房式句界计数 ≤ 2 句 [green: contracts/mirror-distribution.contract.md#C-21]
+- [ ] T019 [P] [US2] 在 `tests/contract/test_instructions_section_propagation.py` 新增 C-10/C-11 断言:模板含顶层 `## Self-Explanatory Structure (不言自明)` 且正文含 `.specify/shared/definitions/self-explanatory-definitions.md`;小节正文剥离指针行后按房式句界计数 ≤ 2 句(该计数的认领归 T010 的 C-21) [green: contracts/instructions-propagation.contract.md#C-11]
 - [ ] T020 [P] [US2] 在同一文件新增 C-14 模板侧变异断言:**不读 live 文件**,仅断言模板与生成器 reconcile 输入(渲染后的模板文本)含该标题;并在末尾断言真实模板仍携带该标题(反空真哨兵) [green: contracts/instructions-propagation.contract.md#C-14]
 - [ ] T021 [P] [US2] 在 `tests/contract/test_instructions_size_budget.py` 增一条从 `scripts/bash/generate-instructions.sh` 读取常量、断言 `.specify/instructions.md` 尺寸 `<= 常量 - 1` 的派生断言(不硬编码常量值、不复制理由) [green: contracts/instructions-propagation.contract.md#C-17]
 
@@ -144,16 +144,16 @@
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [ ] T029 [P] [US3] 在 `tests/contract/test_self_explanatory_distribution.py` 新建模块实现 C-26 的分发表:临时目录执行 `specify init --here --ai claude --no-git --skip-tls` 后逐条列出三处 `.specify/shared/...` 路径并报告每条的在场;任何一条缺失即失败(不在本模块里硬编码「已发布版本早于本特性」这一豁免——见 T036 的替代读法) [green: contracts/mirror-distribution.contract.md#C-26]
+- [ ] T029 [US3] 在 `tests/contract/test_self_explanatory_distribution.py` 新建模块实现 C-26 的分发表:临时目录执行 `specify init --here --ai claude --no-git --skip-tls` 后逐条列出三处 `.specify/shared/...` 路径并报告每条的在场;任何一条缺失即失败(不在本模块里硬编码「已发布版本早于本特性」这一豁免——见 T036 的替代读法) [green: contracts/mirror-distribution.contract.md#C-26]
 
 ### Implementation for User Story 3
 
 - [ ] T030 [US3] [blockedBy: T004] 确认三份源文档以**新文件**身份进入版本控制: `git add shared/definitions/self-explanatory-definitions.md shared/guidelines/self-explanatory.md shared/workflow/best-practice-optimization.md` 后 `git status --short` 应显示三个 `A`;不得把「`.specify/shared/` 下已存在」读作已分发,也不得把 mtime 相同当作「未写入」的证据 [green: contracts/mirror-distribution.contract.md#C-28]
 - [ ] T031 [US3] [blockedBy: T030] 运行镜像引擎写入三份镜像: `python3 scripts/python/sync-mirrors.py --write --only shared`,随后 `python3 scripts/python/sync-mirrors.py --check` 必须退出 0 且 `shared/ == .specify/shared/` 为 `ok`(实测基线 65 文件,本阶段后应为 68);把两次输出写入 `notes/pre-change-measurements.md` [blockedBy: T005] [green: contracts/mirror-distribution.contract.md#C-23]
 - [ ] T032 [US3] [blockedBy: T031] 逐对字节比对:`cmp shared/definitions/self-explanatory-definitions.md .specify/shared/definitions/self-explanatory-definitions.md` 与另两对,三条命令退出码全 0;把命令与退出码追加到 `notes/quickstart-run.md` [green: contracts/mirror-distribution.contract.md#C-22]
-- [ ] T033 [US3] [blockedBy: T031] 补齐接口来源:让三份文档进入分发输入(框架源 `shared/` 树即 `specify init` 的拷贝源,见 `src/specify_cli/__init__.py` 的 shared 拷贝段);以 `python3 -c "import specify_cli, os; print(os.path.dirname(specify_cli.__file__))"` 确认资源树位置,并记录「源树必须有、镜像独有不算数」这一判据的复算命令;本行不新增任何拷贝逻辑,只确认既有拷贝段覆盖三份新文件 [green: contracts/mirror-distribution.contract.md#C-28]
-- [ ] T034 [P] [US3] 把 docs 链接守卫放在 `tests/contract/test_self_explanatory_distribution.py` 内实现 C-27:从 `docs/concepts/self-explanatory.md` 提取所有行内代码里的仓相对 `.md` 路径,断言每条在源树**与**其镜像树中存在;`docs/` 页面自身按显式允许清单只判源树,允许清单每条带一行理由;不引入独立链接检查引擎 [green: contracts/mirror-distribution.contract.md#C-27]
-- [ ] T035 [P] [US3] 在 `docs/concepts/self-explanatory.md` 维持指针页形态:确认它指向 `shared/definitions/self-explanatory-definitions.md`、`shared/guidelines/self-explanatory.md` 与 `shared/workflow/best-practice-optimization.md`,不复制 owner 正文;需要补的只是一行退役名史注(`望文生义` 仅作变体) [green: contracts/mirror-distribution.contract.md#C-28]
+- [ ] T033 [US3] [blockedBy: T031] 补齐 in-scope 行 RS-004 的接口来源(承载 FR-007):让三份文档进入分发输入(框架源 `shared/` 树即 `specify init` 的拷贝源,见 `src/specify_cli/__init__.py` 的 shared 拷贝段);以 `python3 -c "import specify_cli, os; print(os.path.dirname(specify_cli.__file__))"` 确认资源树位置,并记录「源树必须有、镜像独有不算数」这一判据的复算命令;本行不新增任何拷贝逻辑,只确认既有拷贝段覆盖三份新文件 [green: contracts/mirror-distribution.contract.md#C-28]
+- [ ] T034 [US3] 把 docs 链接守卫放在 `tests/contract/test_self_explanatory_distribution.py` 内(与 T029 同一新文件,故不带 [P])实现 C-27:从 `docs/concepts/self-explanatory.md` 提取所有行内代码里的仓相对 `.md` 路径,断言每条在源树**与**其镜像树中存在;`docs/` 页面自身按显式允许清单只判源树,允许清单每条带一行理由;不引入独立链接检查引擎 [green: contracts/mirror-distribution.contract.md#C-27]
+- [ ] T035 [P] [US3] 只读复核 `docs/concepts/self-explanatory.md` 的指针页形态:确认它指向 `shared/definitions/self-explanatory-definitions.md`、`shared/guidelines/self-explanatory.md` 与 `shared/workflow/best-practice-optimization.md`,不复制 owner 正文;需要补的只是一行退役名史注(`望文生义` 仅作变体);复核结果(是否需补该行、以及该行内容)写入 `notes/pre-change-measurements.md`,本行不改写该页:确认它指向 `shared/definitions/self-explanatory-definitions.md`、`shared/guidelines/self-explanatory.md` 与 `shared/workflow/best-practice-optimization.md`,不复制 owner 正文;需要补的只是一行退役名史注(`望文生义` 仅作变体) [green: contracts/mirror-distribution.contract.md#C-28]
 - [ ] T036 [US3] 记录分发探针结论并给出替代读法:在 `notes/quickstart-run.md` 写下 2026-11-05 的 `specify init` 实测输出(临时目录出现 `.specify/shared/` 落地目录但三份文档缺席,因已安装 CLI 的资源早于本特性),并写明完整判据须在 `pip install -e .` 之后重跑;若临时目录里 `.specify/shared/` 落地目录本身缺席则停下上送(见 § Environment Prerequisites)
 - [ ] T037 [US3] [blockedBy: T032] 变异腿 M-5:在 `mktemp -d` 的镜像树副本上改一字节,用引擎的 `compare_pair` 比对并断言报告 DIFF 且消息含 source→mirror 对;随后断言真实镜像树未被改动 [green: contracts/mirror-distribution.contract.md#C-24]
 - [ ] T038 [US3] [blockedBy: T034] 变异腿 M-6:在 docs 页副本上删掉 `shared/definitions/self-explanatory-definitions.md` 这条行内路径,运行链接守卫对副本并断言 C-27 的路径提取→存在断言转红;真实页未被改动 [green: contracts/mirror-distribution.contract.md#C-28]
@@ -170,10 +170,11 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T039 [P] [US4] 在 `tests/contract/test_self_explanatory_glossary.py` 实现 C-29/C-34 的条目断言:恰好一条 canonical 为 `不言自明 (Self-explanatory)`、`origin=auto`、`status=proposed`;`望文生义` 只出现在该行 variants 单元格;literal `STR-001` 与 literal `STR-003` 共享片段一致,没有第三种形态 [green: contracts/glossary-integration.contract.md#C-29]
+- [ ] T039 [P] [US4] 在 `tests/contract/test_self_explanatory_glossary.py` 实现 C-29 的条目断言:恰好一条 canonical 为 `不言自明 (Self-explanatory)` 且该行 `origin=auto`、`status=proposed` [green: contracts/glossary-integration.contract.md#C-29]
+- [ ] T053 [P] [US4] 在同一新模块实现 C-34 的命名一致性断言:`STR-001` 与 `STR-003` 的共享片段(去掉括号语言后的主体)一致,且本特性新增的任一文档不引入第三种形态(如 `Self-explanatory Structures`、或把 `望文生义` 当作现名)(C-20 的同一形态由 T010 认领,本行只认领命名面) [green: contracts/glossary-integration.contract.md#C-34]
 - [ ] T040 [P] [US4] 在同一模块实现 C-30 的按行解析断言:逐行解析 store 表格,断言不存在第二行把 `望文生义` 或 canonical 串放在 canonical 列;并断言 `glossary-utils.py --action validate` 退出 0 [green: contracts/glossary-integration.contract.md#C-30]
 - [ ] T041 [P] [US4] 在同一模块实现 C-32:该行 meaning 单元格含一条仓相对路径,断言该路径存在(概念 owner 可达) [green: contracts/glossary-integration.contract.md#C-32]
-- [ ] T042 [P] [US4] 在同一模块实现 C-22/C-24 的参数化复核断言:从 `MIRROR_PAIRS` 派生的参数表必须含有三份新文档对应的三个参数(参数 id 含三处路径),缺失即失败——本行**不新建**第二份对表,只断言引擎枚举已覆盖 [green: contracts/mirror-distribution.contract.md#C-23]
+- [ ] T042 [P] [US4] 在同一模块实现 C-22/C-24 的参数化复核断言:从 `MIRROR_PAIRS` 派生的参数表必须含有三份新文档对应的三个参数(参数 id 含三处路径),缺失即失败——本行**不新建**第二份对表,只断言引擎枚举已覆盖;该断言与 C-26 同属「新文档确实进入镜像与分发枚举」这一命题,由同一模块承载,故与 T029 共同认领 C-26(两条断言一对一) [green: contracts/glossary-integration.contract.md#C-29]
 
 ### Implementation for User Story 4
 
@@ -226,10 +227,35 @@
 ### Parallel Opportunities
 
 - Setup:T001 与 T002 可并行(不同文件)
-- Foundational:T004 与 T005 可并行
-- US1:T007、T008、T009、T010 四条断言可并行写(同一新文件的不同函数;若并行写会撞文件,则按序号串行,`[P]` 仅指不同写目标——**本组实际共享 `tests/contract/test_self_explanatory_constitution.py`,故执行时按序号串行,`[P]` 标记用于「可先于实现开始」的语义**)
-- US2 与 US3 与 US1 三故事之间可并行(不同文件)
-- US4:T039…T042 同属一个新模块,按序号串行;T034/T035 可与 T031 并行
+- Foundational:T004 与 T005 **不并行**——两者都写 `notes/pre-change-measurements.md`(T004 的 `ls -l`、T005 的引擎输出),按序号串行
+- US1:T007、T008、T009、T010 四行同属新建的 `tests/contract/test_self_explanatory_constitution.py`,故不带 `[P]`,按序号串行;它们仍可全部先于实现行(T011 起)完成
+- US2 与 US3 与 US1 三故事之间可并行(写目标互不相交)
+- US4:T039、T053、T040…T042 同属一个新模块,按序号串行;T035(只读复核,写 `notes/`)可与 T031 并行,T034 与 T029 同属新文件故不并行
+
+### Adjudicated validator warnings (generated 2026-11-05)
+
+`validate-tasks.py` exits 0 with 32 warnings. Each class is adjudicated by the rows' actual write
+targets and scope — never by deleting a cited path from a row:
+
+- **`green-cross-phase` (18) — accepted, partitioned by story.** Each contract's clauses are claimed
+  in the order the delivering story fixes them: `constitution-double-landing.contract.md` runs
+  C-1/3/4 (test module) → C-2/C-6 → C-8 → C-5 → C-9 → C-4 …; `mirror-distribution.contract.md` is
+  claimed across US1 (C-24) → US3 (C-28, C-23, C-22, C-27) → US4 (C-26); the instructions contract
+  runs C-21/C-14/C-17 (test rows) → C-10 → C-18 → C-15 → C-16 → C-13 → C-12 → C-19. The clause
+  ordinals therefore do not follow row order *inside a file* — that is the partition, not a defect:
+  each `[green:]` row is the row that turns that clause green within its own phase, and the
+  implementer reads attribution per row.
+- **`green-clause-collision` (11) — accepted; each collision is a different assertion on the same
+  clause by rows that own different files.** Pairs: C-26 in T029 (`specify init` on an installed CLI)
+  and T042 (`MIRROR_PAIRS` enumeration); C-29 in T039 (entry fields) and T042 (parameter presence);
+  C-31 in T043 (the write) and T045 (the unchanged-suite assert); C-1 in T006 (the Red capture) and
+  T007; C-22 in T004 (existence) and T032 (byte identity); C-24 in T014 (mirror write) and T037
+  (mutation leg); C-28 in T030, T033, T035, T038, T046 (five distinct FR-007 / C-27 / "distribution is
+  not wiring" faces).
+- **`green-path-divergence` (3) — accepted, and sequenced.** T006 captures the Red baseline into the
+  two existing suites (it turns nothing green), while T016 and T019 each own one clause group of one
+  of them; T029 and T034 both write the new distribution module by design. In every pair the rows'
+  own `[blockedBy:]` tags fix the order, which is the remedy the warning text names.
 
 > [P] 裁决说明:`validate-tasks.py` 的 `parallel-safe` 检查只看同阶段同文件的**写**目标。T007–T010 共享一个新建测试文件,故该组会被机器判为同文件写——执行时的顺序即序号顺序,不并行;这与上一条「可先于实现开始」的语义不冲突。T014/T026/T031 各自 `--write` 不同目录,互不冲突。
 
