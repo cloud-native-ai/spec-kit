@@ -3,9 +3,9 @@
 - **line_id**: 082-self-explanatory-integration
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
-- **current_stage**: checklist
+- **current_stage**: analyze
 - **attempts**: 1
-- **breakpoint_verdict**: post-checklist — requirements.md + checklists/requirements.md + checklists/requirements-quality-20261105.md + plan.md + tasks.md present; next stage (analyze) dispatched by driver
+- **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
 - **target_project**: /storage/project/cloud-native-ai/spec-kit
 - **authority**: docs/git-workflow.md; .specify/memory/constitution.md; .specify/instructions.md; .specify/specs/082-self-explanatory-integration/requirements.md; shared/definitions/self-explanatory-definitions.md; shared/guidelines/self-explanatory.md; shared/workflow/best-practice-optimization.md
@@ -23,7 +23,7 @@
 - **stage_started_at**: 2026-11-05T03:53:00Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
-- **last_verdict**: checklist pass — 36-item requirements-quality checklist (8 dimensions, 36/36 traceable, soft cap 40 respected, no implementation-behaviour items) at `checklists/requirements-quality-20261105.md`; existing `checklists/requirements.md` untouched; no plan-owned artifact modified (0 PLAN-EDIT owed); inputs re-measured mechanically (12 FR / 9 SC / 4 STR / 11 A; 53 task rows; 34/34 clauses claimed exactly once; 6 mutation legs; mirror `--check` all six pairs `ok`); docs-only, status=not-run-docs-only; commit 9f871e50
+- **last_verdict**: analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; two upsends require driver adjudication before implement: U1-a T006's red-first expectation is factually false (both named suites pass, 21 passed, verified this run), U1-b C-26/T029 hard-fail against the installed entry point with no reinstatement step in the tasks file; evidence at `test-evidence/analyze-stage-checks.md`
 - **artifacts**:
   - .specify/specs/082-self-explanatory-integration/checklists/requirements-quality-20261105.md (36 items: Completeness 8 / Clarity 7 / Consistency 3 / Traceability 4 / Scenario-EdgeCase 4 / NonFunctional 4 / Dependencies 3 / Ambiguity 3)
   - .specify/specs/082-self-explanatory-integration/test-evidence/checklist-stage-checks.md (E-1 inputs, E-2 baselines, E-3 invariant parse, E-4 E3 stage-status row)
@@ -33,12 +33,53 @@
   - .specify/memory/features/082.md (Latest tasks-stage entry)
   - .specify/memory/glossary.md (term 不言自明 (Self-explanatory))
 - **stage_commits**: f712cf58 (tasks.md + premises) → 85cb38a7 (amendments + coverage baseline + features/082.md) → 1dae464d (glossary term) → 9f871e50 (checklist + stage evidence)
-- **wrapup**: driver-completed for plan (session/20261105T033022Z-run-determination-speckit-plan-r20261105t033022z-e4a7.md; feedback/20261105T033022Z-speckit-plan.md); tasks stage wrap-up executed by this subagent — session 20261105T033628Z-run-determination-speckit-tasks-r20261105t033022z-082tasks.md, exec-quant 20261105T033630408551Z-b337d0f2.json, feedback 20261105T033635Z-speckit-tasks.md; checklist stage wrap-up by this subagent — run-determination skipped (simple-unit), exec-quant 20261105T035525387720Z-9e2fbd29.json, feedback 20261105T035530Z-speckit-checklist.md (threshold notice: count_since_submission=250 ≥ 10)
-- **test_budget**: middle-stage targeted-set-v1 (stage_base=24c27f81); checklist is docs-only → status=not-run-docs-only (six condensed fields recorded in test-evidence/checklist-stage-checks.md E-4)
+- **wrapup**: driver-completed for plan (session/20261105T033022Z-run-determination-speckit-plan-r20261105t033022z-e4a7.md; feedback/20261105T033022Z-speckit-plan.md); tasks stage wrap-up executed by this subagent — session 20261105T033628Z-run-determination-speckit-tasks-r20261105t033022z-082tasks.md, exec-quant 20261105T033630408551Z-b337d0f2.json, feedback 20261105T033635Z-speckit-tasks.md; checklist stage wrap-up by this subagent — run-determination skipped (simple-unit), exec-quant 20261105T035525387720Z-9e2fbd29.json, feedback 20261105T035530Z-speckit-checklist.md (threshold notice: count_since_submission=250 ≥ 10); analyze stage wrap-up by this subagent — run-determination 20261105T040447Z-run-determination-speckit-analyze-r20261105t032102z-c139-ana.md, exec-quant 20261105T040449355071Z-b07129a1.json, feedback 20261105T040452Z-speckit-analyze.md (threshold notice: count_since_submission=251 ≥ 10)
+- **test_budget**: middle-stage targeted-set-v1 (stage_base=2f5ab4bd); analyze is docs-only → status=not-run-docs-only (six condensed fields in test-evidence/analyze-stage-checks.md E-3); one load-bearing exception executed — `pytest test_constitution_double_landing.py test_instructions_section_propagation.py -q` → 21 passed 1.67s, run to test T006's red-first premise, not as a regression gate
 - **evidence**: .specify/specs/082-self-explanatory-integration/test-evidence; spec dir; this spine
 - **stage_history**:
   - 2026-11-05 plan: done — commit 2f6b8bbb; pre-analyze plan pass (0 errors / 8 advisories); subagent hit 120-turn limit after artifacts/commit; driver completed wrap-up; mirror side-effect anomaly recorded below.
   - 2026-11-05 tasks: done — commits f712cf58 / 85cb38a7 / 1dae464d; validate-tasks 0 errors / 32 adjudicated warnings; coverage baseline frozen at f712cf58; glossary term registered; no plan-owned artifact touched (no PLAN-EDIT needed).
+  - 2026-11-05 checklist: done — commit 9f871e50; 36 quality items; inputs re-measured; docs-only.
+  - 2026-11-05 analyze: done (read-only) — CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2; 7 CRITICAL/HIGH candidates sent to a fresh-context validation wave (1 confirm / 4 downgrade / 2 reject); 36/36 checklist gaps raised or dispositioned; no artifact, checklist, registry or plan-owned file modified; evidence commit holds `test-evidence/analyze-stage-checks.md` + this spine only.
+
+## Analyze-stage upsends (need driver adjudication before implement)
+
+Two items were found by this stage that an in-passing repair MUST NOT absorb (each is a decision
+between readings, not a single consistent correction):
+
+- **U1-a — T006's red-first premise is false as written.** `tasks.md` T006 expects
+  `test_constitution_double_landing.py` + `test_instructions_section_propagation.py` to go red before the
+  feature lands ("因 STR-001 尚不存在而失败,或对既有断言为空真"), and T051 closes only when "T006 的红" is
+  paired with T015/T031/T043's green. Measured this run: **21 passed** in 1.67 s. Neither suite
+  references `STR-001`, so the first branch is impossible and the second is green-vacuous. `tasks.md`
+  § Adjudicated validator warnings also states T006 "turns nothing green" while the same paragraph counts
+  it among the red captures. The real red-first evidence this feature needs is the *new* module
+  (`test_self_explanatory_constitution.py`, T007) run before its artifacts land; no task does that.
+- **U1-b — C-26 / T029 cannot pass against the installed entry point as written.** C-26 states an
+  unconditional failure on a missing path and T029 forbids encoding the stale-install exemption, while
+  `tasks.md` § Environment Prerequisites records the installed `specify` as `partial` and T036 records the
+  weaker reading. No task performs the rebuild (`pip install -e .`) that would make T029 satisfiable.
+  Repair is a tasks-file edit (add a rebuild step before T029, or scope T029 to the rebuilt entry point).
+
+## 框架观察（analyze 阶段，2026-11-05）
+
+- **现象**: `account-clause-coverage.py` 的 `UNCOVERED-FR` lane 只读条款引用组、不读 `tasks.md` 的
+  行级 FR 引用,因此本特性 `FR claimed: 1 of 12`,而 `pre-analyze-check.py` 同一批任务行报 `fr=12`。
+  **框架位置**: `scripts/python/account-clause-coverage.py` 的 FR universe/claimed 规则 vs
+  `pre-analyze-check.py --stage tasks` 的 `^- \[.\] T\d{3}.*\bFR-0NN\b` 规则。
+  **影响**: 同一份 `tasks.md` 得两个互相矛盾的 FR 覆盖读数;analyze 阶段必须手工判定该 lane 不可作为
+  需求覆盖缺口的证据。建议把两条规则归一到同一 owner。
+- **现象**: `pre-analyze-check.py` 的 `--stage` 只接受 `requirements|plan|tasks`,analyze 阶段没有对应
+  的事实门禁入口;而 `shared/workflow/expression-gates.md` 的阶段算子表也未给 analyze 登记行。
+  **框架位置**: `.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py` 的 argparse choices;
+  `shared/workflow/expression-gates.md` § 阶段算子表。
+  **影响**: analyze 只能复用 plan/tasks 两次运行的结果作旁证,门禁集的「逐字不变」分支对本阶段无实际
+  判据;建议要么给 analyze 登记一行(可复用 tasks 结论),要么在 owner 中写明 analyze 不设独立门禁。
+- **现象**: 本阶段派发的 7 个外部只读校验子代理以 `qodercli -p` 运行时,后台(`run_in_background`)
+  通道的 stdout 落盘为空(0 字节),同一命令前台运行才拿到 VERDICT 正文。
+  **框架位置**: 派发拓扑 `local-native` 与 `shared/workflow/external-dispatch-recipes.md` § Recipe 7。
+  **影响**: 校验波的证据必须在派发前就选定捕获方式;后台通道会静默给出「空回传 = 无结论」,
+  而空回传 MUST NOT 被读作 confirm。建议在 Recipe 7 里写明捕获方式。
 
 ## 框架观察
 
