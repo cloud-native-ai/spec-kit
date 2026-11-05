@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T001-T006 (part 1 of 10)
+- **part_scope**: T013-T018 (part 3 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,7 +24,7 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
-- **part_checkpoint** (implement part 1/10): `part_scope=T001-T006` — done; commit `94caea76` (7 files, 268+/7-); T001-T006 all `[X]` in tasks.md, no `[>]` held. E2 baseline row + E3 stage-status row below. Next part (P2 T007-T012) is driver-dispatched; this run MUST NOT start T007+.
+- **part_checkpoint** (implement part 3/10): `part_scope=T013-T018` — **done**; commit `2161ac40` (9 files, 409+/26-). T013-T018 all `[X]` in tasks.md, no `[>]` held; 35 unchecked rows remain (T019+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md`. Next part (P4 T019-T023) is driver-dispatched; this run MUST NOT start T019+.
 
 ## E2 baseline row (implement, seq=1)
 
@@ -60,28 +60,59 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
 | claims_verified | T002 baselines re-measured (32739 B / `38:INSTRUCTIONS_BUDGET_BYTES=32768` / 17,18 / live v1.15.0 / gates total 27) — all match tasks.md; T003 coverage re-freeze delta = provenance header only (513 names unchanged); T004 three owner docs present 4508/6271/4613 B with 7/10/8 headings; T005 `sync-mirrors.py --check` exit 0, six `ok` pairs, `shared` 65 files |
 | unproven | R-1's green half (T015), R-2 (T031/T032), R-3 (T043) — recorded as OPEN, not as closed |
 
+## E3 stage-status row (implement part 3)
+
+| field | value |
+|-------|-------|
+| stage | implement |
+| part_scope | T013-T018 |
+| status | us1-green-and-mutation-legs-proven |
+| command | `python3 -m pytest tests/contract/test_self_explanatory_constitution.py -q -k 'not c21'` → **rc 0**, 12 passed 1 deselected; `python3 -m pytest tests/contract/test_constitution_double_landing.py -q` → **rc 0**, 19 passed |
+| selection_basis | targeted-set-v1 — the exact pair the dispatch brief names: the US1 guard subset (subject completed this part) and the carrier whose count constants T016 owns |
+| selected_paths | `tests/contract/test_self_explanatory_constitution.py`, `tests/contract/test_constitution_double_landing.py` |
+| sufficiency | those two are the only guards judging the surfaces this part edits; two further guards (`test_fast_fail_discipline.py`, `test_confirmation_gates_sweep.py`) were run as a companion set because they pin constants referencing the same subjects. Sufficiency claimed for the edit set only; the full-suite verdict belongs to the Completion Gate, not run here |
+| rc | 0 (both mandated commands) |
+| passed / failed | 12 + 19 passed; 0 failed in the selected set |
+| new_failures | none in the selected set; the declared expected-red `test_c21_instructions_summary_is_at_most_two_sentences` stays outside it (`-k 'not c21'`) — its green is T024's |
+| companion_set | `test_fast_fail_discipline.py` + `test_confirmation_gates_sweep.py` + the new module → 3 failed / 160 passed; name-level `comm -13` shows exactly one NEW failure (the declared C-21 red); the other two are baseline-inherited (`test_g9_total_equals_frozen_baseline`, `test_residual_total_within_sc002_target`) |
+| baseline | `baseline-failed.txt` (26 entries from E2), name-level comparison |
+| gate_total | 27 before and after this part — C-8's zero-new-hits obligation held (the 23-vs-27 mismatch is another feature's frozen pin, inherited, not moved here) |
+| evidence_ptr | `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md`; red/green pairing and the M-1/M-2 transcripts in `notes/red-first-evidence.md`; mirror and count measurements in `notes/pre-change-measurements.md` |
+
 - **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
-- **last_verdict**: implement part 2 PASS-with-expected-red — T007-T012 [X]; 12 passed / 1 expected C-21 until T022; no plan-owned edits; subagent hit 120-turn limit before its own checkpoint, driver completed E3/commit — T001-T006 closed with evidence; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal is real and belongs to the NEW module (exit 1) while both pre-existing suites stay green (exit 0, 21 passed), which confirms the analyze-stage repair of T006 rather than re-contradicting it; no plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified); no Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up (out of scope for this part); no push.
-- **next_step**: driver dispatches implement part 2 (P2 `T007-T012`, US1 tests + first implementation). Part 1 stopped at the part boundary by design.
-- **stage_commits**: 94caea76 (implement part 1)
-- **gates**:
+- **last_verdict**: implement part 3 done (`2161ac40`) — US1 surface complete: template principle (part 2), generator mandate entry (T013), both mirrors byte-identical (T014), live constitution XIX with MINOR bump 1.15.0→1.16.0 and a Sync Impact Report naming this amendment's principle (T017), carrier watchlist + three counts raised together 18/19/11 (T016). US1 subset 12 passed rc 0; carrier 19 passed rc 0; both mutation legs M-1/M-2 PASS with anti-vacuity companions and a sha256 unchanged-repository proof (T018). Five collateral guards pinned values this landing moved and were repaired in passing (x13/x15/x18/x5/x6 of `test_fast_fail_discipline.py`), each disclosed with its reason; none weakened, each keeps its own subject. No plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified). No Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up, no push.
+- **next_step**: driver dispatches implement part 4 (P4 `T019-T023`, US2 tests + first implementation). Part 3 stopped at the part boundary by design; C-21's red/green pairing lands at T024 and is NOT closed here.
+- **stage_commits**: 94caea76 (implement part 1) → 171d4bcc (implement part 2) → 8daf6b65 (C-21 ordering correction) → 2161ac40 (implement part 3)
+
+<!-- The first "gates" key above is a preserved historical section; the canonical list follows. -->
+
+- **gates**: (as listed above)
 - **artifacts**:
   - .specify/specs/082-self-explanatory-integration/checklists/requirements-quality-20261105.md (36 items: Completeness 8 / Clarity 7 / Consistency 3 / Traceability 4 / Scenario-EdgeCase 4 / NonFunctional 4 / Dependencies 3 / Ambiguity 3)
   - .specify/specs/082-self-explanatory-integration/test-evidence/checklist-stage-checks.md (E-1 inputs, E-2 baselines, E-3 invariant parse, E-4 E3 stage-status row)
   - .specify/specs/082-self-explanatory-integration/tasks.md (53 rows: Setup 3 / Foundational 3 / US1 12 / US2 10 / US3 10 / US4 9 / Polish 6)
   - .specify/specs/082-self-explanatory-integration/test-evidence/tasks-stage-premises.md
   - .specify/specs/082-self-explanatory-integration/coverage-baseline.txt (base-sha f712cf58; 513 names)
+  - .specify/specs/082-self-explanatory-integration/test-evidence/implement-part-2.md
+  - .specify/specs/082-self-explanatory-integration/test-evidence/implement-part-3.md
+  - .specify/specs/082-self-explanatory-integration/notes/red-first-evidence.md (R-1 red + R-1-GREEN pair, M-1/M-2 transcripts, open-pair table)
+  - .specify/specs/082-self-explanatory-integration/notes/pre-change-measurements.md (T002/T012 baselines + part 3 mirror/count/gate measurements)
+  - .specify/memory/constitution.md (v1.16.0; Principle XIX + Sync Impact Report)
+  - skills/internal/manage-constitution/SKILL.md + .specify mirror (MUST-include list 11 entries)
   - .specify/memory/features/082.md (Latest tasks-stage entry)
   - .specify/memory/glossary.md (term 不言自明 (Self-explanatory))
 - **stage_commits**: f712cf58 (tasks.md + premises) → 85cb38a7 (amendments + coverage baseline + features/082.md) → 1dae464d (glossary term) → 9f871e50 (checklist + stage evidence)
 - **wrapup**: driver-completed for plan (session/20261105T033022Z-run-determination-speckit-plan-r20261105t033022z-e4a7.md; feedback/20261105T033022Z-speckit-plan.md); tasks stage wrap-up executed by this subagent — session 20261105T033628Z-run-determination-speckit-tasks-r20261105t033022z-082tasks.md, exec-quant 20261105T033630408551Z-b337d0f2.json, feedback 20261105T033635Z-speckit-tasks.md; checklist stage wrap-up by this subagent — run-determination skipped (simple-unit), exec-quant 20261105T035525387720Z-9e2fbd29.json, feedback 20261105T035530Z-speckit-checklist.md (threshold notice: count_since_submission=250 ≥ 10); analyze stage wrap-up by this subagent — run-determination 20261105T040447Z-run-determination-speckit-analyze-r20261105t032102z-c139-ana.md, exec-quant 20261105T040449355071Z-b07129a1.json, feedback 20261105T040452Z-speckit-analyze.md (threshold notice: count_since_submission=251 ≥ 10)
-- **test_budget**: middle-stage targeted-set-v1 (stage_base=2f5ab4bd); analyze is docs-only → status=not-run-docs-only (six condensed fields in test-evidence/analyze-stage-checks.md E-3); one load-bearing exception executed — `pytest test_constitution_double_landing.py test_instructions_section_propagation.py -q` → 21 passed 1.67s, run to test T006's red-first premise, not as a regression gate
+- **test_budget**: middle-stage targeted-set-v1 (stage_base=2f5ab4bd); analyze is docs-only → status=not-run-docs-only (six condensed fields in test-evidence/analyze-stage-checks.md E-3); one load-bearing exception executed — `pytest test_constitution_double_landing.py test_instructions_section_propagation.py -q` → 21 passed 1.67s, run to test T006's red-first premise, not as a regression gate; parts 2 and 3 each ran their targeted set only (no second full suite)
 - **evidence**: .specify/specs/082-self-explanatory-integration/test-evidence; spec dir; this spine
 - **stage_history**:
   - 2026-11-05 plan: done — commit 2f6b8bbb; pre-analyze plan pass (0 errors / 8 advisories); subagent hit 120-turn limit after artifacts/commit; driver completed wrap-up; mirror side-effect anomaly recorded below.
   - 2026-11-05 tasks: done — commits f712cf58 / 85cb38a7 / 1dae464d; validate-tasks 0 errors / 32 adjudicated warnings; coverage baseline frozen at f712cf58; glossary term registered; no plan-owned artifact touched (no PLAN-EDIT needed).
   - 2026-11-05 checklist: done — commit 9f871e50; 36 quality items; inputs re-measured; docs-only.
   - 2026-11-05 analyze: done (read-only) — CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2; 7 CRITICAL/HIGH candidates sent to a fresh-context validation wave (1 confirm / 4 downgrade / 2 reject); 36/36 checklist gaps raised or dispositioned; no artifact, checklist, registry or plan-owned file modified; evidence commit holds `test-evidence/analyze-stage-checks.md` + this spine only.
+  - 2026-11-05 implement part 1: done — commit 94caea76; T001-T006 closed; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal belongs to the NEW module while both pre-existing suites stay green.
+  - 2026-11-05 implement part 2: done — commits 171d4bcc + 8daf6b65; T007-T012 closed; template principle XVIII landed; US1 subset 12 passed with C-7 mandate side and C-21 declared expected-red.
+  - 2026-11-05 implement part 3: done — commit 2161ac40; T013-T018 closed; US1 surface complete on all three surfaces; mutation legs M-1/M-2 PASS.
 
 ## Analyze-stage upsends (need driver adjudication before implement)
 
@@ -98,44 +129,34 @@ between readings, not a single consistent correction):
   (`test_self_explanatory_constitution.py`, T007) run before its artifacts land; no task does that.
 - **U1-b — C-26 / T029 cannot pass against the installed entry point as written.** C-26 states an
   unconditional failure on a missing path and T029 forbids encoding the stale-install exemption, while
-  `tasks.md` § Environment Prerequisites records the installed `specify` as `partial` and T036 records the
-  weaker reading. No task performs the rebuild (`pip install -e .`) that would make T029 satisfiable.
+  `tasks.md` § Environment Prerequisites records the installed `specify` as `partial` and T036 records
+  the weaker reading. No task performs the rebuild (`pip install -e .`) that would make T029 satisfiable.
   Repair is a tasks-file edit (add a rebuild step before T029, or scope T029 to the rebuilt entry point).
 
-## 框架观察（analyze 阶段，2026-11-05）
+## 框架观察（implement part 3，2026-11-05）
 
-- **现象**: `account-clause-coverage.py` 的 `UNCOVERED-FR` lane 只读条款引用组、不读 `tasks.md` 的
-  行级 FR 引用,因此本特性 `FR claimed: 1 of 12`,而 `pre-analyze-check.py` 同一批任务行报 `fr=12`。
-  **框架位置**: `scripts/python/account-clause-coverage.py` 的 FR universe/claimed 规则 vs
-  `pre-analyze-check.py --stage tasks` 的 `^- \[.\] T\d{3}.*\bFR-0NN\b` 规则。
-  **影响**: 同一份 `tasks.md` 得两个互相矛盾的 FR 覆盖读数;analyze 阶段必须手工判定该 lane 不可作为
-  需求覆盖缺口的证据。建议把两条规则归一到同一 owner。
-- **现象**: `pre-analyze-check.py` 的 `--stage` 只接受 `requirements|plan|tasks`,analyze 阶段没有对应
-  的事实门禁入口;而 `shared/workflow/expression-gates.md` 的阶段算子表也未给 analyze 登记行。
-  **框架位置**: `.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py` 的 argparse choices;
-  `shared/workflow/expression-gates.md` § 阶段算子表。
-  **影响**: analyze 只能复用 plan/tasks 两次运行的结果作旁证,门禁集的「逐字不变」分支对本阶段无实际
-  判据;建议要么给 analyze 登记一行(可复用 tasks 结论),要么在 owner 中写明 analyze 不设独立门禁。
-- **现象**: 本阶段派发的 7 个外部只读校验子代理以 `qodercli -p` 运行时,后台(`run_in_background`)
-  通道的 stdout 落盘为空(0 字节),同一命令前台运行才拿到 VERDICT 正文。
-  **框架位置**: 派发拓扑 `local-native` 与 `shared/workflow/external-dispatch-recipes.md` § Recipe 7。
-  **影响**: 校验波的证据必须在派发前就选定捕获方式;后台通道会静默给出「空回传 = 无结论」,
-  而空回传 MUST NOT 被读作 confirm。建议在 Recipe 7 里写明捕获方式。
+- **现象**: `sync-mirrors.py --only skills` 匹配不到 `skills/internal/` 的镜像对，SKILL 镜像留在
+  `DIFF` 而不报错——`--only` 的前缀 `skills` 先命中了并列的 `skills/external → .specify/skills`
+  一对，于是内部层被跳过；退出码仍为 0，`DIFF` 只出现在逐行输出里。
+  **框架位置**: `scripts/python/sync-mirrors.py` 的 `--only` 前缀匹配 vs `MIRROR_PAIRS` 中
+  `skills/external` 与 `skills/internal` 两个并列对。
+  **影响**: 一次「同步 skills」的写入会静默漏掉内部层，而 `sync-mirrors.py --check` 随后会以
+  `DIFF` 报出——靠后面的 check 兜住，但 owner 自己的写入通道给出了半完成的“成功”。
+  按 T014 的括号替代读法（“或全量 `--write` 后复查”）改跑 `--only skills/internal` 后一致。
 
-## 框架观察
+- **现象**: `tests/contract/test_fast_fail_discipline.py` 在模块中部把 `PRINCIPLE_TITLE`
+  重新绑到 Fast Fail 标题（第 933 行覆盖第 99 行），该文件后半段的守卫因此都在用一个与注释
+  所指主题不同的名字；`test_x15` 原先的 `PRINCIPLE_TITLE in entries` 断言在监听清单里找的是
+  Fast Fail，而不是本次新增的条目——它无法因自己的主题损坏而转红。
+  **框架位置**: `tests/contract/test_fast_fail_discipline.py` 的重复模块级常量。
+  **影响**: 本次把 x15 改指“派生自 owner 的最后一条”以恢复可红性；同一文件里其余复用该常量的
+  断言仍是旧的绑定方式，建议后续把该常量按段落分区重命名（本阶段未做，避免越界改另一特性的守卫）。
 
-- **现象**: plan 子代理在产物与提交完成后、自身 wrap-up 前触及 120 回合上限。
-  **框架位置**: `agents/sdd-executor.agent.md` 的 `run-turn-budget: 120`；plan 阶段产出 7 类设计产物。
-  **影响**: 驱动者需补跑 run-determination / exec-quant / feedback，增加一次恢复成本。
-- **现象**: plan 的 `test-evidence/plan-stage-checks.md` 用 mtime 相同证明“未写镜像”，但 `.specify/shared/` 下三份镜像实际存在且未跟踪。
-  **框架位置**: `sync-mirrors.py` 的 copy2 语义；plan 的 mirror obligation 证据写法。
-  **影响**: implement 必须接管并提交镜像；mtime 不能作为“未写”证据。
-- **现象**: `shared/workflow/expression-gates.md` 中的 `pre-analyze-check.py` 写作 `.specify/scripts/python/` 下，实际入口在 `.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py`。
-  **框架位置**: `.specify/shared/workflow/expression-gates.md` 的 G-tasks-fact 描述与脚本真实落点不一致。
-  **影响**: 执行者需自行搜索入口；建议后续把路径改成相对 skills 目录的写法（本阶段未改，避免越界修改 shared 制品）。
-- **现象**: C-20 在 `mirror-distribution.contract.md` 与 `constitution-double-landing.contract.md` 双重定义（指针 + 定义），覆盖会计把条款归属到实际定义文件，与执行者按 repo-root 解析读到的文件不同。
-  **框架位置**: `account-clause-coverage.py` 的 clause→file 归属规则 vs `[green:]` 的 co-located→repo-root→cwd 解析次序。
-  **影响**: tasks 阶段出现 1 条“baseline 外未覆盖”孪生条目；本阶段以 T010 同时声明 C-20 与 C-21 的方式显式披露而非改写会计口径。
+- **现象**: 本阶段起点发现 `.specify/` 目录权限为 `drw-r--r--`（缺执行位），`scripts/python/`
+  下全部文件对当前用户不可读，`git status` 因此无法读取部分路径。
+  **框架位置**: 工作树权限，非框架代码。
+  **影响**: 这类状态会让执行者把“读不到”误报为“文件不存在”。本阶段以一次 `chmod -R u+rwX`
+  修复 `.specify/ scripts/ templates/` 后继续，`git diff --summary` 确认没有模式位变更被记录。
 
 ## Split Record（2026-11-05T03:38:51Z）
 
@@ -182,6 +203,21 @@ between readings, not a single consistent correction):
   **框架位置**: `.specify/skills/internal/create-checklist/SKILL.md` § 4 Load feature context 的表。
   **影响**: 缺口发现若只读 plan/tasks，会漏掉“契约比需求更细”这一最常见缺口形态；建议在输入表中加一行 `contracts/`（仅用于发现需求遗漏）。
 
+## 框架观察
+
+- **现象**: plan 子代理在产物与提交完成后、自身 wrap-up 前触及 120 回合上限。
+  **框架位置**: `agents/sdd-executor.agent.md` 的 `run-turn-budget: 120`；plan 阶段产出 7 类设计产物。
+  **影响**: 驱动者需补跑 run-determination / exec-quant / feedback，增加一次恢复成本。
+- **现象**: plan 的 `test-evidence/plan-stage-checks.md` 用 mtime 相同证明“未写镜像”，但 `.specify/shared/` 下三份镜像实际存在且未跟踪。
+  **框架位置**: `sync-mirrors.py` 的 copy2 语义；plan 的 mirror obligation 证据写法。
+  **影响**: implement 必须接管并提交镜像；mtime 不能作为“未写”证据。
+- **现象**: `shared/workflow/expression-gates.md` 中的 `pre-analyze-check.py` 写作 `.specify/scripts/python/` 下，实际入口在 `.specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py`。
+  **框架位置**: `.specify/shared/workflow/expression-gates.md` 的 G-tasks-fact 描述与脚本真实落点不一致。
+  **影响**: 执行者需自行搜索入口；建议后续把路径改成相对 skills 目录的写法（本阶段未改，避免越界修改 shared 制品）。
+- **现象**: C-20 在 `mirror-distribution.contract.md` 与 `constitution-double-landing.contract.md` 双重定义（指针 + 定义），覆盖会计把条款归属到实际定义文件，与执行者按 repo-root 解析读到的文件不同。
+  **框架位置**: `account-clause-coverage.py` 的 clause→file 归属规则 vs `[green:]` 的 co-located→repo-root→cwd 解析次序。
+  **影响**: tasks 阶段出现 1 条“baseline 外未覆盖”孪生条目；本阶段以 T010 同时声明 C-20 与 C-21 的方式显式披露而非改写会计口径。
+
 ## Implement Part Plan（2026-11-05T04:07:42Z）
 
 - P1 T001-T006 — setup + foundational + red-first; **baseline full suite here**.
@@ -209,3 +245,23 @@ between readings, not a single consistent correction):
 - **evidence**: `test-evidence/implement-part-2.md`; baseline 26 inherited failures, no new regression outside the two declared expected-reds.
 - **no plan-owned edits**; no Completion Gate, no status flip, no implement wrap-up.
 - **next**: P3 T013-T018 (generator skill entry, mirrors, US1 green, live constitution, mutation legs).
+
+- 2026-11-05 implement part 2 correction: 2026-11-05T04:23:52Z — 8daf6b65; C-21 green deferred to T024; no plan-owned edits.
+
+## Implement part 3 checkpoint
+
+- **part_scope**: T013-T018 — done; T013-T018 all `[X]` in tasks.md; no `[>]` held; 35 unchecked rows remain (T019-T053), untouched by this part.
+- **commit**: `2161ac40` (9 files, 409+/26-).
+- **artifacts**:
+  - `skills/internal/manage-constitution/SKILL.md` + `.specify/skills/internal/manage-constitution/SKILL.md` — MUST-include list 10 → 11 (T013/T014)
+  - `.specify/memory/constitution.md` — Principle XIX, `**Version**:` 1.15.0 → 1.16.0, Sync Impact Report prepended (T017)
+  - `tests/contract/test_constitution_double_landing.py` — watchlist + `TEMPLATE_COUNT` 18 / `LIVE_COUNT` 19 / `COMMAND_COUNT` 11 (T016)
+  - `tests/contract/test_fast_fail_discipline.py` — five collateral pins raised / repointed (disclosed repairs)
+  - `notes/red-first-evidence.md` — R-1 pair closed + M-1/M-2 transcripts (T015/T018)
+  - `notes/pre-change-measurements.md` — part 3 mirror/count/gate measurements
+  - `test-evidence/implement-part-3.md` — E3 stage-status row
+- **targeted set**: US1 subset 12 passed (rc 0, `-k 'not c21'`) + carrier 19 passed (rc 0). Companion set 160 passed / 3 failed, of which exactly one is new (the declared C-21 red) and two are baseline-inherited.
+- **in-passing repairs**: `test_x13`/`test_x15`/`test_x18`/`test_x5`/`test_x6` in `test_fast_fail_discipline.py`. `test_x6` was a genuine defect repair (it asserted a fixed older title in a 40-line window that every newer amendment pushes out), not a window widening.
+- **gate budget**: `scan-confirmation-gates.py --json` total = 27, unchanged from T002 — C-8 held.
+- **no plan-owned edits** (PLAN-EDIT none); no Completion Gate, no Feature status flip, no implement Feedback/Wrap-up, no push.
+- **next**: P4 T019-T023 (US2 tests + instructions template section). C-21's green is T024's and is NOT closed here.
