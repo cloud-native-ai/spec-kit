@@ -7,10 +7,12 @@
   deterministic commands were executed where a task row asked for one and their output is archived;
   those rows say "read" and cite the file.
 
-  Consequence, stated before any status: the feature is **`Blocked`**, not `Implemented`. Two
-  `final`-path criteria (SC-001, SC-002) rest on test-typed legs that were waived, and the smoke
-  record was not run. The status machine's `Planned → Implemented` condition (3) and (4) fail; three
-  of four is `Blocked` (`templates/feature-details-template.md`).
+  Consequence, stated before any status: the feature is **`Blocked`**, not `Implemented`. After the
+  T032 classification slice, SC-001's four limbs are read from seconds-level coverage/verify
+  (`unclassified 0`, determinism, no orphan declarations, consumer consistency), so SC-001 is
+  `pass`. SC-002 still rests on the waived contract-module/residual readings and the smoke record
+  was not run, so the status machine's `Planned → Implemented` condition (3)/(4) fail; the feature
+  remains `Blocked` (`templates/feature-details-template.md`).
 -->
 
 # -- Baseline (recorded at implement start, before any work changed the tree) --
@@ -63,14 +65,11 @@ verdict=pass
 
 # -- Success Criteria evaluation --
 
-SC-001_status=blocked
-SC-001_value=candidates 83 / in-scope 13 / excluded 12 / unclassified 58; two consecutive coverage runs byte-identical (sha256 70f6dbf5…b483 both runs, 44 ms / 42 ms)
-SC-001_note=limb (i) determinism READ and holds; limb (ii) does NOT hold on this tree (58 `unclassified-candidate:`) and limbs (iii)/(iv) were not re-read; final path, so a non-pass is `blocked`
-SC-001_blocked_at=test-waiver: final-path evidence waived-by-user (2026-11-05)
-SC-001_reduced_measurement=deterministic `--action coverage` read twice on the final tree: byte-identical output, per-state counts, zero `exclusion-anchor-unresolvable`, zero duplicate-name input error
-SC-001_reduced_measurement_run=yes
-SC-001_why_reduced_insufficient=the criterion's own exit-0 condition is "zero unclassified", and the measured reading is 58. Determinism alone cannot stand in for it, and the waived legs (bidirectional consumer consistency, no orphan declaration) are part of the same criterion
-SC-001_unblock=classify or migrate the remaining 58 candidate units (a later slice: their exclusions or declarations are out of T020's named roster), then re-read coverage to zero `unclassified-candidate:` under an unwaived test budget
+SC-001_status=pass
+SC-001_value=candidates 83 / in-scope 13 / excluded 70 / unclassified 0; coverage exit 0; verify exit 0 with 0 findings; two consecutive coverage runs byte-identical (sha256 f9cd934a…3473, 47 ms / 44 ms); no declaration outside the candidate set; consumer consistency declarations→carriers 28/28 and carriers→declarations 16/16
+SC-001_note=all four limbs read on the final tree after T032: (i) determinism holds; (ii) zero `unclassified-candidate:`; (iii) zero orphan declaration; (iv) bidirectional consumer consistency. Fast deterministic readings, not test suites; evidence in test-evidence/t032-classification-readings-2026-11-05.txt
+SC-001_evidence=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
+SC-001_verified_at=2026-11-05 (T032 classification slice, commit 94d9db33)
 
 SC-002_status=blocked
 SC-002_value=declarations 23; consistency declarations→carriers 28/28, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 12 exclusion rows resolved to the excluded disposition

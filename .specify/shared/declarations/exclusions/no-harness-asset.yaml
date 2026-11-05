@@ -18,6 +18,8 @@
 #                    a query result, and the skill writes nothing outside its own config file.
 # Count measured at write time: 2 rows, one file (the two remaining closed reasons carry no row —
 # a reason file that would be empty MUST NOT be created to satisfy the shape).
+# Re-measured 2026-11-05 (implement, part 6) with the T032 append of the screen's remaining
+# candidates: **32 rows**. The earlier count stays as the reading it was, not as the current one.
 
 # D1 unsatisfied: the deliverable is a diagram package, not a harness asset.
 # Engine the unit does reach: its six engine layers are selected per run, so the one deterministic
@@ -33,3 +35,235 @@
 - unit: skills/external/database-utils/SKILL.md
   carrier: skills/external/database-utils/scripts/query.py
   anchor: skills/external/database-utils/SKILL.md#Overview
+
+# --- T032 rows (tasks.md T032), appended 2026-11-05 (implement, part 6): the screen's remaining
+# candidates, 30 rows. The 2 rows above are untouched — data-model.md E-2 says a new unit appends a
+# row and MUST NOT reorder existing ones — and one unit appears exactly once (E-2 R-4).
+# Why `no-harness-asset` on these 30: each one's acceptance deliverable — the product its own
+# `anchor` section names — is not one of the four harness-asset kinds FR-002 (D1) asks for, so the
+# asset side of the scope criterion fails. Nothing about the unit's subject is disputed and its
+# carrier is unchanged.
+# Their text does still reach a deterministic engine, which is why the screen accepts them at all
+# (FR-004's accepted conservative side) and why every row carries a `carrier`: `grep` at write time
+# found either a `scripts/python/<name>.py` reference or the unit's own
+# `${SKILL_HOME}/scripts/<file>` asset invoked by relative path. 8 of these units own no subject
+# engine and reach the record engine their own § Wrap-up calls (`scripts/python/feedback-utils.py`),
+# recorded per row rather than left to be re-derived.
+# Count after this append: 32 rows (2 + 30). Measured, not projected: the merged file was read by
+# `harness-triple-check.py --action coverage`, which reported `exclusion-anchor-unresolvable` 0 and
+# `unclassified` 0 on this tree.
+
+# `shared/workflow/*.md` — protocol documents (3 rows)
+# These carry protocols a driver follows. What they deliver is a memory-store or spec-directory file
+# (`features.md`, `glossary.md`, a dispatch plan) — none of the four kinds — and each still names
+# one engine in prose.
+#
+# shared/workflow/external-dispatch-recipes.md — the deliverable is a recipe catalogue a driver
+# reads; nothing lands on a governed tree and no record or verdict is produced
+# carrier: skills/internal/create-team/scripts/dispatch.sh
+- unit: shared/workflow/external-dispatch-recipes.md
+  carrier: skills/internal/create-team/scripts/dispatch.sh
+  anchor: shared/workflow/external-dispatch-recipes.md#Two Topologies
+#
+# shared/workflow/feature-integration.md — the deliverable is registry rows in
+# `.specify/memory/features.md` and `features/<ID>.md` — the memory registry, which the consumer
+# list does not name
+# carrier: scripts/python/closure-acceptance-check.py
+- unit: shared/workflow/feature-integration.md
+  carrier: scripts/python/closure-acceptance-check.py
+  anchor: shared/workflow/feature-integration.md#Core Protocol
+#
+# shared/workflow/glossary.md — the deliverable is glossary entries in
+# `.specify/memory/glossary.md`; the protocol edits a memory-store file, not one of the four kinds
+# carrier: scripts/python/glossary-utils.py
+- unit: shared/workflow/glossary.md
+  carrier: scripts/python/glossary-utils.py
+  anchor: shared/workflow/glossary.md#5. Scope
+
+# `skills/external/*/SKILL.md` (2 rows)
+# A coaching run and an office-document toolkit. The coaching plan is handed to `improve-skills`,
+# which is the unit that changes `skills/`; the document toolkit's product is a document.
+#
+# skills/external/coaching-skills/SKILL.md — the deliverable is four coaching run files (expectation
+# / observation / deviations / improvement-plan); the plan is only handed to `improve-skills`, so no
+# `skills/` file is changed here
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/external/coaching-skills/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/external/coaching-skills/SKILL.md#Artifacts and Order
+#
+# skills/external/document-utils/SKILL.md — the deliverable is an office document (DOCX / PDF / PPTX
+# / XLSX); the format tools under its own `scripts/` are what it reaches
+# carrier: skills/external/document-utils/scripts/office/validate.py
+- unit: skills/external/document-utils/SKILL.md
+  carrier: skills/external/document-utils/scripts/office/validate.py
+  anchor: skills/external/document-utils/SKILL.md#Overview
+
+# `skills/internal/*/SKILL.md` (15 rows)
+# Authoring and analysis skills whose product is a spec artifact, a registry file, a ledger, a
+# report or a relayed third-party product. Where a unit owns a subject engine that engine is the
+# carrier; where it owns none, the carrier is the record engine its § Wrap-up calls.
+#
+# skills/internal/archive-session/SKILL.md — the deliverable is an exported CLI-session bundle in a
+# user-named directory outside the memory store
+# carrier: skills/internal/archive-session/scripts/export.py
+- unit: skills/internal/archive-session/SKILL.md
+  carrier: skills/internal/archive-session/scripts/export.py
+  anchor: skills/internal/archive-session/SKILL.md#调用
+#
+# skills/internal/clarify-artifact/SKILL.md — the deliverable is ratified answers encoded back into
+# the phase artifact (requirements.md / plan.md)
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/clarify-artifact/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/clarify-artifact/SKILL.md#Goal
+#
+# skills/internal/create-checklist/SKILL.md — the deliverable is a requirements-quality checklist
+# file under the feature's `checklists/`
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/create-checklist/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/create-checklist/SKILL.md#Goal
+#
+# skills/internal/create-plan/SKILL.md — the deliverable is plan.md plus its design artifacts
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/create-plan/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/create-plan/SKILL.md#Goal
+#
+# skills/internal/create-requirements/SKILL.md — the deliverable is requirements.md
+# carrier: scripts/python/validate-requirements.py
+- unit: skills/internal/create-requirements/SKILL.md
+  carrier: scripts/python/validate-requirements.py
+  anchor: skills/internal/create-requirements/SKILL.md#Goal
+#
+# skills/internal/create-tasks/SKILL.md — the deliverable is tasks.md
+# carrier: scripts/python/validate-tasks.py
+- unit: skills/internal/create-tasks/SKILL.md
+  carrier: scripts/python/validate-tasks.py
+  anchor: skills/internal/create-tasks/SKILL.md#Goal
+#
+# skills/internal/derive-architecture/SKILL.md — the deliverable is a derivation archive at
+# `.specify/derive/<slug>/derive.md`
+# carrier: scripts/python/derive-utils.py
+- unit: skills/internal/derive-architecture/SKILL.md
+  carrier: scripts/python/derive-utils.py
+  anchor: skills/internal/derive-architecture/SKILL.md#Workflow
+#
+# skills/internal/manage-features/SKILL.md — the deliverable is the feature registry (`features.md`
+# plus per-feature detail files)
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/manage-features/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/manage-features/SKILL.md#Goal
+#
+# skills/internal/manage-goal/SKILL.md — the deliverable is goal definitions under `.specify/goal/`
+# carrier: scripts/python/goal-utils.py
+- unit: skills/internal/manage-goal/SKILL.md
+  carrier: scripts/python/goal-utils.py
+  anchor: skills/internal/manage-goal/SKILL.md#Goal
+#
+# skills/internal/manage-todo/SKILL.md — the deliverable is TODO blocks and parked ideas in
+# workspace files
+# carrier: scripts/python/search-todo.py
+- unit: skills/internal/manage-todo/SKILL.md
+  carrier: scripts/python/search-todo.py
+  anchor: skills/internal/manage-todo/SKILL.md#Goal
+#
+# skills/internal/research-feature/SKILL.md — the deliverable is research.md
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/research-feature/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/research-feature/SKILL.md#Goal
+#
+# skills/internal/run-agent/SKILL.md — the deliverable is the dispatched agent's own output plus its
+# run report
+# carrier: skills/internal/create-team/scripts/dispatch.sh
+- unit: skills/internal/run-agent/SKILL.md
+  carrier: skills/internal/create-team/scripts/dispatch.sh
+  anchor: skills/internal/run-agent/SKILL.md#Goal
+#
+# skills/internal/run-interview/SKILL.md — the deliverable is the target artifact edited in place
+# plus the decision ledger (spec dir or memory session store)
+# carrier: scripts/python/interview-utils.py
+- unit: skills/internal/run-interview/SKILL.md
+  carrier: scripts/python/interview-utils.py
+  anchor: skills/internal/run-interview/SKILL.md#Goal
+#
+# skills/internal/run-skills/SKILL.md — the deliverable is the target skill's own product, relayed
+# unchanged
+# carrier: scripts/python/feedback-utils.py
+- unit: skills/internal/run-skills/SKILL.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: skills/internal/run-skills/SKILL.md#Goal
+#
+# skills/internal/run-team/SKILL.md — the deliverable is the team's work plus the mandatory run
+# report; a run changes no governed tree
+# carrier: scripts/python/goal-utils.py
+- unit: skills/internal/run-team/SKILL.md
+  carrier: scripts/python/goal-utils.py
+  anchor: skills/internal/run-team/SKILL.md#Goal
+
+# `templates/commands/*.md` (10 rows)
+# The command face of the same ten deliverables. Each template carries entry, parameters and the
+# command-lifecycle wrap-up and delegates the product to its skill; the product is named per row.
+#
+# templates/commands/checklist.md — delivers a checklist file through create-checklist
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/checklist.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/checklist.md#Delegation
+#
+# templates/commands/clarify.md — delivers ratified answers written back into the phase artifact
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/clarify.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/clarify.md#Delegation
+#
+# templates/commands/derive.md — delivers the `.specify/derive/` archive
+# carrier: scripts/python/derive-utils.py
+- unit: templates/commands/derive.md
+  carrier: scripts/python/derive-utils.py
+  anchor: templates/commands/derive.md#Outline
+#
+# templates/commands/goal.md — delivers goal definitions under `.specify/goal/`
+# carrier: scripts/python/goal-utils.py
+- unit: templates/commands/goal.md
+  carrier: scripts/python/goal-utils.py
+  anchor: templates/commands/goal.md#Outline
+#
+# templates/commands/interview.md — delivers the edited target artifact plus the interview ledger
+# carrier: scripts/python/interview-utils.py
+- unit: templates/commands/interview.md
+  carrier: scripts/python/interview-utils.py
+  anchor: templates/commands/interview.md#Skill Delegation
+#
+# templates/commands/plan.md — delivers plan.md plus its design artifacts
+# carrier: scripts/python/flow-class-check.py
+- unit: templates/commands/plan.md
+  carrier: scripts/python/flow-class-check.py
+  anchor: templates/commands/plan.md#Skill Delegation
+#
+# templates/commands/research.md — delivers research.md
+# carrier: scripts/python/feedback-utils.py
+- unit: templates/commands/research.md
+  carrier: scripts/python/feedback-utils.py
+  anchor: templates/commands/research.md#Delegation
+#
+# templates/commands/session.md — delivers the exported session bundle
+# carrier: skills/internal/archive-session/scripts/export.py
+- unit: templates/commands/session.md
+  carrier: skills/internal/archive-session/scripts/export.py
+  anchor: templates/commands/session.md#Modes
+#
+# templates/commands/tasks.md — delivers tasks.md
+# carrier: scripts/python/validate-tasks.py
+- unit: templates/commands/tasks.md
+  carrier: scripts/python/validate-tasks.py
+  anchor: templates/commands/tasks.md#Delegation
+#
+# templates/commands/todo.md — delivers the TODO surface (workspace blocks and parked ideas)
+# carrier: scripts/python/search-todo.py
+- unit: templates/commands/todo.md
+  carrier: scripts/python/search-todo.py
+  anchor: templates/commands/todo.md#Delegation
