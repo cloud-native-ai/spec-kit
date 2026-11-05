@@ -174,3 +174,70 @@ parity suite is this feature's own guard (C-22/C-24). The mirror write is theref
 an in-passing repair and reported in the part-2 anomaly line, not as a scope expansion. The
 `.specify/templates/` copy of the constitution template is a **generated** artifact (Two Hats): it
 follows the source, and the source is what was authored.
+
+---
+
+# Implement part 3 measurements — T013-T018 (appended 2026-11-05)
+
+**Base commit**: `8daf6b65` | **part_scope**: `T013-T018`
+
+## T013/T014 — generator mandate entry and mirror sync
+
+The `- **MUST include**` block went from 10 to 11 sub-entries. The mirror pair that owns it is
+`skills/internal/` → `.specify/skills/internal/` (a separate pair from `skills/external/`), which is
+why `--only templates --only skills` reported `ok` for skills and left the SKILL mirror at `DIFF`:
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check          # after the T013 edit
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+DIFF  .specify/skills/internal/manage-constitution/SKILL.md
+DRIFT detected
+
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal
+scope --only: skills/internal
+DIFF  .specify/skills/internal/manage-constitution/SKILL.md
+sync  skills/internal/ -> .specify/skills/internal/ (1 files)
+EXIT=0
+
+$ cmp skills/internal/manage-constitution/SKILL.md .specify/skills/internal/manage-constitution/SKILL.md
+(identical)
+
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (65 files)
+EXIT=0
+```
+
+## T016/T017 — the counts the carrier and the live roster actually hold
+
+```console
+$ grep -cE '^### [IVXLC0-9]+\. ' templates/constitution-template.md .specify/memory/constitution.md
+templates/constitution-template.md:18
+.specify/memory/constitution.md:19
+
+$ grep -cE '^  - \*\*.+?\*\* —' skills/internal/manage-constitution/SKILL.md
+11
+
+$ grep -n '^\*\*Version\*\*:' .specify/memory/constitution.md
+422:**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05
+```
+
+Numeral split, as C-3 of the double-landing contract states it: the template's next free numeral is
+XVIII, the live roster's is XIX. That is per-surface numbering, not a divergence.
+
+## T017 — gate budget after the live landing (unchanged total)
+
+```console
+$ python3 scripts/python/scan-confirmation-gates.py --json | python3 -c "import json,sys;print(json.load(sys.stdin)['total'])"
+27
+```
+
+27 is the same total measured at T002 (part 1). The new principle block, the instruction surface it
+will gain in T022, and the mandate entry produced **zero** new blocking hits — which is the C-8
+obligation, and the reason the frozen-baseline guards did not move on this feature's account.

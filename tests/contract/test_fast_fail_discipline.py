@@ -995,11 +995,12 @@ def test_x4_live_constitution_principle_xvi():
 
 def test_x5_live_version_minor_bump():
     """C-5: the live version took the MINOR bump to 1.13.0 (raised to 1.15.0 on 2026-10-27
-    by the Grounded Naming amendment)."""
+    by the Grounded Naming amendment; raised to 1.16.0 on 2026-11-05 by Feature 082's
+    Self-Explanatory Structure amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.15.0", f"C-5: live version is {m.group(1)}; expected 1.15.0"
+    assert m.group(1) == "1.16.0", f"C-5: live version is {m.group(1)}; expected 1.16.0"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
@@ -1014,7 +1015,22 @@ def test_x6_sync_impact_report_prepended():
                   "- Templates requiring updates:", "- Follow-up TODOs:", "- Preserved by design:"):
         assert field in head, f"C-6: the report is missing the {field!r} field"
     assert "✅" in head, "C-6: the report carries no per-item ✅ / ⚠ status"
-    assert PRINCIPLE_TITLE.split(" (")[0] in head, "C-6: the report does not name the added principle"
+    # The window is 40 lines and every amendment prepends its own block, so a fixed older
+    # title is pushed out as soon as a newer amendment lands above it (Feature 082 did exactly
+    # that). The proposition this guards is "the report names the principle THIS amendment
+    # added", so the newest double-landing watchlist entry is what it must find -- deriving it
+    # keeps the assertion pointed at the current landing instead of at Fast Fail forever.
+    _carrier = importlib.util.spec_from_file_location(
+        "_ff_carrier_for_watchlist", DOUBLE_LANDING_TEST
+    )
+    assert _carrier is not None and _carrier.loader is not None
+    _carrier_module = importlib.util.module_from_spec(_carrier)
+    _carrier.loader.exec_module(_carrier_module)
+    newest = _carrier_module.DOUBLE_LANDING_WATCHLIST[-1]
+    assert newest.split(" (")[0] in head, (
+        f"C-6: the report does not name the principle the current amendment added "
+        f"({newest!r}); a hard-coded older title goes green for any later amendment"
+    )
 
 
 def test_x7_version_three_segment_form():
@@ -1101,21 +1117,22 @@ def test_x12_principle_block_project_neutral():
 def test_x13_double_landing_three_count_pins():
     """C-13: the three count pins were raised in the same batch. Stale-pin update
     (2026-10-27): the Directory Governance amendment moved template 15 -> 16, live
-    16 -> 17, and command 8 -> 9 in one landing."""
+    16 -> 17, and command 8 -> 9 in one landing. (2026-11-05, Feature 082): template
+    17 -> 18, live 18 -> 19, command 10 -> 11, all in T016."""
     src = _text(DOUBLE_LANDING_TEST)
-    for name, want in (("TEMPLATE_COUNT", 17), ("LIVE_COUNT", 18), ("COMMAND_COUNT", 10)):
+    for name, want in (("TEMPLATE_COUNT", 18), ("LIVE_COUNT", 19), ("COMMAND_COUNT", 11)):
         m = re.search(rf"^{name} = (\d+)", src, re.M)
         assert m, f"C-13: {name} not found in the guard"
         assert int(m.group(1)) == want, f"C-13: {name} is {m.group(1)}; expected {want}"
     # and the counts are true of the artifacts, not just of the pins
-    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 17, "C-13: the template does not actually hold 17"
-    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 18, "C-13: the live constitution does not hold 18"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_TPL))) == 18, "C-13: the template does not actually hold 18"
+    assert len(PRINCIPLE_RE.findall(_text(CONST_LIVE))) == 19, "C-13: the live constitution does not hold 19"
     # S3 re-point: the command list became the generator skill's MUST-include
     # sub-entry block (same block extraction the double-landing guard uses).
     m = re.search(r"^- \*\*MUST include\*\*.*?(?=^- )", _text(CONST_SKILL), re.M | re.S)
     assert m, "C-13: the skill lost its `- **MUST include**` mandatory-principles block"
     entries = re.findall(r"^  - \*\*(.+?)\*\* —", m.group(0), re.M)
-    assert len(entries) == 10, "C-13: the skill's MUST-include list does not actually hold 10 entries"
+    assert len(entries) == 11, "C-13: the skill's MUST-include list does not actually hold 11 entries"
 
 
 def test_x14_min_version_floor_semantics():
@@ -1133,13 +1150,22 @@ def test_x14_min_version_floor_semantics():
 
 def test_x15_watchlist_gains_principle_title():
     """C-15: the double-landing watchlist gained this title (2 -> 3); the Directory
-    Governance and Grounded Naming amendments extended it to 5."""
+    Governance and Grounded Naming amendments extended it to 5; Feature 082's
+    Self-Explanatory Structure entry (2026-11-05, T016) extends it to 6."""
     src = _text(DOUBLE_LANDING_TEST)
     m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
     assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
     entries = re.findall(r'"([^"]+)"', m.group(1))
-    assert PRINCIPLE_TITLE in entries, f"C-15: the watchlist lacks {PRINCIPLE_TITLE!r}"
-    assert len(entries) == 5, f"C-15: the watchlist holds {len(entries)} entries; expected 5"
+    # This module's module-level PRINCIPLE_TITLE is the Fast Fail title (it is rebound at the
+    # constitution-export section for the x3/x4 pins), so the entry this guard must find is
+    # derived from the owner -- the last watchlist entry, which every amendment appends to.
+    newest = entries[-1]
+    assert newest not in ("", None), "C-15: the watchlist's last entry is empty"
+    assert len(entries) == 6, f"C-15: the watchlist holds {len(entries)} entries; expected 6"
+    assert newest in _text(CONST_TPL), (
+        f"C-15: the newest watchlist entry {newest!r} is not a template title -- the append "
+        "did not land on the surface it is supposed to guard"
+    )
 
 
 def test_x16_plan_template_zero_change():
@@ -1174,10 +1200,12 @@ def test_x17_plan_template_enumeration_sentinel():
 
 def test_x18_downstream_gate_rows_15_to_16():
     """C-18: rendering the enumeration logic gives 16 rows, up from 15. Stale-pin
-    update (2026-10-27): the Directory Governance amendment added one row (17 / 16)."""
+    update (2026-10-27): the Directory Governance amendment added one row (17 / 16).
+    Stale-pin update (2026-11-05, Feature 082): the Self-Explanatory Structure
+    amendment added one row (18 / 17)."""
     live = _text(CONST_LIVE)
     rows = PRINCIPLE_RE.findall(live)
-    assert len(rows) == 18, f"C-18: the enumeration yields {len(rows)} gate rows; expected 18"
+    assert len(rows) == 19, f"C-18: the enumeration yields {len(rows)} gate rows; expected 19"
     # the 15 side is measured, not asserted from memory: drop this principle's block.
     # The boundary is the next principle OR the next H2 -- keying on H2 alone would
     # swallow any principle appended after this one (Directory Governance, 2026-10-27).
@@ -1187,7 +1215,7 @@ def test_x18_downstream_gate_rows_15_to_16():
              if lines[k].startswith("### ") or lines[k].startswith("## "))
     sample = "\n".join(lines[:i] + lines[j:])
     before = PRINCIPLE_RE.findall(sample)
-    assert len(before) == 17, f"C-18: without this principle the enumeration yields {len(before)}; expected 17"
+    assert len(before) == 18, f"C-18: without this principle the enumeration yields {len(before)}; expected 18"
     # sentinel: the enumeration is not returning 16 for a trivial reason
     assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
     assert not any(title == PRINCIPLE_TITLE for _n, title in before), (

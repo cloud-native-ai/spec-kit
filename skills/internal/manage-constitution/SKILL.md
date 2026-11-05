@@ -212,6 +212,19 @@ Before processing the template, scan the project to understand its actual contex
     through every reference in the same change. This principle adds a decision order, not
     machinery: it MUST NOT justify a naming linter, a glossary generator, or any new
     tracking system.
+  - **Self-Explanatory Structure (不言自明)** — names, paths and structures MUST carry the
+    information their user needs, judged from the user's view rather than from how clear the
+    implementation looks internally. The ceiling is that the user sees the needed information
+    directly and the floor is no more than one simple command, with a satisfied floor enough to
+    support a change; a concrete user information need MUST be named before the principle
+    applies, and it MUST NOT be used to justify preventive redesign. Each optimization task
+    raises at most one information dimension, landed through a reconcile mechanism, and an
+    encoded attribute keeps its original source of truth (names and paths stay projections of
+    it). The full definition lives at
+    `.specify/shared/definitions/self-explanatory-definitions.md` and MUST be referenced, not
+    restated, inside the constitution. This principle adds a way of naming and structuring, not
+    machinery: it MUST NOT justify a freshness scanner, an information scorer, a maturity
+    report, or any other new tracking system.
 - Ensure the Governance section lists amendment procedure, versioning policy, and compliance
   review expectations.
 
