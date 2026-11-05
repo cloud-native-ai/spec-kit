@@ -1,0 +1,9 @@
+$ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"
+unit_id: spec:084-harness-triple-structure
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit: 0
