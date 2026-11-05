@@ -4,7 +4,7 @@
 
 **投影面**：本文件是两份 owner 的**形态投影**——可以收窄 owner 的值域，MUST NOT 扩大；它不复述 owner 的判据表、症状表、提示骨架、接受形式清单或失败语义表，只把它们变成可断言的字段。
 
-**Census**: 10 个实体（E-1 … E-10；E-1…E-7 属能力一，E-8…E-10 属能力二）、34 条校验规则（V-1 … V-34）、1 个封闭谓词（C1）、1 个封闭成员表（3 / 2 / 1）、1 个封闭允许差异集（18 条路径登记，其中属比较单元者 8）、3 条状态转移（SM-1 作者侧判定、SM-2 消费侧检查、SM-3 引用归一化）。
+**Census**: 10 个实体（E-1 … E-10；E-1…E-7 属能力一，E-8…E-10 属能力二）、34 条校验规则（V-1 … V-34）、1 个封闭谓词（C1）、1 个封闭成员表（3 / 2 / 1）、1 个封闭允许差异集（20 条路径登记，其中属比较单元者 10）、3 条状态转移（SM-1 作者侧判定、SM-2 消费侧检查、SM-3 引用归一化）。
 
 每个实体都同时给出 **carrier**（物理承载它的文件）与 **consumer**（读它的契约/测试）——只有 carrier 而没有 consumer 的实体，正是「绿了但什么都没证明」的失效面（Constitution XVI）。
 
@@ -276,6 +276,8 @@
 | 16 | `tests/contract/skill_reference_matrix.py` | 新增（测试辅助，非门禁脚本） | 否 |
 | 17 | `tests/contract/test_skill_reference_matrix.py` | 新增（SC-006） | 否 |
 | 18 | `tests/contract/{test_skill_reference_grammar,test_skill_reference_consumers,test_skill_reference_command_surface,test_skill_reference_failures}.py` | 新增（GR 形态、SC-007、SC-008、SC-009） | 否 |
+| 19 | `skills/external/coaching-skills/data-model.md` | 改写（技能引用的 coaching 数据模型；吸收的并发改造，随 082b 并入） | 是 |
+| 20 | `skills/external/coaching-skills/references/prompt-templates.md` | 改写（技能引用的 coaching 提示模板；吸收的并发改造，随 082b 并入） | 是 |
 
 登记表在**比较单元内**的条目恰为第 1–8 行（**1 条新增 + 7 条改写**：新增只有第 2 行的 `references/mechanism-policy-check.md`，其余七行都是改写），第 9–18 行是落在比较单元之外（`tests/`）的新增路径，列出是为了让「新增路径」一侧也可逐条核对，它们不参与字节相等断言。**本条与第 9–18 行的条数以本表行为准**：任何引用本节的地方 MUST NOT 手抄一个与表不符的总数（M3 repair 2026-11-05 改，原正文「2 新增 + 6 改写」与行不符）。第 18 行登记的是**一组**文件（五个引用侧模块中的四个 pytest 模块；第五个 `test_skill_reference_matrix.py` 已在第 17 行单列），契约侧只陈述「技能引用测试组」这一数，路径细节以本表与 plan.md § Project Structure 为准。
 

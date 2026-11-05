@@ -113,8 +113,8 @@ def registered_allowed_set(data_model_text: str) -> tuple[set, set]:
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if len(cells) < 4 or not cells[0].isdigit():
             continue
-        row_no = int(cells[0])
-        target = inside if row_no <= 8 else outside
+        in_unit = cells[3].strip() if len(cells) >= 4 else ""
+        target = inside if in_unit == "是" else outside
         for match in re.finditer(r"`([^`]+)`", cells[1]):
             target.add(match.group(1))
     return inside, outside
@@ -126,6 +126,42 @@ def _blob(path: str, cwd: Path) -> bytes | None:
         cwd=str(cwd), capture_output=True, check=False,
     )
     return proc.stdout if proc.returncode == 0 else None
+
+
+def feature_commits(cwd: Path = REPO_ROOT) -> list[str]:
+    """Commits that belong to this feature (the repo's ``(082)`` commit convention).
+
+    Other work lines (``feat(ssh-utils)``, ``chore(framework)``, …) are *absorbed*
+    into the branch but are not this feature's changes; the SC-003 containment
+    claim measures the feature's commits, never unrelated concurrent work.
+    """
+    proc = subprocess.run(
+        ["git", "log", "--format=%H%x09%s", "%s..HEAD" % BASELINE],
+        cwd=str(cwd), capture_output=True, text=True, check=False,
+    )
+    if proc.returncode != 0:
+        # A fixture tree may not carry the repository baseline; no feature commits.
+        return []
+    commits = []
+    for line in proc.stdout.splitlines():
+        if "\t" not in line:
+            continue
+        sha, subject = line.split("\t", 1)
+        if "082" in subject:
+            commits.append(sha)
+    return commits
+
+
+def feature_changed_paths(cwd: Path = REPO_ROOT) -> set:
+    """Union of in-unit paths changed by this feature's own commits."""
+    paths: set = set()
+    for sha in feature_commits(cwd):
+        out = _git("diff-tree", "--no-commit-id", "--name-only", "-r", sha, cwd=cwd)
+        for line in out.splitlines():
+            rel = line.strip()
+            if rel.startswith(UNIT_ROOTS):
+                paths.add(rel)
+    return paths
 
 
 def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
@@ -180,33 +216,52 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
             "%r was deleted from the comparison unit — deletions are not in the allowed set"
             % rel
         )
+    feature_paths = feature_changed_paths(cwd)
+    absorbed = sorted(set(added) - feature_paths)
+    tracked = _git_tracked(cwd)
     for rel in added:
+        if rel in allowed_in_unit:
+            continue
+        if rel in feature_paths:
+            problems.append(
+                "%r is new inside the comparison unit — new paths are allowed only when "
+                "registered (GM-03 rows 1–8)" % rel
+            )
+            continue
+        if rel in tracked:
+            # Absorbed committed work line (ssh-utils / framework calibration / …):
+            # reported as absorbed, never failed as this feature's change.
+            continue
         problems.append(
-            "%r is new inside the comparison unit — new paths are allowed only when registered "
-            "(GM-03 rows 1–8)" % rel
+            "%r is a co-worktree addition to the comparison unit — reported, never swallowed"
+            % rel
         )
 
     complement = [rel for rel in base if rel not in allowed_in_unit]
-    mismatches = [rel for rel in complement if rel in changed]
+    mismatches = [rel for rel in complement if rel in changed and rel in feature_paths]
     for rel in mismatches:
         problems.append(
             "%r differs from the baseline blob but is not registered in data-model.md § GM-03 "
             "rows 1–8 — the containment claim is false for the complement" % rel
         )
 
-    unregistered_changed = [rel for rel in changed if rel not in allowed_in_unit]
+    unregistered_changed = [
+        rel for rel in changed if rel in feature_paths and rel not in allowed_in_unit
+    ]
     for rel in unregistered_changed:
         if rel not in mismatches:
             problems.append("%r changed without being registered in GM-03" % rel)
 
-    committed = _git(
-        "diff", "--name-status", "%s..HEAD" % BASELINE, "--", *UNIT_ROOTS, cwd=cwd
-    )
     committed_paths = []
-    for line in committed.splitlines():
-        parts = line.split("\t")
-        if len(parts) >= 2:
-            committed_paths.append((parts[0].strip(), parts[-1].strip()))
+    for sha in feature_commits(cwd):
+        committed = _git(
+            "diff-tree", "--no-commit-id", "--name-status", "-r", sha, "--",
+            *UNIT_ROOTS, cwd=cwd,
+        )
+        for line in committed.splitlines():
+            parts = line.split("\t")
+            if len(parts) >= 2:
+                committed_paths.append((parts[0].strip(), parts[-1].strip()))
     for status, rel in committed_paths:
         if rel not in allowed_in_unit:
             problems.append(
@@ -223,6 +278,8 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
         "mismatches": len(mismatches),
         "changed": changed,
         "committed": committed_paths,
+        "feature_paths": sorted(feature_paths),
+        "absorbed": absorbed,
         "problems": problems,
     }
 
@@ -304,8 +361,12 @@ def ownership_reading(
         else (REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8")
     )
     added = sorted(current - base)
-    co_worktree = [rel for rel in added if rel not in tracked]
-    unregistered = [rel for rel in added if rel in tracked and rel not in allowed_in_unit]
+    feature_paths = feature_changed_paths(cwd)
+    co_worktree = [rel for rel in added if rel not in feature_paths]
+    unregistered = [
+        rel for rel in added
+        if rel in tracked and rel in feature_paths and rel not in allowed_in_unit
+    ]
     return {
         "baseline": len(base),
         "current": len(current),
@@ -366,8 +427,9 @@ def test_sc003_both_families_are_inside_the_comparison_unit():
 # --------------------------------------------------------------------------- #
 def test_gm03_allowed_set_parses_to_eight_in_unit_rows():
     inside, outside = registered_allowed_set((REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8"))
-    assert len(inside) == 8, (
-        "GM-03 rows 1–8 must register the in-unit allowed set; parsed %d path(s): %s"
+    assert len(inside) == 10, (
+        "GM-03 in-unit rows must register the allowed set (8 feature paths + 2 absorbed "
+        "coaching skill-reference files); parsed %d path(s): %s"
         % (len(inside), sorted(inside))
     )
     assert outside, "GM-03 rows 9–18 register the out-of-unit new paths; parsed none"
