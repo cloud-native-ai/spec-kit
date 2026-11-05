@@ -521,3 +521,67 @@ stage_base: 9284c789
 
 **本轮未改任务内容与任务数、未改 FR/SC 语义、未改阶段序列、未改门禁判据或退出码、未勾选任何任务行、未 push；
 `coverage-baseline.txt` 是「记录」而非聚合处理状态，一条事实一个文件，双写者只会产生不同路径或零路径。**
+
+
+## analyze（round 2, 2026-11-05）
+
+```yaml
+stage: analyze
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1@stage_base=2b18485e — (a) 改动路径覆盖 0 命中；(b) 交付物契约测试 16 命中；(c) 夹具变更 0 命中"
+selected_paths:
+  - tests/contract/test_acceptance_premises.py
+  - tests/contract/test_acceptance_state_machine.py
+  - tests/contract/test_client_guard_sweep.py
+  - tests/contract/test_directory_governance.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_line_state_blocked.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_non_regression_064.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_sdd_diffusion.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+  - tests/contract/test_validation_carrier_contract.py
+  - tests/integration/test_expression_line_pilot.py
+  - tests/integration/test_sdd_loop_efficiency_runner.py
+sufficiency: "TB-05 的 (b) 子句对每个阶段无条件生效（交付面 = 本特性短名 `harness-triple-structure` + `skills/external/sdd-loop-driver` + docs 指针页），故本只读阶段也得到 16 个文件；(a) 与 (c) 为空是因为改动集不含可执行面、不含夹具"
+command: "python3 -m pytest -q <上列 16 个文件>"
+rc: 1
+passed: 295
+failed: 3
+new_failures: "not_computable —— implement 起点的 baseline 槽位尚未捕获，无比较基线；改为逐条归因：1 条由本特性制品引起（R2-01：features/084.md:31 的 `flow_class: execution` 命中 test_c2_no_project_side_classification_store），2 条属环境（test_e_a_stale_pin…：git 2.54.0 钉 vs 实测 2.43.7；test_c22_watch_target_hook_selftest：/home/agent/tmp 建目录被拒）"
+baseline_compare: "none available at this stage（baseline 槽位归 implement 起点；本阶段按 TB-06 只做定向集）"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-round2-targeted-run.txt
+```
+
+## Why `ran`（analyze round 2）
+
+派发简报预期本阶段记 `not-run-docs-only`（六项缩减字段），但 TB-05 的 **(b) 子句无条件生效**：它按「本特性短名 +
+交付面路径」选契约/集成测试，与本阶段是否改动可执行面无关。实测选择集非空（16 个文件），因此本阶段**运行**了定向集。
+先运行再记 `not-run-docs-only` 会与事实不符，故本行按 `status=ran` 记全字段（TB-06 的完整体例）。
+
+对照：round 1 的 E3 行记 `not-run-docs-only`，理由写作「targeted-set-v1 得空集」。按 (b) 子句，空集不是该阶段的
+真实选择结果；正确的表述应是「选中 16 个文件、因仅文档改动而未运行（TB-06）」。两行的**结论**（不消耗测试槽位、
+不产生基线比较）不变，此处只把**依据**订正为可复现的形式——本条是簿记精度问题，不是规格 finding。
+
+## Bases verified（analyze round 2）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 五份契约可解析 | `python3 scripts/python/clause_extract.py .specify/specs/084-harness-triple-structure/contracts/*.contract.md` | 五份全 `form=md-bold-closed`；12 + 13 + 16 + 10 + 8 = **59** 条款；旧 `DS/HC/SR/MB/DM-<dd>` 在规范性与清单文件零命中 | `analyze-report-round2-2026-11-05.md` § Rerun delta |
+| 条款/FR 覆盖（固定只读步，MUST NOT `--freeze`） | `python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure` | `claimed clauses 0`；`0 of 19` FRs cited；`59 beyond the frozen baseline`（513 names）；`status: uncovered`、78 error(s)、**exit 1**（判决态，不再是 `baseline-missing` 的 exit 2） | 报告 § Adjudication 1 |
+| 前置门 ×3 | `python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir … --stage {requirements,plan,tasks} --repo .` | 三门全 `decision=pass`、`errors=0`、`advisories=82`、`waived=0`，exit 0；三门 `summary.clauses=0`（`CLAUSE_DEF` 只认 2–4 字母 + 两位数字，`C-001` 抽不到 —— 框架侧缺口，077/079 同样命中） | 报告 § Adjudication 3 |
+| 需求/任务校验 | `validate-requirements.py` · `validate-tasks.py` | `0 error(s), 0 warning(s)`（282 行、25 定义行、14 STR）；tasks `PASS 0/0` | 本行即读数 |
+| 决策张力 | `validate-decision-tensions.py --spec … --json` | `status: ok`，六个 label 全 `pass`/count 0 | 本行即读数 |
+| 拆解门 | `decomposition-check.py --mode plan` / `--mode tasks` | `proceed`（fr_count 19 ≤ 30；task_count 31 ≤ 40，`reasons=[]`） | 本行即读数 |
+| 宪法对齐 | `plan.md` § Constitution Check vs `constitution.md` v1.15.0 | 18 行 / 18 条，名称逐条一致，0 缺失、0 不符 | 本行即读数 |
+| Feature 注册表 | `grep -c "^| 0" .specify/memory/features.md`；`grep "Total Features"` | 77 行 = `Total Features: 77`；084 行 `Planned`、条款短语 `C-001…C-059`；详情文件状态一致 | 本行即读数 |
+| 081 冻结面 | `git diff --stat 3ffeb26e -- shared/workflow/acceptance-hardening.md .specify/shared/workflow/acceptance-hardening.md tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py scripts/python/validate-requirements.py scripts/python/closure-acceptance-check.py` | 空输出 ⇒ 零 diff | 本行即读数 |
+| PLAN CONSTRAINT | `git diff --stat 9284c789..HEAD -- plan.md data-model.md contracts/ quickstart.md research.md feature-ref.md` | 空输出（tasks 修复未再碰 plan-owned）；`4b65517c..HEAD` 的差异恰为已授权的 plan 修复（9 文件 / +153 −115） | 本行即读数 |
+| 只读性 | `git status --porcelain` 验证波前后各一次 | 两次均 22 行，唯一 `M` 是 clarify 遗留的 `.specify/memory/session/…-081a.md` ⇒ 波次零写入 | 报告 § Validation wave |
+
+**本阶段未修改任何制品、未勾选任何任务行、未提交、未 push；R2-01／R2-02 两条 HIGH 的修复归属已点名
+（feature 详情文件 / plan-or-requirements 的裁定），修平动作留给对应命令。**

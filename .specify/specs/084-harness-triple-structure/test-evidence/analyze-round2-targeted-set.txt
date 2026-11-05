@@ -1,0 +1,21 @@
+# targeted-set-v1 selection (stage_base=2b18485e) — 084 analyze round 2
+# command: find tests/{unit,contract,integration,scenarios} -type f -name 'test_*.py' | LC_ALL=C sort, then (a) grep -lF for each changed path / module stem, (b) grep -lF for the feature short name 'harness-triple-structure' and the delivery-surface paths, (c) fixture refs
+# changed_paths input: git diff --name-only --diff-filter=ACMR 2b18485e..HEAD (empty) + git status --porcelain (memory/session, exec-quant, feedback, state spine)
+# (a) hits: 0   (c) hits: 0   (b) hits: 16
+# selected_paths[]:
+#   tests/contract/test_acceptance_premises.py
+#   tests/contract/test_acceptance_state_machine.py
+#   tests/contract/test_client_guard_sweep.py
+#   tests/contract/test_directory_governance.py
+#   tests/contract/test_expression_compatibility.py
+#   tests/contract/test_line_state_blocked.py
+#   tests/contract/test_loop_state_contract.py
+#   tests/contract/test_non_regression_064.py
+#   tests/contract/test_non_regression_070.py
+#   tests/contract/test_sdd_diffusion.py
+#   tests/contract/test_sdd_loop_driver_efficiency.py
+#   tests/contract/test_sdd_loop_driver_skill.py
+#   tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+#   tests/contract/test_validation_carrier_contract.py
+#   tests/integration/test_expression_line_pilot.py
+#   tests/integration/test_sdd_loop_efficiency_runner.py
