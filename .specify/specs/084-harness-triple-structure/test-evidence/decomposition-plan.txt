@@ -1,0 +1,8 @@
+# decomposition-check --mode plan (captured verbatim; attempt-2 reclose re-run)
+# command: python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/084-harness-triple-structure/requirements.md
+# cwd: /storage/project/cloud-native-ai/spec-kit
+# run_at: 2026-11-05T08:18:19Z
+# exit: 0    duration: 21 ms
+# --- stdout ---
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 19, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T08:18:19Z"}
+# --- stderr --- (empty)

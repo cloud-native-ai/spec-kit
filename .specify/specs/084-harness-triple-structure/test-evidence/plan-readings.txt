@@ -1,0 +1,85 @@
+# Plan-stage readings (084) — captured 2026-11-05T08:07:56Z
+
+## R1 interpreter + pytest pin
+$ python3 --version; python3 -m pytest --version
+Python 3.11.13
+pytest 9.2.0
+
+## R2 git
+$ git --version
+git version 2.43.7
+
+## R3 run-tests.sh resolved interpreter
+$ bash scripts/bash/run-tests.sh --collect-only -q tests/contract/test_requirements_checker.py 2>&1 | head -2
+# test runner: python3 -m pytest --collect-only -q tests/contract/test_requirements_checker.py
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+
+## R4 mirror baseline BEFORE any edit
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (409 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (62 files)
+rc=0
+
+## R5 specify-init route A: PATH console script (installed snapshot)
+$ specify init demo --ai claude --script sh --no-git --ignore-agent-tools   (in .specify/.tmp/084-plan-probe)
+rc=0 ; find demo/.specify/shared -name "*.md" | wc -l -> 55
+worktree shared md count -> 62 ; installed site-packages shared md count -> 55
+
+## R6 specify-init route B: source checkout on PYTHONPATH
+$ PYTHONPATH=<repo>/src python3 -c "from specify_cli import main; main()" init demo3 ...
+get_resource_path() -> /storage/project/cloud-native-ai/spec-kit
+rc=0 ; demo3/.specify/shared md count -> 62 (all five subdirs incl. definitions:, 12 files) ; nested subdir copied
+
+## R7 candidate screen S surface sizes (recomputed, not from a list)
+templates/commands/*.md                -> 27
+skills/{external,internal}/*/SKILL.md -> 53
+shared/workflow/*.md                  -> 19
+shared/definitions/*.md (NOT units)   -> 12
+
+## R8 batch-1 fact sources (file:line as measured)
+93:DEFAULT_THRESHOLD = 10
+23:SEVEN_STATES = (
+27:LANE_NAMES = ("session", "project", "assets", "runs", "feedback")
+96:CLASS_VALUES = (EXECUTION, EXPRESSION)
+97:BASIS_VALUES = ("behavior-oracle", "reader-oracle", "mixed-oracle")
+99:NEUTRAL_CATEGORIES = ("memory", "feedback", "evidence", "session")
+120:REQUIRED_LEDGER_COLUMNS = ("unit_id", CLASS_KEY, "basis", "neutral")
+FLOW_TYPE_VALUES = (
+    "technique-document",
+    "user-manual",
+    "reference",
+    "runbook",
+    "design-note",
+    FLOW_TYPE_NONE,
+)
+98:PATH_VALUES = ("final", "supporting")
+closure-acceptance-check.py inline tuple:         if value not in ("final", "supporting"):
+
+## R9 duplicate face reusable today
+$ python3 scripts/python/doc-consistency-check.py --action verify --faces duplicate --spec-dir <spec>
+checked_at: 2026-11-05T08:08:03Z
+faces: duplicate=pass
+files_scanned: 2
+findings: 0
+
+## R10 tests referencing the five gate scripts (SC-006 selection basis)
+$ grep -rlE "<five script names>" tests/ --include="*.py" | wc -l
+39
+
+## R11 collected counts on the 081 acceptance test files (pin for zero-new-failure)
+tests/contract/test_requirements_checker.py -> 40 tests collected
+tests/contract/test_checker_form.py -> 37 tests collected
+
+## R12 flow-class lookup (stage-level, read once)
+unit_id: spec:084-harness-triple-structure
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false

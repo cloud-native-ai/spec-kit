@@ -1,0 +1,44 @@
+Specify project setup
+  Project:      demo3
+  Working path: 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/084-plan-probe
+  Target path:  
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/084-plan-probe/demo3
+Selected AI assistant: claude
+Selected script type: sh
+   ok Check for local templates: found - using local templates
+   ok Using local templates: constitution.md copied
+   ok Using local templates: features.md copied
+   ok Using local templates: memory/knowledge copied
+   ok Using local templates: memory/session copied
+   ok Using local templates: no flat internal skills to migrate
+   ok Using local templates: skills (external) copied
+   ok Using local templates: skills (internal) copied
+   ok Using local templates: agents copied
+   ok Using local templates: shared copied
+   ok Using local templates: .claude/skills symlink ready
+   ok Using local templates: rendered 3 agents for claude; unmapped intents on 3
+agent(s)
+   ok Using local templates: no obsolete assets to remove
+   ok Prepare features directory: created 
+/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/084-plan-probe/demo3/.sp
+ecify/memory/features
+   ok Set script permissions recursively: 1 updated
+ skip Initialize git repository: --no-git flag
+   ok Configure VS Code: Updated for generic
+
+Project ready.
+Note: agents may store credentials in .claude/; consider adding it (or parts of 
+it) to .gitignore.
+
+Next steps
+  1. Go to the project folder: cd demo3
+  2. Claude Code commands are in .claude/commands/ and ignore rules are in 
+.claudeignore
+  3. Start with slash commands: /speckit.constitution -> /speckit.feature -> 
+/speckit.requirements -> /speckit.plan -> /speckit.tasks -> /speckit.implement
+  Optional: /speckit.agents /speckit.analyze /speckit.checklist /speckit.clarify
+/speckit.derive /speckit.docs /speckit.feedback /speckit.goal /speckit.history 
+/speckit.instructions /speckit.interview /speckit.research /speckit.review 
+/speckit.sanitize /speckit.session /speckit.skills /speckit.team /speckit.todo 
+/speckit.tools
