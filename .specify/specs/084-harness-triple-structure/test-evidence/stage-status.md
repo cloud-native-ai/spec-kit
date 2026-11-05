@@ -1778,3 +1778,36 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/t032-cla
 | 运行时不入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**`、`.specify/state/**` |
 | 既有脏文件未动 | `git status --short` 前后一致 | `M .specify/memory/session/20261102T231648Z-…-081a.md` 与既有未跟踪记录保持原样，未提交未还原 |
 | 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |
+
+## review（四段 + Acceptance Reality Check，2026-11-05）
+
+```yaml
+stage: review
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: "review 面无 pytest 槽位：本阶段只落两份评审记录与秒级确定性读数（closure checker、harness-triple-check coverage ×2、sync-mirrors --check、三处 git diff）；按派发简报的测试预算，全量 closure 槽位在 review 之后由驱动执行，本阶段不消费也不预支它"
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/review.md
+  - .specify/specs/084-harness-triple-structure/code-review.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/review-smoke-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+  - .specify/memory/register.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/review.md
+```
+
+## review 的六条读数（命令 + 实测）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| ARC（判定条件的主人） | `python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/084-harness-triple-structure --json` | `verdict: block`（exit 1）；`claimed_status: Implemented`；`final_path` = pass 2／blocked 0／deferred 0／partial 0／fail 0／unknown 0／total 2；`completion_conditions.smoke_record_pass: false`；`reasons[0].code: status-claims-implemented-but-blocked` |
+| smoke 三件（复跑，定向） | `python3 scripts/python/harness-triple-check.py --action coverage` ×2 + `cmp` + `sha256sum` | 两次 exit 0、逐字节一致、`sha256 f9cd934a…3473`；`candidates 83 / pending 0 / unclassified 0 / findings 0`；证据 `test-evidence/review-smoke-2026-11-05.txt` |
+| 镜像 | `python3 scripts/python/sync-mirrors.py --check` | exit 0，六对全 `ok`（templates 22／skills-external 409／skills-internal 138／agents 3／scripts 121／shared 89） |
+| 非目标 | `git diff --stat 4b65517c -- pyproject.toml`；`git diff --stat 4b65517c -- tests/contract/test_requirements_checker.py tests/contract/test_checker_form.py` | 两条均空输出 |
+| 代码段回执 | `git-delta-review.sh receipt --review-file …/code-review.md --spec …` | `changed 276 / judged 39 / skipped 237 / gap 0`；`renderer: text`；`segment: blocked`（2 条 `[blocking]`）；`report --summary` exit 1 = 门禁拒绝 |
+| 排除记录面 | `grep -c "^- unit:" shared/declarations/exclusions/*.yaml` | `no-harness-asset` 32 + `no-machine-fact` 38 = **70** 行（与 `verification.md` SC-002 的 70 一致；SC-004 的 12 是 T032 之前的陈旧读数，见 `review.md` F10） |
+
+## review 的三处披露
+
+1. **Feature 状态未翻转，这是结论而不是省略**：ARC 的 verdict 是 `block`（条件④ smoke 记录的机器可读形态不成立），且当前 `code-review.md` 含 2 条 `blocking`。两条路径各自独立拒绝 `Implemented → Ready for Review`，故 `features.md` 与 `features/084.md` 保持 `Implemented`，本阶段不写回任何状态值，也不降级（refusal 不是 downgrade）。
+2. **P0 的验证路径较弱且已披露**：本拓扑无子代理派发能力，三条 P0 按 `review-sdd-process` § 5 的 subagent-unavailable 回退走「直接重读」，每条在报告里带 `(validated: direct re-read, subagent unavailable)`。
+3. **代码段回执的跳过不是遗漏**：`judged 39 / skipped 237` 是按类声明的（`.specify/*` 与四个工具命令副本 = `generated`（已由 `sync-mirrors --check` 证明逐字节同源）；`tests/*`、四个未逐行读完的引擎、以及 `*.md` = 各自法定理由）。首轮 `receipt` 默认把 276 件全记 `reviewed`，那是工具默认值而非本轮的读数，故按实际读过的面重写一次；改写动作本身记在此处，不隐藏。
