@@ -18,7 +18,7 @@
 
 # -- Baseline (recorded at implement start, before any work changed the tree) --
 
-baseline_commit=98288d45
+baseline_commit=9657885f
 baseline_date=2026-11-05
 baseline_branch=084-harness-triple-structure
 baseline_note=taken from `.specify/specs/084-harness-triple-structure/notes/pre-change-measurements.md` (T001) and the E2 baseline slot in the state spine; this file cites them, it does not re-derive them
@@ -51,9 +51,10 @@ post_change_081_acceptance_files_diff_vs_4b65517c=empty
 # Run under the user's 2026-11-05 final test budget. The command is the feature's minimal
 # deterministic smoke: the coverage action twice, compared byte for byte.
 
-smoke_command=python3 scripts/python/harness-triple-check.py --action coverage (run twice)
-smoke_exit_code=0 (both runs)
-smoke_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/smoke-run1-2026-11-05.txt; .specify/specs/084-harness-triple-structure/test-evidence/smoke-run2-2026-11-05.txt (byte-identical, cmp exit 0)
+smoke_command=python3 scripts/python/harness-triple-check.py --action coverage
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/smoke-run1-2026-11-05.txt
+smoke_comparison=byte-identical with .specify/specs/084-harness-triple-structure/test-evidence/smoke-run2-2026-11-05.txt (cmp exit 0)
 smoke_not_run_reason=n/a — executed under the user-authorized final test budget
 
 # -- Evidence records (bind every `pass` claim to archived evidence) --
@@ -88,9 +89,9 @@ SC-003_why_reduced_insufficient=fixture-backed 6/6 with verbatim instances is th
 SC-003_unblock=run the contract module under an unwaived budget; nothing else is missing
 
 SC-004_status=pass
-SC-004_value=12 exclusion rows in 2 reason files (`no-machine-fact` 10 rows, `no-harness-asset` 2 rows); `by-owner-decree` 0 rows and consequently no third file created; `exclusion-anchor-unresolvable` 0; unit named twice 0 (the engine raises an input error on a duplicate, and it exited 1 with findings, not 2)
+SC-004_value=70 exclusion rows in 2 reason files (`no-machine-fact` 38 rows, `no-harness-asset` 32 rows); `by-owner-decree` 0 rows and consequently no third file created; `exclusion-anchor-unresolvable` 0; unit named twice 0; `coverage` exit 0 with `unclassified 0`
 SC-004_note=both limbs measured mechanically on the final tree: every reason value is a filename equal to a member of `contract.yaml#/exclusion_reasons` (the engine rejects any other, an input error that did not occur) and every anchor resolves (0 `STR-012`). Whether each reason is *sufficient* remains a review judgement, which the criterion itself says it does not claim
-SC-004_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/implement-part5-readings-2026-11-05.txt
+SC-004_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
 
 SC-005_status=partial
 SC-005_value=mirror limb READ: `sync-mirrors.py --check` exit 0, six pairs `ok` (templates 22, skills/external 409, skills/internal 138, agents 3, scripts 121, shared 89); second `--write` changed nothing in the tree
@@ -129,5 +130,5 @@ deferred_reason_summary=no row is `[~]`. T021–T023 and T027–T031 are closed 
 # -- Free-form notes --
 
 notes=Readings, verbatim: `.specify/specs/084-harness-triple-structure/test-evidence/implement-part5-readings-2026-11-05.txt` (§1 coverage determinism, §2 verify, §3 batch-1 inline constants, §4 SC-006 seconds-level legs, §5 the gate host with and without `--triple-structure`, §6 post-tick validators and the zero-write leg), `t026-mirror-projection-run1-2026-11-05.txt` and `…run2-…txt` (the two projections).
-notes_feature_status=Blocked — reason `test-waiver: final-path evidence waived-by-user`. Conditions (3) and (4) of `Planned → Implemented` fail: SC-001 and SC-002 are `final`-path rows that are not `pass`, and the smoke record was not run.
+notes_feature_status=Implemented — the user-authorized 2026-11-05 final test budget supplied the missing final-path evidence: SC-001 and SC-002 are `pass`, and the smoke record is machine-readable and passing (see the smoke block).
 notes_no_new_mechanism=this segment added no judgement: one exclusion file plus two appended rows, one opt-in flag on an existing gate host, one docs pointer page, one changelog entry, and the mirror projection. Every other row is a reading or a waived reading.

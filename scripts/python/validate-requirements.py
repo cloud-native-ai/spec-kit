@@ -96,7 +96,8 @@ HEADING_RE = re.compile(r"^#{1,6}\s")
 PATH_MARKER_RE = re.compile(r"\*\*Path\*\*")
 PATH_TOKEN_RE = re.compile(r"\*\*Path\*\*\s*:\s*(\S+)\s*$")
 FLOW_CLASS_RE = re.compile(r"^\*\*Flow Class\*\*\s*:\s*(\S+)\s*$")
-EXECUTION_CLASS = "execution"
+# `EXECUTION_CLASS` is derived below from the `flow-class-classes` declaration; the literal that
+# used to sit here was the second copy of the class axis (review 084 blocking #1).
 
 #: Feature 084, batch 1 row 9: the `Path` closed set is a declaration-layer fact
 #: (`shared/declarations/facts/success-criterion-path-values.yaml`). This checker carries no copy of
@@ -120,6 +121,24 @@ def _declared_path_values():
 
 
 PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+PASS_PATH = PATH_VALUES[0] if PATH_VALUES else "final"
+
+
+def _declared_flow_classes():
+    """`(values, label)` for the `flow-class-classes` closed set; `((), <STR-014>)` when unreadable."""
+    try:
+        body = declaration_reader.load_fact(
+            declaration_reader.find_repo(Path(__file__).resolve()), "flow-class-classes")["body"]
+        values = body.get("statement")
+        if not isinstance(values, list) or not values:
+            raise ValueError("statement is not a non-empty sequence")
+        return tuple(str(value) for value in values), None
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+        return (), declaration_reader.absent_label("flow-class-classes")
+
+
+FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
+EXECUTION_CLASS = FLOW_CLASSES[0] if FLOW_CLASSES else "execution"
 
 
 class DomainUnavailable(Exception):
@@ -392,7 +411,7 @@ def check_path_marker(lines, defs, name):
                 "`supporting`); the value decides whether the criterion can refuse a verdict, so "
                 "a third value has no meaning to fall back on" % (label, name, value)))
             continue
-        if value == "final":
+        if value == PASS_PATH:
             has_final = True
     if sc_rows and parsed_cleanly and not has_final and _flow_class(lines) == EXECUTION_CLASS:
         findings.append(Finding(

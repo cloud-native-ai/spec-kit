@@ -62,6 +62,9 @@
     smoke_command        one shell command, verbatim; end-to-end over the feature's main flow, not the whole suite
     smoke_exit_code      0 for a feature claiming `Implemented`
     smoke_evidence_path  repo-relative path to a file that MUST exist and be non-empty
+    smoke_comparison     optional: a repo-relative comparison transcript (e.g. the second run's evidence)
+                         when the smoke is a determinism comparison; the three fields above MUST carry
+                         no annotation — a value the checker parses is a literal
   A second `smoke_command=` line is a defect, not a choice. A feature that cannot run its smoke is `Blocked`:
   "needs a real cluster" or "needs real network" is not an exemption — either the command is made deterministic
   on a local fixture, or the feature is blocked.
@@ -100,6 +103,7 @@ post_change_[METRIC_KEY_2]=[VALUE]
 smoke_command=[ONE_SHELL_COMMAND_VERBATIM]
 smoke_exit_code=[0]
 smoke_evidence_path=[REPO_RELATIVE_EVIDENCE_FILE]
+smoke_comparison=[OPTIONAL_REPO_RELATIVE_COMPARISON]
 
 # -- Evidence records (bind every `pass` claim to archived evidence) --
 # One record per evaluation sample, block shape mirroring the SC blocks below.

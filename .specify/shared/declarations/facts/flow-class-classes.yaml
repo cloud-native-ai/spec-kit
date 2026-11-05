@@ -14,6 +14,8 @@ statement:
   - expression
 consumers:
   - scripts/python/flow-class-check.py
+  - scripts/python/validate-requirements.py
+  - skills/external/sdd-loop-driver/scripts/pre-analyze-check.py
 former_carriers:
   - shared/definitions/flow-class-definitions.md
 note: "Order is part of the value: member 0 is the default class for an undeclared unit (FR-009's default `execution`), so the declaration is an ordered closed set and the engine unpacks it instead of re-spelling the two names."

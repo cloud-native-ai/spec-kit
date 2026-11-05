@@ -170,6 +170,23 @@ def declared_mapping(slug):
     return dict(values)
 
 
+def declared_sequence(slug):
+    """`(tuple(values), None)` for one fact declaration; `((), None)` when unreadable and labelled."""
+    if DECLARATIONS is None:
+        label_absent(slug)
+        return (), None
+    try:
+        values = DECLARATIONS.load_fact(
+            DECLARATIONS.find_repo(__file__), slug)["body"].get("statement")
+    except (DECLARATIONS.DeclarationError, TypeError, ValueError):
+        label_absent(slug)
+        return (), None
+    if not isinstance(values, list) or not values:
+        label_absent(slug)
+        return (), None
+    return tuple(str(value) for value in values), None
+
+
 GATE_ROSTER = declared_mapping(GATE_ROSTER_FACT)
 
 #: The declared check-name set, looked up by the key a call site names.
@@ -329,7 +346,12 @@ ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)", "—", "–", "-"
 DISPOSITIONS = ("resolved", "inherited", "not-applicable")
 #: The closed `Status` domain of `§ Execution Premises`.
 PREMISE_STATUSES = ("verified", "unverified", "falsified")
-FLOW_CLASSES = ("execution", "expression")
+# Feature 084: the class axis is owned by `flow-class-classes`; the literal below is the
+# FR-012 compatibility value used only when the declaration layer is unreadable (labelled on
+# stderr by `declared_sequence`). A readable declaration is the authority.
+FLOW_CLASSES, _ = declared_sequence("flow-class-classes")
+if not FLOW_CLASSES:
+    FLOW_CLASSES = ("execution", "expression")
 
 
 class InputError(Exception):

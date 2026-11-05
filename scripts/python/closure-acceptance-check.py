@@ -119,6 +119,10 @@ def _declared_path_values():
 
 
 PATH_VALUES, PATH_VALUES_LABEL = _declared_path_values()
+# The pass-path member is derived from the declaration (member 0), never re-spelled at the branch
+# sites (review 084 blocking #2). The literal is the FR-012 compatibility value only when the
+# declaration is unreadable; the labelled `PATH_VALUES_LABEL` is emitted in that case.
+PASS_PATH = PATH_VALUES[0] if PATH_VALUES else "final"
 
 # --- the `ARC verdict mapping` (batch 2; owner: the declaration layer) ------------------------ #
 # Feature 084 moved the `final_path` record's key set and the verdict's value set out of this
@@ -913,7 +917,7 @@ def final_path_counts(criteria, statuses):
     counts = {bucket: 0 for bucket in FINAL_PATH_BUCKETS}
     counts[FINAL_PATH_TOTAL_KEY] = 0
     for sc_id, path in criteria.items():
-        if path != "final":
+        if path != PASS_PATH:
             continue
         counts[FINAL_PATH_TOTAL_KEY] += 1
         value = _first_status(statuses, sc_id)
@@ -936,7 +940,7 @@ def final_path_reasons(flow_class, criteria, statuses, counts):
     return [
         _reason(R_FINAL_PATH_NOT_PASS, sc_id)
         for sc_id in sorted(criteria)
-        if criteria[sc_id] == "final" and _first_status(statuses, sc_id) != FINAL_PATH_PASS_BUCKET
+        if criteria[sc_id] == PASS_PATH and _first_status(statuses, sc_id) != FINAL_PATH_PASS_BUCKET
     ]
 
 
@@ -1344,7 +1348,7 @@ def completion_conditions(criteria, statuses, tasks, smoke_passes, flow_class):
     if flow_class == "execution":
         final_all_pass = all(
             _first_status(statuses, sc_id) == "pass"
-            for sc_id, path in criteria.items() if path == "final"
+            for sc_id, path in criteria.items() if path == PASS_PATH
         )
     return {
         "no_open_rows": no_open_rows,
