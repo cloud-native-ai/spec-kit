@@ -173,7 +173,7 @@ Single project at repository root. This feature is a **doc-feature** (`plan.md` 
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] [blockedBy: T005,T019] Prove the command surface is untouched and record it — run `python3 scripts/python/regen-command-copies.py --check`, confirm zero changed copies across the four per-tool trees, confirm `templates/commands/skills.md` is byte-identical to the baseline blob, and record both readings with their commands in `.specify/specs/082-mechanism-policy-separation/notes/pre-change-measurements.md` under a "command surface" heading. If the template must change, stop and report rather than editing it
+- [x] T022 [US4] [blockedBy: T005,T019] Prove the command surface is untouched and record it — run `python3 scripts/python/regen-command-copies.py --check`, confirm zero changed copies across the four per-tool trees, confirm `templates/commands/skills.md` is byte-identical to the baseline blob, and record both readings with their commands in `.specify/specs/082-mechanism-policy-separation/notes/pre-change-measurements.md` under a "command surface" heading. If the template must change, stop and report rather than editing it
 
 **Checkpoint**: US4 is independently observable — a third party reproduces the membership verdict and the command surface proves itself unchanged.
 

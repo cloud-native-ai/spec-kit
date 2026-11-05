@@ -159,6 +159,49 @@ merge-skills / coaching-skills) + one updated existing key (run-skills), each wi
 naming its FR group and markers drawn from that skill's own newly added literals. No
 `references/` file is registered — the frozen list does not cover them.
 
+## Command surface (T022) — the command templates are untouched
+
+Captured 2026-11-05 during implement Part 3B, at continuation baseline `02bef714`.
+The three readings below are taken in the same run; each carries its own command line so
+that a third party can recompute it without reading this file's prose.
+
+```
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+```
+
+Zero changed copies across the four per-tool trees that exist in this repository
+(`.claude/commands`, `.github/prompts`, `.qoder/commands`, `.opencode/command` — 27
+`speckit.*` copies each). `--check` writes nothing (its `--help` states "report drift,
+write nothing"); it reports drift by exit status, and the status is 0.
+
+```
+$ git rev-parse 3ffeb26e:templates/commands/skills.md
+53159b7bb27faf6e8eace2feee6eb423821e338a
+$ git hash-object templates/commands/skills.md
+53159b7bb27faf6e8eace2feee6eb423821e338a
+```
+
+`templates/commands/skills.md` is byte-identical to its `3ffeb26e` blob — the blob hash,
+not a textual diff, is the reading.
+
+```
+$ git ls-tree -r --name-only 3ffeb26e -- templates/commands/ | wc -l    # denominator
+27
+$ <per-path loop> git rev-parse 3ffeb26e:$p vs git hash-object $p       # every path
+(no CHANGED lines)
+$ git diff --name-status 3ffeb26e..HEAD -- templates/commands/
+(no output)
+```
+
+All 27 command templates are byte-identical to the baseline, and the history since
+`3ffeb26e` contains no change to `templates/commands/` at all. T037 re-takes the same
+two readings after the rewrite set, in the same shape, so the two are comparable.
+
+**Consequence recorded for T022's stop clause**: the template did not need to change, so
+the task's "stop and report" branch did not fire.
+
 ## Why this reading set is stable
 
 Three of the six readings changed between plan and now: (a) `skills-external 409 → 413` and
