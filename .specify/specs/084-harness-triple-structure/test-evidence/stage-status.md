@@ -32,7 +32,12 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/validate
 | 规格结构 | `python3 .specify/scripts/python/validate-requirements.py .specify/specs/084-harness-triple-structure/requirements.md` | `status: ok`，六判项全 pass，`0 error(s), 0 warning(s)`，exit 0 | `test-evidence/validate-requirements.txt` |
 | 类别解析 | `python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:084-harness-triple-structure"` | `flow_class: execution` / `flow_type: -` / `source: declaration` / exit 0 | `test-evidence/flow-class-lookup.txt` |
 
-**未运行项（如实登记，不折算为通过）**：本阶段未运行 `decomposition-check.py`
-（该门在本仓属 plan 阶段口径）、未运行 `pre-analyze-check.py --stage requirements`
-（其宿主 `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` 由 analyze /
-review 阶段调用）。两者留待后续阶段，MUST NOT 被读作已通过。
+**驱动者 U4 复跑（2026-11-05 07:53 UTC；独立于阶段执行者）**：
+
+- `decomposition-check.py --mode plan --requirements .specify/specs/084-harness-triple-structure/requirements.md`
+  → `decision=proceed`（`fr_count=19`，上限 30），exit 0。
+- `pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage requirements --repo <repo>`
+  → 首次运行 exit 2（`requirements.md carries no § Runtime Stack & Dependency Ownership`）；
+  驱动者补写该强制节（`execution` 类特性必填，三行：RS-001 CPython / RS-002 pytest / RS-003 `specify init`）后复跑
+  → `decision=pass`，`errors=0`，`advisories=12`（全部为 requirements 阶段尚未创建的计划交付路径，属预期），exit 0。
+- 修复提交：`fix(084): add the mandatory runtime stack section and refresh the evidence`（独立于阶段提交 `a94c3945`）。

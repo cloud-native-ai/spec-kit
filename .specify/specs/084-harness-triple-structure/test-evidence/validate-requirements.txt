@@ -7,6 +7,6 @@ status: ok
   [marker-count] pass (0)
   [dup-id] pass (0)
   [path-marker] pass (0)
-scanned: 240 lines, 25 definition rows, 14 shared strings
+scanned: 250 lines, 25 definition rows, 14 shared strings
 0 error(s), 0 warning(s)
 exit: 0

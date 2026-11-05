@@ -145,6 +145,16 @@
 - **流程单元 (Flow Unit)**：候选屏幕 S 的判定对象，以 markdown 载体路径为身份（命令模板、技能 SKILL.md、工作流步骤文档）。关系：单元的处置由其事实声明与排除记录共同派生，MUST NOT 另行存储。
 - **三层完整性状态 (Layer Completeness State)**：派生量，二值。不是存储的事实，MUST NOT 被写成手工字段。
 
+### Runtime Stack & Dependency Ownership
+
+本特性自身的运行时栈与依赖所有权表（`execution` 类必填；`Premises` 指向 plan 阶段将定义的执行前提）。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | Python 3 解释器（运行 stdlib-only 共享读取入口与 `harness-triple-check.py`） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明；新脚本 stdlib-only，无第三方 import） | `pyproject.toml` | 共享读取入口与 checker 在 `>=3.8` 解释器上通过正／负夹具；静态 import 清单为空 | FR-009, FR-016 | EP-001 |
+| RS-002 | pytest（契约／单元测试运行器） | signed-contract | pytest 上游（本仓只消费） | `pytest 9.2.0`（2026-11-05 实测 `python3 -m pytest --version`；基线比较前须重新核对） | `scripts/bash/run-tests.sh` | `tests/contract/test_harness_triple_structure.py` 在基线／closure 同一 pin 上全绿，既有测试零新增失败 | FR-019 | EP-001 |
+| RS-003 | `specify init`（把 `shared/declarations/` 分发到客户项目） | in-scope | 本仓 `src/` 与 `scripts/` | 仓内 commit（本特性同一提交） | `src/specify_cli/__init__.py` | 在临时夹具执行 `specify init` 后 `.specify/shared/declarations/` 存在，且 `harness-triple-check.py --action lookup` 可读取 | FR-013 | EP-001 |
+
 ## Initial Scope Adjudication（日期基线，不是 owner）
 
 **本表的性质**：这是 requirements 阶段按 FR-002 两条判据对代表单元作出的**逐条裁决记录**（dated record）。它 MUST NOT 充当范围的 owner——owner 是 FR-002 的判据加 FR-005 的声明形态，完整范围由 [[STR-003]] 在 plan 阶段首次运行 `--action coverage` 重算并落在证据目录。本表的作用是证明判据可判：每一行都指到仓内证据，没有一个单元落在「相关」「等等」之下。
