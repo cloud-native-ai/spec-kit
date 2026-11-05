@@ -3,8 +3,8 @@
 - **line_id**: 082-self-explanatory-integration
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
-- **current_stage**: implement
-- **part_scope**: T048-T053 (part 10a of 10; the Completion Gate, the Feature status flip and the implement wrap-up are part 10b)
+- **current_stage**: implement (complete — Feature 082 `Implemented`; next stage is driver-dispatched review)
+- **part_scope**: T048-T053 (part 10b of 10 — final; the Completion Gate, `verification.md`, GATE-4, the Feature status flip and the implement wrap-up)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -593,3 +593,54 @@ between readings, not a single consistent correction):
   of them.
 - **stage_commits** (append): … → 2a525047 (implement part 8) → 32fc3e70 (implement part 9) →
   **7037138b (implement part 10a)**
+
+## Part 10b record（implement T048-T053 最终收尾，2026-11-05）
+
+- **part_scope**: `T048-T053` (part 10b of 10) — **done**; the implement stage is complete
+- **checkpoint**: `part10b` — commit `1f6ab51c` (9 files, 551+/6-); stage_base `c37129f1`
+- **new artifacts**: `.specify/specs/082-self-explanatory-integration/verification.md` (nine SC
+  blocks, the five-field ladder on SC-006, the smoke triple, ten evidence records, the
+  `RS-004_joint_acceptance` row, `deferred_tasks=` empty); `test-evidence/smoke-20261105.txt` (the
+  smoke record: this run's command, two full pytest outputs with exit codes and invocation
+  timestamps); `test-evidence/implement-part-10b.md` (E3 row + verbatim command output + the four
+  gate rows)
+- **edited surfaces**: `features.md` 082 status `Planned → Implemented` (+ `**Last Updated**` to
+  2026-11-05; `**Total Features**: 77` unchanged — no feature added); `features/082.md`
+  `**Status**: Implemented` + the § Status Tracking current-position marker moved to `Implemented` +
+  a `2026-11-05 implement` § Latest Review entry; `tasks.md` `**DoD Status**: pending → done`
+- **smoke (two consecutive runs, one command)**:
+  `python3 -m pytest tests/contract/test_self_explanatory_constitution.py
+  tests/contract/test_instructions_section_propagation.py
+  tests/contract/test_self_explanatory_distribution.py
+  tests/contract/test_self_explanatory_glossary.py -q` → **42 passed rc 0** and **42 passed rc 0**;
+  the capture writes nothing to stderr; the `smoke_command=` line is the first of the two token
+  vectors the path-level parser accepts (the literal path is the read-only fifth token), and the
+  committed record presents the command first with both outputs verbatim
+- **evidence binding** (gate-implement-evidence-binding, template-derived checker):
+  **9 green / 0 red / 0 unverified** — SC-001…SC-005, SC-007, SC-008, SC-009 and the smoke sample
+  all resolve, are non-empty and hash-match; SC-006 is `partial` and carries no binding duty
+- **GATE-4**: **PASS** — every `final`-path SC is `pass` (final_path pass 4 / total 4 / unknown 0)
+  and the smoke triple is present with a 1.3 KB non-empty evidence file; read from the checker's
+  payload (`smoke.evidence_exists: true`, `exit_code: 0`, `records: 1`), not from prose
+- **GATE-1 / GATE-2 / GATE-3**: **PASS**, as executed in part 10a and re-read here; every gate
+  premise re-measured true on this tree — **no row is void**
+- **closure verdict**: `python3 scripts/python/closure-acceptance-check.py --spec-dir
+  .specify/specs/082-self-explanatory-integration --repo . --json` → **`accept`**, `reasons: []`,
+  four completion conditions all `true`, `tasks` closed 53 / open 0 / in-progress 0 / deferred 0
+- **feature status**: `Planned → Implemented` on both status surfaces; the flip was landed **after**
+  the `accept` reading, so `status-claims-implemented-but-blocked` could not fire and the entry does
+  not exceed its evidence
+- **wrap-up pointers**: run-determination
+  `.specify/memory/session/20261105T063813Z-run-determination-speckit-implement-r20261105t032102z-c139.md`;
+  exec-quant `.specify/memory/exec-quant/records/20261105T063815894632Z-d9e6df67.json`; feedback
+  `.specify/memory/feedback/20261105T063820Z-speckit-implement.md`
+- **SC-006 disclosure**: recorded `partial` with the full five-field ladder rather than rounded to
+  `pass` (it is a supporting-path criterion, so it cannot refuse the verdict) — M-1…M-5 have
+  captured non-zero red, M-6 is green in-suite, and the real-tree group is uniformly green only by
+  excluding the inherited EP-003 red
+- **last_verdict**: implement **complete** (`1f6ab51c`). Closure `accept`; GATE-1…GATE-4 PASS; smoke
+  42/42 twice; DoD `done`; `PLAN-EDIT: none`; no review, no merge, no push
+- **next_step**: driver-dispatched `/speckit.review` (the Feature is `Implemented`, not
+  `Ready for Review` — that transition belongs to review)
+- **stage_commits** (append): … → 32fc3e70 (implement part 9) → 7037138b (implement part 10a) →
+  **1f6ab51c (implement part 10b, final)**
