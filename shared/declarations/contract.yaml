@@ -1,6 +1,6 @@
 # Declaration layer contract — the single owner of this feature's machine-read value domains.
 #
-# Feature 084 (harness triple structure). Every value below appears ONCE in the repository:
+# Harness triple structure. Every value below appears ONCE in the repository:
 # markdown owners reference this file, engines read it through scripts/python/declaration_reader.py.
 # A second copy of any of these values is a defect, not a convenience (contract C-002).
 #
