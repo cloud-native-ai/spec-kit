@@ -792,3 +792,195 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-
 （MEDIUM/LOW 跳过校验），零发现下限由「四条单行覆盖的 FR 逐条重读 + 三行抽样」履行；三条 MEDIUM 与两条 LOW 均为
 一句话级措辞/计数精度修复，落在非判据面，不阻断 `/speckit.implement`。完整判定、闭环读数与证据指针见
 `analyze-report-round3-2026-11-05.md`。
+
+## implement（Part 1, T007 收口，2026-11-05）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1@stage_base=fa7ce0f1 —— (a) 两条新增源码路径（`scripts/python/declaration_reader.py`、`scripts/python/harness-triple-check.py`）直接命中，且被触碰文档的模块 stem 把 92 个候选带入（其中一个带来真读数：`test_c57`）；(b) 交付面 16 个文件（特性短名 / `skills/external/sdd-loop-driver` / docs 指针页）；(c) 本段修改的 `tests/contract/test_harness_triple_structure.py` 自身。选择程序及其输出逐字记录在 `test-evidence/implement-part1-targeted-set.txt`"
+changed_paths[]:
+  - .specify/memory/exec-quant/records/20261105T075132768628Z-cf37e921.json
+  - .specify/memory/exec-quant/records/20261105T080159336037Z-7f8a3419.json
+  - .specify/memory/exec-quant/records/20261105T082009374970Z-a1347a99.json
+  - .specify/memory/exec-quant/records/20261105T083525969720Z-0c4b8437.json
+  - .specify/memory/exec-quant/records/20261105T084309278446Z-6ee2f63f.json
+  - .specify/memory/exec-quant/records/20261105T085419852858Z-eb6daa1e.json
+  - .specify/memory/exec-quant/records/20261105T094511658251Z-1d71de8a.json
+  - .specify/memory/exec-quant/records/20261105T094750637884Z-90e0cae3.json
+  - .specify/memory/exec-quant/records/20261105T111724911488Z-17c66632.json
+  - .specify/memory/feedback/20261105T075137Z-speckit-requirements.md
+  - .specify/memory/feedback/20261105T080203Z-speckit-clarify.md
+  - .specify/memory/feedback/20261105T082017Z-speckit-plan.md
+  - .specify/memory/feedback/20261105T083530Z-speckit-tasks.md
+  - .specify/memory/feedback/20261105T084312Z-speckit-checklist.md
+  - .specify/memory/feedback/20261105T085423Z-speckit-analyze.md
+  - .specify/memory/feedback/20261105T094516Z-speckit-analyze.md
+  - .specify/memory/feedback/20261105T094753Z-skill-sdd-loop-driver.md
+  - .specify/memory/feedback/20261105T111730Z-speckit-analyze.md
+  - .specify/memory/session/20261102T231648Z-run-determination-speckit-clarify-r20261102t225758z-081a.md
+  - .specify/memory/session/20261105T075127Z-run-determination-speckit-requirements-r20261105t074027z-084.md
+  - .specify/memory/session/20261105T080146Z-run-determination-speckit-clarify-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T082004Z-run-determination-speckit-plan-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T083523Z-run-determination-speckit-tasks-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T084306Z-run-determination-speckit-checklist-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T085413Z-run-determination-speckit-analyze-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T094508Z-run-determination-speckit-analyze-r20261105t074027z-084a-r2.md
+  - .specify/memory/session/20261105T094745Z-run-determination-skill-sdd-loop-driver-r20261105t074027z-08.md
+  - .specify/memory/session/20261105T111722Z-run-determination-speckit-analyze-r20261105t074027z-084a-r3.md
+  - .specify/specs/084-harness-triple-structure/tasks.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part1-attempt1-targeted-failed-names.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part1-t007-closeout-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part1-targeted-run-2026-11-05.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/implement-part1-targeted-set.txt
+  - .specify/state/084-harness-triple-structure.md
+  - scripts/python/declaration_reader.py
+  - scripts/python/harness-triple-check.py
+  - tests/contract/test_harness_triple_structure.py
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+selected_paths:
+  - tests/contract/test_acceptance_premises.py
+  - tests/contract/test_acceptance_review_composition.py
+  - tests/contract/test_acceptance_state_machine.py
+  - tests/contract/test_checker_form.py
+  - tests/contract/test_clarify_semantic_completeness.py
+  - tests/contract/test_clause_coverage.py
+  - tests/contract/test_cleanup_obsolete_assets.py
+  - tests/contract/test_client_guard_sweep.py
+  - tests/contract/test_closure_acceptance_check.py
+  - tests/contract/test_coaching_run_contract.py
+  - tests/contract/test_decision_tension_contract.py
+  - tests/contract/test_delegation_classes.py
+  - tests/contract/test_directory_governance.py
+  - tests/contract/test_doc_consistency_checker.py
+  - tests/contract/test_docs_command_template.py
+  - tests/contract/test_docs_gate_driver.py
+  - tests/contract/test_docs_step_injection.py
+  - tests/contract/test_evidence_binding_contract.py
+  - tests/contract/test_exec_quant_aggregate.py
+  - tests/contract/test_exec_quant_channel_boundary.py
+  - tests/contract/test_exec_quant_channel_compat.py
+  - tests/contract/test_exec_quant_engine.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_expression_faces.py
+  - tests/contract/test_expression_gate_wiring.py
+  - tests/contract/test_expression_gates_doc.py
+  - tests/contract/test_fast_fail_discipline.py
+  - tests/contract/test_feedback_entry_schema.py
+  - tests/contract/test_feedback_utils_cli.py
+  - tests/contract/test_flow_class_ledger.py
+  - tests/contract/test_gate_wiring_081.py
+  - tests/contract/test_glossary_mechanism.py
+  - tests/contract/test_green_point_claim.py
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_humanize_command_surface.py
+  - tests/contract/test_isomorphism_map.py
+  - tests/contract/test_ledger_reconciliation.py
+  - tests/contract/test_line_state_blocked.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_measurement_instruments.py
+  - tests/contract/test_migration_distribution.py
+  - tests/contract/test_nested_sdd_invocation.py
+  - tests/contract/test_neutrality_budget.py
+  - tests/contract/test_non_regression_064.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_objective_analysis_gate.py
+  - tests/contract/test_premise_carrier_contract.py
+  - tests/contract/test_probe_nonentity_catalog.py
+  - tests/contract/test_review_code_composition.py
+  - tests/contract/test_run_skills_wiring.py
+  - tests/contract/test_sdd_diffusion.py
+  - tests/contract/test_sdd_invocation_governance.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_gates.py
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/contract/test_sdd_loop_driver_wp_coordination.py
+  - tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+  - tests/contract/test_self_improvement_conformance.py
+  - tests/contract/test_skill_layer_visibility_guards.py
+  - tests/contract/test_specify_script_paths.py
+  - tests/contract/test_stage_class_wiring.py
+  - tests/contract/test_status_gate_owner.py
+  - tests/contract/test_summarize_project_prompt_assets.py
+  - tests/contract/test_token_efficiency_feedback.py
+  - tests/contract/test_trigger_engine.py
+  - tests/contract/test_trigger_seed_derivation.py
+  - tests/contract/test_validate_tasks_parallel_safety.py
+  - tests/contract/test_validation_carrier_contract.py
+  - tests/integration/test_docs_command_scenarios.py
+  - tests/integration/test_expression_line_pilot.py
+  - tests/integration/test_feedback_exec_quant_channel.py
+  - tests/integration/test_hugo_scaffold_scenarios.py
+  - tests/integration/test_sdd_loop_efficiency_runner.py
+  - tests/integration/test_trigger_promotion.py
+  - tests/integration/test_trigger_telemetry.py
+  - tests/integration/test_trigger_tuning.py
+  - tests/integration/test_wp_coordination_dry_runs.py
+  - tests/unit/test_admission_check.py
+  - tests/unit/test_audit_plan_changes.py
+  - tests/unit/test_audit_test_budget.py
+  - tests/unit/test_decomposition_check.py
+  - tests/unit/test_derive_live_log.py
+  - tests/unit/test_feedback_exec_quant_payload.py
+  - tests/unit/test_feedback_package.py
+  - tests/unit/test_flow_class_check.py
+  - tests/unit/test_isomorphism_checker.py
+  - tests/unit/test_loop_state_engine.py
+  - tests/unit/test_memory_utils.py
+  - tests/unit/test_pre_analyze_check.py
+  - tests/unit/test_renumber_engine.py
+  - tests/unit/test_trigger_utils_units.py
+  - tests/unit/test_wp_gate.py
+sufficiency: "92 个文件、2349 收集 → 2330 passed / 16 failed / 3 skipped。三个子句各自有贡献：(a) 由两条新增源码路径直接命中，并经 `tasks` 这类通用 stem 过度选择（这正是 `test_isomorphism_map.py` 与 `test_client_guard_sweep.py` 进集合的原因，后者带来一条真读数）；(b) 复现前序阶段的同一交付面；(c) 选中本段唯一被改的 `test_roots` 文件。**集合到不了的地方如实写明**：(a) 是按文本搜索，只能找到*点名*了改动路径的测试，故镜像对测试（`test_mirror_parity_suite.py`、`test_scripts_distribution_parity.py`）落在集合外；本轮以**披露式补充运行**取得该读数并单独记录，MUST NOT 合并进 `selected_paths[]`（看到结果再扩集合会让记录本身不可读）"
+command: "python3 -m pytest -q <上列 92 个文件>"
+rc: 1
+passed: 2330
+failed: 16
+skipped: 3
+new_failures: "相对 E2 的 23 名比较集，集合内 3 条不在基线里，逐条归因，0 条可被读作静默吸收：① `test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation` —— `shared/declarations/contract.yaml` 头部注释写了 `Feature 084`，触犯既有 072 中性化守卫；该文件是 T003 产物、不在本段声明的写域内，按 FF-11 上送而不就地改（见回传 ANOMALY 行与 closeout § 6a）；② `test_ng_08_mirror_no_new_drift` 与 ③ `test_trigger_engine.py::test_c2_sync_mirrors_check_clean` —— 镜像未投影，T026 的所有物，`baseline-reading-2026-11-05.md` 已写明「T026 之前该两条按构造为红」"
+baseline: "E2 `slot=baseline` 行（状态脊 `<!-- test-budget:begin -->` 的 `seq:1`，25F / 7151P / 4S，比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名，另 2 条镜像为在途）。本行按该 23 名做 `comm -23` 差额"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implement-part1-targeted-run-2026-11-05.txt（两次运行完整 stdout：run 1 = 发现轮，run 2 = 清理陈旧 scratch 后的终树读数）
+```
+
+## Why `ran`
+
+本段改的是可执行面（两个新引擎 + 一条契约测试腿），落 `not-run-docs-only` 就是假绿。按 TB-05 的固定程序选
+92 个文件并实跑两次：**run 1** 在接手时的树上跑（18 failed），**run 2** 在清掉上一位执行者遗留的 scratch 后
+跑（16 failed）。两次都在本文件里，前者是发现轮、后者是终树读数，谁都不替代谁。
+
+## T006 / T007 收口读数
+
+| 判项 | 命令 | 读数 | 证据 |
+|---|---|---|---|
+| 契约测试模块 | `python3 -m pytest tests/contract/test_harness_triple_structure.py -q` | **22 passed**（T005 交付时 20 failed / 1 passed，两个主体都不存在） | 本行即读数 |
+| reader 双形态（C-053） | 从 `scripts/python/` 执行 `python3 -c "import declaration_reader"`；`declaration_reader.py --action {list,get}` | import 成功、两个 CLI 动作各自 exit 0，`normalize_path` 只剥一层 `.specify/` | closeout § 1 |
+| 子集语法（C-008） | 对 `parse_subset` 逐构造驱动 11 个禁用构造 + 5 个允许构造 | 11 个禁用构造全部 `template=STR-010` 拒绝、无一被"尽力解析"；5 个允许构造正常读出 | closeout § 2 |
+| 完整性三条件（E-6） | 同一 `negative-duplicated-fact-literal/` 树上跑修前 / 修后引擎 | 修前 `state: complete`（假绿），修后 `state: pending` + `reason: duplicated-fact-literal`；exit 均为 1 | closeout § 3 |
+| verify 不误报理由 | 同一树上修前 / 修后 `--action verify` | 两版输出逐字节相同：只发 `STR-011` 一条，未追加一条理由错位的 `STR-009` | closeout § 3 |
+| 只读（C-039） | 模块腿 `test_a_run_leaves_the_judged_tree_byte_identical`（`git status --porcelain` 前后比对） | 绿；在本仓真树上跑 `coverage` 得 `candidates: 83 / unclassified: 83`、exit 1（批次 1 未迁，属读数） | 本行即读数 |
+| 单一解析器守卫（C-058） | 模块腿 `test_the_shared_read_entry_is_the_only_subset_parser` | 绿：检出集合 = `{declaration_reader.py}` ∪ 两个 N4 祖父（`execution-config.py`、`gate-check.py`） | 本行即读数 |
+
+## 三件补充读数（都在本轮实跑，不与选择集混记）
+
+1. **陈旧 scratch 是两个失败的因，清掉即消**：`test_isomorphism_map.py` 扫全仓 `.md`，上一位执行者留在
+   `.specify/.tmp/084-impl-p1/pristine/` 的 80 MB `git archive` 树被当成"第二份映射载体"。该树的用途（把 E2 的
+   25 条拆成 23 + 2）已记在 `baseline-reading-2026-11-05.md`，按 Temporary Directory Discipline 清除后
+   `tests/contract/test_isomorphism_map.py` 两个腿转绿，`test_client_guard_sweep.py` 51 passed 只剩 c57 一条。
+   这不是"把红的弄绿"，是删掉本不该存在的目录。
+2. **镜像补充运行**（披露式，不进 `selected_paths[]`）：
+   `python3 -m pytest -q tests/contract/test_mirror_parity_suite.py tests/contract/test_scripts_distribution_parity.py`
+   → `6 failed, 761 passed`，六条全是未投影的镜像对（本段两个新引擎 + 之前四件），T026 的所有物；
+   手工补镜像＝FF-12 的错误帽子，MUST NOT。
+3. **上送项**：`test_c57` 命中的是 T003 的 `shared/declarations/contract.yaml`（注释里的 `Feature 084`），
+   一行注释即可修，但越出本段声明的写域（FF-11），故停在本层、连同上送件形态回抛驱动者。
+
+## Bases verified（implement Part 1 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| 任务清单可解析 | `python3 .specify/scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md` | `PASS`，`0 error(s), 0 warning(s)`，exit 0；T001–T007 已勾，31 行结构与任务数未动 |
+| plan 权威零触碰 | `git diff --stat fa7ce0f1 -- .specify/specs/084-harness-triple-structure/{plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}` | 空输出（本段无 PLAN-EDIT） |
+| 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集只含 reader / checker / `tasks.md` / 本行 / 四件证据；`.specify/memory/**`、`.specify/state/**` 不提交 |
+| 不 push | `git log --oneline -1` 本地提交 | 未执行任何 push |
+

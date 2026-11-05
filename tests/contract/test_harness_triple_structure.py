@@ -324,6 +324,23 @@ def test_a_unit_named_by_a_declaration_and_a_row_is_a_finding(tmp_path):
     assert instance("STR-013", "shared/workflow/feedback-step.md") in out, out
 
 
+def test_a_fact_declared_twice_keeps_its_unit_pending(tmp_path):
+    """E-6 (a) / R-6: "exactly one declaration" is a verdict from the run, not a file's existence.
+
+    The reading was red against the engine as first written: one fact, two declarations, and the unit
+    still printed ``state: complete`` — a declaration file existing was taken as evidence for (a), which
+    is the false green E-6 R-6 forbids. The finding beside it (``STR-011``) never repaired that.
+    """
+    tree = make_tree(tmp_path, "negative-duplicated-fact-literal")
+    rc, out, err = run(tree, "--action", "coverage")
+    assert rc == 1, out + err
+    block = unit_blocks(out)["shared/workflow/feedback-step.md"]
+    assert first(block, "disposition") == "in-scope", out
+    assert first(block, "state") == shared_strings()["STR-005"], (
+        "one fact claimed by two declarations fails (a), so the unit is never `complete`\n" + out)
+    assert first(block, "reason") == shared_strings()["STR-011"].split(":")[0], out
+
+
 # --------------------------------------------------------------------------- #
 # the dual-writer property: two branches, two paths, both green
 # --------------------------------------------------------------------------- #

@@ -1,0 +1,32 @@
+# attempt 1 (previous executor, T007 open) — targeted run failure names, preserved before scratch teardown
+# source: .specify/.tmp/084-impl-p1/targeted-program.txt (scratch, deleted per Temporary Directory Discipline)
+# run meta: rc=1 duration=191s
+# summary line: 26 failed, 3835 passed, 3 skipped, 2 warnings in 191.11s (0:03:11)
+# read on the same tree as this segment's run; the selection there was broader (it included tests/contract/test_mirror_parity_suite.py)
+#
+tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+tests/contract/test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership
+tests/contract/test_isomorphism_map.py::test_no_second_map_or_boundary_table_exists
+tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/declaration_reader.py->.specify/scripts/python/declaration_reader.py]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/harness-triple-check.py->.specify/scripts/python/harness-triple-check.py]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/contract.yaml->.specify/shared/declarations/contract.yaml]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/framework-map.md->.specify/shared/definitions/framework-map.md]
+tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/harness-triple-definitions.md->.specify/shared/definitions/harness-triple-definitions.md]
+tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+tests/contract/test_non_regression_064.py::test_ng_08_mirror_no_new_drift
+tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+tests/contract/test_trigger_engine.py::test_c2_sync_mirrors_check_clean
+tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative

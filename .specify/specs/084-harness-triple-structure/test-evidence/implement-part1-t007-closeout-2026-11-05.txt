@@ -1,0 +1,231 @@
+# T006 / T007 close-out — the shared reader and the judging engine
+
+**Feature**: 084 Harness 三重结构 · **Tasks**: `tasks.md` T006 (reader), T007 (checker) · **Date**: 2026-11-05
+**Branch**: `084-harness-triple-structure` · **Stage base**: `fa7ce0f1` (`stage_base_commit` of the implement stage)
+
+This file is the evidence for closing T006 and T007. It records four things a reader can re-run: the reader's
+two calling forms and its subset matrix, the one behavioural repair this segment made to the engine (with the
+before/after readings that show it was red), the scratch teardown that cured two unrelated failures, and the
+mirror supplement whose six failures are `tasks.md` T026's, not this segment's.
+
+---
+
+## 1. The reader is both importable and callable (C-053)
+
+Every consumer in the repository is invoked as `python3 scripts/python/<name>.py`, so the script's own
+directory is `sys.path[0]`; the CLI exists for humans and for the contract test.
+
+```text
+$ cd scripts/python && python3 -c "import declaration_reader; print(declaration_reader.READ_ENTRY, declaration_reader.normalize_path('.specify/shared/declarations/x.yaml'))"
+declaration_reader shared/declarations/x.yaml
+rc=0
+```
+
+`normalize_path` (C-057) stripped exactly one leading `.specify/` and left the source form untouched — the
+single place the three-copy problem is solved.
+
+```text
+$ python3 scripts/python/declaration_reader.py --action list --repo .
+{
+  "contract": [
+    "completeness_states",
+    "exclusion_reasons",
+    "exit_codes",
+    "fact_kinds",
+    "gate_call_sites",
+    "required_exclusion_keys",
+    "required_fact_keys",
+    "schema",
+    "yaml_subset"
+  ],
+  "exclusions": [],
+  "facts": []
+}
+rc=0
+```
+
+The nine keys listed are exactly `contract.yaml`'s nine owned value domains (`declaration-schema.contract.md`
+C-002) — the reader reads the owner rather than restating it.
+
+```text
+$ python3 scripts/python/declaration_reader.py --action get --fact feedback-prompt-threshold --repo <positive fixture>
+{
+  "body": {
+    "consumers": [
+      "scripts/python/feedback-utils.py",
+      "shared/workflow/feedback-step.md"
+    ],
+    "fact": "feedback-prompt-threshold",
+    "former_carriers": [],
+    "kind": "threshold",
+    "note": "fixture value — the engine side wins by the authority order, nothing had drifted.",
+    "statement": "10"
+  },
+  "path": "shared/declarations/facts/feedback-prompt-threshold.yaml",
+  "stem": "feedback-prompt-threshold"
+}
+rc=0
+```
+
+## 2. The subset grammar refuses what it must refuse (C-008)
+
+Run directly against `parse_subset`, one construct per row. The important column is the *absence* of a
+best-effort parse: every forbidden construct raises the typed error carrying the `STR-010` template id, and
+nothing is returned.
+
+```text
+flow-seq       refused: template=STR-010 | flow-seq:1: flow collections are outside the subset (only the empty forms are allowed)
+flow-map       refused: template=STR-010 | flow-map:1: flow collections are outside the subset (only the empty forms are allowed)
+anchor         refused: template=STR-010 | anchor:1: an anchor is outside the subset
+alias          refused: template=STR-010 | alias:1: an alias is outside the subset
+tag            refused: template=STR-010 | tag:1: an explicit tag is outside the subset
+block-literal  refused: template=STR-010 | block-literal:1: a block scalar is outside the subset
+block-folded   refused: template=STR-010 | block-folded:1: a block scalar is outside the subset
+multi-doc      refused: template=STR-010 | multi-doc:2: multiple documents are outside the subset
+multi-doc-end  refused: template=STR-010 | multi-doc-end:2: multiple documents are outside the subset
+tab-indent     refused: template=STR-010 | tab-indent:2: tabs are outside the subset (two-space indentation only)
+odd-indent     refused: template=STR-010 | odd-indent:2: indentation must be a multiple of two spaces
+empty-flow     OK {'a': [], 'b': {}}
+quoted         OK {'a': "it's", 'b': 'xny'}
+comment        OK {'a': '1', 'b': 'hash # inside'}
+nested         OK {'a': [{'k': '1', 'j': '2'}, {'k': '3'}]}
+seq            OK {'a': ['one', 'two']}
+```
+
+**One limitation recorded rather than fixed**: the double-quoted scalar `"x\ny"` decodes to `xny` — the subset
+contract (C-008) names double-quoted scalars as allowed but does not own an escape grammar, and no declaration
+in the tree uses one. Choosing escape semantics would be inventing an intent the artifacts do not record, so it
+is left as it is and stated here.
+
+## 3. The one behavioural repair: E-6 condition (a) counts declarations
+
+**What was wrong.** `data-model.md` § E-6 defines `complete` as three conditions conjunctively, and R-6 states
+the red line: *"A declaration file existing is not evidence for (a)"* — (a) is "each of the unit's facts has
+**exactly one** declaration passing the schema and subset checks". The engine as first written checked (b) the
+pointer and (c) the read point, and its (a) branch tested *required keys present* — a schema question that
+`check_fact_schema` had already answered by raising the exit-2 input error, so the branch was unreachable while
+looking like a judgement. Consequence, measured: one fact, two declarations, and the unit still read `complete`.
+
+```text
+--- pre-fix engine (attempt 1's file) ---
+# harness-triple-check — coverage
+candidates: 1
+pending: 0
+unclassified: 0
+findings: 1
+unit: shared/workflow/feedback-step.md
+disposition: in-scope
+state: complete
+fact: feedback-prompt-threshold
+finding: duplicated-fact-literal: feedback-prompt-threshold@shared/declarations/facts/feedback-prompt-threshold-copy.yaml
+rc=1
+```
+
+```text
+--- post-fix engine (this segment) ---
+# harness-triple-check — coverage
+candidates: 1
+pending: 1
+unclassified: 0
+findings: 1
+unit: shared/workflow/feedback-step.md
+disposition: in-scope
+state: pending
+reason: duplicated-fact-literal
+fact: feedback-prompt-threshold
+finding: duplicated-fact-literal: feedback-prompt-threshold@shared/declarations/facts/feedback-prompt-threshold-copy.yaml
+rc=1
+```
+
+**Why this is a correction, not a decision.** Exactly one reading is consistent with the recorded intent: (a)
+requires *exactly one* declaration, and the fixture `negative-duplicated-fact-literal/` is the tree that
+contradicts it. The change is local (one condition inside `completeness`, plus `claimed` being kept from
+`claimed_slugs`), reversible, and falsifies no downstream premise — later rows read the state of the same
+fixture for the first time in this segment, and the exit code does not move (`1` before and after).
+
+**The reason named is the reason that failed.** A pending unit now carries the code of the condition that broke
+it, so a duplicate reads `duplicated-fact-literal` (the `STR-011` code) rather than `third-layer-missing`. The
+`verify` action was narrowed the same way — it emits `[[STR-009]]` for a unit only when `third-layer-missing` is
+the reason that actually applies, so the duplicate tree does not also acquire a wrong-reason finding:
+
+```text
+--- verify, pre-fix and post-fix, byte-identical ---
+# harness-triple-check — verify
+declarations: 2
+candidates: 1
+consistency-declarations-to-carriers: 3/3
+consistency-carriers-to-declarations: 1/2
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 1
+finding: duplicated-fact-literal: feedback-prompt-threshold@shared/declarations/facts/feedback-prompt-threshold-copy.yaml
+rc=1
+```
+
+**The leg that pins it** — `tests/contract/test_harness_triple_structure.py::test_a_fact_declared_twice_keeps_its_unit_pending`
+— asserts `disposition: in-scope`, `state: pending` and `reason: duplicated-fact-literal` on that fixture. It is
+red against the pre-fix output above (`state: complete`) and green against the post-fix output. It was added by
+this segment, so it did not exist in T005's red run; the before/after readings in this section are the evidence
+that replaces a red-first ordering, and they are stated as such rather than presented as one.
+
+## 4. Two reader-CLI corrections (no contract clause moved)
+
+* The CLI printed the same JSON from both arms of an `if args.format == "json"` branch; the branch and the
+  `--format` flag are gone, and the CLI now says in one line that it has one rendering because the functions are
+  the real surface (C-053). Nothing consumed `--format` on the reader.
+* The CLI mapped every typed error to exit `2`. C-055 says the caller owns the exit code and the error carries
+  the finding id precisely so a caller can tell the two apart, so it now returns `1` when the error carries a
+  finding id (`STR-010` for a construct outside the subset, `STR-014` for an absent fact) and `2` otherwise —
+  the degraded-layer case (C-056) keeps `2`.
+
+## 5. Scratch teardown that cured two failures (and is not a fix)
+
+`test_isomorphism_map.py` scans every `.md` under the repository for a second map/boundary carrier, so a
+pristine `git archive` tree inside `.specify/.tmp/` counts as one. Attempt 1 left exactly that
+(`.specify/.tmp/084-impl-p1/pristine/`, 80 MB) after using it to split the E2 baseline into 23 pre-existing +
+2 in-flight names — a measurement whose result is already recorded in `baseline-reading-2026-11-05.md`.
+`Temporary Directory Discipline` requires the scratch to be gone when the work item ends; deleting it removes
+the cause, not the symptom:
+
+```text
+$ rm -rf .specify/.tmp/084-impl-p1
+$ python3 -m pytest tests/contract/test_isomorphism_map.py tests/contract/test_client_guard_sweep.py -q
+1 failed, 51 passed, 1 warning in 2.48s
+FAILED tests/contract/test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation
+```
+
+Both `test_isomorphism_map` failures disappear; the remaining one is section 6.
+
+## 6. What is still red, and whose it is
+
+**a. `test_c57_shipped_text_adds_no_fresh_neutrality_violation` — `shared/declarations/contract.yaml`.**
+The guard forbids shipped text under `templates/ shared/ skills/ agents/` from naming a feature number; the
+file's header comment opens with "Feature 084 (harness triple structure)." The repair is a one-line comment
+edit, but that file is T003's artifact and this segment's declared write scope is the reader, the engine,
+`tasks.md` and evidence — repairing it here would breach the blast-radius condition (`FF-11`), so it is
+surfaced instead of patched.
+
+```text
+E       AssertionError: C-57: Feature 072 shipped text introduced fresh framework-runtime references:
+E         shared/declarations/contract.yaml
+E       assert not ['shared/declarations/contract.yaml']
+```
+
+**b. Mirror drift — six ids, `tasks.md` T026 owns the projection.**
+The selection program cannot reach these (its (a) clause is a text search, and no test names a file it has not
+been told about), so they were run as a disclosed **supplement**, not merged into the selected set:
+
+```text
+$ python3 -m pytest -q tests/contract/test_mirror_parity_suite.py tests/contract/test_scripts_distribution_parity.py
+6 failed, 761 passed, 1 warning in 1.01s
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/declaration_reader.py->.specify/scripts/python/declaration_reader.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/harness-triple-check.py->.specify/scripts/python/harness-triple-check.py]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/declarations/contract.yaml->.specify/shared/declarations/contract.yaml]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/framework-map.md->.specify/shared/definitions/framework-map.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[shared/definitions/harness-triple-definitions.md->.specify/shared/definitions/harness-triple-definitions.md]
+FAILED tests/contract/test_scripts_distribution_parity.py::TestScriptsDistributionParity::test_repo_has_no_orphan_or_drifted_scripts
+```
+
+Two of these six (`declaration_reader.py`, `harness-triple-check.py`) are the files this segment lands; the other
+four were already red before it. All six are red **by construction** on any tree before T026: the projection is
+`sync-mirrors.py`'s job and `baseline-reading-2026-11-05.md` records the rule that a hand-copied mirror is
+`FF-12`'s wrong-hat change. Nothing here is silenced: the reading stands as `6 failed` until T026 runs.
