@@ -1,0 +1,109 @@
+# implement Part 2c — C-048 readings (verify / lookup / inline greps / degraded path)
+# captured 2026-11-05T12:53:55Z
+
+$ python3 scripts/python/harness-triple-check.py --action verify
+# harness-triple-check — verify
+declarations: 13
+candidates: 83
+consistency-declarations-to-carriers: 15/15
+consistency-carriers-to-declarations: 10/10
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 76
+finding: third-layer-missing: skills/internal/create-requirements/SKILL.md
+finding: unclassified-candidate: shared/workflow/external-dispatch-recipes.md
+finding: unclassified-candidate: shared/workflow/feature-integration.md
+finding: unclassified-candidate: shared/workflow/glossary.md
+finding: unclassified-candidate: skills/external/coaching-skills/SKILL.md
+finding: unclassified-candidate: skills/external/create-docs/SKILL.md
+finding: unclassified-candidate: skills/external/create-pages/SKILL.md
+finding: unclassified-candidate: skills/external/create-skills/SKILL.md
+finding: unclassified-candidate: skills/external/database-utils/SKILL.md
+finding: unclassified-candidate: skills/external/document-utils/SKILL.md
+finding: unclassified-candidate: skills/external/draw-diagram/SKILL.md
+finding: unclassified-candidate: skills/external/git-utils/SKILL.md
+finding: unclassified-candidate: skills/external/humanize/SKILL.md
+finding: unclassified-candidate: skills/external/improve-docs/SKILL.md
+finding: unclassified-candidate: skills/external/improve-skills/SKILL.md
+finding: unclassified-candidate: skills/external/merge-skills/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-house-keeping/SKILL.md
+finding: unclassified-candidate: skills/external/sdd-project-setup/SKILL.md
+finding: unclassified-candidate: skills/internal/analyze-artifacts/SKILL.md
+finding: unclassified-candidate: skills/internal/archive-session/SKILL.md
+finding: unclassified-candidate: skills/internal/clarify-artifact/SKILL.md
+finding: unclassified-candidate: skills/internal/code-review/SKILL.md
+finding: unclassified-candidate: skills/internal/create-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/create-checklist/SKILL.md
+finding: unclassified-candidate: skills/internal/create-plan/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tasks/SKILL.md
+finding: unclassified-candidate: skills/internal/create-team/SKILL.md
+finding: unclassified-candidate: skills/internal/create-tools/SKILL.md
+finding: unclassified-candidate: skills/internal/derive-architecture/SKILL.md
+finding: unclassified-candidate: skills/internal/implement-feature/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-agent/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-team/SKILL.md
+finding: unclassified-candidate: skills/internal/improve-tools/SKILL.md
+exit=1
+
+$ python3 scripts/python/harness-triple-check.py --action lookup --unit-id skills/external/sdd-loop-driver/SKILL.md
+# harness-triple-check — lookup
+unit: skills/external/sdd-loop-driver/SKILL.md
+disposition: in-scope
+state: complete
+fact: driver-completion-sentinels kind=mapping
+fact: driver-stage-sequence kind=ordered-operator-table
+findings: 75
+finding: unclassified-candidate: shared/workflow/external-dispatch-recipes.md
+
+$ grep -n 'return "%s-DONE"' skills/external/sdd-loop-driver/scripts/loop-state.py
+762:    return "%s-DONE" % name.upper()
+
+$ grep -n '^STAGE_ARTIFACTS = {' skills/external/sdd-loop-driver/scripts/loop-state.py
+207:STAGE_ARTIFACTS = {
+
+$ grep -rn 'declaration_reader' skills/external/sdd-loop-driver/scripts/loop-state.py
+94:# Both are read through the one shared entry (`scripts/python/declaration_reader.py`), so editing a
+104:READ_ENTRY_REL = Path("scripts") / "python" / "declaration_reader.py"
+114:    ancestor carrying `scripts/python/declaration_reader.py` is the layer that invocation belongs to,
+124:            import declaration_reader
+125:            return declaration_reader
+
+$ grep -rn 'driver-stage-sequence\|driver-completion-sentinels' skills/external/sdd-loop-driver/SKILL.md
+3:description: 无人值守 SDD 循环驱动手册——以一条一遍性提示词驱动主代理完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶段推进 SDD 完整流程（阶段序列与完成哨兵由 `shared/declarations/facts/driver-stage-sequence.yaml#/statement` 与 `shared/declarations/facts/driver-completion-sentinels.yaml#/statement` 单一拥有，本手册不复述取值）→ 合并 main」的完整闭环，全程循环自推进、零用户提醒。当用户说「使用SDD开发模式推动 <项目>」「无人值守推进」「sdd-loop-driver」「需要使用一个循环来完成这项工作，而不是每次由我提醒你重试或继续」时加载本手册。执行细节（断点探测 / 阶段化 prompt 文件 / runner 与派生 / 后台执行+统一监听 / 收尾纪律）全部由本手册承接，入口只声明目标与起点。当以本技能名给出功能/改进描述时，视为 SDD 目标（目标项目可为本技能自身所在仓库），先做 U0/U1 并走阶段链，不得就地改代码或切换为技能维护路径。
+154:- **框架声明层（本手册引用的两条取值）**——阶段序列 `shared/declarations/facts/driver-stage-sequence.yaml#/statement`、完成哨兵 `shared/declarations/facts/driver-completion-sentinels.yaml#/statement`：两条取值由声明单一拥有，引擎经 `scripts/loop-state.py` 的共享读取入口读取，本手册与 `references/` 各文件只引用路径，不复述取值。
+
+# ---------------------------------------------------------------------------
+# 该单元的两点读数：声明落盘后、载体加指针前 / 加指针后（同一次运行内的前后对照）
+#
+# BEFORE the SKILL.md pointer — the two declarations existed and the engine read point did not:
+#   $ python3 scripts/python/harness-triple-check.py --action lookup --unit-id skills/external/sdd-loop-driver/SKILL.md
+#   unit: skills/external/sdd-loop-driver/SKILL.md
+#   disposition: in-scope
+#   state: pending
+#   reason: third-layer-missing          <- C-047 step 4/5 not done yet: no pointer, no read point
+#   fact: driver-completion-sentinels kind=mapping
+#   fact: driver-stage-sequence kind=ordered-operator-table
+#
+# AFTER (the run above): state: complete. The pending -> complete transition is the reading, not a
+# claim: `third-layer-missing` is the closed reason that names exactly the two missing legs.
+# ---------------------------------------------------------------------------
+
+$ python3 skills/external/sdd-loop-driver/scripts/loop-state.py --self-test   # in-tree: layer reachable
+SELF-TEST: 31 passed, 5 failed        # identical to `git show HEAD:...loop-state.py` run from /tmp: 31/5
+                                      # => behaviour unchanged; the 5 are pre-existing (065a legs)
+
+$ cd /tmp/084p2c && python3 loop-state-new.py --self-test   # layer NOT reachable from this copy's path
+loop-state: declaration layer unreachable: driver-stage-sequence
+loop-state: declaration layer unreachable: driver-completion-sentinels
+SELF-TEST: 31 passed, 5 failed        # same 31/5 => FR-012 compatibility path keeps the render, labelled
+
+$ python3 -c "... module load of the /tmp copy ... "   # degraded render + order
+sentinel: PLAN-DONE                   # pre-migration literal, uppercase — not `plan-DONE`
+order: ['requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review']
+
+$ python3 -c "... module load of the in-tree copy ..."  # declared render + order
+declarations module: declaration_reader
+sequence: ('requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review')
+STAGE_ARTIFACTS order: ['requirements', 'clarify', 'plan', 'tasks', 'checklist', 'analyze', 'implement', 'review']
+pattern: '{stage}-DONE' transform: 'uppercase'
+sentinel plan: PLAN-DONE | none: None | empty: None
+

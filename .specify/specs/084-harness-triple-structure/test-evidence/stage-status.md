@@ -1464,3 +1464,85 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implemen
 第 3 条同时改写了 `success-criterion-path-values.yaml` 的 `note`：原文称该单元「gain the pointer without losing a literal」，
 那是上一轮的预期而非实测——该文件在迁移前对 `final|supporting|Path` 零命中，且现在也没有指针。note 改为实测读数 +
 冻结事实 + 「该单元的处置仍然开放」。
+
+## implement（Part 2c，T014 前两条 driver facts，2026-11-05）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1 —— 12 个文件，三个来源：(a) 本段改动面直接命中（`skills/external/sdd-loop-driver/scripts/loop-state.py`、`skills/external/sdd-loop-driver/SKILL.md`、`shared/declarations/facts/driver-*.yaml`）；(b) 驱动与回环的契约面（`test_sdd_loop_driver_skill`、`test_loop_state_contract`、`test_isomorphism_map`、`test_non_regression_070`、`test_sdd_loop_driver_{gates,efficiency,wp_model,wp_coordination}`、`test_pre_analyze_check`）；(c) 084 自己的契约模块（`test_harness_triple_structure`，本段把两条 slug 追加进 `MIGRATED_SO_FAR`，逐条断言 C-047 步骤 2/3/4）。集合到不了的地方如实写明：镜像对测试（`test_mirror_parity_suite`）与初装夹具（`specify init` 面）不在本段范围，全量套件按预算不跑"
+selected_paths:
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/unit/test_loop_state_engine.py
+  - tests/contract/test_harness_triple_structure.py
+  - tests/contract/test_isomorphism_map.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_sdd_loop_driver_gates.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_wp_model.py
+  - tests/contract/test_sdd_loop_driver_wp_coordination.py
+  - tests/unit/test_pre_analyze_check.py
+sufficiency: "12 个文件、462 收集 → 449 passed / 13 failed / 0 skipped（12.95 s，单次运行；命令、退出码、完整 stdout/stderr 与耗时同次落盘为 `test-evidence/implement-part2c-targeted-run-2026-11-05.txt`，本行读数自该记录派生而非重跑）。13 条红里 10 条在 E2 的 23 名基线集内（`test_c22_watch_target_hook_selftest` + 9 条 `unit/test_loop_state_engine.py`），1 条（`test_c7_mirrors_are_byte_identical`）是 Part 2b 已记录在途的镜像类，2 条为本段改动的镜像后果（见 `new_failures`）。**可判定的充分性缺口**：本集合不含镜像对测试与全量套件，故它证明的是「本段改动的四个面与其载体在其自身断言下正确」，不是「树上无回归」"
+command: "python3 -m pytest tests/contract/test_sdd_loop_driver_skill.py tests/unit/test_loop_state_engine.py tests/contract/test_harness_triple_structure.py tests/contract/test_isomorphism_map.py tests/contract/test_loop_state_contract.py tests/contract/test_expression_compatibility.py tests/contract/test_non_regression_070.py tests/contract/test_sdd_loop_driver_gates.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_sdd_loop_driver_wp_model.py tests/contract/test_sdd_loop_driver_wp_coordination.py tests/unit/test_pre_analyze_check.py -q"
+rc: 1
+passed: 449
+failed: 13
+skipped: 0
+new_failures:
+  - "tests/contract/test_sdd_loop_driver_skill.py::test_c18_mirror_pair_no_drift —— `mirror drift on SKILL.md`（首条即 SKILL.md，`scripts/loop-state.py` 同批）。**不是缺陷而是投影未执行**：本段改的两个文件都在 `MIRROR_FILES` 的镜像对内，而派发约束明写「不改 `.specify/` 镜像」，镜像投影归 T026（`sync-mirrors.py --write` 后 `--check`，并复跑一次确认可重复）。改镜像即越界，不改镜像即本腿必红——两者互斥，处置已由 T026 拥有，故按读数登记不就地修平"
+  - "tests/contract/test_sdd_loop_driver_efficiency.py::test_di_05_delivery_and_mirror —— `DIFF .specify/skills/sdd-loop-driver/SKILL.md` + `DIFF .specify/skills/sdd-loop-driver/scripts/loop-state.py`，`exit 2 / DRIFT detected`。同一类、同一原因、同一所有者（T026）"
+baseline: "E2 `slot=baseline` 行（`seq:1`：25F / 7151P / 4S；比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名）。本行 13 条失败：10 条在该 23 名集内、1 条为 Part 2b 已登记的镜像在途、2 条为本段的镜像类新增 ⇒ **除镜像类外，本段引入的新失败 0 条**"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implement-part2c-targeted-run-2026-11-05.txt
+```
+
+## Why `ran`
+
+本段改的是可执行面（`loop-state.py` 的两处读取点）与一个载体（`SKILL.md` 的 frontmatter 与 § References）。落
+`not-run-docs-only` 就是假绿；`empty-selection-escalated` 更不成立——两处都直接落在 `test_roots` 内。
+
+## 两条 fact 的逐条读数（命令 + 实测）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| 声明落盘且过 schema | `declaration_reader.py --action get --fact driver-stage-sequence`；`… driver-completion-sentinels` | 两条均 exit 0；`kind: ordered-operator-table`（八项有序）/ `kind: mapping`（`pattern` / `transform` / 三个字段名）；`verify` 报 `declarations: 13`（11 + 2） |
+| 引擎侧经共享读取入口 | `grep -n 'declaration_reader' skills/external/sdd-loop-driver/scripts/loop-state.py` | 5 处：模块定位、`import`、`return`，以及两处注释；`DECLARATIONS` 在模块加载时解析一次 |
+| 阶段顺序由声明驱动 | 模块加载后 `list(STAGE_ARTIFACTS)` | `['requirements','clarify','plan','tasks','checklist','analyze','implement','review']`——与声明 `statement` 同序、与改动前同序（两张脸 2026-11-05 未漂移） |
+| 表体仍是本文件的字面量 | `grep -n '^STAGE_ARTIFACTS = {' …/loop-state.py`；`test_isomorphism_map.py` | 命中 `207:STAGE_ARTIFACTS = {`；同表静态解析腿绿（112 passed 的三文件批里含该文件）——顺序改由声明拥有，行的内容仍在此处，`^STAGE_ARTIFACTS\s*=\s*\{` 的位置契约不受影响 |
+| 哨兵由声明渲染 | 模块加载后 `sentinel_literal('plan')` | `PLAN-DONE`；`sentinel_literal(None)` / `('')` 仍为 `None` |
+| C-044 行的 inline 形态已消失 | `grep -n 'return "%s-DONE"' …/loop-state.py`；`test_harness_triple_structure.py` 的 `inline` 正则 | 只剩 `762:    return "%s-DONE" % name.upper()`（兼容路径，见下条）；契约测试钉的 `^    return "%s-DONE" % str\(stage\)\.upper\(\)` 零命中 |
+| 声明缺席时不中断且显式标注 | 把本段引擎复制到 `/tmp` 后 `--self-test`（该副本 `declaration_entry()` 走不到层） | `loop-state: declaration layer unreachable: driver-stage-sequence` / `… driver-completion-sentinels` 各一行 stderr；`SELF-TEST: 31 passed, 5 failed` **与 HEAD 同读数**；`sentinel_literal('plan')` = `PLAN-DONE`。**行为不变、标注非空、无 traceback**（FR-012 / FR-013 的机械三项） |
+| 载体指针（两件） | `grep -n 'driver-…yaml#/' SKILL.md` | frontmatter `description` 与 § References 各一处，四处键路径；单元处置 `pending → complete`（`third-layer-missing` 消失） |
+| 双向一致 | `harness-triple-check.py --action verify` | `consistency-declarations-to-carriers: 15/15`、`consistency-carriers-to-declarations: 10/10` |
+
+## 本段的两处判断（逐条披露；都是纠正而非裁定）
+
+| # | 判断 | 为何是纠正而非裁定 |
+|---|---|---|
+| 1 | **哨兵保留一条被标注的兼容渲染**（`return "%s-DONE" % name.upper()`，仅在声明读不到时可达） | FR-012 原文「声明缺席 ⇒ **允许沿用内联值**，但 MUST 显式标注」；同一句在派发简报里对另一条 fact 写作「保持既有降级语义」——对阶段顺序，该语义只能是「照本文件既有的顺序继续」，故两面对称读法唯一。反路径（读不到即 `None`）会让未重装层的项目静默失去完成判定，那是行为变化而非降级。替代读法未被采纳的理由记此：`None` 亦不违反 FR-012，但它与本简报「行为不变」的强约束冲突 |
+| 2 | **阶段表的行留在字面量里，只有顺序取自声明** | 派发简报写「用声明顺序校验/驱动 `STAGE_ARTIFACTS` 的键序（行为不变）」；`test_isomorphism_map.py` 用 `^STAGE_ARTIFACTS\s*=\s*\{` 静态解析该表，把整表改成声明派生会使该腿拿到空集（Part 2b 已留读数）。故「键序由声明、行由引擎」是唯一同时满足两条约束的读法，且 `driver-stage-artifacts`（行内容）本就不在本段范围 |
+
+## 未完成与仍然开着的读数（不是本段的失败）
+
+- **`T014` 仍未勾**：六条事实里本段只落两条；`driver-gate-roster` 与 `driver-stage-artifacts` 属 Part 2d，其载体
+  （`references/dispatch-recipes.md`）与引擎侧（`pre-analyze-check.py` / `STAGE_ARTIFACTS` 行内容）本段未触。
+- **`references/dispatch-recipes.md:154` 仍逐字重述两条取值**（阶段链与「大写阶段名 + `-DONE`」）；它不在本段
+  `former_carriers` 范围内（`C-044` 该两行的载体面是 `SKILL.md`，`references/*.md` 也不是候选单元），留给 T014 的
+  剩余部分。这不是静默：`test_c5_stage_chain_and_sentinel_literals` 与 `test_058_…` 正把该处字面量逐字钉住，
+  故它与「零 diff 侧」互斥，属需要裁定的一步。
+- **`verify` 仍报 `third-layer-missing: skills/internal/create-requirements/SKILL.md`**（T013 的第三条载体腿，Part 2b
+  已记录为开放处置）。本段按简报勾了 T013 `[X]`，**这条读数是该勾选的反空真伴生量**：勾选表达「T013 的迁移已落地」，
+  而该单元的挂起由 069a 冻结记录与 `in-scope/pending/third-layer-missing` 的封闭原因点名，不因勾选而消失。
+- **两条镜像红腿**（见 `new_failures`）属 T026；本段按约束不触碰 `.specify/` 镜像。
+
+## Bases verified（implement Part 2c 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| plan-owned 零触碰 | `git diff --stat HEAD -- .specify/specs/084-harness-triple-structure/{plan.md,data-model.md,contracts,quickstart.md,research.md,feature-ref.md}` | 空输出 ⇒ 无 PLAN-EDIT |
+| 依赖面未动 | `git diff --stat 4b65517c -- pyproject.toml` | 空输出 |
+| 镜像不手改 | `git status --porcelain -- .specify/skills .specify/shared .specify/scripts` | 空输出（本段未写任何 `.specify/` 镜像；`.specify/` 下的 084 证据与任务行不属镜像） |
+| 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**` 与 `.specify/state/**` |
+| 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |

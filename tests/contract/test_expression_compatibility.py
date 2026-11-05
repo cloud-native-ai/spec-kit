@@ -474,8 +474,17 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "markers": ("Blocked", "feature-details-template.md"),
     },
     "skills/external/sdd-loop-driver/SKILL.md": {
-        "reason": "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2)",
-        "markers": ("监听签名唯一", "--iter"),
+        "reason": (
+            "2026-10-25 watch iteration token (Hard Requirement 9; watch-model §3.2); "
+            "2026-11-05 Feature 084 batch 2 (C-044 rows `driver-stage-sequence` / "
+            "`driver-completion-sentinels`): the frontmatter summary and § References stop restating "
+            "the stage chain and point at the two declarations instead (FR-018). The historical 069a "
+            "hash manifest stays the dated record it is; this entry records the drift and authorizes "
+            "nothing else."
+        ),
+        "markers": ("监听签名唯一", "--iter",
+                    "shared/declarations/facts/driver-stage-sequence.yaml#/statement",
+                    "shared/declarations/facts/driver-completion-sentinels.yaml#/statement"),
     },
     "templates/commands/review.md": {
         "reason": (

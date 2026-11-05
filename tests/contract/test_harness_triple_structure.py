@@ -593,9 +593,11 @@ MIGRATED = {
     },
 }
 
-#: The rows above this part has actually migrated: C-042 rows 1–8, closed by T008–T012. The roster's
-#: remaining rows keep their shape in ``MIGRATED`` but are deliberately **not asserted yet** —
-#: ``success-criterion-path-values`` is T013's, batch 2 is T014–T015's and batch 3 is T016's. C-046 (and
+#: The rows above this part has actually migrated: C-042 rows 1–8 and batch 2's `Path` fact, closed by
+#: T008–T013, plus T014's two `driver-*` rows that reach their read point today (`driver-stage-sequence`,
+#: `driver-completion-sentinels`). The roster's remaining rows keep their shape in ``MIGRATED`` but are
+#: deliberately **not asserted yet** — batch 2's `ARC verdict mapping` is T015's, the rest of the
+#: `driver-*` group is T014's unfinished half and batch 3 is T016's. C-046 (and
 #: DoD-5 after it) makes each batch independently acceptable: "an unfinished batch k+1 MUST NOT be
 #: reported as a failure of batch k". A leg parametrized over an un-migrated row would report exactly
 #: that — a red id owned by a task that has not run — so the parametrization reads this tuple and each
@@ -610,6 +612,8 @@ MIGRATED_SO_FAR = (
     "flow-class-ledger-columns",
     "flow-class-neutral-categories",
     "success-criterion-path-values",
+    "driver-stage-sequence",
+    "driver-completion-sentinels",
 )
 
 
