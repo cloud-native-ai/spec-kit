@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T04:04:10Z"
 summary: "Code segment of the 074a slice review: base 371869045..head 0024585c4, triage=run, renderer=text, 69/9/60/0, gate=allow (0 blocking / 1 important answered / 2 suggestion / 1 question / 2 praise). One "
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

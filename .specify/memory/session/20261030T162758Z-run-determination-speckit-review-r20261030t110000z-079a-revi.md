@@ -6,10 +6,10 @@ feature: "079-humanize-run-output"
 tags: ["run-determination", "r20261030t110000z-079a-review"]
 title: "run-determination /speckit.review r20261030T110000Z-079a-review"
 created: "2026-10-30T16:27:58Z"
-summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated 
   "feature": "079-humanize-run-output",
   "feature_id": "062",
   "determined_at": "2026-10-30T16:27:58Z",
-  "settled_at": null,
+  "settled_at": "2026-11-05T06:53:34Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,9 +87,9 @@ summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated 
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -165,18 +165,6 @@ summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated 
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -196,11 +184,6 @@ summary: "/speckit.review run=r20261030T110000Z-079a-review token=not_evaluated 
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=1 collected=172 reason=no_baseline",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

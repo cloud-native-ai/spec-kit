@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
 feature_id: "078"
+disposition: "processed"
 partial: false
 created: "2026-10-30T06:08:43Z"
 summary: "checklist 阶段新增 36 项需求质量清单 checklists/coaching-loop-2026-10-30.md（CHK001–CHK036，七组：运行输入与解析、执行预期、运行状态与报告、派发/观测/失败、重命名身份与封闭面、依赖与非功能），全部为题问句、36/36 带 Req 锚点（100%），Verify/Test/Confirm/Check 开头 0 条，编号连续无重复，软"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

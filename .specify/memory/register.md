@@ -98,6 +98,7 @@
 | REC-072-03 | `templates/commands/feedback.md` Path A 委派 bullet 收敛回指针形态（载体闭集与呈报三项事实归 `references/path-a-digest.md` § A4a/A4b 独有），消除第三处内容型重复 | `.specify/specs/072-client-self-improvement/review.md` § 5.1 REC-072-03（F3） | open |
 | REC-072-04 | plan 约束激活期间的规格头状态簿记对账（或把头状态字段退役给登记表）：避免 plan-owned 冻结把 `requirements.md` 头状态滞留在 `Draft` | `.specify/specs/072-client-self-improvement/review.md` § 5.4 REC-072-04（F4） | open |
 | OI-073-01 | 仓库既有 contract 债务未在 Feature 073 范围内修复：`analyze-artifacts`/`analyze` 冻结哈希漂移、`feedback-step.md` 附加行、确认门 27>23 基线、四个技能的裸 `shared/` 引用 | `tests/contract/test_expression_compatibility.py`、`test_shared_reference_rewrite.py`、`test_fast_fail_discipline.py` | open（owner = 后续仓库卫生切片；解除条件 = 逐项修复或明确豁免并更新冻结基线） |
+| OI-082-01 | Feature 082 的后续：把 `shared/workflow/best-practice-optimization.md` 接入 `/speckit.improve`（每次调用参考该工作流）；本特性只镜像文档，不接线 | `.specify/specs/082-self-explanatory-integration/requirements.md` § A5 + `shared/workflow/best-practice-optimization.md` § 3 | open（owner = 后续 `/speckit.improve` 改进项；解除条件 = 接线落地并由契约测试断言） |
 | REC-074a-01 | read-only 权威面须可声明并由审计脚本机械核对（含审计基线之前的触碰） | `.specify/specs/074a-authorized-routing/review.md` § REC-1（F1） | open |
 | REC-074a-02 | code-review 的机器路径与 help 由同一有序步骤表派生，`capture` 不得只在机器路径存在 | `.specify/specs/074a-authorized-routing/review.md` § REC-2（F2） | open |
 | REC-074a-03 | `pre-analyze-check` 的路径引用第二候根 `.specify/memory/` 解析，消除永久 advisory 噪声 | `.specify/specs/074a-authorized-routing/review.md` § REC-3（F3） | open |
@@ -128,3 +129,8 @@
 | REC-080-08 | 红先行增加「该测试能否转绿」自检与红因枚举，禁止用临时移出实现文件重建红态 | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-08（F6） | open |
 | REC-080-09 | 一份 verification 只允许一个 SC 判定源：收口表不得用自然语言重述状态，须从 canonical 块派生或只留证据指针 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-09（F2） | open |
 | REC-080-10 | 扩展改变 Feature 定位时强制同步 `## Overview`，或声明「保留原始定位，扩展见 Key Changes」 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-10（F12） | open |
+| REC-T1 | review code subsection must fail loudly on a missing receipt block and point at the recovery command | `.specify/specs/082-self-explanatory-integration/review.md` § 5.1 REC-T1 | open |
+| REC-C1 | Completion Gate's test set must be derived from the delta: every touched file's guard modules, with the derivation printed | `.specify/specs/082-self-explanatory-integration/review.md` § 5.2 REC-C1 | open |
+| REC-A1 | a checkpoint whose spine delta is empty must exit non-zero; a closure commit must carry the spine write for the part it closes | `.specify/specs/082-self-explanatory-integration/review.md` § 5.3 REC-A1 | open |
+| REC-W1 | Completion Gate must state that its verdict is relative to the measured set and require delta guard coverage | `.specify/specs/082-self-explanatory-integration/review.md` § 5.4 REC-W1 | open |
+| REC-W2 | state-spine per-part checkpoint contract must survive the last part; `stage_base` is the sanctioned fallback when commit order cannot reconstruct attribution | `.specify/specs/082-self-explanatory-integration/review.md` § 5.4 REC-W2 | open |

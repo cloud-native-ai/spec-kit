@@ -8,9 +8,11 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "077"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T19:59:01Z"
 summary: "review stage passed both segments in the fixed order; process 0 P0 / 2 P1 / 4 P2; code triage=run, coverage 177/23/154/0, verdict not-evaluated, gate allow, blocking 0 / important 3; Feature 077 Imple"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

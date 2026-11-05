@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T05:34:30Z"
 summary: "analyze rerun on slice 074b (read-only, one-loop limit): 0 CRITICAL / 0 HIGH / 4 MEDIUM / 5 LOW; both round-1 HIGH resolved (F-01 by the C-3/C-6 reading rule now read jointly with T018/DoD-8; F-02 by "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

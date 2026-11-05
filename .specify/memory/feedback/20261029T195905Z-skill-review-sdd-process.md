@@ -8,9 +8,11 @@ probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "077"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T19:59:05Z"
 summary: "process segment: 0 P0 / 2 P1 / 4 P2; four partial SCs judged honest (each names what was not measured; six evidence_sha256 recomputed and identical); P1s are the missing expression pilot line and the "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

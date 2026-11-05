@@ -548,3 +548,28 @@ def test_command_template_embeds_artifact_commit_in_the_shared_pointer_form():
     )
     assert "artifact-commit-step.md" in mine, "the pointer to the owner is missing"
     assert "git add -A" in mine, "the never-`git add -A` reminder is missing"
+
+
+@pytest.mark.contract
+def test_c17_real_tree_live_size_is_within_the_raised_budget():
+    """C-17: the repository's own live instructions file stays inside the budget.
+
+    Derived, never pinned: the budget comes from `_budget_bytes()` (the script is
+    its single owner) and the size is measured from the live file. A literal here
+    would be a second owner of the number and would drift the moment the constant
+    is retuned — which is precisely what Feature 082 does.
+
+    The comparison is `size <= budget - 1` because the generator's `over` verdict
+    fires at `size >= budget`, so a file of exactly `budget` bytes is already over.
+    Stated as arithmetic, not re-derived: the verdict rule lives in the script.
+    """
+    budget = _budget_bytes()
+    live = REPO_ROOT / ".specify" / "instructions.md"
+    size = len(live.read_text(encoding="utf-8").encode("utf-8"))
+    assert size, f"{live} is empty; C-17 cannot be judged on a blank file"
+    assert size <= budget - 1, (
+        f"live instructions are {size} B against a budget of {budget} B (the generator reports "
+        f"`over` at {budget} B and above). Run /speckit.instructions to converge the file, or "
+        "raise INSTRUCTIONS_BUDGET_BYTES in scripts/bash/generate-instructions.sh with the "
+        "recorded reason"
+    )

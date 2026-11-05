@@ -182,4 +182,5 @@
 | Coaching Run | 教练运行, coaching run | 一次教练运行:绑定 run-id、一个 Trainee、一件真实工作,产物落 .specify/memory/coaching/<run-id>/ 下的四个固定文件;字段与状态真源 .specify/specs/078-coaching-skills/requirements.md | auto | proposed |
 | Trainee | 被教练技能, trainee 技能 | 被 coaching-skills 教练的技能:由第一个位置参数指定,按 run-skills 解析语义定位,在独立上下文中按自身 SKILL.md 完成真实工作 | auto | proposed |
 | Observation Gap | 观测缺口, observation gap | 教练侧不可观察的执行步骤标记(字面量见 078 规格 STR-006):计入缺口清单,不得编造也不得省略 | auto | proposed |
+| 不言自明 (Self-explanatory) | 望文生义 | 结构须让用户直接看到所需求的信息:上限是直接看到、下限是一条简单命令且足以支撑一次改造;不是预防性优化,每个优化任务最多增加一个信息维度,被编码属性保留原真源、名称/路径是最终一致的投影;真源 shared/definitions/self-explanatory-definitions.md | auto | proposed |
 | 机制/策略分离 (Mechanism–Policy Separation) | mechanism–policy separation, 机制策略分离, 能力/职责分离 | 元技能治理原则:机制层(逻辑/算法/步骤,归档于技能定义本体及其 references/scripts/assets)与策略层(配置/输入/输出,归档于具体运行环境)语义上必须可分,执行前两层信息须同时具备,缺失时提示而非以默认值顶替;判据/成员/消费契约真源 shared/definitions/mechanism-policy-definitions.md(Feature 083) | user | proposed |

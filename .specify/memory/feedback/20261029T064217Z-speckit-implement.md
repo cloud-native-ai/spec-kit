@@ -8,9 +8,11 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T06:42:17Z"
 summary: "Slice 074b part 4/4 (final) closed the slice and advanced Feature 074 Planned -> Implemented. T023: the 19-file targeted set plus this slice's 3 suites re-run once (338 collected / 337 passed / 1 fail"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

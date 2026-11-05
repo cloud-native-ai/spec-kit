@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T02:50:17Z"
 summary: "Second (and only) analyze round on slice 074a after remediation @8f991f375. All three round-1 HIGH findings verified closed against the artifacts: C-01 (definition-class closure: change_nature now car"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

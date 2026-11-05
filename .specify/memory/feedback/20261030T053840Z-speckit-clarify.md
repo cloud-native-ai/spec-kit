@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-30T05:38:40Z"
 summary: "078 clarify Mode A：同作者条件下 2 个只读子代理分域扫描，24 条发现（20 条 owner 事实裁决修正 + 4 条问答）；Feature 078 绑定完成；三条确定性检查重跑全绿。"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

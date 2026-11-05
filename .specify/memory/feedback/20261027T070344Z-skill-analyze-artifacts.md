@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T07:03:44Z"
 summary: "analyze-artifacts on Feature 071: the seven passes plus the checklist-accountability pass produced 32 findings (0 CRITICAL / 6 HIGH / 22 MEDIUM / 4 LOW) and consumed all 27 unchecked checklist FAILs w"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

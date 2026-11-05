@@ -8,9 +8,12 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
+disposition: "processed"
 partial: false
 created: "2026-10-30T06:46:27Z"
 summary: "analyze rerun (loop 1/1): prior C-01/H-01/H-02/H-03 verified closed with file+line evidence; one new HIGH (H-04 optimization-claim protocol: three inconsistent creation points + check-then-act race vs"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

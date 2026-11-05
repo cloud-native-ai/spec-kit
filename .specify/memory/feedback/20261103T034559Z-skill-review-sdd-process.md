@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-03T03:45:59Z"
 summary: "Process segment executed over the 081a artifact chain. Found: DoD-2 red-first claim contradicted by the evidence file for two of four modules; the 081 gate lines were relocated inside the 077 wiring c"
+introspection_ref: "introspection-20261105T080109Z#F-01"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-01"
 ---
 
 ## Review

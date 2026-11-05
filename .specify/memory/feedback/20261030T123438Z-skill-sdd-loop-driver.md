@@ -8,9 +8,12 @@ probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
 feature: "078-bilingual-expression"
+disposition: "processed"
 partial: false
 created: "2026-10-30T12:34:38Z"
 summary: "positive"
+introspection_ref: "introspection-20261105T080109Z#F-01"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-01"
 ---
 
 ## Review

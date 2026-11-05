@@ -8,9 +8,12 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
+disposition: "processed"
 partial: false
 created: "2026-10-30T11:21:19Z"
 summary: "079 checklist：新建 checklists/run-then-report-2026-10-30.md（39 项 / 8 个契约面分组：调用与迁移 4、派发 5、确认与失败诚实 5、五节报告与输出目标 7、上下文与来源清单 4、旧内容模式 4、并发与嵌套 5、接线与可测性 5），全部为需求文本判定式问句，追溯 39/39；内联自检（条数/编号连续/追溯率/禁用开头/重复 id/不覆盖既"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

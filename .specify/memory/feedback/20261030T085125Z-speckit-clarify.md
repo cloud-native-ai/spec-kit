@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-bilingual-expression"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T08:51:25Z"
 summary: "positive"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

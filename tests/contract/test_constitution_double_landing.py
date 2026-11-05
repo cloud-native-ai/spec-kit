@@ -54,6 +54,7 @@ DOUBLE_LANDING_WATCHLIST = (
     "Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)",
     "Directory Governance (Named, Documented, Ignored When Temporary)",
     "Grounded Naming",
+    "Self-Explanatory Structure (不言自明)",
 )
 
 # C-8: numeral-agnostic matchers. `[IVXLC0-9]+` accepts roman or arabic; nothing pins a value.
@@ -68,10 +69,16 @@ LIVE_TITLE_RE = TEMPLATE_TITLE_RE
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
-TEMPLATE_COUNT = 17     # stale-pin update (2026-10-27): 16 -> 17 (XVII Grounded Naming);
-                        # previously 15 -> 16 (XVI Directory Governance, 067 T025)
-LIVE_COUNT = 18         # stale-pin update (2026-10-27): 17 -> 18 (XVIII Grounded Naming)
-COMMAND_COUNT = 10      # stale-pin update (2026-10-27): 9 -> 10 (Grounded Naming entry)
+TEMPLATE_COUNT = 18     # stale-pin update (2026-11-05, 082 T016): 17 -> 18
+                        # (XVIII Self-Explanatory Structure (不言自明))
+                        # previously 16 -> 17 (XVII Grounded Naming, 2026-10-27);
+                        # 15 -> 16 (XVI Directory Governance, 067 T025)
+LIVE_COUNT = 19         # stale-pin update (2026-11-05, 082 T016): 18 -> 19
+                        # (XIX Self-Explanatory Structure; the live roster's numeral is its own)
+                        # previously 17 -> 18 (XVIII Grounded Naming, 2026-10-27)
+COMMAND_COUNT = 11      # stale-pin update (2026-11-05, 082 T016): 10 -> 11
+                        # (Self-Explanatory Structure entry in the generator's MUST-include list)
+                        # previously 9 -> 10 (Grounded Naming entry, 2026-10-27)
 MIN_VERSION = (1, 13)   # floor semantics, never an equality pin
 
 

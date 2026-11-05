@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "077"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T19:50:20Z"
 summary: "implement stage passed: 28/28 tasks across 4 parts; Feature 077 Implemented; 8 SC statuses recorded (4 pass / 4 partial, the partials require a real expression-class pilot line); 174 feature contract "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

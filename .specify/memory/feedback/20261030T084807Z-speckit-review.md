@@ -8,9 +8,12 @@ probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
+disposition: "processed"
 partial: false
 created: "2026-10-30T08:48:07Z"
 summary: "process review complete: 9 findings (P0=0, P1=5, P2=4); targeted 162/162 green at stage_base 347a1458; closure may proceed after three P1 record repairs"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

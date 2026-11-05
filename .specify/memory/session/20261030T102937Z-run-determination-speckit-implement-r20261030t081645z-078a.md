@@ -21,7 +21,7 @@ summary: "/speckit.implement run=r20261030T081645Z-078a token=not_evaluated elap
   "feature": "078-bilingual-expression",
   "feature_id": null,
   "determined_at": "2026-10-30T10:29:37Z",
-  "settled_at": null,
+  "settled_at": "2026-11-05T06:38:10Z",
   "complexity": "complex",
   "qualification": "partial",
   "axes": {

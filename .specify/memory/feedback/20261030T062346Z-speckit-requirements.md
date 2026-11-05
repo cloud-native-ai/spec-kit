@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
 feature_id: "078"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T06:23:46Z"
 summary: "requirements-fix（analyze 回环 1/1）只修 requirements 侧四条：M-01 把 FR-024/A9 的不改写边界从「.specify/specs/** 一律冻结」改为「本特性 078-coaching-skills 目录之外的既有记录」，并写明本特性自身产物可正常改写与重跑；M-02 把 SC-006 的计数集从 5/5 扩为 FR-018 的八个身份坐标（源"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

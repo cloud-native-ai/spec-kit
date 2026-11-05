@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: true
 created: "2026-10-28T16:06:37Z"
 summary: "**Partial run** — slice 074a requirements: the artifact-authoring dispatch ended at its 40-turn limit with requirements.md (475 lines, 20 FR + 6 SC, 10 shared strings) and checklists/requirements.md o"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

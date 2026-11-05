@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T13:22:35Z"
 summary: "072 process segment: review.md from artifact chain + commit trace; 4 findings (1xP1, 3xP2); disclosure adjudications (a)-(e) recorded in timeline."
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

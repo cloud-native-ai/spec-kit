@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
 feature_id: "062"
+disposition: "processed"
 partial: false
 created: "2026-10-30T16:28:09Z"
 summary: "process review of feature 079: 1 P0 / 8 P1 / 3 P2; closure and merge blocked on the evidence-binding gate (8 pass SCs have no four-key evidence rows; gate never executed); targeted set 172 passed; cod"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

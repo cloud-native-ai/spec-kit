@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T03:56:44Z"
 summary: "Implement 074a completed all 32 tasks in 5 bounded parts. US1/US2/US3 green: 34+21+17 new tests; golden 14/14; targeted set 277 passed; full baseline 6361/23 pre-existing; mirrors clean; verification."
+introspection_ref: "introspection-20261105T080109Z#F-01"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-01"
 ---
 
 ## Review

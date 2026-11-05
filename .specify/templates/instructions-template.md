@@ -74,6 +74,12 @@ A requirement, success criterion, DoD item or verification task that asserts a m
 
 A name links the entity into the project's knowledge network; every later reader, search and agent reaches it through that name. Naming MUST NOT be improvised — the first available source decides, in this order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name. A name mandated by a higher-priority source MUST be carried through every reference in the same change. Owner: the project constitution's Grounded Naming principle.
 
+## Self-Explanatory Structure (不言自明)
+
+Self-explanatory structure means a capability's user view decides its surfaced shape: project what the user must see, add at most one information dimension per improvement, and let the user's real need — not a predicted one — decide when to stop. Every improvement keeps its encoded attribute's original source of truth as the owner, so names and paths stay projections.
+
+Full discipline — definitions, practice steps and the ceiling/floor rule — lives in `.specify/shared/definitions/self-explanatory-definitions.md` (do NOT copy its rules; reference the file).
+
 ## Bilingual Expression (双语表述)
 
 Core concepts and key processes carry a bilingual form at their definition site — the bracket language follows the document's primary language — so readers across contexts and models anchor on the same meaning. Full discipline: shared/guidelines/bilingual-expression.md (do NOT copy its rule enumerations; reference the file).

@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T06:26:11Z"
 summary: "clarify stage for Feature 071: 6 dated session rows written back into requirements.md, artifacts committed at 0d2d2d66, no question put to the user (unattended adjudication per the dispatch brief)"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

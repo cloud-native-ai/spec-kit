@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "071-review-code-integration"
 feature_id: "071"
+disposition: "processed"
 partial: false
 created: "2026-10-27T06:38:50Z"
 summary: "create-plan ran for 071: filled the plan template in place with a 16-row dynamically derived Constitution Check, produced research/data-model/6 contracts/quickstart/feature-ref, and ran the post-gener"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

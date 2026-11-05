@@ -8,9 +8,11 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "076"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T10:18:33Z"
 summary: "checklist stage completed: 37 readiness items (27 pass / 10 fail), all 26 FR and 8 SC covered, every fail names the inheriting implementation surface; requirements unchanged"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

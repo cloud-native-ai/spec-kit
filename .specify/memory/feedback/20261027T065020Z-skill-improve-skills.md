@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T06:50:20Z"
 summary: "Improved sdd-project-setup from this session's real run: physical inventory graded complete while goals were absent, instructions template injection could not fit the 32 KiB budget (15 sections skippe"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

@@ -8,9 +8,11 @@ probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "077"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T19:59:05Z"
 summary: "code segment: triage=run (base c1cd4600, head 794a7f2b, renderer text, no git-delta); receipt changed 177 / judged 23 / skipped 154 / gap 0; verdict not-evaluated (skips earn no coverage credit); gate"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review
