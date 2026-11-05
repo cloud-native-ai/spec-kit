@@ -4,7 +4,7 @@
 - **run_id**: r20261105T032102Z-c139
 - **state**: running
 - **current_stage**: implement
-- **part_scope**: T039-T043 (part 8 of 10)
+- **part_scope**: T044-T047 (part 9 of 10)
 - **attempts**: 1
 - **breakpoint_verdict**: post-analyze — analyze read-only pass complete; findings = CRITICAL 0 / HIGH 0 / MEDIUM 12 / LOW 2 (7 CRITICAL/HIGH candidates validated: 1 confirm already MEDIUM-capped, 4 downgraded, 2 rejected); next stage (implement) dispatched by driver ONLY after the driver adjudicates the U1 upsends (T006 red-first premise, C-26/T029 unsatisfiable entry point)
 - **topology**: local-native (host native subagent; no qodercli)
@@ -24,6 +24,7 @@
 - **stage_started_at**: 2026-11-05T04:07:42Z
 - **stage_deadline_epoch**: 1793856180
 - **pid_status_log_heartbeat**: local native — no pid/status/log; completion is the subagent return + sentinel
+- **part_checkpoint** (implement part 9/10): `part_scope=T044-T047` — **done**; commit `32fc3e70` (5 files, 333+/5-: the carrier's two new C-33 assertions, the T044/T046 note sections, the T047 quickstart-run section, tasks.md rows, the E3 file). T044-T047 all `[X]` in tasks.md, no `[>]` held; 6 unchecked rows remain (T048-T052 plus T053 which is P10), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-9.md`. Targeted-set-v1: carrier 10 passed rc 0 (was 8); `test_glossary_mechanism.py` 12 passed rc 0 with `git diff --stat --exit-code` = 0 (file unmodified); `improve.md` diff empty and `grep -c 'best-practice-optimization'` = 0 (`grep` rc 1 = wanted absence); the two T047 name sweeps rc 0 with per-file ≥ 1 on all eight counts; C-33 red-leg driver 7 PASS / 0 FAIL rc 0 on copies. Store byte-identical (`21482f64…`, 161 entries, empty `git diff`). Next part (P10 T048-T053) is driver-dispatched; this run MUST NOT start T048+ or T053.
 - **part_checkpoint** (implement part 8/10): `part_scope=T039-T043` — **done**; commit `2a525047` (3 files: the new contract module, the red-first evidence append, the E3 row). T039-T043 all `[X]` in tasks.md, no `[>]` held; 10 unchecked rows remain (T044+, and T053 which is P10), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-8.md`. Targeted-set-v1: new module 8 passed rc 0; `test_glossary_mechanism.py` 12 passed rc 0 (file unmodified, `git diff --stat` empty); parity subset 3 passed / 759 deselected rc 0; red-leg driver 10 PASS / 0 FAIL rc 0. Store byte-identical (`21482f64…`, 161 entries) — the engine write was idempotent. Next part (P9 T044-T047) is driver-dispatched; this run MUST NOT start T044+.
 - **part_checkpoint** (implement part 7/10): `part_scope=T034-T038` — **done**; commit `1d0746d4` (7 files, 741+/5-) + `1d15960f` (heading fix). T034-T038 all `[X]` in tasks.md, no `[>]` held; 15 unchecked rows remain (T039+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-7.md`. Next part (P8 T039-T043) is driver-dispatched; this run MUST NOT start T039+.
 - **part_checkpoint** (implement part 6/10): `part_scope=T029-T033` — **done**; commit `e88cebc2` (12 files, 1272+/8-). T029-T033 all `[X]` in tasks.md, no `[>]` held; 20 unchecked rows remain (T034+), by design. E3 stage-status row in `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-6.md`. Next part (P7 T034-T038) is driver-dispatched; this run MUST NOT start T034+.
@@ -118,6 +119,7 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
   - 2026-11-05 implement part 2: done — commits 171d4bcc + 8daf6b65; T007-T012 closed; template principle XVIII landed; US1 subset 12 passed with C-7 mandate side and C-21 declared expected-red.
   - 2026-11-05 implement part 3: done — commit 2161ac40; T013-T018 closed; US1 surface complete on all three surfaces; mutation legs M-1/M-2 PASS.
   - 2026-11-05 implement part 4: done with one held-open clause — T019-T022 closed (C-10/C-11/C-14/C-17 carriers + template section, C-21 green); T023's budget raise applied and recorded but its C-18 claim awaits the driver's reading choice (34816 vs 33792); one new and attributable failure, the deferred T024 live reconcile.
+  - 2026-11-05 implement part 9: done — commit 32fc3e70; T044-T047 closed; C-33 guarded as persistence (2 new assertions, red observed on copies); mechanism suite green and unmodified; improve.md untouched with zero optimization-workflow references (OI-082-01 stays open); T047 name sweep green on all eight counts plus a variant scan.
 
 ## Analyze-stage upsends (need driver adjudication before implement)
 
@@ -409,6 +411,48 @@ between readings, not a single consistent correction):
 - The `shared` pair is **65 files before and after** T030/T031: 62 pre-existing files + 3 mirrors already present (untracked) from the plan stage. T030 only version-controls the 3 source documents; it does not add 3 new mirror files. The task's `65 → 68` prediction was wrong; the task text is corrected.
 - The operative C-22/C-23 evidence stands: `sync-mirrors.py --check` exit 0 (six `ok` pairs), three `cmp` pairs byte-identical, no MISS/DIFF. Part 6's targeted set: distribution 4 passed; mirror parity 766 passed; migration+constitution 31 passed.
 - Next: P7 T034-T038 (docs link guard, docs page, distribution probe, M-5/M-6).
+
+## Part 9 record（implement T044-T047，2026-11-05）
+
+- **part_scope**: `T044-T047` (part 9 of 10) — **done**
+- **checkpoint**: `part9` — commit `32fc3e70` (5 files, 333+/5-); stage_base `5085f46f`
+- **rows closed**: T044, T045, T046, T047 all `[X]` in `tasks.md`; 6 unchecked rows remain
+  (T048-T052 plus T053), by design. No `[>]` held. T053 (C-34) stays in P10 as the part brief directs.
+- **targeted-set-v1 result** (no second full suite; E2's 26 failed / 7156 passed / 1 skipped stands):
+  - `python3 -m pytest tests/contract/test_self_explanatory_glossary.py -q` → **rc 0, 10 passed**
+    (8 carried from part 8 + 2 new C-33 assertions)
+  - `python3 -m pytest tests/contract/test_glossary_mechanism.py -q` → **rc 0, 12 passed**, and
+    `git diff --stat --exit-code tests/contract/test_glossary_mechanism.py` → **rc 0, empty**
+  - `git diff --stat --exit-code templates/commands/improve.md` → **rc 0, empty**;
+    `grep -c 'best-practice-optimization' templates/commands/improve.md` → **0** (`grep` rc 1 =
+    the wanted absence); positive control: the same pattern matches 2 / 1 / 1 in the owner docs
+  - `grep -cF 'Self-Explanatory Structure (不言自明)'` over the four client-facing outputs →
+    **rc 0, `1 / 1 / 2 / 1`**; `grep -cF '.specify/shared/definitions/self-explanatory-definitions.md'`
+    → **rc 0, `1 / 1 / 1 / 1`**; variant scan: plural form absent (rc 1), retired name absent (0 ×4)
+  - `python3 .specify/.tmp/082-part9/red_legs.py` (C-33 legs, copies only) → **rc 0, 7 PASS / 0 FAIL**
+    (2 controls + C-33-a red + C-33-m round-trip + C-33-b red + isolation)
+  - **new_failures**: none
+- **E3 pointer**: `.specify/specs/082-self-explanatory-integration/test-evidence/implement-part-9.md`;
+  transcripts in `notes/pre-change-measurements.md` § T044 / § T046 and `notes/quickstart-run.md` § T047.
+- **last_verdict**: implement part 9 done (`32fc3e70`) — C-33 landed as a **persistence** claim rather
+  than a second snapshot: T039 already reads the status field, but a snapshot cannot distinguish
+  "still proposed" from "promoted after the last read", so T044 asserts the value the engine's
+  `--action list` reports for the canonical row **after** the feature's write, plus an empty
+  write-verb set for the flow, and both assertions are observed red on a promoted copy and on a
+  named writing verb. T045 proves the mechanism suite is both green (12 passed) and byte-unmodified
+  (`--exit-code` 0). T046 records that `templates/commands/improve.md` is untouched and carries zero
+  references to the optimization workflow, names `OI-082-01`, and states the boundary explicitly —
+  **mirrored is not wired**, and the open item stays `open`. T047's two sweeps are green on all eight
+  counts, with a variant scan that would fail if a competing form appeared. Two in-passing
+  corrections disclosed (the red leg's blind substring replace promoting 131 rows; the leg reading
+  the real store because the engine resolves its own root and only `STORE` had been overridden).
+  No plan-owned artifact touched (`PLAN-EDIT: none`). No Completion Gate, no Feature status flip, no
+  implement Feedback/Wrap-up, no push.
+- **next_step**: driver dispatches implement part 10 (P10 `T048-T053`: mirror-total and
+  command-copy checks, the instructions BUDGET and gate-total finals, the Feature index sync, the
+  red-flag evidence wrap-up, the structure validation, C-34/T053, the Completion Gate and the
+  implement wrap-up). This run MUST NOT start T048+ or T053.
+- **stage_commits** (append): … → 2a525047 (implement part 8) → **32fc3e70 (implement part 9)**
 
 ## Part 8 record（implement T039-T043，2026-11-05）
 
