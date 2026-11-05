@@ -140,3 +140,54 @@ Reading, stated plainly rather than rounded up: the FR lane starts at **0 of 19*
 
 - No pass/fail verdict about the feature: this is a docs-only stage, and every executable reading belongs to the implement stage (`tasks.md` T027…T031).
 - No restatement of the toolchain pins: they are owned by `requirements.md` § Runtime Stack & Dependency Ownership and `plan.md` § Execution Premises (EP-001), which were verified at plan time on this branch. Restating them here would create the second copy this feature exists to remove.
+
+---
+
+## H — T002 · the coverage baseline, frozen at implement start (2026-11-05, HEAD `9657885f`)
+
+Command (verbatim, `tasks.md` T002):
+
+```bash
+python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure --freeze > .specify/specs/084-harness-triple-structure/coverage-baseline.txt
+```
+
+```text
+exit code: 0
+stderr:    (empty)
+freeze file: .specify/specs/084-harness-triple-structure/coverage-baseline.txt
+total lines: 515   (2 comment header lines + 513 sorted clause names)
+name list length: 513
+header line 2 (verbatim): # frozen-from: .specify/specs/*/contracts/* excluding 084-harness-triple-structure | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 9657885fe273 | files: 248 (parsed 145 + named 103)
+```
+
+**One field moved, disclosed rather than smoothed**: the tasks-stage freeze (commit `2b18485e`) carried
+`base-sha: 9284c789e154`; the implement-start freeze carries `base-sha: 9657885fe273` — the current
+HEAD, which is what the header field means. The 513 clause names are **byte-identical** between the two
+freezes (`diff` of header-stripped content is empty), so the comparison set did not move; only the
+recorded base SHA did. `tasks.md` T002 prescribes exactly this run at implement start, so the freeze is
+executed as written rather than inherited from the tasks stage.
+
+Delta reading against the frozen baseline, same tree, after the freeze:
+
+```bash
+python3 scripts/python/account-clause-coverage.py --spec-dir .specify/specs/084-harness-triple-structure
+```
+
+```text
+exit code: 1
+companion (must be non-empty on a green run): claimed clauses 0, scanned files 253, clause universe 1576, FR universe 19
+  [clause-uncovered] fail (572) — 572 uncovered, 59 beyond the frozen baseline
+  [fr-uncovered] fail (19) — 0 of 19 FRs cited from citation groups
+  [clause-unparsable] warn (103) — 103 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (59) — baseline holds 513 names; 513 uncovered items are baseline-internal and do not block
+78 error(s), 0 warning(s)
+status: uncovered
+```
+
+Reading, kept verbatim as `tasks.md` T002 requires: the FR lane is `0 of 19` cited from citation groups
+— the known, non-blocking consequence of the optional `[green:]` tag being unused (`tasks.md` banner,
+analyze round 2 § 5.1) — and the baseline now exists, so a later run can be read as a **delta** rather
+than as an absolute. The 59 `beyond the frozen baseline` names are this feature's own 59 clauses: the
+freeze's corpus deliberately excludes `084-harness-triple-structure`, so its own contracts are the
+"beyond baseline" side by construction, not a regression. No green is claimed for this lane by this file
+or by `tasks.md`; T027/T028 own the migration readings.
