@@ -90,7 +90,7 @@ Baseline drift(2026-10-16 实测):`sync-mirrors.py --check` 全树 **exit 0**(sc
 | `scripts/python/exec-quant.py`(新) | `.specify/scripts/python/exec-quant.py`(scripts 对 rglob 自动吸收;副本缺失 = ORPHAN error) | `sync-mirrors.py --check` exit 0(绝对判据,基线已测) |
 | `scripts/python/probe-utils.py`(`_ENGINE_SIBLINGS` +1) | `.specify/scripts/python/probe-utils.py` | 同上 |
 | `shared/definitions/probe-definitions.md`(+7 行) | `.specify/shared/definitions/probe-definitions.md` | 同上 |
-| `templates/commands/*.md`(23 面 compile 再生) | per-tool copies(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/` 等,经 regen-command-copies.py;NO `.specify/templates/commands/` 镜像——已退役) | `regen-command-copies.py --check` exit 0(绝对判据,基线已测);再生副本含新 wrap-up 行 |
+| `templates/commands/*.md`(23 面 compile 再生) | per-tool copies(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/` 等,经 regen-command-copies.py;NO `templates/commands/` 镜像——已退役) | `regen-command-copies.py --check` exit 0(绝对判据,基线已测);再生副本含新 wrap-up 行 |
 | `skills/{external,internal}/*/SKILL.md`(49 面 compile 就地再生) | `.specify/skills/` 镜像(sync 对自动吸收) | `sync-mirrors.py --check` exit 0 |
 
 **传播顺序固定**:compile-embeds → regen-command-copies → sync-mirrors(`test_compile_propagation_order.py` 钉住;顺序不可颠倒)。

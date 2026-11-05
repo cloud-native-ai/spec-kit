@@ -44,7 +44,7 @@
 
 ## 第二个解析器
 
-**C-14** [制品类] US5 MUST 显式处置 `skills/create-team/scripts/build-summary-input.py:354-391` 的**本地** goal 判据解析器:要么让它同样理解指代形,要么显式声明它不理解并记录后果。MUST NOT 沉默。判据:owner 文档或本契约内有一行点名该文件及其处置。(FR-035、D-15)
+**C-14** [制品类] US5 MUST 显式处置 `skills/internal/create-team/scripts/build-summary-input.py:354-391` 的**本地** goal 判据解析器:要么让它同样理解指代形,要么显式声明它不理解并记录后果。MUST NOT 沉默。判据:owner 文档或本契约内有一行点名该文件及其处置。(FR-035、D-15)
 
 **C-15** [行为类] 该本地解析器是**刻意**不 import 的——`:356-360` 明写 "This parses locally rather than importing `scripts/python/goal-utils.py` … cross-tree import breaks once installed"(它是 `skills/` 树内脚本,安装后与 `scripts/python/` 不同树)。故「让它理解指代形」的代价是**两处解析器同步**,MUST NOT 靠加一个 import 解决。(D-15)
 

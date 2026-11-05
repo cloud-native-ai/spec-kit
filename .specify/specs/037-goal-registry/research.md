@@ -10,7 +10,7 @@
 
 | Face | Count | Paths | Disposition |
 |------|-------|-------|-------------|
-| Canonical source | 4 | `skills/create-team/SKILL.md` (L62, 113, 647, 745); `skills/create-team/references/summary-mapping.md` (L12, 155); `skills/create-team/scripts/build-summary-input.py` (L14 docstring, **L577 live path literal**); `templates/commands/team.md` (L91, 96) | **Rewrite** |
+| Canonical source | 4 | `skills/internal/create-team/SKILL.md` (L62, 113, 647, 745); `skills/internal/create-team/references/summary-mapping.md` (L12, 155); `skills/internal/create-team/scripts/build-summary-input.py` (L14 docstring, **L577 live path literal**); `templates/commands/team.md` (L91, 96) | **Rewrite** |
 | `.specify/` mirrors | 4 | mirrors of the four above | **Regenerate** via `sync-mirrors.py --write` |
 | Per-tool generated copies | 5 | `.claude/commands/speckit.team.md` (L83,88); `.github/prompts/speckit.team.prompt.md` (L83,88); `.qoder/commands/speckit.team.md` (L83,88); `.opencode/command/speckit.team.md` (L83,88); `.qwen/commands/speckit.team.toml` (L106,111) | **Regenerate** — never hand-edit |
 | Tests | 9 | `tests/contract/{test_summary_form_generator,test_summary_writeset,test_goal_identity,test_summary_trigger}.py`; `tests/integration/{test_summary_accumulation,test_goal_aggregation,test_goal_concurrent_refresh,test_summary_legacy_backfill,test_summary_four_patterns}.py` | **Rewrite path literals only** (FR-024: assertions must not weaken) |
@@ -20,21 +20,21 @@
 | Historical (append-only / archived) | 18 | `.specify/specs/036-team-summary/**`; `.specify/specs/037-goal-registry/**`; `.specify/memory/feedback/**`; `.specify/memory/features*` | **MUST NOT rewrite** |
 | Build artifacts | 9 | `**/__pycache__/*.pyc` | Ignore |
 
-**Decision D-1**: FR-022 / SC-011 are scoped by face — live residual MUST be 0, historical rewrites MUST be 0. A whole-repo zero is unachievable by construction: the 2026-08-04 Clarifications entry quotes `.specify/project/goal/` verbatim as the user's directive, and rewriting it would falsify the record. Spec corrected accordingly before this plan was filled.
+**Decision D-1**: FR-022 / SC-011 are scoped by face — live residual MUST be 0, historical rewrites MUST be 0. A whole-repo zero is unachievable by construction: the 2026-08-04 Clarifications entry quotes `.specify/goal/` verbatim as the user's directive, and rewriting it would falsify the record. Spec corrected accordingly before this plan was filled.
 
 **Decision D-2**: `test_summary_trigger.py:215` asserts `"project/goal/" in text` across the canonical file, its mirror, and all 5 tool copies. It **breaks by design** on migration and must be updated to the new path in the same change — this is the concrete instance of FR-024's "paths updated only, assertions not weakened".
 
 ## E-2. The old directory is not materialized — migration carries no data
 
-`.specify/project/` contains only `project.md` plus gantt/milestones/wbs `.puml/.png/.svg` from the `manage-project` era. `.specify/project/goal/` **does not exist**; `build-summary-input.py:602` creates it on demand (`out_path.parent.mkdir(parents=True, exist_ok=True)`, annotated "FG-11 — only here"). `.specify/goal/` does not exist either.
+`.specify/project/` contains only `project.md` plus gantt/milestones/wbs `.puml/.png/.svg` from the `manage-project` era. `.specify/goal/` **does not exist**; `build-summary-input.py:602` creates it on demand (`out_path.parent.mkdir(parents=True, exist_ok=True)`, annotated "FG-11 — only here"). `.specify/goal/` does not exist either.
 
 **Decision D-3**: this is a pure code/doc/test migration with no data move and no transitional dual-path state in this repo. The spec's "迁移期新旧路径并存" edge case is retained as a guard for consuming projects but is vacuous here. `tests/integration/test_summary_four_patterns.py:192-200` guards that the real tree stays byte-unchanged, so it doubles as the regression net for the migration.
 
 ## E-3. Generator: one construction site, mirror byte-identical
 
-`skills/create-team/scripts/build-summary-input.py` (675 lines); `.specify/` mirror verified byte-identical (`diff` clean).
+`skills/internal/create-team/scripts/build-summary-input.py` (675 lines); `.specify/` mirror verified byte-identical (`diff` clean).
 
-- **L577** `delivery_dir = repo_root / ".specify/project/goal" / goal_slug` — the **only** construction site.
+- **L577** `delivery_dir = repo_root / ".specify/goal" / goal_slug` — the **only** construction site.
 - L578 default `--out` = `delivery_dir / "data/project-input.yaml"`; L602 the sole `mkdir`; L607 lock `out_path.parent / ".refresh.lock"`; L645–647 `.tmp` + `os.replace` atomic write; L656 report field `delivery_dir`.
 - CLI (L529–539): required mutually-exclusive `--goal` | `--team`, plus `--out`, `--baseline`, `--repo-root`, `--json`.
 - Exit codes (L37–40): `0` OK, `2` input error, `3` no material, `4` serialized (`LOCK_STALE_SECONDS=900`).
@@ -43,7 +43,7 @@
 
 ## E-4. Territory has zero executable validation today
 
-`skills/create-team/SKILL.md:204-231` "Territory Division" specifies: rules (extract domains → map READ/WRITE sets → **Zero Write Overlap** → read overlap allowed → shared writes to a **Forbidden Write List**, Lead-only), a Territory Manifest (`Task`, `Write Scope`, `Read Scope`, `Forbidden`), and a 4-item validation checklist. Related: L244 dispatch payload, L263-266 worktree isolation, L738 "Territory validation MUST pass before parallel dispatch".
+`skills/internal/create-team/SKILL.md:204-231` "Territory Division" specifies: rules (extract domains → map READ/WRITE sets → **Zero Write Overlap** → read overlap allowed → shared writes to a **Forbidden Write List**, Lead-only), a Territory Manifest (`Task`, `Write Scope`, `Read Scope`, `Forbidden`), and a 4-item validation checklist. Related: L244 dispatch payload, L263-266 worktree isolation, L738 "Territory validation MUST pass before parallel dispatch".
 
 Searching `*.py|*.sh|*.mjs` across `scripts/ skills/ src/ tests/ shared/` for `territory` returns **zero files**.
 
@@ -51,7 +51,7 @@ Searching `*.py|*.sh|*.mjs` across `scripts/ skills/ src/ tests/ shared/` for `t
 
 ## E-5. team.md schema is prose-only; only `goal_slug` is validated
 
-Schema lives solely as prose + a fenced YAML example at `skills/create-team/SKILL.md:32-88`. Frontmatter keys (L36-64): `name`, `slug`, `description`, `goal`, `goal_slug`, `pattern`, `preset`, `created`, `updated`, `members[]` (with a **commented-out per-member `territory`** at L51), `config` (incl. `summary.{enabled,every,delivery_dir,interactive}`). Invariant bullets at L83-87.
+Schema lives solely as prose + a fenced YAML example at `skills/internal/create-team/SKILL.md:32-88`. Frontmatter keys (L36-64): `name`, `slug`, `description`, `goal`, `goal_slug`, `pattern`, `preset`, `created`, `updated`, `members[]` (with a **commented-out per-member `territory`** at L51), `config` (incl. `summary.{enabled,every,delivery_dir,interactive}`). Invariant bullets at L83-87.
 
 Executable parsing is limited to `build-summary-input.py`: `split_frontmatter` (L92-103) and `Team.__init__` (L136-143) read `slug`/`name`/`pattern`/`description`/`goal`; `goal_slug` at L148; `members` at L403. **Validation** exists only for `goal_slug` (L187-188, DDL grammar + path safety). There is no team.md schema validator script.
 
@@ -70,7 +70,7 @@ Executable parsing is limited to `build-summary-input.py`: `split_frontmatter` (
 
 Authoritative fan-out config is `_ASSISTANT_COMMAND_DIRS` / `_ASSISTANT_EXTENSIONS` / `_ASSISTANT_ARG_FORMATS` at `src/specify_cli/__init__.py:132-165` (8 tools), but `regen-command-copies.py:51-58` (`_tool_dirs()`) only regenerates directories that **already exist**. Present today (19 files each): `.github/prompts` (`.prompt.md`), `.claude/commands` (`.md`), `.qwen/commands` (**`.toml`**, `{{args}}`), `.opencode/command` (`.md`), `.qoder/commands` (`.md`). Absent and therefore skipped: `.hermes/commands`, `.iflow/commands`, `.codex/commands`.
 
-Files required for `/speckit.goal`: `templates/commands/goal.md` (source) → `.specify/templates/commands/goal.md` (mirror, `regen-command-copies.py:145-147`) → the 5 per-tool copies → `docs/reference/commands/goal.md` (that directory holds exactly 19 files, 1:1 with templates, **no index.md**) → command-table rows in `docs/tutorials/quickstart.md:224` and `docs/tutorials/installation.md:93`.
+Files required for `/speckit.goal`: `templates/commands/goal.md` (source) → `templates/commands/goal.md` (mirror, `regen-command-copies.py:145-147`) → the 5 per-tool copies → `docs/reference/commands/goal.md` (that directory holds exactly 19 files, 1:1 with templates, **no index.md**) → command-table rows in `docs/tutorials/quickstart.md:224` and `docs/tutorials/installation.md:93`.
 
 **Decision D-8**: no test enumerates or counts all commands strictly, so adding one is safe. `tests/integration/test_ai_tools_command_coverage.py:34-97` globs dynamically and asserts only a core subset. **One test needs a deliberate edit**: `tests/contract/test_feedback_command_classification.py:19-29` hard-codes `COMPLEX_COMMANDS` (14) and `SIMPLE_COMMANDS` (4) with `assert len(...)` pins. `/speckit.goal` is a process-interaction command that creates and modifies artifacts through a confirmation gate, so it belongs in **COMPLEX** (bumping the pin 14→15) and MUST carry the `## Feedback` and `## Documentation` wrap-up steps like `/speckit.team`. `tests/contract/test_team_command_routing.py:24` is the routing-test pattern to clone.
 
@@ -78,9 +78,9 @@ Files required for `/speckit.goal`: `templates/commands/goal.md` (source) → `.
 
 | File | Size | Current stance |
 |------|------|----------------|
-| `skills/create-team/references/goal.md` | 3,217 B | Already calls the Goal a "project-level first-class entity at `.specify/goal/<goal-slug>/`" and defers to `goal-definitions.md`; still documents team-side `goal` frontmatter + `## Goal` |
-| `skills/improve-team/references/goal-editing.md` | 4,777 B | Inline-goal editing rules; no filesystem home; defers to `create-team/references/goal.md` |
-| `skills/create-team/references/optimization-goals.md` | 8,160 B | Classifies optimization goals and picks a team shape; no storage location |
+| `skills/internal/create-team/references/goal.md` | 3,217 B | Already calls the Goal a "project-level first-class entity at `.specify/goal/<goal-slug>/`" and defers to `goal-definitions.md`; still documents team-side `goal` frontmatter + `## Goal` |
+| `skills/internal/improve-team/references/goal-editing.md` | 4,777 B | Inline-goal editing rules; no filesystem home; defers to `create-team/references/goal.md` |
+| `skills/internal/create-team/references/optimization-goals.md` | 8,160 B | Classifies optimization goals and picks a team shape; no storage location |
 | `shared/definitions/goal-definitions.md` | 9,808 B | The concept authority. L7 "persisted under `.specify/goal/<goal-slug>/`"; L75-79 storage tree; **L80 delegates the layout inside `<goal-slug>/` to the implementing feature** |
 
 All four have same-size `.specify/` mirrors.

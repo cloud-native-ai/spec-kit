@@ -13,7 +13,7 @@
 
 - [X] T001 Align command template metadata and execution entry point in templates/commands/agents.md
 - [X] T002 [CN] in .github/prompts/speckit.agents.prompt.md
-- [X] T003 [P] [CN] `/speckit.agents` [CN] in docs/usage.md
+- [X] T003 [P] [CN] `/speckit.agents` [CN] in docs/tutorials/quickstart.md
 
 ---
 

@@ -115,7 +115,7 @@
   repo_root / "docs" / "usage.md",
   ```
 
-- **Why it's a problem**: The constitution's own next MINOR bump (1.7.0, required by this spec) broke a contract test that pinned `1.6` exactly; and `docs/usage.md` never existed at any reviewed commit, so two surface tests failed at FileNotFoundError before ever reaching their real assertion. The instructions file already carries the lesson ("Hard-coded counts/numbers … are fragile signals that break on expansion"), yet nothing enforces it at test-authoring time.
+- **Why it's a problem**: The constitution's own next MINOR bump (1.7.0, required by this spec) broke a contract test that pinned `1.6` exactly; and `docs/tutorials/quickstart.md` never existed at any reviewed commit, so two surface tests failed at FileNotFoundError before ever reaching their real assertion. The instructions file already carries the lesson ("Hard-coded counts/numbers … are fragile signals that break on expansion"), yet nothing enforces it at test-authoring time.
 - **Proposed fix**: Add a pin-hygiene rule to the `/speckit.tasks` Task Generation Rules ("version pins MUST be `>=` semantics; every file listed in a test surface fixture MUST be existence-checked or the list generated from the tree") and a one-off sweep task template for existing pins.
 
 ### F4 — /speckit.implement prescribes no mid-run scope-revision protocol
@@ -145,7 +145,7 @@
   ```
 
 - **Why it's a problem**: Every future re-taxonomy (any downstream project adopting the six-type layout) will re-pay the cost of writing anchor-aware, move-map-aware link rewriting from scratch; the logic (2 iterations, ~60 lines) existed only in a session-transient heredoc.
-- **Proposed fix**: Add `--action fix-links --moves <json>` to `scripts/python/docs-utils.py` (safe-write tier: rewrites relative links per an explicit move map, preserves anchors, dry-run by default) and pin it with contract rows in the docs-utils CLI contract.
+- **Proposed fix**: Add `--action fix-links --moves <json>` to `skills/external/create-docs/scripts/docs-utils.py` (safe-write tier: rewrites relative links per an explicit move map, preserves anchors, dry-run by default) and pin it with contract rows in the docs-utils CLI contract.
 
 ### F6 — No writability pre-probe in /speckit.implement; root-owned directory stalled the run mid-phase
 
@@ -194,7 +194,7 @@
 | P1 | Append-only Clarifications invariant | .specify/shared/constants/clarify-taxonomy.md | F2 |
 | P1 | Pin-hygiene rule | templates/commands/tasks.md | F3 |
 | P1 | Mid-run directive protocol | templates/commands/implement.md, templates/commands/plan.md | F4 |
-| P2 | fix-links engine action | scripts/python/docs-utils.py | F5 |
+| P2 | fix-links engine action | skills/external/create-docs/scripts/docs-utils.py | F5 |
 | P2 | Writability pre-probe | templates/commands/implement.md | F6 |
 
 ## 7. Self-Containment Check

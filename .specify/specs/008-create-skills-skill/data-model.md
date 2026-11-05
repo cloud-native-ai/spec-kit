@@ -12,7 +12,7 @@ Represents the reusable knowledge package that guides agents through creating ne
 **Fields**:
 
 - `name`: Always `create-skills`.
-- `canonical_source_path`: Repository source path for the Skill, expected to be `skills/create-skills/SKILL.md`.
+- `canonical_source_path`: Repository source path for the Skill, expected to be `skills/external/create-skills/SKILL.md`.
 - `workspace_compatibility_path`: Current-workspace Skill path when mirrored or installed, typically `.specify/skills/create-skills/SKILL.md`.
 - `description`: Trigger description that clearly identifies new Skill creation and workflow distillation scenarios.
 - `workflow_sections`: Ordered guidance sections covering input parsing, conversation distillation, Skill structure, resources, registry, validation, and reporting.

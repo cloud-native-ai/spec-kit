@@ -3,7 +3,7 @@
 **Requirement Branch**: `040-agent-metadata-portability`  
 **Created**: 2026-08-13  
 **Status**: Draft  
-**Input**: User description: "需要彻底优化一下./agents目录中的预置的agent定义, 需要明确的将agent定义中的元信息和对于agent自身的信息分离出来,另外元信息使用一个更通用的方式组织而不是针对特定的agent工具(如qoder),在init命令进行分发的时候在将元数据转换为对应目标工具的格式,比如执行specify init "${project_name}" --ai qoder的时候在将agent定义的元数据转为qoder支持的格式,然后输出到.qoder/agents/*.agent.md文件中(取消当前的软链接模式). 最后需要明确skills/create-agent/templates目录,skills/create-team/templates/agents目录和./agents目录中所定义的agent的差别."
+**Input**: User description: "需要彻底优化一下./agents目录中的预置的agent定义, 需要明确的将agent定义中的元信息和对于agent自身的信息分离出来,另外元信息使用一个更通用的方式组织而不是针对特定的agent工具(如qoder),在init命令进行分发的时候在将元数据转换为对应目标工具的格式,比如执行specify init "${project_name}" --ai qoder的时候在将agent定义的元数据转为qoder支持的格式,然后输出到.qoder/agents/*.agent.md文件中(取消当前的软链接模式). 最后需要明确skills/internal/create-agent/templates目录,skills/internal/create-team/templates/agents目录和./agents目录中所定义的agent的差别."
 
 ## Related Feature *(mandatory)*
 
@@ -26,8 +26,8 @@
 - **本仓库没有任何"每工具 agent frontmatter 格式"文档**: `docs/reference/cli/` 下六个工具参考文档均不描述 agent/subagent 字段;唯一成文的格式是那份 Qoder 口味的基线。历史依据见 `docs/reference/history/01-agent-system-evolution.md:18`("Claude Code 的 subagent 格式兼容 VS Code Copilot custom agent 规范"),这正是当初用软链接桥接、不做每工具副本的理由。
 - **三个目录的实际形态**(2026-08-13 第二轮澄清已裁定改造方向,见 FR-023:7 个角色定义迁往 Worker 能力模板,`agents/` 改放框架维护型 Meta Agent):
   - `agents/`(7 文件):具体、无占位符、可直接运行;经 `sync-mirrors.py` 的 `MIRROR_PAIRS`(`:56`,`("agents", ".specify/agents/templates", False)`)镜像到 `.specify/agents/templates/`,即术语表的 **Agent Template** 层。
-  - `skills/create-agent/templates/`(10 文件):7 个 `agent-capacity-<slug>-template.md` 是带 `{{AGENT_NAME}}`/`{{PROJECT_NAME}}` 占位符的完整单 agent 授权模板 + `agent-project-custom-template.md`(自定义脚手架,frontmatter 用 `project:` 标记,无 `supervisor`/`capacity-scope`)+ 2 个可组合片段(`agent-skill-enablement.md`、`agent-supervision-delegation.md`)。
-  - `skills/create-team/templates/agents/`(8 文件):团队域授权模板 —— 阶段角色(executor/evaluator/optimizer,`user-invocable: false`、无 `tools`/`maxTurns`/`color`)、`agent-team-supervisor-template.md`(用 `role-scope: team-supervisor` 而非 `capacity-scope`)、三个编排模板(parallel/serial/triad)、`agent-workflow-schema.md`。
+  - `skills/internal/create-agent/templates/`(10 文件):7 个 `agent-capacity-<slug>-template.md` 是带 `{{AGENT_NAME}}`/`{{PROJECT_NAME}}` 占位符的完整单 agent 授权模板 + `agent-project-custom-template.md`(自定义脚手架,frontmatter 用 `project:` 标记,无 `supervisor`/`capacity-scope`)+ 2 个可组合片段(`agent-skill-enablement.md`、`agent-supervision-delegation.md`)。
+  - `skills/internal/create-team/templates/agents/`(8 文件):团队域授权模板 —— 阶段角色(executor/evaluator/optimizer,`user-invocable: false`、无 `tools`/`maxTurns`/`color`)、`agent-team-supervisor-template.md`(用 `role-scope: team-supervisor` 而非 `capacity-scope`)、三个编排模板(parallel/serial/triad)、`agent-workflow-schema.md`。
 - **"templates" 一词当前三义**:Agent Template 层(`.specify/agents/templates/`)、单 agent 授权模板目录、团队授权模板目录 —— 这是本需求要消除的歧义。
 - **相邻在办项**: `.specify/memory/features.md:41` 的 Feature 033(Draft,Agent Project Context Parameterization)提议在 init/refresh 时按目标项目渲染 agent 正文的 `## Project Context` 段;它作用于**正文**,本需求作用于**元信息与分发**,两者需保持可叠加。
 
@@ -105,7 +105,7 @@
 
 ### User Story 5 - 三个 agent 目录的差别被明确定义 (Priority: P2)
 
-作为贡献者,当我看到 `agents/`、`skills/create-agent/templates/`、`skills/create-team/templates/agents/` 三个都在放 `*.agent.md` 的位置时,我能立刻判断某个文件属于哪一类、由谁生产、被谁消费、能否直接运行,不再被 "templates" 一词的多重含义误导。
+作为贡献者,当我看到 `agents/`、`skills/internal/create-agent/templates/`、`skills/internal/create-team/templates/agents/` 三个都在放 `*.agent.md` 的位置时,我能立刻判断某个文件属于哪一类、由谁生产、被谁消费、能否直接运行,不再被 "templates" 一词的多重含义误导。
 
 **Why this priority**: 这是独立于代码改造的认知债务,当前 "templates" 同时指 Agent Template 层、单 agent 授权模板、团队授权模板,极易导致改错位置;但它不阻塞前三个故事,故列 P2。
 
@@ -172,7 +172,7 @@
 
 **三类 agent 目录的差别定义**
 
-- **FR-023**: 系统 MUST 沿 Worker/Meta 类型划分成文定义三者的差别 —— `agents/` **仅**定义 **Meta Agent(元 Agent)**:操作对象是其他技能与其他 agent,均可**独立运行**(无特定团队需求时已具备自身职责,如调整目录结构、验证技能执行效果);`skills/create-agent/templates/` 与 `skills/create-team/templates/agents/` 定义的都是 **Worker Agent(面向问题域操作的 agent 模板)**,前者沿**能力**维度、后者沿**职责**维度(团队席位与编排契约);每类 MUST 写明:是否含占位符、是否可直接运行、生产者与消费者、命名规则、落地位置。现有 7 个角色定义按"操作对象为业务工件"判据实为 **Worker**,MUST 从 `agents/` 迁入 `skills/create-agent/templates/` 的 Worker 能力模板序列;`agents/` MUST 由新作的框架维护型 Meta Agent 定义填充。
+- **FR-023**: 系统 MUST 沿 Worker/Meta 类型划分成文定义三者的差别 —— `agents/` **仅**定义 **Meta Agent(元 Agent)**:操作对象是其他技能与其他 agent,均可**独立运行**(无特定团队需求时已具备自身职责,如调整目录结构、验证技能执行效果);`skills/internal/create-agent/templates/` 与 `skills/internal/create-team/templates/agents/` 定义的都是 **Worker Agent(面向问题域操作的 agent 模板)**,前者沿**能力**维度、后者沿**职责**维度(团队席位与编排契约);每类 MUST 写明:是否含占位符、是否可直接运行、生产者与消费者、命名规则、落地位置。现有 7 个角色定义按"操作对象为业务工件"判据实为 **Worker**,MUST 从 `agents/` 迁入 `skills/internal/create-agent/templates/` 的 Worker 能力模板序列;`agents/` MUST 由新作的框架维护型 Meta Agent 定义填充。
 - **FR-023a**: 差别定义 MUST 成文给出**组队取件规则**:组建 Team 时,Meta Agent 从 `agents/` 选取,Worker Agent 从技能模板实例化选取;迁移完成后,7 个角色定义 MUST 不再以预置形态随 init 分发,而是经 Worker 能力模板按需实例化。
 - **FR-024**: 系统 MUST 以 Worker/Meta 目录划分及其配套文档消除 "templates" 一词的多义:三处用法 MUST 各有可区分的限定表述(Meta Agent 预置集 / Worker 能力模板 / Worker 职责模板),读者无需依赖上下文即可判断指代;MUST NOT 为此物理重命名现有目录。
 - **FR-025**: 差别定义 MUST 被术语表锚定(与既有 Agent Template / Agent Instance / Agent Execution 三层分类法一致,并新增目录级 Worker/Meta 划分条目),并 MUST 记录三类之间现存的不一致([[STR-005]] 与 [[STR-006]] 并存、阶段模板缺运行参数)是"有意为之"还是"待收敛"。
@@ -206,7 +206,7 @@
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 对 `agents/`、`skills/create-agent/templates/`、`skills/create-team/templates/agents/` 做字段名扫描的契约测试,断言禁用词表命中数为 0;每次 CI 运行采集。
+- **SC-001 Source**: 对 `agents/`、`skills/internal/create-agent/templates/`、`skills/internal/create-team/templates/agents/` 做字段名扫描的契约测试,断言禁用词表命中数为 0;每次 CI 运行采集。
 - **SC-002 Source**: 集成测试在临时目录执行 init 后统计目标 agent 目录下的符号链接数与常规文件数;每次 CI 运行采集。
 - **SC-003 Source**: 映射真源文件自身的条目与来源标注列,由契约测试对照受支持工具清单(`AGENT_CONFIG`)校验完备性;每次 CI 运行采集。
 - **SC-004 Source**: 交付时以一次"新增假想工具"的演练记录改动文件清单;一次性验收采集。
@@ -224,7 +224,7 @@
 | `STR-003` | "Qoder-compatible fields" | FR-008(须替换为中立表述);现存于 `docs/reference/agents/templates-and-agents.md:80-83` |
 | `STR-004` | "maxTurns" | FR-005(工具方言键,须中立化);现存于全部 7 个预置 agent frontmatter |
 | `STR-005` | "capacity-scope" | FR-025(与 `role-scope` 并存的不一致须裁定) |
-| `STR-006` | "role-scope" | FR-025(同上);现存于 `skills/create-team/templates/agents/agent-team-supervisor-template.md` |
+| `STR-006` | "role-scope" | FR-025(同上);现存于 `skills/internal/create-team/templates/agents/agent-team-supervisor-template.md` |
 
 **Citation convention**: 下游 FR/契约/任务/测试引用上述字符串时写 `[[STR-NNN]]`,不要复制字面量,便于一次轮换。
 
@@ -260,10 +260,10 @@ Format: - Q: <question> → A: <answer>
 - Q: 元信息载体形态(FR-002)—— 单文件内的中立元信息块,还是正文文件 + 独立元信息文件的物理分离? → A: **单文件结构** —— 一个 `*.agent.md` 同时承载元信息块与正文,边界凭 frontmatter 键归属判定;发现机制、镜像对、迁移面均保持不变。
 - Q: 每工具目标目录矩阵(FR-012)—— codex 是否纳入?claude 与 copilot 是否维持共用 `.github/agents`? → A: **矩阵核定为四家项目级渲染**:`qoder` → `.qoder/agents/`、`claude` → `.claude/agents/`(VS Code 亦读此位置)、`copilot` → `.github/agents/`、`opencode` → `.opencode/agents/`(复数)。`codex` 本轮不渲染(格式为 TOML、落点在用户级 config 层,越出项目作用域),映射真源保留标注行;`hermes` 按 FR-014 静默跳过。矩阵变更经映射真源单点修改。
 - Q: 用户手改渲染产物后的再渲染行为(FR-021)—— 备份替换、跳过保留还是冲突文件? → A: **备份替换 + 报告** —— 用渲染清单(哈希比对)检测手改;未改直接覆盖刷新,已改先备份至可取回位置再覆盖并在 init 反馈中明示备份路径;不在清单中且无中立源对应的文件视为用户资产不覆盖。
-- Q: "templates" 三义消除与三目录差别定义(FR-023/FR-024) → A: (用户指示)三目录沿**三个组合维度**划分:`skills/create-agent/templates/` 定义 Agent 的**能力**,`skills/create-team/templates/agents/` 定义 Agent 的**职责**,`agents/` 定义**元 Agent**(agent 类型定义本身)。经确认取"维度读法":"元"指定义 agent 类型的元层,与 Worker/Meta 阶段判型正交不变;agent 正文不重写、不做物理目录重命名,消歧由三维度模型 + 文档/术语表承载。
+- Q: "templates" 三义消除与三目录差别定义(FR-023/FR-024) → A: (用户指示)三目录沿**三个组合维度**划分:`skills/internal/create-agent/templates/` 定义 Agent 的**能力**,`skills/internal/create-team/templates/agents/` 定义 Agent 的**职责**,`agents/` 定义**元 Agent**(agent 类型定义本身)。经确认取"维度读法":"元"指定义 agent 类型的元层,与 Worker/Meta 阶段判型正交不变;agent 正文不重写、不做物理目录重命名,消歧由三维度模型 + 文档/术语表承载。
 
 ### Session 2026-08-13(第二轮)
 
-- 用户修订指示(原文):"./agents这个目录中应该定义所有的Meta Agent(元Agent),这些 Agent 是用来操作其他技能和其他 Agent,而无论是skills/create-agent还是skills/create-team技能中模板都是所谓的 Worker Agent,即真正面向问题域进行操作的 Agent。通过这种划分,Agent 体系更加清晰。组建 Team 时,需从 Process 中选取原 Agent,从技能模板中选取 Worker Agent。所有原 Agent 均可独立运行,因其在无特定需求时已具备自身职责。例如,启动 Agent 调整目录结构,或启动 Server Agent 验证技能执行效果。" —— 以此**目录级 Worker/Meta 划分**取代第一轮的"三维度正交"读法(第一轮的 能力/职责 子维度保留为 Worker 模板内部的组织方式)。
+- 用户修订指示(原文):"./agents这个目录中应该定义所有的Meta Agent(元Agent),这些 Agent 是用来操作其他技能和其他 Agent,而无论是skills/internal/create-agent还是skills/internal/create-team技能中模板都是所谓的 Worker Agent,即真正面向问题域进行操作的 Agent。通过这种划分,Agent 体系更加清晰。组建 Team 时,需从 Process 中选取原 Agent,从技能模板中选取 Worker Agent。所有原 Agent 均可独立运行,因其在无特定需求时已具备自身职责。例如,启动 Agent 调整目录结构,或启动 Server Agent 验证技能执行效果。" —— 以此**目录级 Worker/Meta 划分**取代第一轮的"三维度正交"读法(第一轮的 能力/职责 子维度保留为 Worker 模板内部的组织方式)。
 - Q: 语音误写更正(术语表协议) → A: 用户确认两处均为语音误写,按建议更正:"从 Process 中选取原 Agent" = **从预置(`agents/`)中选取 Meta Agent**("原"≈"元");"Server Agent" 为笔误,不存在的概念,上下文语义为"某个验证技能执行效果的 Meta Agent"。
-- Q: 现有 7 个预置角色按新判据的归属 —— 双上下文读法(留在 agents/)还是严格判据迁移? → A: **B 严格判据迁移** —— 7 个角色定义按"操作对象为业务工件"判据实为 Worker,从 `agents/` 迁入 `skills/create-agent/templates/` 的 Worker 能力模板序列;`agents/` 由新作的框架维护型 Meta Agent 定义填充;迁移后 7 个角色定义不再以预置形态随 init 分发,经模板按需实例化(FR-023/FR-023a/SC-001/Out of Scope 已联动改写)。
+- Q: 现有 7 个预置角色按新判据的归属 —— 双上下文读法(留在 agents/)还是严格判据迁移? → A: **B 严格判据迁移** —— 7 个角色定义按"操作对象为业务工件"判据实为 Worker,从 `agents/` 迁入 `skills/internal/create-agent/templates/` 的 Worker 能力模板序列;`agents/` 由新作的框架维护型 Meta Agent 定义填充;迁移后 7 个角色定义不再以预置形态随 init 分发,经模板按需实例化(FR-023/FR-023a/SC-001/Out of Scope 已联动改写)。

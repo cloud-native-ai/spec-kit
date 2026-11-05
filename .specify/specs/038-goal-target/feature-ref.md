@@ -16,7 +16,7 @@
 
 ## 交叉引用
 
-- **Feature 027(Team Management)**:团队侧两个消费面(run 指派、台账归属)触碰其章程边界但不改章程——`templates/commands/team.md` 与 `skills/create-team/` 的变更属 027 的文件域、041 的概念域,经本计划统一扇出。
+- **Feature 027(Team Management)**:团队侧两个消费面(run 指派、台账归属)触碰其章程边界但不改章程——`templates/commands/team.md` 与 `skills/internal/create-team/` 的变更属 027 的文件域、041 的概念域,经本计划统一扇出。
 - **Feature 041 状态处理**:041 当前状态 Implemented(037 交付);038 是其后继扩展切片,不回退状态——features.md 与 details 以注记形式记录 038 规划,状态推进待 038 implement 完成时一并评估。
 
 ## 新 Feature 评估

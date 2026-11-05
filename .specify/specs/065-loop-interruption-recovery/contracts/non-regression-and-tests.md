@@ -5,8 +5,8 @@
 
 ## Non-regression
 
-- **NR-01**: `scripts/watch-target.sh` is not edited. Its verdict state machine, signal priority, exit codes 0/10–16 and all 38 `--self-test` cases remain byte- and behavior-identical.
-- **NR-02**: `scripts/line-registry.py` is not edited. Registry, envelope, lease, reservation and ownership semantics remain owned by Feature 064; the new engine reads the Registry entry only.
+- **NR-01**: `skills/external/sdd-loop-driver/scripts/watch-target.sh` is not edited. Its verdict state machine, signal priority, exit codes 0/10–16 and all 38 `--self-test` cases remain byte- and behavior-identical.
+- **NR-02**: `skills/external/sdd-loop-driver/scripts/line-registry.py` is not edited. Registry, envelope, lease, reservation and ownership semantics remain owned by Feature 064; the new engine reads the Registry entry only.
 - **NR-03**: Stage command internals, the three-section dispatch skeleton, sentinel literals, confirmation gates and fast-fail discipline are unchanged.
 - **NR-04**: The four carrier formats remain compatible: new readers accept the 063-style `status/pid/heartbeat` files without `run=` as well as the 064-style envelope. No existing field is renamed or removed.
 - **NR-05**: No daemon, long-running service, external API, model call or new runtime dependency is introduced. The engine is a one-shot Python CLI.

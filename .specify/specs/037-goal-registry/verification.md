@@ -19,7 +19,7 @@ Every success-criterion line below cites the task whose measurement produced it 
 | SC-006 | `pass` | T036 | Narrative + milestones sourced from the definition when present; the "goal bodies disagree" arbitration gap drops to 0; no-definition fallback identical to 036 (zero regression in its suite). |
 | SC-007 | `pass` | T057 | Migration preserves the resolved objective (before/after `project_desc` identical); zero team-run failures. |
 | SC-008 | `pass` | T066 | `goal.md` sha256 byte-identical across a summary refresh — the derived flow never writes the definition. |
-| SC-009 | `pass` | T064 | `.specify/project/goal/` does not exist; exactly one goal-indexed directory (`.specify/goal/`); zero goal artifacts under `.specify/project/`. |
+| SC-009 | `pass` | T064 | `.specify/goal/` does not exist; exactly one goal-indexed directory (`.specify/goal/`); zero goal artifacts under `.specify/project/`. |
 | SC-010 | `pass` | T067 | All three team-domain guidance files link to `goal-definitions.md`; zero second-account statements placing a goal inside team files. |
 | SC-011 | `pass` | T064, T071 | Live-face `project/goal` residual = 0 (24 source files migrated); 25 historical files preserved unchanged; 036 suite green, zero new failures. |
 | SC-012 | `pass` | T068 | Exactly one surface writes `.specify/goal/**` definitions (`goal-utils.py`); `sync-mirrors --check` exit 0 (no command-surface drift). |

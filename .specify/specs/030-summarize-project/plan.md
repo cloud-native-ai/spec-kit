@@ -8,7 +8,7 @@
 
 Deliver visualization-driven project information collection and presentation as two workstreams sharing one rendering dependency (the `draw-plantuml` skill):
 
-- **WS-A (new)**: Create `skills/summarize-project/` — a skill that collects project work items from workspace materials, decomposes them once into a hierarchical breakdown, renders that breakdown as a WBS chart and a Gantt chart (milestones, schedule, progress status) by delegating to `draw-plantuml`, and assembles one self-contained HTML report for external readers.
+- **WS-A (new)**: Create `skills/internal/summarize-project/` — a skill that collects project work items from workspace materials, decomposes them once into a hierarchical breakdown, renders that breakdown as a WBS chart and a Gantt chart (milestones, schedule, progress status) by delegating to `draw-plantuml`, and assembles one self-contained HTML report for external readers.
 - **WS-B (enhancement)**: Extend `skills/analysis-project/` with UML diagramming actions so its report's primary views (structure, key flows, deployment topology) are expressed as standard UML diagrams rendered via `draw-plantuml`, while lightweight Mermaid sketches remain for secondary content and all existing analysis behavior is preserved.
 
 No new runtime code: both workstreams are prompt-artifact skill packages, validated by structural contract tests. No standalone research.md — findings inlined below (all decisions resolve from internal sources: `skills/draw-plantuml/`, `skills/analysis-project/`, `.specify/memory/features/013.md`, constitution).
@@ -16,7 +16,7 @@ No new runtime code: both workstreams are prompt-artifact skill packages, valida
 ## Technical Context
 
 **Language/Version**: N/A runtime — skills are prompt/document artifacts (`SKILL.md` + `references/`); contract tests are Python 3.8+ / pytest per the repo test suite.  
-**Primary Dependencies**: `skills/draw-plantuml/` (delegation target: WBS `@startwbs` via `references/howto/13-wbs-diagram.md`, Gantt `@startgantt` via `references/howto/14-gantt-diagram.md`, UML diagram guides, `scripts/render-plantuml.sh`, output conventions in SKILL.md §输出要求); `templates/skills-template.md` and `skills/create-skills/` (authoring conventions); `${SKILL_HOME}` / `${SKILL_WORKDIR}` path idioms (spec 012); `.specify/instructions.md` skills registry.  
+**Primary Dependencies**: `skills/draw-plantuml/` (delegation target: WBS `@startwbs` via `references/howto/13-wbs-diagram.md`, Gantt `@startgantt` via `references/howto/14-gantt-diagram.md`, UML diagram guides, `skills/external/draw-diagram/references/types/plantuml/scripts/render-plantuml.sh`, output conventions in SKILL.md §输出要求); `templates/skills-template.md` and `skills/external/create-skills/` (authoring conventions); `${SKILL_HOME}` / `${SKILL_WORKDIR}` path idioms (spec 012); `.specify/instructions.md` skills registry.  
 **Storage**: N/A — file-based skill packages under `skills/` (canonical) and `.specify/skills/` (mirror).  
 **Testing**: pytest structural contract tests under `tests/contract/` (precedent: `test_create_skills_prompt_assets.py`, `test_portable_skill_creation.py`, `test_skill_home_workdir_template.py`).  
 **Target Platform**: AI agent prompt surfaces (Qoder, Claude Code, Codex CLI, GitHub Copilot, Qwen Code, opencode, Hermes, iFlow) consuming installed skill packages.  
@@ -72,7 +72,7 @@ No standalone research.md — Phase 0 findings inlined below.
 ### Source Code (repository root)
 
 ```text
-skills/summarize-project/           # NEW: visual project summary skill (WBS + Gantt → HTML report)
+skills/internal/summarize-project/           # NEW: visual project summary skill (WBS + Gantt → HTML report)
 skills/analysis-project/            # MODIFIED: SKILL.md gains UML diagramming actions; +references/uml-visualization-guide.md
 .specify/skills/summarize-project/  # NEW MIRROR: byte-equivalent copy of the canonical skill
 .specify/skills/analysis-project/   # MODIFIED MIRROR: synchronized with canonical edits
@@ -90,7 +90,7 @@ N/A — all Constitution Check rows pass; no violations to justify.
 
 ### Key Findings from Internal Analysis
 
-1. **draw-plantuml already provides everything both workstreams need**: WBS (`@startwbs`, guide `references/howto/13-wbs-diagram.md`), Gantt (`@startgantt` with milestones/dependencies/progress coloring, guide `references/howto/14-gantt-diagram.md`), the full UML diagram set with per-type guides (`references/howto/02`–`12`), a render script (`scripts/render-plantuml.sh` producing PNG+SVG), and explicit output conventions (single HTML, relative paths, `.puml` sources kept). Therefore both workstreams MUST reference this skill rather than duplicate any of it (FR-005/006/011/016; Constitution IX).
+1. **draw-plantuml already provides everything both workstreams need**: WBS (`@startwbs`, guide `references/howto/13-wbs-diagram.md`), Gantt (`@startgantt` with milestones/dependencies/progress coloring, guide `references/howto/14-gantt-diagram.md`), the full UML diagram set with per-type guides (`references/howto/02`–`12`), a render script (`skills/external/draw-diagram/references/types/plantuml/scripts/render-plantuml.sh` producing PNG+SVG), and explicit output conventions (single HTML, relative paths, `.puml` sources kept). Therefore both workstreams MUST reference this skill rather than duplicate any of it (FR-005/006/011/016; Constitution IX).
 
 2. **analysis-project's current visualization is Mermaid-only and text-heavy**: its SKILL.md mandates Mermaid sketches (Phase 5 report-structure design, Output Requirements) and fixes the deliverable at `$WORK_DIR/docs/overview.md`. The enhancement injection points are: frontmatter description (mention UML), Phase 5 (plan UML figures for primary views), Phase 8 (assemble rendered figures into the report), Output Requirements (UML figures as the standard for primary views; Mermaid retained for secondary sketches), plus a new `references/uml-visualization-guide.md` carrying the view→diagram-type mapping (FR-017).
 

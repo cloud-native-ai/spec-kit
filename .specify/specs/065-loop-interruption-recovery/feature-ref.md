@@ -12,7 +12,7 @@
 | Registry row | `.specify/memory/features.md` row 065 |
 | Detail file | `.specify/memory/features/065.md` |
 | Owner surfaces | Existing mechanisms stay with their owners: 058 (U0–U6, spine, sentinels, U4/U5, watcher verdicts), 063 (fast lane, test budget, plan constraint, plan-owned artifacts), 064 (Registry, envelope, lease, reservation, ownership) |
-| New surface | `references/state-awareness.md` (rules), `scripts/loop-state.py` (engine), watchbeat marker, spine machine segment, recovery record/actions |
+| New surface | `references/state-awareness.md` (rules), `skills/external/sdd-loop-driver/scripts/loop-state.py` (engine), watchbeat marker, spine machine segment, recovery record/actions |
 
 This plan does not create a new Feature, merge or split an existing one, or change another Feature's status. The new capability is an additive layer over Feature 058's loop and Feature 064's registry; Feature 065 owns only the observation/recovery rules and their records.
 
@@ -20,7 +20,7 @@ This plan does not create a new Feature, merge or split an existing one, or chan
 
 | FR | Owning artifact / contract |
 |----|----------------------------|
-| FR-001 | `references/state-awareness.md` § Entry; LS-01–LS-04, LS-13; `scripts/loop-state.py` |
+| FR-001 | `references/state-awareness.md` § Entry; LS-01–LS-04, LS-13; `skills/external/sdd-loop-driver/scripts/loop-state.py` |
 | FR-002 | LS-05–LS-07, LS-22; SN-05–SN-06 |
 | FR-003 | SN-01–SN-04; LS-08; data-model E-01/E-02 |
 | FR-004 | SN-08–SN-20; owner reference § Derived Loop State (D0–D8) |

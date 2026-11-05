@@ -31,7 +31,7 @@ description: "Task list for 047-feedback-introspection"
 ## Completion Gate
 
 - GATE-1: 全量套件零新增失败 — check: `scripts/bash/run-tests.sh` 输出与 `.specify/specs/047-feedback-introspection/baseline-failed.txt` 按名比对
-- GATE-2: 镜像义务核验 — check: `diff -q scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py`;`python3 scripts/python/sync-mirrors.py --check` exit 0;4 份生成副本 `grep -l 'introspect'` 全命中(`.specify/templates/commands/` 镜像已退役,不在核验面)
+- GATE-2: 镜像义务核验 — check: `diff -q scripts/python/feedback-utils.py .specify/scripts/python/feedback-utils.py`;`python3 scripts/python/sync-mirrors.py --check` exit 0;4 份生成副本 `grep -l 'introspect'` 全命中(`templates/commands/` 镜像已退役,不在核验面)
 - GATE-3: 无 `[ ]`/`[>]` 任务行残留 — check: `grep -cE '^- \[[ >]\]' tasks.md` 返回 0
 - GATE-4: verification.md 覆盖 SC-001..006 逐条状态 — check: 与 requirements.md 的 SC 清单对账
 

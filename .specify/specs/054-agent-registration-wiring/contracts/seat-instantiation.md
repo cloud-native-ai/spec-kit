@@ -1,6 +1,6 @@
 # Contract: Seat Instantiation(席位实例化)— 054
 
-**Scope**: FR-004(实例化半)、FR-006、FR-008、FR-013。流程主体:`skills/create-team/SKILL.md` + `references/create-mode.md`(create 流程);委托受端:`skills/create-agent/SKILL.md` 的 `AgentAuthoringRequest` 约定。从句形态:`md-bold-closed`(每条从句行首裸粗体 `**C-N**`,语法真源 `shared/definitions/contract-clause-definitions.md`)。
+**Scope**: FR-004(实例化半)、FR-006、FR-008、FR-013。流程主体:`skills/internal/create-team/SKILL.md` + `references/create-mode.md`(create 流程);委托受端:`skills/internal/create-agent/SKILL.md` 的 `AgentAuthoringRequest` 约定。从句形态:`md-bold-closed`(每条从句行首裸粗体 `**C-N**`,语法真源 `shared/definitions/contract-clause-definitions.md`)。
 
 ## § 键与实例(Foundational 侧)
 
@@ -8,7 +8,7 @@
 
 **C-2**: 席位实例的 frontmatter MUST 携带 `team-scope: <team-slug>`(值 = 所属持久团队 slug);stage 帧非已注册 template,故席位实例 MUST NOT 设 `capacity-scope`。(FR-013)
 
-**C-3**: `team-scope` 的键语义(存在性、格式、framework-only 性质)owner 为代码键集;`skills/create-agent/SKILL.md` 的作者键集段 MUST 把它列入(instance 作者面知道此键),分类学条目按引用记载、不重述键集。(FR-013)
+**C-3**: `team-scope` 的键语义(存在性、格式、framework-only 性质)owner 为代码键集;`skills/internal/create-agent/SKILL.md` 的作者键集段 MUST 把它列入(instance 作者面知道此键),分类学条目按引用记载、不重述键集。(FR-013)
 
 ## § 建队流程(create 流程)
 

@@ -2,7 +2,7 @@
 
 **Feature**: 063 → Feature 058（演化）
 **FR 覆盖**: FR-001…FR-010
-**载体**: `skills/external/sdd-loop-driver/SKILL.md`、`references/efficiency-model.md`、`references/dispatch-recipes.md`、`references/stage-prompts.md`、`scripts/admission-check.py`、`docs/reference/skills/sdd-loop-driver.md`
+**载体**: `skills/external/sdd-loop-driver/SKILL.md`、`references/efficiency-model.md`、`references/dispatch-recipes.md`、`references/stage-prompts.md`、`skills/external/sdd-loop-driver/scripts/admission-check.py`、`docs/reference/skills/sdd-loop-driver.md`
 
 - **FL-01（显式启用）**: 快车道 MUST 仅在 U0 入口声明携带字面量 [[STR-006]] 时启用；该字面量 MUST 原文写入该线状态脊。无人值守运行 MUST NOT 接受任何其他启用形式；交互式用户在场时，驱动 MAY 在准入判据实测后提议一次并记录原文采纳，MUST NOT 因等待回答而阻塞运行。缺失字面量 → 完整链；自然语言声明本身不构成启用（FR-002）。
 - **FL-02（裁决时点）**: 准入裁决 MUST 在 `tasks.md` 已产出、`checklist` 派发之前执行，MUST 以制品实测值判定，MUST NOT 以规模印象或历史运行推断（FR-003）。
@@ -19,7 +19,7 @@
 - **FL-05（下游发布与收口）**: 快车道裁决 MUST 随下游阶段提示词发布（至少 `implement` 与 `review`），使阶段不把缺失的 `checklist` 产物当作缺失的必需门；收尾汇总 MUST 携带 `checklist=skipped(fast-lane)` 或等价可见标记（FR-005，[[STR-003]]）。
 - **FL-06（失败回退）**: 录取后任一判据失效，或后续阶段发现新事实使判据不再成立（新增引擎/模式/安全面、任务数越界等）时，驱动 MUST 回退完整链、在适用位置补派 `checklist`、记录回退触发与证据；回退 MUST NOT 静默（FR-006）。若回退发生在 `analyze` 已通过之后，补派 `checklist` 后 MUST 重过 `analyze` 一次再继续（保持完整链顺序与有界回环语义）。
 - **FL-07（analyze/review 不削弱）**: 快车道 MUST NOT 改变 `analyze` 的 CRITICAL/HIGH 归零或已处置判据、至多一轮有界回环，也 MUST NOT 改变 `review` 的行为、证据义务与发现分级（FR-007/FR-008）。
-- **FL-08（确定性准入脚本）**: `scripts/admission-check.py` MUST 以退出码表达裁决（0=可录取 / 1=拒绝 / 2=输入或解析错误），并输出逐条判据的 JSON 记录供状态脊引用。输入 MUST 至少包含 `--project --base-ref --requirements --tasks --checklists --entry-evidence --lines-manifest --expected-branch`；脚本 MUST 自包含（仅 Python 标准库），MUST NOT 读取框架 `.specify/scripts/` 运行时；阈值常量 MUST 由契约测试钉住（FR-009）。
+- **FL-08（确定性准入脚本）**: `skills/external/sdd-loop-driver/scripts/admission-check.py` MUST 以退出码表达裁决（0=可录取 / 1=拒绝 / 2=输入或解析错误），并输出逐条判据的 JSON 记录供状态脊引用。输入 MUST 至少包含 `--project --base-ref --requirements --tasks --checklists --entry-evidence --lines-manifest --expected-branch`；脚本 MUST 自包含（仅 Python 标准库），MUST NOT 读取框架 `.specify/scripts/` 运行时；阈值常量 MUST 由契约测试钉住（FR-009）。
 - **FL-09（定义落点与契约钉住）**: 快车道的判据、记录形态与回退规则 MUST 落在 `references/efficiency-model.md`（技能面单一 owner），并由 `tests/contract/test_sdd_loop_driver_efficiency.py` 钉住；任何运行 MUST NOT 在缺少准入记录时声称自己走了快车道（FR-009）。
 - **FL-10（自应用排除）**: 063 自身的运行 MUST 使用完整阶段链，`checklist`/`analyze`/`review` 均必经，MUST NOT 产生本特性自身的快车道记录；该例外 MUST 在规格、plan 与收尾证据中可见（FR-010）。
 

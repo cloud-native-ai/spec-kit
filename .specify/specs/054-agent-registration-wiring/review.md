@@ -70,7 +70,7 @@ P0 validation: two detection-pass P0s went to disjoint validators — F1 **confi
 ### F3 — P1 — Workflow — clarify commit folded 52 files from a parallel session
 
 **Location**: commit 09bd40a9 (`git show --stat` = 56 files, 4306 insertions)
-**Evidence**: Spec-054 content is ~4 files (requirements.md, checklist, two registry rows); the rest is the parallel self-improvement stream's work (speckit.improve command set ×4, skills/self-improvement, critique-and-self-criticism docs, 6 feedback records, a 706-line test file, and binaries: summary/data/project.db 196KB, wbs.png).
+**Evidence**: Spec-054 content is ~4 files (requirements.md, checklist, two registry rows); the rest is the parallel self-improvement stream's work (speckit.improve command set ×4, skills/internal/self-improvement, critique-and-self-criticism docs, 6 feedback records, a 706-line test file, and binaries: summary/data/project.db 196KB, wbs.png).
 **Why**: Permanently mislabels an entire parallel feature's history under 054; the root cause (git commit takes the whole shared index; ` M`/`??` status doesn't reveal other sessions' staged files) was surfaced by the run itself and recorded in feedback 20261008T093319Z, but the artifact-commit-step owner text still doesn't mandate the path-limited form.
 **Proposed fix**: Already partially self-healed (every later commit used `git commit -m "…" -- <paths>` after the index was confirmed empty). Land the mechanism fix: artifact-commit-step.md should mandate `git commit -- <explicit paths>` (or a pre-commit `git diff --cached --name-only` ownership audit) in multi-session repos. History correction for 09bd40a9 itself is the user's call (rewrite vs annotation).
 

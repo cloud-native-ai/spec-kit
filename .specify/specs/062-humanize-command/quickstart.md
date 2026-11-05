@@ -23,7 +23,7 @@ OK: all per-tool command copies match the source templates.
 python3 scripts/python/sync-mirrors.py --check
 ```
 
-实跑输出（2026-10-19，全量留痕 `notes/baseline-mirror-check.txt`，共 209 行 DIFF；构成实测：`skills/internal` 75 文件、`skills/draw-diagram` 36、`scripts/python` 17、`shared/guidelines` 12、`shared/workflow` 11、`shared/definitions` 10（其中第 181 行即本特性**触碰对** `probe-definitions.md`）等）：
+实跑输出（2026-10-19，全量留痕 `notes/baseline-mirror-check.txt`，共 209 行 DIFF；构成实测：`skills/internal` 75 文件、`skills/external/draw-diagram` 36、`scripts/python` 17、`shared/guidelines` 12、`shared/workflow` 11、`shared/definitions` 10（其中第 181 行即本特性**触碰对** `probe-definitions.md`）等）：
 
 ```text
 DIFF  .specify/shared/workflow/glossary.md

@@ -263,7 +263,7 @@ def test_help_labels_every_action_read_or_write(capsys):
 
 ## D-15 US5 有**第二个**解析器,它刻意不 import
 
-**裁定**:US5 MUST 在契约里显式处置 `skills/create-team/scripts/build-summary-input.py` 的本地解析器:要么让它同样理解指代形,要么显式声明它不理解并记录后果。MUST NOT 沉默。
+**裁定**:US5 MUST 在契约里显式处置 `skills/internal/create-team/scripts/build-summary-input.py` 的本地解析器:要么让它同样理解指代形,要么显式声明它不理解并记录后果。MUST NOT 沉默。
 
 **实测**:该文件 `:354-391` 自行解析 goal 判据,且 `:356-360` 明写这是**刻意**的——"This parses locally rather than importing `scripts/python/goal-utils.py` … cross-tree import breaks once installed"。它是 `skills/` 树内的脚本,安装后与 `scripts/python/` 不同树,故 import 会断。
 
@@ -343,6 +343,6 @@ def test_help_labels_every_action_read_or_write(capsys):
 
 ### 范围外、记入 Feature 详情而不纳入本计划的欠账
 
-1. **退出码表在仓内无 owner**:`derive-utils.py` / `goal-utils.py` / `interview-utils.py` / `trigger-utils.py` 四个脚本各自重复定义同一张 `EXIT_OK=0 / [EXIT_USAGE=1] / EXIT_INPUT_ERROR=2 / EXIT_NOT_FOUND=3 / EXIT_INVALID=4`,而 `shared/`、`templates/`、`docs/` 三处对该表的命中数为 **0**;`skills/create-team/scripts/build-summary-input.py` 另有第五套(`3=NO_MATERIAL / 4=SERIALIZED`)且 3/4 语义相左。本特性只在 D-13 局部回避冲突。
+1. **退出码表在仓内无 owner**:`derive-utils.py` / `goal-utils.py` / `interview-utils.py` / `trigger-utils.py` 四个脚本各自重复定义同一张 `EXIT_OK=0 / [EXIT_USAGE=1] / EXIT_INPUT_ERROR=2 / EXIT_NOT_FOUND=3 / EXIT_INVALID=4`,而 `shared/`、`templates/`、`docs/` 三处对该表的命中数为 **0**;`skills/internal/create-team/scripts/build-summary-input.py` 另有第五套(`3=NO_MATERIAL / 4=SERIALIZED`)且 3/4 语义相左。本特性只在 D-13 局部回避冲突。
 2. **`Consumed by` 列的反向检查全仓无守卫**:`/speckit.clarify` 轮实测该列有 7 处「点名了却未引用」,而模板的引用公约只保证**正向**可解析。US1 的检查器是它最自然的落点,但未纳入 FR 以免扩大范围。
 3. **无任何机器可辨条款形态的 `.md` 契约**:本特性以冻结名字级基线留档可见,收敛机制不在范围内;其规模随 owner 声明的覆盖面而变,两个端值的当前实测由 `notes/clause-form-census.md` 拥有(本条不复写)。

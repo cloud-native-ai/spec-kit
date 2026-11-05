@@ -27,10 +27,10 @@
 - GATE-1: Targeted contract suite passes — check: `pytest tests/contract/test_docs_command_template.py tests/contract/test_docs_skill_pair.py tests/contract/test_docs_utils_cli.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_feedback_command_classification.py tests/contract/test_docs_target_structure_declaration.py tests/contract/test_docs_action_routing.py tests/contract/test_docs_reconcile_orchestration.py -q`
 - GATE-2: Full suite has zero new failing node IDs versus baseline — check: `bash -o pipefail -c 'set +e; .specify/scripts/bash/run-tests.sh -q --names-out /tmp/spec049-current-failed.txt > /tmp/spec049-pytest.txt 2>&1; code=$?; set -e; test "$code" -ne 2 -a "$code" -ne 3 -a "$code" -ne 4; comm -13 .specify/specs/049-docs-reconcile/baseline-failed.txt /tmp/spec049-current-failed.txt > /tmp/spec049-new-failures.txt; test ! -s /tmp/spec049-new-failures.txt'`
 - GATE-3: Generated command copies are current — check: `python3 scripts/python/regen-command-copies.py --check` returns 0
-- GATE-4: Touched mirrors are byte-identical — check: `diff -q templates/docs-target-structure-template.md .specify/templates/docs-target-structure-template.md && diff -q skills/create-docs/SKILL.md .specify/skills/create-docs/SKILL.md && diff -q skills/improve-docs/SKILL.md .specify/skills/improve-docs/SKILL.md`
+- GATE-4: Touched mirrors are byte-identical — check: `diff -q skills/external/create-docs/assets/docs-target-structure-template.md skills/external/create-docs/assets/docs-target-structure-template.md && diff -q skills/external/create-docs/SKILL.md .specify/skills/create-docs/SKILL.md && diff -q skills/external/improve-docs/SKILL.md .specify/skills/improve-docs/SKILL.md`
 - GATE-5: Mirror scanner introduces no new `MISS`/`DIFF` rows beyond baseline — check: `bash -o pipefail -c 'set -e; code=0; python3 scripts/python/sync-mirrors.py --check > /tmp/spec049-mirrors.txt 2>&1 || code=$?; test "$code" -eq 0 -o "$code" -eq 2; comm -13 <(grep -E "^(MISS|DIFF)" .specify/specs/049-docs-reconcile/baseline-mirrors.txt | sort -u) <(grep -E "^(MISS|DIFF)" /tmp/spec049-mirrors.txt | sort -u) > /tmp/spec049-new-mirror-drift.txt; test ! -s /tmp/spec049-new-mirror-drift.txt'`
 - GATE-6: Confirmation gates remain unchanged — check: `python3 scripts/python/scan-confirmation-gates.py --json | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["total"] == 23 and d["by_class"] == {"governance_kept": 10, "destructive": 13} and not d["violations"]'`
-- GATE-7: Documentation-space validation has no new findings — check: `python3 scripts/python/docs-utils.py --action validate --root .`
+- GATE-7: Documentation-space validation has no new findings — check: `python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root .`
 - GATE-8: No open/claimed tasks remain and every success criterion is recorded — check: `bash -o pipefail -c 'set -e; test -f .specify/specs/049-docs-reconcile/verification.md; ! grep -qE "^- \[[ >]\]" .specify/specs/049-docs-reconcile/tasks.md; comm -3 <(grep -oE "SC-[0-9]{3}" .specify/specs/049-docs-reconcile/requirements.md | sort -u) <(grep -oE "SC-[0-9]{3}" .specify/specs/049-docs-reconcile/verification.md | sort -u) > /tmp/spec049-sc-delta.txt; test ! -s /tmp/spec049-sc-delta.txt'`
 
 ## Format: `[ID] [P?] [Story] Description`
@@ -58,7 +58,7 @@
 **⚠️ CRITICAL**: No user-story implementation starts until the shared contract and RED harness are ready.
 
 - [X] T003 Revise C-1, C-4a, C-5, C-7, C-8, and C-18 with a dated 2026-09-01 revision note in `.specify/specs/033-docs-command/contracts/docs-command-template.md`, preserving C-3 and historical withdrawn clauses while correcting the retired command mirror and the classification facts owned by `test_feedback_command_classification.py`
-- [X] T004 [blockedBy: T003] Extend `tests/contract/test_docs_command_template.py` with structural assertions for the target declaration path/template, two-skill single-source ownership, fifth cross-run artifact, unchanged six-heading order, retained required literals, absent `R0 需求解析`, absent retired `.specify/templates/commands/docs.md`, and current classification derived from its owner module without duplicating the command roster
+- [X] T004 [blockedBy: T003] Extend `tests/contract/test_docs_command_template.py` with structural assertions for the target declaration path/template, two-skill single-source ownership, fifth cross-run artifact, unchanged six-heading order, retained required literals, absent `R0 需求解析`, absent retired `templates/commands/docs.md`, and current classification derived from its owner module without duplicating the command roster
 - [X] T005 [blockedBy: T004] Run `pytest tests/contract/test_docs_command_template.py -q`, confirm the new assertions fail for the intended missing behavior rather than fixture/path errors, and record the RED evidence in `.specify/specs/049-docs-reconcile/verification.md`
 
 **Checkpoint**: The shared contract is current and the common structural harness fails only because the new orchestration is not implemented.
@@ -69,7 +69,7 @@
 
 **Goal**: Establish a project-specific, confirmed, persistent target structure declaration that later runs reuse without redesign.
 
-**Independent Test**: In a repository without `.specify/docs/target-structure.md`, produce a project-specific declaration from the template, verify it references rather than copies the create-docs baseline, persist it only after the existing R4 plan confirmation, and verify a second unchanged run reuses it with zero convergence.
+**Independent Test**: In a repository without `docs/target-structure.md`, produce a project-specific declaration from the template, verify it references rather than copies the create-docs baseline, persist it only after the existing R4 plan confirmation, and verify a second unchanged run reuses it with zero convergence.
 
 ### Structural Contract Tests for User Story 1
 
@@ -77,11 +77,11 @@
 
 ### Authoring and Mirror Parity for User Story 1
 
-- [X] T007 [P] [US1] [blockedBy: T006] Create `templates/docs-target-structure-template.md` with the managed-block markers and placeholders for 项目形态、目标读者、静态基线引用、项目专属扩展、内容盘点摘要、最后确认, keeping all create-docs-owned enumerations out of the file
-- [X] T008 [P] [US1] [blockedBy: T006] Rewrite the first orchestration stage inside `templates/commands/docs.md` so it resolves `.specify/docs/target-structure.md`; derives project shape, audience, inventory, and extensions from repository evidence; asks one consolidated batch of at most 3 necessary questions and writes nothing when evidence is insufficient; designs only when absent or explicitly reset; detects evidence-backed substantive drift and adds a redesign proposal to the existing R4 plan without changing the declaration before confirmation; merges declaration approval into that same R4 confirmation; reuses unchanged declarations without churn; and stops on malformed markers without adding a heading, mode, or gate
-- [X] T009 [P] [US1] [blockedBy: T006] Update the R0 baseline/interface wording in `skills/create-docs/SKILL.md` so the command may supply the confirmed target declaration as a higher-precedence project input while create-docs remains the owner of the static baseline and standalone skill behavior remains unchanged
-- [X] T010 [US1] [blockedBy: T007] Run `python3 scripts/python/sync-mirrors.py --write --only templates/docs-target-structure-template.md` to create `.specify/templates/docs-target-structure-template.md` without touching the unrelated `git-fleet` mirror drift
-- [X] T011 [US1] [blockedBy: T009] Run `python3 scripts/python/sync-mirrors.py --write --only skills/create-docs/` to update `.specify/skills/create-docs/SKILL.md` without broad mirror repair
+- [X] T007 [P] [US1] [blockedBy: T006] Create `skills/external/create-docs/assets/docs-target-structure-template.md` with the managed-block markers and placeholders for 项目形态、目标读者、静态基线引用、项目专属扩展、内容盘点摘要、最后确认, keeping all create-docs-owned enumerations out of the file
+- [X] T008 [P] [US1] [blockedBy: T006] Rewrite the first orchestration stage inside `templates/commands/docs.md` so it resolves `docs/target-structure.md`; derives project shape, audience, inventory, and extensions from repository evidence; asks one consolidated batch of at most 3 necessary questions and writes nothing when evidence is insufficient; designs only when absent or explicitly reset; detects evidence-backed substantive drift and adds a redesign proposal to the existing R4 plan without changing the declaration before confirmation; merges declaration approval into that same R4 confirmation; reuses unchanged declarations without churn; and stops on malformed markers without adding a heading, mode, or gate
+- [X] T009 [P] [US1] [blockedBy: T006] Update the R0 baseline/interface wording in `skills/external/create-docs/SKILL.md` so the command may supply the confirmed target declaration as a higher-precedence project input while create-docs remains the owner of the static baseline and standalone skill behavior remains unchanged
+- [X] T010 [US1] [blockedBy: T007] Run `python3 scripts/python/sync-mirrors.py --write --only skills/external/create-docs/assets/docs-target-structure-template.md` to create `skills/external/create-docs/assets/docs-target-structure-template.md` without touching the unrelated `git-fleet` mirror drift
+- [X] T011 [US1] [blockedBy: T009] Run `python3 scripts/python/sync-mirrors.py --write --only skills/external/create-docs/` to update `.specify/skills/create-docs/SKILL.md` without broad mirror repair
 - [X] T012 [US1] [blockedBy: T008,T010,T011] Verify `diff -q` parity for the target template and create-docs skill, run `pytest tests/contract/test_docs_target_structure_declaration.py tests/contract/test_docs_command_template.py -q`, and confirm the owner-derived T-5 check finds zero copied baseline facts in the template
 
 ### Surface Verification for User Story 1
@@ -101,15 +101,15 @@
 ### Structural Contract Tests for User Story 2
 
 - [X] T014 [P] [US2] [blockedBy: T012] Author and run RED tests in `tests/contract/test_docs_action_routing.py` covering action fields, tolerance-band suppression, evidence-required content actions, exact create-docs/improve-docs routing, one-document sequential content dispatch, no cap or silent truncation, pre-dispatch count announcement, abort/pending semantics, per-skill residual reporting, and zero new confirmation gates
-- [X] T015 [P] [US2] [blockedBy: T012] Extend and run RED assertions in `tests/contract/test_docs_skill_pair.py` proving improve-docs still cannot create/move/rename/archive documents, excludes `.specify/docs/target-structure.md` as a non-document cross-run contract rather than misclassifying all `.specify/docs/**` as disposable run artifacts, and preserves create-docs structural ownership
+- [X] T015 [P] [US2] [blockedBy: T012] Extend and run RED assertions in `tests/contract/test_docs_skill_pair.py` proving improve-docs still cannot create/move/rename/archive documents, excludes `docs/target-structure.md` as a non-document cross-run contract rather than misclassifying all `docs/**` as disposable run artifacts, and preserves create-docs structural ownership
 
 ### Authoring and Mirror Parity for User Story 2
 
 - [X] T016 [P] [US2] [blockedBy: T014] Rewrite the second and third orchestration stages inside `templates/commands/docs.md` to emit actions with type/target/owner/confirmation tier/evidence/source fields, suppress tolerated differences, mechanically route structure actions to create-docs and content actions to improve-docs, dispatch content sequentially, and group residual results by owning skill
-- [X] T017 [P] [US2] [blockedBy: T015] Correct the machine-managed-store constraint in `skills/improve-docs/SKILL.md` so `.specify/docs/target-structure.md` is explicitly a cross-run non-document contract that improve-docs never edits while `.specify/docs/plans/` and `.specify/docs/audit/` remain run artifacts
-- [X] T018 [US2] [blockedBy: T017] Run `python3 scripts/python/sync-mirrors.py --write --only skills/improve-docs/` to update `.specify/skills/improve-docs/SKILL.md` without broad mirror repair
+- [X] T017 [P] [US2] [blockedBy: T015] Correct the machine-managed-store constraint in `skills/external/improve-docs/SKILL.md` so `docs/target-structure.md` is explicitly a cross-run non-document contract that improve-docs never edits while `docs/plans/` and `docs/audit/` remain run artifacts
+- [X] T018 [US2] [blockedBy: T017] Run `python3 scripts/python/sync-mirrors.py --write --only skills/external/improve-docs/` to update `.specify/skills/improve-docs/SKILL.md` without broad mirror repair
 - [X] T019 [US2] [blockedBy: T016] Run `python3 scripts/python/regen-command-copies.py` to regenerate `.claude/commands/speckit.docs.md`, `.github/prompts/speckit.docs.prompt.md`, `.qoder/commands/speckit.docs.md`, and `.opencode/command/speckit.docs.md` from the canonical command template
-- [X] T020 [US2] [blockedBy: T018,T019] Verify `diff -q skills/improve-docs/SKILL.md .specify/skills/improve-docs/SKILL.md`, verify all four generated command copies carry the dual-skill routing edit and AUTO-GENERATED marker, and confirm `.specify/templates/commands/docs.md` remains absent
+- [X] T020 [US2] [blockedBy: T018,T019] Verify `diff -q skills/external/improve-docs/SKILL.md .specify/skills/improve-docs/SKILL.md`, verify all four generated command copies carry the dual-skill routing edit and AUTO-GENERATED marker, and confirm `templates/commands/docs.md` remains absent
 - [X] T021 [US2] [blockedBy: T020] Run `pytest tests/contract/test_docs_action_routing.py tests/contract/test_docs_skill_pair.py tests/contract/test_docs_command_template.py tests/contract/test_confirmation_gates_sweep.py -q` and verify the gate scanner remains total 23 with zero violations
 
 ### Surface Verification for User Story 2
@@ -151,7 +151,7 @@
 **Purpose**: Close mirror, governance, documentation, full-regression, Feature-memory, and success-criteria obligations across all stories.
 
 - [X] T030 [blockedBy: T013,T022,T029] Run the complete targeted contract suite from GATE-1 and append totals plus any failures to `.specify/specs/049-docs-reconcile/verification.md`
-- [X] T031 [blockedBy: T030] Run `regen-command-copies.py --check`, targeted `diff -q` checks for `templates/docs-target-structure-template.md`, `skills/create-docs/SKILL.md`, and `skills/improve-docs/SKILL.md`, compare full `sync-mirrors.py --check` MISS/DIFF rows with `.specify/specs/049-docs-reconcile/baseline-mirrors.txt`, and append the mirror verdict to `.specify/specs/049-docs-reconcile/verification.md`
+- [X] T031 [blockedBy: T030] Run `regen-command-copies.py --check`, targeted `diff -q` checks for `skills/external/create-docs/assets/docs-target-structure-template.md`, `skills/external/create-docs/SKILL.md`, and `skills/external/improve-docs/SKILL.md`, compare full `sync-mirrors.py --check` MISS/DIFF rows with `.specify/specs/049-docs-reconcile/baseline-mirrors.txt`, and append the mirror verdict to `.specify/specs/049-docs-reconcile/verification.md`
 - [X] T032 [blockedBy: T031] Run `scan-confirmation-gates.py --json` and `docs-utils.py --action validate --root .`, verify the exact gate baseline and zero new documentation findings, and append both results to `.specify/specs/049-docs-reconcile/verification.md`
 - [X] T033 [blockedBy: T032] Run the full pytest suite, compare failing node IDs with `.specify/specs/049-docs-reconcile/baseline-failed.txt`, investigate every new failure instead of bypassing hooks/tests, and record the final regression delta in `.specify/specs/049-docs-reconcile/verification.md`
 - [X] T034 [blockedBy: T033] Update `.specify/memory/features/037.md` and the Feature 037 row in `.specify/memory/features.md` with implementation evidence, task/test/SC totals, dogfood results, mirror-baseline attribution, and Feature status remaining Implemented; verify the Feature Index total remains derived and internally consistent
@@ -222,9 +222,9 @@ Setup → Foundational → US1 (P1) → US2 (P1) → US3 (P2) → Polish
 
 ```text
 After T006 is RED:
-  Worker A → T007 (`templates/docs-target-structure-template.md`)
+  Worker A → T007 (`skills/external/create-docs/assets/docs-target-structure-template.md`)
   Worker B → T008 (`templates/commands/docs.md`, target-declaration stage only)
-  Worker C → T009 (`skills/create-docs/SKILL.md`)
+  Worker C → T009 (`skills/external/create-docs/SKILL.md`)
 
 Join before mirror writes:
   T010 → T011 → T012 → T013
@@ -239,7 +239,7 @@ After T012:
 
 After both RED lanes are ready:
   Worker A → T016 (`templates/commands/docs.md`)
-  Worker B → T017 (`skills/improve-docs/SKILL.md`)
+  Worker B → T017 (`skills/external/improve-docs/SKILL.md`)
 
 Join:
   T018 + T019 → T020 → T021 → T022

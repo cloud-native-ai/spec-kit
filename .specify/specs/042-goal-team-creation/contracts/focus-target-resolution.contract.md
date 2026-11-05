@@ -1,7 +1,7 @@
 # Contract: focus_target 与 run 侧解析(run 面)
 
 **Spec**: [requirements.md](../requirements.md) FR-011, FR-012(territory 部分), FR-014  
-**Surface**: `scripts/python/goal-utils.py`(新函数)× `templates/commands/team.md`(Run Mode 第 2 步)× `skills/create-team/references/execution-guide.md`  
+**Surface**: `scripts/python/goal-utils.py`(新函数)× `templates/commands/team.md`(Run Mode 第 2 步)× `skills/internal/create-team/references/execution-guide.md`  
 **Authority**: 五查 verdict 唯一权威仍是 `preview_target_check`;本契约只新增其**输入的解析层**
 
 ## C-1 解析函数(引擎扩展)

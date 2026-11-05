@@ -1,7 +1,7 @@
 # Contract: goal-based 创建分支(create 面)
 
 **Spec**: [requirements.md](../requirements.md) FR-001..005, FR-010, FR-013, FR-014  
-**Surface**: `templates/commands/team.md`(create 路由)× `skills/create-team/{SKILL.md, references/create-mode.md}`  
+**Surface**: `templates/commands/team.md`(create 路由)× `skills/internal/create-team/{SKILL.md, references/create-mode.md}`  
 **Authority**: 概念锚 `shared/definitions/goal-definitions.md`(链接,不复述);行为裁决在 `scripts/python/goal-utils.py`
 
 ## C-1 分支识别(确定性,零语义猜测)
@@ -30,7 +30,7 @@
 ## C-4 成组建队(FR-010, FR-013)
 
 - 分解批准后(或复用基线成立时),每个 open Target 对应一个团队;全部声明同一 `goal_slug`;`focus_target = T-<nnn>`(该团队对应切片)。
-- 每个团队的 roster/pattern 派生:MUST 以其 **Target 语句**为输入走既有机制——`python3 skills/create-team/scripts/match-team-preset.py --goal "<Target 语句>" --json`(preset 强匹配推荐复用)+ pattern 决策树(`references/patterns.md`),派生理由入确认预览。
+- 每个团队的 roster/pattern 派生:MUST 以其 **Target 语句**为输入走既有机制——`python3 skills/internal/create-team/scripts/match-team-preset.py --goal "<Target 语句>" --json`(preset 强匹配推荐复用)+ pattern 决策树(`references/patterns.md`),派生理由入确认预览。
 - slug 缺省派生 `<goal-slug>-t<nnn>`(小写、三位零填充,如 `log-split-t003`);MUST 对 `.specify/teams/` 现存目录查重,冲突即改写并回显;用户可在确认门禁改名。
 - 确认门禁一次性披露:分支判定、分析结论、路径决策、提议集或复用声明、territory 划分提议(含 verify 脚本 verdict,见 creation-territory-disjoint 契约)。
 - 同一 `goal_slug` 下已存在团队(扫描 `.specify/teams/*/team.md` frontmatter)时:MUST 检测并向用户提议复用既有团队或移交 `/speckit.goal coordinate`;MUST NOT 无提示重复建队。

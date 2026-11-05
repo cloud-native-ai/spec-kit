@@ -2,7 +2,7 @@
 
 **Requirement**: `036-team-summary` → Feature 027 Team Management
 **Date**: 2026-08-04
-**Method**: 代码优先(Constitution VIII)——每条结论要么来自对 `skills/summarize-project` 与 `skills/create-team` 源码/DDL 的定向阅读,要么来自本轮**实际执行**被调技能的脚本链。文档声明只作线索,不作依据。
+**Method**: 代码优先(Constitution VIII)——每条结论要么来自对 `skills/internal/summarize-project` 与 `skills/internal/create-team` 源码/DDL 的定向阅读,要么来自本轮**实际执行**被调技能的脚本链。文档声明只作线索,不作依据。
 
 ## E. 执行验证(先做,再设计)
 
@@ -106,11 +106,11 @@
 
 门控顺序(硬序):**预算 → 节奏 → 材料**。预算优先由 Edge Case「同一 cycle 内既到达节奏点又触发预算阶梯」直接规定。
 
-**非调度器**:触发点是提示层编排指令,不是守护进程——与 Constitution IX 一致。`scripts/dispatch.sh` 是**派发包装器**(被主管在一次运行内调用),不是调度器;spec Assumption 的结论因此不变,仅其"无可执行运行器"的措辞需按 plan.md 预置约束块的分层术语校正。
+**非调度器**:触发点是提示层编排指令,不是守护进程——与 Constitution IX 一致。`skills/internal/create-team/scripts/dispatch.sh` 是**派发包装器**(被主管在一次运行内调用),不是调度器;spec Assumption 的结论因此不变,仅其"无可执行运行器"的措辞需按 plan.md 预置约束块的分层术语校正。
 
 ### D-6 交付目录与非交互调用
 
-- 交付目录 `[[STR-001]]` = `.specify/project/goal/<goal-slug>/`(2026-08-04 范围修订前为团队目录下的 `summary/`)。被调技能的交付目录**本就可由用户指定**("用户可指定其他位置"),故 FR-024(技能不变)成立。实测 `.specify/.gitignore` 仅忽略 `teams/.work/` 与 `agents/execution/logs/`,`.specify/project/` 未被忽略,该目录保持 tracked。
+- 交付目录 `[[STR-001]]` = `.specify/goal/<goal-slug>/`(2026-08-04 范围修订前为团队目录下的 `summary/`)。被调技能的交付目录**本就可由用户指定**("用户可指定其他位置"),故 FR-024(技能不变)成立。实测 `.specify/.gitignore` 仅忽略 `teams/.work/` 与 `agents/execution/logs/`,`.specify/project/` 未被忽略,该目录保持 tracked。
 - 被调技能 Step 4 默认有**四道逐层交互确认门禁**;团队触发是自动流程,故 MUST 以**非交互模式**调用并在 `## 元信息` 标注(技能已支持"用户显式声明跳过 → 自动确认并标注")。
 
 ### D-7 双索引:goal 为聚合索引,team 为运行索引(2026-08-04 范围修订)

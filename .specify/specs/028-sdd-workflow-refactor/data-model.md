@@ -89,7 +89,7 @@ installed absolute form directly.
 | `docs/` | 4 | prose | describe shared dir, not a skill; fix skill count |
 | `.specify/` mirror | (regenerated) | — | regenerate; no hand-edit |
 
-Excluded from all edits and from the zero-reference gate: `docs/summary/03-sdd-workflow-refactor-proposal.md`,
+Excluded from all edits and from the zero-reference gate: `docs/archive/03-sdd-workflow-refactor-proposal.md`,
 `.specify/specs/028-sdd-workflow-refactor/**`, `docs/history/**`.
 
 ## State Transitions

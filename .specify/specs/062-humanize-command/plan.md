@@ -94,7 +94,7 @@ tests/fixtures/humanize/              # 新增：评估语料 + rubric.md + 确�
 .specify/shared/definitions/          # 镜像：shared 对（probe-definitions）
 ```
 
-**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录——命令模板入既有 `templates/commands/`（sanitize/derive 的兄弟位）、技能入既有 `skills/external/` 平铺镜像体系、probe 注册入既有 `shared/definitions/probe-definitions.md` 单元表、docs 入既有逐命令目录、测试入既有 `tests/contract/` + `tests/fixtures/` 体系。模板不落 `.specify/templates/commands/`（该镜像已退役，per-tool copies 是唯一分发面）。
+**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录——命令模板入既有 `templates/commands/`（sanitize/derive 的兄弟位）、技能入既有 `skills/external/` 平铺镜像体系、probe 注册入既有 `shared/definitions/probe-definitions.md` 单元表、docs 入既有逐命令目录、测试入既有 `tests/contract/` + `tests/fixtures/` 体系。模板不落 `templates/commands/`（该镜像已退役，per-tool copies 是唯一分发面）。
 
 ### Mirror Obligations *(mandatory)*
 
@@ -102,7 +102,7 @@ tests/fixtures/humanize/              # 新增：评估语料 + rubric.md + 确�
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/humanize.md`（新增） | `.claude/commands/speckit.humanize.md`；`.github/prompts/speckit.humanize.prompt.md`；`.opencode/command/speckit.humanize.md`；`.qoder/commands/speckit.humanize.md` — per-tool copies via regen-command-copies.py；NO `.specify/templates/commands/` mirror（retired） | 相对 `notes/baseline-regen-check.txt`：新副本落位且与模板一致，其余副本零变化（「no NEW drift」判据；复跑 `--check` 实测，不预写退出码） |
+| `templates/commands/humanize.md`（新增） | `.claude/commands/speckit.humanize.md`；`.github/prompts/speckit.humanize.prompt.md`；`.opencode/command/speckit.humanize.md`；`.qoder/commands/speckit.humanize.md` — per-tool copies via regen-command-copies.py；NO `templates/commands/` mirror（retired） | 相对 `notes/baseline-regen-check.txt`：新副本落位且与模板一致，其余副本零变化（「no NEW drift」判据；复跑 `--check` 实测，不预写退出码） |
 | `skills/external/humanize/SKILL.md`（新增） | `.specify/skills/humanize/SKILL.md`（平铺对，新增） | 特性限定同步后**绝对字节一致**（新对无既有漂移可作相对基线） |
 | `shared/definitions/probe-definitions.md`（增强） | `.specify/shared/definitions/probe-definitions.md`（shared 对；基线**已漂移**，见第 181 行） | 特性限定同步（`--only shared/definitions/probe-definitions.md`）后**绝对字节一致**；同步不拖入其他对 |
 | `tests/contract/test_humanize_command_surface.py`（新增）及两个下游钉扎测试（更新） | 无镜像（tests/ 不在 MIRROR_PAIRS） | pytest 直跑；分类测试与可见性测试必须绿（C-9） |

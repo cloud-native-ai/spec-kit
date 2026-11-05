@@ -5,7 +5,7 @@
 
 ## Summary
 
-Reframe the `agent-setup` skill around a **unified environment-variable** configuration model: the user exports one canonical set of skill-layer variables for the three core inputs (API key, base URL, model); the skill validates them, reads them, performs a **secondary assignment** into each tool's native variable names, and persists the result into each tool's **own configuration file**. Scope is the six API-key-configurable CLIs — `claude`, `codex`, `qwen`, `qoder`, `iflow`, `opencode` (Copilot/Hermes excluded per clarification). Implementation extends the existing Bash script `skills/agent-setup/scripts/config-agent.sh`, reusing its per-tool config writers behind a new three-step flow (check → read → write) with fail-fast validation, no-partial-writes, idempotency, and secret redaction.
+Reframe the `agent-setup` skill around a **unified environment-variable** configuration model: the user exports one canonical set of skill-layer variables for the three core inputs (API key, base URL, model); the skill validates them, reads them, performs a **secondary assignment** into each tool's native variable names, and persists the result into each tool's **own configuration file**. Scope is the six API-key-configurable CLIs — `claude`, `codex`, `qwen`, `qoder`, `iflow`, `opencode` (Copilot/Hermes excluded per clarification). Implementation extends the existing Bash script `skills/internal/manage-agents/scripts/config-agent.sh`, reusing its per-tool config writers behind a new three-step flow (check → read → write) with fail-fast validation, no-partial-writes, idempotency, and secret redaction.
 
 ## Technical Context
 
@@ -62,7 +62,7 @@ No standalone `research.md` — Phase 0 findings inlined below (fully resolvable
 ### Source Code (repository root)
 
 ```text
-skills/agent-setup/scripts/config-agent.sh   # extend: add unified-env validate/read/apply flow + qwen/codex persistence fixes
+skills/internal/manage-agents/scripts/config-agent.sh   # extend: add unified-env validate/read/apply flow + qwen/codex persistence fixes
 skills/agent-setup/SKILL.md                  # reframe workflow around unified env vars + 6-tool scope
 skills/agent-setup/references/               # add unified-variables.md; update supported/available tuples framing
 tests/contract/                              # new: SKILL.md/contract structure tests for unified model
@@ -98,7 +98,7 @@ N/A — no Constitution gate violations.
 **Branch**: `[###-spec-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Specification from `.specify/specs/[REQUIREMENTS_KEY]/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 

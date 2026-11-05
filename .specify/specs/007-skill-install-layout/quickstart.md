@@ -72,9 +72,9 @@
 
 ## Automated Coverage Mapping
 
-- Scenario 1, Scenario 7 → `tests/contracts/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
-- Scenario 2, Scenario 3 → `tests/contracts/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
-- Scenario 4, Scenario 5, Scenario 6 → `tests/contracts/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
+- Scenario 1, Scenario 7 → `tests/contract/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
+- Scenario 2, Scenario 3 → `tests/contract/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
+- Scenario 4, Scenario 5, Scenario 6 → `tests/contract/test_skill_install_layout_contract.py`, `tests/integration/test_skill_install_layout_integration.py`
 - [CN] → `tests/unit/test_skills_utils_layout.py`
 
 - [CN] `/speckit.skills` [CN]

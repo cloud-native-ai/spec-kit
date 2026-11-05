@@ -266,7 +266,7 @@
 
 | String ID | Value (verbatim) | Consumed by |
 |-----------|------------------|-------------|
-| `STR-001` | ".specify/project/goal/<goal-slug>/" | FR-017, FR-020, FR-030, SC-003, SC-007, SC-013, Assumptions |
+| `STR-001` | ".specify/goal/<goal-slug>/" | FR-017, FR-020, FR-030, SC-003, SC-007, SC-013, Assumptions |
 | `STR-002` | "config.summary" | FR-013, US2 场景 2, SC-008, Assumptions |
 | `STR-003` | "skipped(budget)" | FR-014, US2 场景 3, Edge Cases, SC-006 |
 | `STR-004` | "data/project-input.yaml" | Overview, FR-008, FR-010 |
@@ -281,7 +281,7 @@
 - **"项目"= 团队自身**:总结的对象是团队自身相对其 goal 的执行状态(团队 ≡ 项目),而非团队所监控的外部目标。依据是用户明确要求"将 team 的概念映射到 summarize-project 定义的项目管理概念中"。被监控目标自己的项目总结属于另一次独立调用。
 - **适用范围为全部四种协作模式**,各自有不同的阶段边界语义;不限于长运行的 iteration / continuous 模式。
 - **总结是累积式单份产物**,而非每次运行各出一份快照;这是"项目状态总结"区别于既有运行报告的前提。
-- **交付目录位置**(2026-08-04 范围修订):完整总结落在以 goal 为索引的 [[STR-001]];团队目录只保留运行信息。选择 `.specify/project/goal/` 而非团队目录下的子目录,是为了让"目标"成为可跨团队延续的索引;沿用既有产物(图表源与渲染物一并纳入版本控制)的先例。
+- **交付目录位置**(2026-08-04 范围修订):完整总结落在以 goal 为索引的 [[STR-001]];团队目录只保留运行信息。选择 `.specify/goal/` 而非团队目录下的子目录,是为了让"目标"成为可跨团队延续的索引;沿用既有产物(图表源与渲染物一并纳入版本控制)的先例。
 - **`goal_slug` 是新增 frontmatter 字段**:现有 4 个团队均未声明它,故 FR-034 提供以团队 slug 回填的推断路径,使本机制对存量团队零改造即可启用;显式声明由 `/speckit.team modify`(improve-team)按需补齐。字段名 `goal_slug` 与既有 `slug`(team slug)并存,二者语义不同,不得混用。
 - **`.specify/project/` 已有历史产物**:该目录现存 `project.md` 与 wbs/gantt/milestones 三组图表(2026-07-25 由已重构的 `manage-project` 建立,现作为只读信息源)。本机制在其下新增 `goal/` 子树平级共存,不改动、不迁移、不覆盖既有内容(FR-036)。
 - **`summarize-project` 保持不变**:它仍是只读的呈现工具、输入面仍是表单;团队侧承担"表单作者"角色。本需求不修改其概念模型、脚本或写入白名单语义。
@@ -305,7 +305,7 @@
 
 **用户指令(原文)**:
 
-> team summary的输出除了在.specify/teams中输出team的运行信息,也需要将汇总信息输出到.specify/project/goal/<goal slug>目录.也就是.specify/teams目录以team为index,.specify/project/goal/目录以goal为index.
+> team summary的输出除了在.specify/teams中输出team的运行信息,也需要将汇总信息输出到.specify/goal/<goal slug>目录.也就是.specify/teams目录以team为index,.specify/goal/目录以goal为index.
 
 这是一次**范围修订**(plan.md 与 tasks.md 已存在),按 Scope Revision Protocol 原地修订上游、手工重建下游,不重跑创建脚本。三项决策:
 

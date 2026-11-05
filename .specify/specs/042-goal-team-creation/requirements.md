@@ -20,7 +20,7 @@
 
 - `templates/commands/team.md` create 路径:elicit 自由文本 goal → preset 匹配 → 派生 roster+pattern → 落盘 `team.md`(可选 `goal_slug`)。无 archive 识别分支。
 - `templates/commands/goal.md` + `scripts/python/goal-utils.py`:`targets <slug> --add|--list|--set` 为 Target 唯一授权面(单一撰写入口,038 FR-007);GD-2/GD-3 切片尺度形态检测、判据复述拒绝、终态只读、身份单调发放均在引擎内。
-- `skills/create-team/references/goal.md` § Target:团队侧对 Target 的影响是**提议形**(propose → ratify);`## Targets` 只由引擎渲染,派生流程禁写 `goal.md`(038 FR-008)。
+- `skills/internal/create-team/references/goal.md` § Target:团队侧对 Target 的影响是**提议形**(propose → ratify);`## Targets` 只由引擎渲染,派生流程禁写 `goal.md`(038 FR-008)。
 - run 级 `--target` 指派与五项 preview 校验已落地(038 FR-009);`coordinate`(037)提供跨团队 territory 再划分的提议形机制。
 
 **本需求补三块**:create 流程的**goal-based 分支**(识别已定义 goal → 加载 → 分析);**goal→Target 分解提议与成组批准过程**(提议起草在 team 侧、落盘仍唯一经 `/speckit.goal`);**每 Target 一个团队**的成组创建(N teams : 1 Goal,默认聚焦 + territory 不相交)。
@@ -127,7 +127,7 @@
 **兼容与文档**
 
 - **FR-014**: 既有 create 流程(自由文本 goal、preset 匹配、无 `goal_slug` 的存量团队)MUST 零回归;既有 goal 定义与既有团队 MUST 零迁移可用;run/modify 模式的既有行为 MUST 不变。
-- **FR-015**: 下游文档(canonical:`templates/commands/team.md`、`skills/create-team/references/{goal.md,create-mode.md,execution-guide.md,summary-mapping.md}`、`docs/reference/commands/`)MUST 更新并按概念锚(`shared/definitions/goal-definitions.md`)链接而非复述;全部变更 MUST 经 `sync-mirrors.py` 扇出,MUST NOT 手工双写镜像。
+- **FR-015**: 下游文档(canonical:`templates/commands/team.md`、`skills/internal/create-team/references/{goal.md,create-mode.md,execution-guide.md,summary-mapping.md}`、`docs/reference/commands/`)MUST 更新并按概念锚(`shared/definitions/goal-definitions.md`)链接而非复述;全部变更 MUST 经 `sync-mirrors.py` 扇出,MUST NOT 手工双写镜像。
 
 ### Key Entities *(include if requirement involves data)*
 

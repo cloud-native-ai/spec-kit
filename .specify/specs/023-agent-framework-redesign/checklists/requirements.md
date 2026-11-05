@@ -47,4 +47,4 @@
 
 - Referenced protocol docs (`requirements-guidelines.md`, `feature-integration.md`, `user-input-protocol.md`) are absent from this repo; validation used the command's key rules plus standard SDD quality dimensions.
 - Feature binding intentionally left as "Need clarification"; candidate features to review during `/speckit.clarify`: 019 (Agents Command), 014 (Agent Framework Refactor), 022 (EEI Agent Triad).
-- 0 clarification markers were needed: `docs/agents/design.md` is decision-complete on the redesign's scope and terminology.
+- 0 clarification markers were needed: `docs/reference/agents/design.md` is decision-complete on the redesign's scope and terminology.

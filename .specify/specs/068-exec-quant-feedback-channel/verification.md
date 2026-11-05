@@ -219,7 +219,7 @@ verdict=pass
 | Gate | 判据 | 实跑结果 | 判定 |
 |------|------|----------|------|
 | GATE-1 | `validate-tasks.py` exit 0 | `PASS — 0 error(s), 0 warning(s)`，rc=0（收口标记后复跑） | PASS |
-| GATE-2 | `pre-analyze-check.py --stage tasks` errors=0 | `decision=pass errors=0 advisories=8 waived=0`（advisory 全部为预期 `missing-path` 类：`aggregated/` 运行时派生层与已退役 `.specify/templates/commands/`） | PASS |
+| GATE-2 | `pre-analyze-check.py --stage tasks` errors=0 | `decision=pass errors=0 advisories=8 waived=0`（advisory 全部为预期 `missing-path` 类：`aggregated/` 运行时派生层与已退役 `templates/commands/`） | PASS |
 | GATE-3 | `decomposition-check.py --mode tasks` proceed | `decision: proceed`（fr 19/30 上限、task 30/40 上限） | PASS |
 | GATE-4 | 24 文件集名字级相对冻结基线零新增 | part 6a 最终重跑 **547 passed / 0 failed**（`log-final-post-sync-names.txt` 0 条）；相对 `log-baseline-pre-impl.txt`（3 failed / 544 passed）名字级零新增（T023 `comm -13` 空 + T027 收口，余留 2 既有失败如预测转绿）；上节 `git diff` 空证明当前树与该记录零差异 | PASS |
 | GATE-5 | 镜像零 NEW drift（相对 T001 基线） | `sync-mirrors.py --check` 当前 197 项 DIFF **⊆** T001 基线 202 项（`comm -13` 空 = 零 NEW）；消失 5 项 = 本特性镜像对字节收敛（feedback-utils.py / feedback-step.md / manage-feedback ×3，预期不算回归）；特性镜像对逐对 `cmp` rc=0；`regen-command-copies.py --check` → `OK: all per-tool command copies match the source templates.` rc=0 | PASS |

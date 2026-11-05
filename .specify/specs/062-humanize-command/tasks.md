@@ -58,7 +58,7 @@
 - Framework source: `templates/`, `skills/`, `shared/`, `docs/`, `tests/`.
 - Runtime mirrors: `.specify/skills/`, `.specify/shared/`.
 - Feature evidence: `.specify/specs/062-humanize-command/` (`notes/`, `verification.md`).
-- `templates/commands/` has **no** `.specify/templates/commands/` mirror (retired); per-tool copies are the distribution face.
+- `templates/commands/` has **no** `templates/commands/` mirror (retired); per-tool copies are the distribution face.
 
 ---
 

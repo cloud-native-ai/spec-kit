@@ -123,13 +123,13 @@ tests/contract/
 
 ### Mirror Obligations
 
-The live mirror pairs are defined in `scripts/python/sync-mirrors.py` MIRROR_PAIRS; command templates fan out only to `regen-command-copies.py` per-tool copies (`.specify/templates/commands/` is retired).
+The live mirror pairs are defined in `scripts/python/sync-mirrors.py` MIRROR_PAIRS; command templates fan out only to `regen-command-copies.py` per-tool copies (`templates/commands/` is retired).
 
 **Baseline drift measured before this plan's edits** (2026-10-27): `sync-mirrors.py --check` reports exactly one pre-existing drift, `.specify/skills/improve-skills/references/loop-playbook.md` (legacy divergence recorded in the constitution's Sync Impact Report, unrelated to this feature); `regen-command-copies.py --check` is clean. Pass criterion for every row: **no NEW drift on the pairs this spec touches** — regenerated copies contain the edit.
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/{review,feedback,improve}.md` | per-tool copies via `regen-command-copies.py` (`.claude/commands/`, `.github/prompts/`, `.qoder/commands/`, `.opencode/command/`, …); NO `.specify/templates/commands/` mirror (retired) | `python3 scripts/python/regen-command-copies.py --check` after regen — no new drift vs the measured baseline |
+| `templates/commands/{review,feedback,improve}.md` | per-tool copies via `regen-command-copies.py` (`.claude/commands/`, `.github/prompts/`, `.qoder/commands/`, `.opencode/command/`, …); NO `templates/commands/` mirror (retired) | `python3 scripts/python/regen-command-copies.py --check` after regen — no new drift vs the measured baseline |
 | `skills/internal/code-review/`, `skills/internal/manage-feedback/`, `skills/internal/self-improvement/` | `.specify/skills/internal/` mirror via `sync-mirrors.py` | `python3 scripts/python/sync-mirrors.py --check` — no new drift beyond the one recorded pre-existing diff |
 | `shared/workflow/self-improvement-workflow.md`, `shared/guidelines/dogfooding.md` | `.specify/shared/...` mirror via `sync-mirrors.py` | same check, same criterion |
 | `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py` via `sync-mirrors.py` | same check, same criterion |

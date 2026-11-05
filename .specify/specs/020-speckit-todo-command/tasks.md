@@ -138,9 +138,9 @@
 
 **Purpose**: Final consistency, docs, and feature bookkeeping.
 
-- [X] T049 Update command documentation to include `/speckit.todo` behavior in `docs/usage.md`
-- [X] T050 [P] Add command-focused documentation page in `docs/commands/todo.md`
-- [X] T051 [P] Add/refresh quickstart verification notes for todo workflow in `docs/quickstart.md`
+- [X] T049 Update command documentation to include `/speckit.todo` behavior in `docs/tutorials/quickstart.md`
+- [X] T050 [P] Add command-focused documentation page in `docs/reference/commands/todo.md`
+- [X] T051 [P] Add/refresh quickstart verification notes for todo workflow in `docs/tutorials/quickstart.md`
 - [X] T052 Update feature detail notes after task breakdown in `.specify/memory/features/025.md`
 - [X] T053 Update feature index status/date for feature 025 in `.specify/memory/features.md`
 - [X] T054 Run targeted test commands for todo contract/integration suites and record results in `.specify/specs/020-speckit-todo-command/verification.md`

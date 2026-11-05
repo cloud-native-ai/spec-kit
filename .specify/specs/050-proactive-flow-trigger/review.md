@@ -264,7 +264,7 @@ No P0 survived validation. The single P0 candidate was downgraded to P1 (F1) bec
 
 - **Severity**: P2
 - **Category**: Documentation
-- **Location**: owner `/storage/project/cloud-native-ai/spec-kit/shared/definitions/tool-definitions.md#L36`; copies at `templates/instructions-template.md#L132`, `templates/tools.md#L14`, `templates/commands/tools.md#L103`, `skills/create-tools/SKILL.md#L65`, `skills/improve-tools/SKILL.md#L53`, and the generated `.specify/instructions.md#L147`
+- **Location**: owner `/storage/project/cloud-native-ai/spec-kit/shared/definitions/tool-definitions.md#L36`; copies at `templates/instructions-template.md#L132`, `templates/tools.md#L14`, `templates/commands/tools.md#L103`, `skills/internal/create-tools/SKILL.md#L65`, `skills/internal/improve-tools/SKILL.md#L53`, and the generated `.specify/instructions.md#L147`
 - **Evidence** (verbatim):
 
   ```
@@ -358,7 +358,7 @@ Targets are given as absolute paths because the `{REPO_URL}@{COMMIT_SHA}` form i
 
 ### 5.5 Documentation Improvements
 
-- **Correct the `tools.md` claim at its owner and convert six copies to pointers** — Target: owner `/storage/project/cloud-native-ai/spec-kit/shared/definitions/tool-definitions.md#L36`; copies at `templates/instructions-template.md#L132`, `templates/tools.md#L14`, `templates/commands/tools.md#L103`, `skills/create-tools/SKILL.md#L65`, `skills/improve-tools/SKILL.md#L53`. Change: state the real mechanism (`.specify/tools/{system,shell,project}.json` regenerated via `generate-instructions.sh:39-41`; `.specify/memory/tools.md` is a hand-maintained MCP index), then reduce each copy to a pointer. Source: F8, F1. Expected impact: stops propagating a false operational model to every agent through the ambient surface, and removes the false premise that made DoD-8 unsatisfiable.
+- **Correct the `tools.md` claim at its owner and convert six copies to pointers** — Target: owner `/storage/project/cloud-native-ai/spec-kit/shared/definitions/tool-definitions.md#L36`; copies at `templates/instructions-template.md#L132`, `templates/tools.md#L14`, `templates/commands/tools.md#L103`, `skills/internal/create-tools/SKILL.md#L65`, `skills/internal/improve-tools/SKILL.md#L53`. Change: state the real mechanism (`.specify/tools/{system,shell,project}.json` regenerated via `generate-instructions.sh:39-41`; `.specify/memory/tools.md` is a hand-maintained MCP index), then reduce each copy to a pointer. Source: F8, F1. Expected impact: stops propagating a false operational model to every agent through the ambient surface, and removes the false premise that made DoD-8 unsatisfiable.
 - **Document the two-step initialization pipeline** — Target: `/storage/project/cloud-native-ai/spec-kit/docs/tutorials/quickstart.md` and `docs/reference/cli/`. Change: state plainly that `specify init` distributes resources but does not render `.specify/instructions.md` or create any symlink, and that `/speckit.instructions` (running `generate-instructions.sh`) is the required second step. Source: F4. Expected impact: this is the single most likely first-run stumble for a new user, and it currently appears nowhere outside feature 050's corrected scenario 1.
 
 ## 6. Priority Roadmap

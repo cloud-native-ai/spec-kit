@@ -79,8 +79,8 @@ The gate record is [notes/decomposition-gate.md](notes/decomposition-gate.md). T
 
 | Fact | Evidence | Design consequence |
 |------|----------|--------------------|
-| Watcher owns verdicts and exit codes 0/10–16; `--once` returns one `WATCH …` line plus `EVIDENCE …` for terminal verdicts | `scripts/watch-target.sh` (`EXIT_*`, `format_verdict`, `emit_single`) | `loop-state.py` consumes `--once` output; it never re-implements the verdict state machine and never emits 10–16 |
-| Watcher defaults are published in `--help` (`Defaults: window=200s, interval=3s, start-grace=30s, deadline-grace=120s, heartbeat-max-age=120s`) | `scripts/watch-target.sh` usage block | Thresholds are resolved from that help text (or explicit flags); the new engine does not define a second copy |
+| Watcher owns verdicts and exit codes 0/10–16; `--once` returns one `WATCH …` line plus `EVIDENCE …` for terminal verdicts | `skills/external/sdd-loop-driver/scripts/watch-target.sh` (`EXIT_*`, `format_verdict`, `emit_single`) | `loop-state.py` consumes `--once` output; it never re-implements the verdict state machine and never emits 10–16 |
+| Watcher defaults are published in `--help` (`Defaults: window=200s, interval=3s, start-grace=30s, deadline-grace=120s, heartbeat-max-age=120s`) | `skills/external/sdd-loop-driver/scripts/watch-target.sh` usage block | Thresholds are resolved from that help text (or explicit flags); the new engine does not define a second copy |
 | Watcher attribution requires BOTH `line=` and `run=` in a carrier; missing either → `unattributed` and the carrier is ignored | `classify_pair` in `watch-target.sh` | `loop-state.py` must choose legacy vs attributed watcher invocation; passing `--run-id` at a 063-style file set would silently hide the status |
 | `stage-runner.sh` writes status/pid/heartbeat with `line=`/`stage=` but **no** `run=`; `run-stage.sh` writes `run=` too | `stage-runner.sh:113,114,241`; `run-stage.sh:125,152,198` | Attribution cannot assume `run=`; a file without it is own only when it can be proven (matching line/stage + mtime ≥ `stage_started_at` + registry PID identity); otherwise it is a suspect stale signal |
 | `line-registry.py --action reattach-brief` aggregates registry, spine (`state` + last line), four-piece existence, heartbeat age, reservation and lease | `line-registry.py:2280` | Reused as a registry read path only; it neither becomes the aggregator nor gains recovery actions |
@@ -92,7 +92,7 @@ The gate record is [notes/decomposition-gate.md](notes/decomposition-gate.md). T
 
 ### D-01 — One new engine, three actions, one owner reference
 
-Create `scripts/loop-state.py` (Python 3.8+ stdlib) with `--action snapshot|recover|check-spine` and `--self-test`; create `references/state-awareness.md` as the single owner of the new awareness/interruption/recovery rules. `watch-model.md` remains the sole owner of watch verdicts; `stage-prompts.md` remains the owner of stall defaults, U3/U4/U5 procedure and the spine write points; `efficiency-model.md` remains the owner of the plan-owned artifact set. The new reference points at them and never copies their tables or numeric defaults.
+Create `skills/external/sdd-loop-driver/scripts/loop-state.py` (Python 3.8+ stdlib) with `--action snapshot|recover|check-spine` and `--self-test`; create `references/state-awareness.md` as the single owner of the new awareness/interruption/recovery rules. `watch-model.md` remains the sole owner of watch verdicts; `stage-prompts.md` remains the owner of stall defaults, U3/U4/U5 procedure and the spine write points; `efficiency-model.md` remains the owner of the plan-owned artifact set. The new reference points at them and never copies their tables or numeric defaults.
 
 Rejected: extending `line-registry.py` (its domain is registration/ownership/lease, it is already ~2.5k lines, and mixing a read-only projection plus mutating recovery into it would blur two owners); reimplementing the watcher state machine (forbidden by FR-005).
 
@@ -172,7 +172,7 @@ Snapshot emits no `age_seconds` or elapsed values; it emits `mtime` (stable), bo
 
 ### D-16 — Distribution and task budget
 
-Deliverables: `SKILL.md`, new `references/state-awareness.md`, new `scripts/loop-state.py`, targeted edits to `references/stage-prompts.md` and `references/dispatch-recipes.md`, the docs page, the new unit/contract/integration tests, and the existing skill contract test's pinned H2/mirror lists. The runtime mirror is regenerated, never hand-edited. The plan is structured so `/speckit.tasks` can stay at or below 40 task rows (test matrix consolidated per file); `tasks` U4 re-runs the gate.
+Deliverables: `SKILL.md`, new `references/state-awareness.md`, new `skills/external/sdd-loop-driver/scripts/loop-state.py`, targeted edits to `references/stage-prompts.md` and `references/dispatch-recipes.md`, the docs page, the new unit/contract/integration tests, and the existing skill contract test's pinned H2/mirror lists. The runtime mirror is regenerated, never hand-edited. The plan is structured so `/speckit.tasks` can stay at or below 40 task rows (test matrix consolidated per file); `tasks` U4 re-runs the gate.
 
 ## 3. Rejected alternatives
 

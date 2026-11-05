@@ -17,7 +17,7 @@
 **Target Platform**: 仓库框架源树(skills/、templates/、shared/)+ 本仓运行时镜像(.specify/);宿主发现面经既有 `.claude/skills`、`.qoder/skills`、`.github/skills` → `.specify/skills` 符号链接,无新增 per-tool 机制
 **Project Type**: framework(template-only feature——无运行时行为,测试对象为文档内容/规范路径/镜像字节一致)
 **Performance Goals**: N/A(内容变更,无运行时性能面)
-**Constraints**: ①**门控预算整数余量 0**(实测基线 2026-10-14:scan-confirmation-gates.py total=23=冻结上限,violations 0)——本特性全部新增文案 MUST 零 BLOCKING_PATTERNS 命中(设计规避,不改扫描器/不扩豁免),收尾 total 仍=23;②**镜像相对判据**(实测基线 2026-10-14:全树恰 1 条既有 DIFF `.specify/skills/git-workspace/scripts/git_fleet.py`,不在本特性触及对上)——改后仍恰这 1 条,无新增;③compile-embeds 收尾零漂移(69→71 单元);④regen 命令副本基线全 OK——改后六副本含改动且仍全 OK
+**Constraints**: ①**门控预算整数余量 0**(实测基线 2026-10-14:scan-confirmation-gates.py total=23=冻结上限,violations 0)——本特性全部新增文案 MUST 零 BLOCKING_PATTERNS 命中(设计规避,不改扫描器/不扩豁免),收尾 total 仍=23;②**镜像相对判据**(实测基线 2026-10-14:全树恰 1 条既有 DIFF `skills/external/git-utils/scripts/git_fleet.py`,不在本特性触及对上)——改后仍恰这 1 条,无新增;③compile-embeds 收尾零漂移(69→71 单元);④regen 命令副本基线全 OK——改后六副本含改动且仍全 OK
 **Scale/Scope**: 2 个新技能目录(各 1 个 SKILL.md)+ probe 注册表 2 行 + 2 个命令模板改 + 1 个指南改(双副本)+ agents.md 只读核查 + 1 个新契约测试文件 + quickstart 3 场景
 
 ## Constitution Check
@@ -89,10 +89,10 @@ tests/contract/test_run_skills_wiring.py # NEW — 结构契约测试(本特性�
 |----------------------|---------------------------------------------------|--------|
 | `skills/internal/run-skills/SKILL.md` (NEW) | `.specify/skills/internal/run-skills/SKILL.md`(sync-mirrors `--only skills/internal/run-skills`;宿主发现面经 `.claude/.qoder/.github/skills → .specify/skills` 符号链接自动可达,无 per-tool 副本) | `sync-mirrors.py --check --only skills/internal/run-skills` → 0 DIFF(该对为本特性新建,基线不存在旧漂移);编译后两副本 Wrap-up 段一致 |
 | `skills/internal/run-team/SKILL.md` (NEW) | `.specify/skills/internal/run-team/SKILL.md`(同上) | 同上 |
-| `templates/commands/team.md` | `.claude/commands/speckit.team.md`、`.qoder/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.opencode/command/speckit.team.md`、`.codex/commands/speckit.team.md`、`.hermes/commands/speckit.team.md`(regen-command-copies.py;`.specify/templates/commands/` 已退役不入对) | `regen-command-copies.py --check` EXIT=0(基线 2026-10-14 已实测 OK)且抽查副本含 run-team 路由改动 |
+| `templates/commands/team.md` | `.claude/commands/speckit.team.md`、`.qoder/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.opencode/command/speckit.team.md`、`.codex/commands/speckit.team.md`、`.hermes/commands/speckit.team.md`(regen-command-copies.py;`templates/commands/` 已退役不入对) | `regen-command-copies.py --check` EXIT=0(基线 2026-10-14 已实测 OK)且抽查副本含 run-team 路由改动 |
 | `templates/commands/skills.md` | 同上 6 个 per-tool 副本(speckit.skills) | 同上 |
 | `templates/skills.md` | `.specify/skills.md`(live 指南副本;generate-instructions.sh 仅缺文件时创建,故本仓 live 副本为**手动双写**,两副本字节一致——实测基线 diff 为 IDENTICAL) | `diff -q templates/skills.md .specify/skills.md` → 一致 |
-| `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md`(sync-mirrors shared 对) | `sync-mirrors.py --check --only shared` → 0 DIFF(shared 对基线 0 漂移);全树收尾判据:仍恰基线那 1 条既有 DIFF(`.specify/skills/git-workspace/scripts/git_fleet.py`),无新增 |
+| `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md`(sync-mirrors shared 对) | `sync-mirrors.py --check --only shared` → 0 DIFF(shared 对基线 0 漂移);全树收尾判据:仍恰基线那 1 条既有 DIFF(`skills/external/git-utils/scripts/git_fleet.py`),无新增 |
 | (编译产物)两新 SKILL.md 的 `## Wrap-up` 段 | 由 `probe-utils.py --action compile-embeds` 从注册表渲染进 canonical,随 sync-mirrors 落镜像 | `probe-utils.py --action compile-embeds --check` → 零漂移(基线 69 单元零漂移;注册 2 行后 71 单元) |
 
 ## Complexity Tracking

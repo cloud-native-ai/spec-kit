@@ -7,8 +7,8 @@
 | 目录 | 类别 | 定义 | 占位符 | 可直接运行 | 生产者 → 消费者 |
 |------|------|------|--------|-----------|------------------|
 | `agents/` | **Meta Agent 预置集** | 操作对象为其他技能与其他 agent;均可独立运行 | 无 | 是 | 框架维护者 → init 渲染管线 → 各工具 agent 目录 |
-| `skills/create-agent/templates/` | **Worker 能力模板** | 面向问题域,沿能力维度 | 有(`{{...}}` 白名单内) | 否(需实例化) | create-agent 技能 → 团队组建/单 agent 创作 |
-| `skills/create-team/templates/agents/` | **Worker 职责模板** | 面向问题域,沿团队职责维度(阶段席位 + 编排契约) | 有 | 否 | create-team 技能 → 团队组建 |
+| `skills/internal/create-agent/templates/` | **Worker 能力模板** | 面向问题域,沿能力维度 | 有(`{{...}}` 白名单内) | 否(需实例化) | create-agent 技能 → 团队组建/单 agent 创作 |
+| `skills/internal/create-team/templates/agents/` | **Worker 职责模板** | 面向问题域,沿团队职责维度(阶段席位 + 编排契约) | 有 | 否 | create-team 技能 → 团队组建 |
 
 限定表述(FR-024):指代三处时 MUST 分别使用"Meta Agent 预置集"、"Worker 能力模板"、"Worker 职责模板";文档与术语表 MUST NOT 再以裸 "templates" 指代。
 
@@ -18,7 +18,7 @@
 
 ## T-3 迁移规格(D6)
 
-- 7 个文件 `agents/<slug>.agent.md` 逐一**替换** `skills/create-agent/templates/agent-capacity-<slug>-template.md`(同一角色单一真源)。
+- 7 个文件 `agents/<slug>.agent.md` 逐一**替换** `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`(同一角色单一真源)。
 - frontmatter MUST 转为中立键集(C-1~C-4)。
 - 正文保持原样,**仅**允许把项目身份行与 Project Context 段中的 "Spec Kit (specify-cli)" 参数化为 `{{PROJECT_NAME}}`(白名单占位符)。
 - 迁移后 `agents/` MUST NOT 残留任何 Worker 定义;`test_shipped_agent_presets.py` 的断言对象改为 T-4 的 Meta 预置集。

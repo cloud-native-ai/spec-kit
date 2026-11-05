@@ -34,7 +34,7 @@ The boilerplate used by `create-new-skill.sh` to scaffold new `SKILL.md` files.
 | Resources (scripts, references, assets) | Unchanged (renamed from "Available Tools & Resources") |
 | ~~Tools subsection~~ | **Removed** |
 
-### Create-Skills Workflow (`skills/create-skills/SKILL.md`)
+### Create-Skills Workflow (`skills/external/create-skills/SKILL.md`)
 
 The skill that implements skill creation logic.
 
@@ -66,12 +66,12 @@ templates/skills-template.md
                   └── produces → .specify/skills/<name>/SKILL.md
 
 templates/commands/skills.md
-  └── orchestrates → skills/create-skills/SKILL.md (new skill)
+  └── orchestrates → skills/external/create-skills/SKILL.md (new skill)
   └── orchestrates → skills/improve-skills/SKILL.md (existing skill)
 
-skills/create-skills/SKILL.md
+skills/external/create-skills/SKILL.md
   └── mirrors → .specify/skills/create-skills/SKILL.md
-  └── references → skills/create-skills/references/skill-creation-quality-checklist.md
+  └── references → skills/external/create-skills/references/skill-creation-quality-checklist.md
 ```
 
 ## State Transitions

@@ -84,7 +84,7 @@ done
 .specify/skills/think-skills/SKILL.md
 ```
 
-> 注:本特性 T030 / T032 会改 `skills/create-team/references/patterns.md` 与 `skills/create-agent/SKILL.md`。前者**不在**上述 38 条内(改前一致),故改后它 MUST 仍不出现;后者**已在**38 条内(改前即漂移),故改后它仍会出现——判据是"DIFF 集合无**新增**成员",不是"该文件从集合里消失"。
+> 注:本特性 T030 / T032 会改 `skills/internal/create-team/references/patterns.md` 与 `skills/internal/create-agent/SKILL.md`。前者**不在**上述 38 条内(改前一致),故改后它 MUST 仍不出现;后者**已在**38 条内(改前即漂移),故改后它仍会出现——判据是"DIFF 集合无**新增**成员",不是"该文件从集合里消失"。
 
 ### `regen-command-copies.py --check` 既有待再生集
 
@@ -108,7 +108,7 @@ done
 | 8 | 命令 `MUST include` 条目数 | `grep -c 'MUST include' templates/commands/constitution.md` | **7** | 8 |
 | 9 | 活动宪章版本 | `grep -oP '^\*\*Version\*\*: \K[0-9.]+' .specify/memory/constitution.md` | **1.12.0** | 1.13.0 |
 | 10 | 出厂 Agent 预设份数 | `ls -1 agents/*.agent.md \| wc -l` | **2** | 2(不变) |
-| 11 | Per-Agent Payload 字段行数 | `awk '/^Per-Agent Payload:/,/^Context Isolation Rules:/' skills/create-team/references/patterns.md \| grep -c '^| \`'` | **5** | 6 |
+| 11 | Per-Agent Payload 字段行数 | `awk '/^Per-Agent Payload:/,/^Context Isolation Rules:/' skills/internal/create-team/references/patterns.md \| grep -c '^| \`'` | **5** | 6 |
 | 12 | UFC 类表规则真源路径数(去重) | 见下方脚本(口径同 `test_user_facing_comprehension_doc.py:394-397`) | **8**(8 个路径逐个 `is_file()` 为 True) | 9 |
 | 13 | 门控扫描 `total` | `python3 scripts/python/scan-confirmation-gates.py \| head -1` | **blocking confirmation gates: 23**(destructive 13 / governance_kept 10) | 23(相等) |
 | 14 | `BLOCKING_PATTERNS` / `POLICY_DOCS` / `SELF_REL` | importlib 载入取真(见下方脚本) | **17 / 2 / `shared/guidelines/confirmation-gates.md`** | 逐字不变 |
@@ -188,7 +188,7 @@ scan-exit=0
 ### 引擎与脚本零改动面(GATE-3 的比对源)
 
 ```bash
-git diff --stat 80a8c1fb0e27c70c797974affb8e88510558da19 -- scripts/ src/specify_cli/ skills/create-team/scripts/ templates/plan-template.md
+git diff --stat 80a8c1fb0e27c70c797974affb8e88510558da19 -- scripts/ src/specify_cli/ skills/internal/create-team/scripts/ templates/plan-template.md
 ```
 改前实测:**空**。改后 MUST 仍为空。
 

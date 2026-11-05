@@ -97,7 +97,7 @@ As a reader of an analysis-project architecture report, I want the analysis work
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST provide a dedicated Skill named [[STR-001]] under the project skills directory (`skills/summarize-project`), following the same authoring conventions as existing skills.
+- **FR-001**: The system MUST provide a dedicated Skill named [[STR-001]] under the project skills directory (`skills/internal/summarize-project`), following the same authoring conventions as existing skills.
 - **FR-002**: The Skill's trigger description MUST cover intents such as "项目总结", "项目汇报", "进展报告", "项目进展", "summarize project", and "project summary/report", so agents route such requests to it.
 - **FR-003**: The Skill MUST collect and organize project work items from user-provided or workspace-available materials (documents, task lists, specs, plans, repository history, or conversation description), keep each work item traceable to its source, and MUST NOT fabricate work items without evidence.
 - **FR-004**: The Skill MUST decompose project work into a hierarchical work breakdown structure covering at least phase → task levels before any charting, and this single breakdown MUST be the shared basis for both charts.
@@ -161,7 +161,7 @@ As a reader of an analysis-project architecture report, I want the analysis work
 
 | String ID | Value (verbatim) | Consumed by |
 |-----------|------------------|-------------|
-| `STR-001` | "summarize-project" | FR-001, FR-002, skill directory path `skills/summarize-project`, SKILL.md frontmatter `name`, trigger tests |
+| `STR-001` | "summarize-project" | FR-001, FR-002, skill directory path `skills/internal/summarize-project`, SKILL.md frontmatter `name`, trigger tests |
 | `STR-002` | "analysis-project" | FR-015…FR-019, skill directory path `skills/analysis-project`, SKILL.md frontmatter `name`, trigger tests |
 
 **Citation convention**: When an FR, contract, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal. CI / `/speckit.analyze` can then verify that every `[[STR-NNN]]` reference resolves to a row in this section.

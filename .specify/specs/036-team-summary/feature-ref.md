@@ -39,13 +39,13 @@ Per the Feature reuse-first workflow gate, this is an evolution spec appended to
 | Feature 027 asset | This plan's change |
 |-------------------|--------------------|
 | `templates/commands/team.md` | Run-mode confirmation gate discloses the summary decision (FR-016); output-discipline assertion corrected for the new directory entries |
-| `skills/create-team/SKILL.md` | New SUMMARIZE phase in the continuous per-cycle loop; trigger points for the other three patterns; revised Rules / Hard Constraints bullets |
-| `skills/create-team/references/` | New `summary-mapping.md` — the FR-001 concept-mapping single source of truth |
-| `skills/create-team/scripts/` | New `build-summary-input.py` — the FR-008 deterministic form generator |
-| `skills/improve-team/SKILL.md` | `config.summary` becomes a tunable surface (cadence, enablement, delivery directory) |
-| `skills/create-team/templates/teams/*.md` | Three presets declare their pattern's default summary cadence |
+| `skills/internal/create-team/SKILL.md` | New SUMMARIZE phase in the continuous per-cycle loop; trigger points for the other three patterns; revised Rules / Hard Constraints bullets |
+| `skills/internal/create-team/references/` | New `summary-mapping.md` — the FR-001 concept-mapping single source of truth |
+| `skills/internal/create-team/scripts/` | New `build-summary-input.py` — the FR-008 deterministic form generator |
+| `skills/internal/improve-team/SKILL.md` | `config.summary` becomes a tunable surface (cadence, enablement, delivery directory) |
+| `skills/internal/create-team/templates/teams/*.md` | Three presets declare their pattern's default summary cadence |
 | `.specify/teams/<slug>/` runtime layout | Adds tracked `items.jsonl` (team index — run info only) |
-| `.specify/project/goal/<goal-slug>/` (new subtree) | The goal index — the sole complete summary delivery directory, coexisting with the pre-existing `.specify/project/` artifacts (FR-036) |
+| `.specify/goal/<goal-slug>/` (new subtree) | The goal index — the sole complete summary delivery directory, coexisting with the pre-existing `.specify/project/` artifacts (FR-036) |
 
 ## Feature-list review (Principle II)
 

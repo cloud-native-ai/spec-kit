@@ -371,9 +371,9 @@ absolute for the rest), measured without a pipe so the exit code is the script's
 | `templates/commands` | 0 | 0 | absolute | ok (pair excludes `commands/`; the per-tool copies are its distribution) |
 | `templates` | 2 | **2** | relative vs T002's list | **no NEW drift** |
 | `skills` | 2 | **30** | relative vs T002's list | **no NEW drift** |
-| `skills/create-team/references/execution-guide.md` | 0 | 0 | absolute | ok |
-| `skills/create-team/references/goal.md` | 0 | 0 | absolute | ok |
-| `skills/create-team/scripts/build-summary-input.py` | 0 | 0 | absolute | ok |
+| `skills/internal/create-team/references/execution-guide.md` | 0 | 0 | absolute | ok |
+| `skills/internal/create-team/references/goal.md` | 0 | 0 | absolute | ok |
+| `skills/internal/create-team/scripts/build-summary-input.py` | 0 | 0 | absolute | ok |
 | `regen-command-copies.py --check` | 0 | — | absolute | "OK: all per-tool command copies match the source templates." |
 | whole tree (no `--only`) | 2 | **33** | MUST NOT be used absolutely | = 1 + 2 + 30, reconciles exactly |
 

@@ -3,7 +3,7 @@
 **Requirement Branch**: `008-create-skills-skill`  
 **Created**: 2026-05-10  
 **Status**: Draft  
-**Input**: User description: "将templates/commands/skills.md中创建skill的逻辑提取出来，独立创建一个名为“create-skills”的skill，放到skills/create-skills目录。"
+**Input**: User description: "将templates/commands/skills.md中创建skill的逻辑提取出来，独立创建一个名为“create-skills”的skill，放到skills/external/create-skills目录。"
 
 ## Related Feature *(mandatory)*
 
@@ -40,7 +40,7 @@ As a Spec Kit maintainer, I want skill-creation guidance to live in a dedicated 
 
 **Acceptance Scenarios**:
 
-1. **Given** the existing skills command contains inline creation guidance, **When** the creation logic is extracted, **Then** a dedicated `create-skills` Skill exists under `skills/create-skills` with clear instructions for creating high-quality Skills.
+1. **Given** the existing skills command contains inline creation guidance, **When** the creation logic is extracted, **Then** a dedicated `create-skills` Skill exists under `skills/external/create-skills` with clear instructions for creating high-quality Skills.
 2. **Given** a user invokes the skills workflow for a Skill that does not exist, **When** the command determines creation is required, **Then** the workflow explicitly routes the creation task to `create-skills`.
 
 ---
@@ -86,7 +86,7 @@ As an AI agent using Spec Kit, I want the extracted `create-skills` Skill to pre
 ### Functional Requirements
 
 - **FR-001**: The system MUST provide a dedicated Skill named `create-skills` for creating new Spec Kit Skills.
-- **FR-002**: The `create-skills` Skill MUST be available from the project Skill directory `skills/create-skills`.
+- **FR-002**: The `create-skills` Skill MUST be available from the project Skill directory `skills/external/create-skills`.
 - **FR-003**: The `create-skills` Skill MUST preserve the existing creation workflow guidance from the skills command, including metadata extraction, conversation-based workflow distillation, minimal clarification, Skill structure, resource organization, registry updates, validation, and completion reporting.
 - **FR-004**: The skills command MUST explicitly route missing target Skills to `create-skills` for creation.
 - **FR-005**: The skills command MUST explicitly route existing target Skills to `improve-skills` for refinement or improvement.

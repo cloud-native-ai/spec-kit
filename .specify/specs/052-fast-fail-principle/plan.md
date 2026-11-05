@@ -19,7 +19,7 @@
 ## Technical Context
 
 **Language/Version**: Python `>=3.8`(per `pyproject.toml`);纪律真源文档、常驻章节、宪章原则、注入子句均为 Markdown 文本制品,无编译期。
-**Primary Dependencies**: `pytest`(带 `contract` marker,见 `pyproject.toml` → `[tool.pytest.ini_options]`)。**零新增运行时依赖**;复用既有引擎且**不修改**:`sync-mirrors.py`、`regen-command-copies.py`、`generate-instructions.sh`、`scan-confirmation-gates.py`、`feedback-utils.py`、`skills/create-team/scripts/dispatch.sh`。
+**Primary Dependencies**: `pytest`(带 `contract` marker,见 `pyproject.toml` → `[tool.pytest.ini_options]`)。**零新增运行时依赖**;复用既有引擎且**不修改**:`sync-mirrors.py`、`regen-command-copies.py`、`generate-instructions.sh`、`scan-confirmation-gates.py`、`feedback-utils.py`、`skills/internal/create-team/scripts/dispatch.sh`。
 **Storage**: 文件制品。新增 1 份纪律真源文档 + 1 份其 `.specify/` 镜像副本;新增 1 个契约测试文件。无数据库、无状态存储、无新增台账或注册表(FR-007 的范围限制子句禁止)。
 **Testing**: `pytest -m contract`。新增 `tests/contract/test_fast_fail_discipline.py`(承载 FR-035 的 22 项封闭断言集);**上调三处既有钉子**:`test_constitution_double_landing.py` 的 `TEMPLATE_COUNT` 13→14、`LIVE_COUNT` 15→16、`COMMAND_COUNT` 7→8、`MIN_VERSION` (1,12)→(1,13);`test_user_facing_comprehension_doc.py:400` 的 C-14 去重规则真源路径数 8→9。回归判据取**名字级**(`run-tests.sh --names-out` + `comm -13` 输出为空),不取条数级。
 **Target Platform**: 任意宿主 AI agent CLI(Claude Code / Codex CLI / Qoder CLI / opencode / Hermes Agent / GitHub Copilot)。纪律文本 MUST 项目中立(不含 `spec-kit` / `specify-cli` / `specify_cli` / `cloud-native-ai`),以便随包发布到任意下游项目。
@@ -124,8 +124,8 @@ shared/guidelines/                 # 新增 fast-fail.md(纪律唯一真源,9 �
 shared/definitions/                # subagent-definitions.md 增派发期注入义务(与既有可见性契约并列)
 templates/                         # instructions-template.md 新增顶级 ## Fast Fail Discipline 章节;constitution-template.md 新增原则 XIV
 templates/commands/                # constitution.md 新增 MUST include 条目(7 → 8);agents.md Run Mode 增注入义务(通道二命令侧落点)
-skills/create-team/references/     # patterns.md Per-Agent Payload 新增第六字段行 fast_fail_clause(通道三落点)
-skills/create-agent/               # SKILL.md 创作契约增"注入子句 MUST 在场"要求(通道二制作者侧落点)
+skills/internal/create-team/references/     # patterns.md Per-Agent Payload 新增第六字段行 fast_fail_clause(通道三落点)
+skills/internal/create-agent/               # SKILL.md 创作契约增"注入子句 MUST 在场"要求(通道二制作者侧落点)
 agents/                            # 2 份出厂预设各携一份子句副本(成对定界符包围)
 tests/contract/                    # 新增 test_fast_fail_discipline.py;上调 test_constitution_double_landing.py 四钉;上调 test_user_facing_comprehension_doc.py 的 C-14 8 → 9
 scripts/                           # 不改动 —— scan-confirmation-gates.py 的 POLICY_DOCS / SELF_REL / BLOCKING_PATTERNS 刻意不动(D-8 取设计规避)
@@ -152,10 +152,10 @@ src/specify_cli/                   # 不改动
 | `shared/definitions/subagent-definitions.md` | `.specify/shared/definitions/subagent-definitions.md`(同上 `shared` 对) | 同上;并断言既有 `## External Dispatch Visibility Contract` 的 5 条编号义务逐字未变 |
 | `templates/instructions-template.md` | ① `.specify/templates/instructions-template.md`(`("templates", ".specify/templates", False, {"commands"})` 对);② 再生成的 `.specify/instructions.md`;③ 4 条兼容性符号链接指向该活动文件 | `--check --only templates` 无新增漂移;`generate-instructions.sh` 再生后活动文件 `## ` 节数 19→20 且新章节在 UFC 与 Dogfooding 之间;`test_c7`/`test_c8` 两处位置钉子仍绿;4 条链接仍为符号链接(`test -L`) |
 | `templates/constitution-template.md` | `.specify/templates/constitution-template.md`(同上 `templates` 对) | `--check --only templates` 无新增漂移;`test_constitution_double_landing.py` 的 `TEMPLATE_COUNT` 上调为 14 后相等断言通过;新原则块折行 <100 字符 |
-| `templates/commands/constitution.md` | `.claude/commands/speckit.constitution.md`、`.github/prompts/speckit.constitution.prompt.md`、`.qoder/commands/speckit.constitution.md`、`.opencode/command/speckit.constitution.md`(经 `regen-command-copies.py`;**无** `.specify/templates/commands/` 镜像——该对已退役) | 再生后 4 份副本各含新条目;`COMMAND_COUNT` 上调为 8 后相等断言通过;`regen-command-copies.py --check` 相对改前**无新增**待再生项 |
+| `templates/commands/constitution.md` | `.claude/commands/speckit.constitution.md`、`.github/prompts/speckit.constitution.prompt.md`、`.qoder/commands/speckit.constitution.md`、`.opencode/command/speckit.constitution.md`(经 `regen-command-copies.py`;**无** `templates/commands/` 镜像——该对已退役) | 再生后 4 份副本各含新条目;`COMMAND_COUNT` 上调为 8 后相等断言通过;`regen-command-copies.py --check` 相对改前**无新增**待再生项 |
 | `templates/commands/agents.md` | 同上四棵按工具树的 `speckit.agents.*` | 同上;Run Mode 的既有 4 步序列与 `**Scope boundary**` 逐字未变,仅新增注入义务 |
-| `skills/create-team/references/patterns.md` | `.specify/skills/create-team/references/patterns.md`(`("skills", ".specify/skills", False, {"site"})` 对) | `--check --only skills` 相对改前无新增漂移;Per-Agent Payload 表由 5 行变 6 行,Context Isolation Rules 4 条逐字未变 |
-| `skills/create-agent/SKILL.md` | `.specify/skills/create-agent/SKILL.md`(同上 `skills` 对) | 同上;既有"六个必备正文节"与 Self-Improvement Contract 恰好一次的要求逐字未变 |
+| `skills/internal/create-team/references/patterns.md` | `.specify/skills/internal/create-team/references/patterns.md`(`("skills", ".specify/skills", False, {"site"})` 对) | `--check --only skills` 相对改前无新增漂移;Per-Agent Payload 表由 5 行变 6 行,Context Isolation Rules 4 条逐字未变 |
+| `skills/internal/create-agent/SKILL.md` | `.specify/skills/internal/create-agent/SKILL.md`(同上 `skills` 对) | 同上;既有"六个必备正文节"与 Self-Improvement Contract 恰好一次的要求逐字未变 |
 | `agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md` | ① `.specify/agents/templates/`(`("agents", ".specify/agents/templates", False, set())` 对);② **四棵**按工具 agent 树 `.claude/agents/`、`.qoder/agents/`、`.github/agents/`、`.opencode/agents/`(各 2 条目)——实现期订正:规划期误记为三棵且把第四棵路径写成单数 `.opencode/agent` 而测得 0;渲染键为 `claude`/`qoder`/**`copilot`**/`opencode`(`.github/agents` 的键是 `copilot`,且未知键静默返回 `rendered: 0`) | `--check --only agents` 改后为 `ok`(改前即 `ok`,2 files);两份预设各含**恰好一对**定界符且区间内文本与真源文档拥有者字面量逐字节相等 |
 | `tests/contract/test_fast_fail_discipline.py`(**新**) | 无镜像 | `pytest -m contract` 该文件全绿;全量套件名字级回归 `comm -13 baseline current` 输出为空 |
 | `tests/contract/test_constitution_double_landing.py`、`tests/contract/test_user_facing_comprehension_doc.py` | 无镜像 | 上调后各自全绿;`MIN_VERSION` 为下限语义(`>=`),1.13.0 本就通过,上调至 `(1,13)` 是为把下限推到本特性之后 |

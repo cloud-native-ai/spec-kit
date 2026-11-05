@@ -3,7 +3,7 @@
 **Feature Branch**: `021-agent-specific-config`  
 **Created**: 2026-06-25  
 **Status**: Draft  
-**Input**: User description: "为所有的命令和skill都添加一个"Agent特定配置和说明", 目前speckit框架中的commands和skills对所有的AI Agent工具都一视同仁,都是使用"通用配置".但是在实际执行的过程中不同的Agent工具的差别会比较大. 需要在 "templates/commands/agents.md", "templates/commands/skills.md", "templates/commands/tools.md", "skills/browser-utils", "skills/create-agent", "skills/improve-agent", "skills/improve-skills" 等和特定工具高度相关的命令和技能中添加对应的"特定工具优化"章节, 这些章节需要执行以下步骤:1)识别当前工具是什么: claude code,copilot,qoderwork等等;2)根据工具引入特定工具需要注意的事项和工具特定的方法(使用references子文档);3)回顾执行流程中当前工具执行中遇到的阻碍,生成新的feedback文档供持续优化."
+**Input**: User description: "为所有的命令和skill都添加一个"Agent特定配置和说明", 目前speckit框架中的commands和skills对所有的AI Agent工具都一视同仁,都是使用"通用配置".但是在实际执行的过程中不同的Agent工具的差别会比较大. 需要在 "templates/commands/agents.md", "templates/commands/skills.md", "templates/commands/tools.md", "skills/browser-utils", "skills/internal/create-agent", "skills/internal/improve-agent", "skills/external/improve-skills" 等和特定工具高度相关的命令和技能中添加对应的"特定工具优化"章节, 这些章节需要执行以下步骤:1)识别当前工具是什么: claude code,copilot,qoderwork等等;2)根据工具引入特定工具需要注意的事项和工具特定的方法(使用references子文档);3)回顾执行流程中当前工具执行中遇到的阻碍,生成新的feedback文档供持续优化."
 
 ## Related Feature *(mandatory)*
 
@@ -71,10 +71,10 @@ After a command or skill execution encounters agent-specific obstacles (e.g., a 
 ### Functional Requirements
 
 - **FR-001**: Each targeted command template (`templates/commands/agents.md`, `templates/commands/skills.md`, `templates/commands/tools.md`) MUST include an "Agent-Specific Configuration" section that defines the three-step agent adaptation workflow: identify → load references → capture feedback.
-- **FR-002**: Each targeted skill (`skills/browser-utils`, `skills/create-agent`, `skills/improve-agent`, `skills/improve-skills`) MUST include an "Agent-Specific Configuration" section in its SKILL.md following the same three-step workflow.
+- **FR-002**: Each targeted skill (`skills/browser-utils`, `skills/internal/create-agent`, `skills/internal/improve-agent`, `skills/external/improve-skills`) MUST include an "Agent-Specific Configuration" section in its SKILL.md following the same three-step workflow.
 - **FR-003**: The agent identification step MUST support all officially supported AI tools: Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder, and any Tier 2 agents (Hermes-Agent, iFlow).
 - **FR-004**: Agent identification MUST use environmental signals available to the executing agent (e.g., tool-specific environment variables, file system markers, command invocation context) rather than requiring explicit user input.
-- **FR-005**: Each targeted skill (`skills/browser-utils`, `skills/create-agent`, `skills/improve-agent`, `skills/improve-skills`) MUST maintain a `references/` subdirectory containing per-agent reference documents named `<agent-slug>-guide.md` (e.g., `claude-code-guide.md`, `copilot-guide.md`). Command templates (`templates/commands/*.md`) MUST embed agent-specific guidance inline within the Agent-Specific Configuration section rather than using separate reference files.
+- **FR-005**: Each targeted skill (`skills/browser-utils`, `skills/internal/create-agent`, `skills/internal/improve-agent`, `skills/external/improve-skills`) MUST maintain a `references/` subdirectory containing per-agent reference documents named `<agent-slug>-guide.md` (e.g., `claude-code-guide.md`, `copilot-guide.md`). Command templates (`templates/commands/*.md`) MUST embed agent-specific guidance inline within the Agent-Specific Configuration section rather than using separate reference files.
 - **FR-006**: Reference documents MUST contain agent-specific guidance including: tool capabilities and limitations relevant to the command/skill, preferred tool call patterns, known pitfalls, and workarounds.
 - **FR-007**: When the executing agent cannot be identified or has no corresponding reference document, the command or skill MUST fall back to generic execution without errors.
 - **FR-008**: The feedback generation step MUST produce a structured markdown document capturing: agent identity, execution timestamp, obstacle encountered, workaround applied (if any), and suggested improvement for the command/skill template.

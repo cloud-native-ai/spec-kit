@@ -57,10 +57,10 @@
 
 **⚠️ CRITICAL**: 契约测试先写并确认失败，再实现
 
-- [X] T003 Contract test（先写、先失败）：contracts/docs-utils-cli.md C-1…C-10 断言（action 集合、scan 分组 JSON、expire 不删文件、clean 默认 dry-run/--yes 门禁、archive-check broken 清单、validate 五维校验、audit 落盘 .specify/docs/audit/、exit code 约定、不触碰 feedback 引擎）in tests/contract/test_docs_utils_cli.py
-- [X] T004 实现 scripts/python/docs-utils.py：单一 argparse `--action {scan,expire,clean,archive-check,stats,validate,audit}`，标准库-only，stdout 单 JSON；字面量以 requirements.md Shared Strings（[[STR-001..004]]）为准
-- [X] T005 双写镜像 .specify/scripts/python/docs-utils.py（`\cp -f` 防 cp -i 别名）
-- [X] T006 校验：`diff -q scripts/python/docs-utils.py .specify/scripts/python/docs-utils.py` 零差异；T003 契约测试转绿
+- [X] T003 Contract test（先写、先失败）：contracts/docs-utils-cli.md C-1…C-10 断言（action 集合、scan 分组 JSON、expire 不删文件、clean 默认 dry-run/--yes 门禁、archive-check broken 清单、validate 五维校验、audit 落盘 docs/audit/、exit code 约定、不触碰 feedback 引擎）in tests/contract/test_docs_utils_cli.py
+- [X] T004 实现 skills/external/create-docs/scripts/docs-utils.py：单一 argparse `--action {scan,expire,clean,archive-check,stats,validate,audit}`，标准库-only，stdout 单 JSON；字面量以 requirements.md Shared Strings（[[STR-001..004]]）为准
+- [X] T005 双写镜像 skills/external/create-docs/scripts/docs-utils.py（`\cp -f` 防 cp -i 别名）
+- [X] T006 校验：`diff -q skills/external/create-docs/scripts/docs-utils.py skills/external/create-docs/scripts/docs-utils.py` 零差异；T003 契约测试转绿
 
 **Checkpoint**: 引擎可用——各用户故事可开始
 
@@ -80,10 +80,10 @@
 ### Implementation for User Story 1
 
 - [X] T009 [US1] author-section：编写 templates/commands/docs.md（frontmatter description/handoffs；## User Input / ## Glossary / ## Outline（作用域判定表、R0–R6 薄调度引用 shared/patterns/reconcile-pattern.md、分级确认门禁、四件产物、bootstrap 骨架含 FR-010 注册表四条种子语义与 ADR decisions/ 模板节）/ ## Feedback（unit-id /speckit.docs）/ ## Documentation / ## Handoffs）
-- [X] T010 [US1] mirror-parity（双写）：运行 `python3 scripts/python/regen-command-copies.py` 生成 .specify/templates/commands/docs.md 镜像 + 全部工具运行时副本（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 既存目录）
+- [X] T010 [US1] mirror-parity（双写）：运行 `python3 scripts/python/regen-command-copies.py` 生成 templates/commands/docs.md 镜像 + 全部工具运行时副本（.claude/.github/.qoder/.qwen/.opencode/.codex/.hermes/.iflow 既存目录）
 - [X] T011 [US1] mirror-parity（校验）：`python3 scripts/python/regen-command-copies.py --check` 零漂移；T007 契约测试转绿
-- [X] T012 [P] [US1] author-section：编写命令参考文档 docs/commands/docs.md（结构对齐 docs/commands/history.md：When to Use / Syntax / Execution Flow / Output Artifacts / Tool Support）
-- [X] T013 [US1] docs/quickstart.md 命令表新增 /speckit.docs 行（含 `[details →](commands/docs.md)` 链接）
+- [X] T012 [P] [US1] author-section：编写命令参考文档 docs/reference/commands/docs.md（结构对齐 docs/reference/commands/history.md：When to Use / Syntax / Execution Flow / Output Artifacts / Tool Support）
+- [X] T013 [US1] docs/tutorials/quickstart.md 命令表新增 /speckit.docs 行（含 `[details →](commands/docs.md)` 链接）
 - [X] T014 [US1] render-verify：以 blank/messy 夹具走一遍引擎确定性路径（validate → audit）确认四件产物落点与审计内容；T008 集成测试转绿
 - [X] T015 [US1] Manual QA：交互会话运行 quickstart 场景 1/2（bootstrap + 全量调谐防抖），证据记入 verification.md
 
@@ -139,14 +139,14 @@
 
 **Goal**: 激进重组基调的全量调谐：docs/ 向六类 taxonomy 收敛、两份设计笔记退场、一贯性约束同步更新
 
-**Independent Test**: SC-004 全项——审计/残差在 .specify/docs/、docs/ 顶层合规、两笔记 archived 且 target 存在、零悬空链接/零符号链接破坏
+**Independent Test**: SC-004 全项——审计/残差在 docs/、docs/ 顶层合规、两笔记 archived 且 target 存在、零悬空链接/零符号链接破坏
 
 ### Implementation for User Story 4
 
 - [X] T028 [US4] 为 docs/notes/docs-design.md 与 docs/notes/notes-design.md 补合规 frontmatter（status: draft、target 指向计划中的正式归宿文档）
 - [X] T029 [US4] 交互会话运行 `/speckit.docs`（激进重组基调）：干跑计划逐项确认后收敛——docs/ 子目录向 concepts/tutorials/tasks/reference/decisions/contribute 归位、新建根 ARCHITECTURE.md 与 CONTRIBUTING.md（≤一屏）、归档区 docs/archive/、两份设计笔记内容合入正式文档后置 archived
 - [X] T030 [US4] 同步一贯性表面：更新 .specify/instructions.md Documentation Map 与全部内部链接至新路径（经 /speckit.instructions 或手工），保持 README → docs 单向引用
-- [X] T031 [US4] render-verify：`python3 scripts/python/docs-utils.py --action validate` 零断链；`find . -type l` 符号链接完好；`regen-command-copies.py --check` 零漂移；`--action archive-check` 两笔记 target 存在
+- [X] T031 [US4] render-verify：`python3 skills/external/create-docs/scripts/docs-utils.py --action validate` 零断链；`find . -type l` 符号链接完好；`regen-command-copies.py --check` 零漂移；`--action archive-check` 两笔记 target 存在
 - [X] T032 [US4] Manual QA：SC-004 逐项证据（审计日志/残差报告路径、docs/ 顶层清单、frontmatter 抽检）记入 verification.md
 
 **Checkpoint**: Dogfooding 完成，框架自身文档合规
@@ -204,7 +204,7 @@ Task: "T007 contract test in tests/contract/test_docs_command_template.py"
 Task: "T008 integration test in tests/integration/test_docs_command_scenarios.py"
 # 模板与参考文档（并行，不同文件）：
 Task: "T009 author templates/commands/docs.md"
-Task: "T012 author docs/commands/docs.md"
+Task: "T012 author docs/reference/commands/docs.md"
 ```
 
 ## Implementation Strategy

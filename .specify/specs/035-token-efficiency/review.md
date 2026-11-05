@@ -114,7 +114,7 @@
 - **Why it's a problem**: 标记 `token-efficiency` 只支持子串检索(list --contains),观察值嵌在自由文本里——无法按命令聚合总量、画趋势、或与 F1 的真实计量对账;"真实记录"要求结构化数值字段。
 - **Proposed fix**: 在 feedback-step.md 定义可选结构化尾注文法(如 `token-efficiency [source=billing|proxy] [in=N] [out=N] [saved≈N]`),feedback-utils.py list 增 `--parse-metrics` 输出结构化聚合;向后兼容纯文本条目。
 
-### F4 — gate-check.py 镜像副本把 gate 路径解析成 `.specify/.specify/gate.yaml`
+### F4 — gate-check.py 镜像副本把 gate 路径解析成 `.specify/gate.yaml`
 
 - **Severity**: P2
 - **Category**: Automation / Scripts

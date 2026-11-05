@@ -105,8 +105,8 @@ description: "Task list for CLI Priority AI Tool Support"
 - [X] T022 [US1] Verify existing CODEX_HOME setup code path (lines 1797-1807) in `src/specify_cli/__init__.py` is now reachable after adding `codex` to `AGENT_CONFIG` — fix any edge cases
 - [X] T023 [US1] Add Codex CLI to `select_with_arrows` menu display order in `src/specify_cli/__init__.py` — ensure Codex CLI appears in interactive menu (post-T005, automatically via `_OFFICIAL_ASSISTANT_KEYS` iteration)
 - [X] T024 [US1] Add Codex CLI installation verification to `check_tool()` flow — verify `codex` CLI binary detection works in `src/specify_cli/__init__.py` `check` command (line ~1860)
-- [X] T025 [US1] Update `docs/quickstart.md` — add `specify init <PROJECT_NAME> --ai codex` example and Codex CLI setup instructions
-- [X] T026 [US1] Update `docs/installation.md` — add Codex CLI to supported assistants list and installation instructions
+- [X] T025 [US1] Update `docs/tutorials/quickstart.md` — add `specify init <PROJECT_NAME> --ai codex` example and Codex CLI setup instructions
+- [X] T026 [US1] Update `docs/tutorials/installation.md` — add Codex CLI to supported assistants list and installation instructions
 - [X] T027 [US1] Update `README.md` — add Codex CLI to "Supported AI Agents" section
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently — `specify init --ai codex` works end-to-end.
@@ -133,9 +133,9 @@ description: "Task list for CLI Priority AI Tool Support"
 - [X] T032 [US2] Reorder `_OFFICIAL_ASSISTANT_KEYS` in `src/specify_cli/__init__.py` — Tier 1 first: `["claude", "codex", "qoder", "copilot", "opencode", "qwen"]`
 - [X] T033 [US2] Update `init` command help text in `src/specify_cli/__init__.py` — add tier annotation to `--ai` help: mention Tier 1 tools first
 - [X] T034 [P] [US2] Update `README.md` — annotate each tool with Tier 1 or Tier 2 label in "Supported AI Agents" section
-- [X] T035 [P] [US2] Update `docs/installation.md` — add tier classification to supported assistants list
-- [X] T036 [P] [US2] Update `docs/quickstart.md` — note tier classification in `--ai` examples
-- [X] T037 [P] [US2] Update `docs/usage.md` — add tier explanation and recommendation guidance
+- [X] T035 [P] [US2] Update `docs/tutorials/installation.md` — add tier classification to supported assistants list
+- [X] T036 [P] [US2] Update `docs/tutorials/quickstart.md` — note tier classification in `--ai` examples
+- [X] T037 [P] [US2] Update `docs/tutorials/quickstart.md` — add tier explanation and recommendation guidance
 - [X] T038 [US2] Implement `audit_capability_matrix(project_path)` function in `src/specify_cli/__init__.py` — returns `CapabilityMatrixResult` dict with per-tool × per-dimension entries and summary (tier1_pass_rate, tier2_pass_rate)
 - [X] T039 [US2] Implement `audit_tool_dimension(project_path, tool_key, dimension)` helper in `src/specify_cli/__init__.py` — checks one tool against one dimension, returns "pass"/"fail"/"missing"
 - [X] T040 [US2] Add capability matrix dimensions checkers in `src/specify_cli/__init__.py`: `_check_initialization()`, `_check_command_templates()`, `_check_instructions()`, `_check_ignore_config()`, `_check_skills_symlink()`, `_check_refresh_protection()`
@@ -195,7 +195,7 @@ description: "Task list for CLI Priority AI Tool Support"
 - [X] T067 Run full test suite: `pytest -q` — verify all tests pass (contract, integration, unit)
 - [~] T068 Run quickstart.md validation scenarios 1-7 manually — verify all quickstart scenarios produce expected output <!-- deferred: requires interactive CLI execution in a clean environment -->
 - [X] T069 [P] Update `docs/commands/instructions.md` — add Codex CLI to instructions refresh documentation
-- [X] T070 [P] Update `docs/commands/agents.md` — add Codex CLI to agents documentation if applicable
+- [X] T070 [P] Update `docs/reference/commands/agents.md` — add Codex CLI to agents documentation if applicable
 - [X] T071 Code cleanup: remove any dead code paths in `src/specify_cli/__init__.py` related to the pre-codex-onboarding state
 - [X] T072 Verify constitution amendment version bump is consistent between `.specify/memory/constitution.md` and `templates/constitution-template.md`
 - [X] T073 Final capability matrix audit run: verify all Tier 1 tools pass all 6 dimensions, confirm SC-002 (100% coverage)
@@ -258,9 +258,9 @@ Task: "Verify CODEX_HOME setup code path (T022)"
 ```bash
 # Launch all documentation updates in parallel:
 Task: "Update README.md tier annotations (T034)"
-Task: "Update docs/installation.md tier classification (T035)"
-Task: "Update docs/quickstart.md tier note (T036)"
-Task: "Update docs/usage.md tier explanation (T037)"
+Task: "Update docs/tutorials/installation.md tier classification (T035)"
+Task: "Update docs/tutorials/quickstart.md tier note (T036)"
+Task: "Update docs/tutorials/quickstart.md tier explanation (T037)"
 ```
 
 ---

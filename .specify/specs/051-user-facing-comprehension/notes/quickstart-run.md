@@ -148,7 +148,7 @@ against **that phase's partial expectation**; the full 8/8 expectation belongs t
 $ for f in shared/guidelines/confirmation-gates.md shared/workflow/feedback-step.md \
       shared/patterns/interview-pattern.md templates/commands/clarify.md \
       shared/guidelines/requirements-guidelines.md shared/guidelines/proactive-trigger.md \
-      skills/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
+      skills/internal/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
     printf '%s  %s\n' "$(grep -c 'shared/guidelines/user-facing-comprehension.md' "$f")" "$f"; done
   1  shared/guidelines/confirmation-gates.md
   0  shared/workflow/feedback-step.md
@@ -156,7 +156,7 @@ $ for f in shared/guidelines/confirmation-gates.md shared/workflow/feedback-step
   0  templates/commands/clarify.md
   0  shared/guidelines/requirements-guidelines.md
   0  shared/guidelines/proactive-trigger.md
-  0  skills/summarize-project/references/reporting-playbook.md
+  0  skills/internal/summarize-project/references/reporting-playbook.md
   0  shared/workflow/glossary.md
 ```
 
@@ -234,7 +234,7 @@ Run by T039 · 2026-09-18.
   0  templates/commands/clarify.md                (US5 / T042)
   0  shared/guidelines/requirements-guidelines.md (US5 / T043)
   0  shared/guidelines/proactive-trigger.md       (US5 / T044)
-  0  skills/summarize-project/references/reporting-playbook.md (US5 / T046)
+  0  skills/internal/summarize-project/references/reporting-playbook.md (US5 / T046)
   0  shared/workflow/glossary.md                  (US5 / T045)
 ```
 
@@ -267,7 +267,7 @@ Run by T052/T053 · 2026-09-18.
 $ for f in shared/guidelines/confirmation-gates.md shared/workflow/feedback-step.md \
       shared/patterns/interview-pattern.md templates/commands/clarify.md \
       shared/guidelines/requirements-guidelines.md shared/guidelines/proactive-trigger.md \
-      skills/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
+      skills/internal/summarize-project/references/reporting-playbook.md shared/workflow/glossary.md; do
     printf '%s  %s\n' "$(grep -c 'shared/guidelines/user-facing-comprehension.md' "$f")" "$f"; done
 ```
 
@@ -309,7 +309,7 @@ C-6/C-9/C-10/C-11 and by T041–T049's own row-level assertions.
 
 Three hand-written copies in `docs/reference/` were converged to summary pointers: the
 `## Question Format` paragraph and two guarantee-table rows in `commands/interview.md` (two rows
-became one that names the owner), the raw-engine-path wording rule in `skills/feedback.md`, and
+became one that names the owner), the raw-engine-path wording rule in `docs/reference/skills/feedback.md`, and
 `Write for business stakeholders, not developers` in `commands/requirements.md` — which was a
 **third** unregistered copy of class ⑦'s reader baseline, after the command template's copy was
 removed during US1. `docs/public/**` was not touched: it is Hugo build output, git-ignored
@@ -429,8 +429,8 @@ touches reports `ok`:
 
 ```
 $ python3 scripts/python/sync-mirrors.py --check --only shared --only templates \
-      --only skills/summarize-project --only agents --only scripts; echo "SCOPED_EXIT=$?"
-scope --only: shared, templates, skills/summarize-project, agents, scripts
+      --only skills/internal/summarize-project --only agents --only scripts; echo "SCOPED_EXIT=$?"
+scope --only: shared, templates, skills/internal/summarize-project, agents, scripts
 ok    templates/ == .specify/templates/ (22 files)
 ok    skills/ == .specify/skills/ (24 files)
 ok    agents/ == .specify/agents/templates/ (2 files)
@@ -444,7 +444,7 @@ SCOPED_EXIT=0
 `.opencode/command/`) match their source templates, so no hand-sync residue exists. The
 `skills/` pair's `24 files` here versus the whole-tree run's absence of an `ok skills/` line is the
 engine's normal behaviour: a `DIFF` row replaces the pair's `ok` row in whole-tree mode, and
-`--only skills/summarize-project` scopes past the diverging sibling skill.
+`--only skills/internal/summarize-project` scopes past the diverging sibling skill.
 
 GATE-2's criterion is therefore satisfied in the form `pre-change-measurements.md` § ③ fixed it to:
 **no new `MISS`/`DIFF` lines versus the frozen set**, never a bare whole-tree `EXIT=0`.

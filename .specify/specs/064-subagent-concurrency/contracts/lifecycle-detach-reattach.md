@@ -3,7 +3,7 @@
 **Feature**: 064
 **Owning FR**: FR-046…FR-059
 **实体**: `data-model.md` § E4/E5/E6/E10；决策 `research.md` § R8–R9
-**Implementation surface**: `skills/external/sdd-loop-driver/scripts/line-registry.py`（lease/reservation/identity/classify-remote，接口清单 owner 为 `contracts/line-registry.md` § Engine Actions）+ `references/dispatch-recipes.md`（detach/runner）+ `references/stage-prompts.md`（重接线程序）+ `scripts/watch-target.sh`（`--once` 快照）
+**Implementation surface**: `skills/external/sdd-loop-driver/scripts/line-registry.py`（lease/reservation/identity/classify-remote，接口清单 owner 为 `contracts/line-registry.md` § Engine Actions）+ `references/dispatch-recipes.md`（detach/runner）+ `references/stage-prompts.md`（重接线程序）+ `skills/external/sdd-loop-driver/scripts/watch-target.sh`（`--once` 快照）
 
 ## A. Detach
 

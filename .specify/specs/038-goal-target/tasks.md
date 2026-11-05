@@ -42,7 +42,7 @@
 - [X] T006 [US1] 实现 `targets` 动作组(满足 T005):在 `scripts/python/goal-utils.py` 新增 `targets` 解析器(位置参数 slug + 互斥标志)与 dispatch 分支;`--add` 身份发放 + `open` 落节 + History 行;`--set --id` 按合法迁移集执行 + History 行(no-op 不写);`--list` 输出 `T-<nnn>\t<status>\t<statement>`;判据归一化等值检查(D5);goal 终态拒绝 [blockedBy: T003,T005]
 - [X] T007 [US1] 运行 T005 契约测试 + T002/T004 单元集确认全绿 [blockedBy: T006]
 - [X] T008 [US1] 撰写命令模板目标侧(author-section):编辑 `templates/commands/goal.md`——Modes 表新增 targets 行;引擎调用示例块追加 `targets <slug> --add/--list/--set` 三例;Outline 相应步骤(targets 的添加/列出/迁移经由 modify 意图路由,单一撰写入口纪律不变) [blockedBy: T006]
-- [X] T009 [US1] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 1、2 行):运行 `python3 scripts/python/sync-mirrors.py --write`;随后核验——`diff -q scripts/python/goal-utils.py .specify/scripts/python/goal-utils.py`、`diff -q templates/commands/goal.md .specify/templates/commands/goal.md`,并 grep 确认 4 份 per-tool 副本含 targets 内容:`.claude/commands/speckit.goal.md`、`.github/prompts/speckit.goal.prompt.md`、`.qoder/commands/speckit.goal.md`、`.opencode/command/speckit.goal.md` [blockedBy: T008]
+- [X] T009 [US1] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 1、2 行):运行 `python3 scripts/python/sync-mirrors.py --write`;随后核验——`diff -q scripts/python/goal-utils.py .specify/scripts/python/goal-utils.py`、`diff -q templates/commands/goal.md templates/commands/goal.md`,并 grep 确认 4 份 per-tool 副本含 targets 内容:`.claude/commands/speckit.goal.md`、`.github/prompts/speckit.goal.prompt.md`、`.qoder/commands/speckit.goal.md`、`.opencode/command/speckit.goal.md` [blockedBy: T008]
 - [X] T010 [US1] 更新命令面结构性契约测试:扩展 `tests/contract/test_goal_command_surface.py`——goal.md 含 targets 模式行与引擎示例的内容断言;per-tool 副本集合从既有测试夹具派生(pin hygiene:不新增硬编码计数) [blockedBy: T009]
 - [X] T011 [US1] 端到端验证(render-verify):按 quickstart.md §1 + §5 对真实引擎执行——3 条添加、list、GD-2/GD-3 拒绝样例、drop/编号不复用、存量 goal `view`/`validate` 输出与基线 diff 为空;结果回写 quickstart.md 走查记录 [blockedBy: T009]
 
@@ -61,7 +61,7 @@
 ### Implementation for User Story 2
 
 - [X] T014 [US2] 撰写命令模板团队侧(author-section,满足 T012):编辑 `templates/commands/team.md`——Run Mode 节 preview 步骤插入 `--target` 解析与五步校验(引用 goal-utils 解析为事实源);确认门禁披露清单追加本次 Target 行;run report 步骤追加 `**Target 指派**:` 字段;Routing 表 run 行注记可选 target;显式写入"不改变绑定/身份解析/交付目录"与"无终态执行旁路" [blockedBy: T012,T013]
-- [X] T015 [US2] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 3 行):`python3 scripts/python/sync-mirrors.py --write`;`diff -q templates/commands/team.md .specify/templates/commands/team.md`;grep 确认 4 份 per-tool 副本含 `--target` 校验内容:`.claude/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.qoder/commands/speckit.team.md`、`.opencode/command/speckit.team.md` [blockedBy: T014]
+- [X] T015 [US2] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 3 行):`python3 scripts/python/sync-mirrors.py --write`;`diff -q templates/commands/team.md templates/commands/team.md`;grep 确认 4 份 per-tool 副本含 `--target` 校验内容:`.claude/commands/speckit.team.md`、`.github/prompts/speckit.team.prompt.md`、`.qoder/commands/speckit.team.md`、`.opencode/command/speckit.team.md` [blockedBy: T014]
 - [X] T016 [US2] 运行 T012/T013 测试全绿 + 既有 team 命令面测试(`tests/contract/test_team_command_routing.py` 等)零回归 [blockedBy: T015]
 
 **Checkpoint**: US1+US2 = 完整 MVP(可切片 + 可指派)
@@ -77,12 +77,12 @@
 
 ### Implementation for User Story 3
 
-- [X] T018 [US3] 实现折叠扩展(满足 T017):编辑 `skills/create-team/scripts/build-summary-input.py`——`fold_ledger()` 单遍扫描增加 `target_ref` 分组与无效引用降级;`load_goal_definition()` 读取 `## Targets` 节(经 goal-utils 解析语义);表单装配新增 `targets:` 块(authored_status/attributed_items/completed_items/pending_approval/coverage/unattributed_to_target/invalid_refs);切片轴与判据轴分列,不得出现 achieved 推导 [blockedBy: T003,T017]
+- [X] T018 [US3] 实现折叠扩展(满足 T017):编辑 `skills/internal/create-team/scripts/build-summary-input.py`——`fold_ledger()` 单遍扫描增加 `target_ref` 分组与无效引用降级;`load_goal_definition()` 读取 `## Targets` 节(经 goal-utils 解析语义);表单装配新增 `targets:` 块(authored_status/attributed_items/completed_items/pending_approval/coverage/unattributed_to_target/invalid_refs);切片轴与判据轴分列,不得出现 achieved 推导 [blockedBy: T003,T017]
 - [X] T019 [US3] 更新台账契约文档:编辑 `.specify/specs/036-team-summary/contracts/items-ledger.contract.md`——字段表追加 `target_ref`(可选、局部形文法、缺省语义、IL-1…IL-5 保持声明);先读现行结构按既有格式追加,不改既有条款 [blockedBy: T018]
-- [X] T020 [P] [US3] 更新 create-team 参考文档(author-section):编辑 `skills/create-team/references/summary-mapping.md`——items.jsonl 字段表加 `target_ref` 行、折叠规则加归属/降级条款、表单 `targets:` 块说明 [blockedBy: T018]
-- [X] T021 [P] [US3] 编辑 `skills/create-team/references/goal.md`——Target 的提议形流程(团队/run 提议新 Target 或完成,propose → ratify 经 `/speckit.goal`,派生流程不写 `goal.md`)与 [[STR-004]] 概念锚链接 [blockedBy: T018]
-- [X] T022 [P] [US3] 编辑 `skills/create-team/references/execution-guide.md`——run 执行时目标聚焦 Target 的操作纪律、新台账条目携带 `target_ref` 的主管写入职责 [blockedBy: T018]
-- [X] T023 [US3] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 4、5、6、7 行):`python3 scripts/python/sync-mirrors.py --write`;`diff -q` 核验 `build-summary-input.py`、`summary-mapping.md`、`goal.md`、`execution-guide.md` 各自的 `.specify/skills/create-team/` 镜像 [blockedBy: T020,T021,T022]
+- [X] T020 [P] [US3] 更新 create-team 参考文档(author-section):编辑 `skills/internal/create-team/references/summary-mapping.md`——items.jsonl 字段表加 `target_ref` 行、折叠规则加归属/降级条款、表单 `targets:` 块说明 [blockedBy: T018]
+- [X] T021 [P] [US3] 编辑 `skills/internal/create-team/references/goal.md`——Target 的提议形流程(团队/run 提议新 Target 或完成,propose → ratify 经 `/speckit.goal`,派生流程不写 `goal.md`)与 [[STR-004]] 概念锚链接 [blockedBy: T018]
+- [X] T022 [P] [US3] 编辑 `skills/internal/create-team/references/execution-guide.md`——run 执行时目标聚焦 Target 的操作纪律、新台账条目携带 `target_ref` 的主管写入职责 [blockedBy: T018]
+- [X] T023 [US3] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 4、5、6、7 行):`python3 scripts/python/sync-mirrors.py --write`;`diff -q` 核验 `build-summary-input.py`、`summary-mapping.md`、`goal.md`、`execution-guide.md` 各自的 `.specify/skills/internal/create-team/` 镜像 [blockedBy: T020,T021,T022]
 - [X] T024 [US3] 运行 T017 测试全绿 + 既有总结折叠族(`tests/integration/test_goal_aggregation.py`、`test_summary_four_patterns.py` 等)零回归 [blockedBy: T023]
 
 ## Phase 6: User Story 4 — done Target 喂给里程碑视图(P3)
@@ -96,7 +96,7 @@
 
 ### Implementation for User Story 4
 
-- [X] T026 [US4] 实现里程碑吸收(满足 T025):编辑 `skills/create-team/scripts/build-summary-input.py`——表单 milestones 组追加 Target 来源行(title 取语句、status 映射 achieved 语义、source 值按契约 §5);`skills/summarize-project/` 代码与 DDL MUST 不改(D7) [blockedBy: T025]
+- [X] T026 [US4] 实现里程碑吸收(满足 T025):编辑 `skills/internal/create-team/scripts/build-summary-input.py`——表单 milestones 组追加 Target 来源行(title 取语句、status 映射 achieved 语义、source 值按契约 §5);`skills/internal/summarize-project/` 代码与 DDL MUST 不改(D7) [blockedBy: T025]
 - [X] T027 [US4] 运行 T025 全绿 + 既有里程碑相关断言零回归;`diff -q` 复核 summarize-project 未被触碰 [blockedBy: T026]
 
 ## Phase 7: Polish & Cross-Cutting Concerns

@@ -67,10 +67,10 @@ templates/                                    # New sub-role templates
 ├── agent-subrole-improver-template.md        # Improver sub-role template
 └── agent-triad-orchestration-template.md     # Orchestration prompt template
 
-skills/create-agent/                          # Updated skill
+skills/internal/create-agent/                          # Updated skill
 └── SKILL.md                                  # Add triad creation support
 
-skills/improve-agent/                         # Updated skill
+skills/internal/improve-agent/                         # Updated skill
 └── SKILL.md                                  # Add triad improvement support
 
 docs/                                         # Reference documentation
@@ -125,7 +125,7 @@ See [quickstart.md](quickstart.md) for usage guide.
 
 ## Plan Amendment (2026-07-02) — Supervisor + General-Skill Refactor
 
-**Trigger**: User directive — *"需要将这个 agent 的重构也更新到 skills/create-agent 和 skills/improve-agent 技能中"*, clarified to four goals:
+**Trigger**: User directive — *"需要将这个 agent 的重构也更新到 skills/internal/create-agent 和 skills/internal/improve-agent 技能中"*, clarified to four goals:
 
 1. Each role-based agent is a **role-scoped supervisor** that dynamically creates multiple subagents according to the EEI triad design.
 2. `create-agent` and `improve-agent` (and other agent-related skills) are **general-purpose** skills, not role-only.
@@ -140,16 +140,16 @@ The 022 implementation created the four EEI templates and bolted a "Triad Mode" 
 
 | Gap | Evidence (current state @ commit 0bf2a9a) | Consequence |
 |-----|-------------------------------------------|-------------|
-| **G1 — Role and triad are disjoint dimensions** | `templates/agent-role-*-template.md` have no supervision/delegation section; `templates/agent-triad-orchestration-template.md` is standalone and role-agnostic | A generated role agent (e.g. `system-designer.agent.md`) cannot spin up its own quality loop; the two "dimensions" never meet in a single artifact |
+| **G1 — Role and triad are disjoint dimensions** | `templates/agent-role-*-template.md` have no supervision/delegation section; `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` is standalone and role-agnostic | A generated role agent (e.g. `system-designer.agent.md`) cannot spin up its own quality loop; the two "dimensions" never meet in a single artifact |
 | **G2 — `/speckit.agents` inlines authoring; skills are a parallel path** | `templates/commands/agents.md` Mode A (lines 47–93) renders role templates directly; Mode B (lines 97–206) writes `.agent.md` inline — neither calls `create-agent` | Two authoring engines drift apart (the review already flagged runtime/skill drift); triad creation lives only in the skill and is unreachable from the command |
-| **G3 — Skills are framed as "role-based only"** | `skills/create-agent/SKILL.md:11` Goal: *"Create a new role-based agent template"*; `skills/improve-agent/SKILL.md:17` resolves target to *"exactly one `templates/agent-role-*-template.md` file"* | The skills cannot uniformly author/refine supervisors, sub-roles, orchestration prompts, or custom agents; "customization capability" (goal 4) has no home |
+| **G3 — Skills are framed as "role-based only"** | `skills/internal/create-agent/SKILL.md:11` Goal: *"Create a new role-based agent template"*; `skills/internal/improve-agent/SKILL.md:17` resolves target to *"exactly one `templates/agent-role-*-template.md` file"* | The skills cannot uniformly author/refine supervisors, sub-roles, orchestration prompts, or custom agents; "customization capability" (goal 4) has no home |
 
 ### B. Technical Context (delta)
 
 | Field | Value |
 |-------|-------|
 | **Project Type** | Unchanged — template/prompt engineering; **no runtime code** (aligns with the "no DFX over-design" constraint: supervision is achieved via prompt instructions, not an orchestration runtime) |
-| **Primary targets** | `templates/commands/agents.md`; `skills/create-agent/SKILL.md`; `skills/improve-agent/SKILL.md`; the six `templates/agent-role-*-template.md`; `templates/agent-triad-orchestration-template.md` |
+| **Primary targets** | `templates/commands/agents.md`; `skills/internal/create-agent/SKILL.md`; `skills/internal/improve-agent/SKILL.md`; the six `templates/agent-role-*-template.md`; `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` |
 | **New template concept** | A shared **"Supervision & EEI Delegation"** section injected into role templates (single source, referenced — not copy-pasted per role) |
 | **Authoring engine** | `create-agent` / `improve-agent` become the single authoring engine; `/speckit.agents` becomes a thin orchestrator that gathers project context and delegates |
 | **Runtime mirror** | Any edited `templates/` or `skills/` file MUST be mirrored to `.specify/templates/` / `.specify/skills/` (addresses review finding F4) |
@@ -189,8 +189,8 @@ templates/
 ├── agent-triad-orchestration-template.md  # generalize {{ROLE_SCOPE}} binding for role supervisors (D1)
 └── commands/agents.md                  # Mode A/B refactored to delegate to create-agent/improve-agent (D4)
 
-skills/create-agent/SKILL.md            # generalize Goal + capability matrix + Supervisor capability (D2, D5)
-skills/improve-agent/SKILL.md           # generalize target resolution + classify/route (D3)
+skills/internal/create-agent/SKILL.md            # generalize Goal + capability matrix + Supervisor capability (D2, D5)
+skills/internal/improve-agent/SKILL.md           # generalize target resolution + classify/route (D3)
 
 .specify/templates/ , .specify/skills/  # mirror all of the above (runtime parity, review F4)
 
@@ -226,7 +226,7 @@ skills/improve-agent/SKILL.md           # generalize target resolution + classif
 - **OQ-1**: Does Mode A embed the EEI triad in **all six** roles by default, or only in roles marked `supervisor: true` in frontmatter? (Default-off is safer and cheaper; default-on maximizes the "every role is a supervisor" intent.) Recommend `supervisor: true` opt-in with the delegation section always present but dormant.
 - **OQ-2**: Should the shared "Supervision & EEI Delegation" section be a literal include (single file transcluded) or a maintained copy per role template? (Include reduces drift but the current template system has no transclusion mechanism.)
 
-**Resolution (via `/speckit.clarify`, 2026-07-02)**: OQ-1 → **default-on for all 6 roles** (`supervisor: true` default, `supervisor: false` opt-out). OQ-2 → **compose in create-agent** — one canonical snippet `templates/agent-supervision-delegation.md` inlined at generation; role templates carry only supervision metadata. (Contract R2's dormant-by-default assumption is superseded and should be updated on the next full plan regeneration.)
+**Resolution (via `/speckit.clarify`, 2026-07-02)**: OQ-1 → **default-on for all 6 roles** (`supervisor: true` default, `supervisor: false` opt-out). OQ-2 → **compose in create-agent** — one canonical snippet `skills/internal/create-agent/templates/agent-supervision-delegation.md` inlined at generation; role templates carry only supervision metadata. (Contract R2's dormant-by-default assumption is superseded and should be updated on the next full plan regeneration.)
 
 ### J. Runtime Mirror Map (T033)
 
@@ -235,9 +235,9 @@ Every edited source file mirrors to a runtime counterpart in the same change (co
 | Source | Runtime counterpart |
 |--------|---------------------|
 | `templates/agent-role-*-template.md` | `.specify/templates/agent-role-*-template.md` |
-| `templates/agent-triad-orchestration-template.md` | `.specify/templates/agent-triad-orchestration-template.md` (was MISSING — created) |
+| `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` | `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` (was MISSING — created) |
 | `templates/agent-subrole-*-template.md` | `.specify/templates/agent-subrole-*-template.md` (was MISSING — created) |
-| `templates/agent-supervision-delegation.md` (new) | `.specify/templates/agent-supervision-delegation.md` |
-| `skills/create-agent/SKILL.md` | `.specify/skills/create-agent/SKILL.md` |
-| `skills/improve-agent/SKILL.md` | `.specify/skills/improve-agent/SKILL.md` |
+| `skills/internal/create-agent/templates/agent-supervision-delegation.md` (new) | `skills/internal/create-agent/templates/agent-supervision-delegation.md` |
+| `skills/internal/create-agent/SKILL.md` | `.specify/skills/internal/create-agent/SKILL.md` |
+| `skills/internal/improve-agent/SKILL.md` | `.specify/skills/internal/improve-agent/SKILL.md` |
 | `templates/commands/agents.md` | `.claude/commands/speckit.agents.md` (installed runtime command) |

@@ -2,7 +2,7 @@
 
 **Feature**: 063 → Feature 058（演化）
 **FR 覆盖**: FR-011…FR-019
-**载体**: `references/efficiency-model.md`、`references/stage-prompts.md`、`scripts/audit-test-budget.py`、`docs/reference/skills/sdd-loop-driver.md`
+**载体**: `references/efficiency-model.md`、`references/stage-prompts.md`、`skills/external/sdd-loop-driver/scripts/audit-test-budget.py`、`docs/reference/skills/sdd-loop-driver.md`
 
 - **TB-01（全量定义与作用域）**: 「全量测试运行」= 以项目规范测试运行器执行、不带路径/测试过滤器的完整套件。预算以**运行线**为作用域：每线独立台账与两个槽位，多线并行互不共享或消耗；「每特性运行」指一条运行线的端到端运行（FR-011）。
 - **TB-02（恰两个槽位）**: 每线全量预算 MUST 恰好为两个槽位：`baseline`（implement 起点，按名称捕获失败名单）与 `closure`（最终收口，与基线做名称级回归比较，位于 review 通过之后、合并之前，由驱动或其派发的独立校验单元执行）（FR-011）。
@@ -17,7 +17,7 @@
   - **复现性**：同一 `stage_base` + 同一工作树状态 MUST 产生同一集合；阶段 MUST 记录完整命令、`stage_base`、输出文本（或摘要 + 哈希）与充分性说明。不同阶段 MUST NOT 使用不同选择命令。
   - **空集**：按 TB-06 的 `empty-selection-escalated` 处置。
 - **TB-06（定向证据字段）**: 每次定向运行 MUST 记录：命令、选择依据（规则 + 命令输出摘要）、所选路径、充分性说明、rc、passed/failed、新增失败、比较基线（E3）。`selected_paths` 为空且本阶段改动可执行面 → MUST 扩大同族范围或按显式例外升级为全量，并记录原因；仅文档改动时 MUST 记录 `not-run-docs-only` 与 `changed_paths[]` 改动路径证据（FR-013/FR-014）。`not-run-docs-only` 按缩减字段集判定完整：`stage`、`row_type=stage-status`、`status`、`selection_basis`、`changed_paths[]`、`evidence_ptr` 六项；运行字段（命令、rc、计数、新增失败、基线）不适用，MUST NOT 报 `unknown`。快车道按 FR-001 授权跳过 `checklist` 时，该阶段不产生定向运行，E3 MUST 记录 `status=not-applicable-skipped-stage`（[[STR-008]]），以 E1 准入记录与 [[STR-003]] 为联结证据；MUST NOT 记为 `unknown`，MUST NOT 计入 SC-005 完整性分母。
-- **TB-07（台账格式与审计）**: 台账 MUST 以状态脊内 JSONL 围栏承载（E2），字段至少含槽位、阶段、目的、执行序号、触发、时间；`scripts/audit-test-budget.py` MUST 在收口审计：槽位数、槽外例外、槽内重跑、环境失败、缺失证据报告 `unknown`（MUST NOT 记为零或补造），并输出可粘贴进收尾汇总的摘要（FR-017）。审计 MUST 支持 `--logs-dir` 扫描阶段日志中的全量 runner 命令：日志中出现但台账未入账的全量命中 → 违规；日志缺失 → `unknown`，MUST NOT 当零。收口审计 MUST 以 E1 准入记录与 [[STR-003]] 联结识别授权跳过阶段，将其计为 [[STR-008]] 而非 `unknown`，且不计入 SC-005 完整性分母。审计 MUST 逐阶段检查每个适用阶段恰有一条 `row_type=stage-status` 的 E3 行：缺行 → 计入完整性分母并判未完整（MUST NOT 静默缩小分母）；`not-run-docs-only` 按 TB-06 的缩减字段集判完整；摘要 MUST 输出 `stages=N complete=N`（N = 适用阶段总数，含文档型阶段）。跨拓扑合并的 E2 行 MUST 记录 `merge_source`/`merged_at`，审计 MUST 校验其槽位语义与直接写入一致。
+- **TB-07（台账格式与审计）**: 台账 MUST 以状态脊内 JSONL 围栏承载（E2），字段至少含槽位、阶段、目的、执行序号、触发、时间；`skills/external/sdd-loop-driver/scripts/audit-test-budget.py` MUST 在收口审计：槽位数、槽外例外、槽内重跑、环境失败、缺失证据报告 `unknown`（MUST NOT 记为零或补造），并输出可粘贴进收尾汇总的摘要（FR-017）。审计 MUST 支持 `--logs-dir` 扫描阶段日志中的全量 runner 命令：日志中出现但台账未入账的全量命中 → 违规；日志缺失 → `unknown`，MUST NOT 当零。收口审计 MUST 以 E1 准入记录与 [[STR-003]] 联结识别授权跳过阶段，将其计为 [[STR-008]] 而非 `unknown`，且不计入 SC-005 完整性分母。审计 MUST 逐阶段检查每个适用阶段恰有一条 `row_type=stage-status` 的 E3 行：缺行 → 计入完整性分母并判未完整（MUST NOT 静默缩小分母）；`not-run-docs-only` 按 TB-06 的缩减字段集判完整；摘要 MUST 输出 `stages=N complete=N`（N = 适用阶段总数，含文档型阶段）。跨拓扑合并的 E2 行 MUST 记录 `merge_source`/`merged_at`，审计 MUST 校验其槽位语义与直接写入一致。
 - **TB-08（槽外例外与槽内重跑）**: 槽外全量 MUST 仅以 `out-of-slot-exception` 形式出现，必须记录原因与证据（定向集不足、共享引擎被改动、无法解释的失败等），收尾汇总 MUST 列出例外次数与原因。最终收口因修复新失败而重跑同一套件 MUST 记为 `in-slot-rerun`（含触发与证据），不另开槽；MUST NOT 静默超预算（FR-016）。
 - **TB-09（环境失败）**: 在收集/执行任何测试前即失败的调用（解释器或依赖缺失、收集前错误）MUST 记为 `environment-failure`，不消耗槽位，必须附证据；任何实际执行了测试的调用（含 0 tests collected 的选择失败）MUST 消耗槽位（FR-018）。
 - **TB-10（编排层实现）**: 本预算 MUST 在编排层实现（阶段提示词 + 状态脊台账 + 收口审计），MUST NOT 依赖修改框架命令内部流程（FR-019）。

@@ -42,7 +42,7 @@
 
 - C-22 **前代安装残留**(category `stale-residue`,处置一律 `archive`,severity 遵默认 high;apply 的 delete 拒绝非空目录且内容性残留遵循 archive-not-delete,故不经 delete):
   - **旧代技能目录**:`.specify/skills/<name>/` 为真实目录(符号链接豁免)且 `<name>` ∈ 旧代退役技能名集;**仅客户工作区适用**——`skills/external/` 源侧存在(框架仓)时该面归 mirror-drift 孤儿检查(C-12)管辖,避免同目标双报冲突处置。名集解析梯级:框架仓内读 `src/specify_cli/__init__.py` 的 OBSOLETE-ASSET-REGISTRY 标记块(活真源);客户工作区(无 `src/`)退回引擎内置 `LEGACY_SKILL_NAMES` 常量(CLI 清单的镜像,契约测试钉住防漂移;引擎侧同样置于注册表标记区内,零退役引用扫描按同一豁免机制剥离)。已知后继者(draw-*×6→draw-diagram、git-*×4→git-workspace、manage-project/visualize-project→summarize-project、sdd-workflow→shared/workflow)在 summary 中点名,供归档后核对引用面迁移。**用户自建技能永不入候选**。
-  - **旧代 git-workflow 状态文件**:`.specify/git-workflow.md` 或 `.specify/memory/git-workflow.md` 存在,且 `docs/git-workflow.md` 已存在(新模型状态面已落地——guard:两态皆无或仅旧态时不报,避免误报未迁移的旧代项目);summary 指向 git-workspace bootstrap 核对分支状态迁移。
+  - **旧代 git-workflow 状态文件**:`docs/git-workflow.md` 或 `docs/git-workflow.md` 存在,且 `docs/git-workflow.md` 已存在(新模型状态面已落地——guard:两态皆无或仅旧态时不报,避免误报未迁移的旧代项目);summary 指向 git-workspace bootstrap 核对分支状态迁移。
   - **旧代工具记录目录**:`.specify/tools/` 为目录且新址 `.specify/memory/tools/` 已存在;summary 指向 `shared/definitions/tool-definitions.md` § Terminology(术语与消歧真源)。
 - C-23 **内部分层平铺重复**(category `redundant`,处置 `archive`,severity=medium):`.specify/skills/internal/<name>/` 存在且同名平铺目录 `.specify/skills/<name>/` 亦为真实目录——平铺副本即 init 平铺迁移降级态(init 语义:nested 已存在时 flat 判 stale)。可从运行时树直接推导,不依赖任何名集。summary 提示归档前抽查平铺副本无本地独有修改。
 - C-24 **注册表优先级**:框架仓内 `load_obsolete_registry` 非空时以其为准(与 CLI 同源);客户工作区退回内置常量。两清单的一致性由契约测试以"常量 ⊇ CLI 清单"钉住(CLI 删除条目属正常收敛,不强制反向)。

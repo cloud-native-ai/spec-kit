@@ -6,11 +6,11 @@
 
 ## Decisions
 
-### Decision 1: Extract creation guidance into `skills/create-skills/SKILL.md`
+### Decision 1: Extract creation guidance into `skills/external/create-skills/SKILL.md`
 
 **Decision**: Create a dedicated `create-skills` Skill under the repository `skills/` directory and move detailed Skill-authoring guidance out of `templates/commands/skills.md`.
 
-**Rationale**: The user explicitly requested `skills/create-skills`, and the repository packages the root `skills/` directory in `pyproject.toml`. This makes the Skill available as a reusable source asset for generated projects while reducing command-template size.
+**Rationale**: The user explicitly requested `skills/external/create-skills`, and the repository packages the root `skills/` directory in `pyproject.toml`. This makes the Skill available as a reusable source asset for generated projects while reducing command-template size.
 
 **Alternatives considered**:
 

@@ -1,6 +1,6 @@
 # Extraction Responsibility Checklist: Create Skills Skill
 
-**Purpose**: Track coverage of creation responsibilities moved from `templates/commands/skills.md` into `skills/create-skills/SKILL.md`
+**Purpose**: Track coverage of creation responsibilities moved from `templates/commands/skills.md` into `skills/external/create-skills/SKILL.md`
 **Created**: 2026-05-10
 **Feature**: 013 / Skills Command
 
@@ -48,6 +48,6 @@
 ### Coverage Summary
 
 - **Total creation responsibilities**: 20
-- **Covered in skills/create-skills/SKILL.md**: 20
+- **Covered in skills/external/create-skills/SKILL.md**: 20
 - **Coverage percentage**: 100%
 - **Target**: ≥ 90% (SC-003)

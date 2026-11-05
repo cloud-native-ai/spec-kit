@@ -6,11 +6,11 @@
 
 **C-1**: `templates/commands/agents.md` 的「Tool-specific directories are symlinks — never write to them directly」一句([[STR-001]],spec Shared Strings 表)MUST 改为真实模型陈述:宿主 agent 目录是渲染产出的**真实文件**,由 specify CLI 渲染,legacy 符号链接被替换;per-file 符号链接模型的教学 MUST 移除。(FR-001)
 
-**C-2**: `skills/create-agent/SKILL.md` :122 表行(「Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012)」)与 :127 段落(「the CLI (re)creates a **per-file** symlink for each `*.agent.md` … a real directory of per-file links」)MUST 同步改为真实渲染模型(同 C-1 语义);其对 FR-010/012 的引用按 spec 040 契约的现行语义更新。注意:这两处的退役措辞与 [[STR-001]] **不同字面**,守卫须分别钉住(见 C-4)。(FR-002)
+**C-2**: `skills/internal/create-agent/SKILL.md` :122 表行(「Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012)」)与 :127 段落(「the CLI (re)creates a **per-file** symlink for each `*.agent.md` … a real directory of per-file links」)MUST 同步改为真实渲染模型(同 C-1 语义);其对 FR-010/012 的引用按 spec 040 契约的现行语义更新。注意:这两处的退役措辞与 [[STR-001]] **不同字面**,守卫须分别钉住(见 C-4)。(FR-002)
 
 **C-3**: create 流程终点(agents 命令模板的 create 段 + create-agent 技能的持久化说明)MUST 教授触发真相:定义落 `.specify/agents/{templates,instances}/`;上宿主注册面 = 执行 `specify render-agents --ai <tool>`;不再教「跑一次 specify CLI init/update」的旧措辞——init 是首次安装入口,保留其地位但不作为 re-render 的教法。(FR-003)
 
-**C-4**: 契约测试 MUST 钉两类退役字面在对应面与其全部镜像/工具副本中**零命中**(历史档案类文件除外):① [[STR-001]] 字面 —— `templates/commands/agents.md` + 4 份工具副本(2026-10-08 实测:源 :25 与 `.qoder/commands/speckit.agents.md:19` 等副本均在);② `skills/create-agent/SKILL.md` 专属退役措辞 —— :122 表行短语与 :127 段落短语(实测字面见 C-2;精确禁用正则按改写后文本定形并附变异演练)。断言形态沿用 `test_shipped_surface_client_neutrality.py` 的 BANNED_PATTERNS 先例。(FR-011)
+**C-4**: 契约测试 MUST 钉两类退役字面在对应面与其全部镜像/工具副本中**零命中**(历史档案类文件除外):① [[STR-001]] 字面 —— `templates/commands/agents.md` + 4 份工具副本(2026-10-08 实测:源 :25 与 `.qoder/commands/speckit.agents.md:19` 等副本均在);② `skills/internal/create-agent/SKILL.md` 专属退役措辞 —— :122 表行短语与 :127 段落短语(实测字面见 C-2;精确禁用正则按改写后文本定形并附变异演练)。断言形态沿用 `test_shipped_surface_client_neutrality.py` 的 BANNED_PATTERNS 先例。(FR-011)
 
 ## § 文档增补(FR-009/010)
 

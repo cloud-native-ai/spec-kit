@@ -1,7 +1,7 @@
 # Contract SN — Snapshot, Evidence Attribution, Derived State & Interruptions
 
 **Owner**: `skills/external/sdd-loop-driver/references/state-awareness.md` § Evidence Model, § Derived Loop State, § Interruption Forms.
-**Scope**: what a snapshot aggregates, how each signal is attributed, the numbered derived-state rules and the eight interruption findings. Numeric watch defaults are not owned here; they are resolved from `scripts/watch-target.sh` (see SN-28).
+**Scope**: what a snapshot aggregates, how each signal is attributed, the numbered derived-state rules and the eight interruption findings. Numeric watch defaults are not owned here; they are resolved from `skills/external/sdd-loop-driver/scripts/watch-target.sh` (see SN-28).
 
 ## Snapshot envelope
 

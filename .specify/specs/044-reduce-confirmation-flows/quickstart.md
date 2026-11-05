@@ -4,7 +4,7 @@
 
 ## 1. team 全流程零确认走查(SC-001)
 
-前置:改写后的 `templates/commands/team.md` 与 `skills/create-team/` 已落盘并经副本再生。
+前置:改写后的 `templates/commands/team.md` 与 `skills/internal/create-team/` 已落盘并经副本再生。
 
 1. 以 `/speckit.team` create 提供一个目标与成员设定。
 2. **预期**:定义直接落盘为 `.specify/teams/<slug>.team.md`,流程输出定义内容与修改途径(无"是否确认创建"停等)。

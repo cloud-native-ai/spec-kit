@@ -51,7 +51,7 @@
 | 5 | tasks:21 任务,机械校验(标签放置/DoD 前缀/单行)全过 | feedback 条目 `20260828T062345Z-speckit-tasks` | 无 |
 | 6 | analyze:4 发现(1 HIGH 契约闭集冲突);子代理验证不可用,降级为直接原文复核 | feedback 条目 `20260828T063009Z-speckit-analyze`;contracts C-7/C-5 修复记录 | 有——§5.5 强制验证路径不可用(见 F2) |
 | 7 | 用户批准后修复 4 发现(F-1 契约对齐/F-2 计数/F-3 测试钉/F-4 Excluded 语义) | contracts/introspection-report.md C-7 增 `建议处置` 行;tasks.md T006/T010/T014 扩钉 | 无(按协议) |
-| 8 | implement:开工发现 plan/tasks 镜像义务误列已退役的 `.specify/templates/commands/` 镜像,先修正 3 处再动工 | sync-mirrors.py L58-62 注释("the .specify/templates/commands mirror is retired")vs 修订前 plan.md Mirror Obligations 行 | 有——规划期失真,实现期返工(见 F3) |
+| 8 | implement:开工发现 plan/tasks 镜像义务误列已退役的 `templates/commands/` 镜像,先修正 3 处再动工 | sync-mirrors.py L58-62 注释("the templates/commands mirror is retired")vs 修订前 plan.md Mirror Obligations 行 | 有——规划期失真,实现期返工(见 F3) |
 | 9 | implement:21/21 任务关闭;ENGINE_ACTIONS pin 同任务修订;quickstart E2E 真实执行通过 | verification.md `post_change_*`;测试运行 42 项新契约测试全绿 | 无 |
 | 10 | 全量回归 2218P/44F,对 47F 基线按名零新增;3 个镜像漂移类基线失败因 sync 顺带转绿 | baseline-failed.txt(47)vs current-failed2.txt(44),`comm -13` 为空 | 无(但基线含义被 sync 改变,见 F4) |
 | 11 | 特性整体未提交,等待用户批准提交命令 | `git status --short` 整列未提交变更;`git log` 对 spec 目录为空 | 有——见 F1 |
@@ -115,7 +115,7 @@
 - **Why it's a problem**: "when available" 未定义"不可用"的判定与替代流程;analyze 的 MUST 级验证在子代理通道故障时形成流程卡点(要么违反 MUST,要么即兴降级且无留痕规范)。同一故障模式跨两个命令重复出现,是结构性缺口而非偶发。
 - **Proposed fix**: 两处各补一句降级协议——plan.md:"子代理不可用时(连续 2 次派发失败)降级为摘要优先的手工探查清单(grep 标题/结构 + 定点读)";analyze.md §5.5:"子代理不可用时允许直接原文复核代替,并在报告该行标注 `(validated: direct re-read, subagent unavailable)`"。
 
-### F3 — plan 模板未提示 `.specify/templates/commands/` 镜像已退役,规划期误列镜像义务
+### F3 — plan 模板未提示 `templates/commands/` 镜像已退役,规划期误列镜像义务
 
 - **Severity**: P2
 - **Category**: Template
@@ -125,17 +125,17 @@
   sync-mirrors.py:
   ```
   # the templates pair excludes
-  # commands/ because the .specify/templates/commands mirror is retired (per-tool
+  # commands/ because the templates/commands mirror is retired (per-tool
   # copies come straight from templates/commands/ via regen-command-copies.py).
   ```
   而 plan.md 的 Mirror Obligations 示例行仍写:
   ```
-  | [e.g. `templates/commands/x.md`] | [e.g. `.specify/templates/commands/x.md`; `.claude/commands/speckit.x.md`; ...
+  | [e.g. `templates/commands/x.md`] | [e.g. `templates/commands/x.md`; `.claude/commands/speckit.x.md`; ...
   ```
   本特性规划期按示例列出已退役镜像,实现开工时发现目标目录不存在,返工修订 plan/tasks/GATE-2 共 3 处。
 
 - **Why it's a problem**: 模板示例把已退役的镜像形态列为首选示例,直接误导规划;退役事实只存在于 sync-mirrors.py 的注释里,规划者不可见。
-- **Proposed fix**: 修订 templates/plan.md 的 Mirror Obligations 示例与注释,显式注明 `.specify/templates/commands/` 已退役、命令模板的副本面 = regen-command-copies.py 生成的 per-tool 副本;或在注释中链接 sync-mirrors.py 的 MIRROR_PAIRS 定义作为单一事实源。
+- **Proposed fix**: 修订 templates/plan-template.md 的 Mirror Obligations 示例与注释,显式注明 `templates/commands/` 已退役、命令模板的副本面 = regen-command-copies.py 生成的 per-tool 副本;或在注释中链接 sync-mirrors.py 的 MIRROR_PAIRS 定义作为单一事实源。
 
 ### F4 — sync-mirrors.py --write 全量扇出把无关 drift 带入特性变更面
 
@@ -155,7 +155,7 @@
 - **Why it's a problem**: 全量扇出使特性运行的 diff 混入无关修复,破坏阶段提交的可 bisect 性,也改变了回归基线的含义(3 个镜像漂移类基线失败顺带转绿,基线 47→44)。
 - **Proposed fix**: 为 sync-mirrors.py 增加按路径子集同步的选项(如 `--only scripts/python/feedback-utils.py`),或在 implement 的镜像任务指引中要求先 `--check` 报告全部漂移、与本次无关的漂移显式分流到独立提交。
 
-### F5 — 引擎动作表文档漂移存量:skills/feedback.md 缺 041 的 6 个动作
+### F5 — 引擎动作表文档漂移存量:docs/reference/skills/feedback.md 缺 041 的 6 个动作
 
 - **Severity**: P2
 - **Category**: Documentation
@@ -189,7 +189,7 @@
   report ALL unwritable paths (e.g. root-owned container dirs) ... with the
   `sudo chown -R $USER <dir>` remedy
   ```
-  本运行对 `.specify/templates/commands/` 触探失败,报为 UNWRITABLE——实际原因是**目录不存在**(F3 的退役镜像),按指引走 `sudo chown` 将是错误处置。
+  本运行对 `templates/commands/` 触探失败,报为 UNWRITABLE——实际原因是**目录不存在**(F3 的退役镜像),按指引走 `sudo chown` 将是错误处置。
 
 - **Why it's a problem**: 探针指引把两类失败混为一谈,给出的唯一补救(chown)对"不存在"场景是错的;在退役镜像这类场景下会误导出无谓的权限变更。
 - **Proposed fix**: implement.md Step 4 的探针描述补一句分流:"touch 失败先区分 ENOENT(目录不存在——核对计划是否引用了已退役路径)与 EACCES(权限——才考虑 chown)"。
@@ -206,7 +206,7 @@
 
 ### 5.1 Template Improvements
 
-- **plan.md 镜像示例更正** — Target: https://github.com/github/spec-kit.git/blob/3afd41e36f1ebf9102bffff906a3b92756b906c6/templates/plan.md(Mirror Obligations 节)。Change: 示例与注释注明 `.specify/templates/commands/` 已退役,命令模板的副本面仅为 regen-command-copies.py 生成物。Source: F3。Expected impact: 消除规划期误列退役镜像的返工。
+- **plan.md 镜像示例更正** — Target: https://github.com/github/spec-kit.git/blob/3afd41e36f1ebf9102bffff906a3b92756b906c6/templates/plan.md(Mirror Obligations 节)。Change: 示例与注释注明 `templates/commands/` 已退役,命令模板的副本面仅为 regen-command-copies.py 生成物。Source: F3。Expected impact: 消除规划期误列退役镜像的返工。
 - **implement.md 探针语义分流** — Target: https://github.com/github/spec-kit.git/blob/3afd41e36f1ebf9102bffff906a3b92756b906c6/templates/commands/implement.md(Step 4)。Change: 补 ENOENT vs EACCES 分流句。Source: F6。Expected impact: 避免对不存在路径执行错误 chown。
 
 ### 5.2 Command Prompt Improvements
@@ -231,7 +231,7 @@
 |----------|----------------|--------------------------|-------------------|
 | P1 | implement 提交纪律裁决 | templates/commands/implement.md | F1 |
 | P1 | 子代理降级协议 | templates/commands/plan.md + analyze.md | F2 |
-| P2 | plan.md 镜像示例更正 | templates/plan.md | F3 |
+| P2 | plan.md 镜像示例更正 | templates/plan-template.md | F3 |
 | P2 | sync-mirrors --only 子集同步 | scripts/python/sync-mirrors.py | F4 |
 | P2 | feedback 引擎表补齐 | docs/reference/skills/feedback.md | F5 |
 | P2 | implement 探针语义分流 | templates/commands/implement.md | F6 |
@@ -265,4 +265,4 @@ All six findings were fixed in framework sources immediately after this review:
 | F5 | `docs/reference/skills/feedback.md` 引擎表补齐 041 的 6 个动作行 | 人工比对引擎 `--help` 动作集 |
 | F6 | `templates/commands/implement.md` Step 4 探针分流(ENOENT→修正 plan 引用;EACCES→chown) | 同 F1 文件,一并扇出 |
 
-回归:`run-tests.sh` 2221P/44F,对 047 基线(47F)按名零新增失败(comm -13 为空);`sync-mirrors.py --check` exit 0。附带观察:`tests/contract/test_token_efficiency_remediation_summary_first.py` 的 4 个 `test_mirror_identical[V-00x]` 基线失败属同类"退役镜像陈旧 pin"(断言已退役的 `.specify/templates/commands/` 目录)——超出本评审清单,建议列入下次 sanitize。
+回归:`run-tests.sh` 2221P/44F,对 047 基线(47F)按名零新增失败(comm -13 为空);`sync-mirrors.py --check` exit 0。附带观察:`tests/contract/test_token_efficiency_remediation_summary_first.py` 的 4 个 `test_mirror_identical[V-00x]` 基线失败属同类"退役镜像陈旧 pin"(断言已退役的 `templates/commands/` 目录)——超出本评审清单,建议列入下次 sanitize。

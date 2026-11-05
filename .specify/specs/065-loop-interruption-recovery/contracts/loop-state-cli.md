@@ -3,7 +3,7 @@
 **Owner**: `skills/external/sdd-loop-driver/references/state-awareness.md` § Entry & Invocation.
 **Scope**: the executable surface shared by `snapshot`, `recover` and `check-spine`. The meaning of the output fields is owned by the snapshot and recovery contracts; this contract owns grammar, input resolution, envelope and process behavior.
 
-- **LS-01**: The entry is `scripts/loop-state.py` in the skill directory, executable with `python3`, Python 3.8+ standard library only, zero third-party imports, zero network calls, zero daemons.
+- **LS-01**: The entry is `skills/external/sdd-loop-driver/scripts/loop-state.py` in the skill directory, executable with `python3`, Python 3.8+ standard library only, zero third-party imports, zero network calls, zero daemons.
 - **LS-02**: Exactly three actions exist: `snapshot`, `recover`, `check-spine`. A missing or unknown action is a usage error (exit 2), never a default action.
 - **LS-03**: Global options: `--action`, `--line-id`, `--run-id`, `--stage`, `--spine`, `--state-dir`, `--spec-dir`, `--repo`, `--probe`, `--watch-script`, `--watch-timeout`, `--deadline-grace`, `--heartbeat-max-age`, `--out`, `--self-test`, `--help`.
 - **LS-04**: `recover` additionally accepts `--apply`, `--salvage`, `--evidence` (repeatable), `--window`, `--lock-wait`, `--break-lock`. An option that does not apply to the chosen action is a usage error (exit 2).

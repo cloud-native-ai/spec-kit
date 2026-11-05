@@ -3,7 +3,7 @@
 **Requirement Branch**: `023-agent-framework-redesign`  
 **Created**: 2026-07-10  
 **Status**: Draft  
-**Input**: User description: "基于 docs/agents/design.md 的设计方案重构当前项目的 agent 整体实现，需要从代码和文档两个角度进行整体的重构。"
+**Input**: User description: "基于 docs/reference/agents/design.md 的设计方案重构当前项目的 agent 整体实现，需要从代码和文档两个角度进行整体的重构。"
 
 ## Related Feature *(mandatory)*
 
@@ -12,7 +12,7 @@
 
 ## Context & Motivation
 
-The current Agent framework mixes several concepts whose boundaries are unclear, making it hard to reason about, extend, or teach. Per `docs/agents/design.md`, the confusion manifests as:
+The current Agent framework mixes several concepts whose boundaries are unclear, making it hard to reason about, extend, or teach. Per `docs/reference/agents/design.md`, the confusion manifests as:
 
 - **Role is not cleanly abstracted** — an Agent's responsibility and perspective are implied but never explicitly modeled.
 - **Stage and Role are conflated** — the three execution phases (executor / evaluator / optimizer) are entangled with Role definitions.
@@ -103,7 +103,7 @@ A contributor finds all agent templates co-located with the `create-agent` skill
 1. **Given** the assorted `agent-*` templates, **When** the redesign is complete, **Then** they reside under the `create-agent` skill's `templates` directory rather than scattered in the top-level templates directory.
 2. **Given** the stage templates, **When** the redesign is complete, **Then** `agent-subrole-*.md` files are renamed to `agent-stage-*.md`, and the optimizer stage template and its internal `name`/`description` no longer say "improver".
 3. **Given** the `create-agent` skill doc, orchestration templates, and tests, **When** the redesign is complete, **Then** they all reference the new template locations and stage names with no broken references.
-4. **Given** the `docs/agents` documentation, **When** reviewed, **Then** it describes the Role/Stage/Type/Team/Loop model and the three collaboration scenarios consistently with `docs/agents/design.md`.
+4. **Given** the `docs/agents` documentation, **When** reviewed, **Then** it describes the Role/Stage/Type/Team/Loop model and the three collaboration scenarios consistently with `docs/reference/agents/design.md`.
 
 ---
 
@@ -135,7 +135,7 @@ A contributor finds all agent templates co-located with the `create-agent` skill
 - **FR-014**: The system MUST rename stage templates from `agent-subrole-*.md` to [[STR-008]], including renaming the optimizer stage template so it no longer uses "improver".
 - **FR-015**: The system MUST replace the deprecated term "SubRole"/"Subrole" with "Stage" and "improver" with "optimizer" across all live templates, skills, orchestration files, and tests.
 - **FR-016**: The system MUST update the `create-agent` skill documentation, all orchestration templates, and tests to reference the new template locations and stage names, with no broken references.
-- **FR-017**: The `docs/agents` documentation MUST be refactored to describe the Role/Stage/Type/Team/Loop model and the three collaboration scenarios consistently with `docs/agents/design.md`.
+- **FR-017**: The `docs/agents` documentation MUST be refactored to describe the Role/Stage/Type/Team/Loop model and the three collaboration scenarios consistently with `docs/reference/agents/design.md`.
 - **FR-018**: The redesign MUST cover both **code** (commands, skills, templates, tests) and **documentation** so that the two remain mutually consistent.
 - **FR-019**: When `/speckit.agents` receives ambiguous or unsupported intent, the system MUST report the recognized capabilities and request the missing intent rather than failing silently.
 - **FR-020**: The system MUST migrate existing persisted agent definitions under [[STR-006]] to the new conceptual model and unified terminology (Role/Stage/Type; Stage not SubRole; optimizer not improver), so that no live persisted agent retains deprecated concepts or terms.
@@ -162,7 +162,7 @@ A contributor finds all agent templates co-located with the `create-agent` skill
 - **SC-004**: 0 broken references to old template paths or old stage names remain (verified by the existing test suite passing and by reference validation).
 - **SC-005**: Every Agent definition and every stage/role/orchestration template expresses Role, Stage, and Type consistently — 100% conformance on inspection.
 - **SC-006**: All three collaboration scenarios (parallel, serial, team-loop) can be initiated via `/speckit.agents` and select the correct orchestration pattern in 100% of trials.
-- **SC-007**: `docs/agents` documentation contains 0 statements that contradict `docs/agents/design.md`'s conceptual model or terminology.
+- **SC-007**: `docs/agents` documentation contains 0 statements that contradict `docs/reference/agents/design.md`'s conceptual model or terminology.
 - **SC-008**: A consolidated research-findings artifact exists covering every in-scope `/cws_work/*` sibling project (one agent per project), and at least one concrete redesign decision cites it.
 - **SC-009**: 0 live persisted agents under `.specify/agents` retain deprecated concepts or terms after migration.
 
@@ -174,7 +174,7 @@ A contributor finds all agent templates co-located with the `create-agent` skill
 - **SC-004 Source**: Execution of the existing test suite plus a reference-integrity check for template paths and stage names.
 - **SC-005 Source**: Manual/scripted inspection of agent definitions and templates for the presence of Role/Stage/Type fields.
 - **SC-006 Source**: Manual walkthrough invoking each scenario via `/speckit.agents` and confirming the selected orchestration mode.
-- **SC-007 Source**: Documentation review of `docs/agents` against `docs/agents/design.md`.
+- **SC-007 Source**: Documentation review of `docs/agents` against `docs/reference/agents/design.md`.
 - **SC-008 Source**: Presence/inventory check of the research-findings artifact against the list of in-scope `/cws_work/*` sibling projects, plus traceability from redesign decisions to cited findings.
 - **SC-009 Source**: Automated grep of `.specify/agents/*.agent.md` for deprecated terms and inspection for Role/Stage/Type conformance; count of non-conforming files must be 0.
 
@@ -194,7 +194,7 @@ A contributor finds all agent templates co-located with the `create-agent` skill
 | `STR-004` | "Worker" | FR-003, FR-004, Team matrix |
 | `STR-005` | "Meta" | FR-003, FR-004, FR-007, FR-009, Team matrix |
 | `STR-006` | ".specify/agents" | FR-011, FR-012 |
-| `STR-007` | "skills/create-agent/templates" | FR-013, FR-016 |
+| `STR-007` | "skills/internal/create-agent/templates" | FR-013, FR-016 |
 | `STR-008` | "agent-stage-*.md" | FR-014, FR-016 |
 
 **Citation convention**: When an FR, plan, task, or test references one of these strings, write `[[STR-NNN]]` instead of copy-pasting the literal.

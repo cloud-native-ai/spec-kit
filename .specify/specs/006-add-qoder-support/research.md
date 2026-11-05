@@ -16,7 +16,7 @@
 ### 2. Governance and public docs are currently inconsistent with Qoder support
 
 - `.specify/memory/constitution.md` [CN] GitHub Copilot[CN]Qwen Code[CN]opencode[CN]
-- `README.md` [CN] `docs/installation.md` [CN] Qoder[CN]
+- `README.md` [CN] `docs/tutorials/installation.md` [CN] Qoder[CN]
 - `templates/plan-template.md` [CN] `templates/commands/agents.md` [CN]
 - [CN] CLI[CN] FR-012/FR-013[CN]
 

@@ -7,8 +7,8 @@ This research reviews existing Spec Kit assistant integrations and project gover
 ## Context Reviewed
 
 - `README.md`: Supported AI agents currently list GitHub Copilot, Qwen Code, opencode, and Qoder.
-- `docs/installation.md`: Initialization examples currently expose `--ai copilot`, `--ai qwen`, `--ai opencode`, and `--ai qoder`.
-- `docs/usage.md`: Describes Spec Kit slash-command workflow and contains Qoder maintenance guidance that can inform Claude Code maintenance guidance.
+- `docs/tutorials/installation.md`: Initialization examples currently expose `--ai copilot`, `--ai qwen`, `--ai opencode`, and `--ai qoder`.
+- `docs/tutorials/quickstart.md`: Describes Spec Kit slash-command workflow and contains Qoder maintenance guidance that can inform Claude Code maintenance guidance.
 - `.specify/memory/constitution.md`: Principle V currently approves only GitHub Copilot, Qwen Code, opencode, and Qoder.
 - `.specify/memory/features/020.md`: Qoder Support is the closest implementation pattern for adding a first-class assistant.
 - `src/specify_cli/__init__.py`: Contains `AGENT_CONFIG`, `generate_commands()`, initialization copy flow, assistant validation, and CLI help text.

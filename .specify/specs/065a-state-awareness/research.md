@@ -17,9 +17,9 @@
 | Watcher 判定与退出码 | `0 DONE / 10 RUNNING / 11 ANOMALY / 12 FAILED / 13 DEAD / 14 TIMEOUT / 15 INCOMPLETE / 16 NO_SIGNAL / 2 USAGE`；`--help` 明示“TIMEOUT is a budget verdict, not a death certificate” | `skills/external/sdd-loop-driver/scripts/watch-target.sh --help`（本次运行） |
 | Watcher 默认阈值 | `--help` 打印 window / interval / start-grace / deadline-grace / heartbeat-max-age 的缺省值；脚本是代码侧 owner | 同上；`references/watch-model.md` §1 |
 | Watcher 基线 | `--self-test` = `SELF-TEST: 38 passed, 0 failed`，exit 0 | 本次运行 |
-| 信号信封格式 | status 为空格分隔 `exit=<rc> at=<epoch> sentinel=<0|1> ... line= stage= event=status`；`stage-runner.sh` **不写 `run=`**，`run-stage.sh` 写 `run=`；pid 为 `pid=<pid> start=<token> at=<epoch> ... line= stage= event=pid`；heartbeat 为 `at=<epoch> ... event=heartbeat`，新鲜度看 mtime | `scripts/stage-runner.sh`（写入）；`scripts/run-stage.sh`（写入 `run=` 的变体）；`watch-target.sh` 的 `classify_pair` / `read_status_file`；`references/watch-model.md` §2 |
-| Watcher 归属过滤 | 传入 `--line-id/--run-id` 时，`classify_pair` 要求信封同时含匹配的 `line=` 与 `run=` 才判 `own`；缺 `run=` 判 `unattributed` 并抑制 status/pid/heartbeat；meta JSONL 可提供归属 | `scripts/watch-target.sh` 的 `classify_pair` / `read_meta_file`；`references/dispatch-recipes.md` §Watcher 归属参数 |
-| 信号路径约定 | `status-<line>-<stage>`、`pid-<line>-<stage>`、`heartbeat-<line>-<stage>.log`、`log-<line>-<stage>.log`、`watchbeat-<line>-<stage>` | `scripts/stage-runner.sh`；`references/watch-model.md` §2；FR-010 |
+| 信号信封格式 | status 为空格分隔 `exit=<rc> at=<epoch> sentinel=<0|1> ... line= stage= event=status`；`stage-runner.sh` **不写 `run=`**，`run-stage.sh` 写 `run=`；pid 为 `pid=<pid> start=<token> at=<epoch> ... line= stage= event=pid`；heartbeat 为 `at=<epoch> ... event=heartbeat`，新鲜度看 mtime | `skills/external/sdd-loop-driver/scripts/stage-runner.sh`（写入）；`skills/external/sdd-loop-driver/scripts/run-stage.sh`（写入 `run=` 的变体）；`watch-target.sh` 的 `classify_pair` / `read_status_file`；`references/watch-model.md` §2 |
+| Watcher 归属过滤 | 传入 `--line-id/--run-id` 时，`classify_pair` 要求信封同时含匹配的 `line=` 与 `run=` 才判 `own`；缺 `run=` 判 `unattributed` 并抑制 status/pid/heartbeat；meta JSONL 可提供归属 | `skills/external/sdd-loop-driver/scripts/watch-target.sh` 的 `classify_pair` / `read_meta_file`；`references/dispatch-recipes.md` §Watcher 归属参数 |
+| 信号路径约定 | `status-<line>-<stage>`、`pid-<line>-<stage>`、`heartbeat-<line>-<stage>.log`、`log-<line>-<stage>.log`、`watchbeat-<line>-<stage>` | `skills/external/sdd-loop-driver/scripts/stage-runner.sh`；`references/watch-model.md` §2；FR-010 |
 | Registry | 目录解析 `SPECIFY_LINE_REGISTRY_DIR` → `$XDG_STATE_HOME/spec-kit/lines` → `~/.local/state/spec-kit/lines`；条目含 `stage`、`run_id`、`spine_path`、`status_path` 等；只读 action `reattach-brief` | `skills/external/sdd-loop-driver/scripts/line-registry.py` |
 | U4 产物清单 | 各阶段产物、analyze 无提交要求、review → `review.md` | `references/stage-prompts.md` § Independent Verification |
 | plan-owned 集合 | `plan.md,data-model.md,contracts/,quickstart.md,research.md,feature-ref.md` | `references/efficiency-model.md` §3.1 |
@@ -80,7 +80,7 @@
 
 **裁决**：start-grace、deadline-grace、heartbeat-max-age 缺省值不在本切片复述。解析顺序：显式 `--start-grace/--deadline-grace/--heartbeat-max-age` → 解析 `watch-target.sh --help` 的 `Defaults:` 行 → `unknown`。`unknown` 时依赖该阈值的判定不触发，输出 `thresholds.value_state=unknown`。watchbeat 自身 `window=` 缺失时同样不得推断新鲜度。
 
-**理由**：FR-004/FR-011 明确阈值的 owner 是 `scripts/watch-target.sh`；帮助文本是脚本自己发布的稳定面。回归测试将把“发现值 == 脚本帮助文本中的值”钉住，漂移即转红。
+**理由**：FR-004/FR-011 明确阈值的 owner 是 `skills/external/sdd-loop-driver/scripts/watch-target.sh`；帮助文本是脚本自己发布的稳定面。回归测试将把“发现值 == 脚本帮助文本中的值”钉住，漂移即转红。
 
 **否决**：在 `loop-state.py` 内硬编码同一组数字（第二 owner，必然漂移）；要求调用方每次传参（缺省不可用）。
 

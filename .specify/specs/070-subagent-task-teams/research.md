@@ -14,7 +14,7 @@ This file records the Phase 0 decisions that the plan and the design contracts b
   - `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` → `ok skills/external/ == .specify/skills/ (28 files)`, exit 0. The mirror baseline is clean before this feature.
   - Targeted existing driver tests (`test_decomposition_check.py`, `test_pre_analyze_check.py`, `test_overlap_check.py`, `test_sdd_loop_driver_gates.py`, `test_sdd_loop_driver_skill.py`) → 65 passed in 16.06 s.
   - The 067 baseline was measured on a different host class (macOS arm64, Python 3.14.6, pytest 9.1.1). Absolute durations are therefore not comparable; only name-level failure sets are portable.
-- **Source survey**: the driver already carries a JSONL fence precedent (`<!-- test-budget:begin -->`), a parameterized runner (`scripts/stage-runner.sh`), a watcher with fixed exit codes, a line registry with the Ownership Manifest, and three deterministic gates. Feature 070 adds no fourth dispatch form: it composes the existing native and detached forms.
+- **Source survey**: the driver already carries a JSONL fence precedent (`<!-- test-budget:begin -->`), a parameterized runner (`skills/external/sdd-loop-driver/scripts/stage-runner.sh`), a watcher with fixed exit codes, a line registry with the Ownership Manifest, and three deterministic gates. Feature 070 adds no fourth dispatch form: it composes the existing native and detached forms.
 
 ## R1 — The Work Package is the 067 part brief extended, not a second brief
 

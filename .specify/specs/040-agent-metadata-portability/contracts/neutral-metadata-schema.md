@@ -20,8 +20,8 @@ frontmatter MUST 仅包含 data-model.md §E2 中立键集中的键。出现集�
 契约测试 MUST 对以下三个目录做键名扫描并断言命中数为 0(SC-001):
 
 - `agents/`
-- `skills/create-agent/templates/`
-- `skills/create-team/templates/agents/`
+- `skills/internal/create-agent/templates/`
+- `skills/internal/create-team/templates/agents/`
 
 禁用词表:`maxTurns`、`disallowedTools`、`timeoutMins`、`mcpServers`、`permissionMode`、`background`、`isolation`、`tools`(以 `capability-tools` 取代)、`color`(以 `display-color` 取代)、`model`(以 `model-tier` 取代)。
 

@@ -17,9 +17,9 @@
 本特性修复「用户在 speckit 框架中定义的 agent 能力 —— 无论团队席位还是独立 agent —— 到不了宿主可派发注册面」的链路断裂。调查源头为 backlog.md 两条 2026-10-07 行;以下每一条本轮起草时均已重新实测:
 
 - **渲染链本体(完好段)**:`load_project_agent_definitions`(`src/specify_cli/__init__.py:310`)只读 `.specify/agents/templates/` 与 `instances/`(同名时 instance 优先),逐文件校验中性元数据契约;`render_agents_for_tool`(`:615`,docstring 明写「Real files only (no symlinks)」——含 drift 检测、陈旧产物修剪、legacy 符号链接替换迁移)把定义渲染为宿主真文件。qoder 行 `fields` 映射覆盖 `name`/`description`/`model-tier→model`/`capability-tools→tools`/`skills`/`run-turn-budget→maxTurns`/`display-color→color`,`provenance` 已钉官方文档 URL。渲染模式工具共 4 个:qoder、claude、copilot、opencode(codex/hermes 为 annotated 模式)。
-- **断点 1(可达性)**:框架的 agent **类**另存两处且无任何安装步骤 —— `skills/create-agent/templates/`(7 个 capacity 类 + 4 个其他模板)与 `skills/create-team/templates/agents/`(7 个 stage/orchestration 帧 + 1 个 workflow schema);全仓对席位模板名的引用只有 `__init__.py:135` 一条注释与 `agent-definitions.md` taxonomy 表的一行,无安装代码。实测:`.specify/agents/instances/` 为空、`templates/` 仅出厂 2 件(skill-verifier、structure-adjuster),故 `.qoder/agents/` 同样只有这 2 个原生类型。
+- **断点 1(可达性)**:框架的 agent **类**另存两处且无任何安装步骤 —— `skills/internal/create-agent/templates/`(7 个 capacity 类 + 4 个其他模板)与 `skills/internal/create-team/templates/agents/`(7 个 stage/orchestration 帧 + 1 个 workflow schema);全仓对席位模板名的引用只有 `__init__.py:135` 一条注释与 `agent-definitions.md` taxonomy 表的一行,无安装代码。实测:`.specify/agents/instances/` 为空、`templates/` 仅出厂 2 件(skill-verifier、structure-adjuster),故 `.qoder/agents/` 同样只有这 2 个原生类型。
 - **断点 2(触发面)**:`render_agents_for_tool` 全仓唯一调用点是 `:2283`(specify CLI 的 init/update 流程);对 `templates/commands/*.md` 与 `scripts/python/*.py` 的 `grep -rn` 零命中 —— 没有任何 `/speckit.*` 命令或项目脚本能触发渲染,也没有任何文档告知「create-agent 之后须经一次 specify CLI 运行才能上宿主面」。
-- **断点 3(教学面)**:已退役的 per-file 符号链接模型仍被三个面教授 —— `templates/commands/agents.md:25`(「Tool-specific directories are symlinks — never write to them directly」)、`skills/create-agent/SKILL.md:122` 表行(「Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012)」)与 `:127` 段落(详述 CLI 建立逐文件符号链接)。这是 **F-A02 死信**:2026-09-11 分流 improve-skills 从未执行,跨 ≥3 轮 consume,已从技能扩散进命令模板。同时 `templates/commands/agents.md:72` 要求派发「with its configured `capability-tools`, `model-tier`, and `run-turn-budget`, and system prompt」—— 四样只有宿主已注册类型携带得动,未注册即必然退化为 `general-purpose` 通用载体 + 角色散文注入简报。
+- **断点 3(教学面)**:已退役的 per-file 符号链接模型仍被三个面教授 —— `templates/commands/agents.md:25`(「Tool-specific directories are symlinks — never write to them directly」)、`skills/internal/create-agent/SKILL.md:122` 表行(「Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012)」)与 `:127` 段落(详述 CLI 建立逐文件符号链接)。这是 **F-A02 死信**:2026-09-11 分流 improve-skills 从未执行,跨 ≥3 轮 consume,已从技能扩散进命令模板。同时 `templates/commands/agents.md:72` 要求派发「with its configured `capability-tools`, `model-tier`, and `run-turn-budget`, and system prompt」—— 四样只有宿主已注册类型携带得动,未注册即必然退化为 `general-purpose` 通用载体 + 角色散文注入简报。
 - **Qoder IDE 侧(本轮已官方取证,原悬念解除)**:Qoder IDE 与 Qoder CLI **共享同一项目级 agent 目录** `.qoder/agents/`——IDE 读 `${project}/.qoder/agents/<name>.md`(另有用户级 `~/.qoder/agents/`),CLI 读 `.qoder/agents/*.md`,官方 CLI 文档明写「The path `.qoder/agents/` is shared between Qoder CLI and the Qoder IDE」;文件名不决定 agent 名(名字来自 frontmatter `name` 字段);CLI 侧另支持 `permissionMode`/`disallowedTools`/`timeoutMins`/`isolation` 等字段。来源:`https://docs.qoder.com/extensions/subagent`(IDE 页)与 `https://docs.qoder.com/cli/subagent`(CLI 页),取证日期 2026-10-08。backlog 50 行「取证前 MUST NOT 假定 IDE 与 CLI 同路径」的门槛由此满足:**同路径是已验证事实,不是假设**。
 - **一条既有硬约束(裁定前约束选项 (a),方案 (b) 天然满足)**:渲染器对带未解析 `{{PLACEHOLDER}}` 的定义**直接拒绝**(`:303-307`,「authoring templates must not enter the render input」)。stage 帧与 capacity 类恰恰是带占位符的作者模板 —— 方案 (b) 在建队实例化时填掉占位符,产出可入渲染输入的实例;方案 (a) 的「安装原始帧」则与该不变量直接冲突。
 
@@ -37,7 +37,7 @@
 
 ### User Story 1 - 三个教学面改教真实渲染机制,F-A02 死信终结 (Priority: P1)
 
-使用者(或代理)今天读 `templates/commands/agents.md` 与 `skills/create-agent/SKILL.md` 学到的是已退役的 per-file 符号链接模型,而渲染器实际行为是「真文件渲染、替换 legacy 链接」。本故事把三个教学面(agents.md:25、SKILL.md:122、SKILL.md:127)全部改为与真实机制一致:宿主 agent 目录是渲染产出的真实文件、由 specify CLI 渲染、legacy 符号链接被替换;同时在 create 流程终点教授触发真相 —— 定义落在 `.specify/agents/{templates,instances}/`,上宿主注册面需要一次渲染触发。
+使用者(或代理)今天读 `templates/commands/agents.md` 与 `skills/internal/create-agent/SKILL.md` 学到的是已退役的 per-file 符号链接模型,而渲染器实际行为是「真文件渲染、替换 legacy 链接」。本故事把三个教学面(agents.md:25、SKILL.md:122、SKILL.md:127)全部改为与真实机制一致:宿主 agent 目录是渲染产出的真实文件、由 specify CLI 渲染、legacy 符号链接被替换;同时在 create 流程终点教授触发真相 —— 定义落在 `.specify/agents/{templates,instances}/`,上宿主注册面需要一次渲染触发。
 
 **Why this priority**: 三项里最便宜、零设计依赖、且死信已在 ≥3 轮 consume 中复发并从一个面扩散到三个面 —— 每多存活一天就可能再扩散一个面;同时它是纯文档/模板修正,不阻塞也不被阻塞于设计裁定。
 
@@ -121,7 +121,7 @@
 #### 教学面修正(US1)
 
 - **FR-001**: `templates/commands/agents.md` MUST 描述真实渲染模型 —— 宿主 agent 目录是渲染产出的真实文件、由 specify CLI 渲染、legacy 符号链接被替换 —— 且 MUST NOT 再教授 per-file 符号链接模型([[STR-001]] 所示的退役表述 MUST 被移除)。
-- **FR-002**: `skills/create-agent/SKILL.md` 的持久化说明(现 :122 表行与 :127 段落)MUST 同步修正,其引用的初始化行为陈述 MUST 与渲染器实际语义一致。
+- **FR-002**: `skills/internal/create-agent/SKILL.md` 的持久化说明(现 :122 表行与 :127 段落)MUST 同步修正,其引用的初始化行为陈述 MUST 与渲染器实际语义一致。
 - **FR-003**: 在 create 流程的终点(agents 命令模板与 create-agent 技能),触发真相 MUST 被教授:定义落 `.specify/agents/{templates,instances}/`,上宿主注册面须经渲染触发;所教触发步骤 MUST 与当时已落地的触发面一致。
 
 #### 注册链闭合(US2,方案 (b) 已裁定)

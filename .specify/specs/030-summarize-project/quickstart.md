@@ -10,7 +10,7 @@ Audience: the agent executing `/speckit.tasks` / `/speckit.implement` for this s
 Create two test files modeled on `tests/contract/test_create_skills_prompt_assets.py`:
 
 - `tests/contract/test_summarize_project_prompt_assets.py` — asserts contract items C-1…C-13:
-  - `skills/summarize-project/SKILL.md` and `references/reporting-playbook.md` exist; frontmatter `name`, trigger keywords (`项目总结`, `项目汇报`, `进展报告`, `项目进展`, `summarize project`, `project summary`, `project report`), and `skill_id` pattern (C-1, C-2).
+  - `skills/internal/summarize-project/SKILL.md` and `references/reporting-playbook.md` exist; frontmatter `name`, trigger keywords (`项目总结`, `项目汇报`, `进展报告`, `项目进展`, `summarize project`, `project summary`, `project report`), and `skill_id` pattern (C-1, C-2).
   - Ordered five-step workflow section headers; delegation references to `draw-plantuml` (`@startwbs`, `@startgantt`); no `scripts/` directory in the package (C-4, C-5).
   - Consistency/clarification/splitting rules and canonical `## Feedback` block with unit-id `skill:summarize-project` (C-6…C-9, C-13).
   - Registry row in `.specify/instructions.md`; mirror byte-equivalence via directory diff (C-3, C-1).
@@ -28,7 +28,7 @@ python -m pytest tests/contract/test_summarize_project_prompt_assets.py tests/co
 
 ## 2. Build WS-A: the `summarize-project` skill (Green)
 
-1. Scaffold `skills/summarize-project/` following `templates/skills-template.md` and the `create-skills` skill conventions (frontmatter, `${SKILL_HOME}` / `${SKILL_WORKDIR}` idioms).
+1. Scaffold `skills/internal/summarize-project/` following `templates/skills-template.md` and the `create-skills` skill conventions (frontmatter, `${SKILL_HOME}` / `${SKILL_WORKDIR}` idioms).
 2. Write `SKILL.md` — five-step workflow per data-model.md Part 2 and contract C-4…C-9; every charting step delegates to `draw-plantuml` (cite its howto guides `13-wbs-diagram.md`, `14-gantt-diagram.md` and output conventions); default output location `docs/project-summary/` under the target workspace (user-overridable); end with the canonical `## Feedback` block (unit-id `skill:summarize-project`).
 3. Write `references/reporting-playbook.md` — decomposition depth, estimation defaults with visible assumption marking, chart-set splitting, two-chart consistency checklist.
 4. Do NOT create a `scripts/` directory — rendering is delegated (SR-2).
@@ -40,7 +40,7 @@ python -m pytest tests/contract/test_summarize_project_prompt_assets.py tests/co
    - Phase 5 (report structure design): plan UML figures for primary views per `references/uml-visualization-guide.md`.
    - Phase 8 (final report assembly): embed rendered figures with captions, PNG default + SVG available, keep `.puml` sources.
    - Output Requirements: UML figures as the standard for primary views; Mermaid retained for secondary sketches; degradation note rule.
-2. Create `skills/analysis-project/references/uml-visualization-guide.md` with the normative view→diagram-type mapping (data-model.md Part 1 — including `activity` as the behavior-flow alternative for business/process flows), the `docs/figures/` storage convention with relative-path references, delegation pointers into `draw-plantuml/references/howto/`, and the renderer-unavailable degradation rule.
+2. Create `skills/internal/study-project/references/uml-visualization-guide.md` with the normative view→diagram-type mapping (data-model.md Part 1 — including `activity` as the behavior-flow alternative for business/process flows), the `docs/figures/` storage convention with relative-path references, delegation pointers into `draw-plantuml/references/howto/`, and the renderer-unavailable degradation rule.
 3. Touch nothing else in the workflow — phases 1–4, 6–7, subagent discipline, and `$WORK_DIR/docs/overview.md` stay byte-identical in behavior (FR-018).
 
 ## 4. Registry and mirrors
@@ -49,7 +49,7 @@ python -m pytest tests/contract/test_summarize_project_prompt_assets.py tests/co
 2. Synchronize mirrors and verify byte-equivalence:
 
 ```bash
-diff -r skills/summarize-project .specify/skills/summarize-project
+diff -r skills/internal/summarize-project .specify/skills/summarize-project
 diff -r skills/analysis-project   .specify/skills/analysis-project
 ```
 

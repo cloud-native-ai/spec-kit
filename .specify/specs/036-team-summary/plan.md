@@ -4,11 +4,11 @@
 **Requirement → Feature**: `036-team-summary` → Feature 027 Team Management
 **Input**: Specification from `.specify/specs/036-team-summary/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every `[PLACEHOLDER]` token in place — it MUST NOT append a second copy of this template below the filled content. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every `[PLACEHOLDER]` token in place — it MUST NOT append a second copy of this template below the filled content. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-把团队自身当作一个"项目",在四种协作模式各自的**阶段边界**上自动刷新一份**累积式**状态总结。产物按**双索引**落地:`.specify/teams/<team-slug>/` 以 team 为索引只保留运行信息(`runs/` / `STATE.md` / `run-log.jsonl` / `items.jsonl`),`.specify/project/goal/<goal-slug>/` 以 goal 为索引承载**唯一的完整总结**并聚合同一 goal 下的全部团队。
+把团队自身当作一个"项目",在四种协作模式各自的**阶段边界**上自动刷新一份**累积式**状态总结。产物按**双索引**落地:`.specify/teams/<team-slug>/` 以 team 为索引只保留运行信息(`runs/` / `STATE.md` / `run-log.jsonl` / `items.jsonl`),`.specify/goal/<goal-slug>/` 以 goal 为索引承载**唯一的完整总结**并聚合同一 goal 下的全部团队。
 
 技术路径的核心不是新写一个报告模板,而是**让团队侧扮演"表单作者"**:`summarize-project` 的唯一输入是项目输入表单,技能对表单只读不改、R 档缺失即以退出码 3 阻断。因此本方案由四件事构成——
 
@@ -23,7 +23,7 @@ Phase 0 已**实际执行**被调技能全链路(validate → load → check →
 
 **Language/Version**: Python 3(表单生成器与测试;项目基线 `>=3.8`,与既有 `scripts/python/` 一致)+ Markdown 提示层(技能与命令模板)
 **Primary Dependencies**: 被调技能 `summarize-project` 的既有脚本链(`validate-project-input.py` / `project-db.py` / `progress-engine.py` / `check-coherence.py`)、`draw-plantuml`(渲染委托)、`sync-mirrors.py`(镜像同步);标准库 `json` / `hashlib` / `pathlib`,**不新增第三方依赖**
-**Storage**: 纯文件。团队侧新增 tracked 的 append-only `.specify/teams/<slug>/items.jsonl`(每团队一份,运行信息);goal 侧交付目录 `.specify/project/goal/<goal-slug>/`(`summary.md` + `assets/` + `data/`,唯一完整总结);派生 SQLite `<goal-dir>/data/project.db` 由被调技能每次重建
+**Storage**: 纯文件。团队侧新增 tracked 的 append-only `.specify/teams/<slug>/items.jsonl`(每团队一份,运行信息);goal 侧交付目录 `.specify/goal/<goal-slug>/`(`summary.md` + `assets/` + `data/`,唯一完整总结);派生 SQLite `<goal-dir>/data/project.db` 由被调技能每次重建
 **Testing**: `pytest`,markers `contract` / `integration`(见 `pyproject.toml`)。契约测试钉住台账 schema、ID 文法、goal 身份解析、状态行文法、写入面不变性;集成测试以四模式夹具团队跑通表单生成,并以"两团队共享一个 goal"夹具跑通聚合与并发串行化
 **Target Platform**: 本地开发机 CLI(Linux / macOS),提示层由受支持的 AI agent CLI 解释执行
 **Project Type**: 单体框架仓(code generator / framework 形态:`templates/` + `skills/` + `scripts/` + `src/specify_cli/`)
@@ -37,7 +37,7 @@ Phase 0 已**实际执行**被调技能全链路(validate → load → check →
 
 - **名册解析(People 实体来源)**:团队 `members[]` 引用的 agent 定义位于分层存储 `.specify/agents/templates/<slug>.agent.md`(Agent Template,init 安装)与 `.specify/agents/instances/<slug>.agent.md`(Agent Instance,项目创建),同名时 instance 优先;表单生成器解析人员称名时 MUST 按此顺序取 frontmatter `name`(对应 FR-004)。旧平铺路径 `.specify/agents/<slug>.agent.md` 已废弃,设计中不得出现。
 - **子代理 ≡ Agent Execution(第三层)**:团队派发的子代理是运行形态,不是文件;其持久产物(派发配置 `.specify/agents/execution/configs/<slug>.yaml`、包装脚本 `execution/scripts/`)是 tracked 的,**可**作为出处;运行日志 `execution/logs/`(含外部派发可见性三元组 `.live.log`/`.jsonl`/`.status`)已 gitignore,**不得**作为进度出处(对应 FR-011)。
-- **触发点与派发的边界**:总结触发点嵌入团队执行流(create-team 执行引擎);若总结步骤本身以外部子代理方式派发,MUST 遵守外部派发可见性契约(stream-json + 过滤器 + 三元组,参考实现 `skills/create-team/scripts/dispatch.sh`),且其日志同样落在 git-ignored 位置。
+- **触发点与派发的边界**:总结触发点嵌入团队执行流(create-team 执行引擎);若总结步骤本身以外部子代理方式派发,MUST 遵守外部派发可见性契约(stream-json + 过滤器 + 三元组,参考实现 `skills/internal/create-team/scripts/dispatch.sh`),且其日志同样落在 git-ignored 位置。
 - **写入面不变性的边界扩展**:总结步骤期间除事实源团队工件外,`.specify/agents/**`(三层全部)亦 MUST 保持字节不变——总结是纯派生步骤,不得触碰 agent 定义与派发配置。
 - **术语纪律**:设计文档中提及 agent 时区分层级(Template / Instance / Execution),不用裸词 "agent" 指代文件与运行两种形态。
 
@@ -70,7 +70,7 @@ Phase 0 已**实际执行**被调技能全链路(validate → load → check →
 **Re-check after Phase 1**: 2026-08-04 — Phase 1 产出(data-model.md、4 份契约、quickstart.md、feature-ref.md)落盘后按同表复核,结论不变:13 行中 12 Pass、1 Partial(IX)。契约阶段新增两点强化证据——(a) IV 的契约先行已具体化为 4 份可测契约 + 每条 CLI 示例经真实执行验证;(b) VIII 因 Phase 1 又发现一条文档—代码偏差(`coverage` 恒产要求无对应 FR)并记入 research.md § O,未静默吞掉。IX 的 Partial 判定与理由未变。
 
 **Re-check after the 2026-08-04 scope revision(双索引)**: 逐行重评 13 条,结论仍为 12 Pass / 1 Partial(IX),但两行的证据发生实质变化,故明示而非沿用——
-- **II Feature-Centric**:修订新增 FR-030…FR-036 与 US6,改动面仍全部落在 Feature 027 的团队域内(团队配置 schema、执行流触发点、团队产物布局);`.specify/project/goal/` 是产物落位而非新能力域,故**不新建 Feature**,符合 reuse-first 门禁。
+- **II Feature-Centric**:修订新增 FR-030…FR-036 与 US6,改动面仍全部落在 Feature 027 的团队域内(团队配置 schema、执行流触发点、团队产物布局);`.specify/goal/` 是产物落位而非新能力域,故**不新建 Feature**,符合 reuse-first 门禁。
 - **IX Framework Scope Discipline(仍 Partial)**:修订未新增第三类工件——`goal_slug` 是既有 frontmatter 的一个字段、交付目录是既有 tracked 目录下的子树、聚合与串行化是生成器内的逻辑。Partial 的成因仍只是既有的"1 支脚本 + 1 份台账"两项,理由与 Complexity Tracking 中的论证一致;并发串行化刻意复用既有的"只由团队主管写入"纪律(FR-021)而非引入锁服务或调度器。
 - **VIII Code as SSoT**:修订前实测了 `.specify/project/` 的真实内容(10 个 tracked 文件,`manage-project` 时代遗留),据此写成 FR-036 的共存约束,而非假定该目录为空。
 
@@ -99,31 +99,31 @@ Phase 0 已**实际执行**被调技能全链路(validate → load → check →
 **镜像说明(2026-08-04 agent 重构,承接上游预置备注)**:agents 的镜像对现为 `agents/` ↔ `.specify/agents/templates/`(由 `sync-mirrors.py` 维护);`instances/` 与 `execution/` 是项目本地产物,**从不镜像**。本规格不改动 agents 任何层,该说明仅用于界定"不得触碰"的范围。
 
 ```text
-skills/create-team/                 # 团队域主改面:触发点、映射事实源、表单生成器
-skills/create-team/references/      # + summary-mapping.md(新增,FR-001 概念映射单一事实源)
-skills/create-team/scripts/         # + build-summary-input.py(新增,FR-008 确定性表单生成器)
-skills/improve-team/                # config.summary 的调参入口(节奏/开关/交付目录)
+skills/internal/create-team/                 # 团队域主改面:触发点、映射事实源、表单生成器
+skills/internal/create-team/references/      # + summary-mapping.md(新增,FR-001 概念映射单一事实源)
+skills/internal/create-team/scripts/         # + build-summary-input.py(新增,FR-008 确定性表单生成器)
+skills/internal/improve-team/                # config.summary 的调参入口(节奏/开关/交付目录)
 templates/commands/team.md          # run 模式:确认门禁披露总结成本 + 触发点收口
-skills/create-team/templates/teams/ # 三份预设按模式声明 config.summary 默认节奏
+skills/internal/create-team/templates/teams/ # 三份预设按模式声明 config.summary 默认节奏
 tests/contract/                     # 台账 schema / ID 文法 / 状态行文法 / 写入面不变性
 tests/integration/                  # 四模式夹具团队 → 表单生成 → 装载校验全链路
 tests/fixtures/                     # serial / parallel 夹具团队 + 共享同一 goal 的双团队聚合夹具
 ```
 
-运行期数据(非源码,不在上表):每个团队的 `.specify/teams/<team-slug>/items.jsonl`(新增 tracked 台账,team 索引)与每个 goal 的 `.specify/project/goal/<goal-slug>/`(交付目录 [[STR-001]],goal 索引,唯一完整总结)。
+运行期数据(非源码,不在上表):每个团队的 `.specify/teams/<team-slug>/items.jsonl`(新增 tracked 台账,team 索引)与每个 goal 的 `.specify/goal/<goal-slug>/`(交付目录 [[STR-001]],goal 索引,唯一完整总结)。
 
-**Structure Decision**: 沿用本仓既有的 **code generator / framework** 形态,不新增顶层目录。改动集中在团队域的 `skills/create-team/`(1 份新 reference + 1 支新脚本 + SKILL.md 若干节)与命令模板 `templates/commands/team.md`,并按既有 `tests/{contract,integration,fixtures}/` 布局补测。新增的两个**数据**面分处两个索引:`items.jsonl` 落在 `.specify/teams/<team-slug>/` 之内(需同步修订"团队目录只放 `team.md` + `runs/`"这一既有断言——该断言当前已与 continuous 团队实况不符),交付目录落在既有且 tracked 的 `.specify/project/` 下新增的 `goal/` 子树(与其现存的 `project.md` + wbs/gantt/milestones 历史产物平级共存,不得覆盖,FR-036)。
+**Structure Decision**: 沿用本仓既有的 **code generator / framework** 形态,不新增顶层目录。改动集中在团队域的 `skills/internal/create-team/`(1 份新 reference + 1 支新脚本 + SKILL.md 若干节)与命令模板 `templates/commands/team.md`,并按既有 `tests/{contract,integration,fixtures}/` 布局补测。新增的两个**数据**面分处两个索引:`items.jsonl` 落在 `.specify/teams/<team-slug>/` 之内(需同步修订"团队目录只放 `team.md` + `runs/`"这一既有断言——该断言当前已与 continuous 团队实况不符),交付目录落在既有且 tracked 的 `.specify/project/` 下新增的 `goal/` 子树(与其现存的 `project.md` + wbs/gantt/milestones 历史产物平级共存,不得覆盖,FR-036)。
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/team.md` | `.specify/templates/commands/team.md`; `.claude/commands/speckit.team.md`; `.github/prompts/speckit.team.prompt.md`; `.qoder/commands/speckit.team.md`; `.qwen/commands/speckit.team.toml`; `.opencode/command/speckit.team.md` | `sync-mirrors.py --check`(exit 2 = drift);6 份副本均含"总结披露"与新目录断言 |
-| `skills/create-team/SKILL.md` | `.specify/skills/create-team/SKILL.md` | `diff -q`;两侧同含 SUMMARIZE 相与修订后的输出纪律 |
-| `skills/create-team/references/summary-mapping.md`(新增) | `.specify/skills/create-team/references/summary-mapping.md` | `diff -q`;文件在两侧均存在 |
-| `skills/create-team/scripts/build-summary-input.py`(新增) | `.specify/skills/create-team/scripts/build-summary-input.py` | `diff -q`;两侧均可执行且 `--help` 一致 |
-| `skills/improve-team/SKILL.md` | `.specify/skills/improve-team/SKILL.md` | `diff -q` |
-| `skills/create-team/templates/teams/{artifact-optimizer,process-monitor,workspace-cluster}.md` | `.specify/skills/create-team/templates/teams/*.md` | `diff -q` 三份预设 |
+| `templates/commands/team.md` | `templates/commands/team.md`; `.claude/commands/speckit.team.md`; `.github/prompts/speckit.team.prompt.md`; `.qoder/commands/speckit.team.md`; `.qwen/commands/speckit.team.toml`; `.opencode/command/speckit.team.md` | `sync-mirrors.py --check`(exit 2 = drift);6 份副本均含"总结披露"与新目录断言 |
+| `skills/internal/create-team/SKILL.md` | `.specify/skills/internal/create-team/SKILL.md` | `diff -q`;两侧同含 SUMMARIZE 相与修订后的输出纪律 |
+| `skills/internal/create-team/references/summary-mapping.md`(新增) | `.specify/skills/internal/create-team/references/summary-mapping.md` | `diff -q`;文件在两侧均存在 |
+| `skills/internal/create-team/scripts/build-summary-input.py`(新增) | `.specify/skills/internal/create-team/scripts/build-summary-input.py` | `diff -q`;两侧均可执行且 `--help` 一致 |
+| `skills/internal/improve-team/SKILL.md` | `.specify/skills/internal/improve-team/SKILL.md` | `diff -q` |
+| `skills/internal/create-team/templates/teams/{artifact-optimizer,process-monitor,workspace-cluster}.md` | `.specify/skills/internal/create-team/templates/teams/*.md` | `diff -q` 三份预设 |
 
 统一入口:改动任一 canonical 源后运行 `python3 scripts/python/sync-mirrors.py --write`,再以 `--check` 验证(Tool 记录 `<TOOL:.specify/memory/tools/sync-mirrors.py.md>`)。**不得**手工编辑任何镜像或 per-tool 副本(生成副本带 `AUTO-GENERATED` 头)。
 

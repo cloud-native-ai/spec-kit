@@ -143,17 +143,17 @@ Structural validation for the 2026-07-02 amendment (no runtime code — verified
 
 **G1 — Role supervisors (T036)**
 - [ ] Each of the 6 `templates/agent-role-*-template.md` carries `supervisor: true` (default-on, OQ-1) and a `role-scope:` matching its slug
-- [ ] The shared section lives ONLY in `templates/agent-supervision-delegation.md` (not copied into role templates, OQ-2)
-- [ ] `templates/agent-triad-orchestration-template.md` exposes a `{{ROLE_SCOPE}}` binding
+- [ ] The shared section lives ONLY in `skills/internal/create-agent/templates/agent-supervision-delegation.md` (not copied into role templates, OQ-2)
+- [ ] `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md` exposes a `{{ROLE_SCOPE}}` binding
 
 **G2 — Generalized create-agent (T043)**
-- [ ] `skills/create-agent/SKILL.md` Goal reads as general authoring (not "role-based only")
+- [ ] `skills/internal/create-agent/SKILL.md` Goal reads as general authoring (not "role-based only")
 - [ ] A capability matrix covers role · supervisor · triad · custom
 - [ ] The Supervisor capability inlines `agent-supervision-delegation.md` and binds `{{ROLE_SCOPE}}`
 - [ ] Every `AgentAuthoringRequest` field from `contracts/agent-authoring-contract.md` is consumed
 
 **G3 — Generalized improve-agent (T047)**
-- [ ] `skills/improve-agent/SKILL.md` target resolution covers role · sub-role · orchestration · custom `.agent.md`
+- [ ] `skills/internal/improve-agent/SKILL.md` target resolution covers role · sub-role · orchestration · custom `.agent.md`
 - [ ] A classify-then-route step precedes the refinement workflows
 
 **G4 — Command delegates (T049)**

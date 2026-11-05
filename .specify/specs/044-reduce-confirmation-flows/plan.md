@@ -93,7 +93,7 @@ No standalone research.md — findings inlined under `## Phase 0: Research Revie
 shared/guidelines/              # 新增 confirmation-gates.md——分类判据真源(FR-001/002/003)
 templates/commands/             # team/goal/tools/agents/skills/todo/implement 等门控改写 + 样板确认非阻塞化(FR-004..008)
 templates/instructions-template.md  # Documentation Map 增判据文档引用(D8)
-skills/create-team/             # SKILL.md + references 门控改写(创建/运行/收尾零确认,continuous 例外)(FR-004..006)
+skills/internal/create-team/             # SKILL.md + references 门控改写(创建/运行/收尾零确认,continuous 例外)(FR-004..006)
 scripts/python/                 # 新增 scan-confirmation-gates.py——门控扫描与基线对比(D3)
 tests/contract/                 # 4 份契约对应的契约测试
 .specify/                       # 上述各面的运行时镜像(全部由 sync-mirrors.py / regen-command-copies.py / speckit.instructions 再生,禁手写)
@@ -105,9 +105,9 @@ tests/contract/                 # 4 份契约对应的契约测试
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/*.md`(受影响 stem:team, goal, tools, agents, skills, todo, implement, requirements, plan, tasks, clarify, research, review, analyze, checklist, docs, feature, feedback, session, interview, history, constitution, instructions) | `.specify/templates/commands/*.md`(sync-mirrors);per-tool 副本:`.claude/commands/speckit.<stem>.md`、`.qoder/commands/speckit.<stem>.md`、`.github/prompts/speckit.<stem>.prompt.md`、`.opencode/command/speckit.<stem>.md`(regen-command-copies) | `python3 scripts/python/regen-command-copies.py --check` exit 0;`python3 scripts/python/sync-mirrors.py --check` exit 0 |
+| `templates/commands/*.md`(受影响 stem:team, goal, tools, agents, skills, todo, implement, requirements, plan, tasks, clarify, research, review, analyze, checklist, docs, feature, feedback, session, interview, history, constitution, instructions) | `templates/commands/*.md`(sync-mirrors);per-tool 副本:`.claude/commands/speckit.<stem>.md`、`.qoder/commands/speckit.<stem>.md`、`.github/prompts/speckit.<stem>.prompt.md`、`.opencode/command/speckit.<stem>.md`(regen-command-copies) | `python3 scripts/python/regen-command-copies.py --check` exit 0;`python3 scripts/python/sync-mirrors.py --check` exit 0 |
 | `templates/instructions-template.md` | `.specify/templates/instructions-template.md`(byte-identical);`.specify/instructions.md` 再生(AGENTS.md/CLAUDE.md/QODER.md/.github/copilot-instructions.md 符号链接消费) | `/speckit.instructions` 再生后 diff 核对;符号链接完好 |
-| `skills/create-team/SKILL.md` + `references/*` | `.specify/skills/create-team/**`(sync-mirrors;`.github/skills` 为符号链接,无副本) | `sync-mirrors.py --check` exit 0 |
+| `skills/internal/create-team/SKILL.md` + `references/*` | `.specify/skills/internal/create-team/**`(sync-mirrors;`.github/skills` 为符号链接,无副本) | `sync-mirrors.py --check` exit 0 |
 | `shared/workflow/feedback-step.md`、`shared/workflow/glossary.md`(微调)、新增 `shared/guidelines/confirmation-gates.md` | `.specify/shared/**`(sync-mirrors) | `sync-mirrors.py --check` exit 0 |
 | 新增 `scripts/python/scan-confirmation-gates.py` | `.specify/scripts/python/scan-confirmation-gates.py`(sync-mirrors) | `sync-mirrors.py --check` exit 0 |
 

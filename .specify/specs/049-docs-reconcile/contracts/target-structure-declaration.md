@@ -1,20 +1,20 @@
 # Contract: 目标结构声明
 
 **Requirement**: `049-docs-reconcile` → Feature 037 Docs Command
-**Target artifacts**: `.specify/docs/target-structure.md`(运行时实例)、`templates/docs-target-structure-template.md`(骨架)
+**Target artifacts**: `docs/target-structure.md`(运行时实例)、`skills/external/create-docs/assets/docs-target-structure-template.md`(骨架)
 **Date**: 2026-09-01
 
 ## T-1 路径与可区分性
 
-声明 MUST 位于 `.specify/docs/target-structure.md` —— 运行工作区的**根级单文件**。按次运行产物 MUST 继续留在子目录 `plans/`、`audit/`。此层级差异即 FR-002a 的"可区分"实现:按目录处理按次产物的任何操作都不触及根级文件。
+声明 MUST 位于 `docs/target-structure.md` —— 运行工作区的**根级单文件**。按次运行产物 MUST 继续留在子目录 `plans/`、`audit/`。此层级差异即 FR-002a 的"可区分"实现:按目录处理按次产物的任何操作都不触及根级文件。
 
 声明 MUST NOT 被放入 `plans/` 或 `audit/`;MUST NOT 采用带时间戳的按次命名。
 
 ## T-2 不随按次产物轮转
 
-声明 MUST NOT 被任何轮转/清理逻辑覆盖。现状核验(实现时须复核仍然成立):`sanitize-utils.py` 的 `MATERIAL_ROOTS` 不含 `.specify/docs`;`docs-utils.py` 不枚举该目录;仓内唯一保留期逻辑 `memory-utils.py --action prune` 只作用于 `.specify/memory/`。
+声明 MUST NOT 被任何轮转/清理逻辑覆盖。现状核验(实现时须复核仍然成立):`sanitize-utils.py` 的 `MATERIAL_ROOTS` 不含 `docs`;`docs-utils.py` 不枚举该目录;仓内唯一保留期逻辑 `memory-utils.py --action prune` 只作用于 `.specify/memory/`。
 
-若未来引入针对 `.specify/docs/` 的清理能力,该能力 MUST 显式排除本文件。
+若未来引入针对 `docs/` 的清理能力,该能力 MUST 显式排除本文件。
 
 ## T-3 受管块标记
 
@@ -25,7 +25,7 @@
 <!-- DOCS_TARGET_STRUCTURE_END -->
 ```
 
-写入规则(沿用 `.specify/git-workflow.md` 先例):文件已存在且标记成对时,MUST **只替换标记之间的内容**,标记本身与块外内容 MUST 字节保持。
+写入规则(沿用 `docs/git-workflow.md` 先例):文件已存在且标记成对时,MUST **只替换标记之间的内容**,标记本身与块外内容 MUST 字节保持。
 
 ## T-4 必填字段
 
@@ -56,10 +56,10 @@
 
 ## T-9 骨架模板
 
-`templates/docs-target-structure-template.md` MUST:遵循 `<name>-template.md` 命名约定;含成对标记;为每个 T-4 字段提供占位符;不含任何 T-5 禁止的基线枚举;经 templates 镜像对同步到 `.specify/templates/`。验证以 `sync-mirrors.py --check` 中 templates 对报 `ok`、无新 `MISS`/`DIFF`,且两文件 `diff -q` 字节一致为准;全局命令当前因无关的既有 `git-fleet` 漂移 exit 2,不得误写为本特性须达 exit 0。
+`skills/external/create-docs/assets/docs-target-structure-template.md` MUST:遵循 `<name>-template.md` 命名约定;含成对标记;为每个 T-4 字段提供占位符;不含任何 T-5 禁止的基线枚举;经 templates 镜像对同步到 `.specify/templates/`。验证以 `sync-mirrors.py --check` 中 templates 对报 `ok`、无新 `MISS`/`DIFF`,且两文件 `diff -q` 字节一致为准;全局命令当前因无关的既有 `git-fleet` 漂移 exit 2,不得误写为本特性须达 exit 0。
 
 ## T-10 消歧
 
 本声明与 **Goal Target(目标切片)** 无关——后者是 goal 域的 run 级指派范围概念(`shared/definitions/goal-definitions.md`)。词汇表已登记两者的区分。
 
-`improve-docs` 现有约束行把 `.specify/docs/**` 整体描述为 "run artifacts";实现阶段 MUST 订正该措辞以涵盖跨运行声明,同时保持 improve-docs **不得编辑**该文件的效果不变(它不是文档)。
+`improve-docs` 现有约束行把 `docs/**` 整体描述为 "run artifacts";实现阶段 MUST 订正该措辞以涵盖跨运行声明,同时保持 improve-docs **不得编辑**该文件的效果不变(它不是文档)。

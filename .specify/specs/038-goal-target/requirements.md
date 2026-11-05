@@ -148,7 +148,7 @@ Goal (端态, authored)  1 ── N  Target (范围切片, run 可指定)  1 ─
 **术语与文档对齐**
 
 - **FR-017**: 词汇表 MUST 收录「Goal Target(目标切片)」词条,并与既有同词用法显式消歧:`optimization_target`/`co_targets`(迭代环优化对象)、territory 条目的 `target` 字段、evidence/interview 引擎的 `--target` 选项;存量用法 MUST NOT 被重命名。新 CLI 选项 MUST NOT 与既有 `--goal`(两支脚本占用,037 FR-021)冲突。
-- **FR-018**: 下游文档(canonical:`templates/commands/goal.md`、`templates/commands/team.md`、`skills/create-team/references/{goal.md,execution-guide.md,summary-mapping.md}`、`docs/reference/commands/`)MUST 按 FR-001 链接概念锚;全部变更 MUST 经 `sync-mirrors.py` 扇出,MUST NOT 手工双写镜像或 per-tool 副本。
+- **FR-018**: 下游文档(canonical:`templates/commands/goal.md`、`templates/commands/team.md`、`skills/internal/create-team/references/{goal.md,execution-guide.md,summary-mapping.md}`、`docs/reference/commands/`)MUST 按 FR-001 链接概念锚;全部变更 MUST 经 `sync-mirrors.py` 扇出,MUST NOT 手工双写镜像或 per-tool 副本。
 
 ### Key Entities *(include if requirement involves data)*
 

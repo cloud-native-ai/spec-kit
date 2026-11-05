@@ -33,8 +33,8 @@
 
 **Purpose**: Create target directory structures for all 3 formal skills
 
-- [X] T001 Create directory structure for skills/document-utils/ per data-model.md: scripts/{office,docx,pdf,pptx,xlsx}/, references/, themes/
-- [X] T002 [P] Create directory structure for skills/database-utils/ per data-model.md: scripts/, references/
+- [X] T001 Create directory structure for skills/external/document-utils/ per data-model.md: scripts/{office,docx,pdf,pptx,xlsx}/, references/, themes/
+- [X] T002 [P] Create directory structure for skills/external/database-utils/ per data-model.md: scripts/, references/
 - [X] T003 [P] Create directory structure for skills/browser-utils/ per data-model.md: scripts/{js,python}/, references/, examples/
 
 ---
@@ -47,24 +47,24 @@
 
 ### Supporting Files for US1
 
-- [X] T004 [US1] Copy shared scripts/office/ from draft/skills/docx-utils/scripts/office/ to skills/document-utils/scripts/office/ (ONE copy — identical across docx/pptx/xlsx)
-- [X] T005 [P] [US1] Copy docx-specific scripts from draft/skills/docx-utils/scripts/{accept_changes.py,comment.py,__init__.py,templates/} to skills/document-utils/scripts/docx/
-- [X] T006 [P] [US1] Copy pdf-specific scripts from draft/skills/pdf-utils/scripts/*.py to skills/document-utils/scripts/pdf/
-- [X] T007 [P] [US1] Copy pptx-specific scripts from draft/skills/pptx-utils/scripts/{add_slide.py,clean.py,__init__.py,thumbnail.py} to skills/document-utils/scripts/pptx/
-- [X] T008 [P] [US1] Copy xlsx-specific script from draft/skills/xlsx-utils/scripts/recalc.py to skills/document-utils/scripts/xlsx/recalc.py
-- [X] T009 [P] [US1] Copy reference docs: draft/skills/pdf-utils/{forms.md,reference.md} → skills/document-utils/references/{pdf-forms.md,pdf-reference.md}; draft/skills/pptx-utils/{editing.md,pptxgenjs.md} → skills/document-utils/references/{pptx-editing.md,pptx-creation.md}
-- [X] T010 [P] [US1] Copy themes: draft/skills/theme-creator/{themes/,theme-showcase.pdf} → skills/document-utils/themes/
-- [X] T011 [P] [US1] Copy LICENSE.txt from draft/skills/docx-utils/LICENSE.txt to skills/document-utils/LICENSE.txt
+- [X] T004 [US1] Copy shared scripts/office/ from draft/skills/docx-utils/scripts/office/ to skills/external/document-utils/scripts/office/ (ONE copy — identical across docx/pptx/xlsx)
+- [X] T005 [P] [US1] Copy docx-specific scripts from draft/skills/docx-utils/scripts/{accept_changes.py,comment.py,__init__.py,templates/} to skills/external/document-utils/scripts/docx/
+- [X] T006 [P] [US1] Copy pdf-specific scripts from draft/skills/pdf-utils/scripts/*.py to skills/external/document-utils/scripts/pdf/
+- [X] T007 [P] [US1] Copy pptx-specific scripts from draft/skills/pptx-utils/scripts/{add_slide.py,clean.py,__init__.py,thumbnail.py} to skills/external/document-utils/scripts/pptx/
+- [X] T008 [P] [US1] Copy xlsx-specific script from draft/skills/xlsx-utils/scripts/recalc.py to skills/external/document-utils/scripts/xlsx/recalc.py
+- [X] T009 [P] [US1] Copy reference docs: draft/skills/pdf-utils/{forms.md,reference.md} → skills/external/document-utils/references/{pdf-forms.md,pdf-reference.md}; draft/skills/pptx-utils/{editing.md,pptxgenjs.md} → skills/external/document-utils/references/{pptx-editing.md,pptx-creation.md}
+- [X] T010 [P] [US1] Copy themes: draft/skills/theme-creator/{themes/,theme-showcase.pdf} → skills/external/document-utils/themes/
+- [X] T011 [P] [US1] Copy LICENSE.txt from draft/skills/docx-utils/LICENSE.txt to skills/external/document-utils/LICENSE.txt
 
 ### SKILL.md Authoring for US1
 
-- [X] T012 [US1] Write skills/document-utils/SKILL.md: YAML frontmatter (name: document-utils, description with EN/CN trigger keywords covering Word/docx/PDF/PowerPoint/pptx/Excel/xlsx/spreadsheet/presentation/slides/deck/theme/文档/表格/幻灯片/演示文稿/主题, skill_id), Overview, Quick Reference table
-- [X] T013 [US1] Write DOCX section in skills/document-utils/SKILL.md: merge all content from draft/skills/docx-utils/SKILL.md (creation with docx-js, editing with XML unpack/edit/repack, reading, converting, tracked changes, comments, critical rules, dependencies). Update script paths to use ${SKILL_HOME}/scripts/office/ and ${SKILL_HOME}/scripts/docx/
-- [X] T014 [US1] Write PDF section in skills/document-utils/SKILL.md: merge all content from draft/skills/pdf-utils/SKILL.md (reading, text/table extraction, PDF creation with reportlab, merging/splitting, rotation, watermarks, OCR, password protection, form filling reference). Update script paths to use ${SKILL_HOME}/scripts/pdf/. Reference ${SKILL_HOME}/references/pdf-forms.md and ${SKILL_HOME}/references/pdf-reference.md
-- [X] T015 [US1] Write PPTX section in skills/document-utils/SKILL.md: merge all content from draft/skills/pptx-utils/SKILL.md (reading, editing workflow, creating from scratch, design ideas, color palettes, typography, QA process, converting to images, dependencies). Update script paths to use ${SKILL_HOME}/scripts/pptx/. Reference ${SKILL_HOME}/references/pptx-editing.md and ${SKILL_HOME}/references/pptx-creation.md
-- [X] T016 [US1] Write XLSX section in skills/document-utils/SKILL.md: merge all content from draft/skills/xlsx-utils/SKILL.md (output requirements, financial model standards, reading/analyzing, creating/editing, formula rules, recalculation, verification checklist). Update script paths to use ${SKILL_HOME}/scripts/xlsx/
-- [X] T017 [US1] Write Themes section in skills/document-utils/SKILL.md: merge all content from draft/skills/theme-creator/SKILL.md (10 pre-set themes, usage instructions, application process, custom theme creation). Reference ${SKILL_HOME}/themes/
-- [X] T018 [US1] Add Path Conventions, Resources, and Dependencies sections to skills/document-utils/SKILL.md per contracts/skill-format.md C-002
+- [X] T012 [US1] Write skills/external/document-utils/SKILL.md: YAML frontmatter (name: document-utils, description with EN/CN trigger keywords covering Word/docx/PDF/PowerPoint/pptx/Excel/xlsx/spreadsheet/presentation/slides/deck/theme/文档/表格/幻灯片/演示文稿/主题, skill_id), Overview, Quick Reference table
+- [X] T013 [US1] Write DOCX section in skills/external/document-utils/SKILL.md: merge all content from draft/skills/docx-utils/SKILL.md (creation with docx-js, editing with XML unpack/edit/repack, reading, converting, tracked changes, comments, critical rules, dependencies). Update script paths to use ${SKILL_HOME}/scripts/office/ and ${SKILL_HOME}/scripts/docx/
+- [X] T014 [US1] Write PDF section in skills/external/document-utils/SKILL.md: merge all content from draft/skills/pdf-utils/SKILL.md (reading, text/table extraction, PDF creation with reportlab, merging/splitting, rotation, watermarks, OCR, password protection, form filling reference). Update script paths to use ${SKILL_HOME}/scripts/pdf/. Reference ${SKILL_HOME}/references/pdf-forms.md and ${SKILL_HOME}/references/pdf-reference.md
+- [X] T015 [US1] Write PPTX section in skills/external/document-utils/SKILL.md: merge all content from draft/skills/pptx-utils/SKILL.md (reading, editing workflow, creating from scratch, design ideas, color palettes, typography, QA process, converting to images, dependencies). Update script paths to use ${SKILL_HOME}/scripts/pptx/. Reference ${SKILL_HOME}/references/pptx-editing.md and ${SKILL_HOME}/references/pptx-creation.md
+- [X] T016 [US1] Write XLSX section in skills/external/document-utils/SKILL.md: merge all content from draft/skills/xlsx-utils/SKILL.md (output requirements, financial model standards, reading/analyzing, creating/editing, formula rules, recalculation, verification checklist). Update script paths to use ${SKILL_HOME}/scripts/xlsx/
+- [X] T017 [US1] Write Themes section in skills/external/document-utils/SKILL.md: merge all content from draft/skills/theme-creator/SKILL.md (10 pre-set themes, usage instructions, application process, custom theme creation). Reference ${SKILL_HOME}/themes/
+- [X] T018 [US1] Add Path Conventions, Resources, and Dependencies sections to skills/external/document-utils/SKILL.md per contracts/skill-format.md C-002
 
 ### Verification for US1
 
@@ -82,21 +82,21 @@
 
 ### Supporting Files for US2
 
-- [X] T020 [P] [US2] Copy draft/skills/mysql-utils/scripts/query.py to skills/database-utils/scripts/query_mysql.py
-- [X] T021 [P] [US2] Copy draft/skills/postgres-utils/scripts/query.py to skills/database-utils/scripts/query_postgres.py
-- [X] T022 [US2] Create unified skills/database-utils/scripts/query.py: dispatcher that reads protocol from connection config (or infers from port), imports and delegates to query_mysql.py or query_postgres.py. Preserve the same CLI interface (--list, --tables, --schema, --query, --db, --limit)
-- [X] T023 [P] [US2] Create skills/database-utils/connections.example.json with protocol field: include MySQL example (protocol: "mysql", port: 3306), PostgreSQL example (protocol: "postgres", port: 5432), ClickHouse example (protocol: "postgres", port: 9005), Apache Doris example (protocol: "mysql", port: 9030)
-- [X] T024 [P] [US2] Create skills/database-utils/requirements.txt combining mysql-connector-python and psycopg2-binary
-- [X] T025 [P] [US2] Copy .gitignore from draft/skills/mysql-utils/.gitignore to skills/database-utils/.gitignore
-- [X] T026 [P] [US2] Create skills/database-utils/references/README.md merging setup and usage guides from draft/skills/mysql-utils/README.md and draft/skills/postgres-utils/README.md
-- [X] T027 [P] [US2] Create skills/database-utils/LICENSE.txt with Apache-2.0 license text (same as source skills)
+- [X] T020 [P] [US2] Copy draft/skills/mysql-utils/scripts/query.py to skills/external/database-utils/scripts/query_mysql.py
+- [X] T021 [P] [US2] Copy draft/skills/postgres-utils/scripts/query.py to skills/external/database-utils/scripts/query_postgres.py
+- [X] T022 [US2] Create unified skills/external/database-utils/scripts/query.py: dispatcher that reads protocol from connection config (or infers from port), imports and delegates to query_mysql.py or query_postgres.py. Preserve the same CLI interface (--list, --tables, --schema, --query, --db, --limit)
+- [X] T023 [P] [US2] Create skills/external/database-utils/connections.example.json with protocol field: include MySQL example (protocol: "mysql", port: 3306), PostgreSQL example (protocol: "postgres", port: 5432), ClickHouse example (protocol: "postgres", port: 9005), Apache Doris example (protocol: "mysql", port: 9030)
+- [X] T024 [P] [US2] Create skills/external/database-utils/requirements.txt combining mysql-connector-python and psycopg2-binary
+- [X] T025 [P] [US2] Copy .gitignore from draft/skills/mysql-utils/.gitignore to skills/external/database-utils/.gitignore
+- [X] T026 [P] [US2] Create skills/external/database-utils/references/README.md merging setup and usage guides from draft/skills/mysql-utils/README.md and draft/skills/postgres-utils/README.md
+- [X] T027 [P] [US2] Create skills/external/database-utils/LICENSE.txt with Apache-2.0 license text (same as source skills)
 
 ### SKILL.md Authoring for US2
 
-- [X] T028 [US2] Write skills/database-utils/SKILL.md: YAML frontmatter (name: database-utils, description with EN/CN trigger keywords covering MySQL/PostgreSQL/database/SQL/query/ClickHouse/Doris/SelectDB/数据库/查询, skill_id), Overview, Quick Reference table with supported databases
-- [X] T029 [US2] Write Setup, Usage, Database Selection, Supported Databases sections in skills/database-utils/SKILL.md: merge content from both source SKILL.md files. Add protocol field documentation. Include supported databases table (MySQL, PostgreSQL, ClickHouse, Doris/SelectDB with protocols and ports). Update script paths to use ${SKILL_HOME}/scripts/
-- [X] T030 [US2] Write Safety Features and Troubleshooting sections in skills/database-utils/SKILL.md: merge safety features from both sources (read-only sessions, query validation, single-statement enforcement, timeout, row limits, column width caps, credential sanitization). Combine troubleshooting tables
-- [X] T031 [US2] Add Path Conventions, Resources, and Dependencies sections to skills/database-utils/SKILL.md per contracts/skill-format.md C-002
+- [X] T028 [US2] Write skills/external/database-utils/SKILL.md: YAML frontmatter (name: database-utils, description with EN/CN trigger keywords covering MySQL/PostgreSQL/database/SQL/query/ClickHouse/Doris/SelectDB/数据库/查询, skill_id), Overview, Quick Reference table with supported databases
+- [X] T029 [US2] Write Setup, Usage, Database Selection, Supported Databases sections in skills/external/database-utils/SKILL.md: merge content from both source SKILL.md files. Add protocol field documentation. Include supported databases table (MySQL, PostgreSQL, ClickHouse, Doris/SelectDB with protocols and ports). Update script paths to use ${SKILL_HOME}/scripts/
+- [X] T030 [US2] Write Safety Features and Troubleshooting sections in skills/external/database-utils/SKILL.md: merge safety features from both sources (read-only sessions, query validation, single-statement enforcement, timeout, row limits, column width caps, credential sanitization). Combine troubleshooting tables
+- [X] T031 [US2] Add Path Conventions, Resources, and Dependencies sections to skills/external/database-utils/SKILL.md per contracts/skill-format.md C-002
 
 ### Verification for US2
 
@@ -152,8 +152,8 @@
 
 **Purpose**: Mirror skills, update feature tracking, final validation
 
-- [X] T045 [P] Mirror skills/document-utils/ to .specify/skills/document-utils/ (full directory copy)
-- [X] T046 [P] Mirror skills/database-utils/ to .specify/skills/database-utils/ (full directory copy)
+- [X] T045 [P] Mirror skills/external/document-utils/ to .specify/skills/document-utils/ (full directory copy)
+- [X] T046 [P] Mirror skills/external/database-utils/ to .specify/skills/database-utils/ (full directory copy)
 - [X] T047 [P] Mirror skills/browser-utils/ to .specify/skills/browser-utils/ (full directory copy)
 - [X] T048 Verify byte-equivalence between skills/<name>/ and .specify/skills/<name>/ for all 3 skills (C-006)
 - [X] T049 Update .specify/memory/features/013.md: add key change note for 017-consolidate-draft-skills iteration

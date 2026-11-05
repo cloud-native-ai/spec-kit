@@ -11,12 +11,12 @@ Frozen 2026-10-08 at tasks generation (never-cache: re-capture at /speckit.imple
 
 ## STR-001 retired literal (grep, source + tool copies)
 
-- Command: `grep -rn "Tool-specific directories are symlinks" templates/commands/agents.md skills/create-agent/SKILL.md .qoder/commands/speckit.agents.md`
-- Real hits (2026-10-08): `templates/commands/agents.md:25` and `.qoder/commands/speckit.agents.md:19` (both carry the sentence verbatim); zero hits in skills/create-agent/SKILL.md — the SKILL carries a DIFFERENT retired wording (two distinct literal classes; the teaching-and-guards C-4 guard pins both).
+- Command: `grep -rn "Tool-specific directories are symlinks" templates/commands/agents.md skills/internal/create-agent/SKILL.md .qoder/commands/speckit.agents.md`
+- Real hits (2026-10-08): `templates/commands/agents.md:25` and `.qoder/commands/speckit.agents.md:19` (both carry the sentence verbatim); zero hits in skills/internal/create-agent/SKILL.md — the SKILL carries a DIFFERENT retired wording (two distinct literal classes; the teaching-and-guards C-4 guard pins both).
 
 ## SKILL.md retired phrases (verbatim, sed)
 
-- Command: `sed -n '122p;127p' skills/create-agent/SKILL.md`
+- Command: `sed -n '122p;127p' skills/internal/create-agent/SKILL.md`
 - :122 table row: `| **persistent** | … | Per-file symlinked into every officially supported tool's agent config directory on initialization (FR-010/012) |`
 - :127 paragraph head: `On initialization the CLI (re)creates a **per-file** symlink for each *.agent.md* under .specify/agents/{templates,instances}/ inside every officially supported tool's agent config dir — e.g. .qoder/agents/<slug>.agent.md → ../../.specify/agents/templates/<slug>.agent.md …`
 

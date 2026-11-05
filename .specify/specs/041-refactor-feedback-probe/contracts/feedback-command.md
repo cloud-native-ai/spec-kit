@@ -6,7 +6,7 @@
 
 - C-1.1 canonical 模板:`templates/commands/feedback.md`,含 AUTO-GENERATED 兼容头之外的常规命令结构;归类为**复杂命令**(调用引擎脚本)。
 - C-1.2 模板 MUST 含 `## Feedback` 步(canonical 块,`--unit-id /speckit.feedback`)与 `## Documentation` 步(docs-step 注入,沿 037 先例)。
-- C-1.3 镜像:`.specify/templates/commands/feedback.md` + 仓库现存工具副本面(实测 4:`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;副本清单以 `regen-command-copies.py` 的现存目录探测为准动态派生),经 `sync-mirrors.py --write` 一次落齐,`--check` exit 0;codex/hermes 副本不在本仓生成,由 `specify init` 在下游项目分发。
+- C-1.3 镜像:`templates/commands/feedback.md` + 仓库现存工具副本面(实测 4:`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;副本清单以 `regen-command-copies.py` 的现存目录探测为准动态派生),经 `sync-mirrors.py --write` 一次落齐,`--check` exit 0;codex/hermes 副本不在本仓生成,由 `specify init` 在下游项目分发。
 - C-1.4 `docs/reference/skills/feedback.md` 的命令分类表 MUST 同步:复杂命令清单 +1(feedback),总数 18→19(以实施时实测为准)。
 
 ## C-2 模式一(无参数缺省):probe 总览

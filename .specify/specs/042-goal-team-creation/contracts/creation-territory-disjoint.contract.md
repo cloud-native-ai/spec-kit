@@ -1,13 +1,13 @@
 # Contract: 创建期 territory 两两不相交校验(territory 面)
 
 **Spec**: [requirements.md](../requirements.md) FR-012, FR-013  
-**Surface**: `skills/create-team/scripts/verify-territory-disjoint.py`(新,薄 I/O 包装)× `skills/create-team/references/create-mode.md`  
+**Surface**: `skills/internal/create-team/scripts/verify-territory-disjoint.py`(新,薄 I/O 包装)× `skills/internal/create-team/references/create-mode.md`  
 **Authority**: 重叠判定文法 = `build-summary-input.py` 的 `expand_scopes` / `scopes_overlap` / `overlap_verdict` / `detect_overlaps`(036/037 落地)——**import 复用,零第二文法**
 
 ## C-1 CLI 契约
 
 ```
-python3 skills/create-team/scripts/verify-territory-disjoint.py \
+python3 skills/internal/create-team/scripts/verify-territory-disjoint.py \
   --input <proposals.json> [--repo-root <root>] [--json]
 ```
 

@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 1
 
-- [X] T011 [P] [US1] [blockedBy: T009] 在 `skills/create-skills/references/skill-creation-quality-checklist.md` 增 Token 效率检查组(确定性步骤交程序?数据访问摘要化?引用 `shared/guidelines/token-efficiency.md`)
-- [X] T012 [P] [US1] [blockedBy: T009] 在 `skills/improve-skills/references/skill-quality-checklist.md` 增对偶检查组(同 T011 形式)
-- [X] T013 [P] [US1] [blockedBy: T009] 在 `skills/create-agent/SKILL.md`、`skills/create-team/SKILL.md`、`skills/create-tools/SKILL.md` 各自验证/校验步骤加一行 token-efficiency 检查项引用
-- [X] T014 [US1] [blockedBy: T011,T012,T013] skills 镜像双写与核验:同步五文件至 `.specify/skills/` 对应路径,`diff -rq skills/create-skills .specify/skills/create-skills`(等五组)全部干净
+- [X] T011 [P] [US1] [blockedBy: T009] 在 `skills/external/create-skills/references/skill-creation-quality-checklist.md` 增 Token 效率检查组(确定性步骤交程序?数据访问摘要化?引用 `shared/guidelines/token-efficiency.md`)
+- [X] T012 [P] [US1] [blockedBy: T009] 在 `skills/external/improve-skills/references/skill-quality-checklist.md` 增对偶检查组(同 T011 形式)
+- [X] T013 [P] [US1] [blockedBy: T009] 在 `skills/internal/create-agent/SKILL.md`、`skills/internal/create-team/SKILL.md`、`skills/internal/create-tools/SKILL.md` 各自验证/校验步骤加一行 token-efficiency 检查项引用
+- [X] T014 [US1] [blockedBy: T011,T012,T013] skills 镜像双写与核验:同步五文件至 `.specify/skills/` 对应路径,`diff -rq skills/external/create-skills .specify/skills/create-skills`(等五组)全部干净
 - [X] T015 [US1] [blockedBy: T010] 整改 program-first 类 top-5 行(canonical 命令模板→`python3 scripts/python/sync-mirrors.py --write` 扇出 per-tool 副本);在 audit.md 对应行记录前后注入量实测对比并置 `remediated`
 - [X] T016 [US1] [blockedBy: T014,T015] 运行 `pytest tests/contract/test_token_efficiency_gates.py tests/contract/test_token_efficiency_remediation_program_first.py -q` 确认 GREEN
 

@@ -32,7 +32,7 @@ python3 - <<'EOF'  # direct dual-width extraction over the fixture corpus
   `python3 scripts/python/account-clause-coverage.py --spec <spec-dir>` read-only;
   `templates/commands/analyze.md` Inputs bullet declares the fixed coverage step
   (never `--freeze`); per-tool copies carry it (2/2 spot-checked).
-  Path note: the quickstart's `.specify/templates/commands/analyze.md` path is the
+  Path note: the quickstart's `templates/commands/analyze.md` path is the
   retired mirror location — post-056 the mirror pair excludes `templates/commands`
   (per `sync-mirrors.py` MIRROR_PAIRS note; per-tool copies come straight from
   `templates/commands/` via regen). The duty is verified on the live path.

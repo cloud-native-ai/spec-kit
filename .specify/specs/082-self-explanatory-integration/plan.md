@@ -178,7 +178,7 @@ Two mirror facts that the implementation MUST NOT re-discover the hard way:
    three owner documents or to `shared/` leaves the mirror stale. If a future edit does reintroduce a
    `MISS`/`DIFF` line, the order is `--write` (or `--only shared`) then `--check`.
 2. **`templates/commands/` is a retired mirror.** Editing a command template fans out only to the
-   per-tool copies produced by `regen-command-copies.py`; there is no `.specify/templates/commands/`
+   per-tool copies produced by `regen-command-copies.py`; there is no `templates/commands/`
    copy to update. This feature does not edit command templates at all, which is why the only regen
    assertion here is the unchanged-surface `--check`.
 

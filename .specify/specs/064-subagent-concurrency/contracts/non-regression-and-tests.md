@@ -9,7 +9,7 @@
 - **NG-01（no-push）**: 任何流程 MUST NOT 自动 push；远程写操作仍受显式授权门控；模拟运行中 push 动作数 MUST 为 0（FR-060, SC-007）。
 - **NG-02（不删未提交工作）**: 任何清理（worktree、运行时、证据）MUST NOT 删除未提交工作；清理只在合并成功或用户显式动作后执行（FR-061, FR-032）。
 - **NG-03（迁移无静默丢失）**: 指令/技能/文档迁移（含 063 → 064 的档案收编）MUST 可审计地保留原文，或提供可追溯的等价引用；MUST NOT 静默丢弃内容（FR-062, CLP-17）。
-- **NG-04（哨兵/判定/退出码不变）**: 除归属信封增量外，阶段哨兵字面量、watcher 判定状态机与退出码 MUST 保持不变；退出码仍由 `scripts/watch-target.sh` 代码侧 owner 决定（FR-063, EN-03/EN-06）。
+- **NG-04（哨兵/判定/退出码不变）**: 除归属信封增量外，阶段哨兵字面量、watcher 判定状态机与退出码 MUST 保持不变；退出码仍由 `skills/external/sdd-loop-driver/scripts/watch-target.sh` 代码侧 owner 决定（FR-063, EN-03/EN-06）。
 - **NG-05（无新增运行时依赖）**: MUST NOT 引入常驻服务/daemon、外部服务、模型 API 或新运行时依赖；新脚本 MUST 为 Python 3 stdlib-only 或 bash，复用既有 feedback/probe/mirror 引擎（FR-064, 宪法 IX）。
 - **NG-06（确认门与独立校验）**: 既有确认门、独立校验、阶段 deadline、测试预算与阶段命令内部流程 MUST 保持不变（FR-066, FR-041）。
 - **NG-07（单线兼容）**: 单线运行 MUST 保持 U0–U6、阶段链、哨兵校验与卡死处置行为；新增 Registry/信封为统一增量（FR-068, LR-13）。受控例外：注册/注销失败时显式上送并停止该线（LR-02/LR-11），不视为行为回归。

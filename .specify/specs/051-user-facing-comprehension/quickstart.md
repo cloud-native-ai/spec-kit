@@ -272,7 +272,7 @@ git ls-files docs/public | wc -l
 
 **改前基线(2026-09-18 实测,四值依次为)**: **2 / 1 / 1 / 0**。
 
-**期望(改后)**: 前三条 MUST **下降**(手写复述收敛为指针形态),并记入 `verification.md`;第四条保持 **0** —— `docs/public/**` 是 Hugo 构建产物、未被 git 跟踪(经 `docs/.gitignore` 忽略;证据 `skills/create-pages/references/hugo-site.md:22` "Never committed, never documentation"),故 MUST NOT 手工编辑,修好手写源后由既有 create-pages 流程重建。
+**期望(改后)**: 前三条 MUST **下降**(手写复述收敛为指针形态),并记入 `verification.md`;第四条保持 **0** —— `docs/public/**` 是 Hugo 构建产物、未被 git 跟踪(经 `docs/.gitignore` 忽略;证据 `skills/external/create-pages/references/hugo-site.md:22` "Never committed, never documentation"),故 MUST NOT 手工编辑,修好手写源后由既有 create-pages 流程重建。
 
 **第 2 条的探针形态经实测订正(A-03)**:原写作 `grep -c 'never the raw engine path'`,而该字面量在目标文件中**跨行断开**——`docs/reference/skills/feedback.md:141` 行尾为 `…command (never the raw`、`:142` 行首为 `engine path); under the hood…`——故单行 `grep` 对它**恒为 0**,改前改后同为 0,"计数下降"永不可满足,是一个**可证明的盲探针**(与 T056 曾有的 `--stat` 盲命令同一缺陷类)。已改用完整落在 `:141` 单行内的片段 `never the raw`(实测 1);跨行形态若确需匹配,用 `python3 -c` 配 `never\s+the\s+raw\s+engine\s+path`(实测 1)而非 `grep`。**改前基线 MUST 写成具体数字**:原文"具体值由实现期测定"使执行者手里没有"改前"值,于是一个 0 会被读成"已经收敛了"而记为通过——盲探针之所以危险,正因为它与"成功收敛到 0"不可区分。
 

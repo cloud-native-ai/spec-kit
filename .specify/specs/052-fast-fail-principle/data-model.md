@@ -264,8 +264,8 @@
 | 通道 | 谁撰写提示 | 常驻层可达? | 落点 | 可被测试观测? |
 |---|---|---|---|---|
 | 一 · 内联提示 | 编排者当场撰写 | **是** | 义务经常驻章节 [[STR-003]] 抵达编排者;真源文档规定子句在该提示中的落点与形态 | **否**——提示不落盘,由评审强制;MUST NOT 声称三通道均由守卫覆盖 |
-| 二 · Agent 定义制品 | 制品自带 | **否** | 制作者要求:`templates/commands/agents.md` Run Mode + `skills/create-agent/SKILL.md` 创作契约 + 2 份出厂预设 | 是——断言对象为**有界集合** |
-| 三 · 团队 Per-Agent Payload | 载荷模式 | **否** | `skills/create-team/references/patterns.md` 的 Per-Agent Payload 表**新增第六字段行** `fast_fail_clause`(D-3) | 是——断言该行存在且其内容规则指向拥有者字面量 |
+| 二 · Agent 定义制品 | 制品自带 | **否** | 制作者要求:`templates/commands/agents.md` Run Mode + `skills/internal/create-agent/SKILL.md` 创作契约 + 2 份出厂预设 | 是——断言对象为**有界集合** |
+| 三 · 团队 Per-Agent Payload | 载荷模式 | **否** | `skills/internal/create-team/references/patterns.md` 的 Per-Agent Payload 表**新增第六字段行** `fast_fail_clause`(D-3) | 是——断言该行存在且其内容规则指向拥有者字面量 |
 
 **关系**: 通道二 MUST NOT 通过新增"所有 agent 继承的共享前导文件"实现(Agent 定义制品按既有定义为自包含、其存储下无共享资产目录)。
 

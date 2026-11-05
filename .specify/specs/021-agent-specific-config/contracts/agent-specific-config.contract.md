@@ -31,9 +31,9 @@ Each targeted skill MUST contain a section with the exact heading `## Agent-Spec
 
 **Targets**:
 - `skills/browser-utils/SKILL.md`
-- `skills/create-agent/SKILL.md`
-- `skills/improve-agent/SKILL.md`
-- `skills/improve-skills/SKILL.md`
+- `skills/internal/create-agent/SKILL.md`
+- `skills/internal/improve-agent/SKILL.md`
+- `skills/external/improve-skills/SKILL.md`
 
 **Validation**:
 - MUST contain the heading `## Agent-Specific Configuration`

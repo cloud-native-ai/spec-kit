@@ -28,7 +28,7 @@ Feature 013 ("Skills Command") owns the lifecycle of project-level Skills — cr
 - `007-skill-install-layout` — canonical `.specify/skills/` location with compatibility symlinks.
 - `008-create-skills-skill` — extraction of the creation playbook into a dedicated `create-skills` Skill.
 
-This iteration (`012-skill-home-workdir`) is the next refinement: defining the **path conventions** Skill authors and Skill-invoked scripts use to reference resources. It directly extends Feature 013's authoring-guidance surface (`templates/commands/skills.md`, `skills/create-skills/SKILL.md`, `skills/improve-skills/SKILL.md`) without introducing a new feature concept.
+This iteration (`012-skill-home-workdir`) is the next refinement: defining the **path conventions** Skill authors and Skill-invoked scripts use to reference resources. It directly extends Feature 013's authoring-guidance surface (`templates/commands/skills.md`, `skills/external/create-skills/SKILL.md`, `skills/external/improve-skills/SKILL.md`) without introducing a new feature concept.
 
 ## Deltas to record in `features/013.md`
 

@@ -22,11 +22,11 @@
 
 | 文件 | 形式 |
 |------|------|
-| `skills/create-skills/references/skill-creation-quality-checklist.md` | 检查组:确定性步骤交程序 / 数据访问摘要化 |
-| `skills/improve-skills/references/skill-quality-checklist.md` | 同上(改进侧) |
-| `skills/create-agent/SKILL.md` | 验证步骤一行检查项 |
-| `skills/create-team/SKILL.md` | 交付校验一行检查项 |
-| `skills/create-tools/SKILL.md` | 定义校验一行检查项 |
+| `skills/external/create-skills/references/skill-creation-quality-checklist.md` | 检查组:确定性步骤交程序 / 数据访问摘要化 |
+| `skills/external/improve-skills/references/skill-quality-checklist.md` | 同上(改进侧) |
+| `skills/internal/create-agent/SKILL.md` | 验证步骤一行检查项 |
+| `skills/internal/create-team/SKILL.md` | 交付校验一行检查项 |
+| `skills/internal/create-tools/SKILL.md` | 定义校验一行检查项 |
 
 - 各文件镜像(`.specify/skills/...`)MUST 同步一致(`diff -rq`)。
 - `templates/skills-template.md` MUST NOT 因本需求新增检查单节(检查项归创作流程,防产物模板膨胀)。

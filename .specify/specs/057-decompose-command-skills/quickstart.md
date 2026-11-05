@@ -41,7 +41,7 @@ run-skills my-draft
 
 | 命令 | 已执行结果(2026-10-14) |
 |------|------------------------|
-| `python3 scripts/python/sync-mirrors.py --check` | EXIT=2,恰 1 条既有 DIFF(`.specify/skills/git-workspace/scripts/git_fleet.py`) |
+| `python3 scripts/python/sync-mirrors.py --check` | EXIT=2,恰 1 条既有 DIFF(`skills/external/git-utils/scripts/git_fleet.py`) |
 | `python3 scripts/python/regen-command-copies.py --check` | OK:全部 per-tool 副本与源一致 |
 | `python3 .specify/scripts/python/scan-confirmation-gates.py` | total 23(16 destructive + 7 governance_kept),violations 0 |
 | `python3 scripts/python/probe-utils.py --action compile-embeds --check` | 69 单元零漂移 |

@@ -20,12 +20,12 @@ baseline_specify_templates_agent_star_count=16
 baseline_installed_create_agent_templates_dir=absent
 
 # -- T002 canonical vs installed location finding --
-# Canonical/source of truth: skills/create-agent/templates/ (16 files present).
-# Installed mirror: .specify/skills/create-agent/ exists (SKILL.md + references/)
+# Canonical/source of truth: skills/internal/create-agent/templates/ (16 files present).
+# Installed mirror: .specify/skills/internal/create-agent/ exists (SKILL.md + references/)
 #   but its templates/ subdir is ABSENT — must be created in T032.
 # Legacy stale duplicates present in .specify/templates/agent-* (16 files) — removed in T031.
 # organize-agents skill has NO installed mirror under .specify/skills/ — created in T032.
-t002_canonical_location=skills/create-agent/templates/
+t002_canonical_location=skills/internal/create-agent/templates/
 t002_installed_mirror_templates_subdir=absent
 t002_organize_agents_mirror=absent
 
@@ -35,7 +35,7 @@ implementation_date=2026-07-10
 post_change_commit=uncommitted (working tree on branch 023-agent-framework-redesign; commit deferred to explicit user approval per /speckit.implement Optional Git Commit)
 
 post_change_live_subrole_improver_files=8
-post_change_live_subrole_improver_note=all 8 are legitimate: migration-explanation notes (docs/agents/design.md, docs/agents/eei-triad-pattern.md, skills/create-agent/SKILL.md + installed mirror) + test detection regex/assertion text (2 guard tests, test_persistent_agent_lifecycle.py, role-stage-type-conformance-scenario.md). Deprecated-term guard PASSES (0 live USES). Down from baseline 26.
+post_change_live_subrole_improver_note=all 8 are legitimate: migration-explanation notes (docs/reference/agents/design.md, docs/agents/eei-triad-pattern.md, skills/internal/create-agent/SKILL.md + installed mirror) + test detection regex/assertion text (2 guard tests, test_persistent_agent_lifecycle.py, role-stage-type-conformance-scenario.md). Deprecated-term guard PASSES (0 live USES). Down from baseline 26.
 post_change_agent_subrole_metacoordinator_ref_files=8
 post_change_agent_subrole_metacoordinator_ref_note=migration-marked references + test detection patterns only; reference-integrity guard PASSES (0 dangling paths). Down from baseline 17.
 post_change_meta_coordinator_role_live_files=0
@@ -53,11 +53,11 @@ SC-002_value=deprecated-term guard (tests/unit/test_agent_deprecated_terms.py) P
 SC-002_note=0 live subrole/improver matches (T041 final sweep).
 
 SC-003_status=pass
-SC-003_value=all agent-* templates canonical under skills/create-agent/templates/ (15 files after merge); 0 in top-level templates/; 0 in .specify/templates/. Installed mirror .specify/skills/create-agent/templates/ = 15 files (source==mirror).
+SC-003_value=all agent-* templates canonical under skills/internal/create-agent/templates/ (15 files after merge); 0 in top-level templates/; 0 in .specify/templates/. Installed mirror .specify/skills/internal/create-agent/templates/ = 15 files (source==mirror).
 SC-003_note=All agent-* templates canonical under create-agent skill; 0 stale (T031).
 
 SC-004_status=pass
-SC-004_value=reference-integrity guard (tests/unit/test_agent_reference_integrity.py) PASSES: 0 dangling refs to agent-subrole-*/meta-coordinator/legacy team-supervisor paths; every referenced agent-*-template.md resolves under skills/create-agent/templates/. No new regressions vs baseline (see test_suite_evidence).
+SC-004_value=reference-integrity guard (tests/unit/test_agent_reference_integrity.py) PASSES: 0 dangling refs to agent-subrole-*/meta-coordinator/legacy team-supervisor paths; every referenced agent-*-template.md resolves under skills/internal/create-agent/templates/. No new regressions vs baseline (see test_suite_evidence).
 SC-004_note=0 broken template/stage references; reference-integrity guard green (T037).
 
 SC-005_status=pass
@@ -69,7 +69,7 @@ SC-006_value=Command Intent Routing table maps parallel/serial/team-loop + execu
 SC-006_note=parallel/serial/team-loop reachable via /speckit.agents (T025 routing PASS by inspection).
 
 SC-007_status=pass
-SC-007_value=docs/agents/{design.md,eei-triad-pattern.md,multi-agent-orchestration.md} + docs/commands/agents.md aligned to Role/Stage/Type + Team/Loop model and merged Team Supervisor; only migration-context mentions of deprecated terms remain (T033-T035). No contradiction with design.md on inspection.
+SC-007_value=docs/agents/{design.md,eei-triad-pattern.md,multi-agent-orchestration.md} + docs/reference/commands/agents.md aligned to Role/Stage/Type + Team/Loop model and merged Team Supervisor; only migration-context mentions of deprecated terms remain (T033-T035). No contradiction with design.md on inspection.
 SC-007_note=docs/agents coherent with design.md (T033-T035).
 
 SC-008_status=pass

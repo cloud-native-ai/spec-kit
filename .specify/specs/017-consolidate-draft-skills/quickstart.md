@@ -12,7 +12,7 @@
 
 ### Step 1: Create document-utils
 
-1. Create `skills/document-utils/` directory structure per data-model.md.
+1. Create `skills/external/document-utils/` directory structure per data-model.md.
 2. Write `SKILL.md` with YAML frontmatter (name, description with EN/CN triggers, skill_id) and format-specific sections (DOCX, PDF, PPTX, XLSX, Themes).
 3. Copy shared `scripts/office/` from `draft/skills/docx-utils/scripts/office/` (one copy — identical across docx/pptx/xlsx).
 4. Copy format-specific scripts:
@@ -29,11 +29,11 @@
 
 ### Step 2: Create database-utils
 
-1. Create `skills/database-utils/` directory structure per data-model.md.
+1. Create `skills/external/database-utils/` directory structure per data-model.md.
 2. Write `SKILL.md` with unified MySQL + PostgreSQL sections.
-3. Copy `draft/skills/mysql-utils/scripts/query.py` → `scripts/query_mysql.py`.
-4. Copy `draft/skills/postgres-utils/scripts/query.py` → `scripts/query_postgres.py`.
-5. Create unified `scripts/query.py` that dispatches to the protocol-specific script.
+3. Copy `draft/skills/mysql-utils/scripts/query.py` → `skills/external/database-utils/scripts/query_mysql.py`.
+4. Copy `draft/skills/postgres-utils/scripts/query.py` → `skills/external/database-utils/scripts/query_postgres.py`.
+5. Create unified `skills/external/database-utils/scripts/query.py` that dispatches to the protocol-specific script.
 6. Create unified `connections.example.json` with `protocol` field.
 7. Merge `requirements.txt` (mysql-connector-python + psycopg2-binary).
 8. Copy `.gitignore` from either source skill.

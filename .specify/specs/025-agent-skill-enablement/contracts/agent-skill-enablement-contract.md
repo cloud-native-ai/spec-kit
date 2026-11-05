@@ -44,12 +44,12 @@ The section MUST contain, in order:
    whose skill set is identical to the `skills` frontmatter list.
 
 The shared protocol text MUST have a single source of truth at
-`skills/create-agent/templates/agent-skill-enablement.md` and MUST be composed into agents
+`skills/internal/create-agent/templates/agent-skill-enablement.md` and MUST be composed into agents
 rather than independently reworded.
 
 ## C-3 — Generator template parity
 
-For each preset role, `skills/create-agent/templates/agent-role-<role>-template.md` MUST be
+For each preset role, `skills/internal/create-agent/templates/agent-role-<role>-template.md` MUST be
 updated to include the same `skills` frontmatter field and `## Skill Enablement` section as
 its shipped counterpart, so that a regenerated agent is byte-consistent in structure with the
 shipped agent (no regression per FR-011).

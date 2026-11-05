@@ -6,7 +6,7 @@ Normative rules for the rename/merge/terminology migration. Keywords per RFC 211
 
 ## M1. Canonical Template Location
 
-`skills/create-agent/templates/` MUST be the single source of truth for agent templates; `.specify/skills/create-agent/templates/` is its installed mirror. Legacy `.specify/templates/agent-*` duplicates MUST be removed. No agent template MUST remain in the top-level `templates/` directory (FR-013, SC-003).
+`skills/internal/create-agent/templates/` MUST be the single source of truth for agent templates; `.specify/skills/internal/create-agent/templates/` is its installed mirror. Legacy `.specify/templates/agent-*` duplicates MUST be removed. No agent template MUST remain in the top-level `templates/` directory (FR-013, SC-003).
 
 ## M2. Stage Renames
 

@@ -84,7 +84,7 @@ No standalone research.md — findings inlined above.
 ```text
 scripts/python/feedback-utils.py        # 框架源:引擎扩展(新动作 + dispose/package 扩展)
 .specify/scripts/python/feedback-utils.py  # 引擎镜像(经 sync-mirrors 收敛,不手改)
-templates/commands/feedback.md          # 框架源:新增 introspect 模式章节(.specify/templates/commands 镜像已退役,见 sync-mirrors.py exclude_parts)
+templates/commands/feedback.md          # 框架源:新增 introspect 模式章节(templates/commands 镜像已退役,见 sync-mirrors.py exclude_parts)
 .claude/commands/speckit.feedback.md    # 生成副本(regen-command-copies.py)
 .qoder/commands/speckit.feedback.md     # 生成副本
 .opencode/command/speckit.feedback.md   # 生成副本
@@ -102,7 +102,7 @@ docs/reference/skills/feedback.md       # 系统文档:Layout/Engine/流程章�
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py` | `sync-mirrors.py --check` exit 0 + `diff -q` |
-| `templates/commands/feedback.md` | `.claude/commands/speckit.feedback.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`(生成副本;`.specify/templates/commands/` 镜像已退役) | 经 `regen-command-copies.py` 重生成后 4 份副本均含新模式章节(grep 断言) |
+| `templates/commands/feedback.md` | `.claude/commands/speckit.feedback.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`(生成副本;`templates/commands/` 镜像已退役) | 经 `regen-command-copies.py` 重生成后 4 份副本均含新模式章节(grep 断言) |
 
 ## Complexity Tracking
 

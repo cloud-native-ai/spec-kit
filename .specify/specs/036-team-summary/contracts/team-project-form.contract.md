@@ -1,7 +1,7 @@
 # Contract: Team Project Form Generator
 
 **Requirement → Feature**: `036-team-summary` → Feature 027 Team Management
-**Artifact**: `skills/create-team/scripts/build-summary-input.py` → `<delivery_dir>/data/project-input.yaml` ([[STR-004]])
+**Artifact**: `skills/internal/create-team/scripts/build-summary-input.py` → `<delivery_dir>/data/project-input.yaml` ([[STR-004]])
 **Covers**: FR-001…FR-011, FR-023, FR-025, FR-027, FR-029
 **Pinned by**: `tests/contract/test_summary_form_generator.py`, `tests/integration/test_summary_four_patterns.py`
 
@@ -15,7 +15,7 @@ build-summary-input.py (--goal <goal-slug> | --team <team-slug>) [--out <path>] 
 |--------|----------|-----------|
 | `--goal <goal-slug>` | one of | Aggregate every team that declares this `goal_slug` ([[STR-006]]) |
 | `--team <team-slug>` | one of | Convenience: resolve that team's goal identity, then aggregate that goal's full team set — a team never summarizes in isolation |
-| `--out <path>` | no | Form destination; defaults to `<delivery_dir>/data/project-input.yaml` where `delivery_dir` is `.specify/project/goal/<goal-slug>/` |
+| `--out <path>` | no | Form destination; defaults to `<delivery_dir>/data/project-input.yaml` where `delivery_dir` is `.specify/goal/<goal-slug>/` |
 | `--baseline <iso8601>` | no | Baseline date; defaults to the latest ledger event `ts` across the aggregated teams |
 | `--json` | no | Emit a machine-readable generation report on stdout, including the resolved goal identity, whether it is explicit or inferred, and the contributing team list |
 

@@ -50,7 +50,7 @@ SKILL_WORKDIR="${SKILL_WORKDIR:-$(pwd -P)}"
 **Decision**: No automatic edits to `CLAUDE.md` or `.specify/instructions.md` in this iteration. The contract test will include a grep assertion that no `SKILL_ROOT` reference remains in those two files; if the assertion fails, the task is to remove the stray reference at that point.
 
 **Why**:
-- FR-015 requires consistency, not unconditional edits. A grep of the current tree shows `SKILL_ROOT` only in `skills/create-skills/SKILL.md` and its `.specify/skills/create-skills/SKILL.md` mirror — both already in the edit scope.
+- FR-015 requires consistency, not unconditional edits. A grep of the current tree shows `SKILL_ROOT` only in `skills/external/create-skills/SKILL.md` and its `.specify/skills/create-skills/SKILL.md` mirror — both already in the edit scope.
 - The Skills registry rows in `.specify/instructions.md` reference *canonical paths* (e.g., `.specify/skills/create-skills/SKILL.md`), not the variable name. No drift expected.
 - Adding speculative edits to top-level instruction files would violate YAGNI (Principle VI).
 

@@ -1,7 +1,7 @@
 # Contract: `loop-state.py` CLI 与进程契约
 
 **Scope**: Feature 065 / Slice 065a。定义入口、参数解析、退出码、只读边界与 `--probe`/`--self-test` 的进程级行为。
-**Owner note**: watcher 的判定状态机、信号优先级与退出码归 `scripts/watch-target.sh`；本契约只规定聚合器如何**消费**它们，不复制其规则。derived `loop_state` 映射表的唯一 owner 是切片 `requirements.md` FR-004（parent #FR-004）；本契约只引用，不拥有该表。
+**Owner note**: watcher 的判定状态机、信号优先级与退出码归 `skills/external/sdd-loop-driver/scripts/watch-target.sh`；本契约只规定聚合器如何**消费**它们，不复制其规则。derived `loop_state` 映射表的唯一 owner 是切片 `requirements.md` FR-004（parent #FR-004）；本契约只引用，不拥有该表。
 
 ## 0. 条款编号与别名
 

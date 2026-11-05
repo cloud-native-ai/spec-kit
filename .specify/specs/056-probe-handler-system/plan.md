@@ -91,9 +91,9 @@ docs/reference/skills/                    # 引擎/机制参考更新（FR-022�
 | `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md`（shared↔.specify/shared 对） | `python3 scripts/python/sync-mirrors.py --check` — 改前基线已实测 exit 0（2026-10-13，见 Phase 0 基线记录）；判据 = 无 NEW drift（仅本 spec 所触文件出现新差异）+ 副本含编辑 |
 | `scripts/python/probe-utils.py`（NEW） | `.specify/scripts/python/probe-utils.py`（scripts 严格对，双向新建） | 同上：sync-mirrors --check 无 NEW drift；副本文件存在且 byte-identical |
 | `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py` | 同上：sync-mirrors --check 无 NEW drift |
-| `templates/commands/*.md`（23 个编译单元） | `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/` —— regen-command-copies.py 扇出；NO `.specify/templates/commands/` 镜像（已退役） | `python3 scripts/python/regen-command-copies.py --check` — 改前基线实测 exit 0；判据 = 无 NEW drift + 再生成副本含 `## Wrap-up` 编辑 |
+| `templates/commands/*.md`（23 个编译单元） | `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/` —— regen-command-copies.py 扇出；NO `templates/commands/` 镜像（已退役） | `python3 scripts/python/regen-command-copies.py --check` — 改前基线实测 exit 0；判据 = 无 NEW drift + 再生成副本含 `## Wrap-up` 编辑 |
 | `skills/internal/*/SKILL.md`（35 单元） | `.specify/skills/internal/*`（internal 对，133 文件面） | sync-mirrors --check 无 NEW drift |
-| `skills/external/*/SKILL.md`（11 单元） | `.specify/skills/external/*`（external 对，363 文件面） | sync-mirrors --check 无 NEW drift |
+| `skills/external/*/SKILL.md`（11 单元） | `.specify/skills/*`（external 对，363 文件面） | sync-mirrors --check 无 NEW drift |
 | `shared/workflow/feedback-step.md`、`shared/workflow/docs-step.md` | `.specify/shared/workflow/` 对应副本 | sync-mirrors --check 无 NEW drift |
 | `docs/reference/**`、`.specify/memory/glossary.md` | 无镜像对（memory/ 与 docs/ 不在 MIRROR_PAIRS，finding 5） | N/A — 仅 host-side 编辑，无对账义务 |
 

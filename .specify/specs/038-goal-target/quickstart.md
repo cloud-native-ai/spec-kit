@@ -85,7 +85,7 @@ python3 scripts/python/goal-utils.py targets demo-goal --set done --id T-001
 
 ### 2026-08-12 — US4 首跑(T027)
 
-**§4 里程碑吸收**:经 `tests/integration/test_target_milestones.py` 5 例全绿取证——done Target 以 `source: goal-target:<slug>/goal.md#T-001` 与 `status: achieved` 进入既有 milestones 组;判据投影行语义原样(036 FR-013,source 仍为定义 relpath);open/dropped 不入组;判据为空 + done Target 存在 → 里程碑组由 Target 来源填充并声明来源(material_gaps);DDL 无 goal-target 硬编码——区分仅靠既有 `source` 列(D7)。`git status skills/summarize-project/` 空:引擎与 DDL 零改动。
+**§4 里程碑吸收**:经 `tests/integration/test_target_milestones.py` 5 例全绿取证——done Target 以 `source: goal-target:<slug>/goal.md#T-001` 与 `status: achieved` 进入既有 milestones 组;判据投影行语义原样(036 FR-013,source 仍为定义 relpath);open/dropped 不入组;判据为空 + done Target 存在 → 里程碑组由 Target 来源填充并声明来源(material_gaps);DDL 无 goal-target 硬编码——区分仅靠既有 `source` 列(D7)。`git status skills/internal/summarize-project/` 空:引擎与 DDL 零改动。
 
 ### 2026-08-12 — T032 全走查复跑(refresh-verify,单沙箱 `mktemp -d` 端到端)
 

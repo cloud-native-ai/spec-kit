@@ -71,7 +71,7 @@ Single project / code-generator shape (per plan.md). Engine source lives at `scr
 
 - [X] T006 Implement the stdlib-only engine at scripts/python/feedback-utils.py — all five actions, `(unit_id, run_id)` dedup no-op, `--unit-id` regex `^(?:/speckit\.[a-z0-9._-]+|skill:[a-z0-9._-]+)$`, `--partial` flag, threshold default 10 with `--threshold` / `SPECKIT_FEEDBACK_THRESHOLD`, `reindex` preserving `submitted_at`, exit code 2 on validation errors (patterned on scripts/python/memory-utils.py)
 - [X] T007 Mirror the engine byte-identically to .specify/scripts/python/feedback-utils.py (keep in sync with scripts/python/feedback-utils.py)
-- [X] T008 Author the canonical `## Feedback` step text (qualification+completion gate, agent self-reflection with no user input, scope guard vs `/speckit.review`, stable-`run_id` dedup guard, `record` invocation, consolidated threshold-prompt behavior, abort/partial rule) as a single embeddable source at skills/sdd-workflow/references/feedback-step.md and mirror it to .specify/skills/sdd-workflow/references/feedback-step.md, derived from contracts/feedback-step-convention.md
+- [X] T008 Author the canonical `## Feedback` step text (qualification+completion gate, agent self-reflection with no user input, scope guard vs `/speckit.review`, stable-`run_id` dedup guard, `record` invocation, consolidated threshold-prompt behavior, abort/partial rule) as a single embeddable source at shared/workflow/feedback-step.md and mirror it to shared/workflow/feedback-step.md, derived from contracts/feedback-step-convention.md
 
 **Checkpoint**: Engine + canonical step text ready — user stories can begin.
 
@@ -93,8 +93,8 @@ Single project / code-generator shape (per plan.md). Engine source lives at `scr
 - [X] T011 [US1] Add the canonical `## Feedback` section (from T008) as the final workflow section of templates/skills-template.md so newly authored skills inherit it by default
 - [X] T012 [P] [US1] Add the `## Feedback` section to all 21 installed skills at skills/*/SKILL.md using the canonical step text
 - [X] T013 [P] [US1] Mirror the `## Feedback` additions into the runtime tree at .specify/skills/*/SKILL.md (keep mirror consistent with skills/)
-- [X] T014 [US1] Update skills/create-skills/SKILL.md (and its .specify/skills/ mirror) to VALIDATE that a newly authored skill includes a `## Feedback` section — a skill lacking it is non-conformant (FR-002, FR-010)
-- [X] T015 [US1] Update skills/improve-skills/SKILL.md (and its .specify/skills/ mirror) to verify and repair a missing or malformed `## Feedback` section
+- [X] T014 [US1] Update skills/external/create-skills/SKILL.md (and its .specify/skills/ mirror) to VALIDATE that a newly authored skill includes a `## Feedback` section — a skill lacking it is non-conformant (FR-002, FR-010)
+- [X] T015 [US1] Update skills/external/improve-skills/SKILL.md (and its .specify/skills/ mirror) to verify and repair a missing or malformed `## Feedback` section
 
 **Checkpoint**: US1 is independently functional — any skill records a local feedback entry; conformance + integration tests green.
 
@@ -137,7 +137,7 @@ Single project / code-generator shape (per plan.md). Engine source lives at `scr
 
 ### Implementation for User Story 3
 
-- [X] T026 [US3] Author docs/skills/feedback.md documenting the Feedback Trigger Policy (all skills; 13 complex commands only; trivial/simple excluded), the store layout, the threshold behavior, and its distinction from the global `/speckit.review` — the observable policy source for SC-002/SC-004/SC-006 audits
+- [X] T026 [US3] Author docs/reference/skills/feedback.md documenting the Feedback Trigger Policy (all skills; 13 complex commands only; trivial/simple excluded), the store layout, the threshold behavior, and its distinction from the global `/speckit.review` — the observable policy source for SC-002/SC-004/SC-006 audits
 - [X] T027 [US3] Audit that the canonical step embedded across templates/skills-template.md, all skills/*/SKILL.md, and the 13 complex command templates consistently encodes the qualification+completion gate, stable-`run_id` dedup guard, scope guard, abort/partial rule, and consolidated threshold-prompt behavior; propagate any wording fix from T008 uniformly (and to .specify/ mirrors)
 
 **Checkpoint**: All three user stories independently functional; efficiency, dedup, partial, and threshold guarantees demonstrated.
@@ -149,7 +149,7 @@ Single project / code-generator shape (per plan.md). Engine source lives at `scr
 **Purpose**: Feature bookkeeping, docs, and full-suite validation
 
 - [X] T028 [P] Update .specify/memory/features/028.md with implementation notes/status and refresh the Feature 028 row (last-updated) in .specify/memory/features.md (Feature Integration)
-- [X] T029 [P] Add the Feedback System to the Documentation Map (docs pointer to docs/skills/feedback.md) alongside the existing Memory System entry
+- [X] T029 [P] Add the Feedback System to the Documentation Map (docs pointer to docs/reference/skills/feedback.md) alongside the existing Memory System entry
 - [X] T030 Run the full test suite (`pytest`, plus `pytest -m contract` and `pytest -m integration`) and confirm unit + contract + integration are green
 - [X] T031 Run the quickstart.md conformance checks: `grep -L "## Feedback" skills/*/SKILL.md` (empty), `grep -c "## Feedback" templates/skills-template.md` (≥1), and confirm simple-command exclusion via the classification test
 

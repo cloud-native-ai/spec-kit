@@ -39,7 +39,7 @@ pytest -q                    # existing suite + new deprecated-term guard must p
 ## 4. Conceptual model expressed (SC-005)
 
 - Open any `agent-role-*-template.md` and confirm it states **Role**, applicable **Stage(s)**, and **Type** per the [conceptual-model contract](./contracts/conceptual-model-contract.md).
-- Confirm the Team matrix in `data-model.md` matches `docs/agents/design.md`.
+- Confirm the Team matrix in `data-model.md` matches `docs/reference/agents/design.md`.
 
 ## 5. Single entry & scenarios (SC-001, SC-006)
 
@@ -57,7 +57,7 @@ ls .qoder/commands/ .github/prompts/ | grep -iE "agent" # only speckit.agents(.m
 
 ## 6. Docs coherent (SC-007)
 
-- Review `docs/agents/{design.md,eei-triad-pattern.md,multi-agent-orchestration.md}` and `docs/commands/agents.md`: terminology unified, model consistent with `design.md`.
+- Review `docs/agents/{design.md,eei-triad-pattern.md,multi-agent-orchestration.md}` and `docs/reference/commands/agents.md`: terminology unified, model consistent with `design.md`.
 
 ## 7. Cross-project research delivered (SC-008)
 

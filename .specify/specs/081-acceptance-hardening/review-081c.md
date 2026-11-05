@@ -681,7 +681,7 @@ here.
 
 ### 5.3 Automation / Script Improvements
 
-- **REC-A1 — one source for a row and its evidence.** Target: `scripts/python/run-tests.sh` usage in
+- **REC-A1 — one source for a row and its evidence.** Target: `scripts/bash/run-tests.sh` usage in
   `tasks.md` completion rows. Change: let a row's evidence file record the command it ran, and have the
   close-set check compare the recorded module list against the row's list. Source: A6. Expected impact:
   "the recorded run is not the specified run" becomes a failing assertion instead of a hand-read.

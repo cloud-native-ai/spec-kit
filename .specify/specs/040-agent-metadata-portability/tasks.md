@@ -42,7 +42,7 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 ## Phase 1: Setup (Shared Infrastructure)
 
 - [X] T001 冻结测试基线:运行 `pytest -q`,把失败用例名清单写入 `.specify/specs/040-agent-metadata-portability/baseline-failed.txt`(SC-008 的对照面;区分既有失败与新引入失败) <!-- 证据:run-tests.sh 完成,39 failed/1720 passed/1 skipped(27.19s),baseline-failed.txt 39 行 -->
-- [X] T002 [P] 记录镜像基线:运行 `python3 scripts/python/sync-mirrors.py --check` 确认 exit 0,任何既有 drift 先归因记录再动手 <!-- 实查:exit 2,但 drift 仅来自无关的 skills/create-pages/(他会话未跟踪新增,未镜像);本需求触及的 agents/templates/scripts/shared 对全部 ok,不修无关 drift -->
+- [X] T002 [P] 记录镜像基线:运行 `python3 scripts/python/sync-mirrors.py --check` 确认 exit 0,任何既有 drift 先归因记录再动手 <!-- 实查:exit 2,但 drift 仅来自无关的 skills/external/create-pages/(他会话未跟踪新增,未镜像);本需求触及的 agents/templates/scripts/shared 对全部 ok,不修无关 drift -->
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
@@ -67,13 +67,13 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [X] T007 [US2] [blockedBy: T003] 创建 `tests/contract/test_neutral_vocabulary_scan.py`:对 `agents/`、`skills/create-agent/templates/`、`skills/create-team/templates/agents/` 扫描禁用词表(C-4)并断言命中 0;断言全部键 kebab-case(C-3)
+- [X] T007 [US2] [blockedBy: T003] 创建 `tests/contract/test_neutral_vocabulary_scan.py`:对 `agents/`、`skills/internal/create-agent/templates/`、`skills/internal/create-team/templates/agents/` 扫描禁用词表(C-4)并断言命中 0;断言全部键 kebab-case(C-3)
 
 ### Implementation for User Story 2
 
 - [X] T008 [P] [US2] [blockedBy: T003] 重写 `agents/` 全部 7 个 `*.agent.md` 的 frontmatter 为中立键集(`maxTurns`→`run-turn-budget`、`tools`→`capability-tools`、`color`→`display-color`、`model`→`model-tier`;取值按 §E2 映射)
-- [X] T009 [P] [US2] [blockedBy: T003] 重写 `skills/create-agent/templates/` 全部 10 个文件的 frontmatter 为中立键集(保持占位符白名单不动)
-- [X] T010 [P] [US2] [blockedBy: T003] 重写 `skills/create-team/templates/agents/` 全部 8 个文件的 frontmatter 为中立键集(`role-scope` 作为框架键保留,T-5 裁定在 US5 成文)
+- [X] T009 [P] [US2] [blockedBy: T003] 重写 `skills/internal/create-agent/templates/` 全部 10 个文件的 frontmatter 为中立键集(保持占位符白名单不动)
+- [X] T010 [P] [US2] [blockedBy: T003] 重写 `skills/internal/create-team/templates/agents/` 全部 8 个文件的 frontmatter 为中立键集(`role-scope` 作为框架键保留,T-5 裁定在 US5 成文)
 - [X] T011 [US2] [blockedBy: T008] 改写 `tests/contract/test_shipped_agent_presets.py` 的 `test_preset_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-001]])
 - [X] T012 [US2] [blockedBy: T009] 改写 `tests/contract/test_role_templates.py` 的 `test_template_has_qoder_frontmatter` → 中立断言(更名去 qoder,[[STR-002]];保留 `test_only_approved_placeholders` 与必备章节断言)
 - [X] T013 [US2] [blockedBy: T007, T010, T011, T012] 运行契约套件至绿(`pytest tests/contract -q`)
@@ -120,13 +120,13 @@ Task State Sigil:`[ ]` 待做 / `[X]` 完成 / `[~]` 延迟(须在 Notes 说明)
 
 ### Implementation for User Story 5
 
-- [X] T027 [US5] [blockedBy: T008, T009, T026] 迁移落位(T-3):用 `agents/<slug>.agent.md` 的已中立化内容逐一**替换** `skills/create-agent/templates/agent-capacity-<slug>-template.md`(7 份),正文仅把项目身份行与 Project Context 段的 "Spec Kit (specify-cli)" 参数化为 `{{PROJECT_NAME}}`;完成后删除 `agents/` 下该 7 文件
+- [X] T027 [US5] [blockedBy: T008, T009, T026] 迁移落位(T-3):用 `agents/<slug>.agent.md` 的已中立化内容逐一**替换** `skills/internal/create-agent/templates/agent-capacity-<slug>-template.md`(7 份),正文仅把项目身份行与 Project Context 段的 "Spec Kit (specify-cli)" 参数化为 `{{PROJECT_NAME}}`;完成后删除 `agents/` 下该 7 文件
 - [X] T028 [US5] [blockedBy: T027] 新作 `agents/structure-adjuster.agent.md` 与 `agents/skill-verifier.agent.md`(T-4:中立元信息、`user-invocable: true`、六大必备章节、职责限定操作技能/agent/结构)
 - [X] T029 [US5] [blockedBy: T028] 运行迁移后的契约 + 集成套件至绿(T026 转绿;`test_role_templates.py` 的 ROLE_SLUGS 断言对象随替换自然满足,若白名单需增补同一任务内完成)
 - [X] T030 [P] [US5] [blockedBy: T029] 成文差别定义(T-1/T-2/T-5):重写 `docs/reference/agents/templates-and-agents.md` 的目录分类节 —— Worker/Meta 三目录表、组队取件规则、[[STR-005]]/[[STR-006]] 与阶段模板缺参的裁定记录
 - [X] T031 [P] [US5] [blockedBy: T029] 机械联动(文档面):改写 `docs/reference/commands/agents.md`、`docs/tutorials/quickstart.md`、`docs/reference/agents/design.md` 的预置表与软链接叙述 → 渲染叙述
 - [X] T032 [P] [US5] [blockedBy: T029] 机械联动(模板面):改写 `templates/commands/agents.md` 与 `templates/commands/skills.md`(去软链接表述、7-slug 枚举改为维度表述),然后运行 `python3 scripts/python/regen-command-copies.py` 并 grep 验证 `.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`、`.codex/commands/`、`.hermes/commands/` 副本无旧叙述残留
-- [X] T033 [P] [US5] [blockedBy: T029] 机械联动(shared/skills 面):改写 `shared/workflow/agent-configuration.md`(软链接核验 → 渲染产物核验)、`shared/workflow/interview-walkthrough.md`、`skills/create-skills/SKILL.md`、`skills/create-team/references/patterns.md`、`skills/create-team/templates/agents/agent-workflow-schema.md` 中的旧枚举与软链接表述
+- [X] T033 [P] [US5] [blockedBy: T029] 机械联动(shared/skills 面):改写 `shared/workflow/agent-configuration.md`(软链接核验 → 渲染产物核验)、`shared/workflow/interview-walkthrough.md`、`skills/external/create-skills/SKILL.md`、`skills/internal/create-team/references/patterns.md`、`skills/internal/create-team/templates/agents/agent-workflow-schema.md` 中的旧枚举与软链接表述
 - [X] T034 [US5] [blockedBy: T030, T031, T032, T033] 镜像扇出:运行 `python3 scripts/python/sync-mirrors.py --write` 再 `--check`(覆盖 plan.md Mirror Obligations 全部行:`.specify/agents/templates`、`.specify/skills/...`、`.specify/shared/...`、`.specify/templates/...`),exit 0
 - [X] T035 [US5] [blockedBy: T034] 运行 `/speckit.instructions` 刷新 `AGENTS.md`(Agents 注册表与分发叙述;顺带修复缺 ux-analyst 的既有漂移),验证 GATE-6 软链接完好
 - [~] T036 [US5] [blockedBy: T034] 术语表提案 <!-- deferred: 5 条候选条目已列于 feature-ref.md,写入需用户显式确认(术语表协议),本次 implement 收尾时用户未回复 -->:向用户提交 feature-ref.md 的 5 条候选(Meta Agent/Worker Agent/渲染产物/渲染清单/"原 Agent"更正);获确认后写入 `.specify/memory/glossary.md`,未确认则 `[~]` 延迟并注明

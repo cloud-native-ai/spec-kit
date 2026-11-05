@@ -4,7 +4,7 @@
 **Requirement → Feature**: `037-goal-registry` → Feature 041 Goal Registry
 **Input**: Specification from `.specify/specs/037-goal-registry/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every placeholder token in place — it MUST NOT append a second copy of this template below the filled content. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every placeholder token in place — it MUST NOT append a second copy of this template below the filled content. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
@@ -13,11 +13,11 @@ Promote `goal` from a per-team field into a project-level first-class concept, a
 Four deliverables:
 
 1. **Authored definition archive** at `.specify/goal/<goal-slug>/goal.md` — exactly three parts (narrative, zero-or-more verifiable criteria, lifecycle `active`/`achieved`/`abandoned`), identity carried by the directory name. Never written by a derived flow.
-2. **Consolidated single goal index** — requirement 036's derived delivery directory moves from `.specify/project/goal/<goal-slug>/` into `.specify/goal/<goal-slug>/summary/`, so the definition and its summary are two faces of one object with a **single-subtree write-set allow-list** protecting the definition.
+2. **Consolidated single goal index** — requirement 036's derived delivery directory moves from `.specify/goal/<goal-slug>/` into `.specify/goal/<goal-slug>/summary/`, so the definition and its summary are two faces of one object with a **single-subtree write-set allow-list** protecting the definition.
 3. **`/speckit.goal`** as the sole authoring entry (create / modify / view / migrate), delivered through the existing mirror fan-out.
 4. **Multi-team coordination** — a derived roster of teams sharing the goal, a new **team-level `territory`** declaration, mechanical overlap detection riding 036's existing summary refresh, and a coordination round that only proposes a re-division for human ratification.
 
-**Technical approach**: this is overwhelmingly a *reference-surface* change plus one genuinely new piece of executable logic. Research (E-1…E-3) established that the migration is a one-line path change in the generator (`build-summary-input.py:577`) fanned out across **24 live source files**, with no data to move because `.specify/project/goal/` was never materialized. The one real new capability is overlap detection: territory exists today only as prose for the LLM with **zero executable validation** (E-4), so this requirement writes the first territory validator — and it does so inside `resolve_goal()` (E-6), the existing function that already collects every team sharing a `goal_slug`, which is what makes "zero new trigger machinery" literally true rather than aspirational.
+**Technical approach**: this is overwhelmingly a *reference-surface* change plus one genuinely new piece of executable logic. Research (E-1…E-3) established that the migration is a one-line path change in the generator (`build-summary-input.py:577`) fanned out across **24 live source files**, with no data to move because `.specify/goal/` was never materialized. The one real new capability is overlap detection: territory exists today only as prose for the LLM with **zero executable validation** (E-4), so this requirement writes the first territory validator — and it does so inside `resolve_goal()` (E-6), the existing function that already collects every team sharing a `goal_slug`, which is what makes "zero new trigger machinery" literally true rather than aspirational.
 
 ## Technical Context
 
@@ -80,10 +80,10 @@ Four deliverables:
 ```text
 .specify/goal/                       # NEW runtime dir — the goal archive (authored goal.md + derived summary/)
 templates/commands/                  # + goal.md (new command source of truth); team.md edited for the path change
-skills/create-team/                  # SKILL.md (team-level territory key, gate order, status line), references/, scripts/
-skills/create-team/scripts/          # build-summary-input.py — delivery path + roster derivation + overlap detection
-skills/create-team/references/       # summary-mapping.md (write-set + roster), goal.md (points at concept authority)
-skills/improve-team/references/      # goal-editing.md — re-point concept statements at the authority
+skills/internal/create-team/                  # SKILL.md (team-level territory key, gate order, status line), references/, scripts/
+skills/internal/create-team/scripts/          # build-summary-input.py — delivery path + roster derivation + overlap detection
+skills/internal/create-team/references/       # summary-mapping.md (write-set + roster), goal.md (points at concept authority)
+skills/internal/improve-team/references/      # goal-editing.md — re-point concept statements at the authority
 docs/reference/commands/             # + goal.md (new command reference); team.md layout tables updated
 docs/tutorials/                      # quickstart.md + installation.md — one command-table row each
 tests/contract/                      # 4 existing files repathed; new goal-command + territory contract tests
@@ -92,20 +92,20 @@ tests/fixtures/teams/                # goal-share-{a,b} gain `territory` (the ov
 .specify/**                          # mirrors of every canonical edit above (regenerated, never hand-edited)
 ```
 
-**Structure Decision**: this spec extends the existing **code-generator / framework** shape — it adds one new command to `templates/commands/`, extends one existing engine script and one skill in `skills/create-team/`, and introduces exactly one new top-level runtime directory, `.specify/goal/`. No new package, no new engine, no new top-level source tree. The new directory is a *runtime* artifact location (like `.specify/teams/`), not source. **Prerequisite note**: `shared/definitions/goal-definitions.md` and its `.specify/` mirror are the read-only concept authority for this work (FR-019, spec Assumptions) and are currently **untracked** — they must be committed before or with this requirement, but this requirement does not modify them.
+**Structure Decision**: this spec extends the existing **code-generator / framework** shape — it adds one new command to `templates/commands/`, extends one existing engine script and one skill in `skills/internal/create-team/`, and introduces exactly one new top-level runtime directory, `.specify/goal/`. No new package, no new engine, no new top-level source tree. The new directory is a *runtime* artifact location (like `.specify/teams/`), not source. **Prerequisite note**: `shared/definitions/goal-definitions.md` and its `.specify/` mirror are the read-only concept authority for this work (FR-019, spec Assumptions) and are currently **untracked** — they must be committed before or with this requirement, but this requirement does not modify them.
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/goal.md` **(new)** | `.specify/templates/commands/goal.md`; `.claude/commands/speckit.goal.md`; `.github/prompts/speckit.goal.prompt.md`; `.qoder/commands/speckit.goal.md`; `.opencode/command/speckit.goal.md`; `.qwen/commands/speckit.goal.toml` | `sync-mirrors.py --check` exit 0; each generated copy carries the `AUTO-GENERATED` header naming the source |
-| `templates/commands/team.md` | `.specify/templates/commands/team.md`; the same 5 per-tool copies for `speckit.team` | `diff -q` mirror; generated copies contain the new path and no `project/goal` |
-| `skills/create-team/SKILL.md` | `.specify/skills/create-team/SKILL.md` | `diff -q` |
-| `skills/create-team/references/summary-mapping.md` | `.specify/skills/create-team/references/summary-mapping.md` | `diff -q` |
-| `skills/create-team/references/goal.md` | `.specify/skills/create-team/references/goal.md` | `diff -q` |
-| `skills/create-team/references/optimization-goals.md` | `.specify/skills/create-team/references/optimization-goals.md` | `diff -q` |
-| `skills/improve-team/references/goal-editing.md` | `.specify/skills/improve-team/references/goal-editing.md` | `diff -q` |
-| `skills/create-team/scripts/build-summary-input.py` | `.specify/skills/create-team/scripts/build-summary-input.py` | `diff -q` (verified byte-identical today) |
+| `templates/commands/goal.md` **(new)** | `templates/commands/goal.md`; `.claude/commands/speckit.goal.md`; `.github/prompts/speckit.goal.prompt.md`; `.qoder/commands/speckit.goal.md`; `.opencode/command/speckit.goal.md`; `.qwen/commands/speckit.goal.toml` | `sync-mirrors.py --check` exit 0; each generated copy carries the `AUTO-GENERATED` header naming the source |
+| `templates/commands/team.md` | `templates/commands/team.md`; the same 5 per-tool copies for `speckit.team` | `diff -q` mirror; generated copies contain the new path and no `project/goal` |
+| `skills/internal/create-team/SKILL.md` | `.specify/skills/internal/create-team/SKILL.md` | `diff -q` |
+| `skills/internal/create-team/references/summary-mapping.md` | `.specify/skills/internal/create-team/references/summary-mapping.md` | `diff -q` |
+| `skills/internal/create-team/references/goal.md` | `.specify/skills/internal/create-team/references/goal.md` | `diff -q` |
+| `skills/internal/create-team/references/optimization-goals.md` | `.specify/skills/internal/create-team/references/optimization-goals.md` | `diff -q` |
+| `skills/internal/improve-team/references/goal-editing.md` | `.specify/skills/internal/improve-team/references/goal-editing.md` | `diff -q` |
+| `skills/internal/create-team/scripts/build-summary-input.py` | `.specify/skills/internal/create-team/scripts/build-summary-input.py` | `diff -q` (verified byte-identical today) |
 | `scripts/python/goal-utils.py` **(new)** | `.specify/scripts/python/goal-utils.py` | `diff -q`; `sync-mirrors.py --check` reports `scripts/ == .specify/scripts/` |
 | `.specify/memory/tools/build-summary-input.py.md` | *(no mirror — single canonical location)* | Tool record's source contract matches the edited script |
 

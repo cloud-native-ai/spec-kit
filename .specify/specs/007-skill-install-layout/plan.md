@@ -3,7 +3,7 @@
 **Branch**: `007-skill-install-layout` | **Date**: 2026-04-21 | **Spec**: [.specify/specs/007-skill-install-layout/requirements.md](.specify/specs/007-skill-install-layout/requirements.md)
 **Input**: Specification from `.specify/specs/007-skill-install-layout/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 

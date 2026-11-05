@@ -34,7 +34,7 @@ Validate that detailed Skill creation guidance has been extracted into `create-s
 
 ### Scenario 3: `create-skills` preserves creation guidance
 
-1. Open `skills/create-skills/SKILL.md` after implementation.
+1. Open `skills/external/create-skills/SKILL.md` after implementation.
 2. Confirm it includes guidance for:
    - explicit user input parsing,
    - empty-argument conversation distillation,
@@ -61,7 +61,7 @@ If implementation adds prompt-asset tests, run those tests as well.
 
 ## Review Checklist
 
-- [ ] `skills/create-skills/SKILL.md` exists and has valid frontmatter.
+- [ ] `skills/external/create-skills/SKILL.md` exists and has valid frontmatter.
 - [ ] `templates/commands/skills.md` explicitly delegates missing targets to `create-skills`.
 - [ ] `templates/commands/skills.md` explicitly delegates existing targets to `improve-skills`.
 - [ ] Creation logic is not duplicated in both the command template and the Skill body.

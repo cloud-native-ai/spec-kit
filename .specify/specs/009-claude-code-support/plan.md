@@ -3,7 +3,7 @@
 **Branch**: `009-claude-code-support` | **Date**: 2026-05-14 | **Spec**: [.specify/specs/009-claude-code-support/requirements.md](.specify/specs/009-claude-code-support/requirements.md)
 **Input**: Specification from `.specify/specs/009-claude-code-support/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
@@ -104,7 +104,7 @@ N/A
 
 ## Phase 0: Research Review & Context
 
-- Reviewed `README.md`, `docs/installation.md`, `docs/usage.md`, `docs/quickstart.md`, `docs/spec-driven.md`, and `docs/upstream.md` for assistant support, SDD workflow, initialization, and command expectations.
+- Reviewed `README.md`, `docs/tutorials/installation.md`, `docs/tutorials/quickstart.md`, `docs/tutorials/quickstart.md`, `docs/concepts/spec-driven.md`, and `docs/concepts/upstream.md` for assistant support, SDD workflow, initialization, and command expectations.
 - Reviewed `.specify/memory/constitution.md`, `.specify/memory/features.md`, Feature 020 (Qoder Support), Feature 019 (Agents Command), Feature 017 (Template Engine), Feature 015 (CLI Interface), and Feature 008 (Instructions Command) for integration boundaries.
 - Inspected `pyproject.toml`, `src/specify_cli/__init__.py`, `scripts/bash/generate-instructions.sh`, `templates/commands/`, and existing Qoder tests/artifacts to identify reusable assistant-support patterns.
 - No separate `research.md` existed at plan start; Phase 0 decisions are captured in the generated `research.md` artifact.

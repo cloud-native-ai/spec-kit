@@ -53,7 +53,7 @@
 
 **裁定方式**: **经用户裁定**(同上轮,两选项:新增第六字段行(推荐)、并入 `task_brief` 内容规则)。用户取推荐项。
 
-**裁定**:在 `skills/create-team/references/patterns.md` 的 Per-Agent Payload 表(实测 `:96-102`,五字段行)后**新增第六行** `fast_fail_clause`,而不是改写 `task_brief` 单元格(`:98`)。
+**裁定**:在 `skills/internal/create-team/references/patterns.md` 的 Per-Agent Payload 表(实测 `:96-102`,五字段行)后**新增第六行** `fast_fail_clause`,而不是改写 `task_brief` 单元格(`:98`)。
 
 **实测**:
 - 表结构:`:94` `Per-Agent Payload:` 标签、`:96` 表头、`:97` 分隔行、`:98-102` 五个字段行(`task_brief` / `territory` / `forbidden_files` / `output_convention` / `model_hint`),紧接 `:104-108` Context Isolation Rules、`:110` `### Summary Boundary`。
@@ -128,7 +128,7 @@ violations (reversible gates still blocking): 0
 
 **计数单位是"命中的行"**:`scan()` 逐行 `if not BLOCKING_RE.search(line): continue` 后 `gates.append(…)`,故任何被扫描文件里任何一行命中即 +1。`classify()` 按 `GOVERNANCE_PATH_PATTERNS`(含 `constitution-template`)与 `DESTRUCTIVE_KEYWORDS` 分类,但**两类都计入 total**。
 
-**扫描面覆盖本特性全部新增文本**:`SCAN_DIRS = ("templates/commands", "skills", "shared")`(`:35`)、`SCAN_ROOT_FILES = ("templates",)`(`:36`)⇒ 真源文档(`shared/guidelines/`)、常驻章节与宪章原则(根级 `templates/*.md`)、命令 `MUST include` 条目(`templates/commands/`)、通道三落点(`skills/create-team/references/`)、通道二的命令侧落点(`templates/commands/agents.md`)**全部在范围内**。`SKIP_DIR_PARTS` 含 `.specify`(`:37`),故镜像不重复计数。
+**扫描面覆盖本特性全部新增文本**:`SCAN_DIRS = ("templates/commands", "skills", "shared")`(`:35`)、`SCAN_ROOT_FILES = ("templates",)`(`:36`)⇒ 真源文档(`shared/guidelines/`)、常驻章节与宪章原则(根级 `templates/*.md`)、命令 `MUST include` 条目(`templates/commands/`)、通道三落点(`skills/internal/create-team/references/`)、通道二的命令侧落点(`templates/commands/agents.md`)**全部在范围内**。`SKIP_DIR_PARTS` 含 `.specify`(`:37`),故镜像不重复计数。
 
 **两处已实测的必踩陷阱**:
 1. **相邻纪律的中文名**:阻塞模式含 `confirmation gate|确认门[禁控]`,而「确认门控治理」逐字命中。⇒ 真源文档 MUST 以**路径**指称(`shared/guidelines/confirmation-gates.md` 带连字符,不命中空格形态 `confirmation gate`)。已由 FR-036 承载。
@@ -146,7 +146,7 @@ violations (reversible gates still blocking): 0
 
 **裁定**:拥有者字面量以成对 HTML 注释定界(`<!-- fast-fail-clause:begin -->` … `<!-- fast-fail-clause:end -->`),宿主副本逐字节复制该区间;守卫按定界符机械提取后比对。**无引擎参与**。
 
-**实测(为何不能声称"机器可再生")**:`scripts/python/regen-command-copies.py` 只处理 `templates/commands/*.md` → 四棵按工具树;Agent 渲染方向是 canonical → 按工具副本(`render_agents_for_tool`,`src/specify_cli/__init__.py:615`)。**无任何引擎会再生 `skills/create-team/references/patterns.md` 或 `agents/*.agent.md` 中的子句**。故 FR-052 称其为"守卫钉死的合法重复"(`one-source-of-truth.md:33` 三类合法重复的第二类),漂移修复路径为从拥有者手工重灌。
+**实测(为何不能声称"机器可再生")**:`scripts/python/regen-command-copies.py` 只处理 `templates/commands/*.md` → 四棵按工具树;Agent 渲染方向是 canonical → 按工具副本(`render_agents_for_tool`,`src/specify_cli/__init__.py:615`)。**无任何引擎会再生 `skills/internal/create-team/references/patterns.md` 或 `agents/*.agent.md` 中的子句**。故 FR-052 称其为"守卫钉死的合法重复"(`one-source-of-truth.md:33` 三类合法重复的第二类),漂移修复路径为从拥有者手工重灌。
 
 **定界符是必需的**:房式守卫惯用法是整文件字节相等(`test_user_facing_comprehension_doc.py:193` 的 `read_bytes()` 比对),而这里被比对的单位是**三个不同宿主文件里的内嵌子串**。没有定界符,"逐字节一致"无从机械提取(FR-052 已要求)。
 

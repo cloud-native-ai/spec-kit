@@ -1,7 +1,7 @@
 # Contract: goal→Target 分解提议与成组批准(提议面)
 
 **Spec**: [requirements.md](../requirements.md) FR-006..009, FR-015(部分)  
-**Surface**: `templates/commands/team.md`(分支内分解步骤)× `skills/create-team/references/{goal.md, create-mode.md}` × `scripts/python/goal-utils.py`(扩展动作)  
+**Surface**: `templates/commands/team.md`(分支内分解步骤)× `skills/internal/create-team/references/{goal.md, create-mode.md}` × `scripts/python/goal-utils.py`(扩展动作)  
 **Authority**: 形态检测文法 = `goal-utils.py` 与 `targets --add` 同源(`_bad_shape`/`_reject_bad_target_statement`/判据归一化比对);零第二套文法
 
 ## C-1 干跑校验动作(引擎扩展,本需求唯一新增写侧相邻面)

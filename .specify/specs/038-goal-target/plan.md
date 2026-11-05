@@ -78,9 +78,9 @@ Goal 与团队 run 之间缺少一个粒度层:run 需要的是小时级、可�
 ```text
 scripts/python/                     # goal-utils.py:新增 targets 动作组 + ## Targets 渲染/解析/校验
 templates/commands/                 # goal.md(targets 模式行+引擎调用例)、team.md(run 模式 --target 校验与门禁披露)
-skills/create-team/                 # scripts/build-summary-input.py(target_ref 折叠、targets 块、切片轴);
+skills/internal/create-team/                 # scripts/build-summary-input.py(target_ref 折叠、targets 块、切片轴);
                                     # references/{summary-mapping.md,goal.md,execution-guide.md}(契约与操作文档)
-skills/summarize-project/           # 不改代码——done Target 以 source 标记进入既有 milestones 组(FR-016,P3)
+skills/internal/summarize-project/           # 不改代码——done Target 以 source 标记进入既有 milestones 组(FR-016,P3)
 shared/definitions/                 # goal-definitions.md 概念锚(已随规格落地,本计划只读)
 tests/unit/                         # test_goal_utils.py 扩展(targets 动作、渲染、GD-2/GD-3 复用)
 tests/contract/                     # 新增目标契约族 3 文件 + goal/team 命令面既有测试扩展
@@ -89,19 +89,19 @@ docs/reference/commands/            # goal.md、team.md 用户文档
 .specify/memory/                    # glossary.md 新增「Goal Target」消歧条目(不镜像)
 ```
 
-**Structure Decision**: 扩展既有框架的三个既有点——单引擎 `goal-utils.py` 加一个动作组、命令模板 goal/team 各加既有模式的行与步骤、`build-summary-input.py` 折叠加一个可选字段与输出块。**零新顶层目录、零新脚本文件、零新命令**;`skills/summarize-project/` 保持代码不变(里程碑吸收走既有 `source` 字段)。概念层只读引用 [[STR-004]]。
+**Structure Decision**: 扩展既有框架的三个既有点——单引擎 `goal-utils.py` 加一个动作组、命令模板 goal/team 各加既有模式的行与步骤、`build-summary-input.py` 折叠加一个可选字段与输出块。**零新顶层目录、零新脚本文件、零新命令**;`skills/internal/summarize-project/` 保持代码不变(里程碑吸收走既有 `source` 字段)。概念层只读引用 [[STR-004]]。
 
 ### Mirror Obligations
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `scripts/python/goal-utils.py` | `.specify/scripts/python/goal-utils.py` | `sync-mirrors.py --check` exit 0 |
-| `templates/commands/goal.md` | `.specify/templates/commands/goal.md`;`.claude/commands/speckit.goal.md`;`.github/prompts/speckit.goal.prompt.md`;`.qoder/commands/speckit.goal.md`;`.opencode/command/speckit.goal.md` | 同上(扇出经 `regen-command-copies.py`) |
-| `templates/commands/team.md` | `.specify/templates/commands/team.md`;`.claude/commands/speckit.team.md`;`.github/prompts/speckit.team.prompt.md`;`.qoder/commands/speckit.team.md`;`.opencode/command/speckit.team.md` | 同上 |
-| `skills/create-team/scripts/build-summary-input.py` | `.specify/skills/create-team/scripts/build-summary-input.py` | 同上 |
-| `skills/create-team/references/summary-mapping.md` | `.specify/skills/create-team/references/summary-mapping.md` | 同上 |
-| `skills/create-team/references/goal.md` | `.specify/skills/create-team/references/goal.md` | 同上 |
-| `skills/create-team/references/execution-guide.md` | `.specify/skills/create-team/references/execution-guide.md` | 同上 |
+| `templates/commands/goal.md` | `templates/commands/goal.md`;`.claude/commands/speckit.goal.md`;`.github/prompts/speckit.goal.prompt.md`;`.qoder/commands/speckit.goal.md`;`.opencode/command/speckit.goal.md` | 同上(扇出经 `regen-command-copies.py`) |
+| `templates/commands/team.md` | `templates/commands/team.md`;`.claude/commands/speckit.team.md`;`.github/prompts/speckit.team.prompt.md`;`.qoder/commands/speckit.team.md`;`.opencode/command/speckit.team.md` | 同上 |
+| `skills/internal/create-team/scripts/build-summary-input.py` | `.specify/skills/internal/create-team/scripts/build-summary-input.py` | 同上 |
+| `skills/internal/create-team/references/summary-mapping.md` | `.specify/skills/internal/create-team/references/summary-mapping.md` | 同上 |
+| `skills/internal/create-team/references/goal.md` | `.specify/skills/internal/create-team/references/goal.md` | 同上 |
+| `skills/internal/create-team/references/execution-guide.md` | `.specify/skills/internal/create-team/references/execution-guide.md` | 同上 |
 | `docs/reference/commands/goal.md`、`docs/reference/commands/team.md` | 无镜像(docs/ 不镜像) | — |
 | `.specify/memory/glossary.md` | 无镜像(memory/ 不在 MIRROR_PAIRS) | — |
 

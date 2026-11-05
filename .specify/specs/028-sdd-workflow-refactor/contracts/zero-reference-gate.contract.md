@@ -12,7 +12,7 @@ The final acceptance gate: no live `sdd-workflow` reference remains anywhere in 
   source: `src/`, `scripts/`, `templates/`, `skills/`, `agents/`, `docs/` (except excluded paths),
   `pyproject.toml`, and the regenerated `.specify/` mirror.
 - The following paths are **excluded** (legitimately retain the token as historical/spec content):
-  - `docs/summary/03-sdd-workflow-refactor-proposal.md`
+  - `docs/archive/03-sdd-workflow-refactor-proposal.md`
   - `.specify/specs/028-sdd-workflow-refactor/**` (this spec, plan, contracts, tasks, verification)
   - `docs/history/**`
 - No rewritten reference may resolve to a missing file (no runtime dead link).
@@ -22,7 +22,7 @@ The final acceptance gate: no live `sdd-workflow` reference remains anywhere in 
 ```bash
 grep -rn "sdd-workflow" . \
   --exclude-dir=.git --exclude-dir=.venv --exclude-dir=docs/history \
-  | grep -v "docs/summary/03-sdd-workflow-refactor-proposal.md" \
+  | grep -v "docs/archive/03-sdd-workflow-refactor-proposal.md" \
   | grep -v ".specify/specs/028-sdd-workflow-refactor/"
 # Expected: no output (exit non-zero from grep = success for the gate)
 ```

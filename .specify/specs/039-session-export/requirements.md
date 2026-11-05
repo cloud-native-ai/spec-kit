@@ -19,7 +19,7 @@ AI agent CLI 的会话只有系统自动生成的 ID,既不能命名,也难以�
 
 ### 现状锚点(以源码实测为准)
 
-- `skills/export-session` 已在库(SKILL.md v1.3.0 + `scripts/export.py`),来源标记 `x-source: aone-open`,含平台专属使用上报段(非通用,须移除)。
+- `skills/export-session` 已在库(SKILL.md v1.3.0 + `skills/internal/archive-session/scripts/export.py`),来源标记 `x-source: aone-open`,含平台专属使用上报段(非通用,须移除)。
 - 现支持 10 产品:`qoder-cli / qoder / qoderwork / qwen-code / oh-my-pi / kimi-code / codex-cli / codex-app / opencode / claude-code`。目标六家中 **claude-code / codex-cli / qoder-cli / opencode 已有适配器**;**copilot / hermes 无适配器,需新增**;`qoder(IDE)/ qoderwork / qwen-code / oh-my-pi / kimi-code / codex-app` 六项**移除**。
 - 现产物形态:`<项目根>/.session-export/{tool}+{model}+{sessionId}.zip` 单 zip;本需求改为**目录**形态且名称由用户指定。
 - 会话定位现有机制:`--verify`(用户最近一句内容跨工具重定位)、`--session <id>`、`--tool <name>` 自动识别优先级——保留并适配新形态。

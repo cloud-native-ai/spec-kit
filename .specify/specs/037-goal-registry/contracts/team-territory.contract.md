@@ -2,7 +2,7 @@
 
 **Requirement**: 037-goal-registry | **FRs**: FR-033…FR-042
 **Artifacts**: `team.md` frontmatter `territory` (authored); `summary/roster.md` + generation report (derived)
-**Prior art lifted**: `skills/create-team/SKILL.md` § "Territory Division" (member-level, parallel pattern, prose-only, zero executable validation today)
+**Prior art lifted**: `skills/internal/create-team/SKILL.md` § "Territory Division" (member-level, parallel pattern, prose-only, zero executable validation today)
 
 ## Territory declaration
 
@@ -13,11 +13,11 @@ goal_slug: shared-harvest-goal
 territory:
   write:
     - docs/reference/**
-    - skills/create-team/references/*.md
+    - skills/internal/create-team/references/*.md
   read:
     - skills/**
   forbidden:
-    - skills/create-team/SKILL.md
+    - skills/internal/create-team/SKILL.md
   non_path:
     - type: framework
       target: the spec-kit framework this project consumes

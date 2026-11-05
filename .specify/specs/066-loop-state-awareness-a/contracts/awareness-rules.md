@@ -1,6 +1,6 @@
 # Contract — Awareness, Completion and Action Rules
 
-**Owner**: `references/state-awareness.md` is the single prose owner of these rules; `scripts/loop-state.py` is the code side. Watch verdicts and numeric thresholds remain owned by `scripts/watch-target.sh` / `references/watch-model.md`; stall defaults and U4/spine write points remain owned by `references/stage-prompts.md`; the plan-owned artifact set remains owned by `references/efficiency-model.md` §3. Clauses are numbered `RUL-NN`.
+**Owner**: `references/state-awareness.md` is the single prose owner of these rules; `skills/external/sdd-loop-driver/scripts/loop-state.py` is the code side. Watch verdicts and numeric thresholds remain owned by `skills/external/sdd-loop-driver/scripts/watch-target.sh` / `references/watch-model.md`; stall defaults and U4/spine write points remain owned by `references/stage-prompts.md`; the plan-owned artifact set remains owned by `references/efficiency-model.md` §3. Clauses are numbered `RUL-NN`.
 
 ## Verdict source
 

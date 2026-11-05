@@ -95,7 +95,7 @@ Fixed order and expected effect:
 | `skills/internal/create-agent/{SKILL.md,references/execution-config.md}` | `.specify/skills/internal/create-agent/**` | 同上 |
 | `shared/definitions/subagent-definitions.md` | `.specify/shared/definitions/subagent-definitions.md` | shared pair零 NEW drift |
 | `src/specify_cli/__init__.py` | none (CLI package) | pytest + installed-init integration |
-| `docs/reference/{cli/qoder-cli.md,agents/templates-and-agents.md}` | none (dev docs, not distributed) | content audit |
+| `docs/reference/{cli/qoder-cli.md,docs/reference/agents/templates-and-agents.md}` | none (dev docs, not distributed) | content audit |
 
 Baseline measured 2026-10-18 before any 061 edit: `sync-mirrors --check` exit 0 (all pairs ok), `regen-command-copies --check` exit 0, `compile-embeds --check` 73 units zero drift. The Verify criterion is "no NEW drift", not a pre-written exit code.
 

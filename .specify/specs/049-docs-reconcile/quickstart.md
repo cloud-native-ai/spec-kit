@@ -130,8 +130,8 @@ python3 scripts/python/docs-utils.py --action validate --root .  # 零新增违�
 
 **实跑核验(2026-09-01 规划期)**: 上述四条引擎命令均已实跑。`regen-command-copies.py --check`、`scan-confirmation-gates.py --json`、`docs-utils.py --action validate` 三条 **exit 0**;`pytest` 五文件路径全部解析,收集到 75 个测试。
 
-**`sync-mirrors.py --check` 基线说明(重要)**: 该命令**当前 exit 2**,原因是一处**与本特性无关的既有漂移** —— `git-fleet` 技能在 `skills/` 存在但 `.specify/skills/` 缺 6 个镜像文件(`SKILL.md` + 4 份 references + `scripts/git_fleet.py`),由上游提交 `fe70862e "add a git-fleet skill"` 引入;另有 14 条 `.migration-backups/` 仅存于镜像侧的 `note` 提示(非失败项)。实测 `templates/`(20 文件)、`agents/`、`scripts/`(101 文件)、`shared/`(32 文件)四对均为 `ok`。
+**`sync-mirrors.py --check` 基线说明(重要)**: 该命令**当前 exit 2**,原因是一处**与本特性无关的既有漂移** —— `git-fleet` 技能在 `skills/` 存在但 `.specify/skills/` 缺 6 个镜像文件(`SKILL.md` + 4 份 references + `skills/external/git-utils/scripts/git_fleet.py`),由上游提交 `fe70862e "add a git-fleet skill"` 引入;另有 14 条 `.migration-backups/` 仅存于镜像侧的 `note` 提示(非失败项)。实测 `templates/`(20 文件)、`agents/`、`scripts/`(101 文件)、`shared/`(32 文件)四对均为 `ok`。
 
-因此本特性的镜像门禁是**"所触及镜像对无新增漂移"**,而非笼统的 exit 0:实现后须确认 `templates/docs-target-structure-template.md`、`skills/create-docs/SKILL.md`、`skills/improve-docs/SKILL.md` 三者的镜像均报 `ok`,且 `git-fleet` 之外无新 `MISS`/`DIFF` 行。修复 `git-fleet` 漂移**不属本特性范围**(应由其自身归属方处理)。
+因此本特性的镜像门禁是**"所触及镜像对无新增漂移"**,而非笼统的 exit 0:实现后须确认 `skills/external/create-docs/assets/docs-target-structure-template.md`、`skills/external/create-docs/SKILL.md`、`skills/external/improve-docs/SKILL.md` 三者的镜像均报 `ok`,且 `git-fleet` 之外无新 `MISS`/`DIFF` 行。修复 `git-fleet` 漂移**不属本特性范围**(应由其自身归属方处理)。
 
 > 全量套件存在长期既有失败批次(基线),实现阶段 MUST 先冻结基线再比对,区分"基线失败"与"本次引入的回归"。

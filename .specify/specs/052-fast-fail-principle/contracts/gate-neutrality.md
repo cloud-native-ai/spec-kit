@@ -44,8 +44,8 @@ violations (reversible gates still blocking): 0
 | 宪章原则 XIV | `templates/constitution-template.md` | **是**(同上;且路径含 `constitution-template` ⇒ 命中归 `governance_kept`,**仍计入 total**) |
 | 命令 `MUST include` 条目 | `templates/commands/constitution.md` | **是** |
 | 通道二命令侧落点 | `templates/commands/agents.md` | **是** |
-| 通道二技能侧落点 | `skills/create-agent/SKILL.md` | **是** |
-| 通道三落点 | `skills/create-team/references/patterns.md` | **是** |
+| 通道二技能侧落点 | `skills/internal/create-agent/SKILL.md` | **是** |
+| 通道三落点 | `skills/internal/create-team/references/patterns.md` | **是** |
 | 派发期义务节 | `shared/definitions/subagent-definitions.md` | **是** |
 | 出厂预设子句副本 | `agents/*.agent.md` | 否(`agents/` 不在 `SCAN_DIRS`)——但会经镜像与按工具树扩散,故仍按零命中写作 |
 | 本 spec 目录制品 | `.specify/specs/052-fast-fail-principle/*` | **否**(`SKIP_DIR_PARTS` 含 `.specify`)⇒ 本规格与 `contracts/` 可自由使用「确认门控治理」等命中词 |
@@ -92,7 +92,7 @@ violations (reversible gates still blocking): 0
 
 ## 其他引擎零改动
 
-**C-16** 下列既有引擎与脚本 MUST **零改动**:`scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/bash/generate-instructions.sh`、`scripts/python/feedback-utils.py`、`skills/create-team/scripts/dispatch.sh` 及其流过滤脚本、`src/specify_cli/__init__.py`。守卫形态为 `git diff` 对这六个路径为空,并配反空真哨兵(断言这些路径在改前确实存在且非空)。
+**C-16** 下列既有引擎与脚本 MUST **零改动**:`scripts/python/sync-mirrors.py`、`scripts/python/regen-command-copies.py`、`scripts/bash/generate-instructions.sh`、`scripts/python/feedback-utils.py`、`skills/internal/create-team/scripts/dispatch.sh` 及其流过滤脚本、`src/specify_cli/__init__.py`。守卫形态为 `git diff` 对这六个路径为空,并配反空真哨兵(断言这些路径在改前确实存在且非空)。
 
 **C-17** 镜像与按工具副本 MUST 由既有引擎产出,MUST NOT 手工编辑;`sync-mirrors.py` 的 `MIRROR_PAIRS` MUST 不变(改前实测五对:`templates`(排除 `commands`)、`skills`(排除 `site`)、`agents`→`.specify/agents/templates`、`scripts`、`shared`,其中 `shared` 与 `scripts` 为全树 rglob、无 manifest,故新增 `shared/guidelines/fast-fail.md` 自动被拾取)。
 

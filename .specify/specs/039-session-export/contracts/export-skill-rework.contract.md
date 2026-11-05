@@ -1,6 +1,6 @@
 # Contract: export-skill-rework(export-session 支持面收敛与目录化)
 
-**Surface**: `skills/export-session/SKILL.md` + `scripts/export.py`(stdlib-only 单脚本)
+**Surface**: `skills/export-session/SKILL.md` + `skills/internal/archive-session/scripts/export.py`(stdlib-only 单脚本)
 **Implements**: FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-015, FR-016
 **Upstream contract**: 既有 v1.3.0 行为面(定位机制、退出码)叠加式修订,不改变其语义的部分全部保持。
 

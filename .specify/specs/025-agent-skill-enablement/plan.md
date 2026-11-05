@@ -3,7 +3,7 @@
 **Branch**: `025-agent-skill-enablement` | **Date**: 2026-07-13 | **Spec**: [requirements.md](./requirements.md)
 **Input**: Specification from `.specify/specs/025-agent-skill-enablement/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
@@ -12,8 +12,8 @@ Wire framework skills into the seven built-in role agents so each one prefers a 
 ## Technical Context
 
 **Language/Version**: Markdown agent definitions + YAML frontmatter (no Python runtime change); repo tooling is Python >=3.8  
-**Primary Dependencies**: Existing agent framework (`.specify/agents/`, `skills/create-agent/templates/`), installed skills under `.specify/skills/`; pytest for validation  
-**Storage**: Files only — `agents/*.agent.md`, `skills/create-agent/templates/agent-role-*-template.md`, shared reference snippet  
+**Primary Dependencies**: Existing agent framework (`.specify/agents/`, `skills/internal/create-agent/templates/`), installed skills under `.specify/skills/`; pytest for validation  
+**Storage**: Files only — `agents/*.agent.md`, `skills/internal/create-agent/templates/agent-role-*-template.md`, shared reference snippet  
 **Testing**: pytest (`contract` marker) — reuse the pattern in `tests/contract/test_shipped_agent_presets.py`  
 **Target Platform**: Spec Kit workspace consumed by supported AI agents (Tier 1/2)  
 **Project Type**: Code generator / framework (templates + scripts + `src/specify_cli`)  
@@ -65,20 +65,20 @@ No standalone `research.md` — Phase 0 findings are brief and internal; inlined
 
 ```text
 agents/                                      # 7 shipped role agents — add `skills:` frontmatter + "## Skill Enablement" section to each
-skills/create-agent/templates/               # 7 agent-role-*-template.md — mirror the same additions so regenerated agents inherit skill enablement
-skills/create-agent/templates/               # add agent-skill-enablement.md — single-source skill-preference protocol snippet (composed like agent-supervision-delegation.md)
+skills/internal/create-agent/templates/               # 7 agent-role-*-template.md — mirror the same additions so regenerated agents inherit skill enablement
+skills/internal/create-agent/templates/               # add agent-skill-enablement.md — single-source skill-preference protocol snippet (composed like agent-supervision-delegation.md)
 tests/contract/                              # add test_agent_skill_enablement.py — assert each preset declares ≥1 skill and all refs ⊆ installed skills
 docs/agents/                                 # update command-and-skills.md / design.md to document the skill-enablement convention
 ```
 
-**Structure Decision**: Extends the existing agent framework (a code generator / framework). The canonical source of built-in agents is `agents/*.agent.md` (mirrored to `.specify/agents/` on install); their generators are `skills/create-agent/templates/agent-role-*-template.md`. This spec edits both in lockstep, introduces one shared reference snippet (`agent-skill-enablement.md`) as the single source for the skill-preference protocol, and adds one contract test. No new top-level directory; no `src/specify_cli` change.
+**Structure Decision**: Extends the existing agent framework (a code generator / framework). The canonical source of built-in agents is `agents/*.agent.md` (mirrored to `.specify/agents/` on install); their generators are `skills/internal/create-agent/templates/agent-role-*-template.md`. This spec edits both in lockstep, introduces one shared reference snippet (`agent-skill-enablement.md`) as the single source for the skill-preference protocol, and adds one contract test. No new top-level directory; no `src/specify_cli` change.
 
 ## Phase 0: Research Review
 
 Findings (inlined; internal investigation only):
 
-- **`skills:` frontmatter is supported but unused.** `docs/agents/command-and-skills.md` lists `skills` among supported agent frontmatter fields; `grep` confirms no agent or template currently sets it. Decision: use the existing `skills:` field (YAML list of canonical skill slugs) — no new schema invented (satisfies FR-006, FR-009, "consistency baseline" assumption).
-- **Two edit surfaces exist and must stay in lockstep.** Built-in agents live in `agents/` (shipped, mirrored to `.specify/agents/`); their generators live in `skills/create-agent/templates/agent-role-*-template.md`. Decision: edit both so a regenerated agent is not a regression (FR-011).
+- **`skills:` frontmatter is supported but unused.** `docs/reference/agents/command-and-skills.md` lists `skills` among supported agent frontmatter fields; `grep` confirms no agent or template currently sets it. Decision: use the existing `skills:` field (YAML list of canonical skill slugs) — no new schema invented (satisfies FR-006, FR-009, "consistency baseline" assumption).
+- **Two edit surfaces exist and must stay in lockstep.** Built-in agents live in `agents/` (shipped, mirrored to `.specify/agents/`); their generators live in `skills/internal/create-agent/templates/agent-role-*-template.md`. Decision: edit both so a regenerated agent is not a regression (FR-011).
 - **Single-source guidance pattern already exists.** `agent-supervision-delegation.md` is composed into supervisors at generation time rather than copy-pasted. Decision: add `agent-skill-enablement.md` as the single-source protocol text; each agent's per-role skill table is the only per-agent-varying part (FR-009).
 - **Existing contract test is non-blocking for this change.** `tests/contract/test_shipped_agent_presets.py` only asserts presence of `name/description/model/tools/maxTurns`; adding `skills:` does not break it. Decision: add a dedicated `test_agent_skill_enablement.py` that fails first (Principle IV).
 - **Reference-only skills are excluded from declarations.** `sdd-workflow` is documented as "NOT invoked directly." Meta skills (`create-agent`, `improve-agent`, `create-skills`, `improve-skills`, `organize-agents`) belong to `/speckit.agents` and `/speckit.skills` workflows, not role-agent operations. Decision: exclude both classes from role `skills:` lists to keep the mapping meaningful (FR-004).

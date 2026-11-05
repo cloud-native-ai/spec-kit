@@ -10,7 +10,7 @@
 | D1 引擎源码托管 | `scripts/js/better-harness/`(+ 镜像)+ UPSTREAM.md/LICENSE;contracts/engine-subset-boundary.md |
 | 证据合同与编排 | evidence-utils.py(五 action)+ `.specify/memory/evidence/` 存储;contracts/{findings-contract,evidence-utils-cli}.md |
 | D3 自有泳道 | runs/feedback 纯 Python 泳道(C-E9/C-E10) |
-| 公共技能与约定 | skills/collect-evidence + shared/workflow/evidence-step.md |
+| 公共技能与约定 | skills/internal/collect-evidence + shared/workflow/evidence-step.md |
 | 消费层改造 | improve-skills/agent/team 三技能接入证据步骤 |
 | 纵向验证 | intervention.json + compare verdict(C-E7/C-F14) |
 | D2 平台扩展 | 本 spec 边界内仅 doctor 探测报告与定序建议(Clarify Q3) |

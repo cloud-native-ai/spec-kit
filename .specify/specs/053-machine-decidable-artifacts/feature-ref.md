@@ -148,7 +148,7 @@
 | 镜像副本 | 全部 `scripts/python/` 与 `shared/` 落点的 `.specify/` 对偶 + `templates/commands/` 的 4 个逐工具副本 | D-17 |
 | 改既有 Tool 记录 | `.specify/memory/tools/goal-utils.py.md` —— 其 `:39` 的 subcommand 枚举行当前只列 **6** 个(`create`/`validate`/`list`/`status`/`criteria`/`migrate`)而二进制实有 **9** 个(缺 `check-statement`/`objective`/`targets`);US4 再加第 10 个 `run-checks` 与 `EXIT_BLOCKED = 5`,故 MUST 在同一提交内把该记录订正到 10 个并补退出码表 | Principle XII(Tool 记录的权威高于模型知识,故一份陈旧记录会被下游当作事实继承);本轮委托评分查出的 ❌ Fail |
 | 改既有文档 | `docs/reference/commands/requirements.md`、`docs/reference/commands/tasks.md`、`docs/reference/commands/team.md`(后者 `:68,70` 已被 `contracts/run-checks.md` C-27 点名要求与新调用形式一致) | Principle VI(可观测面文档);本轮委托评分查出的 ⚠ Partial —— 义务已写进契约却无落点行 |
-| 改既有文档 | `skills/create-team/references/execution-guide.md:27,30`、`skills/create-team/references/goal.md:45`(描述同五项检查的散文面) | `contracts/run-checks.md` C-27; Principle VI |
+| 改既有文档 | `skills/internal/create-team/references/execution-guide.md:27,30`、`skills/internal/create-team/references/goal.md:45`(描述同五项检查的散文面) | `contracts/run-checks.md` C-27; Principle VI |
 | 新建 owner 文档的可理解性接线 | `shared/definitions/contract-clause-definitions.md` 的新增节 MUST 携一行指向 `.specify/shared/guidelines/user-facing-comprehension.md` 的 canonical 指针,且新检查器 verdict 消息的**词汇**MUST 受该纪律约束(不只受 `checker-form.md` C-8 的数字尾行形态约束) | Principle XV;本轮委托评分查出的 ⚠ Partial |
 | Better-Harness 归因 | 本特性强化的是 Agent Work Loop 的**验证/证据**维度(把「代理声明已核验」换成「程序给出会红的判定」),归因行落在 `.specify/memory/features/053.md` § Implementation Notes | Principle XIII(`docs/concepts/better-harness.md`);本轮委托评分查出的 ⚠ Partial |
 

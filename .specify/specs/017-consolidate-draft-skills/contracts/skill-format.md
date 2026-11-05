@@ -19,7 +19,7 @@ skill_id: "<SKILL:path>"     # Required. Canonical path-based ID.
 
 ### Validation Rules
 
-- `name` MUST match the directory name (e.g., `document-utils` for `skills/document-utils/SKILL.md`).
+- `name` MUST match the directory name (e.g., `document-utils` for `skills/external/document-utils/SKILL.md`).
 - `description` MUST be a YAML block scalar (`|`) with trigger keywords for AI agent matching.
 - `description` MUST include both English and Chinese trigger terms.
 - `skill_id` MUST follow the pattern `<SKILL:.specify/skills/<name>/SKILL.md>`.

@@ -62,8 +62,8 @@
 
 | 落点 | 形式 |
 |------|------|
-| `skills/create-skills/references/skill-creation-quality-checklist.md` | 新检查组:确定性步骤交程序?数据访问摘要化?(引用纪律文档) |
-| `skills/improve-skills/references/skill-quality-checklist.md` | 同上(改进侧对偶) |
-| `skills/create-agent/SKILL.md`、`skills/create-team/SKILL.md`、`skills/create-tools/SKILL.md` | 各自验证步骤加一行检查项引用(不复制定义) |
+| `skills/external/create-skills/references/skill-creation-quality-checklist.md` | 新检查组:确定性步骤交程序?数据访问摘要化?(引用纪律文档) |
+| `skills/external/improve-skills/references/skill-quality-checklist.md` | 同上(改进侧对偶) |
+| `skills/internal/create-agent/SKILL.md`、`skills/internal/create-team/SKILL.md`、`skills/internal/create-tools/SKILL.md` | 各自验证步骤加一行检查项引用(不复制定义) |
 
 **关系图**: 纪律文档 ←引用— feedback-step 扩展 / 创作检查单 / instructions-template ambient 节;纪律文档 —判据→ audit.md 违规行;audit.md top-5 —整改→ 命令模板(经镜像扇出);反馈条目 —[[STR-001]] 标记→ `list --contains` 检索 → improve-* 消费。

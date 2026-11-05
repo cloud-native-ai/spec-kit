@@ -135,7 +135,7 @@
 - **goal 只有叙述没有可验证判据**:允许归档,但里程碑组为空,且在消费侧显式声明"该目标未提供可验证判据",不虚构判据。
 - **同一 goal 目录内定义与总结混写**:目录既有被撰写的 [[STR-003]] 又有派生的 [[STR-004]] 子树 → 写入面是 [[STR-004]] 白名单(FR-023);若刷新写到了 [[STR-003]],视为写入面违规而非"顺带更新"。
 - **派生产物散落在 goal 目录根**:迁移前的产物直接躺在 `<goal-slug>/` 根(036 现状:`data/project-input.yaml` 与被调技能产出的 `project.md` / 图表)→ 视为待迁移状态,MUST 收拢进 [[STR-004]],MUST NOT 与 [[STR-003]] 平级长期共存。
-- **迁移期新旧路径并存**:迁移过程中若旧 `.specify/project/goal/` 仍有产物 → 以 [[STR-001]] 为唯一权威,旧位置的产物 MUST 被迁移或删除,MUST NOT 长期并存两份总结。
+- **迁移期新旧路径并存**:迁移过程中若旧 `.specify/goal/` 仍有产物 → 以 [[STR-001]] 为唯一权威,旧位置的产物 MUST 被迁移或删除,MUST NOT 长期并存两份总结。
 - **同一 goal 下只有一个团队**:名册照常产出(单行),重叠集为空,协调轮不发起——"无重叠"与"无从判定"MUST 被区分开。
 - **两团队的范围写法不同但指向同一路径**(glob 与显式枚举、相对与规范化路径、`{a,b}` 花括号与展开形式)→ MUST 先规范化再求交,MUST NOT 因写法差异漏判重叠(此类漏判在本仓库已有先例:花括号路径曾逃过一次存在性检查)。
 - **团队改绑到另一个 goal 后仍与新 goal 的团队重叠**:改绑即视为范围变更,下次刷新按新 goal 重新检测(与 036 的 GI-2 一致);原 goal 的名册记录其已不再参与。
@@ -181,7 +181,7 @@
 
 - **FR-020**: [[STR-001]] MUST 是项目中 goal 相关产物的**唯一**归属位置,同时承载该 goal 的**定义**(被撰写)与**总结**(派生);MUST NOT 存在第二个以 goal 为索引的目录。
 - **FR-021**: 新增的任何命令行选项 MUST NOT 与既有 `--goal` 语义冲突——该选项已被两支脚本占用且含义不同(见 Assumptions)。
-- **FR-022**: 需求 036 落地的总结交付目录 MUST 从 `.specify/project/goal/<goal-slug>/` 迁移到 [[STR-001]]`<goal-slug>/`[[STR-004]] 之下;`.specify/project/` MUST NOT 再存放任何 goal 相关产物。迁移 MUST 覆盖**全部活跃引用面**——计划阶段实测 **24 个源文件**:4 个 canonical 源(`skills/create-team/{SKILL.md,references/summary-mapping.md,scripts/build-summary-input.py}`、`templates/commands/team.md`)、4 个 `.specify/` 镜像、5 份 per-tool 生成副本、9 个测试文件、1 个用户文档(`docs/reference/commands/team.md`)、1 个 Tool 记录。**活跃面**的残留旧路径引用数 MUST 为 0;**历史面** MUST NOT 被改写——036 的既有规格产物、append-only 的反馈记录、以及本规格 `## Clarifications` 中逐字引用旧路径的条目(计划阶段实测 18 个文件)是历史事实,改写它们等于篡改记录。
+- **FR-022**: 需求 036 落地的总结交付目录 MUST 从 `.specify/goal/<goal-slug>/` 迁移到 [[STR-001]]`<goal-slug>/`[[STR-004]] 之下;`.specify/project/` MUST NOT 再存放任何 goal 相关产物。迁移 MUST 覆盖**全部活跃引用面**——计划阶段实测 **24 个源文件**:4 个 canonical 源(`skills/internal/create-team/{SKILL.md,references/summary-mapping.md,skills/internal/create-team/scripts/build-summary-input.py}`、`templates/commands/team.md`)、4 个 `.specify/` 镜像、5 份 per-tool 生成副本、9 个测试文件、1 个用户文档(`docs/reference/commands/team.md`)、1 个 Tool 记录。**活跃面**的残留旧路径引用数 MUST 为 0;**历史面** MUST NOT 被改写——036 的既有规格产物、append-only 的反馈记录、以及本规格 `## Clarifications` 中逐字引用旧路径的条目(计划阶段实测 18 个文件)是历史事实,改写它们等于篡改记录。
 - **FR-023**: 在 [[STR-001]]`<goal-slug>/` 之内,**被撰写的定义**MUST 落在 [[STR-003]],**派生的总结**MUST 全部落在 [[STR-004]] 子树之内;总结刷新的写入面 MUST 是 [[STR-004]] 的白名单,MUST NOT 写入 [[STR-003]](承接 FR-007 与 036 的写入面纪律)。
 - **FR-024**: 迁移 MUST 保持 036 的既有验收能力不回归:其成功判据与测试在迁移后 MUST 仍然成立(仅路径更新),MUST NOT 因迁移而削弱任何既有断言。
 
@@ -240,7 +240,7 @@
 - **SC-008**: goal 定义的只读性:任何派生流程(总结刷新等)对 [[STR-003]] 的写入次数为 0(派生写入全部落在 [[STR-004]] 子树内)。
 - **SC-009**: 单一 goal 索引:项目中以 goal 为索引的目录数恒为 1;`.specify/project/` 下 goal 相关产物数为 0。
 - **SC-010**: 团队域中关于 goal 撰写/修改的指引 100% 指向新的单一事实源,残留的第二套说法数为 0。
-- **SC-011**: 迁移完整性:**活跃面**残留 `.specify/project/goal` 引用数为 0(计划阶段实测基线 24 个源文件);历史面(036 规格产物、反馈记录、本规格 Clarifications)被改写的文件数为 0;迁移后 036 的既有测试全部仍然通过,新增失败数为 0。
+- **SC-011**: 迁移完整性:**活跃面**残留 `.specify/goal` 引用数为 0(计划阶段实测基线 24 个源文件);历史面(036 规格产物、反馈记录、本规格 Clarifications)被改写的文件数为 0;迁移后 036 的既有测试全部仍然通过,新增失败数为 0。
 - **SC-012**: 撰写入口单一性:提供 goal 定义写入能力的入口数恒为 1(`/speckit.goal`);新增命令面的镜像漂移数为 0。
 - **SC-013**: 概念一致性:本规格与 [[STR-005]] 的概念冲突数为 0——**八个维度**逐条核对一致:构成部分、生命周期状态集合、与 requirement 的平面关系(含无结构化关联)、判据权威边界、单一性、作用对象范围、叙述形态(结果而非任务清单)、验证方式(按度量而非逐条 pass/fail)。
 - **SC-014**: 两库不混写:goal 判据与任一需求规格 SC-xxx 的逐字重复条数为 0;携带 goal 字段的 `requirements.md` 数为 0;枚举其下 FR 的 goal 定义数为 0。
@@ -261,12 +261,12 @@
 - **SC-008 Source**: 一次总结刷新前后对 [[STR-003]] 做内容指纹比对(与 036 的 SC-003 同法);派生写入以"落在 [[STR-004]] 之外的写入路径数"计数。
 - **SC-009 Source**: 对全仓做 goal 索引目录的枚举(以 `<goal-slug>` 为子目录的路径),以及 `.specify/project/` 下 goal 相关产物的清点。
 - **SC-010 Source**: 对团队域 goal 相关指引文件做指向核对(是否引用新事实源),残留说法以"仍规定 goal 应写在团队文件内"计数。
-- **SC-011 Source**: `grep -rl 'project/goal'` 全仓计数后**按面分类**:活跃面 = canonical 源 + `.specify/` 镜像 + per-tool 生成副本 + 测试 + 用户文档 + Tool 记录(计划阶段实测 24);历史面 = `.specify/specs/036-team-summary/**`、`.specify/specs/037-goal-registry/**`、`.specify/memory/feedback/**`、`.specify/memory/features*`(实测 18),`__pycache__/*.pyc` 为构建产物不计。036 测试套件按其既有 runner 重跑并与 `baseline-failed.txt` 做差集(计划阶段基线:40 failed / 1308 passed / 1 skipped)。**注**:`.specify/project/goal/` 在本仓库尚未实体化(生成器按需创建),故迁移无存量数据需搬移,是纯代码/文档/测试迁移。
+- **SC-011 Source**: `grep -rl 'project/goal'` 全仓计数后**按面分类**:活跃面 = canonical 源 + `.specify/` 镜像 + per-tool 生成副本 + 测试 + 用户文档 + Tool 记录(计划阶段实测 24);历史面 = `.specify/specs/036-team-summary/**`、`.specify/specs/037-goal-registry/**`、`.specify/memory/feedback/**`、`.specify/memory/features*`(实测 18),`__pycache__/*.pyc` 为构建产物不计。036 测试套件按其既有 runner 重跑并与 `baseline-failed.txt` 做差集(计划阶段基线:40 failed / 1308 passed / 1 skipped)。**注**:`.specify/goal/` 在本仓库尚未实体化(生成器按需创建),故迁移无存量数据需搬移,是纯代码/文档/测试迁移。
 - **SC-012 Source**: 清点具备 goal 定义写入能力的入口(命令 / 技能 / 脚本)数;镜像漂移以 `python3 scripts/python/sync-mirrors.py --check` 的退出码计数(0 = 无漂移,2 = 漂移)。基线:当前入口数 0(goal 定义概念尚不存在)。
 - **SC-013 Source**: 以 [[STR-005]] 的条目为清单,逐项比对本规格的对应表述(八个维度,见 SC-013),冲突以"两侧表述互斥"计数、缺口以"定义文件有约束而规格无对应条款"计数。基线实测(2026-08-05 本轮核对前):**3 项冲突** —— 生命周期 4 态 vs 3 态;goal 构成"至少 5 项"vs"恰三部分";Assumptions 写"不同层次"暗示层级 vs 定义明确无必然层级 —— 加 **6 项缺口** —— 叙述须为结果而非任务清单、单一性的"每个 goal 只承载一个目标"半边、作用对象不受限、按度量验证、判据权威互斥、无结构化关联。另有 **8 项本已一致**,详见 Clarifications 的核对条目。
 - **SC-014 Source**: 对 goal 定义与全部 `requirements.md` 做交叉比对:判据逐字重复以文本比对计数,goal 字段与 FR 枚举以字段扫描计数。基线:当前无 goal 定义,三项计数均为 0。
 - **SC-015 Source**: 以"声明了该 [[STR-002]] 的团队集合"为真值,与派生名册做集合差;对 [[STR-003]] 做刷新前后内容指纹比对取写入次数;触发点数由代码路径清点(调用重叠检测的位置数)。基线实测:当前无名册机制,可枚举名册数为 0。
-- **SC-016 Source**: 对名册中任两团队的 Write Scope 做规范化后求交,统计交集条目数;争用区状态由其归属字段(唯一团队 / 禁写区 / 未决)清点;误判由"仅 Read Scope 相交却出现在重叠集中的对数"计数。基线实测:**无从判定** —— 当前无团队级范围声明,`territory` 只存在于 parallel 模式的成员级(见 `skills/create-team/SKILL.md` 的 Territory Division 一节),团队之间无范围可求交。
+- **SC-016 Source**: 对名册中任两团队的 Write Scope 做规范化后求交,统计交集条目数;争用区状态由其归属字段(唯一团队 / 禁写区 / 未决)清点;误判由"仅 Read Scope 相交却出现在重叠集中的对数"计数。基线实测:**无从判定** —— 当前无团队级范围声明,`territory` 只存在于 parallel 模式的成员级(见 `skills/internal/create-team/SKILL.md` 的 Territory Division 一节),团队之间无范围可求交。
 - **SC-017 Source**: 对协调轮前后各 `team.md` 做内容指纹比对(提议阶段 MUST 零变化);落盘的重划以其裁定记录(谁、何时裁定哪一份提议)可追溯性计数。基线:当前无协调机制,三项计数均为 0。
 - **SC-018 Source**: 构造三类团队——已声明范围、未声明范围、以不同写法(glob / `{a,b}` 花括号 / 相对路径)指向同一路径——采集各自的检测结论;漏判以"实际同路径却未判为重叠的对数"计数。基线:当前 4 个团队全部未声明团队级范围,故任一多团队 goal 的结论都应为"无法判定"。
 
@@ -290,7 +290,7 @@
 
 ## Assumptions
 
-- **单一 goal 目录(2026-08-04 用户裁定)**:[[STR-001]] **收编**需求 036 刚落地的 `.specify/project/goal/<goal-slug>/`,`.specify/project/` 不再存放 goal 相关产物。理由是同一个 goal 的定义与总结本就属于同一对象的两面,分置两个高度相似的路径(仅差一层目录)只会持续制造误读。代价已实测(计划阶段复核):**24 个活跃源文件**引用旧路径需一并迁移(FR-022),其中包含 5 份 per-tool 生成副本与 036 的 9 个测试文件;另有 18 个历史面文件同样含该字符串但 MUST NOT 被改写。旧目录 `.specify/project/goal/` 在本仓库尚未实体化,故这是纯代码/文档/测试迁移,无存量数据搬移。这笔返工是有意接受的,换取长期只有一个 goal 索引。目录内部以 [[STR-003]](定义)与 [[STR-004]] 子树(总结)分离(FR-023),使 036 的写入面纪律由"黑名单"变为单一子树白名单,继续可机械校验。
+- **单一 goal 目录(2026-08-04 用户裁定)**:[[STR-001]] **收编**需求 036 刚落地的 `.specify/goal/<goal-slug>/`,`.specify/project/` 不再存放 goal 相关产物。理由是同一个 goal 的定义与总结本就属于同一对象的两面,分置两个高度相似的路径(仅差一层目录)只会持续制造误读。代价已实测(计划阶段复核):**24 个活跃源文件**引用旧路径需一并迁移(FR-022),其中包含 5 份 per-tool 生成副本与 036 的 9 个测试文件;另有 18 个历史面文件同样含该字符串但 MUST NOT 被改写。旧目录 `.specify/goal/` 在本仓库尚未实体化,故这是纯代码/文档/测试迁移,无存量数据搬移。这笔返工是有意接受的,换取长期只有一个 goal 索引。目录内部以 [[STR-003]](定义)与 [[STR-004]] 子树(总结)分离(FR-023),使 036 的写入面纪律由"黑名单"变为单一子树白名单,继续可机械校验。
 - **身份复用 `goal_slug` 而不新造**:036 已把 [[STR-002]] 确立为"同一个 goal"的连接键并写入团队 frontmatter schema,其文法受被调技能的 DDL 约束(首字符字母或数字,其余限 `[A-Za-z0-9_.-]`)。本需求沿用同一键与同一文法,使定义与聚合天然对齐;新造第二套标识会立刻产生两套身份的交接问题。
 - **团队侧改为"引用 + 可选内联"而非强制替换**:团队声明 [[STR-002]] 即视为引用该定义;内联 `goal:` 与 `## Goal` 保留为合法(可读性与存量兼容),但定义存在时以定义为权威(FR-012)。这与 036 对未声明 [[STR-002]] 团队采用推断回退的处置同构,故存量零改造可用。
 - **`--goal` 命令行选项已被占用**:`build-summary-input.py --goal` 表示"要聚合的 goal 身份",`match-team-preset.py --goal` 表示"目标文本"。本需求若需新增选项,MUST 避开该名称或明确复用其中一种语义(FR-021);建议用 `--goal-id` 之类无歧义形式。具体命名留待 `/speckit.plan` 裁定——它取决于 `/speckit.goal` 是否需要脚本级选项,而那是设计决定,不是需求歧义。
@@ -299,14 +299,14 @@
 - **概念事实源为只读输入(2026-08-05 用户裁定)**:[[STR-005]] 是 goal **概念**的单一事实源,本需求只引用、不修改它(其 `.specify/shared/definitions/` 镜像同理)。因此本轮核对的处置一律是"改规格以对齐定义",而非"改定义以迁就规格"——生命周期由 4 态收敛为 3 态即属此列。若日后确需第四个状态或其他概念变更,应作为对该文件的独立修订提出,不由本需求夹带。
 - **目录内布局由本 Feature 拥有**:[[STR-005]] 只固定 goal 的**位置与语义**,并明确"`<goal-slug>/` 之内的文件布局归实现 goal 管理的 Feature 所有"。因此 [[STR-003]] + [[STR-004]] 的划分(含把 036 的派生总结收进同一 goal 目录)不与定义文件冲突,而正是它显式授权的范围;定义文件的存储树只画出 goal 定义本身,并未排除同目录下的派生子树。
 - **成功判据可为空**:允许只有叙述的 goal 归档,此时消费侧(如 036 的里程碑)显式声明"未提供可验证判据"而不虚构——与 036 既有的诚实降级纪律一致。
-- **协调复用既有 territory 词汇,而非另造"覆盖区域"(2026-08-05 用户裁定)**:团队内部早有答案——`skills/create-team/SKILL.md` 的 Territory Division 以 Write Scope / Read Scope / Forbidden 加"零写重叠"不变式解决成员之间的同一问题,并已有可选的 worktree 物理隔离作后手。本需求把这套词汇与不变式抬到团队级(FR-035 / FR-037),而不是引入第二套范围概念。必须新增**团队级**字段的原因是实测:`territory` 只存在于 parallel 模式的**成员级**,serial / iteration / continuous 三种模式完全没有,故无法只靠"求成员范围的并集"来推导团队范围。路径形与非路径形并存则是 FR-029 的直接后果——goal 的作用对象不受限,团队的覆盖范围因此不一定是文件形状的。
+- **协调复用既有 territory 词汇,而非另造"覆盖区域"(2026-08-05 用户裁定)**:团队内部早有答案——`skills/internal/create-team/SKILL.md` 的 Territory Division 以 Write Scope / Read Scope / Forbidden 加"零写重叠"不变式解决成员之间的同一问题,并已有可选的 worktree 物理隔离作后手。本需求把这套词汇与不变式抬到团队级(FR-035 / FR-037),而不是引入第二套范围概念。必须新增**团队级**字段的原因是实测:`territory` 只存在于 parallel 模式的**成员级**,serial / iteration / continuous 三种模式完全没有,故无法只靠"求成员范围的并集"来推导团队范围。路径形与非路径形并存则是 FR-029 的直接后果——goal 的作用对象不受限,团队的覆盖范围因此不一定是文件形状的。
 - **协调与 [[STR-005]] 兼容性已核对**:定义文件规定绑定是"单向身份引用,团队侧只存身份"。本需求的名册是**派生**的(FR-033)——由机制扫描各团队声明得出,不写入 goal 定义、不产生 goal→team 的存储字段,故单向绑定不变;裁定后的划分写回 `team.md`(FR-040),团队仍是唯一声明方。定义文件的单一性规则本就写明"项目可并行持有多个 active goal,each advanced by its own **team(s)**",即 N 团队推进一个 goal 是它已经认可的形态,只是未涉及协调。因此协调是**团队域的增量**而非 Goal 概念的变更,上一轮"定义文件为只读输入"的裁定继续成立,本需求不修改它。
 
 ## Clarifications
 
 ### Session 2026-08-04
 
-- Q: `.specify/goal/`(本规格的定义归档)与 `.specify/project/goal/`(036 刚落地的总结交付目录)命名高度相似,怎么处理? → A(用户原话): **「使用.specify/goal/收编.specify/project/goal/,.specify/project/目录不再存放goal」**。据此:[[STR-001]] 成为 goal 相关产物的唯一归属(FR-024),036 的总结交付目录迁移至其下(FR-026),目录内以结构分离定义与总结以保住写入面纪律(FR-027),迁移不得削弱 036 既有断言(FR-028)。FR-015 相应改写——保留 036 的聚合语义与身份文法,但其交付目录位置按 FR-026 迁移。
+- Q: `.specify/goal/`(本规格的定义归档)与 `.specify/goal/`(036 刚落地的总结交付目录)命名高度相似,怎么处理? → A(用户原话): **「使用.specify/goal/收编.specify/goal/,.specify/project/目录不再存放goal」**。据此:[[STR-001]] 成为 goal 相关产物的唯一归属(FR-024),036 的总结交付目录迁移至其下(FR-026),目录内以结构分离定义与总结以保住写入面纪律(FR-027),迁移不得削弱 036 既有断言(FR-028)。FR-015 相应改写——保留 036 的聚合语义与身份文法,但其交付目录位置按 FR-026 迁移。
 
 ### Session 2026-08-05
 
@@ -335,7 +335,7 @@
 
 用户指示(原话):**「需要在goal层面记录正在实施这一goal的多个team,并且需要建立一套协调机制.假设多个team在同时执行一个goal,而且它们覆盖的区域有重叠,需要对多个team进行一轮协调,以重新划定各个team的范围,保证它们之间是协作关系而不是互相竞争」**。
 
-先核实了现状再设计:团队**内部**已有完整答案(`skills/create-team/SKILL.md` → Territory Division:Write Scope / Read Scope / Forbidden + "零写重叠"不变式 + 可选 worktree 物理隔离),但它只在 **parallel 模式的成员级**成立;serial / iteration / continuous 三种模式没有 territory,且**不存在任何团队级范围字段**。因此本次不另造"覆盖区域"概念,而是把既有纪律抬高一级。
+先核实了现状再设计:团队**内部**已有完整答案(`skills/internal/create-team/SKILL.md` → Territory Division:Write Scope / Read Scope / Forbidden + "零写重叠"不变式 + 可选 worktree 物理隔离),但它只在 **parallel 模式的成员级**成立;serial / iteration / continuous 三种模式没有 territory,且**不存在任何团队级范围字段**。因此本次不另造"覆盖区域"概念,而是把既有纪律抬高一级。
 
 - Q: 团队的"覆盖区域"用什么表示,才能让重叠可检测? → A: **团队级 territory(路径 + 类型化条目)**(否决项:只从成员 territory 派生——三种模式无 territory,覆盖不全;按 goal 判据条目认领——绕过非文件维度但漏掉写冲突;自由文本纯代理判断——与 territory 的确定性纪律背道而驰)。落为 FR-035;路径形可规范化求交,非路径形(承接 FR-029 的作用对象不受限)如实并列待裁定。
 - Q: 协调轮的权限到哪一步? → A: **机制检测 + 提议,人裁定**(否决:代理协商并自动改写;仅报告重叠)。落为 FR-039 —— 提议须附依据,提议阶段对 `team.md` 零写入(SC-017)。与 FR-012 的"报出供人裁决"及团队运行的 preview→confirm→execute 门同源。
@@ -351,6 +351,6 @@
 `/speckit.plan` 的代码勘查暴露出一处**度量缺陷**,不修正则 SC-011 按字面不可能达成,故先改规格再填计划(无用户裁定,属事实核实):
 
 - **旧数"37 个文件"已失效**:该数字在 037 自身的规格与反馈记录写入之前采集。计划阶段重新实测:全仓含 `project/goal` 字符串的文本文件共 **51** 个,其中 `__pycache__/*.pyc` 9 个为构建产物,**活跃源文件 24 个**(4 canonical + 4 `.specify/` 镜像 + 5 per-tool 生成副本 + 9 测试 + 1 用户文档 `docs/reference/commands/team.md` + 1 Tool 记录),**历史面 18 个**。
-- **"全仓残留为 0"不可达成**:历史面包含 036 的既有规格产物、append-only 的反馈记录,以及本规格 `## Clarifications` 中**逐字引用**旧路径的用户裁定条目(2026-08-04 那条原话就含 `.specify/project/goal/`)。改写它们等于篡改历史记录。据此 FR-022 与 SC-011 改为**按面分级**:活跃面残留 MUST 为 0,历史面被改写数 MUST 为 0;SC-011 Source 给出可复现的分类规则。
-- **迁移无存量数据**:`.specify/project/goal/` 在本仓库**尚未实体化**(生成器按需创建,`build-summary-input.py:602`),`.specify/project/` 下只有 `manage-project` 时代的 `project.md` 与图表。因此这是纯代码/文档/测试迁移;"迁移期新旧路径并存"的 Edge Case 在本仓库为空载,但保留为守卫。
+- **"全仓残留为 0"不可达成**:历史面包含 036 的既有规格产物、append-only 的反馈记录,以及本规格 `## Clarifications` 中**逐字引用**旧路径的用户裁定条目(2026-08-04 那条原话就含 `.specify/goal/`)。改写它们等于篡改历史记录。据此 FR-022 与 SC-011 改为**按面分级**:活跃面残留 MUST 为 0,历史面被改写数 MUST 为 0;SC-011 Source 给出可复现的分类规则。
+- **迁移无存量数据**:`.specify/goal/` 在本仓库**尚未实体化**(生成器按需创建,`build-summary-input.py:602`),`.specify/project/` 下只有 `manage-project` 时代的 `project.md` 与图表。因此这是纯代码/文档/测试迁移;"迁移期新旧路径并存"的 Edge Case 在本仓库为空载,但保留为守卫。
 - **基线同时刷新**:测试基线由 036 的 39 failed / 1309 passed 变为 **40 failed / 1308 passed / 1 skipped**,名单存于 `baseline-failed.txt`。新增的那一条 `test_review_prerequisite_flags_are_supported` 与本需求无关——它断言 `AVAILABLE_DOCS` 含 `tasks.md`,而当前分支尚无 `tasks.md`,属**分支状态依赖**的脆弱断言,`/speckit.tasks` 产出 `tasks.md` 后将自动恢复通过。该测试同时验证了 `Related Feature` 绑定可被机器读取(输出含 `"FEATURE_ID":"041"`、`"FEATURE_NAME":"Goal Registry"`)。
