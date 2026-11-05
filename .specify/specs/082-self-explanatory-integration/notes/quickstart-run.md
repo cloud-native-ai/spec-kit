@@ -226,3 +226,72 @@ T036's row is closed with no code change: both readings are transcripts above.
 The leg driver and both mutation transcripts live in `notes/red-first-evidence.md` § M-5 / M-6; the
 scratch root `.specify/.tmp/082-part7/` was created only after `git check-ignore -q .specify/.tmp`
 succeeded, and was removed before this part's commit. No repository file was the subject of a mutation.
+
+## T047 — 名称一致性终检 (executed 2026-11-05, implement part 9)
+
+Two greps over the four client-facing outputs. Both name the **bracketed** form exactly as the
+ratified shared string `STR-003` writes it; neither is a substring proxy for "the principle exists".
+
+```console
+$ grep -cF 'Self-Explanatory Structure (不言自明)' templates/constitution-template.md \
+      templates/instructions-template.md .specify/memory/constitution.md .specify/instructions.md
+templates/constitution-template.md:1
+templates/instructions-template.md:1
+.specify/memory/constitution.md:2
+.specify/instructions.md:1
+RC=0
+```
+
+Each file carries at least one occurrence (`1 / 1 / 2 / 1`). The live constitution's `2` is the body
+heading **plus** this amendment's Sync Impact Report line that names the principle it added — two
+surfaces of the same one name, not two names.
+
+```console
+$ grep -cF '.specify/shared/definitions/self-explanatory-definitions.md' templates/constitution-template.md \
+      templates/instructions-template.md .specify/memory/constitution.md .specify/instructions.md
+templates/constitution-template.md:1
+templates/instructions-template.md:1
+.specify/memory/constitution.md:1
+.specify/instructions.md:1
+RC=0
+```
+
+Each client-facing output carries the **runtime** owner pointer exactly once. The pointer is the
+`.specify/` form (what a client project actually has on disk, Assumption A3), not the framework-source
+`shared/definitions/...` form — those two are different readers, and only the runtime form is
+client-facing.
+
+**Variant scan (the negative half of the claim).** The brief asks only for the two greps above, but a
+name check that cannot fail on a competing form proves little, so the two variant shapes
+`contracts/glossary-integration.contract.md#C-34` enumerates were searched for as well:
+
+```console
+$ grep -rnE 'Self-[Ee]xplanatory [Ss]tructures' --include='*.md' templates/ \
+      .specify/instructions.md .specify/memory/constitution.md .specify/templates/
+(no output)  RC=1
+
+$ grep -c '望文生义' templates/constitution-template.md templates/instructions-template.md \
+      .specify/memory/constitution.md .specify/instructions.md
+templates/constitution-template.md:0
+templates/instructions-template.md:0
+.specify/memory/constitution.md:0
+.specify/instructions.md:0
+RC=1
+```
+
+The plural form `Self-explanatory Structures` appears nowhere (`RC=1` = no match); every occurrence in
+the four outputs is the singular bracketed form. The retired Chinese name `望文生义` is absent from all
+four client-facing outputs (`0` each), so no output treats it as a current name.
+
+**Scope note.** T047's own claim is name consistency across the four outputs, and that is what the
+command output above establishes. The *third-form* assertion with its guard (`STR-001` vs `STR-003`
+shared portion, `望文生义`-as-current-name) is `C-34`'s and is **T053's**, not this row's; T053 is not
+started here.
+
+## Part 9 (T044-T047) — scratch root
+
+The C-33 red-leg driver ran from `.specify/.tmp/082-part9/`, created only after
+`git check-ignore -q .specify/.tmp` matched (`.specify/.gitignore:30 .tmp/`), and removed before this
+part's commit. Every leg operated on copies; the real store's sha256 is asserted unchanged in the leg
+driver's isolation check.
+

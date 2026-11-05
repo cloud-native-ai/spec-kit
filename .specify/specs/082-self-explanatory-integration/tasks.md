@@ -179,9 +179,9 @@
 ### Implementation for User Story 4
 
 - [X] T043 [US4] [blockedBy: T039] 经引擎登记词条: `python3 scripts/python/glossary-utils.py --action add --canonical "不言自明 (Self-explanatory)" --variants "望文生义" --meaning "<摘要 + 真源路径 shared/definitions/self-explanatory-definitions.md>" --origin auto --status proposed`;登记前先跑 `--action detect-conflict` 并把结果留痕;MUST NOT 手工编辑表格 [green: contracts/glossary-integration.contract.md#C-31]
-- [ ] T044 [US4] [blockedBy: T043] 确认状态不被流程推进:断言该行 `status` 仍为 `proposed`,并在 `notes/pre-change-measurements.md` 记一行「提升属用户动作(data-model T-B / 需求 A6),本特性不改写」 [green: contracts/glossary-integration.contract.md#C-33]
-- [ ] T045 [US4] [blockedBy: T043] 断言既有机制套件未受影响且未改动: `git diff --stat tests/contract/test_glossary_mechanism.py` 必须为空,`python3 -m pytest tests/contract/test_glossary_mechanism.py -q` 退出 0 [green: contracts/glossary-integration.contract.md#C-31]
-- [ ] T046 [US4] [blockedBy: T030] 确认 `/speckit.improve` 未被接线:`git diff --stat templates/commands/improve.md` 为空,且 `grep -c 'best-practice-optimization' templates/commands/improve.md` 为 0;把两条命令与输出写入 `notes/pre-change-measurements.md`;该工作在 `OI-082-01` 名下,任何验收不得把「文档已镜像」读作「命令已接线」 [green: contracts/mirror-distribution.contract.md#C-28]
+- [X] T044 [US4] [blockedBy: T043] 确认状态不被流程推进:断言该行 `status` 仍为 `proposed`,并在 `notes/pre-change-measurements.md` 记一行「提升属用户动作(data-model T-B / 需求 A6),本特性不改写」 [green: contracts/glossary-integration.contract.md#C-33]
+- [X] T045 [US4] [blockedBy: T043] 断言既有机制套件未受影响且未改动: `git diff --stat tests/contract/test_glossary_mechanism.py` 必须为空,`python3 -m pytest tests/contract/test_glossary_mechanism.py -q` 退出 0 [green: contracts/glossary-integration.contract.md#C-31]
+- [X] T046 [US4] [blockedBy: T030] 确认 `/speckit.improve` 未被接线:`git diff --stat templates/commands/improve.md` 为空,且 `grep -c 'best-practice-optimization' templates/commands/improve.md` 为 0;把两条命令与输出写入 `notes/pre-change-measurements.md`;该工作在 `OI-082-01` 名下,任何验收不得把「文档已镜像」读作「命令已接线」 [green: contracts/mirror-distribution.contract.md#C-28]
 
 **Checkpoint**: US4 可独立验收——词条可检索、旧名非第二 canonical、parity 参数覆盖三份新文档、既有机制套件绿。
 
@@ -191,7 +191,7 @@
 
 **Purpose**: 三故事合流后的整体核对:名称一致、镜像总表、成本与结构、以及 Feature 索引。
 
-- [ ] T047 [P] 名称一致性终检: `grep -cF 'Self-Explanatory Structure (不言自明)' templates/constitution-template.md templates/instructions-template.md .specify/memory/constitution.md .specify/instructions.md` 逐文件各 ≥ 1,且 `grep -cF '.specify/shared/definitions/self-explanatory-definitions.md'` 在每个客户端面向输出 ≥ 1;输出写入 `notes/quickstart-run.md`
+- [X] T047 [P] 名称一致性终检: `grep -cF 'Self-Explanatory Structure (不言自明)' templates/constitution-template.md templates/instructions-template.md .specify/memory/constitution.md .specify/instructions.md` 逐文件各 ≥ 1,且 `grep -cF '.specify/shared/definitions/self-explanatory-definitions.md'` 在每个客户端面向输出 ≥ 1;输出写入 `notes/quickstart-run.md`
 - [ ] T048 [blockedBy: T014,T026,T031] 镜像总表核对: 逐行对照 plan.md § Mirror Obligations 的十行,`python3 scripts/python/sync-mirrors.py --check` 退出 0;`python3 scripts/python/regen-command-copies.py --check` 打印 `OK: all per-tool command copies match the source templates.`(本特性未改 `templates/commands/`,这条是未变面断言)
 - [ ] T049 [blockedBy: T012,T024] 成本与结构终检: `bash scripts/bash/generate-instructions.sh` 的 `BUDGET` 行为 `within`,并把「旧值 → 新值 / 本次实测尺寸 / 理由」三件套写进同一提交的提交说明(plan T-001、C-18);`python3 scripts/python/scan-confirmation-gates.py --json` 的 `total` 仍为 27(与 T002 基线相同)→ 本特性零新增门控命中
 - [ ] T050 [blockedBy: T047] Feature 索引同步: `.specify/memory/features/082.md` § Latest Review 追加 tasks 阶段条目(行数统计、`validate-tasks.py` 结论、条款认领数),`.specify/memory/features.md` 的 082 行状态**保持 `Planned`**(`Implemented` 属 `/speckit.implement`)

@@ -578,3 +578,93 @@ Both legs ran from `.specify/.tmp/082-part7/m56.py` against copies only. Verbati
   `['shared/definitions/removed-by-m6.md: MISSING in the source tree']` → the guard's own
   `assert not problems` goes red and names the mutated path. The real page is byte-identical before
   and after (`sha256 04bb8c345c4e…`), and all 11 files under `docs/concepts/` keep their digests.
+
+## T044 — status is not promoted by the flow (executed 2026-11-05, implement part 9)
+
+**Decision line (T044's own obligation).** 提升属用户动作(data-model T-B / 需求 A6),本特性不改写 —
+the entry lands `proposed` and stays `proposed`; neither the engine write of T043 nor any verification
+run after it may move it to `confirmed`.
+
+**The registered value, read by the store's own engine rather than off the raw line** (the engine
+renders and re-parses the row, so this is the field a later reader gets, not a substring):
+
+```console
+$ python3 scripts/python/glossary-utils.py --action list | python3 -c \
+    'import json,sys; d=json.load(sys.stdin); print(d["count"]); [print(i,e) for i,e in
+     enumerate(d["entries"]) if "不言自明" in e["canonical"]]'
+161
+160 {'canonical': '不言自明 (Self-explanatory)', 'variants': ['望文生义'],
+     'meaning': '结构须让用户直接看到所需求的信息:…;真源 shared/definitions/self-explanatory-definitions.md',
+     'origin': 'auto', 'status': 'proposed'}
+RC=0
+```
+
+`status` is `proposed` (entry index 160 of 161), which is what C-33 requires and what T039 already
+asserts as a field. T044 adds the **persistence** claim on top of that field assertion: the value must
+survive the feature's own write and any later verification run.
+
+**Why T044 needed a new assertion rather than a re-run of T039.** T039's `test_c29_…` reads the
+`status` field of the canonical row — a *snapshot*. It cannot tell "still proposed" from "promoted and
+then re-read", and it would not fail if a later flow step flipped the value, because nothing re-checks
+it after that step. T044 therefore lands two assertions in the same module:
+
+| assertion | subject | goes red when |
+|-----------|---------|---------------|
+| `test_c33_entry_status_stays_proposed_after_the_features_own_write` | the status the engine's `--action list` reports for the canonical row | the row reads `confirmed` (a promotion the user never authored), or any third value the store's two-value domain does not admit |
+| `test_c33_feature_runs_no_status_promoting_verb` | the set of engine write verbs this feature's flow runs | a write verb is added to the flow without C-33 being re-read (the failure is the review prompt) |
+
+**Red leg, on a copy only** (`.specify/.tmp/082-part9/red_legs.py`, all legs against copied trees):
+
+```console
+$ python3 .specify/.tmp/082-part9/red_legs.py
+[PASS] control: status assertion green on the untouched copy
+[PASS] control: write-verb assertion green on the untouched copy
+[PASS] C-33-a: exactly one row was promoted in the copy: the canonical row only; 131 other rows
+       already read 'auto | confirmed' and are untouched
+[PASS] C-33-a: status assertion is RED on a promoted copy: the canonical entry reads 'confirmed';
+       promotion is a user-authoritative action (data-model.md T-B, requirements.md A6) and no
+       automated step of this feature may flip it — not the engine write, not a later verification run
+[PASS] C-33-m: the engine's list verb reports the promoted status: engine reads status='confirmed'
+[PASS] C-33-b: write-verb assertion is RED when the flow gains a writing verb:
+       ('--action add',) — re-read C-33 before letting it run
+[PASS] isolation: real store sha256 unchanged: 21482f6444ed… -> 21482f6444ed…
+VERDICT: PASS — 7 PASS / 0 FAIL   EXIT=0
+```
+
+The row is mutated **by identity** (the canonical row's own text), not by a file-wide replace: 131 of
+the store's 161 rows already end `| auto | confirmed |`, so a blind replace would have promoted 131
+rows and proved nothing about this one. Two corrections were made while building the leg and are
+disclosed in `test-evidence/implement-part-9.md`.
+
+## T046 — `/speckit.improve` is not wired (executed 2026-11-05, implement part 9)
+
+This row's subject is `OI-082-01` (`.specify/memory/register.md`: wiring
+`shared/workflow/best-practice-optimization.md` into `/speckit.improve`). The row exists to make the
+distinction impossible to lose: **"the document is mirrored and distributed" is not "the command is
+wired"**, and no acceptance reading of this feature may upgrade one into the other.
+
+```console
+$ git diff --stat templates/commands/improve.md
+(no output)
+$ git diff --stat --exit-code templates/commands/improve.md
+DIFF_EXIT=0        # 0 = the file is unmodified against HEAD
+
+$ grep -c 'best-practice-optimization' templates/commands/improve.md
+0
+GREP_EXIT=1        # grep's "no match" exit
+```
+
+Both conditions of C-28 / T046 hold: the command template is **unmodified by this feature** (empty
+`--stat`, `--exit-code` = 0) and carries **zero** references to the optimization-workflow path. The
+zero is a real absence, not a typo'd search: the same pattern matches 2× in
+`shared/definitions/self-explanatory-definitions.md`, 1× in `shared/guidelines/self-explanatory.md`
+and 1× in `docs/concepts/self-explanatory.md`, so it does fire where the subject is present. (It reads
+0 in `shared/workflow/best-practice-optimization.md` itself, which refers to its own subject as "本工作流"
+and carries no self-path.)
+
+**What this does NOT claim.** T046 asserts the command was not touched; it does not assert that
+`/speckit.improve` would ignore the document if it were, nor does it close `OI-082-01`. The open item
+stays open (owner = a later `/speckit.improve` improvement; closing condition = the wiring lands and a
+contract test asserts it). Mirroring the document — T029/T030/T031/T042 — is a distribution fact and
+is deliberately not restated here as a wiring claim.
+

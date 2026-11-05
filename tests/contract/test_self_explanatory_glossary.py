@@ -2,7 +2,7 @@
 
 Implements the glossary clauses of
 ``.specify/specs/082-self-explanatory-integration/contracts/glossary-integration.contract.md``
-(C-29, C-30, C-32) and the enumeration clause of
+(C-29, C-30, C-32, C-33) and the enumeration clause of
 ``contracts/mirror-distribution.contract.md`` that this module co-owns (C-22 / C-24, claimed
 together with C-26 by T029's distribution module).
 
@@ -168,6 +168,49 @@ def test_c30_engine_validate_exits_zero():
     assert rc == 0, f"glossary-utils.py --action validate exited {rc}: {payload} {stderr}"
     assert isinstance(payload, dict) and payload.get("valid") is True, (
         f"validate did not report valid=true: {payload!r}"
+    )
+
+
+# --- C-33: status is not promoted by the flow ------------------------------------------------
+
+# Every verb this feature runs against the store. The registered status is read by
+# ``--action list``, which reconstructs it from the table rendered by ``replace_table`` — so this
+# assertion follows the render/parse round-trip rather than a substring of the file.
+WRITE_VERBS_OF_THIS_FEATURE = ()
+
+
+def registered_status_via_engine() -> str:
+    """The canonical entry's status as the store's own engine reads it (parse after render)."""
+    rc, payload, stderr = run_engine("--action", "list")
+    assert rc == 0, f"glossary-utils.py --action list exited {rc}: {payload} {stderr}"
+    hits = [e for e in payload["entries"] if e["canonical"] == CANONICAL]
+    assert len(hits) == 1, f"expected exactly one canonical row for {CANONICAL!r}, got {hits!r}"
+    return hits[0]["status"]
+
+
+def test_c33_entry_status_stays_proposed_after_the_features_own_write():
+    status = registered_status_via_engine()
+    assert status != "confirmed", (
+        "the canonical entry reads 'confirmed'; promotion is a user-authoritative action "
+        "(data-model.md T-B, requirements.md A6) and no automated step of this feature may flip "
+        "it — not the engine write, not a later verification run"
+    )
+    assert status == "proposed", (
+        f"the canonical entry's status is {status!r}; the glossary store admits only 'proposed' "
+        "and 'confirmed', so this is neither the landed value nor a user promotion"
+    )
+
+
+def test_c33_feature_runs_no_status_promoting_verb():
+    """No status-promoting write is a flow step: the engine's write verbs this module runs stay empty.
+
+    ``--action add`` carries ``--status``; ``--action list`` / ``--action validate`` cannot write.
+    Should a later task add a write verb, it belongs in ``WRITE_VERBS_OF_THIS_FEATURE`` and this
+    test fails until the list is re-read against C-33 — the failure is the review prompt.
+    """
+    assert WRITE_VERBS_OF_THIS_FEATURE == (), (
+        "a writing engine verb was added to this feature's flow: "
+        f"{WRITE_VERBS_OF_THIS_FEATURE!r} — re-read C-33 before letting it run"
     )
 
 
