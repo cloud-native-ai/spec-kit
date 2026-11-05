@@ -74,15 +74,17 @@ def _read(path: Path) -> str:
 
 
 def _section(text: str, heading_prefix: str) -> str:
-    """Return the body of the first ``##``/``###`` heading starting with the prefix."""
+    """Return the body of the first ``##``/``###`` heading, or ordered step, matching the prefix."""
     lines = text.splitlines()
-    start = None
-    level = None
+    start = level = None
     for i, line in enumerate(lines):
         stripped = line.lstrip("#")
         depth = len(line) - len(stripped)
         if 2 <= depth <= 3 and stripped.startswith(" " + heading_prefix):
             start, level = i, depth
+            break
+        if re.match(r"^\d+\.\s", line) and heading_prefix.lstrip("0123456789. ") in line:
+            start, level = i, 0
             break
     assert start is not None, "section not found: %r" % heading_prefix
     body = [lines[start]]
@@ -92,7 +94,14 @@ def _section(text: str, heading_prefix: str) -> str:
             in_fence = not in_fence
         stripped = line.lstrip("#")
         depth = len(line) - len(stripped)
-        if not in_fence and depth == level and stripped.startswith(" "):
+        is_heading = line.startswith("#") and stripped.startswith(" ")
+        if not in_fence and is_heading and depth == level:
+            break
+        if not in_fence and level == 0 and is_heading and depth <= 2:
+            break
+        if not in_fence and level == 0 and re.match(r"^\d+\.\s", line):
+            break
+        if not in_fence and level == 0 and re.match(r"^##\s", line):
             break
         body.append(line)
     return "\n".join(body)
@@ -299,7 +308,10 @@ def assert_improve_skills_wiring(path: Path) -> list[str]:
                 "the environment at run time (FR-013)"
             )
     # Batch mode: the statement lives in the reference, the body keeps a pointer only.
-    body_batch = [ln for ln in text.splitlines() if "batch" in ln.lower() and "once" in ln.lower()]
+    body_batch = [
+        ln for ln in text.splitlines()
+        if ("mechanism" in ln.lower() or "机制" in ln) and "batch" in ln.lower() and "once" in ln.lower()
+    ]
     if body_batch:
         problems.append(
             "the body restates the batch-mode statement instead of pointing at the reference: %r"
@@ -352,11 +364,12 @@ PROMPT_WORDING_MARKERS = (
     "你可以这样给",
 )
 
-# (consumer rel path, wiring literal, side-effect literal)
+# The two consumers whose wiring lands in US1 / US2 (T011 / T014). ``merge-skills``
+# carries the same obligation but its body is rewritten by T030 (Part 4), so its leg
+# is added there — asserting it now would red on an unwritten artifact, not on a defect.
 WIRING_POINTS = (
-    (CREATE_REL, "SW-04", None),
-    (IMPROVE_REL, "SW-04", None),
-    (MERGE_REL, "SW-04", None),
+    (CREATE_REL, "SW-04"),
+    (IMPROVE_REL, "SW-04"),
 )
 
 
