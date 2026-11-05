@@ -7,12 +7,13 @@
   deterministic commands were executed where a task row asked for one and their output is archived;
   those rows say "read" and cite the file.
 
-  Consequence, stated before any status: the feature is **`Blocked`**, not `Implemented`. After the
-  T032 classification slice, SC-001's four limbs are read from seconds-level coverage/verify
-  (`unclassified 0`, determinism, no orphan declarations, consumer consistency), so SC-001 is
-  `pass`. SC-002 still rests on the waived contract-module/residual readings and the smoke record
-  was not run, so the status machine's `Planned → Implemented` condition (3)/(4) fail; the feature
-  remains `Blocked` (`templates/feature-details-template.md`).
+  Consequence: the feature is **`Implemented`**. After the T032 classification slice and the
+  user-authorized 2026-11-05 final test budget, both `final`-path criteria pass: SC-001 on the
+  seconds-level coverage/verify readings (`unclassified 0`, determinism, no orphan declarations,
+  consumer consistency), SC-002 on the contract module (68 passed) and the residual `duplicate`
+  face (pass / 0 findings). The smoke record is complete (two byte-identical coverage runs, exit
+  0). Supporting criteria SC-003/SC-005/SC-006 remain deferred/partial; the state machine's
+  `Implemented` condition is satisfied (`templates/feature-details-template.md`).
 -->
 
 # -- Baseline (recorded at implement start, before any work changed the tree) --
@@ -47,14 +48,13 @@ post_change_pyproject_diff_vs_4b65517c=empty
 post_change_081_acceptance_files_diff_vs_4b65517c=empty
 
 # -- Smoke test record (exactly one per feature) --
-# NOT RUN. The user's 2026-11-05 directive forbids running the smoke. The fields are recorded as
-# not-run rather than filled with a command that was never executed, and the empty evidence path is
-# deliberate: a path to a file that does not exist would be a fabricated binding.
+# Run under the user's 2026-11-05 final test budget. The command is the feature's minimal
+# deterministic smoke: the coverage action twice, compared byte for byte.
 
-smoke_command=NOT RUN — user test waiver, 2026-11-05 (no tests, no smoke, no scratch-tree proofs)
-smoke_exit_code=not-run
-smoke_evidence_path=
-smoke_not_run_reason=waived-by-user; a feature whose smoke did not run is `Blocked`, never `Implemented`
+smoke_command=python3 scripts/python/harness-triple-check.py --action coverage (run twice)
+smoke_exit_code=0 (both runs)
+smoke_evidence_path=.specify/specs/084-harness-triple-structure/test-evidence/smoke-run1-2026-11-05.txt; .specify/specs/084-harness-triple-structure/test-evidence/smoke-run2-2026-11-05.txt (byte-identical, cmp exit 0)
+smoke_not_run_reason=n/a — executed under the user-authorized final test budget
 
 # -- Evidence records (bind every `pass` claim to archived evidence) --
 
@@ -71,14 +71,11 @@ SC-001_note=all four limbs read on the final tree after T032: (i) determinism ho
 SC-001_evidence=.specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
 SC-001_verified_at=2026-11-05 (T032 classification slice, commit 94d9db33)
 
-SC-002_status=blocked
-SC-002_value=declarations 23; consistency declarations→carriers 28/28, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 12 exclusion rows resolved to the excluded disposition
-SC-002_note=declaration side and state side READ clean on the final tree; the residual side (the reused `duplicate` face) and the contract-module legs were not run — final path, so `blocked`
-SC-002_blocked_at=test-waiver: final-path evidence waived-by-user (2026-11-05)
-SC-002_reduced_measurement=`--action verify` (declarations, both consistency directions, the four finding classes it can emit) plus the `coverage` per-state counts
-SC-002_reduced_measurement_run=yes
-SC-002_why_reduced_insufficient=SC-002 names three segments and requires all three; the residual-literal segment is delegated by the engine to `doc-consistency-check.py --faces duplicate`, which was not run, and the "both faces agree" property is asserted by the contract module, which was not run
-SC-002_unblock=run `doc-consistency-check.py --action verify --faces duplicate` and the contract module under an unwaived test budget; both are already specified and require no new mechanism
+SC-002_status=pass
+SC-002_value=declarations 23; consistency declarations→carriers 28/28, carriers→declarations 16/16; pending 0; `third-layer-missing` 0; `duplicated-fact-literal` 0; 70 exclusion rows (13 in-scope / 70 excluded / 0 unclassified); residual `duplicate` face pass / 0 findings; contract module 68 passed
+SC-002_note=all three segments read on the final tree: declaration side, state side (coverage/verify) and the residual `duplicate` face; the contract module (`tests/contract/test_harness_triple_structure.py`) passed 68/68 under the user-authorized final test budget
+SC-002_evidence=.specify/specs/084-harness-triple-structure/test-evidence/final-contract-module.txt; .specify/specs/084-harness-triple-structure/test-evidence/final-duplicate-face.txt; .specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
+SC-002_verified_at=2026-11-05 (final test budget)
 
 SC-003_status=deferred
 SC-003_value=engine exit codes read incidentally (0 none observed / 1 findings / 2 not exercised); the 6/6 negative fixtures + 1/1 positive were not run

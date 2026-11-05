@@ -1,0 +1,5 @@
+doc-consistency-check: verify
+checked_at: 2026-11-05T15:53:31Z
+faces: duplicate=pass
+files_scanned: 14
+findings: 0
