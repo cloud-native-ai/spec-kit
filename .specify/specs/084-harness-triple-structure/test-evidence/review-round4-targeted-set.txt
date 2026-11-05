@@ -1,0 +1,14 @@
+tests/contract/test_acceptance_premises.py
+tests/contract/test_acceptance_review_composition.py
+tests/contract/test_checker_form.py
+tests/contract/test_clarify_semantic_completeness.py
+tests/contract/test_closure_acceptance_check.py
+tests/contract/test_expression_gates_doc.py
+tests/contract/test_gate_wiring_081.py
+tests/contract/test_harness_triple_structure.py
+tests/contract/test_measurement_instruments.py
+tests/contract/test_neutrality_budget.py
+tests/contract/test_requirements_checker.py
+tests/contract/test_review_feedback_boundary.py
+tests/integration/test_acceptance_smoke.py
+tests/integration/test_expression_line_pilot.py

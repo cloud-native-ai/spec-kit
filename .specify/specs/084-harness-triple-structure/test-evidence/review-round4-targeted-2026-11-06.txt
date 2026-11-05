@@ -1,0 +1,83 @@
+# 084 review round 4 — targeted set reading (2026-11-06)
+# set: review-round4-targeted-set.txt (14 files; same selection as round 3 because the only code path
+#      this round's delta changes is scripts/python/closure-acceptance-check.py, which clause (a)
+#      already selected in round 3)
+# command: pytest -q $(cat .specify/specs/084-harness-triple-structure/test-evidence/review-round4-targeted-set.txt)
+# cwd: /storage/project/cloud-native-ai/spec-kit   base=3ffeb26e  head=2d8576b5cb251ca22e90f5312564b657c04811c3
+# rc=1   elapsed=16s   result: 2 failed, 358 passed, 1 warning in 15.63s
+# both failures are in test-evidence/baseline-pre-existing-failed.txt (23 ids):
+#   tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+#   tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+# round 3 on the same set read 4 failed / 356 passed; the two extra failures were
+#   tests/contract/test_gate_wiring_081.py::test_a_block_lands_blocked_after_the_record
+#   tests/contract/test_gate_wiring_081.py::test_a_passing_line_merges_and_records_merged
+# and both are green at head -> zero new failures this round.
+
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+..................F..................................................... [ 20%]
+........................................................................ [ 40%]
+........................................................................ [ 60%]
+..............................................F......................... [ 80%]
+........................................................................ [100%]
+=================================== FAILURES ===================================
+_____ test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it ______
+
+    def test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it():
+        """The pin is valid only while re-reading it reproduces it — and a mismatch is exit-2 class."""
+        for tool, reading in _live_readings().items():
+            assert reading, "%s produced no reading; a pin comparison on nothing proves nothing" % tool
+>           assert _assert_pin(tool, reading)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_acceptance_premises.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'git', reading = 'git version 2.43.7'
+
+    def _assert_pin(tool, reading):
+        """Compare one reading against its recorded pin; a difference is an input error."""
+        pins = _pins()
+        if tool not in pins:
+            raise PinMismatch("no recorded pin for %r in %s" % (tool, PINS))
+        if reading.strip() != pins[tool].strip():
+>           raise PinMismatch(
+                "%s reads %r but %s records %r — the comparison is invalid (input error, exit 2), "
+                "which is not a new failure" % (tool, reading.strip(), PINS.name, pins[tool].strip())
+            )
+E           contract.test_acceptance_premises.PinMismatch: git reads 'git version 2.43.7' but plan-runner-pins.txt records 'git version 2.54.0 (Apple Git-157)' — the comparison is invalid (input error, exit 2), which is not a new failure
+
+tests/contract/test_acceptance_premises.py:627: PinMismatch
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+=============================== warnings summary ===============================
+../../cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+2 failed, 358 passed, 1 warning in 15.63s

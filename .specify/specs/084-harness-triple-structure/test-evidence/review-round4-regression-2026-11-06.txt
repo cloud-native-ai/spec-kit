@@ -1,0 +1,71 @@
+# 084 review round 4 — regression causality and the fix's own claim (2026-11-06)
+# shape A/B: a tree carrying scripts/python/closure-acceptance-check.py WITHOUT its sibling
+#   declaration_reader.py (the shape tests/contract/test_gate_wiring_081.py::_make_line_repo builds,
+#   and the shape FR-013 forbids from dying on a traceback — module comment at READER_ABSENT)
+# scratch roots: .specify/.tmp/review-r4-causal and .specify/.tmp/review-r4-declwins (git-ignored, removed at the end)
+
+## A. round-3 defect shape at the parent e1f59096 (the round-3 reading reproduced)
+$ cd .specify/.tmp/review-r4-causal && python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir> --json
+rc=1  stdout_bytes=0
+--- stderr (verbatim, last 6 lines of the traceback) ---
+    FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r4-causal/scripts/python/closure-acceptance-check.py", line 138, in _declared_flow_classes
+    except (declaration_reader.DeclarationError, TypeError, ValueError):
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'DeclarationError'
+
+## B. the same shape at HEAD 2d8576b5 — no traceback, exit 2, labelled degradation
+   (engine copied from HEAD: sha256 1e6772980d5f6d8585b66a94d7dcc9f0c0f76255dc6959aebff16ddfaddd0b49)
+$ cd .specify/.tmp/review-r4-causal && python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir> --json
+rc=2  stdout_bytes=0
+--- stderr (verbatim) ---
+declaration-absent: success-criterion-path-values
+closure-acceptance-check: the shared read entry is absent; the `Path` membership test is skipped for this run
+declaration-absent: flow-class-classes
+declaration-absent: arc-verdict-mapping
+closure-acceptance-check: the `ARC verdict mapping` is unreadable; this run uses the labelled compatibility value for the `final_path` record and the verdict
+closure-acceptance-check: input error: cannot determine the claimed feature status for /storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure: no --feature-detail / --feature-registry was given, the spec dir carries no feature-detail.md or feature-registry.md, and /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/review-r4-causal/.specify/memory/features.md has no row for '084-harness-triple-structure'
+
+## B2. the same shape at HEAD with the claimed status resolvable — the engine still judges
+$ ... --spec-dir <spec-dir> --feature-detail <features/084.md> --repo /storage/project/cloud-native-ai/spec-kit --json
+rc=0  stdout_bytes=1161
+--- stderr (verbatim) ---
+declaration-absent: success-criterion-path-values
+closure-acceptance-check: the shared read entry is absent; the `Path` membership test is skipped for this run
+declaration-absent: flow-class-classes
+declaration-absent: arc-verdict-mapping
+closure-acceptance-check: the `ARC verdict mapping` is unreadable; this run uses the labelled compatibility value for the `final_path` record and the verdict
+--- stdout (verdict keys only) ---
+  "flow_class": "execution",
+  "reasons": [],
+  "verdict": "accept",
+
+## C. the fix's own claim: "a readable declaration wins" over the FR-012 compatibility tuple
+$ cd .specify/.tmp/review-r4-declwins && python3 scripts/python/closure-acceptance-check.py --spec-dir <spec-dir> --feature-detail <084.md> --repo /storage/project/cloud-native-ai/spec-kit --json
+rc=0  stdout_bytes=1161  stderr_bytes=0
+--- stderr (verbatim; empty = no degradation label was emitted) ---
+--- stdout (keys only) ---
+  "flow_class": "execution",
+  "verdict": "accept",
+
+## C2. same tree, the declaration's statement narrowed to [expression] only
+rc=2  stdout_bytes=0
+--- stderr (verbatim) ---
+closure-acceptance-check: input error: /storage/project/cloud-native-ai/spec-kit/.specify/specs/084-harness-triple-structure/requirements.md declares `**Flow Class**: execution`, outside the closed set expression
+=> the FR-012 fallback tuple would have accepted 'execution'; the read declaration refused it,
+   which is what the fix's comment claims ("a readable declaration wins").
+
+## C3. declaration restored — accept again, no labels
+rc=0  stderr_bytes=0
+  "flow_class": "execution",
+  "verdict": "accept",
+
+## D. contract-test consequence at HEAD (the module that held round 3's two red legs)
+$ pytest -q tests/contract/test_gate_wiring_081.py
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 1 warning in 2.67s
+round 3 read 2 failed / 356 passed on the 14-file targeted set, both new failures in this module;
+the two ids are absent from test-evidence/baseline-pre-existing-failed.txt (23 ids).
+
+# scratch roots removed at the end of this run.

@@ -128,15 +128,17 @@
 | REC-080-08 | 红先行增加「该测试能否转绿」自检与红因枚举，禁止用临时移出实现文件重建红态 | `.specify/specs/080-humanize-run-output/review.md` § 5.4 REC-080-08（F6） | open |
 | REC-080-09 | 一份 verification 只允许一个 SC 判定源：收口表不得用自然语言重述状态，须从 canonical 块派生或只留证据指针 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-09（F2） | open |
 | REC-080-10 | 扩展改变 Feature 定位时强制同步 `## Overview`，或声明「保留原始定位，扩展见 Key Changes」 | `.specify/specs/080-humanize-run-output/review.md` § 5.5 REC-080-10（F12） | open |
-| REC-084-01 | 验证日志为「两次运行逐字节一致」的 smoke 声明给一个法定载体（新增 `smoke_comparison=` 或让 `smoke_evidence_path` 指向一份比对转录），并明写三件 smoke 值不得带注解 | `.specify/specs/084-harness-triple-structure/review.md` § 5.1 REC-084-01（F8、F15） | open |
-| REC-084-02 | `templates/tasks-template.md` 说明 `DoD Status` 是否喂状态机，并要求具名输出路径的 `[X]` 行携带该路径的存在性判据 | `.specify/specs/084-harness-triple-structure/review.md` § 5.1 REC-084-02（F13、F2；与 REC-080-05 同族） | open |
-| REC-084-03 | 迁移契约不得把「必须判 X」与「不得调用判 X 的东西」并置；名册须按事实取值 `grep` 遍历 `scripts/` 与 `skills/` 得出，逐命中列出 | `.specify/specs/084-harness-triple-structure/review.md` § 5.1 REC-084-03（F5、F14） | open |
-| REC-084-04 | 评审报告增加必填 `P0 validation path:` 字段（封闭 `subagent`／`direct re-read`），让同作者回退在报告上可见 | `.specify/specs/084-harness-triple-structure/review.md` § 5.1 REC-084-04（F6） | open |
-| REC-084-05 | `/speckit.implement` 的状态翻转前必须跑 `closure-acceptance-check.py --json` 并抄其 `verdict`；翻转提交同趟重写每个陈述该状态的表面 | `.specify/specs/084-harness-triple-structure/review.md` § 5.2 REC-084-05（F1、F9、F11） | open |
-| REC-084-06 | `validate-tasks.py` 增加载体存在性判据（`[X]` 行具名路径缺失即红，除非行内有 `waived-by-user` 记号），并要求报告从 checker JSON 派生计数而非复述数字 | `.specify/specs/084-harness-triple-structure/review.md` § 5.3 REC-084-06（F2、F3、F10、F12） | open |
-| REC-084-07 | 把「冻结的封闭集阻断新 finding 名」这一形态写进过程评审技能，并要求封闭集指向自己的增长程序（本特性已提供 `shared/declarations/facts/driver-gate-roster.yaml`） | `.specify/specs/084-harness-triple-structure/review.md` § 5.4 REC-084-07（F4） | open |
-| REC-084-08 | `git-delta-review.sh` 帮助文本删除手维护的步骤编号，改指向技能里的封闭枚举（现为五步） | `.specify/specs/084-harness-triple-structure/review.md` § 5.5 REC-084-08（F7） | open |
-| REC-084-09 | 验证日志的每个槽位必须点名读它的程序；无读者的槽位要么删，要么接进授予该记录的 checker（新增 `smoke_comparison` 槽位即反例） | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-09（N3） | open |
-| REC-084-10 | 修复轮必须按 finding 自己枚举的站点逐点给出 closure 表（站点 → 提交 → 读数），下一轮读表而不是读提交标题 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-10（N1） | open |
-| REC-084-11 | 评审收尾必须断言两个法定载体都存在且带本轮身份（报告 § 2.1 + 特性详情 `## Latest Review` 条目），缺席即红 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-11（N2） | open |
-| REC-084-12 | `targeted-set-v1` 增加**形态腿**：改动某个引擎时，同时选中把该引擎 `shutil.copy2` 进构造树的测试文件；且任一阶段的定向运行 MUST 留下捕获证据（命令行／退出码／完整输出），只在提交信息里报告通过数不算读数 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-12（N2；目标 `contracts/test-budget.md` TB-05 + `skills/sdd-loop-driver/references/efficiency-model.md` § 2.3） | open |
+| REC-084-01 | 验证日志为「两次运行逐字节一致」的 smoke 声明给一个法定载体（新增 `smoke_comparison=` 或让 `smoke_evidence_path` 指向一份比对转录），并明写三件 smoke 值不得带注解 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.1 REC-084-01（F8、F15） | open |
+| REC-084-02 | `templates/tasks-template.md` 说明 `DoD Status` 是否喂状态机，并要求具名输出路径的 `[X]` 行携带该路径的存在性判据 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.1 REC-084-02（F13、F2；与 REC-080-05 同族） | open |
+| REC-084-03 | 迁移契约不得把「必须判 X」与「不得调用判 X 的东西」并置；名册须按事实取值 `grep` 遍历 `scripts/` 与 `skills/` 得出，逐命中列出 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.1 REC-084-03（F5、F14） | open |
+| REC-084-04 | 评审报告增加必填 `P0 validation path:` 字段（封闭 `subagent`／`direct re-read`），让同作者回退在报告上可见 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.1 REC-084-04（F6） | open |
+| REC-084-05 | `/speckit.implement` 的状态翻转前必须跑 `closure-acceptance-check.py --json` 并抄其 `verdict`；翻转提交同趟重写每个陈述该状态的表面 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.2 REC-084-05（F1、F9、F11） | open |
+| REC-084-06 | `validate-tasks.py` 增加载体存在性判据（`[X]` 行具名路径缺失即红，除非行内有 `waived-by-user` 记号），并要求报告从 checker JSON 派生计数而非复述数字 | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.3 REC-084-06（F2、F3、F10、F12） | open |
+| REC-084-07 | 把「冻结的封闭集阻断新 finding 名」这一形态写进过程评审技能，并要求封闭集指向自己的增长程序（本特性已提供 `shared/declarations/facts/driver-gate-roster.yaml`） | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.4 REC-084-07（F4） | open |
+| REC-084-08 | `git-delta-review.sh` 帮助文本删除手维护的步骤编号，改指向技能里的封闭枚举（现为五步） | `.specify/specs/084-harness-triple-structure/review-r1.md` § 5.5 REC-084-08（F7） | open |
+| REC-084-09 | 验证日志的每个槽位必须点名读它的程序；无读者的槽位要么删，要么接进授予该记录的 checker（新增 `smoke_comparison` 槽位即反例） | `.specify/specs/084-harness-triple-structure/review-r2.md` § 5 REC-084-09（N3） | open |
+| REC-084-10 | 修复轮必须按 finding 自己枚举的站点逐点给出 closure 表（站点 → 提交 → 读数），下一轮读表而不是读提交标题 | `.specify/specs/084-harness-triple-structure/review-r2.md` § 5 REC-084-10（N1） | open |
+| REC-084-11 | 评审收尾必须断言两个法定载体都存在且带本轮身份（报告 § 2.1 + 特性详情 `## Latest Review` 条目），缺席即红 | `.specify/specs/084-harness-triple-structure/review-r2.md` § 5 REC-084-11（N2） | open |
+| REC-084-12 | `targeted-set-v1` 增加**形态腿**：改动某个引擎时，同时选中把该引擎 `shutil.copy2` 进构造树的测试文件；且任一阶段的定向运行 MUST 留下捕获证据（命令行／退出码／完整输出），只在提交信息里报告通过数不算读数 | `.specify/specs/084-harness-triple-structure/review-r3.md` § 5 REC-084-12（N2；目标 `contracts/test-budget.md` TB-05 + `skills/sdd-loop-driver/references/efficiency-model.md` § 2.3） | open |
+| REC-084-13 | 评审轮转时把该轮拥有的 `REC-…` 行改指**归档**报告（`review-rN.md § …`），并加守卫断言每行的 authority path 可解析到存在的文件／小节 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-13（N9；目标 `.specify/memory/register.md` § ID Register protocol + `/speckit.review` 的轮转步） | open |
+| REC-084-14 | 测试预算记录是**授权序列**而非一个已定值的字段：后续授权追加一条带日期与范围的条目，审计读最新条目，块内定值字段不得继续声称比最新条目更窄的预算 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-14（N8；目标 `skills/external/sdd-loop-driver/references/efficiency-model.md` + `skills/external/sdd-loop-driver/scripts/loop-state.py`） | open |

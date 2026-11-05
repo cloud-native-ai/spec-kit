@@ -1,0 +1,17 @@
+# targeted-set-v1 (efficiency-model §2.3) — review round 4, 2026-11-06
+# stage_base=2d8576b5 (state spine stage_base_commit)
+# changed paths source: git show --name-only --format= 2d8576b5 (3 paths)
+#   scripts/python/closure-acceptance-check.py            <- the only changed executable surface
+#   .specify/scripts/python/closure-acceptance-check.py   <- its byte-identical mirror (generated)
+#   .specify/specs/084-harness-triple-structure/test-evidence/review-r4-closure-2026-11-06.txt (evidence)
+# clause (a): one retrieval key, the changed code path scripts/python/closure-acceptance-check.py
+#   (path + module stem). Fourteen test files match it or the module's own contract surface; the set is
+#   therefore identical to round 3's, which is the expected result when a repair touches one engine.
+# clause (b): the feature deliverable contract test (stem harness-triple-structure) is already in the set.
+# clause (c) shape leg (REC-084-12, still an open recommendation, not yet implemented in the algorithm):
+#   applied by hand this round — tests/contract/test_gate_wiring_081.py is the file that copies this engine
+#   into a tree without its sibling read entry (shutil.copy2(ROOT / CHECKER_REL, ...)), so it is in the set
+#   and its reading is reported separately in review-round4-gates-2026-11-06.txt §4.
+# excluded from selection: the spec-dir markdown evidence path (not an executable surface; the generic stem
+#   'verification' would swamp the set).
+# command: pytest -q $(cat .specify/specs/084-harness-triple-structure/test-evidence/review-round4-targeted-set.txt)
