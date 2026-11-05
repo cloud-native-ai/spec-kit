@@ -28,7 +28,7 @@ its own readings, so a stalled batch leaves the previous ones complete rather th
 | 6 | `flow-class-document-types` | closed-set | `scripts/python/flow-class-check.py` | `shared/definitions/flow-class-definitions.md` |
 | 7 | `flow-class-ledger-columns` | ordered-operator-table | `scripts/python/flow-class-check.py` | `shared/definitions/flow-class-definitions.md` |
 | 8 | `flow-class-neutral-categories` | closed-set | `scripts/python/flow-class-check.py` | `shared/definitions/flow-class-definitions.md` |
-| 9 | `success-criterion-path-values` | closed-set | `scripts/python/validate-requirements.py` **and** `scripts/python/closure-acceptance-check.py` | `shared/workflow/acceptance-hardening.md` § Closure Verdict § Input contract; `templates/commands/requirements.md`; `skills/internal/create-requirements/SKILL.md` |
+| 9 | `success-criterion-path-values` | closed-set | `scripts/python/validate-requirements.py` **and** `scripts/python/closure-acceptance-check.py` | `shared/workflow/acceptance-hardening.md` § Closure Verdict § Input contract; `templates/commands/requirements.md`; `skills/internal/create-requirements/SKILL.md`（producing carrier that never restated the value; 069a byte-frozen, not pointed） |
 
 Row 9 is the 081-sensitive row: the declaration becomes the value's only home, **both** inline tuples are deleted, and
 the judgement prose, refusal message, exit-code meaning and member set stay byte-identical. Its closure reading includes
