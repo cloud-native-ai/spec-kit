@@ -531,7 +531,8 @@ is recorded so the byte counts are reproducible rather than mysterious.
 | R-2 C-24 mirror byte parity | B-1 (plan stage) + part 6's DIFF | T031/T032 | CLOSED (part 6) |
 | R-2b C-26 distribution | part 6's removal leg | T029 | CLOSED (part 6) |
 | **R-5 C-27 docs links** | **M-6 (this part)** | **T034 (this part)** | **CLOSED (this part)** |
-| R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
+| R-3 C-31 glossary entry | **M-1 / M-2 (part 8)** | **T039/T040 (part 8)** | **CLOSED (part 8)** |
+| R-6 C-22/C-24 mirror-enumeration | **M-4 / M-5 (part 8)** | **T042 (part 8)** | **CLOSED (part 8)** |
 
 R-5 is new in this part: C-27 had no carrier before T034, so its red had to be produced by the mutation
 leg rather than inherited from an earlier part. M-6 is that red, and the guard's green on the real page
@@ -539,3 +540,74 @@ is the same assertion run on the unmutated subject (also asserted inside the leg
 half).
 
 T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.
+
+## Part 8 — R-3 (glossary entry) and R-6 (mirror enumeration), T039-T043
+
+**Part scope**: `T039-T043` (implement part 8 of 10) | **Stage base**: `35a2948b` | **Runner**:
+`.specify/.tmp/082-part8/red_legs.py` (git-ignored scratch; the transcript below is the durable copy)
+
+The glossary entry already existed when this part opened (written by the engine during the plan
+stage), so no assertion here could capture a "subject is absent" red the way R-1 did. The red is
+therefore produced the way R-5's was: each assertion is run against a **mutated copy** of its subject
+and must raise, while the same assertion run on the unmutated subject must pass. Copies only — the
+real store's sha256 is compared before and after the whole run.
+
+### Verbatim transcript
+
+```console
+$ python3 .specify/.tmp/082-part8/red_legs.py
+[PASS] control: test_c29_entry_exists_with_origin_auto_and_status_proposed is green on the control
+[PASS] control: test_c30_no_second_row_carries_the_retired_name_or_canonical_as_canonical is green on the control
+[PASS] control: test_c32_meaning_cell_names_an_existing_repository_relative_path is green on the control
+[PASS] M-1: test_c30_no_second_row_carries_the_retired_name_or_canonical_as_canonical is RED — a second row puts the retired name or the canonical string in the canonical column: [(161, '望文生义')] (the canonical row is entry index 160)
+[PASS] M-2: test_c29_entry_exists_with_origin_auto_and_status_proposed is RED — expected exactly one entry whose canonical cell is '不言自明 (Self-explanatory)', found 2: [(160, '不言自明 (Self-explanatory)'), (161, '不言自明 (Self-explanatory)')]
+[PASS] M-2: test_c30_no_second_row_carries_the_retired_name_or_canonical_as_canonical is RED — expected exactly one entry whose canonical cell is '不言自明 (Self-explanatory)', found 2: [(160, '不言自明 (Self-explanatory)'), (161, '不言自明 (Self-explanatory)')]
+[PASS] M-3: test_c32_meaning_cell_names_an_existing_repository_relative_path is RED — the meaning cell does not name the concept owner 'shared/definitions/self-explanatory-definitions.md'; a reader landing on the glossary row would not reach the
+[PASS] M-4: C-22 parameter-presence is RED with the engine enumeration emptied — the engine must own shared/definitions/self-explanatory-definitions.md->.specify/shared/definitions/self-explanatory-definitions.md through exactly one MIRROR_P
+[PASS] M-5: C-22 byte-identity is RED when the mirrored copy differs — mirror drift: shared/workflow/best-practice-optimization.md->.specify/shared/workflow/best-practice-optimization.md (C-22 requires byte identity; C-24 requires
+[PASS] isolation: real store sha256 unchanged (21482f6444ed815fdcbfb17ffaed417728225563c3d6f85173baea4c673c826a -> 21482f6444ed815fdcbfb17ffaed417728225563c3d6f85173baea4c673c826a)
+VERDICT: PASS — 10 PASS / 0 FAIL
+EXIT=0
+```
+
+### What each leg establishes
+
+| Leg | Mutation (on a copy) | Red it produces |
+|-----|----------------------|-----------------|
+| M-1 | a new row with `望文生义` in the **canonical** column, inserted right after the canonical row | `test_c30_...` names the offending entry index and value — the row parse distinguishes the defect from the legitimate occurrence of the same string in the variants cell, which a substring search could not |
+| M-2 | a new row duplicating the **canonical string** in the canonical column | `test_c29_...` reports "found 2" with both indices; `test_c30_...` reports the second row. Two assertions, one mutation, as C-29 and C-30 require |
+| M-3 | the canonical row's owner path replaced with `shared/definitions/absent-by-construction.md` | `test_c32_...` fails on the named-path arm (the owner is unreachable), not on the "no path found" arm |
+| M-4 | `MIRROR_PAIRS` emptied on the loaded engine module | the C-22 parameter-presence assertion fails with "found 0" owning pairs — i.e. with no enumeration a document has no mirror parameter at all |
+| M-5 | both sides copied under one root, then the **mirror** copy's first byte changed | the byte-identity assertion fails naming `source->mirror`, which is the node-id form C-24 requires; the copy root carries exactly one document so the leg reaches the byte arm rather than the enumeration arm |
+| isolation | — | the real store digest is unchanged after all legs |
+
+### The engine's idempotent write (T043)
+
+`--action detect-conflict` reported `{"conflict": true, "kind": "same-term-diff-meaning", "collidesWith": ["不言自明 (Self-explanatory)"]}`
+— a collision **with itself**, because the term is already present. The engine's `action_add`
+excludes the existing entry from its own conflict sweep (`[e for e in entries if e is not existing]`)
+and replaces it in place, so the write is idempotent rather than refused:
+
+```console
+$ sha256sum .specify/memory/glossary.md          # before
+21482f6444ed815fdcbfb17ffaed417728225563c3d6f85173baea4c673c826a  .specify/memory/glossary.md
+$ python3 scripts/python/glossary-utils.py --action add --canonical "不言自明 (Self-explanatory)" \
+      --variants "望文生义" --meaning "<summary; 真源 shared/definitions/self-explanatory-definitions.md>" \
+      --origin auto --status proposed
+{"written": true, "canonical": "不言自明 (Self-explanatory)", "count": 161}
+EXIT=0
+$ sha256sum .specify/memory/glossary.md          # after
+21482f6444ed815fdcbfb17ffaed417728225563c3d6f85173baea4c673c826a  .specify/memory/glossary.md
+$ git diff --stat .specify/memory/glossary.md    # empty
+```
+
+No hand edit, no second row: the file is byte-identical before and after, and the store still reports
+161 entries.
+
+### Pairs after part 8
+
+| Pair | Red captured | Green expected at | Status |
+|------|--------------|-------------------|--------|
+| R-3 C-29/C-30/C-32 glossary entry | M-1 / M-2 / M-3 (this part) | T039 / T040 / T041 (this part) | CLOSED (this part) |
+| R-6 C-22/C-24 mirror enumeration + byte identity | M-4 / M-5 (this part) | T042 (this part) | CLOSED (this part) |
+

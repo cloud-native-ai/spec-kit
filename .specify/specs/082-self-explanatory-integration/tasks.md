@@ -170,15 +170,15 @@
 
 ### Tests for User Story 4 (MANDATORY) ⚠️
 
-- [ ] T039 [P] [US4] 在 `tests/contract/test_self_explanatory_glossary.py` 实现 C-29 的条目断言:恰好一条 canonical 为 `不言自明 (Self-explanatory)` 且该行 `origin=auto`、`status=proposed` [green: contracts/glossary-integration.contract.md#C-29]
+- [X] T039 [P] [US4] 在 `tests/contract/test_self_explanatory_glossary.py` 实现 C-29 的条目断言:恰好一条 canonical 为 `不言自明 (Self-explanatory)` 且该行 `origin=auto`、`status=proposed` [green: contracts/glossary-integration.contract.md#C-29]
 - [ ] T053 [P] [US4] 在同一新模块实现 C-34 的命名一致性断言:`STR-001` 与 `STR-003` 的共享片段(去掉括号语言后的主体)一致,且本特性新增的任一文档不引入第三种形态(如 `Self-explanatory Structures`、或把 `望文生义` 当作现名)(C-20 的同一形态由 T010 认领,本行只认领命名面) [green: contracts/glossary-integration.contract.md#C-34]
-- [ ] T040 [P] [US4] 在同一模块实现 C-30 的按行解析断言:逐行解析 store 表格,断言不存在第二行把 `望文生义` 或 canonical 串放在 canonical 列;并断言 `glossary-utils.py --action validate` 退出 0 [green: contracts/glossary-integration.contract.md#C-30]
-- [ ] T041 [P] [US4] 在同一模块实现 C-32:该行 meaning 单元格含一条仓相对路径,断言该路径存在(概念 owner 可达) [green: contracts/glossary-integration.contract.md#C-32]
-- [ ] T042 [P] [US4] 在同一模块实现 C-22/C-24 的参数化复核断言:从 `MIRROR_PAIRS` 派生的参数表必须含有三份新文档对应的三个参数(参数 id 含三处路径),缺失即失败——本行**不新建**第二份对表,只断言引擎枚举已覆盖;该断言与 C-26 同属「新文档确实进入镜像与分发枚举」这一命题,由同一模块承载,故与 T029 共同认领 C-26(两条断言一对一) [green: contracts/glossary-integration.contract.md#C-29]
+- [X] T040 [P] [US4] 在同一模块实现 C-30 的按行解析断言:逐行解析 store 表格,断言不存在第二行把 `望文生义` 或 canonical 串放在 canonical 列;并断言 `glossary-utils.py --action validate` 退出 0 [green: contracts/glossary-integration.contract.md#C-30]
+- [X] T041 [P] [US4] 在同一模块实现 C-32:该行 meaning 单元格含一条仓相对路径,断言该路径存在(概念 owner 可达) [green: contracts/glossary-integration.contract.md#C-32]
+- [X] T042 [P] [US4] 在同一模块实现 C-22/C-24 的参数化复核断言:从 `MIRROR_PAIRS` 派生的参数表必须含有三份新文档对应的三个参数(参数 id 含三处路径),缺失即失败——本行**不新建**第二份对表,只断言引擎枚举已覆盖;该断言与 C-26 同属「新文档确实进入镜像与分发枚举」这一命题,由同一模块承载,故与 T029 共同认领 C-26(两条断言一对一) [green: contracts/glossary-integration.contract.md#C-29]
 
 ### Implementation for User Story 4
 
-- [ ] T043 [US4] [blockedBy: T039] 经引擎登记词条: `python3 scripts/python/glossary-utils.py --action add --canonical "不言自明 (Self-explanatory)" --variants "望文生义" --meaning "<摘要 + 真源路径 shared/definitions/self-explanatory-definitions.md>" --origin auto --status proposed`;登记前先跑 `--action detect-conflict` 并把结果留痕;MUST NOT 手工编辑表格 [green: contracts/glossary-integration.contract.md#C-31]
+- [X] T043 [US4] [blockedBy: T039] 经引擎登记词条: `python3 scripts/python/glossary-utils.py --action add --canonical "不言自明 (Self-explanatory)" --variants "望文生义" --meaning "<摘要 + 真源路径 shared/definitions/self-explanatory-definitions.md>" --origin auto --status proposed`;登记前先跑 `--action detect-conflict` 并把结果留痕;MUST NOT 手工编辑表格 [green: contracts/glossary-integration.contract.md#C-31]
 - [ ] T044 [US4] [blockedBy: T043] 确认状态不被流程推进:断言该行 `status` 仍为 `proposed`,并在 `notes/pre-change-measurements.md` 记一行「提升属用户动作(data-model T-B / 需求 A6),本特性不改写」 [green: contracts/glossary-integration.contract.md#C-33]
 - [ ] T045 [US4] [blockedBy: T043] 断言既有机制套件未受影响且未改动: `git diff --stat tests/contract/test_glossary_mechanism.py` 必须为空,`python3 -m pytest tests/contract/test_glossary_mechanism.py -q` 退出 0 [green: contracts/glossary-integration.contract.md#C-31]
 - [ ] T046 [US4] [blockedBy: T030] 确认 `/speckit.improve` 未被接线:`git diff --stat templates/commands/improve.md` 为空,且 `grep -c 'best-practice-optimization' templates/commands/improve.md` 为 0;把两条命令与输出写入 `notes/pre-change-measurements.md`;该工作在 `OI-082-01` 名下,任何验收不得把「文档已镜像」读作「命令已接线」 [green: contracts/mirror-distribution.contract.md#C-28]
