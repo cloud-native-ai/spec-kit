@@ -127,6 +127,8 @@ PASS_PATH = PATH_VALUES[0] if PATH_VALUES else "final"
 
 def _declared_flow_classes():
     """`(values, label)` for the `flow-class-classes` closed set; `((), <STR-014>)` when unreadable."""
+    if declaration_reader is None:
+        return (), "declaration-absent: flow-class-classes"
     try:
         body = declaration_reader.load_fact(
             declaration_reader.find_repo(Path(__file__).resolve()),
@@ -140,6 +142,10 @@ def _declared_flow_classes():
 
 
 FLOW_CLASSES, FLOW_CLASSES_LABEL = _declared_flow_classes()
+if not FLOW_CLASSES:
+    # FR-012 compatibility value: a tree without the declaration layer keeps the pre-migration
+    # membership and the label above records the degradation; a readable declaration wins.
+    FLOW_CLASSES = ("execution", "expression")
 
 # --- the `ARC verdict mapping` (batch 2; owner: the declaration layer) ------------------------ #
 # Feature 084 moved the `final_path` record's key set and the verdict's value set out of this
