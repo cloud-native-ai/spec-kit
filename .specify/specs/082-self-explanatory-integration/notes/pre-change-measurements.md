@@ -109,3 +109,68 @@ is reported as a note, not a failure (plan § Mirror Obligations fact 1). Conseq
 feature: `ls .specify/shared/...` is NOT evidence of distribution, and the mirror judgement is
 **keep**, not **reach** — the three mirrors already existed and were byte-identical at task start;
 the obligation is that later edits must not reintroduce `MISS`/`DIFF`.
+
+## T012 — 原则块对确认门控扫描器的零命中（executed 2026-11-05, implement part 2）
+
+The principle block written by T011 into `templates/constitution-template.md` was scanned line by
+line with the scanner's **compiled** pattern (loaded from the script itself, not re-typed), exactly
+as the clause requires:
+
+```console
+$ python3 - <<'PY'
+import importlib.util, json
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("s", "scripts/python/scan-confirmation-gates.py")
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+lines = Path('templates/constitution-template.md').read_text(encoding='utf-8').splitlines()
+start = next(i for i,l in enumerate(lines) if l.startswith('### XVIII.'))
+end = next(i for i in range(start+1, len(lines))
+           if lines[i].startswith('### ') or lines[i].startswith('## '))
+hits = [f"L{i}:{mm.group(0)!r}" for i, line in enumerate(lines[start:end], 1)
+        for mm in m.BLOCKING_RE.finditer(line)]
+print(json.dumps({"block_lines": end-start, "hits": hits}))
+PY
+{"block_lines": 22, "hits": []}
+```
+
+`hits: []` — the block is 22 lines and trips no blocking pattern. No scanner pattern, no frozen
+baseline and no `.json` baseline file was modified.
+
+Whole-scan control, measured in the same session (the clause forbids changing the total, and T049
+owns the final comparison):
+
+```console
+$ python3 scripts/python/scan-confirmation-gates.py --json | python3 -c 'import json,sys; print(json.load(sys.stdin)["total"])'
+27
+```
+
+`27` equals the value re-measured at T002 above and the value pinned in `tasks.md` — zero new gate
+hits attributable to this feature. Note the reading convention recorded at T002: `27` is **not** a
+frozen baseline (the frozen value is `23` and one pre-existing test pins that equality, red in this
+feature's baseline). The obligation this row discharges is "no NEW hit", not "total unchanged".
+
+## T012 follow-on — mirror of the edited template (executed 2026-11-05)
+
+Editing `templates/constitution-template.md` made its runtime mirror stale. `sync-mirrors.py
+--check` reported the drift before the write, and the write was scoped to `templates` only:
+
+```console
+$ python3 scripts/python/sync-mirrors.py --check
+DIFF  .specify/templates/constitution-template.md        (before the write)
+
+$ python3 scripts/python/sync-mirrors.py --write --only templates
+scope --only: templates
+DIFF  .specify/templates/constitution-template.md
+sync  templates/ -> .specify/templates/ (1 files)
+
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+EXIT=0
+```
+
+`tasks.md` defers mirror commits to T039, but T007-T012 cannot leave a `DIFF` standing: T010's C-20
+assertion reads the owner's **mirror** and asserts byte identity with the source, and the mirror
+parity suite is this feature's own guard (C-22/C-24). The mirror write is therefore recorded here as
+an in-passing repair and reported in the part-2 anomaly line, not as a scope expansion. The
+`.specify/templates/` copy of the constitution template is a **generated** artifact (Two Hats): it
+follows the source, and the source is what was authored.

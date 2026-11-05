@@ -61,7 +61,7 @@ Consumption note: this is the single full-suite run of the implement stage (TEST
 | unproven | R-1's green half (T015), R-2 (T031/T032), R-3 (T043) — recorded as OPEN, not as closed |
 
 - **verdict_analyze** (stage closed 2026-11-05, preserved verbatim): analyze PASS-with-open-upsends — CRITICAL=0 HIGH=0 MEDIUM=12 LOW=2; 36/36 checklist `[Gap]` items raised or dispositioned (unchecked+unraised+undispositioned = 0, gate open); validation wave 7 sent / 1 confirm / 4 downgrade / 2 reject (downgrade+reject rate 6/7, reported as a detection-quality signal); coverage `status: uncovered` (1 clause beyond frozen baseline `constitution-double-landing.contract.md#C-20`, FR-citation lane 1/12 — the accountant does not read task rows); read-only on artifacts, no plan-owned file touched (PLAN-EDIT none), no commit of any artifact; both upsends (U1-a T006 red-first premise, U1-b C-26/T029 entry point) adjudicated and repaired in tasks.md at `94e8c30d`; evidence at `test-evidence/analyze-stage-checks.md`
-- **last_verdict**: implement part 1 PASS — T001-T006 closed with evidence; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal is real and belongs to the NEW module (exit 1) while both pre-existing suites stay green (exit 0, 21 passed), which confirms the analyze-stage repair of T006 rather than re-contradicting it; no plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified); no Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up (out of scope for this part); no push.
+- **last_verdict**: implement part 2 PASS-with-expected-red — T007-T012 [X]; 12 passed / 1 expected C-21 until T022; no plan-owned edits; subagent hit 120-turn limit before its own checkpoint, driver completed E3/commit — T001-T006 closed with evidence; baseline full suite captured once (26 failed / 7156 passed / rc=1 / 387s); red-first signal is real and belongs to the NEW module (exit 1) while both pre-existing suites stay green (exit 0, 21 passed), which confirms the analyze-stage repair of T006 rather than re-contradicting it; no plan-owned artifact touched (PLAN-EDIT none, `requirements.md`/`plan.md`/`data-model.md`/`contracts/`/`quickstart.md`/`research.md`/`feature-ref.md` unmodified); no Completion Gate run, no Feature status flip, no implement Feedback/Wrap-up (out of scope for this part); no push.
 - **next_step**: driver dispatches implement part 2 (P2 `T007-T012`, US1 tests + first implementation). Part 1 stopped at the part boundary by design.
 - **stage_commits**: 94caea76 (implement part 1)
 - **gates**:
@@ -200,3 +200,12 @@ between readings, not a single consistent correction):
 - CRITICAL=0 / HIGH=0 → analyze gate open; checklist accountability 36/36.
 - U1-a (T006 red-first premise) and U1-b (T029 distribution entry point) repaired in tasks.md commit 94e8c30d; re-validated: validate-tasks 0 errors / 31 adjudicated warnings, pre-analyze tasks pass, decomposition proceed.
 - Plan-owned MEDIUM findings (C-20/C-21 placement, count drift, FR-004 budget-rule gap, etc.) are carried to review; implement MUST NOT edit plan-owned artifacts or requirements.md.
+
+## Implement part 2 checkpoint（2026-11-05T04:23:23Z）
+
+- **part_scope**: T007-T012 — done; T007-T012 all `[X]` in tasks.md.
+- **artifacts**: `templates/constitution-template.md` + `.specify/templates/constitution-template.md` (principle XVIII), `tests/contract/test_self_explanatory_constitution.py` (457 lines), `notes/pre-change-measurements.md` (T012 `hits: []`).
+- **targeted set**: `test_self_explanatory_constitution.py` → 12 passed / 1 expected-red (`test_c21_instructions_summary_is_at_most_two_sentences`; C-21 green is T022). C-7 mandate-side is expected-red until T013.
+- **evidence**: `test-evidence/implement-part-2.md`; baseline 26 inherited failures, no new regression outside the two declared expected-reds.
+- **no plan-owned edits**; no Completion Gate, no status flip, no implement wrap-up.
+- **next**: P3 T013-T018 (generator skill entry, mirrors, US1 green, live constitution, mutation legs).
