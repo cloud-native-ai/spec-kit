@@ -644,3 +644,12 @@ between readings, not a single consistent correction):
   `Ready for Review` — that transition belongs to review)
 - **stage_commits** (append): … → 32fc3e70 (implement part 9) → 7037138b (implement part 10a) →
   **1f6ab51c (implement part 10b, final)**
+
+## Implement closure record（2026-11-05T06:39:46Z）
+
+- **implement**: IMPLEMENT-DONE; Feature 082 = `Implemented`; DoD `done`.
+- **closure verdict**: `accept` — final_path pass 4 / total 4 / unknown 0; no open rows; smoke record pass; status row per criterion.
+- **verification.md**: SC-001…SC-009; SC-006 supporting `partial` with the five ladder fields (the only allowed pre-existing red is `test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged`, EP-003).
+- **smoke**: `.specify/specs/082-self-explanatory-integration/test-evidence/smoke-20261105.txt` (2321 B, sha256 19fdfbbd…), command covers the four feature guard modules; 42 passed twice, rc 0.
+- **wrap-up**: session 20261105T063813Z-run-determination-speckit-implement-r20261105t032102z-c139.md; exec-quant 20261105T063815894632Z-d9e6df67.json; feedback 20261105T063820Z-speckit-implement.md.
+- **next**: review stage (four segments + ARC); closure full suite after review; local merge; no push.
