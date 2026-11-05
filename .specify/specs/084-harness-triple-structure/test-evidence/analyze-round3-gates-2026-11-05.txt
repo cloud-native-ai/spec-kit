@@ -1,0 +1,179 @@
+# analyze round 3 — deterministic gate run (captured in full) — 2026-11-05T11:15:15Z
+# stage_base=b1b19e93 (HEAD)
+
+$ python3 scripts/python/validate-requirements.py .specify/specs/084-harness-triple-structure/requirements.md
+file: .specify/specs/084-harness-triple-structure/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 286 lines, 25 definition rows, 14 shared strings
+0 error(s), 0 warning(s)
+[exit=0]
+
+$ python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md
+PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+[exit=0]
+
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/084-harness-triple-structure
+spec: .specify/specs/084-harness-triple-structure
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 434 lines, 4 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+[exit=0]
+
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/084-harness-triple-structure/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 19, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T11:15:15Z"}
+[exit=0]
+
+$ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks --requirements .specify/specs/084-harness-triple-structure/requirements.md --tasks .specify/specs/084-harness-triple-structure/tasks.md
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 19, "task_count": 31, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T11:15:15Z"}
+[exit=0]
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage requirements --repo $(pwd)
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 24, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exis
+[exit=0]
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage plan --repo $(pwd)
+{"stage": "plan", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 24, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exist under 
+[exit=0]
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage tasks --repo $(pwd)
+{"stage": "tasks", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 24, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exist under the repo: shared/declarations/"}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 40, "message": "path does not exist under
+[exit=0]
+
+$ python3 scripts/python/clause_extract.py <5 contracts>
+declaration-schema.contract.md	form=md-bold-closed	clauses=12
+  C-001
+  C-002
+  C-003
+  C-004
+  C-005
+  C-006
+  C-007
+  C-008
+  C-009
+  C-010
+  C-011
+  C-012
+distribution-and-mirror.contract.md	form=md-bold-closed	clauses=13
+  C-013
+  C-014
+  C-015
+  C-016
+  C-017
+  C-018
+  C-019
+  C-020
+  C-021
+  C-022
+  C-023
+  C-024
+  C-025
+harness-triple-check.contract.md	form=md-bold-closed	clauses=16
+  C-026
+  C-027
+  C-028
+  C-029
+  C-030
+  C-031
+  C-032
+  C-033
+  C-034
+  C-035
+  C-036
+  C-037
+  C-038
+  C-039
+  C-040
+  C-041
+migration-batches.contract.md	form=md-bold-closed	clauses=10
+  C-042
+  C-043
+  C-044
+  C-045
+  C-046
+  C-047
+  C-048
+  C-049
+  C-050
+  C-051
+shared-reader.contract.md	form=md-bold-closed	clauses=8
+  C-052
+  C-053
+  C-054
+  C-055
+  C-056
+  C-057
+  C-058
+  C-059
+[exit=0]
+
+$ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/084-harness-triple-structure  (no --freeze)
+UNCOVERED-FR: FR-017
+UNCOVERED-FR: FR-018
+UNCOVERED-FR: FR-019
+FR uncovered: 19
+
+companion (must be non-empty on a green run): claimed clauses 0, scanned files 253, clause universe 1576, FR universe 19
+  [clause-uncovered] fail (572) — 572 uncovered, 59 beyond the frozen baseline
+  [fr-uncovered] fail (19) — 0 of 19 FRs cited from citation groups
+  [clause-unparsable] warn (103) — 103 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (59) — baseline holds 513 names; 513 uncovered items are baseline-internal and do not block
+78 error(s), 0 warning(s)
+status: uncovered
+[exit=0]
+
+$ git diff --stat 3ffeb26e -- <081 frozen surface>
+[exit=0 empty-above = zero diff]
+
+$ python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c2_no_project_side_classification_store
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 15 deselected, 1 warning in 0.11s
+[exit=0]
+
+$ python3 scripts/python/account-clause-coverage.py --spec .specify/specs/084-harness-triple-structure >/dev/null 2>&1; echo $?   # exit code, not piped
+[exit=1]
+
+# --- round-3 supplemental readings ---
+$ grep -rn 'no-machine-fact.yaml' $SPEC/*.md $SPEC/contracts/*.md
+.specify/specs/084-harness-triple-structure/requirements.md:203:本表因此**有 3 行**改判 `excluded [[STR-006]] (no-machine-fact)`（analyze、self-improvement、improve）；另 **2 行**（review、manage-history）**保持 in-scope
+.specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md:123:writes is `shared/declarations/exclusions/no-machine-fact.yaml`, whose rows are `unit` / `carrier` / `anchor` ke
+.specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md:132:pair, one for the self-improvement pair, five for the improve pair — so `no-machine-fact.yaml` carries **8 rows*
+.specify/specs/084-harness-triple-structure/tasks.md:144:- [ ] T020 [US4] [blockedBy: T007] (FR-002, FR-005, SC-004, C-006, C-007) Write the exclusion records the candidate set requires and only those
+
+$ grep -o '\[ARC_[A-Z_]*\]' templates/review-template.md | sort -u | wc -l   # §2.4 placeholders (distinct, whole file)
+11
+$ sed -n '138,152p' templates/review-template.md | grep -o '\[ARC_[A-Z_]*\]' | sort -u | wc -l   # §2.4 only
+11
+$ grep -o '\[ARC_[A-Z_]*\]' templates/commands/review.md | sort -u | wc -l
+7
+
+$ for w in decisions lessons TODOs flows conflicts; do grep -rc "\b$w\b" --include=*.py --include=*.sh scripts/ skills/ | grep -v ':0$'; done
+-- decisions
+27
+-- lessons
+1
+-- TODOs
+0
+-- flows
+5
+-- conflicts
+35
+
+$ grep -rl 'Bootstrap\|Operationalize\|Optimize' --include=*.py --include=*.sh scripts/ skills/
+[hits=0]
+
+$ grep -rn 'grep -rl' $SPEC/contracts/migration-batches.contract.md | head -3
+reference to the contract's own re-measure rule (Verification table row 4)

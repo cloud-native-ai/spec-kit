@@ -687,3 +687,108 @@ base_commit: d23490c3
 - **R2-04（LOW，历史提交信息 `DN`）**：历史不可改，不处置。
 - **框架观察（`pre-analyze-check.py` 的 `CLAUSE_DEF` 认不出 `C-<digits>`）**：不属本特性。
 
+
+## analyze（round 3, 2026-11-05）
+
+```yaml
+stage: analyze
+row_type: stage-status
+status: ran
+selection_basis: "targeted-set-v1@stage_base=b1b19e93 — (a) 改动路径覆盖 0 命中；(b) 交付物契约测试 16 命中；(c) 夹具变更 0 命中（改动集 = 27 条既有运行时记录，全部位于 .specify/memory/{session,exec-quant,feedback}/ 与 .specify/state/，没有一条落在 tests/、scripts/、skills/**/scripts/、src/ 或 tests/fixtures/）"
+changed_paths[]:
+  - .specify/memory/session/20261102T231648Z-run-determination-speckit-clarify-r20261102t225758z-081a.md
+  - .specify/memory/exec-quant/records/20261105T075132768628Z-cf37e921.json
+  - .specify/memory/exec-quant/records/20261105T080159336037Z-7f8a3419.json
+  - .specify/memory/exec-quant/records/20261105T082009374970Z-a1347a99.json
+  - .specify/memory/exec-quant/records/20261105T083525969720Z-0c4b8437.json
+  - .specify/memory/exec-quant/records/20261105T084309278446Z-6ee2f63f.json
+  - .specify/memory/exec-quant/records/20261105T085419852858Z-eb6daa1e.json
+  - .specify/memory/exec-quant/records/20261105T094511658251Z-1d71de8a.json
+  - .specify/memory/exec-quant/records/20261105T094750637884Z-90e0cae3.json
+  - .specify/memory/feedback/20261105T075137Z-speckit-requirements.md
+  - .specify/memory/feedback/20261105T080203Z-speckit-clarify.md
+  - .specify/memory/feedback/20261105T082017Z-speckit-plan.md
+  - .specify/memory/feedback/20261105T083530Z-speckit-tasks.md
+  - .specify/memory/feedback/20261105T084312Z-speckit-checklist.md
+  - .specify/memory/feedback/20261105T085423Z-speckit-analyze.md
+  - .specify/memory/feedback/20261105T094516Z-speckit-analyze.md
+  - .specify/memory/feedback/20261105T094753Z-skill-sdd-loop-driver.md
+  - .specify/memory/session/20261105T075127Z-run-determination-speckit-requirements-r20261105t074027z-084.md
+  - .specify/memory/session/20261105T080146Z-run-determination-speckit-clarify-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T082004Z-run-determination-speckit-plan-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T083523Z-run-determination-speckit-tasks-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T084306Z-run-determination-speckit-checklist-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T085413Z-run-determination-speckit-analyze-r20261105t074027z-084a.md
+  - .specify/memory/session/20261105T094508Z-run-determination-speckit-analyze-r20261105t074027z-084a-r2.md
+  - .specify/memory/session/20261105T094745Z-run-determination-skill-sdd-loop-driver-r20261105t074027z-08.md
+  - .specify/state/084-harness-triple-structure.md
+selected_paths:
+  - tests/contract/test_acceptance_premises.py
+  - tests/contract/test_acceptance_state_machine.py
+  - tests/contract/test_client_guard_sweep.py
+  - tests/contract/test_directory_governance.py
+  - tests/contract/test_expression_compatibility.py
+  - tests/contract/test_line_state_blocked.py
+  - tests/contract/test_loop_state_contract.py
+  - tests/contract/test_non_regression_064.py
+  - tests/contract/test_non_regression_070.py
+  - tests/contract/test_sdd_diffusion.py
+  - tests/contract/test_sdd_loop_driver_efficiency.py
+  - tests/contract/test_sdd_loop_driver_skill.py
+  - tests/contract/test_sdd_loop_driver_wrapup_accounting.py
+  - tests/contract/test_validation_carrier_contract.py
+  - tests/integration/test_expression_line_pilot.py
+  - tests/integration/test_sdd_loop_efficiency_runner.py
+sufficiency: "TB-05 的 (b) 子句对每个阶段无条件生效（交付面 = 本特性短名 `harness-triple-structure` + `skills/external/sdd-loop-driver` + docs 指针页），故本只读阶段也得到同一 16 个文件；(a) 与 (c) 为空是因为改动集不含可执行面、不含夹具。选择集与 round 2 逐文件相同，说明 stage_base 的差异没有进入选择输入"
+command: "python3 -m pytest -q <上列 16 个文件>"
+rc: 1
+passed: 296
+failed: 2
+new_failures: "not_computable —— implement 起点的 baseline 槽位仍未捕获，无比较基线；改为逐条归因：0 条由本特性制品引起，2 条属环境（test_e_a_stale_pin…：git 2.54.0 钉 vs 实测 2.43.7；test_c22_watch_target_hook_selftest：mkdir /home/agent/tmp/spec-kit 权限被拒）。round 2 的第三条失败（R2-01 引起的 test_c2_no_project_side_classification_store）已随 43dcf30e 消失 —— 3 failed / 295 passed → 2 failed / 296 passed"
+baseline_compare: "none available at this stage（baseline 槽位归 implement 起点；本阶段按 TB-06 只做定向集）"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-round3-targeted-run.txt
+```
+
+## Why `ran`（analyze round 3）
+
+本阶段是**只读**阶段，改动集 27 条全部是运行时记录（session / exec-quant / feedback / 状态脊），没有一条落在可执行面或夹具。
+按 TB-06 本可记 `not-run-docs-only`（六项缩减字段即可判完整）；本轮仍然**选择并实跑**同一条 16 文件定向集，理由是紧前一阶段
+（plan reopen）证明了这条路线上有两个真信号：① `.specify/memory/` 的守卫测试 R2-01 曾在这里被漏过；② 无 CRITICAL/HIGH 的
+一轮仍需要一条实测来把「本轮没有新失败」写成读数而不是印象。故 E3 行按更严口径记 `status: ran` 并附 `changed_paths[]`，
+使缩减字段集与运行字段同时可读。
+
+## R2 闭环读数（round 3 复测，不继承 round 2）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| R2-01 守卫 | `python3 -m pytest -q tests/contract/test_expression_compatibility.py -k c2_no_project_side_classification_store` | `1 passed, 15 deselected`，exit 0（round 2 修复前为 failed） |
+| R2-01 残留扫描 | `grep -rn "flow_class" .specify/memory/` | 12 命中 / 5 文件，**不含** `features/084.md`；该文件第 31 行为「类别读取结果：`execution`（由 `requirements.md` 的声明行解析）」，不匹配 C-2 的 `flow_class\s*[:=]` 正则 |
+| R2-02 名册行数 | `C-044` / `C-045` 表行机械解析 | 批 2 余 **7** 行、批 3 余 **7** 行（原 14 / 8），14 行全部有今日引擎侧；表内唯一 `none` 是解释句里的英文词 |
+| R2-02 排除记录算术 | § Facts outside the roster 的 `unit` 列去重 | 8 条事实 → **8 个排除单元**（2 analyze + 1 self-improvement + 5 improve）；`review-segment-sequence` 与 `history-categories` 零行，其单元仍 in-scope |
+| R2-02 双向冲突扫描 | 八个排除单元 × `C-042`/`C-044`/`C-045` 的 carrier side | 无交集 ⇒ 不存在「既被声明覆盖又被排除行点名」（E-2 R-4） |
+| R2-02 判据未反转 | `grep -rniE "read point is created\|created during migration\|post-migration criterion"` | 仅 `contracts/migration-batches.contract.md:104` 一处，且是**明确否决**该读法的句子 ⇒ 路径 B 未发生，FR-006 (i) 仍是今日树判据 |
+| R2-03 banner | `tasks.md:11` / `:44` 逐字读 | 前提已为「`C-001…C-059` + `md-bold-closed` + `[green:]` 可选」，旧的 `DS/HC/SR/MB/DM` + `md-none` 前提 0 命中 |
+| 条款解析 | `clause_extract.py` × 五契约 | 12 + 13 + 16 + 10 + 8 = **59**，五份全 `md-bold-closed` |
+| 081 冻结面 | `git diff --stat 3ffeb26e -- …`（六路径） | 空输出 ⇒ 零 diff |
+
+## Bases verified（analyze round 3）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| requirements 校验 | `validate-requirements.py …/requirements.md` | `status: ok`、六判项全 pass、0 error / 0 warning、286 行 / 25 定义行 / 14 字符串、exit 0 |
+| tasks 校验 | `validate-tasks.py …/tasks.md` | `PASS`、0 error / 0 warning、exit 0 |
+| 决策张力 | `validate-decision-tensions.py --spec …` | `status: ok`、六 label 全 pass、4 records、`channel high=0`、exit 0 |
+| 拆解门（plan） | `decomposition-check.py --mode plan …` | `proceed`，`fr_count 19` ≤ 30，`reasons=[]` |
+| 拆解门（tasks） | `decomposition-check.py --mode tasks …` | `proceed`，`task_count 31` ≤ 40，`reasons=[]` |
+| 前置门（三阶段） | `pre-analyze-check.py --stage {requirements,plan,tasks}` | 三次 `decision=pass`、`errors=0`、`advisories=84`、`waived=0`、exit 0 |
+| 覆盖会计 | `account-clause-coverage.py --spec …`（不加 `--freeze`） | `claimed clauses 0`、`0 of 19` FRs、`59 beyond the frozen baseline`、`status: uncovered`、**exit 1**（与 round 2 同读数；范围收缩不改变车道输入） |
+| 宪法对照 | `constitution.md` v1.15.0 × `plan.md` § Constitution Check | 18/18 名称逐字一致，0 缺失、0 错配、0 重排 |
+| Feature 注册表 | `features.md` 头行与行数 | `Total Features: 77` = 77 行；084 行为 `Planned`、路径指 `requirements.md`、条款短语 `C-001…C-059`（旧 id 族 0 命中） |
+| 定向集 | `targeted-set-v1@stage_base=b1b19e93` | (a) 0 / (b) 16 / (c) 0，与 round 2 逐文件相同 |
+
+## gate 结论（analyze round 3）
+
+**GATE GREEN：CRITICAL 0 / HIGH 0 / MEDIUM 3 / LOW 2。** 无 CRITICAL/HIGH ⇒ 独立校验波次按规则派发 0 个校验器
+（MEDIUM/LOW 跳过校验），零发现下限由「四条单行覆盖的 FR 逐条重读 + 三行抽样」履行；三条 MEDIUM 与两条 LOW 均为
+一句话级措辞/计数精度修复，落在非判据面，不阻断 `/speckit.implement`。完整判定、闭环读数与证据指针见
+`analyze-report-round3-2026-11-05.md`。
