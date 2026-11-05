@@ -1728,3 +1728,53 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/implemen
 | 镜像不手改 | 唯一写入 `.specify/` 镜像的命令是 T026 的 `sync-mirrors.py --write`；`grep`／`edit` 未落任何 `.specify/{shared,scripts,skills,templates}/` 文件 | 见 §T026 行 |
 | 运行时记录未纳入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/session/**`、`.specify/memory/exec-quant/**`、`.specify/memory/feedback/**`、`.specify/state/**` |
 | 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |
+
+## implement（Part 6，T032，2026-11-05，用户测试豁免）
+
+```yaml
+stage: implement
+row_type: stage-status
+status: ran
+selection_basis: "user-test-waiver (2026-11-05) —— 未跑任何 pytest／全量／定向／smoke 腿；只执行派发简报允许的秒级确定性读数：`harness-triple-check.py --action coverage`（两次，含 `--format json`）、`--action verify`、`validate-tasks.py`、`git`／`grep`／`ls`。测试型读数一律未执行，不记 pass"
+changed_paths:
+  - shared/declarations/exclusions/no-harness-asset.yaml            # 2 → 32 行（追加 30，T032）
+  - shared/declarations/exclusions/no-machine-fact.yaml             # 10 → 38 行（追加 28，T032）
+  - .specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md   # PLAN-EDIT：§ Facts outside the roster 追加一段判决句
+  - .specify/specs/084-harness-triple-structure/tasks.md            # 新增 T032（32 ≤ 40）+ Traceability 一行
+  - .specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt   # NEW — 五条读数的全量捕获
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+passed: 0
+failed: 0
+new_failures: waived-by-user
+baseline: "E2 `slot=baseline`（seq 1：25F／7151P／4S；比较集 = `test-evidence/baseline-pre-existing-failed.txt` 的 23 名）。本段未跑任何测试，`new_failures` 因此是 `waived-by-user`，不是 0"
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/t032-classification-readings-2026-11-05.txt
+```
+
+**PLAN-EDIT 声明（本段唯一触碰 plan-owned 产物）**：`PLAN-EDIT: .specify/specs/084-harness-triple-structure/contracts/migration-batches.contract.md — § Facts outside the roster 追加「候选屏幕的其余单元由 exclusions/ 的逐行记录处置；覆盖动作的零未分类即判决」一段（不抄 58 行清单）；分类=substantive(user-authorized)`。授权来自派发简报：本次 § Facts outside the roster 的扩展是用户授权的 substantive reopen（`plan_constraint=active since 2026-11-05T08:22:55Z`，`plan_commit=4b65517c`）。其余 plan-owned 产物（`plan.md`、`data-model.md`、`research.md`、`quickstart.md`、`feature-ref.md`、其余四份契约）零触碰。
+
+## 本段三条读数（命令 + 实测；全文 `t032-classification-readings-2026-11-05.txt`）
+
+| 判项 | 命令 | 读数 |
+|---|---|---|
+| T032 归零（SC-001(ii)） | `harness-triple-check.py --action coverage` | `candidates: 83`／`unclassified: **0**`／`pending: 0`／`findings: 0`，exit 0；处置分布 in-scope 13 ／ excluded 70（`no-harness-asset` **32** + `no-machine-fact` **38**）——70 = 12（T020 起的既有行）+ 58（本段） |
+| SC-001(i) 确定性 | 同树连跑两次 `coverage`，`sha256sum` 比对 | 两次逐字节一致（`f9cd934a…3473`），47 ms／44 ms，`stdout_bytes 7845` |
+| SC-004 锚点可判 | `--action verify` | `declarations: 23`；`consistency-declarations-to-carriers: 28/28`；`consistency-carriers-to-declarations: 16/16`；`findings: 0` ⇒ `exclusion-anchor-unresolvable` **0**、单元重名 0（重名与重复 unit 都是 exit 2 输入错误，本次 exit 0） |
+
+58 个单元的处置分布（按面）：`shared/workflow/*.md` 3（全 `no-harness-asset`）；`skills/external/*/SKILL.md` 9（`no-harness-asset` 2 ／ `no-machine-fact` 7）；`skills/internal/*/SKILL.md` 27（`no-harness-asset` 15 ／ `no-machine-fact` 12）；`templates/commands/*.md` 19（`no-harness-asset` 10 ／ `no-machine-fact` 9）。每行三键齐备，`anchor` 一律 `path#Section` 且段落文本在该文件内逐字出现（`verify` 逐行解析的读数，不是人工比对）。
+
+## 本段的四处披露
+
+1. **D1 的读法（本切片自裁的假设，须评审复核）**：D1 判的是**单元的验收交付物（产品）**，不是「运行顺带写下的记录」。依据是已落地的 `no-harness-asset` 行本身——`draw-diagram` 行明写该单元仍会经 `feedback-utils.py` 写下自己的 feedback 记录，理由却仍是「交付物是图包」。若改取「附带记录」读法，D1 对每个候选恒真（每个技能的 § Wrap-up 都写 session／feedback／exec-quant），判据自我作废、只余 D2 单条件——这正是 A2 clarify 裁定否掉的那条读法。
+2. **两条理由没有按面平均分配，也没有被凑成同一个理由**：`no-harness-asset` 落在「产品是 spec 产物／账本／注册表／导出包／文档」的单元，`no-machine-fact` 落在「产品确实改动了消费者清单点名的六棵树，或产出记录与 verdict」的单元。以 `templates/commands/todo.md`（产出工作面 TODO 标记）与 `templates/commands/tools.md`（产出 `tools/` 记录）为例，两者相邻而处置不同。
+3. **`carrier` 的两种来源都写进行注释**：43 行取 `grep` 到的 `scripts/python/<name>.py`；15 行取 `skills/<layer>/<name>/scripts/<file>` 形态的引擎——其中 10 行是该单元自己声明的 `${SKILL_HOME}/scripts/<file>` 资产（以相对路径调用），5 行是它文本里点名的兄弟技能引擎（`create-team/scripts/dispatch.sh`、`create-team/scripts/match-team-preset.py`、`archive-session/scripts/export.py`、`code-review/scripts/git-delta-review.sh`），行注释写明该形态；8 行 `no-harness-asset` 单元无自有主体引擎，carrier 取它自己的 § Wrap-up 所调记录引擎（`feedback-utils.py`，全表 17 行用它），逐条注明。
+4. **`.specify/` 镜像本段未重投（按派发简报执行）**：两份 exclusions 在 `.specify/shared/declarations/exclusions/` 有镜像副本，本段只改框架源。派发简报明令「不改 `.specify/` 镜像」，故 `sync-mirrors.py --check` 在下次获授权的同步前会把这一对判为 drift；这是授权的范围边界，不是未记录的偏差，`diff -r shared/declarations .specify/shared/declarations` 在本段结束后会显示两份 exclusions 文件不同（其余相同）。
+
+## Bases verified（implement Part 6 收口）
+
+| 判项 | 命令 | 结果 |
+|---|---|---|
+| plan-owned 仅声明的那一处 | `git status --porcelain .specify/specs/084-harness-triple-structure` | 只有 `contracts/migration-batches.contract.md`（已按 PLAN-EDIT 声明）；`plan.md`／`data-model.md`／`research.md`／`quickstart.md`／`feature-ref.md` 与其余四份契约无改动 |
+| 依赖面未动 | `git diff 4b65517c -- pyproject.toml` | 空输出 |
+| 运行时不入提交 | `git status --porcelain` 逐条比对 | 提交集不含 `.specify/memory/**`、`.specify/state/**` |
+| 既有脏文件未动 | `git status --short` 前后一致 | `M .specify/memory/session/20261102T231648Z-…-081a.md` 与既有未跟踪记录保持原样，未提交未还原 |
+| 不 push | `git log --oneline -1` | 本地提交，未执行任何 push |

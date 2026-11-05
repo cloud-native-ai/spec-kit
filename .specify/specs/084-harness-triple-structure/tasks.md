@@ -148,6 +148,8 @@ Single project, framework-source layout: `shared/`, `scripts/`, `templates/`, `s
 
 **Checkpoint**: the boundary is writable and checkable in both directions — in-scope by declaration, out-of-scope by record, and nothing silently in between.
 
+- [X] T032 [US4] (FR-002, SC-001, SC-004) Classify the remaining candidate units to zero unclassified: take the screen's own reading (`python3 scripts/python/harness-triple-check.py --action coverage`) and give every unit it still reports `unclassified` exactly one disposition record — `no-harness-asset` where the unit's acceptance deliverable is not one of the harness-asset kinds FR-002 (D1) names, `no-machine-fact` where D1 holds and no value the unit carries is read by an engine to reach a verdict (D2) — with `carrier` the engine the unit's text actually reaches (`grep` at write time: a `scripts/python/<name>.py` reference, or the unit's own `${SKILL_HOME}/scripts/<file>` asset) and `anchor` a `path#Section` that resolves in the tree. A unit already named by a declaration or by an existing row NEVER gets a second record (E-2 R-4); rows append and never reorder. The verdict is a reading, not a summary: `coverage` reports `unclassified: 0` with `findings: 0`, and `verify` reports zero `exclusion-anchor-unresolvable`
+
 ---
 
 ## Phase 7: Polish & Cross-Cutting Concerns
@@ -242,6 +244,7 @@ Every row's requirement and success-criterion references, and the contract claus
 | T029 | FR-010 | SC-006 | N5, FR-018's zero-diff clause — the non-goal readings |
 | T030 | FR-013 | SC-005 | C-013…C-018 — the source-route distribution reading and its teardown |
 | T031 | all 19 FR | SC-001…SC-006 | quickstart S5–S8 rendered on the final tree — `notes/quickstart-run.md` |
+| T032 | FR-002 | SC-001, SC-004 | C-006, C-007, C-030 (the screen's accepted conservative side) — the two exclusion files at `unclassified: 0` with zero `exclusion-anchor-unresolvable` |
 
 **Coverage statement**: all 19 functional requirements and all 6 success criteria are named by at least one row; FR-008 is carried twice on purpose (T005 as its negative fixture, T006 as its implementation), because a subset rule that only one of the two carries is exactly the "rule implemented once, asserted nowhere" shape this feature removes. SC-002's three named segments are carried by three different rows (T010 the residual segment, T011–T016 the declaration side, T018 the state side) and no row claims the criterion on the strength of one segment.
 

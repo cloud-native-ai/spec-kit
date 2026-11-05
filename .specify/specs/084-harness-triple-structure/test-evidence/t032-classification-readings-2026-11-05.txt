@@ -1,0 +1,1159 @@
+# T032 — classification readings (2026-11-05, implement part 6)
+
+Captured at execution time (command line, exit status, full stdout/stderr, duration). Filtered views
+below derive from these records; nothing here was re-run to recover a number. Test budget: waived by the
+user (2026-11-05) — these are the allowed second-scale deterministic readings, no pytest leg was run.
+
+## coverage run 1
+cmd: python3 scripts/python/harness-triple-check.py --action coverage
+exit: 0
+duration_ms: 47
+stdout_bytes: 7845
+stderr: ''
+
+```
+# harness-triple-check — coverage
+candidates: 83
+pending: 0
+unclassified: 0
+findings: 0
+unit: shared/workflow/acceptance-hardening.md
+disposition: in-scope
+state: complete
+fact: success-criterion-path-values
+unit: shared/workflow/evidence-step.md
+disposition: in-scope
+state: complete
+fact: evidence-lanes
+unit: shared/workflow/expression-gates.md
+disposition: in-scope
+state: complete
+fact: expression-gate-faces
+fact: expression-stage-operator-table
+unit: shared/workflow/external-dispatch-recipes.md
+disposition: excluded
+reason: no-harness-asset
+unit: shared/workflow/feature-integration.md
+disposition: excluded
+reason: no-harness-asset
+unit: shared/workflow/feedback-step.md
+disposition: in-scope
+state: complete
+fact: feedback-prompt-threshold
+unit: shared/workflow/glossary.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/coaching-skills/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/create-docs/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/create-pages/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/create-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/database-utils/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/document-utils/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/draw-diagram/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/git-utils/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/humanize/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/improve-docs/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/improve-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/merge-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/sdd-house-keeping/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/sdd-loop-driver/SKILL.md
+disposition: in-scope
+state: complete
+fact: driver-completion-sentinels
+fact: driver-stage-sequence
+unit: skills/external/sdd-project-setup/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/analyze-artifacts/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/archive-session/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/clarify-artifact/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/code-review/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/collect-evidence/SKILL.md
+disposition: in-scope
+state: complete
+fact: evidence-lanes
+fact: evidence-seven-states
+unit: skills/internal/create-agent/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/create-checklist/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-plan/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-requirements/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-tasks/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-team/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/create-tools/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/derive-architecture/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/implement-feature/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-agent/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-team/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-tools/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-agents/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-constitution/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-features/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/manage-feedback/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-goal/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/manage-history/SKILL.md
+disposition: in-scope
+state: complete
+fact: history-manifest-schema
+unit: skills/internal/manage-instructions/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-todo/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/memory-recall/SKILL.md
+disposition: in-scope
+state: complete
+fact: memory-types
+unit: skills/internal/memory-record/SKILL.md
+disposition: in-scope
+state: complete
+fact: memory-types
+unit: skills/internal/research-feature/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/review-feature-quality/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/review-sdd-process/SKILL.md
+disposition: in-scope
+state: complete
+fact: arc-verdict-mapping
+unit: skills/internal/run-agent/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-interview/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-skills/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-team/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/sanitize-materials/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/self-improvement/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/study-project/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/summarize-project/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/analyze.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/checklist.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/clarify.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/derive.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/docs.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/feedback.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/goal.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/history.md
+disposition: in-scope
+state: complete
+fact: history-manifest-schema
+unit: templates/commands/implement.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/improve.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/instructions.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/interview.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/plan.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/requirements.md
+disposition: in-scope
+state: complete
+fact: success-criterion-path-values
+unit: templates/commands/research.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/review.md
+disposition: in-scope
+state: complete
+fact: arc-verdict-mapping
+unit: templates/commands/sanitize.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/session.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/skills.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/tasks.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/team.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/todo.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/tools.md
+disposition: excluded
+reason: no-machine-fact
+```
+
+## coverage run 2
+cmd: python3 scripts/python/harness-triple-check.py --action coverage
+exit: 0
+duration_ms: 46
+stdout_bytes: 7845
+stderr: ''
+
+```
+# harness-triple-check — coverage
+candidates: 83
+pending: 0
+unclassified: 0
+findings: 0
+unit: shared/workflow/acceptance-hardening.md
+disposition: in-scope
+state: complete
+fact: success-criterion-path-values
+unit: shared/workflow/evidence-step.md
+disposition: in-scope
+state: complete
+fact: evidence-lanes
+unit: shared/workflow/expression-gates.md
+disposition: in-scope
+state: complete
+fact: expression-gate-faces
+fact: expression-stage-operator-table
+unit: shared/workflow/external-dispatch-recipes.md
+disposition: excluded
+reason: no-harness-asset
+unit: shared/workflow/feature-integration.md
+disposition: excluded
+reason: no-harness-asset
+unit: shared/workflow/feedback-step.md
+disposition: in-scope
+state: complete
+fact: feedback-prompt-threshold
+unit: shared/workflow/glossary.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/coaching-skills/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/create-docs/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/create-pages/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/create-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/database-utils/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/document-utils/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/draw-diagram/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/external/git-utils/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/humanize/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/improve-docs/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/improve-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/merge-skills/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/sdd-house-keeping/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/external/sdd-loop-driver/SKILL.md
+disposition: in-scope
+state: complete
+fact: driver-completion-sentinels
+fact: driver-stage-sequence
+unit: skills/external/sdd-project-setup/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/analyze-artifacts/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/archive-session/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/clarify-artifact/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/code-review/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/collect-evidence/SKILL.md
+disposition: in-scope
+state: complete
+fact: evidence-lanes
+fact: evidence-seven-states
+unit: skills/internal/create-agent/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/create-checklist/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-plan/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-requirements/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-tasks/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/create-team/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/create-tools/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/derive-architecture/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/implement-feature/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-agent/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-team/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/improve-tools/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-agents/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-constitution/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-features/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/manage-feedback/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-goal/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/manage-history/SKILL.md
+disposition: in-scope
+state: complete
+fact: history-manifest-schema
+unit: skills/internal/manage-instructions/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/manage-todo/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/memory-recall/SKILL.md
+disposition: in-scope
+state: complete
+fact: memory-types
+unit: skills/internal/memory-record/SKILL.md
+disposition: in-scope
+state: complete
+fact: memory-types
+unit: skills/internal/research-feature/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/review-feature-quality/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/review-sdd-process/SKILL.md
+disposition: in-scope
+state: complete
+fact: arc-verdict-mapping
+unit: skills/internal/run-agent/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-interview/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-skills/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/run-team/SKILL.md
+disposition: excluded
+reason: no-harness-asset
+unit: skills/internal/sanitize-materials/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/self-improvement/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/study-project/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: skills/internal/summarize-project/SKILL.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/analyze.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/checklist.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/clarify.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/derive.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/docs.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/feedback.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/goal.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/history.md
+disposition: in-scope
+state: complete
+fact: history-manifest-schema
+unit: templates/commands/implement.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/improve.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/instructions.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/interview.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/plan.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/requirements.md
+disposition: in-scope
+state: complete
+fact: success-criterion-path-values
+unit: templates/commands/research.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/review.md
+disposition: in-scope
+state: complete
+fact: arc-verdict-mapping
+unit: templates/commands/sanitize.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/session.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/skills.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/tasks.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/team.md
+disposition: excluded
+reason: no-machine-fact
+unit: templates/commands/todo.md
+disposition: excluded
+reason: no-harness-asset
+unit: templates/commands/tools.md
+disposition: excluded
+reason: no-machine-fact
+```
+
+## verify
+cmd: python3 scripts/python/harness-triple-check.py --action verify
+exit: 0
+duration_ms: 65
+stdout_bytes: 292
+stderr: ''
+
+```
+# harness-triple-check — verify
+declarations: 23
+candidates: 83
+consistency-declarations-to-carriers: 28/28
+consistency-carriers-to-declarations: 16/16
+residual-literals: delegated: doc-consistency-check.py --faces duplicate (this engine opens no subprocess and never re-scans)
+findings: 0
+```
+
+## coverage --format json
+cmd: python3 scripts/python/harness-triple-check.py --action coverage --format json
+exit: 0
+duration_ms: 46
+stdout_bytes: 13344
+stderr: ''
+
+```
+{
+  "action": "coverage",
+  "candidates": 83,
+  "findings": [],
+  "pending": 0,
+  "unclassified": 0,
+  "units": [
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "success-criterion-path-values"
+      ],
+      "state": "complete",
+      "unit": "shared/workflow/acceptance-hardening.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "evidence-lanes"
+      ],
+      "state": "complete",
+      "unit": "shared/workflow/evidence-step.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "expression-gate-faces",
+        "expression-stage-operator-table"
+      ],
+      "state": "complete",
+      "unit": "shared/workflow/expression-gates.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "shared/workflow/external-dispatch-recipes.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "shared/workflow/feature-integration.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "feedback-prompt-threshold"
+      ],
+      "state": "complete",
+      "unit": "shared/workflow/feedback-step.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "shared/workflow/glossary.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/external/coaching-skills/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/create-docs/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/create-pages/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/create-skills/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/external/database-utils/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/external/document-utils/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/external/draw-diagram/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/git-utils/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/humanize/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/improve-docs/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/improve-skills/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/merge-skills/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/sdd-house-keeping/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "driver-completion-sentinels",
+        "driver-stage-sequence"
+      ],
+      "state": "complete",
+      "unit": "skills/external/sdd-loop-driver/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/external/sdd-project-setup/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/analyze-artifacts/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/archive-session/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/clarify-artifact/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/code-review/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "evidence-lanes",
+        "evidence-seven-states"
+      ],
+      "state": "complete",
+      "unit": "skills/internal/collect-evidence/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/create-agent/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/create-checklist/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/create-plan/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/create-requirements/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/create-tasks/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/create-team/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/create-tools/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/derive-architecture/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/implement-feature/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/improve-agent/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/improve-team/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/improve-tools/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/manage-agents/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/manage-constitution/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/manage-features/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/manage-feedback/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/manage-goal/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "history-manifest-schema"
+      ],
+      "state": "complete",
+      "unit": "skills/internal/manage-history/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/manage-instructions/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/manage-todo/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "memory-types"
+      ],
+      "state": "complete",
+      "unit": "skills/internal/memory-recall/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "memory-types"
+      ],
+      "state": "complete",
+      "unit": "skills/internal/memory-record/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/research-feature/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/review-feature-quality/SKILL.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "arc-verdict-mapping"
+      ],
+      "state": "complete",
+      "unit": "skills/internal/review-sdd-process/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/run-agent/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/run-interview/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/run-skills/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "skills/internal/run-team/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/sanitize-materials/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/self-improvement/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/study-project/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "skills/internal/summarize-project/SKILL.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/analyze.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/checklist.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/clarify.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/derive.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/docs.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/feedback.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/goal.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "history-manifest-schema"
+      ],
+      "state": "complete",
+      "unit": "templates/commands/history.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/implement.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/improve.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/instructions.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/interview.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/plan.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "success-criterion-path-values"
+      ],
+      "state": "complete",
+      "unit": "templates/commands/requirements.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/research.md"
+    },
+    {
+      "disposition": "in-scope",
+      "facts": [
+        "arc-verdict-mapping"
+      ],
+      "state": "complete",
+      "unit": "templates/commands/review.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/sanitize.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/session.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/skills.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/tasks.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/team.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-harness-asset",
+      "unit": "templates/commands/todo.md"
+    },
+    {
+      "disposition": "excluded",
+      "facts": [],
+      "reason": "no-machine-fact",
+      "unit": "templates/commands/tools.md"
+    }
+  ]
+}
+```
+
+## validate-tasks
+cmd: python3 scripts/python/validate-tasks.py .specify/specs/084-harness-triple-structure/tasks.md
+exit: 0
+duration_ms: 31
+stdout_bytes: 88
+stderr: ''
+
+```
+PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+```
+
+## SC-001 (i) determinism — the two runs compared byte-for-byte
+coverage run 1 sha256: f9cd934a51623783fab3d6f6c4f684ff622fd420ec27a1c14cd24fb298b13473
+coverage run 2 sha256: f9cd934a51623783fab3d6f6c4f684ff622fd420ec27a1c14cd24fb298b13473
+byte-identical: True
+comparison object: two captures of one tree in one session (equality is the test; no stored baseline is
+diffed, so a green here cannot be "the previous run compared against itself").
+
+## derived readings (from the JSON record above, not re-run)
+candidates: 83
+unclassified: 0
+pending: 0
+findings: 0
+dispositions: excluded=70, in-scope=13
+excluded reasons: no-harness-asset=32, no-machine-fact=38
+exclusion rows on the tree: no-harness-asset=32, no-machine-fact=38
+verify: exclusion-anchor-unresolvable findings = 0
+verify: duplicated/declaration findings = 0
+validate-tasks: PASS: .specify/specs/084-harness-triple-structure/tasks.md — 0 error(s), 0 warning(s)
+

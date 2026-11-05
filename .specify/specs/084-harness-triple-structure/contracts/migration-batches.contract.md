@@ -140,6 +140,14 @@ implement stage re-runs screen S and the anchor greps before writing the file an
 the screen no longer yields is dropped from the file, and a fact whose anchor grep returns a live engine read point moves
 **back** into `C-044` / `C-045` rather than staying excluded.
 
+**候选屏幕的其余单元由 `exclusions/` 的逐行记录处置；覆盖动作的零未分类即判决**（T032，2026-11-05，implement part 6）。This
+section owns one thing only — which facts left the roster and why. The disposition record of every other candidate the screen
+yields is owned by `shared/declarations/exclusions/<reason>.yaml`, one row per unit (`requirements.md` FR-002 / FR-005,
+`data-model.md` E-2); this file MUST NOT restate that list, because the two exclusion files are its single source and a copy
+here would drift silently. The verdict is a reading of the tree, not a clause: `harness-triple-check.py --action coverage`
+reports `unclassified: 0` with `findings: 0`, and `--action verify` reports zero `exclusion-anchor-unresolvable` and no unit
+named by two rows. A unit that later gains a machine-consumed fact moves back into `C-044` / `C-045` by that same reading.
+
 ## Verification (route (b), per reading)
 
 Every reading above is measured at implement time, not now: the declarations do not exist on this branch. Premises to
