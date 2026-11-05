@@ -297,3 +297,65 @@ evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/analyze-
 
 **本阶段未修改任何制品、未勾选任何任务行、未提交、未 push；F-01／F-02／F-03 三条 CRITICAL/HIGH 的修复归属已点名
 （requirements / plan / requirements），修平动作留给对应命令。**
+
+
+## requirements 修复（2026-11-05，analyze 回环 round 1）
+
+```yaml
+stage: requirements
+row_type: stage-status
+status: not-run-docs-only
+selection_basis: docs-only
+changed_paths:
+  - .specify/specs/084-harness-triple-structure/requirements.md
+  - .specify/specs/084-harness-triple-structure/test-evidence/validate-requirements.txt
+  - .specify/specs/084-harness-triple-structure/test-evidence/stage-status.md
+evidence_ptr: .specify/specs/084-harness-triple-structure/test-evidence/validate-requirements.txt
+base_commit: 6ac4c2d3
+```
+
+## Why `not-run-docs-only`（requirements 修复）
+
+本轮只改规格文本与证据文件：`requirements.md` 上按 finding 计的十组文本修复（F-01／F-03／F-04／F-06／F-08／C-02…C-06），
+外加两份 `test-evidence/` 文件。改动面没有一行落在
+`tests/unit`、`tests/contract`、`tests/integration`、`tests/scenarios`，也没有触碰 `scripts/`、`skills/**/scripts/`、
+`src/`、夹具或 `templates/*.yaml`。因此 `targeted-set-v1` 的输入全部落在 `test_roots` 之外、与夹具无关，得空集属
+**预期形态**，按判据 owner `.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` **TB-06** 记
+`not-run-docs-only` 而非 `empty-selection-escalated`。
+
+## 逐条处置（只处置 requirements-owned findings）
+
+| Finding | 原严重度 | 处置 | 落点 |
+|---|---|---|---|
+| F-01 | CRITICAL | **一次 owner 枚举 + 四处指针**：FR-010 成为「既有门禁脚本」的唯一枚举点，并按两个角色分列——「不得重判侧」六脚本（含 `doc-consistency-check.py`，它在其中是被**复用**的一方）、「零 diff 侧」五脚本（六者去掉 `doc-consistency-check.py`）。FR-019／N5／SC-006／SC-006 Source 四处改为按名字引用 FR-010，各自的计数词随之改正（「四个面」「四个门禁脚本」「五个既有门禁脚本（五名）」全部消失）。**与 plan HC-07 的五处计数在同一行内点名对齐**：六元集是 HC-07 重判清单的超集，第六处 `closure-acceptance-check.py` 由 SC-006／A8(a) 带入、本特性对它承担的是「不得改动」义务（081 验收面，见 FR-018 硬约束），因此不留给 round 2 一个新计数分歧 | FR-010（owner）、FR-019、N5、SC-006、SC-006 Source |
+| F-03 | HIGH | **在每条断言内点名参照物，不在判据内重新推导基线**：基线 = T001 采集进 `notes/pre-change-measurements.md` 的该条读数（实现起点由该次采集固定），plan 侧同形态先例 EP-003 的 `171c2ff8`（镜像侧 EP-004）。三条断言与两条 Source 行各自写明 | FR-009、SC-005、SC-006、SC-005 Source、SC-006 Source |
+| F-06 | MEDIUM | 形态规则的真实分区：**五条各带一个占位符**（`STR-009`／`STR-010`／`STR-012`／`STR-013`／`STR-014`）、**一条带两个**（`STR-011`）、**无零占位模板**（5 + 1 = 6）。value 表本身未动 | § Shared Strings 收尾段 |
+| F-04 | LOW | **钉住 `duplicate` 面的调用形态** `--action verify --faces duplicate --spec-dir <spec 目录>`，并写明该面没有逐事实选择器、读数随 owner 路径而变；**事实级归因**来自 [[STR-011]] 的 `<fact>@<path>` 与 `--action lookup --fact <fact-slug>`。FR-010 的「复用、不另造扫描器」与 SC-002 的逐事实计数由此不冲突 | FR-007 (b)、FR-010、SC-002、SC-002 Source |
+| C-02 | MEDIUM | 去掉开放量词「至少」，改成**收口规则**：受影响 owner 文档 = MB-01／MB-03／MB-04 点名的全部 carrier ∪ 每个 in-scope fact 的每个 markdown carrier；五处已点名文档降级为「举例，不是第二份枚举」 | FR-018 |
+| C-03 | MEDIUM | 二选一取**「文本自由、只判机械项」**：exit 2 降级标注不登记为 Shared String、不进封闭原因集（plan D7），夹具只判三件事（退出码 2／标注非空且点名缺失目录／不抛异常不打印 traceback）；FR-017 同步声明 exit-2 不是 finding | FR-013、FR-017 |
+| C-04 | MEDIUM | `consumers` MUST 至少含一个引擎，只列载体是 **schema 错误**，MUST NOT 被容忍为永久 [[STR-005]] | FR-005 |
+| C-05 | MEDIUM | SR-07 的**单一子集解析器守卫腿**进入 FR-019 的枚举（两份祖父解析器由显式 allowlist 豁免，理由 = N4） | FR-019 |
+| C-06 | LOW | 确定性范围收口为**三个动作**（`coverage`／`verify`／`lookup`），SC-001 (i) 只作 `coverage` 上的读数实例 | FR-016、SC-001 (i) |
+| F-08 | MEDIUM | Exclusion Record 属性表去掉 `reason`，写明**由文件名承载**（`exclusions/<reason>.yaml`） | § Key Entities |
+
+联动修正（同一事实的指针同步，非新裁决）：`STR-003`／`STR-005`／`STR-011` 的 `Consumed by` 列补上本轮新增的引用方。
+
+## 本轮不处置（非 requirements-owned，已在 analyze 报告点名归属）
+
+F-02（contracts 条款 id → plan）、F-05（`tasks.md` 的 `FR-023` → tasks）、F-07（`plan.md` D10 的 `39` → plan）、
+E-01（`coverage-baseline.txt` 冻结 → tasks）、F-09（任务行 tag → tasks）、G-01（特性详情文件的阶段记录 → feature）。
+`tasks.md`／`checklists/`／plan-owned 产物本轮**零改动**。
+
+## Bases verified（requirements 修复）
+
+| 判项 | 命令 | 结果 | 证据 |
+|---|---|---|---|
+| 规格自校验 | `python3 scripts/python/validate-requirements.py .specify/specs/084-harness-triple-structure/requirements.md` | exit 0；六判项全 `pass (0)`；`scanned: 282 lines, 25 definition rows, 14 shared strings`；0 error／0 warning | `test-evidence/validate-requirements.txt` § 1 |
+| 前置门（analysis 前） | `python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/084-harness-triple-structure --stage requirements --repo <repo>` | `decision=fail`、`errors=5`：五条全是 `dangling-id`（`FR-023` 在 `tasks.md:62`／`tasks.md:208`／`checklists/layer-criteria-2026-11-05.md:71/79/82`）。**非本轮引入、非 requirements-owned**（`FR-023` 在 `HEAD` 版 requirements 内同样不存在；`tasks.md`／`checklists/` 零改动），归属 F-05 | 同文件 § 2；修复前对照读数见 § 判读第 3 条 |
+| FR 规模 | `python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/084-harness-triple-structure/requirements.md` | `decision=proceed`、`fr_count=19`（上限 30）、`reasons=[]` ⇒ 19 FR／6 SC 编号稳定，未新增未删除 | 同文件 § 3 |
+| 编号稳定性（独立复核） | `git show HEAD:.specify/specs/084-harness-triple-structure/requirements.md` 的 FR id 集 vs 工作树 | 两处都是 `FR-001..FR-019`（19 个），`**Flow Class**`／`**Flow Type**`／`**Path**` 标注未改 | 本行即读数 + 校验器 `id-contiguous`／`path-marker` 判项 |
+| 只改 requirements-owned | `git status --porcelain -- .specify/specs/084-harness-triple-structure` | 修复轮内只有 `requirements.md` 被修改（证据文件另计），`plan.md`／`data-model.md`／`contracts/`／`quickstart.md`／`research.md`／`feature-ref.md`／`tasks.md`／`checklists/` 全部未动 | 本行即读数 |
+| 临时目录已回收 | `rm -rf .specify/.tmp/084-reqfix` | 修复前的对照副本与两份 JSON 读数用完即删；只留证据文本里的读数与命令 | 本行即读数 |
+
+**本轮未修改 plan-owned 产物、未修改 `tasks.md`、未勾选任何任务行、未改 Feature 注册表、未新增 FR/SC 编号；
+F-01 的 CRITICAL 修复是文本级「一次枚举 + 指针」，不是新增机制。**
