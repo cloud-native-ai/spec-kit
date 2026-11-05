@@ -1,0 +1,71 @@
+# T040 — skill-shape.py before/after and redline-check.py readings
+
+Captured 2026-11-05 during implement Part 5. Script paths (the runtime scripts of the
+`improve-skills` skill):
+
+```
+python3 skills/external/improve-skills/scripts/skill-shape.py <SKILL.md>
+python3 skills/external/improve-skills/scripts/redline-check.py <SKILL.md> --file-only
+```
+
+EP-003 debt rule (stated for every row below): three of the five files were **already over**
+the 5000-token budget before this feature. For them the measurement is the **delta**, and
+`exit 0` was never the criterion; the recorded exception is the "was exit 10 before" branch of
+`improve-skills` Hard Constraint 3.
+
+## Before readings — where they come from, and what was NOT done
+
+- `create-skills` / `improve-skills` / `merge-skills`: quoted from **T001(f)**
+  (`notes/pre-change-measurements.md` § (f), re-taken in Part 1 at `8778d2bb`). They are NOT
+  re-measured from the current tree: doing so would present an after number as a before.
+- `coaching-skills` / `run-skills`: T001(f) did not cover them (at plan time only three files
+  were edited). Their before reading is taken from the **feature baseline object**
+  `3ffeb26e:skills/.../SKILL.md` materialised into a scratch copy
+  (`.specify/.tmp/part5/baseline/`) and measured there — the baseline content, never the
+  current tree.
+
+## Readings
+
+| # | SKILL.md (framework source) | before (source) | after | delta | skill-shape exit (before → after) | redline-check (after) |
+|---|---|---|---|---|---|---|
+| 1 | `skills/external/create-skills/SKILL.md` | ≈5403 (T001(f)) | ≈6181 | **+778** | 10 → 10 (pre-existing debt) | PASS, rc 0 |
+| 2 | `skills/external/improve-skills/SKILL.md` | ≈5722 (T001(f); contract-mandated block 466 excluded) | ≈6208 (contract-mandated block 466 excluded) | **+486** | 10 → 10 (pre-existing debt) | PASS, rc 0 |
+| 3 | `skills/external/merge-skills/SKILL.md` | ≈5134 (T001(f)) | ≈5601 | **+467** | 10 → 10 (pre-existing debt) | PASS, rc 0 |
+| 4 | `skills/external/coaching-skills/SKILL.md` | ≈3301 (3ffeb26e blob) | ≈4206 | **+905** | 0 → 0 | PASS, rc 0 |
+| 5 | `skills/internal/run-skills/SKILL.md` | ≈1770 (3ffeb26e blob) | ≈1924 | **+154** | 0 → 0 | PASS, rc 0 |
+
+Before redline-check readings for the two baseline-blob files: both PASS, rc 0. The three
+T001(f) files have no recorded before redline reading (T001(f) measured shape only); their
+after reading is what this task requires.
+
+## Verbatim after-reading lines
+
+```
+== skills/external/create-skills/SKILL.md
+  判定        slim-recommended
+  正文估算     ≈6181 tokens 可控 / 预算 5000（256 行）
+shape_rc=10
+
+== skills/external/improve-skills/SKILL.md
+  判定        slim-recommended
+  正文估算     ≈6208 tokens 可控 / 预算 5000（全文 6674，契约强制块 466）（160 行）
+shape_rc=10
+
+== skills/external/merge-skills/SKILL.md
+  判定        slim-recommended
+  正文估算     ≈5601 tokens 可控 / 预算 5000（171 行）
+shape_rc=10
+
+== skills/external/coaching-skills/SKILL.md
+  判定        pass
+  正文估算     ≈4206 tokens 可控 / 预算 5000（300 行）
+shape_rc=0
+
+== skills/internal/run-skills/SKILL.md
+  判定        pass
+  正文估算     ≈1924 tokens 可控 / 预算 5000（68 行）
+shape_rc=0
+```
+
+All five `redline-check.py --file-only` runs printed `判定 verdict: PASS — no red line
+triggered` and exited 0.

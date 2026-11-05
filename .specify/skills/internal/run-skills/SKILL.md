@@ -13,7 +13,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ## Input Contract
 
-- **`Target`**:要运行的技能标识,来自调用方参数或会话上下文;名称可省略扩展名。接受形式、归一化顺序与失败语义归 `.specify/shared/definitions/skill-reference-definitions.md`(此处只声明参数名与含义);前缀 `/` 只标记该技能的斜杠命令面,**不是**「直接调用它」的指令。
+- **`Target`**:要运行的技能标识,来自调用方参数或会话上下文;名称可省略扩展名。接受形式、归一化顺序与失败语义归 `shared/definitions/skill-reference-definitions.md`(此处只声明参数名与含义);前缀 `/` 只标记该技能的斜杠命令面,**不是**「直接调用它」的指令。
 - **消歧**:输入若命中 `/speckit.*` 命令名(命令面,非技能),报告该名字属命令面并指向对应 `/speckit.*` 入口,不强行执行。
 - **递归**:目标是 run-skills 自身时照常执行并披露这一点;无特殊分支。
 
@@ -21,7 +21,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-skills/SKILL.md>"
 
 ### 1. 解析(确定性,位置搜索顺序内联于此)
 
-0. **归一化**:先按 `.specify/shared/definitions/skill-reference-definitions.md` 归一化输入(顺序、失败语义与成对报告形态归该 owner,此处不自述),并在输出中披露原始标识、归一化标识与判定类;归一化后命中 `/speckit.*` 命令名的按命令面处置(见上条消歧),不当技能解析。随后按下列顺序取**首个命中**;命中即在输出中披露所选路径:
+0. **归一化**:先按上文 Input Contract 声明的 owner 归一化输入(顺序、失败语义与成对报告形态归该 owner,此处不自述),并在输出中披露原始标识、归一化标识与判定类;归一化后命中 `/speckit.*` 命令名的按命令面处置(见上条消歧),不当技能解析。随后按下列顺序取**首个命中**;命中即在输出中披露所选路径:
 
 1. `skills/internal/<name>/SKILL.md`(dev 规范层 internal)
 2. `skills/external/<name>/SKILL.md`(dev 规范层 external)

@@ -24,7 +24,7 @@ Goal anchor (Constitution Principle XIII — Better-Harness): consolidating two 
 
 Resolve two skills and one relationship before editing:
 
-- **`Source`** (merged *from*, then decommissioned): the source skill's reference. Its accepted forms, normalization order and failure semantics are owned by `.specify/shared/definitions/skill-reference-definitions.md` — reach them there and report the raw and the normalized identifier; this parameter declares only the name and its meaning. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
+- **`Source`** (merged *from*, then decommissioned): the source skill's reference. Its accepted forms, normalization order and failure semantics are owned by `shared/definitions/skill-reference-definitions.md` — reach them there and report the raw and the normalized identifier; this parameter declares only the name and its meaning. It may be a peer skill, a global/library skill, or an **externally-managed** marketplace/upstream skill — this classification decides the decommission scope (see Phase 6).
 - **`Target`** (merged *into*, survives and grows): the target skill's reference, resolved under the **same** owner reference named by `Source` — one reference covers both parameters, so the rule is not stated twice. It MUST already exist; if the user names a non-existent target, this is not a merge — redirect to `create-skills`.
 - **Merge intent**: full absorption (source disappears) is the default. If the user wants the source to keep existing, that is not this skill — route to `improve-skills` (borrow one capability) instead.
 

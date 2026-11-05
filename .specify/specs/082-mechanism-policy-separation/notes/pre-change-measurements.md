@@ -202,6 +202,61 @@ two readings after the rewrite set, in the same shape, so the two are comparable
 **Consequence recorded for T022's stop clause**: the template did not need to change, so
 the task's "stop and report" branch did not fire.
 
+### T037 — the same reading after the full rewrite set
+
+Re-taken 2026-11-05 in implement Part 5 with the same commands and the same shape, so it is
+directly comparable with T022's reading above:
+
+```
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+
+$ git ls-tree -r --name-only 3ffeb26e -- templates/commands/ | wc -l
+27
+$ <per-path loop> git rev-parse 3ffeb26e:$p vs git hash-object $p   # every path
+(no CHANGED lines; changed=0)
+$ git diff --name-status 3ffeb26e..HEAD -- templates/commands/
+(no output)
+```
+
+Zero changed copies, all 27 command templates byte-identical to the baseline, and still no
+history change under `templates/commands/` — identical to T022's reading. Full capture:
+`test-evidence/implement-part5-t036-t037.txt`.
+
+## Reference coordinates (T034 audit, recorded before T035 rewrites)
+
+Captured 2026-11-05 during implement Part 5, at HEAD `fa563b0e`, before any file below was
+edited. The readable coordinate is **file + reference-string content + landing section**;
+line numbers are reported only as the audit-time position and are never the identifying form
+(lines drift with editing — `research.md` § R11 says the same for the plan-time reading).
+
+| # | Consumer (framework source) | Reference string (exact) | Current path form | Landing section (audit time) |
+|---|---|---|---|---|
+| 1 | `skills/external/create-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § 1 Determine the creation source → Case A → `skill name` bullet (line 35) |
+| 2 | `skills/external/create-skills/SKILL.md` | `shared/definitions/skill-reference-definitions.md` | **source** (added by T011) | § 2 Determine SKILL_HOME and metadata → `Both layers before any write` bullet (line 58) |
+| 3 | `skills/external/improve-skills/SKILL.md` | `shared/definitions/skill-reference-definitions.md` | **source** (added by T014) | § Input Contract → `Target identifier` (line 20) |
+| 4 | `skills/external/merge-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § Input Contract → `Source` parameter (line 27) |
+| 5 | `skills/external/coaching-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § Inputs → `Trainee` parameter (line 26) |
+| 6 | `skills/external/coaching-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § Trainee Resolution → normalize-first bullet (line 49) |
+| 7 | `skills/external/coaching-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § Nested (chain) runs → intro line (line 69) |
+| 8 | `skills/internal/run-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § Input Contract → `Target` parameter (line 16) |
+| 9 | `skills/internal/run-skills/SKILL.md` | `.specify/shared/definitions/skill-reference-definitions.md` | mirror | § 1 解析 → step 0 归一化 (line 24) |
+
+Counts at audit time: **7 mirror-path strings** (rows 1, 4–9) + **2 source-path strings**
+(rows 2 and 3, added by T011 / T014 after T001(d) was taken). T001(d) measured the pre-rewrite
+population (8 mirror strings, all mirror); the re-measurement here is 9 strings across the
+same five files. Of the T001(d) population, the `improve-skills` string was already converted
+to the source form by T014, so T035 converts the **7 remaining** mirror strings rather than
+re-converting an already-converted one.
+
+The rewrite's target population is those 7 mirror strings (SR-05 / GR-08, clarify ruling ②).
+After the rewrite each consumer MUST carry **exactly one** source-path reference
+(`test_skill_reference_consumers.py` SR-01…SR-06), so the two consumers that would end with
+two (row 2 vs row 1, row 8 vs row 9) and the consumer that starts with three (rows 5–7)
+collapse to one cited path each; the other landing points keep a pointer to the owner without
+re-spelling its path.
+
 ## Why this reading set is stable
 
 Three of the six readings changed between plan and now: (a) `skills-external 409 → 413` and

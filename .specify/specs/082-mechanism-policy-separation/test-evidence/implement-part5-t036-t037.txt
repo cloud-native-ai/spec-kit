@@ -1,0 +1,99 @@
+# T036 + T037 readings — captured 2026-11-05T17:49:08+0800 at working tree over HEAD fa563b0e
+
+## T036 — mirror obligations (full sync then check)
+
+$ python3 scripts/python/sync-mirrors.py --write
+Regenerated command copies for 4 tools.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (414 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (64 files)
+rc=0
+
+$ python3 scripts/python/sync-mirrors.py --check   # RS-004 joint-acceptance reading (FR-016)
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (414 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (3 files)
+ok    scripts/ == .specify/scripts/ (119 files)
+ok    shared/ == .specify/shared/ (64 files)
+rc=0
+
+# Counts are MEASURED, never pinned (T036). Against T001(a): skills-external 413 -> 414 (create-skills/references/mechanism-policy-check.md, T012) and shared 63 -> 64 (mechanism-policy-definitions.md, T003-T006) — both this feature's own new files; every pair is ok, so no ok->DIFF drift exists.
+
+## T036 — FR-016 no-second-form boundary
+
+$ find . -path ./.git -prune -o -name "mechanism-policy-definitions*" -print
+./shared/definitions/mechanism-policy-definitions.md
+./.specify/shared/definitions/mechanism-policy-definitions.md
+
+$ ls shared/definitions/ | grep -iE "mechanism|classification"
+mechanism-policy-definitions.md
+
+$ git diff --name-status 3ffeb26e..HEAD -- scripts/   # new gate scripts: none
+(no output = zero script changes since baseline)
+
+$ git status --porcelain -- scripts/
+(no output = zero uncommitted script changes)
+
+$ git ls-tree -d --name-only 3ffeb26e | sort   # delivered directory roots at the baseline
+.claude
+.github
+.opencode
+.qoder
+.specify
+agents
+docs
+feedback
+memory
+scripts
+shared
+skills
+src
+templates
+tests
+
+$ git ls-tree -d --name-only HEAD | sort        # delivered directory roots at HEAD
+.claude
+.github
+.opencode
+.qoder
+.specify
+agents
+docs
+feedback
+memory
+scripts
+shared
+skills
+src
+templates
+tests
+
+# The two sets are identical: the feature adds no delivered directory root. (Local untracked
+# tooling dirs .venv/.vscode/.pytest_cache pre-date the feature and are not delivered content;
+# an empty untracked root tmp/ created 15:13 during an earlier implement part, with no files
+# inside, was removed before this reading.)
+
+$ git ls-files --others --exclude-standard | cut -d/ -f1 | sort -u   # top-level of untracked additions
+.specify
+
+# Every untracked addition sits under .specify/ — no new root outside the mirrored six pairs.
+
+## T037 — command surface stayed closed
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+
+$ git ls-tree -r --name-only 3ffeb26e -- templates/commands/ | wc -l
+      27
+
+$ per-path: git rev-parse 3ffeb26e:<p> vs git hash-object <p> (27 paths)
+changed=0
+
+$ git diff --name-status 3ffeb26e..HEAD -- templates/commands/
+(no output = history carries no command-template change)

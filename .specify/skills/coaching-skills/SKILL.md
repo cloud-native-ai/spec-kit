@@ -23,7 +23,7 @@ Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
 - Exactly two positional parameters: the Trainee reference and `<work>`.
 - **`Trainee`**: the Trainee reference. Its accepted forms, normalization order,
   disambiguation rules and failure semantics are owned by
-  `.specify/shared/definitions/skill-reference-definitions.md` — reach them there, and
+  `shared/definitions/skill-reference-definitions.md` — reach them there, and
   report the raw and the normalized identifier plus the decision class. A leading `/`
   names the Trainee's slash-command surface; it is **never** an instruction to invoke
   that skill directly instead of running this loop.
@@ -45,10 +45,9 @@ Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`.
 Reuse the `run-skills` position ladder, with no second resolution rule: canonical
 internal → canonical external → installed internal → installed external.
 
-- Normalize the `Trainee` reference first, by
-  `.specify/shared/definitions/skill-reference-definitions.md` (the order and the failure
-  semantics live there, not here); report the raw identifier, the normalized identifier and
-  the decision class in the run output.
+- Normalize the `Trainee` reference first, by the owner document cited under § Inputs
+  (the order and the failure semantics live there, not here); report the raw identifier, the
+  normalized identifier and the decision class in the run output.
 - A source hit and its installed mirror hit are one hit for the same skill; only two
   distinct layers carrying the same name are two hits.
 - Two hits: fail closed naming both candidate paths; never pick the nearest.
@@ -65,8 +64,8 @@ internal → canonical external → installed internal → installed external.
 ## Nested (chain) runs
 
 A Trainee may itself be a meta-skill whose own target is the skill actually changed —
-`coaching-skills improve-skills 优化 X` is caller → Trainee → **subject**. Supported per
-`.specify/shared/definitions/skill-reference-definitions.md` § Nested, with four duties here:
+`coaching-skills improve-skills 优化 X` is caller → Trainee → **subject**. Supported per the
+skill-reference owner's § Nested (owner cited under § Inputs), with four duties here:
 
 - **The Trainee resolves the subject, not the coach.** The subject reference stays inside
   `<work>` byte-for-byte; resolving, normalizing or rewriting it in this run is a contract

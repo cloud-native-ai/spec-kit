@@ -605,8 +605,58 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "markers": ("coaching-skills", "skills/external/coaching-skills/SKILL.md"),
     },
     "skills/internal/run-skills/SKILL.md": {
-        "reason": "2026-10-30 Feature 078 updates the run-skills routing-family pointer",
-        "markers": ("coaching-skills",),
+        "reason": (
+            "2026-10-30 Feature 078 updates the run-skills routing-family pointer; "
+            "2026-11-05 Feature 082 folds in FR-026's skill-reference wiring (normalize "
+            "by the owner cited in the Input Contract and disclose the raw and the "
+            "normalized identifier), pinned by "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("coaching-skills", "shared/definitions/skill-reference-definitions.md",
+                    "上文 Input Contract 声明的 owner"),
+    },
+    # 2026-11-05 (Feature 082, meta-skill governance): three more non-wiring sources gain
+    # the mechanism/policy judgement and the skill-reference parameter declaration. The
+    # fourth edited consumer, `skills/external/coaching-skills/SKILL.md`, is NOT a manifest
+    # entry — it is the replacement named by `_retired_skill_register` above, so its
+    # registration point is that register's content markers (extended below), never an
+    # `ALLOWED_POST_BASELINE_CHANGES` key (which the module's own membership assertion
+    # would reject as vacuous). Each entry records the drift; it authorizes no other.
+    "skills/external/create-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 082 lands FR-012 (the § 6 mechanism/policy separation "
+            "checklist item) and FR-026 (the § 1 skill-name parameter declaration citing "
+            "the reference owner), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("Mechanism / policy separation",
+                    "shared/definitions/mechanism-policy-definitions.md",
+                    "shared/definitions/skill-reference-definitions.md"),
+    },
+    "skills/external/improve-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 082 lands FR-013 (the § 2 survey question and the § 3 "
+            "`policy source missing or ambiguous` candidate) and FR-026 (the § Input "
+            "Contract target-identifier declaration), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("policy source missing or ambiguous",
+                    "shared/definitions/mechanism-policy-definitions.md",
+                    "shared/definitions/skill-reference-definitions.md"),
+    },
+    "skills/external/merge-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 082 lands FR-014 via SW-03 (the § 5 layer-distribution "
+            "pre-judgement, the § 8 reused separation check and the provenance record's "
+            "layer-attribution permission) and FR-026 (the § Input Contract Source "
+            "declaration), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("changes the two layers' distribution", "Layer split after the merge",
+                    "shared/definitions/skill-reference-definitions.md"),
     },
 }
 
@@ -681,10 +731,16 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
             "the retired source came back at its manifest path: %s" % retired_rel
         )
         replacement = _read(REPO_ROOT / replacement_rel)
-        for marker in ("name: coaching-skills", "classification: external"):
+        # 2026-11-05 (Feature 082): the replacement is also a rewritten consumer — FR-026 /
+        # SR-06 lands the reference wiring only, so the register re-asserts that one added
+        # literal here. This IS coaching-skills' registration point: the path is not in the
+        # 069a manifest, so an ALLOWED_POST_BASELINE_CHANGES key for it would be vacuous.
+        for marker in ("name: coaching-skills", "classification: external",
+                       "shared/definitions/skill-reference-definitions.md"):
             assert marker in replacement, (
-                "the replacement of %s must carry the rename's own content: %r "
-                "missing from %s (2026-10-30, Feature 078)"
+                "the replacement of %s must carry its own content: %r "
+                "missing from %s (2026-10-30 Feature 078 rename; 2026-11-05 Feature 082 "
+                "FR-026 wiring)"
                 % (retired_rel, marker, replacement_rel)
             )
 
