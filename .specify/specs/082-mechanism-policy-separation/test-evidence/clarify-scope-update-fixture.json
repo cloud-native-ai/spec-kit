@@ -1,0 +1,36 @@
+{
+  "probe_id": "FIXTURE-PROBE-01",
+  "captured": "2026-11-05",
+  "purpose": "Evidence for clarify decision (1): does the CURRENT owner-document normalization order produce the outcome this spec requires? Read by scripts/python/run-fixture-probe.py; the probe is deterministic and stdlib-only.",
+  "owner_doc": "shared/definitions/skill-reference-definitions.md",
+  "forms": {
+    "bare": "improve-skills",
+    "slash": "/improve-skills",
+    "at": "@merge-skills",
+    "labelled": "skill:merge-skills",
+    "canonical_path": "skills/external/merge-skills/SKILL.md",
+    "dir_path": "skills/external/merge-skills"
+  },
+  "rows": [
+    {"id": "R01", "input": "improve-skills", "expected_current": "NAME", "expected_target": "SKILL", "note": "bare name"},
+    {"id": "R02", "input": "/improve-skills", "expected_current": "NAME", "expected_target": "SKILL", "note": "slash form must reach the bare name"},
+    {"id": "R03", "input": "@/merge-skills", "expected_current": "PATH", "expected_target": "SKILL", "note": "at+slash: no rule in the current order"},
+    {"id": "R04", "input": "skill:/merge-skills", "expected_current": "PATH", "expected_target": "SKILL", "note": "label+slash: current step 2 fires before step 3"},
+    {"id": "R05", "input": "speckit.skills", "expected_current": "NAME", "expected_target": "COMMAND", "note": "command surface"},
+    {"id": "R06", "input": "speckit.skills/SKILL.md", "expected_current": "PATH", "expected_target": "COMMAND", "note": "same command name, second writing: two classes today"},
+    {"id": "R07", "input": "/speckit.skills", "expected_current": "NAME", "expected_target": "COMMAND", "note": "command surface behind a slash"},
+    {"id": "R08", "input": "skills/external/merge-skills/", "expected_current": "PATH", "expected_target": "PATH", "note": "directory path"},
+    {"id": "R09", "input": "skills/external/merge-skills", "expected_current": "PATH", "expected_target": "PATH", "note": "directory path without trailing slash"},
+    {"id": "R10", "input": "  \"/improve-skills\"  ", "expected_current": "NAME", "expected_target": "SKILL", "note": "wrapping quotes and whitespace"},
+    {"id": "R11", "input": "Improve-Skills", "expected_current": "NAME", "expected_target": "SKILL (after the exact-then-insensitive case rule)", "note": "case variant resolved by the exact-then-insensitive rule"},
+    {"id": "R12", "input": "no-such-skill-xyz", "expected_current": "NAME", "expected_target": "FAILURE (zero hit)", "note": "outcome class must be FAILURE; NAME does not express it"},
+    {"id": "R13", "input": "../../etc/passwd", "expected_current": "PATH", "expected_target": "FAILURE (out of the known locations)", "note": "out-of-ladder path fails closed"},
+    {"id": "R14", "input": "my-draft.md", "expected_current": "NAME", "expected_target": "SKILL (name channel; owner must still remove the omit-extension ambiguity)", "note": "run-skills says a name may omit the extension; the name channel does not strip .md"}
+  ],
+  "reading": {
+    "what_current_requires": "outcome is one of NAME or PATH (two classes); failure is decided downstream, so the closed three-way result of FR-030 is not expressible from the normalization procedure alone",
+    "what_target_requires": "outcome is exactly one of COMMAND / SKILL (identifier or path+layer) / FAILURE (four classes of FR-024)",
+    "fixture_min_rows": 12,
+    "rows_here": 14
+  }
+}

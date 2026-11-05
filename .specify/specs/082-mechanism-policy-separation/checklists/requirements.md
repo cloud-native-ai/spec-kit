@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-11-05
-**Updated**: 2026-11-05（scope update：并入「技能引用语法与归一化」第二能力；新增判定项见 § Scope Update 2026-11-05）
+**Updated**: 2026-11-05（scope update：并入「技能引用语法与归一化」第二能力；新增判定项见 § Scope Update 2026-11-05。同日 clarify 复评：两条已知缺口在本轮裁决中落定，一条收窄为残留面）
 **Feature**: `.specify/specs/082-mechanism-policy-separation/requirements.md`
 
 ## Content Quality
@@ -59,9 +59,15 @@
 
 ### 已知缺口（如实记录，不掩盖）
 
-- [ ] **SC-006…SC-009 的复算载体此刻不存在**：全仓 `tests/` 对 `skill-reference` 的检索零命中，即该能力目前没有任何机器断言。四条的 `**Path**: final` 是**要求**（该状态须在实现完成后成立），不是当前读数。这与 082a 的 SC-001/SC-002/SC-005 属同一类"可测但载体待落"，已在 § Notes 记为本阶段的真实缺口。
-- [ ] **owner 文档（起点实现）自身的归一化顺序与其接受形式表互相矛盾**：步骤 2 把任何含 `/` 的值判为路径，于是以 `/` 开头的斜杠引用永远走不到步骤 3 的剥前缀，`@/name` 无规则可归一，且步骤 5 的产物不是 FR-030 要求的三值封闭判定。逐条证据见 `test-evidence/requirements-scope-update-concurrent-impl-readout.txt` § 3。本规格以 FR-021 / FR-030 / SC-006 把这一矛盾变成可选性要求；**它没有被本阶段修复**（改造未提交的用户工作 + 在多种读法间选择，越出本阶段范围），故本条判为**未闭合**，随回传的 ANOMALY 行上送。
-- [ ] **五处消费者引用的是镜像路径、本规格引用的是源路径**：两者内容今日逐字节相同（`cmp` 一致、`sync-mirrors.py --check` rc=0），但「消费者该写哪一种」没有 owner 裁决。本阶段不改任何一侧，作为 clarify 的裁决点登记（readout § 5）。
+- [x] **（2026-11-05 clarify：本阶段只落了 fixture，未落测试；缺口仍在）SC-006…SC-009 的复算载体此刻不存在**：全仓 `tests/` 对 `skill-reference` 的检索零命中，即该能力目前没有任何机器断言。四条的 `**Path**: final` 是**要求**（该状态须在实现完成后成立），不是当前读数。这与 082a 的 SC-001/SC-002/SC-005 属同一类"可测但载体待落"，已在 § Notes 记为本阶段的真实缺口。
+- [x] **（2026-11-05 clarify 已裁决，修正归 plan/implement）owner 文档（起点实现）自身的归一化顺序与其接受形式表互相矛盾**：步骤 2 把任何含 `/` 的值判为路径，于是以 `/` 开头的斜杠引用永远走不到步骤 3 的剥前缀，`@/name` 无规则可归一，且步骤 5 的产物不是 FR-030 要求的三值封闭判定。逐条证据见 `test-evidence/requirements-scope-update-concurrent-impl-readout.txt` § 3。本规格以 FR-021 / FR-030 / SC-006 把这一矛盾变成可选性要求；**它没有被本阶段修复**（改造未提交的用户工作 + 在多种读法间选择，越出本阶段范围），故本条判为**未闭合**，随回传的 ANOMALY 行上送。**2026-11-05 clarify 落定**：目标顺序与输出语义已写入 `requirements.md` § Clarifications § Session 2026-11-05 的 ① 条（先剥标签与前缀、再判通道，输出恰为命令面／技能标识／失败三值），确定性复算载体为 `test-evidence/clarify-scope-update-fixture.json` + `…-fixture-probe.txt`；**owner 文件本身的修正仍属 plan/implement**，本轮未改任何未提交的 `skills/` 或 `shared/` 文件。
+- [x] **（2026-11-05 clarify 已裁决，改写归 plan/implement）五处消费者引用的是镜像路径、本规格引用的是源路径**：两者内容今日逐字节相同（`cmp` 一致、`sync-mirrors.py --check` rc=0），但「消费者该写哪一种」没有 owner 裁决。本阶段不改任何一侧，作为 clarify 的裁决点登记（readout § 5）。**2026-11-05 clarify 落定**：以源路径 `shared/definitions/skill-reference-definitions.md` 为准，`.specify/` 镜像只作生成物（standalone 以相对框架根解析、不改写拼写）；五份 `SKILL.md` 的 8 处引用串随 plan/implement 改写，SC-007 的扫描项复核。
+
+### 2026-11-05 clarify 复评（残留面，如实记录，不掩盖）
+
+- [ ] **name 通道与 path 通道的判定集合尚未闭合**：`speckit.skills` 归 NAME、`speckit.skills/SKILL.md` 归 PATH —— 同一命令名的两种写法落在两个判定类，「命令面」判定是否覆盖带路径后缀的写法因而悬空。已落 `requirements.md` § Edge Cases 的「命令名带上像路径的后缀」一条（归一化必须先剥前缀再判路径；「保留原值」不得成为第四种结果），但**具体归属（name 通道输出形态 / 路径内外分类 / 接受形式增减）**是 ① 裁决的残留面，交 plan 与再一轮 clarify。
+- [ ] **「名字可省扩展名」与「名字通道不剥 `.md`」的冲突**：`run-skills` § 1 输入契约说名称可省扩展名，而 `my-draft.md` 按归一化落 name 通道、名字里带 `.md`，与 `skills/external/foo`（无 `.md`、有 `/`）落 path 通道构成两个语义不同却共享输入族的失败。已并入 ① 的第 4、11 条要求 owner 消歧；`run-skills` 正文的改写属 plan/implement（它同时是 ② 的消费方之一）。
+- [ ] **`@name` 的 CLI 可达性**：已裁决为 § Constraints C11（形态判定 MUST 是归一化的显式确定性步骤；CLI 形态下 `@name` 走零命中失败类并增记「该形式不可达」）；**形态判定步骤落在 owner、确定性程序，还是两者兼有** 属 plan 的设计选择，本阶段不预设。
 
 ## Notes
 
