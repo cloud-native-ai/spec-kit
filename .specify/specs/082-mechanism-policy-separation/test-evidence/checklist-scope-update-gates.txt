@@ -1,0 +1,95 @@
+checklist-stage generation self-check — feature 082-mechanism-policy-separation
+generated_at: 2026-11-05T06:40:59Z
+artifact: .specify/specs/082-mechanism-policy-separation/checklists/quality-scope-update.md
+owning_command: /speckit.checklist    owning_skill: .specify/skills/internal/create-checklist/SKILL.md
+sibling_preserved: .specify/specs/082-mechanism-policy-separation/checklists/requirements.md (NOT overwritten — one new file per run)
+
+=== [S1] structural self-check (program) ===
+items: 89
+sequence-contiguous-from-CHK001: True
+duplicates: 0
+items-without-dimension-tag: none
+items-without-traceability-reference: none
+items-with-prohibited-stem: none
+items-not-in-question-form: [35]
+hand-written-counts-in-item-rows: none
+sections: 14 (A.  B.  C.  D.  E.  F.  G.  H.  I.  J.  K.  L.  M.  Not)
+has-Readers-declaration: True
+has-Reading-scenario-declaration: True
+ends-with-newline: True
+
+=== [S2] flow class (read once for the feature line) ===
+unit_id: spec:082-mechanism-policy-separation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0
+
+=== [S3] G-checklist-reader (blocking) ===
+doc-consistency-check: verify
+checked_at: 2026-11-05T06:40:59Z
+faces: reader=not-applicable
+files_scanned: 13
+findings: 0
+rc=0
+
+=== [S4] G-checklist-duplicate (blocking) ===
+doc-consistency-check: verify
+checked_at: 2026-11-05T06:41:00Z
+faces: duplicate=pass
+files_scanned: 13
+findings: 0
+rc=0
+
+=== [S5] requirements structural propositions (untouched by this stage; re-run for a clean base) ===
+file: .specify/specs/082-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 318 lines, 39 definition rows, 5 shared strings
+0 error(s), 0 warning(s)
+rc=0
+
+=== [S6] objective-analysis-gate binding determination (machine-derived) ===
+roster owner: tests/contract/test_objective_analysis_gate.py (BINDING dict owns the binding set)
+51:    "checklist": "CHK",
+61:    "checklist": "create-checklist",
+gate doc's own discovery idiom -> grep -rl 'objective-analysis-gate.md' templates/commands/
+  result: no files — the commands were thinned; execution and the gate pointer are owned by .specify/skills/internal/<skill>
+pointer found in:
+.specify/skills/internal/create-checklist/SKILL.md
+  -> checklist IS bound. The gate FIRED on this stage's own instrument.
+
+=== [S7] objective-analysis-gate run record ===
+same-author condition: HELD — requirements.md / plan.md / tasks.md and this checklist were all written by the same agent in the current session, across multiple editing passes.
+detection split (disjoint artifact scope, 3 scopes, no overlap):
+  scope A -> sections Completeness / Clarity / Consistency
+  scope B -> sections Measurability+Traceability / Scope Boundary / Edge Cases
+  scope C -> sections Risks+Dependencies / Bilingual+Terminology / Directory+Mirror / One Source Of Truth / Carried Obligations / Closure Plan
+dispatch attempt: FAILED TWICE — the executor carries no subagent-dispatch tool in this harness; fallback invoked per gate rule 7.
+fallback: direct bounded read per declared scope; routed results are marked '(detected: direct read, subagent unavailable)'.
+findings raised by detection: 4
+  A1 CONFIRMED  GM-11/GM-12 断言的是未加反引号的裸字面，需求侧无条款规定字面形态前缀 -> new item CHK067
+  A2 CONFIRMED  C5「共享提示形态」与 C6「dated record」的豁免边界不互斥 -> new item CHK068
+  A3 WITHDRAWN  「A6 被拆成 C8，需求内 A 小节缺 6」——wrong: A6 exists ('探针位置 = improve-skills 与 create-skills 的自检步骤') and C8 only cross-references it
+  A4 CONFIRMED (reclassified)  guard-and-measurement.contract.md 的编号/计数措辞与自身行集不符 (GM-04「扩到 12 行」vs 8 行；GM-03 要件 3「8 条 = 三个新增 + 五个改写」vs 2 new + 6 rewrites；GM-03 line 39「11 个新模块与 1 份矩阵 fixture」(=12) vs rows 9-18 (=10)) — propagation surface = contract prose only, no task row and no SC denominator inherits it -> held at medium
+downgraded by validation: 2 of 4 (A3 withdrawn outright; A4 capped at medium by its propagation surface).
+downgrade rate: 2/4 — not near zero on a self-authored set.
+
+=== [S8] TEST BUDGET ===
+stage_base: 5e60c629   selection: targeted-set-v1
+changed paths of this stage = spec prose (checklists/*.md) + test-evidence/* -> targeted set EMPTY (no code, no test module touched).
+status: not-run-docs-only (six reduced fields in checklist-scope-update-stage-status.jsonl)
+pre-existing environment defect (not caused by this stage): scripts/bash/run-tests.sh --help -> ModuleNotFoundError: No module named 'platformdirs.pytest_plugin' (EP-001)
+
+=== [S9] pre-analyze-check.py ===
+not applicable: --stage accepts requirements|plan|tasks only; the checklist stage's gate set is the two doc-consistency faces above.
+
+self_check_status: PASS
