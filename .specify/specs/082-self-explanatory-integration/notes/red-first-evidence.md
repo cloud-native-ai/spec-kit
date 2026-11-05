@@ -438,3 +438,104 @@ Two things the red exposed, both repaired in passing and disclosed:
 | R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
 
 T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.
+
+---
+
+# Part 7 (T034-T038) — M-5 / M-6, and the C-27 pair
+
+**Captured**: 2026-11-05 | **Base commit**: `e5d0ae87` | **part_scope**: `T034-T038`
+**Scratch root**: `.specify/.tmp/082-part7/` (git-ignored, `git check-ignore -q .specify/.tmp` checked
+before the first write; removed after the run)
+
+Both legs call the carriers' **own** functions — the mirror engine's `compare_pair` for M-5, the
+distribution module's `docs_page_paths` / `unresolved_docs_page_paths` for M-6 — so neither is a
+paraphrase of the assertion it is meant to break. Neither leg's subject is a repository file: both
+mutate copies, and both assert the real file's digest afterwards.
+
+## Verbatim transcript
+
+```console
+$ python3 .specify/.tmp/082-part7/m56.py
+MUTATION LEGS M-5 / M-6 — part 7 (T037 / T038)
+==============================================================================
+
+[M-5] one byte flipped in a COPY of a mirror file, compared with the engine's compare_pair
+      subject pair: shared/definitions/self-explanatory-definitions.md
+[PASS] M-5 precondition: the copied pair is clean before mutation
+        missing=[] differing=[] extra=[]
+[PASS] M-5 mutation took effect (copy differs by exactly one byte)
+        4508 bytes, byte 53: b'\n' -> b'\x0b'
+[PASS] M-5 compare_pair reports DIFF for exactly that pair
+        missing=[] differing=[PosixPath('definitions/self-explanatory-definitions.md')] extra=[]
+[PASS] M-5 C-22's byte-identity assertion turns red, and the message names source->mirror
+        AssertionError: mirror drift: .specify/shared/definitions/self-explanatory-definitions.md (engine compare_pair DIFF)
+[PASS] M-5 the real mirror pair is byte-identical to its pre-leg digest
+        sha256 source=1b12a9c5e098 mirror=1b12a9c5e098
+
+[M-6] the STR-002 inline pointer deleted from a COPY of the docs page
+      subject: docs/concepts/self-explanatory.md
+[PASS] M-6 precondition: the page carries the STR-002 pointer
+        shared/definitions/self-explanatory-definitions.md
+[PASS] M-6 mutation took effect (the pointer is gone from the copy)
+        1969 -> 1954 bytes
+[PASS] M-6 extraction no longer yields the deleted path (extraction itself is unchanged)
+        ['shared/definitions/removed-by-m6.md', 'shared/guidelines/self-explanatory.md', 'shared/workflow/best-practice-optimization.md']
+[PASS] M-6 C-27's `assert not problems` turns red on the copy
+        ['shared/definitions/removed-by-m6.md: MISSING in the source tree']
+[PASS] M-6 the red names the path the mutation introduced
+[PASS] M-6 anti-vacuity: the same carrier is green on the unmutated page
+[PASS] M-6 the real docs page is byte-identical to its pre-leg digest
+        sha256=04bb8c345c4e
+[PASS] M-6 nothing under docs/concepts/ changed
+        11 files
+
+==============================================================================
+VERDICT: PASS — M-5 turns C-22's byte-identity assertion red on a copy; M-6 turns C-27's
+         resolution assertion red on a copy; both real subjects are byte-identical after
+         the legs. scratch root: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/082-part7
+EXIT=0
+```
+
+The M-6 leg ran against the **pre-T035** page text (1969 B; the page gained a two-line note during
+T035), which is immaterial to the leg — it deletes a pointer and checks that resolution goes red — but
+is recorded so the byte counts are reproducible rather than mysterious.
+
+## M-5 (C-24) — what the leg establishes
+
+| step | measurement |
+|------|-------------|
+| precondition | the copied pair is clean under `compare_pair` (no `MISS`, no `DIFF`, no extra) |
+| mutation | exactly one byte changed (offset 53, `0x0a` → `0x0b`) in the *mirror* copy |
+| detection | `compare_pair` returns `differing=[definitions/self-explanatory-definitions.md]` — the pair, not the file |
+| red | the parity suite's own `assert src.read_bytes() == mirror.read_bytes()` raises, with a message naming `.specify/shared/definitions/self-explanatory-definitions.md`, i.e. the node id is directly re-runnable (C-24) |
+| isolation | the real pair's sha256 is identical before and after the leg |
+
+## M-6 (C-27) — what the leg establishes
+
+| step | measurement |
+|------|-------------|
+| precondition | the page carries the `STR-002` inline path |
+| mutation | `` `shared/definitions/self-explanatory-definitions.md` `` → `` `shared/definitions/removed-by-m6.md` `` in the *copy* |
+| extraction unchanged | the copy still yields three paths; the deleted one is absent, so the leg breaks resolution, not extraction |
+| red | `unresolved_docs_page_paths` returns `['shared/definitions/removed-by-m6.md: MISSING in the source tree']` — the guard's own `assert not problems` line fails, naming the mutation |
+| anti-vacuity | the same carrier returns `[]` on the unmutated text |
+| isolation | the real page's sha256 is unchanged, and all 11 files under `docs/concepts/` keep their digests |
+
+## Pairs after part 7
+
+| Pair | Red captured | Green expected at | Status |
+|------|--------------|-------------------|--------|
+| R-1 C-1 template carries the principle | yes (part 1) | T015 (US1) | CLOSED |
+| C-21 instructions summary | yes (part 4) | T024 (US2) | CLOSED |
+| R-4 C-10/C-11/C-14 | yes (part 4) | T024 / T027 | CLOSED |
+| R-2 C-24 mirror byte parity | B-1 (plan stage) + part 6's DIFF | T031/T032 | CLOSED (part 6) |
+| R-2b C-26 distribution | part 6's removal leg | T029 | CLOSED (part 6) |
+| **R-5 C-27 docs links** | **M-6 (this part)** | **T034 (this part)** | **CLOSED (this part)** |
+| R-3 C-31 glossary entry | — | T043 (US4) | NOT STARTED |
+
+R-5 is new in this part: C-27 had no carrier before T034, so its red had to be produced by the mutation
+leg rather than inherited from an earlier part. M-6 is that red, and the guard's green on the real page
+is the same assertion run on the unmutated subject (also asserted inside the leg as its anti-vacuity
+half).
+
+T051 owns the final consolidation. Nothing above is marked closed without the command that produced it.

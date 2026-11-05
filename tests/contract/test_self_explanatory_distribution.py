@@ -46,11 +46,19 @@ what T029 forbids, so this module does not read the ambient CLI at all: it build
 No second pair table (C-22/One Source Of Truth): the three paths below are the *contract's* subject
 list, not a mirror enumeration. The mirror enumeration stays in the engine's ``MIRROR_PAIRS``; the
 mirror-parity suite derives its parameters from there.
+
+The second half of this module (``C-27``, T034) turns the same question around: the repository's
+``docs/concepts/self-explanatory.md`` pointer page names the owner paths in inline code, and every one
+of those names must resolve on **both** sides of the mirror. It reuses this module's pytest surface
+rather than starting a link-checking engine (FR-012), and it derives the source→mirror mapping from
+the engine's ``MIRROR_PAIRS`` instead of restating it.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -367,3 +375,251 @@ def test_c28_distribution_is_not_wiring():
     # And the distributed subject really is a document, not a wired engine action.
     for rel in DISTRIBUTED_PATHS:
         assert rel.endswith(".md"), f"{rel} is not a document path"
+
+
+# --------------------------------------------------------------------------- #
+# C-27 — the docs page's pointers resolve, on both sides of the mirror (T034)
+# --------------------------------------------------------------------------- #
+DOCS_PAGE = ROOT / "docs" / "concepts" / "self-explanatory.md"
+
+# C-27's "at minimum" floor, taken from the contract clause itself (not from the page, or the
+# assertion would be circular): the framework-source concept owner ``STR-002`` and the
+# optimization-workflow owner. Both are framework-source paths, so both must resolve in source AND
+# in the mirror tree.
+C27_REQUIRED_PATHS = (
+    "shared/definitions/self-explanatory-definitions.md",
+    "shared/workflow/best-practice-optimization.md",
+)
+
+# C-27's one escape hatch: a referenced path that legitimately has no mirror, listed explicitly
+# with the reason it is exempt from the mirror half. It is an ALLOW-LIST of paths whose mirror
+# halves are exempt — never a suppression of the source-tree half, and never a place to hide a
+# missing owner document.
+C27_MIRROR_EXEMPTIONS = {
+    # Reason: `docs/` is this project's development documentation and is NOT distributed
+    # (`AGENTS.md` § Documentation Map); it has no pair in the engine's MIRROR_PAIRS, so a path
+    # under docs/ resolves in the source tree only. Kept explicit so the next docs-internal link
+    # is a visible decision rather than a silent gap. Currently empty by measurement, not by
+    # omission — the page names no docs-internal path today.
+}
+
+# A repository-relative .md path written in inline code is a code span whose whole content is the
+# path. Restricting the span to path characters keeps prose mentions and absolute paths out.
+_INLINE_MD_PATH = re.compile(r"`((?!/)[\w][\w./-]*\.md)`")
+
+
+def _load_mirror_engine():
+    """Load the mirror engine the same way ``test_mirror_parity_suite.py`` does.
+
+    The engine owns ``MIRROR_PAIRS``; deriving the source→mirror mapping from it is what keeps
+    this guard from becoming a second pair table (C-22 / One Source Of Truth).
+    """
+    import importlib.util  # noqa: PLC0415 - local import keeps the module's top import list small
+
+    path = ROOT / "scripts" / "python" / "sync-mirrors.py"
+    spec = importlib.util.spec_from_file_location("_sync_mirrors_c27_engine", path)
+    assert spec is not None and spec.loader is not None, f"cannot load {path}"
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+SYNC_MIRRORS = _load_mirror_engine()
+
+
+def _mirror_of(rel_path: str) -> tuple[str, str] | None:
+    """Map a repo-relative path to ``(source_root, mirror_root)``; ``None`` if it has no pair.
+
+    The engine's pairs are (source_dir, mirror_dir) with the file's path relative to the source
+    dir preserved in the mirror. A path outside every source dir therefore has no mirror.
+    """
+    for src_name, dst_name, _strict, exclude_parts in SYNC_MIRRORS.MIRROR_PAIRS:
+        if rel_path == src_name or not rel_path.startswith(src_name + "/"):
+            continue
+        if any(part in exclude_parts for part in rel_path.split("/")):
+            continue
+        return src_name, dst_name
+    return None
+
+
+def docs_page_paths(page_text: str) -> list[str]:
+    """Every repository-relative ``.md`` path written in inline code, in page order, deduplicated.
+
+    ``docs_page_paths`` is deliberately a plain function over text (not a path): the M-6 mutation
+    leg feeds it a mutated COPY's text, so the leg exercises the real extractor rather than
+    re-typing its regex.
+    """
+    seen: dict[str, None] = {}
+    for match in _INLINE_MD_PATH.finditer(page_text):
+        seen.setdefault(match.group(1), None)
+    return list(seen)
+
+
+def unresolved_docs_page_paths(page_text: str) -> list[str]:
+    """Return one human-readable line per pointer that does not resolve where C-27 requires.
+
+    The return value is the assertion's whole subject: an empty list means every extracted path
+    resolves in the source tree and — unless explicitly exempted — in its mirror tree.
+    """
+    problems: list[str] = []
+    for rel_path in docs_page_paths(page_text):
+        if not (ROOT / rel_path).is_file():
+            problems.append(f"{rel_path}: MISSING in the source tree")
+            continue
+        if rel_path in C27_MIRROR_EXEMPTIONS:
+            continue
+        pair = _mirror_of(rel_path)
+        if pair is None:
+            problems.append(
+                f"{rel_path}: resolves in the source tree but belongs to no mirror pair, and it is "
+                "not in C27_MIRROR_EXEMPTIONS — either it has a mirror, or the exemption (with its "
+                "one-line reason) belongs in that allow-list"
+            )
+            continue
+        _src_name, dst_name = pair
+        mirror_path = ROOT / dst_name / rel_path.split("/", 1)[1]
+        if not mirror_path.is_file():
+            problems.append(f"{rel_path}: MISSING in its mirror tree ({mirror_path})")
+    return problems
+
+
+def test_c27_docs_page_names_both_required_owner_paths():
+    """C-27's floor: the page really carries the two owner pointers the clause names.
+
+    Separated from the resolution test so a page that resolves its (empty) set of pointers cannot
+    pass: this asserts the subject list is non-empty before extraction can.
+    """
+    assert DOCS_PAGE.is_file(), (
+        f"C-27's subject page is absent: {DOCS_PAGE}. `docs/concepts/self-explanatory.md` is the "
+        "pointer page the feature delivers; a missing page is not an empty one"
+    )
+    found = docs_page_paths(DOCS_PAGE.read_text(encoding="utf-8"))
+    for required in C27_REQUIRED_PATHS:
+        assert required in found, (
+            f"docs/concepts/self-explanatory.md does not name {required!r} in inline code; it "
+            f"names {found}. C-27 requires at least the concept owner (STR-002) and the "
+            "optimization-workflow owner"
+        )
+
+
+def test_c27_docs_page_pointers_resolve_in_source_and_mirror():
+    """C-27: every inline ``.md`` path on the page resolves in source AND in its mirror tree."""
+    problems = unresolved_docs_page_paths(DOCS_PAGE.read_text(encoding="utf-8"))
+    assert not problems, (
+        "C-27: the docs page carries pointers that do not resolve:\n  "
+        + "\n  ".join(problems)
+        + f"\npage: {DOCS_PAGE}\nextracted: {docs_page_paths(DOCS_PAGE.read_text(encoding='utf-8'))}"
+        f"\nexemptions: {sorted(C27_MIRROR_EXEMPTIONS)}"
+    )
+
+
+def test_c27_extraction_is_not_vacuous():
+    """Anti-vacuity: the extractor really finds paths, and really reports a broken one.
+
+    Without this, a typo in ``_INLINE_MD_PATH`` would make the resolution test above pass on an
+    empty list forever. Both halves run on synthetic text — no repository file is read here.
+    """
+    sample = (
+        "Owner: `shared/definitions/self-explanatory-definitions.md` and "
+        "`shared/definitions/absent-by-construction.md`.\n"
+        "Not a path: `npm run build`, `/absolute/path.md`, and shared/outside-code.md.\n"
+    )
+    extracted = docs_page_paths(sample)
+    assert extracted == [
+        "shared/definitions/self-explanatory-definitions.md",
+        "shared/definitions/absent-by-construction.md",
+    ], f"the extractor must take inline whole-span .md paths only; it took {extracted}"
+
+    problems = unresolved_docs_page_paths(sample)
+    # Exactly the absent one is reported: the synthetic sample's other pointer is the real owner
+    # path, so a guard that also flagged a resolving path would be wrong in the other direction.
+    assert len(problems) == 1 and "absent-by-construction.md: MISSING in the source tree" in problems[0], (
+        "the resolution check must report the absent pointer and only that one; "
+        f"it reported {problems}"
+    )
+
+
+def test_c27_docs_page_does_not_restate_the_owner_body():
+    """C-27 / FR-012: the page is a POINTER page, not a second copy of the owner's definition.
+
+    The decidable form of "reference, not copy" that C-20 already established: the owner's own
+    level-2 heading text must not appear on the page. Prose may be reworded; a heading transplanted
+    from the definition file is a copy.
+    """
+    owner = ROOT / "shared" / "definitions" / "self-explanatory-definitions.md"
+    assert owner.is_file(), f"the concept owner is absent, so this page cannot be judged: {owner}"
+    owner_headings = {
+        line[3:].strip()
+        for line in owner.read_text(encoding="utf-8").splitlines()
+        if line.startswith("## ")
+    }
+    page_text = DOCS_PAGE.read_text(encoding="utf-8")
+    transplanted = sorted(h for h in owner_headings if h and f"## {h}" in page_text)
+    assert not transplanted, (
+        "docs/concepts/self-explanatory.md restates the owner's heading(s) "
+        f"{transplanted}; the page points at the owner and MUST NOT copy its body (C-27/FR-012)"
+    )
+
+
+def _tree_digest(root: Path) -> dict[str, str]:
+    import hashlib  # noqa: PLC0415 - only needed by the mutation legs
+
+    return {
+        path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+
+def test_m6_docs_pointer_removal_turns_c27_red(tmp_path):
+    """Mutation leg M-6: delete one owner pointer from a COPY of the page; the guard goes red.
+
+    Implements the contract's M-6 row: "Delete the ``STR-002`` inline path from a copy of the docs
+    page and run the link guard against the copy" → C-27's path extraction → existence assertion
+    must go red. The leg calls the module's own ``unresolved_docs_page_paths`` and
+    ``docs_page_paths`` over the mutated text, so it exercises the real assertion rather than a
+    paraphrase of it.
+
+    The real page is never the subject: its digest is taken before and after, and the temp copy
+    lives under pytest's own temporary root.
+    """
+    before = _tree_digest(DOCS_PAGE.parent)
+    original = DOCS_PAGE.read_text(encoding="utf-8")
+    subject = C27_REQUIRED_PATHS[0]  # the concept owner, STR-002
+    assert subject in original, (
+        f"the mutation's subject {subject!r} is not on the page; the leg would be vacuous"
+    )
+
+    copy = tmp_path / DOCS_PAGE.name
+    mutated = original.replace(f"`{subject}`", "`shared/definitions/removed-by-m6.md`", 1)
+    assert mutated != original, "the M-6 mutation did not take effect"
+    copy.write_text(mutated, encoding="utf-8")
+
+    # The extractor still finds pointers on the copy — the leg breaks RESOLUTION, not extraction.
+    extracted = docs_page_paths(copy.read_text(encoding="utf-8"))
+    assert subject not in extracted, (
+        f"the deleted pointer is still extracted from the copy: {extracted}"
+    )
+
+    # C-27's resolution assertion turns red — the exact `assert not problems` line the real guard
+    # runs, applied to the copy. Green here would mean the leg proves nothing.
+    problems = unresolved_docs_page_paths(copy.read_text(encoding="utf-8"))
+    assert problems, (
+        "M-6 did not turn C-27 red: with the concept-owner pointer deleted, the guard must report "
+        f"the missing path. Extracted from the copy: {extracted}"
+    )
+    assert any("removed-by-m6.md" in p for p in problems), (
+        f"the red must name the path the mutation introduced (C-24's re-runnability rule applied "
+        f"here); it reported {problems}"
+    )
+
+    # Anti-vacuity: the SAME guard is green on the same page as it stands in the repository.
+    assert not unresolved_docs_page_paths(original), (
+        "C-27 is red on the unmutated page, so this leg proves nothing about the mutation"
+    )
+
+    # The repository page is untouched by the leg.
+    assert _tree_digest(DOCS_PAGE.parent) == before, (
+        "the M-6 leg modified docs/concepts/; mutation legs operate on temp copies only"
+    )
+    assert copy.is_file() and copy.parent == Path(tmp_path)

@@ -460,3 +460,121 @@ end-to-end proof of the same fact is T029's `specify init` run (three files pres
 specify` resolves to a released site-packages tree that predates this feature; C-26's own text and
 T029's instruction forbid using it as an exemption. T029 therefore builds its own entry point from
 this working tree in a temp venv (see `notes/red-first-evidence.md` § R-2).
+
+---
+
+# Part 7 (T034-T038) — the docs page, its links, and the two mutation legs
+
+**Captured**: 2026-11-05 | **Base commit**: `e5d0ae87` | **part_scope**: `T034-T038`
+**Scratch root**: `.specify/.tmp/082-part7/` (verified with `git check-ignore -q .specify/.tmp` before
+the first write; removed after the run per `shared/guidelines/temp-directory-discipline.md` § 4)
+
+## T035 — read-only review of the docs page's pointer-page form
+
+Command and output (the page was untracked at review time; `git status --short docs/` showed `??`):
+
+```console
+$ wc -c docs/concepts/self-explanatory.md
+1993 docs/concepts/self-explanatory.md
+
+$ python3 - <<'PY'   # sentence-level copy probe + retired-name census
+import re; from pathlib import Path
+page  = Path("docs/concepts/self-explanatory.md").read_text(encoding="utf-8")
+owner = Path("shared/definitions/self-explanatory-definitions.md").read_text(encoding="utf-8")
+def sents(t):
+    return [s.strip() for s in re.split(r"(?<=[。.!?])\s+|\n\n", t) if len(s.strip()) > 24]
+page_s, owner_s = sents(page), set(sents(owner))
+print("page sentences >24ch:", len(page_s),
+      "| verdict-identical to owner sentences:", sum(s in owner_s for s in page_s))
+print("望文生义 occurrences:", page.count("望文生义"))
+print("canonical 不言自明:", page.count("不言自明"))
+PY
+page sentences >24ch: 13 | verdict-identical to owner sentences: 0
+望文生义 occurrences: 1
+canonical 不言自明: 2
+```
+
+Three findings, each decidable:
+
+| check | verdict | measurement |
+|-------|---------|-------------|
+| points at `shared/definitions/self-explanatory-definitions.md` | **yes** | in the extractor's output, first entry |
+| points at `shared/guidelines/self-explanatory.md` | **yes** | second entry |
+| points at `shared/workflow/best-practice-optimization.md` | **yes** | third entry |
+| copies the owner's body | **no** | 0 of 13 page sentences longer than 24 characters appear verbatim in the owner; the owner's seven `## ` headings appear 0 times (asserted by `test_c27_docs_page_does_not_restate_the_owner_body`) |
+| retired name `望文生义` present only as a variant | **yes, and one line short** | one occurrence, inside `## Naming history`: `Introduced as 望文生义; the canonical term is now 不言自明 (Self-explanatory).` — it names the retirement but never states that the old name survives only as a glossary synonym |
+
+**The one row that needed a write.** T035's instruction names exactly one addition — a one-line
+retired-name history note — and the measured page carried the retirement fact without the variant
+fact. Added (the sole edit T035 makes to the page; the page is not plan-owned):
+
+```diff
+ Introduced as 望文生义; the canonical term is now 不言自明 (Self-explanatory).
++The retired name survives only as a synonym in the glossary entry (`望文生义`), never as a second
++canonical term.
+```
+
+1993 B → 2111 B; the added sentence restates no owner rule (the glossary entry it names is the store
+row, and the canonical/variant distinction is `STR-003`'s shape), so the page keeps its pointer-page
+form. The `## Naming history` section is the only section the two-line note touches.
+
+## T034 — the C-27 guard's own measurements
+
+```console
+$ python3 -m pytest tests/contract/test_self_explanatory_distribution.py -q
+.........                                                                [100%]
+9 passed in 6.94s
+EXIT=0
+```
+
+What the extractor found on the real page and how each path maps through the engine's `MIRROR_PAIRS`
+(the mapping is derived, never restated — `_mirror_of` reads the engine):
+
+```console
+$ python3 -c "<load the module; print extraction + _mirror_of>"
+extracted: ['shared/definitions/self-explanatory-definitions.md',
+            'shared/guidelines/self-explanatory.md',
+            'shared/workflow/best-practice-optimization.md']
+problems : []
+pair: shared/definitions/self-explanatory-definitions.md -> ('shared', '.specify/shared')
+pair: shared/guidelines/self-explanatory.md              -> ('shared', '.specify/shared')
+pair: shared/workflow/best-practice-optimization.md      -> ('shared', '.specify/shared')
+exemptions: {}
+```
+
+**The allow-list is empty, and that is a measurement rather than an omission.** C-27 permits a path
+that legitimately has no mirror to be judged in the source tree only, with a one-line reason. The
+page names no such path today: all three of its pointers live under `shared/`, which is one of the
+engine's pairs. `C27_MIRROR_EXEMPTIONS` therefore carries no entry — a one-line contract in the code
+(`docs/` has no mirror, so a docs-internal link would be exempt) rather than five speculative entries.
+The guard is still decidable for the exempt case: any extracted path outside every engine source dir
+is reported as *"belongs to no mirror pair, and it is not in C27_MIRROR_EXEMPTIONS"*, so the next
+docs-internal link fails loudly and forces a visible decision.
+
+Four assertions carry C-27 in the module:
+
+| assertion | subject | goes red when |
+|-----------|---------|---------------|
+| `test_c27_docs_page_names_both_required_owner_paths` | the floor paths named by the clause itself | the page is absent, or stops naming `STR-002` or the workflow owner (an empty extraction cannot pass) |
+| `test_c27_docs_page_pointers_resolve_in_source_and_mirror` | every extracted path | a path is missing in the source tree **or** in its mirror tree |
+| `test_c27_extraction_is_not_vacuous` | the extractor, over synthetic text | the regexp stops matching whole-span `.md` code spans, or stops reporting a broken pointer |
+| `test_c27_docs_page_does_not_restate_the_owner_body` | the page vs the owner's `## ` headings | a heading is transplanted from the definition file |
+
+T034 required no second engine: the guard is plain `re` + `pathlib` + the house `pytest` surface, and
+the only table it consults is the mirror engine's own `MIRROR_PAIRS`.
+
+## T037 / T038 — mutation legs M-5 and M-6
+
+Both legs ran from `.specify/.tmp/082-part7/m56.py` against copies only. Verbatim transcript is in
+`notes/red-first-evidence.md` § M-5 / M-6 and the E3 row below; the closes:
+
+- **M-5**: one byte flipped at offset 53 of a copied mirror file → engine `compare_pair` returns
+  `differing=[PosixPath('definitions/self-explanatory-definitions.md')]` → the parity suite's own
+  byte-identity assertion raises, naming
+  `.specify/shared/definitions/self-explanatory-definitions.md`. Real pair sha256 unchanged
+  (`1b12a9c5e098` both sides).
+- **M-6**: `` `shared/definitions/self-explanatory-definitions.md` `` replaced on a copy of the page →
+  extraction still yields three paths but no longer that one → `unresolved_docs_page_paths` returns
+  `['shared/definitions/removed-by-m6.md: MISSING in the source tree']` → the guard's own
+  `assert not problems` goes red and names the mutated path. The real page is byte-identical before
+  and after (`sha256 04bb8c345c4e…`), and all 11 files under `docs/concepts/` keep their digests.
