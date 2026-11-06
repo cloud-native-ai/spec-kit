@@ -29,7 +29,7 @@ because the requirements are silent.
 ## Requirement Completeness
 
 - [ ] CHK001 Is the owning document's exact delivery path named in the requirements, or is it only fixed by the plan (A10 names `shared/guidelines/reporting-obligations.md`, FR-001 says only "a single owning document under `shared/`")? [Ambiguity, Req §FR-001, Req §A10]
-- [ ] CHK002 Are the **five** facts the owner owns enumerated as a closed set, and does the requirements text state that no sixth fact may be added without revising the owner? [Completeness, Req §FR-001, Req §A10]
+- [x] CHK002 (resolved in analyze loop 2, 2026-11-06 — the closed set is **eight** facts, aligned with C-01; FR-001/A10 updated) Are the facts the owner owns enumerated as a closed set, and does the requirements text state that no extra fact may be added without revising the owner? [Completeness, Req §FR-001, Req §A10]
 - [ ] CHK003 Is the disposition of an in-scope flow that *does* report but whose team has no reporter seat defined, i.e. does the orchestrator's own reporting satisfy FR-007 or does FR-006 also apply? [Gap, Req §FR-006, Req §FR-021]
 - [ ] CHK004 Is "the structure's identity" in FR-004 given a requirement-level definition of what makes two structures distinguishable, or is only the field list (slug + run stamp) fixed with no minimum-content rule? [Completeness, Req §FR-004, Req §FR-007]
 - [ ] CHK005 Are requirements defined for the workspace of the digest when several projects each carry a line registry — does it read one project, the current one, or all of them? [Gap, Req §FR-011, Req §A11]
@@ -102,7 +102,7 @@ because the requirements are silent.
 
 - [ ] CHK052 Is the token "30 seconds" written once as a **value** and everywhere else as a reference, and does the requirements text itself comply — FR-003, FR-020 and SC-006 each name the number? [Consistency, Req §FR-003, Req §FR-020, Req §SC-006]
 - [ ] CHK053 Is "a status report" (FR-003/FR-004) distinguished from "a line" (Edge Cases) and from "a report" (FR-008) — three nouns for two objects, and no requirement says which is which? [Ambiguity, Req §FR-003, Req §FR-008]
-- [ ] CHK054 Is "first-class capability" (FR-001, Overview) given an operational meaning, or does it remain rhetorical with only its consequences (the five owned facts) doing the work? [Clarity, Req §FR-001]
+- [x] CHK054 (resolved in analyze loop 2, 2026-11-06 — the owner now enumerates **eight** owned facts, aligned with C-01) Is "first-class capability" (FR-001, Overview) given an operational meaning, or does it remain rhetorical with only its consequences (the owned facts) doing the work? [Clarity, Req §FR-001]
 - [ ] CHK055 Is the "duration of silence" that FR-009 judges measured against a state artifact's mtime or against an emitted line's timestamp — the two can disagree inside one tick, and no requirement picks one? [Ambiguity, Req §FR-008, Req §FR-009]
 - [ ] CHK056 Does the requirements text resolve whether the **reporter's own** silence is judged by the existing orchestrator liveness signal (A15/Edge Case) and therefore does **not** need FR-016's named condition — two mechanisms are named for one observable event? [Conflict, Req §FR-016, Req §Edge Cases: "A reporter that dies mid-run", Req §A15]
 - [ ] CHK057 Is "the user can always obtain a current-state digest" (Overview surface 3, US3 "at any moment") bounded by any stated condition under which the digest is unavailable, or is "always" an absolute the requirements never qualify? [Ambiguity, Req §Overview, Req §US3]
