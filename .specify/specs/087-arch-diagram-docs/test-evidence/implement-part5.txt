@@ -1,0 +1,122 @@
+# implement stage — Part 5 (T065–T076) evidence
+
+Worktree: /home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs (branch line/087-arch-diagram-docs)
+Base commit: 24cb4edc · prior part commit: 4945a550 · interpreter: /usr/bin/python3 (CPython 3.11.13 / pytest 9.2.0 / typer 0.27.3)
+No full-suite run in this part (test budget: targeted-set-v1 only; the driver owns the full-suite baseline).
+
+## 1. Per-task readings
+
+| Row | Result | Reading |
+|-----|--------|---------|
+| T065 | done | The **exact node id** `tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]` → **1 passed** (1 instance, exit 0); `test_expression_gate_wiring.py -k "a1 or a3 or a5"` → **5 passed, 11 deselected**; `test_docs_command_template.py -k "c3 or c4a"` → **2 passed, 20 deselected**. Failure name set unchanged vs T003 (empty for these three) |
+| T066 | done | `test_directory_governance.py` → **21 passed** (baseline 21, exit 0). `docs/concepts/documentation-model.md` still inside `docs/concepts/` and still in the area map; no new top-level document-type directory (the guard's own area-map assertion is what would go red) |
+| T067 | done | US5 scenario set: `-k "sc003 or sc006 or sc009 or sc010"` → **4 passed, 17 deselected**; `test_docs_command_scenarios.py -k "c018 or c019"` → **4 passed, 32 deselected**. Command lines, exit codes and readings appended to `notes/quickstart-run.md` § T067 |
+| T068 | done | `sync-mirrors.py --write --only skills/external` → `ok  skills/external/ == .specify/skills/ (415 files)`, exit 0. **Zero bytes written**: `git status` over the sources, the `.specify/` mirrors and the four per-tool copies is empty — Parts 1–4 already left the tree at parity, so the pass is a reproduced no-op, not a repair |
+| T069 | done | `regen-command-copies.py` → `Regenerated command copies for 4 tools.`, exit 0; `git diff --numstat` for all four copies is empty (same reason as T068) |
+| T070 | done | `diff -q` per row: `create-docs/SKILL.md`, `create-docs/scripts/docs-utils.py`, `improve-docs/SKILL.md` vs their `.specify/skills/` copies → **identical, identical, identical** (no output). `sync-mirrors.py --check` → six pairs `ok`, exit 0. `regen-command-copies.py --check` → `OK: all per-tool command copies match the source templates.`, exit 0. The dispatch sentence is present in each of the four copies (`grep -c obligation` = 1 each; the five residual counts `not-evaluated` = 3 each) |
+| T071 | done | Entry verified in place (landed by Part 4): `ALLOWED_POST_BASELINE_CHANGES["skills/external/improve-docs/SKILL.md"]` carries a reason naming Feature 087, T-001 and rows T049–T053/T058, plus four markers. Measured in the file: `Diagram-sync` ×3, `skills/external/draw-diagram` ×2, `--action obligation` ×2, `staleness finding` ×2 — all literally present |
+| T072 | done | `test_expression_compatibility.py` → **16 passed** (baseline 16, exit 0). `test_c5_non_wiring_files_keep_their_frozen_hashes` alone → **1 passed**. The allowlist is not vacuous: the improve-docs file **is** a manifest key (74 entries), its current sha256 **differs** from the frozen one, and **all 35** allowlist keys resolve to manifest entries (measured by importing the module and iterating `ALLOWED_POST_BASELINE_CHANGES`, not by eyeballing) |
+| T073 | done | quickstart S1–S9 walked against the landed implementation; executed readings in `notes/quickstart-run.md` § T073. S1 exit 0 with an 85-carrier payload; S2 population 85 reproduced; S3 four fixture verdicts match; S4 `IDENTICAL` + empty `git status`; S5 three exemption readings match; S6 no new failures; S7 six pairs `ok` + copies `OK`; S8 exactly one `docs/` line; S9 `converged=true` on the second pass. Three quickstart corrections disclosed (§ 3) |
+| T074 | done | `python3 .specify/scripts/python/validate-tasks.py .specify/specs/087-arch-diagram-docs/tasks.md` → **PASS: 0 error(s), 0 warning(s)**; therefore **zero WARN to adjudicate** (nothing suppressed, nothing waived). Report figures: total **76** rows; per-phase 4 / 26 / 4 / 10 / 11 / 4 / 8 / 9; per-story US1 11 · US2 10 · US3 4 · US4 4 · US5 8; parallel opportunities **13** `[P]` rows; MVP scope US4 + US2 + US1 + US3 (§ MVP First); validator verdict `PASS`; green claims **39** distinct clause ids (16 diagram + 23 flow), one claim each |
+| T075 | done | Feature list re-validated per the Feature Integration Protocol: **087 stays `Planned`** (`features.md` line 94 and `features/087.md` line 6, both measured), `tasks.md` present, **no `final`-path criterion marked done** (`verification.md` does not exist), **no Feature added** (header `Total Features: 81` == 81 measured rows) and none invalidated. Conclusion recorded as a dated line in `tasks.md` § Notes |
+| T076 | done — **premise void, remedied** | The row prescribes "the six-field reduced set for a **docs-only** stage row". Implement is not docs-only (it carries executable code and generated copies), so the stage row keeps its single `targeted-set` row: **still exactly one line**, no second line, no `docs-only` line. `evidence_ptr` and the reading fields updated to carry Part 5 (§ 4) |
+
+## 2. Targeted readings and the baseline comparison
+
+```
+$ /usr/bin/python3 -m pytest \
+    tests/unit/test_docs_utils_obligation.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_obligation_reuse.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py \
+    tests/contract/test_expression_compatibility.py tests/contract/test_expression_gate_wiring.py \
+    tests/contract/test_docs_command_template.py tests/contract/test_confirmation_gates_sweep.py \
+    tests/contract/test_directory_governance.py -q --no-header -p no:cacheprovider --tb=no -rf
+```
+
+| Set | Reading |
+|-----|---------|
+| five obligation / command files | **121 passed / 0 failed** (identical to the Part-4 close) |
+| `test_expression_compatibility.py` | **16 passed** (baseline 16) |
+| `test_expression_gate_wiring.py` | **16 passed** (baseline 16) |
+| `test_docs_command_template.py` | **22 passed** (baseline 22) |
+| `test_confirmation_gates_sweep.py` | **1 failed, 45 passed** (baseline `1 failed, 45 passed`) |
+| `test_directory_governance.py` | **21 passed** (baseline 21) |
+
+**Baseline comparison (`test-evidence/baseline-failed.txt`, driver-run 26 failed / 7471 passed / 4 skipped):**
+the only baseline name inside this selection is
+`tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target` — **the only failure,
+and it is pre-existing** (085's residual-count budget, untouched by this feature). **New failures: zero.**
+No baseline name regressed and none was silenced.
+
+## 3. quickstart corrections disclosed (three, all corrections — none required a decision)
+
+1. **The fixture record's filename.** `quickstart.md` S3 prints
+   `docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json`; the fixtures carry
+   `…/20261106T090000Z-0870a1b2-diagram-trace.json` (`build_fixtures.py`, the committed builder). Against the
+   printed name S3's commands exit 2 (`--record is not readable`). `data-model.md` E6 is the fixture-composition
+   owner and `C-010` owns the **shape**, so both the value and the base settle one way.
+2. **`--record` is root-relative.** `_record_path` resolves a relative `--record` **under `--root`** (`C-010`'s
+   own convention). S3's block passes the repository-relative path while also setting `--root` to the fixture,
+   which joins the root twice. The executed form is `--record docs/.speckit/runs/<record>.json`.
+3. **`stale-source/` must be judged on a copy.** Its mtime inequality is a copy-time fact
+   (`conftest.apply_mtime_step`, T007). Repository mtimes for `widget.mmd` / `.svg` / `.png` are identical
+   (`2026-11-06 16:47:21.093121107`), so the repository copy reads `satisfied`; the reading `stale` /
+   `source-newer-than-render` is the copy's. Judged on a copy, the fixture produces exactly S3's verdict.
+
+One further **reading difference**, not a correction: S5's `exempt-ok` block expects `converged=true`, and the
+repository copy measures `false` because its five typed `index.md` carriers genuinely carry no diagram
+(`missing=5`). Once the produce step is applied the reading is `exempted=1 converged=true clean=false` — S9's
+exemption row, measured. Both readings are recorded in `notes/quickstart-run.md` § T073.6 and § T073.10 so a
+later reader can tell which belongs to which state.
+
+## 4. E3 — the stage-status evidence row (T076)
+
+`test-evidence/implement-stage-status.jsonl` holds **exactly one line**, `status = "targeted-set"`,
+`selection_basis = "targeted-set-v1"`. This part **adds no line and no `docs-only` row**: implement carries
+executable changes (`skills/external/create-docs/scripts/docs-utils.py --action obligation`, four test files,
+eleven fixture spaces) plus generated copies, so the docs-only premise the row's description names is **not
+applicable**. What this part did is update that single row's reading fields and `evidence_ptr` to carry Part 5's
+measurements, keeping one row for one stage.
+
+## 5. PLAN-EDIT records
+
+None. No plan-owned artifact (`plan.md`, `data-model.md`, `contracts/`, `quickstart.md`, `research.md`,
+`feature-ref.md`) was modified in this part. The three quickstart corrections in § 3 were **not** applied to
+`quickstart.md`: they are recorded as executed readings in `notes/quickstart-run.md`, and changing the plan-owned
+document would itself have been a plan edit this segment did not need to make.
+
+## 6. Repository-level disciplines (unchanged by this part)
+
+```
+$ git diff --name-only 24cb4edc...HEAD -- docs/          -> docs/concepts/documentation-model.md   (1 line, GATE-6 holds)
+$ git status --porcelain docs/                          -> (empty)
+$ git diff --name-only 24cb4edc...HEAD -- skills/external/draw-diagram/ | wc -l   -> 0
+$ git diff --name-only 24cb4edc...HEAD -- templates/commands/                     -> templates/commands/docs.md
+```
+
+Nothing in this part wrote a product byte: the two generators reproduced the tree byte for byte and every
+checker invocation ran either read-only on a fixture copy or on `${TMPDIR}` copies.
+
+## 7. Wrap-up (this part closes the implement stage)
+
+Run id `r20261106T093940Z-087e`, `--feature 087-arch-diagram-docs`, `--feature-id 087`, complexity `complex`.
+
+| Step | Reading |
+|------|---------|
+| 1. Run Determination | `run-determination.py --action determine` → record `.specify/memory/session/20261106T093821Z-run-determination-speckit-implement-r20261106t093940z-087e.md`. Axes: token `not_evaluated (source_unavailable)`, elapsed `not_evaluated (source_unavailable)`, **artifact `ok`**, satisfaction `not_evaluated (pending_next_turn)`. `trigger_feedback: false`, change point `cp-r20261106T093940Z-087e` |
+| 2. Exec Quant | `exec-quant.py --action collect --unit-id /speckit.implement --unit-type command` → `.specify/memory/exec-quant/records/20261106T093826265649Z-d6ce4f86.json` |
+| 3. Feedback Record | `feedback-utils.py --action record …` → `.specify/memory/feedback/20261106T093856Z-speckit-implement.md` (3 optimization points, `duplicate: false`) plus the reflection supplement `.specify/memory/feedback/20261106T093919Z-speckit-implement.md`, whose point carries the stable `token-efficiency` marker and is retrievable by `--action list --contains token-efficiency` (verified) |
+| 4. Threshold Notice | `should_prompt: true` (`count_since_submission` 295 vs threshold 10) → one non-blocking line in the run report, three `/speckit.feedback` choices, no pause, no transmission |
+| 5. Token Reflection | Done as step 3's supplement: the eleven rows of this part's machine-managed readings were consumed summary-first (projected fields, counts, only the non-default rows) rather than dumped in full, and no file was re-read to recover a value already in hand. No fabricated token counts — no session sensor exists for this run, and the record says so |
+| 6. Docs Sync Eval | **无需记录** — this feature's reader-facing surface (`docs/concepts/documentation-model.md` § Diagram Obligation for Readers) was delivered by T064 and is the one `docs/` line `FR-001` allows; the Part-5 work itself adds no user-facing capability, no changed behavior, no ADR and no convention — it verifies what Parts 1–4 landed. `docs/` content growth beyond that one file is explicitly out of scope for this feature (§ Out of Scope, A6) |
+
+**Two determinations were rejected before the recorded one**, each for a real defect in the call rather than
+because the verdict was inconvenient: the first cited `--red-first-refs` at `notes/red-first-evidence.md` only,
+so six of the seven green checks had no literal name there (`green_unproven`); the second's evidence file spelled
+the validator `\`validate-tasks.py\`` without the invocation path the check was declared under, leaving one check
+uncovered. Both are caller defects, and the third call fixed them rather than relaxing the declaration.
+
+**On the two not-evaluated axes**: token consumption and elapsed time have no sensor in this run (no session
+JSONL was supplied, no wall-clock measurement was taken), so they report `not_evaluated` — never `fine`, never
+zero. Satisfaction is `pending_next_turn` because nothing follows this segment until the driver dispatches the
+review stage.
