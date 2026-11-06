@@ -90,9 +90,9 @@
 | Base source | `feature-first-commit` | `git-delta-review.sh base` |
 | Renderer mode | `renderer: text` | the code record's header marker |
 | Changed / judged / skipped / gap files | 177 / 11 / 166 / 0 | copied field by field from the record's coverage receipt block |
-| Segment verdict | `blocked` | `blocking` entries: 2 (plus 6 `important`, 1 `suggestion`) |
+| Segment verdict | `blocked` | the record's verdict; the six-level findings live in `code-review.md` |
 | Gate verdict | `blocking-unresolved` | `report --summary --file` returned `gate=deny`, exit 1 |
-| Reason, when one applies | Two `blocking` entries: the recognisable-diagram suffix list misses the delivery contract's HTML/PDF/drawio/excalidraw faces; a reference to the editable source is reported `satisfied` even though C-007 requires a rendered face | `code-review.md` |
+| Reason, when one applies | The record's `blocking` findings: the recognisable-diagram suffix list misses the delivery contract's HTML/PDF/drawio/excalidraw faces; a reference to the editable source is reported `satisfied` even though C-007 requires a rendered face | `code-review.md` |
 | Uncommitted scope | 38 uncommitted paths at receipt time, disclosed and not reviewed: pre-existing session records, exec-quant/feedback runtime records, and the in-progress `review.md`; `test-evidence/review-smoke.txt` was already committed. The full list lives in the record's disclosure line and in `git status` | same |
 | Record | `.specify/specs/087-arch-diagram-docs/code-review.md` | written because the triage value is `run` |
 | Archive | `none` | first code-segment record for this slice |
