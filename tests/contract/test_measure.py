@@ -360,6 +360,51 @@ def test_c57_cap_one_prints_one_and_changes_the_retained_set_deterministically(t
     assert sum(row["records"] for row in payload["rows"]) == 1, (
         "C-57: truncation retains one record for the unit; got %r" % payload["rows"]
     )
+    retained = payload["rows"][0]
+    assert retained["elapsed"] == {"value": 1000, "min": 1000, "max": 1000, "provenance": "carried"}, (
+        "C-57: the retained record is the one first in record-identity ascending order "
+        "(the earliest name stem), got %r" % retained["elapsed"]
+    )
+
+
+def test_c57_truncation_retains_the_identity_lowest_record_not_the_enumeration_first(tmp_path):
+    """C-57: truncation is by the record's own identity (the name stem) ascending, judged on the RETAINED
+    record — the retained set must not depend on the order the reader enumerated the files in."""
+    workspace = _workspace(tmp_path)
+    for index in (7, 3, 5, 0, 6, 2, 4, 1):  # seeded in a scrambled enumeration order
+        _write(workspace, "20261106T09%02d00000001Z-cap%05d" % (index, index),
+               "/speckit.plan", "command", "2026-11-06T09:%02d:00Z" % index,
+               {"value": 1000 * (index + 1), "provenance": "carried"})
+    proc = _run(["--action", "json", "--workspace", str(workspace), "--cap", "1"], cwd=workspace)
+    assert proc.returncode == 0, proc.stderr
+    row = json.loads(proc.stdout)["rows"][0]
+    assert row["elapsed"] == {"value": 1000, "min": 1000, "max": 1000, "provenance": "carried"}, (
+        "C-57: the retained record is the identity-lowest (stem 09:00), not the enumeration-first; got %r"
+        % row["elapsed"]
+    )
+
+
+def test_c47_the_availability_literal_is_not_spelled_in_the_measure_script():
+    """C-47 / constitution XIV: the ``no measurements`` literal has one definition site (the owner's § 9.1,
+    reached through status-digest's entry); measure.py reads it at run time and spells no second copy."""
+    import ast as _ast
+
+    tree = _ast.parse(_require().read_text(encoding="utf-8"), filename=str(MEASURE))
+    docstrings = set()
+    for node in _ast.walk(tree):
+        if isinstance(node, (_ast.Module, _ast.FunctionDef, _ast.AsyncFunctionDef, _ast.ClassDef)):
+            body = getattr(node, "body", [])
+            if body and isinstance(body[0], _ast.Expr) and isinstance(body[0].value, _ast.Constant):
+                docstrings.add(id(body[0].value))
+    offenders = [
+        (node.value, node.lineno)
+        for node in _ast.walk(tree)
+        if isinstance(node, _ast.Constant) and isinstance(node.value, str)
+        and id(node) not in docstrings and "no measurements" in node.value
+    ]
+    assert not offenders, (
+        "C-47: measure.py re-spells the owner § 9.1 availability literal instead of reading it: %r" % offenders
+    )
 
 
 def test_c57_two_runs_over_one_fixture_are_byte_identical(tmp_path):

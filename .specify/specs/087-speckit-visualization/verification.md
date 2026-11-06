@@ -169,10 +169,14 @@ SC-014_value=two independent `measure.py --action summary` runs over the same fi
 SC-014_note=Supporting-path. The determinism record (run1/run2 diff) is captured in the dated second-slice section of test-evidence/success-criteria.txt; the delivery shape (regen-command-copies, sync-mirrors, wrap-up embed registry) is captured in test-evidence/polish-second-slice.txt; the projections themselves are test-evidence/us5-measure.txt § 1/§ 2.
 
 # -- Joint acceptance (one row per `in-scope` runtime-stack row in requirements.md) --
-# Only RS-005 carries Form: in-scope; RS-001…RS-004 are signed-contract (owner-side duty), so only RS-005 owes a row.
+# RS-005 and RS-007 carry Form: in-scope; RS-001…RS-004 and RS-006 are signed-contract (owner-side duty), so
+# RS-005 and RS-007 each owe a row.
 
 RS-005_joint_acceptance=pass
 RS-005_joint_acceptance_note=The feature's own delivered artifacts satisfy its joint-acceptance columns for SC-004 and SC-007: the carrier/mode mapping is captured for all three modes (us2-execution-modes.txt) and the seeded flow sample classifies 10/10 with 0 unclassifiable (us4-scope-sample.txt). Both are re-read by the guard as RO-12 and RO-02 in the same verdict (us4-guard-verdict.txt § 5.1: pass=12 fail=0 not-evaluated=1, EXIT=0).
+
+RS-007_joint_acceptance=pass
+RS-007_joint_acceptance_note=The feature's own delivered artifacts satisfy its joint-acceptance columns for SC-013 and SC-014: the measure engine's reported figures match the hand-computed expectation table row by row and every exit status of the closed set {0, 2, 3} is exercised (us5-measure.txt § 1-§ 10), and two independent `measure.py --action summary` runs over the same fixture store are byte-identical with the delivery shape engine-produced and --check clean (success-criteria.txt second-slice dated section: run1/run2 diff; polish-second-slice.txt). The engine is strictly read-only over the store it shares with the efficiency surfaces (us5-readonly-store.txt).
 
 # -- Deferred tasks (mirrors `[~]` rows in tasks.md) --
 

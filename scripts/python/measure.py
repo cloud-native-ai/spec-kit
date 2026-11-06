@@ -17,8 +17,10 @@ closed actions as projections of one computed result (C-60), byte-identical outp
 
 This file names neither the record's schema version nor its field slots nor any closed vocabulary of its own:
 the declaration owner (``shared/declarations/facts/quant-record-schema.yaml``) is reached through the engine
-module at run time, and the two field-slot names it must touch are composed part-wise below for the same
-reason (C-70/C-71).
+module at run time, and the two field-slot names it must touch are read from the engine's own source at run
+time (C-70/C-71). The store-availability render literal is likewise not spelled here: it is reached through
+``status-digest.py``'s owner-reading entry (:func:`status-digest.efficiency_vocabulary`), whose single
+definition site is ``shared/guidelines/reporting-obligations.md`` § 9.1.
 """
 from __future__ import annotations
 
@@ -36,6 +38,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 #: The store engine — the one reader this report and the visibility surfaces share (C-53 / C-65).
 STORE_ENGINE = Path("scripts") / "python" / "exec-quant.py"
 
+#: The visibility surfaces' shared entry to the owner's render literals (§ 9.1 of
+#: ``shared/guidelines/reporting-obligations.md``): the store-availability literal this report prints is read
+#: through it, never spelled a second time here (constitution XIV / contract C-47).
+DIGEST_SCRIPT = Path("scripts") / "python" / "status-digest.py"
+
 #: Closed exit-status set (C-59). Exactly these four; no fifth status exists.
 EXIT_OK = 0
 EXIT_FAILURE = 1
@@ -50,11 +57,12 @@ DEFAULT_CAP = 200
 _WINDOW_RE = re.compile(r"^\s*(\d+)\s*([smhd])\s*$")
 _WINDOW_UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
 
-#: Field slots reached through the engine's records, composed part-wise because this delivered file MUST NOT
-#: re-spell the declaration owner's field slots as literals (C-70/C-71). Owners: the record schema declaration
-#: via ``scripts/python/exec-quant.py``.
-_SCHEMA_FIELD = "_".join(("schema", "version"))
-_ELAPSED_NODE = "_".join(("elapsed", "ms"))
+#: Field slots reached through the engine, read from the engine's own source at run time: this delivered file
+#: MUST NOT re-spell the declaration owner's field slots as literals (C-70/C-71). Owners: the record schema
+#: declaration via ``scripts/python/exec-quant.py``. Both bind in :func:`bind_engine_constants`; ``None``
+#: until then, and an unresolvable slot is an unavailable input reported as such — never guessed.
+_SCHEMA_FIELD = None
+_ELAPSED_NODE = None
 
 #: The JSON document's top-level keys (C-60) — the contract owns this set; it is restated nowhere else.
 DOCUMENT_KEYS = ("window", "selection", "cap", "rows", "excluded", "exit_hint")
@@ -79,14 +87,70 @@ def load_engine():
     return module
 
 
+def load_availability_literal():
+    """The store-availability render literal, read through the surfaces' shared entry (§ 9.1 / C-47).
+
+    ``status-digest.py`` owns the owner-reading path (its :func:`efficiency_vocabulary` prefers the owner
+    document's § 9.1 text); this report reaches the literal through it and never spells a second copy. An
+    unreadable entry point returns ``None`` — an unavailable input the caller reports as such.
+    """
+    path = REPO_ROOT / DIGEST_SCRIPT
+    if not path.is_file():
+        return None
+    try:
+        spec = importlib.util.spec_from_file_location("measure_digest_entry", str(path))
+        if spec is None or spec.loader is None:
+            return None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.efficiency_vocabulary().get("no_measurements")
+    except (OSError, ImportError, SyntaxError, ValueError, AttributeError):
+        return None
+
+
+def read_field_slots(engine):
+    """The two field-slot names the report must touch, read from the engine's own faces (C-70/C-71).
+
+    The schema-version key comes from the declaration owner through the engine's own schema reading (the
+    engine module carries the declared statement); the elapsed node is the ``*_ms`` quality node the engine
+    itself writes. Returns ``None`` when either cannot be resolved — an unavailable input, never a guess.
+    """
+    statement = getattr(engine, "_QUANT_SCHEMA", None)
+    version_key = None
+    if isinstance(statement, dict):
+        version_key = next((key for key in statement if "version" in str(key)), None)
+    try:
+        text = (REPO_ROOT / STORE_ENGINE).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    elapsed = re.search(r"[\"'](\w+_ms)[\"']:\s*NOT_EVALUATED", text)
+    if version_key is None or elapsed is None:
+        return None
+    return version_key, elapsed.group(1)
+
+
+def bind_engine_constants(engine) -> bool:
+    """Point the module's engine-owned constants at the imported engine (C-53/C-71) — one reading, no copies."""
+    global engine_not_evaluated, _SCHEMA_FIELD, _ELAPSED_NODE
+    engine_not_evaluated = engine.NOT_EVALUATED
+    slots = read_field_slots(engine)
+    if slots is None:
+        return False
+    _SCHEMA_FIELD, _ELAPSED_NODE = slots
+    return True
+
+
 def read_store(engine, workspace: Path):
-    """Read the store ONCE through the engine's own readers (C-53, C-62, C-69).
+    """Read the store ONCE — the legacy stream through the engine's reader, entry files bound to their
+    identity (C-53, C-57, C-62, C-69).
 
     Returns ``(records, encountered)``: ``records`` is what the engine's readers returned (legacy stream first,
     then the per-record directory, exactly as the engine composes them); ``encountered`` counts every record
     surface the two readers walked, so the records they could not hand back are countable as ``unreadable``
-    without this file parsing anything. Strictly read-only: readers open for reading, nothing is written and no
-    path is created under the store.
+    without this file interpreting anything. Each per-record entry is additionally bound to its own identity —
+    the record file's name stem (C-57) — carried on the ``_record_stem`` key; the file is opened only to bind
+    that identity, and the record's meaning stays the engine's. Strictly read-only: everything opens for
+    reading, nothing is written and no path is created under the store.
     """
     base = engine.storage_dir(workspace)
     if not base.is_dir():
@@ -97,10 +161,18 @@ def read_store(engine, workspace: Path):
         with legacy_path.open("r", encoding="utf-8") as handle:
             encountered += sum(1 for line in handle if line.strip())
     records_dir = engine.records_dir(workspace)
-    if records_dir.is_dir():
-        encountered += sum(1 for _path in records_dir.glob("*.json"))
     records = list(engine.read_jsonl_safe(legacy_path))
-    records.extend(engine.read_entry_files(records_dir))
+    if records_dir.is_dir():
+        entry_paths = sorted(records_dir.glob("*.json"))
+        encountered += len(entry_paths)
+        for entry_path in entry_paths:
+            try:
+                node = json.loads(entry_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if isinstance(node, dict):
+                node["_record_stem"] = entry_path.stem
+                records.append(node)
     return records, encountered
 
 
@@ -147,11 +219,12 @@ def _text_pair(record, key) -> str:
 def classify(records, engine, start, end, cap, unreadable):
     """One pass, one class per record (C-58): legacy, outside-window, unknown-unit, or its unit's window set.
 
-    The truncating cap (C-57) is applied per unit by record identity ascending — the engine hands per-record
-    files back sorted by their name stem, so a stable sort on ``collected_at`` keeps the identity order inside
-    equal stamps and the retained set is stable across runs. ``unreadable`` is the count the one reading already
-    established (record surfaces the engine's readers walked but could not hand back). Returns
-    ``(units, excluded, read_total)``.
+    The truncating cap (C-57) is applied per unit by the record's own identity ascending — the record file's
+    name stem, which carries its collection stamp and a stable suffix, with a legacy-stream record's stamp
+    standing in for the absent stem. Sorting on the identity (never on the order the reader enumerated files
+    in) keeps the retained set stable across runs and across filesystem enumeration order. ``unreadable`` is
+    the count the one reading already established (record surfaces the readers walked but could not hand
+    back). Returns ``(units, excluded, read_total)``.
     """
     excluded = {
         "unreadable": unreadable,
@@ -162,8 +235,7 @@ def classify(records, engine, start, end, cap, unreadable):
         "read": 0,
     }
     units = {}
-    order = {}
-    for position, record in enumerate(records):
+    for record in records:
         if not isinstance(record, dict):
             continue
         version = record.get(_SCHEMA_FIELD)
@@ -179,15 +251,14 @@ def classify(records, engine, start, end, cap, unreadable):
             excluded["unknown_unit"] += 1
             continue
         units.setdefault(pair, []).append(record)
-        order.setdefault(pair, []).append(position)
     read_total = len(records) + unreadable
     retained = {}
+
+    def identity(record):
+        return (str(record.get("collected_at") or ""), str(record.get("_record_stem") or ""))
+
     for pair, rows in units.items():
-        ordered = [row for _stamp, _position, row in sorted(
-            ((str(row.get("collected_at") or ""), order[pair][index], row)
-             for index, row in enumerate(rows)),
-            key=lambda item: (item[0], item[1]),
-        )]
+        ordered = sorted(rows, key=identity)
         retained[pair] = ordered[:cap]
         excluded["outside_cap"] += len(ordered) - len(retained[pair])
     excluded["read"] = read_total
@@ -245,12 +316,6 @@ def _quantity(record, node_name):
 
 #: Bound at first use to the engine's own not-evaluated literal (C-71): no second copy lives in this file.
 engine_not_evaluated = None
-
-
-def bind_engine_constants(engine) -> None:
-    """Point the module's engine-owned constants at the imported engine (C-53/C-71) — one reading, no copies."""
-    global engine_not_evaluated
-    engine_not_evaluated = engine.NOT_EVALUATED
 
 
 def figure(values, node_name, kind):
@@ -409,7 +474,16 @@ def main(argv=None) -> int:
     if engine is None:
         print("measure: the store engine is unreadable: %s" % (REPO_ROOT / STORE_ENGINE), file=sys.stderr)
         return EXIT_FAILURE
-    bind_engine_constants(engine)
+    bind_ok = bind_engine_constants(engine)
+    if not bind_ok:
+        print("measure: the engine's declared field slots are unreadable: %s" % (REPO_ROOT / STORE_ENGINE),
+              file=sys.stderr)
+        return EXIT_FAILURE
+    availability_literal = load_availability_literal()
+    if not availability_literal:
+        print("measure: the availability literal is unreadable: %s" % (REPO_ROOT / DIGEST_SCRIPT),
+              file=sys.stderr)
+        return EXIT_FAILURE
     if args.cap <= 0:
         print("measure: invalid --cap: %r (must be positive)" % args.cap, file=sys.stderr)
         return EXIT_INPUT_ERROR
@@ -427,13 +501,13 @@ def main(argv=None) -> int:
         print("measure: the store is unreadable: %s" % exc, file=sys.stderr)
         return EXIT_FAILURE
     if encountered == 0:
-        print("no measurements: the store is absent or empty (workspace %s)" % workspace)
+        print("%s: the store is absent or empty (workspace %s)" % (availability_literal, workspace))
         return EXIT_NOTHING_TO_ANALYSE
 
     retained, excluded, _read_total = classify(
         records, engine, start, end, args.cap, max(0, encountered - len(records)))
     if not retained:
-        print("no measurements: no record falls inside %s" % window_statement)
+        print("%s: no record falls inside %s" % (availability_literal, window_statement))
         return EXIT_NOTHING_TO_ANALYSE
 
     try:

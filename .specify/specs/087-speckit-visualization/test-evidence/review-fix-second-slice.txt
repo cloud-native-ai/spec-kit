@@ -1,0 +1,64 @@
+# Review-fix (second slice) — targeted evidence, 2026-11-06
+
+Fixes the P1/P2 code findings of `review-second-slice.md` § 2/§ 3 (P1-3 measure.py owner literal,
+P2-4 C-57 truncation order + judge, P2-5 part-wise field-slot composition, P1-2 RS-007 joint-acceptance row).
+
+## § 1. Targeted suites (only these; full suite not run — budget)
+
+```
+$ python3 -m pytest tests/contract/test_measure.py tests/unit/test_measure_unit.py \
+    tests/contract/test_efficiency_element.py tests/contract/test_status_digest.py -q
+.....................                                                    [100%]
+93 passed in 5.85s
+```
+
+Delta vs the review's 91: +2 new judges in `tests/contract/test_measure.py` —
+
+* `test_c57_truncation_retains_the_identity_lowest_record_not_the_enumeration_first` — seeds the
+  C-57 fixture in a scrambled enumeration order and judges the RETAINED record (stem 09:00, elapsed 1000)
+  under `--cap 1`; goes red under the old stamp-first/position-tiebreak order.
+* `test_c47_the_availability_literal_is_not_spelled_in_the_measure_script` — AST scan: no executable string
+  literal in `measure.py` contains `no measurements`; goes red on the old hard-coded prints.
+* `test_c57_cap_one_prints_one_and_changes_the_retained_set_deterministically` — extended to assert the
+  retained record's elapsed/provenance (which record survived), not only the count.
+
+All 91 pre-existing judges stay green unchanged (the C-70/C-71 scan `test_c70_neither_delivered_script_names_…`
+and the C-65 no-second-parser scan included).
+
+## § 2. Smoke — the availability literal renders through the shared owner entry
+
+```
+$ python3 scripts/python/measure.py --action summary
+window: all records
+selection: every unit the store holds
+cap: 200
+…
+$ python3 scripts/python/measure.py --action json --since 2099-01-01 --window 1h
+no measurements: no record falls inside [2099-01-01T00:00:00+00:00, 2099-01-01T01:00:00+00:00)
+```
+
+The `no measurements` prefix now arrives via `status-digest.efficiency_vocabulary()` (the shared reading
+entry of `shared/guidelines/reporting-obligations.md` § 9.1); `measure.py` spells no copy of it.
+
+## § 3. Closure re-check — RS-007 reason cleared
+
+```
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-speckit-visualization --json
+final_path: pass 8 · partial 2 · total 10
+reasons: final-path-not-pass: SC-001 · final-path-not-pass: SC-002
+```
+
+`runtime-dependency-not-owned: RS-007` no longer appears: `verification.md` now carries
+`RS-007_joint_acceptance=pass` (+ note, from requirements RS-007's Joint acceptance column SC-013/SC-014 and
+the second-slice captures us5-measure.txt § 1-§ 10, success-criteria.txt run1/run2 diff, us5-readonly-store.txt),
+and the stale "Only RS-005 …" note above the joint-acceptance block is corrected to RS-005 and RS-007 in-scope.
+
+## § 4. Disclosed implementation choices
+
+* P2-4: the record identity binding opens each per-record entry file once to attach its name stem
+  (`_record_stem`); the parse binds the identity only, the record's meaning stays the engine's, and the
+  C-65 no-second-parser AST scan stays green. Truncation sorts by `(collected_at, name stem)` ascending.
+* P2-5: both delivered scripts now read the `*_ms` elapsed node (and status-digest's mode field) out of the
+  engine's own source at run time; plain literals would themselves fail the C-70/C-71 scan, so the review's
+  "read the node name from the engine" form is used rather than part-wise composition.
+* The features.md row-087 Status cell (review P1-1) is outside this fix's declared territory and is not touched.
