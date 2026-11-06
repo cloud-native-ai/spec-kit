@@ -30,5 +30,27 @@ This note closes WP-A4's T005 observation gap (`notes/red-first-evidence.md`).
 
 - T050 pre-change serial baseline: **7475 passed / 19 failed / 7 skipped / 687.41 s**,
   `test-evidence/baseline-failed.txt` (19 names).
-- T047 final closure: pending (WP-C2), compared against the T050 names; the final default-parallel
-  run must have zero new failure names after the declared serial exception.
+- T047 final closure: **7535 passed / 19 failed / 7 skipped / 284.12 s** plus the serial exception
+  pass **1 passed / 7561 deselected / 35.22 s**, `test-evidence/final-failed.txt` (19 names). Both
+  `comm` directions against the T050 names are empty — zero new failure names after the declared
+  serial exception. Full record: `test-evidence/closure-diff.txt`.
+
+## Mutation leg closure (DoD-2)
+
+All 19 legs M-1…M-19 now have a recorded observation. The readings live in three evidence files:
+
+- `notes/red-first-evidence.md` (this file) — M-1, M-5, M-6, M-7 summaries.
+- `test-evidence/mutation-legs-runner.txt` — M-2, M-3, M-4, and M-10…M-15. M-2/M-3/M-4 run the named
+  contract cases against doctored runner copies; M-10…M-13 are covered by the parametric six-surface
+  case, which also asserts it never writes to a tracked file; M-14/M-15 are read directly
+  (byte-identical regeneration of the live instructions; an equality version pin).
+- `test-evidence/ledger-parallel-flags.txt` — M-8, M-9.
+- `test-evidence/serial-exceptions.txt` — M-17, M-19.
+- `test-evidence/parallel-safety-attribution.md` — M-16, M-18.
+
+**Correction recorded honestly**: the `tasks.md` carrier map pointed M-8/M-9 at
+`test-evidence/ledger-parallel-flags.txt`, which did not exist when this note was first written; and
+M-2/M-3/M-4/M-10…M-15 had carrier tasks but no recorded reading. Both gaps were closed at the
+implement closure by producing the evidence, not by weakening the carriers. No tracked source, test or
+runner file was edited to obtain any leg.
+

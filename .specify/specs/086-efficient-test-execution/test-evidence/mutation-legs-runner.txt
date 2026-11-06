@@ -1,0 +1,133 @@
+# 086 — mutation legs M-2, M-3, M-4, M-10…M-15
+
+Owner of the carrier map: `tasks.md` § Mutation Leg Carriers. This file supplies the readings that map
+obliges for the legs T034/T051/T031 own and that had no recorded observation until now (H-03's repair
+named the carriers; it did not produce the readings).
+
+Housing: every doctored copy is under
+`/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/`, **outside** the repo root. No tracked file was
+edited — each leg either copies the file under test to that directory, or mutates **in memory**
+(the C-040 parametric case). § 4 verifies the in-memory claim.
+
+## 1. Control — the guards are green on the real tree
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest \
+      tests/contract/test_run_tests_runner_contract.py \
+      tests/contract/test_test_execution_efficiency.py \
+      tests/unit/test_audit_test_budget.py -q
+84 passed in 41.34s
+```
+
+## 2. The three runner legs (M-2, M-3, M-4) — T034
+
+Three doctored runners were built by copying `scripts/bash/run-tests.sh` and applying one edit each.
+A doctored copy of the contract test then points its `RUNNER` constant at the mutant, so the **named
+case** is what runs — not a hand-rolled probe that could drift from it.
+
+| leg | edit | case that must go red | control | mutant |
+|---|---|---|---|---|
+| **M-2** | swap the worker precedence so `SPECKIT_TEST_WORKERS` beats `--workers` | `test_c007_workers_flag_beats_the_environment_variable` | 1 passed | **1 failed** |
+| **M-3** | set `MODE="parallel"` where the caller-supplied worker switch was meant to be `MODE="caller"`, so `-n <effective>` is appended anyway | `test_c009_caller_worker_switch_is_not_duplicated[…-n]`, `[…-n4]`, `[…--numprocesses]`, `[…--numprocesses=4]` | 4 passed | **4 failed** |
+| **M-4** | replace the `PYTEST_XDIST_WORKER` test with `[ -n "" ]`, so the nested branch is unreachable | `test_c005_nested_run_is_serial_and_derives_no_second_pool` | 1 passed | **1 failed** |
+
+Verbatim mutant output for M-3, the widest leg:
+
+```
+FAILED …/test_m3.py::test_c009_caller_worker_switch_is_not_duplicated[caller_args0--n]
+FAILED …/test_m3.py::test_c009_caller_worker_switch_is_not_duplicated[caller_args1--n4]
+FAILED …/test_m3.py::test_c009_caller_worker_switch_is_not_duplicated[caller_args2---numprocesses]
+FAILED …/test_m3.py::test_c009_caller_worker_switch_is_not_duplicated[caller_args3---numprocesses=4]
+4 failed, 36 deselected
+```
+
+Each leg is paired: the same case passes on the real runner in the same invocation shape, so a red
+mutant reading is attributable to the edit rather than to a case that was already broken.
+
+## 3. M-8 / M-9 — the ledger legs
+
+Recorded in full in `test-evidence/ledger-parallel-flags.txt`, with the separated/attached matrix and
+the token-level attached-form table. Summary: M-8 red on the separated forms and on the runner's
+default shape; M-9 red on all five value-carrying attached tokens.
+
+## 4. M-10…M-15 — the six principle surfaces, as one parametric guard
+
+These are not six independent legs in this feature's implementation: `test_c40_each_surface_goes_red_when_its_carrier_is_removed`
+is **parametric over the six surfaces** and asserts both halves of each pair —
+
+- the doctored copy MUST produce violations, **and**
+- the real text MUST be clean (a probe whose real half was already red would prove nothing), **and**
+- re-reading the tracked file after the mutation MUST still be clean (so the leg cannot have written
+  to it).
+
+```
+$ … -m pytest tests/contract/test_test_execution_efficiency.py -v
+test_c39_the_principle_lands_on_all_six_surfaces PASSED
+test_c39_the_six_surfaces_are_distinct_files PASSED
+test_c39_no_non_owner_surface_reproduces_the_owner_decision_table PASSED
+test_c39_ambient_section_sits_immediately_after_its_sibling PASSED
+test_c39_the_pointer_forms_are_the_sibling_forms PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[constitution_live] PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[constitution_template] PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[generator_list] PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[instructions_live] PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[instructions_template] PASSED
+test_c40_each_surface_goes_red_when_its_carrier_is_removed[owner] PASSED
+test_c40_no_mutation_leg_touches_the_tracked_files PASSED
+12 passed in 0.05s
+```
+
+Mapping from the carrier map's leg names to the parametric case:
+
+| leg | surface | carrier removed in memory | covered by |
+|---|---|---|---|
+| M-10 | constitution template only | the principle title | `[constitution_template]` |
+| M-11 | live instructions only | the ambient section | `[instructions_live]` |
+| M-12 | live constitution | the pointer (owner decision table pasted instead) | `[constitution_live]` + `test_c39_no_non_owner_surface_reproduces_the_owner_decision_table` |
+| M-13 | generator MUST-include list | the twelfth entry | `[generator_list]` |
+| M-14 | live instructions | regeneration replaced by a hand edit | `[instructions_live]`, plus § 5 below |
+| M-15 | live constitution | the version left at `1.16.0` | `[constitution_live]`, plus § 5 below |
+
+## 5. The two legs whose surface is a *value*, not a heading (M-14, M-15)
+
+The parametric case removes a heading-shaped carrier, which is the right probe for M-10…M-13. M-14 and
+M-15 are about a byte-level property instead, so they were read directly rather than inferred:
+
+**M-14 (hand-edited live instructions)** — the live file must be the generator's own output. Measured by
+regenerating and asking git whether anything moved:
+
+```
+$ bash scripts/bash/generate-instructions.sh ; git status --porcelain -- .specify/instructions.md
+exit 0
+[no output — the tracked live file is byte-identical to a fresh generation]
+$ md5 -q .specify/instructions.md    # before regenerate
+7b62e28381adb19daae2df24aab9a80c
+$ md5 -q .specify/instructions.md    # after regenerate
+7b62e28381adb19daae2df24aab9a80c
+```
+
+A hand edit would make the two hashes differ or make the regeneration produce a diff; neither happens.
+This is the proposition M-14 states, read on the tracked tree.
+
+**M-15 (live version left behind)** — the pin that would catch it exists and now matches:
+
+```
+$ git show <merge-base>:.specify/memory/constitution.md | grep -m1 '^\*\*Version\*\*'
+**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05
+$ grep -m1 '^\*\*Version\*\*' .specify/memory/constitution.md
+**Version**: 1.17.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-06
+$ grep -n '1.17.0' tests/contract/test_fast_fail_discipline.py
+1077:    assert m.group(1) == "1.17.0", f"C-5: live version is {m.group(1)}; expected 1.17.0"
+```
+
+The guard is an equality assertion against `1.17.0`, so leaving the live file at `1.16.0` — the exact
+M-15 edit — makes that assertion fail. The leg is discriminating because the assertion is an equality,
+not a `>=`.
+
+## Verdict
+
+M-2, M-3, M-4 each go red on their named cases against doctored runners while the same cases pass on the
+real runner; M-8/M-9 are recorded in their own evidence file; M-10…M-13 are covered by the parametric
+six-surface case, which additionally proves it never writes to a tracked file; M-14 and M-15 are read
+directly on the tracked tree (byte-identical regeneration, equality version pin). No tracked source,
+test or runner file was edited to obtain any reading.

@@ -1,0 +1,131 @@
+# 086 T056 — the no-new-machinery boundary holds (FR-017, DoD-1)
+
+Owner of the proposition: `tasks.md` T056 / `requirements.md` FR-017 and DoD-1. This row is FR-017's
+**only** carrier: the change adds no `/speckit.*` command, no skill entry template and no runtime
+service.
+
+Worktree `/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2`, branch `line/086-wp-c2`,
+HEAD `93e61050`, base `018b0455`. Base for every diff below is
+`$(git merge-base HEAD master)` = `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08`.
+
+## Check 1 — no command template and no skill entry template were added
+
+```
+$ git diff --name-only $(git merge-base HEAD master)..HEAD -- templates/commands skills/ \
+    | grep -v 'skills/internal/manage-constitution/SKILL.md'
+(no output)
+```
+
+**Empty, as required.** The single `skills/` edit this feature is permitted is T026's twelfth
+`- **MUST include**` entry in `skills/internal/manage-constitution/SKILL.md`, and it is filtered out by
+the command's own definition.
+
+One file under `skills/` is *not* filtered out and must therefore be justified rather than excluded:
+`skills/external/sdd-loop-driver/scripts/audit-test-budget.py`. It is **not** a skill entry template —
+it is the budget-ledger parser US5 upgrades (FR-024…FR-026), a script inside an existing skill, whose diff
+only widens the recognised parallel switch set. The count of changed `skills/` paths is **2**, of which
+one is the permitted edit and one is the parser the feature is *required* to change; neither creates a
+new skill, a new skill directory or a new command.
+
+```
+$ git diff --name-only $(git merge-base HEAD master)..HEAD -- skills/
+skills/external/sdd-loop-driver/scripts/audit-test-budget.py
+skills/internal/manage-constitution/SKILL.md
+```
+
+No directory was created under `skills/`: `git diff --name-status --diff-filter=A` over that path names
+no file.
+
+## Check 2 — no `/speckit.*` command template was added or changed
+
+```
+$ git diff --name-only $(git merge-base HEAD master)..HEAD | grep -E '^templates/commands/'
+(no output)                                                        EXIT=1
+```
+
+**Empty, as required.** The command surface is unchanged: the same number of `/speckit.*` commands exist
+before and after, none gained a file, and `regen-command-copies.py --check` exits 0
+(`test-evidence/mirror-parity.txt` § 2) — which it could not do if a command template had moved without
+its per-tool copies being regenerated.
+
+## Check 3 — the CLI runtime dependency set did not move
+
+```
+$ python3 -c "import tomllib;d=tomllib.load(open('pyproject.toml','rb'));print(sorted(d['project']['dependencies']))"
+```
+
+The host's `/usr/bin/python3` is 3.9.6 and has no `tomllib` (the module arrived in 3.11), so the command
+above exits with `ModuleNotFoundError` on this host. The same reading was therefore taken twice, from two
+independent angles:
+
+**(a) the shipped interpreter `quickstart.md` S-7 names (`/opt/homebrew/bin/python3`, 3.14.6):**
+
+```
+$ /opt/homebrew/bin/python3 -c "import tomllib;d=tomllib.load(open('pyproject.toml','rb'));print(sorted(d['project']['dependencies']))"
+['httpx[socks]', 'platformdirs', 'readchar', 'rich', "truststore>=0.10.4; python_version >= '3.10'", 'typer']
+```
+
+**(b) the same read at the merge-base, so "unchanged" is measured rather than remembered:**
+
+```
+$ git show $(git merge-base HEAD master):pyproject.toml > /tmp/pyproject-base.toml
+$ /opt/homebrew/bin/python3 -c "import tomllib;d=tomllib.load(open('/tmp/pyproject-base.toml','rb'));print(sorted(d['project']['dependencies']))"
+['httpx[socks]', 'platformdirs', 'readchar', 'rich', "truststore>=0.10.4; python_version >= '3.10'", 'typer']
+```
+
+**Byte-for-byte the same six-element set.** The diff of `pyproject.toml` between the merge-base and HEAD
+touches exactly two places, neither of them the runtime list:
+
+```
+$ git diff $(git merge-base HEAD master)..HEAD -- pyproject.toml
+@@ -12,6 +12,16 @@ dependencies = [
+     "truststore>=0.10.4; python_version >= '3.10'",
+ ]
+ 
++# Dev/test-only tooling. This group is never installed with the CLI itself: the runtime
++# dependency set above stays the shipping boundary, and `[tool.hatch.build]` is untouched.
++# pytest-xdist carries the >= 3.9 marker because its 3.x line refuses to run on 3.8 —
++# the canonical runner then reports `reason=no-xdist` and runs serially (086 C-006).
++[project.optional-dependencies]
++dev = [
++    "pytest",
++    "pytest-xdist; python_version >= '3.9'",
++]
++
+@@ -43,4 +53,5 @@ testpaths = ["tests"]
+ markers = [
+     "contract: contract and external-surface validation tests",
+     "integration: integration tests using filesystem or fixture workspaces",
++    "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
+ ]
+```
+
+A line beginning with `+` or `-` inside `dependencies = [...]` would have shown here. There is none: the
+new content is a `[project.optional-dependencies]` group (dev-side only) and one `markers` entry, and
+`[tool.hatch.build]` is untouched.
+
+**Note on the dispatch phrase "unchanged from the T001 capture"**: that capture file
+(`notes/pre-change-measurements.md`) is not on this tree — `notes/` holds only `red-first-evidence.md`, and
+no test-evidence file records a `tomllib` reading taken at T001. Rather than cite a file that does not
+exist, this row measures "unchanged" against the **merge-base of this branch**, which is a stricter and
+independently checkable referent: it is the tree the feature started from. `quickstart.md` S-7 (read at
+`plan.md` time) records the same six-element list, and the reading above matches it.
+
+## Also not added: no runtime service, no gate, no store
+
+- No daemon, no socket, no cache directory, no database, no scheduled job: the feature's diff adds three
+  Python/bash carriers (`scripts/bash/run-tests.sh` + mirror, the ledger parser, the new contract test
+  file `tests/contract/test_test_execution_efficiency.py`) and documentation — nothing that runs outside a
+  test invocation.
+- No new confirmation gate: `scan-confirmation-gates.py --root . --json` reads `total=27`, equal to the
+  pre-change value 27 (`tasks.md` GATE-7; the change adds zero), so nothing new in the framework requires
+  a user's approval.
+- No new `shared/` owner directory: the one new guideline
+  (`shared/guidelines/test-execution-efficiency.md`) sits inside the existing `guidelines/` directory
+  (`shared/guidelines/directory-governance.md`'s documented meaning covers it), and its mirror appears at
+  the same path under `.specify/shared/`.
+
+## Verdict
+
+FR-017 holds on this tree: no `/speckit.*` command, no skill entry template and no runtime service was
+added, and the CLI's runtime dependency set is byte-for-byte what it was at the branch's base.

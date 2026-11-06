@@ -1,0 +1,94 @@
+# 086 T031/T034 — SC-005: the budget ledger parser learns the parallel switches
+
+Owner of the proposition: `requirements.md` SC-005 / `contracts/budget-ledger-parser.contract.md`
+C-017…C-020 / `tasks.md` T031, T034.
+Question (two limbs): an **explicitly parallel** full run is classified as a full run — not dropped,
+not downgraded to a targeted run — **and** the parse result of pre-existing records is unchanged.
+
+Housing: all mutation copies under `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/`, outside the
+repo root. The tracked file under test is
+`skills/external/sdd-loop-driver/scripts/audit-test-budget.py` (mirror:
+`.specify/skills/sdd-loop-driver/scripts/audit-test-budget.py`), read and never edited here.
+
+## The run
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest tests/unit/test_audit_test_budget.py -q
+32 passed in 2.82s
+EXIT=0
+```
+
+Limb-focused subset:
+
+```
+$ … -k "parallel or replay"
+6 passed, 26 deselected in 0.52s
+```
+
+## Limb 1 — an explicit parallel full run is a full run (C-017, C-018, C-019)
+
+`test_parallel_switches_classify_as_full_run` drives `PARALLEL_FULL_RUNS` — the switch surface the
+parser must understand:
+
+```
+bash scripts/bash/run-tests.sh -n 8 --names-out names.txt
+bash scripts/bash/run-tests.sh -n auto --dist load --names-out names.txt
+bash scripts/bash/run-tests.sh -n4 --names-out names.txt
+bash scripts/bash/run-tests.sh -n=4 --names-out names.txt
+bash scripts/bash/run-tests.sh --numprocesses 4 --names-out names.txt
+bash scripts/bash/run-tests.sh --numprocesses=auto --names-out names.txt
+bash scripts/bash/run-tests.sh --dist loadfile --names-out names.txt
+bash scripts/bash/run-tests.sh --dist=loadfile --names-out names.txt
+bash scripts/bash/run-tests.sh --maxprocesses=8 --names-out names.txt
+bash scripts/bash/run-tests.sh -n auto --dist load --names-out names.txt   # the shape the runner emits
+```
+
+For every line the assertion is **two-part**, and the second part is what makes the first meaningful:
+`_suffix(line)` is not `None` (classified as a full run, not targeted) **and** `_positionals(line) == []`
+(no flag value leaked into the positional path list). A parser that strips only `-n 8` and leaves `8`
+as a positional would report "full run" for the wrong reason; the positional assertion is the check
+that catches it.
+
+End-to-end (C-019), on a synthetic ledger:
+
+- `test_explicit_parallel_full_run_is_accounted_not_unaccounted` — a logged
+  `bash scripts/bash/run-tests.sh -n auto --dist load --names-out names.txt` matches its ledger row;
+  the audit exits 0 and prints no `unaccounted`.
+- `test_parallel_full_run_not_downgraded_to_targeted` — the same command shape (`-n4`) logged but
+  **absent** from the ledger is still reported as an unaccounted full run; it is not silently
+  reclassified into a targeted run that would need no slot.
+- `test_targeted_run_still_classified_as_targeted_after_upgrade` — the upgrade did not swallow genuine
+  targeted runs.
+
+The **attached forms** (`-n4`, `-n=4`, `--numprocesses=auto`, `--dist=loadfile`, `--maxprocesses=8`)
+are pinned separately by `test_attached_parallel_forms_carry_a_value`, which asserts the positive set
+(`is_attached_value_flag` true) and the negative set (`-n`, `--numprocesses`, `--dist`,
+`--maxprocesses`, `-q`, `-k` must be exact tokens, not attached-value forms). This case is the M-9
+surface: a parser stripping only the separated form still classifies the run as full, so the verdict
+alone cannot see the defect — the token-level assertion can.
+
+## Limb 2 — pre-existing records parse identically (C-020)
+
+`test_existing_rows_replay_identically` pins the **pre-upgrade verdict of every existing-shaped row**,
+index by index:
+
+| # | row | pre-upgrade verdict (still expected) |
+|---|---|---|
+| 0 | `… --names-out baseline.txt` | `--names-out baseline.txt` |
+| 1 | `-q --durations=50 --names-out .specify/specs/067-loop-efficiency-hardening/test-evidence/closure-failures.txt` | the same suffix |
+| 2 | `--names-out .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q` | the same suffix |
+| 3 | (non-run row) | `None` — **not a full run** |
+| 4 | (non-run row) | `None` — **not a full run** |
+| 5 | `-m 'not slow' --names-out names.txt` | the same suffix |
+| 6 | `-p no:cacheprovider --names-out names.txt` | the same suffix |
+
+Rows 3 and 4 matter most: the upgrade must not turn a previously-non-run row into a full run, which
+would silently consume budget that was never spent. `test_existing_rows_replay_through_the_audit` then
+re-checks the limb **through the audit verdict**, not just the suffix — `baseline=1 / closure=1 /
+unknown=0`, exit 0 — so "unchanged" is asserted at the level the caller reads.
+
+## Verdict
+
+Both limbs hold on the tree: 32/32 unit cases green, 6 of them the limb-specific ones, and the
+positive-scope smoke run (`test-evidence/smoke-086.txt`) carries the same plane green (84 passed across
+the three carrier modules). SC-005 → `pass`.
