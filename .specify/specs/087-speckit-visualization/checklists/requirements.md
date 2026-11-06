@@ -19,10 +19,10 @@
 - [x] Stability / containment claims name a baseline referent and a derivable allowed-delta set — the three stability-shaped criteria (SC-006 owner-literal uniqueness, SC-008 no-new-failures, SC-010 no-new-mechanism) each carry a named baseline and a guard-derived set; SC-012's byte-identity and SC-014's determinism claim also carry theirs; see Notes
 - [x] Success criteria are measurable — counts, cadence, caps, exit statuses, and named-status verdicts
 - [x] Success criteria are technology-agnostic — no framework, library or file path appears in SC text; `Path` markers are the only machine field
-- [x] All acceptance scenarios are defined — six stories, seventeen scenarios
-- [x] Edge cases are identified — eighteen, each anchored on an owner rule or a named failure mode
-- [x] Scope is clearly bounded — `## Out of Scope` names nineteen exclusions, including the no-new-machinery set and the second-store exclusions
-- [x] Dependencies and assumptions identified — twenty-one assumptions (A1–A21) plus the seven-row runtime stack
+- [x] All acceptance scenarios are defined — six stories, twenty scenarios (seventeen from the revision plus one efficiency-surface scenario and two window/not-evaluated scenarios added by `/speckit.clarify`)
+- [x] Edge cases are identified — twenty-four, each anchored on an owner rule or a named failure mode
+- [x] Scope is clearly bounded — `## Out of Scope` names twenty-one exclusions, including the no-new-machinery set, the second-store exclusions, the schema-extension exclusion and the second-reader exclusion
+- [x] Dependencies and assumptions identified — twenty-six assumptions (A1–A26) plus the seven-row runtime stack
 
 ## Feature Readiness
 
@@ -33,8 +33,10 @@
 
 ## Notes
 
-- **Checker readings (verbatim, second slice)**: `status: ok`; six labels all `pass (0)`; `scanned: 805 lines, 43 definition rows, 0 shared strings`; `0 error(s), 0 warning(s)`. Readings archived in `test-evidence/requirements-revision-2026-11-06.txt`. The earlier readings remain in `test-evidence/validator-requirements-clarify.txt` and `test-evidence/validator-requirements.txt`.
+- **Checker readings (verbatim, second slice)**: `status: ok`; six labels all `pass (0)`; `scanned: 805 lines, 43 definition rows, 0 shared strings`; `0 error(s), 0 warning(s)`. Readings archived in `test-evidence/requirements-revision-2026-11-06.txt`. The earlier readings remain in `test-evidence/validator-requirements-clarify.txt` and `test-evidence/validator-requirements.txt`. The third slice's readings (this run) are in `test-evidence/`.
 - **Pre-analyze reading (verbatim, second slice)**: `stage=requirements decision=fail errors=6 advisories=3 waived=0`, with `fr=29` and `sc=14`. The errors are four `count-claim` rows on the plan-stage derived-count literals (`plan.md`, `feature-ref.md`) plus two on this checklist's own pre-revision count sentence, all of them claims that this revision supersedes; the advisories are the one pre-existing `missing-path` row on `.specify/templates/commands/` projected onto this checklist and its two source rows. Both classes are downstream-of-revision staleness in artifacts this stage does not author, and every one of them is a superseded claim rather than a defect in this revision's own content. Readings archived alongside the validator output.
+- **Clarify-run readings (third slice, `/speckit.clarify` 2026-11-06, Mode A override)**: `status: ok`; six labels all `pass (0)`; `scanned: 1009 lines, 43 definition rows, 0 shared strings`; `0 error(s), 0 warning(s)`. Pre-analyze: `stage=requirements decision=pass errors=0 advisories=3 waived=0`, `fr=29 sc=14`. The advisories are the same pre-existing `missing-path` rows the revision baseline recorded, projected onto this checklist and its two source rows — unchanged in kind, and this line names no path so the projection set does not grow.
+- **What the clarify run changed**: `## Clarifications` gained one session entry (six adjudicated questions) and `## Assumptions` gained A22–A26; FR-023, FR-024, FR-025, FR-027, FR-028 and the Key Entities were extended in place; three Edge Cases were added and one extended; one Boundary-and-Ownership row and one Runtime-Stack row were added; the story scenarios and SC-011 / SC-013 each gained the partition, degradation-order and unit-identity assertions their new clauses imply. **No pre-existing clause's meaning changed** and the FR/SC id set is identical (29 / 14) — verified by `validate-requirements.py` (`id-contiguous`, `doc-order`, `dup-id` all `pass (0)`).
 - **Checklist count readings (re-measured, second slice)**: six user stories, seventeen acceptance scenarios, eighteen edge cases, nineteen `## Out of Scope` items, twenty-one assumptions (A1–A21), seven runtime-stack data rows.
 - **Flow-class reading (verbatim, from `test-evidence/flow-class-lookup.txt`)**: `flow_class: execution`, `flow_type: -`, `source: declaration`, exit 0.
 - **Containment claims** (owner: `.specify/shared/guidelines/closed-set-claims.md`):

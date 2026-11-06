@@ -206,6 +206,11 @@ carries the elapsed element with its provenance marker, that the `not_evaluated`
 3. **Given** a workspace with no exec-quant store at all, **When** either surface renders, **Then**
    the efficiency element renders as an explicit "no measurements" statement and the rest of the
    line or digest is unchanged.
+4. **Given** a unit for which the store holds several records of different ages, **When** a status
+   line or a digest renders that unit, **Then** the element reports the record with the latest
+   `collected_at` and no figure is averaged, summed or ranked across the older ones; **and given**
+   a unit the surface lists for which the store holds no record at all, **Then** the element is
+   still present and says the quantity was not measured.
 
 ---
 
@@ -239,6 +244,15 @@ output, and that the store's files are unchanged after the run.
    analysed, and the run does not fail on them.
 3. **Given** an empty or absent store, **When** the command runs, **Then** it reports "no measurements"
    explicitly and exits with the declared "nothing to analyse" status rather than printing zeros.
+4. **Given** two adjacent windows whose boundary falls exactly on one record's `collected_at`, **When**
+   each window is reported, **Then** that record is counted in exactly one of them — the later
+   window, by the half-open rule — and the two reports together account for every record in the
+   store; **and given** a record the engine cannot parse and a record whose schema version reaches
+   it only through the compatibility path, **Then** each is counted once under its own class and
+   never twice.
+5. **Given** a window whose every contributing record carries the not-evaluated elapsed quantity,
+   **When** the command runs, **Then** it produces the per-unit report with the explicit
+   not-evaluated marker and exits with the success status, not the nothing-to-analyse status.
 
 ---
 
@@ -297,11 +311,46 @@ output, and that the store's files are unchanged after the run.
   cannot interfere; a report that would need a cache file is out of bounds by FR-027, and the
   reader's own shell redirection is the only place output lands.
 - **A unit whose elapsed time straddles two runs**: elapsed time is reported per record with the
-  record's run identity preserved, and aggregate figures name how many records they averaged over;
-  the report never silently merges two runs into one figure without saying so.
+  record's run identity preserved, and aggregate figures name how many records they covered; the
+  report never silently merges two runs into one figure without saying so.
+- **A report whose window selects records but no figure**: a window can hold records while every
+  contributing `elapsed_ms` is the not-evaluated literal — the ordinary case in this repository's
+  store today. That is a produced report, not the nothing-to-analyse case: it renders each unit's
+  record count and the not-evaluated marker, states how many records it covered, and exits `0`. The
+  `3` status is reserved for a store that is absent or holds no record in the window at all, so a
+  reader can tell "measured nothing here" from "did not look here".
 - **Efficiency text on the cadence line**: the efficiency element is part of the line's bounded
   content, not an extra line and not a second cadence — a line that doubles in length to carry it
-  has broken the bound in FR-012 and must be truncated with the omitted count stated.
+  has broken the bound in FR-012 and must be truncated with the omitted count stated. Truncation
+  degrades the element in one declared order: the elapsed quantity stays, and the token and
+  invocation quantities are withdrawn from every unit on that render together, with the withdrawn
+  quantity named in the line's existing omitted summary — never dropped for one unit and kept for
+  another, because two units described to different depths is the ambiguity the bound exists to
+  prevent.
+- **A unit the store knows under two types**: the store holds one `unit_id` under more than one
+  `unit_type`, so a figure keyed by the bare id would silently merge two different units. The
+  measurement report's unit identity is the pair `(unit_id, unit_type)`, and two rows sharing an id
+  are reported as two rows; a selection naming the bare id is an input error rather than an
+  ambiguous match.
+- **A unit that renders but has no record**: the status line and the digest list units from their
+  own state sources, not from the exec-quant store, so a listed unit with no record is the ordinary
+  case on a fresh run. It renders the not-evaluated marker — the element is never omitted, because
+  an omission next to a neighbouring unit's number reads as "faster", which is the one inference
+  FR-023 forbids.
+- **Two windows that share a boundary record**: the window is half-open on the end
+  (`start ≤ collected_at < end`), so a record whose `collected_at` equals a boundary belongs to the
+  window that starts there. Two adjacent reports therefore partition the store exactly: no record is
+  counted twice and none falls between them, which is what makes a two-window comparison readable
+  without a footnote.
+- **A store whose elapsed coverage is thin**: the engine's `collect` path leaves `elapsed_ms` as
+  `not_evaluated` whenever it has nothing to carry, so a window may hold many records and few
+  figures. Both surfaces and the report state the record count their figure covered beside the
+  figure itself; reading a thin window as "the run was cheap" is a reader error this feature
+  refuses to make easier by printing a zero.
+- **The same record reached twice**: the store's legacy stream and its per-record directory can
+  describe the same measurement, exactly as the engine's own reader already allows. Both new
+  readings go through that reader's own record identity, so one measurement is one record in the
+  counts; this feature adds no second de-duplication rule of its own.
 
 ## Requirements *(mandatory)*
 
@@ -422,7 +471,12 @@ output, and that the store's files are unchanged after the run.
   states (`measured` / `carried` / `user-given` / `configured`). A quantity the record does not
   carry MUST render as the explicit not-evaluated marker, never as `0`, never as an averaged
   substitute and never as an omission. The element is content of the line or digest, not an extra
-  line and not a second surface, and it is subject to FR-012's entry bound unchanged.
+  line and not a second surface, and it is subject to FR-012's entry bound unchanged. Within an
+  element the **elapsed quantity is unconditional and comes first**; the token and invocation
+  quantities are appended only while the whole element stays inside the entry bound the surface
+  already applies, and when they cannot fit they are dropped from **every** unit on that render
+  uniformly, with the dropped quantity named as not rendered in that render's existing omitted
+  summary — never per-unit, so two statements of one render never disagree.
 - **FR-024**: The efficiency dimension MUST be read **only** from the exec-quant store at
   `.specify/memory/exec-quant/`, through the engine that owns it
   (`scripts/python/exec-quant.py`: its record directory, its legacy-stream compatibility path and
@@ -431,7 +485,16 @@ output, and that the store's files are unchanged after the run.
   record; it MUST NOT introduce a second store, a second record format, a cache file or a derived
   database for the dimension. Store availability is never a precondition of the visibility surfaces:
   an absent or empty store renders the explicit "no measurements" state and leaves the rest of the
-  line or digest unchanged.
+  line or digest unchanged. **Record selection** is one declared rule and no second one: the element
+  reports the latest record **by `collected_at`** for the unit the surface is already listing, and
+  older records of that unit are not folded into it — no ranking, no averaging and no lifetime
+  aggregate is computed on a visibility surface. A unit limit applies and is the surface's own: the
+  element is rendered for at most the entries that surface already lists, so no additional unit is
+  introduced by this dimension. If one unit carries more than one record with the same latest
+  `collected_at`, the tie is resolved by the record's own identity in an ascending, byte-stable
+  order, never by filesystem enumeration order. A surface that lists units but finds no record for
+  one of them is covered by FR-023's not-evaluated rule: the element says the quantity was not
+  measured, and it is never omitted so that a reader mistakes absence for speed.
 - **FR-025**: The efficiency element's **elapsed-time source MUST NOT require a new recorder**. The
   exec-quant record's elapsed quantity is populated by the existing collection path and its existing
   per-unit hooks; where that path leaves the quantity as `not_evaluated`, FR-023's not-evaluated
@@ -439,7 +502,17 @@ output, and that the store's files are unchanged after the run.
   schema does not carry, the extension MUST be declared by the schema's existing owner (the
   declaration fact above plus the engine that reads it), MUST keep the record's existing keys and
   provenance discipline intact, and MUST be stated as a schema-version consequence for readers.
-  This requirement adds no recorder of its own and no second write path to the store.
+  This requirement adds no recorder of its own and no second write path to the store. **No extension
+  is needed to read elapsed time.** The declared schema already carries
+  `quality.elapsed_ms` (`shared/declarations/facts/quant-record-schema.yaml`; schema version 2), and
+  the engine's own collection paths already populate it — `collect-dispatch` as `measured`, and
+  `collect` as `carried` when the neighbouring run-determination record supplies it. What the store
+  does not guarantee is **coverage**: the `collect` path leaves the quantity `not_evaluated` when it
+  has nothing to carry, and inspection of the store on 2026-11-06 found the great majority of
+  records in exactly that state. That is a data condition, not a schema gap: it is rendered under
+  FR-023's not-evaluated rule and this feature opens no recorder to fill it. A schema extension is
+  therefore **out of scope for this feature**; if a later stage finds one genuinely required, it is
+  that schema owner's change under the conditions stated above and never a private field added here.
 - **FR-026**: The framework MUST ship `/speckit.measure` — a thin `speckit.*` command backed by one
   deterministic, stdlib-only analysis engine that is **read-only** over the exec-quant store and
   MUST NOT spawn a subprocess, open a network connection, write any file, or mutate the store. It
@@ -454,7 +527,31 @@ output, and that the store's files are unchanged after the run.
   window and the unit selection it actually used, and MUST state the record count it excluded with
   the reason class (`unreadable`, `legacy-format`, `outside-window`, `unknown-unit`), so that a
   figure is never silently computed over a subset. No threshold verdict, no scoring and no
-  comparison-to-baseline recommendation is issued: the report presents measurements.
+  comparison-to-baseline recommendation is issued: the report presents measurements. **Window
+  semantics** are one declared pair and reuse the store engine's own input form rather than a second
+  one: `--since` carries the **start**, `--window` carries the **span** and resolves the end as start
+  plus span, an invocation with neither covers **all records the store holds** (stated as such in the
+  report, never as an implied 24-hour day), and a start later than the resolved end is an input
+  error. The window is half-open — `start ≤ collected_at < end` — so two adjacent windows over one
+  store partition it without double-counting or dropping a record. **Selection**: one or more
+  `--unit` values, each an exact unit identity, matched as a set; an identity the store does not
+  hold is an input error naming it, not an empty section. **Cap**: per-unit record contribution is
+  bounded by a declared default cap with the omitted count stated in the **same** classes as above
+  (`outside-cap` is not a fourth class — the omitted-events count is reported beside the existing
+  four), and truncation is applied by the record's own identity in ascending order so it is stable.
+  **Default cap**: the engine declares it in exactly one place and prints the value it used on every
+  run, so a reader never has to infer which cap produced a table; `--cap` overrides it per
+  invocation and the printed value follows the override.
+  **Aggregation**: the per-unit elapsed figure is the **median** over the in-window records, with
+  the minimum and the maximum named alongside it; record counts, token figures and invocation counts
+  are **sums**; a quantity absent from **every** contributing record is reported as not evaluated for
+  that unit rather than as `0`, and a quantity present on only some records reports its figure
+  together with the number of records it covered, so a partial figure is never read as a whole one.
+  **Unit identity is `(unit_id, unit_type)`**, because the store holds one `unit_id` under more than
+  one type and a bare id would merge two different units into one row. **Legacy records** are those
+  the engine's legacy stream path can read; a record the engine cannot parse is `unreadable`, and a
+  record whose schema version the engine reads only through its compatibility path is
+  `legacy-format`. All four classes are counted **once per record**, never twice for one record.
 - **FR-028**: `/speckit.measure` MUST be **deterministic** — two invocations over an unchanged store
   with the same window and selection produce byte-identical output, with no wall-clock-dependent
   text beyond the window's stated end and no ordering left to a hash or to filesystem enumeration —
@@ -462,7 +559,19 @@ output, and that the store's files are unchanged after the run.
   summary render and a machine-readable render of the same figures, an input-error status, a
   "nothing to analyse in this window" status distinct from an error, and the success status. It
   MUST NOT add a fourth analysis store, a summary file it persists, or a second reading path beside
-  the one the visibility surfaces use (FR-023): one engine and one reading, reached by path.
+  the one the visibility surfaces use (FR-023): one engine and one reading, reached by path. **The
+  closed exit-status set** is exactly four values: `0` a report was produced (including a report whose
+  window selected some records but none contributed a figure, which is stated as such and is not the
+  nothing-to-analyse case); `2` input error (an unparseable `--since`/`--window`, a start after the
+  end, an unknown `--unit`); `3` nothing to analyse, meaning the store is absent
+  or holds no record inside the resolved window — printed as an explicit "no measurements" statement,
+  never as a zero row; `1` any other failure, which MUST be a plain-language single line and MUST NOT
+  be used for either of the two statuses above. **One reading**: the same in-process reader module —
+  the store engine's own read path reached by path — serves both the visibility surfaces and this
+  command; this command adds no parser of the record format and no second store engine. Where the
+  visibility surfaces already hold the latest-record-per-unit selection rule (FR-024), that rule stays
+  theirs and this command does not restate it: the command aggregates over the window, the surfaces
+  show the latest record.
 - **FR-029**: `/speckit.measure` MUST ship in the same shape as this feature's other entries and the
   framework's existing commands — one command template in the template layer, one deterministic
   script in the script layer, and the per-tool command copies the framework already regenerates —
@@ -484,18 +593,23 @@ output, and that the store's files are unchanged after the run.
   recent completions, with per-entry ages and the omitted-entry count.
 - **Efficiency Element**: the bounded statement carried per listed unit on a status line or in the
   digest — the unit identity, its elapsed time, and (when carried) its token and invocation counts,
-  each with the provenance the source record states. Exactly one per listed unit, and part of the
-  line's existing content bound.
+  each with the provenance the source record states. Exactly one per listed unit, taken from that
+  unit's record with the latest `collected_at`, and part of the line's existing content bound.
 - **Exec-Quant Record**: one measurement the framework already writes for a measured unit — its unit
   identity and type, its run identity, its collection time, and its quality quantities
   (elapsed time, tokens, exit code, satisfaction) each either a value with a provenance or the
-  not-evaluated marker. The record's schema, layout and write path stay with its existing owners;
-  this feature is a reader.
-- **Measurement Window**: the declared start and end a `/speckit.measure` report covers, always
-  printed with the report so a reader can see which records were in scope.
+  not-evaluated marker. `quality.elapsed_ms` is present in the declared schema; its **presence in a
+  given record** is not guaranteed, because the collection path may have had nothing to carry. The
+  record's schema, layout and write path stay with its existing owners; this feature is a reader.
+- **Measured Unit Selection**: the set of `(unit_id, unit_type)` pairs a `/speckit.measure` run
+  analyses — named explicitly by the caller or defaulted to every pair the store holds.
+- **Measurement Window**: the declared start and end a `/speckit.measure` report covers — half-open
+  as `start ≤ collected_at < end` — always printed with the report so a reader can see which records
+  were in scope, and stated as the whole store rather than as an implied span when neither bound was
+  supplied.
 - **Measurement Report**: the bounded, read-only, deterministic output of `/speckit.measure` — per
-  selected unit the record count, elapsed/token/invocation figures with provenance, the declared
-  distribution summary, and the excluded-record counts by reason.
+  selected unit the record count, elapsed/token/invocation figures with provenance and the number of
+  records each covered, the declared distribution summary, and the excluded-record counts by reason.
 
 ### Runtime Stack & Dependency Ownership
 
@@ -510,7 +624,7 @@ output, and that the store's files are unchanged after the run.
 | RS-003 | agent 宿主（渲染 agent template、承载 reporter 的 live console） | signed-contract | 各受支持 agent 工具上游（本仓只消费） | 无声明 pin；执行时以宿主名 + 版本原文记录进 test-evidence | `docs/reference/cli/supported-agent-tools.md` | SC-001、SC-009 在至少一个受支持宿主上真实运行 reporter 并取原始输出 | FR-005, FR-007, FR-014 | EP-003 |
 | RS-004 | line registry 与状态脊（摘要读取的活动状态来源） | signed-contract | 本仓 `skills/external/sdd-loop-driver/scripts/line-registry.py`（消费方，只读） | 同一提交 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | SC-005 的摘要条目逐条解析到该引擎写出的状态文件 | FR-011, FR-012 | EP-001 |
 | RS-005 | 状态汇报义务 owner、reporter 模板、reporter 席位义务、主从汇报义务与摘要入口（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/progress-reporting.md` | SC-004、SC-007 | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-020, FR-021, FR-022 | EP-002 |
-| RS-006 | exec-quant 存储及其记录 schema（效率维度与 measure 报告的只读来源；写入方仍是该引擎自身） | signed-contract | 本仓 `scripts/python/exec-quant.py`（写入 owner）＋ `shared/declarations/facts/quant-record-schema.yaml`（schema owner）；本特性只读消费 | 同一提交 | `shared/declarations/facts/quant-record-schema.yaml` | SC-011、SC-012：两个消费面读同一引擎取到的同一组记录，只读前后存储逐文件零差异；引擎自测（`tests/contract/test_exec_quant_engine.py`）保持全绿 | FR-023, FR-024, FR-025, FR-027 | EP-001 |
+| RS-006 | exec-quant 存储、其记录 schema **及其读路径**（效率维度与 measure 报告的只读来源；写入方仍是该引擎自身） | signed-contract | 本仓 `scripts/python/exec-quant.py`（写入 owner、读路径 owner）＋ `shared/declarations/facts/quant-record-schema.yaml`（schema owner）；本特性只读消费 | 同一提交 | `shared/declarations/facts/quant-record-schema.yaml` | SC-011、SC-012、SC-013：两个消费面在进程内 import 同一读路径、取同一组记录，只读前后存储逐文件零差异；引擎自测（`tests/contract/test_exec_quant_engine.py`）保持全绿 | FR-023, FR-024, FR-025, FR-027, FR-028 | EP-001 |
 | RS-007 | `/speckit.measure` 入口：命令模板 + 确定性只读分析引擎 + 四工具命令副本（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/reporting-obligations.md` | SC-013、SC-014 | FR-026, FR-027, FR-028, FR-029 | EP-002 |
 
 ## Success Criteria *(mandatory)*
@@ -527,9 +641,9 @@ output, and that the store's files are unchanged after the run.
 - **SC-008**: Pre-existing progress-reporting and dispatch-visibility behavior produces no new failures against the pre-change baseline. **Path**: supporting
 - **SC-009**: The full chain runs end to end on the dogfood line: a real multi-minute run reports on cadence, a supervised subordinate flow is reported by its master, a mid-run digest request is answered, and the guard returns a verdict on the line's own artifacts. **Path**: supporting
 - **SC-010**: The feature's changed-file set introduces no scheduler, timer service, daemon, new runtime dependency, new persistent store, new console channel, new registry, new state spine or new ledger. **Path**: supporting
-- **SC-011**: A status line and a digest rendered over the same fixture store each carry one efficiency element per listed unit within the existing entry bound; a unit whose record says `not_evaluated` renders the explicit not-evaluated marker and neither `0` nor an omission; an absent or empty store renders the explicit "no measurements" state with the rest of the line and digest unchanged. **Path**: final
+- **SC-011**: A status line and a digest rendered over the same fixture store each carry one efficiency element per listed unit within the existing entry bound; a unit whose record says `not_evaluated` renders the explicit not-evaluated marker and neither `0` nor an omission; an absent or empty store renders the explicit "no measurements" state with the rest of the line and digest unchanged; a unit the surface lists with no record at all still carries the not-evaluated marker rather than losing the element, and when the token/invocation quantities cannot fit the bound they are withdrawn from every unit on that render together. **Path**: final
 - **SC-012**: Reading the exec-quant store for the efficiency dimension and for the measure report leaves it byte-identical — every file under `.specify/memory/exec-quant/` compares equal before and after both reads, including the legacy stream files, and no new path is created anywhere under it by either read. **Path**: final
-- **SC-013**: `/speckit.measure` over a fixture store of three units (several records each, plus one unreadable record and one legacy-format record) reports per unit the record count and the elapsed/token/invocation figures with their provenance, states the window and selection actually used, and reports the excluded-record counts by reason class; on an empty or absent store it reports "no measurements" and exits with the declared nothing-to-analyse status distinct from both success and error. **Path**: final
+- **SC-013**: `/speckit.measure` over a fixture store of three units (several records each, plus one unreadable record and one legacy-format record) reports per unit the record count and the elapsed/token/invocation figures with their provenance, states the window and selection actually used, and reports the excluded-record counts by reason class; on an empty or absent store it reports "no measurements" and exits with the declared nothing-to-analyse status distinct from both success and error; two adjacent windows over one fixture store partition it — each record counted in exactly one of them — and a unit the store holds under two types is reported as two rows, not one. **Path**: final
 - **SC-014**: Two `/speckit.measure` runs over an unchanged store with the same window and selection produce byte-identical output, the command exits with only statuses from its declared closed set, and its changed-file set adds no process spawn, network call, written file or scheduled process — the additions are one command template, one stdlib-only script, the regenerated per-tool command copies and their tests. **Path**: supporting
 
 ### Measurement Sources & Collection Methods
@@ -564,6 +678,7 @@ output, and that the store's files are unchanged after the run.
 | User-facing comprehension of every emitted line | `shared/guidelines/user-facing-comprehension.md` | The emitted lines are a governed surface; the discipline applies unchanged |
 | Exec-quant record schema: version, closed vocabularies, the eleven config fields, per-action argument manifest | `shared/declarations/facts/quant-record-schema.yaml#/statement`, read by `scripts/python/exec-quant.py` | The efficiency dimension and the measure report read records this declaration shapes; they restate no field name, enum or version, and a schema change is that owner's business (FR-025 admits the extension only there) |
 | Exec-quant store layout and write path: `.specify/memory/exec-quant/`, per-record files under `records/`, the legacy stream, `scores/`, `aggregated/` | `scripts/python/exec-quant.py` (`storage_dir` / `records_dir` / `scores_dir`) and the retention lane that consumes it (`scripts/python/record-retention.py`) | Read-only consumption for both new capabilities. The feature adds no subdirectory, no cache, no second format, no migration; the store's `aggregated/` layer stays feedback's channel and is not repurposed here |
+| Record reading and record ordering: the per-record directory plus the legacy stream, their de-duplication by record identity, and the "latest record" resolution | `scripts/python/exec-quant.py` — its read path (`load_store` and the reader it composes) is the one reading, and its existing `list-records` action is the one entry already exposed over it | Both new capabilities read **through** that path by import, in-process; neither re-parses the format, re-implements the ordering nor shells out to the engine's command line. The measure entry is a second **projection** over the same reader, not a second reader (FR-028) |
 | Record retention, receipt-gated deletion, grace | `scripts/python/record-retention.py` and `shared/declarations/facts/memory-retention-thresholds.yaml#/statement` | Not touched: `/speckit.measure` presents figures over whatever records the store still holds and states its window; it retires nothing and offers no "delete these records" action |
 | "Measured, not impressed" — a quantity with no source reports itself as not evaluated | `shared/guidelines/single-run-evidence.md` § Run Determination and the exec-quant record's provenance discipline | The efficiency element and the measurement report carry the record's provenance verbatim; neither fills a missing quantity with `0`, an average or a guess |
 | Summary-first consumption of machine-managed data | `shared/guidelines/token-efficiency.md` § Escalation Ladder | The efficiency element is a summary projection and `/speckit.measure` is the digest entry for this store — the ladder's first rung, never a raw-record injection |
@@ -681,7 +796,41 @@ output, and that the store's files are unchanged after the run.
   (`Draft`, requirements stage) and asserts nothing about delivery. The prior `Blocked` verdict for
   SC-001 and SC-002 survives verbatim in the feature registry and in `verification.md`; only a later
   closure re-check may re-judge it. Adding criteria here does not unblock, re-open or re-close them.
-
+- **A22 — the elapsed quantity is read, not measured, and its coverage is a data condition**: the
+  declared schema already carries `quality.elapsed_ms` at schema version 2, so no extension is
+  required to *read* it (measured 2026-11-06 against
+  `shared/declarations/facts/quant-record-schema.yaml` and the engine's two population sites,
+  `collect` → `carried`, `collect-dispatch` → `measured`). What varies is coverage: of the 186
+  per-record files in this repository's store, 151 carried `elapsed_ms` as the not-evaluated literal
+  and 35 as a `{value, provenance}` object, and the tokens quantity was absent on all 186. Those
+  readings are the schema-population reality, not a defect this feature repairs: the surfaces and the
+  report are obliged to state the record count behind each figure, and filling a gap is explicitly
+  out of scope. An extension, should one ever be proved necessary, remains the schema owner's change
+  — this assumption fixes only that it is not this feature's.
+- **A23 — the visibility surfaces and the measurement report answer different questions over one
+  reading**: the surfaces show **what the latest record for this unit said**, because the user's
+  question there is "what is it costing right now"; the report aggregates **every record in the
+  window**, because the question there is "what did this cost over the period". One reader module
+  serves both; the two selections are different projections of it, not two implementations of it, and
+  neither is allowed to leak into the other — a lifetime average on a status line, or a
+  latest-record-only figure in a window report, would each answer the wrong question.
+- **A24 — the measure entry's argument shape mirrors the store engine's own input**: `--since` (start)
+  and `--window` (span) reuse the form the store's existing `list-records` already accepts for its
+  start, so a caller who knows one entry knows the other, and no new date dialect is introduced. The
+  half-open interval and the "no bounds means the whole store" default are the two decisions that
+  form leaves open; they are fixed by FR-027 rather than left to the plan, because they decide whether
+  two adjacent reports can partition one store — a property a reader relies on and cannot recover
+  after the fact.
+- **A25 — one command copy source, four generated copies**: `/speckit.measure` ships exactly as this
+  feature's other entry does — one command template in the template layer and the per-tool copies the
+  existing regeneration step writes for the four tool directories this repository actually has. The
+  copy count is a consequence of that step, not a number this spec pins; a fifth tool becoming
+  configured adds a copy without a requirement change.
+- **A26 — the arguments this stage fixes are those a reader could not recover afterwards**: window
+  semantics, aggregation statistic, unit identity, cap behaviour, exit-status meaning and element
+  degradation order are fixed here because each changes what a rendered number *means*. What stays
+  open is deliberately mechanical — action identifiers, the script's file name, the human-readable
+  layout of the summary render — and belongs to the plan under A13.
 ## Out of Scope
 
 - A scheduler, timer service, daemon, background reporting process, or a resident reporter runtime.
@@ -723,6 +872,14 @@ output, and that the store's files are unchanged after the run.
   column, no per-step line per unit, no second cadence for measurements.
 - **Estimating a missing measurement**: no interpolation, no extrapolation from a neighbouring run,
   no filling a `not_evaluated` quantity with a zero or an average.
+- **Extending the exec-quant record schema for this feature**: no new field, no new record version,
+  no private sidecar key. The quantities this feature reads are already declared and already
+  populated by the engine (measured 2026-11-06); an extension, were one ever proved necessary, is
+  that schema owner's change and not a deliverable here.
+- **De-duplicating, reordering or re-reading the store by a second rule**: record identity, ordering
+  and the latest-record resolution stay with the store engine's read path. A second reader, a shelled
+  call back into the engine's command line, or a re-parse of the record format inside either new
+  entry is the duplication this exclusion forbids.
 
 ## Clarifications
 
@@ -801,4 +958,60 @@ stage rather than deferred, and the adjudication is recorded here because the us
 - Q: What happens to the existing `Blocked` verdict now that scope grew? → A: Nothing. The revision
   is a requirements-stage scope addition at `Draft`; the SC-001 / SC-002 `partial` readings and the
   block verdict remain recorded unchanged, to be re-judged only by a later closure check (A21).
+
+### Session 2026-11-06 (clarify, post-revision)
+
+**Mode override: A — post-requirements; target `.specify/specs/087-speckit-visualization/requirements.md`.**
+The phase table would have selected C because `plan.md` and `tasks.md` exist; the driver's assignment
+explicitly names `requirements.md`, and the previous slice already ran the revision here, so the
+override is taken and logged. Zero-question mode: the driver authorized self-adjudication, so each entry
+records the question it answers, the adjudicated answer, and the evidence it rests on. Six questions
+were resolved against the owners rather than put to the user; none of them changes a pre-existing
+clause's meaning — the FR-001…FR-022 / SC-001…SC-010 text is untouched and no FR/SC id was added,
+removed or renumbered (29 FR / 14 SC before and after).
+
+- Q: Does the exec-quant store already carry a per-step elapsed-time field, or does this feature need a
+  schema extension? → A: **It already carries it.** `quality.elapsed_ms` is in the declared schema
+  (version 2) and the engine populates it in two places — `collect` writes `carried` when the adjacent
+  run-determination record supplies it, `collect-dispatch` writes `measured`. No extension is required
+  to read it, so FR-025 is amended to say so explicitly and to close the extension route for this
+  feature. What the store does not guarantee is coverage — measured 2026-11-06 over the 186 per-record
+  files: 151 `not_evaluated`, 35 valued, and tokens absent on all 186 — and that is a data condition
+  rendered under FR-023's not-evaluated rule, never a number to invent (A22).
+- Q: Where on the visibility surfaces does the efficiency element go, and what happens when the line's
+  bound cannot hold it? → A: FR-023's two named surfaces stand (status line + digest) and no third is
+  opened. Inside an element the **elapsed quantity is unconditional and comes first**, and the token
+  and invocation quantities are additive but degradable: when they do not fit the surface's existing
+  entry bound they are withdrawn from **every** unit on that render together and named in that
+  render's existing omitted summary. Per-unit depth differences are the one outcome the bound must not
+  produce, because two units described to different depths cannot be compared (A17 unchanged; the
+  degradation order is new).
+- Q: Which record does a surface show when the store holds several for one unit? → A: The latest by
+  `collected_at`, and nothing is folded in — no average, no sum, no ranking — because the surface's
+  question is "what is it costing now". A listed unit with no record at all renders the not-evaluated
+  marker rather than dropping the element, since an omission beside a neighbouring unit's number reads
+  as "faster". Ties on `collected_at` are broken by record identity in ascending byte-stable order,
+  never by enumeration order (FR-024; A23).
+- Q: What does `/speckit.measure` mean by "a declared window"? → A: One pair reusing the store
+  engine's own input form: `--since` is the start, `--window` is the span resolving the end as
+  start plus span, no bound at all means the whole store (stated as such, never an implied span), a
+  start after the end is an input error, and the interval is **half-open** — `start ≤ collected_at <
+  end` — so two adjacent windows partition a store with no double-count and no gap. Aggregation is
+  fixed here too: the per-unit elapsed figure is the **median** with minimum and maximum named,
+  counts and tokens are **sums**, and a quantity missing from every contributing record is reported
+  as not evaluated while a partially covered one states how many records it covered. Unit identity is
+  the pair `(unit_id, unit_type)` because the store holds one id under more than one type (A24).
+- Q: What is the command's exit-status contract, and how does it bound a large store? → A: Four
+  statuses and no more — `0` a report was produced, `2` input error, `3` nothing to analyse (absent
+  store, or no record inside the resolved window; printed as an explicit "no measurements" statement,
+  never a zero row), `1` any other failure. A per-unit record cap has one declared default printed on
+  every run with `--cap` as the per-invocation override, truncation applied by record identity in
+  ascending order, and the omitted count reported beside the existing four exclusion classes rather
+  than as a fifth class (FR-028).
+- Q: Does `/speckit.measure` share its reading with the visibility surfaces, or may it read the store
+  independently? → A: **One reading.** The same in-process reader module — the store engine's own read
+  path, reached by path — serves both; the measure entry adds no second parser of the record format
+  and no second store engine. The two consumers are two projections of that one reader, and neither
+  may borrow the other's selection: a lifetime figure on a status line, or a latest-record-only figure
+  in a window report, would each answer the wrong question (A23, A26).
 

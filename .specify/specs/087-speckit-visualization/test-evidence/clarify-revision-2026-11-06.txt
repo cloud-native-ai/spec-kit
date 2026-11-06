@@ -1,0 +1,163 @@
+# Feature 087 — /speckit.clarify (post-revision, Mode A override) — evidence
+# Date: 2026-11-06
+# Scope: clarify the S1 (efficiency visibility) / S2 (/speckit.measure) slice the user added
+# Run mode: Mode A (post-requirements), zero-question (driver-authorized self-adjudication).
+#   The phase table would have selected Mode C (plan.md + tasks.md both exist); the assignment
+#   names requirements.md explicitly, so the override is taken and logged (SKILL § 1).
+# Artifacts changed by this stage:
+#   .specify/specs/087-speckit-visualization/requirements.md
+#   .specify/specs/087-speckit-visualization/checklists/requirements.md
+#   .specify/specs/087-speckit-visualization/test-evidence/clarify-revision-2026-11-06.txt (this file)
+
+================================================================
+1. validate-requirements.py  (BEFORE — baseline, 29 FR / 14 SC)
+================================================================
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 805 lines, 43 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+
+================================================================
+2. validate-requirements.py  (AFTER — this clarify run)
+================================================================
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 1018 lines, 43 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+
+READING: 0 error / 0 warning. Definition rows unchanged at 43 = 29 FR + 14 SC:
+this run added no FR/SC id, removed none and renumbered none. The +213 lines are
+in-place clause extensions, one Clarifications session entry, five Assumptions
+and the added Edge Cases / scenarios.
+
+================================================================
+3. pre-analyze-check.py --stage requirements  (BEFORE — baseline)
+================================================================
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+      --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=3 waived=0
+
+================================================================
+4. pre-analyze-check.py --stage requirements  (AFTER — this clarify run)
+================================================================
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+      --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=3 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [
+  {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 219, "message": "path does not exist under the repo: .specify/templates/commands/"},
+  {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: .specify/templates/commands/"},
+  {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 37, "message": "path does not exist under the repo: .specify/templates/commands/"}
+], "summary": {"errors": 0, "advisories": 3, "waived": 0, "fr": 29, "sc": 14, "tasks": 50, "clauses": 0, "files": 15}, "checked_at": "2026-11-06T08:21:00Z"}
+
+READING: 0 error — the brief's target is met. The 3 advisories are the one
+pre-existing `missing-path` row (`.specify/templates/commands/` is retired; the
+pair moved to the per-tool copy step) projected onto the checklist and its two
+source rows, unchanged in kind and count from the baseline.
+
+The revision slice's own reading (`errors=6`) was NOT reproduced and was not
+repairable here: four of those six rows were `count-claim` errors on plan-stage
+artifacts this stage does not author, and the two on `checklists/requirements.md`
+line 37 are guarded by the checker's HISTORICAL_LINE filter (`previous`), which
+suppresses a pre-revision sentence quoted as history. Nothing was edited to make
+that reading move; it is recorded because it differs from this stage's baseline.
+
+================================================================
+5. Read-only / determinism probes for the S2 design (supporting evidence)
+================================================================
+$ python3 .specify/scripts/python/exec-quant.py --action list-records --since 2026-11-06 --format json
+exit=0, 18,811 bytes of output
+$ <same command again>; cmp <first> <second>
+BYTE-IDENTICAL
+$ git status --short .specify/memory/exec-quant | grep '^ M'
+(empty — no tracked store file modified; only the pre-existing untracked records)
+
+Reading: the store's existing read entry is already deterministic over an unchanged
+store, which is the property FR-028 requires of the new analysis entry; and both
+reads left the store's tracked files untouched (SC-012's precondition, probed here
+rather than claimed).
+
+================================================================
+6. Store schema / coverage measurement behind the S1 adjudication
+================================================================
+$ python3 - (json scan of .specify/memory/exec-quant/records/*.json, 186 files)
+quality.elapsed_ms = not_evaluated : 151
+quality.elapsed_ms = {value, provenance} : 35
+quality.tokens     = not_evaluated : 186
+
+$ grep -n "elapsed" scripts/python/exec-quant.py
+628:        "elapsed_ms": NOT_EVALUATED, "tokens": NOT_EVALUATED,   # collect_quality defaults
+638:        group["elapsed_ms"] = {"value": elapsed, "provenance": "carried"}
+930:        group["elapsed_ms"] = {"value": duration, "provenance": "measured"}
+941:                group["elapsed_ms"] = {"value": int(round(delta)), "provenance": "measured"}
+
+$ cat .specify/shared/declarations/facts/quant-record-schema.yaml
+statement: schema_version: 2 ; provenances: [measured, carried, user-given, configured] ; ...
+
+READING (S1, decisive): the declared schema ALREADY carries `quality.elapsed_ms`
+and the engine ALREADY populates it on two paths (`collect` -> carried,
+`collect-dispatch` -> measured). No schema extension is needed to READ it, so the
+brief's "extend the schema if required" branch does not fire. What is missing is
+per-record COVERAGE, and that is a data condition rendered under FR-023's
+not-evaluated rule — never a zero, never an average, never an omission.
+
+================================================================
+7. Semantic-preservation checks (the 22 pre-existing FRs are untouched)
+================================================================
+$ git diff -- .specify/specs/087-speckit-visualization/requirements.md | grep -c '^-.*\*\*FR-0'
+0      # zero FR definition lines removed or rewritten
+$ git diff -- .specify/specs/087-speckit-visualization/requirements.md | grep -c '^-.*\*\*SC-0'
+2      # SC-011 and SC-013 show as removed+re-added: each gained one appended clause
+       # suffix (SC-011: no-record element / degradation order; SC-013: window
+       # partition / unit identity). Byte-level check of both: the original text is
+       # a prefix of the new text, so NO existing claim was weakened, only extended.
+$ python3 - (line-level prefix/suffix comparison of every FR-/SC- definition, HEAD vs this run)
+57 definition lines before, 57 after; 55 identical byte-for-byte; 2 extended with the
+original text preserved as a prefix and no claim removed.$ grep -c '^- \*\*FR-0' requirements.md
+29
+$ awk '/^### Measurable Outcomes/,/^### Measurement Sources/' requirements.md | grep -c '^- \*\*SC-0'
+14
+$ awk '/^## Clarifications/,0' requirements.md | grep -c '^- Q:'
+17     # 11 pre-existing rows preserved byte-for-byte + 6 appended this run
+                            (append-only invariant: 11 -> 17, strictly increased)
+
+================================================================
+8. Derived counts re-measured for the checklist (all read from the file)
+================================================================
+  user stories            :  6
+  acceptance scenarios    : 20   (17 -> 20: +1 efficiency-surface, +2 window/not-evaluated)
+  edge cases              : 24   (18 -> 24: +5 added, 1 extended)
+  ## Out of Scope items   : 21   (19 -> 21: +schema-extension, +second-reader)
+  assumptions             : 26   (A1..A26; +5: A22-A26)
+  runtime-stack data rows :  7   (RS-001..RS-007; no row added, RS-006 extended)
+  FR                      : 29   (unchanged)
+  SC                      : 14   (unchanged)
+
+Re-measure commands:
+  $ grep -c '^### User Story' requirements.md
+  $ grep -c '^[0-9]\. \*\*Given\*\*' requirements.md
+  $ awk '/^### Edge Cases/,/^## Requirements/' requirements.md | grep -c '^- \*\*'
+  $ awk '/^## Out of Scope/,/^## Clarifications/' requirements.md | grep -c '^- '
+  $ grep -c '^- \*\*A[0-9]' requirements.md
+
+================================================================
+9. Scope of this stage's writes
+================================================================
+$ git status --short
+committed by this stage: requirements.md, checklists/requirements.md, this file.
+NOT touched: state spine (.specify/state/087-speckit-visualization.md), session
+records, feedback records, exec-quant records, glossary, features.md,
+features/087.md, plan.md, tasks.md, feature-ref.md, verification.md.
