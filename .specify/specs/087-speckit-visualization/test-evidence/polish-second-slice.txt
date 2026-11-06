@@ -1,0 +1,45 @@
+T073 — generated copies and mirrors for the measure command and the two scripts, engine-produced (captured 2026-11-06)
+================================================================================
+
+1. Per-tool command copies (generator: scripts/python/regen-command-copies.py)
+--------------------------------------------------------------------------------
+$ python3 scripts/python/regen-command-copies.py
+Fixed drift:
+  .github/prompts/speckit.measure.prompt.md (missing)
+  .claude/commands/speckit.measure.md (missing)
+  .opencode/command/speckit.measure.md (missing)
+  .qoder/commands/speckit.measure.md (missing)
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.        (exit 0)
+
+The four speckit.measure.* paths present:
+  .claude/commands/speckit.measure.md
+  .github/prompts/speckit.measure.prompt.md
+  .opencode/command/speckit.measure.md
+  .qoder/commands/speckit.measure.md
+(no .hermes/ or .codex/ path asserted — § Environment Prerequisites; the generator writes only existing directories)
+
+2. Script mirrors (generator: scripts/python/sync-mirrors.py, both STRICT pairs)
+--------------------------------------------------------------------------------
+$ python3 scripts/python/sync-mirrors.py --write --only scripts/python/measure.py
+ok    scripts/ == .specify/scripts/ (1 files)
+$ python3 scripts/python/sync-mirrors.py --write --only scripts/python/status-digest.py
+ok    scripts/ == .specify/scripts/ (1 files)
+$ python3 scripts/python/sync-mirrors.py --check
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (123 files)
+ok    shared/ == .specify/shared/ (95 files)
+→ ok for all six pairs, no NEW drift against plan.md § Mirror Obligations (T005 baseline: 121 scripts, 94 shared;
+  now 123 / 95 — the two new script pairs and the new measure-command template copy are the only deltas).
+
+3. Wrap-up embed registry (the measure command's ## Wrap-up block is engine-compiled, never hand-written)
+--------------------------------------------------------------------------------
+Registry row added at the framework source shared/definitions/probe-definitions.md (| speckit-measure-wrapup |
+command-wrapup | /speckit.measure | wrap-up |), mirror synced by sync-mirrors.py, then:
+$ python3 .specify/scripts/python/probe-utils.py --action compile-embeds
+compiled 79 units: 1 written, 78 unchanged
+$ python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 79 units, zero drift

@@ -1,0 +1,179 @@
+T074 — /speckit.measure real runs (captured 2026-11-06, fixture store under .specify/.tmp/087-part8/measure-ws)
+fixture record paths:
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090000000000Z-fixture00.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090001000000Z-fixture01.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090002000000Z-fixture02.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090003000000Z-fixture03.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090004000000Z-fixture04.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090005000000Z-fixture05.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records/20261106T090099000000Z-broken.json
+  .specify/.tmp/087-part8/measure-ws/.specify/memory/exec-quant/records.jsonl
+
+=== 1. summary over the populated store (unbounded window) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws
+exit=0
+window: all records
+selection: every unit the store holds
+cap: 200
+unit=step-a type=command records=3 elapsed=150000 min=120000 max=180000 provenance=measured tokens=600 provenance=measured invocations=3 provenance=measured
+unit=step-a type=skill records=1 elapsed=5000 min=5000 max=5000 provenance=measured tokens=40 provenance=measured invocations=1 provenance=measured
+unit=step-b type=command records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=step-c type=command records=1 elapsed=7000 min=7000 max=7000 provenance=measured tokens=7 provenance=measured invocations=1 provenance=measured
+excluded: unreadable=1 legacy-format=1 outside-window=0 unknown-unit=0 outside-cap=0 read=8
+9 figures measurable
+
+=== 2. json over the same store ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action json --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws
+exit=0
+{
+  "cap": 200,
+  "excluded": {
+    "legacy_format": 1,
+    "outside_cap": 0,
+    "outside_window": 0,
+    "read": 8,
+    "unknown_unit": 0,
+    "unreadable": 1
+  },
+  "exit_hint": "0 report; 2 input error; 3 nothing to analyse; 1 other failure",
+  "rows": [
+    {
+      "elapsed": {
+        "max": 180000,
+        "min": 120000,
+        "provenance": "measured",
+        "value": 150000
+      },
+      "invocations": {
+        "provenance": "measured",
+        "value": 3
+      },
+      "records": 3,
+      "tokens": {
+        "provenance": "measured",
+        "value": 600
+      },
+      "unit_id": "step-a",
+      "unit_type": "command"
+    },
+    {
+      "elapsed": {
+        "max": 5000,
+        "min": 5000,
+        "provenance": "measured",
+        "value": 5000
+      },
+      "invocations": {
+        "provenance": "measured",
+        "value": 1
+      },
+      "records": 1,
+      "tokens": {
+        "provenance": "measured",
+        "value": 40
+      },
+      "unit_id": "step-a",
+      "unit_type": "skill"
+    },
+    {
+      "elapsed": {
+        "value": "not_evaluated"
+      },
+      "invocations": {
+        "value": "not_evaluated"
+      },
+      "records": 1,
+      "tokens": {
+        "value": "not_evaluated"
+      },
+      "unit_id": "step-b",
+      "unit_type": "command"
+    },
+    {
+      "elapsed": {
+        "max": 7000,
+        "min": 7000,
+        "provenance": "measured",
+        "value": 7000
+      },
+      "invocations": {
+        "provenance": "measured",
+        "value": 1
+      },
+      "records": 1,
+      "tokens": {
+        "provenance": "measured",
+        "value": 7
+      },
+      "unit_id": "step-c",
+      "unit_type": "command"
+    }
+  ],
+  "selection": "every unit the store holds",
+  "window": {
+    "kind": "all records"
+  }
+}
+
+=== 3. bounded window [2026-11-06T08:00:00Z, +30m) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --since 2026-11-06T08:00:00Z --window 30m
+exit=0
+window: [2026-11-06T08:00:00+00:00, 2026-11-06T08:30:00+00:00)
+selection: every unit the store holds
+cap: 200
+unit=step-a type=command records=3 elapsed=150000 min=120000 max=180000 provenance=measured tokens=600 provenance=measured invocations=3 provenance=measured
+unit=step-a type=skill records=1 elapsed=5000 min=5000 max=5000 provenance=measured tokens=40 provenance=measured invocations=1 provenance=measured
+excluded: unreadable=1 legacy-format=1 outside-window=2 unknown-unit=0 outside-cap=0 read=8
+6 figures measurable
+
+=== 4. selection: one unit_id under two unit_type values; repeated value de-duplicated ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --unit step-a/command --unit step-a/command --unit step-a/skill
+exit=0
+window: all records
+selection: step-a/command, step-a/skill
+cap: 200
+unit=step-a type=command records=3 elapsed=150000 min=120000 max=180000 provenance=measured tokens=600 provenance=measured invocations=3 provenance=measured
+unit=step-a type=skill records=1 elapsed=5000 min=5000 max=5000 provenance=measured tokens=40 provenance=measured invocations=1 provenance=measured
+excluded: unreadable=1 legacy-format=1 outside-window=0 unknown-unit=0 outside-cap=0 read=8
+6 figures measurable
+
+=== 5. cap: --cap 1 over step-a/command (3 records -> omitted) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --unit step-a/command --cap 1
+exit=0
+window: all records
+selection: step-a/command
+cap: 1
+unit=step-a type=command records=1 elapsed=120000 min=120000 max=120000 provenance=measured tokens=100 provenance=measured invocations=1 provenance=measured
+excluded: unreadable=1 legacy-format=1 outside-window=0 unknown-unit=0 outside-cap=2 read=8
+3 figures measurable
+
+=== 6. absent store (empty workspace) -> exit 3 ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/absent-ws
+exit=3
+no measurements: the store is absent or empty (workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/absent-ws)
+
+=== 7. window selecting nothing -> exit 3 ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --since 2020-01-01T00:00:00Z --window 1h
+exit=3
+no measurements: no record falls inside [2020-01-01T00:00:00+00:00, 2020-01-01T01:00:00+00:00)
+
+=== 8. bad input: invalid --window -> exit 2 ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --since 2026-11-06T08:00:00Z --window bogus
+exit=2
+[stderr] measure: invalid --window: 'bogus' (expected e.g. 30m, 1h, 24h)
+
+=== 9. bad input: unknown unit -> exit 2 (offending value echoed) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --unit nosuch/unit
+exit=2
+[stderr] measure: unknown unit: nosuch/unit (the store holds no such identity inside the window)
+
+=== 10. all-not_evaluated: --unit step-b/command -> exit 0, '0 figures measurable' ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/measure-ws --unit step-b/command
+exit=0
+window: all records
+selection: step-b/command
+cap: 200
+unit=step-b type=command records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+excluded: unreadable=1 legacy-format=1 outside-window=0 unknown-unit=0 outside-cap=0 read=8
+0 figures measurable
+

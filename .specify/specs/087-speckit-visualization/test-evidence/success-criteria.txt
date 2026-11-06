@@ -96,3 +96,68 @@ python3 scripts/python/status-digest.py --action guard \
   --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
   --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
 ```
+
+================================================================================
+Second slice — dated section (2026-11-06, implement Part 8; SC-011…SC-014 of
+requirements.md § Success Criteria). Each row names its capture file and the
+producing command; a criterion whose evidence would be a green check alone is
+marked `not-measured`, never `pass`.
+================================================================================
+
+SC-011 (final) — both visible surfaces say how long each listed unit took;
+  measured / not-evaluated / absent-store faces
+  status: pass
+  evidence: test-evidence/us5-efficiency-element.txt
+  produced by:
+    python3 scripts/python/status-digest.py --action digest --workspace <fixture-ws>
+    python3 scripts/python/status-digest.py --action report --workspace <fixture-ws> --structure 087-impl ...
+  readings named there: one element per listed step with elapsed first and the
+  `not-evaluated` marker never `0` (§4/§5: the no-record step step-z carries the
+  marker), the tight-bound render-wide withdrawal with the omitted summary naming
+  `tokens, invocations` (§3/§5), the absent store rendering `no measurements` with
+  the entry set unchanged (§6), and the digest carrying the element inside its cap
+  (§1/§2). The two renders are the only surfaces; no third surface is emitted.
+
+SC-012 (final) — the reads write nothing: store byte-identical around both reads
+  status: pass
+  evidence: test-evidence/us5-readonly-store.txt
+  produced by: per-file sha256 digest + listing of the fixture store before and
+  after `status-digest.py --action digest` and `measure.py --action summary`
+  verdict line there: "VERDICT: every file equal and no path created
+  (before files=3, after files=3; digests identical=True; listings identical=True)"
+
+SC-013 (final) — /speckit.measure reports a window's measurements with the
+  exclusions accounted for and a closed exit set
+  status: pass
+  evidence: test-evidence/us5-measure.txt
+  produced by: python3 scripts/python/measure.py --action summary --workspace <fixture-ws> (+ json, window, selection, cap, bad-input, absent-store runs)
+  hand-computed expectation table vs the fixture store's 8 read records
+  (6 per-record + 1 broken/unreadable + 1 legacy stream line):
+
+    row                records  elapsed(min..max)    tokens  invocations
+    step-a/command     3        150000 (120000..180000)  600  3
+    step-a/skill       1        5000 (5000..5000)         40  1
+    step-b/command     1        not_evaluated   not_evaluated  not_evaluated
+    step-c/command     1        7000 (7000..7000)          7  1
+    exclusions: unreadable=1 legacy-format=1 outside-window=0
+                unknown-unit=0 outside-cap=0 read=8
+    identity: contributed(6) + unreadable(1) + legacy-format(1) + outside-window(0)
+              + unknown-unit(0) + outside-cap(0) = 8 = read   ✓ (matches §1 print)
+  empty-store run: exit 3, "no measurements: the store is absent or empty"
+  (§6); window selecting nothing: exit 3 (§7); bad input: exit 2 with the
+  offending value echoed (§8/§9); all-not_evaluated: exit 0 with "0 figures
+  measurable" (§10).
+
+SC-014 (supporting) — the report is deterministic and the delivery shape is
+  machinery-free
+  status: pass
+  evidence: test-evidence/us5-measure.txt §1/§2 (the two projections),
+  test-evidence/polish-second-slice.txt (delivery shape), and the two byte-identical
+  runs captured here:
+    $ measure.py --action summary --workspace <fixture-ws>   # run 1 → run1.txt
+    $ measure.py --action summary --workspace <fixture-ws>   # run 2 → run2.txt
+    $ diff run1.txt run2.txt   → identical (exit 0, no output)
+  changed-file scan: `git diff --name-only 56f3f881..HEAD` — 199 paths, all of
+  them delivered sources, their generated copies/mirrors, tests and spec
+  documents (full reading in test-evidence/cl-01-closure.txt, second-slice
+  section); no schema-extension or second store engine among them.

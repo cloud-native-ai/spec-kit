@@ -1,0 +1,31 @@
+T076 — read-only property measured around both reads (captured 2026-11-06; store: .specify/.tmp/087-part8/digest-ws/.specify/memory/exec-quant)
+
+=== BEFORE: per-file sha256 digest + listing ===
+ecaad34626c9a8e66ff6b6390bddd1dbbadbe4ee1380e8cba8d2aa1f7e95889b  .specify/memory/exec-quant/records/20261106T090000000000Z-fixture00.json
+ead4b68d9ba09ef634dd4c69da966a6c09fe5eb93f3cd1c3952a58c6782851a2  .specify/memory/exec-quant/records/20261106T090001000000Z-fixture01.json
+30bf6fd2070ff558ee76a34ccdfa57b71ad3a28c410c2e3ee64bcca86ca647c4  .specify/memory/exec-quant/records/20261106T090002000000Z-fixture02.json
+
+=== READ 1: the efficiency element's read (status-digest --action digest) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action digest --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws
+exit=0
+generated_at=2026-11-06T12:17:01.912149Z cap=20 stale_bound=15m00s profile=interactive
+line_id=t075-line run_id=r-fix state=running stage=implement age=3h17m stale=yes active=no note=last activity 3h17m ago, beyond the 15m00s stale bound efficiency=unit=step-c elapsed=30000ms(measured) tokens=90 tok(measured) invocations=2 calls(measured)
+
+=== READ 2: the measure report's read (measure.py --action summary) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/measure.py --action summary --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws
+exit=0
+window: all records
+selection: every unit the store holds
+cap: 200
+unit=step-a type=command records=1 elapsed=120000 min=120000 max=120000 provenance=measured tokens=100 provenance=measured invocations=1 provenance=measured
+unit=step-b type=command records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=step-c type=command records=1 elapsed=30000 min=30000 max=30000 provenance=measured tokens=90 provenance=measured invocations=2 provenance=measured
+excluded: unreadable=0 legacy-format=0 outside-window=0 unknown-unit=0 outside-cap=0 read=3
+6 figures measurable
+
+=== AFTER: per-file sha256 digest + listing ===
+ecaad34626c9a8e66ff6b6390bddd1dbbadbe4ee1380e8cba8d2aa1f7e95889b  .specify/memory/exec-quant/records/20261106T090000000000Z-fixture00.json
+ead4b68d9ba09ef634dd4c69da966a6c09fe5eb93f3cd1c3952a58c6782851a2  .specify/memory/exec-quant/records/20261106T090001000000Z-fixture01.json
+30bf6fd2070ff558ee76a34ccdfa57b71ad3a28c410c2e3ee64bcca86ca647c4  .specify/memory/exec-quant/records/20261106T090002000000Z-fixture02.json
+
+VERDICT: every file equal and no path created (before files=3, after files=3; digests identical=True; listings identical=True; exit statuses: digest=0 measure=0)

@@ -381,3 +381,53 @@ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087
 grep -cE '^- \[[ >]\]' .specify/specs/087-speckit-visualization/tasks.md   # expect 0
 sed -n '32,41p' tests/contract/test_coaching_dispatch_contract.py          # the declared delta's tuple
 ```
+
+================================================================================
+Second slice — zero-new-machinery audit, dated section (2026-11-06, implement
+Part 8; T078). Readings appended below; the first slice's sections above are
+untouched. Queried set: `git diff --name-only 56f3f881..HEAD` (full list:
+.specify/.tmp scratch capture — 199 paths), judged against feature-ref.md §
+Delivered paths #29–#40.
+================================================================================
+
+§ S2.1 Changed-file scan (queried set + findings)
+  $ git diff --name-only 56f3f881..HEAD | wc -l
+  199
+  findings: 0 scheduler / daemon / timer-service / new-dependency / new-persistent-
+  store / new-console-channel / second-registry / state-spine / ledger paths.
+  Every path is one of: framework sources (shared/ scripts/ templates/ skills/
+  agents/ tests/), their engine-generated copies and mirrors (.specify/shared,
+  .specify/scripts, .specify/templates, .specify/skills, .specify/agents,
+  .claude/, .github/, .opencode/, .qoder/), the feature's spec documents and
+  evidence (.specify/specs/087-speckit-visualization/), registry/state rows the
+  framework's own commands maintain (.specify/memory/features*.md,
+  register.md, glossary.md, state/), and the first slice's recorded run rows.
+  The exec-quant store record 20261106T042455074010Z-*.json in the diff is a
+  recorded run of the framework's own collect step (a run record, not a schema
+  extension — the store's schema declaration is absent from the changed set).
+
+§ S2.2 Spawn / thread / scheduler / network import-and-call scan (AST-level)
+  over scripts/python/measure.py and scripts/python/status-digest.py:
+    measure.py       → none (no subprocess / os.system / os.fork / threading /
+                       asyncio / socket import; no Popen call site)
+    status-digest.py → none (its only `os` use is os.environ / os.stat —
+                       registry-dir resolution and per-entry mtime, no spawn)
+  Neither file carries a second record-format parser or a second store engine:
+  both reach records only through the imported scripts/python/exec-quant.py read
+  path (the import sites are measure.py:66 load_engine and
+  status-digest.py:439 read_store→load_store_engine).
+
+§ S2.3 pyproject.toml dependency pin
+  $ git diff 56f3f881..HEAD -- pyproject.toml
+  (empty — unchanged against its pre-change values)
+
+§ S2.4 Confirmation-gate count
+  $ python3 .specify/scripts/python/scan-confirmation-gates.py --summary
+  blocking confirmation gates: 27 (destructive: 20, governance_kept: 7),
+  violations: 0 — unchanged against the recorded 27.
+
+§ S2.5 Delivery shape re-audit (T065's C-62, over the delivered tree)
+  scripts/python/measure.py: one stdlib-only file; imports argparse,
+  importlib.util, json, re, statistics, sys, datetime.timedelta, pathlib —
+  nothing outside the standard library; no write-mode open, no subprocess, no
+  network call (tests/contract/test_measure.py's AST audit holds).

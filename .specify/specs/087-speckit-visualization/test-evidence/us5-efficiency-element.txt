@@ -1,0 +1,42 @@
+T075 — efficiency element on both visible surfaces (captured 2026-11-06, fixture store .specify/.tmp/087-part8/digest-ws, registry .specify/.tmp/087-part8/registry)
+fixture record paths:
+  .specify/.tmp/087-part8/digest-ws/.specify/memory/exec-quant/records/20261106T090000000000Z-fixture00.json
+  .specify/.tmp/087-part8/digest-ws/.specify/memory/exec-quant/records/20261106T090001000000Z-fixture01.json
+  .specify/.tmp/087-part8/digest-ws/.specify/memory/exec-quant/records/20261106T090002000000Z-fixture02.json
+
+=== 1. digest over the fixture store (measured step-a, not-evaluated step-b) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action digest --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws
+exit=0
+generated_at=2026-11-06T12:17:01.628022Z cap=20 stale_bound=15m00s profile=interactive
+line_id=t075-line run_id=r-fix state=running stage=implement age=3h17m stale=yes active=no note=last activity 3h17m ago, beyond the 15m00s stale bound efficiency=unit=step-c elapsed=30000ms(measured) tokens=90 tok(measured) invocations=2 calls(measured)
+
+=== 2. digest, window-truncated: --cap 1 (element rides inside the cap) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action digest --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws --cap 1
+exit=0
+generated_at=2026-11-06T12:17:01.675460Z cap=1 stale_bound=15m00s profile=interactive
+line_id=t075-line run_id=r-fix state=running stage=implement age=3h17m stale=yes active=no note=last activity 3h17m ago, beyond the 15m00s stale bound efficiency=unit=step-c elapsed=30000ms(measured) tokens=90 tok(measured) invocations=2 calls(measured)
+
+=== 3. digest, tight element bound: --element-bound 40 (render-wide withdrawal + omitted summary) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action digest --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws --element-bound 40
+exit=0
+generated_at=2026-11-06T12:17:01.722626Z cap=20 stale_bound=15m00s profile=interactive
+line_id=t075-line run_id=r-fix state=running stage=implement age=3h17m stale=yes active=no note=last activity 3h17m ago, beyond the 15m00s stale bound efficiency=unit=step-c elapsed=30000ms(measured)
+omitted=0 not rendered within the entry bound: tokens, invocations
+
+=== 4. status line over the same store (steps: step-a command measured, step-z command with no record) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action report --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws --structure 087-impl --run-stamp r20261106T090000Z-part8 --position implement step 8 --delta steps 6-8 landed --remainder captures + closure --trigger tick --unit-id step-a --unit-id step-z --unit-type command --run-id r-fix
+exit=0
+structure=087-impl | run=r20261106T090000Z-part8 | trigger=tick | profile=interactive | position=implement step 8 | delta=steps 6-8 landed | remainder=captures + closure | blocker=no blocker | efficiency=unit=step-a elapsed=120000ms(measured) tokens=100 tok(measured) invocations=1 calls(measured) efficiency=unit=step-z elapsed=not-evaluated tokens=not-evaluated invocations=not-evaluated | carrier=console
+
+=== 5. status line with tight bound (--element-bound 20) ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action report --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/digest-ws --structure 087-impl --run-stamp r20261106T090000Z-part8 --position implement step 8 --delta steps 6-8 landed --remainder captures + closure --trigger tick --unit-id step-a --unit-type command --run-id r-fix --element-bound 20
+exit=0
+structure=087-impl | run=r20261106T090000Z-part8 | trigger=tick | profile=interactive | position=implement step 8 | delta=steps 6-8 landed | remainder=captures + closure | blocker=no blocker | efficiency=unit=step-a elapsed=120000ms(measured) | note=not rendered within the entry bound: tokens, invocations | carrier=console
+
+=== 6. absent store: digest over an empty workspace renders 'no measurements', entry set unchanged ===
+$ /usr/local/bin/python3 /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py --action digest --workspace /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/087-part8/absent-ws
+exit=0
+generated_at=2026-11-06T12:17:01.864630Z cap=20 stale_bound=15m00s profile=interactive
+line_id=t075-empty run_id=r-fix state=running stage=implement age=3h17m stale=yes active=no note=last activity 3h17m ago, beyond the 15m00s stale bound
+store=no measurements
+

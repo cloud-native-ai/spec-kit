@@ -80,6 +80,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | speckit-checklist-wrapup | command-wrapup | /speckit.checklist | wrap-up |
 | speckit-clarify-wrapup | command-wrapup | /speckit.clarify | wrap-up |
 | speckit-derive-wrapup | command-wrapup | /speckit.derive | wrap-up |
+| speckit-measure-wrapup | command-wrapup | /speckit.measure | wrap-up |
 | speckit-docs-wrapup | command-wrapup | /speckit.docs | wrap-up |
 | speckit-goal-wrapup | command-wrapup | /speckit.goal | wrap-up |
 | speckit-history-wrapup | command-wrapup | /speckit.history | wrap-up |
