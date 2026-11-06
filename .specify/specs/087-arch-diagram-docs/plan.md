@@ -252,7 +252,7 @@ tests/
 tests/contract/test_expression_compatibility.py   # + ALLOWED_POST_BASELINE_CHANGES 一条（仅 improve-docs）
 ```
 
-**Structure Decision**: 本特性落在**既有文档技能引擎 + 既有命令模板**之内，是一个「加动作 + 加文本 + 加夹具」的改动，**不新建任何顶层目录、不新建技能、不新建命令**。形态因此不是上面任何一个通用模板（single/web/mobile/library/monorepo），而是本仓惯用的「框架源 + 镜像运行时」双层：4 个源文件（`create-docs/SKILL.md`、`docs-utils.py`、`improve-docs/SKILL.md`、`templates/commands/docs.md`）+ 1 个既有文档（`docs/concepts/documentation-model.md`）承载全部行为改动，其余全是生成副本或测试。`skills/external/draw-diagram/**` 在交付树里**故意缺席**：它只被引用、一行不改（T-004），缺席就是「不交付」的登记。
+**Structure Decision**: 本特性落在**既有文档技能引擎 + 既有命令模板**之内，是一个「加动作 + 加文本 + 加夹具」的改动，**不新建任何顶层目录、不新建技能、不新建命令**。形态因此不是上面任何一个通用模板（single/web/mobile/library/monorepo），而是本仓惯用的「框架源 + 镜像运行时」双层：4 个源文件（`create-docs/SKILL.md`、`docs-utils.py`、`improve-docs/SKILL.md`、`templates/commands/docs.md`）+ 1 个既有文档（`docs/concepts/documentation-model.md`）承载全部行为改动，其余全是生成副本或测试。`skills/external/draw-diagram/**` 在交付树里**故意缺席**：它只被引用、一行不改（T-004），缺席就是「不交付」的登记。上面那段结构清单**只登记改动落点，不登记镜像副本**——每个被改文件的镜像与生成副本、以及各自的验证命令，逐行登记在紧接的下表 § Mirror Obligations，此处按单一定义点不复述。
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 

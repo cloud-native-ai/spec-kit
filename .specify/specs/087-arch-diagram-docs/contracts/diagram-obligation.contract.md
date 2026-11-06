@@ -15,6 +15,13 @@ restates **no** value, threshold or enumeration.
 contract and refusal semantics stay with `skills/external/draw-diagram/` (FR-011/FR-012 cite it).
 This contract owns only what the spec's RS-006 designates as plan-frozen.
 
+**Notation（记号别名，与 `flow-obligations.contract.md` 头部同一条读法）**：本文件的条款代码是 `C-nnn`
+（`## C-001` … `## C-016`）。`flow-obligations.contract.md` 用 `[D-nnn]` 引用本文件，`[D-nnn]` 即本文件的
+`C-nnn`（`[D-013]` = 本文件 `C-013`）。**这个 `[D-nnn]` 与 `.specify/memory/register.md` 的残差记录 ID
+`D-001` / `D-001-a` 是两套不同的命名空间**：带方括号的是契约条款，不带方括号的是登记册里的残差记录。
+本特性唯一需要辨析的一处：`plan.md` § Residual Risk 的 `D-001`（图文语义面未覆盖）与 `[D-001]`
+（= 本文件 `C-001` 的命令面）互不相干。
+
 ---
 
 ## C-001 — Command surface

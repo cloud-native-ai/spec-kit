@@ -24,6 +24,14 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
 契约前缀，避免与本文件的 `C-nnn` 撞号；本文件自身条款仍写 `C-nnn`）。三处最常被引用的落点：
 `[D-005]` = 该文件的封闭 `reason` 集；`[D-010]` = 追溯记录 schema；`[D-013]` = payload 形态与 `converged` / `clean` 两个谓词的定义点。
 
+> **notation alias（记号别名，读法一次说清）**：本文件的 `[D-nnn]` 是**契约条款代码**——
+> `[D-013]` 读作 `diagram-obligation.contract.md` 的 `C-013`，`[D-001]` 读作该文件的 `C-001`。
+> 它**不是** `.specify/memory/register.md` 的残差记录 ID：同名记号 `D-001` / `D-001-a` 在那本登记册里
+> 是「本特性显式未覆盖的语义面」的记录号（`plan.md` § Residual Risk 的 `D-001`），与契约条款是**两个
+> 不同的命名空间**。两种记号在本特性的工件里并存，判据只有一条：带方括号的 `[D-nnn]` 是契约条款，
+> 不带方括号的 `D-nnn` 是残差记录。实现者若把 `[D-001]` 读成 register 的 `D-001`，会把「`C-001` 的命令面」
+> 误解成「一条未覆盖的残差」，两者的处置方向相反。
+
 ---
 
 ## A. 义务内容（两个流程的共同面）

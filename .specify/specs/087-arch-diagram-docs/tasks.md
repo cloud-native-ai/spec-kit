@@ -1,0 +1,321 @@
+# Tasks: 087 架构图为核心的文档空间（Architecture-Diagram-Centric Documentation Space）
+
+**Requirement ID**: 087
+**Requirement Key**: 087-arch-diagram-docs
+**Related Feature**: 087 架构图为核心的文档空间（Architecture-Diagram-Centric Documentation Space）
+**Input**: Design documents from `.specify/specs/087-arch-diagram-docs/`
+**Prerequisites**: plan.md (required), requirements.md (required for user stories), research.md, data-model.md, contracts/, quickstart.md, feature-ref.md
+
+**Tests Mode**: ON (Constitution Principle IV "Test-First & Contract-Driven Implementation" carries `MUST` clauses — "Write or update tests BEFORE implementing new behavior (Red-Green-Refactor)", "Acceptance scenarios from specifications become automated tests"; the plan's Constitution Check row IV is `✅ Pass` with contracts landed first). The Principle VII "Template-only features" gate is **NOT** cited as the driver: this feature ships executable runtime code (`skills/external/create-docs/scripts/docs-utils.py --action obligation`), so it is not a template-only feature — its tests run against real Python, not only against artifact text. Both layers therefore apply: the engine's unit/integration tests are red-first, and the doc-feature half (skill text, command template, reader projection) is pinned by structural contract tests.
+
+**Tests**: mandatory. Red-first order inside every story; the one documented exception is the migration-shaped guard refresh, whose rows carry `[blockedBy:]` on the implementation row that changes the guarded bytes (see Phase 5).
+
+**Organization**: Tasks are grouped by user story so each story is independently implementable and testable. Within each doc-feature story the order is the doc-feature taxonomy from `.specify/skills/internal/create-tasks/references/phase-shapes.md` — author-section → mirror-parity → render-verify → refresh-verify — with the test rows first.
+
+**Task count**: 76 rows (T001–T076, contiguous, no gaps). No row runs a full test suite: baseline and closure slots are the driver's, per `plan.md` § Test Plan D and `skills/external/sdd-loop-driver/references/efficiency-model.md` § 2.
+
+## Definition of Done (DoD)
+
+- DoD-1: `python3 .specify/scripts/python/validate-tasks.py .specify/specs/087-arch-diagram-docs/tasks.md` exits 0 and every WARN is adjudicated in the run report
+- DoD-2: `skills/external/create-docs/scripts/docs-utils.py --action obligation` exists, is read-only, deterministic and idempotent, and every `C-004` / `C-005` value is reachable by a fixture
+- DoD-3: `tests/unit/test_docs_utils_obligation.py`, `tests/integration/test_docs_obligation_scenarios.py` and the appended rows of `tests/integration/test_docs_command_scenarios.py` pass, and every `plan.md` § Test Plan A/B row has a green assertion
+- DoD-4: `tests/fixtures/docs-obligation/` carries all 11 fixture spaces named by `data-model.md` E6, and the repository copy of each is the pre-deletion green state
+- DoD-5: The five named guard files show **no new failures** against `plan.md` § Residual Risk's recorded baseline (17 known-red in `tests/contract`, all pre-existing)
+- DoD-6: `sync-mirrors.py --check` and `regen-command-copies.py --check` show no new drift relative to the recorded baseline, run with an interpreter that can `import typer`
+- DoD-7: `docs/concepts/documentation-model.md` gained its reader projection and stays inside the directory-governance area map; no new top-level document-type directory exists
+- DoD-8: `skills/external/draw-diagram/**` is byte-identical (zero changes); no drawing engine, renderer, engine-selection table or second delivery contract was introduced
+- DoD-9: Every `final`-path success criterion (SC-001…SC-006) has a `pass` status backed by a named fixture assertion, and SC-007…SC-010 are recorded with their measurement source
+- DoD-10: `tasks.md` reports zero `[ ]` and zero `[>]` rows on completion; any `[~]` carries `<!-- deferred: reason -->`
+
+**DoD Status**: pending
+
+## Completion Gate
+
+- GATE-1: No NEW test failures vs the recorded baseline — check: `python3 -m pytest <the changed test files> -q` then compare the failure name set against `plan.md` § Residual Risk; a new name is a failure, a shrinking set is not
+- GATE-2: Every `plan.md` § Mirror Obligations row verified byte-identical — check: `python3 scripts/python/sync-mirrors.py --check` and `python3 scripts/python/regen-command-copies.py --check`, both with an interpreter that can `import typer`
+- GATE-3: No `[ ]` or `[>]` task rows remain — check: `grep -cE '^- \[[ >]\]' .specify/specs/087-arch-diagram-docs/tasks.md` returns 0
+- GATE-4: Every `final`-path success criterion is `pass` **and** the feature's smoke record is present — check: in `verification.md`, every criterion whose `**Path**` marker reads `final` has `SC-NNN_status=pass`, and `smoke_command=`, `smoke_exit_code=0` and `smoke_evidence_path=` (a path that exists and is non-empty) are all present; a `final` criterion in `blocked` / `deferred` / `fail` fails this gate unless an explicit user waiver names it (condition set owner: `shared/workflow/acceptance-hardening.md` § Gates — this row carries the check, not a second schema)
+- GATE-5: The drawing capability was reached, never duplicated — check: `grep -rn "draw-diagram" skills/external/create-docs skills/external/improve-docs templates/commands/docs.md` finds references only, and `git diff --name-only<BASE> -- skills/external/draw-diagram/` is empty
+- GATE-6: The repository's own `docs/` content is untouched — check: `git diff --name-only<BASE> -- docs/` is empty
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: can run in parallel — different write targets, no dependency on an incomplete row in the same phase
+- **[Story]**: the user story the row belongs to (`[US1]`…`[US5]`); Setup / Foundational / Polish rows carry none
+- **[blockedBy: T027,T029]**: the row MUST NOT start until every listed row is `[X]`; the tag always names concrete row ids, never a placeholder
+- **[green: <contract>#<clause>]**: this row is the one that turns that contract clause green; each clause is claimed exactly once across the file, and within one contract the clause ordinals run forward with the rows
+
+## Path Conventions
+
+Single project at the repository root: `skills/` and `templates/` (framework source), `skills/external/create-docs/scripts/` (the docs engine), `tests/{unit,integration,contract,fixtures}/`, `docs/` (this project's own documentation site source). `${SKILL_HOME}` in a task description means the skill's own directory (`skills/external/create-docs` for the docs engine).
+
+## Phase 1: Setup (Shared Infrastructure)
+
+**Purpose**: workspace prerequisites every later phase depends on — evidence landing points, the red-first note, and the frozen pre-change measurements. No product code yet.
+
+- [ ] T001 FR-022 Create the evidence landing points for this feature — `mkdir -p .specify/specs/087-arch-diagram-docs/notes/` and confirm `.specify/specs/087-arch-diagram-docs/test-evidence/` exists — so Phase 2 rows have a written destination instead of inventing one per run; record the two absolute paths in `.specify/specs/087-arch-diagram-docs/notes/red-first-evidence.md` as its header
+- [ ] T002 FR-014 [P] Capture the pre-change baseline readings into `.specify/specs/087-arch-diagram-docs/notes/pre-change-measurements.md`, each with its command, its real output and the capture date, for the four premises later rows diff against — reason these four and no others: (a) `python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root . --json` → `invalid choice: 'obligation'` + exit 2 (measured at generation: the `choices` list at `skills/external/create-docs/scripts/docs-utils.py:398` is `scan/expire/clean/archive-check/stats/validate/fix-links/audit`, and the string `obligation` appears **0** times in that file); (b) the carrier population from the `quickstart.md` S2 re-derivation (measured now, not copied: `concepts/ 12 · tutorials/ 2 · tasks/ 1 · reference/ 64 · decisions/ 5 · contribute/ 1`, `ARCHITECTURE.md False ⇒ carriers 85` — the naive one-level `glob('*.md')` instead of `rglob` yields **6** for `reference/` and is the documented trap); (c) `ls -d docs/.speckit` → absent (measured), so `docs/.speckit/runs/` and `docs/.speckit/exemptions/` are both new; (d) `find docs -type d -name diagrams | wc -l` → `0` and `ls docs/assets` → `quickstart-workflow.{png,puml,svg}` (measured), so T-005's single landing has a live precedent and no second landing exists
+- [ ] T003 FR-019 Record the guard baseline that T065 and T066 diff against, in `.specify/specs/087-arch-diagram-docs/notes/pre-change-measurements.md` under its own heading — the exact invocation, the exit code and the failure **name set** (not a count) for `tests/contract/test_expression_compatibility.py`, `tests/contract/test_expression_gate_wiring.py`, `tests/contract/test_docs_command_template.py`, `tests/contract/test_confirmation_gates_sweep.py` and `tests/contract/test_directory_governance.py`, plus both mirror `--check` commands, all run with an interpreter that can `import typer` (a bare `python3` that cannot import `typer` reports a false red — record that as the known trap, never as drift)
+- [ ] T004 FR-016 [P] Freeze this feature's coverage baseline with `python3 scripts/python/account-clause-coverage.py .specify/specs/087-arch-diagram-docs --freeze > .specify/specs/087-arch-diagram-docs/coverage-baseline.txt` — the feature carries a contract set of 16 + 23 clauses, so it MUST NOT skip this row with a fabricated empty baseline; paste the freezer's own summary line into `.specify/specs/087-arch-diagram-docs/test-evidence/` as the pointer
+
+**Checkpoint**: Four evidence files exist and each holds a measured, dated reading — later rows consume them instead of re-deriving.
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: the engine action, its fixture spaces and the red-first baseline that every story consumes. Nothing here belongs to one story: US1/US2/US3 call the action, US4 audits what it produces, US5 reads its verdict.
+
+**⚠️ CRITICAL**: no user-story phase can start until this phase is complete — US2, US3, US4 and US5 all read the verdict vocabulary this phase makes real, and US1's completeness claim is decided by it.
+
+**Clause-partition note**: the `[green:]` claims below are the rows that *implement* each contract clause, and each clause is claimed exactly once — `refuses-writes-and-pins` and `option-set-closed` are pure tests over an engine that does not yet answer, so they claim no clause and are stated as assertions only.
+
+- [ ] T005 FR-015 [P] Build the eleven fixture spaces under `tests/fixtures/docs-obligation/`, one directory each exactly as `data-model.md` E6 lists them — `clean/`, `no-diagram/`, `deleted-rendered/`, `orphan-rendered/`, `orphan-source/`, `stale-source/`, `no-trace/`, `trace-incomplete/`, `exempt-ok/`, `exempt-bad/`, `exempt-superseded/` — each a complete miniature documentation space (root `README.md`, the six typed `docs/<type>/` directories, `docs/assets/`, `docs/.speckit/`); every space is the **pre-deletion green state** so the repository copy is never mutated by a test
+- [ ] T006 FR-015 [P] Add the fixture build step to `tests/fixtures/docs-obligation/conftest.py`: a `copy_fixture(name, tmp_path)` helper that `shutil.copytree`s the named space into `tmp_path` (the same shape `tests/integration/test_docs_command_scenarios.py` already uses for `make_skeleton`), so every writing or deleting test case operates on a copy
+- [ ] T007 FR-014 Write the `os.utime` build step in `tests/fixtures/docs-obligation/conftest.py` [blockedBy: T005,T006] that makes `stale-source/`'s source strictly newer than its earliest rendered face (rendered mtime + 60s) — mtime is a explicit fixture fact, never a `git checkout` ordering artifact; assert the inequality right after setting it so a filesystem that silently refuses `utime` fails here instead of making the fixture change colour per machine
+- [ ] T008 FR-014 Author `tests/unit/test_docs_utils_obligation.py` red-first — the command-surface assertions for the `option-set-closed` and `refuses-writes-and-pins` obligations: `U::test_c001_action_registered` (`obligation` is in the parser's `choices`), `U::test_c001_option_set_closed` (`--root` / `--record` / `--only` / `--json` accepted; a fifth contract-external switch rejected with exit 2), `U::test_c001_before_implementation_exit2` (the recorded S1 row, kept as the pre-state reading for the front-loaded gate) — and confirm every one of them fails against the current engine before T013 lands [blockedBy: T002]
+- [ ] T009 FR-003 [P] Author `tests/unit/test_docs_utils_carriers.py` — the `carrier-set-closed` assertion `U::test_carriers_typed_dirs_recursive` (the six typed `docs/` directories read recursively, so `reference/` yields its nested files and not the naive one-level 6 the T002 trap records) — a separate file precisely because it writes a different path from T008's [blockedBy: T005]
+- [ ] T010 FR-015 [P] Author `tests/integration/test_docs_obligation_scenarios.py` with the read-only / determinism / idempotence assertions over the fixture copies — `I::test_c002_two_runs_identical_json` (two runs byte-compared plus an empty `git status --porcelain` on the fixture), `I::test_c002_no_writes_on_dirty_fixture` — and record the red-first evidence for T008–T010 in `.specify/specs/087-arch-diagram-docs/notes/red-first-evidence.md` as command + real output + exit status [blockedBy: T006]
+- [ ] T011 FR-014 Add the ordered-precedence assertions to `tests/unit/test_docs_utils_obligation.py` — `U::test_c016_precedence_order` (a fixture where several tiers hold at once resolves to the earliest one: `deleted-rendered/` MUST land `reference-unresolved`, never `orphan-*`), `U::test_c016_no_backtracking` (a hit is not overwritten by a later tier), `U::test_c016_no_second_precedence_owner` (no second independent `verdict =` decision tree in the engine) [blockedBy: T008]
+- [ ] T012 FR-016 Add the payload-shape assertions to `tests/unit/test_docs_utils_obligation.py` — `U::test_c006_payload_schema` (top-level keys and the four `documents[]` fields), `U::test_c006_field_order_stable` (key order stable across two runs of one input) [blockedBy: T011]
+- [ ] T013 FR-014 Implement `--action obligation` in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-001] : add `obligation` to the `choices` list at line 398, accept `--record` / `--only` / `--json` (the last being the engine's existing output form, a no-op readability switch), route to a read-only `cmd_obligation(root, record, only)` helper, and emit one JSON object carrying `action` / `root` / `record` / `carriers` / `documents[]` / `summary`; the carrier walk reads `<root>/docs/{concepts,tutorials,tasks,reference,decisions,contribute}/**/*.md` recursively plus `<root>/docs/ARCHITECTURE.md` when it exists, and MUST exclude `docs/notes/`, `docs/archive/`, `docs/.speckit/` and the site tooling directories — non-carriers are invisible, never "passing" [blockedBy: T008,T009]
+- [ ] T014 FR-015 Implement the read-only / deterministic posture in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-002] : the judgement is a pure function of `--root` + `--record` + `--only`, it opens no file for writing, creates no directory, touches no mtime, and makes no network or engine call — two runs on the same inputs are byte-identical [blockedBy: T010,T013]
+- [ ] T015 FR-003 Implement the carrier walk in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-003] as the single carrier definition point: the six typed `docs/` directories read recursively plus root `docs/ARCHITECTURE.md`; `docs/notes/`, `docs/archive/`, `docs/.speckit/` and site tooling are never carriers; the count is reported as `summary.carriers` and a non-carrier is invisible rather than silently satisfied [blockedBy: T013]
+- [ ] T016 FR-016 Implement the closed verdict set in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-004] — exactly five values (`satisfied`, `missing`, `stale`, `recorded-exemption`, `not-evaluated`), one per carrier document, with `not-evaluated` forcing `converged` **and** `clean` false; a sixth value anywhere is a contract violation [blockedBy: T013]
+- [ ] T017 FR-016 Implement the verdict↔reason closed table in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-005] , including the two face values that MUST NOT be swapped — source present with rendered face missing ⇒ `orphan-rendered`; rendered face present with source missing ⇒ `orphan-source` — and give every `documents[]` entry its `path` (POSIX, relative to `--root`) and its `line` (`0` when there is no reference) [blockedBy: T016]
+- [ ] T018 FR-016 Implement the payload shape in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-006] — the top-level keys `action` / `root` / `record` / `carriers` / `documents[]` / `summary`, the four `documents[]` fields `path` / `line` / `verdict` / `reason`, and a stable key order so two runs of one input serialise identically [blockedBy: T012,T016]
+- [ ] T019 FR-009 Implement the five-way conjunction for `satisfied` in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-007] — a relative in-document link, resolving to a file, that file being the same-named `rendered[].path` of a `--record` entry, both faces on disk, the record complete per `C-010`, and neither `C-008` nor `C-009` rule holding; a missing record falls through to `not-evaluated`, never to `satisfied` [blockedBy: T017]
+- [ ] T020 FR-014 Implement the `stale` first half in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-008] , gated on both faces being on disk — rule 1 `os.stat(source).st_mtime > os.stat(rendered).st_mtime` (strictly greater, earliest rendered face compared, first hit wins) ⇒ `source-newer-than-render`; rule 2 diff between the record's `sha256` and the on-disk hash of the rendered face ⇒ `render-digest-mismatch`, and rule 2 is `not-applicable` when the record carries no `sha256` [blockedBy: T019]
+- [ ] T021 FR-014 Implement the `stale` second half **as the frozen partial** in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-009] — rule 1 a renamed or moved rendered artifact left referenced ⇒ `missing` / `reference-unresolved` (not `stale`), rule 2 a resolving reference whose target no `--record` entry names ⇒ `not-evaluated` / `trace-incomplete`; the semantic half (labels or relations contradicting the prose) MUST produce **no verdict at all** and MUST be reported by the producing run's report as `D-001` unconverged, never as `stale` and never as satisfied [blockedBy: T020]
+- [ ] T022 FR-013 Implement traceability-record reading in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-010] — read only the file `--record` names (never glob `docs/.speckit/runs/`, never guess the newest), parse `run_id` / `feature` / `diagrams[]`, require `document` / `engine` / `engine_reason` / `ldm_summary` / `delivery.accepted` / `source` / `rendered[].path`, treat a missing `rendered[].sha256` as "rule 2 not applicable", and resolve every record path relative to `--root` [blockedBy: T019]
+- [ ] T023 FR-004 Implement exemption-record reading in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-011] — read `<root>/docs/.speckit/exemptions/<relative doc path>.md`, accept the closed three-value `reason`, validate `document` matches the exempted document, `justification` non-empty and at least 8 characters, `recorded_at` a `YYYY-MM-DD` date; an invalid record ⇒ `not-evaluated` / `exemption-invalid`, and a still-valid record whose document already carries a resolving reference ⇒ the same verdict plus `summary.exemption_superseded` [blockedBy: T022]
+- [ ] T024 FR-016 Implement the four-and-only-four `not-evaluated` conditions in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-012] — `no-trace-record`, `trace-incomplete`, `exemption-invalid`, `render-unreadable` (an `OSError` normalized) — and state in the module docstring that engine unavailability is deliberately **not** one of them because the checker calls no engine at all [blockedBy: T023]
+- [ ] T025 FR-016 Implement the two predicates and the payload counts in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-013] — `judged_scope_has_carrier`, `summary.converged` (the conjunction, exemptions not in the arithmetic) and the stricter `summary.clean` (`converged && exempted == 0`), all five counts plus `exemption_superseded`, `documents[]` sorted by `path`, and the empty-scope cases (default scope with zero carriers ⇒ both false; `--only` narrowed to zero objects ⇒ both true with the annotation) [blockedBy: T024]
+- [ ] T026 FR-014 Implement the exit-code contract in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-015] — `0` means "judged, clean or not" and `2` means "input error" (`--root` absent, `--record` unreadable, unknown option); a non-zero code for a merely dirty space is the defect this clause forbids [blockedBy: T025]
+- [ ] T027 FR-014 Implement the nine-tier ordered single pass in `skills/external/create-docs/scripts/docs-utils.py` [green: contracts/diagram-obligation.contract.md#C-016] — the tiers judged in order, first hit wins, no backtracking, no second overwrite, and only one code path that assigns a `verdict`; the exemption tiers sit before everything, reference resolution before face loss, face loss before `stale`, `stale` before `satisfied` [blockedBy: T026]
+- [ ] T028 FR-020 Pin the existing guards this feature must leave intact, in `tests/unit/test_docs_obligation_reuse.py` (the inventory half of `C-014`; the clause row itself is T034) — one assertion per guard row of `C-014`, each quoting the literal it pins: `tests/contract/test_expression_gate_wiring.py` A1/A3/A5 (the W1 wiring section, `create-docs`'s R6 text, the forbidden category words), `tests/contract/test_docs_command_template.py` C3/C4a (`templates/commands/docs.md`'s top-level section sequence and the `improve-docs` pointer), `tests/contract/test_confirmation_gates_sweep.py` KEEP_LIST (`templates/commands/docs.md` still contains `stop-and-confirm`), `tests/contract/test_directory_governance.py` (`docs/concepts/documentation-model.md` still listed in the area map), and `tests/contract/test_expression_compatibility.py` (`docs-utils.py` is not a wiring file); read-only citations — this row writes no guard file [blockedBy: T027]
+- [ ] T029 FR-015 Extend `tests/unit/test_docs_utils_obligation.py` with the remaining assertions that T014–T027 must satisfy — `U::test_c002_two_runs_identical_payload`, `U::test_c002_open_for_write_never_seen`, `U::test_c003_carrier_table`, `U::test_c003_non_carrier_not_judged`, `U::test_c004_verdict_domain_closed`, `U::test_c004_not_evaluated_breaks_clean`, `U::test_c005_reason_pairs_closed`, `U::test_c005_faces_not_swapped`, `U::test_c005_every_entry_named`, `U::test_c006_field_set_and_order`, `U::test_c007_satisfied_requires_all_five`, `U::test_c007_no_record_not_satisfied`, `U::test_c008_source_newer`, `U::test_c008_render_digest_mismatch`, `U::test_c008_requires_both_faces`, `U::test_c009_landing_is_docs_assets`, `U::test_c009_no_second_landing`, `U::test_c010_record_schema`, `U::test_c010_relative_to_root`, `U::test_c013_clean_is_strict`, `U::test_c013_empty_scope_not_converged`, `U::test_c013_converged_ignores_exemptions`, `U::test_c013_only_empty_scope`, `U::test_c013_documents_field_set`, `U::test_c015_exit_codes`, `U::test_c016_deleted_rendered_first` — names and red-when conditions per `plan.md` § Test Plan table A [blockedBy: T027]
+- [ ] T030 FR-004 Extend `tests/integration/test_docs_obligation_scenarios.py` with the fixture-driven verdict scenarios — `I::test_c011_exempt_ok`, `I::test_c011_exempt_bad`, `I::test_c011_superseded`, `I::test_c012_no_record_not_evaluated`, `I::test_c012_two_faces_resolving_but_unrecorded` — running the engine against `tmp_path` copies of `exempt-ok/`, `exempt-bad/`, `exempt-superseded/` and `no-trace/` [blockedBy: T007,T029]
+**Checkpoint**: the engine action judges every fixture to its recorded tier, and the red-first note proves each assertion was red before the implementation landed.
+
+---
+
+## Phase 3: User Story 4 - Every produced diagram is traceable to the drawing capability (Priority: P2) 🎯 MVP part 1
+
+**Goal**: any diagram the documentation flows produce is traceable to `draw-diagram`'s semantic model plus its delivery-contract acceptance, and the framework keeps exactly one drawing capability.
+
+**Independent Test**: read the run record of a document produced by US1 and confirm it names the selected engine layer and why, carries the semantic-model summary and records the delivery-contract acceptance result — while a repository search finds no drawing engine, renderer or engine-selection table introduced by this feature.
+
+> This story precedes US1/US2/US3 in row order because it is the constraint on *how* they are satisfied: the traceability record is what the checker later reads, and the flow text must cite the capability by reference rather than restate it. Delivering it first means no later story can be satisfied by an improvised second drawing path.
+
+### Tests for User Story 4 (MANDATORY) ⚠️
+
+- [ ] T031 FR-011 [P] [US4] Author the single-capability guard (`SC-005`) `tests/unit/test_docs_obligation_reuse.py` red-first — `test_sc005_no_second_engine`: search `templates/`, `skills/`, `shared/` and `scripts/` for a drawing engine name, a renderer entry point or an engine-selection table introduced by this feature, and assert the hit set is empty; `test_sc005_surfaces_reach_by_reference`: every diagram-producing surface names `skills/external/draw-diagram` and restates none of its routing-matrix rows, delivery-contract clauses or `ldm_summary` schema [blockedBy: T002]
+- [ ] T032 FR-013 [US4] Author the traceability-record guard (`SC-007`) in `tests/unit/test_docs_obligation_reuse.py` — `test_record_carries_the_four_faces`: a produced diagram's record entry carries `engine`, `engine_reason`, `ldm_summary` and `delivery.accepted`; a record missing any one of them makes the diagram `not-evaluated` / `trace-incomplete` rather than satisfied; `test_engine_sticky_on_update`: re-rendering an existing diagram reuses the engine the record already names and never re-routes it [blockedBy: T031]
+
+### Implementation for User Story 4
+
+- [ ] T033 FR-011 [US4] Confirm and record the zero-change boundary for `skills/external/draw-diagram/**` — run `git diff --name-only<BASE> -- skills/external/draw-diagram/` and paste the empty output plus the command line into `.specify/specs/087-arch-diagram-docs/notes/pre-change-measurements.md`; this row writes no source file, it establishes the fact the rest of the feature relies on
+- [ ] T034 FR-020 [US4] Record in `tests/unit/test_docs_obligation_reuse.py` the five named guard files this feature must not weaken, each with the literal it pins, and assert that no row of this feature edits a guard's assertion set — the guard files are `tests/contract/test_expression_gate_wiring.py`, `tests/contract/test_docs_command_template.py`, `tests/contract/test_confirmation_gates_sweep.py`, `tests/contract/test_directory_governance.py` and `tests/contract/test_expression_compatibility.py` (read-only citations, no writes) [blockedBy: T033]
+
+**Checkpoint**: US4 is independently satisfied — a reader can trace any produced diagram to the one declared capability, and the repository proves no second engine exists.
+
+---
+
+## Phase 4: User Story 2 - The documentation structure baseline itself is diagram-centric (Priority: P1) 🎯 MVP part 2
+
+**Goal**: the desired-state baseline `create-docs` reconciles toward makes "has an accompanying diagram" part of a compliant document, the single landing for diagram material gets its own registered subsection, and a reconcile can actually converge the diagram dimension to zero findings.
+
+**Independent Test**: run a full `/speckit.docs` reconcile over a fixture space whose documents are all compliant with today's baseline; the reconcile's dry-run plan and residual report classify the missing diagrams as findings against the amended baseline, and a second run after convergence reports zero diagram findings with no cosmetic churn.
+
+### Tests for User Story 2 (MANDATORY) ⚠️
+
+- [ ] T035 FR-001 [P] [US2] Author the baseline-text assertions in `tests/integration/test_docs_command_scenarios.py` (appending cases; the file exists) — `F::test_c001_obligation_artifact_listed`, `F::test_c002_assets_subsection_present` (a `#### Assets` subsection inside § Desired-State Baseline naming `docs/assets/`; this one is **necessarily red** until T045 lands, which is exactly its use as an "undelivered ⇒ red" criterion), `F::test_c003_r2_scope_names_obligation`, `F::test_c004_r3_includes_verdicts`, `F::test_c005_r4_dry_run_has_produce_rows`, `F::test_c006_r6_residual_four_counts`, `F::test_c007_baseline_single_owner`, `F::test_c009_single_landing_named` [blockedBy: T002]
+- [ ] T036 FR-002 [US2] Author the convergence-loop scenarios in `tests/integration/test_docs_obligation_scenarios.py` — `I::test_c008a_second_reconcile_zero_findings` (first pass reports each missing document, the produce step writes the two faces plus the record, the second pass reports `converged=true` under `C-013`'s predicate, and `git status` on the copy stays empty) and `I::test_c008a_exemption_does_not_block_convergence` (`exempted=1` with the other three counts zero ⇒ `converged=true` and `clean=false` — a lawful terminal state, not a contradiction) [blockedBy: T007]
+
+### Implementation for User Story 2
+
+- [ ] T037 FR-001 [US2] [green: contracts/flow-obligations.contract.md#C-001] Append the diagram-obligation clause to § Desired-State Baseline of `skills/external/create-docs/SKILL.md` as a fifth numbered baseline item, written as one self-contained clause with three parts — carrier set, obligation, named exemption — citing `contracts/diagram-obligation.contract.md` for the carrier table rather than re-listing it, and restating none of the checker's verdict words [blockedBy: T036]
+- [ ] T038 FR-002 [US2] [green: contracts/flow-obligations.contract.md#C-002] Create the `#### Assets` subsection **inside** § Desired-State Baseline of `skills/external/create-docs/SKILL.md` — it registers `<root>/docs/assets/<slug>.<ext>` as the single landing for both faces of a diagram, states that a document reaches it by a resolvable relative reference, and states that a second landing (a `diagrams/` subtree) does not exist; after this row it is the owner of the `assets/` area convention, and before it that fact lived only in the flow contract [blockedBy: T037]
+- [ ] T039 FR-001 [US2] [green: contracts/flow-obligations.contract.md#C-003] Amend R2 of § Reconcile Loop in `skills/external/create-docs/SKILL.md` so the desired-state scope names the diagram dimension of every document in scope [blockedBy: T038]
+- [ ] T040 FR-001 [US2] [green: contracts/flow-obligations.contract.md#C-004] Amend R3 of § Reconcile Loop in `skills/external/create-docs/SKILL.md` so the `--action obligation` verdicts enter the difference set at the same rank as `validate` violations, with `missing` / `stale` / `not-evaluated` all entering the plan [blockedBy: T039]
+- [ ] T041 FR-001 [US2] [green: contracts/flow-obligations.contract.md#C-005] Amend R4 of § Reconcile Loop in `skills/external/create-docs/SKILL.md` so each difference row produces exactly one produce/re-render entry in the dry-run plan — document path, planned diagram class, engine layer ("pending front-door routing" when unknown), landing `assets/` — and so that entry is a pure-write row that never joins the move/archive opt-out list [blockedBy: T040]
+- [ ] T042 FR-001 [US2] [green: contracts/flow-obligations.contract.md#C-006] Amend R6 of § Reconcile Loop in `skills/external/create-docs/SKILL.md` so the residual report carries the diagram dimension's counts, `converged`, `clean` and `exempted`; any non-zero `missing` / `stale` / `not-evaluated` blocks the convergence-complete conclusion; the `converged` predicate (not `clean`) is named as the convergence criterion so an exempted document can still converge; and `D-001`'s semantic face is named once as unconverged by this mechanism [blockedBy: T041]
+- [ ] T043 FR-017 [US2] [green: contracts/flow-obligations.contract.md#C-008] Amend § Reconcile Loop's R5 convergence step in `skills/external/create-docs/SKILL.md` so it calls the `draw-diagram` front door to produce both faces, the document's relative reference and the traceability record **in the same run**; producing and re-rendering happen here, under the existing safe-local-writes tier, not by delegating to the authoring flow; `not-evaluated` is not skipped and `exempt-*` documents are not residual [blockedBy: T042]
+- [ ] T044 FR-001 [US2] Verify US2 (`SC-003`)'s baseline and reconcile wiring end to end — run `pytest tests/integration/test_docs_obligation_scenarios.py -q -k "c008a"` and `pytest tests/integration/test_docs_command_scenarios.py -q`, and confirm `git diff --name-only<BASE> -- docs/` is still empty (the reconcile was exercised on copies, never on this repository's own `docs/`) [blockedBy: T043,T038]
+
+**Checkpoint**: a fixture space compliant with the old baseline now reports diagram findings, and a second reconcile after the produce step reports zero; the amendment lives in exactly one place.
+
+---
+
+## Phase 5: User Story 1 - A newly authored document arrives with its architecture diagram (Priority: P1) 🎯 MVP part 3
+
+**Goal**: a writing commission produces the document **and** the diagram that explains the structure it describes; the run does not report itself complete when either face is missing, and a document with nothing to draw carries a visible named exemption instead of a silent omission.
+
+**Independent Test**: in a fixture space, commission one new concept document; observe the document, a diagram source, the rendered artifact the delivery contract requires, and a resolving relative reference — and that removing either face before the verification step turns the run's own verdict red with the missing face named.
+
+### Tests for User Story 1 (MANDATORY) ⚠️
+
+- [ ] T045 FR-005 [P] [US1] Author the authoring-flow assertions in `tests/integration/test_docs_command_scenarios.py` — `F::test_c010_authoring_flow_produces` (R5 names the produce step), `F::test_c015_authoring_r2` (R2 plans each new document's diagram), `F::test_c016_authoring_r5_render` (R5 re-renders on update and never silently re-routes an existing diagram), `F::test_c017_authoring_r6` (R6 reports both faces separately) [blockedBy: T037]
+- [ ] T046 FR-023 [US1] Author the four-artifact (`SC-002`) and negative-face scenarios in `tests/integration/test_docs_obligation_scenarios.py` — `test_sc001_four_artifacts_present` (document, source, rendered face, resolving reference, plus the traceability record) and `test_sc002_removing_either_face_turns_red` with the two deletions each naming its own face (`orphan-rendered` vs `orphan-source`, never interchanged) [blockedBy: T045]
+- [ ] T047 FR-004 [US1] Author the exemption-visibility (`SC-008`) scenario in `tests/integration/test_docs_obligation_scenarios.py` — `test_sc008_exemption_visible_and_superseded`: a document with nothing to draw converges with a recorded, visible exemption (`recorded-exemption`, counted in `exempted`, not a pass), and an exemption whose justification no longer holds is reported rather than silently retained [blockedBy: T007]
+
+### Implementation for User Story 1
+
+- [ ] T048 FR-005 [US1] [green: contracts/flow-obligations.contract.md#C-010] Amend § Authoring Flow's R2 in `skills/external/create-docs/SKILL.md` so the expected state includes, for each new document, the planned diagram (diagram class intent, expected engine layer, landing for source and rendered faces) [blockedBy: T047]
+- [ ] T049 FR-006 [US1] [green: contracts/flow-obligations.contract.md#C-011] Amend `### 2. Gather evidence (deterministic sources first)` in `skills/external/improve-docs/SKILL.md` so the run reads the document's traceability record when one exists, as machine evidence of which diagram, which engine and which two faces the document already owns [blockedBy: T048]
+- [ ] T050 FR-006 [US1] [green: contracts/flow-obligations.contract.md#C-012] Append the **Diagram-sync** row to the classification table of `### 3. Classify the improvement` in `skills/external/improve-docs/SKILL.md` — the improvement touches a fact the diagram depicts (component name, relation, step order) and its verification consequence is "update the diagram in the same run, or raise a named staleness finding; exactly one of the two" [blockedBy: T049]
+- [ ] T051 FR-007 [US1] [green: contracts/flow-obligations.contract.md#C-013] Amend `### 4. Apply the minimal section-level edit` in `skills/external/improve-docs/SKILL.md` so a Diagram-sync hit updates the diagram under the flow obligations, while a miss states in place that no diagram work was needed and repeats that statement once in the report — never re-rendering to demonstrate activity [blockedBy: T050]
+- [ ] T052 FR-008 [US1] [green: contracts/flow-obligations.contract.md#C-014] Amend `### 5. Verify` in `skills/external/improve-docs/SKILL.md` so the document's `--action obligation --only <path>` verdict must be `satisfied` or a valid `recorded-exemption`, and `stale` / `missing` / `not-evaluated` block the improvement-complete conclusion [blockedBy: T051]
+- [ ] T053 FR-022 [US1] [green: contracts/flow-obligations.contract.md#C-015] Amend `### 6. Record and report` in `skills/external/improve-docs/SKILL.md` so the report carries the obligation reading, and so an inability to re-render raises a **named** staleness finding while leaving the diagram source untouched (never rolled back into a "looks consistent" shape) [blockedBy: T052]
+- [ ] T054 FR-010 [US1] [green: contracts/flow-obligations.contract.md#C-016] Amend § Authoring Flow's R5 in `skills/external/create-docs/SKILL.md` so the writing convergence step calls the `draw-diagram` front door for both faces, the document reference and the traceability record, and R6 runs `docs-utils.py --action obligation --record <this run's record>` alongside `validate` so the run cannot report convergence complete while a diagram verdict is unresolved [blockedBy: T053]
+- [ ] T055 FR-005 [US1] Verify US1 (`SC-001`)'s authoring flow end to end — run `pytest tests/integration/test_docs_obligation_scenarios.py -q -k "sc001 or sc002 or sc008"` and `pytest tests/integration/test_docs_command_scenarios.py -q -k "c010 or c015 or c016 or c017"`, then append the real command lines, exit codes and outputs to `.specify/specs/087-arch-diagram-docs/notes/quickstart-run.md` as the executed scenario record [blockedBy: T054,T049,T048]
+
+**Checkpoint**: US1 is independently satisfied — one commission yields all four artifacts plus the record, and deleting either diagram face turns the flow's own verdict red naming that face.
+
+---
+
+## Phase 6: User Story 3 - Content improvements keep the diagram in step with the prose (Priority: P1) 🎯 MVP part 4
+
+**Goal**: an improvement that changes a fact the document's diagram depicts updates that diagram in the same run, or reports a named staleness finding — a document and its picture cannot silently diverge.
+
+**Independent Test**: take a document with a converged diagram, edit prose so a depicted component's name changes, run the content-improvement flow; the run either updates the diagram source and re-renders, or reports a named staleness finding, and never reports completion with the two disagreeing and no finding raised.
+
+### Tests for User Story 3 (MANDATORY) ⚠️
+
+- [ ] T056 FR-018 [P] [US3] Author the improvement-flow contract assertions in `tests/integration/test_docs_command_scenarios.py` — `F::test_c011_improve_pointer`, `F::test_c012_improve_minimal_edit`, `F::test_c013_improve_verify_includes_obligation`, `F::test_c014_improve_report`, `F::test_c023_per_face_reasons_named` (the three face reasons are each named on the flow side and point at the single step registry) [blockedBy: T002]
+- [ ] T057 FR-006 [US3] Author the rename scenario (`SC-004`) in `tests/integration/test_docs_obligation_scenarios.py` — `test_sc004_rename_keeps_document_and_diagram_in_step`: after a depicted component is renamed, the pair is either updated together or carries a named staleness finding, and a byte-level before/after comparison of both the document and the diagram source is captured; a green run with the two disagreeing is the failure this row exists to catch [blockedBy: T007]
+
+### Implementation for User Story 3
+
+- [ ] T058 FR-018 [US3] [green: contracts/flow-obligations.contract.md#C-017] Record the reader projection decision in `skills/external/improve-docs/SKILL.md`'s own boundary text only where the classification row needs it — the diagram-sync row must not duplicate `create-docs`'s structural ownership, and the improve flow must not gain the power to move, rename or archive a document while updating its diagram [blockedBy: T057]
+- [ ] T059 FR-006 [US3] Verify US3 (`SC-004`) end to end — run `pytest tests/integration/test_docs_obligation_scenarios.py -q -k sc004` and `pytest tests/integration/test_docs_command_scenarios.py -q -k "c011 or c012 or c013 or c014 or c023"`, and append the rename fixture's before/after readings to `.specify/specs/087-arch-diagram-docs/notes/quickstart-run.md` [blockedBy: T058]
+
+**Checkpoint**: US3 is independently satisfied — a rename either propagates into the diagram in the same run or produces a named staleness finding, never a silent divergence.
+
+---
+
+## Phase 7: User Story 5 - A reviewer can tell, without reading every document, which ones are out of step (Priority: P2)
+
+**Goal**: a maintainer gets a mechanical answer to "which documents still lack a diagram, which diagrams no longer match their document, and which documents were exempted" — deterministic, re-runnable, and never vacuous.
+
+**Independent Test**: on a fixture space with a known set of missing and stale diagrams, run the check twice; observe identical verdicts both times, a stable finding set keyed by document, a clean space reporting an explicit clean verdict, and an un-evaluable document reported as not evaluated rather than as a pass.
+
+### Tests for User Story 5 (MANDATORY) ⚠️
+
+- [ ] T060 FR-015 [P] [US5] Author the determinism (`SC-006`), reachability and vocabulary scenarios in `tests/integration/test_docs_obligation_scenarios.py` — `test_sc006_two_runs_identical_and_keyed_by_path` (two runs byte-compared, each affected document reported by path with a reason from the closed vocabulary, a clean space reporting an explicit clean verdict, an un-evaluable document reported as not evaluated), `test_sc003_reconcile_reports_then_converges`, `test_sc009_confirm_tiers_and_zones_unchanged` (a copy containing a move/archive action still stops for confirmation and no diagram artifact is triaged as prose), `test_sc010_unrefreshed_runtime_degrades_visibly` (the obligation is reported as not evaluated, never as satisfied) [blockedBy: T007]
+- [ ] T061 FR-017 [US5] Author the reachability assertion in `tests/integration/test_docs_command_scenarios.py` — `F::test_c019_dispatch_pointer` and `F::test_c018_top_level_sequence_unchanged`: the two writing paths are both bound by the obligation, the command states the obligation only by pointing at the two skills, and the top-level chapter sequence is untouched [blockedBy: T037]
+
+### Implementation for User Story 5
+
+- [ ] T062 FR-017 [US5] [green: contracts/flow-obligations.contract.md#C-018] Add the obligation pointer to `### 分派(本命令保留的编排职责)` in `templates/commands/docs.md` — one sentence stating that both writing paths carry the diagram obligation and that its body lives in `create-docs` § Desired-State Baseline / § Authoring Flow and `improve-docs` § Workflow; the W1 category-reading subsection above it stays byte-identical, and no obligation clause text is restated in the command [blockedBy: T061]
+- [ ] T063 FR-017 [US5] [green: contracts/flow-obligations.contract.md#C-019] Extend that same dispatch section of `templates/commands/docs.md` so the residual report's grouping carries the diagram dimension's five counts under the existing skill-grouped headings, adding no sixth residual group name [blockedBy: T062]
+- [ ] T064 FR-017 [US5] [green: contracts/flow-obligations.contract.md#C-020] Append the reader projection section to `docs/concepts/documentation-model.md` (at most twelve lines) answering one question — what diagrams a reader of this documentation space will meet — covering only: diagrams arrive with documents, a document with nothing to draw carries a visible exemption, and a document diverging from its diagram is reported; it must not restate the verdict vocabulary, the carrier table, or become a second rulebook [blockedBy: T063]
+- [ ] T065 FR-019 [P] [US5] Run the targeted guard sweep for the two guarded artifacts just edited — `pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q` (the **exact node id**, one instance; the 16-instance wide selector is not this row's criterion), `pytest tests/contract/test_expression_gate_wiring.py -q -k "a1 or a3 or a5"`, `pytest tests/contract/test_docs_command_template.py -q -k "c3 or c4a"` — and compare the failure name set against T003's baseline [blockedBy: T064]
+- [ ] T066 FR-020 [P] [US5] Run the directory-governance and reader-path guard — `pytest tests/contract/test_directory_governance.py -q` — and confirm `docs/concepts/documentation-model.md` is still listed in the area map and that no new top-level document-type directory was created, again against T003's recorded name set [blockedBy: T064]
+- [ ] T067 FR-017 [US5] Run the whole US5 scenario set (`SC-009`) and record it — `pytest tests/integration/test_docs_obligation_scenarios.py -q -k "sc003 or sc006 or sc009 or sc010"` and `pytest tests/integration/test_docs_command_scenarios.py -q -k "c018 or c019"`; append command lines, exit codes and real outputs to `.specify/specs/087-arch-diagram-docs/notes/quickstart-run.md` [blockedBy: T065,T066]
+
+**Checkpoint**: US5 is independently satisfied — the check is a verdict a machine refuses, a clean space says so explicitly, an exemption is visible and distinct from a pass, and an unreadable case is never clean.
+
+---
+
+## Phase 8: Polish & Cross-Cutting Concerns
+
+**Purpose**: mirror/rendered-copy parity, the frozen-baseline allowlist entry, the cross-story scenario walkthrough, and the registration bookkeeping — no story owns these.
+
+- [ ] T068 FR-002 Regenerate the mirrors for the three edited sources in one pass — run `python3 scripts/python/sync-mirrors.py --write --only skills/external` with an interpreter that can `import typer`, which brings `.specify/skills/create-docs/SKILL.md`, `.specify/skills/create-docs/scripts/docs-utils.py` and `.specify/skills/improve-docs/SKILL.md` into byte-identity with their sources; hand-editing any mirror is forbidden [blockedBy: T067]
+- [ ] T069 FR-002 Regenerate the four per-tool command copies from the edited template — run `python3 scripts/python/regen-command-copies.py` with the same interpreter, producing `.claude/commands/speckit.docs.md`, `.github/prompts/speckit.docs.prompt.md`, `.opencode/command/speckit.docs.md` and `.qoder/commands/speckit.docs.md` [blockedBy: T068]
+- [ ] T070 FR-002 Verify mirror parity row by row against `plan.md` § Mirror Obligations — `diff -q` the `create-docs` and `improve-docs` sources against their `.specify/skills/` copies, then `python3 scripts/python/sync-mirrors.py --check` and `python3 scripts/python/regen-command-copies.py --check`, and grep the new dispatch sentence in each of the four per-tool copies; the criterion is no new drift relative to T003's baseline, not an absolute exit 0 [blockedBy: T069]
+- [ ] T071 FR-019 Add the `ALLOWED_POST_BASELINE_CHANGES` entry for `skills/external/improve-docs/SKILL.md` in `tests/contract/test_expression_compatibility.py` — a reason naming this feature and the four amended sections plus the `Diagram-sync` row, and markers that are literally present in the edited file — following the shape T-001 ratified instead of standing up a second baseline record [blockedBy: T070]
+- [ ] T072 FR-019 Run the frozen-baseline guard and confirm the entry resolves — `pytest tests/contract/test_expression_compatibility.py -q`, checking that `test_c5_non_wiring_files_keep_their_frozen_hashes` moves from red to green for this file while every allowlist key still resolves to a manifest entry [blockedBy: T071]
+- [ ] T073 FR-022 Walk `quickstart.md` (`SC-010`) S1–S9 against the landed implementation and append the executed readings to `.specify/specs/087-arch-diagram-docs/notes/quickstart-run.md` — S1 now exits 0 with a payload; S2's population is the recorded one; S3's four fixture verdicts match; S4 prints `IDENTICAL` and an empty `git status`; S5's three exemption readings match; S6's guard readings show no new failures; S7's two `--check` commands report no new drift; S8's `git diff --name-only<BASE> -- docs/` is empty; S9's four-step loop reports `converged=true` on the second pass [blockedBy: T069,T072]
+- [ ] T074 FR-022 Run `python3 .specify/scripts/python/validate-tasks.py .specify/specs/087-arch-diagram-docs/tasks.md` and adjudicate every remaining WARN, then record the report figures (total count, per-story counts, parallel opportunities, MVP scope, validator verdict) into the run report rather than only into the conversation [blockedBy: T073]
+- [ ] T075 FR-018 Review the Feature list per the Feature Integration Protocol — confirm `Feature 087` stays `Planned` with `tasks.md` present and no open `final`-path criterion marked done, and confirm this row's conclusion adds no new Feature and invalidates none; record the conclusion in `.specify/specs/087-arch-diagram-docs/tasks.md` under § Notes as a dated line [blockedBy: T074]
+- [ ] T076 FR-022 Write the stage-status evidence row to `.specify/specs/087-arch-diagram-docs/test-evidence/tasks-stage-status.jsonl` — the six-field reduced set for a docs-only stage row, with `changed_paths` listing exactly the paths this run wrote [blockedBy: T075]
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Phase 1 (Setup)**: no dependencies; produces the four evidence files every later row measures against
+- **Phase 2 (Foundational)**: depends on Phase 1; BLOCKS all user stories — the engine action, the verdict vocabulary and the fixtures are what each story asserts against
+- **Phase 3 (US4)**: depends on Phase 2; placed first because it constrains *how* US1–US3 may be satisfied
+- **Phase 4 (US2)**: depends on Phase 2 and US4; the baseline amendment and the reconcile convergence path
+- **Phase 5 (US1)**: depends on Phase 4 (it shares `create-docs/SKILL.md` and extends the same sections) and on Phase 2
+- **Phase 6 (US3)**: depends on Phase 5 (the classification row descends from the authoring wiring) and on Phase 2
+- **Phase 7 (US5)**: depends on Phases 2–6 for the artifacts it guards; the check it verifies is foundational, but its documented reachability is US1's and US2's flows
+- **Phase 8 (Polish)**: depends on every story; mirror regeneration and the frozen-baseline entry are cross-cutting
+
+### User Story Dependencies
+
+- **US4 (P2)**: foundational-constrained, otherwise independent — its own tests run without US1/US2/US3
+- **US2 (P1)**: independent of US1/US3 — its fixture reconcile never needs the authoring flow
+- **US1 (P1)**: independently testable; shares `create-docs/SKILL.md` with US2, so it follows US2 in row order rather than running beside it (same write target, no `[P]`)
+- **US3 (P1)**: independently testable; its four sections live in `improve-docs/SKILL.md`, a different file from US1's, but the classification row descends from the authoring wiring, so it follows
+- **US5 (P2)**: independently testable once the artifacts exist; it guards rather than builds
+
+### Within Each User Story
+
+- Tests first and red before the implementation lands (the `[blockedBy:]` tags encode that order)
+- One write target per `[P]` pair — two rows editing `skills/external/create-docs/SKILL.md` are never parallel
+- Verification rows follow the implementation rows they check, never the reverse
+
+### Parallel Opportunities
+
+- Phase 1: T002 and T004 run together (different files); T003 appends a section to T002's file, so it waits
+- Phase 2: T005 / T006 build different fixture artifacts; T009 / T010 author different files; T011 / T012 extend T008's file and therefore wait on it in order — the only genuinely parallel pair here is T005+T006 and T009+T010
+- Phase 3: T031 is the only `[P]` row; T032 extends T031's file and waits on it
+- Phase 4: T035 is the only `[P]` row; T036 is `tests/integration/test_docs_obligation_scenarios.py` and waits on the fixture helper, then T037–T044 amend `create-docs/SKILL.md` strictly in order
+- Phase 5: T045 is the only `[P]` row; T046 and T047 both append to the shared scenario file and wait in order, then T048–T055 amend the two skill files strictly in order
+- Phase 6: T056 is the only `[P]` row; T057 extends the shared scenario file and waits
+- Phase 7: T060 is the only `[P]` row; T061 extends the command-scenario file; T065 / T066 are two independent guard runs on different files
+- Phase 8: strictly sequential — each row consumes the previous one's output
+
+## Parallel Example: Phase 2
+
+```bash
+# Two independent fixtures, then two independent assertion files in phase 2:
+Task: "T005 Build the eleven fixture spaces under tests/fixtures/docs-obligation/"
+Task: "T006 Add copy_fixture(name, tmp_path) to tests/fixtures/docs-obligation/conftest.py"
+Task: "T009 Carrier-set assertions in tests/unit/test_docs_utils_carriers.py"
+Task: "T010 Read-only/determinism assertions in tests/integration/test_docs_obligation_scenarios.py"
+```
+
+## Implementation Strategy
+
+### MVP First
+
+**MVP scope**: US4 + US2 + US1 + US3 — all four carry an independent value only together: a traceability constraint with no producing flow has nothing to constrain, an authoring flow with no baseline amendment converges toward the old target, and a baseline with no improvement flow rots on the first content edit. US5 is close behind but is a guard over the mechanism rather than the mechanism itself, so it is not required for the first demonstrable increment.
+
+1. Complete Phase 1 (Setup) — evidence landing points and measured baselines
+2. Complete Phase 2 (Foundational) — engine action, fixtures, red-first evidence
+3. Complete Phase 3 (US4), then Phase 4 (US2), Phase 5 (US1), Phase 6 (US3)
+4. **STOP and VALIDATE**: run each story's independent test per its checkpoint
+5. Complete Phase 7 (US5), then Phase 8 (Polish)
+
+### Incremental Delivery
+
+1. Setup + Foundational → the checker exists and judges every fixture to its recorded tier
+2. US4 → the single-capability boundary is proven; nothing can be satisfied by a second engine
+3. US2 → the baseline is amended and a reconcile can converge the diagram dimension to zero
+4. US1 → a commission yields the document, both faces, the reference and the record; a missing face turns red
+5. US3 → a content improvement keeps the diagram in step or names its staleness
+6. US5 → the reviewer-facing check is reachable from the flows and deterministic
+7. Polish → mirrors, per-tool copies, the frozen-baseline entry and the quickstart walkthrough
+
+### Parallel Team Strategy
+
+With more than one executor: after Foundational, US4 and US2 can run concurrently (different primary write targets — `tests/unit/test_docs_obligation_reuse.py` versus `tests/integration/*` and `create-docs/SKILL.md`), and US3 can start in `improve-docs/SKILL.md` as soon as US1's classification row lands. US1 and US2 both write `skills/external/create-docs/SKILL.md`, so they serialize; Phase 8 is single-threaded by construction.
+
+## Notes
+
+- Every count in this file was measured at generation time, not recalled: the carrier population (85) and the `--action` choices list are from Phase 1 T002's commands, which are pasted with their real output.
+- No row runs a full test suite. `plan.md` § Test Plan D fixes the budget at two test files plus appended cases in a third, and the driver owns the baseline and closure slots.
+- `[P]` never marks two rows that write the same file: `skills/external/create-docs/SKILL.md` is written by T037–T044 and T054 only, all sequential; `tests/integration/test_docs_obligation_scenarios.py` is written by T010, T030, T036, T046, T047, T057 and T060, and `tests/integration/test_docs_command_scenarios.py` by T035, T045, T056 and T061 — never two of them `[P]` in one phase.
+- The three inherently-red-until-implemented guard rows (`F::test_c002_assets_subsection_present`, `F::test_c001_before_implementation_exit2`, `F::test_c010_authoring_flow_produces`) are red-first by design; their red state is the evidence, not a failure of the suite.
+- `D-001` (the semantic half of `stale`) is delivered to the review surface, never to the checker; a row that made the checker judge it would violate `C-009`'s frozen partial coverage.
+- Recovery rows carry no `<!-- deferred: -->` markers at generation: every row is expected to run this feature's session.
+
+**Feature-list review (Feature Integration Protocol)**: performed as T075; the conclusion is recorded there because it can only be reached after the artifact set is final — a pre-written conclusion would be a claim, not a finding.

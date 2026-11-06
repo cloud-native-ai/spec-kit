@@ -312,8 +312,8 @@ git diff --name-only 24cb4edc...HEAD -- docs/
 R5 产图 → R6 图维度残差）；本条的断言落在**夹具空间**（不是本仓 `docs/`），因为把本仓 85 份载体文档补图属内容工作（A6）。
 「reconcile」在可执行层面就是它的四条命令序列——`plan` 不新增命令，也不假装存在一个 `--action reconcile`。
 **收敛判据是 `converged`，不是 `clean`**（两个谓词的定义点：`diagram-obligation.contract.md` `C-013`；
-收敛判据的用法：`C-008a` R6）：`converged = missing==0 && stale==0 && not_evaluated==0`（豁免不参与），
-`clean` 更严格（`exempted>0 ⇒ clean=false`）。
+收敛判据的用法：`C-008a` R6）。`converged` 的算式**不在本文件复述**——它的唯一定义点是 `C-013`
+（合取项含 `judged_scope_has_carrier`）；`clean` 更严格（`exempted>0 ⇒ clean=false`，同条 `C-013`）。
 
 | 步 | 命令（`--root` 指向夹具空间的 `tmp_path` 副本） | 期望 |
 |----|--------------------------------------------------|------|
