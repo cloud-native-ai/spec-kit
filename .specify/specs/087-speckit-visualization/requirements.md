@@ -42,6 +42,26 @@ line registry already own the state these lines report. **No new store, schedule
 channel or second registry is introduced** — this feature wires existing owners into a declared,
 testable reporting obligation.
 
+### Revision 2026-11-06 — efficiency visibility and `/speckit.measure`
+
+A second bounded slice was authorized after the first review round. It adds **two** capabilities
+and modifies no existing clause's semantics (FR-001…FR-022 and SC-001…SC-010 are extended by
+addition only):
+
+4. **An efficiency dimension on the same surfaces** — the status line and the digest say not only
+   *what* is running but *how long each measured unit took*, read from the exec-quant store
+   (`.specify/memory/exec-quant/`), whose writer stays the existing exec-quant engine (FR-023,
+   FR-024, FR-025).
+5. **A dedicated measurement-reading command** — `/speckit.measure` analyses and summarises that
+   store: per-unit elapsed time, token and call counts, distributions and baselines, for one
+   window and one or more units (FR-026, FR-027, FR-028).
+
+The two additions reuse the same owners as the rest of the feature: the store's schema, layout and
+write path stay with `scripts/python/exec-quant.py` and its declaration
+(`shared/declarations/facts/quant-record-schema.yaml`); the reading is one new read-only,
+stdlib-only engine consumed by both the visibility surfaces and the command. **Still no new store,
+scheduler, daemon, console channel or second registry**, and no second analysis store.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A team run reports its overall state every 30 seconds (Priority: P1)
@@ -154,6 +174,74 @@ literal is reintroduced elsewhere.
 
 ---
 
+### User Story 5 - The status surfaces also say how long things took (Priority: P2)
+
+While a long run is in progress the user does not only want to know *that* a step is running — they
+want to know what it has cost so far. The status line, and the on-demand digest, therefore carry one
+bounded efficiency element per measured unit: its elapsed time (and, where the store already holds
+them, its token count and its call count), each marked with how it was obtained — measured, carried,
+or not evaluated. The numbers come from the exec-quant store the framework already writes; the
+feature adds no timer and no second measurement path.
+
+**Why this priority**: The user named efficiency visibility explicitly in the revision, and the
+surfaces that must carry it (the cadence line and the digest) already exist in this feature — so the
+addition is a projection, not a new mechanism. It ranks under the core "what is running" surfaces
+because it answers a second question about the same units.
+
+**Independent Test**: Run the status renderer against a store containing units with a measured
+elapsed time, units whose time is `not_evaluated`, and a legacy record; assert each rendered line
+carries the elapsed element with its provenance marker, that the `not_evaluated` case renders as
+"not evaluated" rather than as zero or as an omission, and that an absent store yields the explicit
+"no measurements" state.
+
+**Acceptance Scenarios**:
+
+1. **Given** a run whose measured units have elapsed times in the exec-quant store, **When** a
+   status line or a digest is rendered, **Then** it carries one bounded efficiency element per unit
+   listed, each naming the unit and its elapsed time, within the same declared entry bound as the
+   rest of the line or digest.
+2. **Given** a unit whose record says `not_evaluated` for elapsed time, **When** it is rendered,
+   **Then** the element says the quantity was not evaluated and MUST NOT be printed as `0` and MUST
+   NOT be silently dropped.
+3. **Given** a workspace with no exec-quant store at all, **When** either surface renders, **Then**
+   the efficiency element renders as an explicit "no measurements" statement and the rest of the
+   line or digest is unchanged.
+
+---
+
+### User Story 6 - The user can analyse what the run cost, on demand (Priority: P2)
+
+The user — or a maintainer comparing two branches, or a driver deciding whether a stage is getting
+slower — asks one question: "how long did each unit take, how many times did it run, and how does
+that compare to the baseline?" `/speckit.measure` answers it from the exec-quant store: one bounded
+report over a declared window and a declared unit selection, with per-unit elapsed time, token and
+call counts, distribution statistics, and the historical window the comparison used. The command is
+read-only, deterministic, and introduces no second store.
+
+**Why this priority**: The user asked for a dedicated analysis command in the revision, and the
+store already holds the data. It ranks beside the efficiency projection because it is the deep
+question of the same data; it is not P1 because a reader can already see the current numbers on the
+status line.
+
+**Independent Test**: Run the command against a fixture store (three units, several records each,
+plus one unreadable record and one legacy record); assert the per-unit elapsed/token/call figures
+match a hand-computed expectation, that the unreadable and legacy records appear as declared
+degradations rather than as zeros, that two runs over the same store and window produce byte-identical
+output, and that the store's files are unchanged after the run.
+
+**Acceptance Scenarios**:
+
+1. **Given** a store with records for three units over a window, **When** the command runs with that
+   window and the whole unit set, **Then** it reports per unit the record count, the elapsed time and
+   token figures with their provenance, and the window it actually selected.
+2. **Given** an unreadable record and a legacy-format record in the store, **When** the command runs,
+   **Then** both are reported as named degradations with counts, the readable records are still
+   analysed, and the run does not fail on them.
+3. **Given** an empty or absent store, **When** the command runs, **Then** it reports "no measurements"
+   explicitly and exits with the declared "nothing to analyse" status rather than printing zeros.
+
+---
+
 ### Edge Cases
 
 - **Silence is an event, not a liveness proof**: a reporter whose own tick fails or whose runner
@@ -190,6 +278,30 @@ literal is reintroduced elsewhere.
   exactly one subordinate per run, which the FR-002 wording "keeps one or more asynchronous
   delegations past their dispatch" already covers; it is therefore in scope without needing a
   special case, and its report names that one subordinate rather than reporting an empty set.
+- **A quantity with no source**: an efficiency element whose record says `not_evaluated` renders as
+  "not evaluated" with that marker — never as `0`, never as an averaged-over substitute, and never
+  as an omission, because an omission reads as "fast" to a reader comparing two runs. A record that
+  carries the quantity as a `{"value", "provenance"}` object renders with that provenance, not as a
+  bare number.
+- **A store that is absent, empty or half-written**: the efficiency projection and the measurement
+  report both degrade explicitly — "no measurements" for an absent or empty store, a named
+  degradation count for an unreadable record — and neither invents a value nor fails the surrounding
+  run. A partially written record is judged by the store's own reader, never re-parsed here.
+- **A legacy store file**: the engine's own compatibility path (per-record files plus the legacy
+  stream) is read through that engine, read-only; the feature MUST NOT rewrite, migrate or compact
+  the legacy form, and a legacy-only window is still analysable if the engine can read it.
+- **A measurement window with no overlap**: a report over a window in which no unit ran is the
+  explicit "nothing in this window" result, not an empty table and not an error; the window actually
+  selected is always printed so the reader can see why.
+- **Two analysts at once**: the report is read-only and writes nothing, so concurrent invocations
+  cannot interfere; a report that would need a cache file is out of bounds by FR-027, and the
+  reader's own shell redirection is the only place output lands.
+- **A unit whose elapsed time straddles two runs**: elapsed time is reported per record with the
+  record's run identity preserved, and aggregate figures name how many records they averaged over;
+  the report never silently merges two runs into one figure without saying so.
+- **Efficiency text on the cadence line**: the efficiency element is part of the line's bounded
+  content, not an extra line and not a second cadence — a line that doubles in length to carry it
+  has broken the bound in FR-012 and must be truncated with the omitted count stated.
 
 ## Requirements *(mandatory)*
 
@@ -302,6 +414,61 @@ literal is reintroduced elsewhere.
   deterministic script, sharing its state reads with the FR-017 guard, so that one reading backs both
   the digest and the guard's verdicts. The command and script names are fixed by the plan stage; this
   requirement fixes only the shape (one command, one script, one reading).
+- **FR-023**: The **efficiency dimension** MUST be carried on exactly two existing surfaces of this
+  feature and no third: the periodic status line (FR-003/FR-004) and the current-state digest
+  (FR-011/FR-012). For every unit a surface already lists, it MUST carry at most one bounded
+  efficiency element naming the unit, its **elapsed time**, and — where the source record carries
+  them — its token count and its invocation count, each marked with the provenance the record
+  states (`measured` / `carried` / `user-given` / `configured`). A quantity the record does not
+  carry MUST render as the explicit not-evaluated marker, never as `0`, never as an averaged
+  substitute and never as an omission. The element is content of the line or digest, not an extra
+  line and not a second surface, and it is subject to FR-012's entry bound unchanged.
+- **FR-024**: The efficiency dimension MUST be read **only** from the exec-quant store at
+  `.specify/memory/exec-quant/`, through the engine that owns it
+  (`scripts/python/exec-quant.py`: its record directory, its legacy-stream compatibility path and
+  its record schema declaration `shared/declarations/facts/quant-record-schema.yaml`). This feature
+  MUST treat that store as **read-only** and MUST NOT create, migrate, rewrite, compact or delete a
+  record; it MUST NOT introduce a second store, a second record format, a cache file or a derived
+  database for the dimension. Store availability is never a precondition of the visibility surfaces:
+  an absent or empty store renders the explicit "no measurements" state and leaves the rest of the
+  line or digest unchanged.
+- **FR-025**: The efficiency element's **elapsed-time source MUST NOT require a new recorder**. The
+  exec-quant record's elapsed quantity is populated by the existing collection path and its existing
+  per-unit hooks; where that path leaves the quantity as `not_evaluated`, FR-023's not-evaluated
+  rule applies unchanged. If, and only if, populating elapsed time needs a field the declared
+  schema does not carry, the extension MUST be declared by the schema's existing owner (the
+  declaration fact above plus the engine that reads it), MUST keep the record's existing keys and
+  provenance discipline intact, and MUST be stated as a schema-version consequence for readers.
+  This requirement adds no recorder of its own and no second write path to the store.
+- **FR-026**: The framework MUST ship `/speckit.measure` — a thin `speckit.*` command backed by one
+  deterministic, stdlib-only analysis engine that is **read-only** over the exec-quant store and
+  MUST NOT spawn a subprocess, open a network connection, write any file, or mutate the store. It
+  MUST NOT be a scheduler, a watcher, a daemon or a background process: it runs when invoked and
+  exits.
+- **FR-027**: `/speckit.measure` MUST analyse and summarise the exec-quant store over a **declared
+  window** (a start, and an end that defaults to now) and a **declared unit selection** (one or
+  more unit identities, or all units the store holds), producing per selected unit: the record
+  count, the elapsed-time figures with their provenance, the token figure with its provenance, the
+  invocation count, and — where the selected window holds two or more records — the distribution
+  summary the engine declares (minimum, maximum and a central value, each named). It MUST state the
+  window and the unit selection it actually used, and MUST state the record count it excluded with
+  the reason class (`unreadable`, `legacy-format`, `outside-window`, `unknown-unit`), so that a
+  figure is never silently computed over a subset. No threshold verdict, no scoring and no
+  comparison-to-baseline recommendation is issued: the report presents measurements.
+- **FR-028**: `/speckit.measure` MUST be **deterministic** — two invocations over an unchanged store
+  with the same window and selection produce byte-identical output, with no wall-clock-dependent
+  text beyond the window's stated end and no ordering left to a hash or to filesystem enumeration —
+  and MUST expose a **closed action set** and a **closed exit-status set** it owns: at minimum a
+  summary render and a machine-readable render of the same figures, an input-error status, a
+  "nothing to analyse in this window" status distinct from an error, and the success status. It
+  MUST NOT add a fourth analysis store, a summary file it persists, or a second reading path beside
+  the one the visibility surfaces use (FR-023): one engine and one reading, reached by path.
+- **FR-029**: `/speckit.measure` MUST ship in the same shape as this feature's other entries and the
+  framework's existing commands — one command template in the template layer, one deterministic
+  script in the script layer, and the per-tool command copies the framework already regenerates —
+  and MUST carry the standard wrap-up delegation the other commands carry. It MUST NOT acquire its
+  own store, its own registry entry, its own long-running process, or an authority the read-only
+  obligation of FR-026 excludes.
 
 ### Key Entities *(include if data involved)*
 
@@ -315,19 +482,36 @@ literal is reintroduced elsewhere.
   rather than slow.
 - **Current-State Digest**: the on-demand bounded projection of active lines, dispatched agents and
   recent completions, with per-entry ages and the omitted-entry count.
+- **Efficiency Element**: the bounded statement carried per listed unit on a status line or in the
+  digest — the unit identity, its elapsed time, and (when carried) its token and invocation counts,
+  each with the provenance the source record states. Exactly one per listed unit, and part of the
+  line's existing content bound.
+- **Exec-Quant Record**: one measurement the framework already writes for a measured unit — its unit
+  identity and type, its run identity, its collection time, and its quality quantities
+  (elapsed time, tokens, exit code, satisfaction) each either a value with a provenance or the
+  not-evaluated marker. The record's schema, layout and write path stay with its existing owners;
+  this feature is a reader.
+- **Measurement Window**: the declared start and end a `/speckit.measure` report covers, always
+  printed with the report so a reader can see which records were in scope.
+- **Measurement Report**: the bounded, read-only, deterministic output of `/speckit.measure` — per
+  selected unit the record count, elapsed/token/invocation figures with provenance, the declared
+  distribution summary, and the excluded-record counts by reason.
 
 ### Runtime Stack & Dependency Ownership
 
 本特性交付的运行时能力是状态汇报义务的 owner 文本、reporter 席位义务、主从汇报义务、当前态摘要入口与确定性守卫；
+效率维度是对既有 exec-quant 存储的只读投影，`/speckit.measure` 是一个只读分析入口。
 其余项由外部供给、本仓只消费，按 `signed-contract` 记。该表是 SC-001、SC-004、SC-005、SC-007、SC-009 的运行时前提。
 
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
-| RS-001 | Python 3 解释器（运行确定性守卫与契约测试） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不新增 pin） | `pyproject.toml` | 新增守卫与其测试在 `>=3.8` 解释器上通过；新增脚本 stdlib-only | FR-017 | EP-001 |
-| RS-002 | pytest（守卫测试运行器） | signed-contract | pytest 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 原文记录进 test-evidence | `scripts/bash/run-tests.sh` | 基线差集为空且新增守卫测试全绿 | FR-017 | EP-001 |
+| RS-001 | Python 3 解释器（运行确定性守卫、效率投影与 measure 分析引擎、契约测试） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不新增 pin） | `pyproject.toml` | 新增守卫、`status-digest.py` 的效率投影与 measure 引擎及其测试在 `>=3.8` 解释器上通过；新增脚本 stdlib-only | FR-017, FR-023, FR-026, FR-027, FR-028 | EP-001 |
+| RS-002 | pytest（守卫、效率投影与 measure 引擎测试运行器） | signed-contract | pytest 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 原文记录进 test-evidence | `scripts/bash/run-tests.sh` | 基线差集为空且新增守卫测试全绿 | FR-017, FR-023, FR-026 | EP-001 |
 | RS-003 | agent 宿主（渲染 agent template、承载 reporter 的 live console） | signed-contract | 各受支持 agent 工具上游（本仓只消费） | 无声明 pin；执行时以宿主名 + 版本原文记录进 test-evidence | `docs/reference/cli/supported-agent-tools.md` | SC-001、SC-009 在至少一个受支持宿主上真实运行 reporter 并取原始输出 | FR-005, FR-007, FR-014 | EP-003 |
 | RS-004 | line registry 与状态脊（摘要读取的活动状态来源） | signed-contract | 本仓 `skills/external/sdd-loop-driver/scripts/line-registry.py`（消费方，只读） | 同一提交 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | SC-005 的摘要条目逐条解析到该引擎写出的状态文件 | FR-011, FR-012 | EP-001 |
 | RS-005 | 状态汇报义务 owner、reporter 模板、reporter 席位义务、主从汇报义务与摘要入口（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/progress-reporting.md` | SC-004、SC-007 | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-020, FR-021, FR-022 | EP-002 |
+| RS-006 | exec-quant 存储及其记录 schema（效率维度与 measure 报告的只读来源；写入方仍是该引擎自身） | signed-contract | 本仓 `scripts/python/exec-quant.py`（写入 owner）＋ `shared/declarations/facts/quant-record-schema.yaml`（schema owner）；本特性只读消费 | 同一提交 | `shared/declarations/facts/quant-record-schema.yaml` | SC-011、SC-012：两个消费面读同一引擎取到的同一组记录，只读前后存储逐文件零差异；引擎自测（`tests/contract/test_exec_quant_engine.py`）保持全绿 | FR-023, FR-024, FR-025, FR-027 | EP-001 |
+| RS-007 | `/speckit.measure` 入口：命令模板 + 确定性只读分析引擎 + 四工具命令副本（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/reporting-obligations.md` | SC-013、SC-014 | FR-026, FR-027, FR-028, FR-029 | EP-002 |
 
 ## Success Criteria *(mandatory)*
 
@@ -343,6 +527,10 @@ literal is reintroduced elsewhere.
 - **SC-008**: Pre-existing progress-reporting and dispatch-visibility behavior produces no new failures against the pre-change baseline. **Path**: supporting
 - **SC-009**: The full chain runs end to end on the dogfood line: a real multi-minute run reports on cadence, a supervised subordinate flow is reported by its master, a mid-run digest request is answered, and the guard returns a verdict on the line's own artifacts. **Path**: supporting
 - **SC-010**: The feature's changed-file set introduces no scheduler, timer service, daemon, new runtime dependency, new persistent store, new console channel, new registry, new state spine or new ledger. **Path**: supporting
+- **SC-011**: A status line and a digest rendered over the same fixture store each carry one efficiency element per listed unit within the existing entry bound; a unit whose record says `not_evaluated` renders the explicit not-evaluated marker and neither `0` nor an omission; an absent or empty store renders the explicit "no measurements" state with the rest of the line and digest unchanged. **Path**: final
+- **SC-012**: Reading the exec-quant store for the efficiency dimension and for the measure report leaves it byte-identical — every file under `.specify/memory/exec-quant/` compares equal before and after both reads, including the legacy stream files, and no new path is created anywhere under it by either read. **Path**: final
+- **SC-013**: `/speckit.measure` over a fixture store of three units (several records each, plus one unreadable record and one legacy-format record) reports per unit the record count and the elapsed/token/invocation figures with their provenance, states the window and selection actually used, and reports the excluded-record counts by reason class; on an empty or absent store it reports "no measurements" and exits with the declared nothing-to-analyse status distinct from both success and error. **Path**: final
+- **SC-014**: Two `/speckit.measure` runs over an unchanged store with the same window and selection produce byte-identical output, the command exits with only statuses from its declared closed set, and its changed-file set adds no process spawn, network call, written file or scheduled process — the additions are one command template, one stdlib-only script, the regenerated per-tool command copies and their tests. **Path**: supporting
 
 ### Measurement Sources & Collection Methods
 
@@ -356,6 +544,10 @@ literal is reintroduced elsewhere.
 - **SC-008 Source**: Pre-change baseline node-id set and the post-change run of the affected progress-reporting and dispatch contract suites.
 - **SC-009 Source**: The dogfood run record, the captured cadence lines, the master's subordinate report and the digest output, plus the guard's payload.
 - **SC-010 Source**: The changed-file set from `base..head` and a scan for new process-spawn, scheduler and store-creation sites.
+- **SC-011 Source**: One status-line render and one digest render over the same fixture store (measured, `not_evaluated`, and absent-store cases); their captured output plus the fixture store's record paths, stored verbatim in `test-evidence/`.
+- **SC-012 Source**: A per-file digest of `.specify/memory/exec-quant/` taken before and after both reads, plus a directory listing of it taken after; the two digests and the listing stored verbatim.
+- **SC-013 Source**: One command run over the fixture store with its full output, its exit status, the hand-computed expectation table and the per-reason exclusion counts; plus one run over an empty store with its exit status.
+- **SC-014 Source**: Two consecutive runs' captured outputs compared with a byte-level diff, the command's declared exit-status table, and the changed-file set from `base..head` with the process-spawn / network / write scan.
 
 ## Boundary and Ownership (non-duplication)
 
@@ -370,6 +562,11 @@ literal is reintroduced elsewhere.
 | Fast-fail clause injection at dispatch | `shared/guidelines/fast-fail.md` § 子代理派发注入 | The reporting obligation rides the same dispatch-payload channel; the clause itself is unchanged |
 | Token efficiency, summary-first consumption | `shared/guidelines/token-efficiency.md` | The status line and the digest are summary projections; no raw-log injection is introduced |
 | User-facing comprehension of every emitted line | `shared/guidelines/user-facing-comprehension.md` | The emitted lines are a governed surface; the discipline applies unchanged |
+| Exec-quant record schema: version, closed vocabularies, the eleven config fields, per-action argument manifest | `shared/declarations/facts/quant-record-schema.yaml#/statement`, read by `scripts/python/exec-quant.py` | The efficiency dimension and the measure report read records this declaration shapes; they restate no field name, enum or version, and a schema change is that owner's business (FR-025 admits the extension only there) |
+| Exec-quant store layout and write path: `.specify/memory/exec-quant/`, per-record files under `records/`, the legacy stream, `scores/`, `aggregated/` | `scripts/python/exec-quant.py` (`storage_dir` / `records_dir` / `scores_dir`) and the retention lane that consumes it (`scripts/python/record-retention.py`) | Read-only consumption for both new capabilities. The feature adds no subdirectory, no cache, no second format, no migration; the store's `aggregated/` layer stays feedback's channel and is not repurposed here |
+| Record retention, receipt-gated deletion, grace | `scripts/python/record-retention.py` and `shared/declarations/facts/memory-retention-thresholds.yaml#/statement` | Not touched: `/speckit.measure` presents figures over whatever records the store still holds and states its window; it retires nothing and offers no "delete these records" action |
+| "Measured, not impressed" — a quantity with no source reports itself as not evaluated | `shared/guidelines/single-run-evidence.md` § Run Determination and the exec-quant record's provenance discipline | The efficiency element and the measurement report carry the record's provenance verbatim; neither fills a missing quantity with `0`, an average or a guess |
+| Summary-first consumption of machine-managed data | `shared/guidelines/token-efficiency.md` § Escalation Ladder | The efficiency element is a summary projection and `/speckit.measure` is the digest entry for this store — the ladder's first rung, never a raw-record injection |
 
 ## Assumptions
 
@@ -449,6 +646,41 @@ literal is reintroduced elsewhere.
   numeric stall values. The owner references that table and adds no second threshold set; the
   reporter is a dispatch like any other, so a reporter that stops growing is judged stalled by that
   same signal.
+- **A16 — the efficiency store is exec-quant, and the feature is its reader**: the user named
+  `.specify/memory/exec-quant` directly, so no store choice is open. Its **schema** is owned by
+  `shared/declarations/facts/quant-record-schema.yaml#/statement` and its **layout and write path**
+  by `scripts/python/exec-quant.py` (`storage_dir` / `records_dir` / `scores_dir`); this feature
+  reads through that engine and restates neither. One consequence is accepted explicitly: the
+  record's elapsed-time quantity is populated by that engine's existing collection path, so where it
+  is `not_evaluated` the surfaces say so (FR-023) and FR-025 forbids inventing a second recorder.
+  A schema extension, if the plan proves one is needed, is the schema owner's change and is carried
+  as a compatibility consequence for readers — never as a private field or a parallel record.
+- **A17 — the efficiency projection is bounded to the surfaces that already exist**: the user asked
+  for efficiency "在可视化信息里", so it lands where this feature's own visibility already lands —
+  the cadence status line and the on-demand digest — and nowhere else. No third surface, no extra
+  line, no per-step line per unit; the element is content within the existing entry bound (FR-012),
+  which is what keeps the status line one screen.
+- **A18 — `/speckit.measure` is an analysis entry, not a watcher**: it is the store's analogue of the
+  digest — invoked, reads, prints, exits. The existing engine's own `list-records` / `aggregate`
+  actions stay exactly as they are (feedback's channel owns `aggregate`'s semantics); `/speckit.measure`
+  is a distinct **read-only analysis** entry owned by this feature, and it reuses the store and its
+  reader rather than the feedback channel. `aggregate`'s `aggregated/` layer is NOT repurposed: it
+  remains feedback's received-package summary view.
+- **A19 — the analysis dimensions are chosen from what the record already carries**: per-unit record
+  count, elapsed time, token figure, invocation count, and the declared distribution summary
+  (minimum / maximum / central value) over the selected window, plus the excluded-record counts by
+  reason class. Trends are read as a window comparison the caller selects (this window against an
+  earlier one it names), never as a stored baseline series: persisting a baseline would be the second
+  store FR-024 excludes, and a "too slow" verdict would smuggle a threshold owner into this feature.
+- **A20 — the command's shape is the framework's existing command shape**: one command template in
+  the template layer, one stdlib-only deterministic script, the regenerated per-tool copies, and the
+  standard wrap-up delegation — the same shape `/speckit.status` ships in. The command name
+  (`/speckit.measure`) is the user's, so Grounded Naming carries it unchanged; the script's file name
+  and the exact action identifiers stay the plan stage's decision (A13).
+- **A21 — the blocked closure verdict is preserved, not erased**: this revision is a scope addition
+  (`Draft`, requirements stage) and asserts nothing about delivery. The prior `Blocked` verdict for
+  SC-001 and SC-002 survives verbatim in the feature registry and in `verification.md`; only a later
+  closure re-check may re-judge it. Adding criteria here does not unblock, re-open or re-close them.
 
 ## Out of Scope
 
@@ -470,6 +702,27 @@ literal is reintroduced elsewhere.
   it is recorded, in a run record the emitting flow already writes.
 - Renaming or re-specifying the reporter seat's host tool surface; the reporter is a Template in the
   existing template layer and renders through the existing agent rendering path.
+- **A second measurement store, record format, cache file or derived database** for the efficiency
+  dimension or the measure report; both read `.specify/memory/exec-quant/` through its owning engine
+  and write nothing.
+- **A second recorder or timer**: populating elapsed time is the exec-quant engine's existing
+  collection path; this feature adds no instrumentation of its own and no per-step timing hook.
+  Where the store leaves a quantity `not_evaluated`, the surface says so.
+- **Migrating, compacting, rewriting or retiring exec-quant records**: record retention stays with the
+  retention lane and its receipt gate. `/speckit.measure` offers no delete, prune or migrate action.
+- **A threshold verdict, scoring or "too slow" recommendation**: the measure report presents
+  measurements and their window; judging them is the reader's, and a threshold owner is not created.
+  The engine's existing `score` action is unchanged and is not extended by this feature.
+- **A stored trend series or persisted baseline index**: a trend is the caller's two selected windows
+  compared at read time; nothing is accumulated on disk.
+- **A scheduler, watcher, daemon, polling loop or exported metric endpoint** for efficiency data:
+  `/speckit.measure` runs on invocation and exits, exactly like the digest.
+- **Repurposing feedback's `aggregated/` layer** or changing the existing `aggregate` action's
+  semantics: that layer remains the received-package summary channel owned by the feedback flow.
+- **Efficiency on a surface this feature does not already own** — no web/dashboard panel, no TUI
+  column, no per-step line per unit, no second cadence for measurements.
+- **Estimating a missing measurement**: no interpolation, no extrapolation from a neighbouring run,
+  no filling a `not_evaluated` quantity with a zero or an average.
 
 ## Clarifications
 
@@ -518,4 +771,34 @@ with five closed questions; the reasoning is recorded because the user was not a
   dispatches exactly one subagent per run, and it has no subordinate-state report. The required
   amendment is therefore written as a requirement (FR-019), and the payload's closed-set invariant is
   kept, not silently widened. This is the only pre-existing owner document the feature amends.
+
+### Revision 2026-11-06 (second slice) — recorded adjudications
+
+The user's revision input is two sentences; where they leave a choice open it was adjudicated in this
+stage rather than deferred, and the adjudication is recorded here because the user was not asked:
+
+- Q: Whose store is `.specify/memory/exec-quant/`, and may this feature extend it? → A: The user
+  named the path, so the store is fixed. Its schema and write path stay with
+  `shared/declarations/facts/quant-record-schema.yaml#/statement` and
+  `scripts/python/exec-quant.py`; this feature is a **reader** (A16, FR-024). An extension needed to
+  carry elapsed time is that owner's declared change, with a stated compatibility consequence —
+  never a private field and never a second record format.
+- Q: Which user-visible surface carries efficiency? → A: The two this feature already owns — the
+  cadence status line and the digest — as one bounded element **per listed unit**, inside the
+  existing entry bound (A17, FR-023). No third surface, no extra line, no second cadence.
+- Q: How is elapsed time populated if the record leaves it `not_evaluated`? → A: It is not populated
+  here. FR-025 forbids a second recorder; FR-023 renders the not-evaluated marker explicitly. A
+  plan-stage finding that the existing path cannot populate it becomes a schema-owner request, not a
+  new timing hook in this feature.
+- Q: Is `/speckit.measure` the same thing as the engine's existing `aggregate`? → A: No. `aggregate`
+  is feedback's received-package summary view over `aggregated/`; `/speckit.measure` is this
+  feature's read-only analysis entry over the local store (A18). The two are not merged and
+  `aggregate` is not repurposed.
+- Q: Does the measure command compute trends and baselines itself? → A: Trends are a read-time
+  comparison of two caller-selected windows; a persisted baseline series would be the second store
+  FR-024 excludes (A19). Threshold verdicts are excluded outright — the report presents measurements,
+  the reader judges them.
+- Q: What happens to the existing `Blocked` verdict now that scope grew? → A: Nothing. The revision
+  is a requirements-stage scope addition at `Draft`; the SC-001 / SC-002 `partial` readings and the
+  block verdict remain recorded unchanged, to be re-judged only by a later closure check (A21).
 

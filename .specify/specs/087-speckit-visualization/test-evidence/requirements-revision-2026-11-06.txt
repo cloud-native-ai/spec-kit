@@ -1,0 +1,140 @@
+# Feature 087 — requirements revision (second slice) — evidence
+# Date: 2026-11-06
+# Scope: S1 efficiency visibility + S2 /speckit.measure (user-authorized scope addition)
+# Artifacts changed by this stage:
+#   .specify/specs/087-speckit-visualization/requirements.md
+#   .specify/specs/087-speckit-visualization/checklists/requirements.md
+#   .specify/memory/features.md
+#   .specify/memory/features/087.md
+#   .specify/specs/087-speckit-visualization/test-evidence/requirements-revision-2026-11-06.txt (this file)
+
+================================================================
+1. validate-requirements.py  (BEFORE — baseline, 22 FR / 10 SC)
+================================================================
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 522 lines, 32 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+
+================================================================
+2. validate-requirements.py  (AFTER — this revision)
+================================================================
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 805 lines, 43 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+
+READING: 0 error / 0 warning. Definition rows 32 -> 43 (+7 FR, +4 SC).
+The projection of the added ids onto the standard success-criteria path set is in section 6.
+
+================================================================
+3. pre-analyze-check.py --stage requirements  (BEFORE — baseline)
+================================================================
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+      --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=2 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 219, "message": "path does not exist under the repo: .specify/templates/commands/"}, {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: .specify/templates/commands/"}], "summary": {"errors": 0, "advisories": 2, "waived": 0, "fr": 22, "sc": 10, "tasks": 50, "clauses": 0, "files": 15}, "checked_at": "2026-11-06T08:13:26Z"}
+
+================================================================
+4. pre-analyze-check.py --stage requirements  (AFTER — this revision)
+================================================================
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+      --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=fail errors=6 advisories=3 waived=0
+{"stage": "requirements", "decision": "fail", "findings": [
+  {"check": "count-claim", "severity": "error", "path": "plan.md", "line": 59, "message": "claims 22 FR but the artifacts define 29"},
+  {"check": "count-claim", "severity": "error", "path": "plan.md", "line": 59, "message": "claims 10 SC but the artifacts define 14"},
+  {"check": "count-claim", "severity": "error", "path": "feature-ref.md", "line": 117, "message": "claims 22 FR but the artifacts define 29"},
+  {"check": "count-claim", "severity": "error", "path": "feature-ref.md", "line": 157, "message": "claims 10 SC but the artifacts define 14"},
+  {"check": "count-claim", "severity": "error", "path": "checklists/requirements.md", "line": 37, "message": "claims 22 FR but the artifacts define 29"},
+  {"check": "count-claim", "severity": "error", "path": "checklists/requirements.md", "line": 37, "message": "claims 10 SC but the artifacts define 14"},
+  {"check": "missing-path", "severity": "advisory", "path": "plan.md", "line": 219, "message": "path does not exist under the repo: .specify/templates/commands/"},
+  {"check": "missing-path", "severity": "advisory", "path": "feature-ref.md", "line": 33, "message": "path does not exist under the repo: .specify/templates/commands/"},
+  {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 37, "message": "path does not exist under the repo: .specify/templates/commands/"}
+], "summary": {"errors": 6, "advisories": 3, "waived": 0, "fr": 29, "sc": 14, "tasks": 50, "clauses": 0, "files": 15}, "checked_at": "2026-11-06T08:15:54Z"}
+
+READING: NOT 0 error. This stage's own artifacts are clean; every error is a superseded
+derived-count literal in an artifact this stage does not own.
+
+  - 4 errors: plan.md (2) and feature-ref.md (2) — plan-stage artifacts, outside this
+    stage's commit scope (the brief's item 6 fixes the committable set).
+  - 2 errors: checklists/requirements.md line 37 — that line is the PRE-REVISION
+    count sentence this revision supersedes; it is quoted here so the reading is
+    reproducible verbatim.
+  - 3 advisories: one pre-existing missing-path row (`.specify/templates/commands/`)
+    projected onto the checklist and its two source rows; unchanged in kind from the
+    baseline's 2.
+  - summary fr=29 / sc=14 confirms the added 7 FR / 4 SC are the only definition-row change.
+
+The 0-error target for this gate is therefore NOT met by this stage, and it is
+reported as an anomaly rather than repaired by editing plan-stage artifacts or by
+rewriting the pre-revision sentence this revision exists to supersede.
+
+================================================================
+5. Idempotence and scope checks
+================================================================
+$ git diff --stat -- .specify/specs/087-speckit-visualization/plan.md \
+                   .specify/specs/087-speckit-visualization/feature-ref.md \
+                   .specify/specs/087-speckit-visualization/tasks.md \
+                   .specify/specs/087-speckit-visualization/verification.md
+(empty — no plan-stage artifact modified by this stage)
+
+Semantic-preservation check on the pre-existing clauses (item 1 of the brief):
+$ grep -c '^- \*\*FR-0' .specify/specs/087-speckit-visualization/requirements.md
+29     # FR-001..FR-029 defined; FR-001..FR-022 carry unchanged text
+$ awk '/^### Measurable Outcomes/,/^### Measurement Sources/' \
+      .specify/specs/087-speckit-visualization/requirements.md | grep -c '^- \*\*SC-0'
+14     # SC-001..SC-014 defined; SC-001..SC-010 carry unchanged text
+$ git diff -- .specify/specs/087-speckit-visualization/requirements.md | grep -c '^-.*\*\*FR-0'
+0      # zero FR definition lines removed or rewritten
+$ git diff -- .specify/specs/087-speckit-visualization/requirements.md | grep -c '^-.*\*\*SC-0'
+0      # zero SC definition lines removed or rewritten
+
+================================================================
+6. Derived counts re-measured for the checklist
+================================================================
+$ awk '/^### Measurable Outcomes/,/^### Measurement Sources/' requirements.md | grep -c 'Path\*\*: final'
+10
+$ awk '/^### Measurable Outcomes/,/^### Measurement Sources/' requirements.md | grep -c 'Path\*\*: supporting'
+4
+$ awk '/^### Edge Cases/,/^## Requirements/' requirements.md | grep -c '^- \*\*'
+18
+$ awk '/^## Out of Scope/,/^## Clarifications/' requirements.md | grep -c '^- '
+19
+$ grep -c '^- \*\*FR-0' requirements.md
+29
+$ grep -c '^- \*\*SC-0' <(awk '/^### Measurable Outcomes/,/^### Measurement Sources/' requirements.md)
+14
+$ grep -c '^### User Story' requirements.md
+6
+$ grep -c '^[0-9]\. \*\*Given\*\*' requirements.md
+17
+$ grep -c '^- \*\*A[0-9]' requirements.md
+21
+
+Measured table (all values read from the file, none by hand):
+
+  user stories            : 6   (US1..US4 pre-existing; US5 efficiency, US6 measure added)
+  acceptance scenarios    : 17  (10 pre-existing + 7 added)
+  edge cases              : 18  (10 pre-existing + 8 added)
+  ## Out of Scope items   : 19  (10 pre-existing + 9 added)
+  assumptions             : 21  (A1..A21; +6 added)
+  runtime-stack data rows : 7   (RS-001..RS-007; +2 added)
+  FR                      : 29  (FR-001..FR-029; +7 added)
+  SC                      : 14  (SC-001..SC-014; +4 added)
+    Path: final           : 10  (SC-001..SC-007, SC-011, SC-012, SC-013)
+    Path: supporting      :  4  (SC-008, SC-009, SC-010, SC-014)
