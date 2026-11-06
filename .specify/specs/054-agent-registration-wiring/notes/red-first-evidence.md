@@ -34,7 +34,7 @@ Verdict: 6/6 red after marker tightening. First run was 5/6 red — test_c4 was 
 ## T018 green + mutation drill — 2026-10-08
 
 Green: `scripts/bash/run-tests.sh tests/contract/test_seat_instantiation_flow.py` → `6 passed in 0.02s` after T015 (create-team SKILL.md step 4 seat-instantiation + new step 7 render trigger with failure-disclosure + guidance line; create-mode.md step 4, new step 7, schema-note member-resolution clause rewritten) and T016 (improve-team new step 6 seat backfill + step 7 report distinguishing existing/backfilled/render-stats + guidance line); T017 mirror sync (3 files), `--check` all ok, no NEW drift vs baseline.
-Mutation drill: plant `render-agentz` (1-char) in skills/create-team/SKILL.md → guard RED on exactly test_c8_create_team_create_flow_runs_render_trigger (1 failed, 5 passed) → EXACT reverse substitution count==1 → `diff -q` BYTE-EQUAL vs pre-mutation copy → mirror re-synced → recovery `6 passed`.
+Mutation drill: plant `render-agentz` (1-char) in skills/internal/create-team/SKILL.md → guard RED on exactly test_c8_create_team_create_flow_runs_render_trigger (1 failed, 5 passed) → EXACT reverse substitution count==1 → `diff -q` BYTE-EQUAL vs pre-mutation copy → mirror re-synced → recovery `6 passed`.
 
 ## T019 red capture — 2026-10-08
 

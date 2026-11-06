@@ -1,0 +1,90 @@
+SC-009 — failure semantics reading (T045)
+================================================================================
+
+Criterion   : requirements.md SC-009 — one recomputable assertion per failure class
+              (zero-hit / out-of-ladder / unreadable / dual-layer), each report carrying
+              both the raw and the normalized identifier, and the four classes never
+              bleeding into one another (an out-of-ladder input is never reported as
+              zero-hit, an unreadable directory never as out-of-ladder).
+Carrier     : tests/contract/test_skill_reference_failures.py
+Implementn  : tests/contract/skill_reference_matrix.py (the single executable)
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : macOS 25.6.0 / arm64
+Interpreter : Python 3.14.6 ; pytest 9.2.0 ; git version 2.54.0 (Apple Git-157)
+HEAD        : 88be07141e2feb8902492e2dd357a1c8c97bed19
+
+## 1. The run (verbatim) — four classes with their paired reports, then the two
+##     mutual-exclusion readings
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_skill_reference_failures.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_skill_reference_failures.py
+zero-hit -> zero-hit report={'searched_coordinates': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': 'no-such-skill-xyz', 'normalized': 'no-such-skill-xyz'}
+out-of-ladder -> out-of-ladder report={'path': '../../etc/passwd', 'known_locations': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': '../../etc/passwd', 'normalized': '../../etc/passwd'}
+unreadable -> unreadable report={'path': 'skills/external/hollow-skill', 'defect': 'frontmatter: missing opening ---', 'raw': 'skills/external/hollow-skill', 'normalized': 'skills/external/hollow-skill'}
+dual-layer -> dual-layer report={'candidate_paths': ['.specify/skills/twin-skill/SKILL.md', 'skills/external/twin-skill/SKILL.md'], 'raw': 'twin-skill', 'normalized': 'twin-skill'}
+.exclusion[out-of-ladder->zero-hit] actual=out-of-ladder forbidden_seen=false
+.exclusion[unreadable->out-of-ladder] actual=unreadable forbidden_seen=false
+.....
+7 passed in 0.04s
+----- END VERBATIM -----
+
+## 2. The four classes, with the paired report visible per class
+
+| class | input (raw) | reported class | report items (verbatim, from § 1) |
+|---|---|---|---|
+| `zero-hit` | `no-such-skill-xyz` | `zero-hit` | `searched_coordinates` + `raw` + `normalized` |
+| `out-of-ladder` | `../../etc/passwd` | `out-of-ladder` | `path` + `known_locations` + `raw` + `normalized` |
+| `unreadable` | `skills/external/hollow-skill` | `unreadable` | `path` + `defect` + `raw` + `normalized` |
+| `dual-layer` | `twin-skill` | `dual-layer` | `candidate_paths` (2 paths) + `raw` + `normalized` |
+
+Every report carries both halves of the pair: `raw` is the input string, `normalized`
+the identifier after normalization (they coincide for the first two rows and differ for
+none of these four inputs — the rows that *do* differ are in the matrix's failure
+segment, R28 `@merge-skills` → `merge-skills` and R30 `skill:skill:merge-skills` →
+`skill:merge-skills`). The per-class payload is what distinguishes the classes, so a
+"failure" that names only its class is not this table.
+
+## 3. The mutual-exclusion readings (§ 1, lines 6–7)
+
+    exclusion[out-of-ladder->zero-hit] actual=out-of-ladder forbidden_seen=false
+    exclusion[unreadable->out-of-ladder] actual=unreadable forbidden_seen=false
+
+Both halves are load-bearing, and both are asserted:
+
+- the input built to close as `out-of-ladder` **did** close as `out-of-ladder` (not
+  merely "not zero-hit" — a class that went missing is a different defect and would
+  otherwise satisfy a one-sided assertion);
+- `zero-hit` was **not** the reported class.
+
+The same shape holds for `unreadable` / `out-of-ladder`. The classes are closed at four
+(FR-024 owns the count; the contract's "three permitted classes" is the *allowed
+duplicate* count and is a different fact — CL-01).
+
+## 4. The fixtures the four classes are built from
+
+| class | fixture | why it is genuine |
+|---|---|---|
+| `zero-hit` | the live tree | nothing named `no-such-skill-xyz` exists in any searched coordinate |
+| `out-of-ladder` | the live tree | `../../etc/passwd` leaves the known locations; the ladder, not the search, is what rejects it |
+| `unreadable` | `tmp_path` (`skills/external/hollow-skill/SKILL.md` with no frontmatter) | the directory exists and is named correctly — the defect is readability, which is why it must not be reported as out-of-ladder |
+| `dual-layer` | `tmp_path`, two **different** layers (`skills/external/<name>` + `.specify/skills/<name>`) | a source-and-mirror pair is one hit, not two (GR-05(c) / V-33); the assertion also checks the two candidate paths' `layer_of` values are `{dev-canonical, installed}` |
+
+## 5. Recomputing this reading
+
+- Re-run § 1. All four classes are deterministic: three are pure functions of the tree
+  contents, one is a `tmp_path` construction repeated identically each run.
+- Discriminating power (GM-07), inside the same `7 passed`: a `tmp_path` copy of the
+  implementation with the out-of-ladder return relabelled `zero-hit` makes
+  `check_failures` report the exclusion — the same assertion function, one string
+  changed, must go red. A further pair of cases re-labels a copy of the **owner
+  document** and re-runs the owner-side exclusion assertion, so the rule is asserted
+  both in the executable and in the document it projects (GR-06).
+- `7 passed` = one assertion per class, the two exclusions, the two-layer fixture check,
+  and the two negative cases (implementation copy + owner copy).
+
+## 6. Disclosure
+
+`dual-layer` is the only class whose semantics depend on the tree's layer arrangement;
+its fixture is therefore built in `tmp_path` rather than borrowed from the live tree,
+so the class stays testable even if the live tree later carries only one copy of a name.

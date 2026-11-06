@@ -35,14 +35,14 @@ Exactly one construction site changes in the generator, and its derived defaults
 
 | Before | After |
 |--------|-------|
-| `.specify/project/goal/<goal-slug>/` | `.specify/goal/<goal-slug>/summary/` |
-| `.specify/project/goal/<goal-slug>/data/project-input.yaml` | `.specify/goal/<goal-slug>/summary/data/project-input.yaml` |
-| `.specify/project/goal/<goal-slug>/data/.refresh.lock` | `.specify/goal/<goal-slug>/summary/data/.refresh.lock` |
+| `.specify/goal/<goal-slug>/` | `.specify/goal/<goal-slug>/summary/` |
+| `.specify/goal/<goal-slug>/data/project-input.yaml` | `.specify/goal/<goal-slug>/summary/data/project-input.yaml` |
+| `.specify/goal/<goal-slug>/data/.refresh.lock` | `.specify/goal/<goal-slug>/summary/data/.refresh.lock` |
 
-Verified by execution against the `goal-share-a` / `goal-share-b` fixtures: the generator today reports `delivery_dir = .specify/project/goal/shared-harvest-goal` and writes `data/project-input.yaml` beneath it, confirming a single path root drives every derived location.
+Verified by execution against the `goal-share-a` / `goal-share-b` fixtures: the generator today reports `delivery_dir = .specify/goal/shared-harvest-goal` and writes `data/project-input.yaml` beneath it, confirming a single path root drives every derived location.
 
 - **MG-1** `.specify/project/` MUST hold no goal artifacts after migration. Exactly one goal-indexed directory exists in the project.
-- **MG-2** The migration carries **no data**: `.specify/project/goal/` was never materialized in this repository — the generator creates it on demand. This is a code, documentation, and test migration.
+- **MG-2** The migration carries **no data**: `.specify/goal/` was never materialized in this repository — the generator creates it on demand. This is a code, documentation, and test migration.
 - **MG-3** The pre-existing `.specify/project/` contents (`project.md`, wbs/gantt/milestones charts) MUST NOT be moved, overwritten, or deleted.
 
 ## Reference surface

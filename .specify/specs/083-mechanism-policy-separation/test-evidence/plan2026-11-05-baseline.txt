@@ -1,0 +1,68 @@
+# Plan-stage baseline — 083 机制/策略分离（targeted-set, GM-08）
+
+**Captured**: 2026-11-05 12:09 (+08), branch `083-mechanism-policy-separation`, HEAD `aaee504c`
+**Runner pins**: `.venv/bin/python` → `Python 3.14.6`; `pytest 9.2.0`; `git version 2.54.0 (Apple Git-157)`
+**Prefix**: `env -u PYTHONPATH` is required on this host (research.md § R1: without it pytest aborts before collection with `ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'`).
+
+## 1. Command (verbatim, re-run at plan close)
+
+```bash
+env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -p no:cacheprovider \
+  --names-out /tmp/mp-plan-probe/impact-names.txt \
+  tests/contract/test_merge_provenance_gate.py tests/contract/test_expression_compatibility.py \
+  tests/contract/test_one_source_of_truth.py tests/contract/test_bilingual_expression.py \
+  tests/contract/test_token_efficiency_gates.py tests/contract/test_feedback_skill_conformance.py \
+  tests/contract/test_mirror_parity_suite.py tests/contract/test_glossary_mechanism.py \
+  tests/contract/test_instructions_section_propagation.py \
+  tests/contract/test_skill_layer_visibility_guards.py tests/contract/test_directory_governance.py \
+  tests/contract/test_portable_skill_creation.py
+```
+
+## 2. Result — TWO readings, because the working tree changed mid-stage
+
+| Reading | When | Result | Failed-name set | rc |
+|---------|------|--------|-----------------|-----|
+| **A — contaminated tree** | 2026-11-05 12:09 (plan close) | `1 failed, 892 passed in 14.13s` | `tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes` | 1 |
+| **B — clean tree** | 2026-11-05 (previous attempt, `research.md` § R2) | `892 passed in 16.66s` | empty | 0 |
+
+**Why A differs from B**: the working tree gained, concurrently with this stage, an uncommitted change outside this feature —
+`shared/definitions/skill-reference-definitions.md` (new) plus edits to `skills/external/{create-skills,improve-skills,merge-skills,coaching-skills}/SKILL.md`
+and `skills/internal/run-skills/SKILL.md`, with the `.specify/skills/` mirrors to match (mtimes 12:07:40–12:08:41, i.e. *after* this stage started).
+`test_c5_non_wiring_files_keep_their_frozen_hashes` is exactly the guard that goes red on such a change, and it names the three drifted files.
+That is the guard **working**, not a defect introduced here — and it is a **pre-existing dirty state**, which the stage discipline says MUST NOT be committed and MUST NOT be reverted.
+
+**Verbatim assertion (Reading A)**
+
+```
+E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the
+feedback-step pointer). drifted: ['skills/external/create-skills/SKILL.md',
+'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+E       assert not ['skills/external/create-skills/SKILL.md', ...]
+tests/contract/test_expression_compatibility.py:668: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+1 failed, 892 passed in 14.13s
+```
+
+## 3. Consequence for implement (GM-08)
+
+- The plan-stage gate is **docs-only / not-run** by selection (`test-evidence/plan2026-11-05-stage-status.jsonl`), so neither reading is a gate for this stage.
+- For the implement stage, **Reading B (empty failed set) is the baseline only once the tree is clean again**. Until the concurrent change above is
+  either committed by its own owner or removed, `test_c5_non_wiring_files_keep_their_frozen_hashes` is red for a reason that has nothing to do with 083,
+  and a naive `实现后失败集 − 基线失败集` would **credit 083 with a failure it did not cause**. Implement MUST therefore re-measure the baseline on the tree it
+  actually starts from, and record which of the two readings it used.
+- `test_expression_compatibility.py` is also the module that needs three `ALLOWED_POST_BASELINE_CHANGES` rows for 083's own edits (plan D7). If the
+  concurrent change also lands rows there, the two sets of rows are independent and both must be present — 083 MUST NOT reuse or edit the other change's rows.
+
+## 4. Closed-set / mirror baselines measured the same session
+
+```
+python3 (SC-003 containment, quickstart § S4 shape):
+compared=575 complement=570 allowed_in_unit=5 frozen_mismatches=0
+
+redline-check.py  create-skills / improve-skills / merge-skills  → rc 0  PASS — no red line triggered
+skill-shape.py    create-skills ≈5354 / improve-skills ≈5584 / merge-skills ≈5096  → rc 10 (all three, before edit)
+
+sync-mirrors.py --check            → rc 0   templates 22 / skills-external 409 / skills-internal 138 / agents 3 / scripts 119 / shared 62
+regen-command-copies.py --check    → rc 0   OK: all per-tool command copies match the source templates
+```

@@ -1,0 +1,4 @@
+slots=baseline:1 closure:1 reruns=1 exceptions=0 unknown=0 environment_failures=0
+stages=6 complete=6
+status=ok
+# audit rc=0

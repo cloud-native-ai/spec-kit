@@ -60,7 +60,7 @@
 
 [[STR-001]] `Present` / [[STR-002]] `Wired` / [[STR-003]] `Exercised` / [[STR-004]] `Outcome-supported` / [[STR-005]] `Missing` / [[STR-006]] `Unobserved` / [[STR-007]] `Not applicable`。
 
-语义全量移植上游 `models/agent-work-loop.md:97-103`,定义文本落 `skills/collect-evidence/references/evidence-discipline.md`;消费方不得裁剪/重定义(FR-005)。
+语义全量移植上游 `models/agent-work-loop.md:97-103`,定义文本落 `skills/internal/collect-evidence/references/evidence-discipline.md`;消费方不得裁剪/重定义(FR-005)。
 
 ## E6. manifest.json
 

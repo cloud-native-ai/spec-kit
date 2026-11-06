@@ -8,9 +8,12 @@ probe: "skill-create-requirements-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "074-goal-team-sdd-unification"
+disposition: "processed"
 partial: false
 created: "2026-10-28T12:47:08Z"
 summary: "The create-requirements skill produced the 074 spec and its quality checklist with no unresolved marker. The deterministic checker was run first and re-run after the clarification write-back; the chec"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

@@ -58,4 +58,4 @@ deferred_reason_summary=
 # -- Notes --
 # notes: plan.md:110 docs/-wholesale read remediated together with V-001 (same unit, same discipline; no new audit row per freeze rule).
 # notes: backlog V-006..V-009 left for a later iteration; V-009 (history-utils summary mode) recorded as engine-gap backlog row (T019 condition branch).
-# notes: gate-check.py mirror copy (.specify/scripts/python/) resolves gate path against its own tree (looked for .specify/.specify/gate.yaml, exit 3); canonical scripts/python/gate-check.py used instead — candidate upstream fix, out of this spec's scope.
+# notes: gate-check.py mirror copy (.specify/scripts/python/) resolves gate path against its own tree (looked for .specify/gate.yaml, exit 3); canonical scripts/python/gate-check.py used instead — candidate upstream fix, out of this spec's scope.

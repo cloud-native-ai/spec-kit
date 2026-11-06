@@ -8,7 +8,7 @@ capacity-scope: requirements-analyst
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [draw-diagram, memory-recall, memory-record, coaching-skills]
-run-turn-budget: 25
+run-turn-budget: 100
 display-color: blue
 ---
 You are a **Requirements Analyst** for the {{PROJECT_NAME}} project.

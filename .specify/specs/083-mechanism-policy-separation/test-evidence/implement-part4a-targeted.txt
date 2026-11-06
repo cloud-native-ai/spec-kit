@@ -1,0 +1,107 @@
+# Part 4A (T025–T028) targeted run — 2026-11-05T09:27:28Z, stage_base=094b23f3
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py -rA
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py -rA
+................F..............                                          [100%]
+=================================== FAILURES ===================================
+_________ test_sr01_to_sr06_each_consumer_cites_the_source_owner_once __________
+
+    def test_sr01_to_sr06_each_consumer_cites_the_source_owner_once():
+        problems = assert_consumer_wiring(REPO_ROOT / p for p in CONSUMERS)
+>       assert not problems, "SC-007 wiring violations:\n- " + "\n- ".join(problems)
+E       AssertionError: SC-007 wiring violations:
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: 2 references to the source owner path (lines [16, 24]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: mirror-path reference(s) at line(s) [16, 24] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/SKILL.md: 2 references to the source owner path (lines [35, 58]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/SKILL.md: mirror-path reference(s) at line(s) [35] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/merge-skills/SKILL.md: mirror-path reference(s) at line(s) [27] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md: 3 references to the source owner path (lines [26, 48, 67]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md: mirror-path reference(s) at line(s) [26, 48, 67] — a consumer cites the framework source, never the generated mirror
+E       assert not ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: 2 references to the sourc...xternal/coaching-skills/SKILL.md: 3 references to the source owner path (lines [26, 48, 67]), expected exactly 1', ...]
+
+tests/contract/test_skill_reference_consumers.py:139: AssertionError
+==================================== PASSES ====================================
+_______________________ test_sc006_every_row_recomputes ________________________
+----------------------------- Captured stdout call -----------------------------
+rows=30 matched=30 failed=0
+_______ test_sc007_containment_scan_reports_every_hit_and_the_file_count _______
+----------------------------- Captured stdout call -----------------------------
+permitted[owner]=0
+permitted[owner-mirror]=0
+permitted[fixture]=0
+class-name[zero-hit]=0
+class-name[out-of-ladder]=0
+class-name[unreadable]=0
+class-name[dual-layer]=0
+scanned=54 skills/**/SKILL.md
+______________ test_sc008_command_surface_positives_and_negatives ______________
+----------------------------- Captured stdout call -----------------------------
+R01 raw='speckit.skills' -> command-surface 'templates/commands/skills.md'
+R02 raw='/speckit.skills' -> command-surface 'templates/commands/skills.md'
+R03 raw='speckit.skills/SKILL.md' -> command-surface 'templates/commands/skills.md'
+R04 raw='speckit.skills' -> command-surface 'templates/commands/skills.md'
+R05 raw='speckit.nosuchcommand' -> command-surface 'templates/commands/nosuchcommand.md'
+R06 raw='skills/external/create-docs/SKILL.md' -> skill '-'
+R07 raw='create-docs' -> failure '-'
+R08 raw='humanize' -> failure '-'
+R09 raw='/improve-skills' -> failure '-'
+R10 raw='@merge-skills' -> failure '-'
+R11 raw='@/merge-skills' -> failure '-'
+R12 raw='skill:/merge-skills' -> failure '-'
+R13 raw='skill:improve-skills' -> failure '-'
+R14 raw='skills/external/merge-skills/SKILL.md' -> skill '-'
+R15 raw='skills/external/merge-skills/' -> skill '-'
+R16 raw='skills/external/merge-skills' -> skill '-'
+R17 raw='.specify/skills/humanize' -> skill '-'
+R18 raw='  "/improve-skills"  ' -> failure '-'
+R19 raw='SCRATCH-HELPER' -> failure '-'
+R20 raw='my-draft.md' -> failure '-'
+R21 raw='improve-skills' -> failure '-'
+R22 raw='no-such-skill-xyz' -> failure '-'
+R23 raw='../../etc/passwd' -> failure '-'
+R24 raw='docs/reference/skills/sdd-loop-driver.md' -> failure '-'
+R25 raw='skills/external/ghost-skill' -> failure '-'
+R26 raw='skills/external/hollow-skill' -> failure '-'
+R27 raw='twin-skill' -> failure '-'
+R28 raw='@merge-skills' -> failure '-'
+R29 raw='"improve-skills' -> failure '-'
+R30 raw='skill:skill:merge-skills' -> failure '-'
+__________________ test_sc009_one_assertion_per_failure_class __________________
+----------------------------- Captured stdout call -----------------------------
+zero-hit -> zero-hit report={'searched_coordinates': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': 'no-such-skill-xyz', 'normalized': 'no-such-skill-xyz'}
+out-of-ladder -> out-of-ladder report={'path': '../../etc/passwd', 'known_locations': ['skills/internal', 'skills/external', '.specify/skills/internal', '.specify/skills'], 'raw': '../../etc/passwd', 'normalized': '../../etc/passwd'}
+unreadable -> unreadable report={'path': 'skills/external/hollow-skill', 'defect': 'frontmatter: missing opening ---', 'raw': 'skills/external/hollow-skill', 'normalized': 'skills/external/hollow-skill'}
+dual-layer -> dual-layer report={'candidate_paths': ['.specify/skills/twin-skill/SKILL.md', 'skills/external/twin-skill/SKILL.md'], 'raw': 'twin-skill', 'normalized': 'twin-skill'}
+=========================== short test summary info ============================
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr01_head_declares_owned_and_not_owned_facts_with_landings
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr01_negative_case_dropping_a_not_owned_path_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr01_negative_case_removing_a_landing_section_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr02_accepted_forms_are_six_and_literal_with_e8
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr02_negative_case_dropping_one_accepted_form_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr03_normalization_steps_are_one_to_one_with_np1_to_np8
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr03_negative_case_swapping_two_steps_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr0304_output_is_the_closed_three_values_and_paired
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr0304_negative_case_adding_a_fourth_value_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr03_two_pass_case_rule_closes_a_multi_hit_as_failure
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr03_negative_case_relaxing_the_case_rule_turns_red
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr06_failure_table_has_four_rows_with_report_items
+PASSED tests/contract/test_skill_reference_grammar.py::test_gr06_negative_case_relabelling_a_class_turns_red
+PASSED tests/contract/test_skill_reference_matrix.py::test_sc006_fixture_is_three_disjoint_segments_of_at_least_twelve_rows
+PASSED tests/contract/test_skill_reference_matrix.py::test_sc006_every_row_recomputes
+PASSED tests/contract/test_skill_reference_matrix.py::test_sc006_negative_case_one_changed_expectation_turns_red
+PASSED tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_negative_case_mirror_reference_turns_red
+PASSED tests/contract/test_skill_reference_consumers.py::test_sc007_containment_scan_reports_every_hit_and_the_file_count
+PASSED tests/contract/test_skill_reference_consumers.py::test_sc007_scan_negative_case_a_copied_step_literal_turns_red
+PASSED tests/contract/test_skill_reference_consumers.py::test_sc007_scan_negative_case_a_copied_class_criterion_turns_red
+PASSED tests/contract/test_skill_reference_consumers.py::test_sc007_scan_negative_case_a_failure_name_copy_turns_red
+PASSED tests/contract/test_skill_reference_consumers.py::test_sc007_permitted_classes_are_named_constants_counted_separately
+PASSED tests/contract/test_skill_reference_command_surface.py::test_sc008_command_surface_positives_and_negatives
+PASSED tests/contract/test_skill_reference_command_surface.py::test_sc008_negative_case_flipping_one_expected_class_turns_red
+PASSED tests/contract/test_skill_reference_command_surface.py::test_sc008_negative_case_a_negative_row_ruled_command_turns_red
+PASSED tests/contract/test_skill_reference_failures.py::test_sc009_one_assertion_per_failure_class
+PASSED tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_out_of_ladder_is_not_zero_hit
+PASSED tests/contract/test_skill_reference_failures.py::test_sc009_mutual_exclusion_unreadable_is_not_out_of_ladder
+PASSED tests/contract/test_skill_reference_failures.py::test_sc009_dual_layer_case_uses_two_distinct_layers
+PASSED tests/contract/test_skill_reference_failures.py::test_sc009_negative_case_relabelling_a_class_turns_red
+FAILED tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_each_consumer_cites_the_source_owner_once
+1 failed, 30 passed in 0.65s
+rc=1

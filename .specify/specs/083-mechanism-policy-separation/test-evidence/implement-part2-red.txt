@@ -1,0 +1,186 @@
+# test runner: .venv/bin/python -m pytest -q -p no:cacheprovider tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_missing_policy.py
+FFF.FFFFFFFF...............                                              [100%]
+=================================== FAILURES ===================================
+______________ test_sw01_create_skills_carries_one_judgement_item ______________
+
+    def test_sw01_create_skills_carries_one_judgement_item():
+        problems = assert_create_skills_judgement(REPO_ROOT / CREATE_REL)
+>       assert not problems, "SW-01 violations:\n- " + "\n- ".join(problems)
+E       AssertionError: SW-01 violations:
+E         - expected exactly one Minimum checks item carrying 'Mechanism / policy separation', found 0
+E       assert not ["expected exactly one Minimum checks item carrying 'Mechanism / policy separation', found 0"]
+
+tests/contract/test_mechanism_policy_skill_wiring.py:180: AssertionError
+_____________ test_sw01_negative_case_deleting_the_item_turns_red ______________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-66/test_sw01_negative_case_deleti0')
+
+    def test_sw01_negative_case_deleting_the_item_turns_red(tmp_path):
+        source = REPO_ROOT / CREATE_REL
+        text = _read(source)
+        section = _section(text, "6. Validate the Skill")
+        item = [i for i in _checkbox_items(section) if JUDGEMENT_LITERAL in i]
+>       assert item, "artifact missing: cannot build the negative case before the item exists"
+E       AssertionError: artifact missing: cannot build the negative case before the item exists
+E       assert []
+
+tests/contract/test_mechanism_policy_skill_wiring.py:188: AssertionError
+______________ test_sw01_reference_doc_exists_and_stays_in_budget ______________
+
+    def test_sw01_reference_doc_exists_and_stays_in_budget():
+>       problems = assert_check_doc_shape(REPO_ROOT / CHECK_DOC_REL, _read(REPO_ROOT / OWNER_REL))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_mechanism_policy_skill_wiring.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_mechanism_policy_skill_wiring.py:206: in assert_check_doc_shape
+    text = _read(path)
+           ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/references/mechanism-policy-check.md')
+
+    def _read(path: Path) -> str:
+>       assert path.is_file(), "artifact missing: %s" % path
+E       AssertionError: artifact missing: /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/references/mechanism-policy-check.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/references/mechanism-policy-check.md').is_file
+
+tests/contract/test_mechanism_policy_skill_wiring.py:72: AssertionError
+_______________________ test_sw02_improve_skills_wiring ________________________
+
+    def test_sw02_improve_skills_wiring():
+>       problems = assert_improve_skills_wiring(REPO_ROOT / IMPROVE_REL)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_mechanism_policy_skill_wiring.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_mechanism_policy_skill_wiring.py:265: in assert_improve_skills_wiring
+    survey = _section(text, "2. 调研实现")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '---\nname: improve-skills\ndescription: This skill continuously improves one local Skill from a user-provided Skill d...en Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n'
+heading_prefix = '2. 调研实现'
+
+    def _section(text: str, heading_prefix: str) -> str:
+        """Return the body of the first ``##``/``###`` heading starting with the prefix."""
+        lines = text.splitlines()
+        start = None
+        level = None
+        for i, line in enumerate(lines):
+            stripped = line.lstrip("#")
+            depth = len(line) - len(stripped)
+            if 2 <= depth <= 3 and stripped.startswith(" " + heading_prefix):
+                start, level = i, depth
+                break
+>       assert start is not None, "section not found: %r" % heading_prefix
+E       AssertionError: section not found: '2. 调研实现'
+E       assert None is not None
+
+tests/contract/test_mechanism_policy_skill_wiring.py:87: AssertionError
+_______________ test_sw02_batch_statement_lives_in_the_playbook ________________
+
+    def test_sw02_batch_statement_lives_in_the_playbook():
+        playbook = _read(REPO_ROOT / PLAYBOOK_REL)
+        batch = _section(playbook, "Input Contract — batch mode detail")
+        lowered = batch.lower()
+>       assert "mechanism" in lowered and "policy" in lowered, (
+            "the batch section carries no mechanism/policy statement — the judgement runs "
+            "once for the whole batch"
+        )
+E       AssertionError: the batch section carries no mechanism/policy statement — the judgement runs once for the whole batch
+E       assert ('mechanism' in '## input contract — batch mode detail\n\n### running a batch (explicit multi-skill request)\n\nwhen the user explicit...` monitoring team (`create-team` / `improve-team`) and\ntell the user why, instead of forcing target-skill resolution.')
+
+tests/contract/test_mechanism_policy_skill_wiring.py:321: AssertionError
+________ test_sw02_negative_case_moving_the_candidate_literal_turns_red ________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-66/test_sw02_negative_case_moving0')
+
+    def test_sw02_negative_case_moving_the_candidate_literal_turns_red(tmp_path):
+        text = _read(REPO_ROOT / IMPROVE_REL)
+>       assert CANDIDATE_LITERAL in text, "artifact missing: cannot build the negative case before the category exists"
+E       AssertionError: artifact missing: cannot build the negative case before the category exists
+E       assert 'policy source missing or ambiguous' in '---\nname: improve-skills\ndescription: This skill continuously improves one local Skill from a user-provided Skill d...en Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n'
+
+tests/contract/test_mechanism_policy_skill_wiring.py:333: AssertionError
+________ test_sw04_wiring_points_name_the_owner_contract[create-skills] ________
+
+rel = PosixPath('skills/external/create-skills/SKILL.md')
+
+    @pytest.mark.parametrize("rel", [p[0] for p in WIRING_POINTS], ids=[p[0].parent.name for p in WIRING_POINTS])
+    def test_sw04_wiring_points_name_the_owner_contract(rel: Path):
+        problems = assert_wiring_order(REPO_ROOT / rel)
+>       assert not problems, "SW-04 violations in %s:\n- %s" % (rel, "\n- ".join(problems))
+E       AssertionError: SW-04 violations in skills/external/create-skills/SKILL.md:
+E         - expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0
+E         - does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)
+E       assert not ["expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0", 'does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)']
+
+tests/contract/test_mechanism_policy_skill_wiring.py:396: AssertionError
+_______ test_sw04_wiring_points_name_the_owner_contract[improve-skills] ________
+
+rel = PosixPath('skills/external/improve-skills/SKILL.md')
+
+    @pytest.mark.parametrize("rel", [p[0] for p in WIRING_POINTS], ids=[p[0].parent.name for p in WIRING_POINTS])
+    def test_sw04_wiring_points_name_the_owner_contract(rel: Path):
+        problems = assert_wiring_order(REPO_ROOT / rel)
+>       assert not problems, "SW-04 violations in %s:\n- %s" % (rel, "\n- ".join(problems))
+E       AssertionError: SW-04 violations in skills/external/improve-skills/SKILL.md:
+E         - expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0
+E         - does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)
+E       assert not ["expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0", 'does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)']
+
+tests/contract/test_mechanism_policy_skill_wiring.py:396: AssertionError
+________ test_sw04_wiring_points_name_the_owner_contract[merge-skills] _________
+
+rel = PosixPath('skills/external/merge-skills/SKILL.md')
+
+    @pytest.mark.parametrize("rel", [p[0] for p in WIRING_POINTS], ids=[p[0].parent.name for p in WIRING_POINTS])
+    def test_sw04_wiring_points_name_the_owner_contract(rel: Path):
+        problems = assert_wiring_order(REPO_ROOT / rel)
+>       assert not problems, "SW-04 violations in %s:\n- %s" % (rel, "\n- ".join(problems))
+E       AssertionError: SW-04 violations in skills/external/merge-skills/SKILL.md:
+E         - expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0
+E         - does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)
+E       assert not ["expected at least two references to the owner's '§ Consumption Contract' (the section and its wiring points), found 0", 'does not name the environment-error class, so the two error wordings cannot be told apart at this consumer (FR-007)']
+
+tests/contract/test_mechanism_policy_skill_wiring.py:396: AssertionError
+____________ test_sw04_create_skills_preflight_precedes_the_writes _____________
+
+    def test_sw04_create_skills_preflight_precedes_the_writes():
+        text = _read(REPO_ROOT / CREATE_REL)
+        preflight = text.index("Writability pre-flight")
+        section7 = text.index("### 7. Propagate the Skill")
+        section8 = text.index("### 8. Report completion")
+        wiring = [i for i in re.finditer(re.escape(CONSUMPTION_ANCHOR), text)]
+>       assert wiring, "artifact missing: create-skills carries no %r reference" % CONSUMPTION_ANCHOR
+E       AssertionError: artifact missing: create-skills carries no '§ Consumption Contract' reference
+E       assert []
+
+tests/contract/test_mechanism_policy_skill_wiring.py:405: AssertionError
+_____________ test_sw04_improve_skills_edit_precedes_the_edit_step _____________
+
+    def test_sw04_improve_skills_edit_precedes_the_edit_step():
+        text = _read(REPO_ROOT / IMPROVE_REL)
+        edit = text.index("7. **Update the Skill for the next execution**")
+        wiring = [m.start() for m in re.finditer(re.escape(CONSUMPTION_ANCHOR), text)]
+>       assert wiring, "artifact missing: improve-skills carries no %r reference" % CONSUMPTION_ANCHOR
+E       AssertionError: artifact missing: improve-skills carries no '§ Consumption Contract' reference
+E       assert []
+
+tests/contract/test_mechanism_policy_skill_wiring.py:419: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw01_create_skills_carries_one_judgement_item
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw01_negative_case_deleting_the_item_turns_red
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw01_reference_doc_exists_and_stays_in_budget
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw02_improve_skills_wiring
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw02_batch_statement_lives_in_the_playbook
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw02_negative_case_moving_the_candidate_literal_turns_red
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_points_name_the_owner_contract[create-skills]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_points_name_the_owner_contract[improve-skills]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_points_name_the_owner_contract[merge-skills]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_create_skills_preflight_precedes_the_writes
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_improve_skills_edit_precedes_the_edit_step
+11 failed, 16 passed in 0.10s

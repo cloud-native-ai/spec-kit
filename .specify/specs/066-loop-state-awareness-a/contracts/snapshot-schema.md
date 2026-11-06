@@ -1,6 +1,6 @@
 # Contract — Snapshot Output Schema
 
-**Owner**: `references/state-awareness.md` (semantics) and `scripts/loop-state.py` (emission). This contract is normative for slice A; clauses are numbered `SNP-NN`. Unknown fields are additive and MUST be ignored by old readers.
+**Owner**: `references/state-awareness.md` (semantics) and `skills/external/sdd-loop-driver/scripts/loop-state.py` (emission). This contract is normative for slice A; clauses are numbered `SNP-NN`. Unknown fields are additive and MUST be ignored by old readers.
 
 - **SNP-01**: The top-level document contains at least: `schema_version`, `action`, `line_id`, `run_id`, `stage`, `loop_state`, `verdict_source`, `watch_status`, `watch_verdict`, `completion`, `recovery_action`, `recovery_reason`, `recovery_detail`, `isolation_required`, `spine`, `registry`, `evidence`, `effective`, `salvage`, `interruptions`, `missing_artifacts`, `uncommitted_artifacts`, `stale_signals`, `evaluated_at`.
 - **SNP-02**: `schema_version` is the integer `1`; `action` is the string `"snapshot"`.

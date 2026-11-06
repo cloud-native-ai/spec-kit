@@ -52,4 +52,4 @@ deferred_reason_summary=无任务延期;SC-005 为采用后度量(非任务)
 
 # -- Free-form notes --
 
-notes=实现期修正:(1) plan/tasks 的 Mirror Obligations 原列 `.specify/templates/commands/` 镜像——该镜像已按 sync-mirrors.py exclude_parts 退役,实现开始时更正为"4 份 regen 生成副本";(2) test_dogfooding_practice.py 的 ENGINE_ACTIONS pin 按 041 先例修订(+introspect-register);(3) quickstart 步骤 2 在规划期执行验证时已修正(registry 缺失工作区 --kind internal 过滤归零)。所有提交待用户批准后落地。
+notes=实现期修正:(1) plan/tasks 的 Mirror Obligations 原列 `templates/commands/` 镜像——该镜像已按 sync-mirrors.py exclude_parts 退役,实现开始时更正为"4 份 regen 生成副本";(2) test_dogfooding_practice.py 的 ENGINE_ACTIONS pin 按 041 先例修订(+introspect-register);(3) quickstart 步骤 2 在规划期执行验证时已修正(registry 缺失工作区 --kind internal 过滤归零)。所有提交待用户批准后落地。

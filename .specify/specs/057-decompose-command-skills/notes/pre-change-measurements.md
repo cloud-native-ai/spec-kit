@@ -4,7 +4,7 @@
 
 | # | 命令 | 实测输出(2026-10-14) |
 |---|------|----------------------|
-| 1 | `python3 scripts/python/sync-mirrors.py --check` | EXIT=2;恰 1 条既有 DIFF:`.specify/skills/git-workspace/scripts/git_fleet.py`(不在本特性触及对上) |
+| 1 | `python3 scripts/python/sync-mirrors.py --check` | EXIT=2;恰 1 条既有 DIFF:`skills/external/git-utils/scripts/git_fleet.py`(不在本特性触及对上) |
 | 2 | `python3 .specify/scripts/python/scan-confirmation-gates.py` | blocking confirmation gates: 23(16 destructive + 7 governance_kept);violations 0 |
 | 3 | `python3 scripts/python/probe-utils.py --action compile-embeds --check` | 69 units, zero drift |
 | 4 | `python3 scripts/python/regen-command-copies.py --check` | OK: all per-tool command copies match the source templates. |

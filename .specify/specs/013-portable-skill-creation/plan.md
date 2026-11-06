@@ -74,7 +74,7 @@ scripts/
 # Mirror files to sync (FR-009)
 .specify/skills/
 └── create-skills/
-    ├── SKILL.md                     # Mirror of skills/create-skills/SKILL.md
+    ├── SKILL.md                     # Mirror of skills/external/create-skills/SKILL.md
     └── references/
         └── skill-creation-quality-checklist.md  # Mirror of checklist
 
@@ -99,7 +99,7 @@ N/A
 
 **Target state**: Remove Step 3 entirely. Renumber subsequent steps (Step 4 → Step 3, Step 5 → Step 4, etc.). Remove any remaining references to tool manifests in the Resource Directory Layout section. The `tools/` entry in the directory layout should be removed. The "Progressive Disclosure" step 3 mention of `tools/` should be updated to remove tool references.
 
-**Files**: `skills/create-skills/SKILL.md`, `.specify/skills/create-skills/SKILL.md` (mirror sync)
+**Files**: `skills/external/create-skills/SKILL.md`, `.specify/skills/create-skills/SKILL.md` (mirror sync)
 
 ### Change 2: Remove tool boilerplate from `templates/skills-template.md` (FR-003, FR-004)
 
@@ -141,30 +141,30 @@ N/A
 
 ### Change 5: Update quality checklist (FR-011)
 
-**Current state**: `skills/create-skills/references/skill-creation-quality-checklist.md` includes a "Resource Organization" section that mentions `tools/` as acceptable when containing generated tool manifests.
+**Current state**: `skills/external/create-skills/references/skill-creation-quality-checklist.md` includes a "Resource Organization" section that mentions `tools/` as acceptable when containing generated tool manifests.
 
 **Target state**: Remove the mention of `tools/` and generated tool manifests from the checklist. Keep the check for scripts, references, and assets being relevant.
 
-**Files**: `skills/create-skills/references/skill-creation-quality-checklist.md`, `.specify/skills/create-skills/references/skill-creation-quality-checklist.md` (mirror sync)
+**Files**: `skills/external/create-skills/references/skill-creation-quality-checklist.md`, `.specify/skills/create-skills/references/skill-creation-quality-checklist.md` (mirror sync)
 
 ### Change 6: Update `improve-skills/SKILL.md` tool-manifest references
 
-**Current state**: `skills/improve-skills/SKILL.md` Step 6 (validation) mentions refreshing tool manifests with `create-new-skill.sh --refresh-only` and `refresh-tools.sh`, and discusses generated manifest validation churn.
+**Current state**: `skills/external/improve-skills/SKILL.md` Step 6 (validation) mentions refreshing tool manifests with `create-new-skill.sh --refresh-only` and `refresh-tools.sh`, and discusses generated manifest validation churn.
 
 **Target state**: Remove the tool-manifest refresh instruction from the validation step. Remove the paragraph about distinguishing generated manifests from instruction changes. Keep the rest of the validation step intact.
 
-**Files**: `skills/improve-skills/SKILL.md`, `.specify/skills/improve-skills/SKILL.md` (mirror sync)
+**Files**: `skills/external/improve-skills/SKILL.md`, `.specify/skills/improve-skills/SKILL.md` (mirror sync)
 
 ### Change 7: Contract tests
 
 **New test file**: `tests/contract/test_portable_skill_creation.py`
 
 Assertions covering:
-- FR-001/FR-002: `skills/create-skills/SKILL.md` contains no "refresh-tools" or "tools/system.json" references
+- FR-001/FR-002: `skills/external/create-skills/SKILL.md` contains no "refresh-tools" or "tools/system.json" references
 - FR-003: `templates/skills-template.md` contains no "Tools" subsection or tool-manifest refresh commands
 - FR-005/FR-006: `templates/commands/skills.md` does not require tool manifests in modernization checklist
 - FR-007: `scripts/bash/create-new-skill.sh` does not contain `refresh_tools_for_target` calls (function definition or invocations)
-- FR-009: Mirror parity between `skills/create-skills/SKILL.md` and `.specify/skills/create-skills/SKILL.md`
+- FR-009: Mirror parity between `skills/external/create-skills/SKILL.md` and `.specify/skills/create-skills/SKILL.md`
 - FR-011: Quality checklist does not reference tool manifests
 
 **Existing test updates**: `tests/contract/test_create_skills_prompt_assets.py`

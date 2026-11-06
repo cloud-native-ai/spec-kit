@@ -43,7 +43,7 @@ EXIT=0
 
 | 常量 | 值 | 对本特性的含义 |
 |---|---|---|
-| `SCAN_DIRS`(`:35`) | `("templates/commands", "skills", "shared")`,递归 `rglob("*.md")`(`:85`) | **新真源文档在范围内**;`skills/summarize-project/**` 的搬家也在范围内 |
+| `SCAN_DIRS`(`:35`) | `("templates/commands", "skills", "shared")`,递归 `rglob("*.md")`(`:85`) | **新真源文档在范围内**;`skills/internal/summarize-project/**` 的搬家也在范围内 |
 | `SCAN_ROOT_FILES`(`:36`) | `("templates",)`,非递归 `glob("*.md")`(`:94`) | **`templates/instructions-template.md` 与 `templates/constitution-template.md` 都在范围内** |
 | `SKIP_DIR_PARTS`(`:37`) | `.specify`、`.claude`、`.qoder`、`.github`、`.opencode`、`__pycache__`、`.archive` | 镜像与 4 棵按工具副本树**不重复计数**;本 spec 目录不被扫描 |
 | `SELF_REL`(`:38`) | `shared/guidelines/confirmation-gates.md` | 该文件**整体豁免**计数 ⇒ 编辑它(FR-018 的 `:68` 提升)不影响 `total` |

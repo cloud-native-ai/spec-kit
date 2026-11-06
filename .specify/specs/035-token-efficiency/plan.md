@@ -82,9 +82,9 @@ shared/workflow/              # feedback-step.md 扩展 Reflect 步骤(Token 自
 templates/                    # instructions-template.md 增 ambient 引用节
 templates/commands/           # top-5 整改对象(以 audit.md 定稿;候选 plan/clarify/tasks/implement/requirements)
 scripts/python/               # feedback-utils.py list 增 --contains 过滤
-skills/create-skills/         # references/skill-creation-quality-checklist.md 增检查项
-skills/improve-skills/        # references/skill-quality-checklist.md 增检查项
-skills/create-agent/          # SKILL.md 验证步骤增检查项引用(create-team/create-tools 同)
+skills/external/create-skills/         # references/skill-creation-quality-checklist.md 增检查项
+skills/external/improve-skills/        # references/skill-quality-checklist.md 增检查项
+skills/internal/create-agent/          # SKILL.md 验证步骤增检查项引用(create-team/create-tools 同)
 tests/contract/               # 新 contract 测试:纪律文档/标记/引擎过滤/整改措辞钉扎
 ```
 
@@ -97,11 +97,11 @@ tests/contract/               # 新 contract 测试:纪律文档/标记/引擎�
 | `shared/guidelines/token-efficiency.md`(新增) | `.specify/shared/guidelines/token-efficiency.md` | `sync-mirrors.py --check` |
 | `shared/workflow/feedback-step.md` | `.specify/shared/workflow/feedback-step.md` | `sync-mirrors.py --check` |
 | `templates/instructions-template.md` | `.specify/templates/instructions-template.md` | `sync-mirrors.py --check`(字节一致) |
-| `templates/commands/<top-5 整改命令>.md`(每个) | `.specify/templates/commands/<cmd>.md`;`.claude/commands/speckit.<cmd>.md`;`.github/prompts/speckit.<cmd>.prompt.md`;`.qoder/commands/speckit.<cmd>.md`;`.qwen/commands/speckit.<cmd>.toml`;`.opencode/command/speckit.<cmd>.md` | `sync-mirrors.py --write` 委派 regen 后 `--check`;副本含整改措辞 |
+| `templates/commands/<top-5 整改命令>.md`(每个) | `templates/commands/<cmd>.md`;`.claude/commands/speckit.<cmd>.md`;`.github/prompts/speckit.<cmd>.prompt.md`;`.qoder/commands/speckit.<cmd>.md`;`.qwen/commands/speckit.<cmd>.toml`;`.opencode/command/speckit.<cmd>.md` | `sync-mirrors.py --write` 委派 regen 后 `--check`;副本含整改措辞 |
 | `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py` | `sync-mirrors.py --check` |
-| `skills/create-skills/references/skill-creation-quality-checklist.md` | `.specify/skills/create-skills/references/…` | `diff -rq skills/ .specify/skills/` |
-| `skills/improve-skills/references/skill-quality-checklist.md` | `.specify/skills/improve-skills/references/…` | 同上 |
-| `skills/create-agent/SKILL.md`、`skills/create-team/SKILL.md`、`skills/create-tools/SKILL.md` | `.specify/skills/<name>/SKILL.md` 各一 | 同上 |
+| `skills/external/create-skills/references/skill-creation-quality-checklist.md` | `.specify/skills/create-skills/references/…` | `diff -rq skills/ .specify/skills/` |
+| `skills/external/improve-skills/references/skill-quality-checklist.md` | `.specify/skills/improve-skills/references/…` | 同上 |
+| `skills/internal/create-agent/SKILL.md`、`skills/internal/create-team/SKILL.md`、`skills/internal/create-tools/SKILL.md` | `.specify/skills/<name>/SKILL.md` 各一 | 同上 |
 
 ## Complexity Tracking
 

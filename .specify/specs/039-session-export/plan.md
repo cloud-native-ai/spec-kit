@@ -86,8 +86,8 @@ tests/integration/              # 新增:夹具驱动 export.py 真跑(目录产
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `skills/export-session/SKILL.md`、`skills/export-session/scripts/export.py` | `.specify/skills/export-session/SKILL.md`、`.specify/skills/export-session/scripts/export.py` | `sync-mirrors.py --check` exit 0 |
-| `templates/commands/session.md` | `.specify/templates/commands/session.md`;`.claude/commands/speckit.session.md`;`.github/prompts/speckit.session.prompt.md`;`.qoder/commands/speckit.session.md`;`.opencode/command/speckit.session.md` | 同上(扇出经 `regen-command-copies.py`) |
+| `skills/export-session/SKILL.md`、`skills/internal/archive-session/scripts/export.py` | `.specify/skills/export-session/SKILL.md`、`skills/internal/archive-session/scripts/export.py` | `sync-mirrors.py --check` exit 0 |
+| `templates/commands/session.md` | `templates/commands/session.md`;`.claude/commands/speckit.session.md`;`.github/prompts/speckit.session.prompt.md`;`.qoder/commands/speckit.session.md`;`.opencode/command/speckit.session.md` | 同上(扇出经 `regen-command-copies.py`) |
 | `docs/reference/commands/session.md` | 无镜像(docs/ 不镜像) | — |
 | `.specify/memory/features/043.md`、`.specify/memory/features.md` | 无镜像(memory/ 不在 MIRROR_PAIRS) | — |
 

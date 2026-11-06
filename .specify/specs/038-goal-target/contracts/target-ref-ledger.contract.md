@@ -37,7 +37,7 @@
 
 - `authored_status: done` 的 Target 追加为 `milestones` 组行:`title` 取语句,`status` 映射 achieved 语义,`source` 取 `goal-target:<goal-slug>/goal.md#T-<nnn>`。
 - 判据投影行(036 FR-013)语义原样保留,来源标记两类天然区分;判据为空而存在 done Target → 里程碑组由 Target 来源条目填充并声明来源(US4 场景 2)。
-- `skills/summarize-project/` 代码与 DDL 不改——区分仅靠既有 `source` 列(D7)。
+- `skills/internal/summarize-project/` 代码与 DDL 不改——区分仅靠既有 `source` 列(D7)。
 
 ## 6. Contract / Integration Test Pins
 

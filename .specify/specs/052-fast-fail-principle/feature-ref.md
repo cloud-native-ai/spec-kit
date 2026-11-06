@@ -161,9 +161,9 @@ grep -oE '^\| FR-[0-9]{3} \|' feature-ref.md | sort -u | wc -l   # → 78
 | 宪章命令条目 | `templates/commands/constitution.md` | 4 棵按工具树由 `regen-command-copies.py` 再生 |
 | 活动宪章原则 XVI | `.specify/memory/constitution.md` + Sync Impact Report + 版本 1.13.0 | 手写(活动宪章不是镜像) |
 | 通道二命令侧 | `templates/commands/agents.md` Run Mode | 4 棵按工具树再生 |
-| 通道二技能侧 | `skills/create-agent/SKILL.md` 创作契约 | `.specify/skills/` 镜像 |
+| 通道二技能侧 | `skills/internal/create-agent/SKILL.md` 创作契约 | `.specify/skills/` 镜像 |
 | 通道二制品 | `agents/skill-verifier.agent.md`、`agents/structure-adjuster.agent.md` | `.specify/agents/templates/` 镜像 + 3 棵按工具 agent 树渲染 |
-| 通道三 | `skills/create-team/references/patterns.md` Per-Agent Payload 第六字段行 | `.specify/skills/` 镜像 |
+| 通道三 | `skills/internal/create-team/references/patterns.md` Per-Agent Payload 第六字段行 | `.specify/skills/` 镜像 |
 | 派发期义务 | `shared/definitions/subagent-definitions.md` 新增节 | `.specify/shared/` 镜像 |
 | 跨纪律登记 | `shared/guidelines/user-facing-comprehension.md` 类 ⑪ 行 | `.specify/shared/` 镜像 |
 | 新守卫 | `tests/contract/test_fast_fail_discipline.py`(**新**) | 无镜像 |

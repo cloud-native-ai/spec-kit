@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "074-goal-team-sdd-unification"
+disposition: "processed"
 partial: false
 created: "2026-10-28T12:47:04Z"
 summary: "Requirements spec 074 produced and validated: deterministic checker status ok (28 FR + 8 SC, 10 shared strings, 0 errors/warnings), decomposition gate proceed (28 <= 30). Three load-bearing design cho"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

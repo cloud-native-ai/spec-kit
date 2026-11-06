@@ -25,7 +25,7 @@
 **Purpose**: export.py 改造核心——支持面收敛、zip→目录、`--name` 必填、meta 输出骨架,US1/US2/US3/US4 全部消费
 
 - [X] T002 编写改造核心契约/集成测试(测试先行):新建 `tests/contract/test_export_skill_rework.py` pin `contracts/export-skill-rework.contract.md`——`PARSERS` 键集合 == 六家规范名(STR-002);被移除六标识(qwen/qoderwork/oh-my-pi/kimi/codex-app/qoder-IDE 形态)全文扫描计数 0;目录产物布局断言(构造 jsonl 夹具驱动 export.py:`main.*`/`session-meta.json`/`SESSION.md` 存在性,`subagents/`/`state/`/`large-results/`/`request-ids.jsonl` 按夹具内容);`--name` 缺省/文法越界 → 退出码 2;同名冲突 → 非零拒绝;copilot/hermes 探测无源 → 退出码 4 + "未探测到"声明;五值退出码语义;只读断言(夹具存储导出前后 hash 一致) [blockedBy: T001]
-- [X] T003 实现改造核心(满足 T002):编辑 `skills/export-session/scripts/export.py`——删除 qwen/qoder-IDE/qoderwork/oh-my-pi/kimi/codex-app 六家适配器与其专属辅助函数/路径常量;`PARSERS` 收敛为六家(claude-code/codex-cli/qoder-cli/opencode 保留适配 + copilot/hermes 新增探测式适配器,`available()` 按候选路径探测);四家 `*_pack` 的 zip 写入改为目录写入(D4 布局),移除原子 zip 机制(`_open_zip_atomic`/`_commit_zip`/`_abort_zip`);新增 `--name` 必填参数(文法校验,越界退出码 2)与同名冲突拒绝;stdout 改打印导出目录绝对路径;新增 `session-meta.json` 确定性输出(D7 字段集,含 `snapshot` 与 `over_summary_budget` 骨架);退出码五值保持 [blockedBy: T002]
+- [X] T003 实现改造核心(满足 T002):编辑 `skills/internal/archive-session/scripts/export.py`——删除 qwen/qoder-IDE/qoderwork/oh-my-pi/kimi/codex-app 六家适配器与其专属辅助函数/路径常量;`PARSERS` 收敛为六家(claude-code/codex-cli/qoder-cli/opencode 保留适配 + copilot/hermes 新增探测式适配器,`available()` 按候选路径探测);四家 `*_pack` 的 zip 写入改为目录写入(D4 布局),移除原子 zip 机制(`_open_zip_atomic`/`_commit_zip`/`_abort_zip`);新增 `--name` 必填参数(文法校验,越界退出码 2)与同名冲突拒绝;stdout 改打印导出目录绝对路径;新增 `session-meta.json` 确定性输出(D7 字段集,含 `snapshot` 与 `over_summary_budget` 骨架);退出码五值保持 [blockedBy: T002]
 - [X] T004 运行 T002 测试集全绿,并以本环境真实会话(claude-code 或 qoder-cli)冒烟一次目录导出确认端到端可跑 [blockedBy: T003]
 
 ## Phase 3: User Story 1 — 当前会话导出为用户命名目录(P1)🎯 MVP
@@ -40,7 +40,7 @@
 ### Implementation for User Story 1
 
 - [X] T006 [US1] 撰写命令模板(author-section,满足 T005):新建 `templates/commands/session.md`——frontmatter(description/argument-hint)、User Input、export 子命令文法、preview→confirm→execute 门禁(披露四要素)、委托 export-session 技能调用块、同名冲突交互确认(无 --force)、结果回报格式、Feedback/Documentation 收尾节 [blockedBy: T003,T005]
-- [X] T007 [US1] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 2 行):运行 `python3 scripts/python/sync-mirrors.py --write`;核验 `diff -q templates/commands/session.md .specify/templates/commands/session.md`,并 grep 确认 4 份 per-tool 副本含 export 文法:`.claude/commands/speckit.session.md`、`.github/prompts/speckit.session.prompt.md`、`.qoder/commands/speckit.session.md`、`.opencode/command/speckit.session.md` [blockedBy: T006]
+- [X] T007 [US1] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 2 行):运行 `python3 scripts/python/sync-mirrors.py --write`;核验 `diff -q templates/commands/session.md templates/commands/session.md`,并 grep 确认 4 份 per-tool 副本含 export 文法:`.claude/commands/speckit.session.md`、`.github/prompts/speckit.session.prompt.md`、`.qoder/commands/speckit.session.md`、`.opencode/command/speckit.session.md` [blockedBy: T006]
 - [X] T008 [US1] 端到端验证(render-verify):按 quickstart §1 对本环境真实会话(claude-code/qoder-cli)执行——导出成功与目录内容、`--session`/`--tool` 显式路径、缺 `--name` 与非法名拒绝(exit 2)、同名冲突拒绝;结果回写 `quickstart.md` 走查记录 [blockedBy: T007]
 
 **Checkpoint**: US1 完成即可独立交付——会话可导出为用户命名目录(MVP 主体)
@@ -57,7 +57,7 @@
 ### Implementation for User Story 2
 
 - [X] T010 [US2] 重写技能文档(author-section,满足 T009):重写 `skills/export-session/SKILL.md`——frontmatter(description 六家表述、argument-hint 加 `--name`、去 `x-source`/`disable-model-invocation` 语义保持);移除 §1 aone-open 使用上报段;调用段(bash/PowerShell 两组,解释器探测纪律保持)探测目录收敛六家;输出节改目录形态(D4 布局 + SESSION.md/session-meta.json);`--tool` 取值表六家;支持矩阵表含 copilot/hermes「会话存储未探测到」声明行;退出码表五值保持;描述文档流程节(脚本元信息 + agent 总结补写 + 预算降级纪律) [blockedBy: T003,T009]
-- [X] T011 [US2] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 1 行):运行 `python3 scripts/python/sync-mirrors.py --write`;核验 `diff -q skills/export-session/SKILL.md .specify/skills/export-session/SKILL.md` 与 `diff -q skills/export-session/scripts/export.py .specify/skills/export-session/scripts/export.py` [blockedBy: T010]
+- [X] T011 [US2] 镜像扇出 + 逐行核验(mirror-parity,覆盖 Mirror Obligations 第 1 行):运行 `python3 scripts/python/sync-mirrors.py --write`;核验 `diff -q skills/export-session/SKILL.md .specify/skills/export-session/SKILL.md` 与 `diff -q skills/internal/archive-session/scripts/export.py skills/internal/archive-session/scripts/export.py` [blockedBy: T010]
 - [X] T012 [US2] 收敛验收(render-verify):按 quickstart §2 执行——零残留 grep 双文件计数 0、`--tool copilot`/`--tool hermes` 探测退出码 4 + 声明文本、保留四家逐家真跑(本环境可用者 claude-code/qoder-cli 真跑;未安装者按未安装路径)与改造前产物内容面对照(夹具级);结果回写 quickstart §2 [blockedBy: T011]
 
 **Checkpoint**: US1+US2 = 完整 MVP(导出可用 + 支持面收敛通用)
@@ -73,7 +73,7 @@
 
 ### Implementation for User Story 3
 
-- [X] T014 [US3] 实现描述文档确定性半体(满足 T013):编辑 `skills/export-session/scripts/export.py`——冻结预算常量 `SUMMARY_LINE_LIMIT`/`SUMMARY_BYTE_LIMIT`(以主记录计);`session-meta.json` 完整字段集输出(D7);`SESSION.md` 渲染:STR-003 标识行 + 元信息节(与 meta.json 逐字段一致,不可得字段 null + 「记录未含」标注)+ 固定 heading 总结占位节;stdout 输出预算判定 [blockedBy: T003,T013]
+- [X] T014 [US3] 实现描述文档确定性半体(满足 T013):编辑 `skills/internal/archive-session/scripts/export.py`——冻结预算常量 `SUMMARY_LINE_LIMIT`/`SUMMARY_BYTE_LIMIT`(以主记录计);`session-meta.json` 完整字段集输出(D7);`SESSION.md` 渲染:STR-003 标识行 + 元信息节(与 meta.json 逐字段一致,不可得字段 null + 「记录未含」标注)+ 固定 heading 总结占位节;stdout 输出预算判定 [blockedBy: T003,T013]
 - [X] T015 [US3] 运行 T013 测试集全绿 + 对真实会话导出核验描述文档两形态一致,结果回写 quickstart §3 [blockedBy: T014]
 
 ## Phase 6: User Story 4 — 团队 run 追溯衔接(P3)

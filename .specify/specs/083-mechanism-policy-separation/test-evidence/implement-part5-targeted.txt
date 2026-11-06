@@ -1,0 +1,69 @@
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_skill_reference_failures.py tests/contract/test_expression_compatibility.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_run_skills_wiring.py tests/contract/test_coaching_run_contract.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_mirror_parity_suite.py tests/contract/test_bilingual_expression.py tests/contract/test_glossary_mechanism.py tests/contract/test_directory_governance.py tests/contract/test_shared_reference_rewrite.py
+........................................................................ [  7%]
+.....................................................F.................. [ 14%]
+.F...................................................................... [ 21%]
+........................................................................ [ 29%]
+........................................................................ [ 36%]
+........................................................................ [ 43%]
+........................................................................ [ 51%]
+........................................................................ [ 58%]
+........................................................................ [ 65%]
+........................................................................ [ 73%]
+........................................................................ [ 80%]
+........................................................................ [ 87%]
+........................................................................ [ 95%]
+...........................................F...                          [100%]
+=================================== FAILURES ===================================
+_______ test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work ________
+
+    def test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work():
+        body = _require_section(_text(SKILL), "Inputs")
+>       assert "<trainee-name|trainee-path>" in body
+E       assert '<trainee-name|trainee-path>' in "Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`. - Exactly two positional parameters: the Train...s behalf. - Missing-argument handling is a plain one-sentence clarification, then stop. It is not a confirmation step."
+
+tests/contract/test_coaching_run_contract.py:223: AssertionError
+_________________ test_c1_eight_identity_coordinates_all_hold __________________
+
+    def test_c1_eight_identity_coordinates_all_hold():
+        verdicts = _coordinate_verdicts()
+        assert len(verdicts) == 8, f"coordinate count drifted: {len(verdicts)}"
+        failing = {name: detail for name, (ok, detail) in verdicts.items() if not ok}
+>       assert not failing, "failing identity coordinates: " + repr(failing)
+E       AssertionError: failing identity coordinates: {'8-description-triggers': 'missing=[] call-form=False'}
+E       assert not {'8-description-triggers': 'missing=[] call-form=False'}
+
+tests/contract/test_coaching_wiring_contract.py:276: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/external/merge-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/create-docs/SKILL.md', 'skills/external/coaching-skills/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/create-skills/SKILL.md', 'skills/external/create-skills/references/mechanism-policy-check.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/dispatch-recipes.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/external/merge-skills/references/provenance-record.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/implement-feature/SKILL.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/review-feature-quality/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/run-skills/SKILL.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/references/artifact-and-implementation-review.md', 'skills/internal/manage-feedback/references/path-a-digest.md']
+E       assert not ['skills/external/merge-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/create-docs/SKIL...external/coaching-skills/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/create-skills/SKILL.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:103: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_coaching_run_contract.py::test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+3 failed, 980 passed in 37.96s

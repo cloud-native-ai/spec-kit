@@ -9,7 +9,7 @@
 | root_entries | 根目录入口文件集：README.md、ARCHITECTURE.md、CONTRIBUTING.md、CHANGELOG.md | 名称全大写（FR-010）；"一屏"尺寸阈值（FR-007，确定性） |
 | docs_tree | `docs/` 目录树：concepts/ tutorials/ tasks/ reference/ decisions/ contribute/ notes/ | 六类正式目录 + notes 临时区（FR-002） |
 | archive_zone | `docs/archive/` 归档区 | 只进不出；同名冲突后缀 `__<ts>` 避让（FR-004） |
-| workspace | `.specify/docs/` 运行产物工作区 | 干跑计划、审计日志落盘处（FR-003）；不混入 docs/ |
+| workspace | `docs/` 运行产物工作区 | 干跑计划、审计日志落盘处（FR-003）；不混入 docs/ |
 | zones | A=root_entries+docs_tree（读写）；B=代码/规格目录（只读）；C=符号链接等锚点（跳过） | 越区写入为缺陷 |
 
 ## 2. Desired-State Baseline（期望态基线）
@@ -64,8 +64,8 @@ expired --(续期：更新 expires)--> draft
 | 产物 | 形态 | 落点 | 必产 |
 |------|------|------|------|
 | 观察快照 | 内联报告 | 会话内 | ✅ |
-| 干跑计划 | 文件（`[x]/[ ]` 可勾选退出行） | `.specify/docs/plans/` | 移动/归档/重组类动作存在时 |
-| 审计日志 | 文件（时间戳、作用域、逐项动作+结果、容忍摘要、回滚依据） | `.specify/docs/audit/` | ✅（零收敛也落"全维度在容忍带内"） |
+| 干跑计划 | 文件（`[x]/[ ]` 可勾选退出行） | `docs/plans/` | 移动/归档/重组类动作存在时 |
+| 审计日志 | 文件（时间戳、作用域、逐项动作+结果、容忍摘要、回滚依据） | `docs/audit/` | ✅（零收敛也落"全维度在容忍带内"） |
 | 残差报告 | 内联报告（已收敛/已归档/已容忍/待人工决策） | 会话内 | ✅ |
 
 ## 7. Docs-Sync Step（文档同步步骤，FR-011）

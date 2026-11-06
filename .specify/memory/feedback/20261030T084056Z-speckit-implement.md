@@ -8,9 +8,11 @@ probe: "speckit-implement-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T08:40:56Z"
 summary: "part4 PASS: 162/162 targeted green, new_failures=0, seven frozen-roster reds closed; all seven C-8 commands exit 0; new-line gate blocking_hits=0 over 475 added lines; real coaching run validated 4/4 "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

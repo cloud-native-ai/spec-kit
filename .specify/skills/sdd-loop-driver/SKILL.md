@@ -106,7 +106,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 1. **自迭代**：U4 通过后立即派发下一阶段（U2），不等用户任何形式的「继续」。
 2. **独立校验**：阶段完成判定不由执行者自报——校验者不是该阶段执行子代理；哨兵在而产物缺 = 伪完成，判未完成；阶段 Wrap-up 记账缺失（且未返回 `WRAPUP-DEFERRED`）同样按伪完成判未完成（记账核验归 `references/stage-prompts.md` § Independent Verification）。
-3. **卡死处置**：达重试上限（缺省 2 次）或阶段超时（缺省 90 分钟）→ 停环、落状态脊、出上送件四要素（发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）。
+3. **卡死处置**：达重试上限（缺省 3 次）或阶段超时（缺省 180 分钟）→ 停环、落状态脊、出上送件四要素（发现了什么 / 为何吃重 / 已产生的中间产物逐项可定位 / 可选处置）。
 4. **状态脊**：每线状态文件在 U2 派发前、U3 终止判定时、U4 校验后、U5 停线时先写后动；续环与重入只认状态脊，不依赖会话记忆。
 5. **驱动者生命周期**：U3 是当前运行内的有界等待（外部 CLI 用窗口；本地原生以一次同步调用为界，见 `references/watch-model.md`），驱动者必须存活到全线收束或显式停线上送；独立 `sleep` 回合与「挂监视器后等通知/恢复」均不合法——除非宿主已被探针证明能自动恢复同一运行。确须结束时，唯一合法路径是把状态脊写为 stalled/reentry-required 并显式上报。
 6. **驱动拓扑**：加载者即驱动者，亲自执行 U0–U6；阶段子代理只收三段骨架提示词；本地拓扑的阶段派发用宿主原生子代理（MUST NOT 启动 qodercli），远端才用外部 CLI；反嵌套义务真源在 run-agent 派发治理，本手册于 U2 派发前自检。
@@ -130,7 +130,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 2. **两槽位测试预算**：每线仅 implement 起点与 review 后两次全量，其余用定向集留证。
 3. **Plan 只小修**：`PLAN-EDIT:` 声明；实质改动按两分支处置。
 4. **进度与脱离**：runner 默认 stream-json + live log；本地与远端均脱离，`--once` 只核验不重派。
-5. **大特性拆分门**：plan 入口 >30 FR 或 tasks U4 >40 任务判 `split-required`。
+5. **大特性拆分门**：plan 入口 >60 FR 或 tasks U4 >80 任务判 `split-required`。
 6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`。
 7. **跨特性重叠预检**：clarify U4 跑 `overlap-check.py`，先裁决归属再派发 plan。
 
@@ -181,7 +181,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
 - **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：本地拓扑的阶段派发用宿主原生子代理（MUST NOT 启动 qodercli），远端拓扑用外部 CLI；远端进入形态为 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，CLI 缺省取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖；以拓扑声明 + 实例引用发起执行；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
-- **阶段子代理预算**：默认 `run-turn-budget` 120；大 implement 阶段按 ≤8 任务/段拆分，细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
+- **阶段子代理预算**：默认 `run-turn-budget` 400；大 implement 阶段按 ≤16 任务/段拆分，细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
 
 ## Feedback & Probe Points（反馈与探针采集点）
 

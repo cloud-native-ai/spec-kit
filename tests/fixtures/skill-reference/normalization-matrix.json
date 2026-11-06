@@ -1,0 +1,550 @@
+{
+  "matrix_id": "SKILL-REFERENCE-NORMALIZATION-MATRIX",
+  "owner": "shared/definitions/skill-reference-definitions.md",
+  "implementation": "tests/contract/skill_reference_matrix.py",
+  "purpose": "The single expectation table for SC-006 / SC-008 / SC-009. Every row is recomputed by tests/contract/skill_reference_matrix.py and compared field by field by tests/contract/test_skill_reference_matrix.py; the denominator is this file's own row count. Rows start from the fourteen-line clarify probe (test-evidence/clarify-scope-update-fixture.json) and extend to every form SC-006 names.",
+  "captured": "2026-11-05",
+  "repo_state": "entries are read from the live repository by NP-7; every row declares the repo_root it was authored against",
+  "segments": {
+    "surface": "Rows whose outcome is command-surface, plus the rows that prove the ruling is not 'anything with a dot or a slash is a command' (SC-008).",
+    "normalize": "Rows that settle into skills — matched identically in both layers (§ Disambiguation rules (c): the layer, not the path literal), a single layer, or a scratch repository for the case-insensitive pass.",
+    "failure": "Rows that close on one of the four failure classes, each carrying that class's required report items (SC-009)."
+  },
+  "row_schema": {
+    "segment": "surface | normalize | failure — the three segments are disjoint",
+    "id": "R<NN>",
+    "raw": "the reference exactly as received",
+    "form": "one of the six accepted forms, or 'cli' for the NP-1 operation form",
+    "operation": "invocation | cli (NP-1; default invocation)",
+    "repo_root": "live | scratch | none — where NP-7 reads; 'scratch' rows are materialised under tmp_path by the module that reads them",
+    "scratch": "scratch rows only: {layer: {skill-name: {frontmatter, body}}, unreadable: [skill-name], dirs?: {layer: directory}} — dirs overrides the layer directory for one row",
+    "exercises": "the form or variation this row is here to prove",
+    "expect": "the closed three-valued expectation, paired with the raw identifier"
+  },
+  "rows": [
+    {
+      "segment": "surface",
+      "id": "R01",
+      "raw": "speckit.skills",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "a /speckit.* command name; a legal dotted name that must NOT be rejected as illegal characters",
+      "expect": {
+        "outcome": "command-surface",
+        "normalized": "speckit.skills",
+        "command_target": "templates/commands/skills.md"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R02",
+      "raw": "/speckit.skills",
+      "form": "slash reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "the command surface behind a slash: NP-4 strips the prefix before NP-6 tests the channel",
+      "expect": {
+        "outcome": "command-surface",
+        "normalized": "speckit.skills",
+        "command_target": "templates/commands/skills.md"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R03",
+      "raw": "speckit.skills/SKILL.md",
+      "form": "canonical path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "the same command name written a second way: NP-5 strips SKILL.md before NP-6, so both spellings converge",
+      "expect": {
+        "outcome": "command-surface",
+        "normalized": "speckit.skills",
+        "command_target": "templates/commands/skills.md"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R04",
+      "raw": "speckit.skills",
+      "form": "cli",
+      "operation": "cli",
+      "repo_root": "live",
+      "exercises": "the same command token arriving in the cli operation form (NP-1): both forms yield the same identifier",
+      "expect": {
+        "outcome": "command-surface",
+        "normalized": "speckit.skills",
+        "command_target": "templates/commands/skills.md"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R05",
+      "raw": "speckit.nosuchcommand",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "NEGATIVE (SC-008): command-shaped and in the /speckit.* namespace, but no such command — the ruling follows the namespace, not the shape of the string",
+      "expect": {
+        "outcome": "command-surface",
+        "normalized": "speckit.nosuchcommand",
+        "command_target": "templates/commands/nosuchcommand.md"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R06",
+      "raw": "skills/external/create-docs/SKILL.md",
+      "form": "canonical path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "NEGATIVE (SC-008): a path that a 'slash means command' reading would misjudge; it is a Skill, not a command",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "skills/external/create-docs",
+        "layer": "dev-canonical",
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "surface",
+      "id": "R07",
+      "raw": "create-docs",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "NEGATIVE (SC-008): a dot-free bare name carrying no slash; nothing about it is command-shaped. The live tree carries the same Skill at both the source and its installed mirror, which § Disambiguation rules (c) counts as ONE hit — so it settles as a skill, never a command",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "create-docs",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R08",
+      "raw": "humanize",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "bare name; the live tree carries the same Skill at both the source and its installed mirror, and § Disambiguation rules (c) makes those two paths ONE hit (the layer, not the path literal) — so this settles as a skill",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "humanize",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R09",
+      "raw": "/improve-skills",
+      "form": "slash reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "a leading / marks the slash-command surface, not 'invoke it instead'; NP-4 strips it before NP-6 sees the slash, and the source-plus-mirror hit is one, so this settles as a skill",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "improve-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R10",
+      "raw": "@merge-skills",
+      "form": "at reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "at reference in the invocation form; the source-plus-mirror hit is one (FR-023(c)), so this settles as a skill",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "merge-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R11",
+      "raw": "@/merge-skills",
+      "form": "at reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "prefix deformation: @/name counts as ONE prefix segment (NP-4); without that rule the residual keeps a slash and is read as a path",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "merge-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R12",
+      "raw": "skill:/merge-skills",
+      "form": "labelled reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "label plus slash: NP-3 then NP-4 run before NP-6, so the slash after the label is a prefix, not a path",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "merge-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R13",
+      "raw": "skill:improve-skills",
+      "form": "labelled reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "labelled reference without a slash",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "improve-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R14",
+      "raw": "skills/external/merge-skills/SKILL.md",
+      "form": "canonical path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "canonical path: NP-5 strips SKILL.md, and the normalized identifier carries no suffix",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "skills/external/merge-skills",
+        "layer": "dev-canonical",
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R15",
+      "raw": "skills/external/merge-skills/",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "directory path with a trailing slash",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "skills/external/merge-skills",
+        "layer": "dev-canonical",
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R16",
+      "raw": "skills/external/merge-skills",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "directory path without a trailing slash",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "skills/external/merge-skills",
+        "layer": "dev-canonical",
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R17",
+      "raw": ".specify/skills/humanize",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "the installed layer named explicitly: the same Skill as R08, reached through the mirror path, still one hit",
+      "expect": {
+        "outcome": "skill",
+        "normalized": ".specify/skills/humanize",
+        "layer": "installed",
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R18",
+      "raw": "  \"/improve-skills\"  ",
+      "form": "slash reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "wrapping quotes and surrounding whitespace (NP-2): the quotes are paired and disappear from the normalized identifier",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "improve-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R19",
+      "raw": "SCRATCH-HELPER",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "scratch",
+      "scratch": {
+        "layer": {
+          "dev-canonical": {
+            "Scratch-Helper": {
+              "frontmatter": true,
+              "body": "# Scratch-Helper\n"
+            }
+          }
+        },
+        "unreadable": []
+      },
+      "exercises": "case variant resolved by the exact-then-insensitive rule: the name matches no directory exactly, so one case-insensitive pass runs and finds the one candidate; the live tree carries no such name, so the pass has exactly one outcome",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "SCRATCH-HELPER",
+        "layer": "dev-canonical",
+        "case_pass": "insensitive"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R20",
+      "raw": "my-draft.md",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "none",
+      "exercises": "a .md that is not SKILL.md is not stripped: omit-extension is a settlement convention, not a normalization step",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "my-draft.md",
+        "layer": null,
+        "case_pass": "exact"
+      }
+    },
+    {
+      "segment": "normalize",
+      "id": "R21",
+      "raw": "improve-skills",
+      "form": "cli",
+      "operation": "cli",
+      "repo_root": "live",
+      "exercises": "the same identifier as R09 in the cli operation form: the two forms differ only in failure reachability, not in the identifier — same outcome class and same normalized value as R09",
+      "expect": {
+        "outcome": "skill",
+        "normalized": "improve-skills",
+        "layer": "dev-canonical"
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R22",
+      "raw": "no-such-skill-xyz",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "zero-hit (SC-009)",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "no-such-skill-xyz",
+        "failure_class": "zero-hit",
+        "report_items": [
+          "raw",
+          "normalized",
+          "searched_coordinates"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R23",
+      "raw": "../../etc/passwd",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "out-of-ladder: a relative escape in the path channel",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "../../etc/passwd",
+        "failure_class": "out-of-ladder",
+        "report_items": [
+          "raw",
+          "normalized",
+          "path",
+          "known_locations"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R24",
+      "raw": "docs/reference/skills/sdd-loop-driver.md",
+      "form": "canonical path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "out-of-ladder: a real file, plausible-looking, outside the known location set",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "docs/reference/skills/sdd-loop-driver.md",
+        "failure_class": "out-of-ladder",
+        "report_items": [
+          "raw",
+          "normalized",
+          "path",
+          "known_locations"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R25",
+      "raw": "skills/external/ghost-skill",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "zero-hit on an in-ladder path that names no directory: out-of-ladder must NOT absorb it",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "skills/external/ghost-skill",
+        "failure_class": "zero-hit",
+        "report_items": [
+          "raw",
+          "normalized",
+          "searched_coordinates"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R26",
+      "raw": "skills/external/hollow-skill",
+      "form": "directory path",
+      "operation": "invocation",
+      "repo_root": "scratch",
+      "scratch": {
+        "layer": {
+          "dev-canonical": {
+            "hollow-skill": {
+              "frontmatter": false,
+              "body": ""
+            }
+          }
+        },
+        "unreadable": [
+          "hollow-skill"
+        ]
+      },
+      "exercises": "unreadable: an in-ladder directory whose SKILL.md has invalid frontmatter; zero-hit and out-of-ladder must NOT absorb it",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "skills/external/hollow-skill",
+        "failure_class": "unreadable",
+        "report_items": [
+          "raw",
+          "normalized",
+          "path",
+          "defect"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R27",
+      "raw": "twin-skill",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "scratch",
+      "scratch": {
+        "layer": {
+          "dev-canonical": {
+            "twin-skill": {
+              "frontmatter": true,
+              "body": "# twin (source)\n"
+            }
+          },
+          "installed": {
+            "twin-skill": {
+              "frontmatter": true,
+              "body": "# twin (mirror)\n"
+            }
+          }
+        },
+        "unreadable": [],
+        "dirs": {
+          "dev-canonical": "skills/internal"
+        }
+      },
+      "exercises": "dual-layer: the same name in TWO genuinely different layers, never a source-and-mirror pair (a mirror pair is one hit — FR-023(c) / V-33). The dev-canonical hit lives under skills/internal, whose mirror is .specify/skills/internal; the installed hit under .specify/skills is therefore a different layer, not its mirror",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "twin-skill",
+        "failure_class": "dual-layer",
+        "report_items": [
+          "raw",
+          "normalized",
+          "candidate_paths"
+        ],
+        "candidate_paths": [
+          ".specify/skills/twin-skill/SKILL.md",
+          "skills/internal/twin-skill/SKILL.md"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R28",
+      "raw": "@merge-skills",
+      "form": "at reference",
+      "operation": "cli",
+      "repo_root": "live",
+      "exercises": "the C11 ruling: in the cli form the host consumes @, so the form is unreachable — zero-hit plus the note, and no syntax is invented to rescue it",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "merge-skills",
+        "failure_class": "zero-hit",
+        "report_items": [
+          "raw",
+          "normalized",
+          "searched_coordinates"
+        ],
+        "note": "this form is unreachable in the cli form"
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R29",
+      "raw": "\"improve-skills",
+      "form": "bare name",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "an unpaired wrapping quote is a failure, not a silent trim (NP-2)",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "\"improve-skills",
+        "failure_class": "zero-hit",
+        "report_items": [
+          "raw",
+          "normalized",
+          "searched_coordinates"
+        ]
+      }
+    },
+    {
+      "segment": "failure",
+      "id": "R30",
+      "raw": "skill:skill:merge-skills",
+      "form": "labelled reference",
+      "operation": "invocation",
+      "repo_root": "live",
+      "exercises": "a label is stripped exactly once (V-24): the second label survives and the residual does not resolve",
+      "expect": {
+        "outcome": "failure",
+        "normalized": "skill:merge-skills",
+        "failure_class": "zero-hit",
+        "report_items": [
+          "raw",
+          "normalized",
+          "searched_coordinates"
+        ]
+      }
+    }
+  ]
+}

@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Feature 083 (meta-skill governance: mechanism/policy separation + skill-reference
+  normalization)**: two framework owners — `shared/definitions/mechanism-policy-definitions.md`
+  (boundary test, misplacement symptoms, archival rules, consumption contract, meta-layer
+  membership) and `shared/definitions/skill-reference-definitions.md` (accepted forms,
+  normalization order, disambiguation rules, failure semantics) — plus one mechanism/policy
+  judgement line and one skill-reference line in each of the five meta-skill consumers
+  (`create-skills`, `improve-skills`, `merge-skills`, `coaching-skills`, `run-skills`). Pinned by
+  eleven contract modules under `tests/contract/`
+  (`test_mechanism_policy_{owner_doc,skill_wiring,guard,ownership,decidability,missing_policy}.py`
+  and `test_skill_reference_{grammar,matrix,consumers,command_surface,failures}.py`) and the
+  normalization matrix fixture `tests/fixtures/skill-reference/normalization-matrix.json`.
 - **Feature 084 (harness triple structure)**: harness processes move from a two-layer
   `markdown + script` carrier to a three-layer `markdown + yaml + script` one. New declaration layer
   `shared/declarations/` — `contract.yaml` owning every machine-read value domain, one

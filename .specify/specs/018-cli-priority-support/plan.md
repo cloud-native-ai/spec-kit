@@ -3,7 +3,7 @@
 **Branch**: `018-cli-priority-support` | **Date**: 2026-06-21 | **Spec**: [requirements.md](requirements.md)
 **Input**: Specification from `.specify/specs/018-cli-priority-support/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 

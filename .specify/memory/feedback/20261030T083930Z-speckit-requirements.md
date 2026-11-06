@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "078-bilingual-expression"
 feature_id: "078"
+disposition: "processed"
 partial: false
 created: "2026-10-30T08:39:30Z"
 summary: "positive"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

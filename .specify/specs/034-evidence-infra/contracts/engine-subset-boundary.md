@@ -41,4 +41,4 @@
 
 ## C-B7 边界侵蚀防御
 
-`skills/collect-evidence/references/evidence-discipline.md` MUST 载明"采集子集只进事实,不进观点";向子集新增上游文件时 MUST 同步更新 UPSTREAM.md 清单,且新增文件不得来自 C-B2 排除清单(评审红线)。
+`skills/internal/collect-evidence/references/evidence-discipline.md` MUST 载明"采集子集只进事实,不进观点";向子集新增上游文件时 MUST 同步更新 UPSTREAM.md 清单,且新增文件不得来自 C-B2 排除清单(评审红线)。

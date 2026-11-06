@@ -36,7 +36,7 @@ Mode is inferred from the invocation and confirmed with the user before any writ
 | Artifact | Path | Nature |
 |----------|------|--------|
 | source of truth | `templates/commands/goal.md` | authored |
-| runtime mirror | `.specify/templates/commands/goal.md` | generated |
+| runtime mirror | `templates/commands/goal.md` | generated |
 | Claude Code | `.claude/commands/speckit.goal.md` | generated |
 | GitHub Copilot | `.github/prompts/speckit.goal.prompt.md` | generated |
 | Qoder CLI | `.qoder/commands/speckit.goal.md` | generated |

@@ -19,8 +19,8 @@ description: "Task list for 012-skill-home-workdir — SKILL_HOME / SKILL_WORKDI
 
 - [ ] `pytest -m contract tests/contract/test_skill_home_workdir_template.py` passes with zero failures.
 - [ ] `templates/commands/skills.md` contains the five required sections from `data-model.md` entity 4 (`Path Conventions`, `Computation Idioms`, `Paired Example`, `Migration Mapping`, `Non-shell Agents`).
-- [ ] `skills/create-skills/SKILL.md` and its `.specify/skills/create-skills/SKILL.md` mirror have zero residual `SKILL_ROOT` references (SC-006).
-- [ ] `skills/improve-skills/SKILL.md` and its mirror contain the legacy-idiom detection clause (FR-010).
+- [ ] `skills/external/create-skills/SKILL.md` and its `.specify/skills/create-skills/SKILL.md` mirror have zero residual `SKILL_ROOT` references (SC-006).
+- [ ] `skills/external/improve-skills/SKILL.md` and its mirror contain the legacy-idiom detection clause (FR-010).
 - [ ] `diff skills/<name>/SKILL.md .specify/skills/<name>/SKILL.md` exits 0 for both edited Skills (mirror byte-equivalence).
 - [ ] Migration mapping table contains ≥ 3 rows covering all three legacy idiom kinds (SC-005 / FR-011).
 - [ ] SC-003 manual verification passes: same Skill invoked via `.specify/skills/<name>/` and `.github/skills/<name>/` symlink resolves `${SKILL_HOME}` to the same real path.
@@ -39,8 +39,8 @@ description: "Task list for 012-skill-home-workdir — SKILL_HOME / SKILL_WORKDI
 Single-project layout (per plan.md). Edit targets:
 
 - Template: `templates/commands/skills.md`
-- Authoring guide + mirror: `skills/create-skills/SKILL.md` ↔ `.specify/skills/create-skills/SKILL.md`
-- Improvement guide + mirror: `skills/improve-skills/SKILL.md` ↔ `.specify/skills/improve-skills/SKILL.md`
+- Authoring guide + mirror: `skills/external/create-skills/SKILL.md` ↔ `.specify/skills/create-skills/SKILL.md`
+- Improvement guide + mirror: `skills/external/improve-skills/SKILL.md` ↔ `.specify/skills/improve-skills/SKILL.md`
 - Test file: `tests/contract/test_skill_home_workdir_template.py`
 
 ---
@@ -75,7 +75,7 @@ Single-project layout (per plan.md). Edit targets:
 
 > Write these tests FIRST, run them, and confirm they FAIL before any implementation task in this phase.
 
-- [X] T003 [US1] Add failing assertions to `tests/contract/test_skill_home_workdir_template.py` for `TemplateAssertions.definesSkillHome`, `hasPathConventionsSection`, `hasComputationIdiomsSection` (verifies `SKILL_HOME_IDIOM` substring appears in `templates/commands/skills.md`), `containsNormativeScriptIdiom.skillHomeFallback` (exact substring match), `hasNonShellAgentsClause`, `TemplateAssertions.hasNestedInvocationsClause` (substring match for both `unset SKILL_HOME` and `MUST NOT unset SKILL_WORKDIR` within ~10 lines of each other in `templates/commands/skills.md`, resolving the "Nested invocations" edge case from requirements.md), `CreateSkillsAssertions.skillRootOccurrences == 0`, `CreateSkillsAssertions.skillHomeOccurrences >= 1`, `CreateSkillsAssertions.hasSkillHomeAdoptionGuidance` (matches a section in `skills/create-skills/SKILL.md` that instructs new Skills to write Skill-owned resources as `${SKILL_HOME}/...`), and `CreateSkillsAssertions.hasSkillWorkdirAdoptionGuidance` (matches the parallel sentence directing new Skills to write user-facing inputs/outputs as `${SKILL_WORKDIR}/...`).
+- [X] T003 [US1] Add failing assertions to `tests/contract/test_skill_home_workdir_template.py` for `TemplateAssertions.definesSkillHome`, `hasPathConventionsSection`, `hasComputationIdiomsSection` (verifies `SKILL_HOME_IDIOM` substring appears in `templates/commands/skills.md`), `containsNormativeScriptIdiom.skillHomeFallback` (exact substring match), `hasNonShellAgentsClause`, `TemplateAssertions.hasNestedInvocationsClause` (substring match for both `unset SKILL_HOME` and `MUST NOT unset SKILL_WORKDIR` within ~10 lines of each other in `templates/commands/skills.md`, resolving the "Nested invocations" edge case from requirements.md), `CreateSkillsAssertions.skillRootOccurrences == 0`, `CreateSkillsAssertions.skillHomeOccurrences >= 1`, `CreateSkillsAssertions.hasSkillHomeAdoptionGuidance` (matches a section in `skills/external/create-skills/SKILL.md` that instructs new Skills to write Skill-owned resources as `${SKILL_HOME}/...`), and `CreateSkillsAssertions.hasSkillWorkdirAdoptionGuidance` (matches the parallel sentence directing new Skills to write user-facing inputs/outputs as `${SKILL_WORKDIR}/...`).
 
 ### Manual Verification for User Story 1
 
@@ -84,8 +84,8 @@ Single-project layout (per plan.md). Edit targets:
 ### Implementation for User Story 1
 
 - [X] T004 [US1] In `templates/commands/skills.md`, add a top-level `## Path Conventions` section that defines `${SKILL_HOME}` per `data-model.md` entity 1 (meaning, invariants, usage rule); follow it with a `### Computation Idioms` subsection that quotes the FR-016 `SKILL_HOME` script idiom verbatim (must match `SKILL_HOME_IDIOM` constant from T001) and also lists the conceptual `dirname $(readlink -f SKILL.md)` recipe explicitly marked "prose only — NOT for scripts"; add a `### Non-shell Agents` clause stating that agents without a shell resolve `${SKILL_HOME}` semantically while keeping the same written form; then add a `### Nested Invocations` clause stating: "When one Skill's script calls another Skill's script, the caller MUST `unset SKILL_HOME` before the call so the callee's `${SKILL_HOME:-fallback}` recomputes from the callee's own location. The caller MUST NOT unset `SKILL_WORKDIR` — the user's working directory stays anchored across the chain. The runtime-export-precedence design (Clarifications Q3) applies to the top-level agent runtime; intermediate Skill scripts do not export `SKILL_HOME` for their callees." (covers FR-001, FR-003 partial, FR-004, FR-007, FR-013, FR-014, and the "Nested invocations" edge case from requirements.md).
-- [X] T005 [P] [US1] In `skills/create-skills/SKILL.md`, rename all four `SKILL_ROOT` occurrences (lines 37, 39, 42, 91 per pre-edit grep) to `SKILL_HOME`; under section "2. Determine SKILL_HOME and metadata" add two adjacent sentences: (a) "Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets)." and (b) "Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path the new Skill reads or writes (inputs in the user's project, outputs delivered to the user)."; cross-reference the `## Path Conventions` section of `templates/commands/skills.md` (covers FR-008, FR-009 fully, SC-001, SC-006).
-- [X] T006 [US1] Update `.specify/skills/create-skills/SKILL.md` so its content is byte-equivalent to the post-T005 `skills/create-skills/SKILL.md` (mirror invariant from `data-model.md` cross-entity rules). Depends on T005.
+- [X] T005 [P] [US1] In `skills/external/create-skills/SKILL.md`, rename all four `SKILL_ROOT` occurrences (lines 37, 39, 42, 91 per pre-edit grep) to `SKILL_HOME`; under section "2. Determine SKILL_HOME and metadata" add two adjacent sentences: (a) "Use `${SKILL_HOME}/<relative-path>` for every Skill-owned resource reference (scripts, references, assets)." and (b) "Use `${SKILL_WORKDIR}/<relative-path>` for every runtime/user-facing path the new Skill reads or writes (inputs in the user's project, outputs delivered to the user)."; cross-reference the `## Path Conventions` section of `templates/commands/skills.md` (covers FR-008, FR-009 fully, SC-001, SC-006).
+- [X] T006 [US1] Update `.specify/skills/create-skills/SKILL.md` so its content is byte-equivalent to the post-T005 `skills/external/create-skills/SKILL.md` (mirror invariant from `data-model.md` cross-entity rules). Depends on T005.
 - [X] T007 [US1] Run `pytest -m contract tests/contract/test_skill_home_workdir_template.py -v` and confirm every US1 assertion from T003 now passes. Resolve any failure before continuing to Phase 4. — Confirmed: 11 passed (1 sentinel + 10 US1 assertions).
 
 **Checkpoint**: User Story 1 fully functional — `${SKILL_HOME}` defined in template, adopted by `create-skills`, mirrors in sync, contract test green for US1 scope.
@@ -132,8 +132,8 @@ Single-project layout (per plan.md). Edit targets:
 ### Implementation for User Story 3
 
 - [X] T012 [US3] In `templates/commands/skills.md`, add a `## Migration Mapping` section containing a markdown table with at least three rows mapping legacy → new patterns (`./X` → `${SKILL_HOME}/X`; `${SKILL_ROOT}/X` → `${SKILL_HOME}/X`; agent-specific install path such as `${HOME}/.copilot/skills/<name>/X` → `${SKILL_HOME}/X`), each row including a concrete one-line `example_before` and `example_after` per `data-model.md` entity 3 (covers FR-011, SC-005).
-- [X] T013 [P] [US3] In `skills/improve-skills/SKILL.md`, within Workflow step 2 ("Measure execution effectiveness from history") or step 3 ("Analyze user-provided emphasis and organize improvement items"), add a "Legacy path idioms" detection bullet listing `./X`, `${SKILL_ROOT}/X`, and hard-coded agent-specific install paths (e.g., `${HOME}/.copilot/skills/<name>/...`) as migration candidates whenever a Skill is being improved; cross-reference the Migration Mapping table in `templates/commands/skills.md` (covers FR-010).
-- [X] T014 [US3] Update `.specify/skills/improve-skills/SKILL.md` so its content is byte-equivalent to the post-T013 `skills/improve-skills/SKILL.md`. Depends on T013.
+- [X] T013 [P] [US3] In `skills/external/improve-skills/SKILL.md`, within Workflow step 2 ("Measure execution effectiveness from history") or step 3 ("Analyze user-provided emphasis and organize improvement items"), add a "Legacy path idioms" detection bullet listing `./X`, `${SKILL_ROOT}/X`, and hard-coded agent-specific install paths (e.g., `${HOME}/.copilot/skills/<name>/...`) as migration candidates whenever a Skill is being improved; cross-reference the Migration Mapping table in `templates/commands/skills.md` (covers FR-010).
+- [X] T014 [US3] Update `.specify/skills/improve-skills/SKILL.md` so its content is byte-equivalent to the post-T013 `skills/external/improve-skills/SKILL.md`. Depends on T013.
 - [X] T015 [US3] Run `pytest -m contract tests/contract/test_skill_home_workdir_template.py -v` and confirm every US3 assertion from T011 now passes; US1+US2 assertions must remain green. — Confirmed: 20 passed (1 sentinel + 10 US1 + 3 US2 + 6 US3).
 
 **Checkpoint**: All three user stories independently functional. Pre-existing Skills can migrate opportunistically via the documented mapping.
@@ -149,8 +149,8 @@ Single-project layout (per plan.md). Edit targets:
 - [X] T018 SC-003 manual verification: follow `quickstart.md` Step 3 — invoke a Skill through the `.github/skills/<name>/` compatibility symlink and confirm `${SKILL_HOME}` resolves to the real `.specify/skills/<name>/` (or `skills/<name>/`) path, not the symlink path. Record the resolved path in a brief note. — PASSED. Canary Skill invoked via canonical and symlinked paths both resolved `${SKILL_HOME}` = `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/skills/sc003-canary-81397` (the real .specify path, not the .github symlink). SKILL_WORKDIR correctly anchored to the user's tmp dir.
 - [X] T019 SC-004 manual smoke test: run each pre-existing Skill once post-change — `create-skills`, `improve-skills`, `analysis-project`, `draw-d3js`, `draw-echarts`, `draw-plantuml` — and confirm each completes successfully with no behavioural regression vs. the pre-change baseline. Record exit status / produced artifact per Skill. — Structural pass: 4 unedited Skills (analysis-project, draw-d3js, draw-echarts, draw-plantuml) have zero git diff from HEAD — zero regression risk. 2 edited Skills (create-skills, improve-skills) have valid frontmatter, byte-equivalent mirrors, structurally sound. analysis-project's shell script: bash -n syntax OK. Real LLM-driven invocation of each Skill remains the operator's final SC-004 confirmation.
 - [X] T020 Run `quickstart.md` end-to-end (Steps 1–5) using a throwaway `skills/my-skill/` directory; confirm Steps 2, 3, 4, 5 all yield the expected output described in the quickstart. — PASSED. Steps 1-3 exercised by T018 canary script (SKILL_HOME resolved correctly via two layouts; SKILL_WORKDIR anchored to user dir). Step 4 (env override): `SKILL_HOME=/tmp/forced-home script.sh` printed `SKILL_HOME=/tmp/forced-home` — the `${VAR:-fallback}` precedence works. Step 5 (migration mapping): template's Migration Mapping section shows all 3 required idiom rows with valid before/after examples.
-- [X] T021 [P] Verify mirror byte-equivalence post-implementation: `diff skills/create-skills/SKILL.md .specify/skills/create-skills/SKILL.md` exits 0; `diff skills/improve-skills/SKILL.md .specify/skills/improve-skills/SKILL.md` exits 0. (Belt-and-braces check against T015's automated MirrorConsistency assertion.) — Both diffs returned exit 0; mirrors in sync.
-- [X] T022 Update `.specify/memory/features/013.md` by appending Key Change #17: "Completed `012-skill-home-workdir` implementation — added `${SKILL_HOME}` / `${SKILL_WORKDIR}` convention to `templates/commands/skills.md`, renamed `SKILL_ROOT` → `SKILL_HOME` in `skills/create-skills/SKILL.md` and its mirror, added legacy-idiom detection to `skills/improve-skills/SKILL.md` and its mirror, and added structural contract test `tests/contract/test_skill_home_workdir_template.py` covering FR-001 through FR-016 and SC-001 through SC-006."; bump `Last Updated` in `.specify/memory/features.md` Feature 013 row to today's date.
+- [X] T021 [P] Verify mirror byte-equivalence post-implementation: `diff skills/external/create-skills/SKILL.md .specify/skills/create-skills/SKILL.md` exits 0; `diff skills/external/improve-skills/SKILL.md .specify/skills/improve-skills/SKILL.md` exits 0. (Belt-and-braces check against T015's automated MirrorConsistency assertion.) — Both diffs returned exit 0; mirrors in sync.
+- [X] T022 Update `.specify/memory/features/013.md` by appending Key Change #17: "Completed `012-skill-home-workdir` implementation — added `${SKILL_HOME}` / `${SKILL_WORKDIR}` convention to `templates/commands/skills.md`, renamed `SKILL_ROOT` → `SKILL_HOME` in `skills/external/create-skills/SKILL.md` and its mirror, added legacy-idiom detection to `skills/external/improve-skills/SKILL.md` and its mirror, and added structural contract test `tests/contract/test_skill_home_workdir_template.py` covering FR-001 through FR-016 and SC-001 through SC-006."; bump `Last Updated` in `.specify/memory/features.md` Feature 013 row to today's date.
 
 ---
 
@@ -191,10 +191,10 @@ Single-project layout (per plan.md). Edit targets:
 ```bash
 # After T003/T003A confirm the test fails, launch the two implementation edits in parallel:
 Task: "Edit templates/commands/skills.md — add Path Conventions + Computation Idioms (SKILL_HOME) + Non-shell Agents sections (T004)"
-Task: "Edit skills/create-skills/SKILL.md — rename SKILL_ROOT → SKILL_HOME, add SKILL_HOME usage rule (T005)"
+Task: "Edit skills/external/create-skills/SKILL.md — rename SKILL_ROOT → SKILL_HOME, add SKILL_HOME usage rule (T005)"
 
 # Then sequentially:
-Task: "Mirror skills/create-skills/SKILL.md to .specify/skills/create-skills/SKILL.md (T006)"
+Task: "Mirror skills/external/create-skills/SKILL.md to .specify/skills/create-skills/SKILL.md (T006)"
 Task: "Run pytest -m contract; verify US1 assertions pass (T007)"
 ```
 
@@ -203,10 +203,10 @@ Task: "Run pytest -m contract; verify US1 assertions pass (T007)"
 ```bash
 # After T011/T011A confirm the test fails:
 Task: "Edit templates/commands/skills.md — add Migration Mapping section + table (T012)"
-Task: "Edit skills/improve-skills/SKILL.md — add legacy-idiom detection clause (T013)"
+Task: "Edit skills/external/improve-skills/SKILL.md — add legacy-idiom detection clause (T013)"
 
 # Then sequentially:
-Task: "Mirror skills/improve-skills/SKILL.md to .specify/skills/improve-skills/SKILL.md (T014)"
+Task: "Mirror skills/external/improve-skills/SKILL.md to .specify/skills/improve-skills/SKILL.md (T014)"
 Task: "Run pytest -m contract; verify US3 assertions pass (T015)"
 ```
 

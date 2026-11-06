@@ -127,7 +127,7 @@ tests/
 | `skills/external/sdd-loop-driver/SKILL.md` | `.specify/skills/sdd-loop-driver/SKILL.md` | `sync-mirrors.py --check --only skills/external/sdd-loop-driver` — no NEW drift vs §0 baseline (baseline: 3 DIFF, all three files are edited by this feature and should converge to clean) |
 | `skills/external/sdd-loop-driver/references/cli/index.md` + 5 profiles (new) | `.specify/skills/sdd-loop-driver/references/cli/*` | same command; new files must exist in both trees byte-identical |
 | `references/dispatch-recipes.md`, `references/stage-prompts.md`, `references/watch-model.md` | `.specify/skills/sdd-loop-driver/references/*` | same command; the §0 baseline drift is exactly `SKILL.md`, `dispatch-recipes.md`, `watch-model.md` — all three are edited by this feature, so the pair must converge to no drift; `stage-prompts.md` has no baseline drift |
-| `skills/external/sdd-loop-driver/scripts/line-registry.py` (new), `scripts/watch-target.sh` | `.specify/skills/sdd-loop-driver/scripts/*` | same command + `tests/contract/test_sdd_loop_driver_cli_profiles.py` pins the pair |
+| `skills/external/sdd-loop-driver/scripts/line-registry.py` (new), `skills/external/sdd-loop-driver/scripts/watch-target.sh` | `.specify/skills/sdd-loop-driver/scripts/*` | same command + `tests/contract/test_sdd_loop_driver_cli_profiles.py` pins the pair |
 | `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md` | `sync-mirrors.py --check --only shared/definitions/probe-definitions.md` — exit 0 for this file (it is not in the 9-file pre-existing drift baseline) |
 | `docs/reference/skills/sdd-loop-driver.md` | none (docs tree is not mirrored) | n/a |
 

@@ -180,7 +180,7 @@ name: "<required: unique identifier>"
 description: "<required: trigger words + when to use>"
 capability-tools: [Read, Grep, Glob]
 model-tier: auto
-run-turn-budget: 12
+run-turn-budget: 50
 display-color: purple
 ---
 ```

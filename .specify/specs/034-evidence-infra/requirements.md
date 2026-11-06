@@ -198,7 +198,7 @@
 - **SC-002 Source**: pytest 合同测试(`pytest -m contract`)输出 + findings.json 字段抽查记录(verification 记录)。
 - **SC-003 Source**: 隔离环境(无 Node)演练记录:doctor 输出、collect 产物与 manifest 泳道状态核对。
 - **SC-004 Source**: 采集产物与 `.specify/memory/feedback/` 索引条数比对 + 脱敏抽查记录 + recurrence 信号与人工盘点对照表。
-- **SC-005 Source**: 技能演练记录 + `diff -rq skills/collect-evidence .specify/skills/collect-evidence` 输出 + 技能格式核查单。
+- **SC-005 Source**: 技能演练记录 + `diff -rq skills/internal/collect-evidence .specify/skills/internal/collect-evidence` 输出 + 技能格式核查单。
 - **SC-006 Source**: improve-skills 闭环演练记录 + 三技能 SKILL.md 静态扫描(引用存在性 + 红线文本)+ 改造前后 SKILL.md diff 复核。
 - **SC-007 Source**: 两轮 improve 运行的干预台账与 compare 输出存档(verification 记录)。
 - **SC-008 Source**: 各适配器 fixture 测试输出 + 采集产物脱敏抽查 + doctor 能力表快照。

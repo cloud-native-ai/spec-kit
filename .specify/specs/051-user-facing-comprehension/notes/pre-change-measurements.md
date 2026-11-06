@@ -95,7 +95,7 @@ Suite totals at freeze time: **26 failed, 1972 passed**.
 planning, and the passed count has since grown by 48 tests. The delta from 24 to 26 is
 fully attributed:
 
-- **+3 new failures**, all caused by uncommitted in-flight work in `skills/draw-diagram/`
+- **+3 new failures**, all caused by uncommitted in-flight work in `skills/external/draw-diagram/`
   that postdates the planning baseline and is unrelated to this feature
   (`test_browser_site_exclusions.py::…::test_mirror_check_ignores_site_probe`,
   `test_scripts_distribution_parity.py::…::test_repo_has_no_orphan_or_drifted_scripts`,
@@ -117,9 +117,9 @@ directions** (0 new, 0 gone). Two things moved underneath it without changing th
   `test_derive_us3.py`, `test_derive_validate.py` and others). All 36 pass, so the failure
   set is untouched and this feature's 34 cases are still green.
 - **the cause of 3 of the 26 changed while the count did not**: those three assert a
-  whole-tree `sync-mirrors.py --check`. They previously failed on the `skills/draw-diagram/`
+  whole-tree `sync-mirrors.py --check`. They previously failed on the `skills/external/draw-diagram/`
   drift, which this session committed and mirrored away; they now fail on the
-  `skills/improve-skills/scripts/redline-check.py` drift that upstream itself shipped. See
+  `skills/external/improve-skills/scripts/redline-check.py` drift that upstream itself shipped. See
   section ③. This is exactly why GATE-1 and GATE-2③ compare **name sets**, not counts — a
   count-only check would have reported "still 26, nothing changed" across a real change of
   cause.
@@ -151,7 +151,7 @@ python3 scripts/python/sync-mirrors.py --check 2>&1 | grep -E '^(MISS|DIFF)' | s
 ```
 
 **Re-frozen 2026-09-18 after the rebase onto `gitlab/master`.** The originally frozen set was
-the two `skills/draw-diagram/` lines (one modified source file, one untracked file — another
+the two `skills/external/draw-diagram/` lines (one modified source file, one untracked file — another
 unit's in-flight work). Both are gone from this set for two separate reasons:
 
 1. That work was **committed at the user's direction** as its own clearly-attributed commit
@@ -160,12 +160,12 @@ unit's in-flight work). Both are gone from this set for two separate reasons:
    now agree, so neither line is drift any more.
 2. The single remaining line **arrived with the rebase** and is upstream's own: commit
    `925badb6 feat(improve-skills): add attribute-triggered red-line framework` committed
-   `skills/improve-skills/scripts/redline-check.py` and its mirror with **different content**.
+   `skills/external/improve-skills/scripts/redline-check.py` and its mirror with **different content**.
    Verified rather than assumed — extracting both blobs from upstream's own tree and
    comparing them:
 
    ```bash
-   git show gitlab/master:skills/improve-skills/scripts/redline-check.py          > /tmp/up-src.py
+   git show gitlab/master:skills/external/improve-skills/scripts/redline-check.py          > /tmp/up-src.py
    git show gitlab/master:.specify/skills/improve-skills/scripts/redline-check.py > /tmp/up-mir.py
    cmp /tmp/up-src.py /tmp/up-mir.py   # → differ: byte 6510, line 122
    ```
@@ -173,7 +173,7 @@ unit's in-flight work). Both are gone from this set for two separate reasons:
    The source carries the newer multi-line tuple formatting (14 lines where the mirror has
    7), i.e. the mirror is a **stale projection** of an earlier revision — upstream edited the
    source and did not re-sync. Repair is one command, `sync-mirrors.py --write --only
-   skills/improve-skills`, but it is **deliberately not run here**: it is another unit's
+   skills/external/improve-skills`, but it is **deliberately not run here**: it is another unit's
    script, and folding its repair into this feature's branch would attribute their fix to
    this work. Reported as an upstream deviation instead.
 

@@ -1,0 +1,363 @@
+{
+  "ledger": ".specify/memory/session/interview-wangwenshengyi.md",
+  "target": "shared/definitions/self-explanatory-definitions.md + shared/guidelines/self-explanatory.md + shared/workflow/best-practice-optimization.md",
+  "mode": "special",
+  "branches": [
+    "essence",
+    "boundary",
+    "naming-home",
+    "practice",
+    "application",
+    "governance"
+  ],
+  "started": "2026-11-04",
+  "decisions": [
+    {
+      "id": "D1",
+      "question": "核心断言与读者收益",
+      "dependsOn": [],
+      "branch": "essence",
+      "status": "settled",
+      "decision": "以人为本；从用户视角而非程序视角一次性传达系统信息；用户可直接看到，或经一个简单命令取得更详细的信息；防住结构不携带信息、用户只能逐项打开实体的失效。",
+      "span": "## 1. 这条原则断言什么",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-04 11:41:12"
+    },
+    {
+      "id": "D2",
+      "question": "与既有命名/路径原则的边界",
+      "dependsOn": [],
+      "branch": "boundary",
+      "status": "settled",
+      "decision": "与 Constitution X 最接近，是对其的具现化；核心判断条件是能否触发 goal 目录改为 <status>/<goal-slug> 的改造；望文生义应作为最佳实践流程中的一项。",
+      "span": "## 3. 与既有原则的关系; ## 4. 最佳实践流程（待定边界）",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-04 11:41:12"
+    },
+    {
+      "id": "D3",
+      "question": "受约束的命名与结构表面",
+      "dependsOn": [],
+      "branch": "boundary",
+      "status": "settled",
+      "decision": "当前只确定原则与实践方法，不预先固定实施面；不同项目与用户标准不同，无普适实施清单；由用户主动触发，或在优化流程中提示触发。",
+      "span": "## 2. 适用面与实践方法",
+      "supersededBy": null,
+      "round": 1,
+      "updated": "2026-11-04 11:41:12"
+    },
+    {
+      "id": "D4",
+      "question": "规范术语与文件名",
+      "dependsOn": [
+        "D1",
+        "D3"
+      ],
+      "branch": "naming-home",
+      "status": "settled",
+      "decision": "中文规范名：不言自明；英文规范名：Self-explanatory；文件名按同族约定：definitions 为 self-explanatory-definitions.md，guidelines 为 self-explanatory.md。",
+      "span": "shared/definitions/self-explanatory-definitions.md > 标题与命名史; shared/guidelines/self-explanatory.md > 标题",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:15"
+    },
+    {
+      "id": "D5",
+      "question": "原则的归属与权威形态",
+      "dependsOn": [
+        "D2",
+        "D3"
+      ],
+      "branch": "naming-home",
+      "status": "settled",
+      "decision": "概念、模式与实践方法先在 shared 层定义（框架源 shared/*，运行时镜像 .specify/shared/*）；Constitution 与 instructions 作为输出机制投射到用户项目 harness，不持有第二份定义；shared 层是唯一 owner。",
+      "span": "## 5. 权威归属与输出机制",
+      "supersededBy": null,
+      "round": 2,
+      "updated": "2026-11-04 11:55:45"
+    },
+    {
+      "id": "D6",
+      "question": "被编码属性的权威归属（与单一真源的关系）",
+      "dependsOn": [
+        "D1",
+        "D2"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "goal 的 status 仍以 goal.md YAML frontmatter 为 One Source of Truth；路径是投影、非第二真源，不得独立编辑路径改状态；投影由 /speckit.sanitize 等机制调协。",
+      "span": "## 6. 被编码属性的真源与投影",
+      "supersededBy": null,
+      "round": 2,
+      "updated": "2026-11-04 11:55:45"
+    },
+    {
+      "id": "D7",
+      "question": "维度选择判据",
+      "dependsOn": [
+        "D1",
+        "D3"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "判据按具体上下文决定：起点不是先选维度，而是用户需要更明确的信息系统；框架最佳实践目录中的望文生义作为候选实践，方法是将用户需要的信息维度加入名称/路径/结构；判据输入是用户信息需求，不是预先枚举的维度清单。",
+      "span": "## 2. 适用面与实践方法 > ### 2.2 维度选择判据（context-driven）",
+      "supersededBy": null,
+      "round": 2,
+      "updated": "2026-11-04 11:55:45"
+    },
+    {
+      "id": "D8",
+      "question": "维度过多的护栏",
+      "dependsOn": [
+        "D7"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "加维度的顺序：用户明确要求 > 框架自身规则 > 每次最多只增加一个维度；采用小步快跑、及时止损。",
+      "span": "shared/definitions/self-explanatory-definitions.md > ## 7. 维度增加顺序; shared/guidelines/self-explanatory.md > ## 2. 操作步骤; ## 3. 维度过多的护栏",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D9",
+      "question": "goal 状态目录案例的定位",
+      "dependsOn": [
+        "D3",
+        "D6",
+        "D7"
+      ],
+      "branch": "application",
+      "status": "settled",
+      "decision": "goal 的 <status>/<slug> 布局只是该概念的示例；具体 goal 改造作为后续项记录到 /speckit.todo，不在本概念中强制。",
+      "span": "shared/guidelines/self-explanatory.md > ## 5. 示例：goal 状态目录（仅示例）",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D10",
+      "question": "强制力与检查方式",
+      "dependsOn": [
+        "D5",
+        "D7"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "强制力 SHOULD；以最佳实践条目方式嵌入框架自主的优化流程。",
+      "span": "shared/definitions/self-explanatory-definitions.md > ## 5. 权威归属与强制力; shared/guidelines/self-explanatory.md > ## 6. 与最佳实践优化框架的关系",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D11",
+      "question": "非目标与反模式",
+      "dependsOn": [
+        "D1",
+        "D8"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "目的是提高人的可读性，必须存在具体目的；不得作为无缘由的预防性优化措施。",
+      "span": "shared/definitions/self-explanatory-definitions.md > ## 3. 适用面; shared/guidelines/self-explanatory.md > ## 7. 反模式; ## 8. 目的性约束（非目标）",
+      "supersededBy": null,
+      "round": 4,
+      "updated": "2026-11-04 14:07:23"
+    },
+    {
+      "id": "D12",
+      "question": "既有结构的回溯适用与迁移",
+      "dependsOn": [
+        "D7",
+        "D8",
+        "D9"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "既有结构逐步迁移，使用 reconcile 模式；每次调协生成具体的向目标靠近的动作；新结构直接执行，旧结构评估影响后由用户决定是否执行；每次调协重复该步骤。",
+      "span": "shared/guidelines/self-explanatory.md > ## 9. 既有结构的迁移（reconcile 模式）",
+      "supersededBy": null,
+      "round": 4,
+      "updated": "2026-11-04 14:07:23"
+    },
+    {
+      "id": "D13",
+      "question": "验收与判定样例",
+      "dependsOn": [
+        "D7",
+        "D10"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "验收样例在逐步实践中积累；当前只提供框架文档（记录字段），不固化正例/反例清单。",
+      "span": "shared/guidelines/self-explanatory.md > ## 10. 验收与样例积累框架",
+      "supersededBy": null,
+      "round": 5,
+      "updated": "2026-11-04 14:21:12"
+    },
+    {
+      "id": "D14",
+      "question": "框架集成面",
+      "dependsOn": [
+        "D5",
+        "D10"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "先在 definitions 与 guidelines 定义，再定义 shared/workflow 输出机制；/speckit.constitution 输出到 .specify/memory/constitution.md，/speckit.instructions 输出到 .specify/instructions.md；其他 /speckit.* 命令也应用这些最佳实践规则。",
+      "span": "shared/workflow/best-practice-optimization.md",
+      "supersededBy": null,
+      "round": 5,
+      "updated": "2026-11-04 14:21:12"
+    },
+    {
+      "id": "D15",
+      "question": "最佳实践流程的交付边界",
+      "dependsOn": [
+        "D2",
+        "D3"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "本次只交付不言自明这一项最佳实践；基于最佳实践的优化框架作为另一项交付，放到 /speckit.improve 流程中建设。",
+      "span": "shared/guidelines/self-explanatory.md > ## 6. 与最佳实践优化框架的关系",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D16",
+      "question": "查询可达性在判据中的地位",
+      "dependsOn": [
+        "D1",
+        "D7"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "可达性上限是用户可直接看到，下限是一个简单命令可取得；只要下限满足就足以支持一次改造。",
+      "span": "shared/definitions/self-explanatory-definitions.md > ## 2. 用户视角的信息可达性",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D17",
+      "question": "shared 层内的制品分解与本次目标",
+      "dependsOn": [
+        "D5"
+      ],
+      "branch": "naming-home",
+      "status": "settled",
+      "decision": "将概念名替换为不言自明（Self-explanatory）；核心概念定义在 shared/definitions/self-explanatory-definitions.md，实践方法在 shared/guidelines/self-explanatory.md；无需输出模式。",
+      "span": "shared/definitions/self-explanatory-definitions.md; shared/guidelines/self-explanatory.md",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D18",
+      "question": "路径投影的同步时机与一致性保证",
+      "dependsOn": [
+        "D6"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "投影采用最终一致，不要求实时性；调协后必须与真源一致。",
+      "span": "shared/definitions/self-explanatory-definitions.md > ## 6. 被编码属性的真源与投影; shared/guidelines/self-explanatory.md > ## 4. 投影的维护",
+      "supersededBy": null,
+      "round": 3,
+      "updated": "2026-11-04 13:59:14"
+    },
+    {
+      "id": "D19",
+      "question": "最佳实践优化框架的归属与交付",
+      "dependsOn": [
+        "D15"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "最佳实践优化框架的定义落在 shared/workflow/best-practice-optimization.md；每次 /speckit.improve 参考该工作流；框架在客户项目与 spec-kit 自身两种帽子下解析输出目标。",
+      "span": "shared/workflow/best-practice-optimization.md",
+      "supersededBy": null,
+      "round": 6,
+      "updated": "2026-11-04 14:37:33"
+    },
+    {
+      "id": "D20",
+      "question": "goal 状态目录改造的执行",
+      "dependsOn": [
+        "D9"
+      ],
+      "branch": "application",
+      "status": "deferred",
+      "decision": "deferred: D9：goal 布局仅为示例；具体改造交由 /speckit.todo 后续记录",
+      "span": null,
+      "supersededBy": null,
+      "round": null,
+      "updated": "2026-11-04 13:59:15"
+    },
+    {
+      "id": "D21",
+      "question": "旧结构迁移的影响评估内容",
+      "dependsOn": [
+        "D12"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "既有结构迁移的影响评估：找出所有引用被改名文件/路径/变量的代码或流程，评估改造工作量与向前兼容性，以可决策形式呈现给用户。",
+      "span": "shared/guidelines/self-explanatory.md > ## 9. 既有结构的迁移（reconcile 模式）",
+      "supersededBy": null,
+      "round": 5,
+      "updated": "2026-11-04 14:21:12"
+    },
+    {
+      "id": "D22",
+      "question": "D8 与 D12 的粒度关系",
+      "dependsOn": [
+        "D8",
+        "D12"
+      ],
+      "branch": "practice",
+      "status": "settled",
+      "decision": "D8 与 D12 粒度不同：D8 约束优化任务（目标为增加一个维度），D12 描述实现该目标的调协过程（可多次调协）；二者不冲突。",
+      "span": "shared/guidelines/self-explanatory.md > ## 9. 既有结构的迁移（reconcile 模式） > 粒度区分",
+      "supersededBy": null,
+      "round": 5,
+      "updated": "2026-11-04 14:21:12"
+    },
+    {
+      "id": "D23",
+      "question": "shared/workflow 的作用域与最终命名",
+      "dependsOn": [
+        "D14"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "shared/workflow 定义 best-practice-based 优化工作流：分析上下文、查找最佳实践文档；不言自明作为最佳实践条目或独立文档（视内容量）；每次 /speckit.improve 都参考该工作流。",
+      "span": "shared/workflow/best-practice-optimization.md > ## 1. 目的与适用范围; ## 3. 触发与上下文分析; ## 4. 最佳实践目录与条目形态",
+      "supersededBy": null,
+      "round": 6,
+      "updated": "2026-11-04 14:37:33"
+    },
+    {
+      "id": "D24",
+      "question": "宪章/指令中的输出形态",
+      "dependsOn": [
+        "D5",
+        "D14"
+      ],
+      "branch": "governance",
+      "status": "settled",
+      "decision": "使用 two-hat 区分：/speckit.constitution 与 /speckit.instructions 的输出直接呈现在用户项目；shared 层内容作用于 spec-kit 自身；优化流程也作用于 spec-kit 自优化，具体输出目标由对应执行流程决定。",
+      "span": "shared/workflow/best-practice-optimization.md > ## 2. 两顶帽子（Two Hats）; ## 6. 输出映射; ## 7. 输出形态",
+      "supersededBy": null,
+      "round": 6,
+      "updated": "2026-11-04 14:37:33"
+    }
+  ],
+  "retractions": []
+}

@@ -1,0 +1,12 @@
+# T022 command-surface proof — one run, verbatim (captured 2026-11-05, baseline 02bef714)
+$ env -u PYTHONPATH python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+rc=0
+
+$ git rev-parse 3ffeb26e:templates/commands/skills.md
+53159b7bb27faf6e8eace2feee6eb423821e338a
+$ git hash-object templates/commands/skills.md
+53159b7bb27faf6e8eace2feee6eb423821e338a
+
+$ git diff --name-status 3ffeb26e..HEAD -- templates/commands/
+(end)

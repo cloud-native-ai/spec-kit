@@ -5,7 +5,7 @@
 
 ## Summary
 
-Introduce two named, agent-engine-agnostic path variables — `${SKILL_HOME}` (the Skill's real on-disk directory after symlink resolution) and `${SKILL_WORKDIR}` (the runtime working directory of a Skill-invoked process) — into the `/speckit.skills` orchestration template (`templates/commands/skills.md`) and propagate the convention into `skills/create-skills/SKILL.md` and `skills/improve-skills/SKILL.md` (plus their `.specify/skills/` mirrors).
+Introduce two named, agent-engine-agnostic path variables — `${SKILL_HOME}` (the Skill's real on-disk directory after symlink resolution) and `${SKILL_WORKDIR}` (the runtime working directory of a Skill-invoked process) — into the `/speckit.skills` orchestration template (`templates/commands/skills.md`) and propagate the convention into `skills/external/create-skills/SKILL.md` and `skills/external/improve-skills/SKILL.md` (plus their `.specify/skills/` mirrors).
 
 The change is documentation-only: no new CLI code, no new scripts, no new runtime dependencies. The deliverable is a normative writing/computation convention covering (a) how authors reference Skill-owned resources, (b) how authors reference user-facing runtime paths, (c) how shell scripts self-compute both variables with a portable fallback, (d) how `SKILL_HOME` supersedes the legacy `SKILL_ROOT`, and (e) a legacy-→-new migration mapping so pre-existing Skills can be converted opportunistically without a flag-day change.
 
@@ -15,7 +15,7 @@ Technical approach: pick a portable shell idiom (`cd … && pwd -P` instead of `
 
 **Language/Version**: Markdown/YAML for templates and Skills (primary edit target); Bash 3.2+ for the normative script idiom (lowest common denominator: stock macOS `/bin/bash`); Python 3.8+ for the existing pytest harness  
 **Primary Dependencies**: No new runtime or build dependencies. Tests reuse existing `pytest` markers (`contract`); template/Skill content is plain Markdown, no new template engine  
-**Storage**: File-based repository artifacts only — `templates/commands/skills.md`, `skills/create-skills/SKILL.md`, `skills/improve-skills/SKILL.md`, mirrored `.specify/skills/<name>/SKILL.md` files, and optionally `.specify/instructions.md` / `CLAUDE.md` consistency check (per FR-015)  
+**Storage**: File-based repository artifacts only — `templates/commands/skills.md`, `skills/external/create-skills/SKILL.md`, `skills/external/improve-skills/SKILL.md`, mirrored `.specify/skills/<name>/SKILL.md` files, and optionally `.specify/instructions.md` / `CLAUDE.md` consistency check (per FR-015)  
 **Testing**: `pytest -m contract` for a new structural assertion suite on the updated template and Skills; manual regression check (per SC-004) by invoking each pre-existing Skill once post-change  
 **Target Platform**: All officially supported AI agents (Claude Code, GitHub Copilot, Qwen Code, opencode, Qoder); host OSes: macOS (BSD shell), Linux (GNU shell), WSL. The portable shell idiom must run on stock macOS `/bin/bash` (3.2) without GNU coreutils  
 **Project Type**: Single (Python CLI + Markdown templates + reusable Skill directories). No frontend/backend split  
@@ -123,7 +123,7 @@ The clarify phase deferred one item to planning ("the exact portable recipe for 
 
 **Decision**: No automatic edits to `CLAUDE.md` or `.specify/instructions.md`. Verify they contain no `SKILL_ROOT` references (grep check in the contract test); if a future audit finds drift, raise a follow-up.
 
-**Rationale**: FR-015 requires consistency, not unconditional edits. Current grep (Phase 0 evidence) shows `SKILL_ROOT` only in `skills/create-skills/SKILL.md` and its mirror — already in the edit scope. The Skills registry rows in `.specify/instructions.md` reference canonical paths, not the deprecated variable name.
+**Rationale**: FR-015 requires consistency, not unconditional edits. Current grep (Phase 0 evidence) shows `SKILL_ROOT` only in `skills/external/create-skills/SKILL.md` and its mirror — already in the edit scope. The Skills registry rows in `.specify/instructions.md` reference canonical paths, not the deprecated variable name.
 
 **Output**: `research.md` will record these three decisions as locked-in design choices.
 
@@ -193,5 +193,5 @@ This command stops here. Next step: `/speckit.tasks` to decompose into atomic ta
 - Phase 1 (Setup): create the new contract test file with failing assertions.
 - Phase 2 (Foundational): finalize the portable shell idiom and the migration mapping table content.
 - Phase 3 (US1 / US2 — P1): edit `templates/commands/skills.md` with the new section, paired example, and table; verify contract test now passes for the template.
-- Phase 4 (US3 — P2): edit `skills/create-skills/SKILL.md` (rename `SKILL_ROOT`, adopt `${SKILL_HOME}`) and its mirror; edit `skills/improve-skills/SKILL.md` to flag legacy idioms; sync mirrors; final contract test pass.
+- Phase 4 (US3 — P2): edit `skills/external/create-skills/SKILL.md` (rename `SKILL_ROOT`, adopt `${SKILL_HOME}`) and its mirror; edit `skills/external/improve-skills/SKILL.md` to flag legacy idioms; sync mirrors; final contract test pass.
 - Phase 5 (Verification): SC-003 (two-layout regression) + SC-004 (six pre-existing Skill smoke check).

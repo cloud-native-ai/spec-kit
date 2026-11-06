@@ -8,9 +8,12 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "076"
+disposition: "processed"
 partial: false
 created: "2026-10-29T09:46:33Z"
 summary: "clarify round 1: six rulings ratified (template anchor, analyze scope, validator contract, expected_sacrifice grammar, quartet rejection judge, mirror pairs); 7 FR amended; validate-requirements exit "
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

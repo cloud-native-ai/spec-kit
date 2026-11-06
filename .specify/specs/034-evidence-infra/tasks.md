@@ -147,8 +147,8 @@
 ### Implementation for User Story 4
 
 - [X] T025 [P] [US4] 撰写 `.specify/shared/workflow/evidence-step.md`(FR-009,与 feedback-step.md 对偶结构:定位与红线 → canonical 步骤块 Step A 采集/复用 → Step B 按 evidenceState 分拣(四路规则)+ 候选冻结 → Step E 干预台账 → embedder 注意事项);源侧镜像 `shared/workflow/evidence-step.md`(确认仓库存在顶层 shared/ 后双写;不存在则以 .specify/ 侧为单源并在 verification.md 记录)
-- [X] T026 [P] [US4] 撰写 `skills/collect-evidence/SKILL.md`(编排四步 + Feedback 节,红线:不解读证据)与 `references/evidence-contract.md`(findings 合同人读版,引用 contracts/findings-contract.md 内容)、`references/evidence-discipline.md`(四纪律 + 七态定义,移植上游 agent-work-loop.md:97-103 语义 + C-B7 边界句)
-- [X] T027 [US4] 双镜像 + 注册:`cp -rf skills/collect-evidence .specify/skills/collect-evidence` 且 `diff -rq` 零差异;`.specify/instructions.md` Skills 注册表追加 collect-evidence 行 + Key Directories 技能计数更新为真实值(现 23 + 1 = 24,列表补 code-review/collect-evidence 等实际在位技能名)
+- [X] T026 [P] [US4] 撰写 `skills/internal/collect-evidence/SKILL.md`(编排四步 + Feedback 节,红线:不解读证据)与 `references/evidence-contract.md`(findings 合同人读版,引用 contracts/findings-contract.md 内容)、`references/evidence-discipline.md`(四纪律 + 七态定义,移植上游 agent-work-loop.md:97-103 语义 + C-B7 边界句)
+- [X] T027 [US4] 双镜像 + 注册:`cp -rf skills/internal/collect-evidence .specify/skills/internal/collect-evidence` 且 `diff -rq` 零差异;`.specify/instructions.md` Skills 注册表追加 collect-evidence 行 + Key Directories 技能计数更新为真实值(现 23 + 1 = 24,列表补 code-review/collect-evidence 等实际在位技能名)
 - [X] T028 [US4] 运行 T024 的 US4 断言全绿;对话式演练技能一次(doctor → collect → 边界申明),输出存档为 SC-005 素材
 
 **Checkpoint**: 证据层公共入口就绪,消费改造可开始
@@ -167,9 +167,9 @@
 
 ### Implementation for User Story 5
 
-- [X] T030 [P] [US5] 改造 `skills/improve-skills/SKILL.md`:Workflow Step 2("Measure execution effectiveness from history",L32-41)升级为 Step A/B(调 evidence-utils latest/collect,session+feedback 泳道分拣,候选冻结);保留失败模式分类法与既有纪律;改动 30~60 行级
-- [X] T031 [P] [US5] 改造 `skills/improve-agent/SKILL.md`:同构接入 Step A/B(assets 泳道模板 lint 证据入分析);"不从通用最佳实践优化"红线与 Unobserved 红线合并表述;保留六节结构分析法(§3 Analyze root causes)
-- [X] T032 [P] [US5] 改造 `skills/improve-team/SKILL.md`:Inputs 表 evidence 行(L21)与 Behavior Gather evidence 步骤改为消费 runs 泳道 findings(evidence-utils latest/collect),移除对 STATE.md/run-log.jsonl 的直接解析表述;保留 Refinement Map 与结构保持编辑
+- [X] T030 [P] [US5] 改造 `skills/external/improve-skills/SKILL.md`:Workflow Step 2("Measure execution effectiveness from history",L32-41)升级为 Step A/B(调 evidence-utils latest/collect,session+feedback 泳道分拣,候选冻结);保留失败模式分类法与既有纪律;改动 30~60 行级
+- [X] T031 [P] [US5] 改造 `skills/internal/improve-agent/SKILL.md`:同构接入 Step A/B(assets 泳道模板 lint 证据入分析);"不从通用最佳实践优化"红线与 Unobserved 红线合并表述;保留六节结构分析法(§3 Analyze root causes)
+- [X] T032 [P] [US5] 改造 `skills/internal/improve-team/SKILL.md`:Inputs 表 evidence 行(L21)与 Behavior Gather evidence 步骤改为消费 runs 泳道 findings(evidence-utils latest/collect),移除对 STATE.md/run-log.jsonl 的直接解析表述;保留 Refinement Map 与结构保持编辑
 - [X] T033 [US5] 三技能镜像 dual-write + parity:分别 `cp -f` 到 `.specify/skills/{improve-skills,improve-agent,improve-team}/SKILL.md`;逐个 `diff -q` 零差异;运行 T029 断言全绿;改造前后 SKILL.md diff 存档(保留项完好性复核,SC-006 素材)
 - [X] T034 [US5] Dogfood 闭环演练(SC-006):对 `skill:improve-skills` 走完整流程——collect(全泳道)→ 按 evidenceState 分拣并冻结候选 → 选一条 Exercised 负向证据做最小定向修改 → 写 `intervention.json`(E8 四要素,verdict 留空)→ 演练记录存档
 
@@ -247,9 +247,9 @@ US1 ⊥ US3(可并行);US2 ← US1(引擎在位);US4 ← US2;US5 ← US3+US4;US6
 
 ```bash
 # 三技能改造并行(不同文件):
-Task: "改造 skills/improve-skills/SKILL.md Step 2 → Step A/B"
-Task: "改造 skills/improve-agent/SKILL.md 接入 Step A/B"
-Task: "改造 skills/improve-team/SKILL.md 切换 runs 泳道消费"
+Task: "改造 skills/external/improve-skills/SKILL.md Step 2 → Step A/B"
+Task: "改造 skills/internal/improve-agent/SKILL.md 接入 Step A/B"
+Task: "改造 skills/internal/improve-team/SKILL.md 切换 runs 泳道消费"
 ```
 
 ## Implementation Strategy

@@ -9,11 +9,11 @@
 
 | 实体 | 物化形态 | 生命周期 | 归属 |
 |------|----------|----------|------|
-| 目标结构声明 (Target Structure Declaration) | `.specify/docs/target-structure.md`(受管块) | 跨运行长存 | `/speckit.docs` 编排层 |
+| 目标结构声明 (Target Structure Declaration) | `docs/target-structure.md`(受管块) | 跨运行长存 | `/speckit.docs` 编排层 |
 | 调协动作 (Reconcile Action) | 干跑计划行 → 审计日志条目 → 残差报告行 | 单次运行内 | `/speckit.docs` 编排层 |
 | 分发批次 (Dispatch Batch) | 干跑计划的分组 + 分发前告知 | 单次运行内 | `/speckit.docs` 编排层 |
 
-**复用的既有产物**(reconcile-pattern.md 四件强制产物,本特性不改其定义):观察快照(inline)、干跑计划(`.specify/docs/plans/<ts>-plan.md`)、审计日志(`.specify/docs/audit/<ts>-docs-audit.md`,经 `docs-utils.py --action audit` 追加)、残差报告(inline)。
+**复用的既有产物**(reconcile-pattern.md 四件强制产物,本特性不改其定义):观察快照(inline)、干跑计划(`docs/plans/<ts>-plan.md`)、审计日志(`docs/audit/<ts>-docs-audit.md`,经 `docs-utils.py --action audit` 追加)、残差报告(inline)。
 
 ---
 
@@ -21,7 +21,7 @@
 
 项目专属文档结构契约,每次调协的期望态锚点。
 
-**路径**: `.specify/docs/target-structure.md` —— 运行工作区**根级单文件**。与按次产物子目录 `plans/`、`audit/` 处于不同层级,这一结构差异即 FR-002a 要求的"可区分"实现方式:任何按目录轮转/清理按次产物的操作都不会触及根级文件。
+**路径**: `docs/target-structure.md` —— 运行工作区**根级单文件**。与按次产物子目录 `plans/`、`audit/` 处于不同层级,这一结构差异即 FR-002a 要求的"可区分"实现方式:任何按目录轮转/清理按次产物的操作都不会触及根级文件。
 
 **字段(受管块内)**:
 
@@ -35,9 +35,9 @@
 | `固定检索入口` | 是 | 表:消费者 · 入口 · 刷新方式 | 至少覆盖人类索引入口与 Agent instructions 的 Documentation Map；只保存项目专属路径/刷新指针,不复制 create-docs 基线枚举 |
 | `最后确认` | 是 | 日期 + 确认方式(随计划批准 / 显式重设) | 用于 FR-004 复用判定与 FR-015 脱节检测 |
 
-**标记**: `<!-- DOCS_TARGET_STRUCTURE_START -->` … `<!-- DOCS_TARGET_STRUCTURE_END -->`(成对,沿用 `.specify/git-workflow.md` 先例)。标记之外的内容为人工可加注区,写入时**字节保持**。
+**标记**: `<!-- DOCS_TARGET_STRUCTURE_START -->` … `<!-- DOCS_TARGET_STRUCTURE_END -->`(成对,沿用 `docs/git-workflow.md` 先例)。标记之外的内容为人工可加注区,写入时**字节保持**。
 
-**骨架来源**: `templates/docs-target-structure-template.md`(占位符形态),经 templates 镜像对同步到 `.specify/templates/`,并由 `specify init` 装入下游项目。
+**骨架来源**: `skills/external/create-docs/assets/docs-target-structure-template.md`(占位符形态),经 templates 镜像对同步到 `.specify/templates/`,并由 `specify init` 装入下游项目。
 
 ### 状态机
 
@@ -95,7 +95,7 @@
 | 规则 | 来源 FR | 检验方式 |
 |------|---------|----------|
 | 声明只引用不复制基线枚举 | FR-002 / SC-005 | 契约测试:模板骨架零基线枚举字符串;dogfood 时对实文件交叉计数 |
-| 声明与按次产物可区分且不随其轮转 | FR-002a | 契约测试:声明路径为工作区根级;`sanitize-utils.py` `MATERIAL_ROOTS` 不含 `.specify/docs` |
+| 声明与按次产物可区分且不随其轮转 | FR-002a | 契约测试:声明路径为工作区根级;`sanitize-utils.py` `MATERIAL_ROOTS` 不含 `docs` |
 | 每动作携带四要素 | FR-005 | 契约测试:干跑计划行须含类型/对象/技能/层级 |
 | 结构↔create-docs、内容↔improve-docs | FR-006 / FR-007 / SC-002 | 契约测试 + dogfood 残差报告归属核对 |
 | 内容动作必有证据、无证据不改写 | FR-007 / SC-004 | dogfood:连续两次全量运行,未指瑕文档零 diff |

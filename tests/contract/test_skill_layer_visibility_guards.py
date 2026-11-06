@@ -47,11 +47,13 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 # together: `INTERNAL_SKILLS` gains it and the nested count 37 -> 38. The pinned count is not
 # decoration: guard 1's exclusion is only meaningful while internal units actually exist, so a
 # census that stopped tracking them would let the guard go green over an empty subtree.
+# 2026-11-05 (improve-skills ssh-utils): +1 external unit — `ssh-utils`, the SSH transport
+# owner extracted from `sdd-project-setup`; the external roster and flat count 15 -> 16 move.
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
     "coaching-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
-    "sdd-project-setup", "humanize",
+    "sdd-project-setup", "ssh-utils", "humanize",
 }
 INTERNAL_SKILLS = {
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -100,8 +102,8 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 15, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 15 external "
+    assert len(seen) == 16, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 16 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"

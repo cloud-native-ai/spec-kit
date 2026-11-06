@@ -1,0 +1,23 @@
+# T035 post-rewrite population — captured 2026-11-05T17:48:44+0800 at HEAD fa563b0e
+
+$ grep -rno "\.specify/shared/definitions/skill-reference-definitions\.md" skills/ | wc -l
+       0
+
+$ per-file reference count after the rewrite (source form = only allowed string)
+skills/internal/run-skills/SKILL.md mirror_lines=0 source_lines=1
+skills/external/create-skills/SKILL.md mirror_lines=0 source_lines=1
+skills/external/improve-skills/SKILL.md mirror_lines=0 source_lines=1
+skills/external/merge-skills/SKILL.md mirror_lines=0 source_lines=1
+skills/external/coaching-skills/SKILL.md mirror_lines=0 source_lines=1
+
+$ the five surviving source-path reference strings, with their landing sections
+- **skill name**: A concise command-like identifier matching the project script validator: letters, digits, hyphens (`-`), and underscores (`_`) only. A reference form is accepted — `/name`, `@name`, 
+- **Target identifier**: identify exactly one local Skill by `skill_id`, frontmatter `name`, canonical path, or Skill directory name. This skill declares **only the parameter and its meaning**; the ac
+- **`Source`** (merged *from*, then decommissioned): the source skill's reference. Its accepted forms, normalization order and failure semantics are owned by `shared/definitions/skill-reference-defini
+  `shared/definitions/skill-reference-definitions.md` — reach them there, and
+- **`Target`**:要运行的技能标识,来自调用方参数或会话上下文;名称可省略扩展名。接受形式、归一化顺序与失败语义归 `shared/definitions/skill-reference-definitions.md`(此处只声明参数名与含义);前缀 `/` 只标记该技能的斜杠命令面,**不是**「直接调用它」的指令。
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_skill_reference_consumers.py
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_skill_reference_consumers.py
+.......                                                                  [100%]
+7 passed in 0.39s

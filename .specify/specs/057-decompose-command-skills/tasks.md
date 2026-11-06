@@ -24,7 +24,7 @@
 ## Completion Gate
 
 - GATE-1: 结构契约测试全绿 — check: `python3 -m pytest tests/contract/test_run_skills_wiring.py -q` EXIT=0
-- GATE-2: 镜像义务相对判据 — check: `python3 scripts/python/sync-mirrors.py --check` DIFF 计数仍 = 1 且为既有 `.specify/skills/git-workspace/scripts/git_fleet.py`
+- GATE-2: 镜像义务相对判据 — check: `python3 scripts/python/sync-mirrors.py --check` DIFF 计数仍 = 1 且为既有 `skills/external/git-utils/scripts/git_fleet.py`
 - GATE-3: 无残留开放任务 — check: `grep -cE '^- \[[ >]\]' .specify/specs/057-decompose-command-skills/tasks.md` 返回 0
 - GATE-4: verification.md 逐 SC 状态 — check: `grep -cE 'SC-00[1-5]' .specify/specs/057-decompose-command-skills/verification.md` ≥ 5
 - GATE-5: 门控预算不变(设计规避验证) — check: `python3 .specify/scripts/python/scan-confirmation-gates.py` total 仍 = 23、violations = 0
@@ -56,7 +56,7 @@
 **Purpose**: 测试先行与两故事共用的注册基础设施;完成前不得开始任何用户故事
 
 **Generation-time premise measurements(2026-10-14 实跑,生成期复测与 plan 阶段一致)**:
-`python3 scripts/python/sync-mirrors.py --check` → EXIT=2,恰 1 条既有 DIFF(`.specify/skills/git-workspace/scripts/git_fleet.py`);`python3 .specify/scripts/python/scan-confirmation-gates.py` → total 23(16 destructive + 7 governance_kept),violations 0;`python3 scripts/python/probe-utils.py --action compile-embeds --check` → 69 units, zero drift;`python3 scripts/python/regen-command-copies.py --check` → OK。
+`python3 scripts/python/sync-mirrors.py --check` → EXIT=2,恰 1 条既有 DIFF(`skills/external/git-utils/scripts/git_fleet.py`);`python3 .specify/scripts/python/scan-confirmation-gates.py` → total 23(16 destructive + 7 governance_kept),violations 0;`python3 scripts/python/probe-utils.py --action compile-embeds --check` → 69 units, zero drift;`python3 scripts/python/regen-command-copies.py --check` → OK。
 
 - [X] T002 [P] Write structural contract test tests/contract/test_run_skills_wiring.py covering clauses C-1…C-12 of contracts/run-skills-wiring.md (red-first: both skills and edits absent) and record each clause's failing evidence (command, real output, exit status) in .specify/specs/057-decompose-command-skills/notes/red-first-evidence.md
 - [X] T003 [P] Capture pre-change baselines into .specify/specs/057-decompose-command-skills/notes/pre-change-measurements.md by running the four engine checks listed in this phase preamble and pasting real outputs (re-freeze: re-run, never inherit)

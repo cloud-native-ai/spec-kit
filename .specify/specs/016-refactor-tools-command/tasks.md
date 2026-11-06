@@ -24,7 +24,7 @@
 
 **Purpose**: Verify project structure and ensure working baseline before changes
 
-- [X] T001 Verify existing tool record templates exist at `templates/tool-project-script-template.md`, `templates/tool-system-binary-template.md`, `templates/tool-shell-function-template.md`
+- [X] T001 Verify existing tool record templates exist at `skills/internal/create-tools/templates/tool-project-script-template.md`, `skills/internal/create-tools/templates/tool-system-binary-template.md`, `skills/internal/create-tools/templates/tool-shell-function-template.md`
 - [X] T002 Verify existing command template exists at `templates/commands/tools.md` and review its current 10-step Outline structure
 - [X] T003 Verify existing scripts at `scripts/bash/create-new-tools.sh` and `scripts/bash/refresh-tools.sh` and confirm JSON output format
 - [X] T004 Ensure `.specify/memory/tools/` directory exists; create if missing
@@ -40,10 +40,10 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [X] T006 Add `## Behavioral Rules` section to `templates/tool-project-script-template.md` after the Usage Notes section, with placeholder bullet format `- {MUST|MUST NOT|SHOULD|SHOULD NOT} {constraint text}` and guidance comment explaining RFC 2119 keyword requirements
-- [X] T007 [P] Add `## Behavioral Rules` section to `templates/tool-system-binary-template.md` with the same structure as T006
-- [X] T008 [P] Add `## Behavioral Rules` section to `templates/tool-shell-function-template.md` with the same structure as T006
-- [X] T009 Add `discovery_origin` field (`manual-entry | discovery-assisted | imported`) to the header metadata block of all three tool record templates (`templates/tool-project-script-template.md`, `templates/tool-system-binary-template.md`, `templates/tool-shell-function-template.md`)
+- [X] T006 Add `## Behavioral Rules` section to `skills/internal/create-tools/templates/tool-project-script-template.md` after the Usage Notes section, with placeholder bullet format `- {MUST|MUST NOT|SHOULD|SHOULD NOT} {constraint text}` and guidance comment explaining RFC 2119 keyword requirements
+- [X] T007 [P] Add `## Behavioral Rules` section to `skills/internal/create-tools/templates/tool-system-binary-template.md` with the same structure as T006
+- [X] T008 [P] Add `## Behavioral Rules` section to `skills/internal/create-tools/templates/tool-shell-function-template.md` with the same structure as T006
+- [X] T009 Add `discovery_origin` field (`manual-entry | discovery-assisted | imported`) to the header metadata block of all three tool record templates (`skills/internal/create-tools/templates/tool-project-script-template.md`, `skills/internal/create-tools/templates/tool-system-binary-template.md`, `skills/internal/create-tools/templates/tool-shell-function-template.md`)
 - [X] T010 Sync updated templates to `.specify/` runtime: copy the three updated tool record templates to their `.specify/templates/` counterparts if the project uses runtime copies
 
 **Checkpoint**: Foundation ready — all tool record templates include Behavioral Rules section and discovery_origin field. User story implementation can now begin.

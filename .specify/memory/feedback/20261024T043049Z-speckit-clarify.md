@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-24T04:30:49Z"
 summary: "Ran clarify Mode A on 069: bound new Feature 069, wrote 10 self-adjudicated decisions back (0 questions to the user), corrected one false input premise (067 is unregistered), and validated with valida"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

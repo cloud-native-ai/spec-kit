@@ -154,7 +154,7 @@ Framework repo (code generator). New/changed paths: `templates/`, `.specify/temp
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [X] T035 [P] Document the glossary mechanism in `docs/` (e.g. `docs/skills/glossary.md` or `docs/memory` area) and add a lean pointer from `README.md`/Documentation Map (one-way reference direction), plus a Documentation Map row for this repo's own instructions
+- [X] T035 [P] Document the glossary mechanism in `docs/` (e.g. `docs/reference/glossary.md` or `docs/memory` area) and add a lean pointer from `README.md`/Documentation Map (one-way reference direction), plus a Documentation Map row for this repo's own instructions
 - [X] T036 [P] Verify ALL mirror pairs byte-identical: `diff -rq` for `templates/glossary-template.md` & `templates/instructions-template.md` vs `.specify/templates/`; `shared/workflow/glossary.md` vs `.specify/shared/workflow/`; and per-tool command copies vs their source templates
 - [X] T037 Run the full `pytest` suite; confirm new contract + unit tests pass and there are no regressions vs the T001 baseline
 - [X] T038 Run quickstart.md end-to-end (all 4 steps) and record results in `verification.md`

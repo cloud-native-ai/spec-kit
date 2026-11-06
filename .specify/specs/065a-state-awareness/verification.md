@@ -18,7 +18,7 @@
 | 命令 | 结果 | 状态 |
 |------|------|------|
 | `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test` | `SELF-TEST: 38 passed, 0 failed`，exit 0 | **smoke-evidence**（与 plan 期基线 38/0 逐字相同，判定与退出码零差异） |
-| `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` | `ok skills/external/ == .specify/skills/ (28 files)`，exit 0 | **smoke-evidence**（基线 26 files → 28 files，新增两份即 `references/state-awareness.md` 与 `scripts/loop-state.py`；无新增漂移） |
+| `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` | `ok skills/external/ == .specify/skills/ (28 files)`，exit 0 | **smoke-evidence**（基线 26 files → 28 files，新增两份即 `references/state-awareness.md` 与 `skills/external/sdd-loop-driver/scripts/loop-state.py`；无新增漂移） |
 | `bash scripts/bash/run-tests.sh tests/unit/test_line_registry_engine.py tests/contract/test_sdd_loop_driver_skill.py -q` | 未执行 | `waived/not-run` |
 | 名字级比较（相对 T001 基线，形态 owner `.specify/skills/internal/implement-feature/SKILL.md` § Test runs） | 无可比较对象（本轮无 pytest 运行） | `waived/not-run` |
 
@@ -26,7 +26,7 @@
 
 - **US5-A1**: watcher 判定与退出码零差异 —— **smoke-evidence**。命令 `bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test` → `SELF-TEST: 38 passed, 0 failed`，exit 0，与 `tasks.md` § Environment Prerequisites 记录的基线（38 passed / 0 failed @ 2026-10-21）逐字一致；`git status --short skills/external/sdd-loop-driver/scripts/watch-target.sh` 为空、`git diff --stat` 对该文件无输出 → 脚本本体未被本切片改动。
 - **US5-A2**: 四件套与 Registry 旧条目可读（含无 `run=` 信封）—— **smoke-evidence**。临时夹具（`/tmp`，非仓库交付面）写入 legacy Registry 条目（`schema_version=1`，**无 `run_id`**，`stage=tasks`）与无 `run=` 的四件套：`registry.status=present`、`registry.stage=tasks`、`paths.state_dir` 由 Registry 运行目录解析成功；`evidence.status.status=present`、`attribution=legacy`、`stale_signals=0`（旧信封未被误判 stale），exit 0。未请求 `--stage` 时 `stage` 仍取 Registry 的 `tasks`，映射可建立。
-- **US5-A3**: 源/镜像字节一致与漂移为零 —— **smoke-evidence**。`sync-mirrors.py --write --only …` 报告 `MISS references/state-awareness.md`、`DIFF SKILL.md`、`DIFF scripts/loop-state.py`，`sync … (3 files)`；随后 `--check` → `ok … (28 files)` exit 0；三对文件 `cmp -s` 全部 IDENTICAL，sha256 逐对相等（`loop-state.py b472e52d…`、`state-awareness.md 910e4fe2…`、`SKILL.md 5216a08f…`）。镜像由生成器产出，未手改 `.specify/skills/sdd-loop-driver/`。
+- **US5-A3**: 源/镜像字节一致与漂移为零 —— **smoke-evidence**。`sync-mirrors.py --write --only …` 报告 `MISS references/state-awareness.md`、`DIFF SKILL.md`、`DIFF skills/external/sdd-loop-driver/scripts/loop-state.py`，`sync … (3 files)`；随后 `--check` → `ok … (28 files)` exit 0；三对文件 `cmp -s` 全部 IDENTICAL，sha256 逐对相等（`loop-state.py b472e52d…`、`state-awareness.md 910e4fe2…`、`SKILL.md 5216a08f…`）。镜像由生成器产出，未手改 `.specify/skills/sdd-loop-driver/`。
 - **US5-A4**: 既有 `/speckit.*` 命令三段骨架 / 哨兵字面量 / 确认门 / no-push 策略无改动 —— **范围审计证据**（见 §T029）。`git status --short` 与 `git diff --stat` 显示命令模板（`templates/commands/`、`.specify/templates/`）零改动；本切片未改哨兵字面量（`<STAGE>-DONE`）与 watcher 判定码 10–16；未执行 push / merge / kill / 删除。
 
 ## T026 — SC-006 变异演练
@@ -71,7 +71,7 @@
 
 **`git diff --stat`**：7 files changed, 133 insertions(+), 7 deletions(-)（明细见上表同名文件；`verification.md` / `quickstart-run.md` / 两份新镜像为未跟踪新增）。
 
-- **镜像改动来源**：`.specify/skills/sdd-loop-driver/` 的 3 个路径（`SKILL.md` 修改、`references/state-awareness.md` 与 `scripts/loop-state.py` 新增）全部由 `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 产出；`--check` 复验 `ok skills/external/ == .specify/skills/ (28 files)` exit 0，三对 `cmp -s` IDENTICAL。**未手改任何镜像**。
+- **镜像改动来源**：`.specify/skills/sdd-loop-driver/` 的 3 个路径（`SKILL.md` 修改、`references/state-awareness.md` 与 `skills/external/sdd-loop-driver/scripts/loop-state.py` 新增）全部由 `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver` 产出；`--check` 复验 `ok skills/external/ == .specify/skills/ (28 files)` exit 0，三对 `cmp -s` IDENTICAL。**未手改任何镜像**。
 - **禁改面零命中**（`git status --short -- <path> | wc -l` 均为 0）：`.specify/specs/066-`、`067-`、`068-`、`.specify/specs/065-loop-interruption-recovery`、`skills/external/sdd-loop-driver/scripts/watch-target.sh`、`skills/external/sdd-loop-driver/scripts/line-registry.py`、`templates/commands`、`.specify/templates`、`pyproject.toml`。
 - **无 daemon / 外部依赖**：`loop-state.py` 仅标准库；无新增依赖、无网络轮询、无常驻进程；`pyproject.toml` 零改动。
 - **无 push / merge / kill / 删除**：本段只有本地 `git` 读操作（status/log/diff）与 `sync-mirrors --write`（生成器）；未执行 push、merge、分支操作、进程终止或文件删除。

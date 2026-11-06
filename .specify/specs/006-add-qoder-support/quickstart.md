@@ -54,7 +54,7 @@
 1. [CN] `generate-instructions.sh` [CN]
 2. [CN]
    - `README.md`
-   - `docs/installation.md`
+   - `docs/tutorials/installation.md`
    - `.ai/instructions.md`
    - `templates/plan-template.md`
    - `templates/commands/agents.md`

@@ -4,7 +4,7 @@
 **Requirement → Feature**: `041-refactor-feedback-probe` → Feature 028 Feedback Mechanism
 **Input**: Specification from `.specify/specs/041-refactor-feedback-probe/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every `[PLACEHOLDER]` token in place — it MUST NOT append a second copy of this template below the filled content. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command, which **replaces** every `[PLACEHOLDER]` token in place — it MUST NOT append a second copy of this template below the filled content. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
@@ -90,10 +90,10 @@ tests/contract/test_feedback_probe_*.py        # 新增契约测试(注册表/�
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md` | `sync-mirrors.py --check`(exit 0) |
-| `templates/commands/feedback.md` | `.specify/templates/commands/feedback.md`; 仓库现存工具副本面(实测 4):`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;codex/hermes 副本由 `specify init` 下游分发,不在本仓生成 | `sync-mirrors.py --write` 后 `--check`;逐副本含 AUTO-GENERATED 头 |
+| `templates/commands/feedback.md` | `templates/commands/feedback.md`; 仓库现存工具副本面(实测 4):`.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`;codex/hermes 副本由 `specify init` 下游分发,不在本仓生成 | `sync-mirrors.py --write` 后 `--check`;逐副本含 AUTO-GENERATED 头 |
 | `shared/workflow/feedback-step.md` | `.specify/shared/workflow/feedback-step.md` | `sync-mirrors.py --check` |
 | `scripts/python/feedback-utils.py` | `.specify/scripts/python/feedback-utils.py` | `sync-mirrors.py --check` |
-| 既有 18 个命令模板的 Feedback 步骤措辞(如受 canonical 步骤改版牵连) | `.specify/templates/commands/*.md` + 各工具命令副本(经 `regen-command-copies.py` 再生) | 再生副本含编辑;`--check` exit 0 |
+| 既有 18 个命令模板的 Feedback 步骤措辞(如受 canonical 步骤改版牵连) | `templates/commands/*.md` + 各工具命令副本(经 `regen-command-copies.py` 再生) | 再生副本含编辑;`--check` exit 0 |
 
 ## Complexity Tracking
 

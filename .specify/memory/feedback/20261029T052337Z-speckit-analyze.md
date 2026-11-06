@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T05:23:37Z"
 summary: "Analyze remediation round 1/1 went as briefed: both HIGH findings had an unambiguous repair recorded by the driver (qualify a cross-slice id; state one containment criterion over the shared set), so n"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

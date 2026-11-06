@@ -30,7 +30,7 @@
 
 **Purpose**: [CN]
 
-- [X] T001 [CN] `tests/contracts/test_skill_install_layout_contract.py`[CN]`tests/integration/test_skill_install_layout_integration.py`[CN]`tests/unit/test_skills_utils_layout.py`
+- [X] T001 [CN] `tests/contract/test_skill_install_layout_contract.py`[CN]`tests/integration/test_skill_install_layout_integration.py`[CN]`tests/unit/test_skills_utils_layout.py`
 - [X] T002 [P] [CN] `tests/fixtures/skill-layout/`
 - [X] T003 [P] [CN] `.specify/specs/007-skill-install-layout/quickstart.md` [CN]
 
@@ -62,7 +62,7 @@
 
 ### Tests for User Story 1
 
-- [X] T011 [P] [US1] [CN] `tests/contracts/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/install` [CN]
+- [X] T011 [P] [US1] [CN] `tests/contract/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/install` [CN]
 - [X] T012 [P] [US1] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN]
 
 ### Implementation for User Story 1
@@ -90,7 +90,7 @@
 
 ### Tests for User Story 2
 
-- [X] T020 [P] [US2] [CN] `tests/contracts/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/entrypoints` [CN] mode/status [CN]
+- [X] T020 [P] [US2] [CN] `tests/contract/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/entrypoints` [CN] mode/status [CN]
 - [X] T021 [P] [US2] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN] GitHub [CN]/[CN]
 - [X] T022 [P] [US2] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN] placeholder [CN]
 
@@ -119,7 +119,7 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] [CN] `tests/contracts/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/migrate-legacy` [CN]/422 [CN]
+- [ ] T030 [P] [US3] [CN] `tests/contract/test_skill_install_layout_contract.py` [CN] `/skills/{skillName}/migrate-legacy` [CN]/422 [CN]
 - [X] T031 [P] [US3] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN]+[CN]+[CN]
 - [X] T032 [P] [US3] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN] manual-required [CN]
 - [X] T033 [P] [US3] [CN] `tests/integration/test_skill_install_layout_integration.py` [CN]/[CN]
@@ -146,10 +146,10 @@
 **Purpose**: [CN]
 
 - [X] T041 [P] [CN] `README.md` [CN] `docs/skills/vscode.md`[CN] `.specify/skills` [CN]`.github/skills` [CN]
-- [X] T042 [P] [CN] `docs/usage.md` [CN] `/speckit.skills` [CN]
+- [X] T042 [P] [CN] `docs/tutorials/quickstart.md` [CN] `/speckit.skills` [CN]
 - [X] T043 [CN] `.specify/memory/features/013.md`[CN] tasks [CN]
 - [X] T044 [CN] `.specify/memory/features.md` [CN] Feature 013 [CN] Last Updated [CN] Implemented
-- [X] T045 [CN] `tests/contracts/test_skill_install_layout_contract.py`[CN]`tests/integration/test_skill_install_layout_integration.py`[CN]`tests/unit/test_skills_utils_layout.py`
+- [X] T045 [CN] `tests/contract/test_skill_install_layout_contract.py`[CN]`tests/integration/test_skill_install_layout_integration.py`[CN]`tests/unit/test_skills_utils_layout.py`
 - [ ] T046 [CN] `.specify/specs/007-skill-install-layout/quickstart.md` [CN]
 
 ---
@@ -191,7 +191,7 @@
 ## Parallel Example: User Story 2
 
 ```text
-Task: T020 [US2] Contract assertions for /skills/{skillName}/entrypoints in tests/contracts/test_skill_install_layout_contract.py
+Task: T020 [US2] Contract assertions for /skills/{skillName}/entrypoints in tests/contract/test_skill_install_layout_contract.py
 Task: T021 [US2] Multi-tool entrypoint integration scenarios in tests/integration/test_skill_install_layout_integration.py
 Task: T022 [US2] Placeholder fallback integration scenario in tests/integration/test_skill_install_layout_integration.py
 

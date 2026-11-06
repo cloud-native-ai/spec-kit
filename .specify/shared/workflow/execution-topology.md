@@ -56,4 +56,5 @@ This is the single decision rule for the three SDD-driving external skills:
 ## Boundary
 
 - 本文档拥有**两侧角色划分 + speckit 安装归属**这一模型；两拓扑（remote/local）的具体命令形态归 [`external-dispatch-recipes.md`](external-dispatch-recipes.md)，派发生命周期与可见性契约归 [`../definitions/subagent-definitions.md`](../definitions/subagent-definitions.md)，五族前置检查归 run-agent `references/dispatch-preflight.md`。若本文与命令配方冲突，角色模型以本文为准，命令以配方为准。
+- **SSH 传输 owner 是 `ssh-utils`**：具体选项、引号、stdin 推送与退出码由其 `scripts/ssh-exec.py` 承载，固定 `-o RemoteCommand=none`（主机预置 `RemoteCommand` 时裸 ssh 会与命令行冲突）；本文只声明拓扑形态。
 - 团队（/speckit.team）经 `dispatch.sh` 的派发不改变本模型：团队座位同样是执行侧形态。

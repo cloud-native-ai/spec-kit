@@ -2,7 +2,7 @@
 
 **Date**: 2026-10-21 | **Spec**: [requirements.md](requirements.md) | **Research**: [research.md](research.md)
 
-This model describes the projection and record shapes the new layer reads or writes. Existing owners are not redefined: watch verdicts belong to `scripts/watch-target.sh` / `references/watch-model.md`; stall defaults, U3/U4/U5 procedure and spine write points belong to `references/stage-prompts.md`; the plan-owned artifact set belongs to `references/efficiency-model.md` §3. The new owner reference `references/state-awareness.md` carries the numbered rule tables this model references.
+This model describes the projection and record shapes the new layer reads or writes. Existing owners are not redefined: watch verdicts belong to `skills/external/sdd-loop-driver/scripts/watch-target.sh` / `references/watch-model.md`; stall defaults, U3/U4/U5 procedure and spine write points belong to `references/stage-prompts.md`; the plan-owned artifact set belongs to `references/efficiency-model.md` §3. The new owner reference `references/state-awareness.md` carries the numbered rule tables this model references.
 
 ## 1. Entities
 

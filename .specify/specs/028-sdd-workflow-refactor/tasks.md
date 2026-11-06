@@ -143,8 +143,8 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 
 ### Implementation for User Story 4
 
-- [X] T020 [P] [US4] Update `docs/agents/command-and-skills.md` and `docs/agents/design.md` to describe the shared reference directory instead of the `sdd-workflow` skill.
-- [X] T021 [P] [US4] Update `docs/commands/skills.md` and `docs/skills/feedback.md` (feedback-step now at `shared/workflow/feedback-step.md`) to reference the shared location and remove skill framing.
+- [X] T020 [P] [US4] Update `docs/reference/agents/command-and-skills.md` and `docs/reference/agents/design.md` to describe the shared reference directory instead of the `sdd-workflow` skill.
+- [X] T021 [P] [US4] Update `docs/reference/commands/skills.md` and `docs/reference/skills/feedback.md` (feedback-step now at `shared/workflow/feedback-step.md`) to reference the shared location and remove skill framing.
 - [X] T022 [US4] Update the AGENTS.md / instructions Documentation Map and skill-count wording so `sdd-workflow` is described as a shared reference directory (not a skill) and counts are consistent with US1.
 
 **Checkpoint**: Documentation is consistent and free of skill framing for `sdd-workflow`.
@@ -156,7 +156,7 @@ Code-generator/framework layout: source assets at repo root (`shared/`, `skills/
 **Purpose**: Regenerate the mirror and run the final acceptance gates.
 
 - [X] T023 Regenerate the `.specify/` mirror from source so it reflects the move (copy `shared/` → `.specify/shared/`, re-sync `.specify/skills/` without `sdd-workflow`, re-sync `.specify/templates/`, regenerate `.specify/instructions.md`); confirm no `sdd-workflow` remnant survives regeneration.
-- [X] T024 Run the zero-reference acceptance gate: `grep -rn "sdd-workflow" .` excluding `.git`, `.venv`, `docs/history`, `docs/summary/03-sdd-workflow-refactor-proposal.md`, and `.specify/specs/028-sdd-workflow-refactor/` → expect empty (SC-001).
+- [X] T024 Run the zero-reference acceptance gate: `grep -rn "sdd-workflow" .` excluding `.git`, `.venv`, `docs/history`, `docs/archive/03-sdd-workflow-refactor-proposal.md`, and `.specify/specs/028-sdd-workflow-refactor/` → expect empty (SC-001).
 - [X] T025 Run `pytest -q` and compare against the T001 baseline; confirm 0 new failures (SC-006). Record the SC-001…SC-006 status rows and any `[~]` deferrals in `.specify/specs/028-sdd-workflow-refactor/verification.md`.
 - [X] T026 Run `quickstart.md` steps 1-7 as a final manual verification sweep and update Feature 029 detail (`.specify/memory/features/029.md`) with the implementation outcome.
 

@@ -1,6 +1,6 @@
 # Contract: Team Flow(团队流程零确认)
 
-**改写面**: `templates/commands/team.md`、`skills/create-team/SKILL.md` + `references/create-mode.md` / `team-presets.md` / `execution-guide.md` / `summary-mapping.md`、`shared/workflow/feedback-step.md`
+**改写面**: `templates/commands/team.md`、`skills/internal/create-team/SKILL.md` + `references/create-mode.md` / `team-presets.md` / `execution-guide.md` / `summary-mapping.md`、`shared/workflow/feedback-step.md`
 **溯源**: FR-004、FR-005、FR-006、FR-009;澄清会话 2026-08-18(continuous 例外、提交提示形态)
 
 ## C-1 创建零确认
@@ -29,4 +29,4 @@ team run 派发调用的技能 MUST 保持非交互(既有 summary-mapping.md �
 
 ## C-7 副本传播
 
-team.md 改写 MUST 经 regen-command-copies.py 再生全部 per-tool 副本;create-team 技能改写 MUST 经 sync-mirrors.py 同步 `.specify/skills/create-team/`;手工同步副本视为违约。
+team.md 改写 MUST 经 regen-command-copies.py 再生全部 per-tool 副本;create-team 技能改写 MUST 经 sync-mirrors.py 同步 `.specify/skills/internal/create-team/`;手工同步副本视为违约。

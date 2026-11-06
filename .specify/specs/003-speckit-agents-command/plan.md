@@ -3,7 +3,7 @@
 **Branch**: `003-speckit-agents-command` | **Date**: 2026-02-28 | **Spec**: `/storage/project/cloud-native-ai/spec-kit/.specify/specs/003-speckit-agents-command/requirements.md`
 **Input**: Specification from `/storage/project/cloud-native-ai/spec-kit/.specify/specs/003-speckit-agents-command/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 

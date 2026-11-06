@@ -1,0 +1,14 @@
+# Part 3B targeted set (T022–T024) — captured 2026-11-05
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_mechanism_policy_guard.py tests/contract/test_mechanism_policy_decidability.py tests/contract/test_mechanism_policy_owner_doc.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_ownership.py tests/contract/test_mechanism_policy_missing_policy.py tests/contract/test_expression_compatibility.py tests/contract/test_one_source_of_truth.py tests/contract/test_no_retired_draw_skill_refs.py
+1 failed, 100 passed in 35.56s
+
+## The one failure, attributed
+tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+drifted: ['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+Cause: the 069a frozen-hash registry does not yet carry these three paths' markers.
+Their wiring landed in this feature's Part 3A (afd8115a), before this segment; the working
+tree holds no change to skills/ under this segment (git status --short skills/ is empty).
+Owner of the repair: T038 (the five registration points) — not T022–T024.
+
+$ git status --short skills/ templates/commands/
+(no output: this segment edited no file under either)

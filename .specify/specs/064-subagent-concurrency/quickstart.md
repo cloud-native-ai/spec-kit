@@ -123,7 +123,7 @@ SELF-TEST: 12 passed, 4 failed
 
 ### S1. 单线兼容 + 信封（回归）
 
-**Premise**: `TMP=$(mktemp -d)`；预先 `mkdir -p "$TMP/proj/.specify" "$TMP/reg"`；四件套（pid/status/log/heartbeat）与 `log-….meta.jsonl` 由测试 fixture 写入（S1 不启动真实 CLI）；`<line_id>`/`<run_id>` 用上文格式示例；退出码语义的 owner 是 `scripts/watch-target.sh`，本表不重列数值。
+**Premise**: `TMP=$(mktemp -d)`；预先 `mkdir -p "$TMP/proj/.specify" "$TMP/reg"`；四件套（pid/status/log/heartbeat）与 `log-….meta.jsonl` 由测试 fixture 写入（S1 不启动真实 CLI）；`<line_id>`/`<run_id>` 用上文格式示例；退出码语义的 owner 是 `skills/external/sdd-loop-driver/scripts/watch-target.sh`，本表不重列数值。
 
 | 步骤 | 命令（设计目标） | 期望 |
 |------|------------------|------|

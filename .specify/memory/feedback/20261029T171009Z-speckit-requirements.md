@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "077-doc-sdd-integration"
 feature_id: "077"
+disposition: "processed"
 partial: false
 created: "2026-10-29T17:10:09Z"
 summary: "good"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

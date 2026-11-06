@@ -1,0 +1,52 @@
+# test runner: .venv/bin/python -m pytest -q -p no:cacheprovider tests/contract/test_mechanism_policy_guard.py
+F......                                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_sc003_complement_is_byte_identical_to_the_baseline ____________
+
+    def test_sc003_complement_is_byte_identical_to_the_baseline():
+        reading = compare_working_tree()
+        line = reading_line(reading)
+        print(line)
+        assert reading["unit"] > 0, "empty comparison unit: %s" % line
+        assert reading["allowed_in_unit"] > 0, "empty allowed set: %s" % line
+        assert reading["complement"] > 0, "empty complement: %s" % line
+>       assert not reading["problems"], "SC-003 containment failures (%s):\n- %s" % (
+            line, "\n- ".join(reading["problems"])
+        )
+E       AssertionError: SC-003 containment failures (compared=575 unit=575 complement=568 allowed_in_unit=8 mismatches=22):
+E         - 'skills/external/create-skills/references/mechanism-policy-check.md' is new inside the comparison unit — new paths are allowed only when registered (GM-03 rows 1–8)
+E         - 'skills/external/ssh-utils/SKILL.md' is new inside the comparison unit — new paths are allowed only when registered (GM-03 rows 1–8)
+E         - 'skills/external/ssh-utils/references/pitfalls.md' is new inside the comparison unit — new paths are allowed only when registered (GM-03 rows 1–8)
+E         - 'skills/external/ssh-utils/references/recipes.md' is new inside the comparison unit — new paths are allowed only when registered (GM-03 rows 1–8)
+E         - 'skills/external/ssh-utils/scripts/ssh-exec.py' is new inside the comparison unit — new paths are allowed only when registered (GM-03 rows 1–8)
+E         - 'skills/external/coaching-skills/data-model.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/coaching-skills/references/prompt-templates.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/SKILL.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/references/dispatch-recipes.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/references/efficiency-model.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/references/stage-prompts.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/references/watch-model.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/scripts/admission-check.py' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/scripts/decomposition-check.py' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-loop-driver/scripts/loop-state.py' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-project-setup/SKILL.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/external/sdd-project-setup/references/setup-recipes.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-module-designer-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-system-designer-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-agent/templates/agent-project-custom-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/create-team/templates/agents/agent-team-supervisor-template.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E         - 'skills/internal/run-agent/SKILL.md' differs from the baseline blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement
+E       assert not ["'skills/external/create-skills/references/mechanism-policy-check.md' is new inside the comparison unit — new paths a...blob but is not registered in data-model.md § GM-03 rows 1–8 — the containment claim is false for the complement", ...]
+
+tests/contract/test_mechanism_policy_guard.py:271: AssertionError
+----------------------------- Captured stdout call -----------------------------
+compared=575 unit=575 complement=568 allowed_in_unit=8 mismatches=22
+=========================== short test summary info ============================
+FAILED tests/contract/test_mechanism_policy_guard.py::test_sc003_complement_is_byte_identical_to_the_baseline
+1 failed, 6 passed in 22.31s
+rc=1

@@ -61,8 +61,8 @@
 | `templates/commands/docs.md` | 标记缺失/不配对/不可解析即停;尾部 MUST NOT 静默延迟 |
 | `templates/commands/clarify.md` | 无 requirements.md 即中止;超上限即停并建议 interview |
 | `templates/commands/interview.md` | 冲突 MUST 呈现、MUST NOT 静默解决 |
-| `skills/create-team/references/create-mode.md` | 悬空引用 MUST NOT 静默降级为内联目标创建 |
-| `skills/draw-diagram/SKILL.md` | MUST NOT 静默降级、MUST NOT 即兴绕过 |
+| `skills/internal/create-team/references/create-mode.md` | 悬空引用 MUST NOT 静默降级为内联目标创建 |
+| `skills/external/draw-diagram/SKILL.md` | MUST NOT 静默降级、MUST NOT 即兴绕过 |
 
 **C-17** 反空真哨兵:断言"上述点位的正文改动行数为 0"时,MUST 同时断言"上述点位中至少一个确实新增了指针行",使"零改动因为只加了指针"与"零改动因为整条收敛没做"可区分。
 

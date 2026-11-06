@@ -46,7 +46,7 @@
 | 决策 | 结果 | 规格改动 |
 |------|------|----------|
 | Feature 绑定 | 037 Docs Command(第四次 follow-up),本需求不新增 Feature | `Related Feature` 解析 + 绑定依据;`features/037.md` Related Specifications 交叉引用;features.md 037 行追加 follow-up 说明;Feature 总数引用 index owner |
-| 目标声明归属面 | 运行工作区 `.specify/docs/`(已核实入库) | FR-001 补归属;**新增 FR-002a**(跨运行契约与按次产物不同频、须可区分、不得随其轮转);Key Entities 同步;Out of Scope 收窄为仅延期"确切子路径/格式/是否引擎化" |
+| 目标声明归属面 | 运行工作区 `docs/`(已核实入库) | FR-001 补归属;**新增 FR-002a**(跨运行契约与按次产物不同频、须可区分、不得随其轮转);Key Entities 同步;Out of Scope 收窄为仅延期"确切子路径/格式/是否引擎化" |
 | 内容动作量设界 | 不设上限,全部分发 | FR-008 明确无上限 + 禁止下游隐式截断 + 分发前告知文档数;**新增边界情况**"大规模内容扇出"(中途中止保留已完成项、未开始项转 pending) |
 
 后置校验:残留占位符 0;历史 Clarifications 追加式保留;FR 计数 19(FR-001…FR-018 + FR-002a),SC 计数 7;实现期用户修订“写什么/放哪里 + 固定检索入口”已映射到 FR-016…FR-018 / SC-007;标题层级完好;本需求未增加 Feature（当前总数引用 Feature Index owner）。

@@ -98,7 +98,7 @@ Consolidated artifact at `.specify/specs/023-agent-framework-redesign/research.m
 
 ## Template Migration Map (old → new)
 
-Applied within `skills/create-agent/templates/` (canonical) and mirrored to `.specify/skills/create-agent/templates/`.
+Applied within `skills/internal/create-agent/templates/` (canonical) and mirrored to `.specify/skills/internal/create-agent/templates/`.
 
 | Old file | New file | Change |
 |----------|----------|--------|
@@ -110,7 +110,7 @@ Applied within `skills/create-agent/templates/` (canonical) and mirrored to `.sp
 | `agent-triad-orchestration-template.md` | (same name) | `improver`→`optimizer`, add Stage/Type framing |
 | `.specify/templates/agent-*` (legacy duplicates) | (removed) | delete stale copies (D3) |
 
-**Migration targets outside templates**: `create-agent/SKILL.md`, `improve-agent/SKILL.md`, `organize-agents/SKILL.md`, `templates/commands/agents.md`, `docs/agents/*`, `docs/commands/agents.md`, `tests/scenarios/multi-agent-orchestration/*`, `.specify/agents/*.agent.md` + `AGENTS.md`, and installed `.specify/skills/**` mirrors.
+**Migration targets outside templates**: `create-agent/SKILL.md`, `improve-agent/SKILL.md`, `organize-agents/SKILL.md`, `templates/commands/agents.md`, `docs/agents/*`, `docs/reference/commands/agents.md`, `tests/scenarios/multi-agent-orchestration/*`, `.specify/agents/*.agent.md` + `AGENTS.md`, and installed `.specify/skills/**` mirrors.
 
 ## State Transitions
 

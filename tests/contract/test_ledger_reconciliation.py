@@ -301,9 +301,9 @@ def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     )
     coverage = _coverage(record)
     _assert_coverage_shape(coverage)
-    assert coverage["inventory_units"] == record["units"] == 80
-    assert coverage["ledger_rows"] == 80
-    assert coverage["matched"] == 80
+    assert coverage["inventory_units"] == record["units"] == 81
+    assert coverage["ledger_rows"] == 81
+    assert coverage["matched"] == 81
     assert coverage["gaps"] == 0
     assert coverage["parse_errors"] == 0
     assert coverage["floor"] == LEDGER_FLOOR == 39

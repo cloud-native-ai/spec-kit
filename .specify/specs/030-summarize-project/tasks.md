@@ -13,8 +13,8 @@
 ## Definition of Done (DoD)
 
 - DoD-1: Both contract test files green — `tests/contract/test_summarize_project_prompt_assets.py` (C-1…C-13) and `tests/contract/test_analysis_project_uml_assets.py` (C-14…C-20) — plus zero regressions across the full `tests/contract/` suite
-- DoD-2: Both skill packages structurally complete per contract: `skills/summarize-project/` (SKILL.md five-step workflow + references/reporting-playbook.md, no scripts/ dir) and `skills/analysis-project/` (four injection points + references/uml-visualization-guide.md)
-- DoD-3: Mirrors byte-equivalent (`.specify/skills/summarize-project/`, `.specify/skills/analysis-project/`), skills registry in `.specify/instructions.md` updated, skill count references refreshed
+- DoD-2: Both skill packages structurally complete per contract: `skills/internal/summarize-project/` (SKILL.md five-step workflow + references/reporting-playbook.md, no scripts/ dir) and `skills/analysis-project/` (four injection points + references/uml-visualization-guide.md)
+- DoD-3: Mirrors byte-equivalent (`.specify/skills/internal/summarize-project/`, `.specify/skills/analysis-project/`), skills registry in `.specify/instructions.md` updated, skill count references refreshed
 - DoD-4: Dry-run verifications recorded in `verification.md` with a status row for every SC-001…SC-007; deferred tasks (if any) registered as `[~]` with reasons
 - DoD-5: Feature 013 detail (`.specify/memory/features/013.md`) and index updated; canonical `## Feedback` records written for touched skills
 
@@ -32,7 +32,7 @@
 
 **Purpose**: Create the new package skeleton and confirm the enhancement target layout
 
-- [X] T001 Create `skills/summarize-project/` package skeleton (`SKILL.md` stub + `references/` directory) per plan.md Project Structure
+- [X] T001 Create `skills/internal/summarize-project/` package skeleton (`SKILL.md` stub + `references/` directory) per plan.md Project Structure
 - [X] T002 [P] Verify `skills/analysis-project/` existing layout (SKILL.md + 5 reference guides) is intact and record its section inventory for later regression assertions (SC-007)
 
 ---
@@ -64,14 +64,14 @@
 
 ### Implementation for User Story 1
 
-- [X] T006 [US1] Write `skills/summarize-project/SKILL.md` YAML frontmatter (name, description covering the 7 trigger keywords, `skill_id`) per `templates/skills-template.md` (FR-001, FR-002)
-- [X] T007 [US1] Write workflow steps 1–2 in `skills/summarize-project/SKILL.md`: collect and source-trace work items (FR-003, no fabrication) then single hierarchical decomposition covering phase → task (FR-004)
-- [X] T008 [US1] Write workflow steps 3–4 in `skills/summarize-project/SKILL.md`: render the decomposition as WBS via draw-plantuml `@startwbs` (FR-005, cite `references/howto/13-wbs-diagram.md`) and as Gantt via `@startgantt` (FR-006, cite `references/howto/14-gantt-diagram.md`); two charts derive from the SAME breakdown (FR-009)
-- [X] T009 [US1] Write workflow step 5 in `skills/summarize-project/SKILL.md`: assemble one self-contained HTML report with per-chart explanations and overview narrative (FR-010), PNG+SVG + relative paths + `.puml` sources kept (FR-011), default location `docs/project-summary/` user-overridable, generation date/scope/assumptions stated (FR-014)
-- [X] T010 [P] [US1] Write `skills/summarize-project/references/reporting-playbook.md`: decomposition depth rules, schedule-estimation defaults with visible assumption marking (FR-012), chart-set splitting for large projects (FR-013), two-chart consistency checklist (FR-009/SC-003)
-- [X] T011 [US1] Append the canonical `## Feedback` block with unit-id `skill:summarize-project` to `skills/summarize-project/SKILL.md` (SR-4)
+- [X] T006 [US1] Write `skills/internal/summarize-project/SKILL.md` YAML frontmatter (name, description covering the 7 trigger keywords, `skill_id`) per `templates/skills-template.md` (FR-001, FR-002)
+- [X] T007 [US1] Write workflow steps 1–2 in `skills/internal/summarize-project/SKILL.md`: collect and source-trace work items (FR-003, no fabrication) then single hierarchical decomposition covering phase → task (FR-004)
+- [X] T008 [US1] Write workflow steps 3–4 in `skills/internal/summarize-project/SKILL.md`: render the decomposition as WBS via draw-plantuml `@startwbs` (FR-005, cite `references/howto/13-wbs-diagram.md`) and as Gantt via `@startgantt` (FR-006, cite `references/howto/14-gantt-diagram.md`); two charts derive from the SAME breakdown (FR-009)
+- [X] T009 [US1] Write workflow step 5 in `skills/internal/summarize-project/SKILL.md`: assemble one self-contained HTML report with per-chart explanations and overview narrative (FR-010), PNG+SVG + relative paths + `.puml` sources kept (FR-011), default location `docs/project-summary/` user-overridable, generation date/scope/assumptions stated (FR-014)
+- [X] T010 [P] [US1] Write `skills/internal/summarize-project/references/reporting-playbook.md`: decomposition depth rules, schedule-estimation defaults with visible assumption marking (FR-012), chart-set splitting for large projects (FR-013), two-chart consistency checklist (FR-009/SC-003)
+- [X] T011 [US1] Append the canonical `## Feedback` block with unit-id `skill:summarize-project` to `skills/internal/summarize-project/SKILL.md` (SR-4)
 - [X] T012 [P] [US1] Register `summarize-project` in the skills registry of `.specify/instructions.md` and refresh the skill count (SR-3)
-- [X] T013 [US1] Sync mirror `.specify/skills/summarize-project/` and verify byte-equivalence via `diff -r` (SR-1)
+- [X] T013 [US1] Sync mirror `.specify/skills/internal/summarize-project/` and verify byte-equivalence via `diff -r` (SR-1)
 - [X] T014 [US1] Run `python -m pytest tests/contract/test_summarize_project_prompt_assets.py -q` → green (Red-Green checkpoint)
 
 ### Manual Verification for User Story 1
@@ -94,8 +94,8 @@
 
 ### Implementation for User Story 2
 
-- [X] T016 [US2] Update the Gantt step in `skills/summarize-project/SKILL.md`: milestone identification and zero-duration anchoring rules (FR-007), status + percent-complete presentation and current-date/reference marker (FR-008) — satisfied during T008 front-loading; verified by T015 assertions
-- [X] T017 [P] [US2] Update `skills/summarize-project/references/reporting-playbook.md`: status inference rules from materials, milestone identification guidance, degenerate-state handling (project not started / fully complete edge cases) — satisfied during T010 front-loading (playbook §3); verified by T015 assertions
+- [X] T016 [US2] Update the Gantt step in `skills/internal/summarize-project/SKILL.md`: milestone identification and zero-duration anchoring rules (FR-007), status + percent-complete presentation and current-date/reference marker (FR-008) — satisfied during T008 front-loading; verified by T015 assertions
+- [X] T017 [P] [US2] Update `skills/internal/summarize-project/references/reporting-playbook.md`: status inference rules from materials, milestone identification guidance, degenerate-state handling (project not started / fully complete edge cases) — satisfied during T010 front-loading (playbook §3); verified by T015 assertions
 - [X] T018 [US2] Sync mirror, verify byte-equivalence, run `python -m pytest tests/contract/test_summarize_project_prompt_assets.py -q` → green
 
 ### Manual Verification for User Story 2
@@ -122,7 +122,7 @@
 - [X] T021 [US4] Edit Phase 5 (report structure design) in `skills/analysis-project/SKILL.md`: plan UML figures for primary views per `references/uml-visualization-guide.md` (FR-015, FR-017)
 - [X] T022 [US4] Edit Phase 8 (final report assembly) in `skills/analysis-project/SKILL.md`: embed rendered figures with captions, PNG default + SVG available, `.puml` sources kept under `docs/figures/` with relative-path references (FR-019)
 - [X] T023 [US4] Edit Output Requirements in `skills/analysis-project/SKILL.md`: UML figures as the standard for primary views, Mermaid restricted to secondary quick-glance content (FR-018), renderer-unavailable degradation note rule (C-18)
-- [X] T024 [P] [US4] Create `skills/analysis-project/references/uml-visualization-guide.md`: normative view→diagram-type mapping (component/package for structure, deployment for topology, sequence primary + activity alternative for flows, class/ER for data), `docs/figures/` convention, delegation pointers into `draw-plantuml/references/howto/`, degradation rule (FR-016, FR-017, FR-019)
+- [X] T024 [P] [US4] Create `skills/internal/study-project/references/uml-visualization-guide.md`: normative view→diagram-type mapping (component/package for structure, deployment for topology, sequence primary + activity alternative for flows, class/ER for data), `docs/figures/` convention, delegation pointers into `draw-plantuml/references/howto/`, degradation rule (FR-016, FR-017, FR-019)
 - [X] T025 [US4] Sync mirror `.specify/skills/analysis-project/` and verify byte-equivalence via `diff -r` (SR-1)
 - [X] T026 [US4] Run `python -m pytest tests/contract/test_analysis_project_uml_assets.py -q` → green, including the SC-007 regression assertions against T004 baseline fixtures (Red-Green checkpoint) — 15/15 green
 
@@ -146,7 +146,7 @@
 
 ### Implementation for User Story 3
 
-- [X] T028 [US3] Add scope/granularity guidance to `skills/summarize-project/SKILL.md` and `skills/summarize-project/references/reporting-playbook.md`: reporting-period constraint handling (out-of-scope work omitted or de-emphasized) and audience-driven WBS depth control — satisfied during T009/T010 front-loading (SKILL.md「汇报范围与受众粒度」+ playbook §6); verified by T027 assertions
+- [X] T028 [US3] Add scope/granularity guidance to `skills/internal/summarize-project/SKILL.md` and `skills/internal/summarize-project/references/reporting-playbook.md`: reporting-period constraint handling (out-of-scope work omitted or de-emphasized) and audience-driven WBS depth control — satisfied during T009/T010 front-loading (SKILL.md「汇报范围与受众粒度」+ playbook §6); verified by T027 assertions
 - [X] T029 [US3] Sync mirror, verify byte-equivalence, run `python -m pytest tests/contract/test_summarize_project_prompt_assets.py -q` → green
 
 ### Manual Verification for User Story 3
@@ -164,7 +164,7 @@
 - [X] T030 [P] Sweep skill-count and skill-list references across `.specify/instructions.md` and `docs/` so `summarize-project` appears consistently (21 → 22 skills) — instructions.md updated to 22 total + registry row; remaining "20 total" hit is a historical proposal doc (intentionally untouched)
 - [X] T031 Run the full contract suite `python -m pytest tests/contract -q` → zero regressions beyond the two new files — 52F/440P vs stash-verified baseline 53F/403P = 0 new failures, 13 pre-existing errors unchanged
 - [X] T032 Run quickstart.md end-to-end validation: every step (Red-Green order, registry, mirror diffs, dry runs) matches the shipped artifacts — validated by executing the documented steps verbatim during Phases 3–6
-- [X] T033 Final mirror byte-equivalence sweep for both packages: `diff -r skills/summarize-project .specify/skills/summarize-project` and `diff -r skills/analysis-project .specify/skills/analysis-project` — both byte-equivalent
+- [X] T033 Final mirror byte-equivalence sweep for both packages: `diff -r skills/internal/summarize-project .specify/skills/internal/summarize-project` and `diff -r skills/analysis-project .specify/skills/analysis-project` — both byte-equivalent
 - [X] T034 Complete `verification.md` with a status row per SC-001…SC-007 (including dry-run evidence T014A/T018A/T026A/T029A) and register any deferred tasks; update `.specify/memory/features/013.md` Key Changes and `.specify/memory/features.md` Last Updated per the Feature Integration Protocol — verification.md written (SC-001/003/004/007 pass, SC-002 partial, SC-005/006 deferred, deferred_tasks=T026A); features/013.md Key Changes #31 added
 
 ---
@@ -209,7 +209,7 @@ Developer A (WS-A): T005 (failing test) → T006–T013 → T014 green → T014A
 Developer B (WS-B): T019 (failing test) → T020–T025 → T026 green → T026A
 
 # Within US1, parallelizable file-level tasks:
-Task: "Write skills/summarize-project/references/reporting-playbook.md"   # T010
+Task: "Write skills/internal/summarize-project/references/reporting-playbook.md"   # T010
 Task: "Register summarize-project in .specify/instructions.md"            # T012
 ```
 

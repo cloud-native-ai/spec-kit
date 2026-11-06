@@ -8,9 +8,12 @@ probe: "skill-review-sdd-process-wrapup"
 kind: "internal"
 slice: "skills"
 feature: "078-bilingual-expression"
+disposition: "processed"
 partial: false
 created: "2026-10-30T12:07:23Z"
 summary: "review-sdd-process segment wrap-up for 078-bilingual-expression"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

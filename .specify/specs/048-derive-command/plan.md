@@ -113,7 +113,7 @@ Live pairs consulted from `scripts/python/sync-mirrors.py:MIRROR_PAIRS` (not mem
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/derive.md` | `.claude/commands/speckit.derive.md`; `.github/prompts/speckit.derive.prompt.md`; `.qoder/commands/speckit.derive.md` (+ `description:` frontmatter from `short-description`); `.opencode/command/speckit.derive.md` — all via `regen-command-copies.py`. **NO `.specify/templates/commands/` mirror (retired — that pair excludes `commands/`).** | `regen-command-copies.py --check` exit 0; each copy carries `<!-- AUTO-GENERATED from templates/commands/derive.md … -->` |
+| `templates/commands/derive.md` | `.claude/commands/speckit.derive.md`; `.github/prompts/speckit.derive.prompt.md`; `.qoder/commands/speckit.derive.md` (+ `description:` frontmatter from `short-description`); `.opencode/command/speckit.derive.md` — all via `regen-command-copies.py`. **NO `templates/commands/` mirror (retired — that pair excludes `commands/`).** | `regen-command-copies.py --check` exit 0; each copy carries `<!-- AUTO-GENERATED from templates/commands/derive.md … -->` |
 | `shared/definitions/derivation-definitions.md` | `.specify/shared/definitions/derivation-definitions.md` | `diff -q` byte-identical; `sync-mirrors.py --check` exit 0 |
 | `shared/definitions/probe-definitions.md` | `.specify/shared/definitions/probe-definitions.md` | `diff -q`; `feedback-utils.py --action probes --validate` exit 0 (engine reads the **mirror**) |
 | `shared/definitions/framework-map.md` | `.specify/shared/definitions/framework-map.md` | `diff -q` |

@@ -21,7 +21,7 @@ description: "Task list for Agent Framework Redesign"
 - DoD-3: Layer-2 structural validation passes — the three `tests/scenarios/multi-agent-orchestration/*` scenarios and the quickstart.md walkthrough
 - DoD-4: 0 live references to "SubRole"/"Subrole", "improver", and "Meta-Coordinator" (as a separate role) outside immutable history (SC-002, SC-009)
 - DoD-5: Source templates and installed `.specify/` mirrors are consistent (M7)
-- DoD-6: `docs/agents/*` and `docs/commands/agents.md` are coherent with `docs/agents/design.md` and the Role/Stage/Type + Team/Loop model (SC-007)
+- DoD-6: `docs/agents/*` and `docs/reference/commands/agents.md` are coherent with `docs/reference/agents/design.md` and the Role/Stage/Type + Team/Loop model (SC-007)
 - DoD-7: FR-021 research deliverable exists and ≥1 redesign decision cites it (SC-008)
 - DoD-8: All success criteria SC-001…SC-009 validated via quickstart.md and recorded in verification.md
 
@@ -41,7 +41,7 @@ description: "Task list for Agent Framework Redesign"
 
 ## Path Conventions
 
-Single project (code-generator / authoring-time tooling). Canonical template home: `skills/create-agent/templates/`; installed mirror: `.specify/skills/create-agent/templates/`. Tests under `tests/` (unit, contract, integration, scenarios).
+Single project (code-generator / authoring-time tooling). Canonical template home: `skills/internal/create-agent/templates/`; installed mirror: `.specify/skills/internal/create-agent/templates/`. Tests under `tests/` (unit, contract, integration, scenarios).
 
 ---
 
@@ -50,7 +50,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 **Purpose**: Establish baselines and confirm canonical locations before any migration.
 
 - [X] T001 Capture a pre-migration baseline in `.specify/specs/023-agent-framework-redesign/verification.md`: record current counts from the quickstart.md grep commands (live `subrole|improver` files, `agent-subrole-|meta-coordinator` reference files) so post-migration deltas are measurable.
-- [X] T002 Confirm canonical vs installed locations for the refactor: verify `skills/create-agent/templates/` is the source of truth and note that the installed mirror `.specify/skills/create-agent/templates/` is currently absent (must be created in T032); record the finding inline in verification.md.
+- [X] T002 Confirm canonical vs installed locations for the refactor: verify `skills/internal/create-agent/templates/` is the source of truth and note that the installed mirror `.specify/skills/internal/create-agent/templates/` is currently absent (must be created in T032); record the finding inline in verification.md.
 
 ---
 
@@ -61,7 +61,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 **⚠️ CRITICAL**: No user story work may begin until this phase is complete. The guards MUST be authored to FAIL against the current (pre-migration) tree, establishing the TDD red state.
 
 - [X] T003 [P] Author deprecated-term guard test in `tests/unit/test_agent_deprecated_terms.py`: assert 0 live matches for `SubRole`/`Subrole`, `improver`, and `Meta-Coordinator` (as a role) across `skills/`, `templates/`, `docs/`, `tests/`, `.specify/agents/`, `.specify/skills/`, excluding immutable history (`.specify/specs/`, `CHANGELOG`, `draft/`, `.specify/memory/features/019.md`). Must FAIL now.
-- [X] T004 [P] Author reference-integrity guard test in `tests/unit/test_agent_reference_integrity.py`: assert no live reference resolves to a pre-migration path/name (`agent-subrole-*`, `agent-role-meta-coordinator-template.md`, `agent-team-supervisor-template.md`) and that every referenced `agent-*-template.md` path exists under `skills/create-agent/templates/`. Must FAIL now.
+- [X] T004 [P] Author reference-integrity guard test in `tests/unit/test_agent_reference_integrity.py`: assert no live reference resolves to a pre-migration path/name (`agent-subrole-*`, `agent-role-meta-coordinator-template.md`, `agent-team-supervisor-template.md`) and that every referenced `agent-*-template.md` path exists under `skills/internal/create-agent/templates/`. Must FAIL now.
 - [X] T005 Produce FR-021 cross-project research deliverable `.specify/specs/023-agent-framework-redesign/research.md`: dispatch one agent per in-scope `/cws_work/*` sibling (exclude `spec-kit`) via the `organize-agents` parallel pattern, mining agent-framework best practices; consolidate findings and ensure ≥1 concrete redesign decision in this spec cites it (SC-008).
 
 **Checkpoint**: Guards are red; research findings are available to inform model/template decisions.
@@ -81,7 +81,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 ### Implementation for User Story 1
 
 - [X] T007 [US1] Refactor `templates/commands/agents.md` into the single-entry intent→capability router (create / organize / execute), delegate to skills without inline template rendering, add ambiguous/unsupported-intent capability listing (FR-001, FR-002, FR-019), and reflect the merged Team Supervisor (no Meta-Coordinator).
-- [X] T008 [US1] Update `docs/commands/agents.md` to describe the single entry point, intent routing table, and Role/Stage/Type + Team/Loop model alignment.
+- [X] T008 [US1] Update `docs/reference/commands/agents.md` to describe the single entry point, intent routing table, and Role/Stage/Type + Team/Loop model alignment.
 - [X] T009 [US1] Verify command inventory: confirm `.qoder/commands/`, `.github/prompts/`, `.opencode/command/`, `.qwen/commands/` contain only `speckit.agents` as the agent-specific command (SC-001); record result in verification.md.
 
 **Checkpoint**: `/speckit.agents` is the sole agent command and routes all intents — MVP functional.
@@ -96,19 +96,19 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [X] T010 [P] [US2] Add model-conformance scenario test in `tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md` asserting each `skills/create-agent/templates/agent-role-*-template.md` declares Role, applicable Stage(s), and Type, and enforces Type-follows-Stage (contracts/conceptual-model-contract.md C1–C6). Must FAIL before implementation.
+- [X] T010 [P] [US2] Add model-conformance scenario test in `tests/scenarios/conceptual-model/role-stage-type-conformance-scenario.md` asserting each `skills/internal/create-agent/templates/agent-role-*-template.md` declares Role, applicable Stage(s), and Type, and enforces Type-follows-Stage (contracts/conceptual-model-contract.md C1–C6). Must FAIL before implementation.
 
 ### Implementation for User Story 2
 
-- [X] T011 [P] [US2] Rename `skills/create-agent/templates/agent-subrole-executor-template.md` → `agent-stage-executor-template.md` and update its internal Stage/Type framing (M2).
-- [X] T012 [P] [US2] Rename `skills/create-agent/templates/agent-subrole-evaluator-template.md` → `agent-stage-evaluator-template.md` and update its internal Stage/Type framing (M2).
-- [X] T013 [P] [US2] Rename `skills/create-agent/templates/agent-subrole-improver-template.md` → `agent-stage-optimizer-template.md`; replace all "improver" occurrences (including internal `name`/`description`) with "optimizer" (FR-014, M2).
-- [X] T014 [US2] Merge `skills/create-agent/templates/agent-role-meta-coordinator-template.md` + `agent-team-supervisor-template.md` into a single `agent-role-team-supervisor-template.md` (Meta role, Meta at all stages); delete the two source files (FR-007, M3, D2).
-- [X] T015 [P] [US2] Update `skills/create-agent/templates/agent-triad-orchestration-template.md`: "improver"→"optimizer", add Stage/Type framing (M4, data-model migration map).
-- [X] T016 [P] [US2] Update `skills/create-agent/templates/agent-supervision-delegation.md`: terminology substitution ("SubRole"→"Stage", "improver"→"optimizer") and Team Supervisor merge references (M4).
-- [X] T017 [P] [US2] Add Role/Stage/Type + Team/Loop model headers to the 6 worker role templates in `skills/create-agent/templates/agent-role-{requirements-analyst,system-designer,module-designer,test-engineer,qa-engineer,knowledge-manager}-template.md` (SC-005, C1/C6).
-- [X] T018 [US2] Refactor `skills/create-agent/SKILL.md`: add the canonical Role/Stage/Type + Team/Loop model section, new stage/role names, canonical template location, and Team Supervisor merge; remove "SubRole"/"improver"/"Meta-Coordinator" (FR-003, FR-015, FR-016).
-- [X] T019 [P] [US2] Update `skills/improve-agent/SKILL.md`: replace "improver"→"optimizer" and "SubRole"→"Stage" (FR-015).
+- [X] T011 [P] [US2] Rename `skills/internal/create-agent/templates/agent-subrole-executor-template.md` → `agent-stage-executor-template.md` and update its internal Stage/Type framing (M2).
+- [X] T012 [P] [US2] Rename `skills/internal/create-agent/templates/agent-subrole-evaluator-template.md` → `agent-stage-evaluator-template.md` and update its internal Stage/Type framing (M2).
+- [X] T013 [P] [US2] Rename `skills/internal/create-agent/templates/agent-subrole-improver-template.md` → `agent-stage-optimizer-template.md`; replace all "improver" occurrences (including internal `name`/`description`) with "optimizer" (FR-014, M2).
+- [X] T014 [US2] Merge `skills/internal/create-agent/templates/agent-role-meta-coordinator-template.md` + `agent-team-supervisor-template.md` into a single `agent-role-team-supervisor-template.md` (Meta role, Meta at all stages); delete the two source files (FR-007, M3, D2).
+- [X] T015 [P] [US2] Update `skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md`: "improver"→"optimizer", add Stage/Type framing (M4, data-model migration map).
+- [X] T016 [P] [US2] Update `skills/internal/create-agent/templates/agent-supervision-delegation.md`: terminology substitution ("SubRole"→"Stage", "improver"→"optimizer") and Team Supervisor merge references (M4).
+- [X] T017 [P] [US2] Add Role/Stage/Type + Team/Loop model headers to the 6 worker role templates in `skills/internal/create-agent/templates/agent-role-{requirements-analyst,system-designer,module-designer,test-engineer,qa-engineer,knowledge-manager}-template.md` (SC-005, C1/C6).
+- [X] T018 [US2] Refactor `skills/internal/create-agent/SKILL.md`: add the canonical Role/Stage/Type + Team/Loop model section, new stage/role names, canonical template location, and Team Supervisor merge; remove "SubRole"/"improver"/"Meta-Coordinator" (FR-003, FR-015, FR-016).
+- [X] T019 [P] [US2] Update `skills/internal/improve-agent/SKILL.md`: replace "improver"→"optimizer" and "SubRole"→"Stage" (FR-015).
 - [X] T020 [US2] Update `skills/organize-agents/SKILL.md`: collapse the Team Loop from 3 layers to 2 (Team Supervisor + Workers), merge Meta-Coordinator into Team Supervisor, and apply terminology substitution (FR-007, M3, D2).
 
 **Checkpoint**: Model and terminology unified across templates and skills; guards from T003/T004 now pass for these files.
@@ -129,7 +129,7 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 
 ### Implementation for User Story 3
 
-- [X] T024 [P] [US3] Align orchestration templates `skills/create-agent/templates/agent-parallel-orchestration-template.md` and `agent-serial-orchestration-template.md` to the Role/Stage/Type + Team/Loop model and unified terminology (FR-008, C2).
+- [X] T024 [P] [US3] Align orchestration templates `skills/internal/create-team/templates/agents/agent-parallel-orchestration-template.md` and `agent-serial-orchestration-template.md` to the Role/Stage/Type + Team/Loop model and unified terminology (FR-008, C2).
 - [X] T025 [US3] Validate all three scenarios route correctly via `/speckit.agents` per quickstart.md §5 (parallel / serial / team-loop → `organize-agents`) and record the walkthrough result in verification.md (SC-006).
 
 **Checkpoint**: All three collaboration topologies are model-consistent and selectable through the single entry point.
@@ -149,8 +149,8 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 ### Implementation for User Story 4
 
 - [X] T027 [P] [US4] Migrate the 6 persisted agents `.specify/agents/{requirements-analyst,system-designer,module-designer,test-engineer,qa-engineer,knowledge-manager}.agent.md` to Role/Stage/Type expression and unified terminology (Stage not SubRole; optimizer not improver) so 0 retain deprecated concepts/terms (FR-020, SC-009).
-- [X] T028 [US4] Migrate `.specify/agents/AGENTS.md`: replace Meta-Coordinator references with the merged Team Supervisor and apply terminology substitution (FR-020, M6).
-- [X] T029 [US4] Document the temporary vs persistent lifecycle and all-officially-supported-tools config generation in `skills/create-agent/SKILL.md` (FR-010/011/012), consistent with Feature 022 multi-tool support.
+- [X] T028 [US4] Migrate `AGENTS.md`: replace Meta-Coordinator references with the merged Team Supervisor and apply terminology substitution (FR-020, M6).
+- [X] T029 [US4] Document the temporary vs persistent lifecycle and all-officially-supported-tools config generation in `skills/internal/create-agent/SKILL.md` (FR-010/011/012), consistent with Feature 022 multi-tool support.
 - [X] T030 [US4] Verify `.qoder/agents → ../.specify/agents` link (and any other supported-tool agent config) is (re)created on initialization and survives migration; record in verification.md (FR-012, A4).
 
 **Checkpoint**: Lifecycle handling verified; no live persisted agent retains deprecated concepts.
@@ -166,10 +166,10 @@ Single project (code-generator / authoring-time tooling). Canonical template hom
 ### Implementation for User Story 5
 
 - [X] T031 [US5] Remove stale `.specify/templates/agent-*` duplicates (`agent-role-*`, `agent-subrole-*`, `agent-supervision-delegation.md`, `agent-triad-orchestration-template.md`, and the `agent-{common,file,knowledge,plan,research}-template.md` set) after confirming no live references remain, so `ls .specify/templates/ | grep -i '^agent-'` returns none (FR-013, M1, D3).
-- [X] T032 [US5] Create/re-sync installed mirrors from source: `.specify/skills/create-agent/**` (including the missing `templates/` subdir), `.specify/skills/improve-agent/**`, and `.specify/skills/organize-agents/**`, so installed copies match the refactored source (M7, Constitution VI).
+- [X] T032 [US5] Create/re-sync installed mirrors from source: `.specify/skills/internal/create-agent/**` (including the missing `templates/` subdir), `.specify/skills/internal/improve-agent/**`, and `.specify/skills/organize-agents/**`, so installed copies match the refactored source (M7, Constitution VI).
 - [X] T033 [P] [US5] Refactor `docs/agents/eei-triad-pattern.md` to the Role/Stage/Type + Team/Loop model and unified terminology (FR-017, SC-007).
 - [X] T034 [P] [US5] Refactor `docs/agents/multi-agent-orchestration.md`: Meta-Coordinator→merged Team Supervisor, terminology, and the three collaboration scenarios (FR-017, SC-007).
-- [X] T035 [US5] Reconcile `docs/agents/design.md` so any remaining "SubRole"/"improver"/"Meta-Coordinator" mentions appear only as explicit historical/migration context, not as live model vocabulary; ensure it remains the authoritative, self-consistent model source (SC-007).
+- [X] T035 [US5] Reconcile `docs/reference/agents/design.md` so any remaining "SubRole"/"improver"/"Meta-Coordinator" mentions appear only as explicit historical/migration context, not as live model vocabulary; ensure it remains the authoritative, self-consistent model source (SC-007).
 - [X] T036 [US5] Fix any remaining broken references to old template paths or old stage names across `skills/`, `docs/`, `tests/`, and command templates so all references resolve (FR-016, SC-004).
 
 **Checkpoint**: Templates consolidated, mirrors synced, docs coherent.

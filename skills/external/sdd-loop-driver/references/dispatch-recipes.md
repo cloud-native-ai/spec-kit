@@ -26,8 +26,8 @@
 
 ## 阶段子代理预算与分段（Stage Subagent Budget & Bounded Dispatch）
 
-- **默认预算**：阶段执行子代理的 `run-turn-budget` 为 **120**（owner：`agents/sdd-executor.agent.md`；2026-10-22 由 40 上调，依据：065a implement 阶段 30 个任务在 40 回合耗尽）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
-- **有界分段**：大阶段（implement >20 任务，或契约 >40 条）MUST 拆成 **≤8 任务 / 一个 phase** 的子派发；每段在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；驱动者 U4 通过后才派下一段。禁止把整个大阶段压在一次派发里。
+- **默认预算**：阶段执行子代理的 `run-turn-budget` 为 **400**（owner：`agents/sdd-executor.agent.md`；2026-10-22 由 40 上调至 120，2026-11-05 在 1M-context 运行档下由 120 上调至 400，依据：requirements/plan 阶段在 120 回合处两次预算耗尽）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
+- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **≤16 任务 / 一个 phase** 的子派发；每段在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；驱动者 U4 通过后才派下一段。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
 - **状态字段**：状态脊记录 `turn_budget`、`sub_dispatch`、`part_scope`、`checkpoint`；预算耗尽/输出上限属 U5 预算触顶，按卡死处置上报，不得伪完成。
 

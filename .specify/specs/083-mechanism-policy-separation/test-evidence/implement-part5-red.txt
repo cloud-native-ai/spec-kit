@@ -1,0 +1,8 @@
+E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+E       assert not ['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+
+tests/contract/test_expression_compatibility.py:675: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_each_consumer_cites_the_source_owner_once
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+2 failed, 21 passed in 1.36s

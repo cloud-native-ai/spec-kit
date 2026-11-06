@@ -34,7 +34,7 @@
 - Canonical command templates: `templates/commands/*.md`
 - Generated assistant assets under test: `.claude/commands/`, `CLAUDE.md`, `.claudeignore`, and `.specify/instructions.md`
 - Tests: `tests/contract/`, `tests/integration/`, and `tests/unit/`
-- Documentation and governance: `.specify/memory/constitution.md`, `README.md`, `docs/installation.md`, `docs/usage.md`, `docs/quickstart.md`, and `.specify/memory/features/021.md`
+- Documentation and governance: `.specify/memory/constitution.md`, `README.md`, `docs/tutorials/installation.md`, `docs/tutorials/quickstart.md`, `docs/tutorials/quickstart.md`, and `.specify/memory/features/021.md`
 
 ## Phase 1: Setup (Shared Infrastructure)
 
@@ -65,9 +65,9 @@
 - [x] T009 Update approved assistant governance to include Claude Code in .specify/memory/constitution.md
 - [x] T010 Update assistant support matrix metadata for Claude Code in src/specify_cli/__init__.py
 - [x] T011 [P] Update public supported-agent list for Claude Code in README.md
-- [x] T012 [P] Update installation prerequisites and `--ai claude` examples in docs/installation.md
-- [x] T013 [P] Update quickstart assistant setup guidance for Claude Code in docs/quickstart.md
-- [x] T014 [P] Update usage guide with Claude Code maintenance and refresh workflow in docs/usage.md
+- [x] T012 [P] Update installation prerequisites and `--ai claude` examples in docs/tutorials/installation.md
+- [x] T013 [P] Update quickstart assistant setup guidance for Claude Code in docs/tutorials/quickstart.md
+- [x] T014 [P] Update usage guide with Claude Code maintenance and refresh workflow in docs/tutorials/quickstart.md
 - [x] T015 Record foundational governance and task-splitting notes in .specify/memory/features/021.md
 
 **Checkpoint**: Governance, support matrix, and documentation baseline are ready; user-story implementation can proceed.
@@ -168,9 +168,9 @@
 
 - [x] T050 [US3] Update `specify init --help`, invalid assistant error text, and `check` output support claims for Claude Code in src/specify_cli/__init__.py
 - [x] T051 [US3] Update supported-agent references and Claude Code overview in README.md
-- [x] T052 [P] [US3] Update Claude Code installation and validation examples in docs/installation.md
-- [x] T053 [P] [US3] Update Claude Code workflow and maintenance instructions in docs/usage.md
-- [x] T054 [P] [US3] Update quickstart assistant selection examples for Claude Code in docs/quickstart.md
+- [x] T052 [P] [US3] Update Claude Code installation and validation examples in docs/tutorials/installation.md
+- [x] T053 [P] [US3] Update Claude Code workflow and maintenance instructions in docs/tutorials/quickstart.md
+- [x] T054 [P] [US3] Update quickstart assistant selection examples for Claude Code in docs/tutorials/quickstart.md
 - [x] T055 [P] [US3] Update AI agent integration guidance for Claude Code in templates/plan-template.md
 - [x] T056 [P] [US3] Update agent/provider whitelist guidance for Claude Code in templates/commands/agents.md
 - [x] T057 [P] [US3] Update instruction compatibility guidance for Claude Code in templates/instructions-template.md
@@ -261,7 +261,7 @@ Task: "Add unit coverage for Claude Code refresh helper behavior in tests/unit/t
 ```bash
 Task: "Add contract coverage for /audits/claude-code-support and /assistants/claude/commands/coverage in tests/contract/test_claude_support_surfaces_contract.py"
 Task: "Add integration coverage for generated project distribution consistency in tests/integration/test_claude_distribution.py"
-Task: "Update Claude Code installation and validation examples in docs/installation.md"
+Task: "Update Claude Code installation and validation examples in docs/tutorials/installation.md"
 Task: "Update agent/provider whitelist guidance for Claude Code in templates/commands/agents.md"
 ```
 

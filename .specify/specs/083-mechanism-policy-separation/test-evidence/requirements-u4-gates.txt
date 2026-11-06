@@ -1,0 +1,34 @@
+# U4 independent gate run — 083 requirements
+# captured: 2026-11-05T03:41:38Z
+
+## validate-requirements.py
+file: .specify/specs/083-mechanism-policy-separation/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 211 lines, 23 definition rows, 3 shared strings
+0 error(s), 0 warning(s)
+rc=0
+
+## pre-analyze-check.py --stage requirements
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=3 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 34, "message": "path does not exist under the repo: .specify/shared/definitions/mechanism-policy-definitions.md"}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 40, "message": "path does not exist under the repo: skills/external/..."}, {"check": "missing-path", "severity": "advisory", "path": "checklists/requirements.md", "line": 40, "message": "path does not exist under the repo: shared/guidelines/..."}], "summary": {"errors": 0, "advisories": 3, "waived": 0, "fr": 18, "sc": 5, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-11-05T03:41:39Z"}
+rc=0
+
+## decomposition-check.py --mode plan
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 18, "task_count": null, "fr_ceiling": 30, "task_ceiling": 40}, "reasons": [], "checked_at": "2026-11-05T03:41:39Z"}
+rc=0
+
+## flow-class-check.py --action lookup
+unit_id: spec:083-mechanism-policy-separation
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+rc=0

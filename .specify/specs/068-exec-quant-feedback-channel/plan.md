@@ -91,7 +91,7 @@ tests/integration/                    # 新增端到端测试（package→ingest
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 
-镜像对真源 = `scripts/python/sync-mirrors.py MIRROR_PAIRS`；`.specify/templates/commands/` 已退役（命令模板只扇出到逐工具副本）。**Pre-edit drift baseline（2026-10-22 `sync-mirrors.py --check` 实测）**: 既有 DIFF 含 `shared/workflow/feedback-step.md` 等 shared 多文件（完整名单见镜像检查输出）——本表 Verify 判据一律为「**相对该既有基线零 NEW drift**」，绝不见「全绿」绝对判据。
+镜像对真源 = `scripts/python/sync-mirrors.py MIRROR_PAIRS`；`templates/commands/` 已退役（命令模板只扇出到逐工具副本）。**Pre-edit drift baseline（2026-10-22 `sync-mirrors.py --check` 实测）**: 既有 DIFF 含 `shared/workflow/feedback-step.md` 等 shared 多文件（完整名单见镜像检查输出）——本表 Verify 判据一律为「**相对该既有基线零 NEW drift**」，绝不见「全绿」绝对判据。
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
@@ -100,7 +100,7 @@ tests/integration/                    # 新增端到端测试（package→ingest
 | `skills/internal/manage-feedback/SKILL.md` | `.specify/skills/internal/manage-feedback/SKILL.md`（skills/internal 对） | 同法；零 NEW drift + 副本含改动 |
 | `skills/internal/manage-feedback/references/path-a-digest.md` | `.specify/skills/internal/manage-feedback/references/path-a-digest.md` | 同上 |
 | `skills/internal/manage-feedback/references/path-b-and-probe.md` | `.specify/skills/internal/manage-feedback/references/path-b-and-probe.md` | 同上 |
-| `templates/commands/feedback.md` | `.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`、Codex 对应副本（以 regen-command-copies.py 逐工具清单为准）；**无** `.specify/templates/commands/` 镜像（已退役） | `regen-command-copies.py` 重生成后 diff 逐工具副本含改动；零手改副本 |
+| `templates/commands/feedback.md` | `.claude/commands/speckit.feedback.md`、`.github/prompts/speckit.feedback.prompt.md`、`.qoder/commands/speckit.feedback.md`、`.opencode/command/speckit.feedback.md`、Codex 对应副本（以 regen-command-copies.py 逐工具清单为准）；**无** `templates/commands/` 镜像（已退役） | `regen-command-copies.py` 重生成后 diff 逐工具副本含改动；零手改副本 |
 | `shared/workflow/feedback-step.md` | `.specify/shared/workflow/feedback-step.md`（shared 对） | 编辑前 `--check --only shared/workflow/feedback-step.md`（该文件**已在既有 DIFF 基线内**）；落地后 `--write` 同步 + 既有失败测试 `test_feedback_step_reference_form.py::test_owner_mirror_is_byte_identical` 预期转绿（基线失败的消失不算回归） |
 | `docs/reference/commands/feedback.md`、`docs/reference/skills/feedback.md` | 无镜像（docs 不随框架分发，shared/docs 边界） | 文档站构建/引用检查零新增破损 |
 

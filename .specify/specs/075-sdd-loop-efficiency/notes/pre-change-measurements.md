@@ -79,11 +79,11 @@ Observed tuples (fixture observation, not transcribed):
 New paths (15) — `driver-stall-fixture.py` and the fixture directory exist after T000; the other 13 are absent:
 
 - absent: `references/efficiency-model.md`
-- absent: `scripts/stage-runner.sh`
-- absent: `scripts/derive-live-log.py`
-- absent: `scripts/admission-check.py`
-- absent: `scripts/audit-test-budget.py`
-- absent: `scripts/audit-plan-changes.py`
+- absent: `skills/external/sdd-loop-driver/scripts/stage-runner.sh`
+- absent: `skills/external/sdd-loop-driver/scripts/derive-live-log.py`
+- absent: `skills/external/sdd-loop-driver/scripts/admission-check.py`
+- absent: `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`
+- absent: `skills/external/sdd-loop-driver/scripts/audit-plan-changes.py`
 - absent: `tests/contract/test_sdd_loop_driver_efficiency.py`
 - absent: `tests/unit/test_admission_check.py`
 - absent: `tests/unit/test_derive_live_log.py`

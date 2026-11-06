@@ -222,15 +222,15 @@ def test_large_fixture_denied(admission_engine, tmp_path, large_template):
                          spec_name="013-large")
     assert code == 1, payload and payload["reasons"]
     assert payload["decision"] == "full-chain"
-    assert payload["measured"]["task_count"] == 60
+    assert payload["measured"]["task_count"] == 90
     assert _criteria(payload)["a"]["verdict"] == "fail"
 
 
 @pytest.mark.parametrize("fr_count,task_count,admitted", [
-    (8, 10, True), (30, 40, True), (7, 40, False), (31, 40, False),
-    (12, 9, False), (12, 41, False),
+    (8, 10, True), (60, 80, True), (7, 80, False), (61, 80, False),
+    (12, 9, False), (12, 81, False),
     # 067 T005 sibling rows (same shape; every row keeps its own assertions and id):
-    (30, 10, True),   # fr upper bound x task lower bound, both inside the window
+    (60, 10, True),   # fr upper bound x task lower bound, both inside the window
     (7, 9, False),    # both counts below their lower bounds
 ])
 def test_task_count_boundary_edges(admission_engine, tmp_path, medium_template,

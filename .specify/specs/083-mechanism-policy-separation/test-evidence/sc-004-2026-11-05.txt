@@ -1,0 +1,254 @@
+SC-004 — host transcript: missing policy stops with the prompt and zero writes; supplied policy reproduces the pre-change bytes (T049)
+================================================================================
+
+Criterion   : requirements.md SC-004 (Path: final) — when policy is missing, zero files are
+              written to any path (the flow stops before any side effect); once the policy is
+              supplied, the same input produces output byte-identical to the pre-change output.
+Contract    : contracts/guard-and-measurement.contract.md GM-05 — this file is the **支撑面**
+              (execution-face record). The **主面** (deterministic face) is
+              `tests/contract/test_mechanism_policy_missing_policy.py` (T016), whose legs are green
+              in the same tree (see `test-evidence/final-gates.txt` GATE-1).
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : Qoder CLI 1.1.83 (`qodercli --version` → `1.1.83`), a Tier 1 host on
+              `docs/reference/cli/supported-agent-tools.md`. The version string was collected;
+              the model behind the CLI's default is not pinned by this run.
+Machine     : macOS 25.6.0 / arm64 (Darwin 25.6.0, `uname -a`)
+Flow driven : `skills/external/create-skills/SKILL.md` — the SW-04 wiring point this feature
+              changed (§ 2's read-judge-stop check before the writability pre-flight).
+Tool budget : `--tools Read,Grep,Glob,Write,Edit --permission-mode accept_edits`. Write tools
+              WERE available to every run below, so "zero files written" is the flow's own
+              stop, not a tool-denial artefact.
+
+Sandbox     : `.specify/.tmp/sc-004/` (the sanctioned, `.gitignore`-matched in-repo scratch
+              root; deleted after this record was written). `before/` and `after/` are two
+              byte-fixed states; only the skill tree differs between them.
+
+## 1. What "before" and "after" are
+
+- **after** = the working tree at HEAD `28662977fab2d8cae60e7f2c2e369df0d984affd`
+  (`skills/external/create-skills/` plus `shared/definitions/mechanism-policy-definitions.md`
+  copied in; no `.specify/` in the sandbox → standalone mode).
+- **before** = the same skill tree read out of baseline `3ffeb26e`
+  (`git archive 3ffeb26e skills/external/create-skills` and
+  `git archive 3ffeb26e shared/definitions`), which carries **no** mechanism/policy owner
+  (`ls before/shared/definitions | grep -c mechanism-policy` → `0`) and no § 2 policy check.
+- Both states got the **same** draft and, for the supplied run, the **same** policy values and
+  the same driving prompt; only the skill tree differs.
+
+## 2. The draft (identical bytes in both states)
+
+| path (relative to each state root) | sha256 |
+|---|---|
+| `drafts/billing-export/SKILL.md` | `7868171b1317aa5922a5f7f25e9f3f5e0ba8a21bb7a6c423c7d0b634f31f9c44` |
+| `drafts/billing-export/references/columns.md` | `0f3150302bd12222b56756219e23d92dd68e6d1fef22450db037586a18fc033b` |
+
+The draft is a small, already conformant skill (frontmatter, Goal, Workflow,
+`## Self-Improvement Contract`, `## Feedback`). Its body states the runtime input/output
+contract in mechanism-safe words; it states no creation-time policy **value**.
+
+## 3. The missing-policy run (after state)
+
+### 3.1 The driving prompt (verbatim)
+
+```text
+你在当前目录扮演执行体，按 skills/external/create-skills/SKILL.md 这份技能定义新建一个技能。
+
+调用方已给出的信息：
+- 技能名字：billing-export
+- 创建来源：drafts/billing-export/ 这份草稿目录
+
+调用方还没有给出（不要猜测，也不要从草稿或环境里补）：
+- 新技能要落在哪个目录
+- 该技能每次运行的输入来源
+- 该技能每次运行的输出落点
+
+执行范围：按该技能定义的流程走到首个需要这些策略项的地方后停止；MUST NOT 执行 Step 7/8。
+```
+
+### 3.2 The host transcript (verbatim)
+
+----- BEGIN VERBATIM -----
+**结果：按流程停在 Step 2 的策略检查点，未创建任何文件。**
+
+- **运行时模式：standalone**。判定依据是当前工作目录（`${SKILL_WORKDIR}`）下不存在 `.specify/`；父级仓库里的同名目录不参与该判定。因此 Step 7 的 agent 传播不适用。
+- **已完成的只读动作**：读取 `drafts/billing-export/SKILL.md` 与 `drafts/billing-export/references/columns.md`；名称与 `description` 可从草稿 frontmatter 解析，不构成阻塞。工作目录内同名扫描只命中草稿本身；完整跨根碰撞扫描要等落地根确定后才有目标。
+- **停止点**：Step 2“Both layers before any write”。策略检查必须先于可写性预检（touch-test 会写探针文件）和 § 3 的第一个文件，因此没有执行 touch-test，也没有留下半成品。
+- **判定分类**：以下三项均属**策略缺失（policy missing）**——调用方从未给出；不是**环境错误（environment error）**。
+
+需要你确认：**新技能落在哪个目录**
+- 缺的是：`billing-export` 的落点（`SKILL_HOME` 所在的 skills 根）
+- 为什么现在需要：下一步要确定 `SKILL_HOME`、做可写性预检并写出第一份 `SKILL.md`
+- 你可以这样给：给出一个 skills 根目录（新技能会落在其下的 `billing-export/`），或直接给出期望的完整目录。当前工作区已有技能位于 `skills/external/create-skills/`；若要与它同层可给出 `skills/external/`，但这只是候选，不是默认。
+
+需要你确认：**每次运行的输入来源**
+- 缺的是：技能运行时从哪里读取账单行
+- 为什么现在需要：正文必须写成可执行、可检查的读取步骤，输入来源决定这一步怎么写
+- 你可以这样给：给一个文件路径或目录、贴一段取数命令，或在回复里说明由每次运行的调用方在对话或参数中提供
+
+需要你确认：**每次运行的输出落点**
+- 缺的是：导出的账单要写到哪里
+- 为什么现在需要：正文要写出可执行的写入步骤，且不能把某个具体落点固化成默认值
+- 你可以这样给：给一个目录或明确的文件路径；若希望每次运行时由调用方临时指定，也请明说，技能里只写索取规则
+
+草稿中的 “caller-specified file” 是运行时的行为规则，我没有把它当作本次创建所需的策略值。Step 7/8 未执行；三项策略给齐后，从 Step 2 继续。
+----- END VERBATIM -----
+
+### 3.3 The snapshot (the zero-write claim)
+
+A full content-hash + directory-set snapshot (never mtime) of the whole `after/` sandbox,
+taken immediately before and immediately after the run:
+
+```text
+before files=8 dirs=10
+after  files=8 dirs=10
+files_equal=True dirs_equal=True
+added_files=[] removed_files=[] changed_files=[]
+added_dirs=[] removed_dirs=[]
+```
+
+- The prompt carries the owner's three required fields: **缺的是哪一项** (three items named in
+  user-recognisable words), **为什么此刻需要**, **你可以怎么给**.
+- The run declares the class as **policy missing**, not **environment error**, matching
+  FR-007's distinction.
+- **Zero writes**: the 8 files and 10 directories are byte-identical before and after, including
+  the draft, both skill trees and the owner document. No touch-test probe survived, because the
+  check precedes it.
+
+## 4. The supplied-policy run (before and after states)
+
+### 4.1 The driving prompt (verbatim; identical for both states)
+
+```text
+你在当前目录扮演执行体，按 skills/external/create-skills/SKILL.md 这份技能定义新建一个技能。
+
+调用方已给出的信息：
+- 技能名字：billing-export
+- 创建来源：drafts/billing-export/ 这份草稿目录
+- 新技能的落点：out/skills/billing-export/
+- 该技能每次运行的输入来源：由调用方在运行时给出
+- 该技能每次运行的输出落点：由调用方在运行时给出
+- 产物要求：把 drafts/billing-export/ 目录下的文件逐字节复制到该落点（保留相对路径），不新增、不改写、不删除任何文件
+
+执行范围：按该技能定义的流程走完 Step 0 到 Step 6（Validate）后立即停止；MUST NOT 执行 Step 7/8。
+```
+
+### 4.2 Baseline state (before) — transcript (verbatim)
+
+----- BEGIN VERBATIM -----
+已按 create-skills 定义的流程执行 Step 0–6，Step 7/8 未执行。
+
+## Step 0 — 运行模式
+工作目录 `.../sc-004/before` 下不存在 `.specify/`，判定为 **standalone mode**。因此：无引擎 Feedback 调用、契约测试套件不适用、不涉及 `.specify/**` 引用、Step 7 的 agent 传播不适用。
+
+## Step 1–2 — 来源与落点
+- **Case A（显式输入）**：名称 `billing-export` 合法；描述来自草稿，含触发词。
+- **同名冲突扫描**：可读工作区内仅有 `skills/external/create-skills` 与草稿本身，无同名实体。全局/agent 技能目录受沙箱读取限制，未能纳入扫描（已如实记录）。
+- **SKILL_HOME**：`out/skills/billing-export/`；写入成功，证明目标可写。
+- 已检查同级技能 `skills/external/create-skills` 的格式作为参照。
+
+## 产物（逐字节复制）
+| 文件 | 行数 |
+|---|---|
+| `out/skills/billing-export/SKILL.md` | 24 |
+| `out/skills/billing-export/references/columns.md` | 3 |
+
+相对路径已保留；逐行内容一致；均为 LF、单一末尾换行、无 BOM、无 CRLF、无行尾空白。落点内未新增草稿之外的文件、未改写内容、未删除任何文件。
+
+## Step 6 — 校验结果
+**通过项**：`name` 与目录一致；description 含触发词且未概述工作流；Goal/Workflow 可执行；`## Self-Improvement Contract` 恰好一次且紧邻 Feedback；Feedback 为最后一节、自包含且无引擎调用；SKILL.md 远小于 500 行；无无关文档；无断链、无 `.specify/**` 引用；目录 + frontmatter 可发现；未写注册表。
+
+**受“逐字节复制、不改写”约束而未修复的偏差**：
+1. 缺 `skill_id` frontmatter（Step 5 期望 `<SKILL:out/skills/billing-export/SKILL.md>`；主规范中该字段为可选）。
+2. `references/columns.md` 未被 SKILL.md 链接，渐进披露链路缺失。
+3. Self-Improvement Contract 较简：仅提及 `improve-skills` 与记录观察，未写明验证路由、对比信号与升级边界。
+4. Feedback 未以运行时模式门开头，仅在末尾声明 standalone。
+
+**不适用的检查**：standalone 模式下契约测试套件不适用（工作区无 `tests/`）；无技能拓扑注册表或 agent 加载目录需要核对。
+
+## 未执行
+- Step 6.5 压力测试：不在指定的 Step 0–6 范围内，且当前环境无子代理派发能力。
+- Step 7（agent 传播）与 Step 8（完成报告流程）：按指令未执行。
+
+除落点产物外，未修改、新增或删除任何文件。
+----- END VERBATIM -----
+
+### 4.3 Changed state (after) — transcript (verbatim)
+
+----- BEGIN VERBATIM -----
+已完成 Step 0–6，产物与草稿逐字节一致。
+
+**执行结果**
+
+- **Step 0 模式判定**：`${SKILL_WORKDIR}/.specify/` 不存在 → **standalone 模式**。未向上级目录探测（避免命中父仓库的 `.specify/`）；Step 7 传播跳过。
+- **Step 1 创建来源与碰撞扫描**：名称 `billing-export`；工作目录内仅命中指定草稿来源 `drafts/billing-export/`，`out/skills/billing-export/` 此前不存在，无同名实体。home 下的全局技能目录因读取权限被拒，扫描止于工作目录（环境限制，非策略缺失）。
+- **Step 2 策略项**：名称、落点、运行时输入来源、运行时输出落点、产物形态（逐字节复制）均已给出且无歧义，无需停下索取。本环境无 shell 工具，无法执行 `touch` 探针；写入工具成功创建首个文件即为可写性的快速失败信号。
+- **Step 3–5 产出**：按“不新增、不改写、不删除”约束原样复制；解析路径为 `out/skills/billing-export/SKILL.md`。因逐字节约束禁止改写，未在 frontmatter 中补写 Step 5 的 `skill_id`——可发现性由目录名 + `name: billing-export` 保证。
+- **Step 6 校验**：最小检查全部通过（名称匹配、触发词、可执行步骤、无断链、少于 500 行、无无关文档、`## Self-Improvement Contract` 紧邻 `## Feedback` 且仅一次、Feedback 为标准 standalone 自包含形态、无 `.specify/**` 引用、无策略硬编码）。`tests/` 不存在 → **contract suite not applicable**。
+
+**产物（2 个文件，无额外文件）**
+
+```
+out/skills/billing-export/SKILL.md
+out/skills/billing-export/references/columns.md
+```
+
+**留待调用方决定的检查项**（均因“不改写”约束无法就地修正）：`references/columns.md` 未被 `SKILL.md` 链接；Self-Improvement Contract 仅点名 `improve-skills` 与观察记录，未展开规范要求的全部分项；`skill_id` 缺失。若需补齐，应走 `improve-skills` 而非本次创建。
+
+按执行范围，Step 6.5、Step 7、Step 8 均未执行。本次未发现异常，也未做伴随修复。
+----- END VERBATIM -----
+
+### 4.4 The artifact comparison
+
+Denominator (GM-05): same input = same draft + same policy values; the assertion object is the
+produced path set and every file's sha256. Both artifact roots are `<state>/out/`; the paths
+below are relative to it.
+
+| path | baseline (before) sha256 | changed (after) sha256 |
+|---|---|---|
+| `skills/billing-export/SKILL.md` | `7868171b1317aa5922a5f7f25e9f3f5e0ba8a21bb7a6c423c7d0b634f31f9c44` | `7868171b1317aa5922a5f7f25e9f3f5e0ba8a21bb7a6c423c7d0b634f31f9c44` |
+| `skills/billing-export/references/columns.md` | `0f3150302bd12222b56756219e23d92dd68e6d1fef22450db037586a18fc033b` | `0f3150302bd12222b56756219e23d92dd68e6d1fef22450db037586a18fc033b` |
+
+```text
+path_sets_equal=True
+per_file_hashes_equal=True
+dir_sets_equal=True
+```
+
+- The produced path set is identical across the two states (`2` files, `3` directories
+  under `out/`), and every file's sha256 is identical — the supplied-policy behaviour is
+  **additive**: the check changed nothing about what is produced.
+- Each produced file also equals its draft source byte-for-byte (the two sha256 above are the
+  draft's own § 2 hashes), which makes the "same input" denominator concrete.
+
+## 5. Harness premise and disclosure
+
+- **What "missing" means here**: the three unstated items are the creation's declared policy
+  items (§ 2: the landing root, the new skill's runtime input source, its runtime output
+  location). The prompt states that the caller has not given them; the draft's
+  "caller-specified file" is the runtime behaviour rule, not a creation-time policy value —
+  the run says so itself in § 3.2's last paragraph.
+- **Two trial prompts were corrected before the recorded reading** (both discarded; their
+  artefacts were deleted and their states re-snapshotted):
+  1. Trial 1 left only the landing unstated while a standalone host skills root existed in the
+     sandbox; the flow resolved the landing from the environment (`skills/external/<name>/`,
+     the sibling of the visible skill) and proceeded. That is a resolved item, not a missing one.
+  2. Trial 2 left the runtime input/output items unstated while the draft itself declared
+     caller-supplied behaviour; the flow judged them present and proceeded. That is a declared
+     runtime rule, not an absent creation-time policy.
+  Neither trial is a reading of SC-004 and neither is counted; they are recorded so the
+  recorded run's premise can be checked rather than trusted.
+- **What this does not establish**: the model behind the CLI is not pinned; a different model
+  may behave differently. The mechanised face (T016) is the deterministic carrier and stands on
+  the owner's contract text plus a filesystem snapshot, never on model behaviour (GM-02).
+- **Cleanup**: `.specify/.tmp/sc-004/` is scratch. Its findings are in this file; the directory
+  is deleted after this record lands, per the temp-directory discipline.
+
+## 6. Recomputing this reading
+
+1. Build `before/` from `git archive 3ffeb26e skills/external/create-skills shared/definitions`
+   and `after/` from the working tree at this feature's close, as in § 1.
+2. Write the § 2 draft into both states and hash it.
+3. Run the § 3.1 prompt in `after/` with write tools available; snapshot the whole state before
+   and after; the two snapshots must be equal and the transcript must carry the three fields.
+4. Run the § 4.1 prompt in both states; compare the two `out/` trees' path sets and per-file
+   sha256 (the table in § 4.4 must reproduce).

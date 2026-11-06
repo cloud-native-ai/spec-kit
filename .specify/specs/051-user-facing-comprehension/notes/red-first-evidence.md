@@ -68,7 +68,7 @@ Both were caught by the red-first run rather than by reading, which is what the 
    `.sh` anywhere in the repo would have passed C-5 silently. Fixed by unioning
    `git ls-files --others --exclude-standard` into the change set. The fix was verified not
    to drag in the other unit's in-flight work: the only untracked non-test path in the repo
-   is `skills/draw-diagram/references/self-deploy-render-service.md` (a `.md`, outside both
+   is `skills/external/draw-diagram/references/self-deploy-render-service.md` (a `.md`, outside both
    clauses' scope). **This is the third "blind check" defect found this feature** (after the
    `--stat` piping form and `git diff HEAD`'s CI vacuity) and the same shape: a command whose
    output is empty for a reason unrelated to the proposition it was supposed to test.
@@ -201,7 +201,7 @@ of through an assertion.
 | C-4 | The five criteria sections are byte-frozen by SHA-256 and untouched. Green now is the point — it must *stay* green through T017/T018, which edit the header and `:68` only. |
 | C-5 | `:58-60`'s triad is still owned by `confirmation-gates.md`, and the truth document already reaches it by path (T006 landed that side). Both halves hold before US2 starts. |
 | C-7 | `interview-pattern.md:125-126`'s two pattern-specific rules are untouched; freeze assertion, US5's T041 must not drop them. |
-| C-14 | `regen-command-copies.py --check` is EXIT=0 today and `.specify/templates/commands/` does not exist. |
+| C-14 | `regen-command-copies.py --check` is EXIT=0 today and `templates/commands/` does not exist. |
 
 The remaining xfailed clauses (C-1, C-6, C-8, C-9, C-10, C-11, C-12, C-13) are **US4/US5's**
 取证 targets, not US2's; T035 and T040 own those runs.

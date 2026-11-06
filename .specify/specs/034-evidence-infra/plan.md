@@ -12,7 +12,7 @@
 
 ### Session 2026-07-29
 
-- 勘察确认(better-harness 源码):四能力的 CLI 入口不全在目录内——session-analysis 的入口是根级 `scripts/session-analysis.mjs`(registry 派发);core-change-watch 无 cli.mjs,8 个文件各自带 shebang 与自调用 `main()`;asset-baseline 额外依赖 `scripts/agent-lint/`(4 文件)。复制布局须保持这些相对路径关系(§Source Code)。
+- 勘察确认(better-harness 源码):四能力的 CLI 入口不全在目录内——session-analysis 的入口是根级 `scripts/js/better-harness/session-analysis.mjs`(registry 派发);core-change-watch 无 cli.mjs,8 个文件各自带 shebang 与自调用 `main()`;asset-baseline 额外依赖 `scripts/agent-lint/`(4 文件)。复制布局须保持这些相对路径关系(§Source Code)。
 - 勘察确认(spec-kit 现状):`.specify/skills/` 镜像现状不全(5/23),`instructions.md` 技能计数文本(22)与实际(23)不一致——本 spec 只对 `collect-evidence` 与三个 improve 技能承担镜像义务,存量漂移记录为已知基线问题,不在本 spec 修复。
 - 勘察确认:feedback 存量条目已达 54(动态口径已入 spec);teams 现有 2 个团队,其中 `bh-port-monitor` 具备完整 STATE.md + run-log.jsonl,`draw-plantuml-optimizer` 仅有 runs/ 报告——runs 泳道必须容忍字段缺失的团队目录。
 - 勘察确认:上游 `engines` 要求 Node `>=22.20.0 <25`;doctor 必须校验 Node 版本并把不满足视为三条 Node 泳道 unavailable 的一种成因。
@@ -91,11 +91,11 @@ scripts/js/better-harness/                 # 引擎子集(D1 源码托管;上游
 .specify/scripts/python/evidence-utils.py  # 泳道编排引擎(stdlib-only;doctor/collect/list/latest/compare)
 scripts/python/evidence-utils.py           # ↑ 镜像(现行 scripts/python ↔ .specify/scripts/python 规则)
 .specify/memory/evidence/                  # 证据存储:<run-id>/{findings,manifest,lanes/} + index.json
-skills/collect-evidence/                   # 公共采集技能:SKILL.md + references/{evidence-contract,evidence-discipline}.md
-.specify/skills/collect-evidence/          # ↑ 镜像
-skills/improve-skills/SKILL.md             # 消费改造:Step 2 升级为证据步骤(30~60 行级)
-skills/improve-agent/SKILL.md              # 消费改造:同上 + assets 泳道模板 lint 证据
-skills/improve-team/SKILL.md               # 消费改造:runs 泳道消费替代原始工件解析
+skills/internal/collect-evidence/                   # 公共采集技能:SKILL.md + references/{evidence-contract,evidence-discipline}.md
+.specify/skills/internal/collect-evidence/          # ↑ 镜像
+skills/external/improve-skills/SKILL.md             # 消费改造:Step 2 升级为证据步骤(30~60 行级)
+skills/internal/improve-agent/SKILL.md              # 消费改造:同上 + assets 泳道模板 lint 证据
+skills/internal/improve-team/SKILL.md               # 消费改造:runs 泳道消费替代原始工件解析
 .specify/skills/{improve-skills,improve-agent,improve-team}/SKILL.md  # ↑ 三镜像
 .specify/shared/workflow/evidence-step.md  # 标准证据步骤(与 feedback-step.md 对偶,单一事实源)
 shared/workflow/evidence-step.md           # ↑ 镜像(现行 shared ↔ .specify/shared 规则)
@@ -114,10 +114,10 @@ tests/contract/test_evidence_step_conformance.py # 三 improve 技能证据步�
 |----------------------|---------------------------------------------------|--------|
 | `scripts/js/better-harness/**`(全部引擎文件) | `.specify/scripts/js/better-harness/**` | `diff -rq scripts/js/better-harness .specify/scripts/js/better-harness` |
 | `.specify/scripts/python/evidence-utils.py` | `scripts/python/evidence-utils.py` | `diff -q` |
-| `skills/collect-evidence/**` | `.specify/skills/collect-evidence/**` | `diff -rq` |
-| `skills/improve-skills/SKILL.md` | `.specify/skills/improve-skills/SKILL.md` | `diff -q` |
-| `skills/improve-agent/SKILL.md` | `.specify/skills/improve-agent/SKILL.md` | `diff -q` |
-| `skills/improve-team/SKILL.md` | `.specify/skills/improve-team/SKILL.md` | `diff -q` |
+| `skills/internal/collect-evidence/**` | `.specify/skills/internal/collect-evidence/**` | `diff -rq` |
+| `skills/external/improve-skills/SKILL.md` | `.specify/skills/improve-skills/SKILL.md` | `diff -q` |
+| `skills/internal/improve-agent/SKILL.md` | `.specify/skills/internal/improve-agent/SKILL.md` | `diff -q` |
+| `skills/internal/improve-team/SKILL.md` | `.specify/skills/internal/improve-team/SKILL.md` | `diff -q` |
 | `shared/workflow/evidence-step.md`(若源侧存在 shared/) | `.specify/shared/workflow/evidence-step.md` | `diff -q`(以仓库实际 shared 镜像方向为准,勘察确认后单向落盘) |
 | `.specify/instructions.md`(Skills 注册表 + 计数) | `AGENTS.md`/`CLAUDE.md`/`QODER.md` 等为符号链接,零额外写;`.github/skills` 符号链接自动生效 | `find . -maxdepth 1 -type l` 链接完好 |
 

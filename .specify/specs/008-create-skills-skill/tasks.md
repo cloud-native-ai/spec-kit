@@ -32,10 +32,10 @@
 **Purpose**: Establish the implementation workspace and identify the source guidance to extract.
 
 - [x] T001 Verify current feature artifacts in .specify/specs/008-create-skills-skill/plan.md and .specify/specs/008-create-skills-skill/requirements.md
-- [x] T002 [P] Create the source Skill directory at skills/create-skills/ for the new reusable Skill
+- [x] T002 [P] Create the source Skill directory at skills/external/create-skills/ for the new reusable Skill
 - [x] T003 [P] Create the current-workspace mirror directory at .specify/skills/create-skills/ for discoverability during local validation
 - [x] T004 [P] Create prompt asset test scaffold in tests/contract/test_create_skills_prompt_assets.py
-- [x] T005 Review the inline creation workflow currently in templates/commands/skills.md and identify creation-only sections to move into skills/create-skills/SKILL.md
+- [x] T005 Review the inline creation workflow currently in templates/commands/skills.md and identify creation-only sections to move into skills/external/create-skills/SKILL.md
 
 ---
 
@@ -45,7 +45,7 @@
 
 **⚠️ CRITICAL**: No user story implementation should begin until these checks exist and fail against the current state.
 
-- [x] T006 [P] Add failing frontmatter and required-section tests for skills/create-skills/SKILL.md in tests/contract/test_create_skills_prompt_assets.py
+- [x] T006 [P] Add failing frontmatter and required-section tests for skills/external/create-skills/SKILL.md in tests/contract/test_create_skills_prompt_assets.py
 - [x] T007 [P] Add failing routing tests for missing-target `create-skills` and existing-target `improve-skills` language in templates/commands/skills.md using tests/contract/test_create_skills_prompt_assets.py
 - [x] T008 [P] Add failing duplication-boundary tests that reject full creation methodology remaining in templates/commands/skills.md using tests/contract/test_create_skills_prompt_assets.py
 - [x] T009 [P] Add failing packaging assertion that pyproject.toml still force-includes the root skills/ directory in tests/contract/test_create_skills_prompt_assets.py
@@ -57,23 +57,23 @@
 
 ## Phase 3: User Story 1 - Create new skills through a dedicated capability (Priority: P1) 🎯 MVP
 
-**Goal**: Provide a reusable `create-skills` Skill at `skills/create-skills/SKILL.md` that owns new Skill creation guidance.
+**Goal**: Provide a reusable `create-skills` Skill at `skills/external/create-skills/SKILL.md` that owns new Skill creation guidance.
 
-**Independent Test**: A maintainer can open `skills/create-skills/SKILL.md` and follow it end-to-end to create a new Skill without relying on creation-specific instructions from `templates/commands/skills.md`.
+**Independent Test**: A maintainer can open `skills/external/create-skills/SKILL.md` and follow it end-to-end to create a new Skill without relying on creation-specific instructions from `templates/commands/skills.md`.
 
 ### Tests for User Story 1
 
-- [x] T011 [P] [US1] Run failing Skill existence/frontmatter checks in tests/contract/test_create_skills_prompt_assets.py for skills/create-skills/SKILL.md
+- [x] T011 [P] [US1] Run failing Skill existence/frontmatter checks in tests/contract/test_create_skills_prompt_assets.py for skills/external/create-skills/SKILL.md
 - [x] T012 [P] [US1] Add and run failing checks for explicit-input and conversation-history creation guidance in tests/contract/test_create_skills_prompt_assets.py
 
 ### Implementation for User Story 1
 
-- [x] T013 [US1] Create skills/create-skills/SKILL.md with YAML frontmatter containing `name: create-skills`, a trigger-rich `description`, and `skill_id: "<SKILL:.specify/skills/create-skills/SKILL.md>"`
-- [x] T014 [US1] Move explicit user input parsing, valid Skill name rules, and description extraction guidance from templates/commands/skills.md into skills/create-skills/SKILL.md
-- [x] T015 [US1] Move empty-argument conversation distillation guidance from templates/commands/skills.md into skills/create-skills/SKILL.md
-- [x] T016 [US1] Add minimal clarification rules and one-question-at-a-time behavior to skills/create-skills/SKILL.md
-- [x] T017 [US1] Add completion reporting requirements with created path, `skill_id`, example prompts, and follow-up actions to skills/create-skills/SKILL.md
-- [x] T018 [US1] Mirror the completed Skill content from skills/create-skills/SKILL.md to .specify/skills/create-skills/SKILL.md for current-workspace discovery
+- [x] T013 [US1] Create skills/external/create-skills/SKILL.md with YAML frontmatter containing `name: create-skills`, a trigger-rich `description`, and `skill_id: "<SKILL:.specify/skills/create-skills/SKILL.md>"`
+- [x] T014 [US1] Move explicit user input parsing, valid Skill name rules, and description extraction guidance from templates/commands/skills.md into skills/external/create-skills/SKILL.md
+- [x] T015 [US1] Move empty-argument conversation distillation guidance from templates/commands/skills.md into skills/external/create-skills/SKILL.md
+- [x] T016 [US1] Add minimal clarification rules and one-question-at-a-time behavior to skills/external/create-skills/SKILL.md
+- [x] T017 [US1] Add completion reporting requirements with created path, `skill_id`, example prompts, and follow-up actions to skills/external/create-skills/SKILL.md
+- [x] T018 [US1] Mirror the completed Skill content from skills/external/create-skills/SKILL.md to .specify/skills/create-skills/SKILL.md for current-workspace discovery
 
 **Checkpoint**: User Story 1 delivers the MVP dedicated creation capability.
 
@@ -106,7 +106,7 @@
 
 **Goal**: Ensure the extracted Skill retains quality rules for metadata, progressive disclosure, resource organization, registry updates, validation, and completion reporting.
 
-**Independent Test**: A reviewer can compare the extraction checklist against `skills/create-skills/SKILL.md` and confirm at least 90% of previous creation responsibilities remain represented.
+**Independent Test**: A reviewer can compare the extraction checklist against `skills/external/create-skills/SKILL.md` and confirm at least 90% of previous creation responsibilities remain represented.
 
 ### Tests for User Story 3
 
@@ -116,13 +116,13 @@
 
 ### Implementation for User Story 3
 
-- [x] T029 [US3] Add Skill structure, `SKILL.md` frontmatter, body, and relative resource path guidance to skills/create-skills/SKILL.md
-- [x] T030 [US3] Add progressive disclosure and size-control guidance to skills/create-skills/SKILL.md, including when to use skills/create-skills/references/
-- [x] T031 [US3] Create skills/create-skills/references/skill-creation-quality-checklist.md with metadata, structure, registry, resource, and validation checks
-- [x] T032 [US3] Link skills/create-skills/references/skill-creation-quality-checklist.md from skills/create-skills/SKILL.md using a relative path
-- [x] T033 [US3] Add registry update instructions for .specify/instructions.md and `.specify/memory/features.md` discoverability constraints to skills/create-skills/SKILL.md
-- [x] T034 [US3] Add quality anti-pattern guidance for vague descriptions, invalid names, oversized `SKILL.md`, missing executable steps, and inconsistent resource paths to skills/create-skills/SKILL.md
-- [x] T035 [US3] Mirror skills/create-skills/references/skill-creation-quality-checklist.md to .specify/skills/create-skills/references/skill-creation-quality-checklist.md for current-workspace discovery
+- [x] T029 [US3] Add Skill structure, `SKILL.md` frontmatter, body, and relative resource path guidance to skills/external/create-skills/SKILL.md
+- [x] T030 [US3] Add progressive disclosure and size-control guidance to skills/external/create-skills/SKILL.md, including when to use skills/external/create-skills/references/
+- [x] T031 [US3] Create skills/external/create-skills/references/skill-creation-quality-checklist.md with metadata, structure, registry, resource, and validation checks
+- [x] T032 [US3] Link skills/external/create-skills/references/skill-creation-quality-checklist.md from skills/external/create-skills/SKILL.md using a relative path
+- [x] T033 [US3] Add registry update instructions for .specify/instructions.md and `.specify/memory/features.md` discoverability constraints to skills/external/create-skills/SKILL.md
+- [x] T034 [US3] Add quality anti-pattern guidance for vague descriptions, invalid names, oversized `SKILL.md`, missing executable steps, and inconsistent resource paths to skills/external/create-skills/SKILL.md
+- [x] T035 [US3] Mirror skills/external/create-skills/references/skill-creation-quality-checklist.md to .specify/skills/create-skills/references/skill-creation-quality-checklist.md for current-workspace discovery
 - [x] T036 [US3] Update .specify/instructions.md Skills registry with one deduplicated row for `create-skills` pointing to .specify/skills/create-skills/SKILL.md
 
 **Checkpoint**: User Story 3 preserves existing creation quality expectations after extraction.
@@ -137,10 +137,10 @@
 - [x] T038 [P] Update .specify/memory/features/013.md with task-breakdown notes and the latest tasks.md related file entry
 - [x] T039 [P] Verify .specify/memory/features.md keeps Feature 013 status `Implemented`, spec path .specify/specs/008-create-skills-skill/requirements.md, and last updated date 2026-05-10
 - [x] T040 Run pytest tests/contract/test_create_skills_prompt_assets.py
-- [ ] T041 Run pytest tests/contract/test_create_new_skill_contract.py tests/contracts/test_skill_install_layout_contract.py tests/integration/test_skill_install_layout_integration.py tests/integration/test_skills_resource_ids.py
-- [x] T042 Execute quickstart validation scenarios from .specify/specs/008-create-skills-skill/quickstart.md against templates/commands/skills.md and skills/create-skills/SKILL.md
-- [x] T043 [P] Confirm pyproject.toml still force-includes skills/ so skills/create-skills/SKILL.md is packaged
-- [x] T044 Review git diff for templates/commands/skills.md, skills/create-skills/SKILL.md, .specify/skills/create-skills/SKILL.md, and tests/contract/test_create_skills_prompt_assets.py to ensure no unrelated changes
+- [ ] T041 Run pytest tests/contract/test_create_new_skill_contract.py tests/contract/test_skill_install_layout_contract.py tests/integration/test_skill_install_layout_integration.py tests/integration/test_skills_resource_ids.py
+- [x] T042 Execute quickstart validation scenarios from .specify/specs/008-create-skills-skill/quickstart.md against templates/commands/skills.md and skills/external/create-skills/SKILL.md
+- [x] T043 [P] Confirm pyproject.toml still force-includes skills/ so skills/external/create-skills/SKILL.md is packaged
+- [x] T044 Review git diff for templates/commands/skills.md, skills/external/create-skills/SKILL.md, .specify/skills/create-skills/SKILL.md, and tests/contract/test_create_skills_prompt_assets.py to ensure no unrelated changes
 
 ---
 
@@ -182,7 +182,7 @@
 ## Parallel Example: User Story 1
 
 ```text
-Task: "Run failing Skill existence/frontmatter checks in tests/contract/test_create_skills_prompt_assets.py for skills/create-skills/SKILL.md"
+Task: "Run failing Skill existence/frontmatter checks in tests/contract/test_create_skills_prompt_assets.py for skills/external/create-skills/SKILL.md"
 Task: "Add and run failing checks for explicit-input and conversation-history creation guidance in tests/contract/test_create_skills_prompt_assets.py"
 ```
 
@@ -210,7 +210,7 @@ Task: "Add and run failing checks for quality anti-patterns in tests/contract/te
 1. Complete Phase 1: Setup.
 2. Complete Phase 2: Foundational tests and extraction checklist.
 3. Complete Phase 3: User Story 1.
-4. Stop and validate `skills/create-skills/SKILL.md` independently against quickstart Scenario 3.
+4. Stop and validate `skills/external/create-skills/SKILL.md` independently against quickstart Scenario 3.
 5. Demo the new Skill as the reusable creation capability.
 
 ### Incremental Delivery
@@ -225,5 +225,5 @@ Task: "Add and run failing checks for quality anti-patterns in tests/contract/te
 
 ```text
 pytest tests/contract/test_create_skills_prompt_assets.py
-pytest tests/contract/test_create_new_skill_contract.py tests/contracts/test_skill_install_layout_contract.py tests/integration/test_skill_install_layout_integration.py tests/integration/test_skills_resource_ids.py
+pytest tests/contract/test_create_new_skill_contract.py tests/contract/test_skill_install_layout_contract.py tests/integration/test_skill_install_layout_integration.py tests/integration/test_skills_resource_ids.py
 ```

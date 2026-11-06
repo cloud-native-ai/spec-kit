@@ -175,7 +175,7 @@
 
 - [x] CHK032 — 每个被改的框架源文件是否都列了镜像/副本目标与再生成命令，且列法经得起镜像引擎核对？[Completeness, Req §FR-021, §FR-024]
   - **Verdict**: PASS
-  - **Evidence**: `plan.md:192-200` 逐行给出 source → mirror → verify；本次与引擎逐条核对一致：`scripts/python/sync-mirrors.py:82-89` 的六对为 `templates`（exclude `commands`）、`skills/external → .specify/skills`（exclude `site`,`internal`）、`skills/internal → .specify/skills/internal`、`agents`、`scripts`（`strict=True`）、`shared`；`.specify/templates/commands/` 实测**不存在**（与 `plan.md:194` 的「retired」一致）。
+  - **Evidence**: `plan.md:192-200` 逐行给出 source → mirror → verify；本次与引擎逐条核对一致：`scripts/python/sync-mirrors.py:82-89` 的六对为 `templates`（exclude `commands`）、`skills/external → .specify/skills`（exclude `site`,`internal`）、`skills/internal → .specify/skills/internal`、`agents`、`scripts`（`strict=True`）、`shared`；`templates/commands/` 实测**不存在**（与 `plan.md:194` 的「retired」一致）。
 
 - [x] CHK033 — 「不得手改 `.specify/` 镜像」这条规则是否有**测量得到的**零漂移基线支撑（而不是预先写死的期望值）？[Measurability, Req §FR-024, §SC-009 ①]
   - **Verdict**: PASS
@@ -226,7 +226,7 @@
 | P5 | `grep -n "_status=partial" .specify/specs/071*/verification.md .specify/specs/077*/verification.md` | 5 条（071:66,86；077:77,89,101）→ 与 `plan.md` IB 行 1:1 |
 | P6 | `grep -rln '^## Deferred' .specify/memory/features/` | 零命中 |
 | P7 | `wc -l baseline-failed.txt` + 基线日志末行 | 39 行 / `39 failed, 6970 passed, 7 skipped` |
-| P8 | `ls .specify/templates/commands`、`grep -n MIRROR_PAIRS -A 8 scripts/python/sync-mirrors.py` | 目录不存在（retired 属实）/ 六对与 `plan.md:192-200` 相符 |
+| P8 | `ls templates/commands`、`grep -n MIRROR_PAIRS -A 8 scripts/python/sync-mirrors.py` | 目录不存在（retired 属实）/ 六对与 `plan.md:192-200` 相符 |
 | P9 | `grep -rn test_acceptance_schema_ownership` 于 plan/tasks/quickstart + `ls tests/contract/` | 零命中、文件不存在（→ CHK024） |
 | P10 | `sed -n '98p' templates/feature-details-template.md`、`sed -n '121p' skills/internal/manage-features/SKILL.md`、`sed -n '20p' templates/feature-index-template.md` + `wc -l` | 前两处有取值域清单；第三处只有 `Status` 列、全文 21 行（→ CHK005） |
 | P11 | `grep -n '^### Step 8\|^### Step 9' skills/internal/implement-feature/SKILL.md` | `249:### Step 8 — Completion validation`、`310:### Step 9 — Pre-Status-Flip Gate …`（→ CHK035） |

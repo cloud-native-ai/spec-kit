@@ -256,7 +256,7 @@
   仓库的 `skills/external/sdd-loop-driver/scripts/` 只有 `line-registry.py` 与 `watch-target.sh`，没有可执行的 runner；测试里的 `runner` 是 pytest 在 `tmp_path` 动态生成的 `fake-runner.sh`，由 pytest 自己用 `start_new_session=True` 启动。SIGHUP 发给的是与 runner 无关的 `sleep 30` driver shell。
 
 - **Why it's a problem**: FR-046/FR-047 的核心保证是“主会话故障不得终止子代理”。当前测试证明的是 pytest 夹具的 detach 行为，不是交付给驱动的 recipe。若 dispatch-recipes 的 `setsid/nohup/disown` 顺序、stdio 重定向或 `wait` 逻辑有误，测试仍然全绿。`verification.md:42` 的 SC-005 “detached runner survives driver SIGHUP”因此是夹具级证据，不是产品级证据；mutation drill 2（`SDD_RUNNER_MODE=foreground`）也只是切换夹具的启动方式。
-- **Proposed fix**: 把 dispatch-recipes 的本地 detach 片段提取为可执行 runner 脚本（或提供 `scripts/run-stage.sh`），让集成测试通过文档给出的命令启动它，再 kill driver group；断言 runner 写入四件套、心跳继续、registry 的 `runner_pid`/`cli_pid` 正确。若短期不提供 runner，应把 SC-005 标为“protocol simulated”并把该缺口写进 verification，而不是 Pass。
+- **Proposed fix**: 把 dispatch-recipes 的本地 detach 片段提取为可执行 runner 脚本（或提供 `skills/external/sdd-loop-driver/scripts/run-stage.sh`），让集成测试通过文档给出的命令启动它，再 kill driver group；断言 runner 写入四件套、心跳继续、registry 的 `runner_pid`/`cli_pid` 正确。若短期不提供 runner，应把 SC-005 标为“protocol simulated”并把该缺口写进 verification，而不是 Pass。
 
 ### F5 — `151 passed` 中包含大量文档/元测试；它们不能作为行为覆盖
 

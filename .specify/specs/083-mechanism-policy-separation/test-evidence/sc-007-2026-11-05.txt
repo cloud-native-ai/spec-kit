@@ -1,0 +1,106 @@
+SC-007 — five-consumer wiring and containment reading (T044)
+================================================================================
+
+Criterion   : requirements.md SC-007 — each of the five consumer `SKILL.md` files
+              (run-skills / create-skills / improve-skills / merge-skills /
+              coaching-skills) carries exactly one reference to the owner
+              `shared/definitions/skill-reference-definitions.md` and declares only its
+              own parameters; and a repository-wide scan finds zero copies of the
+              normalization steps or the failure table outside the owner.
+Carriers    : tests/contract/test_skill_reference_consumers.py (both halves)
+              sync-mirrors.py --check (the mirror layer, proved separately — T036)
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : macOS 25.6.0 / arm64
+Interpreter : Python 3.14.6 ; pytest 9.2.0 ; git version 2.54.0 (Apple Git-157)
+HEAD        : 88be07141e2feb8902492e2dd357a1c8c97bed19
+
+## 1. The run (verbatim) — wiring readings first, then the containment scan
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q -s tests/contract/test_skill_reference_consumers.py
+----- BEGIN VERBATIM -----
+# test runner: .venv/bin/python -m pytest -q -s tests/contract/test_skill_reference_consumers.py
+consumer /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md source_refs=1 lines=[16] mirror_refs=0
+consumer /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/SKILL.md source_refs=1 lines=[35] mirror_refs=0
+consumer /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/improve-skills/SKILL.md source_refs=1 lines=[20] mirror_refs=0
+consumer /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/merge-skills/SKILL.md source_refs=1 lines=[27] mirror_refs=0
+consumer /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md source_refs=1 lines=[26] mirror_refs=0
+..permitted[owner]=0
+permitted[owner-mirror]=0
+permitted[fixture]=0
+class-name[zero-hit]=0
+class-name[out-of-ladder]=0
+class-name[unreadable]=0
+class-name[dual-layer]=0
+scanned=54 skills/**/SKILL.md
+.....
+7 passed in 0.41s
+----- END VERBATIM -----
+
+## 2. The five consumers' single-reference readings
+
+| consumer | source refs | at line | mirror refs |
+|---|---|---|---|
+| `skills/internal/run-skills/SKILL.md` | 1 | 16 | 0 |
+| `skills/external/create-skills/SKILL.md` | 1 | 35 | 0 |
+| `skills/external/improve-skills/SKILL.md` | 1 | 20 | 0 |
+| `skills/external/merge-skills/SKILL.md` | 1 | 27 | 0 |
+| `skills/external/coaching-skills/SKILL.md` | 1 | 26 | 0 |
+
+"Exactly one" is read per file, not in aggregate: `source_refs=1` on all five could not
+be reached by one file carrying two and another carrying zero — the assertion loops per
+path. `mirror_refs=0` on all five is the other half of the same claim: no consumer cites
+the generated mirror (`.specify/shared/definitions/…`), which is the coordinate that
+would silently freeze a stale copy.
+
+Line numbers are reported for location, never asserted: a line number drifts with any
+edit above it, so pinning it would turn an innocent rewrite into a red gate.
+
+## 3. The containment scan — denominators and permitted classes
+
+    scanned=54 skills/**/SKILL.md
+    permitted[owner]=0   permitted[owner-mirror]=0   permitted[fixture]=0
+    class-name[zero-hit]=0   class-name[out-of-ladder]=0
+    class-name[unreadable]=0  class-name[dual-layer]=0
+
+- **Denominator**: every `SKILL.md` under the framework-source `skills/` tree. `find
+  skills -name SKILL.md | wc -l` → `54`, identical to `scanned=54` (no `__pycache__`
+  files, no mirror copies inside the source tree). The `.specify/skills/**` mirror is
+  **not** in this denominator; parity there is proved by `sync-mirrors.py --check`
+  (T036, `test-evidence/implement-part5-t036-t037.txt`).
+- **Hits**: **zero**, so there is no `hit <path>:<line>` line to report. That is the
+  honest form of a zero: the scan prints each hit it finds, and found none.
+- **Per-class counts are all 0 and that is expected**: the three permitted classes are
+  the owner file, the owner mirror and the fixture directory — none of them is under
+  `skills/`, so a permitted hit can only arise if a `SKILL.md` were the owner. Counting
+  them separately is what keeps "0 hits" from hiding "the scan never classified
+  anything".
+- **Two vocabularies are scanned.** The eight step identifiers `NP-1`…`NP-8`; the four
+  class names read from `data-model.md` E-10 at call time (and cross-checked against the
+  module's own constant, so an edited E-10 fails here rather than widening the search
+  silently); and the class **criteria** (`路径落在已知位置之外`, `目录无可读
+  \`SKILL.md\``, `两个不同层同名命中`) — the second vocabulary a copy carries, and one
+  that already stood in `run-skills` before the T031 rewrite.
+
+## 4. Recomputing this reading
+
+- Re-run § 1. Both halves are deterministic file reads; no model judgement is involved.
+- Discriminating power (GM-07), in the same run's `7 passed`: a `tmp_path` copy of
+  `run-skills` whose source reference is rewritten to the mirror path turns the wiring
+  assertion red; a copy appending `Step NP-3 strips the label.` turns the step-literal
+  scan red; a copy repeating a class criterion turns the criteria scan red; a copy
+  opening a failure table with `| \`dual-layer\` | … |` turns the class-name scan red;
+  and the permitted-class constants are asserted to be exactly three, with the
+  per-class counts summing to the permitted hit total.
+
+## 5. Disclosure
+
+The containment claim is a **containment** claim and carries its five declarations:
+baseline reference object (`3ffeb26e`, used only to locate historical hits, never
+asserted against current content), comparison unit (`skills/**/SKILL.md`), allowed
+difference set source (three named classes, counted not listed), complement assertion
+(zero copies of either vocabulary outside the permitted classes) and the undefined
+aggregate-word clause (no "其余 / 未受影响" scope anywhere in the contract). The scan
+deliberately counts a class name only in the three forms a copied table takes (table
+row's leading cell, definition-list member, bare token), because the bare English word
+appears in unrelated prose (`unreadable` as a record status and a page quality); the
+criteria scan closes the hole that tightening would otherwise open.

@@ -7,39 +7,50 @@ restate the run-artifact schema or the workflow here.
 
 ## Entities
 
-- **Run** — `{run_id, trainee, resolved_path, layer, started_at, run_dir}`; one run owns
-  the four ordered artifacts in `run_dir`.
+- **Run** — `{run_id, trainee, resolved_path, layer, chain, subject_ref, subject_path,
+  started_at, run_dir}`; one run owns the four ordered artifacts in `run_dir`. For a
+  direct run `chain = <coach> → <trainee>` and `subject == trainee`; for a nested run
+  `chain = <coach> → <trainee> → <subject>` and `subject` is the skill the Trainee writes.
 - **DispatchRecord** — the `## Dispatch` block in `observation.md`:
   `{mode, dispatched_at, payload_ref, returned, anomaly_line, failure_coordinates}`.
-- **Claim** — one per Trainee, not per run: `{trainee_slug, run_id, trainee_path,
-  created_at}` stored at the claim path below.
+- **Claim** — one per **subject**, not per run: `{subject_slug, trainee_slug, run_id,
+  subject_path, trainee_path, chain, created_at}` stored at the claim path below.
 - **RunStatus** — the pair `{run, optimization}` recorded once in
   `improvement-plan.md` § Run Status.
 
 ## Optimization claim
 
-**Purpose**: serialize the one write step that changes the Trainee Skill, so two
-coaching runs cannot invoke `improve-skills` for the same Trainee concurrently.
+**Purpose**: serialize the one write step that changes the skill whose files actually
+change — the **subject**. For a direct run the subject is the Trainee; for a nested run
+(`coaching-skills improve-skills 优化 X`) it is the Trainee's own target, so two runs
+coaching *different* meta-trainees at the same subject still serialize, and one Trainee
+writing two different subjects does not block itself.
 
-**Location**: `<coaching-root>/.claims/<trainee-slug>.claim`
+**Location**: `<coaching-root>/.claims/<subject-slug>.claim`
 
 - `<coaching-root>` is the directory that contains the run directories (Spec Kit
   deployments: `.specify/memory/coaching/`; standalone: the directory in which the run
   directory was created).
-- `<trainee-slug>` is the lowercase kebab slug of the resolved Trainee name — the same
-  slug used in the run-id.
+- `<subject-slug>` is the lowercase kebab slug of the resolved **subject** name (the skill
+  being written); the Trainee slug is carried in the content instead of the filename.
 - The claim is a sibling of the run directories, never inside a run directory.
 
 **Content**: one JSON object on one line:
 
 ```json
-{"trainee_slug":"<slug>","run_id":"<run-id>","trainee_path":"<resolved SKILL.md path>","created_at":"<ISO-8601 UTC>"}
+{"subject_slug":"<slug>","trainee_slug":"<slug>","run_id":"<run-id>","subject_path":"<resolved SKILL.md path>","trainee_path":"<resolved SKILL.md path>","chain":"<caller> → <trainee> → <subject>","created_at":"<ISO-8601 UTC>"}
 ```
 
-**Single timing**: create the claim exactly once per run, after
-`improvement-plan.md` is on disk and immediately before invoking `improve-skills`.
-No earlier and no later. The claim covers only the optimization write, not the
-execution loop.
+**Single timing** — exactly once per run, and it MUST cover the moment the subject is
+written:
+
+- **Direct run** (Trainee is the subject; the optimization edits it after the plan): create
+  the claim after `improvement-plan.md` is on disk and immediately before invoking
+  `improve-skills`. No earlier and no later.
+- **Nested run** (Trainee is a meta-skill; the subject is written *inside* the dispatch):
+  create the claim after `expectation.md` is on disk and immediately **before dispatching**.
+  The optimization step that follows re-enters the same claim (same `run_id` → continue).
+  Taking it after the plan would guard a write that already happened.
 
 **Atomic creation**: create `.claims/` if absent (idempotent), then create the claim
 file with a single exclusive-create syscall. That syscall is the claim decision; a
@@ -48,8 +59,10 @@ read-then-create sequence is forbidden.
 ```python
 import json, os
 os.makedirs(claim_dir, exist_ok=True)
-data = json.dumps({"trainee_slug": slug, "run_id": run_id,
-                   "trainee_path": trainee_path, "created_at": created_at}) + "\n"
+data = json.dumps({"subject_slug": subject_slug, "trainee_slug": trainee_slug,
+                   "run_id": run_id, "subject_path": subject_path,
+                   "trainee_path": trainee_path, "chain": chain,
+                   "created_at": created_at}) + "\n"
 fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
 try:
     os.write(fd, data.encode())

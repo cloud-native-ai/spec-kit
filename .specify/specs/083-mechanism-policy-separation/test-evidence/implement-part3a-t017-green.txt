@@ -1,0 +1,14 @@
+# T017 green — SW-04 side-effect-before-check legs (test_mechanism_policy_skill_wiring.py)
+# command: env -u PYTHONPATH .venv/bin/python -m pytest -q -p no:cacheprovider \
+#            tests/contract/test_mechanism_policy_skill_wiring.py -k sw04
+# captured_at: 2026-11-05
+#
+# The red reading for this leg is implement-part3-t017-red.txt (7 failed / 14 passed):
+#   five scenario failures (create-skills pre-flight / § 7 / § 8, improve-skills § 7,
+#   merge-skills § 7) where merge-skills read "artifact missing" and the rest read a
+#   moved-away ordering / shape assertion — no import error, no collection error (GM-01).
+# The three legs added in this part (step scope, parked-in-an-earlier-step negative case,
+# interposing-write negative case) were checked against the same tree and are green here.
+..............                                                           [100%]
+14 passed, 7 deselected in 0.04s
+rc=0

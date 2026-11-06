@@ -5,7 +5,7 @@ user-invocable: false
 disable-model-invocation: false
 model-tier: auto
 capability-tools: [Read, Grep, Glob]
-run-turn-budget: 10
+run-turn-budget: 40
 team-scope: demo-seat-dispatch
 ---
 

@@ -1,6 +1,6 @@
 # Contract — Snapshot CLI and Inputs
 
-**Owner**: `references/state-awareness.md` (rules) and `scripts/loop-state.py` (code). This contract is normative for slice A; clauses are numbered `CLI-NN`.
+**Owner**: `references/state-awareness.md` (rules) and `skills/external/sdd-loop-driver/scripts/loop-state.py` (code). This contract is normative for slice A; clauses are numbered `CLI-NN`.
 
 - **CLI-01**: The engine is `skills/external/sdd-loop-driver/scripts/loop-state.py`, a Python 3.8+ standard-library script with no third-party import.
 - **CLI-02**: `--action snapshot` is the only implemented action. `recover` and `check-spine` are recognized as reserved actions and MUST return exit 2 with the shared envelope `{schema_version:1, action:<name>, applied:false, result:"refused", steps:[], reason:"action-not-available-in-slice"}`; they MUST NOT read or write any state, lock, carrier or worktree.

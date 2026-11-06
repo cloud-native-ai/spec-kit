@@ -62,9 +62,9 @@ WATCHER_EXIT_CODES = "10-16"  # data only; owner: watch-target.sh --help
 REFUSAL_OWNER = {"recover": "065c", "check-spine": "065b"}
 
 # retry_limit default — owner: references/stage-prompts.md § Stall Handling
-# ("同阶段重试上限缺省 2 次"). Contract test pins this constant to the owner
+# ("同阶段重试上限缺省 3 次"). Contract test pins this constant to the owner
 # literal; do not change it here without the owner document.
-RETRY_LIMIT_DEFAULT = 2
+RETRY_LIMIT_DEFAULT = 3
 
 LOOP_STATES = [
     "RUNNING", "DONE", "INCOMPLETE", "ANOMALY", "FAILED", "DEAD", "TIMEOUT",
@@ -780,7 +780,7 @@ def watcher_defaults_from_help(watch_script):
     return defaults
 
 
-def resolve_thresholds(args, watch_script):
+def resolve_thresholds(args, watch_script, spine=None):
     # C-16: explicit -> `watch-target.sh --help` -> unknown. The help probe is
     # skipped when every threshold was given explicitly: it would be a pointless
     # invocation of the watcher script (observable side effect).
@@ -797,6 +797,9 @@ def resolve_thresholds(args, watch_script):
         "watch-target-help" if defaults else "unknown"
     )
     value_state = "known" if (explicit_any or defaults) else "unknown"
+    spine_retry = spine_field(spine, "retry_limit") if isinstance(spine, dict) else None
+    if not isinstance(spine_retry, int):
+        spine_retry = None
     return {
         "source": source,
         "value_state": value_state,
@@ -808,7 +811,7 @@ def resolve_thresholds(args, watch_script):
         if args.heartbeat_max_age is not None
         else defaults.get("heartbeat-max-age"),
         "retry_limit": args.retry_limit if args.retry_limit is not None
-        else RETRY_LIMIT_DEFAULT,
+        else (spine_retry if spine_retry is not None else RETRY_LIMIT_DEFAULT),
     }
 
 
@@ -2242,7 +2245,6 @@ def do_probe_snapshot(args):
     paths = {"state_dir": None, "spec_dir": None, "repo": None, "spine": None,
              "probe": str(probe_path), "registry_dir": None,
              "registry_path": None}
-    threshold_set = resolve_thresholds(args, None)
     remote_unreachable = shape == "unreachable"
 
     if remote_unreachable:
@@ -2283,6 +2285,7 @@ def do_probe_snapshot(args):
         stage = (args.stage or registry.get("stage")
                  or artifacts.get("stage"))
 
+    threshold_set = resolve_thresholds(args, None, spine)
     # Probe evidence carries its own freshness: no local reader runs, so the
     # view is built from the probe signals alone (C-13).
     view = build_view(signals, set(), spine, threshold_set, now)
@@ -2346,7 +2349,7 @@ def do_snapshot(args, parser):
     paths, registry, raw_registry = resolve_paths(args)
     spine = read_spine(paths)
     stage = args.stage or registry.get("stage")
-    threshold_set = resolve_thresholds(args, args.watch_script)
+    threshold_set = resolve_thresholds(args, args.watch_script, spine)
     fp = four_piece_paths(paths["state_dir"] if paths["state_dir"] else None,
                           args.line_id, stage)
 

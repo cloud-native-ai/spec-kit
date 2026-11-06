@@ -66,7 +66,7 @@ SC-010 以冻结提交上录制的三类卡死处置元组（[[STR-007]]）为�
 ### ① 中型特性快车道
 
 - **启用**：U0 入口声明出现 [[STR-006]] 并原文入状态脊；无人值守唯一入口；交互式允许一次非阻塞提议。
-- **裁决点**：`tasks` U4 通过后、`checklist` 派发前；`scripts/admission-check.py` 输出七判据 JSON（全部机械判定，无自证项），任何解析失败 fail-closed。
+- **裁决点**：`tasks` U4 通过后、`checklist` 派发前；`skills/external/sdd-loop-driver/scripts/admission-check.py` 输出七判据 JSON（全部机械判定，无自证项），任何解析失败 fail-closed。
 - **计数口径**：准入只使用 FR-003(a) 的窄模式（FR 定义行 `^- **FR-[0-9]{3}**:`；任务行 `^- \[[ xX]\] T[0-9]{3}`）；宽模式 `^- \[[ xX>~]\] T[0-9]{3}` 仅用于仓库任务记账（tasks.md 当前 53 行，tasks-repair-3 后），MUST NOT 用于准入，两者不得混用；当前 requirements 为 43 条 FR 定义行（tasks-repair-2 收口 CLI-profile 条款后复算），准入夹具始终以窄模式为准。
 - **录取**：状态脊写入 E1 记录 + [[STR-003]]；派发 `analyze`，跳过 `checklist`；`implement`/`review` 提示词携带跳过标记与准入证据指针。
 - **回退**：`analyze` 等阶段发现新引擎/安全面/任务越界 → 回退完整链，补派 `checklist`；若 `analyze` 已过则补派后重过 analyze 一次。
@@ -91,7 +91,7 @@ SC-010 以冻结提交上录制的三类卡死处置元组（[[STR-007]]）为�
 
 ### ④ 进度可见与脱离
 
-- **runner**：`scripts/stage-runner.sh` 参数化；auto 模式探测 `--output-format` 能力；stream 模式 `CLI | tee raw.jsonl | derive-live-log.py > live.log`。
+- **runner**：`skills/external/sdd-loop-driver/scripts/stage-runner.sh` 参数化；auto 模式探测 `--output-format` 能力；stream 模式 `CLI | tee raw.jsonl | derive-live-log.py > live.log`。
 - **派生**：非终止事件只输出带前缀进度行；EOF 时追加终止 `result` 文本，保证 live log 最后非空行 = 哨兵；派生失败由 runner 一次性 `--finish` 恢复或判 `degraded`。
 - **watcher**：判定表与退出码不变；可选 `--raw-stream` 只输出成长/字节证据；自测覆盖非终止哨兵、终止哨兵、派生失败、脱离存活。
 - **脱离**：远端保留 `ssh+su+nohup`；本地 `nohup ... </dev/null >runner-log 2>&1 &`（可用时 `setsid`）；派发记录 `detached`；重入 `--once` 只核验不重派。
@@ -161,7 +161,7 @@ tests/fixtures/sdd_loop_efficiency/              # 中型/大型 spec、stream �
 .specify/memory/features.md                      # 索引 Last Updated 注记
 ```
 
-**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录：四项优化进入 `skills/external/sdd-loop-driver/` 的 references 与 scripts 面；docs 页在同目录惯例路径更新；测试进入既有 `tests/{contract,unit,integration,fixtures}` 分层。`references/cli/` 与 Probe Object `skill-sdd-loop-driver-cli-profile` 由 064 拥有，本特性不新增、不修改、不注册。不新增技能目录、不新增 command/template、不触碰 `.specify/templates/commands/`。
+**Structure Decision**: 本特性落在既有框架源布局内，无新顶层目录：四项优化进入 `skills/external/sdd-loop-driver/` 的 references 与 scripts 面；docs 页在同目录惯例路径更新；测试进入既有 `tests/{contract,unit,integration,fixtures}` 分层。`references/cli/` 与 Probe Object `skill-sdd-loop-driver-cli-profile` 由 064 拥有，本特性不新增、不修改、不注册。不新增技能目录、不新增 command/template、不触碰 `templates/commands/`。
 
 ### Mirror Obligations *(mandatory)*
 

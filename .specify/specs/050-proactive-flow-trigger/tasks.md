@@ -386,7 +386,7 @@ clause is **void** (unsatisfiable as written), not skipped or deferred.
 **Class-level finding (out of scope for feature 050, reported not fixed)**: the same false claim is
 repeated in **seven surfaces** — `templates/instructions-template.md:132`, `templates/tools.md:14`,
 `templates/commands/tools.md:103`, `shared/definitions/tool-definitions.md:36`,
-`skills/create-tools/SKILL.md:65`, `skills/improve-tools/SKILL.md:53`, and the generated
+`skills/internal/create-tools/SKILL.md:65`, `skills/internal/improve-tools/SKILL.md:53`, and the generated
 `.specify/instructions.md:147`. Because the first is ambient, every agent inherits it. This is
 Principle XIV's rule of thumb failing loudly: correcting one fact requires editing six framework
 files. The fix belongs to the owner (`shared/definitions/tool-definitions.md`) plus a pointer-shaped

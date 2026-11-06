@@ -30,7 +30,7 @@
 
 **Why this priority**: [CN]“[CN]”[CN] spec → plan → tasks → implement[CN]
 
-**Independent Test**: [CN] docs/usage.md [CN] templates/commands/*.md[CN]/[CN]“[CN]”[CN]
+**Independent Test**: [CN] docs/tutorials/quickstart.md [CN] templates/commands/*.md[CN]/[CN]“[CN]”[CN]
 
 **Acceptance Scenarios**:
 
@@ -99,8 +99,8 @@
 
 ### Functional Requirements
 
-- **FR-001**: docs/usage.md MUST [CN]feature → requirements → plan → tasks → implement → review[CN]clarify[CN]checklist[CN]analyze[CN]research [CN]
-- **FR-002**: docs/usage.md MUST [CN]“[CN]/[CN]”[CN]
+- **FR-001**: docs/tutorials/quickstart.md MUST [CN]feature → requirements → plan → tasks → implement → review[CN]clarify[CN]checklist[CN]analyze[CN]research [CN]
+- **FR-002**: docs/tutorials/quickstart.md MUST [CN]“[CN]/[CN]”[CN]
 - **FR-003**: [CN] templates/commands/*.md MUST [CN] YAML frontmatter [CN] `handoffs` [CN]
 - **FR-004**: [CN] templates/commands/*.md MUST [CN]“[CN]/[CN]”[CN] Follow Up / Suggestion [CN]
 - **FR-005**: [CN]“[CN]”[CN] analyze[CN] MUST [CN]“[CN]/[CN]”[CN]
@@ -110,13 +110,13 @@
 
 - [CN]“[CN]”[CN] usage [CN] Core Lifecycle [CN]
 - `handoffs` [CN]“[CN]”[CN]
-- [CN] docs/usage.md [CN] templates/commands/*.md [CN]
+- [CN] docs/tutorials/quickstart.md [CN] templates/commands/*.md [CN]
 
 ### Key Entities *(include if requirement involves data)*
 
 - **Command**: Spec Kit [CN] AI Agent [CN] `/speckit.plan`[CN]
 - **Handoff**: [CN]
-- **Usage Guide**: docs/usage.md [CN]
+- **Usage Guide**: docs/tutorials/quickstart.md [CN]
 - **Command Template**: templates/commands/*.md [CN] `handoffs` [CN]“[CN]”[CN]
 
 ## Success Criteria *(mandatory)*
@@ -128,7 +128,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: docs/usage.md [CN]“[CN]/[CN]”[CN]
+- **SC-001**: docs/tutorials/quickstart.md [CN]“[CN]/[CN]”[CN]
 - **SC-002**: templates/commands/*.md [CN] `handoffs` frontmatter[CN] YAML [CN]
 - **SC-003**: templates/commands/*.md [CN]“[CN]/[CN]”[CN] `## Follow Up` [CN]
 - **SC-004**: [CN]requirements/plan/tasks/implement[CN] usage [CN]

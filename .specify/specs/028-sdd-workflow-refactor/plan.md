@@ -84,13 +84,13 @@ Findings from direct inspection of the current code (no external research needed
 
 **Path rewrite.** `rewrite_paths()` (L674) applies negative-lookbehind regex for `memory/`, `scripts/`, `templates/` → `.specify/<x>/`. It runs on command bodies during `generate_commands` (L844). Adding a `shared/ → .specify/shared/` rule lets command templates use root-relative `shared/workflow/...`.
 
-**Reference inventory.** `sdd-workflow` appears in: 17 `templates/commands/*.md` + `templates/skills-template.md` (18 template files, root-relative form); 20 sibling `skills/*/SKILL.md` (hard-coded `.specify/skills/sdd-workflow/...` form); 4 docs (`docs/agents/command-and-skills.md`, `docs/agents/design.md`, `docs/commands/skills.md`, `docs/skills/feedback.md`); and the generated `.specify/` mirror (regenerated, not hand-edited). `docs/summary/03-sdd-workflow-refactor-proposal.md` and this spec are excluded as archival.
+**Reference inventory.** `sdd-workflow` appears in: 17 `templates/commands/*.md` + `templates/skills-template.md` (18 template files, root-relative form); 20 sibling `skills/*/SKILL.md` (hard-coded `.specify/skills/sdd-workflow/...` form); 4 docs (`docs/reference/agents/command-and-skills.md`, `docs/reference/agents/design.md`, `docs/reference/commands/skills.md`, `docs/reference/skills/feedback.md`); and the generated `.specify/` mirror (regenerated, not hand-edited). `docs/archive/03-sdd-workflow-refactor-proposal.md` and this spec are excluded as archival.
 
 **Skill registry & count.** The skill list/count ("20 total … sdd-workflow …") lives in the generated instructions file (`.specify/instructions.md` L54 and its symlinks), produced by `/speckit.instructions`; `skills-utils.py` enumerates `*/SKILL.md` under `.specify/skills` and `.github/skills` (L262-267). Deleting `skills/sdd-workflow/` plus regenerating instructions removes it from the registry, count, and skill-discovery automatically.
 
 **Symlink surface.** `_check_skills_symlink` / `ensure_specify_symlink` symlink `.specify/skills` into `<tool>/skills`. Because `shared/` is referenced only through `.specify/shared/...` paths (never discovered as a skill), it needs **no** new symlink surface; removing `sdd-workflow` from `.specify/skills` removes it from every tool's skills view.
 
-**Feedback-step reference.** `skills/sdd-workflow/references/feedback-step.md` is the canonical `## Feedback` step consumed by skills/commands (Feature 028). It moves to `shared/workflow/feedback-step.md` with the other nine docs and its references are rewritten alongside.
+**Feedback-step reference.** `shared/workflow/feedback-step.md` is the canonical `## Feedback` step consumed by skills/commands (Feature 028). It moves to `shared/workflow/feedback-step.md` with the other nine docs and its references are rewritten alongside.
 
 ## Phase 1: Design & Contracts
 

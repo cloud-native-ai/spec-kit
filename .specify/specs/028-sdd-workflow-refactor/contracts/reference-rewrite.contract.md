@@ -39,7 +39,7 @@ Files: `user-input-protocol.md`, `feature-integration.md`, `agent-configuration.
 - Templates (17 commands): `agents, analyze, checklist, clarify, constitution, feature, implement, instructions, plan, requirements, research, review, skills, tasks, team, todo, tools`.
 - Template (1): `templates/skills-template.md`.
 - Skills (20): `analysis-project, browser-utils, cli-setup, create-agent, create-skills, create-team, database-utils, document-utils, draw-d3js, draw-echarts, draw-plantuml, extension-e2e-test, git-submodule-edit, git-workflow, improve-agent, improve-skills, improve-team, memory-recall, memory-record, think-skills`.
-- Docs (4): `docs/agents/command-and-skills.md, docs/agents/design.md, docs/commands/skills.md, docs/skills/feedback.md`.
+- Docs (4): `docs/reference/agents/command-and-skills.md, docs/reference/agents/design.md, docs/reference/commands/skills.md, docs/reference/skills/feedback.md`.
 
 ## Test Mapping
 

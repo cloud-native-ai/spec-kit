@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T02:25:40Z"
 summary: "074a checklist 阶段按切片生成新检查单，14 条需求缺口如实记录并交回回环"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

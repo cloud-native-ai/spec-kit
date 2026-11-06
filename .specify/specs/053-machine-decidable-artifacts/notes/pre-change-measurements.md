@@ -85,7 +85,7 @@ Per-pair, exit code taken by assignment (never through a pipe):
 | `templates` (pair) | 2 | 2 | 0 | `.specify/templates/proactive-trigger-seed.json`, `.specify/templates/skills-template.md` |
 | `skills` (pair) | 2 | 30 | 0 | the 30 names listed below |
 
-`skills` pair, all 30 (this feature writes three files under `skills/create-team/`; **none of the three appears here**, so each is currently byte-identical to its mirror and carries an absolute criterion):
+`skills` pair, all 30 (this feature writes three files under `skills/internal/create-team/`; **none of the three appears here**, so each is currently byte-identical to its mirror and carries an absolute criterion):
 
 ```
 .specify/skills/archive-session/SKILL.md

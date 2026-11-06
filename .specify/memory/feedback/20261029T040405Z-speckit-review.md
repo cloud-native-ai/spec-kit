@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "ignored"
 partial: false
 created: "2026-10-29T04:04:05Z"
 summary: "074a slice review: process segment ran first (6 findings), code segment second (triage=run, 69 changed / 9 judged / 60 skipped / 0 gap, gate=allow, capture skipped framework-hat)."
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

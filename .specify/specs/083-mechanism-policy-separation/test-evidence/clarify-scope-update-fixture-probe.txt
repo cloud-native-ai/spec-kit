@@ -1,0 +1,42 @@
+# Deterministic probe for clarify decision (1) — owner-document normalization order
+# captured: 2026-11-05
+# Why: decision (1) claims the CURRENT owner-document order cannot produce FR-030's closed
+#      three-way outcome. The claim below is a program output, not a reading.
+# Input: test-evidence/clarify-scope-update-fixture.json (14 rows; SC-006 asks for >= 12)
+# Owner: shared/definitions/skill-reference-definitions.md, read by hash and never written.
+# The probe re-implements the order the owner document STATES TODAY (its steps 1-5) and
+# classifies each row. It lives outside the repo (scratch); the fixture and this capture are
+# the committed artifacts, so the measurement is reproducible: same fixture + same order = same table.
+
+$ python3 <scratch>/083-clarify-probe.py test-evidence/clarify-scope-update-fixture.json shared/definitions/skill-reference-definitions.md
+fixture: FIXTURE-PROBE-01 (14 rows)
+owner: shared/definitions/skill-reference-definitions.md (sha256 28432cd08257, unchanged by this run)
+
+CURRENT   'improve-skills'                       -> NAME 'improve-skills'                 [expected NAME agrees]
+CURRENT   '/improve-skills'                      -> NAME 'improve-skills'                 [expected NAME agrees]
+CURRENT   '@/merge-skills'                       -> PATH '@/merge-skills'                 [expected PATH agrees]
+CURRENT   'skill:/merge-skills'                  -> PATH 'skill:/merge-skills'            [expected PATH agrees]
+CURRENT   'speckit.skills'                       -> NAME 'speckit.skills'                 [expected NAME agrees]
+CURRENT   'speckit.skills/SKILL.md'              -> PATH 'speckit.skills/SKILL.md'        [expected PATH agrees]
+CURRENT   '/speckit.skills'                      -> NAME 'speckit.skills'                 [expected NAME agrees]
+CURRENT   'skills/external/merge-skills/'        -> PATH 'skills/external/merge-skills/'  [expected PATH agrees]
+CURRENT   'skills/external/merge-skills'         -> PATH 'skills/external/merge-skills'   [expected PATH agrees]
+CURRENT   '  "/improve-skills"  '                -> NAME 'improve-skills'                 [expected NAME agrees]
+CURRENT   'Improve-Skills'                       -> NAME 'Improve-Skills'                 [expected NAME agrees]
+CURRENT   'no-such-skill-xyz'                    -> NAME 'no-such-skill-xyz'              [expected NAME agrees]
+CURRENT   '../../etc/passwd'                     -> PATH '../../etc/passwd'               [expected PATH agrees]
+CURRENT   'my-draft.md'                          -> NAME 'my-draft.md'                    [expected NAME agrees]
+
+rows=14 current_unique_outcome_classes=2 (NAME,PATH) closed_three_way=False disagreements=none
+exit: 0
+
+## verdict
+The current order yields exactly TWO outcome classes (NAME, PATH). It cannot yield FAILURE, so the
+closed three-way result FR-030 demands is not expressible from the procedure; failure is decided
+downstream by two other documents (position ladder + trust boundary), which is the "fourth result"
+FR-030 forbids. Two rows prove the order/host interaction (the third defect — the name channel not stripping `.md` — is a separate ambiguity owned by requirements (1) item 11, not a class error):
+  R06 speckit.skills/SKILL.md -> PATH   while R05 speckit.skills -> NAME: same command name, two classes.
+  R14 my-draft.md            -> NAME "my-draft.md" while run-skills says a name may omit the extension.
+The ratified TARGET order (requirements.md Section Clarifications, Session 2026-11-05, answer (1))
+moves the strip step ahead of the channel test, adds the @/ form, keeps FAILURE inside the outcome
+set as a fourth-class-free close, and forbids the case-insensitive multi-hit arbitrary pick.

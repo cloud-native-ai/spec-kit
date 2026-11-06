@@ -1,0 +1,24 @@
+# T035 pre-rewrite population — captured 2026-11-05T17:47:11+0800 at HEAD fa563b0e
+
+$ grep -rno "\.specify/shared/definitions/skill-reference-definitions\.md" skills/ | sort
+skills/external/coaching-skills/SKILL.md:26:.specify/shared/definitions/skill-reference-definitions.md
+skills/external/coaching-skills/SKILL.md:49:.specify/shared/definitions/skill-reference-definitions.md
+skills/external/coaching-skills/SKILL.md:69:.specify/shared/definitions/skill-reference-definitions.md
+skills/external/create-skills/SKILL.md:35:.specify/shared/definitions/skill-reference-definitions.md
+skills/external/merge-skills/SKILL.md:27:.specify/shared/definitions/skill-reference-definitions.md
+skills/internal/run-skills/SKILL.md:16:.specify/shared/definitions/skill-reference-definitions.md
+skills/internal/run-skills/SKILL.md:24:.specify/shared/definitions/skill-reference-definitions.md
+
+$ grep -rno "\.specify/shared/definitions/skill-reference-definitions\.md" skills/ | wc -l
+       7
+
+$ grep -rn "shared/definitions/skill-reference-definitions\.md" skills/ | grep -v "\.specify/shared/definitions"  # source-form line count
+skills/external/improve-skills/SKILL.md:20:- **Target identifier**: identify exactly one local Skill by `skill_id`, frontmatter `name`, canonical path, or Skill directory name. This skill declares **only the parameter and its meaning**; the accepted forms, the normalization order, the disambiguation rules and the failure table are owned by `shared/definitions/skill-reference-definitions.md` — reach them there and disclose both the raw and the normalized identifier in the run's output. A slash form names the command surface, not a routing instruction. If multiple Skills match or no local Skill can be found, ask one targeted clarification before editing.
+skills/external/create-skills/SKILL.md:58:- **Both layers before any write**: read the policy items this creation needs (where the new skill's runtime inputs come from, where its outputs land), then judge them with the owner's read-judge-stop check (§ Consumption Contract of `shared/definitions/mechanism-policy-definitions.md`), and stop on any item that has no value or two readings. A policy item the user did not state is **missing**, not a default to be invented. This check runs **before** the writability touch-test below and before the first file of § 3 — the touch-test writes a probe file, so a stop leaves no half product behind. **Policy missing** vs **environment error** are different wordings with different follow-ups (the user never said which one / the user named it but the path cannot be read): never report one as the other. A new skill is **named**, never resolved from a reference form — the naming grammar belongs to `shared/definitions/skill-reference-definitions.md` and is not restated here.
+
+$ per-file mirror-count (before)  # python re: mirror = .specify/-prefixed, source = not prefixed
+skills/internal/run-skills/SKILL.md mirror_lines=2 source_lines=0
+skills/external/create-skills/SKILL.md mirror_lines=1 source_lines=1
+skills/external/improve-skills/SKILL.md mirror_lines=0 source_lines=1
+skills/external/merge-skills/SKILL.md mirror_lines=1 source_lines=0
+skills/external/coaching-skills/SKILL.md mirror_lines=3 source_lines=0

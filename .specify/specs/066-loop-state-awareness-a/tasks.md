@@ -19,7 +19,7 @@
 - DoD-2: `skills/external/sdd-loop-driver/scripts/loop-state.py` 实现 `snapshot`、`--probe`、`--self-test`，对 `recover`/`check-spine` 返回结构化拒绝（exit 2）；全部执行路径只读（显式 `--out` 除外）。
 - DoD-3: 4 份契约的 92 条条款（CLI 20 / SNP 30 / RUL 30 / CMP 12）逐条有测试或 owner reference 落点；§ Requirement Coverage Map 与 § Contract Coverage Map 保持当前。
 - DoD-4: 新增 `tests/unit/test_loop_state_engine.py`、`tests/contract/test_sdd_loop_driver_state_awareness.py`、`tests/integration/test_loop_state_snapshot_matrix.py` 与更新后的 `tests/contract/test_sdd_loop_driver_skill.py` 全绿，且相对 T001 基线零 NEW 失败。
-- DoD-5: 源与运行时镜像字节一致（`SKILL.md`、`references/state-awareness.md`、`scripts/loop-state.py` 三对）；`sync-mirrors.py --check` 相对 T001 基线无新增漂移。
+- DoD-5: 源与运行时镜像字节一致（`SKILL.md`、`references/state-awareness.md`、`skills/external/sdd-loop-driver/scripts/loop-state.py` 三对）；`sync-mirrors.py --check` 相对 T001 基线无新增漂移。
 - DoD-6: `.specify/specs/066-loop-state-awareness-a/verification.md` 以 `- **SC-001**:` 至 `- **SC-008**:` 列出八条成功标准的状态、命令、输出与证据；`notes/quickstart-run.md` 与 `notes/mutation-drills.md` 提供 quickstart 与变异演练的真实记录。
 - DoD-7: 文档取值与代码一致：`references/state-awareness.md`、`SKILL.md`、`docs/reference/skills/sdd-loop-driver.md` 均含入口、调用形态与 watcher/Registry 关系，且与 `--help` 一致；owner reference 不含 watcher 阈值数值，不声称 `recover`/`check-spine` 已实现。
 - DoD-8: 范围审计通过：未改动 `watch-target.sh`、`line-registry.py`、`references/watch-model.md`、`references/stage-prompts.md`、`references/efficiency-model.md`、命令模板与依赖清单；无 daemon、无 push/merge/kill/删除。
@@ -236,14 +236,14 @@ CMP-07 的 18 个具名夹具由测试文件自身枚举；两个套件共同覆
 
 ### Tests for User Story 2 (MANDATORY) ⚠️
 
-- [ ] T023 [P] [US2] 红先更新 `tests/contract/test_sdd_loop_driver_skill.py`：把 `references/state-awareness.md` 与 `scripts/loop-state.py` 加入 `MIRROR_FILES`；新增 docs 入口断言（read-only `skills/external/sdd-loop-driver/scripts/loop-state.py` 的入口、`snapshot`/`--probe`/`--self-test` 调用形态、与 watcher/Registry 的关系、只读边界、`recover`/`check-spine` 不可用）与 owner reference 断言（章节、`recovery_reason` 闭集、无 watcher 阈值数值、阶段映射表与代码数据一致）；运行镜像/文档断言并把失败输出追加到 `.specify/specs/066-loop-state-awareness-a/notes/red-first-evidence.md`。 [blockedBy: T022]
+- [ ] T023 [P] [US2] 红先更新 `tests/contract/test_sdd_loop_driver_skill.py`：把 `references/state-awareness.md` 与 `skills/external/sdd-loop-driver/scripts/loop-state.py` 加入 `MIRROR_FILES`；新增 docs 入口断言（read-only `skills/external/sdd-loop-driver/scripts/loop-state.py` 的入口、`snapshot`/`--probe`/`--self-test` 调用形态、与 watcher/Registry 的关系、只读边界、`recover`/`check-spine` 不可用）与 owner reference 断言（章节、`recovery_reason` 闭集、无 watcher 阈值数值、阶段映射表与代码数据一致）；运行镜像/文档断言并把失败输出追加到 `.specify/specs/066-loop-state-awareness-a/notes/red-first-evidence.md`。 [blockedBy: T022]
 - [ ] T024 [P] [US2] 编写 owner reference `skills/external/sdd-loop-driver/references/state-awareness.md`：快照投影与字段闭域、derived D1–D11、归属裁决、completion 与 `loop_state` 分离、I1–I8 注释语义、`effective` 来源、`recovery_reason` 闭集、八阶段产物映射散文表、watchbeat 原子写形态与驱动者写入义务；用指针引用 `watch-model.md`/`stage-prompts.md`/`efficiency-model.md`，不复制 watcher 阈值数值，不声称 `recover`/`check-spine` 已实现。 [blockedBy: T022]
 - [ ] T025 [US2] 更新 `skills/external/sdd-loop-driver/SKILL.md`：在 Hard Requirements 增加一条“快照只读、不得写脊/载体/工作树、不得停活进程”的硬要求，在 References 增加 `references/state-awareness.md` 指针；不新增 H2 章节，保持既有 H2 契约稳定；只做增量编辑并保留工作树中的未提交改动。 [blockedBy: T024]
 - [ ] T026 [P] [US2] 更新文档入口 `docs/reference/skills/sdd-loop-driver.md`：新增状态感知小节，写清 read-only `skills/external/sdd-loop-driver/scripts/loop-state.py` 的入口、`snapshot`/`--probe`/`--self-test` 调用形态、与 watcher 和 Registry 的关系、只读边界，以及 `recover`/`check-spine` 在本切片不可用；取值以该脚本只读 `--help` 和 owner reference 为准。 [blockedBy: T022]
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] 再生成运行时镜像并验证：运行 `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver`，随后 `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` 相对 T001 基线无新增漂移，并对 `SKILL.md`、`references/state-awareness.md`、`scripts/loop-state.py` 三对源/镜像做 `cmp` 字节比较；禁止手改 `.specify/skills/sdd-loop-driver/`。 [blockedBy: T023,T024,T025,T026]
+- [ ] T027 [US2] 再生成运行时镜像并验证：运行 `python3 scripts/python/sync-mirrors.py --write --only skills/external/sdd-loop-driver`，随后 `python3 scripts/python/sync-mirrors.py --check --only skills/external/sdd-loop-driver` 相对 T001 基线无新增漂移，并对 `SKILL.md`、`references/state-awareness.md`、`skills/external/sdd-loop-driver/scripts/loop-state.py` 三对源/镜像做 `cmp` 字节比较；禁止手改 `.specify/skills/sdd-loop-driver/`。 [blockedBy: T023,T024,T025,T026]
 - [ ] T028 [US2] 运行兼容性回归并写入 `.specify/specs/066-loop-state-awareness-a/verification.md`：`bash skills/external/sdd-loop-driver/scripts/watch-target.sh --self-test`（`0 failed`）、watcher SHA-256 等于 CMP-01 钉住值、既有 `tests/contract/test_sdd_loop_driver_skill.py` 与 `tests/unit/test_line_registry_engine.py`/`tests/unit/test_decomposition_check.py` 全绿、Registry 旧条目可读且无写回、依赖清单无新增、无 daemon/外部服务、命令模板与 `stage-prompts.md` 写入时点未变；以 `- **US2-A1**:` 至 `- **US2-A5**:` 记录命令、输出与证据指针。 [blockedBy: T027]
 
 **Checkpoint**: US2 可独立验收：既有测试全绿、镜像字节一致、文档与代码取值一致、五条兼容性验收均有证据。

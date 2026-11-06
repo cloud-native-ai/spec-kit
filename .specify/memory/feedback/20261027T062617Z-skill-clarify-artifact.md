@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-clarify-artifact-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T06:26:17Z"
 summary: "Mode A coverage scan + integration on 071-review-code-integration/requirements.md: 12 taxonomy categories scanned, 5 adjudicated rows plus 1 review-conclusion row appended, 3 in-passing corrections di"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

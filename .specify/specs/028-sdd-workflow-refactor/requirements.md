@@ -3,7 +3,7 @@
 **Requirement Branch**: `028-sdd-workflow-refactor`  
 **Created**: 2026-07-14  
 **Status**: Draft  
-**Input**: User description: "参考 docs/summary/03-sdd-workflow-refactor-proposal.md 的提议，将 sdd-workflow 从「技能」重构为「共享参考目录」。"
+**Input**: User description: "参考 docs/archive/03-sdd-workflow-refactor-proposal.md 的提议，将 sdd-workflow 从「技能」重构为「共享参考目录」。"
 
 ## Related Feature *(mandatory)*
 

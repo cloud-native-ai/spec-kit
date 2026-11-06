@@ -22,7 +22,7 @@
 | `reconcile-pattern.md` | `test_c7_thin_dispatch_references` |
 | `docs-utils.py` | `test_c7_thin_dispatch_references` |
 | `single source of truth` | `test_c4a_mandatory_delegation` |
-| `skills/create-docs/SKILL.md` | `test_c4a_mandatory_delegation` |
+| `skills/external/create-docs/SKILL.md` | `test_c4a_mandatory_delegation` |
 | `观察快照`、`残差报告`、`审计日志`、`干跑计划` | `test_c5_*`(四件强制产物) |
 | `全量`、`单目标`、`写作`、`扇出`、`Bootstrap` | `test_c4_scope_resolution_and_tiered_gates` |
 
@@ -30,15 +30,15 @@
 
 - `R0 需求解析` —— 技能内部写作环标签 MUST NOT 内联进命令(`test_c7_thin_dispatch_references` 断言)。
 - 引擎语义正文 —— 基线枚举、调谐环步骤展开、门禁判据正文 MUST NOT 复制进命令;一律以路径引用接入(宪法 XIV;`confirmation-gates.md` § 规定命令以单行引用接入)。
-- `.specify/templates/commands/docs.md` 镜像 MUST NOT 被重建(2026-08-17 退役,`test_c1_source_and_mirror` 断言其缺席)。
+- `templates/commands/docs.md` 镜像 MUST NOT 被重建(2026-08-17 退役,`test_c1_source_and_mirror` 断言其缺席)。
 
 ## D-4 双技能委托声明
 
-模板 MUST 同时点名两个 owning 技能及其路径:`skills/create-docs/SKILL.md`(结构与基线)、`skills/improve-docs/SKILL.md`(既有文档内容)。每个技能 MUST 被声明为其对应半边的单一事实源。MUST NOT 再表述为"仅委托单一技能"。
+模板 MUST 同时点名两个 owning 技能及其路径:`skills/external/create-docs/SKILL.md`(结构与基线)、`skills/external/improve-docs/SKILL.md`(既有文档内容)。每个技能 MUST 被声明为其对应半边的单一事实源。MUST NOT 再表述为"仅委托单一技能"。
 
 ## D-5 目标结构声明接入
 
-模板 MUST 声明:声明文件路径 `.specify/docs/target-structure.md`;骨架来源 `templates/docs-target-structure-template.md`;首次运行设计并经确认后持久化;已存在且未要求重设时**复用不重设**。模板 MUST NOT 内联声明的完整字段清单(属 `target-structure-declaration.md` 契约)。
+模板 MUST 声明:声明文件路径 `docs/target-structure.md`;骨架来源 `skills/external/create-docs/assets/docs-target-structure-template.md`;首次运行设计并经确认后持久化;已存在且未要求重设时**复用不重设**。模板 MUST NOT 内联声明的完整字段清单(属 `target-structure-declaration.md` 契约)。
 
 ## D-6 零新增确认门控
 
@@ -79,7 +79,7 @@
 
 | 条款 | 修订内容 |
 |------|----------|
-| C-1 | 删除"并在 `.specify/templates/commands/docs.md` 存在字节一致镜像"——与 `test_c1_source_and_mirror` 的断言相反,措辞事实过时 |
+| C-1 | 删除"并在 `templates/commands/docs.md` 存在字节一致镜像"——与 `test_c1_source_and_mirror` 的断言相反,措辞事实过时 |
 | C-4a | 单技能 SoT → **技能对**:create-docs 为结构半边 SoT、improve-docs 为内容半边 SoT;命令为编排层而非"仅分发单一技能" |
 | C-5 | 四件强制产物 → 追加**目标结构声明**为第五件(跨运行长存,区别于四件按次产物) |
 | C-7 | thin-dispatch 语义保留;明确"编排叙述可在 Outline 内展开,引擎语义仍不得内联" |
@@ -92,4 +92,4 @@ C-3 **不修订**(六章节枚举因 D-1 保持成立)。
 
 `templates/commands/docs.md` 改动后 MUST 重生成 4 份工具副本(`.claude/commands/speckit.docs.md`、`.github/prompts/speckit.docs.prompt.md`、`.qoder/commands/speckit.docs.md`、`.opencode/command/speckit.docs.md`),验证 `regen-command-copies.py --check` exit 0。副本 MUST 保留 AUTO-GENERATED 头。
 
-注意路径重写行为:仅 `memory/`、`scripts/`、`templates/`、`shared/` 前导段被改写为 `.specify/<seg>/`;`skills/` 与 `.specify/docs/` 原样保留。
+注意路径重写行为:仅 `memory/`、`scripts/`、`templates/`、`shared/` 前导段被改写为 `.specify/<seg>/`;`skills/` 与 `docs/` 原样保留。

@@ -44,7 +44,7 @@
 | 3 | `/speckit.clarify` bound the spec to a feature | requirements.md line 173: `Q: Which existing Feature should this spec belong to? → A: Feature 019 (Agents Command)` | None |
 | 4 | `/speckit.plan` produced plan + design docs | plan.md Constitution Check table; data-model.md; contracts/triad-protocol.md; quickstart.md | Minor: `research.md` intentionally skipped — plan.md line 57: `No standalone research.md — findings inlined below` |
 | 5 | `/speckit.tasks` produced 31 tasks | tasks.md with 8 phases | None |
-| 6 | `/speckit.implement` created templates + docs | templates/agent-subrole-{executor,evaluator,improver}-template.md; templates/agent-triad-orchestration-template.md; docs/eei-triad-pattern.md all present | None (files exist) |
+| 6 | `/speckit.implement` created templates + docs | templates/agent-subrole-{executor,evaluator,improver}-template.md; skills/internal/create-team/templates/agents/agent-triad-orchestration-template.md; docs/eei-triad-pattern.md all present | None (files exist) |
 | 7 | Both automated-test tasks deferred | tasks.md T008/T013 `[~]`; verification.md line 50: `deferred_tasks=T008,T013` | Deviation: Test-First mandate (tasks.md line 9 `Tests Mode: ON`) satisfied by deferral, not by tests. See F2. |
 | 8 | Feature committed with unrelated changes bundled in | `git show --stat f261cea` lists `skills/draw-plantuml/SKILL.md`, `.../howto/00-semantic-analysis.md` (~540 lines) alongside the EEI feature | Deviation: commit boundary not feature-scoped. See F5. |
 | 9 | verification.md left with stale field | verification.md line 17: `post_change_commit=pending` | Deviation: post-change commit never backfilled. See F6. |

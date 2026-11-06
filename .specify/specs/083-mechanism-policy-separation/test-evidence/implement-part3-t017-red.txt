@@ -1,0 +1,162 @@
+# test runner: .venv/bin/python -m pytest -q -p no:cacheprovider tests/contract/test_mechanism_policy_skill_wiring.py
+.............FFFFFFF.                                                    [100%]
+=================================== FAILURES ===================================
+_____ test_sw04_wiring_point_shape_and_ordering[create-skills::pre-flight] _____
+
+scenario = {'rel': PosixPath('skills/external/create-skills/SKILL.md'), 'name': 'create-skills § 2 writability pre-flight', 'block_start': '**Both layers before any write**', 'side_effect': '**Writability pre-flight (fail fast)**'}
+
+    @pytest.mark.parametrize(
+        "scenario",
+        list(WIRING_SCENARIOS),
+        ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+    )
+    def test_sw04_wiring_point_shape_and_ordering(scenario):
+        path = REPO_ROOT / scenario["rel"]
+        problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+        problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+>       assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+            scenario["rel"], scenario["name"], "\n- ".join(problems)
+        )
+E       AssertionError: SW-04 violations in skills/external/create-skills/SKILL.md (create-skills § 2 writability pre-flight):
+E         - wiring point '**Both layers before any write**' does not say the stop leaves no half product (SW-04 / FR-008)
+E         - the wiring point '**Both layers before any write**' (ends at offset 7472) sits at or after its side effect '**Writability pre-flight (fail fast)**' (offset 6144) — the check must precede every write
+E       assert not ["wiring point '**Both layers before any write**' does not say the stop leaves no half product (SW-04 / FR-008)", "the... or after its side effect '**Writability pre-flight (fail fast)**' (offset 6144) — the check must precede every write"]
+
+tests/contract/test_mechanism_policy_skill_wiring.py:591: AssertionError
+_____ test_sw04_wiring_point_shape_and_ordering[create-skills::propagate] ______
+
+scenario = {'rel': PosixPath('skills/external/create-skills/SKILL.md'), 'name': 'create-skills § 7 propagate', 'block_start': 'Before the first edit below,', 'side_effect': '### 7. Propagate the Skill to built-in agents'}
+
+    @pytest.mark.parametrize(
+        "scenario",
+        list(WIRING_SCENARIOS),
+        ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+    )
+    def test_sw04_wiring_point_shape_and_ordering(scenario):
+        path = REPO_ROOT / scenario["rel"]
+        problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+        problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+>       assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+            scenario["rel"], scenario["name"], "\n- ".join(problems)
+        )
+E       AssertionError: SW-04 violations in skills/external/create-skills/SKILL.md (create-skills § 7 propagate):
+E         - wiring point 'Before the first edit below,' names no environment-error class, so the two error wordings are not distinguishable there (FR-007)
+E         - the wiring point 'Before the first edit below,' (ends at offset 17776) sits at or after its side effect '### 7. Propagate the Skill to built-in agents' (offset 17081) — the check must precede every write
+E       assert not ["wiring point 'Before the first edit below,' names no environment-error class, so the two error wordings are not dist...r its side effect '### 7. Propagate the Skill to built-in agents' (offset 17081) — the check must precede every write"]
+
+tests/contract/test_mechanism_policy_skill_wiring.py:591: AssertionError
+_____ test_sw04_wiring_point_shape_and_ordering[create-skills::completion] _____
+
+scenario = {'rel': PosixPath('skills/external/create-skills/SKILL.md'), 'name': 'create-skills § 8 report completion', 'block_sta..."Run the owner's read-judge-stop check once more before writing the report", 'side_effect': '### 8. Report completion'}
+
+    @pytest.mark.parametrize(
+        "scenario",
+        list(WIRING_SCENARIOS),
+        ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+    )
+    def test_sw04_wiring_point_shape_and_ordering(scenario):
+        path = REPO_ROOT / scenario["rel"]
+        problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+        problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+>       assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+            scenario["rel"], scenario["name"], "\n- ".join(problems)
+        )
+E       AssertionError: SW-04 violations in skills/external/create-skills/SKILL.md (create-skills § 8 report completion):
+E         - wiring point "Run the owner's read-judge-stop check once more before writing the report" does not say the stop leaves no half product (SW-04 / FR-008)
+E         - wiring point "Run the owner's read-judge-stop check once more before writing the report" names no environment-error class, so the two error wordings are not distinguishable there (FR-007)
+E         - the wiring point "Run the owner's read-judge-stop check once more before writing the report" (ends at offset 19532) sits at or after its side effect '### 8. Report completion' (offset 19246) — the check must precede every write
+E       assert not ['wiring point "Run the owner\'s read-judge-stop check once more before writing the report" does not say the stop leav...32) sits at or after its side effect \'### 8. Report completion\' (offset 19246) — the check must precede every write']
+
+tests/contract/test_mechanism_policy_skill_wiring.py:591: AssertionError
+_______ test_sw04_wiring_point_shape_and_ordering[improve-skills::edit] ________
+
+scenario = {'rel': PosixPath('skills/external/improve-skills/SKILL.md'), 'name': 'improve-skills § 7 edit', 'block_start': 'Both layers before the first edit', 'side_effect': 'Edit `SKILL.md` to make the improved behavior executable'}
+
+    @pytest.mark.parametrize(
+        "scenario",
+        list(WIRING_SCENARIOS),
+        ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+    )
+    def test_sw04_wiring_point_shape_and_ordering(scenario):
+        path = REPO_ROOT / scenario["rel"]
+        problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+        problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+>       assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+            scenario["rel"], scenario["name"], "\n- ".join(problems)
+        )
+E       AssertionError: SW-04 violations in skills/external/improve-skills/SKILL.md (improve-skills § 7 edit):
+E         - the wiring point 'Both layers before the first edit' (ends at offset 14781) sits at or after its side effect 'Edit `SKILL.md` to make the improved behavior executable' (offset 13344) — the check must precede every write
+E       assert not ["the wiring point 'Both layers before the first edit' (ends at offset 14781) sits at or after its side effect 'Edit `SKILL.md` to make the improved behavior executable' (offset 13344) — the check must precede every write"]
+
+tests/contract/test_mechanism_policy_skill_wiring.py:591: AssertionError
+____ test_sw04_wiring_point_shape_and_ordering[merge-skills::decommission] _____
+
+scenario = {'rel': PosixPath('skills/external/merge-skills/SKILL.md'), 'name': 'merge-skills § 7 decommission', 'block_start': '**Both layers before the decommission**', 'side_effect': '### 7. Decommission the source as an independent skill'}
+
+    @pytest.mark.parametrize(
+        "scenario",
+        list(WIRING_SCENARIOS),
+        ids=["%s::%s" % (s["rel"].parent.name, s["name"].split(" ")[-1]) for s in WIRING_SCENARIOS],
+    )
+    def test_sw04_wiring_point_shape_and_ordering(scenario):
+        path = REPO_ROOT / scenario["rel"]
+        problems = assert_wiring_point_matches_contract(path, scenario["block_start"])
+        problems += assert_wiring_precedes_side_effect(path, scenario["block_start"], scenario["side_effect"])
+>       assert not problems, "SW-04 violations in %s (%s):\n- %s" % (
+            scenario["rel"], scenario["name"], "\n- ".join(problems)
+        )
+E       AssertionError: SW-04 violations in skills/external/merge-skills/SKILL.md (merge-skills § 7 decommission):
+E         - artifact missing: the wiring point '**Both layers before the decommission**' is absent
+E         - artifact missing: the wiring point '**Both layers before the decommission**' is absent
+E       assert not ["artifact missing: the wiring point '**Both layers before the decommission**' is absent", "artifact missing: the wiring point '**Both layers before the decommission**' is absent"]
+
+tests/contract/test_mechanism_policy_skill_wiring.py:591: AssertionError
+_________ test_sw04_negative_case_reordering_a_wiring_point_turns_red __________
+
+tmp_path = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-88/test_sw04_negative_case_reorde0')
+
+    def test_sw04_negative_case_reordering_a_wiring_point_turns_red(tmp_path):
+        """Move improve-skills' § 7 check below its first edit line; the ordering assertion must go red."""
+        scenario = next(s for s in WIRING_SCENARIOS if s["name"] == "improve-skills § 7 edit")
+        text = _read(REPO_ROOT / scenario["rel"])
+        paragraph = _paragraph_at(text, scenario["block_start"])
+        without = text.replace(paragraph + "\n\n", "", 1)
+        assert without != text, "artifact missing: the wiring paragraph could not be lifted out"
+>       effect_at = without.index(scenario["side_effect"])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: substring not found
+
+tests/contract/test_mechanism_policy_skill_wiring.py:603: ValueError
+_ test_sw04_missing_policy_and_environment_error_wordings_are_distinguishable __
+
+    def test_sw04_missing_policy_and_environment_error_wordings_are_distinguishable():
+        """The owner keeps the two classes on separate rows; every wiring point names both."""
+        owner_text = _read(OWNER)
+        table = _section(owner_text, "两类判定的区分")
+        rows = [r for r in _table_rows(table) if "策略缺失" in r or "环境错误" in r]
+        assert len(rows) == 2, "the owner's two-class table must keep exactly two ruled rows, found %d" % len(rows)
+        missing_row = next(r for r in rows if "策略缺失" in r)
+        env_row = next(r for r in rows if "环境错误" in r)
+        assert "缺的是" in missing_row, "the missing-policy row lost its wording"
+        assert "取不到" in env_row, "the environment-error row lost its wording"
+        assert missing_row != env_row, "the two classes must not collapse into one wording (FR-007)"
+        for scenario in WIRING_SCENARIOS:
+            paragraph = _paragraph_at(_read(REPO_ROOT / scenario["rel"]), scenario["block_start"])
+>           assert _any_anchor(paragraph, ENV_ERROR_ANCHORS), (
+                "%s names only one class — the two wordings must stay distinguishable there" % scenario["name"]
+            )
+E           AssertionError: create-skills § 7 propagate names only one class — the two wordings must stay distinguishable there
+E           assert False
+E            +  where False = _any_anchor("Before the first edit below, re-run the owner's read-judge-stop check over the new skill's policy items (`shared/defi...§ Consumption Contract): this step writes into agent definitions, so a missing policy stops here with no file touched.", ('environment error', '环境错误'))
+
+tests/contract/test_mechanism_policy_skill_wiring.py:629: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_point_shape_and_ordering[create-skills::pre-flight]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_point_shape_and_ordering[create-skills::propagate]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_point_shape_and_ordering[create-skills::completion]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_point_shape_and_ordering[improve-skills::edit]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_wiring_point_shape_and_ordering[merge-skills::decommission]
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_negative_case_reordering_a_wiring_point_turns_red
+FAILED tests/contract/test_mechanism_policy_skill_wiring.py::test_sw04_missing_policy_and_environment_error_wordings_are_distinguishable
+7 failed, 14 passed in 0.07s
+rc=1

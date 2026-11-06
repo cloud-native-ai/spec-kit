@@ -17,7 +17,7 @@ description: "Task list for 024-agent-env-config"
 
 ## Definition of Done (DoD)
 
-- DoD-1: `config_agent_env_validate` and `config_agent_env_apply` implemented in `skills/agent-setup/scripts/config-agent.sh` per `contracts/unified-env-contract.md`.
+- DoD-1: `config_agent_env_validate` and `config_agent_env_apply` implemented in `skills/internal/manage-agents/scripts/config-agent.sh` per `contracts/unified-env-contract.md`.
 - DoD-2: All automated tests pass (`pytest -m contract`, `pytest -m integration`, and unit tests).
 - DoD-3: Manual verification completed via `quickstart.md` (validate → apply → inspect files).
 - DoD-4: `SKILL.md` and reference docs reflect the unified env-var workflow and 6-tool scope.
@@ -30,7 +30,7 @@ description: "Task list for 024-agent-env-config"
 
 - **[P]**: Can run in parallel (different files, no dependencies).
 - **[Story]**: US1/US2/US3 maps to requirements.md user stories.
-- **Note**: Almost all implementation edits the single file `skills/agent-setup/scripts/config-agent.sh`; those tasks are therefore **serialized** (no `[P]`). Test files, docs, and reference files are separate and parallelizable.
+- **Note**: Almost all implementation edits the single file `skills/internal/manage-agents/scripts/config-agent.sh`; those tasks are therefore **serialized** (no `[P]`). Test files, docs, and reference files are separate and parallelizable.
 
 ## Path Conventions
 
@@ -44,7 +44,7 @@ description: "Task list for 024-agent-env-config"
 **Purpose**: Test scaffolding and the input contract reference doc.
 
 - [X] T001 [P] Create an isolated-HOME bash invocation test helper (source `config-agent.sh`, run functions with a temp `$HOME` and controlled `AGENT_*` env, capture stdout/stderr/exit) in tests/integration/agent_env_helpers.py
-- [X] T002 [P] Create skills/agent-setup/references/unified-variables.md documenting `AGENT_API_KEY`, `AGENT_MODEL`, `AGENT_BASE_URL`, `AGENT_ANTHROPIC_BASE_URL` and their rules, sourced from `.specify/specs/024-agent-env-config/contracts/unified-env-contract.md`
+- [X] T002 [P] Create skills/internal/manage-agents/references/setup/unified-variables.md documenting `AGENT_API_KEY`, `AGENT_MODEL`, `AGENT_BASE_URL`, `AGENT_ANTHROPIC_BASE_URL` and their rules, sourced from `.specify/specs/024-agent-env-config/contracts/unified-env-contract.md`
 
 ---
 
@@ -55,9 +55,9 @@ description: "Task list for 024-agent-env-config"
 **⚠️ CRITICAL**: No user-story work can begin until this phase is complete.
 
 - [X] T003 [P] Contract test asserting skills/agent-setup/SKILL.md documents the unified variables, the `config_agent_env_validate`/`config_agent_env_apply` commands, and the 6-tool scope (claude, codex, qwen, qoder, iflow, opencode) in tests/contract/test_agent_env_config_contract.py
-- [X] T004 Add the 6-tool profile registry (fields: name|protocol|url_source|config_path|format) for claude, codex, qwen, qoder, iflow, opencode in skills/agent-setup/scripts/config-agent.sh
-- [X] T005 Add shared helpers (`_ca_ensure_dir`, `_ca_url_has_scheme`, `_ca_json_merge`, `_ca_dotenv_upsert`, `_ca_toml_write_block`) in skills/agent-setup/scripts/config-agent.sh (depends on T004)
-- [X] T006 Add target-aware offender collector `_config_agent_env_collect_offenders <targets>` (returns grouped missing/malformed; requires `AGENT_ANTHROPIC_BASE_URL` only when claude is targeted) in skills/agent-setup/scripts/config-agent.sh (depends on T005)
+- [X] T004 Add the 6-tool profile registry (fields: name|protocol|url_source|config_path|format) for claude, codex, qwen, qoder, iflow, opencode in skills/internal/manage-agents/scripts/config-agent.sh
+- [X] T005 Add shared helpers (`_ca_ensure_dir`, `_ca_url_has_scheme`, `_ca_json_merge`, `_ca_dotenv_upsert`, `_ca_toml_write_block`) in skills/internal/manage-agents/scripts/config-agent.sh (depends on T004)
+- [X] T006 Add target-aware offender collector `_config_agent_env_collect_offenders <targets>` (returns grouped missing/malformed; requires `AGENT_ANTHROPIC_BASE_URL` only when claude is targeted) in skills/internal/manage-agents/scripts/config-agent.sh (depends on T005)
 - [X] T007 [P] Reframe skills/agent-setup/SKILL.md around the unified env-var workflow (check → read → write), the 6-tool scope, and the `config_agent_env_validate`/`config_agent_env_apply` commands
 
 **Checkpoint**: Registry + helpers + validation core ready — user stories can begin.
@@ -78,9 +78,9 @@ description: "Task list for 024-agent-env-config"
 
 ### Implementation for User Story 1
 
-- [X] T009 [US1] Update per-tool writers `_config_agent_write_claude` (use `AGENT_ANTHROPIC_BASE_URL`), `_config_agent_write_qoder`, `_config_agent_write_iflow`, `_config_agent_write_opencode` to secondary-assign from unified values and merge-preserve unrelated keys, in skills/agent-setup/scripts/config-agent.sh
-- [X] T010 [US1] Add durable file persistence: `_config_agent_write_qwen` → `~/.qwen/.env` (dotenv upsert) and `_config_agent_write_codex` → `~/.codex/config.toml` + `~/.codex/auth.json` (mode 600), in skills/agent-setup/scripts/config-agent.sh (depends on T009)
-- [X] T011 [US1] Implement `config_agent_env_apply [--all|<tool>...]` orchestration: read values, iterate targets, ensure dirs, call writers, emit secret-free per-tool report (configured/skipped/failed), exit 0 or 2, in skills/agent-setup/scripts/config-agent.sh (depends on T004–T006, T009, T010)
+- [X] T009 [US1] Update per-tool writers `_config_agent_write_claude` (use `AGENT_ANTHROPIC_BASE_URL`), `_config_agent_write_qoder`, `_config_agent_write_iflow`, `_config_agent_write_opencode` to secondary-assign from unified values and merge-preserve unrelated keys, in skills/internal/manage-agents/scripts/config-agent.sh
+- [X] T010 [US1] Add durable file persistence: `_config_agent_write_qwen` → `~/.qwen/.env` (dotenv upsert) and `_config_agent_write_codex` → `~/.codex/config.toml` + `~/.codex/auth.json` (mode 600), in skills/internal/manage-agents/scripts/config-agent.sh (depends on T009)
+- [X] T011 [US1] Implement `config_agent_env_apply [--all|<tool>...]` orchestration: read values, iterate targets, ensure dirs, call writers, emit secret-free per-tool report (configured/skipped/failed), exit 0 or 2, in skills/internal/manage-agents/scripts/config-agent.sh (depends on T004–T006, T009, T010)
 
 ### Manual Verification for User Story 1
 
@@ -102,8 +102,8 @@ description: "Task list for 024-agent-env-config"
 
 ### Implementation for User Story 2
 
-- [X] T014 [US2] Implement `config_agent_env_validate [--all|<tool>...]` using the offender collector: print grouped `Missing`/`Malformed` variables, return exit 1 on any offender, write nothing, in skills/agent-setup/scripts/config-agent.sh
-- [X] T015 [US2] Wire the validation gate into `config_agent_env_apply` so it aborts (exit 1, no writes) before any file operation when offenders exist, in skills/agent-setup/scripts/config-agent.sh (depends on T011, T014)
+- [X] T014 [US2] Implement `config_agent_env_validate [--all|<tool>...]` using the offender collector: print grouped `Missing`/`Malformed` variables, return exit 1 on any offender, write nothing, in skills/internal/manage-agents/scripts/config-agent.sh
+- [X] T015 [US2] Wire the validation gate into `config_agent_env_apply` so it aborts (exit 1, no writes) before any file operation when offenders exist, in skills/internal/manage-agents/scripts/config-agent.sh (depends on T011, T014)
 
 **Checkpoint**: US1 and US2 both work independently.
 
@@ -121,7 +121,7 @@ description: "Task list for 024-agent-env-config"
 
 ### Implementation for User Story 3
 
-- [X] T017 [US3] Add target parsing (`--all` | one-or-more tool names) and unknown-tool rejection (exit 3, list the six supported tools) shared by `config_agent_env_validate`/`config_agent_env_apply`, in skills/agent-setup/scripts/config-agent.sh (depends on T011, T014)
+- [X] T017 [US3] Add target parsing (`--all` | one-or-more tool names) and unknown-tool rejection (exit 3, list the six supported tools) shared by `config_agent_env_validate`/`config_agent_env_apply`, in skills/internal/manage-agents/scripts/config-agent.sh (depends on T011, T014)
 
 **Checkpoint**: All three stories independently functional.
 
@@ -130,7 +130,7 @@ description: "Task list for 024-agent-env-config"
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [X] T018 [P] Unit tests for pure helpers (`_ca_url_has_scheme`, `_ca_dotenv_upsert`) invoked via bash, in tests/unit/test_agent_env_helpers.py
-- [X] T019 [P] Update skills/agent-setup/references/supported-tuples.md and skills/agent-setup/references/available-tuples.md to note the unified `AGENT_*` input model supersedes provider-specific input variables (frame prior four-tuple provider vars as legacy)
+- [X] T019 [P] Update skills/internal/manage-agents/references/setup/supported-tuples.md and skills/internal/manage-agents/references/setup/available-tuples.md to note the unified `AGENT_*` input model supersedes provider-specific input variables (frame prior four-tuple provider vars as legacy)
 - [X] T020 Run quickstart.md end-to-end and confirm secret-free output; record result for SC-001..SC-006 in verification.md (created by /speckit.implement)
 
 ---
@@ -169,7 +169,7 @@ description: "Task list for 024-agent-env-config"
 ```bash
 # Setup + foundational tests/docs in parallel:
 Task: "T001 isolated-HOME test helper in tests/integration/agent_env_helpers.py"
-Task: "T002 reference doc skills/agent-setup/references/unified-variables.md"
+Task: "T002 reference doc skills/internal/manage-agents/references/setup/unified-variables.md"
 Task: "T003 SKILL.md contract test in tests/contract/test_agent_env_config_contract.py"
 Task: "T007 reframe skills/agent-setup/SKILL.md"
 

@@ -23,7 +23,7 @@
 
 | 单元 | 排除理由 |
 |------|----------|
-| skills/improve-tools/SKILL.md:27(Tool 记录整读) | 例外 (a):该文件是编辑目标(read-before-edit) |
+| skills/internal/improve-tools/SKILL.md:27(Tool 记录整读) | 例外 (a):该文件是编辑目标(read-before-edit) |
 | glossary-utils.py `list` 全表 / `.specify/memory/glossary.md` | 例外 (b):33 行 / 2,970 B,低于小文件阈值(≤ 100 行 且 ≤ 10 KB) |
 | skills/git-workflow(读 git-workflow.md) | 该文件当前不存在(首跑生成);生成后典型体量低于小文件阈值,不构成违规 |
 | templates/commands/analyze.md:75 | 合规反例:"Load only the minimal necessary context from each artifact" |

@@ -1,0 +1,10 @@
+# T023 red — the fixture did not exist before this row (captured 2026-11-05)
+# Recomputability contract this fixture must satisfy (SC-006 / GM-13):
+#   - one matrix, three disjoint segments surface / normalize / failure
+#   - >= 12 rows; each row carries raw + expect.outcome (closed three) + expect.normalized
+#   - every accepted-form example from the owner has a row with an expected output
+$ git ls-tree -r 02bef714 -- tests/fixtures/skill-reference/
+(baseline carries no such path -> the path is the red)
+
+$ git ls-tree -r 02bef714 -- tests/contract/skill_reference_matrix.py
+(same: the implementation is absent at the baseline)

@@ -46,7 +46,7 @@ SC-005_note=Verified by tests/integration/test_feedback_dedup.py (2 passed) + co
 
 SC-006_status=pass
 SC-006_value=Every entry is scope:local; review command records only a local self-review kept distinct from its global report
-SC-006_note=Verified by scope assertions in schema/skill/command record tests; distinction documented in docs/skills/feedback.md and review.md step note.
+SC-006_note=Verified by scope assertions in schema/skill/command record tests; distinction documented in docs/reference/skills/feedback.md and review.md step note.
 
 SC-007_status=pass
 SC-007_value=should_prompt == (count_since_submission >= threshold); default threshold 10; mark-submitted resets to 0 and stamps submitted_at

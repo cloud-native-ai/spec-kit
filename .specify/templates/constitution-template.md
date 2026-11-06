@@ -301,6 +301,28 @@ Rationale: a name is how every later reader, search, and agent finds an entity a
 it to related concepts. An improvised name silently breaks those links, so the cheapest
 correct decision is always the one an existing authority already made.
 
+### XVIII. Self-Explanatory Structure (不言自明)
+Names, paths and structures MUST carry the information their user needs, judged from the
+user's view rather than from how clear the implementation looks internally:
+- It MUST be the user's view that decides, not implementation-internal clarity: information
+  a program can infer without context does NOT count as reachable.
+- The ceiling is that the user sees the needed information directly; the floor MUST be no
+  more than one simple command, and a satisfied floor is sufficient to support a change.
+- The principle MUST NOT be used to justify preventive redesign — a concrete user
+  information need MUST be named before it applies to anything.
+- Each optimization task MUST raise at most one information dimension, and a reconcile
+  mechanism MUST be how that dimension lands.
+- An encoded attribute MUST keep its original source of truth, and names and paths MUST stay
+  projections of it, reconciled to it rather than edited into a second owner.
+- The full definition is owned by `.specify/shared/definitions/self-explanatory-definitions.md`
+  and MUST be referenced, not restated, here; the framework's own source copy of this owner
+  stays at `shared/definitions/self-explanatory-definitions.md` and MUST NOT be the path a
+  downstream project is told to open.
+
+Rationale: a structure that carries no user information forces the user to open files or
+ask a maintainer before they can filter, sort or judge the system. Naming the information a
+structure must carry keeps it legible at the entry point instead of only from inside.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

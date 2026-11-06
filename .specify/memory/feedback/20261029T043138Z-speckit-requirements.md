@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T04:31:38Z"
 summary: "requirements stage for slice 074b: gates green on first second-pass; one in-passing correction disclosed (cross-slice id form), no scope or quality regression observed"
+introspection_ref: "introspection-20261105T080109Z#F-06"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-06"
 ---
 
 ## Review

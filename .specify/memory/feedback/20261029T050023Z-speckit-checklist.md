@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "074b-nested-governance"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T05:00:23Z"
 summary: "positive"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

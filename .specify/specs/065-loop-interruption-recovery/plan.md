@@ -12,7 +12,7 @@
 
 实现落点是一个新引擎加一个 owner 文档：
 
-1. **状态感知**：`scripts/loop-state.py --action snapshot` 一次只读调用聚合状态脊、Registry、四件套、watchbeat、阶段产物、git 提交与 watcher 判定；watcher 可用时 `loop_state` 逐字等于其判定，否则按固定编号规则 D0–D8 派生并标注 `verdict_source=derived`。
+1. **状态感知**：`skills/external/sdd-loop-driver/scripts/loop-state.py --action snapshot` 一次只读调用聚合状态脊、Registry、四件套、watchbeat、阶段产物、git 提交与 watcher 判定；watcher 可用时 `loop_state` 逐字等于其判定，否则按固定编号规则 D0–D8 派生并标注 `verdict_source=derived`。
 2. **中断检测**：八类封闭形态 I1–I8（`unwatched / dead-no-exit-record / deadline-overrun-live / heartbeat-stalled / artifacts-without-completion / stale-signal / lifecycle-spine-violation / remote-unreachable`），每类携带证据指针与落脊建议；多条并存时一次裁决。
 3. **状态恢复**：`--action recover` 默认 dry-run，按 AD-1–AD-9 输出唯一动作 `none/watch/verify/resume/retry/stop`；`--apply` 下 resume 只补提交本阶段产物、retry 原子隔离旧信号、stop 落 `stalled` 并生成四要素上送件；同线独立锁与幂等保证可重入。
 4. **生命周期约束**：SKILL.md Hard Requirements 固化「U2 派发与首个 U3 窗口同回合启动」「退出前落 stalled/reentry-required」，状态脊机读段（`<!-- loop-state:begin/end -->`、`spine_state:`）由 `--action check-spine` 确定性校验；watchbeat 作为第五个存在信号。

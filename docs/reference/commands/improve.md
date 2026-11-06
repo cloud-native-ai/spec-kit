@@ -58,7 +58,7 @@ The command's wrap-up records its own run determination, exec quant, and feedbac
 
 ## See Also
 
-- Execution order and constraints: [Self-Improvement Workflow](../../shared/workflow/self-improvement-workflow.md) (canonical at `shared/workflow/self-improvement-workflow.md`)
+- Execution order and constraints: [Self-Improvement Workflow](../../../shared/workflow/self-improvement-workflow.md) (canonical at `shared/workflow/self-improvement-workflow.md`)
 - Concepts: `shared/definitions/self-improvement-definitions.md` · policy: `shared/guidelines/self-improvement.md`
 - Evidence lanes and the intervention ledger: `shared/workflow/evidence-step.md`
 - Client feedback channel: [Feedback Command](feedback.md) (`kind: external` entries, the custom subject's observation source)

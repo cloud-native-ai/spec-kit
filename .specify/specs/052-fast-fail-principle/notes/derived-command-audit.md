@@ -331,7 +331,7 @@
 | 11 | C-10 | 三行钉子:`test_user_facing_comprehension_doc.py:557`(`== 23`)/ `test_proactive_trigger_section.py:352`(`== frozen["total"]`)/ `test_confirmation_gates_sweep.py:162`(`<= cap`,`cap = 93 × 0.25 = 23.25` ⇒ 可通过的最大整数 23) | LIVE `sed -n` 三处 + 读 044 基线 | 钉子二 `:352` ✓、钉子三 `:162` ✓、044 `total: 93` ⇒ cap 23.25 ✓;**钉子一实为 `:576`**(`:557` 是改前位置,052 自己在该文件插入断言使其下移 19 行,落地时未回填) | **不符 ⇒ 已订正**(见 §13 M1) |
 | 12 | C-10(a) | 三行各自可独立定位到真实断言,形态特征为 `== 23` / `== frozen["total"]` / `<= cap` | LIVE 三种形态各 `grep -n` | 三种形态各命中 1 处真实断言(伴生量:三者皆非空) | 相符 |
 | 13 | C-11 | 两个基线文件未被重冻 | LIVE 052 窗口 `git diff --stat` 对 050 与 044 基线 | 空 | 相符 |
-| 14 | C-16 | 六个引擎/脚本路径 `git diff` 为空 + 反空真哨兵 | LIVE 两种窗口 | 052 窗口(`BASE_SHA..b7aeba9d`)对 `scripts/ src/specify_cli/ skills/create-team/scripts/ templates/plan-template.md` **为空** ✓;`BASE_SHA..HEAD` **不为空**(8 文件,全部由 052 之后的 5 个提交造成,携 052 主题的提交数 = **0**)⇒ 详见 §13 M4 的门禁影响 | 相符(就 052 的改动面而言) |
+| 14 | C-16 | 六个引擎/脚本路径 `git diff` 为空 + 反空真哨兵 | LIVE 两种窗口 | 052 窗口(`BASE_SHA..b7aeba9d`)对 `scripts/ src/specify_cli/ skills/internal/create-team/scripts/ templates/plan-template.md` **为空** ✓;`BASE_SHA..HEAD` **不为空**(8 文件,全部由 052 之后的 5 个提交造成,携 052 主题的提交数 = **0**)⇒ 详见 §13 M4 的门禁影响 | 相符(就 052 的改动面而言) |
 | 15 | C-17 | `MIRROR_PAIRS` 五对(含各自排除集),`shared` 与 `scripts` 为全树 rglob 无 manifest | LIVE 只读解析该字面量 | 5 对,逐个相符:`templates`(排除 `commands`)、`skills`(排除 `site`)、`agents`→`.specify/agents/templates`、`scripts`(strict)、`shared` | 相符 |
 
 **小结**:抽出 15 项 / 相符 14 / **不符 1(已订正)**。

@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "081-acceptance-hardening"
 feature_id: "081"
+disposition: "ignored"
 partial: false
 created: "2026-11-02T23:07:45Z"
 summary: "081 requirements stage: 25 FR / 9 SC / 17 STR; 2 final-path SCs; validator and deterministic gates green; branch/commit clean; no push."
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

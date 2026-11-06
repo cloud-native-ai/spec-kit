@@ -10,8 +10,8 @@ unrefreshed form has no call sites at all):
 * **C-1 zero new commands** — ``templates/commands/`` holds exactly the frozen
   27 command templates (count *and* name set), and no command file exists below
   a subdirectory; ``skills/{external,internal}/*/SKILL.md`` holds exactly the
-  frozen 52 skill units (51 at the 069a baseline; 2026-10-30 Feature 078 renames
-  one of them in place, so the count is unchanged).
+  frozen 54 skill units (51 at the 069a baseline; the dated notes above the
+  roster record every sanctioned movement).
 * **C-2 zero project-side storage** — nothing under ``.specify/memory/`` is a
   second classification store (no classification-named file, no ledger-style
   row, no ``flow_class`` assignment).
@@ -124,7 +124,7 @@ FROZEN_COMMANDS = (
     "tools",
 )
 
-# C-1 frozen denominator: 53 skill units, layer-qualified so a layer move or a
+# C-1 frozen denominator: 54 skill units, layer-qualified so a layer move or a
 # rename is a failure rather than a silent re-count.
 #
 # 2026-10-30 (Feature 078): the pre-existing external mental-simulation unit is
@@ -141,6 +141,11 @@ FROZEN_COMMANDS = (
 # document, so the closed wiring surface below needs no entry for it and its
 # `ALLOWED_POST_BASELINE_CHANGES` counterpart has nothing to allow: a new file is
 # not a drifted file, and the 069a hash manifest stays the dated record it is.
+# 2026-11-05 (improve-skills ssh-utils): 53 -> 54 = 16 external + 38 internal. The
+# new unit is `external/ssh-utils`, the SSH transport owner extracted out of
+# `sdd-project-setup` (fixed `-o RemoteCommand=none`, quoting, stdin script push,
+# `su` wrapping, exit-code propagation). It names no engine and no owner document
+# in C-5's closed wiring surface, so only the roster moves.
 FROZEN_SKILLS = (
     "external/coaching-skills",
     "external/create-docs",
@@ -157,6 +162,7 @@ FROZEN_SKILLS = (
     "external/sdd-house-keeping",
     "external/sdd-loop-driver",
     "external/sdd-project-setup",
+    "external/ssh-utils",
     "internal/analyze-artifacts",
     "internal/archive-session",
     "internal/clarify-artifact",
@@ -583,8 +589,9 @@ ALLOWED_POST_BASELINE_CHANGES = {
     # legitimately gained their Directory Governance segments; each entry carries
     # the needles its change must contain.
     "skills/external/sdd-project-setup/SKILL.md": {
-        "reason": "2026-10-27 Directory Governance (Hard Requirements 10-11)",
-        "markers": ("目标项目治理优先", "目录创建限于规范落点"),
+        "reason": ("2026-10-27 Directory Governance (Hard Requirements 10-11); "
+                   "2026-11-05 delegates SSH transport to ssh-utils (Hard Requirement 15)"),
+        "markers": ("目标项目治理优先", "目录创建限于规范落点", "ssh-utils", "RemoteCommand=none"),
     },
     "skills/internal/manage-constitution/SKILL.md": {
         "reason": "2026-10-27 Directory Governance MUST-include entry (Principle XVII)",
@@ -621,8 +628,58 @@ ALLOWED_POST_BASELINE_CHANGES = {
         "markers": ("coaching-skills", "skills/external/coaching-skills/SKILL.md"),
     },
     "skills/internal/run-skills/SKILL.md": {
-        "reason": "2026-10-30 Feature 078 updates the run-skills routing-family pointer",
-        "markers": ("coaching-skills",),
+        "reason": (
+            "2026-10-30 Feature 078 updates the run-skills routing-family pointer; "
+            "2026-11-05 Feature 083 folds in FR-026's skill-reference wiring (normalize "
+            "by the owner cited in the Input Contract and disclose the raw and the "
+            "normalized identifier), pinned by "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("coaching-skills", "shared/definitions/skill-reference-definitions.md",
+                    "上文 Input Contract 声明的 owner"),
+    },
+    # 2026-11-05 (Feature 083, meta-skill governance): three more non-wiring sources gain
+    # the mechanism/policy judgement and the skill-reference parameter declaration. The
+    # fourth edited consumer, `skills/external/coaching-skills/SKILL.md`, is NOT a manifest
+    # entry — it is the replacement named by `_retired_skill_register` above, so its
+    # registration point is that register's content markers (extended below), never an
+    # `ALLOWED_POST_BASELINE_CHANGES` key (which the module's own membership assertion
+    # would reject as vacuous). Each entry records the drift; it authorizes no other.
+    "skills/external/create-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 083 lands FR-012 (the § 6 mechanism/policy separation "
+            "checklist item) and FR-026 (the § 1 skill-name parameter declaration citing "
+            "the reference owner), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("Mechanism / policy separation",
+                    "shared/definitions/mechanism-policy-definitions.md",
+                    "shared/definitions/skill-reference-definitions.md"),
+    },
+    "skills/external/improve-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 083 lands FR-013 (the § 2 survey question and the § 3 "
+            "`policy source missing or ambiguous` candidate) and FR-026 (the § Input "
+            "Contract target-identifier declaration), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("policy source missing or ambiguous",
+                    "shared/definitions/mechanism-policy-definitions.md",
+                    "shared/definitions/skill-reference-definitions.md"),
+    },
+    "skills/external/merge-skills/SKILL.md": {
+        "reason": (
+            "2026-11-05 Feature 083 lands FR-014 via SW-03 (the § 5 layer-distribution "
+            "pre-judgement, the § 8 reused separation check and the provenance record's "
+            "layer-attribution permission) and FR-026 (the § Input Contract Source "
+            "declaration), pinned by "
+            "tests/contract/test_mechanism_policy_skill_wiring.py and "
+            "tests/contract/test_skill_reference_consumers.py"
+        ),
+        "markers": ("changes the two layers' distribution", "Layer split after the merge",
+                    "shared/definitions/skill-reference-definitions.md"),
     },
 }
 
@@ -697,10 +754,16 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
             "the retired source came back at its manifest path: %s" % retired_rel
         )
         replacement = _read(REPO_ROOT / replacement_rel)
-        for marker in ("name: coaching-skills", "classification: external"):
+        # 2026-11-05 (Feature 083): the replacement is also a rewritten consumer — FR-026 /
+        # SR-06 lands the reference wiring only, so the register re-asserts that one added
+        # literal here. This IS coaching-skills' registration point: the path is not in the
+        # 069a manifest, so an ALLOWED_POST_BASELINE_CHANGES key for it would be vacuous.
+        for marker in ("name: coaching-skills", "classification: external",
+                       "shared/definitions/skill-reference-definitions.md"):
             assert marker in replacement, (
-                "the replacement of %s must carry the rename's own content: %r "
-                "missing from %s (2026-10-30, Feature 078)"
+                "the replacement of %s must carry its own content: %r "
+                "missing from %s (2026-10-30 Feature 078 rename; 2026-11-05 Feature 083 "
+                "FR-026 wiring)"
                 % (retired_rel, marker, replacement_rel)
             )
 

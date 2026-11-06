@@ -25,7 +25,7 @@ Project stakeholders outside the engineering team cannot easily grasp what a pro
 
 One theme — visualization-driven project information collection and presentation — delivered as two workstreams sharing the `draw-plantuml` skill as the sole rendering path:
 
-- **WS-A**: Create `skills/summarize-project/`, a skill that collects source-traceable work items, decomposes them once into a hierarchy, renders the decomposition as a WBS chart (`@startwbs`) and as a Gantt chart (`@startgantt`, with milestones, dependencies, and progress status), and assembles one self-contained HTML report for external readers.
+- **WS-A**: Create `skills/internal/summarize-project/`, a skill that collects source-traceable work items, decomposes them once into a hierarchy, renders the decomposition as a WBS chart (`@startwbs`) and as a Gantt chart (`@startgantt`, with milestones, dependencies, and progress status), and assembles one self-contained HTML report for external readers.
 - **WS-B**: Extend `skills/analysis-project/` at four injection points (frontmatter description, Phase 5 figure planning, Phase 8 figure assembly, Output Requirements) plus one new reference guide so primary analysis views — structure, key flows, deployment topology — are expressed as standard UML diagrams; Mermaid remains for secondary sketches and all existing behavior is preserved.
 
 ## Impact on Feature 013

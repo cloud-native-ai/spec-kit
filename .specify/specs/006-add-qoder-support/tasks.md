@@ -103,7 +103,7 @@
 - [X] T019 [US2] Implement Qoder missing-CLI guidance and `--ignore-agent-tools` parity in src/specify_cli/__init__.py
 - [X] T020 [US2] Extend Qoder compatibility link generation for refresh flows in scripts/bash/generate-instructions.sh
 - [X] T021 [P] [US2] Align instruction generation template with approved Qoder support in templates/instructions-template.md
-- [X] T022 [P] [US2] Document Qoder maintenance and refresh workflows in docs/usage.md
+- [X] T022 [P] [US2] Document Qoder maintenance and refresh workflows in docs/tutorials/quickstart.md
 
 **Checkpoint**: User Story 2 [CN]Qoder [CN]
 
@@ -128,7 +128,7 @@
 ### Implementation for User Story 3
 
 - [X] T027 [US3] Update public support matrix and Qoder overview in README.md
-- [X] T028 [P] [US3] Update installation examples and prerequisite guidance for Qoder in docs/installation.md
+- [X] T028 [P] [US3] Update installation examples and prerequisite guidance for Qoder in docs/tutorials/installation.md
 - [X] T029 [P] [US3] Regenerate supported-agent instruction content for Qoder in .ai/instructions.md
 - [X] T030 [P] [US3] Align approved-provider guidance with Qoder in .github/prompts/speckit.agents.prompt.md
 - [X] T031 [US3] Ensure packaged template resources continue shipping Qoder-facing assets via pyproject.toml
@@ -194,7 +194,7 @@ Task: "Add unit coverage for Qoder bootstrap helper paths in tests/unit/test_qod
 
 ```bash
 # [CN] US3 [CN]
-Task: "Update installation examples and prerequisite guidance for Qoder in docs/installation.md"
+Task: "Update installation examples and prerequisite guidance for Qoder in docs/tutorials/installation.md"
 Task: "Regenerate supported-agent instruction content for Qoder in .ai/instructions.md"
 Task: "Align approved-provider guidance with Qoder in .github/prompts/speckit.agents.prompt.md"
 ```

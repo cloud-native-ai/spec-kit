@@ -6,7 +6,7 @@
 
 ## Summary
 
-把 agent 定义改造成"中立元信息 + 正文"单文件结构(FR-001/002),元信息用工具无关词汇表达、消除现存 Qoder 方言(FR-005~008);`specify init --ai <tool>` 时经单一映射真源把中立元信息渲染为目标工具的真实 agent 文件,替代逐文件软链接(FR-009~018),并保住既有分发语义(渲染清单驱动的手改备份、失效清理、instance 优先、用户资产不覆盖,FR-019~022);同时按目录级 Worker/Meta 划分重排三目录:7 个角色定义迁入 `skills/create-agent/templates/` 的 Worker 能力模板序列,`agents/` 改由新作的框架维护型 Meta Agent 填充,差别与组队取件规则成文(FR-023~026)。
+把 agent 定义改造成"中立元信息 + 正文"单文件结构(FR-001/002),元信息用工具无关词汇表达、消除现存 Qoder 方言(FR-005~008);`specify init --ai <tool>` 时经单一映射真源把中立元信息渲染为目标工具的真实 agent 文件,替代逐文件软链接(FR-009~018),并保住既有分发语义(渲染清单驱动的手改备份、失效清理、instance 优先、用户资产不覆盖,FR-019~022);同时按目录级 Worker/Meta 划分重排三目录:7 个角色定义迁入 `skills/internal/create-agent/templates/` 的 Worker 能力模板序列,`agents/` 改由新作的框架维护型 Meta Agent 填充,差别与组队取件规则成文(FR-023~026)。
 
 技术路径:渲染器、中立字段模式、工具映射表全部落在 `src/specify_cli/__init__.py`(单模块 CLI 的既有约定,`AGENT_CONFIG` 先例);映射每行带官方文档出处;渲染清单为 `.specify/agents/.render-manifest.json`(既有 `json.dump` 先例:`.vscode/settings.json`)。测试先行:契约测试按新语义改写/新增,全量基线对照(SC-008)。
 
@@ -87,7 +87,7 @@ No standalone research.md — Phase 0 findings(两轮 clarify 的外部格式核
 ```text
 src/specify_cli/                # 单模块 CLI:新增中立键集/映射表/渲染函数,退役 _AGENT_LINK_DIRS+ensure_per_file_agent_links,迁移路径与 tracker 反馈
 agents/                         # 移除 7 个角色定义,新增 2 个 Meta Agent(structure-adjuster, skill-verifier);sync-mirrors 镜像对不变(→ .specify/agents/templates)
-skills/create-agent/templates/  # 7 个 agent-capacity-<slug>-template.md 被迁入的角色定义替换(中立 frontmatter + {{PROJECT_NAME}} 参数化)
+skills/internal/create-agent/templates/  # 7 个 agent-capacity-<slug>-template.md 被迁入的角色定义替换(中立 frontmatter + {{PROJECT_NAME}} 参数化)
 tests/contract/                 # test_shipped_agent_presets / test_role_templates / test_agents_symlink(改名 render 语义)/ test_agent_skill_enablement 按新契约改写;新增映射完备性与中立词表扫描测试
 tests/integration/              # test_init_agents / test_persistent_agent_lifecycle 改为渲染语义(真实文件、清单、备份、幂等)
 docs/reference/agents/          # templates-and-agents.md:目录级 Worker/Meta 划分 + 中立格式 + 移除 Qoder 基准表述([[STR-003]])与 crosswalk
@@ -95,7 +95,7 @@ docs/reference/commands/        # agents.md 等:软链接叙述 → 渲染叙述
 docs/tutorials/quickstart.md    # 目录树与分发叙述更新
 templates/commands/             # agents.md / skills.md 模板更新(含全部 per-tool 副本,经 regen-command-copies)
 shared/workflow/                # agent-configuration.md:软链接核验 → 渲染产物核验
-skills/create-skills/SKILL.md、skills/create-team/{references,templates}/、shared/workflow/interview-walkthrough.md  # 7-slug 枚举的机械联动
+skills/external/create-skills/SKILL.md、skills/internal/create-team/{references,templates}/、shared/workflow/interview-walkthrough.md  # 7-slug 枚举的机械联动
 .specify/{templates,skills,shared,agents}/  # 上述全部改动的镜像侧(sync-mirrors.py --write)
 AGENTS.md                       # Agents 注册表与分发叙述(经 /speckit.instructions 刷新,顺带修复缺 ux-analyst 的既有漂移)
 .specify/memory/glossary.md     # 新增/修订条目(见 feature-ref.md 术语节,写入需用户确认)
@@ -108,11 +108,11 @@ AGENTS.md                       # Agents 注册表与分发叙述(经 /speckit.i
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
 | `agents/*`(7 删 + 2 增) | `.specify/agents/templates/`(sync-mirrors 对) | `python3 scripts/python/sync-mirrors.py --check` exit 0 |
-| `skills/create-agent/templates/agent-capacity-*-template.md`(7 替换) | `.specify/skills/create-agent/templates/` | 同上 |
-| `skills/create-skills/SKILL.md` | `.specify/skills/create-skills/SKILL.md` | 同上 |
-| `skills/create-team/references/patterns.md`、`skills/create-team/templates/agents/agent-workflow-schema.md` | 对应 `.specify/skills/...` 副本 | 同上 |
+| `skills/internal/create-agent/templates/agent-capacity-*-template.md`(7 替换) | `.specify/skills/internal/create-agent/templates/` | 同上 |
+| `skills/external/create-skills/SKILL.md` | `.specify/skills/create-skills/SKILL.md` | 同上 |
+| `skills/internal/create-team/references/patterns.md`、`skills/internal/create-team/templates/agents/agent-workflow-schema.md` | 对应 `.specify/skills/...` 副本 | 同上 |
 | `shared/workflow/agent-configuration.md`、`shared/workflow/interview-walkthrough.md` | `.specify/shared/workflow/...` | 同上 |
-| `templates/commands/agents.md`、`templates/commands/skills.md` | `.specify/templates/commands/*.md` + per-tool 副本(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`、`.codex/commands/`、`.hermes/commands/`) | `python3 scripts/python/regen-command-copies.py` 后 grep 无旧软链接叙述 |
+| `templates/commands/agents.md`、`templates/commands/skills.md` | `templates/commands/*.md` + per-tool 副本(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`、`.codex/commands/`、`.hermes/commands/`) | `python3 scripts/python/regen-command-copies.py` 后 grep 无旧软链接叙述 |
 | `docs/**`(仅文档,无镜像) | — | docs-utils validate 无新增违规 |
 
 ## Complexity Tracking

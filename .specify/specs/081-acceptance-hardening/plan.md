@@ -99,7 +99,7 @@ Owner of the record shape, the admissibility criteria, the rejection forms and t
 ### T-004 — 产物段与实现段的方法论载体是**新增内部技能**，不是既有技能下的命名文档
 
 - **decision**: 新建 `skills/internal/review-feature-quality/SKILL.md`，其正文以两个具名段承载（`Segment A — Artifact Review`、`Segment B — Implementation Review`），运行时路径 `.specify/skills/internal/review-feature-quality/SKILL.md`；`templates/commands/review.md` 只引用路径与章节锚。
-- **antithesis**: 把方法论写成 `skills/internal/review-sdd-process/references/artifact-and-implementation-review.md` 一类的命名文档，由过程段技能顺带承载；当希望「段数不变、只加文档」而避开技能普查改动时它更优——零新增技能、零普查计数变化、零第四套收尾记录。
+- **antithesis**: 把方法论写成 `skills/internal/review-feature-quality/references/artifact-and-implementation-review.md` 一类的命名文档，由过程段技能顺带承载；当希望「段数不变、只加文档」而避开技能普查改动时它更优——零新增技能、零普查计数变化、零第四套收尾记录。
 - **binding_constraints**:
   - pole_a: 每段必须有独立且可运行时抵达的 owner——否则「两段各自成文、互不代答」没有承载物（A12 要求载体是能以运行时路径抵达的具名 owner）。
   - pole_b: 过程技能的判定对象不许被污染——`review-sdd-process` 的判定对象是「产出该切片的 SDD 流程」，把产物/实现审查塞进它的 references 会让「过程段 MUST NOT 被当作产物段或实现段的替代」变成一句无对象的话。
@@ -195,7 +195,7 @@ Baseline measured **before** any edit on this branch (2026-11-03): `regen-comman
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `templates/commands/{review,implement,tasks}.md` | `.claude/commands/speckit.<name>.md`; `.github/prompts/speckit.<name>.prompt.md`; `.qoder/commands/speckit.<name>.md`; `.opencode/command/speckit.<name>.md` — per-tool copies via `regen-command-copies.py`; NO `.specify/templates/commands/` mirror (retired) | `python3 scripts/python/regen-command-copies.py --check` → exit 0 (baseline exit 0, measured) |
+| `templates/commands/{review,implement,tasks}.md` | `.claude/commands/speckit.<name>.md`; `.github/prompts/speckit.<name>.prompt.md`; `.qoder/commands/speckit.<name>.md`; `.opencode/command/speckit.<name>.md` — per-tool copies via `regen-command-copies.py`; NO `templates/commands/` mirror (retired) | `python3 scripts/python/regen-command-copies.py --check` → exit 0 (baseline exit 0, measured) |
 | `templates/{feature-details,verification-log,tasks,feature-index,plan,review}-template.md` | `.specify/templates/` same names | `python3 scripts/python/sync-mirrors.py --check` → exit 0 |
 | `shared/workflow/{acceptance-hardening(NEW),feature-integration,expression-gates}.md` | `.specify/shared/workflow/` same names | same `--check` |
 | `skills/internal/{review-feature-quality(NEW),review-sdd-process,manage-features,implement-feature,code-review}/**` | `.specify/skills/internal/<name>/**` | same `--check` |

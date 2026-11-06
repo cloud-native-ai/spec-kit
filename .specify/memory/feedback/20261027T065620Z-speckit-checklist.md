@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-27T06:56:20Z"
 summary: "checklist stage on Feature 071: generated a 40-item requirements-quality checklist (13 PASS / 27 FAIL) whose deterministic self-check passed on all structural propositions (numbering contiguous, 40/40"
+introspection_ref: "introspection-20261105T080109Z#F-04"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-04"
 ---
 
 ## Review

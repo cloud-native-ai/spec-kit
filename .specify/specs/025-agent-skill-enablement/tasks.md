@@ -23,7 +23,7 @@ description: "Task list for Agent Skill Enablement"
 - DoD-3: Union of declared skills is a subset of installed declarable skills with 0 dangling references and 0 non-declarable slugs (SC-002).
 - DoD-4: `pytest -m contract tests/contract/test_agent_skill_enablement.py` is green; `test_shipped_agent_presets.py` remains green (no regression, SC-004).
 - DoD-5: The 7 `create-agent` role templates mirror the same additions (C-3 parity; FR-011 regeneration safety).
-- DoD-6: Docs (`docs/agents/command-and-skills.md`, `docs/agents/design.md`) document the skill-enablement convention; quickstart Scenarios 1–5 pass.
+- DoD-6: Docs (`docs/reference/agents/command-and-skills.md`, `docs/reference/agents/design.md`) document the skill-enablement convention; quickstart Scenarios 1–5 pass.
 
 **DoD Status**: green
 
@@ -42,8 +42,8 @@ description: "Task list for Agent Skill Enablement"
 ## Path Conventions
 
 - Shipped agents: `agents/<slug>.agent.md` (mirrored to `.specify/agents/` on install)
-- Generator templates: `skills/create-agent/templates/agent-role-<role>-template.md`
-- Shared snippet: `skills/create-agent/templates/agent-skill-enablement.md`
+- Generator templates: `skills/internal/create-agent/templates/agent-role-<role>-template.md`
+- Shared snippet: `skills/internal/create-agent/templates/agent-skill-enablement.md`
 - Installed skills reference set: `skills/<slug>/SKILL.md` (mirrored to `.specify/skills/<slug>/SKILL.md`)
 - Contract test: `tests/contract/test_agent_skill_enablement.py`
 
@@ -63,7 +63,7 @@ description: "Task list for Agent Skill Enablement"
 
 **⚠️ CRITICAL**: Blocks all user stories — every agent and template edit composes this snippet.
 
-- [X] T002 Create the shared single-source protocol snippet `skills/create-agent/templates/agent-skill-enablement.md` (composed like `agent-supervision-delegation.md`) containing the 5-point protocol from contract C-2 / data-model.md §Skill-Usage Guidance: (1) skills install with agents so every declared skill is invocable; (2) prefer an applicable framework skill over manual/ad-hoc work; (3) when multiple apply, choose the most role-specific; (4) when none applies or a skill is unavailable/fails, complete directly and surface the failure; (5) invoke the skill rather than reimplementing its logic inline.
+- [X] T002 Create the shared single-source protocol snippet `skills/internal/create-agent/templates/agent-skill-enablement.md` (composed like `agent-supervision-delegation.md`) containing the 5-point protocol from contract C-2 / data-model.md §Skill-Usage Guidance: (1) skills install with agents so every declared skill is invocable; (2) prefer an applicable framework skill over manual/ad-hoc work; (3) when multiple apply, choose the most role-specific; (4) when none applies or a skill is unavailable/fails, complete directly and surface the failure; (5) invoke the skill rather than reimplementing its logic inline.
 
 **Checkpoint**: Shared protocol snippet exists — agent and template edits can begin.
 
@@ -126,20 +126,20 @@ description: "Task list for Agent Skill Enablement"
 
 ### Tests for User Story 3 (MANDATORY) ⚠️
 
-- [X] T014 [US3] Add a template-parity assertion (contract C-3) to `tests/contract/test_agent_skill_enablement.py`: each `skills/create-agent/templates/agent-role-<role>-template.md` MUST declare a `skills:` frontmatter list and contain a `## Skill Enablement` heading. Run and confirm it FAILS before the template edits.
+- [X] T014 [US3] Add a template-parity assertion (contract C-3) to `tests/contract/test_agent_skill_enablement.py`: each `skills/internal/create-agent/templates/agent-role-<role>-template.md` MUST declare a `skills:` frontmatter list and contain a `## Skill Enablement` heading. Run and confirm it FAILS before the template edits.
 
 ### Implementation for User Story 3
 
-- [X] T015 [P] [US3] Edit `skills/create-agent/templates/agent-role-requirements-analyst-template.md`: mirror the `skills:` frontmatter and `## Skill Enablement` section from `agents/requirements-analyst.agent.md`.
-- [X] T016 [P] [US3] Edit `skills/create-agent/templates/agent-role-system-designer-template.md`: mirror the additions from `agents/system-designer.agent.md`.
-- [X] T017 [P] [US3] Edit `skills/create-agent/templates/agent-role-module-designer-template.md`: mirror the additions from `agents/module-designer.agent.md`.
-- [X] T018 [P] [US3] Edit `skills/create-agent/templates/agent-role-test-engineer-template.md`: mirror the additions from `agents/test-engineer.agent.md`.
-- [X] T019 [P] [US3] Edit `skills/create-agent/templates/agent-role-qa-engineer-template.md`: mirror the additions from `agents/qa-engineer.agent.md`.
-- [X] T020 [P] [US3] Edit `skills/create-agent/templates/agent-role-knowledge-manager-template.md`: mirror the additions from `agents/knowledge-manager.agent.md`.
-- [X] T021 [P] [US3] Edit `skills/create-agent/templates/agent-role-ux-analyst-template.md`: mirror the additions from `agents/ux-analyst.agent.md`.
+- [X] T015 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-requirements-analyst-template.md`: mirror the `skills:` frontmatter and `## Skill Enablement` section from `agents/requirements-analyst.agent.md`.
+- [X] T016 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-system-designer-template.md`: mirror the additions from `agents/system-designer.agent.md`.
+- [X] T017 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-module-designer-template.md`: mirror the additions from `agents/module-designer.agent.md`.
+- [X] T018 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-test-engineer-template.md`: mirror the additions from `agents/test-engineer.agent.md`.
+- [X] T019 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-qa-engineer-template.md`: mirror the additions from `agents/qa-engineer.agent.md`.
+- [X] T020 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-knowledge-manager-template.md`: mirror the additions from `agents/knowledge-manager.agent.md`.
+- [X] T021 [P] [US3] Edit `skills/internal/create-agent/templates/agent-role-ux-analyst-template.md`: mirror the additions from `agents/ux-analyst.agent.md`.
 - [X] T022 [US3] Run `pytest -m contract tests/contract/test_agent_skill_enablement.py` and confirm the template-parity assertion (T014) now PASSES.
-- [X] T023 [P] [US3] Update `docs/agents/command-and-skills.md` to document the `skills:` frontmatter field and the `## Skill Enablement` section convention (single-source protocol + per-role table).
-- [X] T024 [P] [US3] Update `docs/agents/design.md` to reference the skill-enablement convention and its single-source snippet.
+- [X] T023 [P] [US3] Update `docs/reference/agents/command-and-skills.md` to document the `skills:` frontmatter field and the `## Skill Enablement` section convention (single-source protocol + per-role table).
+- [X] T024 [P] [US3] Update `docs/reference/agents/design.md` to reference the skill-enablement convention and its single-source snippet.
 - [X] T025 [US3] Verify uniformity (quickstart Scenario 1 uniformity check, SC-005): confirm all 7 agents share identical protocol text and section location, differing only in the skill table.
 
 **Checkpoint**: Skill guidance is uniform, discoverable, and regeneration-safe.
@@ -204,13 +204,13 @@ Task: "Edit agents/ux-analyst.agent.md — skills frontmatter + Skill Enablement
 
 ```bash
 # Mirror the same additions into all 7 role templates in parallel:
-Task: "Edit skills/create-agent/templates/agent-role-requirements-analyst-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-system-designer-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-module-designer-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-test-engineer-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-qa-engineer-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-knowledge-manager-template.md"
-Task: "Edit skills/create-agent/templates/agent-role-ux-analyst-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-requirements-analyst-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-system-designer-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-module-designer-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-test-engineer-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-qa-engineer-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-knowledge-manager-template.md"
+Task: "Edit skills/internal/create-agent/templates/agent-role-ux-analyst-template.md"
 ```
 
 ---

@@ -11,7 +11,7 @@
 ## 现有机制（需复用，勿重造）
 - `skills/external/sdd-loop-driver/references/watch-model.md`：四类信号（哨兵/退出记录/PID+start ticks/心跳）、判定状态机（ANOMALY/FAILED/INCOMPLETE/DEAD/TIMEOUT/NO_SIGNAL/DONE/RUNNING）、窗口 vs deadline、`--once` 重入快照。
 - `references/stage-prompts.md`：状态脊字段与“先写后动”、stalled/reentry-required、重入程序。
-- `scripts/watch-target.sh`（只读监听）、`scripts/line-registry.py`（线路/租约/orphan 检查）、`scripts/stage-runner.sh`、`scripts/run-stage.sh`、`scripts/hook-stop.sh`/`watch-hook.sh`。
+- `skills/external/sdd-loop-driver/scripts/watch-target.sh`（只读监听）、`skills/external/sdd-loop-driver/scripts/line-registry.py`（线路/租约/orphan 检查）、`skills/external/sdd-loop-driver/scripts/stage-runner.sh`、`skills/external/sdd-loop-driver/scripts/run-stage.sh`、`skills/external/sdd-loop-driver/scripts/hook-stop.sh`/`watch-hook.sh`。
 - 现状缺口：**没有面向驱动者的统一“状态感知”入口**（把状态脊 + 四件套 + git/产物聚合成一个可读判定），**没有自动化“状态恢复”程序**（区分已完成/伪完成/中断，决定续派/重试/停线，并在驱动者退出时落 stalled）。
 
 ## 建议特性范围（requirements 裁决）

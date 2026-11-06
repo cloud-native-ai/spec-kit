@@ -7,7 +7,7 @@
 - `<skill-dir>` is `skills/external/sdd-loop-driver/` in this repository.
 - `<line-id>` is a registered line in the environment Line Registry; `<spec-dir>` is the feature's spec directory; `<repo>` is the target git repository.
 - The state spine, carriers and watchbeat are fixture files unless the scenario says otherwise.
-- The watcher is the existing `scripts/watch-target.sh`; it is never modified by this slice.
+- The watcher is the existing `skills/external/sdd-loop-driver/scripts/watch-target.sh`; it is never modified by this slice.
 - A snapshot without `--out` writes nothing. A snapshot with `--out` writes only that file.
 - `recovery_action` is advisory. Slice A never executes `resume`, `retry` or `stop`.
 

@@ -44,15 +44,15 @@
 
 **⚠️ CRITICAL**: All tests in this phase must FAIL initially. They define the target state.
 
-- [x] T002 [P] Write test `test_create_skills_no_refresh_tools_ref` in `tests/contract/test_portable_skill_creation.py` — assert `skills/create-skills/SKILL.md` does not contain "refresh-tools.sh" (FR-001)
-- [x] T003 [P] Write test `test_create_skills_no_tool_manifest_refs` in `tests/contract/test_portable_skill_creation.py` — assert `skills/create-skills/SKILL.md` does not contain "tools/system.json", "tools/shell.json", "tools/project.json" (FR-002)
-- [x] T004 [P] Write test `test_create_skills_no_obtain_tools_step` in `tests/contract/test_portable_skill_creation.py` — assert `skills/create-skills/SKILL.md` does not contain "Obtain available tools information" heading (FR-002, SC-005)
+- [x] T002 [P] Write test `test_create_skills_no_refresh_tools_ref` in `tests/contract/test_portable_skill_creation.py` — assert `skills/external/create-skills/SKILL.md` does not contain "refresh-tools.sh" (FR-001)
+- [x] T003 [P] Write test `test_create_skills_no_tool_manifest_refs` in `tests/contract/test_portable_skill_creation.py` — assert `skills/external/create-skills/SKILL.md` does not contain "tools/system.json", "tools/shell.json", "tools/project.json" (FR-002)
+- [x] T004 [P] Write test `test_create_skills_no_obtain_tools_step` in `tests/contract/test_portable_skill_creation.py` — assert `skills/external/create-skills/SKILL.md` does not contain "Obtain available tools information" heading (FR-002, SC-005)
 - [x] T005 [P] Write test `test_skills_template_no_tools_subsection` in `tests/contract/test_portable_skill_creation.py` — assert `templates/skills-template.md` does not contain "### Tools" heading or "refresh-tools.sh" (FR-003)
 - [x] T006 [P] Write test `test_skills_template_retains_resources` in `tests/contract/test_portable_skill_creation.py` — assert `templates/skills-template.md` still contains sections for scripts, references, and assets (FR-004)
 - [x] T007 [P] Write test `test_orchestration_no_refresh_tools` in `tests/contract/test_portable_skill_creation.py` — assert `templates/commands/skills.md` does not contain "refresh-tools.sh" (FR-005)
 - [x] T008 [P] Write test `test_script_no_refresh_tools_for_target` in `tests/contract/test_portable_skill_creation.py` — assert `scripts/bash/create-new-skill.sh` does not contain "refresh_tools_for_target" (FR-007)
-- [x] T009 [P] Write test `test_create_skills_mirror_parity` in `tests/contract/test_portable_skill_creation.py` — assert `skills/create-skills/SKILL.md` is byte-identical to `.specify/skills/create-skills/SKILL.md` (FR-009)
-- [x] T010 [P] Write test `test_checklist_no_tool_manifest_refs` in `tests/contract/test_portable_skill_creation.py` — assert `skills/create-skills/references/skill-creation-quality-checklist.md` does not contain "tool manifests" or "tools/system.json" (FR-011)
+- [x] T009 [P] Write test `test_create_skills_mirror_parity` in `tests/contract/test_portable_skill_creation.py` — assert `skills/external/create-skills/SKILL.md` is byte-identical to `.specify/skills/create-skills/SKILL.md` (FR-009)
+- [x] T010 [P] Write test `test_checklist_no_tool_manifest_refs` in `tests/contract/test_portable_skill_creation.py` — assert `skills/external/create-skills/references/skill-creation-quality-checklist.md` does not contain "tool manifests" or "tools/system.json" (FR-011)
 - [x] T011 Verify all T002–T010 tests FAIL by running `pytest -m contract tests/contract/test_portable_skill_creation.py -v` — confirm every test is red
 
 **Checkpoint**: All 9 contract tests exist and fail. TDD baseline established.
@@ -63,14 +63,14 @@
 
 **Goal**: Remove tool-discovery step and tool-manifest references from `create-skills/SKILL.md` so created skills are portable across environments.
 
-**Independent Test**: After completion, `skills/create-skills/SKILL.md` contains zero references to `refresh-tools.sh`, `tools/system.json`, `tools/shell.json`, `tools/project.json`, or "Obtain available tools information". Contract tests T002–T004 pass.
+**Independent Test**: After completion, `skills/external/create-skills/SKILL.md` contains zero references to `refresh-tools.sh`, `tools/system.json`, `tools/shell.json`, `tools/project.json`, or "Obtain available tools information". Contract tests T002–T004 pass.
 
 ### Implementation for User Story 1
 
-- [x] T012 [US1] Remove Step 3 ("### 3. Obtain available tools information") entirely from `skills/create-skills/SKILL.md` — delete the heading and all content under it (lines 52–65 approximately: the heading, the `scripts/bash/refresh-tools.sh` code block, the tool manifest category list, and the "Filter available tools" instruction)
-- [x] T013 [US1] Renumber remaining steps in `skills/create-skills/SKILL.md` — Step 4 → Step 3 ("Structure the Skill"), Step 5 → Step 4 ("Incrementally clarify details"), Step 6 → Step 5 ("Register the Skill"), Step 7 → Step 6 ("Validate the Skill"), Step 8 → Step 7 ("Report completion")
-- [x] T014 [US1] Remove `tools/` from the Resource Directory Layout in `skills/create-skills/SKILL.md` — in the directory tree under "#### Resource Directory Layout" (around line 96), delete the `├── tools/              # Tool descriptions (optional)` line
-- [x] T015 [US1] Remove tool-manifest references from the validation step in `skills/create-skills/SKILL.md` — in the "Progressive Disclosure" constraints section, remove any reference to `tools/` in the discovery/load steps
+- [x] T012 [US1] Remove Step 3 ("### 3. Obtain available tools information") entirely from `skills/external/create-skills/SKILL.md` — delete the heading and all content under it (lines 52–65 approximately: the heading, the `scripts/bash/refresh-tools.sh` code block, the tool manifest category list, and the "Filter available tools" instruction)
+- [x] T013 [US1] Renumber remaining steps in `skills/external/create-skills/SKILL.md` — Step 4 → Step 3 ("Structure the Skill"), Step 5 → Step 4 ("Incrementally clarify details"), Step 6 → Step 5 ("Register the Skill"), Step 7 → Step 6 ("Validate the Skill"), Step 8 → Step 7 ("Report completion")
+- [x] T014 [US1] Remove `tools/` from the Resource Directory Layout in `skills/external/create-skills/SKILL.md` — in the directory tree under "#### Resource Directory Layout" (around line 96), delete the `├── tools/              # Tool descriptions (optional)` line
+- [x] T015 [US1] Remove tool-manifest references from the validation step in `skills/external/create-skills/SKILL.md` — in the "Progressive Disclosure" constraints section, remove any reference to `tools/` in the discovery/load steps
 - [x] T016 [US1] Run contract tests T002–T004: `pytest tests/contract/test_portable_skill_creation.py::test_create_skills_no_refresh_tools_ref tests/contract/test_portable_skill_creation.py::test_create_skills_no_tool_manifest_refs tests/contract/test_portable_skill_creation.py::test_create_skills_no_obtain_tools_step -v` — all three must pass
 
 **Checkpoint**: US1 contract tests pass. `create-skills/SKILL.md` has no tool-discovery logic.
@@ -135,11 +135,11 @@
 
 **Purpose**: Quality checklist update, improve-skills update, mirror sync, existing test fix, and full validation.
 
-- [x] T032 [P] Update `skills/create-skills/references/skill-creation-quality-checklist.md` — in the "Resource Organization" section, remove the mention of `tools/` and "generated tool manifests from project scripts" from the checklist item about acceptable resource directories (FR-011)
-- [x] T033 [P] Update `skills/improve-skills/SKILL.md` Step 6 (validation) — remove the bullet about refreshing tool manifests with `create-new-skill.sh --refresh-only` or `refresh-tools.sh` (around line 70), and remove the paragraph about distinguishing generated manifests from instruction changes (around lines 71-72)
-- [x] T034 Sync mirror: copy `skills/create-skills/SKILL.md` to `.specify/skills/create-skills/SKILL.md` (byte-identical copy)
-- [x] T035 Sync mirror: copy `skills/create-skills/references/skill-creation-quality-checklist.md` to `.specify/skills/create-skills/references/skill-creation-quality-checklist.md` (byte-identical copy)
-- [x] T036 Sync mirror: copy `skills/improve-skills/SKILL.md` to `.specify/skills/improve-skills/SKILL.md` (byte-identical copy)
+- [x] T032 [P] Update `skills/external/create-skills/references/skill-creation-quality-checklist.md` — in the "Resource Organization" section, remove the mention of `tools/` and "generated tool manifests from project scripts" from the checklist item about acceptable resource directories (FR-011)
+- [x] T033 [P] Update `skills/external/improve-skills/SKILL.md` Step 6 (validation) — remove the bullet about refreshing tool manifests with `create-new-skill.sh --refresh-only` or `refresh-tools.sh` (around line 70), and remove the paragraph about distinguishing generated manifests from instruction changes (around lines 71-72)
+- [x] T034 Sync mirror: copy `skills/external/create-skills/SKILL.md` to `.specify/skills/create-skills/SKILL.md` (byte-identical copy)
+- [x] T035 Sync mirror: copy `skills/external/create-skills/references/skill-creation-quality-checklist.md` to `.specify/skills/create-skills/references/skill-creation-quality-checklist.md` (byte-identical copy)
+- [x] T036 Sync mirror: copy `skills/external/improve-skills/SKILL.md` to `.specify/skills/improve-skills/SKILL.md` (byte-identical copy)
 - [x] T037 Update `tests/contract/test_create_skills_prompt_assets.py` — in `test_create_skills_uses_relative_resource_paths` (line 206), remove `"./tools/"` from the `rel_patterns` list so the test no longer expects a tools path reference
 - [x] T038 Run mirror parity test T009: `pytest tests/contract/test_portable_skill_creation.py::test_create_skills_mirror_parity -v` — must pass
 - [x] T039 Run checklist test T010: `pytest tests/contract/test_portable_skill_creation.py::test_checklist_no_tool_manifest_refs -v` — must pass
@@ -164,7 +164,7 @@
 
 ### User Story Dependencies
 
-- **US1 (P1)**: Independent — edits `skills/create-skills/SKILL.md` only
+- **US1 (P1)**: Independent — edits `skills/external/create-skills/SKILL.md` only
 - **US2 (P1)**: Independent — edits `templates/skills-template.md` only
 - **US3 (P2)**: Independent — edits `templates/commands/skills.md` only
 - **US4 (P3)**: Independent — edits `scripts/bash/create-new-skill.sh` only
@@ -188,7 +188,7 @@ All four user stories touch different files and have zero cross-dependencies. Th
 
 ```bash
 # After Phase 2 (foundational tests written), all stories can start in parallel:
-# Stream 1: US1 — edit skills/create-skills/SKILL.md (T012–T016)
+# Stream 1: US1 — edit skills/external/create-skills/SKILL.md (T012–T016)
 # Stream 2: US2 — edit templates/skills-template.md (T017–T019)
 # Stream 3: US3 — edit templates/commands/skills.md (T020–T024)
 # Stream 4: US4 — edit scripts/bash/create-new-skill.sh (T025–T031)

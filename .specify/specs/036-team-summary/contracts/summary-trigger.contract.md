@@ -3,7 +3,7 @@
 **Requirement → Feature**: `036-team-summary` → Feature 027 Team Management
 **Covers**: FR-012…FR-016, FR-028
 **Pinned by**: `tests/contract/test_summary_trigger.py`
-**Edited surfaces**: `skills/create-team/SKILL.md`, `templates/commands/team.md` (+ 6 mirrors/copies)
+**Edited surfaces**: `skills/internal/create-team/SKILL.md`, `templates/commands/team.md` (+ 6 mirrors/copies)
 
 ## Trigger points
 
@@ -60,7 +60,7 @@ The run mode's preview→confirm→execute sequence is unchanged in shape. Step 
 
 - **TG-13**: Before confirmation, the gate MUST state whether this run will produce a summary, and when it will not, which gate suppresses it.
 - **TG-14**: Disclosure MUST appear in the preview, before execution, so cost is known at decision time.
-- **TG-15**: The existing assertion that the team directory holds only `team.md` and `runs/` MUST be corrected wherever it appears. It is already inaccurate for continuous teams, which additionally hold `constraints.md`, `STATE.md`, and `run-log.jsonl`; this mechanism adds `items.jsonl`. Affected locations: the output-discipline line in `templates/commands/team.md`, the Rules bullet and the Hard Constraints bullet in `skills/create-team/SKILL.md`, and every mirrored copy.
+- **TG-15**: The existing assertion that the team directory holds only `team.md` and `runs/` MUST be corrected wherever it appears. It is already inaccurate for continuous teams, which additionally hold `constraints.md`, `STATE.md`, and `run-log.jsonl`; this mechanism adds `items.jsonl`. Affected locations: the output-discipline line in `templates/commands/team.md`, the Rules bullet and the Hard Constraints bullet in `skills/internal/create-team/SKILL.md`, and every mirrored copy.
 
 ## Goal-scope rules
 

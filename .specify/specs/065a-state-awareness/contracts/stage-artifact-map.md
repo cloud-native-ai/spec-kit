@@ -1,7 +1,7 @@
 # Contract: 阶段产物映射与提交证据
 
 **Scope**: 阶段 → 必需产物 / owned 路径 / 提交义务的唯一定义，以及“产物完整性”和“提交证据”的机械判据。
-**Owner pair**: 运行时机器权威为 `scripts/loop-state.py` 的 `STAGE_ARTIFACTS` 数据表；人类可读 owner 为 `references/state-awareness.md` §Stage Artifact Map。本文件的 §2 表是 plan 阶段的接口定义，实施后作为 dated 设计记录，不再作为 live owner。契约测试 MUST 断言 script 与 reference 逐项一致（`C-50`）。U4 核验清单的 owner 是 `references/stage-prompts.md` § Independent Verification；plan-owned 集合的 owner 是 `references/efficiency-model.md` §3.1。`提交齐备` 谓词的唯一 owner 是 `interruption-and-action.md` C-46（`IA-14`）；本契约只定义它消费的证据状态。
+**Owner pair**: 运行时机器权威为 `skills/external/sdd-loop-driver/scripts/loop-state.py` 的 `STAGE_ARTIFACTS` 数据表；人类可读 owner 为 `references/state-awareness.md` §Stage Artifact Map。本文件的 §2 表是 plan 阶段的接口定义，实施后作为 dated 设计记录，不再作为 live owner。契约测试 MUST 断言 script 与 reference 逐项一致（`C-50`）。U4 核验清单的 owner 是 `references/stage-prompts.md` § Independent Verification；plan-owned 集合的 owner 是 `references/efficiency-model.md` §3.1。`提交齐备` 谓词的唯一 owner 是 `interruption-and-action.md` C-46（`IA-14`）；本契约只定义它消费的证据状态。
 
 ## 0. 条款编号与别名
 

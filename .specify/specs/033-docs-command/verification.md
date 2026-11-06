@@ -25,7 +25,7 @@ post_change_regen_check=OK (zero drift, all 19 command stems × 5 tool dirs + .s
 # (test_docs_utils_cli 11, test_docs_command_template 11, test_docs_step_injection 24,
 # scenarios 3+lifecycle 4 minus overlaps), sync batch 63/63 green. Three stale pins
 # fixed in the same change (conftest/claude/qoder distribution paths, phantom
-# docs/usage.md row, fragile constitution-version pin per baseline-discipline lesson).
+# docs/tutorials/quickstart.md row, fragile constitution-version pin per baseline-discipline lesson).
 
 # -- Success Criteria evaluation --
 

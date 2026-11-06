@@ -1,7 +1,7 @@
 # Data Model — 066-loop-state-awareness-a
 
 **Date**: 2026-10-21 | **Slice**: A (state awareness) of Feature 065
-**Scope**: the projection this slice emits and the evidence it reads. Existing owners are not redefined: watch verdicts belong to `scripts/watch-target.sh` / `references/watch-model.md`; stall defaults, U4 and spine write points belong to `references/stage-prompts.md`; the plan-owned artifact set belongs to `references/efficiency-model.md` §3. The new owner reference `references/state-awareness.md` carries the numbered rule tables this model references.
+**Scope**: the projection this slice emits and the evidence it reads. Existing owners are not redefined: watch verdicts belong to `skills/external/sdd-loop-driver/scripts/watch-target.sh` / `references/watch-model.md`; stall defaults, U4 and spine write points belong to `references/stage-prompts.md`; the plan-owned artifact set belongs to `references/efficiency-model.md` §3. The new owner reference `references/state-awareness.md` carries the numbered rule tables this model references.
 
 ## 1. Entities
 

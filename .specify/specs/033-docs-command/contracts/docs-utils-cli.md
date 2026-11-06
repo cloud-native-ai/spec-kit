@@ -1,11 +1,11 @@
-# Contract: docs-utils.py 引擎 CLI（scripts/python/docs-utils.py）
+# Contract: docs-utils.py 引擎 CLI（skills/external/create-docs/scripts/docs-utils.py）
 
-确定性引擎脚本契约（FR-006d/FR-007 确定性维度）。标准库-only；stdout 输出单个 JSON 对象；镜像 `.specify/scripts/python/docs-utils.py` 字节一致。字面量以 requirements.md Shared Strings 为准。
+确定性引擎脚本契约（FR-006d/FR-007 确定性维度）。标准库-only；stdout 输出单个 JSON 对象；镜像 `skills/external/create-docs/scripts/docs-utils.py` 字节一致。字面量以 requirements.md Shared Strings 为准。
 
 ## 调用形态
 
 ```bash
-python3 scripts/python/docs-utils.py --action <action> [--root <project-root>] [其余 action 特定参数]
+python3 skills/external/create-docs/scripts/docs-utils.py --action <action> [--root <project-root>] [其余 action 特定参数]
 ```
 
 - **C-1** 参数解析 MUST 为单一 argparse，`--action` 取值集合固定为：`scan | expire | clean | archive-check | stats | validate | fix-links | audit`。新增动作属契约变更。

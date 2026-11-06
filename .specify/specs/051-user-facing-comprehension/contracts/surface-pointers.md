@@ -21,7 +21,7 @@
 | 4 | `templates/commands/clarify.md` | ⑤ |
 | 5 | `shared/guidelines/requirements-guidelines.md` | ⑤⑦ |
 | 6 | `shared/guidelines/proactive-trigger.md` | ⑥ |
-| 7 | `skills/summarize-project/references/reporting-playbook.md` | ⑧ |
+| 7 | `skills/internal/summarize-project/references/reporting-playbook.md` | ⑧ |
 | 8 | `shared/workflow/glossary.md` | ⑨ |
 
 **C-2** `confirmation-gates.md` 的指针 MUST 落在**头部所有权区**(`:3-5`,紧邻既有的"命令模板与技能 MUST 以单行引用接入本文档"规则),MUST NOT 落在 `:7-52` 的任何判据节内。一行头部指针覆盖 ①②⑩⑪ 四类,MUST NOT 拆成四条分节指针(SC-004 的"仅含一行")。
@@ -50,7 +50,7 @@
 
 ## 搬家 C:`summarize-project`(FR-022)
 
-**C-11** `skills/summarize-project/references/reporting-playbook.md` §1.7(`:109-113`)MUST 已收敛为指针;其内部标识黑名单与读者向改写映射 MUST 已提升进真源文档(`discipline-doc.md` C-10 的另一侧)。
+**C-11** `skills/internal/summarize-project/references/reporting-playbook.md` §1.7(`:109-113`)MUST 已收敛为指针;其内部标识黑名单与读者向改写映射 MUST 已提升进真源文档(`discipline-doc.md` C-10 的另一侧)。
 
 **C-12** `shared/` + `skills/` 下**独立黑名单副本数 MUST 为 0**——即除真源文档外,不存在第二份枚举内部标识类别的清单。`reporting-playbook.md:309` 的落盘门禁与 `references/project-overview.md:51` 的 `- [ ] 无内部黑话;外部读者不读代码也能看懂` MUST **保留**(它们是该界面类的落盘检查,不是黑名单定义)。
 
@@ -64,7 +64,7 @@
 
 **C-13** `shared/` + `templates/` + `skills/` 下以**内容形态**复述真源文档规则的位置数 MUST 为 **0**。复述的判定针:白名单条件、黑名单条件、上下文下限项、上限约束、机械判问、七个 H2 节名(对齐 `test_one_source_of_truth.py:142-153` 与 `test_token_efficiency_discipline.py:94-104` 的既有扫描形态)。**豁免**:真源文档自身;机械副本(`.specify/**` 镜像、4 棵按工具命令树、`docs/public/**`);测试内钉死的字面量常量。
 
-**C-14** `templates/commands/interview.md` 与 `templates/commands/clarify.md` 改动后,4 棵按工具副本树(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`)MUST 经 `regen-command-copies.py` 再生且 `--check` 返回 0;MUST NOT 存在手工批改痕迹。注意 `.specify/templates/commands/` 镜像**已退役**(`sync-mirrors.py:73` 的 templates 对排除 `commands`),MUST NOT 被创建。
+**C-14** `templates/commands/interview.md` 与 `templates/commands/clarify.md` 改动后,4 棵按工具副本树(`.claude/commands/`、`.github/prompts/`、`.qoder/commands/`、`.opencode/command/`)MUST 经 `regen-command-copies.py` 再生且 `--check` 返回 0;MUST NOT 存在手工批改痕迹。注意 `templates/commands/` 镜像**已退役**(`sync-mirrors.py:73` 的 templates 对排除 `commands`),MUST NOT 被创建。
 
 ---
 

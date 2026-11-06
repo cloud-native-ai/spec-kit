@@ -31,7 +31,7 @@
 
 **C-8** **通道二 · 制作者要求(命令侧)**:`templates/commands/agents.md` 的 `### Run Mode (subagent dispatch)` 节 MUST 含一条注入义务,指向真源文档;该节既有的 4 步序列(Resolve / Present & dispatch / Dispatch / Report)与 `**Scope boundary**` 段 MUST **逐字未变**。〔制品类〕
 
-**C-9** **通道二 · 制作者要求(技能侧)**:`skills/create-agent/SKILL.md` 的创作契约 MUST 含一条"注入子句 MUST 在场"的要求;其既有的"六个必备正文节"与"`## Self-Improvement Contract` 恰好一次"要求 MUST 逐字未变。〔制品类〕
+**C-9** **通道二 · 制作者要求(技能侧)**:`skills/internal/create-agent/SKILL.md` 的创作契约 MUST 含一条"注入子句 MUST 在场"的要求;其既有的"六个必备正文节"与"`## Self-Improvement Contract` 恰好一次"要求 MUST 逐字未变。〔制品类〕
 
 **C-10** **通道二 · 出厂预设**:`agents/skill-verifier.agent.md` 与 `agents/structure-adjuster.agent.md`(实测 `agents/*.agent.md` 恰为 **2** 份)MUST 各含**恰好一对** C-1 的定界符,且区间内文本与真源文档拥有者区间**逐字节相等**(V2)。〔制品类〕
 
@@ -39,7 +39,7 @@
 
 **C-12** **通道二 · 有界性**:守卫的断言对象 MUST 是 C-10 枚举的**有界集合**(2 份出厂预设 + C-8/C-9 的两处创作要求文本),MUST NOT 试图枚举 `.specify/agents/instances/`(实测为空且由用户日后创建)。枚举一个无界集合的守卫要么漏要么恒红(FR-061 / D-3 裁定)。〔制品类〕
 
-**C-13** **通道三 · 团队载荷**:`skills/create-team/references/patterns.md` 的 Per-Agent Payload 表 MUST 由 5 个字段行增至 **6** 个,新增行字段名为 `fast_fail_clause`,其内容规则 MUST 指向真源文档的拥有者字面量(D-3)。〔制品类〕
+**C-13** **通道三 · 团队载荷**:`skills/internal/create-team/references/patterns.md` 的 Per-Agent Payload 表 MUST 由 5 个字段行增至 **6** 个,新增行字段名为 `fast_fail_clause`,其内容规则 MUST 指向真源文档的拥有者字面量(D-3)。〔制品类〕
 
 > *本条的 **6** 是 052 落地时点的行数;行数的现行拥有者是守卫 `test_i13`(2026-09-24 复核:该表因本特性之外的改动增入 `incremental_landing`,今为 7 行,守卫同批要求两行同时在场)。本条的规范内容是「`fast_fail_clause` 行在场且指向拥有者字面量」,不是行数本身。*
 
@@ -61,7 +61,7 @@
 
 **C-21** 真源文档 MUST 载明**异常停 ≠ 普通失败**,且该排除 MUST 覆盖既有的**全部**失败规则——两振停滞、"连续两次派发失败即降级"、以及"非并行任务失败即停 / 并行任务成功者继续、失败者上报"(FR-055 / FR-071)。守卫形态为三个被排除规则各自的关键短语在真源文档中命中。〔制品类〕
 
-**C-22** 真源文档 MUST 载明:注入义务对 native / virtual / external **三种执行模式同等成立**,且 virtual 模式 MUST NOT 因"会话本身持有常驻层"而豁免(FR-057);注入 MUST 是**调用方**的内容义务,MUST NOT 被实现进派发包装器(FR-058),据此 `skills/create-team/scripts/dispatch.sh` 与其流过滤脚本 MUST 零改动。〔制品类〕
+**C-22** 真源文档 MUST 载明:注入义务对 native / virtual / external **三种执行模式同等成立**,且 virtual 模式 MUST NOT 因"会话本身持有常驻层"而豁免(FR-057);注入 MUST 是**调用方**的内容义务,MUST NOT 被实现进派发包装器(FR-058),据此 `skills/internal/create-team/scripts/dispatch.sh` 与其流过滤脚本 MUST 零改动。〔制品类〕
 
 **C-23** 真源文档 MUST 载明**派发链逐跳重新注入**(FR-059)与**注入子句优先于 Agent 定义正文**的裁决顺序,且该冲突本身 MUST 作为异常回抛、MUST NOT 由子代理自行择一(FR-060)。〔制品类〕
 

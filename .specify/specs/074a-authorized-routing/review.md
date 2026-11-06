@@ -225,7 +225,7 @@ was changed by this audit; `G7` and `G2` keep their documented `direct` verdicts
 - **Proposed fix**: introduce a `PARENT-EDIT:` (or, generally, `READ-ONLY-EDIT:`) declaration token
   as a sibling of `PLAN-EDIT:` in the implement stage's declaration protocol, and make the
   read-only surface list an explicit `--plan-owned`/`--read-only` input to
-  `scripts/external/audit-plan-changes.py`, so the audit reports undeclared touches of *any*
+  `skills/external/sdd-loop-driver/scripts/audit-plan-changes.py`, so the audit reports undeclared touches of *any*
   declared-immutable path. Additionally require the closing task to state the measurement range's
   own commit, so a baseline that sits downstream of the audited event is visible on the face of the
   log.

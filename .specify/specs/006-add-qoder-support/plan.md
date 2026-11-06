@@ -3,7 +3,7 @@
 **Branch**: `006-add-qoder-support` | **Date**: 2026-03-29 | **Spec**: [.specify/specs/006-add-qoder-support/requirements.md](.specify/specs/006-add-qoder-support/requirements.md)
 **Input**: Specification from `.specify/specs/006-add-qoder-support/requirements.md`
 
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command. See `templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
@@ -169,7 +169,7 @@ N/A
 2. [CN] `src/specify_cli/__init__.py` [CN] `AGENT_CONFIG`[CN]`--ai` [CN]CLI [CN] `check()` [CN] Qoder [CN] CLI [CN]
 3. [CN] Qoder [CN] `.qoder/project_rules.md` [CN]
 4. [CN] `templates/commands/*.md`[CN]`templates/plan-template.md`[CN]`templates/instructions-template.md` [CN]
-5. [CN] `README.md`[CN]`docs/installation.md`[CN]`docs/usage.md` [CN]
+5. [CN] `README.md`[CN]`docs/tutorials/installation.md`[CN]`docs/tutorials/quickstart.md` [CN]
 6. [CN]/[CN] CLI [CN] Qoder[CN]
 7. [CN]CLI [CN] contract/integration/unit [CN]
 8. [CN] Feature 020 [CN] Feature Memory [CN]

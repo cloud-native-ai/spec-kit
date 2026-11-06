@@ -1,0 +1,73 @@
+# GM-12 要件 4 — does the "four failure names" predicate admit any true positive?
+
+Probe date: 2026-11-05. Purpose: decide the T027 scan vocabulary by measurement, not by
+preference. E-10 is data-model.md's failure table; FR-024 states the same four classes
+as prose conditions and carries no identifier of its own.
+
+## 1. The four class names, across the whole skill/command surface
+
+$ grep -rniE 'zero-hit|out-of-ladder|dual-layer' skills/ templates/ --include=*.md | wc -l
+0
+
+$ grep -rn 'unreadable' skills/ .specify/skills/ templates/ --include=*.md | wc -l
+39
+
+The three distinctive names have **zero** occurrences anywhere outside the owner, the
+mirror and the fixture (verified by the containment scan below). The fourth,
+`unreadable`, occurs 39 times, every one of them an ordinary English word in another
+Skill's own contract:
+
+  skills/internal/sanitize-materials/SKILL.md:259   a record status in its own status set
+  skills/internal/sanitize-materials/SKILL.md:369   "unreadable exec-quant records"
+  skills/internal/implement-feature/SKILL.md:124    "gate unreadable"
+  skills/internal/run-agent/SKILL.md:140            "an unreadable input (exit 2)"
+  skills/internal/manage-instructions/SKILL.md:133  "root metadata ... unreadable"
+  skills/external/improve-docs/SKILL.md:4,13        "restructure an unreadable page"
+  skills/external/{create-skills:185,improve-skills:70,merge-skills:102}
+                                                    the mechanism/policy environment-error
+                                                    class: "named but unreadable"
+
+`create-skills` / `improve-skills` / `merge-skills` are the three Skills that already
+carry the mechanism/policy landing (T011 / T014 / T030). Rewriting their
+`unreadable` to satisfy SC-007 would put the skill-reference owner's vocabulary inside
+the mechanism/policy judgement's own sentence — the C9 boundary GR-09 forbids.
+
+## 2. The Chinese condition literals — no second vocabulary
+
+$ grep -rniE '路径越界|零命中|两层同名' skills/ --include=SKILL.md
+skills/internal/run-skills/SKILL.md:33:- **零命中**:停在异常点,逐项列出上述 4 个已搜索位置,...
+
+This is the one genuine copy: `run-skills` § 33 restates the owner's first failure
+condition. It is a **known** gap, closed by T031 (Phase 8, US5), which rewrites
+`run-skills` with "zero mechanism/policy literals ... normalise-by-owner"; T027 runs
+before it and is the carrier that will turn red-then-green on it.
+
+## 3. Ruling (the scan's two vocabularies)
+
+- **Class names** (E-10, read at call time): counted by **form** — table-row leading
+  cell, definition-list member, or a token standing alone on its line. A bare adjective
+  inside an English sentence is not an identifier. Every class is printed with its
+  count (`class-name[<name>]=<n>`), so an abbreviated ruling is visible, not silent.
+- **Class criteria** (FR-024's three distinctive conditions, literal): matched with
+  whitespace and backticks normalized away. This is the vocabulary that carries no
+  false-positive ledger, and it is what the criterion-copy negative case exercises.
+
+## 4. Measured predicate result
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q \
+    tests/contract/test_skill_reference_consumers.py::test_sc007_containment_scan_reports_every_hit_and_the_file_count -rA
+
+  permitted[owner]=0
+  permitted[owner-mirror]=0
+  permitted[fixture]=0
+  class-name[zero-hit]=0
+  class-name[out-of-ladder]=0
+  class-name[unreadable]=0
+  class-name[dual-layer]=0
+  scanned=54 skills/**/SKILL.md
+  PASSED
+
+Note on the printed hit list of § 1: the `零命中` row is reported through the **criteria**
+scanner. The predicate counts it and the containment assertion fails on it — correctly:
+`run-skills` § 33 IS a copy until T031 rewrites it. The `unreadable` rows are reported
+per class with their counts and do **not** fail, per the ruling in § 3.

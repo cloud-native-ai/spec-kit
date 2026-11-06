@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "078-coaching-skills"
 feature_id: "078"
+disposition: "processed"
 partial: false
 created: "2026-10-30T06:19:08Z"
 summary: "078-coaching-skills analyze（只读）：跨 requirements/plan/tasks/contracts/data-model/quickstart/checklists/feature 注册表对账。1 CRITICAL + 3 HIGH（经 5 个 fresh-context 只读验证器：4 confirm / 1 downgrade / 0 reject）；三条约"
+introspection_ref: "introspection-20261105T080109Z#F-05"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-05"
 ---
 
 ## Review

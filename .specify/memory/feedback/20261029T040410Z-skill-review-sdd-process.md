@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "074a-authorized-routing"
 feature_id: "074"
+disposition: "processed"
 partial: false
 created: "2026-10-29T04:04:10Z"
 summary: "Process segment of the 074a slice review: 6 findings (0 P0 / 3 P1 / 3 P2) written to review.md with verbatim evidence; same-author gate did not fire (fresh dispatch); no subagent dispatch capability, "
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-27T09:29:36Z"
 summary: "clarify stage for 072: coverage scan on self-authored requirements.md; 5 underspecifications adjudicated and bound (six-severity count set FR-007/SC-001; explicit-unit-no-probe -> unarmed STR-004 FR-0"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

@@ -13,6 +13,6 @@
 | P-7 | 报告契约:每次运行强制写 `.specify/teams/<slug>/runs/<UTC-timestamp>-report.md`(含 `## Verification`);Target 指派字段逐字(`**Target 指派**: T-<nnn>(<statement>)` / `无(goal 整体)`,团队默认路径追加 `(团队默认)`);台账新条目带 `"target_ref": "T-<nnn>"` | Workflow § 7 Report | equal |
 | P-8 | `--target` 不变量:不改 Goal–Team 绑定、不改身份解析、不改 summary 送达目录——仅本次聚焦切片 | Constraints 节(逐字承接) | equal |
 | P-9 | 输出纪律:中间产物居 git-ignored `.specify/teams/.work/<slug>/`;交付物只到声明的目标路径(真源 create-team SKILL.md → Run Workspace, Reports & Output Discipline) | Constraints 节(引用不复制) | equal |
-| P-10 | continuous 循环例外门控:`skills/internal/create-team/references/operating-loops.md` + `templates/teams/project-cluster.md` 的分级门保持 | Constraints 节(引用) | equal |
+| P-10 | continuous 循环例外门控:`skills/internal/create-team/references/operating-loops.md` + `skills/internal/create-team/templates/teams/project-cluster.md` 的分级门保持 | Constraints 节(引用) | equal |
 
 **提取边界**:create/modify 语义不进 run-team(FR-012);create-team 的执行引擎引用关系不变(run-team 调用同一引擎与 references,不复制其内容)。

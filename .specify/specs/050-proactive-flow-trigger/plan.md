@@ -122,7 +122,7 @@ tests/
 | `scripts/python/trigger-utils.py` | `.specify/scripts/python/trigger-utils.py`(**STRICT 对** — mirror-only 文件报 ORPHAN 并 exit 2) | `sync-mirrors.py --check` exit 0 |
 | `scripts/bash/generate-instructions.sh` | `.specify/scripts/bash/generate-instructions.sh`(**STRICT 对**) | `sync-mirrors.py --check` exit 0 |
 | `templates/proactive-trigger-seed.json` | `.specify/templates/proactive-trigger-seed.json`(templates 对) | `diff -q` + 新 `test_trigger_seed_derivation.py` C-1 |
-| *(不改任何命令模板)* | **无 per-tool 命令副本变动**:`.claude/commands/`、`.qoder/commands/`、`.github/prompts/`、`.opencode/command/` 全部不动;`.specify/templates/commands/` 已退役(templates 对排除 commands/) | `regen-command-copies.py --check` 保持 exit 0(不变即通过) |
+| *(不改任何命令模板)* | **无 per-tool 命令副本变动**:`.claude/commands/`、`.qoder/commands/`、`.github/prompts/`、`.opencode/command/` 全部不动;`templates/commands/` 已退役(templates 对排除 commands/) | `regen-command-copies.py --check` 保持 exit 0(不变即通过) |
 | `.specify/memory/tools/trigger-utils.py.md` | `.specify/memory/tools.md`(发现清单,由 `refresh-tools.sh` 再生,**禁手改**);`.specify/tools/{system,shell,project}.json`(同脚本再生) | `refresh-tools.sh --json` 后清单含新 Tool;`generate-instructions.sh` L34–45 的 tools refresh 阶段顺带再生 |
 
 ## Phase 0: Research Review
@@ -192,7 +192,7 @@ FR-005a 要求每回合评估、FR-005 要求默认近零证据预算、FR-009�
 
 ### D-8 状态存储与跟踪边界:按变动频率切分
 
-`.specify/memory/trigger/` 与既有 `.specify/memory/feedback/`(index.json + 条目)同层同构。跟踪边界按**变动频率**切:`index.json`(配置 + 规则集 + 晋升聚合态 + 调优提议)每会话变数次 → **git 跟踪**,使用户调优跨 clone 存活(与 `.specify/git-workflow.md`、`.specify/docs/target-structure.md` 同为持久项目契约);`telemetry.jsonl` 每回合变一次 → **git 忽略**(承 `implement-loop.local.md` 先例),避免每回合 churn 污染提交。FR-009a 的轮转只作用于后者,晋升计数作为 `index.json` 里规则上的**聚合态**不受轮转影响(SC-015 据此可测)。
+`.specify/memory/trigger/` 与既有 `.specify/memory/feedback/`(index.json + 条目)同层同构。跟踪边界按**变动频率**切:`index.json`(配置 + 规则集 + 晋升聚合态 + 调优提议)每会话变数次 → **git 跟踪**,使用户调优跨 clone 存活(与 `docs/git-workflow.md`、`.specify/docs/target-structure.md` 同为持久项目契约);`telemetry.jsonl` 每回合变一次 → **git 忽略**(承 `implement-loop.local.md` 先例),避免每回合 churn 污染提交。FR-009a 的轮转只作用于后者,晋升计数作为 `index.json` 里规则上的**聚合态**不受轮转影响(SC-015 据此可测)。
 
 ### D-9 接线义务盘点:哪些计数变、哪些不变
 

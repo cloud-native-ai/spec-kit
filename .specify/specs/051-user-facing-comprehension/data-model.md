@@ -49,7 +49,7 @@
 | `templates/commands/clarify.md` | ⑤ |
 | `shared/guidelines/requirements-guidelines.md` | ⑤⑦ |
 | `shared/guidelines/proactive-trigger.md` | ⑥ |
-| `skills/summarize-project/references/reporting-playbook.md` | ⑧ |
+| `skills/internal/summarize-project/references/reporting-playbook.md` | ⑧ |
 | `shared/workflow/glossary.md` | ⑨ |
 
 **已记录的真源缺口**(不在本特性内补):类 ⑦ 的 plan/tasks 侧实测零措辞规则;类 ⑩ 无专属真源,裁定归 `confirmation-gates.md:62-66`。
@@ -85,7 +85,7 @@ FR-005 列举的 5 条:① 用户已先用的术语 ② 词汇表 canonical 术�
 
 FR-006 列举的 4 条:① 存在用户视角途径时的引擎/脚本/函数内部调用形态 ② 内部代号/分级码/字段名/库表列名渗入面向读者正文 ③ 该消费单元内首次出现却无就地注解的缩写 ④ 以代码符号名充当行为概念名的提问。
 
-**实例来源(FR-022 的提升结果)**: `skills/summarize-project/references/reporting-playbook.md` §1.7(`:109-113`)的内部标识黑名单(`T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)与读者向改写映射(`unknown-schedule` → 「无计划日期,无法判定延期」)提升进 E1 作为条目 ② 的实例来源;提升后 §1.7 收敛为指针,MUST NOT 保留第二份独立黑名单(SC-014)。
+**实例来源(FR-022 的提升结果)**: `skills/internal/summarize-project/references/reporting-playbook.md` §1.7(`:109-113`)的内部标识黑名单(`T1–T5`、`E1–E5`、`RC-*`、`CG-*`、`§编号`、`M-*`、引擎字段名、库/表/列/SQL、脚本名)与读者向改写映射(`unknown-schedule` → 「无计划日期,无法判定延期」)提升进 E1 作为条目 ② 的实例来源;提升后 §1.7 收敛为指针,MUST NOT 保留第二份独立黑名单(SC-014)。
 
 **E3/E4 的临界裁定**(规格 Edge Cases 已载,此处为结构化落地):无用户视角途径时 → E3 ③ 优先,原始标识符保留但标注为引擎细节;用户先用行话 → E3 ① 优先,MUST NOT 降级改写;白话改写损失精度 → 精度优先,保留术语并就地注解;机器消费的消息 → 不属任何 E2 类,本纪律不适用。
 

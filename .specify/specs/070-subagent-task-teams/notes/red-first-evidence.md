@@ -315,7 +315,7 @@ Append-only record of each new-behavior test row's failing run and its red-to-gr
   python3 -m pytest -q tests/contract/test_sdd_loop_driver_wp_preset.py
   ```
 - **Real output**: `13 failed, 1 passed in 0.14s`; exit code `1`.
-- **Failing group (real)**: every ST behavior test fails because `templates/stage-team-preset.md` does not exist (`AssertionError: missing stage-team preset`) and `wp_driver_sim.adapt_stage_team` does not exist; the two text pins on the runtime owner also fail because the adapter section is absent. The single passing case is `test_st_10_create_team_and_run_team_are_not_modified`, an anti-drift pin that holds before the change (disclosed; it is not cited as new-behavior evidence).
+- **Failing group (real)**: every ST behavior test fails because `skills/external/sdd-loop-driver/templates/stage-team-preset.md` does not exist (`AssertionError: missing stage-team preset`) and `wp_driver_sim.adapt_stage_team` does not exist; the two text pins on the runtime owner also fail because the adapter section is absent. The single passing case is `test_st_10_create_team_and_run_team_are_not_modified`, an anti-drift pin that holds before the change (disclosed; it is not cited as new-behavior evidence).
 - **Command 2**:
   ```sh
   python3 -m pytest -q tests/integration/test_wp_coordination_dry_runs.py -k "no_team_directory"

@@ -1,0 +1,62 @@
+# T038 — frozen-hash registration points
+
+Captured 2026-11-05 during implement Part 5, at the working tree over HEAD fa563b0e.
+
+## Red (before this part's registration) — see test-evidence/implement-part5-red.txt
+
+```
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+AssertionError: non-wiring source changed (C-5 ...). drifted:
+['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md',
+ 'skills/external/merge-skills/SKILL.md']
+```
+
+`run-skills` was already keyed (078 entry). `coaching-skills` is not a manifest entry (see below).
+
+## Registrations landed
+
+- NEW key `skills/external/create-skills/SKILL.md` — reason names FR-012 + FR-026; markers
+  `Mechanism / policy separation`, the mechanism/policy owner path, the skill-reference owner path.
+- NEW key `skills/external/improve-skills/SKILL.md` — reason names FR-013 + FR-026; markers
+  `policy source missing or ambiguous`, the mechanism/policy owner path, the skill-reference owner path.
+- NEW key `skills/external/merge-skills/SKILL.md` — reason names FR-014 (SW-03) + FR-026; markers
+  `changes the two layers' distribution`, `Layer split after the merge`, the skill-reference owner path.
+- UPDATED key `skills/internal/run-skills/SKILL.md` — the 078 reason is extended to cover FR-026's
+  skill-reference wiring, and the markers fold in the new step-0 wiring literal
+  `上文 Input Contract 声明的 owner` next to `coaching-skills` and the owner path.
+- `coaching-skills` — registered through `_retired_skill_register`'s replacement markers (below).
+
+## Why coaching-skills is not an ALLOWED_POST_BASELINE_CHANGES key
+
+T038's text names four new keys, `{create-skills, improve-skills, merge-skills, coaching-skills}`.
+Measured against the module and the hash list:
+
+- 069a's manifest has 74 entries and contains `create-skills` / `improve-skills` / `merge-skills` /
+  `run-skills`; it does NOT contain `skills/external/coaching-skills/SKILL.md`
+  (`grep -c coaching` over the manifest = 0).
+- The test iterates ALLOWED_POST_BASELINE_CHANGES and asserts each key IS a manifest entry
+  ("allowlisted but is not a manifest entry, so the freeze never covered it and the allowance
+  is vacuous"); a coaching key would therefore turn `test_c5` RED, not green.
+- `coaching-skills` IS covered by the freeze through the retired-path register: the manifest's
+  `skills/external/think-skills/SKILL.md` is the one entry gone from disk, and the register maps it
+  to `skills/external/coaching-skills/SKILL.md` and content-asserts the replacement.
+
+Therefore coaching's registration point is that register's marker tuple, extended with the FR-026
+source-path literal. The hash list, `WIRING_SKILLS` and every assertion stay intact; the set of
+frozen points is still the five T038 names — only coaching's carrier differs. This is a
+correction of a task premise against the measured manifest, not a weakened assertion.
+
+## Green
+
+`env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/contract/test_expression_compatibility.py`
+
+```
+................                                                         [100%]
+16 passed
+```
+
+## GR-04 / /speckit.skills invariant
+
+`templates/commands/skills.md` keeps its existing key byte-for-byte; T037 proves all 27 command
+templates (including `skills.md`) are byte-identical to `3ffeb26e`, and no GR-04 clause was edited.
+The Part 4A disclosure does not require a GR-04 change for T038.

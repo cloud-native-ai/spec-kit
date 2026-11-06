@@ -8,9 +8,12 @@ probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
 feature: "074-goal-team-sdd-unification"
+disposition: "processed"
 partial: true
 created: "2026-10-28T13:45:52Z"
 summary: "**Partial run** — U0/U1 and the plan stage artifacts completed: plan.md, research.md, data-model.md, 5 contract files with 67 clauses, quickstart.md, feature-ref.md and test-evidence; pre-analyze(plan"
+introspection_ref: "introspection-20261105T080109Z#F-10"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-10"
 ---
 
 ## Review

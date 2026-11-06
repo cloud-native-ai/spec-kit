@@ -33,8 +33,8 @@
 **Purpose**: Create directories and scaffold infrastructure needed by all user stories
 
 - [X] T001 Create feedback directory at `.specify/memory/feedback/` with `.gitkeep` file
-- [X] T002 [P] Create `skills/create-agent/references/` directory (does not exist yet)
-- [X] T003 [P] Create `skills/improve-agent/references/` directory (does not exist yet)
+- [X] T002 [P] Create `skills/internal/create-agent/references/` directory (does not exist yet)
+- [X] T003 [P] Create `skills/internal/improve-agent/references/` directory (does not exist yet)
 
 ---
 
@@ -93,23 +93,23 @@
 ### Implementation for User Story 2 — SKILL.md Sections
 
 - [X] T016 [P] [US2] Add Agent-Specific Configuration section to `skills/browser-utils/SKILL.md` — Step 1 (identify agent), Step 2 (load `${SKILL_HOME}/references/<agent-slug>-guide.md`), Step 3 (feedback capture)
-- [X] T017 [P] [US2] Add Agent-Specific Configuration section to `skills/create-agent/SKILL.md` — same three-step structure
-- [X] T018 [P] [US2] Add Agent-Specific Configuration section to `skills/improve-agent/SKILL.md` — same three-step structure
-- [X] T019 [P] [US2] Add Agent-Specific Configuration section to `skills/improve-skills/SKILL.md` — same three-step structure
+- [X] T017 [P] [US2] Add Agent-Specific Configuration section to `skills/internal/create-agent/SKILL.md` — same three-step structure
+- [X] T018 [P] [US2] Add Agent-Specific Configuration section to `skills/internal/improve-agent/SKILL.md` — same three-step structure
+- [X] T019 [P] [US2] Add Agent-Specific Configuration section to `skills/external/improve-skills/SKILL.md` — same three-step structure
 
 ### Implementation for User Story 2 — Claude Code Reference Documents
 
 - [X] T020 [P] [US2] Create `skills/browser-utils/references/claude-code-guide.md` — Tool Mapping (Bash for Playwright, Read for screenshots, Agent for parallel tests), Best Practices (headless default, /tmp scripts, auto-detect dev servers), Known Pitfalls (WebFetch doesn't support file://, timeout needed for long renders), Capability Notes (background tasks, structured output)
-- [X] T021 [P] [US2] Create `skills/create-agent/references/claude-code-guide.md` — Tool Mapping (Edit for .agent.md modifications, Agent for subagent testing, Bash for frontmatter validation), Best Practices (use Edit not Write for updates, verify symlinks via Bash), Known Pitfalls (Write overwrites without diff, Agent tool typing differences), Capability Notes (hooks, worktrees)
-- [X] T022 [P] [US2] Create `skills/improve-agent/references/claude-code-guide.md` — Tool Mapping (Read for template analysis, Edit for targeted fixes, Bash for grep-based evidence), Best Practices (minimal diffs, read before edit), Known Pitfalls (context window limits on large templates), Capability Notes (auto-memory for feedback patterns)
-- [X] T023 [P] [US2] Create `skills/improve-skills/references/claude-code-guide.md` — Tool Mapping (Read for SKILL.md analysis, Edit for targeted fixes, Bash for validation scripts, Agent for parallel analysis), Best Practices (re-read after edits, use grep for evidence), Known Pitfalls (symlink resolution differences, skill_id refresh), Capability Notes (background tasks for validation)
+- [X] T021 [P] [US2] Create `skills/internal/create-agent/references/claude-code-guide.md` — Tool Mapping (Edit for .agent.md modifications, Agent for subagent testing, Bash for frontmatter validation), Best Practices (use Edit not Write for updates, verify symlinks via Bash), Known Pitfalls (Write overwrites without diff, Agent tool typing differences), Capability Notes (hooks, worktrees)
+- [X] T022 [P] [US2] Create `skills/internal/improve-agent/references/claude-code-guide.md` — Tool Mapping (Read for template analysis, Edit for targeted fixes, Bash for grep-based evidence), Best Practices (minimal diffs, read before edit), Known Pitfalls (context window limits on large templates), Capability Notes (auto-memory for feedback patterns)
+- [X] T023 [P] [US2] Create `skills/external/improve-skills/references/claude-code-guide.md` — Tool Mapping (Read for SKILL.md analysis, Edit for targeted fixes, Bash for validation scripts, Agent for parallel analysis), Best Practices (re-read after edits, use grep for evidence), Known Pitfalls (symlink resolution differences, skill_id refresh), Capability Notes (background tasks for validation)
 
 ### Implementation for User Story 2 — Copilot Reference Documents
 
 - [X] T024 [P] [US2] Create `skills/browser-utils/references/copilot-guide.md` — Tool Mapping (terminal panel for shell commands, workspace edit for file changes), Best Practices (use @terminal for Playwright, prefer headless mode in IDE context), Known Pitfalls (limited background task support, no direct screenshot viewing in chat), Capability Notes (VS Code integration, limited shell timeout)
-- [X] T025 [P] [US2] Create `skills/create-agent/references/copilot-guide.md` — Tool Mapping (workspace edit for .agent.md, @terminal for validation), Best Practices (use Copilot-native frontmatter fields, test with agent picker), Known Pitfalls (.agent.md format differences from Claude Code), Capability Notes (agent picker integration, @agent invocation)
-- [X] T026 [P] [US2] Create `skills/improve-agent/references/copilot-guide.md` — Tool Mapping (search for template analysis, workspace edit for fixes), Best Practices (use inline suggestions for small changes), Known Pitfalls (limited multi-file diff support), Capability Notes (IDE-integrated agent testing)
-- [X] T027 [P] [US2] Create `skills/improve-skills/references/copilot-guide.md` — Tool Mapping (search for evidence, workspace edit for targeted fixes, @terminal for scripts), Best Practices (Copilot Chat for analysis, workspace edit for SKILL.md), Known Pitfalls (limited grep capabilities in chat mode, no background validation), Capability Notes (VS Code task integration)
+- [X] T025 [P] [US2] Create `skills/internal/create-agent/references/copilot-guide.md` — Tool Mapping (workspace edit for .agent.md, @terminal for validation), Best Practices (use Copilot-native frontmatter fields, test with agent picker), Known Pitfalls (.agent.md format differences from Claude Code), Capability Notes (agent picker integration, @agent invocation)
+- [X] T026 [P] [US2] Create `skills/internal/improve-agent/references/copilot-guide.md` — Tool Mapping (search for template analysis, workspace edit for fixes), Best Practices (use inline suggestions for small changes), Known Pitfalls (limited multi-file diff support), Capability Notes (IDE-integrated agent testing)
+- [X] T027 [P] [US2] Create `skills/external/improve-skills/references/copilot-guide.md` — Tool Mapping (search for evidence, workspace edit for targeted fixes, @terminal for scripts), Best Practices (Copilot Chat for analysis, workspace edit for SKILL.md), Known Pitfalls (limited grep capabilities in chat mode, no background validation), Capability Notes (VS Code task integration)
 
 - [X] T028 [US2] Run contract tests from T013–T015 and verify all pass
 
@@ -192,19 +192,19 @@
 ```bash
 # Launch all SKILL.md edits together (4 independent files):
 Task T016: "Add Agent-Specific Configuration section to skills/browser-utils/SKILL.md"
-Task T017: "Add Agent-Specific Configuration section to skills/create-agent/SKILL.md"
-Task T018: "Add Agent-Specific Configuration section to skills/improve-agent/SKILL.md"
-Task T019: "Add Agent-Specific Configuration section to skills/improve-skills/SKILL.md"
+Task T017: "Add Agent-Specific Configuration section to skills/internal/create-agent/SKILL.md"
+Task T018: "Add Agent-Specific Configuration section to skills/internal/improve-agent/SKILL.md"
+Task T019: "Add Agent-Specific Configuration section to skills/external/improve-skills/SKILL.md"
 
 # Launch all reference documents together (8 independent files):
 Task T020: "Create skills/browser-utils/references/claude-code-guide.md"
-Task T021: "Create skills/create-agent/references/claude-code-guide.md"
-Task T022: "Create skills/improve-agent/references/claude-code-guide.md"
-Task T023: "Create skills/improve-skills/references/claude-code-guide.md"
+Task T021: "Create skills/internal/create-agent/references/claude-code-guide.md"
+Task T022: "Create skills/internal/improve-agent/references/claude-code-guide.md"
+Task T023: "Create skills/external/improve-skills/references/claude-code-guide.md"
 Task T024: "Create skills/browser-utils/references/copilot-guide.md"
-Task T025: "Create skills/create-agent/references/copilot-guide.md"
-Task T026: "Create skills/improve-agent/references/copilot-guide.md"
-Task T027: "Create skills/improve-skills/references/copilot-guide.md"
+Task T025: "Create skills/internal/create-agent/references/copilot-guide.md"
+Task T026: "Create skills/internal/improve-agent/references/copilot-guide.md"
+Task T027: "Create skills/external/improve-skills/references/copilot-guide.md"
 ```
 
 ---

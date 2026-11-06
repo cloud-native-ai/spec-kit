@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-review-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-24T18:25:44Z"
 summary: "Reviewed the 069b slice at 41453812: 12 findings (P0 x2 / P1 x4 / P2 x6). The mapping's enforcement claim is a stage-level proxy that survived a nonsense-cell mutation; the slice edited expression-gat"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

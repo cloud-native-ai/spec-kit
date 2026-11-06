@@ -1,0 +1,200 @@
+SC-005 — uninvolved-reader reading (T047)
+================================================================================
+
+Criterion   : requirements.md SC-005 (Path: supporting) — one reader who did not take part
+              in this feature answers the **same** closed set from the owner document
+              alone; the reading is the number correct against the full set size.
+Carrier     : this file. SC-005 shares SC-001's denominator and MUST NOT create a second
+              question set — the snapshot below is byte-identical to SC-001's (same sha256).
+
+Date        : 2026-11-05 (Asia/Shanghai)
+Host        : Qoder CLI 1.1.83 (macOS 25.6.0 / arm64); model = the CLI's default, not pinned by this reading
+Protocol    : fresh-context read-only — a separate non-interactive process per respondent,
+              no session persistence (`--no-session-persistence`), the only built-in tool is
+              `Read` (`--tools Read`), working directory outside the repository so no project
+              instruction file (AGENTS.md / .specify/instructions.md) is in scope.
+Owner copy  : shared/definitions/mechanism-policy-definitions.md with the answer-key section
+              (`## Worked Examples`) removed — sha256 c49fce7767ef97b88befbb6275fae4700acf8f6a5fabf4aec9ed92b88a8747f3
+              The normative body (§ Terminology / § Boundary Test / § Misplacement Symptoms /
+              § Archival Rules / § Consumption Contract / § Meta-layer Membership /
+              § Boundaries / § Change Log) is given in full.
+Question set: the owner's own 14 samples S-01…S-14, re-labelled Q-01…Q-14 in a fixed
+              deterministic shuffle (seed 8211) so the section labels ("机制侧" /
+              "策略误置" …) cannot leak the answer. Snapshot sha256 9e8926b0d364c63c67870f1458c91bb7850891efd4c79affcc52c945baa03aaa
+              Denominator = 14 = the owner appendix's own count; this is the ONLY question
+              set (SC-001 and SC-005 share it; no second set exists).
+
+
+## 1. The reader's invocation (verbatim prompt)
+
+A third fresh process — not judge A, not judge B, and framed as a reader rather than as a
+judge — against its own copy of the same two files:
+
+    qodercli -p --no-session-persistence --tools Read --permission-mode default \
+      "你是一位从未参与过本项目、也没有参与撰写 owner.md 的读者。请阅读 owner.md 与
+       questions.md，仅凭 owner.md 回答：questions.md 里的每个片段该归哪一层。每题一个答案，
+       取值必须是 机制、策略、待澄清。每题一行，形如 Q-01: 策略 。不需要说明理由。"
+
+The set is SC-001's set: same 14 items, same neutral ids, same shuffled order, same owner
+copy (see the two sha256 in the header). No new question was written for this criterion.
+
+## 2. The set snapshot (verbatim — the same bytes as SC-001's § 2)
+
+# Question set snapshot (owner § Worked Examples, 14 items)
+
+### Q-01
+
+```text
+| merge-skills | included | 产出合并后的目标技能 |
+```
+
+### Q-02
+
+```text
+## Requirements
+```
+
+### Q-03
+
+```text
+def normalize(raw): 去掉首尾空白，再剥一层包裹引号
+```
+
+### Q-04
+
+```text
+<!-- SKILL.md 正文 -->
+输出固定写到 /Users/alice/work/reports。
+```
+
+### Q-05
+
+```text
+# .specify/notes/TODO.md
+若 A 不满足则跳过 B；否则继续到 C。
+```
+
+### Q-06
+
+```text
+重新生成镜像，然后把结果写进项目里。
+```
+
+### Q-07
+
+```text
+机制 (Mechanism)——换掉运行环境仍然成立的那部分内容。
+```
+
+### Q-08
+
+```text
+先精确匹配技能名；只有零命中时才做一次不分大小写的比较。
+```
+
+### Q-09
+
+```text
+<!-- references/report.md -->
+默认输出到 reports/ 目录。
+```
+
+### Q-10
+
+```text
+项目模式下走完整流程，独立模式下跳过传播步骤。
+```
+
+### Q-11
+
+```text
+从用户粘在对话里的那份清单读取条目。
+```
+
+### Q-12
+
+```text
+把生成的报告写到用户本次指定的交付目录。
+```
+
+### Q-13
+
+```text
+report.py --out <dir>
+```
+
+### Q-14
+
+```text
+# 某用户目录下的 NOTES.md
+发布日期前必须先跑一遍完整性检查，再跑发布步骤。
+```
+
+
+## 3. The reader's verdict set (verbatim)
+
+Q-01: 机制
+Q-02: 机制
+Q-03: 机制
+Q-04: 策略
+Q-05: 机制
+Q-06: 策略
+Q-07: 机制
+Q-08: 机制
+Q-09: 策略
+Q-10: 策略
+Q-11: 策略
+Q-12: 策略
+Q-13: 策略
+Q-14: 机制
+
+## 4. Scoring
+
+qid  sid   key    judgeA   judgeB   reader  
+Q-01 S-11  机制     机制       机制       机制      
+Q-02 S-07  机制     机制       机制       机制      
+Q-03 S-06  机制     机制       机制       机制      
+Q-04 S-04  策略     策略       策略       策略      
+Q-05 S-08  机制     机制       机制       机制      
+Q-06 S-12  待澄清    待澄清      待澄清      策略      
+Q-07 S-09  机制     机制       机制       机制      
+Q-08 S-01  机制     机制       机制       机制      
+Q-09 S-10  策略     策略       策略       策略      
+Q-10 S-13  策略     策略       策略       策略      
+Q-11 S-14  策略     策略       策略       策略      
+Q-12 S-02  策略     策略       策略       策略      
+Q-13 S-05  策略     策略       策略       策略      
+Q-14 S-03  机制     机制       机制       机制
+
+## 5. The reading
+
+    correct = 13 / 14   (full set size = 14)
+
+One item was answered differently from the owner's own answer: **Q-06**, the boundary
+sample whose text carries a mechanism clause and a policy clause in one sentence
+("重新生成镜像，然后把结果写进项目里"). The owner's answer is `待澄清`
+(§ Boundary Test 3: when the sentence cannot be split and both readings hold, the item is
+recorded as 待澄清 with the reason); the reader collapsed it to `策略`.
+
+Recorded as it happened, not repaired:
+
+- The count is 13/14, which is **below** the full set size, so SC-005's literal wording
+  ("正确回答不少于 owner 附录给出的全部样例") is **not** met by this one reader sample.
+- SC-005's path is `supporting`: the criterion is a supplementary reading, not a closure
+  gate (`requirements.md` § SC-005's Path rationale). The decidability itself is carried
+  by SC-001 (14/14 agreement) and by the parseability guard
+  `tests/contract/test_mechanism_policy_decidability.py`.
+- The failure mode is one of reading discipline, not of the closed set: the same item was
+  answered `待澄清` by both SC-001 judges, so the value is reachable from the document.
+  A reader who stops at "this sentence mentions a path, therefore policy" skips
+  § Boundary Test's three-step rule; the document states that rule, and states that
+  待澄清 is not a third decision value but a hold that must name which layer is the real
+  constraint.
+- No second reader was run to look for a passing sample. One reader is what the criterion
+  names; running readers until one scores full marks would turn a reading into a search.
+
+## 6. Recomputing this reading
+
+Re-run § 1 against the frozen snapshot and the frozen owner copy. The set is shared with
+SC-001 by construction (identical sha256), so the two criteria cannot drift onto two
+different denominators.

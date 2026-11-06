@@ -25,7 +25,7 @@ The watcher baseline is a dated observation. The implementation resolves default
 
 ### 1.1 Watcher output and verdict ownership
 
-`scripts/watch-target.sh` owns the verdict state machine and the exit codes. The relevant observed facts:
+`skills/external/sdd-loop-driver/scripts/watch-target.sh` owns the verdict state machine and the exit codes. The relevant observed facts:
 
 - `--once` sets the window to zero and evaluates once, returning a single `WATCH` line (and an `EVIDENCE` line for terminal verdicts).
 - The `WATCH` line carries `label=`, `verdict=`, `pid=`, `heartbeat=`, `hook=`, `anomaly=`, `sentinel=`, `rc=`, `elapsed=`, `reason=`, `stream=`, `line=`, `run=`, `stage=`, `at=`, `attribution=`.
@@ -85,7 +85,7 @@ The snapshot never writes the spine.
 
 ### D-01 — One new engine action, not a Registry extension
 
-Add `scripts/loop-state.py` with `--action snapshot` and a stdlib `--self-test`; leave `recover` and `check-spine` reserved and non-mutating (they return exit 2 with an explicit "not available in this slice" error). Reason: the Registry engine owns registration/lease/ownership and is already large; the snapshot is read-only, needs spec/git evidence and must be independently testable. Rejected: extending `line-registry.py` (scope and blast radius), adding a second daemon (forbidden).
+Add `skills/external/sdd-loop-driver/scripts/loop-state.py` with `--action snapshot` and a stdlib `--self-test`; leave `recover` and `check-spine` reserved and non-mutating (they return exit 2 with an explicit "not available in this slice" error). Reason: the Registry engine owns registration/lease/ownership and is already large; the snapshot is read-only, needs spec/git evidence and must be independently testable. Rejected: extending `line-registry.py` (scope and blast radius), adding a second daemon (forbidden).
 
 ### D-02 — Watcher verbatim, derived only as a fallback
 

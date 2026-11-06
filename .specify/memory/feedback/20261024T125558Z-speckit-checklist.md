@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-10-24T12:55:58Z"
 summary: "069a checklist run: 40 items (16 verified sound / 24 open). Two spec contradictions found that a presence-absence contract suite cannot catch: humanize gains a script call (lookup) which flips it to c"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

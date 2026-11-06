@@ -54,8 +54,8 @@ Each of the four edited documents must contain the named sections below. The con
 | Document | Required Sections |
 |----------|-------------------|
 | `templates/commands/skills.md` | `Path Conventions`, `Computation Idioms`, `Paired Example`, `Migration Mapping`, `Non-shell Agents` |
-| `skills/create-skills/SKILL.md` | Renamed `SKILL_ROOT` → `SKILL_HOME` (zero residual `SKILL_ROOT` occurrences); guidance to write new Skill resources as `${SKILL_HOME}/...` |
-| `skills/improve-skills/SKILL.md` | A "Legacy path idioms" detection clause listing `./X`, `${SKILL_ROOT}/X`, agent-specific install paths as migration candidates |
+| `skills/external/create-skills/SKILL.md` | Renamed `SKILL_ROOT` → `SKILL_HOME` (zero residual `SKILL_ROOT` occurrences); guidance to write new Skill resources as `${SKILL_HOME}/...` |
+| `skills/external/improve-skills/SKILL.md` | A "Legacy path idioms" detection clause listing `./X`, `${SKILL_ROOT}/X`, agent-specific install paths as migration candidates |
 | Mirrored `.specify/skills/<name>/SKILL.md` files | Byte-equivalent to their `skills/<name>/SKILL.md` counterparts |
 
 ## Cross-Entity Invariants

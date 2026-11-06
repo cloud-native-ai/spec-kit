@@ -11,7 +11,7 @@
 ## Technical Context
 
 **Language/Version**: Python ≥ 3.8(引擎 stdlib-only,与 feedback-utils.py / evidence-utils.py 同纪律)  
-**Primary Dependencies**: 无第三方依赖;复用 `scripts/python/docs-utils.py`(模块导入,docs 树链接校验)与 `scripts/python/sync-mirrors.py`(子进程 `--check`,镜像漂移);git 证据经 `subprocess` 调用本仓 git  
+**Primary Dependencies**: 无第三方依赖;复用 `skills/external/create-docs/scripts/docs-utils.py`(模块导入,docs 树链接校验)与 `scripts/python/sync-mirrors.py`(子进程 `--check`,镜像漂移);git 证据经 `subprocess` 调用本仓 git  
 **Storage**: `.specify/memory/sanitize/findings.json` —— 累积发现台账(单一文件,稳定 ID 合并语义);归档处置移入 `.specify/archive/<原相对路径>`(既有 `.specify/archive/spec/` 先例的推广)  
 **Testing**: pytest(contract / unit / integration 标记);夹具复刻真实案例(过期 parked todo + 已合入提交)驱动 SC-001;命令模板结构契约测试对齐 046 模式  
 **Target Platform**: 跨平台本地 CLI 上下文(Linux/macOS/Windows),与既有 *-utils.py 相同  

@@ -1,0 +1,59 @@
+# Readout of the concurrent uncommitted implementation (as-of 2026-11-05, dated record)
+# captured: 2026-11-05T04:19Z
+# Purpose: FR-027 requires the implementation stage to "verify and fill gaps" of this
+# working-tree implementation instead of rewriting it. This readout is the EVIDENCE that
+# the gaps exist, so the next stage inherits a list, not an impression.
+# Scope: read-only. Nothing under skills/ or shared/ was modified or committed by this stage.
+
+## 1. What exists (working tree, uncommitted)
+- shared/definitions/skill-reference-definitions.md (4028 B) and its mirror
+  .specify/shared/definitions/skill-reference-definitions.md (byte-identical; `cmp` = IDENTICAL).
+  Sections: lead paragraph (ownership split vs the position ladder), Accepted forms,
+  Normalization (deterministic, in this order), Disambiguation rules, Failure semantics, Consumers.
+- Five consumer SKILL.md wiring edits:
+    skills/external/create-skills/SKILL.md      (Case A name parsing -> reference form accepted)
+    skills/external/improve-skills/SKILL.md     (Target identifier -> normalized first)
+    skills/external/merge-skills/SKILL.md       (source + target resolution -> reference form)
+    skills/external/coaching-skills/SKILL.md    (Invocation/Inputs/Trainee Resolution)
+    skills/internal/run-skills/SKILL.md         (Input Contract + Workflow § 1 step 0)
+- `python3 scripts/python/sync-mirrors.py --check` -> rc=0 (all pairs in sync right now).
+
+## 2. What does NOT exist
+- Tests: `grep -rn "skill-reference\|skill_reference" tests/` matches only the pre-existing
+  `test_skill_references_state_awareness_reference` (unrelated). The normalization matrix,
+  the consumer-wiring scan, the command-surface assertions and the four failure cases have
+  ZERO machine checks. SC-006..SC-009 therefore rest on an execution-time observation today,
+  which FR-030 explicitly forbids as a standing substitute.
+
+## 3. Defect found in the owner document's normalization ORDER (agent-drafted, not user-ratified)
+The document's steps 2 and 3 contradict its own Accepted-forms table:
+- Accepted forms lists `/improve-skills` (Slash reference) as an accepted form meaning
+  "the Skill behind that slash-command name".
+- Step 2 says: "If the value contains a path separator (`/`) ... treat it as a path or
+  directory reference and skip to step 5". A leading `/` IS a path separator, so
+  `/improve-skills` leaves normalization as a PATH, and step 3 ("Strip one leading `skill:`
+  label, then one leading `/` or `@`") is unreachable for every value that starts with `/`.
+  Consequence: the slash form can never normalize to a bare name under the written order.
+- `@/improve-skills` has no rule that strips `@` and then `/`; it becomes a path by step 2.
+- The table's "Directory path" row ends in the directory itself, while step 2's path test
+  admits `/`, `SKILL.md` or a trailing `/`; `skills/external/foo` only qualifies via the `/`.
+- FR-030 requires the normalized result to be one of command-surface / skill id / failure.
+  Step 5's outcome ("names go through the run-skills ladder; paths must sit inside the known
+  locations") is a resolution procedure, not a third outcome, and step 3's expectation
+  `^[A-Za-z0-9_-]+$` would reject a legitimate dotted skill name holding it to a hard failure.
+
+## 4. What the spec now asks for (this stage's contribution)
+FR-021 (deterministic order + output shape with prefix/suffix consumed, not deferred),
+FR-030 (closed three-way outcome, matrix must live at a real in-repo location),
+SC-006 (>= 12 input fixture, 100% match), SC-007 (five wirings + zero copies elsewhere),
+SC-008 (command surface + at least one negative case), SC-009 (four failure classes,
+raw+normalized pair). The § 3 defects are exactly the gap those rows exist to catch; they
+are NOT repaired here because the owner document is uncommitted user-visible work outside
+this stage's scope and the fix is an execution-time choice among readings (see the returned
+ANOMALY line).
+
+## 5. Open question left for clarify (registered, not decided here)
+Consumers cite the MIRROR path `.specify/shared/definitions/skill-reference-definitions.md`;
+this spec cites the SOURCE path `shared/definitions/skill-reference-definitions.md` (STR-004).
+Both spellings resolve to identical content today. Which spelling the consumers must carry
+is a clarify decision (C10 / FR-028 boundary); this stage changed neither.

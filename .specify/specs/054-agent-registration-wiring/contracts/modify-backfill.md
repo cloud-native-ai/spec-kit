@@ -1,6 +1,6 @@
 # Contract: Modify-Time Seat Backfill(modify 时席位回填)— 054
 
-**Scope**: FR-014。流程主体:`skills/improve-team/SKILL.md` 的 modify 流程(`/speckit.team modify` 的受端技能,`templates/commands/team.md:45,52` 既有路由)。从句形态:`md-bold-closed`(语法真源 `shared/definitions/contract-clause-definitions.md`)。
+**Scope**: FR-014。流程主体:`skills/internal/improve-team/SKILL.md` 的 modify 流程(`/speckit.team modify` 的受端技能,`templates/commands/team.md:45,52` 既有路由)。从句形态:`md-bold-closed`(语法真源 `shared/definitions/contract-clause-definitions.md`)。
 
 ## § 触发与范围(opt-in)
 

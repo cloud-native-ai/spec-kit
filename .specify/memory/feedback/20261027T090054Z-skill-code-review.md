@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-code-review-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-10-27T09:00:54Z"
 summary: "Ran the non-interactive four-step over the feature slice: base (feature-first-commit, e57052ef), triage (run, 11 code paths), start (record created, renderer text chosen by the two-condition rule), no"
+introspection_ref: "introspection-20261105T080109Z#F-03"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-03"
 ---
 
 ## Review

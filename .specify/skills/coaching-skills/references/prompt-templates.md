@@ -12,13 +12,17 @@ ordering evidence.
 ```markdown
 ## Run header
 - run-id: <YYYYMMDDTHHMMSSZ-trainee-slug>
+- chain: <caller> → <trainee> → <subject>   (direct run: <caller> → <trainee>)
 - trainee: <resolved Trainee name and path>
+- subject: <subject reference verbatim from `<work>`; its resolved path belongs to
+  `observation.md`, never retro-filled here>
 - started-at: <ISO-8601 UTC>
 
 ## Trainee
 - identifier (verbatim):
 - resolved-path:
 - layer: external | internal
+- subject-resolution: self (Trainee is the subject) | delegated to the Trainee (meta-skill)
 - failure-semantics: <extracted from the Trainee's own text>
 
 ## Outcome Correctness
@@ -104,7 +108,12 @@ expectation predicted.
 ```markdown
 ## Run header
 - run-id: <YYYYMMDDTHHMMSSZ-trainee-slug>
+- chain: <caller> → <trainee> → <subject>
 - trainee: <resolved Trainee name and path>
+- subject-resolved-path: <as reported by the Trainee; `unresolved` is a legitimate value
+  and MUST be paired with a deviation>
+- subject-evidence: <read-only post-run probe of the subject — changed file list, or
+  `none-observed` when the subject is byte-identical; recorded as `file-evidence` steps>
 - observation-window: <first observed step at> .. <last observed step at>
 
 ## Dispatch
@@ -141,8 +150,9 @@ Rules for the record:
   the Trainee's verification logic — verifying the Trainee's output is the Trainee's job,
   not an observation side effect.
 - Every step row carries a `source`: `host-event` when the host reported the step,
-  `self-report` when only the subagent's structured return described it, and
-  `observation-gap` when neither channel carried it. When both channels describe one step
+  `self-report` when only the subagent's structured return described it, `file-evidence`
+  when a read-only filesystem probe of the subject supplies the fact (never an inference),
+  and `observation-gap` when no channel carried it. When two channels describe one step
   and disagree at field level, the `host-event` value wins.
 - The gap marker `observation-gap` appears only on step rows. `## Gaps` describes the gaps
   in plain prose and does not repeat the marker; it reports the count (`gap-count`) and

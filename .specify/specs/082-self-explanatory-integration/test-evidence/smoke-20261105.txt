@@ -1,0 +1,30 @@
+# Feature 082 smoke record — the four guard classes end to end
+# Command: python3 -m pytest tests/contract/test_self_explanatory_constitution.py tests/contract/test_instructions_section_propagation.py tests/contract/test_self_explanatory_distribution.py tests/contract/test_self_explanatory_glossary.py -q
+# Run twice on the final tree; the pytest body is identical apart from its duration line, and a
+# stdout+stderr capture does not mention "stderr" (nothing is written there). No network, no cluster.
+
+run A — 2026-11-05T06:36:49Z
+  exit 0
+  ..........................................                               [100%]
+  42 passed in 8.89s
+
+run B — 2026-11-05T06:36:59Z
+  exit 0
+  ..........................................                               [100%]
+  42 passed in 9.72s
+
+# What the four modules prove, so the record is readable without opening the test files:
+#   test_self_explanatory_constitution.py       — the principle lands on template (XVIII), live (XIX) and
+#                                                 the manage-constitution mandate list, points at the
+#                                                 client-resolvable owner path, and M-1 shows deleting the
+#                                                 block turns the membership assertions red.
+#   test_instructions_section_propagation.py    — template and live both carry the section as summary +
+#                                                 pointer; the generator injects it additively into an
+#                                                 existing live file and takes C-1/C-2 red when it does not.
+#   test_self_explanatory_distribution.py       — the three documents reach a client project through
+#                                                 `specify init` (temp venv + editable install), the docs
+#                                                 page's owner pointers resolve on both sides, and M-6
+#                                                 proves the pointer guard can go red.
+#   test_self_explanatory_glossary.py           — the glossary entry exists once with origin=auto /
+#                                                 status=proposed, the retired name stays a variant, and
+#                                                 no third naming form is introduced (C-29/C-30/C-34).

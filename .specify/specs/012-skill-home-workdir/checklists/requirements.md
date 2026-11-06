@@ -32,6 +32,6 @@
 ## Notes
 
 - The spec deliberately leaves `Related Feature` as `Need clarification`; `/speckit.clarify` is expected to bind this spec to Feature 013 (Skills Command), which is the working assumption already reflected in `.specify/memory/features.md` and `.specify/memory/features/013.md`.
-- Two terms appear in the spec — `SKILL_HOME` (the new convention) and `SKILL_ROOT` (the pre-existing notation in `skills/create-skills/SKILL.md`). FR-008 explicitly requires the planning phase to reconcile precedence; this is intentional and not an unresolved ambiguity in the requirements.
+- Two terms appear in the spec — `SKILL_HOME` (the new convention) and `SKILL_ROOT` (the pre-existing notation in `skills/external/create-skills/SKILL.md`). FR-008 explicitly requires the planning phase to reconcile precedence; this is intentional and not an unresolved ambiguity in the requirements.
 - Shell-form computation idioms (`dirname $(readlink -f SKILL.md)`, `bash -c 'pwd || echo ${PWD}'`) appear in requirements as *named recipes* the template must surface, not as implementation prescriptions for the variables themselves.
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`.

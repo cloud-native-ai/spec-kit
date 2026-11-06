@@ -89,7 +89,7 @@
 | 需求清晰度 | `scripts/python/validate-requirements.py`（5 项结构检查）+ `shared/guidelines/requirements-guidelines.md` | 无（复用） |
 | 读者/目的/边界 | `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议（基准读者唯一来源）；`skills/external/create-docs/SKILL.md` § Authoring Flow R0/R4（写作前必须回答受众） | 声明形态（可机械校验的两行） |
 | 证据分级与 as-of | 无（新增面） | 语法与配对规则 |
-| 结构/链接/构建 | `skills/external/create-docs/SKILL.md` § Desired-State Baseline + `scripts/docs-utils.py --action validate|fix-links`；站点层存在时 `improve-docs` § Verify 的构建 | 无（复用，且「构建通过≠内容正确」作为负向条款） |
+| 结构/链接/构建 | `skills/external/create-docs/SKILL.md` § Desired-State Baseline + `skills/external/create-docs/scripts/docs-utils.py --action validate|fix-links`；站点层存在时 `improve-docs` § Verify 的构建 | 无（复用，且「构建通过≠内容正确」作为负向条款） |
 | 事实一致性 | `shared/guidelines/one-source-of-truth.md`（判据） | 检查器 |
 | 评审 | 既有 `/speckit.review` 流程 + `skills/internal/review-sdd-process` | 「按读者基准判定」的接口约束 |
 

@@ -1,0 +1,9 @@
+{
+  "targetFinding": "execution-window: user-reported RemoteCommand conflict (2026-11-05); evidence-engine lanes carried no SSH finding",
+  "change": "New external ssh-utils skill (scripts/ssh-exec.py always carries -o RemoteCommand=none, POSIX quoting, stdin script push, su wrapping, exit-code propagation); sdd-project-setup delegates remote execution to it; shared dispatch recipes normalized",
+  "baselineRunId": "ev-20261105-065313-sdd-project-setup",
+  "expectedSignal": {
+    "signalKey": "ssh-remotecommand-conflict-rate",
+    "direction": "reduce"
+  }
+}

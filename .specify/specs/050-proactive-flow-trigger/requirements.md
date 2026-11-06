@@ -47,7 +47,7 @@
 - **今天没有任何主动建议机制**(每回合分析义务虽已存在,却从不产出"该执行哪个流程"的建议)。既有近似物及其局限:① **25 个命令模板全部带 `## Handoffs`**(Feature 001),但那是"已调用某命令之后"的下一步提示——恰是本特性要解决的先有鸡还是先有蛋问题:不记得命令名就永远读不到 Handoffs;② `implement` 长跑模式(`templates/commands/implement.md:86–94`)用 git-ignored 状态文件 `implement-loop.local.md` 驱动有界循环,明示 "no Stop-hook required";③ feedback 阈值提示(count ≥ 阈值时一行非阻塞提示);④ better-harness(`scripts/js/better-harness/`)只对会话日志中的 hook/SessionStart/UserPromptSubmit 事件做**只读法证分析**,不是运行时触发器。
 - **计数-阈值机制已有可复用先例**:`feedback-utils.py` 的 `DEFAULT_THRESHOLD = 10`(L52)、`should_prompt(count, threshold)`(L101–102)、`resolve_threshold`(优先级:显式 CLI > 环境变量 > 存储 index > 默认,L105–116)。本特性的"N 次晋升"与之同构。
 - **确认门控治理是本特性的硬边界**:`.specify/shared/guidelines/confirmation-gates.md` 两级分类(破坏性/不可逆 → 前置确认;可逆 → 自动执行 + 三段式执行报告 L54–66)、破坏性清单(L14–22:删除、搬迁/归档、远端推送/外部权威写入、覆盖用户内容)、存疑从严(L43–45)、**回流约束**(L47–52:新命令/技能 MUST NOT 引入非破坏性阻塞门控),由 `scan-confirmation-gates.py` + 结构契约测试强制。
-- **机器维护状态的既有落盘范式**(学习状态可复用):`.specify/git-workflow.md`(`<!-- GIT_WORKFLOW_START/END -->` 受管块,指令文件只放指针)、`.specify/memory/features.md`(自动派生头部)、`.specify/memory/tools.md`(`refresh-tools.sh` 再生的发现清单)、`.specify/memory/feedback/index.json` + `probe-map.md`(引擎再生派生视图)。
+- **机器维护状态的既有落盘范式**(学习状态可复用):`docs/git-workflow.md`(`<!-- GIT_WORKFLOW_START/END -->` 受管块,指令文件只放指针)、`.specify/memory/features.md`(自动派生头部)、`.specify/memory/tools.md`(`refresh-tools.sh` 再生的发现清单)、`.specify/memory/feedback/index.json` + `probe-map.md`(引擎再生派生视图)。
 - **框架当前不掌握各 agent 的 hook 能力**:`AGENT_CONFIG`(L64–101)唯一能力位是 `requires_cli`;`_ASSISTANT_TIERS`(L851–858)只区分 CLI 形态(Tier 1: claude/codex/qoder/opencode;Tier 2: hermes/copilot);仓库与模板中**无任何 hooks 配置**(`.claude/settings.local.json`、`.qoder/settings.local.json` 仅含 `permissions.allow`,且为用户本地、非模板产物)。
 
 **与现状的差异(本需求要闭合的缺口)**:
@@ -311,7 +311,7 @@ Format: - Q: <question> → A: <answer>
 ## Assumptions
 
 - **交付通道**复用既有 symlink 模型与 `generate-instructions.sh`,不新增兼容文件类型。
-- **学习状态落盘**采用既有"机器维护 + 受管块/独立文件"范式(参照 `.specify/git-workflow.md`、`.specify/memory/features.md`、`implement-loop.local.md`),与指令文件分离,使再生与学习互不干扰。确切路径、格式与是否引擎化管理由 `/speckit.plan` 决定。
+- **学习状态落盘**采用既有"机器维护 + 受管块/独立文件"范式(参照 `docs/git-workflow.md`、`.specify/memory/features.md`、`implement-loop.local.md`),与指令文件分离,使再生与学习互不干扰。确切路径、格式与是否引擎化管理由 `/speckit.plan` 决定。
 - **阈值语义**(clarify 2026-09-07 第二轮 R2-Q3 裁定,**已决**):默认 3,可配置;计数为**连续采纳**、一次拒绝即重置——晋升编码稳定的当前偏好而非历史累计。已落 FR-010;此前的"推断默认、待确认"标注随之失效。
 - **出厂种子规则集**(clarify 2026-09-07 第二轮 R2-Q2 裁定):随 `templates/` 分发,使新项目第一天即有价值。**派生而非撰写**——来源是 25 个 `templates/commands/*.md` 既有的 `## Handoffs` 条件式(框架已持有的 situation→flow 知识真源);in-package `memory/` 已有出厂默认数据先例(constitution/features/knowledge/session)。种子的确切制品形态(独立文件 / 由脚本从 Handoffs 派生 / 引擎生成)由 `/speckit.plan` 决定,但"不得另撰第二份流程知识"是 FR-022 的硬约束。
 - **情境受控词表**(clarify 2026-09-07 第二轮 R2-Q4 裁定):粗粒度二元组 (特性生命周期阶段, 待处理信号集),小而稳定,与 Handoffs 条件式的粒度天然对齐。词表的具体取值集由 `/speckit.plan` 定义;扩展只经 FR-016 的用户确认通道。若 plan 阶段发现粗粒度抹平了关键差异,升级路径是"粗身份计数 + 细条件触发"的两级形态,而不是一开始就付该复杂度。

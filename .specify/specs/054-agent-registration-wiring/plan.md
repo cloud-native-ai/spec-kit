@@ -24,7 +24,7 @@ Feature 044(spec 040)交付了中性元数据 → 各工具真实格式的渲染
 
 1. **渲染触发 = 新增窄 CLI 子命令 `specify render-agents --ai <tool>`**(`--ai` 必填,单次渲染一个工具;验收演示以 4 次调用覆盖全部 4 个渲染模式工具,满足 US2 场景 1)。证据:渲染器唯一调用点在 init 内部(`src/specify_cli/__init__.py:2283`),CLI 现只有 `init`(:2653)与 `check`(:2993)两个子命令;重跑 init 过重且带整仓副作用,与 FR-004「直接执行渲染触发、失败披露」不符;脚本 import 模块在 uv/pipx 工具隔离下对下游项目不可达。**被拒替代**:教授重跑 `specify init`(重、副作用面大)、项目脚本 `from specify_cli import …`(环境脆弱)、独立渲染脚本(重复渲染器逻辑,违反复用与漂移纪律)。
 2. **席位来源追溯 = 中性 frontmatter 键 `team-scope: <team-slug>`**,加入 `NEUTRAL_AGENT_METADATA_KEYS` 的 framework-only 段(`renders_to_tools=False`;先例 `role-scope`,`__init__.py:139`)。证据:校验器拒绝未知键(`:273-279`),故 FR-013 的可机读追溯必须进键集;命名沿用 `capacity-scope`/`role-scope` 的 `-scope` 家族。语义 owner:代码键集(Principle VIII,code-first),分类学条目由 `agent-definitions.md` 按引用记载。
-3. **席位实例化 = create-team 以 create-agent 的既有委托入口(`AgentAuthoringRequest`,`skills/create-agent/SKILL.md:52-53`)按约定调用**,kind 走 instance 层;占位符全部解析(满足渲染器对作者模板的拒绝不变量,`:296-306`);与既有持久定义同名 slug 时冲突披露、不静默覆写(loader 的 instance-wins 语义不因建队而破坏)。
+3. **席位实例化 = create-team 以 create-agent 的既有委托入口(`AgentAuthoringRequest`,`skills/internal/create-agent/SKILL.md:52-53`)按约定调用**,kind 走 instance 层;占位符全部解析(满足渲染器对作者模板的拒绝不变量,`:296-306`);与既有持久定义同名 slug 时冲突披露、不静默覆写(loader 的 instance-wins 语义不因建队而破坏)。
 4. **FR-014 回填落在 improve-team 技能**:`/speckit.team modify` 路由至该技能(`templates/commands/team.md:45,52`),回填步在其 modify 流程内(opt-in,modify 由用户显式发起)。
 5. **逐工具渲染语义与 init 一致**:init 以 `--ai <tool>` 渲染单工具(`:2283` 上下文),render-agents 沿用;`--ai` 不接受 annotated 模式工具(codex/hermes)——报错而非静默。
 
@@ -61,7 +61,7 @@ Feature 044(spec 040)交付了中性元数据 → 各工具真实格式的渲染
 
 无独立 `research.md`(发现内联于此;外部源取证——Qoder IDE/CLI agent 目录共享——已在 spec 阶段完成并记录于 requirements.md Overview,此处不重复)。代码触点探查经 Explore 只读子代理完成(非降级路径),要点:
 
-- **create-team 挂点**:6 步流程(`skills/create-team/SKILL.md:27-32`),席位解析在 create-mode.md 步 4(:14,「prefer existing agents … otherwise temporary stage/worker templates」),直接落地在步 6(:16)——**席位实例化 + 渲染触发插在 :14 与 :16 之间**;schema 注释 `:128`(「members MUST resolve to … or a temporary stage/worker template; unresolved members are surfaced as broken references」)即 FR-008 更新点。modify 无 create-team 侧 reference——路由到 improve-team(`templates/commands/team.md:45,52`)。
+- **create-team 挂点**:6 步流程(`skills/internal/create-team/SKILL.md:27-32`),席位解析在 create-mode.md 步 4(:14,「prefer existing agents … otherwise temporary stage/worker templates」),直接落地在步 6(:16)——**席位实例化 + 渲染触发插在 :14 与 :16 之间**;schema 注释 `:128`(「members MUST resolve to … or a temporary stage/worker template; unresolved members are surfaced as broken references」)即 FR-008 更新点。modify 无 create-team 侧 reference——路由到 improve-team(`templates/commands/team.md:45,52`)。
 - **create-agent 可被委托**:prompt 技能但带结构化委托入口 `AgentAuthoringRequest`(`SKILL.md:52-53`:kind/role_slug/task/scoring_dimensions/environment_paths/…→`AuthoringResult`);kind→层映射(:37-43),instance 引用 template 须带 `capacity-scope:`(:111)——**stage 帧非已注册 template,席位实例不设 capacity-scope,由 team-scope 承载来源**。待修教学行:`SKILL.md:122`、`:127`。
 - **渲染链现状**:`render_agents_for_tool(project_path, tool, tracker=None)`(`src/specify_cli/__init__.py:615`,真文件渲染/manifest 漂移/修剪/legacy 迁移),唯一调用点 `:2283`(init 内 `copy_local_templates`);CLI 仅 `init`(:2653)/`check`(:2993);技能层今日从不 subprocess specify CLI(grep 仅散见 prose)。
 - **渲染清单**:`.specify/agents/.render-manifest.json`(`:544`,entries `{rel_path: {source, sha256}}`),仅渲染器自身与既有测试消费;SC-003 的「框架渲染产物」以它为判定面。
@@ -91,9 +91,9 @@ No standalone research.md — findings inlined above.
 
 ```text
 src/specify_cli/            # render-agents 子命令 + team-scope 中性键(校验器键集)——唯一运行时代码改动
-skills/create-team/         # 席位实例化步 + 渲染触发步(SKILL.md、references/create-mode.md:含 :128 schema 注)
-skills/improve-team/        # FR-014 modify 时席位回填步
-skills/create-agent/        # 退役 symlink 教学修正 + team-scope 作者键(SKILL.md:122/:127 及键集段)
+skills/internal/create-team/         # 席位实例化步 + 渲染触发步(SKILL.md、references/create-mode.md:含 :128 schema 注)
+skills/internal/improve-team/        # FR-014 modify 时席位回填步
+skills/internal/create-agent/        # 退役 symlink 教学修正 + team-scope 作者键(SKILL.md:122/:127 及键集段)
 templates/commands/         # agents.md:真实渲染模型 + 触发真相(无 .specify 镜像,扇出 4 工具副本)
 shared/definitions/         # agent-definitions.md:「宿主注册面」定义 owner + 席位实例分类学
 shared/workflow/            # symlink-model.md:agent 面 CLI/IDE 关系条目(FR-009)
@@ -107,13 +107,13 @@ tests/contract/             # 守卫:STR-001 缺席钉、render-agents CLI 契�
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
-| `skills/create-team/SKILL.md` | `.specify/skills/create-team/SKILL.md`(sync-mirrors skills 对) | `python3 scripts/python/sync-mirrors.py --check` 对本 spec 触及的镜像对**无新增**漂移(基线 2026-10-08 实测:exit 0 全净) |
-| `skills/create-team/references/create-mode.md` | `.specify/skills/create-team/references/create-mode.md` | 同上 |
-| `skills/improve-team/SKILL.md`(及其触及的 references) | `.specify/skills/improve-team/**` 对应件 | 同上 |
-| `skills/create-agent/SKILL.md` | `.specify/skills/create-agent/SKILL.md` | 同上 |
+| `skills/internal/create-team/SKILL.md` | `.specify/skills/internal/create-team/SKILL.md`(sync-mirrors skills 对) | `python3 scripts/python/sync-mirrors.py --check` 对本 spec 触及的镜像对**无新增**漂移(基线 2026-10-08 实测:exit 0 全净) |
+| `skills/internal/create-team/references/create-mode.md` | `.specify/skills/internal/create-team/references/create-mode.md` | 同上 |
+| `skills/internal/improve-team/SKILL.md`(及其触及的 references) | `.specify/skills/internal/improve-team/**` 对应件 | 同上 |
+| `skills/internal/create-agent/SKILL.md` | `.specify/skills/internal/create-agent/SKILL.md` | 同上 |
 | `shared/definitions/agent-definitions.md` | `.specify/shared/definitions/agent-definitions.md` | 同上 |
 | `shared/workflow/symlink-model.md` | `.specify/shared/workflow/symlink-model.md` | 同上 |
-| `templates/commands/agents.md` | 4 份工具副本:`.claude/commands/speckit.agents.md`、`.github/prompts/speckit.agents.prompt.md`、`.opencode/command/speckit.agents.md`、`.qoder/commands/speckit.agents.md`(经 `scripts/python/regen-command-copies.py`;无 `.specify/templates/commands/` 镜像——已退役) | 副本重生成后 `regen-command-copies.py` 校验通过、副本含改动(`diff -q` 对源);镜像基线同上 |
+| `templates/commands/agents.md` | 4 份工具副本:`.claude/commands/speckit.agents.md`、`.github/prompts/speckit.agents.prompt.md`、`.opencode/command/speckit.agents.md`、`.qoder/commands/speckit.agents.md`(经 `scripts/python/regen-command-copies.py`;无 `templates/commands/` 镜像——已退役) | 副本重生成后 `regen-command-copies.py` 校验通过、副本含改动(`diff -q` 对源);镜像基线同上 |
 | `src/specify_cli/__init__.py`、`docs/reference/cli/supported-agent-tools.md`、`tests/contract/*` | 无镜像(源码/文档/测试面) | N/A |
 
 ## Complexity Tracking

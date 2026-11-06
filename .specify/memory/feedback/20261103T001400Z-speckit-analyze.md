@@ -7,9 +7,11 @@ scope: "local"
 probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-03T00:14:00Z"
 summary: "analyze 081a: 3 checklist semantic FAILs adjudicated (CHK012/017/021 sustained), 8 fixes re-verified with 3 reopenings, 3 HIGH confirmed by external qodercli validators (after SDK-env defect on first "
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

@@ -22,7 +22,7 @@
 
 | 门控 | 位置 | 裁定 |
 |------|------|------|
-| team 创建确认 | templates/commands/team.md:50,83,84,97,102-104;skills/create-team/SKILL.md:32;references/create-mode.md:16;team-presets.md:9,52,55 | auto_execute |
+| team 创建确认 | templates/commands/team.md:50,83,84,97,102-104;skills/internal/create-team/SKILL.md:32;references/create-mode.md:16;team-presets.md:9,52,55 | auto_execute |
 | team 运行确认 | templates/commands/team.md:52,108-110,125,133-134;SKILL.md:38,44;execution-guide.md:31 | auto_execute |
 | team 收尾确认 | SKILL.md:236;shared/workflow/feedback-step.md:80 | auto_execute |
 | goal 写入门控 | templates/commands/goal.md:28,47 | auto_execute |
@@ -38,5 +38,5 @@
 | constitution 不可撤销确认 | templates/constitution-template.md:127-130 | keep_gate(intrinsic) |
 | glossary 冲突确认 | shared/workflow/glossary.md:41-64 | keep_gate(覆盖用户数据) |
 | git-workflow 远程门控 | skills/git-workflow/SKILL.md:28-34 | keep_gate |
-| continuous 循环分级门控 | skills/create-team/references/operating-loops.md:28-40;workspace-cluster.md:59,124 | keep_gate(D4 例外) |
+| continuous 循环分级门控 | skills/internal/create-team/references/operating-loops.md:28-40;workspace-cluster.md:59,124 | keep_gate(D4 例外) |
 | reconcile 分级模型(概念基础,非待治理门控) | shared/patterns/reconcile-pattern.md:98-104 | 参照 |

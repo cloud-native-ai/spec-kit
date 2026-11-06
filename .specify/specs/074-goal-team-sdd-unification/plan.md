@@ -213,7 +213,7 @@ mirror/generator machinery.
 ### Mirror Obligations
 
 The live mirror pairs are defined in `scripts/python/sync-mirrors.py` `MIRROR_PAIRS`; command
-templates fan out only to `regen-command-copies.py` per-tool copies (`.specify/templates/commands/`
+templates fan out only to `regen-command-copies.py` per-tool copies (`templates/commands/`
 is retired). This spec edits **no** `templates/commands/**` file, so no per-tool command copy is
 regenerated.
 

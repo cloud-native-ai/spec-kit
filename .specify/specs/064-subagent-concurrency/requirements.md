@@ -22,7 +22,7 @@
 ## 现状锚点（2026-10-20 以 master `ae0eebeb` 与相关分支实测为准；dated record，仅作可行性输入，非运行时保证）
 
 - `skills/external/sdd-loop-driver/` 已定义 U0–U6 循环、每线一份状态脊、通用阶段哨兵与独立校验；「线」目前是驱动侧概念，没有环境级 Line Registry，也没有事件级 line/run 归属信封。
-- 监听模型（`references/watch-model.md`）以 PID 文件 + start ticks + status/log/heartbeat 四件套判定，明确禁止用 `pgrep` 零匹配推断完成；判定状态机与退出码由 `scripts/watch-target.sh` 代码侧拥有。
+- 监听模型（`references/watch-model.md`）以 PID 文件 + start ticks + status/log/heartbeat 四件套判定，明确禁止用 `pgrep` 零匹配推断完成；判定状态机与退出码由 `skills/external/sdd-loop-driver/scripts/watch-target.sh` 代码侧拥有。
 - `references/dispatch-recipes.md` 的远端配方已使用 `nohup` 脱离派发；但「主会话死亡后如何重新接线」没有定义，本地/远端也没有统一 Registry。
 - `skills/internal/run-agent/SKILL.md` 拥有派发治理（fast-fail 注入、反嵌套、配置解析）；`shared/definitions/subagent-definitions.md` 拥有 Subagent 概念、三种执行模式与可见性契约。
 - 主分支当前不存在 `skills/external/sdd-loop-driver/references/cli/`；Feature 063 的在途分支 `bcf27c77` 已临时加入 CLI 能力档案（`FR-044`…`FR-049`、`contracts/cli-profiles.md` 的 `CP-01`…`CP-10`），尚未合并。

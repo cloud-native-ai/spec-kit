@@ -274,8 +274,8 @@ sleep turn and do not start any resident service.
 
 ### 缺省值（入口参数可覆盖）
 
-- 阶段超时缺省 **90 分钟**（单阶段数十分钟量级的实测基础；入口可覆盖）。
-- 同阶段重试上限缺省 **2 次**（两振停滞先例；入口可覆盖）。
+- 阶段超时缺省 **180 分钟**（1M-context 运行档下的校准值；入口可覆盖）。
+- 同阶段重试上限缺省 **3 次**（1M-context 运行档下的校准值；入口可覆盖）。
 - 预算（budget）与节奏（cadence）：预算降级沿用 on_80pct report-only / on_100pct halt 形态；cadence 仅指**回退形态（间隔轮询）**的检查频率，缺省长轮询窗口不使用固定 cadence（见 `watch-model.md` §4–§5）。
 
 ### 处置程序

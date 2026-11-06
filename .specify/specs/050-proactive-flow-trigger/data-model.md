@@ -18,7 +18,7 @@
 templates/proactive-trigger-seed.json   # 出厂种子(随包分发,携带 provenance;+ .specify/templates/ 镜像)
 ```
 
-跟踪边界按**变动频率**切分(plan.md D-8):`index.json` 承载需跨 clone 存活的用户调优(同 `.specify/git-workflow.md`、`.specify/docs/target-structure.md` 的持久项目契约定位);`telemetry.jsonl` 是高频 ephemeral churn,承 `implement-loop.local.md` 先例入 gitignore。轮转只作用于后者。
+跟踪边界按**变动频率**切分(plan.md D-8):`index.json` 承载需跨 clone 存活的用户调优(同 `docs/git-workflow.md`、`.specify/docs/target-structure.md` 的持久项目契约定位);`telemetry.jsonl` 是高频 ephemeral churn,承 `implement-loop.local.md` 先例入 gitignore。轮转只作用于后者。
 
 ---
 

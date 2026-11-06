@@ -3,7 +3,7 @@
 **Feature Branch**: `013-portable-skill-creation`  
 **Created**: 2026-06-05  
 **Status**: Draft  
-**Input**: User description: "优化templates/commands/skills.md相关的命令和skills/create-skills中的skill实现,需要让通过这个命令和skill创建的skill更加通用,比如移除tools的逻辑(创建tools的环境也就是创建skill的环境和执行skill的环境可能存在差异,tools有可能不可用)."
+**Input**: User description: "优化templates/commands/skills.md相关的命令和skills/external/create-skills中的skill实现,需要让通过这个命令和skill创建的skill更加通用,比如移除tools的逻辑(创建tools的环境也就是创建skill的环境和执行skill的环境可能存在差异,tools有可能不可用)."
 
 ## Related Feature *(mandatory)*
 
@@ -91,15 +91,15 @@ The `scripts/bash/create-new-skill.sh` script currently calls `refresh_tools_for
 - **FR-006**: The `templates/commands/skills.md` orchestration template MUST update the directory layout example to remove or mark `tools/` as optional/legacy.
 - **FR-007**: The `scripts/bash/create-new-skill.sh` script MUST NOT call `refresh_tools_for_target()` or generate tool manifest JSON files when creating or refreshing a skill.
 - **FR-008**: The `scripts/bash/create-new-skill.sh` script MUST continue to support `--refresh-only` for refreshing `skill_id` frontmatter, but without tool manifest generation.
-- **FR-009**: The `.specify/skills/create-skills/SKILL.md` mirror MUST be updated to match the canonical `skills/create-skills/SKILL.md` after changes are applied.
+- **FR-009**: The `.specify/skills/create-skills/SKILL.md` mirror MUST be updated to match the canonical `skills/external/create-skills/SKILL.md` after changes are applied.
 - **FR-010**: Existing skills that already contain a `tools/` directory MUST NOT have their `tools/` directory or contents deleted by any automated process introduced by this change.
-- **FR-011**: The `skills/create-skills/references/skill-creation-quality-checklist.md` MUST be updated to remove validation items that check for tool manifest presence or tool manifest refresh commands.
+- **FR-011**: The `skills/external/create-skills/references/skill-creation-quality-checklist.md` MUST be updated to remove validation items that check for tool manifest presence or tool manifest refresh commands.
 
 ### Key Entities
 
 - **Skill Template** (`templates/skills-template.md`): The source-of-truth boilerplate used to scaffold every new `SKILL.md`. Determines the default structure of all created skills.
 - **Orchestration Template** (`templates/commands/skills.md`): The `/speckit.skills` command definition that routes creation and improvement, including the modernization checklist.
-- **Create-Skills Skill** (`skills/create-skills/SKILL.md`): The skill that implements the creation workflow, currently containing a tool-discovery step.
+- **Create-Skills Skill** (`skills/external/create-skills/SKILL.md`): The skill that implements the creation workflow, currently containing a tool-discovery step.
 - **Skill Scaffolding Script** (`scripts/bash/create-new-skill.sh`): The shell script that creates skill directories and generates boilerplate, currently including tool manifest generation.
 
 ## Success Criteria *(mandatory)*
@@ -118,7 +118,7 @@ The `scripts/bash/create-new-skill.sh` script currently calls `refresh_tools_for
 - **SC-002 Source**: Manual or integration test: create a skill, copy the skill directory to an isolated environment without `scripts/bash/`, confirm the `SKILL.md` workflow is self-contained.
 - **SC-003 Source**: Static inspection of `templates/skills-template.md` content; can be verified by a contract test.
 - **SC-004 Source**: Integration test: create a skill with a pre-existing `tools/` directory containing custom content, run `--refresh-only`, verify `tools/` contents are unchanged.
-- **SC-005 Source**: Static inspection of `skills/create-skills/SKILL.md` step list; contract test on step headings.
+- **SC-005 Source**: Static inspection of `skills/external/create-skills/SKILL.md` step list; contract test on step headings.
 
 ## Assumptions
 

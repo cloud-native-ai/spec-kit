@@ -8,9 +8,11 @@ probe: "speckit-analyze-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "079-humanize-run-output"
+disposition: "ignored"
 partial: false
 created: "2026-10-30T11:32:16Z"
 summary: "Analyze of 079-humanize-run-output: read-only cross-artifact consistency across requirements/plan/data-model/5 contracts/quickstart/tasks/2 checklists/Feature 062/constitution/instructions. Gate verdi"
+disposition_reason: "introspection:introspection-20261105T080109Z#Excluded"
 ---
 
 ## Review

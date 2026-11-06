@@ -2,7 +2,7 @@
 
 **Requirement → Feature**: `036-team-summary` → Feature 027 Team Management
 **Date**: 2026-08-04
-**Upstream authority**: 被调技能的字段定义与约束唯一权威是 `skills/summarize-project/schema/project.sql`(DDL)。本文件**不复写**该 schema,只定义(a) 团队侧新增的持久结构,(b) 团队词汇 → 七实体的映射,(c) 身份与状态的判定规则。
+**Upstream authority**: 被调技能的字段定义与约束唯一权威是 `skills/internal/summarize-project/schema/project.sql`(DDL)。本文件**不复写**该 schema,只定义(a) 团队侧新增的持久结构,(b) 团队词汇 → 七实体的映射,(c) 身份与状态的判定规则。
 
 ## 1. 新增持久结构
 
@@ -30,12 +30,12 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 - **IL-4**:`identity: explicit` 的行,其 `item_id` MUST 匹配 `TI-<nnnn>`;`inferred` MUST 匹配 `TIX-<8hex>`。
 - **IL-5**:`supersedes` 非空时,被指向的 ID MUST 在本台账中出现过,且折叠后 MUST 只产生一条记录(FR-027)。
 
-### 1.2 Goal Summary Delivery Directory — `.specify/project/goal/<goal-slug>/` ([[STR-001]])
+### 1.2 Goal Summary Delivery Directory — `.specify/goal/<goal-slug>/` ([[STR-001]])
 
 以 **goal** 为索引的唯一完整总结。结构由被调技能规定(目录自包含),团队侧只负责生成 `data/project-input.yaml`:
 
 ```text
-.specify/project/goal/<goal-slug>/
+.specify/goal/<goal-slug>/
 ├── summary.md            # 主报告(含 ## 附注 人工批注节,刷新时保留)
 ├── assets/               # 每图 .puml + .svg + .png 同名三件套
 └── data/
@@ -75,7 +75,7 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
 |----|------|------|------|
 | `enabled` | bool | `true` | 缺省即启用(opt-out 语义,FR-013) |
 | `every` | int | continuous `5`;其余模式 `1` | 每 N 个阶段边界刷新一次。continuous MUST NOT 默认为 1(FR-013) |
-| `delivery_dir` | string | `.specify/project/goal/<goal-slug>/` | 交付目录([[STR-001]]);由解析出的 goal 身份决定,不随 team slug 变动 |
+| `delivery_dir` | string | `.specify/goal/<goal-slug>/` | 交付目录([[STR-001]]);由解析出的 goal 身份决定,不随 team slug 变动 |
 | `interactive` | bool | `false` | 团队触发为自动流程,MUST 以非交互模式调用被调技能 |
 
 **整节缺省**等价于 `{enabled: true, every: <模式默认>, delivery_dir: <默认>, interactive: false}`。
@@ -169,20 +169,20 @@ tracked、append-only、JSON Lines。每行一个**条目状态事件**。只由
               └─────────────────────────────────────┘  │        --goal <goal-slug>
                               …(该 goal 下全部 N 个团队)┘                │
                                                                           ▼
-                                    .specify/project/goal/<goal-slug>/data/project-input.yaml
+                                    .specify/goal/<goal-slug>/data/project-input.yaml
                                                                           │
                                                                           ▼
                                               summarize-project(零改动,FR-024,非交互模式)
                                               validate → project-db --load → --check → progress-engine
                                                                           │
                                                                           ▼
-                              .specify/project/goal/<goal-slug>/{summary.md, assets/, data/}
+                              .specify/goal/<goal-slug>/{summary.md, assets/, data/}
 ```
 
 **方向单一**:团队工件 → 表单 → 数据库 → 报告。反向零写入——总结步骤期间 `.specify/teams/**` 字节不变(FR-020)。`project.db` 为派生物,每次 `--load` 重建;累积状态的权威在各团队的 `items.jsonl`,不在数据库(research.md D-1),故"删除 goal 交付目录后重跑得同一份总结"成立。
 
 **两个索引的分工**:
 - `.specify/teams/<team-slug>/` —— **team 索引**,运行信息(事实源),回答"这个团队在怎么运行"。
-- `.specify/project/goal/<goal-slug>/` —— **goal 索引**,唯一完整总结(派生物),回答"这个目标推进到哪里"。
+- `.specify/goal/<goal-slug>/` —— **goal 索引**,唯一完整总结(派生物),回答"这个目标推进到哪里"。
 
 **触发与写入者**:任一团队到达其阶段边界即触发该 goal 的刷新;写入者恒为该团队的主管(FR-021)。同 goal 下两个团队邻近触发时串行化为一次成功刷新,禁半写产物(FR-035)。

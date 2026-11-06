@@ -1,5 +1,22 @@
 <!--
 Sync Impact Report
+- Version change: 1.15.0 → 1.16.0 (MINOR; new Principle XIX added, 2026-11-05)
+- Added principles: XIX. Self-Explanatory Structure (不言自明) — names, paths and structures MUST carry the information their user needs, judged from the user's view rather than from implementation-internal clarity; the ceiling is direct visibility and the floor is one simple command (a satisfied floor is enough to support a change); the principle MUST NOT justify preventive redesign, each optimization task raises at most one information dimension and lands it through a reconcile mechanism, and an encoded attribute keeps its original source of truth with names and paths as projections of it
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XVIII. Self-Explanatory Structure; principles 17 → 18 (Feature 082 T011)
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 10 → 11 entries (Feature 082 T013)
+  ✅ .specify/skills/internal/manage-constitution/SKILL.md + .specify/templates/constitution-template.md — mirrors byte-identical (Feature 082 T014)
+  ✅ shared/definitions/self-explanatory-definitions.md (+ .specify mirror) — NEW owner of the full definition: concept, user-view reachability, scope, relation to sibling principles, authority, encoded-attribute source of truth, and dimension-addition order
+  ✅ tests/contract/test_constitution_double_landing.py — template 18 / live 19 / skill 11; watchlist 5 → 6
+  ✅ tests/contract/test_self_explanatory_constitution.py (NEW) — C-1…C-8 plus the C-20/C-21 reference-not-copy clauses
+- Follow-up TODOs: (a) `tests/contract/test_fast_fail_discipline.py::test_x13_double_landing_three_count_pins` and `::test_x15_watchlist_gains_principle_title` re-pin the carrier's three counts (17/18/10) and watchlist length (5) at import time; they are raised in the same change that lands this amendment's count update — a guard pin, not a second source of the values; (b) the template roster carries XVIII while this live roster carries XIX, which is the per-surface numbering C-3 of `contracts/constitution-double-landing.contract.md` already states as normal, not a new divergence
+- Preserved by design: `templates/plan-template.md` renders the principle roster dynamically, so the new row needs no edit; no new `shared/guidelines/` file is introduced (the owner is a `shared/definitions/` document); the gate scanner's patterns are NOT widened — the principle block was written to produce zero new blocking hits
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.14.0 → 1.15.0 (MINOR; new Principle XVIII added, 2026-10-27)
 - Added principles: XVIII. Grounded Naming — a name links an entity into the project's knowledge network and MUST NOT be improvised; the first available source decides, in order: user instruction > project convention > imitation of the closest same-kind siblings > a self-chosen descriptive name; a mandated rename lands in every reference in the same change
 - Modified principles: VI. Continuous Quality & Observability — two bullets added: symptom suppression is not a fix (judge success at the whole-run level), and version control is the backup (no `.bak` / `.backup` / `.orig` copies)
@@ -48,7 +65,7 @@ Sync Impact Report
 - Follow-up TODOs: (a) `scan-confirmation-gates.py --baseline` reads a TOP-LEVEL `total` key while the frozen baseline nests it under `confirmationGates`, and its exit code reflects only violations — so it cannot serve as an equality gate (proved by mutation drill: doctored frozen total 99 still exits 0); (b) `generate-instructions.sh` reconciles only WHOLE sections, so a bullet added inside an existing section never reaches already-initialized projects — the `Inherited premises` bullet at `templates/instructions-template.md:41` is absent from this live file while 10 files point readers at it; (c) an over-broad count pattern yielding a FALSE RED is in neither closed list and was settled by doubtful-strict alone in two independent reviews — a growth-loop candidate whose evidence qualification (2 independent observations) is already met
 - Preserved by design: `templates/plan-template.md` is untouched — it enumerates constitution principles dynamically, so this principle enters every downstream plan gate with zero edit (rendered rows 15 → 16); `scripts/` and `src/specify_cli/` are untouched, including the gate scanner's `POLICY_DOCS` / `SELF_REL` / `BLOCKING_PATTERNS`, because gate neutrality is achieved by wording (design avoidance) and NOT by widening the exemption set
 
-Previous change (1.11.0 → 1.12.0, MINOR): Principle XV User-Facing Comprehension (No Jargon, With Context) added — every message a flow sends to a human must be readable by someone who did not take part in the run, bounding both its vocabulary and the context it carries; discipline anchored at shared/guidelines/user-facing-comprehension.md. That amendment's own Sync Impact Report block is preserved VERBATIM below this one, together with its still-open Follow-up TODOs and its frozen-by-SHA `confirmation-gates.md` preservation note.
+Previous change (1.11.0 → 1.12.0, MINOR): Principle XV User-Facing Comprehension (No Jargon, With Context) added — every message a flow sends to a human must be readable by someone who did not take part in the run, bounding both its vocabulary and the context it carries; discipline anchored at `shared/guidelines/user-facing-comprehension.md`. That amendment's own Sync Impact Report block is preserved VERBATIM below this one, together with its still-open Follow-up TODOs and its frozen-by-SHA `confirmation-gates.md` preservation note.
 -->
 
 <!--
@@ -65,7 +82,7 @@ Sync Impact Report
   ✅ templates/instructions-template.md (+ mirror + .specify/instructions.md) — new ambient `## User-Facing Comprehension` summary+pointer section between Token Efficiency Discipline and Dogfooding Practice
   ✅ tests/contract/test_user_facing_comprehension_doc.py / _section.py / _pointers.py + test_constitution_double_landing.py — guarding contracts
   ⚠️ 7 of the 8 interface-class rule sources still lack their one-line pointer (only `shared/guidelines/confirmation-gates.md` is wired); the remaining insertions plus the two content moves are pending
-- Follow-up TODOs: (a) the 13 governance-kept gate prompts have a wording obligation now but their individual text has not been reviewed against it; (b) `skills/improve-skills/scripts/redline-check.py` has a source/mirror divergence shipped by an unrelated upstream commit — one `sync-mirrors.py --write --only skills/improve-skills` away, deliberately not folded into this amendment; (c) the reader-baseline cap counts override *sites* by class, and the by-line reading of that cap is an open question recorded in the feature's clarification log
+- Follow-up TODOs: (a) the 13 governance-kept gate prompts have a wording obligation now but their individual text has not been reviewed against it; (b) `skills/external/improve-skills/scripts/redline-check.py` has a source/mirror divergence shipped by an unrelated upstream commit — one `sync-mirrors.py --write --only skills/external/improve-skills` away, deliberately not folded into this amendment; (c) the reader-baseline cap counts override *sites* by class, and the by-line reading of that cap is an open question recorded in the feature's clarification log
 - Preserved by design: `confirmation-gates.md`'s five criteria sections are frozen byte-for-byte (SHA-256 pinned by contract test) — this feature adds a wording obligation beside them, it does not edit gate criteria
 
 Previous change (1.10.0 → 1.11.0, MINOR): Principle XIV One Source of Truth added — every fact has exactly one authoritative definition point (its owner) and every other location reaches it by reference; discipline anchored at shared/guidelines/one-source-of-truth.md; Principle V's tier roster repaired as the first compliance act; templates/constitution-template.md intentionally left unchanged at the time (independent downstream numbering).
@@ -330,6 +347,28 @@ Rationale: a name is how every later reader, search, and agent finds an entity a
 it to related concepts. An improvised name silently breaks those links, so the cheapest
 correct decision is always the one an existing authority already made.
 
+### XIX. Self-Explanatory Structure (不言自明)
+Names, paths and structures MUST carry the information their user needs, judged from the
+user's view rather than from how clear the implementation looks internally:
+- It MUST be the user's view that decides, not implementation-internal clarity: information
+  a program can infer without context does NOT count as reachable.
+- The ceiling is that the user sees the needed information directly; the floor MUST be no
+  more than one simple command, and a satisfied floor is sufficient to support a change.
+- The principle MUST NOT be used to justify preventive redesign — a concrete user
+  information need MUST be named before it applies to anything.
+- Each optimization task MUST raise at most one information dimension, and a reconcile
+  mechanism MUST be how that dimension lands.
+- An encoded attribute MUST keep its original source of truth, and names and paths MUST stay
+  projections of it, reconciled to it rather than edited into a second owner.
+- The full definition is owned by `.specify/shared/definitions/self-explanatory-definitions.md`
+  and MUST be referenced, not restated, here; the framework's own source copy of this owner
+  stays at `shared/definitions/self-explanatory-definitions.md` and MUST NOT be the path a
+  downstream project is told to open.
+
+Rationale: a structure that carries no user information forces the user to open files or
+ask a maintainer before they can filter, sort or judge the system. Naming the information a
+structure must carry keeps it legible at the entry point instead of only from inside.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -380,4 +419,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.15.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-10-27
+**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05

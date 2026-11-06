@@ -7,9 +7,12 @@ scope: "local"
 probe: "speckit-instructions-wrapup"
 kind: "internal"
 slice: "commands"
+disposition: "processed"
 partial: false
 created: "2026-10-30T03:50:38Z"
 summary: "指令体积收敛：模板与 live 同步精简，静态不变量全绿；契约测试未执行（项目 .venv 缺 pytest，替代解释器运行被拒）。"
+introspection_ref: "introspection-20261105T080109Z#F-11"
+disposition_reason: "introspection:introspection-20261105T080109Z#F-11"
 ---
 
 ## Review

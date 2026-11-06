@@ -1,0 +1,105 @@
+# test runner: .venv/bin/python -m pytest -q tests/contract/test_skill_reference_failures.py tests/contract/test_skill_reference_consumers.py tests/contract/test_skill_reference_grammar.py tests/contract/test_skill_reference_matrix.py tests/contract/test_skill_reference_command_surface.py tests/contract/test_mechanism_policy_skill_wiring.py tests/contract/test_mechanism_policy_guard.py tests/contract/test_run_skills_wiring.py tests/contract/test_coaching_run_contract.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_mirror_parity_suite.py tests/contract/test_expression_compatibility.py
+.......F................................................................ [  8%]
+...F...................F................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+........................................................................ [ 56%]
+........................................................................ [ 64%]
+........................................................................ [ 72%]
+........................................................................ [ 80%]
+........................................................................ [ 88%]
+........................................................................ [ 96%]
+................F.............                                           [100%]
+=================================== FAILURES ===================================
+_________ test_sr01_to_sr06_each_consumer_cites_the_source_owner_once __________
+
+    def test_sr01_to_sr06_each_consumer_cites_the_source_owner_once():
+        problems = assert_consumer_wiring(REPO_ROOT / p for p in CONSUMERS)
+>       assert not problems, "SC-007 wiring violations:\n- " + "\n- ".join(problems)
+E       AssertionError: SC-007 wiring violations:
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: 2 references to the source owner path (lines [16, 24]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: mirror-path reference(s) at line(s) [16, 24] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/SKILL.md: 2 references to the source owner path (lines [35, 58]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/create-skills/SKILL.md: mirror-path reference(s) at line(s) [35] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/merge-skills/SKILL.md: mirror-path reference(s) at line(s) [27] — a consumer cites the framework source, never the generated mirror
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md: 3 references to the source owner path (lines [26, 48, 67]), expected exactly 1
+E         - /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md: mirror-path reference(s) at line(s) [26, 48, 67] — a consumer cites the framework source, never the generated mirror
+E       assert not ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/skills/internal/run-skills/SKILL.md: 2 references to the sourc...xternal/coaching-skills/SKILL.md: 3 references to the source owner path (lines [26, 48, 67]), expected exactly 1', ...]
+
+tests/contract/test_skill_reference_consumers.py:139: AssertionError
+_______ test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work ________
+
+    def test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work():
+        body = _require_section(_text(SKILL), "Inputs")
+>       assert "<trainee-name|trainee-path>" in body
+E       assert '<trainee-name|trainee-path>' in "Invocation: `coaching-skills <trainee-reference|trainee-path> <work>`. - Exactly two positional parameters: the Train...s behalf. - Missing-argument handling is a plain one-sentence clarification, then stop. It is not a confirmation step."
+
+tests/contract/test_coaching_run_contract.py:223: AssertionError
+_________________ test_c1_eight_identity_coordinates_all_hold __________________
+
+    def test_c1_eight_identity_coordinates_all_hold():
+        verdicts = _coordinate_verdicts()
+        assert len(verdicts) == 8, f"coordinate count drifted: {len(verdicts)}"
+        failing = {name: detail for name, (ok, detail) in verdicts.items() if not ok}
+>       assert not failing, "failing identity coordinates: " + repr(failing)
+E       AssertionError: failing identity coordinates: {'8-description-triggers': 'missing=[] call-form=False'}
+E       assert not {'8-description-triggers': 'missing=[] call-form=False'}
+
+tests/contract/test_coaching_wiring_contract.py:276: AssertionError
+______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
+
+    def test_c5_non_wiring_files_keep_their_frozen_hashes():
+        manifest = _hash_manifest()
+        templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+        skills = [rel for rel in manifest if rel.startswith("skills/")]
+        assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+        assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+        assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+        assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+            "the manifest is the NON-wiring complement; it still lists a wiring template"
+        )
+        assert not any(rel in WIRING_SKILLS for rel in skills), (
+            "the manifest is the NON-wiring complement; it still lists a wiring skill"
+        )
+    
+        # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+        # the register above, then re-asserted on content at its new path — the
+        # manifest entry itself stays untouched as 069a's dated record.
+        retired = _retired_skill_register(manifest)
+    
+        drifted: list[str] = []
+        missing: list[str] = []
+        for rel, expected in sorted(manifest.items()):
+            if rel in retired:
+                continue
+            path = REPO_ROOT / rel
+            if not path.is_file():
+                missing.append(rel)
+                continue
+            if _sha256(path) != expected:
+                if rel in ALLOWED_POST_BASELINE_CHANGES:
+                    continue
+                drifted.append(rel)
+        assert not missing, (
+            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+        )
+>       assert not drifted, (
+            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "feedback-step pointer). drifted: %r" % drifted
+        )
+E       AssertionError: non-wiring source changed (C-5: the slice may only touch W1-W4 and the feedback-step pointer). drifted: ['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+E       assert not ['skills/external/create-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/merge-skills/SKILL.md']
+
+tests/contract/test_expression_compatibility.py:675: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_skill_reference_consumers.py::test_sr01_to_sr06_each_consumer_cites_the_source_owner_once
+FAILED tests/contract/test_coaching_run_contract.py::test_c1_inputs_declare_exactly_two_parameters_and_verbatim_work
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+4 failed, 890 passed in 38.61s
+
+real	0m39.248s
+user	0m10.093s
+sys	0m12.723s

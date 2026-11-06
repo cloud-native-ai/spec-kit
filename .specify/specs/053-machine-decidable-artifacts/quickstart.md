@@ -357,7 +357,7 @@ grep -n "glob\|\*/\|directory-reference\|<dir>\|rglob\|iterdir" shared/definitio
 > - 路径不存在 → 可区分错误;路径存在但成员为空 → 前缀 STR-010 `SUBJECT EMPTY:`
 > - 冲突判据为「`[subjects:]` 与花括号展开 `\{[^}]*,[^}]*\}` 同行同现」;**诚实边界**:不带花括号的散文枚举检不出,该边界 MUST 记入 owner 文档
 > - 该文件在门控扫描面内且整数余量为 **0**,新节措辞 MUST 对 `BLOCKING_PATTERNS` 零命中
-> - 第二解析器 `skills/create-team/scripts/build-summary-input.py:354-391` **刻意**不 import(`:356-360`「cross-tree import breaks once installed」),故 MUST 显式处置它, MUST NOT 沉默
+> - 第二解析器 `skills/internal/create-team/scripts/build-summary-input.py:354-391` **刻意**不 import(`:356-360`「cross-tree import breaks once installed」),故 MUST 显式处置它, MUST NOT 沉默
 
 **SC-009 的取证形态**(改后 MUST 实测):对同一主体集合分别用指代形与成员枚举写两条判据,在目录里增删一个成员后,指代形导出的集合随之变化而枚举形不变;增删 MUST 在临时副本里做,MUST NOT 改动真实 skills 目录。
 
@@ -378,9 +378,9 @@ python3 scripts/python/scan-confirmation-gates.py --summary
 # 11c 镜像无新增漂移(FR-047):逐对给出判据,不用全树绝对判据
 for p in scripts/python shared/definitions shared/guidelines shared/constants \
          templates/tasks-template.md templates/commands templates skills \
-         skills/create-team/references/execution-guide.md \
-         skills/create-team/references/goal.md \
-         skills/create-team/scripts/build-summary-input.py; do
+         skills/internal/create-team/references/execution-guide.md \
+         skills/internal/create-team/references/goal.md \
+         skills/internal/create-team/scripts/build-summary-input.py; do
   out=$(python3 scripts/python/sync-mirrors.py --check --only "$p" 2>&1); code=$?
   printf '%-30s EXIT=%s\n' "$p" "$code"
 done
@@ -399,7 +399,7 @@ python3 scripts/python/regen-command-copies.py --check; echo "regen EXIT=$?"
 | `templates/commands` | 0 | 绝对 |
 | `templates`(整对;2026-10-03 由第二轮 `/speckit.analyze` 补测) | **2** —— **2** 处 DIFF(`.specify/templates/proactive-trigger-seed.json`、`.specify/templates/skills-template.md`,皆先于本特性,最后提交 2026-09-20) | **相对**:无新增漂移(本特性不写这两个文件;T023 的 `--write --only templates` 会把它们一并同步,见 plan.md 订正记录 4) |
 | `skills`(整对;2026-10-03 由 `/speckit.analyze` 补测——初版**从未测过这一对**,因为它不在计划表里) | **2** —— **30** 处 DIFF(皆先于本特性,含同目录的 `operating-loops.md`、`summary-mapping.md`) | **相对**:无新增漂移 |
-| `skills/create-team/references/execution-guide.md`、`.../references/goal.md`、`.../scripts/build-summary-input.py`(2026-10-03 补测) | 三个**单文件**各自 **0** —— 当前与各自镜像逐字节相同 | 绝对;这三处正是 T034/T041 的写入面 |
+| `skills/internal/create-team/references/execution-guide.md`、`.../references/goal.md`、`.../scripts/build-summary-input.py`(2026-10-03 补测) | 三个**单文件**各自 **0** —— 当前与各自镜像逐字节相同 | 绝对;这三处正是 T034/T041 的写入面 |
 | **全树**(不带 `--only`) | **2** DRIFT,实测 **33** 处 = `skills` **30** + `templates` **2** + `scripts/python` **1**(初版记为「三处」并把余下 30 处全归给 `skills`,漏了 `templates` 对里的 2 处) | MUST NOT 用绝对判据 |
 | `regen-command-copies.py --check` | **0**「OK: all per-tool command copies match the source templates.」 | 绝对 |
 

@@ -80,7 +80,7 @@ FR-014 枚举 11 类。实测其规则真源**不是 11 个文件**——存在�
 | ⑤ | 澄清提问与选项表 | **两个共管**:`templates/commands/clarify.md` + `shared/guidelines/requirements-guidelines.md` | clarify.md 借用段 `:70`(把借用扩到行话半侧);requirements-guidelines.md 的 `[NEEDS CLARIFICATION]` 呈现步骤 `:70-72` 或模板块 `:72-88` | FR-020 显式点名两个表面;clarify 既有裁定(封闭式、选项表 + Recommended、不采纳开放式提问)不变 |
 | ⑥ | 主动流程建议行 | `shared/guidelines/proactive-trigger.md` | `## Suggestion Shape` `:45-55`(在 `:47`),**或**头部"归属不在本文档"要点列表 `:11-15`(已有三条"只以路径引用",含 `:15` 指向 confirmation-gates.md)——后者是加第四条的自然位 | 指令模板 `:31` 的镜像 MUST 保持摘要形态,不内联 |
 | ⑦ | 面向干系人的需求/规划/任务工件 | `shared/guidelines/requirements-guidelines.md`(**仅需求侧**) | `## General Guidelines > Quick Rules` `:97-102`(在 `:101`) | **实测缺口**:`templates/plan-template.md` 与 `templates/tasks-template.md` 的 stakeholder / plain-language / business 检索**零命中**——plan/tasks 侧今天**无任何措辞规则**。裁定见下 |
-| ⑧ | 面向外部读者的项目总结报告 | `skills/summarize-project/references/reporting-playbook.md` §1.7 `:109-113` | §1.7 正文 `:111`;落盘门禁 `:309` 保留但改指提升后的来源 | 次级实例面:`references/project-overview.md:22,38,51`、`references/consistency-rules.md:31` |
+| ⑧ | 面向外部读者的项目总结报告 | `skills/internal/summarize-project/references/reporting-playbook.md` §1.7 `:109-113` | §1.7 正文 `:111`;落盘门禁 `:309` 保留但改指提升后的来源 | 次级实例面:`references/project-overview.md:22,38,51`、`references/consistency-rules.md:31` |
 | ⑨ | 词汇表校正的对外呈现 | `shared/workflow/glossary.md` §1 `:17-28` | surface-it 要点 `:23-24`(或节首 `:17`) | 出向 canonical 术语规则在 `templates/commands/interview.md:30`,属类 ④ 的载体而非本类真源 |
 | ⑩ | 流程收尾报告 | **无专属真源(缺口)** → 裁定归 `shared/guidelines/confirmation-gates.md` § 执行报告 的粒度与形态规则 `:62-66` | 由 ① 的头部指针覆盖 | 实测规则分裂在 `confirmation-gates.md:62-66`(琐碎并入 / 合并呈现)与 `feedback-step.md:86-93`(收尾提交提示)。FR-011 已记录本类**无长度界** |
 | ⑪ | 失败如实报告 | `shared/guidelines/confirmation-gates.md:66`(在 § 执行报告 内) | 由 ① 的头部指针覆盖 | 已有守卫:`test_confirmation_gates_execution_report.py:38-41` 断言 `失败` + `中间产物` |
@@ -232,11 +232,11 @@ FR-014 枚举 11 类。实测其规则真源**不是 11 个文件**——存在�
 - **门控预算安全**:该文件在 `POLICY_DOCS`(`:41-44`)⇒ 整体豁免计数。✓
 - **连带面**:`.specify/shared/patterns/interview-pattern.md`(镜像,`sync-mirrors.py`)。
 
-**搬家 B —— `skills/summarize-project/references/reporting-playbook.md`(FR-022)**
+**搬家 B —— `skills/internal/summarize-project/references/reporting-playbook.md`(FR-022)**
 - §1.7(`:109-113`)的内部标识黑名单与读者向改写映射(`unknown-schedule` → 「无计划日期,无法判定延期」)**提升进真源文档**,作为黑名单第 ② 条的**实例来源**;§1.7 正文收敛为指针。
 - `:309` 的落盘门禁 `- [ ] **读者用语纪律已过**(§1.7)` 保留,但改指提升后的来源。
 - 次级实例面收敛为指针:`references/project-overview.md:22`、`:38`、`:51`(其中 `:51` 的 `- [ ] 无内部黑话;外部读者不读代码也能看懂` 是**可机械核查的门禁形态**,提升后应保留在技能侧作为该类的落盘检查)、`references/consistency-rules.md:31`。
-- **连带面**:`.specify/skills/summarize-project/`(镜像,489 文件对之一)。
+- **连带面**:`.specify/skills/internal/summarize-project/`(镜像,489 文件对之一)。
 
 **搬家 C(规格已含,一并列出)—— `confirmation-gates.md:68`**:见 D-4。
 
@@ -266,7 +266,7 @@ FR-014 枚举 11 类。实测其规则真源**不是 11 个文件**——存在�
 5. 其余 `docs/concepts`、`docs/tutorials`、`docs/contribute`、`docs/decisions`、`docs/tasks`、`docs/notes`、`docs/archive` 对相关模式**零命中**。
 
 **生成、MUST NOT 手工编辑**:
-- `docs/public/**` —— **Hugo 构建产物**。证据:`docs/hugo.toml`、`docs/layouts/`、`docs/static/` 存在;`skills/create-pages/references/hugo-site.md:22` 明写 "`docs/public/` | Hugo | Build output. Never committed, never documentation.";`git ls-files docs/public` = **0 个跟踪文件**,`git check-ignore docs/public` → 被忽略(经 `docs/.gitignore`)。⇒ 上面 1–3 项修好后需 Hugo 重建,`docs/public` 内的副本才会跟上;绝不手改。
+- `docs/public/**` —— **Hugo 构建产物**。证据:`docs/hugo.toml`、`docs/layouts/`、`docs/static/` 存在;`skills/external/create-pages/references/hugo-site.md:22` 明写 "`docs/public/` | Hugo | Build output. Never committed, never documentation.";`git ls-files docs/public` = **0 个跟踪文件**,`git check-ignore docs/public` → 被忽略(经 `docs/.gitignore`)。⇒ 上面 1–3 项修好后需 Hugo 重建,`docs/public` 内的副本才会跟上;绝不手改。
 - 4 棵按工具命令树 —— `regen-command-copies.py` 再生。
 - `.specify/**` 镜像 —— `sync-mirrors.py`。
 
