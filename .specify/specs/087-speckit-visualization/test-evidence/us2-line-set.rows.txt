@@ -1,0 +1,4 @@
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=2m23s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=2m32s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=2m32s | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=2m27s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=4m47s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=4m47s | carrier=console

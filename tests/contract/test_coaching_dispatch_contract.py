@@ -37,6 +37,7 @@ REQUIRED_FIELDS = (
     "anomaly-line",
     "fast-fail-clause",
     "confirmation-relay",
+    "reporting-cadence",
 )
 
 #: Content classes the payload must never carry (C-2). Each marker is a detector, not the
@@ -45,6 +46,7 @@ FORBIDDEN_MARKERS = {
     "expectation": ("expectation", ".specify/memory/coaching/"),
     "criteria-row": ("OC-", "PE-"),
     "coach-conclusion": ("deviation", "my reading", "coach concludes"),
+    "coach-status": ("judged stalled", "will be judged", "expected state is"),
 }
 
 TRANSPORT_MODES = ("native", "run-agent-fallback", "run-skills-explicit-path")
@@ -120,6 +122,10 @@ COMPLIANT_PAYLOAD = {
         "If the Trainee flow reaches a destructive step, stop and report it back instead "
         "of approving it yourself."
     ),
+    "reporting-cadence": (
+        "tick value in force for this run, plus the attribution pair the subordinate's own "
+        "lines must carry"
+    ),
 }
 
 
@@ -172,8 +178,15 @@ def test_c2_the_four_forbidden_classes_are_declared():
         {"OC-1": "checklist.md has five rows"},
         {"coach-note": "my reading is that item 4 is covered"},
         {"payload-ref": ".specify/memory/coaching/20261030T101500Z-fixture-trainee/x.md"},
+        {"coach-status": "the subordinate will be judged stalled at the next tick"},
     ],
-    ids=["expectation-file", "criteria-row", "coach-conclusion", "run-directory-path"],
+    ids=[
+        "expectation-file",
+        "criteria-row",
+        "coach-conclusion",
+        "run-directory-path",
+        "coach-status-line",
+    ],
 )
 def test_c2_each_forbidden_class_is_red(addition):
     broken = dict(COMPLIANT_PAYLOAD)

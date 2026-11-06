@@ -1,0 +1,98 @@
+### mode 1 (native subagent): native progress surface, carrier=console
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T091500Z-us2m --position mode 1 dispatch in flight --delta 1 native subagent dispatched --remainder 1 mode left; about 1 minute --trigger tick
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run | position=mode 1 dispatch in flight | delta=1 native subagent dispatched | remainder=1 mode left; about 1 minute | blocker=no blocker | carrier=console
+EXIT=0
+
+### mode 2 (virtual subagent): inline visible session, carrier=console
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T091500Z-us2m --position mode 2 dispatch in flight --delta 1 in-session execution step --remainder 1 mode left; about 1 minute --trigger tick
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run | position=mode 2 dispatch in flight | delta=1 in-session execution step | remainder=1 mode left; about 1 minute | blocker=no blocker | carrier=console
+EXIT=0
+
+### mode 3 (external subagent): the sub-flow report, carried by its declared .live.log
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T091500Z-us2m --sub-flow 087-supervision--r20261106T091500Z-us2m--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/modes/triplet --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T091500Z-us2m--trainee | state=running | age=5s | slow=yes | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=5s | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+
+### RO-12 over mode 3's run record: the carrier is the triplet's declared .live.log
+$ python3 scripts/python/status-digest.py --action guard --carrier /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/modes/triplet/087-supervision--r20261106T091500Z-us2m--trainee.live.log
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 not-evaluated no captured supervision report supplied (--line-set)
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 not-evaluated no captured line set supplied (--line-set)
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 pass carrier is a declared stream artifact path
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+
+### agent host probe: `qodercli` -> /home/agent/.local/bin/qodercli
+
+### agent host probe: `claude` -> /home/agent/.npm-global/bin/claude
+
+---
+
+## Reading — the three-mode mapping this capture asserts
+
+Contract `status-report.contract.md` C-27 (SR-06) states the mapping as a premise and asserts it over a three-mode
+fixture; this file is that fixture's real render. The mapping is:
+
+| Mode | Mechanism (`shared/definitions/subagent-definitions.md` § Three Execution Modes) | Carrier | Reading above |
+|------|------------------------------------------------------------------------------------|---------|---------------|
+| 1. Native subagent | the executing runtime dispatches and the host UI renders the subagent's activity | `console` | § "mode 1" line, `carrier=console` |
+| 2. Virtual subagent | the current session simulates the subagent inline, in the session the user is watching | `console` | § "mode 2" line, `carrier=console` |
+| 3. External subagent | a separate agent process through a shell; progress visibility is **not automatic** | the dispatch's declared triplet `<label>.live.log` | § "mode 3" sub-flow row plus § "RO-12 over mode 3's run record" |
+
+**Why one carrier form and not two.** The two legal carrier forms are `console` and the flow's declared stream
+artifact path — no third form and no new channel (C-26 / C-27). Mode 3's carrier is the `.live.log` the External
+Dispatch Visibility Contract already declares as its liveness surface; the capture names that file and nothing else,
+so the carrier is the mode's own declared stream artifact rather than a second one created for reporting.
+
+**The mode and the carrier are named together.** The run record a flow already writes carries the mode; the carrier
+value is the one `--carrier` holds and RO-12 reads. The two are recorded in the same place — this capture shows RO-12
+reading mode 3's carrier value and passing it, and § "mode 1"/"mode 2" showing `carrier=console` in the rendered line
+itself.
+
+**Not measured here, stated rather than glossed.** The capture renders the *carrier rule* through the delivered
+renderer; it does not launch three live agent processes (mode 1's and mode 2's subagent, mode 3's external CLI). The
+agent host is the run's own per `requirements.md` § Environment Prerequisites, probed above: both `qodercli` and
+`claude` are on `PATH`, so mode 3 is dispatchable on this host without a second mechanism. A live three-process
+launch is out of scope for this row and is not claimed by it.
+
+## Reproduction
+
+```bash
+export SPECIFY_LINE_REGISTRY_DIR=$HOME/.local/state/spec-kit/lines
+M=.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/modes
+python3 scripts/python/status-digest.py --action report --structure 087-supervision \
+  --run-stamp r20261106T091500Z-us2m --position "mode 1 dispatch in flight" \
+  --delta "1 native subagent dispatched" --remainder "1 mode left; about 1 minute" --trigger tick
+python3 scripts/python/status-digest.py --action report --structure 087-supervision \
+  --run-stamp r20261106T091500Z-us2m --position "mode 2 dispatch in flight" \
+  --delta "1 in-session execution step" --remainder "1 mode left; about 1 minute" --trigger tick
+python3 scripts/python/status-digest.py --action guard --structure 087-supervision \
+  --run-stamp r20261106T091500Z-us2m \
+  --sub-flow 087-supervision--r20261106T091500Z-us2m--trainee=$PWD/$M/triplet
+python3 scripts/python/status-digest.py --action guard \
+  --carrier $PWD/$M/triplet/087-supervision--r20261106T091500Z-us2m--trainee.live.log
+```

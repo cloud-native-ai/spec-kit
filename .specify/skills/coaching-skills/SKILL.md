@@ -161,6 +161,7 @@ The payload is a closed field set; anything not listed below is forbidden.
 | `anomaly-line` | "State one explicit anomaly line on return; state `none` when there is none" | silence is not read as clean |
 | `fast-fail-clause` | the dispatcher's anomaly discipline | injected at dispatch time; a subagent does not inherit this conversation |
 | `confirmation-relay` | "If the Trainee flow reaches a destructive step **or needs a targeted clarification**, stop and report it back instead of approving or guessing" | the answer comes from the user; the subagent never self-approves and never substitutes a guess |
+| `reporting-cadence` | the tick value in force for this run, plus the attribution pair (structure slug + run stamp) the subordinate's own lines must carry | the value is the resolved profile's cadence; the subordinate reports its own progress on it and the coach reports the subordinate's state on it |
 
 The payload MUST NOT contain:
 
@@ -168,20 +169,45 @@ The payload MUST NOT contain:
 2. the coach's deviation guesses or conclusions about `<work>`;
 3. a coach-authored simplification or reordering of the Trainee flow;
 4. any artifact path inside the run directory — the subagent writes Trainee outputs,
-   not coach records.
+   not coach records;
+5. the coach's own status lines or its expected subordinate-state conclusions — the
+   subordinate is never told what its state will be judged as.
 
 Exactly one payload is dispatched per run. A failed dispatch is not re-sent with a
 modified payload; the failure is recorded instead.
 
 On return, the anomaly line is written into the DispatchRecord unchanged. Self-reported
 steps become `self-report` rows, and anything the self-report does not cover becomes an
-`observation-gap` row rather than an inferred one. A return that claims completion
+`observation-gap` row rather than an inferred one. The Trainee's own reported state at
+return is recorded verbatim as a `self-report` row: when the coach's report cites that
+state it cites `self-report`, and it MUST NOT infer the state from host events or from
+the silence of the Trainee's output. A return that claims completion
 without the Trainee's primary artifact is recorded as `partial`, not `completed`.
 
 The transport — `native` host subagent tool, `run-agent-fallback`, or
 `run-skills-explicit-path` mode — is recorded in the DispatchRecord `mode` field, and the
 rendered payload is stored or referenced by `payload-ref`. The payload's raw text never
 enters the coach's user-facing report.
+
+## Sub-flow Report
+
+The Trainee dispatch is the sub-flow this run reports. On the tick in force for the run,
+the coach reports that one dispatch — not an empty set, and not merely the coach's own
+progress — with its **identity** (the dispatch's label), its **state** and the **age** of
+its last observed activity. The state and the age come from the Trainee's own reported
+state at return once it is available, and from the artifact triplet the dispatch already
+declares before that; the coach cites `self-report` rather than inferring.
+
+An omission is a defect, not a sampling decision: a dispatch this run made and did not
+report on a tick is named by its label, and a failure or a stall crossing is reported
+before the next tick rather than waiting for the clock.
+
+**This section demonstrates the duty; it does not define it.** Scope, cadence, the stall
+threshold and the transition classes are owned by
+`shared/guidelines/reporting-obligations.md` — reach them there. This skill MUST NOT
+restate any of them, because a restatement would make the shipped example a second
+definition of the obligation. The label convention is owned by
+`shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract.
 
 ## Compare
 

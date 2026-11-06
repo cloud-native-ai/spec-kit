@@ -136,6 +136,25 @@ GATE_MARKERS = (
     "请确认",
 )
 
+#: The label convention a dispatched sub-flow's identity comes from (``data-model.md`` E3 / E7): its owner is
+#: ``shared/definitions/subagent-definitions.md`` § External Dispatch Visibility Contract point 5. The pattern is
+#: read here rather than copied there because the owner states the convention in prose, and the projection needs a
+#: decidable form of it; the shape, not the rule, is what this constant fixes.
+SUPERVISION_LABEL_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*--[A-Za-z0-9._-]+--[A-Za-z0-9._-]+$")
+
+#: The triplet suffixes the visibility contract declares (point 3); the newest mtime among them is the sub-flow's
+#: last observed activity (``data-model.md`` E3).
+TRIPLET_SUFFIXES = (".live.log", ".jsonl", ".status")
+
+#: The sub-flow state vocabulary (``data-model.md`` E3) — a projection of the visibility contract and the exit
+#: record, not a new closed set. ``slow`` is deliberately absent: it is a qualifier on ``running``.
+SUB_FLOW_STATES = ("running", "completed", "stalled", "failed")
+
+#: The threshold row identity default: the row a dispatch that produced no manifest at all falls under. Row
+#: identities are the owner table's own ``Condition`` cells (``data-model.md`` E4), so this string is an index into
+#: the owner's table, never a threshold value.
+MANDATORY_THRESHOLD_ROW = "No manifest created"
+
 
 # ---------------------------------------------------------------- reader: registry resolution
 def resolve_registry_dir() -> Path:
@@ -272,7 +291,11 @@ def read_state(cap: int, stale_bound: int, workspace: Path):
 
     Returns ``(state, error)``; ``error`` is a human-readable input-error string, never a traceback. ``state`` is the
     single reading: ``registry_dir``, ``entries`` (already workspace-filtered, ordered and capped), ``all_entries``,
-    ``omitted``, ``cap``, ``stale_bound_seconds``, ``generated_at``, ``vocabulary``.
+    ``omitted``, ``cap``, ``stale_bound_seconds``, ``generated_at``, ``vocabulary``, ``now``.
+
+    ``now`` is the single instant this reading was taken at. The digest's age, the supervision report's age and the
+    stall judgement all measure against it, so one render is one clock reading rather than three (C-41's one-reading
+    rule applied to time as well as to state).
     """
     registry_dir = resolve_registry_dir()
     now = datetime.now(timezone.utc)
@@ -333,6 +356,7 @@ def read_state(cap: int, stale_bound: int, workspace: Path):
         "all_entries": projected,
         "omitted": omitted,
         "vocabulary": vocabulary,
+        "now": now,
     }, None
 
 
@@ -403,6 +427,8 @@ def action_digest(args) -> int:
         payload["profile"] = profile_in_force(state)
         payload["state_summary"] = "active" if state["entries"] else NOTHING_RUNNING
         payload.pop("vocabulary", None)
+        # ``now`` is the reading's clock, not a rendered field: it is consumed by the renderers and never serialized.
+        payload.pop("now", None)
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
         print(render_digest(state))
@@ -426,20 +452,37 @@ def render_status_line(args) -> str:
 
     The labels are named here; their definitions are reached by anchor to
     ``shared/guidelines/progress-reporting.md`` § 汇报内容下限 and are deliberately not restated (contract C-23).
+
+    ``--transition`` replaces the trigger with that transition's own class, so a supervising flow reports a
+    significant transition through this same line shape rather than growing a second status renderer
+    (contract ``supervision-report.contract.md`` C-34).
     """
     state, _error = read_state(args.cap, args.stale_bound, Path(args.workspace).expanduser().resolve())
-    profile = profile_in_force(state) if state else PROFILE_LONG_RUN
+    # The profile in force is read from the state when the reading decides it. A mid-run loss of the live receiver
+    # switches to `interactive` AT THE NEXT BOUNDARY and says so (contract C-30): `--profile` lets the emitting flow
+    # record the switch, and `--profile-switch` carries the reason it switched, so the switch line states it rather
+    # than a reader inferring it from a changed field value.
+    profile = args.profile or (profile_in_force(state) if state else PROFILE_LONG_RUN)
     fields = [
         "structure=%s" % args.structure,
         "run=%s" % args.run_stamp,
-        "trigger=%s" % args.trigger,
+        "trigger=%s"
+        % (
+            "transition:%s" % args.transition
+            if args.transition
+            else args.trigger
+        ),
         "profile=%s" % profile,
     ]
+    if args.transition:
+        fields.append("class=%s" % args.transition)
     if args.cadence:
         # An override is recorded NEXT TO the profile, so a reader can tell an override from the definition (C-24).
         fields.append("cadence=%s" % args.cadence)
     if args.delay_reason:
         fields.append("delay=%s" % args.delay_reason)
+    if args.profile_switch:
+        fields.append("switch=%s" % args.profile_switch)
     fields.extend(
         [
             "position=%s" % args.position,
@@ -460,6 +503,376 @@ def action_report(args) -> int:
     line = render_status_line(args)
     print(line)
     return EXIT_OK
+
+
+# ---------------------------------------------------------------- reader: the stall threshold table
+def read_threshold_rows():
+    """Read the declared stall-threshold rows from their owner at render time.
+
+    The numbers are owned by ``skills/internal/create-team/references/patterns.md`` § Monitoring → Stall Detection
+    (``data-model.md`` E4); this function parses the table's ``Condition`` and ``Threshold`` cells so the projection
+    can name a row and judge against its value without carrying either a copy of the table or a number of its own.
+    A failed read is an *unavailable input*, reported as such — never replaced by a hard-coded default.
+    """
+    path = REPO_ROOT / PATTERNS_DOC
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return None, "unreadable threshold owner %s: %s" % (PATTERNS_DOC, exc)
+
+    start = text.find("Stall Detection")
+    if start < 0:
+        return None, "threshold owner %s carries no Stall Detection section" % PATTERNS_DOC
+    rows = {}
+    for line in text[start:].splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            if rows:
+                break
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 3 or cells[0].lower() == "condition" or set(cells[0]) <= set("-: "):
+            continue
+        row_id = cells[0]
+        threshold = cells[1]
+        # Only a row whose threshold cell *is* a duration can judge silence; a qualitative cell states a condition
+        # (e.g. "manifest exists but deliverables empty") and is never a stall threshold.
+        match = re.match(r"^\s*(\d+)\s*(s|sec|secs|seconds?|秒)\b", threshold, re.I)
+        if not match:
+            continue
+        rows[row_id] = {
+            "row": row_id,
+            "threshold_cell": threshold,
+            "threshold_seconds": int(match.group(1)),
+        }
+    if not rows:
+        return None, "threshold owner %s carries no readable duration row" % PATTERNS_DOC
+    return rows, None
+
+
+def resolve_threshold(rows, row_id, override_seconds):
+    """Resolve the E4 judgement reference: the named row, its declared value, and the override actually used.
+
+    The override rule is C-24's, applied to the threshold: a per-run value replaces the declared one *and is
+    recorded next to it*, so a reader can tell an override from the definition.
+    """
+    if rows is None:
+        return None
+    if row_id in rows:
+        chosen = rows[row_id]
+    elif override_seconds is not None:
+        # No such row: the judgement's `judged_against` would not resolve, which `data-model.md` calls a defect;
+        # the override keeps a reading available but the missing row is named.
+        chosen = {"row": row_id, "threshold_cell": "(row not found)", "threshold_seconds": None}
+    else:
+        return None
+    return {
+        "row": chosen["row"],
+        "threshold_cell": chosen["threshold_cell"],
+        "declared_seconds": chosen["threshold_seconds"],
+        "override_seconds": override_seconds,
+        "value_seconds": override_seconds if override_seconds is not None else chosen["threshold_seconds"],
+    }
+
+
+# ---------------------------------------------------------------- reader: one supervised sub-flow
+def project_sub_flow(label, triplet_dir, now, threshold):
+    """Project one dispatched sub-flow into the E3 shape the supervision report renders.
+
+    Field ownership (this function copies no rule):
+
+    * ``label`` — the identity, from the visibility contract's label convention;
+    * ``state`` — from the triplet and the exit record the visibility contract already declares: a ``.status`` line
+      carrying ``exit=0`` is ``completed``, a non-zero ``exit=`` is ``failed``, and silence past the declared
+      threshold is ``stalled``;
+    * ``age`` — now minus the newest mtime among the triplet files;
+    * ``slow`` — a qualifier on ``running``: not progressing *yet*, below the threshold. It is deliberately not a
+      fifth state (``data-model.md`` E3's deviation note), so ``slow`` and ``stalled`` are never merged.
+    """
+    directory = Path(triplet_dir).expanduser()
+    triplet_paths = {suffix: directory / (label + suffix) for suffix in TRIPLET_SUFFIXES}
+    present = [path for path in triplet_paths.values() if path.is_file()]
+
+    entry = {
+        "label": label,
+        "state": None,
+        "age_seconds": None,
+        "age": DASH,
+        "slow": False,
+        "exit_code": None,
+        "triplet": {suffix: str(triplet_paths[suffix]) for suffix in TRIPLET_SUFFIXES},
+        "triplet_present": len(present),
+        "judged_against": None,
+        "measured_silence": DASH,
+        "transition": None,
+    }
+
+    if not present:
+        # A dispatch that produced no part of its declared triplet is not running and cannot have completed:
+        # the dispatch itself did not take hold.
+        entry["state"] = "failed"
+        return entry
+
+    newest = max(path.stat().st_mtime for path in present)
+    age_seconds = max(0, int(now - newest))
+    entry["age_seconds"] = age_seconds
+    entry["age"] = format_duration(age_seconds)
+    entry["measured_silence"] = entry["age"]
+
+    status_path = triplet_paths[".status"]
+    if status_path.is_file():
+        try:
+            status_text = status_path.read_text(encoding="utf-8")
+        except OSError:
+            status_text = ""
+        match = re.search(r"exit=(-?\d+)", status_text)
+        if match:
+            entry["exit_code"] = int(match.group(1))
+            entry["state"] = "completed" if entry["exit_code"] == 0 else "failed"
+
+    if entry["state"] is None:
+        if threshold and threshold.get("value_seconds") is not None:
+            entry["judged_against"] = threshold
+            if age_seconds > threshold["value_seconds"]:
+                entry["state"] = "stalled"
+            else:
+                entry["state"] = "running"
+                entry["slow"] = True
+        else:
+            entry["state"] = "running"
+
+    return entry
+
+
+def project_supervision(sub_flows, expected_labels, now, threshold, transition, interval_elapsed):
+    """Assemble the supervision projection: the rows, the closure defects, and the pre-tick transition.
+
+    One reader backs both renderings (C-41's one-reading rule): the rows this returns are the same rows
+    ``render_supervision`` prints and ``proposition_ro_06`` judges, so no second parser appears.
+    """
+    rows = [project_sub_flow(label, directory, now, threshold) for label, directory in sub_flows]
+    by_label = {row["label"]: row for row in rows}
+
+    # Presence is closure (C-33): a label the caller knows was dispatched but that produced no row is an omission,
+    # named by that label — never a quietly smaller active set.
+    omitted = [label for label in (expected_labels or []) if label not in by_label]
+
+    # The transition classes (C-34), each decided from the row's own observed condition.
+    if transition == "sub-flow failure":
+        targets = [row for row in rows if row["state"] == "failed" and row["triplet_present"]]
+    elif transition == "stall crossing":
+        targets = [row for row in rows if row["state"] == "stalled"]
+    elif transition == "dispatch failure":
+        targets = [row for row in rows if row["triplet_present"] == 0]
+    else:
+        targets = []
+
+    pre_tick = None
+    if targets and not interval_elapsed:
+        pre_tick = {
+            "class": transition,
+            "labels": [row["label"] for row in targets],
+            "timing": "pre-tick (emitted before the next tick)",
+        }
+
+    return {"rows": rows, "omitted": omitted, "pre_tick": pre_tick, "threshold": threshold,
+            "transition": transition, "interval_elapsed": interval_elapsed}
+
+
+def parse_sub_flow_args(items):
+    """Parse ``--sub-flow LABEL=TRIPLET_DIR`` values, judging each label against the declared convention."""
+    sub_flows = []
+    for item in items or []:
+        if "=" not in item:
+            return None, "--sub-flow expects LABEL=TRIPLET_DIR; got %r" % item
+        label, directory = item.split("=", 1)
+        if not SUPERVISION_LABEL_PATTERN.match(label):
+            return None, (
+                "--sub-flow label %r is not the declared convention"
+                " `<team-slug>--<run-stamp>--<member-role>`" % label
+            )
+        sub_flows.append((label, directory))
+    return sub_flows, None
+
+
+def build_projection(args, now):
+    """Build the supervision projection from the arguments, or ``(None, None)`` when no sub-flow was supplied."""
+    sub_flows, error = parse_sub_flow_args(args.sub_flow)
+    if error:
+        return None, error
+    if not sub_flows:
+        return None, None
+    rows, read_error = read_threshold_rows()
+    threshold = resolve_threshold(rows, args.threshold_row, args.threshold_seconds)
+    projection = project_supervision(
+        sub_flows,
+        args.expect_sub_flow or [],
+        now.timestamp(),
+        threshold,
+        args.transition,
+        args.interval_elapsed,
+    )
+    return projection, read_error
+
+
+# ---------------------------------------------------------------- action: supervision report
+def render_supervision(state, projection, format_age=format_duration) -> str:
+    """Render one sub-flow row per dispatched flow, plus the pre-tick transition and the omission defects.
+
+    Shape (contract ``supervision-report.contract.md`` C-32…C-35 and ``status-report.contract.md`` C-30):
+
+    * ``structure`` / ``run`` / ``profile`` — the attribution pair and the profile in force, the same prefix the
+      status line carries, so an interleaved report is still attributable;
+    * one ``sub-flow=<label>`` row per dispatched flow carrying ``state=``, ``age=``, ``slow=`` and, where a
+      judgement was made, ``judged_against=`` (the owner's table reachable by path), ``row=`` (the threshold row's
+      own identity) and ``measured_silence=``;
+    * an ``omitted:`` clause on a ``state=missing`` row per known-but-unreported dispatch — the omission named by
+      its label, never silently absent;
+    * a ``trigger=transition:<label>`` line per pre-tick transition, stating that it did not wait for the clock.
+
+    The durations are rendered through the caller's formatter so this renderer shares one formatting rule with the
+    digest (C-41's one-rendering rule: a second age renderer would let the two surfaces disagree about one duration).
+    """
+    fields = [
+        "structure=%s" % (state["structure"] if state else DASH),
+        "run=%s" % (state["run"] if state else DASH),
+        "trigger=tick",
+        "profile=%s" % (state["profile"] if state else PROFILE_LONG_RUN),
+    ]
+    # The tick line carries the four content elements like every other status line (contract C-23): its position is
+    # that this is the tick's own report, its delta the number of sub-flows observed, and its remainder the number
+    # still running. Without them this line would be a bare header whose reader learns nothing about the run.
+    running = sum(1 for row in projection["rows"] if row["state"] in ("running", "stalled"))
+    finished = sum(1 for row in projection["rows"] if row["state"] == "completed")
+    failed = sum(1 for row in projection["rows"] if row["state"] == "failed")
+    if projection["rows"]:
+        fields.extend(
+            [
+                "position=%d dispatched sub-flow(s) watched (tick report)" % len(projection["rows"]),
+                "delta=%d completed, %d running or stalled, %d failed since the last tick"
+                % (finished, running, failed),
+                "remainder=%d sub-flow(s) still active"
+                % (running + (len(projection["omitted"]) if projection["omitted"] else 0)),
+                "blocker=%s"
+                % (
+                    "sub-flow(s) dispatched but not reported: %s" % ", ".join(projection["omitted"])
+                    if projection["omitted"]
+                    else NO_BLOCKER
+                ),
+            ]
+        )
+    lines = [" | ".join(fields)]
+    for row in projection["rows"]:
+        parts = [
+            "sub-flow=%s" % row["label"],
+            "state=%s" % row["state"],
+            "age=%s" % format_age(row["age_seconds"]),
+            "slow=%s" % ("yes" if row["slow"] else "no"),
+        ]
+        if row["judged_against"]:
+            judged = row["judged_against"]
+            parts.extend(
+                [
+                    "judged_against=%s § Monitoring → Stall Detection"
+                    % PATTERNS_DOC.as_posix(),
+                    "row=%s" % judged["row"],
+                    "threshold=%s"
+                    % (
+                        format_age(judged["override_seconds"])
+                        if judged["override_seconds"] is not None
+                        else judged["threshold_cell"]
+                    ),
+                    "override=%s"
+                    % (
+                        "yes (per-run value recorded beside the declared one)"
+                        if judged["override_seconds"] is not None
+                        else "none"
+                    ),
+                    "measured_silence=%s" % format_age(row["age_seconds"]),
+                ]
+            )
+        parts.append("carrier=%s" % CARRIER_CONSOLE)
+        lines.append(" | ".join(parts))
+    for label in projection["omitted"]:
+        # An omission says which flow it is, and what a reader should do about it — never only that something is
+        # missing: `state=missing` is not one of the four projected states, it is the omission's own marker (C-33).
+        lines.append(
+            "sub-flow=%s | state=missing | omitted: dispatched but no row on this tick (C-33)"
+            " | position=authored but never reported | delta=none observed on this tick"
+            " | remainder=dispatch presumed alive; report it or declare it lost"
+            " | blocker=this dispatch was not reportable on this tick | carrier=%s"
+            % (label, CARRIER_CONSOLE)
+        )
+    if projection["pre_tick"]:
+        for label in projection["pre_tick"]["labels"]:
+            lines.append(
+                "sub-flow=%s | trigger=transition:%s | class=%s | timing=%s | carrier=%s"
+                % (label, label, projection["pre_tick"]["class"], projection["pre_tick"]["timing"],
+                   CARRIER_CONSOLE)
+            )
+    return "\n".join(lines)
+
+
+def _supervision_lines(projection, live, format_age):
+    """The rendered supervision lines for one projection (empty when no sub-flow was supplied)."""
+    if projection is None:
+        return []
+    return render_supervision(live, projection, format_age).splitlines()
+
+
+def action_supervision(args) -> int:
+    workspace = Path(args.workspace).expanduser().resolve()
+    state, _error = read_state(args.cap, args.stale_bound, workspace)
+    live = (
+        dict(state, structure=args.structure, run=args.run_stamp, profile=profile_in_force(state))
+        if state
+        else {
+            "structure": args.structure,
+            "run": args.run_stamp,
+            "profile": PROFILE_LONG_RUN,
+            "now": datetime.now(timezone.utc),
+        }
+    )
+    projection, error = build_projection(args, live["now"])
+    if error:
+        print(error, file=sys.stderr)
+        return EXIT_INPUT_ERROR
+    if projection is None:
+        print("--supervision-report requires at least one --sub-flow", file=sys.stderr)
+        return EXIT_INPUT_ERROR
+
+    for line in _supervision_lines(projection, live, format_duration):
+        print(line)
+
+    verdicts = [
+        proposition_ro_06(args.line_set, projection),
+        proposition_ro_08(args.line_set, projection),
+    ]
+    return _emit_verdicts(verdicts, args.format)
+
+
+def _emit_verdicts(verdicts, output_format) -> int:
+    """Print the verdicts in the requested format and return the closed exit status (C-45)."""
+    if output_format == "json":
+        print(json.dumps({"action": "guard", "propositions": verdicts}, indent=2, sort_keys=True))
+    else:
+        for verdict in verdicts:
+            print(
+                "%s %s %s"
+                % (verdict["proposition"], verdict["status"], verdict["reason"])
+            )
+        counts = {}
+        for verdict in verdicts:
+            counts[verdict["status"]] = counts.get(verdict["status"], 0) + 1
+        print(
+            "summary pass=%d fail=%d not-evaluated=%d"
+            % (
+                counts.get("pass", 0),
+                counts.get("fail", 0),
+                counts.get("not-evaluated", 0),
+            )
+        )
+    return EXIT_FINDINGS if any(v["status"] == "fail" for v in verdicts) else EXIT_OK
 
 
 # ---------------------------------------------------------------- action: guard
@@ -598,8 +1011,17 @@ def proposition_ro_05(owner_text, line_set_path):
     return _pass(name, "%d line(s) carry the four labels" % len(lines))
 
 
-def proposition_ro_06(line_set_path):
+def proposition_ro_06(line_set_path, projection=None):
     name = "RO-06"
+    if projection is not None:
+        if not projection["rows"]:
+            return _fail(name, "no per-sub-flow row was produced for the dispatches supplied")
+        if projection["omitted"]:
+            return _fail(
+                name,
+                "sub-flow(s) dispatched but absent from the report: %r" % (projection["omitted"],),
+            )
+        return _pass(name, "%d sub-flow row(s) present, 0 omitted" % len(projection["rows"]))
     if not line_set_path:
         return _not_evaluated(name, "no captured supervision report supplied (--line-set)")
     text = _read_text(Path(line_set_path))
@@ -611,8 +1033,25 @@ def proposition_ro_06(line_set_path):
     return _pass(name, "%d sub-flow row(s) present" % len(rows))
 
 
-def proposition_ro_07(owner_text):
+def proposition_ro_07(owner_text, projection=None):
     name = "RO-07"
+    if projection is not None:
+        threshold = projection["threshold"]
+        if threshold is None:
+            return _not_evaluated(
+                name, "no threshold row resolved for this report (the owner table is unreadable)"
+            )
+        if threshold["value_seconds"] is None:
+            return _fail(
+                name,
+                "the row %r does not resolve in the threshold owner and no per-run value was supplied"
+                % threshold["row"],
+            )
+        return _pass(
+            name,
+            "row %r resolved from %s; value used %s"
+            % (threshold["row"], PATTERNS_DOC.as_posix(), format_duration(threshold["value_seconds"])),
+        )
     if owner_text is None:
         return _not_evaluated(name, "owner document %s is unreadable" % OWNER_DOC)
     if "Stall Detection" not in owner_text or PATTERNS_DOC.as_posix() not in owner_text:
@@ -641,8 +1080,21 @@ def proposition_ro_07(owner_text):
 THRESHOLD_EXCLUDE_MARKER = "长跑档(long-run profile)"
 
 
-def proposition_ro_08(line_set_path):
+def proposition_ro_08(line_set_path, projection=None):
     name = "RO-08"
+    if projection is not None:
+        if not projection["transition"]:
+            return _not_evaluated(name, "no transition class was observed for this report")
+        if not projection["pre_tick"]:
+            return _fail(
+                name,
+                "a %r was observed after the tick had already elapsed; the report waited for the clock"
+                % projection["transition"],
+            )
+        return _pass(
+            name,
+            "%r reported pre-tick for %r" % (projection["transition"], projection["pre_tick"]["labels"]),
+        )
     if not line_set_path:
         return _not_evaluated(name, "no captured line set supplied (--line-set)")
     text = _read_text(Path(line_set_path))
@@ -809,15 +1261,32 @@ def action_guard(args) -> int:
     state, _error = read_state(args.cap, args.stale_bound, workspace)
     roster_baseline = _load_roster_baseline(args.roster_baseline)
 
+    # The supervision projection is built from the SAME reading the digest consumed, and rendered by the same
+    # renderer, so the report a supervising flow pastes into a captured line set is the one these verdicts judge
+    # (C-41's one-reading rule; T022's "no second parser").
+    now = state["now"] if state else datetime.now(timezone.utc)
+    projection, projection_error = build_projection(args, now)
+    if projection_error and projection is not None:
+        print(projection_error, file=sys.stderr)
+        return EXIT_INPUT_ERROR
+    if projection is not None:
+        live = (
+            dict(state, structure=args.structure, run=args.run_stamp, profile=profile_in_force(state))
+            if state
+            else {"structure": args.structure, "run": args.run_stamp, "profile": PROFILE_LONG_RUN}
+        )
+        for line in _supervision_lines(projection, live, format_duration):
+            print(line)
+
     verdicts = [
         proposition_ro_01(owner_text),
         proposition_ro_02(owner_text, args.flow_sample),
         proposition_ro_03(owner_text),
         proposition_ro_04(args.roster, roster_baseline),
         proposition_ro_05(owner_text, args.line_set),
-        proposition_ro_06(args.line_set),
-        proposition_ro_07(owner_text),
-        proposition_ro_08(args.line_set),
+        proposition_ro_06(args.line_set, projection),
+        proposition_ro_07(owner_text, projection),
+        proposition_ro_08(args.line_set, projection),
         proposition_ro_09(owner_text, state),
         proposition_ro_10(args.line_set),
         proposition_ro_11(args.line_set),
@@ -825,27 +1294,7 @@ def action_guard(args) -> int:
         proposition_ro_13(owner_text),
     ]
 
-    if args.format == "json":
-        print(json.dumps({"action": "guard", "propositions": verdicts}, indent=2, sort_keys=True))
-    else:
-        for verdict in verdicts:
-            print(
-                "%s %s %s"
-                % (verdict["proposition"], verdict["status"], verdict["reason"])
-            )
-        counts = {}
-        for verdict in verdicts:
-            counts[verdict["status"]] = counts.get(verdict["status"], 0) + 1
-        print(
-            "summary pass=%d fail=%d not-evaluated=%d"
-            % (
-                counts.get("pass", 0),
-                counts.get("fail", 0),
-                counts.get("not-evaluated", 0),
-            )
-        )
-
-    return EXIT_FINDINGS if any(v["status"] == "fail" for v in verdicts) else EXIT_OK
+    return _emit_verdicts(verdicts, args.format)
 
 
 # ---------------------------------------------------------------- cli
@@ -918,6 +1367,62 @@ def build_parser():
         default="tick",
         help="which rule produced the line: tick | boundary | transition:<sub-flow-id> | reporter-failure",
     )
+    # guard inputs: the supervision report over the dispatches a supervising flow watches (C-32…C-35).
+    parser.add_argument(
+        "--supervision-report",
+        action="store_true",
+        help="judge the supervision report over the dispatched sub-flows named by --sub-flow",
+    )
+    parser.add_argument(
+        "--sub-flow",
+        action="append",
+        default=None,
+        metavar="LABEL=TRIPLET_DIR",
+        help="one dispatched sub-flow: its label plus the directory holding its triplet (repeatable)",
+    )
+    parser.add_argument(
+        "--expect-sub-flow",
+        action="append",
+        default=None,
+        metavar="LABEL",
+        help="a label the caller knows was dispatched; a label with no row is an omission (C-33)",
+    )
+    parser.add_argument(
+        "--transition",
+        default=None,
+        choices=TRANSITION_CLASSES,
+        help="a significant transition the flow observed while rendering this report (C-34)",
+    )
+    parser.add_argument(
+        "--interval-elapsed",
+        action="store_true",
+        help="set when the cadence tick had already elapsed when the transition was observed",
+    )
+    parser.add_argument(
+        "--profile",
+        default=None,
+        choices=(PROFILE_LONG_RUN, PROFILE_INTERACTIVE),
+        help=(
+            "the cadence profile in force, when the emitting flow records a switch rather than reading it"
+            " from the state (C-30)"
+        ),
+    )
+    parser.add_argument(
+        "--profile-switch",
+        default=None,
+        help="the record of why the profile changed, so a switch is never silent (C-30)",
+    )
+    parser.add_argument(
+        "--threshold-row",
+        default=MANDATORY_THRESHOLD_ROW,
+        help="the condition row the caller says is silent; the threshold is read from its table cell",
+    )
+    parser.add_argument(
+        "--threshold-seconds",
+        type=int,
+        default=None,
+        help="a per-run threshold override, recorded next to the row it overrides (C-24's override rule)",
+    )
     return parser
 
 
@@ -931,6 +1436,8 @@ def main(argv=None) -> int:
         return action_digest(args)
     if args.action == "report":
         return action_report(args)
+    if args.supervision_report:
+        return action_supervision(args)
     return action_guard(args)
 
 

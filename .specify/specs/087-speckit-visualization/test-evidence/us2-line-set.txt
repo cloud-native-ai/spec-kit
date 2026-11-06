@@ -1,0 +1,325 @@
+--- tick 1 (t=0s)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position tick 1; two sub-flows dispatched --delta elapsed 0s since run start --remainder 2 intervals left --trigger tick
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=tick | profile=long-run | position=tick 1; two sub-flows dispatched | delta=elapsed 0s since run start | remainder=2 intervals left | blocker=no blocker | carrier=console
+EXIT=0
+
+--- tick 1 sub-flow report
+$ python3 scripts/python/status-digest.py --action guard --format json --structure 087-supervision --run-stamp r20261106T092000Z-us2l --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=tick | profile=long-run | position=2 dispatched sub-flow(s) watched (tick report) | delta=1 completed, 1 running or stalled, 0 failed since the last tick | remainder=1 sub-flow(s) still active | blocker=no blocker
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=2m23s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=2m32s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=2m32s | carrier=console
+{
+  "action": "guard",
+  "propositions": [
+    {
+      "proposition": "RO-01",
+      "reason": "owner declaration lists exactly 8 owned facts",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-02",
+      "reason": "no seeded flow sample supplied (--flow-sample)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-03",
+      "reason": "exactly one definition site: shared/guidelines/reporting-obligations.md",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-04",
+      "reason": "no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-05",
+      "reason": "no captured line set supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-06",
+      "reason": "2 sub-flow row(s) present, 0 omitted",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-07",
+      "reason": "row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-08",
+      "reason": "no transition class was observed for this report",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-09",
+      "reason": "owner digest section stated; bounded/omitted/stale/nothing-running faces render",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-10",
+      "reason": "no captured line set supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-11",
+      "reason": "no suppressed-tick fixture supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-12",
+      "reason": "no run record carrier value supplied (--carrier)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-13",
+      "reason": "prohibition names all nine items; no spawn site in the delivered script",
+      "status": "pass"
+    }
+  ]
+}
+EXIT=0
+
+--- boundary (t=2s, between ticks 1 and 2)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position work package boundary crossed --delta a work package boundary was crossed at elapsed 2s --remainder 1 interval left --trigger boundary
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=boundary | profile=long-run | position=work package boundary crossed | delta=a work package boundary was crossed at elapsed 2s | remainder=1 interval left | blocker=no blocker | carrier=console
+EXIT=0
+
+--- tick 2 (t=4s)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position tick 2; worker now past the stall row --delta elapsed 4s since run start --remainder run closing --trigger tick
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=tick | profile=long-run | position=tick 2; worker now past the stall row | delta=elapsed 4s since run start | remainder=run closing | blocker=no blocker | carrier=console
+EXIT=0
+
+--- tick 2 sub-flow report
+$ python3 scripts/python/status-digest.py --action guard --format json --structure 087-supervision --run-stamp r20261106T092000Z-us2l --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/above-threshold --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=tick | profile=long-run | position=2 dispatched sub-flow(s) watched (tick report) | delta=1 completed, 1 running or stalled, 0 failed since the last tick | remainder=1 sub-flow(s) still active | blocker=no blocker
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=2m27s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=4m47s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=4m47s | carrier=console
+{
+  "action": "guard",
+  "propositions": [
+    {
+      "proposition": "RO-01",
+      "reason": "owner declaration lists exactly 8 owned facts",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-02",
+      "reason": "no seeded flow sample supplied (--flow-sample)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-03",
+      "reason": "exactly one definition site: shared/guidelines/reporting-obligations.md",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-04",
+      "reason": "no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-05",
+      "reason": "no captured line set supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-06",
+      "reason": "2 sub-flow row(s) present, 0 omitted",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-07",
+      "reason": "row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-08",
+      "reason": "no transition class was observed for this report",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-09",
+      "reason": "owner digest section stated; bounded/omitted/stale/nothing-running faces render",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-10",
+      "reason": "no captured line set supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-11",
+      "reason": "no suppressed-tick fixture supplied (--line-set)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-12",
+      "reason": "no run record carrier value supplied (--carrier)",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-13",
+      "reason": "prohibition names all nine items; no spawn site in the delivered script",
+      "status": "pass"
+    }
+  ]
+}
+EXIT=0
+
+--- transition: sub-flow failure (before any tick, stamp 20261106T071120Z)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T071120Z-us2l --position worker failed --delta non-zero exit observed --remainder reporting the failure now, not at the next tick --transition sub-flow failure
+structure=087-supervision | run=r20261106T071120Z-us2l | trigger=transition:sub-flow failure | profile=long-run | class=sub-flow failure | position=worker failed | delta=non-zero exit observed | remainder=reporting the failure now, not at the next tick | blocker=no blocker | carrier=console
+EXIT=0
+
+--- transition: stall crossing (before any tick, stamp 20261106T071120Z)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T071120Z-us2l --position worker crossed the stall row --delta slow -> stalled --remainder reporting the crossing now, not at the next tick --transition stall crossing
+structure=087-supervision | run=r20261106T071120Z-us2l | trigger=transition:stall crossing | profile=long-run | class=stall crossing | position=worker crossed the stall row | delta=slow -> stalled | remainder=reporting the crossing now, not at the next tick | blocker=no blocker | carrier=console
+EXIT=0
+
+--- transition: dispatch failure (before any tick, stamp 20261106T071120Z)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T071120Z-us2l --position a third dispatch did not take hold --delta no triplet produced --remainder reporting the dispatch failure now, not at the next tick --transition dispatch failure
+structure=087-supervision | run=r20261106T071120Z-us2l | trigger=transition:dispatch failure | profile=long-run | class=dispatch failure | position=a third dispatch did not take hold | delta=no triplet produced | remainder=reporting the dispatch failure now, not at the next tick | blocker=no blocker | carrier=console
+EXIT=0
+
+--- profile switch record (live receiver lost mid-run)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position profile switch --delta live receiver lost; switching to the interactive profile at this boundary --remainder run closing --trigger boundary --profile interactive --profile-switch live receiver lost (the last active line ended); interactive profile from this boundary on
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=boundary | profile=interactive | switch=live receiver lost (the last active line ended); interactive profile from this boundary on | position=profile switch | delta=live receiver lost; switching to the interactive profile at this boundary | remainder=run closing | blocker=no blocker | carrier=console
+EXIT=0
+
+--- first line under the new profile
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position after the switch --delta first line under the interactive profile --remainder run closing --trigger tick --profile interactive
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=tick | profile=interactive | position=after the switch | delta=first line under the interactive profile | remainder=run closing | blocker=no blocker | carrier=console
+EXIT=0
+
+--- reporter-failure (the loop could not emit)
+$ python3 scripts/python/status-digest.py --action report --structure 087-supervision --run-stamp r20261106T092000Z-us2l --position reporting loop could not emit --delta one interval missed --remainder 1 interval --blocker the reporting loop did not emit this interval --trigger reporter-failure
+structure=087-supervision | run=r20261106T092000Z-us2l | trigger=reporter-failure | profile=long-run | position=reporting loop could not emit | delta=one interval missed | remainder=1 interval | blocker=the reporting loop did not emit this interval | carrier=console
+EXIT=0
+
+
+=== guard readings over the captured sets ===
+--- us2-line-set.status-lines.txt
+RO-05 pass 11 line(s) carry the four labels
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+summary pass=9 fail=1 not-evaluated=3
+--- us2-line-set.full.txt
+RO-05 fail line 3 lacks position; line 3 lacks delta; line 3 lacks remainder; line 3 lacks blocker; line 4 lacks position; line 4 lacks delta; line 4 lacks remainder; line 4 lacks blocker; line 8 lacks position; line 8 lacks delta; line 8 lacks remainder; line 8 lacks blocker; line 9 lacks position; line 9 lacks delta; line 9 lacks remainder; line 9 lacks blocker
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+summary pass=9 fail=1 not-evaluated=3
+--- us2-line-set.lines.txt (the 11 structure= lines, split out with pathlib)
+$ python3 scripts/python/status-digest.py --action guard --carrier ".live.log stream artifact path (an external dispatch writes its lines here)" --line-set $PWD/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 pass 11 line(s) carry the four labels
+RO-06 fail no per-sub-flow row found in the captured supervision report
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=10 fail=1 not-evaluated=2
+--- us2-line-set.rows.txt (the 4 sub-flow= rows, split out with pathlib)
+$ python3 scripts/python/status-digest.py --action guard --line-set $PWD/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.rows.txt
+RO-05 fail line 1 lacks position; line 1 lacks delta; line 1 lacks remainder; line 1 lacks blocker; line 2 …; line 3 …; line 4 …
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 fail transition class(es) absent from the line set: ['sub-flow failure', 'stall crossing', 'dispatch failure']
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 fail the fixture carries no reporter-failure line
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=7 fail=3 not-evaluated=3
+
+
+=== T053 verdict: the cadence survives boundaries, transitions and profile switches ===
+
+Subject: the 11 captured status lines above (real timed run over the us2f fixture
+triplets, fixture interval 2s) plus the 4 sub-flow rows they carry.
+
+1. The ticks are stamped on one clock and are not reset by an intervening line.
+   tick 1 renders `delta=elapsed 0s since run start` under
+   `run=r20261106T092000Z-us2l`; a `trigger=boundary` line follows at elapsed 2s;
+   tick 2 renders `delta=elapsed 4s since run start` under the same run stamp.
+   0s -> 4s across the boundary is the observation that the cadence clock is
+   the run's, not the boundary's: a reset would have shown 2s on tick 2.
+2. All three transition classes are present, each on its own run stamp, each
+   marked as emitted before a tick: `trigger=transition:sub-flow failure`,
+   `trigger=transition:stall crossing`, `trigger=transition:dispatch failure`,
+   each with `class=` and `remainder=reporting … now, not at the next tick`.
+   Distinct stamps per class mean a transition is a separate emission, not a
+   re-labelled tick. RO-08 pass over the lines set.
+3. Every line carries `profile=`; there is no un-profiled line in the set. The
+   mid-run loss of the live receiver is emitted as
+   `trigger=boundary | profile=interactive | switch=live receiver lost (the last
+   active line ended); interactive profile from this boundary on`, and the next
+   line renders `profile=interactive`. A profile change is therefore always a
+   recorded `switch=`, never a silent change of cadence.
+4. The reporting loop's own inability to emit is itself reported:
+   `trigger=reporter-failure` with `blocker=the reporting loop did not emit this
+   interval`. RO-11 pass.
+
+Verdict: T053 satisfied. The bounded fixture interval (2s) is a test artifact,
+not a cadence declaration; the production value is owned once by
+`shared/guidelines/reporting-obligations.md` and is not restated here (RO-03
+pass: exactly one definition site).
+
+Reading surface disclosure (lines vs rows). RO-05's reading surface per C-46 is
+a captured status line set; C-32's identity/state/age and C-35's
+`judged_against`/`measured_silence` live on the `sub-flow=` rows, which are a
+different row class. The three splits above are therefore each read by their own
+propositions and none of the three readings is allowed to stand as "whole
+report green":
+- lines-only: RO-05 pass, RO-06 fail ("no per-sub-flow row") — expected, the
+  rows were deliberately excluded; every other evaluated proposition passes
+  (summary pass=10 fail=1 not-evaluated=2).
+- rows-only: RO-06 pass (4 rows), RO-05 fail, RO-08 fail, RO-11 fail —
+  expected, rows carry none of the line-level elements or triggers
+  (summary pass=7 fail=3 not-evaluated=3).
+- full set: RO-05 fail naming exactly the four `sub-flow=` rows, every other
+  evaluated proposition pass (summary pass=9 fail=1 not-evaluated=3).
+The union of the three readings is the green statement: 11 lines carry the four
+elements, 4 rows carry the per-sub-flow identity/state/age and the judge, three
+transition classes and the reporter-failure line are present. This split is the
+deliberate C-46 design (RO-05 is a line-shaped proposition and MUST NOT be
+widened to accept rows), not a renderer defect. A single mixed capture is
+rejected by RO-05 by construction; the fixture is therefore stored as the three
+split files plus the master capture above.
+
+=== T054 verdict: emitting a line neither asks nor authorizes ===
+
+1. No question, no approval request, no waiver marker anywhere in the set:
+   RO-10 pass, `no interrogative or approval marker in the line set`, over each
+   of the three splits above. The lines are declarative — they report position,
+   delta, remainder and blocker, and they never end in a request for consent.
+2. The repertoire an emitted line can reach is closed: the renderer offers tick,
+   boundary, transition:<class> and reporter-failure and nothing else; each of
+   the four appears above. There is no line kind whose effect is "approved" or
+   "waived" (RO-13 pass: the prohibition names all nine items and the delivered
+   script has no spawn site).
+3. Consent does not travel on the reporting channel. Gate discipline stays with
+   its own owner: a decision still has to reach the gate path stated in
+   `shared/guidelines/confirmation-gates.md`, and a supervision line is not that
+   path — the report never carries the decision, it only says the reporter is
+   still watching. Anything that reads a line as an approval is reading against
+   the owner document, not through a gap in it.
+4. The absence of a prompt is load-bearing here: because the reporter must never
+   stop to ask (a blocked reporter looks exactly like a stalled sub-flow), the
+   verdict is that its output CANNOT be a consent surface — it has no
+   interrogative form to begin with.
+
+Verdict: T054 satisfied. Note the reading most likely to be mistaken for a
+finding: the transition lines say failure/stall/dispatch-failure "now, not at
+the next tick", which is a timing commitment about reporting, not an
+authorization of any remediation.

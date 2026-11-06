@@ -27,6 +27,8 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -643,3 +645,251 @@ def _section(text: str, heading: str) -> str:
         len(lines),
     )
     return "\n".join(lines[start:end])
+
+
+# --------------------------------------------------------------------------- #
+# T021 (US2) — the supervision report: presence is closure, transitions report
+# before the clock, and slow is not stalled
+#
+# This partition's own green point is C-33 (presence is a closure requirement).
+# Clauses C-32 / C-36 (what the report is over) are asserted by
+# `test_coaching_reporting_duty.py` (T020) on the shipped example; C-34 / C-35 (the
+# transition rule and the stall judgement) are turned green by T022's projection and
+# judged here against its real render.
+# --------------------------------------------------------------------------- #
+PATTERNS_ANCHOR = "Stall Detection"
+
+#: The two threshold rows a fixture pair brackets. Row identity is the table's own `Condition`
+#: cell — the test asserts the row is *named*, never what its number is (C-35: the number lives
+#: in `patterns.md` and comes from there at render time).
+STALL_ROW_ABOVE = "No manifest created"
+STALL_ROW_STUCK = "Manifest stuck at `in-progress`"
+
+
+def _digest_ready_us2() -> Path:
+    assert STATUS_DIGEST.is_file(), (
+        "status-digest.py missing: %s — expected at T009" % STATUS_DIGEST.relative_to(REPO_ROOT)
+    )
+    return STATUS_DIGEST
+
+
+def _supervise(digest: Path, sub_flows, **options):
+    """Render one supervision report through the delivered projection.
+
+    ``sub_flows`` is a list of ``(label, triplet_dir)`` pairs; each triplet directory carries the
+    files the visibility contract already declares for a dispatch (`<label>.live.log`,
+    `<label>.jsonl`, `<label>.status`). Ages are produced with ``os.utime`` at the fixture level, so
+    the *renderer* decides slow vs stalled — the test never passes a state in.
+    """
+    args = [sys.executable, str(digest), "--action", "guard", "--supervision-report"]
+    for label, triplet_dir in sub_flows:
+        args.extend(["--sub-flow", "%s=%s" % (label, triplet_dir)])
+    for key, value in options.items():
+        flag = "--" + key.replace("_", "-")
+        if value is True:
+            args.append(flag)
+        elif value is None or value is False:
+            continue
+        else:
+            args.extend([flag, str(value)])
+    env = dict(os.environ)
+    env["SPECIFY_LINE_REGISTRY_DIR"] = str(_EMPTY_REGISTRY)
+    return subprocess.run(args, capture_output=True, text=True, env=env)
+
+
+def _write_triplet(directory: Path, label: str, exit_code: int | None, age_seconds: int) -> Path:
+    """Materialise one dispatch's triplet with a controlled last-activity age."""
+    directory.mkdir(parents=True, exist_ok=True)
+    live_log = directory / ("%s.live.log" % label)
+    raw_log = directory / ("%s.jsonl" % label)
+    status = directory / ("%s.status" % label)
+    live_log.write_text("dispatch started\n", encoding="utf-8")
+    raw_log.write_text("{}\n", encoding="utf-8")
+    if exit_code is None:
+        status.write_text("", encoding="utf-8")
+    else:
+        status.write_text("%s exit=%d\n" % (label, exit_code), encoding="utf-8")
+    stamp = time.time() - age_seconds
+    for path in (live_log, raw_log, status):
+        os.utime(path, (stamp, stamp))
+    return directory
+
+
+def _sub_flow_rows(stdout: str) -> list:
+    return [ln for ln in stdout.splitlines() if "sub-flow=" in ln]
+
+
+def _row_for(stdout: str, label: str) -> str:
+    for line in _sub_flow_rows(stdout):
+        if re.search(r"sub-flow=%s\b" % re.escape(label), line):
+            return line
+    return ""
+
+
+def test_c33_presence_is_closure_every_dispatched_sub_flow_appears():
+    """C-33 / MV-02: both sub-flows appear on the tick; neither is sampled away."""
+    digest = _digest_ready_us2()
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        flows = [
+            ("alpha--r20261106T000000Z-aaaa--trainee",
+             _write_triplet(root / "a", "alpha--r20261106T000000Z-aaaa--trainee", 0, 5)),
+            ("beta--r20261106T000000Z-aaaa--trainee",
+             _write_triplet(root / "b", "beta--r20261106T000000Z-aaaa--trainee", None, 5)),
+        ]
+        proc = _supervise(digest, flows)
+    assert proc.returncode in (0, 1), (
+        "the supervision render must produce verdicts; rc=%s stderr=%r" % (proc.returncode, proc.stderr)
+    )
+    for label, _dir in flows:
+        assert _row_for(proc.stdout, label), (
+            "sub-flow %r is missing from the report; presence is a closure requirement, not a"
+            " sampling decision (C-33). Full output:\n%s" % (label, proc.stdout)
+        )
+
+
+def test_c33_an_omitted_sub_flow_is_named_by_its_label():
+    """C-33: an omission is a defect named by the label, never a silently smaller active set."""
+    digest = _digest_ready_us2()
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        label = "gamma--r20261106T000000Z-aaaa--trainee"
+        _write_triplet(root / "g", label, None, 5)
+        # `--expect-sub-flow` states the dispatch set the caller knows about; a label in that set
+        # with no row is an omission, and the report must name it rather than shrink quietly.
+        proc = _supervise(
+            digest,
+            [(label, root / "g")],
+                expect_sub_flow="delta--r20261106T000000Z-aaaa--trainee",
+            )
+    assert proc.returncode == 1, (
+        "an omitted sub-flow must turn the guard red; rc=%s stdout=%r" % (proc.returncode, proc.stdout)
+    )
+    assert re.search(
+        r"omitted|missing", proc.stdout, re.I
+    ) and "delta--r20261106T000000Z-aaaa--trainee" in proc.stdout, (
+        "the omission must be named by its label (C-33); got:\n%s" % proc.stdout
+    )
+
+
+def test_c33_a_completed_sub_flow_still_appears_on_the_tick_that_observes_it():
+    """C-33's second half: completion is observed on the tick, and only then may the flow leave."""
+    digest = _digest_ready_us2()
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        label = "epsilon--r20261106T000000Z-aaaa--trainee"
+        _write_triplet(root / "e", label, 0, 2)
+        proc = _supervise(digest, [(label, root / "e")])
+    row = _row_for(proc.stdout, label)
+    assert row, "a sub-flow that completed between ticks still appears (C-33); got:\n%s" % proc.stdout
+    assert "state=completed" in row, (
+        "the completed flow is reported as `completed`, not dropped from the active set; got %r" % row
+    )
+
+
+def test_c32_a_single_dispatch_supervisor_names_that_subordinate_not_an_empty_set():
+    """C-32 / C-36 over the projection: one dispatch yields one named row, never an empty set."""
+    digest = _digest_ready_us2()
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        label = "zeta--r20261106T000000Z-aaaa--trainee"
+        _write_triplet(root / "z", label, None, 3)
+        proc = _supervise(digest, [(label, root / "z")])
+    rows = _sub_flow_rows(proc.stdout)
+    assert len(rows) == 1, (
+        "exactly one dispatch must yield exactly one named row (not an empty set, not a set padded"
+        " by the master's own progress); got %r" % rows
+    )
+    assert "state=" in rows[0] and "age=" in rows[0], (
+        "the row carries the state and the age of last observed activity (C-32); got %r" % rows[0]
+    )
+
+
+@pytest.mark.parametrize("klass", TRANSITION_CLASSES)
+def test_c34_each_transition_class_produces_a_pre_tick_report(klass):
+    """C-34 / MV-03: failure, stall crossing and dispatch failure each report before the next tick."""
+    digest = _digest_ready_us2()
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        label = "eta--r20261106T000000Z-aaaa--trainee"
+        # Each class is seeded by its own observed condition, and the renderer is told which class it
+        # observed — the transition is never passed in as a state, only as the event that produced it.
+        if klass == "sub-flow failure":
+            _write_triplet(root / "t", label, 1, 5)
+        elif klass == "stall crossing":
+            _write_triplet(root / "t", label, None, 9000)
+        else:
+            _write_triplet(root / "t", label, None, 5)
+        if klass == "dispatch failure":
+            # A dispatch that never produced its triplet is the dispatch-failure condition.
+            for path in (root / "t").iterdir():
+                path.unlink()
+        proc = _supervise(
+            digest,
+            [(label, root / "t")],
+            transition=klass,
+            interval_elapsed=False,
+        )
+    assert proc.returncode in (0, 1), (
+        "the transition render must produce a verdict; rc=%s stderr=%r" % (proc.returncode, proc.stderr)
+    )
+    text = proc.stdout
+    assert "trigger=transition:" in text, (
+        "class %r produced no pre-tick transition line; the line's trigger kind is"
+        " `transition:<sub-flow-id>` (C-25) and it MUST NOT wait for the clock (C-34); got:\n%s"
+        % (klass, text)
+    )
+    assert klass in text or klass.replace(" ", "-") in text, (
+        "the pre-tick report must identify the transition class %r; got:\n%s" % (klass, text)
+    )
+    assert "pre-tick" in text or "before the next tick" in text, (
+        "the report must say it does not wait for the cadence (C-34); got:\n%s" % text
+    )
+
+
+def test_c35_slow_and_stalled_are_separated_by_the_declared_threshold_row():
+    """C-35 / MV-04: just-under is `slow`, just-over is `stalled`, and the row used is named."""
+    digest = _digest_ready_us2()
+    patterns = PATTERNS.read_text(encoding="utf-8")
+    assert PATTERNS_ANCHOR in patterns, (
+        "premise: the threshold owner carries a `%s` table (C-35)" % PATTERNS_ANCHOR
+    )
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        label = "theta--r20261106T000000Z-aaaa--trainee"
+        # The fixture pair is driven by a per-run threshold override, so the test does not carry the
+        # owner's number: the renderer reads the row and the override together and names the row.
+        under_dir = _write_triplet(root / "under", label, None, 4)
+        over_dir = _write_triplet(root / "over", label, None, 4000)
+        under = _supervise(
+            digest, [(label, under_dir)], threshold_row=STALL_ROW_ABOVE, threshold_seconds=60
+            )
+        over = _supervise(
+            digest, [(label, over_dir)], threshold_row=STALL_ROW_ABOVE, threshold_seconds=60
+            )
+    under_row = _row_for(under.stdout, label)
+    over_row = _row_for(over.stdout, label)
+    assert under_row and over_row, (
+        "both fixture renders must produce a row; under=%r over=%r" % (under.stdout, over.stdout)
+    )
+    assert "slow=yes" in under_row, (
+        "a sub-flow below the threshold is reported `slow`, a qualifier on running, not `stalled`;"
+        " got %r" % under_row
+    )
+    assert "state=stalled" not in under_row, (
+        "`slow` and `stalled` MUST NOT be merged (C-35); got %r" % under_row
+    )
+    assert "state=stalled" in over_row, (
+        "a sub-flow beyond the threshold is `stalled`; got %r" % over_row
+    )
+    for row, reading in ((under_row, "just-under"), (over_row, "just-over")):
+        assert "judged_against=" in row, (
+            "the %s judgement must name the threshold row it used (C-35); got %r" % (reading, row)
+        )
+        assert STALL_ROW_ABOVE in row, (
+            "the %s row must name the declared threshold row %r; got %r"
+            % (reading, STALL_ROW_ABOVE, row)
+        )
+        assert "measured_silence=" in row, (
+            "the %s judgement must state the measured silence (C-35); got %r" % (reading, row)
+        )

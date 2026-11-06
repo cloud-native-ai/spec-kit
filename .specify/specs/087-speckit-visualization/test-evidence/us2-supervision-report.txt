@@ -1,0 +1,146 @@
+=== 1. tick 1 (just-under): the two-sub-flow report, worker slow ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=35s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=running | age=45s | slow=yes | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=45s | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 2 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+
+=== 2. tick 2 (just-over): the same worker past the row is stalled, not slow ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/above-threshold --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=35s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=2m55s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=2m55s | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 2 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+
+=== 3. the omission defect: a dispatched label with no row is named (C-33) ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under --expect-sub-flow 087-supervision--r20261106T090000Z-us2f--worker --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=completed | age=36s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=missing | omitted: dispatched but no row on this tick (C-33) | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 fail sub-flow(s) dispatched but absent from the report: ['087-supervision--r20261106T090000Z-us2f--worker']
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=5 fail=1 not-evaluated=7
+EXIT=1
+
+=== 4. the pre-tick failure report (C-34): a sub-flow that exited non-zero ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/failed-exit --transition sub-flow failure --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=failed | age=3s | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | trigger=transition:087-supervision--r20261106T090000Z-us2f--worker | class=sub-flow failure | timing=pre-tick (emitted before the next tick) | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 pass 'sub-flow failure' reported pre-tick for ['087-supervision--r20261106T090000Z-us2f--worker']
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=7 fail=0 not-evaluated=6
+EXIT=0
+
+=== 5. the pre-tick stall crossing (C-34) ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/above-threshold --transition stall crossing --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=2m55s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=2m55s | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | trigger=transition:087-supervision--r20261106T090000Z-us2f--worker | class=stall crossing | timing=pre-tick (emitted before the next tick) | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 pass 'stall crossing' reported pre-tick for ['087-supervision--r20261106T090000Z-us2f--worker']
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=7 fail=0 not-evaluated=6
+EXIT=0
+
+=== 6. the pre-tick dispatch failure (C-34): no triplet at all ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--runner=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/dispatch-failure --transition dispatch failure --threshold-row Manifest stuck at `in-progress`
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--runner | state=failed | age=- | slow=no | carrier=console
+sub-flow=087-supervision--r20261106T090000Z-us2f--runner | trigger=transition:087-supervision--r20261106T090000Z-us2f--runner | class=dispatch failure | timing=pre-tick (emitted before the next tick) | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 pass 'dispatch failure' reported pre-tick for ['087-supervision--r20261106T090000Z-us2f--runner']
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=7 fail=0 not-evaluated=6
+EXIT=0
+
+=== 7. the coaching payload's single dispatch (C-36): one row, never an empty set ===
+$ python3 scripts/python/status-digest.py --action guard --structure 087-coaching --run-stamp r20261106T090000Z-us2c --sub-flow 087-supervision--r20261106T090000Z-us2f--trainee=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/coaching-trainee --threshold-row Manifest stuck at `in-progress`
+structure=087-coaching | run=r20261106T090000Z-us2c | trigger=tick | profile=long-run
+sub-flow=087-supervision--r20261106T090000Z-us2f--trainee | state=running | age=3s | slow=yes | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=3s | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md
+RO-04 not-evaluated no roster path is in the obligation's population (no --roster supplied and the recorded name-list holds none)
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section stated; bounded/omitted/stale/nothing-running faces render
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--line-set)
+RO-12 not-evaluated no run record carrier value supplied (--carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+
