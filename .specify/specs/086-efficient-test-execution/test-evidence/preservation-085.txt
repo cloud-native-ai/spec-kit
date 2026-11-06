@@ -1,0 +1,183 @@
+# 086 T038 / T040 / T043 — the 085 surface did not move, and the dogfood evidence it earned
+
+Owner of the propositions this file carries:
+`.specify/specs/086-efficient-test-execution/contracts/dogfood-and-preservation.contract.md`
+C-041 (the 085 surface, the one carve-out, and its two-part mechanical check), C-043 (the 085
+contract/integration re-run), C-048 (the per-stage record shape), C-049 (`actual_concurrency_max > 1`
+from dispatch records), C-050 (SC-010's status follows the evidence) and C-051 (the carrier downgrade is
+an observation). The 085 mechanisms themselves are owned by
+`.specify/specs/085-sdd-temporary-goal-team/` and are cited, never restated.
+
+Worktree `/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2`, branch `line/086-wp-c2`,
+HEAD `93e61050`, base `018b0455`. Every run line below carries the A20 environment (`PYTHONPATH`
+cleared, `SPECKIT_PYTHON` = `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python`,
+CPython 3.14.6 / pytest 9.2.0 / pytest-xdist 3.8.0 / 18 CPUs / arm64).
+
+## 1. GATE-5, bone (a) — what moved under the 085 surface (C-041)
+
+The base is `$(git merge-base HEAD master)`, exactly as GATE-5 expresses it — no hand-supplied commit is
+substituted:
+
+```
+$ git merge-base HEAD master
+24cb4edcc53db3cfc86f574e5e6d627c78b2ca08
+
+$ git diff -U0 --name-only \
+    $(git merge-base HEAD master)..HEAD -- \
+    .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams
+.specify/specs/085-sdd-temporary-goal-team/verification.md
+```
+
+**One file, and it is the carve-out file.** No path under `.specify/goal/` and none under
+`.specify/teams/` moved — the 086 run wrote its temporary Goal and Team inside its own spec directory,
+as the 085 contract requires.
+
+## 2. GATE-5, bone (b) — what moved *inside* that file (C-041)
+
+The hunk-level check: every added and every removed line must match
+`^SC-010_(status|value|note|blocked_at)=`.
+
+```
+$ git diff -U0 $(git merge-base HEAD master)..HEAD -- \
+    .specify/specs/085-sdd-temporary-goal-team/verification.md \
+  | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)'
+-SC-010_value=live bounded dogfood: temp goal + temp team + 2 child lines + real worktrees + integration queue + checkpoints 04/05 + run report
+-SC-010_note=A disposable live dogfood executed: the temporary goal/team were created in a temp project, two child lines were active concurrently with agent_cap 24, each wrote in its own worktree, and both merged through the integration queue (fsck clean, no push). A full 8-stage driver run with LLM stage agents was not executed; the dogfood is bounded to the team/child-line/checkpoint mechanics.
+-SC-010_blocked_at=no full 8-stage driver run with LLM stage agents
++SC-010_value=live SDD run via the 085 temporary Goal/Team: 10 stage wave records (requirements..implement waves 1-4) each with a checkpoint, 8 child lines in real worktrees merged through the integration queue, actual concurrency max 3
++SC-010_note=Feature 086's own unattended run used the spec-local temporary Goal and Team: every completed stage wave carries a dispatch record and a checkpoint (01-requirements..11-implement-wave4), agent_concurrency_requested 24 / team effective 18 (verifier-reserve) with a per-stage effective and its named reason, and actual concurrency taken from dispatch records reached a maximum of 3 (implement wave 2: three packages in flight). Worktree write isolation and the integration queue were exercised by 8 child lines. The carrier downgrade (host-native agent identities for 085's stage-agent types) is recorded as an observation, not a failure (contract C-051). The status stays partial because the review stage has not run yet: its record and checkpoint are still missing.
++SC-010_blocked_at=review stage has no record or checkpoint yet (stages requirements..implement are recorded; the review stage is still pending in 086's run)
+
+$ ... | grep -cvE '^[+-]SC-010_(status|value|note|blocked_at)='
+0
+```
+
+**Six lines changed: three removed, three added, all six matching the carve-out prefixes, zero
+non-matching lines.** `SC-010_status` was deliberately **not** flipped — see § 5. Every other line of
+`verification.md` (the header block, the baseline block, `SC-001`…`SC-009`, `SC-010_reduced_measurement*`,
+`SC-010_why_reduced_insufficient`, `SC-010_unblock`, `deferred_tasks=`, the acceptance summary) is
+byte-identical: the diff above names six lines and nothing else.
+
+### The M-16 leg proves this check is not vacuous
+
+A identical-looking check that would say "ok" to anything proves nothing. `parallel-safety-attribution.md`
+§ Leg M-16 runs the same command over a doctored copy with one non-carve-out line renamed
+(`SC-010_unblock` → `SC-010_UNBLOCK`) and gets **2** — the check goes red on exactly the mutation C-041
+forbids. The green reading above is therefore a measured green, not an unexercised one.
+
+## 3. No untracked file under the 085 surface (C-041, third limb)
+
+```
+$ git status --porcelain --untracked-files=all -- \
+    .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams
+(no output)
+```
+
+No untracked file, no modified file, and nothing under the two global directories. The working tree's
+only pre-existing modification is `.specify/memory/trigger/index.json`, which is outside this surface
+(`test-evidence/worktree-clean.txt` § Permitted residue).
+
+## 4. The carrier was recorded, not repaired (C-051 — T043's fourth green point)
+
+The host running this run does not expose 085's stage-agent types; each stage was carried by a
+host-native agent (`SDD Executor`, `general-purpose`, `SDD Requirements Executor`). That is recorded as
+an **observation** in `test-evidence/dogfood-record.md` § 5, with the mechanism list 085 owns named as
+created-and-used. It is not recorded as a 085 failure, and nothing in this feature's diff repairs, adds
+or replaces a stage-agent definition:
+
+```
+$ git diff --name-only $(git merge-base HEAD master)..HEAD -- .specify/agents agents/ .specify/teams
+(no output)
+```
+
+The observation is a property of this host, not a defect in 085, and the driver's run used the 085
+mechanisms as they are.
+
+## 5. The per-stage record (C-048 — T043's first green point)
+
+`test-evidence/dogfood-record.md` § 1 names, for every stage: the carrier identity, the requested value,
+the team effective value, the stage effective value, `actual_concurrency_max`, the checkpoint path and the
+completion state. § 2 gives each stage's *reason* for sitting below the team ceiling. § 3 reads every
+concurrency figure from the wave dispatch records and never from the declared `24`.
+
+| check C-048 asks for | where it is recorded |
+|---|---|
+| carrier identity (host-native agent) | `dogfood-record.md` § 1, column 2 |
+| `agent_concurrency_requested` | § 1, column 3 (`24`, labelled as declared) |
+| `agent_concurrency_effective` + named reason when lower | § 2's table (`2` for stages 01–06, `3`/`4`/`3`/`2` for waves 1–4, each with its reason) |
+| checkpoint path | § 1, column 7 (`checkpoints/01-requirements.md` … `10-implement-wave3.md`; wave 4's is the driver's `11-implement-wave4.md`) |
+| completion state | § 1, column 8 (`complete (REQUIREMENTS-DONE)` … `complete`) |
+
+The checkpoint files exist on disk:
+
+```
+$ ls .specify/specs/086-efficient-test-execution/checkpoints/
+01-requirements.md  02-clarify.md  03-plan.md  04-tasks.md  05-checklist.md  06-analyze.md
+07-implement-preflight.md  08-implement-wave1.md  09-implement-wave2.md  10-implement-wave3.md
+11-implement-wave4.md
+```
+
+## 6. Actual concurrency above one, from dispatch records (C-049 — T043's second green point)
+
+`dogfood-record.md` § 3: maximum observed **3** in implement wave 2 (A2 ∥ A3 ∥ B2), recorded in
+`checkpoints/09-implement-wave2.md` § 1; wave 1 **2** (A1 ∥ B1, `checkpoints/08-implement-wave1.md` § 1);
+wave 3 **2** (A4 ∥ B3, `checkpoints/10-implement-wave3.md` § 1). `actual_concurrency_max > 1` therefore
+holds for three stages, each read from its own wave's dispatch record.
+
+The value **24 never appears as an observation** anywhere in the record: it appears only in the
+`requested` column and in § 2 as the declared budget that was never binding. The M-19 leg (a record that
+reports `effective` from the declared 24) is carried in `test-evidence/serial-exceptions.txt` § 5; the
+M-18 leg (a `pass` claim on a partial chain) in `test-evidence/parallel-safety-attribution.md`.
+
+## 7. 085 SC-010's status follows that evidence (C-050 — T043's third green point)
+
+T041 edited the four `SC-010_*` lines. The status is **`partial`**, not `pass`, and the gap is named in
+one line:
+
+```
+SC-010_status=partial
+SC-010_value=live SDD run via the 085 temporary Goal/Team: 10 stage wave records (requirements..implement waves 1-4) each with a checkpoint, 8 child lines in real worktrees merged through the integration queue, actual concurrency max 3
+SC-010_note=... (full text in § 2 above)
+SC-010_blocked_at=review stage has no record or checkpoint yet (stages requirements..implement are recorded; the review stage is still pending in 086's run)
+```
+
+Why `partial` and not `pass`: 085 SC-010 asks for the **full** stage chain ending in terminal archival,
+and this run has reached implement (11 checkpoints, waves 1–4) with the **review stage still outstanding**
+— no `review.md`, no review checkpoint. C-050's rule is that a `pass` needs the whole chain; the chain is
+not whole, so the honest value is `partial` with the missing stage named. Restating the 085 requirement:
+"the feature ran once" is not evidence, and neither is "ten of eleven stages ran".
+
+The complement is measured too — the M-18 leg shows the same evidence-chain reading go **red** on a
+doctored copy that claims `pass` with only requirements/clarify/plan checkpoints present, so the
+`partial` here is a decision the check would have contradicted if it were wrong.
+
+## 8. The 085 contract/integration re-run (C-043 — T040)
+
+Five named files, unchanged by this feature, re-run on this tree:
+
+```
+$ env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python bash scripts/bash/run-tests.sh \
+    --names-out /Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/t040-names.txt -q \
+    tests/contract/test_temp_goal_contract.py tests/contract/test_temp_team_schema.py \
+    tests/contract/test_checkpoint_protocol.py tests/integration/test_temp_team_worktree_queue.py \
+    tests/integration/test_checkpoint_rollback.py
+
+# test runner: mode=parallel workers=auto dist=load passes=1
+20 passed in 6.22s
+# failed-name list written: .../t040-names.txt (0 entries) passes=1
+EXIT=0
+```
+
+- **20 passed, 0 failed, 0 skipped.** Pass condition: zero new failure names against
+  `test-evidence/baseline-failed.txt`. The name list has **0 entries**, and the baseline's 19 names all
+  live in `tests/contract/` files outside these five, so the new-name count is **0** — the pass
+  condition holds on an empty list rather than on a count match (FR-033).
+- A targeted five-file run, not a full-suite run: it consumes no full-run slot (T054).
+
+## 9. What this file does not claim
+
+- It does not claim 085 SC-010 is `pass`; it records the `partial` decision and the one-line gap.
+- It does not claim any 085 mechanism was designed or changed by this feature; the mechanisms are 085's
+  and this feature only used them.
+- It does not restate the 085 contract clauses or the 085 goal/team schemas — those live in
+  `.specify/specs/085-sdd-temporary-goal-team/`.

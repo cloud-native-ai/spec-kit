@@ -121,6 +121,15 @@ An expensive execution (long tests, builds, bulk queries, remote calls) is a one
 - **Diagnostics-Before-the-Run (诊断开关前置)**: enable opt-in, side-effect-free diagnostics before the run; once it finishes without them, that information is gone.
 - **Consume-the-Record (消费留痕而非重跑)**: answer follow-up questions from the record; re-running to recover information already produced is the canonical anti-pattern.
 
+## Test Execution Efficiency (测试执行效率)
+
+Coverage is necessary and never sufficient: a suite that is not actually run protects nothing, so what tests cost to execute is a quality attribute at the same tier as coverage. Full discipline: `.specify/shared/guidelines/test-execution-efficiency.md` (do NOT copy its rules; reference the file).
+
+- **Cost is a quality attribute (成本即质量属性)**: when efficiency meets the owner's criterion it is a releasable requirement, not an optional optimisation; a faster run MUST NOT be bought by shrinking the selection, skipping, declaring flakiness, or retrying until green.
+- **Mode follows the discriminating property (方式由判别属性决定)**: process-level parallelism, asynchronous concurrency and neither are decided per execution unit by what it waits on — serial stays a legitimate answer, recorded rather than forced.
+- **Isolation before parallelism (先隔离后并行)**: the owner's preconditions must hold on measured name-level evidence against serial execution, never on reading the tests; repair the precondition, do not reclassify the failure it causes.
+- **One scope (单一适用范围)**: this rule binds any project that builds a test framework or writes test cases; runner defaults and parameters belong to the runner, not to this section.
+
 ## Progress Reporting Discipline
 
 A long-running task owes the user a periodic sign of life: minutes of silence are indistinguishable from a hang. Full discipline: `.specify/shared/guidelines/progress-reporting.md` (do NOT copy its rules; reference the file).

@@ -1,0 +1,156 @@
+# analyze-repair gates — feature 086 (Efficient Test Execution, Concurrent by Default)
+
+Recorded by the driver's **analyze findings 修复 pass** (not a stage). Every command below was
+re-run against the live tree after the last artifact edit; the tail of each raw stdout is pasted.
+The pre-repair readings are quoted beside each gate so the delta is visible rather than asserted.
+
+## 1. `validate-requirements.py`
+
+```text
+python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md
+```
+
+Exit code: 0
+
+```text
+file: .specify/specs/086-efficient-test-execution/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 335 lines, 45 definition rows, 7 shared strings
+0 error(s), 0 warning(s)
+```
+
+Pre-repair: same command, 0 error / 0 warning (334 lines). Post-repair: 0 error / 0 warning
+(335 lines). Definitions, shared strings and the FR / SC / STR counts are unchanged at 45 rows /
+7 / 33 / 12 / 7 — the pass added prose to existing requirements, not new requirement ids.
+
+## 2. `validate-tasks.py`
+
+```text
+python3 scripts/python/validate-tasks.py .specify/specs/086-efficient-test-execution/tasks.md
+```
+
+Exit code: 0
+
+```text
+PASS: .specify/specs/086-efficient-test-execution/tasks.md — 0 error(s), 0 warning(s)
+```
+
+Pre-repair: PASS with 2 warnings (`green-clause-collision` T009/T009a on C-020, and a forward
+`blockedBy`). Post-repair: 0 error / 0 warning. 56 task rows; C-001…C-052 each claimed by exactly
+one `[green:]` row.
+
+## 3. `account-clause-coverage.py` — the blocking gate (C-01)
+
+```text
+python3 scripts/python/account-clause-coverage.py --spec .specify/specs/086-efficient-test-execution
+```
+
+Exit code: 0
+
+```text (tail)
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 33
+FR claimed: 33
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 52, scanned files 270, clause universe 1728, FR universe 33
+  [clause-uncovered] pass (573) — 573 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 33 of 33 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 573 names; 573 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+```
+
+Pre-repair: this gate was the only red one — `FR universe: 33 / FR claimed: 30 / FR uncovered: 3`
+(FR-016, FR-032, FR-033 had no clause citation group). Post-repair: `status: ok`, `fr-uncovered 0`,
+`companion` non-empty (claimed clauses 52, scanned files 270). The clause lane is unchanged at 573
+baseline-internal uncovered items, 0 beyond baseline.
+
+## 4. `pre-analyze-check.py --stage requirements`
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements \
+  --spec-dir .specify/specs/086-efficient-test-execution --repo .
+```
+
+Exit code: 0
+
+```text
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=39 waived=0
+```
+
+## 4b. `pre-analyze-check.py --stage plan`
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan \
+  --spec-dir .specify/specs/086-efficient-test-execution --repo .
+```
+
+Exit code: 0
+
+```text
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=39 waived=0
+```
+
+## 4c. `pre-analyze-check.py --stage tasks`
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage tasks \
+  --spec-dir .specify/specs/086-efficient-test-execution --repo .
+```
+
+Exit code: 0
+
+```text
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=39 waived=0
+```
+
+Pre-repair readings were `requirements` pass / `plan` pass / `tasks` pass with 39 advisories each.
+Mid-repair the three stages read `decision=fail errors=7…8` — worth recording, because the cause was
+not the artifacts' content but the **id form**: the three-digit `T\d{3}` task-id form the validator
+uses (`TASK_DEF = ^- \[.\] (T\d{3})`) reads a suffixed id such as a letter-suffixed baseline row as a
+*duplicate of its stem row*. The affected rows were renumbered to plain three-digit ids (T050 baseline
+slot, T051 ledger close, T052 xdist API cover, T053 isolation re-measure, T054 two-slot account,
+T055 parallel-safety attribution, T056 no-new-machinery), which restored `errors=0` on all three
+stages. All 39 remaining advisories are `missing-path` on files this feature is scheduled to create
+(`shared/guidelines/test-execution-efficiency.md`, `tests/contract/test_run_tests_runner_contract.py`,
+`tests/contract/test_test_execution_efficiency.py`, plus the not-yet-regenerated
+`.specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py` mirror) — zero advisories name
+a path this pass was supposed to produce.
+
+## 5. `decomposition-check.py --mode plan`
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan \
+  --requirements .specify/specs/086-efficient-test-execution/requirements.md
+```
+
+Exit code: 0
+
+```json
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 33, "task_count": null, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T05:14:38Z"}
+```
+
+## 6. `decomposition-check.py --mode tasks`
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+  --requirements .specify/specs/086-efficient-test-execution/requirements.md --tasks .specify/specs/086-efficient-test-execution/tasks.md
+```
+
+Exit code: 0
+
+```json
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 33, "task_count": 56, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T05:14:38Z"}
+```
+
+Post-repair the task count moved 50 → 56 (six rows added by this pass: the baseline slot, the
+two-slot accountability row, the ledger close, the xdist API cover, the isolation re-measure and the
+no-new-machinery row). Both ceilings still hold.

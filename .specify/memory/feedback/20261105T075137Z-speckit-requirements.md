@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T07:51:37Z"
 summary: "requirements attempt 2 completed: spec + checklist + evidence green"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

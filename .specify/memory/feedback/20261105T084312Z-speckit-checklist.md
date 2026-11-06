@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T08:43:12Z"
 summary: "checklist 阶段产出 38 条需求质量清单（100% 可追溯、0 禁用开头、既有清单未被覆盖），每条前提由自检程序重新推导；两个跨产物分歧（tasks.md 的 FR-023 悬空引用、既有门禁集合的口径不一）只登记未修平，交 analyze 裁决；plan-owned 与 requirements/tasks 零 diff。"
+introspection_ref: "introspection-20261106T084116Z#F-03"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-03"
 ---
 
 ## Review

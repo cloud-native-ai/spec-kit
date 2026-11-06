@@ -1,0 +1,229 @@
+# 086 plan-stage gates — captured 2026-11-06T04:20Z
+
+    branch: 086-efficient-test-execution
+    stage base commit: 554d8333
+    mode: plan (requirements.md bound to Feature 086; plan.md created this stage)
+    flow_class: execution / source=declaration / marker=null
+    carrier: host-native `SDD Executor` as the 085 `sdd-plan-coordinator` role (carrier downgrade, A19b)
+
+## 1. Artifacts created (plan stage)
+
+    plan.md              (19-row dynamic Constitution Check; 3 decision tensions; 10 execution premises; 1 inherited-blocker row; § Document Structure intentionally absent — execution class)
+    research.md          (B-1..B-9 measured baseline + R-1..R-10 decisions + 9-row re-measure list)
+    data-model.md        (E-1..E-10 / V-1..V-22 / SM-1..SM-3)
+    contracts/           (4 files: C-001..C-052, 19 mutation legs M-1..M-19)
+    quickstart.md        (S-0 executed + S-1..S-8 route (b))
+    feature-ref.md       (binding + 21-row delivery surface + 7 disclosed rulings)
+
+## 2. Gate: validate-decision-tensions
+
+    $ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/086-efficient-test-execution
+    spec: .specify/specs/086-efficient-test-execution
+    status: ok
+      [dtr-anchor] pass (0)
+      [dtr-section-missing] pass (0)
+      [dtr-record-incomplete] pass (0)
+      [dtr-tension-id] pass (0)
+      [dtr-rejected-form] pass (0)
+      [expected-sacrifice-unmapped] pass (0)
+    scanned: 330 lines, 3 record(s)
+    channel: value_domain=HIGH-or-0, high=0
+    0 error(s), 0 warning(s)
+
+First run returned `status: error` with 3 × `expected-sacrifice-unmapped`
+(HIGH): the three `expected_sacrifice` values used an em-dash instead of the
+closed `<SC-NNN> Source <↓|↑>` form. Repaired in place (direction tokens added:
+T-001 SC-011 ↓, T-002 SC-004 ↓, T-003 SC-002 ↓); re-run is the `ok` above.
+
+## 3. Gate: pre-analyze-check --stage plan
+
+    $ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+        --spec-dir .specify/specs/086-efficient-test-execution --stage plan --repo .
+    pre-analyze-check: stage=plan decision=pass errors=0 advisories=25 waived=0
+    EXIT=0
+
+    summary: fr=33 sc=12 tasks=0 clauses=0 files=11
+
+Advisory breakdown (all 25 are `missing-path`, all for surfaces this feature
+creates or mirrors in implement; none blocks the stage). Counts taken from the
+JSON output, not transcribed:
+
+     12  shared/guidelines/test-execution-efficiency.md      (new owner)
+      5  tests/contract/test_run_tests_runner_contract.py    (new test)
+      3  .specify/shared/guidelines/test-execution-efficiency.md  (mirror of the owner)
+      3  tests/contract/test_test_execution_efficiency.py    (new test)
+      2  .specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py  (mirror path)
+
+    25  total
+
+Two errors were found and repaired in place before the passing run:
+  1. `plan.md:209` § Execution Premises EP-009 — a `|` inside the Evidence cell
+     split the row, so the parser read `sort > "$NAMES_OUT"` as the `Status`.
+     Reworded without pipes or backticked shell fragments; `Status` now reads
+     `verified`.
+  2. `plan.md:224` § Inherited Blockers row 1 — the `Carrier` cell was
+     `task:T###+test:…` (unparseable; `T###` is not `T\d{3}`), then
+     `gate:GATE-086-DOGFOOD` (the closed grammar is `gate:GATE-<digits>`).
+     Final value `gate:GATE-086`, with the tasks-stage obligation spelled out in
+     the note so `/speckit.tasks` emits that exact completion-gate id.
+
+## 4. Gate: decomposition-check --mode plan
+
+    $ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py \
+        --mode plan --requirements .specify/specs/086-efficient-test-execution/requirements.md
+    {"mode": "plan", "decision": "proceed", "measured": {"fr_count": 33, "task_count": null,
+     "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T04:20:14Z"}
+
+Decision: **proceed**, single package. 33 FR is under the 60 ceiling, so no slice
+split is required. The three work-package slices in `plan.md` § Work Packages are
+the 085 team's *concurrency* unit, not a feature decomposition.
+
+## 5. Gate: doc-consistency-check --action structure
+
+    $ python3 scripts/python/doc-consistency-check.py --action structure \
+        --spec-dir .specify/specs/086-efficient-test-execution
+    class=execution source=declaration
+    status: not-applicable
+    two-way: not-run
+    files_scanned: 1
+    not-applicable: 结构门禁只适用于表达类；已检视 1 个文件，未做结构判定
+
+Decision: **not-applicable**, and correct per the plan template's class
+condition (an execution-class line MUST NOT be required to emit
+`## Document Structure`). The plan states this explicitly rather than silently
+omitting the section.
+
+## 6. Gate: overlap-check
+
+    $ python3 skills/external/sdd-loop-driver/scripts/overlap-check.py \
+        --spec-dir .specify/specs/086-efficient-test-execution --repo .
+    overlap-check: current=086-efficient-test-execution checked=77 overlaps=27 decision=overlap
+
+Adjudication (the check's own header: "Runs at the driver's clarify U4" — no plan
+stage is owned by it; recorded here because this stage changed the declared
+surface):
+
+  The 27 overlaps are **13 distinct (other_spec, path) pairs** over 5 of this
+  feature's 7 declared shared-root paths. Every one is
+  `relation: same-path` on a **governance surface that many features legitimately
+  extend by adding their own row**, not on an exclusive delivery lane:
+
+  | Path | Features that already changed it | Why coexistence is the intended shape |
+  |------|----------------------------------|--------------------------------------|
+  | `templates/instructions-template.md` | 006, 009, 029, 031, 032, 035, 044, 050, 051, 052, 054, 063, 076, 079, 082 | Every principle/ambient-section landing adds one section to one file; 082 did exactly this |
+  | `templates/constitution-template.md` | 051, 052, 082 | Every principle amendment appends one `### NNN.` block; the roster is single-owner by design |
+  | `skills/internal/manage-constitution/SKILL.md` | 059, 062, 063, 082 | The MUST-include list is the single owner of that enumeration; each amendment adds an entry |
+  | `scripts/bash/run-tests.sh` | 044, 047, 067 | Canonical runner; each consumer extends it additively. 067's RC-01..RC-08 are **cited, not reopened** by this plan |
+  | `skills/external/sdd-loop-driver/scripts/audit-test-budget.py` | 067 (nested-path), 075 | 086 extends `VALUE_FLAGS` only; slot semantics and selection stay with 075/067 |
+
+  No path is claimed exclusively by another feature, and no other feature
+  declares this feature's only genuinely new path
+  (`shared/guidelines/test-execution-efficiency.md`) — it appears in zero other
+  specs. The two remaining declared paths
+  (`docs/contribute/dev-setup.md`, the four test files) produce no overlap.
+
+  Disposition: **adjudicated as additive coexistence, not a conflict.** The
+  requirement to "adjudicate ownership before plan" is met by the table above:
+  each path keeps its existing owner (the roster/list/section is single-owner;
+  the features listed are past contributors, not co-owners). This mirrors how
+  082 and 083 recorded the same shape in their own runs.
+
+## 7. Gate: mirror baseline (measured before any edit)
+
+    $ python3 scripts/python/sync-mirrors.py --check
+    OK: all per-tool command copies match the source templates.
+    ok    templates/ == .specify/templates/ (22 files)
+    ok    skills/external/ == .specify/skills/ (415 files)
+    ok    skills/internal/ == .specify/skills/internal/ (138 files)
+    ok    agents/ == .specify/agents/templates/ (16 files)
+    ok    scripts/ == .specify/scripts/ (121 files)
+    ok    shared/ == .specify/shared/ (94 files)
+
+Baseline drift: **zero**. Every Mirror Obligations `Verify` cell in `plan.md` is
+therefore phrased as "no NEW drift" against this measurement.
+
+## 8. Gate: confirmation-gate scan baseline (measured before any edit)
+
+    $ python3 .specify/scripts/python/scan-confirmation-gates.py --root . --json \
+        > .specify/.tmp/086/gate-scan-baseline.json
+    total 27 violations 0
+
+Frozen baseline file (`baseline-gates.json` of feature 050) reads
+`confirmationGates.total = 23`, so the two guard tests that assert equality
+(`test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged`,
+`test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline`) are
+**already red on the serial baseline** — both names appear in
+`.specify/.tmp/086/baseline-failed.txt`. 086's criterion is therefore "total does
+not increase over 27", recorded as EP-008 and research R-8.
+
+## 9. Feature registry transition (plan owns Draft → Planned)
+
+    .specify/memory/features.md      row 086: Status `Draft` -> `Planned`; Last Updated refreshed
+    .specify/memory/features/086.md  Status `Draft` -> `Planned`; Latest Review / Last Updated refreshed
+    Total Features                   81 (unchanged; no new feature, no renumber)
+    Specification path               unchanged (.specify/specs/086-efficient-test-execution/requirements.md)
+
+## 10. In-passing repairs disclosed
+
+1. § Decision Tensions `expected_sacrifice` values rewritten into the closed
+   `<SC-NNN> Source <↓|↑>` form (3 records).
+2. § Execution Premises EP-009 Evidence cell rewritten without a `|`, restoring
+   the five-column parse.
+3. § Inherited Blockers row 1 `Carrier` corrected twice: an unparseable `task:T###…`
+   placeholder, then a `gate:` id outside the closed grammar; final `gate:GATE-086`
+   with the tasks-stage obligation stated in the note.
+4. `contracts/budget-ledger-parser.contract.md` cited a non-existent owner path
+   `skills/external/sdd-loop-driver/contracts/test-budget.md`; the real owner is
+   `.specify/specs/075-sdd-loop-efficiency/contracts/test-budget.md` plus
+   `skills/external/sdd-loop-driver/references/efficiency-model.md`.
+   Corrected to both.
+5. `plan.md` Risk R-8 and WP-C2 named a non-existent preservation test
+   (`test_temporary_goal_team_preservation.py`); replaced with the mechanical
+   `git diff --name-only` check (contract C-041) and the five existing 085
+   contract/integration test files, which were then verified to exist.
+6. Requirements' watcher-test id `test_c24` (from the dispatch brief) corrected to
+   the live `test_c22_watch_target_hook_selftest`; grounded on
+   `tests/contract/test_sdd_loop_driver_skill.py:537` and on the Phase 0 name diff.
+
+## 11. 085 preservation
+
+    $ git diff --name-only -- .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams
+    (empty)
+
+No 085 path was created, modified or deleted by this stage. The temporary Goal
+created at the requirements stage remains the only spec-local goal artifact.
+The temporary Team is still deferred to the driver after plan U4 (085 C-008);
+this stage did not create it.
+
+## 12. Final confirmation pass (after the registry transition)
+
+    $ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+        --spec-dir .specify/specs/086-efficient-test-execution --stage plan --repo .
+    pre-analyze-check: stage=plan decision=pass errors=0 advisories=25 waived=0
+
+    $ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/086-efficient-test-execution
+    status: ok / 0 error(s), 0 warning(s)
+
+    $ python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md
+    status: ok / 0 error(s), 0 warning(s)   (requirements unchanged by this stage)
+
+## 13. Plan integrity checks
+
+    $ grep -cE '^# ' plan.md                                  -> 1   (exactly one top-level heading)
+    $ grep -noE '\[[A-Z][A-Z0-9_]+\]' plan.md research.md data-model.md \
+        quickstart.md feature-ref.md contracts/*.md             -> (no output; no residual placeholders)
+    $ grep -n 'Requirement → Feature' plan.md                   -> line 4, the required stamp
+
+The template's self-referential Note line about `[PLACEHOLDER]` replacement was
+removed while filling, so it does not false-positive the placeholder scan.
+
+## 14. Change surface for this stage
+
+    $ git status --porcelain
+    ?? .specify/specs/086-efficient-test-execution/{contracts/,plan.md,research.md,
+         data-model.md,quickstart.md,feature-ref.md,test-evidence/plan-gates.txt}
+     M .specify/memory/features.md         (row 086: Draft -> Planned, Last Updated)
+     M .specify/memory/features/086.md     (Status Draft -> Planned, Last Updated, Latest Review)
+
+No file under scripts/, templates/, shared/, skills/, src/, tests/ or docs/ was
+touched. No source, template or test edit — as the stage discipline requires.

@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-05T09:47:53Z"
 summary: "084 harness-triple-structure run stopped at analyze round 2 with CRITICAL 0 / HIGH 2. R2-01 (features/084.md flow_class assignment tripped the 069 C-2 contract test) was mechanically fixed in 43dcf30e"
+introspection_ref: "introspection-20261106T084116Z#F-08"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-08"
 ---
 
 ## Review

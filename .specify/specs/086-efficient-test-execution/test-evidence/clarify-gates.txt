@@ -1,0 +1,102 @@
+# 086 clarify-stage gates — captured 2026-11-06T04:11Z
+# branch: 086-efficient-test-execution  base commit: 3afe10df
+# mode: A (post-requirements; plan.md absent)  target: requirements.md
+# carrier: host-native general-purpose as the sdd-clarify-analyzer role (085 carrier downgrade, see A19)
+
+== writability probe (before questions)
+$ bash .specify/scripts/bash/check-prerequisites.sh --json --paths-only
+{"REPO_ROOT":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit","BRANCH":"086-efficient-test-execution","REQUIREMENT_ID":"086","REQUIREMENTS_DIR":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution","FEATURE_ID":"","FEATURE_NAME":"Need clarification","FEATURE_SPEC":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/requirements.md","IMPL_PLAN":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/plan.md","TASKS":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution/tasks.md","MODE":"A","WRITABLE":true}
+EXIT=0
+
+== feature binding (Mode A taxonomy, Feature Linkage)
+feature_id: 086
+feature_name: Efficient Test Execution (Concurrent by Default)
+action: bind-existing (no new Feature, no renumber)
+evidence:
+  - .specify/memory/features.md row 086 exists (Total Features stays 81; rows 81)
+  - .specify/memory/features/086.md exists; Related Specifications/Requirements section added with the binding note
+  - requirements.md § Related Feature now carries concrete Feature ID / Feature Name
+  - feature status stays Draft (clarify does not own Draft -> Planned; A18)
+
+== taxonomy coverage scan (Mode A)
+| Category | Status | Note |
+|---|---|---|
+| Feature Linkage | Resolved | bound to 086; no new/renumber |
+| Functional Scope & Behavior | Clear | US1-US5 + Out of Scope |
+| Domain & Data Model | Clear | Key Entities; no persistent data store |
+| Interaction & UX Flow | Clear | CLI paths, stderr header/fallback note, exit codes |
+| Non-Functional Quality Attributes | Resolved | A13 (auto/load, no invented cap), A15 (dev-only xdist, Python boundary) |
+| Integration & External Dependencies | Clear | xdist dev-only; Python 3.8 serial fallback; no new services |
+| Edge Cases & Failure Handling | Clear | Edge Cases section covers timeout, empty list, duplicate -n, nesting, unwritable temp, shared-path writes |
+| Constraints & Tradeoffs | Clear | A4/A5/A6/A13/A14 |
+| Terminology & Consistency | Clear | Shared Strings STR-001..STR-007 |
+| Completion Signals | Clear | SC-001..SC-012 each with a collection source |
+| Misc / Placeholders | Resolved | marker-count 0; no "Need clarification" remains |
+| Deferred-by-assumption | Resolved | A13/A14 carry measured re-opening conditions; A15-A19 fix boundaries |
+
+Coverage summary: Resolved 4 / Deferred 0 / Clear 8 / Outstanding 0
+Questions asked & answered this stage: 4 (self-adjudicated, no user prompt); Clarifications session rows: 10 total (6 pre-existing + 4 appended).
+
+== $ python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md
+file: .specify/specs/086-efficient-test-execution/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 332 lines, 45 definition rows, 7 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+== $ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements --spec-dir .specify/specs/086-efficient-test-execution --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=1 waived=0
+{"stage":"requirements","decision":"pass","findings":[{"check":"missing-path","severity":"advisory","path":"requirements.md","line":249,"message":"path does not exist under the repo: shared/guidelines/test-execution-efficiency.md"}],"summary":{"errors":0,"advisories":1,"waived":0,"fr":33,"sc":12,"tasks":0,"clauses":0,"files":2},"checked_at":"2026-11-06T04:10:20Z"}
+EXIT=0
+# The single advisory is the owner guideline this feature creates in implement; expected, not a clarify error.
+
+== $ python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id spec:086-efficient-test-execution
+unit_id: spec:086-efficient-test-execution
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0
+
+== $ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/086-efficient-test-execution/requirements.md
+{"mode":"plan","decision":"proceed","measured":{"fr_count":33,"task_count":null,"fr_ceiling":60,"task_ceiling":80},"reasons":[],"checked_at":"2026-11-06T04:10:39Z"}
+EXIT=0
+
+== $ python3 skills/external/sdd-loop-driver/scripts/overlap-check.py --spec-dir .specify/specs/086-efficient-test-execution --repo .
+overlap-check: current=086-efficient-test-execution checked=1 overlaps=0 decision=clear
+{"decision":"clear","current_spec":"086-efficient-test-execution","checked_specs":["086-efficient-test-execution"],"overlaps":[],"note":"current feature has no declaration artifact","checked_at":"2026-11-06T04:10:16Z"}
+EXIT=0
+
+== overlap adjudication (no silent clearing)
+- Tool verdict: clear; checked=1 (no sibling spec declares a delivery overlap against 086); 086 has no declaration artifact at clarify time (plan contracts not yet created).
+- Expected conceptual boundaries are not file-level overlaps and are adjudicated read-only in requirements.md § Boundary and Ownership:
+  - 067 runner contract RC-03: 086 records its own adoption decision at the authorized position; 067's conclusion is not rewritten.
+  - 085 preservation surface: 086 only uses and preserves it; no edits to 085 goal/team/checkpoints/contracts/history.
+- Evidence that the 085 surface is untouched by this stage: `git diff --name-only -- .specify/specs/085-sdd-temporary-goal-team` prints nothing (empty).
+
+== working-tree snapshot after clarify edits
+$ git status --porcelain
+ M .specify/memory/features.md
+ M .specify/memory/features/086.md
+ M .specify/specs/086-efficient-test-execution/checklists/requirements.md
+ M .specify/specs/086-efficient-test-execution/requirements.md
+# plus this new test-evidence/clarify-gates.txt before commit
+
+== in-passing repairs (disclosed; corrections, not decisions)
+1. checklists/requirements.md: stale "待 clarify 绑定" feature-scope note and the requirements-stage line-count note were corrected to the bound state (332 lines after the clarify append; FR/SC/STR counts unchanged). No checklist item was added, removed or re-scored.
+2. .specify/memory/features.md row 086 and .specify/memory/features/086.md: stale "Related Feature 待 clarify 绑定" notes were replaced with the binding record required by Feature Binding Rules; no status transition, no new row, no renumber.
+
+== framework observations (recorded, not repaired by this feature; A19)
+1. The requirements-stage scaffold briefly created a `087-` branch before the correct `086` branch; it was cleaned by the driver. This feature does not modify the scaffold script.
+2. The host does not expose the 085 stage-agent types; requirements was carried by `SDD Requirements Executor` and clarify by host-native `general-purpose` acting as `sdd-clarify-analyzer`. The 085 team/concurrency/checkpoint mechanisms are still used; the carrier downgrade is an observation, not a 085 failure.
+
+== anomalies
+none. No load-bearing anomaly encountered; no decision was assumed.

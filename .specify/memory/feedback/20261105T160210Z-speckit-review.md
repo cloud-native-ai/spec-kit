@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T16:02:10Z"
 summary: "Composed review of feature 084 (four segments + ARC). ARC refused the transition: closure-acceptance-check.py returns verdict=block (completion condition 4 smoke_record_pass=false) although the claime"
+introspection_ref: "introspection-20261106T084116Z#F-06"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-06"
 ---
 
 ## Review

@@ -728,9 +728,12 @@ def test_a6_not_inside_three_section_window():
 def test_a7_section_counts_20_to_21_and_21_to_22():
     """C-7: top-level counts -- template 32, live 33.
 
-    Stale-pin update (2026-11-05, Feature 082 T022): the Self-Explanatory Structure
-    amendment adds one ambient `##` section to the template, and T024's reconcile
-    carries it into the live file (31/32 -> 32/33). Earlier updates: feature 078
+    Stale-pin update (2026-11-06, Feature 086 T028): the Efficient Test Execution
+    amendment adds one ambient `##` section to the template, and T025's regeneration
+    carries it into the live file (32/33 -> 33/34). Stale-pin update (2026-11-05,
+    Feature 082 T022): the Self-Explanatory Structure amendment adds one ambient
+    `##` section to the template, and T024's reconcile carries it into the live
+    file (31/32 -> 32/33). Earlier updates: feature 078
     bilingual-expression adds one ambient section (the Bilingual Expression
     pointer); slice 074b adds one ambient section (the SDD routing pointer) on top
     of the Closed-Set Claims amendment's one (2026-10-27) and the Grounded Naming
@@ -744,8 +747,8 @@ def test_a7_section_counts_20_to_21_and_21_to_22():
     adds or removes a `##` section MUST raise or lower `TPL_EXPECTED` /
     `LIVE_EXPECTED` in the same commit.
     """
-    TPL_EXPECTED = 32  # .specify/specs/082-self-explanatory-integration: +1 for STR-001 at T022
-    LIVE_EXPECTED = 33  # the reconcile at T024 carries that same section into the live file
+    TPL_EXPECTED = 33  # .specify/specs/086-efficient-test-execution: +1 for the STR-001 owner pointer at T024
+    LIVE_EXPECTED = 34  # the regeneration at T025 carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
     assert tpl == TPL_EXPECTED, (
@@ -911,14 +914,24 @@ def test_a17_instance_points_sentinel():
 # user-facing-comprehension.md). A heading collision between two disciplines is
 # not a restatement of this one's criteria, so it is excluded from the sweep --
 # explicitly, with the collision named, rather than by loosening every needle.
+#
+# "## 与相邻纪律的边界" is the same situation, measured a second time when Feature 086
+# landed shared/guidelines/test-execution-efficiency.md with that section name. The
+# needle set is about *this* discipline's criteria; a sibling discipline using the
+# same generic heading title for *its own* boundary section restates nothing of this
+# one. Both exclusions are asserted below to still hold on both sides, so an
+# exclusion whose reason expired turns this guard red instead of silently widening.
 GENERIC_HEADING_SHARED_WITH_ANOTHER_DISCIPLINE = "## 范围限制"
+GENERIC_HEADING_BOUNDARY_SHARED_WITH_ANOTHER_DISCIPLINE = "## 与相邻纪律的边界"
+GENERIC_HEADINGS_EXCLUDED = (
+    GENERIC_HEADING_SHARED_WITH_ANOTHER_DISCIPLINE,
+    GENERIC_HEADING_BOUNDARY_SHARED_WITH_ANOTHER_DISCIPLINE,
+)
 
 
 def test_a18_convergence_scope_bounded():
     """C-18: no second restatement of the criteria anywhere under shared/ or templates/."""
-    heading_needles = [
-        h for h in SECTION_HEADINGS if h != GENERIC_HEADING_SHARED_WITH_ANOTHER_DISCIPLINE
-    ]
+    heading_needles = [h for h in SECTION_HEADINGS if h not in GENERIC_HEADINGS_EXCLUDED]
     literal_needles = [MECHANICAL_TEST_FIX, BLIND_CHECK_SENTINEL, "- **FF-", "- **RP-"]
     offenders = {}
     for base in ("shared", "templates"):
@@ -942,7 +955,7 @@ def test_a18_convergence_scope_bounded():
     missing = [h for h in heading_needles if h not in owner_lines]
     missing += [n for n in literal_needles if n not in owner]
     assert missing == [], f"C-18 sentinel: the owner itself lacks these needles: {missing}"
-    # the excluded heading is excluded for a measured reason, not silently: it must
+    # the excluded headings are excluded for a measured reason, not silently: each must
     # still exist in the owner and in the other discipline's document
     assert GENERIC_HEADING_SHARED_WITH_ANOTHER_DISCIPLINE in owner_lines, (
         "C-18: the excluded generic heading is not even a section of the owner"
@@ -953,6 +966,24 @@ def test_a18_convergence_scope_bounded():
     }, (
         "C-18: the exclusion reason no longer holds -- "
         f"{other.relative_to(ROOT)} no longer uses that heading, so put it back in the needle set"
+    )
+    assert GENERIC_HEADING_BOUNDARY_SHARED_WITH_ANOTHER_DISCIPLINE in owner_lines, (
+        "C-18: the excluded boundary heading is not even a section of the owner"
+    )
+    sibling = ROOT / "shared" / "guidelines" / "test-execution-efficiency.md"
+    assert GENERIC_HEADING_BOUNDARY_SHARED_WITH_ANOTHER_DISCIPLINE in {
+        line.strip() for line in _text(sibling).splitlines()
+    }, (
+        "C-18: the exclusion reason no longer holds -- "
+        f"{sibling.relative_to(ROOT)} no longer uses that heading, so put it back in the needle set"
+    )
+    # and the exclusion covers headings only: the boundary heading must never grow into a
+    # carrier for this discipline's literals, or the exemption would hide a real restatement.
+    sibling_body = _text(sibling)
+    smuggled = [n for n in literal_needles if n in sibling_body]
+    assert smuggled == [], (
+        "C-18: the excluded sibling document carries this discipline's literals: "
+        f"{smuggled}"
     )
 
 
@@ -1038,11 +1069,12 @@ def test_x4_live_constitution_principle_xvi():
 def test_x5_live_version_minor_bump():
     """C-5: the live version took the MINOR bump to 1.13.0 (raised to 1.15.0 on 2026-10-27
     by the Grounded Naming amendment; raised to 1.16.0 on 2026-11-05 by Feature 082's
-    Self-Explanatory Structure amendment)."""
+    Self-Explanatory Structure amendment; raised to 1.17.0 on 2026-11-06 by Feature 086's
+    Efficient Test Execution amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.16.0", f"C-5: live version is {m.group(1)}; expected 1.16.0"
+    assert m.group(1) == "1.17.0", f"C-5: live version is {m.group(1)}; expected 1.17.0"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
@@ -1218,7 +1250,8 @@ def test_x14_min_version_floor_semantics():
 def test_x15_watchlist_gains_principle_title():
     """C-15: the double-landing watchlist gained this title (2 -> 3); the Directory
     Governance and Grounded Naming amendments extended it to 5; Feature 082's
-    Self-Explanatory Structure entry (2026-11-05, T016) extends it to 6."""
+    Self-Explanatory Structure entry (2026-11-05, T016) extended it to 6; Feature 086's
+    Efficient Test Execution entry (2026-11-06, T028) extends it to 7."""
     src = _text(DOUBLE_LANDING_TEST)
     m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
     assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
@@ -1228,7 +1261,7 @@ def test_x15_watchlist_gains_principle_title():
     # derived from the owner -- the last watchlist entry, which every amendment appends to.
     newest = entries[-1]
     assert newest not in ("", None), "C-15: the watchlist's last entry is empty"
-    assert len(entries) == 6, f"C-15: the watchlist holds {len(entries)} entries; expected 6"
+    assert len(entries) == 7, f"C-15: the watchlist holds {len(entries)} entries; expected 7"
     assert newest in _text(CONST_TPL), (
         f"C-15: the newest watchlist entry {newest!r} is not a template title -- the append "
         "did not land on the surface it is supposed to guard"
@@ -1269,10 +1302,11 @@ def test_x18_downstream_gate_rows_15_to_16():
     """C-18: rendering the enumeration logic gives 16 rows, up from 15. Stale-pin
     update (2026-10-27): the Directory Governance amendment added one row (17 / 16).
     Stale-pin update (2026-11-05, Feature 082): the Self-Explanatory Structure
-    amendment added one row (18 / 17)."""
+    amendment added one row (18 / 17). Stale-pin update (2026-11-06, Feature 086):
+    the Efficient Test Execution amendment added one row (20 / 19)."""
     live = _text(CONST_LIVE)
     rows = PRINCIPLE_RE.findall(live)
-    assert len(rows) == 19, f"C-18: the enumeration yields {len(rows)} gate rows; expected 19"
+    assert len(rows) == 20, f"C-18: the enumeration yields {len(rows)} gate rows; expected 20"
     # the 15 side is measured, not asserted from memory: drop this principle's block.
     # The boundary is the next principle OR the next H2 -- keying on H2 alone would
     # swallow any principle appended after this one (Directory Governance, 2026-10-27).
@@ -1282,7 +1316,7 @@ def test_x18_downstream_gate_rows_15_to_16():
              if lines[k].startswith("### ") or lines[k].startswith("## "))
     sample = "\n".join(lines[:i] + lines[j:])
     before = PRINCIPLE_RE.findall(sample)
-    assert len(before) == 18, f"C-18: without this principle the enumeration yields {len(before)}; expected 18"
+    assert len(before) == 19, f"C-18: without this principle the enumeration yields {len(before)}; expected 19"
     # sentinel: the enumeration is not returning 16 for a trivial reason
     assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
     assert not any(title == PRINCIPLE_TITLE for _n, title in before), (

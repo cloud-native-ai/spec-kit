@@ -1,0 +1,105 @@
+# 086 T051 — US5 ledger regression proof, plus legs M-8 and M-9
+
+Owner of the proposition: `requirements.md` SC-005 / `contracts/budget-ledger-parser.contract.md`
+C-017, C-018, C-019, C-020 / `tasks.md` T051 and `tasks.md` § Mutation Leg Carriers rows M-8/M-9.
+Housing: doctored copies under `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/ledger/`, **outside**
+the repo root. The tracked parser
+(`skills/external/sdd-loop-driver/scripts/audit-test-budget.py`) is read and copied, never edited.
+
+## 1. The regression proof (green control)
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest -q tests/unit/test_audit_test_budget.py
+32 passed in 2.82s
+EXIT=0
+```
+
+Feeding the upgraded parser one full-run command carrying `-n auto`: it classifies as a full run with
+`auto` absent from the positional list — the `runner default shape` row of § 3's control column.
+
+## 2. The two doctored copies
+
+**M-8** — revert `VALUE_FLAGS` to the pre-change tuple (drop the four parallel switches):
+
+```
+$VALUE_FLAGS = ("--names-out", "-m", "-k", "--maxfail", "-p", "--rootdir", "-c")   # pre-change
+```
+
+**M-9** — keep `-n` in `VALUE_FLAGS` but strip only the **separated** form:
+
+```
+$ATTACHED_VALUE_FLAGS = ()      # was ("-n", "--numprocesses", "--dist", "--maxprocesses")
+```
+
+Both copies are executable Python; the assertion below loads each as its own module, so the reading
+comes from the doctored code's own behaviour, not from a description of it.
+
+## 3. M-8 — the separated/attached classification matrix
+
+`command_suffix(line)` is the parser's classification surface; `positionals` replays the same token
+walk with the module's own flag sets (the check the contract's consequence clause needs — a flag VALUE
+must never be read as a path).
+
+| case | control: suffix / positionals | M-8: suffix / positionals | M-9: suffix / positionals |
+|---|---|---|---|
+| separated `-n 4` | full-run / `[]` | **NOT-full / `['4']`** | full-run / `[]` |
+| attached `-n4` | full-run / `[]` | full-run / `[]` | full-run / `[]` |
+| `--numprocesses=auto` | full-run / `[]` | full-run / `[]` | full-run / `[]` |
+| separated `--dist loadfile` | full-run / `[]` | **NOT-full / `['loadfile']`** | full-run / `[]` |
+| `--dist=loadfile` | full-run / `[]` | full-run / `[]` | full-run / `[]` |
+| `--maxprocesses=8` | full-run / `[]` | full-run / `[]` | full-run / `[]` |
+| runner default shape (`-n auto --dist load`) | full-run / `[]` | **NOT-full / `['auto', 'load']`** | full-run / `[]` |
+
+**M-8 reading**: the three **separated** forms go red exactly as T051 requires — `-n 4` and
+`--dist loadfile` are no longer full runs and their values leak into the positional list, and the shape
+the runner actually emits degrades to a targeted run against two paths named `auto` and `load`. T051's
+pass condition is met for the separated `-n 4` case it names.
+
+**Disclosed, not glossed**: M-8 leaves the **attached** forms green. This matches the note already in
+`notes/red-first-evidence.md` — the pre-change parser drops any unknown `-x=value` token, so reverting
+`VALUE_FLAGS` alone does not reach them. That is precisely why M-9 exists as a separate leg: the two
+legs together cover the separated and attached surfaces, neither covers both alone.
+
+## 4. M-9 — the attached-form leg, measured at the token level
+
+The attached forms are classified by `is_attached_value_flag`, so the discriminating probe is at that
+surface, which is exactly what `test_attached_parallel_forms_carry_a_value` asserts:
+
+| token | control | M-9 |
+|---|---|---|
+| `-n4` | True | **False** |
+| `-n=4` | True | **False** |
+| `--numprocesses=auto` | True | **False** |
+| `--dist=loadfile` | True | **False** |
+| `--maxprocesses=8` | True | **False** |
+| `-n` (separated) | False | False |
+| `--dist` (separated) | False | False |
+| `-q` (not a value flag) | False | False |
+
+**M-9 reading**: with `ATTACHED_VALUE_FLAGS = ()` all five value-carrying attached tokens go False, so
+the case citing them fails; the negative half (the three non-attached tokens stay False) is unchanged,
+so the case is not passing for a degenerate reason. M-9 is therefore discriminating.
+
+Note why the verdict column of § 3 cannot see M-9: with only the separated handling intact, an attached
+token still starts with `-` and is dropped by the `token.startswith("-")` line, so `command_suffix`
+returns "full-run" and no positional leaks. The defect is invisible one level up, which is why the
+contract puts this leg on the token-level case rather than on the classification verdict. Recorded here
+so the green column in § 3 is not mistaken for M-9 being non-discriminating.
+
+## 5. FR-026 — the fixture replay (pre-existing records unchanged)
+
+The regression surface for pre-existing records is the replay set, green in § 1:
+
+- `test_existing_rows_replay_identically` — all seven pre-upgrade row shapes replay to their exact
+  prior verdicts, including the two rows that must stay **non-runs**.
+- `test_existing_rows_replay_through_the_audit` — the same limb asserted through the audit verdict
+  (`baseline=1 / closure=1 / unknown=0`, exit 0) rather than the suffix alone.
+
+Detail and the row-by-row table are in `test-evidence/budget-ledger.txt` § "Limb 2".
+
+## Verdict
+
+US5's ledger regression holds (`32 passed`, replay verdicts unchanged) and both named legs are applied
+to doctored copies and observed to fail their named cases: M-8 red on the separated forms and on the
+runner's default shape, M-9 red on all five attached tokens. Neither the tracked parser nor any test
+file was edited.

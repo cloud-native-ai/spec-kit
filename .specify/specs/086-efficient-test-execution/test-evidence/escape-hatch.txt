@@ -1,0 +1,127 @@
+# 086 T035 — the three escape-hatch scenarios, end to end
+
+Owner of the proposition: `requirements.md` SC-004 / `contracts/runner-contract-086.contract.md`
+C-004 (explicit switch), C-005 (nested call), C-006 (missing engine) / `tasks.md` T035.
+Question: do the three serial escape hatches each complete a **full run**, is the `--names-out` list
+valid in each, and can the path actually taken be decided from the command and the stderr header?
+
+Housing: every scratch artifact is under `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/`,
+**outside** the repo root. `scripts/bash/run-tests.sh` itself is the tracked file under test — read,
+never edited here.
+
+## The probe suite
+
+A two-test module at `mutations-c2/eh-suite/test_sample.py`: `test_pass_0` passes, `test_fail_0` fails
+deliberately. It is used so each arm has exactly one failure name to check the list against.
+
+## Arm 1 — the explicit switch (`--serial`)
+
+```
+$ env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python bash scripts/bash/run-tests.sh \
+      --serial --names-out <scratch>/arm1-serial.txt <scratch>/eh-suite -q
+
+# test runner: <venv>/python -m pytest -n0 <scratch>/eh-suite -q
+# test runner: mode=serial reason=explicit
+1 failed, 1 passed in 0.01s
+# failed-name list written: …/arm1-serial.txt (1 entries) passes=1
+```
+
+- Mode line: `mode=serial reason=explicit` — decidable from stderr alone.
+- **Effectively serial**: the header shows `-n0` in the pytest command line, so no worker pool exists.
+- Exit code **1** (pytest's own code, propagated).
+- Names: `../../mutations-c2/eh-suite/test_sample.py::test_fail_0` — **1 entry**, the real failure.
+
+## Arm 2 — the missing engine (`reason=no-xdist`)
+
+The engine is made genuinely absent with the **three-part shim the contract case itself builds**
+(`test_run_tests_runner_contract.py` `_build_no_xdist_shim`):
+
+1. `xdist.py` that raises `ImportError` — so `"$PY" -c 'import xdist'` (the runner's probe at
+   `run-tests.sh:135`) fails;
+2. a `xdist_dist/` copy of the real package with its intra-package imports rewritten to the alias, so
+   pytest's plugin manager still loads the distribution while the shadowed name stays broken;
+3. `pytest_xdist-0.0.0.dist-info/` declaring the same `[pytest11]` entry points.
+
+Shim at `mutations-c2/noxdist4/`. Probe re-checked first (the premise must not be assumed):
+
+```
+$ PYTHONPATH=<shim> <venv>/python -c "import xdist"
+ImportError: xdist is shadowed by the 086 no-xdist escape-hatch run
+PROBE_EXIT=1
+```
+
+```
+$ env PYTHONPATH=<shim> SPECKIT_PYTHON=<venv>/python bash scripts/bash/run-tests.sh \
+      --names-out <scratch>/arm2-noxdist.txt <scratch>/eh-suite -q
+
+# test runner: <venv>/python -m pytest -n0 <scratch>/eh-suite -q
+# test runner: mode=serial reason=no-xdist detail=pytest-xdist-not-importable-by-<venv>/python
+1 failed, 1 passed in 0.01s
+# failed-name list written: …/arm2-noxdist.txt (1 entries) passes=1
+```
+
+- Mode line: `mode=serial reason=no-xdist` — and the `detail=` segment **names what is missing**, as
+  C-006 requires.
+- **Completed, not errored**: exit **1** is pytest's own result, not the runner aborting. No empty run.
+- Header again carries `-n0`.
+- Names: identical single failure name as arm 1.
+
+### Disclosed: two discarded shims, and why
+
+The first two attempts to make the engine absent produced `EXIT=3` with
+`Error while loading plugin "pytest11" … ModuleNotFoundError`. That is a **broken environment**, not an
+absent engine: pytest's plugin manager tried to import the shadowed name eagerly and aborted the
+session. Both attempts were discarded — the reading is not evidence about C-006 because the run never
+started. The two-part shim above (real package relocated under an alias + a synthetic dist-info) is what
+distinguishes "no engine" from "broken engine", and it is the shape the contract case already pins.
+Recorded here so the discarded legs are not mistaken for a pass.
+
+## Arm 3 — the nested call (`reason=nested`)
+
+```
+$ env -u PYTHONPATH PYTEST_XDIST_WORKER=gw3 SPECKIT_PYTHON=<venv>/python \
+      bash scripts/bash/run-tests.sh --names-out <scratch>/arm3-nested.txt <scratch>/eh-suite -q
+
+# test runner: <venv>/python -m pytest -n0 <scratch>/eh-suite -q
+# test runner: mode=serial reason=nested detail=PYTEST_XDIST_WORKER=gw3
+1 failed, 1 passed in 0.01s
+# failed-name list written: …/arm3-nested.txt (1 entries) passes=1
+```
+
+- Mode line: `mode=serial reason=nested detail=PYTEST_XDIST_WORKER=gw3`.
+- **No second worker pool derived** — the criterion T035 asks for: the inner run's own command line
+  carries `-n0` (`# test runner: … -m pytest -n0 …`) and its mode line reads `reason=nested`. A derived
+  pool would have shown `-n auto` or `-n <N>` in that header.
+- Exit **1**, one name, identical to the other two arms.
+
+## Cross-arm reading
+
+| arm | mode line | inner pytest command | exit | names | passes |
+|---|---|---|---|---|---|
+| `--serial` | `mode=serial reason=explicit` | `-m pytest -n0 …` | 1 | 1 | 1 |
+| missing engine | `mode=serial reason=no-xdist detail=…` | `-m pytest -n0 …` | 1 | 1 | 1 |
+| nested | `mode=serial reason=nested detail=PYTEST_XDIST_WORKER=gw3` | `-m pytest -n0 …` | 1 | 1 | 1 |
+
+Three arms, three distinct `reason=` values, three completed runs, three **identical** one-entry name
+lists. The path taken is decidable from the command and the stderr header in every arm, which is
+SC-004's second limb.
+
+## A positive-scope run confirming the arms are not vacuous
+
+Each arm was additionally run over `tests/unit/test_audit_test_budget.py` (32 passing tests, no
+failures) to show the serial path completes a real suite rather than only the toy:
+
+- `--serial`: `mode=serial reason=explicit`, `32 passed in 4.42s`, names `(0 entries)`, exit **0**.
+- no-xdist shim: `mode=serial reason=no-xdist detail=…`, `32 passed in 2.92s`, names `(0 entries)`, exit **0**.
+- nested: `mode=serial reason=nested detail=PYTEST_XDIST_WORKER=gw3`, `32 passed in 2.96s`, names
+  `(0 entries)`, exit **0**.
+
+An escape hatch that only ever ran a deliberately-failing fixture would prove less than one that also
+runs a green suite to completion.
+
+## Carrier
+
+The code green points of C-004/C-005/C-006 are T007's cases in
+`tests/contract/test_run_tests_runner_contract.py` (green in the feature smoke run — 84 passed across
+the three carrier modules, `test-evidence/smoke-086.txt`). This file records the **end-to-end**
+observation those cases assert at the unit level; it does not re-claim their clauses.

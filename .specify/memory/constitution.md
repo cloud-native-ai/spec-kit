@@ -1,5 +1,24 @@
 <!--
 Sync Impact Report
+- Version change: 1.16.0 → 1.17.0 (MINOR; new Principle XX added, 2026-11-06)
+- Added principles: XX. Efficient Test Execution (Concurrent by Default) — test coverage is necessary and never sufficient, so the cost of running a suite is a quality attribute at the same tier as coverage; the criterion that decides whether efficiency is releasable, the choice between process-level parallelism, asynchronous concurrency and neither, the isolation preconditions that make parallel execution legitimate, and the ways of being faster that are never admissible are all owned by `shared/guidelines/test-execution-efficiency.md` and referenced, not restated; the principle governs what tests cost to execute while the pre-existing test-quality principles govern what test exists and when it is written
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XIX. Efficient Test Execution (Concurrent by Default); principles 18 → 19 (Feature 086 T021)
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 11 → 12 entries (Feature 086 T026)
+  ✅ .specify/skills/internal/manage-constitution/SKILL.md + .specify/templates/*.md — mirrors byte-identical (Feature 086 T027)
+  ✅ templates/instructions-template.md (+ .specify/instructions.md, generated) — new ambient `## Test Execution Efficiency (测试执行效率)` section after `## Single-Run Evidence Discipline`; top-level sections 32 → 33 (template) / 33 → 34 (live) (Feature 086 T024, T025)
+  ✅ shared/guidelines/test-execution-efficiency.md (+ .specify mirror) — NEW owner of the full discipline: the coverage-insufficiency argument, the criterion for efficiency as a quality attribute, the parallelism / async / neither decision table with its discriminating property, the isolation preconditions, the four measurement anchors, the inadmissible shortcuts, and the boundary with the test-quality principles (Feature 086 T020)
+  ✅ tests/contract/test_constitution_double_landing.py — template 19 / live 20 / skill 12; watchlist 6 → 7 (Feature 086 T028)
+  ✅ tests/contract/test_fast_fail_discipline.py — version pin, three count pins, watchlist length, section-count pins (Feature 086 T028)
+  ⚠️ tests/contract/test_test_execution_efficiency.py (NEW) — the six-surface both-sides guard with a red leg per surface (Feature 086 T011); pending, see Follow-up TODO (b)
+- Follow-up TODOs: (a) the template roster carries this principle as XIX while this live roster carries it as XX — the per-surface numbering `contracts/principle-landing.contract.md` § C-025 already states as normal, not a new divergence; (b) the six-surface guard `tests/contract/test_test_execution_efficiency.py` is authored by Feature 086 T011 in the same feature; this block records it as pending until that guard is claimed green at T031, and the entry is not evidence that the guard already passes
+- Preserved by design: `templates/plan-template.md` renders the principle roster dynamically, so the new row needs no edit; this principle is worded to add zero blocking hits to `scan-confirmation-gates.py` — the scanner's patterns are NOT widened; the owner is a `shared/guidelines/` document, so no new command, skill entry template or runtime service is introduced
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.15.0 → 1.16.0 (MINOR; new Principle XIX added, 2026-11-05)
 - Added principles: XIX. Self-Explanatory Structure (不言自明) — names, paths and structures MUST carry the information their user needs, judged from the user's view rather than from implementation-internal clarity; the ceiling is direct visibility and the floor is one simple command (a satisfied floor is enough to support a change); the principle MUST NOT justify preventive redesign, each optimization task raises at most one information dimension and lands it through a reconcile mechanism, and an encoded attribute keeps its original source of truth with names and paths as projections of it
 - Modified principles: None
@@ -369,6 +388,37 @@ Rationale: a structure that carries no user information forces the user to open 
 ask a maintainer before they can filter, sort or judge the system. Naming the information a
 structure must carry keeps it legible at the entry point instead of only from inside.
 
+### XX. Efficient Test Execution (Concurrent by Default)
+Test coverage is a necessary condition for quality and never a sufficient one: a suite that
+exists but is not actually run protects nothing, so the cost of running it is a quality
+attribute in its own right, at the same tier as coverage, and MUST be treated as one:
+- Test execution efficiency MUST be judged by the criterion owned at
+  `.specify/shared/guidelines/test-execution-efficiency.md`, which is also the only
+  definition point of the choice between process-level parallelism, asynchronous
+  concurrency and neither, of the isolation preconditions that make parallel execution
+  legitimate, and of the ways of being faster that are never admissible; consumers MUST
+  reference it, do not restate it.
+- Where that criterion is met, efficiency MUST be a releasable requirement: a change MAY be
+  refused for exceeding it, and a faster run MUST NOT be bought by shrinking the selection,
+  skipping, declaring flakiness, or retrying until green.
+- Before any execution mode is changed, the isolation preconditions MUST hold on measurement
+  — compared by failure name against serial execution — not by reading the tests; a
+  precondition that does not hold MUST be repaired before parallelism is enabled.
+- This principle applies to every project that builds a test framework or writes test cases,
+  and not only to this repository; the defaults and parameters of a concrete runner remain
+  the runner's own.
+- Where this principle and the existing test-quality principles both speak, the split is
+  fixed: this one governs what tests cost to execute, the others govern what test exists and
+  when it is written — an overlapping obligation is a defect to repair, not a duplicate to
+  keep.
+- This principle adds a criterion, not machinery: it MUST NOT justify a duration registry, a
+  slow-test ranking, a coverage-versus-time report, or any other standing measurement surface.
+
+Rationale: coverage answers whether a path is tested at all, never whether those tests still
+run, and the two fail independently — an idle suite keeps its coverage number and loses all
+protection while every report stays green. Naming execution cost as a quality attribute keeps
+the cheaper-to-run suite from becoming a suite nobody runs.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -419,4 +469,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05
+**Version**: 1.17.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-06

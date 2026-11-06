@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T07:12:36Z"
 summary: "Extracted SSH transport from sdd-project-setup into the new external ssh-utils skill. ssh-exec.py fixes RemoteCommand=none, POSIX quoting, stdin script push, su wrapping and exit-code propagation; set"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

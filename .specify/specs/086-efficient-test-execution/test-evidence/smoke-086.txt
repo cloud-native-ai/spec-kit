@@ -1,0 +1,41 @@
+# 086 smoke record — the runner execution model, the shipped principle, the ledger parser
+
+# Command: env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python bash scripts/bash/run-tests.sh \
+#            tests/contract/test_run_tests_runner_contract.py \
+#            tests/contract/test_test_execution_efficiency.py \
+#            tests/unit/test_audit_test_budget.py -q
+# Written by those three carrier modules on 2026-11-06 (WP-C2), against the closure tree.
+# No network, no wall clock. Runs under the shipped default (parallel-first) — the very
+# execution model it asserts.
+
+## Verbatim run
+
+```
+# test runner: <venv>/python -m pytest -n auto --dist load \
+#     tests/contract/test_run_tests_runner_contract.py \
+#     tests/contract/test_test_execution_efficiency.py \
+#     tests/unit/test_audit_test_budget.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+........................................................................ [ 85%]
+............                                                             [100%]
+84 passed in 9.18s
+```
+
+- exit code: **0**
+- `passes=1` — no serial exception matched this selection, so one parallel pass is the whole run
+  (the watch-target self-test is the single registered `serial` node id and is not in this selection).
+
+## What the three carriers cover
+
+| module | propositions |
+|---|---|
+| `tests/contract/test_run_tests_runner_contract.py` | the runner's shipped contract: parallel-first default, `--serial`, `--workers N\|auto`, `SPECKIT_TEST_WORKERS` precedence (flag beats env, env beats `auto`), nested-run serialisation, `reason=no-xdist` fallback naming, `--names-out` / stderr header / exit-code parity on both paths |
+| `tests/contract/test_test_execution_efficiency.py` | the shipped principle: the owner guideline exists and holds the criteria, and the constitution (template + live), the instructions (template + live) and the generator's MUST-include list each carry a **pointer** to it rather than a copy |
+| `tests/unit/test_audit_test_budget.py` | the budget ledger parser classifies an explicitly parallel full run as a full run instead of dropping it, and the parse result of pre-existing records is unchanged |
+
+## Reproducibility
+
+The selection is the three files; nothing depends on ordering, wall clock or network. Re-running the
+same command on the same tree yields the same `84 passed` — the modules are deterministic and the
+only host-sensitive readings (worker count, `dist`) are reported in the stderr header, not asserted
+against a fixed number beyond `auto`.

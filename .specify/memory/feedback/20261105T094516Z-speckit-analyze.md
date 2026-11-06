@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T09:45:16Z"
 summary: "Analyze round 2 re-adjudicated all 17 round-1 findings and found two HIGH defects the first round did not: a regression introduced by the remediation commit itself (a features-file line trips an exist"
+introspection_ref: "introspection-20261106T084116Z#F-11"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-11"
 ---
 
 ## Review

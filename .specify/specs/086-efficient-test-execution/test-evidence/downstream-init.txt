@@ -1,0 +1,90 @@
+# 086 T032 — downstream render-verify for SC-003
+
+Owner of the proposition: `requirements.md` SC-003 / `contracts/principle-landing.contract.md` C-021
+(`STR-001`, `STR-003`) / `tasks.md` T032.
+Question: does a project initialised from this checkout's `specify init` receive the principle, the
+owner-guideline **path** and the owner-guideline **filename**, without having to read this repository?
+
+## Where the run happened (temp-directory discipline)
+
+Everything lives **outside** the repo root, per the brief's housing rule:
+
+```
+/Users/liuqiming.lqm/tmp/spec-kit/086/downstream-086/
+```
+
+Nothing from this row sits under the repo, so it cannot enter a `_md_files()` walk or a `git status`.
+
+## The run
+
+```
+$ cd /Users/liuqiming.lqm/tmp/spec-kit/086/downstream-086
+$ env -u PYTHONPATH /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/specify \
+      init ds086 --ai claude --no-git --script sh --ignore-agent-tools
+```
+
+Tail of stdout:
+
+```
+Next steps
+  1. Go to the project folder: cd ds086
+  2. Claude Code commands are in .claude/commands/ and ignore rules are in .claudeignore
+  3. Start with slash commands: /speckit.constitution -> /speckit.feature -> ...
+```
+
+Exit code: **0**.
+
+## The reading
+
+The generated tree at `ds086/.specify/` carries **templates**, not a pre-filled constitution: the
+generated `.specify/memory/constitution.md` is the two-line placeholder
+(`This file is a placeholder for the project constitution. … use /speckit.constitution command line to
+fill content.`), and `.specify/instructions.md` is not generated at init time at all. That is the
+product's designed shape — constitution and instructions are produced by `/speckit.constitution` and
+`/speckit.instructions`, both of which render **from the shipped templates in the initialised tree**.
+SC-003's proposition is therefore read on the artifacts the downstream project actually receives and
+will render from, and the read was taken on those:
+
+| check | command | result |
+|---|---|---|
+| principle title present | `grep -n "Efficient Test Execution (Concurrent by Default)" .specify/templates/constitution-template.md` | exit 0 — line **326**: `### XIX. Efficient Test Execution (Concurrent by Default)` |
+| section present | `grep -n "^## Test Execution Efficiency (测试执行效率)" .specify/templates/instructions-template.md` | exit 0 — line **124**: `## Test Execution Efficiency (测试执行效率)` |
+| owner path (`STR-003`) | `grep -c "shared/guidelines/test-execution-efficiency.md"` over both generated templates | **1** in each (constitution-template, instructions-template) |
+| owner filename (`STR-001`) | `grep -c "test-execution-efficiency.md"` over both generated templates | **1** in each |
+| templates are the shipped ones | `diff -q .specify/templates/instructions-template.md <repo>/templates/instructions-template.md` | silent — byte-identical |
+
+The constitution block the downstream project will render (lines 326-345 of the generated template):
+
+```
+### XIX. Efficient Test Execution (Concurrent by Default)
+Test coverage is a necessary condition for quality and never a sufficient one: a suite that
+exists but is not actually run protects nothing, so the cost of running it is a quality
+attribute in its own right, at the same tier as coverage, and MUST be treated as one:
+- Test execution efficiency MUST be judged by the criterion owned at
+  `.specify/shared/guidelines/test-execution-efficiency.md`, which is also the only
+  definition point of the choice between process-level parallelism, asynchronous
+  concurrency and neither, of the isolation preconditions that make parallel execution
+  legitimate, and of the ways of being faster that are never admissible; consumers MUST
+  reference it, do not restate it.
+- … (isolation preconditions, releasable-requirement wording, whole-scope wording)
+```
+
+The instructions section the downstream project will render (lines 124+): the title, a one-paragraph
+summary, and four bullets (`Cost is a quality attribute`, `Mode follows the discriminating property`,
+`Isolation before parallelism`, `One scope`) whose closing line points at the owner path.
+
+**Reader-independence satisfied**: a downstream reader meets the title, the owner file name and the
+owner path in the artifacts they receive, without opening this repository. The block also says in its
+own words that the rule binds any project that builds a test framework or test cases, which is SC-003's
+"读者不需要读本仓即可理解原则适用范围" limb.
+
+## Why the reading is taken at the template layer (disclosed, not glossed)
+
+The earlier intent was to grep `.specify/memory/constitution.md` and `.specify/instructions.md` in the
+freshly initialised tree. On the real product those two files do not carry authored content at init
+time (one is a placeholder, one does not exist), so that grep would have returned zero hits for a
+reason unrelated to this feature — it would have measured the initialisation order, not the delivery
+of the principle. The substitution is disclosed here rather than reported as a passing grep: the
+render-verify proves the **shipped** surfaces carry the pointer set, and `tests/contract/test_test_execution_efficiency.py`
+(T031) is the guard that keeps them there. The full render through `/speckit.constitution` /
+`/speckit.instructions` is not run in this package — it would spend a stage the package does not own.

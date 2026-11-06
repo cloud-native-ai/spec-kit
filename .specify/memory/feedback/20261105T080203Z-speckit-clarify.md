@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T08:02:03Z"
 summary: "clarify Mode A 无人值守：A1–A10 全裁定（ratified 7 / revised 2 / A10 前半 ratified 后半 superseded），A8 拆为 Path 取值域 in-scope 与标签集越界不迁；Feature 084 绑定落册"
+introspection_ref: "introspection-20261106T084116Z#F-04"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-04"
 ---
 
 ## Review
