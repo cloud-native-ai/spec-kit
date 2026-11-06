@@ -261,10 +261,10 @@
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
 | RS-001 | Python 解释器（运行运行器、测试与确定性检查） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不改变下限） | `pyproject.toml` | 新增脚本 stdlib-only；新增测试在 `>=3.8` 上通过；并行引擎的缺席路径由 FR-006 覆盖 | FR-015, FR-016 | EP-001 |
-| RS-002 | 测试框架（守卫测试运行器）与并行引擎（[[STR-005]]） | signed-contract | pytest / pytest-xdist 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 等原文记录进 `test-evidence/` | `pyproject.toml`（开发侧依赖） | 并行运行与串行运行在同一版本组合下得到 SC-001 的空差集 | FR-001, FR-015 | EP-001 |
+| RS-002 | 测试框架（守卫测试运行器）与并行引擎（[[STR-005]]；开发侧依赖） | signed-contract | pytest / pytest-xdist 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 等原文记录进 `test-evidence/` | `pyproject.toml` | 并行运行与串行运行在同一版本组合下得到 SC-001 的空差集 | FR-001, FR-015 | EP-001 |
 | RS-003 | canonical 运行器与其项目运行时镜像 | in-scope | 本仓 `scripts/bash/run-tests.sh` | 同一提交 | `tests/contract/` 中的运行器契约测试 | SC-004, SC-009 | FR-001–FR-009 | EP-001 |
 | RS-004 | 预算台账解析器 | in-scope | 本仓 `skills/external/sdd-loop-driver/scripts/audit-test-budget.py` | 同一提交 | 同目录单元测试 | SC-005 | FR-024–FR-026 | EP-001 |
-| RS-005 | 宿主操作系统与文件系统（并行工作进程的临时目录、进程派生） | signed-contract | 宿主环境（本仓只消费） | 无声明 pin；执行时记录宿主平台与核数 | 运行证据文件 | SC-001, SC-004, SC-011 | FR-005, FR-013 | EP-002 |
+| RS-005 | 宿主操作系统与文件系统（并行工作进程的临时目录、进程派生） | signed-contract | 宿主环境（本仓只消费） | 无声明 pin；执行时记录宿主平台与核数 | `.specify/specs/086-efficient-test-execution/requirements.md` | SC-001, SC-004, SC-011 | FR-005, FR-013 | EP-002 |
 
 ## Assumptions
 

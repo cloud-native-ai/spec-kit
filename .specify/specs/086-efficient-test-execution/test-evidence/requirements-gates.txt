@@ -32,3 +32,27 @@ EXIT=0
 == $ python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/086-efficient-test-execution/requirements.md
 {"mode": "plan", "decision": "proceed", "measured": {"fr_count": 33, "task_count": null, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T04:01:43Z"}
 EXIT=0
+
+# ---------------------------------------------------------------------------
+# U4 independent re-run — driver, 2026-11-06T04:04Z
+# The stage's original pre-analyze block above was captured at 04:01:43Z and
+# claimed advisories=0. The driver's independent rerun found two Runtime Stack
+# Contract cells that did not resolve under the repo:
+#   RS-002: `pyproject.toml`（开发侧依赖） -> `pyproject.toml` (annotation moved to Capability)
+#   RS-005: `运行证据文件` -> `.specify/specs/086-efficient-test-execution/requirements.md`
+# Both are local formatting corrections consistent with the recorded intent; no FR/SC changed.
+# ---------------------------------------------------------------------------
+
+== $ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage requirements --spec-dir .specify/specs/086-efficient-test-execution --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=1 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 249, "message": "path does not exist under the repo: shared/guidelines/test-execution-efficiency.md"}], "summary": {"errors": 0, "advisories": 1, "waived": 0, "fr": 33, "sc": 12, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-11-06T04:04:25Z"}
+EXIT=0
+# The single advisory is the future owner guideline, created in implement; not a requirements-stage error.
+
+== $ python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md
+status: ok; 0 error(s), 0 warning(s)
+EXIT=0
+
+== $ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/086-efficient-test-execution/requirements.md
+decision=proceed; fr_count=33 <= 60
+EXIT=0
