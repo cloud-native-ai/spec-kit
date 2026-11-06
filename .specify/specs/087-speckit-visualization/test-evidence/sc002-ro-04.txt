@@ -1,0 +1,14 @@
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 pass 1 roster path(s) in population, no named defect
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 not-evaluated no captured supervision report supplied (--supervision-line-set)
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 not-evaluated no captured line set supplied (--line-set)
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--supervision-line-set or --line-set)
+RO-12 not-evaluated no carrier value supplied (the run record holds none and no --carrier was given)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7

@@ -1,0 +1,95 @@
+# Second slice — the element's listed-unit lookup key (measured reading, Part 7)
+
+Capture date: 2026-11-06T09:2xZ (UTC). Reader: implement Part 7, target T055/T056/T062/T063.
+Nothing below is a conclusion: every block is a verbatim reading from this tree or from the store.
+
+## 1. What the three second-slice test files fix as the listed-unit shape (measured)
+
+Fixture registry entry written by all three files (`_entry(...)` / `_digest_fixture(...)`):
+
+```
+line_id  = <surface's own name>          (a registry line id, e.g. "t055-wide", "t061-line-00")
+run_id   = "r20261106T000000Z-<line_id>"
+```
+
+Fixture store record written by all three files (`_store_record(...)` / `_record(...)`):
+
+```
+unit_id      = "/speckit.plan" | "/speckit.tasks"     (an exec-quant unit)
+unit_type    = "command"
+run_id       = "r20261106090000Z"                     (derived from collected_at, unrelated to the entry's run_id)
+collected_at = "2026-11-06T09:00:00Z"
+```
+
+## 2. The element the three files require (verbatim from their assertions)
+
+```
+efficiency-element.contract.md C-64 judge (tests/contract/test_efficiency_element.py):
+    name, tail = _elements(line.stdout)[0]
+    assert name == "/speckit.plan", "the element names its unit first"
+
+efficiency-element.contract.md C-67 judge (same file):
+    two listed registry entries, one store record -> two elements, ONE carrying the marker,
+    the other carrying the record's quantity
+
+efficiency-element.contract.md C-68 judge (same file):
+    an absent store renders "no measurements" and exactly 0 not-evaluated markers
+
+efficiency-element.contract.md C-66 judge (tests/unit/test_measure_unit.py):
+    _element_for(workspace, registry, "/speckit.plan")   # the element for /speckit.plan
+```
+
+Equivalently, in the words of the assertions: **the element's `unit=` is the store's `unit_id`**, and the corpus
+matches a store record to the listed entry by `unit_id` / `unit_type` (collected_at ordering inside one unit), not by
+`run_id`.
+
+## 3. Run-identity collision in the real store and the real registry (measured)
+
+Real exec-quant store, `.specify/memory/exec-quant/records/` (last 9 records, verbatim):
+
+```
+20261106T040830002388Z-9d3fe0ac.json  /speckit.requirements  r20261106T040353Z-087a      2026-11-06T04:08:29Z
+20261106T041355578171Z-fe0c1645.json  /speckit.clarify       r20261106T040353Z-087a      2026-11-06T04:13:55Z
+20261106T042455074010Z-718d1935.json  /speckit.plan          r20261106T040353Z-087a      2026-11-06T04:24:55Z
+20261106T043320619084Z-f4299a57.json  /speckit.tasks         r20261106T040353Z-087a      2026-11-06T04:33:20Z
+20261106T043928897970Z-72b5067e.json  /speckit.checklist     r20261106T040353Z-087a      2026-11-06T04:39:28Z
+20261106T044957654772Z-98988b68.json  /speckit.analyze       r20261106T040353Z-087a      2026-11-06T04:49:57Z
+20261106T080251629491Z-6fdbf6d7.json  /speckit.review        r20261106T040353Z-087a      2026-11-06T08:02:51Z
+20261106T085558125731Z-a041364b.json  /speckit.checklist     r20261106T040353Z-087a-rev  2026-11-06T08:55:58Z
+20261106T090630637485Z-cdcd82f1.json  /speckit.analyze       r20261106T040353Z-087a-rev  2026-11-06T09:06:30Z
+```
+
+One run id, `r20261106T040353Z-087a`, is shared by **seven different units** in one store.
+
+Real line registry, `~/.local/state/spec-kit/lines/*.json` (last 6 entries, verbatim):
+
+```
+cws-logger-unification      r20261022T105618Z-7c2a  closed
+nginx-layered               r20261023T024449Z-ae8e  closed
+reproducibility-review      r20261030T101700Z-b7c2  closed
+review-code-integration     r20261027T061144Z-a3ec  closed
+speckit-068-execquant-feedback r20261022T063341Z-068a  closed
+team-component-dev-env      r20261029T094500Z-7f3c  closed
+```
+
+The registry's run ids carry a **day + time + 4-hex** suffix (`...Z-7f3c`); the store's run ids above carry a
+**day + time + `<feature>-<phase>`** suffix (`...Z-087a`). No value occurs on both sides today, so on the real tree a
+`run_id`-keyed lookup renders the not-evaluated marker for every listed line.
+
+## 4. `run_id` resolution is not a function of the record (measured)
+
+`scripts/python/exec-quant.py` owns run identity through `resolve_run_identity(workspace_root, unit_id,
+explicit_run_id)`, which composes the explicit value, an *adopted* adjacent run-determination record inside a
+time window around **now**, and a *synthesized* `<slug>-<now>`. There is no per-record resolver: the stored
+`run_id` is a snapshot of the writer's resolution at collection time.
+
+## 5. Point-in-time RED/GREEN readings, this tree
+
+```
+python3 -m pytest tests/contract/test_status_digest.py -q
+  -> 49 passed                                     (T061's additions, against the current renderer)
+
+python3 -m pytest tests/contract/test_efficiency_element.py tests/unit/test_measure_unit.py -q
+  -> 13 failed, 5 passed                           (the 13 are the listed-unit/run_id shape of §2 + the absent
+                                                    scripts/python/measure.py that T064 has not yet authored)
+```

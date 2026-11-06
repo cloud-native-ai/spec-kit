@@ -1,16 +1,16 @@
 # Line State — 087-speckit-visualization
 
 <!-- loop-state:begin -->
-spine_state: blocked
+spine_state: done
 run_id: r20261106T040353Z-087a
 slice: 087
-stage: closure-second-slice
+stage: closure
 stage_started_at: 1793956066
 stage_deadline_epoch: 1793966866
 stage_base_commit: 993d2a49
 attempt: 2
 retry_limit: 3
-last_verdict: closure-block (SC-001/SC-002 partial; second slice pass 8/10; no merge)
+last_verdict: closure-accept (final_path 10/10 pass; tasks 73 closed; budget baseline:1 closure:1; stages=6 complete=6)
 plan_constraint: active
 plan_activated_at: 2026-11-06T04:25:00Z
 plan_commit: 10e1a2df
@@ -31,6 +31,7 @@ checkpoint_pending_proposal: none
 
 <!-- test-budget:begin -->
 {"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "implement-start baseline (Part 1)", "trigger": "implement Part 1 start", "at": "2026-11-06T06:40:48Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/087-speckit-visualization/baseline-failed.txt", "selection_basis": "full-suite", "rc": 1, "passed": 7473, "failed": 27, "skipped": 1, "failed_names_path": ".specify/specs/087-speckit-visualization/baseline-failed.txt", "evidence_ptr": ".specify/specs/087-speckit-visualization/test-evidence/baseline-full-suite-20261106T063158Z.log", "merge_source": "na", "merged_at": "na"}
+{"seq": 2, "slot": "closure", "stage": "closure", "purpose": "post-review closure full suite (in-slot rerun after mirror drift, probe recompile and frozen-pin alignment)", "trigger": "mirror drift + probe registry recompile + frozen-pin alignment", "at": "2026-11-06T16:08:58Z", "command": "bash scripts/bash/run-tests.sh --names-out .specify/specs/087-speckit-visualization/final-failed-r6.txt", "selection_basis": "full-suite", "rc": 1, "passed": 7698, "failed": 27, "skipped": 1, "failed_names_path": ".specify/specs/087-speckit-visualization/final-failed-r6.txt", "evidence_ptr": ".specify/specs/087-speckit-visualization/test-evidence/closure-full-suite-r6-20261106T160121Z.log", "baseline_compare": "comm -13 baseline final -> 0 new; comm -23 -> 0 fixed (27 baseline failures unchanged)", "in_slot_rerun": "trigger=mirror/probe/pin alignment; evidence=c9fe8ed8", "merge_source": "na", "merged_at": "na"}
 <!-- test-budget:end -->
 
 - line_id: `087-speckit-visualization`
@@ -822,3 +823,13 @@ turn_budget=500 per part; sub_dispatch=single executor; checkpoint written after
 - **Feature 状态**：`.specify/memory/features.md` 与 `features/087.md` = `Blocked`（`993d2a49`）；review 的 P1-1 已处理。
 - **review 后修复**：`454d86da`（owner 字面量运行时读取、C-57 截断序、字段槽、RS-007 行）；定向 93 passed；RS-007 closure reason 清除。
 - **解除阻断路径**：同 checkpoint 11 §4（真实 >90s team run；经 entry 创建带 reporter 席位的 roster；更新 verification 后重跑 closure/review）。
+
+## U6 收尾（最终，2026-11-07）
+
+- **closure**：`accept`（final_path 10/10 pass；tasks 73/73；reasons []）。
+- **SC-001**：真实 >90 秒 dogfood run（087-reporting-dogfood；worker closure 全量 437.97 s）+ reporter 20 条 30 秒节奏归属行 → pass。
+- **SC-002**：经 team-creation entry 创建带 reporter 席位的 roster；validate-roster exit 0；guard RO-04 pass → pass。
+- **第二切片**：SC-011…SC-014 全 pass。
+- **测试预算**：baseline:1 / closure:1（closure 全量 27 failed 全为 baseline，0 新增）；audit `stages=6 complete=6` status=ok。
+- **Feature 状态**：`Completed`（用户指令「完成所有剩余的工作」作为验收）。
+- **合并**：本地 master 快进到特性 HEAD；不 push（确认门控；需显式授权）。

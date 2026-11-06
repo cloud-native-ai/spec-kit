@@ -1,0 +1,1 @@
+conforming: team 087-reporting-dogfood carries exactly one reporter seat (agent: reporter)
