@@ -1,4 +1,46 @@
+# Code Review Report — Round 3 (087-arch-diagram-docs)
+
+| 属性 | 值 |
+|------|-----|
+| **轮次** | Round 3 — final small-repair 复核（focused） |
+| **基准** | `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08` (`24cb4edc`) |
+| **目标** | `4fb0f1aa8494eced991ff43188f4f4624a8fcdcd` (`4fb0f1aa`) |
+| **本轮增量** | `b06c93a7..4fb0f1aa`（2 个提交：round-2 记录 + final small repair；14 个路径） |
+| **基准来源** | `feature-first-commit`（未变） |
+| **渲染模式** | `renderer: text` |
+| **Reviewer** | `Qiming Liu (John)` |
+| **日期** | `2026-11-06T10:55:00Z` |
+| **Round-3 evidence** | `.specify/specs/087-arch-diagram-docs/test-evidence/review-round3.txt` |
+
+## Round 3 verdict
+
+**Gate: `allow`.** No blocking, important or suggestion entry remains. Round 2's two `suggestion`s (F26/F27)
+are closed in `4fb0f1aa`; the fix commit changes no engine behaviour. Read by
+`git-delta-review.sh report --summary --file code-review.md`: `blocking=0`, `important=0`,
+`suggestion=0`, exit 0.
+
+| Round-2 entry | Severity | Disposition |
+|---------------|----------|-------------|
+| `skills/external/create-docs/SKILL.md:61/75` — two spec-local links in the shipped skill (F26) | suggestion | **closed** — line 61 now cites the framework contract by name only (the guard additionally asserts that it is not a link); line 61's face-registry pointer and line 75 now point at the shipped `references/diagram-obligation.md`; `improve-docs/SKILL.md:119` points at the same shipped reference. `grep -rn "specs/087" skills/ .specify/skills/` has no match, and every remaining link resolves inside the shipped tree |
+| `skills/external/create-docs/references/diagram-obligation.md:3` — dual ownership with the spec contract (F27) | suggestion | **closed** — the shipped reference's header now declares itself a client-facing projection, not a design record; the contract gained the reciprocal paragraph and stays the owner; its precedence table is the 9-row `C-016` projection (orders 6/7 unmerged); the "six-value" sentence now reads five verdicts vs six criterion statuses |
+
+**Round-3 scope note.** The delta `b06c93a7..4fb0f1aa` contains 14 paths: the two review-record commits'
+artifacts, the shipped skill text and its shipped reference (both mirrored byte-identically), the spec
+artifacts (`feature-ref.md`, `quickstart.md`, `verification.md`, the contract), and one test file,
+`tests/integration/test_docs_command_scenarios.py`. The test change strengthens the guard (name-not-link
+assertion; shipped-reference literal) and is covered by the five-file run: `124 passed`, exit 0. No engine
+line, fixture composition or criterion semantics changed. The round-1 coverage receipt (177 changed /
+11 judged / 166 skipped / 0 gap at head `37d93787`) remains the dated coverage record; this round did not
+re-run a receipt over the full feature delta. No full test suite was run; readings are in
+`test-evidence/review-round3.txt`.
+
+---
+
 # Code Review Report — Round 2 (087-arch-diagram-docs)
+
+> **Dated record.** Its two `suggestion` entries were closed in round 3; the two headings below are demoted
+> to `####` and marked `resolved` so the round-3 gate reads only the current entries. The opinion bodies are
+> unchanged.
 
 | 属性 | 值 |
 |------|-----|
@@ -30,13 +72,13 @@ current entries are two `suggestion`s (F26/F27 below). The gate is read by
 | `create-docs/SKILL.md:61-69` + `improve-docs/SKILL.md:57` — spec-local contract links (F6, two entries) | important | **closed in substance** — no `../../specs/087-.../contracts/` link remains; the schema/reason table now ships in `references/diagram-obligation.md`; the remaining dead links are F26 (suggestion) |
 | `build_fixtures.py:295` — `--check` not byte-exact, unknown flags rebuild (F25) | important | **closed** — byte comparison; `--help` exits 2; the probe left `git status` empty |
 
-### 🟢 [SUGGESTION] skills/external/create-docs/SKILL.md (Line 61)
+#### R2 [SUGGESTION — resolved in 4fb0f1aa] skills/external/create-docs/SKILL.md (Line 61)
 
 > Two spec-local links remain in the shipped skill: [`contracts/diagram-obligation.contract.md`](contracts/diagram-obligation.contract.md) at line 61 and [`quickstart.md`](quickstart.md) at line 75; `skills/external/improve-docs/SKILL.md:119` also cites `quickstart.md` S3. Neither resolves in a client project (the skill ships as `.specify/skills/create-docs/`). The primary F6 harm is fixed — the record schema, verdict/reason table and exemption schema now live in the shipped reference — so this is a suggestion, not a repeat of the important entry. Line 61 is also pinned by `test_c007_baseline_single_owner`, so removing it needs a test change. Fix: cite the contract by its framework-repository path in prose and replace the `quickstart.md` links with `references/diagram-obligation.md` pointers. (F26)
 
 <sub>10:36:30</sub>
 
-### 🟢 [SUGGESTION] skills/external/create-docs/references/diagram-obligation.md (Line 3)
+#### R2 [SUGGESTION — resolved in 4fb0f1aa] skills/external/create-docs/references/diagram-obligation.md (Line 3)
 
 > Dual ownership: the spec contract (`contracts/diagram-obligation.contract.md:4-10`) declares itself owner of the closed verdict/reason sets, the precedence and the two record schemas; the shipped reference (`references/diagram-obligation.md:3-6`) declares itself owner of "the two record formats and the verdict vocabulary". The precedence tables differ in granularity (contract `C-016` 9 rows; reference § 7 8 rows, two pairs merged), and the reference header says "six-value verdict set" while § 4 lists five. The two copies currently agree on the five verdicts and reason pairs, so this is a drift risk rather than a live wrong reading. Fix: demote the contract to the dated design record (or point its vocabulary at the shipped reference), align the precedence table, and correct the "six-value" sentence. (F27)
 

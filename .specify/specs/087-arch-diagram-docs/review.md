@@ -1,3 +1,114 @@
+# SDD Review — 087-arch-diagram-docs — Round 3 (2026-11-06)
+
+> **Round 3 of the same review — final focused round.** Round 2 returned `pass` / `pass-with-residuals` with
+> 1 P1 partial (F2) and 7 P2 open (F10, F11, F13, F17, F26, F27, F28). The final small repair `4fb0f1aa`
+> closes five of them and leaves one P2 residual at F17. This section re-judges those six findings, the four
+> segment verdicts, the regression set and the Acceptance Reality Check. The round-2 and round-1 reports below
+> are preserved as dated records; their verdicts are superseded only by R3.1–R3.7.
+
+## R3.0 Object and authority
+
+| Field | Value |
+|-------|-------|
+| Feature | 087-arch-diagram-docs（架构图为核心的文档空间） |
+| Branch / worktree | `line/087-arch-diagram-docs` / `/home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs` |
+| Base | `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08` |
+| Prior heads | `b06c93a7` (review-repair); `6ecf00a3` (round-2 record) |
+| Round-3 review head | `4fb0f1aa8494eced991ff43188f4f4624a8fcdcd` (final small repair) |
+| Review date | 2026-11-06 |
+| Reviewer | Qoder agent `sdd-review-executor` (unattended run; no user ruling in session) |
+| Environment | Linux x86_64; bash; CPython 3.11.13; pytest 9.2.0 |
+| Round-3 evidence | `test-evidence/review-round3.txt` |
+| Category quadruple | `flow_class=execution; source=declaration; marker=; error=-` |
+
+## R3.1 Four segment verdicts
+
+| Segment | Round-2 verdict | Round-3 verdict | Basis |
+|---------|-----------------|-----------------|-------|
+| Process | `pass`, P2 F10/F11 | **pass** — F10/F11 remain accepted dated-record P2s | the process evidence is unchanged; no new process finding |
+| Artifact | `pass-with-residuals` (P1 F2 partial; P2 F13/F17/F28) | **pass-with-residuals** — F2/F13/F28 closed; F17 one P2 residual (S3 step 3) | 11/11 expected members; all three sites state the same FR-001 exception; the repaired S3/S5 record names reproduce except the `stale-source/` step (R3.5) |
+| Implementation | `pass`, P2 F26/F27 | **pass** — F26/F27 closed | zero spec-local links in the shipped skills; the shipped reference is the single shipped carrier; the contract stays the owner with a reciprocal projection paragraph |
+| Code | `pass` — 0 blocking / 0 important / 2 suggestions | **pass** — gate `allow`; 0 blocking / 0 important / 0 suggestion | round-2's two suggestions are closed; the fix commit changes no engine behaviour |
+
+## R3.2 Residual findings (round-3 disposition)
+
+| ID | Sev | Status | Round-3 evidence |
+|----|-----|--------|------------------|
+| F2 | P1 | **closed** | `requirements.md:289`, `plan.md:32`, `plan.md:81` and `feature-ref.md:72` now state the same one-file FR-001 exception and the same "a second changed path under `docs/` is the breach" rule; `requirements.md` has zero diff since `6ecf00a3` (the exception landed at `b06c93a7` as a single Out-of-Scope line), so FR/SC semantics are unchanged |
+| F13 | P2 | **closed** | `feature-ref.md:30` now lists `.specify/skills/create-docs/**`, `.specify/skills/improve-docs/**` and the four per-tool copies; the retired `.specify/templates/commands/` subtree is named only as retired, and the cited source `templates/commands/docs.md` exists; `.specify/templates/commands/docs.md` no longer appears as a generated copy |
+| F17 | P2 | **partial — one residual** | S3 steps 1–2 and all three S5 commands reproduce their printed verdicts with `20261106T090000Z-0870a1b2-diagram-trace.json` and a root-relative `--record`; the old `000000Z-aaaaaaaa` name and the double-root form are gone from `quickstart.md`. The printed S3 step 3 (`mktemp` + `cp -R`) leaves all three faces with one identical mtime and returns `satisfied`, where the block prints `stale` — the inequality is only made inside the tests by `conftest.apply_mtime_step` (R3.5) |
+| F26 | P2 | **closed** | `grep -rn "specs/087" skills/ .specify/skills/` → no match; every Markdown link in the two shipped skills resolves inside the skill tree (`references/diagram-obligation.md`, `../create-docs/references/diagram-obligation.md`) or the shipped `shared/` tree; the guard `test_c007_baseline_single_owner` was strengthened to require a name citation, not a link |
+| F27 | P2 | **closed** | the shipped reference's header declares itself the client-facing projection and not a design record; the contract gained the reciprocal paragraph and stays the owner (a disagreement makes the projection the defect); its precedence table is 9 rows one-for-one with `C-016` (orders 6/7 unmerged); the "six-value" sentence now reads five verdicts vs six criterion statuses; no second runtime owner |
+| F28 | P2 | **closed** | `verification.md:39` reads `post_change_commit=b06c93a7`, a real SHA (the line shifted down by the round-2 note added above it) |
+
+**Accepted, not repaired**: F10 and F11 remain the round-2 dated-record P2s — the `/tmp` readings stay in dated stage evidence, and the 84/77 advisory pair stays labelled by its round-2 note. This round used `.specify/.tmp/087-review3/` and removed it; no new occurrence.
+
+**Round-3 counts**: P0 **0 open / 1 total**; P1 **0 open / 6 total**; P2 **3 open / 21 total** (open: F10, F11 accepted, F17 residual; closed: F8, F9, F12, F13, F14, F15, F16, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28).
+
+## R3.3 Code segment (round 3)
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Base / head | `24cb4edc` / `4fb0f1aa` | this round |
+| Delta judged | `b06c93a7..4fb0f1aa` (14 paths in 2 commits: the round-2 record + the final small repair) | `git diff --name-only` |
+| Round-2 entries | 2 suggestions (F26/F27) | `code-review.md` round-2 record |
+| Round-3 disposition | **both closed** — all remaining entries 0 | R3.2 and `code-review.md` § Round 3 |
+| Gate verdict | `allow` — `blocking=0`, `important=0`, `suggestion=0` | `git-delta-review.sh report --summary --file code-review.md` after the round-3 rewrite |
+| Full-delta receipt | the round-1 receipt (`changed=177 / judged=11 / skipped=166 / gap=0`) remains the dated coverage record; round 3 re-judged the two prior suggestions and the guard-test delta and did not re-run a receipt | `code-review.md` |
+
+The fix commit changes no engine behaviour: the only code-side change is
+`tests/integration/test_docs_command_scenarios.py` (a stronger negative assertion plus the shipped-reference
+literal); the rest is shipped skill text, the shipped reference, spec artifacts and their mirrors.
+
+## R3.4 Acceptance Reality Check (round 3)
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Claimed status (read, never written) | `Planned` | `.specify/memory/features.md:94`; `.specify/memory/features/087.md:6` |
+| `final_path` record, copied verbatim | `pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6` | `closure-acceptance-check.py --spec-dir .specify/specs/087-arch-diagram-docs` |
+| Closure verdict | `accept` | same, exit 0 |
+| Completion conditions | `every_final_path_pass=true`, `no_open_rows=true`, `smoke_record_pass=true`, `status_row_per_criterion=true` | `--json` payload |
+| Smoke record | 1 record; the five 087 files; `smoke_exit_code=0`; `test-evidence/smoke.txt` exists | `--json` payload |
+| Tasks | 76 closed / 0 open / 0 deferred | `--json` payload |
+| Scope readings | `docs/` exactly one changed path; `draw-diagram` zero diff; no new command | evidence § 7 |
+| Status left unchanged | `Planned` — no flip, no fabricated `Implemented` / `Ready for Review` / `Completed` | this run |
+
+**Status recommendation (not executed)**: the four mechanical conditions for `Planned → Implemented` hold
+(0 deferred tasks, one smoke record, 0 blocking code entries, every `final`-path criterion `pass`), and the
+P1 set is empty. An authorized `/speckit.implement` run may flip the status; this review writes nothing. The
+remaining P2 residual (F17 S3 step 3) is a documentation defect, not a transition condition — if the driver
+wants an all-green gate before the flip, repair that step first (the fix shape is in R3.5).
+
+## R3.5 F17 residual — the S3 step-3 recipe does not manufacture its own premise (P2)
+
+- **Location**: `.specify/specs/087-arch-diagram-docs/quickstart.md:169-175` (the step-3 comment, command block and its printed expectation); the same premise appears in the S3 table at `quickstart.md:129`.
+- **Evidence**: the printed recipe is `SPACE="$(mktemp -d)/space-stale-source" && cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"`, then the obligation call with the root-relative record. After that copy, `stat` shows `widget.mmd`, `widget.png` and `widget.svg` all at `2026-11-06 18:52:23.333209400 +0800`, and the engine returns `satisfied / reference-resolves` — not the printed `stale / source-newer-than-render`. The engine's rule is `source_mtime > min(rendered_mtimes)` (`docs-utils.py:705`); the inequality only exists after `conftest.apply_mtime_step` (`tests/fixtures/docs-obligation/conftest.py:71`) runs inside the test harness, and the printed block does not invoke it.
+- **Why it matters**: the S3 block is the feature's negative-observability walkthrough; a reader following it gets a green reading where the block promises a red one, which is the confusion F17 was raised to remove. This stays P2 — the tests do cover the stale verdict (`copy_fixture` applies the step), so SC coverage is intact.
+- **Proposed fix (not taken by this review)**: add the one missing command to the block (e.g. a `python3 -c`/`touch` that sets the source mtime to rendered + 60s, matching `MTIME_GAP_SECONDS`) or replace the block with the exact `pytest` node that exercises the step; keep the corrected record name and the root-relative `--record`.
+
+## R3.6 Round-3 test readings
+
+| Command | Reading |
+|---------|---------|
+| five 087 files | `124 passed, 1 warning in 4.88s`, exit 0 |
+| five guard files | `1 failed, 120 passed`, exit 1; the failure is `baseline-failed.txt` line 3 (`test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`) — the recorded baseline, no drift |
+| `build_fixtures.py --check` | `OK: 11 … bytes`, exit 0; `--help` exit 2; fixtures `git status` empty |
+| closure checker | `verdict: accept`; `final_path pass=6 … total=6`; exit 0 |
+| plan audit | `undeclared=false`, `classification=declared`; exit 0 |
+| mirrors / command copies | 6/6 pairs `ok`; copies `OK`; exit 0 |
+| quickstart S3/S5 | S3 steps 1–2 and all three S5 commands match; S3 step 3 does not (F17 residual) |
+
+No full-suite run was made; the baseline slot belongs to the driver.
+
+## R3.7 Round-3 self-containment
+
+- [x] Every finding/status row names an exact repo-relative path and line; quoted excerpts stay short.
+- [x] The round-3 counts are derived from R3.2: 0 P0 open, 0 P1 open, 3 P2 open (2 accepted + 1 residual).
+- [x] The status recommendation cites the state-machine owner and writes no status.
+- [x] The round-2 and round-1 reports below are preserved as dated records; their verdicts are superseded only by R3.1–R3.7.
+
+---
+
 # SDD Review — 087-arch-diagram-docs — Round 2 (2026-11-06)
 
 > **Round 2 of the same review.** Round 1 (`37d93787`) returned `blocked` on 1 P0 / 6 P1 / 18 P2. The repair
