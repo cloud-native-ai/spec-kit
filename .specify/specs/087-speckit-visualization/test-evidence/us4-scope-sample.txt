@@ -1,0 +1,53 @@
+# Seeded flow sample — Feature 087, T038 (US4)
+#
+# Scope: ten real framework flows, classified against the owner's scope predicate, judged by guard proposition
+# RO-02 (`--flow-sample <this file>`). The predicate itself is owned by `shared/guidelines/reporting-obligations.md`
+# § 一 · 义务的范围是一个可判定谓词, restated by `contracts/reporting-obligations.contract.md` C-02 and
+# `requirements.md` FR-002; this file applies it and restates none of it.
+#
+# Capture date: 2026-11-06 (UTC). Command this file was produced for:
+#   python3 scripts/python/status-digest.py --action guard --flow-sample \
+#     .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt
+#
+# Form: one flow per line, `<flow> | verdict=<in-scope|out-of-scope> | <evidence: what the flow structurally does, and the clause of the
+# predicate it lands on>`. A line with no verdict is unclassifiable and turns RO-02 red; a flow silently dropped
+# from the sample is not detectable by the guard, so the sample's own completeness rule is stated here as the list
+# of the four flow kinds the task text fixes: team runs, supervising masters, single-dispatch chains, and single
+# synchronous commands.
+#
+# The ten flows below are the framework's own, read from the delivered skills — each line names the file the
+# structure is read from, so a reviewer reaches the evidence rather than trusting the verdict.
+
+# --- kind 1: team runs (two or more concurrent units) -------------------------------------------------------
+run-team-parallel /storage/project/cloud-native-ai/spec-kit/skills/internal/run-team/SKILL.md | verdict=in-scope | the parallel pattern dispatches the team's member seats concurrently, with a territory check before dispatch (SKILL.md § Workflow step "并行(parallel):派发前做 territory 校验") — two or more concurrent units
+run-team-pipeline /storage/project/cloud-native-ai/spec-kit/skills/internal/run-team/SKILL.md | verdict=in-scope | the staged pattern dispatches several stage seats whose units overlap across the handoff, so at least two units are live together — two or more concurrent units
+create-team-roster-authoring /storage/project/cloud-native-ai/spec-kit/skills/internal/create-team/SKILL.md | verdict=out-of-scope | one synchronous authoring step: the skill writes one roster file and returns it; nothing is dispatched and no delegation outlives the step — single synchronous step
+
+# --- kind 2: supervising masters (watch dispatched sub-flows) -----------------------------------------------
+coaching-skills-dispatch /storage/project/cloud-native-ai/spec-kit/skills/external/coaching-skills/SKILL.md | verdict=in-scope | dispatches exactly ONE subagent (the Trainee) and then observes what actually happens after the dispatch returns, continuing to judge it — one asynchronous delegation continued past dispatch
+sdd-loop-driver-supervision /storage/project/cloud-native-ai/spec-kit/skills/external/sdd-loop-driver/SKILL.md | verdict=in-scope | drives a line, dispatches stage executors and keeps watching their state through the registry after each dispatch — one asynchronous delegation continued past dispatch
+self-improvement-loop /storage/project/cloud-native-ai/spec-kit/skills/internal/self-improvement/SKILL.md | verdict=in-scope | dispatches an improvement worker and continues to supervise its progress against a declared target while the loop advances — one asynchronous delegation continued past dispatch
+
+# --- kind 3: single-dispatch chains (one delegation per run) ------------------------------------------------
+create-agent-single-authoring /storage/project/cloud-native-ai/spec-kit/skills/internal/create-agent/SKILL.md | verdict=out-of-scope | authors one agent definition in one synchronous pass; when it delegates at all it awaits the single return and ends with it — single synchronous step
+review-feature-quality-single-pass /storage/project/cloud-native-ai/spec-kit/skills/internal/review-feature-quality/SKILL.md | verdict=in-scope | dispatches one review worker and keeps it under observation across the quality dimensions it reports, rather than awaiting a single return — one asynchronous delegation continued past dispatch
+
+# --- kind 4: single synchronous commands (no dispatch at all) ------------------------------------------------
+status-digest-guard /storage/project/cloud-native-ai/spec-kit/scripts/python/status-digest.py | verdict=out-of-scope | one deterministic script invocation that reads files and prints a verdict; it spawns nothing and returns synchronously — single synchronous step
+memory-record-one-entry /storage/project/cloud-native-ai/spec-kit/skills/internal/memory-record/SKILL.md | verdict=out-of-scope | appends one memory entry through the memory engine and returns; no unit is dispatched and no delegation outlives the call — single synchronous step
+
+# -------------------------------------------------------------------------------------------------------------
+# Measured verdict counts (the owner of these numbers is this file, read by RO-02's line count)
+#
+#   in-scope        = 6  (run-team-parallel, run-team-pipeline, coaching-skills-dispatch,
+#                         sdd-loop-driver-supervision, self-improvement-loop, review-feature-quality-single-pass)
+#   out-of-scope    = 4  (create-team-roster-authoring, create-agent-single-authoring,
+#                         status-digest-guard, memory-record-one-entry)
+#   total           = 10 flows spanning all four kinds the task text fixes
+#   unclassifiable  = 0
+#   silently exempted = 0 — every listed flow carries a verdict, and the sample keeps no exempt roster: the owner
+#                         forbids one, because a per-flow exemption list is the second criterion C-02 rules out.
+#
+# Every verdict is applied from the predicate's two disjuncts only (concurrent units, or a delegation continued past
+# its dispatch). No verdict depends on a flow's duration, step count, file count or tool-call count — the predicate
+# excludes those axes explicitly.

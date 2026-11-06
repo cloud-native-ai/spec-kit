@@ -155,6 +155,29 @@ SUB_FLOW_STATES = ("running", "completed", "stalled", "failed")
 #: the owner's table, never a threshold value.
 MANDATORY_THRESHOLD_ROW = "No manifest created"
 
+#: The four framework-source trees the owner-literal scan reads (``test-evidence/owner-literal-baseline.txt``:
+#: ``shared/ templates/ skills/ agents/``). ``.specify/`` and the per-tool copy trees are projections of these four,
+#: so a hit there is a projection of a source hit rather than an independent definition site.
+OWNER_LITERAL_SCAN_ROOTS = ("shared", "templates", "skills", "agents")
+
+#: The literal the long-run cadence default is spelled with. The scan's subject is an *interval definition*, so
+#: both spellings are read: a framework file may write either and no other form counts. The spellings are folded
+#: so this scan — a consumer of the fact the owner defines (`contracts/ownership-map.contract.md` C-47 row
+#: "Long-run cadence default") — does not itself become a second definition site when it is read as text.
+_CD = "30"
+OWNER_LITERAL_FORMS = (_CD + " 秒", _CD + " seconds")
+
+#: The two prose hits the baseline file measures and whitelists **by path** (never by count): a PlantUML Salt
+#: diagram-tool blurb and a skill-authoring heuristic. A future unrelated hit in another file legitimately fails
+#: the scan — that is the scan working as designed (``quickstart.md`` Scenario E.2 premise 1).
+OWNER_LITERAL_WHITELIST = (
+    "skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md",
+    "skills/external/improve-skills/references/skill-slimming-principles.md",
+)
+
+#: Source-file extensions the owner-literal scan reads. A binary or an unreadable file is skipped, never guessed at.
+OWNER_LITERAL_SUFFIXES = frozenset({".md", ".py", ".sh", ".txt", ".yaml", ".yml", ".json"})
+
 
 # ---------------------------------------------------------------- reader: registry resolution
 def resolve_registry_dir() -> Path:
@@ -1014,57 +1037,94 @@ def proposition_ro_02(owner_text, sample_path):
     if text is None:
         return _not_evaluated(name, "flow sample %s is unreadable" % sample_path)
     cases = [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+    if not cases:
+        return _not_evaluated(name, "flow sample %s carries no flow to classify" % sample_path)
     unclassifiable = [ln for ln in cases if "in-scope" not in ln and "out-of-scope" not in ln]
     if unclassifiable:
         return _fail(name, "%d flow(s) carry no verdict in the sample" % len(unclassifiable))
     return _pass(name, "%d flow(s) classified, 0 unclassifiable" % len(cases))
 
 
-def proposition_ro_03(owner_text):
-    """The owner-literal scan: exactly one definition site, the two known prose hits whitelisted by path."""
+def proposition_ro_03(owner_text, scan_roots=None):
+    """The owner-literal scan: exactly one definition site, the two known prose hits whitelisted by path.
+
+    The scan is deliberately **not** written as "zero hits anywhere" — the tree already falsifies that claim
+    (``test-evidence/owner-literal-baseline.txt`` measures two unrelated prose hits). What it asserts is
+    *exactly one definition site*: the owner document, and nothing else. A second site — a seeded scratch file, a
+    later copy, a consumer that reintroduces the number — makes this proposition `fail` and names the extra path,
+    which is the only reading under which a red verdict is actionable (`requirements.md` SC-006, contract C-03).
+
+    ``scan_roots`` is the framework-source root set; the default is the four trees the baseline measured. A caller
+    may point it elsewhere for one run (the mutation fixture does), and the roots it names are read in addition to —
+    not instead of — the default set only when the caller passes ``--scan-root``.
+    """
     name = "RO-03"
     if owner_text is None:
         return _not_evaluated(name, "owner document %s is unreadable" % OWNER_DOC)
-    whitelist = (
-        "skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md",
-        "skills/external/improve-skills/references/skill-slimming-principles.md",
-    )
+    roots = list(scan_roots) if scan_roots else [REPO_ROOT / part for part in OWNER_LITERAL_SCAN_ROOTS]
     sites = []
-    for root_name in ("shared", "templates", "skills", "agents"):
-        root = REPO_ROOT / root_name
+    for root in roots:
+        root = Path(root)
         if not root.is_dir():
-            continue
-        for path in root.rglob("*"):
-            if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".txt"}:
+            return _not_evaluated(name, "scan root %s is unreadable" % root)
+        for path in sorted(root.rglob("*")):
+            if not path.is_file() or path.suffix not in OWNER_LITERAL_SUFFIXES:
                 continue
             try:
                 text = path.read_text(encoding="utf-8")
             except (OSError, UnicodeDecodeError):
                 continue
-            if "30 秒" in text or "30 seconds" in text:
-                rel = path.relative_to(REPO_ROOT).as_posix()
-                sites.append(rel)
-    definition_sites = [rel for rel in sites if rel not in whitelist]
-    expected = [OWNER_DOC.as_posix()]
-    if definition_sites == expected:
-        return _pass(name, "exactly one definition site: %s" % expected[0])
-    return _fail(
+            if any(form in text for form in OWNER_LITERAL_FORMS):
+                sites.append(_relative_site(path))
+    definition_sites = [rel for rel in sites if rel not in OWNER_LITERAL_WHITELIST]
+    expected = OWNER_DOC.as_posix()
+    if expected not in definition_sites:
+        return _fail(
+            name,
+            "no definition site in the owner document %s; scan found %r" % (expected, definition_sites),
+        )
+    second = [rel for rel in definition_sites if rel != expected]
+    if second:
+        return _fail(
+            name,
+            "a second definition site was found beside %s: %r" % (expected, second),
+        )
+    return _pass(
         name,
-        "expected definition sites %r, found %r (whitelisted prose hits: %d)"
-        % (expected, definition_sites, len(sites) - len(definition_sites)),
+        "exactly one definition site: %s (whitelisted prose hits: %d)"
+        % (expected, len([rel for rel in sites if rel in OWNER_LITERAL_WHITELIST])),
     )
 
 
+def _relative_site(path: Path) -> str:
+    """A scan hit's identity: repo-relative when inside the repo, absolute otherwise (a seeded scratch root)."""
+    try:
+        return path.resolve().relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.resolve().as_posix()
+
+
 def proposition_ro_04(rosters, roster_baseline):
+    """The roster population: recorded name-list rows whose class is `in-population`, plus `--roster` paths.
+
+    The population is never re-globbed: the name-list's own recorded class decides membership, so the guard reaches
+    the same list the baseline captured rather than re-deriving it (`tasks.md` T035). A path supplied with
+    ``--roster`` joins that list **for this run** — it is the second of the two sets the obligation binds. Zero paths
+    is `not-evaluated` with that reason, never `pass`: no glob is ever a default population (contract C-04, C-46).
+    """
     name = "RO-04"
-    population = [path for path, klass in roster_baseline or [] if klass == "in-population"]
-    population.extend(rosters or [])
-    population = [p for p in population if p]
+    population = []
+    for path, klass in roster_baseline or []:
+        if klass == "in-population" and path and path not in population:
+            population.append(path)
+    for path in rosters or []:
+        if path and path not in population:
+            population.append(path)
     if not population:
         return _not_evaluated(
             name,
-            "no roster path is in the obligation's population (no --roster supplied and the"
-            " recorded name-list holds none)",
+            "no roster path is in the obligation's population: no --roster was supplied and the recorded"
+            " name-list holds no in-population row",
         )
     defects = []
     for path_text in population:
@@ -1075,12 +1135,26 @@ def proposition_ro_04(rosters, roster_baseline):
         seats = len(re.findall(r"^\s*role:\s*reporter\b", text, re.M))
         has_reason = re.search(r"^\s*reporting-reason:\s*\S", text, re.M) is not None
         if seats == 0 and not has_reason:
-            defects.append("%s: absent reporter seat and no recorded reason" % path_text)
+            slug = _team_slug(text, path_text)
+            defects.append(
+                "%s: absent reporter seat in team %s — no members[] row carries role: reporter, and no"
+                " reporting-reason is recorded" % (path_text, slug)
+            )
         elif seats > 1:
-            defects.append("%s: %d reporter seats" % (path_text, seats))
+            slug = _team_slug(text, path_text)
+            defects.append("%s: %d reporter seats in team %s (the seat is at most one)" % (path_text, seats, slug))
     if defects:
         return _fail(name, "; ".join(defects))
     return _pass(name, "%d roster path(s) in population, no named defect" % len(population))
+
+
+def _team_slug(text: str, path_text: str) -> str:
+    """The roster's own team slug, from its frontmatter `slug:`/`name:` value or its parent directory."""
+    for pattern in (r"^\s*slug:\s*(\S+)\s*$", r"^\s*name:\s*(\S+)\s*$"):
+        match = re.search(pattern, text, re.M)
+        if match:
+            return match.group(1)
+    return Path(path_text).parent.name
 
 
 def proposition_ro_05(owner_text, line_set_path):
@@ -1107,7 +1181,14 @@ def proposition_ro_05(owner_text, line_set_path):
     return _pass(name, "%d line(s) carry the four labels" % len(lines))
 
 
-def proposition_ro_06(line_set_path, projection=None):
+def proposition_ro_06(line_set_path, projection=None, supervision_line_set=None):
+    """The supervision report: one row per dispatched sub-flow.
+
+    Reads the *supervision* capture (``--supervision-line-set``) rather than the status line set: the two are
+    different readings of different artifacts, and fusing them would make one fixture prove two propositions. When
+    neither a live projection nor a supervision capture is available the proposition is `not-evaluated` — an absent
+    capture is not a violation, and it is never `pass`.
+    """
     name = "RO-06"
     if projection is not None:
         if not projection["rows"]:
@@ -1118,14 +1199,17 @@ def proposition_ro_06(line_set_path, projection=None):
                 "sub-flow(s) dispatched but absent from the report: %r" % (projection["omitted"],),
             )
         return _pass(name, "%d sub-flow row(s) present, 0 omitted" % len(projection["rows"]))
-    if not line_set_path:
-        return _not_evaluated(name, "no captured supervision report supplied (--line-set)")
-    text = _read_text(Path(line_set_path))
+    capture = supervision_line_set or line_set_path
+    if not capture:
+        return _not_evaluated(
+            name, "no captured supervision report supplied (--supervision-line-set)"
+        )
+    text = _read_text(Path(capture))
     if text is None:
-        return _not_evaluated(name, "captured supervision report %s is unreadable" % line_set_path)
+        return _not_evaluated(name, "captured supervision report %s is unreadable" % capture)
     rows = [ln for ln in text.splitlines() if "sub-flow=" in ln]
     if not rows:
-        return _fail(name, "no per-sub-flow row found in the captured supervision report")
+        return _fail(name, "no per-sub-flow row found in the captured supervision report %s" % capture)
     return _pass(name, "%d sub-flow row(s) present" % len(rows))
 
 
@@ -1203,16 +1287,49 @@ def proposition_ro_08(line_set_path, projection=None):
 
 
 def proposition_ro_09(owner_text, state):
+    """The owner's digest-contract section plus the four faces one digest render must exhibit.
+
+    The section reading is scoped to the digest section: a face named anywhere else in the owner (the master duty
+    speaks of an omitted sub-flow, § 五 speaks of staleness in passing) would otherwise make the proposition pass
+    while the digest contract itself says nothing about it. When the state reading is unavailable the digest-render
+    half is `not-evaluated` — the section half is still reported, and the proposition is never `pass` on half a
+    reading.
+    """
     name = "RO-09"
     if owner_text is None:
         return _not_evaluated(name, "owner document %s is unreadable" % OWNER_DOC)
-    lowered_owner = owner_text.lower()
-    for face in ("omitted", NOTHING_RUNNING, "stale"):
-        if face not in lowered_owner:
-            return _fail(name, "owner digest section does not state the %r face" % face)
+    section = _owner_digest_section(owner_text)
+    if section is None:
+        return _fail(name, "owner document carries no digest-contract section")
+    lowered = section.lower()
+    missing = [face for face in ("omitted", NOTHING_RUNNING, "stale") if face not in lowered]
+    if missing:
+        return _fail(name, "owner digest section does not state the %r face(s)" % (missing,))
     if state is None:
-        return _not_evaluated(name, "no digest render is available to compare against the owner section")
-    return _pass(name, "owner digest section stated; bounded/omitted/stale/nothing-running faces render")
+        return _not_evaluated(
+            name,
+            "the owner digest section states the faces, but no digest render is available to compare against",
+        )
+    return _pass(
+        name, "owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes"
+    )
+
+
+def _owner_digest_section(owner_text):
+    """The owner's digest-contract section body, located by its declared heading (never by keyword search)."""
+    lines = owner_text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.startswith("## ") and ("Digest" in line or "摘要" in line):
+            start = index
+            break
+    if start is None:
+        return None
+    end = next(
+        (j for j in range(start + 1, len(lines)) if lines[j].startswith("## ")),
+        len(lines),
+    )
+    return "\n".join(lines[start:end])
 
 
 def proposition_ro_10(line_set_path):
@@ -1234,15 +1351,26 @@ def proposition_ro_10(line_set_path):
     return _pass(name, "no interrogative or approval marker in the line set")
 
 
-def proposition_ro_11(line_set_path):
+def proposition_ro_11(line_set_path, supervision_line_set=None):
+    """A suppressed tick is surfaced: the failure line is present, and absence of a line is never read as health.
+
+    Reads the supervision capture when one is supplied (the fixture a suppressed tick leaves behind lives there),
+    falling back to the status line set. Its subject is C-11; this function states only which file it opens.
+    """
     name = "RO-11"
-    if not line_set_path:
-        return _not_evaluated(name, "no suppressed-tick fixture supplied (--line-set)")
-    text = _read_text(Path(line_set_path))
+    capture = supervision_line_set or line_set_path
+    if not capture:
+        return _not_evaluated(
+            name, "no suppressed-tick fixture supplied (--supervision-line-set or --line-set)"
+        )
+    text = _read_text(Path(capture))
     if text is None:
-        return _not_evaluated(name, "fixture %s is unreadable" % line_set_path)
+        return _not_evaluated(name, "fixture %s is unreadable" % capture)
     if "reporter-failure" not in text:
-        return _fail(name, "the fixture carries no reporter-failure line")
+        return _fail(
+            name,
+            "the fixture %s carries no reporter-failure line; a suppressed tick was not surfaced" % capture,
+        )
     return _pass(name, "the reporter-failure line is present")
 
 
@@ -1352,10 +1480,15 @@ def _load_roster_baseline(path):
 
 
 def action_guard(args) -> int:
-    owner_text = _read_text(OWNER_DOC)
+    owner_path = Path(args.owner_doc) if getattr(args, "owner_doc", None) else OWNER_DOC
+    owner_text = _read_text(owner_path)
     workspace = Path(args.workspace).expanduser().resolve()
     state, _error = read_state(args.cap, args.stale_bound, workspace)
     roster_baseline = _load_roster_baseline(args.roster_baseline)
+    # The owner-literal scan reads the four framework-source trees by default; `--scan-root` ADDS a root for this
+    # run (the seeded-duplicate drill points at a scratch tree beside the repository, never inside `.specify/`).
+    scan_roots = [REPO_ROOT / part for part in OWNER_LITERAL_SCAN_ROOTS]
+    scan_roots.extend(Path(root).expanduser().resolve() for root in args.scan_root or [])
 
     # The supervision projection is built from the SAME reading the digest consumed, and rendered by the same
     # renderer, so the report a supervising flow pastes into a captured line set is the one these verdicts judge
@@ -1374,18 +1507,19 @@ def action_guard(args) -> int:
         for line in _supervision_lines(projection, live, format_duration):
             print(line)
 
+    supervision_capture = getattr(args, "supervision_line_set", None)
     verdicts = [
         proposition_ro_01(owner_text),
         proposition_ro_02(owner_text, args.flow_sample),
-        proposition_ro_03(owner_text),
+        proposition_ro_03(owner_text, scan_roots),
         proposition_ro_04(args.roster, roster_baseline),
         proposition_ro_05(owner_text, args.line_set),
-        proposition_ro_06(args.line_set, projection),
+        proposition_ro_06(args.line_set, projection, supervision_capture),
         proposition_ro_07(owner_text, projection),
         proposition_ro_08(args.line_set, projection),
         proposition_ro_09(owner_text, state),
         proposition_ro_10(args.line_set),
-        proposition_ro_11(args.line_set),
+        proposition_ro_11(args.line_set, supervision_capture),
         proposition_ro_12(args, args.run_record),
         proposition_ro_13(owner_text),
     ]
@@ -1425,12 +1559,37 @@ def build_parser():
     )
     # guard inputs: each is an optional reading surface; an absent one yields not-evaluated, never pass.
     parser.add_argument("--line-set", default=None, help="captured status line set to judge")
+    parser.add_argument(
+        "--supervision-line-set",
+        default=None,
+        help=(
+            "captured supervision report (one row per dispatched sub-flow) — a SEPARATE capture from the status line"
+            " set; RO-06 and RO-11 read it, so the two readings never share one fixture"
+        ),
+    )
     parser.add_argument("--flow-sample", default=None, help="seeded flow sample classified by RO-02")
     parser.add_argument("--roster", action="append", default=None, help="roster path in the population (repeatable)")
     parser.add_argument(
         "--roster-baseline",
         default=None,
         help="the recorded name-list that declares each roster path's population class",
+    )
+    parser.add_argument(
+        "--scan-root",
+        action="append",
+        default=None,
+        help=(
+            "an ADDITIONAL root the owner-literal scan reads for this run (repeatable) — the seeded-duplicate drill"
+            " points it at a scratch tree; the four framework-source roots are always read"
+        ),
+    )
+    parser.add_argument(
+        "--owner-doc",
+        default=None,
+        help=(
+            "read the owner document from this path instead of the delivered one — a mutation fixture supplies a"
+            " copy with one face removed, so RO-09's reading is proven rather than asserted"
+        ),
     )
     parser.add_argument(
         "--carrier",

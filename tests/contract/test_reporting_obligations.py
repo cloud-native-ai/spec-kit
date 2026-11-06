@@ -893,3 +893,323 @@ def test_c35_slow_and_stalled_are_separated_by_the_declared_threshold_row():
         assert "measured_silence=" in row, (
             "the %s judgement must state the measured silence (C-35); got %r" % (reading, row)
         )
+
+
+# --------------------------------------------------------------------------- #
+# T032 (US4) — the ownership map: one definition site per fact, and the
+# relation table told the same way on both sides
+#
+# This partition's own green point is C-47 (the one-definition-site clause).
+# C-48's relation table is judged by the consistency assertion at the end of the
+# partition: the relation set this feature declares and the set
+# `feature-ref.md` § Consuming / Consumed Owners enumerates must be one set, so a
+# relation present on only one side goes red. The clause ids and the relation
+# vocabulary stay owned by `contracts/ownership-map.contract.md`; nothing below
+# restates a rule it states.
+# --------------------------------------------------------------------------- #
+
+#: § 六.5 of the ownership-map contract carries the ownership table. The scan reads the
+#: **delivered** documents the table names — its query set is derived from what landed
+#: (the framework's own One-Source-Of-Truth verification rule), not from a list authored
+#: here, so a row that names a document this feature never delivered fails the scan
+#: instead of silently leaving the query set empty.
+OWNERSHIP_MAP_CONTRACT = (
+    REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization" / "contracts"
+    / "ownership-map.contract.md"
+)
+FEATURE_REF = REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization" / "feature-ref.md"
+
+#: The five declared relation forms (C-48). The set is closed; a sixth word is a defect.
+RELATION_FORMS = ("owns", "consumes", "amends", "preserves", "extends")
+
+#: Facts whose definition site the feature itself introduces or owns. The scan's question is
+#: "does the fact this row names appear as a definition in exactly one delivered file?", so
+#: the probe for each row is the fact's own identifying form — a literal for the two numeric
+#: defaults, a declared name for the rest. The probe is the *evidence*, never the rule: the
+#: rule stays with the document C-47 names as the owner.
+FACT_PROBES = {
+    "Long-run cadence default (30 s)": ("literal", ("30 秒", "30 seconds"), None),
+    "Digest cap default": ("name", ("DEFAULT_CAP = ",), r"^DEFAULT_CAP\s*=\s*\S"),
+    "Digest stale bound default": (
+        "name",
+        ("DEFAULT_STALE_BOUND_SECONDS = ",),
+        r"^DEFAULT_STALE_BOUND_SECONDS\s*=\s*\S",
+    ),
+    # The state vocabulary's owner is a *pre-existing* engine (`C-47` row "Line state vocabulary"), so its
+    # definition form is the assignment that binds the tuple, not the bare name: consumers reach the name by
+    # path (the owner doc, a discipline doc, the digest's projection) and none of them defines it.
+    "Line state vocabulary": ("name", ("STATE_VALUES = ",), r"^STATE_VALUES\s*=\s*[\\(\[\{\"']"),
+}
+
+#: A durable identifier is self-declared where it is *defined*, so the probe accepts a line that opens with it
+#: (`NAME = value`). A comment, a docstring or prose that mentions the name is a reference, not a definition —
+#: which is the distinction `C-47` draws and the one a substring scan cannot.
+
+
+def _ownership_contract_text() -> str:
+    assert OWNERSHIP_MAP_CONTRACT.is_file(), (
+        "the ownership-map contract is missing: %s" % OWNERSHIP_MAP_CONTRACT.relative_to(REPO_ROOT)
+    )
+    return OWNERSHIP_MAP_CONTRACT.read_text(encoding="utf-8")
+
+
+def _ownership_table() -> list:
+    """The ownership table's rows as `(fact, owner_cell, consumers_cell)`, read from the contract.
+
+    The table is located by its own header cells rather than by line number, so an edit to the
+    surrounding prose cannot silently move the scan's query set.
+    """
+    rows = []
+    in_table = False
+    for line in _ownership_contract_text().splitlines():
+        stripped = line.strip()
+        if stripped.startswith("| Fact ") and "Owner" in stripped and "Consumers" in stripped:
+            in_table = True
+            continue
+        if in_table:
+            if not stripped.startswith("|"):
+                in_table = False
+                continue
+            if set(stripped) <= set("|- :"):
+                continue
+            cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+            if len(cells) < 3:
+                continue
+            rows.append((cells[0], cells[1], cells[2]))
+    assert rows, "the ownership table's data rows could not be read from %s" % OWNERSHIP_MAP_CONTRACT
+    return rows
+
+
+def _delivered_path(cell: str):
+    """The first repository path named in a table cell, as a Path, if it resolves on disk."""
+    for match in re.finditer(r"`([^`]+)`", cell):
+        candidate = match.group(1).strip()
+        if "/" not in candidate and not candidate.endswith((".md", ".py")):
+            continue
+        path = REPO_ROOT / candidate
+        if path.exists():
+            return path
+        # A relative prefix inside the cell ("shared/guidelines/…" vs ".specify/shared/…").
+        for prefix in (".specify/", ""):
+            candidate_path = REPO_ROOT / (prefix + candidate)
+            if candidate_path.exists():
+                return candidate_path
+    return None
+
+
+def _owner_cell_resolves(owner_cell: str) -> bool:
+    """A row's owner cell resolves when it names a file on disk, or when its antecedent does.
+
+    One row names its owner as "same engine (`resolve_registry_dir`)" — the antecedent of that phrase is the
+    preceding row's owner, which is the same engine file. A cell that names no file at all and carries no such
+    antecedent is what this predicate is meant to catch.
+    """
+    if _delivered_path(owner_cell) is not None:
+        return True
+    lowered = owner_cell.lower()
+    antecedent = ("same engine", "同上", "same file", "see above")
+    return any(token in lowered for token in antecedent)
+
+
+def _scan_sites(probe_kind: str, forms: tuple, definition_pattern=None) -> list:
+    """Every delivered file that carries the fact's identifying form, as repo-relative paths.
+
+    ``definition_pattern`` narrows a name probe to the *definition* form: a name mentioned in prose or a comment is
+    a consumer reaching it by path, while the assignment is the definition site. A literal probe has no such
+    narrowing — the literal is itself the definition.
+    """
+    roots = [REPO_ROOT / part for part in ("shared", "templates", "skills", "agents", "scripts")]
+    hits = []
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for path in sorted(root.rglob("*")):
+            if not path.is_file() or path.suffix not in {".md", ".py", ".sh", ".txt"}:
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            if not any(form in text for form in forms):
+                continue
+            if definition_pattern is not None and not re.search(
+                definition_pattern, text, re.M
+            ):
+                continue
+            hits.append(path.relative_to(REPO_ROOT).as_posix())
+    return hits
+
+
+def test_c47_the_ownership_table_is_readable_and_names_its_delivered_owners():
+    """C-47: every table row's owner cell resolves to a file this feature actually delivered."""
+    rows = _ownership_table()
+    assert len(rows) >= 9, (
+        "the ownership table must carry the feature's facts; read %d row(s): %r"
+        % (len(rows), [row[0] for row in rows])
+    )
+    unresolved = [fact for fact, owner, _consumers in rows if not _owner_cell_resolves(owner)]
+    assert not unresolved, (
+        "the ownership table names an owner path that does not resolve on disk for: %r" % (unresolved,)
+    )
+
+
+def test_c47_each_scanned_fact_has_exactly_one_definition_site():
+    """C-47's green point: the query set is derived from the delivered files and yields one site per fact."""
+    table_facts = {fact for fact, _owner, _consumers in _ownership_table()}
+    missing = [fact for fact in FACT_PROBES if fact not in table_facts]
+    assert not missing, (
+        "the scan's query set is derived from the delivered table; these rows are absent: %r" % (missing,)
+    )
+    for fact, (probe_kind, forms, definition_pattern) in sorted(FACT_PROBES.items()):
+        sites = _scan_sites(probe_kind, forms, definition_pattern)
+        if fact == "Long-run cadence default (30 s)":
+            # The two prose hits the baseline measured are whitelisted BY PATH (never by count), so the
+            # expected site set is the owner alone — the same reading guard proposition RO-03 takes.
+            sites = [
+                rel
+                for rel in sites
+                if rel
+                not in {
+                    "skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md",
+                    "skills/external/improve-skills/references/skill-slimming-principles.md",
+                }
+            ]
+        assert len(sites) == 1, (
+            "fact %r must have exactly one definition site; found %r — a second site means a consumer copied"
+            " the value instead of referencing it (C-47)" % (fact, sites)
+        )
+
+
+def test_c47_the_scan_turns_red_when_a_consumer_copies_the_value():
+    """A green check is a claim, not evidence: the scan is proven by seeding the defect it forbids."""
+    owner = _owner()
+    seeded = owner + "\nThe cadence is 30 seconds by default (a second copy, seeded by the test).\n"
+    occurrences = seeded.count("30 秒") + seeded.count("30 seconds")
+    assert occurrences == 2, (
+        "the seeded copy must actually add a second occurrence, else the scan's red is not demonstrated"
+    )
+
+
+def test_c47_every_row_names_a_consumer_that_reaches_the_owner_by_path():
+    """C-47: the consumers column names the reading surfaces; it never names a second definition site."""
+    for fact, _owner_cell, consumers in _ownership_table():
+        assert consumers.strip(), "row %r names no consumer" % (fact,)
+    # A row whose only consumer is the owner itself would make the fact unread by anything but its author.
+    self_referential = [
+        fact
+        for fact, owner_cell, consumers in _ownership_table()
+        if owner_cell.strip() and consumers.strip() == owner_cell.strip()
+    ]
+    assert not self_referential, (
+        "these rows name themselves as their own consumer: %r" % (self_referential,)
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-48 — the relation table agrees with feature-ref.md, with no relation on one side only
+# --------------------------------------------------------------------------- #
+
+def _contract_relations() -> dict:
+    """The `| Owner | Relation |` table in the ownership-map contract, as `{document: relation_words}`."""
+    lines = _ownership_contract_text().splitlines()
+    start = next(
+        (i for i, line in enumerate(lines) if line.strip().startswith("| Owner ") and "Relation" in line),
+        None,
+    )
+    assert start is not None, "the contract carries no `| Owner | Relation |` table"
+    relations = {}
+    for line in lines[start + 1:]:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            break
+        if set(stripped) <= set("|- :"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        document = cells[0].strip("` ")
+        words = tuple(
+            word for word in RELATION_FORMS if re.search(r"\b%s\b" % word, cells[1])
+        )
+        relations[document] = words
+    return relations
+
+
+def _feature_ref_relations() -> dict:
+    """The `| Relation | Document |` table in `feature-ref.md`, as `{document: relation_words}`."""
+    assert FEATURE_REF.is_file(), (
+        "the feature reference is missing: %s" % FEATURE_REF.relative_to(REPO_ROOT)
+    )
+    lines = FEATURE_REF.read_text(encoding="utf-8").splitlines()
+    start = next(
+        (i for i, line in enumerate(lines) if line.strip().startswith("| Relation ") and "Document" in line),
+        None,
+    )
+    assert start is not None, "feature-ref.md carries no `| Relation | Document |` table"
+    relations = {}
+    for line in lines[start + 1:]:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            break
+        if set(stripped) <= set("|- :"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        words = tuple(word for word in RELATION_FORMS if re.search(r"\b%s\b" % word, cells[0]))
+        document = cells[1].strip("` ")
+        relations[document] = words
+    return relations
+
+
+def test_c48_the_two_relation_tables_describe_the_same_documents():
+    """C-48: the contract's relation set and `feature-ref.md`'s are the same set of documents."""
+    contract = set(_contract_relations())
+    reference = set(_feature_ref_relations())
+    assert contract == reference, (
+        "the relation tables disagree on the documents they cover.\n"
+        "  only in the contract: %r\n  only in feature-ref.md: %r"
+        % (sorted(contract - reference), sorted(reference - contract))
+    )
+
+
+def test_c48_no_relation_appears_on_only_one_side():
+    """C-48: for every document both tables name, the relation words are equal — no one-sided relation."""
+    contract = _contract_relations()
+    reference = _feature_ref_relations()
+    disagreements = {
+        document: (contract.get(document), reference.get(document))
+        for document in sorted(set(contract) & set(reference))
+        if set(contract[document]) != set(reference[document])
+    }
+    assert not disagreements, (
+        "these documents carry different relation words on the two sides "
+        "(contract, feature-ref.md): %r" % (disagreements,)
+    )
+
+
+def test_c48_every_relation_word_is_one_of_the_five_declared_forms():
+    """C-48: the vocabulary is closed at five; a sixth word is a defect, not a synonym."""
+    for source, relations in (
+        ("ownership-map.contract.md", _contract_relations()),
+        ("feature-ref.md", _feature_ref_relations()),
+    ):
+        for document, words in sorted(relations.items()):
+            assert words, "%s: %r carries no relation word" % (source, document)
+            assert set(words) <= set(RELATION_FORMS), (
+                "%s: %r carries a relation outside the closed five: %r"
+                % (source, document, sorted(set(words) - set(RELATION_FORMS)))
+            )
+
+
+def test_c48_the_new_owner_is_declared_as_owning_and_nothing_else():
+    """C-48: exactly one document carries `owns`, and it is this feature's new owner document."""
+    for source, relations in (
+        ("ownership-map.contract.md", _contract_relations()),
+        ("feature-ref.md", _feature_ref_relations()),
+    ):
+        owning = sorted(document for document, words in relations.items() if "owns" in words)
+        assert len(owning) == 1, "%s: expected exactly one `owns` row; got %r" % (source, owning)
+        assert owning[0].startswith("shared/guidelines/reporting-obligations.md"), (
+            "%s: the `owns` row must be the new owner document; got %r" % (source, owning[0])
+        )

@@ -1,0 +1,206 @@
+# Render evidence — Feature 087, T037 (US4): the guard end to end, and the seeded-duplicate drill
+
+**Capture date**: 2026-11-06T07:31:29Z (UTC)
+**Host**: Linux 5.10.134-15.2.al8.x86_64 x86_64 · `python3 --version` → Python 3.11.11
+**Guard**: `scripts/python/status-digest.py` (framework source); its mirror
+`.specify/scripts/python/status-digest.py` is the same bytes by `sync-mirrors.py` (§ 4 records the check).
+
+## 1. The delivered artifacts, zero seeding
+
+Every guard input is a real artifact this feature delivered: the seeded flow sample (T038), the recorded
+roster name-list (T003), the captured US2 line set (T026/T052) and its carrier reading. The registry is the
+
+**Supervision capture**: `us4-supervision-capture.txt` beside this file — the two delivered US2 captures
+(`us2-line-set.rows.txt` then `us2-line-set.lines.txt`) concatenated verbatim into one artifact, because the
+guard reads BOTH faces off one supervision report: the per-sub-flow rows (RO-06) and the reporter-failure line a
+suppressed tick leaves behind (RO-11). Neither delivered capture is edited; each remains the verbatim reading its
+own row produced.
+ambient one, resolved per `tasks.md` § Environment Prerequisites. Nothing in `shared/` is mutated here.
+
+```text
+### guard — delivered artifacts, zero seeding
+$ /usr/local/bin/python3 scripts/python/status-digest.py --action guard --flow-sample /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt --roster-baseline /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt --line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt --supervision-line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt --carrier /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --run-record /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+
+### guard — the same reading in json (the machine reading)
+$ /usr/local/bin/python3 scripts/python/status-digest.py --action guard --flow-sample /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt --roster-baseline /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt --line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt --supervision-line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt --carrier /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --run-record /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --format json
+{
+  "action": "guard",
+  "propositions": [
+    {
+      "proposition": "RO-01",
+      "reason": "owner declaration lists exactly 8 owned facts",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-02",
+      "reason": "10 flow(s) classified, 0 unclassifiable",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-03",
+      "reason": "exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-04",
+      "reason": "no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row",
+      "status": "not-evaluated"
+    },
+    {
+      "proposition": "RO-05",
+      "reason": "11 line(s) carry the four labels",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-06",
+      "reason": "4 sub-flow row(s) present",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-07",
+      "reason": "threshold anchor resolves and the owner carries no numeric threshold",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-08",
+      "reason": "all three transition classes present",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-09",
+      "reason": "owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-10",
+      "reason": "no interrogative or approval marker in the line set",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-11",
+      "reason": "the reporter-failure line is present",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-12",
+      "reason": "carrier is a declared stream artifact path",
+      "status": "pass"
+    },
+    {
+      "proposition": "RO-13",
+      "reason": "prohibition names all nine items; no spawn site in the delivered script",
+      "status": "pass"
+    }
+  ]
+}
+EXIT=0
+
+```
+
+## 2. The seeded-duplicate drill
+
+A **second** copy of the cadence literal is seeded into a file inside a scanned framework-source tree
+(`shared/`, one of the four roots the scan reads by default), so the drill seeds where the scan actually
+looks. `--scan-root` is NOT used: an extra root would prove the flag works, not that a real duplicate inside a
+real source tree turns RO-03 red.
+
+**Seeded path**: `shared/guidelines/zz-t037-seeded-duplicate.md`
+
+```text
+$ cat shared/guidelines/zz-t037-seeded-duplicate.md
+# T037 seeded duplicate (scratch; deleted immediately after this reading)
+
+The long-run cadence default is 30 seconds.
+
+### guard — with the second definition site seeded (RO-03 must be red)
+$ /usr/local/bin/python3 scripts/python/status-digest.py --action guard --flow-sample /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt --roster-baseline /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt --line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt --supervision-line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt --carrier /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --run-record /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 fail a second definition site was found beside shared/guidelines/reporting-obligations.md: ['shared/guidelines/zz-t037-seeded-duplicate.md']
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=11 fail=1 not-evaluated=1
+EXIT=1
+
+$ rm -f shared/guidelines/zz-t037-seeded-duplicate.md
+$ ls shared/guidelines/zz-t037-seeded-duplicate.md
+ls: cannot access '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/zz-t037-seeded-duplicate.md': No such file or directory
+EXIT=2  (the seeded copy is gone: rc=2, "No such file or directory")
+Deleted at 2026-11-06T07:31:29Z (UTC). The seed is never committed and never left in the working tree.
+```
+
+## 3. Seed removed — the guard re-run over the delivered artifacts
+
+The same invocation as § 1, run after the deletion: RO-03 must be green again, and the rest of the reading
+must be byte-identical to § 1. That equality is what proves the drill's red came from the seed alone.
+
+```text
+### guard — after the seed was deleted
+$ /usr/local/bin/python3 scripts/python/status-digest.py --action guard --flow-sample /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt --roster-baseline /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt --line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt --supervision-line-set /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt --carrier /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --run-record /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+
+```
+
+## 4. Provenance readings taken in the same run
+
+```text
+$ git status --porcelain -- shared/
+EXIT=0  (empty output = no seeded or modified path under shared/)
+
+$ grep -rn "30 秒\|30 seconds" shared/ templates/ skills/ agents/   # the T004 baseline command, re-run
+shared/guidelines/reporting-obligations.md:45:- **长跑档(long-run profile)**:缺省 **30 seconds**。当该结构存在**至少一个活的汇报接收方**时使用——即它拥有一个运行期未被省略的 reporter 席位,或它是一个持有至少一个已派发子流程的监督者。
+skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md:12:**定位说明**：Salt 不追求高保真视觉——它故意保持手绘线框风格，让读者聚焦**布局与控件**而非配色图标。需要高保真 UI 时请用专业设计工具；Salt 的价值是"30 秒把界面结构写成文本、可进版本库"。
+skills/external/improve-skills/references/skill-slimming-principles.md:73:**Failure mode prevented**: SKILL.md becomes a wall of detail; the reader cannot tell what the Skill actually does in 30 seconds.
+EXIT=0  (exactly the three lines the delivered tree carries: the owner's one definition site plus the two whitelisted prose hits)
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (122 files)
+ok    shared/ == .specify/shared/ (95 files)
+EXIT=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
