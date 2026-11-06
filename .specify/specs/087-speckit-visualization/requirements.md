@@ -206,8 +206,10 @@ literal is reintroduced elsewhere.
   scope, and an out-of-scope flow MUST be able to say so in one line rather than emitting an empty
   report.
 - **FR-003**: Every in-scope supervised structure — a team, or a master that dispatches and watches
-  sub-flows — MUST emit a status report on a fixed cadence whose default is 30 seconds, and the
-  cadence MUST remain configurable per run and per structure without a source edit.
+  sub-flows — MUST emit a status report on a fixed cadence, using the cadence profile FR-020 selects
+  for its run, and the cadence MUST remain configurable per run and per structure without a source
+  edit. This requirement names no interval value: FR-020 is the single definition site of both
+  profiles' defaults.
 - **FR-004**: Every status report MUST carry, in the progress-reporting discipline's content
   terms: the structure's identity (slug and run stamp), the current position in its plan, the
   change since the previous report, what remains with a rough estimate or the stated reason none
@@ -217,10 +219,20 @@ literal is reintroduced elsewhere.
   the framework's agent template source and usable by any team or supervisory structure; its
   capability surface MUST be sufficient to read the state it reports and MUST NOT include the
   authority to dispatch, authorize, retry, terminate or write outside its own stream artifact.
-- **FR-006**: Every team created through the framework's team-creation entry MUST carry one
-  **reporter seat** bound to that template with the reporter's territory declared; roster
-  validation MUST report a missing reporter seat as a named defect naming the seat, and MUST accept
-  an explicit, recorded reason when a team legitimately cannot host one.
+- **FR-006**: The population the reporter-seat obligation binds is exactly two sets and no third:
+  **(a)** every team roster created or modified through the framework's team-creation entry
+  (`skills/internal/create-team/` invoked by `/speckit.team`) **from the commit that delivers this
+  feature onward**, and **(b)** every roster handed to validation or run explicitly by path. Every
+  roster in that population MUST carry one **reporter seat** bound to the template of FR-005 with
+  the reporter's territory declared; roster validation MUST report a missing reporter seat as a
+  named defect naming the seat, and MUST accept an explicit, recorded reason when a team
+  legitimately cannot host one. Every roster outside that population — notably the rosters that
+  already exist in the repository when this feature lands — is **not** bound by this requirement:
+  this feature MUST NOT retroactively amend them, they MUST NOT be judged against the seat
+  obligation at their pre-existing revision, and they MUST NOT become unrunnable because of it.
+  Inside the population, the only accepted escape remains the recorded reason (the FR-021 channel,
+  `all-lanes-in-session-single-interval` or `host-cannot-host-reporter`); outside it, no
+  disposition is owed at all, and no per-roster backfill is a deliverable of this feature.
 - **FR-007**: Every team run MUST emit the reports FR-003/FR-004 require, with each line attributed
   to its team slug and run stamp, and MUST record which carrier (live console, or the declared
   stream artifact when no live console exists) actually received them.
@@ -237,7 +249,11 @@ literal is reintroduced elsewhere.
   bounded summary of the active state: active lines and their states, dispatched agents with their
   last observed activity and its age, and the most recent completions. The digest MUST read state
   artifacts rather than require a reporter process to be alive, MUST mark stale data with its age,
-  and MUST render an explicit "nothing running" state.
+  and MUST render an explicit "nothing running" state. **Workspace rule**: the digest MUST list only
+  the registry entries whose `project_dir` equals the current workspace, and MUST NOT list entries
+  belonging to another project at all — this exclusion is the chosen reading of the two options the
+  analyze report left open, so no `other-project` label is rendered and no entry outside the current
+  workspace is counted against the FR-012 cap.
 - **FR-012**: The digest's size MUST be bounded by a declared cap, with the number of entries it
   omitted stated when it truncates, so that the answer to "what is running?" is one screen and not
   a log dump.
@@ -250,9 +266,11 @@ literal is reintroduced elsewhere.
   MUST say which mode and which carrier were used. No fourth mode or second carrier is introduced.
 - **FR-015**: A status report MUST NOT become an approval request: it is a one-way statement, it
   never waits for a response, and its presence never authorizes an action.
-- **FR-016**: The reporter's own failure MUST be reported, not swallowed: a run whose reporting loop
-  cannot emit MUST surface that as a named condition, and MUST NOT leave the user reading absence
-  as health.
+- **FR-016**: The **emitting flow's own** reporting loop MUST NOT swallow its own failure: a run whose
+  reporting loop cannot emit MUST surface that as a named condition, and MUST NOT leave the user
+  reading absence as health. This requirement governs that loop only; a reporter that stops growing
+  after a successful emission is a different event and is adjudicated by the visibility contract's
+  existing liveness signal (A15), not by this requirement and not by a second detector.
 - **FR-017**: The framework MUST ship a deterministic guard that judges the mechanically decidable
   propositions of this obligation — reporter seat present or an explicit recorded reason, cadence
   value present and read from the owner, report lines carrying the identity and the element set,
@@ -313,11 +331,11 @@ literal is reintroduced elsewhere.
 ### Measurable Outcomes
 
 - **SC-001**: A fixture team run lasting more than 90 seconds produces at least three attributed status lines, each naming the team slug and run stamp and carrying all four content elements, and each line's carrier is recorded in the run record. **Path**: final
-- **SC-002**: Every team created through the framework's team-creation entry either carries a reporter seat resolvable to the shipped template, or records an explicit reason; a roster missing the seat without a reason fails validation with the seat named. **Path**: final
-- **SC-003**: A fixture supervising flow over two stubbed sub-flows reports both sub-flows on each cadence tick, marks the one below the declared stall threshold as stalled with the threshold and measured silence named, and emits the failure report before the next tick. **Path**: final
+- **SC-002**: Every roster in FR-006's population — created or modified through the framework's team-creation entry after this feature, or passed explicitly by path — either carries a reporter seat resolvable to the shipped template, or records an explicit reason; a roster in that population missing the seat without a reason fails validation with the seat named, and no roster outside that population is judged. **Path**: final
+- **SC-003**: A fixture supervising flow over two stubbed sub-flows — one quiet **beyond** the declared stall threshold, one just under it — reports both sub-flows on each cadence tick, marks the beyond-threshold one `stalled` and the just-under one `slow` with the threshold and measured silence named in both cases, and emits the failure report before the next tick. **Path**: final
 - **SC-004**: In every execution mode of the subagent model, a dispatched reporter's output reaches its declared carrier and the mode plus carrier are recorded; no mode is left with neither a live surface nor a declared stream artifact. **Path**: final
 - **SC-005**: The current-state digest answers a mid-run request within one bounded summary of at most the declared cap of entries, states the omitted-entry count when truncated, marks stale entries with their age, and renders an explicit "nothing running" state with the declared exit status when no run is active. **Path**: final
-- **SC-006**: The default cadence value has exactly one definition site in the framework sources; every other occurrence is either a user-supplied value for one run or a dated record, and the guard fails when the literal is reintroduced elsewhere. **Path**: final
+- **SC-006**: The default cadence value has exactly one definition site in the framework sources — the scan domain is `shared/`, `templates/`, `skills/` and `agents/`; every other occurrence is either a user-supplied value for one run or a dated record, and the guard fails when the literal is reintroduced elsewhere. **Path**: final
 - **SC-007**: The reporting owner document states its scope as a decidable predicate, and a seeded sample of framework flows is classified against it with zero unclassifiable cases and zero flows silently exempted. **Path**: final
 - **SC-008**: Pre-existing progress-reporting and dispatch-visibility behavior produces no new failures against the pre-change baseline. **Path**: supporting
 - **SC-009**: The full chain runs end to end on the dogfood line: a real multi-minute run reports on cadence, a supervised subordinate flow is reported by its master, a mid-run digest request is answered, and the guard returns a verdict on the line's own artifacts. **Path**: supporting
@@ -345,7 +363,7 @@ literal is reintroduced elsewhere.
 | Subagent execution modes and mode selection | `shared/definitions/subagent-definitions.md` § Three Execution Modes | Constrains the obligation to hold in all three modes; adds no fourth mode |
 | Agent Template / Instance / Execution taxonomy and storage | `shared/definitions/agent-definitions.md` | The shipped reporting definition is a Template in the existing template store; no new layer |
 | Team roster schema, seats, territory, patterns, run reports | `skills/internal/create-team/` and `/speckit.team` | Adds the reporter seat obligation to roster creation and validation; keeps the schema |
-| Line registry, state spine, per-entry records | `skills/external/sdd-loop-driver/scripts/line-registry.py`, `.specify/state/` | Read-only input to the digest; no new store and no second registry |
+| Line registry, state spine, per-entry records | `skills/external/sdd-loop-driver/scripts/line-registry.py`, `.specify/state/` | The **line registry is the digest's machine-readable source** — entries resolved exactly as `line-registry.py` resolves them (`$SPECIFY_LINE_REGISTRY_DIR` → XDG `$XDG_STATE_HOME/spec-kit/lines` → `~/.local/state/spec-kit/lines`), read-only; the state spine under `.specify/state/` stays human-readable only. No new store and no second registry |
 | Fast-fail clause injection at dispatch | `shared/guidelines/fast-fail.md` § 子代理派发注入 | The reporting obligation rides the same dispatch-payload channel; the clause itself is unchanged |
 | Token efficiency, summary-first consumption | `shared/guidelines/token-efficiency.md` | The status line and the digest are summary projections; no raw-log injection is introduced |
 | User-facing comprehension of every emitted line | `shared/guidelines/user-facing-comprehension.md` | The emitted lines are a governed surface; the discipline applies unchanged |
@@ -377,8 +395,13 @@ literal is reintroduced elsewhere.
   points at it. The default interval is a single declared literal and is referenced, never copied.
 - **A7 — existing behavior is the compatibility baseline**: the pre-change progress-reporting,
   subagent-dispatch and team-creation contract suites are the regression baseline; the feature is
-  additive except where the reporter seat obligation narrows roster validation — and that narrowing
-  accepts a recorded reason, so no existing team is made unrunnable without a stated disposition.
+  additive. The reporter-seat obligation's population is exactly FR-006's two sets — the rosters this
+  feature creates or modifies through the team-creation entry from its delivering commit onward,
+  plus rosters passed explicitly by path — so **no pre-existing team roster is amended, judged or
+  made unrunnable by this feature**, and no backfill of `reporting-reason` into an existing roster is
+  a deliverable. Inside the population a run that legitimately cannot host a reporter records the
+  declared reason instead. This population is the one the plan's RO-04 group must state; the two
+  MUST NOT diverge.
 - **A8 — historical records are immutable inputs**: dated evidence, prior specs and `.specify/state/`
   records are read, never rewritten.
 - **A9 — scope is a union of a predicate and two named surfaces**: the user's two named surfaces —
@@ -398,8 +421,11 @@ literal is reintroduced elsewhere.
   the dispatch-payload channel; the new owner references those by section anchor. This keeps A6's
   boundary and SC-008's baseline intact: the pre-existing discipline's clauses are not rewritten.
 - **A11 — no register exists for flow states**: the digest's line and agent states are read from the
-  state spine and the per-entry records under `.specify/state/` (dynamic directory listing plus each
-  record's own fields); no flow-state register table is created, and no second state spine is
+  **line registry** — owner `skills/external/sdd-loop-driver/scripts/line-registry.py`, entries
+  resolved exactly as that engine resolves them (`$SPECIFY_LINE_REGISTRY_DIR`, then XDG
+  `$XDG_STATE_HOME/spec-kit/lines`, then `~/.local/state/spec-kit/lines`) — as the machine-readable
+  source; the state spine and its per-entry Markdown are read for a human, never to recover a field
+  the registry already carries. No flow-state register table is created, and no second state spine is
   introduced.
 - **A12 — report lines are visible console output, not a required artifact**: the received carrier is
   recorded in whichever run record the emitting run already writes (team run report, dispatch record,

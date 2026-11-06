@@ -1,0 +1,30 @@
+# requirements repair — analyze loop 1 (087-speckit-visualization)
+# date: 2026-11-06T04:53Z
+# assignment: bounded requirements-stage repair of analyze round-1 findings
+# findings repaired: F-02 (HIGH), A-01 (MEDIUM), C-02 (MEDIUM), C-06 (LOW), F-05 (MEDIUM), E-01 (HIGH, requirements half)
+# files touched: requirements.md, .specify/memory/features/087.md (F-05 only)
+# baseline before repair: validate-requirements status=ok 0 error/0 warning; pre-analyze decision=pass errors=0 advisories=125
+
+## validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 518 lines, 32 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+exit code: 0
+
+## pre-analyze-check.py --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+decision: pass
+errors: 0
+advisories: 125 (all `missing-path` for paths this feature is scheduled to create — unchanged from the pre-repair baseline count)
+waived: 0
+summary: fr=22 sc=10 tasks=50 clauses=0 files=15
+exit code: 0
+
+## id-set invariant
+FR-001..FR-022 = 22 (unchanged); SC-001..SC-010 = 10 (unchanged). No FR/SC added, removed or renumbered.
