@@ -71,13 +71,13 @@
 |----------|------:|------------|
 | P0 | 1 | Blocks correct use of spec-kit, or creates silent corruption risk. Fix before next spec. |
 | P1 | 6 | Recurring friction across specs. Fix when convenient — currently every spec writer pays the toll. |
-| P2 | 17 | Quality-of-life. Compounding gains across many specs. |
+| P2 | 18 | Quality-of-life. Compounding gains across many specs. |
 
 | Category | Count |
 |----------|------:|
 | Template | 0 |
 | Command Prompt | 0 |
-| Automation / Scripts | 6 |
+| Automation / Scripts | 7 |
 | Workflow | 5 |
 | Documentation | 13 |
 
@@ -90,7 +90,7 @@
 | Base source | `feature-first-commit` | `git-delta-review.sh base` |
 | Renderer mode | `renderer: text` | the code record's header marker |
 | Changed / judged / skipped / gap files | 177 / 11 / 166 / 0 | copied field by field from the record's coverage receipt block |
-| Segment verdict | `blocked` | `blocking` entries: 2 (plus 5 `important`, 1 `suggestion`) |
+| Segment verdict | `blocked` | `blocking` entries: 2 (plus 6 `important`, 1 `suggestion`) |
 | Gate verdict | `blocking-unresolved` | `report --summary --file` returned `gate=deny`, exit 1 |
 | Reason, when one applies | Two `blocking` entries: the recognisable-diagram suffix list misses the delivery contract's HTML/PDF/drawio/excalidraw faces; a reference to the editable source is reported `satisfied` even though C-007 requires a rendered face | `code-review.md` |
 | Uncommitted scope | 39 uncommitted paths disclosed and not reviewed: pre-existing session records, exec-quant/feedback runtime records, and this run's `test-evidence/review-smoke.txt`; the full list lives in the record's disclosure line and in `git status` | same |
@@ -145,6 +145,7 @@ This subsection carries the verdict and the pointers only: no opinion body, no p
 | P2 | `skills/external/create-docs/scripts/docs-utils.py` | 520 | — | `str.removeprefix` (520) and `Path.is_relative_to` (604) are 3.9+ APIs against a declared `>=3.8` floor; see F22 |
 | P2 | `skills/external/create-docs/scripts/docs-utils.py` | 429 | — | Fenced-code removal deletes newlines and shifts the reported reference line (9 → 5 in the probe); see F23 |
 | P2 | `tests/integration/test_docs_obligation_scenarios.py` | 539 | — | SC-001's reference assertion accepts any `../assets/` link and would pass a source reference; see F24 |
+| P2 | `tests/fixtures/docs-obligation/build_fixtures.py` | 295 | — | `check()` verifies only path presence/absence; a bare `--help` runs `build_all()` and rewrites a fixture record while `--check` still reports OK; see F25 |
 
 ### 2.4 Acceptance Reality Check
 
@@ -506,6 +507,26 @@ This subsection carries the verdict and the pointers only: no opinion body, no p
 - **Why it's a problem**: the assertion accepts any `../assets/` link, including `widget.mmd`; it is the test gap behind F4 and lets a source reference pass as the fourth artifact. The test name says "four artifacts present", but the reference half is not tied to the record's rendered path.
 - **Proposed fix**: read the trace entry and assert the document's link target equals one of `rendered[].path`; keep the on-disk assertion as the second half.
 
+### F25 — The fixture builder's `--check` cannot detect a record-content drift, and an unknown flag rebuilds the fixtures
+
+- **Severity**: P2
+- **Category**: Automation / Scripts
+- **Location**: `tests/fixtures/docs-obligation/build_fixtures.py:295` (the `__main__` branch); `:239` (`check()`)
+- **Evidence** (verbatim quote):
+
+  ```
+  if "--check" in sys.argv:
+      sys.exit(check())
+  names = build_all()
+
+  $ python3 tests/fixtures/docs-obligation/build_fixtures.py --help   # no --check → build_all()
+  built 11 fixture spaces: clean, no-diagram, deleted-rendered, …
+  OK: 11 docs-obligation fixture spaces match their registered composition
+  # git diff showed orphan-rendered/…/diagram-trace.json gained the PNG face and two sha256 values
+  ```
+- **Why it's a problem**: `check()` only asserts that each registered path is present or absent; it never compares the bytes of a record, so a fixture can be silently rewritten and the invariant still prints `OK`. The `__main__` branch makes this easy to trigger: any argument other than `--check` (including `--help`) runs `build_all()` and mutates the repository fixtures. This review's own `--help` probe changed `orphan-rendered`'s record; the file was restored to `HEAD` before this report was committed, but the underlying defect remains.
+- **Proposed fix**: make `check()` compare each fixture's bytes against the builder's deterministic output (or a committed hash manifest), and make unknown flags exit 2 instead of falling through to `build_all()`; add a negative test that edits a record and expects `check()` to fail.
+
 ## 4. What Worked — Preserve (Brief)
 
 - **Red-first evidence with per-task attribution**: 13 reds before `--action obligation` existed, each attributed to T008–T012; the later Part-3 ten reds each name their delivering row, and no red was loosened to go green.
@@ -534,6 +555,7 @@ This subsection carries the verdict and the pointers only: no opinion body, no p
 - **Preserve line numbers when stripping code fences** — Target: `skills/external/create-docs/scripts/docs-utils.py` `_relative_links`. Change: replace fenced blocks with an equal number of newlines or parse with a fence state. Source: F23. Expected impact: the `line` field points at the real reference.
 - **Keep the existing actions' missing-root behaviour unchanged** — Target: `skills/external/create-docs/scripts/docs-utils.py:791`. Change: move the check into the `obligation` branch or make the change a declared, tested behaviour change. Source: F21. Expected impact: C-015's "validate semantics unchanged" holds.
 - **Honour the declared Python floor** — Target: `skills/external/create-docs/scripts/docs-utils.py` and `tests/fixtures/docs-obligation/conftest.py`. Change: replace `removeprefix`/`is_relative_to` or raise `requires-python` and record it. Source: F22. Expected impact: the script runs on the floor it advertises.
+- **Make the fixture builder's `--check` byte-exact and reject unknown flags** — Target: `tests/fixtures/docs-obligation/build_fixtures.py`. Change: compare each fixture's bytes against the builder's deterministic output (or a committed hash manifest), and exit 2 on an unknown argument instead of rebuilding. Source: F25. Expected impact: a record-content drift cannot pass as `OK`, and a help probe cannot mutate the repository fixtures.
 
 ### 5.4 Workflow Improvements
 
@@ -559,6 +581,7 @@ This subsection carries the verdict and the pointers only: no opinion body, no p
 | P2 | Reconcile the stale counts, section pointers and checklist readings | `feature-ref.md`, `data-model.md`, `features/087.md`, `checklists/requirements.md`, `quickstart.md` | F12–F20 |
 | P2 | Re-audit the active plan constraint at every stage close and use sanctioned scratch roots | `audit-plan-changes.py` usage, stage evidence templates | F9, F10, F11 |
 | P2 | Keep existing actions' missing-root behaviour and the Python floor intact | `skills/external/create-docs/scripts/docs-utils.py`, `conftest.py` | F21, F22, F23 |
+| P2 | Make the fixture builder byte-exact and reject unknown flags | `tests/fixtures/docs-obligation/build_fixtures.py` | F25 |
 
 ## 7. Self-Containment Check
 
