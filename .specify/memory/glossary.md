@@ -184,3 +184,6 @@
 | Observation Gap | 观测缺口, observation gap | 教练侧不可观察的执行步骤标记(字面量见 078 规格 STR-006):计入缺口清单,不得编造也不得省略 | auto | proposed |
 | 不言自明 (Self-explanatory) | 望文生义 | 结构须让用户直接看到所需求的信息:上限是直接看到、下限是一条简单命令且足以支撑一次改造;不是预防性优化,每个优化任务最多增加一个信息维度,被编码属性保留原真源、名称/路径是最终一致的投影;真源 shared/definitions/self-explanatory-definitions.md | auto | proposed |
 | 机制/策略分离 (Mechanism–Policy Separation) | mechanism–policy separation, 机制策略分离, 能力/职责分离 | 元技能治理原则:机制层(逻辑/算法/步骤,归档于技能定义本体及其 references/scripts/assets)与策略层(配置/输入/输出,归档于具体运行环境)语义上必须可分,执行前两层信息须同时具备,缺失时提示而非以默认值顶替;判据/成员/消费契约真源 shared/definitions/mechanism-policy-definitions.md(Feature 083) | user | proposed |
+| 汇报义务 (Reporting Obligation) | - | 并发/异步流程向用户可见化的一项框架级义务:范围谓词、缺省周期(长跑档)、reporter 席位义务、主从汇报义务、停滞判定引用与当前态摘要契约的唯一 owner 为 shared/guidelines/reporting-obligations.md;节奏纪律与四要素内容下限仍归 progress-reporting.md(需求 087) | auto | proposed |
+| reporter 席位 (Reporter Seat) | - | team roster 中绑定 reporter agent Template 的必设席位:结构上必需、运行期可带显式记录的原因省略;不得持有派发/授权/重试/终止权(需求 087) | auto | proposed |
+| 当前态摘要 (Current-State Digest) | - | 有界的「现在到底在做什么」只读投影:/speckit.status 瘦命令 + scripts/python/status-digest.py 的 --action digest 共用同一读入口;按声明上限截断并报省略条数、对陈旧条目显示龄期、无运行时以声明退出码报「无正在运行」;不新建流程状态注册表(需求 087) | auto | proposed |
