@@ -46,6 +46,9 @@ COMPLEX_COMMANDS = [
     "feedback", "sanitize",
     # Added 2026-10-08 with the command itself (S4, session-driven-self-improvement).
     "improve",
+    # Added 2026-11-06 with Feature 087 (FR-022 / FR-026): both carry the compiled
+    # wrap-up face and are classified Complex in the owner table.
+    "status", "measure",
 ]
 SIMPLE_COMMANDS = ["agents", "constitution", "feature"]
 
