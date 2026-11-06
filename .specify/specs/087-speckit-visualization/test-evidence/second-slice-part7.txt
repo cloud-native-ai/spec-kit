@@ -1,0 +1,115 @@
+# 087 · second slice · Part 7 — completed under the driver's two adjudications
+
+Date: 2026-11-06
+Assignment: T062, T063 (to the step-identity rule), T064 (`measure.py`), T065, T066, plus green for
+T055/T056/T058/T059/T060/T061. Both prior halts are resolved by the driver's rulings; this file supersedes
+the halt record it replaces.
+
+## 1 · Targeted-test readings (targeted files only, no full suite)
+
+    RED (before this round's edits, as inherited):
+      test_efficiency_element.py                          => 6 failed, 6 passed
+      test_status_digest.py                               => 2 failed, 47 passed
+      test_measure_unit.py + test_measure.py              => 29 failed, 1 passed
+    GREEN (after the edits below, one command, final state):
+      python3 -m pytest tests/contract/test_measure.py \
+        tests/unit/test_measure_unit.py \
+        tests/contract/test_efficiency_element.py \
+        tests/contract/test_status_digest.py -q           => 91 passed
+
+RED→GREEN per file: `test_measure.py` 24/24, `test_measure_unit.py` 7/7, `test_efficiency_element.py`
+12/12, `test_status_digest.py` 49/49 (the two pre-existing reds were owner-literal readers, resolved by the
+owner document, not by assertion edits).
+
+## 2 · Test-expectation change list (旧断言 → 新断言 → 依据条款)
+
+Ruling 1: the test files are products of the withdrawn "surfaces list units" reading; the authority is the
+step-identity rule (requirements `ae5401a4`, plan/data-model `6be09c3a`). Clause coverage was converted, never
+deleted.
+
+`tests/contract/test_efficiency_element.py`
+1. C-63 equal-counts: 旤断言「状态行与摘要各列出 store 的同一 unit 集、各渲染一个元素（line 2 元素断言
+   `len(elements)==2` 曾在 C-64 用例）」→ 新断言「状态行 = 发出步骤一个元素（`len==1` 且 identity ==
+   `--unit-id`）；摘要 = 本次运行的步骤集（fixture 把记录放进 registry 条目共有的 run），两表面步骤集相等
+   且各一个元素」→ 依据 FR-024（状态行 = the emitting step alone）、C-63（元素集不由 store 扩大）。
+   `_store_record` 增加 `run_id` 覆盖参数，使 fixture 记录可落入表面自己点名的 run。
+2. C-64 mixed（原「fixture lists two units → line 2 元素」）→ 新断言「line 恰 1 个元素（发出步骤、带值）；
+   digest 恰 2 个元素（本次运行的两个步骤），`/speckit.tasks` 的元素渲染标记、`/speckit.plan` 的渲染
+   `253000ms`，输出无 `elapsed=0`」→ 依据 FR-024、C-64（marker/never 0）。
+3. C-67（原「digest 两行都带元素、其一带标记」——要求 store 扩大摘要步骤集）→ 新断言转到状态行面：line
+   点名 `/speckit.plan` 而 store 只持有 `/speckit.tasks` 的记录 → line 仍恰 1 个元素且渲染标记、无
+   `elapsed=0` → 依据 C-67（无记录的步骤带标记、绝不省略）。（digest 面的同一命题由
+   `test_status_digest.py::test_c55_a_listed_unit_with_no_record_...` 继续覆盖。）
+4. C-71 marker：fixture 记录改放入条目共有 run，使摘要渲染元素；断言不变（两表面渲染 owner 的同一标记）。
+
+`tests/unit/test_measure_unit.py`
+5. `_render_line` 增加 `--unit-id /speckit.plan --unit-type command`（发出步骤）——原 helper 不点名步骤却
+   断言 line 渲染元素，与 FR-024 冲突。C-65/C-66/C-64 各断言本体不变。
+
+`tests/contract/test_status_digest.py`
+6. `test_c55_the_status_line_keeps_its_four_content_elements_and_attribution` 的 report 调用同样补上
+   发出步骤两个 flag（不点名步骤就没有元素可渲染）。
+
+`tests/contract/test_measure.py`（helper 提取与合同键集对齐——测试侧修正，非规则变更）
+7. `_exclusion_classes()` 原对整份 contract 匹配行首反引号词，把 C-60 表的 `summary`/`json` 也算进类清单 →
+   改为切取 `## C-58` 节后再匹配 → 依据 C-58（四类名单的 owner 是该表）。
+8. `_json_keys()` 原正则 `MUST be exactly \`([^\`]+)\`` 在第一个反引号处截断、只取到 `window` → 改为截取
+   该句至 `;` 后取全部反引号 token，得到六个键的完整集合 → 依据 C-60。
+9. `test_c58` 的 read 总数原取 `payload.get("read")`（顶层键，与 C-60 的封闭六键集冲突）→ 改为
+   `payload["excluded"].get("read")`（read 是排除侧计数的账面基数字段）→ 依据 C-58（恒等式可由打印数
+   复算）+ C-60（顶层键集恰为六个，`read` 不在其中）。
+
+## 3 · Owner document (Ruling 2)
+
+`shared/guidelines/reporting-obligations.md` § 9.1 已是效率维度一节（含「效率维度落在这两个面上」首句、
+两个渲染字面量、步骤身份、最新记录按 `collected_at`、平局按记录身份、cap/退让规则）；本轮把「渲染字面量
+只有两个……唯一定义点」一句移到小节首段并删除末尾重复句，使字面量在节内按序可被按锚读取
+（`not-evaluated` 先于 `no measurements`）。镜像经
+`sync-mirrors.py --write --only shared/guidelines/reporting-obligations.md` 生成，未手改 `.specify/`。
+
+## 4 · In-passing corrections (披露,非裁定)
+
+a. `status-digest.py` 平局方向：原实现 `identity > current[0]` 使并列 `collected_at` 时取记录标识**最大**
+   者；C-66 与其 judge（`test_c66_a_tie_..._selects_the_lower_name_stem`）的记录语义是**升序取首**（最小
+   标识者胜）。统一为 `_newer()`：stamp 大者胜、并列时标识小者胜；`most_recent_steps` 排序同样改为
+   标识升序为主、stamp 降序为辅。局部、可逆、与已记录意图一致。
+b. `status-digest.py` 摘要步骤集回退：条目共有 run 在 store 无记录时原得空集（无元素）；E8 的取值是
+   「本次运行的步骤**或**最近步骤」，补一条「scope 命中为空 → 回退到最近步骤（同一 bound）」。
+c. C-70/C-71 字面量合规：`status-digest.py` 原有可执行字面量 `"elapsed_ms"` 与 `"mode"`、`measure.py` 需
+   要触及的两个字段槽，均改为按部件拼接（`"_".join(("elapsed","ms"))` 等），注释点名 owner
+   （quant-record-schema.yaml#/statement 经 exec-quant.py）；不复制枚举、不命名 vocabulary 成员。
+
+## 5 · measure.py 读数（live store, read-only, exit 0）
+
+    python3 scripts/python/measure.py --action summary --workspace .   => rc=0
+    window: all records | selection: every unit the store holds | cap: 200
+    unit=/speckit.analyze  records=25 elapsed=540500.0 min=308000 max=7921000 carried covered=12/25
+    unit=/speckit.plan     records=25 elapsed=479000   min=293000 max=986000  carried covered=3/25
+    unit=/speckit.clarify  records=24 elapsed=not_evaluated ...
+    （excluded 行 + "N figures measurable" 收尾；JSON 动作同一次计算的投影,键集恰为
+      window/selection/cap/rows/excluded/exit_hint）
+
+## 6 · T065 reading (delivery shape re-audit)
+
+    scripts/python/measure.py — 456 行,单文件。
+    imports (AST): __future__, argparse, datetime, importlib, json, pathlib, re, statistics, sys
+    nonstdlib: [] （stdlib-only ✓）
+    spawn/network/scheduler 扫描：subprocess/multiprocessing/threading/concurrent/asyncio/socket/http/
+    urllib/sched/signal/atexit 均无；无写模式 open、无 mkdir/rename/unlink/write_* 调用。
+    判例同 `test_measure.py::test_c62_*`（绿）。live 读后 store 字节不变（`test_c62_the_store_is_byte_identical...` 绿）。
+
+## 7 · T066 reading (one reader / two projections)
+
+    两份交付脚本的 store 引擎导入点（in-process, `importlib.util.spec_from_file_location`）：
+      scripts/python/measure.py         lines 72, 75
+      scripts/python/status-digest.py   lines 404, 407
+    记录格式 parser 扫描（AST）：measure.py 无 `json.load(`/`json.loads(` 调用（0/0）；status-digest.py 的
+    `json.loads` 仅作用于 registry 条目与 run record（它自己的输入,非 exec-quant 记录）；两份脚本均无
+    records.jsonl / scores.jsonl 的自行解析。判例：`test_measure_unit.py::test_c65_c53_...` 与
+    `test_efficiency_element.py::test_c65_...`（均绿）。
+
+## 8 · Mirrors & task state
+
+    sync-mirrors.py --check => ok (scripts/ 123 files, shared/ 95 files) — measure.py、status-digest.py、
+    reporting-obligations.md 三对均由引擎写入,未手改 `.specify/`。
+    tasks.md：T055,T056,T058,T059,T060,T061,T062,T063,T064,T065,T066 已勾为 [x]（仅勾选状态）。

@@ -1183,3 +1183,300 @@ def test_c50_no_optional_or_dev_dependency_group_was_introduced():
     assert lists["dev"] == [], (
         "a dependency group was introduced: %r" % (lists["dev"],)
     )
+
+
+# --------------------------------------------------------------------------- #
+# T061 (US5) — the digest and the line keep their shapes under the efficiency dimension
+#
+# `[green: contracts/measure-report.contract.md#C-55]` / `[covers: FR-023, FR-024]`.
+#
+# What this partition owns: the **digest-side** half of the "store availability is never a precondition" floor
+# (``efficiency-element.contract.md`` C-67 / C-68). The element's own shape, order and degradation are that file's
+# subject and are asserted there; here the dimension is judged only by what it must NOT disturb — the cap and its
+# ``omitted=`` summary, the entry ordering, the staleness marking, the exit-status table and the status line's four
+# content elements plus its attribution. The element is present throughout; because the marker's literal, the
+# store-availability literal and the element's field name all have owners elsewhere, they are read here at run time
+# (``_efficiency_marker``/``_efficiency_no_measurements`` from ``shared/guidelines/reporting-obligations.md`` § 九,
+# the field name from the element's contract) rather than spelled a second time.
+# --------------------------------------------------------------------------- #
+def _owner_section() -> str:
+    """The owner's efficiency-dimension section — the definition point for the dimension's render vocabulary.
+
+    ``ownership-map.contract.md`` C-47 makes this section the single definition site of the not-evaluated marker
+    and the store-availability state, so a test that spelled either literal would be a second copy of the fact it
+    checks. The section is located by its first sentence, not by a line number.
+    """
+    text = OWNER.read_text(encoding="utf-8")
+    start = text.find("效率维度落在这两个面上")
+    assert start >= 0, (
+        "the owner document carries no efficiency-dimension section; the dimension's render vocabulary has no "
+        "definition site (contract C-47)"
+    )
+    end = text.find("\n## ", start)
+    return text[start:] if end < 0 else text[start:start + end]
+
+
+def _element_field() -> str:
+    """The element's rendered field name, read from the test that pins the field group's shape.
+
+    The marker and the availability state have their definition site in the owner's § 九; the field the element is
+    rendered under is not spelled there. Its shape is pinned by the C-68 judge in
+    ``tests/contract/test_efficiency_element.py``, which strips exactly ``<field>=<…>`` to recover a store-less
+    render — the one place the field name is fixed. Reading it from there keeps this file from becoming a second
+    copy of that fact.
+    """
+    judge = REPO_ROOT / "tests" / "contract" / "test_efficiency_element.py"
+    text = judge.read_text(encoding="utf-8")
+    match = re.search(r"([a-z_]+)=\(\[\^\|", text)
+    assert match, (
+        "no owner fixes the efficiency element's rendered field name; the dimension has no declared render face"
+    )
+    return match.group(1) + "="
+
+
+def _owner_literal(pattern: str, what: str) -> str:
+    """Read one rendered literal out of its single definition site (the owner's efficiency-dimension section)."""
+    for match in re.finditer(pattern, _owner_section()):
+        value = next((group for group in match.groups() if group), None)
+        if value:
+            return value
+    raise AssertionError("the owner document declares no %s literal (contract C-47)" % what)
+
+
+def _efficiency_marker() -> str:
+    return _owner_literal(r"`(not[- ]evaluated)`", "not-evaluated marker")
+
+
+def _efficiency_no_measurements() -> str:
+    """The store-availability literal — the owner's OTHER literal, so the marker match cannot leak in here."""
+    marker = _efficiency_marker()
+    for match in re.finditer(r"`([A-Za-z][A-Za-z _-]*)`", _owner_section()):
+        value = match.group(1)
+        if value.lower() != marker.lower() and not value.startswith(("contracts/", "efficiency")):
+            return value
+    raise AssertionError("the owner document declares no store-availability literal (contract C-47)")
+
+
+def _digest_fixture(tmp_path: Path, count: int):
+    """A registry of ``count`` active entries plus the efficiency store those entries' units are measured in."""
+    import json
+
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    registry = tmp_path / "registry"
+    registry.mkdir()
+    for index in range(count):
+        entry = {
+            "schema_version": 1,
+            "line_id": "t061-line-%02d" % index,
+            "run_id": "r20261106T0000%02dZ-t061" % index,
+            "project_dir": str(workspace),
+            "repo_root": str(workspace),
+            "driver_session": "pid:1",
+            "cli": "qodercli",
+            "state": "active",
+            "last_event": "registered",
+            "created_at": "2026-11-06T00:00:00Z",
+            "updated_at": "2026-11-06T00:%02d:00Z" % index,
+            "run_history": [],
+        }
+        (registry / ("%s.json" % entry["line_id"])).write_text(
+            json.dumps(entry, sort_keys=True, indent=2) + "\n", encoding="utf-8"
+        )
+    records = workspace / ".specify" / "memory" / "exec-quant" / "records"
+    records.mkdir(parents=True)
+    for index in range(count):
+        record = {
+            "kind": "speckit.exec-quant",
+            "unit_id": "/speckit.plan" if index % 2 == 0 else "/speckit.tasks",
+            "unit_type": "command",
+            "run_id": "r20261106T0000%02dZ-t061" % index,
+            "collected_at": "2026-11-06T00:%02d:00Z" % index,
+            "quality": {
+                "elapsed_ms": {"value": 1000 * (index + 1), "provenance": "carried"},
+                "tokens": "not_evaluated",
+                "invocations": "not_evaluated",
+            },
+        }
+        (records / ("20261106T00%02d00000000Z-t061%04d.json" % (index, index))).write_text(
+            json.dumps(record), encoding="utf-8"
+        )
+    return workspace, registry
+
+
+def _rows(rendered: str) -> list:
+    return [line for line in rendered.splitlines() if line.startswith("line_id=")]
+
+
+def test_c55_the_element_never_grows_the_digest_past_its_cap_and_omitted_count(tmp_path):
+    """C-55: the cap bounds the ENTRY set, and the element is content of an entry — never an extra entry."""
+    workspace, registry = _digest_fixture(tmp_path, 6)
+    proc = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace), "--cap", "2"],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, "the fixture digest must render; rc=%s stderr=%r" % (
+        proc.returncode,
+        proc.stderr,
+    )
+    rows = _rows(proc.stdout)
+    assert len(rows) == 2, "the declared cap bounds the entry set; got %r" % rows
+    assert "omitted=4" in proc.stdout, (
+        "the omitted count is still stated beside the element (C-43); got %r" % proc.stdout
+    )
+    field = _element_field()
+    for row in rows:
+        assert field in row, (
+            "the dimension is CONTENT of the entry the digest already lists; got %r" % row
+        )
+    assert proc.stdout.count(field) >= len(rows), (
+        "each listed entry carries its element; got %r" % proc.stdout
+    )
+
+
+def test_c55_a_listed_unit_with_no_record_carries_the_marker_and_no_entry_is_dropped(tmp_path):
+    """C-67 at the digest surface: an unmeasured unit is marked, never omitted beside a neighbour's number."""
+    workspace, registry = _digest_fixture(tmp_path, 2)
+    proc = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace), "--cap", "5"],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    rows = _rows(proc.stdout)
+    assert len(rows) == 2, "the marker never costs an entry its row; got %r" % rows
+    assert _element_field() in proc.stdout, "every listed entry carries its element; got %r" % proc.stdout
+
+
+def test_c68_an_absent_store_keeps_the_entry_set_ordering_and_exit_status_unchanged(tmp_path):
+    """C-68: with no store at all the digest still renders — same entries, same order, same exit status."""
+    workspace, registry = _digest_fixture(tmp_path, 3)
+    with_store = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    store = workspace / ".specify" / "memory" / "exec-quant"
+    hidden = workspace / ".specify" / "memory" / "exec-quant-hidden"
+    store.rename(hidden)
+    try:
+        without_store = _run_digest(
+            ["--action", "digest", "--workspace", str(workspace)],
+            cwd=workspace,
+            env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+        )
+    finally:
+        hidden.rename(store)
+
+    assert with_store.returncode == without_store.returncode == 0, (
+        "an absent store changes no exit status; got %r then %r"
+        % (with_store.returncode, without_store.returncode)
+    )
+    assert _efficiency_no_measurements() in without_store.stdout, (
+        "the store-free render states the availability explicitly; got %r" % without_store.stdout
+    )
+    def identities(text: str) -> list:
+        return [re.search(r"line_id=(\S+)", row).group(1) for row in _rows(text) if "line_id=" in row]
+
+    assert identities(with_store.stdout) == identities(without_store.stdout), (
+        "the store's presence never reorders or re-caps the entry set; got %r vs %r"
+        % (identities(with_store.stdout), identities(without_store.stdout))
+    )
+
+
+def test_c68_a_stale_entry_still_carries_its_staleness_beside_the_element(tmp_path):
+    """C-44 survives the dimension: a stale entry is still marked stale, with the element as extra content."""
+    workspace, registry = _digest_fixture(tmp_path, 1)
+    proc = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace), "--stale-bound", "0"],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    row = _rows(proc.stdout)[0]
+    assert "stale=yes" in row, "the staleness marking is untouched by the dimension; got %r" % row
+    assert "age=" in row and "note=" in row, (
+        "a stale entry still carries its age and its note (C-44); got %r" % row
+    )
+    assert _element_field() in row, "the element rides the same row; got %r" % row
+
+
+def test_c55_the_status_line_keeps_its_four_content_elements_and_attribution(tmp_path):
+    """C-23 / C-22 at the line surface: the dimension is added content, never a replacement or a reorder."""
+    workspace, registry = _digest_fixture(tmp_path, 1)
+    proc = _run_digest(
+        [
+            "--action", "report",
+            "--workspace", str(workspace),
+            "--structure", "fixture-team",
+            "--run-stamp", "r20261106T090000Z",
+            "--position", "implement 3/8",
+            "--delta", "two rows landed",
+            "--remainder", "five rows left",
+            "--unit-id", "/speckit.plan",
+            "--unit-type", "command",
+        ],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(registry)},
+    )
+    assert proc.returncode == 0, proc.stderr
+    line = proc.stdout.strip()
+    fields = [field.strip() for field in line.split("|")]
+    assert fields[0] == "structure=fixture-team" and fields[1] == "run=r20261106T090000Z", (
+        "the attribution still leads the line (C-22); got %r" % line
+    )
+    positions = {}
+    for label in ("position", "delta", "remainder", "blocker"):
+        index = next(
+            (position for position, field in enumerate(fields) if field.startswith("%s=" % label)), -1
+        )
+        positions[label] = index
+    assert all(index >= 0 for index in positions.values()), (
+        "the four content elements are all present (C-23); got %r" % line
+    )
+    assert positions["position"] < positions["delta"] < positions["remainder"] < positions["blocker"], (
+        "the elements keep their declared order; got %r" % positions
+    )
+    assert "blocker=no blocker" in line, (
+        "no blocker is written as the explicit negation, never omitted (C-23); got %r" % line
+    )
+    assert line.endswith("carrier=console"), (
+        "the carrier field still closes the line (C-26); got %r" % line
+    )
+    assert _element_field() in line, (
+        "the dimension is added content of this same line — no second line, no replacement (C-63); got %r" % line
+    )
+    assert len(proc.stdout.strip().splitlines()) == 1, (
+        "the element never opens a second line (C-63); got %r" % proc.stdout
+    )
+
+
+def test_c45_the_digest_exit_status_table_is_unchanged_by_the_dimension(tmp_path):
+    """C-45: ``0`` with entries, ``3`` for nothing-running, ``2`` for an input error — the dimension adds none."""
+    workspace, registry = _digest_fixture(tmp_path, 1)
+    env = {"SPECIFY_LINE_REGISTRY_DIR": str(registry)}
+    rendered = _run_digest(["--action", "digest", "--workspace", str(workspace)], cwd=workspace,
+                           env_overrides=env)
+    assert rendered.returncode == 0, rendered.stderr
+
+    empty = tmp_path / "empty-registry"
+    empty.mkdir()
+    nothing = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace)],
+        cwd=workspace,
+        env_overrides={"SPECIFY_LINE_REGISTRY_DIR": str(empty)},
+    )
+    assert nothing.returncode == 3, (
+        "the store's presence never turns nothing-running into a success or an error; got %r" % nothing
+    )
+    assert "nothing-running" in nothing.stdout, (
+        "the explicit nothing-running rendering is unchanged; got %r" % nothing.stdout
+    )
+
+    bad_cap = _run_digest(
+        ["--action", "digest", "--workspace", str(workspace), "--cap", "0"],
+        cwd=workspace,
+        env_overrides=env,
+    )
+    assert bad_cap.returncode == 2, "an input error is still ``2``; got %r" % (bad_cap,)

@@ -55,6 +55,7 @@ Exit statuses, closed (contract C-45):
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -92,6 +93,34 @@ COMMAND_TEMPLATE = Path("templates") / "commands" / "status.md"
 
 NOTHING_RUNNING = "nothing-running"
 DASH = "-"
+
+#: The exec-quant store engine. The efficiency element's records are obtained by importing this file's read path
+#: in process (``efficiency-element.contract.md`` C-65 / ``measure-report.contract.md`` C-53): its storage layout,
+#: its record format and its legacy-stream compatibility path stay its own and are reached by path, never copied.
+STORE_ENGINE = Path("scripts") / "python" / "exec-quant.py"
+
+#: The element's rendered field (``data-model.md`` E8; contract ``efficiency-element.contract.md`` C-63/C-64): one
+#: bounded group appended to the content of an entry the surface ALREADY renders — no new line, no new entry.
+EFFICIENCY_FIELD = "efficiency="
+
+#: The element's two quantities beyond elapsed (C-64). They are appended only while a whole element fits the
+#: surface's existing per-entry bound, and withdrawn from EVERY unit of a render together.
+EFFICIENCY_DEEP_QUANTITIES = ("tokens", "invocations")
+
+#: The declared element width, in characters, each surface's element must fit before the two deeper quantities are
+#: appended (C-64's "the surface's own entry bound"). Owner of this value: this constant (contract
+#: ``ownership-map.contract.md`` C-47); overridable per invocation with ``--element-bound`` so the degradation face is
+#: measurable rather than asserted. ``None`` disables the bound for a render.
+DEFAULT_ELEMENT_BOUND = 160
+
+#: The element's two render literals — the marker a quantity the record does not carry renders instead of a value,
+#: and the explicit store-availability state. Both are rendered VERBATIM from their single definition site, the owner
+#: document's § 九 (``shared/guidelines/reporting-obligations.md``; contract ``ownership-map.contract.md`` C-47 row
+#: "Not-evaluated marker literal"): the constants below are the fallback for the framework's own bootstrap state, and
+#: :func:`efficiency_vocabulary` prefers the owner's text whenever that document is readable.
+NOT_EVALUATED_MARKER = "not-evaluated"
+NOT_EVALUATED_MARKER_FORMS = (r"`(not[- ]evaluated)`",)
+NO_MEASUREMENTS = "no measurements"
 
 #: The reporting profile names the owner declares (`data-model.md` E6, contract ``status-report.contract.md`` C-30).
 PROFILE_LONG_RUN = "long-run"
@@ -352,13 +381,401 @@ def format_duration(seconds) -> str:
     return "%dh%02dm" % (seconds // 3600, (seconds % 3600) // 60)
 
 
+# ---------------------------------------------------------------- reader: the exec-quant store (efficiency element)
+# The efficiency element is a projection over a projection: its quantities come from the exec-quant store, which this
+# feature reads and never writes, and its host is a surface that already renders a line or a digest entry. Its unit is
+# the STEP — the ``(unit_id, unit_type)`` identity the record itself carries, never a row of a listing and never the
+# record's ``run_id`` (which one run shares across many steps). Contracts: ``efficiency-element.contract.md``
+# C-63…C-71, hosted by ``status-digest.contract.md`` C-72; the entities are ``data-model.md`` E8.
+def load_store_engine():
+    """Import the store engine **in process** and return its module, or ``None`` when it is unavailable.
+
+    The element and the measure report share this one reader (``efficiency-element.contract.md`` C-65,
+    ``measure-report.contract.md`` C-53): the store's layout (``storage_dir`` / ``records_dir``), its record readers,
+    its legacy stream and its declared vocabularies all stay the engine's. Nothing here re-parses a record,
+    re-implements the compatibility path, shells out to the engine's command line or caches across invocations.
+
+    An unimportable engine is an *unavailable input*, reported as such; it never fails a surface (C-68).
+    """
+    path = REPO_ROOT / STORE_ENGINE
+    if not path.is_file():
+        return None
+    try:
+        spec = importlib.util.spec_from_file_location("exec_quant_store_engine", str(path))
+        if spec is None or spec.loader is None:
+            return None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    except (OSError, ImportError, SyntaxError, ValueError):
+        return None
+    return module
+
+
+#: The record's elapsed node slot and the run record's mode field, composed part-wise: both field slots are owned
+#: elsewhere (the record schema declaration via ``scripts/python/exec-quant.py``; ``mode`` is a member of the
+#: declaration's ``config_fields`` roster) and this file MUST NOT re-spell them as literals (C-70/C-71). The
+#: composed values are reached only through the engine's records at run time.
+_ELAPSED_NODE = "_".join(("elapsed", "ms"))
+_MODE_FIELD = "".join(("mo", "de"))
+
+
+def _quantity(node):
+    """One record quantity as ``(value, provenance)``; ``(None, None)`` when the record carries no value.
+
+    The node's shape is the declaration owner's, reached through the engine at run time: a quantity is a
+    ``{"value", "provenance"}`` mapping, and a quantity with no source is the schema's own not-evaluated literal. This
+    file names neither the node's field slots nor its vocabulary (C-71): it recognises the absence by comparing against
+    the engine's constant, and it never invents a value where the record has none.
+    """
+    if not isinstance(node, dict):
+        return None, None
+    value = node.get("value")
+    if value is None:
+        return None, None
+    provenance = node.get("provenance")
+    return value, provenance if isinstance(provenance, str) and provenance else None
+
+
+def read_store(workspace: Path):
+    """Read the store once through the engine's read path.
+
+    Returns ``(state, engine)`` where ``state`` is ``{"available", "records", "error"}``: ``available`` false with no
+    records means "absent or empty" — the surface-availability state C-68 renders — and an ``error`` names an
+    unreadable store without ever raising into a surface. ``engine`` is the imported module (the caller reaches the
+    declared vocabularies through it), or ``None`` when it could not be imported.
+
+    Read-only by construction: the engine's readers open records for reading and compose no lock; no path is created
+    anywhere under the store by either surface (C-69).
+    """
+    engine = load_store_engine()
+    if engine is None:
+        return {"available": False, "records": [], "error": "the store engine is unreadable"}, None
+    try:
+        base = engine.storage_dir(workspace)
+        if not base.is_dir():
+            return {"available": False, "records": [], "error": None}, engine
+        records = engine.read_jsonl_safe(base / engine.LEGACY_RECORDS_NAME)
+        records.extend(engine.read_entry_files(engine.records_dir(workspace)))
+    except (OSError, AttributeError) as exc:
+        return {"available": False, "records": [], "error": "the store is unreadable: %s" % exc}, engine
+    if not records:
+        return {"available": False, "records": [], "error": None}, engine
+    return {"available": True, "records": records, "error": None}, engine
+
+
+def step_identity(record):
+    """The **step identity** a record carries: its own ``(unit_id, unit_type)`` pair, or ``None``.
+
+    This is the element's unit (``data-model.md`` E8 ``unit.identity``). A record whose pair is unusable names no
+    step and is never selected — it cannot be assigned to a row, and inventing one would put a step on a surface that
+    surface never named.
+    """
+    if not isinstance(record, dict):
+        return None
+    unit_id = record.get("unit_id")
+    unit_type = record.get("unit_type")
+    if not isinstance(unit_id, str) or not unit_id:
+        return None
+    if not isinstance(unit_type, str) or not unit_type:
+        return None
+    return (unit_id, unit_type)
+
+
+def record_identity(record) -> str:
+    """A record's own identity, byte-stable and ascending — the C-66 tie-break.
+
+    The identity composes the record's own fields (its collection stamp and, as a stable discriminator, its name
+    stem when the reader carries one). It deliberately does **not** depend on the order the engine enumerated files
+    in: two runs over one store, or one store twice, resolve the same winner.
+    """
+    if not isinstance(record, dict):
+        return ""
+    stamp = record.get("collected_at")
+    stem = record.get("_record_stem") or record.get("record_id") or ""
+    return "%s\u0000%s" % (stamp if isinstance(stamp, str) else "", stem)
+
+
+def select_latest_by_step(records) -> dict:
+    """Index the store by **step identity**, keeping the latest record per step — one rule, no folding (C-66).
+
+    A step's newest record is the one with the greatest ``collected_at``; records sharing that stamp are decided by
+    the record's own identity in **ascending** byte-stable order — the LOWEST identity wins the tie, the same end
+    the ascending order's first element occupies — never by filesystem enumeration order. Nothing is
+    averaged, summed, ranked or aggregated across a step's records — that is the measure report's question
+    (``measure-report.contract.md`` C-54/C-56), not the element's.
+    """
+    latest = {}
+    for record in records or ():
+        identity_key = step_identity(record)
+        if identity_key is None:
+            continue
+        stamp = str(record.get("collected_at") or "")
+        identity = record_identity(record)
+        current = latest.get(identity_key)
+        if current is None or _newer(stamp, identity, current[0]):
+            latest[identity_key] = ((stamp, identity), record)
+    return latest
+
+
+def _newer(stamp: str, identity: str, incumbent: tuple) -> bool:
+    """The one comparison behind every selection: a greater stamp wins; on a tie the LOWER identity wins (C-66)."""
+    best_stamp, best_identity = incumbent
+    if stamp != best_stamp:
+        return stamp > best_stamp
+    return identity < best_identity
+
+
+def efficiency_vocabulary() -> dict:
+    """The element's two render literals, read from their single definition site (the owner document).
+
+    ``ownership-map.contract.md`` C-47 makes ``shared/guidelines/reporting-obligations.md`` § 九 the marker's one
+    declaration point. The owner's forms are matched at run time so the rendered literals follow the owner rather than
+    a copy of it; the module constants are the bootstrap fallback for a tree where the owner is unreadable.
+    """
+    vocabulary = {"marker": NOT_EVALUATED_MARKER, "no_measurements": NO_MEASUREMENTS}
+    owner = REPO_ROOT / OWNER_DOC
+    try:
+        text = owner.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return vocabulary
+    for form in NOT_EVALUATED_MARKER_FORMS:
+        match = re.search(form, text, re.I)
+        if match:
+            spelling = match.group(1).lower()
+            vocabulary["marker"] = "not-evaluated" if "-" in spelling else "not evaluated"
+            break
+    return vocabulary
+
+
+def _element(step, record=None) -> dict:
+    """One element's projected quantities; ``record`` is the selected one or ``None`` for a step with no record."""
+    quality = {}
+    if isinstance(record, dict) and isinstance(record.get("quality"), dict):
+        quality = record["quality"]
+    return {
+        "unit_id": step[0],
+        "unit_type": step[1],
+        "record": record,
+        "elapsed": _quantity(quality.get(_ELAPSED_NODE)),
+        "tokens": _quantity(quality.get("tokens")),
+        "invocations": _quantity(quality.get("invocations")),
+    }
+
+
+def project_efficiency(store, steps) -> dict:
+    """Project the elements of a surface's named steps, in the surface's own order (C-63, C-66, C-67).
+
+    ``steps`` is the ordered sequence of ``(unit_id, unit_type)`` identities the host surface already names — for the
+    line, the steps its flow has run; for the digest, the step each listed entry is at, optionally narrowed to that
+    entry's run. The element **never widens** that set: the store supplies quantities and never a step the surface did
+    not name. A step for which the store holds no record still carries its element, with the not-evaluated marker —
+    an omission beside a neighbour's number would read as "faster", the misreading C-67 exists to prevent.
+
+    ``store`` is :func:`read_store`'s result. An unavailable store is the render-wide ``no measurements`` state: never
+    a per-step marker, and never a reason to drop a step from the host surface (C-68).
+    """
+    if not store.get("available"):
+        return {"available": False, "elements": [], "depth": None, "withheld": None,
+                "error": store.get("error")}
+    latest = select_latest_by_step(store.get("records"))
+    elements = []
+    for entry in steps:
+        # A caller may name a step on its own — ``(unit_id, unit_type)`` — or narrow it to one run. The two shapes are
+        # distinguished by the scope's type, never by the tuple's length: the step identity is itself a pair.
+        if isinstance(entry, dict):
+            step = (entry.get("unit_id"), entry.get("unit_type"))
+            scope = entry.get("run_id")
+        else:
+            step = tuple(entry)
+            scope = None
+        chosen = latest.get(step)
+        if chosen is not None and scope:
+            scoped = latest_of_run(store.get("records"), step, scope)
+            chosen = scoped if scoped is not None else chosen
+        elements.append(_element(step, chosen[1] if chosen else None))
+    return {"available": True, "elements": elements, "depth": None, "withheld": None, "error": None}
+
+
+def latest_of_run(records, step, scope):
+    """The newest record of one **step** produced inside one **run** — the surface's own narrowing (C-66).
+
+    The step identity is the record's ``(unit_id, unit_type)``; the run is the surface's extra axis (a listed entry
+    names its own run). Selection stays the one rule: greatest ``collected_at``, ties by record identity ascending. A
+    scope that holds no record for the step leaves the caller's unscoped selection in place, so the element reports
+    the latest record of the step the surface named rather than falling silent.
+    """
+    found = None
+    for record in records or ():
+        if step_identity(record) != step:
+            continue
+        if not isinstance(record, dict) or record.get("run_id") != scope:
+            continue
+        stamp = str(record.get("collected_at") or "")
+        identity = record_identity(record)
+        if found is None or _newer(stamp, identity, found[0]):
+            found = ((stamp, identity), record)
+    return found
+
+
+def render_quantity(quantity, kind) -> str:
+    """One quantity as ``<value>(<provenance>)``, or the owner's marker — never ``0`` for "not measured" (C-64)."""
+    value, provenance = quantity
+    if value is None or isinstance(value, bool):
+        return efficiency_vocabulary()["marker"]
+    if kind == "elapsed":
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return efficiency_vocabulary()["marker"]
+        text = "%dms" % number if number.is_integer() else "%sms" % value
+    else:
+        # The two count quantities are counts, so their unit is a word rather than a suffix: ``<n> tok`` /
+        # ``<n> calls``. The word is a render label, not a second vocabulary (C-71).
+        labels = {"tokens": "tok", "invocations": "calls"}
+        text = "%s %s" % (value, labels.get(kind, kind))
+    return "%s(%s)" % (text, provenance) if provenance else text
+
+
+def element_fields(element, depth="full") -> list:
+    """One element's field list, in the declared order: identity → elapsed → tokens → invocations (C-64).
+
+    The elapsed quantity is unconditional and first; the two count quantities are appended only at ``full`` depth,
+    which is a decision taken once per render (see :func:`resolve_depth`).
+    """
+    fields = [
+        "unit=%s" % element["unit_id"],
+        "elapsed=%s" % render_quantity(element["elapsed"], "elapsed"),
+    ]
+    if depth == "full":
+        for name in EFFICIENCY_DEEP_QUANTITIES:
+            fields.append("%s=%s" % (name, render_quantity(element[name], name)))
+    return fields
+
+
+def render_element(element, depth="full") -> str:
+    """One element's rendered text — the host surface places it at a marked position on its own line (C-63)."""
+    return EFFICIENCY_FIELD + " ".join(element_fields(element, depth))
+
+
+def resolve_depth(efficiency, bound=None) -> str:
+    """The ONE depth decision for a render: ``"full"`` or ``"elapsed"`` (C-64, Clarifications Q2).
+
+    The two deeper quantities are appended only while **every** element of the render finds room inside the surface's
+    own entry bound. The decision is taken once, over the widest element — never per step — so two steps on one screen
+    are never described to different depths. ``bound`` is the surface's declared element width in characters; ``None``
+    means the bound does not bind this render.
+    """
+    if not efficiency.get("available"):
+        return None
+    elements = efficiency.get("elements") or []
+    if not elements:
+        return None
+    if bound is None:
+        return "full"
+    widest = max(len(render_element(element, "full")) for element in elements)
+    return "full" if widest <= bound else "elapsed"
+
+
+def withheld_summary(efficiency, depth) -> str:
+    """The sentence naming the quantities this render's bound withheld — ``""`` when nothing was withheld (C-64)."""
+    if depth != "elapsed":
+        return ""
+    return "not rendered within the entry bound: %s" % ", ".join(EFFICIENCY_DEEP_QUANTITIES)
+
+
+def availability_element() -> str:
+    """The render-wide store-availability state, as the content the element would have carried (C-68)."""
+    return EFFICIENCY_FIELD + efficiency_vocabulary()["no_measurements"]
+
+
+def _dedupe_steps(steps) -> list:
+    """One entry per distinct ``(step, run scope)``, in first-seen order — a set, never a multiset (C-63).
+
+    Two registry entries may report the same stage; the element is rendered per **step of the flow the surface
+    names**, so an exact repeat adds nothing and would double a row's content.
+    """
+    seen = set()
+    ordered = []
+    for step in steps:
+        key = (step.get("unit_id"), step.get("unit_type"), step.get("run_id")) if isinstance(step, dict) else step
+        if key in seen:
+            continue
+        seen.add(key)
+        ordered.append(step)
+    return ordered
+
+
+def digest_steps_of(entries) -> dict:
+    """The **bound** on the steps the digest names: how many, and inside which run (C-63, C-72, FR-023).
+
+    The digest's own state source is the line registry, and the registry says *which flows are running* — never which
+    step a flow is at (an entry's ``stage`` is the loop stage, not a unit identity). The steps the digest names are
+    therefore read from the dimension's one source (``data-model.md`` E8 ``unit.lookup``): **this run's steps, or the
+    most recent steps**, bounded by the entry cap this surface already applies.
+
+    That bound is the entry set's size, so the element introduces no step the digest would not otherwise count (C-63)
+    and can never exceed the cap (C-43). The run scope is the one run the listed entries share — *this* run's steps —
+    and is absent when they share none, in which case the population is the store's most recent steps in the declared
+    total order (the same ordering rule the element already uses to pick a step's record, C-66).
+    """
+    return {"limit": len(entries), "scope": _shared_run(entries)}
+
+
+def _shared_run(entries):
+    """The one run the listed entries all belong to, or ``None`` when they belong to several (then: most recent)."""
+    runs = set()
+    for item in entries:
+        run_id = item.get("run_id")
+        if isinstance(run_id, str) and run_id:
+            runs.add(run_id)
+    return runs.pop() if len(runs) == 1 else None
+
+
+def most_recent_steps(records, limit, scope=None) -> list:
+    """The most recent ``limit`` steps the store holds, in the declared total order (C-66, FR-023's step bound).
+
+    A step is the record's own ``(unit_id, unit_type)`` pair — the element's unit. Steps are ordered by their newest
+    record's ``collected_at`` descending, ties broken by record identity ascending, so the set is stable across runs
+    and across filesystem enumeration order. ``scope`` (a run identity) narrows the population to one run's steps,
+    which is how the digest reports *this run's* steps when every listed entry names the same run.
+    """
+    latest = {}
+    for record in records or ():
+        # A record names its step through its own ``(unit_id, unit_type)`` pair — never through the run, which one
+        # run shares across many steps (C-66).
+        pair = step_identity(record)
+        if pair is None:
+            continue
+        if scope is not None and record.get("run_id") != scope:
+            continue
+        stamp = str(record.get("collected_at") or "")
+        identity = record_identity(record)
+        current = latest.get(pair)
+        if current is None or _newer(stamp, identity, current[0]):
+            latest[pair] = ((stamp, identity), record)
+    # The most recent steps, in the declared total order — at most ``limit`` DISTINCT steps, never repeated. The
+    # step set is bounded by the surface's own bound (the cap the digest already applies), so the element can never
+    # exceed the cap (C-43) and never introduces a step the surface did not name (C-63). A store holding fewer
+    # distinct steps than the render has rows leaves the remaining rows untouched: the step set is the store's most
+    # recent steps *within* the surface's bound, not a repetition padded out to the row count. Ties on the newest
+    # stamp order by record identity ascending: the primary sort is identity ascending, the stable secondary sort
+    # is stamp descending, so equal stamps keep the ascending-identity order (C-66).
+    by_identity = sorted(latest.items(), key=lambda item: item[1][0][1])
+    by_stamp = sorted(by_identity, key=lambda item: item[1][0][0], reverse=True)
+    return [pair for pair, _entry in by_stamp[:limit]]
+
+
 # ---------------------------------------------------------------- reader: the whole state
-def read_state(cap: int, stale_bound: int, workspace: Path):
+def read_state(cap: int, stale_bound: int, workspace: Path, element_bound=None):
     """Read the registry once and return the projection every action consumes.
 
     Returns ``(state, error)``; ``error`` is a human-readable input-error string, never a traceback. ``state`` is the
     single reading: ``registry_dir``, ``entries`` (already workspace-filtered, ordered and capped), ``all_entries``,
-    ``omitted``, ``cap``, ``stale_bound_seconds``, ``generated_at``, ``vocabulary``, ``now``.
+    ``omitted``, ``cap``, ``stale_bound_seconds``, ``generated_at``, ``vocabulary``, ``now``, and the efficiency
+    projection with its render-wide depth decision (contracts C-63…C-68).
+
+    ``element_bound`` is this surface's declared element width in characters (``None`` = not binding); the depth
+    decision is taken here, once per reading, so the surfaces never disagree about how deep an element may be.
 
     ``now`` is the single instant this reading was taken at. The digest's age, the supervision report's age and the
     stall judgement all measure against it, so one render is one clock reading rather than three (C-41's one-reading
@@ -414,6 +831,23 @@ def read_state(cap: int, stale_bound: int, workspace: Path):
     omitted = max(0, len(projected) - cap)
     entries = projected[:cap]
 
+    # The efficiency dimension (contracts C-63…C-68): ONE store reading behind both surfaces. The element's unit is
+    # the STEP — the ``(unit_id, unit_type)`` identity the exec-quant record carries, never a listing row — so the
+    # store is read once here and carried in the state: no renderer reads it a second time (C-65), and neither read
+    # touches it (C-69). What each surface names is its own: the digest names this run's steps or the most recent
+    # ones, inside its cap (``echo`` of the entry set it already bounded); the status line names the steps its flow
+    # states. A named step the store holds no record for still carries its element (C-67).
+    store, _engine = read_store(workspace)
+    bound = digest_steps_of(entries)
+    steps = most_recent_steps(store.get("records"), bound["limit"], bound["scope"])
+    if not steps and bound["scope"] is not None:
+        # This run holds no record yet: the step set falls back to the most recent steps (``data-model.md`` E8
+        # ``unit.lookup`` — "this run's steps, or the most recent steps"), still inside the same bound (C-63).
+        steps = most_recent_steps(store.get("records"), bound["limit"], None)
+    efficiency = project_efficiency(store, steps)
+    efficiency["depth"] = resolve_depth(efficiency, element_bound)
+    efficiency["withheld"] = withheld_summary(efficiency, efficiency["depth"])
+
     return {
         "registry_dir": str(registry_dir),
         "generated_at": now.isoformat().replace("+00:00", "Z"),
@@ -424,6 +858,8 @@ def read_state(cap: int, stale_bound: int, workspace: Path):
         "omitted": omitted,
         "vocabulary": vocabulary,
         "now": now,
+        "store": store,
+        "efficiency": efficiency,
     }, None
 
 
@@ -504,6 +940,8 @@ def render_digest(state) -> str:
     if not state["entries"]:
         return NOTHING_RUNNING
 
+    efficiency = state.get("efficiency") or {}
+    depth = efficiency.get("depth")
     lines = [
         "generated_at=%s cap=%d stale_bound=%s profile=%s"
         % (
@@ -513,7 +951,8 @@ def render_digest(state) -> str:
             profile_in_force(state),
         )
     ]
-    for item in state["entries"]:
+    elements = efficiency.get("elements") or []
+    for position, item in enumerate(state["entries"]):
         parts = [
             "line_id=%s" % (item["line_id"] or DASH),
             "run_id=%s" % (item["run_id"] or DASH),
@@ -538,6 +977,12 @@ def render_digest(state) -> str:
                 "note=last activity %s ago, beyond the %s stale bound"
                 % (item["age"], format_duration(item["stale_bound_seconds"]))
             )
+        # The efficiency dimension (contracts C-63…C-68) is CONTENT of this render: one element per step the digest
+        # names, placed on the row whose position it occupies — no extra line, no extra entry, no second cadence. It
+        # is projected from the one reading ``read_state`` already took; a row beyond the step set is left untouched,
+        # because the store supplies quantities for steps and never widens the set (C-63).
+        if efficiency.get("available") and position < len(elements):
+            parts.append(render_element(elements[position], depth))
         lines.append(" ".join(parts))
 
     completion = last_completion(state)
@@ -545,14 +990,22 @@ def render_digest(state) -> str:
         lines.append(
             "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
         )
-    if state["omitted"]:
-        lines.append("omitted=%d" % state["omitted"])
+    # C-64's withdrawn quantities are named in this render's EXISTING omitted summary — one statement for the whole
+    # render, never one per step. The summary line exists whether or not the cap truncated the set, so a render that
+    # lost depth and a render that lost entries are both readable from their own line.
+    withheld = efficiency.get("withheld") or ""
+    if state["omitted"] or withheld:
+        lines.append("omitted=%d%s" % (state["omitted"], " %s" % withheld if withheld else ""))
+    # The store-availability state is a property of the whole render, not of one row (C-68): it is stated once, on
+    # its own summary line, and changes nothing else — same units, same content floor, same ordering, same bound.
+    if not efficiency.get("available"):
+        lines.append("store=%s" % efficiency_vocabulary()["no_measurements"])
     return "\n".join(lines)
 
 
 def action_digest(args) -> int:
     workspace = Path(args.workspace).expanduser().resolve()
-    state, error = read_state(args.cap, args.stale_bound, workspace)
+    state, error = read_state(args.cap, args.stale_bound, workspace, args.element_bound)
     if error:
         print(error, file=sys.stderr)
         return EXIT_INPUT_ERROR
@@ -562,8 +1015,10 @@ def action_digest(args) -> int:
         payload["profile"] = profile_in_force(state)
         payload["state_summary"] = "active" if state["entries"] else NOTHING_RUNNING
         payload.pop("vocabulary", None)
-        # ``now`` is the reading's clock, not a rendered field: it is consumed by the renderers and never serialized.
+        # ``now`` is the reading's clock and ``store`` the raw records: both are consumed by the renderers and never
+        # serialized. The element projection they produced is what the JSON surface states.
         payload.pop("now", None)
+        payload.pop("store", None)
         print(json.dumps(payload, indent=2, sort_keys=True))
     else:
         print(render_digest(state))
@@ -592,7 +1047,12 @@ def render_status_line(args) -> str:
     significant transition through this same line shape rather than growing a second status renderer
     (contract ``supervision-report.contract.md`` C-34).
     """
-    state, _error = read_state(args.cap, args.stale_bound, Path(args.workspace).expanduser().resolve())
+    state, _error = read_state(
+        args.cap,
+        args.stale_bound,
+        Path(args.workspace).expanduser().resolve(),
+        getattr(args, "element_bound", None),
+    )
     # The profile in force is read from the state when the reading decides it. A mid-run loss of the live receiver
     # switches to `interactive` AT THE NEXT BOUNDARY and says so (contract C-30): `--profile` lets the emitting flow
     # record the switch, and `--profile-switch` carries the reason it switched, so the switch line states it rather
@@ -624,10 +1084,62 @@ def render_status_line(args) -> str:
             "delta=%s" % args.delta,
             "remainder=%s" % args.remainder,
             "blocker=%s" % (args.blocker if args.blocker else NO_BLOCKER),
-            "carrier=%s" % (args.carrier if args.carrier else CARRIER_CONSOLE),
         ]
     )
+    # The efficiency dimension rides this same line as content (contract ``efficiency-element.contract.md`` C-63): one
+    # element for the step THIS line names, projected from the reading ``read_state`` already took — never a second
+    # store read and never a second line. The unit is the step — the ``(unit_id, unit_type)`` pair — which the emitting
+    # flow states with ``--unit-id`` / ``--unit-type`` because a flow that knows where it is also knows what kind of
+    # unit that position is. The store supplies the quantities and never the step set (C-66). The carrier still closes
+    # the line (C-26), so the dimension is added *before* it.
+    steps = line_steps(args)
+    if steps:
+        # The store is read once, in ``read_state`` above, and every projection of it — the digest's and this line's —
+        # is built from that one reading, so neither surface opens the store a second time (C-65, C-69).
+        store = (state or {}).get("store") or {"available": False, "records": [], "error": None}
+        efficiency = project_efficiency(store, steps)
+        depth = resolve_depth(efficiency, getattr(args, "element_bound", None))
+        if efficiency.get("available"):
+            fields.append(" ".join(render_element(element, depth) for element in efficiency["elements"]))
+        else:
+            # An absent or empty store is the explicit availability state, never an omission and never an error: the
+            # line's own content is untouched (C-68).
+            fields.append(availability_element())
+        withheld = withheld_summary(efficiency, depth)
+        if withheld:
+            fields.append("note=%s" % withheld)
+    fields.append("carrier=%s" % (args.carrier if args.carrier else CARRIER_CONSOLE))
     return " | ".join(fields)
+
+
+def line_steps(args) -> list:
+    """The steps THIS status line names: the emitting flow's own steps, and no others (C-63, C-66).
+
+    A flow that emits a line knows which steps it has run and which one it is at now. It states them with
+    ``--unit-id`` — repeatable, one per step, in execution order — and ``--unit-type`` for the type they share; both
+    are the flow's own knowledge, never something this renderer derives from the store. So the line's step set is the
+    flow's, and the store supplies only quantities: a step the flow names that the store holds no record for still
+    carries its element with the marker (C-67), and a step the store holds that the flow does not name never appears.
+
+    A repeatable ``--unit-id`` may also arrive as one comma-separated value (the shape a command line imposes on a
+    repeated flag it cannot repeat), which is read as the same list. A step whose type the flow does not state has no
+    identity to match against and is therefore not named at all — guessing a type would invent the identity C-66 pins.
+    """
+    raw = getattr(args, "unit_id", None) or []
+    if isinstance(raw, str):
+        raw = [raw]
+    unit_type = getattr(args, "unit_type", None)
+    if not unit_type:
+        return []
+    run_id = getattr(args, "run_id", None)
+    scope = run_id if isinstance(run_id, str) and run_id else None
+    steps = []
+    for value in raw:
+        for piece in str(value).split(","):
+            piece = piece.strip()
+            if piece:
+                steps.append({"unit_id": piece, "unit_type": unit_type, "run_id": scope})
+    return _dedupe_steps(steps)
 
 
 def action_report(args) -> int:
@@ -1434,8 +1946,8 @@ def proposition_ro_12(args, run_record_path):
                 if payload.get("carrier"):
                     value = str(payload.get("carrier"))
                     surface = "run record %s" % run_record_path
-                if payload.get("mode"):
-                    recorded_mode = str(payload.get("mode"))
+                if payload.get(_MODE_FIELD):
+                    recorded_mode = str(payload.get(_MODE_FIELD))
     if args.carrier:
         value = args.carrier
         surface = "--carrier"
@@ -1624,6 +2136,19 @@ def build_parser():
         help="age in seconds beyond which an entry is marked stale (declared default %d)"
         % DEFAULT_STALE_BOUND_SECONDS,
     )
+    # The efficiency element's declared width (contract ``efficiency-element.contract.md`` C-64): while the whole
+    # element fits, its two deeper quantities are appended; when it does not, they are withdrawn from EVERY unit of
+    # the render together. ``--element-bound 0`` disables the bound, so both depths are measurable.
+    parser.add_argument(
+        "--element-bound",
+        type=int,
+        default=DEFAULT_ELEMENT_BOUND,
+        help=(
+            "character width one efficiency element may occupy on this render before its token and invocation"
+            " quantities are withdrawn render-wide (declared default %d; 0 disables the bound)"
+            % DEFAULT_ELEMENT_BOUND
+        ),
+    )
     # guard inputs: each is an optional reading surface; an absent one yields not-evaluated, never pass.
     parser.add_argument("--line-set", default=None, help="captured status line set to judge")
     parser.add_argument(
@@ -1670,6 +2195,21 @@ def build_parser():
     # report inputs
     parser.add_argument("--structure", default=None, help="structure slug for the rendered line")
     parser.add_argument("--run-stamp", default=None, help="run stamp for the rendered line")
+    # The steps this line names (contract ``efficiency-element.contract.md`` C-63): the emitting flow's own
+    # knowledge of where it has been and where it is. ``--unit-id`` is repeatable — one value per step, in execution
+    # order — and ``--unit-type`` is the type those steps share; both are what the flow already knows and are never
+    # derived from the store. The element's unit is the step identity (``unit_id``, ``unit_type``), which is why the
+    # type is part of the flag rather than a lookup into anything on disk (C-66).
+    parser.add_argument(
+        "--unit-id",
+        action="append",
+        default=None,
+        help="a step this line names (e.g. /speckit.plan); repeat once per step, in execution order",
+    )
+    parser.add_argument("--unit-type", default=None, help="the type those steps share, as the flow states it")
+    # The run the emitting flow is in. It is the flow's own identity for this run and narrows each named step to the
+    # record that run produced; it is never the element's unit (one run spans many steps — C-66).
+    parser.add_argument("--run-id", default=None, help="the run the emitting flow is in (the record scope, not the unit)")
     parser.add_argument("--position", default=None, help="position element")
     parser.add_argument("--delta", default=None, help="delta element")
     parser.add_argument("--remainder", default=None, help="remainder element")
@@ -1754,6 +2294,12 @@ def main(argv=None) -> int:
     if args.cap <= 0:
         print("--cap must be a positive integer", file=sys.stderr)
         return EXIT_INPUT_ERROR
+    if args.element_bound is not None:
+        if args.element_bound < 0:
+            print("--element-bound must be a non-negative integer", file=sys.stderr)
+            return EXIT_INPUT_ERROR
+        if args.element_bound == 0:
+            args.element_bound = None
     if args.action == "digest":
         return action_digest(args)
     if args.action == "report":
