@@ -7,7 +7,7 @@ VIII). Each reading carries the command that produced it so a later reviewer can
 this file.
 
 **Reading-id namespace (disambiguation, not a second vocabulary)**: the `RO-nn` headings **in this file** are
-*research readings* — a Phase 0 numbering of measured observations, closed at `RO-15`. They are **not** the guard
+*research readings* — a Phase 0 numbering of measured observations, closed at `RO-19` (RO-16…RO-19 were added by the 2026-11-06 second slice). They are **not** the guard
 propositions, whose `RO-01`…`RO-13` namespace is owned by `contracts/reporting-obligations.contract.md` C-01…C-13.
 The two namespaces share a spelling and nothing else; a reference that means a guard proposition says so and cites
 the contract, and a reference that means a reading cites this file.
@@ -223,6 +223,140 @@ the naming order — `status` describes what the command answers, and it imitate
 a read-only renderer and the reporter is a read-and-emit role, so neither needs one. A future reviewer can re-run
 this scan and expect **the same 27**, which is a passable criterion (an increment is a defect).
 
+## RO-16 — The exec-quant store's record surface, measured through the engine's own reader (second slice)
+
+**Command** (the read is the engine's, imported in-process — the same three names `load_store()` composes):
+
+```bash
+python3 - <<'PY'
+import importlib.util, pathlib, collections
+spec = importlib.util.spec_from_file_location("eq", "scripts/python/exec-quant.py")
+eq = importlib.util.module_from_spec(spec); spec.loader.exec_module(eq)
+base = eq.storage_dir(pathlib.Path("."))
+legacy = eq.read_jsonl_safe(base / eq.LEGACY_RECORDS_NAME)
+perfile = eq.read_entry_files(base / eq.RECORDS_DIR_NAME)
+print("storage_dir:", base)
+print("legacy stream records:", len(legacy), "per-record files:", len(perfile))
+PY
+```
+
+Measured 2026-11-06, verbatim:
+
+```text
+storage_dir: .specify/memory/exec-quant
+legacy stream records: 59   per-record files: 186   total: 245
+elapsed coverage: {'not_evaluated': 209, 'carried': 36}
+schema_version dist: {2: 226, 1: 19}
+unit_type dist (per-record files): {'command': 147, 'skill': 39}
+token quantity: not_evaluated on all 245
+```
+
+**Readings, and what each one settles**:
+
+1. **Two read surfaces, one reader.** A hand-written parser would have to reproduce both the per-record directory
+   (`records/*.json`, 186 files) and the legacy stream (`records.jsonl`, 59 records) — the store is the *union*.
+   That is the measured basis for `FR-028`'s "one reading" and for T-003: importing the engine's reader is not
+   convenience, it is the only way to see the store the engine writes.
+2. **`quality.elapsed_ms` exists and is populated.** 36 records carry a node (a value plus a `provenance`), all of
+   them `carried` — supplied by the neighbouring run-determination record through the `collect` path. The schema is
+   version 2 and declares the field, so **no schema extension and no new recorder** is required (`FR-025`,
+   `EP-011`). The requirements' earlier conditional phrasing ("if, and only if, a field is needed") is closed by
+   this measurement.
+3. **Coverage is the real limit.** 209 of 245 records are `not_evaluated`, and **no** record carries a token count.
+   So on real data the element's "elapsed-only" degradation is the *expected* rendering, not an edge case, and
+   every token quantity renders the not-evaluated marker. This is why the marker rule (`FR-023`) had to be a hard
+   rule rather than a fallback.
+4. **Two schema versions in the store.** 19 records carry version 1 and are reachable only through the engine's
+   compatibility path — the measured justification for the report's `legacy-format` exclusion class being a class
+   of its own rather than "anything not version 2".
+5. **Unit identity needs the type axis.** The per-record distribution shows two `unit_type` values in use
+   (`command`, `skill`) and the schema declares four; no `unit_id` currently appears under two types, but the key
+   is still the pair `(unit_id, unit_type)` because the merge defect is a property of the *key*, not of today's
+   data (`contracts/measure-report.contract.md` C-55).
+
+**Consequence**: both second-slice capabilities are pure readers over a store that already carries what they need;
+the design's risk is coverage, not schema, and the marker rule is the only honest rendering for 85 % of the records
+on disk today.
+
+## RO-17 — Window partition, aggregation and determinism, measured on the live store (second slice)
+
+**Command** (aggregation pilot, over the live store through the same imported reader):
+
+```bash
+python3 - <<'PY'
+# per-unit median / min / max over the store, and a two-window partition check
+# [2026-10-21, 2026-10-30) then [2026-10-30, 2026-11-08)
+PY
+```
+
+Measured 2026-11-06:
+
+```text
+partition: w1=93  w2=93  outside=0  sum == 186 per-record records   (half-open: no double count, no gap)
+('/speckit.analyze', 'command')  records=21 elapsed_n=12 median=540500 min=308000  max=7921000 prov=['carried']
+('/speckit.plan', 'command')     records=20 elapsed_n=3  median=479000 min=293000  max=986000  prov=['carried']
+('/speckit.checklist', 'command') records=16 elapsed_n=1 median=253000 min=253000 max=253000 prov=['carried']
+('/speckit.tasks', 'command')    records=19 elapsed_n=5  median=422000 min=34965   max=4694000 prov=['carried']
+('/speckit.clarify', 'command')  records=19 elapsed_n=0  -> not evaluated for this unit
+```
+
+**Readings**:
+
+1. **The half-open window partitions cleanly.** Two adjacent windows over the 186 per-record records give 93 + 93
+   with 0 outside and no overlap — the property `SC-013` asks for, measured rather than assumed
+   (`contracts/measure-report.contract.md` C-54).
+2. **Partial coverage is the normal case, not the exception.** `/speckit.analyze` has 21 records of which 12 carry
+   elapsed; `/speckit.plan` 20 of which 3; `/speckit.clarify` 19 of which **0**. A report that printed only the
+   median would silently describe 12 records as if it described 21, which is exactly what `C-56`'s
+   `covered=<k>/<n>` field exists to prevent.
+3. **Median and min/max are far apart.** `/speckit.analyze`'s elapsed spans 308 000 ms to 7 921 000 ms around a
+   540 500 ms median — a mean would be dominated by the tail and would describe no actual record. That is the
+   measured justification for the requirement fixing the **median** rather than leaving the central value to the
+   plan.
+4. **A unit with zero valued records is a legitimate row.** `/speckit.clarify` must appear as a row reported not
+   evaluated, not be dropped: dropping it would make the table read as if that unit were free
+   (`contracts/measure-report.contract.md` C-56).
+
+**Consequence**: window, aggregation and identity rules are all measurable on today's store, and each has at least
+one observed case that a simpler rule would get wrong.
+
+## RO-18 — No existing Tool record and no existing command covers measurement reading (second slice)
+
+`ls .specify/memory/tools/` (Tool Reuse gate, `.specify/shared/workflow/tool-reuse-gate.md`) plus a scan of
+`templates/commands/` and `scripts/python/` for an existing measurement-reading surface, measured 2026-11-06:
+
+- `templates/commands/` holds 26 command templates; none reads the exec-quant store. The nearest neighbours are
+  `/speckit.session` (exports host sessions), `/speckit.history` (distils conversations) and `/speckit.status`
+  (this feature's digest), none of which measures cost.
+- `scripts/python/exec-quant.py` exposes a **closed** per-action face (`collect`, `list-records`, `score`,
+  `collect-dispatch`, `args-manifest`, `aggregate` — the `arg_manifest` in
+  `shared/declarations/facts/quant-record-schema.yaml`). Its `aggregate` action summarises **received feedback
+  packages** under `aggregated/`, not the local store, so it is neither a substitute nor a place to add an action
+  (that manifest is another capability's closed face).
+- `templates/commands/measure.md` and `scripts/python/measure.py` do not exist; no `speckit.measure.*` copy exists
+  in any of the four tool directories (28 copies each, measured).
+
+**Consequence**: authoring `measure.py` is the expected outcome under the Tool Reuse gate — no record covers it and
+no existing engine face may be widened — and the sibling-script shape `scripts/python/<verb>-<noun>.py` is the
+grounded name, the same form as `flow-class-check.py`, `line-registry.py` and this feature's own
+`status-digest.py`.
+
+## RO-19 — Read-only is a measured property of the current reader, not an assumption (second slice)
+
+```bash
+find .specify/memory/exec-quant -type f | sort | xargs md5sum > /tmp/eq_before.txt
+python3 -c "…load_store(pathlib.Path('.'))…"   # full reader invocation
+find .specify/memory/exec-quant -type f | sort | xargs md5sum > /tmp/eq_after.txt
+diff /tmp/eq_before.txt /tmp/eq_after.txt && echo IDENTICAL
+```
+
+Measured 2026-11-06: `records: 245`, then `IDENTICAL`; 189 files hashed on both sides (186 per-record files, the
+two legacy stream files and the scores store).
+
+**Consequence**: `SC-012`'s "byte-identical after both reads" is achievable by construction — the reader touches
+nothing — so the new consumers inherit the property by importing rather than re-implementing. The consumers still
+owe their own before/after capture, which `SC-012 Source` names.
+
 ## Resolved unknowns (Phase 0 exit)
 
 | # | Unknown carried from the spec | Resolution | Where it lands |
@@ -232,6 +366,10 @@ this scan and expect **the same 27**, which is a passable criterion (an incremen
 | U-3 | Where does the seat obligation attach in the roster? | A `members[]` row with `role: reporter`, plus a declared `reporting-reason` key for the two recorded-reason escape paths | `plan.md` D3; contract RS-02, RS-05 |
 | U-4 | What is the digest's command + script name and exit-status set? | `/speckit.status` (`templates/commands/status.md`) + `scripts/python/status-digest.py`; statuses `0` rendered / `3` nothing active / `2` input error (guard action: `0`/`1`/`2`) | `plan.md` D8, D10; contract DG-01, DG-05 |
 | U-5 | What are the coaching payload's exact added field and clauses? | exactly one field `reporting-cadence`, one forbidden-content class, one return-handling clause, plus the test tuple update | `plan.md` D5; contract MV-06…MV-08 |
+| U-6 | Does the efficiency element need a schema extension or a recorder? | **No** — `quality.elapsed_ms` is declared (schema version 2) and populated by the engine's existing paths; 36 of 245 records carry it, all `carried` | `plan.md` EP-011, D13; `efficiency-element.contract.md` C-70; RO-16 |
+| U-7 | How does a consumer reach the store without re-implementing it? | Import `exec-quant.py`'s read path in-process; the store is a directory **plus** a legacy stream, so a hand-written parser would be a second reader of the same facts | `plan.md` T-003, EP-012; `measure-report.contract.md` C-53; RO-16 |
+| U-8 | What are `/speckit.measure`'s script name, action set and exit statuses? | `scripts/python/measure.py`; actions `summary` / `json`; statuses `0` produced / `2` input error / `3` nothing to analyse / `1` other failure | `plan.md` D14, S2; `measure-report.contract.md` C-59, C-60; RO-18 |
+| U-9 | Which aggregation and window semantics are measurable on real data? | a half-open window partitions cleanly (93 + 93, 0 outside); median with min/max (a mean is dominated by a 7.9 M ms tail); partial coverage is the norm, so `covered=<k>/<n>` is required | `plan.md` S2; `measure-report.contract.md` C-54/C-56; RO-17 |
 
 ## Unknowns that remain, with why they are not blocking
 
@@ -239,4 +377,6 @@ this scan and expect **the same 27**, which is a passable criterion (an incremen
 |---|---------|--------------------------|
 | R-1 | Whether a real multi-minute team run can be staged inside this unattended run for SC-001's live evidence | SC-001 states its own path as `final`; the plan provides the fixture shape in `quickstart.md` scenario C and `contracts/status-report.contract.md`, so `/speckit.implement` can measure it. Whether a given host console captures the line is an execution-time fact, not a design fact |
 | R-2 | Which concrete host will serve SC-009's dogfood run | `requirements.md` RS-003 declares "at least one supported host" and records host + version into `test-evidence`; the plan does not pin a host, so no plan fact depends on the answer |
+| R-4 | The measure report's exact default per-record cap value | The cap is a declared default **inside** `measure.py`, printed on every run and overridable per invocation (C-57). The value is chosen at implementation time; no other artifact restates it, so choosing it later creates no drift |
+| R-5 | Whether elapsed coverage on a future store stays at today's majority-`not_evaluated` state | The element's marker rule renders whatever the store holds, so a coverage change alters what the user sees but not a single design fact. The plan does not predict it — `RO-16` records today's reading and the rule handles both extremes |
 | R-3 | The digest's exact default entry cap value | The cap is a declared default **inside the script** and overridable per invocation (D9). The value is chosen at implementation time and measured by the guard; no other artifact restates it, so choosing it later creates no drift |

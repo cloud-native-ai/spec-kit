@@ -2,14 +2,17 @@
 
 **Feature**: 087 | **Date**: 2026-11-06 | **Plan**: `plan.md`
 
-This model introduces **no new persistent store**. Six of the seven entities are *views or obligations over state
-that already has an owner*; the seventh (Reporting Profile) is a declared configuration pair read from one owner
-document. Every field below names where its value comes from — an owner path plus a section anchor where one
-exists. A field with no such owner is not in this model.
+This model introduces **no new persistent store**. Seven of the nine entities are *views or obligations over state
+that already has an owner*; the eighth (Reporting Profile) is a declared configuration pair read from one owner
+document, and the ninth (Measure Report, added by the 2026-11-06 revision) is an output that is neither persisted nor
+cached. Every field below names where its value comes from — an owner path plus a section anchor where one exists. A
+field with no such owner is not in this model.
 
 **Storage boundary**: nothing here creates a table, a database, a registry, a ledger or a second state spine
 (`FR-018`). The only write a reporter performs goes to its own stream artifact, which is one of the three files the
-External Dispatch Visibility Contract already declares.
+External Dispatch Visibility Contract already declares. The exec-quant store (`.specify/memory/exec-quant/`) is
+**read-only** for this feature: E8 and E9 read it and neither creates, migrates, rewrites or deletes anything in it
+(`FR-024`).
 
 ## E1 — Reporter Seat
 
@@ -177,6 +180,66 @@ projection. The registry entry is the machine-readable owner of line state; pars
 create a second parser for the same facts (`research.md` RO-06 records this correction). A digest entry may cite the
 spine path for a human to open, but its fields come from the registry.
 
+## E8 — Efficiency Element
+
+**Revision 2026-11-06, entity 8.** One bounded element per listed unit, carried as **content** of E5's digest entry
+and of the status line E2 defines (`FR-023`). It is a **projection over a projection**: its quantities come from the
+exec-quant store, which this feature reads and never writes, and its host is the surface that already lists the unit.
+No third surface is opened.
+
+| Field | Type | Source / rule |
+|-------|------|---------------|
+| `unit.identity` | user-facing unit name | the surface's own listed unit, rendered in a readable form (`INV-05`); never a bare engine identifier |
+| `elapsed.value` | integer ms **or** the not-evaluated marker | the record's `quality.elapsed_ms` node, read through the store engine's read path (owner: `shared/declarations/facts/quant-record-schema.yaml#/statement` — the field and its type are **not** restated here) |
+| `elapsed.provenance` | one member of the schema's declared provenance vocabulary | the record's own node; the vocabulary is reached **by reference** to the declaration owner and never enumerated here (C-71) |
+| `tokens` | integer **or** the not-evaluated marker | the record's token quantity; rendered only while the element fits the host surface's bound (C-64) |
+| `invocations` | integer **or** the not-evaluated marker | the record's invocation quantity; same all-or-nothing rule |
+| `source_record` | record identity (the record file's name stem) | the record chosen by the selection rule below; carried for traceability, never rendered as a raw id |
+| `degradation` | `full` \| `elapsed-only` | `elapsed-only` when tokens/invocations were withdrawn **from every unit on this render together**; the withdrawn quantity is named in the surface's existing omitted summary (E5 `omitted`) |
+| `store_state` | `populated` \| `no-measurements` | `no-measurements` when the store is absent or holds no record; the host surface's own content is unchanged in that case (`FR-024`) |
+
+**Selection rule (one rule, owned by the requirements' FR-024; quoted here only as the projection shape)**: for a
+unit the surface lists, the element reads the record with the **latest `collected_at`**, with ties broken by the
+record's own identity in ascending byte-stable order. Nothing is folded: no average, no sum, no ranking, no lifetime
+aggregate — those belong to E9, a different question.
+
+**Bounding rule**: the element is *content*, so the host's own bound applies unchanged — the digest's cap (E5) and
+the status line's entry bound. When the token/invocation quantities do not fit, they are dropped from **every** unit
+on that render together and named once in the omitted summary. Per-unit depth differences are forbidden
+(`FR-023`, Clarifications Q2).
+
+## E9 — Measure Report
+
+**Revision 2026-11-06, entity 9.** The output of `/speckit.measure` (`FR-026`…`FR-029`). An **output**, never a stored
+object: nothing here is persisted, cached or written back, and the command writes no file at all.
+
+| Field | Type | Source / rule |
+|-------|------|---------------|
+| `window.since` | ISO timestamp or the literal "all records" | resolved from `--since`; with no bound the report states the whole store explicitly (C-54) |
+| `window.end` | ISO timestamp or the literal "all records" | `since + --window`; the **only** wall-clock-dependent text the report may carry (C-61) |
+| `window.rule` | literal `half-open` | `start ≤ collected_at < end`, so two adjacent windows partition the store |
+| `selection` | list of `(unit_id, unit_type)` **or** the literal "all units" | matched as an exact set; an identity the store does not hold is an input error naming it (C-55) |
+| `cap` | integer | the **default per-record cap printed on every run**, overridden by `--cap`; the number is declared once in `scripts/python/measure.py` and carried nowhere else (`C-47` row) |
+| `rows[]` | list of Measure Row (below) | one row per selected unit identity, ordered `(unit_type, unit_id)` ascending |
+| `excluded` | four named counts + one omitted count | the classes and the "omitted is not a class" rule are owned by `contracts/measure-report.contract.md` C-58 / C-57; this entity names the fields and restates no rule |
+| `figures_measurable` | integer | how many selected rows carried at least one measurable figure; `0` is a **produced report** at exit `0`, not the nothing-to-analyse case (C-59) |
+| `exit_hint` | one of the four declared statuses | which status the run took; the set is owned by `contracts/measure-report.contract.md` C-59 |
+
+### Measure Row
+
+| Field | Type | Source / rule |
+|-------|------|---------------|
+| `unit_id`, `unit_type` | strings | the **identity pair**; the store holds one `unit_id` under more than one type, and the pair is what keeps two different units from merging into one row (C-55) |
+| `records` | integer | the count of contributing records in the window, after truncation (a **sum**) |
+| `elapsed` | `{median, min, max, provenance, covered}` **or** the not-evaluated marker | median over the in-window records with min and max named; `covered` is present when only some records carried the quantity (C-56) |
+| `tokens` | `{sum, provenance, covered}` **or** the not-evaluated marker | a sum, with the count of records that carried it |
+| `invocations` | integer **or** the not-evaluated marker | a sum |
+
+**Invariants**: INV-13 (the element never opens a third surface and never grows the unit set), INV-14 (a listed unit
+with no record carries the marker, never an omission), INV-15 (both reads leave the store byte-identical and add no
+path), INV-16 (the report is a measurement, never a verdict), INV-17 (a produced report, a nothing-to-analyse run
+and an input error are three distinguishable outcomes of one closed status set).
+
 ## Invariants (asset-level, checked by the guard and by contract tests)
 
 | ID | Invariant | Judged by |
@@ -193,6 +256,11 @@ spine path for a human to open, but its fields come from the registry.
 | INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03 (C-43); `tests/unit/test_status_digest_unit.py` (the cap is C-43's subject, not a proposition of its own) |
 | INV-11 | An entry whose age exceeds the stale bound is marked stale with its age; stale data is never presented as current | DG-04 (C-44) |
 | INV-12 | No scheduler, timer service, daemon, third-party dependency, new persistent store, console channel, registry, state spine or ledger is introduced | `contracts/ownership-map.contract.md` OM-04 (C-50); guard RO-13 |
+| INV-13 | The efficiency element appears on exactly two surfaces (status line, digest), never grows the unit set, and never becomes an extra line or a second cadence | `contracts/efficiency-element.contract.md` EF-01 (C-63); `tests/contract/test_efficiency_element.py` |
+| INV-14 | A listed unit with no record at all carries the not-evaluated marker; it is never dropped, and a missing quantity is never rendered as `0` | EF-02/EF-05 (C-64, C-67); `tests/contract/test_efficiency_element.py` |
+| INV-15 | Reading the store for the element and for the report leaves every file under `.specify/memory/exec-quant/` byte-identical and creates no new path there | EF-07 (C-69), ME-10 (C-62); the before/after per-file digest in `test-evidence/` (SC-012 Source) |
+| INV-16 | The measure report presents measurements and issues no verdict: no score, no threshold judgement, no baseline recommendation, no persisted trend | `contracts/measure-report.contract.md` ME-04 (C-56); `tests/contract/test_measure.py` vocabulary check |
+| INV-17 | "A report was produced", "nothing to analyse" and "input error" are three distinguishable outcomes of one closed four-value status set; each renders its own explicit statement | ME-07 (C-59); `tests/contract/test_measure.py` |
 
 ## State transitions
 
@@ -219,3 +287,14 @@ threshold), and `stalled → running` (growth resumes). No transition is invente
 4. A digest rendering `state: active` while `entries[]` is empty is a defect; an empty set must render
    `nothing-running`.
 5. A stall judgement whose `judged_against` does not resolve to the owner table's row is a defect (FR-009).
+6. An efficiency element that renders `0` for a quantity the record marks not evaluated is a defect; so is an
+   element omitted for a listed unit (INV-14). Where the token/invocation quantities do not fit the bound, they are
+   withdrawn from every unit on that render together — one unit showing them beside another without is a defect
+   (C-64).
+7. A measure row that merges two `unit_type` values under one `unit_id` is a defect, and so is a `--unit` value the
+   store does not hold rendered as an empty section instead of an input error (C-55).
+8. A measure run over a store holding no record in the resolved window that renders a zero-valued row instead of the
+   explicit `no measurements` statement is a defect (C-59).
+9. Any delivered artifact that restates the exec-quant schema's version, provenance vocabulary or unit-type
+   vocabulary instead of naming the declaration owner is a defect (C-71, `contracts/ownership-map.contract.md`
+   C-47).

@@ -1,0 +1,79 @@
+=== 087 plan revision evidence — second slice (efficiency element + /speckit.measure) ===
+captured_at: 2026-11-06T08:33:00Z
+revision: plan attempt 2 (single package, per the 070 decomposition decision)
+scope: FR-023…FR-029 / SC-011…SC-014 added to plan-owned artifacts; no renumbering of C-01…C-52
+
+§ 1 pre-analyze-check.py --stage plan --repo . --spec-dir .specify/specs/087-speckit-visualization
+-- decision line (the machine grep) --
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=58 waived=0
+-- summary object --
+{"errors": 0, "advisories": 58, "waived": 0, "fr": 29, "sc": 14, "tasks": 50, "clauses": 0, "files": 17}
+-- advisory classes (none is an error; all are declared not-yet-existing delivery paths) --
+missing-path: templates/commands/measure.md (plan.md, research.md, feature-ref.md, contracts/*)
+missing-path: scripts/python/measure.py / .specify/scripts/python/measure.py (feature-ref.md, plan.md)
+missing-path: tests/contract/test_measure.py, tests/contract/test_efficiency_element.py, tests/unit/test_measure_unit.py
+missing-path: .specify/templates/commands/ (plan.md, feature-ref.md, checklists/requirements.md — pre-existing)
+advisory delta vs the first capture: 57 → 58, from the plan.md Phase 1 Research row now citing the three
+second-slice test files by path (the row previously summarised the readings without naming them)
+PRE_ANALYZE_EXIT=0
+
+§ 2 validate-decision-tensions.py --spec <spec>
+spec: .specify/specs/087-speckit-visualization
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 535 lines, 3 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+records: 3 (T-001, T-002 unchanged; T-003 added by the second slice — import the engine's reader vs write an
+         own parser, sacrifice SC-014 Source, revision trigger: the store growing a third read surface)
+note: an earlier run failed [dtr-anchor] because the new "Second-slice design" block sat between
+      `## Constitution Check` and `## Decision Tensions`; the block now sits after `## Project Structure`
+      as a `###` subsection, and the anchor chain is consecutive again
+DECISION_TENSIONS_EXIT=0
+
+§ 3 decomposition-check.py --mode plan --requirements <requirements>
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 29, "task_count": null, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T08:32:24Z"}
+DECOMPOSITION_EXIT=0
+
+§ 4 sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (122 files)
+ok    shared/ == .specify/shared/ (95 files)
+SYNC_MIRRORS_EXIT=0
+
+§ 5 regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+REGEN_EXIT=0
+
+§ 6 account-clause-coverage.py <spec-dir>   (FR reference groups readability, task 3)
+FR universe: 29 / FR claimed: 29 / FR uncovered: 0
+companion: claimed clauses (tasks.md [green:] declarations) 33, scanned files 274, clause universe 1748
+  [fr-uncovered] pass (0) — 29 of 29 FRs cited from citation groups
+  [clause-uncovered] fail (612) / [coverage-baseline-delta] fail (39) — read below
+  [clause-unparsable] warn (107) — 0 of them declare a positive form
+status: uncovered (39 error(s), 0 warning(s))
+COVERAGE_EXIT=1
+
+§ 6 reading — why this is expected at the plan stage and is not a plan defect
+The clause side counts *tasks.md `[green:]` declarations*. At the plan stage tasks.md is still the
+pre-revision task list (50 tasks, no `[green:]` marker for any second-slice clause), so every clause the
+second slice introduced is counted uncovered:
+  efficiency-element.contract.md#C-63…C-71          (9)
+  measure-report.contract.md#C-53…C-62              (10)
+  status-digest.contract.md#C-72                    (1)
+  ownership-map.contract.md#C-48                    (1, rewritten relation table, still one clause)
+  = 21 second-slice clauses, plus 18 first-slice clauses that were already beyond the frozen baseline
+  before this revision (reporting-obligations C-02…C-13, reporter-seat C-14/C-18/C-21, status-report
+  C-23/C-30, supervision-report C-36/C-38) = 39 beyond-baseline items, matching the reported delta.
+The FR side — the readability the assignment asks about, "FR reference groups remain readable" — is green:
+29 of 29 FRs cited from citation groups, 0 uncovered, including the seven new FR-023…FR-029 rows added to
+feature-ref.md. The clause coverage closes when /speckit.tasks writes the `[green:]` declarations.

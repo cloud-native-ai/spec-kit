@@ -1,13 +1,17 @@
 # Contract: Current-State Digest and Guard
 
-**Feature**: 087 | **Covers**: FR-011, FR-012, FR-017, FR-022
+**Feature**: 087 | **Covers**: FR-011, FR-012, FR-017, FR-022 (and, by the second slice, FR-023's host surface)
 **Contract object**: (a) the thin command `templates/commands/status.md` (entry `/speckit.status`) and its
 generated per-tool copies; (b) the deterministic script `scripts/python/status-digest.py` with three actions;
 (c) their shared reading of existing state.
 
-Clause ids are dense (`DG-01`…`DG-06`) and are cited verbatim by `/speckit.tasks`.
+Clause ids are dense (`DG-01`…`DG-07`) and are cited verbatim by `/speckit.tasks`; `DG-07` (C-72) was added by the 2026-11-06 second slice and carries no renumbering of `DG-01`…`DG-06`.
 
----
+**Second slice, added without touching C-41…C-46.** The script gains the **efficiency element** as *content* of the
+two renders it already produces (`--action digest`, `--action report`): the action set stays exactly three and the
+digest's cap, staleness, ordering and exit statuses are unchanged. The element's own clauses are owned by
+`contracts/efficiency-element.contract.md` `C-63`…`C-71` — this file names the host shape and states only what the
+element must not disturb.
 
 ## C-41 · DG-01 — One command, one script, three actions, one reading
 
@@ -131,3 +135,21 @@ thirteen, is a defect. The trigger mechanics are not propositions — profile se
 `contracts/status-report.contract.md` C-30 and the failure line by C-29 — so no trigger gets a slot of its own.
 
 Requirements served: (FR-017, FR-022).
+
+## C-72 · DG-07 — The efficiency element is content of this digest, and changes none of its bounds
+
+The digest MUST render one efficiency element per **listed** unit (inside the cap of C-43), as content of the entry
+and never as an extra line, entry or section. The element's shape, its degradation order and its not-evaluated rule
+are owned by `contracts/efficiency-element.contract.md` C-64 — this clause states only what the digest must
+preserve: the entry set, the ordering (C-43), the `cap=<n>` / `omitted=<n>` rendering, the staleness marking (C-44)
+and the exit-status table (C-45) are **byte-identical** to a render without the element except for the element's own
+text and the omitted-summary sentence naming a withdrawn quantity. An absent or empty store renders the explicit "no
+measurements" state and changes none of those bounds either.
+
+`--action report` renders the same element on its one line, under the same rule: its four content elements and its
+attribution are unchanged, and the element is content within them.
+
+*Judged by*: `tests/contract/test_status_digest.py` (existing assertions, unchanged) plus its added efficiency
+items, and `tests/contract/test_efficiency_element.py` for the element's own properties.
+
+Requirements served: (FR-023, FR-024).

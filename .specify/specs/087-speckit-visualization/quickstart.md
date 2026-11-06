@@ -7,6 +7,12 @@ scenario** — a file-level disclaimer is deliberately absent, because the plan-
 the examples it does not cover. Two scenarios (E and G) carry an **executed** measurement taken during this plan
 stage; the other six carry the premises they rest on.
 
+**Revision 2026-11-06 — scenarios I, J, K, L.** The second slice (efficiency element + `/speckit.measure`) adds four
+scenarios at the same standard: each states its own executed/unexecuted status, and the executed ones quote the real
+output of the command that produced them. Scenario I is **EXECUTED** (it reads the live store through the engine
+that already exists); J, K and L are **unexecuted** because `scripts/python/measure.py` and the efficiency renderer
+do not exist at plan time — their premises are stated instead.
+
 **What exists at plan time**: this plan stage authored documents only. None of the delivered *implementation*
 artifacts exists yet (`shared/guidelines/reporting-obligations.md`, `agents/reporter.agent.md`,
 `templates/commands/status.md`, `scripts/python/status-digest.py`, the create-team guard script), so the commands
@@ -329,3 +335,202 @@ removed; (3) `56f3f881` is this line's stage base (`plan.md` header and the stat
 
 **Verification route (b)**: contract `ownership-map.contract.md` C-51 (`OM-05`) plus the AST-level import audit in
 `tests/contract/test_status_digest.py`.
+
+---
+
+## Scenario I — Measure the live store with the store's own reader (EXECUTED, plan stage)
+
+**Goal**: establish, before any design is committed, what the exec-quant store actually holds — the record count,
+the elapsed-time coverage, the format mix — by reading it through **the engine's own read path** rather than by
+parsing the files by hand. This is the measurement `research.md` RO-16 rests on.
+
+### I.1 — The executed reading
+
+```bash
+python3 - <<'PY'
+import importlib.util, pathlib, collections
+spec = importlib.util.spec_from_file_location("eq", "scripts/python/exec-quant.py")
+eq = importlib.util.module_from_spec(spec); spec.loader.exec_module(eq)
+root = pathlib.Path(".")
+base = eq.storage_dir(root)
+legacy = eq.read_jsonl_safe(base / eq.LEGACY_RECORDS_NAME)
+perfile = eq.read_entry_files(base / eq.RECORDS_DIR_NAME)
+print("storage_dir:", base)
+print("legacy stream records:", len(legacy), "per-record files:", len(perfile))
+kind = collections.Counter()
+for r in perfile + legacy:
+    q = r.get("quality") or {}
+    e = q.get("elapsed_ms")
+    kind["valued" if isinstance(e, dict) else "not_evaluated"] += 1
+print("elapsed coverage:", dict(kind))
+print("schema_version dist:", dict(collections.Counter(r.get("schema_version") for r in perfile + legacy)))
+PY
+```
+
+Actual output on 2026-11-06 (this checkout, through the engine's reader):
+
+```text
+storage_dir: .specify/memory/exec-quant
+legacy stream records: 59 per-record files: 186
+elapsed coverage: {'not_evaluated': 209, 'carried': 36}
+schema_version dist: {2: 226, 1: 19}
+```
+
+**Reading**: the store holds 245 records across **two** read surfaces (186 per-record files plus a 59-record legacy
+stream), and the reader composes them — which is exactly why neither new consumer may parse the files itself. 36
+records carry an elapsed value, all of them with provenance `carried`; 209 are `not_evaluated`; 19 records are
+schema version 1 and therefore reach the report only through the engine's compatibility path. The token quantity is
+`not_evaluated` on **every** record, so every efficiency element on real data today renders the not-evaluated marker
+for tokens — the "elapsed-only" degradation is the floor, not an edge case.
+
+**Premises**: (1) the reader used is the same three functions (`storage_dir`, `read_jsonl_safe`, `read_entry_files`)
+that `load_store()` composes, imported in-process; (2) the store is the repository-local one, so counts are this
+checkout's, not a distribution constant; (3) `quality.elapsed_ms` is a node (a value plus provenance) when present
+and the literal `not_evaluated` when absent — the shape the schema owner declares, not one this file defines.
+
+**Verification route (b)**: `research.md` RO-16; the efficiency element's marker rule is
+`contracts/efficiency-element.contract.md` C-64/C-67 and the report's accounting identity is
+`contracts/measure-report.contract.md` C-58.
+
+---
+
+## Scenario J — `/speckit.measure` over a populated store (unexecuted; premises stated)
+
+**Goal**: a reader asks what a window cost, per unit, and can recompute every figure from the numbers printed.
+
+```bash
+python3 scripts/python/measure.py --action summary --since 2026-10-20 --window P14D
+echo "exit=$?"
+python3 scripts/python/measure.py --action json --since 2026-10-20 --window P14D --unit /speckit.plan --unit /speckit.analyze
+echo "exit=$?"
+```
+
+**Expected**: a header naming the window actually used (`since` … `end`, or `all records`), the selection, and the
+**cap in force**; then one row per selected `(unit_id, unit_type)` ordered by `(unit_type, unit_id)`, each carrying
+the record count, the median elapsed with min and max and its provenance, the token sum with `covered=<k>/<n>`, and
+the invocation count — each rendered as the explicit not-evaluated marker where no record carried it. Then the four
+exclusion counts, the omitted count, and `figures measurable=<n>`. Exit `0`.
+
+**Status**: NOT EXECUTED — `scripts/python/measure.py` does not exist at plan time. The store half of the premises
+was measured (Scenario I).
+
+**Premises this scenario rests on**:
+1. the window is half-open (`start ≤ collected_at < end`), so two adjacent windows partition the store with no
+   double count and no gap (`contracts/measure-report.contract.md` C-54);
+2. `--window` takes the same duration form the store engine already accepts, so no second input grammar is
+   introduced;
+3. the elapsed figure is a **median** with min and max named, and counts/tokens are **sums** (C-56) — the report
+   does not choose between a mean and a median at run time;
+4. the cap is printed on every run and `--cap` follows through to the printed value (C-57);
+5. the four exclusion classes are counted once per record and the omitted count is printed beside them, never as a
+   fifth class (C-58);
+6. two `--unit` values naming one identity produce one row, and an identity the store does not hold is an input
+   error naming it (C-55).
+
+**Anti-fixture (what would make this a false pass)**: a report that prints totals but whose numbers do not sum back
+to the records it read. The clause that closes that hole is C-58's accounting identity, and
+`tests/contract/test_measure.py` asserts it on a seeded fixture.
+
+---
+
+## Scenario K — `/speckit.measure` over an absent store and over an empty window (unexecuted; premises stated)
+
+**Goal**: "there is nothing to analyse" is a distinct, explicit answer — never a zero row and never an error.
+
+```bash
+# absent store
+python3 scripts/python/measure.py --action summary --workspace /tmp/no-such-workspace; echo "exit=$?"
+# store present, window selects nothing
+python3 scripts/python/measure.py --action summary --since 2030-01-01; echo "exit=$?"
+```
+
+**Expected**: the first prints the explicit `no measurements` statement and exits `3`; the second resolves a window
+containing no record, prints the same explicit statement (naming the window it used) and exits `3`. Neither prints a
+row of zeros, and neither is an error.
+
+The contrast case is a window that **does** select records none of which carry a figure: that is a **produced
+report** — `figures measurable=0` is stated and the exit status is `0`, not `3`. An input error (an unparseable
+`--since`, a start after the resolved end, an unknown `--unit`) exits `2` with one line naming the offending value.
+
+**Status**: NOT EXECUTED — the script does not exist at plan time.
+
+**Premises**: (1) the four exit statuses are closed: `0` produced, `2` input error, `3` nothing to analyse, `1` any
+other failure, with `1` never used for the two above (C-59); (2) "absent store" and "empty window" share one
+status because they answer the same reader question — there is nothing to analyse here — while remaining
+distinguishable in the printed text; (3) the store path resolution is the engine's, so `--workspace` means what it
+means to `exec-quant.py`.
+
+**Verification route (b)**: `tests/contract/test_measure.py` — four fixtures assert the four statuses and their
+renderings, plus the all-`not_evaluated` fixture that must exit `0` rather than `3`.
+
+---
+
+## Scenario L — The efficiency element on the two visibility surfaces (unexecuted; premises stated)
+
+**Goal**: the status line and the digest each say **how long** each listed unit took, without opening a third
+surface and without inventing a number.
+
+```bash
+python3 scripts/python/status-digest.py --action digest --cap 6 | sed -n '1,20p'
+python3 scripts/python/status-digest.py --action report --structure <slug> --run-stamp <stamp> \
+  --position "<stage> <k>/<N>" --delta "<clause>" --remainder "<clause>" --blocker "no blocker"
+```
+
+**Expected**: every listed unit's entry carries one element beginning with the unit's readable name and its elapsed
+time with provenance, and — only while the entry bound permits — its token and invocation counts. A unit whose
+record is `not_evaluated` (which is the majority on today's store, Scenario I) renders the explicit not-evaluated
+marker; a listed unit with no record at all still carries the element, with the same marker. With the cap set low
+enough that tokens cannot fit, **every** entry on that render drops tokens together and the omitted summary names
+the withdrawn quantity. With the store absent, both surfaces render the explicit `no measurements` state and
+everything else about the line and digest is unchanged.
+
+**Status**: NOT EXECUTED — the efficiency renderer does not exist at plan time (the digest itself does; its
+current output carries no element).
+
+**Premises**: (1) the element is *content*, so the host surface's bound is the only bound (C-63/C-64); (2) the
+element reports the **latest** record for the unit and folds nothing (C-66/C-65) — the windowed aggregate is the
+measure command's question, not the line's; (3) provenance and the field paths are reached from the schema
+declaration by reference, never restated (C-70/C-71); (4) both reads leave the store byte-identical (C-69).
+
+**Verification route (b)**: `tests/contract/test_efficiency_element.py` and `tests/unit/test_measure_unit.py`; the
+store-side half is measured today by the per-file digest comparison `SC-012 Source` names.
+
+---
+
+## Scenario M — The two reads leave the store byte-identical (EXECUTED, plan stage)
+
+**Goal**: before any code is written, prove that reading the store through the engine leaves it untouched — the
+property `SC-012` asks for, measured on the current reader.
+
+### M.1 — The executed reading
+
+```bash
+find .specify/memory/exec-quant -type f | sort | xargs md5sum > /tmp/eq_before.txt
+python3 - <<'PY'
+import importlib.util, pathlib
+spec = importlib.util.spec_from_file_location("eq", "scripts/python/exec-quant.py")
+eq = importlib.util.module_from_spec(spec); spec.loader.exec_module(eq)
+root = pathlib.Path(".")
+print("records:", len(eq.load_store(root)[0]))
+PY
+find .specify/memory/exec-quant -type f | sort | xargs md5sum > /tmp/eq_after.txt
+diff /tmp/eq_before.txt /tmp/eq_after.txt && echo "IDENTICAL"
+```
+
+Actual output on 2026-11-06:
+
+```text
+records: 245
+IDENTICAL
+```
+
+**Reading**: a full `load_store()` read over the live store changes no byte and adds no path — 189 files hashed
+before and after, identical in both cases. The property therefore already holds for the reader this feature intends
+to import; the new consumers inherit it by importing rather than re-implementing.
+
+**Premises**: (1) `md5sum` over the sorted file list covers the per-record directory, the legacy streams and the
+scores store; (2) the read is the composed `load_store()`, i.e. what both new consumers will call; (3) this measures
+the **reader**, not the new consumers — those still owe their own before/after digest (C-69, SC-012 Source).
+
+**Verification route (b)**: `contracts/efficiency-element.contract.md` C-69 and `contracts/measure-report.contract.md`
+C-62; `SC-012 Source` names the exact capture this scenario performed.
