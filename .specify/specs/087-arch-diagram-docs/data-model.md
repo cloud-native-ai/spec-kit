@@ -45,14 +45,23 @@
 | `path` / `line` | `C-005` | 逐文档具名（`FR-016`） |
 | `verdict` | `C-004`（封闭五值 + 有序优先级） | `satisfied` / `missing` / `stale` / `recorded-exemption` / `not-evaluated` |
 | `reason` | `C-005`（与 verdict 一一绑定的封闭表） | 闭集外的值是契约违规 |
-| `summary.*` | `C-013` | 计数 + `clean` + `exemption_superseded` |
+| `summary.*` | `C-013` | 五个计数 + `converged` + `clean` + `exemption_superseded` |
 
 **状态判定（有序，命中即停）**：唯一登记处是 `C-016` 的九行表（`recorded-exemption` → 失效豁免 →
 `no-diagram-reference` → `reference-unresolved` → `orphan-*` → `trace-incomplete` → `no-trace-record` →
 `stale` → `satisfied`）。本文件不复述该表，只登记它在实现上的落法：单趟顺序判断，**不回溯**、不二次覆盖。
 
-`clean` = 四个计数全零（`C-013`）；`exempted > 0` 与 `carriers == 0` 都 MUST 使 `clean=false`（`FR-004` / `FR-016` 的假绿防线）。
-`--only` 收敛到 0 个对象时 `clean` 按公式算得 `true`，但**那不是**空间合规的结论（`C-013` 的附注）。
+**两个谓词，两个问题**（定义点在 `C-013`，本文件只登记它们的区别，不复述算式）：
+
+| 字段 | 回答的问题 | 豁免的角色 |
+|------|-----------|-----------|
+| `converged` | 还有没有**待收敛**的 finding（`missing` / `stale` / `not_evaluated`） | 不阻断——豁免是 `FR-004` 的合法终态 |
+| `clean` | 这个空间是不是**零 finding** 的显式结论 | 阻断——`exempted > 0` ⇒ `clean=false`（`FR-004` / `FR-016` 的假绿防线） |
+
+⇒ **收敛判据用 `converged`**（`flow-obligations` `C-008a` R6、`SC-003`）；「零图 finding」= `converged`
+「一个文档无结构可绘、已具名豁免」的收敛终态是 `converged=true` + `clean=false`，合法且不矛盾（`SC-008`）。
+`carriers == 0` 使两个谓词**都**为假（判据没有对象，不是零 finding）。
+`--only` 收敛到 0 个对象时两个谓词按公式都算得 `true`，但**那不是**空间合规的结论（`C-013` 的附注）。
 
 ## E4 — Diagram Trace Record（追溯记录）
 
@@ -71,7 +80,7 @@
 | `document` / `reason` / `recorded_at` / `justification` | `C-011` | `reason` 封闭三值 |
 | 落点 | `C-011` | `<root>/docs/.speckit/exemptions/<相对文档路径>.md` |
 
-**生命周期**：无记录 → `missing`；记录有效 → `recorded-exemption`（可见，不计 pass）；记录缺字段或 `justification` 不足 → `not-evaluated` / `exemption-invalid`；记录仍有效但其文档**已带解析到渲染产物的引用** → `exemption-invalid` + `summary.exemption_superseded` 计数（`FR-004` 后半的唯一机械信号）。
+**生命周期**：无记录 → `missing`；记录有效 → `recorded-exemption`（可见，不计 pass，但**不阻断** `converged`，只使 `clean=false`）；记录缺字段或 `justification` 不足 → `not-evaluated` / `exemption-invalid`；记录仍有效但其文档**已带解析到渲染产物的引用** → `exemption-invalid` + `summary.exemption_superseded` 计数（`FR-004` 后半的唯一机械信号）。**这四档里只有前两档是「已收敛」，后两档落 `not-evaluated`，因此使 `converged=false`**。
 
 ## E6 — Fixture Space（夹具空间）
 
@@ -83,17 +92,17 @@
 
 | 夹具 | 构成 | `--record` | 断言的目标状态（`C-016` 的档位） |
 |------|------|-----------|----------------------------------|
-| `clean/` | 1 份正式文档 + 1 图两面（`docs/assets/foo.{mmd,svg,png}`）+ 引用解析 + 记录齐备 | 本夹具记录 | `satisfied` / `reference-resolves`；`summary.clean=true` |
-| `no-diagram/` | 同 `clean/`，文档无任何指向图渲染产物的引用 | 本夹具记录 | `missing` / `no-diagram-reference`；`clean=false` |
+| `clean/` | 1 份正式文档 + 1 图两面（`docs/assets/foo.{mmd,svg,png}`）+ 引用解析 + 记录齐备 | 本夹具记录 | `satisfied` / `reference-resolves`；`summary.converged=true`、`summary.clean=true` |
+| `no-diagram/` | 同 `clean/`，文档无任何指向图渲染产物的引用 | 本夹具记录 | `missing` / `no-diagram-reference`；`converged=false`、`clean=false` |
 | `deleted-rendered/` | 同 `clean/`，渲染产物已删、源在、引用仍指向被删的渲染面 | 本夹具记录 | `missing` / `reference-unresolved`（`C-016` 序 4 **先于**失面序 5） |
 | `orphan-rendered/` | 同 `clean/`，渲染产物已删、源在、**引用指向源**（解析成功） | 本夹具记录 | `missing` / `orphan-rendered`（`C-016` 序 5） |
 | `orphan-source/` | 同 `clean/`，源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`（`C-016` 序 5） |
 | `stale-source/` | 同 `clean/`，两面**都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`（`C-016` 序 8） |
-| `no-trace/` | 同 `clean/`，两面与引用都在，**不给** `--record` | 缺省 | `not-evaluated` / `no-trace-record`（序 7） |
+| `no-trace/` | 同 `clean/`，两面与引用都在，**不给** `--record` | 缺省 | `not-evaluated` / `no-trace-record`（序 7）；`converged=false` |
 | `trace-incomplete/` | 同 `clean/`，记录在但 `diagrams[]` 无同名条目 / 缺必填字段 | 本夹具记录 | `not-evaluated` / `trace-incomplete`（序 6） |
-| `exempt-ok/` | `C-011` 三字段齐备的豁免记录，文档无图 | — | `recorded-exemption` / `exempt-chronological`；`exempted=1`；`clean=false` |
-| `exempt-bad/` | 豁免记录缺 `justification`（或长度 < 8） | — | `not-evaluated` / `exemption-invalid`（序 2） |
-| `exempt-superseded/` | 豁免记录齐备，但文档**已带**解析到渲染产物的引用 | 本夹具记录 | `not-evaluated` / `exemption-invalid` + `summary.exemption_superseded=1` |
+| `exempt-ok/` | `C-011` 三字段齐备的豁免记录，文档无图 | — | `recorded-exemption` / `exempt-chronological`；`exempted=1`；**`converged=true`**、`clean=false`（`C-008a` 的豁免收敛夹具） |
+| `exempt-bad/` | 豁免记录缺 `justification`（或长度 < 8） | — | `not-evaluated` / `exemption-invalid`（序 2）；`converged=false` |
+| `exempt-superseded/` | 豁免记录齐备，但文档**已带**解析到渲染产物的引用 | 本夹具记录 | `not-evaluated` / `exemption-invalid` + `summary.exemption_superseded=1`；`converged=false` |
 
 **mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `conftest` 的建造步骤里用
 `os.utime` 把 `source` 设为「渲染面 mtime + 60s」（写在 `.gitattributes` 之外，不进版本库），
@@ -115,7 +124,8 @@
 
 数量：**5 处落点、4 个文件**（`create-docs` 两个小节族同文件）。契约侧条款见 `contracts/flow-obligations.contract.md` 的 A–E 组；
 其中 **B 组的 `C-008a` 是「reconcile 能把图维度收敛掉」的唯一登记处**——缺了它，`SC-003` 的「收敛后二次运行零图 finding」
-在文本上不可达（这正是 attempt 1 的 P1-5）。
+在文本上不可达（这正是 attempt 1 的 P1-5）；而它的判据必须是 `converged`，**不是** `clean`——用 `clean` 会让
+「靠具名豁免收敛」的文档永远不收敛，收敛于是没有唯一读法（这是 attempt 2 的 P1-A）。
 
 ## E8 — Guard Assertion Set（实施期必须保持的守卫）
 

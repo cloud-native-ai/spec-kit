@@ -17,7 +17,7 @@
 3. **判据冻结在契约**：[`contracts/diagram-obligation.contract.md`](./contracts/diagram-obligation.contract.md) 拥有命令面、封闭 verdict/reason 集、**逐文档判定的有序优先级（`C-016`）**、`stale` 逐面判据、追溯记录与豁免记录 schema；所有其他面按路径引用它，不复述取值。
 4. **能力零新建**（T-004）：`draw-diagram` 只被引用、一行不改；文档侧不出现第二个引擎、第二份路由表或第二份交付契约。
 5. **诚实的能力边界**（T-003 / D-001）：`stale` 的第二半「图与文档就同一事实不一致」只判到「引用仍在且解析」，语义一致性**显式登记为未覆盖**，不发明一条没有判据的 verdict——这是 A12 自己给的第二条路。
-6. **收敛责任在 reconcile 之内**（P1-5）：`flow-obligations.contract.md` 的 `C-008a` 把 Reconcile 的 R3/R4/R5/R6 各追加一步，使 `missing` / `stale` / `not-evaluated` 成为**可被这一轮 reconcile 收敛掉的差异项**——产图与重渲染由既有 `draw-diagram` 前门在 R5 内完成（safe local writes，不加确认档），`not-evaluated` 不跳过，`D-001` 的语义面在报告里显式点名且**不**属收敛目标。没有这条路径，`SC-003` 的「收敛后二次运行零图 finding」在文本上不可达。
+6. **收敛责任在 reconcile 之内**（P1-5）：`flow-obligations.contract.md` 的 `C-008a` 把 Reconcile 的 R3/R4/R5/R6 各追加一步，使 `missing` / `stale` / `not-evaluated` 成为**可被这一轮 reconcile 收敛掉的差异项**——产图与重渲染由既有 `draw-diagram` 前门在 R5 内完成（safe local writes，不加确认档），`not-evaluated` 不跳过，`D-001` 的语义面在报告里显式点名且**不**属收敛目标。没有这条路径，`SC-003` 的「收敛后二次运行零图 finding」在文本上不可达。**收敛判据是一个独立的 `converged` 谓词**（`diagram-obligation.contract.md` `C-013`：三档全零，豁免不参与），与严格的 `clean`（`exempted>0 ⇒ clean=false`）分开：具名豁免是 `FR-004` 的合法终态，用 `clean` 当收敛判据会让这类文档永远不收敛，收敛因此没有唯一读法。
 7. **图的落点只有一个**（T-005）：`docs/assets/<slug>.<ext>`，源与渲染产物同处，文档用相对引用指向它；与 `flow-obligations` `C-009`、`diagram-obligation` `C-010` 的示例、`data-model.md` E6、`quickstart.md` S3 同源。
 
 ## Technical Context
@@ -81,7 +81,7 @@
 | XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子已显式点名：本特性改框架源（`skills/` `templates/`），`.specify/` 与四家 per-tool 副本由 `sync-mirrors.py` / `regen-command-copies.py` 生成（§ Mirror Obligations 逐行登记）；本仓 `docs/` 内容工作被 § Out of Scope 排除，`quickstart.md` S8 以空 diff 为判据 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 图的产生一律走既有 `draw-diagram`（FR-011、T-004），MUST NOT 另写绘图/渲染代码；检查器复用既有文档引擎 `docs-utils.py` 而非另起脚本（T-002） |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 本特性强化 **Change Validation** 维度：图从「作者记得画」变成「既有验证步骤判得出」，且负面可观测（FR-023）。目标模型引 `shared/guidelines/better-harness.md`，不另立维度或评分 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 义务定义点唯一（Baseline 一条）；检查器取值域唯一（`contracts/diagram-obligation.contract.md`，含 `C-016` 的逐文档优先级）；图的落点唯一（Baseline `#### Assets` + `flow-obligations` `C-009`）；`docs/concepts/documentation-model.md` 只做读者投影；`data-model.md` 与 `quickstart.md` 头部均写明「不复述取值域」。`checklists/requirements.md` 的派生计数副本**不改写、只登记**（`OI-087-01`），处置归 `/speckit.checklist` |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 义务定义点唯一（Baseline 一条）；检查器取值域唯一（`contracts/diagram-obligation.contract.md`，含 `C-016` 的逐文档优先级）；图的落点唯一（`flow-obligations` `C-009`，实施期落脚到本特性**新建**的 Baseline `#### Assets` 小节——该小节当前不在盘，见 `flow-obligations.contract.md` 头部的读法说明）；`docs/concepts/documentation-model.md` 只做读者投影；`data-model.md` 与 `quickstart.md` 头部均写明「不复述取值域」。`checklists/requirements.md` 的派生计数副本**不改写、只登记**（`OI-087-01`），处置归 `/speckit.checklist` |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 新增 finding 的输出面向未参与运行的人：每份文档带路径与闭集理由（FR-016），`C-005` 给每个 reason 一句自然语言含义；`C-013` 的 `clean` 是显式结论而不是空输出。基准读者取自 `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议，不另定义 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 「主体坏了检查仍绿」被明确定义为**未验证而非通过**（FR-023 / `C-013` 的 `carriers == 0 ⇒ clean=false`）；`exemption_superseded` 把「豁免理由已失效」作为可见事实报出（FR-004）；本阶段的两处纠正（`reference/ 64` 的载体普查订正、`orphan-*` 两值的面序订正）已在 § Decision Tensions 与 `quickstart.md` 就地披露 |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | 不新建顶层目录；两个新子目录（`docs/.speckit/runs/`、`docs/.speckit/exemptions/`）的含义在本特性契约 `C-010`/`C-011` 处登记，且**不是**新的顶层或新的目录族——`docs/.speckit/` 已是基线登记的机器目录；`docs/assets/` 已存在（本阶段 `find` 实测）。`test_directory_governance.py` 保持通过（`C-014`，基线 21 passed） |
@@ -156,7 +156,7 @@ Every record is carried by a level-3 sub-section whose heading begins with `T-NN
 
 ### T-005 — 图的落点：全局 `assets/` 约定，不按类型目录分叉
 
-- **decision**: 图的源与渲染产物一律落 `<root>/docs/assets/<slug>.<ext>`（本仓先例 `docs/assets/quickstart-workflow.{puml,svg,png}`），文档以内联或相对引用指向它（`../assets/x.png`）——**一个全局落点，一处约定**，由 `skills/external/create-docs/SKILL.md` § Desired-State Baseline 的 `#### Assets` 条目承载。
+- **decision**: 图的源与渲染产物一律落 `<root>/docs/assets/<slug>.<ext>`（本仓先例 `docs/assets/quickstart-workflow.{puml,svg,png}`），文档以内联或相对引用指向它（`../assets/x.png`）——**一个全局落点，一处约定**，落点本身由 `flow-obligations.contract.md` `C-009` 登记，实施期由本特性在 `skills/external/create-docs/SKILL.md` § Desired-State Baseline 内**新建**的 `#### Assets` 小节承接（该小节当前不在盘；建成后它才是 `assets/` 区域约定的 owner，MUST NOT 在写它之前被当成既有章节）。
 - **antithesis**: 按类型目录分叉——每类正式目录下各建一棵 `diagrams/` 子树（`docs/concepts/diagrams/`、`docs/reference/diagrams/`…）；当图像散文一样需要「就近导出、就近浏览」、且某类目录的图与另一类的图从不同时被读到、需要各自独立的生命周期时它更优——读者不必跳出一个类型目录就能看到该类型的全部图，站点侧也能按 section 分别 mount。
 - **binding_constraints**:
   - pole_a: 图的落点 MUST 只有一个约定，否则同一张图的两个候选家会让「引用解析到哪一份」依赖作者习惯，检查器无法给出稳定 verdict。
@@ -233,7 +233,7 @@ Every record is carried by a level-3 sub-section whose heading begins with `T-NN
 
 ```text
 skills/external/create-docs/
-├── SKILL.md                             # + § Desired-State Baseline 一条义务条目（+ `#### Assets` 的图落点）；+ Reconcile R3/R4/R5/R6 与 Authoring R2,R5,R6 的接线
+├── SKILL.md                             # + § Desired-State Baseline 一条义务条目（并在该节内**新建** `#### Assets` 小节登记图落点，当前不在盘）；+ Reconcile R3/R4/R5/R6 与 Authoring R2,R5,R6 的接线
 └── scripts/docs-utils.py                # + --action obligation（只读判定，见 contracts/diagram-obligation.contract.md C-001…C-016）
 
 skills/external/improve-docs/
@@ -370,7 +370,7 @@ Dependency set: none
 
 | 断言 | 证据等级 | as-of | source |
 |------|----------|-------|--------|
-| 本仓当前的载体集合是 23 份（六类正式目录 22 份 + 根 `ARCHITECTURE.md`） | 实测 | 2026-11-06 | `quickstart.md` S2 的一次性只读扫描（`concepts/ 12 · tutorials/ 2 · tasks/ 1 · reference/ 1 · decisions/ 5 · contribute/ 1` = 22，+1） |
+| 本仓当前的载体集合人口（六类正式目录内 `*.md` 递归计数 + 根 `ARCHITECTURE.md` 是否在盘） | 实测 | 2026-11-06 | `quickstart.md` S2 的普查命令与其逐行输出；**人口数字只在那处存在一份**（宪法 XIV：本行不复制该数字） |
 | 本仓当前只有 1 份文档引用图的两面，且该图**没有**追溯记录（无 `docs/.speckit/runs/`） | 实测 | 2026-11-06 | `quickstart.md` S2 第 1 条 + `ls -d docs/.speckit` 返回「不存在」 |
 | `docs-utils.py` 当前的 `--action` 选择表不含 `obligation`，未知动作以退出码 2 被 `argparse` 拒绝 | 实测 | 2026-11-06 | `quickstart.md` S1 的实际输出（`invalid choice: 'obligation' … exit 2`） |
 | 既有动作 `--action validate` 在本仓报出 3 条违规（`root-entry-oversize` 1 + `note-frontmatter` 2），且先于本特性存在 | 实测 | 2026-11-06 | `quickstart.md` S1 的第二段输出（exit 0 + 3 条 violations） |
@@ -416,32 +416,32 @@ Dependency set: none
 | `C-001` 接口面与封闭参数集 | `U::test_c001_action_registered`（`--action obligation` 出现在 `choices`）；`U::test_c001_option_set_closed`（`--record` / `--only` / `--json` 均被接受，未知选项 exit 2）；`U::test_c001_before_implementation_exit2`（S1 的 argparse 单行，作为**门禁 4 的前态读数**保留） | `--record` 未注册、或选项集出现契约外的第六个开关 |
 | `C-002` 只读 / 确定性 / 幂等 | `I::test_c002_two_runs_identical_json`（S4 的两跑比对 + `git status --porcelain` 为空）；`I::test_c002_no_writes_on_dirty_fixture` | 任一跑写出盘上文件，或两次输出字节不等 |
 | `C-003` 载体集合 | `U::test_c003_carrier_table`（六类目录 + `ARCHITECTURE.md` 入集；保留根文件 / notes / 归档 / 站点工具目录不入集）；`U::test_c003_non_carrier_not_judged`（`in_carrier_set=false` 的文档不出现在 `documents[]`） | 非载体文档进入 `documents[]`，或某类正式目录被整类漏判 |
-| `C-004` 封闭 verdict 集 | `U::test_c004_verdict_domain_closed`（五值之外取值即失败）；`U::test_c004_not_evaluated_breaks_clean` | `not-evaluated` 被算作合格态（`clean=true`） |
+| `C-004` 封闭 verdict 集 | `U::test_c004_verdict_domain_closed`（五值之外取值即失败）；`U::test_c004_not_evaluated_breaks_clean`（判 `not-evaluated` 的文档使 `converged` **与** `clean` 同时为 `false`） | `not-evaluated` 被算作合格态（`converged=true` 或 `clean=true`） |
 | `C-005` verdict↔reason 封闭表 + 失面具名 | `U::test_c005_reason_pairs_closed`（对每个 verdict，reason 只能取表内值）；**`U::test_c005_faces_not_swapped`**（夹具 `orphan-rendered` ⇒ `orphan-rendered`、`orphan-source` ⇒ `orphan-source`，两值互换即红——`SC-002` 的核心）；`U::test_c005_every_entry_named`（每条 `documents[]` 都有 `path` 与 `line`） | 两个失面值被任一实现互换、合并为单值，或某条判定缺 `path` |
 | `C-006` JSON 载荷与字段序 | `U::test_c006_payload_schema`（顶层四键 + `documents[]` 四字段）；`U::test_c006_field_order_stable` | 载荷形状漂移，或同一输入的键序不稳定 |
-| `C-007` 落档只有一处 | `U::test_c007_no_second_precedence_owner`（源码里不存在第二处 `verdict =` 的分支树，判定只能走 `C-016` 的单趟函数） | 出现第二处独立判定实现 |
+| `C-007` `satisfied` 的五条合取 | `U::test_c007_satisfied_requires_all_five`（五条拆成五个独立断言：缺任一条 ⇒ 不是 `satisfied`，而是由 `C-016` 落档）；`U::test_c007_no_record_not_satisfied`（两面齐 + 引用解析 + 无记录 ⇒ `not-evaluated` / `no-trace-record`，**不是** `satisfied`——本条与 `C-012` 同一事实，两条款各挂自己的断言） | 五个合取条件任一被弱化成「或」，或「文件都在」被当成「义务已履行」 |
 | `C-008` `stale` 逐面判据 | **`U::test_c008_source_newer`**（夹具 `stale-source/` ⇒ `stale` / `source-newer-than-render`）；`U::test_c008_render_digest_mismatch`（夹具在 `tmp_path` 副本里改渲染面字节 ⇒ `stale` / `render-digest-mismatch`）；`U::test_c008_requires_both_faces`（只一面时**不得**落到 `stale`） | 单面文档被判 `stale`；`os.utime` 失效后夹具自发变色而断言仍绿 |
 | `C-009` 单一落点 | `U::test_c009_landing_is_docs_assets`（`source` / `rendered[]` 的父目录必须是 `<root>/docs/assets/`）；`U::test_c009_no_second_landing`（不存在 `docs/*/diagrams/` 形式的第二落点——T-005 的反题已被排他） | 图落进 `docs/<类型>/diagrams/` 或项目根下第二个 `assets/` |
 | `C-010` 记录 schema | `U::test_c010_record_schema`（`--record` 文件逐字段校验，含 `engine` / `engine_reason` / `ldm_summary` / `delivery`）；`U::test_c010_relative_to_root`（记录里的路径一律相对项目根，绝对路径即红） | 记录里出现绝对路径，或缺任一必填字段仍被判合格 |
-| `C-011` 豁免记录 | `I::test_c011_exempt_ok`（`exempt-ok/` ⇒ `recorded-exemption` / `exempt-chronological`，`exempted=1`、`clean=false`）；**`I::test_c011_exempt_bad`**（`exempt-bad/` 缺 `justification` ⇒ `not-evaluated` / `exemption-invalid`，**不是** `recorded-exemption`）；`I::test_c011_superseded`（`exempt-superseded/` ⇒ `exemption-invalid` + `summary.exemption_superseded=1`） | 无效豁免被当成有效豁免放行（假绿），或 `exempted>0` 仍 `clean=true` |
-| `C-012` 未记录不得合格 | `I::test_c012_no_record_not_evaluated`（`no-trace/` 不传 `--record` ⇒ `not-evaluated` / `no-trace-record`、`clean=false`）；`I::test_c012_two_faces_resolving_but_unrecorded`（两面齐 + 引用解析 + 无记录仍然不是 `satisfied`） | 「文件都在」被当成「义务已履行」（`SC-002` 的假绿面） |
-| `C-013` 计数与 `clean` | **`U::test_c013_clean_is_four_zeros`**（四计数任一非零 ⇒ `clean=false`；`exempted>0` 与 `carriers==0` 两个假绿面各有独立断言）；`U::test_c013_only_empty_scope`（`--only` 匹配 0 个对象时 `clean` 按公式算得 `true` 而输出带注记）；`U::test_c013_documents_field_set`（`documents[]` 恰四字段） | 四个假绿面任一漏判（`exempted>0`、`carriers==0`、`--only` 空作用域、`not-evaluated` 计作通过） |
+| `C-011` 豁免记录 | `I::test_c011_exempt_ok`（`exempt-ok/` ⇒ `recorded-exemption` / `exempt-chronological`，`exempted=1`、`clean=false`、**`converged=true`**）；**`I::test_c011_exempt_bad`**（`exempt-bad/` 缺 `justification` ⇒ `not-evaluated` / `exemption-invalid`，**不是** `recorded-exemption`）；`I::test_c011_superseded`（`exempt-superseded/` ⇒ `exemption-invalid` + `summary.exemption_superseded=1`） | 无效豁免被当成有效豁免放行（假绿）；或 `exempted>0` 仍 `clean=true`；或 `exempted>0` 把 `converged` 压成 `false`（那会让豁免终态永远不收敛） |
+| `C-012` 未记录不得合格 | `I::test_c012_no_record_not_evaluated`（`no-trace/` 不传 `--record` ⇒ `not-evaluated` / `no-trace-record`、`converged=false`、`clean=false`）；`I::test_c012_two_faces_resolving_but_unrecorded`（两面齐 + 引用解析 + 无记录仍然不是 `satisfied`） | 「文件都在」被当成「义务已履行」（`SC-002` 的假绿面） |
+| `C-013` 计数、`converged` 与 `clean` | **`U::test_c013_clean_is_strict`**（`clean` 的严格面：`missing`/`stale`/`not_evaluated` 任一非零 ⇒ `converged=false` 且 `clean=false`；`exempted>0` ⇒ `clean=false`；`carriers==0` ⇒ `converged=false` 且 `clean=false`）；**`U::test_c013_converged_ignores_exemptions`**（`exempted>0`、其余三档全零 ⇒ `converged=true` 且 `clean=false`——两个谓词的分歧点本体）；`U::test_c013_only_empty_scope`（`--only` 匹配 0 个对象时两个谓词都按公式算得 `true` 而输出带注记）；`U::test_c013_documents_field_set`（`documents[]` 恰四字段，`summary` 含 `converged`） | 四个假绿面任一漏判（`exempted>0`、`carriers==0`、`--only` 空作用域、`not-evaluated` 计作通过）；或 `converged` 被实现成 `clean` 的同义词（带豁免的空间于是永远不收敛） |
 | `C-014` 接线守卫不动 | `A1` / `A3` / `A5`（`test_expression_gate_wiring.py`）、`C3` / `C4a`（`test_docs_command_template.py`）、`KEEP_LIST`（`test_confirmation_gates_sweep.py`）、`test_directory_governance.py`——均为**既有测试**，本特性不改断言只加义务指针 | 任一守卫文件的冻结清单出现未登记变更（`C5` 的哈希比对） |
 | `C-015` 退出码 | `U::test_c015_exit_codes`（`0` = 已判定（含不干净）、`2` = 输入错误：`--root` 不存在 / `--record` 不可读 / 未知选项） | 「不干净」被映射成非 0（会让调用方把判定当故障） |
-| `C-016` 有序优先级 | `U::test_c016_precedence_order`（构造**多档位同时成立**的夹具，断言命中的是最靠前的那一档：`deleted-rendered/` 必须先落 `reference-unresolved` 而非 `orphan-*`）；`U::test_c016_no_backtracking`（单趟、不重复覆盖） | 档位顺序被实现成集合判定（顺序无关）——这是 attempt 1 的 `F-01` 本体 |
+| `C-016` 有序优先级 | `U::test_c016_precedence_order`（构造**多档位同时成立**的夹具，断言命中的是最靠前的那一档：`deleted-rendered/` 必须先落 `reference-unresolved` 而非 `orphan-*`）；`U::test_c016_no_backtracking`（单趟、不重复覆盖——命中后 MUST NOT 被后面的档位二次覆盖）；`U::test_c016_no_second_precedence_owner`（源码里不存在第二处 `verdict =` 的分支树，落档只能走 `C-016` 的单趟函数） | 档位顺序被实现成集合判定（顺序无关）——这是 attempt 1 的 `F-01` 本体；或出现第二处独立判定实现（两处判据各自漂移） |
 
 ### B — `flow-obligations.contract.md`（`C-001`…`C-023`）
 
 | 条款 | 断言 / 夹具 | red-when |
 |------|-------------|----------|
 | `C-001` 第五类工件登记 | `F::test_c001_obligation_artifact_listed`（Desired-State Baseline 的工件清单含配套图义务） | 义务被写成「可选建议」而非工件 |
-| `C-002` Baseline `#### Assets` | `F::test_c002_assets_subsection_present`（`create-docs/SKILL.md` 出现 `#### Assets` 且含 `docs/assets/`） | 落点区域无 owner 章节 |
+| `C-002` Baseline `#### Assets` | `F::test_c002_assets_subsection_present`（`create-docs/SKILL.md` 出现 `#### Assets` 且含 `docs/assets/`——该小节由**实施期新建**，当前不在盘，因此这条断言在实施前**必然红**，这正是它作为「未交付即红」判据的用法） | 实现在盘上仍无 `#### Assets` 小节（落点区域无 owner 章节）；判据 MUST NOT 因其它小节含有 `docs/assets/` 字样而变绿 |
 | `C-003` Reconcile R2 口径 | `F::test_c003_r2_scope_names_obligation` | R2 的文档范围口径漏掉图维度 |
 | `C-004` Reconcile R3 差异含 verdict | `F::test_c004_r3_includes_verdicts`（R3 的 diff 描述含四计数） | R3 只报文本差异 |
 | `C-005` R4 干跑计划含产图行 | `F::test_c005_r4_dry_run_has_produce_rows` | 干跑计划无法预告产图/重渲染 |
 | `C-006` R6 残差报告四计数 | `F::test_c006_r6_residual_four_counts` | 残差只报总数不报分类 |
 | `C-007` `--action obligation` 的调用点 | `F::test_c007_recorded_call_site`（R6 用 `--record <本次运行记录>`） | 调用不带记录 ⇒ 自造 `no-trace-record` |
-| **`C-008a` Reconcile 收敛** | **`I::test_c008a_second_reconcile_zero_findings`**（S9 的四步：首次 R6 有 finding → R5 产图 → 第二次 R6 四计数全零 → `git status` 空） | 第二次运行仍有 finding（「永久 missing」接线），或第二次运行又写盘（churn） |
+| **`C-008a` Reconcile 收敛** | **`I::test_c008a_second_reconcile_zero_findings`**（S9 的四步：首次 R6 有 finding → R5 产图 → 第二次 R6 **`converged=true`**（`missing` / `stale` / `not_evaluated` 三档全零）→ `git status` 空）；**`I::test_c008a_exemption_does_not_block_convergence`**（`exempt-ok/` 形态的夹具：`exempted=1` ⇒ 同一轮 `converged=true` 且 `clean=false`，即「靠豁免收敛」是合法终态） | 断言写成 `clean=true`（带豁免的空间永远变不了绿 ⇒ 收敛判据不可判定），或第二次运行仍有 `missing`/`stale`/`not_evaluated`，或第二次运行又写盘（churn） |
 | `C-009` 单落点（流程侧） | `F::test_c009_single_landing_named`（`create-docs` 的落点文字与 `C-009` 一致，无 `diagrams/` 子树） | 流程文本与契约落点冲突 |
 | `C-010` Authoring Flow 产图点 | `F::test_c010_authoring_flow_produces` | 新建文档时无产图步骤 |
 | `C-011` improve-docs `### 2. Gather evidence` | `F::test_c011_improve_pointer`（锚在真实标题上） | 指针指向不存在的章节 |
@@ -489,7 +489,7 @@ N/A — § Constitution Check 的 19 行全部 `✅ Pass`，无 `❌ Fail`、无
 
 | ID | 未覆盖的面 | 为什么本特性不判 | 承接方 | 重开条件 |
 |----|-----------|------------------|--------|----------|
-| D-001 | 图内标签 / 关系与文档正文所述事实的**语义**一致（`stale` 的第二半，见 T-003） | 检查器只读、无第三方依赖、无图形解析器（research R3/R4）；依赖 LDM 摘要的实现会把「本特性之前产生的手工图」判成假红 | `/speckit.review` 的评审面 + 后续特性（补语义判据时按 T-003 的 `revision_trigger` 重开） | `--action obligation` 的 `no-trace-record` 计数显著下降（LDM 摘要已普遍落盘），或评审面连续两次报出「机械绿但图文语义不一致」 |
+| D-001 | 图内标签 / 关系与文档正文所述事实的**语义**一致（`stale` 的第二半，见 T-003） | 检查器只读、无第三方依赖、无图形解析器（research R3/R4）；依赖 LDM 摘要的实现会把「本特性之前产生的手工图」判成假红 | `/speckit.review` 的评审面 + 后续特性（补语义判据时按 T-003 的 `revision_trigger` 重开） | `--action obligation` 的 `no-trace-record` 计数显著下降（LDM 摘要已普遍落盘），或评审面连续两次报出「机械绿但图文语义不一致」。**读法**：`quickstart.md` S9 的「零 finding」只指 `converged` 的三档全零（`missing`/`stale`/`not_evaluated`），MUST NOT 被读成「图文语义也一致」，也 MUST NOT 被读成 `clean=true`——带豁免的空间 `clean` 恒为假，而 `converged` 仍可为真 |
 
 已登记、但**不是**本特性风险的未决项：`OI-087-01` —— `checklists/requirements.md` 的派生计数副本与「23 FR / 10 SC」的实际计数共存（owner：`/speckit.checklist`；处置归 requirements 收尾；本阶段不改写，见 § Inherited Blockers 的最后一行）。
 
@@ -504,7 +504,7 @@ N/A — § Constitution Check 的 19 行全部 `✅ Pass`，无 `❌ Fail`、无
 | 已带图的载体 | **1**（`docs/tutorials/quickstart.md`），且**无** `docs/.speckit/runs/*-diagram-trace.json` 记录 | 检查器落地后该文档**第一次运行必然**是 `not-evaluated` / `no-trace-record`（`C-012`）——这是**已知红**，不是实现缺陷；`clean=false` 是正确结论 |
 | 该图的交付面 | 只有渲染面、**缺 HTML 面**（`D1` 交付要求三面） | 同上，属 `D-001` 的内容债；本特性只负责把它**如实报出来**，不负责补图 |
 
-⇒ 由此得出一条硬约束：**本特性的验收 MUST NOT 是「`--action obligation --root .` 返回 `clean=true`」**。规划期已经知道本仓不干净（85 个载体里 84 个无图、唯一有图的那份无记录）。验收面只能是**夹具空间**（S3 / S9）与**守卫无新失败**两条，本仓的真实读数只作为「已如实登记」的证据。把本仓读成验收门会把内容工作伪装成实现工作。
+⇒ 由此得出一条硬约束：**本特性的验收 MUST NOT 是「`--action obligation --root .` 返回 `clean=true`」**，也 **MUST NOT** 是「返回 `converged=true`」——规划期已经知道本仓不干净（85 个载体里 84 个无图、唯一有图的那份无记录），两条都是本仓**必然**达不到的判据。验收面只能是**夹具空间**（S3 / S9）与**守卫无新失败**两条，本仓的真实读数只作为「已如实登记」的证据。把本仓读成验收门会把内容工作伪装成实现工作。
 
 ## Phase 1: Design Artifacts Summary
 

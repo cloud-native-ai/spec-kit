@@ -83,10 +83,12 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
   优先级只在同一文档可落多值时才起作用（例如带失效豁免且确实无图 ⇒ 记 `not-evaluated`
   并给 `reason: exemption-invalid`，MUST NOT 记 `missing`——失效的豁免是「判不了」，不是「没有」）。
 - **`recorded-exemption` 不是 pass**：`summary.exempted > 0` 时 `summary.clean` MUST 为 `false`，
-  payload MUST 单独计数（FR-004：「记录的豁免不是 pass」）。
+  payload MUST 单独计数（FR-004：「记录的豁免不是 pass」）。**它不阻断 `summary.converged`**：豁免是合法终态，
+  而 `converged` 只问「还有没有待收敛的 `missing` / `stale` / `not-evaluated`」（两谓词的定义点见 `C-013`；
+  收敛判据 MUST 用 `converged`，MUST NOT 用 `clean`）。
 - 闭集性质：payload 里出现第六种值即契约违规，MUST 由 `tests/unit/test_docs_utils_obligation.py`
   对一组夹具逐值断言（含负向夹具）；断言形态见 `C-016` 与 `plan.md` § Test Plan 的 clause→test 表。
-- `not-evaluated` **不是合格态**：它与 `missing` / `stale` 一样使 `clean` 为 `false`（`C-013`）。
+- `not-evaluated` **不是合格态**：它与 `missing` / `stale` 一样使 `clean` 与 `converged` **同时**为 `false`（`C-013`）。
 
 ## C-005 — 封闭 `reason` 集（RS-006 的另一半，FR-016）
 
@@ -213,8 +215,9 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 - **路径一律相对 `<root>`**（与 `C-005` 的 `path` 同口径），因此 `source` / `rendered[].path` 与文档里的
   相对引用可以按同一基准比对。
 - **图的落点归 Baseline（T-005）**：本示例里的 `docs/assets/` 取自 `skills/external/create-docs/SKILL.md`
-  § Desired-State Baseline 的 `assets/` 区域约定（该技能 `#### Assets` 条目），本契约只借它作示例、
-  MUST NOT 成为第二个落点 owner。
+  § Desired-State Baseline 内**由本特性新建**的 `#### Assets` 小节（该小节当前不在盘，尚待实施期落笔——
+  它是**新建**的区域约定条目，MUST NOT 被读作既有的 owner 章节）；在此之前，「图的落点」的唯一登记处是
+  `flow-obligations.contract.md` `C-009`。本契约只借它作示例、MUST NOT 成为第二个落点 owner。
 - 字段**含义**归 `draw-diagram`：`engine` 取自其 `references/routing-matrix.md` 的六引擎层名；
   `ldm_summary` 是 `references/semantic-model.md` 的 Schema 摘要；`delivery` 是
   `references/delivery-contract.md` § D6 自检表的结论。本契约只登记**字段名与必填性**，MUST NOT 复述那三份 owner 的判据。
@@ -258,7 +261,7 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 归产生方运行，不归检查器。
 
 **这一项也就此定死「刚生成、尚未入记录」的图**：两面在、引用解析、却没有一条记录点到它 ⇒ `no-trace-record`
-⇒ `clean: false`，直到产生方运行**同一次**写出记录为止（`flow-obligations.contract.md` `C-003`）。
+⇒ `converged: false` 且 `clean: false`，直到产生方运行**同一次**写出记录为止（`flow-obligations.contract.md` `C-003`）。
 把 `not-evaluated` 读成「暂不追究」是本契约明确禁止的读法（`C-013`）。
 
 ## C-013 — Payload 形态
@@ -274,17 +277,26 @@ justification: "按时间排序的发布流水，没有可绘的结构"
   ],
   "summary": {
     "satisfied": 1, "missing": 0, "stale": 0, "exempted": 0, "not_evaluated": 0,
-    "clean": false, "exemption_superseded": 0
+    "converged": true, "clean": true, "exemption_superseded": 0
   }
 }
 ```
 
-- `summary.clean` 为 `true` **当且仅当** `missing == 0 && stale == 0 && not_evaluated == 0 && exempted == 0`。
-  干净空间因此是「零 finding 的显式结论」，不是「空输出」（FR-016）；有豁免的空间 MUST NOT 报 `clean`
-  （豁免可见，不等于通过）。
-- 空载体集合（`carriers == 0`）MUST 报 `clean: false` + `documents: []`：一个没有正式文档的空间
-  不是「合规」，是「判据没有对象」。这条防的是 `FR-016` 允许的假绿。**这条只对 `--only` 缺省时成立**：
-  `--only` 缩小后剩下的 0 个对象是**调用方的选择**，`clean` 按上式对 0 个条目算得 `true`（没有东西不干净），
+- **两个谓词，两个问题（本条是它们的唯一定义点）**：
+  - `summary.converged` 为 `true` **当且仅当** `missing == 0 && stale == 0 && not_evaluated == 0`。
+    它回答「还有没有待收敛的 finding」；**豁免不在它的算式里**——豁免是 `FR-004` 的合法终态，
+    它不产生待收敛项。
+  - `summary.clean` 为 `true` **当且仅当** `converged == true && exempted == 0`（等价于
+    `missing == 0 && stale == 0 && not_evaluated == 0 && exempted == 0`）。它回答「这个空间是不是零 finding
+    的显式结论」，因此**严格**：有豁免的空间 MUST NOT 报 `clean`（豁免可见，不等于通过，`FR-004`）。
+  - ⇒ `exempted > 0 ⇒ clean = false`（硬约束，不变）；`exempted > 0` 与 `converged` **无关**，
+    所以「一个具体文档无结构可绘、已具名豁免」的收敛终态是 **`converged=true` + `clean=false`**，这是合法结果，
+    不是矛盾（`SC-008`）。**「零图 finding」这句话指 `converged`，不是 `clean`。**
+  - 两个字段**同时在场**（字段集固定，`C-006`）：只给 `clean` 会让带豁免的空间无法表达「已收敛」。
+- 空载体集合（`carriers == 0`）MUST 报 `converged: false` + `clean: false` + `documents: []`：一个没有正式文档的空间
+  不是「合规」，是「判据没有对象」，因此两个谓词在这里**都**取假——这是上面主算式的唯一例外，防的是
+  `FR-016` 允许的「零 finding」被一个空判定集合冒充。**本条只对 `--only` 缺省时成立**：
+  `--only` 缩小后剩下的 0 个对象是**调用方的选择**，`converged` 与 `clean` 按上式对 0 个条目算得 `true`（没有东西不干净），
   调用方 MUST NOT 把这一次「空 `--only`」读成「空间合规」——`--only` 的判定面只有它点名的那些文档。
 - `--only` 只缩小被检对象集合，不改变任何判据；`summary` 只统计被检对象。
 - `documents[]` 的字段集固定为 `path` / `line` / `verdict` / `reason` 四个（`C-006` 规则 1 的

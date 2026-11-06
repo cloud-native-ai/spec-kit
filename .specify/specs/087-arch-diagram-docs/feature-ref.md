@@ -19,7 +19,7 @@
 | # | Surface | Change |
 |---|---------|--------|
 | 1 | `skills/external/create-docs/scripts/docs-utils.py` | 新增只读动作 `obligation`（`C-001`…`C-016`） |
-| 2 | `skills/external/create-docs/SKILL.md` § Desired-State Baseline（含新增 `#### Assets` 小节） | 配套图义务的基线条目（义务的定义点）+ **图的落点区域**（T-005，`docs/assets/`） |
+| 2 | `skills/external/create-docs/SKILL.md` § Desired-State Baseline（并在**该节内新建** `#### Assets` 小节，当前不在盘） | 配套图义务的基线条目（义务的定义点）+ **图的落点区域**（T-005，`docs/assets/`） |
 | 3 | 同上 § Reconcile Loop R3/R4/R5/R6 · § Authoring Flow R2/R5/R6 | 图作为交付物、两面具名报告、检查器并列执行；**R5 内的产图/重渲染闭环**（`C-008a`） |
 | 4 | `skills/external/improve-docs/SKILL.md` § Workflow | 命名分类行 + 最小编辑规则（不改图时明说） |
 | 5 | `templates/commands/docs.md` § Outline | 义务指针（新增小节，W1 接线小节原样保留） |
@@ -46,10 +46,10 @@
 |----|------|--------------------|
 | SC-001 | final | `clean/` 夹具的四件产物 + `--action obligation` 报 `satisfied` |
 | SC-002 | final | 失面逐面**具名**且**不互换**：`orphan-rendered` / `orphan-source` / `reference-unresolved` 三段独立夹具（`quickstart.md` S3 的 premises 表 + `U::test_c005_faces_not_swapped`） |
-| SC-003 | final | reconcile 两次运行（`quickstart.md` S9 + `I::test_c008a_second_reconcile_zero_findings`）：首次逐文档报 `missing`，R5 按 `C-008a` 产图后**第二次运行四计数全零**且 `git status` 无 cosmetic 变化 |
+| SC-003 | final | reconcile 两次运行（`quickstart.md` S9 + `I::test_c008a_second_reconcile_zero_findings`）：首次逐文档报 `missing`，R5 按 `C-008a` 产图后**第二次运行 `converged=true`**（`missing`/`stale`/`not_evaluated` 三档全零）且 `git status` 无 cosmetic 变化。**「零图 finding」判的是 `converged`，不是 `clean`**（两谓词定义点 `diagram-obligation.contract.md` `C-013`）：带有效豁免的文档是 `FR-004` 的合法终态，其 `converged=true` + `clean=false` 同样满足本条（`I::test_c008a_exemption_does_not_block_convergence`） |
 | SC-004 | final | 改名夹具：文档与图一致或留下具名 `stale`；文档与图源字节前后比较 |
 | SC-005 | final | `skills/` `templates/` `shared/` `scripts/` 的引擎名 / 路由表搜索命令与输出 |
-| SC-006 | final | `cmp a.json b.json`（S4）+ 干净空间 `clean=true` + `not-evaluated` 夹具 |
+| SC-006 | final | `cmp a.json b.json`（S4）+ 干净空间 `clean=true`（该夹具无豁免，故 `converged=true` 与 `clean=true` 同时成立）+ `not-evaluated` 夹具（`converged=false`、`clean=false`） |
 | SC-007 | supporting | 追溯记录的四个必填面（`C-010`）；缺一即 `trace-incomplete` |
 | SC-008 | supporting | `exempt-ok` / `exempt-superseded` 两段夹具的 verdict 与计数（S5） |
 | SC-009 | supporting | `test_protected_gate_preserved` 16 项 + 分区定义前后对读 |

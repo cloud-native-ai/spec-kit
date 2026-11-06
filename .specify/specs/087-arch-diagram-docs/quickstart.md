@@ -122,10 +122,10 @@ exit 0
 
 | 夹具 | 前置状态（仓库内的形态） | `--record` | 期望 `verdict` / `reason` |
 |------|--------------------------|-----------|---------------------------|
-| `clean/` | 两面齐 + 引用解析到 `foo.png` + 本夹具记录齐备 | `tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json` | `satisfied` / `reference-resolves`；`summary.clean=true`；exit 0 |
-| `orphan-rendered/` | **删除前绿灯**的前态记录在案（`clean/` 同构）；渲染产物已删、源在、**引用指向源** | 本夹具记录 | `missing` / `orphan-rendered`；`clean=false`；exit 0 |
-| `orphan-source/` | 源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`；`clean=false`；exit 0 |
-| `stale-source/` | **两面都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`；`clean=false`；exit 0 |
+| `clean/` | 两面齐 + 引用解析到 `foo.png` + 本夹具记录齐备（**无豁免记录**） | `tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json` | `satisfied` / `reference-resolves`；`summary.converged=true`、`summary.clean=true`（`exempted=0`，故两谓词同时成立）；exit 0 |
+| `orphan-rendered/` | **删除前绿灯**的前态记录在案（`clean/` 同构）；渲染产物已删、源在、**引用指向源** | 本夹具记录 | `missing` / `orphan-rendered`；`converged=false`、`clean=false`；exit 0 |
+| `orphan-source/` | 源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`；`converged=false`、`clean=false`；exit 0 |
+| `stale-source/` | **两面都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`；`converged=false`、`clean=false`；exit 0 |
 
 **夹具 ID 形态**：追溯记录文件名 `<UTC ISO basic>-<8 hex>-diagram-trace.json`（例
 `20261106T000000Z-aaaaaaaa-diagram-trace.json`）；计数形态：每个夹具恰 **1** 份载体文档、**1** 张图（两面以上）。
@@ -142,23 +142,23 @@ exit 0
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/clean \
   --record tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
-# 预期：verdict = satisfied / reference-resolves ; summary.clean = true ; exit 0
+# 预期：verdict = satisfied / reference-resolves ; summary.converged = true ; summary.clean = true ; exit 0
 
 # 2) 失面（未删除前为绿灯，删除后必须转红）：渲染产物缺、源在、引用指向源
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/orphan-rendered \
   --record tests/fixtures/docs-obligation/orphan-rendered/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
-# 预期：verdict = missing / reason = orphan-rendered（源在、渲染面缺）; summary.clean = false ; exit 0
+# 预期：verdict = missing / reason = orphan-rendered（源在、渲染面缺）; summary.converged = false ; summary.clean = false ; exit 0
 
 # 3) 面序对照：两面都在、只是源更新 ⇒ stale（不是 missing）
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/stale-source \
   --record tests/fixtures/docs-obligation/stale-source/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
-# 预期：verdict = stale / reason = source-newer-than-render ; summary.clean = false ; exit 0
+# 预期：verdict = stale / reason = source-newer-than-render ; summary.converged = false ; summary.clean = false ; exit 0
 ```
 
 - **退出码恒为 0**（`C-001`）：红绿在 payload 里，不在退出码里；`FR-023` 的「验证必须变红」判在
-  `summary.clean` 与 `documents[].verdict` 上，MUST NOT 判在退出码上。
+  `summary.converged` / `summary.clean` 与 `documents[].verdict` 上，MUST NOT 判在退出码上。
 - **`orphan-rendered` 与 `orphan-source` 是两个值**（`C-005`）：`SC-002` 要求「点名缺失的那一面」，
   一个值同时表示两面就使该判据不可判。
 - **判据的绿灯前态**：仓库里的夹具本身**永远是删除前的绿灯态**；「删一个面」发生在 `tmp_path` 的副本上
@@ -187,18 +187,22 @@ git status --porcelain tests/fixtures/docs-obligation/clean    # 预期：空（
 
 ```bash
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root tests/fixtures/docs-obligation/exempt-ok --json
-# 预期：verdict = recorded-exemption / reason = exempt-chronological ; summary.exempted = 1 ; summary.clean = false
+# 预期：verdict = recorded-exemption / reason = exempt-chronological ; summary.exempted = 1
+#       summary.converged = true（豁免是合法终态，不参与收敛算式）; summary.clean = false（exempted>0）
 
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root tests/fixtures/docs-obligation/exempt-bad --json
-# 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.not_evaluated = 1
+# 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.not_evaluated = 1 ; summary.converged = false
 
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/exempt-superseded \
   --record tests/fixtures/docs-obligation/exempt-superseded/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
-# 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.exemption_superseded = 1
+# 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.exemption_superseded = 1 ; summary.converged = false
 ```
 
 `summary.exempted > 0 ⇒ clean=false` 是 `C-013` 的硬约束：**豁免可见，不等于通过**。
+同一条款同时规定 `exempted` **不参与** `converged`——因此 `exempt-ok/` 的读数是
+**`converged=true` + `clean=false`**，这不是矛盾，而是「已收敛但仍不干净」这个真实状态的唯一写法
+（`SC-008`；收敛判据的用法见 `C-008a` R6）。
 
 ## S6 — 流程侧的接线验证（`FR-005`~`FR-010`、`FR-017`）
 
@@ -212,7 +216,7 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
 | `create-docs` 新建文档 | Authoring Flow R5 产出图两面、R6 报两面具名 | `pytest tests/contract/test_expression_gate_wiring.py -q` |
 | `create-docs` 全量 reconcile 收敛 | Reconcile R3/R4/R5 产图条目 + R6 图维度残差（`flow-obligations` C-008a） | `pytest tests/unit/test_docs_utils_obligation.py -q -k reconcile` |
 | `improve-docs` 改名改图 | 图的引擎与源不变（`FR-010`）；无须动图时明说「no diagram work」 | `pytest tests/contract/test_docs_command_template.py -q` |
-| `docs.md` 分派 | W1 接线小节未动、`stop-and-confirm` 仍字面存在、`improve-docs` 指针仍在 | `pytest tests/contract/test_confirmation_gates_sweep.py -q -k test_protected_gate_preserved` |
+| `docs.md` 分派 | W1 接线小节未动、`stop-and-confirm` 仍字面存在、`improve-docs` 指针仍在 | `pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q`（**逐实例 node id**，不是 `-k test_protected_gate_preserved`） |
 | 读者面 | `documentation-model.md` 仍在目录治理清单内 | `pytest tests/contract/test_directory_governance.py -q` |
 
 计划期实测基线（2026-11-06，`/tmp/087-toolenv/bin/python -m pytest …`，逐条即第 5 步 gate 4 的读数）：
@@ -237,6 +241,22 @@ tests/contract（全量，research R6）                          -> 6038 passed
 > 下文的三条单文件读数加起来是 21 + 11 + 3 = 35，正是第二条命令的例数。
 
 ⇒ 判据是**相对基线无新失败**；写成「全绿」在本仓当前状态下不可达，写下来就是一条没人量过的判据。
+
+**`test_protected_gate_preserved` 是 16 个参数化实例，不是一条断言**：`KEEP_LIST`（该测试文件）里只有
+`("templates/commands/docs.md", "stop-and-confirm")` 这一对属于 `docs.md` 的 `stop-and-confirm` 守卫，
+其余 15 对分别钉别的受保护门。因此**宽选择器 `-k test_protected_gate_preserved` 是错的判据形态**：
+它会在那 15 个无关守卫上变绿，而 `docs.md` 的那一条早已被删除——一条会因无关对象变绿的门等于没有门。
+收窄到具体实例可以做到（`-k` 表达式做不到「按参数取值」这一粒度，node id 可以）：
+
+```text
+/tmp/087-toolenv/bin/python -m pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q
+  -> 1 passed, 1 warning in 0.06s                     （2026-11-06 实测，本阶段复跑）
+/tmp/087-toolenv/bin/python -m pytest tests/contract/test_confirmation_gates_sweep.py -q -k test_protected_gate_preserved
+  -> 16 passed, 30 deselected                          （同一文件；这 16 例是**更宽的守卫**，不构成 docs.md 的判据）
+```
+
+⇒ 读法：`docs.md` 的 `stop-and-confirm` 判据只认第一条（`1 passed`，且 `1` 就是全部被选中的实例数）。
+第二条的 `16 passed` 登记在此是为了**说明它不是本行的判据**，不是为了给它算读数。
 
 ## S7 — 镜像与生成副本（`plan.md` § Mirror Obligations）
 
@@ -291,13 +311,18 @@ git diff --name-only 24cb4edc...HEAD -- docs/
 **premises**: reconcile 的收敛路径由 `contracts/flow-obligations.contract.md` `C-008a` 登记（R3 差异 → R4 计划 →
 R5 产图 → R6 图维度残差）；本条的断言落在**夹具空间**（不是本仓 `docs/`），因为把本仓 85 份载体文档补图属内容工作（A6）。
 「reconcile」在可执行层面就是它的四条命令序列——`plan` 不新增命令，也不假装存在一个 `--action reconcile`。
+**收敛判据是 `converged`，不是 `clean`**（两个谓词的定义点：`diagram-obligation.contract.md` `C-013`；
+收敛判据的用法：`C-008a` R6）：`converged = missing==0 && stale==0 && not_evaluated==0`（豁免不参与），
+`clean` 更严格（`exempted>0 ⇒ clean=false`）。
 
 | 步 | 命令（`--root` 指向夹具空间的 `tmp_path` 副本） | 期望 |
 |----|--------------------------------------------------|------|
-| 首次 R6 | `docs-utils.py --action obligation --root <fixture>` | 每份无图文档一条 `missing` / `no-diagram-reference`；`clean=false` |
+| 首次 R6 | `docs-utils.py --action obligation --root <fixture>` | 每份无图文档一条 `missing` / `no-diagram-reference`；`converged=false`、`clean=false` |
 | R5 产图 | 按 `C-008a` 调 `draw-diagram` 前门产出两面 + 引用 + 同轮记录（夹具里由测试替身写出与 `clean/` 同构的记录与文件） | 该文档 verdict 变 `satisfied` |
-| 二次 R6 | 同第一条命令 | `missing/stale/not_evaluated/exempted` 四计数全零、`clean=true` |
+| 二次 R6（全产图） | 同第一条命令 | `missing` / `stale` / `not_evaluated` 三档全零 ⇒ **`converged=true`**；`exempted=0` ⇒ `clean=true` |
+| 二次 R6（含豁免夹具 `exempt-ok/`） | 同第一条命令，`--root` 指向带一份有效豁免记录的夹具 | `missing` / `stale` / `not_evaluated` 三档全零 ⇒ **`converged=true`**，而 `exempted=1` ⇒ **`clean=false`**——**这是合法终态**（`FR-004` / `SC-008`：无结构可绘的具名豁免即「已收敛」），MUST NOT 被判成未收敛 |
 | 反 churn | `git status --porcelain <fixture>` | 空（第二次运行零写，`C-002`） |
 
 **判据的可达性说明**：`D-001`（图文语义面）**不在这条回路的收敛目标内**——它由评审面承接，
-因此 S9 的「零 finding」只指四计数，MUST NOT 被读成「图文语义也一致」。这一条写在 `D-001` 的登记行里。
+因此 S9 的「零 finding」只指 `converged` 的三档全零，MUST NOT 被读成「图文语义也一致」，也 MUST NOT 被读成
+`clean=true`（带豁免的空间 `clean` 恒为假）。这两句同样写在 `D-001` 的登记行里。
