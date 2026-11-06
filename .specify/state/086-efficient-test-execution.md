@@ -7,11 +7,19 @@ slice: 086
 stage: implement
 stage_started_at: 1793942160
 stage_deadline_epoch: 1793952960
-stage_base_commit: 9496090b
+stage_base_commit: f3279c6e
 attempt: 0
 retry_limit: 3
-last_verdict: repair pass pass (commit 9496090b; C-01 fixed 33/33; H-01..H-05 fixed; gates pass); T050 pre-change serial baseline running; WP-A/WP-B implement dispatch after T050
+last_verdict: T050 baseline complete (7475 passed / 19 failed / 7 skipped / 687.41s / rc=1; names 19); first wave A1+B1 dispatch next (effective 3); T047/T014/T016/T044 budget planned
 <!-- loop-state:end -->
+
+<!-- test-budget:begin -->
+{"seq": 1, "slot": "baseline", "stage": "implement", "purpose": "T050 pre-change serial baseline", "trigger": "implement start before first source edit", "at": "2026-11-06T05:18Z", "command": "env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q", "selection_basis": "full-suite", "rc": 1, "passed": 7475, "failed": 19, "skipped": 7, "failed_names_path": ".specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt", "evidence_ptr": ".specify/specs/086-efficient-test-execution/test-evidence/baseline.txt"}
+{"seq": 2, "slot": "closure", "stage": "review", "purpose": "T047 final closure", "trigger": "post-review closure", "at": "pending", "command": "env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt -q", "selection_basis": "full-suite", "rc": null, "passed": null, "failed": null, "skipped": null, "failed_names_path": ".specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt", "evidence_ptr": "pending"}
+{"seq": 3, "slot": "out-of-slot-exception", "stage": "implement", "purpose": "T014 parallel-safety measurement against T050", "trigger": "after the runner change", "at": "pending", "command": "env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/us1-parallel.txt -q", "selection_basis": "full-suite", "rc": null, "passed": null, "failed": null, "skipped": null, "failed_names_path": ".specify/.tmp/086/us1-parallel.txt", "evidence_ptr": "pending"}
+{"seq": 4, "slot": "out-of-slot-exception", "stage": "implement", "purpose": "T016 scheduling representative pair", "trigger": "A13 experiment", "at": "pending", "command": "env -u PYTHONPATH bash scripts/bash/run-tests.sh -n auto ... / --workers 8 --dist loadfile ...", "selection_basis": "full-suite", "rc": null, "passed": null, "failed": null, "skipped": null, "failed_names_path": ".specify/.tmp/086/scheduling-*.txt", "evidence_ptr": "pending"}
+{"seq": 5, "slot": "out-of-slot-exception", "stage": "implement", "purpose": "T044 worktree-clean bracket reuses T047", "trigger": "bracket T047", "at": "pending", "command": "reuses T047; no separate full-suite run", "selection_basis": "full-suite", "rc": null, "passed": null, "failed": null, "skipped": null, "failed_names_path": ".specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt", "evidence_ptr": "pending"}
+<!-- test-budget:end -->
 
 - line_id: `086-efficient-test-execution`
 - run_id: `r20261106T033959Z-086a`
@@ -51,7 +59,7 @@ last_verdict: repair pass pass (commit 9496090b; C-01 fixed 33/33; H-01..H-05 fi
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
 - **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
 - **085 live status exception（T041）**：只允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 的 SC-010 status 行；由 FR-030/A12/A17 授权（live reference），不得扩散到 085 的 goal/team/checkpoints/contracts/history。最终验证须证明只改了 SC-010 行。
-- **并发度（085）**：`agent_concurrency_requested: 24`；team `agent_concurrency_effective: 18`（verifier reserve 5 / executor slots 13；host capacity `host-capacity-undeclared`）；per-stage effective 2（requirements/clarify/plan/tasks/checklist/analyze），implement planned **10**（7 ready work packages WP-A1…A4 + WP-B1…B3 + 3 verifier reserve；team cap 18 not binding）；任何降级具名。
+- **并发度（085）**：`agent_concurrency_requested: 24`；team `agent_concurrency_effective: 18`（verifier reserve 5 / executor slots 13；host capacity `host-capacity-undeclared`）；per-stage effective 2（requirements/clarify/plan/tasks/checklist/analyze），implement first wave **A1+B1**（2 executors + 1 verifier reserve = effective 3；team cap 18 not binding），后续 A2/A3, B2, A4, B3, C1, C2 按 plan 合并序；任何降级具名。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
 - **保留义务**：不删除、不禁止、不绕过、不重写 085 的 goal/team/checkpoints/contracts 与历史记录；086 改动必须 additive；086 落地后重跑 085 的 contract/integration 测试；085 SC-010 只有在取得完整 dogfood 证据后才可 pass，否则保持 partial 并写明缺口。
@@ -181,10 +189,19 @@ last_verdict: repair pass pass (commit 9496090b; C-01 fixed 33/33; H-01..H-05 fi
 - C-01 fixed: `account-clause-coverage.py` **status ok / FR 33/33 / clause 52**；H-01 fixed: FR-027 narrow carve-out + C-041/GATE-5/M-16/team/WP-C2/R-8/T041 aligned, fabricated `CLOSURE.md` citation removed；H-04 fixed: T050 pre-change baseline；H-05: T054 budget + T050/T047 + out-of-slot T014/T016/T044；H-02: `env -u PYTHONPATH` + A20；H-03: 19 mutation-leg carriers；M-01…M-13/L-01…L-05 fixed。
 - independent gates: `validate-requirements` 0/0；`validate-tasks` 0/0；`pre-analyze` requirements/plan/tasks pass errors=0 advisories=39（future deliverables）；`decomposition --mode tasks` proceed 33 FR / 56 tasks ≤ 60/80。
 - gate-scan actual: **total 34 / keep_gate 27 / violations 0**；pre-existing drift (frozen 23 / plan-stage 27) disclosed；feature adds zero hits (GATE-7).
-- concurrency: requested 24; team effective 18; per-stage 2; implement planned 10 (7 work packages + 3 verifier reserve).
+- concurrency: requested 24; team effective 18; per-stage 2; implement first wave A1+B1 (2 executors + 1 verifier reserve = effective 3); later waves per plan merge order.
 - T050 baseline: pending; command `env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out …/test-evidence/baseline-failed.txt -q` (pre-change runner is serial by default; `--serial` after the runner change is equivalent).
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/07-implement-preflight.md`。
 - next: T050 baseline → WP-A1…A4 + WP-B1…B3 parallel implement (085 team worktrees/integration queue) → WP-C after.
+
+## Implement baseline — T050（2026-11-06T05:29Z）
+
+- command: `env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q`（pre-change runner default serial; run on `f3279c6e`）。
+- result: **7475 passed / 19 failed / 7 skipped / 687.41s（0:11:27）/ rc=1**；names 19；`baseline.txt` / `baseline-failed.txt`。
+- env: Python 3.14.6 / pytest 9.2.0 / xdist 3.8.0 / 18 CPU / arm64；PYTHONPATH cleared（host value logged in baseline.txt）。
+- worktree: only the two baseline evidence files; no source edit before this run; 085 diff empty。
+- first wave: **A1+B1**（2 executors + 1 verifier reserve = effective 3）；后续 A2/A3, B2, A4, B3, C1, C2 按 plan 合并序；T047 closure；T014/T016/T044 out-of-slot（fence 已写）。
+- next: 从 T050 evidence commit 创建 A1/B1 child lines/worktrees，并发派发两个 `sdd-implement-executor`；记录 actual concurrency 2 供 085 SC-010。
 
 ## U0.5 自检
 
