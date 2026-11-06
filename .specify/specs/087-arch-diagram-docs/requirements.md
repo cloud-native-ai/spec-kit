@@ -176,6 +176,20 @@ A maintainer wants a mechanical answer to "which documents still lack a diagram,
 - **Diagram traceability record**: produced per diagram-generating run — selected engine layer plus selection reason, semantic-model summary, delivery-contract acceptance outcome.
 - **Diagram-bearing root entry**: the existing one-screen root signpost whose fixed semantics already summarize the architecture; it points at diagram material rather than duplicating it.
 
+### Runtime Stack & Dependency Ownership
+
+本特性交付的运行时能力是下表的 `in-scope` 三行：义务如何被判定与如何被改（`reason` 枚举 + 复核流程）、检查器动作、以及承载本文义务的文档空间。其余四项由外部供给、本仓只消费，按 `signed-contract` 记——其中 `draw-diagram` 的两行是本特性最实质的依赖：读法正确性与交付契约（源 + 渲染产物两面）是 FR-005 / FR-008 / FR-013 的前提。该表是 SC-001、SC-002、SC-004、SC-005、SC-006 的运行时前提；本阶段无 `user-waived` 行。
+
+| ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
+|----|------------|------|-------|-----|----------|------------------|-----|----------|
+| RS-001 | Python 3 解释器（运行检查器、引擎动作与守卫测试） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不新增 pin；新增脚本 stdlib-only） | `pyproject.toml` | 新增与改动的测试在 `>=3.8` 解释器上通过；新增脚本无第三方 import | FR-019 | EP-001 |
+| RS-002 | pytest（守卫测试运行器） | signed-contract | pytest 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 原文记录进 test-evidence | `scripts/bash/run-tests.sh` | 基线差集为空，且 FR-023 的负向夹具在同一 pin 上全绿 | FR-023 | EP-001 |
+| RS-003 | `draw-diagram` 技能前门（LDM 语义模型、路由、交付契约、验收与拒绝语义）——本特性只消费，不新建引擎 | signed-contract | `skills/external/draw-diagram/SKILL.md` | 同一提交（框架源与 `.specify/` 镜像同一次生成；本特性 MUST NOT 改动该技能） | `skills/external/draw-diagram/SKILL.md` | 每个产出图都带 FR-013 的记录（引擎层 + 选择理由 + LDM 摘要 + 交付契约验收结论），且仓内搜索找不到本特性引入的第二引擎或第二交付契约 | FR-011, FR-012, FR-013 | EP-001 |
+| RS-004 | 共享渲染后端可用性 preflight 与自部署回退（六引擎共用的 `xuanji-render` 服务，环境特定） | signed-contract | `skills/external/draw-diagram/SKILL.md` § Step 2.5（前门统一持有） | 无声明 pin；执行时把 `healthz` preflight 的原文读数记录进 test-evidence | `skills/external/draw-diagram/references/self-deploy-render-service.md` | 后端不可达的夹具上，文档流程报出该技能既有的响亮失败，MUST NOT 出现静默跳过或本地即兴渲染（FR-012 / SC-002）；后端可达的夹具上图正常产出（SC-001） | FR-012, FR-005 | EP-001 |
+| RS-005 | `create-docs` 与 `improve-docs` 两个写入技能及其验证步骤（本特性在其上追加配套图义务） | in-scope | 本仓 `skills/external/create-docs/SKILL.md` § Desired-State Baseline 与其 Authoring Flow、`skills/external/improve-docs/SKILL.md` § Workflow | 同一提交 | `skills/external/create-docs/SKILL.md` | SC-001（新建文档四件产物齐备且验证报 present）与 SC-004（改名后文档与图一致或留下具名 staleness finding） | FR-001, FR-006, FR-007, FR-008, FR-017 | EP-001 |
+| RS-006 | 检查器的理由词表：FR-016 的封闭 finding 集合，以及 FR-004 具名豁免的 `reason` 枚举 | in-scope | 本特性 plan 阶段确定的检查器接口（取值域 owner 在 plan 冻结；FR-016 拥有「封闭」这一性质） | 同一提交 | `skills/external/create-docs/SKILL.md` | SC-006（两次运行同 verdict、每份受影响文档按路径给出集合内的理由、干净空间零 finding、不可评估文档报 not evaluated）与 SC-008（豁免可见且失效可报） | FR-014, FR-015, FR-016, FR-004 | EP-001 |
+| RS-007 | 文档检查引擎的既有动作与验证步骤（被 FR-017 的既有验证步骤触达；形态归 plan，A4） | in-scope | 本仓 `skills/external/create-docs/scripts/docs-utils.py` | 同一提交 | `skills/external/create-docs/scripts/docs-utils.py` | SC-003（reconcile 报出告缺文档、收敛后二次运行零图 finding 且无 cosmetic churn）与 SC-009（只读区、锚区、归档不删除与确认分级可观测地未变） | FR-017, FR-019, FR-020 | EP-001 |
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
