@@ -1,0 +1,146 @@
+# Tasks-stage bounded repair — analyze loop 2, round 3 (final gate repair)
+
+Scope: repair ONLY the four tasks-owned findings of `test-evidence/analyze-report-round2-2026-11-06.md`
+(F-07 tasks half, E-03, F-03, F-04) against baselines requirements `b2c044e0` / plan `3ec54975` / tasks `852e0843`.
+Write territory: `tasks.md` + this stage's evidence. No requirements / plan / data-model / contracts / quickstart /
+research / feature-ref / checklists file touched; `coverage-baseline.txt` untouched (no clause was added or removed,
+so the frozen 573-name baseline is still correct). State spine not written.
+Captured: 2026-11-06T06:10Z (evidence readings recomputed after the `tasks.md` repair)
+
+## 1. Finding -> repair location
+
+F-07 (CRITICAL, tasks half)  `tasks.md:83` T007 now reads "naming **exactly eight** owned facts — the count is the
+      closed set `contracts/reporting-obligations.contract.md` C-01 fixes and `requirements.md` FR-001 enumerates,
+      and this row asserts it by clause id and count rather than re-listing the eight — and the four non-owned owners
+      it points at by path". `tasks.md:87` T008 now reads "(the eight owned facts `contracts/reporting-obligations.
+      contract.md` C-01 owns — the same eight `requirements.md` FR-001 enumerates — plus four named non-owned owners
+      by path)". Rationale of the shape: C-01 and FR-001 are the two definition points the closed set already has;
+      a third verbatim copy of the eight names inside a *task row* would be a new definition point, so T007 asserts
+      the count and reaches the names by clause id. That makes the red-first assertion and C-01 simultaneously
+      satisfiable — the state F-07 recorded as impossible under a hard-coded five. Residual sweep: `grep -n "five
+      owned\|five facts" tasks.md` -> 0 hits (the only other "five" occurrences are § WARNING ADJUDICATION's
+      "partitioned across five documents" and the ordinal "five", neither an owned-fact count). `checklists/…:105`
+      CHK054 and `feature-ref.md` were repaired by other stages / are dated artifacts — not in this stage's territory.
+
+E-03 (MEDIUM)  Clause Coverage Ledger rewritten to be the command's own beyond-baseline set, member for member
+      (19 rows). Removed: `reporting-obligations#C-01` (claimed by T008 `[green: …#C-01]`) and
+      `reporting-obligations#C-04` (claimed by T038 `[green: …#C-04]`). Added: `ownership-map#C-48` (row 1, asserted
+      by T032) and `supervision-report#C-38` (row 19, asserted by T020 + authored by T023). All 19 names now equal
+      the script's `BEYOND-BASELINE:` list exactly (compared line by line). The false "accountant resolves by
+      basename, C-12/C-13 are masked" paragraph is deleted and replaced by a section that states the measured truth:
+      `_claims_for` resolves `spec_dir / claim["contract_file"]` by full path
+      (`scripts/python/account-clause-coverage.py:209-240`), so all 33 tags resolve; the 36/37 round-1 discrepancy is
+      the format-legend line `[green: <contract>#<clause>]` (`tasks.md:48`) counted as text, i.e. 34 raw occurrences
+      vs 33 parsed claims. Two latent collision risks are recorded rather than absorbed: 081's
+      `closure-acceptance-check.contract.md` and 053's `green-point-claim.md` also declare `C-01`, and only the scan
+      order keeps 087's own contract the speaker today.
+
+F-03 (MEDIUM)  Option "re-cut the partition" taken, chosen so the file keeps 33 clauses claimed and 50 rows:
+      T028 keeps no tag of its own. It now asserts the command-entry half of C-41 (already claimed by T009) and
+      carries `[green: contracts/status-digest.contract.md#C-42]` — the digest's state-projection clause, whose
+      judged-by surface is precisely `tests/contract/test_status_digest.py` reading a fixture registry and opening
+      no file for writing (contract C-42 *Judged by* line). C-42 is thus claimed against the row that truly turns it
+      green, and C-41 is not double-claimed. Also folded into the same row: the per-tool copy list is now stated as
+      the set `_ASSISTANT_COMMAND_DIRS` produces (6 configured tools, 4 directories present — the "four existing
+      per-tool copies" wording contradicted the fact that no `speckit.status.*` copy exists yet at authoring time).
+      § WARNING ADJUDICATION's evidence pointer moved from `test-evidence/validator-tasks.txt` (13 warnings, stale)
+      to `test-evidence/tasks-repair-analyze-loop1.txt` (the 11-warning baseline) plus this file (current reading);
+      the three in-paragraph pointers were moved the same way. T043/C-40 is left as the author adjudicated; F-03
+      explicitly accepts it.
+
+F-04 (MEDIUM)  `tasks.md:28` GATE-1 no longer carries a `--deselect` placeholder. It now reads "no `--deselect`: the
+      baseline name-list is exactly the node-id set T002 captures for the progress-reporting suite, and there is no
+      docker or hugo suite in this repository to deselect (plan.md EP-010 states the premise and its measurement)",
+      and the check command is `bash scripts/bash/run-tests.sh -q`. Verified against `plan.md:216` EP-010 and
+      `tasks.md:65` T002.
+
+## 2. Judgement calls recorded (not silent)
+
+1. **"exactly eight" is asserted by count + clause id, not re-enumerated.** A task row is a third definition point
+   if it copies the eight names; constitution XIV forbids that (and F-07 itself was raised against exactly that
+   pattern). T007 therefore pins the count and the owning clause, which is the strongest red-first assertion that is
+   simultaneously satisfiable with C-01. Reported here because the finding's literal wording ("改为八条 … 逐项一致")
+   can also be read as "list the eight again"; that reading would re-create the defect.
+2. **F-03 resolved by re-partitioning, not by dropping a row.** T028 keeps its row (50 total unchanged) and gains
+   C-42, which the ledger previously implied no row turned green. C-41 stays with T009 as the author already had it.
+3. **081/053 `C-01` collision is reported, not repaired.** It is a defect of the accounting tool's name-keying, not
+   of this feature's partition; changing it would be a false claim in the other direction, and the tool is outside
+   this stage's write territory.
+
+## 3. validate-tasks.py .specify/specs/087-speckit-visualization/tasks.md
+=== validate-tasks.py .specify/specs/087-speckit-visualization/tasks.md ===
+WARN  106: green-path-divergence: T012 (line 106) and T021 (line 129) both write tests/contract/test_reporting_obligations.py but claim different green points (['contracts/status-report.contract.md#C-22'] vs ['contracts/supervision-report.contract.md#C-33']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  106: green-path-divergence: T012 (line 106) and T032 (line 169) both write tests/contract/test_reporting_obligations.py but claim different green points (['contracts/status-report.contract.md#C-22'] vs ['contracts/ownership-map.contract.md#C-47']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  108: green-cross-phase: T014 (line 108, `## Phase 3: User Story 1 — A team run reports its overall st`, order 14) claims contracts/reporter-seat.contract.md#C-19 while the later T015 (line 109, `## Phase 3: User Story 1 — A team run reports its overall st`, order 15) claims #C-15 — the clause order runs backwards against the row order, so T014 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  111: green-cross-phase: T017 (line 111, `## Phase 3: User Story 1 — A team run reports its overall st`, order 17) claims contracts/status-report.contract.md#C-29 while the later T018 (line 113, `## Phase 3: User Story 1 — A team run reports its overall st`, order 19) claims #C-26 — the clause order runs backwards against the row order, so T017 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  114: green-cross-phase: T019 (line 114, `## Phase 3: User Story 1 — A team run reports its overall st`, order 20) claims contracts/status-report.contract.md#C-31 while the later T052 (line 135, `## Phase 4: User Story 2 — A supervising master reports the `, order 28) claims #C-27 — the clause order runs backwards against the row order, so T019 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  129: green-path-divergence: T021 (line 129) and T032 (line 169) both write tests/contract/test_reporting_obligations.py but claim different green points (['contracts/supervision-report.contract.md#C-33'] vs ['contracts/ownership-map.contract.md#C-47']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  132: green-cross-phase: T024 (line 132, `## Phase 4: User Story 2 — A supervising master reports the `, order 25) claims contracts/supervision-report.contract.md#C-39 while the later T026 (line 134, `## Phase 4: User Story 2 — A supervising master reports the `, order 27) claims #C-35 — the clause order runs backwards against the row order, so T024 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  135: green-cross-phase: T052 (line 135, `## Phase 4: User Story 2 — A supervising master reports the `, order 28) claims contracts/status-report.contract.md#C-27 while the later T053 (line 136, `## Phase 4: User Story 2 — A supervising master reports the `, order 29) claims #C-25 — the clause order runs backwards against the row order, so T052 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  151: green-cross-phase: T027 (line 151, `## Phase 5: User Story 3 — The user can ask for a current-st`, order 31) claims contracts/status-digest.contract.md#C-44 while the later T028 (line 152, `## Phase 5: User Story 3 — The user can ask for a current-st`, order 32) claims #C-42 — the clause order runs backwards against the row order, so T027 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+WARN  152: green-path-divergence: T028 (line 152) and T033 (line 170) both write tests/contract/test_status_digest.py but claim different green points (['contracts/status-digest.contract.md#C-42'] vs ['contracts/status-digest.contract.md#C-46']) — two rows cannot each be the one that turns this file green; partition the clauses between them or sequence the pair with [blockedBy:]
+WARN  173: green-cross-phase: T036 (line 173, `## Phase 6: User Story 4 — The cadence, content and attribut`, order 40) claims contracts/ownership-map.contract.md#C-50 while the later T037 (line 174, `## Phase 6: User Story 4 — The cadence, content and attribut`, order 41) claims #C-49 — the clause order runs backwards against the row order, so T036 cannot leave that contract green at its own phase; move the earlier clause's row up or re-cut the partition
+PASS (with warnings): .specify/specs/087-speckit-visualization/tasks.md — 0 error(s), 11 warning(s)
+exit: 0
+
+## 4. account-clause-coverage.py .specify/specs/087-speckit-visualization (no --freeze)
+
+
+=== account-clause-coverage.py .specify/specs/087-speckit-visualization (no --freeze) ===
+spec-dir: .specify/specs/087-speckit-visualization
+corpus:   .specify/specs/*/contracts/*
+owner forms (shared/definitions/contract-clause-definitions.md): md-bold-closed, md-bold-paren, md-heading, yaml-openapi, yaml-assertions; md-none named
+scanned 272 files: parsed 165 + named-unparseable 107 == 272  [relational sentinel OK]
+  per form (counts owned by notes/clause-form-census.md, re-derive, never restate): md-bold-closed 111 files/1396 clauses; md-bold-paren 4 files/45 clauses; md-heading 40 files/266 clauses; yaml-openapi 9 files/39 clauses; yaml-assertions 1 files/6 clauses; md-none 107 files/0 clauses
+  zero-clause-but-parseable (parse doubt): 0
+  .yaml: parsed 10 / total 10 / named 0
+named-unparseable: 107 (use --list-named to expand)
+clause universe: 1728 distinct names over 165 parsed files (1752 ids extracted)
+  collapsed: 24 extracted ids share a name with another in the same file, so the distinct-name denominator is smaller than the id count — the owner's yaml-openapi form names a clause by its HTTP method key, which one file may declare under several paths. Reported, never absorbed; qualifying those ids is research.md A-8, not this run's call.
+
+== clause coverage (universe: contract files per the owner's forms; claimed: tasks.md [green:] declarations) ==
+claimed clauses (this feature): 33
+baseline: .specify/specs/087-speckit-visualization/coverage-baseline.txt (573 names)
+baseline-internal existing uncovered: 573
+uncovered beyond baseline: 19
+BEYOND-BASELINE: 087-speckit-visualization/contracts/ownership-map.contract.md#C-48
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporter-seat.contract.md#C-14
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporter-seat.contract.md#C-18
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporter-seat.contract.md#C-21
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-02
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-03
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-05
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-06
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-07
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-08
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-09
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-10
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-11
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-12
+BEYOND-BASELINE: 087-speckit-visualization/contracts/reporting-obligations.contract.md#C-13
+BEYOND-BASELINE: 087-speckit-visualization/contracts/status-report.contract.md#C-23
+BEYOND-BASELINE: 087-speckit-visualization/contracts/status-report.contract.md#C-30
+BEYOND-BASELINE: 087-speckit-visualization/contracts/supervision-report.contract.md#C-36
+BEYOND-BASELINE: 087-speckit-visualization/contracts/supervision-report.contract.md#C-38
+
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 22
+FR claimed: 22
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 33, scanned files 272, clause universe 1728, FR universe 22
+  [clause-uncovered] fail (592) — 592 uncovered, 19 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 22 of 22 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (19) — baseline holds 573 names; 573 uncovered items are baseline-internal and do not block
+19 error(s), 0 warning(s)
+status: uncovered
+
+tool exit: 1 (re-run without the grep pipeline: `account-clause-coverage.py <spec>` exits 1 on this reading; the
+verdict is `uncovered`, carried by `[clause-uncovered] fail (592)` and `[coverage-baseline-delta] fail (19)`).
+
+## 5. pre-analyze-check.py --spec-dir .specify/specs/087-speckit-visualization --stage tasks --repo .
+
+"summary": {"errors": 0, "advisories": 134, "waived": 0, "fr": 22, "sc": 10, "tasks": 50, "clauses": 0, "files": 15}
+
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=134 waived=0
