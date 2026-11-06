@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
-stage: tasks
-stage_started_at: 1793939100
-stage_deadline_epoch: 1793949900
-stage_base_commit: 67bbae51
+stage: checklist
+stage_started_at: 1793940100
+stage_deadline_epoch: 1793950900
+stage_base_commit: f3105c98
 attempt: 0
 retry_limit: 3
-last_verdict: plan U4 pass (plan artifacts, registry Planned, pre-analyze pass/advisories 25, 085 untouched); temporary Team created (8 stage seats, 24/18, worktree); checkpoint 03 written; tasks dispatch next
+last_verdict: tasks U4 pass (50 tasks/9 phases, 33 FR/12 SC, gates pass); T041 085 SC-010 live-status exception recorded; missing skill feedback/exec-quant filled; checkpoint 04 written; checklist dispatch next
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -50,6 +50,7 @@ last_verdict: plan U4 pass (plan artifacts, registry Planned, pre-analyze pass/a
 
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
 - **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
+- **085 live status exception（T041）**：只允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 的 SC-010 status 行；由 FR-030/A12/A17 授权（live reference），不得扩散到 085 的 goal/team/checkpoints/contracts/history。最终验证须证明只改了 SC-010 行。
 - **并发度（085）**：`agent_concurrency_requested: 24`；`agent_concurrency_effective: 24`（初值；host capacity 未声明 → 记录 `host-capacity-undeclared`；每阶段按 ready packages / stage max_parallel / resource capacity 重算）；`verifier_reserve: 6`（`max(1, ceil(24/4))`）；executor slots = 18；任何降级必须具名写入状态脊。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
@@ -140,6 +141,16 @@ last_verdict: plan U4 pass (plan artifacts, registry Planned, pre-analyze pass/a
 - temporary Team: `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md` — `scope: spec`、`goal_slug: 086-efficient-test-execution`、8 stage_seats、14 seats、`agent_concurrency` 24/18、`isolation: worktree`、checkpoint standing；schema check passed。
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/03-plan.md`。
 - next: `tasks` dispatch（effective 2 = 1 task executor + 1 verifier；team tasks max_parallel 12 not binding）。
+
+## U4 tasks（2026-11-06T04:41Z）
+
+- sentinel: `TASKS-DONE`；stage commit `f3105c98`。
+- artifacts: `tasks.md`（50 tasks / 9 phases；52/52 contract clauses；Tests Mode ON；GATE-086 + GATE-1…8）、`coverage-baseline.txt`（575 行，base `0f4b203e`）、`test-evidence/tasks-gates.txt`。
+- driver independent gates: `validate-tasks` PASS 0/0；`decomposition --mode tasks` proceed（33 FR / 50 tasks ≤ 60/80）；`pre-analyze --stage tasks` pass（errors=0, advisories=39 future paths）。
+- 085 diff `67bbae51..f3105c98` = empty；T041 为 085 `verification.md` SC-010 live-status 单点例外（FR-030/A12/A17）。
+- accounting: tasks stage session records present；driver filled `skill:create-tasks` feedback/exec-quant；`speckit:tasks` feedback skipped because the engine expects `/speckit.tasks` and the skill identity satisfies U4.
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/04-tasks.md`。
+- next: `checklist` dispatch（effective 2 = 1 checklist executor + 1 verifier）。
 
 ## U0.5 自检
 
