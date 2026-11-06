@@ -310,3 +310,115 @@ a red — which is why they are recorded here:
 - `bullet_after()` matched the step marker anywhere in a line, so R4's sentence cross-referencing "R6" resolved
   to R6's bullet, and R4's own cross-reference to "R3"/"R5" made the label ambiguous. Fixed by anchoring on the
   bullet's label token (`R5`, `R5 写作收敛`), which also keeps an indented `R6` sub-bullet from matching `R4`.
+
+## T049–T064 — Part 4 (US3 improve-docs → US5 determinism/reachability → dispatch counts + reader projection)
+
+Interpreter for every reading below: `/usr/bin/python3` — CPython 3.11.13 / pytest 9.2.0. No full-suite run in
+this part (test budget: targeted-set-v1; the driver owns the baseline).
+
+### 1. Red, first moment — the four Part-4 assertions authored before their subject
+
+Authored before any Part-4 text landed, then measured:
+
+```text
+$ /usr/bin/python3 -m pytest tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=line \
+    -k "c002_improve_docs or c023_per_face_reasons_named_on or c019_no_new_command_reachable or c018_top_level_sequence"
+FAILED tests/integration/test_docs_command_scenarios.py::test_c002_improve_docs_reaches_the_capability_by_path_only
+FAILED tests/integration/test_docs_command_scenarios.py::test_c023_per_face_reasons_named_on_the_improve_side
+FAILED tests/integration/test_docs_command_scenarios.py::test_c019_no_new_command_reachable_from_existing_verification_steps
+FAILED tests/integration/test_docs_command_scenarios.py::test_c018_top_level_sequence_unchanged_and_confirm_literal_kept
+4 failed, 32 deselected
+```
+
+The four failures were **not** the same kind, and the difference is the finding:
+
+- the first two are genuine red-first readings (their subject, the improve-side pointer and the improve-side face
+  names, did not exist yet);
+- the third was **red for the right reason** — `improve-docs/SKILL.md` did not yet name `--action obligation`,
+  which is exactly what T052/T053 deliver;
+- the fourth was **red for a wrong reason and was repaired in passing**: the assertion scoped the
+  `stop-and-confirm` literal to `### 分派`, but the literal lives in the delegation sentence of `## Outline`
+  (base commit line 30), which PRECEDES that section. Measured against the base commit, a correct file was red.
+  The repair measures "before `### 分派`" instead — a correction (one reading consistent with the recorded
+  intent, local, reversible), disclosed here rather than silently applied.
+
+### 2. The whole targeted set at the red moment, and at the green moment
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_obligation_reuse.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+FAILED tests/unit/test_docs_obligation_reuse.py::test_sc005_surfaces_reach_by_reference
+FAILED tests/integration/test_docs_command_scenarios.py::test_c002_by_reference_only
+FAILED tests/integration/test_docs_command_scenarios.py::test_c011_improve_pointer
+FAILED tests/integration/test_docs_command_scenarios.py::test_c012_improve_minimal_edit
+FAILED tests/integration/test_docs_command_scenarios.py::test_c013_improve_verify_includes_obligation
+FAILED tests/integration/test_docs_command_scenarios.py::test_c014_improve_report
+FAILED tests/integration/test_docs_command_scenarios.py::test_c015_named_staleness_keeps_source
+FAILED tests/integration/test_docs_command_scenarios.py::test_c016_dispatch_names_both_paths
+FAILED tests/integration/test_docs_command_scenarios.py::test_c017_residual_five_counts
+FAILED tests/integration/test_docs_command_scenarios.py::test_c020_reader_projection_bounded
+FAILED tests/integration/test_docs_command_scenarios.py::test_c002_improve_docs_reaches_the_capability_by_path_only
+FAILED tests/integration/test_docs_command_scenarios.py::test_c023_per_face_reasons_named_on_the_improve_side
+FAILED tests/integration/test_docs_command_scenarios.py::test_c019_no_new_command_reachable_from_existing_verification_steps
+13 failed, 108 passed
+```
+
+⇒ after the implementation and the mirror resync:
+
+```text
+$ /usr/bin/python3 -m pytest <same five files> -q --no-header -p no:cacheprovider --tb=no -rf
+121 passed
+```
+
+**The ten Part-3 carry-overs are zero**, and the three Part-4 authors joined them rather than being fixed by
+loosening them.
+
+### 3. Per-task red → green attribution (Part 4)
+
+| Row | Assertion(s) it turned green | First red reading |
+|-----|------------------------------|-------------------|
+| T049 | `F::test_c011_improve_pointer` | "the evidence step must read the traceability record" |
+| T050 | `F::test_c012_improve_minimal_edit` | "exactly one Diagram-sync row must exist, found 0" |
+| T051 | `F::test_c013_improve_verify_includes_obligation` | "a miss must be stated in place, not left to inference" |
+| T052 | `F::test_c014_improve_report` | "Verify must require the satisfied reading" |
+| T053 | `F::test_c015_named_staleness_keeps_source` | "the source must stay untouched" |
+| T054 | *(nothing new — covered by T048)* | four readings re-measured green (§ 4) |
+| T056 | 3 new assertions (authored red, § 1) | see § 1 |
+| T057 | `I::test_sc004_rename_keeps_document_and_diagram_in_step` | the pair-then-render sequence, § 5 |
+| T058 | `F::test_c002_by_reference_only` (its improve leg), `U::test_sc005_surfaces_reach_by_reference`, `F::test_c002_improve_docs_*`, `F::test_c023_*_on_the_improve_side` | "must reach the capability by path" |
+| T060 | 4 US5 scenarios (authored, § 5) | — |
+| T061 | 2 assertions (one red, one repaired-in-passing, § 1) | see § 1 |
+| T062 | `F::test_c019_no_new_command_reachable_from_existing_verification_steps` | "improve-docs/SKILL.md must be the surface that runs the checker" |
+| T063 | `F::test_c016_dispatch_names_both_paths`, `F::test_c017_residual_five_counts` | "the authoring path must be named" |
+| T064 | `F::test_c020_reader_projection_bounded` | "the reader document no longer carries the section" |
+
+### 4. T054 — already satisfied by T048, measured rather than asserted
+
+`skills/external/create-docs/SKILL.md` § Authoring Flow R5 (landed by `b8651591`, row T048) already carries every
+element T054 asks for, and the four assertions that pin them are green **before** any Part-4 edit to that file:
+`test_c001_four_artifacts_one_run` (document / editable source / rendered face / reference, record spoken of
+separately), `test_c003_same_run_wording`, `test_c004_refusal_carried_through`, `test_c006_r5_keeps_a_recorded_engine`
+→ `4 passed, 32 deselected`. T054 is therefore closed as **covered by T048**, with no second rewrite — a second
+pass over the same paragraph would be churn, and the two rows' text is the same obligation read from two sides.
+
+### 5. Two authoring readings the measured runs forced, both in the test layer
+
+- **`test_sc004_*`**: the first draft asserted that a renamed pair stays `satisfied` — and it failed with
+  `('stale', 'source-newer-than-render')`, correctly: renaming the source makes it newer than its faces, so the
+  pair is out of step until the run **re-renders**. The assertion now measures that middle state first (the
+  mechanism), then re-renders and reads `satisfied` (the outcome). A green here without the middle reading would
+  have been a test that could never catch a source rename.
+- **`test_sc006_*`**: `clean/` carries six carriers, five of which are directory indexes with no diagram, so its
+  space-level `clean` is `false`. The "a clean space says so" reading is therefore scoped to `--only <the
+  designated carrier>`, which is what `test_sc001_four_artifacts_present` already pins from the same side.
+  Asserting space-level `clean=true` would have required editing the fixture, i.e. changing the measurement to
+  match the claim.
+
+### 6. The two readings whose red-when had to be stated rather than tightened
+
+`test_sc004_*`'s prose-only row and `test_c020_*`'s bounded projection both had a tempting stronger form that
+would have asserted something the contract does not claim. The prose-only row asserts the **recorded** `D-001`
+boundary (`stale`'s semantic half is uncovered) and then asserts the one thing that boundary must never do —
+silently re-render, destroying the evidence. `D-001` is registered in `plan.md` § Residual Risk; restating it as
+a stronger green would be exactly the "未覆盖读成通过" the plan forbids.

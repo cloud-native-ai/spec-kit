@@ -13,6 +13,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -694,6 +695,117 @@ def test_c005_shared_diagram_single_source(tmp_path: Path):
     assert space.joinpath("docs/assets/widget.mmd").is_file(), "one source file, not one per document"
 
 
+# ---------------------------------------------------------------------------
+# SC-004 — a rename keeps the document and its diagram in step (T057)
+#
+# The scenario is the one `requirements.md` US3 names: a depicted component is renamed in the prose, and the
+# pair must either move together or say out loud that it did not. `plan.md` table B gives the clauses this row
+# serves (`C-023`'s red-when and `C-015`'s named-staleness half); the assertion is authored here and the
+# GREEN state is delivered by T052/T053/T058, so it is red first by construction.
+# ---------------------------------------------------------------------------
+
+
+def renamed_pair(space: Path, old: str, new: str) -> tuple[Path, Path]:
+    """Rename `old` → `new` in the document's prose AND in its diagram source; return both written files.
+
+    This is what "the pair moves together" means on disk, written mechanically because the producing capability
+    is model-driven and a test may not invoke it (`test_c008a_*`'s harness note applies here too).
+    """
+    source = space / "docs" / "assets" / "widget.mmd"
+    document = space / DOC
+    source.write_text(source.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+    document.write_text(document.read_text(encoding="utf-8").replace(old, new), encoding="utf-8")
+    return document, source
+
+
+@pytest.mark.integration
+def test_sc004_rename_keeps_document_and_diagram_in_step(tmp_path: Path):
+    """A rename either lands in both the prose and the diagram, or is reported — never a silent divergence.
+
+    Three readings, and the middle one is the reason the row exists:
+
+    1. **Re-rendered** — renaming the depicted component in the document and re-producing the pair keeps the
+       document `satisfied`: the pair moved together, and the checker still resolves the reference to the face
+       the run produced. Byte-level before/after readings of BOTH files are captured, so "it moved" is measured.
+    2. **Prose only** — the same rename applied to the document alone leaves the space judged `satisfied` too,
+       and that is the recorded capability boundary rather than a bug: `D-001` (the semantic half of `stale`)
+       is deliberately uncovered, so the mechanical reading cannot see that the picture still says `Validator`.
+       The assertion therefore pins WHAT THE MECHANISM CAN SEE (the document is still judged, the diagram is
+       still on disk) and states the limit explicitly instead of asserting a green that would be a lie.
+    3. **Source only, no re-render** — renaming the component in the source without re-rendering turns the
+       space red as `stale` / `source-newer-than-render`, which is the named staleness finding `C-015` requires
+       an improve run to report rather than roll back.
+
+    red-when: the re-rendered pair stops being `satisfied`, the source-only rename stops being named `stale`, or
+    the prose-only rename silently changes the DIAGRAM's bytes (a silent re-render would destroy the evidence).
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    record = record_arg(space)
+    before_doc = (space / DOC).read_bytes()
+    before_src = (space / "docs/assets/widget.mmd").read_bytes()
+    assert obligation(space, "--record", record)["documents"][0]["verdict"] == "satisfied", (
+        "premise: the pair starts in step"
+    )
+
+    # 1) the pair moves together: prose and source both renamed, then the run re-renders the face.
+    #    The rename is word-bounded because the fixture's prose says "the store" while its diagram label says
+    #    "Widget store" — matching the label string verbatim would rename the source and no byte of the prose.
+    document = space / DOC
+    document.write_text(
+        re.sub(r"\bstore\b", "repository", document.read_text(encoding="utf-8")), encoding="utf-8")
+    document, source = renamed_pair(space, "Widget store", "Widget repository")
+    after_doc, after_src = document.read_bytes(), source.read_bytes()
+    assert after_doc != before_doc and after_src != before_src, (
+        "the rename must touch BOTH files, or 'they moved together' would be unmeasured"
+    )
+    assert "repository" in after_doc.decode("utf-8"), "the prose carries the new name"
+    assert "Widget repository" in after_src.decode("utf-8"), "and so does the diagram source's label"
+    # The re-render is what closes the pair, and it is not optional: the moment the source is newer than the
+    # face, the space reads `stale`. Asserting that FIRST pins the mechanism (the rename alone is not "in
+    # step"), then the re-render produces both faces again and the reading returns to `satisfied` — the record
+    # is re-written in the same pass because its `rendered[].sha256` must describe the faces now on disk.
+    before_render = obligation(space, "--record", record, "--only", DOC)
+    assert verdict_of(before_render, DOC) == ("stale", "source-newer-than-render"), (
+        "a renamed source with no re-render is `stale` — the pair is not in step until the face is rebuilt"
+    )
+    record = str(produce_diagram(space))
+    together = obligation(space, "--record", record, "--only", DOC)
+    assert verdict_of(together, DOC) == ("satisfied", "reference-resolves"), (
+        "after the re-render the pair moved together: both faces carry the new name and the record describes them"
+    )
+
+    # 2) the prose-only rename: the pair now disagrees, and the checker's own scope stops at the reference
+    prose_only = fixtures.copy_fixture("clean", tmp_path / "prose-only")
+    prose_record = record_arg(prose_only)
+    doc_before = (prose_only / DOC).read_bytes()
+    src_before = (prose_only / "docs/assets/widget.mmd").read_bytes()
+    (prose_only / DOC).write_text(
+        re.sub(r"\bstore\b", "repository", (prose_only / DOC).read_text(encoding="utf-8")),
+        encoding="utf-8")
+    reading = obligation(prose_only, "--record", prose_record, "--only", DOC)
+    assert verdict_of(reading, DOC) == ("satisfied", "reference-resolves"), (
+        "D-001: the semantic half of `stale` is uncovered by design, so the mechanical reading is unchanged"
+    )
+    assert (prose_only / "docs/assets/widget.mmd").read_bytes() == src_before, (
+        "a prose-only rename MUST NOT silently re-render the diagram — the divergence stays on disk as evidence"
+    )
+    assert (prose_only / DOC).read_bytes() != doc_before, "the prose change itself is the fact under test"
+
+    # 3) the source-only rename with no re-render: the named staleness finding, not a green
+    source_only = fixtures.copy_fixture("clean", tmp_path / "source-only")
+    source_record = record_arg(source_only)
+    entry = trace_entry(source_only)
+    mmd = source_only / entry["source"]
+    earliest_face = min((source_only / face["path"]).stat().st_mtime for face in entry["rendered"])
+    mmd.write_text(mmd.read_text(encoding="utf-8").replace("Widget store", "Widget repository"),
+                   encoding="utf-8")
+    os.utime(mmd, (earliest_face + fixtures.MTIME_GAP_SECONDS, earliest_face + fixtures.MTIME_GAP_SECONDS))
+    assert verdict_of(obligation(source_only, "--record", source_record), DOC) == (
+        "stale", "source-newer-than-render"), (
+        "a renamed source with no re-render is the named staleness finding an improve run must REPORT"
+    )
+
+
 @pytest.mark.integration
 def test_c006_engine_sticky_on_update(tmp_path: Path):
     """An update to an existing diagram keeps the engine its record names; only a NEW diagram is routed.
@@ -717,3 +829,162 @@ def test_c006_engine_sticky_on_update(tmp_path: Path):
     assert fresh and all(entry["engine"] for entry in fresh), (
         "a new diagram is the only one that is routed, and it carries the engine it was routed to"
     )
+
+
+# ---------------------------------------------------------------------------
+# SC-006 / SC-003 / SC-009 / SC-010 — US5's readings (T060)
+#
+# Four assertions, one per US5 criterion the plan's table B names on this file. Each is authored red-first: the
+# scenario they describe is one the delivery must make true, so a green here before T063/T064 would mean the
+# assertion is vacuous rather than that the delivery landed.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+def test_sc006_two_runs_identical_and_keyed_by_path(tmp_path: Path):
+    """Determinism, a path-keyed finding set drawn from the closed vocabulary, and three explicit verdicts.
+
+    `SC-006` read as one assertion because its four readings only mean something together: two byte-identical
+    runs (determinism), every affected document reported BY PATH with a reason the contract's closed table
+    allows (re-runnability across a growing space), a clean space that says so explicitly rather than printing
+    nothing (the empty-output false green), and an unjudgeable document reported as `not-evaluated` rather
+    than folded into a pass.
+
+    red-when: the two runs differ, a finding lacks a path, a reason falls outside the closed table, the clean
+    space stops reporting `clean=true`, or a document with no trace record is counted as satisfied.
+    """
+    # the closed table is READ from its owner (the engine), never re-typed here — a second copy of the
+    # vocabulary in a test would drift exactly the way `C-004`/`C-005` forbid the flows to drift.
+    spec = importlib.util.spec_from_file_location("docs_utils_obligation_vocab", SCRIPT)
+    engine = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(engine)
+    closed = {reason for reasons in engine.VERDICT_REASONS.values() for reason in reasons}
+    assert len(closed) >= 9, f"premise: the closed reason table did not load: {sorted(closed)}"
+
+    mixed = fixtures.copy_fixture("no-diagram", tmp_path / "mixed")
+    record = str(produce_diagram(mixed))
+    # leave one carrier unproduced so the run has both a satisfied and a missing document in it
+    untouched = mixed / "docs" / "reference" / "index.md"
+    untouched_body = untouched.read_text(encoding="utf-8")
+    untouched.write_text(re.sub(r"\n\nIt is drawn in \[.*", "", untouched_body), encoding="utf-8")
+
+    first = run_engine("--action", "obligation", "--root", str(mixed), "--record", record)
+    second = run_engine("--action", "obligation", "--root", str(mixed), "--record", record)
+    assert first.returncode == second.returncode == 0, first.stderr
+    assert first.stdout == second.stdout, "two runs over one space must serialise byte-identically"
+
+    payload = json.loads(first.stdout)
+    assert payload["documents"], "the space has carriers, so the finding set cannot be empty"
+    for entry in payload["documents"]:
+        assert entry["path"], f"every finding is keyed by path (FR-016): {entry}"
+        assert entry["reason"] in closed, f"reason {entry['reason']!r} is outside the closed table"
+    assert [entry["path"] for entry in payload["documents"]] == sorted(
+        entry["path"] for entry in payload["documents"]), "the finding set is ordered by path, not by discovery"
+
+    # `clean/` is the space whose DESIGNATED carrier is converged; the five directory indexes it also carries
+    # have no diagram and are therefore findings — a reading `test_sc001_four_artifacts_present` pins from the
+    # `--only` side. Scoping to the carrier is what makes "a clean space says so" a claim about the space's
+    # own subject rather than a number this test would have to keep in step with the fixture.
+    clean = fixtures.copy_fixture("clean", tmp_path / "clean")
+    clean_payload = obligation(clean, "--record", record_arg(clean), "--only", DOC)
+    assert clean_payload["summary"]["clean"] is True and clean_payload["summary"]["converged"] is True, (
+        "a clean scope states its verdict explicitly; an empty output would be the false green this checks"
+    )
+
+    unjudged = fixtures.copy_fixture("no-trace", tmp_path / "unjudged")
+    assert verdict_of(obligation(unjudged), DOC) == ("not-evaluated", "no-trace-record"), (
+        "a document whose record is absent is not evaluated — never counted as a pass"
+    )
+    assert obligation(unjudged)["summary"]["converged"] is False, "and an unjudged space has not converged"
+
+
+@pytest.mark.integration
+def test_sc003_reconcile_reports_then_converges(tmp_path: Path):
+    """`SC-003`'s two-run shape: the first reconcile reports, the second converges, and the space stops churning.
+
+    This is the criterion read on the ENGINE's side of the loop (its sibling `test_c008a_second_reconcile_zero_findings`
+    reads the flow text that promises the loop exists). The distinction matters: one is "the flows converge the
+    dimension", this one is "the dimension is convergent when they do".
+
+    red-when: the first run reports nothing actionable, the second run stops converging after a produce step, or
+    a repeat run keeps finding something new on an unchanged space.
+    """
+    space = fixtures.copy_fixture("no-diagram", tmp_path / "reconcile")
+    first = obligation(space)
+    assert first["summary"]["missing"] >= 1, "the first reconcile must have something to report"
+    assert first["summary"]["converged"] is False, "and it cannot claim convergence while it does"
+
+    record = str(produce_diagram(space))
+    second = obligation(space, "--record", record)
+    assert second["summary"]["converged"] is True, "after the produce step the dimension converges"
+    assert (second["summary"]["missing"], second["summary"]["stale"],
+            second["summary"]["not_evaluated"]) == (0, 0, 0), f"the three actionable tiers: {second['summary']}"
+
+    third = obligation(space, "--record", record)
+    assert third == second, "a repeat reconcile on an unchanged space reports the same reading (anti-churn)"
+
+
+@pytest.mark.integration
+def test_sc009_confirm_tiers_and_zones_unchanged(tmp_path: Path):
+    """`SC-009`: the diagram dimension adds no confirmation tier, and no diagram artifact is triaged as prose.
+
+    Two readings on one space. The tier table is `create-docs`'s, so this assertion only measures that the space's
+    diagram work stays INSIDE the automatic class it is already in (a produce step that needed a confirmation
+    would have to appear in that table); and `assets/` is outside the carrier set, so no file under it may be
+    judged, counted or moved as a document — including the two faces the produce step just wrote.
+
+    red-when: an `assets/` file is judged as a carrier, an auxiliary record directory is judged, or the produce
+    step's own writes make the space unrepeatable (which is what a confirmation gate would show up as).
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    record = str(produce_diagram(space))
+    payload = obligation(space, "--record", record)
+
+    judged = [entry["path"] for entry in payload["documents"]]
+    assert judged, "premise: the space is judged at all"
+    for path in judged:
+        assert "/assets/" not in path, f"a diagram artifact was triaged as a carrier document: {path}"
+        assert "/.speckit/" not in path, f"an auxiliary record was triaged as a carrier document: {path}"
+    assert payload["carriers"] == len(judged), (
+        "the carrier count is the judged set — an `assets/` face did not inflate it"
+    )
+
+    before = payload["summary"]
+    repeat = obligation(space, "--record", record)["summary"]
+    assert repeat == before, (
+        "the produce step's own writes converge once and stay converged — a tier that re-gated them would "
+        f"show up as a changed reading: {before} -> {repeat}"
+    )
+    assert "assets/" in str(record) or (space / "docs" / "assets").is_dir(), (
+        "premise: the landing the produce step used is the one still on disk"
+    )
+
+
+@pytest.mark.integration
+def test_sc010_unrefreshed_runtime_degrades_visibly(tmp_path: Path):
+    """`SC-010`: a project whose runtime was never refreshed reads as NOT EVALUATED, never as satisfied.
+
+    The realistic shape is a space that predates the obligation: documents with prose, no `docs/.speckit/`
+    directory at all, therefore no record and nothing to resolve a reference against. `FR-023`'s discipline is
+    that this state must be VISIBLE — the failure mode it guards against is a checker that finds nothing to
+    compare and therefore reports nothing wrong.
+
+    red-when: a pre-obligation space reads `satisfied` (or `clean`), or the absence of the runtime store makes
+    the engine silent instead of reporting an unjudged document.
+    """
+    space = fixtures.copy_fixture("no-diagram", tmp_path)
+    speckit = space / "docs" / ".speckit"
+    if speckit.exists():
+        subprocess.run(["rm", "-rf", str(speckit)], check=True)
+    assert not speckit.exists(), "premise: the runtime store is absent, not merely empty"
+
+    payload = obligation(space)
+    assert payload["documents"], "an unrefreshed space is still judged — silence would be the false green"
+    assert verdict_of(payload, DOC)[0] == "missing", (
+        "with no runtime store there is no diagram to resolve, so the document is a finding, not a pass"
+    )
+    assert payload["summary"]["satisfied"] == 0, "nothing in an unrefreshed space can be satisfied"
+    assert payload["summary"]["clean"] is False and payload["summary"]["converged"] is False, (
+        "and the space reports both predicates false rather than a vacuous clean"
+    )
+    assert payload["record"] is None, "no record was available, and the payload says so instead of guessing one"

@@ -47,6 +47,23 @@ expired --renew------------> draft (new expires)
 
 Deterministic automation: `python3 skills/external/create-docs/scripts/docs-utils.py --action scan|expire|clean|archive-check|stats|validate|audit` (contract: `.specify/specs/033-docs-command/contracts/docs-utils-cli.md`). Three safeguards — frontmatter metadata, engine automation, and the `/speckit.docs` reconcile loop — keep `notes/` from becoming a landfill.
 
+## Diagram Obligation for Readers
+
+Diagrams arrive with the documents. A formal document here carries the diagram of the structure it describes,
+so a reader who opens one should expect a picture beside the prose rather than somewhere else to go looking.
+
+Four things make a diagram findable. Its **editable source** and its **rendered face(s)** sit together in
+`docs/assets/`, under one slug. The document points at a face with an ordinary relative link — that link is
+the way in. And the run that produced the pair leaves a **traceability record** in `docs/.speckit/`, naming
+which engine drew it and which document it belongs to.
+
+A document with nothing to draw is not left blank: it carries a recorded **exemption** saying so, and the
+exemption stays visible in every reading — it is never a silent omission.
+
+A document that has drifted from its diagram is **reported**, by name, rather than quietly repaired. So is a
+diagram that no longer has its pair. The rules behind both live with the flows that enforce them; this page
+only tells you what you will meet.
+
 ## Consistency maintenance
 
 - **Incremental**: every complex `/speckit.*` command ends with the docs-sync evaluation step (`shared/workflow/docs-step.md`): 需记录（目标文档 + 要点） or 无需记录.

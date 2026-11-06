@@ -713,6 +713,104 @@ def test_c019_no_new_command_no_new_tier():
         )
 
 
+# --- E. the improve-docs legs of US3, read as text (T056 / T058) -------------------------------------------
+#
+# The five assertions `test_c011` … `test_c015` above are table B's owners and they live in section C because
+# T035 authored them red-first; what T056 adds here is the OTHER half of the same two clauses — that the
+# improve flow reaches the drawing capability without duplicating it (`C-002`) — plus the reader's copy of the
+# three face names (`C-023`). All three are readings of `improve-docs/SKILL.md`'s own text, never of a command.
+
+
+@pytest.mark.integration
+def test_c002_improve_docs_reaches_the_capability_by_path_only():
+    """The improve flow names the capability's path AND stays inside its own structural boundary.
+
+    `C-002` is a two-sided claim, and T058's row states both sides: reached by path (so a reader of the improve
+    flow knows where to go) and never copied (no semantic model, no routing criteria, no delivery-contract row,
+    no second rendering path). The second side is what keeps `create-docs` § Desired-State Baseline the single
+    owner of the obligation's body — and what keeps the improve flow from gaining structural powers it does not
+    have: it may update a diagram, never move, rename or archive a document while doing so.
+
+    red-when: the pointer is absent, a copy of the capability's own rows appears, or the flow gains a move /
+    rename / archive power on the way to the diagram.
+    """
+    body = read(IMPROVE_DOCS)
+    assert DRAW_DIAGRAM_POINTER in body, "the improve flow must reach the capability by path"
+    for copied in ("ldm_summary:", "| `mermaid` |", "§ D6", "routing-matrix.md#"):
+        assert copied not in body, f"the improve flow restates {copied!r}, which the capability owns"
+    boundary = section(IMPROVE_DOCS, "### Ownership boundary (do not cross)")
+    flat = " ".join(boundary.split()).lower()
+    assert "create-docs" in flat, "the boundary must keep the structural owner named"
+    assert "move" in flat and "archive" in flat, (
+        "the boundary must keep the move/archive hand-off that the diagram work cannot cross"
+    )
+
+
+@pytest.mark.integration
+def test_c023_per_face_reasons_named_on_the_improve_side():
+    """The three face reasons a content improvement can produce are each named where the improvement reads them.
+
+    `C-023`'s flow half. `test_c023_per_face_reasons_named` reads them on `create-docs`'s side; an improvement
+    run makes the same three findable, because a rename or a re-render is exactly what produces them. The
+    registry pointer is part of the claim: three names without their step sequence are three words.
+
+    red-when: one of the three is unnamed on the improve side, or the pointer to the single step registry is gone.
+    """
+    body = read(IMPROVE_DOCS)
+    for face in ("orphan-rendered", "orphan-source", "source-newer-than-render"):
+        assert face in body, f"the improve flow must name the face {face!r}"
+    assert "quickstart.md" in body, "the faces must point at the single step registry"
+
+
+@pytest.mark.integration
+def test_c019_no_new_command_reachable_from_existing_verification_steps():
+    """`F::test_c019_dispatch_pointer`: the obligation has no entry point of its own — only the flows' verify.
+
+    `FR-017`'s reachability claim read as a POSITIVE roster instead of as an absence: every surface that names
+    the checker is one of the two owning skills' verification steps, and the command names it only through them.
+    "No new command" was already checked as a delta (`test_c019_no_new_command_no_new_tier`); this is the same
+    clause's other direction — that the check was not smuggled into a new dispatch point either.
+
+    red-when: a third surface names `--action obligation`, or the command stops citing both skills for it.
+    """
+    dispatch = section(DOCS_TEMPLATE, "### 分派(本命令保留的编排职责)")
+    assert "--action obligation" not in dispatch, (
+        "the command must reach the checker through the skills' verification steps, not by calling it itself"
+    )
+    for skill in ("create-docs", "improve-docs"):
+        assert skill in dispatch, f"the dispatch must keep naming {skill} as the owning surface"
+    for skill_file in (CREATE_DOCS, IMPROVE_DOCS):
+        assert "--action obligation" in read(skill_file), (
+            f"{skill_file.relative_to(REPO)} must be the surface that runs the checker"
+        )
+
+
+@pytest.mark.integration
+def test_c018_top_level_sequence_unchanged_and_confirm_literal_kept():
+    """`F::test_c018_top_level_sequence_unchanged`: the two hard constraints a reader can check in one read.
+
+    The full four-constraint reading is `test_c018_hard_constraints_kept`, including the byte-unchanged W1
+    subsection; this assertion adds the one thing that one cannot state — that the sequence is the same as the
+    BASE COMMIT's, not merely the same as a literal written in the test.
+
+    red-when: a chapter is added, removed or reordered relative to the branch base, or the governance literal
+    stops appearing BEFORE the dispatch section (which is where the command declares the tier it delegates).
+    """
+    def chapters(text: str) -> list[str]:
+        return [line for line in text.splitlines() if line.startswith("## ")]
+
+    assert chapters(read(DOCS_TEMPLATE)) == chapters(base_commit_text("templates/commands/docs.md")), (
+        "the top-level chapter sequence must be the base commit's, measured rather than restated"
+    )
+    # The literal's position is a reading, not a choice: the command declares the tier it delegates in the
+    # delegation sentence of `## Outline` (line 30 at the base commit), which PRECEDES `### 分派`. Scoping the
+    # reading to the dispatch section instead would make the assertion red against a correct base commit.
+    text = read(DOCS_TEMPLATE)
+    assert "stop-and-confirm" in text.split("### 分派", 1)[0], (
+        "the governance keep-list literal must survive in the delegation text before the dispatch section"
+    )
+
+
 @pytest.mark.integration
 def test_c020_reader_projection_bounded():
     """The reader section exists, stays ≤ 12 lines and carries exactly the three reader-facing points.

@@ -443,6 +443,26 @@ def test_c1_skill_inventory_is_frozen():
 # and `test_coverage_receipt.py`; this entry records the drift, it does not
 # authorize any other.
 ALLOWED_POST_BASELINE_CHANGES = {
+    "skills/external/improve-docs/SKILL.md": {
+        "reason": (
+            "2026-11-06 Feature 087 (T-001 of its plan, rows T049-T053/T058): the "
+            "content-improvement flow gains the diagram dimension its own workflow "
+            "owes — the evidence step reads the document's traceability record, the "
+            "classification table gains the one Diagram-sync row, the minimal-edit and "
+            "verify steps carry the hit and the miss, and the report names a staleness "
+            "finding rather than rolling a source back. The obligation's body stays in "
+            "`create-docs` § Desired-State Baseline and the drawing capability stays "
+            "referenced by path, so this is scope on this file, not a second owner. "
+            "The historical 069a hash manifest stays the dated record it is; this entry "
+            "records the drift and authorizes nothing else."
+        ),
+        "markers": (
+            "Diagram-sync",
+            "skills/external/draw-diagram",
+            "--action obligation",
+            "staleness finding",
+        ),
+    },
     "skills/internal/collect-evidence/SKILL.md": {
         "reason": (
             "2026-11-05 Feature 084 batch 1 (rows 2-3, C-042/C-047): the evidence "
