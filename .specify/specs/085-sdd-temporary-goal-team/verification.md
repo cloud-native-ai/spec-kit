@@ -11,7 +11,7 @@ baseline_failure_source=.specify/specs/085-sdd-temporary-goal-team/test-evidence
 # -- Implementation results --
 
 implementation_date=2026-11-06
-post_change_commit=cbbf6dda
+post_change_commit=2cb68c44
 post_change_smoke=43 passed (see smoke record)
 post_change_targeted_suites=scope/temp-goal/temp-team/child-line/checkpoint/wp-gate tests all green
 

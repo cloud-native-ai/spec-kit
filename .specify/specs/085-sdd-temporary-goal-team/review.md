@@ -6,8 +6,8 @@
 |-------|-------|
 | Repository | spec-kit |
 | Branch | `085-sdd-temporary-goal-team` |
-| Base commit | `aafbf5a8352fa58daf5c09e5560d2ea36e1be99e` |
-| Head | `cbbf6dda` (working tree committed) |
+| Base commit | `97995525` (updated trunk after the remote 084 line) |
+| Head | `2cb68c44` (feature commit; record updates follow) |
 | Review date | 2026-11-06 |
 | Reviewer | Qoder agent (session) |
 | Environment | Linux x64, Python 3.11.11, pytest 8.4.2 |
@@ -15,7 +15,7 @@
 
 **Artifact inventory**: requirements.md (50 FR / 10 SC), plan.md (19-principle check, 3 decision tensions, 4 execution premises), research.md (R1–R8), data-model.md (E1–E8 + V-1…V-24), contracts/ (5 files, 65 clauses), quickstart.md (S1–S6), feature-ref.md (20 delivery rows), tasks.md (26 rows), verification.md, checklists/requirements.md, test-evidence/ (requirements/plan/tasks gates, smoke, full-suite).
 
-**Reachability**: the head is `cbbf6dda`; the code delta is `aafbf5a8..cbbf6dda`. The review was produced before the commit, so the code segment remains `not-evaluated`; the commit is now available for a follow-up code review.
+**Reachability**: the head is `2cb68c44`; the code delta is `97995525..2cb68c44`. The review was produced before the commit, so the code segment remains `not-evaluated`; the commit is now available for a follow-up code review.
 
 ## 1. Process Execution Timeline
 
@@ -37,7 +37,7 @@
 
 ### 2.1 Code Segment (Verdict and Pointers)
 
-- triage: `not-evaluated` — this report was produced before the commit; the delta `aafbf5a8..cbbf6dda` is now committed and can be reviewed in a follow-up run.
+- triage: `not-evaluated` — this report was produced before the commit; the delta `97995525..2cb68c44` is now committed and can be reviewed in a follow-up run.
 - basis: review produced pre-commit; the current commit is `cbbf6dda`.
 - record: no `code-review.md` is created for a non-`run` triage; this subsection is the carrier.
 - no `blocking` entry exists; the non-conclusion is disclosed, not a pass over code.
@@ -50,7 +50,7 @@
 
 ### 2.3 Implementation Review Segment
 
-- base..head: `aafbf5a8..cbbf6dda`.
+- base..head: `97995525..2cb68c44`.
 - smoke: `python3 -m pytest -q tests/unit/test_goal_scope_engine.py tests/contract/test_scope_resolution.py tests/contract/test_temp_goal_contract.py tests/contract/test_temp_team_schema.py tests/contract/test_line_registry_child_lines.py tests/contract/test_checkpoint_protocol.py tests/unit/test_wp_gate_085.py tests/integration/test_temp_team_worktree_queue.py tests/integration/test_checkpoint_rollback.py`; exit `0`; evidence `.specify/specs/085-sdd-temporary-goal-team/test-evidence/smoke.txt`.
 - live dogfood: two child lines, real worktrees, integration queue, fsck clean; evidence `test-evidence/live-dogfood.txt`, report `team/085-sdd-temporary-goal-team/runs/20261106T024600Z-report.md`, checkpoint `checkpoints/05-live-dogfood.md`.
 - scope/regression: the targeted 070/064 suites (1048 cases) pass; mirror checks are clean; the full-suite delta is pre-existing/environmental (F2).
@@ -69,7 +69,7 @@ Checker verdict: `accept`; claim: the final-path criteria are all pass; claim co
 ### F1 — Code segment was produced pre-commit
 
 - **Why**: this report was written while the tree was uncommitted; the code segment therefore recorded `not-evaluated`.
-- **Status**: resolved by commit `cbbf6dda`; a follow-up `/speckit.review` can run the code segment against `aafbf5a8..cbbf6dda`.
+- **Status**: resolved by commit `2cb68c44`; a follow-up `/speckit.review` can run the code segment against `aafbf5a8..cbbf6dda`.
 
 ### F2 — Pre-existing full-suite failures
 
