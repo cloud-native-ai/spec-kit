@@ -7,10 +7,10 @@ slice: 086
 stage: clarify
 stage_started_at: 1793937900
 stage_deadline_epoch: 1793948700
-stage_base_commit: 2a88a9e7
+stage_base_commit: fee3f874
 attempt: 0
 retry_limit: 3
-last_verdict: requirements U4 pass after 3 in-passing repairs; temp goal created and spec-local; checkpoint 01 written; clarify dispatch next
+last_verdict: clarify U4 pass: Feature 086 bound (no new/renumber); 4 self-adjudicated Q/A + A13–A19; validate-requirements ok 0/0; overlap-check clear; 085 surface untouched; stage commit fee3f874
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -100,6 +100,28 @@ last_verdict: requirements U4 pass after 3 in-passing repairs; temp goal created
 - wrap-up records: `.specify/memory/session/20261106T040443Z-run-determination-skill-create-requirements-r20261106t033959.md`、`.specify/memory/feedback/20261106T040443Z-skill-create-requirements.md`、`.specify/memory/exec-quant/records/20261106T040443520576Z-7ea40fdc.json`。
 - next: `clarify` dispatch（effective 2 = 1 clarify executor + 1 verifier reserve；临时 Team 待 clarify+plan U4 后创建）。
 
+## U4 clarify（2026-11-06T04:12Z）
+
+- sentinel: `CLARIFY-DONE`；stage commit `fee3f874`；branch `086-efficient-test-execution`；base `3afe10df`。
+- mode: A（post-requirements；`plan.md` 不存在）；target `requirements.md`；writability probe `WRITABLE:true`；MODE=A。
+- artifacts:
+  - `requirements.md`：§ Related Feature 绑定 Feature 086；§ Clarifications 追加 4 条 Q/A（共 10 条）；§ Assumptions 新增 A13–A19；FR-024 补四个并行开关字面量（无 FR/SC 计数变化）。
+  - `checklists/requirements.md`：Feature Scope 与行数注记同步到绑定后状态（332 行；FR/SC/STR 不变）。
+  - `test-evidence/clarify-gates.txt`：覆盖率扫描、绑定记录、门禁原始输出、overlap 裁决、in-passing repairs、框架观察。
+  - `features.md` row 086 / `features/086.md`：绑定记录；`Related Specifications/Requirements` 一节；状态保持 `Draft`。
+- clarifications（自裁，无用户提问）：
+  1. 默认并发：`-n auto` + `--dist load`；优先级 `--workers` > `SPECKIT_TEST_WORKERS` > `auto`；不重复注入调用者 `-n`/`--numprocesses`；`PYTEST_XDIST_WORKER` 存在时自动串行；xdist 缺失时串行 + 具名 stderr 回退；cap/loadfile 只在实测证据后调整（A13）。
+  2. watch-target 唯一新增失败：优先具名可枚举串行标记 + 运行器仍产出完整一份 `--names-out` 清单与单一退出码；仅当无法保真时用测试级、有实测依据的超时上调；禁止 skip/xfail/静默全局串行（A14）。
+  3. 原则落点：标题 `Efficient Test Execution (Concurrent by Default)`；template XIX / live XX；版本 1.16.0→1.17.0；instructions 章节插在 `## Single-Run Evidence Discipline` 后；计数 19/20/12、watchlist 7、章节 33/34；预算仅在实测超过 34,816 B 时调整；镜像重新生成。
+  4. 收口比较：名称差集对实现起点 SDD 基线槽位，双向记录新增/消失；19 个串行既存失败按名称排除；最终并行收口新增名必须为 0；消失项不追认为修复。
+- gates: `validate-requirements` ok（332 行 / 45 definition rows / 7 STR，0 error / 0 warning）；`pre-analyze --stage requirements` pass errors=0 advisories=1（未来 owner guideline）；`decomposition --mode plan` proceed（fr=33 ≤ 60）；`flow-class` execution / declaration；`overlap-check` clear（checked=1, overlaps=0, note: no declaration artifact）。
+- overlap 裁决：067 RC-03 与 085 保留面是**概念边界**而非文件级重叠，已在 requirements § Boundary and Ownership 记明；067 结论未改写；`git diff --name-only -- .specify/specs/085-sdd-temporary-goal-team` 为空。未静默清除任何 overlap。
+- 085 dogfood：requested 24；clarify effective 2（1 executor + 1 verifier reserve，按 checkpoint 01）；临时 Team 仍待 clarify + plan U4 后创建（085 C-008）；085 goal/team/checkpoints/contracts/历史零改动。
+- in-passing repairs：checklist 与 feature registry 的“待 clarify 绑定”注记、requirements-stage 行数注记更新为绑定后事实；无 FR/SC 增减、无状态翻转。
+- wrap-up records：run-determination `skill:clarify-artifact` + `/speckit.clarify`；exec-quant 两条；feedback 两条；`should_prompt=true`（282/283 ≥ 10，非阻断通知，未自动发送）。
+- docs sync eval：`无需记录`（clarify 只收敛既有规格，无用户可见能力变化）。
+- next: `plan` dispatch（driver；临时 Team 在 clarify+plan U4 后创建）。
+
 ## U0.5 自检
 
 1. 目标、拓扑、权威、切片、断点已写入状态脊：**是**。
@@ -110,4 +132,5 @@ last_verdict: requirements U4 pass after 3 in-passing repairs; temp goal created
 
 ## 框架观察
 
-- 暂无（U4/U6 时按三要素记录）。
+- **requirements scaffold 短暂创建 `087-` 分支（2026-11-06，A19a）**：脚本在正确 `086` 分支之前短暂创建了 `087-` 分支，随后由驱动清理并以 `086` 重建。本特性不修改该脚本；建议 improve 流程复核编号推导顺序。
+- **宿主阶段 agent 承载降级（2026-11-06，A19b）**：宿主未暴露 085 的阶段 agent 类型；requirements 以 `SDD Requirements Executor`、clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色。085 的 team/concurrency/checkpoint 机制仍被使用；此承载降级不记为 085 失败，登记为观察。
