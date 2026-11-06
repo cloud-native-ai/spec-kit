@@ -72,6 +72,26 @@ evidence_path=.specify/specs/087-speckit-visualization/test-evidence/cl-01-closu
 evidence_sha256=58a8e8b95e38676d29624d0c5524697cae116dfd586deb221494b90a1d77ac1d
 verdict=pass
 
+sample_id=SC-011
+evidence_path=.specify/specs/087-speckit-visualization/test-evidence/us5-efficiency-element.txt
+evidence_sha256=d66674fb82d23ae0df0a6c94667ae2d7af90a1d5e5aee3a971aa3b2e91646967
+verdict=pass
+
+sample_id=SC-012
+evidence_path=.specify/specs/087-speckit-visualization/test-evidence/us5-readonly-store.txt
+evidence_sha256=b3abe43dd2933ca27beead0be3a6652509c7b401c1407e5f121aec1b32d528d7
+verdict=pass
+
+sample_id=SC-013
+evidence_path=.specify/specs/087-speckit-visualization/test-evidence/us5-measure.txt
+evidence_sha256=e958de621b97d5d3336177f7546c529e7bb842558f2fa7ccc87a119d568e81d8
+verdict=pass
+
+sample_id=SC-014
+evidence_path=.specify/specs/087-speckit-visualization/test-evidence/success-criteria.txt
+evidence_sha256=1ec833c60e4fe99b585e1492027503033ead0e16be93022667e5dee6bd0295f3
+verdict=pass
+
 # -- Success Criteria evaluation --
 # One block per SC declared in requirements.md § Success Criteria. `Path` markers and the `final` / `supporting`
 # split are owned by requirements.md; the per-SC capture file and producing command are tabulated in
@@ -132,6 +152,22 @@ SC-010_status=pass
 SC-010_value=0 spawn/thread/scheduler sites in the two delivered scripts; pyproject.toml untouched; 0 new store, registry or channel; 2 environment variables introduced, both render-parameter only; confirmation gates 27 -> 27 with 0 violations; guard RO-13 pass
 SC-010_note=Supporting-path. Every clause of the nine-item prohibition audited over git diff --name-only 56f3f881..HEAD, with the two introduced render-parameter variables disclosed rather than counted as zero (test-evidence/cl-01-closure.txt § 2-§ 3; guard reading in test-evidence/us4-guard-verdict.txt § 5.1).
 
+SC-011_status=pass
+SC-011_value=one efficiency element per listed step with elapsed first and the explicit `not-evaluated` marker never `0` (§4/§5: the no-record step step-z carries the marker); the tight-bound render-wide withdrawal with the omitted summary naming `tokens, invocations` (§3/§5); the absent store rendering `no measurements` with the entry set unchanged (§6); the digest carrying the element inside its cap (§1/§2); the two renders are the only surfaces
+SC-011_note=Final-path. Both visible surfaces (digest and report) say how long each listed unit took, and every face — measured, not-evaluated, absent-store — is captured on the fixture store (test-evidence/us5-efficiency-element.txt; capture inventory in test-evidence/success-criteria.txt second-slice section).
+
+SC-012_status=pass
+SC-012_value=store byte-identical around both reads: before files=3, after files=3; per-file sha256 digests identical=True; listings identical=True; no path created; verdict line "VERDICT: every file equal and no path created"
+SC-012_note=Final-path. The store is proven read-only by before/after sha256 digest and listing over the whole fixture store around `status-digest.py --action digest` and `measure.py --action summary` (test-evidence/us5-readonly-store.txt).
+
+SC-013_status=pass
+SC-013_value=summary over the fixture store's 8 read records (6 per-record + 1 broken/unreadable + 1 legacy stream line) matches the hand-computed table row by row: step-a/command 3 records elapsed 150000 (120000..180000) tokens=600 invocations=3; step-a/skill 1 record elapsed 5000 tokens=40 invocations=1; step-b/command all not_evaluated; step-c/command 1 record elapsed 7000 tokens=7 invocations=1; exclusions unreadable=1 legacy-format=1 and the accounting identity contributed(6)+unreadable(1)+legacy-format(1)=8=read holds; closed exit set: absent store exit 3 (§6), window selecting nothing exit 3 (§7), bad input exit 2 with the offending value echoed (§8/§9), all-not_evaluated exit 0 with "0 figures measurable" (§10)
+SC-013_note=Final-path. Every reported number is checked against a hand-computed expectation table, and every exit status of the closed set {0, 2, 3} is exercised (test-evidence/us5-measure.txt § 1-§ 10).
+
+SC-014_status=pass
+SC-014_value=two independent `measure.py --action summary` runs over the same fixture store are byte-identical (diff exit 0, no output); the changed-file scan `git diff --name-only 56f3f881..HEAD` shows 199 paths, all delivered sources, their generated copies/mirrors, tests and spec documents — no schema-extension or second store engine; the measure command's per-tool copies and mirrors are engine-produced and --check clean
+SC-014_note=Supporting-path. The determinism record (run1/run2 diff) is captured in the dated second-slice section of test-evidence/success-criteria.txt; the delivery shape (regen-command-copies, sync-mirrors, wrap-up embed registry) is captured in test-evidence/polish-second-slice.txt; the projections themselves are test-evidence/us5-measure.txt § 1/§ 2.
+
 # -- Joint acceptance (one row per `in-scope` runtime-stack row in requirements.md) --
 # Only RS-005 carries Form: in-scope; RS-001…RS-004 are signed-contract (owner-side duty), so only RS-005 owes a row.
 
@@ -146,3 +182,4 @@ deferred_reason_summary=no task row was deferred; every row of tasks.md is close
 # -- Free-form notes --
 
 notes=Closure verdict (scripts/python/closure-acceptance-check.py, the single source per shared/workflow/acceptance-hardening.md § Closure Verdict) is recorded in test-evidence/cl-01-closure.txt § 6. Two final-path criteria are `partial` (SC-001, SC-002) and one supporting-path criterion is `not-measured` (SC-009); the reasons and the ladder for each are above and in test-evidence/success-criteria.txt § 3. The feature status landed by this run is stated in .specify/memory/features.md row 087 and .specify/memory/features/087.md § Status Tracking, with the closure reason that decides it — `Implemented` is NOT claimed.
+Second-slice addendum (2026-11-06, implement Part 8): SC-011…SC-014 now carry status rows above, bound to their capture files. Final-path total is 10 criteria (SC-001…SC-007, SC-011…SC-013): 8 `pass`, 2 `partial` (SC-001, SC-002 unchanged). Supporting-path is 4 criteria (SC-008…SC-010, SC-014): 3 `pass` and 1 `blocked` (SC-009). Per test-evidence/success-criteria.txt second-slice dated section, SC-011…SC-014 are all `pass` — SC-011/SC-012/SC-013 on their own fixture captures (us5-efficiency-element.txt, us5-readonly-store.txt, us5-measure.txt), SC-014 on the captured run1/run2 determinism diff plus the delivery-shape capture (polish-second-slice.txt).
