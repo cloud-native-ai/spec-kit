@@ -9,6 +9,16 @@ per-face criteria, the traceability-record schema and the exemption-record schem
 `docs/concepts/documentation-model.md` reader projection) cites this file by section anchor and
 restates **no** value, threshold or enumeration.
 
+**Same facts, second carrier — and which one is the owner**: `skills/external/create-docs/references/diagram-obligation.md`
+is the **client-facing projection** of this contract. It exists because this contract does not ship: a client
+project installs `.specify/skills/create-docs/` and never receives `.specify/specs/087-…/contracts/`, so the values
+a project must apply have to travel with the skill. Its ownership is therefore delegated and one-directional —
+**this file is the design record and stays the owner** of every value above; the shipped reference restates those
+values for a reader who cannot open this file, and where the two disagree the projection is the defect. The
+reference carries the same projection duty in the other direction for the engine: its header says that a
+disagreement between the projection and `docs-utils.py --action obligation` **is** the engine winning. No third
+carrier of these values exists (`D-001` aside, which is a declared non-coverage, not a value).
+
 **Boundary.** The carrier set, the taxonomy, the reserved root filenames and the confirmation tiers are
 **not** owned here — they stay with `skills/external/create-docs/SKILL.md` § Desired-State Baseline
 (FR-001/FR-002/FR-003 cite it). The drawing capability's semantic model, engine routing, delivery

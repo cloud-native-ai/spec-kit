@@ -9,7 +9,17 @@
   this file is the P0 finding F1. It is written HONESTLY: a `final`-path criterion reads `pass` only
   where the evidence pointer exists and reproduces; where the evidence is a unit/integration assertion
   on a local fixture the note says exactly that, and no criterion is promoted by a model judgement.
+
+  Round 2 (same date): review F2/F13/F17/F26/F27/F28 were closed as a documentation-and-guard repair — no
+  engine behaviour, fixture composition or criterion semantics changed. `post_change_commit` therefore keeps
+  naming `b06c93a7`, the commit whose run produced these readings; the round-2 repair commit rides in the
+  run's own commit log rather than overwriting where the measurements came from.
 -->
+
+# -- Repair rounds on this log (one line per round) --
+
+round2_repair_scope=documentation-only (review F2/F13/F17/F26/F27/F28); no engine, fixture or test-semantics change
+round2_repair_reading=the five 087 files re-run at the repair head: 124 passed, 0 failed; the SC rows above carry over unchanged
 
 # -- Baseline (recorded before this round's repairs) --
 
@@ -26,7 +36,7 @@ baseline_failed_names=.specify/specs/087-arch-diagram-docs/baseline-failed.txt
 # -- /speckit.implement results --
 
 implementation_date=2026-11-06
-post_change_commit=pending-this-round
+post_change_commit=b06c93a7
 
 post_change_087_files_passed=124
 post_change_087_files_failed=0

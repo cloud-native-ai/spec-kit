@@ -27,7 +27,7 @@
 | 7 | `skills/external/draw-diagram/**` | **零改动**：只被引用（FR-011）——本表登记为「不交付面」以防误改 |
 | 8 | `tests/unit/test_docs_utils_obligation.py` + `tests/integration/test_docs_obligation_scenarios.py` | 封闭 verdict / reason 集、只读、确定性、负向档位、收敛回路（`plan.md` § Test Plan 表 A/B） |
 | 9 | `tests/fixtures/docs-obligation/**` | **11 段夹具**（`data-model.md` E6 的逐档表：8 段判定 + 3 段豁免） |
-| 10 | `.specify/skills/create-docs/**`、`.specify/skills/improve-docs/**`、`.specify/templates/commands/docs.md`，加四家 per-tool 命令副本 `.claude/commands/speckit.docs.md`、`.github/prompts/speckit.docs.prompt.md`、`.opencode/command/speckit.docs.md`、`.qoder/commands/speckit.docs.md` | 由 `sync-mirrors.py` / `regen-command-copies.py` 生成，手不改（镜像路径是 `.specify/skills/<name>`，**没有** `external/` 这一层；源目录才有 `skills/external/<name>`） |
+| 10 | `.specify/skills/create-docs/**`、`.specify/skills/improve-docs/**`，加四家 per-tool 命令副本 `.claude/commands/speckit.docs.md`、`.github/prompts/speckit.docs.prompt.md`、`.opencode/command/speckit.docs.md`、`.qoder/commands/speckit.docs.md` | 由 `sync-mirrors.py` / `regen-command-copies.py` 生成，手不改（镜像路径是 `.specify/skills/<name>`，**没有** `external/` 这一层；源目录才有 `skills/external/<name>`）。`.specify/templates/commands/` 子树**已退役**（两侧都不存在），四家 per-tool 副本的来源是 `templates/commands/docs.md`，不经该镜像层 |
 
 ## 3. FR → Contract / Slice Map
 
@@ -69,7 +69,9 @@
   源与渲染产物同置一处、文档内联或用可解析相对引用；**反题**是按文档类型的 `docs/<类型>/diagrams/` 子树，
   判别证据 `find docs -type d \( -name assets -o -name diagrams \)`（实测：`docs/assets` 在、`diagrams/` 0 个）。
   不新增文档类型目录、不改保留根文件语义。
-- 本特性**不改**本仓 `docs/` 的内容（Two Hats：框架改动）；`.specify/` 只接受生成。
+- 本特性**不改本仓 `docs/` 的内容**——**唯一例外**是 FR-001/T064 交付的 `docs/concepts/documentation-model.md` 读者投影
+  （与本文件 § 2 第 6 行同一件事，判据同 `requirements.md` § Out of Scope 与 `plan.md` § Constraints / § Constitution Check）：
+  `docs/` 下出现**第二个**被改动的路径即违约（Two Hats：框架改动）；`.specify/` 只接受生成。
 - **收敛归属 → T-005 之外的 `C-008a`**：Reconcile 的 R5 **必须**能产图/重渲染，否则 `SC-003` 的「第二次运行零 finding」
   在文本上不可达（「永久 missing」接线）。`missing` **不**被路由到 Authoring Flow 去收敛——那会让 reconcile 永远报残留。
 - `checklists/requirements.md` 的派生计数漂移**已消解（`OI-087-01` resolved 2026-11-06）**：该清单的 N6 计数副本已按宪法 XIV 删除而非改正，FR/SC 的唯一 owner 回到 `requirements.md`，`register.md` 的该行已关闭。

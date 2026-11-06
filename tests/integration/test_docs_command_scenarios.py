@@ -112,6 +112,9 @@ READER_DOC = REPO / "docs" / "concepts" / "documentation-model.md"
 BASE_COMMIT = "24cb4edc"
 
 DRAW_DIAGRAM_POINTER = "skills/external/draw-diagram"
+# F26: the faces' step registry must be a path that SHIPS with the skill, not the framework repo's
+# `quickstart.md` — a client project installs `.specify/skills/create-docs/` and never receives the spec dir.
+SHIPPED_REFERENCE = "references/diagram-obligation.md"
 
 
 def read(path: Path) -> str:
@@ -396,6 +399,11 @@ def test_c007_baseline_single_owner():
     assert "exempt" in flat, "the obligation item must name the named-exemption path"
     assert "contracts/diagram-obligation.contract.md" in obligation, (
         "the obligation must cite the carrier table's owner instead of re-listing it"
+    )
+    # F26: the citation is by NAME, never by a spec-local link — the skill ships as `.specify/skills/create-docs/`,
+    # where `contracts/` and `quickstart.md` do not exist, so a link there is dead for every client project.
+    assert "](" + "contracts/diagram-obligation.contract.md" + ")" not in obligation, (
+        "the carrier table's owner must be cited by name, not as a link that resolves only in the framework repo"
     )
     for verdict in ("satisfied", "not-evaluated", "recorded-exemption", "no-trace-record"):
         assert verdict not in flat, f"the baseline must not restate the checker's verdict word {verdict!r}"
@@ -759,7 +767,7 @@ def test_c023_per_face_reasons_named_on_the_improve_side():
     body = read(IMPROVE_DOCS)
     for face in ("orphan-rendered", "orphan-source", "source-newer-than-render"):
         assert face in body, f"the improve flow must name the face {face!r}"
-    assert "quickstart.md" in body, "the faces must point at the single step registry"
+    assert SHIPPED_REFERENCE in body, "the faces must point at the single step registry"
 
 
 @pytest.mark.integration
@@ -885,7 +893,7 @@ def test_c023_per_face_reasons_named():
     body = assets + section(CREATE_DOCS, "### Reconcile Loop (thin dispatch — engine semantics live in the pattern doc)")
     for face in ("orphan-rendered", "orphan-source", "source-newer-than-render"):
         assert face in body, f"the flow text must name the face {face!r}"
-    assert "quickstart.md" in body, "the faces must point at the single step registry"
+    assert SHIPPED_REFERENCE in body, "the faces must point at the single step registry"
 
 
 # --- D. the run report's four evidences, and the two repository-level readings -----------------------------

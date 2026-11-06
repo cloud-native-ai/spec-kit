@@ -1,18 +1,27 @@
 # The Diagram Obligation — schema reference (distributed with this skill)
 
-**Owner of this file**: the two record formats and the verdict vocabulary a project needs in order to *read* the
-`docs-utils.py --action obligation` output and to *write* the records that make a diagram traceable. It travels with
-the skill, so a client project that installed `create-docs` holds everything the obligation asks of it; no path here
-points outside this skill's own tree or the project's `docs/`.
+**What this file is**: the **client-facing projection** of the obligation — the part a project that installed
+`create-docs` needs in order to *read* the `docs-utils.py --action obligation` output and to *write* the records
+that make a diagram traceable. It travels with the skill, so no path here points outside this skill's own tree or
+the project's `docs/`.
+
+**What this file is NOT**: a design record. The obligation's design — the closed verdict and reason sets, the
+per-document decision order, the two record schemas and their clause codes (`C-001`…`C-016`) — is owned by the
+framework repository's `contracts/diagram-obligation.contract.md`, which does **not** ship and is therefore cited
+here by name, never by a link. Where this page and that contract disagree about a **value**, the contract wins and
+this page is the defect; where this page and **the engine** disagree, the engine wins
+(`scripts/docs-utils.py --action obligation --help` and its JSON payload are authoritative for anything this page
+summarises).
 
 The obligation's **requirement** (which documents must carry a diagram, and how a named exemption replaces one) is
-stated in `SKILL.md` § Desired-State Baseline, item 5. The **checker's behaviour** is the engine itself:
-`scripts/docs-utils.py --action obligation --help` and its JSON payload are authoritative for anything this page
-summarises, and a disagreement between this page and the engine is a defect in this page.
+stated in `SKILL.md` § Desired-State Baseline, item 5. This page restates only which value each document lands and
+why; it adds no rule of its own.
 
-The six-value verdict set below is the same vocabulary the framework's verification log uses for a success
-criterion; the framework's `shared/workflow/acceptance-hardening.md` § Verification Vocabulary owns that set, and
-this page restates only which value each document lands and why.
+The **five** verdicts below (`satisfied` / `missing` / `stale` / `recorded-exemption` / `not-evaluated`) are the
+checker's vocabulary. They are a different set from the **six** statuses the framework's verification log uses for
+a success criterion (`pass` / `partial` / `fail` / `blocked` / `deferred` / `unknown`), owned by the framework's
+`shared/workflow/acceptance-hardening.md` § Verification Vocabulary: five document verdicts here, six criterion
+statuses there, and the two are not interchangeable.
 
 ---
 
@@ -149,14 +158,19 @@ verdict with a later tier's:
 
 | # | Condition | Verdict / reason |
 |---|-----------|------------------|
-| 1 | A valid exemption record, no diagram face referenced | `recorded-exemption` |
+| 1 | A valid exemption record, no diagram face referenced | `recorded-exemption` / `exempt-chronological` |
 | 2 | An exemption record that is invalid or overturned | `not-evaluated` / `exemption-invalid` |
 | 3 | No relative reference to a diagram face | `missing` / `no-diagram-reference` |
 | 4 | A reference whose target is not on disk | `missing` / `reference-unresolved` |
 | 5 | One face of the pair on disk while the other is absent | `missing` / `orphan-rendered` · `orphan-source` |
-| 6 | Faces and reference in place, record absent or unable to point here | `not-evaluated` / `no-trace-record` · `trace-incomplete` |
-| 7 | Faces, reference and complete record in place; a staleness rule holds | `stale` / `source-newer-than-render` · `render-digest-mismatch` |
-| 8 | Everything above is clear and the reference names a rendered face | `satisfied` / `reference-resolves` |
+| 6 | Faces and reference in place, but no record points at this diagram (a record exists and its entry is missing a required field) | `not-evaluated` / `trace-incomplete` |
+| 7 | Faces and reference in place, and there is no `--record` at all (or nothing in it points here) | `not-evaluated` / `no-trace-record` |
+| 8 | Faces, reference and complete record in place; a staleness rule holds | `stale` / `source-newer-than-render` · `render-digest-mismatch` |
+| 9 | Everything above is clear and the reference names a rendered face | `satisfied` / `reference-resolves` |
+
+The row count is the design record's (`contracts/diagram-obligation.contract.md` `C-016`, nine orders) projected
+one for one: orders 6 and 7 are two different facts — a record that exists but cannot point at this diagram, and no
+record to point with — so they are never merged into one row here.
 
 Face loss precedes staleness, because a rule that compares two faces cannot be judged when one of them does not
 exist; attributing the loss to staleness sends the reader to re-render something that is missing.

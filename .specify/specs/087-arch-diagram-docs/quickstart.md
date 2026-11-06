@@ -123,13 +123,18 @@ exit 0
 
 | 夹具 | 前置状态（仓库内的形态） | `--record` | 期望 `verdict` / `reason` |
 |------|--------------------------|-----------|---------------------------|
-| `clean/` | 两面齐 + 引用解析到 `foo.png` + 本夹具记录齐备（**无豁免记录**） | `tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json` | `satisfied` / `reference-resolves`；`summary.converged=true`、`summary.clean=true`（`exempted=0`，故两谓词同时成立）；exit 0 |
+| `clean/` | 两面齐 + 引用解析到 `foo.png` + 本夹具记录齐备（**无豁免记录**） | `docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json` | `satisfied` / `reference-resolves`；exit 0。**`summary.converged` / `summary.clean` 只在 `--only` 收窄后才是 `true`**：整空间读数带同一空间另外 5 份无图 `index.md`（`missing=5`）故两谓词为 `false`，那是夹具的既定构成（`data-model.md` E6），不是本行的判据 |
 | `orphan-rendered/` | 渲染产物已删、源 `docs/assets/widget.mmd` 在、**引用指向源**；记录以**源**登记该图、`rendered` 为空（不为不在盘的面写条目：`C-008` 规则 2 会拿它的 `sha256` 与盘上文件比对），`satisfied` 的第二条件 `C-007` 因此不成立 | `docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json` | `missing` / `orphan-rendered`；`converged=false`、`clean=false`；exit 0 |
-| `orphan-source/` | 源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`；`converged=false`、`clean=false`；exit 0 |
-| `stale-source/` | **两面都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`；`converged=false`、`clean=false`；exit 0 |
+| `orphan-source/` | 源已删、渲染产物在 | 本夹具记录（`docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json`） | `missing` / `orphan-source`；`converged=false`、`clean=false`；exit 0 |
+| `stale-source/` | **两面都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录（同上文件名） | `stale` / `source-newer-than-render`；`converged=false`、`clean=false`；exit 0 |
 
-**夹具 ID 形态**：追溯记录文件名 `<UTC ISO basic>-<8 hex>-diagram-trace.json`（例
-`20261106T000000Z-aaaaaaaa-diagram-trace.json`）；计数形态：每个夹具恰 **1** 份载体文档、**1** 张图（两面以上）。
+**记录名与 `--record` 的取值口径（两件事，读混了命令就会 exit 2）**：
+① **文件名是夹具的事实**：`tests/fixtures/docs-obligation/<space>/docs/.speckit/runs/` 下每份夹具只有一份记录，
+名恒为 `20261106T090000Z-0870a1b2-diagram-trace.json`（`ls` 实测；由 `build_fixtures.py` 逐字节产出）。
+文件名**形状**归 `C-010`（`<UTC ISO basic>-<8 hex>-diagram-trace.json`），本文件只用这个**实测值**，不再举别的例子。
+② **`--record` 的值相对 `--root` 解析**（`C-010` 的约定），因此它写成 `docs/.speckit/runs/<文件名>`——
+**不带** `tests/fixtures/...` 前缀；整条仓库相对路径填进 `--record` 会与 `--root` 拼接两次，引擎以 exit 2 拒绝。
+计数形态：每个夹具恰 **1** 份带图的载体文档 + 该空间另外 5 份无图 `index.md`（共 6 份载体）、**1** 张图（两面以上）；
 夹具落点与「`tmp_path` 副本」纪律见 `data-model.md` E6。
 
 **`missing-face` 的原步序已被删除（P1-2 的修复本体）**：attempt 1 的 S3 在同一个 `missing-face` 夹具上
@@ -146,8 +151,8 @@ exit 0
 # 会与 `--root` 拼接两次，命令以 exit 2 拒绝。
 
 # 1) 绿态基线：两面齐 + 引用解析 + 记录齐备
-#    判据的载体是**这一份文档**，所以必须带 `--only`：整空间里另外六个类型目录的 `index.md` 没有图，
-#    那是夹具的既定构成（E6），整空间读数的 `missing=6` 是正确结论，不是失败。不带 `--only` 时
+#    判据的载体是**这一份文档**，所以必须带 `--only`：整空间里另外五个类型目录的 `index.md` 没有图，
+#    那是夹具的既定构成（E6），整空间读数的 `missing=5` 是正确结论，不是失败。不带 `--only` 时
 #    `summary.converged=false` 属于预期，MUST NOT 被读成绿态基线不成立。
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/clean \
@@ -198,24 +203,36 @@ git status --porcelain tests/fixtures/docs-obligation/clean    # 预期：空（
 
 **premises**: 三个夹具各带一份 `C-011` 形态的豁免记录（`exempt-ok` 三字段齐备；`exempt-bad` 缺
 `justification`；`exempt-superseded` 记录齐备但文档已带解析到渲染产物的引用）。豁免记录**不产生**
-`documents[]` 之外的计数，只走 `summary` 的两个字段。
+`documents[]` 之外的计数，只走 `summary` 的两个字段。三条 `--root` 都指向**夹具空间根**，`--record`
+（仅在 `exempt-superseded` 需要）按 `--root` 相对解析为 `docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json`
+——该空间 `runs/` 下就是这一份记录（`ls` 实测），`exempt-ok` / `exempt-bad` 的空间**没有** `runs/`，故不给 `--record`。
 
 ```bash
-python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root tests/fixtures/docs-obligation/exempt-ok --json
+python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+  --root tests/fixtures/docs-obligation/exempt-ok --only docs/concepts/widget-overview.md --json
 # 预期：verdict = recorded-exemption / reason = exempt-chronological ; summary.exempted = 1
 #       summary.converged = true（豁免是合法终态，不参与收敛算式）; summary.clean = false（exempted>0）
+#       `--only` 只收窄判定的载体范围；它上面这句 `converged=true` 是**该一份文档**的读数。
+#       整空间读数同除 `--only` 与 S3 的 `clean/` 同因：该空间另有 5 份无图 `index.md` ⇒ missing=5、converged=false。
 
-python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root tests/fixtures/docs-obligation/exempt-bad --json
+python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+  --root tests/fixtures/docs-obligation/exempt-bad --json
 # 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.not_evaluated = 1 ; summary.converged = false
 
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/exempt-superseded \
-  --record tests/fixtures/docs-obligation/exempt-superseded/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
+  --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
 # 预期：verdict = not-evaluated / reason = exemption-invalid ; summary.exemption_superseded = 1 ; summary.converged = false
 ```
 
+**整空间 vs 单文档（`C-013` 的 `judged_scope_has_carrier` 不替你收窄范围）**：E6 的每个夹具空间都有
+6 份载体（1 份带图 + 5 份 typed `index.md`），这 5 份**真的**没有图，因此**整空间**读数的 `converged`
+恒为 `false`——那是夹具的既定构成，不是本行期望被推翻。要读「收敛」与「干净」这两个谓词就带
+`--only docs/concepts/widget-overview.md`（读数变为该一份文档的范围）；要读「这份文档落哪一档」，
+整空间读数里的那一行即可。两种读数都成立，MUST NOT 把整空间的那个 `false` 当成失败。
+
 `summary.exempted > 0 ⇒ clean=false` 是 `C-013` 的硬约束：**豁免可见，不等于通过**。
-同一条款同时规定 `exempted` **不参与** `converged`——因此 `exempt-ok/` 的读数是
+同一条款同时规定 `exempted` **不参与** `converged`——因此在**收窄到这一份文档**的读数上，`exempt-ok/` 是
 **`converged=true` + `clean=false`**，这不是矛盾，而是「已收敛但仍不干净」这个真实状态的唯一写法
 （`SC-008`；收敛判据的用法见 `C-008a` R6）。
 
