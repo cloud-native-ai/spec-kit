@@ -378,6 +378,12 @@ def load_project_agent_definitions(project_path):
 _OPENCODE_THEME_COLORS = frozenset(
     {"primary", "secondary", "accent", "success", "warning", "error", "info"}
 )
+# Qoder's agent schema hard-validates `color` against this closed set; any
+# other value fails the whole definition at load time, so the renderer must
+# never emit one (the field is skipped and counted as unmapped instead).
+_QODER_AGENT_COLORS = frozenset(
+    {"red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan"}
+)
 _OPENCODE_COLOR_HEX_MAP = {
     "red": "#FF0000",
     "green": "#008000",
@@ -456,7 +462,7 @@ _AGENT_METADATA_MAPPING = {
             "capability-tools": {"emit": "tools", "style": "list"},
             "skills": {"emit": "skills", "style": "list"},
             "run-turn-budget": {"emit": "maxTurns"},
-            "display-color": {"emit": "color"},
+            "display-color": {"emit": "color", "value_enum": _QODER_AGENT_COLORS},
         },
         "provenance": "https://docs.qoder.com/cli/subagent",
     },

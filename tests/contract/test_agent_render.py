@@ -151,6 +151,29 @@ def test_qoder_output_uses_qoder_fields(tmp_path):
     assert "Body of alpha." in content
 
 
+def test_qoder_skips_a_color_outside_its_accepted_enum(tmp_path):
+    """Qoder rejects the whole agent when `color` is outside its closed set.
+
+    The renderer must omit such a value (and count it as an unmapped intent)
+    instead of emitting it; accepted values still render verbatim.
+    """
+    root = _project(tmp_path, template_slugs=("alpha", "beta"))
+    templates = root / ".specify" / "agents" / "templates"
+    (templates / "alpha.agent.md").write_text(
+        _def("alpha", "Alpha").replace("display-color: blue", "display-color: teal")
+    )
+    (templates / "beta.agent.md").write_text(
+        _def("beta", "Beta").replace("display-color: blue", "display-color: pink")
+    )
+    stats = render_agents_for_tool(root, "qoder")
+    alpha = (root / ".qoder" / "agents" / "alpha.agent.md").read_text()
+    beta = (root / ".qoder" / "agents" / "beta.agent.md").read_text()
+    assert "color:" not in alpha
+    assert "color: pink" in beta
+    assert "display-color" in stats["unmapped"].get("alpha", [])
+    assert "display-color" not in stats["unmapped"].get("beta", [])
+
+
 def test_claude_output_joins_tools_as_string(tmp_path):
     root = _project(tmp_path)
     render_agents_for_tool(root, "claude")
