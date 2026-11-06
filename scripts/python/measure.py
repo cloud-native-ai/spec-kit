@@ -2,7 +2,7 @@
 """``/speckit.measure`` engine — the read-only measurement report over the exec-quant store (087, T064).
 
 One stdlib-only script behind the thin command ``templates/commands/measure.md``. Its clauses are owned by
-``.specify/specs/087-speckit-visualization/contracts/measure-report.contract.md`` (C-53…C-62) and its store
+``.specify/specs/088-speckit-visualization/contracts/measure-report.contract.md`` (C-53…C-62) and its store
 access is shared with the visibility surfaces through the ONE store reader
 (``efficiency-element.contract.md`` C-65): records are obtained only by importing
 ``scripts/python/exec-quant.py``'s read path in process — never by re-parsing the record format, never by

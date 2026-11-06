@@ -14,7 +14,7 @@ the defect C-41 names, so no action re-reads a registry entry by a different cod
 Authority map (this file owns no rule; it names the owner of each):
 
 * The propositions the guard decides — their ids and their subjects — are owned by
-  ``.specify/specs/087-speckit-visualization/contracts/reporting-obligations.contract.md`` C-01…C-13. This file
+  ``.specify/specs/088-speckit-visualization/contracts/reporting-obligations.contract.md`` C-01…C-13. This file
   names each proposition by id and states only *what it reads on disk*; it restates no proposition.
 * The reporting obligation itself (scope predicate, cadence default, seat obligation, master duty, transition
   triggers, digest contract, machinery prohibition) is owned by ``shared/guidelines/reporting-obligations.md``.

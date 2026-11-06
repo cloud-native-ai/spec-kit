@@ -56,13 +56,13 @@ RUNTIME_CACHE_PREFIXES = (
     # failure text that names the old path; a generated evidence cache is not a
     # live face and must not be read as one.
     ".specify/specs/085-sdd-temporary-goal-team/test-evidence/",
-    # 2026-11-06 Feature 087: same rationale, every feature's evidence lane. A
+    # 2026-11-06 Feature 088: same rationale, every feature's evidence lane. A
     # full-suite log is a *generated* capture of a run's stdout: it quotes the
     # failure text of this very guard, so a spec-directory evidence lane always
     # contains the needle by construction. Excluding the generated lane is the
     # owner's own rule (a generated artifact is not a live face); deleting the
     # capture would destroy the run's evidence instead.
-    ".specify/specs/087-speckit-visualization/test-evidence/",
+    ".specify/specs/088-speckit-visualization/test-evidence/",
 )
 
 #: Migration guards must *name* the old path in order to assert its absence, so they

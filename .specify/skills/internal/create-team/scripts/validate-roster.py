@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Creation-time reporter-seat roster guard (087-speckit-visualization).
+"""Creation-time reporter-seat roster guard (088-speckit-visualization).
 
 Judges ONE persisted roster against the reporter-seat obligation
 (`reporter-seat.contract.md` C-16 / C-17 / C-21; a contract fragment is

@@ -1,6 +1,6 @@
 """Contract test: the reporting obligation's owner document (087, T007).
 
-Layer-2 of the Feature 087 test map. This file owns the assertions over
+Layer-2 of the Feature 088 test map. This file owns the assertions over
 ``shared/guidelines/reporting-obligations.md`` (framework source) and its mirror
 ``.specify/shared/guidelines/reporting-obligations.md``.
 
@@ -918,10 +918,10 @@ def test_c35_slow_and_stalled_are_separated_by_the_declared_threshold_row():
 #: here, so a row that names a document this feature never delivered fails the scan
 #: instead of silently leaving the query set empty.
 OWNERSHIP_MAP_CONTRACT = (
-    REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization" / "contracts"
+    REPO_ROOT / ".specify" / "specs" / "088-speckit-visualization" / "contracts"
     / "ownership-map.contract.md"
 )
-FEATURE_REF = REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization" / "feature-ref.md"
+FEATURE_REF = REPO_ROOT / ".specify" / "specs" / "088-speckit-visualization" / "feature-ref.md"
 
 #: The five declared relation forms (C-48). The set is closed; a sixth word is a defect.
 RELATION_FORMS = ("owns", "consumes", "amends", "preserves", "extends")
@@ -995,7 +995,7 @@ def _ownership_table() -> list:
 #: C-66) or a requirement clause (`the requirements' FR-024`), and those live inside the spec
 #: directory rather than at the repository root. Resolving the spec-relative prefix is what lets
 #: a row name the owner it actually has instead of forcing an artificial owner path.
-SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization"
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "088-speckit-visualization"
 
 
 def _delivered_path(cell: str):

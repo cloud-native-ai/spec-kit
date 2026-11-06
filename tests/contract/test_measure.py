@@ -42,7 +42,7 @@ pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MEASURE = REPO_ROOT / "scripts" / "python" / "measure.py"
-CONTRACT = REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization" / "contracts" / "measure-report.contract.md"
+CONTRACT = REPO_ROOT / ".specify" / "specs" / "088-speckit-visualization" / "contracts" / "measure-report.contract.md"
 
 
 # --------------------------------------------------------------------------- #
