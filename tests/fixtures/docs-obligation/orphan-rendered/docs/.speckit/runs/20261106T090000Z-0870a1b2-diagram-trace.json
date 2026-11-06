@@ -1,0 +1,27 @@
+{
+  "run_id": "20261106T090000Z-0870a1b2",
+  "feature": "087-arch-diagram-docs",
+  "diagrams": [
+    {
+      "document": "docs/concepts/widget-overview.md",
+      "engine": "mermaid",
+      "engine_reason": "routing matrix row: flow graph, no zone grammar required",
+      "ldm_summary": "diagram_class=flow; elements=3; relations=2; zones=0",
+      "delivery": {
+        "accepted": true,
+        "unmet": []
+      },
+      "source": "docs/assets/widget.mmd",
+      "rendered": [
+        {
+          "path": "docs/assets/widget.svg",
+          "sha256": "6af28ffe1c1e6aff6f859ec2d4ecb96578420e24b2f738580d3a9ddbb44a2443"
+        },
+        {
+          "path": "docs/assets/widget.png",
+          "sha256": "dbfef7064572d648e343f1f3ee5d5c2378da578dcd5deea39590ef5bba776085"
+        }
+      ]
+    }
+  ]
+}

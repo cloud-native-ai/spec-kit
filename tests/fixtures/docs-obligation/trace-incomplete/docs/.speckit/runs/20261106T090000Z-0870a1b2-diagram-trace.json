@@ -1,0 +1,22 @@
+{
+  "run_id": "20261106T090000Z-0870a1b2",
+  "feature": "087-arch-diagram-docs",
+  "diagrams": [
+    {
+      "document": "docs/concepts/widget-overview.md",
+      "engine": "mermaid",
+      "engine_reason": "routing matrix row: flow graph, no zone grammar required",
+      "ldm_summary": "diagram_class=flow; elements=3; relations=2; zones=0",
+      "delivery": {
+        "accepted": true,
+        "unmet": []
+      },
+      "source": "docs/assets/widget.mmd",
+      "rendered": [
+        {
+          "path": "docs/assets/other.svg"
+        }
+      ]
+    }
+  ]
+}
