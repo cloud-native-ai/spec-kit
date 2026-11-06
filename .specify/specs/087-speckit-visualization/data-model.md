@@ -105,8 +105,8 @@ The declared silence duration beyond which a sub-flow is judged stalled. **No nu
 | `measured_silence` | duration | the observed age being judged |
 
 This entity exists so that the *reference* has a home while the *number* keeps its single definition point.
-`storage/guidelines/one-source-of-truth.md` is the discipline: a copy of the number anywhere else would be a second
-definition that drifts.
+`.specify/shared/guidelines/one-source-of-truth.md` is the discipline: a copy of the number anywhere else would be a
+second definition that drifts.
 
 ## E5 — Current-State Digest
 

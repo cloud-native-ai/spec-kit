@@ -63,7 +63,7 @@ the enumeration owner (28 paths).
 | 14 | `.github/prompts/speckit.status.prompt.md` | per-tool copy (generated) | FR-022 |
 | 15 | `.opencode/command/speckit.status.md` | per-tool copy (generated) | FR-022 |
 | 16 | `.qoder/commands/speckit.status.md` | per-tool copy (generated) | FR-022 |
-| 17 | `scripts/python/status-digest.py` | NEW deterministic script (digest + guard) | FR-011, FR-012, FR-017, FR-022 |
+| 17 | `scripts/python/status-digest.py` | NEW deterministic script (digest + guard + report) | FR-007, FR-011, FR-012, FR-017, FR-022 |
 | 18 | `.specify/scripts/python/status-digest.py` | mirror (generated) | — |
 | 19 | `shared/definitions/subagent-definitions.md` | edit — one pointer line (§ Dispatch-Time Governance Obligation) | FR-013, FR-014 |
 | 20 | `.specify/shared/definitions/subagent-definitions.md` | mirror (generated) | — |

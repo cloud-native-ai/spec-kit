@@ -2,26 +2,27 @@
 
 **Feature**: 087 | **Covers**: FR-011, FR-012, FR-017, FR-022
 **Contract object**: (a) the thin command `templates/commands/status.md` (entry `/speckit.status`) and its
-generated per-tool copies; (b) the deterministic script `scripts/python/status-digest.py` with two actions;
+generated per-tool copies; (b) the deterministic script `scripts/python/status-digest.py` with three actions;
 (c) their shared reading of existing state.
 
 Clause ids are dense (`DG-01`…`DG-06`) and are cited verbatim by `/speckit.tasks`.
 
 ---
 
-## C-41 · DG-01 — One command, one script, two actions, one reading
+## C-41 · DG-01 — One command, one script, three actions, one reading
 
 The entry MUST be a thin command template (`templates/commands/status.md`) that delegates to
-`scripts/python/status-digest.py` and carries no logic of its own. The script MUST implement exactly two actions:
+`scripts/python/status-digest.py` and carries no logic of its own. The script MUST implement exactly three actions:
 
 - `--action digest` — render the bounded current-state summary;
-- `--action guard` — judge the mechanically decidable propositions of the obligation and return named statuses.
+- `--action guard` — judge the mechanically decidable propositions of the obligation and return named statuses;
+- `--action report` — render one status line from the owner's four labels plus attribution and the profile in force.
 
-Both actions MUST share the same reader functions for state (one reading backs both, per `FR-022`). A second
-parser or a second renderer is a defect.
+All three actions MUST share the same reader functions for state (one reading backs the digest, the guard's verdicts
+and the rendered line — the shape `FR-022` fixes). A second parser or a second renderer is a defect.
 
-*Judged by*: `tests/contract/test_status_digest.py` — the script exposes both actions; the command template contains
-no rendering logic (it names the script path and the delegated action).
+*Judged by*: `tests/contract/test_status_digest.py` — the script exposes exactly these three actions; the command
+template contains no rendering logic (it names the script path and the delegated action).
 
 Requirements served: (FR-017, FR-022).
 

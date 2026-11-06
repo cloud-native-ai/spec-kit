@@ -173,7 +173,7 @@ agents/                     # NEW reporter.agent.md — the reporting role as an
 skills/internal/create-team/ # SKILL.md + references/create-mode.md (roster schema + create step) + references/patterns.md (threshold table citation) + scripts/validate-roster.py (NEW guard)
 skills/external/coaching-skills/ # SKILL.md § Dispatch Payload — one added field inside the closed set
 templates/commands/         # NEW status.md — the thin /speckit.status entry
-scripts/python/             # NEW status-digest.py — digest renderer + guard (one reading)
+scripts/python/             # NEW status-digest.py — digest renderer + guard + line renderer (one reading)
 tests/contract/             # NEW test_reporting_obligations.py, test_roster_reporter_seat.py, test_status_digest.py, test_coaching_reporting_duty.py; EDITED test_coaching_dispatch_contract.py (declared expected delta, OM-05)
 tests/unit/                 # NEW test_status_digest_unit.py — projection, bounding, staleness, exit codes
 ```
@@ -279,18 +279,20 @@ and reads entries plus the per-entry triplet paths recorded in them.
 observed activity, taken from the registry entry's `updated_at` / the triplet file's mtime, and an entry whose age
 exceeds the declared staleness bound is marked stale with that age rather than rendered as current.
 
-**D8 — One script, two actions.** `status-digest.py --action digest` renders the bounded summary;
-`--action guard` judges the mechanically decidable propositions and returns named statuses. Both share the same
-reader functions, which is what FR-022's "one reading backs both" requires — a second parser would be a second
-definition of what "current state" means.
+**D8 — One script, three actions.** `status-digest.py --action digest` renders the bounded summary;
+`--action guard` judges the mechanically decidable propositions and returns named statuses; `--action report`
+renders one status line from the owner's four labels plus attribution and the profile in force. All three share the
+same reader functions, which is what FR-022's "one reading backs both the digest and the guard's verdicts" requires —
+a second parser would be a second definition of what "current state" means.
 
 **D9 — The bound is an entry cap with an omitted count.** `FR-012`'s "one screen and not a log dump" is
 mechanical: the script writes at most `--cap` entries (declared default in the script, configurable per
 invocation) and states `omitted=<n>` when it truncates. No "reasonable size" prose.
 
-**D10 — Exit statuses are a closed three-value set.** `0` = a digest was rendered (including the explicit
-"nothing running" rendering, which is an answer), `3` = nothing active (the declared "nothing active" status
-`FR-011`/SC-005 name), `2` = usage or input error. The guard action reuses `0`/`1`/`2` in the framework's existing
+**D10 — Exit statuses are a closed three-value set.** `0` = a digest was rendered with at least one entry, `3` =
+nothing active — the declared "nothing active" status `FR-011`/SC-005 name, carried by the explicit
+`nothing-running` rendering (an empty entry set MUST NOT render an empty digest with status `0`), `2` = usage or
+input error. The guard action reuses `0`/`1`/`2` in the framework's existing
 convention (clean / findings / input error), matching `flow-class-check.py` and `pre-analyze-check.py`.
 
 **D11 — The new owner's Chinese/English shape follows its siblings.** The framework's `shared/guidelines/`
