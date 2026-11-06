@@ -323,6 +323,37 @@ Rationale: a structure that carries no user information forces the user to open 
 ask a maintainer before they can filter, sort or judge the system. Naming the information a
 structure must carry keeps it legible at the entry point instead of only from inside.
 
+### XIX. Efficient Test Execution (Concurrent by Default)
+Test coverage is a necessary condition for quality and never a sufficient one: a suite that
+exists but is not actually run protects nothing, so the cost of running it is a quality
+attribute in its own right, at the same tier as coverage, and MUST be treated as one:
+- Test execution efficiency MUST be judged by the criterion owned at
+  `.specify/shared/guidelines/test-execution-efficiency.md`, which is also the only
+  definition point of the choice between process-level parallelism, asynchronous
+  concurrency and neither, of the isolation preconditions that make parallel execution
+  legitimate, and of the ways of being faster that are never admissible; consumers MUST
+  reference it, do not restate it.
+- Where that criterion is met, efficiency MUST be a releasable requirement: a change MAY be
+  refused for exceeding it, and a faster run MUST NOT be bought by shrinking the selection,
+  skipping, declaring flakiness, or retrying until green.
+- Before any execution mode is changed, the isolation preconditions MUST hold on measurement
+  — compared by failure name against serial execution — not by reading the tests; a
+  precondition that does not hold MUST be repaired before parallelism is enabled.
+- This principle applies to every project that builds a test framework or writes test cases,
+  and not only to this repository; the defaults and parameters of a concrete runner remain
+  the runner's own.
+- Where this principle and the existing test-quality principles both speak, the split is
+  fixed: this one governs what tests cost to execute, the others govern what test exists and
+  when it is written — an overlapping obligation is a defect to repair, not a duplicate to
+  keep.
+- This principle adds a criterion, not machinery: it MUST NOT justify a duration registry, a
+  slow-test ranking, a coverage-versus-time report, or any other standing measurement surface.
+
+Rationale: coverage answers whether a path is tested at all, never whether those tests still
+run, and the two fail independently — an idle suite keeps its coverage number and loses all
+protection while every report stays green. Naming execution cost as a quality attribute keeps
+the cheaper-to-run suite from becoming a suite nobody runs.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

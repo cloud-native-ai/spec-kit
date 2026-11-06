@@ -225,6 +225,22 @@ Before processing the template, scan the project to understand its actual contex
     restated, inside the constitution. This principle adds a way of naming and structuring, not
     machinery: it MUST NOT justify a freshness scanner, an information scorer, a maturity
     report, or any other new tracking system.
+  - **Efficient Test Execution (Concurrent by Default)** — test coverage is a necessary and
+    never a sufficient condition for quality: a suite that exists but is not actually run
+    protects nothing, so the cost of running it is a quality attribute at the same tier as
+    coverage. The criterion that decides when efficiency becomes a releasable requirement, the
+    choice between process-level parallelism, asynchronous concurrency and neither, the
+    isolation preconditions that make parallel execution legitimate, the measurement anchors,
+    and the ways of being faster that are never admissible (shrinking the selection, skipping,
+    declaring flakiness, retrying until green) live at
+    `.specify/shared/guidelines/test-execution-efficiency.md` and MUST be referenced, not
+    restated, inside the constitution. The principle governs what tests cost to execute; the
+    pre-existing test-quality principles govern what test exists and when it is written, and
+    an obligation that appears on both sides is a defect to repair. It applies to any project
+    that builds a test framework or writes test cases, and the defaults and parameters of a
+    concrete runner stay the runner's own. This principle adds a criterion, not machinery: it
+    MUST NOT justify a duration registry, a slow-test ranking, a coverage-versus-time report,
+    or any other standing measurement surface.
 - Ensure the Governance section lists amendment procedure, versioning policy, and compliance
   review expectations.
 
