@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
-stage: checklist
-stage_started_at: 1793940100
-stage_deadline_epoch: 1793950900
-stage_base_commit: f3105c98
+stage: analyze
+stage_started_at: 1793940400
+stage_deadline_epoch: 1793951200
+stage_base_commit: 5cbc757b
 attempt: 0
 retry_limit: 3
-last_verdict: tasks U4 pass (50 tasks/9 phases, 33 FR/12 SC, gates pass); T041 085 SC-010 live-status exception recorded; missing skill feedback/exec-quant filled; checkpoint 04 written; checklist dispatch next
+last_verdict: checklist U4 pass (44 CHK, 44/44 traceable; no 085/source edits); findings CHK007/008, CHK017, CHK036 handed to analyze; checkpoint 05 written; analyze dispatch next
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -151,6 +151,15 @@ last_verdict: tasks U4 pass (50 tasks/9 phases, 33 FR/12 SC, gates pass); T041 0
 - accounting: tasks stage session records present；driver filled `skill:create-tasks` feedback/exec-quant；`speckit:tasks` feedback skipped because the engine expects `/speckit.tasks` and the skill identity satisfies U4.
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/04-tasks.md`。
 - next: `checklist` dispatch（effective 2 = 1 checklist executor + 1 verifier）。
+
+## U4 checklist（2026-11-06T04:46Z）
+
+- sentinel: `CHECKLIST-DONE`；stage commit `5cbc757b`。
+- artifact: `checklists/requirements-quality-2026-11-06.md`（44 CHK，44/44 traceable）；`test-evidence/checklist-gates.txt`（13 probes）。
+- driver U4: no source/template/test/085 edits；worktree clean；checklist stage 未留 Wrap-up → driver 补跑 `skill:create-checklist` 的 run-determination/exec-quant/feedback。
+- findings handed to analyze: CHK017（FR-027/FR-030 085 live-status carve-out）、CHK036（PYTHONPATH 前提）、CHK007/CHK008（two-pass/mode 未进 FR）。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/05-checklist.md`。
+- next: `analyze` dispatch（effective 2 = 1 analyze executor + 1 verifier）。
 
 ## U0.5 自检
 
