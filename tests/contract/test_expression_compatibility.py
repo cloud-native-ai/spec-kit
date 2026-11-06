@@ -93,7 +93,13 @@ WIRING_SKILLS = (
     "skills/external/humanize/SKILL.md",
 )
 
-# C-1 frozen denominator: 27 command templates (stem == `/speckit.<stem>`).
+# C-1 frozen denominator: the command-template set (stem == `/speckit.<stem>`).
+#
+# 2026-11-06 (Feature 087): 27 -> 29. FR-022 and FR-026 legitimately add two command
+# templates — `/speckit.status` (`status.md`, the current-state digest) and
+# `/speckit.measure` (`measure.md`, the read-only measurement report). The guard's clause
+# ("zero *unintended* new / renamed / deleted commands") is unchanged; the two sanctioned
+# additions are enumerated here so a third one still goes red.
 FROZEN_COMMANDS = (
     "agents",
     "analyze",
@@ -111,6 +117,7 @@ FROZEN_COMMANDS = (
     "improve",
     "instructions",
     "interview",
+    "measure",
     "plan",
     "requirements",
     "research",
@@ -118,6 +125,7 @@ FROZEN_COMMANDS = (
     "sanitize",
     "session",
     "skills",
+    "status",
     "tasks",
     "team",
     "todo",

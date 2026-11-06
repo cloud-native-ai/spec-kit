@@ -1,6 +1,6 @@
 ---
 description: Answer "what did this window cost, per unit?" from the exec-quant store that already exists — a read-only measurement report over a declared half-open window and selection; a thin entry that delegates every read, every figure and every exclusion count to one deterministic script and carries no rendering logic of its own.
-short-description: 测量入口：委托 measure.py 只读统计 exec-quant 存储在声明窗口内每单元的耗时/令牌/调用
+short-description: 测量入口：委托 measure.py 只读统计 exec-quant 每单元耗时/令牌/调用
 ---
 
 ## User Input
@@ -16,8 +16,8 @@ Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-pr
 `/speckit.measure` is a **thin entry**: it names the script and the action to run, and it renders nothing itself. Every
 record read, every figure, every exclusion count and every exit verdict belongs to the script — a second projection
 authored in this command would be the defect the measure contract names. The rules themselves are owned by
-`.specify/specs/087-speckit-visualization/contracts/measure-report.contract.md` (C-53…C-62) and by the store engine
-`scripts/python/exec-quant.py`; this command reaches them by path and restates none of them.
+`measure-report.contract.md` (C-53…C-62) and by the store engine `scripts/python/exec-quant.py`; this command
+reaches them by name and restates none of them.
 
 **Script**: `scripts/python/measure.py`, run from the repository root with plain `python3` (stdlib only). It writes
 nothing, spawns nothing and reads the store only through the engine's own read path.

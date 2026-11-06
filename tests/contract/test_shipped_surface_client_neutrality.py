@@ -53,6 +53,44 @@ KNOWN_DEBT = {
     "skills/internal/sanitize-materials/SKILL.md",
 }
 
+#: The shipped surfaces Feature 087 delivered, each of which this guard covers by
+#: construction (the roots above) and each of which the 2026-11-06 alignment rewrote
+#: client-neutrally rather than allowlisting: the reporting-obligation owner document
+#: (§ 9.1 cites its contract fragments by name), the two new command templates, the
+#: roster guard's docstring, and the reporter Agent Template. The rows exist so a
+#: later regression in any of them is attributable, not because they are exempt.
+FEATURE_087_SHIPPED_SURFACES = (
+    "shared/guidelines/reporting-obligations.md",
+    "templates/commands/status.md",
+    "templates/commands/measure.md",
+    "skills/internal/create-team/scripts/validate-roster.py",
+    "agents/reporter.agent.md",
+)
+
+
+@pytest.mark.contract
+def test_every_feature_087_shipped_surface_is_covered_and_clean():
+    """The 087 surfaces are audited by the sweep above, never by an allowlist entry.
+
+    A surface that drifted into an allowlist would make the guard green for the wrong
+    reason (a covered file reading as exempt); this row pins that this feature's
+    delivered set is inside the swept roots and outside every exemption.
+    """
+    for rel in FEATURE_087_SHIPPED_SURFACES:
+        path = REPO_ROOT / rel
+        assert path.is_file(), f"delivered shipped surface missing: {rel}"
+        assert path.relative_to(REPO_ROOT).parts[0] in SHIPPED_ROOTS, (
+            f"{rel} is not inside a swept shipped root"
+        )
+        assert rel not in KNOWN_DEBT, f"{rel} MUST stay audited, not allowlisted"
+        text = path.read_text(encoding="utf-8", errors="replace")
+        hits = [
+            m.group(0)
+            for pattern in BANNED_PATTERNS
+            for m in pattern.finditer(text)
+        ]
+        assert hits == [], f"{rel} references the framework's own runtime artifacts: {hits}"
+
 
 @pytest.mark.contract
 def test_shipped_surface_has_no_framework_runtime_references():

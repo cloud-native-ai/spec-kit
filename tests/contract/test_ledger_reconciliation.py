@@ -289,9 +289,13 @@ def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     # stays at its measured 2026-10-24 constants (27/51 -> 39): it is a lower
     # bound on the inventory side, not a denominator, and 39 still sits below the
     # real 80 so a truncation keeps firing as a gap.
+    # Stale-pin update (2026-11-06, Feature 087 second slice): 81 -> 83 rows/units —
+    # `/speckit.status` (+ its unit) and `/speckit.measure` (+ `measure.py`) join the
+    # flow-class inventory and the ledger together; the three matched counts move as
+    # one again, and the floor is untouched.
     proc, record = _check(REPO_ROOT)
     assert proc.returncode == 0, (
-        "the real 80-row ledger must reconcile clean; findings=%r stderr=%r"
+        "the real 83-row ledger must reconcile clean; findings=%r stderr=%r"
         % (None if record is None else record.get("findings"), proc.stderr)
     )
     assert record is not None and record.get("findings") == []
@@ -301,9 +305,9 @@ def test_real_tree_reconciles_clean_with_the_declared_coverage_numbers():
     )
     coverage = _coverage(record)
     _assert_coverage_shape(coverage)
-    assert coverage["inventory_units"] == record["units"] == 81
-    assert coverage["ledger_rows"] == 81
-    assert coverage["matched"] == 81
+    assert coverage["inventory_units"] == record["units"] == 83
+    assert coverage["ledger_rows"] == 83
+    assert coverage["matched"] == 83
     assert coverage["gaps"] == 0
     assert coverage["parse_errors"] == 0
     assert coverage["floor"] == LEDGER_FLOOR == 39

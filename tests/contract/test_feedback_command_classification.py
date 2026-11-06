@@ -91,7 +91,10 @@ def measured_feedback_carriers() -> set[str]:
 def test_classification_counts():
     # The one place these literals are pinned (test_docs_command_template.py::test_c8
     # deliberately does not restate them, to keep a reclassification a one-file edit).
-    assert len(COMPLEX_COMMANDS) == 23
+    # 2026-11-06 (Feature 087): 23 + 4 -> 25 + 4 — `/speckit.status` and `/speckit.measure`
+    # join as Complex (each runs its own engine, produces a reading a downstream flow
+    # consumes, and consumes a store). No simple->complex reclassification happened.
+    assert len(COMPLEX_COMMANDS) == 25
     assert len(SIMPLE_COMMANDS) == 4
 
 

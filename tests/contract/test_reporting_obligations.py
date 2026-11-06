@@ -158,8 +158,11 @@ def test_declaration_forbids_restating_the_borrowed_rules():
 def test_scope_predicate_is_stated_as_two_conjuncts():
     """In scope = two or more concurrent units OR one or more asynchronous delegations continued past dispatch.
 
-    The owner is bilingual at the definition site (`shared/guidelines/bilingual-expression.md`), so each disjunct is
-    accepted in either form: the assertion is on the *fact*, not on the typography that carries it.
+    The owner is bilingual at the definition site (the bilingual-expression owner document under
+    ``shared/guidelines/``), so each disjunct is accepted in either form: the assertion is on the *fact*,
+    not on the typography that carries it. The owner is reached by path, never by re-typing its path
+    literal: `STR-001` has a registered closed set of consumption points (bilingual owner, C-03), and a
+    docstring naming the same path would be a second definition point that drifts silently.
     """
     text = _owner().lower()
     assert "in scope" in text or "在范围内" in text, (
@@ -244,8 +247,9 @@ def test_no_second_framework_source_carries_the_literal():
 def test_four_element_labels_are_named():
     """The owner may name the labels; a consumer that cannot name what it emits cannot comply.
 
-    Contract C-05 allows the labels and forbids the descriptions; the bilingual owner carries both forms, so a label
-    is accepted in English or in Chinese (`shared/guidelines/bilingual-expression.md`).
+    Contract C-05 allows the labels and forbids the descriptions; the bilingual owner under
+    ``shared/guidelines/`` carries both forms, so a label is accepted in English or in Chinese (reached by
+    path; `STR-001`'s consumption set is closed, so its literal is never re-typed here).
     """
     text = _owner().lower()
     accepted = {

@@ -2,8 +2,10 @@
 """Creation-time reporter-seat roster guard (087-speckit-visualization).
 
 Judges ONE persisted roster against the reporter-seat obligation
-(`.specify/specs/087-speckit-visualization/contracts/reporter-seat.contract.md`
-C-16 / C-17 / C-21). It is a creation-time check with a closed defect set: a
+(`reporter-seat.contract.md` C-16 / C-17 / C-21; a contract fragment is
+reached by name — a shipped file carries no spec-directory path, because that
+directory is one repository's development doc and is not distributed with the
+framework). It is a creation-time check with a closed defect set: a
 roster either satisfies the obligation, carries exactly one named defect, or
 could not be read at all.
 

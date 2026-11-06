@@ -272,7 +272,7 @@ def _expected_verdict(
 
 
 # --------------------------------------------------------------------------- #
-# whole repository: 27 templates, every edge same-class or neutral-exempt
+# whole repository: every template, every edge same-class or neutral-exempt
 # --------------------------------------------------------------------------- #
 def test_every_template_edge_is_same_class_or_neutral_exempt():
     ledger, neutral = _owner_tables()
@@ -288,8 +288,12 @@ def test_every_template_edge_is_same_class_or_neutral_exempt():
         "the real delegation graph must carry zero findings; got %r"
         % record.get("findings")
     )
-    assert record.get("commands_scanned") == 27, (
-        "commands_scanned MUST be the scanned template count (27); got %r"
+    # 2026-11-06 (Feature 087): the census moves 27 -> 29 — the feature legitimately adds the
+    # `/speckit.status` and `/speckit.measure` command templates (FR-022/FR-026, the two
+    # sanctioned additions). The reading moves; the clause it guards (every template edge is
+    # same-class or neutral-exempt) does not.
+    assert record.get("commands_scanned") == 29, (
+        "commands_scanned MUST be the scanned template count (29); got %r"
         % record.get("commands_scanned")
     )
 

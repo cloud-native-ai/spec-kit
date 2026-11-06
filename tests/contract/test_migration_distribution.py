@@ -76,7 +76,8 @@ NEW_ACTION_CALL_RE = re.compile(
 )
 ENGINE_REF = "flow-class-check.py"
 
-# Contract C-1: the frozen pre-change inventory (27 command templates, 53 skills).
+# Contract C-1: the frozen pre-change inventory (the command-template and skill rosters below;
+# the current lengths are pinned at the bottom of this block, and each growth is dated).
 # 2026-10-30 (Feature 078): the pre-existing external skill unit now named
 # `coaching-skills` was renamed in place (FR-001/FR-018), so the shipped file-name
 # set swaps one name for another and the count stays 52 = 15 external + 37 internal.
@@ -90,13 +91,17 @@ ENGINE_REF = "flow-class-check.py"
 # 2026-11-05 (improve-skills ssh-utils): 53 -> 54. The external `ssh-utils` unit is the
 # SSH transport owner extracted from `sdd-project-setup`; it ships in the same wheel
 # through the same hatch staging step, so the roster and length move together again.
+# 2026-11-06 (Feature 087): 27 -> 29 command templates. `/speckit.status` and
+# `/speckit.measure` (FR-022/FR-026) ship as two more `templates/commands/*.md` files
+# inside the same staged payload, so the shipped-set census and the pinned length move
+# together; a missing one still fails here rather than only at runtime.
 COMMAND_BASELINE = frozenset(
     {
         "agents", "analyze", "checklist", "clarify", "constitution", "derive",
         "docs", "feature", "feedback", "goal", "history", "humanize",
-        "implement", "improve", "instructions", "interview", "plan",
+        "implement", "improve", "instructions", "interview", "measure", "plan",
         "requirements", "research", "review", "sanitize", "session", "skills",
-        "tasks", "team", "todo", "tools",
+        "status", "tasks", "team", "todo", "tools",
     }
 )
 SKILL_BASELINE = frozenset(
@@ -119,7 +124,7 @@ SKILL_BASELINE = frozenset(
         "summarize-project",
     }
 )
-assert len(COMMAND_BASELINE) == 27
+assert len(COMMAND_BASELINE) == 29
 assert len(SKILL_BASELINE) == 54
 
 # Contract C-2: the four payload classes and where the release package carries them.

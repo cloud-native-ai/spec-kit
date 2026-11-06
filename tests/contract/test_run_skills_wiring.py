@@ -153,9 +153,15 @@ def test_c8_run_team_frontmatter_classification_and_skill_id():
     assert 'skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"' in text
 
 
-# --- C-9: compiled wrap-up embeds, zero drift, 75 units (+ sdd-house-keeping) ---
+# --- C-9: compiled wrap-up embeds, zero drift, 79 units (+ sdd-house-keeping) ---
 
 def test_c9_compile_embeds_zero_drift_75_units():
+    # Stale-pin update (2026-11-06, Feature 087 second slice): 77 -> 79 units —
+    # `/speckit.status` and `/speckit.measure` each carry a compiled `## Wrap-up`
+    # face (`speckit-measure-wrapup` is registered in the probe registry; both
+    # templates carry the AUTO-GENERATED embed), so the compile census grows by
+    # two while the zero-drift property is unchanged. Source of the reading: the
+    # engine's own `compile-embeds --check --format json` `units` field.
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
     # the ssh-utils skill ships its own compiled Wrap-up embed, so the compile
     # census grows by one while the zero-drift property is unchanged.
@@ -168,7 +174,7 @@ def test_c9_compile_embeds_zero_drift_75_units():
     )
     combined = out.stdout + out.stderr
     assert out.returncode == 0, f"compile-embeds --check not clean:\n{combined[-800:]}"
-    assert "77 units" in combined, f"expected 77 units, got: {combined[-400:]}"
+    assert "79 units" in combined, f"expected 79 units, got: {combined[-400:]}"
     assert "zero drift" in combined
     for skill in (RUN_SKILLS, RUN_TEAM):
         assert "## Wrap-up" in _read(skill), f"missing compiled Wrap-up in {skill}"

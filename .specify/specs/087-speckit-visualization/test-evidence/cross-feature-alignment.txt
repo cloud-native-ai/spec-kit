@@ -1,0 +1,144 @@
+# Cross-feature frozen-denominator alignment — Feature 087, second slice
+# Recorded: 2026-11-06T14:56:59Z (UTC)
+# Scope: the 13 cross-feature failures of the closure full-suite r2 run
+#   (.specify/specs/087-speckit-visualization/test-evidence/closure-full-suite-r2-20261106T144304Z.log)
+
+## Command line
+python -m pytest -q <13 node ids>   # reproduced verbatim below as the final reading
+
+## Clause
+Feature 087 legitimately adds two command templates (/speckit.status, /speckit.measure) under
+FR-022/FR-026. Every failure below is either (a) an EXPECTED INCREMENT — a frozen denominator or
+name roster that must move to the delivered census, updated with a dated note and a minimum
+edit, or (b) a REAL DEFECT — a delivered artifact that must be repaired. No guard was deleted
+and no assertion was loosened without a dated reason.
+
+## Per-item disposition
+
+[01] test_bilingual_expression.py::test_drift_str_literal_unique_consumers
+     REAL DEFECT (test-side, second definition point).
+     Offender: tests/contract/test_reporting_obligations.py — its docstrings re-typed the
+     STR-001 literal ("shared/guidelines/bilingual-expression.md") twice, adding an
+     unregistered consumption point. Bilingual owner C-03 requires a new consumer to
+     register in the drift-guard whitelist FIRST; a prose reference is not worth widening
+     a closed set. Fix: both docstrings now reach the owner by name/描述, not by literal.
+     Guard unchanged (no whitelist entry added).
+
+[02] test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation
+     REAL DEFECT (delivered shipped text carried framework-runtime paths).
+     Offenders: shared/guidelines/reporting-obligations.md (3 lines), 
+     skills/internal/create-team/scripts/validate-roster.py (docstring),
+     templates/commands/measure.md (delegation paragraph) — all cited
+     `.specify/specs/087-speckit-visualization/contracts/<x>.contract.md`.
+     A shipped file must not carry a spec-directory path: that directory is this repo's
+     own development doc and is never distributed. Fix: cite the contract fragment by
+     NAME (`measure-report.contract.md` C-53…C-62, `reporter-seat.contract.md` C-16/17/21,
+     `efficiency-element.contract.md` C-63…C-71), the same shape status-digest.py already
+     uses; the framework-source/spec boundary is stated once in the owner's 9.1.
+     Mirrors resynced (sync-mirrors.py --write). PRE_EXISTING_NEUTRALITY_DEBT untouched.
+
+[03] test_delegation_classes.py::test_every_template_edge_is_same_class_or_neutral_exempt
+     EXPECTED INCREMENT. Frozen census 27 -> 29 command templates (measured:
+     engine reports commands_scanned=29, zero findings). Dated note added; clause intact.
+
+[04] test_expression_compatibility.py::test_c1_zero_new_commands
+     EXPECTED INCREMENT. FROZEN_COMMANDS 27 -> 29; `measure` and `status` enumerated
+     explicitly with a dated note so the two sanctioned additions are named and a third
+     one still goes red.
+
+[05] test_expression_gate_wiring.py::test_a6_wiring_inventory_matches_the_frozen_denominator
+     EXPECTED INCREMENT. Template inventory 27 -> 29 (skills stay 54), dated note.
+
+[06] test_feedback_command_classification.py::test_complex_set_equals_measured_feedback_carriers
+     EXPECTED INCREMENT. Both new templates measurably carry the compiled `## Wrap-up`
+     face (AUTO-GENERATED marker), so they are Complex under the owner's three criteria:
+     (a) each runs its own engine in its own step, (b) each produces a reading a
+     downstream flow consumes, (c) each consumes a store. Rows added to the owner table
+     (027 contract), Result line 23+4 -> 25+4.
+
+[07] test_feedback_command_classification.py::test_table_covers_every_command_template
+     EXPECTED INCREMENT (same owner edit as [06]). Table + Maintenance dated note updated.
+     Coverage assertion unchanged — a template with no row still fails.
+
+[08] test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+     EXPECTED INCREMENT (false positive on a generated artifact).
+     Offenders: the three full-suite evidence logs of THIS feature. A captured run's
+     stdout necessarily quotes this very guard's failure message, so the needle appears
+     by construction. The owner already excludes generated evidence lanes
+     (RUNTIME_CACHE_PREFIXES, precedent: 085). Fix: add this feature's evidence lane to
+     that closed exclusion list. Evidence logs NOT deleted; no live face is exempt.
+
+[09] test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers
+     EXPECTED INCREMENT. Ledger/inventory 81 -> 83 units (measured: check exits 0,
+     red_kind=clean, gaps 0, parse_errors 0). Anti-vacuous floor stays 39.
+
+[10] test_migration_distribution.py::test_command_template_name_set_matches_frozen_baseline
+     EXPECTED INCREMENT. COMMAND_BASELINE 27 -> 29 (+ pinned length), dated note; the
+     stale "27 command templates, 53 skills" header line rewritten to a pointer.
+
+[11] test_qoder_command_frontmatter.py::test_every_template_has_short_description
+     REAL DEFECT. templates/commands/measure.md carried a 55-char short-description
+     (ceiling 50); status.md sat exactly at 50. Fix: measure.md shortened to 46 chars,
+     then regen-command-copies.py regenerated the four per-tool copies (the pinned
+     "copy matches template" row in the same file then went red on the stale copy and
+     is now green). Template is the source; the copies are generated.
+
+[12] test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_75_units
+     EXPECTED INCREMENT. Compile census 77 -> 79 units, reading taken from the engine
+     itself (`probe-utils.py --action compile-embeds --check --format json` -> units=79,
+     zero drift); source named in the dated note. Zero-drift clause unchanged.
+
+[13] test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references
+     NO INCREMENT NEEDED (the guard is green in this tree) + REGRESSION PIN ADDED.
+     The fresh violations that existed in the r2 run were exactly the three surfaces
+     repaired under [02] (reporting-obligations.md, measure.md, validate-roster.py).
+     The reporter Agent Template and status.md were already client-neutral. Rather than
+     growing KNOWN_DEBT, a new row enumerates the five 087 delivered surfaces and asserts
+     each stays inside a swept root, out of KNOWN_DEBT, and hit-free.
+
+## Collateral (same-owner, same-truth drift found by the same edits)
+
+* tests/contract/test_humanize_command_surface.py::test_c09_baseline_no_new_failures
+  pinned the 027 Result line as "23 complex"; it re-reads the owner table this change
+  edits, so it moved to "25 complex" with a dated note (humanize stays Simple, simple
+  count stays 4). Same owner, same fact, no separate guard weakened.
+
+## Verification
+
+* sync-mirrors.py --check : OK (templates / skills / agents / scripts / shared, 6 pairs)
+* regen-command-copies.py --check : OK (4 tools)
+* collateral suites: test_mirror_parity_suite, test_reporting_obligations,
+  test_feedback_command_classification, test_shipped_surface_client_neutrality,
+  test_client_guard_sweep -> 921 passed
+* test_bilingual_expression, test_delegation_classes, test_expression_compatibility,
+  test_expression_gate_wiring, test_ledger_reconciliation, test_migration_distribution,
+  test_qoder_command_frontmatter, test_run_skills_wiring, test_flow_class_ledger,
+  test_humanize_command_surface, test_compile_embeds, test_coaching_wiring_contract,
+  test_probe_nonentity_catalog -> green except two PRE-EXISTING reds outside this scope
+  (test_expression_compatibility::test_c2_no_project_side_classification_store,
+   test_goal_migration::TestHistoricalFacesArePreserved::
+   test_the_user_directive_quoting_the_old_path_survives_verbatim) — both in the
+  baseline and r2 failure lists, both caused by the 2026-11-05 sanitize substitution
+  that rewrote the historical record; neither is touched by this change.
+
+## Final reading — the 13 node ids, one run
+$ python -m pytest -q \
+    tests/contract/test_bilingual_expression.py::test_drift_str_literal_unique_consumers \
+    tests/contract/test_client_guard_sweep.py::test_c57_shipped_text_adds_no_fresh_neutrality_violation \
+    tests/contract/test_delegation_classes.py::test_every_template_edge_is_same_class_or_neutral_exempt \
+    tests/contract/test_expression_compatibility.py::test_c1_zero_new_commands \
+    tests/contract/test_expression_gate_wiring.py::test_a6_wiring_inventory_matches_the_frozen_denominator \
+    tests/contract/test_feedback_command_classification.py::test_complex_set_equals_measured_feedback_carriers \
+    tests/contract/test_feedback_command_classification.py::test_table_covers_every_command_template \
+    tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path \
+    tests/contract/test_ledger_reconciliation.py::test_real_tree_reconciles_clean_with_the_declared_coverage_numbers \
+    tests/contract/test_migration_distribution.py::test_command_template_name_set_matches_frozen_baseline \
+    tests/contract/test_qoder_command_frontmatter.py::test_every_template_has_short_description \
+    tests/contract/test_run_skills_wiring.py::test_c9_compile_embeds_zero_drift_75_units \
+    tests/contract/test_shipped_surface_client_neutrality.py::test_shipped_surface_has_no_framework_runtime_references \
+
+exit status: 0
+duration_ms: 1504
+--- complete stdout ---
+.............                                                            [100%]
+13 passed in 1.00s

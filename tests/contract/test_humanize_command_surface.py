@@ -304,8 +304,12 @@ def test_c09_baseline_no_new_failures():
     assert row, "027 classification table lacks a humanize row"
     assert any("**Simple**" in ln for ln in row), "humanize must be classified Simple"
     result = [ln for ln in contract.splitlines() if "**Result**" in ln]
-    assert result and "23 complex" in result[0] and "4 simple" in result[0], (
-        "027 Result line must read 23 complex / 4 simple after humanize"
+    # 2026-11-06 (Feature 087): the Result line reads 25 complex / 4 simple — the two
+    # new command templates (`status`, `measure`) are Complex. The clause this row
+    # guards is unchanged: humanize is Simple and the simple count is 4, so a
+    # humanize reclassification still goes red here.
+    assert result and "25 complex" in result[0] and "4 simple" in result[0], (
+        "027 Result line must read 25 complex / 4 simple after humanize"
     )
     feedback_mod = _import_test_module("test_feedback_command_classification.py")
     assert "humanize" in feedback_mod.SIMPLE_COMMANDS, (

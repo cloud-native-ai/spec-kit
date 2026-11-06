@@ -373,11 +373,14 @@ def test_a6_wiring_inventory_matches_the_frozen_denominator():
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 52 -> 53 skills — the
     # review-feature-quality carrier joins the inventory; the wiring census must
     # still cover every unit the inventory actually holds.
+    # Stale-pin update (2026-11-06, Feature 087): 27 -> 29 command templates —
+    # `/speckit.status` and `/speckit.measure` are the feature's two sanctioned
+    # additions (FR-022/FR-026); the wiring census must still cover every unit.
     templates = sorted(COMMANDS_DIR.glob("*.md"))
     skills = sorted(SKILLS_DIR.glob("external/*/SKILL.md")) + sorted(
         SKILLS_DIR.glob("internal/*/SKILL.md")
     )
-    assert len(templates) == 27, "template inventory drifted: %d (expected 27)" % len(templates)
+    assert len(templates) == 29, "template inventory drifted: %d (expected 29)" % len(templates)
     assert len(skills) == 54, "skill inventory drifted: %d (expected 54)" % len(skills)
 
 

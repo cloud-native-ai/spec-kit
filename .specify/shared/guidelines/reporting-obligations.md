@@ -146,7 +146,7 @@
 
 ### 9.1 效率维度落在这两个面上(Efficiency dimension on the same two surfaces)
 
-效率维度**不是第三张报表**,而是上述状态行与摘要各自**已有条目的一段内容**:不新增行、不新增条目、不新增小节、不新增节奏,也不新增单位。本维度的渲染字面量只有两个,均以本小节为唯一定义点:`not-evaluated` 与 `no measurements`;元素的具体字段名、宽度界值与渲染位置归交付脚本与其契约(`.specify/specs/087-speckit-visualization/contracts/efficiency-element.contract.md` C-63…C-71),此处只按路径抵达,不复述。
+效率维度**不是第三张报表**,而是上述状态行与摘要各自**已有条目的一段内容**:不新增行、不新增条目、不新增小节、不新增节奏,也不新增单位。本维度的渲染字面量只有两个,均以本小节为唯一定义点:`not-evaluated` 与 `no measurements`;元素的具体字段名、宽度界值与渲染位置归交付脚本与其契约片段(`efficiency-element.contract.md` C-63…C-71),此处只按名抵达,不复述。**契约片段在本框架内按名引用,不给出任何仓内路径**:交付仓里的 spec 目录是那一仓自己的开发文档,不随框架分发,写进路径即把框架文本绑到一个仓的布局上。
 
 - **单位是步骤(step identity)**:一条记录的 `(unit_id, unit_type)` 对,而不是任何清单的一行。状态行上的一个元素属于**发出该行的那个步骤**;摘要上的元素属于**本次运行的步骤,或最近的步骤**,其条数由 § 九 已声明的条目上限界定——存储**从不扩大**任一表面自己已经点名的步骤集。
 - **来源只读、只读一次**:两个面都从 `.specify/memory/exec-quant/` 读,且只经由存储引擎既有的读取路径读一次;第二个 parser、第二个 renderer 或任何写回都是缺陷,与 § 九 末段的「同一次状态读」是同一条规则。
@@ -181,8 +181,8 @@
 
 ## 守卫与证据
 
-本义务的一部分命题是可机械判定的,由 `scripts/python/status-digest.py --action guard` 裁决。**命题的编号与主题只由契约拥有**:`.specify/specs/087-speckit-visualization/contracts/reporting-obligations.contract.md` C-01…C-13 定义全部十三条命题(`RO-01`…`RO-13`),其他任何表面只按 id 抵达、只陈述「守卫读什么」,不得重述命题断言的内容。本文档不复述那十三条命题清单。
+本义务的一部分命题是可机械判定的,由 `scripts/python/status-digest.py --action guard` 裁决。**命题的编号与主题只由契约拥有**:`reporting-obligations.contract.md` C-01…C-13 定义全部十三条命题(`RO-01`…`RO-13`),其他任何表面只按 id 抵达、只陈述「守卫读什么」,不得重述命题断言的内容。本文档不复述那十三条命题清单。
 
-同样由契约拥有、本文档只按 id 抵达的范围:四要素的标签集与归属字段、摘要的条目上限与过期界限的具体位置(分别见 `.specify/specs/087-speckit-visualization/contracts/` 下的 `status-report.contract.md`、`status-digest.contract.md`、`ownership-map.contract.md`)。
+同样由契约拥有、本文档只按 id 抵达的范围:四要素的标签集与归属字段、摘要的条目上限与过期界限的具体位置(分别见 `status-report.contract.md`、`status-digest.contract.md`、`ownership-map.contract.md`)。
 
 框架内的下游表面只以路径引用本文档:MUST NOT 复制上文的八项所有权、范围谓词、周期数值、席位义务文本、主从义务文本、触发类清单或禁令术语表。若某下游表面需要让读者不必打开本文档即可行动,它可以给**摘要 + 指针**,不得给运营细节。
