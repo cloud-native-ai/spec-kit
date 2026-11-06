@@ -68,11 +68,20 @@ die_workers_error() {
 }
 
 # Caller-supplied worker switch (C-009): -n N, -nN, -n=N, --numprocesses N, --numprocesses=N.
+# A caller-supplied scheduler is guarded the same way: the runner's default `--dist load`
+# MUST NOT be appended on top of the caller's own `--dist` (C-009), or the mode line would
+# report a scheduler the caller did not choose.
 caller_has_workers=0
+caller_has_dist=0
+CALLER_DIST=""
+arg_index=0
 for arg in ${ARGS[@]+"${ARGS[@]}"}; do
     case "$arg" in
         --numprocesses|--numprocesses=*|-n|-n*|-n=*) caller_has_workers=1 ;;
+        --dist=*) caller_has_dist=1; CALLER_DIST="${arg#--dist=}" ;;
+        --dist) caller_has_dist=1; CALLER_DIST="${ARGS[$((arg_index + 1))]:-caller}" ;;
     esac
+    arg_index=$((arg_index + 1))
 done
 
 # C-008: validate the chosen worker value, flag first (C-007).
@@ -134,8 +143,13 @@ else
 fi
 
 if [ "$MODE" = "parallel" ] && [ "$caller_has_workers" -eq 0 ]; then
-    MODE_ARGS=(-n "$WORKERS_N" --dist load)
-    MODE_NOTE="workers=$WORKERS_N dist=load"
+    MODE_ARGS=(-n "$WORKERS_N")
+    if [ "$caller_has_dist" -eq 0 ]; then
+        MODE_ARGS+=(--dist load)
+        MODE_NOTE="workers=$WORKERS_N dist=load"
+    else
+        MODE_NOTE="workers=$WORKERS_N dist=$CALLER_DIST"
+    fi
 elif [ "$MODE" = "caller" ]; then
     MODE_ARGS=()
     MODE_NOTE="workers=caller"

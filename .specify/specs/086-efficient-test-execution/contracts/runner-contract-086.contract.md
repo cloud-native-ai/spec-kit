@@ -42,7 +42,10 @@ guarantee; this contract owns only what 067 left to "a future recorded scope dec
   MUST exit non-zero with a named error on stderr. Silent fallback to one worker is forbidden (FR-003).
 - **C-009**: If the caller's own arguments already contain `-n`, `-n<value>`, `--numprocesses` or
   `--numprocesses=<value>`, the runner MUST NOT append `-n` or `--dist`. The result MUST contain exactly one
-  worker-count switch (FR-004).
+  worker-count switch (FR-004). The same guard covers a caller-supplied scheduler (`--dist <value>` /
+  `--dist=<value>`): the runner MUST NOT append its own `--dist load` on top of it, MUST forward the
+  caller's scheduler verbatim, and MUST name the executed scheduler in the mode line (C-002/C-003), so the
+  A13 `load` vs `loadfile` experiment (`quickstart.md` S-5 / T016) measures the arm it claims.
 
 ## D. Declared serial exceptions
 

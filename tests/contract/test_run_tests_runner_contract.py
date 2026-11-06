@@ -369,6 +369,28 @@ def test_c009_caller_switch_suppresses_an_appended_dist(tmp_path):
     assert header[0].count("-n 2") == 1, header[0]
 
 
+@MARK_CONTRACT
+@pytest.mark.parametrize("dist_args", [["--dist", "loadfile"], ["--dist=loadfile"]])
+def test_c009_caller_scheduler_is_not_overridden(tmp_path, dist_args):
+    """The runner's default ``--dist load`` never lands on top of the caller's own scheduler.
+
+    Without this guard ``--workers 2 --dist loadfile`` becomes ``-n 2 --dist load
+    --dist loadfile`` and the mode line reports ``dist=load``; the A13 experiment
+    (quickstart S-5 / T016) could not then compare ``load`` with ``loadfile``.
+    """
+    suite = _write_suite(tmp_path)
+    done = _run(["--workers", "2", *dist_args, str(suite), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+    header = _command_lines(done.stderr)
+    assert len(header) == 1, done.stderr
+    tokens = header[0].split()
+    assert tokens.count("--dist") + sum(t.startswith("--dist=") for t in tokens) == 1, header[0]
+    assert "loadfile" in header[0], header[0]
+    assert header[0].count("-n 2") == 1, header[0]
+    mode = [line for line in done.stderr.splitlines() if "mode=parallel" in line]
+    assert mode and "dist=loadfile" in mode[0], done.stderr
+
+
 # --------------------------------------------------------------------------- #
 # C-013 / C-014 / C-015 — combined list, entry + pass count, combined exit code
 # --------------------------------------------------------------------------- #
