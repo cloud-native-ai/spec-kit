@@ -264,6 +264,16 @@ last_verdict: A4/B3 integrated (f12b554d, 1d962bfb; clean combined 191/1, only t
 - GATE-5 复跑：名字仅 `verification.md`；非 `SC-010_*` 行 **0**。`sync-mirrors --check` rc=0；`regen-command-copies --check` rc=0；`closure-acceptance-check` **accept**（final_path 8/8）。
 - next: U6 本地合并 `master`（不 push），工作树清理与收尾汇总。
 
+## U6 closure — 2026-11-06T08:15Z
+
+- `master` ff-merged to `e915fce6`; **not pushed**; worktrees removed (`git worktree list` = main only); child lines all closed; feature status **Ready for Review** on both carriers.
+- closure checks on the merged tree: `closure-acceptance-check.py` **accept** (final_path 8/8), GATE-5 8 changed lines all `SC-010_*` (0 non-matching), `sync-mirrors --check` rc=0, `regen-command-copies --check` rc=0, `git status --porcelain` clean.
+- 085 SC-010 **pass** on the complete eight-stage chain; 086 SC-012 pass; checkpoint `13-review.md`.
+- driver wrap-up: run-determination (record persisted; token/elapsed/satisfaction not evaluated, 4 findings), exec-quant recorded, feedback entry `20261106T075537Z-skill-sdd-loop-driver` (5 points; `should_prompt=true`, threshold 10, count 293), token reflection below.
+- **Final result**: 7475/19/7 serial 687.41s → 7535/19/7 parallel 284.12s (0.41× of the slot baseline; 69% of the 412.59s SC-001 ceiling), name diff empty both ways, one declared serial exception (`test_c22_watch_target_hook_selftest`), principle on six surfaces, 085 mechanisms preserved and dogfooded (actual concurrency 2/3/2, 13 checkpoints, 8 child lines).
+- **Residual findings** (recorded, non-blocking): review F1 (SC-003 template-layer reading), F2 (DoD-2 backfill), F6/F9 (checker-accept status flip), F10/F11 (source/runtime pointer form, follow-up), F12 (probe path), plus the 5 feedback points above.
+- **Token reflection**: the run spent most tokens on evidence completeness, not code; the highest-leverage savings would be (1) a machine-checkable "narrowed surface" tag so SC substitutions surface at task time, and (2) a worktree sandbox rule outside the repo to prevent whole-tree contamination — both filed as feedback points.
+
 ## U0.5 自检
 
 1. 目标、拓扑、权威、切片、断点已写入状态脊：**是**。
