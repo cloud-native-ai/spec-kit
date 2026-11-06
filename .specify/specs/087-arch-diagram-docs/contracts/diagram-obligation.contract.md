@@ -38,7 +38,7 @@ python3 ${SKILL_HOME}/scripts/docs-utils.py --action obligation --root <project-
   `docs/.speckit/` 这个**既有 C 区机器目录**下的两个新子目录，MUST NOT 另起第三个机器目录。
 - 输出**一个 JSON 对象**到 stdout（与该引擎既有动作同形，`docs-utils.py` 的模块契约）。
 - `--record` 给出来源运行记录（C-010）时才可能产出 `satisfied`；缺省时没有任何文档能被判 `satisfied`，
-  全部落 `unrecorded-trace` 或 `missing`（C-007）。检查器 MUST NOT 凭猜测补一条记录。
+  全部落 `not-evaluated` / `no-trace-record` 或 `missing`（C-007/C-012）。检查器 MUST NOT 凭猜测补一条记录。
 - 退出码：`0` = 已完成判定（**不论是否干净**）；`2` = 输入错误（`--root` 不存在、`--record` 给了但不可读）。
   「干净与否」只在 payload 的 `verdict` 里，MUST NOT 由退出码承载——否则「干净」与「跑完」两种事实会被压成一个。
 - 一个动作、一个调用方族（`skill:create-docs` 的两处 R6，见
@@ -245,7 +245,7 @@ justification: "按时间排序的发布流水，没有可绘的结构"
   豁免已被事实推翻 ⇒ `not-evaluated` / `exemption-invalid` 并在 `summary.exemption_superseded` 计数。
   这是「豁免理由不再成立」的**唯一**机械信号；理由的语义变化 MUST NOT 被自动推断。
 - **图的落点不在本条款内**：本条款只拥有「豁免记录放哪、怎么算有效」。图的两面放哪归
-  `skills/external/create-docs/SKILL.md` § Desired-State Baseline（`plan.md` T-005 裁定为 `assets/`），
+  `skills/external/create-docs/SKILL.md` § Desired-State Baseline（该节内 `#### Assets` 小节由本特性实施期新建，当前不在盘；`plan.md` T-005 裁定为 `assets/`），
   MUST NOT 在此复述（宪法 XIV：一个事实一个 owner）。
 
 ## C-012 — `not-evaluated` 的封闭四项
@@ -283,20 +283,22 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 ```
 
 - **两个谓词，两个问题（本条是它们的唯一定义点）**：
-  - `summary.converged` 为 `true` **当且仅当** `missing == 0 && stale == 0 && not_evaluated == 0`。
+  - 记 `judged_scope_has_carrier = (--only 缺省 ? carriers > 0 : true)`：默认全量作用域没有正式文档时
+    判据没有对象；`--only` 把作用域缩到 0 个对象是调用方的选择（见下）。
+  - `summary.converged` 为 `true` **当且仅当** `judged_scope_has_carrier && missing == 0 && stale == 0 && not_evaluated == 0`。
     它回答「还有没有待收敛的 finding」；**豁免不在它的算式里**——豁免是 `FR-004` 的合法终态，
-    它不产生待收敛项。
+    它不产生待收敛项。`carriers == 0`（默认作用域）是该谓词的一个合取项，不是例外。
   - `summary.clean` 为 `true` **当且仅当** `converged == true && exempted == 0`（等价于
-    `missing == 0 && stale == 0 && not_evaluated == 0 && exempted == 0`）。它回答「这个空间是不是零 finding
+    `judged_scope_has_carrier && missing == 0 && stale == 0 && not_evaluated == 0 && exempted == 0`）。它回答「这个空间是不是零 finding
     的显式结论」，因此**严格**：有豁免的空间 MUST NOT 报 `clean`（豁免可见，不等于通过，`FR-004`）。
   - ⇒ `exempted > 0 ⇒ clean = false`（硬约束，不变）；`exempted > 0` 与 `converged` **无关**，
     所以「一个具体文档无结构可绘、已具名豁免」的收敛终态是 **`converged=true` + `clean=false`**，这是合法结果，
     不是矛盾（`SC-008`）。**「零图 finding」这句话指 `converged`，不是 `clean`。**
   - 两个字段**同时在场**（字段集固定，`C-006`）：只给 `clean` 会让带豁免的空间无法表达「已收敛」。
-- 空载体集合（`carriers == 0`）MUST 报 `converged: false` + `clean: false` + `documents: []`：一个没有正式文档的空间
-  不是「合规」，是「判据没有对象」，因此两个谓词在这里**都**取假——这是上面主算式的唯一例外，防的是
-  `FR-016` 允许的「零 finding」被一个空判定集合冒充。**本条只对 `--only` 缺省时成立**：
-  `--only` 缩小后剩下的 0 个对象是**调用方的选择**，`converged` 与 `clean` 按上式对 0 个条目算得 `true`（没有东西不干净），
+- 空载体集合（默认作用域，`carriers == 0`）MUST 报 `converged: false` + `clean: false` + `documents: []`：一个没有正式文档的空间
+  不是「合规」，是「判据没有对象」，因此 `judged_scope_has_carrier=false`，两个谓词**都**取假——这是
+  `carriers > 0` 合取项的直接结果，不是主算式的例外，防的是 `FR-016` 允许的「零 finding」被一个空判定集合冒充。
+  `--only` 缩小后剩下的 0 个对象是**调用方的选择**：`judged_scope_has_carrier=true`，`converged` 与 `clean` 按上式对 0 个条目算得 `true`（没有东西不干净），
   调用方 MUST NOT 把这一次「空 `--only`」读成「空间合规」——`--only` 的判定面只有它点名的那些文档。
 - `--only` 只缩小被检对象集合，不改变任何判据；`summary` 只统计被检对象。
 - `documents[]` 的字段集固定为 `path` / `line` / `verdict` / `reason` 四个（`C-006` 规则 1 的

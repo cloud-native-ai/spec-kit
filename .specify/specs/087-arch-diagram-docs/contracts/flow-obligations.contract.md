@@ -65,7 +65,7 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
   | R3 差异 | 把 `--action obligation --root . --record <最新记录>` 的 verdict **作为差异项**并入差异集（与 `validate` 的违规同级），`missing` / `stale` / `not-evaluated` 三档都进计划 | 三档中任一非零 ⇒ 本轮差异非空 |
   | R4 干跑计划 | 每条差异生成**一条产图/重渲染条目**：`[ ]` 行写文档路径 + 计划图类 + 引擎层（未知则写「待前门路由」）+ 落点（`assets/`，C-009）；这条属**纯写**条目，可与其它纯写条目一起内联展示，**不**进「移动/归档」的逐项 opt-out 清单（写图不是搬迁） | 计划里每条 `missing`/`stale`/`not-evaluated` 文档恰有一条对应条目 |
   | R5 收敛 | 对每条条目调 `draw-diagram` 前门（C-002）产出两面 + 文档相对引用 + **同一次运行**写追溯记录（C-003），落点按 C-009 | 条目执行后该文档的 `--action obligation` verdict 变为 `satisfied` 或有效的 `recorded-exemption` |
-  | R6 验证 | 重跑 `--action obligation` 并出**图维度残差报告**（四个计数 + `converged` + `clean` + `exempted`）；`missing` / `stale` / `not-evaluated` 任一非零 ⇒ MUST NOT 报「收敛完成」；`D-001` 的语义面 MUST 在报告里以「未覆盖」字样出现一次 | 收敛后的第二次 reconcile：`converged=true`（= 三档全零）。**收敛判据是 `converged`，不是 `clean`**：`clean` 更严格（`exempted>0 ⇒ clean=false`，`[D-013]`），带具名豁免的文档是 `FR-004` 的合法终态，因此 `converged=true` + `clean=false` 是**合法**的收敛结果；报告 MUST 同时给出 `exempted` 计数，使「靠豁免收敛」与「靠产图收敛」可区分 |
+  | R6 验证 | 重跑 `--action obligation` 并出**图维度残差报告**（四个计数 + `converged` + `clean` + `exempted`）；`missing` / `stale` / `not-evaluated` 任一非零 ⇒ MUST NOT 报「收敛完成」；`D-001` 的语义面 MUST 在报告里以「未覆盖」字样出现一次 | 收敛后的第二次 reconcile：`converged=true`（按 `C-013` 的 `converged` 谓词：`judged_scope_has_carrier && 三档全零`；不是单看三档）。**收敛判据是 `converged`，不是 `clean`**：`clean` 更严格（`exempted>0 ⇒ clean=false`，`[D-013]`），带具名豁免的文档是 `FR-004` 的合法终态，因此 `converged=true` + `clean=false` 是**合法**的收敛结果；报告 MUST 同时给出 `exempted` 计数，使「靠豁免收敛」与「靠产图收敛」可区分 |
 
   **收敛责任的归属（单一 owner，MUST NOT 两处都声称）**：产图与重渲染**在 reconcile 的 R5 内完成**，
   经既有 `draw-diagram` 前门、经既有 safe-local-writes 分级（C-010），**不**移交给 Authoring Flow——

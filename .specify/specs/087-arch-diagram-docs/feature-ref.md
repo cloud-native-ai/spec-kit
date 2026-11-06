@@ -52,7 +52,7 @@
 | SC-006 | final | `cmp a.json b.json`（S4）+ 干净空间 `clean=true`（该夹具无豁免，故 `converged=true` 与 `clean=true` 同时成立）+ `not-evaluated` 夹具（`converged=false`、`clean=false`） |
 | SC-007 | supporting | 追溯记录的四个必填面（`C-010`）；缺一即 `trace-incomplete` |
 | SC-008 | supporting | `exempt-ok` / `exempt-superseded` 两段夹具的 verdict 与计数（S5） |
-| SC-009 | supporting | `test_protected_gate_preserved` 16 项 + 分区定义前后对读 |
+| SC-009 | supporting | 精确 node id `test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]`（1 个实例）；16 项是更宽守卫，不构成本行判据；分区定义前后对读 |
 | SC-010 | supporting | 未刷新运行时项目上的 `not-evaluated` 表现（`C-012` 第 1 项） |
 
 ## 5. Disclosed Rulings
