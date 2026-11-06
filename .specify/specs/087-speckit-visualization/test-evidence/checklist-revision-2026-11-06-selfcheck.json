@@ -1,0 +1,53 @@
+{
+  "file": ".specify/specs/087-speckit-visualization/checklists/efficiency-measure-2026-11-06.md",
+  "items": 94,
+  "ids_continuous_CHK001_to_N": true,
+  "ids_unique": true,
+  "traced_items": 94,
+  "trace_ratio_pct": 100,
+  "trace_floor_pct": 80,
+  "trace_floor_met": true,
+  "trace_measurement": "an item counts as traced when its trailing bracket carries 'Req §' or one of the markers Gap/Ambiguity/Conflict/Assumption",
+  "prohibited_verify_test_confirm_check_prefix_rows": 0,
+  "every_item_is_a_question": true,
+  "every_item_has_trailing_dimension_bracket": true,
+  "prohibited_dimension_terms_present": 0,
+  "soft_cap": 40,
+  "soft_cap_exceeded_justified": true,
+  "sections": [
+    "Requirement Completeness — the element's obligation and its closed delivery set",
+    "Requirement Clarity — the element's shape, order and degradation",
+    "Requirement Clarity — the measure report's window, selection and aggregation",
+    "Requirement Consistency — closed sets, exit statuses and determinism",
+    "Requirement Consistency — read-only discipline against the existing owners",
+    "Acceptance Criteria Quality & Measurability",
+    "Scenario & Edge-Case Coverage — degradation, absence and partiality",
+    "Cross-Feature Boundary & Dependencies — FR-011 / FR-012 / FR-017 / FR-018",
+    "Dependencies & Assumptions",
+    "Ambiguities & Conflicts",
+    "Assumptions",
+    "Notes"
+  ],
+  "dimension_hits": {
+    "Completeness": 5,
+    "Clarity": 5,
+    "Consistency": 16,
+    "Measurability": 7,
+    "Coverage": 10,
+    "Edge Case": 9,
+    "Dependency": 2,
+    "Assumption": 5,
+    "Ambiguity": 21,
+    "Conflict": 9,
+    "Gap": 16
+  },
+  "distinct_dimensions": 11,
+  "pre_existing_checklist_overwritten": false,
+  "pre_existing_checklist_digests": {
+    "checklists/requirements.md": "ae01527aa0349ca490f62cf2076f02f5",
+    "checklists/framework-visualization-2026-11-06.md": "5f377eec74a308a79c796a444e3ad8b1"
+  },
+  "new_file": true,
+  "created": "2026-11-06",
+  "bytes": 36919
+}
