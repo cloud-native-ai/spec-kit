@@ -59,6 +59,15 @@ def verdict_of(payload: dict, doc_path: str) -> tuple[str, str]:
     raise AssertionError(f"{doc_path} not judged; documents={payload['documents']}")
 
 
+def _reported_line(root: Path, doc_path: str, *extra: str) -> int:
+    """The `line` the engine reports for `doc_path` (C-005: the reference's own line, or 0 when there is none)."""
+    payload = obligation(root, *extra)
+    for entry in payload["documents"]:
+        if entry["path"] == doc_path:
+            return entry["line"]
+    raise AssertionError(f"{doc_path} not judged; documents={payload['documents']}")
+
+
 DOC = "docs/concepts/widget-overview.md"
 TYPE_DIRS = ("concepts", "tutorials", "tasks", "reference", "decisions", "contribute")
 
@@ -833,6 +842,95 @@ def test_c007_no_record_not_satisfied(tmp_path: Path):
     payload = obligation(space)
     assert payload["record"] is None, "no --record was given"
     assert verdict_of(payload, DOC) == ("not-evaluated", "no-trace-record")
+
+
+@pytest.mark.integration
+def test_c007_source_only_reference_is_not_satisfied(tmp_path: Path):
+    """A reference at the editable SOURCE, with both faces on disk, is never `satisfied` (C-007 condition 2).
+
+    `satisfied` is a five-condition conjunction and condition 2 is "the referenced file is a same-named
+    `rendered[].path`" — a `.mmd` link fails it while every file is present and the record is complete, so no
+    other tier can be what rejects the document. The old reading matched the record entry on `source` too and fell
+    through to the last tier, which reported the central obligation as met for a document whose reader gets a
+    file they cannot view.
+
+    red-when: the source-only reference reads `satisfied` (the probe that motivated this row returned exactly
+    that), or the engine reports an unrelated reason that any complete pair would also produce.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    document = space / DOC
+    assert verdict_of(obligation(space, "--record", record_arg(space)), DOC) == (
+        "satisfied", "reference-resolves"), "premise: the unmodified copy is green"
+    document.write_text(
+        document.read_text(encoding="utf-8").replace("../assets/widget.svg", "../assets/widget.mmd"),
+        encoding="utf-8")
+    for face in ("widget.mmd", "widget.svg", "widget.png"):
+        assert (space / "docs" / "assets" / face).is_file(), f"premise: {face} stays on disk"
+    verdict, reason = verdict_of(obligation(space, "--record", record_arg(space)), DOC)
+    assert (verdict, reason) != ("satisfied", "reference-resolves"), (
+        "a reference at the source must not be a pass: C-007 condition 2 names rendered[].path"
+    )
+    assert (verdict, reason) == ("missing", "orphan-rendered"), (
+        f"a source-only reference with the record pointing at this document means the reader has no render; "
+        f"expected the named face loss, got {(verdict, reason)}"
+    )
+
+
+@pytest.mark.integration
+def test_c010_html_face_is_recognised(tmp_path: Path):
+    """The delivery contract's D1 HTML page is a recognisable diagram face, not an unrecognised suffix.
+
+    `draw-diagram`'s delivery contract requires an `.html` page on every delivery and registers the `.drawio` /
+    `.excalidraw` sources and the `.pdf` render for the engine layers that produce them. The checker's suffix set
+    is a projection of that table, so a document linking `widget.html` must be judged, not reported as
+    `no-diagram-reference` — the false red a hard-coded `.svg`/`.png` list produced.
+
+    red-when: a conformant delivery whose document links the D1 page reads `missing` / `no-diagram-reference`.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    page = space / "docs" / "assets" / "widget.html"
+    page.write_text("<!doctype html><title>Widget pipeline</title><img src=\"widget.svg\">\n", encoding="utf-8")
+    document = space / DOC
+    document.write_text(
+        document.read_text(encoding="utf-8").replace("../assets/widget.svg", "../assets/widget.html"),
+        encoding="utf-8")
+    verdict, reason = verdict_of(obligation(space, "--record", record_arg(space)), DOC)
+    assert (verdict, reason) != ("missing", "no-diagram-reference"), (
+        "an `.html` delivery page is a diagram-shaped reference (delivery contract D1)"
+    )
+    # the record carries no entry for the page, so the honest reading is "cannot be traced", never a false red
+    # about the document having no diagram at all
+    assert (verdict, reason) == ("not-evaluated", "trace-incomplete"), (
+        f"a page the record does not register is untraceable, not absent: got {(verdict, reason)}"
+    )
+
+
+@pytest.mark.integration
+def test_c005_fenced_block_does_not_shift_the_line(tmp_path: Path):
+    """A fenced example above the diagram link must not move the reported line (C-005's `line` field).
+
+    Stripping a fenced block by deleting it also deletes its newlines, so every later reference shifts upward and
+    the finding sends its reader to the wrong place. The case inserts a five-line block above the existing link
+    and asserts the line moved by exactly those five lines.
+
+    red-when: the reported line does not account for the inserted block.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    document = space / DOC
+    before = verdict_of(obligation(space, "--record", record_arg(space)), DOC)
+    assert before == ("satisfied", "reference-resolves"), "premise: the unmodified copy is green"
+    baseline = _reported_line(space, DOC, "--record", record_arg(space))
+    fenced = "```mermaid\ngraph LR\n  A --> B\n  B --> C\n```\n"
+    inserted = fenced.count("\n") + 1  # the block's own lines plus the blank separator below it
+    body = document.read_text(encoding="utf-8")
+    marker = "The pipeline is drawn in"
+    assert marker in body, "premise: the reference line is the one this case moves"
+    document.write_text(body.replace(marker, fenced + "\n" + marker), encoding="utf-8")
+    after = _reported_line(space, DOC, "--record", record_arg(space))
+    assert after == baseline + inserted, (
+        f"a {fenced.count(chr(10))}-line fenced block plus its blank separator must move the line by {inserted}: "
+        f"baseline={baseline}, after={after}"
+    )
 
 
 @pytest.mark.integration

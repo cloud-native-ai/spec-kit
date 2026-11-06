@@ -399,7 +399,28 @@ EXEMPTIONS_DIR = Path("docs") / ".speckit" / "exemptions"
 # C-010 — the requirement set a trace record's `diagrams[]` entry must satisfy.
 TRACE_REQUIRED = ("document", "engine", "engine_reason", "ldm_summary", "delivery", "source", "rendered")
 
-DIAGRAM_SUFFIXES = (".mmd", ".mermaid", ".puml", ".plantuml", ".svg", ".png", ".dot", ".gv", ".dotx")
+# C-010 — the recognisable-diagram suffix set. The extension table is owned by
+# `skills/external/draw-diagram/references/delivery-contract.md` § D1/D2; this tuple is a projection of
+# that table and MUST NOT invent an extension the contract does not carry. Read, in the delivery contract's own
+# terms: D1's `.html` entry page; D2's editable sources and the renders it allows beside them; plus the graphviz
+# family the delivery path already reached. No engine is named here: this set says which FILE a reader may
+# recognise as a diagram face, never which capability produced it (FR-011 keeps the engine table in one place).
+DIAGRAM_SUFFIXES = (
+    ".html",
+    ".svg", ".png", ".pdf",
+    ".mmd", ".mermaid", ".puml", ".plantuml", ".excalidraw", ".drawio",
+    ".dot", ".gv", ".dotx",
+)
+
+
+def _has_rendered_face(entry: dict | None, rel_path: str) -> bool:
+    """True when `rel_path` is one of `entry`'s `rendered[].path` values (C-007 condition 2)."""
+    if not entry:
+        return False
+    for face in entry.get("rendered") or []:
+        if face.get("path") == rel_path:
+            return True
+    return False
 
 
 def _carrier_files(root: Path) -> list[Path]:
@@ -424,9 +445,28 @@ def _carrier_files(root: Path) -> list[Path]:
     return sorted(found, key=lambda p: rel(root, p))
 
 
+def _blank_fenced_blocks(text: str) -> str:
+    """Replace every fenced code block with one blank line per line it occupied.
+
+    C-005 requires `line` to be the reference's own line. Deleting a block outright (the old
+    `re.sub(r"```.*?```", "", text)`) also deletes its newlines, so every later reference shifts upward and the
+    reported line sends its reader to the wrong place. Blanking preserves the line count while still keeping
+    fenced examples out of the link scan.
+    """
+    out: list[str] = []
+    in_fence = False
+    for line in text.splitlines():
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            out.append("")
+            continue
+        out.append("" if in_fence else line)
+    return "\n".join(out)
+
+
 def _relative_links(text: str) -> list[tuple[int, str]]:
     """(1-based line, target) for every relative Markdown link — no http(s), no absolute, no anchors."""
-    stripped = re.sub(r"```.*?```", "", text, flags=re.S)
+    stripped = _blank_fenced_blocks(text)
     stripped = "\n".join(re.sub(r"`[^`\n]*`", "", line) for line in stripped.splitlines())
     out: list[tuple[int, str]] = []
     for lineno, line in enumerate(stripped.splitlines(), start=1):
@@ -517,7 +557,9 @@ def _read_exemption(root: Path, doc: Path) -> dict | None:
     rel_doc = rel(root, doc)
     # C-011's landing is `<root>/docs/.speckit/exemptions/<relative doc path>.md`, and the
     # relative doc path already carries its own `.md` — the record mirrors the document's path.
-    path = root / EXEMPTIONS_DIR / rel_doc.removeprefix("docs/")
+    # `str.removeprefix` is 3.9+; this script declares and keeps a >=3.8 floor (RS-001).
+    suffix = rel_doc[len("docs/"):] if rel_doc.startswith("docs/") else rel_doc
+    path = root / EXEMPTIONS_DIR / suffix
     if not path.is_file():
         return None
     fields: dict[str, str] = {}
@@ -554,6 +596,18 @@ def _exemption_status(record: dict | None, rel_doc: str) -> tuple[str, str] | No
     return ("valid", record["reason"])
 
 
+def _relative_to_root(root: Path, target: Path) -> str | None:
+    """`target`'s root-relative POSIX path, or None when it falls outside `root`.
+
+    `Path.is_relative_to` is 3.9+; this script keeps a >=3.8 floor (RS-001), so the containment test is the
+    3.8-compatible `relative_to` call with its own exception as the negative answer.
+    """
+    try:
+        return target.relative_to(root).as_posix()
+    except ValueError:
+        return None
+
+
 def _file_sha256(path: Path) -> str | None:
     """sha256 of a rendered face, or None when the face cannot be read (C-012's `render-unreadable`).
 
@@ -587,9 +641,9 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
         if state == "valid" and reference is None:
             verdict, reason = "recorded-exemption", exempt_reason
         else:
-            # a valid record whose document now resolves a render has been overturned by fact, while
-            # an invalid record is simply unjudgeable — both land here (C-011, FR-004). Only the
-            # former is the "reason no longer holds" signal the summary counts.
+            # A valid record whose document now carries a diagram-shaped reference has been OVERTURNED by fact;
+            # an invalid record is simply unjudgeable — both deny a judgement and land here (C-011, FR-004). Only
+            # the former is the "reason no longer holds" signal the summary counts.
             verdict, reason = "not-evaluated", "exemption-invalid"
             superseded = state == "valid"
             if reference is not None:
@@ -601,7 +655,7 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
 
     if verdict is None:
         line, target = reference
-        reference_rel = rel(root, target) if target.is_relative_to(root) else None
+        reference_rel = _relative_to_root(root, target)
 
         # tier 4 — the reference does not resolve to a file on disk
         if not target.is_file():
@@ -653,7 +707,21 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
                 elif any(actual != expected for actual, expected in digests):
                     verdict, reason = "stale", "render-digest-mismatch"
 
-            # tier 9 — both faces present, record complete, no staleness rule holding
+            # tier 6b — a reference that names the EDITABLE SOURCE while the record points at this document is the
+            # face-loss reading, not a pass and not an incompleteness: the document must reference a rendered face
+            # (FR-005, C-007 condition 2), so a source-only link means the render is what is missing. It therefore
+            # lands the paired value `missing` / `orphan-rendered`, above `trace-incomplete` — otherwise a document
+            # whose render was deleted would be reported as a record problem instead of naming the missing face
+            # (C-005: "失面必须报具名的那一面"; FR-008 / FR-023, SC-002's judgement body).
+            if (verdict is None and entry is not None
+                    and not _has_rendered_face(entry, reference_rel)):
+                verdict, reason = "missing", "orphan-rendered"
+
+            # tier 9 — both faces present, record complete, no staleness rule holding, and the reference names a
+            # rendered face. A reference at the editable source is NEVER `satisfied` (C-007 condition 2): the check
+            # is on the resolved target, not on whether some entry happens to own it.
+            if verdict is None and not _has_rendered_face(entry, reference_rel):
+                verdict, reason = "missing", "orphan-rendered"
             if verdict is None:
                 verdict, reason = "satisfied", "reference-resolves"
 
@@ -787,10 +855,10 @@ def main() -> int:
                              "without editing this engine")
     args = parser.parse_args()
 
+    # The missing-root check is scoped to `obligation` ALONE (C-015): the other actions keep their pre-existing
+    # behaviour on an absent root (an empty report, exit 0), so a caller that relies on that reading is not broken
+    # by this feature. The obligation branch performs its own check below.
     root = Path(args.root).resolve()
-    if args.action != "obligation" and not root.is_dir():
-        print(_input_error(f"--root does not exist: {args.root}"), file=sys.stderr)
-        return 2
     if args.action == "scan":
         out = cmd_scan(root)
     elif args.action == "expire":

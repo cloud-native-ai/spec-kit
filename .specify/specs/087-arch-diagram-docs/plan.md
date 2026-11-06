@@ -29,7 +29,7 @@
 **Target Platform**: 任意 POSIX 文件系统（`os.stat` 的 mtime 与 `hashlib.sha256` 是唯一机器信号，无图形解析、无网络）。
 **Project Type**: 文档 / 提示框架仓（Two Hats：改 `skills/` `templates/` 的框架源，`.specify/` 与四家 per-tool 副本由生成器同步；`docs/` 的内容工作不属本特性）。
 **Performance Goals**: 不设指标。检查器只做一次目录遍历 + 每个图的两次 `stat` / 一次 sha256，载体规模是本仓 **85** 份量级（`quickstart.md` S2 的实测；根 `ARCHITECTURE.md` 是本仓尚不存在的载体，基线第 1 项登记其**语义**，不是盘上事实）。
-**Constraints**: 检查器 MUST 只读（允许的副作用集合是空集）、确定性（两次运行字节可比）、幂等；MUST NOT 新增 `/speckit.*` 命令；MUST NOT 改动 069a 的四字面量与 W1/W3 接线小节；MUST NOT 改本仓 `docs/` 内容。
+**Constraints**: 检查器 MUST 只读（允许的副作用集合是空集）、确定性（两次运行字节可比）、幂等；MUST NOT 新增 `/speckit.*` 命令；MUST NOT 改动 069a 的四字面量与 W1/W3 接线小节；MUST NOT 改本仓 `docs/` 内容——**唯一例外**是 FR-001/T064 交付的 `docs/concepts/documentation-model.md` 读者投影（该目录下第二个被改动的路径即违约，判据见下表与 `quickstart.md` S8）。
 **Scale/Scope**: 5 处文本落点 / 4 个文件（`data-model.md` E7 的五行；`create-docs/SKILL.md` 的两个小节族同属一个文件）+ 1 个引擎动作 + 2 份记录 schema + 11 段夹具；85 份载体文档的实测人口（`quickstart.md` S2）。
 
 ### Technical Constraints（实施期 MUST 保持）
@@ -78,10 +78,10 @@
 | VIII | Code as the Single Source of Truth | ✅ Pass | 检查器的行为以 `docs-utils.py` 的实现在盘为准；`data-model.md` 与契约只登记接口与取值域，不复述实现细节；`quickstart.md` S1 记录**当前**动作表用 `argparse` 拒绝未知动作的实测输出（单行原文），而不是凭记忆写 |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | 不新建引擎 / 渲染器 / 命令 / 确认分级 / 目录族（FR-011、FR-017、FR-018、T-004、T-005）；新增面无第三方依赖；`C-012` 把「引擎不可用」排除在检查器判据之外——引擎可用性不归检查器判 |
 | X | Documentation Naming & Location Conventions | ✅ Pass | 不新增保留根文件名、不改其注册位置（FR-002）；图的落点沿用 `docs/assets/`（T-005，先例 `docs/assets/quickstart-workflow.*`），两份记录的落点是既有 `docs/.speckit/` 机器目录下的 `runs/` 与 `exemptions/` 两个 lowercase 子目录，`data-model.md` E4/E5 与 `C-010`/`C-011` 同源 |
-| XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子已显式点名：本特性改框架源（`skills/` `templates/`），`.specify/` 与四家 per-tool 副本由 `sync-mirrors.py` / `regen-command-copies.py` 生成（§ Mirror Obligations 逐行登记）；本仓 `docs/` 内容工作被 § Out of Scope 排除，`quickstart.md` S8 以空 diff 为判据 |
+| XI | Dogfooding (Self-Application) | ✅ Pass | 两顶帽子已显式点名：本特性改框架源（`skills/` `templates/`），`.specify/` 与四家 per-tool 副本由 `sync-mirrors.py` / `regen-command-copies.py` 生成（§ Mirror Obligations 逐行登记）；本仓 `docs/` 内容工作被 § Out of Scope 排除（唯一例外：FR-001 的读者投影），`quickstart.md` S8 以「恰一行」为判据 |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | 图的产生一律走既有 `draw-diagram`（FR-011、T-004），MUST NOT 另写绘图/渲染代码；检查器复用既有文档引擎 `docs-utils.py` 而非另起脚本（T-002） |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | 本特性强化 **Change Validation** 维度：图从「作者记得画」变成「既有验证步骤判得出」，且负面可观测（FR-023）。目标模型引 `shared/guidelines/better-harness.md`，不另立维度或评分 |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 义务定义点唯一（Baseline 一条）；检查器取值域唯一（`contracts/diagram-obligation.contract.md`，含 `C-016` 的逐文档优先级）；图的落点唯一（`flow-obligations` `C-009`，实施期落脚到本特性**新建**的 Baseline `#### Assets` 小节——该小节当前不在盘，见 `flow-obligations.contract.md` 头部的读法说明）；`docs/concepts/documentation-model.md` 只做读者投影；`data-model.md` 与 `quickstart.md` 头部均写明「不复述取值域」。`checklists/requirements.md` 的派生计数副本**不改写、只登记**（`OI-087-01`），处置归 `/speckit.checklist` |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | 义务定义点唯一（Baseline 一条）；检查器取值域唯一（`contracts/diagram-obligation.contract.md`，含 `C-016` 的逐文档优先级）；图的落点唯一（`flow-obligations` `C-009`，已由 T038 在 Baseline 内**新建** `#### Assets` 小节、现已在盘，见 `flow-obligations.contract.md` 头部带日期的读法说明）；`docs/concepts/documentation-model.md` 只做读者投影；`data-model.md` 与 `quickstart.md` 头部均写明「不复述取值域」。`checklists/requirements.md` 的派生计数副本已由该清单 **N6 删除**（不改写数字、只删副本，宪法 XIV），登记项 `OI-087-01` 于 2026-11-06 关闭 |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | 新增 finding 的输出面向未参与运行的人：每份文档带路径与闭集理由（FR-016），`C-005` 给每个 reason 一句自然语言含义；`C-013` 的 `clean` 是显式结论而不是空输出。基准读者取自 `shared/guidelines/user-facing-comprehension.md` § 基准读者与覆盖协议，不另定义 |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | 「主体坏了检查仍绿」被明确定义为**未验证而非通过**（FR-023 / `C-013` 的 `carriers == 0 ⇒ clean=false`）；`exemption_superseded` 把「豁免理由已失效」作为可见事实报出（FR-004）；本阶段的两处纠正（`reference/ 64` 的载体普查订正、`orphan-*` 两值的面序订正）已在 § Decision Tensions 与 `quickstart.md` 就地披露 |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | 不新建顶层目录；两个新子目录（`docs/.speckit/runs/`、`docs/.speckit/exemptions/`）的含义在本特性契约 `C-010`/`C-011` 处登记，且**不是**新的顶层或新的目录族——`docs/.speckit/` 已是基线登记的机器目录；`docs/assets/` 已存在（本阶段 `find` 实测）。`test_directory_governance.py` 保持通过（`C-014`，基线 21 passed） |
@@ -446,7 +446,7 @@ Dependency set: none
 |------|------|-------------|----------|
 | `C-001` | 四件在盘产物 | `I::test_c001_four_artifacts_one_run`（一次产出恰得四件：载体文档、可再编辑源、交付契约要求的全部渲染面、文档内解析得到的相对引用；缺任一件则该运行 MUST NOT 报完成） | 运行在缺一面或引用不可解析时仍报「完成」；或把追溯记录算成第五件（记录属 `C-003`） |
 | `C-002` | 按引用产生，不复制、不建第二渲染路径 | `F::test_c002_by_reference_only`（文档流程引用 `skills/external/draw-diagram` 路径，不复制其语义模型/路由判据/交付契约条文）；`F::test_c002_no_second_render_path`（反例闭集为空：无新增绘图脚本、无引擎选择表、无交付契约副本、无绕过前门的直调） | 任一处出现复制的语义模型或第二条渲染路径 |
-| `C-003` | 追溯记录同轮落盘 | `F::test_c003_record_same_run`（记录在与产图同一次运行内落盘）；`I::test_c003_missing_record_not_satisfied`（缺记录的图在检查器眼里是 `not-evaluated` / `no-trace-record`，不是 `satisfied`） | 记录缺失或延后到另一次运行仍被判 `satisfied` |
+| `C-003` | 追溯记录同轮落盘 | `F::test_c003_same_run_wording`（记录在与产图同一次运行内落盘——文本面，锚在 Authoring R5）；`I::test_c007_no_record_not_satisfied`（缺记录的图在检查器眼里是 `not-evaluated` / `no-trace-record`，不是 `satisfied`——引擎面） | 记录缺失或延后到另一次运行仍被判 `satisfied` |
 | `C-004` | 引擎拒绝原样上抛 | `F::test_c004_refusal_carried_through`（前门 Step 2 preflight 失败 / Step 2.5 后端不可达 / Step 4 覆盖不通过三种拒绝各由自己的用例驱动：流程 MUST NOT 改写为「文档已写完，图跳过」、MUST NOT 本地即兴渲染、MUST NOT 标完成，措辞归 `draw-diagram`） | 任一种拒绝被吸收成「跳过」并仍报完成；或流程自行渲染 |
 | `C-005` | 共享图去重 | `I::test_c005_shared_diagram_single_source`（两份文档引用同一渲染件 ⇒ 源恰一个、记录 `diagrams[]` 恰一条同路径条目；更新写回该条而非 fork 成逐文档副本） | 共享图被 fork 成逐文档副本，或记录出现两条同路径条目 |
 | `C-006` | 既有图保持引擎层 | `I::test_c006_engine_sticky_on_update`（更新后记录的 `engine` 与更新前一致；只有新图走前门路由） | 更新现有图时引擎被重新路由 |
@@ -462,7 +462,7 @@ Dependency set: none
 | `C-015` | 无法重渲染 ⇒ 具名 staleness finding + 源不动 | `F::test_c015_named_staleness_keeps_source`（引擎层不可用 ⇒ 报具名 staleness finding，且源文件保持不动；MUST NOT 回滚成「看起来一致」的形态） | 重渲染失败被静默吞掉，或源被回滚/降级 |
 | `C-016` | `docs.md` `### 分派` 的义务指针 | `F::test_c016_dispatch_names_both_paths`（该节增加一句：authoring 与 content 两条路径都受义务约束，义务正文只引两个技能，命令内不复述条文） | 命令里复述义务条文，或只声明了一条路径 |
 | `C-017` | 残差报告按技能归口分组 | `F::test_c017_residual_five_counts`（产出行把图维度并进分组：`satisfied`/`missing`/`stale`/`exempted`/`not-evaluated` 五计数按技能归口；MUST NOT 新增第六个分组名） | 出现第六个分组名，或计数缺项 |
-| `C-018` | `docs.md` 硬约束（守卫钉住） | `C3`（既有 `test_docs_command_template.py`：顶层章节序列不变）；`KEEP_LIST`（既有 `test_confirmation_gates_sweep.py`：`stop-and-confirm` 字面量保留在分派段）；`F::test_c018_improve_docs_literal_kept`（`improve-docs/SKILL.md` 字面量保留）；`F::test_c018_w1_section_byte_unchanged`（W1 类别读取小节逐字不动，新内容落在其后） | 任一条硬约束被本特性的改动破坏 |
+| `C-018` | `docs.md` 硬约束（守卫钉住） | `C3`（既有 `test_docs_command_template.py`：顶层章节序列不变）；`KEEP_LIST`（既有 `test_confirmation_gates_sweep.py`：`stop-and-confirm` 字面量保留在分派段）；`F::test_c018_hard_constraints_kept`（四条硬约束的整体读数：章节序列 + `stop-and-confirm` + 两个 owner 指针 + W1 类别读取小节对 base commit 逐字不动）；`F::test_c018_top_level_sequence_unchanged_and_confirm_literal_kept`（相对 **base commit** 的章节序列，以及对 `### 分派` 之前委派句中该字面量的定位） | 任一条硬约束被本特性的改动破坏 |
 | `C-019` | 不新增命令 / 确认档 / 不改四技能分工 | `F::test_c019_no_new_command_no_new_tier`（义务只从既有流程的验证步骤可达；命令面不新增 `/speckit.*`、不新增确认档、四技能职责划分不变） | 新增 `/speckit.*` 命令、新增确认档，或改动四技能分工 |
 | `C-020` | 读者面新增一节（≤ 12 行） | `F::test_c020_reader_projection_bounded`（`docs/concepts/documentation-model.md` 新增一节 ≤ 12 行，只含「图随文档交付 / 无用可绘时有可见豁免 / 失步会被报出」三点；不复述 verdict 词表、不复述载体表、不成第二本规则书） | 超出 12 行、复述词表或载体表，或写成第二本规则书 |
 | `C-021` | 该文件留在 `docs/concepts/` 且路径不变 | `test_directory_governance.py`（既有：area-map 清单仍引用该路径）；`F::test_c021_path_unchanged`（该文件不在 `git diff --name-status` 里以 `R`/`D` 出现） | 该文件被移动、重命名或删除；area-map 不再引用它 |
@@ -482,7 +482,7 @@ Dependency set: none
 | `tests/contract/test_docs_command_template.py` | `C3` / `C4a` | 无新失败 | 顶层章节序列不变、W1 接线小节逐字不动 |
 | `tests/contract/test_confirmation_gates_sweep.py` | `KEEP_LIST`（含 `stop-and-confirm`） | 无新失败 | 确认门不被新增小节绕开；不引入第三档 |
 | `tests/contract/test_directory_governance.py` | area-map 清单 | 无新失败 | 义务 MUST NOT 触发新增顶层文档类型目录；`docs/concepts/documentation-model.md` 路径不变 |
-| 仓库既有失败集（全部 `tests/`） | — | 17 项已知红（见 § Residual Risk 的基线登记） | 允许集合不变；新增红即失败 |
+| 仓库既有失败集（全部 `tests/`） | — | **26 项已知红**（17 项 `tests/contract` + 9 项 `tests/unit/test_loop_state_engine.py`；名单见 `test-evidence/baseline-failed.txt`，分母说明见 § Residual Risk） | 允许集合不变；新增红即失败 |
 | 镜像检查 `sync-mirrors.py` / `regen-command-copies.py` | — | `exit 0`，六对镜全 ok | 同 `$PY` 前提 |
 
 ### D — 测试预算与红线
@@ -490,7 +490,7 @@ Dependency set: none
 | 项 | 预算 | 说明 |
 |----|------|------|
 | 新增测试文件 | **4**（`tests/unit/test_docs_utils_obligation.py`、`tests/unit/test_docs_utils_carriers.py`、`tests/integration/test_docs_obligation_scenarios.py`、`tests/unit/test_docs_obligation_reuse.py`） | 不开第二个**引擎**测试文件家系之外的文件；`test_docs_command_scenarios.py` 只加用例。`test_docs_utils_carriers.py` 是 `tasks.md` T009 明确单列的一行（写不同路径、可与 T008 并行），`test_docs_obligation_reuse.py` 是 T031/T032 明确单列的复用与守卫文件（读仓库而非判夹具空间，故与引擎家系分文件），本行计数按实际任务登记（analyze M4） |
-| 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `conftest` 建造步骤 | 夹具是**仓库内删除前的绿灯态**，写入型用例先 `copytree` 到 `tmp_path` |
+| 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `conftest` 建造步骤 | 不变量的唯一读法是 `data-model.md` E6：**仓库副本 == E6 表登记的构成**（九个空间登记态本身即红，不是删除前绿灯态）；写入型用例先 `copytree` 到 `tmp_path` |
 | 第三方依赖 | **0** | 检查器只用标准库（research R3/R4） |
 | 测试时长 | 上述两文件的**全量运行 ≤ 10s**（本机、无网络） | 85 个载体在检查器里只读元数据，不读文档全文以外的内容 |
 | 红线 | 任何断言 MUST NOT 依赖 `git checkout` 的写入顺序或机器时钟 | `stale-source/` 用 `os.utime` 显式造 mtime（`data-model.md` E6） |
@@ -514,7 +514,7 @@ N/A — § Constitution Check 的 19 行全部 `✅ Pass`，无 `❌ Fail`、无
 
 | 基线项 | 规划期读数 | 对实施期的含义 |
 |--------|-----------|----------------|
-| 仓库既有失败集 | **17 项已知红**（与本特性无关，实施期不修、不计入本特性的红） | 判据是「17 项之外无新增」；新跑若变成 18 项，需逐条具名说明 |
+| 仓库既有失败集 | 规划期读数 **17 项**——这是 `tests/contract` 子集（research R6）；**全量基线是 26 个名字**（17 项 `tests/contract` + 9 项 `tests/unit/test_loop_state_engine.py`，实施期实测记入 `test-evidence/baseline-failed.txt`，7471 passed / 26 failed / 4 skipped）。两个分母不是同一件事，MUST NOT 互相当作对方的读数。| 判据是「**26 项**之外无新增」；实施期若变成 27 项，需逐条具名说明。取 17 会把这 9 项既有单元失败读成新失败，取 26 才与基线差集同口径 |
 | 载体总数 | **85**（`docs/` 下六类正式目录内 `*.md` 的实测人口：`concepts/ 12 · tutorials/ 2 · tasks/ 1 · reference/ 64 · decisions/ 5 · contribute/ 1`；见 `quickstart.md` S2 的可复跑普查命令） | `summary.carriers` 的期望值。**不是** attempt 1 写的 23（一级目录计数造成的低估），**也不是**修订中途写过又撤掉的 86：`docs/ARCHITECTURE.md` 在本仓**不存在**，`C-003` 登记的是基线对该**保留根文件名**的语义（若出现在项目根则是载体），不是「本仓已有一份」。计数 MUST NOT 把不存在的文件算进人口 |
 | 已带图的载体 | **1**（`docs/tutorials/quickstart.md`），且**无** `docs/.speckit/runs/*-diagram-trace.json` 记录 | 检查器落地后该文档**第一次运行必然**是 `not-evaluated` / `no-trace-record`（`C-012`）——这是**已知红**，不是实现缺陷；`clean=false` 是正确结论 |
 | 该图的交付面 | 只有渲染面、**缺 HTML 面**（`D1` 交付要求三面） | 同上，属 `D-001` 的内容债；本特性只负责把它**如实报出来**，不负责补图 |

@@ -43,7 +43,7 @@
 | 字段 | owner | 说明 |
 |------|-------|------|
 | `path` / `line` | `C-005` | 逐文档具名（`FR-016`） |
-| `verdict` | `C-004`（封闭五值 + 有序优先级） | `satisfied` / `missing` / `stale` / `recorded-exemption` / `not-evaluated` |
+| `verdict` | `C-004`（只声明封闭**五值**构成；同一文档可落多值时的**落档顺序唯一归 `C-016`**，本行不复述该顺序） | `satisfied` / `missing` / `stale` / `recorded-exemption` / `not-evaluated` |
 | `reason` | `C-005`（与 verdict 一一绑定的封闭表） | 闭集外的值是契约违规 |
 | `summary.*` | `C-013` | 五个计数 + `converged` + `clean` + `exemption_superseded` |
 
@@ -104,7 +104,7 @@
 | `clean/` | 1 份正式文档 + 1 图两面（`docs/assets/foo.{mmd,svg,png}`）+ 引用解析 + 记录齐备 | 本夹具记录 | `satisfied` / `reference-resolves`；`summary.converged=true`、`summary.clean=true` |
 | `no-diagram/` | 同 `clean/`，文档无任何指向图渲染产物的引用 | 本夹具记录 | `missing` / `no-diagram-reference`；`converged=false`、`clean=false` |
 | `deleted-rendered/` | 同 `clean/`，渲染产物已删、源在、引用仍指向被删的渲染面 | 本夹具记录 | `missing` / `reference-unresolved`（`C-016` 序 4 **先于**失面序 5） |
-| `orphan-rendered/` | 同 `clean/`，渲染产物已删、源在、**引用指向源**（解析成功） | 本夹具记录 | `missing` / `orphan-rendered`（`C-016` 序 5） |
+| `orphan-rendered/` | 同 `clean/`，渲染产物已删、源在、**引用指向源**（解析成功）；记录以**源**登记该图、`rendered` 为空 | 本夹具记录 | `missing` / `orphan-rendered`（`C-016` 序 5） |
 | `orphan-source/` | 同 `clean/`，源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`（`C-016` 序 5） |
 | `stale-source/` | 同 `clean/`，两面**都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`（`C-016` 序 8） |
 | `no-trace/` | 同 `clean/`，两面与引用都在，**不给** `--record` | 缺省 | `not-evaluated` / `no-trace-record`（序 7）；`converged=false` |

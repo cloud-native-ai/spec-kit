@@ -124,7 +124,7 @@ exit 0
 | 夹具 | 前置状态（仓库内的形态） | `--record` | 期望 `verdict` / `reason` |
 |------|--------------------------|-----------|---------------------------|
 | `clean/` | 两面齐 + 引用解析到 `foo.png` + 本夹具记录齐备（**无豁免记录**） | `tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json` | `satisfied` / `reference-resolves`；`summary.converged=true`、`summary.clean=true`（`exempted=0`，故两谓词同时成立）；exit 0 |
-| `orphan-rendered/` | **删除前绿灯**的前态记录在案（`clean/` 同构）；渲染产物已删、源在、**引用指向源** | 本夹具记录 | `missing` / `orphan-rendered`；`converged=false`、`clean=false`；exit 0 |
+| `orphan-rendered/` | 渲染产物已删、源 `docs/assets/widget.mmd` 在、**引用指向源**；记录以**源**登记该图、`rendered` 为空（不为不在盘的面写条目：`C-008` 规则 2 会拿它的 `sha256` 与盘上文件比对），`satisfied` 的第二条件 `C-007` 因此不成立 | `docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json` | `missing` / `orphan-rendered`；`converged=false`、`clean=false`；exit 0 |
 | `orphan-source/` | 源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`；`converged=false`、`clean=false`；exit 0 |
 | `stale-source/` | **两面都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`；`converged=false`、`clean=false`；exit 0 |
 
@@ -135,26 +135,38 @@ exit 0
 **`missing-face` 的原步序已被删除（P1-2 的修复本体）**：attempt 1 的 S3 在同一个 `missing-face` 夹具上
 「先跑绿、再删渲染面、期望 `orphan-source`」。两处错：① 判据 `C-016` 序 4 规定「引用目标整个不在盘 ⇒
 `reference-unresolved`」，序 5 才是失面，而原文把两个面混成一条用例，期望值随「删哪个面」而漂移；
-② 原文的 `rm` 直接作用在**仓库内**夹具上，第二次运行就再也测不到「删除前的绿灯」。修复后**每个面各一个夹具**，
-删除动作只发生在 `tmp_path` 的副本上：
+② 原文的 `rm` 直接作用在**仓库内**夹具上，第二次运行就再也测不到「失面之前」的读法。修复后**每个面各一个夹具**，
+每个夹具的盘上状态就是 `data-model.md` E6 登记的那一份（仓库副本 == 登记构成，由
+`build_fixtures.py --check` 守住）；需要「先完整、再破坏」的读数只在 `tmp_path` 的副本上做：
 
 ```bash
+# `--record` 的值一律相对 `--root` 解析（C-010 的约定，不试图从 cwd 兜底），因此这里只写
+# `docs/.speckit/runs/` 之后的文件名；夹具里唯一的记录名就是 `20261106T090000Z-0870a1b2-diagram-trace.json`
+# （`ls tests/fixtures/docs-obligation/clean/docs/.speckit/runs/` 实测）。把仓库相对路径整条填进 `--record`
+# 会与 `--root` 拼接两次，命令以 exit 2 拒绝。
+
 # 1) 绿态基线：两面齐 + 引用解析 + 记录齐备
+#    判据的载体是**这一份文档**，所以必须带 `--only`：整空间里另外六个类型目录的 `index.md` 没有图，
+#    那是夹具的既定构成（E6），整空间读数的 `missing=6` 是正确结论，不是失败。不带 `--only` 时
+#    `summary.converged=false` 属于预期，MUST NOT 被读成绿态基线不成立。
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/clean \
-  --record tests/fixtures/docs-obligation/clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
-# 预期：verdict = satisfied / reference-resolves ; summary.converged = true ; summary.clean = true ; exit 0
+  --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json \
+  --only docs/concepts/widget-overview.md --json
+# 预期：documents[0].verdict = satisfied / reference-resolves ; summary.converged = true ; summary.clean = true ; exit 0
 
-# 2) 失面（未删除前为绿灯，删除后必须转红）：渲染产物缺、源在、引用指向源
+# 2) 失面：渲染产物缺、源在、引用指向源（夹具的既定盘上状态就是这一面缺失）
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root tests/fixtures/docs-obligation/orphan-rendered \
-  --record tests/fixtures/docs-obligation/orphan-rendered/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
+  --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
 # 预期：verdict = missing / reason = orphan-rendered（源在、渲染面缺）; summary.converged = false ; summary.clean = false ; exit 0
 
-# 3) 面序对照：两面都在、只是源更新 ⇒ stale（不是 missing）
+# 3) 面序对照：两面都在、只是源更新 ⇒ stale（不是 missing）。`stale-source/` 的 mtime 不等式是**复制到
+#    tmp_path 时**由 conftest.apply_mtime_step 造出来的夹具事实（git 不存 mtime），所以本条要在副本上跑：
+#    SPACE="$(mktemp -d)/space-stale-source" && cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
-  --root tests/fixtures/docs-obligation/stale-source \
-  --record tests/fixtures/docs-obligation/stale-source/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
+  --root "${SPACE}" \
+  --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
 # 预期：verdict = stale / reason = source-newer-than-render ; summary.converged = false ; summary.clean = false ; exit 0
 ```
 
@@ -162,8 +174,10 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   `summary.converged` / `summary.clean` 与 `documents[].verdict` 上，MUST NOT 判在退出码上。
 - **`orphan-rendered` 与 `orphan-source` 是两个值**（`C-005`）：`SC-002` 要求「点名缺失的那一面」，
   一个值同时表示两面就使该判据不可判。
-- **判据的绿灯前态**：仓库里的夹具本身**永远是删除前的绿灯态**；「删一个面」发生在 `tmp_path` 的副本上
-  （`data-model.md` E6 的纪律），因此「删除前绿灯」不是一句声明，而是同一条命令在 `clean/` 上的实测读数。
+- **判据的参照态**：仓库里每个夹具的盘上状态**就是 `data-model.md` E6 为它登记的构成**——`clean/` 是绿灯，
+  `orphan-rendered/` 等九个空间登记时本身就是红的，它们的「删除」是夹具的事实而非用例的副作用；任何改动
+  （删面、推进 mtime）都发生在 `tmp_path` 的副本上（E6 的纪律）。因此「失面转红」不是一句声明，
+  而是同一条命令在 `clean/` 与其副本上的实测对照。
 
 ## S4 — 确定性 / 幂等 / 零写（`FR-015`、`SC-006`）
 
@@ -305,7 +319,7 @@ git diff --name-only 24cb4edc...HEAD -- docs/
 `git status --porcelain docs/` → **空输出、`exit 0`**（计划期尚未动 `docs/`）。
 
 预期（交付后）：**恰为一行** —— `docs/concepts/documentation-model.md`。该行是 `FR-001` 明文要求的读者投影
-（`plan.md` § Delivery Surfaces 列出它、`tasks.md` 的 DoD-7 要求它、T064 交付它），因此它不是「零改动」的反例，
+（`plan.md` § Source Code 的落点清单与 § Constitution Check 的 `docs/` 判据行登记它、`tasks.md` 的 DoD-7 要求它、T064 交付它），因此它不是「零改动」的反例，
 而是本特性**唯一的、被要求的** `docs/` 改动。`git status --porcelain docs/` 同样 MUST 只出现这一个路径。
 
 ⇒ 判据是**「多一行即违约」**，不是「必须为空」。除 `docs/concepts/documentation-model.md` 外，`docs/` 树的内容工作

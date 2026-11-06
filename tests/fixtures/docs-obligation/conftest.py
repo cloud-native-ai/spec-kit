@@ -77,7 +77,9 @@ def apply_mtime_step(root: Path) -> None:
     rendered = Path(root) / RENDERED_REL
     if not (source.is_file() and rendered.is_file()):
         return
-    if (Path(root).name.removeprefix("space-")) not in MTIME_SPACES:
+    # `str.removeprefix` is 3.9+; the suite keeps its declared >=3.8 floor (RS-001), so slice explicitly.
+    name = Path(root).name
+    if (name[len("space-"):] if name.startswith("space-") else name) not in MTIME_SPACES:
         return
     rendered_mtime = rendered.stat().st_mtime
     target = rendered_mtime + MTIME_GAP_SECONDS

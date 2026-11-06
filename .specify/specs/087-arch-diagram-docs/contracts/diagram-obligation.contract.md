@@ -319,7 +319,7 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 
 ## C-014 — 与既有守卫的关系（实施期 MUST 保持）
 
-本契约不授权改动任何守卫。实现时下列断言 MUST 逐条保持通过（读数见 `plan.md` § Definition of Done）：
+本契约不授权改动任何守卫。实现时下列断言 MUST 逐条保持通过（登记面见 `tasks.md` 的 DoD 行——`plan.md` **没有** `§ Definition of Done` 这一节，DoD 的唯一 owner 是 `tasks.md`；契约 `C-014` 在此只引用它，不另立一份）：
 
 | 守卫 | 钉住的字面量 |
 |------|--------------|

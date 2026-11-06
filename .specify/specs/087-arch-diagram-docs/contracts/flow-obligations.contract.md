@@ -9,12 +9,12 @@
 / `### 4. Apply the minimal section-level edit` / `### 5. Verify`）、
 `templates/commands/docs.md`（`### 分派(本命令保留的编排职责)`）。
 
-> **`#### Assets` 的读法（MUST NOT 读作既有 owner）**：`skills/external/create-docs/SKILL.md` § Desired-State Baseline
-> **当前没有** `#### Assets` 小节（实测 2026-11-06：`grep -n '^####'` 无输出，基线只有 1–4 四个编号条目）。
-> 它是**本特性在实施期于该节内新建**的小节，建成后才是 `assets/` 区域约定的 owner（`C-009`、`[D-010]` 与
-> `plan.md` T-005 都指向它）。在此之前，「图的落点」这一事实的唯一登记处是 `C-009`（本特性自己）；
-> 本文件中任何形如「§ Desired-State Baseline 的 `#### Assets` 条目（owner）」的句子，一律读作
-> 「本特性在 § Desired-State Baseline 内**新建**的 `#### Assets` 小节（建成后即 owner）」。
+> **`#### Assets` 的读法（本特性新建，现已落盘）**：`skills/external/create-docs/SKILL.md` § Desired-State Baseline
+> 的 `#### Assets` 小节是**本特性在实施期新建**的（T038），落盘后即是 `assets/` 区域约定的 owner（`C-009`、
+> `[D-010]` 与 `plan.md` T-005 都指向它）。**计划期的实测读数**是「当时不在盘」（2026-11-06 的 `grep -n '^####'`
+> 无输出，基线只有 1–4 四个编号条目）——那一句是**带日期的历史读数**，MUST NOT 被读成盘上现状；现状是交付树里
+> 该小节已在盘并承载 `docs/assets/` 的落点约定。本文件中任何形如「§ Desired-State Baseline 的 `#### Assets`
+> 条目（owner）」的句子，一律读作「本特性在 § Desired-State Baseline 内新建的 `#### Assets` 小节」。
 **FR served**: FR-005, FR-006, FR-007, FR-009, FR-010, FR-012, FR-017, FR-022
 **Owner of this contract**: this file. The checker vocabulary the flows *call* is owned by
 `contracts/diagram-obligation.contract.md`; this file MUST NOT restate it (it cites `[D-nnn]`).

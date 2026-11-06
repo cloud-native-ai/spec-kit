@@ -538,6 +538,17 @@ def test_sc001_four_artifacts_present(tmp_path: Path):
     body = document.read_text(encoding="utf-8")
     reference = [line for line in body.splitlines() if "../assets/" in line and "](" in line]
     assert len(reference) == 1, f"artifact 4: exactly one resolving relative reference, found {reference}"
+    # artifact 4 is a reference at a RENDERED face, not merely at some `../assets/` path (FR-005, C-007 condition
+    # 2). Reading the record is what makes this half of the assertion able to catch a source-only link — which is
+    # exactly the reading the engine got wrong once, so the test has to be able to see it.
+    rendered_paths = {face["path"] for face in entry["rendered"]}
+    targets = re.findall(r"\]\(([^)\s]+)\)", reference[0])
+    assert len(targets) == 1, f"artifact 4: one link target on the reference line, found {targets}"
+    resolved = (document.parent / targets[0]).resolve()
+    assert resolved.relative_to(space).as_posix() in rendered_paths, (
+        f"artifact 4: the reference must land one of the record's rendered faces {sorted(rendered_paths)}, "
+        f"got {targets[0]}"
+    )
 
     payload = obligation(space, "--record", record, "--only", DOC)
     assert verdict_of(payload, DOC) == ("satisfied", "reference-resolves"), (

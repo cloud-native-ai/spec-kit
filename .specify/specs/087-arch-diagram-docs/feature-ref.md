@@ -72,6 +72,6 @@
 - 本特性**不改**本仓 `docs/` 的内容（Two Hats：框架改动）；`.specify/` 只接受生成。
 - **收敛归属 → T-005 之外的 `C-008a`**：Reconcile 的 R5 **必须**能产图/重渲染，否则 `SC-003` 的「第二次运行零 finding」
   在文本上不可达（「永久 missing」接线）。`missing` **不**被路由到 Authoring Flow 去收敛——那会让 reconcile 永远报残留。
-- `checklists/requirements.md` 的派生计数漂移**本阶段不改**，登记为未决项（`OI-087-01`）：owner 是 `/speckit.checklist`。
+- `checklists/requirements.md` 的派生计数漂移**已消解（`OI-087-01` resolved 2026-11-06）**：该清单的 N6 计数副本已按宪法 XIV 删除而非改正，FR/SC 的唯一 owner 回到 `requirements.md`，`register.md` 的该行已关闭。
 - **恢复行（P2-3）**：`docs/tutorials/quickstart.md` 的图 alt text 写 "Core Development"、正文写 "Develop"；
   `C-009` 只判引用**可解析**，不判 alt 文本语义——该不一致归 `D-001`（`register.md` 已登记）。

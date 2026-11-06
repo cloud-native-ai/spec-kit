@@ -20,6 +20,7 @@ import hashlib
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -162,11 +163,20 @@ def build_all() -> list[str]:
     finish("deleted-rendered")
 
     # 4. orphan-rendered/ — render deleted, source present, reference points at the SOURCE (resolves!)
+    #
+    # The record names the diagram by its SOURCE only (`rendered: []`). Two reasons:
+    #   1. `rendered[].sha256` is optional in the record schema but, when present, is checked against the file on
+    #      disk (C-008 rule 2), so a rendered entry whose file is not on disk can only be written by hashing
+    #      something that does not exist — a fabricated record.
+    #   2. The reading this space exists to pin is C-007 condition 2 (`satisfied` needs a reference that
+    #      resolves to one of the record's `rendered[].path` values). With no rendered face in the record the
+    #      condition is false for every reference, so the document lands `missing` / `orphan-rendered` from the
+    #      SOURCE-ONLY reference alone (C-005's named face) — the verdict never depends on which tier ran first.
     s = HERE / "orphan-rendered"
     base_space(s)
     write(s, DOC_PATH, doc_text("assets/widget.mmd"))
     write(s, SOURCE_PATH, SOURCE_TEXT)
-    write(s, RECORD_PATH, json.dumps(record_payload(), indent=2) + "\n")
+    write(s, RECORD_PATH, json.dumps(record_payload({"rendered": []}), indent=2) + "\n")
     finish("orphan-rendered")
 
     # 5. orphan-source/ — source deleted, render present, reference resolves to the render
@@ -236,8 +246,45 @@ def build_all() -> list[str]:
     return built
 
 
+CHECKS = "--check"
+REBUILD = "--rebuild"
+
+
+def _expected_files(name: str) -> dict[str, bytes] | None:
+    """`{relpath: bytes}` the builder would write for `name`, computed without touching the working tree.
+
+    `build_all()` is redirected to a scratch directory (`tempfile.mkdtemp`, removed here), so this function is the
+    only way to see the builder's deterministic output without rewriting the committed fixtures. A name the builder
+    does not know returns None.
+    """
+    scratch = Path(tempfile.mkdtemp(prefix="docs-obligation-fixtures-"))
+    global HERE
+    saved = HERE
+    try:
+        HERE = scratch
+        built = build_all()
+    finally:
+        HERE = saved
+    if name not in built:
+        shutil.rmtree(scratch, ignore_errors=True)
+        return None
+    space = scratch / name
+    files = {
+        path.relative_to(space).as_posix(): path.read_bytes()
+        for path in sorted(space.rglob("*")) if path.is_file()
+    }
+    shutil.rmtree(scratch, ignore_errors=True)
+    return files
+
+
 def check() -> int:
-    """Assert every registered space is on disk with its registered shape (writes nothing)."""
+    """Assert every registered space is on disk with its registered shape (writes nothing).
+
+    Presence alone is not the invariant E6 registers: a record can be rewritten in place while every path the
+    table names still exists, so `--check` also compares each fixture's BYTES with what this builder would write.
+    The composition table (`must` / `absent`) stays as the legible half of the assertion; the byte comparison below
+    is what makes a content drift visible.
+    """
     expected = [
         "clean", "no-diagram", "deleted-rendered", "orphan-rendered", "orphan-source",
         "stale-source", "no-trace", "trace-incomplete", "exempt-ok", "exempt-bad",
@@ -283,16 +330,42 @@ def check() -> int:
         for rel in rels:
             if (HERE / name / rel).exists():
                 problems.append(f"{name}: {rel} must not exist")
+    # byte comparison: the composition table says WHAT is there, this says it is still the SAME content. A record
+    # whose path is registered but whose faces were rewritten in place passes every presence check above.
+    for name in expected:
+        want = _expected_files(name)
+        if want is None:
+            problems.append(f"{name}: the builder does not register this space")
+            continue
+        have = {
+            path.relative_to(HERE / name).as_posix(): path
+            for path in sorted((HERE / name).rglob("*")) if path.is_file()
+        }
+        for relpath in sorted(set(want) - set(have)):
+            problems.append(f"{name}: missing {relpath}")
+        for relpath in sorted(set(have) - set(want)):
+            problems.append(f"{name}: unexpected {relpath} (the builder would not write it)")
+        for relpath in sorted(set(want) & set(have)):
+            if have[relpath].read_bytes() != want[relpath]:
+                problems.append(f"{name}: {relpath} differs from the builder's output (content drift)")
     if problems:
         for p in problems:
             print(f"FIXTURE-{p}", file=sys.stderr)
         return 1
-    print(f"OK: {len(expected)} docs-obligation fixture spaces match their registered composition")
+    print(f"OK: {len(expected)} docs-obligation fixture spaces match their registered composition and bytes")
     return 0
 
 
 if __name__ == "__main__":
-    if "--check" in sys.argv:
+    # Exactly two accepted invocations. An unknown flag is an input error (exit 2) rather than a rebuild: a bare
+    # `--help` probe used to fall through to `build_all()` and rewrite a committed record, which is how a fixture
+    # can be silently changed by a read-only-looking command.
+    unknown = [arg for arg in sys.argv[1:] if arg not in (CHECKS, REBUILD)]
+    if unknown:
+        print(f"build_fixtures.py: error: unknown argument(s) {unknown}; accepted: {CHECKS} | {REBUILD}",
+              file=sys.stderr)
+        sys.exit(2)
+    if REBUILD not in sys.argv[1:]:
         sys.exit(check())
     names = build_all()
     print(f"built {len(names)} fixture spaces: {', '.join(names)}")

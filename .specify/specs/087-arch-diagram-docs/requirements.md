@@ -286,7 +286,7 @@ This feature adds obligations to surfaces that already have owners. It creates n
 - **不新建绘图引擎、不新建渲染器、不新建引擎选择表**（FR-011）。`draw-diagram` 的路由顺序与交付契约归它自己，本特性一行不改。
 - **不新增 `/speckit.*` 命令**（FR-017）。义务挂在既有 `create-docs` / `improve-docs` 的既有步骤上，检查由既有流程的验证步骤触达。
 - **不改变既有四个技能的职责划分**（FR-018），也不改变确认分级、只归档不删除、容忍带与反churn 规则（FR-019）。
-- **不改动本仓 `docs/` 树的内容**——本线是框架改动（Two Hats），`docs/` 与 `.specify/` 只接受生成/镜像；把本仓文档逐份补图属内容工作，A6 已排除。
+- **不改动本仓 `docs/` 树的内容**（唯一例外：FR-001 要求的 `docs/concepts/documentation-model.md` 读者投影）——本线是框架改动（Two Hats），`docs/` 与 `.specify/` 只接受生成/镜像；把本仓文档逐份补图属内容工作，A6 已排除。该例外是 FR-001 明文交付的一行，不是内容工作的开口：`docs/` 下出现第二个被改动的路径即违约。
 - **不覆盖表达类门禁集与流程类别机制**（077 / 069a 的领域）；本特性只消费它们，不修订。
 - **不提供图形化编辑器或站点层改动**；`create-pages` 的发布面不在本特性范围内。
 
