@@ -120,7 +120,7 @@ Every FR has at least one delivered path and one contract clause. (22 FR, 22 row
 
 | Relation | Document | Note |
 |----------|----------|------|
-| owns | `shared/guidelines/reporting-obligations.md` (NEW) | scope predicate, long-run cadence default, reporter-seat obligation, master-reporting duty + stall reference, digest contract |
+| owns | `shared/guidelines/reporting-obligations.md` (NEW) | the new owner; the facts it owns are enumerated once, in `contracts/reporting-obligations.contract.md` C-01 (mirroring `requirements.md` FR-001), and are not re-enumerated here |
 | consumes | `shared/guidelines/progress-reporting.md` | cadence anchor, four content elements, deferral rule, not-a-gate, measured figures, dispatch channel — reached by section anchor, **no clause rewritten** |
 | consumes | `shared/definitions/subagent-definitions.md` | artifact triplet, liveness monitoring, three execution modes; **one pointer line added** |
 | consumes | `shared/workflow/external-dispatch-recipes.md` | dispatch recipes; **one pointer line added** |
@@ -131,8 +131,9 @@ Every FR has at least one delivered path and one contract clause. (22 FR, 22 row
 | amends | `skills/external/coaching-skills/SKILL.md` § Dispatch Payload | exactly one field, one forbidden-content class, one return-handling clause; closed-set invariant preserved |
 | consumes | `skills/external/sdd-loop-driver/scripts/line-registry.py` | registry entry fields + `STATE_VALUES` / `ACTIVE_STATES` + directory resolution — read-only |
 
-This table is the same relation set contract C-48 declares; `tests/contract/test_reporting_obligations.py` asserts
-the two agree.
+This table is the same relation set contract `contracts/ownership-map.contract.md` C-48 declares (ten rows, same
+order and same relation words over the same ten documents);
+`tests/contract/test_reporting_obligations.py` asserts the two agree.
 
 ## Neighbouring Features (binding decision record — carried forward)
 

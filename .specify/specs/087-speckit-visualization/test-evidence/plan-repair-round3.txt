@@ -1,0 +1,151 @@
+# plan repair — analyze round 2 (loop 2), round 3
+# spec: .specify/specs/087-speckit-visualization
+# requirements baseline: b2c044e0 (FR-001 aligned to C-01's eight); plan baseline before this repair: 644ebf35
+# scope: plan-owned files only — plan.md, data-model.md, contracts/, quickstart.md, feature-ref.md
+# forbidden and untouched: requirements.md, tasks.md, checklists/, .specify/state/
+
+== FINDINGS REPAIRED (plan half) ==
+
+F-01 (HIGH, residual pointers) — option (a) taken in every sub-point: a fact that has its own
+clause owner is judged by that clause + its contract test, never by a proposition whose subject differs.
+
+  (1) attribution (C-22 / INV-02)
+      contracts/status-report.contract.md:22-24   Judged by -> tests/contract/test_reporting_obligations.py
+                                                   (attribution is C-22's subject, not RO-05's four
+                                                   elements). Same file, same behavioural anchor as
+                                                   C-31/C-27.
+      data-model.md:185                             INV-02 Judged by -> tests/contract/test_reporting_obligations.py
+                                                   (guard RO-05 removed)
+
+  (2) RO-09 subject kept as C-09 = the digest contract
+      contracts/status-digest.contract.md:110       C-46 RO-09 row -> "the owner document's digest section, plus
+                                                   the bounded / omitted / stale / nothing-running faces of one
+                                                   digest render"
+      contracts/status-report.contract.md:48-50     C-24 Judged by -> RO-03 + test_reporting_obligations.py;
+                                                   override record pinned by C-30, not RO-09
+      contracts/status-report.contract.md:125-127   C-30 Judged by -> test_reporting_obligations.py
+                                                   (no guard proposition named)
+      data-model.md:187                             INV-04 Judged by -> SR-09 (C-30) + test_reporting_obligations.py
+      contracts/status-digest.contract.md:116-120   "FR-020's profile fields (RO-09)" deleted; the not-a-proposition
+                                                   list now names digest cap (C-43), profile selection (C-30),
+                                                   owner content (C-01), and drops the FR-to-RO binding entirely
+      contracts/status-digest.contract.md:128-131   restatement of "profile ... read by RO-09" deleted; the trigger
+                                                   paragraph now names C-30 / C-29 only
+
+  (3) cap -> C-43
+      data-model.md:193                             INV-10 Judged by -> DG-03 (C-43) + test_status_digest_unit.py;
+                                                   "guard RO-13" and its parenthetical removed
+
+  (4) C-46 RO-04 row -> no glob default
+      contracts/status-digest.contract.md:105        RO-04 reads "the roster paths with recorded membership in
+                                                   T003's name-list that are in-population, plus every path
+                                                   supplied by --roster; zero paths supplied => not-evaluated
+                                                   (no glob is a default population)". The ".specify/teams/*/team.md"
+                                                   parenthetical is gone, so the row no longer contradicts FR-006 / A7.
+
+  (5) plan.md:85 XIV Pass assertion re-measured, and the re-check paragraph at plan.md:97-108 now states what the
+      repair changed instead of asserting the old claim. two facts were also restored to their own owners in the
+      row (digest cap + stale bound -> status-digest.py constants via C-43/C-44; profile selection -> C-30).
+
+F-07 (CRITICAL) plan half — feature-ref owns row
+      feature-ref.md:123                            the five-item enumeration is removed; the row now states that the
+                                                   owned-fact list is enumerated once, in C-01 (mirroring FR-001)
+                                                   and is not re-enumerated here. Measured: no five-item, six-item
+                                                   or "five owned" residue remains in feature-ref.md (grep for
+                                                   "five owned|exactly five|five facts" -> 0 hits).
+      NOTE: requirements.md FR-001 and tasks.md T007/T008 are the other two sides of F-07 and are NOT in this
+      assignment's territory (requirements already aligned at b2c044e0). T007 still reads "exactly the five owned
+      facts" (tasks.md:83) and T008 "five owned facts" (tasks.md:87) — tasks-side, must be repaired by the tasks
+      stage. Surfaced as an anomaly line below, not repaired here.
+
+F-08 (MEDIUM) — option (a) taken: five forms, full ten-row relation table
+      contracts/ownership-map.contract.md:36-56      form set -> exactly one of FIVE (owns/consumes/amends/preserves/
+                                                   extends, with extends defined); table -> 10 rows in feature-ref
+                                                   order, gaining "owns — reporting-obligations.md (NEW)" and
+                                                   "consumes — line-registry.py"; header "Pre-existing owner" ->
+                                                   "Owner" because the new owner is now a row.
+      contracts/ownership-map.contract.md:57-59      Judged by -> feature-ref carries the same ten rows (same
+                                                   documents, same order, same relation words).
+      feature-ref.md:134-136                        pointer now names the ten-row set explicitly, so T032's
+                                                   "no one-sided relation" assertion is satisfiable.
+
+F-09 (LOW) — quickstart B
+      quickstart.md:56-59                           Expected block now names all three closed-set defects (absent
+                                                   seat / unresolvable agent / two seats), not just the missing one.
+      quickstart.md:73-76                           Verification route (b) -> four defect fixtures (compliant /
+                                                   missing-seat / unresolvable-agent / two-seats, the closed set
+                                                   C-16 fixes) plus the C-17 reason value-domain fixture; total
+                                                   stated as five cases, not three.
+
+== UNCHANGED, BY CONSTRAINT ==
+- requirements.md, tasks.md, checklists/ : zero writes.
+- 22 FR / 10 SC citation count: unchanged. 0 new mechanisms, 0 new dependencies, 0 new paths
+  (pre-analyze: fr=22 sc=10 tasks=50 files=15 — identical to the round-2 reading on these four counters).
+- .specify/state/087-speckit-visualization.md : not written.
+
+== GATE READINGS (this repair) ==
+
+[1] pre-analyze-check.py --stage plan --repo .
+    cmd: python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+           --stage plan --repo . --spec-dir .specify/specs/087-speckit-visualization
+    out: {"stage":"plan","decision":"pass", ... ,
+          "summary":{"errors":0,"advisories":133,"waived":0,"fr":22,"sc":10,"tasks":50,"clauses":0,"files":15}}
+    stderr tail: pre-analyze-check: stage=plan decision=pass errors=0 advisories=133 waived=0
+    exit: 0
+    advisory delta vs round 2: 126 -> 133. All are "missing-path" on delivery-time paths (the new owner document,
+    agent template, command, script and the four new test files). The +7 come from the repaired Judged-by lines:
+    they now name `tests/contract/test_reporting_obligations.py` / `tests/unit/test_status_digest_unit.py`
+    explicitly where a proposition id used to stand alone (status-report.contract.md, data-model.md). This is the
+    intended direction — a Judged-by line pointing at a file that does not exist yet is an advisory, while a
+    Judged-by line pointing at a proposition whose subject differs is a defect.
+
+[2] validate-decision-tensions.py --spec <spec>
+    cmd: python3 .specify/scripts/python/validate-decision-tensions.py \
+           --spec .specify/specs/087-speckit-visualization
+    out: status: ok
+         [dtr-anchor] pass (0) / [dtr-section-missing] pass (0) / [dtr-record-incomplete] pass (0)
+         [dtr-tension-id] pass (0) / [dtr-rejected-form] pass (0) / [expected-sacrifice-unmapped] pass (0)
+         scanned: 330 lines, 2 record(s); channel: value_domain=HIGH-or-0, high=0
+         0 error(s), 0 warning(s)
+    exit: 0
+    (330 lines vs 321 in round 2 — the +9 are the plan.md XIV re-check paragraph.)
+
+[3] account-clause-coverage.py <spec>   (read-only; NOT --freeze)
+    cmd: python3 .specify/scripts/python/account-clause-coverage.py \
+           --spec .specify/specs/087-speckit-visualization
+    out: claimed clauses (this feature): 33
+         baseline: .specify/specs/087-speckit-visualization/coverage-baseline.txt (573 names)
+         baseline-internal existing uncovered: 573
+         uncovered beyond baseline: 19
+         [fr-uncovered] pass (0) — 22 of 22 FRs cited from citation groups
+         [clause-uncovered] fail (592) — 592 uncovered, 19 beyond the frozen baseline
+         [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms
+         [coverage-baseline-delta] fail (19) — baseline holds 573 names; 573 uncovered items are
+                                              baseline-internal and do not block
+         19 error(s), 0 warning(s); status: uncovered
+    exit: 1
+    Reading: decision-neutral for this repair and identical to the round-2 reading (33 claimed / 19 beyond
+    baseline / 22-of-22 FR cited). The 19 beyond-baseline names are this feature's own not-yet-implemented
+    clauses; their ledger membership is finding E-03, which is tasks-owned (tasks.md § Clause Coverage Ledger)
+    and outside this assignment's territory. The clause universe did not change (52 clauses, same ids) —
+    verified by the unchanged count, so no clause was added or removed by the repair.
+
+[4] sync-mirrors.py --check
+    cmd: python3 .specify/scripts/python/sync-mirrors.py --check
+    out: OK: all per-tool command copies match the source templates.
+         ok templates/ == .specify/templates/ (22 files)
+         ok skills/external/ == .specify/skills/ (415 files)
+         ok skills/internal/ == .specify/skills/internal/ (138 files)
+         ok agents/ == .specify/agents/templates/ (16 files)
+         ok scripts/ == .specify/scripts/ (121 files)
+         ok shared/ == .specify/shared/ (94 files)
+    exit: 0
+    (No framework source or mirror was edited: every changed file is under .specify/specs/, which no mirror
+    pair covers. The green reading is therefore the expected one, not a vacuous one.)
+
+== EVIDENCE INTEGRITY ==
+- Commands above were executed in this run; their output is captured here verbatim (single-run evidence: the
+  outputs are the record, no re-run is needed to answer follow-ups).
+- No --freeze was run. No write command other than the plan-owned edits and this file.
+- git status of pre-existing dirty files: untouched (session/, feedback/, exec-quant/, .specify/state/ were not
+  read into any edit and not staged).

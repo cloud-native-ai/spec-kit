@@ -182,15 +182,15 @@ spine path for a human to open, but its fields come from the registry.
 | ID | Invariant | Judged by |
 |----|-----------|-----------|
 | INV-01 | Every Status Report carries all four content elements; `blocker` is present as `no blocker` rather than omitted | `contracts/status-report.contract.md` SR-02 (C-23); guard proposition RO-05 |
-| INV-02 | Every Status Report names its structure slug and run stamp; two structures cannot produce an identical unattributed line | SR-01 (C-22); guard RO-05 |
+| INV-02 | Every Status Report names its structure slug and run stamp; two structures cannot produce an identical unattributed line | SR-01 (C-22); `tests/contract/test_reporting_obligations.py` (attribution is C-22's subject, not RO-05's four elements) |
 | INV-03 | A roster in E1's population has at most one reporter seat, and a missing seat is a **named defect** unless a `reporting-reason` is recorded | `contracts/reporter-seat.contract.md` RS-03 (C-16), RS-04 (C-17); guard RO-04 |
-| INV-04 | The two cadence profiles never compete inside one run; a profile switch is recorded before the next line | SR-09 (C-30); guard RO-09 |
+| INV-04 | The two cadence profiles never compete inside one run; a profile switch is recorded before the next line | SR-09 (C-30); `tests/contract/test_reporting_obligations.py` (profile selection is C-30's subject, not RO-09's) |
 | INV-05 | No emitted line carries an internal engine identifier where a user-facing name exists; the line is readable by a reader who did not take part in the run | SR-10 (C-31); `shared/guidelines/user-facing-comprehension.md` |
 | INV-06 | A status report is a one-way statement: it never awaits a response and its presence authorizes nothing | SR-08 (C-28); guard RO-10 |
 | INV-07 | Every dispatched sub-flow appears in its master's report at least once; presence is a closure requirement, not a best effort | `contracts/supervision-report.contract.md` MV-02 (C-33); guard RO-06 |
 | INV-08 | The reporter's authority is read + write-own-stream; it never dispatches, authorizes, retries or terminates | RS-06 (C-19), RS-07 (C-20) |
 | INV-09 | A significant state transition (sub-flow failure, stall crossing, dispatch failure) produces a line **before** the next tick | MV-03 (C-34); guard RO-08 |
-| INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03 (C-43); guard RO-13 (the cap constant is a delivery-fact of the changed-file set, not a proposition of its own) |
+| INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03 (C-43); `tests/unit/test_status_digest_unit.py` (the cap is C-43's subject, not a proposition of its own) |
 | INV-11 | An entry whose age exceeds the stale bound is marked stale with its age; stale data is never presented as current | DG-04 (C-44) |
 | INV-12 | No scheduler, timer service, daemon, third-party dependency, new persistent store, console channel, registry, state spine or ledger is introduced | `contracts/ownership-map.contract.md` OM-04 (C-50); guard RO-13 |
 

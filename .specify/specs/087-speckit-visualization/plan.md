@@ -82,7 +82,7 @@ carried by any principle heading in that file, so none is rendered):
 | XI | Dogfooding (Self-Application) | ✅ Pass | Two hats named: all delivery lands in framework sources (`shared/`, `agents/`, `skills/`, `scripts/`, `templates/`) and reaches `.specify/` only through `sync-mirrors.py` / `regen-command-copies.py`; no hand edit of a `.specify/` mirror |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | `research.md` RO-05/RO-06 record the Tool-record lookup (`.specify/memory/tools/`) before authoring `status-digest.py`; no existing Tool covers a current-state digest, so authoring is the expected outcome |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | `feature-ref.md` names the strengthened work-loop dimension (Task Understanding + Reliable Delivery visibility); no scoring system or maturity report is added |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | Each fact has one owner: cadence value → the new owner; content floor + interactive default → `progress-reporting.md`; artifact triplet + modes → `subagent-definitions.md`; stall numbers → `create-team/references/patterns.md`; registry states → `line-registry.py` `STATE_VALUES`; the guard's thirteen propositions → `contracts/reporting-obligations.contract.md` C-01…C-13 (every other surface reaches them by id). C-47 makes the ownership consignment a contract clause and SC-006 its measurement |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | Each fact has one owner: cadence value → the new owner; content floor + interactive default → `progress-reporting.md`; artifact triplet + modes → `subagent-definitions.md`; stall numbers → `create-team/references/patterns.md`; registry states → `line-registry.py` `STATE_VALUES`; the digest's cap and stale bound → the constants in `status-digest.py` (C-43/C-44); profile selection → `status-report.contract.md` C-30; the guard's thirteen propositions → `contracts/reporting-obligations.contract.md` C-01…C-13. Every other surface reaches a proposition by id and states only what it reads, never what the proposition asserts. C-47 makes the ownership consignment a contract clause and SC-006 its measurement |
 | XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | Emitted lines are a governed surface of that discipline; `contracts/status-report.contract.md` C-23 (SR-02) pins the four content elements and C-22 (SR-01) the attribution fields, and `data-model.md` § Invariants INV-05 forbids an internal identifier from reaching the line without a user-facing name |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | The reporting obligation rides the same dispatch-payload channel as the fast-fail clause and does not modify it; the reporter is not given authority to repair or to halt anything (FR-005, INV-08) |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | No new directory is created: `contracts/`, `test-evidence/`, `agents/`, `shared/guidelines/` all exist; the digest's scratch needs none (`temp_directory_discipline` not exercised) |
@@ -101,7 +101,16 @@ contracts enumerate the tests to write rather than leaving them implicit; XI (Do
 by hand-editing a mirror. XIV was checked separately: it passes only because
 `contracts/reporting-obligations.contract.md` C-01…C-13 declares itself the single owner of the thirteen guard
 propositions and every other surface — `status-digest.contract.md` C-46, `data-model.md` § Invariants, each contract's
-`*Judged by*` line, and `quickstart.md` § F — reaches them by id without restating a subject.
+`*Judged by*` line, and `quickstart.md` § F — reaches them by id and states only what it reads, without restating a
+proposition's subject.
+
+**Re-check after the round-3 plan repair** (analyze round 2, findings F-01/F-07/F-08/F-09): the row above was
+re-measured against the consumers rather than asserted. Every `*Judged by*` line and every invariant now names the
+RO id whose subject actually matches, and the four facts that have their own clause owners go to those clauses
+instead of to a proposition — attribution and profile selection to `status-report.contract.md` C-22/C-30, the digest
+cap to `status-digest.contract.md` C-43, the digest contract itself to C-09/`RO-09`. `C-46`'s `RO-04` row no longer
+offers a glob as a default population, so no consumer contradicts `FR-006`. Evidence:
+`test-evidence/plan-repair-round3.txt`.
 
 ## Decision Tensions
 

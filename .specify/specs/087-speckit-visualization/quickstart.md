@@ -53,8 +53,9 @@ echo "exit=$?"
 ```
 
 **Expected**: status `0` when the roster carries a `role: reporter` member (or a `reporting-reason`); status `1`
-with a defect line naming `reporter` and the team slug when it does not; status `2` on an unreadable or unparsable
-file.
+with a defect line naming `reporter` and the team slug when it does not — and also for the two other defects of the
+closed set (an unresolvable `agent`, and two or more reporter rows, each named distinctly by C-16); status `2` on an
+unreadable or unparsable file.
 
 **Status**: NOT EXECUTED — the guard script does not exist at plan time.
 
@@ -68,8 +69,10 @@ file.
 4. the defect line is single-line and contains the literal `reporter` (contract RS-03 names the seat literal);
 5. the script is stdlib-only (contract RS-08), so plain `python3` runs it with no installed package.
 
-**Verification route (b)**: pinned by `tests/contract/test_roster_reporter_seat.py` over three fixtures
-(compliant / missing-seat / unresolvable-agent) plus one out-of-domain `reporting-reason` fixture.
+**Verification route (b)**: pinned by `tests/contract/test_roster_reporter_seat.py` over four defect fixtures
+(compliant / missing-seat / unresolvable-agent / two-seats — the closed defect set C-16 fixes) plus the
+`reporting-reason` value-domain fixture C-17 requires (one per accepted value and one out-of-domain). That is five
+fixture cases in total, not three.
 
 ---
 

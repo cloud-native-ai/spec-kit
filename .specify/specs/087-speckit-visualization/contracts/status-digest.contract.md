@@ -102,21 +102,21 @@ asserts, because a second statement of the subject is what constitution XIV forb
 | RO-01 | the owner document's single-source-of-truth block and its owned-fact list |
 | RO-02 | a seeded flow sample classified by the owner's predicate (zero unclassifiable cases) |
 | RO-03 | the owner-literal scan over the framework sources (one definition site) |
-| RO-04 | the roster paths in `FR-006`'s population only (`.specify/teams/*/team.md` plus every path supplied with `--roster`); zero paths supplied ⇒ `not-evaluated` with that reason |
+| RO-04 | the roster paths with recorded membership in `T003`'s name-list that are in-population, plus every path supplied by `--roster`; zero paths supplied ⇒ `not-evaluated` with that reason (no glob is a default population) |
 | RO-05 | a captured line set: the four content-element labels plus an explicit blocker field |
 | RO-06 | a captured supervision report: one row per dispatched sub-flow |
 | RO-07 | the owner document: the threshold anchor resolves, and no second numeric threshold set exists |
 | RO-08 | a captured line set: the three transition classes and their pre-tick stamps |
-| RO-09 | a captured line set: the profile value recorded per line and the recorded profile switch |
+| RO-09 | the owner document's digest section, plus the bounded / omitted / stale / nothing-running faces of one digest render |
 | RO-10 | a captured line set: interrogative / approval-request verbs |
 | RO-11 | a fixture whose tick was suppressed: the `reporter-failure` line |
 | RO-12 | a run record's carrier value against the two legal forms |
 | RO-13 | the delivered changed-file set: scheduler / timer / daemon / dependency / store / channel / registry / spine / ledger sites |
 
-The proposition **ids and their subjects** are owned by C-01…C-13 only. `SC-005`'s (C-44/C-45), `FR-009`'s stall
-judgement (RO-07), `FR-020`'s profile fields (RO-09) and `FR-012`'s cap/omitted count (RO-13) are named by their
-owning clauses and are **not** propositions of their own; where a proposition reads a value those FRs define, the
-owning clause of that value is the one that pins it.
+The proposition **ids and their subjects** are owned by C-01…C-13 only. These names are **not** propositions
+of their own: `SC-005`'s (C-44/C-45), the stall judgement (C-07/RO-07), the digest's cap and omitted count
+(C-43), profile selection (C-30), and readiness of the owner document's own content (C-01). Where a proposition
+reads a value one of those clauses owns, that clause is the one that pins it.
 
 Each proposition MUST be decidable from files on disk with no network and no process spawn. A proposition the guard
 cannot decide MUST be reported `not-evaluated` with the reason, and MUST NOT be reported `pass`.
@@ -126,8 +126,7 @@ compliant fixture, and a mutation fixture (seat removed, second cadence literal 
 proposition red.
 
 The guard's id set MUST equal the C-01…C-13 id set exactly: a fourteenth proposition, or a second id for one of the
-thirteen, is a defect. The trigger mechanics are not propositions — `FR-020`'s profile selection is pinned by
-`contracts/status-report.contract.md` C-30 and read by `RO-09`, and `FR-016`'s failure line is pinned by C-29 and
-read by `RO-11` — so no trigger gets a slot of its own.
+thirteen, is a defect. The trigger mechanics are not propositions — profile selection is pinned by
+`contracts/status-report.contract.md` C-30 and the failure line by C-29 — so no trigger gets a slot of its own.
 
 Requirements served: (FR-017, FR-022).

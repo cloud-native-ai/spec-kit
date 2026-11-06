@@ -19,8 +19,9 @@ session").
 The run stamp is the one the emitting flow already writes (team run report filename stamp, or the registry
 `run_id`); no new stamp format is introduced.
 
-*Judged by*: guard proposition RO-05 over a captured line set; contract test asserts a two-structure fixture yields
-two distinguishable lines.
+*Judged by*: `tests/contract/test_reporting_obligations.py` — a two-structure fixture yields two distinguishable
+lines, and an attribution field left empty is red. Attribution is not one of RO-05's four content elements, so no
+guard proposition is named here (the element set is C-23's subject, RO-05's owner).
 
 Requirements served: (FR-007).
 
@@ -44,8 +45,9 @@ from the owner document, never restated in the emitting flow (`FR-003`). An expl
 MAY replace it without a source edit; when present it MUST be recorded next to the line's profile so a reader can
 tell an override from the definition.
 
-*Judged by*: guard proposition RO-03 and RO-09 (the value is read from the owner, and the override is recorded next
-to the line's profile).
+*Judged by*: guard proposition RO-03 (the value is read from the owner, never restated in the emitting flow) plus
+`tests/contract/test_reporting_obligations.py` (an override is recorded next to the line's profile). The override's
+record and its reading surface are pinned by C-30, not by RO-09 — RO-09's subject is the digest contract (C-09).
 
 Requirements served: (FR-003).
 
@@ -120,7 +122,9 @@ E6's; a run MUST NOT mix the two profiles' ticks as if they were one cadence. A 
 switches to `interactive` at the next boundary **and says so**; the switch is recorded, never silent
 (`FR-020`, `requirements.md` Edge Cases "Two cadence profiles in one session").
 
-*Judged by*: guard proposition RO-09 over a fixture that loses its receiver mid-run.
+*Judged by*: `tests/contract/test_reporting_obligations.py` over a fixture that loses its receiver mid-run — the
+pre- and post-switch lines carry their own profile and the switch record precedes the first line under the new one.
+Profile selection is pinned by this clause, so no guard proposition is named here.
 
 Requirements served: (FR-020).
 

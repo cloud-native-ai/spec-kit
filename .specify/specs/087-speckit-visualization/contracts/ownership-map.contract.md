@@ -34,23 +34,27 @@ Requirements served: (FR-018, SC-006).
 
 ## C-48 · OM-02 — The ownership relation to pre-existing owners is declared, in one direction
 
-Each pre-existing owner this feature touches MUST be recorded with its relation, in exactly one of four forms:
-`owns` (the new owner document), `consumes` (reached by path), `amends` (a bounded edit), `preserves` (untouched
-because the feature deliberately keeps its clauses). The declared set MUST be:
+Each owner this feature touches — the new one and every pre-existing one — MUST be recorded with its relation, in
+exactly one of five forms: `owns` (the new owner document), `consumes` (reached by path), `amends` (a bounded edit),
+`preserves` (untouched because the feature deliberately keeps its clauses), `extends` (an existing subtree gains
+declared content without any of its clauses being rewritten). The declared set MUST be:
 
-| Pre-existing owner | Relation |
-|--------------------|----------|
+| Owner | Relation |
+|-------|----------|
+| `shared/guidelines/reporting-obligations.md` (NEW) | `owns` — the new owner document |
 | `shared/guidelines/progress-reporting.md` | `consumes` — no clause of it is rewritten (`SC-008`) |
 | `shared/definitions/subagent-definitions.md` | `consumes` + one pointer line added |
 | `shared/workflow/external-dispatch-recipes.md` | `consumes` + one pointer line added |
-| `shared/guidelines/fast-fail.md` | `preserves` — the dispatch injection clause is referenced, never modified |
+| `shared/guidelines/fast-fail.md` § 子代理派发注入 | `preserves` — the dispatch injection clause is referenced, never modified |
 | `shared/guidelines/user-facing-comprehension.md` | `consumes` — the emitted line is a governed surface |
 | `shared/guidelines/confirmation-gates.md` | `preserves` — no gate is added (measured: 27 blocking gates before and after) |
 | `skills/internal/create-team/` | `extends` — roster schema note + create step + guard script |
 | `skills/external/coaching-skills/SKILL.md` § Dispatch Payload | `amends` — exactly one field, one forbidden class, one return clause (`FR-019`) |
+| `skills/external/sdd-loop-driver/scripts/line-registry.py` | `consumes` — registry entry fields + `STATE_VALUES` / `ACTIVE_STATES` + directory resolution, read-only |
 
-*Judged by*: `feature-ref.md` § Consuming / Consumed Owners carries the same table, and the contract test asserts
-the two are consistent (no relation appears in one and not the other).
+*Judged by*: `feature-ref.md` § Consuming / Consumed Owners carries the same ten rows (same documents, same order,
+same relation words) and the contract test asserts the two are consistent (no relation appears in one and not the
+other).
 
 Requirements served: (FR-013, SC-008).
 
