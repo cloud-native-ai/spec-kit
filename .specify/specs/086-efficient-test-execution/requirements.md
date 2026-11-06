@@ -9,8 +9,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 086
+**Feature Name**: Efficient Test Execution (Concurrent by Default)
 
 ## Overview
 
@@ -180,7 +180,7 @@
 
 #### E. 预算台账与效率测量（US5）
 
-- **FR-024**: 驱动的预算台账解析器 MUST 认识并行相关参数（进程数开关及其长形式、分布式策略开关、最大进程数开关），使**显式并行的全量运行**被正确分类为全量运行，MUST NOT 被丢弃或降级。
+- **FR-024**: 驱动的预算台账解析器 MUST 认识并行相关参数（进程数开关 `-n` / `--numprocesses`、分布式策略开关 `--dist`、最大进程数开关 `--maxprocesses`），使**显式并行的全量运行**被正确分类为全量运行，MUST NOT 被丢弃或降级。
 - **FR-025**: 台账解析器 MUST 把这些开关当作**带取值**的参数处理，其取值 MUST NOT 被当作位置参数（路径）参与分类。
 - **FR-026**: 台账解析器的升级 MUST 保持既有记录的解析结果不变（回归等价性）。
 
@@ -280,6 +280,13 @@
 - **A10（085 保留的读法）**：保留义务是"不改 085 面"，不是"不用 085 面"。本特性运行必须**使用**这些机制（否则 085 SC-010 无证据），但不得修改其定义、契约、checkpoint 记录或历史。
 - **A11（自应用例外）**：本仓开发自身的运行按完整链执行（含 checklist / analyze / review），不因并行默认而跳过质量阶段。
 - **A12（不改写历史）**：`.specify/state/`、`.specify/memory/evidence/`、已日期化的 review/feedback 条目与 085 全部记录都是只读输入；只更新存活引用与存活定义。
+- **A13（默认并发的工作进程与调度策略）**：初始策略为 `-n auto`（逻辑 CPU 数）配合 `--dist load`；优先级与嵌套规则见 FR-003–FR-005。不预先引入进程数上限，也不预先改用 `loadfile`：只有同口径实测显示 `auto`/`load` 产生新的失败名或显著资源争用时，才允许在证据中具名调整（cap 或调度模式），并按 FR-010 处置新增失败；调整不得以"更稳"为名静默缩小并行。plan 与 implement 的实测记录 MUST 写明解释器、xdist 版本、逻辑 CPU 数与所选调度模式。
+- **A14（watch-target 串行例外的优先形态）**：优先为该测试声明**具名、可枚举**的串行标记，并由运行器在并行运行中排除、在串行段补跑，最终仍只写出一份完整的 `--names-out` 失败名清单与单一退出码；标记集合 MUST 可按名称枚举并记录大小。仅当该形态无法保真清单或退出码时，才允许退到**测试级**超时上调，且 MUST 附带串行/并行耗时实测与"不削弱其他测试超时"的说明。禁止 skip/xfail、禁止静默全局串行、禁止靠重跑碰运气（FR-010–FR-012）。
+- **A15（并行引擎的解释器边界）**：`pytest-xdist` 仅作为开发侧依赖，其版本标记按解释器划定（xdist 3.x 需要 Python >= 3.9）；当前实测组合为 Python 3.14.6 + pytest 9.2.0 + xdist 3.8.0（`.venv`），执行时把 `pytest --version` / `pip show pytest-xdist` 原文记入 `test-evidence/`。Python 3.8 下游拿不到 xdist 属正常路径，由 FR-006 承接；CLI 运行时依赖集合不变。
+- **A16（台账解析器升级的增量边界）**：只扩展 `VALUE_FLAGS` 对四个并行开关的识别，不改槽位语义、selection 算法或既有行的分类结果；回归等价性由同目录单元测试守住（显式并行全量运行判为全量、开关取值不被当作路径、既有记录重放结果不变）。
+- **A17（085 保留与本次 dogfood 参数）**：`agent_concurrency_requested=24`；`effective` 按阶段 ready packages / verifier reserve / host capacity 重算（clarify 阶段为 2：1 executor + 1 verifier reserve），任何降级具名写入状态脊与 checkpoint；`write_isolation=worktree` 为本次临时 Team 运行的 opt-in，集成队列与每阶段 checkpoint 按 085 契约执行；085 的 goal/team/checkpoints/contracts 与历史只读。085 SC-010 只有在全阶段链、LLM 阶段 agent、并发与 checkpoints 证据完整时才可记 `pass`，否则保持 `partial` 并写明缺口。
+- **A18（特性生命周期）**：clarify 阶段保持 `Draft`；`Draft → Planned` 由 `/speckit.plan` 拥有，本阶段不提前翻转状态。
+- **A19（框架观察，本特性不修复）**：(a) requirements 阶段的 scaffold 曾短暂创建 `087-` 分支，随后清理并以正确的 `086` 分支重建；本特性不修改该脚本，只把观察登记为框架问题。(b) 宿主未暴露 085 的阶段 agent 类型，clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色；085 的 team/concurrency/checkpoint 机制仍被使用，此承载降级不记为 085 失败。
 
 ## Out of Scope
 
@@ -318,3 +325,7 @@
 - Q: 原则写到哪里，下游怎么拿到？ → A: 四件套——owner 指南 + constitution（模板与 live 各一条，编号各自独立）+ instructions（模板与 live 各一个常驻章节）+ 生成器的 MUST-include 条目；四处都是指针（FR-018–FR-022、A8）。
 - Q: 085 的机制要保留到什么程度？ → A: 不改动 085 面（goal/team/checkpoints/contracts/历史），但必须**使用**它们跑完本次运行以补齐 085 SC-010 的证据；证据不完整则保持 `partial`（FR-027–FR-030、A10）。
 - Q: 既存失败如何对待？ → A: 按名称比较，两侧差集（新增/消失）都记录；消失项不追认为本特性修复（A3、FR-014、SC-006）。
+- Q: 默认并发采用什么工作进程数与调度策略，调用者参数如何优先？ → A: 初始策略为 `-n auto` + `--dist load`；优先级 `--workers` > `SPECKIT_TEST_WORKERS` > `auto`；调用者已传 `-n` / `--numprocesses` 时不重复注入；进程环境含 `PYTEST_XDIST_WORKER` 时自动串行；xdist 缺失时串行并在 stderr 给出具名回退说明。不预设 cap，`auto` vs capped 与 `load` vs `loadfile` 作为待实测的假设（A13），调整必须带同口径证据并按 FR-010 处置新增失败。
+- Q: watch-target 自测的唯一新增失败如何处置？ → A: 优先具名显式串行例外（可枚举标记），运行器仍产出一份完整 `--names-out` 清单与单一退出码（必要时并行段 + 串行段合并）；仅当该形态无法保真时，才用**测试级**、有串行/并行耗时实测依据的超时上调，且不得削弱其他测试超时；禁止 skip/xfail/静默全局串行/重跑碰运气（FR-010–FR-012、A14）。
+- Q: 原则落地的编号、位置与计数守卫取什么值？ → A: 标题 `Efficient Test Execution (Concurrent by Default)`；constitution 模板 XIX / live XX；版本 1.16.0 → 1.17.0；instructions 常驻章节插在 `## Single-Run Evidence Discipline` 之后；计数 19/20/12、watchlist 7、指令章节 33/34；仅当实测新增章节使 live 指令文件超过 34,816 B 时才调整预算；框架源与运行时镜像重新生成并逐字节一致（FR-019–FR-022、A8）。
+- Q: 收口时如何判定零新增失败？ → A: 以**名称差集**对实现起点的 SDD 基线槽位失败名比较，双向记录新增与消失；当前 19 个串行既存失败按名称排除；最终并行收口运行的新增失败名必须为 0；消失项不追认为本特性修复，也不宣称无关修复（A3、A9、SC-006、FR-014）。

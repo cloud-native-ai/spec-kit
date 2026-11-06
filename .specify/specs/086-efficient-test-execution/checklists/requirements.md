@@ -2,7 +2,7 @@
 
 **Purpose**: Validate the quality, clarity and completeness of the 086 requirements before `/speckit.clarify` and `/speckit.plan`.
 **Created**: 2026-11-06
-**Feature (Requirement Scope)**: `.specify/memory/features/086.md`（待 `/speckit.clarify` 绑定）
+**Feature (Requirement Scope)**: `.specify/memory/features/086.md`（2026-11-06 `/speckit.clarify` Mode A 绑定）
 **Requirements (What)**: [`../requirements.md`](../requirements.md)
 
 ## Content Quality
@@ -33,6 +33,6 @@
 
 ## Notes
 
-- Checker-of-record: `python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md` → `status: ok`, 0 errors / 0 warnings, 321 lines / 45 definition rows / 7 shared strings. All counts on this page are copied from that run (recorded in `../test-evidence/requirements-gates.txt`), never hand-typed.
-- `Feature ID: Need clarification` is pending by design; `/speckit.clarify` binds it.
+- Checker-of-record: `python3 scripts/python/validate-requirements.py .specify/specs/086-efficient-test-execution/requirements.md` → `status: ok`, 0 errors / 0 warnings; requirements-stage run: 321 lines / 45 definition rows / 7 shared strings; after the 2026-11-06 clarify append: 332 lines, 45 definition rows / 7 shared strings (FR/SC/STR counts unchanged). All counts on this page are copied from the checker's run (recorded in `../test-evidence/requirements-gates.txt`), never hand-typed.
+- `Related Feature` is bound to Feature 086 by `/speckit.clarify` Mode A on 2026-11-06; no new Feature and no renumbering.
 - The two blocked-at-U0 items resolved here: the flow-class declaration is written (`execution` / `-`) and the plan-mode decomposition gate returns `proceed` (33 FR, ceiling 60).
