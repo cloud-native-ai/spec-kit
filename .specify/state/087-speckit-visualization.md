@@ -4,18 +4,18 @@
 spine_state: blocked
 run_id: r20261106T040353Z-087a
 slice: 087
-stage: analyze-round2
-stage_started_at: 1793940020
-stage_deadline_epoch: 1793950820
-stage_base_commit: $(git rev-parse --short HEAD)
+stage: closure-second-slice
+stage_started_at: 1793956066
+stage_deadline_epoch: 1793966866
+stage_base_commit: 993d2a49
 attempt: 2
 retry_limit: 3
-last_verdict: closure-block (SC-001/SC-002 partial); review P0=0/P1=4 (REC-A2 fixed adde4e70; REC-A1/W1/W4 deferred)
+last_verdict: closure-block (SC-001/SC-002 partial; second slice pass 8/10; no merge)
 plan_constraint: active
 plan_activated_at: 2026-11-06T04:25:00Z
-plan_commit: e14b10a2
+plan_commit: 10e1a2df
 plan_reactivated_at: 2026-11-06T05:06:00Z
-approved_baseline_commit: b2c044e0
+approved_baseline_commit: 4b34327e
 rebaseline_events: [{trigger: "analyze-loop1 F-02/E-01 requirements repair", prior: 2b24d24e, new: 142ecc4d, at: "2026-11-06T04:58:00Z", summary: "SC-003 direction; FR-003/FR-020 cadence single owner; FR-006/SC-002 population; FR-011 workspace rule; FR-016 scoping; A11 path premise"}]
 plan_owned_paths: plan.md,data-model.md,contracts/,quickstart.md,research.md,feature-ref.md
 agent_concurrency_requested: 24
@@ -210,6 +210,8 @@ checkpoint_pending_proposal: none
 {"event": "plan", "stage": "plan", "stage_attempt": 1, "plan_hash": "sha256:a0ace7423af73f70ec5b04305cb3b669944d0bcd5b7572ccf191c9cfb05d86e4", "decision": "single-package", "pattern": "serial", "slot_cap": 1, "verdict": "single-package", "gate_evidence": ".specify/state/wp/087-speckit-visualization-plan-a1-gate-plan.json", "at": 1793938539}
 {"event": "plan", "stage": "implement", "stage_attempt": 1, "plan_hash": "sha256:621dab1da9ea6039fffca30372f76247a811c167996db7ac388ddd840b0f0aa9", "decision": "single-package", "pattern": "serial", "slot_cap": 1, "verdict": "single-package", "gate_evidence": ".specify/state/wp/087-speckit-visualization-implement-a1-gate-plan.json", "at": 1793946738}
 {"event": "plan", "stage": "review", "stage_attempt": 1, "plan_hash": "sha256:1cb479b211a10803672f121e1fbe6d5b92a40670ba50de1bcadd1d1352591d2c", "decision": "disabled", "pattern": "serial", "slot_cap": 1, "verdict": "no-gate-run", "gate_evidence": "none", "at": 1793951666}
+{"event": "plan", "stage": "plan", "stage_attempt": 2, "plan_hash": "sha256:e981a6a6b2b58e19a010f05e1b64226adb19926b289c4b8e9313f01682634268", "decision": "single-package", "pattern": "serial", "slot_cap": 1, "verdict": "single-package", "gate_evidence": ".specify/state/wp/087-speckit-visualization-plan-a2-gate-plan.json", "at": 1793953422}
+{"event": "plan", "stage": "implement", "stage_attempt": 2, "plan_hash": "sha256:afc03835b2532ebd2e8b9d21fca747d006efa1234a117bd3993cf94a0f03c9a4", "decision": "single-package", "pattern": "serial", "slot_cap": 1, "verdict": "single-package", "gate_evidence": ".specify/state/wp/087-speckit-visualization-implement-a2-gate-plan.json", "at": 1793956066}
 <!-- wp-ledger:end -->
 
 ## U5 停线（analyze 门回环预算耗尽，2026-11-06 05:20 UTC）
@@ -498,3 +500,325 @@ turn_budget=500 per part; sub_dispatch=single executor; checkpoint written after
 - **review**：四段 + ARC 完成（`review.md` / `code-review.md`，提交 `d9a74d66`）；ARC `block` 与 `Blocked` **agree**；P0=0、P1=4（REC-A2 已修 `adde4e70`；REC-A1/W1/W4 框架级 defer，见 `register.md`）。
 - **解除阻断路径**：① 真实 >90 秒 team run + reporter 席位捕获（SC-001）；② 经 team-creation entry 创建带 reporter 席位的 roster 并复验（SC-002）；③ 更新 `verification.md` 后重跑 closure checker 与 review 后流程。
 - **提交链**：52b2d5a6 → 6e969caa → 2b24d24e → 47fd6d07/424d970c → efe24cff → a7eaaa4a → 142ecc4d → 644ebf35 → 852e0843 → 123e5949 → 8b4b2c7e → b2c044e0 → 3ec54975 → 799083f2 → d3946058 → 428e5a22 → ae6d6b19 → e14b10a2 → 0d97dfd3 → c047740d → f7acc23f → 650b70f3 → 62676f38 → 3f58e3d3 → c0fd01ac → a289f756 → f74cc7e6 → 930adc2f → 0df6f6c6 → d9a74d66 → adde4e70。
+
+## 范围追加（2026-11-06，用户指令）
+
+- **S1 效率可视化**：可视化信息中体现效率信息（各步骤执行时间等），并记录到 `.specify/memory/exec-quant`。
+- **S2 `/speckit.measure`**：新增命令，专门分析与汇总 `.specify/memory/exec-quant` 中的信息。
+- 路由裁决：`sdd`（nature=feature / traceability=required / blast=cross-cutting / reversibility=hard / complexity=complex；reason=sdd-capability-or-contract-change）。
+- 处理：该线由 blocked 恢复为 running，requirements 修订 → clarify → plan 更新 → tasks 追加 → checklist/analyze 重跑 → implement 新切片 → review → closure。
+
+<!-- wp-plan:begin stage=plan stage_attempt=2 -->
+{
+  "schema_version": 1,
+  "line_id": "087-speckit-visualization",
+  "run_id": "r20261106T040353Z-087a",
+  "stage": "plan",
+  "stage_attempt": 2,
+  "decision": "single-package",
+  "gate_verdict": "single-package",
+  "reason": "scope-revision plan update is one coherent write package over the same design artifact set; no parallel benefit",
+  "rule": null,
+  "source_artifacts": [
+    "requirements.md",
+    "requirements.md#Clarifications"
+  ],
+  "required_outputs": [
+    "plan.md",
+    "research.md",
+    "data-model.md",
+    "contracts/",
+    "quickstart.md",
+    "feature-ref.md"
+  ],
+  "integrator_outputs": [],
+  "pattern": "serial",
+  "tie_break": "wp_id-lexicographic",
+  "slot_cap": 1,
+  "packages": [
+    {
+      "wp_id": "plan-wp01",
+      "stage": "plan",
+      "objective": "Update the plan and Phase 1 design artifacts for FR-023…FR-029 / SC-011…SC-014 (efficiency visibility + /speckit.measure)",
+      "kind": "write",
+      "source_refs": [
+        "requirements.md#Functional Requirements",
+        "requirements.md#Clarifications"
+      ],
+      "inputs": [
+        "requirements.md",
+        ".specify/memory/constitution.md",
+        ".specify/instructions.md"
+      ],
+      "outputs": [
+        "plan.md",
+        "research.md",
+        "data-model.md",
+        "contracts/",
+        "quickstart.md",
+        "feature-ref.md"
+      ],
+      "intermediate_outputs": [],
+      "owned_paths": [
+        "plan.md",
+        "research.md",
+        "data-model.md",
+        "contracts/",
+        "quickstart.md",
+        "feature-ref.md"
+      ],
+      "read_only_paths": [
+        "requirements.md",
+        ".specify/memory/constitution.md",
+        ".specify/instructions.md"
+      ],
+      "depends_on": [],
+      "parallel_safe": false,
+      "max_turns": 500,
+      "bounded_by": {
+        "unit": "artifacts",
+        "count": 6
+      },
+      "acceptance": [
+        {
+          "id": "A1",
+          "check": "plan update lands with new clauses and delivery paths; plan U4 gates pass",
+          "evidence": "plan.md"
+        }
+      ],
+      "sentinel": "PLAN-DONE",
+      "evidence": "test-evidence/plan.jsonl",
+      "seat": {
+        "role": "stage-worker",
+        "stage": "executor",
+        "type": "Worker"
+      },
+      "resources": {
+        "ports": "none",
+        "tmp_dir": "none",
+        "cache_dir": "none",
+        "shared_readonly": []
+      }
+    }
+  ],
+  "plan_hash": "sha256:e981a6a6b2b58e19a010f05e1b64226adb19926b289c4b8e9313f01682634268"
+}
+<!-- wp-plan:end -->
+
+<!-- wp-plan:begin stage=implement stage_attempt=2 -->
+{
+  "schema_version": 1,
+  "line_id": "087-speckit-visualization",
+  "run_id": "r20261106T040353Z-087a-rev",
+  "stage": "implement",
+  "stage_attempt": 2,
+  "decision": "single-package",
+  "gate_verdict": "single-package",
+  "reason": "scope-revision implement slice is a serial write chain over the existing shared tree; the 067 part discipline segments it into <=16-task parts",
+  "rule": null,
+  "source_artifacts": [
+    "tasks.md",
+    "plan.md",
+    "feature-ref.md"
+  ],
+  "required_outputs": [
+    "shared/guidelines/reporting-obligations.md",
+    ".specify/shared/guidelines/reporting-obligations.md",
+    "agents/reporter.agent.md",
+    ".specify/agents/templates/reporter.agent.md",
+    "skills/internal/create-team/SKILL.md",
+    "skills/internal/create-team/references/create-mode.md",
+    "skills/internal/create-team/references/patterns.md",
+    "skills/internal/create-team/scripts/validate-roster.py",
+    "skills/external/coaching-skills/SKILL.md",
+    ".specify/skills/coaching-skills/SKILL.md",
+    "templates/commands/status.md",
+    ".claude/commands/speckit.status.md",
+    ".github/prompts/speckit.status.prompt.md",
+    ".opencode/command/speckit.status.md",
+    ".qoder/commands/speckit.status.md",
+    "scripts/python/status-digest.py",
+    ".specify/scripts/python/status-digest.py",
+    "shared/definitions/subagent-definitions.md",
+    ".specify/shared/definitions/subagent-definitions.md",
+    "shared/workflow/external-dispatch-recipes.md",
+    ".specify/shared/workflow/external-dispatch-recipes.md",
+    "tests/contract/test_reporting_obligations.py",
+    "tests/contract/test_roster_reporter_seat.py",
+    "tests/contract/test_coaching_reporting_duty.py",
+    "tests/contract/test_status_digest.py",
+    "tests/unit/test_status_digest_unit.py",
+    "tests/contract/test_coaching_dispatch_contract.py",
+    "templates/commands/measure.md",
+    ".claude/commands/speckit.measure.md",
+    ".github/prompts/speckit.measure.prompt.md",
+    ".opencode/command/speckit.measure.md",
+    ".qoder/commands/speckit.measure.md",
+    "scripts/python/measure.py",
+    ".specify/scripts/python/measure.py",
+    "tests/contract/test_measure.py",
+    "tests/unit/test_measure_unit.py",
+    "tests/contract/test_efficiency_element.py",
+    ".specify/skills/internal/create-team/"
+  ],
+  "integrator_outputs": [],
+  "pattern": "serial",
+  "tie_break": "wp_id-lexicographic",
+  "slot_cap": 1,
+  "write_isolation": "shared-tree",
+  "packages": [
+    {
+      "wp_id": "implement-wp01",
+      "stage": "implement",
+      "objective": "Implement T055–T078 (efficiency element + /speckit.measure) and land the second-slice delivery paths",
+      "kind": "write",
+      "source_refs": [
+        "tasks.md#Phase 8",
+        "plan.md#Design Decisions",
+        "contracts/measure-report.contract.md",
+        "contracts/efficiency-element.contract.md"
+      ],
+      "inputs": [
+        "requirements.md",
+        "plan.md",
+        "data-model.md",
+        "contracts/",
+        "quickstart.md",
+        "research.md"
+      ],
+      "outputs": [
+        "shared/guidelines/reporting-obligations.md",
+        ".specify/shared/guidelines/reporting-obligations.md",
+        "agents/reporter.agent.md",
+        ".specify/agents/templates/reporter.agent.md",
+        "skills/internal/create-team/SKILL.md",
+        "skills/internal/create-team/references/create-mode.md",
+        "skills/internal/create-team/references/patterns.md",
+        "skills/internal/create-team/scripts/validate-roster.py",
+        "skills/external/coaching-skills/SKILL.md",
+        ".specify/skills/coaching-skills/SKILL.md",
+        "templates/commands/status.md",
+        ".claude/commands/speckit.status.md",
+        ".github/prompts/speckit.status.prompt.md",
+        ".opencode/command/speckit.status.md",
+        ".qoder/commands/speckit.status.md",
+        "scripts/python/status-digest.py",
+        ".specify/scripts/python/status-digest.py",
+        "shared/definitions/subagent-definitions.md",
+        ".specify/shared/definitions/subagent-definitions.md",
+        "shared/workflow/external-dispatch-recipes.md",
+        ".specify/shared/workflow/external-dispatch-recipes.md",
+        "tests/contract/test_reporting_obligations.py",
+        "tests/contract/test_roster_reporter_seat.py",
+        "tests/contract/test_coaching_reporting_duty.py",
+        "tests/contract/test_status_digest.py",
+        "tests/unit/test_status_digest_unit.py",
+        "tests/contract/test_coaching_dispatch_contract.py",
+        "templates/commands/measure.md",
+        ".claude/commands/speckit.measure.md",
+        ".github/prompts/speckit.measure.prompt.md",
+        ".opencode/command/speckit.measure.md",
+        ".qoder/commands/speckit.measure.md",
+        "scripts/python/measure.py",
+        ".specify/scripts/python/measure.py",
+        "tests/contract/test_measure.py",
+        "tests/unit/test_measure_unit.py",
+        "tests/contract/test_efficiency_element.py",
+        ".specify/skills/internal/create-team/"
+      ],
+      "intermediate_outputs": [],
+      "owned_paths": [
+        "shared/guidelines/reporting-obligations.md",
+        ".specify/shared/guidelines/reporting-obligations.md",
+        "agents/reporter.agent.md",
+        ".specify/agents/templates/reporter.agent.md",
+        "skills/internal/create-team/SKILL.md",
+        "skills/internal/create-team/references/create-mode.md",
+        "skills/internal/create-team/references/patterns.md",
+        "skills/internal/create-team/scripts/validate-roster.py",
+        "skills/external/coaching-skills/SKILL.md",
+        ".specify/skills/coaching-skills/SKILL.md",
+        "templates/commands/status.md",
+        ".claude/commands/speckit.status.md",
+        ".github/prompts/speckit.status.prompt.md",
+        ".opencode/command/speckit.status.md",
+        ".qoder/commands/speckit.status.md",
+        "scripts/python/status-digest.py",
+        ".specify/scripts/python/status-digest.py",
+        "shared/definitions/subagent-definitions.md",
+        ".specify/shared/definitions/subagent-definitions.md",
+        "shared/workflow/external-dispatch-recipes.md",
+        ".specify/shared/workflow/external-dispatch-recipes.md",
+        "tests/contract/test_reporting_obligations.py",
+        "tests/contract/test_roster_reporter_seat.py",
+        "tests/contract/test_coaching_reporting_duty.py",
+        "tests/contract/test_status_digest.py",
+        "tests/unit/test_status_digest_unit.py",
+        "tests/contract/test_coaching_dispatch_contract.py",
+        "templates/commands/measure.md",
+        ".claude/commands/speckit.measure.md",
+        ".github/prompts/speckit.measure.prompt.md",
+        ".opencode/command/speckit.measure.md",
+        ".qoder/commands/speckit.measure.md",
+        "scripts/python/measure.py",
+        ".specify/scripts/python/measure.py",
+        "tests/contract/test_measure.py",
+        "tests/unit/test_measure_unit.py",
+        "tests/contract/test_efficiency_element.py",
+        ".specify/skills/internal/create-team/"
+      ],
+      "read_only_paths": [
+        "requirements.md",
+        "plan.md",
+        "data-model.md",
+        "contracts/",
+        "quickstart.md",
+        "research.md",
+        ".specify/memory/constitution.md"
+      ],
+      "depends_on": [],
+      "parallel_safe": false,
+      "max_turns": 500,
+      "bounded_by": {
+        "unit": "artifacts",
+        "count": 38
+      },
+      "acceptance": [
+        {
+          "id": "A1",
+          "check": "T055–T078 complete; the second-slice delivery paths exist; contract/unit tests pass; SC-011…SC-014 evidence recorded",
+          "evidence": "verification.md"
+        }
+      ],
+      "sentinel": "IMPLEMENT-DONE",
+      "evidence": "test-evidence/implement.jsonl",
+      "seat": {
+        "role": "stage-worker",
+        "stage": "executor",
+        "type": "Worker"
+      },
+      "resources": {
+        "ports": "none",
+        "tmp_dir": "none",
+        "cache_dir": "none",
+        "shared_readonly": []
+      }
+    }
+  ],
+  "plan_hash": "sha256:afc03835b2532ebd2e8b9d21fca747d006efa1234a117bd3993cf94a0f03c9a4"
+}
+<!-- wp-plan:end -->
+
+## Implement second slice parts (T055–T078)
+
+| Part | Tasks | Scope | Status |
+|------|-------|-------|--------|
+| P7 | T055,T056,T058,T059,T060,T061,T062,T063,T064,T065,T066 (11) | tests-first for efficiency/measure, status-digest efficiency element, measure.py engine | dispatched |
+| P8 | T067–T078 (11) | thin measure command + four copies + mirrors, captures, SC-011…SC-014 evidence, zero-machinery scan | pending |
+
+## U6 收尾（第二切片，2026-11-06）
+
+- **终态：`blocked`** —— 第二切片（效率元素 + `/speckit.measure`）全部实现、测试、证据与 delta review 完成；closure 仍因第一切片的 SC-001/SC-002 partial 判 `block`，不合并、不 push、分支保留。
+- **Feature 状态**：`.specify/memory/features.md` 与 `features/087.md` = `Blocked`（`993d2a49`）；review 的 P1-1 已处理。
+- **review 后修复**：`454d86da`（owner 字面量运行时读取、C-57 截断序、字段槽、RS-007 行）；定向 93 passed；RS-007 closure reason 清除。
+- **解除阻断路径**：同 checkpoint 11 §4（真实 >90s team run；经 entry 创建带 reporter 席位的 roster；更新 verification 后重跑 closure/review）。
