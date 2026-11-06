@@ -1,0 +1,13 @@
+# validate-requirements (2026-11-06T04:13:17Z) — post-clarify
+$ python3 scripts/python/validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 492 lines, 32 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+exit=0

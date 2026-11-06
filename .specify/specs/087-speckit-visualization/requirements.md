@@ -9,8 +9,8 @@
 
 ## Related Feature *(mandatory)*
 
-**Feature ID**: Need clarification
-**Feature Name**: Need clarification
+**Feature ID**: 087
+**Feature Name**: Speckit 框架可视化（Speckit Framework Visualization）
 
 ## Overview
 
@@ -178,6 +178,18 @@ literal is reintroduced elsewhere.
   outside its own stream artifact is a defect.
 - **Digest during a stall**: the digest must remain answerable when the escalated line stream is
   stalled — it reads state artifacts, not the reporter's process.
+- **Two cadence profiles in one session**: a run that starts with a live receiver and later loses it
+  (every team lane finished, the master stops) switches to the interactive profile at the next
+  boundary and says so; the switch is recorded, never silent, and a run MUST NOT report both
+  profiles' ticks as if they were one cadence.
+- **A reporter that dies mid-run**: the reporter is a dispatch like any other, so its own silence is
+  judged by the orchestrator's existing liveness signal and the existing threshold table, and the
+  orchestrator's report names it as stalled rather than continuing to claim the run is healthy.
+  FR-016 is satisfied through that existing signal, not through a second detector.
+- **A single-dispatch supervisor judged against the predicate**: the coaching skill dispatches
+  exactly one subordinate per run, which the FR-002 wording "keeps one or more asynchronous
+  delegations past their dispatch" already covers; it is therefore in scope without needing a
+  special case, and its report names that one subordinate rather than reporting an empty set.
 
 ## Requirements *(mandatory)*
 
@@ -249,6 +261,26 @@ literal is reintroduced elsewhere.
   dependency, a new persistent store, a new console channel, or a second registry, state spine or
   ledger; every state the reporting reads MUST already have an owner, and a fact that would need
   one is declared a new concept instead of being defined inline.
+- **FR-019**: The shipped supervising structure the user named — `skills/external/coaching-skills` —
+  MUST carry the subordinate-state report: its `## Dispatch Payload` closed field set MUST gain the
+  reporting fields the supervision duty requires, and its subordinate's state MUST be reported on
+  the cadence rather than only at return. The amendment MUST keep the closed-set invariant (the
+  field list stays closed and is extended, never widened to "anything"), and the example MUST NOT
+  become the definition of the duty — FR-008/FR-009/FR-010 remain owned by the owner document.
+- **FR-020**: The framework MUST read **two declared cadence profiles from one owner** and select
+  between them by one declared condition: a long-run profile whose default is **30 seconds**, used
+  whenever the run has at least one live status receiver, and the existing interactive profile
+  already owned by the progress-reporting discipline, used when it has none. The two profiles MUST
+  NOT compete inside one run, and the long-run value MUST have exactly one definition site.
+- **FR-021**: Where a structure's lanes are all executed by the current session and the whole run is
+  expected to finish inside one cadence interval, the reporter seat MAY be runtime-omitted, and the
+  omission MUST be recorded as a declared reason (the same recorded-reason channel FR-006 defines)
+  rather than as a silent absence; the orchestrating session then carries the reporting duty itself.
+  Outside that condition a reporter execution is required.
+- **FR-022**: The current-state digest MUST ship as a thin `speckit.*` command backed by a
+  deterministic script, sharing its state reads with the FR-017 guard, so that one reading backs both
+  the digest and the guard's verdicts. The command and script names are fixed by the plan stage; this
+  requirement fixes only the shape (one command, one script, one reading).
 
 ### Key Entities *(include if data involved)*
 
@@ -274,7 +306,7 @@ literal is reintroduced elsewhere.
 | RS-002 | pytest（守卫测试运行器） | signed-contract | pytest 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 原文记录进 test-evidence | `scripts/bash/run-tests.sh` | 基线差集为空且新增守卫测试全绿 | FR-017 | EP-001 |
 | RS-003 | agent 宿主（渲染 agent template、承载 reporter 的 live console） | signed-contract | 各受支持 agent 工具上游（本仓只消费） | 无声明 pin；执行时以宿主名 + 版本原文记录进 test-evidence | `docs/reference/cli/supported-agent-tools.md` | SC-001、SC-009 在至少一个受支持宿主上真实运行 reporter 并取原始输出 | FR-005, FR-007, FR-014 | EP-003 |
 | RS-004 | line registry 与状态脊（摘要读取的活动状态来源） | signed-contract | 本仓 `skills/external/sdd-loop-driver/scripts/line-registry.py`（消费方，只读） | 同一提交 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | SC-005 的摘要条目逐条解析到该引擎写出的状态文件 | FR-011, FR-012 | EP-001 |
-| RS-005 | 状态汇报义务 owner、reporter 模板、reporter 席位义务、主从汇报义务与摘要入口（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/progress-reporting.md` | SC-004、SC-007 | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018 | EP-002 |
+| RS-005 | 状态汇报义务 owner、reporter 模板、reporter 席位义务、主从汇报义务与摘要入口（本特性交付） | in-scope | 本特性 | 同一提交 | `shared/guidelines/progress-reporting.md` | SC-004、SC-007 | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016, FR-017, FR-018, FR-019, FR-020, FR-021, FR-022 | EP-002 |
 
 ## Success Criteria *(mandatory)*
 
@@ -308,7 +340,7 @@ literal is reintroduced elsewhere.
 
 | Concern | Existing owner | This feature's relationship |
 |---------|----------------|-----------------------------|
-| Cadence discipline, four-element content floor, "reporting is not a gate", atomic-step deferral | `shared/guidelines/progress-reporting.md` | This feature's owner consumes it by path; it does not restate the interval rule, the element set or the deferral rule |
+| Cadence discipline, four-element content floor, "reporting is not a gate", atomic-step deferral | `shared/guidelines/progress-reporting.md` | This feature's owner consumes it by path; it does not restate the interval rule, the element set or the deferral rule. The long-run 30-second profile of FR-020 is a **declared profile beside** the existing interactive default, not a replacement of it |
 | External dispatch visibility: artifact triplet, liveness monitoring, label convention | `shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract | Reused as the observable carrier; the feature adds the reporting cadence on top and introduces no second carrier |
 | Subagent execution modes and mode selection | `shared/definitions/subagent-definitions.md` § Three Execution Modes | Constrains the obligation to hold in all three modes; adds no fourth mode |
 | Agent Template / Instance / Execution taxonomy and storage | `shared/definitions/agent-definitions.md` | The shipped reporting definition is a Template in the existing template store; no new layer |
@@ -349,6 +381,44 @@ literal is reintroduced elsewhere.
   accepts a recorded reason, so no existing team is made unrunnable without a stated disposition.
 - **A8 — historical records are immutable inputs**: dated evidence, prior specs and `.specify/state/`
   records are read, never rewritten.
+- **A9 — scope is a union of a predicate and two named surfaces**: the user's two named surfaces —
+  the team run and the supervising master/subordinate structure (including
+  `skills/external/coaching-skills`) — are a flat minimum set that MUST be covered; the FR-002
+  predicate widens the scope beyond them. A flow that implements a supervisor of its own (a pattern
+  or skill that dispatches and watches) consumes the shared obligation; a single-dispatch chain
+  (the coaching skill's own one-`Trainee`-per-run rule) sits inside that supervisor, so the coach
+  reports the state of the one dispatch it actually watches rather than being read out of scope.
+  Every other concurrent or asynchronous flow is judged by the predicate alone — no per-flow roster
+  of in-scope or exempt flows is maintained.
+- **A10 — structure chosen for the owner**: the obligation's owner is a new document
+  `shared/guidelines/reporting-obligations.md`, which owns cadence-and-override, obligation scope,
+  the reporter-seat obligation, the master-reporting duty and stall judgement, and the digest
+  contract. The existing `shared/guidelines/progress-reporting.md` keeps ownership of the anchoring
+  rule, the content floor, the late-report rule, the not-a-gate rule, the measured-figures rule and
+  the dispatch-payload channel; the new owner references those by section anchor. This keeps A6's
+  boundary and SC-008's baseline intact: the pre-existing discipline's clauses are not rewritten.
+- **A11 — no register exists for flow states**: the digest's line and agent states are read from the
+  state spine and the per-entry records under `.specify/state/` (dynamic directory listing plus each
+  record's own fields); no flow-state register table is created, and no second state spine is
+  introduced.
+- **A12 — report lines are visible console output, not a required artifact**: the received carrier is
+  recorded in whichever run record the emitting run already writes (team run report, dispatch record,
+  supervision record). No line-persistence requirement is added on top, because the no-machinery
+  boundary rejects one.
+- **A13 — this spec chooses no file paths**: template file names, script paths and entry-point names
+  are the plan stage's decisions; the requirements state the store (`agents/` template layer), the
+  entry kind (a thin `speckit.*` command backed by a deterministic script) and the guard's
+  propositions only.
+- **A14 — `Draft` is the feature status this stage lands**: `.specify/shared/workflow/feature-integration.md`
+  § Feature Binding Rules § 3 owns that `/speckit.requirements` lands `Draft`, and this stage performs
+  the binding without flipping it; the pre-flip transition belongs to a later stage.
+- **A15 — a stalled reporter is detected by the orchestrator's existing liveness signal**: the
+  orchestrator already monitors a dispatched member's artifact-triplet growth
+  (`shared/definitions/subagent-definitions.md` § External Dispatch Visibility Contract point 4) and
+  the existing threshold table in `skills/internal/create-team/references/patterns.md` owns the
+  numeric stall values. The owner references that table and adds no second threshold set; the
+  reporter is a dispatch like any other, so a reporter that stops growing is judged stalled by that
+  same signal.
 
 ## Out of Scope
 
@@ -362,8 +432,14 @@ literal is reintroduced elsewhere.
 - Guaranteed delivery of a status line when the host session is closed; a run with no live surface
   uses its stream artifact and records that fact.
 - Rewriting dated historical records, evidence archives, or prior feature specs.
+- Replacing the existing interactive progress-reporting default; FR-020 adds a declared long-run
+  profile beside it and never removes the interactive one.
 - Compressing or deleting the raw artifacts the digest reads; the digest is a projection, not a
   retention change.
+- Requiring a status line to be persisted as an artifact of its own; only the carrier that received
+  it is recorded, in a run record the emitting flow already writes.
+- Renaming or re-specifying the reporter seat's host tool surface; the reporter is a Template in the
+  existing template layer and renders through the existing agent rendering path.
 
 ## Clarifications
 
@@ -374,3 +450,42 @@ literal is reintroduced elsewhere.
   reporter Template's content, and whether the digest ships as a script entry or a thin skill entry
   are left to that stage.
 -->
+
+**Mode A — post-requirements; target `.specify/specs/087-speckit-visualization/requirements.md`.
+Zero-question mode: the driver authorized self-adjudication, so each entry below records the question
+it answers, the adjudicated answer, and the reasoning it rests on. The five-question budget was met
+with five closed questions; the reasoning is recorded because the user was not asked.**
+
+- Q: Which Feature does this spec bind to — an existing Feature or a new one? → A: A new Feature,
+  **087 · Speckit 框架可视化（Speckit Framework Visualization）**, status `Draft`. Scan result: no
+  existing Feature owns "current-state visibility of concurrent/asynchronous flows". The nearest
+  neighbours are 070 (task decomposition / coordination), 074 (Goal/Team/Agent × SDD unification),
+  085 (temporary Goal/Team and multi-agent concurrency — it owns *how many* agents run, never *what
+  the user sees*) and 066/079 (progress-reporting and humanized output at the wrap-up end); each has
+  a different subject, so none is a binding precedent.
+- Q: Does the verified 30-second cadence replace the existing 15-minute default, or sit beside it? →
+  A: Neither. `shared/guidelines/progress-reporting.md` owns the interactive default and keeps it;
+  the new owner adds exactly one **long-run cadence profile** whose default is **30 seconds**.
+  Selection between the two is decided by one declared condition: the run has at least one live
+  status receiver (a reporter seat or a supervising master) → the 30-second profile; no live receiver
+  → the existing interactive default. Two defaults therefore never compete inside one run.
+- Q: What may the receiving console entry be called? → A: A **thin `speckit.*` command backed by a
+  deterministic script** — the existing command + script shape the framework already uses for its
+  other deterministic read-only verdicts. One layer, because the guard (FR-017) and the digest
+  (FR-011) share the same state reads and two renderers would duplicate the projection. The command
+  name itself is fixed in the plan stage (A13).
+- Q: What happens to the user's "every team gets a reporter subagent" when the team fits in one
+  model call through virtual mode and has no independent execution to report on? → A: The seat
+  remains mandatory as **structure** and becomes optional as **runtime** under one declared
+  condition: the team's lanes are all executed by the current session and the whole run is expected
+  to finish inside one cadence interval. Under that condition the team records the declared reason
+  (FR-021), and the orchestrator itself carries the reporting duty; outside it a reporter execution
+  is created. The user's decision is preserved, and a recorded reason is the only accepted escape —
+  no silent omission.
+- Q: Can the shipped `skills/external/coaching-skills` satisfy the master-reporting duty as it
+  stands? → A: No — not without an amendment. Its `## Dispatch Payload` is a **closed field set**
+  whose "anything not listed below is forbidden" clause excludes a reporting-cadence field, it
+  dispatches exactly one subagent per run, and it has no subordinate-state report. The required
+  amendment is therefore written as a requirement (FR-019), and the payload's closed-set invariant is
+  kept, not silently widened. This is the only pre-existing owner document the feature amends.
+

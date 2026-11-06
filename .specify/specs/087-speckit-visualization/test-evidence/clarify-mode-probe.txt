@@ -1,0 +1,11 @@
+# clarify-writability-probe (2026-11-06T04:13:25Z)
+$ bash .specify/scripts/bash/check-prerequisites.sh --json --paths-only
+{"REPO_ROOT":"/storage/project/cloud-native-ai/spec-kit","BRANCH":"087-speckit-visualization","REQUIREMENT_ID":"087","REQUIREMENTS_DIR":"/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization","FEATURE_ID":"087","FEATURE_NAME":"Speckit 框架可视化（Speckit Framework Visualization）","FEATURE_SPEC":"/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/requirements.md","IMPL_PLAN":"/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/plan.md","TASKS":"/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/tasks.md","MODE":"A","WRITABLE":true}
+exit=0
+$ test -w <target> && test -w <dir>
+requirements.md writable=true
+spec dir writable=true
+$ ls .specify/specs/087-speckit-visualization/{plan.md,tasks.md}
+ls: cannot access '.specify/specs/087-speckit-visualization/plan.md': No such file or directory
+ls: cannot access '.specify/specs/087-speckit-visualization/tasks.md': No such file or directory
+=> mode A (plan.md absent)

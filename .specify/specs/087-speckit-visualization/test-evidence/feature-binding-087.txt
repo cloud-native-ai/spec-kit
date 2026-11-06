@@ -1,0 +1,14 @@
+# feature-binding (2026-11-06T04:13:23Z) — clarify Mode A discharge
+$ grep -nE '^\| (087|[0-9]{3}) \|' .specify/memory/features.md | wc -l
+81
+$ grep -E '^\*\*Total Features' .specify/memory/features.md
+**Total Features**: 81
+$ grep -nE '^\| 087 \|' .specify/memory/features.md
+94:| 087 | Speckit 框架可视化（Speckit Framework Visualization） | 把并发／异步流程的「现状可见性」提升为基础特性：新增汇报义务 owner（周期、范围谓词、reporter 席位义务、主从汇报义务、摘要契约），发布 reporter 的 agent Template
+$ ls -l .specify/memory/features/087.md
+-rw------- 1 agent agent 9450 Nov  6 12:13 .specify/memory/features/087.md
+$ grep -n 'Feature ID\|Feature Name' .specify/specs/087-speckit-visualization/requirements.md | head -4
+12:**Feature ID**: 087
+13:**Feature Name**: Speckit 框架可视化（Speckit Framework Visualization）
+$ grep -c 'Need clarification' .specify/specs/087-speckit-visualization/requirements.md
+0
