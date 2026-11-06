@@ -1,0 +1,161 @@
+# T039 — the generated copies, written by the generator, and the no-NEW-drift reading
+
+**Capture date**: 2026-11-06T07:41:39Z (UTC)
+**Capture base**: `d82063f5` (Part 5 landed) plus this Part's working-tree writes
+**Criterion**: the T005 baseline (`test-evidence/mirror-baseline-tasks.txt`) is already clean on all seven
+surfaces, so the pass condition is **no NEW drift**, compared per pair and per count — never a bare exit code.
+The coverage this row is judged against is `plan.md` § Mirror Obligations, whose rows this file re-measures and
+does not restate.
+
+## 1. The generator writes the copies (`--write`, one `--only` per source this feature delivered)
+
+No file below was edited by hand: every byte on the mirror side came from `sync-mirrors.py`, and the four per-tool
+command copies are T040's generator run.
+
+```text
+$ python3 scripts/python/sync-mirrors.py --write --only shared/guidelines/reporting-obligations.md
+scope --only: shared/guidelines/reporting-obligations.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only shared/definitions/subagent-definitions.md
+scope --only: shared/definitions/subagent-definitions.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only shared/workflow/external-dispatch-recipes.md
+scope --only: shared/workflow/external-dispatch-recipes.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only agents/reporter.agent.md
+scope --only: agents/reporter.agent.md
+ok    agents/ == .specify/agents/templates/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only skills/internal/create-team
+scope --only: skills/internal/create-team
+ok    skills/internal/ == .specify/skills/internal/ (27 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only skills/external/coaching-skills
+scope --only: skills/external/coaching-skills
+ok    skills/external/ == .specify/skills/ (3 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --write --only scripts/python/status-digest.py
+scope --only: scripts/python/status-digest.py
+DIFF  .specify/scripts/python/status-digest.py
+sync  scripts/ -> .specify/scripts/ (1 files)
+EXIT=0
+```
+
+**The `DIFF` line is the row's whole point for the STRICT `scripts/` pair**: T009 delivered
+`scripts/python/status-digest.py` and this Part's T043 amendment (the RO-12 reading surface, below) changed it
+again; until this write the mirror was stale. `--write` reported the drift and repaired it in the same pass. The
+pair is STRICT, so a source-only file FAILS `--check` — the reading in § 2 is what proves both sides now exist
+byte-identically.
+
+## 2. The per-source readings (`--check --only`, after the writes)
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check --only shared/guidelines/reporting-obligations.md
+scope --only: shared/guidelines/reporting-obligations.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only shared/definitions/subagent-definitions.md
+scope --only: shared/definitions/subagent-definitions.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only shared/workflow/external-dispatch-recipes.md
+scope --only: shared/workflow/external-dispatch-recipes.md
+ok    shared/ == .specify/shared/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only agents/reporter.agent.md
+scope --only: agents/reporter.agent.md
+ok    agents/ == .specify/agents/templates/ (1 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/internal/create-team
+scope --only: skills/internal/create-team
+ok    skills/internal/ == .specify/skills/internal/ (27 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only skills/external/coaching-skills
+scope --only: skills/external/coaching-skills
+ok    skills/external/ == .specify/skills/ (3 files)
+EXIT=0
+
+$ python3 scripts/python/sync-mirrors.py --check --only scripts/python/status-digest.py
+scope --only: scripts/python/status-digest.py
+ok    scripts/ == .specify/scripts/ (1 files)
+EXIT=0
+```
+
+## 3. The whole-surface reading (`--check`, both commands)
+
+```text
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (122 files)
+ok    shared/ == .specify/shared/ (95 files)
+EXIT=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
+
+## 4. The delta against the T005 baseline, pair by pair
+
+| Pair | T005 baseline | This reading | Delta | Expected by `mirror-baseline-tasks.txt` § "expected post-change delta" | Verdict |
+|------|---------------|--------------|-------|---------------------------------------------------------------------|---------|
+| `templates/` ↔ `.specify/templates/` | 22 | 22 | 0 | 23 (+1, new `status.md`) | **as recorded, not as first expected** — see the note below |
+| `skills/external/` ↔ `.specify/skills/` | 415 | 415 | 0 | 415 (0, edit in place) | matches |
+| `skills/internal/` ↔ `.specify/skills/internal/` | 138 | 139 | +1 | 139 (+1, new `validate-roster.py`) | matches |
+| `agents/` ↔ `.specify/agents/templates/` | 16 | 17 | +1 | 17 (+1, new `reporter.agent.md`) | matches |
+| `scripts/` ↔ `.specify/scripts/` | 121 | 122 | +1 | 122 (+1, new `status-digest.py`) | matches |
+| `shared/` ↔ `.specify/shared/` | 94 | 95 | +1 | 95 (+1, new `reporting-obligations.md`) | matches |
+| per-tool command copies | `OK`, 4 dirs written | `OK`, 4 dirs written | 0 | still `OK` plus four `speckit.status.*` paths | matches (T040 reads the four paths) |
+
+**The one row where the recorded expectation and the tree disagree, stated rather than smoothed over.**
+`mirror-baseline-tasks.txt`'s table row for `templates/` predicted 23 files, counting
+`templates/commands/status.md` into the total. The measured reading is 22, unchanged from the baseline. The
+reason is the plan's own retirement note (`plan.md` § Mirror Obligations, last column of the
+`templates/commands/status.md` row): the `.specify/templates/commands/` pair is **retired**, so the `templates/`
+pair excludes the `commands/` subtree on **both** sides — a new command template therefore never enters this
+count, and its distribution is the four per-tool copies T040 reads. The count is the correct reading of the
+current generator; the baseline file's `+1` was written before that exclusion was spelled out. Nothing is hidden:
+the prediction is wrong, the tree is right, and the correct reading is this one. This is recorded as an
+in-passing correction in T046's sweep, not as a new drift.
+
+**Drift verdict**: zero NEW drift on all seven surfaces. Four pairs rose by exactly the designed `+1`, one pair
+(edited-in-place) stayed level, and the two `OK` readings held.
+
+## 5. What this row proves and what it does not
+
+- **Proves**: every source this feature delivered has a byte-identical generated counterpart, the STRICT
+  `scripts/` pair exists on both sides, and the four per-tool command copies match their source template.
+- **Does not prove**: that the mirrors are *correct* content — that judgement belongs to the contract tests
+  (T007/T012/T028/T032) and the guard (T044). This row is the distribution half only.
+
+## 6. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+for p in shared/guidelines/reporting-obligations.md shared/definitions/subagent-definitions.md \
+         shared/workflow/external-dispatch-recipes.md agents/reporter.agent.md \
+         skills/internal/create-team skills/external/coaching-skills scripts/python/status-digest.py; do
+  python3 scripts/python/sync-mirrors.py --write --only "$p"
+  python3 scripts/python/sync-mirrors.py --check --only "$p"
+done
+python3 scripts/python/sync-mirrors.py --check
+python3 scripts/python/regen-command-copies.py --check
+```

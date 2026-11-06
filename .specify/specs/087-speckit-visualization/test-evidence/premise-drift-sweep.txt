@@ -1,0 +1,119 @@
+# T046 — the premise drift sweep after implementation
+
+**Capture date**: 2026-11-06T08:30Z (UTC)
+**What this row is**: a read-only scan of the feature's own artifacts for **(a)** environment verdicts that
+contradict the § Environment Prerequisites probes and **(b)** counts that no longer match the tree, followed by an
+in-place correction of the stale side in the **same run**. It claims no clause and no new mechanism.
+**Direction of correction**: where an artifact states a pre-change count and the artifact is a *measurement record*
+(`research.md` RO-01, `quickstart.md`'s "actual output"), the pre-change reading is **left as the pre-change
+measurement it is** and the post-change reading is added beside it — rewriting a dated measurement into today's
+number would destroy the very baseline the feature diffs against. Where the artifact states a **planning premise**
+(`plan.md` § Execution Premises, § Mirror Obligations), the stale figure is corrected in place and the correction is
+annotated on the same row, per `/speckit.implement` step 8 § Gate-premise decay ("re-reference the premise, measure
+the new form, annotate the falsified premise inline").
+
+---
+
+## 1. The queried set
+
+Six artifact families plus the three measurement records the environment section rests on. Every file below was read
+during this sweep; the grep forms are quoted so the set is reproducible.
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization
+# (a) counts stated in prose/tables across every authority artifact and every contract
+grep -rnE '\b(121|122|415|138|139|94|95|16|17|22|23|13|7473|27)\b (files|node ids|paths|rosters|entries|blocking|passed|failed)' \
+     plan.md research.md data-model.md quickstart.md feature-ref.md tasks.md contracts/*.md
+# (b) named count-words, which the numeric form above cannot catch
+grep -rnE '(7 names|9 fields|8-value|seven fields|six tools|6 configured|4 per-tool|23 files|templates/ 23)' \
+     *.md contracts/*.md
+# (c) environment verdicts, against the probes in tasks.md § Environment Prerequisites
+grep -rnE '(available|partial|absent|unavailable).{0,40}(python3|pytest|registry|hermes|codex|agent host)' \
+     tasks.md plan.md quickstart.md research.md feature-ref.md
+# (d) the three records the environment section cites
+cat test-evidence/mirror-baseline.txt test-evidence/roster-baseline.txt test-evidence/owner-literal-baseline.txt
+```
+
+**Files read**: `tasks.md`, `requirements.md`, `plan.md`, `research.md`, `data-model.md`, `quickstart.md`,
+`feature-ref.md`, `contracts/*.md` (6 files), and the three baseline records under `test-evidence/`.
+
+---
+
+## 2. Environment verdicts vs. the § Environment Prerequisites probes
+
+Every probe in `tasks.md` § Environment Prerequisites was re-run in this sweep. **All five verdicts hold; no
+contradiction was found.**
+
+| Prerequisite | Verdict in `tasks.md` | Probe re-run in this sweep | Actual | Drift |
+|---|---|---|---|---|
+| plain `python3` interpreter | **available** (`Python 3.11.11` @ 2026-11-06) | `python3 --version` | `Python 3.11.11` | none |
+| `pytest` | **available** (version string captured at implementation time) | `python3 -m pytest --version` | `pytest 8.4.2` | none — and the string is captured (`pre-change-measurements.md` § T002) |
+| registry directory `~/.local/state/spec-kit/lines` | **partial**, one or more `<line_id>.json` present | `ls "$HOME"/.local/state/spec-kit/lines/*.json \| wc -l` | `13` | none (the earlier captures read 13 as well — `us3-digest-active.txt` § 1) |
+| per-tool command directories | **partial** — all four exist, `.hermes/` and `.codex/` do not | `ls -d .claude/commands .github/prompts .opencode/command .qoder/commands` and `ls -d .hermes .codex` | four exist; `.hermes` and `.codex` both absent | none |
+| agent host console | **available** (this run is on one) | `command -v qodercli claude` | `/home/agent/.local/bin/qodercli`, `/home/agent/.npm-global/bin/claude` | none |
+
+**"partial" is a verdict about the environment, not a claim about the feature.** `.hermes/` and `.codex/` being
+absent is why `plan.md` line 209 and T040 assert **four** per-tool copies and explicitly assert no `.hermes/` or
+`.codex/` path. That statement was re-checked against the tree and is accurate; it was **not** corrected.
+
+---
+
+## 3. Findings: counts that no longer match the tree
+
+Six findings, all corrected in this run. Each row names the artifact, the stale side, the measured side, and the
+form of the correction.
+
+| # | Artifact / location | Stale side | Measured side (this sweep) | Correction applied |
+|---|---|---|---|---|
+| **D-01** | `plan.md` § Mirror Obligations (line 194–197) | the six pair counts are given as the *only* reading, so a reader takes `skills/internal/` 138, `agents/` 16, `scripts/` 121, `shared/` 94 for the delivered state | `sync-mirrors.py --check` → `EXIT=0`, `ok` on all six: `templates/` 22, `skills/external/` 415, `skills/internal/` **139**, `agents/` **17**, `scripts/` **122**, `shared/` **95** | **A post-delivery paragraph added** below the baseline sentence, naming the four increments and their four source files, and explaining why `templates/` stays at 22 (the `templates/commands/` mirror pair is retired and `commands/` is excluded on both sides, so `status.md` cannot move that count). |
+| **D-02** | `research.md` RO-01 | the pair counts read as the current state | same as D-01 | **A parenthetical post-delivery reading added**; the pre-change numbers are left standing as the dated measurement they are, and the addition says so explicitly. |
+| **D-03** | `quickstart.md` (Block for scenario C, "Actual output on 2026-11-06") | the six-pair block is labelled "actual output" with no date qualifier in the surrounding prose | same as D-01 | **Relabelled as the pre-change reading** and **a second, post-delivery block appended** with its clause and row citation (`polish-mirror-check.txt` § 3, T039). Both blocks are verbatim tool output; neither is reconstructed. |
+| **D-04** | `plan.md` EP-006 | "`REQUIRED_FIELDS` (7 names)" — true at measurement time, false after this feature's own FR-019 amendment | `tests/contract/test_coaching_dispatch_contract.py` L32–41 now carries **8** names (`reporting-cadence` added) | **Corrected inline**: "7 names at the time of measurement; **8 after this feature's FR-019 amendment**, which is the declared expected delta". The premise itself (`can be extended by exactly one field`) stays `verified` — the tree confirms it. |
+| **D-05** | `plan.md` EP-004 | "returned **9 fields** per entry on 2026-11-06" | `line-registry.py --action list --all --format json` returns **7** fields: `branch`, `line_id`, `project_dir`, `run_id`, `stage`, `state`, `updated_at` | **Corrected inline**, with the seven names enumerated so the reading is checkable rather than a bare integer. The premise (the entry carries identity, state, stage and timestamps) stays `verified`. |
+| **D-06** | `success-criteria.txt` § 1 / `verification.md` SC-009 | my own first draft gave SC-009 the status string `not-measured` | the closed status set is `pass \| fail \| partial \| blocked \| deferred \| unknown` — no `not-measured` member | **Corrected**: recorded as `blocked` (the honest member: the environment cannot measure it this round), with the ladder filled, and both files state the reading/recorded-status distinction in one sentence each. Found by running the closure checker, whose `status_row_per_criterion` came back `False` for exactly that row. |
+
+### Findings deliberately NOT corrected (with the reason)
+
+- **`tasks.md` T041's "(measured 2026-11-06 baseline: 27 blocking gates, and a compliant change leaves it at 27)"** —
+  re-measured: `scan-confirmation-gates.py --summary` still reads **27 blocking / 20 destructive / 7 governance_kept /
+  0 violations**. No drift.
+- **`contracts/ownership-map.contract.md` L50's "(measured: 27 blocking gates before and after)"** — same measurement,
+  still 27. No drift.
+- **`plan.md` § Scale/Scope's "28 delivered paths … plus 4 per-tool command copies"** — re-checked against
+  `feature-ref.md` § Delivered paths (28 rows) and the tree (four `speckit.status.*` copies exist, two tool trees
+  absent). No drift.
+- **`plan.md` line 76's "`_ASSISTANT_COMMAND_DIRS` (6 tools)"** — the mapping at `src/specify_cli/__init__.py:796`
+  does configure six (`copilot`, `claude`, `hermes`, `opencode`, `qoder`, `codex`) and the generator writes only the
+  four whose directories exist. The count is of the *map*, not of this repo's directories, and the sentence says so.
+  No drift.
+- **`test-evidence/mirror-baseline.txt`'s "`templates/` == `.specify/templates/` (22 files)"** — this is T005's
+  pre-change reading and it is **correct as a pre-change reading**. `polish-mirror-check.txt` § 4 already disclosed
+  (at T039) the one place where a *prediction* about this pair was off by one; the record itself is not stale.
+- **`roster-baseline.txt`'s "13 paths … 0 in-population"** — re-globbed in this sweep: the same 13 paths under the
+  same two globs. No drift.
+
+---
+
+## 4. Verdict
+
+| Sweep half | Reading |
+|---|---|
+| Environment verdicts vs. the five probes | **no drift** — all five verdicts reproduce (`available`, `available`, `partial`=13 registry entries, `partial`=four of six tool trees, `available`=two hosts resolved) |
+| Counts vs. the tree | **6 drifts found, 6 corrected in this run** (D-01…D-06); 6 further count claims re-measured and found accurate, listed above rather than left implicit |
+| Correction direction | measurement records keep their dated pre-change numbers with the post-change reading added; planning premises are corrected inline and annotated |
+
+No stale side was left uncorrected, and nothing was corrected on one side only: every D-row's artifact now agrees
+with the tree **and** with the record it cites.
+
+## 5. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+python3 scripts/python/sync-mirrors.py --check                       # six pairs, EXIT=0
+python3 --version; python3 -m pytest --version
+ls "$HOME"/.local/state/spec-kit/lines/*.json | wc -l               # 13
+ls -d .claude/commands .github/prompts .opencode/command .qoder/commands; ls -d .hermes .codex
+python3 skills/external/sdd-loop-driver/scripts/line-registry.py --action list --all --format json | head -c 400
+python3 scripts/python/scan-confirmation-gates.py --summary        # 27 blocking, 0 violations
+python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-speckit-visualization --json
+```

@@ -1,0 +1,98 @@
+# T042 — the success-criterion evidence table, with its capture file and producing command
+
+**Capture date**: 2026-11-06T08:05Z (UTC)
+**Clause claimed by this row**: `contracts/ownership-map.contract.md` **C-52** (OM-06).
+**Rule this table obeys**: a criterion whose evidence is a *green check with no captured reading* is recorded
+`not-measured`, never `pass`. A green test run is a green check; the reading it is green *about* has to have been
+captured somewhere a reader can open. Where the capture exists, the row names the file and the exact command that
+produced it; where it does not, the row says so in the same table instead of letting the status column imply more
+than the tree holds.
+
+**Paths below are repo-relative** and resolve from the repository root. The capture directory is
+`.specify/specs/087-speckit-visualization/test-evidence/`.
+
+---
+
+## 1. `final`-path criteria — SC-001…SC-007 (each MUST reach `pass` for the feature to be acceptable)
+
+| SC | What the criterion asserts (owner: `requirements.md` § Success Criteria) | Capture file that proves it | Producing command (verbatim) | Reading the capture delivers | Verdict |
+|----|----|----|----|----|----|
+| **SC-001** | A fixture team run longer than 90 s produces ≥3 attributed status lines, each naming team slug + run stamp and carrying all four content elements, each line's carrier recorded in the run record. | `test-evidence/us1-team-cadence.txt` § Part 2 (5 lines, 3 ticks + 2 boundaries) | `python3 scripts/python/status-digest.py --action report --structure us1-compliant-fixture --run-stamp "r<UTC stamp>-us1f" --position … --delta … --remainder … --trigger tick\|boundary` | 3 tick lines + 2 boundary lines; every line carries `structure=` + `run=r<stamp>-us1f` and all four of `position=`, `delta=`, `remainder=`, `blocker=`; every line carries `carrier=console`; exit `0` per emission. **Scope note**: the run is a **fixture** run compressed to 3 × 2 s (the delivered default is 30 s), not a ≥90 s wall-clock team run — see § 3. | **partial** |
+| **SC-002** | Every roster in FR-006's population either carries a reporter seat resolvable to the shipped template or records an explicit reason; a roster in that population missing the seat without a reason fails validation **naming the seat**; no roster outside the population is judged. | `test-evidence/us1-team-cadence.txt` § Part 1 (1a real roster, 1b compliant fixture, 1c 13-path sweep) + the fixture roster `fixtures/us1-compliant-fixture/team.md` | `python3 skills/internal/create-team/scripts/validate-roster.py .specify/teams/command-logic-as-classified-skills/team.md` (defect side) and `… fixtures/us1-compliant-fixture/team.md` (pass side) | Defect side: `absent-seat` named, `rc=1`. Pass side: `conforming: team us1-compliant-fixture carries exactly one reporter seat (agent: reporter)`, `rc=0`. Sweep: all 13 baseline paths return `absent-seat` / `rc=1`, matching the recorded zero-seat baseline. **Population note**: the population has **zero** in-population rosters (T003's name list, 13/13 outside), so the criterion's population half is measured on fixtures — see § 3. | **partial** |
+| **SC-003** | A fixture supervising flow over two stubbed sub-flows — one quiet **beyond** the stall threshold, one just under — reports both on each cadence tick, marks the beyond one `stalled` and the just-under one `slow` with threshold and measured silence named in both cases, and emits the failure report before the next tick. | `test-evidence/us2-supervision-report.txt` § 1 (tick 1, just-under), § 2 (tick 2, just-over), § 5 (sub-flow failure transition), § 7 (coaching trainee) | `python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow <label>=<fixture dir> --threshold-row 'Manifest stuck at \`in-progress\`'` | Tick 1: both sub-flows reported; `worker … slow=yes … threshold=120s with no file changes … measured_silence=45s`. Tick 2: `worker … state=stalled … threshold=120s with no file changes … measured_silence=2m55s`. The `stalled` transition is captured in § 5 as its own out-of-cadence line (`--transition stall crossing`), and § 5 also captures the failure transition (`--transition sub-flow failure`, `state=failed`). | **pass** |
+| **SC-004** | In every execution mode of the subagent model, a dispatched reporter's output reaches its declared carrier and the mode plus carrier are recorded; no mode is left with neither a live surface nor a declared stream artifact. | `test-evidence/us2-execution-modes.txt` (three modes, one dispatch each) + `test-evidence/us4-supervision-capture.txt` (the same captures fed to the guard's RO-12 read) | the three dispatches recorded in that file, each followed by `python3 scripts/python/status-digest.py --action guard … --carrier … --run-record …` | Mode 1 native: `carrier=console`. Mode 2 virtual inline: `carrier=console`. Mode 3 external: carrier is the triplet's declared `.live.log` path, present in the run record. `RO-12` reads the recorded carrier and returns `pass … carrier is a declared stream artifact path (from --carrier)`. **Host note**: mode 3's host probe recorded `qodercli` and `claude` as the agent hosts present on this machine (`us2-execution-modes.txt`), not a version string per host — see § 3. | **pass** |
+| **SC-005** | The current-state digest answers a mid-run request within one bounded summary of at most the declared cap, states the omitted-entry count when truncated, marks stale entries with their age, and renders an explicit "nothing running" state with the declared exit status when no run is active. | `test-evidence/us3-digest-active.txt` § 2 (bounded, truncated, stale) and `test-evidence/us3-digest-idle.txt` § 1–§ 3 (idle + the closed exit set) | `python3 scripts/python/status-digest.py --action digest --cap 5; echo "EXIT=$?"` and `SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"` | Bounded: `cap=5` header, exactly 5 `line_id=` rows, `omitted=3`. Stale: 5/5 marked `stale=yes`, each with its age in `note=last activity <age> ago`. Idle: the single line `nothing-running` with `EXIT=3`; a missing registry renders `EXIT=2` (input error), proving `3` is a state and not a catch-all failure. | **pass** |
+| **SC-006** | The default cadence value has exactly one definition site in the framework sources (`shared/`, `templates/`, `skills/`, `agents/`); every other occurrence is a per-run user value or a dated record; the guard fails when the literal is reintroduced. | `test-evidence/owner-literal-baseline.txt` (measured pre-change tree: exactly 2 unrelated prose hits, whitelisted by path) + `test-evidence/us4-guard-verdict.txt` § 2 (seeded duplicate → RO-03 red) and § 3 (seed removed → RO-03 green) | `grep -rn "30 秒\|30 seconds" shared/ templates/ skills/ agents/` then `python3 scripts/python/status-digest.py --action guard …` before and after seeding `shared/guidelines/zz-t037-seeded-duplicate.md` | Seeded: `RO-03 fail a second definition site was found beside shared/guidelines/reporting-obligations.md: ['shared/guidelines/zz-t037-seeded-duplicate.md']`, `summary pass=11 fail=1 not-evaluated=1`, `EXIT=1`. Seed removed: `RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)`, `summary pass=12 fail=0 not-evaluated=1`, `EXIT=0`. The red is attributable to the seed alone because every other line is byte-identical across the two readings. | **pass** |
+| **SC-007** | The reporting owner document states its scope as a decidable predicate, and a seeded sample of framework flows is classified against it with zero unclassifiable cases and zero flows silently exempted. | `test-evidence/us4-scope-sample.txt` (ten flows, four kinds, every line carrying a verdict) | `python3 scripts/python/status-digest.py --action guard --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt` (the guard's RO-02 read) | RO-02: `pass 10 flow(s) classified, 0 unclassifiable`. The sample's own footer counts `in-scope 6 / out-of-scope 4 / total 10 / unclassifiable 0 / silently exempted 0`, and each line names the file its structure was read from, so the verdict is reachable rather than asserted. | **pass** |
+
+**`final`-path tally: 5 `pass` (SC-003, SC-004, SC-005, SC-006, SC-007) and 2 `partial` (SC-001, SC-002).** Both
+`partial` rows carry their five ladder fields in `verification.md`; the reason each is `partial` and not `pass` is
+stated in § 3, not smoothed over.
+
+---
+
+## 2. `supporting`-path criteria — SC-008, SC-009, SC-010 (the measurements T041 and the guard produced)
+
+| SC | What the criterion asserts | Capture file | Producing command | Reading | Verdict |
+|----|----|----|----|----|----|
+| **SC-008** | Pre-existing progress-reporting and dispatch-visibility behavior produces no new failures against the pre-change baseline. | `test-evidence/cl-01-closure.txt` § 1 (six suites, node-id diff) + `test-evidence/pre-change-measurements.md` (the T002 name list) | `python3 -m pytest -q --collect-only tests/contract/<suite>.py \| grep "::" \| LC_ALL=C sort` on both sides, then `LC_ALL=C comm -23 before after` and `comm -13 before after` | 91 node ids before (`56f3f881` worktree), 92 after: **0 removed**, **1 added**, and the addition is the declared expected delta (the payload's new forbidden class row). Both sides green: 91 passed pre, 92 passed post. The pre-existing baseline's own 27 name-level failures are the driver's recorded implement-start reading and are reproduced, not added to. | **pass** |
+| **SC-009** | The full chain runs end to end **on the dogfood line**: a real multi-minute run reports on cadence, a supervised subordinate flow is reported by its master, a mid-run digest request is answered, and the guard returns a verdict on the line's own artifacts. | — (no capture exists) | — | **No row of this feature schedules or produces a real multi-minute dogfood run, and `tasks.md` T042 says so explicitly**: "a fixture run is not that evidence". The three pieces exist separately — a fixture cadence run (`us1-team-cadence.txt`, 4 s compressed), a fixture supervision capture (`us2-supervision-report.txt`), and digest runs over the **real** registry (`us3-digest-active.txt`, 13 real entries) — but they are three fixture/adjacent readings, not one chain on the dogfood line. Per the task text's explicit instruction this row may claim no measurement. Its **recorded** status is `blocked` — the environment cannot produce the assertion this round — because `verification.md`'s closed six-value set has no `not-measured` member; `unknown` is defined as "no status row exists" and `deferred` as "not attempted, may still be acceptable", and both would misreport what happened. See § 3 point 4. | **not-measured** (recorded `blocked`) |
+| **SC-010** | The changed-file set introduces no scheduler, timer service, daemon, new runtime dependency, new persistent store, new console channel, new registry, new state spine or new ledger. | `test-evidence/cl-01-closure.txt` § 2 (spawn / store / env / dependency audit) and § 3 (the guard's own RO-13 + the confirmation-gate count) | `git diff --name-only 56f3f881..HEAD \| grep -E '\.py$'` + the spawn-import/spawn-call greps; `git diff --name-only 56f3f881..HEAD -- pyproject.toml`; `python3 scripts/python/scan-confirmation-gates.py --summary`; `python3 scripts/python/status-digest.py --action guard …` | 0 spawn/thread/scheduler sites in the two delivered scripts; `pyproject.toml` untouched; 0 new store/registry/channel; 2 environment variables introduced, both **render-parameter only** (documented rather than counted as zero); confirmation gates 27 → 27 with 0 violations; `RO-13 pass`. | **pass** |
+
+---
+
+## 3. Disclosures — why two `final` rows are `partial` and one `supporting` row is `not-measured`
+
+1. **SC-001 — the run is a fixture run, and it is 4 s, not ≥90 s.** The criterion's subject is a team run
+   "lasting more than 90 seconds". What was captured is a fixture run over the compliant roster that emitted
+   three tick lines and two boundary lines across three **2-second** intervals (wall clock 4 s). Compressing the
+   interval does not change **what** is being verified — the lines are emitted by the delivered renderer, not
+   hand-written, and the attribution, four-element, profile and boundary behaviour are all visible in the capture —
+   but it does not satisfy the stated measurement condition either. It is therefore `partial`, not `pass`, and the
+   ladder in `verification.md` names the missing piece: an actual multi-minute team run.
+2. **SC-002 — the population is empty, so the population half is measured on fixtures.** T003's name list records
+   13 rosters, **13 outside the population, 0 in-population**, and that is a measurement of the tree rather than a
+   policy choice. The guard's RO-04 correspondingly returns `not-evaluated` with that reason, which
+   `contracts/status-digest.contract.md` C-46 requires ("never `pass`"). Both halves of the criterion —
+   the defect side naming the seat, and the compliant side resolving to the shipped template — are captured on
+   fixtures, and the 13-path sweep confirms no pre-existing roster is judged. That is a real measurement of the
+   rule; it is not a measurement **over a populated tree at scale**, so the row is `partial`.
+3. **SC-004 — the host evidence is a probe, not a per-host version record.** `us2-execution-modes.txt` records
+   `qodercli` and `claude` as resolved on this machine (path probes), while `requirements.md` RS-003's joint
+   acceptance asks for "宿主名 + 版本原文". The carrier/mode mapping — which is what SC-004 itself asserts — is
+   fully captured for all three modes; the version string is not. Recorded here rather than raised to a defect of
+   this criterion, because the criterion's own subject is the carrier, and disclosed so that no reader infers a
+   version record that does not exist.
+4. **SC-009 — `not-measured`, per the task text's explicit instruction, recorded as `blocked`.** No row above
+   produces a real multi-minute dogfood run, and the task text fixes that reading: "SC-009 additionally carries the
+   explicit reading `not-measured` unless a row of this feature produces a real multi-minute dogfood run, because
+   no row above schedules one and a fixture run is not that evidence." **The recorded status in `verification.md`
+   is `blocked`, not the string `not-measured`**: the status vocabulary is a closed six-value set
+   (`pass | fail | partial | blocked | deferred | unknown`, owned by `shared/workflow/acceptance-hardening.md`
+   § Verification Vocabulary) that no carrier may widen, and none of its members means "measured as unmade".
+   `blocked` is the honest member — "the environment cannot measure this assertion, so the feature is NOT
+   ACCEPTABLE" — and `unknown`/`deferred` would each misreport (the first says no status row exists, the second
+   says not attempted but possibly fine). The two readings agree in substance: nothing was measured and nothing is
+   claimed. It is `supporting`-path, so a non-`pass` status here does not by itself force `Blocked`; it does keep
+   the end-to-end dogfood claim unmade. The ladder fields for this row are in `verification.md`.
+5. **Why SC-010 is `pass` while SC-009 is not.** SC-010's evidence is a **machine reading over the delivered
+   change set** that was captured in full (`cl-01-closure.txt` § 2–§ 3), including the honest disclosure of the two
+   introduced render-parameter variables. SC-009's evidence would be a *run*, and no run exists. The difference is
+   not severity — it is whether the capture exists at all.
+
+## 4. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+# every command in the two tables above is quoted verbatim in its capture file's own § Reproduction section
+python3 scripts/python/status-digest.py --action digest --cap 5; echo "EXIT=$?"
+SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"
+python3 skills/internal/create-team/scripts/validate-roster.py .specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md
+python3 scripts/python/status-digest.py --action guard \
+  --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt \
+  --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt \
+  --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt \
+  --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt \
+  --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
+  --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+```

@@ -1,0 +1,172 @@
+# T043 — the named guard propositions RO-05…RO-12 as decidable reads, each exercised by its mutation fixture
+
+**Capture date**: 2026-11-06T07:43:36Z (UTC)
+**Clause this row's green point is**: `contracts/supervision-report.contract.md` **C-40** (MV-09) — a supervising
+master that is not a team carries the same duty through the **same payload channel**; the payload-channel clause
+this row's RO-12 read serves is claimed here, its pointer surfaces having been authored by T010.
+
+**What this file does and does not do.** The propositions' *subjects* are owned by
+`contracts/reporting-obligations.contract.md` C-01…C-13, and the *reading surfaces* by
+`contracts/status-digest.contract.md` C-46's table. Neither is restated below: this file names each proposition by
+its **RO id**, states **what the guard opens on disk** to decide it (the operational half C-46 leaves to the code),
+and shows the fixture that turns it red. A `pass` here is a claim only if its mutation can make it `fail`, so every
+row below carries one.
+
+---
+
+## 1. The delivered reading, zero seeding
+
+```text
+$ python3 scripts/python/status-digest.py --action guard \
+    --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt \
+    --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt \
+    --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt \
+    --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt \
+    --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
+    --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path (from --carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+```
+
+`RO-04` is `not-evaluated` **by design** and stays that way: no roster path of this feature's population exists
+(`test-evidence/roster-baseline.txt` records 13 rosters, every one **outside** the population, and this invocation
+supplies no `--roster`). `not-evaluated` is never counted as `pass` — the summary line keeps them separate.
+
+---
+
+## 2. RO-05 … RO-12, each named, with what the guard opens to decide it
+
+| RO | What the guard reads on disk | Delivered reading | Mutation fixture that turns it red | Fixture result |
+|----|------------------------------|-------------------|-------------------------------------|----------------|
+| **RO-05** | `shared/guidelines/reporting-obligations.md` for the content-floor anchor, **plus** the `--line-set` capture: each non-comment line must carry all four element labels | `pass` — 11 line(s) carry the four labels | `annotation-dropped`: one captured line loses an element label (`blocker=no blocker` → `blocker_status=none`) | **`fail`** — `line 1 lacks blocker` |
+| **RO-06** | the `--supervision-line-set` capture (a **separate** artifact from the status line set): `sub-flow=` rows | `pass` — 4 sub-flow row(s) present | no dedicated mutation row; the read is also exercised by the US2 capture and by RO-06's `fail` path when the capture carries no `sub-flow=` row at all | covered by the three fixtures named in § 3 |
+| **RO-07** | the owner document **and** the threshold owner `skills/internal/create-team/references/patterns.md`: the anchor must resolve there, and the owner must carry no second numeric threshold | `pass` — anchor resolves, owner carries no numeric threshold | the owner's numeric-literal branch is exercised by RO-03's scan family and the contract's not-evaluated fixture (unreadable threshold owner ⇒ `not-evaluated`, never `pass`) | see § 3 |
+| **RO-08** | the `--line-set` capture: the three transition classes must all be present | `pass` — all three present | no dedicated mutation row; `not-evaluated` when no transition class was observed | see § 3 |
+| **RO-09** | the owner document's digest section (located by its **declared heading**, not keyword search) **plus** one digest render: `omitted`, `stale`, `nothing-running` faces must all be stated | `pass` | `omission-count-removed` (the section loses the omitted-count face) **and** `stale-marker-removed` (it loses the staleness face) — two fixtures for one proposition | **`fail`** for both |
+| **RO-10** | the `--line-set` capture: no interrogative / approval-request / waiver marker in any line | `pass` — no marker in the line set | `interrogative-line-injected`: a line is appended carrying "do you approve this?" | **`fail`** — the offending line is named |
+| **RO-11** | the supervision capture when supplied, else the status line set: the `reporter-failure` line must be present | `pass` — the reporter-failure line is present | `suppressed-tick`: the capture's `trigger=reporter-failure` is rewritten to `trigger=tick`, so a suppressed tick leaves no trace | **`fail`** — "carries no reporter-failure line" |
+| **RO-12** | **a run record's `carrier` value** against the two legal forms (`console`, or a declared stream artifact path), with the run record's `mode` echoed when it carries one; the `--carrier` value answers when the record holds none (or is not a record shape) | `pass` — `carrier is a declared stream artifact path (from --carrier)` | `carrier-value-altered`: `--carrier` is set to `a channel that was never declared` | **`fail`** — "matches neither legal form (from --carrier)" |
+
+### 2.1 The RO-12 read is what this Part changed, and why
+
+The delivered reading above passes RO-12 through `--carrier` because no run record is passed to that invocation.
+The first `carrier-value-altered` run against the **pre-change** implementation reported `pass` on an obviously
+illegal carrier: the module-level helper `_read_text` prefixes the repo root onto the path it is given, so a
+`--run-record` path a test placed under a temp directory silently failed to read and the flag was never consulted.
+Two changes were made, both **inside C-46's stated reading surface for RO-12** ("a run record's carrier value
+against the two legal forms"):
+
+1. a caller-supplied path is now opened as given (absolute) or against the repo root (relative), so `--run-record`
+   reads the file the caller named instead of a repo-root-relative lookalike;
+2. `--carrier` is authoritative when given, and the run record supplies the value when it is not. Precedence runs
+   **flag first** deliberately: a reading that preferred the record would make a wrong `--carrier` unobservable —
+   a green check that cannot go red proves nothing. The reason string names which surface answered (`from
+   --carrier` / `from run record <path>`), and `mode` is echoed when the record carries it, so a reader can see the
+   two surfaced together rather than take it on trust.
+
+No literal from the test fixture is encoded in the framework source: the illegal carrier the fixture supplies is a
+**test-side** value only, and `status-digest.py` neither names it nor special-cases it — the same `fail` is the
+generic "matches neither legal form" branch that any illegal carrier reaches.
+
+---
+
+## 3. The fixtures, exercised (node ids and results)
+
+```text
+$ python3 -m pytest tests/contract/test_status_digest.py -k mutation -v
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[seat-removed] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[second-cadence-literal-seeded] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[omission-count-removed] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[stale-marker-removed] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[annotation-dropped] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[interrogative-line-injected] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[suppressed-tick] PASSED
+tests/contract/test_status_digest.py::test_c46_a_mutation_fixture_turns_its_matching_proposition_red[carrier-value-altered] PASSED
+8 passed, 33 deselected in 0.69s
+```
+
+Every one of the eight fixtures asserts two things, so a green line above is a measured red-to-green contrast and
+not a bare exit code: the **mutated** fixture turns its proposition `fail` **and** the run exits `1`; and the paired
+**unmutated** baseline (`test_c46_the_unmutated_baseline_stays_green`) carries no `fail` at all.
+
+**Mapping the eight fixtures onto RO-05…RO-12** (which rows have a dedicated fixture and which do not, stated
+instead of implied):
+
+| RO | Dedicated mutation fixture? |
+|----|------------------------------|
+| RO-05 | yes — `annotation-dropped` |
+| RO-06 | **no** dedicated row; its red path is the "no per-sub-flow row found" branch, exercised by the unmutated-baseline contrast and by `--supervision-line-set` absence (⇒ `not-evaluated`) |
+| RO-07 | **no** dedicated row; its red path needs a second numeric threshold set inside the owner, which RO-03's seeded-duplicate family covers from the other side |
+| RO-08 | **no** dedicated row; absent transition classes ⇒ `fail` is exercised only by the delivered capture |
+| RO-09 | yes — **two** (`omission-count-removed`, `stale-marker-removed`) |
+| RO-10 | yes — `interrogative-line-injected` |
+| RO-11 | yes — `suppressed-tick` |
+| RO-12 | yes — `carrier-value-altered` |
+
+**The four rows without a dedicated fixture are recorded as a gap, not as coverage.** The task row asks that each
+of RO-05…RO-12 "is exercised by its mutation fixture from T033"; T033 delivered **eight** fixtures for thirteen
+propositions, so five propositions (RO-01's declaration-count branch among them) have no dedicated row by
+construction. This file does not claim otherwise: RO-06/07/08 are decided by a readable branch that the delivered
+captures and the absence-path fixtures (§ 3's `not-evaluated` cases) exercise, but **no fixture in this feature
+turns RO-06, RO-07 or RO-08 red from its own subject**. Closing that gap is a T033-scope question (add three
+fixtures) and is reported here rather than silently absorbed.
+
+---
+
+## 4. The absence path: unavailable input is never `pass`
+
+```text
+$ python3 -m pytest tests/contract/test_status_digest.py -k "not_evaluated or no_readable_input or unreadable or empty_roster" -q
+```
+
+The readings this feature keeps in the same suite, each asserting a proposition with no readable input reports
+`not-evaluated` **with a reason** and never `pass`:
+
+- `test_c46_a_proposition_with_no_readable_input_is_never_reported_pass` — zero inputs: all thirteen reported,
+  each `pass` or a reason-bearing `not-evaluated`, none `fail` (absence is not a violation);
+- `test_c46_an_unreadable_line_set_is_not_evaluated_not_pass` — RO-05 names the unreadable path in its reason;
+- `test_c46_an_empty_roster_population_is_not_evaluated_with_that_reason` — RO-04's population rule.
+
+---
+
+## 5. Payload channel (C-40), the clause this row claims
+
+`contracts/supervision-report.contract.md` C-40 states that a supervising master which is not a team carries the
+same duty by injecting it into its dispatch payload — the same channel the fast-fail clause uses — and that
+`shared/workflow/external-dispatch-recipes.md` gains **one pointer line** while its recipes stay unchanged. The two
+pointer surfaces were authored by T010; what this row adds is the **read** that makes the channel decidable:
+
+- `RO-12` reads the carrier value the run record holds, which is the surface a non-team master's dispatch records
+  when its reporter has no native console — i.e. the channel C-40's sentence lives on;
+- the payload's own closed set is asserted by `tests/contract/test_coaching_reporting_duty.py` and the amended
+  `tests/contract/test_coaching_dispatch_contract.py` (the `reporting-cadence` field, the one added forbidden
+  class), which is where the amendment's direction is checked (additions only, no rewrite).
+
+---
+
+## 6. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+python3 scripts/python/status-digest.py --action guard \
+  --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt \
+  --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt \
+  --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt \
+  --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt \
+  --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
+  --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+python3 -m pytest tests/contract/test_status_digest.py -k mutation -v
+```

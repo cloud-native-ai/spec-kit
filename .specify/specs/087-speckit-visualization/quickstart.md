@@ -237,7 +237,7 @@ python3 scripts/python/sync-mirrors.py --check
 python3 scripts/python/regen-command-copies.py --check
 ```
 
-Actual output on 2026-11-06:
+Actual output on 2026-11-06 (the **pre-change** reading; the post-delivery reading is one block below):
 
 ```text
 OK: all per-tool command copies match the source templates.
@@ -250,6 +250,19 @@ ok    shared/ == .specify/shared/ (94 files)
 ```
 
 Both commands exited `0`.
+
+The same two commands after delivery (`test-evidence/polish-mirror-check.txt` § 3, T039) — still `0`, still `ok` on
+all six pairs, at the counts this feature's four new source files produce:
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (122 files)
+ok    shared/ == .specify/shared/ (95 files)
+```
 
 ### G.2 — Post-change assertion (unexecuted; premises stated)
 

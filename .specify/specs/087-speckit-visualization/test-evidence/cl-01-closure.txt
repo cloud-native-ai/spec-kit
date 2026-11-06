@@ -1,0 +1,383 @@
+# T041 — the closure baseline diff (by name) and the zero-new-machinery audit
+
+**Capture date**: 2026-11-06T07:44Z (UTC)
+**Base commit**: `56f3f881` ("chore(087): record the clarify checkpoint") — the row's own range start.
+**Head**: `d82063f5` (Part 5 landed) **plus this Part's working-tree writes**, which is the delivered change set the
+ownership contract judges (`ownership-map.contract.md`, preamble: "base..head **plus the working tree at
+implementation time**").
+**Clause**: `contracts/ownership-map.contract.md` **C-51** (OM-05) — the regression criterion is **name-level**: the
+pre-change node-id set of the affected suites equals the post-change set for pre-existing tests, and one suite is
+declared to change **by design**.
+
+---
+
+## 1. The six affected pre-existing suites, compared by node id
+
+The baseline side was measured **from the base commit itself**, not from a remembered number: a worktree at
+`56f3f881` was checked out so the same `pytest --collect-only` ran against the pre-change tree.
+
+```text
+$ git worktree add /tmp/087t041/base 56f3f881
+Preparing worktree (detached HEAD 56f3f881)
+HEAD is now at 56f3f881 chore(087): record the clarify checkpoint
+
+# baseline (inside the worktree, i.e. at the base commit)
+$ cd /tmp/087t041/base && for f in <six suites>; do
+    python3 -m pytest -q --collect-only "tests/contract/$f.py" | grep "::" | LC_ALL=C sort > before-$f.txt
+  done
+
+# delivered (repository root, working tree)
+$ cd /storage/project/cloud-native-ai/spec-kit && for f in <six suites>; do
+    python3 -m pytest -q --collect-only "tests/contract/$f.py" | grep "::" | LC_ALL=C sort > after-$f.txt
+  done
+
+$ LC_ALL=C comm -23 before-$f.txt after-$f.txt    # ids present before, absent after  → a removal
+$ LC_ALL=C comm -13 before-$f.txt after-$f.txt    # ids absent before, present after  → an addition
+```
+
+`LC_ALL=C` on both `sort` and `comm` is load-bearing: under a UTF-8 collation the two sides order differently and
+`comm` reports a false delta.
+
+### The readings, suite by suite
+
+```text
+=== test_progress_reporting ===                 before 7   after 7
+-- removed (in before, not after) --            (none)
+-- added   (in after, not before) --            (none)
+
+=== test_coaching_dispatch_contract ===         before 11  after 12
+-- removed (in before, not after) --            (none)
+-- added   (in after, not before) --
+tests/contract/test_coaching_dispatch_contract.py::test_c2_each_forbidden_class_is_red[coach-status-line]
+
+=== test_agent_dispatch_mechanism ===           before 32  after 32
+-- removed / added --                           (none)
+
+=== test_team_territory ===                     before 6   after 6
+-- removed / added --                           (none)
+
+=== test_improve_team_presence ===              before 3   after 3
+-- removed / added --                           (none)
+
+=== test_team_command_routing ===               before 32  after 32
+-- removed / added --                           (none)
+```
+
+**Totals**: 91 node ids before, 92 after, **0 removed, 1 added**.
+
+### The one delta, and why it is the declared one
+
+| | |
+|---|---|
+| Added id | `tests/contract/test_coaching_dispatch_contract.py::test_c2_each_forbidden_class_is_red[coach-status-line]` |
+| Declared where | `contracts/ownership-map.contract.md` C-51 — "One suite is expected to change **by design** … it is the amendment's own test update (`FR-019`)" |
+| Mechanism | `REQUIRED_FIELDS` gained `reporting-cadence` (`FR-019`), and the payload validator gained one **forbidden class**: a status line in the dispatch payload (`FR-015` / the one-way-statement rule). Both are additions inside an existing closed set, and the parametrised case is the existing counterexample table gaining one row — which is how a "forbidden class" is stated in that suite, not a second test function. |
+| Removal? | **None.** No pre-existing id was renamed away, and the `REQUIRED_FIELDS` tuple's names are asserted inside a pre-existing test function rather than each name being its own node id, so the field addition shows up here as *zero* removed ids, exactly as C-51 requires. |
+
+**Verdict: compatible.** The pre-change node-id set is a **subset** of the post-change set (0 removals), the single
+addition is the declared expected delta, and every one of the 92 post-change ids is green:
+
+```text
+$ python3 -m pytest -q tests/contract/test_progress_reporting.py tests/contract/test_coaching_dispatch_contract.py \
+    tests/contract/test_agent_dispatch_mechanism.py tests/contract/test_team_territory.py \
+    tests/contract/test_improve_team_presence.py tests/contract/test_team_command_routing.py
+........................................................................ [ 78%]
+....................                                                     [100%]
+92 passed in 0.59s
+
+$ cd /tmp/087t041/base && python3 -m pytest -q <the same six>
+........................................................................ [ 79%]
+...................                                                      [100%]
+91 passed in 0.58s
+```
+
+(The base-side run is the matching green reading: 91 passed there, 92 here. Neither side carries a pre-existing
+red, so this comparison is not measuring around a broken suite.)
+
+---
+
+## 2. The zero-new-machinery audit over the delivered change
+
+### 2.1 What was audited
+
+```text
+$ git diff --name-only 56f3f881..HEAD | wc -l
+147
+```
+
+The set includes the feature's own spec directory (`test-evidence/`, `checklists/`, `contracts/`, …), the
+`.specify/` mirrors the generators produced, and the four per-tool command copies. The audit's **decision surface
+is the delivered framework code and its tests**, because a scheduler/store/channel can only be introduced by
+executable content or by a declared new path — Markdown evidence files cannot run.
+
+### 2.2 Process spawn, scheduler, thread, channel sites in every delivered `.py`
+
+```text
+$ for f in $(git diff --name-only 56f3f881..HEAD | grep -E '\.py$'); do
+    grep -nE '^\s*(import|from)\s+(subprocess|multiprocessing|threading|asyncio|sched)' "$f"
+    grep -nE 'os\.(system|fork|exec[lv]|popen)|subprocess\.(run|Popen|call|check_)' "$f"
+  done
+```
+
+| Delivered file | Kind | Reading |
+|----------------|------|---------|
+| `scripts/python/status-digest.py` | framework script (delivery path) | **no** spawn/thread/scheduler import; **no** spawn call |
+| `skills/internal/create-team/scripts/validate-roster.py` | framework script (delivery path) | **no** spawn import; **no** spawn call |
+| `.specify/scripts/python/status-digest.py`, `.specify/skills/internal/create-team/scripts/validate-roster.py` | generated mirrors of the two above | byte-identical to their sources (T039 § 2), so the same reading holds |
+| `tests/contract/test_reporting_obligations.py`, `test_roster_reporter_seat.py`, `test_status_digest.py`, `test_coaching_reporting_duty.py`, `tests/unit/test_status_digest_unit.py` | **test** files | `subprocess` present — **not** a delivery path; each occurrence is the test harness invoking the delivered script or `git`, which is what a test does |
+| `tests/contract/test_coaching_wiring_contract.py`, `test_fast_fail_discipline.py` | **test** files, edited/extended | same: `subprocess.run` is the test harness; `test_fast_fail_discipline.py`'s four call sites are pre-existing precedent (the amended file already shelled out before this feature) |
+| `tests/contract/test_coaching_dispatch_contract.py` | **test** file, edited in place | no spawn import, no spawn call |
+
+**Why test files are not a finding, stated rather than waved away.** C-50 scopes itself to "any delivered script …
+on a delivery path", and `ownership-map.contract.md` C-49/C-50 both speak of what the *changed-file set
+introduces*. A test that runs the delivered script under `subprocess` introduces no runtime machinery into any
+delivered surface: nothing in `shared/`, `skills/`, `scripts/` or `templates/` imports those test modules, and no
+product code path reaches them. The alternative — banning `subprocess` in tests — would forbid testing the
+delivered script's exit codes at all, which is the opposite of the clause's intent. The guard's own RO-13 reads the
+**delivered script's AST** for exactly this reason (`status-digest.py` `_delivered_script_spawns`), and it reports
+`pass` (§ 3).
+
+### 2.3 Storage, registry and channel sites
+
+```text
+$ git diff --name-only 56f3f881..HEAD | grep -E '^\.specify/state/|^\.specify/memory/|lines/|registry'
+.specify/memory/exec-quant/records/20261106T042455074010Z-718d1935.json
+.specify/memory/features.md
+.specify/memory/features/087.md
+.specify/memory/feedback/20261106T042459Z-speckit-plan.md
+.specify/memory/glossary.md
+.specify/memory/register.md
+.specify/memory/session/20261106T042449Z-run-determination-speckit-plan-r20261106t040353z-087a.md
+.specify/shared/guidelines/reporting-obligations.md
+shared/guidelines/reporting-obligations.md
+```
+
+**Every hit is a pre-existing store written by the SDD process itself, or the feature's own owner document.**
+Named one by one, because a bare "none" would be a claim this reading cannot support:
+
+| Path | What it is | New store introduced by this feature? |
+|------|------------|----------------------------------------|
+| `.specify/memory/exec-quant/records/20261106T042455074010Z-718d1935.json` | a per-run exec-quant record, written by the **plan stage** of this very feature (timestamped `2026-11-06T04:24:55Z`, inside the analyse window) | No — the engine and its directory pre-exist; this is one ordinary record entry |
+| `.specify/memory/features.md`, `features/087.md` | the canonical feature registry, updated by the plan stage | No — single-owner canonical registry (T045 appends to the same two) |
+| `.specify/memory/feedback/…speckit-plan.md` | one feedback entry from the plan stage | No — pre-existing per-entry store |
+| `.specify/memory/glossary.md`, `register.md` | canonical single-owner registries edited by earlier stages | No — pre-existing |
+| `.specify/memory/session/…run-determination…md` | one run-determination record | No — pre-existing per-entry store |
+| `.specify/shared/guidelines/reporting-obligations.md`, `shared/guidelines/reporting-obligations.md` | **the feature's owner document** and its mirror | Not a store: it is a guideline file, matched only because the grep pattern includes `registry`/`lines` loosely. Neither is under `.specify/state/`, neither is a registry, and the script never writes either |
+
+No **new** file under `.specify/state/`, no new registry directory, and **no new file written by any delivered
+script**: the two delivered scripts open exactly one file and only for reading.
+
+```text
+$ grep -nE 'open\(|\.write_text|\.write_bytes|mkdir|makedirs' scripts/python/status-digest.py \
+    skills/internal/create-team/scripts/validate-roster.py
+scripts/python/status-digest.py:383:            with path.open("r", encoding="utf-8") as handle:
+(validate-roster.py: no match — it reads the roster through a helper and writes nothing)
+```
+
+### 2.4 Environment variables: read, or introduced?
+
+```text
+$ grep -nE 'os\.environ|getenv' scripts/python/status-digest.py
+191:    override = os.environ.get("SPECIFY_LINE_REGISTRY_DIR")
+194:    xdg = os.environ.get("XDG_STATE_HOME")
+197:    home = Path(os.environ.get("HOME", "~")).expanduser()
+1596:        default=os.environ.get("SPECIFY_STATUS_WORKSPACE") or str(Path.cwd()),
+1602:        default=int(os.environ.get(CAP_ENV, DEFAULT_CAP)),      # CAP_ENV = "SPECIFY_STATUS_DIGEST_CAP"
+```
+
+`SPECIFY_LINE_REGISTRY_DIR`, `XDG_STATE_HOME` and `HOME` are **read** and select nothing new — they are the
+registry resolution order `contracts/status-digest.contract.md` C-42 restates deliberately (the engine cannot be
+imported).
+
+**Two variables ARE introduced by this feature, and the audit says so instead of letting the count read zero:**
+`SPECIFY_STATUS_WORKSPACE` (an optional default for `--workspace`) and `SPECIFY_STATUS_DIGEST_CAP` (an optional
+default for `--cap`). Both **select a render parameter, not a store**: with neither set the script behaves exactly
+as the contract fixes (`Path.cwd()` and `DEFAULT_CAP`), and neither can point the script at a different registry,
+state directory or channel. C-49 forbids "a new environment variable **that selects a store**"; these two do not,
+and the `--workspace`/`--cap` flags they default were already the declared surface (C-43 "overridable per
+invocation"). Recorded here so the reading is auditable rather than a bare "none": **0 store-selecting variables
+introduced, 2 render-parameter variables documented.**
+
+### 2.5 Dependencies
+
+```text
+$ git diff --name-only 56f3f881..HEAD -- pyproject.toml
+(empty)
+EXIT=0
+```
+
+`pyproject.toml` is **untouched**: no dependency was added, removed or re-pinned. Both delivered scripts import only
+the standard library (`argparse`, `json`, `os`, `re`, `sys`, `datetime`, `pathlib`).
+
+---
+
+## 3. The guard's own machinery proposition, and the confirmation-gate count
+
+```text
+$ python3 scripts/python/status-digest.py --action guard \
+    --flow-sample …/us4-scope-sample.txt --roster-baseline …/roster-baseline.txt \
+    --line-set …/us2-line-set.lines.txt --supervision-line-set …/us4-supervision-capture.txt \
+    --carrier …/us2-execution-modes.txt --run-record …/us2-execution-modes.txt
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+```
+(the full 13-line reading is § 3 of `polish-guard-rerun.txt`; only RO-13 is quoted here because it is this audit's
+own machine half.)
+
+```text
+$ python3 scripts/python/scan-confirmation-gates.py --summary
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+EXIT=0
+```
+
+**27 blocking gates, before and after** — the measured 2026-11-06 baseline in the row text is 27, and a compliant
+change leaves it at 27. It is still 27, and the violation count (reversible gates still blocking) is 0. This is the
+`shared/guidelines/confirmation-gates.md` **`preserves`** relation C-48 declares: no gate was added, removed or
+reclassified.
+
+---
+
+## 4. Verdict
+
+| Audit | Reading | Verdict |
+|-------|---------|---------|
+| Compatibility baseline (C-51) | 91 → 92 node ids, 0 removed, 1 declared addition, 92/92 green post-change and 91/91 green pre-change | **compatible** |
+| Process spawn / scheduler / thread on a delivery path (C-50) | 0 sites in the two delivered scripts; test-harness `subprocess` is not a delivery path (§ 2.2) | **compliant** |
+| Store / registry / channel (C-49) | 0 new files written by a delivered script; 0 new store, registry or channel; the 9 grep hits are pre-existing process stores plus the owner document | **compliant** |
+| Environment variables | 3 read (declared resolution order); 2 introduced, both render-parameter only | **compliant, with the two documented** |
+| Dependencies (C-50) | `pyproject.toml` untouched | **compliant** |
+| Confirmation gates | 27 → 27, 0 violations | **compliant** |
+| Guard RO-13 | `pass` | **green** |
+
+## 5. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+git worktree add /tmp/087t041/base 56f3f881
+# node-id diff, per suite, with LC_ALL=C on both sort and comm
+git diff --name-only 56f3f881..HEAD
+python3 scripts/python/scan-confirmation-gates.py --summary
+python3 scripts/python/status-digest.py --action guard <the six inputs quoted in § 3>
+```
+
+---
+
+## 6. T045 — the compatibility baseline outcome and the stage state
+
+**Capture date**: 2026-11-06T08:20Z (UTC). **Owner row**: T045 — *record the compatibility baseline outcome and the
+feature's stage state*. This section claims no clause; C-51 is claimed by § 1 of this file, and the status transition
+it lands is owned by `shared/workflow/feature-integration.md` § Status State Machine and
+`shared/workflow/acceptance-hardening.md` § Feature Status.
+
+### 6.1 The before/after node-id verdict (restated from § 1, because T045's row asks for it here)
+
+```text
+six C-51 suites, node-id sets, LC_ALL=C on sort and comm
+  before (worktree @ 56f3f881) : 91 ids
+  after  (delivered tree)      : 92 ids
+  removed                      : 0
+  added                        : 1   -> tests/contract/test_coaching_dispatch_contract.py::test_c2_each_forbidden_class_is_red[coach-status-line]
+  green before                 : 91 passed
+  green after                  : 92 passed
+VERDICT: compatible
+```
+
+### 6.2 The one declared expected delta, and where it is declared
+
+| | |
+|---|---|
+| **Declared delta** | `REQUIRED_FIELDS` gains `reporting-cadence` (FR-019), which lands in `tests/contract/test_coaching_dispatch_contract.py` |
+| **Declared where** | `contracts/ownership-map.contract.md` C-51 already declares that one suite changes **by design** because of the amendment's own test update; the tuple itself is at `tests/contract/test_coaching_dispatch_contract.py` L32–41 |
+| **Measured form of the delta** | The tuple's names are asserted *inside* a pre-existing test function, so adding `reporting-cadence` produces **zero** new node ids. The node-id delta that does appear (the `[coach-status-line]` parametrisation) belongs to the companion change in the same suite — the payload validator gains one forbidden class, a status line in the dispatch payload (FR-015), which is how a forbidden class is stated in that file. |
+| **Reading** | Both changes are additions inside an existing closed set. No pre-existing id was renamed away, so the "no removals" half of C-51 holds strictly; the one addition is a parametrised counterexample row, not a new assertion shape. |
+
+```text
+$ sed -n '32,41p' tests/contract/test_coaching_dispatch_contract.py
+REQUIRED_FIELDS = (
+    "trainee", "work", "instruction", "return-contract", "anomaly-line",
+    "fast-fail-clause", "confirmation-relay", "reporting-cadence",
+)
+```
+
+### 6.3 The closure verdict — the single source, quoted
+
+`shared/workflow/feature-integration.md` § Pre-Status-Flip Gate item 5 forbids re-deciding this by model judgement,
+another script or an ad-hoc grep, so the command and its payload are quoted rather than summarised:
+
+```bash
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-speckit-visualization \
+    --feature-registry .specify/memory/features.md
+verdict: block
+spec_dir: /storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization
+flow_class: execution
+claimed_status: Planned
+final_path: pass=5 blocked=0 deferred=0 partial=2 fail=0 unknown=0 total=7
+reason: final-path-not-pass: SC-001
+reason: final-path-not-pass: SC-002
+EXIT=1
+```
+
+The machine payload adds the four conjunctive conditions of `Planned → Implemented`:
+
+```text
+completion_conditions = {
+    "no_open_rows": True,
+    "status_row_per_criterion": True,
+    "every_final_path_pass": False,
+    "smoke_record_pass": True,
+}
+final_path = {pass: 5, blocked: 0, deferred: 0, partial: 2, fail: 0, unknown: 0, total: 7}
+tasks = {closed: 50, deferred: 0, in_progress: 0, open: 0}
+```
+
+**Reading**: three of the four conditions hold. The fourth does not: two `final`-path criteria are `partial`, so the
+verdict is `block` and the closed reason set names exactly those two. Per `acceptance-hardening.md` § Feature Status,
+"three of four is `Blocked`", and § The four `Blocked` transitions lists `Planned → Blocked` as allowed precisely
+for this shape ("tasks are closed but at least one `final`-path criterion is not `pass`").
+
+### 6.4 The stage state this run lands
+
+| Carrier | Before this Part | After this Part | Why |
+|---------|------------------|-----------------|-----|
+| `.specify/memory/features.md` row 087 `Status` | `Planned` | `Blocked` | The closure verdict is `block`; the transition is the one `/speckit.implement` owns, and the state machine's `Planned → Blocked` row covers exactly "tasks closed, a `final` criterion not `pass`". |
+| `.specify/memory/features/087.md` `Status` | `Planned` | `Blocked` | Same fact, kept in step — the detail file and the index are edited together so the registry cannot read self-inconsistent. |
+| `Implemented` | not claimed | **not claimed** | Its four conditions are conjunctive; one fails. Landing it anyway would be the exact overclaim § Feature Status forbids. |
+
+**Two disclosures that travel with this state, so `Blocked` is not read as "the work was not done":**
+
+1. **All 50 task rows are closed** (`open=0`, `in_progress=0`, `deferred=0`), and the feature's smoke record passes
+   (`smoke_exit_code=0`, evidence present and non-empty). What is missing is not work but a **measurement
+   condition**: SC-001's capture is a 4 s fixture run where the criterion says ">90 s", and SC-002's population is
+   empty in this tree so its population half is measured on fixtures. Both ladder blocks in `verification.md` name
+   the unblock.
+2. **SC-009 is `blocked` for the same kind of reason** — no row of this feature produces a real multi-minute dogfood
+   run — but it is `supporting`-path, so it is not itself one of the two blocking reasons. It is disclosed here
+   because a reader comparing this file to `success-criteria.txt` will otherwise meet two different words for one
+   fact; `success-criteria.txt` § 3 point 4 explains the mapping (`not-measured` as a *reading*, `blocked` as the
+   *recorded status*, because the six-value set is closed and has no third member for "measured as unmade").
+
+### 6.5 GATE-3 and the pre-change side
+
+```text
+$ grep -cE '^- \[[ >]\]' .specify/specs/087-speckit-visualization/tasks.md
+0
+```
+
+GATE-3 holds: no `[ ]` and no `[>]` row remains. The eight rows this Part closed (T039–T046) were ticked **checkbox
+only** — no task text was edited — so the row ids, their `[blockedBy:]`, `[green:]` and `[covers:]` tags are the ones
+`validate-tasks.py` already adjudicated (0 error / 11 warning, the same 11).
+
+### 6.6 Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-speckit-visualization \
+  --feature-registry .specify/memory/features.md            # expect verdict: block, EXIT=1
+python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-speckit-visualization --json
+grep -cE '^- \[[ >]\]' .specify/specs/087-speckit-visualization/tasks.md   # expect 0
+sed -n '32,41p' tests/contract/test_coaching_dispatch_contract.py          # the declared delta's tuple
+```

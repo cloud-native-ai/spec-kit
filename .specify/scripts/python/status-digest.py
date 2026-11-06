@@ -449,6 +449,22 @@ def _read_text(rel_path: Path):
         return None
 
 
+def _read_any(path_arg):
+    """Read a caller-supplied path verbatim: absolute paths are opened as given, relative ones against the repo.
+
+    ``_read_text`` prefixes :data:`REPO_ROOT`, which is right for the framework sources this module owns and wrong
+    for an input a caller names — a guard fixture's run record lives wherever the test put it. Kept as one helper so
+    no caller has to guess which reading a path argument gets.
+    """
+    path = Path(path_arg)
+    if not path.is_absolute():
+        path = REPO_ROOT / path
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
 # ---------------------------------------------------------------- action: digest
 #: The two engine states that mean "this line finished" (``data-model.md`` E5 ``last_completion``: "the most recently
 #: ``completed`` entry of the set"). ``closed`` is the engine's own end state; the names are a projection of the
@@ -1375,15 +1391,52 @@ def proposition_ro_11(line_set_path, supervision_line_set=None):
 
 
 def proposition_ro_12(args, run_record_path):
+    """The carrier value the run record holds: `console`, or the flow's declared stream artifact path.
+
+    The *reading surface* is stated because "recorded" and "supplied" are easy to confuse. `--carrier` is the
+    value the caller hands this invocation and is the engine's declared carrier input; `--run-record` is the file
+    the run already writes, read here for the `carrier` field the owner
+    (`shared/guidelines/reporting-obligations.md` § 八) requires it to hold. The record is a **fallback**, and the
+    precedence is deliberate: `--carrier` wins when both are given, because a reading that silently preferred the
+    record would make a wrong `--carrier` unobservable — a green check that cannot go red proves nothing. The
+    reason names which surface answered, and `mode` is echoed when the record carries it, so a reading shows the
+    two were recorded together instead of asserting that they should be.
+    """
     name = "RO-12"
-    carrier = args.carrier
-    if not carrier:
-        return _not_evaluated(name, "no run record carrier value supplied (--carrier)")
-    if carrier == CARRIER_CONSOLE:
-        return _pass(name, "carrier=%s (one of the two legal forms)" % carrier)
-    if Path(carrier).suffix:
-        return _pass(name, "carrier is a declared stream artifact path")
-    return _fail(name, "carrier %r matches neither legal form" % carrier)
+    value = None
+    surface = None
+    recorded_mode = None
+    if run_record_path:
+        record = _read_any(run_record_path)
+        if record is None:
+            if not args.carrier:
+                return _not_evaluated(name, "run record %s is unreadable" % run_record_path)
+        else:
+            try:
+                payload = json.loads(record)
+            except ValueError:
+                payload = None
+            if isinstance(payload, dict):
+                if payload.get("carrier"):
+                    value = str(payload.get("carrier"))
+                    surface = "run record %s" % run_record_path
+                if payload.get("mode"):
+                    recorded_mode = str(payload.get("mode"))
+    if args.carrier:
+        value = args.carrier
+        surface = "--carrier"
+    if not value:
+        return _not_evaluated(
+            name, "no carrier value supplied (the run record holds none and no --carrier was given)"
+        )
+    if value == CARRIER_CONSOLE:
+        return _pass(name, "carrier=%s is one of the two legal forms (from %s)" % (value, surface))
+    if Path(value).suffix:
+        statement = "carrier is a declared stream artifact path (from %s)" % surface
+        if recorded_mode:
+            statement = "%s; mode=%s recorded beside it" % (statement, recorded_mode)
+        return _pass(name, statement)
+    return _fail(name, "carrier %r (from %s) matches neither legal form" % (value, surface))
 
 
 def proposition_ro_13(owner_text):

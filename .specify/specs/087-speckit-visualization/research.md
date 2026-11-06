@@ -20,6 +20,11 @@ the contract, and a reference that means a reading cites this file.
 (415), `skills/internal/` == `.specify/skills/internal/` (138), `agents/` == `.specify/agents/templates/` (16),
 `scripts/` == `.specify/scripts/` (121), `shared/` == `.specify/shared/` (94).
 
+*(Post-delivery reading, added at implement Part 6 — `test-evidence/polish-mirror-check.txt` § 3: the same six pairs
+read `ok` with `EXIT=0`, at `templates/` 22, `skills/external/` 415, `skills/internal/` 139, `agents/` 17,
+`scripts/` 122, `shared/` 95. The four increments are the four new framework-source files; the reading above is left
+as the pre-change measurement it is, not rewritten into the post-change one.)*
+
 **Consequence**: the baseline drift is **zero**, so every mirror obligation in `plan.md` can state "no NEW drift"
 as a passable criterion instead of an absolute "all green" that a future unrelated drift would fail. The pair
 mapping is not uniform and matters for path shapes: `skills/external/<name>/` → `.specify/skills/<name>/` (the

@@ -1,0 +1,153 @@
+# Smoke record — Feature 087: one render of the feature's main flow, end to end
+
+**Capture date**: 2026-11-06T08:07Z (UTC)
+**Host**: `python3 --version` -> Python 3.11.11 (the two delivered scripts are stdlib-only)
+**Form owner**: `shared/workflow/acceptance-hardening.md` § Verification Vocabulary (three fields, exactly one
+record per feature). This file is the `smoke_evidence_path` archive; the `smoke_command` in `verification.md` is the
+four-command chain reproduced verbatim below.
+
+**Why this is the feature's main flow and not a test run**: feature 087's main flow is *"a flow reports what it is
+doing, and the framework can answer what is running right now"*. The chain below drives that flow in one pass on a
+deterministic local fixture: the roster is judged for its reporter seat (the seat obligation), the digest renders a
+bounded current-state response (the reachability floor), a supervised sub-flow is reported and judged against the
+declared stall threshold (the master-reporting duty), and the deterministic guard returns a verdict over the
+delivered artifacts. No network, no cluster, no LLM, no wall-clock dependence.
+
+---
+
+## 1. The seat obligation — the compliant fixture roster and a defective one
+
+```bash
+$ python3 skills/internal/create-team/scripts/validate-roster.py \
+    .specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md; echo "EXIT=$?"
+conforming: team us1-compliant-fixture carries exactly one reporter seat (agent: reporter)
+EXIT=0
+```
+
+```bash
+$ python3 skills/internal/create-team/scripts/validate-roster.py \
+    .specify/teams/command-logic-as-classified-skills/team.md; echo "EXIT=$?"
+```
+
+(the defect side is quoted in full in `us1-team-cadence.txt` § 1a: `absent-seat` named with the seat literal and the
+team slug, `rc=1`. It is a **pre-existing** roster, so the defect is the correct reading of a roster outside this
+feature's population, not a regression — `roster-baseline.txt` records all 13 paths as `outside-the-population`.)
+
+## 2. The reachability floor — a bounded digest, and the idle state
+
+```bash
+$ python3 scripts/python/status-digest.py --action digest --cap 5; echo "EXIT=$?"
+generated_at=2026-11-06T07:48:32.628660Z cap=5 stale_bound=15m00s profile=long-run
+line_id=087-speckit-visualization run_id=r20261106T040353Z-087a state=active stage=- age=1h25m stale=yes active=yes note=last activity 1h25m ago, beyond the 15m00s stale bound
+line_id=082-self-explanatory-integration run_id=r20261105T032102Z-c139 state=closed stage=- age=24h44m stale=yes active=no note=last activity 24h44m ago, beyond the 15m00s stale bound
+… (three further `line_id=` rows; the full five are in `us3-digest-active.txt` § 2)
+last_completion=line_id=082-self-explanatory-integration age=24h44m
+omitted=3
+EXIT=0
+```
+
+The header, the five-row bound (`cap=5`), the `omitted=3` count, the per-entry `age=` and the `stale=yes` marking are
+the four shapes the criterion asks for; the ages differ from `us3-digest-active.txt` § 2 because they are computed
+from the live registry at read time (that file's capture is one hour older).
+
+```bash
+$ SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"
+nothing-running
+EXIT=3
+```
+
+## 3. The master-reporting duty — a supervised sub-flow judged against the declared threshold
+
+```bash
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision \
+    --run-stamp r20261106T090000Z-us2f \
+    --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=$PWD/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/just-under \
+    --threshold-row 'Manifest stuck at `in-progress`'
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run | position=1 dispatched sub-flow(s) watched (tick report) | delta=0 completed, 1 running or stalled, 0 failed since the last tick | remainder=1 sub-flow(s) still active | blocker=no blocker
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=running | age=45s | slow=yes | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=45s | carrier=console
+```
+
+```bash
+$ python3 scripts/python/status-digest.py --action guard --structure 087-supervision \
+    --run-stamp r20261106T090000Z-us2f \
+    --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=$PWD/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/above-threshold \
+    --threshold-row 'Manifest stuck at `in-progress`'
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run | position=1 dispatched sub-flow(s) watched (tick report) | delta=0 completed, 1 running or stalled, 0 failed since the last tick | remainder=1 sub-flow(s) still active | blocker=no blocker
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=2m55s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=2m55s | carrier=console
+```
+
+(the same two readings with the trainee row beside them, and the out-of-cadence transition lines, are captured in
+full in `us2-supervision-report.txt` § 1 and § 2. The `age=` and `measured_silence=` fields are computed from the
+fixture directories' **mtimes**, so their exact numbers differ between runs — the readings above are the values at
+`us2-supervision-report.txt`'s capture instant, and a re-run today reports the fixture's current age while keeping
+the same `state=` / `slow=` verdicts. `just-under` gives `state=running slow=yes`; `above-threshold` gives
+`state=stalled`. A reproduction therefore compares the verdicts and the threshold row, not the age integers.)
+
+**The guard's verdict on that same single-report invocation** (quoted because it is what makes the reading above a
+*judged* reading rather than a printed one; deterministic apart from the age fields):
+
+```text
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--supervision-line-set or --line-set)
+RO-12 not-evaluated no carrier value supplied (the run record holds none and no --carrier was given)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+EXIT=0
+```
+
+The seven `not-evaluated` rows are the **correct** reading of a single-report invocation: that run supplies one
+sub-flow and no line set, so each proposition whose input it does not carry says so rather than turning green. § 4
+supplies all six inputs and returns the full 12/0/1 reading.
+
+## 4. The deterministic guard over the delivered artifacts
+
+```bash
+$ python3 scripts/python/status-digest.py --action guard \
+    --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt \
+    --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt \
+    --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt \
+    --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt \
+    --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
+    --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt; echo "EXIT=$?"
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path (from --carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+```
+
+**Reading**: `EXIT=0`, `fail=0`. The single `not-evaluated` is RO-04's empty population — the honest reading of a
+feature that creates no in-population roster, and the reading `contracts/status-digest.contract.md` C-46 requires
+("never `pass`"). The same 13-line reading was re-taken after the mirror and per-tool-copy regeneration
+(`us4-guard-verdict.txt` § 5.1), so the verdict is about the tree as delivered, not an earlier state.
+
+---
+
+## Reproduction (the exact four-command chain the `smoke_command` field names)
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+python3 skills/internal/create-team/scripts/validate-roster.py .specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md
+python3 scripts/python/status-digest.py --action digest --cap 5
+python3 scripts/python/status-digest.py --action guard --structure 087-supervision --run-stamp r20261106T090000Z-us2f --sub-flow 087-supervision--r20261106T090000Z-us2f--worker=$PWD/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/above-threshold --threshold-row "Manifest stuck at \`in-progress\`"
+python3 scripts/python/status-digest.py --action guard --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+```

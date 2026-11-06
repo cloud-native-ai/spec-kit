@@ -204,3 +204,79 @@ $ python3 scripts/python/regen-command-copies.py --check
 OK: all per-tool command copies match the source templates.
 EXIT=0
 ```
+
+---
+
+## 5. Part 6 closing section — the guard re-run over the delivered tree after T039 / T040 / T043
+
+**Capture date**: 2026-11-06T07:44:03Z (UTC)
+**Why this section exists**: T039 regenerated every mirror, T040 regenerated the four per-tool command copies, and
+T043 amended the RO-12 read. This is the same guard and the same test set re-run **over the tree those three rows
+produced**, so the verdict a reader takes away is about the delivered change and not about a state that no longer
+exists.
+**This row owns no clause of its own** — it re-runs the suite; the propositions it reads belong to C-01…C-13, the
+digest contract to C-41…C-47.
+
+### 5.1 The guard
+
+```text
+$ python3 scripts/python/status-digest.py --action guard \
+    --flow-sample .specify/specs/087-speckit-visualization/test-evidence/us4-scope-sample.txt \
+    --roster-baseline .specify/specs/087-speckit-visualization/test-evidence/roster-baseline.txt \
+    --line-set .specify/specs/087-speckit-visualization/test-evidence/us2-line-set.lines.txt \
+    --supervision-line-set .specify/specs/087-speckit-visualization/test-evidence/us4-supervision-capture.txt \
+    --carrier .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt \
+    --run-record .specify/specs/087-speckit-visualization/test-evidence/us2-execution-modes.txt
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path (from --carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1
+EXIT=0
+```
+
+**Delta against § 1 of this file**: exactly one line changed — `RO-12`'s reason gained the `(from --carrier)`
+surface annotation after T043's amendment (`polish-mirror-check.txt` § 1 records the mirror being re-synced for the
+same edit). Every other line, including the `not-evaluated` on RO-04 and the 12/0/1 summary, is byte-identical, so
+the amendment provably did not disturb any other proposition.
+
+### 5.2 The four contract suites (T044's command, verbatim)
+
+```text
+$ pytest -m contract tests/contract/test_reporting_obligations.py tests/contract/test_roster_reporter_seat.py \
+    tests/contract/test_coaching_reporting_duty.py tests/contract/test_status_digest.py
+........................................................................ [ 56%]
+.......................................................                  [100%]
+127 passed in 3.03s
+```
+
+### 5.3 The unit suite
+
+```text
+$ pytest tests/unit/test_status_digest_unit.py
+.............................                                            [100%]
+29 passed in 0.93s
+```
+
+### 5.4 GATE-2 and DoD-2
+
+| Check | Reading | Verdict |
+|-------|---------|---------|
+| **GATE-2** — the whole guard over the delivered tree | `summary pass=12 fail=0 not-evaluated=1`, `EXIT=0`; the single `not-evaluated` is RO-04's empty population, which is the correct reading of a feature that creates no in-population roster | **holds** |
+| **DoD-2** — the acceptance surface's own tests after the polish rows | 127 contract + 29 unit = **156 green**, 0 red, 0 skipped | **holds** |
+| Mirror/copy invariants re-checked after T039/T040 | `sync-mirrors.py --check` and `regen-command-copies.py --check` both `OK`, exit 0 (`polish-mirror-check.txt` § 3) | **holds** |
+| Compatibility baseline re-checked after T043's source edit | 91 → 92 node ids, 0 removed, 1 declared addition, 92/92 green (`cl-01-closure.txt` § 1) | **holds** |
+
+**Not measured here, and not claimed**: the full repository suite. The state spine's test budget took that reading
+once at implement start (`seq=1`, `rc=1`, `passed=7473`, `failed=27`, `skipped=1`); the closure full-suite slot
+belongs to the driver after review. This row's evidence is the four named suites plus the unit suite, which is what
+its own command list fixes.

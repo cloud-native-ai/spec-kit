@@ -1,0 +1,113 @@
+# T040 — the four per-tool copies of `/speckit.status`, generated and proven repeatable
+
+**Capture date**: 2026-11-06T07:42:00Z (UTC)
+**Criterion (from the row, and from `plan.md` § Mirror Obligations' last table row)**: the check prints
+`OK: all per-tool command copies match the source templates.` with exit `0`, **and** the four `speckit.status.*`
+paths exist. The baseline was already `OK`, so staying `OK` is necessary and the four paths are the other half.
+
+## 1. Generate, then check
+
+```text
+$ python3 scripts/python/regen-command-copies.py
+Regenerated command copies for 4 tools.
+EXIT=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
+
+**Repeatability**: the run above was executed twice in this Part (once before T039's whole-surface check, once
+here). The second `--check` after a fresh `--write` is what proves the generator is idempotent — a non-repeatable
+generator would show drift on the second check without any source edit in between.
+
+## 2. The four `speckit.status.*` paths, listed
+
+```text
+$ ls -l .claude/commands/speckit.status.md .github/prompts/speckit.status.prompt.md \
+        .opencode/command/speckit.status.md .qoder/commands/speckit.status.md
+-rw------- 1 agent agent 4997 Nov  6 15:41 .claude/commands/speckit.status.md
+-rw------- 1 agent agent 4997 Nov  6 15:41 .github/prompts/speckit.status.prompt.md
+-rw------- 1 agent agent 4997 Nov  6 15:41 .opencode/command/speckit.status.md
+-rw------- 1 agent agent 5129 Nov  6 15:41 .qoder/commands/speckit.status.md
+EXIT=0
+```
+
+**Exactly four, and the other two are asserted to be absent** — the row forbids asserting a `.hermes/` or
+`.codex/` path, and this reading is the reason: `_ASSISTANT_COMMAND_DIRS` configures six tools, the generator
+writes only the directories that exist, and these two do not exist in this checkout.
+
+```text
+$ ls -d .hermes .codex
+ls: cannot access '.hermes': No such file or directory
+ls: cannot access '.codex': No such file or directory
+EXIT=2   (expected: neither directory exists, so neither copy is written or claimed)
+```
+
+## 3. The per-tool transformations are the generator's, not a hand's
+
+The four copies are **not** byte-identical to the source template, and that is correct — each is rewritten for its
+tool by the generator. The `.qoder` copy differs additionally by its frontmatter projection (a `short-description`
+key instead of the two source keys). The three "same" copies share one digest:
+
+```text
+$ md5sum templates/commands/status.md .claude/commands/speckit.status.md \
+         .github/prompts/speckit.status.prompt.md .opencode/command/speckit.status.md \
+         .qoder/commands/speckit.status.md
+717ecf8138de012be2eb7fa1e6f8c906  templates/commands/status.md
+cd23492a6ef0ae3797e45cecac78c2b2  .claude/commands/speckit.status.md
+cd23492a6ef0ae3797e45cecac78c2b2  .github/prompts/speckit.status.prompt.md
+cd23492a6ef0ae3797e45cecac78c2b2  .opencode/command/speckit.status.md
+ab1c69fea8e7a3e2575a15f267729d47  .qoder/commands/speckit.status.md
+```
+
+```text
+$ diff templates/commands/status.md .qoder/commands/speckit.status.md | head -30
+2,3c2
+< description: Answer "what is running right now?" from state artifacts that already exist — …
+< short-description: 现状摘要入口：委托 status-digest.py 读取既有状态，输出有界摘要/守卫判定/单行状态
+---
+> description: 现状摘要入口：委托 status-digest.py 读取既有状态，输出有界摘要/守卫判定/单行状态
+5c4
+<
+---
+> <!-- AUTO-GENERATED from templates/commands/status.md — do not edit; edit the source template, then run scripts/python/regen-command-copies.py -->
+12c11
+< Process `$ARGUMENTS` per the [User Input Protocol](shared/workflow/user-input-protocol.md). …
+---
+> Process `$ARGUMENTS` per the [User Input Protocol](.specify/shared/workflow/user-input-protocol.md). …
+19c18
+< `shared/guidelines/reporting-obligations.md` § 九 · 当前态摘要契约 (Digest contract); this command reaches them by path
+---
+> `.specify/shared/guidelines/reporting-obligations.md` § 九 · 当前态摘要契约 (Digest contract); this command reaches them by path
+22c21
+**Script**: `scripts/python/status-digest.py`, run from the repository root with plain `python3` (stdlib only).
+---
+> **Script**: `.specify/scripts/python/status-digest.py`, run from the repository root with plain `python3` (stdlib only).
+28,30c27,29
+| `digest` | `python3 scripts/python/status-digest.py --action digest [--cap <n>]` | …
+---
+> | `digest` | `python3 .specify/scripts/python/status-digest.py --action digest [--cap <n>]` | …
+```
+
+Every difference is a mechanical projection: the `AUTO-GENERATED` banner (so a hand-edit is visible as a lie), the
+`shared/` → `.specify/shared/` and `scripts/` → `.specify/scripts/` path rewrites that make the copy reachable from
+a consuming project's runtime layer, and `.qoder`'s frontmatter shape. **No paragraph, table or step was authored
+here** — the source is `templates/commands/status.md`, which T028/T029 delivered.
+
+## 4. Verdict
+
+- Generator: repeatable (two `--write` → `--check` cycles, both `OK`, exit 0).
+- Copies: exactly the four whose tool directories exist; `.hermes/` and `.codex/` absent and unclaimed.
+- Byte provenance: three copies share one digest, `.qoder` differs only by the documented projections.
+
+## 5. Reproduction
+
+```bash
+cd /storage/project/cloud-native-ai/spec-kit
+python3 scripts/python/regen-command-copies.py
+python3 scripts/python/regen-command-copies.py --check      # expect: OK … / EXIT=0
+ls -l .claude/commands/speckit.status.md .github/prompts/speckit.status.prompt.md \
+      .opencode/command/speckit.status.md .qoder/commands/speckit.status.md
+ls -d .hermes .codex                                        # expect: both absent
+```

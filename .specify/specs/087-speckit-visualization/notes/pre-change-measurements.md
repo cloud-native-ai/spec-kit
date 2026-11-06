@@ -61,3 +61,10 @@ spine's test-budget block (`seq=1`, `rc=1`, `passed=7473`, `failed=27`, `skipped
 **Doctests / collection note**: the command above is a pure collection, so its exit status reflects importability
 only — the seven ids were also confirmed green by the same-file run quoted above, so none of them is a collection-only
 ghost.
+
+## Pre-change side closure — `status=not-run-docs-only` (T045)
+
+status=not-run-docs-only
+status_note=Written by `/speckit.implement` Part 6 (T045) to close the pre-change side of this file. The **full suite** was not re-run by any row of this feature beyond the single implement-start shot recorded above (state spine test-budget `seq=1`, `passed=7473`, `failed=27`, `skipped=1`, evidence `test-evidence/baseline-full-suite-20261106T063158Z.log`). Every later reading this feature took is a **targeted** set: the seven progress-reporting node ids above, the six C-51 suites compared by node-id set (`test-evidence/cl-01-closure.txt` § 1), and the four contract suites plus the unit suite (127 + 29 passed, `test-evidence/us4-guard-verdict.txt` § 5). The closure full-suite slot belongs to the driver after review, per the test budget — so this file's pre-change side is closed as "not run beyond the one start-of-run shot", not as "green".
+status_readings=pre-change progress-reporting baseline 7 ids all green (above); pre-change affected suites 91 ids, 91 passed (`cl-01-closure.txt` § 1); pre-change full suite 7473 passed / 27 failed / 1 skipped (state spine seq=1)
+status_owner=the baseline form is `/speckit.implement` step 6 bullet `**Test runs**` (`.specify/skills/internal/implement-feature/SKILL.md`); this file points at it and defines no second form
