@@ -292,19 +292,23 @@ python3 scripts/python/sync-mirrors.py --check   （裸解释器，仅作反例�
 把这一行当漂移去 `--write` 会制造真实改动——**MUST NOT** 那样处置；正确处置是换解释器重跑。
 ⇒ 实施期的判据同为**无新漂移**，不是「退出码 0」这一条绝对断言。
 
-## S8 — 本仓的零改动核对（Two Hats）
+## S8 — 本仓的零改动核对（Two Hats），单文件例外
 
-**premises**: base 是 `24cb4edc`；本特性只改框架源与其镜像。
+**premises**: base 是 `24cb4edc`；本特性只改框架源与其镜像，**外加 FR-001 要求的那一个文档文件**。
 
 ```bash
 git diff --name-only 24cb4edc...HEAD -- docs/
 ```
 
 计划期实测（2026-11-06 复跑）：`git diff --name-only 24cb4edc...HEAD -- docs/` → **空输出、`exit 0`**；
-`git status --porcelain docs/` → **空输出、`exit 0`**（`docs/` 自 base 起零改动，含未提交改动面）。
+`git status --porcelain docs/` → **空输出、`exit 0`**（计划期尚未动 `docs/`）。
 
-预期：**空**。本特性只改框架源与其镜像（`skills/` → `.specify/skills/`、`templates/commands/` → 四家 per-tool 副本），
-`.specify/` 的运行时副本由 `sync-mirrors.py` 生成；`docs/` 树的内容工作不属本特性（A6 / `requirements.md` § Out of Scope）。
+预期（交付后）：**恰为一行** —— `docs/concepts/documentation-model.md`。该行是 `FR-001` 明文要求的读者投影
+（`plan.md` § Delivery Surfaces 列出它、`tasks.md` 的 DoD-7 要求它、T064 交付它），因此它不是「零改动」的反例，
+而是本特性**唯一的、被要求的** `docs/` 改动。`git status --porcelain docs/` 同样 MUST 只出现这一个路径。
+
+⇒ 判据是**「多一行即违约」**，不是「必须为空」。除 `docs/concepts/documentation-model.md` 外，`docs/` 树的内容工作
+不属本特性（A6 / `requirements.md` § Out of Scope）；`.specify/` 的运行时副本由 `sync-mirrors.py` 生成。
 
 ## S9 — Reconcile 的收敛回路（`SC-003`；实施期执行）
 

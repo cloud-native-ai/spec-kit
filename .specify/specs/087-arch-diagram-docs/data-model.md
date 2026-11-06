@@ -69,9 +69,9 @@
 |------|-------|------|
 | `run_id` / `feature` | `C-010` | 一次产生方运行一件 |
 | `diagrams[]` | `C-010` | 每图一条，含 E2 的全部字段 |
-| 落点 | `C-001` + `C-010` | `<root>/docs/.speckit/runs/<UTC>-diagram-trace.json`，一文一件 |
+| 落点 | `C-001` + `C-010` | `<root>/docs/.speckit/runs/<UTC basic>-<8 hex>-diagram-trace.json`，一文一件（形态唯一 true source 是 `C-010`；`<UTC basic>` = `YYYYMMDDTHHMMSSZ`，`<8 hex>` = 本次运行 id 的前 8 位） |
 
-**生命周期**：由**产生方运行**写（文档流程的 R5/R6），检查器只读（`C-002`）。`FR-013` 的「未接受」= 记录缺失或不齐 ⇒ E3 落 `not-evaluated`，不是 `missing`（图在、只是没被接受）。
+**生命周期**：由**产生方运行**的 **R5 写**（产图的同一次运行），**R6 只读**（读回本轮记录并重跑判定），检查器亦只读（`C-002`）。`FR-013` 的「未接受」= 记录缺失或不齐 ⇒ E3 落 `not-evaluated`，不是 `missing`（图在、只是没被接受）。
 
 ## E5 — Exemption Record（具名豁免记录）
 
@@ -87,8 +87,15 @@
 全部纯文件（research `R5`：不依赖渲染后端、不依赖网络、不依赖 `pytest` 之外的东西）。**落点与形态**：
 `tests/fixtures/docs-obligation/<name>/`，每个夹具是一棵**完整的迷你文档空间**（根 `README.md` +
 `docs/<六类目录>/` + `docs/assets/` + `docs/.speckit/`），判据是 `--root` 指向该目录；
-**每个产生写入的用例先把夹具 `shutil.copytree` 到 `tmp_path` 再操作**，因此仓库里的夹具永远是**删除前的绿灯态**
+**每个产生写入的用例先把夹具 `shutil.copytree` 到 `tmp_path` 再操作**，因此仓库里的夹具**永远不被任何用例改动**
 （先例：`tests/integration/test_docs_command_scenarios.py` 的 `make_skeleton(tmp_path)` 同形）。
+
+**夹具不变量的唯一读法（本轮定为 `C-01` 的处置）**：仓库副本是**每个夹具的既定盘上状态**，不是「统一的绿灯态」。
+`clean/`、`exempt-ok/` 等的既定状态是绿灯；`deleted-rendered/`、`orphan-rendered/`、`orphan-source/`、`no-diagram/`、
+`no-trace/`、`trace-incomplete/`、`exempt-bad/`、`exempt-superseded/` 的既定状态**本身就是红的**——它们的「删除」「缺记录」
+是**夹具的事实**，不是用例的副作用。因此「删除/推进 mtime」型用例仍须 `copytree` 到 `tmp_path` **在副本上**做，
+既为了不污染仓库副本，也为了让「仓库副本 == 下表登记的构成」这一等式可被 `git status` 核对。
+判据一句话：**仓库副本 == E6 表登记的构成；任何用例造成的差异只允许存在于 `tmp_path`。**
 
 | 夹具 | 构成 | `--record` | 断言的目标状态（`C-016` 的档位） |
 |------|------|-----------|----------------------------------|

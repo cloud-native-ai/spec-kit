@@ -27,7 +27,7 @@
 | 7 | `skills/external/draw-diagram/**` | **零改动**：只被引用（FR-011）——本表登记为「不交付面」以防误改 |
 | 8 | `tests/unit/test_docs_utils_obligation.py` + `tests/integration/test_docs_obligation_scenarios.py` | 封闭 verdict / reason 集、只读、确定性、负向档位、收敛回路（`plan.md` § Test Plan 表 A/B） |
 | 9 | `tests/fixtures/docs-obligation/**` | **11 段夹具**（`data-model.md` E6 的逐档表：8 段判定 + 3 段豁免） |
-| 10 | `.specify/skills/external/create-docs/**`、`.specify/skills/external/improve-docs/**`、`.specify/templates/**`、四家 per-tool 命令副本 | 由 `sync-mirrors.py` / `regen-command-copies.py` 生成，手不改 |
+| 10 | `.specify/skills/create-docs/**`、`.specify/skills/improve-docs/**`、`.specify/templates/commands/docs.md`，加四家 per-tool 命令副本 `.claude/commands/speckit.docs.md`、`.github/prompts/speckit.docs.prompt.md`、`.opencode/command/speckit.docs.md`、`.qoder/commands/speckit.docs.md` | 由 `sync-mirrors.py` / `regen-command-copies.py` 生成，手不改（镜像路径是 `.specify/skills/<name>`，**没有** `external/` 这一层；源目录才有 `skills/external/<name>`） |
 
 ## 3. FR → Contract / Slice Map
 

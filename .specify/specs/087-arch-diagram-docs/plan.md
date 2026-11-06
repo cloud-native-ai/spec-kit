@@ -30,7 +30,7 @@
 **Project Type**: 文档 / 提示框架仓（Two Hats：改 `skills/` `templates/` 的框架源，`.specify/` 与四家 per-tool 副本由生成器同步；`docs/` 的内容工作不属本特性）。
 **Performance Goals**: 不设指标。检查器只做一次目录遍历 + 每个图的两次 `stat` / 一次 sha256，载体规模是本仓 **85** 份量级（`quickstart.md` S2 的实测；根 `ARCHITECTURE.md` 是本仓尚不存在的载体，基线第 1 项登记其**语义**，不是盘上事实）。
 **Constraints**: 检查器 MUST 只读（允许的副作用集合是空集）、确定性（两次运行字节可比）、幂等；MUST NOT 新增 `/speckit.*` 命令；MUST NOT 改动 069a 的四字面量与 W1/W3 接线小节；MUST NOT 改本仓 `docs/` 内容。
-**Scale/Scope**: 6 处文本落点 / 4 个文件（`data-model.md` E7）+ 1 个引擎动作 + 2 份记录 schema + 11 段夹具；85 份载体文档的实测人口（`quickstart.md` S2）。
+**Scale/Scope**: 5 处文本落点 / 4 个文件（`data-model.md` E7 的五行；`create-docs/SKILL.md` 的两个小节族同属一个文件）+ 1 个引擎动作 + 2 份记录 schema + 11 段夹具；85 份载体文档的实测人口（`quickstart.md` S2）。
 
 ### Technical Constraints（实施期 MUST 保持）
 
@@ -43,7 +43,7 @@
 | 无新命令 | FR-017 | `git diff --name-only 24cb4edc...HEAD -- templates/commands/` 只出现 `docs.md` |
 | 守卫保持通过 | A7 / 契约 `C-014` | 五条具名守卫**相对基线无新失败**（基线见 § Baseline & Known-Red） |
 | 镜像无新漂移 | 模板 § Mirror Obligations | `sync-mirrors.py --check` 与 `regen-command-copies.py --check` 相对基线 exit 0，需能 import `typer` 的解释器 |
-| 本仓 `docs/` 零改动 | requirements § Out of Scope / A6 | `git diff --name-only 24cb4edc...HEAD -- docs/` 为空 |
+| 本仓 `docs/` 仅一处改动 | requirements § Out of Scope / A6 + FR-001 | `git diff --name-only 24cb4edc...HEAD -- docs/` 的结果**恰为一行** `docs/concepts/documentation-model.md`（FR-001 要求的读者投影，T064 交付）；该目录下任何第二行即违约 |
 
 ## Constitution Check
 
@@ -311,7 +311,7 @@ Dependency set: none
 - **077 的 W1/W3 接线**（`flow-class-check.py` / `doc-consistency-check.py`）——**不构成**。同上：已落地、只被引用；本特性 MUST NOT 改动那两个接线小节（`C-014`），因此无版本协商需求。
 - **`draw-diagram` 技能**——**不构成**。本特性对它是只读引用（T-004），且该技能已在同一树内。
 - **渲染后端 `xuanji-render`**——**不构成**。检查器不调用引擎、夹具零渲染（EP-001 的 evidence 列）。
-- **`checklists/requirements.md` 的派生计数漂移**——**不构成 blocker，登记为未决项 `OI-087-01`**。owner 是 `/speckit.checklist`，处置归 requirements 阶段收尾；本特性 MUST NOT 改写它（宪法 XIV：发现陈旧的计数副本时删掉副本，而不是改正数字）。它是可见的未决项，不是前置条件：绕开它本特性仍可完整交付。
+- **`checklists/requirements.md` 的派生计数漂移**——**已消解（`OI-087-01` resolved 2026-11-06）**。该清单的 N6 记录副本已按宪法 XIV **删除而非改正**，FR/SC 的唯一 owner 归 `requirements.md`；`register.md` 的 `OI-087-01` 行已相应关闭。本特性仍未改写它，且此后无需改写。
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|
@@ -377,8 +377,9 @@ Dependency set: none
 | `tests/contract` 的基线为 6038 passed / 17 failed / 2 skipped，其中 `test_residual_total_within_sc002_target` 先于本特性存在 | 实测 | 2026-11-06 | `research.md` R6（`python3 -m pytest tests/contract -q`） |
 | 两命令的镜像基线均为 exit 0，且必须用能 import `typer` 的解释器才不假红 | 实测 | 2026-11-06 | `research.md` R6 推论 1 + 本阶段 scratch venv 的 `regen` / `sync-mirrors --check` 读数 |
 | `draw-diagram` 的四份 owner 文件在盘，本特性只引用不改动 | 实测 | 2026-11-06 | `ls skills/external/draw-diagram/references/` → `delivery-contract.md` / `routing-matrix.md` / `semantic-model.md` / `self-deploy-render-service.md` |
-| `docs/` 树自 base `24cb4edc` 起零改动 | 实测 | 2026-11-06 | `git diff --name-only 24cb4edc...HEAD -- docs/` 空输出、exit 0 |
+| `docs/` 树自 base `24cb4edc` 起**只**改动 `docs/concepts/documentation-model.md` | 实测 + FR-001 | 2026-11-06（计划期实测为空；交付后预期恰为一行，即 T064 的读者投影） | `git diff --name-only 24cb4edc...HEAD -- docs/` → 计划期空输出、exit 0；交付后 MUST 恰为 `docs/concepts/documentation-model.md` |
 | `improve-docs/SKILL.md` 在 069a 的 74 条冻结清单内且当前未漂移，因此改它需要 allowlist 条目 | 实测 | 2026-11-06 | `research.md` R7（`grep "  skills/external/improve-docs/SKILL.md$" notes/pre-change-file-hashes.txt` 与当前文件同哈希） |
+| 74 条 = **25 条非接线模板 + 49 条非接线技能**，两个分母不是同一件事 | 引用 | 2026-11-06 | `tests/contract/test_expression_compatibility.py` 模块 docstring 的 C-5 段（"the 25 non-wiring templates and 49 non-wiring skills … the 74 non-wiring sources"）+ `assert len(manifest) == 74`；`FROZEN_SKILLS` 是 49 条那一半的名字表 |
 | `create-docs/SKILL.md` 与 `templates/commands/docs.md` 不在冻结清单内（是 W1/W3 接线面），因此改它们无需 allowlist 条目 | 实测 | 2026-11-06 | `research.md` R7 的三条 `grep` 读数 |
 | 069a 把「接线面」与「冻结技能」分开登记，所以同一改动可能既要 allowlist 条目又不必 | 引用 | 2026-11-06 | `.specify/specs/069a-flow-classification-docs-gates/notes/pre-change-file-hashes.txt` + `tests/contract/test_expression_compatibility.py` 的 `WIRING_SKILLS` / `ALLOWED_POST_BASELINE_CHANGES` 定义 |
 
@@ -402,8 +403,17 @@ Dependency set: none
 ## Test Plan — clause → test 映射（P1-4）
 
 *本节是**条款到可执行断言**的唯一登记处：每一条契约条款都必须在实施期落到一个具名测试或一个具名夹具，
-否则「负向可观测」只是文字承诺。表 A / B 覆盖两份契约的**全部条目**（`diagram-obligation` `C-001`…`C-016`、
-`flow-obligations` `C-001`…`C-023`），表 C 是守卫文件的基线，表 D 是测试预算与红线。*
+否则「负向可观测」只是文字承诺。表 A 覆盖 `diagram-obligation` 的 `C-001`…`C-016`（16 行），表 B 覆盖
+`flow-obligations` 的 `C-001`…`C-023` 加 `C-008a`（24 行），两表合计 **40 行、40 条条款、每条恰一行**；
+表 C 是守卫文件的基线，表 D 是测试预算与红线。每行按该条款的**实际主体**绑定断言，不按编号对齐——
+`diagram` 的 `C-006`（确定性）绑确定性断言、`C-009`（`stale` 第二半）绑 `stale` 断言、`C-015`（与 `validate` 的关系）
+绑「不复用不合并」断言，三处都是 v1 表里按同号错绑的位置。*
+
+`C-008a` 在本表中有行、有名具名夹具断言，但它**不是**机器可判定的条款 id：条款语法
+（`shared/definitions/contract-clause-definitions.md` § 1–§ 2）的 id 形态是 `C-<数字>` 加至多一个**小数**后缀，
+不带字母后缀，故 `clause_extract.py` 对那份契约抽出 23 个 id，`tasks.md` 无法对它声明 `[green:]`（会被判
+`green-dangling`，且判得正确——没有机器能核这条声明）。**覆盖判定按 39 个可判定 id 计**；`C-008a` 的交付由本表
+这一行 + `quickstart.md` S9 + `I::test_c008a_*` 三条具名断言承担。这是本轮如实登记的边界，不是遗漏。
 
 命名约定：`U::` = `tests/unit/test_docs_utils_obligation.py`；`I::` = `tests/integration/test_docs_obligation_scenarios.py`；
 `F::` = `tests/integration/test_docs_command_scenarios.py`（既有文件，只加用例）。
@@ -413,62 +423,67 @@ Dependency set: none
 
 | 条款 | 断言 / 夹具 | red-when |
 |------|-------------|----------|
-| `C-001` 接口面与封闭参数集 | `U::test_c001_action_registered`（`--action obligation` 出现在 `choices`）；`U::test_c001_option_set_closed`（`--record` / `--only` / `--json` 均被接受，未知选项 exit 2）；`U::test_c001_before_implementation_exit2`（S1 的 argparse 单行，作为**门禁 4 的前态读数**保留） | `--record` 未注册、或选项集出现契约外的第六个开关 |
-| `C-002` 只读 / 确定性 / 幂等 | `I::test_c002_two_runs_identical_json`（S4 的两跑比对 + `git status --porcelain` 为空）；`I::test_c002_no_writes_on_dirty_fixture` | 任一跑写出盘上文件，或两次输出字节不等 |
-| `C-003` 载体集合 | `U::test_c003_carrier_table`（六类目录 + `ARCHITECTURE.md` 入集；保留根文件 / notes / 归档 / 站点工具目录不入集）；`U::test_c003_non_carrier_not_judged`（`in_carrier_set=false` 的文档不出现在 `documents[]`） | 非载体文档进入 `documents[]`，或某类正式目录被整类漏判 |
-| `C-004` 封闭 verdict 集 | `U::test_c004_verdict_domain_closed`（五值之外取值即失败）；`U::test_c004_not_evaluated_breaks_clean`（判 `not-evaluated` 的文档使 `converged` **与** `clean` 同时为 `false`） | `not-evaluated` 被算作合格态（`converged=true` 或 `clean=true`） |
-| `C-005` verdict↔reason 封闭表 + 失面具名 | `U::test_c005_reason_pairs_closed`（对每个 verdict，reason 只能取表内值）；**`U::test_c005_faces_not_swapped`**（夹具 `orphan-rendered` ⇒ `orphan-rendered`、`orphan-source` ⇒ `orphan-source`，两值互换即红——`SC-002` 的核心）；`U::test_c005_every_entry_named`（每条 `documents[]` 都有 `path` 与 `line`） | 两个失面值被任一实现互换、合并为单值，或某条判定缺 `path` |
-| `C-006` JSON 载荷与字段序 | `U::test_c006_payload_schema`（顶层四键 + `documents[]` 四字段）；`U::test_c006_field_order_stable` | 载荷形状漂移，或同一输入的键序不稳定 |
-| `C-007` `satisfied` 的五条合取 | `U::test_c007_satisfied_requires_all_five`（五条拆成五个独立断言：缺任一条 ⇒ 不是 `satisfied`，而是由 `C-016` 落档）；`U::test_c007_no_record_not_satisfied`（两面齐 + 引用解析 + 无记录 ⇒ `not-evaluated` / `no-trace-record`，**不是** `satisfied`——本条与 `C-012` 同一事实，两条款各挂自己的断言） | 五个合取条件任一被弱化成「或」，或「文件都在」被当成「义务已履行」 |
-| `C-008` `stale` 逐面判据 | **`U::test_c008_source_newer`**（夹具 `stale-source/` ⇒ `stale` / `source-newer-than-render`）；`U::test_c008_render_digest_mismatch`（夹具在 `tmp_path` 副本里改渲染面字节 ⇒ `stale` / `render-digest-mismatch`）；`U::test_c008_requires_both_faces`（只一面时**不得**落到 `stale`） | 单面文档被判 `stale`；`os.utime` 失效后夹具自发变色而断言仍绿 |
-| `C-009` 单一落点 | `U::test_c009_landing_is_docs_assets`（`source` / `rendered[]` 的父目录必须是 `<root>/docs/assets/`）；`U::test_c009_no_second_landing`（不存在 `docs/*/diagrams/` 形式的第二落点——T-005 的反题已被排他） | 图落进 `docs/<类型>/diagrams/` 或项目根下第二个 `assets/` |
-| `C-010` 记录 schema | `U::test_c010_record_schema`（`--record` 文件逐字段校验，含 `engine` / `engine_reason` / `ldm_summary` / `delivery`）；`U::test_c010_relative_to_root`（记录里的路径一律相对项目根，绝对路径即红） | 记录里出现绝对路径，或缺任一必填字段仍被判合格 |
-| `C-011` 豁免记录 | `I::test_c011_exempt_ok`（`exempt-ok/` ⇒ `recorded-exemption` / `exempt-chronological`，`exempted=1`、`clean=false`、**`converged=true`**）；**`I::test_c011_exempt_bad`**（`exempt-bad/` 缺 `justification` ⇒ `not-evaluated` / `exemption-invalid`，**不是** `recorded-exemption`）；`I::test_c011_superseded`（`exempt-superseded/` ⇒ `exemption-invalid` + `summary.exemption_superseded=1`） | 无效豁免被当成有效豁免放行（假绿）；或 `exempted>0` 仍 `clean=true`；或 `exempted>0` 把 `converged` 压成 `false`（那会让豁免终态永远不收敛） |
-| `C-012` 未记录不得合格 | `I::test_c012_no_record_not_evaluated`（`no-trace/` 不传 `--record` ⇒ `not-evaluated` / `no-trace-record`、`converged=false`、`clean=false`）；`I::test_c012_two_faces_resolving_but_unrecorded`（两面齐 + 引用解析 + 无记录仍然不是 `satisfied`） | 「文件都在」被当成「义务已履行」（`SC-002` 的假绿面） |
-| `C-013` 计数、`converged` 与 `clean` | **`U::test_c013_clean_is_strict`**（`clean` 的严格面：`missing`/`stale`/`not_evaluated` 任一非零 ⇒ `converged=false` 且 `clean=false`；`exempted>0` ⇒ `clean=false`；`carriers==0` ⇒ `converged=false` 且 `clean=false`）；**`U::test_c013_empty_scope_not_converged`**（默认作用域 `carriers==0` ⇒ `judged_scope_has_carrier=false` ⇒ `converged=false` 且 `clean=false`；与 `--only` 空作用域的 vacuous true 对照）；**`U::test_c013_converged_ignores_exemptions`**（`exempted>0`、其余三档全零 ⇒ `converged=true` 且 `clean=false`——两个谓词的分歧点本体）；`U::test_c013_only_empty_scope`（`--only` 匹配 0 个对象时两个谓词都按公式算得 `true` 而输出带注记）；`U::test_c013_documents_field_set`（`documents[]` 恰四字段，`summary` 含 `converged`） | 四个假绿面任一漏判（`exempted>0`、`carriers==0`、`--only` 空作用域、`not-evaluated` 计作通过）；或 `converged` 被实现成 `clean` 的同义词（带豁免的空间于是永远不收敛） |
-| `C-014` 接线守卫不动 | `A1` / `A3` / `A5`（`test_expression_gate_wiring.py`）、`C3` / `C4a`（`test_docs_command_template.py`）、`KEEP_LIST`（`test_confirmation_gates_sweep.py`）、`test_directory_governance.py`——均为**既有测试**，本特性不改断言只加义务指针 | 任一守卫文件的冻结清单出现未登记变更（`C5` 的哈希比对） |
-| `C-015` 退出码 | `U::test_c015_exit_codes`（`0` = 已判定（含不干净）、`2` = 输入错误：`--root` 不存在 / `--record` 不可读 / 未知选项） | 「不干净」被映射成非 0（会让调用方把判定当故障） |
-| `C-016` 有序优先级 | `U::test_c016_precedence_order`（构造**多档位同时成立**的夹具，断言命中的是最靠前的那一档：`deleted-rendered/` 必须先落 `reference-unresolved` 而非 `orphan-*`）；`U::test_c016_no_backtracking`（单趟、不重复覆盖——命中后 MUST NOT 被后面的档位二次覆盖）；`U::test_c016_no_second_precedence_owner`（源码里不存在第二处 `verdict =` 的分支树，落档只能走 `C-016` 的单趟函数） | 档位顺序被实现成集合判定（顺序无关）——这是 attempt 1 的 `F-01` 本体；或出现第二处独立判定实现（两处判据各自漂移） |
+| `C-001` Command surface（命令面与封闭选项集） | `U::test_c001_action_registered`（`--action obligation` 出现在 `choices`）；`U::test_c001_option_set_closed`（`--record` / `--only` / `--json` 均被接受，未知选项 exit 2）；`U::test_c001_before_implementation_exit2`（S1 的 argparse 单行，作为**门禁 4 的前态读数**保留）；`U::test_c015_exit_codes`（`0` = 已判定（含不干净）、`2` = 输入错误：`--root` 不存在 / `--record` 不可读 / 未知选项——退出码定义在命令面这一条款内） | `--record` 未注册、选项集出现契约外的第六个开关，或「不干净」被映射成非 0 |
+| `C-002` Read-only by construction | `I::test_c002_no_writes_on_dirty_fixture`（脏夹具上运行后 `git status --porcelain` 仍为空）；`U::test_c002_open_for_write_never_seen`（源码里该动作路径不出现写模式的文件打开） | 动作在夹具上创建、修改或删除任何文件（只读构造被破坏） |
+| `C-003` Carrier set | `U::test_c003_carrier_table`（六类目录 + `ARCHITECTURE.md` 入集；notes / 归档 / 站点工具目录不入集）；`U::test_c003_non_carrier_not_judged`（非载体文档不出现在 `documents[]`） | 非载体文档进入 `documents[]`，或某类正式目录被整类漏判 |
+| `C-004` 封闭 verdict 集（五值） | `U::test_c004_verdict_domain_closed`（五值之外取值即失败）；`U::test_c004_not_evaluated_breaks_clean`（判 `not-evaluated` 的文档使 `converged` **与** `clean` 同时为 `false`） | `not-evaluated` 被算作合格态，或出现第六个 verdict 值 |
+| `C-005` 封闭 `reason` 集 | `U::test_c005_reason_pairs_closed`（对每个 verdict，reason 只能取该 verdict 行内的值）；`U::test_c005_faces_not_swapped`（`orphan-rendered` / `orphan-source` 两值不得互换——`SC-002` 的核心）；`U::test_c005_every_entry_named`（每条 `documents[]` 都有 `path` 与 `line`） | 两个失面值被互换或合并为单值，或某条判定缺 `path`，或 reason 取到该 verdict 行之外的值 |
+| `C-006` 确定性、幂等、零写 | `I::test_c002_two_runs_identical_json`（同输入两跑字节比对，且两跑皆零写）；`U::test_c002_two_runs_identical_payload`（进程内两次调用载荷逐字节相等）；`U::test_c006_field_order_stable`（同一输入的键序稳定） | 两次输出字节不等，或第二跑引入任何盘上改动（幂等面被破坏） |
+| `C-007` `satisfied` 的合取条件 | `U::test_c007_satisfied_requires_all_five`（五条拆成五个独立断言：缺任一条 ⇒ 不是 `satisfied`，而由 `C-016` 落档）；`U::test_c007_no_record_not_satisfied`（两面齐 + 引用解析 + 无记录 ⇒ `not-evaluated` / `no-trace-record`，**不是** `satisfied`） | 五个合取条件任一被弱化成「或」，或「文件都在」被当成「义务已履行」 |
+| `C-008` `stale` 第一半（两个面彼此不一致） | `U::test_c008_source_newer`（夹具 `stale-source/` ⇒ `stale` / `source-newer-than-render`）；`U::test_c008_render_digest_mismatch`（`tmp_path` 副本里改渲染面字节 ⇒ `stale` / `render-digest-mismatch`）；`U::test_c008_requires_both_faces`（只一面时**不得**落到 `stale`） | 单面文档被判 `stale`；`os.utime` 失效后夹具自发变色而断言仍绿 |
+| `C-009` `stale` 第二半（图与文档就同一事实不一致，部分覆盖） | `U::test_c009_reference_unresolved_not_stale`（重命名/移走渲染件 ⇒ `missing` / `reference-unresolved`，**不落** `stale`）；`U::test_c009_unrecorded_target_not_evaluated`（解析到但记录未登记的目标 ⇒ `not-evaluated` / `trace-incomplete`）；`U::test_c009_semantic_half_has_no_verdict`（语义面 MUST 不产出任何 verdict，由运行报告以 `D-001` 未收敛报出） | 语义面被实现成一个 verdict（越出冻结的部分覆盖），或重命名被判成 `stale`，或未登记目标被判成 `satisfied` |
+| `C-010` 追溯记录 schema | `U::test_c010_record_schema`（逐字段校验，含 `engine` / `engine_reason` / `ldm_summary` / `delivery.accepted` / `source` / `rendered[].path`）；`U::test_c010_relative_to_root`（记录内路径一律相对 `<root>`，绝对路径即红）；`U::test_c010_no_glob_no_guess`（只读 `--record` 指定的文件，不 glob `runs/`、不猜最新） | 记录里出现绝对路径、缺任一必填字段仍被判合格，或实现去 glob/猜最新记录 |
+| `C-011` 豁免记录 schema | `I::test_c011_exempt_ok`（`exempt-ok/` ⇒ `recorded-exemption` / `exempt-chronological`，`exempted=1`、`clean=false`、**`converged=true`**）；`I::test_c011_exempt_bad`（缺 `justification` ⇒ `not-evaluated` / `exemption-invalid`）；`I::test_c011_superseded`（`exemption-invalid` + `summary.exemption_superseded=1`） | 无效豁免被当成有效豁免放行（假绿）；或 `exempted>0` 仍 `clean=true`；或 `exempted>0` 把 `converged` 压成 `false` |
+| `C-012` `not-evaluated` 的封闭四项 | `I::test_c012_no_record_not_evaluated`（`no-trace/` 不传 `--record` ⇒ `not-evaluated` / `no-trace-record`）；`I::test_c012_two_faces_resolving_but_unrecorded`（两面齐 + 引用解析 + 无记录仍不是 `satisfied`）；`U::test_c012_four_conditions_closed`（四个条件各由自己的夹具驱动：`no-trace-record` / `trace-incomplete` / `exemption-invalid` / `render-unreadable`，第五个即失败） | 「文件都在」被当成「义务已履行」；或出现第五个 `not-evaluated` 条件；或引擎不可用被错列为其中之一（检查器不调引擎） |
+| `C-013` Payload 形态（含 `converged` / `clean`） | `U::test_c006_payload_schema`（顶层键与 `documents[]` 四字段）；`U::test_c013_clean_is_strict`（`missing`/`stale`/`not_evaluated` 任一非零 ⇒ 两谓词皆 false；`exempted>0` ⇒ `clean=false`；`carriers==0` ⇒ 两者皆 false）；`U::test_c013_empty_scope_not_converged`（默认作用域 `carriers==0` ⇒ `converged=false`）；`U::test_c013_converged_ignores_exemptions`（`exempted>0`、其余全零 ⇒ `converged=true` 且 `clean=false`）；`U::test_c013_only_empty_scope`；`U::test_c013_documents_field_set` | 四个假绿面任一漏判（`exempted>0`、`carriers==0`、`--only` 空作用域、`not-evaluated` 计作通过）；或 `converged` 被实现成 `clean` 的同义词 |
+| `C-014` 与既有守卫的关系 | `A1` / `A3` / `A5`（`test_expression_gate_wiring.py`）、`C3` / `C4a`（`test_docs_command_template.py`）、`KEEP_LIST`（`test_confirmation_gates_sweep.py`）、`test_directory_governance.py`、`C5`（`test_expression_compatibility.py`）——均为**既有测试**，本特性不改断言，只加义务指针；`tests/unit/test_docs_obligation_reuse.py` 以只读引用逐条钉住它们 | 任一守卫文件的冻结清单出现未登记变更（`C5` 的哈希比对），或本特性改写了某守卫的断言集 |
+| `C-015` 与既有 `validate` 动作的关系（不复用、不合并） | `U::test_c015_validate_not_merged`（`--action validate` 仍在 `choices` 且判据不变；`obligation` 是**并列**动作，两者不共享判据函数）；`U::test_c015_validate_zero_new_violations`（W1 调用点「零新增违规」基准不因新动作改变）；`U::test_c015_judged_together_in_r6`（R6 里两动作并列执行、各出各的 verdict） | 两个动作被合并进一个 `--action`（「今日合规、明日因新义务全红」的过渡态无法表达），或 `validate` 判据被本特性改动 |
+| `C-016` 逐文档判定的有序优先级 | `U::test_c016_precedence_order`（多档位同时成立的夹具，断言命中**最靠前**那档：`deleted-rendered/` 必须落 `reference-unresolved` 而非 `orphan-*`）；`U::test_c016_no_backtracking`（单趟、命中后 MUST NOT 被后续档位二次覆盖）；`U::test_c016_no_second_precedence_owner`（源码里不存在第二处 `verdict =` 的分支树） | 档位顺序被实现成集合判定（顺序无关）——attempt 1 的 `F-01` 本体；或出现第二处独立判定实现；或出现第二处优先级顺序声明（`C-004` 已不再声明顺序，见 `F-03`） |
 
-### B — `flow-obligations.contract.md`（`C-001`…`C-023`）
+### B — `flow-obligations.contract.md`（`C-001`…`C-023` + `C-008a`，共 24 条）
 
-| 条款 | 断言 / 夹具 | red-when |
-|------|-------------|----------|
-| `C-001` 第五类工件登记 | `F::test_c001_obligation_artifact_listed`（Desired-State Baseline 的工件清单含配套图义务） | 义务被写成「可选建议」而非工件 |
-| `C-002` Baseline `#### Assets` | `F::test_c002_assets_subsection_present`（`create-docs/SKILL.md` 出现 `#### Assets` 且含 `docs/assets/`——该小节由**实施期新建**，当前不在盘，因此这条断言在实施前**必然红**，这正是它作为「未交付即红」判据的用法） | 实现在盘上仍无 `#### Assets` 小节（落点区域无 owner 章节）；判据 MUST NOT 因其它小节含有 `docs/assets/` 字样而变绿 |
-| `C-003` Reconcile R2 口径 | `F::test_c003_r2_scope_names_obligation` | R2 的文档范围口径漏掉图维度 |
-| `C-004` Reconcile R3 差异含 verdict | `F::test_c004_r3_includes_verdicts`（R3 的 diff 描述含四计数） | R3 只报文本差异 |
-| `C-005` R4 干跑计划含产图行 | `F::test_c005_r4_dry_run_has_produce_rows` | 干跑计划无法预告产图/重渲染 |
-| `C-006` R6 残差报告四计数 | `F::test_c006_r6_residual_four_counts` | 残差只报总数不报分类 |
-| `C-007` Baseline 唯一落点 | `F::test_c007_baseline_single_owner`（§ Desired-State Baseline 是义务的唯一落点，不重述检查器 verdict 词表） | 义务在 Baseline 之外出现第二处定义；`--record` 调用点义务归 `C-008a` R6 / `diagram-obligation` C-012，不在本行 |
-| **`C-008a` Reconcile 收敛** | **`I::test_c008a_second_reconcile_zero_findings`**（S9 的四步：首次 R6 有 finding → R5 产图 → 第二次 R6 **`converged=true`**（按 `C-013` 的 `converged` 谓词：`judged_scope_has_carrier && missing` / `stale` / `not_evaluated` 三档全零）→ `git status` 空）；**`I::test_c008a_exemption_does_not_block_convergence`**（`exempt-ok/` 形态的夹具：`exempted=1` ⇒ 同一轮 `converged=true` 且 `clean=false`，即「靠豁免收敛」是合法终态） | 断言写成 `clean=true`（带豁免的空间永远变不了绿 ⇒ 收敛判据不可判定），或第二次运行仍有 `missing`/`stale`/`not_evaluated`，或第二次运行又写盘（churn） |
-| `C-009` 单落点（流程侧） | `F::test_c009_single_landing_named`（`create-docs` 的落点文字与 `C-009` 一致，无 `diagrams/` 子树） | 流程文本与契约落点冲突 |
-| `C-010` Authoring Flow 产图点 | `F::test_c010_authoring_flow_produces` | 新建文档时无产图步骤 |
-| `C-011` improve-docs `### 2. Gather evidence` | `F::test_c011_improve_pointer`（锚在真实标题上） | 指针指向不存在的章节 |
-| `C-012` improve-docs `### 4. Apply…` | `F::test_c012_improve_minimal_edit` | 最小编辑规则被改写成可大改 |
-| `C-013` improve-docs `### 5. Verify` | `F::test_c013_improve_verify_includes_obligation` | 校验步骤漏掉图维度 |
-| `C-014` improve-docs `### 6. Record and report` | `F::test_c014_improve_report` | 报告不含义务读数 |
-| `C-015` Authoring R2 | `F::test_c015_authoring_r2` | — |
-| `C-016` Authoring R5 | `F::test_c016_authoring_r5_render` | 重渲染步骤缺失 |
-| `C-017` Authoring R6 | `F::test_c017_authoring_r6` | — |
-| `C-018` `docs.md` 顶层章节序列 | `C3`（既有 `test_docs_command_template.py`） | 顶层序列被改动 |
-| `C-019` `docs.md` `### 分派` 义务指针 | `F::test_c019_dispatch_pointer` | 新增小节改动了 W1 接线小节 |
-| `C-020` `stop-and-confirm` 保留 | `KEEP_LIST`（既有 `test_confirmation_gates_sweep.py`） | 确认门被新增小节绕开 |
-| `C-021` 禁类别词 | `A1` / `A3` / `A5`（既有 `test_expression_gate_wiring.py`） | 新增文字引入类别词 |
-| `C-022` 冻结清单登记 | `C5`（既有 `test_expression_compatibility.py`）+ `manifest` key | 冻结清单哈希漂移且未登记 |
-| `C-023` 逐面拒绝语义的流程侧 | `F::test_c023_per_face_reasons_named`（`orphan-rendered` / `orphan-source` / `source-newer-than-render` 三值在流程文本里各自具名，且指向 `quickstart.md` S3 作为唯一步骤登记） | 流程侧把三面合并成一句「图有问题」 |
+| 条款 | 主体 | 断言 / 夹具 | red-when |
+|------|------|-------------|----------|
+| `C-001` | 四件在盘产物 | `I::test_c001_four_artifacts_one_run`（一次产出恰得四件：载体文档、可再编辑源、交付契约要求的全部渲染面、文档内解析得到的相对引用；缺任一件则该运行 MUST NOT 报完成） | 运行在缺一面或引用不可解析时仍报「完成」；或把追溯记录算成第五件（记录属 `C-003`） |
+| `C-002` | 按引用产生，不复制、不建第二渲染路径 | `F::test_c002_by_reference_only`（文档流程引用 `skills/external/draw-diagram` 路径，不复制其语义模型/路由判据/交付契约条文）；`F::test_c002_no_second_render_path`（反例闭集为空：无新增绘图脚本、无引擎选择表、无交付契约副本、无绕过前门的直调） | 任一处出现复制的语义模型或第二条渲染路径 |
+| `C-003` | 追溯记录同轮落盘 | `F::test_c003_record_same_run`（记录在与产图同一次运行内落盘）；`I::test_c003_missing_record_not_satisfied`（缺记录的图在检查器眼里是 `not-evaluated` / `no-trace-record`，不是 `satisfied`） | 记录缺失或延后到另一次运行仍被判 `satisfied` |
+| `C-004` | 引擎拒绝原样上抛 | `F::test_c004_refusal_carried_through`（前门 Step 2 preflight 失败 / Step 2.5 后端不可达 / Step 4 覆盖不通过三种拒绝各由自己的用例驱动：流程 MUST NOT 改写为「文档已写完，图跳过」、MUST NOT 本地即兴渲染、MUST NOT 标完成，措辞归 `draw-diagram`） | 任一种拒绝被吸收成「跳过」并仍报完成；或流程自行渲染 |
+| `C-005` | 共享图去重 | `I::test_c005_shared_diagram_single_source`（两份文档引用同一渲染件 ⇒ 源恰一个、记录 `diagrams[]` 恰一条同路径条目；更新写回该条而非 fork 成逐文档副本） | 共享图被 fork 成逐文档副本，或记录出现两条同路径条目 |
+| `C-006` | 既有图保持引擎层 | `I::test_c006_engine_sticky_on_update`（更新后记录的 `engine` 与更新前一致；只有新图走前门路由） | 更新现有图时引擎被重新路由 |
+| `C-007` | 义务唯一落点 = § Desired-State Baseline | `F::test_c007_baseline_single_owner`（义务正文只在该节出现，以「载体集合 + 义务 + 豁免」三项写出，引 `[D-003]` 载体表而非重列；该节不复述 verdict 词表） | 义务在 Baseline 之外出现第二处定义，或该节复述了检查器 verdict 词表 |
+| `C-008` | § Authoring Flow 三处接线（R2/R5/R6） | `F::test_c008_authoring_r2_plans_and_r6_checks`（R2 规划每份新文档的图类意图/预计引擎层/落点；R5 产两面 + 引用 + 记录；R6 跑 `--action obligation --record <本轮记录>` 并把 verdict 并入残差，任一非零 ⇒ MUST NOT 报收敛完成） | 三处接线任一缺失，或 R6 未把 verdict 并入残差 |
+| **`C-008a`** | **Reconcile 的收敛路径（R3/R4/R5/R6）** | **`I::test_c008a_second_reconcile_zero_findings`**（S9 四步：首次 R6 有 finding → R5 产图 → 第二次 R6 **`converged=true`**（按 `C-013` 谓词：`judged_scope_has_carrier && 三档全零`）→ `git status` 空）；**`I::test_c008a_exemption_does_not_block_convergence`**（`exempted=1` ⇒ 同一轮 `converged=true` 且 `clean=false`，即「靠豁免收敛」是合法终态）；`I::test_c008a_r3_r4_r5_wiring`（R3 三档都进差异集、R4 每条差异恰一条产图/重渲染条目且不进移动/归档 opt-out、R5 在 reconcile 内产图不委派 Authoring Flow） | 断言写成 `clean=true`（带豁免的空间永远变不了绿 ⇒ 收敛判据不可判定）；或第二次运行仍有三档非零；或 R5 把产图委派给 Authoring Flow |
+| `C-009` | 单一落点 `<root>/docs/assets/` | `F::test_c009_single_landing_named`（落点是 `docs/assets/<slug>.<ext>`，文档以相对引用指向它；无 `diagrams/` 子树；不新建顶层文档类型目录） | 出现第二落点（`docs/<类型>/diagrams/`），或新建顶层文档类型目录 |
+| `C-010` | 分级确认一格不加 | `F::test_c010_tiers_unchanged`（写图仍是 safe local writes 自动执行；移动/归档/重构仍是 stop-and-confirm；MUST NOT 引入第三档） | 出现第三档，或写图被提升为需确认 |
+| `C-011` | improve-docs `### 2. Gather evidence` | `F::test_c011_improve_pointer`（该节读文档的追溯记录，作为「哪张图/哪个引擎/哪两面」的机器证据；锚在真实标题上） | 指针指向不存在的章节，或该节不读记录 |
+| `C-012` | improve-docs `### 3. Classify` 的 **Diagram-sync** 行 | `F::test_c012_improve_minimal_edit`（分类表恰新增一行 **Diagram-sync**：改进改到了图所描绘的事实（组件名/关系/步骤顺序），验证后果为「同轮更新图或报具名 staleness finding，二者必居其一」） | Diagram-sync 行缺失，或其验证后果被写成「或」以外的含糊表述 |
+| `C-013` | improve-docs `### 4. Apply the minimal section-level edit` | `F::test_c013_improve_verify_includes_obligation`（命中 Diagram-sync 时按 `C-001`…`C-004` 更新；不命中时在原处打一行「本次无需图工作」并在报告里重复一次） | 不命中时不作声明地重渲染（为表演活动而渲染），或命中时不更新 |
+| `C-014` | improve-docs `### 5. Verify` | `F::test_c014_improve_report`（`--action obligation --only <该文档>` 的 verdict 必须是 `satisfied` 或有效 `recorded-exemption`；`stale`/`missing`/`not-evaluated` ⇒ MUST NOT 报改进完成） | Verify 步骤漏掉图维度，或非合格 verdict 仍报改进完成 |
+| `C-015` | 无法重渲染 ⇒ 具名 staleness finding + 源不动 | `F::test_c015_named_staleness_keeps_source`（引擎层不可用 ⇒ 报具名 staleness finding，且源文件保持不动；MUST NOT 回滚成「看起来一致」的形态） | 重渲染失败被静默吞掉，或源被回滚/降级 |
+| `C-016` | `docs.md` `### 分派` 的义务指针 | `F::test_c016_dispatch_names_both_paths`（该节增加一句：authoring 与 content 两条路径都受义务约束，义务正文只引两个技能，命令内不复述条文） | 命令里复述义务条文，或只声明了一条路径 |
+| `C-017` | 残差报告按技能归口分组 | `F::test_c017_residual_five_counts`（产出行把图维度并进分组：`satisfied`/`missing`/`stale`/`exempted`/`not-evaluated` 五计数按技能归口；MUST NOT 新增第六个分组名） | 出现第六个分组名，或计数缺项 |
+| `C-018` | `docs.md` 硬约束（守卫钉住） | `C3`（既有 `test_docs_command_template.py`：顶层章节序列不变）；`KEEP_LIST`（既有 `test_confirmation_gates_sweep.py`：`stop-and-confirm` 字面量保留在分派段）；`F::test_c018_improve_docs_literal_kept`（`improve-docs/SKILL.md` 字面量保留）；`F::test_c018_w1_section_byte_unchanged`（W1 类别读取小节逐字不动，新内容落在其后） | 任一条硬约束被本特性的改动破坏 |
+| `C-019` | 不新增命令 / 确认档 / 不改四技能分工 | `F::test_c019_no_new_command_no_new_tier`（义务只从既有流程的验证步骤可达；命令面不新增 `/speckit.*`、不新增确认档、四技能职责划分不变） | 新增 `/speckit.*` 命令、新增确认档，或改动四技能分工 |
+| `C-020` | 读者面新增一节（≤ 12 行） | `F::test_c020_reader_projection_bounded`（`docs/concepts/documentation-model.md` 新增一节 ≤ 12 行，只含「图随文档交付 / 无用可绘时有可见豁免 / 失步会被报出」三点；不复述 verdict 词表、不复述载体表、不成第二本规则书） | 超出 12 行、复述词表或载体表，或写成第二本规则书 |
+| `C-021` | 该文件留在 `docs/concepts/` 且路径不变 | `test_directory_governance.py`（既有：area-map 清单仍引用该路径）；`F::test_c021_path_unchanged`（该文件不在 `git diff --name-status` 里以 `R`/`D` 出现） | 该文件被移动、重命名或删除；area-map 不再引用它 |
+| `C-022` | 运行报告含 FR-022 四件 | `F::test_c022_report_carries_four_evidences`（运行报告含源路径、渲染产物路径（可多条）、文档引用、追溯记录路径；缺任一件的「已完成」MUST NOT 被写成证据） | 报告缺任一件却仍得出「已完成」结论 |
+| `C-023` | 负向可观测逐面点名 | `I::test_sc002_removing_either_face_turns_red`（三种各一次：删渲染面 ⇒ `missing`/`orphan-rendered`；删源 ⇒ `missing`/`orphan-source`；推进源 mtime ⇒ `stale`/`source-newer-than-render`）；`F::test_c023_per_face_reasons_named`（三值在流程文本里各自具名，并指向 `quickstart.md` S3 作为唯一步骤登记） | 三种任一不转红（「一直绿」= 未验证而非满足），或三面被合并成一句「图有问题」 |
 
 ### C — 守卫基线与「无新失败」红线
 
-本特性的实施 MUST NOT 让下列文件出现**新失败**（读数见 § Mirror Obligations 与 § Phase 1 的实跑块）：
+本特性的实施 MUST NOT 让下列文件出现**新失败**（读数见 § Mirror Obligations 与 § Phase 1 的实跑块）。
+一行一个文件，守卫 id 按它**实际所在的文件**归行——v1 把 A1/A3/A5、C3/C4a、C5 三组钉在同一个 `test_expression_compatibility.py`
+名下，那是把三个文件的守卫算成了一份（本轮的 `F-07`）：
 
-| 守卫 | 基线 | 判据 |
-|------|------|------|
-| `test_expression_compatibility.py` 五条具名守卫（A1 / A3 / A5 / C3 / C4a / C5） | 无新失败 | 用 `$PY`（能 import `typer` 的解释器）跑；裸 `python3` 的 import 错是**环境缺口**，不是结论 |
-| `test_directory_governance.py` | 无新失败 | 目录治理不被义务触发新增目录 |
-| `test_confirmation_gates_sweep.py` | 无新失败 | `KEEP_LIST` 覆盖 `stop-and-confirm` |
-| 仓库既有失败集 | 17 项已知红（见 § Residual Risk 的基线登记） | 允许集合不变；新增红即失败 |
-| 镜像检查 `sync-mirrors.py` / `regen-command-copies.py` | `exit 0`，六对镜全 ok | 同 `$PY` 前提 |
+| 守卫文件 | 钉住的守卫 id | 基线 | 判据 |
+|----------|---------------|------|------|
+| `tests/contract/test_expression_compatibility.py` | `C5`（74 条非接线源的 sha256 比对） | 无新失败 | 用 `$PY`（能 import `typer` 的解释器）跑；裸 `python3` 的 import 错是**环境缺口**，不是结论。本特性新增一条 `ALLOWED_POST_BASELINE_CHANGES` 条目（T071），`C5` 由红转绿 |
+| `tests/contract/test_expression_gate_wiring.py` | `A1` / `A3` / `A5` | 无新失败 | 新增文字 MUST NOT 引入引擎词或类别词；本特性不改断言，只加义务指针 |
+| `tests/contract/test_docs_command_template.py` | `C3` / `C4a` | 无新失败 | 顶层章节序列不变、W1 接线小节逐字不动 |
+| `tests/contract/test_confirmation_gates_sweep.py` | `KEEP_LIST`（含 `stop-and-confirm`） | 无新失败 | 确认门不被新增小节绕开；不引入第三档 |
+| `tests/contract/test_directory_governance.py` | area-map 清单 | 无新失败 | 义务 MUST NOT 触发新增顶层文档类型目录；`docs/concepts/documentation-model.md` 路径不变 |
+| 仓库既有失败集（全部 `tests/`） | — | 17 项已知红（见 § Residual Risk 的基线登记） | 允许集合不变；新增红即失败 |
+| 镜像检查 `sync-mirrors.py` / `regen-command-copies.py` | — | `exit 0`，六对镜全 ok | 同 `$PY` 前提 |
 
 ### D — 测试预算与红线
 
@@ -491,7 +506,7 @@ N/A — § Constitution Check 的 19 行全部 `✅ Pass`，无 `❌ Fail`、无
 |----|-----------|------------------|--------|----------|
 | D-001 | 图内标签 / 关系与文档正文所述事实的**语义**一致（`stale` 的第二半，见 T-003） | 检查器只读、无第三方依赖、无图形解析器（research R3/R4）；依赖 LDM 摘要的实现会把「本特性之前产生的手工图」判成假红 | `/speckit.review` 的评审面 + 后续特性（补语义判据时按 T-003 的 `revision_trigger` 重开） | `--action obligation` 的 `no-trace-record` 计数显著下降（LDM 摘要已普遍落盘），或评审面连续两次报出「机械绿但图文语义不一致」。**读法**：`quickstart.md` S9 的「零 finding」只指 `converged` 的三档全零（`missing`/`stale`/`not_evaluated`），MUST NOT 被读成「图文语义也一致」，也 MUST NOT 被读成 `clean=true`——带豁免的空间 `clean` 恒为假，而 `converged` 仍可为真 |
 
-已登记、但**不是**本特性风险的未决项：`OI-087-01` —— `checklists/requirements.md` 的派生计数副本与「23 FR / 10 SC」的实际计数共存（owner：`/speckit.checklist`；处置归 requirements 收尾；本阶段不改写，见 § Inherited Blockers 的最后一行）。
+已关闭的登记项：`OI-087-01` —— `checklists/requirements.md` 的派生计数副本已由该清单 **N6** 按宪法 XIV 删除而非改正（owner：`/speckit.checklist`，resolved 2026-11-06；`register.md` 同一行已更新）。`requirements.md` 是 FR/SC 集合的唯一 owner，其计数由 `validate-requirements.py` 每次派生，故不存在需要同步的第二个数字。
 
 ### 已知红基线（实施期的「无新失败」判据以此为准）
 

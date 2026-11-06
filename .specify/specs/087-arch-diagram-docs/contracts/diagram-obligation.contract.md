@@ -86,9 +86,11 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 | `recorded-exemption` | 文档带**有效**具名豁免记录（C-011） | — |
 | `not-evaluated` | 无法判定（C-012 的封闭四项） | — |
 
-- 五值**有序优先级**：`recorded-exemption` > `missing` > `not-evaluated` > `stale` > `satisfied`。
-  优先级只在同一文档可落多值时才起作用（例如带失效豁免且确实无图 ⇒ 记 `not-evaluated`
-  并给 `reason: exemption-invalid`，MUST NOT 记 `missing`——失效的豁免是「判不了」，不是「没有」）。
+- **顺序不在本条款声明**：本条款只声明五值构成一个**封闭集**（第五个值即违约）。同一文档可落多值时的
+  落档裁决**唯一归 `C-016`** 的九行有序优先级表——本条款 MUST NOT 复述该顺序，也 MUST NOT 给出第二份优先级。
+  只举一个非顺序性的例子说明「同值优先于失值」的直觉：带失效豁免且确实无图 ⇒ 记 `not-evaluated`
+  并给 `reason: exemption-invalid`，MUST NOT 记 `missing`（失效的豁免是「判不了」，不是「没有」）；
+  该例的**位次**仍以 `C-016` 为准。
 - **`recorded-exemption` 不是 pass**：`summary.exempted > 0` 时 `summary.clean` MUST 为 `false`，
   payload MUST 单独计数（FR-004：「记录的豁免不是 pass」）。**它不阻断 `summary.converged`**：豁免是合法终态，
   而 `converged` 只问「还有没有待收敛的 `missing` / `stale` / `not-evaluated`」（两谓词的定义点见 `C-013`；
@@ -184,13 +186,17 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 ## C-010 — 追溯记录 schema（FR-013、FR-022 的机器面）
 
 **落点**：每次产出或改动图的**运行**把记录 append 到
-`<root>/docs/.speckit/runs/<UTC 时间戳>-diagram-trace.json`（`<root>` 见 C-001）——一文一件，路径即身份
+`<root>/docs/.speckit/runs/<UTC basic>-<8 hex>-diagram-trace.json`（`<root>` 见 C-001）——一文一件，路径即身份
 （Concurrent Development Safety：两个并发的写入运行写不同路径，不共享可变聚合）。
+文件名形态在本条款**唯一钉死**，`data-model.md` 的 E4 行与 `quickstart.md` 只是它的发布视图，MUST NOT 另立形态：
+`<UTC basic>` = `YYYYMMDDTHHMMSSZ`（`datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')`），
+`<8 hex>` = 本次运行 id 的前 8 个十六进制字符（与 `test-evidence/` 的 `exec-quant` 记录同一约定）；
+两段之间、段与 `diagram-trace` 之间均为单个 `-`，扩展名恒为 `.json`。
 
 > **文件名形态是 `C-001` 的 `--record` 使用约定，不是检查器的发现机制**：
 > 检查器**只读 `--record` 明确点名的文件**（`C-006` 规则 3），不 glob 目录、不按时间戳猜「最新一份」——
 > 猜一份就让「记录被改 ⇒ 失步不可发现」重新成立，与 `FR-015` 相悖。流水线里只需
-> `--record docs/.speckit/runs/<最新时间戳>-diagram-trace.json`，那是**调用方**的选择。
+> `--record docs/.speckit/runs/<UTC basic>-<8 hex>-diagram-trace.json`，那是**调用方**的选择。
 
 ```json
 {
