@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261106T062030Z",
+  "rendered_at": "20261106T131633Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -238,6 +238,10 @@
     ".qoder/agents/framework-engineer.agent.md": {
       "source": "instances/framework-engineer.agent.md",
       "sha256": "e8830a02e04f6577b74dfa06c988ed0f9c48a321a958b58953caeb8ae00534ce"
+    },
+    ".qoder/agents/reporter.agent.md": {
+      "source": "templates/reporter.agent.md",
+      "sha256": "80e18f81edc00e72b5304e3aa210ef8ca66a797aab41952bd326e5e2c5624ecf"
     },
     ".qoder/agents/sdd-analysis-worker.agent.md": {
       "source": "templates/sdd-analysis-worker.agent.md",

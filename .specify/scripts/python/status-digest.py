@@ -408,15 +408,39 @@ def load_store_engine():
         spec.loader.exec_module(module)
     except (OSError, ImportError, SyntaxError, ValueError):
         return None
+    if not _read_field_slots(module):
+        return None
     return module
 
 
-#: The record's elapsed node slot and the run record's mode field, composed part-wise: both field slots are owned
-#: elsewhere (the record schema declaration via ``scripts/python/exec-quant.py``; ``mode`` is a member of the
-#: declaration's ``config_fields`` roster) and this file MUST NOT re-spell them as literals (C-70/C-71). The
-#: composed values are reached only through the engine's records at run time.
-_ELAPSED_NODE = "_".join(("elapsed", "ms"))
-_MODE_FIELD = "".join(("mo", "de"))
+#: The record's elapsed node slot and the run record's mode field, read from the engine's own source at run
+#: time: both field slots are owned elsewhere (the record schema declaration via ``scripts/python/exec-quant.py``;
+#: ``mode`` is a member of the declaration's ``config_fields`` roster) and this file MUST NOT re-spell them as
+#: literals (C-70/C-71). Both bind in :func:`load_store_engine` from the engine module's own faces; ``None``
+#: until then, and an unresolvable slot is an unavailable input reported as such — never guessed.
+_ELAPSED_NODE = None
+_MODE_FIELD = None
+
+
+def _read_field_slots(engine) -> bool:
+    """Bind the two engine-owned field-slot names from the engine's own faces (C-70/C-71).
+
+    The elapsed node is the ``*_ms`` quality node the engine itself writes; the mode field is the config field
+    the engine reads through its leaf accessor. Returns ``False`` when either cannot be resolved — an
+    unavailable input the caller reports, never a hard-coded default.
+    """
+    global _ELAPSED_NODE, _MODE_FIELD
+    try:
+        text = (REPO_ROOT / STORE_ENGINE).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return False
+    elapsed = re.search(r"[\"'](\w+_ms)[\"']:\s*NOT_EVALUATED", text)
+    mode = re.search(r"[\"'](\w+)[\"']:\s*leaf\(", text)
+    if elapsed is None or mode is None:
+        return False
+    _ELAPSED_NODE = elapsed.group(1)
+    _MODE_FIELD = mode.group(1)
+    return True
 
 
 def _quantity(node):
