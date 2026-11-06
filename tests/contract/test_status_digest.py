@@ -879,6 +879,89 @@ def test_c46_an_unreadable_line_set_is_not_evaluated_not_pass(tmp_path):
     )
 
 
+def test_c46_a_roster_outside_the_repository_is_judged_by_its_content(tmp_path):
+    """C-04 / REC-A2: an absolute `--roster` path outside the repo is read as given, never repo-prefixed.
+
+    SC-002's documented unblock step creates the roster in *another* project, so the population half of the
+    criterion is decided over a path this repository does not contain. The fixture is passed as an absolute path —
+    the caller-supplied form — and both readings of the *same* path are asserted (present seat, then absent seat),
+    so a helper that flattened every outside path into one verdict cannot satisfy this test.
+    """
+    registry = tmp_path / "registry"
+    registry.mkdir()
+    outside = tmp_path / "external-project"
+    outside.mkdir()
+    roster = outside / "outside-team.md"
+    roster.write_text(
+        "---\n"
+        "name: outside-fixture-team\n"
+        "members:\n"
+        "  - slug: lead\n"
+        "    role: lead\n"
+        "  - slug: reporter\n"
+        "    role: reporter\n"
+        "---\n",
+        encoding="utf-8",
+    )
+    assert REPO_ROOT not in roster.resolve().parents, (
+        "the fixture must live outside the repository, else it proves nothing about a caller-supplied path"
+    )
+
+    proc = _guard(["--roster", str(roster.resolve())], registry)
+    verdicts = _verdicts(proc.stdout)
+    status, reason = verdicts.get("RO-04", ("", ""))
+    assert status == "pass", (
+        "the roster path is in the population and supplies exactly one reporter seat, so its content must be read"
+        " into the verdict: the expected verdict is `pass`, not the `not-evaluated` an unread path produces;"
+        " got %r (reason %r)\nstdout=%r" % (status, reason, proc.stdout)
+    )
+    assert "1 roster path" in reason, (
+        "the reason must count the population it judged; got %r" % reason
+    )
+
+    roster.write_text(
+        "---\nname: outside-fixture-team\nmembers:\n  - slug: lead\n    role: lead\n---\n",
+        encoding="utf-8",
+    )
+    proc = _guard(["--roster", str(roster.resolve())], registry)
+    verdicts = _verdicts(proc.stdout)
+    status, reason = verdicts.get("RO-04", ("", ""))
+    assert status == "fail", (
+        "the same outside path with its reporter seat removed must be `fail`, never `not-evaluated`;"
+        " got %r (reason %r)" % (status, reason)
+    )
+    assert "absent reporter seat" in reason, (
+        "the reason must name the seat defect the content carries; got %r" % reason
+    )
+
+
+def test_c46_an_unreadable_roster_path_is_not_evaluated_not_fail(tmp_path):
+    """C-46 / REC-A2: a population path that cannot be read is `not-evaluated` with its path — never a seat defect.
+
+    The paired red for the test above: the two outside-path readings are only distinguishable if this one does
+    **not** come back `pass`, and an unreadable input must not be booked as an absent seat either.
+    """
+    registry = tmp_path / "registry"
+    registry.mkdir()
+    missing = tmp_path / "external-project" / "no-such-roster.md"
+    proc = _guard(["--roster", str(missing)], registry)
+    verdicts = _verdicts(proc.stdout)
+    status, reason = verdicts.get("RO-04", ("", ""))
+    assert status == "not-evaluated", (
+        "an unreadable roster path proves nothing about the seat, so it must be `not-evaluated`;"
+        " got %r (reason %r) — a `pass` or a `fail` here means the read error was booked as a finding"
+        % (status, reason)
+    )
+    assert "no-such-roster.md" in reason, "the reason must name the unreadable path; got %r" % reason
+    assert "absent reporter seat" not in reason, (
+        "an unreadable path must not be booked as an absent seat; got %r" % reason
+    )
+    assert proc.returncode == 0, (
+        "a `not-evaluated` proposition is not a finding (C-45); rc=%s stdout=%r"
+        % (proc.returncode, proc.stdout)
+    )
+
+
 def test_c46_an_empty_roster_population_is_not_evaluated_with_that_reason(tmp_path):
     """C-46 / C-04: zero population paths is `not-evaluated` — no glob is ever a default population."""
     registry = tmp_path / "registry"

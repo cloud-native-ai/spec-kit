@@ -1127,6 +1127,13 @@ def proposition_ro_04(rosters, roster_baseline):
     the same list the baseline captured rather than re-deriving it (`tasks.md` T035). A path supplied with
     ``--roster`` joins that list **for this run** — it is the second of the two sets the obligation binds. Zero paths
     is `not-evaluated` with that reason, never `pass`: no glob is ever a default population (contract C-04, C-46).
+
+    A path here is **caller-supplied**, so it is read with :func:`_read_any` and never with the repo-prefixing
+    :func:`_read_text`: SC-002's documented unblock step creates the roster in *another* project, and a path outside
+    this repository must be judged by its content rather than reported unreadable. Three outcomes stay distinct — a
+    path whose content carries no reporter seat is `fail`; a path the seat check passes is `pass`; a path that
+    cannot be read at all is `not-evaluated` with that reason, because an unreadable input proves nothing about the
+    seat and MUST NOT be booked as an absent seat, nor as a pass.
     """
     name = "RO-04"
     population = []
@@ -1143,10 +1150,11 @@ def proposition_ro_04(rosters, roster_baseline):
             " name-list holds no in-population row",
         )
     defects = []
+    unreadable = []
     for path_text in population:
-        text = _read_text(Path(path_text))
+        text = _read_any(path_text)
         if text is None:
-            defects.append("%s: unreadable" % path_text)
+            unreadable.append(path_text)
             continue
         seats = len(re.findall(r"^\s*role:\s*reporter\b", text, re.M))
         has_reason = re.search(r"^\s*reporting-reason:\s*\S", text, re.M) is not None
@@ -1161,6 +1169,12 @@ def proposition_ro_04(rosters, roster_baseline):
             defects.append("%s: %d reporter seats in team %s (the seat is at most one)" % (path_text, seats, slug))
     if defects:
         return _fail(name, "; ".join(defects))
+    if unreadable:
+        return _not_evaluated(
+            name,
+            "roster path(s) in the population are unreadable, so the seat check cannot be made: %s"
+            % ", ".join(unreadable),
+        )
     return _pass(name, "%d roster path(s) in population, no named defect" % len(population))
 
 
