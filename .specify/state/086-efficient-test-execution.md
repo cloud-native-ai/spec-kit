@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
-stage: clarify
-stage_started_at: 1793937900
-stage_deadline_epoch: 1793948700
-stage_base_commit: fee3f874
+stage: plan
+stage_started_at: 1793938380
+stage_deadline_epoch: 1793949180
+stage_base_commit: 554d8333
 attempt: 0
 retry_limit: 3
-last_verdict: clarify U4 pass: Feature 086 bound (no new/renumber); 4 self-adjudicated Q/A + A13–A19; validate-requirements ok 0/0; overlap-check clear; 085 surface untouched; stage commit fee3f874
+last_verdict: clarify U4 pass (Feature 086 bound; A13-A19; overlap clear; 085 untouched); checkpoint 02 written; plan dispatch next
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -121,6 +121,15 @@ last_verdict: clarify U4 pass: Feature 086 bound (no new/renumber); 4 self-adjud
 - wrap-up records：run-determination `skill:clarify-artifact` + `/speckit.clarify`；exec-quant 两条；feedback 两条；`should_prompt=true`（282/283 ≥ 10，非阻断通知，未自动发送）。
 - docs sync eval：`无需记录`（clarify 只收敛既有规格，无用户可见能力变化）。
 - next: `plan` dispatch（driver；临时 Team 在 clarify+plan U4 后创建）。
+
+## U4 clarify（2026-11-06T04:13Z）
+
+- sentinel: `CLARIFY-DONE`；stage commits `fee3f874` + `554d8333`。
+- Feature 086 已绑定（无新建/改号）；4 条自裁 Q/A + A13–A19；FR-024 增加 `-n`/`--numprocesses`/`--dist`/`--maxprocesses`。
+- driver independent re-runs: `overlap-check` clear（checked=1, overlaps=0）；`validate-requirements` 0/0；`pre-analyze --stage requirements` pass（advisories=1 future owner guideline）。
+- 085 diff in `3afe10df..HEAD` = empty；Wrap-up records present（session/feedback for `skill:clarify-artifact` and `speckit:clarify`）。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/02-clarify.md`。
+- next: `plan` dispatch（effective 2 = 1 plan coordinator + 1 verifier；carrier `SDD Executor`；临时 Team 待 plan U4 后创建）。
 
 ## U0.5 自检
 
