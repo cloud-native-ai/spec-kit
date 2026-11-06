@@ -1,0 +1,50 @@
+# Owner-literal baseline — Feature 087, T004
+
+**Capture date**: 2026-11-06T06:43Z (UTC)
+**Purpose**: measure the pre-change occurrences of the long-run cadence literal in the framework sources, so the
+post-change assertion is written against a **measured** tree instead of an assumed zero (`plan.md` EP-008,
+`requirements.md` SC-006).
+
+## Capture command (verbatim)
+
+```bash
+grep -rn "30 秒\|30 seconds" shared/ templates/ skills/ agents/
+```
+
+**Scan domain**: `shared/`, `templates/`, `skills/`, `agents/` — the four framework-source trees SC-006 names. `.specify/`
+and the per-tool copy trees (`.claude/`, `.github/`, `.opencode/`, `.qoder/`) are excluded because they are generated
+from these four (`plan.md` § Mirror Obligations), so a hit there would be a projection of a source hit, not an
+independent definition site.
+
+## Actual output (verbatim, complete — exit status 0)
+
+```text
+skills/external/draw-diagram/references/types/plantuml/references/howto/19-salt-diagram.md:12:**定位说明**：Salt 不追求高保真视觉——它故意保持手绘线框风格，让读者聚焦**布局与控件**而非配色图标。需要高保真 UI 时请用专业设计工具；Salt 的价值是"30 秒把界面结构写成文本、可进版本库"。
+skills/external/improve-skills/references/skill-slimming-principles.md:73:**Failure mode prevented**: SKILL.md becomes a wall of detail; the reader cannot tell what the Skill actually does in 30 seconds.
+```
+
+## Reading
+
+- **Exactly 2 hits**, both unrelated prose: a PlantUML Salt diagram-tool blurb ("write the UI structure as text in 30
+  seconds") and a skill-authoring heuristic ("the reader cannot tell what the Skill does in 30 seconds").
+- **Zero framework-source definition of a reporting interval exists at capture time.** The naive claim "zero hits
+  anywhere" is falsified by this tree, so no scan is ever written in that form (`tasks.md` T004 states the same).
+- The two hits are **whitelisted by path**, not by count. A future unrelated hit in another file legitimately fails
+  the post-change scan; that is the scan working as designed (`quickstart.md` Scenario E.2 premise 1).
+
+## Post-change assertion these two hits feed
+
+The post-change reading (delivered by `shared/guidelines/reporting-obligations.md` in T008 and judged by guard
+proposition RO-03 in T034) is:
+
+```bash
+grep -rn "30 秒\|30 seconds" shared/ templates/ skills/ agents/ \
+  | grep -v "draw-diagram/references" \
+  | grep -v "improve-skills/references/skill-slimming-principles.md"
+```
+
+**Expected**: exactly **one** line — the single definition site inside `shared/guidelines/reporting-obligations.md`.
+A second line means the literal was duplicated and RO-03 must report `fail` naming the second path.
+
+**Pre-change state of that same command**: not runnable as a meaningful assertion yet (the owner document does not
+exist), and this row takes the measurement only — it claims no contract clause.

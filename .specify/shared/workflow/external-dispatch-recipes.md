@@ -117,3 +117,4 @@ DISPATCH_LOG_DIR="<run-dir>/validators" \
 
 - **What this document is not**: the contract that makes a dispatch observable lives in [`subagent-definitions.md`](../definitions/subagent-definitions.md); the decision of *whether* a progression should run as an unattended loop lives in [`unattended-loop-pattern.md`](../patterns/unattended-loop-pattern.md). If a recipe here and the contract disagree, the contract wins — fix the recipe.
 - **Not a team substitute**: these recipes drive raw agent CLIs; structured multi-member runs with verifier seats and stall protocols belong to teams (`/speckit.team`), whose dispatch goes through the reference wrapper `skills/internal/create-team/scripts/dispatch.sh`.
+- **Reporting duty rides the same payload**: an in-scope dispatched flow also carries the reporting obligation — reached by path at [`reporting-obligations.md`](../guidelines/reporting-obligations.md); the recipes below stay command shapes and define none of it.

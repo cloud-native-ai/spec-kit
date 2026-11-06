@@ -1,0 +1,83 @@
+# Roster baseline (name-list form) — Feature 087, T003
+
+**Capture date**: 2026-11-06T06:43Z (UTC)
+**Form**: **name-list**, one path per line, each carrying its population class. This file records **no bare count**;
+the guard's RO-04 proposition re-measures this same list instead of re-globbing by hand (`tasks.md` T035), so the
+form is load-bearing rather than cosmetic.
+
+## Population condition (quoted from its owner, not restated)
+
+A roster is **in the population** when it is created or modified by this feature, or when it is supplied to the guard
+with `--roster` for that run. A roster is **outside the population** when it is an existing roster this feature
+neither creates nor modifies; no row retrofits it. Condition owner: `requirements.md` FR-006 (population = exactly
+two sets, no third) judged through `contracts/reporting-obligations.contract.md` C-04.
+
+## Capture commands (verbatim)
+
+```bash
+ls .specify/teams/*/team.md
+ls .specify/specs/*/team/*/team.md
+grep -l 'role: *reporter' .specify/teams/*/team.md .specify/specs/*/team/*/team.md
+```
+
+## Glob 1 — `.specify/teams/*/team.md` (12 paths)
+
+```text
+.specify/teams/command-logic-as-classified-skills/team.md
+.specify/teams/cws-workspace-cluster/team.md
+.specify/teams/demo-seat-dispatch/team.md
+.specify/teams/draw-diagram-interactive/team.md
+.specify/teams/draw-plantuml-optimizer/team.md
+.specify/teams/draw-two-layer-structure/team.md
+.specify/teams/post-refactor-mechanism-integrity/team.md
+.specify/teams/requirement-implement-monitor/team.md
+.specify/teams/session-driven-self-improvement/team.md
+.specify/teams/skill-layer-install-separation/team.md
+.specify/teams/summarize-project-optimizer/team.md
+.specify/teams/viz-skill-arena/team.md
+```
+
+## Glob 2 — `.specify/specs/*/team/*/team.md` (1 path)
+
+```text
+.specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md
+```
+
+## Reporter-seat reading
+
+```text
+grep -l 'role: *reporter' .specify/teams/*/team.md .specify/specs/*/team/*/team.md
+(no output — exit status 1: zero files match)
+```
+
+Cross-check with the same pattern plus `reporting-reason` over the two rosters roots also returned no output.
+**Zero reporter seats exist in the tree at capture time.**
+
+## Classified name list (the form T035 reads)
+
+Each line is `<path> | class=<in-population|outside-the-population> | why`.
+
+```text
+.specify/teams/command-logic-as-classified-skills/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/cws-workspace-cluster/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/demo-seat-dispatch/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/draw-diagram-interactive/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/draw-plantuml-optimizer/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/draw-two-layer-structure/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/post-refactor-mechanism-integrity/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/requirement-implement-monitor/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/session-driven-self-improvement/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/skill-layer-install-separation/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/summarize-project-optimizer/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/teams/viz-skill-arena/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+.specify/specs/085-sdd-temporary-goal-team/team/085-sdd-temporary-goal-team/team.md | outside-the-population | pre-existing roster; not created or modified by Feature 087
+```
+
+**Population size at capture: 13 paths listed, 13 outside the population, 0 in-population.** The zero is a
+measurement, not a policy: T015 later creates the seat obligation in the *schema* and T011 exercises it over
+fixtures, so any roster of this feature lands in the population only when a row creates or modifies it. Until then
+the guard's RO-04 has an empty population and MUST report `not-evaluated` with that reason — never `pass`
+(`contracts/status-digest.contract.md` C-46).
+
+**Generation-time probe consistency**: `tasks.md` T003 records the 2026-11-06 generation-time probe as `12` under
+`.specify/teams/` + `1` under `.specify/specs/*/team/`, `0` reporter seats. This capture reproduces it exactly.

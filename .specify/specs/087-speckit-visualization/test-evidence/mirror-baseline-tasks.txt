@@ -1,0 +1,59 @@
+# Mirror and copy baseline — Feature 087, T005
+
+**Capture date**: 2026-11-06T06:43Z (UTC)
+**Pass criterion for every later mirror row**: **no NEW drift**, never a bare exit code. The baseline below is already
+clean, so an exit code alone would prove nothing about what this feature changed; the counts and the per-pair `ok`
+lines are what a post-change reading is compared against (`plan.md` § Mirror Obligations, `tasks.md` GATE-2).
+
+## Capture commands (verbatim)
+
+```bash
+python3 scripts/python/sync-mirrors.py --check
+python3 scripts/python/regen-command-copies.py --check
+```
+
+## Actual output — `sync-mirrors.py --check` (verbatim, complete)
+
+```text
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (94 files)
+```
+
+**EXIT=0**
+
+## Actual output — `regen-command-copies.py --check` (verbatim, complete)
+
+```text
+OK: all per-tool command copies match the source templates.
+```
+
+**EXIT=0**
+
+## Per-pair baseline and the expected post-change delta
+
+| Pair | Files at baseline | Expected after the whole feature lands | Why |
+|------|-------------------|----------------------------------------|-----|
+| `templates/` ↔ `.specify/templates/` | 22 | 23 (+1) | new `templates/commands/status.md` is counted here; the `commands/` subtree is excluded from the *mirror* comparison but the source file still counts in the listed total |
+| `skills/external/` ↔ `.specify/skills/` | 415 | 415 (0) | `coaching-skills/SKILL.md` is edited in place |
+| `skills/internal/` ↔ `.specify/skills/internal/` | 138 | 139 (+1) | new `create-team/scripts/validate-roster.py` |
+| `agents/` ↔ `.specify/agents/templates/` | 16 | 17 (+1) | new `agents/reporter.agent.md` |
+| `scripts/` ↔ `.specify/scripts/` | 121 | 122 (+1) | new `scripts/python/status-digest.py` — a **STRICT** pair, so a source-only file FAILS `--check` |
+| `shared/` ↔ `.specify/shared/` | 94 | 95 (+1) | new `shared/guidelines/reporting-obligations.md` |
+| per-tool command copies | `OK`, 4 tool directories written (`_ASSISTANT_COMMAND_DIRS` configures 6; `.hermes/` and `.codex/` do not exist in this checkout) | still `OK`, plus `speckit.status.*` in `.claude/commands/`, `.github/prompts/`, `.opencode/command/`, `.qoder/commands/` | `templates/commands/status.md` is a new command template |
+
+**Reading**: zero drift on all seven surfaces before any edit. The four edited-only files
+(`shared/definitions/subagent-definitions.md`, `shared/workflow/external-dispatch-recipes.md`, the `create-team`
+documents, `coaching-skills/SKILL.md`) change bytes without changing any count, so a count rise larger than the
+`+N` column means an unintended file shipped and an unchanged count on a pair that should have gained a file means a
+mirror is missing.
+
+**Part-1 scope note**: Phase 1/2 deliver `shared/guidelines/reporting-obligations.md` (T008),
+`scripts/python/status-digest.py` (T009) and the two pointer-line edits (T010). Their mirrors are produced by the
+Polish row T039, per the part brief, and that row proves no NEW drift against this baseline. T009's `scripts/` pair
+is STRICT, so the file must not be left source-only at the end of the feature — this baseline is the fact that row is
+measured against.
