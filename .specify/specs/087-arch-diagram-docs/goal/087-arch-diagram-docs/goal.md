@@ -1,5 +1,5 @@
 ---
-status: active
+status: achieved
 created: 2026-11-06
 updated: 2026-11-06
 ---
@@ -26,3 +26,4 @@ updated: 2026-11-06
 ## History
 
 - 2026-11-06 — created.
+- 2026-11-06 — status active -> achieved.

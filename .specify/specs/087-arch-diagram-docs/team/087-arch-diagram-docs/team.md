@@ -4,7 +4,7 @@ slug: 087-arch-diagram-docs
 description: Run-scoped SDD team for Feature 087 — architecture-diagram-centric docs; stage-specific agents, explicit concurrency, per-agent worktrees and stage checkpoints.
 scope: spec
 spec_dir: .specify/specs/087-arch-diagram-docs
-lifecycle_state: active
+lifecycle_state: archived
 goal: >-
   Deliver Feature 087 through the full SDD chain: make "every generated or improved formal document
   carries an architecture diagram or a named exemption" a decidable fact, wire the obligation into the
