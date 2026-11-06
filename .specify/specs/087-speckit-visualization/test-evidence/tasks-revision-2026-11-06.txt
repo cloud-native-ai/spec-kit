@@ -1,0 +1,185 @@
+---
+# Tasks-stage revision close-out — the 2026-11-06 second slice (Phase 8 / T055–T078)
+
+Scope: close the bookkeeping the Phase 8 authoring pass left open — Clause Coverage Ledger re-read, the
+in-body statements that still describe the pre-revision file, the accepted-warning adjudication, and the
+self-check readings below. Phase 8's 23 rows (T055–T078) are NOT reworded and NOT re-ranked.
+Write territory: `tasks.md` + this file only.
+Not touched: requirements / plan / data-model / contracts / quickstart / research / feature-ref / checklists /
+`coverage-baseline.txt` (no contract clause was added or removed). State spine not written
+(`.specify/state/087-speckit-visualization.md` left exactly as found).
+Captured: 2026-11-06, readings re-taken after the edits (all four commands below re-run on the final tree).
+
+## 1. `python3 .specify/scripts/python/validate-tasks.py .specify/specs/087-speckit-visualization/tasks.md`
+
+Exit status: 0
+Last line (verbatim):
+`PASS (with warnings): .specify/specs/087-speckit-visualization/tasks.md — 0 error(s), 20 warning(s)`
+
+Warning-class census over that invocation's output:
+```
+     14  green-cross-phase:
+      6  green-path-divergence:
+      0  green-dangling
+      0  green-clause-collision
+```
+Every one of the 20 is a member of the two classes adjudicated as accepted in `tasks.md` →
+§ Within Each User Story → WARNING ADJUDICATION. No third class appears, so **no new adjudication category was
+created** for this reading; Phase 8's warnings were folded into the existing two.
+
+Rows involved, per class (row ids; line numbers shift with edits and are omitted on purpose):
+
+`green-cross-phase` (14): T014→T015, T017→T018, T019→T052, T024→T026, T052→T053, T027→T028, T036→T037,
+T059→T061, T064→T076, T065→T066, T066→T067, T069→T070, T070→T071, T076→T077.
+Of these, **7 belong to Phase 8**: T059, T064, T065, T066, T069, T070, T076.
+
+`green-path-divergence` (6): T012↔T021, T012↔T032, T021↔T032 (all over
+`tests/contract/test_reporting_obligations.py`); T028↔T033, T028↔T061, T033↔T061 (all over
+`tests/contract/test_status_digest.py`). Of these, **2 belong to Phase 8**: T028↔T061 and T033↔T061.
+
+Phase 8 therefore contributes 9 of the 20 readings — the same two classes, produced by the same two mechanisms
+(contract clause ids follow *design* reading order while task ids follow *execution* order; one test file
+legitimately carries clauses of several contracts). Adjudicated, not re-ranked. The driver's ruling — accept the
+two warning classes, hold `validate-tasks.py` to 0 error, and do NOT reorder rows to silence warnings — is what
+this reading implements.
+
+## 2. `python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/087-speckit-visualization --stage tasks --repo .`
+
+Exit status: 0
+Last line (verbatim):
+`pre-analyze-check: stage=tasks decision=pass errors=0 advisories=72 waived=0`
+
+Summary object from the JSON body (verbatim subset):
+`"summary": {"errors": 0, "advisories": 72, "waived": 0, "fr": 29, "sc": 14, "tasks": 73, "clauses": 0, "files": 17}`
+`"decision": "pass"`, `"checked_at": "2026-11-06T08:50:31Z"`.
+
+Advisory composition: all 72 are `missing-path` verdicts over the second slice's not-yet-written files
+(`tests/contract/test_measure.py`, `tests/unit/test_measure_unit.py`,
+`tests/contract/test_efficiency_element.py`, `templates/commands/measure.md`,
+`.specify/scripts/python/measure.py`, `.specify/templates/commands/`) as named by plan.md, tasks.md and the
+contracts. That is exactly the tasks stage's premise: the tasks file names the files the implement stage will
+create. Zero errors, zero waivers.
+
+## 3. `python3 .qoder/skills/sdd-loop-driver/scripts/decomposition-check.py --mode tasks …`
+
+Exit status: 0, verbatim:
+`{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 29, "task_count": 73, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T08:50:31Z"}`
+
+`task_count: 73` — the target reading; `fr_count: 29` (the universe includes the second slice's
+FR-023…FR-029); decision `proceed`, `reasons: []`.
+
+## 4. `python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/087-speckit-visualization`
+
+Exit status: 1 — the command's own status line is `status: uncovered`. This is a *coverage-completeness* reading,
+not a tasks-file validity reading: the 25 uncovered names are enumerated and each is answered with a reason and a
+named asserting row in `tasks.md` → § Clause Coverage Ledger.
+
+Key lines (verbatim):
+```
+claimed clauses (this feature): 47
+uncovered beyond baseline: 25
+companion (must be non-empty on a green run): claimed clauses 47, scanned files 274, clause universe 1748, FR universe 29
+  [fr-uncovered] pass (0) — 29 of 29 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form
+  [coverage-baseline-delta] fail (25) — baseline holds 573 names; 573 uncovered items are baseline-internal and do not block
+```
+
+The 25 `BEYOND-BASELINE` names (verbatim order), which are the ledger's 25 rows, member for member:
+```
+087-speckit-visualization/contracts/efficiency-element.contract.md#C-65
+087-speckit-visualization/contracts/efficiency-element.contract.md#C-69
+087-speckit-visualization/contracts/efficiency-element.contract.md#C-70
+087-speckit-visualization/contracts/efficiency-element.contract.md#C-71
+087-speckit-visualization/contracts/measure-report.contract.md#C-60
+087-speckit-visualization/contracts/ownership-map.contract.md#C-48
+087-speckit-visualization/contracts/reporter-seat.contract.md#C-14
+087-speckit-visualization/contracts/reporter-seat.contract.md#C-18
+087-speckit-visualization/contracts/reporter-seat.contract.md#C-21
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-02
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-03
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-05
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-06
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-07
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-08
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-09
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-10
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-11
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-12
+087-speckit-visualization/contracts/reporting-obligations.contract.md#C-13
+087-speckit-visualization/contracts/status-digest.contract.md#C-72
+087-speckit-visualization/contracts/status-report.contract.md#C-23
+087-speckit-visualization/contracts/status-report.contract.md#C-30
+087-speckit-visualization/contracts/supervision-report.contract.md#C-36
+087-speckit-visualization/contracts/supervision-report.contract.md#C-38
+```
+
+Contracts' clause universe for this feature: C-01…C-72 = **72** clauses over eight files (reporting-obligations
+C-01…C-13, reporter-seat C-14…C-21, status-report C-22…C-31, supervision-report C-32…C-40, status-digest
+C-41…C-46 + C-72, ownership-map C-47…C-52, measure-report C-53…C-62, efficiency-element C-63…C-71).
+47 claimed + 25 unclaimed = 72.
+
+Green-tag arithmetic (all re-derivable from `tasks.md`):
+- `grep -o '\[green: contracts/[^]]*\]' tasks.md | sort -u | wc -l` → `47` (47 claim tags, 47 distinct clauses,
+  none repeated)
+- `grep -c '\[green: contracts/' tasks.md` → `49` (47 claim tags + 2 in-row references to a claim tag inside
+  row prose, which are not claims)
+- `grep -c '\[green:' tasks.md` → `52` (49 + the 3 bare `[green:]` literals)
+- the 5 non-claim literals are: the § Format legend template `[green: <contract>#<clause>]` (twice), and three
+  bare `[green:]` prose references (the ledger's Reading paragraph, the ledger's table header, § Notes' partition
+  phrase)
+
+## 5. What this revision changed in `tasks.md` (the diff's own reading)
+
+- § Clause Coverage Ledger: re-read from the accountant (`47 / 25 / 72`), the table rebuilt to the command's
+  actual beyond-baseline set (19 pre-revision rows preserved verbatim + 6 new rows: efficiency-element C-65,
+  C-69, C-70, C-71; measure-report C-60; status-digest C-72), the name-collision paragraph corrected (081's
+  `C-01` is a bullet-form clause this corpus does not parse; 053's `C-01`s live only in prose), the
+  "one count, two readings" paragraph re-derived. Every stale `33` / `19 unclaimed` / `52 clauses` statement is
+  gone.
+- § WARNING ADJUDICATION: the accepted-class paragraphs generalized from "five documents" to the eight contracts,
+  a paragraph folding Phase 8's nine readings into the same two classes with their reasons, and the "does NOT
+  claim all 52" statement corrected to 72.
+- Header: Tests Mode's layer mapping now names the second slice's test files and the third delivered script.
+- DoD: DoD-1 `#1–#28` → `#1–#40`; DoD-2's suite list gains the second slice's files plus the pre-existing
+  `test_coaching_dispatch_contract.py` / `test_exec_quant_engine.py`; DoD-5's domain corrected to the nine
+  `final`-path criteria (SC-014 is `supporting`); DoD-6 gains the read-only citations; a new DoD-7 states the
+  `supporting`-criterion rule (captured reading **or** explicit `not-measured`). The DoD Status block carries the
+  new warning count and the DoD-7 open line.
+- § Dependencies & Execution Order: a Phase 8 bullet (both inner chains, their convergence on T073, and why it
+  lands after Phase 7); a paragraph in § User Story Dependencies stating why Phase 8 carries no `[US<n>]` label.
+- § Parallel Opportunities: a Phase 8 bullet naming the three parallel test rows and the two sequential chains.
+- § Incremental Delivery: a seventh step for the scope revision.
+- § Notes: the `[blockedBy:]` bullet widened to cover `measure.py`; the unclaimed-clause count corrected to
+  `25 of 72` with the current reading inline; a new bullet on the second slice's by-anchor discipline; the
+  evidence-sink bullet now names three sinks; the ID-form bullet records that `T057` is a gap and is deliberately
+  NOT reclaimed; a new bullet surfaces the second slice's missing test files.
+
+## 6. Anomalies found while closing this ledger (surfaced, not silently repaired)
+
+1. The second slice's test files are absent while their rows are `[x]`: `tests/contract/test_measure.py`,
+   `tests/unit/test_measure_unit.py` and `tests/contract/test_efficiency_element.py` do not exist; nor do
+   `scripts/python/measure.py` and `templates/commands/measure.md`. Yet T055, T056, T058, T059, T060, T061, T062,
+   T063, T064, T065, T066, T067, T068, T069, T070, T071, T072, T073, T074, T075, T076, T077 and T078 all read
+   `[x]`, and the Phase 8 checkpoint claims the captures exist. `test-evidence/us5-measure.txt`,
+   `us5-efficiency-element.txt` and `us5-readonly-store.txt` are absent from `test-evidence/`, and
+   `success-criteria.txt` carries only the first slice's tables. The completion markers are left exactly as the
+   previous pass wrote them: re-marking them is a `/speckit.implement` adjudication, not a tasks-stage bookkeeping
+   correction, and this pass has no evidence that would justify either direction.
+2. Phase 8's row prose carries dangling internal cross-references that were NOT rewritten (rows are frozen):
+   T055 names "T073's closure read" for the surface count while T073 claims a different subject;
+   T073's text claims "the two-surface counting clause" (efficiency-element C-63) while already carrying
+   `efficiency-element#C-68` — a clause that T064, not T073, would have to claim for that statement to hold.
+   Effect on the ledger: **none** (C-63 and C-68 are both claimed, C-63 by nobody and C-68 by T064 — the tags
+   resolve, the prose does not). Effect on execution: an implement-stage reader following T073's prose would look
+   for a closure read that lives in T075.
+3. The driver's brief read the beyond-baseline set as "about 23 names, including C-62 and C-69…C-71". Measured:
+   **25** names; the set contains C-65, C-69…C-71, C-60 and C-72 from the second slice, but **not** C-62 (T065
+   claims it). The pre-revision 19 are all still present. The measured set is what the ledger now carries; the
+   brief's membership list is short by three and long by one.
+4. `T057` does not exist: Phase 8's ids run T055, T056, T058…T078. The file has 73 task rows over the id range
+   T001–T056, T058–T078 plus T051–T054, which is why `decomposition-check.py` reads `task_count: 73` while the
+   highest id is `T078`. No id was reused, renumbered or reclaimed by this pass.
+5. The working tree already held this run's `tasks.md` change before this pass started
+   (`git diff 56f3f881..HEAD -- tasks.md` → `313 insertions, 0 deletions`; `git diff -- tasks.md` →
+   `100 insertions, 42 deletions`), consistent with the previous pass writing the file but not committing it.
+   This pass committed only `tasks.md` + this evidence file.
