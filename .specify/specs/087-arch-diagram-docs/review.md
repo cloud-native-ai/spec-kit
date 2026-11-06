@@ -1,3 +1,146 @@
+# SDD Review — 087-arch-diagram-docs — Round 2 (2026-11-06)
+
+> **Round 2 of the same review.** Round 1 (`37d93787`) returned `blocked` on 1 P0 / 6 P1 / 18 P2. The repair
+> commit is `b06c93a7`. This section re-judges the closure of those findings, the four segment verdicts, the
+> regression set and the Acceptance Reality Check. The round-1 report follows unchanged as a dated record; its
+> finding bodies (F1–F25), quoted excerpts and recommendations are not rewritten here.
+
+## R2.0 Object and authority
+
+| Field | Value |
+|-------|-------|
+| Feature | 087-arch-diagram-docs（架构图为核心的文档空间） |
+| Branch / worktree | `line/087-arch-diagram-docs` / `/home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs` |
+| Base | `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08` |
+| Round-1 report head | `37d937872613f97c5141bfb36e8bbc17e678dd1c` |
+| Round-2 review head | `b06c93a7678b432a2c7649a1c9df21575124a081` (review-repair) |
+| Review date | 2026-11-06 |
+| Reviewer | Qoder agent `sdd-review-executor` (unattended run; no user ruling in session) |
+| Environment | Linux x86_64; bash; CPython 3.11.13; pytest 9.2.0 |
+| Round-2 evidence | `test-evidence/review-round2.txt`; round-1 evidence kept at `test-evidence/review-smoke.txt` and `test-evidence/review-repair.txt` |
+
+## R2.1 Four segment verdicts
+
+| Segment | Round-1 verdict | Round-2 verdict | Basis |
+|---------|-----------------|-----------------|-------|
+| Process | `blocked` | **pass**, P2 residuals F10/F11 | F1/F7 closed (verification.md on disk, closure checker `accept`); F8/F9 closed; F10/F11 remain dated-record P2s |
+| Artifact | `blocked` | **pass-with-residuals** — 11/11 expected members present; one P1 residual (F2 at `feature-ref.md:72`); P2 F13/F17/F28 | coverage 11/11 (round 1: 10/11); F1/F3/F12/F14/F15/F16/F18/F19/F20 closed; F13/F17 partially open |
+| Implementation | `blocked` | **pass**, P2 residuals F26/F27 | F3/F4/F5/F7 closed in substance; F6's primary defect closed; F21/F22/F23/F24/F25 closed; two new P2s |
+| Code | `blocked` (2 blocking, 6 important, 1 suggestion) | **pass** — gate `allow`; 0 blocking / 0 important / 2 suggestions | all 2 blocking and 6 important entries closed in substance; residual documented as F26/F27 at P2 |
+
+## R2.2 F1–F28 status (round-2 disposition)
+
+| ID | Sev (round 1) | Status | Round-2 evidence |
+|----|---------------|--------|------------------|
+| F1 | P0 | **closed** | `verification.md` has 10 `SC-NNN_status`/`_value`/`_note` rows, the one smoke triple, and joint-acceptance rows; `closure-acceptance-check.py` → `verdict: accept`, `final_path pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6`, exit 0; feature still `Planned`. Residual: `post_change_commit=pending-this-round` (F28) |
+| F2 | P1 | **partial** (one site open) | `requirements.md:289` and `plan.md:32/81` carry the FR-001 exception; **`feature-ref.md:72` still reads the unqualified "不改本仓 `docs/` 的内容"**. FR/SC semantics unchanged (single-line diff at requirements.md:289) |
+| F3 | P1 | **closed** | `data-model.md` E6, `plan.md:493`, `tasks.md` DoD-4/T005 and `quickstart.md` all read "repository copy == E6 registered composition"; `build_fixtures.py --check` is byte-exact. `orphan-rendered/` `rendered: []` is a deliberately incomplete record under C-010's `rendered[].path`; E6 registers that shape and C-016 order 5 (face loss) precedes order 6, so the fixture still exercises the intended tier; tier 9 is covered independently by `clean/` |
+| F4 | P1 | **closed** | Tier 9 requires `_has_rendered_face` (C-007 condition 2); a source-only reference lands `missing`/`orphan-rendered`; `test_c007_source_only_reference_is_not_satisfied` is on disk and red against `37d93787`'s engine, green at `b06c93a7` |
+| F5 | P1 | **closed** | `DIAGRAM_SUFFIXES` carries `.html`, `.pdf`, `.drawio`, `.excalidraw` (plus the pre-existing graphviz family); the comment names `draw-diagram`'s delivery contract D1/D2 as the extension-table owner. The spec contract has no suffix table, so no second table exists; `test_c010_html_face_is_recognised` is on disk and red against the old engine. Note: the pre-existing `.dot`/`.gv`/`.dotx` entries are not in D2, so the comment's "MUST NOT invent an extension the contract does not carry" is stricter than the tuple — a pre-existing inconsistency, not introduced by this repair |
+| F6 | P1 | **closed in substance; residual tracked as F26** | No `../../specs/087-.../contracts/` link remains in the shipped skills; `skills/external/create-docs/references/diagram-obligation.md` is on disk and cited by both skills; mirrors byte-identical. Two dead spec-local links remain (F26) |
+| F7 | P1 | **closed in substance** | The acceptance surface now exists and the closure checker accepts; `checkpoints/07-implement.md` still records `U4: pass` from before the file existed — a dated record, not rewritten by this review |
+| F8 | P2 | **closed** | `test-evidence/analyze-report-round2.md` is on disk; the analyze stage row's `evidence_ptr` names it |
+| F9 | P2 | **closed** | `audit-plan-changes.py --base 61e39e8f --head HEAD` → `undeclared=false`, `classification=declared`, 6 touched plan-owned paths all covered by `PLAN-EDIT:` lines |
+| F10 | P2 | **open** (accepted as dated history) | The `/tmp/087-toolenv` and `/tmp/w087/` readings remain in dated stage evidence; this round used `.specify/.tmp/` and removed it. No new occurrence |
+| F11 | P2 | **open** (partially labelled) | The round-2 analyze report labels 77 as the measured reading (L6); `analyze-repair-round1.md:129` still carries the unlabelled 84 |
+| F12 | P2 | **closed** | The four stale assertion names are replaced; all four implemented names resolve (`test_c003_same_run_wording`, `test_c007_no_record_not_satisfied`, `test_c018_hard_constraints_kept`, `test_c018_top_level_sequence_unchanged_and_confirm_literal_kept`) |
+| F13 | P2 | **open** (partial) | `feature-ref.md:30` still lists `.specify/templates/commands/docs.md` as a generated copy; that subtree is absent on disk and `plan.md:266` says it is retired on both sides. The `OI-087-01` half is fixed |
+| F14 | P2 | **closed** | `data-model.md:46` attributes the five values to `C-004` and the precedence to `C-016` only |
+| F15 | P2 | **closed** | `quickstart.md` S8 cites real sections; contract `C-014` names `tasks.md` as the DoD owner instead of a nonexistent `plan.md § Definition of Done` |
+| F16 | P2 | **closed** | `.specify/memory/features/087.md` reads `C-001…C-016`, `flow-obligations` A–F + `C-008a`, and `S1–S9` |
+| F17 | P2 | **open** (partial) | The S3 command block is reproducible (step 1 exits 0); the S3 premises table's `clean/` `--record` value and the S5 command still use `20261106T000000Z-aaaaaaaa...` and a repository-relative path that joins the root twice (both exit 2, evidence §10) |
+| F18 | P2 | **closed** | The plan's residual-risk row states both denominators (17 `tests/contract` subset; 26 full-suite baseline) and instructs comparison against 26 |
+| F19 | P2 | **closed** | The `#### Assets` note is a dated plan-time reading and says the subsection has landed |
+| F20 | P2 | **closed** | `checklists/requirements.md` reads five verdict values (citing C-004/C-016) and `A1–A12` |
+| F21 | P2 | **closed** | The missing-root check is scoped to `obligation`; `validate --root /nonexistent` exits 0 with `{"violations": []}`, `obligation` exits 2 |
+| F22 | P2 | **closed** | `removeprefix` / `is_relative_to` are gone from code (comment references only); the `>=3.8` floor holds |
+| F23 | P2 | **closed** | Fenced blocks are blanked with equal line counts; `test_c005_fenced_block_does_not_shift_the_line` pins it |
+| F24 | P2 | **closed** | SC-001's assertion resolves the link target and requires it to be one of the record's `rendered[].path` values |
+| F25 | P2 | **closed** | `build_fixtures.py --check` byte-compares every registered file; `--help` exits 2 without rebuilding; the probe left `git status` empty |
+| F26 | P2 (new) | **open** | Two dead spec-local links remain in the shipped `create-docs` skill: `contracts/diagram-obligation.contract.md` (line 61) and `quickstart.md` (line 75); `improve-docs/SKILL.md:119` also cites `quickstart.md` S3. None resolves in a client project. See R2.5 |
+| F27 | P2 (new) | **open** | Dual ownership: `contracts/diagram-obligation.contract.md` declares itself owner of the closed verdict/reason sets, precedence and record schemas; the shipped `references/diagram-obligation.md` declares itself owner of "the two record formats and the verdict vocabulary". The precedence tables differ in granularity (contract `C-016` 9 rows; reference § 7 8 rows, two pairs merged), and the reference's header says "six-value verdict set" while listing five verdicts. See R2.5 |
+| F28 | P2 (new) | **open** | `verification.md:29` still reads `post_change_commit=pending-this-round`; the template expects a commit SHA (`templates/verification-log-template.md:89`) |
+
+**Round-2 counts**: P0 **0 open / 1 total** (F1 closed); P1 **1 partial open / 6 total** (F2; F6's residual moved to P2/F26); P2 **7 open / 21 total** (open: F10, F11, F13, F17, F26, F27, F28; closed: F8, F9, F12, F14, F15, F16, F18, F19, F20, F21, F22, F23, F24, F25).
+
+## R2.3 Code segment (round 2)
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Base / head | `24cb4edc` / `b06c93a7` | round-1 base plus the repair commit |
+| Round-2 delta judged | `37d93787..b06c93a7` (32 paths in 5 commits: four review-artifact commits + the repair) | `git diff --name-only` |
+| Round-1 code findings | 2 blocking, 6 important, 1 suggestion | `code-review.md` round-1 record |
+| Round-2 disposition | **2 blocking closed; 6 important closed in substance; 1 suggestion closed**; 2 new suggestions (F26/F27) | R2.2 and `code-review.md` § Round 2 |
+| Gate verdict | `allow` | `git-delta-review.sh report --summary --file code-review.md` after the round-2 rewrite: 0 blocking, 0 important, 2 suggestions |
+| Full-delta coverage receipt | the round-1 receipt (`changed=177 / judged=11 / skipped=166 / gap=0`, head `37d93787`) remains the dated record; round 2 re-judged the six prior code findings and the two new suggestions file by file, and did not re-run a receipt over the full delta | `code-review.md` |
+
+## R2.4 Acceptance Reality Check (round 2)
+
+| Field | Value | Source |
+|-------|-------|--------|
+| Claimed status (read, never written) | `Planned` | `.specify/memory/features.md:94`; `.specify/memory/features/087.md:6` |
+| `final_path` record, copied verbatim | `pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6` | `closure-acceptance-check.py --spec-dir .specify/specs/087-arch-diagram-docs` |
+| Closure verdict | `accept` | same, exit 0 |
+| Completion conditions | `every_final_path_pass=true`, `no_open_rows=true`, `smoke_record_pass=true`, `status_row_per_criterion=true` | `--json` payload |
+| Smoke record | 1 record; command = the five 087 files; `smoke_exit_code=0`; `test-evidence/smoke.txt` exists (1370 bytes) | `--json` payload |
+| Tasks | 76 closed / 0 open / 0 deferred | `--json` payload |
+| Transition judged | `Implemented → Ready for Review` — not attempted: the feature is not at `Implemented` | state machine owner: `templates/feature-details-template.md` § Canonical Status State Machine |
+| `Planned → Implemented` | its four completeness conditions now hold (closure `accept`, 10 status rows, one smoke record, zero open tasks); the flip is `/speckit.implement`'s act, not this review's | same |
+| Status left unchanged | `Planned` — no flip, no fabricated `Implemented` / `Ready for Review` / `Completed` | this run |
+
+**Status recommendation (not executed)**: after the open P1/P2 documentation residuals are closed (F2 at `feature-ref.md:72`; F13/F17; F26/F27/F28), an authorized `/speckit.implement` run may flip `Planned → Implemented`; a later review/checklist run may then flip `Implemented → Ready for Review` — all four mechanical conditions for that transition hold today (0 deferred tasks, review evidence produced, 0 blocking entries in the current code record, every `final`-path criterion `pass`). `Completed` remains a human/governance act. No status was written by this review.
+
+## R2.5 New findings (round 2)
+
+### F26 — Two spec-local links remain in the shipped create-docs skill (P2)
+
+- **Location**: `skills/external/create-docs/SKILL.md:61`, `:75`; `skills/external/improve-docs/SKILL.md:119`; mirrors under `.specify/skills/`.
+- **Evidence**: line 61 links `[contracts/diagram-obligation.contract.md](contracts/diagram-obligation.contract.md)`; line 75 links `[quickstart.md](quickstart.md)`; `ls skills/external/create-docs/contracts` and `ls skills/external/create-docs/quickstart.md` are both absent. Line 61 is also pinned by `test_c007_baseline_single_owner`, which requires the literal `contracts/diagram-obligation.contract.md` in the obligation item, so removing it requires a test change (not taken by this review).
+- **Why it matters**: a client project receives `.specify/skills/create-docs/`; both links are dead there. The primary F6 harm is fixed — the record schema, verdict/reason table and exemption schema are now in the shipped reference — so this is quality-of-life, not the original P1.
+- **Proposed fix**: cite the contract by its framework-repository path in prose (not a relative Markdown link) and remove the `quickstart.md` link (or replace both with `references/diagram-obligation.md` pointers); adjust the guard literal in the same change.
+
+### F27 — The shipped reference and the spec contract both declare ownership of the same vocabulary (P2)
+
+- **Location**: `skills/external/create-docs/references/diagram-obligation.md:3-6`; `.specify/specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md:4-10`.
+- **Evidence**: the contract says "Declared owner of this contract: this file. It owns … the closed `verdict` set, the closed `reason` set, the per-document decision precedence (`C-016`), … the traceability-record schema and the exemption-record schema"; the shipped reference says "Owner of this file: the two record formats and the verdict vocabulary". The precedence tables also differ in granularity (9 rows vs 8, the `trace-incomplete`/`no-trace-record` pair merged), and the reference header says "six-value verdict set" while § 4 lists five.
+- **Why it matters**: the F6 repair intended the shipped reference to become the client-facing owner and the contract to remain a dated design record; the contract was not demoted, so the same facts now have two authored owners and can drift (Constitution XIV). The two copies currently agree on the five verdicts and reason pairs.
+- **Proposed fix**: mark the contract as the dated design record (or have it point at the shipped reference for the vocabulary), make the shipped reference's precedence table the 9-row projection (or state explicitly that it merges tiers), and correct the "six-value" sentence to name the five verdicts as distinct from the verification log's six statuses.
+
+### F28 — `verification.md` keeps a placeholder commit (P2)
+
+- **Location**: `.specify/specs/087-arch-diagram-docs/verification.md:29`.
+- **Evidence**: `post_change_commit=pending-this-round`; `templates/verification-log-template.md:89` expects `[GIT_SHA_AT_RUN_END]`.
+- **Why it matters**: a later reader cannot tie the smoke reading to a commit; the closure checker does not read this field, so it passes silently.
+- **Proposed fix**: write the run-end commit (`b06c93a7` for the repair round, or the driver's final commit) in place of the placeholder.
+
+## R2.6 Round-2 test readings
+
+| Command | Reading |
+|---------|---------|
+| five 087 files | `124 passed, 1 warning in 4.86s`, exit 0 |
+| five guard files | `1 failed, 120 passed`, exit 1; the failure is `baseline-failed.txt` line 3 (`test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`) — the recorded baseline name, no guard drift |
+| `build_fixtures.py --check` | `OK: 11 … bytes`, exit 0; `--help` exit 2; fixtures `git status` empty |
+| closure checker | `verdict: accept`; `final_path pass=6 … total=6`; exit 0 |
+| plan audit | `undeclared=false`, `classification=declared`; exit 0 |
+| mirrors / command copies | 6/6 pairs `ok`; copies `OK`; exit 0 |
+| red-first | the two new negatives fail against `37d93787`'s engine (`2 failed, 38 deselected`) and pass at `b06c93a7` |
+
+No full-suite run was made; the baseline slot belongs to the driver.
+
+## R2.7 Round-2 self-containment
+
+- [x] Every new finding names an exact repo-relative path and line; every quoted excerpt is short enough to judge without opening the file.
+- [x] The round-2 counts are derived from the R2.2 table: 0 P0 open, 1 P1 partial, 7 P2 open.
+- [x] The status transition recommendation cites the state-machine owner and does not write the status spine.
+- [x] The round-1 report below is preserved as a dated record; its verdicts are superseded only by R2.1–R2.4.
+
+---
+
+# Round 1 report — dated record (commit 37d93787, 2026-11-06)
+
+> Preserved unchanged. Read its verdicts as round 1's; the round-2 section above supersedes the status table,
+> the segment verdicts and the Acceptance Reality Check.
+
 # Specification-Driven Development (SDD) Process Review Report: 087 架构图为核心的文档空间（Architecture-Diagram-Centric Documentation Space）
 
 > **Audience**: spec-kit framework maintainers.

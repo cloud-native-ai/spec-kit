@@ -1,3 +1,60 @@
+# Code Review Report — Round 2 (087-arch-diagram-docs)
+
+| 属性 | 值 |
+|------|-----|
+| **轮次** | Round 2 — review-repair 复核 |
+| **基准** | `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08` (`24cb4edc`) |
+| **目标** | `b06c93a7678b432a2c7649a1c9df21575124a081` (`b06c93a7`) |
+| **本轮增量** | `37d93787..b06c93a7`（5 个提交：4 个 review 工件提交 + 1 个修复提交） |
+| **基准来源** | `feature-first-commit`（round-1 base，未变） |
+| **渲染模式** | `renderer: text` |
+| **Reviewer** | `Qiming Liu (John)` |
+| **日期** | `2026-11-06T10:36:30Z` |
+| **Round-2 evidence** | `.specify/specs/087-arch-diagram-docs/test-evidence/review-round2.txt` |
+
+## Round 2 verdict
+
+**Gate: `allow`.** Round-1's 2 `blocking` and 6 `important` entries are closed in substance; the only
+current entries are two `suggestion`s (F26/F27 below). The gate is read by
+`git-delta-review.sh report --summary --file code-review.md`: `blocking=0`, `important=0`,
+`suggestion=2`, exit 0.
+
+| Round-1 entry | Severity | Disposition |
+|---------------|----------|-------------|
+| `docs-utils.py:402` — suffix list misses D1/D2 faces (F5) | blocking | **closed** — `DIAGRAM_SUFFIXES` carries `.html`, `.pdf`, `.drawio`, `.excalidraw`; `test_c010_html_face_is_recognised` is on disk and red against `37d93787`'s engine |
+| `docs-utils.py:656` — source-only reference reported `satisfied` (F4) | blocking | **closed** — tier 9 requires `_has_rendered_face`; `test_c007_source_only_reference_is_not_satisfied` red-then-green |
+| `docs-utils.py:429` — fenced-block removal shifts line numbers (F23) | important | **closed** — `_blank_fenced_blocks` preserves line counts; `test_c005_fenced_block_does_not_shift_the_line` |
+| `docs-utils.py:791` — global `--root` check changes existing actions (F21) | important | **closed** — check scoped to `obligation`; `validate --root /nonexistent` exits 0, `obligation` exits 2 |
+| `docs-utils.py:520/604` — 3.9+ APIs against a 3.8 floor (F22) | important | **closed** — slice/`relative_to` forms; `removeprefix`/`is_relative_to` appear only in explanatory comments |
+| `test_docs_obligation_scenarios.py:539` — SC-001 reference assertion too loose (F24) | suggestion | **closed** — the assertion resolves the link target and requires a `rendered[].path` member |
+| `create-docs/SKILL.md:61-69` + `improve-docs/SKILL.md:57` — spec-local contract links (F6, two entries) | important | **closed in substance** — no `../../specs/087-.../contracts/` link remains; the schema/reason table now ships in `references/diagram-obligation.md`; the remaining dead links are F26 (suggestion) |
+| `build_fixtures.py:295` — `--check` not byte-exact, unknown flags rebuild (F25) | important | **closed** — byte comparison; `--help` exits 2; the probe left `git status` empty |
+
+### 🟢 [SUGGESTION] skills/external/create-docs/SKILL.md (Line 61)
+
+> Two spec-local links remain in the shipped skill: [`contracts/diagram-obligation.contract.md`](contracts/diagram-obligation.contract.md) at line 61 and [`quickstart.md`](quickstart.md) at line 75; `skills/external/improve-docs/SKILL.md:119` also cites `quickstart.md` S3. Neither resolves in a client project (the skill ships as `.specify/skills/create-docs/`). The primary F6 harm is fixed — the record schema, verdict/reason table and exemption schema now live in the shipped reference — so this is a suggestion, not a repeat of the important entry. Line 61 is also pinned by `test_c007_baseline_single_owner`, so removing it needs a test change. Fix: cite the contract by its framework-repository path in prose and replace the `quickstart.md` links with `references/diagram-obligation.md` pointers. (F26)
+
+<sub>10:36:30</sub>
+
+### 🟢 [SUGGESTION] skills/external/create-docs/references/diagram-obligation.md (Line 3)
+
+> Dual ownership: the spec contract (`contracts/diagram-obligation.contract.md:4-10`) declares itself owner of the closed verdict/reason sets, the precedence and the two record schemas; the shipped reference (`references/diagram-obligation.md:3-6`) declares itself owner of "the two record formats and the verdict vocabulary". The precedence tables differ in granularity (contract `C-016` 9 rows; reference § 7 8 rows, two pairs merged), and the reference header says "six-value verdict set" while § 4 lists five. The two copies currently agree on the five verdicts and reason pairs, so this is a drift risk rather than a live wrong reading. Fix: demote the contract to the dated design record (or point its vocabulary at the shipped reference), align the precedence table, and correct the "six-value" sentence. (F27)
+
+<sub>10:36:30</sub>
+
+**Round-2 scope note.** The delta `37d93787..b06c93a7` contains 32 paths: the 7 code/test files re-judged
+above, spec artifacts and review evidence, generated mirrors, and one fixture record. The round-1
+coverage receipt (177 changed / 11 judged / 166 skipped / 0 gap at head `37d93787`) remains the dated
+coverage record; this round did not re-run a receipt over the full feature delta and does not restate
+its four counts. No full test suite was run; the targeted readings are in `test-evidence/review-round2.txt`.
+
+---
+
+# Round 1 code record — dated record (head 37d93787, 2026-11-06)
+
+> Preserved as the round-1 record. Its seven finding headings are demoted to `####` and marked
+> `resolved` so the round-2 gate reads only the current entries; the opinion bodies are unchanged.
+
 # Code Review Report — 代码段 (code segment)
 
 | 属性 | 值 |
@@ -198,42 +255,42 @@
 ## Review 意见
 
 
-### 🔴 [BLOCKING] skills/external/create-docs/scripts/docs-utils.py (Line 402)
+#### R1 [BLOCKING — resolved in b06c93a7] skills/external/create-docs/scripts/docs-utils.py (Line 402)
 
 > The recognisable-diagram suffix list is a second, incomplete copy of draw-diagram's delivery table. DIAGRAM_SUFFIXES omits the D1-mandatory .html face and the D2 .drawio/.excalidraw sources and .pdf render; a conformant document that links widget.html, widget.drawio or widget.pdf is judged missing/no-diagram-reference. Probes on copies of tests/fixtures/docs-obligation/clean/ reproduced all three false reds. Fix: derive the suffix set from skills/external/draw-diagram/references/delivery-contract.md (or add .html/.pdf/.drawio/.excalidraw) and add fixtures.
 
 <sub>18:06:25</sub>
 
 
-### 🔴 [BLOCKING] skills/external/create-docs/scripts/docs-utils.py (Line 656)
+#### R1 [BLOCKING — resolved in b06c93a7] skills/external/create-docs/scripts/docs-utils.py (Line 656)
 
 > Tier 9 returns satisfied when the document's only reference points at the editable SOURCE (widget.mmd) and both faces exist. C-007 condition 2 requires the reference target to be a rendered[].path. Probe: clean/ copy, document changed from ../assets/widget.svg to ../assets/widget.mmd, engine returns satisfied/reference-resolves. The SC-001 assertion (tests/integration/test_docs_obligation_scenarios.py:539) only checks '../assets/' and '](', so it cannot catch this. Fix: require the resolved target to be one of the entry's rendered[].path before tier 9, and add a negative fixture.
 
 <sub>18:06:25</sub>
 
 
-### 🟠 [IMPORTANT] skills/external/create-docs/scripts/docs-utils.py (Line 429)
+#### R1 [IMPORTANT — resolved in b06c93a7] skills/external/create-docs/scripts/docs-utils.py (Line 429)
 
 > Fenced-code removal uses re.sub(r'\`\`\`.*?\`\`\`', '', text, flags=re.S), which deletes the block's newlines and shifts every later line number. A document with a 5-line fenced block before its diagram link (link on line 9) reports line=5. C-005 requires line to be the reference's line. Fix: replace each fenced block with the same number of newlines (or blank lines) so line numbering is preserved.
 
 <sub>18:06:25</sub>
 
 
-### 🟠 [IMPORTANT] skills/external/create-docs/scripts/docs-utils.py (Line 791)
+#### R1 [IMPORTANT — resolved in b06c93a7] skills/external/create-docs/scripts/docs-utils.py (Line 791)
 
 > The new global 'if args.action != obligation and not root.is_dir(): return 2' changes every existing action's behaviour on a missing root. Base 24cb4edc: validate/scan/stats exited 0 with an empty JSON payload; new: exit 2. C-015 says validate's exit-code semantics are unchanged, and no task row asks for this change. Fix: scope the check to obligation (as the branch already does) or record and test the behaviour change explicitly.
 
 <sub>18:06:25</sub>
 
 
-### 🟠 [IMPORTANT] skills/external/create-docs/scripts/docs-utils.py (Line 520)
+#### R1 [IMPORTANT — resolved in b06c93a7] skills/external/create-docs/scripts/docs-utils.py (Line 520)
 
 > str.removeprefix (line 520) and Path.is_relative_to (line 604) are Python 3.9+ APIs. pyproject.toml declares requires-python >=3.8 and RS-001 promises the new scripts/tests run on >=3.8; on a 3.8 interpreter the new action raises AttributeError. Fix: use startswith/slicing and a try/relative_to or string-prefix check, or raise the declared floor and record the change.
 
 <sub>18:06:25</sub>
 
 
-### 🟢 [SUGGESTION] tests/integration/test_docs_obligation_scenarios.py (Line 539)
+#### R1 [SUGGESTION — resolved in b06c93a7] tests/integration/test_docs_obligation_scenarios.py (Line 539)
 
 > SC-001's 'reference' assertion accepts any '../assets/' link (it never checks the target is a rendered face). It would pass a document that links widget.mmd, which is the behaviour the second blocking finding describes. Tighten the assertion to the trace record's rendered[].path(s).
 
@@ -242,14 +299,14 @@
 
 
 
-### 🟠 [IMPORTANT] skills/external/create-docs/SKILL.md (Line 61)
+#### R1 [IMPORTANT — resolved in b06c93a7] skills/external/create-docs/SKILL.md (Line 61)
 
 > The shipped skill links the obligation to ../../specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md (lines 61-63, 69). The runtime mirror is .specify/skills/create-docs/SKILL.md, so that relative link resolves to .specify/specs/087-arch-diagram-docs/... — the authoring repository's development spec, which no client project receives. In a consuming project the trace-record schema, carrier table and exemption schema the skill names are unreachable (dead link), and the skill cannot be followed by the book. Fix: move the normative schema/table to a shipped reference under skills/external/create-docs/references/ (or inline the record schema in the skill) and keep the spec contract as the dated record.
 
 <sub>18:06:49</sub>
 
 
-### 🟠 [IMPORTANT] skills/external/improve-docs/SKILL.md (Line 57)
+#### R1 [IMPORTANT — resolved in b06c93a7] skills/external/improve-docs/SKILL.md (Line 57)
 
 > Same portability defect as the create-docs pointer: the content-improvement flow sends a client reader to ../../specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md for the verdict vocabulary and reason table, but the shipped mirror is .specify/skills/improve-docs/SKILL.md and the linked spec is not part of any client runtime. The skill quotes none of the vocabulary, so the client has no reachable owner. Fix: cite a shipped reference (or the checker's own --help/payload) rather than the authoring spec.
 
@@ -258,7 +315,7 @@
 
 
 
-### 🟠 [IMPORTANT] tests/fixtures/docs-obligation/build_fixtures.py (Line 295)
+#### R1 [IMPORTANT — resolved in b06c93a7] tests/fixtures/docs-obligation/build_fixtures.py (Line 295)
 
 > The builder's __main__ treats every argument except --check as 'rebuild': a plain '--help' invocation ran build_all() and rewrote tests/fixtures/docs-obligation/orphan-rendered/.../20261106T090000Z-0870a1b2-diagram-trace.json (added the PNG face and two sha256 values). check() only verifies path presence/absence, so it still printed OK — the 'repository copy == registered composition' invariant does not cover record bytes. This review's accidental run changed that file and it was restored to HEAD before this record was refreshed; the defect remains. Fix: make check() byte-compare each fixture against the builder's deterministic output (or a committed hash manifest), and make unknown flags exit 2 instead of rebuilding.
 
