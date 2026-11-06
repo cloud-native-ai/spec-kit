@@ -13,6 +13,13 @@ for unaccounted full runs, and per-stage ``stage-status`` completeness over the
 full applicable-stage denominator (a missing or empty evidence file stays in the
 denominator and reports ``unknown``).
 
+Command recognition: only the tokens a runner command carries are inspected, and
+every value-carrying flag contributes no positional argument. That includes the
+parallel switches (``-n`` / ``--numprocesses`` / ``--dist`` / ``--maxprocesses``,
+in both the separated and the attached form), so an explicitly parallel full run
+classifies as a full run instead of degrading to "targeted" against a path named
+``auto`` (086 FR-024/FR-025).
+
 Exit codes: 0 pass, 1 audit failure, 2 input or parse error.
 
 Python >= 3.8, standard library only.
@@ -35,7 +42,14 @@ E3_STAGES = ("clarify", "plan", "tasks", "checklist", "analyze", "review")
 SKIP_STATUS = "not-applicable-skipped-stage"
 SKIP_MARKER = "checklist=skipped(fast-lane)"
 RUNNER_TOKEN = "run-tests.sh"
-VALUE_FLAGS = ("--names-out", "-m", "-k", "--maxfail", "-p", "--rootdir", "-c")
+VALUE_FLAGS = ("--names-out", "-m", "-k", "--maxfail", "-p", "--rootdir", "-c",
+               "-n", "--numprocesses", "--dist", "--maxprocesses")
+# The subset of VALUE_FLAGS that pytest also accepts in an attached form (`-n4`,
+# `-n=4`, `--numprocesses=auto`, `--dist=loadfile`). Matching only the separated
+# token would let the value fall through as a positional argument and turn a
+# parallel full run into a "targeted" run against a path named `4` or `auto`
+# (086 FR-024/FR-025, C-017/C-018).
+ATTACHED_VALUE_FLAGS = ("-n", "--numprocesses", "--dist", "--maxprocesses")
 
 
 class InputError(Exception):
@@ -217,6 +231,21 @@ def _check_full_slot(row, label, violations, unknown, closure):
                           % label)
 
 
+def is_attached_value_flag(token):
+    """True for `-n4`, `-n=4`, `--numprocesses=auto`, `--dist=loadfile`, …"""
+    for flag in ATTACHED_VALUE_FLAGS:
+        if not token.startswith(flag) or token == flag:
+            continue
+        remainder = token[len(flag):]
+        if remainder.startswith("="):
+            remainder = remainder[1:]
+        # A flag with no remainder is the separated form, handled above as an exact
+        # token match; only a token that actually carries a value is matched here.
+        if remainder:
+            return True
+    return False
+
+
 def command_suffix(line):
     index = line.find(RUNNER_TOKEN)
     if index < 0:
@@ -234,6 +263,8 @@ def command_suffix(line):
             continue
         if token in VALUE_FLAGS:
             skip_next = True
+            continue
+        if is_attached_value_flag(token):
             continue
         if token.startswith("-"):
             continue
