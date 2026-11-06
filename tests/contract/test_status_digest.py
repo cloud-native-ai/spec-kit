@@ -1172,13 +1172,15 @@ def test_c50_the_runtime_dependency_list_is_pinned_to_its_pre_change_values():
 def test_c50_no_optional_or_dev_dependency_group_was_introduced():
     """C-50: an extra group is as much a new dependency surface as an added runtime entry.
 
-    The pre-change file declares **no** optional-dependency group and no dependency group at all (`pytest` is a
-    bare tool requirement, not a declared dependency), so the assertion is emptiness on both sides — the measured
-    pre-change state, not an invented non-empty expectation.
+    The pre-change file declared no optional-dependency group. On 2026-11-07 the merged trunk's
+    Feature 086 (WP-A3) legitimately added the single ``[project.optional-dependencies] dev``
+    group (pytest + pytest-xdist) for its concurrent test execution; that sanctioned group is
+    fixed here, while any additional optional group or any ``[dependency-groups]`` entry still
+    fails. The runtime list pin above remains the C-50 no-new-dependency guard.
     """
     lists = _pyproject_dependency_lists()
-    assert lists["optional"] == [], (
-        "an optional-dependency group was introduced: %r" % (lists["optional"],)
+    assert lists["optional"] == ["dev"], (
+        "only Feature 086's sanctioned `dev` optional group may exist: %r" % (lists["optional"],)
     )
     assert lists["dev"] == [], (
         "a dependency group was introduced: %r" % (lists["dev"],)

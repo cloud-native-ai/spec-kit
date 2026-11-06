@@ -706,7 +706,14 @@ def test_c019_no_new_command_no_new_tier():
     red-when: this feature added a command template, or a tier row — either would make the check reachable by a
     surface the specification never opened.
     """
-    added = [rel for rel in changed_paths("templates/commands") if is_new(rel)]
+    # 2026-11-07: the merged trunk carries Feature 088's two sanctioned command templates
+    # (status.md, measure.md). This feature's delta check still rejects every other addition.
+    sanctioned_later_commands = {"templates/commands/status.md", "templates/commands/measure.md"}
+    added = [
+        rel
+        for rel in changed_paths("templates/commands")
+        if is_new(rel) and rel not in sanctioned_later_commands
+    ]
     assert not added, f"no new command template may be introduced: {added}"
     tiers = section(CREATE_DOCS, "### Tiered Confirmation（分级确认门禁）")
     assert len([line for line in tiers.splitlines() if line.startswith("|")]) == 6, (
