@@ -1,0 +1,75 @@
+# second-slice review smoke — 2026-11-06T12:24:55Z
+## targeted suites
+...................                                                      [100%]
+91 passed in 5.70s
+## measure.py live summary (read-only, exit 0 saved below)
+window: all records
+selection: every unit the store holds
+cap: 200
+unit=/speckit.analyze type=command records=25 elapsed=540500.0 min=308000 max=7921000 provenance=carried covered=12/25 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.checklist type=command records=21 elapsed=253000 min=253000 max=253000 provenance=carried covered=1/21 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.clarify type=command records=24 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.feedback type=command records=5 elapsed=2700000 min=2700000 max=2700000 provenance=carried covered=1/5 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.implement type=command records=10 elapsed=719497 min=430000 max=1908000 provenance=carried covered=3/10 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.instructions type=command records=2 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.interview type=command records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.plan type=command records=25 elapsed=479000 min=293000 max=986000 provenance=carried covered=3/25 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.requirements type=command records=24 elapsed=344000 min=252000 max=1284000 provenance=carried covered=5/24 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.review type=command records=20 elapsed=970000 min=409000 max=1069000 provenance=carried covered=3/20 tokens=not_evaluated invocations=not_evaluated
+unit=/speckit.tasks type=command records=23 elapsed=422000 min=34965 max=4694000 provenance=carried covered=5/23 tokens=not_evaluated invocations=not_evaluated
+unit=skill:analyze-artifacts type=skill records=3 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:clarify-artifact type=skill records=2 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:closure-repair type=skill records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:code-review type=skill records=7 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:create-plan type=skill records=2 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:create-requirements type=skill records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:git-utils type=skill records=2 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:implement-feature type=skill records=2 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:improve-skills type=skill records=7 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:manage-constitution type=skill records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:manage-feedback type=skill records=1 elapsed=2700000 min=2700000 max=2700000 provenance=carried tokens=not_evaluated invocations=not_evaluated
+unit=skill:review-feature-quality type=skill records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:review-sdd-process type=skill records=7 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:sanitize-materials type=skill records=1 elapsed=1020000 min=1020000 max=1020000 provenance=carried tokens=not_evaluated invocations=not_evaluated
+unit=skill:sdd-house-keeping type=skill records=1 elapsed=not_evaluated tokens=not_evaluated invocations=not_evaluated
+unit=skill:sdd-loop-driver type=skill records=9 elapsed=12660000 min=12660000 max=12660000 provenance=carried covered=1/9 tokens=not_evaluated invocations=not_evaluated
+excluded: unreadable=0 legacy-format=19 outside-window=0 unknown-unit=0 outside-cap=0 read=247
+11 figures measurable
+rc=0
+## measure.py --action json key set
+['cap', 'excluded', 'exit_hint', 'rows', 'selection', 'window']
+## closure-acceptance-check --json (verdict block only)
+{
+ "claimed_status": "Planned",
+ "final_path": {
+  "blocked": 0,
+  "deferred": 0,
+  "fail": 0,
+  "partial": 2,
+  "pass": 8,
+  "total": 10,
+  "unknown": 0
+ },
+ "reasons": [
+  {
+   "code": "final-path-not-pass",
+   "target": "SC-001"
+  },
+  {
+   "code": "final-path-not-pass",
+   "target": "SC-002"
+  },
+  {
+   "code": "runtime-dependency-not-owned",
+   "target": "RS-007"
+  }
+ ],
+ "verdict": "block",
+ "tasks": {
+  "closed": 73,
+  "deferred": 0,
+  "in_progress": 0,
+  "open": 0
+ }
+}
+rc=0

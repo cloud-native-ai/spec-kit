@@ -590,3 +590,109 @@ file.165.verdict=reviewed
 file.166.path=tests/unit/test_status_digest_unit.py
 file.166.verdict=reviewed
 <!-- coverage-receipt:end -->
+
+<!-- coverage-receipt:begin · second slice · /speckit.review r20261106T040353Z-087a-rev -->
+# Second-Slice Coverage Receipt (dated 2026-11-06)
+
+| Field | Value |
+|-------|-------|
+| Delta | `git diff --name-only a3d4be1a..50487649` |
+| Changed / judged / skipped / gap files | 46 / 46 / 0 / 0 |
+| Renderer | text (git-delta absent) |
+| Segment verdict | pass — findings P1×3 / P2×2 recorded in `review-second-slice.md` § 6 |
+| Per-file verdicts | every path below `reviewed`; the judged substance is in `review-second-slice.md`, not repeated per path |
+
+paths=46
+file.1.path=.claude/commands/speckit.measure.md
+file.1.verdict=reviewed
+file.2.path=.github/prompts/speckit.measure.prompt.md
+file.2.verdict=reviewed
+file.3.path=.opencode/command/speckit.measure.md
+file.3.verdict=reviewed
+file.4.path=.qoder/commands/speckit.measure.md
+file.4.verdict=reviewed
+file.5.path=.specify/scripts/python/measure.py
+file.5.verdict=reviewed
+file.6.path=.specify/scripts/python/status-digest.py
+file.6.verdict=reviewed
+file.7.path=.specify/shared/definitions/probe-definitions.md
+file.7.verdict=reviewed
+file.8.path=.specify/shared/guidelines/reporting-obligations.md
+file.8.verdict=reviewed
+file.9.path=.specify/specs/087-speckit-visualization/checklists/efficiency-measure-2026-11-06.md
+file.9.verdict=reviewed
+file.10.path=.specify/specs/087-speckit-visualization/checkpoints/10-revision-cycle.md
+file.10.verdict=reviewed
+file.11.path=.specify/specs/087-speckit-visualization/contracts/efficiency-element.contract.md
+file.11.verdict=reviewed
+file.12.path=.specify/specs/087-speckit-visualization/contracts/status-digest.contract.md
+file.12.verdict=reviewed
+file.13.path=.specify/specs/087-speckit-visualization/data-model.md
+file.13.verdict=reviewed
+file.14.path=.specify/specs/087-speckit-visualization/plan.md
+file.14.verdict=reviewed
+file.15.path=.specify/specs/087-speckit-visualization/quickstart.md
+file.15.verdict=reviewed
+file.16.path=.specify/specs/087-speckit-visualization/requirements.md
+file.16.verdict=reviewed
+file.17.path=.specify/specs/087-speckit-visualization/tasks.md
+file.17.verdict=reviewed
+file.18.path=.specify/specs/087-speckit-visualization/test-evidence/analyze-report-round5-2026-11-06.md
+file.18.verdict=reviewed
+file.19.path=.specify/specs/087-speckit-visualization/test-evidence/checklist-revision-2026-11-06-selfcheck.json
+file.19.verdict=reviewed
+file.20.path=.specify/specs/087-speckit-visualization/test-evidence/checklist-revision-2026-11-06.jsonl
+file.20.verdict=reviewed
+file.21.path=.specify/specs/087-speckit-visualization/test-evidence/checklist-revision-flow-class-2026-11-06.txt
+file.21.verdict=reviewed
+file.22.path=.specify/specs/087-speckit-visualization/test-evidence/cl-01-closure.txt
+file.22.verdict=reviewed
+file.23.path=.specify/specs/087-speckit-visualization/test-evidence/plan-unit-correction-2026-11-06.txt
+file.23.verdict=reviewed
+file.24.path=.specify/specs/087-speckit-visualization/test-evidence/polish-second-slice.txt
+file.24.verdict=reviewed
+file.25.path=.specify/specs/087-speckit-visualization/test-evidence/requirements-unit-correction-2026-11-06.txt
+file.25.verdict=reviewed
+file.26.path=.specify/specs/087-speckit-visualization/test-evidence/round5-coverage.txt
+file.26.verdict=reviewed
+file.27.path=.specify/specs/087-speckit-visualization/test-evidence/round5-pre-analyze-plan.txt
+file.27.verdict=reviewed
+file.28.path=.specify/specs/087-speckit-visualization/test-evidence/round5-pre-analyze-tasks.txt
+file.28.verdict=reviewed
+file.29.path=.specify/specs/087-speckit-visualization/test-evidence/round5-validator-decision-tensions.txt
+file.29.verdict=reviewed
+file.30.path=.specify/specs/087-speckit-visualization/test-evidence/round5-validator-requirements.txt
+file.30.verdict=reviewed
+file.31.path=.specify/specs/087-speckit-visualization/test-evidence/round5-validator-tasks.txt
+file.31.verdict=reviewed
+file.32.path=.specify/specs/087-speckit-visualization/test-evidence/second-slice-part7.txt
+file.32.verdict=reviewed
+file.33.path=.specify/specs/087-speckit-visualization/test-evidence/success-criteria.txt
+file.33.verdict=reviewed
+file.34.path=.specify/specs/087-speckit-visualization/test-evidence/us5-efficiency-element.txt
+file.34.verdict=reviewed
+file.35.path=.specify/specs/087-speckit-visualization/test-evidence/us5-measure.txt
+file.35.verdict=reviewed
+file.36.path=.specify/specs/087-speckit-visualization/test-evidence/us5-readonly-store.txt
+file.36.verdict=reviewed
+file.37.path=.specify/specs/087-speckit-visualization/verification.md
+file.37.verdict=reviewed
+file.38.path=scripts/python/measure.py
+file.38.verdict=reviewed
+file.39.path=scripts/python/status-digest.py
+file.39.verdict=reviewed
+file.40.path=shared/definitions/probe-definitions.md
+file.40.verdict=reviewed
+file.41.path=shared/guidelines/reporting-obligations.md
+file.41.verdict=reviewed
+file.42.path=templates/commands/measure.md
+file.42.verdict=reviewed
+file.43.path=tests/contract/test_efficiency_element.py
+file.43.verdict=reviewed
+file.44.path=tests/contract/test_measure.py
+file.44.verdict=reviewed
+file.45.path=tests/contract/test_status_digest.py
+file.45.verdict=reviewed
+file.46.path=tests/unit/test_measure_unit.py
+file.46.verdict=reviewed
+<!-- coverage-receipt:end -->
