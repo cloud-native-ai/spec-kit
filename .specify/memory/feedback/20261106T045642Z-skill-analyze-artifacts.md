@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-analyze-artifacts-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-06T04:56:42Z"
 summary: "analyze read-only pass: coverage accountant red (fr-uncovered 0/33, status=uncovered, 33 errors); findings 1 CRITICAL / 5 HIGH / 12 MEDIUM / 7 LOW; 085 diff empty; no source/template/test edits; CRITI"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

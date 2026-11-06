@@ -7,9 +7,11 @@ scope: "local"
 probe: "skill-create-plan-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "ignored"
 partial: false
 created: "2026-11-06T04:21:46Z"
 summary: "create-plan executed: outline steps 1-5, dynamic 19-row Constitution Check, Phase 0 research, Phase 1 artifacts, post-generation gate, feature integration"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

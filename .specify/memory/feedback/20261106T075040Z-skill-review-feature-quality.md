@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:50:40Z"
 summary: "Artifact and implementation segments of the composed review of 086. Artifact segment: 13-member expected set derived from the stage rules and plan.md Project Structure (not from disk), 13/13 checked, "
+introspection_ref: "introspection-20261106T081504Z#F-03"
+disposition_reason: "introspection:introspection-20261106T081504Z#F-03"
 ---
 
 ## Review

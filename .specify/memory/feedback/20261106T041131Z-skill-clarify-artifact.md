@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "ignored"
 partial: false
 created: "2026-11-06T04:11:31Z"
 summary: "clarify Mode A pass: Feature 086 bound (no new/renumber); 4 self-adjudicated Q/A appended plus A13-A19; validate-requirements ok 0/0 (332 lines, 45 rows, 7 STR); overlap-check clear; 085 surface untou"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

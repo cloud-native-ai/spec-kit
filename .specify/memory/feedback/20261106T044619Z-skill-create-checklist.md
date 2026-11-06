@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "ignored"
 partial: false
 created: "2026-11-06T04:46:19Z"
 summary: "checklist U4 pass: 44 CHK, 44/44 traceable; findings CHK017 (FR-027/FR-030), CHK036 (PYTHONPATH precondition), CHK007/008 (two-pass/mode not in FR) handed to analyze; no 085 edits"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

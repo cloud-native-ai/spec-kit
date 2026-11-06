@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:50:35Z"
 summary: "Process segment of the composed review of 086. Reconstructed the 14-row timeline from git log plus test-evidence; judged four disclosed limitations and found three of four do not stand as disclosed: t"
+introspection_ref: "introspection-20261106T081504Z#F-02"
+disposition_reason: "introspection:introspection-20261106T081504Z#F-02"
 ---
 
 ## Review

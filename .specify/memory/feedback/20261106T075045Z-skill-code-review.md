@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:50:45Z"
 summary: "Code segment of the composed review of 086: base 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08 (feature-first-commit; the receipt re-resolution reported trunk-merge-base to the same commit), head a0426644f"
+introspection_ref: "introspection-20261106T081504Z#F-04"
+disposition_reason: "introspection:introspection-20261106T081504Z#F-04"
 ---
 
 ## Review

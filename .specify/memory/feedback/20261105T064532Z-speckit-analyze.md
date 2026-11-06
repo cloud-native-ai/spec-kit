@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "083-mechanism-policy-separation"
 feature_id: "082"
+disposition: "processed"
 partial: false
 created: "2026-11-05T06:45:32Z"
 summary: "082 的 analyze 读闸完成。确定性引擎侧：pre-analyze(--stage tasks) 判 pass、errors 0、advisories 123（全部为待建产物的 missing-path）；validate-tasks PASS 0/0；flow-class-check exit 0；check-prerequisites MODE C（tasks 可用）。但 valida"
+introspection_ref: "introspection-20261106T084116Z#F-01"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-01"
 ---
 
 ## Review

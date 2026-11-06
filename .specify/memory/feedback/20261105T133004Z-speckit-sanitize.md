@@ -7,9 +7,11 @@ scope: "local"
 probe: "gate-sanitize-destructive-cleanup"
 kind: "internal"
 slice: "commands"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T13:30:04Z"
 summary: "confirm-gate observation: gate-sanitize-destructive-cleanup fired when the user requested the sanitize cleanup (2491 dead references + 1 stale residue). Fired during /speckit.sanitize materials cleanu"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

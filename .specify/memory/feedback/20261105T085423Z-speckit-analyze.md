@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T08:54:23Z"
 summary: "Round-1 analyze of feature 084: 17 findings (1 CRITICAL / 2 HIGH / 10 MEDIUM / 4 LOW), all adjudicated; CRITICAL/HIGH confirmed by an external read-only validator wave (3 confirm, 1 downgrade, 0 rejec"
+introspection_ref: "introspection-20261106T084116Z#F-01"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-01"
 ---
 
 ## Review

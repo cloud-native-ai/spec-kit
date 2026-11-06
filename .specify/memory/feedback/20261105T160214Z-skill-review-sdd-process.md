@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T16:02:14Z"
 summary: "Process segment of feature 084's review: the SDD chain, its gates and its two halts (task/plan turn budgets, analyze U5) were sound; the failures are in how a machine fact was recorded and then believ"
+introspection_ref: "introspection-20261106T084116Z#F-10"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-10"
 ---
 
 ## Review

@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "083-mechanism-policy-separation"
 feature_id: "082"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T07:01:32Z"
 summary: "Analyze round 2 (read-only re-check) on Feature 083 after the repair commit 974db180: both reported HIGH clusters are measurably closed (Decision Tensions validates 0 error/0 HIGH with the section in "
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

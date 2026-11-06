@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-loop-driver-cli-profile"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:55:37Z"
 summary: "# Specification-Driven Development (SDD) Process Review Report: 测试高效执行（默认并发）"
+introspection_ref: "introspection-20261106T081504Z#F-05"
+disposition_reason: "introspection:introspection-20261106T081504Z#F-05"
 ---
 
 ## Review

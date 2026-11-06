@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "086-efficient-test-execution"
 feature_id: "086"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:50:30Z"
 summary: "Composed review of feature 086 (templates/commands/review.md: process -> artifact -> implementation -> code + Acceptance Reality Check). All four segments pass: process P0 0 / P1 8 / P2 5 (F1-F13); ar"
+introspection_ref: "introspection-20261106T081504Z#F-01"
+disposition_reason: "introspection:introspection-20261106T081504Z#F-01"
 ---
 
 ## Review

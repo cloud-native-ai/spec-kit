@@ -8,9 +8,11 @@ probe: "speckit-clarify-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "083-mechanism-policy-separation"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T03:45:32Z"
 summary: "082 clarify Mode A: bound new Feature 083 after rechecking 15 candidate features; C1 meta-layer predicate ratified without change (create-skills/improve-skills/merge-skills included; coaching-skills a"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review
