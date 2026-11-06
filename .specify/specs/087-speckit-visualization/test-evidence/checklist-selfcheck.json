@@ -1,0 +1,43 @@
+{
+  "file": ".specify/specs/087-speckit-visualization/checklists/framework-visualization-2026-11-06.md",
+  "items": 60,
+  "ids_continuous_CHK001_to_N": true,
+  "ids_unique": true,
+  "traced_items": 60,
+  "trace_ratio_pct": 100,
+  "trace_floor_pct": 80,
+  "trace_floor_met": true,
+  "prohibited_verify_test_confirm_check_prefix_rows": 0,
+  "every_item_is_a_question": true,
+  "soft_cap": 40,
+  "soft_cap_exceeded_justified": true,
+  "sections": [
+    "Requirement Completeness",
+    "Requirement Clarity — cadence and the scope predicate",
+    "Requirement Consistency — seats, roles and authority",
+    "Acceptance Criteria Quality & Measurability",
+    "Scenario & Edge-Case Coverage — truthfulness invariants",
+    "Cross-Feature Boundary & Dependencies",
+    "Dependencies & Assumptions",
+    "Ambiguities & Conflicts",
+    "Assumptions",
+    "Notes"
+  ],
+  "dimension_hits": {
+    "Completeness": 4,
+    "Clarity": 6,
+    "Consistency": 5,
+    "Measurability": 6,
+    "Coverage": 2,
+    "Dependency": 3,
+    "Assumption": 3,
+    "Ambiguity": 13,
+    "Conflict": 6,
+    "Gap": 19
+  },
+  "distinct_dimensions": 10,
+  "pre_existing_checklist_overwritten": false,
+  "new_file": true,
+  "created": "2026-11-06",
+  "bytes": 22417
+}
