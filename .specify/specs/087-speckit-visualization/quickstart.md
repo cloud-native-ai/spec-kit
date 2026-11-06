@@ -69,8 +69,8 @@ unreadable or unparsable file.
 4. the defect line is single-line and contains the literal `reporter` (contract RS-03 names the seat literal);
 5. the script is stdlib-only (contract RS-08), so plain `python3` runs it with no installed package.
 
-**Verification route (b)**: pinned by `tests/contract/test_roster_reporter_seat.py` over four defect fixtures
-(compliant / missing-seat / unresolvable-agent / two-seats — the closed defect set C-16 fixes) plus the
+**Verification route (b)**: pinned by `tests/contract/test_roster_reporter_seat.py` over four fixtures
+(compliant / missing-seat / unresolvable-agent / two-seats — three named defects plus the compliant case, the closed set C-16 fixes) plus the
 `reporting-reason` value-domain fixture C-17 requires (one per accepted value and one out-of-domain). That is five
 fixture cases in total, not three.
 
