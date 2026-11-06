@@ -265,7 +265,7 @@ tests/contract/test_expression_compatibility.py   # + ALLOWED_POST_BASELINE_CHAN
 | `skills/external/improve-docs/SKILL.md` | `.specify/skills/improve-docs/SKILL.md`（同一对） | 同上；**另有一条独立守卫**：`pytest tests/contract/test_expression_compatibility.py -q` 相对基线无新失败（基线 16 passed；本行是唯一需要 `ALLOWED_POST_BASELINE_CHANGES` 条目的文件，见 T-001） |
 | `templates/commands/docs.md` | 四家 per-tool 副本（`regen-command-copies.py` 逐工具生成，**无** `.specify/templates/commands/` 镜像——该子树两侧都已退役，`test -f` 实测不存在）：`.claude/commands/speckit.docs.md`；`.github/prompts/speckit.docs.prompt.md`；`.opencode/command/speckit.docs.md`；`.qoder/commands/speckit.docs.md` | `$PY scripts/python/regen-command-copies.py --check` —— 相对基线无新漂移，且新内容在四家副本里逐字出现 |
 | `docs/concepts/documentation-model.md` | **无镜像、无生成副本**（`docs/` 树不在任何 `MIRROR_PAIRS` 内） | 无镜像判据；唯一约束是 `pytest tests/contract/test_directory_governance.py -q` 相对基线无新失败（基线 21 passed；该文件须留在 area-map 清单内，`C-014`） |
-| `tests/**`（新增夹具与两个测试文件） | **无镜像**（`tests/` 不在任何 pair 内） | 无镜像判据 |
+| `tests/**`（新增夹具与四个测试文件） | **无镜像**（`tests/` 不在任何 pair 内） | 无镜像判据 |
 | `tests/contract/test_expression_compatibility.py`（追加 allowlist 条目） | **无镜像** | 该文件自身的哈希不在冻结清单内；修改由 T-001 的判别证据覆盖 |
 
 （`$PY` = 上段那个能 import `typer` 的解释器；本阶段实测值 `/usr/bin/python3`。）
@@ -437,7 +437,7 @@ Dependency set: none
 | `C-012` `not-evaluated` 的封闭四项 | `I::test_c012_no_record_not_evaluated`（`no-trace/` 不传 `--record` ⇒ `not-evaluated` / `no-trace-record`）；`I::test_c012_two_faces_resolving_but_unrecorded`（两面齐 + 引用解析 + 无记录仍不是 `satisfied`）；`U::test_c012_four_conditions_closed`（四个条件各由自己的夹具驱动：`no-trace-record` / `trace-incomplete` / `exemption-invalid` / `render-unreadable`，第五个即失败） | 「文件都在」被当成「义务已履行」；或出现第五个 `not-evaluated` 条件；或引擎不可用被错列为其中之一（检查器不调引擎） |
 | `C-013` Payload 形态（含 `converged` / `clean`） | `U::test_c006_payload_schema`（顶层键与 `documents[]` 四字段）；`U::test_c013_clean_is_strict`（`missing`/`stale`/`not_evaluated` 任一非零 ⇒ 两谓词皆 false；`exempted>0` ⇒ `clean=false`；`carriers==0` ⇒ 两者皆 false）；`U::test_c013_empty_scope_not_converged`（默认作用域 `carriers==0` ⇒ `converged=false`）；`U::test_c013_converged_ignores_exemptions`（`exempted>0`、其余全零 ⇒ `converged=true` 且 `clean=false`）；`U::test_c013_only_empty_scope`；`U::test_c013_documents_field_set` | 四个假绿面任一漏判（`exempted>0`、`carriers==0`、`--only` 空作用域、`not-evaluated` 计作通过）；或 `converged` 被实现成 `clean` 的同义词 |
 | `C-014` 与既有守卫的关系 | `A1` / `A3` / `A5`（`test_expression_gate_wiring.py`）、`C3` / `C4a`（`test_docs_command_template.py`）、`KEEP_LIST`（`test_confirmation_gates_sweep.py`）、`test_directory_governance.py`、`C5`（`test_expression_compatibility.py`）——均为**既有测试**，本特性不改断言，只加义务指针；`tests/unit/test_docs_obligation_reuse.py` 以只读引用逐条钉住它们 | 任一守卫文件的冻结清单出现未登记变更（`C5` 的哈希比对），或本特性改写了某守卫的断言集 |
-| `C-015` 与既有 `validate` 动作的关系（不复用、不合并） | `U::test_c015_validate_not_merged`（`--action validate` 仍在 `choices` 且判据不变；`obligation` 是**并列**动作，两者不共享判据函数）；`U::test_c015_validate_zero_new_violations`（W1 调用点「零新增违规」基准不因新动作改变）；`U::test_c015_judged_together_in_r6`（R6 里两动作并列执行、各出各的 verdict） | 两个动作被合并进一个 `--action`（「今日合规、明日因新义务全红」的过渡态无法表达），或 `validate` 判据被本特性改动 |
+| `C-015` 与既有 `validate` 动作的关系（不复用、不合并） | `U::test_c015_exit_codes`（`0` = 「判过，干净与否都算判过」、`2` = 输入错误；`validate` 的退出码语义不因此动作改变）；`U::test_c015_validate_action_intact`（`--action validate` 仍在 `choices`、仍是独立动作，两者不共享判据函数）；`U::test_c015_validate_zero_new_violations`（W1 调用点「零新增违规」基准不因新动作改变） | 两个动作被合并进一个 `--action`（「今日合规、明日因新义务全红」的过渡态无法表达），或 `validate` 判据被本特性改动 |
 | `C-016` 逐文档判定的有序优先级 | `U::test_c016_precedence_order`（多档位同时成立的夹具，断言命中**最靠前**那档：`deleted-rendered/` 必须落 `reference-unresolved` 而非 `orphan-*`）；`U::test_c016_no_backtracking`（单趟、命中后 MUST NOT 被后续档位二次覆盖）；`U::test_c016_no_second_precedence_owner`（源码里不存在第二处 `verdict =` 的分支树） | 档位顺序被实现成集合判定（顺序无关）——attempt 1 的 `F-01` 本体；或出现第二处独立判定实现；或出现第二处优先级顺序声明（`C-004` 已不再声明顺序，见 `F-03`） |
 
 ### B — `flow-obligations.contract.md`（`C-001`…`C-023` + `C-008a`，共 24 条）
@@ -489,7 +489,7 @@ Dependency set: none
 
 | 项 | 预算 | 说明 |
 |----|------|------|
-| 新增测试文件 | **3**（`tests/unit/test_docs_utils_obligation.py`、`tests/unit/test_docs_utils_carriers.py`、`tests/integration/test_docs_obligation_scenarios.py`） | 不开第二个**引擎**测试文件家系之外的文件；`test_docs_command_scenarios.py` 只加用例。`test_docs_utils_carriers.py` 是 `tasks.md` T009 明确单列的一行（写不同路径、可与 T008 并行），本行计数按实际任务登记 |
+| 新增测试文件 | **4**（`tests/unit/test_docs_utils_obligation.py`、`tests/unit/test_docs_utils_carriers.py`、`tests/integration/test_docs_obligation_scenarios.py`、`tests/unit/test_docs_obligation_reuse.py`） | 不开第二个**引擎**测试文件家系之外的文件；`test_docs_command_scenarios.py` 只加用例。`test_docs_utils_carriers.py` 是 `tasks.md` T009 明确单列的一行（写不同路径、可与 T008 并行），`test_docs_obligation_reuse.py` 是 T031/T032 明确单列的复用与守卫文件（读仓库而非判夹具空间，故与引擎家系分文件），本行计数按实际任务登记（analyze M4） |
 | 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `conftest` 建造步骤 | 夹具是**仓库内删除前的绿灯态**，写入型用例先 `copytree` 到 `tmp_path` |
 | 第三方依赖 | **0** | 检查器只用标准库（research R3/R4） |
 | 测试时长 | 上述两文件的**全量运行 ≤ 10s**（本机、无网络） | 85 个载体在检查器里只读元数据，不读文档全文以外的内容 |
@@ -549,7 +549,7 @@ N/A — § Constitution Check 的 19 行全部 `✅ Pass`，无 `❌ Fail`、无
 | Quickstart | [`quickstart.md`](./quickstart.md) | **9 个场景（S1–S9）**，每个命令示例自带 premises 行；S1/S2/S6/S7 含规划期实测读数，S9 是 `SC-003` 的收敛回路 |
 | Feature ref | [`feature-ref.md`](./feature-ref.md) | 绑定表 + 10 行交付面 + 6 组 FR→契约映射 + 10 行 SC→计量 + 5 条已披露裁定 |
 | Decision Tensions | 本文件 § Decision Tensions | 5 条（T-001…T-005），`validate-decision-tensions.py` 实测 `ok` / 5 record(s) / 0 error |
-| Test Plan（条款→断言映射） | 本文件 § Test Plan | `diagram-obligation` 16 条 + `flow-obligations` 23 条全覆盖 + 守卫基线 + 测试预算；新增 2 个测试文件、11 个夹具 |
+| Test Plan（条款→断言映射） | 本文件 § Test Plan | `diagram-obligation` 16 条 + `flow-obligations` 23 条全覆盖 + 守卫基线 + 测试预算；新增 4 个测试文件、11 个夹具 |
 | Test evidence | `test-evidence/plan-stage-status.md` + `plan-stage-status.jsonl` | 本阶段各校验命令的**实跑读数**（见下）；`.jsonl` 是机器可读行（`stage=plan` / `row_type=stage-status`） |
 
 **与 Phase 0 预期的漂移**：Phase 0 预期「两份契约覆盖 RS-006 的两半 + 流程接线」；实际落地时多发现一处需要机械纠正的口径——`C-001` 初稿把 `--root` 写成「文档空间根」，而 `docs-utils.py` 的既有动作一律以**项目根**为根（`--action validate --root .` 的实读输出证明）。该纠正已就地落进 `C-001`/`C-010`/`C-011`（`<root>`），并在本阶段回传中披露：它是**纠正**（恰有一种与既有引擎一致的读法），不是裁定。契约条款数因此从 15+23 不变，但三处路径口径改为统一引用 `C-001`。

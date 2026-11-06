@@ -1,0 +1,188 @@
+# implement / Part 2 — targeted test readings (T017–T032)
+
+Stage: `implement`, Part 2 only (T017–T032). No full suite was run in this stage; the `baseline` slot belongs to
+the driver and is already recorded (`test-evidence/baseline-full-suite.log`, `baseline-failed.txt`).
+
+Interpreter for every reading below:
+
+```text
+$ /usr/bin/python3 -c "import sys, pytest; print(sys.version); print('pytest', pytest.__version__)"
+3.11.13 (main, May 13 2026, 09:30:18) [GCC 10.2.1 20200825 (Alibaba 10.2.1-3.9 2.32)]
+pytest 9.2.0
+```
+
+---
+
+## 1. What Part 2 authored
+
+| Task | Deliverable | File |
+|---|---|---|
+| T017 | verdict↔reason closed table, two face values, `path`/`line` on every entry | `skills/external/create-docs/scripts/docs-utils.py` |
+| T018 | payload shape (`action` / `root` / `record` / `documents[]` / `summary`) | same |
+| T019 | `satisfied`'s five-way conjunction | same |
+| T020 | `stale` first half (`source-newer-than-render`, `render-digest-mismatch`) | same |
+| T021 | `stale` second half as the frozen partial; `D-001`'s semantic face produces **no** verdict | same |
+| T022 | trace-record reading (`_load_trace_record`, `_record_path`, `_resolved_record`) | same |
+| T023 | exemption-record reading (`exempt-chronological` / `invalid-exemption`, `exempted`, `_superseded`) | same |
+| T024 | four-and-only-four `not-evaluated` conditions, `render-unreadable` included | same |
+| T025 | `test_c013_*` (5 assertions) | `tests/unit/test_docs_utils_obligation.py` |
+| T026 | `test_c015_exit_codes`, `test_c015_validate_action_intact`, `test_c015_validate_zero_new_violations` | same |
+| T027 | nine-tier ordered single pass, first hit wins, one verdict-assignment site | `docs-utils.py` |
+| T028 | `test_c005_*` (3), four guard pins via `test_c014_*` | same / `test_docs_obligation_reuse.py` |
+| T029 | `test_c004_*`, `test_c002_*`, `test_c003_carrier_table`, `test_c006_*`, `test_c007_*`…`test_c012_*` | same |
+| T030 | `test_c011_*` (3), `test_c012_*` end-to-end, `test_c016_deleted_rendered_first` | `tests/integration/test_docs_obligation_scenarios.py` |
+| T031 | `test_sc005_no_second_engine`, `test_sc005_surfaces_reach_by_reference`, `test_c014_guard_rows_intact`, `test_c014_per_tool_copies_present`, `test_c014_contract_names_each_guard_file`, `test_sc005_engine_domain_is_single_owner` | `tests/unit/test_docs_obligation_reuse.py` (**new — the 4th new test file**) |
+| T032 | `test_record_carries_the_four_faces` (×4 parametrised), `test_engine_sticky_on_update` | same |
+
+## 2. Red → green, per reading (detail in `notes/red-first-evidence.md` § T017–T032)
+
+Red, first moment (assertions authored before T017–T024/T027 landed):
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/integration/test_docs_obligation_scenarios.py -q --no-header -p no:cacheprovider
+16 failed, N passed
+```
+
+Three of the sixteen were real engine defects that the assertions caught, and each was fixed in the engine:
+
+1. `--record` unreadable exited **1**, not `2` (`SystemExit(message)`); now prints and `raise SystemExit(2)`.
+2. `render-unreadable` was unreachable — tier 8 tested the digest rule before readability, so an unreadable
+   face read `satisfied`; tier 8 restructured so digest and readability are gathered together and readability
+   wins.
+3. The contract-table helper parsed the header row as a verdict named `verdict`; now filtered by the closed set.
+
+Red, second moment (T031/T032 authored before their subject existed):
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_obligation_reuse.py -q --no-header -p no:cacheprovider
+7 failed, 12 passed
+```
+
+Final green — the obligation set:
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/unit/test_docs_utils_carriers.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/unit/test_docs_obligation_reuse.py -q --no-header -p no:cacheprovider
+FAILED tests/unit/test_docs_obligation_reuse.py::test_sc005_surfaces_reach_by_reference
+1 failed, 66 passed, 1 warning in 3.41s
+```
+
+## 3. The one remaining red — declared, not patched
+
+`test_sc005_surfaces_reach_by_reference` asserts that `skills/external/create-docs/SKILL.md`,
+`skills/external/improve-docs/SKILL.md` and `templates/commands/docs.md` name `skills/external/draw-diagram` by
+path. That pointer text is delivered by T037–T044 (`create-docs/SKILL.md`) and T048/T049
+(`improve-docs/SKILL.md`, and the `docs.md` dispatch sentence by T054). T031 lists no `[blockedBy]` on any of
+them, so at T031 the assertion is red **by construction**, and its red is the evidence that the pointer is not
+yet delivered.
+
+Writing the pointer into the skill files from T031 was considered and rejected: it would execute T037–T044 out
+of order and outside this Part's territory. The assertion's second half — no surface restates a routing row or
+the `ldm_summary` schema — already holds on all three files and is re-checked on every run, so the assertion is
+not vacuous while red.
+
+## 4. A corrected premise (correction, disclosed)
+
+`test_sc005_engine_domain_is_single_owner`'s first draft asserted `assert changed` over the changed-file set
+after excluding drawn-diagram's tree, `tests/` and `docs-utils.py`. That set is empty for this feature (the only
+non-excluded change is `docs-utils.py` itself), so the premise could never hold and the assertion failed with
+`assert []` instead of measuring anything. It was rewritten so the **population** (`tracked_files()`, non-empty,
+an empty read now means the scan broke) and the **claim** (no file this feature authored enumerates two or more
+engine layers) are two separate readings, plus a containment check that the scan never reports a path outside
+the scanned roots.
+
+## 5. Assertion-name drift fixed (analyze M1)
+
+`plan.md` is the sole owner of assertion names; `tasks.md` must not create a second name. Measured drift and
+its adjudication:
+
+| Owner row | Drift | Adjudication |
+|---|---|---|
+| `plan.md` table A `C-015` | the row named `U::test_c015_validate_not_merged` and `U::test_c015_judged_together_in_r6`; `tasks.md` T026 names `U::test_c015_exit_codes`. No function for either plan-only name existed. | `exit_codes` is the name the clause's subject actually is (the exit-code contract), so table A now reads `U::test_c015_exit_codes` + `U::test_c015_validate_action_intact` + `U::test_c015_validate_zero_new_violations`, and both new functions were authored. `judged_together_in_r6` was dissolved: R6's side-by-side execution is a surface fact carried by `flow-obligations` `F::test_c008_authoring_r2_plans_and_r6_checks` (T035) and `F::test_c013_improve_verify_includes_obligation`, not by a checker assertion — a unit test cannot read a Markdown call site without becoming a second statement of the contract. |
+
+After the fix, every assertion name in `plan.md` table A resolves to exactly one function in the four obligation
+test files (44 names, 0 unresolved — measured, see § 6).
+
+## 6. Coverage measurement
+
+```text
+$ python3 - <<'EOF'   # names in plan.md table A vs `^def test_…` in the four obligation files
+plan table A: 44 missing: []
+EOF
+```
+
+## 7. targeted-set-v1 — the whole reading (no full suite)
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/unit/test_docs_utils_carriers.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/unit/test_docs_obligation_reuse.py tests/contract/test_expression_compatibility.py \
+    tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py \
+    tests/contract/test_confirmation_gates_sweep.py tests/contract/test_directory_governance.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+FAILED tests/unit/test_docs_obligation_reuse.py::test_sc005_surfaces_reach_by_reference
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+2 failed, 189 passed, 1 warning in 5.72s
+exit status = 1
+```
+
+Per-file readings:
+
+| File | Reading |
+|---|---|
+| `tests/unit/test_docs_utils_obligation.py` | 37 passed |
+| `tests/unit/test_docs_utils_carriers.py` | 2 passed |
+| `tests/integration/test_docs_obligation_scenarios.py` | 9 passed |
+| `tests/unit/test_docs_obligation_reuse.py` | 18 passed, 1 failed (the declared red) |
+| `tests/contract/test_expression_compatibility.py` (C5) | 16 passed |
+| `tests/contract/test_expression_gate_wiring.py` (A1/A3/A5) | 16 passed |
+| `tests/contract/test_docs_command_template.py` (C3/C4a) | 22 passed |
+| `tests/contract/test_confirmation_gates_sweep.py` (KEEP_LIST) | 45 passed, 1 failed (**baseline #3**) |
+| `tests/contract/test_directory_governance.py` | 21 passed |
+| `tests/integration/test_docs_command_scenarios.py` | 3 passed |
+
+## 8. Baseline comparison
+
+Baseline: `test-evidence/baseline-failed.txt` (driver-run full suite: 26 failed / 7471 passed / 4 skipped). The
+guard subset's failure name set, compared name by name:
+
+| Baseline name | In this reading | Verdict |
+|---|---|---|
+| `tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target` | failed | unchanged — pre-existing, recorded as baseline line 3 |
+
+No baseline name regressed, and the guard files gained no failure. The one **new** failure name is the declared
+SC-005 red of § 3: `tests/unit/test_docs_obligation_reuse.py::test_sc005_surfaces_reach_by_reference`.
+
+It is reported, not fixed, per the U5 rule for a new failure: the assertion's subject is another row's delivery
+(T037–T044 / T048–T049 / T054), and T031 declares no dependency on them. Whoever executes T044 and T049 turns it
+green; until then it is a named, attributable failure rather than a silent skip.
+
+## 9. PLAN-EDIT records (plan-owned artifacts, minor)
+
+```text
+PLAN-EDIT: .specify/specs/087-arch-diagram-docs/plan.md — the new-test-file budget goes from 3 to 4, adding
+tests/unit/test_docs_obligation_reuse.py (T031/T032), and the two other count mentions (§ Mirror Obligations
+row, § DoD table row) follow; analysis M4 registered the drift between the plan's count and the tasks' four
+files；分类=minor
+PLAN-EDIT: .specify/specs/087-arch-diagram-docs/plan.md — table A's C-015 row is renamed to the assertions that
+exist (`test_c015_exit_codes`, `test_c015_validate_action_intact`, `test_c015_validate_zero_new_violations`),
+removing two names no row of tasks.md ever asked for (analysis M1, plan-as-sole-owner)；分类=minor
+PLAN-EDIT: .specify/specs/087-arch-diagram-docs/tasks.md — DoD-3 names all four new test files instead of two, so
+the DoD statement matches the budget and the tasks rows；分类=minor
+PLAN-EDIT: .specify/specs/087-arch-diagram-docs/tasks.md — § Completion Gate's budget sentence reads four new
+test files plus appended cases in a fifth, matching table D；分类=minor
+```
+
+No contract, data-model, quickstart or research artifact was edited in this Part.
+
+## 10. Scope and territory
+
+- Writes: `skills/external/create-docs/scripts/docs-utils.py`, the four obligation test files, the plan-owned
+  artifacts named in § 9, `tasks.md` (ticks + DoD/budget sentences), `notes/red-first-evidence.md`,
+  `test-evidence/implement-part2.txt`, `test-evidence/implement-stage-status.jsonl` (the single line, updated in
+  place).
+- Not touched: the state spine (driver-owned), the main repository's pre-existing dirty files, any branch or
+  remote operation, any draw-diagram file, any of the three surface files whose pointer text is another row's
+  delivery.

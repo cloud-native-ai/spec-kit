@@ -370,7 +370,8 @@ def cmd_fix_links(root: Path, moves_file: str | None, apply: bool) -> dict:
 #
 # Engine availability is deliberately NOT one of the `not-evaluated` conditions: this checker
 # calls no engine at all, so "the engine is down" cannot make a document unjudgeable here
-# (C-012). Engine refusal semantics belong to the producing run.
+# (C-012). Engine refusal semantics belong to the producing run. A sixth `not-evaluated`
+# condition would be an extension of the frozen closed set and is not available to this block.
 # ---------------------------------------------------------------------------
 
 # C-003 — the carrier set. Six typed documentation directories read RECURSIVELY (a one-level
@@ -451,19 +452,31 @@ def _diagram_reference(root: Path, doc: Path) -> tuple[int, Path] | None:
     return None
 
 
+def _record_path(root: Path, record: str) -> Path:
+    """The one file `--record` names, resolved **relative to `--root`** (C-010's own convention).
+
+    Only an explicitly absolute value escapes the root; no other candidate is ever tried, so a
+    relative value that does not exist under the root is an input error rather than a silent
+    fallback to the caller's cwd (C-006 rule 3, `--record` is read, never discovered).
+    """
+    given = Path(record)
+    return given if given.is_absolute() else root / given
+
+
 def _load_trace_record(root: Path, record: str | None) -> dict | None:
     """Read ONLY the file `--record` names. Never glob `runs/`, never guess the newest (C-006 rule 3)."""
     if not record:
         return None
-    # relative to --root (C-010's own path convention), falling back to the caller's cwd
-    given = Path(record)
-    path = given if given.is_absolute() else root / given
-    if not path.is_file() and given.is_file():
-        path = given
+    path = _record_path(root, record)
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        raise SystemExit(_input_error(f"--record is not readable: {exc}"))
+        print(_input_error(f"--record is not readable: {exc}"), file=sys.stderr)
+        raise SystemExit(2)
+    if not isinstance(payload, dict):
+        print(_input_error(f"--record is not a JSON object: {path}"), file=sys.stderr)
+        raise SystemExit(2)
+    return payload
 
 
 def _trace_entry_for(record: dict | None, reference_rel: str) -> dict | None:
@@ -542,6 +555,12 @@ def _exemption_status(record: dict | None, rel_doc: str) -> tuple[str, str] | No
 
 
 def _file_sha256(path: Path) -> str | None:
+    """sha256 of a rendered face, or None when the face cannot be read (C-012's `render-unreadable`).
+
+    The whole file is read rather than a header: a face that is present but unreadable must be distinguishable
+    from one that was never there, and the only signal that a read failed is the exception. `known=False` in
+    the caller turns this None into `render-unreadable`; a missing face never gets here.
+    """
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError:
@@ -557,6 +576,7 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
     rel_doc = rel(root, doc)
     verdict = reason = None
     line = 0
+    superseded = False
 
     # tier 1/2 — an exemption record, valid or overturned, is decided before anything else
     exemption = _read_exemption(root, doc)
@@ -567,9 +587,11 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
         if state == "valid" and reference is None:
             verdict, reason = "recorded-exemption", exempt_reason
         else:
-            # a still-valid record whose document now resolves a render has been overturned by fact,
-            # and an invalid record is simply unjudgeable — both land here (C-011, FR-004)
+            # a valid record whose document now resolves a render has been overturned by fact, while
+            # an invalid record is simply unjudgeable — both land here (C-011, FR-004). Only the
+            # former is the "reason no longer holds" signal the summary counts.
             verdict, reason = "not-evaluated", "exemption-invalid"
+            superseded = state == "valid"
             if reference is not None:
                 line = reference[0]
 
@@ -607,31 +629,29 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
 
             # tier 8 — the record is complete: the two faces are allowed to disagree (C-008)
             if verdict is None:
+                # rule 2 is evaluated here, not after rule 1, because an unreadable face is C-012's own
+                # `render-unreadable` condition and has to be seen even when rule 1 settles the document:
+                # the tiers below THIS one must not mask a closed condition of the one above.
+                digests = [(_file_sha256(face_path), face.get("sha256"))
+                           for face, face_path in zip(entry.get("rendered") or [], faces)
+                           if face.get("sha256")]
                 try:
                     source_mtime = source.stat().st_mtime
                 except OSError:
                     source_mtime = None
-                if source_mtime is not None:
-                    rendered_mtimes = []
-                    unreadable = False
-                    for face in faces:
-                        try:
-                            rendered_mtimes.append(face.stat().st_mtime)
-                        except OSError:
-                            unreadable = True
-                    if unreadable:
-                        verdict, reason = "not-evaluated", "render-unreadable"
-                    elif rendered_mtimes and source_mtime > min(rendered_mtimes):
-                        verdict, reason = "stale", "source-newer-than-render"
-                    else:
-                        for face, face_path in zip(entry.get("rendered") or [], faces):
-                            expected = face.get("sha256")
-                            if not expected:
-                                continue
-                            actual = _file_sha256(face_path)
-                            if actual is not None and actual != expected:
-                                verdict, reason = "stale", "render-digest-mismatch"
-                                break
+                rendered_mtimes = []
+                unreadable = False
+                for face in faces:
+                    try:
+                        rendered_mtimes.append(face.stat().st_mtime)
+                    except OSError:
+                        unreadable = True
+                if unreadable or any(actual is None for actual, _ in digests):
+                    verdict, reason = "not-evaluated", "render-unreadable"
+                elif source_mtime is not None and rendered_mtimes and source_mtime > min(rendered_mtimes):
+                    verdict, reason = "stale", "source-newer-than-render"
+                elif any(actual != expected for actual, expected in digests):
+                    verdict, reason = "stale", "render-digest-mismatch"
 
             # tier 9 — both faces present, record complete, no staleness rule holding
             if verdict is None:
@@ -640,14 +660,13 @@ def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
     assert verdict in VERDICT_REASONS, f"verdict {verdict!r} is outside the closed set"
     assert reason in VERDICT_REASONS[verdict], f"reason {reason!r} does not pair with verdict {verdict!r}"
     return {"path": rel_doc, "line": line if verdict not in ("missing",) or line else 0,
-            "verdict": verdict, "reason": reason}
+            "verdict": verdict, "reason": reason, "_superseded": superseded}
 
 
 def _resolved_record(root: Path, record: str | None) -> str | None:
     if not record:
         return None
-    given = Path(record)
-    return str(given.resolve() if given.is_absolute() else (root / given).resolve())
+    return str(_record_path(root, record).resolve())
 
 
 def cmd_obligation(root: Path, record: str | None, only: str | None) -> dict:
@@ -665,7 +684,7 @@ def cmd_obligation(root: Path, record: str | None, only: str | None) -> dict:
     superseded = 0
     for entry in documents:
         counts[entry["verdict"]] += 1
-        if entry["reason"] == "exemption-invalid" and entry["line"]:
+        if entry.pop("_superseded"):
             superseded += 1
 
     judged_scope_has_carrier = True if only else len(carriers) > 0
@@ -698,6 +717,13 @@ def cmd_obligation(root: Path, record: str | None, only: str | None) -> dict:
 
 def _input_error(message: str) -> str:
     return f"docs-utils.py: error: {message}"
+
+
+# ---------------------------------------------------------------------------
+# End of the read-only obligation block. `cmd_audit` below is a WRITING command of another
+# action; it lives after this line so the obligation block's read-only span stays contiguous
+# (asserted by `U::test_c002_open_for_write_never_seen`).
+# ---------------------------------------------------------------------------
 
 
 def cmd_audit(root: Path, scope: str, summary: str, items_file: str | None) -> dict:
