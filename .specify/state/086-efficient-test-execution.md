@@ -230,6 +230,16 @@ last_verdict: A4/B3 integrated (f12b554d, 1d962bfb; clean combined 191/1, only t
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/10-implement-wave3.md`。
 - next: C1（parallel-safety/dogfood; T014 vs T050; 085 tests）→ C2（registry/docs/closure; T044/T047）。
 
+## Implement wave 4 — C1（2026-11-06T06:53Z）
+
+- C1 `05ae56ca` + repair `bf455401`（watch-target `serial` marker；nested-runner 断言；`dogfood-record.md`；`parallel-safety.txt` T014 19/19、双向空、206.12s vs 687.41s = 0.30×；`scheduling-experiment.txt` T016；`parallel-safety-attribution.md` 0 新增/0 未归因）。
+- **anomaly + driver repair**：C1 执行者按 Fast Fail 停在「runner 对调用方 `--dist` 无守卫」的跨包决定上（`--workers 8 --dist loadfile` 被追加 `--dist load`，模式行报 `dist=load`，T016 无法测 `loadfile`）。驱动裁定根因修复：C-009 增加 `--dist`/`--dist=` 守卫，透传调用方调度并在模式行具名；新增 2 条契约用例（40/40 通过）；契约文件同步。
+- T016 结果：两臂同 19 名，`comm -3` 空，新增名 0；`-n auto --dist load` 201.34s vs `-n 8 --dist loadfile` 204.99s → **默认保持 `-n auto` + `--dist load`**，不上 cap、不换调度。
+- T040 085 五文件重跑：20 passed / 0 failed / 0 新增名；serial 枚举恰 1 个 node id；C1 相关测试 27/27、runner 契约 40/40。
+- integration: C1 ff → `bf455401`；worktree 删除；`086-wp-c1` deregistered；actual concurrency **1**。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/11-implement-wave4.md`。
+- next: C2（T038/T041/T042/T043/T044/T045/T047/T048/T049/T054/T055 + registry/CHANGELOG；closure slot 2）→ review。
+
 ## U0.5 自检
 
 1. 目标、拓扑、权威、切片、断点已写入状态脊：**是**。
