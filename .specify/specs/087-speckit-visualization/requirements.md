@@ -196,10 +196,13 @@ literal is reintroduced elsewhere.
 ### Functional Requirements
 
 - **FR-001**: The framework MUST declare current-state visibility as a first-class capability with
-  a single owning document under `shared/`, which owns: the obligation's scope (which flows must
-  report), the default cadence value, the reporter-seat obligation, the master-reporting duty and
-  the digest's contract. The owner MUST reference the existing progress-reporting discipline and
-  the existing visibility contract rather than restating either.
+  a single owning document under `shared/`, which owns exactly eight facts and no others: the
+  obligation's **scope predicate** (which flows must report), the **long-run cadence default**, the
+  **reporter-seat obligation**, the **master-reporting duty**, the **stall judgement reference**,
+  the **out-of-cadence transition triggers**, the **digest contract**, and the **zero-new-machinery
+  prohibition**. The owner MUST name what it does not own, with the owner path for each, and MUST
+  reference the existing progress-reporting discipline and the existing visibility contract rather
+  than restating either.
 - **FR-002**: The owning document MUST define the obligation's **scope as a decidable predicate**:
   a flow is in scope when it dispatches two or more concurrent units, or holds one or more
   asynchronous delegations it continues past their dispatch. A single synchronous step is out of
@@ -415,8 +418,9 @@ literal is reintroduced elsewhere.
   of in-scope or exempt flows is maintained.
 - **A10 — structure chosen for the owner**: the obligation's owner is a new document
   `shared/guidelines/reporting-obligations.md`, which owns cadence-and-override, obligation scope,
-  the reporter-seat obligation, the master-reporting duty and stall judgement, and the digest
-  contract. The existing `shared/guidelines/progress-reporting.md` keeps ownership of the anchoring
+  the reporter-seat obligation, the master-reporting duty and stall judgement, the out-of-cadence
+  transition triggers, the digest contract and the zero-new-machinery prohibition — the eight
+  facts, enumerated in full by FR-001. The existing `shared/guidelines/progress-reporting.md` keeps ownership of the anchoring
   rule, the content floor, the late-report rule, the not-a-gate rule, the measured-figures rule and
   the dispatch-payload channel; the new owner references those by section anchor. This keeps A6's
   boundary and SC-008's baseline intact: the pre-existing discipline's clauses are not rewritten.

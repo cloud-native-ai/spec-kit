@@ -1,0 +1,104 @@
+# requirements repair — analyze loop 2, round 3 (087-speckit-visualization)
+# date: 2026-11-06T06:00Z
+# assignment: bounded requirements-stage repair of analyze round-2 finding F-07 (CRITICAL, requirements half)
+# authority: contracts/reporting-obligations.contract.md C-01 (lines 21-32) — the sole owner of the owned-fact set
+# files touched: requirements.md only
+# baseline before repair: validate-requirements status=ok 0 error/0 warning; pre-analyze decision=pass errors=0 advisories=126
+
+## F-07 requirements-half: repaired surfaces
+
+### 1. FR-001 (requirements.md:198-205) — owned-fact enumeration now exactly eight
+
+Before: "which owns: the obligation's scope (which flows must report), the default cadence value, the
+reporter-seat obligation, the master-reporting duty and the digest's contract" — five facts, closed by
+an implicit list, conflicting with C-01's "exactly eight facts ... and no others".
+
+After: "which owns exactly eight facts and no others: ..." — the count is now stated and the set is
+enumerated in C-01's order. Item-by-item correspondence (C-01 line -> FR-001 wording):
+
+| C-01 # | C-01 item (lines 25-32)                                   | FR-001 wording (post-repair)              |
+|--------|-----------------------------------------------------------|-------------------------------------------|
+| 1      | the obligation's scope predicate (RO-02)                  | the scope predicate (which flows must report) |
+| 2      | the long-run cadence default (RO-03)                      | the long-run cadence default              |
+| 3      | the reporter-seat obligation (RO-04)                      | the reporter-seat obligation              |
+| 4      | the master-reporting duty (RO-06)                         | the master-reporting duty                 |
+| 5      | the stall judgement reference (`FR-009`)                  | the stall judgement reference             |
+| 6      | the out-of-cadence transition triggers (`FR-010`)         | the out-of-cadence transition triggers    |
+| 7      | the digest contract (RO-09)                               | the digest contract                       |
+| 8      | the zero-new-machinery prohibition (`FR-018`)             | the zero-new-machinery prohibition        |
+
+Count check: 8 items, no item added, merged or dropped; the three items requirements previously
+omitted (stall judgement reference, out-of-cadence transition triggers, zero-new-machinery
+prohibition) are now present, and the two previously narrowed wording differences ("the obligation's
+scope" -> "the scope predicate"; "the default cadence value" -> "the long-run cadence default") now
+match C-01's ledger names. Prose style of requirements.md retained; the fact set is identical to C-01.
+
+Note on the remaining sentence: C-01 lines 34-38 also require the declaration to name what it does
+NOT own. FR-001 now carries "The owner MUST name what it does not own, with the owner path for each"
+in the existing sentence position; the set of non-owned owners is C-01's own enumeration and is not
+restated here (one-source-of-truth: requirements names the obligation, C-01 owns the list).
+
+### 2. A10 restatement clause (requirements.md:420-424) — "five owned facts" residue removed
+
+Before: the A10 structure clause listed "cadence-and-override, obligation scope, the reporter-seat
+obligation, the master-reporting duty and stall judgement, and the digest contract" — a second,
+differently-shaped (five-and-a-half) enumeration of the same closed set.
+
+After: the same clause adds "the out-of-cadence transition triggers, the digest contract and the
+zero-new-machinery prohibition — the eight facts, enumerated in full by FR-001". The clause is now a
+pointer to FR-001's enumeration rather than an independent count, so the closed set has one
+requirements-side definition point (FR-001) and C-01 remains the cross-artifact owner.
+
+### 3. Residue scan — no other owned-fact count remains in requirements.md
+
+`grep -n "owned fact|owned-fact|five owned|single owner|owning document" requirements.md` returns:
+- `:199` FR-001 (repaired, eight)
+- `:203` FR-002 "The owning document MUST define ..." — no count, no enumeration, no edit needed
+- `:420-424` A10 (repaired, pointer to FR-001)
+- `:139` "Why this priority" — narrative, no count, no enumeration
+No "five", "five facts" or "five owned facts" string remains anywhere in requirements.md.
+
+## Invariants held
+
+- FR id set: 22 definition rows, 22 unique ids (FR-001..FR-022) — unchanged.
+- SC id set: 10 definition rows, 10 unique ids (SC-001..SC-010) — unchanged.
+- No new mechanism, no new requirement, no renumbering, no path/entry-point decision introduced
+  (A13 preserved).
+- Out-of-scope artifacts untouched: feature-ref.md, tasks.md, contracts/** (owned by plan/tasks
+  halves of F-07), state spine `.specify/state/087-speckit-visualization.md`.
+
+## validate-requirements.py .specify/specs/087-speckit-visualization/requirements.md
+
+file: .specify/specs/087-speckit-visualization/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 522 lines, 32 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+exit code: 0
+
+## pre-analyze-check.py --spec-dir .specify/specs/087-speckit-visualization --stage requirements --repo .
+
+decision: pass
+errors: 0
+advisories: 126 (all `missing-path` for paths this feature is scheduled to create — unchanged from
+the pre-repair baseline count and from the analyze round-2 reading)
+waived: 0
+summary: fr=22 sc=10 tasks=50 clauses=0 files=15
+exit code: 0
+script path: .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py (the driver-skill copy;
+no pre-analyze-check.py exists under .specify/scripts/python/)
+
+## Residual (NOT repaired here, by assignment boundary)
+
+- F-07 tasks half: `tasks.md:83` (T007 "exactly the five owned facts"), `tasks.md:87` (T008 "five
+  owned facts + four named non-owned owners by path") still say five — owned by the tasks-stage
+  repair. Until that lands, T007's red-first assertion contradicts C-01 and this repaired FR-001.
+- F-07 feature-ref half: `feature-ref.md:123` `owns` row still lists five — owned by the plan-stage
+  repair.
+- F-07 checklist note: `checklists/framework-visualization-2026-11-06.md:32,105` cite five — dated
+  artifact, annotate in the next checklist round per the round-2 recommendation.
