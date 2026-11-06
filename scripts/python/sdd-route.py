@@ -93,10 +93,22 @@ installation and no third-party import.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
 from pathlib import Path
+
+
+def _goal_utils():
+    """Load the sibling goal engine so the scope path rule has one owner."""
+    path = Path(__file__).resolve().with_name("goal-utils.py")
+    spec = importlib.util.spec_from_file_location("_sdd_route_goal_utils", path)
+    if spec is None or spec.loader is None:
+        raise InputError(f"cannot load the goal engine beside sdd-route.py: {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 EXIT_OK = 0
 EXIT_INPUT_ERROR = 2
@@ -267,9 +279,14 @@ def _resolve_agent_half(agent_path: Path):
     return value, {"source": "declared"}
 
 
-def _resolve_seat_half(root: Path, team_slug: str, seat_slug: str):
+def _resolve_seat_half(root: Path, team_slug: str, seat_slug: str,
+                       scope: str = "global", spec_dir: str | None = None):
     """`(value, supplying, team_md_path)`; an absent map / entry / key means deny."""
-    team_path = root / ".specify" / "teams" / team_slug / "team.md"
+    try:
+        resolved = _goal_utils().resolve_scope(root, scope, spec_dir, team_slug)
+        team_path = resolved.team_definition(team_slug)
+    except Exception as exc:
+        raise InputError(f"scope resolution failed: {exc}") from exc
     if not team_path.is_file():
         raise InputError(
             f"{team_path}: team slug {team_slug!r} does not resolve to a persisted team "
@@ -330,7 +347,8 @@ def action_authorize(args) -> int:
     agent_path = Path(args.agent)
     agent_value, agent_supplying = _resolve_agent_half(agent_path)
     seat_value, seat_supplying, team_path = _resolve_seat_half(
-        Path.cwd(), args.team, args.seat
+        Path.cwd(), args.team, args.seat,
+        getattr(args, "scope", "global") or "global", getattr(args, "spec_dir", None)
     )
 
     effective = ALLOW if (agent_value == ALLOW and seat_value == ALLOW) else DENY
@@ -353,6 +371,8 @@ def action_authorize(args) -> int:
         "failed_half": failed_half,
         "team_slug": args.team,
         "seat_slug": args.seat,
+        "scope": getattr(args, "scope", "global") or "global",
+        "spec_dir": getattr(args, "spec_dir", None),
         "supplying": {
             "agent": agent_supplying["source"],
             "seat": seat_supplying["source"],
@@ -1004,6 +1024,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--agent", help="agent definition (.agent.md) carrying the capability")
     parser.add_argument("--team", help="team slug — the first authorization coordinate")
     parser.add_argument("--seat", help="seat slug — the second authorization coordinate")
+    parser.add_argument("--scope", choices=("global", "spec", "auto"), default="global",
+                        help="team scope: global (default), spec (requires --spec-dir), or auto")
+    parser.add_argument("--spec-dir", default=None,
+                        help="the spec directory for --scope spec/auto")
     parser.add_argument("--nature", help="declared change_nature value")
     parser.add_argument("--traceability", help="declared traceability value")
     parser.add_argument("--blast-radius", help="declared blast_radius value")

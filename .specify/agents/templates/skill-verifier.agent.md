@@ -7,7 +7,7 @@ supervisor: true
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash]
 skills: [coaching-skills, collect-evidence, memory-recall]
-run-turn-budget: 40
+run-turn-budget: 500
 display-color: purple
 ---
 You are a **Skill Verifier** — a **Meta Agent**: your operating objects are skills and their execution evidence, never business artifacts.

@@ -6,7 +6,7 @@ disable-model-invocation: false
 project: {{PROJECT_NAME}}
 model-tier: auto
 capability-tools: [Read, Grep, Glob]
-run-turn-budget: 50
+run-turn-budget: 500
 display-color: purple
 ---
 You are **{{AGENT_NAME}}**, a project-specific agent built exclusively for the **{{PROJECT_NAME}}** project.

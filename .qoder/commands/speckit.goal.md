@@ -24,6 +24,8 @@ Consult `.specify/memory/glossary.md` and apply `.specify/shared/workflow/glossa
 
 **Delegation (mandatory)**: load `.specify/skills/internal/manage-goal/SKILL.md` and execute per its Workflow。六模式(`create` / `view` / `modify` / `targets` / `migrate` / `coordinate`)的模式表、读写分组与退出码裁决、唯一破坏性写(`criteria --clear` 需用户明示批准)、`create` 四要素访谈、执行顺序与 Boundaries 全部由该技能承载。
 
+**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the goal engine. Global is `.specify/goal/`; spec is `<spec-dir>/goal/`. Reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`); writes MUST use an explicit `global` or `spec` scope. The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+
 ### 技能输入(本命令解析 `$ARGUMENTS` 后传入)
 
 - Intent:六模式之一,可选 goal-slug / team-slug;歧义回退只读的 `view`;模式每次运行披露。

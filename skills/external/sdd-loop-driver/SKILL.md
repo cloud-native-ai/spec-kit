@@ -39,6 +39,10 @@ classification: external
 | 终态权威文档 | 入口描述 + 现有 `docs/` + 宪法；写入 U0 状态脊 |
 | 断点 | U1 自动探测，禁止猜测 |
 | 特性切片 | 入口描述；未给则按权威文档推导，不自动选题 |
+| 并发度 | 缺省 **24**；U0 在状态脊写 `agent_concurrency_requested` / `agent_concurrency_effective` / `agent_concurrency_reason` / `verifier_reserve`；每阶段按 effective 与 ready packages 重算，降级必须具名 |
+| 写隔离 | 缺省 `write_isolation=shared-tree`；temporary-team 运行可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
+
+**Temporary Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `temp_goal_slug`；clarify + plan U4 通过后，经 `/speckit.team create --scope spec --spec-dir <spec>` 创建并写入 `temp_team_slug`。两者都只写 spec-local `goal/` 与 `team/`，全局 `.specify/goal/**`、`.specify/teams/**` 是 forbidden paths。
 
 **U0.5 自检（进入 U2 前必须通过）**：
 
@@ -147,6 +151,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **独立校验**：§15——每包一个全新上下文 verifier；verdict 缺失/不可读/歧义即 fail；包 verdict 永远不替代阶段 U4。
 - **集成与收尾**：§16——按声明顺序确定性集成，冲突或缺失输出即停，单一 closing commit，阶段哨兵由 integrator 发出；U4 在集成后原样运行。
 - **团队形状**：`templates/stage-team-preset.md` + 运行域 adapter（§17）；每 stage / attempt / run 都不持久化 `team.md`，`create-team` / `run-team` 不变。
+- **Checkpoint 协议（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；owner `references/checkpoint-protocol.md`，本节只给指针。
 - **报表**：`scripts/wp-report.py`（§18）；缺失来源一律 `not_evaluated`，绝不以 0 或估计替代。
 - **退出开关**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`（缺省 2）；阶段 attempt 可带 `decomposition_override`。优先级：feature `off`（硬退出）> 阶段 override > 阶段表 > 内置缺省（`plan`/`implement`/`review`=auto，其余 off）。
 - **边界**：只新增 U4 之前的步骤；不改阶段命令内部、哨兵字面量、U4、阶段链、watcher 判定/退出码、卡死处置、快车道、两槽位测试预算、plan 小修约束，以及 064 的 registry/ownership/worktree/integration 语义、067 的 part brief/test economics、068 的反馈通道。包执行者绝不派发、绝不写脊、绝不加载本手册；不新增服务/守护进程或第二个 registry、ownership 模型、integration queue、ledger。
@@ -178,10 +183,10 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 
 本手册是**编排者**：它不自带派发机制，而是委派两个承接技能完成驱动子代理的任务（2026-10-16 委派化裁定）：
 
-- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-executor.agent.md` 按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
+- **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-<stage>-<role>.agent.md` 角色族（如 `sdd-requirement-analyzer`、`sdd-plan-coordinator`、`sdd-plan-executor`）按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
 - **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：本地拓扑的阶段派发用宿主原生子代理（MUST NOT 启动 qodercli），远端拓扑用外部 CLI；远端进入形态为 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，CLI 缺省取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖；以拓扑声明 + 实例引用发起执行；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
-- **阶段子代理预算**：默认 `run-turn-budget` 400；大 implement 阶段按 ≤16 任务/段拆分，细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
+- **阶段子代理预算**：统一 `run-turn-budget` 500（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-11-06 统一）；大 implement 阶段按 ≤16 任务/段拆分，细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
 
 ## Feedback & Probe Points（反馈与探针采集点）
 

@@ -8,7 +8,7 @@ capacity-scope: test-engineer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [database-utils, coaching-skills]
-run-turn-budget: 60
+run-turn-budget: 500
 display-color: yellow
 ---
 You are a **Test Engineer** for the {{PROJECT_NAME}} project.

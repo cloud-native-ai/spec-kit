@@ -239,7 +239,7 @@ def compare_working_tree(cwd: Path = REPO_ROOT) -> dict:
         if rel in feature_paths:
             problems.append(
                 "%r is new inside the comparison unit — new paths are allowed only when "
-                "registered (GM-03 in-unit rows 1–8 + 19–20)" % rel
+                "registered (GM-03 registered in-unit rows)" % rel
             )
             continue
         if rel in tracked:
@@ -425,7 +425,7 @@ def test_sc003_unregistered_additions_are_absent_and_co_worktree_paths_are_repor
     )
     assert reading["current"] > 0 and reading["baseline"] > 0, "empty comparison unit"
     assert not reading["unregistered_additions"], (
-        "tracked paths inside the comparison unit are new and not registered in GM-03 in-unit rows 1–8 + 19–20: %s"
+        "tracked paths inside the comparison unit are new and not registered in GM-03 registered in-unit rows: %s"
         % reading["unregistered_additions"]
     )
     # A co-worktree path that *is* in the allowed set would be a path this feature claims but
@@ -476,12 +476,15 @@ def test_sc003_reading_line_is_recomputable_from_its_own_fields():
     assert int(fields["frozen_mismatches"]) == 0, line
 
 
-def test_gm03_allowed_set_parses_to_ten_in_unit_rows():
+def test_gm03_allowed_set_parses_to_the_registered_rows():
     inside, outside = registered_allowed_set((REPO_ROOT / DATA_MODEL_REL).read_text(encoding="utf-8"))
-    assert len(inside) == 10, (
-        "GM-03 in-unit rows must register the allowed set (8 feature paths + 2 absorbed "
-        "coaching skill-reference files); parsed %d path(s): %s"
-        % (len(inside), sorted(inside))
+    # 10 rows from 083 (8 feature paths + 2 absorbed coaching files) + 22 rows
+    # registered by 085 for the temporary Goal/Team, stage agents, child lines and
+    # checkpoint protocol. The 083 rows keep their own meaning; this expectation
+    # moves only when a later feature deliberately registers another in-unit path.
+    assert len(inside) == 32, (
+        "GM-03 in-unit rows must register the allowed set (10 from 083 + 22 from 085); "
+        "parsed %d path(s): %s" % (len(inside), sorted(inside))
     )
     assert outside, "GM-03 rows 9–18 register the out-of-unit new paths; parsed none"
     for rel in inside:

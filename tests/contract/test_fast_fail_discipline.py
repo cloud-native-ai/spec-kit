@@ -71,9 +71,22 @@ PROACTIVE_TEST = ROOT / "tests" / "contract" / "test_proactive_trigger_section.p
 SWEEP_TEST = ROOT / "tests" / "contract" / "test_confirmation_gates_sweep.py"
 
 FACTORY_PRESETS = (
+    ROOT / "agents" / "sdd-analysis-worker.agent.md",
+    ROOT / "agents" / "sdd-checklist-worker.agent.md",
+    ROOT / "agents" / "sdd-clarify-analyzer.agent.md",
+    ROOT / "agents" / "sdd-implement-coordinator.agent.md",
+    ROOT / "agents" / "sdd-implement-executor.agent.md",
+    ROOT / "agents" / "sdd-plan-coordinator.agent.md",
+    ROOT / "agents" / "sdd-plan-executor.agent.md",
+    ROOT / "agents" / "sdd-requirement-analyzer.agent.md",
+    ROOT / "agents" / "sdd-review-coordinator.agent.md",
+    ROOT / "agents" / "sdd-review-executor.agent.md",
+    ROOT / "agents" / "sdd-stage-integrator.agent.md",
+    ROOT / "agents" / "sdd-stage-verifier.agent.md",
+    ROOT / "agents" / "sdd-task-coordinator.agent.md",
+    ROOT / "agents" / "sdd-task-executor.agent.md",
     ROOT / "agents" / "skill-verifier.agent.md",
     ROOT / "agents" / "structure-adjuster.agent.md",
-    ROOT / "agents" / "sdd-executor.agent.md",  # 060: SDD executor template (deliberate enumeration update)
 )
 
 # --- literals (Shared Strings of requirements.md are the owner) ------------
@@ -1381,7 +1394,7 @@ AGENT_TREES = (
     (".github/agents", "{slug}.agent.md"),
     (".opencode/agents", "{slug}.md"),
 )
-PRESET_SLUGS = ("skill-verifier", "structure-adjuster")
+PRESET_SLUGS = tuple(p.name[:-len(".agent.md")] for p in FACTORY_PRESETS)
 DISPATCH_WRAPPER = ROOT / "skills" / "internal" / "create-team" / "scripts" / "dispatch.sh"
 OWNER_SECTION = "## 子代理派发注入"
 VISIBILITY_HEADING = "## External Dispatch Visibility Contract"
@@ -1510,9 +1523,9 @@ def test_i9_channel_two_skill_authoring_requirement():
 
 
 def test_i10_channel_two_factory_presets_byte_equal():
-    """C-10: both factory presets carry exactly one pair, byte-identical to the owner."""
+    """C-10: every framework agent preset carries exactly one pair, byte-identical to the owner."""
     owner = _clause_interval(_text(DOC))
-    assert len(FACTORY_PRESETS) == 3, f"C-10: expected 3 factory presets, the constant holds {len(FACTORY_PRESETS)}"
+    assert len(FACTORY_PRESETS) == 16, f"C-10: expected 16 framework agent presets, the constant holds {len(FACTORY_PRESETS)}"
     assert sorted(ROOT.glob("agents/*.agent.md")) == sorted(FACTORY_PRESETS), (
         "C-10: the bounded preset set no longer matches agents/*.agent.md -- update the enumeration deliberately"
     )
@@ -1566,7 +1579,7 @@ def test_i12_channel_two_bounded_set():
     assert len(own_source) > 1000, "C-12 sentinel: this module read as near-empty, so the scan is blind"
     assert "FACTORY_PRESETS" in own_source, "C-12 sentinel: the bounded enumeration constant is gone"
     bounded = list(FACTORY_PRESETS) + [AGENTS_CMD, CREATE_AGENT_SKILL]
-    assert len(bounded) == 5, f"C-12: the bounded set should be 3 presets + 2 authoring texts, got {len(bounded)}"  # 060: sdd-executor joins the preset set
+    assert len(bounded) == 18, f"C-12: the bounded set should be 16 presets + 2 authoring texts, got {len(bounded)}"  # 084: stage-specific agent set replaces the generic template
     for p in bounded:
         assert p.is_file(), f"C-12: a member of the bounded set does not exist: {p.relative_to(ROOT)}"
 

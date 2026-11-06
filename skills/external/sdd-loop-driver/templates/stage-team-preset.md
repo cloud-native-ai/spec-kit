@@ -51,6 +51,7 @@ config:
   verification: one fresh-context verifier execution per Work Package
   retry: at most one automatic retry per Work Package; the retry must change scope, budget, or topology
   persistence: run-scoped only; never .specify/teams/<slug>/team.md
+  write_isolation: shared-tree | worktree   # 084: worktree uses per-agent child lines + the integration queue
 provenance: Feature 070 clarify 2026-10-24; shape derived from the measured baseline in the 070 brief and the existing Role × Stage × Type vocabulary, not from a create-team catalog run. First-run provenance is attached when the first decomposed stage closes (its coordination report path is recorded in the spine).
 ---
 

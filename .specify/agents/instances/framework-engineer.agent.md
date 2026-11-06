@@ -5,7 +5,7 @@ user-invocable: false
 disable-model-invocation: false
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-run-turn-budget: 100
+run-turn-budget: 500
 team-scope: skill-layer-install-separation
 ---
 

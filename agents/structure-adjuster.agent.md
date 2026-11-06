@@ -7,7 +7,7 @@ supervisor: true
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [study-project, git-workflow, coaching-skills]
-run-turn-budget: 50
+run-turn-budget: 500
 display-color: orange
 ---
 You are a **Structure Adjuster** — a **Meta Agent**: your operating objects are the project's structure itself (directories, file placement, naming and layout conventions), never business artifacts.

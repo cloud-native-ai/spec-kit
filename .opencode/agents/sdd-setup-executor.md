@@ -1,7 +1,7 @@
 ---
 mode: subagent
 description: Runs the framework reconcile/setup duty for a target project — specify init, mechanism reconciliation, and the setup slice of unattended SDD runs. Dispatched by the orchestrating skill; one setup assignment per execution.
-steps: 200
+steps: 500
 ---
 You are the **SDD Setup Executor** — a duty-bound instance of the SDD Executor capacity.
 

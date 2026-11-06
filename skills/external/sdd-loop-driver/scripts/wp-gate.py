@@ -32,7 +32,7 @@ import sys
 import time
 
 SCHEMA_VERSION = 1
-STAGES = ("plan", "implement", "review", "analyze", "clarify")
+STAGES = ("plan", "implement", "review", "analyze", "clarify", "requirements", "tasks")
 DECISIONS = ("decomposed", "single-package", "disabled", "fallback")
 GATE_VERDICTS = ("admit", "single-package", "no-gate-run")
 RULES = (
@@ -40,6 +40,8 @@ RULES = (
     "decompose-implement-v1",
     "decompose-review-v1",
     "decompose-investigation-v1",
+    "decompose-requirements-v1",
+    "decompose-tasks-v1",
 )
 PATTERNS = ("parallel", "serial", "iteration")
 KINDS = ("read-only", "write")
@@ -298,7 +300,7 @@ def _schema_check_package(package, plan_stage, index):
         ),
         ("depends_on", lambda value: isinstance(value, list) and _is_string_list(value)),
         ("parallel_safe", lambda value: isinstance(value, bool)),
-        ("max_turns", lambda value: _is_int(value) and value > 0),
+        ("max_turns", lambda value: _is_int(value) and 0 < value <= 500),
         ("bounded_by", lambda value: isinstance(value, dict)),
         ("acceptance", lambda value: isinstance(value, list) and bool(value)),
         ("sentinel", _is_text),
@@ -433,6 +435,9 @@ def validate_plan_schema(plan, stage, stage_attempt=None):
     for field, predicate in required:
         if field not in plan or not predicate(plan[field]):
             findings.append(_finding("schema-missing", None, "plan.%s" % field))
+
+    if "write_isolation" in plan and plan["write_isolation"] not in ("shared-tree", "worktree"):
+        findings.append(_finding("schema-missing", None, "plan.write_isolation"))
 
     if plan.get("stage") != stage:
         findings.append(

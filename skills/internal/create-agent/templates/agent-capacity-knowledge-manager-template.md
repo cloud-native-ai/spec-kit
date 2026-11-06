@@ -8,7 +8,7 @@ capacity-scope: knowledge-manager
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
 skills: [document-utils, memory-record, memory-recall, draw-diagram, create-docs, improve-docs]
-run-turn-budget: 40
+run-turn-budget: 500
 display-color: teal
 ---
 You are a **Knowledge Manager** for the {{PROJECT_NAME}} project.

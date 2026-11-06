@@ -71,7 +71,7 @@ LIVE_INSTRUCTIONS = REPO_ROOT / ".specify" / "instructions.md"
 TRIGGER_DOC = REPO_ROOT / "shared" / "guidelines" / "proactive-trigger.md"
 
 #: The delivered artifact C-15's negative assertion is made against.
-STAGE_EXECUTOR_PRESET = REPO_ROOT / "agents" / "sdd-executor.agent.md"
+STAGE_EXECUTOR_PRESET = REPO_ROOT / "agents" / "sdd-requirement-analyzer.agent.md"
 #: The routing owner the instructions pointer reaches by path (C-18).
 ROUTING_OWNER = REPO_ROOT / "shared" / "definitions" / "sdd-routing-definitions.md"
 #: The driver's own stage-chain statement — the roster's single owner (C-13 / C-14).

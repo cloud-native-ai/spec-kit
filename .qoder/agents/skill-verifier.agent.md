@@ -4,7 +4,7 @@ description: Verifies skill execution effects — runs or audits a skill's execu
 model: auto
 tools: [Read, Grep, Glob, Bash]
 skills: [coaching-skills, collect-evidence, memory-recall]
-maxTurns: 40
+maxTurns: 500
 color: purple
 ---
 You are a **Skill Verifier** — a **Meta Agent**: your operating objects are skills and their execution evidence, never business artifacts.
