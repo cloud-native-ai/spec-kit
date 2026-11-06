@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
-stage: plan
-stage_started_at: 1793938380
-stage_deadline_epoch: 1793949180
-stage_base_commit: 554d8333
+stage: tasks
+stage_started_at: 1793939100
+stage_deadline_epoch: 1793949900
+stage_base_commit: 67bbae51
 attempt: 0
 retry_limit: 3
-last_verdict: clarify U4 pass (Feature 086 bound; A13-A19; overlap clear; 085 untouched); checkpoint 02 written; plan dispatch next
+last_verdict: plan U4 pass (plan artifacts, registry Planned, pre-analyze pass/advisories 25, 085 untouched); temporary Team created (8 stage seats, 24/18, worktree); checkpoint 03 written; tasks dispatch next
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -49,7 +49,7 @@ last_verdict: clarify U4 pass (Feature 086 bound; A13-A19; overlap clear; 085 un
 ## 085 机制保留与实测（本次运行即 085 的真实场景 dogfood）
 
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
-- **临时 Team（085）**：clarify + plan U4 通过后，经 `/speckit.team create --scope spec --spec-dir <spec>` 创建 spec-local 临时 Team；写入 `temp_team_slug`；全局 `.specify/teams/**` 为 forbidden。
+- **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
 - **并发度（085）**：`agent_concurrency_requested: 24`；`agent_concurrency_effective: 24`（初值；host capacity 未声明 → 记录 `host-capacity-undeclared`；每阶段按 ready packages / stage max_parallel / resource capacity 重算）；`verifier_reserve: 6`（`max(1, ceil(24/4))`）；executor slots = 18；任何降级必须具名写入状态脊。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
@@ -130,6 +130,16 @@ last_verdict: clarify U4 pass (Feature 086 bound; A13-A19; overlap clear; 085 un
 - 085 diff in `3afe10df..HEAD` = empty；Wrap-up records present（session/feedback for `skill:clarify-artifact` and `speckit:clarify`）。
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/02-clarify.md`。
 - next: `plan` dispatch（effective 2 = 1 plan coordinator + 1 verifier；carrier `SDD Executor`；临时 Team 待 plan U4 后创建）。
+
+## U4 plan（2026-11-06T04:23Z）
+
+- sentinel: `PLAN-DONE`；stage commit `67bbae51`。
+- artifacts: `plan.md` / `research.md` / `data-model.md` / `feature-ref.md` / `quickstart.md` + 4 contracts；Feature 086 Draft → Planned。
+- driver independent gates: `pre-analyze --stage plan` pass errors=0 advisories=25（均为未来交付路径）；`validate-requirements` 0/0；`decomposition --mode plan` proceed（fr=33 ≤ 60）。
+- 085 diff `3afe10df..67bbae51` = empty；plan stage Wrap-up records present（session/feedback for `speckit:plan` and `skill:create-plan`）。
+- temporary Team: `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md` — `scope: spec`、`goal_slug: 086-efficient-test-execution`、8 stage_seats、14 seats、`agent_concurrency` 24/18、`isolation: worktree`、checkpoint standing；schema check passed。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/03-plan.md`。
+- next: `tasks` dispatch（effective 2 = 1 task executor + 1 verifier；team tasks max_parallel 12 not binding）。
 
 ## U0.5 自检
 
