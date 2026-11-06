@@ -114,7 +114,7 @@ supplies no population path reports its roster proposition `not-evaluated` rathe
 | FR-021 | 5, 6, 8 | C-18, C-04 |
 | FR-022 | 12–18 | C-41 |
 
-Every FR has at least one delivered path and one contract clause. (22 FR, 22 rows.)
+Every FR has at least one delivered path and one contract clause. (29 FR; FR-023…FR-029 rows are added by the plan refresh, 22 rows before it).
 
 ## Consuming / Consumed Owners
 
@@ -154,7 +154,7 @@ system, maturity report or runtime evaluation platform.
 
 | Stage | State | Artifact |
 |-------|-------|----------|
-| requirements | done (22 FR / 10 SC, 15 assumptions, 5 clarifications) | `requirements.md` |
+| requirements | done (29 FR / 14 SC, 15 assumptions, 5 clarifications) | `requirements.md` |
 | clarify | done (Feature binding + 5 adjudications) | `requirements.md` § Clarifications |
 | plan | **this stage** | `plan.md`, `research.md`, `data-model.md`, `contracts/` (6 files / 52 clauses `C-01`…`C-52`), `quickstart.md` (8 scenarios A–H), this file (28 delivered paths) |
 | tasks | not started | — |

@@ -56,7 +56,7 @@ files; no network, no process spawn).
 timer, daemon or store; every emitted line readable by a reader who did not take part in the run
 (`shared/guidelines/user-facing-comprehension.md`); the 30-second literal has exactly one definition site.
 **Scale/Scope**: 28 delivered paths across 7 framework-source areas plus their mirrors and 4 per-tool command
-copies (`feature-ref.md` § Delivered paths is the enumerated owner of this list); 22 FR, 10 SC, 6 contracts / 52
+copies (`feature-ref.md` § Delivered paths is the enumerated owner of this list); 29 FR, 14 SC, 6 contracts / 52
 clauses, 7 entities.
 
 ## Constitution Check
@@ -331,7 +331,7 @@ Counts below were taken **from the files on disk after they were written**, not 
 | Data model | `data-model.md` | 7 entities (Reporter Seat, Status Report, Supervised Sub-flow, Stall Threshold, Current-State Digest, Reporting Profile, Registry Line Projection) and 12 invariants (INV-01…INV-12) |
 | Contracts | `contracts/` | 6 files, 52 numbered clauses total: `reporting-obligations.contract.md` C-01…C-13 (RO-01…RO-13), `reporter-seat.contract.md` C-14…C-21 (RS-01…RS-08), `status-report.contract.md` C-22…C-31 (SR-01…SR-10), `supervision-report.contract.md` C-32…C-40 (MV-01…MV-09), `status-digest.contract.md` C-41…C-46 (DG-01…DG-06), `ownership-map.contract.md` C-47…C-52 (OM-01…OM-06) — clause ids are dense per file and cited by `/speckit.tasks` |
 | Quickstart | `quickstart.md` | 8 scenarios (A owner read, B roster guard, C digest active, D digest idle, E owner-literal scan, F guard, G mirror/copy integrity, H zero-new-machinery audit) with the executed/unexecuted premise stated per scenario |
-| Feature reference | `feature-ref.md` | Feature 087 binding, shared delivery root, FR → artifact map (22 FR), neighbouring-feature scan |
+| Feature reference | `feature-ref.md` | Feature 087 binding, shared delivery root, FR → artifact map (29 FR), neighbouring-feature scan |
 | Research | `research.md` | 15 measured readings (RO-01…RO-15) and 5 resolved unknowns |
 | Stage evidence | `test-evidence/plan.jsonl` | 1 E3 `stage-status` row, `status=not-run-docs-only` with the six reduced fields |
 
