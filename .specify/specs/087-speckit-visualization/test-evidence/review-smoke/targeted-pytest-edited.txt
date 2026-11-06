@@ -1,0 +1,60 @@
+........................................................................ [ 54%]
+..............................F.....................F........            [100%]
+=================================== FAILURES ===================================
+_______________ test_i11_channel_two_mirrors_and_per_tool_copies _______________
+
+    def test_i11_channel_two_mirrors_and_per_tool_copies():
+        """C-11: the mirror and all four per-tool trees carry the identical clause."""
+        # Stale-pin update (067 T025, 2026-10-22): per-tool trees are RENDERED copies —
+        # the render engine (specify_cli.rewrite_paths, the recorded owner of the rule)
+        # rewrites root-relative `shared/` to the runtime `.specify/shared/` prefix. The
+        # raw owner literal is the wrong expected value for that channel; the pin now
+        # compares each per-tool interval against the engine-rendered owner literal.
+        # Byte-identity strength unchanged (still exact interval equality).
+        from specify_cli import rewrite_paths
+        owner = _clause_interval(_text(DOC))
+        for preset in FACTORY_PRESETS:
+            mirror = ROOT / ".specify" / "agents" / "templates" / preset.name
+            assert mirror.is_file(), f"C-11: missing mirror {mirror.relative_to(ROOT)}"
+            assert mirror.read_bytes() == preset.read_bytes(), (
+                f"C-11: {mirror.relative_to(ROOT)} differs from its source"
+            )
+        for tree, naming in AGENT_TREES:
+            d = ROOT / tree
+            assert d.is_dir(), f"C-11: per-tool agent tree {tree} is missing"
+            for slug in PRESET_SLUGS:
+                copy = d / naming.format(slug=slug)
+                assert copy.is_file(), f"C-11: {copy.relative_to(ROOT)} was not rendered"
+>               assert _clause_interval(_text(copy)) == rewrite_paths(owner), (
+                    f"C-11: {copy.relative_to(ROOT)}'s clause interval is not byte-identical "
+                    f"to the engine-rendered owner literal (rewrite_paths)"
+                )
+E               AssertionError: C-11: .qoder/agents/sdd-analysis-worker.agent.md's clause interval is not byte-identical to the engine-rendered owner literal (rewrite_paths)
+E               assert '\nfast-fail-...t-fail.md`。\n' == '\nfast-fail-...t-fail.md`。\n'
+E                 
+E                 Skipping 316 identical leading characters in diff, use -v to show
+E                 - 件形态的唯一真源:`.specify/shared/guidelines/fast-fail.md`。
+E                 ?           ---------
+E                 + 件形态的唯一真源:`shared/guidelines/fast-fail.md`。
+
+tests/contract/test_fast_fail_discipline.py:1561: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1949: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+2 failed, 131 passed in 3.27s
+RC=1

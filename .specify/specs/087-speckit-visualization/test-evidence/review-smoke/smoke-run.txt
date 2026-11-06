@@ -1,0 +1,39 @@
+conforming: team us1-compliant-fixture carries exactly one reporter seat (agent: reporter)
+generated_at=2026-11-06T07:56:15.977936Z cap=5 stale_bound=15m00s profile=long-run
+line_id=087-speckit-visualization run_id=r20261106T040353Z-087a state=active stage=- age=1h33m stale=yes active=yes note=last activity 1h33m ago, beyond the 15m00s stale bound
+line_id=082-self-explanatory-integration run_id=r20261105T032102Z-c139 state=closed stage=- age=24h51m stale=yes active=no note=last activity 24h51m ago, beyond the 15m00s stale bound
+line_id=078-bilingual-expression run_id=r20261030T081645Z-078a state=closed stage=- age=163h21m stale=yes active=no note=last activity 163h21m ago, beyond the 15m00s stale bound
+line_id=074b-nested-governance run_id=r20261029T045000Z-b074 state=closed stage=- age=192h43m stale=yes active=no note=last activity 192h43m ago, beyond the 15m00s stale bound
+line_id=074-goal-team-sdd-unification run_id=r20261028T132000Z-074d state=stalled stage=requirements age=207h47m stale=yes active=no activity=label=074-goal-team-sdd-unification,state=running,age=207h47m note=last activity 207h47m ago, beyond the 15m00s stale bound
+last_completion=line_id=082-self-explanatory-integration age=24h51m
+omitted=3
+structure=087-supervision | run=r20261106T090000Z-us2f | trigger=tick | profile=long-run | position=1 dispatched sub-flow(s) watched (tick report) | delta=0 completed, 1 running or stalled, 0 failed since the last tick | remainder=1 sub-flow(s) still active | blocker=no blocker
+sub-flow=087-supervision--r20261106T090000Z-us2f--worker | state=stalled | age=49m42s | slow=no | judged_against=skills/internal/create-team/references/patterns.md § Monitoring → Stall Detection | row=Manifest stuck at `in-progress` | threshold=120s with no file changes | override=none | measured_silence=49m42s | carrier=console
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 not-evaluated no seeded flow sample supplied (--flow-sample)
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 not-evaluated no captured line set supplied (--line-set)
+RO-06 pass 1 sub-flow row(s) present, 0 omitted
+RO-07 pass row 'Manifest stuck at `in-progress`' resolved from skills/internal/create-team/references/patterns.md; value used 2m00s
+RO-08 not-evaluated no transition class was observed for this report
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 not-evaluated no captured line set supplied (--line-set)
+RO-11 not-evaluated no suppressed-tick fixture supplied (--supervision-line-set or --line-set)
+RO-12 not-evaluated no carrier value supplied (the run record holds none and no --carrier was given)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=6 fail=0 not-evaluated=7
+RO-01 pass owner declaration lists exactly 8 owned facts
+RO-02 pass 10 flow(s) classified, 0 unclassifiable
+RO-03 pass exactly one definition site: shared/guidelines/reporting-obligations.md (whitelisted prose hits: 2)
+RO-04 not-evaluated no roster path is in the obligation's population: no --roster was supplied and the recorded name-list holds no in-population row
+RO-05 pass 11 line(s) carry the four labels
+RO-06 pass 4 sub-flow row(s) present
+RO-07 pass threshold anchor resolves and the owner carries no numeric threshold
+RO-08 pass all three transition classes present
+RO-09 pass owner digest section states bounded/omitted/stale/nothing-running; one digest render backs the shapes
+RO-10 pass no interrogative or approval marker in the line set
+RO-11 pass the reporter-failure line is present
+RO-12 pass carrier is a declared stream artifact path (from --carrier)
+RO-13 pass prohibition names all nine items; no spawn site in the delivered script
+summary pass=12 fail=0 not-evaluated=1

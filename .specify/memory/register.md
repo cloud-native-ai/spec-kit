@@ -150,3 +150,12 @@
 | REC-084-12 | `targeted-set-v1` 增加**形态腿**：改动某个引擎时，同时选中把该引擎 `shutil.copy2` 进构造树的测试文件；且任一阶段的定向运行 MUST 留下捕获证据（命令行／退出码／完整输出），只在提交信息里报告通过数不算读数 | `.specify/specs/084-harness-triple-structure/review-r3.md` § 5 REC-084-12（N2；目标 `contracts/test-budget.md` TB-05 + `skills/sdd-loop-driver/references/efficiency-model.md` § 2.3） | open |
 | REC-084-13 | 评审轮转时把该轮拥有的 `REC-…` 行改指**归档**报告（`review-rN.md § …`），并加守卫断言每行的 authority path 可解析到存在的文件／小节 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-13（N9；目标 `.specify/memory/register.md` § ID Register protocol + `/speckit.review` 的轮转步） | open |
 | REC-084-14 | 测试预算记录是**授权序列**而非一个已定值的字段：后续授权追加一条带日期与范围的条目，审计读最新条目，块内定值字段不得继续声称比最新条目更窄的预算 | `.specify/specs/084-harness-triple-structure/review.md` § 5 REC-084-14（N8；目标 `skills/external/sdd-loop-driver/references/efficiency-model.md` + `skills/external/sdd-loop-driver/scripts/loop-state.py`） | open |
+| REC-A1 | 逐工具 agent 渲染器须对 fast-fail 子句区间应用 `rewrite_paths`，并加「整树渲染 → `test_i11` 往返」测试；否则新渲染的副本出生即红 | `.specify/specs/087-speckit-visualization/review.md` § 5.1 REC-A1（F1） | open |
+| REC-A2 | `status-digest.py` § `proposition_ro_04` 的调用方路径须走 `_read_any`，区分「读不到」与「席位缺席」；否则仓外 roster 的 population 半边无法测定 | `.specify/specs/087-speckit-visualization/review.md` § 5.1 REC-A2（F2） | open |
+| REC-W1 | 回归套件集须由改动文件机械派生（verification 日志加派生字段、闭合检查器接受改动套件 node-id diff 并给自己的 reason code），禁止手挑子集 | `.specify/specs/087-speckit-visualization/review.md` § 5.2 REC-W1（F3、F10） | open |
+| REC-W2 | analyze 修复波须声明可写路径集，checkpoint 之后触达集合外的提交令 wrap-up 变红 | `.specify/specs/087-speckit-visualization/review.md` § 5.2 REC-W2（F7） | open |
+| REC-W3 | 须声明运行记录存储（`.specify/memory/{session,exec-quant,feedback}/`）的 git 跟踪策略并对齐 `.gitignore` | `.specify/specs/087-speckit-visualization/review.md` § 5.2 REC-W3（F8） | open |
+| REC-W4 | 特性索引行保持 pointer 形态并增机器可读 reason-code 列，使 `Blocked` 可被读取器直接处置 | `.specify/specs/087-speckit-visualization/review.md` § 5.2 REC-W4（F4） | open |
+| REC-T1 | 产物评审段 A 增五维逐维 verdict 行，使干净维度以「干净」而非沉默呈现 | `.specify/specs/087-speckit-visualization/review.md` § 5.3 REC-T1（F5） | open |
+| REC-T2 | 代码技能体内枚举四个段 verdict 取值及其导出方式，评审模板 § 2.1 改为引用 | `.specify/specs/087-speckit-visualization/review.md` § 5.3 REC-T2（F6） | open |
+| REC-D1 | 摘要契约的两条数值缺省（条目上限、陈旧界）移入 owner 文档 `reporting-obligations.md`，脚本读取或引用 | `.specify/specs/087-speckit-visualization/review.md` § 5.4 REC-D1（F9） | open |

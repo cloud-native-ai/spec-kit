@@ -1,0 +1,15 @@
+### C-51's six affected pre-existing suites, re-measured by this review
+### base = 56f3f881 (detached worktree), head = 0df6f6c6 (working tree)
+
+suite | base rc / reading | head rc / reading
+tests/contract/test_progress_reporting.py | 0 / 7 passed | 0 / 7 passed
+tests/contract/test_coaching_dispatch_contract.py | 0 / 11 passed | 0 / 12 passed
+tests/contract/test_agent_dispatch_mechanism.py | 0 / 32 passed | 0 / 32 passed
+tests/contract/test_team_territory.py | 0 / 6 passed | 0 / 6 passed
+tests/contract/test_improve_team_presence.py | 0 / 3 passed | 0 / 3 passed
+tests/contract/test_team_command_routing.py | 0 / 32 passed | 0 / 32 passed
+
+=> the C-51 reading in test-evidence/cl-01-closure.txt § 1 reproduces exactly (91 -> 92 node ids,
+   0 removed, 1 declared addition = test_coaching_dispatch_contract.py's new row).
+=> it does NOT cover tests/contract/test_fast_fail_discipline.py, which is an EDITED file in this
+   delta and carries the one new red (test_i11) recorded in baseline-reproduction.txt.

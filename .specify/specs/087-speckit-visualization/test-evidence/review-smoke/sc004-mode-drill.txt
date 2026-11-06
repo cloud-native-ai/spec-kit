@@ -1,0 +1,11 @@
+### SC-004 mode 1 — --action report with the carrier NOT passed
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run | position=mode 1 dispatch in flight | delta=1 native subagent dispatched | remainder=1 mode left; about 1 minute | blocker=no blocker | carrier=console
+EXIT=0
+
+### SC-004 mode 2 — same, --carrier also not passed
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run | position=mode 2 dispatch in flight | delta=1 in-session execution step | remainder=1 mode left; about 1 minute | blocker=no blocker | carrier=console
+EXIT=0
+
+### SC-004 mode 3 — same shape with a triplet path
+structure=087-supervision | run=r20261106T091500Z-us2m | trigger=tick | profile=long-run | position=mode 3 dispatch in flight | delta=1 external dispatch | remainder=1 mode left | blocker=no blocker | carrier=/storage/project/cloud-native-ai/spec-kit/.specify/specs/087-speckit-visualization/fixtures/us2-supervision-fixture/modes/triplet/087-supervision--r20261106T091500Z-us2m--trainee.live.log
+EXIT=0

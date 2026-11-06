@@ -1,0 +1,1 @@
+smoke_command_exit=0 elapsed=1s

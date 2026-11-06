@@ -1,0 +1,19 @@
+### baseline-suite reproduction: the two edited-surface suites that report red
+$ python3 -m pytest -q tests/contract/test_coaching_dispatch_contract.py tests/contract/test_coaching_wiring_contract.py tests/contract/test_fast_fail_discipline.py
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+2 failed, 131 passed in 3.27s
+RC=1
+
+### the same two node ids re-measured at the pre-change base 56f3f881 in a detached worktree
+$ git worktree add --detach <tmp> 56f3f881 && python3 -m pytest -q tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+test_i11_channel_two_mirrors_and_per_tool_copies PASSED at 56f3f881
+test_g9_total_equals_frozen_baseline FAILED at 56f3f881 (G-9: gate total moved from the frozen 23 to 27)
+=> G-9 is inherited from the baseline tree (identical assertion, identical numbers, before and after).
+   I-11 is NOT: it is green at 56f3f881 and red at the run-start head, and the first failing copy is a
+   pre-existing agent (.qoder/agents/sdd-analysis-worker.agent.md line 50) whose source this delta touched
+   (commit 0d97dfd3, display-color only). Under a per-tool tree render the clause interval of all 17 copies
+   is written un-rewritten, so the newly added reporter copy is the first FACTORY_PRESETS member to reach
+   the assertion -- see review.md finding F3.
+   Neither node id is on the 27-name baseline-failed.txt list, which is why the feature's own
+   cl-01-closure.txt § 1 node-id comparison is green (it compares the six suites C-51 names).
