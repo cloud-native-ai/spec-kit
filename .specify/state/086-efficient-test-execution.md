@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
-stage: analyze
-stage_started_at: 1793940400
-stage_deadline_epoch: 1793951200
-stage_base_commit: 5cbc757b
+stage: implement
+stage_started_at: 1793940960
+stage_deadline_epoch: 1793951760
+stage_base_commit: 3855f2fb
 attempt: 0
 retry_limit: 3
-last_verdict: checklist U4 pass (44 CHK, 44/44 traceable; no 085/source edits); findings CHK007/008, CHK017, CHK036 handed to analyze; checkpoint 05 written; analyze dispatch next
+last_verdict: analyze U4 pass (read-only; 1 CRITICAL / 5 HIGH / 13 MEDIUM / 5 LOW); implement blocked; driver repair pass in progress (C-01 contracts, H-01 085 carve-out, H-02..H-05)
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -160,6 +160,20 @@ last_verdict: checklist U4 pass (44 CHK, 44/44 traceable; no 085/source edits); 
 - findings handed to analyze: CHK017（FR-027/FR-030 085 live-status carve-out）、CHK036（PYTHONPATH 前提）、CHK007/CHK008（two-pass/mode 未进 FR）。
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/05-checklist.md`。
 - next: `analyze` dispatch（effective 2 = 1 analyze executor + 1 verifier）。
+
+## U4 analyze（2026-11-06T04:56Z）
+
+- sentinel: `ANALYZE-DONE`；只读，无 requirements/plan/tasks/contracts/source/test/085 改动。
+- findings: **1 CRITICAL / 5 HIGH / 13 MEDIUM / 5 LOW**；digest `test-evidence/analyze-findings.md`。
+  - C-01：四份契约无 FR 引用组，`account-clause-coverage` 0/33；必须先修。
+  - H-01：FR-027/FR-030 的 085 live-status carve-out 未落 requirements，且 C-041/GATE-5/M-16/team/WP-C2/R-8 字面禁止 T041。
+  - H-02：PYTHONPATH 是 run-derived SC 的未声明前提。
+  - H-03：M-8…M-15/M-18/M-19 无任务；T042 错位。
+  - H-04：baseline 在 T014（源码改动后）迟到；须移到 T001a。
+  - H-05：计划 ≥9 次全量 vs 两槽位；缺 out-of-slot-exception；closure names 路径不符 TB-04。
+- repair pass: 驱动者按 findings 修复 artifacts；先 C-01，再 H-01/H-04/H-05/H-02/H-03 与 M/L；随后重跑 validate/coverage/pre-analyze/decomposition，再派发 implement。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/06-analyze.md`。
+- next: repair pass → implement（plan-first wave WP-A1…A4 + WP-B1…B3，planned effective 10；WP-C after）。
 
 ## U0.5 自检
 
