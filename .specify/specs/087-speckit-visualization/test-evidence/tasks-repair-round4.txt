@@ -1,0 +1,132 @@
+---
+# Tasks-stage bounded repair — analyze loop 3, round 4 (final gate repair)
+
+Scope: repair ONLY the tasks-owned findings of `test-evidence/analyze-report-round3-2026-11-06.md`
+— F-11 (tasks half), F-12, G-02 — against plan baseline `e14b10a2` (new plan baseline after the round-4 plan
+repair that unified C-41/D8 on **three actions**: digest / guard / report).
+Write territory: `tasks.md` + `.specify/memory/features/087.md` + this stage's evidence file. No requirements /
+plan / data-model / contracts / quickstart / research / feature-ref / checklists file touched; `coverage-baseline.txt`
+untouched (no clause added or removed). State spine not written.
+Captured: 2026-11-06T06:26Z (readings recomputed after the repair)
+
+## 1. Finding -> repair location
+
+F-11 (HIGH, tasks half)  the script's action set had two definitions: contract C-41 (`two actions`, now `three
+  actions` after the plan-side repair) / plan D8 versus `tasks.md` rows that still said two. Aligned one-way to
+  **three actions** (digest / guard / report); no task row now enumerates a different cardinality.
+
+  `tasks.md:88` T009 — "as one stdlib-only file with two actions over one shared reader: `--action digest` … and
+      `--action guard` …" replaced by "exposing **exactly the three actions** `contracts/status-digest.contract.md`
+      C-41 fixes, over one shared reader: `--action digest` …, `--action guard` … and `--action report` (one status
+      line rendered from the owner's four labels plus attribution and the profile in force, authored by T016 — this
+      row establishes the action as an entry point and the shared reader behind it, T016 authors the rendered shape);
+      all three actions share the same reader functions for state, so a second parser or a second renderer is the
+      defect the clause names, and the action set is **exactly** this three — neither a fourth action nor a missing
+      one satisfies C-41". C-41's *Judged by* is "the script exposes **exactly these three** actions", so the row's
+      green-point claim now covers the exact-count assertion rather than merely "both actions". C-41 remains claimed
+      by T009 only (no second claim); T028 still asserts the command-entry half without a tag, unchanged.
+
+  `tasks.md:91` Foundational checkpoint — "the shared reader exists behind both script actions" ->
+      "the shared reader exists behind all three script actions (digest / guard / report)".
+
+  `tasks.md:153` T029 — "a body that only names the script path, the two actions and the exit-status set" ->
+      "… the **three actions** (digest / guard / report) and the exit-status set". T029 keeps no `[green:]` tag and
+      no `[covers:]` change; the clause set of the file is untouched.
+
+  Cross-checked for consistency with the three-action set (read, no edit needed unless noted):
+    `tasks.md:110` T016 — "as the third action (`--action report`)" made explicit that its entry point and shared
+        reader are established by T009, so the two rows no longer read as competing definitions of the same action.
+    `tasks.md:111` T017 — "the two out-of-cadence triggers … into the same renderer": the two is the **trigger**
+        count, not the action count; unchanged.
+    `tasks.md:113` T018 — depends on T013/T016/T017 and emits ≥3 attributed lines through the report path; no
+        action-count wording; unchanged.
+    `tasks.md:135` T052 — "the three-mode carrier mapping" is the execution-mode set, not the action set; unchanged.
+    `tasks.md:130` T022 — names `--action guard`/`--action digest` as the render targets of the supervision
+        projection; a subset usage, not a closed-set statement; unchanged.
+  Grep proof: `grep -n "two actions\|both script actions\|both actions" tasks.md` -> 0 hits.
+
+F-12 (MEDIUM)  the US1 roster-fixture count was stale and the defect naming imprecise.
+  `tasks.md:99` US1 Independent Test — "over the three roster fixtures (compliant / missing-seat /
+      unresolvable-agent)" -> "over the four roster fixtures (compliant / missing-seat / unresolvable-agent /
+      two-seats — the compliant one plus the closed defect set of three `contracts/reporter-seat.contract.md` C-16
+      fixes)".
+  `tasks.md:273` Parallel Example — "(three roster fixtures + reason set)" -> "(four roster fixtures: compliant +
+      three named defects, plus the reason set)".
+  `tasks.md:105` T011 — "four defect fixtures (compliant, missing seat, reporter whose `agent` does not resolve …,
+      **two `role: reporter` seats** …)" reworded to "four fixtures (three named defects + compliant), each
+      asserting its own exact named-defect text so a caller can tell them apart — compliant (no defect), absent
+      seat, unresolvable agent, and **two `role: reporter` seats**, the closed defect set's third member". The count
+      (4) and the closed defect set (3, C-16) are now both stated, and the compliant fixture is no longer called a
+      defect. `[green:]` / `[covers:]` / `[blockedBy:]` unchanged.
+  Note (out of territory, NOT edited): `quickstart.md:72` carries the same "four defect fixtures" naming. The
+  round-3 recommendation line offered to synchronise it, but this assignment's boundary forbids touching
+  quickstart.md; the count there is already correct (four) and only the naming is imprecise. Reported, not fixed.
+
+G-02 (LOW)  the feature registry recorded the plan's premise count as 9.
+  `.specify/memory/features/087.md:20` — "Execution Premises EP-001…EP-009 全 verified" -> "Execution Premises
+      EP-001…EP-010 全 verified（EP-010 = 「无 docker/hugo 套件可 deselect」，round-1 为消解 GATE-1 占位新增，
+      2026-11-06 补记）". Verified against `plan.md:216-225`: the table has exactly 10 `EP-0NN` rows (`grep -cE
+      '^\| EP-0' plan.md` -> 10), all `verified`, EP-010 being the no-docker/hugo-suite premise.
+  `.specify/memory/features.md:94` NOT edited — outside this assignment's declared territory (tasks.md +
+  features/087.md + stage evidence). Reported in §4 below so the driver can route it.
+  `Status: Planned` unchanged; no status transition claimed, and no other line of features/087.md edited.
+
+## 2. Gate readings (re-taken after the repair)
+
+=== validate-tasks.py ===
+$ python3 .specify/scripts/python/validate-tasks.py .specify/specs/087-speckit-visualization/tasks.md
+PASS (with warnings): .specify/specs/087-speckit-visualization/tasks.md — 0 error(s), 11 warning(s)
+VALIDATE_EXIT=0
+  The 11 warnings are exactly the adjudicated classes (7 × `green-cross-phase` on T014/T017/T019/T024/T052/T027/
+  T036, 4 × `green-path-divergence` on T012×T021, T012×T032, T021×T032, T028×T033) — same count and same members as
+  the round-3 reading, so this repair neither added nor removed a warning. Zero `green-dangling`, zero
+  `green-clause-collision`. Adjudication: `tasks.md` § WARNING ADJUDICATION.
+
+=== pre-analyze-check.py --stage tasks --repo . ===
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/087-speckit-visualization --stage tasks --repo .
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=134 waived=0
+PREANALYZE_EXIT=0
+  advisories are the 134 `missing-path` notices for artifacts this feature CREATES (they do not exist yet at the
+  tasks stage) — identical count to the round-3 reading, unchanged by this repair.
+
+=== account-clause-coverage.py ===
+$ python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/087-speckit-visualization
+claimed clauses (this feature): 33
+FR claimed: 22 / FR uncovered: 0
+companion: claimed clauses 33, scanned files 272, clause universe 1728, FR universe 22
+  Same 33 claimed / 19 beyond-baseline / 22-of-22 FR as the round-3 reading; no clause added, removed or
+  re-claimed. § Clause Coverage Ledger (19-row table) is therefore still member-for-member correct.
+  (script exit 1 = the by-design `uncovered` status for a 19-row beyond-baseline set, unchanged.)
+
+=== counts and structure ===
+task rows `^- [ ] T###`: 50   distinct T ids: 50   ids are bare three-digit (`T\d{3}`), no suffix
+GATE-3 probe `grep -cE '^- \[[ >]\]' tasks.md` -> 50 (all rows still open — this stage authors no `[X]`)
+plan premise rows `^\| EP-0`: 10 (EP-001…EP-010)
+
+=== sync-mirrors.py --check ===
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (94 files)
+SYNC_EXIT=0
+  No new drift: `tasks.md` and `features/087.md` are not mirrored paths, so the six pairs are untouched.
+
+## 3. Preserved invariants
+
+- 50 task rows, 50 distinct ids, bare three-digit form only; row count unchanged by this repair.
+- 33 claimed clauses / 19 beyond-baseline / 22-of-22 FR — unchanged (no tag edited).
+- 11 validator warnings, same members as round 3 (all adjudicated); 0 errors.
+- No requirements / plan / data-model / contracts / quickstart / research / feature-ref / checklists file touched.
+- `coverage-baseline.txt` untouched. State spine not written.
+
+## 4. Out-of-territory residue reported, not repaired
+
+- `.specify/memory/features.md:94` still says "Execution Premises EP-001…EP-009（全 `verified`）" — the index row
+  carries the same stale count as the detail row this repair fixed (G-02, index half). Not in this assignment's
+  write territory, so it is reported here for a bounded follow-up rather than silently absorbed.
+- `quickstart.md:72` still says "four defect fixtures" (count correct, naming imprecise; same class as F-12's
+  T011 wording). quickstart.md is outside this assignment's territory.
