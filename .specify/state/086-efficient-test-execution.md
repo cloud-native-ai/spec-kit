@@ -252,6 +252,18 @@ last_verdict: A4/B3 integrated (f12b554d, 1d962bfb; clean combined 191/1, only t
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/12-implement-closure.md`。
 - next: **review**（最后一阶段；1 seat + verifier reserve）→ SC-010 收口 → U6 本地合并 master（不 push）。
 
+## Review — 2026-11-06T08:05Z
+
+- review `3b0855fe`：四段全 pass（process P0 0/P1 8/P2 5；artifact 13/13；implementation smoke exit 0 + 84 passed 定向确认；code 113/113，gate allow，blocking 0）；ARC `final_path` pass 8 / total 8，comparison **agree**；`Implemented → Ready for Review`（两载体），无豁免。
+- 发现：F1（SC-003 模板层读取，P1）、F2（DoD-2 回填，P1）、F6/F9（checker accept 触发的状态翻转，P1）、F10/F11（source/runtime 指针形态，important，reviewer 判定为 follow-up）、F12（probe 路径，P2，已清理）；均记录在 `review.md`，无 P0/blocking。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/13-review.md`。
+
+## Closure — 2026-11-06T08:10Z
+
+- 085 `SC-010_*` 收口：status **pass**（八阶段链 + 13 checkpoints + actual max 3 + review ARC agree）；只改 4 条 carve-out 行；SC-010_blocked_at 清空。086 SC-012 同步。
+- GATE-5 复跑：名字仅 `verification.md`；非 `SC-010_*` 行 **0**。`sync-mirrors --check` rc=0；`regen-command-copies --check` rc=0；`closure-acceptance-check` **accept**（final_path 8/8）。
+- next: U6 本地合并 `master`（不 push），工作树清理与收尾汇总。
+
 ## U0.5 自检
 
 1. 目标、拓扑、权威、切片、断点已写入状态脊：**是**。

@@ -35,7 +35,9 @@ for that stage, read from the dispatch records.
 | implement (preflight + wave 1) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 3 (wave 1: A1+B1+verifier) | **2** (A1 ∥ B1) | `checkpoints/07-implement-preflight.md`, `checkpoints/08-implement-wave1.md` | complete |
 | implement (wave 2) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 4 (A2+A3+B2+verifier) | **3** (A2 ∥ A3 ∥ B2) | `checkpoints/09-implement-wave2.md` | complete |
 | implement (wave 3) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 3 (A4+B3+verifier) | **2** (A4 ∥ B3) | `checkpoints/10-implement-wave3.md` | complete |
-| implement (wave 4 — this slice) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 2 (C1 + verifier reserve) | 1 (C1 alone; the stage is measured against the whole tree) | this WP-C1's own dispatch record; checkpoint `11-implement-wave4.md` is written by the driver | in progress at the time of this record |
+| implement (wave 4) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 2 (C1 + verifier reserve) | 1 (C1 alone; the stage is measured against the whole tree) | `checkpoints/11-implement-wave4.md` | complete (`C1-DONE`; the driver's `--dist` guard repair followed) |
+| implement (wave 5 — closure) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 2 (C2 + verifier reserve) | 1 (C2 alone; one integration slice) | `checkpoints/12-implement-closure.md` | complete (`C2-DONE`; nine gates pass, `closure-acceptance-check.py` accept) |
+| review | `SDD Executor` (host-native) | 24 | 18 | 2 (review seat + verifier reserve) | 1 (one review seat; the driver's U4 verified afterwards) | `checkpoints/13-review.md` | complete (`REVIEW-DONE`; four segments pass, ARC `agree`, `Ready for Review`) |
 
 ## 2. `agent_concurrency_effective` and the named reason (C-048)
 
@@ -131,16 +133,16 @@ half of C-041 are owned by `.specify/specs/086-efficient-test-execution/test-evi
 
 The dogfood chain C-050 requires: every stage has a record (§ 1), a checkpoint each (§ 1 + § 4), and
 C-049 satisfied (§ 3, max actual concurrency 3). Per C-050, on that chain **085 SC-010 qualifies for
-`pass`**, with the carrier downgrade recorded as an observation rather than a failure (§ 5).
-
-The status line itself is **not** edited here: `.specify/specs/085-sdd-temporary-goal-team/verification.md`
-is under WP-C2's narrow FR-027 carve-out and outside this work package's owned paths. Reading this record,
-WP-C2 holds the evidence C-050 asks for; the edit and its GATE-5 proof belong to T041.
+`pass`**, with the carrier downgrade recorded as an observation rather than a failure (§ 5). The
+status line is flipped at feature closure on this record: the chain now covers all eight stages
+(requirements → review), each with a checkpoint (`01-requirements` … `13-review`), and the concurrency
+observation comes from dispatch records (maximum 3, implement wave 2).
 
 ## 8. Not claimed by this record
 
 - No 085 file was modified, moved or deleted by this work package.
 - No concurrency number here was taken from `requested: 24`; every `actual_concurrency_max` cites the
   wave it was observed in.
-- The reviewer stage has not run, so the goal's 5th criterion ("Ready for Review with zero blocking
-  findings") is `not_evaluated` and is not claimed.
+- The reviewer stage has run (checkpoint `13-review.md`, `review.md`, `code-review.md`); its verdict is
+  `Ready for Review`, code `blocking 0`, and its P1 findings are framework-improvement material
+  recorded in `review.md` § 3.
