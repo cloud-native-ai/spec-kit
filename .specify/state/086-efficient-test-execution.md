@@ -10,7 +10,7 @@ stage_deadline_epoch: 1793952960
 stage_base_commit: f3279c6e
 attempt: 0
 retry_limit: 3
-last_verdict: A2/A3/B2 integrated (01cc8da8, 58d30bde, dfe27809; actual concurrency 3; gate-scan 27/0; live instructions 34,685 B); checkpoint 09 written; next A4+B3 (2-way, effective 3)
+last_verdict: A4/B3 integrated (f12b554d, 1d962bfb; clean combined 191/1, only test_g9 T050 pre-existing; actual concurrency 2); checkpoint 10 written; next C1 (parallel-safety/dogfood) then C2 (closure)
 <!-- loop-state:end -->
 
 <!-- test-budget:begin -->
@@ -59,7 +59,7 @@ last_verdict: A2/A3/B2 integrated (01cc8da8, 58d30bde, dfe27809; actual concurre
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
 - **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
 - **085 live status exception（T041）**：只允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 的 SC-010 status 行；由 FR-030/A12/A17 授权（live reference），不得扩散到 085 的 goal/team/checkpoints/contracts/history。最终验证须证明只改了 SC-010 行。
-- **实际并发（085 dogfood）**：wave 1 A1+B1 = **2 路**；wave 2 A2/A3/B2 = **3 路**；child lines 已 closed；worktree 在 repo 外（line-registry 拒绝 `.specify/.tmp`，与 C-008 冲突，记为 085 observation）；wave 3 A4+B3 计划 2 路。
+- **实际并发（085 dogfood）**：wave 1 A1+B1 = **2 路**；wave 2 A2/A3/B2 = **3 路**；wave 3 A4+B3 = **2 路**；C1/C2 各 1 路；child lines 已 closed；worktree 在 repo 外（line-registry 拒绝 `.specify/.tmp`，与 C-008 冲突，记为 085 observation）。
 - **并发度（085）**：`agent_concurrency_requested: 24`；team `agent_concurrency_effective: 18`（verifier reserve 5 / executor slots 13；host capacity `host-capacity-undeclared`）；per-stage effective 2（requirements/clarify/plan/tasks/checklist/analyze），implement first wave **A1+B1**（2 executors + 1 verifier reserve = effective 3；team cap 18 not binding），后续 A2/A3, B2, A4, B3, C1, C2 按 plan 合并序；任何降级具名。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
@@ -220,6 +220,15 @@ last_verdict: A2/A3/B2 integrated (01cc8da8, 58d30bde, dfe27809; actual concurre
 - anomalies: A3 T017/T046 docs overlap (WP-A3 owns the two docs; T046 share already met; C2 must not re-edit); B2 leaves 6 stale count pins to B3; A2 M-8 `--dist=loadfile` green (pre-change parser drops unknown `-x=value`).
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/09-implement-wave2.md`。
 - next: A4（append the runner tests; after A2/A3）+ B3（count pins/principle tests; after B2）2-way；effective 3；then C1（after A1+A4+B2）→ C2。
+
+## Implement wave 3 — A4+B3（2026-11-06T06:09Z）
+
+- A4 `f12b554d`（append runner contract tests；38 total；23 A1 preserved）；B3 `1d962bfb`（count pins + new principle guard + owner guideline in-passing title/boundary repair）。
+- integration: A4 ff; B3 rebase+ff; worktree clean; actual concurrency **2**。
+- clean combined A4+B3: **191 passed / 1 failed**（`test_g9` T050 pre-existing）；the 25-failure false red was the driver's relative `SPECKIT_PYTHON`; the full suite unset falls back to `sys.executable`.
+- anomalies: A4 C-010/C-011 pass against pre-086; `notes/red-first-evidence.md` created by driver; B3 edited the B1 owner guideline outside its owned paths (in-passing; disclosed).
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/10-implement-wave3.md`。
+- next: C1（parallel-safety/dogfood; T014 vs T050; 085 tests）→ C2（registry/docs/closure; T044/T047）。
 
 ## U0.5 自检
 
