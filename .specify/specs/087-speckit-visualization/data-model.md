@@ -182,14 +182,16 @@ spine path for a human to open, but its fields come from the registry.
 
 ## E8 — Efficiency Element
 
-**Revision 2026-11-06, entity 8.** One bounded element per listed unit, carried as **content** of E5's digest entry
-and of the status line E2 defines (`FR-023`). It is a **projection over a projection**: its quantities come from the
-exec-quant store, which this feature reads and never writes, and its host is the surface that already lists the unit.
-No third surface is opened.
+**Revision 2026-11-06, entity 8.** One bounded element per **step**, carried as **content** of E5's digest entry
+and of the status line E2 defines (`FR-023`). Its **unit is the step** — the identity `(unit_id, unit_type)` the
+exec-quant record itself carries — and never a row of a listing (`requirements.md` Clarifications Q4). It is a
+**projection over a projection**: its quantities come from the exec-quant store, which this feature reads and never
+writes, and its host is the surface that already renders the line or the digest. No third surface is opened.
 
 | Field | Type | Source / rule |
 |-------|------|---------------|
-| `unit.identity` | user-facing unit name | the surface's own listed unit, rendered in a readable form (`INV-05`); never a bare engine identifier |
+| `unit.identity` | user-facing step name | **the exec-quant record's step identity `(unit_id, unit_type)`** — the pair itself, rendered in a readable form (`INV-05`); never a bare engine identifier and never a listing row |
+| `unit.lookup` | step set → matching records → latest per step; tie-break record identity ascending; no record for a named step → not-evaluated | each record matched **on its own `(unit_id, unit_type)`** (never on the record's `run_id`, which one run shares across many steps; `requirements.md` Clarifications Q4). The **step set** is the surface's own — the status line is **the emitting step** alone, the digest is **this run's steps or the most recent steps**, bounded by `FR-012`'s existing cap and the surface's declared bound (`FR-024`); the store never widens it (`C-63`). A step in that set for which the store holds **no record** still renders its element with the not-evaluated marker — the element never disappears (`C-67`) |
 | `elapsed.value` | integer ms **or** the not-evaluated marker | the record's `quality.elapsed_ms` node, read through the store engine's read path (owner: `shared/declarations/facts/quant-record-schema.yaml#/statement` — the field and its type are **not** restated here) |
 | `elapsed.provenance` | one member of the schema's declared provenance vocabulary | the record's own node; the vocabulary is reached **by reference** to the declaration owner and never enumerated here (C-71) |
 | `tokens` | integer **or** the not-evaluated marker | the record's token quantity; rendered only while the element fits the host surface's bound (C-64) |
@@ -199,13 +201,14 @@ No third surface is opened.
 | `store_state` | `populated` \| `no-measurements` | `no-measurements` when the store is absent or holds no record; the host surface's own content is unchanged in that case (`FR-024`) |
 
 **Selection rule (one rule, owned by the requirements' FR-024; quoted here only as the projection shape)**: for a
-unit the surface lists, the element reads the record with the **latest `collected_at`**, with ties broken by the
-record's own identity in ascending byte-stable order. Nothing is folded: no average, no sum, no ranking, no lifetime
-aggregate — those belong to E9, a different question.
+step the surface names, the element reads the record with the **latest `collected_at`** among that step's records —
+the step being the record's own `(unit_id, unit_type)` — with ties broken by the record's own identity in ascending
+byte-stable order. Nothing is folded: no average, no sum, no ranking, no lifetime aggregate — those belong to E9, a
+different question.
 
 **Bounding rule**: the element is *content*, so the host's own bound applies unchanged — the digest's cap (E5) and
-the status line's entry bound. When the token/invocation quantities do not fit, they are dropped from **every** unit
-on that render together and named once in the omitted summary. Per-unit depth differences are forbidden
+the status line's entry bound. When the token/invocation quantities do not fit, they are dropped from **every** step
+on that render together and named once in the omitted summary. Per-step depth differences are forbidden
 (`FR-023`, Clarifications Q2).
 
 ## E9 — Measure Report
@@ -235,8 +238,8 @@ object: nothing here is persisted, cached or written back, and the command write
 | `tokens` | `{sum, provenance, covered}` **or** the not-evaluated marker | a sum, with the count of records that carried it |
 | `invocations` | integer **or** the not-evaluated marker | a sum |
 
-**Invariants**: INV-13 (the element never opens a third surface and never grows the unit set), INV-14 (a listed unit
-with no record carries the marker, never an omission), INV-15 (both reads leave the store byte-identical and add no
+**Invariants**: INV-13 (the element never opens a third surface and never grows the step set), INV-14 (a step with
+no record carries the marker, never an omission), INV-15 (both reads leave the store byte-identical and add no
 path), INV-16 (the report is a measurement, never a verdict), INV-17 (a produced report, a nothing-to-analyse run
 and an input error are three distinguishable outcomes of one closed status set).
 
@@ -256,8 +259,8 @@ and an input error are three distinguishable outcomes of one closed status set).
 | INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03 (C-43); `tests/unit/test_status_digest_unit.py` (the cap is C-43's subject, not a proposition of its own) |
 | INV-11 | An entry whose age exceeds the stale bound is marked stale with its age; stale data is never presented as current | DG-04 (C-44) |
 | INV-12 | No scheduler, timer service, daemon, third-party dependency, new persistent store, console channel, registry, state spine or ledger is introduced | `contracts/ownership-map.contract.md` OM-04 (C-50); guard RO-13 |
-| INV-13 | The efficiency element appears on exactly two surfaces (status line, digest), never grows the unit set, and never becomes an extra line or a second cadence | `contracts/efficiency-element.contract.md` EF-01 (C-63); `tests/contract/test_efficiency_element.py` |
-| INV-14 | A listed unit with no record at all carries the not-evaluated marker; it is never dropped, and a missing quantity is never rendered as `0` | EF-02/EF-05 (C-64, C-67); `tests/contract/test_efficiency_element.py` |
+| INV-13 | The efficiency element appears on exactly two surfaces (status line, digest), never grows the step set, and never becomes an extra line or a second cadence | `contracts/efficiency-element.contract.md` EF-01 (C-63); `tests/contract/test_efficiency_element.py` |
+| INV-14 | A step with no record at all carries the not-evaluated marker; it is never dropped, and a missing quantity is never rendered as `0` | EF-02/EF-05 (C-64, C-67); `tests/contract/test_efficiency_element.py` |
 | INV-15 | Reading the store for the element and for the report leaves every file under `.specify/memory/exec-quant/` byte-identical and creates no new path there | EF-07 (C-69), ME-10 (C-62); the before/after per-file digest in `test-evidence/` (SC-012 Source) |
 | INV-16 | The measure report presents measurements and issues no verdict: no score, no threshold judgement, no baseline recommendation, no persisted trend | `contracts/measure-report.contract.md` ME-04 (C-56); `tests/contract/test_measure.py` vocabulary check |
 | INV-17 | "A report was produced", "nothing to analyse" and "input error" are three distinguishable outcomes of one closed four-value status set; each renders its own explicit statement | ME-07 (C-59); `tests/contract/test_measure.py` |
@@ -288,9 +291,9 @@ threshold), and `stalled → running` (growth resumes). No transition is invente
    `nothing-running`.
 5. A stall judgement whose `judged_against` does not resolve to the owner table's row is a defect (FR-009).
 6. An efficiency element that renders `0` for a quantity the record marks not evaluated is a defect; so is an
-   element omitted for a listed unit (INV-14). Where the token/invocation quantities do not fit the bound, they are
-   withdrawn from every unit on that render together — one unit showing them beside another without is a defect
-   (C-64).
+   element omitted for a step the surface names (INV-14). Where the token/invocation quantities do not fit the bound,
+   they are withdrawn from every step on that render together — one step showing them beside another without is a
+   defect (C-64).
 7. A measure row that merges two `unit_type` values under one `unit_id` is a defect, and so is a `--unit` value the
    store does not hold rendered as an empty section instead of an input error (C-55).
 8. A measure run over a store holding no record in the resolved window that renders a zero-valued row instead of the

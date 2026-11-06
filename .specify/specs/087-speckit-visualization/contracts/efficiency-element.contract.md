@@ -1,8 +1,8 @@
 # Contract: The efficiency element on the two visibility surfaces
 
 **Feature**: 087 | **Covers**: FR-023, FR-024, FR-025, SC-011, SC-012
-**Contract object**: the one bounded efficiency element a status line and a digest entry each carry per listed
-unit, the read-only store access behind it, and the source of its elapsed quantity.
+**Contract object**: the one bounded efficiency element a status line and a digest entry each carry per step, the
+read-only store access behind it, and the source of its elapsed quantity.
 
 Clause ids continue the feature's dense `C-nn` sequence (`C-63`…`C-71`, in the `EF` family) and are
 cited verbatim by `/speckit.tasks`. They add to `C-01`…`C-62` and renumber none of them.
@@ -15,17 +15,20 @@ path (`scripts/python/exec-quant.py`).
 
 ---
 
-## C-63 · EF-01 — Exactly two surfaces, one element per listed unit, and no third surface
+## C-63 · EF-01 — Exactly two surfaces, one element per step, and no third surface
 
 The efficiency dimension MUST appear on exactly two surfaces — the periodic status line (`status-report.contract.md`
 C-22…C-31) and the current-state digest (`status-digest.contract.md` C-41…C-46) — and on no third one. On each, it
 MUST be the **content** of an entry the surface already renders: no extra line, no extra entry, no extra section,
-no second cadence and no additional unit. The number of efficiency elements on a render MUST equal the number of
-units that render lists, and the element MUST NOT introduce a unit the surface did not already list (FR-023).
+no second cadence and no additional unit. The element's unit is the **step** — the `(unit_id, unit_type)` identity
+the exec-quant record itself carries, never a row of a listing (`requirements.md` Clarifications Q4). The number of
+efficiency elements on a render MUST equal the number of steps that surface names (the emitting step for the line,
+this run's or the most recent steps inside the digest's cap for the digest), and the element MUST NOT introduce a
+step the surface did not already name (FR-023).
 
 *Judged by*: `tests/contract/test_efficiency_element.py` — a status line and a digest rendered over one fixture
-have equal element counts and equal listed-unit sets; a render whose surface lists `n` units carries `n` elements
-in the status-line case and no more than the digest's cap (`C-43`) in the digest case.
+have equal element counts and equal step sets; a render naming `n` steps carries `n` elements in the status-line
+case and no more than the digest's cap (`C-43`) in the digest case.
 
 Requirements served: (FR-023, SC-011).
 
@@ -33,8 +36,8 @@ Requirements served: (FR-023, SC-011).
 
 Within one element the quantities appear in this fixed order:
 
-1. the **unit identity** — a user-facing name, never a bare internal engine identifier (`data-model.md` INV-05;
-   `status-report.contract.md` C-31);
+1. the **step identity** — the record's `(unit_id, unit_type)` in a user-facing name, never a bare internal engine
+   identifier (`data-model.md` INV-05; `status-report.contract.md` C-31);
 2. the **elapsed** quantity — **unconditional** and **first**;
 3. the **token** count and the **invocation** count — **appended only while the whole element stays inside the
    surface's own entry bound**.
@@ -45,9 +48,9 @@ Each rendered quantity MUST carry the provenance the record states (`measured` /
 omission (FR-023).
 
 **Degradation is all-or-nothing per render**: when the token and invocation quantities cannot fit the surface's
-existing bound, they are withdrawn from **every** unit on **that render together**, and the withdrawn quantity is
-named in that render's **existing omitted summary**. Per-unit depth differences — one unit shown with tokens while
-a neighbour is shown without — are a defect, because two units described to different depths cannot be compared
+existing bound, they are withdrawn from **every** step on **that render together**, and the withdrawn quantity is
+named in that render's **existing omitted summary**. Per-step depth differences — one step shown with tokens while
+a neighbour is shown without — are a defect, because two steps described to different depths cannot be compared
 (FR-023; Clarifications Q2).
 
 *Judged by*: `tests/contract/test_efficiency_element.py` — a tight-bound fixture asserts every element carries
@@ -77,33 +80,34 @@ Requirements served: (FR-024, FR-028).
 
 ## C-66 · EF-04 — Record selection is one rule: the latest by `collected_at`, ties by record identity
 
-For a unit the surface lists, the element MUST report the record with the **latest `collected_at`**, selected in
-exactly one declared way:
+For a step the surface names, the element MUST report the record with the **latest `collected_at`** among that
+step's records — the step being the **record's own `(unit_id, unit_type)`**, never the record's `run_id` (one run's
+id is shared across many steps) — selected in exactly one declared way:
 
-- records of the same unit are not folded — no average, no sum, no ranking, no lifetime aggregate;
+- records of the same step are not folded — no average, no sum, no ranking, no lifetime aggregate;
 - a tie on `collected_at` is resolved by the record's **own identity in ascending, byte-stable order** (the record
   file's name stem), never by filesystem enumeration order;
-- the element MUST NOT widen the surface's unit limit: it is rendered for at most the units that surface already
-  lists.
+- the element MUST NOT widen the surface's step limit: it is rendered for at most the steps that surface already
+  names — the emitting step on the line, this run's or the most recent steps inside the digest's cap.
 
 This rule is owned **here** and is the element's own; the report's window aggregation is owned by
 `measure-report.contract.md` C-54/C-56 and is a different question, not a second statement of this one (FR-024;
 Clarifications Q3).
 
-*Judged by*: `tests/unit/test_measure_unit.py` — a fixture holding three records for one unit with increasing
+*Judged by*: `tests/unit/test_measure_unit.py` — a fixture holding three records for one step with increasing
 `collected_at` selects the newest; a fixture with two records sharing the newest `collected_at` selects the same
 one under a shuffled enumeration order.
 
 Requirements served: (FR-024).
 
-## C-67 · EF-05 — A listed unit with no record renders the not-evaluated marker, never an omission
+## C-67 · EF-05 — A step with no record renders the not-evaluated marker, never an omission
 
-A unit the surface lists for which the store holds **no record at all** MUST still carry the element, rendering the
-**not-evaluated marker** for the elapsed quantity. Dropping the element for such a unit is a defect: an omission
-beside a neighbouring unit's number reads as "faster", which is the misreading FR-023's rule exists to prevent
+A step the surface names for which the store holds **no record at all** MUST still carry the element, rendering the
+**not-evaluated marker** for the elapsed quantity. Dropping the element for such a step is a defect: an omission
+beside a neighbouring step's number reads as "faster", which is the misreading FR-023's rule exists to prevent
 (FR-024 final sentence; SC-011).
 
-*Judged by*: `tests/contract/test_efficiency_element.py` — a fixture where the surface lists two units and the
+*Judged by*: `tests/contract/test_efficiency_element.py` — a fixture where the surface names two steps and the
 store holds a record for only one asserts both elements are present and one carries the marker.
 
 Requirements served: (FR-023, FR-024, SC-011).

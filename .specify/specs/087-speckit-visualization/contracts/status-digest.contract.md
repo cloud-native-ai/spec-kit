@@ -138,13 +138,15 @@ Requirements served: (FR-017, FR-022).
 
 ## C-72 · DG-07 — The efficiency element is content of this digest, and changes none of its bounds
 
-The digest MUST render one efficiency element per **listed** unit (inside the cap of C-43), as content of the entry
-and never as an extra line, entry or section. The element's shape, its degradation order and its not-evaluated rule
-are owned by `contracts/efficiency-element.contract.md` C-64 — this clause states only what the digest must
-preserve: the entry set, the ordering (C-43), the `cap=<n>` / `omitted=<n>` rendering, the staleness marking (C-44)
-and the exit-status table (C-45) are **byte-identical** to a render without the element except for the element's own
-text and the omitted-summary sentence naming a withdrawn quantity. An absent or empty store renders the explicit "no
-measurements" state and changes none of those bounds either.
+The digest MUST render one efficiency element per **step it names** (inside the cap of C-43) — the unit is the
+`(unit_id, unit_type)` identity the exec-quant record carries, and the step set is this run's or the most recent
+steps, never a registry line — as content of the entry and never as an extra line, entry or section. The element's
+shape, its degradation order and its not-evaluated rule are owned by `contracts/efficiency-element.contract.md`
+C-64 — this clause states only what the digest must preserve: the entry set, the ordering (C-43), the `cap=<n>` /
+`omitted=<n>` rendering, the staleness marking (C-44) and the exit-status table (C-45) are **byte-identical** to a
+render without the element except for the element's own text and the omitted-summary sentence naming a withdrawn
+quantity. An absent or empty store renders the explicit "no measurements" state and changes none of those bounds
+either.
 
 `--action report` renders the same element on its one line, under the same rule: its four content elements and its
 attribution are unchanged, and the element is content within them.

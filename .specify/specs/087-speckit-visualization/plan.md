@@ -35,16 +35,19 @@ exactly as the existing progress-reporting discipline already requires.
 A second bounded slice adds two capabilities to the same three surfaces and to one new command. It extends nothing
 that came before and rewrites no clause:
 
-4. **An efficiency element on the existing two surfaces** (`FR-023`, `FR-024`, `FR-025`). The status line and the
-   digest each carry **one bounded element per unit they already list** — the unit's readable name, its **elapsed
-   time first and unconditionally**, then its token and invocation counts **only while the whole element stays inside
-   the surface's existing entry bound**. When they do not fit, they are withdrawn from **every** unit on that render
-   together and named in the render's existing omitted summary, so two units on one screen are never described to
-   different depths. A quantity the record does not carry renders the explicit not-evaluated marker — never `0`,
-   never an averaged substitute, never an omission. The source is the exec-quant store
-   (`.specify/memory/exec-quant/`), read **only** through the engine that owns it, and **only** for the latest
-   record per unit (ties by record identity). The store's schema already carries `quality.elapsed_ms`; no recorder,
-   no schema extension and no second store is added.
+4. **An efficiency element on the existing two surfaces** (`FR-023`, `FR-024`, `FR-025`). Its **unit is the step** —
+   the `(unit_id, unit_type)` identity the exec-quant record itself carries, never a row a surface lists. The status
+   line and the digest each carry **one bounded element per step they name** — the step's readable name, its
+   **elapsed time first and unconditionally**, then its token and invocation counts **only while the whole element
+   stays inside the surface's existing entry bound**. The step set is the surface's own: the line carries the emitting
+   step alone, the digest this run's or the most recent steps, inside the existing cap. When the deeper quantities do
+   not fit, they are withdrawn from **every** step on that render together and named in the render's existing omitted
+   summary, so two steps on one screen are never described to different depths. A quantity the record does not carry
+   renders the explicit not-evaluated marker — never `0`, never an averaged substitute, never an omission. The source
+   is the exec-quant store (`.specify/memory/exec-quant/`), read **only** through the engine that owns it, and
+   **only** for the latest record per step (matched on the record's own `(unit_id, unit_type)`, ties by record
+   identity). The store's schema already carries `quality.elapsed_ms`; no recorder, no schema extension and no second
+   store is added.
 5. **A dedicated measurement-reading command** (`FR-026`…`FR-029`). `/speckit.measure` —
    `templates/commands/measure.md` backed by one stdlib-only script `scripts/python/measure.py` — analyses the same
    store over a **declared half-open window** (`--since` from, `--window` span, neither = the whole store stated as
@@ -216,17 +219,27 @@ name the clause and state only what they read.
 Not a third surface, not an extra line, not a second cadence, and never an extra unit: `contracts/efficiency-element.contract.md`
 C-63 is the clause that fixes that, and `data-model.md` E8 is the entity.
 
-**What one element holds, in order.** The unit's readable name → the elapsed quantity → (if the bound permits) the
+**What the unit is.** The **step** — the `(unit_id, unit_type)` identity the exec-quant record itself carries, such
+as one `/speckit.*` invocation or one skill execution (`requirements.md` Clarifications Q4; `FR-023`). It is never a
+row a listing carries. The **step set** is the host surface's own: the status line carries the **emitting step**
+alone, and the digest carries **this run's steps or the most recent steps**, inside `FR-012`'s existing cap and the
+surface's declared bound (`FR-024`). The store is the efficiency *measurement* source only; every non-efficiency part
+of the line or digest keeps coming from that surface's own state sources, and the store never widens the step set.
+
+**What one element holds, in order.** The step's readable name → the elapsed quantity → (if the bound permits) the
 token count → (if the bound permits) the invocation count, each with the provenance the record states. The elapsed
 quantity is **unconditional and first**; the other two are appended **all-or-nothing across the whole render** —
-when they do not fit the host surface's existing entry bound, they are dropped from every unit on that render and
+when they do not fit the host surface's existing entry bound, they are dropped from every step on that render and
 named once in that render's existing omitted summary (C-64).
 
 **Where the numbers come from.** `quality.elapsed_ms`, `quality.tokens` and the invocation quantity of **one**
-exec-quant record per listed unit: the record with the latest `collected_at`, ties broken by the record's own
-identity (the file's name stem) ascending (C-66). Nothing is folded on a surface — no average, no sum, no lifetime
-aggregate. A listed unit with **no** record at all still renders the element, with the not-evaluated marker (C-67):
-an omission beside a neighbour's number reads as "faster", which is the misreading FR-023 exists to prevent.
+exec-quant record per step: the record with the latest `collected_at` among that step's records, ties broken by the
+record's own identity (the file's name stem) ascending (C-66). The record is found by the lookup `data-model.md` E8
+`unit.lookup` declares — matched **on the record's own `(unit_id, unit_type)`**, never on its `run_id` (one run's id
+is shared by many steps, so a `run_id` join matches the wrong record or none). Nothing is folded on a surface — no
+average, no sum, no lifetime aggregate. A step the surface names with **no** record at all still renders the element,
+with the not-evaluated marker (C-67): an omission beside a neighbour's number reads as "faster", which is the
+misreading FR-023 exists to prevent.
 
 **How the record is reached.** By importing the store engine's read path (`storage_dir` + `read_jsonl_safe(<legacy
 stream>)` + `read_entry_files(<per-record directory>)`) — the same three names `load_store()` composes — and never

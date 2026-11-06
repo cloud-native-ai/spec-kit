@@ -467,30 +467,34 @@ renderings, plus the all-`not_evaluated` fixture that must exit `0` rather than 
 
 ## Scenario L — The efficiency element on the two visibility surfaces (unexecuted; premises stated)
 
-**Goal**: the status line and the digest each say **how long** each listed unit took, without opening a third
-surface and without inventing a number.
+**Goal**: the status line and the digest each say **how long** each step took, without opening a third surface and
+without inventing a number. The unit is the **step** — the `(unit_id, unit_type)` identity the exec-quant record
+itself carries (`/speckit.plan`, `skill:xxx` and their siblings) — never a registry line.
 
 ```bash
 python3 scripts/python/status-digest.py --action digest --cap 6 | sed -n '1,20p'
 python3 scripts/python/status-digest.py --action report --structure <slug> --run-stamp <stamp> \
-  --position "<stage> <k>/<N>" --delta "<clause>" --remainder "<clause>" --blocker "no blocker"
+  --position "<stage> <k>/<N>" --delta "<clause>" --remainder "<clause>" --blocker "no blocker" \
+  --unit-id /speckit.plan --unit-type command
 ```
 
-**Expected**: every listed unit's entry carries one element beginning with the unit's readable name and its elapsed
-time with provenance, and — only while the entry bound permits — its token and invocation counts. A unit whose
-record is `not_evaluated` (which is the majority on today's store, Scenario I) renders the explicit not-evaluated
-marker; a listed unit with no record at all still carries the element, with the same marker. With the cap set low
-enough that tokens cannot fit, **every** entry on that render drops tokens together and the omitted summary names
-the withdrawn quantity. With the store absent, both surfaces render the explicit `no measurements` state and
-everything else about the line and digest is unchanged.
+**Expected**: on the status line, the one element belongs to the **emitting step** (`/speckit.plan` above); in the
+digest, one element per step of this run or per most recent step, up to the existing cap — in both cases the element
+begins with the step's readable name and its elapsed time with provenance, and — only while the entry bound permits —
+its token and invocation counts. A step whose record is `not_evaluated` (which is the majority on today's store,
+Scenario I) renders the explicit not-evaluated marker; a step the surface names with no record at all still carries
+the element, with the same marker. With the cap set low enough that tokens cannot fit, **every** element on that
+render drops tokens together and the omitted summary names the withdrawn quantity. With the store absent, both
+surfaces render the explicit `no measurements` state and everything else about the line and digest is unchanged.
 
 **Status**: NOT EXECUTED — the efficiency renderer does not exist at plan time (the digest itself does; its
 current output carries no element).
 
 **Premises**: (1) the element is *content*, so the host surface's bound is the only bound (C-63/C-64); (2) the
-element reports the **latest** record for the unit and folds nothing (C-66/C-65) — the windowed aggregate is the
-measure command's question, not the line's; (3) provenance and the field paths are reached from the schema
-declaration by reference, never restated (C-70/C-71); (4) both reads leave the store byte-identical (C-69).
+element reports the **latest** record for the step, matched on that record's own `(unit_id, unit_type)` — never on
+its `run_id` — and folds nothing (C-66/C-65); the windowed aggregate is the measure command's question, not the
+line's; (3) provenance and the field paths are reached from the schema declaration by reference, never restated
+(C-70/C-71); (4) both reads leave the store byte-identical (C-69).
 
 **Verification route (b)**: `tests/contract/test_efficiency_element.py` and `tests/unit/test_measure_unit.py`; the
 store-side half is measured today by the per-file digest comparison `SC-012 Source` names.
