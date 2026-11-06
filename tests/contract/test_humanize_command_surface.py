@@ -1878,11 +1878,14 @@ def test_wc16_command_roster_unchanged():
     live = {p.name for p in (REPO_ROOT / "templates" / "commands").glob("*.md")}
     base = {Path(n).name for n in _git_tracked(BASELINE_COMMIT, "templates/commands/")}
     assert base, "the baseline tree lists no command templates"
-    assert live == base, (
-        f"command roster drifted — added: {sorted(live - base)}; "
+    # 2026-11-06: Feature 087 (FR-022 / FR-026) adds two command templates by design;
+    # they are the only sanctioned post-baseline additions to this roster.
+    approved_additions = {"status.md", "measure.md"}
+    assert live == base | approved_additions, (
+        f"command roster drifted — added: {sorted(live - base - approved_additions)}; "
         f"removed: {sorted(base - live)} (WC-16)"
     )
-    assert len(live) == 27, f"the roster must stay at 27 command templates, found {len(live)} (WC-16)"
+    assert len(live) == 29, f"the roster must stay at 29 command templates, found {len(live)} (WC-16)"
 
 
 def test_wc17_new_line_gate_zero():
