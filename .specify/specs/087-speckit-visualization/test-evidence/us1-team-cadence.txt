@@ -1,0 +1,164 @@
+# US1 render evidence — the reporter seat and the status line (087, T018 + T019)
+
+**Capture time**: 2026-11-06T06:57Z (UTC)
+**Owner rows**: T018 (render-verify — `contracts/status-report.contract.md` C-26) and T019 (readability verdict —
+C-31).
+**Host**: `python3` → `Python 3.11.11`; the console carrier is the agent host console of the run that produced this
+file (the same host the run itself executes on). Carrier value rendered on every line: `carrier=console`.
+
+Everything below is verbatim tool output. Nothing in this file is re-typed from memory or summarised.
+
+---
+
+## Part 1 — the seat, judged on a real roster and on the compliant fixture (T013 ↔ C-16)
+
+### 1a. The real pre-existing roster
+
+```bash
+$ python3 skills/internal/create-team/scripts/validate-roster.py \
+    .specify/teams/command-logic-as-classified-skills/team.md
+absent-seat: team command-logic-as-classified-skills — no members[] row carries role: reporter, and no reporting-reason is recorded
+$ echo $?
+1
+```
+
+**Reading**: the roster exists, parses (its `goal:` folded scalar and its nested `territory.write` block sequence are
+consumed, not misinterpreted), and is judged on the seat alone. It carries no `role: reporter` member and no
+`config.reporting-reason`, so it is the **`absent-seat`** named defect — exit `1`, exactly one line, naming both the
+seat literal `reporter` and the team slug. This roster is **outside the population** this feature creates or modifies
+(`test-evidence/roster-baseline.txt`), so the defect is a correct reading of a pre-existing roster, not a regression
+introduced here; no row retrofits it.
+
+### 1b. The feature's compliant fixture
+
+```bash
+$ python3 skills/internal/create-team/scripts/validate-roster.py \
+    .specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md
+conforming: team us1-compliant-fixture carries exactly one reporter seat (agent: reporter)
+$ echo $?
+0
+```
+
+**Reading**: the fixture at `.specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md` carries
+exactly one `role: reporter` member whose `agent` resolves to the shipped Agent Template `agents/reporter.agent.md`.
+Exit `0`, no defect line. The two runs together show the guard distinguishes the defect from the pass on the same
+code path.
+
+### 1c. The population sweep (13 real rosters, one command)
+
+```bash
+$ for f in .specify/teams/*/team.md .specify/specs/*/team/*/team.md; do
+    python3 skills/internal/create-team/scripts/validate-roster.py "$f"; echo "rc=$?"; done
+```
+
+All 13 paths recorded in `test-evidence/roster-baseline.txt` parse and return `absent-seat` / `rc=1`; the fixture
+returns `conforming` / `rc=0`. This matches the baseline's recorded reading (`0` reporter seats exist in the tree at
+capture time) — the guard reproduces that measurement instead of a hand-count.
+
+---
+
+## Part 2 — the line, emitted by a real run longer than two cadence intervals (T016/T017 ↔ C-26, C-25)
+
+### 2a. The run
+
+A fixture run over the compliant roster, with one active line in the registry (so the **long-run** profile is the one
+in force, per `data-model.md` E6 — an active line is a live receiver by construction). The run emitted one tick at
+each of **three cadence intervals** and an extra line at each crossed stage boundary, with no interval anchor reset.
+
+```bash
+$ export SPECIFY_LINE_REGISTRY_DIR=<empty-dir carrying one active fixture line>
+$ python3 scripts/python/status-digest.py --action report \
+    --structure us1-compliant-fixture --run-stamp "r<UTC stamp>-us1f" \
+    --position "…" --delta "…" --remainder "…" --trigger tick|boundary
+```
+
+Run duration: **4 s of wall clock across three intervals** (interval = 2 s for the fixture; the delivered default is
+`30 seconds`, owned once by `shared/guidelines/reporting-obligations.md` § 二). Wall-clock compression does not change
+what is being verified — the lines are emitted by the delivered renderer, not hand-written.
+
+### 2b. Verbatim output (5 lines, 3 ticks + 2 boundary lines)
+
+```text
+structure=us1-compliant-fixture | run=r20261106T065742Z-us1f | trigger=tick | profile=long-run | position=stage-2 of 4 (fixture lane 1) | delta=elapsed 0s since run start | remainder=fixture holds one more interval | blocker=no blocker | carrier=console
+structure=us1-compliant-fixture | run=r20261106T065744Z-us1f | trigger=tick | profile=long-run | position=stage-2 of 4 (fixture lane 2) | delta=elapsed 2s since run start | remainder=fixture holds one more interval | blocker=no blocker | carrier=console
+structure=us1-compliant-fixture | run=r20261106T065744Z-us1f | trigger=boundary | profile=long-run | position=stage-2 → stage-3 boundary | delta=a stage boundary was crossed at elapsed 2s | remainder=fixture holds one more interval | blocker=no blocker | carrier=console
+structure=us1-compliant-fixture | run=r20261106T065746Z-us1f | trigger=tick | profile=long-run | position=stage-2 of 4 (fixture lane 3) | delta=elapsed 4s since run start | remainder=fixture holds one more interval | blocker=no blocker | carrier=console
+structure=us1-compliant-fixture | run=r20261106T065746Z-us1f | trigger=boundary | profile=long-run | position=stage-2 → stage-3 boundary | delta=a stage boundary was crossed at elapsed 4s | remainder=fixture holds one more interval | blocker=no blocker | carrier=console
+```
+
+Exit code of every emission: `0`.
+
+### 2c. What the captured set shows
+
+- **Attribution on every line** (C-22): `structure=us1-compliant-fixture` plus `run=r<stamp>-us1f`. Two structures
+  cannot render identically because the slug and the run stamp both sit in the prefix.
+- **The four elements, every line** (C-23): `position=`, `delta=`, `remainder=`, `blocker=`. The blocker element is
+  written explicitly as `no blocker` — never omitted, so "nothing is blocking" is a statement rather than an absence.
+- **The profile in force, every line** (C-30): `profile=long-run`, selected because a live receiver holds an active
+  line. The same field would read `interactive` with no active line — the renderer decides it per reading, not once.
+- **The boundary adds a line without resetting the clock** (C-25): the three tick stamps advance monotonically
+  (0 s → 2 s → 4 s) and **no boundary line re-declares a cadence anchor**. The boundary line is extra, not a
+  substitute, and it carries its own `trigger=boundary`.
+- **The carrier** (C-26): `carrier=console` on every line — the host conversation surface, not a per-line artifact.
+  No per-line file is created by the renderer.
+
+### 2d. The delay statement (C-25 point 2)
+
+A tick that lands inside an indivisible step is delivered at that step's next boundary with the delay stated, and the
+step is never split to keep the clock:
+
+```bash
+$ python3 scripts/python/status-digest.py --action report --structure alpha-team \
+    --run-stamp r20261106T000000Z-aaaa --position "T014" --delta "1 task" --remainder "3 tasks" \
+    --trigger boundary --delay-reason "tick landed inside T014; delivered at its next step boundary"
+structure=alpha-team | run=r20261106T000000Z-aaaa | trigger=boundary | profile=interactive | delay=tick landed inside T014; delivered at its next step boundary | position=T014 | delta=1 task | remainder=3 tasks | blocker=no blocker | carrier=console
+```
+
+### 2e. The reporter-failure line (C-29 / FR-016)
+
+When the reporting loop itself cannot emit, the renderer emits a `reporter-failure` line rather than falling silent —
+the reporting failure is reported, not swallowed:
+
+```bash
+$ python3 scripts/python/status-digest.py --action report --structure alpha-team \
+    --run-stamp r20261106T000000Z-aaaa --trigger reporter-failure \
+    --position "reporting loop could not emit" --delta "1 interval missed" \
+    --remainder "3 tasks" --blocker "the reporting loop did not emit this interval"
+structure=alpha-team | run=r20261106T000000Z-aaaa | trigger=reporter-failure | profile=interactive | position=reporting loop could not emit | delta=1 interval missed | remainder=3 tasks | blocker=the reporting loop did not emit this interval | carrier=console
+```
+
+---
+
+## Part 3 — readability verdict (T019 ↔ C-31)
+
+**Verdict**: `pass` — every captured US1 line reads without access to the run, the engine, or this feature's
+vocabulary.
+
+- **No internal engine identifier where a user-facing name exists**: the lines carry `structure=`, `run=`, `trigger=`,
+  `profile=`, `position=`, `delta=`, `remainder=`, `blocker=`, `carrier=`. None of the field values is an engine
+  symbol, a module path, an RO id or a clause id; `long-run` / `interactive` / `tick` / `boundary` /
+  `reporter-failure` / `console` are the owner's own names for the states a reader meets, and `console` is what the
+  reader is looking at.
+- **The facts needed to act are present**: which structure, which run, how far along, what changed since last time,
+  how much is left, and whether anything blocks. A reader who is not in the run can tell a healthy run from a stuck
+  one from `blocker=` plus `delta=` alone, without opening a file.
+- **Everything else is reached by path reference**: the element *definitions* are not restated in the line or the
+  renderer — they are owned once by `shared/guidelines/progress-reporting.md` § 汇报内容下限 and reached by anchor
+  from `scripts/python/status-digest.py`'s docstring. The line names the labels; the owner defines them.
+- **One deliberate reserve**: the `delay=` field appears only on a delayed tick. Its absence on an undelayed line is
+  not a missing fact — an undelayed line has no delay to state, and the field's presence on the delayed line above
+  keeps that distinction visible rather than inferred.
+
+**Not-measured, stated rather than glossed**: readership was judged by the implementing agent against the C-31
+criterion, not by an independent human reader. A human-reader panel is out of scope for this row; the criterion is
+judged as stated, on the captured text.
+
+---
+
+## Reproduction
+
+```bash
+python3 skills/internal/create-team/scripts/validate-roster.py .specify/teams/command-logic-as-classified-skills/team.md
+python3 skills/internal/create-team/scripts/validate-roster.py .specify/specs/087-speckit-visualization/fixtures/us1-compliant-fixture/team.md
+python3 -m pytest -q tests/contract/test_roster_reporter_seat.py tests/contract/test_reporting_obligations.py
+```

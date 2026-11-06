@@ -414,25 +414,42 @@ def action_digest(args) -> int:
 def render_status_line(args) -> str:
     """Render one status line from the owner's four labels plus attribution and the profile in force.
 
+    Shape (contract ``status-report.contract.md``):
+
+    * attribution first — the structure slug and the run stamp (C-22), then the profile in force (C-30);
+    * the trigger kind that produced this line (C-25): ``tick`` for a cadence line, ``boundary`` for the extra line a
+      crossed stage boundary emits, ``transition:<sub-flow-id>`` for a significant state transition, and
+      ``reporter-failure`` when the reporting loop could not emit (C-29);
+    * the delay statement when the tick landed inside an indivisible step and was delivered at that step's next
+      boundary (C-25 point 2) — the step is never split to keep the clock;
+    * the four content-element labels, then the carrier that receives the line (C-26).
+
     The labels are named here; their definitions are reached by anchor to
     ``shared/guidelines/progress-reporting.md`` § 汇报内容下限 and are deliberately not restated (contract C-23).
     """
     state, _error = read_state(args.cap, args.stale_bound, Path(args.workspace).expanduser().resolve())
     profile = profile_in_force(state) if state else PROFILE_LONG_RUN
-    return (
-        "%s | %s | profile=%s | structure=%s | run=%s | position=%s | delta=%s | remainder=%s | blocker=%s"
-        % (
-            args.structure,
-            args.trigger,
-            profile,
-            args.structure,
-            args.run_stamp,
-            args.position,
-            args.delta,
-            args.remainder,
-            args.blocker if args.blocker else NO_BLOCKER,
-        )
+    fields = [
+        "structure=%s" % args.structure,
+        "run=%s" % args.run_stamp,
+        "trigger=%s" % args.trigger,
+        "profile=%s" % profile,
+    ]
+    if args.cadence:
+        # An override is recorded NEXT TO the profile, so a reader can tell an override from the definition (C-24).
+        fields.append("cadence=%s" % args.cadence)
+    if args.delay_reason:
+        fields.append("delay=%s" % args.delay_reason)
+    fields.extend(
+        [
+            "position=%s" % args.position,
+            "delta=%s" % args.delta,
+            "remainder=%s" % args.remainder,
+            "blocker=%s" % (args.blocker if args.blocker else NO_BLOCKER),
+            "carrier=%s" % (args.carrier if args.carrier else CARRIER_CONSOLE),
+        ]
     )
+    return " | ".join(fields)
 
 
 def action_report(args) -> int:
@@ -870,7 +887,14 @@ def build_parser():
         default=None,
         help="the recorded name-list that declares each roster path's population class",
     )
-    parser.add_argument("--carrier", default=None, help="run record carrier value for RO-12")
+    parser.add_argument(
+        "--carrier",
+        default=None,
+        help=(
+            "the carrier that receives the line: 'console' or the declared stream artifact path (C-26)"
+            " — the same value the run record holds and RO-12 reads"
+        ),
+    )
     parser.add_argument("--run-record", default=None, help="run record path (context for RO-12)")
     # report inputs
     parser.add_argument("--structure", default=None, help="structure slug for the rendered line")
@@ -879,6 +903,16 @@ def build_parser():
     parser.add_argument("--delta", default=None, help="delta element")
     parser.add_argument("--remainder", default=None, help="remainder element")
     parser.add_argument("--blocker", default=None, help="blocker element (omit to write 'no blocker')")
+    parser.add_argument(
+        "--cadence",
+        default=None,
+        help="the cadence value in force when it is a per-run/per-structure override (C-24)",
+    )
+    parser.add_argument(
+        "--delay-reason",
+        default=None,
+        help="stated delay when a tick was delivered at the next step boundary (C-25)",
+    )
     parser.add_argument(
         "--trigger",
         default="tick",

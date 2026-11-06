@@ -23,7 +23,10 @@ never attributable to work this row did not do.
 """
 from __future__ import annotations
 
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -361,6 +364,238 @@ def test_not_a_gate_clause_points_at_the_gate_owner():
         or "永不构成" in lowered
         or "审批请求" in lowered
     ), "the owner must state that a report is a one-way statement that authorizes nothing"
+
+
+# --------------------------------------------------------------------------- #
+# T012 (US1) — the status report: attribution, the four elements, the boundary
+# trigger, the Template's authority, and the Template on both sides of the pair
+# --------------------------------------------------------------------------- #
+REPORTER_TEMPLATE = REPO_ROOT / "agents" / "reporter.agent.md"
+REPORTER_TEMPLATE_MIRROR = REPO_ROOT / ".specify" / "agents" / "templates" / "reporter.agent.md"
+STATUS_DIGEST = REPO_ROOT / "scripts" / "python" / "status-digest.py"
+
+#: The two structures the attribution fixture renders. Two lines MUST be tellable apart by their own fields.
+STRUCTURES = (
+    ("alpha-team", "r20261106T000000Z-aaaa"),
+    ("beta-team", "r20261106T000000Z-bbbb"),
+)
+
+
+def _status_line(digest: Path, structure: str, run_stamp: str, **elements) -> str:
+    """Render one status line through the delivered renderer (``--action report``)."""
+    args = [
+        sys.executable,
+        str(digest),
+        "--action",
+        "report",
+        "--structure",
+        structure,
+        "--run-stamp",
+        run_stamp,
+        "--position",
+        elements.get("position", "stage-2 of 4"),
+        "--delta",
+        elements.get("delta", "one deliverable landed"),
+        "--remainder",
+        elements.get("remainder", "two stages left; about 10 minutes"),
+        "--trigger",
+        elements.get("trigger", "tick"),
+    ]
+    if "blocker" in elements:
+        args.extend(["--blocker", elements["blocker"]])
+    if "delay_reason" in elements:
+        args.extend(["--delay-reason", elements["delay_reason"]])
+    if "cadence" in elements:
+        args.extend(["--cadence", elements["cadence"]])
+    return args
+
+
+def _render(digest: Path, structure: str, run_stamp: str, **elements):
+    """Run the renderer over an empty registry so the profile is deterministic and no live state leaks in."""
+    env = dict(os.environ)
+    env["SPECIFY_LINE_REGISTRY_DIR"] = str(_EMPTY_REGISTRY)
+    return subprocess.run(
+        _status_line(digest, structure, run_stamp, **elements),
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+
+def _digest_ready() -> Path:
+    assert STATUS_DIGEST.is_file(), (
+        "status-digest.py missing: %s — expected at T009" % STATUS_DIGEST.relative_to(REPO_ROOT)
+    )
+    return STATUS_DIGEST
+
+
+_EMPTY_REGISTRY: Path | None = None
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _empty_registry(tmp_path_factory):
+    """An empty, readable registry: the renderer resolves it, finds nothing, and selects the interactive profile.
+
+    An autouse fixture (rather than a named one) because the helper is called from module-level code paths that
+    pytest would not otherwise inject into; the directory is created once per module and never written to.
+    """
+    global _EMPTY_REGISTRY
+    _EMPTY_REGISTRY = tmp_path_factory.mktemp("registry")
+    yield _EMPTY_REGISTRY
+
+
+def test_attribution_is_present_and_two_structures_are_distinguishable():
+    """C-22 / SR-01: every line names its structure slug and run stamp; two structures never render identically."""
+    digest = _digest_ready()
+    rendered = []
+    for structure, run_stamp in STRUCTURES:
+        proc = _render(digest, structure, run_stamp)
+        assert proc.returncode == 0, (
+            "the renderer must emit one line for %r; rc=%s stderr=%r"
+            % (structure, proc.returncode, proc.stderr)
+        )
+        line = proc.stdout.strip()
+        assert line, "the renderer printed nothing"
+        assert "\n" not in line, "a status line is ONE line; got %r" % line
+        assert structure in line, "the line must name the structure slug %r; got %r" % (structure, line)
+        assert run_stamp in line, "the line must name the run stamp %r; got %r" % (run_stamp, line)
+        rendered.append(line)
+
+    assert len(set(rendered)) == 2, (
+        "two structures must not be able to produce an identical line; got %r" % (rendered,)
+    )
+
+
+def test_an_empty_attribution_field_is_refused():
+    """C-22: an absent attribution field is an input error, never a silently unattributed line."""
+    digest = _digest_ready()
+    env = dict(os.environ)
+    env["SPECIFY_LINE_REGISTRY_DIR"] = str(_EMPTY_REGISTRY)
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(digest),
+            "--action",
+            "report",
+            "--structure",
+            "alpha-team",
+            "--position",
+            "stage-2 of 4",
+            "--delta",
+            "one deliverable landed",
+            "--remainder",
+            "two stages left",
+        ],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    assert proc.returncode != 0, (
+        "omitting the run stamp must be refused rather than rendered as an unattributed line;"
+        " stdout=%r" % proc.stdout
+    )
+
+
+def test_four_content_elements_and_the_explicit_no_blocker():
+    """C-23 / SR-02 by way of the labels: all four present, and `no blocker` written when none exists."""
+    digest = _digest_ready()
+    proc = _render(digest, "alpha-team", "r20261106T000000Z-aaaa")
+    assert proc.returncode == 0, "renderer failed: rc=%s stderr=%r" % (proc.returncode, proc.stderr)
+    line = proc.stdout.strip()
+    for label in ELEMENT_LABELS:
+        assert "%s=" % label in line, (
+            "the line must carry the %r element (its definition is reached by anchor, contract C-23); got %r"
+            % (label, line)
+        )
+    assert "no blocker" in line, (
+        "when there is no blocker the line MUST write the explicit negation, not an empty value; got %r" % line
+    )
+
+
+def test_an_explicit_blocker_is_rendered_verbatim():
+    """C-23's other half: an actual blocker is carried, and the explicit negation is not additionally written."""
+    digest = _digest_ready()
+    proc = _render(digest, "alpha-team", "r20261106T000000Z-aaaa", blocker="upstream registry is unreadable")
+    assert proc.returncode == 0, "renderer failed: rc=%s stderr=%r" % (proc.returncode, proc.stderr)
+    line = proc.stdout.strip()
+    assert "upstream registry is unreadable" in line
+    assert "no blocker" not in line, (
+        "a real blocker must replace the explicit negation, never appear beside it; got %r" % line
+    )
+
+
+def test_boundary_trigger_is_rendered_without_a_cadence_reset():
+    """C-25 / SR-04: a boundary line names its trigger; it does not restart the periodic cadence."""
+    digest = _digest_ready()
+    tick = _render(digest, "alpha-team", "r20261106T000000Z-aaaa", trigger="tick")
+    boundary = _render(digest, "alpha-team", "r20261106T000000Z-aaaa", trigger="boundary")
+    assert tick.returncode == 0 and boundary.returncode == 0
+    assert "trigger=tick" in tick.stdout, "the default trigger must render as `tick`; got %r" % tick.stdout
+    assert "trigger=boundary" in boundary.stdout, (
+        "a crossed stage boundary must render its own trigger kind; got %r" % boundary.stdout
+    )
+    # The out-of-cadence line is an EXTRA line: it carries the same attribution and its own trigger, and nothing in
+    # the rendering re-anchors the clock (the anchor is the owner's, reached by path — this asserts the shape only).
+    assert "alpha-team" in boundary.stdout and "r20261106T000000Z-aaaa" in boundary.stdout
+    assert "anchor" not in boundary.stdout.lower(), (
+        "the boundary line must not re-declare a cadence anchor; the cadence continues on its original one"
+    )
+
+
+def test_a_tick_delayed_to_the_next_boundary_states_its_delay():
+    """C-25: a tick delivered at the next step boundary states the delay instead of splitting the step."""
+    digest = _digest_ready()
+    proc = _render(
+        digest,
+        "alpha-team",
+        "r20261106T000000Z-aaaa",
+        trigger="tick",
+        delay_reason="delivered at the next step boundary (an indivisible step was running)",
+    )
+    assert proc.returncode == 0, "renderer failed: rc=%s stderr=%r" % (proc.returncode, proc.stderr)
+    assert "deliver" in proc.stdout.lower() or "delay" in proc.stdout.lower(), (
+        "a delayed tick must state the delay; got %r" % proc.stdout
+    )
+
+
+def test_reporter_template_authority_deny_list():
+    """C-19 / SR-06 (read here, authored by T014): no dispatch, spawn, authorize, retry or terminate tool."""
+    assert REPORTER_TEMPLATE.is_file(), (
+        "the reporting Agent Template is missing: %s — expected at T014"
+        % REPORTER_TEMPLATE.relative_to(REPO_ROOT)
+    )
+    frontmatter = REPORTER_TEMPLATE.read_text(encoding="utf-8").split("---", 2)[1]
+    match = re.search(r"^capability-tools:\s*\[(.*?)\]", frontmatter, re.M | re.S)
+    assert match, "the Template must declare capability-tools as a list value"
+    tools = {item.strip() for item in match.group(1).split(",") if item.strip()}
+    denied = {"Agent", "Task", "Bash", "Kill", "Retry", "Approve", "Dispatch", "Workflow"}
+    assert not (tools & denied), (
+        "the reporter must not hold dispatching/authorizing tools; held %r" % sorted(tools & denied)
+    )
+    assert {"Read"} <= tools, "the reporter must be able to read the state it reports"
+
+
+def test_reporter_template_exists_on_both_sides_of_the_pair():
+    """C-14 / RS-01 (existence + byte equal): source and mirror both resolve, byte-identically."""
+    assert REPORTER_TEMPLATE.is_file(), (
+        "the framework-source Template is missing: %s" % REPORTER_TEMPLATE.relative_to(REPO_ROOT)
+    )
+    assert REPORTER_TEMPLATE_MIRROR.is_file(), (
+        "the mirror %s must be produced by sync-mirrors.py (agents/ → .specify/agents/templates/);"
+        " a source-only file never reaches a downstream project"
+        % REPORTER_TEMPLATE_MIRROR.relative_to(REPO_ROOT)
+    )
+    assert REPORTER_TEMPLATE.read_bytes() == REPORTER_TEMPLATE_MIRROR.read_bytes(), (
+        "the agents/ and .specify/agents/templates/ copies of reporter.agent.md differ"
+    )
+
+
+def test_reporter_template_is_framework_neutral():
+    """The Template is distributed to every project, so it carries no repository-specific identifier."""
+    assert REPORTER_TEMPLATE.is_file(), "the reporting Agent Template is missing (expected at T014)"
+    text = REPORTER_TEMPLATE.read_text(encoding="utf-8")
+    for token in ("spec-kit", "cloud-native-ai", "/Users/"):
+        assert token not in text, "project-specific token %r leaked into the Template" % token
 
 
 # --------------------------------------------------------------------------- #

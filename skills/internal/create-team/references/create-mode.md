@@ -94,16 +94,23 @@ stage_seats:                   # optional (085) — canonical SDD stage -> seats
     max_parallel: 6
 members:
   - agent: <slug-or-template-id>
-    role: <role>
+    role: <role>                 # the literal `reporter` marks the reporter seat (087); any other value is an ordinary member
     lifecycle: persistent | temporary
     # territory: [...]        # parallel
     # blockedBy: [...]        # serial
+    # --- reporter seat only (087) — present on the row whose role is `reporter` ---
+    # reporting-territory:
+    #   read: [<path-or-glob>, ...]   # what the seat observes: the run's state surfaces
+    #   write: [<path>]               # the ONE stream artifact the seat writes; nothing else
+    # reporting-cadence: default | <explicit duration>   # `default` = the cadence defined once in
+    #                                                    # shared/guidelines/progress-reporting.md
 config:
   # pattern-specific block (parallelism / DAG / loop settings)
   # optimization goals: optimization_target (single target path), or co_targets
   # (coordinated multi-target optimization — list of target paths + the layering
   # principle stating which kind of content belongs to which target; see
   # references/optimization-goals.md)
+  reporting-reason: <value>    # only when the reporter seat is omitted — see RS-05 below
   summary:                     # optional — omit the block entirely and summary is still ENABLED (opt-out)
     enabled: true
     every: 5                   # refresh once per N phase boundaries; continuous default 5, bounded patterns 1
@@ -147,4 +154,7 @@ config:
 - `stage_seats` is an optional (085) block map keyed only by the eight canonical SDD stages. Each entry carries `seats[]` (each resolving to a roster member) and a positive `max_parallel` that MUST NOT exceed the run's effective concurrency. The Team's own `Stage` dimension remains `executor`/`evaluator`/`optimizer`; SDD stage names MUST NOT be used there. Absent `stage_seats` preserves the global-team behavior byte for byte.
 - `members` MUST resolve to `.specify/agents/{templates,instances}/<slug>.agent.md` (instance wins on filename collision) or a seat instantiated by this flow (create-agent delegation, kind instance, ALL frame placeholders resolved, `team-scope: <team-slug>` set — the framework-only seat-provenance key, never rendered to tools); same-slug collisions are disclosed and the seat halted, never silently overwritten; unresolved members are surfaced as broken references. After `team.md` and the seat instances land, the create flow runs `specify render-agents --ai <tool>` (render-mode tools: qoder/claude/copilot/opencode) so seats reach the host registration surface; render-trigger failure MUST be disclosed, never silently skipped. 存量团队经一次 modify 即可让席位上注册面。
 - `config` MUST match `pattern`.
+- **The reporter seat (087)** is expressed as a row of the existing `members[]` list whose `role` is the literal `reporter` — roster membership has exactly one expression point, so the schema MUST NOT gain a parallel top-level `reporter:` block. The row's two seat-specific keys are `reporting-territory` (a `read` list plus a `write` list holding the one stream artifact the seat owns) and `reporting-cadence` (an explicit duration, or the literal `default` meaning the cadence defined once in `shared/guidelines/progress-reporting.md`). The seat's cardinality is **at most one**: two or more `role: reporter` rows is a defect, never a richer roster. The seat's agent resolves to the shipped Agent Template `agents/reporter.agent.md` (mirror `.specify/agents/templates/reporter.agent.md`).
+- **RS-05 · the runtime-omission condition (FR-021)** — the reporter seat may be omitted only when **both** facts hold: **every lane of the run is executed by the orchestrating session itself**, **and** the whole run is expected to finish **inside one cadence interval**. Joined conjunctively, the two facts are one condition; under it the **orchestrating session carries the reporting duty itself** and the omission is recorded as `config.reporting-reason: all-lanes-in-session-single-interval`, so a reader can tell a recorded omission from a forgotten seat. The other accepted value, `host-cannot-host-reporter`, records the case where the host provides no surface for the seat at all. The value set is closed — any other value is a defect. This condition MUST NOT be widened by a per-team judgement: outside those two conjunctive facts a reporter seat is required, and "this team is small" / "this team reports informally" are not widening grounds.
+- **Seat-guard call site** — after `team.md` is written and before it is presented, the create flow runs `python3 ${SKILL_HOME}/scripts/validate-roster.py <team-root>/<slug>/team.md`: exit `0` = the obligation is satisfied (seat present, or a recorded reason), exit `1` = one named defect printed on one line naming the seat and the team slug (`absent-seat`, `unresolvable-agent`, `two-seats`, or `out-of-domain-reason`), exit `2` = input error. A non-zero exit is disclosed in the execution report and the defect is fixed before presenting — the guard is a step of this procedure, not a separate command.
 - Every persisted team MUST contain `## Self-Improvement Contract` exactly once. A one-shot team MUST NOT claim subject identity.
