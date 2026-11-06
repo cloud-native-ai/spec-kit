@@ -755,6 +755,37 @@ def diff_lines(rel_path: Path, revision: str = BASELINE_COMMIT) -> tuple[list[st
     return removed, added
 
 
+def compiled_banner_delta(rel_path: Path, revision: str = BASELINE_COMMIT) -> tuple[str, str]:
+    """``(old_banner, new_banner)`` — the compiled Wrap-up banner the recompile rewrote.
+
+    The banner under ``## Wrap-up`` is machine-owned: ``probe-utils.py --action
+    compile-embeds`` regenerates it from the registry's projection fingerprint, so ANY
+    registry addition moves it in every unit it is compiled into. Feature 087
+    (d41d0ced) added a probe Object (``speckit-status-wrapup``) plus two
+    ``h-docs-sync-eval`` HandlerBindings, which moved the fingerprint
+    ``7877db82c58c`` -> ``8cb5a238739a``; this file's banner followed.
+
+    Reading the two banner lines out of git rather than pinning the hex literal keeps
+    this a *containment* judge: the criterion stays "the banner is the only
+    machine-generated line this file gained, and it is exactly one line", which is
+    decidable at any future recompile. A hand edit to the banner, a second compiled
+    line, or any other delta still turns the test red.
+    """
+    old = git_show(rel_path, revision).splitlines()
+    new = read(rel_path).splitlines()
+    old_banners = [line for line in old if line.startswith("<!-- AUTO-GENERATED")]
+    new_banners = [line for line in new if line.startswith("<!-- AUTO-GENERATED")]
+    assert len(old_banners) == 1, (
+        f"{rel_path.relative_to(ROOT)}: expected exactly one compiled banner at "
+        f"{revision}, found {len(old_banners)}"
+    )
+    assert len(new_banners) == 1, (
+        f"{rel_path.relative_to(ROOT)}: expected exactly one compiled banner now, "
+        f"found {len(new_banners)}"
+    )
+    return old_banners[0], new_banners[0]
+
+
 def pointer_paragraph(text: str) -> list[str]:
     """The pass-enumeration paragraph that points at the detection reference."""
     lines = text.splitlines()
@@ -1046,25 +1077,42 @@ class TestScenarioBAnalyzeStructuralChannel:
         )
 
         # (3) SKILL.md is a pointer update OUTSIDE the containment claim: its only
-        # deltas are the pass-enumeration paragraph and the `## Rounds` section
-        # (the latter added by Feature 081c, f892c8a8, 2026-11-03 — the two-round
-        # adjudication; see rounds_section_lines). The added-line multiset must
-        # equal paragraph-delta ∪ Rounds-section exactly (hunk order is file
-        # order, so the comparison is order-free); any third delta stays red.
+        # deltas are the pass-enumeration paragraph, the `## Rounds` section (the
+        # latter added by Feature 081c, f892c8a8, 2026-11-03 — the two-round
+        # adjudication; see rounds_section_lines), and the compiled Wrap-up banner
+        # (see compiled_banner_delta below). The added-line multiset must equal
+        # paragraph-delta ∪ Rounds-section ∪ banner-line exactly (hunk order is file
+        # order, so the comparison is order-free); any fourth delta stays red.
         old_paragraph = pointer_paragraph(git_show(ANALYZE_SKILL))
         new_paragraph = pointer_paragraph(read(ANALYZE_SKILL))
+        old_banner, new_banner = compiled_banner_delta(ANALYZE_SKILL)
         removed_skill, added_skill = diff_lines(ANALYZE_SKILL)
-        assert removed_skill == [line for line in old_paragraph if line not in new_paragraph], (
-            "C-5: SKILL.md must change only inside its pass-enumeration paragraph; "
-            f"removed {removed_skill!r}"
+        assert removed_skill == (
+            [line for line in old_paragraph if line not in new_paragraph]
+            + [old_banner]
+        ), (
+            "C-5: SKILL.md must change only inside its pass-enumeration paragraph and its "
+            f"compiled Wrap-up banner; removed {removed_skill!r}"
         )
         allowed_added = Counter(
             [line for line in new_paragraph if line not in old_paragraph]
             + rounds_section_lines()
+            + [new_banner]
         )
         assert Counter(added_skill) == allowed_added, (
-            "C-5: SKILL.md gained a change outside the enumeration paragraph and "
-            f"the Rounds section: {sorted(set(added_skill) - set(allowed_added))!r}"
+            "C-5: SKILL.md gained a change outside the enumeration paragraph, the Rounds "
+            f"section and the compiled banner: {sorted(set(added_skill) - set(allowed_added))!r}"
+        )
+        # The banner is machine-owned, so it is not merely allowed — exactly one compiled
+        # line may move, and it is the one the projection currently declares.
+        moved_banners = [line for line in added_skill if line.startswith("<!-- AUTO-GENERATED")]
+        assert moved_banners == [new_banner], (
+            "C-5: the compiled banner delta must be exactly one line, the current projection; "
+            f"got {moved_banners!r}"
+        )
+        assert old_banner != new_banner, (
+            "C-5: the banner delta is empty, so the baseline and the file disagree for some "
+            "other reason than a recompile"
         )
         updated = " ".join(new_paragraph)
         assert "Eight passes" in updated, (

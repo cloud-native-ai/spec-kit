@@ -1,0 +1,177 @@
+# Feature 087 — final freeze-pin alignment (closure r5's 12 new failures)
+
+Captured: 2026-11-06T15:59:50Z (UTC)   Branch: 087-speckit-visualization
+HEAD at capture: d41d0ced697a69c10091c94a070a6b2d0c7df637
+Scope: the 12 failures listed in test-evidence/closure-full-suite-r5-20261106T154214Z.log that
+were absent from .specify/specs/087-speckit-visualization/baseline-failed.txt (the recorded
+27-failure implement-start baseline). All 12 route to two machine-generated surfaces this
+feature legitimately moved: the probe registry (one new Object + two new HandlerBindings) and
+the `compile-embeds` recompile that reads it.
+
+---
+
+## 1. Root cause, measured
+
+| Surface | Before 087 | After d41d0ced | Evidence |
+|---|---|---|---|
+| Probe Objects (`objects`) | 120 | **121** | `probe-utils.py --action probes` / `load_probe_registry()`: `{classes: 10, objects: 121, external: 0, errors: 0}` |
+| Registry source (new rows) | — | `speckit-status-wrapup` Object + 2× `h-docs-sync-eval` binding (status, measure) | `git show d41d0ced -- shared/definitions/probe-definitions.md` |
+| Compiled banner fingerprint | `7877db82c58c` | `8cb5a238739a` | every AUTO-GENERATED line, all 235 files in d41d0ced |
+| `compile-embeds --check` | — | `79 units, zero drift`, exit 0 | engine self-check at capture |
+
+The recompile is the only thing that moved the templates and skills below: for **every** file
+this alignment touches, `git diff d91ef91c -- <path>` (the commit immediately before the
+recompile) is exactly the AUTO-GENERATED banner line, or — for the seven stage templates — that
+line plus a delta that already had its own dated allowance from 077/081/081c. Nothing was
+rewritten outside the banner by the recompile, so no 12th-line defect is being papered over.
+
+---
+
+## 2. The 12 failures, dispositioned one by one
+
+### 2.1 `tests/contract/test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts` — EXPECTED INCREMENT
+
+Assertion: `internal == 120`, got `121`. Offender: the count literal, not the catalog — the
+catalog chapter's pointer rows are unchanged and the registry loads errors-free.
+The pre-existing comment claimed the feature's *only* Object increment was
+`speckit-measure-wrapup` and that "the first slice (`status.md`) registered no probe Object of
+its own". That premise is false at HEAD: d41d0ced registered `speckit-status-wrapup`.
+Repair: `120 -> 121`, dated note that names the second Object **and** corrects the stale premise
+in place (the old sentence is kept as history, preceded by "correction"). Guard untouched.
+
+### 2.2 `tests/contract/test_stage_class_wiring.py::test_stripping_the_card_restores_the_baseline_bytes[7 stems]` (failing ids 6–12) — EXPECTED INCREMENT
+
+Assertion: stripping the 077 wiring card restores `c1cd4600` byte for byte; all seven stems failed.
+Offender: the pinned digest, not the card. Measured per stem:
+`git diff d91ef91c -- templates/commands/<stem>.md` = the single compiled banner line
+(plus, for `tasks`/`implement`/`checklist`, deltas that predate 087 and already carry dated
+rows), so the card-strip result moved for exactly one reason — the banner sits OUTSIDE the card
+and its fingerprint changed.
+Cross-check that makes the increment decidable rather than assumed: at `d91ef91c` **all seven
+pinned values still measured green** (sha of the card-stripped blob at that commit == the then
+pinned value), so the movement is the recompile's and nothing else.
+Repair: the 7 digests re-measured with the test's own `strip_wiring`; the guard, the strip
+algorithm and the assertion shape are unchanged. A dated block records the cause, the
+`d91ef91c` cross-check and its method.
+
+### 2.3 `tests/contract/test_stage_class_wiring.py::test_clarify_is_inside_and_the_other_entry_points_are_untouched` — EXPECTED INCREMENT
+
+Assertion: the two pre-077 entry points (`docs`, `humanize`) keep their bytes. Offender:
+`templates/commands/docs.md` (`3684c30e…` -> `d91467bc…`). `humanize` still matches its
+079-dated pin and was NOT re-measured.
+Cause is the same banner: `git diff d91ef91c -- templates/commands/docs.md` = one line, the
+AUTO-GENERATED banner, byte-for-byte identical text apart from the 12-hex fingerprint.
+Repair: the `docs` row re-measured with a dated comment; `humanize` left alone.
+
+### 2.4 `tests/contract/test_humanize_command_surface.py::test_wc13_stage_class_pin_remeasured` — EXPECTED INCREMENT (consumer of 2.2)
+
+This test imports `test_stage_class_wiring` as a module and re-asserts the same
+`BASELINE_SHA256` / `UNCHANGED_SHA256` rows plus the same card strip. It has no pin of its own
+and went red only because 2.2/2.3 were red; the "humanize re-measured 2026-10-31 (079" comment
+guard it also checks is intact. No test edit was needed or made here.
+
+### 2.5 `tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes` — EXPECTED INCREMENT
+
+Assertion: 069a's 74-source non-wiring manifest keeps its frozen hashes. Offender: 37 manifest
+sources drifted. Measured set membership, not a guess:
+- 36 of them moved **only** the compiled banner. Verified twice: (a) against `d91ef91c`, each
+  differs by exactly two lines and both are the AUTO-GENERATED banner; (b) the structural check
+  in the new helper — swapping the live banner back to the frozen one restores the frozen
+  SHA-256 byte for byte.
+- 1 of them (`skills/internal/analyze-artifacts/SKILL.md`) carries its own 2026-10-28 allowance
+  (already in the register) plus the banner, and was already green before this change.
+`templates/commands/analyze.md` also drifted and already had its own allowance.
+
+Repair (guard kept, widened by exactly one decidable predicate): a new
+`COMPILED_BANNER_ONLY` allowance class. Each of the 36 rows is *derived and proven*, not
+waved through: `_banner_only_drift(rel, frozen_sha)` reads the frozen bytes from
+`FREEZE_COMMIT` = `98288d45` (measured: for the 69 manifest rows still byte-equal to their
+frozen value, that commit's blob hashes to exactly that value — the window the 069a note
+describes had uncommitted edits in four rows, so git is the only faithful source), requires
+exactly one compiled banner on each side, swaps it, and re-hashes. A one-line hand edit
+anywhere else in any of those 36 files makes the test red again.
+The dated 2026-10-25 record and the 069a window record are untouched.
+
+### 2.6 `tests/contract/test_decision_tension_contract.py::TestScenarioBAnalyzeStructuralChannel::test_channel_only_add_allowed_delta_enumeration` — EXPECTED INCREMENT
+
+Assertion (3): `skills/internal/analyze-artifacts/SKILL.md`'s post-baseline delta must be the
+pass-enumeration paragraph ∪ `## Rounds` section. Offender: one extra removed line, the compiled
+banner. The containment claim itself still holds: the enumeration paragraph is byte-identical to
+its intended content and no authorial line appeared.
+Repair: the allowed-delta set gains the compiled banner as a third sanctioned member, read from
+git via a new `compiled_banner_delta()` helper rather than a hex literal, so the criterion stays
+decidable at any future recompile ("the banner is the only machine-generated line this file
+gained, and it is the projection the registry currently declares"). A fourth delta, a hand edit
+inside the banner, or two compiled lines all stay red — asserted explicitly.
+
+---
+
+## 3. Same-family pin sweep (what was queried, and what came back)
+
+Queried set (repo-wide, `tests/` + `scripts/` + `docs/`, excluding `__pycache__` and git):
+
+| # | Query | Hits | Verdict |
+|---|---|---|---|
+| Q1 | probe Object count literals (`internal ==`, `>=`, `"objects"] ==`) | `test_probe_nonentity_catalog.py:112` (fixed), `test_probe_registry_umbrella.py:155` (`internal >= 72`) | first moved 120->121; second is a floor, green |
+| Q2 | the 12-hex fingerprint literal (`7877db82c58c`, `8cb5a238739a`) | 0 in tests/scripts/src beyond the two dated comments added here | nothing else pins the hex |
+| Q3 | `BASELINE_SHA256` / `UNCHANGED_SHA256` users | `test_stage_class_wiring.py` (owner), `test_humanize_command_surface.py` (consumer) | both green after 2.2/2.3 |
+| Q4 | `strip_wiring` consumers | same two files | no third consumer |
+| Q5 | command census `29` | `test_humanize_command_surface`, `test_migration_distribution`, `test_expression_gate_wiring`, `test_flow_class_ledger`, `test_expression_compatibility`, `test_delegation_classes`, `test_requirements_checker`, `test_run_skills_wiring`, `test_coaching_wiring_contract` | already aligned by the earlier 087 commits; unaffected by the recompile (they count files, not banner bytes) |
+| Q6 | `compile-embeds` unit count / drift | `test_run_skills_wiring.py::test_c9` pins `79 units` + `zero drift`; `test_compile_embeds.py` drives its own scratch workspace | engine at capture: `79 units, zero drift`, exit 0 — green |
+| Q7 | decision-tension scenario enumeration (`Seven passes` / `eight passes` / allowed delta) | `test_decision_tension_contract.py` (owner, 2 clauses) | only clause (3) moved; `TestScenarioGClosedSetDelta` reads the detection reference only and stayed green |
+| Q8 | per-tool copies of the two new commands | `test_status_digest.py`, `test_run_skills_wiring.py`, `test_coaching_wiring_contract.py` | banner-only drift, no byte pins; green |
+| Q9 | mirror / copy generators | `sync-mirrors.py --check` | `ok` on all 6 pairs (415/139/17/123/95 files), `regen-command-copies.py --check` -> `OK` |
+| Q10 | probe Object counts stated in prose (`docs/`, `shared/`, `templates/`) | 0 hits | no doc restates the count, so nothing to re-measure |
+
+One judgement call recorded rather than assumed: `test_expression_compatibility.py::
+test_c2_no_project_side_classification_store` is ALSO red at HEAD (offenders
+`.specify/memory/features.md:94`, `.specify/memory/features/087.md:62`). It is **not** one of the
+12: it is line 6 of `baseline-failed.txt`, i.e. a pre-existing failure of the recorded
+implement-start baseline, and it is on the forbidden-edit list (memory/features.md). Left as found.
+
+---
+
+## 4. Targeted readings (no full-suite run)
+
+```
+# the 12 assigned ids (7 parametrised stems expanded)
+$ python -m pytest <12 ids> -q
+12 passed in 0.27s
+
+# same-family sweep: the four owner files + the four consumer files + the probe/compile families
+$ python -m pytest tests/contract/test_decision_tension_contract.py \
+    tests/contract/test_expression_compatibility.py \
+    tests/contract/test_humanize_command_surface.py \
+    tests/contract/test_probe_nonentity_catalog.py \
+    tests/contract/test_stage_class_wiring.py \
+    tests/contract/test_compile_embeds.py tests/contract/test_compile_propagation_order.py \
+    tests/contract/test_compile_reconcile_guards.py tests/contract/test_phase2_bindings.py \
+    tests/contract/test_feedback_probe_registry.py tests/contract/test_probe_engine_action_sets.py \
+    tests/contract/test_probe_registry_umbrella.py tests/contract/test_feedback_probe_cli.py \
+    tests/contract/test_feedback_probe_entry_schema.py -q
+1 failed, 322 passed in 7.15s
+   ^ the single failure is test_c2_no_project_side_classification_store, pre-existing (see §3)
+
+$ python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 79 units, zero drift                        (exit 0)
+
+$ python3 scripts/python/sync-mirrors.py --check                    (exit 0, 6/6 ok)
+$ python3 scripts/python/regen-command-copies.py --check            (OK)
+```
+
+## 5. Files changed by this alignment
+
+- `tests/contract/test_stage_class_wiring.py` — 7 `BASELINE_SHA256` rows + 1 `UNCHANGED_SHA256`
+  row re-measured, dated cause block; guards, rosters and strip algorithm untouched.
+- `tests/contract/test_probe_nonentity_catalog.py` — `120 -> 121` with a dated correction of the
+  stale premise.
+- `tests/contract/test_decision_tension_contract.py` — `compiled_banner_delta()` helper; the C-5
+  allowed-delta set gains the one machine-owned banner line, asserted to be exactly one line and
+  to be a real delta.
+- `tests/contract/test_expression_compatibility.py` — `FREEZE_COMMIT`, `_banner_only_drift()`,
+  and the 36-row `COMPILED_BANNER_ONLY` allowance class with its structural marker check.
+- `.specify/specs/087-speckit-visualization/test-evidence/final-pin-alignment.txt` — this file.
+
+No requirement, plan, data-model, contract, quickstart, research, feature-ref or checklist file
+was modified; no runtime record (session/feedback/exec-quant/glossary) was staged; no pre-existing
+dirty file was committed or restored.

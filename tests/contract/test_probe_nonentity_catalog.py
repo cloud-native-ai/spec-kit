@@ -103,8 +103,13 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # 2026-11-06: Feature 087's second slice adds one command-wrapup Object
     # (speckit-measure-wrapup, the /speckit.measure Wrap-up embed — the registry row
     # 70df8130 registered); the first slice (`status.md`) registered no probe Object of
-    # its own, so this is the feature's only Object increment; 119 -> 120.
-    assert internal == 120, (
+    # its own, so that slice contributed no Object; 119 -> 120.
+    # 2026-11-06 (correction, d41d0ced): the premise above is incomplete. Feature 087
+    # DOES register a second Object — `speckit-status-wrapup` (/speckit.status) — plus the
+    # two `h-docs-sync-eval` HandlerBindings for status/measure, added by d41d0ced in
+    # shared/definitions/probe-definitions.md; 120 -> 121. Measured:
+    # `probe-utils.py --action probes` reports 121 Objects, 0 external, 0 errors.
+    assert internal == 121, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

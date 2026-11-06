@@ -61,6 +61,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "069a-flow-classification-docs-gates"
 HASH_MANIFEST = SPEC_DIR / "notes" / "pre-change-file-hashes.txt"
+# The commit whose tree carries the manifest's frozen bytes (measured, 2026-11-06:
+# every still-untouched manifest row hashes to exactly its value there).
+FREEZE_COMMIT = "98288d45"
 
 # The slice's pre-change baseline (notes/pre-change-measurements.md § header).
 PRE_CHANGE_HEAD = "01d1feaa08d4541be2b59af30aa8c2e87128e55a"
@@ -332,6 +335,36 @@ def _section(text: str, heading: str) -> str:
             return "\n".join(lines[start:index])
     assert start is not None, "section %r missing" % heading
     return "\n".join(lines[start:])
+
+
+def _banner_only_drift(rel: str, frozen_sha: str) -> bool:
+    """The path's only post-baseline delta is the machine-owned compiled banner.
+
+    The frozen bytes live at ``FREEZE_COMMIT`` — measured: for all 69 manifest rows whose
+    current text still equals its frozen bytes, those bytes equal that commit's, so the
+    historical record is read from git rather than relying on a tree the 069a window
+    never committed. The live file must carry exactly as many compiled banners as the
+    frozen copy, and swapping its banner text back must restore the frozen SHA-256 byte
+    for byte. The allowance is therefore decidable on content, not on a hash pair: a
+    one-line hand edit anywhere else in the file makes this false, and so does a
+    re-frozen digest.
+    """
+    frozen = _git("show", "%s:%s" % (FREEZE_COMMIT, rel))
+    assert frozen.returncode == 0, (
+        "cannot read the frozen bytes of %s at %s: %r" % (rel, FREEZE_COMMIT, frozen.stderr)
+    )
+    frozen_bytes = frozen.stdout.encode("utf-8")
+    live_bytes = (REPO_ROOT / rel).read_bytes()
+    banner = b"<!-- AUTO-GENERATED"
+    frozen_lines = frozen_bytes.splitlines()
+    live_lines = live_bytes.splitlines()
+    frozen_banners = [line for line in frozen_lines if line.startswith(banner)]
+    live_banners = [line for line in live_lines if line.startswith(banner)]
+    if len(frozen_banners) != 1 or len(live_banners) != 1:
+        return False
+    restored = [frozen_banners[0] if line.startswith(banner) else line for line in live_lines]
+    body = b"\n".join(restored) + (b"\n" if live_bytes.endswith(b"\n") else b"")
+    return hashlib.sha256(body).hexdigest() == frozen_sha
 
 
 def _hash_manifest() -> dict[str, str]:
@@ -716,6 +749,71 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
         "markers": ("spec:<spec 目录名>", "--action lookup", "owner-unavailable"),
     }
 
+# 2026-11-06 Feature 087 (d41d0ced): the compiled Wrap-up banner is machine-owned
+# (`probe-utils.py --action compile-embeds`), so registering one probe Object
+# (`speckit-status-wrapup`) plus the status/measure `h-docs-sync-eval` bindings
+# rewrote the banner — one line — in every unit the projection compiles into, this
+# 069a window record included. These sources carry no authorial edit, so they are
+# recorded here rather than re-measured: the 2026-10-25 record stays the dated
+# record of what 069a did, and the freeze keeps judging every OTHER delta.
+#
+# The entries are DERIVED, not enumerated: each path is the one whose current text
+# equals its 069a bytes with the compiled banner replaced by the registry's current
+# projection (see `_banner_only_drift` below). All-but-the-banner-lines equality is
+# the marker — stronger than a needle list, and the reason a hand edit inside any of
+# these skills cannot ride in on the allowance. 36 rows: the two remaining drifted
+# sources, `skills/internal/analyze-artifacts/SKILL.md` and
+# `templates/commands/analyze.md`, already carry their own authorial allowances
+# above and are not re-listed.
+_FEATURE_087_BANNER_ONLY = (
+    "skills/external/create-pages/SKILL.md",
+    "skills/external/database-utils/SKILL.md",
+    "skills/external/document-utils/SKILL.md",
+    "skills/external/draw-diagram/SKILL.md",
+    "skills/external/git-utils/SKILL.md",
+    "skills/external/improve-docs/SKILL.md",
+    "skills/internal/archive-session/SKILL.md",
+    "skills/internal/clarify-artifact/SKILL.md",
+    "skills/internal/create-checklist/SKILL.md",
+    "skills/internal/create-plan/SKILL.md",
+    "skills/internal/create-requirements/SKILL.md",
+    "skills/internal/create-tools/SKILL.md",
+    "skills/internal/derive-architecture/SKILL.md",
+    "skills/internal/improve-agent/SKILL.md",
+    "skills/internal/improve-team/SKILL.md",
+    "skills/internal/improve-tools/SKILL.md",
+    "skills/internal/manage-agents/SKILL.md",
+    "skills/internal/manage-goal/SKILL.md",
+    "skills/internal/manage-history/SKILL.md",
+    "skills/internal/manage-instructions/SKILL.md",
+    "skills/internal/manage-todo/SKILL.md",
+    "skills/internal/memory-recall/SKILL.md",
+    "skills/internal/memory-record/SKILL.md",
+    "skills/internal/research-feature/SKILL.md",
+    "skills/internal/run-interview/SKILL.md",
+    "skills/internal/run-team/SKILL.md",
+    "skills/internal/study-project/SKILL.md",
+    "skills/internal/summarize-project/SKILL.md",
+    "templates/commands/derive.md",
+    "templates/commands/history.md",
+    "templates/commands/instructions.md",
+    "templates/commands/interview.md",
+    "templates/commands/research.md",
+    "templates/commands/session.md",
+    "templates/commands/todo.md",
+    "templates/commands/tools.md",
+)
+for _rel in _FEATURE_087_BANNER_ONLY:
+    ALLOWED_POST_BASELINE_CHANGES[_rel] = {
+        "reason": (
+            "2026-11-06 Feature 087 (d41d0ced) recompiled the Wrap-up banner after the "
+            "speckit-status-wrapup Object and the status/measure h-docs-sync-eval "
+            "bindings moved the registry fingerprint 7877db82c58c -> 8cb5a238739a; the "
+            "compiled line is machine-owned and no authored text changed"
+        ),
+        "markers": ("COMPILED_BANNER_ONLY",),
+    }
+
 # The historical baseline stays; a later amendment that legitimately edits an
 # untouchable path records itself here with the content it must carry.
 ALLOWED_POST_BASELINE_PATHS = {
@@ -789,7 +887,18 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
 
     for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        banner_only = allowance["markers"] == ("COMPILED_BANNER_ONLY",)
         for marker in allowance["markers"]:
+            if banner_only:
+                # The machine-owned banner sentinel is not a needle in the file: it states
+                # that the file equals its 069a bytes once the compiled banner is swapped for
+                # the registry's current projection. That is the assertion, so it is made.
+                assert _banner_only_drift(rel, manifest[rel]), (
+                    "declared compiled-banner-only drift does not hold for %s: the file "
+                    "differs from its 069a bytes by something other than the compiled "
+                    "Wrap-up banner (%s)" % (rel, allowance["reason"])
+                )
+                continue
             assert marker in text, (
                 "allowed post-baseline change must carry its own intended content: "
                 "%s is missing marker %r (%s)" % (rel, marker, allowance["reason"])
