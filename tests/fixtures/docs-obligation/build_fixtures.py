@@ -11,7 +11,7 @@ Check (CI-safe, writes nothing):  /usr/bin/python3 tests/fixtures/docs-obligatio
 E6 invariant this builder honours: the repository copy of every space IS its registered state. Nine spaces
 are registered as red (`deleted-rendered/`, `orphan-rendered/`, `orphan-source/`, `no-diagram/`, `no-trace/`,
 `trace-incomplete/`, `exempt-bad/`, `exempt-superseded/` and `stale-source/` whose mtime step lives in
-`conftest.py`); only `clean/` and `exempt-ok/` are green. A writing or deleting test case therefore copies a
+`helpers.py`); only `clean/` and `exempt-ok/` are green. A writing or deleting test case therefore copies a
 space into `tmp_path` first — the repository copy is never mutated.
 """
 from __future__ import annotations
@@ -188,7 +188,7 @@ def build_all() -> list[str]:
     write(s, RECORD_PATH, json.dumps(record_payload(), indent=2) + "\n")
     finish("orphan-source")
 
-    # 6. stale-source/ — both faces on disk; conftest.py pins the mtime inequality
+    # 6. stale-source/ — both faces on disk; helpers.py pins the mtime inequality
     s = HERE / "stale-source"
     base_space(s)
     write(s, DOC_PATH, doc_text("assets/widget.svg"))

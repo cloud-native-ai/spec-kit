@@ -167,7 +167,7 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
 # 预期：verdict = missing / reason = orphan-rendered（源在、渲染面缺）; summary.converged = false ; summary.clean = false ; exit 0
 
 # 3) 面序对照：两面都在、只是源更新 ⇒ stale（不是 missing）。`stale-source/` 的 mtime 不等式是**复制到
-#    tmp_path 时**由 conftest.apply_mtime_step 造出来的夹具事实（git 不存 mtime），所以本条要在副本上跑：
+#    tmp_path 时**由 helpers.apply_mtime_step 造出来的夹具事实（git 不存 mtime），所以本条要在副本上跑：
 #    SPACE="$(mktemp -d)/space-stale-source" && cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"
 python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
   --root "${SPACE}" \

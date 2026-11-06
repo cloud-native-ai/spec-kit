@@ -490,7 +490,7 @@ Dependency set: none
 | 项 | 预算 | 说明 |
 |----|------|------|
 | 新增测试文件 | **4**（`tests/unit/test_docs_utils_obligation.py`、`tests/unit/test_docs_utils_carriers.py`、`tests/integration/test_docs_obligation_scenarios.py`、`tests/unit/test_docs_obligation_reuse.py`） | 不开第二个**引擎**测试文件家系之外的文件；`test_docs_command_scenarios.py` 只加用例。`test_docs_utils_carriers.py` 是 `tasks.md` T009 明确单列的一行（写不同路径、可与 T008 并行），`test_docs_obligation_reuse.py` 是 T031/T032 明确单列的复用与守卫文件（读仓库而非判夹具空间，故与引擎家系分文件），本行计数按实际任务登记（analyze M4） |
-| 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `conftest` 建造步骤 | 不变量的唯一读法是 `data-model.md` E6：**仓库副本 == E6 表登记的构成**（九个空间登记态本身即红，不是删除前绿灯态）；写入型用例先 `copytree` 到 `tmp_path` |
+| 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `helpers.py` 建造步骤 | 不变量的唯一读法是 `data-model.md` E6：**仓库副本 == E6 表登记的构成**（九个空间登记态本身即红，不是删除前绿灯态）；写入型用例先 `copytree` 到 `tmp_path`。建造步骤文件名是 `helpers.py` 而非 `conftest.py`：pytest 会把 rootdir 下任意 `conftest.py` 以裸模块名 `conftest` 注册，遮蔽根 `tests/conftest.py`（closure 有界修复轮实测） |
 | 第三方依赖 | **0** | 检查器只用标准库（research R3/R4） |
 | 测试时长 | 上述两文件的**全量运行 ≤ 10s**（本机、无网络） | 85 个载体在检查器里只读元数据，不读文档全文以外的内容 |
 | 红线 | 任何断言 MUST NOT 依赖 `git checkout` 的写入顺序或机器时钟 | `stale-source/` 用 `os.utime` 显式造 mtime（`data-model.md` E6） |

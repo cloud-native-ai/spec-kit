@@ -30,8 +30,10 @@ Owns the wiring-form and execution-zero-change assertions of
 * **C-011** the per-tool command copies carry the same subsection; the copy set
   is derived from the generator's own registry (``src/specify_cli``), never
   hard-coded here.
-* ``docs.md`` / ``humanize.md`` are the two other wiring entry points and MUST
-  keep their pre-077 bytes — this feature does not touch them.
+* ``docs.md`` / ``humanize.md`` are the two other wiring entry points: ``humanize.md``
+  MUST keep its pre-077 bytes, and ``docs.md`` carries no wiring card either — its
+  pinned bytes were refreshed once, by 087 T063 (2026-11-06, the obligation dispatch
+  段), so the guard still asserts "these entry points gain no wiring card".
 
 Red-first (Constitution IV): today the seven templates carry the wiring nowhere
 (measured: zero hits for ``flow_class|flow-class|expression`` in each of them), so
@@ -119,9 +121,16 @@ BASELINE_SHA256 = {
 # humanize re-measured 2026-10-31 (079 WC-13): the template was rewritten by 079,
 # then its short-description was shortened to satisfy the 50-char frontmatter guard.
 # feature 079 (run-then-report repositioning + breaking-change/migration block),
-# so its pinned bytes move with that rewrite; docs is untouched.
+# so its pinned bytes move with that rewrite.
+#
+# docs is no longer "untouched" — 087 T063 (2026-11-06) legitimately edits
+# `templates/commands/docs.md`: it adds the obligation dispatch段 (the
+# `--action obligation` entry the create-docs skill gains) and restates the five
+# counts the dispatch carries. The guard's assertion is unchanged — the pin was
+# refreshed to the post-087 bytes because the edit is part of this feature, not a
+# drift; humanize's pin stays byte-identical.
 UNCHANGED_SHA256 = {
-    "docs": "3684c30ed841ab4256e4c30ff9382f769ccc1f68713b94e7c1ccd4832c0407c9",
+    "docs": "533dfba053e0d6f87ee4d5e97c8e3c4e8344e1dc07542b82b263c94ba288f41a",
     "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
 }
 
@@ -378,8 +387,9 @@ def test_clarify_is_inside_and_the_other_entry_points_are_untouched():
         path = _stage_path(stem)
         assert path.is_file(), "sentinel: %s moved" % path.relative_to(REPO_ROOT)
         assert _sha256_text(_read(path)) == UNCHANGED_SHA256[stem], (
-            "%s is a pre-077 wiring entry point and must keep its bytes in this "
-            "feature" % path.relative_to(REPO_ROOT)
+            "%s is a non-wiring entry point whose bytes are pinned; a mismatch "
+            "means either an unregistered edit or a stale pin (see UNCHANGED_SHA256)"
+            % path.relative_to(REPO_ROOT)
         )
 
 

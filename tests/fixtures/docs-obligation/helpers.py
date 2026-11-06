@@ -1,5 +1,13 @@
 """T006/T007 — the fixture build steps for the `docs-obligation` spaces.
 
+**Not a pytest fixture module.** This file is named `helpers.py`, not `conftest.py`, on purpose: pytest
+collects every `conftest.py` under the rootdir and registers it in `sys.modules` under the plain name
+`conftest`, so a `tests/fixtures/docs-obligation/conftest.py` silently replaced the root
+`tests/conftest.py` module for the whole session — breaking `from conftest import install_template_clone`
+(`test_instructions_size_budget.py`, `test_proactive_trigger_section.py`) and every other root-conftest
+importer. The 087 test modules load this file explicitly by path
+(`importlib.util.spec_from_file_location`), so the name carries no pytest meaning here.
+
 Two duties live here, both about the *state* of a fixture copy rather than about judging anything:
 
 * **T006 `copy_fixture(name, tmp_path)`** — every writing or deleting case operates on a `tmp_path` copy, so

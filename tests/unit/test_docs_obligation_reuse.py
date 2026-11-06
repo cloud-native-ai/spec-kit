@@ -34,7 +34,7 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs-obligation"
 CONTRACT = REPO_ROOT / ".specify" / "specs" / "087-arch-diagram-docs" / "contracts" / "diagram-obligation.contract.md"
 SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "087-arch-diagram-docs"
 
-_spec = importlib.util.spec_from_file_location("docs_obligation_fixtures_reuse", FIXTURES / "conftest.py")
+_spec = importlib.util.spec_from_file_location("docs_obligation_fixtures_reuse", FIXTURES / "helpers.py")
 fixtures = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(fixtures)
 

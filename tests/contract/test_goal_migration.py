@@ -98,6 +98,26 @@ def _is_historical(path: str) -> bool:
     return any(path.startswith(prefix) for prefix in HISTORICAL_PREFIXES + RUNTIME_CACHE_PREFIXES)
 
 
+def _is_ignored_log(path: str) -> bool:
+    """A git-untracked ``*.log`` under a spec is run scratch, not a live face.
+
+    Read from git itself (``check-ignore``) rather than from a list kept here: the
+    run logs of an in-flight feature quote pre-existing failure text, which can name
+    the old path, and those logs are evidence for the run — not surfaces the
+    migration must rewrite. The exclusion is bounded to git-ignored files matching
+    ``*.log``, so an authored file never qualifies.
+    """
+    if not path.endswith(".log"):
+        return False
+    proc = subprocess.run(
+        ["git", "check-ignore", "-q", "--no-index", path],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    return proc.returncode == 0
+
+
 def _is_guard(path: str) -> bool:
     return path in GUARD_FILES
 
@@ -118,12 +138,13 @@ class TestLiveSurfacesAreMigrated:
         """Catches live surfaces the explicit list above does not enumerate."""
         offenders = [
             p for p in _tracked_files_containing(OLD_PATH_NEEDLE)
-            if not _is_historical(p) and not _is_guard(p)
+            if not _is_historical(p) and not _is_guard(p) and not _is_ignored_log(p)
         ]
         assert offenders == [], (
             "live-face files still reference the pre-migration path "
-            f"(historical faces and the {len(GUARD_FILES)} migration guards are "
-            "excluded by design):\n  " + "\n  ".join(offenders)
+            f"(historical faces, the {len(GUARD_FILES)} migration guards and "
+            "git-ignored *.log run scratch are excluded by design):\n  "
+            + "\n  ".join(offenders)
         )
 
 

@@ -27,11 +27,12 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs-obligation"
 
-# `conftest` is a name pytest itself registers per test directory, so importing it by that
-# plain name collides with the root `tests/conftest.py` module. Load the fixture build steps by
-# file path instead — one explicit module, no import-order dependency.
+# The fixture build steps are a plain helper module, not a pytest fixture module: a
+# `conftest.py` anywhere under the rootdir is registered by pytest under the plain module
+# name `conftest`, which shadowed the root `tests/conftest.py`. Load it by file path
+# instead — one explicit module, no import-order dependency.
 _spec = importlib.util.spec_from_file_location(
-    "docs_obligation_fixtures", FIXTURES / "conftest.py")
+    "docs_obligation_fixtures", FIXTURES / "helpers.py")
 fixtures = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(fixtures)
 
@@ -937,7 +938,7 @@ def test_c005_fenced_block_does_not_shift_the_line(tmp_path: Path):
 def test_c008_source_newer(tmp_path: Path):
     """A source strictly newer than its earliest rendered face reads `stale` / `source-newer-than-render`.
 
-    The inequality is a fixture fact (`conftest.apply_mtime_step`), asserted here a second time so a silently
+    The inequality is a fixture fact (`helpers.apply_mtime_step`), asserted here a second time so a silently
     failed `os.utime` fails on this assertion instead of making the case green by accident.
 
     red-when: the fixture's mtime inequality did not take effect, or a newer source is not reported stale.

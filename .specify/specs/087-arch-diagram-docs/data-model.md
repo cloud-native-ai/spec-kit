@@ -113,7 +113,7 @@
 | `exempt-bad/` | 豁免记录缺 `justification`（或长度 < 8） | — | `not-evaluated` / `exemption-invalid`（序 2）；`converged=false` |
 | `exempt-superseded/` | 豁免记录齐备，但文档**已带**解析到渲染产物的引用 | 本夹具记录 | `not-evaluated` / `exemption-invalid` + `summary.exemption_superseded=1`；`converged=false` |
 
-**mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `conftest.py` 的建造步骤（`apply_mtime_step`，
+**mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `helpers.py` 的建造步骤（`apply_mtime_step`，
 由 `copy_fixture` 在每次复制后调用）里用 `os.utime` 把 `source` 设为「渲染面 mtime + 60s」（写在 `.gitattributes` 之外，
 不进版本库），并在设置后**立刻断言该不等式**——文件系统若静默拒绝 `utime`，失败发生在建造步骤而不是让该夹具随机器变色；
 否则 `git checkout` 的写入顺序会让该夹具随机器而红或绿——一条会自己变色的判据等于没有判据。
