@@ -16,7 +16,7 @@ Exit codes:
   2 = input or parse error
 
 Standard library only, Python >= 3.8. The gate judges the spec tree it is pointed at with its own
-code and adds no framework runtime dependency. Feature 084 accounts for the two deviations from
+code and adds no framework runtime dependency. The declaration migration accounts for the two deviations from
 that self-containment by name instead of leaving them implicit:
 
 * **One module import — the shared read entry** (``scripts/python/declaration_reader.py``). It is
@@ -90,7 +90,7 @@ STAGES = {
 }
 
 # ---------------------------------------------------------------------------
-# Declaration layer (Feature 084, batch 2 row `driver-gate-roster` of C-044)
+# Declaration layer (batch 2 row `driver-gate-roster` of C-044)
 #
 # This gate's roster — the six check names its findings carry and the per-stage file requirement —
 # used to be spelled here: at every `add(findings, "<name>", …)` call site and in the `STAGES` table
@@ -216,7 +216,7 @@ def declared_check(key):
 
 # ---------------------------------------------------------------------------
 # Opt-in delegation: the declaration layer's judging engine
-# (Feature 084 / `C-040`, plan D8, decision tension `T-003`)
+# (`C-040`, plan D8, decision tension `T-003`)
 #
 # `--triple-structure` asks the layer's own engine once for `verify` and forwards every finding line
 # it prints **verbatim** under one check name. The flag defaults **off**: an existing 081 assertion
@@ -346,7 +346,7 @@ ABSENT_LOCATORS = ("(none)", "none", "n/a", "(no dependency)", "—", "–", "-"
 DISPOSITIONS = ("resolved", "inherited", "not-applicable")
 #: The closed `Status` domain of `§ Execution Premises`.
 PREMISE_STATUSES = ("verified", "unverified", "falsified")
-# Feature 084: the class axis is owned by `flow-class-classes`; the literal below is the
+# The class axis is owned by `flow-class-classes`; the literal below is the
 # FR-012 compatibility value used only when the declaration layer is unreadable (labelled on
 # stderr by `declared_sequence`). A readable declaration is the authority.
 FLOW_CLASSES, _ = declared_sequence("flow-class-classes")
@@ -1263,7 +1263,7 @@ def run(args):
         carrier_tasks_text=carrier_tasks,
     )
 
-    # Opt-in, default off (Feature 084 / D8): one delegation, then the verdict above is unchanged.
+    # Opt-in, default off (D8): one delegation, then the verdict above is unchanged.
     if args.triple_structure:
         delegate_triple_structure(repo, findings)
 
@@ -1309,7 +1309,7 @@ def main(argv=None):
                              "verify) and forward each of its finding lines verbatim under the "
                              "single check name triple-structure. Off by measurement: an existing "
                              "081 assertion closes the finding-name set a stage run may produce "
-                             "(plan D8 / T-003, Feature 084 C-040)")
+                             "(plan D8 / T-003, C-040)")
     parser.add_argument("--json-out", default="")
     args = parser.parse_args(argv)
 

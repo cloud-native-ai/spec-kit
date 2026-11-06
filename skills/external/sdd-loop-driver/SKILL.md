@@ -74,6 +74,8 @@ classification: external
 
 ## The Loop (U0–U6)
 
+**Stage chain (test-pinned literal; owner: `shared/declarations/facts/driver-stage-sequence.yaml#/statement`)**: requirements → clarify → plan → tasks → checklist → analyze → implement → review
+
 ```text
 U0 ENTRY     一遍性入口：目标、线、断点（或"探测"）、终态权威文档
 U1 PROBE     每线：断点探测（git 分支 + 近期提交 + specs 目录 + 终态文档）判定续跑阶段

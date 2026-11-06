@@ -239,6 +239,10 @@ def test_no_second_classification_data_file():
             # .specify/ = generated mirrors + spec artifacts; tests/ holds the
             # pinned literal copies this repository deliberately keeps.
             continue
+        if rel.startswith("shared/declarations/"):
+            # 2026-11-06 triple-structure migration: the declaration layer is the single
+            # machine-read owner this invariant now points at, not a second source.
+            continue
         path = REPO_ROOT / rel
         if not path.is_file():
             continue

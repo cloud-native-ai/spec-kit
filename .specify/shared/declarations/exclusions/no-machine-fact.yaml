@@ -3,7 +3,7 @@
 # One row per **unit** whose last in-scope fact left the roster
 # (contracts/migration-batches.contract.md § Facts outside the roster). The rows are the unit-level
 # records; the fact-level record for the same removal lives in that contract section and in
-# `.specify/memory/features/084.md` § Latest Review — an absent migration, never a silent deletion.
+# the feature detail's § Latest Review — an absent migration, never a silent deletion.
 #
 # `carrier` is the deterministic engine the unit's text actually calls (located by `grep` at write
 # time), never the markdown that carried the fact. `anchor` is the resolvable in-tree location where

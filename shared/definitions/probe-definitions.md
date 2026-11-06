@@ -17,7 +17,7 @@
 > 切片 Class 的 Object 单元为引擎脚本路径); external ids carry the `ext-`
 > prefix and `custom:` units. Validate with `--action probes --validate`.
 
-## 机器可读取值(三重结构,Feature 084)
+## 机器可读取值(三重结构)
 
 本文件拥有 probe 注册表的**行与判据**;它的**取值域**不在这里,而在 `shared/declarations/`
 的声明层,由引擎经 `scripts/python/declaration_reader.py` 读取:

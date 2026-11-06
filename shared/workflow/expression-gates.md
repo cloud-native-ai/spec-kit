@@ -22,7 +22,7 @@
 | 事实一致性 | fact-consistency | `shared/guidelines/one-source-of-truth.md`（整文件即判据，无单章节锚） |
 | 评审 | review | `skills/internal/review-sdd-process/SKILL.md` § Workflow + `templates/review-template.md` |
 
-**机器可读的两处取值归声明层（Feature 084 批 2）**：本文件的**六面行数与表内列集**是机器读得到的值，单一 owner 是
+**机器可读的两处取值归声明层（批 2）**：本文件的**六面行数与表内列集**是机器读得到的值，单一 owner 是
 `shared/declarations/facts/expression-gate-faces.yaml#/statement`（`section_keyword` + `expected`）与
 `shared/declarations/facts/expression-stage-operator-table.yaml#/statement`（五个列名，有序）；引擎
 `scripts/python/flow-class-check.py` 经共享读取入口读这两处，本文件保留的是**判据**——表必须落在哪个章节、哪些列必须

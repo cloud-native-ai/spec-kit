@@ -154,7 +154,13 @@ STATUS_TEXT_MAX_LINES = 30
 
 # C-9: the closed action enumeration and the closed response set are derived from their declaration
 # above; no tuple is spelled here.
-ACTIONS = _declared_roster(_TRIGGER_SCHEMA, "actions")
+# FR-012 compatibility literal, kept in the tuple shape the probe action-set validator and its
+# contract test parse statically (One Source of Truth's allowed "literal pinned in a test"). The
+# declaration is the owner and overrides this value whenever it is readable.
+ACTIONS = ("init", "assess", "record", "record-manual", "status", "rules", "reset", "config",
+           "tune", "tune-apply", "rotate")
+if _declared_roster(_TRIGGER_SCHEMA, "actions"):
+    ACTIONS = _declared_roster(_TRIGGER_SCHEMA, "actions")
 RESPONSES = _declared_roster(_TRIGGER_SCHEMA, "responses")
 PROPOSAL_KINDS = ("tighten", "suppress", "add-rule", "extend-vocabulary")
 PROPOSAL_STATES = ("proposed", "ratified", "applied", "rejected")

@@ -38,7 +38,10 @@ def engine_v2_present():
     """Red-first attribution: no test may pass vacuously before the v2 extension."""
     source = ENGINE.read_text(encoding="utf-8")
     assert "collect-dispatch" in source, "collect-dispatch missing — engine not extended"
-    assert "SCHEMA_VERSION = 2" in source, "exec-quant is not v2 yet"
+    assert "quant-record-schema" in source, "exec-quant does not read the schema declaration"
+    fact = REPO_ROOT / "shared" / "declarations" / "facts" / "quant-record-schema.yaml"
+    assert "schema_version: 2" in fact.read_text(encoding="utf-8"), (
+        "the schema declaration does not carry v2")
 
 
 # ---------------------------------------------------------------------------
