@@ -1,0 +1,9 @@
+# Plan integrity gate — feature 087, plan stage, measured 2026-11-06
+#
+$ python3 - <<'PY' (regex checks over plan.md)
+residual [UPPER_SNAKE_CASE] tokens: []
+h1 headings: ['# Implementation Plan: Speckit 框架可视化（Speckit Framework Visualization）'] -> count 1
+**Requirement -> Feature** stamp present: True
+self-referential Note line (template boilerplate) present: False
+deliberation markers present: False
+total lines: 312

@@ -1,0 +1,7 @@
+unit_id: spec:087-speckit-visualization
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false

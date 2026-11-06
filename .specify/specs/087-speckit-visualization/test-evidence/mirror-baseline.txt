@@ -1,0 +1,16 @@
+# Mirror / per-tool-copy baseline — feature 087, plan stage, measured 2026-11-06
+# criterion: no NEW drift relative to this baseline
+#
+$ python3 scripts/python/sync-mirrors.py --check
+EXIT=0
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (94 files)
+
+$ python3 scripts/python/regen-command-copies.py --check
+EXIT=0
+OK: all per-tool command copies match the source templates.
