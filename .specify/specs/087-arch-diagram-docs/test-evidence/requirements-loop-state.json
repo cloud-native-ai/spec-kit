@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "line_id": "087-arch-diagram-docs",
+  "run_id": "r20261106T061509Z-316e",
+  "stage": "requirements",
+  "loop_state": "UNKNOWN",
+  "verdict_source": "derived",
+  "loop_state_reason": "unknown",
+  "watch_verdict": {
+    "present": false,
+    "status": "missing",
+    "value_state": "na",
+    "verdict": null,
+    "reason": "unavailable",
+    "exit_code": null,
+    "attribution": null,
+    "detail": "script-missing"
+  },
+  "recovery_action": "stop",
+  "recovery_reason": "evidence-gap",
+  "recovery_decision": {
+    "action": "stop",
+    "reason": "evidence-gap",
+    "preconditions": [
+      "no evaluable evidence set (or spine missing after dispatch)"
+    ],
+    "blocked_by": []
+  },
+  "false_completion": false,
+  "spine": {
+    "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/087-arch-diagram-docs.md",
+    "status": "present",
+    "schema": "v1",
+    "state": "running",
+    "state_value_state": "known",
+    "consistent": false,
+    "fields": {
+      "stage_started_at": 1793945883,
+      "stage_deadline_epoch": 1793956683,
+      "stage_base_commit": "24cb4edc",
+      "attempt": 1,
+      "retry_limit": 3,
+      "last_verdict": "requirements U4 pass after repair (validator ok, pre-analyze pass, flow-class execution); commits 779f1a9b + ac1ed706",
+      "salvage": null,
+      "salvage_evidence": null,
+      "salvage_at": null,
+      "pid_path": null,
+      "status_path": null,
+      "log_path": null,
+      "heartbeat_path": null,
+      "run_id": "r20261106T061509Z-316e"
+    },
+    "missing_fields": []
+  },
+  "registry": {
+    "status": "present",
+    "path": "/home/agent/.local/state/spec-kit/lines/087-arch-diagram-docs.json",
+    "state": "active",
+    "stage": null,
+    "run_id": "r20261106T061509Z-316e",
+    "spine_path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/087-arch-diagram-docs.md"
+  },
+  "paths": {
+    "state_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/state",
+    "spec_dir": "/home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs/.specify/specs/087-arch-diagram-docs",
+    "repo": "/home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs",
+    "spine": "/storage/project/cloud-native-ai/spec-kit/.specify/state/087-arch-diagram-docs.md",
+    "probe": null
+  },
+  "thresholds": {
+    "source": "unknown",
+    "value_state": "unknown",
+    "start_grace": null,
+    "deadline_grace": null,
+    "heartbeat_max_age": null,
+    "retry_limit": 3
+  },
+  "evidence": {
+    "evidence_source": "local",
+    "pid": {
+      "status": "missing",
+      "value_state": "na",
+      "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/pid-087-arch-diagram-docs-requirements",
+      "pid": null,
+      "start": null,
+      "at": null,
+      "alive": null,
+      "identity": null,
+      "attribution": null
+    },
+    "status": {
+      "status": "missing",
+      "value_state": "na",
+      "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/status-087-arch-diagram-docs-requirements",
+      "exit_code": null,
+      "at": null,
+      "sentinel": null,
+      "run_id": null,
+      "stage": null,
+      "event": null,
+      "legacy": null,
+      "attribution": null
+    },
+    "log": {
+      "status": "missing",
+      "value_state": "na",
+      "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/log-087-arch-diagram-docs-requirements.log",
+      "last_line": null,
+      "sentinel_present": false,
+      "sentinel": null,
+      "anomaly": false
+    },
+    "heartbeat": {
+      "status": "missing",
+      "value_state": "na",
+      "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/heartbeat-087-arch-diagram-docs-requirements.log",
+      "at": null,
+      "mtime_ns": null,
+      "fresh": null,
+      "attribution": null
+    },
+    "watchbeat": {
+      "status": "missing",
+      "value_state": "na",
+      "path": "/storage/project/cloud-native-ai/spec-kit/.specify/state/watchbeat-087-arch-diagram-docs-requirements",
+      "run_id": null,
+      "stage": null,
+      "window": null,
+      "at": null,
+      "event": null,
+      "fresh": null
+    },
+    "hook": {
+      "status": "na",
+      "value_state": "na",
+      "path": null,
+      "observed_at": null
+    },
+    "artifacts": {
+      "status": "present",
+      "value_state": "known",
+      "stage": "requirements",
+      "complete": true,
+      "commit_required": true,
+      "no_change_allowed": false,
+      "items": [
+        {
+          "path": "requirements.md",
+          "required": true,
+          "status": "present",
+          "size": 44890
+        }
+      ]
+    },
+    "commits": {
+      "status": "present",
+      "value_state": "known",
+      "base": "24cb4edc",
+      "pathspec": [
+        ".specify/specs/087-arch-diagram-docs/requirements.md"
+      ],
+      "commits": [
+        {
+          "sha": "ac1ed706bd5e0a964c62fab9294548e76efdb1ef",
+          "subject": "fix(087): add the execution-class runtime stack and dependency ownership table to requirements"
+        },
+        {
+          "sha": "779f1a9b3b73c5f03672b782801e6397b2ce8310",
+          "subject": "feat(087): write the architecture-diagram-centric docs requirements and quality checklist"
+        }
+      ],
+      "touching": true
+    }
+  },
+  "interruptions": [
+    {
+      "form": "artifacts-without-completion",
+      "detail": "all required stage artifacts are complete but no final-line sentinel exists",
+      "evidence": [
+        {
+          "signal": "artifacts",
+          "path": null
+        }
+      ],
+      "detector": "065a"
+    }
+  ],
+  "missing_artifacts": [],
+  "uncommitted_artifacts": [],
+  "stale_signals": [],
+  "evaluated_at": "2026-11-06T06:26:21Z"
+}
