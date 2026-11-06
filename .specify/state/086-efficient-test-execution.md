@@ -240,6 +240,18 @@ last_verdict: A4/B3 integrated (f12b554d, 1d962bfb; clean combined 191/1, only t
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/11-implement-wave4.md`。
 - next: C2（T038/T041/T042/T043/T044/T045/T047/T048/T049/T054/T055 + registry/CHANGELOG；closure slot 2）→ review。
 
+## Implement closure — C2（2026-11-06T07:50Z）
+
+- C2 `93e61050` + `d30bfadf`；ff → `d30bfadf`；worktree/branch/child line 清理；actual concurrency **1**。
+- closure slot（T047，清理后重跑）：`19 failed / 7535 passed / 7 skipped / 284.12s` + serial pass `1 passed / 7561 deselected / 35.22s`；rc=1；19 名；双向 diff 空；284.12s ≤ SC-001 上限 412.59s。污染首跑（21 名 / 271.72s）记 `slot-2-in-slot-rerun-attempt`，非第二槽。
+- T049 九门 **9 PASS**；`closure-acceptance-check.py` **accept**（final_path 8/8，无 waiver）；registry/detail → **Implemented**。
+- 085 SC-010 保持 `partial`（gap: review 无 record/checkpoint）；T041 只改 4 条 `SC-010_*` 行，GATE-5 6 行 0 不符。
+- 记录面：`verification.md`（扁平 SC 行）、`completion-gate.txt`、`full-run-budget.md`、`preservation-085.txt`、`mirror-parity.txt`、`no-new-machinery.txt`、`worktree-clean.txt`；56/56 任务关闭；CHANGELOG/registry 更新。
+- 驱动裁定：① T047 in-slot rerun（沙箱污染属包内过程，非特性）；② T048 扁平 `SC-NNN_status=` 形态；③ sandbox M-16 两 rep 记 out-of-slot；④ `Implemented` 依 checker verdict（覆盖包的 Blocked 前提）。
+- disclosed：SC-003 在模板层读取（init 不生成渲染后文件）；C2 补齐 M-2…M-15 读取（DoD-2 回填）；GATE-6 用 homebrew python3（3.9.6 无 tomllib）；`.specify/memory/trigger/index.json` 为运行期残留，恢复不提交。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/12-implement-closure.md`。
+- next: **review**（最后一阶段；1 seat + verifier reserve）→ SC-010 收口 → U6 本地合并 master（不 push）。
+
 ## U0.5 自检
 
 1. 目标、拓扑、权威、切片、断点已写入状态脊：**是**。
