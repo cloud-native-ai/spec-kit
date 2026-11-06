@@ -271,7 +271,51 @@ def project_entry(entry: dict, now: datetime, stale_bound: int) -> dict:
         "stale": bool(age_seconds is not None and age_seconds > stale_bound),
         "stale_bound_seconds": stale_bound,
         "triplet": triplet,
+        # E5's per-entry projection: packed from the same reading, never a second parser (C-41).
+        "line_activity": project_line_activity(entry, triplet, age_seconds),
     }
+
+
+def project_line_activity(entry: dict, triplet: dict, age_seconds):
+    """The E5 ``line_activity`` pack: this line's own dispatch activity, where the entry declares its triplet.
+
+    The pack is the E3 projection read back off the artifact triplet the entry already declares — the same three
+    paths ``project_sub_flow`` consumes, so the digest and the supervision report cannot disagree about one flow's
+    state or age. An entry that declares no triplet has no dispatch mapping to read, so it projects ``None`` and the
+    renderer writes nothing for it (``data-model.md`` E7: an absent triplet is not invented activity).
+    """
+    if not any(value and value != DASH for value in triplet.values()):
+        return None
+    state, exit_code = project_exit_record(triplet.get("status_path"))
+    if state is None:
+        state = "running"
+    return {
+        "label": entry.get("line_id"),
+        "state": state,
+        "exit_code": exit_code,
+        "age_seconds": age_seconds,
+        "age": format_duration(age_seconds),
+    }
+
+
+def project_exit_record(status_path):
+    """Read the exit record the triplet's ``.status`` file carries (``exit=<n>``).
+
+    The shape is the engine's own: ``line-registry.py``'s ``_status_summary`` reads ``exit=`` from the same file at
+    line start, so this function consumes the artifact and invents no format. Returns ``(state, exit_code)`` with
+    ``state`` ``None`` when no exit record is present yet.
+    """
+    if not status_path or status_path == DASH:
+        return None, None
+    try:
+        text = Path(status_path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None, None
+    match = re.search(r"^exit=(-?\d+)", text, re.M)
+    if not match:
+        return None, None
+    code = int(match.group(1))
+    return ("completed" if code == 0 else "failed"), code
 
 
 def format_duration(seconds) -> str:
@@ -383,8 +427,41 @@ def _read_text(rel_path: Path):
 
 
 # ---------------------------------------------------------------- action: digest
+#: The two engine states that mean "this line finished" (``data-model.md`` E5 ``last_completion``: "the most recently
+#: ``completed`` entry of the set"). ``closed`` is the engine's own end state; the names are a projection of the
+#: engine's vocabulary rather than a second closed set, and a state the engine adds later simply yields no row.
+COMPLETED_STATES = ("closed", "completed")
+
+#: The per-entry activity pack's rendered field name (the E5 / E3 pack: label, state, age — nothing else).
+ACTIVITY_FIELD = "activity="
+
+
+def last_completion(state):
+    """E5's ``last_completion``: the single most recently finished entry of the whole (uncapped) set.
+
+    It is read off ``all_entries``, not off the capped view: a completion that fell past the cap is still the most
+    recent completion, and reporting a *different* one would be a quietly wrong answer to "what just finished?".
+    """
+    finished = [
+        item
+        for item in state["all_entries"]
+        if (item.get("state") in COMPLETED_STATES or item.get("exit_code") == 0)
+        and item.get("last_activity_at") not in (None, DASH)
+    ]
+    if not finished:
+        return None
+    return max(finished, key=lambda item: _parse_iso(item["last_activity_at"]).timestamp())
+
+
 def render_digest(state) -> str:
-    """Render the bounded summary, derived from the one reading (contracts C-42, C-43, C-44, C-45)."""
+    """Render the bounded summary, derived from the one reading (contracts C-42, C-43, C-44, C-45).
+
+    Shape, top to bottom: the reading header (the clock, the cap and stale bound in force, the profile), one row per
+    entry — each carrying its age always, and its stale marker with that age when the bound is exceeded — the packed
+    per-entry activity where the entry declares its triplet, the single most recent completion, and the
+    ``omitted=<n>`` line when the cap truncated the set. The empty set renders the literal ``nothing-running`` and
+    nothing else (C-45): an empty header would be an empty page wearing a title.
+    """
     if not state["entries"]:
         return NOTHING_RUNNING
 
@@ -398,17 +475,36 @@ def render_digest(state) -> str:
         )
     ]
     for item in state["entries"]:
-        lines.append(
-            "line_id=%s run_id=%s state=%s stage=%s age=%s stale=%s active=%s"
-            % (
-                item["line_id"] or DASH,
-                item["run_id"] or DASH,
-                item["state"] or DASH,
-                item["stage"],
-                item["age"],
-                "yes" if item["stale"] else "no",
-                "yes" if item["is_active"] else "no",
+        parts = [
+            "line_id=%s" % (item["line_id"] or DASH),
+            "run_id=%s" % (item["run_id"] or DASH),
+            "state=%s" % (item["state"] or DASH),
+            "stage=%s" % item["stage"],
+            "age=%s" % item["age"],
+            "stale=%s" % ("yes" if item["stale"] else "no"),
+            "active=%s" % ("yes" if item["is_active"] else "no"),
+        ]
+        activity = item.get("line_activity")
+        if activity:
+            # The E3 pack rendered inline: label, the state the triplet's exit record shows, and the same age the row
+            # already carries — one reading, one clock (C-41).
+            parts.append(
+                "%slabel=%s,state=%s,age=%s"
+                % (ACTIVITY_FIELD, activity["label"] or DASH, activity["state"], activity["age"])
             )
+        if item["stale"]:
+            # A stale entry's data is never presented as current (C-44): the marker carries the age it is stale by,
+            # so a reader cannot mistake the row for live state.
+            parts.append(
+                "note=last activity %s ago, beyond the %s stale bound"
+                % (item["age"], format_duration(item["stale_bound_seconds"]))
+            )
+        lines.append(" ".join(parts))
+
+    completion = last_completion(state)
+    if completion is not None:
+        lines.append(
+            "last_completion=line_id=%s age=%s" % (completion["line_id"], completion["age"])
         )
     if state["omitted"]:
         lines.append("omitted=%d" % state["omitted"])

@@ -1,0 +1,88 @@
+# US3 render evidence — the current-state digest (087, T031)
+
+**Capture time**: 2026-11-06T07:21Z
+**Owner row**: T031 — render-verify the two real digest runs into captured output (`contracts/status-digest.contract.md` C-45, DG-05).
+**Host**: `python3` → Python 3.11.11; the script is stdlib-only, so no installed package is involved.
+
+Everything below is verbatim tool output captured at execution time. Nothing here is re-typed from memory.
+
+---
+
+## 1. The registry the active run resolves (`tasks.md` § Environment Prerequisites)
+
+Resolution order (owner: the engine's own `resolve_registry_dir`): `$SPECIFY_LINE_REGISTRY_DIR` → `$XDG_STATE_HOME/spec-kit/lines` → `~/.local/state/spec-kit/lines`. No override was set in this shell, so the third step decides:
+
+```bash
+$ echo "$HOME/.local/state/spec-kit/lines"
+/home/agent/.local/state/spec-kit/lines
+$ ls -1 "$HOME"/.local/state/spec-kit/lines/*.json | wc -l
+13
+```
+
+## 2. The active run — `--cap 5` over the real registry
+
+```bash
+$ python3 scripts/python/status-digest.py --action digest --cap 5; echo "EXIT=\$?"
+generated_at=2026-11-06T07:21:37.960125Z cap=5 stale_bound=15m00s profile=long-run
+line_id=087-speckit-visualization run_id=r20261106T040353Z-087a state=active stage=- age=58m51s stale=yes active=yes note=last activity 58m51s ago, beyond the 15m00s stale bound
+line_id=082-self-explanatory-integration run_id=r20261105T032102Z-c139 state=closed stage=- age=24h17m stale=yes active=no note=last activity 24h17m ago, beyond the 15m00s stale bound
+line_id=078-bilingual-expression run_id=r20261030T081645Z-078a state=closed stage=- age=162h47m stale=yes active=no note=last activity 162h47m ago, beyond the 15m00s stale bound
+line_id=074b-nested-governance run_id=r20261029T045000Z-b074 state=closed stage=- age=192h09m stale=yes active=no note=last activity 192h09m ago, beyond the 15m00s stale bound
+line_id=074-goal-team-sdd-unification run_id=r20261028T132000Z-074d state=stalled stage=requirements age=207h13m stale=yes active=no activity=label=074-goal-team-sdd-unification,state=running,age=207h13m note=last activity 207h13m ago, beyond the 15m00s stale bound
+last_completion=line_id=082-self-explanatory-integration age=24h17m
+omitted=3
+EXIT=0
+```
+
+**Readings taken from that render**:
+
+| Reading | Value | Where it comes from |
+|---------|-------|---------------------|
+| exit status | `0` — a digest was rendered (C-45's "rendered" status, not `3`) | the captured `EXIT=` line |
+| entries rendered | `5` (the cap in force, `cap=5` on the header line) | five `line_id=` rows |
+| entries omitted | `3` (`omitted=3`) | the trailing line; the registry holds 13 entries, 8 belong to this workspace |
+| active lines | `1` (`087-speckit-visualization`, `state=active`, `active=yes`) | the first row — active lines order first (C-43) |
+| ordering | descending last activity after the active line: 24h17m → 162h47m → 192h09m → 207h13m | the `age=` fields, strictly increasing |
+| stale entries | `5` of `5`, each carrying the age it is stale by (`stale=yes` plus `note=last activity <age> ago`) | C-44: an entry past the bound is marked stale **with its age**, never shown as current |
+| per-entry activity pack | `1` entry (`074-goal-team-sdd-unification`), the only one whose registry entry declares a triplet | `activity=label=…,state=…,age=…` |
+| most recent completion | `082-self-explanatory-integration` at `24h17m` | `last_completion=` — exactly one such line |
+
+**Note on the "active" label of this run**: the run that produced this file *is* the `087-speckit-visualization` line,
+so the active row is this capture's own line. Its age (`58m51s`) exceeds the 15-minute stale bound, so it is marked
+stale — the registry's `updated_at` is written at line events, not at every minute, so a long implementation stretch
+leaves the entry's last recorded activity behind. That is the staleness rule working as declared (the digest reports
+what the artifact says, and says how old it is), not a defect in the reading.
+
+---
+
+## 3. The idle run — an empty registry
+
+```bash
+$ SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"
+nothing-running
+EXIT=3
+```
+
+**Readings taken from that render**:
+
+| Reading | Value | Where it comes from |
+|---------|-------|---------------------|
+| rendered output | the literal `nothing-running`, and nothing else | the captured stdout — one line, no header, no table |
+| exit status | `3` — the declared "nothing active" status | the captured `EXIT=` line |
+| entries / omitted | `0` entries, no `omitted=` line | there is nothing to cap, so nothing is omitted |
+| contrast with an input error | the empty registry renders `nothing-running` with `3`; a *missing* directory exits `2` (asserted by `tests/unit/test_status_digest_unit.py::test_c45_an_unreadable_registry_exits_two_and_prints_no_digest`) | C-45's closed three-value set, measured on both sides |
+
+---
+
+## 4. What these two runs establish, and what they do not
+
+**Established** (each reading above is a captured artifact, not a green check): the digest is bounded by a cap that
+truncates with `omitted=<n>` stated; the ordering is total and observable; every rendered entry carries its age and a
+stale entry is marked with the age it is stale by; an entry that declares a triplet carries its packed activity; the
+single most recent completion is named; and an idle repository answers explicitly with `nothing-running` at status `3`
+rather than an empty page at status `0`.
+
+**Not established here**: that a *live* second line appears. This checkout's registry holds one `active` entry (this
+run's own line) at capture time, so the active run above shows one active row and four finished ones. The multi-entry
+active case is covered by the 12-entry fixture in `tests/unit/test_status_digest_unit.py` (T027), which is where the
+cap/ordering/staleness arithmetic is pinned; this file records the real-registry reading as it was.

@@ -165,6 +165,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | /speckit.sanitize | execution | behavior-oracle |  | 交付清理结果与残留清单；由脚本复算判定 |
 | /speckit.session | execution | behavior-oracle |  | 交付会话导出目录；文件集与清单可校验 |
 | /speckit.skills | execution | behavior-oracle |  | 交付技能实体；以再运行与校验判定 |
+| /speckit.status | execution | behavior-oracle |  | 交付一次状态读取的三个渲染面（摘要 / 守卫裁决 / 单行状态）；条目集、有界与退出码由脚本复算判定 |
 | /speckit.tasks | execution | behavior-oracle |  | 交付任务清单；由 validate-tasks 与覆盖核对判定 |
 | /speckit.team | execution | behavior-oracle |  | 交付团队定义与运行报告；由预检与运行结果判定 |
 | /speckit.todo | execution | behavior-oracle |  | 交付 TODO 块与搁置条目；由扫描器判定 |

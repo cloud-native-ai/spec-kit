@@ -1,0 +1,65 @@
+# US3 render evidence — the idle digest run (087, T031, second file)
+
+**Capture time**: 2026-11-06T07:22Z
+**Owner row**: T031 — the *idle* half of the render verification. `tasks.md` asks for the two real digest runs captured
+separately: the active run into `us3-digest-active.txt` and the idle run into `us3-digest-idle.txt`. This file is the
+idle half; the active half (`--cap 5` over the real registry) lives in `us3-digest-active.txt` and also reproduces
+this idle capture inside its § 3, so the two files agree by construction rather than by transcription.
+
+**Owner of the rule being measured**: `contracts/status-digest.contract.md` C-45 (DG-05) — a closed exit-status set
+with an explicit `nothing-running` state, where an empty entry set MUST render `nothing-running` with status `3` and
+MUST NOT render an empty digest with status `0`.
+
+**Host**: `python3` → Python 3.11.11; the script is stdlib-only.
+
+---
+
+## 1. The command, run with a fresh empty registry
+
+```bash
+$ SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"
+nothing-running
+EXIT=3
+```
+
+`mktemp -d` creates a directory the script has never seen and that holds no `<line_id>.json`; the override is the
+resolution order's first step, so the run reads exactly that empty directory.
+
+## 2. The same run, separated so its stdout and its status are each readable on their own
+
+```bash
+$ SPECIFY_LINE_REGISTRY_DIR="$(mktemp -d)" python3 scripts/python/status-digest.py --action digest
+nothing-running
+```
+
+```bash
+$ echo "EXIT=$?"
+EXIT=3
+```
+
+## 3. The contrast that makes status `3` decidable
+
+An exit status is only meaningful against its neighbours in the closed set. The three members, measured:
+`0` = a digest was rendered (captured in `us3-digest-active.txt` § 2), `3` = nothing active (above), and `2` = input
+error, measured here against a registry directory that does not exist:
+
+```bash
+$ SPECIFY_LINE_REGISTRY_DIR="$HOME/.local/state/spec-kit/lines-does-not-exist" \
+    python3 scripts/python/status-digest.py --action digest; echo "EXIT=$?"
+registry directory is unreadable: /home/agent/.local/state/spec-kit/lines-does-not-exist
+EXIT=2
+```
+
+**Readings taken from these runs**:
+
+| Reading | Value | Evidence |
+|---------|-------|----------|
+| idle output | the literal `nothing-running`, exactly one line | § 1 / § 2 stdout |
+| idle exit status | `3` | § 1 / § 2 `EXIT=` |
+| an idle run is not an input error | the empty directory exits `3`, the missing directory exits `2` | § 2 vs § 3 |
+| an input error is not an idle state | the `2` run writes its reason to stderr and prints no `nothing-running` | § 3 |
+| a rendered digest | `0` | `us3-digest-active.txt` § 2 |
+
+**What this file does not establish**: nothing about a registry that holds entries — that is the active file's
+subject, and the 12-entry fixture in `tests/unit/test_status_digest_unit.py` (T027) is where the cap, the ordering and
+the staleness arithmetic are pinned.
