@@ -76,7 +76,9 @@
 - `quickstart.md:123` —— Scenario D「status `3`」；`:132` —— premise 4「the exit status is `3` — … distinct from `0` (a rendered digest)」；`data-model.md:125` —— E5「`nothing-running` … with exit status `3`, never an empty result」；`research.md:228` —— U-4「statuses `0` rendered / `3` nothing active / `2` input error」。
 - `requirements.md:340` —— SC-005 写「renders an explicit "nothing running" state with the **declared** exit status」，把该值的可判定性交给「声明」；两处声明不一致即不可判定。
 
-**evidence_not_supported**：不声称某条测试必然失败——T027 的测试行只写「an empty registry renders `nothing-running`」而未在行内点名 exit code；T031 只要求「with exit codes」；C-45 的 judged-by 说「three fixtures … assert the three statuses」，若测试作者按 C-45 写则会与 D10 派生的实现冲突。也不自称知道作者意图（0 还是 3）；只声称 D10 自身两句互斥、且与 C-45 的 MUST NOT 逐字相反。
+**evidence_not_supported**：不声称某条测试必然失败——T027 的测试行只写「an empty registry renders `nothing-running`」而未在行内点名 exit code；T031 只要求「with exits codes」；C-45 的 judged-by 说「three fixtures … assert the three statuses」，若测试作者按 C-45 写则会与 D10 派生的实现冲突。也不自称知道作者意图（0 还是 3）；只声称 D10 自身两句互斥、且与 C-45 的 MUST NOT 逐字相反。
+
+**stale-copy decision test**：D10 的 exit-status 重述不属于 XIV 允许的三类合法重复（不是镜像/逐工具副本、不是测试里钉住的字面量、不是 dated record），因此它是会漂移的副本，按 `.specify/shared/guidelines/one-source-of-truth.md` 必须转为引用（或删去 D10 的集合，改为「see C-45」）。
 
 ### 2.2 F-11（HIGH）证据
 
@@ -88,6 +90,8 @@
 - 后果链：T009 以 C-41 为 green point；T016 落地后脚本有第三个 action，C-41 的「exactly two」不再成立——同一文件的 § WARNING ADJUDICATION 声称 green point 与行内容一致，此处是它未覆盖的一条。
 
 **evidence_not_supported**：不声称 C-41 的 judged-by 会失败——其断言是「the script exposes **both** actions」，三个 action 仍满足「exposes both」；因此这不是 F-07 式「两条机器断言互斥」的死锁，而是规范文本（C-41/D8/T009/T029）与执行行（T016）对同一接口的两套定义。也不替作者选择「二动作」还是「三动作」；两种读法都只需单向、有界的对齐。
+
+**stale-copy decision test**：action 集合在 D8/T009/T029 中的重述都不属于三类合法重复，且 T016 给出了第三值——按 one-source-of-truth 的 disagreement procedure，C-41 是 owner，其他位置应转为引用，或（若设计确为三动作）先改 owner 再让副本引用它。
 
 ### 2.3 MEDIUM 证据（F-12）
 
