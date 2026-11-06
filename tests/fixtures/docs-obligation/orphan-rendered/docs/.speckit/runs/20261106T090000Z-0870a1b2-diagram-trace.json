@@ -14,12 +14,7 @@
       "source": "docs/assets/widget.mmd",
       "rendered": [
         {
-          "path": "docs/assets/widget.svg",
-          "sha256": "6af28ffe1c1e6aff6f859ec2d4ecb96578420e24b2f738580d3a9ddbb44a2443"
-        },
-        {
-          "path": "docs/assets/widget.png",
-          "sha256": "dbfef7064572d648e343f1f3ee5d5c2378da578dcd5deea39590ef5bba776085"
+          "path": "docs/assets/widget.svg"
         }
       ]
     }

@@ -12,6 +12,7 @@ it.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import subprocess
@@ -24,9 +25,13 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs-obligation"
 
-sys.path.insert(0, str(FIXTURES))
-
-import conftest as fixtures  # noqa: E402
+# `conftest` is a name pytest itself registers per test directory, so importing it by that
+# plain name collides with the root `tests/conftest.py` module. Load the fixture build steps by
+# file path instead — one explicit module, no import-order dependency.
+_spec = importlib.util.spec_from_file_location(
+    "docs_obligation_fixtures", FIXTURES / "conftest.py")
+fixtures = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(fixtures)
 
 
 def run_engine(*args: str) -> subprocess.CompletedProcess:
@@ -154,8 +159,9 @@ def test_c016_precedence_order(tmp_path: Path):
     }
     for name, expected in cases.items():
         space = fixtures.copy_fixture(name, tmp_path / name)
-        extra = ("--record", record_arg(space)) if name not in ("exempt-ok", "exempt-bad",
-                                                                "exempt-superseded") else ()
+        runs = space / "docs" / ".speckit" / "runs"
+        records = sorted(runs.glob("*.json"))
+        extra = ("--record", str(records[0])) if records else ()
         payload = obligation(space, *extra)
         assert verdict_of(payload, DOC) == expected, (
             f"{name}/ expected {expected}, got {verdict_of(payload, DOC)}"

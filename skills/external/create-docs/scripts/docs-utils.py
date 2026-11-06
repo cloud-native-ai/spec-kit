@@ -9,6 +9,7 @@ STR-002 "expired", STR-003 "archived", STR-004 "expires".
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -357,6 +358,348 @@ def cmd_fix_links(root: Path, moves_file: str | None, apply: bool) -> dict:
     return {"dry_run": not apply, "fixed": uniq, "unresolved": unresolved}
 
 
+# ---------------------------------------------------------------------------
+# --action obligation — the accompanying-diagram obligation checker (spec 087)
+#
+# Read-only by construction (C-002): every function below opens files for reading only,
+# creates no directory, touches no mtime and calls no network or engine. The judgement is a
+# pure function of --root + --record + --only, so two runs on one input serialise identically
+# (C-006). Owner of the vocabulary, the precedence order and the payload shape is
+# contracts/diagram-obligation.contract.md (C-001…C-016); this block implements it and
+# re-states no rule of its own.
+#
+# Engine availability is deliberately NOT one of the `not-evaluated` conditions: this checker
+# calls no engine at all, so "the engine is down" cannot make a document unjudgeable here
+# (C-012). Engine refusal semantics belong to the producing run.
+# ---------------------------------------------------------------------------
+
+# C-003 — the carrier set. Six typed documentation directories read RECURSIVELY (a one-level
+# glob loses every nested file: docs/reference/ has 1 first-level document and 64 in total),
+# plus docs/ARCHITECTURE.md when it exists. docs/notes/, docs/archive/, docs/.speckit/ and
+# site-tooling directories are never carriers — they are invisible, never "passing".
+CARRIER_DIRS = ("concepts", "tutorials", "tasks", "reference", "decisions", "contribute")
+CARRIER_ROOT_FILE = "ARCHITECTURE.md"
+HIDDEN_DOC_PARTS = ("notes", "archive", "node_modules", "site", "assets", ".git")
+
+# C-004 / C-005 — the closed verdict set and its closed reason table (one row per allowed pair).
+VERDICT_REASONS = {
+    "satisfied": ("reference-resolves",),
+    "missing": ("no-diagram-reference", "reference-unresolved", "orphan-source", "orphan-rendered"),
+    "stale": ("source-newer-than-render", "render-digest-mismatch"),
+    "not-evaluated": ("no-trace-record", "trace-incomplete", "exemption-invalid", "render-unreadable"),
+    "recorded-exemption": ("exempt-chronological",),
+}
+
+# C-011 — the closed three-value exemption reason set, and the record locations (C-001).
+EXEMPTION_REASONS = ("exempt-chronological", "exempt-flat-reference", "exempt-licence")
+RUNS_DIR = Path("docs") / ".speckit" / "runs"
+EXEMPTIONS_DIR = Path("docs") / ".speckit" / "exemptions"
+
+# C-010 — the requirement set a trace record's `diagrams[]` entry must satisfy.
+TRACE_REQUIRED = ("document", "engine", "engine_reason", "ldm_summary", "delivery", "source", "rendered")
+
+DIAGRAM_SUFFIXES = (".mmd", ".mermaid", ".puml", ".plantuml", ".svg", ".png", ".dot", ".gv", ".dotx")
+
+
+def _carrier_files(root: Path) -> list[Path]:
+    """Every carrier document under `root`, POSIX-sorted by repository-relative path."""
+    docs = root / "docs"
+    if not docs.is_dir():
+        return []
+    found: list[Path] = []
+    for name in CARRIER_DIRS:
+        base = docs / name
+        if not base.is_dir():
+            continue
+        for path in base.rglob("*.md"):
+            rel_parts = path.relative_to(docs).parts
+            if any(part.startswith(".") or part in HIDDEN_DOC_PARTS for part in rel_parts[:-1]):
+                continue
+            if path.is_file():
+                found.append(path)
+    root_file = docs / CARRIER_ROOT_FILE
+    if root_file.is_file():
+        found.append(root_file)
+    return sorted(found, key=lambda p: rel(root, p))
+
+
+def _relative_links(text: str) -> list[tuple[int, str]]:
+    """(1-based line, target) for every relative Markdown link — no http(s), no absolute, no anchors."""
+    stripped = re.sub(r"```.*?```", "", text, flags=re.S)
+    stripped = "\n".join(re.sub(r"`[^`\n]*`", "", line) for line in stripped.splitlines())
+    out: list[tuple[int, str]] = []
+    for lineno, line in enumerate(stripped.splitlines(), start=1):
+        for target in LINK_RE.findall(line):
+            bare = target.split("#", 1)[0].strip()
+            if not bare or "://" in bare or bare.startswith(("mailto:", "/", "#")):
+                continue
+            out.append((lineno, bare))
+    return out
+
+
+def _diagram_reference(root: Path, doc: Path) -> tuple[int, Path] | None:
+    """The first relative reference from `doc` that names a diagram-shaped file (resolving or not)."""
+    try:
+        text = doc.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    for lineno, target in _relative_links(text):
+        if Path(target).suffix.lower() not in DIAGRAM_SUFFIXES:
+            continue
+        resolved = Path(os.path.normpath(os.path.join(str(doc.parent), target)))
+        return lineno, resolved
+    return None
+
+
+def _load_trace_record(root: Path, record: str | None) -> dict | None:
+    """Read ONLY the file `--record` names. Never glob `runs/`, never guess the newest (C-006 rule 3)."""
+    if not record:
+        return None
+    # relative to --root (C-010's own path convention), falling back to the caller's cwd
+    given = Path(record)
+    path = given if given.is_absolute() else root / given
+    if not path.is_file() and given.is_file():
+        path = given
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(_input_error(f"--record is not readable: {exc}"))
+
+
+def _trace_entry_for(record: dict | None, reference_rel: str) -> dict | None:
+    """The `diagrams[]` entry that owns the file `reference_rel`, or None.
+
+    A document's diagram reference may point at either face — the render (the normal case) or the
+    re-editable source (the orphan case, where the render is gone but the reference was written against
+    the source). The entry is therefore matched on its `rendered[].path` **or** its `source`, which is
+    what lets the tier-5 face-loss rules distinguish `orphan-rendered` from `orphan-source` at all
+    (C-005: the two values are mirror images and MUST NOT be swapped).
+    """
+    if not record:
+        return None
+    for entry in record.get("diagrams") or []:
+        if entry.get("source") == reference_rel:
+            return entry
+        for face in entry.get("rendered") or []:
+            if face.get("path") == reference_rel:
+                return entry
+    return None
+
+
+def _trace_entry_complete(entry: dict) -> bool:
+    """C-010 — every required field present and non-empty; `rendered[].path` on every face."""
+    if not isinstance(entry.get("delivery"), dict) or entry["delivery"].get("accepted") is None:
+        return False
+    for key in ("document", "engine", "engine_reason", "ldm_summary", "source"):
+        if not entry.get(key):
+            return False
+    faces = entry.get("rendered")
+    if not isinstance(faces, list) or not faces:
+        return False
+    return all(isinstance(face, dict) and face.get("path") for face in faces)
+
+
+def _read_exemption(root: Path, doc: Path) -> dict | None:
+    """The exemption record for `doc`, parsed; None when no record exists (C-011)."""
+    rel_doc = rel(root, doc)
+    # C-011's landing is `<root>/docs/.speckit/exemptions/<relative doc path>.md`, and the
+    # relative doc path already carries its own `.md` — the record mirrors the document's path.
+    path = root / EXEMPTIONS_DIR / rel_doc.removeprefix("docs/")
+    if not path.is_file():
+        return None
+    fields: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {"_invalid": "unreadable"}
+    if not lines or lines[0].strip() != "---":
+        return {"_invalid": "no-frontmatter"}
+    for line in lines[1:]:
+        if line.strip() == "---":
+            return fields
+        match = re.match(r"^([A-Za-z_][\w-]*):\s*(.*)$", line)
+        if match:
+            fields[match.group(1)] = match.group(2).strip().strip('"').strip("'")
+    return {"_invalid": "unterminated-frontmatter"}
+
+
+def _exemption_status(record: dict | None, rel_doc: str) -> tuple[str, str] | None:
+    """(state, reason) where state is absent/valid/invalid, plus the record's own reason when valid."""
+    if record is None:
+        return None
+    if "_invalid" in record:
+        return ("invalid", "exemption-invalid")
+    if record.get("document") != rel_doc:
+        return ("invalid", "exemption-invalid")
+    if record.get("reason") not in EXEMPTION_REASONS:
+        return ("invalid", "exemption-invalid")
+    justification = record.get("justification") or ""
+    if len(justification.strip()) < 8:
+        return ("invalid", "exemption-invalid")
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", record.get("recorded_at") or ""):
+        return ("invalid", "exemption-invalid")
+    return ("valid", record["reason"])
+
+
+def _file_sha256(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _judge_document(root: Path, doc: Path, record: dict | None) -> dict:
+    """The ordered single pass of C-016. First hit wins; no backtracking, no second overwrite.
+
+    This is the ONLY place a verdict is assigned. Reading it top to bottom reads the contract's
+    precedence table top to bottom; a tier only gets to fire when its own precondition holds.
+    """
+    rel_doc = rel(root, doc)
+    verdict = reason = None
+    line = 0
+
+    # tier 1/2 — an exemption record, valid or overturned, is decided before anything else
+    exemption = _read_exemption(root, doc)
+    status = _exemption_status(exemption, rel_doc)
+    reference = _diagram_reference(root, doc)
+    if status is not None:
+        state, exempt_reason = status
+        if state == "valid" and reference is None:
+            verdict, reason = "recorded-exemption", exempt_reason
+        else:
+            # a still-valid record whose document now resolves a render has been overturned by fact,
+            # and an invalid record is simply unjudgeable — both land here (C-011, FR-004)
+            verdict, reason = "not-evaluated", "exemption-invalid"
+            if reference is not None:
+                line = reference[0]
+
+    # tier 3 — nothing in the document points at a diagram file
+    if verdict is None and reference is None:
+        verdict, reason = "missing", "no-diagram-reference"
+
+    if verdict is None:
+        line, target = reference
+        reference_rel = rel(root, target) if target.is_relative_to(root) else None
+
+        # tier 4 — the reference does not resolve to a file on disk
+        if not target.is_file():
+            verdict, reason = "missing", "reference-unresolved"
+        else:
+            entry = _trace_entry_for(record, reference_rel) if reference_rel else None
+            source = root / entry["source"] if entry and entry.get("source") else None
+            faces = [root / face["path"] for face in (entry or {}).get("rendered") or []]
+
+            # tier 5 — a face is missing from a pair whose other face is on disk
+            if entry is not None and source is not None:
+                source_on_disk = source.is_file()
+                rendered_on_disk = any(face.is_file() for face in faces)
+                if source_on_disk and not rendered_on_disk:
+                    verdict, reason = "missing", "orphan-rendered"
+                elif rendered_on_disk and not source_on_disk:
+                    verdict, reason = "missing", "orphan-source"
+
+            # tier 6/7 — the record cannot point at this diagram, or there is no record at all
+            if verdict is None:
+                if record is None:
+                    verdict, reason = "not-evaluated", "no-trace-record"
+                elif entry is None or not _trace_entry_complete(entry):
+                    verdict, reason = "not-evaluated", "trace-incomplete"
+
+            # tier 8 — the record is complete: the two faces are allowed to disagree (C-008)
+            if verdict is None:
+                try:
+                    source_mtime = source.stat().st_mtime
+                except OSError:
+                    source_mtime = None
+                if source_mtime is not None:
+                    rendered_mtimes = []
+                    unreadable = False
+                    for face in faces:
+                        try:
+                            rendered_mtimes.append(face.stat().st_mtime)
+                        except OSError:
+                            unreadable = True
+                    if unreadable:
+                        verdict, reason = "not-evaluated", "render-unreadable"
+                    elif rendered_mtimes and source_mtime > min(rendered_mtimes):
+                        verdict, reason = "stale", "source-newer-than-render"
+                    else:
+                        for face, face_path in zip(entry.get("rendered") or [], faces):
+                            expected = face.get("sha256")
+                            if not expected:
+                                continue
+                            actual = _file_sha256(face_path)
+                            if actual is not None and actual != expected:
+                                verdict, reason = "stale", "render-digest-mismatch"
+                                break
+
+            # tier 9 — both faces present, record complete, no staleness rule holding
+            if verdict is None:
+                verdict, reason = "satisfied", "reference-resolves"
+
+    assert verdict in VERDICT_REASONS, f"verdict {verdict!r} is outside the closed set"
+    assert reason in VERDICT_REASONS[verdict], f"reason {reason!r} does not pair with verdict {verdict!r}"
+    return {"path": rel_doc, "line": line if verdict not in ("missing",) or line else 0,
+            "verdict": verdict, "reason": reason}
+
+
+def _resolved_record(root: Path, record: str | None) -> str | None:
+    if not record:
+        return None
+    given = Path(record)
+    return str(given.resolve() if given.is_absolute() else (root / given).resolve())
+
+
+def cmd_obligation(root: Path, record: str | None, only: str | None) -> dict:
+    """The read-only obligation judgement. Opens no file for writing (C-002)."""
+    trace = _load_trace_record(root, record)
+    carriers = _carrier_files(root)
+    if only:
+        wanted = only.replace(os.sep, "/").lstrip("./")
+        carriers = [p for p in carriers if rel(root, p) == wanted]
+
+    documents = [_judge_document(root, path, trace) for path in carriers]
+    documents.sort(key=lambda entry: entry["path"])
+
+    counts = {name: 0 for name in ("satisfied", "missing", "stale", "recorded-exemption", "not-evaluated")}
+    superseded = 0
+    for entry in documents:
+        counts[entry["verdict"]] += 1
+        if entry["reason"] == "exemption-invalid" and entry["line"]:
+            superseded += 1
+
+    judged_scope_has_carrier = True if only else len(carriers) > 0
+    converged = bool(
+        judged_scope_has_carrier
+        and counts["missing"] == 0
+        and counts["stale"] == 0
+        and counts["not-evaluated"] == 0
+    )
+    clean = bool(converged and counts["recorded-exemption"] == 0)
+
+    return {
+        "action": "obligation",
+        "root": str(root),
+        "record": _resolved_record(root, record),
+        "carriers": len(_carrier_files(root)),
+        "documents": documents,
+        "summary": {
+            "satisfied": counts["satisfied"],
+            "missing": counts["missing"],
+            "stale": counts["stale"],
+            "exempted": counts["recorded-exemption"],
+            "not_evaluated": counts["not-evaluated"],
+            "converged": converged,
+            "clean": clean,
+            "exemption_superseded": superseded,
+        },
+    }
+
+
+def _input_error(message: str) -> str:
+    return f"docs-utils.py: error: {message}"
+
+
 def cmd_audit(root: Path, scope: str, summary: str, items_file: str | None) -> dict:
     audit_dir = root / "docs" / ".speckit" / "audit"
     audit_dir.mkdir(parents=True, exist_ok=True)
@@ -396,7 +739,7 @@ def main() -> int:
     parser.add_argument(
         "--action", required=True,
         choices=["scan", "expire", "clean", "archive-check", "stats", "validate",
-                 "fix-links", "audit"],
+                 "fix-links", "audit", "obligation"],
     )
     parser.add_argument("--root", default=".")
     parser.add_argument("--yes", action="store_true", help="confirm deletion for clean")
@@ -405,6 +748,13 @@ def main() -> int:
     parser.add_argument("--scope", default="unspecified", help="audit scope label")
     parser.add_argument("--summary", default="", help="audit summary line")
     parser.add_argument("--items-file", default=None, help="JSON file with audit items")
+    parser.add_argument("--record", default=None, metavar="FILE",
+                        help="obligation: the one diagram trace record to judge against "
+                             "(never globbed, never guessed; absent ⇒ nothing can be satisfied)")
+    parser.add_argument("--only", default=None, metavar="DOC",
+                        help="obligation: judge this one carrier document instead of the whole space")
+    parser.add_argument("--json", action="store_true",
+                        help="obligation: readability no-op — every action already prints one JSON object")
     parser.add_argument("--allow-special", action="append", default=None, metavar="NAME",
                         help="additional tool-mandated ALL-CAPS filename to accept at the "
                              "project root (repeatable); extends the ADR-0001 registry "
@@ -412,6 +762,9 @@ def main() -> int:
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
+    if args.action != "obligation" and not root.is_dir():
+        print(_input_error(f"--root does not exist: {args.root}"), file=sys.stderr)
+        return 2
     if args.action == "scan":
         out = cmd_scan(root)
     elif args.action == "expire":
@@ -426,6 +779,11 @@ def main() -> int:
         out = cmd_validate(root, set(args.allow_special or []))
     elif args.action == "fix-links":
         out = cmd_fix_links(root, args.moves, args.apply)
+    elif args.action == "obligation":
+        if not root.is_dir():
+            print(_input_error(f"--root does not exist: {args.root}"), file=sys.stderr)
+            return 2
+        out = cmd_obligation(root, args.record, args.only)
     else:
         out = cmd_audit(root, args.scope, args.summary, args.items_file)
     json.dump(out, sys.stdout, ensure_ascii=False, indent=2)

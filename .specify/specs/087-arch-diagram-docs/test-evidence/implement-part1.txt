@@ -1,0 +1,156 @@
+# implement / Part 1 — targeted test readings (T001–T016)
+
+Stage: `implement`, Part 1 only (T001–T016). No full suite was run in this stage; the `baseline` slot belongs
+to the driver and is already recorded (`test-evidence/baseline-full-suite.log`, `baseline-failed.txt`).
+
+Interpreter for every reading below:
+
+```text
+$ /usr/bin/python3 -c "import sys, typer, pytest; print(sys.version); print('typer', typer.__version__); print('pytest', pytest.__version__)"
+3.11.13 (main, May 13 2026, 09:30:18) [GCC 10.2.1 20200825 (Alibaba 10.2.1-3.9 2.32)]
+typer 0.27.3
+pytest 9.2.0
+```
+
+---
+
+## 1. Red reading — before `--action obligation` existed
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/unit/test_docs_utils_carriers.py tests/integration/test_docs_obligation_scenarios.py \
+    -q --no-header -p no:cacheprovider
+13 failed, 1 warning in 0.18s
+exit status = 1
+```
+
+Cause, quoted from one of the reds — the action was not a registered choice:
+
+```text
+E       AssertionError: `--action obligation` is not a registered choice: usage: docs-utils.py [-h] --action
+E                              {scan,expire,clean,archive-check,stats,validate,fix-links,audit}
+E         docs-utils.py: error: argument --action: invalid choice: 'obligation'
+E       assert 2 == 0
+```
+
+Per-task attribution of the thirteen reds: T008 → 3, T009 → 2, T010 → 2, T011 → 3, T012 → 3. Details in
+`notes/red-first-evidence.md`.
+
+## 2. Green reading — after T013–T016 landed
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/unit/test_docs_utils_carriers.py tests/integration/test_docs_obligation_scenarios.py \
+    -q --no-header -p no:cacheprovider
+13 passed, 1 warning in 0.72s
+exit status = 0
+```
+
+Duration check against the plan's budget (`plan.md` § Test Plan D: the two new files full run ≤ 10s on this
+machine, no network):
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py \
+    tests/integration/test_docs_obligation_scenarios.py -q --no-header -p no:cacheprovider
+11 passed, 1 warning in 0.66s     (wall clock incl. interpreter start 0.92s)
+```
+
+(`test_docs_utils_carriers.py` is the third new file; the plan's "2 new test files" count is corrected below.)
+
+## 3. Every fixture lands its registered tier
+
+One line per fixture, read off the engine directly (`--only docs/concepts/widget-overview.md`):
+
+```text
+clean              satisfied         reference-resolves        line=5  conv=True  clean=True
+no-diagram         missing           no-diagram-reference      line=0  conv=False clean=False
+deleted-rendered   missing           reference-unresolved      line=5  conv=False clean=False
+orphan-rendered    missing           orphan-rendered           line=5  conv=False clean=False
+orphan-source      missing           orphan-source             line=5  conv=False clean=False
+stale-source       stale             source-newer-than-render          conv=False clean=False   (on a tmp_path copy)
+no-trace           not-evaluated     no-trace-record                   conv=False clean=False
+trace-incomplete   not-evaluated     trace-incomplete          line=5  conv=False clean=False
+exempt-ok          recorded-exemption exempt-chronological               exempted=1 conv=True  clean=False
+exempt-bad         not-evaluated     exemption-invalid                 conv=False clean=False
+exempt-superseded  not-evaluated     exemption-invalid         superseded=1 conv=False clean=False
+```
+
+`stale-source` is read on a `tmp_path` copy because git stores no mtime: the +60s fact is applied by
+`conftest.py::apply_mtime_step` at copy time and asserted right after `os.utime`. Read on the repository copy
+(where the function refuses to fabricate an ordering) it reports `satisfied`, which is exactly why the fact is
+applied to the copy.
+
+The two face-loss values are mirror images and were verified separately, never by one shared assertion:
+`orphan-rendered` (source on disk, render gone, reference names the source) and `orphan-source` (render on
+disk, source gone).
+
+## 4. Guard sweep — failure **names** against the T003 baseline
+
+```text
+$ /usr/bin/python3 -m pytest tests/contract/test_expression_compatibility.py \
+    tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py \
+    tests/contract/test_confirmation_gates_sweep.py tests/contract/test_directory_governance.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+1 failed, 123 passed, 1 warning in 2.39s
+rc=1
+```
+
+| | T003 baseline | this stage |
+|---|---|---|
+| failure name set | `test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target` | identical |
+| new failures | — | **none** |
+
+The one red is the pre-existing residual-count budget recorded in the driver's baseline
+(`baseline-failed.txt`, same node id). Nothing this feature touched moved it.
+
+## 5. Mirror parity — back to the recorded baseline after the engine edit
+
+```text
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check      # immediately after editing the engine
+DIFF  .specify/skills/create-docs/scripts/docs-utils.py
+DRIFT detected — run: python3 scripts/python/sync-mirrors.py --write
+rc=2
+
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --write      # source → mirror, never the reverse
+sync  skills/external/ -> .specify/skills/ (1 files)
+rc=0
+
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check      # back to the baseline
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (94 files)
+rc=0
+```
+
+`regen-command-copies.py --check` is unaffected by this part (no command template was edited) and stays at the
+T003 reading: `OK: all per-tool command copies match the source templates.`, rc=0.
+
+## 6. Fixture inventory (T005–T007)
+
+```text
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --check
+OK: 11 docs-obligation fixture spaces match their registered composition
+rc=0
+```
+
+111 files across the eleven spaces + the builder + the conftest. The builder is idempotent and its `--check`
+mode writes nothing, so a later reader can verify the spaces without mutating them.
+
+## 7. Two corrections this stage is making to plan-owned text (declared as PLAN-EDIT)
+
+Both are counted facts that read differently from the artifacts as written; neither changes a fixture's
+subject, a clause binding or an assertion name.
+
+- `plan.md` § Test Plan D says the feature adds **2** new test files. It adds **3**
+  (`test_docs_utils_obligation.py`, `test_docs_utils_carriers.py`, `test_docs_obligation_scenarios.py`) —
+  `tasks.md` T009 authors the carrier file on its own path deliberately ("a separate file precisely because it
+  writes a different path from T008's"). The count is corrected to 3; the rule it guards (no third *engine*
+  test file, no full suite) is unchanged.
+- `data-model.md` E6 wording is aligned to `tasks.md` T005–T007's fixture invariant, which is also what the
+  builder and `--check` enforce: the repository copy of a space **is** its registered composition (nine red, two
+  green), not a universal "pre-deletion green state". The mtime fact for `stale-source/` lives in the build step
+  and is applied to the copy.

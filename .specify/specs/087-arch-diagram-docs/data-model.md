@@ -90,12 +90,14 @@
 **每个产生写入的用例先把夹具 `shutil.copytree` 到 `tmp_path` 再操作**，因此仓库里的夹具**永远不被任何用例改动**
 （先例：`tests/integration/test_docs_command_scenarios.py` 的 `make_skeleton(tmp_path)` 同形）。
 
-**夹具不变量的唯一读法（本轮定为 `C-01` 的处置）**：仓库副本是**每个夹具的既定盘上状态**，不是「统一的绿灯态」。
-`clean/`、`exempt-ok/` 等的既定状态是绿灯；`deleted-rendered/`、`orphan-rendered/`、`orphan-source/`、`no-diagram/`、
-`no-trace/`、`trace-incomplete/`、`exempt-bad/`、`exempt-superseded/` 的既定状态**本身就是红的**——它们的「删除」「缺记录」
-是**夹具的事实**，不是用例的副作用。因此「删除/推进 mtime」型用例仍须 `copytree` 到 `tmp_path` **在副本上**做，
-既为了不污染仓库副本，也为了让「仓库副本 == 下表登记的构成」这一等式可被 `git status` 核对。
+**夹具不变量的唯一读法（`C-01` 的处置；实施期（`tasks.md` T005–T007）为唯一裁决口径）**：仓库副本是**每个夹具的既定盘上状态**，
+不是「统一的删除前绿灯态」。`clean/`、`exempt-ok/` 的既定状态是绿灯；`deleted-rendered/`、`orphan-rendered/`、
+`orphan-source/`、`no-diagram/`、`no-trace/`、`trace-incomplete/`、`exempt-bad/`、`exempt-superseded/` 的既定状态**本身就是红的**——
+它们的「删除」「缺记录」是**夹具的事实**，不是用例的副作用。因此「删除/推进 mtime」型用例仍须 `copytree` 到 `tmp_path`
+**在副本上**做，既为了不污染仓库副本，也为了让「仓库副本 == 下表登记的构成」这一等式可被 `git status` 核对。
 判据一句话：**仓库副本 == E6 表登记的构成；任何用例造成的差异只允许存在于 `tmp_path`。**
+该等式的可执行形态是 `tests/fixtures/docs-obligation/build_fixtures.py --check`（逐空间核对构成，零写入），
+本文件的 E6 表是它核对的**唯一规格来源**，两者冲突时以本表为准并把差异登记为缺陷。
 
 | 夹具 | 构成 | `--record` | 断言的目标状态（`C-016` 的档位） |
 |------|------|-----------|----------------------------------|
@@ -111,8 +113,9 @@
 | `exempt-bad/` | 豁免记录缺 `justification`（或长度 < 8） | — | `not-evaluated` / `exemption-invalid`（序 2）；`converged=false` |
 | `exempt-superseded/` | 豁免记录齐备，但文档**已带**解析到渲染产物的引用 | 本夹具记录 | `not-evaluated` / `exemption-invalid` + `summary.exemption_superseded=1`；`converged=false` |
 
-**mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `conftest` 的建造步骤里用
-`os.utime` 把 `source` 设为「渲染面 mtime + 60s」（写在 `.gitattributes` 之外，不进版本库），
+**mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `conftest.py` 的建造步骤（`apply_mtime_step`，
+由 `copy_fixture` 在每次复制后调用）里用 `os.utime` 把 `source` 设为「渲染面 mtime + 60s」（写在 `.gitattributes` 之外，
+不进版本库），并在设置后**立刻断言该不等式**——文件系统若静默拒绝 `utime`，失败发生在建造步骤而不是让该夹具随机器变色；
 否则 `git checkout` 的写入顺序会让该夹具随机器而红或绿——一条会自己变色的判据等于没有判据。
 
 夹具同时是 `FR-023` 的「可观测负向」载体：同一夹具在删除一个面后 MUST 由绿转红，且 finding 点名该面。

@@ -10,6 +10,7 @@ Read-only is asserted the way a reader can check it: run the engine, then ask gi
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
@@ -21,9 +22,13 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs-obligation"
 
-sys.path.insert(0, str(FIXTURES))
-
-import conftest as fixtures  # noqa: E402
+# `conftest` is a name pytest itself registers per test directory, so importing it by that
+# plain name collides with the root `tests/conftest.py` module. Load the fixture build steps by
+# file path instead — one explicit module, no import-order dependency.
+_spec = importlib.util.spec_from_file_location(
+    "docs_obligation_fixtures", FIXTURES / "conftest.py")
+fixtures = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(fixtures)
 
 DOC = "docs/concepts/widget-overview.md"
 
@@ -42,28 +47,33 @@ def record_arg(space: Path) -> str:
     return str(runs / names[0])
 
 
-def git_status(space: Path) -> str:
-    """`git status --porcelain` restricted to the space.
+GIT_ENV = {
+    "PATH": "/usr/bin:/bin",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_SYSTEM": "/dev/null",
+    "GIT_AUTHOR_NAME": "fixture",
+    "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+    "GIT_COMMITTER_NAME": "fixture",
+    "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+}
 
-    The space lives under a `tmp_path`, outside the repository, so it is initialised as its own throwaway
-    repository — which is exactly the question this assertion asks: did the engine's run change any byte, add
-    any path, or touch any tracked file?
-    """
-    env = {
-        "PATH": "/usr/bin:/bin",
-        "GIT_CONFIG_GLOBAL": "/dev/null",
-        "GIT_CONFIG_SYSTEM": "/dev/null",
-        "GIT_AUTHOR_NAME": "fixture",
-        "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
-        "GIT_COMMITTER_NAME": "fixture",
-        "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
-    }
-    subprocess.run(["git", "init", "-q"], cwd=space, check=True, capture_output=True, env=env)
-    subprocess.run(["git", "add", "-A"], cwd=space, check=True, capture_output=True, env=env)
+
+def git_baseline(space: Path) -> None:
+    """Turn the space into a throwaway repository whose HEAD is the pre-run state."""
+    subprocess.run(["git", "init", "-q"], cwd=space, check=True, capture_output=True, env=GIT_ENV)
+    subprocess.run(["git", "add", "-A"], cwd=space, check=True, capture_output=True, env=GIT_ENV)
     subprocess.run(["git", "commit", "-qm", "fixture baseline"], cwd=space, check=True,
-                   capture_output=True, env=env)
+                   capture_output=True, env=GIT_ENV)
+
+
+def git_status(space: Path) -> str:
+    """`git status --porcelain` for the space — did the engine's run change any byte?
+
+    The space lives under a `tmp_path`, outside the repository, so it is its own throwaway repository: that
+    is exactly the question this assertion asks. `git_baseline` commits once; this helper only reads.
+    """
     proc = subprocess.run(["git", "status", "--porcelain"], cwd=space, capture_output=True,
-                          text=True, env=env, check=True)
+                          text=True, env=GIT_ENV, check=True)
     return proc.stdout
 
 
@@ -87,6 +97,7 @@ def test_c002_two_runs_identical_json(tmp_path: Path):
     """
     space = fixtures.copy_fixture("clean", tmp_path)
     record = record_arg(space)
+    git_baseline(space)
     assert git_status(space) == "", "the fixture baseline commit must leave a clean tree"
 
     first = run_engine("--action", "obligation", "--root", str(space), "--record", record)
@@ -110,8 +121,9 @@ def test_c002_no_writes_on_dirty_fixture(tmp_path: Path):
     red-when: `git status --porcelain` grows after the run — the engine created, modified or deleted a file.
     """
     space = fixtures.copy_fixture("exempt-bad", tmp_path)
+    git_baseline(space)
     (space / "docs" / "concepts" / "extra.md").write_text(
-        "# Extra carrier\n\nNo diagram here either.\n", encoding="utf-8")
+        "# Extra carrier\n\nStill no diagram here.\n", encoding="utf-8")
     before = git_status(space)
     assert before != "", "this case needs a dirty baseline to be meaningful"
 

@@ -9,9 +9,10 @@
 
 **执行前提（全局，逐例仍各自声明自己的前提）**：所有命令以**工作树根**为 cwd（`--root .` 是项目根，
 不是 `docs/`，见 `C-001`）。`pytest` / `typer` 不在裸 `python3` 里（research `R6`）：镜像与 `regen` 检查
-MUST 用能 import `typer` 的解释器；本阶段的实测解释器是 `/tmp/087-toolenv/bin/python`
-（CPython 3.11.13 / `pytest 9.2.0` / `typer 0.27.3`，一次性 scratch venv）。该路径**不由本计划创建**，
-换机器时按同一口径新建一个即可；文件不存在时如实记录「前置条件未就绪」，不得把裸 `python3` 的假红当结论。
+MUST 用能 import `typer` 的解释器；本阶段的实测解释器是 `/usr/bin/python3`
+（CPython 3.11.13 / `pytest 9.2.0` / `typer 0.27.3`）。该解释器**不由本计划创建**，
+换机器时选一个满足同一口径的即可（实测命令见 `notes/pre-change-measurements.md` 头部）；
+找不到时如实记录「前置条件未就绪」，不得把裸 `python3` 的假红当结论。
 
 ---
 
@@ -214,12 +215,12 @@ python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
 | 场景 | 判据 | 验证命令 |
 |------|------|----------|
 | `create-docs` 新建文档 | Authoring Flow R5 产出图两面、R6 报两面具名 | `pytest tests/contract/test_expression_gate_wiring.py -q` |
-| `create-docs` 全量 reconcile 收敛 | Reconcile R3/R4/R5 产图条目 + R6 图维度残差（`flow-obligations` C-008a） | `pytest tests/unit/test_docs_utils_obligation.py -q -k reconcile` |
+| `create-docs` 全量 reconcile 收敛 | Reconcile R3/R4/R5 产图条目 + R6 图维度残差（`flow-obligations` C-008a） | `pytest tests/integration/test_docs_obligation_scenarios.py -q -k c008a` |
 | `improve-docs` 改名改图 | 图的引擎与源不变（`FR-010`）；无须动图时明说「no diagram work」 | `pytest tests/contract/test_docs_command_template.py -q` |
 | `docs.md` 分派 | W1 接线小节未动、`stop-and-confirm` 仍字面存在、`improve-docs` 指针仍在 | `pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q`（**逐实例 node id**，不是 `-k test_protected_gate_preserved`） |
 | 读者面 | `documentation-model.md` 仍在目录治理清单内 | `pytest tests/contract/test_directory_governance.py -q` |
 
-计划期实测基线（2026-11-06，`/tmp/087-toolenv/bin/python -m pytest …`，逐条即第 5 步 gate 4 的读数）：
+计划期实测基线（2026-11-06，`/usr/bin/python3 -m pytest …`，逐条即第 5 步 gate 4 的读数）：
 
 ```text
 pytest tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py \
@@ -249,9 +250,9 @@ tests/contract（全量，research R6）                          -> 6038 passed
 收窄到具体实例可以做到（`-k` 表达式做不到「按参数取值」这一粒度，node id 可以）：
 
 ```text
-/tmp/087-toolenv/bin/python -m pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q
+/usr/bin/python3 -m pytest "tests/contract/test_confirmation_gates_sweep.py::test_protected_gate_preserved[templates/commands/docs.md-stop-and-confirm]" -q
   -> 1 passed, 1 warning in 0.06s                     （2026-11-06 实测，本阶段复跑）
-/tmp/087-toolenv/bin/python -m pytest tests/contract/test_confirmation_gates_sweep.py -q -k test_protected_gate_preserved
+/usr/bin/python3 -m pytest tests/contract/test_confirmation_gates_sweep.py -q -k test_protected_gate_preserved
   -> 16 passed, 30 deselected                          （同一文件；这 16 例是**更宽的守卫**，不构成 docs.md 的判据）
 ```
 
@@ -261,20 +262,20 @@ tests/contract（全量，research R6）                          -> 6038 passed
 ## S7 — 镜像与生成副本（`plan.md` § Mirror Obligations）
 
 **premises**: 需能 import `typer` 的解释器（`sync-mirrors.py` 内嵌调用 `regen-command-copies.py`，后者
-`import specify_cli` → `import typer`）。本阶段实测解释器 `/tmp/087-toolenv/bin/python`；该 venv 由执行者
-一次性创建，**不在仓内、不由本计划提供**。
+`import specify_cli` → `import typer`）。本阶段实测解释器 `/usr/bin/python3`；选解释器的口径见本文档开头的
+「执行前提」，**不由本计划提供**。
 
 ```bash
-/tmp/087-toolenv/bin/python scripts/python/regen-command-copies.py --check
-/tmp/087-toolenv/bin/python scripts/python/sync-mirrors.py --check
+/usr/bin/python3 scripts/python/regen-command-copies.py --check
+/usr/bin/python3 scripts/python/sync-mirrors.py --check
 ```
 
 计划期实测（2026-11-06，本次 attempt 2 复跑）：
 
 ```text
-/tmp/087-toolenv/bin/python scripts/python/regen-command-copies.py --check
+/usr/bin/python3 scripts/python/regen-command-copies.py --check
   -> OK: all per-tool command copies match the source templates.        exit 0
-/tmp/087-toolenv/bin/python scripts/python/sync-mirrors.py --check
+/usr/bin/python3 scripts/python/sync-mirrors.py --check
   -> ok  templates/ == .specify/templates/ (22 files)
      ok  skills/external/ == .specify/skills/ (415 files)
      ok  skills/internal/ == .specify/skills/internal/ (138 files)

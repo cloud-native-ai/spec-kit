@@ -256,7 +256,7 @@ tests/contract/test_expression_compatibility.py   # + ALLOWED_POST_BASELINE_CHAN
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 
-**基线（编辑前实测，2026-11-06）**：`regen-command-copies.py --check` → `OK: all per-tool command copies match the source templates.`（exit 0）；`sync-mirrors.py --check` → 六对镜全 `ok`（exit 0）。两条都必须用**能 import `typer` 的解释器**跑：`sync-mirrors.py` 内嵌调用 `regen`，裸 `python3` 会因 `ModuleNotFoundError: typer` 以 exit 2 假红，即使六对镜本身全 ok（research R6 推论 1）。**该解释器不由本计划创建**：本阶段的实测用的是执行者一次性建的 scratch venv `/tmp/087-toolenv/bin/python`（CPython 3.11.13 / `pytest 9.2.0` / `typer 0.27.3`）；换环境时按同一口径新建一个，文件不存在就如实记「前置条件未就绪」，MUST NOT 用裸 `python3` 的假红当漂移。因此本表每一行 `Verify` 的判据形态是**相对上述基线无新漂移**，不是「退出码 0」这一条绝对断言。
+**基线（编辑前实测，2026-11-06）**：`regen-command-copies.py --check` → `OK: all per-tool command copies match the source templates.`（exit 0）；`sync-mirrors.py --check` → 六对镜全 `ok`（exit 0）。两条都必须用**能 import `typer` 的解释器**跑：`sync-mirrors.py` 内嵌调用 `regen`，裸 `python3` 会因 `ModuleNotFoundError: typer` 以 exit 2 假红，即使六对镜本身全 ok（research R6 推论 1）。**该解释器不由本计划创建**：本阶段的实测用的是 `/usr/bin/python3`（CPython 3.11.13 / `pytest 9.2.0` / `typer 0.27.3`，实测命令见 `.specify/specs/087-arch-diagram-docs/notes/pre-change-measurements.md` 头部）；换环境时选一个满足同一口径的解释器，找不到就如实记「前置条件未就绪」，MUST NOT 用裸 `python3` 的假红当漂移。因此本表每一行 `Verify` 的判据形态是**相对上述基线无新漂移**，不是「退出码 0」这一条绝对断言。
 
 | Source file (edited) | Mirror / generated copies (must land identically) | Verify |
 |----------------------|---------------------------------------------------|--------|
@@ -268,7 +268,7 @@ tests/contract/test_expression_compatibility.py   # + ALLOWED_POST_BASELINE_CHAN
 | `tests/**`（新增夹具与两个测试文件） | **无镜像**（`tests/` 不在任何 pair 内） | 无镜像判据 |
 | `tests/contract/test_expression_compatibility.py`（追加 allowlist 条目） | **无镜像** | 该文件自身的哈希不在冻结清单内；修改由 T-001 的判别证据覆盖 |
 
-（`$PY` = 上段那个能 import `typer` 的解释器；本阶段实测值 `/tmp/087-toolenv/bin/python`。）
+（`$PY` = 上段那个能 import `typer` 的解释器；本阶段实测值 `/usr/bin/python3`。）
 
 **裸解释器的 `exit 2` 不是漂移（读法说明）**：本次复跑的裸 `python3 scripts/python/sync-mirrors.py --check` 输出是
 
@@ -489,7 +489,7 @@ Dependency set: none
 
 | 项 | 预算 | 说明 |
 |----|------|------|
-| 新增测试文件 | **2**（`tests/unit/test_docs_utils_obligation.py`、`tests/integration/test_docs_obligation_scenarios.py`） | 不开第三个；`test_docs_command_scenarios.py` 只加用例 |
+| 新增测试文件 | **3**（`tests/unit/test_docs_utils_obligation.py`、`tests/unit/test_docs_utils_carriers.py`、`tests/integration/test_docs_obligation_scenarios.py`） | 不开第二个**引擎**测试文件家系之外的文件；`test_docs_command_scenarios.py` 只加用例。`test_docs_utils_carriers.py` 是 `tasks.md` T009 明确单列的一行（写不同路径、可与 T008 并行），本行计数按实际任务登记 |
 | 新增夹具 | **11**（`tests/fixtures/docs-obligation/` 下的 E6 表），加 1 个 `conftest` 建造步骤 | 夹具是**仓库内删除前的绿灯态**，写入型用例先 `copytree` 到 `tmp_path` |
 | 第三方依赖 | **0** | 检查器只用标准库（research R3/R4） |
 | 测试时长 | 上述两文件的**全量运行 ≤ 10s**（本机、无网络） | 85 个载体在检查器里只读元数据，不读文档全文以外的内容 |
@@ -567,8 +567,8 @@ python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .s
      以及 T-005 **反题**里那两个 `diagrams/` 目录——引它们正是为了说明它们**不**该存在）
 python3 .qoder/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/087-arch-diagram-docs --stage requirements --repo .
   -> decision=pass errors=0 advisories=38 waived=0（同一批，规格面无回归）                          exit 0
-/tmp/087-toolenv/bin/python scripts/python/sync-mirrors.py --check            -> exit 0，六对镜全 ok
-/tmp/087-toolenv/bin/python scripts/python/regen-command-copies.py --check     -> exit 0，"OK: all per-tool command copies match the source templates."
+/usr/bin/python3 scripts/python/sync-mirrors.py --check            -> exit 0，六对镜全 ok
+/usr/bin/python3 scripts/python/regen-command-copies.py --check     -> exit 0，"OK: all per-tool command copies match the source templates."
 python3 scripts/python/sync-mirrors.py --check（裸解释器，仅作反例）          -> exit 2，见 § Mirror Obligations 的读法说明
 ```
 
