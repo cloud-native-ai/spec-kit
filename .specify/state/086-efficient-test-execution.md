@@ -10,7 +10,7 @@ stage_deadline_epoch: 1793952960
 stage_base_commit: f3279c6e
 attempt: 0
 retry_limit: 3
-last_verdict: T050 baseline complete (7475 passed / 19 failed / 7 skipped / 687.41s / rc=1; names 19); first wave A1+B1 dispatch next (effective 3); T047/T014/T016/T044 budget planned
+last_verdict: A1/B1 integrated (A1 bd241323, B1 3540c7f5; actual concurrency 2; 23 runner tests; gate-scan 27/0 violations); checkpoint 08 written; next A2/A3+B2 (3-way, effective 4)
 <!-- loop-state:end -->
 
 <!-- test-budget:begin -->
@@ -59,6 +59,7 @@ last_verdict: T050 baseline complete (7475 passed / 19 failed / 7 skipped / 687.
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
 - **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
 - **085 live status exception（T041）**：只允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 的 SC-010 status 行；由 FR-030/A12/A17 授权（live reference），不得扩散到 085 的 goal/team/checkpoints/contracts/history。最终验证须证明只改了 SC-010 行。
+- **实际并发（085 dogfood）**：wave 1 A1+B1 = **2 路并发**；child lines `086-wp-a1`/`086-wp-b1` 已 closed；worktree 在 repo 外（line-registry 拒绝 `.specify/.tmp`，与 C-008 冲突，记为 085 observation）；wave 2 A2/A3+B2 计划 3 路。
 - **并发度（085）**：`agent_concurrency_requested: 24`；team `agent_concurrency_effective: 18`（verifier reserve 5 / executor slots 13；host capacity `host-capacity-undeclared`）；per-stage effective 2（requirements/clarify/plan/tasks/checklist/analyze），implement first wave **A1+B1**（2 executors + 1 verifier reserve = effective 3；team cap 18 not binding），后续 A2/A3, B2, A4, B3, C1, C2 按 plan 合并序；任何降级具名。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
@@ -188,7 +189,7 @@ last_verdict: T050 baseline complete (7475 passed / 19 failed / 7 skipped / 687.
 - sentinel `REPAIR-DONE`；commit `9496090b`（14 files；no source/tests/085）；worktree clean。
 - C-01 fixed: `account-clause-coverage.py` **status ok / FR 33/33 / clause 52**；H-01 fixed: FR-027 narrow carve-out + C-041/GATE-5/M-16/team/WP-C2/R-8/T041 aligned, fabricated `CLOSURE.md` citation removed；H-04 fixed: T050 pre-change baseline；H-05: T054 budget + T050/T047 + out-of-slot T014/T016/T044；H-02: `env -u PYTHONPATH` + A20；H-03: 19 mutation-leg carriers；M-01…M-13/L-01…L-05 fixed。
 - independent gates: `validate-requirements` 0/0；`validate-tasks` 0/0；`pre-analyze` requirements/plan/tasks pass errors=0 advisories=39（future deliverables）；`decomposition --mode tasks` proceed 33 FR / 56 tasks ≤ 60/80。
-- gate-scan actual: **total 34 / keep_gate 27 / violations 0**；pre-existing drift (frozen 23 / plan-stage 27) disclosed；feature adds zero hits (GATE-7).
+- gate-scan actual: **total 27 / keep_gate 27 / violations 0**；pre-existing drift (frozen 23) disclosed；feature adds zero hits (GATE-7).
 - concurrency: requested 24; team effective 18; per-stage 2; implement first wave A1+B1 (2 executors + 1 verifier reserve = effective 3); later waves per plan merge order.
 - T050 baseline: pending; command `env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out …/test-evidence/baseline-failed.txt -q` (pre-change runner is serial by default; `--serial` after the runner change is equivalent).
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/07-implement-preflight.md`。
@@ -202,6 +203,15 @@ last_verdict: T050 baseline complete (7475 passed / 19 failed / 7 skipped / 687.
 - worktree: only the two baseline evidence files; no source edit before this run; 085 diff empty。
 - first wave: **A1+B1**（2 executors + 1 verifier reserve = effective 3）；后续 A2/A3, B2, A4, B3, C1, C2 按 plan 合并序；T047 closure；T014/T016/T044 out-of-slot（fence 已写）。
 - next: 从 T050 evidence commit 创建 A1/B1 child lines/worktrees，并发派发两个 `sdd-implement-executor`；记录 actual concurrency 2 供 085 SC-010。
+
+## Implement wave 1 — A1+B1（2026-11-06T05:54Z）
+
+- A1 `bd241323`（runner source+mirror+23 contract tests；23 tests pass；guard 213/1 pre-existing `test_c5`）；anomaly: A1 created the A4-owned test file，A4 must append。
+- B1 `3540c7f5`（owner guideline 16.7 KB + mirror；79 targeted/1 deselected；gate-scan **27 / 20 / 7 / violations 0**）；anomalies: guideline language; the earlier 34 reading was wrong（actual 27）。
+- integration: A1 ff; B1 rebase+ff; worktree clean; A1/B1 worktrees removed; child lines closed; branches deleted。
+- actual concurrency: **2**（085 SC-010 evidence）；worktrees under `~/tmp/spec-kit/086/worktrees/`（C-008 `.specify/.tmp` rejected by the line-registry; 085 observation）。
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/08-implement-wave1.md`。
+- next: A2（audit parser）+ A3（pyproject/dev docs/serial marker）+ B2（constitution/instructions）3-way；effective 4（3 executors + 1 verifier）；after: A4, B3, C1, C2。
 
 ## U0.5 自检
 

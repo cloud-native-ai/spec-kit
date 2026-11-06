@@ -81,7 +81,7 @@ is reached by path; none is copied here.
   size exceeds it, and then the measured value MUST be recorded in test evidence. The gate-scan ceiling
   itself is unchanged by this feature (FR-022).
 - **C-038**: The new principle and guideline MUST add **zero** confirmation-gate hits: the scan total after
-  the change MUST NOT exceed the value measured immediately before it (34, per `plan.md` EP-008). Equality
+  the change MUST NOT exceed the value measured immediately before it (27, per `plan.md` EP-008). Equality
   with the stale frozen baseline (23) is explicitly NOT this feature's criterion — two guard tests assert
   that equality and both are already failing on the serial baseline. The budget-raise rule holds: a guarded
   budget (instructions bytes) is raised only with the measured value recorded, and a gate baseline is never

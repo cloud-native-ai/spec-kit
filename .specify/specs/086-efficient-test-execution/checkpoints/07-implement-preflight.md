@@ -8,7 +8,7 @@
   - `validate-requirements.py` → 0/0; `validate-tasks.py` → 0/0;
   - `pre-analyze --stage requirements/plan/tasks` → pass, errors=0, advisories=39 (future deliverables);
   - `decomposition --mode tasks` → proceed, 33 FR / 56 tasks ≤ 60/80;
-  - `scan-confirmation-gates.py` → total **34** / keep_gate **27** / violations **0**; frozen 23 and plan-stage 27 are the disclosed pre-existing drift; the feature adds zero hits.
+  - `scan-confirmation-gates.py` → total **27** / keep_gate **27** / violations **0**; frozen 23 is the disclosed pre-existing drift; the feature adds zero hits.
 - C-01 fixed; H-01 (085 live-status carve-out) fixed across FR-027/C-041/GATE-5/M-16/team/WP-C2/R-8/T041; H-02 (`env -u PYTHONPATH` + A20) fixed; H-03 (19 mutation legs) fixed; H-04 (T050 pre-change baseline) fixed; H-05 (T054 two-slot budget) fixed; M-01…M-13 and L-01…L-05 fixed.
 - concurrency adjudication: requested 24; team effective **18** (verifier reserve 5 / executor slots 13); per-stage effective 2; implement first wave **A1+B1** (2 executors + 1 verifier reserve = effective 3); later waves per the plan merge order; team cap 18 not binding.
 - anomaly: none in the repair pass; the analyze findings were the anomaly and are now repaired.
