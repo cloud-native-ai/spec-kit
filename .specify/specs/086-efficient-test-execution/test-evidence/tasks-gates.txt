@@ -1,0 +1,95 @@
+# tasks-stage gates — feature 086 (Efficient Test Execution, Concurrent by Default)
+
+Recorded by the `/speckit.tasks` stage executor. Each command was run against the live tree;
+the raw stdout is pasted verbatim below, not paraphrased.
+
+## 1. `validate-tasks.py` — structural validator
+
+Command:
+
+```text
+python3 .specify/scripts/python/validate-tasks.py .specify/specs/086-efficient-test-execution/tasks.md
+```
+
+Exit code: 0
+
+Output:
+
+```text
+PASS: .specify/specs/086-efficient-test-execution/tasks.md — 0 error(s), 0 warning(s)
+```
+
+50 task rows; 52 of 52 contract clauses claimed by exactly one `[green:]` row
+(0 errors, 0 warnings — no WARN left to justify).
+
+## 2. `decomposition-check.py --mode tasks`
+
+Command:
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/decomposition-check.py --mode tasks \
+  --requirements .specify/specs/086-efficient-test-execution/requirements.md \
+  --tasks        .specify/specs/086-efficient-test-execution/tasks.md
+```
+
+Exit code: 0
+
+Output:
+
+```json
+{"mode": "tasks", "decision": "proceed", "measured": {"fr_count": 33, "task_count": 50, "fr_ceiling": 60, "task_ceiling": 80}, "reasons": [], "checked_at": "2026-11-06T04:40:45Z"}
+```
+
+Decision: **proceed** — measured 33 FR / 50 tasks against ceilings 60 / 80.
+No split is required and none is proposed.
+
+## 3. `pre-analyze-check.py --stage tasks`
+
+Command:
+
+```text
+python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
+  --spec-dir .specify/specs/086-efficient-test-execution --stage tasks --repo .
+```
+
+Exit code: 0
+
+Summary line:
+
+```text
+pre-analyze-check: stage=tasks decision=pass errors=0 advisories=39 waived=0
+```
+
+Decision: **pass**, errors 0, advisories 39, waived 0.
+
+### Error findings
+
+None. (On the first run this gate reported 2 errors — `runtime-stack-row` for RS-003 and
+RS-004, each complaining that no task row quotes its FRs at line level. Both were fixed at
+the artifact: T007 now quotes `FR-001…FR-009` and its RS id, T009 quotes `FR-024…FR-026`
+and its RS id. The gate was then re-run and returned this pass.)
+
+The `signed-contract` rows (RS-001, RS-002, RS-005) never produced an error, because the
+signed-contract duty is contract *path* resolvability plus non-empty `Pin` / `Contract` /
+`Joint acceptance` / `Owner`, all of which hold. For completeness the upstream xdist API
+that RS-002 pins is now also covered by a task row (T097, the `[US1]` RS-002 guard)
+rather than left as an unstated assumption.
+
+### Advisories (39, all the same class)
+
+Every advisory is `missing-path` on a file this feature is *scheduled to create*:
+
+- `.specify/shared/guidelines/test-execution-efficiency.md` — 3 occurrence(s)
+- `.specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py` — 2 occurrence(s)
+- `shared/guidelines/test-execution-efficiency.md` — 16 occurrence(s)
+- `tests/contract/test_run_tests_runner_contract.py` — 13 occurrence(s)
+- `tests/contract/test_test_execution_efficiency.py` — 5 occurrence(s)
+
+These are expected at the tasks stage and are not defects: `plan.md` WP-A/WP-B assign the
+creation of `shared/guidelines/test-execution-efficiency.md`,
+`tests/contract/test_run_tests_runner_contract.py` and
+`tests/contract/test_test_execution_efficiency.py` to the implementation stage, and
+`.specify/skills/external/sdd-loop-driver/scripts/audit-test-budget.py` is the not-yet-
+regenerated mirror of the parser T009 edits. Zero advisories name a path that this stage
+was supposed to have produced.
+

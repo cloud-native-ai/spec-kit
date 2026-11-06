@@ -1,0 +1,187 @@
+# 086 T042 — the declared serial exception set (C-044, C-045) and its mutation legs
+
+Owner of the propositions this file carries:
+`.specify/specs/086-efficient-test-execution/contracts/dogfood-and-preservation.contract.md`
+C-044 (the watch-target self-test is a *declared* exception via the registered `serial` marker and is
+neither skipped, xfailed, deleted nor re-timed) and C-045 (the three-way disposition, unattributed 0).
+The exception mechanism itself is owned by
+`contracts/runner-contract-086.contract.md` C-010…C-012; this file records the enumeration, the
+registration, and the legs that show the mechanism is what makes the exception safe.
+
+Environment for every run-derived line below (A20): `PYTHONPATH` cleared (`env -u PYTHONPATH`);
+interpreter `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python`
+(CPython 3.14.6, pytest 9.2.0, pytest-xdist 3.8.0); worktree
+`/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2`, branch `line/086-wp-c2`, base `018b0455`.
+`SPECKIT_PYTHON` is the absolute main-tree `.venv` path — a worktree has no `.venv`, and a relative
+`SPECKIT_PYTHON` would break the nested-runner integration cases.
+
+## 1. The exception set is exactly one node id (C-044)
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest -m serial --collect-only -q
+tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+1/7562 tests collected (7561 deselected) in 1.92s
+```
+
+Member count: **1**. The set is enumerable by name (`-m serial --collect-only -q` lists node ids), so the
+exception cannot grow silently: a second member changes this line.
+
+## 2. The marker is registered (C-044)
+
+`pyproject.toml` → `[tool.pytest.ini_options].markers`, beside `contract` and `integration`:
+
+```
+pyproject.toml:56:    "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
+```
+
+Absence of an unknown-mark warning on the real tree's exception enumeration:
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest -m serial --collect-only -q 2>&1 | grep -c "Unknown pytest.mark.serial"
+0
+```
+
+The runner-contract cases assert the same property per fixture tree (`_assert_no_unknown_mark`, used by
+`test_c010_marked_test_is_excluded_from_the_parallel_pass`), so a tree that loses the registration fails
+there too rather than emitting a warning nobody reads.
+
+## 3. The exception is declared, not suppressed (C-044)
+
+The self-test's body, its assertions and its `timeout=60` are byte-unchanged from before the marker
+landed; only the decorator line was added (`tests/contract/test_sdd_loop_driver_skill.py:537-543`
+carries the one-line reason: 28 s unloaded vs over 60 s under `-n auto`). It is not skipped, not
+xfailed, not deleted and not re-timed.
+
+That a failure in it **still reaches the combined exit code** is proved by the runner contract's own
+cases, which are the mechanism this file relies on:
+
+| case | what it pins |
+|---|---|
+| `test_run_tests_runner_contract.py::test_c010_marked_test_is_excluded_from_the_parallel_pass` | C-010 first half — the marked member leaves the parallel pass; the negative control (same tree, marker ignored) collects all three, so neither half passes vacuously |
+| `test_run_tests_runner_contract.py::test_c010_the_runner_re_runs_the_exception_reaching_the_combined_exit_code` | C-010 second half — a failure injected into the marked test → exit 1, the name appears in the `--names-out` list, `passes=2` |
+| `test_run_tests_runner_contract.py::test_c012_serial_pass_exit_5_normalized_but_parallel_pass_exit_5_is_not` | C-012 — "nothing collected" is success on the serial pass only, so an empty exception pass cannot masquerade as a green serial pass |
+| `test_run_tests_runner_contract.py::test_c014_list_line_carries_both_entry_and_pass_counts` | C-014 — the list line carries both `<n>` and `<k>`, so a one-pass list is distinguishable from a combined one |
+
+The same mechanism was re-exercised end-to-end on this tree in leg M-17/E below (marker + injected
+failure → exit 1 and the name listed), so the clause is not resting on a fixture that never met the real
+test.
+
+## 4. Three-way disposition, unattributed 0 (C-045)
+
+The post-change name diff carries **no new failure name**, so there is nothing to dispose of. The
+disposition table and its "pre-existing" determination against `test-evidence/baseline-failed.txt` are in
+`test-evidence/parallel-safety-attribution.md` § Three-way disposition:
+
+| disposition | count |
+|---|---|
+| root-cause fix | 0 |
+| named serial exception | 0 **new** (the one declared exception is not a new failure name — it passes in the serial pass) |
+| pre-existing baseline failure | 0 new (the 19 parallel names are exactly the 19 T050 baseline names) |
+| **unattributed** | **0** |
+
+## 5. Mutation legs (doctored copies, never a tracked-file edit)
+
+Mechanism: a detached `git worktree` of this branch at
+`.specify/.tmp/086/mutations/sandbox/` (sanctioned temp root — `.specify/.gitignore:30` ignores
+`.tmp/`, so nothing here reaches `git status`). The real test file needs its repo root two parents up
+(`REPO_ROOT = Path(__file__).resolve().parents[2]`), so a copy must sit at the same depth; a standalone
+copy directory makes all 25 cases fail for path reasons instead of the one case under test. Each leg
+patches the copy in the sandbox, runs the runner against
+`tests/contract/test_sdd_loop_driver_skill.py`, then restores the sandbox with `git checkout --`
+(verified: `git status --porcelain` → 0 entries after every leg). No tracked file in the primary
+worktree was touched.
+
+### Leg A — control: the marker form (C-044 green point)
+
+```
+$ env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python bash scripts/bash/run-tests.sh -q tests/contract/test_sdd_loop_driver_skill.py
+# test runner exceptions: 1 declared serial test(s)
+# test runner: mode=parallel workers=auto dist=load passes=2
+24 passed in 1.10s
+1 passed, 24 deselected in 26.97s
+```
+
+The exception is **enumerated** (1 declared), **excluded** from the parallel pass and **re-run** in the
+serial pass (`passes=2`, 26.97 s — the load-free cost the marker was introduced to stop paying under
+`-n auto`).
+
+### Leg B — M-17 skip form: the exception disappears from the enumerated set
+
+Mutation: the decorator becomes `@pytest.mark.skip(reason='M-17 skip leg')`.
+
+```
+$ ... bash scripts/bash/run-tests.sh -q tests/contract/test_sdd_loop_driver_skill.py
+# test runner: mode=parallel workers=auto dist=load passes=1      <- no exception line at all
+24 passed, 1 skipped in 1.41s
+```
+
+RED as required, and differently from the marker-removal leg: the test is now **skipped inside the
+parallel pass**, not excluded-and-re-run. It is not one of the three admissible dispositions (C-045):
+a skip removes the test from the evidence rather than relocating it.
+
+### Leg C — marker removal: the same case goes red on the enumeration
+
+Mutation: the `@pytest.mark.serial` line is deleted (body untouched).
+
+```
+$ env -u PYTHONPATH <venv>/python -m pytest -m serial --collect-only -q tests/contract/test_sdd_loop_driver_skill.py
+no tests collected (25 deselected) in 0.01s                                       EXIT=5
+
+$ ... bash scripts/bash/run-tests.sh -q tests/contract/test_sdd_loop_driver_skill.py
+# test runner: mode=parallel workers=auto dist=load passes=1      <- no exception line
+25 passed in 29.15s
+```
+
+The marker/exception-enumeration case fails (the set is empty where C-044 requires exactly this one
+member). The 25 `passed` is **not** a green green: the test ran unexcluded and, in this two-file
+selection, happened to finish inside its 60 s budget. Under real suite load it does not — see leg F.
+
+### Leg D — M-17 skip form with an injected failure: the exit code is lost
+
+Mutation: skip decorator **plus** `assert False` as the body's first statement.
+
+```
+$ ... bash scripts/bash/run-tests.sh --names-out /tmp/m17-names.txt -q tests/contract/test_sdd_loop_driver_skill.py
+EXIT=0
+# test runner: mode=parallel workers=auto dist=load passes=1
+# failed-name list written: /tmp/m17-names.txt (0 entries) passes=1
+24 passed, 1 skipped in 1.12s
+```
+
+This is the sharpest statement of why M-17 is inadmissible: the test's own failure is invisible — exit 0,
+zero names. A skip would have made the suite look healthier precisely when the self-test broke.
+
+### Leg E — marker form with an injected failure: the exit code and the name are kept
+
+Mutation: the marker is kept and `assert False` is added as the body's first statement.
+
+```
+$ ... bash scripts/bash/run-tests.sh --names-out /tmp/mk-names.txt -q tests/contract/test_sdd_loop_driver_skill.py
+EXIT=1
+# test runner exceptions: 1 declared serial test(s)
+# test runner: mode=parallel workers=auto dist=load passes=2
+# failed-name list written: /tmp/mk-names.txt (1 entries) passes=2
+24 passed in 1.20s
+1 failed, 24 deselected in 0.04s
+names: tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest
+```
+
+D against E is the whole C-044 argument: the marker form preserves the name list **and** the exit code;
+the skip form preserves neither.
+
+### Leg F (M-16 marker removal under real load) — carried by T055
+
+The contract's M-16 leg and the "marker removal" leg of T042's body are different mutations:
+M-16 touches `verification.md` outside the carve-out (proved in
+`test-evidence/parallel-safety-attribution.md`), while T042's body asks for the marker removal. The
+marker-removal leg was exercised twice — once in isolation (leg C, where it is red **only** on the
+enumeration) and once under whole-suite parallel load (M-16 in
+`parallel-safety-attribution.md` § Leg M-16, where the unmarked test times out after 60 s and lands in the
+failure-name list, `comm -13` non-empty). Both observations are recorded; neither is suppressed.
+
+## 6. Not claimed here
+
+- No clause of `contracts/dogfood-and-preservation.contract.md` is claimed green by this file; C-044 and
+  C-045 land in `tasks.md` T042 and are re-read by T055.
+- No tracked file, test or runner was edited to produce these legs; every mutation lives in a git-ignored
+  sandbox and every leg was restored.

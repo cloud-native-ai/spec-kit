@@ -1,0 +1,339 @@
+# checklist-stage gates — feature 086 (Efficient Test Execution, Concurrent by Default)
+
+Recorded by the `/speckit.checklist` stage executor (2026-11-06). Every command below was run against
+the live tree at commit `21833d92`; the raw stdout is pasted, not paraphrased. Read-only probes only —
+this stage edited no source, template, test or requirement file.
+
+## 1. Prerequisite script (`templates/commands/checklist.md` § scripts)
+
+Command:
+
+```text
+.specify/scripts/bash/check-prerequisites.sh --json
+```
+
+Exit code: 0
+
+Output:
+
+```text
+{"REQUIREMENTS_DIR":"/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/086-efficient-test-execution","REQUIREMENT_ID":"086","FEATURE_ID":"086","FEATURE_NAME":"Efficient Test Execution (Concurrent by Default)","AVAILABLE_DOCS":["research.md","data-model.md","contracts/","quickstart.md","checklists/","feature-ref.md"],"MODE":"C","WRITABLE":true}
+```
+
+## 2. Flow-class lookup (one read per stage run)
+
+Command:
+
+```text
+python3 .specify/scripts/python/flow-class-check.py --action lookup --unit-id "spec:086-efficient-test-execution"
+```
+
+Exit code: 0
+
+Output:
+
+```text
+unit_id: spec:086-efficient-test-execution
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+```
+
+Reading: an `execution`-class line, so the expression-class stage operator adds no gate row and the
+existing gate set stays byte-identical (zero new blocking items, zero new mandatory sections).
+
+## 3. Count / budget measurements quoted by the checklist
+
+| Command | Measured value |
+|---|---|
+| `grep -cE '^### [IVXLC0-9]+\. ' templates/constitution-template.md` | `18` |
+| `grep -cE '^### [IVXLC0-9]+\. ' .specify/memory/constitution.md` | `19` |
+| `grep -cE '^## ' templates/instructions-template.md` | `32` |
+| `grep -cE '^## ' .specify/instructions.md` | `33` |
+| `wc -c .specify/instructions.md` | `33357` |
+| `grep -n 'INSTRUCTIONS_BUDGET_BYTES' scripts/bash/generate-instructions.sh \| head -3` | `53:INSTRUCTIONS_BUDGET_BYTES=34816` |
+| `grep -nE '^\*\*(Version\|Last Amended\|Ratified)\*\*' .specify/memory/constitution.md` | `422:**Version**: 1.16.0 \| **Ratified**: 2026-01-30 \| **Last Amended**: 2026-11-05` |
+| `grep -n '^\*\*Version\*\*' templates/constitution-template.md` | `**Version**: [CONSTITUTION_VERSION] \| **Ratified**: [RATIFICATION_DATE] \| **Last Amended**: [LAST_AMENDED_DATE]` — the template carries **no numeric version literal** |
+| `grep -n 'TEMPLATE_COUNT\|LIVE_COUNT\|COMMAND_COUNT' tests/contract/test_constitution_double_landing.py` | `72: TEMPLATE_COUNT = 18`, `76: LIVE_COUNT = 19`, `79: COMMAND_COUNT = 11` |
+| last two principle headings, live | `### XVIII. Grounded Naming`, `### XIX. Self-Explanatory Structure (不言自明)` |
+| last principle heading, template | `### XVIII. Self-Explanatory Structure (不言自明)` |
+
+**Agreement check**: the clarify ruling's "19/20/12, live 33 sections, template 32" matches the *measured
+current* values (`LIVE_COUNT = 19`, `TEMPLATE_COUNT = 18`, `COMMAND_COUNT = 11`, live `33` `##` sections,
+template `32`), so the ruling's numbers are *current*, not post-change targets — `C-034`'s
+"`TEMPLATE_COUNT 18 → 19`, `LIVE_COUNT 19 → 20`, `COMMAND_COUNT 11 → 12`" reads the same values as a delta.
+(`CHK015`)
+
+## 4. Principle-numeral agreement (live roster)
+
+Command:
+
+```text
+grep -nE '^### [IVXLC0-9]+\. ' .specify/memory/constitution.md | tail -5
+```
+
+Output (last 5 lines):
+
+```text
+240:### XV. User-Facing Comprehension (No Jargon, With Context)
+276:### XVI. Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)
+307:### XVII. Directory Governance (Named, Documented, Ignored When Temporary)
+332:### XVIII. Grounded Naming
+350:### XIX. Self-Explanatory Structure (不言自明)
+```
+
+Reading: the live roster's final numeral is **XIX**, so the clarify ruling's "live XX" is the correct next
+numeral and `C-025`'s "`### XX. Efficient Test Execution …`" is derivable from the live file. **No numeral
+conflict.** (Disclosure: the pre-write expectation was XX for the live tail as well; the measurement
+refuted it and the checklist item was written against the measurement, not the expectation.)
+
+## 5. Template two-landing pair
+
+Command:
+
+```text
+grep -nE '^### [IVXLC0-9]+\. ' templates/constitution-template.md | tail -4
+```
+
+Exit code: 0
+
+Output:
+
+```text
+230:### XV. Single-Run Evidence (Capture Once, Consume Many)
+261:### XVI. Directory Governance (Named, Documented, Ignored When Temporary)
+286:### XVII. Grounded Naming
+304:### XVIII. Self-Explanatory Structure (不言自明)
+```
+
+Command:
+
+```text
+grep -n '^### XIX\.' templates/constitution-template.md
+```
+
+Exit code: 1, output empty — the template's `### XIX.` is `plan.md` T021's deliverable, absent today as
+expected.
+
+Command:
+
+```text
+grep -n '^### XIX\.' .specify/memory/constitution.md
+```
+
+Exit code: 0
+
+Output:
+
+```text
+350:### XIX. Self-Explanatory Structure (不言自明)
+```
+
+Reading: numeral XIX is already taken on the **live** roster, which is exactly why the new live entry is
+XX; the two rosters' numerals are independent, not related.
+
+**Disclosure — the first template probe of this step was mis-specified.** An earlier attempt piped the
+`### <numeral>.` heading grep through a `[IVXLC0-9]+` class and then filtered it with an unrelated
+`-B4 '^\*\*Version\*\*'` context window; the two produce output about *different* facts, so the combined
+line said nothing about the numeral at the end of the template roster. The probes were re-run in the exact
+forms pasted above, and those outputs are the reading kept here. The mis-specified attempt is disclosed
+rather than erased, because a reviewer reproducing only the final commands would never see it.
+
+## 6. `pyproject.toml` dependency-surface baseline
+
+Commands and outputs:
+
+```text
+grep -n 'xdist' pyproject.toml
+(no output — no xdist anywhere in the file today)
+
+grep -n -A6 'optional-dependencies' pyproject.toml
+(no output — the section does not exist today)
+
+grep -n -A6 'markers' pyproject.toml
+43:markers = [
+44-    "contract: contract and external-surface validation tests",
+45-    "integration: integration tests using filesystem or fixture workspaces",
+46-]
+```
+
+Reading: the dev extra and the `serial` marker are genuine additions (`FR-015`, `FR-016`, `A15`;
+`plan.md` WP-A3; `tasks.md` T010). The runtime `[project].dependencies` block is untouched by this
+stage, so `SC-010`'s "empty diff" has a clean start.
+
+## 7. Ledger parser `VALUE_FLAGS`
+
+Command:
+
+```text
+grep -n 'VALUE_FLAGS' skills/external/sdd-loop-driver/scripts/audit-test-budget.py | head
+```
+
+Output:
+
+```text
+38:VALUE_FLAGS = ("--names-out", "-m", "-k", "--maxfail", "-p", "--rootdir", "-c")
+235:        if token in VALUE_FLAGS:
+```
+
+Reading: matches `contracts/budget-ledger-parser.contract.md` § Scope verbatim (`-n`, `--numprocesses`,
+`--dist`, `--maxprocesses` are absent today), so `C-017`/`C-018` are red now and green only after T009.
+
+## 8. Watch-target self-test identity
+
+Commands:
+
+```text
+ls -la tests/contract/test_sdd_loop_driver_skill.py
+grep -n 'def test_c22' tests/contract/test_sdd_loop_driver_skill.py
+grep -n 'def test_c24' tests/contract/test_sdd_loop_driver_skill.py
+```
+
+Output:
+
+```text
+-rw-r--r--@ 1 liuqiming.lqm  staff  22818  11月  5 12:25 tests/contract/test_sdd_loop_driver_skill.py
+537:def test_c22_watch_target_hook_selftest():
+```
+
+Reading: the node id is `tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest`,
+matching `research.md` R-9's correction of the dispatch brief's `test_c24` label. `test_c24` does not exist.
+`C-044` and `quickstart.md` S-6 are consistent with the tree.
+
+## 9. Gate-scan baseline drift
+
+Commands and outputs:
+
+```text
+python3 -c "import json;d=json.load(open('.specify/specs/050-proactive-flow-trigger/baseline-gates.json'));print(d.get('confirmationGates'))"
+{'total': 23, 'destructive': 13, 'governanceKept': 10, 'violations': 0, 'expectedTotal': 23, 'expectedViolations': 0, 'integerHeadroom': 0, 'cap': 23.25, 'capSource': '.specify/specs/044-reduce-confirmation-flows/baseline.json (total 93) x 0.25'}
+
+python3 .specify/scripts/python/scan-confirmation-gates.py --root . --json | python3 -c "import json,sys;d=json.load(sys.stdin);print('total',d['total'],'violations',len(d['violations']))"
+total 27 violations 0
+```
+
+Reading: the pre-existing drift `EP-008` and `C-038` describe is real and measured (frozen 23 vs live 27,
+zero integer headroom, violations 0). The requirement text does not name the guard tests that assert the
+frozen value, so `CHK035` stays open; `CHK043` records that the "no increase" ceiling exists only as a
+contract clause.
+
+## 10. 085 dependency-artifact probes (read-only; no 085 file was written by this stage)
+
+```text
+grep -n 'SC-010_status' .specify/specs/085-sdd-temporary-goal-team/verification.md → 62:SC-010_status=partial
+```
+
+```text
+tests/contract/test_temp_goal_contract.py        OK
+tests/contract/test_temp_team_schema.py          OK
+tests/contract/test_checkpoint_protocol.py       OK
+tests/integration/test_temp_team_worktree_queue.py OK
+tests/integration/test_checkpoint_rollback.py    OK
+```
+
+Reading: `SC-010` is `partial` today with a named gap (`SC-010_blocked_at=no full 8-stage driver run with
+LLM stage agents`), so `FR-030`/`SC-012`'s "no evidence-free pass" has a real starting state. The five test
+files T040 must re-run all exist. `CHK017` records the FR-027/FR-030 tension the status line creates.
+
+## 11. Runner and mirror baseline
+
+```text
+-rwxr-xr-x@ 1 liuqiming.lqm  staff  1577 11月  6 11:16 .specify/scripts/bash/run-tests.sh
+-rwxr-xr-x@ 1 liuqiming.lqm  staff  1577  7月 29 10:49 scripts/bash/run-tests.sh
+$ diff -q scripts/bash/run-tests.sh .specify/scripts/bash/run-tests.sh
+(no output — byte-identical)
+```
+
+Reading: `FR-009`/`C-016`'s parity obligation currently holds at 1577 B on both carriers; the runner has
+neither a mode line nor any parallel argument today, so `C-001`…`C-015` are all red and `STR-007`
+(`--serial`) does not yet exist in the script.
+
+## 12. Host-environment premise (`CHK036`)
+
+```text
+echo "PYTHONPATH=[${PYTHONPATH:-<unset>}]"
+PYTHONPATH=[/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/src:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib:/Users/liuqiming.lqm/project/profiles/script/python]
+```
+
+Observed consequence while probing the runner (three attempts, all read-only):
+
+```text
+$ bash scripts/bash/run-tests.sh -q tests/unit/test_audit_test_budget.py
+# test runner: .venv/bin/python -m pytest -q tests/unit/test_audit_test_budget.py
+Error while loading plugin "pytest11".
+ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'
+
+$ .venv/bin/python -m pytest -q tests/unit/test_audit_test_budget.py
+Error while loading plugin "pytest11".
+ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'
+
+$ env -u PYTHONPATH bash scripts/bash/run-tests.sh -q tests/unit/test_audit_test_budget.py
+# test runner: .venv/bin/python -m pytest -q tests/unit/test_audit_test_budget.py
+.........................                                                [100%]
+25 passed in 2.33s
+```
+
+Reading: an inherited `PYTHONPATH` refuses the run; the same command with `env -u PYTHONPATH` runs 25
+tests green through the canonical runner. The requirements' `RS-002` / `RS-005` `signed-contract` rows
+record interpreter and host but not this variable, and `SC-001`/`SC-004`/`SC-005`/`SC-006`/`SC-011` are
+all run-derived. Recorded as `CHK036`; **not** repaired (this stage edits no runner).
+
+## 13. Checklist self-checks
+
+Command (the `grep` form is unreliable here — see the disclosure below — so the structural check is a
+Python program, per the Program-First discipline):
+
+```text
+python3 - <<'PY'
+import re,pathlib
+f=pathlib.Path('.specify/specs/086-efficient-test-execution/checklists/requirements-quality-2026-11-06.md')
+rows=[l for l in f.read_text().splitlines() if l.startswith('- [ ] CHK')]
+pat=re.compile(r'\[(?:[^\[\]]*,\s*)*(?:Req §|Gap|Ambiguity|Conflict|Assumption)')
+ids=[re.match(r'- \[ \] (CHK\d{3})',r).group(1) for r in rows]
+print('rows',len(rows),'traceable',sum(1 for r in rows if pat.search(r)))
+print('unique ids',len(set(ids)))
+print('sequential',[int(i[3:]) for i in ids]==list(range(1,len(ids)+1)))
+PY
+```
+
+Output:
+
+```text
+rows 44 traceable 44
+unique ids 44
+sequential True
+```
+
+Additional structural checks (same program class, same run):
+
+```text
+grep -c '^- \[ \] CHK' <file>                                            → 44
+grep '^- \[ \] CHK' <file> | grep -c 'Req §'                             → 44   (simplest reproducible form)
+grep '^- \[ \] CHK' <file> | grep -v 'Req §'                             → (no output: no untraceable row)
+grep -oE '^- \[ \] CHK[0-9]{3}' <file> | grep -oE '[0-9]{3}' | awk 'NR!=$1' → (no output: no gap, no duplicate)
+grep -nE '^- \[ \] CHK[0-9]+ (Verify|Test|Confirm|Check) ' <file>        → no hits
+```
+
+Structural properties of the new file:
+
+- 44 `CHK` rows, numbered CHK001…CHK044 with no gaps and no duplicates.
+- Traceability: 44/44 rows carry at least one `[Req §…]` / `[Gap]` / `[Ambiguity]` / `[Conflict]` /
+  `[Assumption]` reference (100 %; floor 80 %).
+- Every row is a question; no row starts with "Verify / Test / Confirm / Check" + implementation behaviour.
+- Eight quality dimensions, per-section counts: Completeness 7, Consistency 6, Acceptance Criteria Quality
+  6, Coverage 6, Traceability & Governance 6, Clarity 5, Dependencies & Assumptions 4, Edge Case &
+  Non-Functional 4 (total 44).
+- Soft cap: 44 > 40 by 4, deliberately (recorded in the file's `## Notes` with the brief-coverage reason).
+- No existing checklist was modified; `checklists/requirements.md` is untouched.
+
+**Disclosure — a bracketed `grep` form gave a wrong count.** An earlier form of this check,
+`LC_ALL=C grep '^- \[ \] CHK' <file> | LC_ALL=C grep -cE '\[(Req §|Gap|...)'`, reported **6**, and the same
+pattern under the default locale printed the full row list instead of a count. Both readings were wrong: the
+`§` is a UTF-8 multi-byte token inside a byte-oriented (`LC_ALL=C`) matcher, and the alternation was
+parenthesised in a form that required a bracket layout only some rows have. The rows themselves were never
+the problem — `grep '^- \[ \] CHK' <file> | grep -c 'Req §'` reports **44/44** and is the reproducible form
+kept above. The wrong readings stay in this record so a reviewer can reproduce the discrepancy instead of
+inheriting a clean story; the Python program is the verdict of record because it is locale-independent.

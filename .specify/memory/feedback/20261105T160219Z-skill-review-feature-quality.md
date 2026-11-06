@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T16:02:19Z"
 summary: "Artifact and implementation segments of feature 084: expected set 9 members derived from the stage rules union plan.md Project Structure, coverage 9/9, no missing member; implementation smoke reproduc"
+introspection_ref: "introspection-20261106T084116Z#F-10"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-10"
 ---
 
 ## Review

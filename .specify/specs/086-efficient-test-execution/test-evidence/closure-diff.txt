@@ -1,0 +1,148 @@
+# 086 T047 — closure comparison (full-run slot 2 of 2)
+
+Owner of the propositions this file carries: `tasks.md` T047 / `requirements.md` FR-014 and SC-006 /
+`contracts/dogfood-and-preservation.contract.md` C-047. The slot model is owned by
+`skills/external/sdd-loop-driver/references/efficiency-model.md` § 2.1 and 075's
+`contracts/test-budget.md`; this file only records the runs.
+
+Environment (A20) for every run below: `PYTHONPATH` cleared (`env -u PYTHONPATH`); the cleared value was
+`/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/src:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib:/Users/liuqiming.lqm/project/profiles/script/python`;
+`SPECKIT_PYTHON` = `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python`
+(CPython 3.14.6, pytest 9.2.0, pytest-xdist 3.8.0); `os.cpu_count()` 18, `uname -m` arm64. Worktree
+`/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2`, branch `line/086-wp-c2`, HEAD `93e61050`,
+base `018b0455`.
+
+## The two commands
+
+Closure (slot 2, the recorded run):
+
+```
+env -u PYTHONPATH SPECKIT_PYTHON=/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python \
+  bash scripts/bash/run-tests.sh \
+  --names-out .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt -q
+```
+
+Baseline (slot 1, **re-used, not re-run** — `test-evidence/baseline-failed.txt`, taken at T050 before any
+source edit; re-taking it here would measure the changed tree against itself, TB-03/A9):
+
+```
+env -u PYTHONPATH bash scripts/bash/run-tests.sh \
+  --names-out .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q
+```
+
+## Run ledger for slot 2
+
+The slot was consumed **once**, and the record it carries is the second of two executions whose first
+was a disclosed process defect. Both are listed, because a contaminated execution that is quietly
+dropped is exactly the accounting hole the slot model exists to prevent.
+
+| # | id | trigger | mode line | summary | wall clock | exit | names |
+|---|----|---------|-----------|---------|------------|------|-------|
+| 1 | `slot-2-in-slot-rerun-attempt` | a mutation-leg sandbox worktree sat **inside the repo root** (`.specify/.tmp/086/mutations/sandbox/`, git-ignored but visible to a filesystem walk), so two whole-tree Markdown scans saw a second claimant of `flow-class-definitions.md` | `mode=parallel workers=auto dist=load passes=2` | `21 failed, 7533 passed, 7 skipped, 55 warnings in 271.72s` | 271.72 s (+ 34.36 s serial pass) | 1 | 21 (19 baseline + 2 sandbox-induced) |
+| 2 | `slot-2-closure` | sandbox removed (`git worktree remove --force` + `git worktree prune`); `git worktree list` shows only the main tree and this worktree; the executor's doctored copies relocated to `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/`, **outside** the repo root | `mode=parallel workers=auto dist=load passes=2` | `19 failed, 7535 passed, 7 skipped, 55 warnings in 284.12s (0:04:44)`; serial pass `1 passed, 7561 deselected, 3 warnings in 35.22s` | 284.12 s (+ 35.22 s serial pass) | 1 | **19** |
+
+Execution 1 is an `in-slot-rerun-attempt`, **not** a second slot: its trigger is a property of the
+executor's own sandbox, not of the feature tree, so it never measured the tree the baseline measured.
+The slot record is execution 2. The driver adjudicated this disposition (option 1: re-run the closure
+once on the cleaned tree); this file carries the decision and its evidence.
+
+## Each run's own readings — the slot record (execution 2)
+
+| | baseline (T050, slot 1) | closure (T047, slot 2) |
+|---|---|---|
+| mode line | `# test runner: .venv/bin/python -m pytest -q` (pre-change runner: serial) | `# test runner: <venv>/python -m pytest -n auto --dist load -q` then `# test runner: mode=parallel workers=auto dist=load passes=2` |
+| summary line | `19 failed, 7475 passed, 7 skipped, 4 warnings in 687.41s (0:11:27)` | `19 failed, 7535 passed, 7 skipped, 55 warnings in 284.12s (0:04:44)` |
+| serial exception pass | n/a (one pass) | `1 passed, 7561 deselected, 3 warnings in 35.22s` |
+| exit code | 1 | 1 |
+| `--names-out` line | `(      19 entries)` | `(19 entries) passes=2` |
+| evidence | `test-evidence/baseline.txt` | this file; durable names in `test-evidence/final-failed.txt`; raw log `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/closure-run-clean.txt` |
+| slot | `slot-1-baseline` | `slot-2-closure` |
+
+The closure wall clock **284.12 s** is the parallel pass only, read from that run's own pytest summary
+line; the serial exception pass (35.22 s) is reported separately and is never folded into a total the
+runner did not print. Against the baseline's 687.41 s that is 284.12 / 687.41 = **0.41×**.
+
+Against SC-001's own ceiling (the pre-pull serial reading 1,031.48 s × 40% = 412.59 s), 284.12 s is
+**69% of the ceiling** — inside it. The ratio to the T050 baseline slot (0.41×) is *not* the SC-001
+formula and is recorded only as a like-for-like observation; SC-001's 40% is judged against 412.59 s in
+`verification.md`.
+
+## Name-level diff, both directions (C-047 shape)
+
+```
+$ comm -13 <(sort -u test-evidence/baseline-failed.txt) <(sort -u test-evidence/final-failed.txt)
+   (no output)
+
+$ comm -23 <(sort -u test-evidence/baseline-failed.txt) <(sort -u test-evidence/final-failed.txt)
+   (no output)
+```
+
+- `comm -13` (**new names introduced by the parallel default**): **empty — 0 names**, after attribution.
+- `comm -23` (**baseline names the closure run no longer carries**): **empty — 0 names**. Nothing is
+  claimed as "fixed by this feature"; there is nothing to claim.
+- Counts: baseline `19` / closure `19`, `wc -l final-failed.txt` = **19**, and the two sorted sets are
+  equal. Count equality is reported as a *consequence* of the empty two-way diff, never as the evidence
+  for it (FR-033).
+
+The attribution operator, re-run against the clean closure record:
+
+```
+$ sort -u .specify/.../final-failed.txt | wc -l
+19
+$ comm -13 <(sort -u baseline-failed.txt) <(sort -u final-failed.txt) | wc -l
+0
+$ comm -23 <(sort -u baseline-failed.txt) <(sort -u final-failed.txt) | wc -l
+0
+```
+
+The 19 names are byte-for-byte the 19 T050 baseline names; the unattributed count is **0**.
+
+## The contaminated execution — trigger and targeted disproof
+
+Execution 1's two extra names, both from `tests/contract/test_isomorphism_map.py`:
+
+```
+tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership
+tests/contract/test_isomorphism_map.py::test_no_second_map_or_boundary_table_exists
+```
+
+Mechanism: both cases walk every Markdown file under the repo root (`_md_files()`) and exclude the
+declared owner. The executor's mutation sandbox was a detached `git worktree` of this branch at
+`.specify/.tmp/086/mutations/sandbox/` — inside the repository root, matched by `.specify/.gitignore`'s
+`.tmp/` rule, therefore invisible to `git status` but **not** invisible to a filesystem walk. The
+sandbox carried a full second copy of `shared/definitions/flow-class-definitions.md` and
+`.specify/shared/definitions/flow-class-definitions.md`, so both cases saw a second claimant. The
+assertion messages named the sandbox paths directly, which is what identified the cause rather than
+merely counting it.
+
+Targeted disproof, executed after removal: with the sandbox gone and no other change,
+
+```
+$ bash scripts/bash/run-tests.sh -q tests/contract/test_isomorphism_map.py
+27 passed
+```
+
+— the same 27 passed twice (once through the runner, once through the bare engine). The names were
+never red on this tree; they were red on a tree that had an extra copy of the tree inside it.
+
+The baseline did not carry them because the T050 run happened before the sandbox existed.
+
+**What this file does not do**: it does not amend execution 1's numbers, does not delete them, and does
+not present the clean run as if it were the only execution. The slot-2 record is execution 2; execution
+1 stands as the disclosed `in-slot-rerun-attempt` that triggered it.
+
+## Housing discipline for the remaining mutation legs
+
+All remaining doctored-copy work (M-16, M-17, M-18 for T055; the T044 snapshots) lives under
+`/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/` — the sanctioned cross-repository temp root
+(`shared/guidelines/temp-directory-discipline.md` § 1, `~/tmp/<project>/<purpose>/`), outside the repo
+root entirely, so no filesystem walk of the repository can see it. The closure run happened **before**
+that sandbox was created and with the previous one removed; `test-evidence/worktree-clean.txt` brackets
+it.
+
+## Not claimed
+
+- No name is claimed as fixed by this feature (`comm -23` empty).
+- Execution 1's 2 contaminated names are not claimed as this feature's regressions either; they are
+  attributed to the executor's own process and disproved by a targeted re-run.
+- This file does not claim C-047 green on its own; T055 reads these two runs and carries the clause.

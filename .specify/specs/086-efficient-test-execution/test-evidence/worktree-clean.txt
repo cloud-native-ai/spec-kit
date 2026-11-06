@@ -1,0 +1,86 @@
+# 086 T044 — the working tree carries no new pollution after the closure run (SC-011)
+
+Owner of the proposition: `tasks.md` T044 / `requirements.md` SC-011 and A20 /
+`contracts/dogfood-and-preservation.contract.md` C-046 (the whole-worktree `git status` proposition,
+unweakened). This row adds **no run of its own**: it brackets T047's closure run with a snapshot before
+and a snapshot after (T054 accounts for it as "no run").
+
+Worktree `/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2`, branch `line/086-wp-c2`,
+HEAD `93e61050` at snapshot time.
+
+## Method
+
+`git status --porcelain --untracked-files=all` — the `-uall` form on purpose: the default `-unormal`
+collapses an untracked directory into one entry, which would hide a newly created untracked tree.
+
+Both snapshots were taken inside this worktree, "before" immediately before the closure command was
+launched and "after" immediately after the process exited. No other process wrote to the worktree in
+between — the closure run was the only thing launched. The second snapshot was taken **before this
+evidence file was written**, so this file and the other evidence files T044's siblings produce do not
+appear in it; that ordering is stated here because a reader cannot recover it from the files.
+
+## Before the closure run
+
+```
+$ git status --porcelain --untracked-files=all
+ M .specify/memory/trigger/index.json
+```
+
+## After the closure run
+
+```
+$ git status --porcelain --untracked-files=all
+ M .specify/memory/trigger/index.json
+ M .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt
+```
+
+## Delta
+
+```
+$ comm -13 <(sort before.txt) <(sort after.txt)   # lines present only after the run
+ M .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt
+
+$ comm -23 <(sort before.txt) <(sort after.txt)   # lines present only before the run
+(no output)
+```
+
+One line appeared, one line disappeared-none, and no untracked path appeared in either snapshot.
+
+The single new line is **not** pollution: it is a tracked file (`final-failed.txt`, tracked since T047's
+first execution in commit `93e61050`) that was *clean* before the run and *modified* after it. It is the
+run's own `--names-out` target, named in the closure command line itself; a run that left it unchanged
+would have failed to write its failure-name list (FR-008). The path existed before and after — only its
+status changed, and it changed because the run's declared job is to write it.
+
+## Permitted residue
+
+| path | classification |
+|---|---|
+| `.specify/memory/trigger/index.json` | **pre-existing modification**, present in both snapshots, untouched by the run. The proactive-trigger engine owns this file and writes it outside this feature's control. Disclosed, not this feature's pollution, and not repaired here (a second writer would fight the engine that owns it). |
+| `.specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt` | **the run's declared output** — T047's `--names-out` target, rewritten by the run under test. |
+
+## What the run did **not** leave behind
+
+No untracked file, no untracked directory, no generated artifact, no mirror drift, and no temp worktree
+registered by the run:
+
+- `git worktree list` shows exactly two entries — the main checkout
+  (`/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit`, branch `086-efficient-test-execution`) and this
+  worktree. Neither is a sandbox and neither was created by the closure run. (The mutation sandbox used
+  later for T055 and the M-legs lives at `/Users/liuqiming.lqm/tmp/spec-kit/086/mutations-c2/sandbox`,
+  **outside the repo root**; it was created after the closure run finished.)
+- `python3 scripts/python/sync-mirrors.py --check` after the run exits 0 with all six pairs `ok`
+  (`test-evidence/mirror-parity.txt`, T045).
+
+## Verdict
+
+SC-011 holds for this run. The delta against the pre-run snapshot contains no new path, no untracked
+path and no disappearing path; the one status change is the run's own named output, and the only other
+entry was already modified before the run started.
+
+## Not claimed
+
+- This file does not weaken the whole-worktree `git status` assertions other tests make
+  (`test_closure_acceptance_check.py`, `test_humanize_command_surface.py`); they were left untouched and
+  stayed green in this run. C-046's green point is carried by T055.
+- This file records one bracketed run in one worktree; it says nothing about trees this run did not have.

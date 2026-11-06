@@ -1,0 +1,104 @@
+# 086 T016 — A13 scheduling experiment (representative pair)
+
+Owner of the proposition: `tasks.md` T016 / `quickstart.md` S-5 / `requirements.md` A13.
+This file records the two-arm experiment only; the two-slot account closes in
+`test-evidence/full-run-budget.md` (T054). Both arms are `out-of-slot-exception` full-suite runs.
+
+Worktree: `~/tmp/spec-kit/086/worktrees/086-wp-c1`, branch `line/086-wp-c1`, base `ac8d5dcf`
+with WP-A1/A4/B2/B3 integrated plus the driver-authorised C-009 guard repair described below.
+Selection: the whole suite, no `tests/`-narrowing argument. Environment: `env -u PYTHONPATH`,
+`SPECKIT_PYTHON` = the main-tree `.venv` (a worktree has no `.venv`).
+
+## Environment A13 requires the record to name (H-02)
+
+| field | value |
+|---|---|
+| interpreter | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python` (CPython 3.14.6) |
+| pytest | 9.2.0 |
+| pytest-xdist | 3.8.0 |
+| `os.cpu_count()` | 18 (`uname -m` = arm64) |
+| host | macOS arm64, 18 logical CPUs |
+
+## Arm 1 — the shipped default (`-n auto`, `--dist load`)
+
+```
+env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python \
+  bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/s5-auto-names.txt -q
+```
+
+```
+# test runner: <venv>/python -m pytest -n auto --dist load -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+19 failed, 7535 passed, 7 skipped, 55 warnings in 201.34s (0:03:21)   <- parallel pass
+1 passed, 7561 deselected, 3 warnings in 35.06s                       <- serial pass (-n0)
+# failed-name list written: .specify/.tmp/086/s5-auto-names.txt (19 entries) passes=2
+```
+
+- Exit code **1**; command wall clock **239 s** (parallel **201.34 s** + serial exception pass **35.06 s**).
+- `--names-out` entries: **19**.
+
+## Arm 2 — the single most plausible alternative (`--workers 8`, `--dist loadfile`)
+
+```
+env -u PYTHONPATH SPECKIT_PYTHON=<venv>/python \
+  bash scripts/bash/run-tests.sh --workers 8 --dist loadfile \
+  --names-out .specify/.tmp/086/s5-lf-names.txt -q
+```
+
+```
+# test runner: <venv>/python -m pytest -n 8 --dist loadfile -q
+# test runner: mode=parallel workers=8 dist=loadfile passes=2
+19 failed, 7535 passed, 7 skipped, 25 warnings in 204.99s (0:03:24)   <- parallel pass
+1 passed, 7561 deselected, 3 warnings in 32.32s                       <- serial pass (-n0)
+# failed-name list written: .specify/.tmp/086/s5-lf-names.txt (19 entries) passes=2
+```
+
+- Exit code **1**; command wall clock **241 s** (parallel **204.99 s** + serial exception pass **32.32 s**).
+- `--names-out` entries: **19**.
+
+## Comparison
+
+```
+$ comm -3 <(sort -u .specify/.tmp/086/s5-auto-names.txt) \
+          <(sort -u .specify/.tmp/086/s5-lf-names.txt)
+   (no output)
+
+$ comm -13 <(sort -u test-evidence/baseline-failed.txt) <(sort -u .specify/.tmp/086/s5-auto-names.txt)
+   (no output)
+$ comm -13 <(sort -u test-evidence/baseline-failed.txt) <(sort -u .specify/.tmp/086/s5-lf-names.txt)
+   (no output)
+```
+
+- Arm-to-arm symmetric difference: **empty** — the two arms produce the identical 19 failure names.
+- New names vs the T050 baseline (`baseline-failed.txt`): **0** for both arms.
+- Wall clock: arm 2 / arm 1 = 204.99 / 201.34 = **1.02×** — `-n 8` + `loadfile` is not faster on this
+  host; the 8-worker cap is not justified. `loadfile` changes distribution (per-file grouping), not the
+  failure set.
+
+## Decision (A13)
+
+**Keep the default `-n auto` + `--dist load`.** Neither arm introduces a new failure name, and the
+alternative is not faster; no worker cap and no scheduler switch is adopted. The default therefore
+stays as shipped in C-001, and this file is the evidence attached to that decision (T016 asks for it
+either way).
+
+## Runner guard repair enabling this arm (driver-authorised, disclosed)
+
+Before the repair, `--workers 8 --dist loadfile` produced `-n 8 --dist load --dist loadfile` and the
+mode line said `dist=load`: the runner appended its default `--dist load` while the caller guard
+(C-009) covered only `-n`/`--numprocesses`. The arm could not have measured `loadfile`.
+
+The root-cause repair, landed in this worktree as part of C1:
+
+- `scripts/bash/run-tests.sh` (+ byte-identical `.specify/scripts/bash/run-tests.sh`): the caller scan
+  now also recognises `--dist <value>` / `--dist=<value>`; when the caller supplies a scheduler the
+  runner appends only `-n <effective>`, forwards the scheduler verbatim, and reports
+  `dist=<caller value>` in the mode line.
+- `tests/contract/test_run_tests_runner_contract.py`: two new C-009 cases pin both `--dist` forms
+  (exactly one scheduler switch, `-n 2` unchanged, mode line `dist=loadfile`); 40/40 runner-contract
+  tests pass.
+- `contracts/runner-contract-086.contract.md` C-009: the proposition now owns the scheduler guard.
+
+This is the one-line decision the WP-C1 executor flagged as not its own; the driver took it because
+the alternative — declaring a different T016 arm — would abandon the recorded A13 question rather
+than answer it.

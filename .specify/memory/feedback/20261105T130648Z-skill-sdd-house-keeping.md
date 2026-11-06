@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sdd-house-keeping-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-05T13:06:48Z"
 summary: "sdd-house-keeping check on the spec-kit repo: H1 physical complete / logical ready; sanitize materials 2492 pending (2491 dead-reference / 1 high stale-residue); retention 696 scanned / 0 eligible / 6"
+introspection_ref: "introspection-20261106T084116Z#F-09"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-09"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "processed"
 partial: false
 created: "2026-11-05T16:02:26Z"
 summary: "Code segment of feature 084 over 3ffeb26e..03a19487 (276 changed files; receipt judged 39 / skipped 237 / gap 0, renderer text). Verdict blocked: 2 blocking, 2 important, 2 suggestion, 1 nitpick, 0 qu"
+introspection_ref: "introspection-20261106T084116Z#F-10"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-10"
 ---
 
 ## Review

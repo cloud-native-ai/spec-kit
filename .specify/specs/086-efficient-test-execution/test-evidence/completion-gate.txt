@@ -1,0 +1,297 @@
+# 086 T049 — every Completion Gate row re-validated by running its check, not by reading it
+# Tree: branch line/086-wp-c2, HEAD 93e61050, merge-base with master 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08
+# Run 2026-11-06 by WP-C2. Nine rows: GATE-086 plus GATE-1..GATE-8.
+
+==============================================================
+GATE-086 — dogfood evidence is complete
+==============================================================
+$ ls -l .specify/specs/086-efficient-test-execution/test-evidence/dogfood-record.md
+-rw-r--r--@ 1 liuqiming.lqm  staff  10470 11月  6 14:54 .specify/specs/086-efficient-test-execution/test-evidence/dogfood-record.md
+
+$ grep -c '^SC-010_status=pass' .specify/specs/085-sdd-temporary-goal-team/verification.md
+0
+
+$ grep -n '^SC-010_status=' .specify/specs/085-sdd-temporary-goal-team/verification.md
+62:SC-010_status=partial
+
+$ grep -n '^SC-010_blocked_at=' .specify/specs/085-sdd-temporary-goal-team/verification.md
+65:SC-010_blocked_at=review stage has no record or checkpoint yet (stages requirements..implement are recorded; the review stage is still pending in 086's run)
+
+-- the per-stage record table (carrier, requested, effective+reason, checkpoint, completion) --
+| Stage | Carrier identity (host-native) | requested | team_effective | stage_effective | actual_concurrency_max | checkpoint | completion state |
+|-------|-------------------------------|-----------|----------------|-----------------|------------------------|------------|------------------|
+| requirements | `SDD Requirements Executor` | 24 | 18 | 2 | 1 (one analyzer; the driver's U4 verified afterwards) | `checkpoints/01-requirements.md` | complete (`REQUIREMENTS-DONE`) |
+| clarify | `general-purpose` | 24 | 18 | 2 | 1 | `checkpoints/02-clarify.md` | complete (`CLARIFY-DONE`) |
+| plan | `SDD Executor` | 24 | 18 | 2 | 1 | `checkpoints/03-plan.md` | complete (`PLAN-DONE`) |
+| tasks | `SDD Executor` | 24 | 18 | 2 | 1 | `checkpoints/04-tasks.md` | complete (`TASKS-DONE`) |
+| checklist | `general-purpose` / `SDD Executor` | 24 | 18 | 2 | 1 | `checkpoints/05-checklist.md` | complete (`CHECKLIST-DONE`) |
+| analyze | `general-purpose` / `SDD Executor` | 24 | 18 | 2 | 1 | `checkpoints/06-analyze.md` | complete (`ANALYZE-DONE`) |
+| implement (preflight + wave 1) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 3 (wave 1: A1+B1+verifier) | **2** (A1 ∥ B1) | `checkpoints/07-implement-preflight.md`, `checkpoints/08-implement-wave1.md` | complete |
+| implement (wave 2) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 4 (A2+A3+B2+verifier) | **3** (A2 ∥ A3 ∥ B2) | `checkpoints/09-implement-wave2.md` | complete |
+| implement (wave 3) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 3 (A4+B3+verifier) | **2** (A4 ∥ B3) | `checkpoints/10-implement-wave3.md` | complete |
+| implement (wave 4 — this slice) | `sdd-implement-executor` (host-native `SDD Executor`) | 24 | 18 | 2 (C1 + verifier reserve) | 1 (C1 alone; the stage is measured against the whole tree) | this WP-C1's own dispatch record; checkpoint `11-implement-wave4.md` is written by the driver | in progress at the time of this record |
+
+## 2. `agent_concurrency_effective` and the named reason (C-048)
+
+Three distinct numbers are in play and only one of them is evidence of concurrency:
+
+1. `requested: 24` — declared in the team file. **Not** used anywhere in this record as an observation.
+2. `effective: 18`, `reason: verifier-reserve` — the team's configured ceiling
+
+-- the > 1 concurrency reading, taken from dispatch records --
+5:C-048 (per-stage record shape), C-049 (`actual_concurrency_max > 1` from dispatch records),
+77:`actual_concurrency_max > 1` therefore holds for **three** stages (wave 1, wave 2, wave 3), which
+
+VERDICT GATE-086: PASS — dogfood-record.md exists and carries the per-stage carrier identity,
+  agent_concurrency_requested, agent_concurrency_effective with its named reason, the checkpoint
+  path and the completion state; actual_concurrency_max > 1 holds for three stages from dispatch
+  records; and the 085 side reads SC-010_status=partial with a one-line named gap, which is the
+  gate's second admissible limb (the grep for pass is 0, and the partial-with-gap form is present).
+
+==============================================================
+GATE-1 — zero NEW failures vs the T050 baseline, both directions
+==============================================================
+The gate's own command is a full-suite run. It is NOT re-run here: T047's slot-2-closure run
+already produced final-failed.txt on this exact tree, and re-running would spend a third full-run
+slot to re-derive a file already on record. The two commands the gate asks to be read are run below.
+
+$ comm -13 .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt        # appeared (must be empty)
+[end of comm -13 — empty]
+
+$ comm -23 .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt        # disappeared (recorded, never claimed as a fix)
+[end of comm -23 — empty]
+
+$ wc -l .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt
+      19 .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt
+      19 .specify/specs/086-efficient-test-execution/test-evidence/final-failed.txt
+      38 total
+
+VERDICT GATE-1: PASS — both directions empty; the closure run introduced 0 new failure names and
+  dropped 0. The names are on record in test-evidence/closure-diff.txt with the slot ledger.
+
+==============================================================
+GATE-2 — every mirror obligation byte-identical / regenerated
+==============================================================
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (95 files)
+[exit=0]
+
+$ diff -q scripts/bash/run-tests.sh .specify/scripts/bash/run-tests.sh
+[exit=0 — silent means byte-identical]
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+[exit=0]
+
+VERDICT GATE-2: PASS — six mirror pairs ok, the runner's two carriers diff-silent, command copies ok.
+
+==============================================================
+GATE-3 — no [ ] or [>] task rows remain
+==============================================================
+$ grep -cE '^- \[[ >]\]' .specify/specs/086-efficient-test-execution/tasks.md
+0
+[exit=1 — grep exits 1 on zero matches, which is the pass]
+
+$ grep -cE '^- \[x\]' .specify/specs/086-efficient-test-execution/tasks.md
+56
+
+VERDICT GATE-3: PASS — 0 open rows, 56 closed.
+
+==============================================================
+GATE-4 — every final-path SC is pass AND the smoke record is present
+==============================================================
+$ grep -m1 '^SC-001_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-001_status=pass
+$ grep -m1 '^SC-002_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-002_status=pass
+$ grep -m1 '^SC-003_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-003_status=pass
+$ grep -m1 '^SC-004_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-004_status=pass
+$ grep -m1 '^SC-005_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-005_status=pass
+$ grep -m1 '^SC-006_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-006_status=pass
+$ grep -m1 '^SC-007_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-007_status=pass
+$ grep -m1 '^SC-008_status=' .specify/specs/086-efficient-test-execution/verification.md
+SC-008_status=pass
+
+$ grep -E '^smoke_(command|exit_code|evidence_path)=' .specify/specs/086-efficient-test-execution/verification.md
+smoke_command=env -u PYTHONPATH SPECKIT_PYTHON=.venv/bin/python bash scripts/bash/run-tests.sh tests/contract/test_run_tests_runner_contract.py tests/contract/test_test_execution_efficiency.py tests/unit/test_audit_test_budget.py -q
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/086-efficient-test-execution/test-evidence/smoke-086.txt
+
+$ test -s .specify/specs/086-efficient-test-execution/test-evidence/smoke-086.txt && wc -c < that path
+    2557
+[exit=0 — the evidence path exists and is non-empty]
+
+VERDICT GATE-4: PASS — SC-001..SC-008 all pass, the smoke triple is present, exit_code is 0 and the
+  evidence file is non-empty. No final-path criterion is blocked/deferred/fail, so no waiver applies.
+
+==============================================================
+GATE-5 — nothing under the 085 surface moved outside the carve-out
+==============================================================
+$ git merge-base HEAD master
+24cb4edcc53db3cfc86f574e5e6d627c78b2ca08
+
+-- (a) named paths across the 085 spec, .specify/goal and .specify/teams --
+$ git diff -U0 --name-only 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08..HEAD -- .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams
+.specify/specs/085-sdd-temporary-goal-team/verification.md
+[end of (a) — the only named path is .specify/specs/085-sdd-temporary-goal-team/verification.md, which the gate admits]
+
+-- (b) every added/removed line of that one file --
+$ git diff -U0 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08..HEAD -- .specify/specs/085-sdd-temporary-goal-team/verification.md | grep -E '^[+-]' | grep -v '^+++\|^---'
+-SC-010_value=live bounded dogfood: temp goal + temp team + 2 child lines + real worktrees + integration queue + checkpoints 04/05 + run report
+-SC-010_note=A disposable live dogfood executed: the temporary goal/team were created in a temp project, two child lines were active concurrently with agent_cap 24, each wrote in its own worktree, and both merged through the integration queue (fsck clean, no push). A full 8-stage driver run with LLM stage agents was not executed; the dogfood is bounded to the team/child-line/checkpoint mechanics.
+-SC-010_blocked_at=no full 8-stage driver run with LLM stage agents
++SC-010_value=live SDD run via the 085 temporary Goal/Team: 10 stage wave records (requirements..implement waves 1-4) each with a checkpoint, 8 child lines in real worktrees merged through the integration queue, actual concurrency max 3
++SC-010_note=Feature 086's own unattended run used the spec-local temporary Goal and Team: every completed stage wave carries a dispatch record and a checkpoint (01-requirements..11-implement-wave4), agent_concurrency_requested 24 / team effective 18 (verifier-reserve) with a per-stage effective and its named reason, and actual concurrency taken from dispatch records reached a maximum of 3 (implement wave 2: three packages in flight). Worktree write isolation and the integration queue were exercised by 8 child lines. The carrier downgrade (host-native agent identities for 085's stage-agent types) is recorded as an observation, not a failure (contract C-051). The status stays partial because the review stage has not run yet: its record and checkpoint are still missing.
++SC-010_blocked_at=review stage has no record or checkpoint yet (stages requirements..implement are recorded; the review stage is still pending in 086's run)
+
+-- (b) the non-matching count, which is what the gate actually tests --
+$ …same pipeline… | grep -cvE '^[+-]SC-010_(status|value|note|blocked_at)='
+0
+
+-- untracked pollution over the same three roots (must be silent) --
+$ git status --porcelain --untracked-files=all -- .specify/specs/085-sdd-temporary-goal-team .specify/goal .specify/teams
+[end — empty]
+
+VERDICT GATE-5: PASS — (a) names only verification.md; (b) six changed lines, every one matching
+  the SC-010 carve-out prefix, non-matching count 0. requirements FR-027 is the owner of the
+  carve-out, FR-030 authorizes it, contract C-041 carries the green point.
+
+==============================================================
+GATE-6 — the runtime dependency set did not move
+==============================================================
+$ python3 -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['dependencies'])"
+ModuleNotFoundError: No module named 'tomllib'
+[host python3 is 3.9.6 and has no tomllib — a host fact, not a tree fact; same reading taken below]
+
+$ /opt/homebrew/bin/python3 -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['dependencies'])"
+['typer', 'rich', 'httpx[socks]', 'platformdirs', 'readchar', "truststore>=0.10.4; python_version >= '3.10'"]
+
+$ git show 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08:pyproject.toml | /opt/homebrew/bin/python3 -c "import tomllib,sys;print(tomllib.load(sys.stdin.buffer)['project']['dependencies'])"
+['typer', 'rich', 'httpx[socks]', 'platformdirs', 'readchar', "truststore>=0.10.4; python_version >= '3.10'"]
+[the merge-base reading is identical — the runtime set did not move]
+
+$ grep -n 'pytest-xdist' pyproject.toml
+17:# pytest-xdist carries the >= 3.9 marker because its 3.x line refuses to run on 3.8 —
+22:    "pytest-xdist; python_version >= '3.9'",
+
+$ git diff 24cb4edcc53db3cfc86f574e5e6d627c78b2ca08..HEAD -- pyproject.toml
+diff --git a/pyproject.toml b/pyproject.toml
+index 4dcd0f0d..9c69667b 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -12,6 +12,16 @@ dependencies = [
+     "truststore>=0.10.4; python_version >= '3.10'",
+ ]
+ 
++# Dev/test-only tooling. This group is never installed with the CLI itself: the runtime
++# dependency set above stays the shipping boundary, and `[tool.hatch.build]` is untouched.
++# pytest-xdist carries the >= 3.9 marker because its 3.x line refuses to run on 3.8 —
++# the canonical runner then reports `reason=no-xdist` and runs serially (086 C-006).
++[project.optional-dependencies]
++dev = [
++    "pytest",
++    "pytest-xdist; python_version >= '3.9'",
++]
++
+ [project.scripts]
+ specify = "specify_cli:main"
+ 
+@@ -43,4 +53,5 @@ testpaths = ["tests"]
+ markers = [
+     "contract: contract and external-surface validation tests",
+     "integration: integration tests using filesystem or fixture workspaces",
++    "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
+ ]
+
+VERDICT GATE-6: PASS — the runtime dependencies list is identical at HEAD and at the merge base
+  (same six entries); pytest-xdist appears only inside the [project.optional-dependencies] dev
+  block, and the diff touches only that block plus one markers entry.
+
+==============================================================
+GATE-7 — the gate-scan total did not increase
+==============================================================
+$ python3 .specify/scripts/python/scan-confirmation-gates.py --root . --json | python3 -c "import json,sys;print(json.load(sys.stdin)['total'])"
+27
+
+Gate condition: total <= 27 (the pre-change value measured by the B1 wave). The frozen baseline
+of 23 is NOT this feature's criterion — plan.md EP-008 records that 23 drift.
+
+VERDICT GATE-7: PASS — total 27, equal to the pre-change value, so it did not increase.
+
+==============================================================
+GATE-8 — closure-acceptance-check.py does not return block
+==============================================================
+$ python3 scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/086-efficient-test-execution --repo . --feature-detail .specify/memory/features/086.md --feature-registry .specify/memory/features.md --json
+{
+  "claimed_status": "Implemented",
+  "claimed_status_source": "/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2/.specify/memory/features/086.md",
+  "completion_conditions": {
+    "every_final_path_pass": true,
+    "no_open_rows": true,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 8,
+    "total": 8,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [],
+  "smoke": {
+    "command": "env -u PYTHONPATH SPECKIT_PYTHON=.venv/bin/python bash scripts/bash/run-tests.sh tests/contract/test_run_tests_runner_contract.py tests/contract/test_test_execution_efficiency.py tests/unit/test_audit_test_budget.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/086-efficient-test-execution/test-evidence/smoke-086.txt",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c2/.specify/specs/086-efficient-test-execution",
+  "tasks": {
+    "closed": 56,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "accept",
+  "waived": []
+}
+[exit=0]
+
+VERDICT GATE-8: PASS — verdict=accept, exit 0, reasons=[], waived=[], final_path pass 8 / total 8,
+  and all four completion conditions true. No waiver was used at any point.
+
+==============================================================
+SUMMARY — nine rows, nine PASS
+==============================================================
+GATE-086  PASS  dogfood record complete; 085 SC-010 partial with its named gap (admissible limb)
+GATE-1    PASS  both comm directions empty; 19 names each side
+GATE-2    PASS  six mirror pairs ok; runner carriers byte-identical; command copies ok
+GATE-3    PASS  0 open rows, 56 closed
+GATE-4    PASS  SC-001..SC-008 all pass; smoke triple present, exit 0, non-empty evidence
+GATE-5    PASS  (a) only 085 verification.md; (b) 6 lines, 0 non-matching
+GATE-6    PASS  runtime dependency list identical at HEAD and merge base
+GATE-7    PASS  gate-scan total 27 <= 27
+GATE-8    PASS  verdict accept, exit 0, no waiver
+
+Disclosure carried forward, not waived: 085's SC-010 stays partial because the review stage has
+no record or checkpoint yet. The checker accepts this feature anyway — an inherited row is judged
+by whether its carrier RESOLVES (gate:GATE-086 in tasks.md), not by whether the dependency has
+already flipped that row to pass. That path was confirmed non-vacuous in passing (blanking the
+carrier or naming gate:GATE-999 each immediately yields inherited-blocker-undisposed). The gap
+remains GATE-086's to carry, and the review stage's to close.

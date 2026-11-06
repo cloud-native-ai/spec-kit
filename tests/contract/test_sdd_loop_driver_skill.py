@@ -534,6 +534,12 @@ def test_c21_hook_backstop_documented():
     assert (SKILL_DIR / "scripts" / "watch-hook.sh").exists(), "watch-hook.sh missing"
 
 
+# Declared serial exception (086 C-044, FR-010/FR-012). Reason: parallel-load timeout —
+# this self-test reads 28 s unloaded but exceeds its own 60 s budget under `-n auto`. The
+# marker is the enumerable, reversible form (`pytest -m serial --collect-only -q`); its
+# assertions, timeout value and body are unchanged, so a defect in it still fails the
+# runner's serial pass and still reaches the combined exit code.
+@pytest.mark.serial
 def test_c22_watch_target_hook_selftest():
     script = SKILL_DIR / "scripts" / "watch-target.sh"
     result = subprocess.run(

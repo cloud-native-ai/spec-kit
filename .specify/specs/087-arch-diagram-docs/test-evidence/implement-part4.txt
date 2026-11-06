@@ -1,0 +1,123 @@
+# implement stage — Part 4 (T049–T064) evidence
+
+Worktree: /home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs (branch line/087-arch-diagram-docs)
+Base commit: 24cb4edc · prior part commit: b8651591 · interpreter: /usr/bin/python3 (CPython 3.11.13 / pytest 9.2.0)
+No full-suite run in this part (test budget: targeted-set-v1 only; the driver owns the full-suite baseline).
+
+## 1. Per-task readings
+
+| Row | Result | Reading |
+|-----|--------|---------|
+| T049 | done | `### 2. Gather evidence (deterministic sources first)` now reads the document's traceability record (`docs/.speckit/runs/*-diagram-trace.json`, located by the document's own path, never by "newest") as the machine evidence of which diagram / which engine layer / which two faces the document owns; the judgement stays the checker's, whose vocabulary is cited by contract path and not restated |
+| T050 | done | One row appended to `### 3. Classify the improvement`'s table: **Diagram-sync** — a fact the diagram depicts (component name, relation, step order); consequence "update the diagram in the same run, or raise a named staleness finding; exactly one of the two, never both and never neither" → `test_c012_improve_minimal_edit` 1 passed |
+| T051 | done | `### 4. Apply the minimal section-level edit` gains both branches: a hit updates the diagram under the flow obligations (existing diagram keeps its recorded engine, new one goes through `skills/external/draw-diagram`); a miss states "no diagram work" in place AND repeats it once in the report, with re-rendering named as churn → `test_c013_*` 1 passed |
+| T052 | done | `### 5. Verify` gains the obligation reading: `--action obligation --root . --only <this document>` must be `satisfied` or a valid `recorded-exemption`; `stale`/`missing`/`not-evaluated` each block the improvement-complete conclusion → `test_c014_improve_report` 1 passed |
+| T053 | done | `### 6. Record and report` gains the diagram reading in the report (verdict + the four artefacts when a diagram was touched) and the named-staleness rule: an unavailable engine raises a named finding and leaves the editable source untouched, never rolled back → `test_c015_*` 1 passed |
+| T054 | done — **covered by T048** | § Authoring Flow R5 (landed in `b8651591`) already carries every element T054 asks for: the `draw-diagram` front door, the editable source, the rendered face(s), the resolving relative reference and the record in the same run, plus R6's `--action obligation --record` beside `validate`. Re-measured before any Part-4 edit: `test_c001_four_artifacts_one_run`, `test_c003_same_run_wording`, `test_c004_refusal_carried_through`, `test_c006_r5_keeps_a_recorded_engine` → **4 passed, 32 deselected**. No second rewrite (that would be churn on a paragraph already correct) |
+| T055 | done | US1 end to end: `-k "sc001 or sc002 or sc008"` → 3 passed; `-k "c010 or c015 or c016 or c017"` → 4 passed; both appended to `notes/quickstart-run.md` with command lines, exit status and readings |
+| T056 | done | 3 new assertions authored in `tests/integration/test_docs_command_scenarios.py` (red first — see § 3): `test_c002_improve_docs_reaches_the_capability_by_path_only`, `test_c023_per_face_reasons_named_on_the_improve_side`, plus the sibling leg of `test_c002_by_reference_only`. The four names table B owns (`test_c011`…`test_c014`) were authored by T035 in Part 3 and are asserted there; T056 verifies rather than duplicates them |
+| T057 | done | `I::test_sc004_rename_keeps_document_and_diagram_in_step` authored in `tests/integration/test_docs_obligation_scenarios.py`: three states on `tmp_path` copies (pair renamed + re-rendered → `satisfied`; prose only → `satisfied` with the diagram's bytes **unchanged**, the recorded `D-001` boundary; source only → `stale`/`source-newer-than-render`), byte-level before/after captured for both files. Readings in `notes/quickstart-run.md` |
+| T058 | done | The by-reference boundary lands as `improve-docs/SKILL.md` constraint bullets: the capability is reached at `skills/external/draw-diagram` and its rows are quoted nowhere; the obligation's body stays `create-docs`'s; no second rendering path; a diagram update never carries a move/rename/archive. The three face names are named on the improve side with `quickstart.md` S3 as their single registry → turns `U::test_sc005_surfaces_reach_by_reference` and `F::test_c002_by_reference_only` green |
+| T059 | done | US3 end to end: `-k sc004` → 1 passed; `-k "c011 or c012 or c013 or c014 or c023"` → 6 passed; the rename fixture's five before/after rows appended to `notes/quickstart-run.md` |
+| T060 | done | 4 US5 scenarios authored red-first: `test_sc006_two_runs_identical_and_keyed_by_path` (byte-identical runs, path-keyed set ordered by path, every reason inside the closed table **read from the engine**, explicit clean verdict, `not-evaluated` never a pass), `test_sc003_reconcile_reports_then_converges`, `test_sc009_confirm_tiers_and_zones_unchanged` (no `assets/` or `.speckit` artefact triaged as a carrier; the produce step's writes converge once and stay converged), `test_sc010_unrefreshed_runtime_degrades_visibly` → 4 passed |
+| T061 | done | `F::test_c019_no_new_command_reachable_from_existing_verification_steps` + `F::test_c018_top_level_sequence_unchanged_and_confirm_literal_kept`, both under names that do not collide with table B's owners (table B owns `test_c019_no_new_command_no_new_tier` and the four `C-018` readings T035 already asserts). Name drift corrected on the task row (§ 4) |
+| T062 | done | `F::test_c019_no_new_command_no_new_tier` already exists (T035, green): no new command template against the base commit, the tier table keeps its header + four action classes, the ownership table keeps `create-pages` and `improve-docs` as owners. T062's positive half (the checker is named only by the two skills' verification steps, never by the command) is the assertion added under T061 → 1 passed |
+| T063 | done | `templates/commands/docs.md` § 分派 gains the obligation sentence (both paths bound, body cited at the two owning skills, `skills/external/draw-diagram` named, no clause restated) and the residual-report sentence now carries the five counts `satisfied`/`missing`/`stale`/`exempted`/`not-evaluated` **inside the existing skill-grouped headings** with the four backing evidences per row and no sixth group name → `test_c016_dispatch_names_both_paths` + `test_c017_residual_five_counts` green; four per-tool copies regenerated |
+| T064 | done | `docs/concepts/documentation-model.md` gains `## Diagram Obligation for Readers` — exactly **12** non-blank lines including the heading (ceiling is 12): diagrams arrive with documents, the four findable things (source, face(s), the resolving link, the trace record), the visible exemption, and the reported divergence. No verdict vocabulary, no carrier table, no second rulebook → `test_c020_reader_projection_bounded` + `test_c021_path_unchanged` green |
+
+## 2. Final targeted reading (Part 4)
+
+```
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_obligation_reuse.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+121 passed, 1 warning in 4.65s
+exit status = 0
+```
+
+**Zero failures** — the ten Part-3 carry-overs are closed, and the three assertions this part authored joined
+them instead of being loosened. No baseline name regressed.
+
+## 3. The ten Part-3 reds, closed one by one
+
+| Failing assertion (Part 3) | Delivered by | Measured now |
+|---|---|---|
+| `U::test_sc005_surfaces_reach_by_reference` | T058 (pointer in `improve-docs/SKILL.md`) | passed |
+| `F::test_c002_by_reference_only` (improve leg) | T058 | passed |
+| `F::test_c011_improve_pointer` | T049 | passed |
+| `F::test_c012_improve_minimal_edit` | T050 | passed |
+| `F::test_c013_improve_verify_includes_obligation` | T051 | passed |
+| `F::test_c014_improve_report` | T052 | passed |
+| `F::test_c015_named_staleness_keeps_source` | T053 | passed |
+| `F::test_c016_dispatch_names_both_paths` | T063 | passed |
+| `F::test_c017_residual_five_counts` | T063 | passed |
+| `F::test_c020_reader_projection_bounded` | T064 | passed |
+
+**T031/T032 dependency status: closed.** `test_sc005_surfaces_reach_by_reference` — red since Part 2 — is now
+green: all three diagram-producing surfaces (`create-docs/SKILL.md`, `improve-docs/SKILL.md`,
+`templates/commands/docs.md`) name `skills/external/draw-diagram` by path, and none of the three carries two or
+more engine-layer names or the `ldm_summary:` schema. Its companion `test_sc005_engine_domain_is_single_owner`
+stays green (no second engine enumeration was added).
+
+## 4. Name-drift corrections (tasks.md rows corrected, `plan.md` untouched)
+
+1. **T061** proposed `F::test_c019_dispatch_pointer` and `F::test_c018_top_level_sequence_unchanged`. Table B owns
+   `C-019` as `F::test_c019_no_new_command_no_new_tier` (already authored by T035, == T062's row) and `C-018` as
+   `C3` / `KEEP_LIST` / `test_c018_improve_docs_literal_kept` / `test_c018_w1_section_byte_unchanged`. T061
+   therefore authors two **non-colliding** complementary readings with qualified names, and the row now names
+   them. Recorded on the row itself (`tasks.md`, inline note under T061).
+2. **T060** proposes `test_sc004_*`-style names for `SC-006` / `SC-003` / `SC-009` / `SC-010`; table B does not
+   own those four (they are `SC-` criteria, not `C-` clauses), so the names stand as row-specified.
+3. **T054**'s assertion names (`test_c001_*`, `test_c008_*`) are T035's delivery; T054 re-measured them rather
+   than re-authoring them — no drift.
+
+## 5. Guard sweep and mirrors
+
+```
+$ /usr/bin/python3 -m pytest tests/contract/test_expression_compatibility.py tests/contract/test_expression_gate_wiring.py \
+    tests/contract/test_docs_command_template.py tests/contract/test_confirmation_gates_sweep.py \
+    tests/contract/test_directory_governance.py -q --no-header -p no:cacheprovider --tb=no -rf
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+1 failed, 120 passed
+```
+
+The single failure is **in `baseline-failed.txt`** (pre-existing, 085's residual-total assertion) — the baseline
+name set is unchanged, so the delta is empty. `test_expression_compatibility.py` alone is **16 passed**, matching
+its recorded baseline, after the `ALLOWED_POST_BASELINE_CHANGES` entry landed (see § 6).
+
+```
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --write      -> sync skills/external/ -> .specify/skills/ (1 files)
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check      -> six pairs ok, exit 0
+$ /usr/bin/python3 scripts/python/regen-command-copies.py      -> Regenerated command copies for 4 tools.
+$ /usr/bin/python3 scripts/python/regen-command-copies.py --check -> OK: all per-tool command copies match the source templates.
+```
+
+Regenerated copies (all four, all committed): `.claude/commands/speckit.docs.md`,
+`.github/prompts/speckit.docs.prompt.md`, `.opencode/command/speckit.docs.md`, `.qoder/commands/speckit.docs.md`.
+
+## 6. The one guard the delivery made red, and its sanctioned remedy
+
+Editing `skills/external/improve-docs/SKILL.md` turned `C5` (`test_c5_non_wiring_files_keep_their_frozen_hashes`)
+red — expected, and exactly what `plan.md` `T-001` decided: the file sits in 069a's 74-source frozen manifest, so
+the sanctioned remedy is one `ALLOWED_POST_BASELINE_CHANGES` entry carrying a reason AND the markers its intended
+content must still hold. The entry landed with four markers (`Diagram-sync`, `skills/external/draw-diagram`,
+`--action obligation`, `staleness finding`), and the guard re-asserts the content instead of waiving it:
+`16 passed` (baseline 16). The 069a hash manifest itself is untouched — it stays the dated record it is.
+
+## 7. Repository-level disciplines
+
+```
+$ git diff --name-only 24cb4edc -- docs/
+docs/concepts/documentation-model.md            （exactly one line — GATE-6 holds）
+$ git diff --name-only 24cb4edc -- docs/ | wc -l
+1
+$ git diff --name-only 24cb4edc -- skills/external/draw-diagram/ | wc -l
+0                                               （T-004: zero changes to the capability）
+```
+
+## 8. PLAN-EDIT records
+
+None. No plan-owned artifact (`plan.md`, `data-model.md`, `contracts/`, `quickstart.md`, `research.md`,
+`feature-ref.md`) was modified in this part. Nothing in this part contradicted a plan-owned statement: the two
+places where the delivery could have (the KEEP_LIST literal's position, and the assertion names) were resolved
+inside the task/test layer, which is not plan-owned.

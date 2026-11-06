@@ -12,6 +12,16 @@ dependencies = [
     "truststore>=0.10.4; python_version >= '3.10'",
 ]
 
+# Dev/test-only tooling. This group is never installed with the CLI itself: the runtime
+# dependency set above stays the shipping boundary, and `[tool.hatch.build]` is untouched.
+# pytest-xdist carries the >= 3.9 marker because its 3.x line refuses to run on 3.8 —
+# the canonical runner then reports `reason=no-xdist` and runs serially (086 C-006).
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-xdist; python_version >= '3.9'",
+]
+
 [project.scripts]
 specify = "specify_cli:main"
 
@@ -43,4 +53,5 @@ testpaths = ["tests"]
 markers = [
     "contract: contract and external-surface validation tests",
     "integration: integration tests using filesystem or fixture workspaces",
+    "serial: not parallel-safe — excluded from the runner's parallel pass and re-run by its serial pass",
 ]

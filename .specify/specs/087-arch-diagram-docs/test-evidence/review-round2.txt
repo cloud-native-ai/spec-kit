@@ -1,0 +1,244 @@
+# Review round 2 — evidence (087-arch-diagram-docs, 2026-11-06)
+
+- Object: review round 1's `blocked` verdict (1 P0 / 6 P1 / 18 P2) after the review-repair commit `b06c93a7`
+- Round-1 report head: `37d93787`; fix commit: `b06c93a7`; base: `24cb4edc`
+- Scope of this round: recheck the P0/P1 closures, the P2 dispositions, the four segment verdicts, the
+  regression set and the Acceptance Reality Check. Review artifacts only; no product code, spec source,
+  plan-owned file or test was modified by this round.
+- Interpreter: `/usr/bin/python3` (CPython 3.11.13); pytest 9.2.0
+
+## 1 — The five 087 test files (targeted; not the full suite)
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_utils_obligation.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+124 passed, 1 warning in 4.86s
+EXIT=0
+```
+
+The five files read 121 passed at the round-1 review smoke and 124 after the repair; the three added
+tests are `test_c007_source_only_reference_is_not_satisfied`, `test_c010_html_face_is_recognised` and
+`test_c005_fenced_block_does_not_shift_the_line`.
+
+## 2 — The five guard files (baseline comparison by name)
+
+```text
+$ /usr/bin/python3 -m pytest tests/contract/test_expression_compatibility.py \
+    tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py \
+    tests/contract/test_confirmation_gates_sweep.py tests/contract/test_directory_governance.py \
+    -q --no-header -p no:cacheprovider --tb=no -rf
+1 failed, 120 passed, 1 warning in 2.26s
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+EXIT=1
+```
+
+The one failure is `baseline-failed.txt` line 3 — the recorded baseline name, not a new failure. The
+same reading was taken in round 1 (1 failed / 120 passed); no guard drifted.
+
+## 3 — Red-first proof for the two F4/F5 negatives
+
+The fixed engine is `skills/external/create-docs/scripts/docs-utils.py`; the pre-fix engine is
+`git show 37d93787:skills/external/create-docs/scripts/docs-utils.py`. The two tests were run in a
+sanctioned temp tree (`.specify/.tmp/087-review2`, removed after the run) against the pre-fix engine:
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py -q -k "c007_source_only or c010_html"
+FAILED tests/unit/test_docs_utils_obligation.py::test_c007_source_only_reference_is_not_satisfied
+FAILED tests/unit/test_docs_utils_obligation.py::test_c010_html_face_is_recognised
+2 failed, 38 deselected, 1 warning in 0.22s
+EXIT=1
+```
+
+Both tests pass against the fixed tree (inside the 124-passed run above). Red first, then green.
+
+## 4 — Fixture invariant and builder
+
+```text
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --check
+OK: 11 docs-obligation fixture spaces match their registered composition and bytes
+EXIT=0
+
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --help
+build_fixtures.py: error: unknown argument(s) ['--help']; accepted: --check | --rebuild
+EXIT=2
+$ git status --porcelain tests/fixtures/docs-obligation
+(empty)
+```
+
+`--check` is byte-exact (missing / unexpected / content drift) and unknown arguments are rejected
+before `build_all()`; the `--help` probe mutated nothing.
+
+## 5 — Closure acceptance check (ARC input)
+
+```text
+$ /usr/bin/python3 .specify/scripts/python/closure-acceptance-check.py \
+    --spec-dir .specify/specs/087-arch-diagram-docs
+verdict: accept
+spec_dir: …/.specify/specs/087-arch-diagram-docs
+flow_class: execution
+claimed_status: Planned
+final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+reason: none
+EXIT=0
+```
+
+`--json` payload: `completion_conditions` all true (`every_final_path_pass`, `no_open_rows`,
+`smoke_record_pass`, `status_row_per_criterion`); `smoke.records=1`, `smoke.exit_code=0`,
+`smoke.evidence_exists=true`; `tasks: closed=76 open=0`. Feature 087 still reads `Planned` in
+`.specify/memory/features.md:94` and `.specify/memory/features/087.md:6`.
+
+## 6 — Plan constraint audit (F9)
+
+```text
+$ /usr/bin/python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py --repo . \
+    --base 61e39e8f --head HEAD \
+    --plan-owned .specify/specs/087-arch-diagram-docs/plan.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/data-model.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/contracts/ \
+    --plan-owned .specify/specs/087-arch-diagram-docs/quickstart.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/research.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/feature-ref.md \
+    --declarations .specify/specs/087-arch-diagram-docs/test-evidence/plan-edit-declarations.txt
+"undeclared": false
+"classification": "declared"
+"touched_paths": [contracts/diagram-obligation.contract.md, contracts/flow-obligations.contract.md,
+                  data-model.md, feature-ref.md, plan.md, quickstart.md]
+"uncommitted_paths": []
+EXIT=0
+```
+
+Every touched plan-owned path is covered by a `PLAN-EDIT:` line; the interpreter-path edit is declared.
+
+## 7 — Mirror and command-copy parity
+
+```text
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+ok templates/ == .specify/templates/ (22 files)
+ok skills/external/ == .specify/skills/ (416 files)
+ok skills/internal/ == .specify/skills/internal/ (138 files)
+ok agents/ == .specify/agents/templates/ (16 files)
+ok scripts/ == .specify/scripts/ (121 files)
+ok shared/ == .specify/shared/ (94 files)
+EXIT=0
+
+$ /usr/bin/python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
+
+The new shipped reference `skills/external/create-docs/references/diagram-obligation.md` is mirrored
+byte-identically.
+
+## 8 — Scope disciplines
+
+```text
+$ git diff --name-only 24cb4edc..HEAD -- docs/
+docs/concepts/documentation-model.md
+EXIT=0
+
+$ git diff --name-only 24cb4edc..HEAD -- skills/external/draw-diagram/ | wc -l
+0
+
+$ git diff --name-only 24cb4edc..HEAD -- templates/commands/
+templates/commands/docs.md
+$ git diff --name-status 24cb4edc..HEAD -- templates/commands/ | grep '^A'
+(empty)
+```
+
+Exactly one `docs/` line, zero `draw-diagram` diff, no new command.
+
+## 9 — F21 / F22 probes
+
+```text
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action validate --root /nonexistent
+{"violations": []}
+EXIT=0
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation --root /nonexistent
+docs-utils.py: error: --root does not exist: /nonexistent
+EXIT=2
+```
+
+The missing-root check is scoped to `obligation`; the pre-existing actions keep their exit-0/empty
+payload behaviour. `removeprefix` / `is_relative_to` appear only in comments explaining their removal;
+no 3.9+ API is called.
+
+## 10 — F17 quickstart probes (residual found)
+
+```text
+$ # S3 step 1 (as printed in the command block)
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root tests/fixtures/docs-obligation/clean \
+    --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json \
+    --only docs/concepts/widget-overview.md --json
+EXIT=0  (satisfied/ reference-resolves)
+
+$ # S3 premises table, `clean/` row (as printed in the --record column)
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root tests/fixtures/docs-obligation/clean \
+    --record docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json \
+    --only docs/concepts/widget-overview.md --json
+docs-utils.py: error: --record is not readable: … clean/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json
+EXIT=2
+
+$ # S5 printed command
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root tests/fixtures/docs-obligation/exempt-superseded \
+    --record tests/fixtures/docs-obligation/exempt-superseded/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json --json
+docs-utils.py: error: --record is not readable: …/exempt-superseded/tests/fixtures/docs-obligation/exempt-superseded/docs/.speckit/runs/20261106T000000Z-aaaaaaaa-diagram-trace.json
+EXIT=2
+```
+
+The S3 command block is reproducible; the S3 premises table's `clean/` `--record` value and the S5
+command still carry the old record name and the repository-relative path that joins the root twice.
+F17 therefore remains partially open (P2).
+
+## 11 — Residual evidence for F2 / F13 / F26 / F27 / F28
+
+```text
+$ grep -n "不改.*docs/" .specify/specs/087-arch-diagram-docs/feature-ref.md
+72:- 本特性**不改**本仓 `docs/` 的内容（Two Hats：框架改动）；`.specify/` 只接受生成。
+# requirements.md:289 and plan.md:32/81 carry the FR-001 exception; feature-ref.md:72 does not.
+
+$ grep -n "templates/commands/docs.md" .specify/specs/087-arch-diagram-docs/feature-ref.md
+30: … `.specify/templates/commands/docs.md`，加四家 per-tool 命令副本 …
+# `.specify/templates/commands/` does not exist; plan.md:266 says the subtree is retired on both sides.
+
+$ grep -rn "specs/087-arch-diagram-docs" skills/external/
+(no match)
+$ grep -n "contracts/diagram-obligation.contract.md\|quickstart.md" skills/external/create-docs/SKILL.md
+61: … [`contracts/diagram-obligation.contract.md`](contracts/diagram-obligation.contract.md) …
+75: … executed per [`quickstart.md`](quickstart.md) S3 …
+$ ls skills/external/create-docs/contracts skills/external/create-docs/quickstart.md
+(absent)
+# The two remaining links resolve to nothing in a shipped skill; F6's primary defect is fixed but
+# these two spec-local links remain (F26).
+
+$ sed -n '4,6p' .specify/specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md
+**Declared owner of this contract**: this file. It owns … the closed `verdict` set, the closed `reason`
+set, the per-document **decision precedence** (`C-016`), … the traceability-record schema and the
+exemption-record schema.
+$ sed -n '3,6p' skills/external/create-docs/references/diagram-obligation.md
+**Owner of this file**: the two record formats and the verdict vocabulary …
+# Two authored owners for the same facts; the precedence tables also differ in row granularity
+# (contract C-016: 9 rows; shipped reference § 7: 8 rows, the trace-incomplete/no-trace-record pair
+# merged). F27.
+
+$ grep -n "post_change_commit" .specify/specs/087-arch-diagram-docs/verification.md
+29:post_change_commit=pending-this-round
+# templates/verification-log-template.md:89 expects [GIT_SHA_AT_RUN_END]. F28.
+```
+
+## 12 — Readings summary
+
+| Reading | Value |
+|---------|-------|
+| 087 five files | 124 passed / 0 failed, exit 0 |
+| Five guard files | 120 passed / 1 failed (recorded baseline `test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`), exit 1 |
+| Fixture check | OK: 11 spaces, bytes match; unknown flag exit 2; zero writes |
+| Closure verdict | `accept`; final_path pass=6 / 0 in every other bucket; 76/76 tasks closed |
+| Plan audit | `undeclared=false`, `classification=declared` |
+| Mirrors / copies | 6/6 pairs ok; command copies OK |
+| Scope | docs exactly one line; draw-diagram 0; no new command |
+| Red-first | 2 new negatives fail against `37d93787`'s engine, pass at `b06c93a7` |
+| Residual probes | F17 S3-table/S5 exit 2; F2/F13/F26/F27/F28 lines on disk |

@@ -5,10 +5,10 @@ source: "skill:manage-feedback"
 tags: ["run-determination", "r20261022t105731z-fbconsume"]
 title: "run-determination skill:manage-feedback r20261022T105731Z-fbconsume"
 created: "2026-10-22T11:43:34Z"
-summary: "skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
+summary: "skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
 ---
 
-skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
+skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
 
 ```json
 {
@@ -20,7 +20,7 @@ skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapse
   "feature": null,
   "feature_id": null,
   "determined_at": "2026-10-22T11:43:34Z",
-  "settled_at": null,
+  "settled_at": "2026-11-06T08:49:50Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -86,9 +86,9 @@ skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapse
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -160,18 +160,6 @@ skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapse
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -191,11 +179,6 @@ skill:manage-feedback run=r20261022T105731Z-fbconsume token=not_evaluated elapse
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

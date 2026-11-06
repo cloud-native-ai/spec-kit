@@ -6,10 +6,10 @@ feature: "083-mechanism-policy-separation"
 tags: ["run-determination", "r20261105t033420z-082a"]
 title: "run-determination /speckit.clarify r20261105T033420Z-082a"
 created: "2026-11-05T03:45:32Z"
-summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted"
+summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated"
 ---
 
-/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=accepted
+/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapsed=not_evaluated artifact=not_evaluated satisfaction=not_evaluated
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapse
   "feature": "083-mechanism-policy-separation",
   "feature_id": null,
   "determined_at": "2026-11-05T03:45:32Z",
-  "settled_at": "2026-11-06T04:13:47Z",
+  "settled_at": "2026-11-06T06:32:08Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -83,9 +83,9 @@ summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapse
       "evidence_refs": []
     },
     "satisfaction": {
-      "verdict": "accepted",
-      "reason": null,
-      "user_turn_class": "continuation_non_negative",
+      "verdict": "not_evaluated",
+      "reason": "no_user_input",
+      "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
         "source": "undeclared"
@@ -157,6 +157,18 @@ summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapse
         },
         "evidence_refs": [],
         "status": "observed"
+      },
+      {
+        "axis": "satisfaction",
+        "verdict": "not_evaluated",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
+        "signal": {
+          "key": "satisfaction",
+          "direction": "improve"
+        },
+        "evidence_refs": [],
+        "status": "observed"
       }
     ]
   },
@@ -176,6 +188,11 @@ summary: "/speckit.clarify run=r20261105T033420Z-082a token=not_evaluated elapse
       },
       {
         "observation": "artifact_correctness not_evaluated: failed-set diff not_evaluated added=None, green evidence not_evaluated uncovered=0 declared_checks=None collected=None reason=no_declared_checks",
+        "parked_via": "none",
+        "ref": null
+      },
+      {
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

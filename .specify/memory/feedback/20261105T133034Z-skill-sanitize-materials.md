@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-sanitize-materials-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-05T13:30:34Z"
 summary: "Executed the sanitize materials cleanup on the spec-kit workspace: 2,495 dead-reference findings plus 1 stale residue. Archived .specify/tools under the user's explicit cleanup request. A first blanke"
+introspection_ref: "introspection-20261106T084116Z#F-06"
+disposition_reason: "introspection:introspection-20261106T084116Z#F-06"
 ---
 
 ## Review

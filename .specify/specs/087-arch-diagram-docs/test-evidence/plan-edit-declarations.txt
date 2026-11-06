@@ -1,0 +1,26 @@
+# PLAN-EDIT declarations — 087-arch-diagram-docs, implement stage and review-repair round 1
+
+Plan constraint: `active@61e39e8f`. Every line below declares one plan-owned touch, in the form the
+audit script reads (`PLAN-EDIT:` + path + reason + `分类`). Semantic classification stays with the
+driver; these are the round's own claims, each `minor`.
+
+## Implement stage (commits 8d0e0ba9 … e17eee90)
+
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/plan.md — 实施期把镜像/命令副本的实测解释器由一次性 scratch venv `/tmp/087-toolenv/bin/python` 改为 `/usr/bin/python3`（同一 CPython 3.11.13 / pytest 9.2.0 / typer 0.27.3，实测命令记入 notes/pre-change-measurements.md 头部）；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/data-model.md — E4 的追溯记录文件名形态与 E6 的夹具不变量按 C-010 / 实施期实测对齐（R5 写、R6 只读；仓库副本 == 登记构成）；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/quickstart.md — 执行前提的解释器实测值订正；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md — C-010 钉死追溯记录文件名形态，删除 C-004 的五值顺序句（顺序唯一归 C-016）；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/contracts/flow-obligations.contract.md — 头部补 notation alias（`[D-nnn]` 是契约条款、`D-nnn` 是 register 残差记录）；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/feature-ref.md — 镜像路径订正为 `.specify/skills/<name>`（无 `external/` 层）并列出四家 per-tool 副本；分类=minor
+
+## Review-repair round 1 (this round)
+
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/plan.md — Constraints / Constitution XI / 实测表把「`docs/` 零改动」收窄为「唯一例外：FR-001 的读者投影」（F2 的 re-baseline 在下游的 requirements.md 声明，不是本文件的语义改动）；Mirror Obligations 的「新增两个测试文件」改为实际的四个；§ Residual Risk 的 `OI-087-01` 由未决改为已消解；fixture 预算行（493）改用 E6 的「仓库副本 == 登记构成」读法；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/data-model.md — E6 表 `orphan-rendered/` 行的构成补齐为实际的登记态（记录以源登记、`rendered` 为空）；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/quickstart.md — S3 判据表与命令块改成可复现形态（root-relative `--record`、`--only` 限定载体、stale 读数在 `tmp_path` 副本上），S3 的「删除前绿灯」叙事改为 E6 的登记构成读法；分类=minor
+
+## Closure bounded-repair round 1 (2026-11-06)
+
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/plan.md — § 测试预算 行的建造步骤名 `conftest` → `helpers.py`（夹具 helper 不是 pytest 夹具模块；`conftest.py` 遮蔽根 `tests/conftest.py`），并补一句遮蔽事实的理由；分类=minor（仅路径文本 + 一条理由，无判据/预算语义改动）
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/data-model.md — E6 下方散文的 `conftest.py` 建造步骤 → `helpers.py`；分类=minor
+- PLAN-EDIT: .specify/specs/087-arch-diagram-docs/quickstart.md — S3 注释里的 `conftest.apply_mtime_step` → `helpers.apply_mtime_step`；分类=minor

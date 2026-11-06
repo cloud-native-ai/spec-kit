@@ -1,7 +1,7 @@
 {
   "version": 1,
   "tool": "qoder",
-  "rendered_at": "20261106T131633Z",
+  "rendered_at": "20261106T161426Z",
   "entries": {
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -245,7 +245,7 @@
     },
     ".qoder/agents/sdd-analysis-worker.agent.md": {
       "source": "templates/sdd-analysis-worker.agent.md",
-      "sha256": "fe315b0a6c4082252e598193a8d40b38819bc4daee01b056b2d5f1fa1071289d"
+      "sha256": "b9b3f0f310d7c26c88667b3c97b72cfba412ee0da33bbd831580f72e61432647"
     },
     ".qoder/agents/sdd-checklist-worker.agent.md": {
       "source": "templates/sdd-checklist-worker.agent.md",

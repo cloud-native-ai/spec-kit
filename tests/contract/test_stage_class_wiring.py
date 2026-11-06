@@ -30,8 +30,10 @@ Owns the wiring-form and execution-zero-change assertions of
 * **C-011** the per-tool command copies carry the same subsection; the copy set
   is derived from the generator's own registry (``src/specify_cli``), never
   hard-coded here.
-* ``docs.md`` / ``humanize.md`` are the two other wiring entry points and MUST
-  keep their pre-077 bytes — this feature does not touch them.
+* ``docs.md`` / ``humanize.md`` are the two other wiring entry points: ``humanize.md``
+  MUST keep its pre-077 bytes, and ``docs.md`` carries no wiring card either — its
+  pinned bytes were refreshed once, by 087 T063 (2026-11-06, the obligation dispatch
+  段), so the guard still asserts "these entry points gain no wiring card".
 
 Red-first (Constitution IV): today the seven templates carry the wiring nowhere
 (measured: zero hits for ``flow_class|flow-class|expression`` in each of them), so
@@ -105,40 +107,30 @@ BASELINE_COMMIT = "c1cd4600"
 # criteria ... are owned by templates/feature-details-template.md § Canonical
 # Status State Machine"), outside the 077 card and in that sentence's semantic
 # home.  The pinned value is again the card strip, not the file's bytes.
-#
-# 2026-11-06 Feature 087 re-measures all seven rows at once.  `probe-utils.py
-# --action compile-embeds` re-derives every compiled Wrap-up banner from the one
-# registry fingerprint, so a registry addition (the `speckit-status-wrapup`
-# Object and the status/measure `h-docs-sync-eval` bindings) rewrites the banner
-# in every command template and every skill — including these seven.  The guard's
-# shape is unchanged and still judges exactly what it always judged: a card strip
-# must restore the pinned bytes.  Cross-checked against `git show d91ef91c:` (the
-# commit before the recompile), where all seven pinned values still measured
-# green, so the movement is the recompile's and nothing else: measured
-# `git diff d91ef91c -- templates/commands/<stem>.md` is exactly two lines per
-# file — the banner's fingerprint — and the card strip (which has always held the
-# same banner) restores those bytes for the reason it always has.
 BASELINE_SHA256 = {
-    "requirements": "afe094ea61eaeac6e8c5aeac10435b9c0aa4d1da5e39167fddab462a8b601fb4",
-    "clarify": "63441a05e923dac1f8dd30533c97ed38c54e67baa459e4a18ee17cc245dbad7e",
-    "plan": "720a470def7bb6a136766386fe8972346cd2a59f1f7d0e3eb48610027414d0cd",
-    "tasks": "bad18f749cbba7fc05c05a92581aa51524ebb4a4b3986d572596834d521bdc70",
-    "checklist": "0cdc5a68fd5da04f08df2a07093f6c005dce4201ccefb50fd73e528b769f931f",
-    "analyze": "45288d99f2b6c4561cf9c06bb6f4dee30d1f085622b869fb2e592335422a3a0c",
-    "implement": "e836ad4a683050d781557a61c042cb7ac7ef36a1ab61de292271db80a83269f5",
+    "requirements": "31d0e1b43079a35f87c35029053ecee8557b75a282a5949079e2f90c6701a82b",
+    "clarify": "baf687495d7f5bee1befbb61941aa348085148fe047c15360222e0ecab95cb92",
+    "plan": "1833be4a713f7b9cc80f6953303428469e095f9f3efb9472dff225ec835f485c",
+    "tasks": "08f64367d89b046904112532453eba4323b6faf7b67a4920d20a6200e55d6e9e",
+    "checklist": "f3ca6423354cc0e687586261efc7810faeefaaea560f034edd28e89a17599b69",
+    "analyze": "31dc261d9bf76243e4a50af62909dbb0c07fd7aa555ebf6acc0970c2eff8151b",
+    "implement": "3282de6a7843ea6eb369046ab5d01df0819b842257bd6bd37f651cc49e9d54a2",
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
 # humanize re-measured 2026-10-31 (079 WC-13): the template was rewritten by 079,
 # then its short-description was shortened to satisfy the 50-char frontmatter guard.
 # feature 079 (run-then-report repositioning + breaking-change/migration block),
-# so its pinned bytes move with that rewrite; docs is untouched.
-# 2026-11-06 Feature 087 (d41d0ced): `docs` is re-measured for the same single
-# cause the seven stage rows above name — its only delta against d91ef91c is the
-# compiled Wrap-up banner's fingerprint (one line, measured). `humanize` did not
-# move and keeps its 079-dated value.
+# so its pinned bytes move with that rewrite.
+#
+# docs is no longer "untouched" — 087 T063 (2026-11-06) legitimately edits
+# `templates/commands/docs.md`: it adds the obligation dispatch段 (the
+# `--action obligation` entry the create-docs skill gains) and restates the five
+# counts the dispatch carries. The guard's assertion is unchanged — the pin was
+# refreshed to the post-087 bytes because the edit is part of this feature, not a
+# drift; humanize's pin stays byte-identical.
 UNCHANGED_SHA256 = {
-    "docs": "d91467bcbbdd448fcd8d3b56fcd32b8050e450089aa3439d5e48c8731a24f6c1",
+    "docs": "533dfba053e0d6f87ee4d5e97c8e3c4e8344e1dc07542b82b263c94ba288f41a",
     "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
 }
 
@@ -395,8 +387,9 @@ def test_clarify_is_inside_and_the_other_entry_points_are_untouched():
         path = _stage_path(stem)
         assert path.is_file(), "sentinel: %s moved" % path.relative_to(REPO_ROOT)
         assert _sha256_text(_read(path)) == UNCHANGED_SHA256[stem], (
-            "%s is a pre-077 wiring entry point and must keep its bytes in this "
-            "feature" % path.relative_to(REPO_ROOT)
+            "%s is a non-wiring entry point whose bytes are pinned; a mismatch "
+            "means either an unregistered edit or a stale pin (see UNCHANGED_SHA256)"
+            % path.relative_to(REPO_ROOT)
         )
 
 

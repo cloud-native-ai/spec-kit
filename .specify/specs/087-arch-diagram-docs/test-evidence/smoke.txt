@@ -1,0 +1,23 @@
+# 087-arch-diagram-docs — smoke record (main flow: the obligation sweep over the fixture spaces)
+
+Command (verbatim, single line):
+
+    /usr/bin/python3 -m pytest tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_carriers.py tests/unit/test_docs_utils_obligation.py tests/integration/test_docs_obligation_scenarios.py tests/integration/test_docs_command_scenarios.py -q
+
+Exit code: 0
+
+Output (real, verbatim tail):
+
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    124 passed, 1 warning in 4.88s
+
+Why this is the feature's main flow, not the suite: the five files are the whole surface this feature
+delivers — the engine's judgement (`test_docs_utils_obligation.py`), the carrier set
+(`test_docs_utils_carriers.py`), the fixture-space verdicts (`test_docs_obligation_scenarios.py`), the
+flow-side wiring in the two skills and the command template (`test_docs_command_scenarios.py`), and the
+reuse/containment guards (`test_docs_obligation_reuse.py`). Nothing outside these five files changes
+behaviour in this feature; the wider suite is the driver's baseline slot, not this record.
+
+Recorded by the review-repair round (2026-11-06). The same command read `121 passed` at the review
+smoke before this round's repairs; the three added tests are the F4/F24 negative cases recorded in
+`test-evidence/review-repair.txt`.

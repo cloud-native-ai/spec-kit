@@ -1,0 +1,251 @@
+# Review round 3 — evidence (087-arch-diagram-docs, 2026-11-06)
+
+- Object: the round-2 residuals F2/F13/F17/F26/F27/F28 after the final small repair `4fb0f1aa`
+- Heads: base `24cb4edc`; review-repair `b06c93a7`; round-2 record `6ecf00a3`; round-3 fix `4fb0f1aa`
+- Scope of this round: focused recheck of the six named residuals, the four segment verdicts, the
+  regression set and the Acceptance Reality Check. Review artifacts only; no product code, spec source,
+  plan-owned file or test was modified by this round.
+- Interpreter: `/usr/bin/python3` (CPython 3.11.13); pytest 9.2.0
+
+## 1 — The five 087 test files (targeted; not the full suite)
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_utils_obligation.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+124 passed, 1 warning in 4.88s
+EXIT=0
+```
+
+## 2 — The five guard files (baseline comparison by name)
+
+```text
+$ /usr/bin/python3 -m pytest tests/contract/test_expression_compatibility.py \
+    tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py \
+    tests/contract/test_confirmation_gates_sweep.py tests/contract/test_directory_governance.py \
+    -q --no-header -p no:cacheprovider --tb=no -rf
+1 failed, 120 passed, 1 warning in 2.23s
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+EXIT=1
+```
+
+The one failure is `baseline-failed.txt` line 3 — the recorded baseline name, not a new failure. The
+same reading was taken in rounds 1–2 (1 failed / 120 passed); no guard drifted.
+
+## 3 — Fixture invariant and builder
+
+```text
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --check
+OK: 11 docs-obligation fixture spaces match their registered composition and bytes
+EXIT=0
+
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --help
+EXIT=2   (unknown argument rejected before build_all)
+$ git status --porcelain tests/fixtures/docs-obligation
+(empty)
+```
+
+## 4 — Closure acceptance check (ARC input)
+
+```text
+$ /usr/bin/python3 .specify/scripts/python/closure-acceptance-check.py \
+    --spec-dir .specify/specs/087-arch-diagram-docs
+verdict: accept
+spec_dir: …/.specify/specs/087-arch-diagram-docs
+flow_class: execution
+claimed_status: Planned
+final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+reason: none
+EXIT=0
+```
+
+`--json` payload: `completion_conditions` all true (`every_final_path_pass`, `no_open_rows`,
+`smoke_record_pass`, `status_row_per_criterion`); `smoke.records=1`, `smoke.exit_code=0`,
+`smoke.evidence_exists=true`; `tasks: closed=76 open=0 in_progress=0 deferred=0`.
+
+## 5 — Plan constraint audit
+
+```text
+$ /usr/bin/python3 skills/external/sdd-loop-driver/scripts/audit-plan-changes.py --repo . \
+    --base 61e39e8f --head HEAD \
+    --plan-owned .specify/specs/087-arch-diagram-docs/plan.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/data-model.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/contracts/ \
+    --plan-owned .specify/specs/087-arch-diagram-docs/quickstart.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/research.md \
+    --plan-owned .specify/specs/087-arch-diagram-docs/feature-ref.md \
+    --declarations .specify/specs/087-arch-diagram-docs/test-evidence/plan-edit-declarations.txt
+"undeclared": false
+"classification": "declared"
+"touched_paths": [contracts/diagram-obligation.contract.md, contracts/flow-obligations.contract.md,
+                  data-model.md, feature-ref.md, plan.md, quickstart.md]
+"uncommitted_paths": []
+EXIT=0
+```
+
+The round-2 edits to `quickstart.md` and `contracts/diagram-obligation.contract.md` are covered by the
+existing `PLAN-EDIT:` lines.
+
+## 6 — Mirror and command-copy parity
+
+```text
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+ok templates/ == .specify/templates/ (22 files)
+ok skills/external/ == .specify/skills/ (416 files)
+ok skills/internal/ == .specify/skills/internal/ (138 files)
+ok agents/ == .specify/agents/templates/ (16 files)
+ok scripts/ == .specify/scripts/ (121 files)
+ok shared/ == .specify/shared/ (94 files)
+EXIT=0
+
+$ /usr/bin/python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+EXIT=0
+```
+
+The shipped reference is mirrored byte-identically:
+
+```text
+$ cmp .specify/skills/create-docs/references/diagram-obligation.md \
+      skills/external/create-docs/references/diagram-obligation.md
+(no output; BYTE_IDENTICAL)
+```
+
+The bare `python3` on this host is a venv without `typer` and yields a false red on the copy check;
+`/usr/bin/python3` is the interpreter the plan declares for the mirror obligation.
+
+## 7 — Scope disciplines
+
+```text
+$ git diff --name-only 24cb4edc..HEAD -- docs/
+docs/concepts/documentation-model.md
+$ git diff --name-only 24cb4edc..HEAD -- skills/external/draw-diagram/ | wc -l
+0
+$ git diff --name-only 24cb4edc..HEAD -- templates/commands/
+templates/commands/docs.md
+```
+
+Exactly one `docs/` path, zero `draw-diagram` diff, no new command. Feature 087 still reads `Planned`
+(`.specify/memory/features.md:94`; `.specify/memory/features/087.md:6`).
+
+## 8 — F17 quickstart probes
+
+```text
+# S3 step 1 — clean, narrow to the one carrier
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root tests/fixtures/docs-obligation/clean \
+    --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json \
+    --only docs/concepts/widget-overview.md --json
+doc: satisfied / reference-resolves
+summary: satisfied=1 missing=0 stale=0 exempted=0 not_evaluated=0 converged=true clean=true
+EXIT=0   # matches the printed expectation
+
+# S3 step 2 — orphan-rendered
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root tests/fixtures/docs-obligation/orphan-rendered \
+    --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
+doc: missing / orphan-rendered
+summary: missing=6 converged=false clean=false
+EXIT=0   # matches the printed expectation
+
+# S3 step 3 — stale-source, exactly the printed recipe
+$ SPACE="$(mktemp -d)/space-stale-source" && cp -R tests/fixtures/docs-obligation/stale-source "$SPACE"
+$ stat -c '%n %y' "$SPACE"/docs/assets/*
+…/docs/assets/widget.mmd 2026-11-06 18:52:23.333209400 +0800
+…/docs/assets/widget.png 2026-11-06 18:52:23.333209400 +0800
+…/docs/assets/widget.svg 2026-11-06 18:52:23.333209400 +0800
+$ /usr/bin/python3 skills/external/create-docs/scripts/docs-utils.py --action obligation \
+    --root "$SPACE" \
+    --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
+doc: satisfied / reference-resolves
+summary: satisfied=1 missing=5 stale=0 converged=false clean=false
+EXIT=0   # printed expectation is stale / source-newer-than-render — MISMATCH (F17 residual)
+```
+
+The printed copy leaves all three faces with one identical mtime; the engine's rule is
+`source_mtime > min(rendered_mtimes)`. The inequality only exists after `conftest.apply_mtime_step`
+(`tests/fixtures/docs-obligation/conftest.py:71`) runs inside the test harness — the printed block does
+not invoke it, so the step cannot reproduce its stated verdict. The S3 premises table's `stale-source/`
+row (quickstart.md:129) states the same copy-time fact as a repository-form premise.
+
+```text
+# S5 — three exemption spaces, as printed
+$ … --root tests/fixtures/docs-obligation/exempt-ok --only docs/concepts/widget-overview.md --json
+doc: recorded-exemption / exempt-chronological ; exempted=1 converged=true clean=false ; EXIT=0
+$ … --root tests/fixtures/docs-obligation/exempt-bad --json
+doc: not-evaluated / exemption-invalid ; not_evaluated=1 converged=false ; EXIT=0
+$ … --root tests/fixtures/docs-obligation/exempt-superseded \
+      --record docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json --json
+doc: not-evaluated / exemption-invalid ; exemption_superseded=1 converged=false ; EXIT=0
+```
+
+All three S5 readings match their printed expectations. The old record name and the double-root
+`--record` form are gone from S3/S5:
+
+```text
+$ grep -n "000000Z-aaaaaaaa" .specify/specs/087-arch-diagram-docs/quickstart.md
+(no match)
+$ grep -c "docs/.speckit/runs/20261106T090000Z-0870a1b2-diagram-trace.json" \
+    .specify/specs/087-arch-diagram-docs/quickstart.md
+8
+```
+
+## 9 — F2 / F13 / F26 / F27 / F28 evidence
+
+```text
+$ grep -n "唯一例外" .specify/specs/087-arch-diagram-docs/{requirements.md,plan.md,feature-ref.md}
+requirements.md:289  …（唯一例外：FR-001 要求的 docs/concepts/documentation-model.md 读者投影）…第二个被改动的路径即违约
+plan.md:32           …唯一例外是 FR-001/T064 交付的 docs/concepts/documentation-model.md 读者投影…
+plan.md:81           …（唯一例外：FR-001 的读者投影）…
+feature-ref.md:72    …唯一例外是 FR-001/T064 交付的 docs/concepts/documentation-model.md 读者投影…
+# F2 closed: the same one-file exception at all three sites; requirements.md has zero diff since
+# 6ecf00a3 (the exception landed as a single Out-of-Scope line at b06c93a7; FR/SC text unchanged).
+
+$ grep -n "templates/commands" .specify/specs/087-arch-diagram-docs/feature-ref.md
+25: … templates/commands/docs.md § Outline …          (the source row, unchanged)
+30: … .specify/skills/create-docs/**、.specify/skills/improve-docs/**，加四家 per-tool 命令副本…
+    … .specify/templates/commands/ 子树已退役 … 来源是 templates/commands/docs.md …
+55: … SC-009 的精确 node id …
+$ ls .specify/templates/commands              → No such file or directory
+$ ls templates/commands/docs.md              → exists (the per-tool copies' source)
+# F13 closed: the retired .specify/templates/commands/docs.md is no longer listed as a generated copy.
+
+$ grep -rn "specs/087" skills/ .specify/skills/          → (no match)
+$ grep -noE '\]\([^)]+\)' skills/external/create-docs/SKILL.md skills/external/improve-docs/SKILL.md
+  create-docs/SKILL.md: ../../shared/patterns/reconcile-pattern.md
+                         references/diagram-obligation.md (lines 62, 63, 75)
+                         ../../shared/patterns/explicit-implicit-pattern.md
+  improve-docs/SKILL.md: ../create-docs/references/diagram-obligation.md
+# F26 closed: every remaining link resolves inside the shipped skill tree or the shipped shared tree.
+
+$ sed -n '1,26p' skills/external/create-docs/references/diagram-obligation.md
+  "What this file is: the client-facing projection …"
+  "What this file is NOT: a design record … owned by the framework repository's contracts/diagram-obligation.contract.md …"
+  "five verdicts here, six criterion statuses there, and the two are not interchangeable"
+$ sed -n '12,20p' .specify/specs/087-arch-diagram-docs/contracts/diagram-obligation.contract.md
+  "Same facts, second carrier — and which one is the owner … this file is the design record and
+   stays the owner … where the two disagree the projection is the defect."
+$ grep -c '^| [0-9]* |' skills/external/create-docs/references/diagram-obligation.md
+9
+# F27 closed: 9-row precedence one-for-one with C-016 (orders 6/7 unmerged), five verdicts, one owner.
+
+$ grep -n "post_change_commit" .specify/specs/087-arch-diagram-docs/verification.md
+39:post_change_commit=b06c93a7
+# F28 closed: a real commit SHA, the commit whose run produced the readings (line shifted by the
+# round-2 note added above it).
+```
+
+## 10 — Readings summary
+
+| Reading | Value |
+|---------|-------|
+| 087 five files | 124 passed / 0 failed, exit 0 |
+| Five guard files | 120 passed / 1 failed (recorded baseline `test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`), exit 1 |
+| Fixture check | OK: 11 spaces, bytes match; unknown flag exit 2; zero writes |
+| Closure verdict | `accept`; `final_path pass=6` / 0 in every other bucket; 76/76 tasks closed |
+| Plan audit | `undeclared=false`, `classification=declared` |
+| Mirrors / copies | 6/6 pairs ok; command copies OK |
+| Scope | docs exactly one line; draw-diagram 0; no new command |
+| S3 step 1 / step 2 / S5 (3 commands) | reproduce their printed verdicts, exit 0 |
+| S3 step 3 (as printed) | **satisfied**, printed expectation stale — F17 residual (P2) |
+| Residual line probes | F2/F13/F26/F27/F28 all move to closed |

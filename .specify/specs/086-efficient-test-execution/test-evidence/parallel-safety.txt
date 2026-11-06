@@ -1,0 +1,82 @@
+# 086 T014 — Parallel safety against the T050 baseline slot
+
+Owner of the proposition: `tasks.md` T014 / T015 and
+`contracts/dogfood-and-preservation.contract.md` C-045, C-047.
+**This file records the measurement only.** The per-name disposition C-045 asks for is
+`test-evidence/parallel-safety-attribution.md` (T015, a different row, not claimed here).
+
+The comparison referent is the implementation-start baseline slot taken **before** any source edit —
+`test-evidence/baseline-failed.txt` (T050). It was not rewritten here.
+
+## Command (out-of-slot-exception, per T054)
+
+```
+env -u PYTHONPATH SPECKIT_PYTHON=/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python \
+  bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/us1-parallel.txt -q
+```
+
+Worktree: `/Users/liuqiming.lqm/tmp/spec-kit/086/worktrees/086-wp-c1`, branch `line/086-wp-c1`,
+base `ac8d5dcf` with WP-A1/A4/B2/B3 integrated. Executed by WP-C1. `PYTHONPATH` cleared (A20);
+`SPECKIT_PYTHON` points at the main-tree `.venv` because a worktree has no `.venv`.
+
+## Environment A13 requires this record to name (H-02)
+
+| field | value |
+|---|---|
+| interpreter | `/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/bin/python` (CPython 3.14.6) |
+| pytest | 9.2.0 |
+| pytest-xdist | 3.8.0 |
+| `os.cpu_count()` | 18 (`uname -m` = arm64) |
+| workers / dist resolved | `workers=auto` (expands to 18 on this host) / `dist=load` |
+| passes | **2** (`# test runner exceptions: 1 declared serial test(s)`) |
+| host | macOS arm64, 18 logical CPUs |
+
+## Result
+
+```
+# test runner: <venv>/python -m pytest -n auto --dist load -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+19 failed, 7533 passed, 7 skipped, 55 warnings in 206.12s (0:03:26)      <- parallel pass (-m "not serial")
+1 passed, 7559 deselected, 3 warnings in 35.08s                          <- serial pass (-n0 -m serial)
+# failed-name list written: .specify/.tmp/086/us1-parallel.txt (19 entries) passes=2
+```
+
+- **Exit code: 1** (one pass failed; the serial pass was green).
+- **Wall clock, parallel pass: 206.12 s** (from that run's own pytest summary line). The serial exception
+  pass is reported separately (35.08 s) and is **not** added into a single "total" figure that the
+  runner did not print.
+- Same-selection serial reference: the T050 baseline slot, **687.41 s** (same selection, pre-change
+  runner). Ratio of the parallel pass to that reading: **0.30×** (206.12 / 687.41), i.e. the parallel
+  default ran at 30% of the recorded serial wall clock on this host.
+- `--names-out` entry count: **19**, `passes=2` — one combined list, not one per pass.
+
+## Name-level diff, both directions (C-047 shape)
+
+```
+$ comm -13 <(sort -u test-evidence/baseline-failed.txt) <(sort -u .specify/.tmp/086/us1-parallel.txt)
+   (no output)
+
+$ comm -23 <(sort -u test-evidence/baseline-failed.txt) <(sort -u .specify/.tmp/086/us1-parallel.txt)
+   (no output)
+```
+
+- `comm -13` (**new names introduced by the parallel default**): **empty — 0 names**.
+- `comm -23` (**names the baseline carried that the parallel run no longer carries**): **empty — 0
+  names**. Nothing is claimed as "fixed by this feature"; there is nothing to claim.
+- Counts: baseline `19` / parallel `19`, and the two sorted sets are equal.
+
+## The declared serial exception
+
+`tests/contract/test_sdd_loop_driver_skill.py::test_c22_watch_target_hook_selftest` is excluded from the
+parallel pass by the registered `serial` marker and re-run in the second pass, which collected
+`1 passed, 7559 deselected`. It is the **only** member: the same enumeration over the whole tree lists one
+node id. It does not appear in either list because it **passes** — the marker changed where it runs, not
+whether it runs or whether a defect in it would reach the exit code.
+
+## Self-attribution (T015 input, recorded honestly)
+
+The full parallel run matches the serial baseline by name *after the marker was applied*: `comm -13` is
+empty, so the single parallel-only failure that `research.md` B-4 recorded before the marker
+(`test_c22_watch_target_hook_selftest`, a parallel-load timeout) is no longer a name diff at all — it is a
+declared exception that passes serially. The unattributed count this file supports is therefore **0**; the
+disposition table itself belongs to T015.

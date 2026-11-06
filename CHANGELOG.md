@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Feature 086 (efficient test execution — concurrent by default)**: the canonical test runner
+  gains a parallel-first execution model — when a parallel engine is available the suite runs
+  across worker processes by default, with `--serial`, `--workers N|auto`, an automatic
+  serial run inside an already-parallel worker, and a named serial fallback on the stderr
+  header when the engine is absent. `--names-out`, the stderr header, exit codes and the
+  comment-only `comm -13` discipline are preserved on both paths. The principle "coverage is
+  necessary but not sufficient — test execution efficiency is a quality attribute of the same
+  rank" lands as a shipped owner guideline (`shared/guidelines/test-execution-efficiency.md`)
+  with pointers from the constitution (template + live), the instructions (template + live)
+  and the constitution generator's MUST-include list. The driver's budget ledger parser learns
+  the parallel switches so an explicitly parallel full run is not dropped from the ledger.
+  085's temporary Goal/Team and multi-agent concurrency mechanisms are preserved unchanged and
+  exercised by this feature's own run. Requirements: `.specify/specs/086-efficient-test-execution/requirements.md`.
 - **Feature 083 (meta-skill governance: mechanism/policy separation + skill-reference
   normalization)**: two framework owners — `shared/definitions/mechanism-policy-definitions.md`
   (boundary test, misplacement symptoms, archival rules, consumption contract, meta-layer

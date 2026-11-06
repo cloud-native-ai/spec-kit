@@ -1,0 +1,582 @@
+# T050 pre-change serial baseline
+# command: env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q
+# captured: 2026-11-06T05:18:14Z
+# PYTHONPATH cleared: /Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/src:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib:/Users/liuqiming.lqm/project/profiles/script/python
+# python: Python 3.14.6
+# pytest: pytest 9.2.0
+# xdist: 3.8.0
+# cpu: 18
+# uname: arm64
+# git: f3279c6e
+# test runner: .venv/bin/python -m pytest -q
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+.............F.......................................................... [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+...................................F.................................... [  9%]
+..............................................s......................... [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+................................F....................................... [ 16%]
+.....................................ssss..s............................ [ 17%]
+..................................F.FFFF................FF.............. [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+......................................................................F. [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+..................................FF.................................... [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........F............................................................... [ 51%]
+........................................................................ [ 52%]
+..........................F............................................. [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+.............................................................F.......... [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+.................................................F...................... [ 73%]
+........................................................................ [ 74%]
+.............................................F.......................... [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+......................................................................F. [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+.....................................................................s.. [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.............                                                            [100%]
+=================================== FAILURES ===================================
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+___________________ test_residual_total_within_sc002_target ____________________
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+_ TestCF13FeedbackPackageExclusion.test_package_zip_contains_no_evidence_paths _
+
+self = <contract.test_evidence_findings_schema.TestCF13FeedbackPackageExclusion object at 0x113ab8f50>
+artifacts = {'findings': {'schemaVersion': 1, 'kind': 'speckit.evidence-findings', 'target': 'project', 'runId': 'ev-20261106-0521...cjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/evidence0/ws/.specify/memory/evidence/ev-20261106-052108-project'), ...}
+
+    def test_package_zip_contains_no_evidence_paths(self, artifacts):
+        workspace = artifacts["workspace"]
+        feedback_utils = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+        subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "reindex",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        result = subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "package", "--all",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        assert result.returncode == 0, result.stderr
+        packages_dir = workspace / ".specify" / "memory" / "feedback" / "packages"
+        zips = sorted(packages_dir.glob("feedback-*.zip"))
+>       assert zips, "package produced no zip in the isolated workspace"
+E       AssertionError: package produced no zip in the isolated workspace
+E       assert []
+
+tests/contract/test_evidence_findings_schema.py:223: AssertionError
+____________ TestLLMCollection.test_endpoint_candidates_origin_only ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x113b7f110>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_endpoint_candidates_origi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_endpoint_candidates_origi0/home')
+
+    def test_endpoint_candidates_origin_only(self, ws, fake_home):
+        # the whitelist is read from the HOST process environ, so the values
+        # must be planted on the impersonated host (the wrapper), not the
+        # engine's own env
+        result = run_via_host_wrapper(
+            collect_args(ws),
+            env_home=fake_home,
+            extra_env={"ANTHROPIC_BASE_URL": "https://user:pw@api.example.com/v1/path?k=1",
+                       "DASHSCOPE_API_URL": "https://dashscope.example.com/compatible/v1"},
+        )
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        endpoints = record["llm"]["endpoint_candidates"]
+>       assert isinstance(endpoints, dict), f"expected candidate mapping: {endpoints!r}"
+E       AssertionError: expected candidate mapping: 'not_evaluated'
+E       assert False
+E        +  where False = isinstance('not_evaluated', dict)
+
+tests/contract/test_exec_quant_engine.py:518: AssertionError
+____________ TestLLMCollection.test_qoder_adapter_reads_config_face ____________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x113bf8c30>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_qoder_adapter_reads_confi0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_qoder_adapter_reads_confi0/home')
+
+    def test_qoder_adapter_reads_config_face(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "gfmodel",
+                      "preferences": {"gfmodel": {"contextWindow": 1000000}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:544: AssertionError
+_____ TestLLMCollection.test_qoder_adapter_reads_per_model_effort_when_set _____
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x113bf8d60>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_qoder_adapter_reads_per_m0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_qoder_adapter_reads_per_m0/home')
+
+    def test_qoder_adapter_reads_per_model_effort_when_set(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "qmodel_38max",
+                      "preferences": {"qmodel_38max": {
+                          "contextWindow": 1000000,
+                          "reasoning": {"enabled": True, "effort": "xhigh"}}}}}),
+            encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        llm = load_single_record(ws)["llm"]
+>       assert llm["reasoning_effort"] == {"value": "xhigh", "provenance": "measured"}
+E       AssertionError: assert 'not_evaluated' == {'value': 'xhigh', 'provenance': 'measured'}
+
+tests/contract/test_exec_quant_engine.py:565: AssertionError
+________ TestLLMCollection.test_missing_config_face_degrades_to_marker _________
+
+self = <contract.test_exec_quant_engine.TestLLMCollection object at 0x113bd8b90>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_missing_config_face_degra0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_missing_config_face_degra0/home')
+
+    def test_missing_config_face_degrades_to_marker(self, ws, fake_home):
+        # fake HOME has no .qoder/ at all — the adapter finds nothing
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+>       assert record["agent"]["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:572: AssertionError
+_______ TestAgentCollection.test_resolved_agent_fields_from_wrapper_host _______
+
+self = <contract.test_exec_quant_engine.TestAgentCollection object at 0x113b7f390>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_resolved_agent_fields_fro0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_resolved_agent_fields_fro0/home')
+
+    def test_resolved_agent_fields_from_wrapper_host(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        agent = record["agent"]
+>       assert agent["resolution"] == "resolved"
+E       AssertionError: assert 'unresolved' == 'resolved'
+E         
+E         - resolved
+E         + unresolved
+E         ? ++
+
+tests/contract/test_exec_quant_engine.py:585: AssertionError
+_______ TestSizeCap.test_oversized_record_is_field_truncated_and_capped ________
+
+self = <contract.test_exec_quant_engine.TestSizeCap object at 0x113b7fd90>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_oversized_record_is_field0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_oversized_record_is_field0/home')
+
+    def test_oversized_record_is_field_truncated_and_capped(self, ws, fake_home):
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home,
+                                      wrapper_args=("x" * 70000,))
+        assert result.returncode == 0, result.stderr
+        entry_files = record_files(ws)
+        assert len(entry_files) == 1, f"expected one entry file, found {entry_files}"
+        line = entry_files[0].read_text(encoding="utf-8").splitlines()[0]
+        assert len(line.encode("utf-8")) <= 64 * 1024 + 1, "record must fit the cap"
+        record = json.loads(line)
+>       assert record["truncated"], "truncation must be annotated in the record"
+E       AssertionError: truncation must be annotated in the record
+E       assert []
+
+tests/contract/test_exec_quant_engine.py:836: AssertionError
+___ TestCredentialDefense.test_engine_masks_credential_shaped_config_values ____
+
+self = <contract.test_exec_quant_engine.TestCredentialDefense object at 0x113b7fed0>
+ws = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_engine_masks_credential_s0/ws')
+fake_home = PosixPath('/private/var/folders/d1/243gzhtd0pvdfsg1jl8jfcjm0000gn/T/pytest-of-liuqiming.lqm/pytest-429/test_engine_masks_credential_s0/home')
+
+    def test_engine_masks_credential_shaped_config_values(self, ws, fake_home):
+        settings = fake_home / ".qoder" / "settings.json"
+        settings.parent.mkdir(parents=True)
+        settings.write_text(json.dumps({
+            "model": {"name": "sk-0123456789abcdef0123",
+                      "preferences": {"sk-0123456789abcdef0123": {
+                          "contextWindow": 1000000}}}}), encoding="utf-8")
+        result = run_via_host_wrapper(collect_args(ws), env_home=fake_home)
+        assert result.returncode == 0, result.stderr
+        record = load_single_record(ws)
+        serialized = json.dumps(record)
+        assert "sk-0123456789abcdef0123" not in serialized, \
+            "credential-shaped value must be masked before write"
+>       assert "[masked-credential:" in serialized, "mask must be annotated in place"
+E       AssertionError: mask must be annotated in place
+E       assert '[masked-credential:' in '{"kind": "speckit.exec-quant", "schema_version": 2, "unit_id": "/speckit.plan", "unit_type": "command", "run_id": "sp...d", "satisfaction": "not_evaluated", "exit_code": "not_evaluated"}, "qualification": "not_evaluated", "truncated": []}'
+
+tests/contract/test_exec_quant_engine.py:866: AssertionError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1948: AssertionError
+___ TestLiveSurfacesAreMigrated.test_no_live_face_file_retains_the_old_path ____
+
+self = <contract.test_goal_migration.TestLiveSurfacesAreMigrated object at 0x113fbbee0>
+
+    def test_no_live_face_file_retains_the_old_path(self):
+        """Catches live surfaces the explicit list above does not enumerate."""
+        offenders = [
+            p for p in _tracked_files_containing(OLD_PATH_NEEDLE)
+            if not _is_historical(p) and not _is_guard(p)
+        ]
+>       assert offenders == [], (
+            "live-face files still reference the pre-migration path "
+            f"(historical faces and the {len(GUARD_FILES)} migration guards are "
+            "excluded by design):\n  " + "\n  ".join(offenders)
+        )
+E       AssertionError: live-face files still reference the pre-migration path (historical faces and the 4 migration guards are excluded by design):
+E           .specify/.tmp/086/baseline.log
+E           .specify/.tmp/086/parallel.log
+E           .specify/.tmp/hk-20261105T130452Z/sanitize.json
+E           .specify/.tmp/hk-sanitize-apply.json
+E           .specify/.tmp/test-parallel-eval/full-parallel.log
+E           .specify/.tmp/test-parallel-eval/full-serial.log
+E       assert ['.specify/.t...l-serial.log'] == []
+E         
+E         Left contains 6 more items, first extra item: '.specify/.tmp/086/baseline.log'
+E         Use -v to get more diff
+
+tests/contract/test_goal_migration.py:123: AssertionError
+_ TestHistoricalFacesArePreserved.test_the_user_directive_quoting_the_old_path_survives_verbatim _
+
+self = <contract.test_goal_migration.TestHistoricalFacesArePreserved object at 0x114035f90>
+
+    def test_the_user_directive_quoting_the_old_path_survives_verbatim(self):
+        spec = REPO_ROOT / ".specify/specs/037-goal-registry/requirements.md"
+        text = spec.read_text(encoding="utf-8")
+>       assert "使用.specify/goal/收编.specify/project/goal/" in text, (
+            "the 2026-08-04 user directive quoting the old path must remain verbatim "
+            "in the Clarifications record; rewriting it falsifies history"
+        )
+E       AssertionError: the 2026-08-04 user directive quoting the old path must remain verbatim in the Clarifications record; rewriting it falsifies history
+E       assert '使用.specify/goal/收编.specify/project/goal/' in '# Requirements Specification: Goal 作为项目级一等概念(goal 定义归档 + 团队引用 + 单一撰写入口 + 多团队协调)\n\n**Requirement Branch**: `037-goal-... `tasks.md` 后将自动恢复通过。该测试同时验证了 `Related Feature` 绑定可被机器读取(输出含 `"FEATURE_ID":"041"`、`"FEATURE_NAME":"Goal Registry"`)。\n'
+
+tests/contract/test_goal_migration.py:136: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/external/merge-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/create-docs/SKILL.md', 'skills/external/coaching-skills/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/create-skills/SKILL.md', 'skills/external/create-skills/references/mechanism-policy-check.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/dispatch-recipes.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/external/merge-skills/references/provenance-record.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/implement-feature/SKILL.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/review-feature-quality/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/run-skills/SKILL.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/references/artifact-and-implementation-review.md', 'skills/internal/manage-feedback/references/path-a-digest.md']
+E       assert not ['skills/external/merge-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md', 'skills/external/create-docs/SKIL...external/coaching-skills/SKILL.md', 'skills/external/humanize/SKILL.md', 'skills/external/create-skills/SKILL.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:103: AssertionError
+______ test_write_whitelist_is_the_goal_directory_not_the_team_directory _______
+
+    def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
+        """FR-017 / FR-020: the goal side owns the summary; the team side is read-only.
+    
+        This reads requirement 036's frozen contract, which states the pre-migration
+        path. That document is history and MUST NOT be rewritten (037 FR-022), so the
+        assertion keeps 036's wording — its subject is goal-indexed vs team-indexed,
+        which the historical path satisfies just as well. The *live* write-set truth is
+        pinned separately by tests/contract/test_goal_writeset.py against
+        skills/internal/create-team/references/summary-mapping.md.
+        """
+        text = WRITESET_CONTRACT.read_text(encoding="utf-8")
+        whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]
+>       assert "project/goal/" in whitelist
+E       AssertionError: assert 'project/goal/' in '\n\nDuring the summary step, writes are permitted ONLY to:\n\n| # | Path | Contents |\n|---|------|----------|\n| W-1...k entries recorded by the invoked skill |\n\nAny write outside W-1 and W-2 during the summary step is a violation.\n\n'
+
+tests/contract/test_summary_writeset.py:163: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+_____ test_c11_no_dangling_guideline_pointer_on_either_instruction_surface _____
+
+    def test_c11_no_dangling_guideline_pointer_on_either_instruction_surface():
+        surfaces = (("template", TEMPLATE), ("live", LIVE))
+        pointed: set[str] = set()
+        for label, path in surfaces:
+            names = set(GUIDELINE_POINTER_RE.findall(_text(path)))
+            assert names, f"the {label} instruction surface carries no guideline pointer at all"
+            pointed |= names
+    
+        # A pointer's whole job is to let a reader open the file, so the target that must exist
+        # is the one the reader actually resolves: `.specify/shared/guidelines/<name>.md`.
+        # Checking only the framework source leaves the downstream failure mode invisible —
+        # proven by drill: with the runtime copy moved aside and the source intact, a
+        # source-only version of this clause still passed. Both halves are asserted, because
+        # the source is what regenerates the runtime copy.
+        runtime_dir = ROOT / ".specify" / "shared" / "guidelines"
+        dangling_runtime = sorted(n for n in pointed if not (runtime_dir / n).is_file())
+        assert not dangling_runtime, (
+            "instruction surfaces point at guidelines with no runtime copy under "
+            ".specify/shared/guidelines/ — a reader following the pointer finds nothing, which "
+            "is the delivery window FR-038 / SC-017 exists to close "
+            f"(run scripts/python/sync-mirrors.py --write shared): {dangling_runtime}"
+        )
+        dangling_source = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
+        assert not dangling_source, (
+            "instruction surfaces point at guidelines with no framework source under "
+            f"shared/guidelines/ — the runtime copy cannot be regenerated: {dangling_source}"
+        )
+    
+        # C-11(b): the remainder must not grow past the three structurally unpointed files.
+        # Anti-vacuity: name the three and require them to exist, so an empty guidelines
+        # directory cannot make the subset assertion pass on nothing.
+        for name in UNPOINTED_BY_STRUCTURE:
+            assert (GUIDELINES / name).is_file(), (
+                f"C-11(b) names {name} as unpointed-by-structure but it is not in shared/guidelines/"
+            )
+        full = {p.name for p in GUIDELINES.glob("*.md")}
+        remainder = full - pointed
+        unexpected = sorted(remainder - set(UNPOINTED_BY_STRUCTURE))
+>       assert not unexpected, (
+            "a guideline lost its instruction-surface pointer, so it can no longer dangle "
+            "loudly — coverage shrank silently. Either restore the pointer or amend "
+            f"ambient-section.md C-11(b) with a recorded reason: {unexpected}"
+        )
+E       AssertionError: a guideline lost its instruction-surface pointer, so it can no longer dangle loudly — coverage shrank silently. Either restore the pointer or amend ambient-section.md C-11(b) with a recorded reason: ['self-explanatory.md']
+E       assert not ['self-explanatory.md']
+
+tests/contract/test_user_facing_comprehension_section.py:283: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/contract/test_evidence_utils_cli.py::TestCE3Doctor::test_node_block
+  /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit/.venv/lib/python3.14/site-packages/_pytest/fixtures.py:1392: PytestRemovedIn10Warning: Class-scoped fixtures defined as instance methods are deprecated.
+  Instance attributes set in the 'doctor' fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use a @classmethod decorator below @pytest.fixture and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_endpoint_candidates_origin_only
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_config_face
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_qoder_adapter_reads_per_model_effort_when_set
+FAILED tests/contract/test_exec_quant_engine.py::TestLLMCollection::test_missing_config_face_degrades_to_marker
+FAILED tests/contract/test_exec_quant_engine.py::TestAgentCollection::test_resolved_agent_fields_from_wrapper_host
+FAILED tests/contract/test_exec_quant_engine.py::TestSizeCap::test_oversized_record_is_field_truncated_and_capped
+FAILED tests/contract/test_exec_quant_engine.py::TestCredentialDefense::test_engine_masks_credential_shaped_config_values
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+FAILED tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_summary_writeset.py::test_write_whitelist_is_the_goal_directory_not_the_team_directory
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface
+19 failed, 7475 passed, 7 skipped, 4 warnings in 687.41s (0:11:27)
+# failed-name list written: .specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt (      19 entries)
+EXIT:1 ELAPSED:689s

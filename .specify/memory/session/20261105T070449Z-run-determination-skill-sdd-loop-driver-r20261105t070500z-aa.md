@@ -21,7 +21,7 @@ skill:sdd-loop-driver run=r20261105T070500Z-aa11 token=not_evaluated elapsed=not
   "feature": "082-self-explanatory-integration",
   "feature_id": "082",
   "determined_at": "2026-11-05T07:04:49Z",
-  "settled_at": null,
+  "settled_at": "2026-11-06T07:55:22Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,7 +87,7 @@ skill:sdd-loop-driver run=r20261105T070500Z-aa11 token=not_evaluated elapsed=not
     },
     "satisfaction": {
       "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
+      "reason": "no_user_input",
       "user_turn_class": "no_user_input",
       "unresolved_red": {
         "present": "unknown",
@@ -176,8 +176,8 @@ skill:sdd-loop-driver run=r20261105T070500Z-aa11 token=not_evaluated elapsed=not
       {
         "axis": "satisfaction",
         "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "reason": "no_user_input",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "signal": {
           "key": "satisfaction",
           "direction": "improve"
@@ -207,7 +207,7 @@ skill:sdd-loop-driver run=r20261105T070500Z-aa11 token=not_evaluated elapsed=not
         "ref": null
       },
       {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=pending_next_turn",
+        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=unknown adjacent=False reason=no_user_input",
         "parked_via": "none",
         "ref": null
       }

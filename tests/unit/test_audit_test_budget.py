@@ -5,7 +5,9 @@ The ledger authority is the ``<!-- test-budget:begin/end -->`` JSONL fence in
 the line state spine; ``<spec-dir>/test-evidence/`` only carries E3 rows.
 """
 
+import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
@@ -13,6 +15,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "sdd-loop-driver" / "scripts" / "audit-test-budget.py"
+# Mutation-leg hook: a doctored copy of the parser is exercised through the SAME
+# cases by pointing this variable at it (the tracked file is never edited). Unset
+# in every ordinary run, so the default subject is the tracked canonical source.
+PARSER = Path(os.environ.get("SPECKIT_AUDIT_TEST_BUDGET_PARSER") or SCRIPT)
 
 SLOT_SUMMARY = re.compile(
     r"slots=baseline:(\d+) closure:(\d+) reruns=(\d+) exceptions=(\d+) "
@@ -147,7 +153,7 @@ def _write_all_stage_evidence(spec_dir, checklist="ran", overrides=None):
 
 
 def _run(spine, spec_dir, logs_dir=None, stage_check=None):
-    cmd = [sys.executable, str(SCRIPT), "--spine", str(spine), "--spec-dir", str(spec_dir)]
+    cmd = [sys.executable, str(PARSER), "--spine", str(spine), "--spec-dir", str(spec_dir)]
     if logs_dir is not None:
         cmd += ["--logs-dir", str(logs_dir)]
     if stage_check is not None:
@@ -528,3 +534,186 @@ def test_missing_evidence_directory_fails(tmp_path):
     assert completed.returncode == 1
     assert _stages(completed) == (6, 0)
     assert completed.stdout.count("stage evidence file missing") == 6
+
+
+# ---------------------------------------------------------------------------
+# 086 C-017…C-020: the budget ledger parser recognizes parallel switches, so an
+# explicitly parallel full run stays a full run and pre-existing rows replay
+# identically. ``command_suffix`` is the only classification surface these cases
+# reach: a non-None suffix == "this command is a full run"; None == the command
+# carries a positional argument and is therefore not a full-suite invocation.
+# ---------------------------------------------------------------------------
+
+
+def _suffix(line):
+    spec = importlib.util.spec_from_file_location("audit_test_budget", PARSER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.command_suffix(line)
+
+
+def _positionals(line):
+    """The parser's positional-argument list, reconstructed from its own flag sets.
+
+    ``command_suffix`` only reports whether a positional exists; the contract's
+    consequence clause (a flag VALUE must never be read as a path) is observable
+    one level down, so this replays the same token walk with the module's own
+    ``VALUE_FLAGS`` / ``is_attached_value_flag`` rather than a copied tuple.
+    """
+    spec = importlib.util.spec_from_file_location("audit_test_budget_pos", PARSER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    rest = line[line.find("run-tests.sh") + len("run-tests.sh"):]
+    tokens = module.shlex.split(rest, posix=True)
+    positional = []
+    skip_next = False
+    for token in tokens:
+        if skip_next:
+            skip_next = False
+            continue
+        if token in module.VALUE_FLAGS:
+            skip_next = True
+            continue
+        if module.is_attached_value_flag(token):
+            continue
+        if token.startswith("-"):
+            continue
+        positional.append(token)
+    return positional
+
+
+PARALLEL_FULL_RUNS = (
+    # C-017: separated and attached worker-count forms (FR-025).
+    "bash scripts/bash/run-tests.sh -n 4 --names-out names.txt",
+    "bash scripts/bash/run-tests.sh -n4 --names-out names.txt",
+    "bash scripts/bash/run-tests.sh --numprocesses 4 --names-out names.txt",
+    "bash scripts/bash/run-tests.sh --numprocesses=auto --names-out names.txt",
+    # C-018: the scheduling policy and the process cap, separated and attached.
+    "bash scripts/bash/run-tests.sh --dist load --names-out names.txt",
+    "bash scripts/bash/run-tests.sh --dist=loadfile --names-out names.txt",
+    "bash scripts/bash/run-tests.sh --maxprocesses 8 --names-out names.txt",
+    "bash scripts/bash/run-tests.sh --maxprocesses=8 --names-out names.txt",
+    # The shape the runner itself emits on the default parallel path.
+    "bash scripts/bash/run-tests.sh -n auto --dist load --names-out names.txt",
+)
+
+
+def test_parallel_switches_classify_as_full_run():
+    """C-017, C-018, C-019: a value token never becomes a positional path."""
+    for line in PARALLEL_FULL_RUNS:
+        assert _suffix(line) is not None, "misclassified as targeted: %s" % line
+        positionals = _positionals(line)
+        assert positionals == [], (
+            "flag values leaked into the positional list: %s -> %r" % (line, positionals))
+
+
+def test_attached_parallel_forms_carry_a_value():
+    """C-017 (attached form): `-n4` / `-n=4` are one value-carrying token, not a flag plus a path.
+
+    This is the mutation leg M-9 surface: a parser that strips only the separated
+    form still classifies the run as full (the attached token is dropped as an
+    unknown flag) but leaks its value, so the verdict alone cannot see the defect.
+    """
+    spec = importlib.util.spec_from_file_location("audit_test_budget_attached", PARSER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for token in ("-n4", "-n=4", "--numprocesses=auto", "--dist=loadfile",
+                  "--maxprocesses=8"):
+        assert module.is_attached_value_flag(token), (
+            "%s is not treated as value-carrying (M-9)" % token)
+    for token in ("-n", "--numprocesses", "--dist", "--maxprocesses", "-q", "-k"):
+        assert not module.is_attached_value_flag(token), (
+            "%s must be handled as an exact token, not as an attached form" % token)
+
+
+def test_explicit_parallel_full_run_is_accounted_not_unaccounted(tmp_path):
+    """C-019 end to end: a logged `-n auto` full run matches its ledger row."""
+    spec = tmp_path / "spec"
+    _write_all_stage_evidence(spec)
+    logs = tmp_path / "logs"
+    logs.mkdir()
+    command = "bash scripts/bash/run-tests.sh -n auto --dist load --names-out names.txt"
+    (logs / "baseline.log").write_text("$ %s\n" % command, encoding="utf-8")
+    spine = _write_spine(tmp_path, [
+        _row(1, "baseline", command=command), _row(2, "closure"),
+    ])
+    completed = _run(spine, spec, logs_dir=logs)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "unaccounted" not in completed.stdout
+
+
+def test_parallel_full_run_not_downgraded_to_targeted(tmp_path):
+    """C-019: the same command logged but absent from the ledger is still a full run."""
+    spec = tmp_path / "spec"
+    _write_all_stage_evidence(spec)
+    logs = tmp_path / "logs"
+    logs.mkdir()
+    (logs / "analyze.log").write_text(
+        "$ bash scripts/bash/run-tests.sh -n4 --names-out names.txt\n", encoding="utf-8")
+    spine = _write_spine(tmp_path, [_row(1, "baseline"), _row(2, "closure")])
+    completed = _run(spine, spec, logs_dir=logs)
+    assert completed.returncode == 1
+    assert "unaccounted full run in analyze.log" in completed.stdout
+
+
+def test_targeted_run_still_classified_as_targeted_after_upgrade():
+    """A positional path is still a positional path; the upgrade widens nothing else."""
+    for line in (
+        "bash scripts/bash/run-tests.sh -n 2 tests/unit/test_x.py -q",
+        "bash scripts/bash/run-tests.sh --dist=load tests/contract/test_y.py",
+        "bash scripts/bash/run-tests.sh -n4 tests/unit/test_x.py",
+        "bash scripts/bash/run-tests.sh --dist load tests/unit/test_x.py -v",
+    ):
+        assert _suffix(line) is None, "a targeted run became a full run: %s" % line
+
+
+PRE_EXISTING_ROWS = (
+    # Shapes recorded by real lines before the parallel flags existed.
+    "bash scripts/bash/run-tests.sh --names-out baseline.txt",
+    "bash scripts/bash/run-tests.sh -q --durations=50 --names-out "
+    ".specify/specs/067-loop-efficiency-hardening/test-evidence/closure-failures.txt",
+    "env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out "
+    ".specify/specs/086-efficient-test-execution/test-evidence/baseline-failed.txt -q",
+    "bash scripts/bash/run-tests.sh tests/integration/test_acceptance_smoke.py -q",
+    "bash scripts/bash/run-tests.sh tests/contract/ --names-out 054-baseline.txt",
+    "bash scripts/bash/run-tests.sh -m 'not slow' --names-out names.txt",
+    "bash scripts/bash/run-tests.sh -p no:cacheprovider --names-out names.txt",
+)
+
+
+def test_existing_rows_replay_identically():
+    """C-020: the pre-upgrade classification of every existing-shaped row is preserved."""
+    expected = {
+        # index -> the pre-upgrade verdict (None = not a full run)
+        0: "--names-out baseline.txt",
+        1: "-q --durations=50 --names-out .specify/specs/"
+           "067-loop-efficiency-hardening/test-evidence/closure-failures.txt",
+        2: "--names-out .specify/specs/086-efficient-test-execution/"
+           "test-evidence/baseline-failed.txt -q",
+        3: None,
+        4: None,
+        5: "-m 'not slow' --names-out names.txt",
+        6: "-p no:cacheprovider --names-out names.txt",
+    }
+    for index, line in enumerate(PRE_EXISTING_ROWS):
+        assert _suffix(line) == expected[index], (
+            "row %d reclassified: %s" % (index, line))
+
+
+def test_existing_rows_replay_through_the_audit(tmp_path):
+    """C-020: an existing-shaped ledger audits to the same verdict, not just the same suffix."""
+    spec = tmp_path / "spec"
+    _write_all_stage_evidence(spec)
+    logs = tmp_path / "logs"
+    logs.mkdir()
+    (logs / "baseline.log").write_text(
+        "$ %s\n" % PRE_EXISTING_ROWS[0], encoding="utf-8")
+    spine = _write_spine(tmp_path, [
+        _row(1, "baseline", command=PRE_EXISTING_ROWS[0]),
+        _row(2, "closure", command=PRE_EXISTING_ROWS[2]),
+    ])
+    completed = _run(spine, spec, logs_dir=logs)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert _slots(completed)["baseline"] == 1
+    assert _slots(completed)["closure"] == 1
+    assert _slots(completed)["unknown"] == 0

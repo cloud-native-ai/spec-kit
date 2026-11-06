@@ -9,9 +9,11 @@ kind: "internal"
 slice: "commands"
 feature: "084-harness-triple-structure"
 feature_id: "084"
+disposition: "ignored"
 partial: false
 created: "2026-11-05T11:17:30Z"
 summary: "analyze round 3 (final gate) closed the path-A reopen: GATE GREEN with CRITICAL 0 / HIGH 0 / MEDIUM 3 / LOW 2, so the feature can proceed to /speckit.implement. All four round-2 rows are closed with r"
+disposition_reason: "introspection:introspection-20261106T084116Z#Excluded"
 ---
 
 ## Review

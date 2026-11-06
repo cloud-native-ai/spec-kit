@@ -1,0 +1,154 @@
+# Review-repair round 1 — evidence (087-arch-diagram-docs)
+
+- Object: review round 1's **blocked** verdict (1 P0 / 6 P1 / 17 P2), `review.md` F1–F25
+- This round's scope: the seven MUST-FIX rows (F1–F7) plus a disposition for every P2 that a
+  bounded round could carry. `review.md` and `code-review.md` were **not** modified.
+- Base: `24cb4edc`; branch `line/087-arch-diagram-docs`; plan constraint `active@61e39e8f`
+
+## F1 (P0) — `verification.md` now exists, and its closure verdict was run
+
+`verification.md` was written from `shared/workflow/acceptance-hardening.md` § Verification Vocabulary
+(owner) and `templates/verification-log-template.md` (carrier): one `SC-NNN_status` / `_value` / `_note`
+block for all ten criteria, the five measurement-ladder fields on every non-`pass` row, exactly one
+smoke record, and one joint-acceptance row per `in-scope` runtime row.
+
+No `pass` was fabricated. The two `supporting` rows held at `partial` name their reduced measurement,
+why it is insufficient, and what would lift them:
+
+| row | status | why |
+|-----|--------|-----|
+| `SC-007` | `partial` | the record's required-field set is measured (`U::test_c010_record_schema`, `I::test_c012_trace_incomplete_end_to_end`); the criterion's "reported as **unaccepted**" half has no fixture that separates an unaccepted delivery from an incomplete record |
+| `SC-010` | `partial` (deferred) | the degraded reading is asserted at the text/wiring level; no fixture project with an unrefreshed `.specify/` runtime was run end to end this round |
+
+Closure verdict, verbatim:
+
+```text
+$ /usr/bin/python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/087-arch-diagram-docs
+verdict: accept
+spec_dir: …/.specify/specs/087-arch-diagram-docs
+flow_class: execution
+claimed_status: Planned
+final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+reason: none
+exit=0
+```
+
+`completion_conditions` from the `--json` payload: `every_final_path_pass=true`, `no_open_rows=true`,
+`smoke_record_pass=true`, `status_row_per_criterion=true`; `tasks: closed=76 open=0`.
+
+**Feature 087 stays `Planned`.** `.specify/memory/features.md` and `.specify/memory/features/087.md`
+both still read `Planned`; the `Planned → Implemented` flip is a later run's act, and this round does
+not take it.
+
+## F4 — a source-only reference is never `satisfied`
+
+Tier 9 of `docs-utils.py` now requires the reference target to be one of the record's
+`rendered[].path` values (`_has_rendered_face`, C-007 condition 2). A reference at the editable source
+with both faces on disk lands `missing` / `orphan-rendered` instead of `satisfied`.
+
+Red-first, measured by swapping the new engine out for `HEAD`'s and re-running:
+
+```text
+$ /usr/bin/cp <HEAD>:docs-utils.py skills/external/create-docs/scripts/docs-utils.py
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py -q -k "c007_source_only"
+FAILED tests/unit/test_docs_utils_obligation.py::test_c007_source_only_reference_is_not_satisfied
+AssertionError: ('missing', 'orphan-rendered') != ('satisfied', 'reference-resolves')
+$ # restored the fixed engine
+1 passed
+```
+
+## F5 — the rendered-suffix set is a projection of the delivery contract
+
+`DIAGRAM_SUFFIXES` now carries D1's `.html` entry page and D2's editable sources and renders:
+`.html .svg .png .pdf .mmd .mermaid .puml .plantuml .excalidraw .drawio .dot .gv .dotx`. The comment
+states the projection and names **no** engine (the SC-005 guard scans changed files for engine names —
+this comment tripped it once and was rewritten, not the guard).
+
+`U::test_c010_html_face_is_recognised`: a document whose only diagram reference is an `.html` page is
+no longer `no-diagram-reference`; it reads `not-evaluated` / `trace-incomplete` because this fixture's
+record does not list that face.
+
+## F6 — the shipped skills no longer link into the spec directory
+
+- New shipped reference: `skills/external/create-docs/references/diagram-obligation.md` (9 sections:
+  record locations, trace-record schema, exemption schema, the five verdicts + reason table,
+  `satisfied`'s five conditions, the two staleness rules, the precedence table, payload/`converged`/
+  `clean`, and what the checker does not judge).
+- `create-docs/SKILL.md` item 5 and `improve-docs/SKILL.md` now point at that reference, not at
+  `../../specs/087-arch-diagram-docs/contracts/...`. The carrier set is owned by the item (with the
+  contract cited by path only), per the guard that requires the citation.
+- Mirror regenerated; `sync-mirrors.py --check` reports six pairs `ok`, `regen-command-copies.py
+  --check` reports `OK`.
+
+## F3 — one fixture invariant, propagated
+
+The invariant is `data-model.md` E6's: **the repository copy of each space IS the composition E6
+registers for it**, and nine of the eleven spaces are registered red by design. Propagated to
+`plan.md` (fixture budget row), `tasks.md` (DoD-4, T005), `quickstart.md` (S3's table row, the
+"pre-deletion green" narrative, and the reference-state bullet), and `data-model.md`'s
+`orphan-rendered/` row now states the record's actual shape.
+
+One fixture was aligned with the schema while doing it: `orphan-rendered/`'s record carries the
+diagram by its **source** with `rendered: []`. A rendered entry for a file that is not on disk would
+have to hash nothing (`C-008` rule 2 compares a present `sha256` against the file), i.e. a fabricated
+record — and with no rendered face the C-007 condition 2 is false for every reference, so the reading
+does not depend on which tier fires first.
+
+## F7 — this file
+
+The F1 closure above and this round's test readings are what close F7.
+
+## Red / green readings (this round)
+
+```text
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_carriers.py \
+    tests/unit/test_docs_utils_obligation.py tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py -q
+124 passed, 1 warning in 4.86s            # exit 0
+
+$ /usr/bin/python3 -m pytest <the same five> tests/contract/test_acceptance_premises.py \
+    tests/contract/test_acceptance_schema_ownership.py tests/contract/test_acceptance_state_machine.py \
+    tests/contract/test_closure_acceptance_check.py -q
+1 failed, 200 passed, 1 warning in 8.53s  # exit 1
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --check
+OK: 11 docs-obligation fixture spaces match their registered composition and bytes   # exit 0
+```
+
+The one failure is the **recorded baseline** name (`baseline-failed.txt` line 1): the premise pin
+records `git version 2.54.0 (Apple Git-157)` and this machine reads `git version 2.43.7`, so the
+comparison is an input error (the test's own `PinMismatch`), not a new failure. No other name in the
+targeted set differs from the baseline.
+
+The five feature files went from 121 (review smoke) to 124 passed: the three added tests are the two
+F4 negatives (`test_c007_source_only_reference_is_not_satisfied`, `test_c010_html_face_is_recognised`)
+and the F23 line-shift guard (`test_c005_fenced_block_does_not_shift_the_line`).
+
+## P2 dispositions
+
+| id | disposition |
+|----|-------------|
+| F8 | **closed** — `test-evidence/analyze-report-round2.md` written; the stage-status row's `evidence_ptr` now names it |
+| F9 | **closed** — `audit-plan-changes.py --base 61e39e8f --head HEAD` → `undeclared=false`, `classification=declared`; declarations in `test-evidence/plan-edit-declarations.txt` (10 lines, all `分类=minor`, covering the implement stage's interpreter edit and this round's three plan-owned touches) |
+| F12 | **closed** — all four stale names replaced with the implemented ones in `plan.md` table B (`C-003`, `C-018`); the five further phantom names in `tasks.md` (T045, T035, the Notes bullet) were folded onto the plan-owned names. Every `[FI]::test_…` name in `plan.md` (37) and `tasks.md` (excluding the drift note) now resolves against a collected test: `missing: []` |
+| F13 | **closed** — `feature-ref.md` row 10 lists the real mirrors (`.specify/skills/<name>`, no `external/` layer) and the four per-tool copies; the `OI-087-01` sentence reads `resolved 2026-11-06` |
+| F14 | **closed** — `data-model.md` attributes the closed **five values** to `C-004` and the per-document precedence to `C-016` only |
+| F15 | **closed** — `quickstart.md` points at `plan.md`'s real sections, and the contract's `C-014` no longer cites a `plan.md § Definition of Done` (the DoD's owner is `tasks.md`) |
+| F16 | **closed** — `.specify/memory/features/087.md` now reads `C-001…C-016`, `flow-obligations` A–F + `C-008a`, and `S1–S9` |
+| F17 | **closed** — S3 is reproducible as printed: root-relative `--record`, `--only` on the green baseline, the stale reading on a `tmp_path` copy. All three expectations were re-run and matched (`satisfied`/`converged=true`/`clean=true`; `missing`/`orphan-rendered`; `stale`/`source-newer-than-render`) |
+| F18 | **closed** — the plan's known-red row now states both denominators: `17` is the `tests/contract` subset (research R6), the full-suite baseline is `26` names (`baseline-failed.txt`), and the implement comparison is against 26 |
+| F19 | **closed** — `flow-obligations.contract.md`'s `#### Assets` note is a dated **plan-time** reading and says the subsection has landed; `plan.md`'s two sites say the same |
+| F20 | **closed** — `checklists/requirements.md` reads five verdict values (citing `C-004`/`C-016` rather than copying) and `A1–A12` |
+| F21 | **closed** — the global `--root` existence check is scoped back to the `obligation` branch; the other actions' exit codes are unchanged (contract `C-015`) |
+| F22 | **closed** — `removeprefix`/`is_relative_to` replaced with slice/`relative_to` forms inside `_read_exemption` and `_relative_to_root`; the declared floor (`>=3.8`) holds |
+| F23 | **closed** — `_blank_fenced_blocks` replaces fenced lines with equal-count empty lines, so `documents[].line` points at the real reference; `U::test_c005_fenced_block_does_not_shift_the_line` pins it |
+| F24 | **closed** — `I::test_sc001_four_artifacts_present` resolves the link target and asserts it is one of the record's `rendered[].path` values |
+| F25 | **closed** — `build_fixtures.py --check` byte-compares every registered file (missing / unexpected / content drift) and rejects unknown arguments with exit 2 instead of rebuilding |
+
+## What this round did NOT do
+
+- No full test suite run (the baseline is the driver's slot; only the targeted set was re-run).
+- No edit to `review.md` or `code-review.md`.
+- No write to the state spine, no push, no branch switch, no dispatch of another agent.
+- Feature 087 not flipped to `Implemented` / `Ready for Review`.

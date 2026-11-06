@@ -1,0 +1,92 @@
+# implement stage — Part 3 (T033–T048) evidence
+
+Worktree: /home/agent/.local/state/spec-kit/worktrees/087-arch-diagram-docs (branch line/087-arch-diagram-docs)
+Base commit: 24cb4edc · prior part commit: 8fa3252a · interpreter: /usr/bin/python3 (CPython 3.11.13 / pytest 9.2.0)
+No full-suite run in this part (test budget: targeted-set-v1 only; the driver owns the full-suite baseline).
+
+## 1. Per-task readings
+
+| Row | Result | Reading |
+|-----|--------|---------|
+| T033 | done | `git diff --name-only 24cb4edc -- skills/external/draw-diagram/` → empty, exit 0 (measured twice; appended to `notes/pre-change-measurements.md`) |
+| T034 | done | `tests/unit/test_docs_obligation_reuse.py`: `test_c014_five_guard_files_declared[5 params]` + `test_c014_no_row_of_this_feature_edits_a_guard_assertion_set` → 6 passed |
+| T035 | done | `tests/integration/test_docs_command_scenarios.py`: 29 new assertions; red-first run 22 failed / 8 passed, 4 vacuous greens strengthened. After Part 3: 23 passed / 9 failed, all 9 declared (§ 3) |
+| T036 | done | `-k c008a` in the obligation-scenario file → 2 passed (`second_reconcile_zero_findings`, `exemption_does_not_block_convergence`) |
+| T037 | done | § Desired-State Baseline gains a fifth numbered item (carrier set / obligation / named exemption, cites `contracts/diagram-obligation.contract.md` § C-003/C-010/C-011, restates no verdict word) |
+| T038 | done | `#### Assets` created INSIDE § Desired-State Baseline: single landing `docs/assets/<slug>.<ext>`, relative-reference rule, no `diagrams/` subtree, shared diagrams stay single, `assets/` outside the carrier set, three face names → `quickstart.md` S3 |
+| T039 | done | Reconcile R2 names the diagram dimension for every document in scope |
+| T040 | done | Reconcile R3 admits `missing`/`stale`/`not-evaluated` at `validate`'s rank; the three `draw-diagram` refusal points carried verbatim |
+| T041 | done | Reconcile R4: one produce/re-render row per difference (path + class + engine layer, `待前门路由` when unknown + `assets/`), pure-write, never in the move/archive opt-out list, never rewrites the document body (FR-021) |
+| T042 | done | Reconcile R6: five counts + `converged`/`clean` + `exempted`; convergence criterion is `converged`, not `clean`; exemption = lawful state, not a residual; four evidences; `D-001` semantic face named 未覆盖 |
+| T043 | done | Reconcile R5 produces in-loop through the `draw-diagram` front door under safe-local-writes, same-run record, engine sticky, not delegated to the authoring flow, `not-evaluated` not skipped, `exempt-*` not residual |
+| T044 | done | `-k c008a` → 2 passed; whole command-scenario file → see § 2; `git diff --name-only 24cb4edc -- docs/` → **empty** (the one permitted line belongs to T064) |
+| T045 | done | Authoring readings folded into `F::test_c008_authoring_r2_plans_and_r6_checks` (R2 plan elements, R5 four artifacts + engine stickiness, R6 four evidences); tasks.md row corrected for the name drift (§ 4) |
+| T046 | done | `test_sc001_four_artifacts_present` (four artifacts on disk + engine verdict + record asserted separately) and `test_sc002_removing_either_face_turns_red` (three faces, each on its own `tmp_path` copy, green baseline measured first) → 2 passed |
+| T047 | done | `test_sc008_exemption_visible_and_superseded` (visible-not-a-pass, converges with `clean=false`, superseded reported and record retained) → 1 passed |
+| T048 | done | Authoring Flow R2/R5/R6 amended; R5 now owes all four artifacts plus the record in one run and carries refusals verbatim |
+
+## 2. Final targeted reading (Part 3)
+
+```
+$ /usr/bin/python3 -m pytest tests/integration/test_docs_obligation_scenarios.py \
+    tests/integration/test_docs_command_scenarios.py \
+    tests/unit/test_docs_obligation_reuse.py tests/unit/test_docs_utils_obligation.py \
+    tests/unit/test_docs_utils_carriers.py -q --no-header -p no:cacheprovider
+10 failed, 102 passed
+```
+The 10 failures are exactly the declared set in § 3 — no baseline name, no guard name, and no Part 1/2 name moved.
+
+Guard sweep (`tests/contract/{test_expression_compatibility,test_expression_gate_wiring,test_docs_command_template,
+test_confirmation_gates_sweep,test_directory_governance}.py`): `1 failed, 120 passed`; the only failure is
+`test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target`, which is in `baseline-failed.txt`
+(pre-existing). The two mirror-identity guards (`test_c7_mirrors_are_byte_identical`,
+`test_c12_skill_source_mirror_byte_identity`) were red until `sync-mirrors.py --write` ran and are green now —
+they are mirror-derivation guards, not scope failures.
+
+Mirrors: `scripts/python/sync-mirrors.py --write` → `sync skills/external/ -> .specify/skills/ (1 files)`;
+`--check` → six pairs ok. `scripts/python/regen-command-copies.py --check` → OK (all per-tool copies match).
+
+## 3. Declared reds carried out of Part 3 (each names its delivering row)
+
+| Failing assertion | Delivered by | Why it is red now |
+|---|---|---|
+| `F::test_c002_by_reference_only` (the `improve-docs` leg only; `create-docs` and `docs.md` legs pass) | T058 (Part 4), T049–T053 | `improve-docs/SKILL.md` gains the `skills/external/draw-diagram` pointer there |
+| `F::test_c011_improve_pointer` … `F::test_c015_named_staleness_keeps_source` (5) | T049–T053 (Part 4) | the five `improve-docs` sections those clauses amend |
+| `F::test_c016_dispatch_names_both_paths`, `F::test_c017_residual_five_counts` (2) | T063 (Part 5) | the `docs.md` dispatch sentence and the five-count residual grouping |
+| `F::test_c020_reader_projection_bounded` | T064 (Part 5) | the reader projection section does not exist yet; `docs/` deliberately untouched in this part |
+| `U::test_sc005_surfaces_reach_by_reference` | T054 / T049 / T064 | cross-Part red registered in Parts 1–2; still open at the end of Part 3 (see § 5) |
+
+## 4. Name-drift corrections (tasks.md rows corrected, `plan.md` untouched)
+
+`plan.md` § Test Plan tables A/B are the sole owner of assertion names; three `tasks.md` rows proposed names that
+collide with, or miss, the owner's:
+
+1. **T045** proposed `F::test_c010_authoring_flow_produces`, `F::test_c015_authoring_r2`,
+   `F::test_c016_authoring_r5_render`, `F::test_c017_authoring_r6`. Table B assigns `test_c010_…` to the tier
+   clause, `test_c015_…`/`test_c016_…`/`test_c017_…` to `improve-docs`/`docs.md` clauses (C-015/C-016/C-017), and
+   has no `*_authoring_*` name for the authoring flow: `C-008`'s owner is
+   `F::test_c008_authoring_r2_plans_and_r6_checks`, and `C-001`'s is `I::test_c001_four_artifacts_one_run`.
+   The row now names the owner's assertions; the readings are authored inside them.
+2. **T035** wrote `F::test_c021_path_unchanged` for `C-021`; the owner is `F::test_c021_path_unchanged`
+   (`plan.md` table B) — consistent, no change.
+3. **T037/T038** anchor at the `### Desired-State Baseline` / `#### Assets` headings, which the contract's own
+   reading note (`flow-obligations.contract.md` header) says do not exist before this part. They exist now.
+
+A mechanical reading, not prose, is what forced two authoring-test repairs (both in the *test* helper layer, not
+in the owner text): `section()` cuts at the next heading of any level, so a `####` child of a `###` section was
+invisible to `subsection()` — fixed by measuring the child's scope inside the parent's heading level;
+`bullet_after()` matched a step marker anywhere in a line, so a cross-reference to "R6" inside R4's own sentence
+resolved to the wrong step — fixed by anchoring on the bullet's label token.
+
+## 5. T031/T032 dependency status (terminal-green obligation, this part's slice)
+
+`U::test_sc005_surfaces_reach_by_reference` still fails. Its subject is now delivered on two of its three
+surfaces (`create-docs/SKILL.md` and `templates/commands/docs.md` name `skills/external/draw-diagram`); the
+`improve-docs/SKILL.md` leg is T058's (Part 4). Remaining rows that must land before that assertion is green:
+**T058**, plus **T049** (whose `### 2. Gather evidence` pointer is the natural home for the path). Recorded on the
+T031/T032 rows of `tasks.md` as a `[blockedBy: 见 Part 3 证据 §5]` note rather than by editing plan-owned text.
+
+## 6. PLAN-EDIT records
+
+None. No plan-owned artifact (`plan.md`, `data-model.md`, `contracts/`, `quickstart.md`, `research.md`,
+`feature-ref.md`) was modified in this part.

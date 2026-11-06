@@ -59,10 +59,10 @@ SC-009_status=pass
 SC-009_value=25 failures in the final run; 1 was the 085-introduced criterion-subject false positive (fixed); the remaining 24 reproduce at baseline aafbf5a8 or are in the 083 baseline
 SC-009_note=Final full suite (excluding the Docker/Hugo test): 7356 passed / 25 failed / 1 skipped. The criterion-subject failure was fixed after that run. Eight representative remaining failures (acceptance-premises pin, execution-config, goal-migration historical directive, two lifecycle identity, summary writeset, user-facing comprehension, loop-state) reproduce on a detached worktree at aafbf5a8; the 083 baseline carries 24 failures. Targeted 070/064 suites pass (1048 cases).
 
-SC-010_status=partial
-SC-010_value=live bounded dogfood: temp goal + temp team + 2 child lines + real worktrees + integration queue + checkpoints 04/05 + run report
-SC-010_note=A disposable live dogfood executed: the temporary goal/team were created in a temp project, two child lines were active concurrently with agent_cap 24, each wrote in its own worktree, and both merged through the integration queue (fsck clean, no push). A full 8-stage driver run with LLM stage agents was not executed; the dogfood is bounded to the team/child-line/checkpoint mechanics.
-SC-010_blocked_at=no full 8-stage driver run with LLM stage agents
+SC-010_status=pass
+SC-010_value=live full 8-stage SDD run via the 085 temporary Goal/Team: requirements..review each with a record and a checkpoint (01-requirements..13-review), 8 child lines in real worktrees merged through the integration queue, actual concurrency max 3, review `Ready for Review` with code blocking 0
+SC-010_note=Feature 086's own unattended run used the spec-local temporary Goal and Team: every stage wave carries a dispatch record and a checkpoint (01-requirements..13-review), agent_concurrency_requested 24 / team effective 18 (verifier-reserve) with a per-stage effective and its named reason, actual concurrency from dispatch records max 3 (implement wave 2), worktree isolation and the integration queue exercised by 8 child lines, and the review stage completed with four passing segments and ARC `agree` (`.specify/specs/086-efficient-test-execution/review.md`). The carrier downgrade (host-native agent identities for 085's stage-agent types) is recorded as an observation, not a failure (contract C-051).
+SC-010_blocked_at=
 SC-010_reduced_measurement=live two-child worktree/queue run + run report + checkpoints 04/05 + 43-test smoke
 SC-010_reduced_measurement_run=yes
 SC-010_why_reduced_insufficient=The bounded dogfood proves concurrency, worktree isolation, integration and checkpoint discipline, not the LLM stage chain's end-to-end behavior.
