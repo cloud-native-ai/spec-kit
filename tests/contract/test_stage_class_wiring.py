@@ -107,14 +107,27 @@ BASELINE_COMMIT = "c1cd4600"
 # criteria ... are owned by templates/feature-details-template.md § Canonical
 # Status State Machine"), outside the 077 card and in that sentence's semantic
 # home.  The pinned value is again the card strip, not the file's bytes.
+#
+# 2026-11-07 all seven rows re-measured: the merge of the remote 087 line
+# (a4260b34 integrating d41d0ced) recompiled the Wrap-up banner in every command
+# template, because the `speckit-status-wrapup` Object and the status/measure
+# `h-docs-sync-eval` bindings moved the registry fingerprint
+# 7877db82c58c -> 8cb5a238739a.  Measured, not assumed: the ONLY delta in these
+# seven files outside the 077 card is that one machine-owned banner line — swapping
+# the live banner back for the pre-recompile one restores each previously pinned
+# value byte for byte, and `probe-utils.py --action compile-embeds --check` reports
+# zero drift on the merged tree.  No authored text moved, so the assertion is
+# unchanged: *stripping the card restores the pinned bytes*.  Measured with this
+# module's own `strip_wiring` + `_sha256_text`, per the documented legitimate-edit
+# path above.
 BASELINE_SHA256 = {
-    "requirements": "31d0e1b43079a35f87c35029053ecee8557b75a282a5949079e2f90c6701a82b",
-    "clarify": "baf687495d7f5bee1befbb61941aa348085148fe047c15360222e0ecab95cb92",
-    "plan": "1833be4a713f7b9cc80f6953303428469e095f9f3efb9472dff225ec835f485c",
-    "tasks": "08f64367d89b046904112532453eba4323b6faf7b67a4920d20a6200e55d6e9e",
-    "checklist": "f3ca6423354cc0e687586261efc7810faeefaaea560f034edd28e89a17599b69",
-    "analyze": "31dc261d9bf76243e4a50af62909dbb0c07fd7aa555ebf6acc0970c2eff8151b",
-    "implement": "3282de6a7843ea6eb369046ab5d01df0819b842257bd6bd37f651cc49e9d54a2",
+    "requirements": "afe094ea61eaeac6e8c5aeac10435b9c0aa4d1da5e39167fddab462a8b601fb4",
+    "clarify": "63441a05e923dac1f8dd30533c97ed38c54e67baa459e4a18ee17cc245dbad7e",
+    "plan": "720a470def7bb6a136766386fe8972346cd2a59f1f7d0e3eb48610027414d0cd",
+    "tasks": "bad18f749cbba7fc05c05a92581aa51524ebb4a4b3986d572596834d521bdc70",
+    "checklist": "0cdc5a68fd5da04f08df2a07093f6c005dce4201ccefb50fd73e528b769f931f",
+    "analyze": "45288d99f2b6c4561cf9c06bb6f4dee30d1f085622b869fb2e592335422a3a0c",
+    "implement": "e836ad4a683050d781557a61c042cb7ac7ef36a1ab61de292271db80a83269f5",
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
@@ -129,8 +142,18 @@ BASELINE_SHA256 = {
 # counts the dispatch carries. The guard's assertion is unchanged — the pin was
 # refreshed to the post-087 bytes because the edit is part of this feature, not a
 # drift; humanize's pin stays byte-identical.
+#
+# 2026-11-07 the same merge of the remote 087 line (a4260b34 integrating
+# d41d0ced) recompiled `docs.md`'s Wrap-up banner (fingerprint
+# 7877db82c58c -> 8cb5a238739a), so the 087-T063 pin above no longer described the
+# live bytes even though the authored content it pinned is untouched. Measured:
+# swapping the pre-recompile banner back restores the previous pin byte for byte,
+# and `docs.md` still carries NO wiring card (this module's `strip_wiring`
+# reports zero matching subsections), which is what this guard actually asserts —
+# "these entry points gain no wiring card". Re-pinned to the merged bytes; the
+# `humanize` pin is untouched because that file carries no compiled banner.
 UNCHANGED_SHA256 = {
-    "docs": "533dfba053e0d6f87ee4d5e97c8e3c4e8344e1dc07542b82b263c94ba288f41a",
+    "docs": "a4671ff57302d37dca1a15ec790681336f519047f2984565904d1c98ccfa6889",
     "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
 }
 

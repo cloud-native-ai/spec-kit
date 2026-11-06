@@ -275,6 +275,40 @@ def files_changed_in_worktree(roots: tuple[str, ...]) -> list[str]:
     return sorted(line for line in proc.stdout.splitlines() if line)
 
 
+_COMPILED_BANNER = "<!-- AUTO-GENERATED"
+
+
+def _authored_lines(rel: str) -> list[str] | None:
+    """The text this feature CONTRIBUTED to ``rel``, excluding machine-owned compiled lines.
+
+    The claim below is about what the feature *authored*, so a whole-file read is the wrong
+    reading: a file the feature only touched by recompiling the Wrap-up banner still carries
+    whatever its body said before, and judging that body would indict the feature for a
+    sentence it never wrote. Measured 2026-11-07 on the merged tree: `run-team/SKILL.md`
+    differs from `BASE_COMMIT` by exactly one compiled banner line, yet a whole-file read
+    reported `['mermaid', 'plantuml']` — names that were already on that line at the base
+    commit and belong to 063's engine-face contract, not to this feature.
+
+    So the scan reads the union of the hunks' *added* lines from the base commit and from the
+    working tree, dropping the compiled banner (machine-owned, never authored).
+    """
+    added: list[str] = []
+    for rev_range in (f"{BASE_COMMIT}...HEAD", "HEAD"):
+        proc = subprocess.run(
+            ["git", "diff", "-U0", rev_range, "--", rel],
+            cwd=REPO_ROOT, capture_output=True, text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        for line in proc.stdout.splitlines():
+            if not line.startswith("+") or line.startswith("+++"):
+                continue
+            body = line[1:]
+            if body.lstrip().startswith(_COMPILED_BANNER):
+                continue
+            added.append(body)
+    return added
+
+
 @pytest.mark.contract
 def test_sc005_no_second_engine():
     """No second drawing engine, renderer entry point, or engine-selection table was introduced.
@@ -379,10 +413,8 @@ def test_sc005_engine_domain_is_single_owner():
         path = REPO_ROOT / rel
         if not path.is_file():
             continue
-        try:
-            lowered = path.read_text(encoding="utf-8").lower()
-        except (OSError, UnicodeDecodeError):
-            continue
+        # Only the lines this feature wrote are judged — see `_authored_lines`.
+        lowered = "\n".join(_authored_lines(rel)).lower()
         mentioned = {name for name in names if re.search(rf"\b{re.escape(name)}\b", lowered)}
         if len(mentioned) >= 2:
             carriers.append(f"{rel}: {sorted(mentioned)}")

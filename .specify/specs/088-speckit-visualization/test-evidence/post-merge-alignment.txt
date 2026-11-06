@@ -1,0 +1,177 @@
+Post-merge alignment — local 088 line × remote 086/087 line
+================================================================
+
+Merge under test : a4260b34  merge(gitlab): integrate the remote 086/087 line
+                              with the local 088 visualization feature
+Date             : 2026-11-07
+Scope            : tests / fixtures / mechanism pins only. No requirements, plan,
+                   data-model, contracts, quickstart, research, feature-ref or
+                   checklist file was touched. No runtime record was committed.
+
+Commands run
+------------
+  1. Targeted (before): python -m pytest tests/contract/test_stage_class_wiring.py
+       + test_expression_compatibility::test_c5_non_wiring_files_keep_their_frozen_hashes
+       + test_goal_migration::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+       -> 10 failed / 0 passed (the 12 assigned, minus the 2 pre-existing local baselines)
+
+  2. Full suite (merge verification, ONE run — not a per-line budget slot):
+       bash scripts/bash/run-tests.sh \
+         --names-out .specify/specs/088-speckit-visualization/final-failed-merged.txt
+     Raw log: .specify/.tmp/merged-full-suite-final.log (git-ignored scratch)
+     Runner  : python3 -m pytest -n auto --dist load, passes=2
+
+     FINAL: 29 failed, 7879 passed, 1 skipped, 576 warnings in 31.42s
+
+Baseline definition (mechanical, not by impression)
+---------------------------------------------------
+  union = final-failed-r6.txt (local 088 line, 27 entries)
+        ∪ 086-efficient-test-execution/test-evidence/final-failed.txt (19 entries)
+  -> 35 distinct entries (11 shared, 16 local-only, 8 remote-only)
+
+Merge-introduced  := a failure in the final run that is NOT in that union.
+"Zero merge-introduced" was the target.
+
+The 12 assigned failures — per-entry disposition
+------------------------------------------------
+1  test_stage_class_wiring::test_clarify_is_inside_and_the_other_entry_points_are_untouched
+   OFFENDER : templates/commands/docs.md (non-wiring entry point) hash
+              a4671ff5… ≠ pinned 533dfba0…
+   CAUSE    : the merge recompiled the Wrap-up banner in every command template
+              (registry fingerprint 7877db82c58c -> 8cb5a238739a). MEASURED, not
+              assumed: swapping the pre-recompile banner back restores 533dfba0…
+              byte for byte, and compile-embeds --check reports zero drift on the
+              merged tree.
+   FIX      : UNCHANGED_SHA256["docs"] re-pinned to the merged bytes + dated note.
+              humanize untouched (no compiled banner; pin still matches).
+              GUARD PRESERVED: docs.md still carries NO wiring card — strip_wiring
+              reports zero matching subsections, which is what this guard asserts.
+
+2-8 test_stage_class_wiring::test_stripping_the_card_restores_the_baseline_bytes
+    [requirements|clarify|plan|tasks|checklist|analyze|implement]
+   OFFENDER : all 7 rows' strip-hash moved with the same banner recompile.
+   EVIDENCE : for each of the 7, the ONLY delta outside the 077 card is the one
+              machine-owned banner line; swapping it back reproduces each previous
+              pin exactly (measured against d41d0ced^, 7/7 MATCH).
+   FIX      : BASELINE_SHA256 re-measured with THIS MODULE's own strip_wiring +
+              _sha256_text + dated note explaining the merge recompile.
+              GUARD PRESERVED: no assertion deleted; card presence still asserted
+              (block.strip() non-empty), and each pin ≠ its full-file hash, so the
+              strip is still doing the work it claims.
+
+9  test_expression_compatibility::test_c5_non_wiring_files_keep_their_frozen_hashes
+   OFFENDER : skills/external/improve-docs/SKILL.md
+   ROOT CAUSE (two layers, both measured):
+     a) The frozen 069a copy carries NO `<!-- AUTO-GENERATED` banner at all, so the
+        COMPILED_BANNER_ONLY shape declared for this path could never hold — the
+        swap had nothing to swap back into. It "passed" at d41d0ced only against
+        that commit's own bytes, not against the frozen record: a vacuous green.
+     b) Worse, the derived `_FEATURE_087_BANNER_ONLY` loop writes its entry
+        UNCONDITIONALLY after the dict literal, so it silently OVERWROTE the
+        authored entry in ALLOWED_POST_BASELINE_CHANGES.
+   FIX      : the authored entry now wins (path removed from the derived tuple, with
+              a note); its markers were already the authorial ones (the Content-
+              Improvement scan marked only the banner change). Markers upgraded to
+              ADDED-CONTENT assertions matching the vocabulary the authorial scan
+              found: --action obligation, the trace-record path, the shipped
+              reference, orphan-rendered, staleness finding, draw-diagram path.
+              Guard now requires each marker present in the live file AND absent
+              from the 069a frozen bytes ("added_markers": True) — strictly stronger
+              than a needle check, and it caught the candidate "Diagram-sync", which
+              already exists at 069a and would have witnessed nothing.
+              MUTATION-CHECKED: replacing `orphan-rendered` in the live file turns
+              the test red (file restored via git checkout, verified clean).
+
+10 test_goal_migration::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path
+   OFFENDER : .specify/specs/086-efficient-test-execution/test-evidence/baseline.txt
+   NATURE   : generated full-suite capture (086 T050, ed9dad97) that quotes this
+              guard's OWN failure text, so it contains the needle by construction.
+   FIX      : added to the test's existing generated-artifact exception
+              (RUNTIME_CACHE_PREFIXES) with a dated note. Evidence preserved — not
+              deleted, not rewritten. Important: the exception is keyed on THIS FILE,
+              not on the whole 086 lane (the 088 entry above excluding a whole lane is
+              a workaround; a file-level exception for a file that genuinely is a
+              capture is honest).
+              NOTE ON ATTRIBUTION: this test is also in the remote 086 line's own
+              baseline-failed.txt, so strictly it pre-existed on that line — it is
+              fixed here because it was in the assignment and because a generated
+              capture is not a live face.
+
+11 test_expression_compatibility::test_c2_no_project_side_classification_store
+12 test_fast_fail_discipline::test_i11_channel_two_mirrors_and_per_tool_copies
+   (and test_g9_total_equals_frozen_baseline)
+   DISPOSITION : NOT TOUCHED — the three declared pre-existing local baselines.
+   STILL RED in the final run, as expected and as assigned.
+
+Merge-introduced failures found by the full run — disposition
+-------------------------------------------------------------
+A. test_unit/test_docs_obligation_reuse.py::test_sc005_engine_domain_is_single_owner
+   OFFENDER : skills/internal/run-team/SKILL.md — ['mermaid', 'plantuml']
+   ROOT CAUSE : the test's own docstring says the claim is about what this feature
+                *authored*, but it read whole files. run-team/SKILL.md differs from
+                BASE_COMMIT 24cb4edc by EXACTLY ONE compiled banner line (measured:
+                git diff 24cb4edc -- <file>), yet the whole-file read indicted it for
+                the names `textual / mermaid / PlantUML` that its Dynamic-Structure
+                sentence already carried at the base commit (063's engine-face
+                contract, not this feature's).
+   FIX       : scan narrowed to what the change set ADDED (union of +lines from
+                BASE_COMMIT...HEAD and from the working tree), dropping the
+                machine-owned banner. Every candidate is still read; the population
+                and the anti-vacuity premises are unchanged.
+   MUTATION-CHECKED: appending "routing matrix … mermaid and plantuml engine layers"
+                to run-team turns it red (file restored, verified clean).
+   RESULT    : 25/25 in that file pass.
+
+B. test_integration/test_docs_command_scenarios.py::test_c019_no_new_command_no_new_tier
+   OFFENDER : templates/commands/measure.md, templates/commands/status.md
+              (both ADDED by the remote 087 line: c0fd01ac, 70df8130)
+   UNRESOLVED — DECISION, see "Anomalies" below.
+
+C. test_contract/test_status_digest.py::test_c50_no_optional_or_dev_dependency_group_was_introduced
+   OFFENDER : pyproject.toml `[project.optional-dependencies].dev`
+              (ADDED by the remote 086 line: 58d30bde, WP-A3)
+   UNRESOLVED — DECISION, see "Anomalies" below.
+
+Also observed (improvements, not failures)
+------------------------------------------
+  8 baseline entries are now GREEN on the merged tree, 7 of them the remote 086
+  line's test_exec_quant_engine failures (that line's own baseline said they failed;
+  they pass here) plus the goal-migration live-surface test fixed above. This is
+  recorded because "fewer than the union" is not the same reading as "the union".
+
+Anomalies (surfaced, NOT silently repaired)
+-------------------------------------------
+ANOMALY: B and C are CONTRADICTIONS between a clause a feature froze and a message
+         another feature deliberately delivered. Resolving either means choosing
+         which of two recorded intents is wrong:
+           - C-50 (status-digest, 087) asserts pyproject declares NO optional/dependency
+             group. The 086 line deliberately added `[dev]` = pytest + pytest-xdist
+             (WP-A3, plan.md:38, tasks.md T010, verification.md SC-010) precisely so
+             `pip install -e ".[dev]"` pulls the runner's parallel tooling.
+           - C-019 (087's own flow-obligations contract) asserts this feature adds NO
+             new /speckit.* command. 087 itself added status.md and measure.md.
+         Repairing them means rewriting another feature's frozen clause or its
+         delivered surface; neither file is in this alignment's territory
+         (requirements/contracts are explicitly out of bounds). Escalated, not patched.
+ANOMALY: the 3 pre-existing local baselines the assignment told me to leave include
+         test_fast_fail_discipline::test_g9 — the brief named test_g9 as a baseline but
+         the 12-item list named test_i11; both are red and both were left untouched.
+         Recorded so the count reconciliation is not read as a missed repair.
+
+Final count
+-----------
+  failed           : 29   (was 30 before the sc005 fix; 39 before this alignment)
+  passed           : 7879
+  skipped          : 1
+  union baseline   : 35
+  MERGE-INTRODUCED : 2    (both = anomalies above, both escalated)
+  baseline now green: 8
+
+Files changed by this alignment
+-------------------------------
+  tests/contract/test_stage_class_wiring.py          (pins re-measured, dated notes)
+  tests/contract/test_goal_migration.py              (one generated-artifact exception)
+  tests/contract/test_expression_compatibility.py    (vacuous allowance replaced, guard strengthened)
+  tests/unit/test_docs_obligation_reuse.py           (authored-lines scan)
+  .specify/specs/088-speckit-visualization/final-failed-merged.txt   (runner output)
+  .specify/specs/088-speckit-visualization/test-evidence/post-merge-alignment.txt (this file)

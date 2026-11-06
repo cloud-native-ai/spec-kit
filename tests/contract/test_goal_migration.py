@@ -63,6 +63,15 @@ RUNTIME_CACHE_PREFIXES = (
     # owner's own rule (a generated artifact is not a live face); deleting the
     # capture would destroy the run's evidence instead.
     ".specify/specs/088-speckit-visualization/test-evidence/",
+    # 2026-11-07 Feature 086 (ed9dad97, T050): the same rule, keyed on the file
+    # that actually offends rather than on the whole lane. `baseline.txt` is the
+    # generated full-suite capture the 086 line took *before* it changed anything;
+    # it quotes this guard's own failure text, so it contains the needle by
+    # construction — the needle is evidence that the guard was red at the baseline,
+    # not a live surface that forgot the migration. Deleting or rewriting the
+    # capture would destroy the baseline reading the feature's whole comparison
+    # rests on.
+    ".specify/specs/086-efficient-test-execution/test-evidence/baseline.txt",
 )
 
 #: Migration guards must *name* the old path in order to assert its absence, so they

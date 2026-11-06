@@ -495,14 +495,36 @@ ALLOWED_POST_BASELINE_CHANGES = {
             "`create-docs` § Desired-State Baseline and the drawing capability stays "
             "referenced by path, so this is scope on this file, not a second owner. "
             "The historical 069a hash manifest stays the dated record it is; this entry "
-            "records the drift and authorizes nothing else."
+            "records the drift and authorizes nothing else. "
+            "AMENDED 2026-11-07 (merge a4260b34 of the remote 087 line): the "
+            "COMPILED_BANNER_ONLY shape declared for this path was VACUOUS and is "
+            "replaced by a content assertion. Measured, not assumed: 087's later commits "
+            "(4fb0f1aa, d41d0ced) added the trace-record evidence step, the "
+            "`orphan-rendered` face names and the shipped-reference pointer AFTER this "
+            "entry was written, and the frozen 069a copy carries no `<!-- AUTO-GENERATED` "
+            "line at all, so the swap had nothing to swap back into and returned false "
+            "for a delta that was machine-owned plus authored. Worse, at d41d0ced the "
+            "swap's blind spot was the 069a gap itself: swapping at that commit reported "
+            "clean against its own commit-time bytes, not against the frozen record. The "
+            "markers below are therefore asserted as ADDED CONTENT in both directions — "
+            "present in the live file, absent from the 069a frozen bytes — which is "
+            "strictly more than a needle check. The drift stays bounded the same way: "
+            "every marker lies in the diagram-obligation scope above, none names an "
+            "engine or an owner document from C-5's closed wiring surface, and this "
+            "entry authorizes nothing outside that scope."
         ),
         "markers": (
-            "Diagram-sync",
-            "skills/external/draw-diagram",
             "--action obligation",
+            "docs/.speckit/runs/*-diagram-trace.json",
+            "create-docs/references/diagram-obligation.md",
+            "orphan-rendered",
             "staleness finding",
+            "skills/external/draw-diagram",
         ),
+        # The markers above are asserted as ADDED content (absent at 069a), not as
+        # needles that may already have been there. This bites: `Diagram-sync` was the
+        # first candidate and it exists in the frozen bytes, so it witnesses nothing.
+        "added_markers": True,
     },
     "skills/internal/collect-evidence/SKILL.md": {
         "reason": (
@@ -781,17 +803,23 @@ for _stage in ("requirements", "clarify", "plan", "tasks", "checklist",
 # equals its 069a bytes with the compiled banner replaced by the registry's current
 # projection (see `_banner_only_drift` below). All-but-the-banner-lines equality is
 # the marker — stronger than a needle list, and the reason a hand edit inside any of
-# these skills cannot ride in on the allowance. 36 rows: the two remaining drifted
-# sources, `skills/internal/analyze-artifacts/SKILL.md` and
-# `templates/commands/analyze.md`, already carry their own authorial allowances
-# above and are not re-listed.
+# these skills cannot ride in on the allowance. 36 rows: the three remaining drifted
+# sources, `skills/internal/analyze-artifacts/SKILL.md`,
+# `templates/commands/analyze.md` and — as of 2026-11-07 — 
+# `skills/external/improve-docs/SKILL.md`, already carry their own authorial
+# allowances above and are not re-listed.
+#
+# `improve-docs` was REMOVED from this tuple on 2026-11-07 (merge a4260b34): this loop
+# below writes its entry into `ALLOWED_POST_BASELINE_CHANGES` unconditionally, so it
+# silently OVERWROTE the authored entry above and installed the vacuous banner-only
+# shape as the live one. Its own entry now wins, and `_banner_only_drift` is applied
+# to 35 rows instead of 36.
 _FEATURE_087_BANNER_ONLY = (
     "skills/external/create-pages/SKILL.md",
     "skills/external/database-utils/SKILL.md",
     "skills/external/document-utils/SKILL.md",
     "skills/external/draw-diagram/SKILL.md",
     "skills/external/git-utils/SKILL.md",
-    "skills/external/improve-docs/SKILL.md",
     "skills/internal/archive-session/SKILL.md",
     "skills/internal/clarify-artifact/SKILL.md",
     "skills/internal/create-checklist/SKILL.md",
@@ -908,6 +936,7 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
     for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
         text = (REPO_ROOT / rel).read_text(encoding="utf-8")
         banner_only = allowance["markers"] == ("COMPILED_BANNER_ONLY",)
+        added = allowance.get("added_markers", False)
         for marker in allowance["markers"]:
             if banner_only:
                 # The machine-owned banner sentinel is not a needle in the file: it states
@@ -923,6 +952,17 @@ def test_c5_non_wiring_files_keep_their_frozen_hashes():
                 "allowed post-baseline change must carry its own intended content: "
                 "%s is missing marker %r (%s)" % (rel, marker, allowance["reason"])
             )
+            if added:
+                # Two directions, and the second one is what keeps the needle honest: a
+                # marker that was ALREADY in the 069a bytes cannot witness that a drift
+                # happened, so an allowance keyed on it would be vacuous. Needed wherever
+                # the banner swap cannot bound the drift (see `added_markers` below).
+                assert marker not in _git_show("%s:%s" % (FREEZE_COMMIT, rel)), (
+                    "%s is declared as ADDED post-baseline content, but the marker %r is "
+                    "already in its %s frozen bytes — it witnesses nothing and the "
+                    "allowance would accept any drift (%s)"
+                    % (rel, marker, FREEZE_COMMIT, allowance["reason"])
+                )
         assert rel in manifest, (
             "%s is allowlisted but is not a manifest entry, so the freeze never "
             "covered it and the allowance is vacuous" % rel
