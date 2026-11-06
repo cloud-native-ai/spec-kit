@@ -49,9 +49,9 @@ and modifies no existing clause's semantics (FR-001…FR-022 and SC-001…SC-010
 addition only):
 
 4. **An efficiency dimension on the same surfaces** — the status line and the digest say not only
-   *what* is running but *how long each measured unit took*, read from the exec-quant store
+   *what* is running but *how long each step took*, read from the exec-quant store
    (`.specify/memory/exec-quant/`), whose writer stays the existing exec-quant engine (FR-023,
-   FR-024, FR-025).
+   FR-024, FR-025). A step is the `(unit_id, unit_type)` identity the record carries.
 5. **A dedicated measurement-reading command** — `/speckit.measure` analyses and summarises that
    store: per-unit elapsed time, token and call counts, distributions and baselines, for one
    window and one or more units (FR-026, FR-027, FR-028).
@@ -178,10 +178,13 @@ literal is reintroduced elsewhere.
 
 While a long run is in progress the user does not only want to know *that* a step is running — they
 want to know what it has cost so far. The status line, and the on-demand digest, therefore carry one
-bounded efficiency element per measured unit: its elapsed time (and, where the store already holds
-them, its token count and its call count), each marked with how it was obtained — measured, carried,
-or not evaluated. The numbers come from the exec-quant store the framework already writes; the
-feature adds no timer and no second measurement path.
+bounded efficiency element per step: the status line for the step that emitted it, the digest for
+this run's steps or its most recent ones up to the existing cap. A step is the identity the exec-quant
+record itself carries — one `/speckit.*` command invocation, one skill execution — not a row of a
+listing. Each element states that step's elapsed time (and, where the store already holds them, its
+token count and its call count), marked with how it was obtained — measured, carried, or not
+evaluated. The numbers come from the exec-quant store the framework already writes; the feature adds
+no timer and no second measurement path.
 
 **Why this priority**: The user named efficiency visibility explicitly in the revision, and the
 surfaces that must carry it (the cadence line and the digest) already exist in this feature — so the
@@ -196,21 +199,22 @@ carries the elapsed element with its provenance marker, that the `not_evaluated`
 
 **Acceptance Scenarios**:
 
-1. **Given** a run whose measured units have elapsed times in the exec-quant store, **When** a
-   status line or a digest is rendered, **Then** it carries one bounded efficiency element per unit
-   listed, each naming the unit and its elapsed time, within the same declared entry bound as the
-   rest of the line or digest.
-2. **Given** a unit whose record says `not_evaluated` for elapsed time, **When** it is rendered,
+1. **Given** a run whose steps have elapsed times in the exec-quant store, **When** a status line or
+   a digest is rendered, **Then** it carries one bounded efficiency element per step — the emitting
+   step on the line, and the digest's set of this run's or the most recent steps — each naming the
+   step by its `(unit_id, unit_type)` identity and its elapsed time, within the same declared entry
+   bound as the rest of the line or digest.
+2. **Given** a step whose record says `not_evaluated` for elapsed time, **When** it is rendered,
    **Then** the element says the quantity was not evaluated and MUST NOT be printed as `0` and MUST
    NOT be silently dropped.
 3. **Given** a workspace with no exec-quant store at all, **When** either surface renders, **Then**
    the efficiency element renders as an explicit "no measurements" statement and the rest of the
    line or digest is unchanged.
-4. **Given** a unit for which the store holds several records of different ages, **When** a status
-   line or a digest renders that unit, **Then** the element reports the record with the latest
-   `collected_at` and no figure is averaged, summed or ranked across the older ones; **and given**
-   a unit the surface lists for which the store holds no record at all, **Then** the element is
-   still present and says the quantity was not measured.
+4. **Given** a step for which the store holds several records of different ages, **When** a status
+   line or a digest renders that step, **Then** the element reports the record with the latest
+   `collected_at` and no figure is averaged, summed or ranked across the older ones; **and given** a
+   step the surface names for which the store holds no record at all, **Then** the element is still
+   present and says the quantity was not measured.
 
 ---
 
@@ -323,20 +327,23 @@ output, and that the store's files are unchanged after the run.
   content, not an extra line and not a second cadence — a line that doubles in length to carry it
   has broken the bound in FR-012 and must be truncated with the omitted count stated. Truncation
   degrades the element in one declared order: the elapsed quantity stays, and the token and
-  invocation quantities are withdrawn from every unit on that render together, with the withdrawn
-  quantity named in the line's existing omitted summary — never dropped for one unit and kept for
-  another, because two units described to different depths is the ambiguity the bound exists to
+  invocation quantities are withdrawn from every step on that render together, with the withdrawn
+  quantity named in the line's existing omitted summary — never dropped for one step and kept for
+  another, because two steps described to different depths is the ambiguity the bound exists to
   prevent.
-- **A unit the store knows under two types**: the store holds one `unit_id` under more than one
-  `unit_type`, so a figure keyed by the bare id would silently merge two different units. The
-  measurement report's unit identity is the pair `(unit_id, unit_type)`, and two rows sharing an id
-  are reported as two rows; a selection naming the bare id is an input error rather than an
-  ambiguous match.
-- **A unit that renders but has no record**: the status line and the digest list units from their
-  own state sources, not from the exec-quant store, so a listed unit with no record is the ordinary
-  case on a fresh run. It renders the not-evaluated marker — the element is never omitted, because
-  an omission next to a neighbouring unit's number reads as "faster", which is the one inference
-  FR-023 forbids.
+- **A step the store knows under two types**: the store holds one `unit_id` under more than one
+  `unit_type`, so a figure keyed by the bare id would silently merge two different steps. Step
+  identity is the pair `(unit_id, unit_type)` on every surface that carries efficiency, and in the
+  measurement report two rows sharing an id are reported as two rows; a selection naming the bare id
+  is an input error rather than an ambiguous match.
+- **A measured step with no record**: the **unit of the efficiency element is the step identity the
+  exec-quant record itself carries** — the `(unit_id, unit_type)` pair — not a row of any listing, so
+  the element is attached to the step that emitted the line or to the steps the digest summarises,
+  and the store is the efficiency *measurement* source while every non-efficiency part of the line or
+  digest still comes from that surface's own state sources. A step the surface names for which the
+  store holds no record was either never collected or collected outside the window; either way it
+  renders the not-evaluated marker — the element is never omitted, because an omission next to a
+  neighbouring step's number reads as "faster", which is the one inference FR-023 forbids.
 - **Two windows that share a boundary record**: the window is half-open on the end
   (`start ≤ collected_at < end`), so a record whose `collected_at` equals a boundary belongs to the
   window that starts there. Two adjacent reports therefore partition the store exactly: no record is
@@ -465,18 +472,25 @@ output, and that the store's files are unchanged after the run.
   requirement fixes only the shape (one command, one script, one reading).
 - **FR-023**: The **efficiency dimension** MUST be carried on exactly two existing surfaces of this
   feature and no third: the periodic status line (FR-003/FR-004) and the current-state digest
-  (FR-011/FR-012). For every unit a surface already lists, it MUST carry at most one bounded
-  efficiency element naming the unit, its **elapsed time**, and — where the source record carries
-  them — its token count and its invocation count, each marked with the provenance the record
-  states (`measured` / `carried` / `user-given` / `configured`). A quantity the record does not
-  carry MUST render as the explicit not-evaluated marker, never as `0`, never as an averaged
-  substitute and never as an omission. The element is content of the line or digest, not an extra
-  line and not a second surface, and it is subject to FR-012's entry bound unchanged. Within an
-  element the **elapsed quantity is unconditional and comes first**; the token and invocation
-  quantities are appended only while the whole element stays inside the entry bound the surface
-  already applies, and when they cannot fit they are dropped from **every** unit on that render
-  uniformly, with the dropped quantity named as not rendered in that render's existing omitted
-  summary — never per-unit, so two statements of one render never disagree.
+  (FR-011/FR-012). Its **unit is the step** — the step identity `(unit_id, unit_type)` the
+  exec-quant record carries, such as one `/speckit.*` command invocation or one skill execution —
+  and never a row of a registry or a listing: the status line carries the efficiency of the step
+  that emitted it, and the digest carries the efficiency of the steps in this run or of the most
+  recent steps, the set and its size bounded by FR-012's entry bound and its declared cap. For each
+  such step the element MUST be at most one bounded statement naming the step, its **elapsed time**,
+  and — where the source record carries them — its token count and its invocation count, each marked
+  with the provenance the record states (`measured` / `carried` / `user-given` / `configured`). The
+  store is the efficiency **measurement** source only; every non-efficiency content of the line or
+  digest keeps coming from that surface's own state sources, which is why a step's absence from the
+  store never removes the step from those surfaces. A quantity the record does not carry MUST render
+  as the explicit not-evaluated marker, never as `0`, never as an averaged substitute and never as an
+  omission. The element is content of the line or digest, not an extra line and not a second surface,
+  and it is subject to FR-012's entry bound unchanged. Within an element the **elapsed quantity is
+  unconditional and comes first**; the token and invocation quantities are appended only while the
+  whole element stays inside the entry bound the surface already applies, and when they cannot fit
+  they are dropped from **every** step on that render uniformly, with the dropped quantity named as
+  not rendered in that render's existing omitted summary — never per-step, so two statements of one
+  render never disagree.
 - **FR-024**: The efficiency dimension MUST be read **only** from the exec-quant store at
   `.specify/memory/exec-quant/`, through the engine that owns it
   (`scripts/python/exec-quant.py`: its record directory, its legacy-stream compatibility path and
@@ -486,15 +500,16 @@ output, and that the store's files are unchanged after the run.
   database for the dimension. Store availability is never a precondition of the visibility surfaces:
   an absent or empty store renders the explicit "no measurements" state and leaves the rest of the
   line or digest unchanged. **Record selection** is one declared rule and no second one: the element
-  reports the latest record **by `collected_at`** for the unit the surface is already listing, and
-  older records of that unit are not folded into it — no ranking, no averaging and no lifetime
-  aggregate is computed on a visibility surface. A unit limit applies and is the surface's own: the
-  element is rendered for at most the entries that surface already lists, so no additional unit is
-  introduced by this dimension. If one unit carries more than one record with the same latest
+  reports the latest record **by `collected_at`** for the step it describes, matched on that record's
+  own `(unit_id, unit_type)` identity, and older records of that step are not folded into it — no
+  ranking, no averaging and no lifetime aggregate is computed on a visibility surface. A step limit
+  applies and is the surface's own: the status line is the emitting step alone, and the digest's step
+  set is bounded by FR-012's declared cap, so the efficiency dimension introduces no entry the digest
+  would not otherwise count. If one step carries more than one record with the same latest
   `collected_at`, the tie is resolved by the record's own identity in an ascending, byte-stable
-  order, never by filesystem enumeration order. A surface that lists units but finds no record for
-  one of them is covered by FR-023's not-evaluated rule: the element says the quantity was not
-  measured, and it is never omitted so that a reader mistakes absence for speed.
+  order, never by filesystem enumeration order. A step the surface names for which the store holds no
+  record is covered by FR-023's not-evaluated rule: the element says the quantity was not measured,
+  and it is never omitted so that a reader mistakes absence for speed.
 - **FR-025**: The efficiency element's **elapsed-time source MUST NOT require a new recorder**. The
   exec-quant record's elapsed quantity is populated by the existing collection path and its existing
   per-unit hooks; where that path leaves the quantity as `not_evaluated`, FR-023's not-evaluated
@@ -591,10 +606,11 @@ output, and that the store's files are unchanged after the run.
   rather than slow.
 - **Current-State Digest**: the on-demand bounded projection of active lines, dispatched agents and
   recent completions, with per-entry ages and the omitted-entry count.
-- **Efficiency Element**: the bounded statement carried per listed unit on a status line or in the
-  digest — the unit identity, its elapsed time, and (when carried) its token and invocation counts,
-  each with the provenance the source record states. Exactly one per listed unit, taken from that
-  unit's record with the latest `collected_at`, and part of the line's existing content bound.
+- **Efficiency Element**: the bounded statement carried per step on a status line or in the digest —
+  the step identity `(unit_id, unit_type)`, its elapsed time, and (when carried) its token and
+  invocation counts, each with the provenance the source record states. One per step: the emitting
+  step on a status line, the digest's bounded step set in a digest. Taken from that step's record with
+  the latest `collected_at`, and part of the line's existing content bound.
 - **Exec-Quant Record**: one measurement the framework already writes for a measured unit — its unit
   identity and type, its run identity, its collection time, and its quality quantities
   (elapsed time, tokens, exit code, satisfaction) each either a value with a provenance or the
@@ -641,7 +657,7 @@ output, and that the store's files are unchanged after the run.
 - **SC-008**: Pre-existing progress-reporting and dispatch-visibility behavior produces no new failures against the pre-change baseline. **Path**: supporting
 - **SC-009**: The full chain runs end to end on the dogfood line: a real multi-minute run reports on cadence, a supervised subordinate flow is reported by its master, a mid-run digest request is answered, and the guard returns a verdict on the line's own artifacts. **Path**: supporting
 - **SC-010**: The feature's changed-file set introduces no scheduler, timer service, daemon, new runtime dependency, new persistent store, new console channel, new registry, new state spine or new ledger. **Path**: supporting
-- **SC-011**: A status line and a digest rendered over the same fixture store each carry one efficiency element per listed unit within the existing entry bound; a unit whose record says `not_evaluated` renders the explicit not-evaluated marker and neither `0` nor an omission; an absent or empty store renders the explicit "no measurements" state with the rest of the line and digest unchanged; a unit the surface lists with no record at all still carries the not-evaluated marker rather than losing the element, and when the token/invocation quantities cannot fit the bound they are withdrawn from every unit on that render together. **Path**: final
+- **SC-011**: A status line and a digest rendered over the same fixture store each carry one efficiency element per step — the emitting step for the line, the digest's bounded step set for the digest — within the existing entry bound, and each element's unit is the record's `(unit_id, unit_type)` step identity rather than a listing row; a step whose record says `not_evaluated` renders the explicit not-evaluated marker and neither `0` nor an omission; an absent or empty store renders the explicit "no measurements" state with the rest of the line and digest unchanged; a step the surface names with no record at all still carries the not-evaluated marker rather than losing the element, and when the token/invocation quantities cannot fit the bound they are withdrawn from every step on that render together. **Path**: final
 - **SC-012**: Reading the exec-quant store for the efficiency dimension and for the measure report leaves it byte-identical — every file under `.specify/memory/exec-quant/` compares equal before and after both reads, including the legacy stream files, and no new path is created anywhere under it by either read. **Path**: final
 - **SC-013**: `/speckit.measure` over a fixture store of three units (several records each, plus one unreadable record and one legacy-format record) reports per unit the record count and the elapsed/token/invocation figures with their provenance, states the window and selection actually used, and reports the excluded-record counts by reason class; on an empty or absent store it reports "no measurements" and exits with the declared nothing-to-analyse status distinct from both success and error; two adjacent windows over one fixture store partition it — each record counted in exactly one of them — and a unit the store holds under two types is reported as two rows, not one. **Path**: final
 - **SC-014**: Two `/speckit.measure` runs over an unchanged store with the same window and selection produce byte-identical output, the command exits with only statuses from its declared closed set, and its changed-file set adds no process spawn, network call, written file or scheduled process — the additions are one command template, one stdlib-only script, the regenerated per-tool command copies and their tests. **Path**: supporting
@@ -658,7 +674,7 @@ output, and that the store's files are unchanged after the run.
 - **SC-008 Source**: Pre-change baseline node-id set and the post-change run of the affected progress-reporting and dispatch contract suites.
 - **SC-009 Source**: The dogfood run record, the captured cadence lines, the master's subordinate report and the digest output, plus the guard's payload.
 - **SC-010 Source**: The changed-file set from `base..head` and a scan for new process-spawn, scheduler and store-creation sites.
-- **SC-011 Source**: One status-line render and one digest render over the same fixture store (measured, `not_evaluated`, and absent-store cases); their captured output plus the fixture store's record paths, stored verbatim in `test-evidence/`.
+- **SC-011 Source**: One status-line render and one digest render over the same fixture store (measured, `not_evaluated`, absent-store, and step-with-no-record cases); their captured output plus the fixture store's record paths and the `(unit_id, unit_type)` identity of each rendered step, stored verbatim in `test-evidence/`.
 - **SC-012 Source**: A per-file digest of `.specify/memory/exec-quant/` taken before and after both reads, plus a directory listing of it taken after; the two digests and the listing stored verbatim.
 - **SC-013 Source**: One command run over the fixture store with its full output, its exit status, the hand-computed expectation table and the per-reason exclusion counts; plus one run over an empty store with its exit status.
 - **SC-014 Source**: Two consecutive runs' captured outputs compared with a byte-level diff, the command's declared exit-status table, and the changed-file set from `base..head` with the process-spawn / network / write scan.
@@ -770,11 +786,14 @@ output, and that the store's files are unchanged after the run.
   is `not_evaluated` the surfaces say so (FR-023) and FR-025 forbids inventing a second recorder.
   A schema extension, if the plan proves one is needed, is the schema owner's change and is carried
   as a compatibility consequence for readers — never as a private field or a parallel record.
-- **A17 — the efficiency projection is bounded to the surfaces that already exist**: the user asked
-  for efficiency "在可视化信息里", so it lands where this feature's own visibility already lands —
-  the cadence status line and the on-demand digest — and nowhere else. No third surface, no extra
-  line, no per-step line per unit; the element is content within the existing entry bound (FR-012),
-  which is what keeps the status line one screen.
+- **A17 — the efficiency projection is bounded to the surfaces that already exist, and its unit is
+  the step**: the user asked for efficiency "在可视化信息里" **and** for the time each step took
+  ("每个步骤执行的时间"), so it lands where this feature's own visibility already lands — the cadence
+  status line and the on-demand digest — and nowhere else, with the exec-quant record's
+  `(unit_id, unit_type)` as its unit. No third surface, no extra line, and no separate line per step:
+  the line in front of a step carries that step's element, and the digest summarises this run's or the
+  most recent steps. The element is content within the existing entry bound (FR-012), which is what
+  keeps the status line one screen.
 - **A18 — `/speckit.measure` is an analysis entry, not a watcher**: it is the store's analogue of the
   digest — invoked, reads, prints, exits. The existing engine's own `list-records` / `aggregate`
   actions stay exactly as they are (feedback's channel owns `aggregate`'s semantics); `/speckit.measure`
@@ -941,8 +960,9 @@ stage rather than deferred, and the adjudication is recorded here because the us
   carry elapsed time is that owner's declared change, with a stated compatibility consequence —
   never a private field and never a second record format.
 - Q: Which user-visible surface carries efficiency? → A: The two this feature already owns — the
-  cadence status line and the digest — as one bounded element **per listed unit**, inside the
-  existing entry bound (A17, FR-023). No third surface, no extra line, no second cadence.
+  cadence status line and the digest — as one bounded element **per step**, inside the existing entry
+  bound (A17, FR-023). No third surface, no extra line, no second cadence. The step-based unit itself
+  was fixed later by the user's own adjudication; see § Session 2026-11-06 (post-revision-2).
 - Q: How is elapsed time populated if the record leaves it `not_evaluated`? → A: It is not populated
   here. FR-025 forbids a second recorder; FR-023 renders the not-evaluated marker explicitly. A
   plan-stage finding that the existing path cannot populate it becomes a schema-owner request, not a
@@ -986,10 +1006,10 @@ removed or renumbered (29 FR / 14 SC before and after).
   render's existing omitted summary. Per-unit depth differences are the one outcome the bound must not
   produce, because two units described to different depths cannot be compared (A17 unchanged; the
   degradation order is new).
-- Q: Which record does a surface show when the store holds several for one unit? → A: The latest by
+- Q: Which record does a surface show when the store holds several for one step? → A: The latest by
   `collected_at`, and nothing is folded in — no average, no sum, no ranking — because the surface's
-  question is "what is it costing now". A listed unit with no record at all renders the not-evaluated
-  marker rather than dropping the element, since an omission beside a neighbouring unit's number reads
+  question is "what is it costing now". A step with no record at all renders the not-evaluated
+  marker rather than dropping the element, since an omission beside a neighbouring step's number reads
   as "faster". Ties on `collected_at` are broken by record identity in ascending byte-stable order,
   never by enumeration order (FR-024; A23).
 - Q: What does `/speckit.measure` mean by "a declared window"? → A: One pair reusing the store
@@ -1014,4 +1034,32 @@ removed or renumbered (29 FR / 14 SC before and after).
   and no second store engine. The two consumers are two projections of that one reader, and neither
   may borrow the other's selection: a lifetime figure on a status line, or a latest-record-only figure
   in a window report, would each answer the wrong question (A23, A26).
+
+### Session 2026-11-06 (post-revision-2) — the efficiency unit, adjudicated by the user
+
+**Mode: A — post-requirements; target `.specify/specs/087-speckit-visualization/requirements.md`.**
+This entry records a **user adjudication**, not a self-adjudication: the question was put to the user
+and answered by them, so the reasoning below is theirs plus the evidence it was checked against. It
+corrects one reading the earlier revision had taken without asking, and its direct dependants only —
+no FR or SC id is added, removed or renumbered (29 FR / 14 SC before and after), and
+FR-001…FR-022 / SC-001…SC-010 are untouched.
+
+- Q: On the visibility surfaces, what is the **unit** of an efficiency element — a row the surface is
+  already listing (a registry line, a digest entry), or the step the measurement belongs to? → A:
+  **The step.** The unit is the step identity `(unit_id, unit_type)` that the exec-quant record itself
+  carries — `/speckit.plan`, `skill:xxx` and their siblings — so the status line shows the efficiency
+  of the step that emitted it, and the digest shows this run's or the most recent steps' efficiency,
+  bounded by the existing cap. This is the user's own wording, "每个步骤执行的时间", and the earlier
+  revision's reading — that the surfaces list units **from their own state sources, not from the
+  exec-quant store**, making "a listed unit with no record" the ordinary case — is **withdrawn as
+  wrong**: the store is the efficiency *measurement* source, while every non-efficiency part of a line
+  or digest still comes from the surface's own state source. The ordinary degraded case is therefore
+  not "a listing row with no record" but "a step whose quantity the record leaves `not_evaluated` or
+  for which no record was collected", which renders the explicit not-evaluated marker rather than
+  dropping the element. Evidence: the records under `.specify/memory/exec-quant/records/` carry
+  `unit_id` / `unit_type` / `collected_at` per record and are keyed by step, so a step is directly
+  resolvable and needs no join to a listing. Dependants corrected with it: the User Story 5 narrative
+  and its acceptance scenario 4, the listed-unit Edge Case, FR-023 (now names the step as the unit),
+  FR-024 (matching and the step limit), SC-011, SC-011's source, the Efficiency Element key entity
+  and A17.
 
