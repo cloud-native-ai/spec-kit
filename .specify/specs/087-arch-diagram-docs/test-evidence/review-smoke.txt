@@ -1,0 +1,57 @@
+# Review smoke — 087-arch-diagram-docs (2026-11-06)
+
+Interpreter: 3.11.13
+
+## Command 1 — the five obligation/command files
+$ /usr/bin/python3 -m pytest tests/unit/test_docs_utils_obligation.py tests/unit/test_docs_utils_carriers.py tests/unit/test_docs_obligation_reuse.py tests/integration/test_docs_obligation_scenarios.py tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [ 59%]
+.................................................                        [100%]
+=============================== warnings summary ===============================
+../../../../../../../storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+121 passed, 1 warning in 4.68s
+EXIT=0
+
+## Command 2 — the five guard files (baseline comparison by name)
+$ /usr/bin/python3 -m pytest tests/contract/test_expression_compatibility.py tests/contract/test_expression_gate_wiring.py tests/contract/test_docs_command_template.py tests/contract/test_confirmation_gates_sweep.py tests/contract/test_directory_governance.py -q --no-header -p no:cacheprovider --tb=no -rf
+/home/agent/.local/lib/python3.11/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.......................................................F................ [ 59%]
+.................................................                        [100%]
+=============================== warnings summary ===============================
+../../../../../../../storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14
+  /storage/project/cloud-native-tools/cws-lib-python/lib/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+1 failed, 120 passed, 1 warning in 2.21s
+EXIT=1
+
+## Command 3 — fixture invariant check
+$ /usr/bin/python3 tests/fixtures/docs-obligation/build_fixtures.py --check
+OK: 11 docs-obligation fixture spaces match their registered composition
+EXIT=0
+
+## Command 4 — scope disciplines
+$ git diff --name-only 24cb4edc..HEAD -- docs/
+docs/concepts/documentation-model.md
+EXIT=0
+$ git diff --name-only 24cb4edc..HEAD -- skills/external/draw-diagram/ | wc -l
+0
