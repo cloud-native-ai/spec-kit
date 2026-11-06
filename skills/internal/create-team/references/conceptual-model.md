@@ -89,6 +89,23 @@ The team domain has **four** collaboration patterns. Each encodes a different **
 - **temporary** — a worker/stage agent instantiated for a single run from a stage/worker template; discarded when the run ends. Lives only in the orchestrator's context.
 - **persistent** — a reusable agent stored at `.specify/agents/templates/<slug>.agent.md` (role Template) or `.specify/agents/instances/<slug>.agent.md` (Instance) and symlinked into each supported tool.
 
+## Temporary (Run-Scoped) Team
+
+A **Temporary Team** is a spec-attached, run-scoped team used when the SDD flow is the outer container (run-scoped SDD flow). It uses the same team schema, create/run/improve machinery, and report contract as a Global Team; only its **storage and lifecycle scope** differ.
+
+```
+.specify/specs/<NNN-slug>/team/
+├── team.md
+└── runs/<run_id>-report.md
+```
+
+- **Creation timing**: created only after both `clarify` and `plan` pass U4 — the design is what makes the roster and concurrency decidable. It is bound to the spec's Temporary Goal.
+- **Frontmatter extension**: `scope: spec`, `spec_dir`, `goal_slug`, optional `lifecycle_state`, and a `stage_seats` block map. These are additive; existing keys keep their meaning.
+- **Stage dimension is not the SDD stage roster**: the Team's own `Stage` values remain `executor` / `evaluator` / `optimizer`. The canonical SDD stages exist only as `stage_seats` keys, each carrying its seats and `max_parallel`.
+- **Dynamic roster**: the number and type of agents per stage are implementation details decided by the work-package benefit test, effective concurrency, and checkpoint evidence. No fixed per-stage count is a contract.
+- **Lifecycle**: active by default; archived in place at completion. It never writes `.specify/teams/**` or `.specify/goal/**`.
+- **One per spec by default**: multiple runs append `runs/` and checkpoints rather than creating new team directories.
+
 ## Template home
 
 The multi-agent authoring templates (team-supervisor, the three EEI stages, and the parallel/serial/triad orchestration templates + workflow schema) live in `skills/internal/create-team/templates/agents/` (installed mirror: `.specify/skills/internal/create-team/templates/agents/`). The single-agent **capacity** templates (`agent-capacity-<X>-template.md`) and the custom/project-custom scaffolds remain in `skills/internal/create-agent/templates/`. The `continuous` operating discipline is documented in [`operating-loops.md`](operating-loops.md).

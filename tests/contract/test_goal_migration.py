@@ -52,6 +52,10 @@ HISTORICAL_PREFIXES = (
 #: cache that records dead references to renamed paths by design.
 RUNTIME_CACHE_PREFIXES = (
     ".specify/memory/sanitize/",
+    # 2026-11-06 Feature 085: full-suite evidence records may quote pre-existing
+    # failure text that names the old path; a generated evidence cache is not a
+    # live face and must not be read as one.
+    ".specify/specs/085-sdd-temporary-goal-team/test-evidence/",
 )
 
 #: Migration guards must *name* the old path in order to assert its absence, so they

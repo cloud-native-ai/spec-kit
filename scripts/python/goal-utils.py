@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -53,8 +54,119 @@ EXIT_INVALID = 4
 EXIT_BLOCKED = 5
 
 ARCHIVE_DIRNAME = ".specify/goal"
+TEAM_DIRNAME = ".specify/teams"
+SPEC_GOAL_DIRNAME = "goal"
+SPEC_TEAM_DIRNAME = "team"
 DEFINITION_FILENAME = "goal.md"
 SUMMARY_DIRNAME = "summary"
+
+#: Resolved once per CLI invocation by `resolve_scope`; direct API callers leave it None,
+#: which preserves the legacy global behavior byte for byte.
+_ACTIVE_SCOPE = None
+
+
+class ScopeError(Exception):
+    """A scope selection that cannot be resolved; the message names the failing condition."""
+
+
+class Scope:
+    """The resolved goal/team roots for one CLI invocation."""
+
+    __slots__ = ("scope", "repo_root", "spec_dir", "goal_root", "team_root")
+
+    def __init__(self, scope: str, repo_root: Path, spec_dir: Path | None,
+                 goal_root: Path, team_root: Path):
+        self.scope = scope
+        self.repo_root = Path(repo_root)
+        self.spec_dir = spec_dir
+        self.goal_root = Path(goal_root)
+        self.team_root = Path(team_root)
+
+    def goal_definition(self, slug: str) -> Path:
+        return self.goal_root / slug / DEFINITION_FILENAME
+
+    def team_definition(self, slug: str) -> Path:
+        return self.team_root / slug / "team.md"
+
+    def as_dict(self, slug: str | None = None) -> dict:
+        row = {
+            "scope": self.scope,
+            "spec_dir": str(self.spec_dir) if self.spec_dir else None,
+            "goal_root": str(self.goal_root),
+            "team_root": str(self.team_root),
+        }
+        if slug:
+            row["goal_definition"] = str(self.goal_definition(slug))
+            row["team_definition"] = str(self.team_definition(slug))
+        return row
+
+
+def _has_any_definition(root: Path) -> bool:
+    if not root.is_dir():
+        return False
+    return any(child.is_dir() and (child / DEFINITION_FILENAME).is_file()
+               for child in root.iterdir())
+
+
+def _has_team(root: Path, slug: str | None) -> bool:
+    if not root.is_dir():
+        return False
+    if slug:
+        return (root / slug / "team.md").is_file()
+    return any(child.is_dir() and (child / "team.md").is_file()
+               for child in root.iterdir())
+
+
+def resolve_scope(repo_root: Path, scope: str = "global",
+                  spec_dir: str | os.PathLike | None = None,
+                  team_slug: str | None = None) -> Scope:
+    """Resolve the goal/team roots. The path rule has exactly one owner: this function."""
+    repo_root = Path(repo_root)
+    global_goal = repo_root / ARCHIVE_DIRNAME
+    global_team = repo_root / TEAM_DIRNAME
+    if scope not in ("global", "spec", "auto"):
+        raise ScopeError(f"scope {scope!r} is outside the closed set global / spec / auto")
+
+    resolved_spec = None
+    if spec_dir:
+        candidate = Path(spec_dir)
+        if not candidate.is_absolute():
+            candidate = repo_root / candidate
+        candidate = candidate.resolve()
+        try:
+            candidate.relative_to((repo_root / ".specify" / "specs").resolve())
+        except ValueError as exc:
+            raise ScopeError(
+                f"spec scope requires a directory under .specify/specs/: {candidate}") from exc
+        resolved_spec = candidate
+    elif os.environ.get("SPECIFY_FEATURE"):
+        candidate = repo_root / ".specify" / "specs" / os.environ["SPECIFY_FEATURE"]
+        if candidate.is_dir():
+            resolved_spec = candidate.resolve()
+
+    def spec_scope() -> Scope:
+        if resolved_spec is None:
+            raise ScopeError(
+                "spec-scope-requires-spec-dir: spec scope requires --spec-dir (or SPECIFY_FEATURE resolving to an existing spec directory)")
+        return Scope("spec", repo_root, resolved_spec,
+                     resolved_spec / SPEC_GOAL_DIRNAME, resolved_spec / SPEC_TEAM_DIRNAME)
+
+    if scope == "global":
+        return Scope("global", repo_root, None, global_goal, global_team)
+    if scope == "spec":
+        return spec_scope()
+
+    global_present = _has_any_definition(global_goal) or _has_team(global_team, team_slug)
+    spec_present = (resolved_spec is not None and
+                    (_has_any_definition(resolved_spec / SPEC_GOAL_DIRNAME) or
+                     _has_team(resolved_spec / SPEC_TEAM_DIRNAME, team_slug)))
+    if global_present and spec_present:
+        raise ScopeError(
+            "scope-ambiguous: both the global and spec candidates exist "
+            f"({global_goal} and {resolved_spec}); pass --scope global or --scope spec")
+    if spec_present:
+        return spec_scope()
+    return Scope("global", repo_root, None, global_goal, global_team)
 
 #: Exactly three, per the concept authority. `superseded` is deliberately absent.
 LIFECYCLE_STATES = ("active", "achieved", "abandoned")
@@ -169,7 +281,15 @@ def is_valid_identity(slug: str) -> bool:
 
 
 def archive_root(repo_root: Path) -> Path:
+    if _ACTIVE_SCOPE is not None:
+        return _ACTIVE_SCOPE.goal_root
     return Path(repo_root) / ARCHIVE_DIRNAME
+
+
+def team_root(repo_root: Path) -> Path:
+    if _ACTIVE_SCOPE is not None:
+        return _ACTIVE_SCOPE.team_root
+    return Path(repo_root) / TEAM_DIRNAME
 
 
 def definition_path(repo_root: Path, slug: str) -> Path:
@@ -759,7 +879,7 @@ def resolve_team_goal_identity(repo_root: Path, team_slug: str) -> tuple[str | N
     """Two-level goal identity resolution (036 §10.1) — explicit `goal_slug`
     wins, else the team slug when it names an archived definition. No third
     level (038 contract §2.1)."""
-    team_md = Path(repo_root) / ".specify/teams" / team_slug / "team.md"
+    team_md = team_root(repo_root) / team_slug / "team.md"
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
     meta, _ = _split_frontmatter(team_md.read_text(encoding="utf-8"))
@@ -983,7 +1103,7 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
     is the `input-error` verdict, which maps to exit 2 for either cause alike.
     """
     repo_root = Path(repo_root)
-    team_md = repo_root / ".specify/teams" / team_slug / "team.md"
+    team_md = team_root(repo_root) / team_slug / "team.md"
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
 
@@ -1080,7 +1200,7 @@ def migrate_team(repo_root: Path, team_slug: str, *, keep_inline: bool = True) -
     removal is the user's choice, never forced. Semantics are preserved: the objective
     the team resolved before migration is the objective the definition carries after.
     """
-    team_md = Path(repo_root) / ".specify/teams" / team_slug / "team.md"
+    team_md = team_root(repo_root) / team_slug / "team.md"
     if not team_md.is_file():
         raise GoalError(f"team not found: {team_md}")
     text = team_md.read_text(encoding="utf-8")
@@ -1165,12 +1285,20 @@ def main(argv: list[str] | None = None) -> int:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--repo-root", default=None, help="repository root (default: cwd)")
     common.add_argument("--json", action="store_true", help="machine-readable output")
+    common.add_argument("--scope", choices=("global", "spec", "auto"), default=None,
+                        help="goal/team scope: global, spec (requires --spec-dir), or auto")
+    common.add_argument("--spec-dir", default=None,
+                        help="the spec directory for --scope spec/auto (repo-relative or absolute)")
 
     parser = argparse.ArgumentParser(
         description="Goal definition engine for /speckit.goal.",
         parents=[common],
     )
     sub = parser.add_subparsers(dest="action", required=True)
+
+    p_scope = sub.add_parser("resolve-scope", parents=[common],
+                             help="read: resolve the global/spec/auto goal and team roots")
+    p_scope.add_argument("--team", default=None, help="optional team slug for identity-aware auto")
 
     p_create = sub.add_parser("create", parents=[common],
                               help="write: archive a new goal definition")
@@ -1252,6 +1380,29 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
+
+    global _ACTIVE_SCOPE
+    _ACTIVE_SCOPE = None
+    write_action = args.action in ("create", "status", "objective", "criteria", "migrate")
+    if args.action == "targets":
+        write_action = bool(args.add_statement or args.set_state)
+    requested_scope = args.scope
+    if requested_scope is None:
+        requested_scope = "auto" if args.action == "resolve-scope" else "global"
+    if requested_scope == "auto" and write_action:
+        _emit({"error": "scope auto is read-only; pass --scope global or --scope spec for a write"},
+              args.json)
+        return EXIT_INPUT_ERROR
+    team_slug = getattr(args, "team_slug", None) or getattr(args, "team", None)
+    try:
+        scope_obj = resolve_scope(repo_root, requested_scope, args.spec_dir, team_slug)
+    except ScopeError as exc:
+        _emit({"error": str(exc)}, args.json)
+        return EXIT_INPUT_ERROR
+    if args.action == "resolve-scope":
+        _emit(scope_obj.as_dict(team_slug), args.json)
+        return EXIT_OK
+    _ACTIVE_SCOPE = scope_obj
 
     try:
         if args.action == "create":
@@ -1391,6 +1542,10 @@ def main(argv: list[str] | None = None) -> int:
     except GoalError as exc:
         _emit({"error": str(exc)}, args.json)
         return EXIT_INPUT_ERROR
+    finally:
+        # The scope is per invocation; a leaked value would redirect a later
+        # direct API call (e.g. a fixture's create_goal) into the wrong root.
+        _ACTIVE_SCOPE = None
 
     _emit(result, args.json)
     return EXIT_OK

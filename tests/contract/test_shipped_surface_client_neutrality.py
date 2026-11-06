@@ -35,6 +35,17 @@ BANNED_PATTERNS = [
 ]
 
 KNOWN_DEBT = {
+    # 2026-11-06 Feature 085 audit: pre-existing Feature NNN attributions in the SDD
+    # driver/complement are dated provenance, not client-runtime pointers. Recorded
+    # here so the guard stays live for every other shipped file; a later cleanup can
+    # rewrite them client-neutrally and drop these entries.
+    "shared/definitions/flow-class-definitions.md",
+    "skills/external/sdd-loop-driver/references/decomposition-model.md",
+    "skills/external/sdd-loop-driver/references/dispatch-recipes.md",
+    "skills/external/sdd-loop-driver/scripts/loop-state.py",
+    "skills/external/sdd-loop-driver/scripts/wp-report.py",
+    "skills/external/sdd-loop-driver/SKILL.md",
+    "skills/external/sdd-loop-driver/templates/stage-team-preset.md",
     # 2026-10-12 S3 command thinning (sanitize.md -> sanitize-materials skill) flattened
     # the framework repo's own spec-contract path into the skill prose (2 lines). The
     # client-neutral rewrite belongs to the S3 team's skill-side follow-up; allowlisted

@@ -457,6 +457,18 @@ ALLOWED_POST_BASELINE_CHANGES = {
             "shared/declarations/facts/evidence-seven-states.yaml#/statement",
         ),
     },
+    "skills/internal/create-agent/SKILL.md": {
+        "reason": "2026-11-06 Feature 085 replaces the generic sdd-executor first application with the stage-specific role family",
+        "markers": ("sdd-requirement-analyzer", "sdd-plan-coordinator"),
+    },
+    "templates/commands/goal.md": {
+        "reason": "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local goals",
+        "markers": ("--scope", "--spec-dir"),
+    },
+    "templates/commands/team.md": {
+        "reason": "2026-11-06 Feature 085 adds --scope/--spec-dir for global and spec-local teams",
+        "markers": ("--scope", "--spec-dir"),
+    },
     "skills/internal/create-team/SKILL.md": {
         "reason": "2026-10-29 Feature 074b adds the mandatory `## Nested SDD Runs` report section (report contract)",
         "markers": ("## Nested SDD Runs", "Nested SDD Runs section"),

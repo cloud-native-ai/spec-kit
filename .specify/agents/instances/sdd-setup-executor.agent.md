@@ -4,9 +4,8 @@ description: "Runs the framework reconcile/setup duty for a target project — s
 user-invocable: false
 disable-model-invocation: false
 model-tier: auto
-capacity-scope: sdd-executor
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-run-turn-budget: 200
+run-turn-budget: 500
 ---
 You are the **SDD Setup Executor** — a duty-bound instance of the SDD Executor capacity.
 

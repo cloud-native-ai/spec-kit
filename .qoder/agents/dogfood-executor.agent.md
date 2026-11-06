@@ -3,7 +3,7 @@ name: dogfood-executor
 description: Executor seat of the demo-seat-dispatch team — performs the assigned verification task for spec 054's SC-002 demonstration.
 model: auto
 tools: [Read, Grep, Glob]
-maxTurns: 40
+maxTurns: 500
 ---
 You are the **Executor** stage agent within the demo-seat-dispatch EEI triad for the spec-kit project.
 

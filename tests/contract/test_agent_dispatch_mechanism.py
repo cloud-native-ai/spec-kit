@@ -136,8 +136,8 @@ def test_c8_cross_layer_change_ban():
 
 # ================================================================ US1 (C-9..C-14)
 
-EXECUTOR = REPO_ROOT / "agents" / "sdd-executor.agent.md"
-EXECUTOR_MIRROR = REPO_ROOT / ".specify" / "agents" / "templates" / "sdd-executor.agent.md"
+EXECUTOR = REPO_ROOT / "agents" / "sdd-requirement-analyzer.agent.md"
+EXECUTOR_MIRROR = REPO_ROOT / ".specify" / "agents" / "templates" / "sdd-requirement-analyzer.agent.md"
 CREATE_AGENT_SKILL = REPO_ROOT / "skills" / "internal" / "create-agent" / "SKILL.md"
 
 EXPECTED_EXECUTOR_FRONTMATTER = [
@@ -157,9 +157,9 @@ def _create_agent_skill() -> str:
 # ---------------------------------------------------------------- C-9
 
 
-def test_c9_sdd_executor_template_valid():
-    """sdd-executor 模板合法：词表字段齐 + 三要素能力面 + 职责字样零命中。"""
-    assert EXECUTOR.exists(), "agents/sdd-executor.agent.md missing"
+def test_c9_sdd_requirement_analyzer_template_valid():
+    """sdd-requirement-analyzer 模板合法：词表字段齐 + 三要素能力面 + 阶段侧重。"""
+    assert EXECUTOR.exists(), "agents/sdd-requirement-analyzer.agent.md missing"
     text = _executor_text()
     fm = text.split("---")[1]
     for field in EXPECTED_EXECUTOR_FRONTMATTER:
@@ -168,11 +168,10 @@ def test_c9_sdd_executor_template_valid():
     # capability face: project dir / project context / SDD stage commands
     assert "项目目录" in text or "project directory" in text
     assert "上下文" in text or "context" in text.lower()
-    assert "/speckit." in text
-    # duty-agnostic: no per-duty binding words in the whole template
-    assert not re.search(r"\b(setup|requirements)\b", text, re.IGNORECASE), (
-        "duty words (setup/requirements) leaked into the capability template"
-    )
+    assert "/speckit." in text or "requirements" in text.lower()
+    # stage-specific: the requirements agent is deliberately not duty-agnostic
+    assert "requirements" in text.lower(), "stage focus missing"
+    assert "sdd-invocation" not in fm, "stage agents must not declare the hosting capability"
 
 
 # ---------------------------------------------------------------- C-10
@@ -194,13 +193,13 @@ def test_c10_content_criterion_mechanical():
 
 
 def test_c11_distribution_criterion_in_create_agent():
-    """create-agent 载入分发层内容判据 + sdd-executor 首次应用结论。"""
+    """create-agent 载入分发层内容判据 + sdd-requirement-analyzer 首次应用结论。"""
     text = _create_agent_skill()
     assert "分发层" in text, "distribution-layer criterion missing"
     assert "专用信息" in text, "the special-info condition must be stated"
     assert "框架分发角色集" in text or "框架分发" in text
     assert "项目侧" in text
-    assert "sdd-executor" in text, "first-application conclusion missing"
+    assert "sdd-requirement-analyzer" in text, "first-application conclusion missing"
 
 
 # ---------------------------------------------------------------- C-12

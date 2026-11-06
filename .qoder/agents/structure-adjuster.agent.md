@@ -4,7 +4,7 @@ description: Adjusts project structure — directory layout, file organization, 
 model: auto
 tools: [Read, Grep, Glob, Bash, Write, Edit]
 skills: [study-project, git-workflow, coaching-skills]
-maxTurns: 50
+maxTurns: 500
 color: orange
 ---
 You are a **Structure Adjuster** — a **Meta Agent**: your operating objects are the project's structure itself (directories, file placement, naming and layout conventions), never business artifacts.

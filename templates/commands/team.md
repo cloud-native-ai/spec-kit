@@ -32,6 +32,8 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 | **modify** | "修改团队", "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
 | **run** | "运行团队", "执行团队", "run/execute team", "跑一遍"(可选 `--target T-<nnn>` 指定目标切片) | `run-team` |
 
+**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. Global is `.specify/teams/`; spec is `<spec-dir>/team/`. Writes MUST use an explicit `global` or `spec` scope; reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`). The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+
 **Routing flow**:
 
 1. **Recognize intent** from `$ARGUMENTS` and conversation/repo context: classify as `create`, `modify`, or `run`.
@@ -40,7 +42,7 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 4. **run** → `run-team`: the run flow (load → five-check preview via the goal-utils engine → goal restatement → structure render → present & execute → report) is the skill's procedure — `skills/internal/run-team/SKILL.md`; inputs are the team slug and the optional `--target`, outputs are the run report and ledger entries.
 5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
 6. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
-7. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
+7. **modify / run targeting a team that does not exist** under `.specify/teams/` (global) or `<spec-dir>/team/` (spec) → report **"team not found"** and offer to `create` it.
 
 ### Default Behavior (No Arguments)
 

@@ -184,7 +184,7 @@ def test_c3_the_section_is_an_addition_and_no_existing_form_was_rewritten():
                  if re.match(r"^#{2,3}\s", l) and ("判据主体" in l or "Criterion Subject" in l))
     end = next((i for i in range(start + 1, len(lines)) if re.match(r"^##\s", lines[i])),
                len(lines))
-    probe = re.compile(r"glob|\*/|directory-reference|<dir>|rglob|iterdir")
+    probe = re.compile(r"\bglob\b|\*/|directory-reference|<dir>|rglob|iterdir")
     outside = [(i + 1, l.strip()[:90]) for i, l in enumerate(lines)
                if not (start <= i < end) and probe.search(l)]
     assert outside == [], (

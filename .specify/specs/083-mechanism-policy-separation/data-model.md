@@ -288,6 +288,37 @@
 
 - **V-34**: `coaching-skills` / `run-skills` 的改写 MUST 限于引用串改写与「按 owner 归一化并披露」的接线句；出现判据表 / 症状表 / 失败表的任何一行即判红（C9：两个能力的 owner 互不复制）。
 
+### 085 追加登记（2026-11-06）
+
+Feature 085 legitimately edits the comparison unit to add the temporary Goal/Team, stage agents, child lines and checkpoint protocol. The rows below are registered so the SC-003 containment guard stays decidable; the 083 rows above keep their own meaning and count.
+
+| # | 路径 | 类别 | 属比较单元 |
+|---|---|---|---|
+| 21 | `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` | 新增（085 checkpoint protocol） | 是 |
+| 22 | `skills/external/sdd-loop-driver/SKILL.md` | 改写（085 U0/temporary scope/checkpoint pointer） | 是 |
+| 23 | `skills/external/sdd-loop-driver/references/decomposition-model.md` | 改写（085 write_isolation + requirements/tasks rules） | 是 |
+| 24 | `skills/external/sdd-loop-driver/references/dispatch-recipes.md` | 改写（085 budget 500） | 是 |
+| 25 | `skills/external/sdd-loop-driver/scripts/line-registry.py` | 改写（085 child lines + agent cap） | 是 |
+| 26 | `skills/external/sdd-loop-driver/scripts/wp-gate.py` | 改写（085 stages/rules/write_isolation/max_turns） | 是 |
+| 27 | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | 改写（085 write_isolation） | 是 |
+| 28 | `skills/internal/create-agent/SKILL.md` | 改写（085 first application + stage roles） | 是 |
+| 29 | `skills/internal/create-agent/templates/agent-capacity-knowledge-manager-template.md` | 改写（085 budget 500） | 是 |
+| 30 | `skills/internal/create-agent/templates/agent-capacity-module-designer-template.md` | 改写（085 budget 500） | 是 |
+| 31 | `skills/internal/create-agent/templates/agent-capacity-qa-engineer-template.md` | 改写（085 budget 500） | 是 |
+| 32 | `skills/internal/create-agent/templates/agent-capacity-requirements-analyst-template.md` | 改写（085 budget 500） | 是 |
+| 33 | `skills/internal/create-agent/templates/agent-capacity-system-designer-template.md` | 改写（085 budget 500） | 是 |
+| 34 | `skills/internal/create-agent/templates/agent-capacity-test-engineer-template.md` | 改写（085 budget 500） | 是 |
+| 35 | `skills/internal/create-agent/templates/agent-capacity-ux-analyst-template.md` | 改写（085 budget 500） | 是 |
+| 36 | `skills/internal/create-agent/templates/agent-project-custom-template.md` | 改写（085 budget 500） | 是 |
+| 37 | `skills/internal/create-team/references/conceptual-model.md` | 改写（085 Temporary Team） | 是 |
+| 38 | `skills/internal/create-team/references/create-mode.md` | 改写（085 scope/stage_seats） | 是 |
+| 39 | `skills/internal/create-team/templates/agents/agent-team-supervisor-template.md` | 改写（085 budget 500） | 是 |
+| 40 | `skills/internal/run-agent/SKILL.md` | 改写（085 stage role family） | 是 |
+| 41 | `templates/commands/goal.md` | 改写（085 --scope/--spec-dir） | 是 |
+| 42 | `templates/commands/team.md` | 改写（085 --scope/--spec-dir） | 是 |
+
+**结构不变量**：第 21–42 行是 085 的追加登记，不改变 083 第 1–20 行的计数与含义；比较单元的分母仍是“baseline 路径 + 本表 in-unit 新增路径”，由 `test_mechanism_policy_guard.py` 的同一解析器读取。
+
 ## 实体关系
 
 ```

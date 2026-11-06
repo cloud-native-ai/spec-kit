@@ -69,6 +69,8 @@ DEFAULT_LOCK_TIMEOUT = 10.0
 DEFAULT_PORT_START = 39000
 DEFAULT_BLOCK_SIZE = 20
 DEFAULT_CONCURRENCY_CAP = 4
+DEFAULT_AGENT_CONCURRENCY_CAP = 24
+LINE_ROLES = {"root", "coordinator", "agent-write"}
 RUNTIME_RECORD_DIRS = (
     Path(".specify") / "memory" / "feedback",
     Path(".specify") / "memory" / "session",
@@ -440,6 +442,15 @@ def validate_entry(entry: dict) -> dict:
     validate_line_id(entry["line_id"])
     validate_run_id(entry["run_id"])
     validate_state(entry["state"])
+    if entry.get("line_role") is not None:
+        require(entry["line_role"] in LINE_ROLES,
+                f"line_role must be one of {sorted(LINE_ROLES)}")
+    if entry.get("parent_line_id"):
+        require(entry.get("line_role") == "agent-write",
+                "a child line requires line_role=agent-write")
+    if entry.get("line_role") == "agent-write":
+        require(bool(entry.get("parent_line_id")),
+                "line_role=agent-write requires parent_line_id")
     _check_abs(entry["project_dir"], "project_dir")
     _check_abs(entry["repo_root"], "repo_root")
     state = entry["state"]
@@ -552,6 +563,16 @@ def fail_from(exc: EngineError) -> int:
 # ---------------------------------------------------------------- actions: lifecycle
 
 
+def _child_count(reg: Path, parent_line_id: str) -> int:
+    count = 0
+    for path in reg.glob("*.json"):
+        other = read_json(path)
+        if (other.get("parent_line_id") == parent_line_id
+                and other.get("state") in {"active", "waiting"}):
+            count += 1
+    return count
+
+
 def action_register(ctx: Context) -> int:
     args = ctx.args
     ensure_registry_dir(ctx.reg)
@@ -584,6 +605,31 @@ def action_register(ctx: Context) -> int:
         "updated_at": at,
         "run_history": [],
     }
+    if args.parent_line_id:
+        require(args.line_role in (None, "agent-write"),
+                "a child line requires line_role=agent-write")
+        parent_id = validate_line_id(args.parent_line_id)
+        parent = ctx.load(parent_id)
+        require(parent.get("parent_line_id") is None,
+                "the parent line must not itself be a child (depth is exactly one)")
+        require(parent.get("line_role") in (None, "root", "coordinator"),
+                "the parent line must be a root or coordinator line")
+        cap = int(os.environ.get("SPECIFY_AGENT_CONCURRENCY_CAP",
+                                 DEFAULT_AGENT_CONCURRENCY_CAP))
+        if _child_count(ctx.reg, parent_id) >= cap:
+            raise EngineError(
+                EXIT_HELD,
+                f"agent-concurrency-cap: parent {parent_id} already has "
+                f"{_child_count(ctx.reg, parent_id)} active/waiting child lines (cap {cap})",
+                line_id=line_id, parent_line_id=parent_id,
+            )
+        require(bool(args.write_line),
+                "a child line requires --write-line (own worktree and branch)")
+        entry["parent_line_id"] = parent_id
+        entry["line_role"] = "agent-write"
+        entry["agent_cap"] = cap
+    elif args.line_role:
+        entry["line_role"] = args.line_role
     if args.worktree_path:
         entry["worktree_path"] = str(Path(args.worktree_path).expanduser().resolve())
     if args.branch:
@@ -1632,6 +1678,7 @@ def action_promote_waiting(ctx: Context) -> int:
     active = [
         read_json(path) for path in ctx.reg.glob("*.json")
         if read_json(path).get("line_id") != line_id
+        and not read_json(path).get("parent_line_id")
         and read_json(path).get("state") == "active"
         and read_json(path).get("stage")
     ]
@@ -1825,7 +1872,7 @@ def action_allocate_resources(ctx: Context) -> int:
         other = read_json(path)
         if other.get("line_id") == line_id:
             continue
-        if other.get("state") == "active" and other.get("stage"):
+        if other.get("state") == "active" and other.get("stage") and not other.get("parent_line_id"):
             others.append(other)
     if len(others) >= cap:
         def mark_waiting(data):
@@ -2484,6 +2531,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--state")
     parser.add_argument("--manifest")
     parser.add_argument("--write-line", action="store_true", default=False)
+    parser.add_argument("--parent-line-id", default=None,
+                        help="parent line for a child agent-write line (depth 1)")
+    parser.add_argument("--line-role", choices=sorted(LINE_ROLES), default=None,
+                        help="root | coordinator | agent-write")
     parser.add_argument("--stage")
     parser.add_argument("--last-event")
     parser.add_argument("--driver-session")

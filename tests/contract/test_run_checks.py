@@ -74,10 +74,11 @@ EXIT_CODES = {
     "EXIT_BLOCKED": 5,
 }
 
-# C-22: the closed action roster (10 = the existing 9 plus run-checks).
+# C-22: the closed action roster (11 = the existing 10 plus resolve-scope).
 ACTIONS = [
     "create", "validate", "check-statement", "list", "status",
     "objective", "criteria", "migrate", "targets", "run-checks",
+    "resolve-scope",
 ]
 
 CHECK_KEYS = {"id", "name", "verdict", "message"}
@@ -258,15 +259,15 @@ def test_c1_the_action_exists_and_the_roster_grew_by_exactly_one(capsys):
     with pytest.raises(SystemExit):
         mod.main(["--help"])
     out = capsys.readouterr().out
-    choices = re.search(r"\{([a-z,-]+)\}", out)
-    assert choices, f"no choices row in --help:\n{out}"
-    names = choices.group(1).split(",")
+    choices = [m.group(1) for m in re.finditer(r"\{([a-z,-]+)\}", out)]
+    names = next((c.split(",") for c in choices if "run-checks" in c), [])
+    assert names, f"no action choices row in --help:\n{out}"
     assert "run-checks" in names, f"run-checks is not an action: {names}"
-    assert len(names) == len(ACTIONS) == 10, (
-        f"the roster was 9 before this feature and must be exactly 10 now: {names}"
+    assert len(names) == len(ACTIONS) == 11, (
+        f"the roster was 10 before this feature and must be exactly 11 now: {names}"
     )
-    assert _source().count("sub.add_parser") == 10, (
-        "the add_parser count must move 9 -> 10 with the new action, so a name reused "
+    assert _source().count("sub.add_parser") == 11, (
+        "the add_parser count must move 10 -> 11 with the new action, so a name reused "
         "instead of added cannot slip through"
     )
 

@@ -38,6 +38,8 @@
 
 **边界**: 任何 SDD 运行 MUST NOT 创建、重绑、改范围或终止 Goal、Target、Team 或 roster。下层不得改写上层的定义；需要改变上层的动作 MUST 返回给上层执行者（Goal 侧归 `/speckit.goal`，Team 侧归 `/speckit.team` 的既有写线），而不是在运行内就地改写。层级不新增结构字段、不新增强制绑定。
 
+**Temporary run-scoped scopes（追加 carve-out）**: 上述禁令治理的是 **Global** Goal/Team/roster。一个 spec-local 的 **Temporary Goal/Team** MAY 由 SDD 运行在其自身 spec 内撰写与维护：Temporary Goal 在 requirements U4 后写入 `.specify/specs/<NNN-slug>/goal/`，Temporary Team 在 clarify+plan U4 后写入 `<spec-dir>/team/`。它是一条独立的、更低的作用域：MUST NOT 创建/重绑 Global Goal/Team，且 `.specify/goal/**` 与 `.specify/teams/**` 仍是运行与 child line 的 forbidden paths。Temporary 概念归 `shared/definitions/goal-definitions.md` 与 `skills/internal/create-team/references/conceptual-model.md`；本段只是路由层的 carve-out，不复述其构成。
+
 ## Direct modification
 
 **直接修改** = 执行一次变更而**不产生 SDD 工件链**：不建立工件链、不经过驱动的阶段与哨兵、不产出 handoff。

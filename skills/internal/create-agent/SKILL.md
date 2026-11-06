@@ -124,7 +124,7 @@ A capacity Template authored for cross-project use lands in ONE of two distribut
 
 The mechanical face of the criterion: the template text must contain zero special-info literals (IPv4, home-directory prefixes, internal hostnames) to qualify for framework distribution.
 
-**First application**: `agents/sdd-executor.agent.md` — its capability face (project directory + project context + `/speckit.*` stage execution) is generic, so it ships in the framework distribution role set.
+**First application**: `agents/sdd-requirement-analyzer.agent.md` — its capability face (project directory + project context + the requirements stage) is stage-specific but contains no project-specific information, so it ships in the framework distribution role set. The other stage roles (`sdd-plan-coordinator`, `sdd-plan-executor`, and the `<stage>-<role>` family) follow the same rule.
 
 **Retirement (退役)** — the third lifecycle state for persistent Templates and Instances (an Execution is a live run and is never retired):
 

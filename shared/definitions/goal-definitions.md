@@ -149,6 +149,22 @@ Four defining properties:
 - **Goal Archive** = the whole `.specify/goal/` tree: the materialized "current & historical goal list" of the project. Terminal (`achieved` / `abandoned`) Goals stay archived — never deleted.
 - This document fixes only the **location and semantics**; the file layout inside `<goal-slug>/` is owned by the feature that implements Goal management.
 
+## Temporary (Run-Scoped) Goal
+
+A **Temporary Goal** is a spec-attached, run-scoped authored end-state definition used when the SDD flow is the outer container (run-scoped SDD flow). It uses the same three-part composition, identity grammar, lifecycle table, change-history discipline, and engine as a Global Goal; only its **storage and lifecycle scope** differ.
+
+```
+.specify/specs/<NNN-slug>/goal/
+└── <goal-slug>/goal.md     # one temporary goal for this spec
+```
+
+- **Creation timing**: authored only after the `requirements` stage passes U4 — the requirement set is what makes the desired end state nameable. It MUST NOT exist before requirements; a resumed run validates and reuses an existing temporary goal instead of recreating it.
+- **Authored, not derived**: the orchestrator writes the objective and degree criteria; it MUST NOT mechanically copy the requirements specification's `SC-` rows into the goal. The Goal-vs-Requirement boundary and the criteria-disjointness rule apply unchanged.
+- **Identity**: defaults to the spec directory basename; one temporary goal per spec by default. A deliberate re-scope may use a suffixed identity, but the engine refuses duplicates.
+- **Lifecycle**: `active` / `achieved` / `abandoned`; a terminal temporary goal stays under the spec and is never deleted. It is not registered in the global Goal Archive.
+- **Targets**: optional, unordered scope slices; they never encode SDD stage order or dependencies.
+- **Global boundary**: a temporary goal is not a Global Goal, does not rebind a Global Team, and does not write `.specify/goal/**`. Promotion to a Global Goal is a deliberate `/speckit.goal` action, never an automatic side effect of an SDD run.
+
 ## Goal–Team Binding
 
 - A team references its Goal by **one-way identity**: the team declares a `goal_slug`; the binding is **N teams : 1 Goal**. The team side stores the identity only — never a copy of the Goal content.
@@ -161,6 +177,7 @@ Four defining properties:
 | Term | Meaning | Where defined |
 |------|---------|---------------|
 | **Goal** (this document) | Project-level authored end-state definition (narrative + criteria + lifecycle) | here; store `.specify/goal/<goal-slug>/` |
+| **Temporary Goal** (this document) | Spec-attached, run-scoped authored end-state definition; same composition/engine, stored under the spec | here; store `.specify/specs/<NNN-slug>/goal/<goal-slug>/goal.md` |
 | **Goal Archive** | The `.specify/goal/` tree — current & historical Goals, terminal ones retained | here |
 | **Goal–Team Binding** | One-way `goal_slug` reference, N teams : 1 Goal, identity-only | here |
 | **Team Goal** | A team's reference to the project-level Goal it serves | here; declared in `.specify/teams/<slug>/team.md` |

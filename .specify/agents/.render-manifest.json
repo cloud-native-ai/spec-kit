@@ -1,35 +1,83 @@
 {
   "version": 1,
   "tool": "opencode",
-  "rendered_at": "20261105T061629Z",
+  "rendered_at": "20261106T015536Z",
   "entries": {
     ".qoder/agents/dogfood-executor.agent.md": {
       "source": "instances/dogfood-executor.agent.md",
-      "sha256": "7781d587deda0a991dc0d2e83b81c712a0fed4f9e601668cdbcaee92c3ef0297"
+      "sha256": "9d1d57b14d4c44a68e1b38e48ae9046ca0a06d465aadce6af4d39fb8d1309c8f"
     },
     ".qoder/agents/framework-engineer.agent.md": {
       "source": "instances/framework-engineer.agent.md",
-      "sha256": "599576aacb92b74fe7177bfe3033cdc960bbe4aa61a4113e900f00df67d38ad7"
+      "sha256": "e8830a02e04f6577b74dfa06c988ed0f9c48a321a958b58953caeb8ae00534ce"
     },
-    ".qoder/agents/sdd-executor.agent.md": {
-      "source": "templates/sdd-executor.agent.md",
-      "sha256": "85870eed07ce0f594cd9ace3327422fd6cf4bcb89701272bc6c3979417f6db9b"
+    ".qoder/agents/sdd-analysis-worker.agent.md": {
+      "source": "templates/sdd-analysis-worker.agent.md",
+      "sha256": "40685b285e1ccab0de8cbb3ca7b6ad2ec980b8715be66f8647b76c0646426fcc"
     },
-    ".qoder/agents/sdd-requirements-executor.agent.md": {
-      "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "3ab8ee1426b1dc444a7f2bd5f002f4c9b94ca08f803769c925f26cc63858dcca"
+    ".qoder/agents/sdd-checklist-worker.agent.md": {
+      "source": "templates/sdd-checklist-worker.agent.md",
+      "sha256": "5460112c813662fdc6274b49af4c858d636c41f4ba8f8fedaf80b81da0eb5e3d"
+    },
+    ".qoder/agents/sdd-clarify-analyzer.agent.md": {
+      "source": "templates/sdd-clarify-analyzer.agent.md",
+      "sha256": "0c39a7e3258fb7721e488f953dc5ee35264284ea78d7a08054c8e7dbed2cd3f8"
+    },
+    ".qoder/agents/sdd-implement-coordinator.agent.md": {
+      "source": "templates/sdd-implement-coordinator.agent.md",
+      "sha256": "6f69c1146fcfb2cf90db3c7075d5b113874c97844abd305361cbfe5d2c35fc85"
+    },
+    ".qoder/agents/sdd-implement-executor.agent.md": {
+      "source": "templates/sdd-implement-executor.agent.md",
+      "sha256": "e076e504d2de8ed870a954d41852db15c44c208b5b8cedaf3854ef4198c6d144"
+    },
+    ".qoder/agents/sdd-plan-coordinator.agent.md": {
+      "source": "templates/sdd-plan-coordinator.agent.md",
+      "sha256": "f4f7f869e89b63b570624bed87288d108cf4eebf1df4d1c545beaa2fb9af549d"
+    },
+    ".qoder/agents/sdd-plan-executor.agent.md": {
+      "source": "templates/sdd-plan-executor.agent.md",
+      "sha256": "c9d1e68708e3b061099c0897c1e6d26f41276e10f35cd2c6aaa743c17d254b55"
+    },
+    ".qoder/agents/sdd-requirement-analyzer.agent.md": {
+      "source": "templates/sdd-requirement-analyzer.agent.md",
+      "sha256": "bee2f1b87efc2e27c08b964be184163dd5469e9fbec04e471823644db884d746"
+    },
+    ".qoder/agents/sdd-review-coordinator.agent.md": {
+      "source": "templates/sdd-review-coordinator.agent.md",
+      "sha256": "119fe964b575b09440267e1478bf9a93f60e62cbe210bb24a45bb4f01e64fdfa"
+    },
+    ".qoder/agents/sdd-review-executor.agent.md": {
+      "source": "templates/sdd-review-executor.agent.md",
+      "sha256": "0895ed84e80e72b250bc77955022c21475ca086905a0c8c955668ef8bd4513c4"
     },
     ".qoder/agents/sdd-setup-executor.agent.md": {
       "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "5c96ad69cfed1ed6907530a78b68463f58e32e4347fc9693b459459e997b6e74"
+      "sha256": "fc093a06c74f2fc36686445c075f6c5a9245ff271d2ebe959ec0b411b0f3506c"
+    },
+    ".qoder/agents/sdd-stage-integrator.agent.md": {
+      "source": "templates/sdd-stage-integrator.agent.md",
+      "sha256": "dd17e10a9b253ef389864b0a41e52492a7ac631b9f39cc0e0277d0ff2718c061"
+    },
+    ".qoder/agents/sdd-stage-verifier.agent.md": {
+      "source": "templates/sdd-stage-verifier.agent.md",
+      "sha256": "712ef1d8f112fa47fffce5d5f52cd35a2906f808cbe9f082edae4780daf088b2"
+    },
+    ".qoder/agents/sdd-task-coordinator.agent.md": {
+      "source": "templates/sdd-task-coordinator.agent.md",
+      "sha256": "5963b2d73fd2d821450a927229c97bce779d3ccca5548bad1b26e9908bef69fb"
+    },
+    ".qoder/agents/sdd-task-executor.agent.md": {
+      "source": "templates/sdd-task-executor.agent.md",
+      "sha256": "04327fd52cce853544d733aefe7049503dcde0f0ffb447851f71372aad4c23d9"
     },
     ".qoder/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "78d195cbfd9c3278ec6c6996121be41cbc5e60e71e54a2f22b15aab7978837a8"
+      "sha256": "5f85b5119788067f04dcf57b83fca7c1adbe16e6d31dc81c8e0dc6da645f3ca7"
     },
     ".qoder/agents/structure-adjuster.agent.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "361a5dac67dceeb19d8c775b2f3409b1a5728abdf5730f2d207ec2c29ba3821a"
+      "sha256": "d921e70d6f64d32fa80ff5617053c5ada2f484c16177d914ca3ad8cdabb5e129"
     },
     ".claude/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
@@ -39,17 +87,65 @@
       "source": "instances/framework-engineer.agent.md",
       "sha256": "faf6bbdc94324fd93a164be33bf710abf80b753e160bbcbaf1c869ec52432886"
     },
-    ".claude/agents/sdd-executor.md": {
-      "source": "templates/sdd-executor.agent.md",
-      "sha256": "b6e3b8c02aa82cc6296219f0ca264d66d144a5285d0c1cfd88fe9ea0a74378df"
+    ".claude/agents/sdd-analysis-worker.md": {
+      "source": "templates/sdd-analysis-worker.agent.md",
+      "sha256": "9ecd4eba6da1c80280f216c141e337f07d1ea4208f626b961de7ec8aafd1fe6b"
     },
-    ".claude/agents/sdd-requirements-executor.md": {
-      "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "03a47a4b12fecb4c67d4c8a27b4ae1a4944aa302bf4fce0617c432de48a3380a"
+    ".claude/agents/sdd-checklist-worker.md": {
+      "source": "templates/sdd-checklist-worker.agent.md",
+      "sha256": "1e40cf330352cdf2f6fbb8e17745285d92c2f8cd5e659960cc696e60f55c25c2"
+    },
+    ".claude/agents/sdd-clarify-analyzer.md": {
+      "source": "templates/sdd-clarify-analyzer.agent.md",
+      "sha256": "22281ce104a0ce67c9521f52abbe858ea57bab89c0f02fd2ce54634d758f08dc"
+    },
+    ".claude/agents/sdd-implement-coordinator.md": {
+      "source": "templates/sdd-implement-coordinator.agent.md",
+      "sha256": "74d8a1c61bfd0301249e176beaea69095469274ebfe8c1c6692741ad30f3f77d"
+    },
+    ".claude/agents/sdd-implement-executor.md": {
+      "source": "templates/sdd-implement-executor.agent.md",
+      "sha256": "28ea9002e2d46cb1b6722f2e6d6538aabf0d5e47e2caf9bd6c254ef2f494b5ee"
+    },
+    ".claude/agents/sdd-plan-coordinator.md": {
+      "source": "templates/sdd-plan-coordinator.agent.md",
+      "sha256": "1b150b0b2fe06985ec807e3dbcc104cb8e3b5a318140ca7a22f6095875c68805"
+    },
+    ".claude/agents/sdd-plan-executor.md": {
+      "source": "templates/sdd-plan-executor.agent.md",
+      "sha256": "a91150b7971e8affb1ca585d372864c82864dcec67cd4ca1bb15f7ab63d55e32"
+    },
+    ".claude/agents/sdd-requirement-analyzer.md": {
+      "source": "templates/sdd-requirement-analyzer.agent.md",
+      "sha256": "67fc194f98cb34efb84ef904e983f71ee6eed362975d1319dd2cb046927ffdcf"
+    },
+    ".claude/agents/sdd-review-coordinator.md": {
+      "source": "templates/sdd-review-coordinator.agent.md",
+      "sha256": "10d393450807aab846129ee9aee6f7220feff20570cb120eca158db5c08ad978"
+    },
+    ".claude/agents/sdd-review-executor.md": {
+      "source": "templates/sdd-review-executor.agent.md",
+      "sha256": "a23decf0f3f1751968093cf18da0632403e9cd3cba23e5d8277c5c7ac4ab3d17"
     },
     ".claude/agents/sdd-setup-executor.md": {
       "source": "instances/sdd-setup-executor.agent.md",
       "sha256": "d5928e633b2f16b8350bf55c60e194087a7a71850391769e512dea6c30a097df"
+    },
+    ".claude/agents/sdd-stage-integrator.md": {
+      "source": "templates/sdd-stage-integrator.agent.md",
+      "sha256": "24b754317c277cd3b2af4ce5acaea559fcf201eec33d3c84d15163b15f471d3d"
+    },
+    ".claude/agents/sdd-stage-verifier.md": {
+      "source": "templates/sdd-stage-verifier.agent.md",
+      "sha256": "69567f5f308a905640078d2eddb781ad86dc915ad67e98894e73b5a9ae04df16"
+    },
+    ".claude/agents/sdd-task-coordinator.md": {
+      "source": "templates/sdd-task-coordinator.agent.md",
+      "sha256": "8924c626dbefb6d27e135ae700c8019d5cbe648c4b6071fc2f02beaf0634c2ca"
+    },
+    ".claude/agents/sdd-task-executor.md": {
+      "source": "templates/sdd-task-executor.agent.md",
+      "sha256": "76b12a226e5f4ffde65362c590737826b61487edf6f69b2724cf3ac9920dfe3c"
     },
     ".claude/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -67,17 +163,65 @@
       "source": "instances/framework-engineer.agent.md",
       "sha256": "77448954698b9bb1231555533f68ce2c7d2491a49a53064607963eebeb2750f6"
     },
-    ".github/agents/sdd-executor.agent.md": {
-      "source": "templates/sdd-executor.agent.md",
-      "sha256": "86da7dfe08ee8c0544d643ce1f03ad8934161a8beffd878f7aafe0ba460dcde3"
+    ".github/agents/sdd-analysis-worker.agent.md": {
+      "source": "templates/sdd-analysis-worker.agent.md",
+      "sha256": "ef7d155ffffa5e45d70c499ed97862b9ca3c3630fc881445be47223592f06960"
     },
-    ".github/agents/sdd-requirements-executor.agent.md": {
-      "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "22dc4acf57b7ef5c6bc7132d249302f244dd388c798e23556902f323a0cfb7aa"
+    ".github/agents/sdd-checklist-worker.agent.md": {
+      "source": "templates/sdd-checklist-worker.agent.md",
+      "sha256": "d651dec27a5f626f0d08feac67a25ce04661970185a17eea18ada530da123a79"
+    },
+    ".github/agents/sdd-clarify-analyzer.agent.md": {
+      "source": "templates/sdd-clarify-analyzer.agent.md",
+      "sha256": "07afa7e34feb919bfabcf10c31b71577187de4a67c1051123795465495a824d9"
+    },
+    ".github/agents/sdd-implement-coordinator.agent.md": {
+      "source": "templates/sdd-implement-coordinator.agent.md",
+      "sha256": "1b39b30f50e2ff099ce3e5363e2546f7e92d88dff89e954adb33b246c776c13c"
+    },
+    ".github/agents/sdd-implement-executor.agent.md": {
+      "source": "templates/sdd-implement-executor.agent.md",
+      "sha256": "9dd26c1646696a552cfa91ac7cac38d87ea2b7d54a18295e8b95914c3a47b33e"
+    },
+    ".github/agents/sdd-plan-coordinator.agent.md": {
+      "source": "templates/sdd-plan-coordinator.agent.md",
+      "sha256": "0aa5498af8081788d3f81579af84be4626bd1ca35a8f62a1201f23dd9b31d002"
+    },
+    ".github/agents/sdd-plan-executor.agent.md": {
+      "source": "templates/sdd-plan-executor.agent.md",
+      "sha256": "e50b5d477f2dd6365ee7103d4b0d65818c91ed32a687bdaa7ef49b66a2eb1a03"
+    },
+    ".github/agents/sdd-requirement-analyzer.agent.md": {
+      "source": "templates/sdd-requirement-analyzer.agent.md",
+      "sha256": "1325f75f162ac6af65fcc5c22f82c8aaa66bbd8a4cb52c69fcff13564935b2c8"
+    },
+    ".github/agents/sdd-review-coordinator.agent.md": {
+      "source": "templates/sdd-review-coordinator.agent.md",
+      "sha256": "eecdf52ab5a84c1f3ff53246832e36bc4ec1c15d16f654e6c265b134104863ce"
+    },
+    ".github/agents/sdd-review-executor.agent.md": {
+      "source": "templates/sdd-review-executor.agent.md",
+      "sha256": "fad61c0d820316a286275a3fe5126e4b047a276357f38f8475014bc8ef568b3b"
     },
     ".github/agents/sdd-setup-executor.agent.md": {
       "source": "instances/sdd-setup-executor.agent.md",
       "sha256": "b0a15e2d87a9bcb7517726aa3fe761b38f58719cc4800826553872219393e9d1"
+    },
+    ".github/agents/sdd-stage-integrator.agent.md": {
+      "source": "templates/sdd-stage-integrator.agent.md",
+      "sha256": "ea8f3605dbd3660b2bac4c9d7c8264d4a0547bef4b31292d7c3bb99445251f84"
+    },
+    ".github/agents/sdd-stage-verifier.agent.md": {
+      "source": "templates/sdd-stage-verifier.agent.md",
+      "sha256": "78b68bba07ddc87bbc82329d84c6625f13f17b278c342183feaa6d8acc7617ce"
+    },
+    ".github/agents/sdd-task-coordinator.agent.md": {
+      "source": "templates/sdd-task-coordinator.agent.md",
+      "sha256": "9b4e42b19aecf61ccbabe85eda67b50e7c0688aa3febfb8ae5f9890d7990d163"
+    },
+    ".github/agents/sdd-task-executor.agent.md": {
+      "source": "templates/sdd-task-executor.agent.md",
+      "sha256": "4f3314aebfd214fc57b306e94e2d5b62b6146502d62b565ff4815855b23c09e1"
     },
     ".github/agents/skill-verifier.agent.md": {
       "source": "templates/skill-verifier.agent.md",
@@ -89,31 +233,79 @@
     },
     ".opencode/agents/dogfood-executor.md": {
       "source": "instances/dogfood-executor.agent.md",
-      "sha256": "799ac66512a0355b3446abc7c9a892c20ae20e165f51d52d11422fa142cd2af7"
+      "sha256": "e8abbfb610706291d0b488e71e940784d42aded21ce042f6e580df12f71cbe92"
     },
     ".opencode/agents/framework-engineer.md": {
       "source": "instances/framework-engineer.agent.md",
-      "sha256": "2c09596357bc970ecd50bb02ce3efaa30053bfc8e2213cc7bf7f3ea38311d799"
+      "sha256": "8013b6305a75f0b7959b15fc7c166a2fd5f3813ec2ac002b25d5d70caea41c61"
     },
-    ".opencode/agents/sdd-executor.md": {
-      "source": "templates/sdd-executor.agent.md",
-      "sha256": "42092e7f8d4913da9d268402e991ca1dd0fac82298d89f57cae43b31cfe539ce"
+    ".opencode/agents/sdd-analysis-worker.md": {
+      "source": "templates/sdd-analysis-worker.agent.md",
+      "sha256": "c1eeafe731902f341374786211af7a708ac5828991b88db92b03923221db43cd"
     },
-    ".opencode/agents/sdd-requirements-executor.md": {
-      "source": "instances/sdd-requirements-executor.agent.md",
-      "sha256": "950eb1cfcb0f3c27298c9e7062d232bd758356b9779ee8f40653a8f17f50128b"
+    ".opencode/agents/sdd-checklist-worker.md": {
+      "source": "templates/sdd-checklist-worker.agent.md",
+      "sha256": "2c866f9b840f3147424fce9c479780025371a664a9502ddb828f5bf4d4620064"
+    },
+    ".opencode/agents/sdd-clarify-analyzer.md": {
+      "source": "templates/sdd-clarify-analyzer.agent.md",
+      "sha256": "646245cd4ddb65cc25236ee44a155a190bc76a6f3d7f2a93b1e9e7477d5d4bad"
+    },
+    ".opencode/agents/sdd-implement-coordinator.md": {
+      "source": "templates/sdd-implement-coordinator.agent.md",
+      "sha256": "ac4ff9436e736485c3d6160a17766f8d0302b7c852985ad19fc483724185055f"
+    },
+    ".opencode/agents/sdd-implement-executor.md": {
+      "source": "templates/sdd-implement-executor.agent.md",
+      "sha256": "adb8710720997e9ef904ffe7c841c78dddd8fdb5047692a26926c966e31faa33"
+    },
+    ".opencode/agents/sdd-plan-coordinator.md": {
+      "source": "templates/sdd-plan-coordinator.agent.md",
+      "sha256": "13392bc5c7a45f356a67441b5976384fff64c15bd4926095d386d2a4680af569"
+    },
+    ".opencode/agents/sdd-plan-executor.md": {
+      "source": "templates/sdd-plan-executor.agent.md",
+      "sha256": "91053c37493c932d5cb8a3db2c52e7378a29887466573e8fbe24ac7283d62b52"
+    },
+    ".opencode/agents/sdd-requirement-analyzer.md": {
+      "source": "templates/sdd-requirement-analyzer.agent.md",
+      "sha256": "ebf0db3582b3e13567013f4ed2a2ec04dea605787365bd82b2f773f8e72fa2cf"
+    },
+    ".opencode/agents/sdd-review-coordinator.md": {
+      "source": "templates/sdd-review-coordinator.agent.md",
+      "sha256": "39e72f34e24ecea4a6f0b34fb1fc387e62a6e2e34f812f148e7ee06000866be6"
+    },
+    ".opencode/agents/sdd-review-executor.md": {
+      "source": "templates/sdd-review-executor.agent.md",
+      "sha256": "c371e7454b531798e0023ae0955228133fdb9a8fc0d18264024c3a9f5a0d46b2"
     },
     ".opencode/agents/sdd-setup-executor.md": {
       "source": "instances/sdd-setup-executor.agent.md",
-      "sha256": "eb2c87fa1dfd6f83a5f7581d78ecdb8af0c633e2394c053bcb88b26cfa99d1f3"
+      "sha256": "d771d0bbecad4f57552feed9673f5a370e9b16f79168359e3ec852e3c9f91ab3"
+    },
+    ".opencode/agents/sdd-stage-integrator.md": {
+      "source": "templates/sdd-stage-integrator.agent.md",
+      "sha256": "68fa97cc3f82e88119b6ea8c53c7cc79622acdd1b1cba05b86b645eef3df0cbb"
+    },
+    ".opencode/agents/sdd-stage-verifier.md": {
+      "source": "templates/sdd-stage-verifier.agent.md",
+      "sha256": "e9a3b95c5f7bedb5c135642ae0f6e235596f4cebe1c02e8b0c325286aa5921f0"
+    },
+    ".opencode/agents/sdd-task-coordinator.md": {
+      "source": "templates/sdd-task-coordinator.agent.md",
+      "sha256": "1fed0bf6fac0dce226fc364d2b74f744b3f62fae2a441154eb188f448b98da7f"
+    },
+    ".opencode/agents/sdd-task-executor.md": {
+      "source": "templates/sdd-task-executor.agent.md",
+      "sha256": "1a6045b229f0f13b6bf8fd97c8ac4c4655281ab2fe90c78fc374cf1d2680b139"
     },
     ".opencode/agents/skill-verifier.md": {
       "source": "templates/skill-verifier.agent.md",
-      "sha256": "fcb449e810c8e288e7ea3c281b209ec0ac8919a03bb0eafb2c3bd19d52f04072"
+      "sha256": "0528fded9d92051e49f9a182d0191101ceb4eb2f133f30bf42ec57b24a232134"
     },
     ".opencode/agents/structure-adjuster.md": {
       "source": "templates/structure-adjuster.agent.md",
-      "sha256": "99fdd19c6acc00eb5c847086208008276ec2bb216fcf765daba1ee497001257c"
+      "sha256": "4be4fa88fd31b7819f439b33cebbe482d092152b9cdb889745facd092927080e"
     }
   }
 }
