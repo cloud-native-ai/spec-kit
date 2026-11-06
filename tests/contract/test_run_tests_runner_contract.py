@@ -1,9 +1,13 @@
 """Contract cases for the canonical runner's execution model (086, C-001…C-016).
 
 Owner of the propositions: `.specify/specs/086-efficient-test-execution/contracts/
-runner-contract-086.contract.md`. This module is the WP-A1 red-first slice: it carries the
-default-mode, worker-resolution, escape-hatch, two-pass and output clauses. The serial-marker
-cases (C-010/C-011) live in WP-A4's slice of the same file.
+runner-contract-086.contract.md`. Two slices share this file, and the split is additive — WP-A4's
+block is appended after WP-A1's and rewrites none of it:
+
+- WP-A1 carries default mode, worker resolution, the escape hatches, the two-pass list/exit
+  semantics and the exit-5 normalization.
+- WP-A4 carries the serial-exception clauses C-010/C-011, the two-pass green point, the
+  C-003/C-008 truthfulness pairs named by T012, and the parallel-safety disposition (T013).
 
 Construction constraints (contract § F):
 
@@ -20,7 +24,6 @@ import os
 import re
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 
 import pytest
@@ -492,3 +495,352 @@ def test_c016_runner_carriers_are_byte_identical():
         "scripts/bash/run-tests.sh and .specify/scripts/bash/run-tests.sh drifted — "
         "regenerate the mirror with `python3 scripts/python/sync-mirrors.py --write --only scripts/bash`"
     )
+
+
+# =========================================================================== #
+# WP-A4 slice (tasks T004, T005, T012, T013) — appended after WP-A1's cases.
+#
+# The cases above are WP-A1's; the block below is additive and carries the C-010/C-011
+# serial-exception clauses (T004), the two-pass green point (T005), the truthfulness
+# pairs T012 names explicitly, and the parallel-safety disposition (T013).
+# =========================================================================== #
+
+EXCEPTIONS_LINE = re.compile(
+    r"^# test runner exceptions: (?P<n>\d+) declared serial test\(s\)$", re.M
+)
+MIXED_SUITE = (
+    "import pytest\n\n"
+    "def test_plain_a():\n    assert True\n\n"
+    "def test_plain_b():\n    assert True\n\n"
+    "@pytest.mark.serial\n"
+    "def test_marked_ok():\n    assert True\n"
+)
+EXPECTED_TYPO_ERRORS = {
+    "--workers": "error: --workers expects a positive integer or \"auto\", got \"abc\"",
+    "SPECKIT_TEST_WORKERS": (
+        "error: SPECKIT_TEST_WORKERS expects a positive integer or \"auto\", got \"abc\""
+    ),
+}
+
+
+def _write_mixed_suite(root: Path, body: str = MIXED_SUITE) -> Path:
+    """A small suite whose ``serial``-marked members are what C-010/C-011 talk about."""
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "pytest.ini").write_text("[pytest]\nmarkers =\n    serial: x\n", encoding="utf-8")
+    (root / "test_mixed.py").write_text(body, encoding="utf-8")
+    return root
+
+
+def _engine_env():
+    """Environment for the raw-engine probes: no ``SPECKIT_PYTHON``, no inherited worker id."""
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTEST_XDIST_WORKER", None)
+    return env
+
+
+def _exception_count(done):
+    """The declared-exception count the runner reported, or ``None`` when it reported none.
+
+    C-011's enumeration is the property under test here (not a formatting detail), so a runner
+    that states the count in another wording still satisfies it; the assertion in each case is
+    about the *value*.
+    """
+    match = EXCEPTIONS_LINE.search(done.stderr)
+    return None if match is None else int(match.group("n"))
+
+
+def _assert_no_unknown_mark(done, where: str) -> None:
+    assert "PytestUnknownMarkWarning" not in done.stderr, (
+        f"{where}: the `serial` marker is not registered, so the exception set is not a "
+        f"declared exception:\n{done.stderr}"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# C-010 — the marked test leaves the parallel pass and is re-run serially
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_c010_marked_test_is_excluded_from_the_parallel_pass(tmp_path):
+    """C-010, first half. The discriminating observation is the *engine's own* report of what
+    the parallel pass collected: when marked tests are excluded the parallel pass reports the two
+    unmarked tests, and when they are not excluded it reports all three (the case below). The
+    two counts differ by exactly the marked member, so neither half can pass vacuously."""
+    root = _write_mixed_suite(tmp_path / "tree")
+    done = _run(["--workers", "2", str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+    mode, _ = _mode(done.stderr)
+    assert mode == "parallel", done.stderr
+    assert _exception_count(done) == 1, done.stderr
+    _assert_no_unknown_mark(done, "parallel pass")
+
+    parallel = subprocess.run(
+        [_python(), "-m", "pytest", str(root), "-q", "-n", "2", "--dist", "load",
+         "-m", "not serial"],
+        capture_output=True,
+        text=True,
+        cwd=str(tmp_path),
+        env=_engine_env(),
+    )
+    assert parallel.returncode == 0, parallel.stdout + parallel.stderr
+    assert re.search(r"\b2 passed\b", parallel.stdout), (
+        "the parallel pass must collect the unmarked tests only:\n" + parallel.stdout
+    )
+
+    serial = subprocess.run(
+        [_python(), "-m", "pytest", str(root), "-q", "-n0", "-m", "serial"],
+        capture_output=True,
+        text=True,
+        cwd=str(tmp_path),
+        env=_engine_env(),
+    )
+    assert serial.returncode == 0, serial.stdout + serial.stderr
+    assert re.search(r"\b1 passed\b", serial.stdout), (
+        "the serial pass must collect exactly the marked exception:\n" + serial.stdout
+    )
+
+
+@MARK_CONTRACT
+def test_c010_marked_test_is_included_when_the_marker_is_ignored(tmp_path):
+    """C-010's negative control: the same tree without the exclusion collects all three tests.
+    Without this leg the case above could pass on a suite that simply has two tests."""
+    root = _write_mixed_suite(tmp_path / "tree")
+    everything = subprocess.run(
+        [_python(), "-m", "pytest", str(root), "-q"],
+        capture_output=True,
+        text=True,
+        cwd=str(tmp_path),
+        env=_engine_env(),
+    )
+    assert everything.returncode == 0, everything.stdout + everything.stderr
+    assert re.search(r"\b3 passed\b", everything.stdout), everything.stdout
+
+
+@MARK_CONTRACT
+def test_c010_the_runner_re_runs_the_exception_reaching_the_combined_exit_code(tmp_path):
+    """C-010, second half: exclusion alone would silently drop the marked test. A failure
+    injected into it must still be executed, must appear in the combined list and must reach
+    the run's exit code."""
+    root = _write_mixed_suite(
+        tmp_path / "tree",
+        "import pytest\n\n"
+        "def test_plain_ok():\n    assert True\n\n"
+        "@pytest.mark.serial\n"
+        "def test_marked_fail():\n    assert False\n",
+    )
+    names = tmp_path / "names.txt"
+    done = _run(["--workers", "2", "--names-out", names, str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 1, (
+        "the failure lives in the serial pass, so the combined exit code must carry it:\n"
+        + done.stdout + done.stderr
+    )
+    assert _names(names) == ["tree/test_mixed.py::test_marked_fail"], _names(names)
+    match = _list_line(done.stderr)
+    assert int(match.group("k")) == 2, f"both passes must contribute: {done.stderr}"
+
+
+def _engine_env():
+    """Environment for the raw-engine probes: no ``SPECKIT_PYTHON``, no inherited worker id."""
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTEST_XDIST_WORKER", None)
+    return env
+
+
+# --------------------------------------------------------------------------- #
+# C-011 — the exception set is enumerable by name, with a recordable size
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_c011_exception_set_is_enumerable_by_name_and_counted(tmp_path):
+    root = _write_mixed_suite(tmp_path / "tree")
+    enumerated = subprocess.run(
+        [_python(), "-m", "pytest", "-m", "serial", "--collect-only", "-q", str(root)],
+        capture_output=True,
+        text=True,
+        cwd=str(tmp_path),
+        env=_engine_env(),
+    )
+    assert enumerated.returncode == 0, enumerated.stdout + enumerated.stderr
+    members = [ln.strip() for ln in enumerated.stdout.splitlines() if "::" in ln]
+    assert len(members) == 1, enumerated.stdout
+    assert members[0].endswith("test_mixed.py::test_marked_ok"), members
+
+    done = _run(["--workers", "2", str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+
+
+@MARK_CONTRACT
+def test_c011_runner_records_the_exception_count_it_acted_on(tmp_path):
+    """The count the runner acts on is displayed and equals the enumerable member count, so a
+    global "parallel off" switch (which would have no member list) cannot satisfy the clause."""
+    root = _write_mixed_suite(tmp_path / "tree")
+    done = _run(["--workers", "2", str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+    # the count the runner acted on is the enumerable member count (readable from stderr) ...
+    assert _exception_count(done) == 1, done.stderr
+    # ... and the mode is still parallel with a second pass: a global "parallel off" switch,
+    # which has no member list at all, could satisfy neither observation.
+    mode, note = _mode(done.stderr)
+    assert mode == "parallel", done.stderr
+    assert "passes=2" in note, note
+
+
+@MARK_CONTRACT
+def test_c011_a_tree_without_exceptions_records_zero(tmp_path):
+    """The count is truthful in the other direction too: no marked test, no second pass, and
+    the run is still reported as one parallel pass."""
+    suite = _write_suite(tmp_path / "plain")
+    done = _run(["--workers", "2", str(suite), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+    assert _exception_count(done) is None, done.stderr
+    mode, note = _mode(done.stderr)
+    assert mode == "parallel", done.stderr
+    assert "passes=1" in note, note
+
+
+# --------------------------------------------------------------------------- #
+# C-015 (T005's green point) — a green parallel pass with an empty serial pass exits 0
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_c015_green_parallel_pass_with_an_empty_serial_pass_exits_zero(tmp_path):
+    """The two-pass green point (T005): the serial pass is *reachable and empty* — every marked
+    member is deselected because the caller's selection is a single unmarked test — yet the run
+    exits 0, because C-012 normalizes the serial pass's exit 5. The two halves are asserted
+    together, so "green" cannot be produced by skipping the second pass: the runner must record
+    that the pass ran (``passes=``) while reporting zero failures in the combined list."""
+    root = _write_mixed_suite(
+        tmp_path / "tree",
+        "import pytest\n\n"
+        "def test_plain_a():\n    assert True\n\n"
+        "def test_plain_b():\n    assert True\n\n"
+        "@pytest.mark.serial\n"
+        "def test_marked_ok():\n    assert True\n\n"
+        "def test_deselect_me():\n    assert True\n",
+    )
+    plain = tmp_path / "tree" / "test_mixed.py"
+    names = tmp_path / "names.txt"
+    done = _run(
+        [
+            "--workers", "2", "--names-out", names,
+            str(plain) + "::test_plain_a", str(plain) + "::test_plain_b", str(plain) + "::test_marked_ok",
+            "-q",
+        ],
+        cwd=tmp_path,
+    )
+    assert done.returncode == 0, (
+        "an empty serial pass must normalize to 0 — a green parallel pass stays green:\n"
+        + done.stdout + done.stderr
+    )
+    assert _exception_count(done) == 1, (
+        "the declared member must still be enumerated, otherwise the serial pass was skipped "
+        "rather than run and normalized:\n" + done.stderr
+    )
+    match = _list_line(done.stderr)
+    assert int(match.group("k")) == 2, done.stderr
+    assert int(match.group("n")) == 0, done.stderr
+    assert names.is_file() and _names(names) == []
+
+
+# --------------------------------------------------------------------------- #
+# T012 — truthfulness: the header never names an unapplied argument, and a typo is named
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+@pytest.mark.parametrize(
+    "flag_args, env_extra, expected",
+    [
+        (["--workers", "3"], {}, "-n 3"),
+        # the runner's own environment variable is a *config* source, not a pytest argument:
+        # forwarding it is what FR-003 forbids, so the effective count must still reach the
+        # header (as the resolved value, never as the variable's name)
+        ([], {"SPECKIT_TEST_WORKERS": "3"}, ("-n 3", "--numprocesses=3")),
+        (["--serial", "--workers", "3"], {}, "-n0"),
+    ],
+)
+def test_t012_header_never_names_an_unapplied_worker_argument(
+    tmp_path, flag_args, env_extra, expected
+):
+    """C-003 in its concrete form: ``--workers`` / ``SPECKIT_TEST_WORKERS`` are the runner's own
+    inputs, never pytest arguments. In serial mode a tuned worker count is resolved but not
+    applied, so it must not appear in the command header at all."""
+    suite = _write_suite(tmp_path)
+    done = _run([*flag_args, str(suite), "-q"], cwd=tmp_path, env_extra=env_extra)
+    assert done.returncode == 0, done.stdout + done.stderr
+    header = _command_lines(done.stderr)
+    assert len(header) == 1, done.stderr
+    line = header[0]
+    assert "--workers" not in line, line
+    assert "SPECKIT_TEST_WORKERS" not in line, line
+    alternatives = expected if isinstance(expected, tuple) else (expected,)
+    assert any(alt in line for alt in alternatives), line
+    # exactly one worker-count switch in the applied form (no-resolved-yet-unapplied value
+    # survives the dedup above, because the resolved count either IS the switch or is absent)
+    applied = [t for t in line.split() if is_worker_switch(t)]
+    assert len(applied) == 1, f"exactly one worker-count switch must run: {line}"
+
+
+@MARK_CONTRACT
+@pytest.mark.parametrize("source", ["--workers", "SPECKIT_TEST_WORKERS"])
+def test_t012_config_typo_is_refused_before_anything_runs(tmp_path, source):
+    """A typo must not become a healthy-looking single-worker run: whichever of the two inputs
+    carried it, the runner exits non-zero and names the offending value and its own source."""
+    suite = _write_suite(tmp_path)
+    args = ["--workers", "abc"] if source == "--workers" else []
+    env_extra = {} if source == "--workers" else {"SPECKIT_TEST_WORKERS": "abc"}
+    done = _run([*args, str(suite), "-q"], cwd=tmp_path, env_extra=env_extra)
+    assert done.returncode == 2, done.stdout + done.stderr
+    assert EXPECTED_TYPO_ERRORS[source] in done.stderr, done.stderr
+    assert "# test runner: mode=" not in done.stderr, (
+        "a refused configuration must not reach mode resolution:\n" + done.stderr
+    )
+
+
+@MARK_CONTRACT
+def test_t012_typo_leaves_no_trace_of_a_run(tmp_path):
+    """The corollary that makes the previous case load-bearing: nothing was executed, so no
+    failed-name list is written and no pytest output is produced."""
+    suite = _write_suite(tmp_path, failing=1)
+    names = tmp_path / "names.txt"
+    done = _run(["--workers", "nope", "--names-out", names, str(suite), "-q"], cwd=tmp_path)
+    assert done.returncode == 2, done.stdout + done.stderr
+    assert not names.exists(), done.stderr
+    assert "FAILED" not in done.stdout, done.stdout
+
+
+# --------------------------------------------------------------------------- #
+# T013 — parallel-safety disposition: excluded, re-run, combined exactly once
+# --------------------------------------------------------------------------- #
+@MARK_CONTRACT
+def test_t013_one_failure_per_member_across_both_passes(tmp_path):
+    """The disposition case: one marked failure and one plain failure land in the combined list
+    exactly once each, and the run is still ONE run (one list, one exit code)."""
+    root = _write_mixed_suite(
+        tmp_path / "tree",
+        "import pytest\n\n"
+        "def test_plain_fail():\n    assert False\n\n"
+        "@pytest.mark.serial\n"
+        "def test_marked_fail():\n    assert False\n",
+    )
+    names = tmp_path / "names.txt"
+    done = _run(["--workers", "2", "--names-out", names, str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 1, done.stdout + done.stderr
+    listed = _names(names)
+    assert sorted(listed) == [
+        "tree/test_mixed.py::test_marked_fail",
+        "tree/test_mixed.py::test_plain_fail",
+    ], listed
+    assert len(listed) == len(set(listed)), f"the combined list must not repeat a name: {listed}"
+    match = _list_line(done.stderr)
+    assert int(match.group("n")) == 2 and int(match.group("k")) == 2, done.stderr
+    assert len(_command_lines(done.stderr)) == 1, "one run, one command header"
+
+
+@MARK_CONTRACT
+def test_t013_unmarked_tests_keep_their_full_parallel_freedom(tmp_path):
+    """The exception must not cost the rest of the suite its parallelism: with only the marked
+    member present, the parallel pass must still be a real multi-worker pass (the header names
+    the engine switch), so declaring an exception is not a silent global serial switch."""
+    root = _write_mixed_suite(tmp_path / "tree")
+    done = _run(["--workers", "2", str(root), "-q"], cwd=tmp_path)
+    assert done.returncode == 0, done.stdout + done.stderr
+    header = _command_lines(done.stderr)[0]
+    assert "-n 2" in header and "--dist load" in header, header
