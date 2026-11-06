@@ -5,12 +5,12 @@ spine_state: running
 run_id: r20261106T033959Z-086a
 slice: 086
 stage: implement
-stage_started_at: 1793940960
-stage_deadline_epoch: 1793951760
-stage_base_commit: 3855f2fb
+stage_started_at: 1793942160
+stage_deadline_epoch: 1793952960
+stage_base_commit: 9496090b
 attempt: 0
 retry_limit: 3
-last_verdict: analyze U4 pass (read-only; 1 CRITICAL / 5 HIGH / 13 MEDIUM / 5 LOW); implement blocked; driver repair pass in progress (C-01 contracts, H-01 085 carve-out, H-02..H-05)
+last_verdict: repair pass pass (commit 9496090b; C-01 fixed 33/33; H-01..H-05 fixed; gates pass); T050 pre-change serial baseline running; WP-A/WP-B implement dispatch after T050
 <!-- loop-state:end -->
 
 - line_id: `086-efficient-test-execution`
@@ -51,7 +51,7 @@ last_verdict: analyze U4 pass (read-only; 1 CRITICAL / 5 HIGH / 13 MEDIUM / 5 LO
 - **临时 Goal（085）**：**已创建** `.specify/specs/086-efficient-test-execution/goal/086-efficient-test-execution/goal.md`（slug `086-efficient-test-execution`，status `active`，engine `validate: valid`）；创建时曾因参数顺序误写全局 `.specify/goal/`，已删除该错误目录并重建 spec-local。
 - **临时 Team（085）**：**已创建** `.specify/specs/086-efficient-test-execution/team/086-efficient-test-execution/team.md`（`scope: spec`、`goal_slug: 086-efficient-test-execution`、8 个 stage_seats、14 个 seats、`config.agent_concurrency` 24 requested / 18 effective、`isolation: worktree`、checkpoint policy standing）；schema 校验通过。
 - **085 live status exception（T041）**：只允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 的 SC-010 status 行；由 FR-030/A12/A17 授权（live reference），不得扩散到 085 的 goal/team/checkpoints/contracts/history。最终验证须证明只改了 SC-010 行。
-- **并发度（085）**：`agent_concurrency_requested: 24`；`agent_concurrency_effective: 24`（初值；host capacity 未声明 → 记录 `host-capacity-undeclared`；每阶段按 ready packages / stage max_parallel / resource capacity 重算）；`verifier_reserve: 6`（`max(1, ceil(24/4))`）；executor slots = 18；任何降级必须具名写入状态脊。
+- **并发度（085）**：`agent_concurrency_requested: 24`；team `agent_concurrency_effective: 18`（verifier reserve 5 / executor slots 13；host capacity `host-capacity-undeclared`）；per-stage effective 2（requirements/clarify/plan/tasks/checklist/analyze），implement planned **10**（7 ready work packages WP-A1…A4 + WP-B1…B3 + 3 verifier reserve；team cap 18 not binding）；任何降级具名。
 - **写隔离（085）**：`write_isolation=worktree`（temporary-team 运行 opt-in）；写 agent 各占 child line + 独立 worktree + 集成队列；读-only agent 可共享；child worktree 位于 `.specify/.tmp/sdd-loop/worktrees/<child_line_id>`，分支 `line/<child_line_id>`；不 push。
 - **Checkpoint（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；回滚规则按 checkpoint-protocol。
 - **保留义务**：不删除、不禁止、不绕过、不重写 085 的 goal/team/checkpoints/contracts 与历史记录；086 改动必须 additive；086 落地后重跑 085 的 contract/integration 测试；085 SC-010 只有在取得完整 dogfood 证据后才可 pass，否则保持 partial 并写明缺口。
@@ -174,6 +174,17 @@ last_verdict: analyze U4 pass (read-only; 1 CRITICAL / 5 HIGH / 13 MEDIUM / 5 LO
 - repair pass: 驱动者按 findings 修复 artifacts；先 C-01，再 H-01/H-04/H-05/H-02/H-03 与 M/L；随后重跑 validate/coverage/pre-analyze/decomposition，再派发 implement。
 - checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/06-analyze.md`。
 - next: repair pass → implement（plan-first wave WP-A1…A4 + WP-B1…B3，planned effective 10；WP-C after）。
+
+## Repair pass（2026-11-06T05:16Z）
+
+- sentinel `REPAIR-DONE`；commit `9496090b`（14 files；no source/tests/085）；worktree clean。
+- C-01 fixed: `account-clause-coverage.py` **status ok / FR 33/33 / clause 52**；H-01 fixed: FR-027 narrow carve-out + C-041/GATE-5/M-16/team/WP-C2/R-8/T041 aligned, fabricated `CLOSURE.md` citation removed；H-04 fixed: T050 pre-change baseline；H-05: T054 budget + T050/T047 + out-of-slot T014/T016/T044；H-02: `env -u PYTHONPATH` + A20；H-03: 19 mutation-leg carriers；M-01…M-13/L-01…L-05 fixed。
+- independent gates: `validate-requirements` 0/0；`validate-tasks` 0/0；`pre-analyze` requirements/plan/tasks pass errors=0 advisories=39（future deliverables）；`decomposition --mode tasks` proceed 33 FR / 56 tasks ≤ 60/80。
+- gate-scan actual: **total 34 / keep_gate 27 / violations 0**；pre-existing drift (frozen 23 / plan-stage 27) disclosed；feature adds zero hits (GATE-7).
+- concurrency: requested 24; team effective 18; per-stage 2; implement planned 10 (7 work packages + 3 verifier reserve).
+- T050 baseline: pending; command `env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out …/test-evidence/baseline-failed.txt -q` (pre-change runner is serial by default; `--serial` after the runner change is equivalent).
+- checkpoint: `.specify/specs/086-efficient-test-execution/checkpoints/07-implement-preflight.md`。
+- next: T050 baseline → WP-A1…A4 + WP-B1…B3 parallel implement (085 team worktrees/integration queue) → WP-C after.
 
 ## U0.5 自检
 
