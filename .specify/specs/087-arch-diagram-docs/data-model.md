@@ -1,9 +1,9 @@
 # Data Model — 087 架构图为核心的文档空间
 
 **Feature**: 087 | **Date**: 2026-11-06 | **Stage**: plan (Phase 1)
-**Authority**: 本文件**不拥有**任何取值域。实体字段、封闭 verdict / reason 集、`stale` 逐面判据、
-追溯记录与豁免记录的 schema 的 owner 是 `contracts/diagram-obligation.contract.md`（下文以 `C-NNN` 引用）；
-载体集合的分类含义归 `skills/external/create-docs/SKILL.md` § Desired-State Baseline；
+**Authority**: 本文件**不拥有**任何取值域。实体字段、封闭 verdict / reason 集、逐文档判定的有序优先级、
+`stale` 逐面判据、追溯记录与豁免记录的 schema 的 owner 是 `contracts/diagram-obligation.contract.md`（下文以 `C-NNN` 引用）；
+载体集合的分类含义与**图的落点区域**归 `skills/external/create-docs/SKILL.md` § Desired-State Baseline；
 图的语义模型 / 路由 / 交付契约归 `skills/external/draw-diagram/`。本文件只登记**实体、关系与状态迁移**，
 每个字段以 owner 的锚点引用，MUST NOT 复述取值。
 
@@ -26,7 +26,7 @@
 
 | 字段 | 来源 / owner | 说明 |
 |------|--------------|------|
-| `source` | `C-010` `source`；扩展名表归 `references/delivery-contract.md` § D2 | 可编辑源，**每图恰一份**（`FR-009`） |
+| `source` | `C-010` `source`；扩展名表归 `references/delivery-contract.md` § D2 | 可编辑源，**每图恰一份**（`FR-009`）；落点 `docs/assets/`（T-005） |
 | `rendered[]` | `C-010` `rendered[]` | 渲染产物面；引擎不同则条数不同（`D2` 的表，本文件不复述） |
 | `engine` | `C-010` `engine`；闭集归 `references/routing-matrix.md` | 引擎层名 |
 | `engine_reason` | `C-010` `engine_reason` | 路由命中理由（独占登记 / 图类矩阵行 / tie-break） |
@@ -47,10 +47,12 @@
 | `reason` | `C-005`（与 verdict 一一绑定的封闭表） | 闭集外的值是契约违规 |
 | `summary.*` | `C-013` | 计数 + `clean` + `exemption_superseded` |
 
-**状态判定（有序，命中即停）**：`recorded-exemption`（有效豁免）→ `missing`（含 `reference-unresolved` / `orphan-source`）→ `not-evaluated`（`C-012` 的四项）→ `stale`（`C-008` / `C-009`）→ `satisfied`（`C-007` 五条合取）。
-优先级在 `C-004` 已冻结，本文件只登记它在实现上的落法：单趟顺序判断，**不回溯**、不二次覆盖。
+**状态判定（有序，命中即停）**：唯一登记处是 `C-016` 的九行表（`recorded-exemption` → 失效豁免 →
+`no-diagram-reference` → `reference-unresolved` → `orphan-*` → `trace-incomplete` → `no-trace-record` →
+`stale` → `satisfied`）。本文件不复述该表，只登记它在实现上的落法：单趟顺序判断，**不回溯**、不二次覆盖。
 
 `clean` = 四个计数全零（`C-013`）；`exempted > 0` 与 `carriers == 0` 都 MUST 使 `clean=false`（`FR-004` / `FR-016` 的假绿防线）。
+`--only` 收敛到 0 个对象时 `clean` 按公式算得 `true`，但**那不是**空间合规的结论（`C-013` 的附注）。
 
 ## E4 — Diagram Trace Record（追溯记录）
 
@@ -73,15 +75,29 @@
 
 ## E6 — Fixture Space（夹具空间）
 
-四段，全部纯文件（research `R5`：不依赖渲染后端、不依赖网络、不依赖 `pytest` 之外的东西）：
+全部纯文件（research `R5`：不依赖渲染后端、不依赖网络、不依赖 `pytest` 之外的东西）。**落点与形态**：
+`tests/fixtures/docs-obligation/<name>/`，每个夹具是一棵**完整的迷你文档空间**（根 `README.md` +
+`docs/<六类目录>/` + `docs/assets/` + `docs/.speckit/`），判据是 `--root` 指向该目录；
+**每个产生写入的用例先把夹具 `shutil.copytree` 到 `tmp_path` 再操作**，因此仓库里的夹具永远是**删除前的绿灯态**
+（先例：`tests/integration/test_docs_command_scenarios.py` 的 `make_skeleton(tmp_path)` 同形）。
 
-| 夹具 | 构成 | 断言的目标状态 |
-|------|------|----------------|
-| `clean/` | 1 份正式文档 + 1 图两面 + 追溯记录 + 解析引用 | 全 `satisfied`，`summary.clean=true` |
-| `missing-face/` | 同 `clean/`，删渲染产物 | `missing` / `orphan-source`；删源则 `missing` / `orphan-source` 的对应面（`FR-023` 的负向） |
-| `no-diagram/` | 同 `clean/`，删引用与两面 | `missing` / `no-diagram-reference` |
-| `stale-source/` | 同 `clean/`，把源 mtime 推到渲染产物之后 | `stale` / `source-newer-than-render` |
-| `exempt-ok/` `exempt-bad/` `exempt-superseded/` | 三条豁免记录各一（有效 / 缺 justification / 文档已带引用） | `recorded-exemption` / `not-evaluated` / `not-evaluated` + 计数 |
+| 夹具 | 构成 | `--record` | 断言的目标状态（`C-016` 的档位） |
+|------|------|-----------|----------------------------------|
+| `clean/` | 1 份正式文档 + 1 图两面（`docs/assets/foo.{mmd,svg,png}`）+ 引用解析 + 记录齐备 | 本夹具记录 | `satisfied` / `reference-resolves`；`summary.clean=true` |
+| `no-diagram/` | 同 `clean/`，文档无任何指向图渲染产物的引用 | 本夹具记录 | `missing` / `no-diagram-reference`；`clean=false` |
+| `deleted-rendered/` | 同 `clean/`，渲染产物已删、源在、引用仍指向被删的渲染面 | 本夹具记录 | `missing` / `reference-unresolved`（`C-016` 序 4 **先于**失面序 5） |
+| `orphan-rendered/` | 同 `clean/`，渲染产物已删、源在、**引用指向源**（解析成功） | 本夹具记录 | `missing` / `orphan-rendered`（`C-016` 序 5） |
+| `orphan-source/` | 同 `clean/`，源已删、渲染产物在 | 本夹具记录 | `missing` / `orphan-source`（`C-016` 序 5） |
+| `stale-source/` | 同 `clean/`，两面**都在**，源 mtime 严格晚于最早的渲染面 | 本夹具记录 | `stale` / `source-newer-than-render`（`C-016` 序 8） |
+| `no-trace/` | 同 `clean/`，两面与引用都在，**不给** `--record` | 缺省 | `not-evaluated` / `no-trace-record`（序 7） |
+| `trace-incomplete/` | 同 `clean/`，记录在但 `diagrams[]` 无同名条目 / 缺必填字段 | 本夹具记录 | `not-evaluated` / `trace-incomplete`（序 6） |
+| `exempt-ok/` | `C-011` 三字段齐备的豁免记录，文档无图 | — | `recorded-exemption` / `exempt-chronological`；`exempted=1`；`clean=false` |
+| `exempt-bad/` | 豁免记录缺 `justification`（或长度 < 8） | — | `not-evaluated` / `exemption-invalid`（序 2） |
+| `exempt-superseded/` | 豁免记录齐备，但文档**已带**解析到渲染产物的引用 | 本夹具记录 | `not-evaluated` / `exemption-invalid` + `summary.exemption_superseded=1` |
+
+**mtime 必须是夹具的显式事实，不是检出顺序的副产品**：`stale-source/` 在 `conftest` 的建造步骤里用
+`os.utime` 把 `source` 设为「渲染面 mtime + 60s」（写在 `.gitattributes` 之外，不进版本库），
+否则 `git checkout` 的写入顺序会让该夹具随机器而红或绿——一条会自己变色的判据等于没有判据。
 
 夹具同时是 `FR-023` 的「可观测负向」载体：同一夹具在删除一个面后 MUST 由绿转红，且 finding 点名该面。
 
@@ -91,13 +107,15 @@
 
 | 落点 | 追加内容 | owner 边界 |
 |------|----------|------------|
-| `skills/external/create-docs/SKILL.md` § Desired-State Baseline | 配套图义务的一条基线条目 | 分类 / 保留名 / 一屏上限仍归本节 |
-| 同上 § Authoring Flow R2/R5/R6 · § Reconcile Loop R6 | 图作为交付物、两面具名报告、检查器并列执行 | 确认分级、容忍带、归档不删除不动 |
-| `skills/external/improve-docs/SKILL.md` § Workflow | 命名分类行 + 最小编辑规则 | § Ownership boundary 不动 |
-| `templates/commands/docs.md` § Outline | 义务指针（新增小节，不改 W1 接线小节） | 顶层章节序列不动 |
+| `skills/external/create-docs/SKILL.md` § Desired-State Baseline（+ 其 `#### Assets` 条目） | 配套图义务的一条基线条目；图的落点按该条目（T-005） | 分类 / 保留名 / 一屏上限仍归本节 |
+| 同上 § Reconcile Loop R3/R4/R5/R6 · § Authoring Flow R2/R5/R6 | 图作为差异项与交付物、R5 **产图/重渲染**（收敛路径 `flow-obligations` C-008a）、两面具名报告、检查器并列执行 | 确认分级、容忍带、归档不删除不动 |
+| `skills/external/improve-docs/SKILL.md` § Workflow 2–5 | 命名分类行 + 最小编辑规则 | § Ownership boundary 不动 |
+| `templates/commands/docs.md` § Outline 的 `### 分派` | 义务指针（新增一节，不改 W1 接线小节） | 顶层章节序列不动 |
 | `docs/concepts/documentation-model.md` | 读者面投影一段 | 只引 owner，不定义规则 |
 
-数量：**5 处落点、4 个文件**（`create-docs` 两个小节族同文件）。契约侧条款见 `contracts/flow-obligations.contract.md` 的 A–E 组。
+数量：**5 处落点、4 个文件**（`create-docs` 两个小节族同文件）。契约侧条款见 `contracts/flow-obligations.contract.md` 的 A–E 组；
+其中 **B 组的 `C-008a` 是「reconcile 能把图维度收敛掉」的唯一登记处**——缺了它，`SC-003` 的「收敛后二次运行零图 finding」
+在文本上不可达（这正是 attempt 1 的 P1-5）。
 
 ## E8 — Guard Assertion Set（实施期必须保持的守卫）
 
@@ -133,17 +151,20 @@ GuardAssertionSet (E8) --constrains edits to--> E7
 
 ```text
 none          --文档无引用--------------------> missing / no-diagram-reference
-none          --引用存在但目标缺失------------> missing / reference-unresolved
-none          --源在、渲染面缺----------------> missing / orphan-source
-two faces ok  --无追溯记录--------------------> not-evaluated / no-trace-record
-two faces ok  --记录缺必填字段----------------> not-evaluated / trace-incomplete
+none          --引用指向的渲染产物缺失--------> missing / reference-unresolved
+two faces ok  --无追溯记录（或未给 --record）--> not-evaluated / no-trace-record
+two faces ok  --记录在但指不到这张图/缺字段---> not-evaluated / trace-incomplete
 two faces ok  --记录齐备 + 引用解析------------> satisfied / reference-resolves
-satisfied     --源 mtime > 渲染 mtime---------> stale / source-newer-than-render
+satisfied     --源 mtime > 最早渲染 mtime-----> stale / source-newer-than-render
 satisfied     --盘上 sha ≠ 记录 sha-----------> stale / render-digest-mismatch
+源在、渲染缺  （引用指向源，解析成功）--------> missing / orphan-rendered
+源缺、渲染在  （两面只剩渲染）-----------------> missing / orphan-source
 any           --豁免有效且未被事实推翻--------> recorded-exemption / exempt-chronological
 any           --豁免失效（已带解析引用）------> not-evaluated / exemption-invalid (+superseded)
 any           --渲染产物读不出----------------> not-evaluated / render-unreadable
 ```
 
-迁移表是 `C-004` 优先级与 `C-005` 配对表的**同一份事实的两种读法**（按触发面 vs 按 verdict 优先级）；
-冲突时以 `C-004`/`C-005` 为准。
+**这张表是 `C-016` 有序判定的另一种读法**（按触发面），不是第二套判据：冲突时以 `C-016` 为准。
+两处顺序值得点名，因为它们各自是一次真实的误判来源：**失面（`orphan-*`）先于 `stale`**——`C-008` 的两条规则
+在缺少一个面时对象不存在、不可判；**引用解析（`reference-unresolved`）先于失面**——目标整个不在盘时
+根本走不到「两面里缺哪一个」这一步。

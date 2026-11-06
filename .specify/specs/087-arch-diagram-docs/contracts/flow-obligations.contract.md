@@ -1,13 +1,20 @@
 # Contract — Flow Obligations（两个写入流程的配套图义务）
 
 **Feature**: 087 架构图为核心的文档空间 | **Date**: 2026-11-06
-**Surfaces carrying these obligations**: `skills/external/create-docs/SKILL.md`（§ Desired-State Baseline、
-§ Authoring Flow R2/R5/R6）、`skills/external/improve-docs/SKILL.md`（§ Workflow 2/3/4/5/6）、
-`templates/commands/docs.md`（§ Outline 的分派与产出段）
+**Surfaces carrying these obligations**（章节名逐字取自当前 owner 文件，`grep -n '^###'` 实测 2026-11-06）：
+`skills/external/create-docs/SKILL.md`（`### Desired-State Baseline` / `#### Assets`、
+`### Reconcile Loop` 的 R2–R6、`### Authoring Flow（文档写作流程）` 的 R2–R6）、
+`skills/external/improve-docs/SKILL.md`（`## Workflow` 的 `### 2. Gather evidence` / `### 3. Classify the improvement`
+/ `### 4. Apply the minimal section-level edit` / `### 5. Verify`）、
+`templates/commands/docs.md`（`### 分派(本命令保留的编排职责)`）。
 **FR served**: FR-005, FR-006, FR-007, FR-009, FR-010, FR-012, FR-017, FR-022
 **Owner of this contract**: this file. The checker vocabulary the flows *call* is owned by
 `contracts/diagram-obligation.contract.md`; this file MUST NOT restate it (it cites `[D-nnn]`).
 The drawing capability's own rules are owned by `skills/external/draw-diagram/` and are cited, never paraphrased.
+
+**引用记号**：`[D-nnn]` = `contracts/diagram-obligation.contract.md` 的 `C-nnn`（`D` 是 Dogfooding/Diagram 的
+契约前缀，避免与本文件的 `C-nnn` 撞号；本文件自身条款仍写 `C-nnn`）。三处最常被引用的落点：
+`[D-005]` = 该文件的封闭 `reason` 集；`[D-010]` = 追溯记录 schema；`[D-013]` = payload 形态与 `clean` 公式。
 
 ---
 
@@ -16,6 +23,7 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
 - **C-001** 一次产出 = **四件在盘产物**，缺一即该运行 MUST NOT 报完成：载体文档、图的**可再编辑源**、
   **渲染产物**（交付契约对该引擎层要求的全部格式）、文档内**解析得到的相对引用**。四件的清单与
   「两面分为两面报告」的形态引 `[D-007]`（两组证据清单是它的实例）。
+  第四件之外的第五件——**追溯记录**——由 `C-003` 单独承担，因为它由运行写、由检查器读，不属「图的两面」。
 - **C-002** 图 MUST 由 `skills/external/draw-diagram` **按引用**产生：文档流程 MUST NOT 复制它的语义模型、
   路由判据或交付契约条文，MUST NOT 自建第二条渲染路径。**反例清单（闭集）**：新增绘图脚本、新增引擎选择表、
   新增交付契约副本、直接调用某引擎脚本绕过前门。
@@ -38,33 +46,57 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
 - **C-008** § Authoring Flow 三处接线：
   - **R2 期望态**追加一项：本批新文档各自配套图的**规划**（图类意图、预计引擎层、源与渲染产物的落点）；
   - **R5 写作收敛**追加一条：调 `draw-diagram` 产出两面 + 文档引用 + 追溯记录（C-001…C-004）；
-  - **R6 验证**追加一次 `docs-utils.py --action obligation`（`--record` 指向本次运行记录）并把 verdict
+  - **R6 验证**追加一次 `docs-utils.py --action obligation --record <本次运行记录>` 并把 verdict
     并入残差报告；`missing` / `stale` / `not-evaluated` 任一非零 ⇒ MUST NOT 报「收敛完成」。
-- **C-009** 图产物 MUST 落在**既有 taxonomy 内**（与文档同目录的 `diagrams/` 子树，或文档同级），
-  MUST NOT 触发新建顶层文档类型目录（FR-002）。`diagrams/` 是既有目录下的子目录，不是新分类。
+- **C-008a — Reconcile 的收敛路径（P1-5，**MUST 可判定地收敛到零图 finding**）**
+  § Reconcile Loop 的 **R3 差异**与 **R4 干跑计划**、**R5 收敛**各追加一条，使「图」成为一次
+  reconcile 可以真正收敛掉的维度，而不是一个永远 `missing` 的观测项：
+
+  | 步骤 | 追加内容 | 判据 |
+  |------|----------|------|
+  | R3 差异 | 把 `--action obligation --root . --record <最新记录>` 的 verdict **作为差异项**并入差异集（与 `validate` 的违规同级），`missing` / `stale` / `not-evaluated` 三档都进计划 | 三档中任一非零 ⇒ 本轮差异非空 |
+  | R4 干跑计划 | 每条差异生成**一条产图/重渲染条目**：`[ ]` 行写文档路径 + 计划图类 + 引擎层（未知则写「待前门路由」）+ 落点（`assets/`，C-009）；这条属**纯写**条目，可与其它纯写条目一起内联展示，**不**进「移动/归档」的逐项 opt-out 清单（写图不是搬迁） | 计划里每条 `missing`/`stale`/`not-evaluated` 文档恰有一条对应条目 |
+  | R5 收敛 | 对每条条目调 `draw-diagram` 前门（C-002）产出两面 + 文档相对引用 + **同一次运行**写追溯记录（C-003），落点按 C-009 | 条目执行后该文档的 `--action obligation` verdict 变为 `satisfied` 或有效的 `recorded-exemption` |
+  | R6 验证 | 重跑 `--action obligation` 并出**图维度残差报告**（四计数 + `clean`）；任一非零 ⇒ MUST NOT 报「收敛完成」；`D-001` 的语义面 MUST 在报告里以「未覆盖」字样出现一次 | 收敛后的第二次 reconcile：四计数全零且 `clean=true` |
+
+  **收敛责任的归属（单一 owner，MUST NOT 两处都声称）**：产图与重渲染**在 reconcile 的 R5 内完成**，
+  经既有 `draw-diagram` 前门、经既有 safe-local-writes 分级（C-010），**不**移交给 Authoring Flow——
+  reconcile 的 scope 是「单目标/全量」，不是「写作委托」，二次委派会把一次 reconcile 变成一个无法判定的递归。
+  `not-evaluated` **不跳过**：它意味着「尚未被接受」，R5 的条目即「补记录或补图」，补完重判（C-012 的说明段）。
+  **永不收敛的两种残差必须显式**：`D-001` 的语义面（不由本机制收敛，MUST 在报告里点名）与
+  `exempt-*` 文档（`recorded-exemption` 使 `clean=false`，见合同 `C-013`）——报告 MUST NOT 把它们混进「已收敛」。
+- **C-009** 图产物 MUST 落在**既有 taxonomy 内**，且**只有一个落点约定**（`plan.md` T-005 裁定）：
+  载体文档所述结构对应的图，其源与渲染产物落 `<root>/docs/assets/<slug>.<ext>`（本仓先例
+  `docs/assets/quickstart-workflow.{puml,svg,png}`），文档以**相对引用**指向它（`../assets/x.png`）。
+  - `assets/` 的区域约定与「不是文档」的判定归 § Desired-State Baseline 的 `#### Assets` 条目（owner），
+    本条款只登记「图的落点就是它」，MUST NOT 重述该条目的判据。
+  - **MUST NOT** 新建顶层文档类型目录（FR-002）；**MUST NOT** 为图另起一个与该约定并列的第二落点
+    （同目录 `diagrams/` 子树即第二落点，已由 T-005 排除）。
+  - 跨文档共享一张图时，落点不变（仍是一处 `assets/`），由多份文档各自相对引用（C-005）。
 - **C-010** § Tiered Confirmation **一格不加**：写图仍是 safe local writes（自动执行）；移动 / 归档 / 重构
   仍是 stop-and-confirm。本契约 MUST NOT 引入第三档。
 
 ## C. 适配面：`improve-docs`
 
-- **C-011** § Workflow step 2（证据）追加一项：读该文档的追溯记录 `[D-010]`（存在时），作为「这张图是什么、
-  哪个引擎、哪两面」的机器证据。
-- **C-012** § Workflow step 3（分类）追加**一行**到既有分类表：**Diagram-sync**——
-  「改进改到了图所描绘的事实（组件名、关系、步骤顺序）」；**验证后果**：「同一次运行更新图或报具名
-  staleness finding，二者必居其一」。表本身由该技能拥有，本契约只登记这一行必须存在（不复制表格）。
-- **C-013** § Workflow step 4（最小编辑）追加：命中 Diagram-sync 时，按 C-001…C-004 更新；**不命中时**
-  MUST 在原处打一行「本次无需图工作」并在报告里重复一次（FR-007：MUST NOT 为表演活动而重渲染）。
-- **C-014** § Workflow step 5（验证）追加：`docs-utils.py --action obligation --only <该文档>` 的 verdict 必须是
+- **C-011** `## Workflow` 的 `### 2. Gather evidence (deterministic sources first)` 追加一项：读该文档的追溯记录
+  `[D-010]`（存在时），作为「这张图是什么、哪个引擎、哪两面」的机器证据。
+- **C-012** `### 3. Classify the improvement` 的分类表追加**一行**（表本身由该技能拥有，本契约只登记这一行必须存在）：
+  **Diagram-sync**——「改进改到了图所描绘的事实（组件名、关系、步骤顺序）」；**验证后果**：
+  「同一次运行更新图或报具名 staleness finding，二者必居其一」。
+- **C-013** `### 4. Apply the minimal section-level edit` 追加：命中 Diagram-sync 时，按 C-001…C-004 更新；
+  **不命中时** MUST 在原处打一行「本次无需图工作」并在报告里重复一次（FR-007：MUST NOT 为表演活动而重渲染）。
+- **C-014** `### 5. Verify` 追加：`docs-utils.py --action obligation --only <该文档>` 的 verdict 必须是
   `satisfied` 或有效的 `recorded-exemption`；`stale` / `missing` / `not-evaluated` ⇒ MUST NOT 报改进完成。
+  `--only` 收敛到 0 个对象时的 `clean` 语义见 `[D-013]` 的附注，本条款不据此放行。
 - **C-015** 无法重渲染（引擎层不可用）⇒ MUST 报**具名** staleness finding 并保留源文件不动
   （FR-006 后半 + C-004）。MUST NOT 把源回滚成「看起来一致」的形态。
 
 ## D. 适配面：`templates/commands/docs.md`
 
-- **C-016** § Outline 的分派段 MUST 增加一句：写作（authoring）与内容（content）两条路径**都**受配套图义务约束，
+- **C-016** `### 分派(本命令保留的编排职责)`  MUST 增加一句：写作（authoring）与内容（content）两条路径**都**受配套图义务约束，
   义务正文**只引**两个技能（`create-docs` § Desired-State Baseline / § Authoring Flow、`improve-docs` § Workflow），
   MUST NOT 在命令里复述义务条文。
-- **C-017** 产出段（「产出: audit log + 残差报告」）MUST 把图维度并进残差报告的分组：
+- **C-017** 同节的产出行（`产出:audit log appended … + residual report grouped by owning skill`）MUST 把图维度并进残差报告的分组：
   `satisfied` / `missing` / `stale` / `exempted` / `not-evaluated` 五个计数按**技能归口**分组（FR-022）。
   MUST NOT 新增第六个残差分组名。
 - **C-018** 硬约束（由既有守卫钉住，MUST 逐条保持）：
@@ -85,7 +117,8 @@ The drawing capability's own rules are owned by `skills/external/draw-diagram/` 
 
 - **C-022** 每次运行的运行报告 MUST 含 FR-022 的四件：源路径、渲染产物路径（可多条）、文档引用、
   追溯记录路径。缺任一件的「已完成」结论 MUST NOT 被写成证据。
-- **C-023** 负向可观测（FR-023）由**夹具 + 检查器**承担，不需要真渲染：删掉渲染产物 ⇒ 下一次
-  `--action obligation` 报 `missing` / `orphan-source`；删掉源 ⇒ 报 `missing` / `orphan-source`；
-  触碰源使其 mtime 更新 ⇒ 报 `stale` / `source-newer-than-render`。三种都必须**转红**；
-  一直绿即「未验证」而非「满足」。
+- **C-023** 负向可观测（FR-023）由**夹具 + 检查器**承担，不需要真渲染，逐面点名（`[D-005]` 的 `orphan-*` 两值）：
+  删掉**渲染产物** ⇒ `missing` / `orphan-rendered`；删掉**源** ⇒ `missing` / `orphan-source`；
+  触碰源使其 mtime 更新（两面都在）⇒ `stale` / `source-newer-than-render`。三种都必须**转红**；
+  一直绿即「未验证」而非「满足」。三种的夹具、步序与期望读数**唯一登记处**是
+  `plan.md` § Test Plan 的夹具表与 `quickstart.md` S3——本条款只声明义务，不复述步序。

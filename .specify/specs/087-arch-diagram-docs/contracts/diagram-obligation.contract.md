@@ -4,8 +4,8 @@
 **Implementing engine**: `skills/external/create-docs/scripts/docs-utils.py`（新动作 `obligation`）
 **FR served**: FR-003, FR-004, FR-005, FR-008, FR-013, FR-014, FR-015, FR-016, FR-022, FR-023
 **Declared owner of this contract**: this file. It owns the checker's **command surface**, the closed
-`verdict` set, the closed `reason` set, the `stale` per-face criteria, the traceability-record schema
-and the exemption-record schema. Every other surface (skill text, contract index, tests, the
+`verdict` set, the closed `reason` set, the per-document **decision precedence** (`C-016`), the `stale`
+per-face criteria, the traceability-record schema and the exemption-record schema. Every other surface (skill text, contract index, tests, the
 `docs/concepts/documentation-model.md` reader projection) cites this file by section anchor and
 restates **no** value, threshold or enumeration.
 
@@ -21,9 +21,14 @@ This contract owns only what the spec's RS-006 designates as plan-frozen.
 
 ```text
 python3 ${SKILL_HOME}/scripts/docs-utils.py --action obligation --root <project-root> \
-  [--record <run-record-path>]... [--only <doc-path>]... [--json]
+  [--record <trace-record-file>] [--only <doc-path>] [--json]
 ```
 
+- **参数集是封闭的**：`obligation` 只接受上表四个选项。`--json` 是**既有动作已隐含的形态**
+  （该引擎每次调用都 `json.dump` 一个对象到 stdout，见 `main()`），因此它是**无操作的可读性开关**，
+  不给引擎加第二个输出模式；`--record` 单值（可重复出现，后者覆盖前者，不做并集）。
+  其余既有选项（`--yes` / `--apply` / `--moves` / `--scope` / `--summary` / `--items-file` /
+  `--allow-special`）对 `obligation` **无定义**，实现 MAY 接受并忽略，MUST NOT 赋予语义。
 - `--root` 缺省 `.`，与同引擎既有动作一致，取**项目根**（carrier set 的根是项目根，不是 `docs/`）：
   `validate` / `scan` / `audit` 同此口径，文档空间由 `--root` + `docs/` 推出。
 - 两个目录常量由本契约固定，其余模块不重复声明：追溯记录
@@ -80,7 +85,8 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 - **`recorded-exemption` 不是 pass**：`summary.exempted > 0` 时 `summary.clean` MUST 为 `false`，
   payload MUST 单独计数（FR-004：「记录的豁免不是 pass」）。
 - 闭集性质：payload 里出现第六种值即契约违规，MUST 由 `tests/unit/test_docs_utils_obligation.py`
-  对一组夹具逐值断言（含负向夹具）。
+  对一组夹具逐值断言（含负向夹具）；断言形态见 `C-016` 与 `plan.md` § Test Plan 的 clause→test 表。
+- `not-evaluated` **不是合格态**：它与 `missing` / `stale` 一样使 `clean` 为 `false`（`C-013`）。
 
 ## C-005 — 封闭 `reason` 集（RS-006 的另一半，FR-016）
 
@@ -91,16 +97,19 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 | `satisfied` | `reference-resolves` | 文档引用解析到渲染产物，且记录齐备一致 |
 | `missing` | `no-diagram-reference` | 文档里没有任何指向图渲染产物的相对引用 |
 | `missing` | `reference-unresolved` | 有引用但目标在盘上不存在 |
-| `missing` | `orphan-source` | 图的源在盘、渲染产物缺失（两面只剩一面） |
+| `missing` | `orphan-source` | 渲染产物在盘、可再编辑源缺失（两面只剩「渲染」一面） |
+| `missing` | `orphan-rendered` | 可再编辑源在盘、渲染产物缺失（两面只剩「源」一面） |
 | `stale` | `source-newer-than-render` | 源 mtime 晚于渲染产物 mtime（源改过没再渲染） |
 | `stale` | `render-digest-mismatch` | 记录里的渲染产物 sha256 与盘上实际文件不等（图被手改） |
-| `not-evaluated` | `no-trace-record` | 有图但产生方运行没留下追溯记录（FR-013：未接受） |
-| `not-evaluated` | `trace-incomplete` | 记录在但缺字段（引擎层 / 理由 / LDM 摘要 / 交付契约结论） |
+| `not-evaluated` | `no-trace-record` | 两面与引用都在，但产生方运行没留下任何追溯记录（FR-013：未接受） |
+| `not-evaluated` | `trace-incomplete` | 两面与引用都在、记录也在，但记录里**指不到这张图**：`diagrams[]` 无与文档引用目标同名的一条，或该条缺 `C-010` 必填字段 |
 | `not-evaluated` | `exemption-invalid` | 有豁免记录但理由字段缺失或不再适用 |
 | `not-evaluated` | `render-unreadable` | 渲染产物存在但读不出来（权限 / 编码） |
-| `recorded-exemption` | `exempt-chronological` | 记录的理由是「无结构可绘」类（C-011 的闭集） |
+| `recorded-exemption` | `exempt-chronological` | 记录的理由是「无结构可绘」类（`C-011` 的闭集） |
 
 - `reason` 与 `verdict` 的配对表即**闭集本身**：新增一行属契约变更，MUST NOT 由实现就地扩面。
+- **失面必须报具名的那一面**（FR-008 / FR-023）：源在、渲染产物缺 ⇒ `orphan-rendered`；渲染产物在、
+  源缺 ⇒ `orphan-source`。两个值方向相反、不可互换——「点名缺失的面」是 `SC-002` 的判据本体。
 - 每条条目 MUST 带 `path`（**相对 `--root` 的 POSIX 路径**）与 `line`（引用所在行；无引用时为 `0`）。
   「逐文档路径具名」是 FR-016 的原文要求，MUST NOT 只给计数。
 
@@ -115,28 +124,31 @@ MUST NOT 打开任何文件用于写入。允许的副作用集合是**空集**�
 
 ## C-007 — `satisfied` 的合取条件
 
-一个文档判 `satisfied` 当且仅当下列五条**同时**成立：
+一个文档判 `satisfied` 当且仅当下列五条**同时**成立（任何一条不成立时**落哪一档由 `C-016` 的有序判定决定**，
+不由本节决定）：
 
 1. 文档内至少一条**相对 Link**（`[..](path)`，非 `http(s)://`、非绝对路径）解析到一个存在的文件；
-2. 该文件是 C-010 记录里某条 `rendered[].path` 的**同名**路径；
+2. 该文件是 `--record` 记录里某条 `rendered[].path` 的**同名**路径；
 3. 该图条目的 `source` 与 `rendered[]` 两面**都在盘**；
 4. 该图条目所属运行记录齐备（C-010 必填字段非空）；
 5. C-008 与 C-009 两条判据都不成立（不 stale）。
 
-任一不成立 ⇒ 按 C-005 的配对落到对应 `verdict`/`reason`。**没有记录即 `not-evaluated`**，
-MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`（FR-013：无记录 = 未接受）。
+**没有记录即 `not-evaluated`**，MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`
+（FR-013：无记录 = 未接受）。
 
 ## C-008 — `stale` 第一半：图的两个面彼此不一致（A12 的并集左半）
+
+**前置条件**：记录里存在与文档引用目标同名的一条 `diagrams[]` 条目，且该条目的 `source` 与
+全部 `rendered[]` **都在盘**。两面不全时本节不判——失面归 `missing`，且按 `C-016` 的优先级先于本档结算。
 
 判定规则（任一成立即 `stale`，`reason` 取命中的第一条）：
 
 | # | 规则 | `reason` |
 |---|------|----------|
-| 1 | `os.stat(source).st_mtime > os.stat(rendered).st_mtime`（**严格大于**；相等不算） | `source-newer-than-render` |
-| 2 | 记录里该 `rendered[]` 条目的 `sha256` 与盘上文件的 sha256 不等 | `render-digest-mismatch` |
+| 1 | `os.stat(source).st_mtime > os.stat(rendered).st_mtime`（**严格大于**；相等不算；多面取**最早**的 `rendered` mtime 比较） | `source-newer-than-render` |
+| 2 | 记录里该 `rendered[]` 条目的 `sha256` 与盘上文件的 sha256 不等（多面逐个比对，任一不等即命中） | `render-digest-mismatch` |
 
-- 规则 2 **只在记录里带 `sha256` 时**才判；记录无 `sha256` 时该条规则 `not-applicable`，
-  不计入 stale（缺字段本身已由 C-007 第 4 条挡在 `satisfied` 之外）。
+- 规则 2 **只在记录里带 `sha256` 时**才判；记录无 `sha256` 时该条规则 `not-applicable`。
 - **不覆盖**：重渲染后字节不同但语义相同——每次真实重渲染都由产生方重写记录，`sha256` 随之刷新；
   因此规则 2 不会把一次正常重渲染误判成 stale。
 - **不覆盖**：渲染产物的内容是否与源**语义**相符（无解析器，见 research R3）。
@@ -148,7 +160,10 @@ MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`（FR-01
 | # | 规则 | 后果 |
 |---|------|------|
 | 1 | 文档引用的渲染产物被改名 / 移走后，文档仍指向旧路径 | `missing` / `reference-unresolved`（不是 stale） |
-| 2 | 文档引用的图，其记录的 `rendered[].path` 与文档引用目标不是同一路径 | `stale` / `render-digest-mismatch` 不作此用；本条落 `not-evaluated` / `trace-incomplete` |
+| 2 | 文档引用解析到渲染产物，但 `--record` 记录里没有任何一条 `rendered[].path` 与之同名 | `not-evaluated` / `trace-incomplete`（记录不覆盖这张图） |
+
+- 两条都由 `C-016` 的有序判定结算；本节只声明「它们各自落哪一档、不落 `stale`」。
+- **`stale` 的判据因此只有一个入口**：`C-008`。`C-009` 冻结部分是「引用与记录不同源」的归类，不是 stale 的第二判据。
 
 **未冻结的部分（显式残差，MUST NOT 读作通过）**：
 
@@ -162,6 +177,11 @@ MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`（FR-01
 **落点**：每次产出或改动图的**运行**把记录 append 到
 `<root>/docs/.speckit/runs/<UTC 时间戳>-diagram-trace.json`（`<root>` 见 C-001）——一文一件，路径即身份
 （Concurrent Development Safety：两个并发的写入运行写不同路径，不共享可变聚合）。
+
+> **文件名形态是 `C-001` 的 `--record` 使用约定，不是检查器的发现机制**：
+> 检查器**只读 `--record` 明确点名的文件**（`C-006` 规则 3），不 glob 目录、不按时间戳猜「最新一份」——
+> 猜一份就让「记录被改 ⇒ 失步不可发现」重新成立，与 `FR-015` 相悖。流水线里只需
+> `--record docs/.speckit/runs/<最新时间戳>-diagram-trace.json`，那是**调用方**的选择。
 
 ```json
 {
@@ -177,10 +197,10 @@ MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`（FR-01
         "accepted": true,
         "unmet": []
       },
-      "source": "docs/concepts/diagrams/foo.mmd",
+      "source": "docs/assets/foo.mmd",
       "rendered": [
-        {"path": "docs/concepts/diagrams/foo.svg", "sha256": "<64 hex>"},
-        {"path": "docs/concepts/diagrams/foo.png", "sha256": "<64 hex>"}
+        {"path": "docs/assets/foo.svg", "sha256": "<64 hex>"},
+        {"path": "docs/assets/foo.png", "sha256": "<64 hex>"}
       ]
     }
   ]
@@ -190,8 +210,13 @@ MUST NOT 因为「两面都在、引用也解析了」而判 `satisfied`（FR-01
 必填字段（缺一即 `trace-incomplete`）：`document`、`engine`、`engine_reason`、`ldm_summary`、
 `delivery.accepted`、`source`、`rendered[].path`。`rendered[].sha256` 可缺（缺则 C-008 规则 2 不判）。
 
+- **路径一律相对 `<root>`**（与 `C-005` 的 `path` 同口径），因此 `source` / `rendered[].path` 与文档里的
+  相对引用可以按同一基准比对。
+- **图的落点归 Baseline（T-005）**：本示例里的 `docs/assets/` 取自 `skills/external/create-docs/SKILL.md`
+  § Desired-State Baseline 的 `assets/` 区域约定（该技能 `#### Assets` 条目），本契约只借它作示例、
+  MUST NOT 成为第二个落点 owner。
 - 字段**含义**归 `draw-diagram`：`engine` 取自其 `references/routing-matrix.md` 的六引擎层名；
-  `ldm_summary` 是 `references/semantic-model.md` schema 的摘要；`delivery` 是
+  `ldm_summary` 是 `references/semantic-model.md` 的 Schema 摘要；`delivery` 是
   `references/delivery-contract.md` § D6 自检表的结论。本契约只登记**字段名与必填性**，MUST NOT 复述那三份 owner 的判据。
 - 记录由**产生方运行**写（FR-015：只读检查 MUST NOT 写它）；检查器只读。
 
@@ -216,18 +241,25 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 - **失效可报（FR-004 后半）**：被豁免文档在同一次运行里**已经带一条解析到渲染产物的引用**时，
   豁免已被事实推翻 ⇒ `not-evaluated` / `exemption-invalid` 并在 `summary.exemption_superseded` 计数。
   这是「豁免理由不再成立」的**唯一**机械信号；理由的语义变化 MUST NOT 被自动推断。
+- **图的落点不在本条款内**：本条款只拥有「豁免记录放哪、怎么算有效」。图的两面放哪归
+  `skills/external/create-docs/SKILL.md` § Desired-State Baseline（`plan.md` T-005 裁定为 `assets/`），
+  MUST NOT 在此复述（宪法 XIV：一个事实一个 owner）。
 
 ## C-012 — `not-evaluated` 的封闭四项
 
 只有下列四种情形产出 `not-evaluated`，别的一律落到 `missing` / `stale` / `satisfied`：
 
 1. 有图两面与引用，但**没有**追溯记录（`no-trace-record`）；
-2. 记录在但缺 C-010 必填字段（`trace-incomplete`）；
+2. 记录在但**指不到这张图**——无同名 `diagrams[]` 条目，或该条缺 C-010 必填字段（`trace-incomplete`）；
 3. 豁免记录无效或已失效（`exemption-invalid`）；
 4. 渲染产物存在但读不出来（`render-unreadable`，`OSError` 归一）。
 
 「引擎不可用」不在此列：检查器**不调用**任何引擎（C-006 无网络、无第三方）——FR-012 的引擎拒绝语义
 归产生方运行，不归检查器。
+
+**这一项也就此定死「刚生成、尚未入记录」的图**：两面在、引用解析、却没有一条记录点到它 ⇒ `no-trace-record`
+⇒ `clean: false`，直到产生方运行**同一次**写出记录为止（`flow-obligations.contract.md` `C-003`）。
+把 `not-evaluated` 读成「暂不追究」是本契约明确禁止的读法（`C-013`）。
 
 ## C-013 — Payload 形态
 
@@ -251,8 +283,12 @@ justification: "按时间排序的发布流水，没有可绘的结构"
   干净空间因此是「零 finding 的显式结论」，不是「空输出」（FR-016）；有豁免的空间 MUST NOT 报 `clean`
   （豁免可见，不等于通过）。
 - 空载体集合（`carriers == 0`）MUST 报 `clean: false` + `documents: []`：一个没有正式文档的空间
-  不是「合规」，是「判据没有对象」。这条防的是 `FR-016` 允许的假绿。
+  不是「合规」，是「判据没有对象」。这条防的是 `FR-016` 允许的假绿。**这条只对 `--only` 缺省时成立**：
+  `--only` 缩小后剩下的 0 个对象是**调用方的选择**，`clean` 按上式对 0 个条目算得 `true`（没有东西不干净），
+  调用方 MUST NOT 把这一次「空 `--only`」读成「空间合规」——`--only` 的判定面只有它点名的那些文档。
 - `--only` 只缩小被检对象集合，不改变任何判据；`summary` 只统计被检对象。
+- `documents[]` 的字段集固定为 `path` / `line` / `verdict` / `reason` 四个（`C-006` 规则 1 的
+  「字段集固定 ⇒ 字节可比」）：MUST NOT 追加第五个字段，MUST NOT 省略任一字段（无引用时 `line` 为 `0`）。
 
 ## C-014 — 与既有守卫的关系（实施期 MUST 保持）
 
@@ -260,7 +296,7 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 
 | 守卫 | 钉住的字面量 |
 |------|--------------|
-| `tests/contract/test_expression_gate_wiring.py` A1/A3 | W1 接线小节与 `create-docs` 的 R6 文字 |
+| `tests/contract/test_expression_gate_wiring.py` A1/A3/A5 | W1 接线小节、`create-docs` 的 R6 文字、禁类别词 |
 | `tests/contract/test_docs_command_template.py` C3/C4a | `templates/commands/docs.md` 的顶层章节序列与 `improve-docs` 指针 |
 | `tests/contract/test_confirmation_gates_sweep.py` KEEP_LIST | `templates/commands/docs.md` 含 `stop-and-confirm` |
 | `tests/contract/test_directory_governance.py` | `docs/concepts/documentation-model.md` 留在 area-map 清单内 |
@@ -271,3 +307,30 @@ justification: "按时间排序的发布流水，没有可绘的结构"
 判据**零新增违规**（W1 调用点行原文）。`--action obligation` 的判据是「配套图义务」，两者**输入相同、判据互不相同**，
 MUST NOT 合并进一个动作：合并会让「今日合规、明日因新义务全红」的过渡状态无法表达，
 也会让 W1 的「零新增违规」判据失去基准。两者在 R6 的验证步骤里**并列执行**，各自出各自的 verdict。
+
+## C-016 — 逐文档判定的有序优先级（唯一的落档裁决）
+
+`C-004` 表内的「有序优先级」在此展开成**可实现的单趟判定**。对一份载体文档，按下列顺序逐条判，
+**命中即停、不回溯、不二次覆盖**；每条只在它的前置成立时才有资格出手：
+
+| 序 | 条件 | 落档 | `reason` |
+|----|------|------|----------|
+| 1 | 存在豁免记录且**有效、未被事实推翻** | `recorded-exemption` | `exempt-chronological` |
+| 2 | 存在豁免记录但无效，或已被事实推翻（`C-011`） | `not-evaluated` | `exemption-invalid` |
+| 3 | 文档没有任何解析到图文件的相对引用（`C-005`） | `missing` | `no-diagram-reference` |
+| 4 | 有引用但目标不在盘（`C-009` 规则 1） | `missing` | `reference-unresolved` |
+| 5 | 目标在盘、引用指向**源**扩展名而渲染产物缺失；或两面中**渲染产物在、源缺** | `missing` | `orphan-rendered` / `orphan-source` |
+| 6 | 两面齐、但记录里**指不到这张图**，或指到了却缺 `C-010` 必填字段 | `not-evaluated` | `trace-incomplete` |
+| 7 | 两面齐、当前**没有** `--record`（或记录里没有任何一条点到它） | `not-evaluated` | `no-trace-record` |
+| 8 | 两面齐、记录齐、`C-008` 任一规则成立 | `stale` | `source-newer-than-render` / `render-digest-mismatch` |
+| 9 | 两面齐、记录齐、`C-008` 都不成立、引用解析 | `satisfied` | `reference-resolves` |
+
+**为什么失面先于 `stale`，而 `stale` 又先于 `satisfied`**：失面时 `C-008` 的两条规则都**没有可比的第二个面**
+（`os.stat` 的对象不存在），因此它根本不可判——把不可判的规则排在可判规则之前，会让一次「删掉渲染面」的负向
+用例落到错误的理由上。`C-008` 因此带有显式前置条件（两面都在盘）。这条顺序就是 `F-01` 的修复本体。
+
+**豁免先于一切**：豁免有效性本身就是「判不了 / 已豁免」，与两面在不在无关；`C-004` 的两条附注
+（失效豁免 + 确实无图 ⇒ `not-evaluated`）在本表第 2 行得到实现。
+
+**`stale` 只有一个入口**：第 8 行只引用 `C-008`。`C-009` 的冻结部分在第 4、6 行结算，`C-009` 的语义残差
+（`D-001`）不产出任何档位。

@@ -110,17 +110,25 @@ A12 明确要求 plan 给不出可判据时**如实登记为该面未覆盖**，
 **裁决**：新增三段夹具（`clean` / `missing-face` / `stale-source`）+ 一段豁免夹具，全部纯文件；
 负向断言用**删除一个面**的方式构造，不使用渲染后端。
 
+*（Phase 1 修订，attempt 2）* 「`missing-face` 一段夹具」在流程上不可复检：删除发生在同一个夹具上，
+第二次运行就测不到「删除前的绿灯」，而且 `C-016` 的落档顺序决定了缺失的两面**各需一段独立夹具**
+（否则量到的是「哪个真在前」而不是「这一面被判成什么」）。因此最终的夹具集是 `data-model.md` E6 的
+**11 段**（8 段判定 + 3 段豁免），删除动作一律发生在 `tmp_path` 的副本上。R5 的**结论**未变
+（纯文件、不依赖渲染、不依赖网络）；变化的只是**段数**，且是纠正（同一判据下唯一可复检的读法），不是新裁决。
+
 ## R6 — 基线读数（本特性必须「零新增」，而不是「全绿」）
 
 **实测（2026-11-06，本工作树；解释器 3.11.13；`pytest 9.2.0` 取自一次性 scratch venv）**：
 
 ```text
 python3 -m pytest tests/contract -q          -> 6038 passed, 17 failed, 2 skipped (289.58s)
-python3 scripts/python/sync-mirrors.py --check   -> EXIT 0（六对镜全部 ok；需能 import typer 的解释器）
+python3 scripts/python/sync-mirrors.py --check   -> EXIT 0 仅在能 import typer 的解释器下成立
+                                                      （裸 python3 → exit 2「DRIFT detected」，见 R6 推论 1）
 python3 scripts/python/regen-command-copies.py --check -> OK: all per-tool command copies match
 python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py \
         --spec-dir .specify/specs/087-arch-diagram-docs --stage requirements
-  -> decision=pass errors=0 advisories=0（fr=23 sc=10）
+  -> decision=pass errors=0 advisories=0（fr=23 sc=10）   ← requirements 时点读数
+     Phase 1 落盘后复跑：advisories=38（全部同型 missing-path，指向实施期才存在的路径），errors 仍 0
 python3 .specify/scripts/python/doc-consistency-check.py --action structure \
         --spec-dir .specify/specs/087-arch-diagram-docs
   -> status: not-applicable（class=execution）
