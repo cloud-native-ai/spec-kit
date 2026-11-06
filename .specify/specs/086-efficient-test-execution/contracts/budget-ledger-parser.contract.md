@@ -20,15 +20,15 @@ classification targets or the audit's other checks.
 ## Clauses
 
 - **C-017**: `-n` and `--numprocesses` MUST be treated as value-carrying flags, in both the separated form
-  (`-n 4`) and the attached forms pytest accepts (`-n4`, `--numprocesses=4`).
+  (`-n 4`) and the attached forms pytest accepts (`-n4`, `--numprocesses=4`) (FR-024, FR-025).
 - **C-018**: `--dist` and `--maxprocesses` MUST be treated as value-carrying flags in both the separated
-  (`--dist load`) and attached (`--dist=load`) forms.
+  (`--dist load`) and attached (`--dist=load`) forms (FR-024, FR-025).
 - **C-019**: A full-suite run whose command carries an explicit parallel switch MUST classify as a full run
   (`selection_basis` unchanged from the equivalent serial command). It MUST NOT be dropped, downgraded to
-  targeted, or reported as unaccounted.
+  targeted, or reported as unaccounted (FR-024).
 - **C-020**: Replaying every pre-existing ledger row through the upgraded parser MUST produce the same
   classification and the same positional-argument list as before the upgrade. Regression equivalence is
-  asserted over a fixture set of existing-shaped rows, not argued from the diff.
+  asserted over a fixture set of existing-shaped rows, not argued from the diff (FR-026).
 
 ## Consequence for the report surface
 

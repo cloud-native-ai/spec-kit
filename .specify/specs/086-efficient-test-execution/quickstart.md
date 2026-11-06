@@ -18,8 +18,13 @@ and check a claim. Nothing here assumes you have read the rest of the spec.
   (`research.md` B-6).
 - Nothing in these scenarios writes outside `.specify/.tmp/` (the sanctioned temporary root) and
   `.specify/specs/086-efficient-test-execution/test-evidence/`.
-- A **full run** takes about 3–17 minutes depending on mode. Scenarios S-1/S-2/S-3/S-8 use a small
+- A **full run** takes about 3–17 minutes depending on mode. Scenarios S-1/S-2/S-3/S-4/S-8 use a small
   `--workers 2` selection where possible so they are cheap to repeat.
+- **Every runner invocation in this file is written `env -u PYTHONPATH …`** (requirements A20, SC-001/SC-004/
+  SC-011's measurement environment). An inherited `PYTHONPATH` off this host's unrelated site directories makes
+  the `.venv` pytest die at plugin load with `ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'`;
+  the same command with the variable cleared runs green (`test-evidence/checklist-gates.txt` § 12). `PYTHONPATH=
+  bash …` is the equivalent spelling. A run whose environment is unrecorded proves nothing about those criteria.
 
 ## S-0 — Pre-flight (EXECUTED at plan time)
 
@@ -27,15 +32,18 @@ Run these four before anything else; they establish the starting facts every lat
 
 ```bash
 cd /Users/liuqiming.lqm/project/cloud-native-ai/spec-kit
-.venv/bin/python -m pytest --version
-.venv/bin/python -c "import os; print('logical_cpu', os.cpu_count())"
+echo "PYTHONPATH=[${PYTHONPATH:-<unset>}]"     # recorded, then cleared for every run below (A20)
+env -u PYTHONPATH .venv/bin/python -m pytest --version
+env -u PYTHONPATH .venv/bin/python -c "import os; print('logical_cpu', os.cpu_count())"
 python3 scripts/python/sync-mirrors.py --check
 python3 .specify/scripts/python/scan-confirmation-gates.py --root . --json | python3 -c "import json,sys; d=json.load(sys.stdin); print('total', d['total'], 'violations', len(d['violations']))"
 ```
 
-Actual output on 2026-11-06 (pasted, not transcribed):
+Actual output on 2026-11-06 (pasted, not transcribed; the `PYTHONPATH` line was added at the repair pass
+and its value is the one the checklist probe recorded):
 
 ```text
+PYTHONPATH=[/Users/liuqiming.lqm/project/profiles/script/python:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/src:/Users/liuqiming.lqm/project/cloud-native-tools/cws-lib-python/lib]   (cleared below; host-specific, recorded not relied on)
 pytest 9.2.0
 logical_cpu 18
 OK: all per-tool command copies match the source templates.
@@ -56,11 +64,12 @@ that disagrees is drift to investigate, not a scenario failure.
 ## S-1 — Default run is parallel (route b)
 
 ```bash
-bash scripts/bash/run-tests.sh --workers 2 --names-out .specify/.tmp/086/s1-names.txt -q tests/unit -k audit
+env -u PYTHONPATH bash scripts/bash/run-tests.sh --workers 2 --names-out .specify/.tmp/086/s1-names.txt -q tests/unit -k audit
 ```
 
 Expected: stderr carries `# test runner: mode=parallel`, the run exits with pytest's own code, and the name
-list file exists with a `# failed-name list written: … (<n> entries)` line.
+list file exists with a `# failed-name list written: … (<n> entries) passes=<k>` line (`<k>` = passes that
+contributed: `1` for a plain run, `2` when a declared serial exception ran its own pass).
 
 **Pinned by**: `tests/contract/test_run_tests_runner_contract.py` (contract C-001, C-002, C-013, C-014).
 **Premises**: the runner accepts `--workers`; `tests/unit -k audit` selects a small subset; the mode line
@@ -69,7 +78,7 @@ starts with `# test runner: mode=`.
 ## S-2 — Explicit serial is a complete run (route b)
 
 ```bash
-bash scripts/bash/run-tests.sh --serial --names-out .specify/.tmp/086/s2-names.txt -q tests/unit -k audit
+env -u PYTHONPATH bash scripts/bash/run-tests.sh --serial --names-out .specify/.tmp/086/s2-names.txt -q tests/unit -k audit
 ```
 
 Expected: stderr carries `# test runner: mode=serial reason=explicit`; the same selection runs; the name list
@@ -80,9 +89,9 @@ is written; the exit code semantics are unchanged. A serial run MUST NOT be labe
 ## S-3 — Precedence, and a named error instead of a silent fallback (route b)
 
 ```bash
-SPECKIT_TEST_WORKERS=3 bash scripts/bash/run-tests.sh --workers 2 -q tests/unit -k audit   # flag wins -> 2
-SPECKIT_TEST_WORKERS=abc bash scripts/bash/run-tests.sh -q tests/unit -k audit             # named error, non-zero
-bash scripts/bash/run-tests.sh -n 4 --workers 8 -q tests/unit -k audit                    # caller's -n wins, no second -n
+env -u PYTHONPATH SPECKIT_TEST_WORKERS=3 bash scripts/bash/run-tests.sh --workers 2 -q tests/unit -k audit   # flag wins -> 2
+env -u PYTHONPATH SPECKIT_TEST_WORKERS=abc bash scripts/bash/run-tests.sh -q tests/unit -k audit             # named error, non-zero
+env -u PYTHONPATH bash scripts/bash/run-tests.sh -n 4 --workers 8 -q tests/unit -k audit                    # caller's -n wins, no second -n
 ```
 
 Expected: (1) the executed command contains `-n 2`; (2) the run exits non-zero and stderr names the bad value;
@@ -95,7 +104,7 @@ recognises `-n 4` (separated) as a caller-supplied worker count.
 ## S-4 — Nested auto-serial (route b)
 
 ```bash
-PYTEST_XDIST_WORKER=gw3 bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/s4-names.txt -q tests/unit -k audit
+env -u PYTHONPATH PYTEST_XDIST_WORKER=gw3 bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/s4-names.txt -q tests/unit -k audit
 ```
 
 Expected: stderr carries `# test runner: mode=serial reason=nested`; no second worker pool is started; the
@@ -106,23 +115,25 @@ on a process-tree walk; xdist sets that variable in worker processes before coll
 
 ## S-5 — Scheduling and worker-count measurement (route b, an experiment, not an assertion)
 
-Run the same selection four ways and compare failure names and wall clock:
+Run the same selection through the **two representative arms** — the shipped default and the single most
+plausible alternative — and compare failure names and wall clock (both under the A20 environment):
 
 ```bash
-bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/s5-auto-names.txt  -q            # -n auto, --dist load
-bash scripts/bash/run-tests.sh --workers 6 --names-out .specify/.tmp/086/s5-n6-names.txt -q
-bash scripts/bash/run-tests.sh --workers 8 --names-out .specify/.tmp/086/s5-n8-names.txt -q
-bash scripts/bash/run-tests.sh --workers 8 --dist loadfile --names-out .specify/.tmp/086/s5-lf-names.txt -q
-comm -3 <(sort .specify/.tmp/086/s5-auto-names.txt) <(sort .specify/.tmp/086/s5-n8-names.txt)
+env -u PYTHONPATH bash scripts/bash/run-tests.sh --names-out .specify/.tmp/086/s5-auto-names.txt  -q            # -n auto, --dist load
+env -u PYTHONPATH bash scripts/bash/run-tests.sh --workers 8 --dist loadfile --names-out .specify/.tmp/086/s5-lf-names.txt -q
+comm -3 <(sort .specify/.tmp/086/s5-auto-names.txt) <(sort .specify/.tmp/086/s5-lf-names.txt)
 ```
 
 Expected: recorded, not predicted — the purpose is evidence for assumption A13. A change to the default
 (worker cap, `load` → `loadfile`) is admissible only with this evidence attached and with every new failure
-name attributed per contract C-045/C-047.
+name attributed per contract C-045/C-047. The two-arm pair decides the hypothesis; the wider four-arm sweep
+(`-n 6`, `-n 8` separate arms) is deliberately **not** run because each extra arm spends a full-suite run
+against the two-slot ceiling (`tasks.md` T054 / T016).
 
 **Pinned by**: contract C-001 (default is `-n auto` + `--dist load`), `plan.md` § Risks R-1.
-**Premises**: the four commands share one selection (no `tests/`-narrowing argument); `comm -3` output is the
-symmetric difference; wall clock is read from each run's own pytest summary line.
+**Premises**: the two commands share one selection (no `tests/`-narrowing argument); `comm -3` output is the
+symmetric difference; wall clock is read from each run's own pytest summary line; both runs are
+`out-of-slot-exception` consumptions recorded in `test-evidence/full-run-budget.md`.
 
 ## S-6 — The `serial` exception is enumerable (route b)
 
@@ -156,8 +167,8 @@ or a text read — this scenario is documented as host-specific for that reason)
 ## S-8 — Name-level comparison between serial and parallel (route b)
 
 ```bash
-bash scripts/bash/run-tests.sh --serial --names-out .specify/.tmp/086/s8-serial.txt -q
-bash scripts/bash/run-tests.sh            --names-out .specify/.tmp/086/s8-parallel.txt -q
+env -u PYTHONPATH bash scripts/bash/run-tests.sh --serial --names-out .specify/.tmp/086/s8-serial.txt -q
+env -u PYTHONPATH bash scripts/bash/run-tests.sh            --names-out .specify/.tmp/086/s8-parallel.txt -q
 comm -13 .specify/.tmp/086/s8-serial.txt .specify/.tmp/086/s8-parallel.txt   # new names -> MUST be empty after attribution
 comm -23 .specify/.tmp/086/s8-serial.txt .specify/.tmp/086/s8-parallel.txt   # dropped names -> recorded, never claimed as a fix
 ```
@@ -168,9 +179,12 @@ Expected: the first `comm` prints nothing (zero new failure names); the second i
 **Pinned by**: requirements SC-001/SC-006, contract C-047; this is the same procedure Phase 0 already ran
 (`research.md` B-4, B-5), which produced exactly one new name at that time.
 
-**Premises**: the baseline for the closure comparison is the **implementation-start** baseline slot, not the
-Phase 0 lists (A9); both runs use the same `--names-out` discipline and the same selection; the serial run's
-duration is ~17 minutes on this host, so run it once and consume the record.
+**Premises**: the baseline for the closure comparison is the **implementation-start** baseline slot
+(`test-evidence/baseline-failed.txt`, written at T050 before any source edit), not the Phase 0 lists (A9);
+both runs use the same `--names-out` discipline, the same selection and the declared measurement environment
+(A20); the final record's names path is the TB-04 `<spec>/final-failed.txt` form (`tasks.md` T047), not a
+`.specify/.tmp/` scratch file; the serial run's duration is ~17 minutes on this host, so run it once and
+consume the record.
 
 ## What "done" looks like
 

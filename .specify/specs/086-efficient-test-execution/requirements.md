@@ -133,6 +133,7 @@
 - **watch-target 自测在并行负载下超时**：本次实测的唯一新增失败。要求是"具名的显式串行例外或超时修复"二选一，二者都必须可复核；**不得**用 skip/xfail 掩盖，也不得靠"跑两次碰运气"。
 - **既存失败本身是时序敏感的**：并行可能让某个既存失败在某些运行中变绿或变红。差集比较必须同时报告"新增"与"消失"两侧，消失项不得被宣称成本特性的修复。
 - **`--names-out` 在并行下写出空清单**：当并行运行整体崩在启动阶段时，空清单与"没有任何失败"不可区分。必须让"空且可疑"与"确实零失败"可区分。
+- **运行被中途打断（某个工作进程被杀死 / 进程组被中断 / 两趟中的一趟未跑完）**：这与"整体崩在启动阶段"是两回事——清单可能只写了一半，退出码可能只反映先结束的那一趟。判据是：中断的运行 MUST 以非零退出码结束且 MUST NOT 被当作完成态证据；合并清单 MUST 要么完整，要么在 stderr 被明确标为不完整（哪种形态由计划阶段裁定，本规格只要求"不完整可被识别、不完整的结果不得进入差集比较"）。这类运行也不得被计入 SC-001 的墙钟。
 - **调用者已在自己的命令里传了进程数**：既不能重复注入，也不能忽略调用者意图。
 - **工作进程数与测试数严重不匹配**（例如 1 个测试、很多工作进程）：不得因此报错或空跑。
 - **运行器在只读/受限环境下无法写临时目录**：并行引擎的临时协调需要可写位置，失败必须具名，不得静默串行兜底后仍宣称并行。
@@ -145,7 +146,7 @@
 
 #### A. 运行器执行模型（US1, US3）
 
-- **FR-001**: canonical 运行器 MUST 在并行引擎可用且调用者未显式要求串行时**默认并行**执行完整 selection。默认行为的变化 MUST 记录在运行器自身的注释与开发文档中，并保留一次"为什么并行是默认"的依据指针。
+- **FR-001**: canonical 运行器 MUST 在并行引擎可用且调用者未显式要求串行时**默认并行**执行完整 selection。默认行为的变化 MUST 记录在运行器自身的注释与开发文档中，并保留一次"为什么并行是默认"的依据指针。每次运行 MUST 在 stderr 的既有头部区域如实披露本次实际采用的执行模式（串行/并行、并行时的进程数、以及走串行时的原因：显式开关、嵌套保护或并行引擎不可用），使调用者不需要从输出推断自己跑的是哪一种。
 - **FR-002**: 运行器 MUST 提供**显式串行开关**（[[STR-007]]）。带该开关的运行 MUST 是一次完整、可跑的运行，其 selection 与默认运行相同；它 MUST NOT 被当作"降级"或被标注为不完整。
 - **FR-003**: 运行器 MUST 提供进程数控制：显式参数（`--workers N|auto`）优先于环境变量（[[STR-006]]），二者都缺省时取自动值。解析失败（非数字、负数、零）MUST 以具名错误退出，MUST NOT 静默回退到 1。
 - **FR-004**: 当调用者已经在自己传入的参数里给了进程数开关时，运行器 MUST NOT 再追加一个，避免同一开关出现两次导致的未定义行为。
@@ -158,7 +159,7 @@
 #### B. 并行安全（US1）
 
 - **FR-010**: 默认并行运行相对同一棵树串行运行的失败名差集 MUST 为空（既存失败按名称排除）。任何非空差集 MUST 被逐项处置为以下三者之一：(a) 修掉并行不安全的根因；(b) 为该测试声明**具名显式串行例外**并说明理由；(c) 记为既存失败（其名称同时出现在串行基线与并行结果中）。MUST NOT 使用 skip / xfail / 重跑碰运气 / 缩小 selection 中的任何一种来消除差集。
-- **FR-011**: 每一项被声明的串行例外 MUST 是可复核的具名标记（能按名称列出全部例外），MUST NOT 是一个"静默关掉并行"的全局开关；例外集合的大小 MUST 在证据中如实记录。
+- **FR-011**: 每一项被声明的串行例外 MUST 是可复核的具名标记（能按名称列出全部例外），MUST NOT 是一个"静默关掉并行"的全局开关；例外集合的大小 MUST 在证据中如实记录。带例外的默认运行 MUST 仍然只呈现为**一次**运行：两次执行（并行主体 + 具名例外）合成为一份失败名清单与一个退出码，例外的那一趟收集到零个测试时 MUST 视为成功而非失败。
 - **FR-012**: 本次实测确认的唯一并行不安全项（watch-target 自测在并行负载下超过其 60 s 超时）MUST 按 FR-010 的 (a) 或 (b) 处置；若取 (b)，该例外 MUST 只覆盖该测试，不影响其余测试的并行。
 - **FR-013**: 任何测试若因其自身与被测对象共享可变状态而在并行下不稳定，MUST 通过修根因（隔离临时目录、幂等写、独立仓库根）解决；MUST NOT 通过"让它只在特定工作进程上跑"来规避。
 - **FR-014**: 并行安全性的判定 MUST 由**名称差集实测**给出，而不是由阅读代码推断；差集两侧（新增与消失）MUST 一并记录。
@@ -175,7 +176,7 @@
 - **FR-019**: constitution 的**出厂模板与 live 文件** MUST 各新增一条原则条目，且该条目 MUST 以指针方式引用 [[STR-003]]：(a) 覆盖是必要条件而非充分条件；(b) 测试执行效率是与覆盖同层级的质量属性；(c) 该原则适用于任何构建测试框架或测试用例的项目，而不只是本项目。编号由各自名册自行决定（模板与 live 编号不要求相同），条款 MUST 以指针方式引用 owner 指南，MUST NOT 复述其判据表。
 - **FR-020**: instructions 的**出厂模板与 live 文件** MUST 各新增一个常驻章节（摘要 + 指向 [[STR-003]] 的路径），且 MUST NOT 内联 owner 指南的二级标题。
 - **FR-021**: 生成 constitution 的 MUST-include 候选清单 MUST 增加该原则的条目，使下游项目由生成器而非由本项目人工投递获得该原则。
-- **FR-022**: 本特性 MUST 在同一变更中更新所有因新增原则而变化的计数守卫与预算守卫（原则数、常驻章节数、指令字节预算、MUST-include 条目数），而不是让守卫先红后补。
+- **FR-022**: 本特性 MUST 在同一变更中更新所有因新增原则而变化的计数守卫与预算守卫（原则数、常驻章节数、指令字节预算、MUST-include 条目数），而不是让守卫先红后补。落地后确认门禁扫描（confirmation gate scan）的条目总数 MUST NOT 增加——该上限不因本特性而抬高。指令字节预算只在实测确实超过既有上限时才上调，且 MUST 以实测值上调并记录该实测值，MUST NOT 预先放宽。
 - **FR-023**: 该原则 MUST 与既有测试相关原则形成可判定的分工（一个规定测试**做什么与何时写**，一个规定测试**以什么代价执行**），MUST NOT 产生互相矛盾的指令。
 
 #### E. 预算台账与效率测量（US5）
@@ -187,6 +188,7 @@
 #### F. 085 机制保留与实测（US4）
 
 - **FR-027**: 本特性 MUST NOT 删除、禁用、绕过或重写 085 的临时 Goal/Team 机制、阶段专用 agent 角色、默认并发度、worktree 写入隔离、集成队列、checkpoint 协议、契约文件与历史记录。所有改动对 085 面 MUST 是 additive。
+  **窄例外（唯一 085 写入）**：仅允许更新 `.specify/specs/085-sdd-temporary-goal-team/verification.md` 中 SC-010 的 `SC-010_status` / `SC-010_value` / `SC-010_note` / `SC-010_blocked_at` 四类行；该文件其余行与 085 的其他任何路径 MUST 保持字节不变。该例外由 FR-030 授权（085 SC-010 的验收状态必须依据本特性取得的证据更新），其合法性来自 085 自身 `plan.md` 把 `verification.md` 指定为 `/speckit.implement` 的输出工件——因此它是**存活引用**而非改写冻结记录（A12、A17）。例外 MUST 可机械判定：`git diff -U0 <stage-base>..<closure-commit> -- .specify/specs/085-sdd-temporary-goal-team` 命名的文件至多 `verification.md`，且其 hunk 的新增/删除行逐行匹配 `^SC-010_(status|value|note|blocked_at)=`；任一其他 085 路径、或任一触及非 `SC-010_*` 行的 hunk 即违反本条。
 - **FR-028**: 本特性自身的这次运行 MUST 走完整 SDD 阶段链，并留下：临时 Goal 与临时 Team（绑定可解析）、各阶段 checkpoint、requested/effective 并发与具名理由、以及至少一个阶段实际并发派发多于一个 agent 的证据。
 - **FR-029**: 本特性落地后 MUST 重跑 085 的契约与集成测试并记录结果；零新增失败是保留义务的判定依据。
 - **FR-030**: 085 SC-010 的验收状态 MUST 依据本特性取得的实际证据更新：证据完整才记 `pass`，否则保持 `partial` 并写明仍缺什么。MUST NOT 以"本特性已跑过一次"为由默认判 pass。
@@ -212,7 +214,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 同一棵树上，默认并发运行的失败名集合与串行运行的失败名集合差集为空（既存失败按名称排除，新增项计数为 0），且并行墙钟相对串行有被记录的下降。**Path**: final
+- **SC-001**: 同一棵树上，默认并发运行的失败名集合与串行运行的失败名集合差集为空（既存失败按名称排除，新增项计数为 0），且并行墙钟**不高于**串行基线（1031.48 s）的 40%；差集与墙钟两项 MUST 同时成立，只满足其中一项不算达成。**Path**: final
 - **SC-002**: 出厂 constitution 模板与 live constitution 各含该原则条目；出厂 instructions 模板与 live instructions 各含其常驻章节（指向 [[STR-003]]）；一处都不缺。**Path**: final
 - **SC-003**: 在临时目录用 CLI 初始化的新项目里，生成的 constitution 与 instructions 中都能检出该原则、其 owner 指南指针（[[STR-003]]）与文件名（[[STR-001]]），读者不需要读本仓即可理解原则适用范围。**Path**: final
 - **SC-004**: 串行逃生口三种情形（显式开关 [[STR-007]]、缺引擎回退、嵌套调用）各自完成一次完整运行且失败名清单有效；从命令与 stderr 可判定实际走了哪条路径。**Path**: final
@@ -227,7 +229,7 @@
 
 ### Measurement Sources & Collection Methods
 
-- **SC-001 Source**: 同一棵树、同一 selection、同一 `--names-out` 口径下的两次运行（串行 / 默认并发）；墙钟取自两次运行的框架摘要行，失败名清单取自 `--names-out` 文件，差集用 `comm -13` / `comm -23` 双向计算；两者命令、退出码、清单与差集落在 `.specify/specs/086-efficient-test-execution/test-evidence/`。
+- **SC-001 Source**: 同一棵树、同一 selection、同一 `--names-out` 口径下的两次运行（串行基线 / 默认并发闭合运行）；墙钟取自两次运行的框架摘要行，40% 上限按 `1031.48 s × 0.4 = 412.59 s` 判定并把实测秒数与比值一并记录，失败名清单取自 `--names-out` 文件，差集用 `comm -13` / `comm -23` 双向计算；两者命令、退出码、清单、墙钟与差集落在 `.specify/specs/086-efficient-test-execution/test-evidence/`。
 - **SC-002 Source**: 对出厂模板与 live 文件的确定性检索（原则名册、常驻章节计数）与既有计数守卫测试的实际运行结果。
 - **SC-003 Source**: 在临时目录执行 CLI 初始化后，在生成的 `.specify/memory/constitution.md` 与 `.specify/instructions.md` 中检索原则标题与 owner 指南路径；记录命令、退出码与命中行。
 - **SC-004 Source**: 三次实跑的命令、退出码、stderr 头部与回退说明行、`--names-out` 条目数；嵌套场景另记"未派生第二个进程池"的判据（例如工作进程环境标识未被子运行继承或子运行显式串行）。
@@ -263,8 +265,8 @@
 | RS-001 | Python 解释器（运行运行器、测试与确定性检查） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明，不改变下限） | `pyproject.toml` | 新增脚本 stdlib-only；新增测试在 `>=3.8` 上通过；并行引擎的缺席路径由 FR-006 覆盖 | FR-015, FR-016 | EP-001 |
 | RS-002 | 测试框架（守卫测试运行器）与并行引擎（[[STR-005]]；开发侧依赖） | signed-contract | pytest / pytest-xdist 上游（本仓只消费） | 无声明 pin；执行时以 `pytest --version` 等原文记录进 `test-evidence/` | `pyproject.toml` | 并行运行与串行运行在同一版本组合下得到 SC-001 的空差集 | FR-001, FR-015 | EP-001 |
 | RS-003 | canonical 运行器与其项目运行时镜像 | in-scope | 本仓 `scripts/bash/run-tests.sh` | 同一提交 | `tests/contract/` 中的运行器契约测试 | SC-004, SC-009 | FR-001–FR-009 | EP-001 |
-| RS-004 | 预算台账解析器 | in-scope | 本仓 `skills/external/sdd-loop-driver/scripts/audit-test-budget.py` | 同一提交 | 同目录单元测试 | SC-005 | FR-024–FR-026 | EP-001 |
-| RS-005 | 宿主操作系统与文件系统（并行工作进程的临时目录、进程派生） | signed-contract | 宿主环境（本仓只消费） | 无声明 pin；执行时记录宿主平台与核数 | `.specify/specs/086-efficient-test-execution/requirements.md` | SC-001, SC-004, SC-011 | FR-005, FR-013 | EP-002 |
+| RS-004 | 预算台账解析器 | in-scope | 本仓 `skills/external/sdd-loop-driver/scripts/audit-test-budget.py`（及 `tests/unit/test_audit_test_budget.py`） | 同一提交 | 同目录单元测试 | SC-005 | FR-024, FR-025, FR-026 | EP-001 |
+| RS-005 | 宿主操作系统与文件系统（并行工作进程的临时目录、进程派生）以及测试进程的**环境洁净度**（`PYTHONPATH` 不得指向宿主的无关站点目录） | signed-contract | 宿主环境（本仓只消费） | 无声明 pin；执行时记录宿主平台、核数、`PYTHONPATH` 原值与清除方式 | `.specify/specs/086-efficient-test-execution/requirements.md` | 环境按 A20 声明：SC-001, SC-004, SC-011 的每次运行 MUST 在 `env -u PYTHONPATH` 下执行，并在证据中记录被清除的 `PYTHONPATH` 原值、平台与核数；未声明环境的运行不构成证据 | FR-005, FR-013 | EP-002 |
 
 ## Assumptions
 
@@ -286,7 +288,8 @@
 - **A16（台账解析器升级的增量边界）**：只扩展 `VALUE_FLAGS` 对四个并行开关的识别，不改槽位语义、selection 算法或既有行的分类结果；回归等价性由同目录单元测试守住（显式并行全量运行判为全量、开关取值不被当作路径、既有记录重放结果不变）。
 - **A17（085 保留与本次 dogfood 参数）**：`agent_concurrency_requested=24`；`effective` 按阶段 ready packages / verifier reserve / host capacity 重算（clarify 阶段为 2：1 executor + 1 verifier reserve），任何降级具名写入状态脊与 checkpoint；`write_isolation=worktree` 为本次临时 Team 运行的 opt-in，集成队列与每阶段 checkpoint 按 085 契约执行；085 的 goal/team/checkpoints/contracts 与历史只读。085 SC-010 只有在全阶段链、LLM 阶段 agent、并发与 checkpoints 证据完整时才可记 `pass`，否则保持 `partial` 并写明缺口。
 - **A18（特性生命周期）**：clarify 阶段保持 `Draft`；`Draft → Planned` 由 `/speckit.plan` 拥有，本阶段不提前翻转状态。
-- **A19（框架观察，本特性不修复）**：(a) requirements 阶段的 scaffold 曾短暂创建 `087-` 分支，随后清理并以正确的 `086` 分支重建；本特性不修改该脚本，只把观察登记为框架问题。(b) 宿主未暴露 085 的阶段 agent 类型，clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色；085 的 team/concurrency/checkpoint 机制仍被使用，此承载降级不记为 085 失败。
+- **A19（框架观察，本特性不修复）**：(a) requirements 阶段的 scaffold 曾短暂创建 `087-` 分支，随后清理并以正确的 `086` 分支重建；本特性不修改该脚本。登记位置有二且都可查：本节即为登记处，`.specify/memory/features.md` 的 086 行同时记下该观察；随后续框架工作（feature 目录 scaffold 脚本）认领，认领时在本条与索引行各补一行指针，本特性不新增 TODO 文件也不新建特性。(b) 宿主未暴露 085 的阶段 agent 类型，clarify 以宿主原生 `general-purpose` 承载 `sdd-clarify-analyzer` 角色；085 的 team/concurrency/checkpoint 机制仍被使用，此承载降级不记为 085 失败。
+- **A20（run-derived SC 的测量环境）**：本特性的 SC-001、SC-004、SC-005、SC-006、SC-011 都是**运行导出**判据，其数值只有在声明的测量环境下才可复现。测量环境 MUST 包含两项：解释器由运行器解析（`SPECKIT_PYTHON` → `.venv/bin/python` → `python3` → `python`），且 `PYTHONPATH` MUST 被清除后运行规范命令，写作 `env -u PYTHONPATH bash scripts/bash/run-tests.sh …`（等价写法 `PYTHONPATH= bash …`）。依据是实测而非偏好：本宿主继承的 `PYTHONPATH` 指向宿主的无关站点目录，使 `.venv` 的 pytest 在加载 `platformdirs` 插件时以 `ModuleNotFoundError: No module named 'platformdirs.pytest_plugin'` 直接失败，同一条命令加上 `env -u PYTHONPATH` 即 25 passed（`test-evidence/checklist-gates.txt` § 12，CHK036）。因此每一项 run-derived 证据 MUST 在记录中写出它是在哪个环境下取得的（含被清除的 `PYTHONPATH` 原值）；未声明环境的运行结果 MUST NOT 被用来支撑 SC-001/SC-004/SC-005/SC-006/SC-011。
 
 ## Out of Scope
 

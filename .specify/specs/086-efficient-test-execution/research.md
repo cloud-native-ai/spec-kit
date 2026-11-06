@@ -67,8 +67,10 @@ already how the runner's own tests express "one process".
 
 ### R-4 — Nested-run guard keys on `PYTEST_XDIST_WORKER`
 
-**Decision**: if `PYTEST_XDIST_WORKER` is set in the environment, the runner goes serial and prints
-`# test runner: serial (nested under xdist worker $PYTEST_XDIST_WORKER)`. Exit code unchanged.
+**Decision**: if `PYTEST_XDIST_WORKER` is set in the environment, the runner goes serial and prints the
+contract's mode line in its `nested` form — `# test runner: mode=serial reason=nested` (contract C-002), with
+the worker id carried on the adjacent note line rather than folded into the mode line, so the mode line stays
+one machine-readable shape across all three reasons (`data-model.md` E-5). Exit code unchanged.
 
 **Evidence** (EP-005): `xdist/remote.py:417` sets the variable before collection and no cleanup path
 deletes it, so a test that shells out to the runner sees it. Without this guard, every subprocess-using

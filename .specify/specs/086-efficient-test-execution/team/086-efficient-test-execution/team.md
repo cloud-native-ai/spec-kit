@@ -24,6 +24,9 @@ territory:
     - docs/**
     - pyproject.toml
     - CHANGELOG.md
+    # FR-027 narrow carve-out, authorized by FR-030: the SC-010 status/value/note/blocked_at
+    # lines only. Everything else under 085 stays in `forbidden` below.
+    - .specify/specs/085-sdd-temporary-goal-team/verification.md
   read:
     - "**"
   forbidden:

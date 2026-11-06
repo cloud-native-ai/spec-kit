@@ -17,7 +17,7 @@ The unit every comparison in this feature is expressed in.
 |-------|------|--------|-------|
 | `command` | string | runner `argv` after flag processing | The command actually executed, echoed in the stderr header (FR-005, R-6) |
 | `mode` | enum `parallel` \| `serial` | runner | Required; never inferred from the absence of a flag |
-| `reason` | enum `default` \| `explicit` \| `nested` \| `no-xdist` | runner | Set whenever `mode=serial`; `-` when `mode=parallel` and the default applied |
+| `reason` | enum `explicit` \| `nested` \| `no-xdist` \| absent | runner | Present only when `mode=serial` (contract C-002's three closed values); `mode=parallel` carries no `reason` token at all — the default applying is visible from `mode=parallel` itself |
 | `workers` | integer \| `auto` | runner | Resolved value (auto is replaced by the engine's choice at execution time; the record keeps the literal for evidence) |
 | `dist` | enum `load` \| `loadfile` \| `loadscope` \| caller-supplied | runner | Default `load` |
 | `passes` | list of Pass (E-2) | runner | One element in serial mode; two in parallel mode when a `serial` exception exists, one otherwise |
@@ -47,8 +47,8 @@ The only legal comparison substrate (FR-007, FR-014, A3).
 |-------|------|-------|
 | `path` | absolute path | The `--names-out` target |
 | `entries` | sorted, de-duplicated list of test ids | One nodeid per line; no counts, no classes |
-| `entry_count` | integer | Echoed to stderr with the `# failed-name list written:` prefix (`STR-002`) so "empty because zero failures" is distinguishable from "not written" (FR-008) |
-| `sources` | list of pass indices | Which passes contributed; stated in the same stderr line so a two-pass run is auditable |
+| `entry_count` | integer | Echoed to stderr as the `<n>` of `# failed-name list written: <path> (<n> entries) passes=<k>` (`STR-002`) so "empty because zero failures" is distinguishable from "not written" (FR-008) |
+| `sources` | list of pass indices | Which passes contributed; its size is the `<k>` of `passes=<k>` in the same stderr line, so a two-pass run is auditable (FR-011) |
 
 ### E-4 Worker Configuration (进程数配置)
 
@@ -81,7 +81,7 @@ output (FR-002, FR-005, FR-006, SC-004).
 | `justification` | path + one line | Points at the evidence (measured serial vs parallel cost) |
 
 **Owner**: `pyproject.toml` (registration) + the marked test file (membership); the enumeration command is
-owned by `contracts/runner-contract-086.contract.md` C-013.
+owned by `contracts/runner-contract-086.contract.md` C-011 (with C-012 for the disposition rule and C-013 for the combined list).
 
 ### E-7 Parallel Engine Availability (并行引擎可用性)
 
