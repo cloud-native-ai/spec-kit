@@ -9,12 +9,13 @@ that ``tasks.md`` T004 names:
        neutral list / change log); no second classification data file exists
        (Markdown ledger rows, YAML/JSON data, code constants).
 * C-3  the binary values are the only two, keyed by the namespaced class key.
-* C-4  the ledger is a Markdown table with one row per unit (measured 81 on
-       2026-11-05; 80 on 2026-11-03; 79 at 069a authoring — the census
-       legitimately grew, see the dated note at each pin), the class key verbatim
-       in the header, and only the two values in the class column.
+* C-4  the ledger is a Markdown table with one row per unit (measured 83 on
+       2026-11-06; 81 on 2026-11-05; 80 on 2026-11-03; 79 at 069a authoring — the
+       census legitimately grew, see the dated note at each pin), the class key
+       verbatim in the header, and only the two values in the class column.
 * C-5  the ledger unit set equals the repository inventory in both directions
-       (27 command templates + 54 skills since 2026-11-05; 53 since 2026-11-03).
+       (29 command templates + 54 skills since 2026-11-06; 27 + 54 since
+       2026-11-05; 53 skills since 2026-11-03).
 * C-6  the ledger never repeats a unit id.
 * C-7  ``lookup`` marks an unregistered unit as default + fixed marker, and a
        registered one as ledger-sourced with ``marker=null``.
@@ -24,8 +25,8 @@ that ``tasks.md`` T004 names:
        ledger-style row.
 * C-12 the change log keeps the ``date | unit_id | before → after | basis | 依据``
        row form.
-* C-13 ``check`` reports every unit with zero findings (measured 80 units on
-       2026-11-03; 79 at 069a authoring).
+* C-13 ``check`` reports every unit with zero findings (measured 83 units on
+       2026-11-06; 81 on 2026-11-05; 80 on 2026-11-03; 79 at 069a authoring).
 
 Red-first discipline (Constitution IV): the owner document and the engine do not
 exist yet. Every engine call goes through ``_run``, which asserts the script path
@@ -277,6 +278,12 @@ def test_no_second_classification_data_file():
 # C-4 / C-5 / C-6 — ledger shape, cardinality, and bidirectional coverage
 # --------------------------------------------------------------------------- #
 def test_ledger_has_79_rows_covering_inventory_bidirectionally():
+    # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 rows. Two command templates (and
+    # their two ledger rows) joined the framework inventory — `templates/commands/status.md`
+    # (first slice, c0fd01ac) and `templates/commands/measure.md` (second slice, 70df8130) —
+    # so the command count moved 27 -> 29 while the 54-skill count is unchanged. Ledger rows
+    # and inventory grew together; the bidirectional equality below is the assertion that
+    # matters, the pinned number is only its dated reading.
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 rows. The
     # new external unit `ssh-utils` registers `skill:ssh-utils` in the owner's
     # ledger, so the inventory and the ledger grow together (54 skills, 27
@@ -288,8 +295,8 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
     # the 069a id under which this pin was first measured; the assertion is the
     # same shape: ledger rows == inventory, bidirectionally.
     rows = _ledger_rows()
-    assert len(rows) == 81, (
-        "ledger must carry exactly 81 rows (27 commands + 54 skills); got %d" % len(rows)
+    assert len(rows) == 83, (
+        "ledger must carry exactly 83 rows (29 commands + 54 skills); got %d" % len(rows)
     )
     ids = [row["unit_id"] for row in rows]
     assert len(set(ids)) == len(ids), (
@@ -303,11 +310,11 @@ def test_ledger_has_79_rows_covering_inventory_bidirectionally():
         )
     commands = {unit for unit in ids if unit.startswith("/speckit.")}
     skills = {unit for unit in ids if unit.startswith("skill:")}
-    assert len(commands) == 27, "expected 27 command units, got %d" % len(commands)
+    assert len(commands) == 29, "expected 29 command units, got %d" % len(commands)
     assert len(skills) == 54, "expected 54 skill units, got %d" % len(skills)
     inventory_commands, inventory_skills = _inventory()
-    assert len(inventory_commands) == 27, (
-        "inventory self-check: expected 27 templates/commands/*.md, got %d"
+    assert len(inventory_commands) == 29, (
+        "inventory self-check: expected 29 templates/commands/*.md, got %d"
         % len(inventory_commands)
     )
     assert len(inventory_skills) == 54, (
@@ -352,6 +359,8 @@ def test_first_batch_members_are_registered_as_expression():
 
 
 def test_check_reports_79_units_and_zero_gaps():
+    # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 scanned units, the same
+    # census movement as the ledger-row pin above (`status.md` + `measure.md`).
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 scanned
     # units, the same census movement as the ledger-row pin above.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): 79 -> 80 scanned
@@ -365,8 +374,8 @@ def test_check_reports_79_units_and_zero_gaps():
     )
     assert record.get("action") == "check"
     assert record.get("findings") == []
-    assert record.get("units") == 81, (
-        "check must report 81 scanned units; got %r" % record.get("units")
+    assert record.get("units") == 83, (
+        "check must report 83 scanned units; got %r" % record.get("units")
     )
     assert ISO_Z_RE.match(str(record.get("checked_at", ""))), (
         "checked_at must be ISO-8601 Z; got %r" % record.get("checked_at")
@@ -514,6 +523,8 @@ def test_change_log_row_form():
 # C-9 — no class-key assignment in templates or skills (wiring reads the owner)
 # --------------------------------------------------------------------------- #
 def test_templates_and_skills_never_assign_class_key():
+    # Stale-pin update (2026-11-06, Feature 087): 81 -> 83 files, the same census
+    # movement as the pins above (the two new command templates are scanned here too).
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 80 -> 81 files, the
     # same census movement as the pins above (the new ssh-utils skill joins the
     # scanned inventory).
@@ -521,8 +532,8 @@ def test_templates_and_skills_never_assign_class_key():
     # same census movement as the two pins above (the new review-feature-quality
     # skill is also scanned for the forbidden literals below).
     paths = sorted(COMMANDS_DIR.glob("*.md")) + sorted(SKILLS_DIR.glob("*/*/SKILL.md"))
-    assert len(paths) == 81, (
-        "expected 27 templates + 54 skills, got %d files" % len(paths)
+    assert len(paths) == 83, (
+        "expected 29 templates + 54 skills, got %d files" % len(paths)
     )
     problems: list[str] = []
     for path in paths:

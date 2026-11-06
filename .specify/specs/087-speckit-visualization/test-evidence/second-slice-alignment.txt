@@ -1,0 +1,166 @@
+# Second slice — disciplinary alignment (measured reading)
+
+Capture date: 2026-11-06T14:4xZ (UTC). Reader: implement alignment pass over the second slice's
+closure failures. Every block below is a verbatim reading from this tree.
+
+## 0. Scope and starting point
+
+The second slice legitimately added `/speckit.measure` (`templates/commands/measure.md`, the
+`speckit-measure-wrapup` probe registry row, `scripts/python/measure.py` as its owner) and updated
+the ownership-map C-47/C-48 owner/relation tables. The closure full-suite run
+(`closure-full-suite-20261106T130128Z.log`, 58 failures against a 27-name baseline, 31 names new)
+exposed hard-coded expectations in pre-existing suites that had not followed the census.
+
+Alignment pass = bring those expectations to the delivered state. No clause coverage removed.
+
+## 1. The flow-class ledger row (failure 1 of the closure list)
+
+Before:
+
+```
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 83 unit(s) scanned, 1 finding(s) [matched=82 inventory_units=83, gap]
+coverage: ledger_rows=82 matched=82 inventory_units=83 gaps=1 parse_errors=0 floor=39
+  [missing] /speckit.measure — inventory unit has no ledger row
+exit=1
+```
+
+Edit: `shared/definitions/flow-class-definitions.md` § 逐流程台账 gains one row, in alphabetical
+position, in the same shape as the `/speckit.status` row (`execution` / `behavior-oracle` / empty
+`neutral` / one-sentence rationale):
+
+```
+| /speckit.measure | execution | behavior-oracle |  | 交付一份只读测量报告；窗口、选择、截断与退出码由 measure.py 复算判定 |
+```
+
+Mirror: `python3 scripts/python/sync-mirrors.py --write` → `sync  shared/ -> .specify/shared/ (1 files)`;
+`--check` afterwards reports all six roots `ok`.
+
+After:
+
+```
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 83 unit(s) scanned, 0 finding(s) [matched=83 inventory_units=83, clean]
+coverage: ledger_rows=83 matched=83 inventory_units=83 gaps=0 parse_errors=0 floor=39
+exit=0
+```
+
+```
+$ python3 scripts/python/flow-class-check.py --action check --format json
+{
+  "action": "check",
+  "checked_at": "2026-11-06T14:41:08Z",
+  "repo": "/storage/project/cloud-native-ai/spec-kit",
+  "units": 83,
+  "inventory": {
+    "commands": 29,
+    "skills": 54,
+    "floors": {
+      "commands": 27,
+      "skills": 51
+    }
+  },
+  "coverage": {
+    "ledger_rows": 83,
+    "inventory_units": 83,
+    "matched": 83,
+    "gaps": 0,
+    "parse_errors": 0,
+    "floor": 39
+  },
+  "red_kind": "clean",
+  "findings": [],
+  "error": null
+}
+```
+
+## 2. The six failures named in the assignment — old → new, with the basis
+
+Every conversion below is a **dated stale-pin update**: the assertion keeps its shape and its
+clause, only the census/matcher it pins moves to the delivered state. Each carries a dated
+comment at the pin, in the house form the surrounding pins already use.
+
+| # | Test | Old expectation | New expectation | Basis |
+|---|------|-----------------|-----------------|-------|
+| 1 | `flow-class-check --action check` (engine, no test) | `/speckit.measure` has no ledger row → 1 finding | 0 findings, `matched=83 inventory_units=83` | § 1 above |
+| 2 | `test_coaching_wiring_contract.py::test_c3_probe_compiled_face_is_zero_drift` | `"78 units, zero drift"` | `"79 units, zero drift"` | the new `speckit-measure-wrapup` registry row (`shared/definitions/probe-definitions.md`, added by `70df8130`) compiles one more `## Wrap-up` embed, because `templates/commands/measure.md` carries a compiled Wrap-up. The same run reports `zero drift`, so this is the new command's increment, not drift. Measured: `compile-embeds --check: 79 units, zero drift` |
+| 3 | `test_reporting_obligations.py::test_c47_the_ownership_table_is_readable_and_names_its_delivered_owners` | every row's owner cell must name a file that resolves on disk, or carry an antecedent phrase ("same engine") | a cell may also name a **numbered clause** — resolved against the feature's own `requirements.md` / `contracts/*.md` with a named-file preference. Records still fail when the id is not live | the three second-slice rows name their definition site as the clause that states the fact: `contracts/measure-report.contract.md` C-58 (exclusion classes), C-59 (exit statuses), `the requirements' FR-024` (selection rule, **no path in the cell at all**). The clause is the definition site — restating the rule in a Python file would be the second site C-47 forbids. Verified live: `C-58`/`C-59` occur in `contracts/measure-report.contract.md`; `FR-024` in `requirements.md` |
+| 4 | `test_reporting_obligations.py::test_c47_each_scanned_fact_has_exactly_one_definition_site` | probe `"Digest cap default"` = name probe on `DEFAULT_CAP = `, narrowed by `^DEFAULT_CAP\s*=\s*\S`, matched `scripts/python/status-digest.py` only | two probes bound to their **values**: `"Digest cap default"` = `DEFAULT_CAP = 20\n` (→ `status-digest.py`), and a new row `"Measure default per-record cap"` = `DEFAULT_CAP = 200\n` (→ `measure.py`) | the two caps are distinct facts with distinct owners (`C-43` bounds a digest entry; `C-57` bounds a unit's contributed records). The two engines legitimately share the identifier `DEFAULT_CAP`; the identifier was the wrong discriminator and the *value* is the fact. A digest-side copy of `20` still goes red, so the clause keeps its teeth. The new row mirrors the C-47 row text `Measure default per-record cap` verbatim |
+| 5 | `test_reporting_obligations.py::test_c48_the_two_relation_tables_describe_the_same_documents` | raw cell text as the document key: contract side read `shared/declarations/facts/` (the declarations directory)`, feature-ref side read `shared/declarations/facts/` | both sides key on the first backticked token — the **path** — with the parenthetical annotation dropped (`_document_key`) | the tables are transposed (`| Owner | Relation |` vs `| Relation | Document |`); the divergence was formatting, not a relation disagreement. Both tables name the same fifteen documents in the same order — the mechanism, not a loosened assertion: the sets must still be equal, and a real extra/absent document still goes red |
+| 6 | `test_reporting_obligations.py::test_c48_the_new_owner_is_declared_as_owning_and_nothing_else` | `len(owning) == 1` and `owning[0].startswith("shared/guidelines/reporting-obligations.md")` | `EXPECTED_OWNING_DOCUMENTS = ("shared/guidelines/reporting-obligations.md", "scripts/python/measure.py")`; exactly those two carry `owns`, each must be present, and a third `owns` row is still a defect | the second slice delivered a second owner. Both `owns` rows are the feature's own and both are marked `(NEW)` in the relation table: `reporting-obligations.md` (first slice) and `measure.py` (second slice, owner of the declared per-record cap — C-57 and the C-47 row `Measure default per-record cap`). The clause "…and nothing else" is preserved: the count is pinned to exactly two named documents, so an extra `owns` row fails |
+
+Additional attribution found while aligning (same class, not in the six): the closure list's
+`test_probe_nonentity_catalog.py::test_catalog_does_not_participate_in_registry_counts` fails because
+the new `speckit-measure-wrapup` Object moves the internal Object count 119 → 120. Fixed by the same
+dated-pin form (`assert internal == 120`, with the dated note). Measured after:
+`probe-utils.py --action probes --validate` → `Probe registry valid: 10 classes, 120 internal + 0 external objects`.
+
+## 3. Targeted suites (this pass ran these only; the full suite was not re-run)
+
+```
+$ pytest tests/contract/test_flow_class_ledger.py \
+         tests/contract/test_coaching_wiring_contract.py \
+         tests/contract/test_reporting_obligations.py \
+         tests/contract/test_probe_nonentity_catalog.py \
+         tests/contract/test_mirror_parity_suite.py \
+         tests/contract/test_scripts_distribution_parity.py -q
+.....................................                                    [100%]
+901 passed in 4.27s
+```
+
+Per file:
+
+```
+test_flow_class_ledger          11 passed in 0.39s
+test_coaching_wiring_contract   17 passed in 1.55s
+test_reporting_obligations      44 passed in 1.19s
+test_probe_nonentity_catalog     8 passed in 0.13s
+test_mirror_parity_suite       817 passed in 0.70s
+test_scripts_distribution_parity 4 passed in 0.45s
+```
+
+## 4. Engine readings (verbatim)
+
+```
+$ python3 scripts/python/flow-class-check.py --action check
+flow-class check: 83 unit(s) scanned, 0 finding(s) [matched=83 inventory_units=83, clean]
+coverage: ledger_rows=83 matched=83 inventory_units=83 gaps=0 parse_errors=0 floor=39
+exit=0
+
+$ python3 scripts/python/probe-utils.py --action compile-embeds --check
+compile-embeds --check: 79 units, zero drift
+exit=0
+
+$ python3 scripts/python/probe-utils.py --action probes --validate
+Probe registry valid: 10 classes, 120 internal + 0 external objects
+exit=0
+
+$ python3 scripts/python/sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (139 files)
+ok    agents/ == .specify/agents/templates/ (17 files)
+ok    scripts/ == .specify/scripts/ (123 files)
+ok    shared/ == .specify/shared/ (95 files)
+exit=0
+
+$ python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+exit=0
+```
+
+## 5. Disclosed in-passing corrections and one handed-back judgement
+
+- **Comment accuracy (corrected in passing).** Two comments first written during this pass named a
+  registry row (`speckit-status-wrapup`) that does not exist. The first slice registered no probe
+  Object — `grep -c "speckit-status-wrapup"` over `shared/definitions/probe-definitions.md` at
+  `70df8130` and at HEAD returns 0, and the registry's `command-wrapup` count moves 24 → 25 only at
+  `70df8130`. Both comments were rewritten to say what the tree shows.
+- **Handed back, not repaired: `test_humanize_command_surface.py::test_wc16_command_roster_unchanged`.**
+  This test freezes the command roster at **27** and compares it to `BASELINE_COMMIT`. The first
+  slice already moved that census to 28 (`status.md`, `c0fd01ac`) and the second to 29
+  (`measure.md`, `70df8130`), so it fails on the delivered state. It is **not** in the six-item
+  assignment and fixing it means deciding whether a pre-existing feature's frozen baseline moves at
+  all — that is an adjudication (two legitimate readings: re-baseline the freeze, or exclude the new
+  command from that feature's roster claim), not a correction. Left untouched; surfaced below.

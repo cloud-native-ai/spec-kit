@@ -344,6 +344,13 @@ def test_c6_the_old_mirror_directory_is_gone_and_the_new_one_exists():
 
 
 def test_c3_probe_compiled_face_is_zero_drift():
+    # Stale-pin update (2026-11-06, Feature 087 second slice /speckit.measure): 78 -> 79
+    # units — the new `speckit-measure-wrapup` registry row
+    # (`shared/definitions/probe-definitions.md`, added by 70df8130) compiles one more
+    # Wrap-up embed into the face, because `templates/commands/measure.md` carries a
+    # compiled `## Wrap-up`. This is the new command's expected increment, not drift: the
+    # same run reports `zero drift`, and the registry row is the truth source that produced
+    # it (the first slice's `status.md` registered no Object, so 78 stands from that slice).
     # Stale-pin update (2026-11-06, Feature 087 /speckit.status): 77 -> 78 units —
     # the new thin command's Wrap-up embed joins the compiled face.
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): 76 -> 77 units —
@@ -352,7 +359,7 @@ def test_c3_probe_compiled_face_is_zero_drift():
     # review-feature-quality skill's own Wrap-up embed joins the compiled face.
     proc = _run("scripts/python/probe-utils.py", "--action", "compile-embeds", "--check")
     assert proc.returncode == 0, proc.stdout + proc.stderr
-    assert "78 units, zero drift" in proc.stdout
+    assert "79 units, zero drift" in proc.stdout
 
 
 def test_c3_mirrors_and_command_copies_are_zero_drift():
@@ -436,11 +443,15 @@ def test_c8_the_verification_surface_runs_green():
     }
     failing = {name: proc.returncode for name, proc in checks.items() if proc.returncode != 0}
     assert not failing, f"verification surface not green: {failing}"
+    # Stale-pin update (2026-11-06, Feature 087 second slice /speckit.measure):
+    # matched=82 -> 83 — the /speckit.measure registration grows the ledger and inventory
+    # together. The feature's two slices moved the command census 27 -> 29 (status.md by
+    # c0fd01ac, measure.md by 70df8130); the ledger_rows=83 reading is the measured sum.
     # Stale-pin update (2026-11-06, Feature 087 /speckit.status): matched=81 -> 82 —
     # the /speckit.status registration grows the ledger and inventory together.
     # Stale-pin update (2026-11-05, improve-skills ssh-utils): matched=80 -> 81 —
     # the ssh-utils registration grows the ledger and inventory together.
     # Stale-pin update (2026-11-03, Feature 081c df9bbe0e): matched=79 -> 80 — the
     # review-feature-quality registration grows the ledger and inventory together.
-    assert "matched=82" in checks["flow-class check"].stdout
+    assert "matched=83" in checks["flow-class check"].stdout
     assert "zero drift" in checks["probe compile"].stdout

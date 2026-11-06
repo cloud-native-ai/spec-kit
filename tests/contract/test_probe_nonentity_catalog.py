@@ -100,7 +100,11 @@ def test_catalog_does_not_participate_in_registry_counts() -> None:
     # (skill-review-feature-quality-wrapup, the dogfooding review carrier); 117 -> 118.
     # 2026-11-05: improve-skills adds one skill-wrapup Object
     # (skill-ssh-utils-wrapup, the SSH transport owner); 118 -> 119.
-    assert internal == 119, (
+    # 2026-11-06: Feature 087's second slice adds one command-wrapup Object
+    # (speckit-measure-wrapup, the /speckit.measure Wrap-up embed — the registry row
+    # 70df8130 registered); the first slice (`status.md`) registered no probe Object of
+    # its own, so this is the feature's only Object increment; 119 -> 120.
+    assert internal == 120, (
         f"catalog leaked into the engine population or Objects drifted: internal={internal}"
     )
 

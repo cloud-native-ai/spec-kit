@@ -929,7 +929,13 @@ RELATION_FORMS = ("owns", "consumes", "amends", "preserves", "extends")
 #: rule stays with the document C-47 names as the owner.
 FACT_PROBES = {
     "Long-run cadence default (30 s)": ("literal", ("30 秒", "30 seconds"), None),
-    "Digest cap default": ("name", ("DEFAULT_CAP = ",), r"^DEFAULT_CAP\s*=\s*\S"),
+    # The two cap defaults are distinct facts with distinct owners: the digest's cap and the
+    # measure report's per-record cap are different numbers (`C-43` bounds a digest entry,
+    # `C-57` bounds a unit's contributed records). The probe therefore binds the *value*,
+    # not the shared identifier: two engines that both spell the constant `DEFAULT_CAP` are
+    # two owners, not a copied value, and a digest-side copy of `20` still goes red.
+    "Digest cap default": ("literal", ("DEFAULT_CAP = 20\n",), None),
+    "Measure default per-record cap": ("literal", ("DEFAULT_CAP = 200\n",), None),
     "Digest stale bound default": (
         "name",
         ("DEFAULT_STALE_BOUND_SECONDS = ",),
@@ -980,35 +986,73 @@ def _ownership_table() -> list:
     return rows
 
 
+#: The feature's own spec directory. Second-slice rows name their definition site as a contract
+#: clause (`contracts/measure-report.contract.md` C-58/C-59, `contracts/efficiency-element.contract.md`
+#: C-66) or a requirement clause (`the requirements' FR-024`), and those live inside the spec
+#: directory rather than at the repository root. Resolving the spec-relative prefix is what lets
+#: a row name the owner it actually has instead of forcing an artificial owner path.
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "087-speckit-visualization"
+
+
 def _delivered_path(cell: str):
     """The first repository path named in a table cell, as a Path, if it resolves on disk."""
     for match in re.finditer(r"`([^`]+)`", cell):
         candidate = match.group(1).strip()
         if "/" not in candidate and not candidate.endswith((".md", ".py")):
             continue
+        # The spec-relative reading is tried LAST: a delivered document that happens to share a
+        # relative prefix with a spec file must keep resolving to the delivered file.
         path = REPO_ROOT / candidate
         if path.exists():
             return path
-        # A relative prefix inside the cell ("shared/guidelines/…" vs ".specify/shared/…").
-        for prefix in (".specify/", ""):
-            candidate_path = REPO_ROOT / (prefix + candidate)
+        # A relative prefix inside the cell ("shared/guidelines/…" vs ".specify/shared/…"), then
+        # the spec-relative form (`contracts/measure-report.contract.md`, the feature's own).
+        for base in (REPO_ROOT / ".specify", SPEC_DIR):
+            candidate_path = base / candidate
             if candidate_path.exists():
                 return candidate_path
     return None
 
 
 def _owner_cell_resolves(owner_cell: str) -> bool:
-    """A row's owner cell resolves when it names a file on disk, or when its antecedent does.
+    """A row's owner cell resolves when it names a delivered file or a numbered clause.
 
-    One row names its owner as "same engine (`resolve_registry_dir`)" — the antecedent of that phrase is the
-    preceding row's owner, which is the same engine file. A cell that names no file at all and carries no such
-    antecedent is what this predicate is meant to catch.
+    Two shapes are legitimate and neither is a dangling reference. (a) An antecedent: one row names its
+    owner as "same engine (`resolve_registry_dir`)" — the antecedent of that phrase is the preceding row's
+    owner, which is the same engine file. (b) A clause: the second slice's rows name their definition site
+    as the clause that states the fact — `contracts/measure-report.contract.md` C-58, or `the requirements'
+    FR-024` (which names no path at all, the clause id being the whole reference). A **clause-shaped** cell
+    resolves only when that id is actually present in the feature's requirements; an unresolvable clause id
+    is still caught. A cell that names neither a delivered file nor a live clause, and carries no
+    antecedent, is what this predicate is meant to catch.
     """
     if _delivered_path(owner_cell) is not None:
         return True
     lowered = owner_cell.lower()
     antecedent = ("same engine", "同上", "same file", "see above")
-    return any(token in lowered for token in antecedent)
+    if any(token in lowered for token in antecedent):
+        return True
+    clause_ids = re.findall(r"\b(?:C|FR)-\d+\b", owner_cell)
+    if not clause_ids:
+        return False
+    requirements = (SPEC_DIR / "requirements.md").read_text(encoding="utf-8")
+    contracts_text = {
+        path.name: path.read_text(encoding="utf-8")
+        for path in sorted((SPEC_DIR / "contracts").glob("*.md"))
+    }
+    for clause_id in clause_ids:
+        if re.search(r"\b%s\b" % re.escape(clause_id), requirements):
+            continue
+        # A `C-nn` id is minted in exactly one contract of this feature (plan.md: the ids are
+        # dense across the delivery order). The cell may name the file itself; otherwise the
+        # id must still occur somewhere in the delivered contract set.
+        named = [name for name in contracts_text if name in owner_cell]
+        pool = "".join(contracts_text[name] for name in named) if named else "".join(
+            contracts_text.values()
+        )
+        if not re.search(r"\b%s\b" % re.escape(clause_id), pool):
+            return False
+    return True
 
 
 def _scan_sites(probe_kind: str, forms: tuple, definition_pattern=None) -> list:
@@ -1108,6 +1152,18 @@ def test_c47_every_row_names_a_consumer_that_reaches_the_owner_by_path():
 # --------------------------------------------------------------------------- #
 # C-48 — the relation table agrees with feature-ref.md, with no relation on one side only
 # --------------------------------------------------------------------------- #
+def _document_key(cell: str) -> str:
+    """The document a relation-table cell names, with its annotation removed.
+
+    Both C-48 tables name a document as a backticked repository path plus an optional
+    parenthetical note (`shared/guidelines/reporting-obligations.md` (NEW)) or a trailing
+    gloss on a directory (`…/ (the declarations directory)`). The path is what the two
+    tables have to agree on; the note is prose about it. The key is therefore the first
+    backticked token, and a cell with no backticks keeps its whole text.
+    """
+    match = re.search(r"`([^`]+)`", cell)
+    return (match.group(1) if match else cell).strip("` ")
+
 
 def _contract_relations() -> dict:
     """The `| Owner | Relation |` table in the ownership-map contract, as `{document: relation_words}`."""
@@ -1127,7 +1183,12 @@ def _contract_relations() -> dict:
         cells = [cell.strip() for cell in stripped.strip("|").split("|")]
         if len(cells) < 2:
             continue
-        document = cells[0].strip("` ")
+        # The two tables are transposed (`| Owner | Relation |` here, `| Relation | Document |`
+        # in feature-ref.md), so both sides normalise the document cell the same way: the path
+        # token, never the annotation that follows it (`… (NEW)`, `… (the declarations
+        # directory)`). Without this the same document keys differently on the two sides and
+        # the consistency assertion fails on formatting rather than on a real disagreement.
+        document = _document_key(cells[0])
         words = tuple(
             word for word in RELATION_FORMS if re.search(r"\b%s\b" % word, cells[1])
         )
@@ -1157,7 +1218,7 @@ def _feature_ref_relations() -> dict:
         if len(cells) < 2:
             continue
         words = tuple(word for word in RELATION_FORMS if re.search(r"\b%s\b" % word, cells[0]))
-        document = cells[1].strip("` ")
+        document = _document_key(cells[1])
         relations[document] = words
     return relations
 
@@ -1202,14 +1263,31 @@ def test_c48_every_relation_word_is_one_of_the_five_declared_forms():
             )
 
 
+#: The documents C-48's `owns` relation must cover — this feature's own two owners, and no
+#: others. The first slice delivered the owner document; the second slice delivered the
+#: measure engine beside it, and the ownership table names the engine's per-record cap as a
+#: fact it owns (`Measure default per-record cap`). Both are `(NEW)` in the relation table,
+#: so the assertion is "exactly these two carry `owns`, and nothing else does" — a third
+#: `owns` row is still a defect, and so is a missing one.
+EXPECTED_OWNING_DOCUMENTS = (
+    "shared/guidelines/reporting-obligations.md",
+    "scripts/python/measure.py",
+)
+
+
 def test_c48_the_new_owner_is_declared_as_owning_and_nothing_else():
-    """C-48: exactly one document carries `owns`, and it is this feature's new owner document."""
+    """C-48: exactly this feature's two new owners carry `owns`, and no other document does."""
     for source, relations in (
         ("ownership-map.contract.md", _contract_relations()),
         ("feature-ref.md", _feature_ref_relations()),
     ):
         owning = sorted(document for document, words in relations.items() if "owns" in words)
-        assert len(owning) == 1, "%s: expected exactly one `owns` row; got %r" % (source, owning)
-        assert owning[0].startswith("shared/guidelines/reporting-obligations.md"), (
-            "%s: the `owns` row must be the new owner document; got %r" % (source, owning[0])
+        assert len(owning) == len(EXPECTED_OWNING_DOCUMENTS), (
+            "%s: expected exactly %d `owns` row(s) — the feature's own owners; got %r"
+            % (source, len(EXPECTED_OWNING_DOCUMENTS), owning)
         )
+        for expected in EXPECTED_OWNING_DOCUMENTS:
+            assert any(document.startswith(expected) for document in owning), (
+                "%s: the feature's owner %r carries no `owns` row; got %r"
+                % (source, expected, owning)
+            )
