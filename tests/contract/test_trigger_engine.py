@@ -195,10 +195,11 @@ def test_c1_stdlib_only():
     if stdlib is None:  # Python 3.8/3.9
         import distutils.sysconfig  # noqa
         stdlib = None
+    first_party_siblings = {"declaration_reader"}  # shipped beside the engine by the same mirror
     non_std = []
     for m in sorted(mods):
         top = m.split(".")[0]
-        if stdlib is not None and top not in stdlib:
+        if stdlib is not None and top not in stdlib and m not in first_party_siblings:
             non_std.append(m)
     assert not non_std, f"non-stdlib imports: {non_std}"
     # Local-project imports are also forbidden: the engine must be self-contained

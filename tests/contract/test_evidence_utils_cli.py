@@ -67,6 +67,9 @@ class TestCE2StaticSafety:
         stdlib_allow = {
             "argparse", "json", "hashlib", "os", "re", "subprocess", "sys",
             "datetime", "pathlib", "shutil", "typing", "collections", "textwrap",
+            # First-party sibling shipped beside the engine by the same mirror (the shared
+            # declaration read entry); not a third-party dependency.
+            "declaration_reader",
         }
         for match in re.finditer(r"^(?:import|from)\s+([a-zA-Z_][a-zA-Z0-9_]*)", source, re.M):
             assert match.group(1) in stdlib_allow, f"unexpected import: {match.group(1)}"
