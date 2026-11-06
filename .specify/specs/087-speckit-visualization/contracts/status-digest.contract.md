@@ -23,6 +23,8 @@ parser or a second renderer is a defect.
 *Judged by*: `tests/contract/test_status_digest.py` — the script exposes both actions; the command template contains
 no rendering logic (it names the script path and the delegated action).
 
+Requirements served: (FR-017, FR-022).
+
 ## C-42 · DG-02 — The digest is a projection of state that already has an owner
 
 The digest MUST read:
@@ -40,6 +42,8 @@ anything (`data-model.md` E7; `research.md` RO-06).
 *Judged by*: `tests/unit/test_status_digest_unit.py` — a fixture registry is read, and the script is asserted to
 open no file for writing.
 
+Requirements served: (FR-011, FR-022).
+
 ## C-43 · DG-03 — Bounded by a declared cap, with the omitted count stated
 
 The digest MUST render at most the declared cap of entries. When it truncates it MUST state `omitted=<n>`. The cap
@@ -50,14 +54,19 @@ yields the same first-N set (`FR-012`).
 *Judged by*: `tests/unit/test_status_digest_unit.py` — a 12-entry fixture with cap 5 renders 5 entries and
 `omitted=7`; two renders are byte-identical.
 
+Requirements served: (FR-012).
+
 ## C-44 · DG-04 — Staleness is marked with its age, never presented as current
 
 Each entry MUST show the age of its last observed activity. An entry whose age exceeds the declared stale bound
-MUST be marked stale with that age. A digest MUST NOT render a stale entry's data as current (`FR-011`,
-`SC-005`).
+MUST be marked stale with that age. A digest MUST NOT render a stale entry's data as current; the bound's declared
+default lives in `scripts/python/status-digest.py` (ownership row in
+`contracts/ownership-map.contract.md` C-47), and no other file carries the value (`FR-011`, `SC-005`).
 
 *Judged by*: `tests/unit/test_status_digest_unit.py` — a fixture entry older than the bound is marked stale and
 carries its age.
+
+Requirements served: (FR-011, SC-005).
 
 ## C-45 · DG-05 — A closed exit-status set, and an explicit "nothing running" state
 
@@ -78,30 +87,47 @@ An empty entry set MUST render `nothing-running` with status `3`; it MUST NOT re
 *Judged by*: `tests/unit/test_status_digest_unit.py` — three fixtures (active, empty, unreadable) assert the three
 statuses and the `nothing-running` literal.
 
+Requirements served: (FR-011, SC-005).
+
 ## C-46 · DG-06 — The guard's propositions are the named, mechanically decidable set
 
 `--action guard` MUST judge, and report each with a **named status** (`pass` / `fail` / `not-evaluated` plus a
-reason), exactly these propositions:
+reason), exactly the thirteen propositions `contracts/reporting-obligations.contract.md` C-01…C-13 defines. That
+file is the propositions' **single owner**; this table is a consumer of it. Each row below names the proposition by
+id and states only **what this guard reads** on disk to decide it — it MUST NOT restate what the proposition
+asserts, because a second statement of the subject is what constitution XIV forbids.
 
-| Proposition | What it reads |
-|-------------|---------------|
-| RO-01 | the owner document declares its single-source-of-truth block and its five owned facts |
-| RO-02 | scope predicate present and applied to a seeded flow sample with zero unclassifiable cases |
-| RO-03 | the owner-literal scan: exactly one definition site of the long-run default in framework sources |
-| RO-04 | each team roster (`.specify/teams/*/team.md` or a supplied path) carries a reporter seat or an RS-04 reason, named |
-| RO-05 | a captured line set carries the four content-element labels and an explicit blocker field |
-| RO-06 | a captured supervision report names every dispatched sub-flow at least once |
-| RO-07 | the stall judgement's anchor resolves and no second numeric threshold set exists |
-| RO-08 | a captured report contains the three transition classes and their pre-tick timing |
-| RO-09 | a captured line set carries the profile field and a recorded profile switch |
-| RO-10 | no captured line is interrogative or an approval request |
-| RO-11 | a fixture whose tick was suppressed renders a `reporter-failure` line |
-| RO-12 | the carrier value recorded in a run record is one of the two legal forms |
-| RO-13 | the delivered changed-file set introduces no scheduler/timer/daemon/dependency/store/channel/registry/spine/ledger |
+| Proposition | What this guard reads |
+|-------------|-----------------------|
+| RO-01 | the owner document's single-source-of-truth block and its owned-fact list |
+| RO-02 | a seeded flow sample classified by the owner's predicate (zero unclassifiable cases) |
+| RO-03 | the owner-literal scan over the framework sources (one definition site) |
+| RO-04 | the roster paths in `FR-006`'s population only (`.specify/teams/*/team.md` plus every path supplied with `--roster`); zero paths supplied ⇒ `not-evaluated` with that reason |
+| RO-05 | a captured line set: the four content-element labels plus an explicit blocker field |
+| RO-06 | a captured supervision report: one row per dispatched sub-flow |
+| RO-07 | the owner document: the threshold anchor resolves, and no second numeric threshold set exists |
+| RO-08 | a captured line set: the three transition classes and their pre-tick stamps |
+| RO-09 | a captured line set: the profile value recorded per line and the recorded profile switch |
+| RO-10 | a captured line set: interrogative / approval-request verbs |
+| RO-11 | a fixture whose tick was suppressed: the `reporter-failure` line |
+| RO-12 | a run record's carrier value against the two legal forms |
+| RO-13 | the delivered changed-file set: scheduler / timer / daemon / dependency / store / channel / registry / spine / ledger sites |
+
+The proposition **ids and their subjects** are owned by C-01…C-13 only. `SC-005`'s (C-44/C-45), `FR-009`'s stall
+judgement (RO-07), `FR-020`'s profile fields (RO-09) and `FR-012`'s cap/omitted count (RO-13) are named by their
+owning clauses and are **not** propositions of their own; where a proposition reads a value those FRs define, the
+owning clause of that value is the one that pins it.
 
 Each proposition MUST be decidable from files on disk with no network and no process spawn. A proposition the guard
 cannot decide MUST be reported `not-evaluated` with the reason, and MUST NOT be reported `pass`.
 
 *Judged by*: `tests/contract/test_status_digest.py` — every proposition name appears in the guard's output for a
-compliant fixture, and a mutation fixture (seat removed, omission count removed) turns the matching proposition
-red.
+compliant fixture, and a mutation fixture (seat removed, second cadence literal seeded) turns the matching
+proposition red.
+
+The guard's id set MUST equal the C-01…C-13 id set exactly: a fourteenth proposition, or a second id for one of the
+thirteen, is a defect. The trigger mechanics are not propositions — `FR-020`'s profile selection is pinned by
+`contracts/status-report.contract.md` C-30 and read by `RO-09`, and `FR-016`'s failure line is pinned by C-29 and
+read by `RO-11` — so no trigger gets a slot of its own.
+
+Requirements served: (FR-017, FR-022).

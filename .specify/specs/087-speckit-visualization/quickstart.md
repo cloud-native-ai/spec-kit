@@ -2,7 +2,7 @@
 
 **Feature**: 087 | **Date**: 2026-11-06 | **Plan**: `plan.md`
 
-Six scenarios of the obligation read on one screen, each with its executed/unexecuted status stated **per
+Eight scenarios (A–H) of the obligation read on one screen, each with its executed/unexecuted status stated **per
 scenario** — a file-level disclaimer is deliberately absent, because the plan-stage gate treats one as vouching for
 the examples it does not cover. Two scenarios (E and G) carry an **executed** measurement taken during this plan
 stage; the other six carry the premises they rest on.
@@ -23,8 +23,8 @@ confirmation-gate scanner, the validators — **was executed** during this stage
 sed -n '1,40p' shared/guidelines/reporting-obligations.md
 ```
 
-**Expected**: the file opens with a single-source-of-truth declaration naming five owned facts and four documents it
-does **not** own, each with a path.
+**Expected**: the file opens with a single-source-of-truth declaration naming eight owned facts (the list contract
+C-01 fixes) and four documents it does **not** own, each with a path.
 
 **Status**: NOT EXECUTED — the file does not exist at plan time.
 
@@ -201,18 +201,21 @@ input error.
 **Status**: NOT EXECUTED — the script does not exist at plan time.
 
 **Premises this scenario rests on**:
-1. the thirteen proposition ids are exactly the RO-01…RO-13 names contract C-46 enumerates, and they are the same
-   names `contracts/reporting-obligations.contract.md` uses for its clauses (one vocabulary, two uses: a clause and
-   the proposition that judges it);
+1. the thirteen proposition ids are exactly the `RO-01`…`RO-13` names
+   `contracts/reporting-obligations.contract.md` C-01…C-13 defines — that file is the propositions' **single owner**,
+   and contract C-46 is its consumer, naming each id with only what the guard reads (one vocabulary, one owner: a
+   proposition is defined in one place and cited by id everywhere else);
 2. `not-evaluated` is a legal verdict and is never counted as a pass (`requirements.md` reports the same rule for
    expression-class gates; here it is the guard's own rule);
 3. the guard reads only files on disk — no network, no process spawn (contract OM-04), so it is runnable in a
    sandbox with no host CLI;
 4. the exit-status set `0`/`1`/`2` follows the framework's existing convention (`flow-class-check.py`,
    `pre-analyze-check.py`, `gate-check.py`), so no new convention is introduced;
-5. a line's own artifacts must exist for a proposition to be `pass` — RO-04 needs at least one team roster, RO-05
-   needs a captured line set. With no roster present, RO-04 reports `not-evaluated` with that reason rather than
-   `pass`.
+5. a line's own artifacts must exist for a proposition to be `pass` — RO-04 needs at least one roster **path in
+   `FR-006`'s population** (a `--roster` argument, or a roster this feature created), RO-05 needs a captured line
+   set. With no population path supplied, RO-04 reports `not-evaluated` with that reason rather than `pass`; the
+   rosters already in the repository are not in the population and are never judged (`FR-006`, contract
+   `contracts/reporting-obligations.contract.md` C-04).
 
 **Verification route (b)**: pinned by `tests/contract/test_status_digest.py` (every proposition name appears in the
 output for a compliant fixture; a mutation fixture turns the matching proposition red).
@@ -257,9 +260,12 @@ ls .claude/commands/speckit.status.md .github/prompts/speckit.status.prompt.md \
 ```
 
 **Expected**: `--check` prints `ok` for every pair and `OK: all per-tool command copies match the source
-templates.` (both exit `0`); the four `ls` paths all resolve; the file counts rise by exactly the delivered files
-(`agents/` 16 → 17, `shared/` 94 → 95, `scripts/` 121 → 122, `skills/internal/` 138 → 139, plus one file per
-edited skill file that already exists).
+templates.` (both exit `0`); the four `ls` paths all resolve; the file counts rise by exactly the **new** files this
+feature adds, per pair: `agents/` 16 → 17 (one new Template), `shared/` 94 → 95 (one new owner document),
+`scripts/` 121 → 122 (one new script), `skills/internal/` 138 → 139 (one new guard script under
+`create-team/scripts/`), `templates/commands/` is not mirrored into `.specify/` any more (that pair is retired), and
+the edited-but-already-present files (`subagent-definitions.md`, `external-dispatch-recipes.md`, the three
+`create-team` files, `coaching-skills/SKILL.md`) change bytes without changing any count.
 
 **Status**: NOT EXECUTED — the pre-change tree is already `ok` on both checks, so there is nothing to regenerate
 until the implementation lands.
@@ -276,7 +282,8 @@ until the implementation lands.
    by `--write` (or `--only scripts/python/status-digest.py`) in the same change;
 5. `skills/external/<name>/` mirrors to `.specify/skills/<name>/` (the `external/` component is dropped), so the
    coaching skill's mirror path is `.specify/skills/coaching-skills/SKILL.md`;
-6. the counts rise **by exactly** the delivered files — a larger rise means an unintended file shipped.
+6. the per-pair counts rise **by exactly** the new files this feature adds — a larger rise means an unintended file
+   shipped, and an unchanged count for a pair that should have gained a new file means the mirror is missing.
 
 **Verification route (b)**: pinned by `tests/contract/test_reporting_obligations.py` (file existence on both sides
 of each pair) and by the mirror check itself, whose baseline is the measured `ok` above.
@@ -294,7 +301,8 @@ git diff --name-only 56f3f881..HEAD
 
 **Expected**: the scanner still reports `blocking confirmation gates: 27` (unchanged — the baseline measured
 2026-11-06 was `27` with `destructive: 20`, `governance_kept: 7`, `violations: 0`), and the changed-path list
-contains no file that spawns a process, keeps a store, or opens a channel (audited by contract OM-03/OM-04).
+contains no file that spawns a process, keeps a store, or opens a channel (audited by contract
+`ownership-map.contract.md` OM-03/OM-04, i.e. C-49/C-50).
 
 **Status**: the scanner half was EXECUTED during this plan stage (measured `27`); the changed-path half is NOT
 EXECUTED — it is an implementation-time audit.
@@ -303,5 +311,5 @@ EXECUTED — it is an implementation-time audit.
 `27` is the number a compliant change leaves unchanged — an increment is a defect, a decrement means a gate was
 removed; (3) `56f3f881` is this line's stage base (`plan.md` header and the state spine's `stage_base_commit`).
 
-**Verification route (b)**: contract C-51 (`OM-05`) plus the AST-level import audit in
+**Verification route (b)**: contract `ownership-map.contract.md` C-51 (`OM-05`) plus the AST-level import audit in
 `tests/contract/test_status_digest.py`.

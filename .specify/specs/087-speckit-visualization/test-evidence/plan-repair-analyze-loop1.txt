@@ -1,0 +1,75 @@
+# Plan repair — analyze loop 1 (plan stage, attempt 2) — gate readings
+# feature: 087-speckit-visualization | date: 2026-11-06
+# scope: plan-owned artifacts only (plan.md, data-model.md, contracts/, quickstart.md, research.md, feature-ref.md)
+# findings repaired here: D-01, F-01, E-01 (plan half), E-05, F-04, F-06, C-01, C-03
+# no --freeze was run; no state spine was written; requirements.md / tasks.md / checklists/ untouched
+
+$ python3 .specify/scripts/python/account-clause-coverage.py .specify/specs/087-speckit-visualization
+== clause coverage (universe: contract files per the owner's forms; claimed: tasks.md [green:] declarations) ==
+claimed clauses (this feature): 36
+baseline: .specify/specs/087-speckit-visualization/coverage-baseline.txt (0 names, MISSING)
+
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 22
+FR claimed: 22
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 36, scanned files 272, clause universe 1728, FR universe 22
+  [clause-uncovered] fail (589) — 589 uncovered, 589 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 22 of 22 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] fail (589) — baseline holds 0 names; 0 uncovered items are baseline-internal and do not block
+590 error(s), 0 warning(s)
+status: baseline-missing
+
+# reading: the FR lane moved from `fail (20) — 2 of 22 FRs cited` (analyze report §5) to
+# `pass (0) — 22 of 22 FRs cited`. Every one of this feature's 52 clauses now carries a
+# non-code-span citation group (`Requirements served: (FR-… , SC-…)`).
+# `status: baseline-missing` and `[clause-uncovered] fail` are NOT repaired here and MUST NOT be:
+# the frozen `coverage-baseline.txt` is tasks-stage runtime evidence (analyze report E-04, owner
+# `.specify/skills/internal/create-tasks/SKILL.md` § Runtime-evidence landing points); the analyze-side
+# brief forbids `--freeze`, and the 589 uncovered names belong to other features' contracts.
+
+$ python3 skills/external/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/087-speckit-visualization --stage plan --repo .
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=126 waived=0
+  summary: {"errors": 0, "advisories": 126, "waived": 0, "fr": 22, "sc": 10, "tasks": 50, "clauses": 0, "files": 15}
+# before this repair: decision=pass errors=0 advisories=125 (analyze report §1 quotes the same verdict)
+# the +1 advisory is a new `missing-path` line for a not-yet-delivered path; `missing-path` is an advisory
+# class for artifacts this stage does not deliver (all 126 advisories are of that class). verdict unchanged: pass.
+
+$ python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/087-speckit-visualization
+status: ok
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+scanned: 321 lines, 2 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+# scanned line count rose 312 -> 321 with the plan.md edits; 2 records (T-001, T-002) unchanged.
+
+$ python3 - <<'PY'   # clause-id census, from clause_extract (the owner's parser), not by eye
+ownership-map.contract.md 6 | reporter-seat.contract.md 8 | reporting-obligations.contract.md 13
+status-digest.contract.md 6 | status-report.contract.md 10 | supervision-report.contract.md 9
+total clauses: 52   (C-01…C-52, dense per file; 52/52 carry a citation group)
+PY
+
+$ grep -c '^## Scenario' .specify/specs/087-speckit-visualization/quickstart.md
+8   (A–H)
+$ python3 scripts/python/sync-mirrors.py --check       # measured, not assumed: no mirror pair changed in this repair
+EXIT=0
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files)
+ok    skills/external/ == .specify/skills/ (415 files)
+ok    skills/internal/ == .specify/skills/internal/ (138 files)
+ok    agents/ == .specify/agents/templates/ (16 files)
+ok    scripts/ == .specify/scripts/ (121 files)
+ok    shared/ == .specify/shared/ (94 files)
+
+$ python3 scripts/python/regen-command-copies.py --check
+EXIT=0
+OK: all per-tool command copies match the source templates.
+# identical to test-evidence/mirror-baseline.txt: this repair edited documents only (no framework source),
+# so no mirror or per-tool copy could drift.

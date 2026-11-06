@@ -41,7 +41,9 @@ than inherit this reading.
 
 ## Delivered paths (dry inventory)
 
-The set `/speckit.implement` must produce. Counts are the plan's target, not a claim about the tree.
+The set `/speckit.implement` must produce, enumerated so contract `ownership-map.contract.md` C-52 (OM-06) can audit
+it as a file list rather than a claim. Counts are the plan's target, not a claim about the tree; the rows below are
+the enumeration owner (28 paths).
 
 | # | Path | Kind | FR |
 |---|------|------|----|
@@ -77,6 +79,13 @@ The set `/speckit.implement` must produce. Counts are the plan's target, not a c
 **Audit answer for contract OM-06**: no path in the list above is a scheduler, a timer service, a daemon, a
 persistent store, a console channel, a registry, a state spine or a ledger. Paths 8 and 17 are deterministic,
 single-file, stdlib-only readers; path 1 is a document; paths 3 and 12 are prompt surfaces.
+
+**Roster population (no roster is a delivered path)**: `FR-006` binds exactly two sets — rosters created or modified
+through the team-creation entry from this feature's delivering commit onward, plus rosters passed explicitly by
+path. No `.specify/teams/*/team.md` path appears above because none is bound: the rosters already in the repository
+are outside the population, they are not amended or backfilled with a `reporting-reason`, and a guard run that
+supplies no population path reports its roster proposition `not-evaluated` rather than judging them (owner:
+`contracts/reporting-obligations.contract.md` C-04).
 
 ## FR → artifact map
 
@@ -146,6 +155,6 @@ system, maturity report or runtime evaluation platform.
 |-------|-------|----------|
 | requirements | done (22 FR / 10 SC, 15 assumptions, 5 clarifications) | `requirements.md` |
 | clarify | done (Feature binding + 5 adjudications) | `requirements.md` § Clarifications |
-| plan | **this stage** | `plan.md`, `research.md`, `data-model.md`, `contracts/` (6 files / 52 clauses), `quickstart.md`, this file |
+| plan | **this stage** | `plan.md`, `research.md`, `data-model.md`, `contracts/` (6 files / 52 clauses `C-01`…`C-52`), `quickstart.md` (8 scenarios A–H), this file (28 delivered paths) |
 | tasks | not started | — |
 | checklist / analyze / implement / review / closure | not started | — |

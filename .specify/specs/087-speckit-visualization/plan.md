@@ -55,8 +55,9 @@ files; no network, no process spawn).
 **Constraints**: digest output bounded by a declared entry cap with the omitted count stated; no new process,
 timer, daemon or store; every emitted line readable by a reader who did not take part in the run
 (`shared/guidelines/user-facing-comprehension.md`); the 30-second literal has exactly one definition site.
-**Scale/Scope**: ~15 delivered files across 7 framework-source areas plus their mirrors and 4 per-tool command
-copies; 22 FR, 10 SC, 6 contracts, 7 entities.
+**Scale/Scope**: 28 delivered paths across 7 framework-source areas plus their mirrors and 4 per-tool command
+copies (`feature-ref.md` § Delivered paths is the enumerated owner of this list); 22 FR, 10 SC, 6 contracts / 52
+clauses, 7 entities.
 
 ## Constitution Check
 
@@ -71,18 +72,18 @@ carried by any principle heading in that file, so none is rendered):
 | I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every delivered file traces to an FR in `requirements.md` § Functional Requirements; `feature-ref.md` carries the FR → artifact map; `contracts/` names the FR each clause serves |
 | II | Feature-Centric Development | ✅ Pass | Feature 087 row + detail updated synchronously in this stage (`Draft → Planned`); `feature-ref.md` records the binding and the neighbouring-feature scan |
 | III | Intent-Driven Development | ✅ Pass | `research.md` records the measured current state before any design; `plan.md` § Decision Tensions records the "why" for the two load-bearing choices |
-| IV | Test-First & Contract-Driven Implementation | ✅ Pass | `contracts/` fixes the numbered clauses (C-1…C-50) that `/speckit.tasks` turns into red-first contract tests; RO-01…RO-13 are the guard's judgements, each with a named status |
+| IV | Test-First & Contract-Driven Implementation | ✅ Pass | `contracts/` fixes the numbered clauses (`C-01`…`C-52`, dense per file) that `/speckit.tasks` turns into red-first contract tests; `RO-01`…`RO-13` are the guard's judgements, each with a named status, and `contracts/reporting-obligations.contract.md` C-01…C-13 is their single owner |
 | V | AI Agent Integration Standards | ✅ Pass | No agent is added to `AGENT_CONFIG`; the new Template renders through the existing render path; `_ASSISTANT_COMMAND_DIRS` (6 tools) is the copy-target owner, unchanged |
 | VI | Continuous Quality & Observability | ✅ Pass | The feature's subject *is* observability; no `.bak` copy is produced (version control is the backup); root cause over symptom — a flow that cannot report records that fact (FR-016) rather than staying green |
 | VII | Specification-Plan-Task-Implementation Workflow | ✅ Pass | This stage lands at most `Planned`; FR-018's zero-new-machinery shape keeps Test-First Partial-unneeded — the guard and its tests are ordinary code + contract tests, so no `Partial (justified)` row exists |
 | VIII | Code as the Single Source of Truth | ✅ Pass | `research.md` every claim was measured against the tree (mirror check, engine `--help`, literal scans) rather than read from documentation; where a doc disagreed, the measurement is quoted |
-| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | Cadence is executed by the running flow between its steps; RO-13 (no scheduler/timer/daemon/second store) is a named guard proposition, and contract C-48 makes the delivered set auditable against it |
+| IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | Cadence is executed by the running flow between its steps; RO-13 (no scheduler/timer/daemon/second store) is a named guard proposition, and contract `ownership-map.contract.md` C-49/C-50 makes the delivered set auditable against it |
 | X | Documentation Naming & Location Conventions | ✅ Pass | New owner `shared/guidelines/reporting-obligations.md`, new Template `agents/reporter.agent.md` (lowercase kebab), new command `templates/commands/status.md`; no `README.md` is introduced; `skills/*/SKILL.md` keeps its mandated name |
 | XI | Dogfooding (Self-Application) | ✅ Pass | Two hats named: all delivery lands in framework sources (`shared/`, `agents/`, `skills/`, `scripts/`, `templates/`) and reaches `.specify/` only through `sync-mirrors.py` / `regen-command-copies.py`; no hand edit of a `.specify/` mirror |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | `research.md` RO-05/RO-06 record the Tool-record lookup (`.specify/memory/tools/`) before authoring `status-digest.py`; no existing Tool covers a current-state digest, so authoring is the expected outcome |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | `feature-ref.md` names the strengthened work-loop dimension (Task Understanding + Reliable Delivery visibility); no scoring system or maturity report is added |
-| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | Each fact has one owner: cadence value → the new owner; content floor + interactive default → `progress-reporting.md`; artifact triplet + modes → `subagent-definitions.md`; stall numbers → `create-team/references/patterns.md`; registry states → `line-registry.py` `STATE_VALUES`. C-44 makes the owners consignment a contract clause and SC-006 its measurement |
-| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | Emitted lines are a governed surface of that discipline; `contracts/status-report.contract.md` C-20 pins the four content elements and the attribution fields, and `data-model.md` § Invariants INV-05 forbids an internal identifier from reaching the line without a user-facing name |
+| XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | Each fact has one owner: cadence value → the new owner; content floor + interactive default → `progress-reporting.md`; artifact triplet + modes → `subagent-definitions.md`; stall numbers → `create-team/references/patterns.md`; registry states → `line-registry.py` `STATE_VALUES`; the guard's thirteen propositions → `contracts/reporting-obligations.contract.md` C-01…C-13 (every other surface reaches them by id). C-47 makes the ownership consignment a contract clause and SC-006 its measurement |
+| XV | User-Facing Comprehension (No Jargon, With Context) | ✅ Pass | Emitted lines are a governed surface of that discipline; `contracts/status-report.contract.md` C-23 (SR-02) pins the four content elements and C-22 (SR-01) the attribution fields, and `data-model.md` § Invariants INV-05 forbids an internal identifier from reaching the line without a user-facing name |
 | XVI | Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest) | ✅ Pass | The reporting obligation rides the same dispatch-payload channel as the fast-fail clause and does not modify it; the reporter is not given authority to repair or to halt anything (FR-005, INV-08) |
 | XVII | Directory Governance (Named, Documented, Ignored When Temporary) | ✅ Pass | No new directory is created: `contracts/`, `test-evidence/`, `agents/`, `shared/guidelines/` all exist; the digest's scratch needs none (`temp_directory_discipline` not exercised) |
 | XVIII | Grounded Naming | ✅ Pass | Names follow the highest available source — user instruction ("reporter subagent", "team"), sibling imitation (`shared/guidelines/<topic>.md`, `scripts/python/<verb>-<noun>.py` next to `flow-class-check.py`, `line-registry.py`), then a descriptive own choice (`/speckit.status`, `status-digest.py`) |
@@ -92,12 +93,15 @@ carried by any principle heading in that file, so none is rendered):
 is owed (that section states `N/A`).
 
 **Re-check after Phase 1**: 2026-11-06, re-run against the design artefacts on disk (`data-model.md` with 7
-entities and INV-01…INV-12, `contracts/` with 6 files / 50 clauses, `quickstart.md` with 6 scenarios,
+entities and INV-01…INV-12, `contracts/` with 6 files / 52 clauses, `quickstart.md` with 8 scenarios A–H,
 `feature-ref.md`). The table above is the refreshed reading: no row changed verdict. Two rows were the only
 candidates for a downgrade and each was checked against its artefact — IV (Feature) stays Pass because the
 contracts enumerate the tests to write rather than leaving them implicit; XI (Dogfooding) stays Pass because
 `plan.md` § Mirror Obligations names every copy and the baseline drift is zero, so no artifact could be delivered
-by hand-editing a mirror.
+by hand-editing a mirror. XIV was checked separately: it passes only because
+`contracts/reporting-obligations.contract.md` C-01…C-13 declares itself the single owner of the thirteen guard
+propositions and every other surface — `status-digest.contract.md` C-46, `data-model.md` § Invariants, each contract's
+`*Judged by*` line, and `quickstart.md` § F — reaches them by id without restating a subject.
 
 ## Decision Tensions
 
@@ -138,8 +142,8 @@ fail all four triggers and are therefore recorded as ordinary trade-offs, not as
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output — measured current state and resolved unknowns
 ├── data-model.md        # Phase 1 output — 7 entities, fields, invariants
-├── quickstart.md        # Phase 1 output — 6 executable scenarios
-├── contracts/           # Phase 1 output — 6 contract files, 50 clauses
+├── quickstart.md        # Phase 1 output — 8 executable scenarios (A–H)
+├── contracts/           # Phase 1 output — 6 contract files, 52 clauses
 ├── feature-ref.md       # Phase 1 output — Feature 087 binding, FR → artifact map
 ├── checklists/          # /speckit.checklist output (later stage)
 ├── test-evidence/       # this run's gate readings and the E3 stage-status row
@@ -161,16 +165,20 @@ skills/internal/create-team/ # SKILL.md + references/create-mode.md (roster sche
 skills/external/coaching-skills/ # SKILL.md § Dispatch Payload — one added field inside the closed set
 templates/commands/         # NEW status.md — the thin /speckit.status entry
 scripts/python/             # NEW status-digest.py — digest renderer + guard (one reading)
-tests/contract/             # NEW test_reporting_obligations.py, test_roster_reporter_seat.py, test_status_digest.py, test_coaching_reporting_duty.py
+tests/contract/             # NEW test_reporting_obligations.py, test_roster_reporter_seat.py, test_status_digest.py, test_coaching_reporting_duty.py; EDITED test_coaching_dispatch_contract.py (declared expected delta, OM-05)
 tests/unit/                 # NEW test_status_digest_unit.py — projection, bounding, staleness, exit codes
 ```
 
 **Structure Decision**: this spec extends the existing framework-source layout; it creates **no new top-level
-directory**. Three files are new (`shared/guidelines/reporting-obligations.md`, `agents/reporter.agent.md`,
-`templates/commands/status.md`, `scripts/python/status-digest.py`), five existing framework-source files gain a
-bounded edit, and four test files are new. The shape is "one new owner + one new template + one new command pair +
-bounded edits to four existing owners", whose mirrored runtime copies are produced by the two existing sync
-engines.
+directory**. Four files are new (`shared/guidelines/reporting-obligations.md`, `agents/reporter.agent.md`,
+`templates/commands/status.md`, `scripts/python/status-digest.py`), **six** existing framework-source files gain a
+bounded edit (`shared/definitions/subagent-definitions.md`, `shared/workflow/external-dispatch-recipes.md`,
+`skills/internal/create-team/SKILL.md`, `skills/internal/create-team/references/create-mode.md`,
+`skills/internal/create-team/references/patterns.md`, `skills/external/coaching-skills/SKILL.md`), and five test
+files are new/stated — `tests/contract/` ×4 new plus `tests/unit/test_status_digest_unit.py`, with
+`tests/contract/test_coaching_dispatch_contract.py` edited in place. The shape is "one new owner + one new template
++ one new command pair + bounded edits to six existing framework-source files", whose mirrored runtime copies are
+produced by the two existing sync engines.
 
 ### Mirror Obligations *(mandatory when any changed file has mirrors or generated copies)*
 
@@ -190,7 +198,7 @@ templates.`, and `ok` for all six pairs (`templates/` 22 files, `skills/external
 | `skills/external/coaching-skills/SKILL.md` (edited) | `.specify/skills/coaching-skills/SKILL.md` | same command with `--only skills/external/coaching-skills`; note the pair maps `skills/external/` → `.specify/skills/` (flat), so the mirror path loses the `external/` component |
 | `scripts/python/status-digest.py` (NEW) | `.specify/scripts/python/status-digest.py` | same command with `--only scripts/python/status-digest.py`; **this pair is STRICT** — a mirror-only or source-only file FAILS the check, so both sides must be present |
 | `templates/commands/status.md` (NEW) | `.claude/commands/speckit.status.md`; `.github/prompts/speckit.status.prompt.md`; `.qoder/commands/speckit.status.md`; `.opencode/command/speckit.status.md` — generated by `regen-command-copies.py` from `_ASSISTANT_COMMAND_DIRS` (6 configured tools: copilot, claude, hermes, opencode, qoder, codex; only the 4 whose directories exist in this repo are written). **NO `.specify/templates/commands/` mirror — that pair is retired.** | `python3 scripts/python/regen-command-copies.py` then `python3 scripts/python/regen-command-copies.py --check`; the check must print `OK: all per-tool command copies match the source templates.` — baseline was already `OK`, so the criterion is met only if it stays `OK` **and** the four `.qoder`/`.claude`/`.github`/`.opencode` `speckit.status.*` files exist |
-| the four `tests/` files | none (tests are not mirrored) | `ls .specify/shared/guidelines/reporting-obligations.md` and the sibling paths above must all resolve — a mirror-only or source-only artifact is the defect this row prevents |
+| the five `tests/` files (four new, one edited) | none (tests are not mirrored) | `ls .specify/shared/guidelines/reporting-obligations.md` and the sibling paths above must all resolve — a mirror-only or source-only artifact is the defect this row prevents |
 
 ## Execution Premises
 
@@ -205,6 +213,7 @@ templates.`, and `ok` for all six pairs (`templates/` 22 files, `skills/external
 | EP-007 | Adding one command template propagates through the existing generator, so no per-tool copy needs to be hand-written | `python3 scripts/python/regen-command-copies.py --check` exits 0 today over the 6 configured tools and writes only the 4 tool directories present in this repo (`_ASSISTANT_COMMAND_DIRS`, `src/specify_cli/__init__.py:796`) | verified | — |
 | EP-008 | The 30-second long-run default has no pre-existing definition site in the framework sources, so designating the new owner does not create a duplicate | A recursive scan for `30 秒` and `30 seconds` across `shared/`, `templates/`, `skills/`, `agents/` on 2026-11-06 returned zero framework-source definition of a reporting interval; the only two matches are unrelated prose uses inside `draw-diagram` and `improve-skills` references (recorded in `research.md` RO-11) | verified | — |
 | EP-009 | The interactive default interval stays owned by `progress-reporting.md` and is already pinned by a contract test, so the plan must not touch that literal | `tests/contract/test_progress_reporting.py` exists and pins the owner doc plus the instructions mirror; `shared/guidelines/progress-reporting.md:23` carries the literal | verified | — |
+| EP-010 | The framework's progress-reporting contract suite is the name-level compatibility baseline and is the only pre-existing suite this feature's zero-NEW-failure criterion is measured against; there is no docker or hugo suite in this repository to deselect | `tests/contract/test_progress_reporting.py` exists; the stage's only pre-change capture is that suite (tasks row T002); contract `ownership-map.contract.md` C-51 names the six pre-existing suites the closure diff covers | verified | — |
 
 ## Inherited Blockers
 
@@ -300,7 +309,7 @@ Counts below were taken **from the files on disk after they were written**, not 
 |----------|------|---------------|
 | Data model | `data-model.md` | 7 entities (Reporter Seat, Status Report, Supervised Sub-flow, Stall Threshold, Current-State Digest, Reporting Profile, Registry Line Projection) and 12 invariants (INV-01…INV-12) |
 | Contracts | `contracts/` | 6 files, 52 numbered clauses total: `reporting-obligations.contract.md` C-01…C-13 (RO-01…RO-13), `reporter-seat.contract.md` C-14…C-21 (RS-01…RS-08), `status-report.contract.md` C-22…C-31 (SR-01…SR-10), `supervision-report.contract.md` C-32…C-40 (MV-01…MV-09), `status-digest.contract.md` C-41…C-46 (DG-01…DG-06), `ownership-map.contract.md` C-47…C-52 (OM-01…OM-06) — clause ids are dense per file and cited by `/speckit.tasks` |
-| Quickstart | `quickstart.md` | 6 scenarios (A owner read, B roster guard, C digest active, D digest idle, E owner-literal scan, F guard) with the executed/unexecuted premise stated per scenario |
+| Quickstart | `quickstart.md` | 8 scenarios (A owner read, B roster guard, C digest active, D digest idle, E owner-literal scan, F guard, G mirror/copy integrity, H zero-new-machinery audit) with the executed/unexecuted premise stated per scenario |
 | Feature reference | `feature-ref.md` | Feature 087 binding, shared delivery root, FR → artifact map (22 FR), neighbouring-feature scan |
 | Research | `research.md` | 15 measured readings (RO-01…RO-15) and 5 resolved unknowns |
 | Stage evidence | `test-evidence/plan.jsonl` | 1 E3 `stage-status` row, `status=not-run-docs-only` with the six reduced fields |

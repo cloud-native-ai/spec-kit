@@ -19,8 +19,10 @@ session").
 The run stamp is the one the emitting flow already writes (team run report filename stamp, or the registry
 `run_id`); no new stamp format is introduced.
 
-*Judged by*: guard proposition RO-08 over a captured line set; contract test asserts a two-structure fixture yields
+*Judged by*: guard proposition RO-05 over a captured line set; contract test asserts a two-structure fixture yields
 two distinguishable lines.
+
+Requirements served: (FR-007).
 
 ## C-23 · SR-02 — The four content elements, reached by reference
 
@@ -33,6 +35,8 @@ This contract names the elements as labels; it MUST NOT restate the owner's desc
 
 *Judged by*: guard proposition RO-05 over a captured line set (four labels present, blocker present).
 
+Requirements served: (FR-004, FR-013).
+
 ## C-24 · SR-03 — Cadence: the long-run default, overridable per run and per structure
 
 A structure whose E6 `long-run.condition` holds MUST emit at the long-run default cadence; the value MUST be read
@@ -40,7 +44,10 @@ from the owner document, never restated in the emitting flow (`FR-003`). An expl
 MAY replace it without a source edit; when present it MUST be recorded next to the line's profile so a reader can
 tell an override from the definition.
 
-*Judged by*: guard proposition RO-03 and RO-09.
+*Judged by*: guard proposition RO-03 and RO-09 (the value is read from the owner, and the override is recorded next
+to the line's profile).
+
+Requirements served: (FR-003).
 
 ## C-25 · SR-04 — Two out-of-cadence triggers are legal, and neither resets the cadence
 
@@ -52,8 +59,10 @@ tell an override from the definition.
 A tick that falls inside an indivisible step is delivered at that step's next boundary **with the delay stated**;
 the step MUST NOT be split to keep the clock (`progress-reporting.md` § 不打断原子步骤).
 
-*Judged by*: guard proposition RO-09 (line set contains both trigger kinds and their stamps show the cadence was
+*Judged by*: guard proposition RO-08 (the line set contains both trigger kinds and their stamps show the cadence was
 not reset).
+
+Requirements served: (FR-010).
 
 ## C-26 · SR-05 — The carrier is recorded, and exactly one of two forms is legal
 
@@ -66,7 +75,9 @@ writes** (team run report, dispatch record, or supervision record). The carrier 
 No third carrier and no newly persisted per-line artifact is permitted (`FR-007`, `FR-014`, `requirements.md`
 Out of Scope "Requiring a status line to be persisted as an artifact of its own").
 
-*Judged by*: guard proposition RO-12 and `contracts/ownership-map.contract.md` OM-03.
+*Judged by*: guard proposition RO-12 and `contracts/ownership-map.contract.md` OM-03 (C-49).
+
+Requirements served: (FR-007, FR-014).
 
 ## C-27 · SR-06 — Every execution mode is covered, and the mode is recorded
 
@@ -80,6 +91,8 @@ contract asserts those two mappings and asserts that mode 1 records `console`.
 
 *Judged by*: `tests/contract/test_reporting_obligations.py` over a three-mode fixture.
 
+Requirements served: (FR-014, SC-004).
+
 ## C-28 · SR-07 — A status line is a statement, never a gate
 
 A line MUST NOT contain a question, an approval request, or a waiver solicitation, and emitting one MUST NOT be
@@ -88,6 +101,8 @@ treated as authorization for any action (`FR-015`). Destructive actions keep the
 
 *Judged by*: guard proposition RO-10 — a line set containing an interrogative or an approval verb is red.
 
+Requirements served: (FR-015).
+
 ## C-29 · SR-08 — A reporting failure emits a line of its own
 
 When the reporting loop cannot emit at its expected tick, the flow MUST surface that as a named condition
@@ -95,6 +110,8 @@ When the reporting loop cannot emit at its expected tick, the flow MUST surface 
 claim the run is healthy. "No line" is never readable as "progressing".
 
 *Judged by*: guard proposition RO-11 over a fixture whose second tick was suppressed.
+
+Requirements served: (FR-016).
 
 ## C-30 · SR-09 — Two profiles, one condition, one selected per run
 
@@ -105,6 +122,8 @@ switches to `interactive` at the next boundary **and says so**; the switch is re
 
 *Judged by*: guard proposition RO-09 over a fixture that loses its receiver mid-run.
 
+Requirements served: (FR-020).
+
 ## C-31 · SR-10 — Every line is readable by a reader who did not take part in the run
 
 A line MUST NOT carry an internal engine identifier where a user-facing name exists (a state spine path, an
@@ -114,3 +133,5 @@ reach everything else by path reference. The governing discipline is
 
 *Judged by*: `tests/contract/test_reporting_obligations.py` — a deny list of internal identifiers over a fixture
 line set.
+
+Requirements served: (FR-015).

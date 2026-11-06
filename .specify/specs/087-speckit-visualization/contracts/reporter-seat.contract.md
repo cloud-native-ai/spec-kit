@@ -23,6 +23,8 @@ with `user-invocable: false` (a seat is dispatched, not invoked by a user).
 *Judged by*: `tests/contract/test_reporting_obligations.py` — file existence on both sides, byte equality, and the
 key set.
 
+Requirements served: (FR-005).
+
 ## C-15 · RS-02 — The seat is a roster member row, not a new roster key
 
 The obligation MUST be expressed as a row of the existing `members[]` list in the team schema
@@ -36,18 +38,31 @@ The row's two seat-specific keys are `reporting-territory` (`read` list + `write
 block carries `members[]`, asserts `role: reporter` is the discriminator, and asserts no top-level `reporter:` key
 is introduced.
 
-## C-16 · RS-03 — A missing seat is a NAMED defect
+Requirements served: (FR-006).
+
+## C-16 · RS-03 — A missing seat is a NAMED defect, and the defect set is closed
 
 `skills/internal/create-team/scripts/validate-roster.py` MUST accept a team file path and MUST report a missing
 reporter seat as a defect whose message **names the seat** (the literal `reporter` and the team slug) rather than
-reporting a generic failure. A roster that carries a reporter row whose `agent` does not resolve to the shipped
-template or to a seat instance referencing it is a **second** named defect, distinct from the missing-seat one.
+reporting a generic failure. The script's defect set is **closed at three named defects**, and each is named
+distinctly so a caller can tell them apart:
+
+1. **absent seat** — the roster carries no `role: reporter` member;
+2. **unresolvable agent** — the seat's `agent` does not resolve to the shipped template or to a seat instance
+   referencing it;
+3. **two seats** — the roster carries **two or more** `role: reporter` members. The seat's cardinality is at most
+   one (`data-model.md` E1; INV-03), so a two-seat roster is a defect of its own name rather than a pass.
+
+A fourth defect class MUST NOT be added here; the out-of-domain `reporting-reason` value is RS-04's defect and is
+named there.
 
 Exit codes: `0` = the roster satisfies the obligation (seat present, or an RS-05 reason recorded); `1` = at least
 one named defect; `2` = input error (file missing, frontmatter unparsable).
 
-*Judged by*: `tests/contract/test_roster_reporter_seat.py` — three fixtures (compliant, missing-seat,
-unresolvable-agent) with the exact expected defect name asserted.
+*Judged by*: `tests/contract/test_roster_reporter_seat.py` — four fixtures (compliant, missing-seat,
+unresolvable-agent, two-seats) with the exact expected defect name asserted in each.
+
+Requirements served: (FR-006, FR-021).
 
 ## C-17 · RS-04 — The recorded reason is an accepted alternative, never a silent omission
 
@@ -57,6 +72,8 @@ output, so a reader can tell a recorded omission from a forgotten seat. The acce
 `reporting-reason` value outside that set is a named defect of its own.
 
 *Judged by*: same test file — one fixture per value plus one out-of-domain fixture.
+
+Requirements served: (FR-006, FR-021).
 
 ## C-18 · RS-05 — The runtime-omission condition is exactly FR-021's
 
@@ -68,6 +85,8 @@ execution is required. The condition MUST NOT be widened by a per-team judgement
 *Judged by*: `tests/contract/test_roster_reporter_seat.py` asserts both conjuncts appear and that the "carries the
 duty itself" consequence is stated.
 
+Requirements served: (FR-021).
+
 ## C-19 · RS-06 — The Template's authority is read + write-own-stream, and nothing else
 
 `capability-tools` MUST contain only read-class tools (Read, Grep, Glob) plus the minimal write surface for the
@@ -77,6 +96,8 @@ and that a reporter observed mutating anything outside its own stream artifact i
 
 *Judged by*: `tests/contract/test_reporting_obligations.py` — a deny list over the `capability-tools` value
 (`Agent`, `Task`, `Bash` launching a CLI, any dispatch wrapper) and the presence of the boundary clause.
+
+Requirements served: (FR-005).
 
 ## C-20 · RS-07 — The seat carries the dispatch-injection duties it is subject to
 
@@ -88,6 +109,8 @@ is a defect.
 *Judged by*: `tests/contract/test_reporting_obligations.py` — both anchors resolve to real sections and the Template
 does not contain their clause text.
 
+Requirements served: (FR-005, FR-013).
+
 ## C-21 · RS-08 — The guard is stdlib-only and is called from the create procedure
 
 `skills/internal/create-team/scripts/validate-roster.py` MUST import only the standard library (it runs under the
@@ -96,3 +119,5 @@ step of `references/create-mode.md` or of `SKILL.md` so the obligation is reacha
 
 *Judged by*: `tests/contract/test_roster_reporter_seat.py` — an import audit over the file's `import` lines plus an
 assertion that `create-mode.md` or `SKILL.md` names the script.
+
+Requirements served: (FR-006, FR-017).

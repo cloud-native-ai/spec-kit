@@ -24,10 +24,13 @@ is a defect.
 | Line state vocabulary | `skills/external/sdd-loop-driver/scripts/line-registry.py` (`STATE_VALUES`, `ACTIVE_STATES`) | the digest's projection (`data-model.md` E7) — quoted, never re-enumerated |
 | Registry directory resolution | same engine (`resolve_registry_dir`) | the digest (C-42 restates the order because the script cannot import the engine; that restatement is the one legal duplicate and is marked as such in the script's docstring) |
 | Digest cap default | `scripts/python/status-digest.py` (a declared constant) | the digest's rendered `cap=<n>` and the guard's DG-03 proposition — no other file carries the number |
+| Digest stale bound default | `scripts/python/status-digest.py` (a declared constant) | the digest's rendered `stale` marker and the age it shows (`data-model.md` E5 `stale_bound`) — this row is the declaration point `SC-005`'s "declared stale bound" resolves to, and no other file carries the number |
 
 *Judged by*: `tests/contract/test_reporting_obligations.py` — a scan set derived **from the delivered files
 themselves** (the owner-literal scan's query set is extracted from what landed, not from the author's intention —
 the framework's own One-Source-Of-Truth verification rule) must report exactly one definition site per row.
+
+Requirements served: (FR-018, SC-006).
 
 ## C-48 · OM-02 — The ownership relation to pre-existing owners is declared, in one direction
 
@@ -49,6 +52,8 @@ because the feature deliberately keeps its clauses). The declared set MUST be:
 *Judged by*: `feature-ref.md` § Consuming / Consumed Owners carries the same table, and the contract test asserts
 the two are consistent (no relation appears in one and not the other).
 
+Requirements served: (FR-013, SC-008).
+
 ## C-49 · OM-03 — No new persistent store, channel or registry
 
 The changed-file set MUST introduce:
@@ -61,6 +66,8 @@ The changed-file set MUST introduce:
 
 *Judged by*: `status-digest.py --action guard` proposition RO-13 plus a changed-path audit in
 `tests/contract/test_status_digest.py`.
+
+Requirements served: (FR-018).
 
 ## C-50 · OM-04 — No scheduler, timer, daemon or third-party dependency
 
@@ -76,6 +83,8 @@ discipline already mandates — so no scheduler is needed or permitted.
 
 *Judged by*: `tests/contract/test_status_digest.py` — an AST-level import and call audit over every delivered
 `.py` file, plus a pin on `pyproject.toml`'s dependency lists against the pre-change baseline.
+
+Requirements served: (FR-018, SC-006).
 
 ## C-51 · OM-05 — Pre-existing behaviour is the compatibility baseline, measured by name
 
@@ -95,9 +104,14 @@ regression; it is the amendment's own test update (`FR-019`).
 *Judged by*: the implement-stage baseline/closure name-level diff, plus this clause being the declared expected
 delta.
 
+Requirements served: (FR-019, SC-008, SC-009).
+
 ## C-52 · OM-06 — The delivered set is auditable as a file list, not as a claim
 
 `feature-ref.md` MUST enumerate the delivered paths. The audit MUST be able to answer "which of these paths is a
 scheduler, a store, a channel, a registry?" by reading the list, and the answer MUST be "none".
 
-*Judged by*: `contracts/ownership-map.contract.md` OM-03/OM-04 plus `feature-ref.md` § Delivered Paths.
+*Judged by*: `contracts/ownership-map.contract.md` OM-03/OM-04 (C-49, C-50) plus `feature-ref.md` § Delivered
+Paths, whose table is the enumerated file list this clause reads.
+
+Requirements served: (FR-018, SC-010).

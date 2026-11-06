@@ -27,12 +27,28 @@ The team-roster seat bound to the reporting template. It is a **roster row**, no
 | `reporting-cadence` | duration or `default` | `default` resolves to the long-run profile of E6; an explicit value overrides per structure without a source edit (`FR-003`) |
 | `reporting-reason` | one of `all-lanes-in-session-single-interval` \| `host-cannot-host-reporter` | the recorded-reason channel; **required** exactly when the seat's runtime execution is omitted (`FR-006`, `FR-021`) |
 
-**Cardinality**: at most one reporter seat per team. Two reporter rows is a named defect (E7 INV-03).
+**Cardinality**: at most one reporter seat per team. Two reporter rows is a defect named by contract
+`contracts/reporter-seat.contract.md` C-16 (the closed defect set: absent seat / unresolvable agent / two seats), and
+E7 INV-03 states the same cardinality for the invariant table.
+
+**Population the entity is read over** (`FR-006`; contract `contracts/reporting-obligations.contract.md` C-04 is the
+owner of the rule): exactly two sets and no third — rosters **created or modified** through the team-creation entry
+from the delivering commit onward, plus rosters **passed explicitly by path**. A roster already in the repository
+when this feature lands is outside the population: it is not judged against the seat obligation, it is not
+backfilled with a `reporting-reason`, and it does not become unrunnable. A guard run with no population path
+supplied reports its roster proposition `not-evaluated` rather than judging the pre-existing rosters.
 
 **Relationship**: one Reporter Seat → one Agent Template (E6 owner document defines the obligation; the template
 provides the capability). One Reporter Seat → many Status Reports (E2).
 
 ## E2 — Status Report
+
+**Definition (the vocabulary this spec's four names resolve to).** A **Status Report** is *the one line a single
+tick (or a single trigger) emits* — E2 is exactly that object, and the four names the requirements and the contracts
+use (`status line`, `status report`, `report`, `line`) all denote it. A **Supervision Report** (contract
+`contracts/supervision-report.contract.md`) is that same object in its **sub-class shape**: the line a supervising
+master emits to describe its sub-flows, carrying the E3 projection as its payload. There is no third term and no
+second object; a clause that says "report" or "line" reaches one of these two by this sentence.
 
 One emitted line. It is a **rendering**, not a persisted artifact (`requirements.md` Out of Scope; the received
 carrier is recorded in the emitting flow's existing run record).
@@ -94,7 +110,10 @@ definition that drifts.
 
 ## E5 — Current-State Digest
 
-The on-demand bounded projection (`FR-011`, `FR-012`). An **output**, never a stored object.
+The on-demand bounded projection (`FR-011`, `FR-012`). An **output**, never a stored object. Its **workspace rule**
+is `FR-011`'s: only the registry entries whose `project_dir` equals the current workspace are listed and counted
+against `cap`; an entry belonging to another project is neither rendered nor labelled, so the projection has no
+`other-project` state.
 
 | Field | Type | Source / rule |
 |-------|------|---------------|
@@ -102,7 +121,7 @@ The on-demand bounded projection (`FR-011`, `FR-012`). An **output**, never a st
 | `entries[]` | list of `Digest Entry` (below) | at most `cap` entries |
 | `omitted` | integer | the number of entries the cap dropped; MUST be rendered as `omitted=<n>` when non-zero (`FR-012`) |
 | `cap` | integer | the declared cap in force for this render (default declared in the script, overridable per invocation) |
-| `stale_bound` | duration | the age beyond which an entry is marked stale |
+| `stale_bound` | duration | the declared age beyond which an entry is marked stale; its **declaration point** is the constant in `scripts/python/status-digest.py` (ownership row in `contracts/ownership-map.contract.md` C-47), which is what `SC-005`'s "declared stale bound" resolves to |
 | `state` | `active` \| `nothing-running` | `nothing-running` is an **explicit rendered state** with exit status `3`, never an empty result (`FR-011`, SC-005) |
 | `profile_summary` | one clause | which cadence profiles are in force across the active lines (E6) |
 
@@ -112,6 +131,7 @@ The on-demand bounded projection (`FR-011`, `FR-012`). An **output**, never a st
 |-------|------|---------------|
 | `line_id`, `run_id` | identifiers | registry entry (E7) |
 | `state` | one of the registry's `STATE_VALUES` | **quoted from the engine**, never re-enumerated here |
+| `project_dir` | path | registry entry `project_dir`; the workspace rule above compares it to the current workspace and drops a non-matching entry before the cap is applied |
 | `stage` | string or `-` | registry entry `stage` |
 | `last_activity_at` | ISO timestamp | registry entry `updated_at`, or the newest triplet mtime when the entry declares triplet paths |
 | `age` | duration | now − `last_activity_at`, always rendered |
@@ -161,18 +181,18 @@ spine path for a human to open, but its fields come from the registry.
 
 | ID | Invariant | Judged by |
 |----|-----------|-----------|
-| INV-01 | Every Status Report carries all four content elements; `blocker` is present as `no blocker` rather than omitted | `contracts/status-report.contract.md` SR-02; guard proposition RO-07 |
-| INV-02 | Every Status Report names its structure slug and run stamp; two structures cannot produce an identical unattributed line | SR-01; guard RO-08 |
-| INV-03 | A team has at most one reporter seat, and a missing seat is a **named defect** unless a `reporting-reason` is recorded | `contracts/reporter-seat.contract.md` RS-03, RS-04; guard RO-04 |
-| INV-04 | The two cadence profiles never compete inside one run; a profile switch is recorded before the next line | SR-09; guard RO-09 |
-| INV-05 | No emitted line carries an internal engine identifier where a user-facing name exists; the line is readable by a reader who did not take part in the run | SR-10; `shared/guidelines/user-facing-comprehension.md` |
-| INV-06 | A status report is a one-way statement: it never awaits a response and its presence authorizes nothing | SR-08; guard RO-10 |
-| INV-07 | Every dispatched sub-flow appears in its master's report at least once; presence is a closure requirement, not a best effort | `contracts/supervision-report.contract.md` MV-02; guard RO-11 |
-| INV-08 | The reporter's authority is read + write-own-stream; it never dispatches, authorizes, retries or terminates | RS-06, RS-07 |
-| INV-09 | A significant state transition (sub-flow failure, stall crossing, dispatch failure) produces a line **before** the next tick | MV-03 |
-| INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03; guard RO-12 |
-| INV-11 | An entry whose age exceeds the stale bound is marked stale with its age; stale data is never presented as current | DG-04 |
-| INV-12 | No scheduler, timer service, daemon, third-party dependency, new persistent store, console channel, registry, state spine or ledger is introduced | `contracts/ownership-map.contract.md` OM-05; guard RO-13 |
+| INV-01 | Every Status Report carries all four content elements; `blocker` is present as `no blocker` rather than omitted | `contracts/status-report.contract.md` SR-02 (C-23); guard proposition RO-05 |
+| INV-02 | Every Status Report names its structure slug and run stamp; two structures cannot produce an identical unattributed line | SR-01 (C-22); guard RO-05 |
+| INV-03 | A roster in E1's population has at most one reporter seat, and a missing seat is a **named defect** unless a `reporting-reason` is recorded | `contracts/reporter-seat.contract.md` RS-03 (C-16), RS-04 (C-17); guard RO-04 |
+| INV-04 | The two cadence profiles never compete inside one run; a profile switch is recorded before the next line | SR-09 (C-30); guard RO-09 |
+| INV-05 | No emitted line carries an internal engine identifier where a user-facing name exists; the line is readable by a reader who did not take part in the run | SR-10 (C-31); `shared/guidelines/user-facing-comprehension.md` |
+| INV-06 | A status report is a one-way statement: it never awaits a response and its presence authorizes nothing | SR-08 (C-28); guard RO-10 |
+| INV-07 | Every dispatched sub-flow appears in its master's report at least once; presence is a closure requirement, not a best effort | `contracts/supervision-report.contract.md` MV-02 (C-33); guard RO-06 |
+| INV-08 | The reporter's authority is read + write-own-stream; it never dispatches, authorizes, retries or terminates | RS-06 (C-19), RS-07 (C-20) |
+| INV-09 | A significant state transition (sub-flow failure, stall crossing, dispatch failure) produces a line **before** the next tick | MV-03 (C-34); guard RO-08 |
+| INV-10 | The digest's entry count never exceeds the declared cap and the omitted count is stated when it truncates | `contracts/status-digest.contract.md` DG-03 (C-43); guard RO-13 (the cap constant is a delivery-fact of the changed-file set, not a proposition of its own) |
+| INV-11 | An entry whose age exceeds the stale bound is marked stale with its age; stale data is never presented as current | DG-04 (C-44) |
+| INV-12 | No scheduler, timer service, daemon, third-party dependency, new persistent store, console channel, registry, state spine or ledger is introduced | `contracts/ownership-map.contract.md` OM-04 (C-50); guard RO-13 |
 
 ## State transitions
 

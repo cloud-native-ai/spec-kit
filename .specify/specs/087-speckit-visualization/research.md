@@ -6,6 +6,12 @@ document and the tree disagreed, the measurement is quoted and the document is t
 VIII). Each reading carries the command that produced it so a later reviewer can re-measure instead of trusting
 this file.
 
+**Reading-id namespace (disambiguation, not a second vocabulary)**: the `RO-nn` headings **in this file** are
+*research readings* — a Phase 0 numbering of measured observations, closed at `RO-15`. They are **not** the guard
+propositions, whose `RO-01`…`RO-13` namespace is owned by `contracts/reporting-obligations.contract.md` C-01…C-13.
+The two namespaces share a spelling and nothing else; a reference that means a guard proposition says so and cites
+the contract, and a reference that means a reading cites this file.
+
 ## RO-01 — The repository is the framework source, and every delivery path is mirrored by an existing engine
 
 `python3 scripts/python/sync-mirrors.py --check` → `EXIT=0`;

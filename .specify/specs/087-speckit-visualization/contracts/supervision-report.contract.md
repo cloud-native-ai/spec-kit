@@ -18,6 +18,8 @@ the shipped example demonstrates; it MUST NOT become the definition of the duty.
 
 *Judged by*: guard proposition RO-06 over a two-sub-flow fixture.
 
+Requirements served: (FR-008).
+
 ## C-33 · MV-02 — Presence is a closure requirement
 
 Every dispatched sub-flow MUST appear in the master's report **at least once** per cadence tick while it is
@@ -25,7 +27,9 @@ dispatched. A sub-flow omitted from a tick is a defect named by its label — an
 (`requirements.md` US2 AS1). When a sub-flow completes between ticks it still appears in the tick that observes the
 completion (as `completed`), and only then MAY leave the active set.
 
-*Judged by*: guard proposition RO-11 over a fixture where one of two sub-flows finishes mid-interval.
+*Judged by*: guard proposition RO-06 over a fixture where one of two sub-flows finishes mid-interval.
+
+Requirements served: (FR-008, FR-016).
 
 ## C-34 · MV-03 — A significant transition reports before the clock
 
@@ -33,6 +37,8 @@ A sub-flow failure, a stall crossing and a dispatch failure each MUST produce a 
 (`FR-010`). The report MUST identify the sub-flow's label and the transition, and MUST NOT wait for the cadence.
 
 *Judged by*: guard proposition RO-08 over a fixture whose sub-flow exits non-zero at t = 40 % of the interval.
+
+Requirements served: (FR-010).
 
 ## C-35 · MV-04 — Stall versus slow, with the threshold named
 
@@ -46,6 +52,8 @@ Detection** at render time; this contract carries no number.
 *Judged by*: guard proposition RO-07 and `tests/contract/test_coaching_reporting_duty.py` (a fixture pair at
 just-under and just-over the threshold yields `slow` and `stalled`).
 
+Requirements served: (FR-009, SC-003).
+
 ## C-36 · MV-05 — The coaching skill's single dispatch is in scope and named
 
 `skills/external/coaching-skills` dispatches exactly one subagent per run. Its report MUST name that one Trainee
@@ -54,6 +62,8 @@ dispatch with its state and age — not an empty set and not merely the coach's 
 
 *Judged by*: `tests/contract/test_coaching_reporting_duty.py` asserts the skill's report section names the Trainee
 dispatch as the reported sub-flow.
+
+Requirements served: (FR-008, FR-013).
 
 ## C-37 · MV-06 — The payload's closed field set gains EXACTLY one field
 
@@ -70,6 +80,8 @@ place, unchanged. The set is **extended, never widened** — no "any reporting f
 *Judged by*: `tests/contract/test_coaching_dispatch_contract.py` (its `REQUIRED_FIELDS` tuple gains the new name in
 the same change) plus `tests/contract/test_coaching_reporting_duty.py` (the preamble still forbids unlisted fields).
 
+Requirements served: (FR-019).
+
 ## C-38 · MV-07 — One added forbidden-content class and one added return-handling clause
 
 The forbidden-content list MUST gain: the coach's own status lines or the expected subordinate-state conclusions
@@ -81,6 +93,8 @@ Both MUST be additions; no existing forbidden class and no existing return-contr
 *Judged by*: `tests/contract/test_coaching_reporting_duty.py` asserts the four pre-existing forbidden classes are
 still present plus the new one, and that the return contract still names every pre-existing item.
 
+Requirements served: (FR-019).
+
 ## C-39 · MV-08 — The example demonstrates the duty; the owner document defines it
 
 `coaching-skills/SKILL.md` MUST reference `shared/guidelines/reporting-obligations.md` for the duty's definition and
@@ -90,6 +104,8 @@ obligation (`FR-013`, `FR-019`).
 
 *Judged by*: `tests/contract/test_coaching_reporting_duty.py` — a scan over the skill for the owner's exclusive
 literals (the cadence value and the threshold numbers) must find zero hits.
+
+Requirements served: (FR-013, FR-019).
 
 ## C-40 · MV-09 — Any supervising master carries the same duty through the same payload channel
 
@@ -101,3 +117,5 @@ unchanged.
 
 *Judged by*: `tests/contract/test_reporting_obligations.py` asserts both files carry the pointer and that the
 recipes' command shapes are unchanged from the pre-change baseline.
+
+Requirements served: (FR-013, FR-014).
