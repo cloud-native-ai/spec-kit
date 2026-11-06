@@ -195,3 +195,24 @@ $ head -2 .specify/specs/087-arch-diagram-docs/coverage-baseline.txt
 575 lines = 2 header lines + **573 frozen uncovered clause names**, matching the analyze-stage record. The
 freezer's own summary line is pasted as the pointer in
 `test-evidence/coverage-baseline-pointer.txt`, not as a second copy of the data.
+
+---
+
+## T033 — the zero-change boundary for `skills/external/draw-diagram/**` (measured 2026-11-06, Part 3)
+
+`T-004` decision: the drawing capability is **cited, never edited**. This row does not change a source file; it
+establishes the fact every later row of this feature relies on — the tree is byte-identical to the branch base.
+
+```text
+$ git diff --name-only 24cb4edc -- skills/external/draw-diagram/
+
+exit 0
+```
+
+The output is **empty**: zero changed paths, zero added paths, zero deleted paths. Measured twice with the same
+result (`… | wc -l` → `0`), the second time after Part 2 had already landed its engine and mirror changes, so the
+reading is not an artifact of an unmodified working tree.
+
+Read-as-one-sentence: nothing this feature delivered before this row — not the checker, not its fixtures, not its
+contracts — reached into the drawing capability, and the rows after it are constrained by the same boundary.
+`GATE-5` re-reads this fact at closure with the same command; the two readings must agree.

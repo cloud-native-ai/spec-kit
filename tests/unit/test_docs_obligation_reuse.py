@@ -32,6 +32,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = REPO_ROOT / "skills" / "external" / "create-docs" / "scripts" / "docs-utils.py"
 FIXTURES = REPO_ROOT / "tests" / "fixtures" / "docs-obligation"
 CONTRACT = REPO_ROOT / ".specify" / "specs" / "087-arch-diagram-docs" / "contracts" / "diagram-obligation.contract.md"
+SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "087-arch-diagram-docs"
 
 _spec = importlib.util.spec_from_file_location("docs_obligation_fixtures_reuse", FIXTURES / "conftest.py")
 fixtures = importlib.util.module_from_spec(_spec)
@@ -149,6 +150,74 @@ def test_c014_contract_names_each_guard_file():
     assert "ALLOWED_POST_BASELINE_CHANGES" in plan_body, (
         "the citation must name the mechanism (the allowlist), not only the file"
     )
+
+
+# T034 — the five guard FILES (as distinct from the guard ids of `GUARD_ROWS` above). One row per file, each
+# naming the literal that file pins and the owner that places it. This is the "which files may this feature not
+# weaken" register: the ids above say *what* is pinned, this says *where the pin lives*, and the two are not the
+# same question — `C3` and `C4a` both live in one file while `A1`/`A3`/`A5` share another.
+GUARD_FILES = (
+    ("tests/contract/test_expression_gate_wiring.py", "A1/A3/A5", "def test_a1_docs_template_wiring_subsection",
+     "contracts/diagram-obligation.contract.md"),
+    ("tests/contract/test_docs_command_template.py", "C3/C4a", "def test_c3_section_order",
+     "contracts/diagram-obligation.contract.md"),
+    ("tests/contract/test_confirmation_gates_sweep.py", "KEEP_LIST", '("templates/commands/docs.md", "stop-and-confirm")',
+     "contracts/diagram-obligation.contract.md"),
+    ("tests/contract/test_directory_governance.py", "area-map", '"docs/concepts/documentation-model.md"',
+     "contracts/diagram-obligation.contract.md"),
+    ("tests/contract/test_expression_compatibility.py", "C5", "def test_c5_non_wiring_files_keep_their_frozen_hashes",
+     ".specify/specs/087-arch-diagram-docs/plan.md"),
+)
+
+# The files this feature authored. A row of this feature that appears here while a `GUARD_FILES` path also appears
+# here is a feature editing a guard's assertion set — the one thing `C-014` forbids.
+AUTHORED_BY_THIS_FEATURE = (
+    "tests/unit/test_docs_utils_obligation.py",
+    "tests/unit/test_docs_utils_carriers.py",
+    "tests/unit/test_docs_obligation_reuse.py",
+    "tests/integration/test_docs_obligation_scenarios.py",
+    "tests/integration/test_docs_command_scenarios.py",
+)
+
+
+@pytest.mark.contract
+@pytest.mark.parametrize("guard_file,guard_ids,literal,owner", GUARD_FILES)
+def test_c014_five_guard_files_declared(guard_file: str, guard_ids: str, literal: str, owner: str):
+    """Each of the five guard files is declared here with the literal it pins and the owner that places it.
+
+    The declaration is the deliverable, and it is checked against reality rather than trusted: the file must
+    exist, it must still carry the literal, and the clause that places the guard must be nameable. A register
+    that only lists names is a wish list.
+
+    red-when: one of the five guard files is gone, has lost its pinning literal, or its placing owner no longer
+    names it — the delivery would then be constrained by a guard that is not there.
+    """
+    path = REPO_ROOT / guard_file
+    assert path.is_file(), f"guard file {guard_file} ({guard_ids}) is missing"
+    assert literal in path.read_text(encoding="utf-8"), f"{guard_ids} no longer pins {literal!r} in {guard_file}"
+    owner_path = SPEC_DIR / owner.replace(".specify/specs/087-arch-diagram-docs/", "")
+    assert owner_path.is_file(), f"the owner placing {guard_ids} is missing: {owner}"
+    body = owner_path.read_text(encoding="utf-8")
+    assert guard_file in body, f"{owner} no longer places the guard {guard_file}"
+
+
+@pytest.mark.contract
+def test_c014_no_row_of_this_feature_edits_a_guard_assertion_set():
+    """None of this feature's own row files is one of the five guard files.
+
+    `C-014` says the feature "只加义务指针" — it may add a pointer, it may not rewrite an assertion. The
+    mechanical form of that sentence is a disjointness check between the set of files this feature authored and
+    the set of files whose assertions are the guards: an intersection is the violation.
+
+    red-when: a file that both this feature authored and the guard register names appears in
+    `AUTHORED_BY_THIS_FEATURE` — i.e. a guard's assertion set was edited in the name of adding a pointer.
+    """
+    guard_paths = {row[0] for row in GUARD_FILES}
+    overlap = sorted(guard_paths & set(AUTHORED_BY_THIS_FEATURE))
+    assert not overlap, (
+        "this feature edits a guard's assertion set, which C-014 forbids: " + ", ".join(overlap)
+    )
+    assert len(guard_paths) == 5, f"the guard register must name five distinct files, got {sorted(guard_paths)}"
 
 
 # ---------------------------------------------------------------------------

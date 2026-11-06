@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -319,3 +320,400 @@ def test_c016_deleted_rendered_first(tmp_path: Path):
     sibling = fixtures.copy_fixture("orphan-rendered", tmp_path / "sibling")
     assert verdict_of(obligation(sibling, "--record", record_arg(sibling)), DOC) == (
         "missing", "orphan-rendered"), "with a resolving reference the same face loss is named at tier 5"
+
+
+# ---------------------------------------------------------------------------
+# C-008a — the reconcile convergence loop (`plan.md` § Test Plan table B, rows `C-008a`)
+#
+# The clause is "a reconcile can converge the diagram dimension to zero". Its executable form is the four-step
+# sequence `quickstart.md` S9 registers: R6 finding → R5 produce → second R6 → anti-churn. The R5 step calls
+# `draw-diagram`, which is a model-driven capability and not something a test may invoke; the harness therefore
+# plays that role mechanically by writing exactly what `flow-obligations` `C-003` says a producing run writes —
+# the two faces, the document's resolving relative reference and the traceability record, in one pass. That is a
+# test double for the PRODUCER, never for the checker: every verdict below is the real engine's.
+# ---------------------------------------------------------------------------
+
+import hashlib  # noqa: E402  (kept beside its only use)
+
+
+def produce_diagram(space: Path, doc_rel: str = DOC, exempt: str | None = None) -> Path:
+    """The R5 produce step, written by hand: both faces, the resolving reference, the record, and ONE plan row.
+
+    Shapes are the ones `clean/` registers (source + two rendered faces + one record entry), because `clean/` is
+    this feature's green reference reading and a second shape would be a second fixture standard. The record's
+    `diagrams[]` carries one entry PER DOCUMENT, which is `C-010`'s own unit of identity ("每图一条"): each
+    carrier document that has nothing to depict gets its own generated face naming what it indexes.
+
+    Only the fixture's designated carrier gets the human-written `widget` pipeline; a directory `index.md` gets a
+    generated `index-<type>` flow, which is what a producing run would draw for an index page. Returns the record
+    path, which is the `--record` the second R6 must be given.
+    """
+    asset_dir = space / "docs" / "assets"
+    asset_dir.mkdir(parents=True, exist_ok=True)
+    source = asset_dir / "widget.mmd"
+    svg = asset_dir / "widget.svg"
+    png = asset_dir / "widget.png"
+    source.write_text("graph LR\n  A[Request] --> B[Validator]\n  B --> C[Widget store]\n", encoding="utf-8")
+    svg.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40">\n'
+                   '  <text x="4" y="24">Request -> Validator -> Widget store</text>\n</svg>\n', encoding="utf-8")
+    png.write_text("PNG-PLACEHOLDER 087 produced rendered face (never decoded; only hashed)\n", encoding="utf-8")
+
+    entries = []
+
+    def entry_for(doc_path: str, slug: str, label: str) -> dict:
+        faces = []
+        for suffix in ("svg", "png"):
+            face = asset_dir / f"{slug}.{suffix}"
+            if not face.is_file():
+                face.write_text(
+                    f'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="30">\n'
+                    f'  <text x="4" y="20">{label} structure</text>\n</svg>\n' if suffix == "svg"
+                    else f"PNG-PLACEHOLDER 087 {slug} ({suffix})\n", encoding="utf-8")
+            faces.append({"path": f"docs/assets/{face.name}",
+                          "sha256": hashlib.sha256(face.read_bytes()).hexdigest()})
+        return {
+            "document": doc_path,
+            "engine": "mermaid",
+            "engine_reason": "routing matrix row: flow graph, no zone grammar required",
+            "ldm_summary": "diagram_class=flow; elements=3; relations=2; zones=0",
+            "delivery": {"accepted": True, "unmet": []},
+            "source": f"docs/assets/{slug}.mmd",
+            "rendered": faces,
+        }
+
+    def write_reference(doc_path: Path, target: str) -> None:
+        body = doc_path.read_text(encoding="utf-8")
+        if target in body:
+            return
+        doc_path.write_text(body.rstrip("\n") + f"\n\nIt is drawn in [its structure diagram](../{target}).\n",
+                            encoding="utf-8")
+
+    # the referenced carrier: the two faces `clean/` registers. When the space's designated carrier is the
+    # EXEMPTED one, the produce step draws something else — an exempted document must stay unreferenced, or its
+    # exemption would be overturned by an artifact rather than by a fact (`C-011`).
+    drawn_doc = doc_rel
+    if exempt is not None and doc_rel == exempt:
+        drawn_doc = sorted(
+            doc.relative_to(space).as_posix() for doc in (space / "docs").rglob("*.md")
+        )[0]
+    write_reference(space / drawn_doc, "assets/widget.svg")
+    entries.append(entry_for(drawn_doc, "widget", "Widget pipeline"))
+
+    # every remaining carrier: one generated flow per document (`C-010`: one entry per produced diagram)
+    for doc in sorted((space / "docs").rglob("*.md")):
+        rel_doc = doc.relative_to(space).as_posix()
+        if rel_doc in (doc_rel, drawn_doc) or "/.speckit/" in rel_doc or "/assets/" in rel_doc:
+            continue
+        if exempt is not None and rel_doc == exempt:
+            # an exempted document has nothing to depict; `C-008a` R5 says it is not a residual, so the
+            # producing run does not give it a face (and its own reference must stay absent, `C-011`).
+            continue
+        slug = "index-" + doc.parent.name if doc.name == "index.md" else doc.stem
+        (asset_dir / f"{slug}.mmd").write_text(f"graph LR\n  T[{doc.parent.name} index] --> L[linked pages]\n",
+                                               encoding="utf-8")
+        write_reference(doc, f"assets/{slug}.svg")
+        entries.append(entry_for(rel_doc, slug, doc.parent.name))
+
+    runs = space / "docs" / ".speckit" / "runs"
+    runs.mkdir(parents=True, exist_ok=True)
+    record = {"run_id": "20261106T120000Z-087b2c3d", "feature": "087-arch-diagram-docs", "diagrams": entries}
+    target = runs / "20261106T120000Z-087b2c3d-diagram-trace.json"
+    target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    return target
+
+
+@pytest.mark.integration
+def test_c008a_second_reconcile_zero_findings(tmp_path: Path):
+    """Four steps: the first pass finds, R5 produces, the second pass converges, and nothing churns.
+
+    `SC-003` end to end on a fixture whose documents are all compliant with the PRE-change baseline — which is
+    the point: they were compliant yesterday and are findings today, because the baseline moved (US2).
+
+    Three readings per step, and the middle one is the sharpest: the record the first pass did not have is what
+    turns each document from `missing` into `satisfied`, so the convergence is attributable to the produce step
+    rather than to the checker changing its mind.
+
+    red-when: the second pass still reports an actionable tier, `converged` is not true, or the copy's `git
+    status` is non-empty (cosmetic churn, or the engine writing where it must not).
+    """
+    space = fixtures.copy_fixture("no-diagram", tmp_path)
+
+    first = obligation(space)
+    assert verdict_of(first, DOC) == ("missing", "no-diagram-reference"), (
+        "a document compliant with the pre-change baseline is a finding under the amended one"
+    )
+    assert first["summary"]["converged"] is False, "the first pass cannot be converged while a document lacks a diagram"
+    assert first["summary"]["missing"] >= 1
+
+    record = produce_diagram(space)
+    second = obligation(space, "--record", str(record))
+    assert verdict_of(second, DOC) == ("satisfied", "reference-resolves"), (
+        "the produce step's own record is what makes the document judgeable"
+    )
+    assert second["summary"]["missing"] == 0 and second["summary"]["stale"] == 0, (
+        "the actionable tiers must be zero after the produce step"
+    )
+    assert second["summary"]["not_evaluated"] == 0
+    assert second["summary"]["converged"] is True, "C-013's predicate: a carrier in scope and three tiers at zero"
+
+    # anti-churn, measured the way `C-002` states it: the space is its own throwaway repository whose HEAD is
+    # the post-produce state, and the second run must leave it byte-identical.
+    git_baseline(space)
+    assert git_status(space) == "", "the baseline commit must land after the produce step"
+    third = obligation(space, "--record", str(record))
+    assert third == second, "a repeat run on an unchanged space reports the same verdict (anti-churn)"
+    assert git_status(space) == "", "the convergent run wrote to the space (C-002)"
+
+
+@pytest.mark.integration
+def test_c008a_exemption_does_not_block_convergence(tmp_path: Path):
+    """An exempted space converges while staying unclean: `converged` and `clean` answer different questions.
+
+    The space is the one this clause's family exercises: one carrier with a lawful recorded exemption and one
+    carrier that must be produced. The reading after the produce step is `converged=true` + `clean=false` + a
+    non-zero `exempted` — the classification `FR-004` calls a lawful terminal state, and the one an
+    implementation that used `clean` as its convergence criterion could never reach.
+
+    red-when: an exemption drags `converged` to false (the convergence criterion was `clean`), or `exempted`
+    stops being counted separately from the pass count.
+    """
+    space = fixtures.copy_fixture("exempt-ok", tmp_path)
+    record_doc = produce_diagram(space, exempt=DOC)
+    payload = obligation(space, "--record", str(record_doc))
+    summary = payload["summary"]
+    assert summary["exempted"] == 1, f"the exemption stays visible, got {summary['exempted']}"
+    assert summary["missing"] == 0 and summary["stale"] == 0 and summary["not_evaluated"] == 0, (
+        f"no actionable tier survives the produce step: {summary}"
+    )
+    assert summary["converged"] is True, "an exemption is a lawful terminal state; it cannot block convergence"
+    assert summary["clean"] is False, "an exempted space is not a zero-finding space (FR-004)"
+    assert verdict_of(payload, DOC) == ("recorded-exemption", "exempt-chronological"), (
+        "and the exempted document reads as exempted, not as satisfied"
+    )
+
+
+# ---------------------------------------------------------------------------
+# SC-001 / SC-002 — the four artifacts one run owes, and the negative faces (T046)
+#
+# `T046` authors these under `C-023`'s own two names (`plan.md` table B): `test_sc001_four_artifacts_present` is
+# `C-001`'s subject read on a space (`F::test_c001_four_artifacts_one_run` reads the flow text that promises it),
+# and `test_sc002_removing_either_face_turns_red` is `I::test_sc002_removing_either_face_turns_red` verbatim.
+# Every deletion happens on a `tmp_path` copy — the repository copy of a fixture is its registered state.
+# ---------------------------------------------------------------------------
+
+
+def trace_entry(space: Path, doc_rel: str = DOC) -> dict:
+    """The one `diagrams[]` entry a space's record carries for `doc_rel` (`C-010`'s unit of identity)."""
+    record = json.loads(Path(record_arg(space)).read_text(encoding="utf-8"))
+    hits = [entry for entry in record["diagrams"] if entry["document"] == doc_rel]
+    assert len(hits) == 1, f"expected exactly one record entry for {doc_rel}, got {len(hits)}"
+    return hits[0]
+
+
+@pytest.mark.integration
+def test_sc001_four_artifacts_present(tmp_path: Path):
+    """One run's four on-disk artifacts, read on the space: document, source, rendered face(s), reference.
+
+    `SC-001`'s independent reading. The four are asserted on disk AND read through the engine's verdict, because
+    either half alone is a false green: files on disk with no reference are not the artifact set (nobody can find
+    the diagram), and a reference with no faces is not either. The traceability record is asserted separately —
+    `C-003` owns it, and folding it into the four would make the artifact count five.
+
+    red-when: any of the four is absent while the run still reads satisfied, or the record is counted as one of
+    the four.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    record = record_arg(space)
+    entry = trace_entry(space)
+
+    document = space / DOC
+    assert document.is_file(), "artifact 1: the carrier document"
+    source = space / entry["source"]
+    assert source.is_file(), f"artifact 2: the editable source at {entry['source']}"
+    rendered = [space / face["path"] for face in entry["rendered"]]
+    assert rendered and all(face.is_file() for face in rendered), (
+        f"artifact 3: every rendered face the delivery contract requires: {entry['rendered']}"
+    )
+    body = document.read_text(encoding="utf-8")
+    reference = [line for line in body.splitlines() if "../assets/" in line and "](" in line]
+    assert len(reference) == 1, f"artifact 4: exactly one resolving relative reference, found {reference}"
+
+    payload = obligation(space, "--record", record, "--only", DOC)
+    assert verdict_of(payload, DOC) == ("satisfied", "reference-resolves"), (
+        "the four artifacts must be exactly what the engine calls satisfied"
+    )
+    assert payload["summary"]["converged"] is True and payload["summary"]["clean"] is True
+    assert (Path(record)).is_file(), "the traceability record is the fifth file, cited by C-003 and not counted"
+
+
+@pytest.mark.integration
+def test_sc002_removing_either_face_turns_red(tmp_path: Path):
+    """Each of `C-023`'s three faces, one at a time, on its own copy: every one of them turns the run red.
+
+    The baseline is measured first (the copy reads satisfied), then exactly one face is disturbed — so a red
+    reading is attributable to that face and to nothing else. The two `orphan-*` values are asserted to be
+    DIFFERENT values in different directions: deleting the rendered face names the rendered face, deleting the
+    source names the source, and an implementation that swapped them would pass a count-based assertion while
+    failing this one.
+
+    red-when: any of the three disturbances leaves the space satisfied (which is "unverified", not "satisfied"),
+    or the missing face is named by the other face's reason.
+    """
+    faces = []
+
+    # a) the rendered face is deleted, the source stays, and the document's reference points at the SOURCE (so
+    #    the loss is a face loss and not an unresolvable reference — `C-016` tier 5, not tier 4).
+    no_render = fixtures.copy_fixture("clean", tmp_path / "no-render")
+    record = record_arg(no_render)
+    entry = trace_entry(no_render)
+    assert verdict_of(obligation(no_render, "--record", record), DOC) == ("satisfied", "reference-resolves")
+    for face in entry["rendered"]:
+        (no_render / face["path"]).unlink()
+    document = no_render / DOC
+    document.write_text(
+        document.read_text(encoding="utf-8").replace("../assets/widget.svg", "../assets/widget.mmd"),
+        encoding="utf-8")
+    faces.append(("rendered face deleted", no_render, record, ("missing", "orphan-rendered")))
+
+    # b) the source is deleted, both rendered faces stay, and the reference resolves to a rendered face.
+    no_source = fixtures.copy_fixture("clean", tmp_path / "no-source")
+    record = record_arg(no_source)
+    assert verdict_of(obligation(no_source, "--record", record), DOC) == ("satisfied", "reference-resolves")
+    (no_source / trace_entry(no_source)["source"]).unlink()
+    faces.append(("source deleted", no_source, record, ("missing", "orphan-source")))
+
+    # c) both faces on disk, but the source is touched afterwards: the pair is out of step, not incomplete.
+    stale = fixtures.copy_fixture("clean", tmp_path / "stale")
+    record = record_arg(stale)
+    entry = trace_entry(stale)
+    source = stale / entry["source"]
+    earliest_render = min((stale / face["path"]).stat().st_mtime for face in entry["rendered"])
+    assert verdict_of(obligation(stale, "--record", record), DOC) == ("satisfied", "reference-resolves")
+    untouched = source.read_text(encoding="utf-8")
+    os.utime(source, (earliest_render + fixtures.MTIME_GAP_SECONDS, earliest_render + fixtures.MTIME_GAP_SECONDS))
+    assert source.stat().st_mtime > min((stale / f["path"]).stat().st_mtime for f in entry["rendered"]), (
+        "the mtime step must take effect, or this face would go green for the wrong reason"
+    )
+    assert source.read_text(encoding="utf-8") == untouched, "only the mtime moves; the bytes stay"
+    faces.append(("source touched after render", stale, record, ("stale", "source-newer-than-render")))
+
+    for label, space, record, expected in faces:
+        payload = obligation(space, "--record", record, "--only", DOC)
+        reading = verdict_of(payload, DOC)
+        assert reading == expected, f"{label}: expected {expected}, got {reading}"
+        assert payload["summary"]["converged"] is False, f"{label}: an actionable reading cannot converge"
+        assert payload["summary"]["clean"] is False, f"{label}: an actionable reading cannot be clean"
+
+    reasons = {reading[1] for _, _, _, reading in faces}
+    assert reasons == {"orphan-rendered", "orphan-source", "source-newer-than-render"}, (
+        f"the three faces must be three distinct named reasons, got {sorted(reasons)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# SC-008 — an exemption is visible, and an exemption that no longer holds is reported (T047)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+def test_sc008_exemption_visible_and_superseded(tmp_path: Path):
+    """A recorded exemption is visible and lawful; one whose justification stopped holding is reported, not kept.
+
+    Three readings of one state machine, on a space whose designated carrier has nothing to draw:
+
+    1. **Visible, not a pass** — the document reads `recorded-exemption`, is counted in `exempted`, and the space
+       is therefore not `clean`. An exemption a reader cannot see is an omission with paperwork.
+    2. **It converges** — the same space converges once the other carriers carry diagrams (`converged=true` with
+       `clean=false`): the exemption is a legal end state, never a residual awaiting work.
+    3. **Superseded is reported** — once the document itself carries a resolving reference, the exemption is
+       overturned by a fact, `summary.exemption_superseded` counts it, and the reading becomes unjudgeable. The
+       record is NOT silently retained, and NOT silently deleted.
+
+    red-when: an exempted document reads as satisfied or as missing, an exemption keeps the space from converging,
+    or an exemption contradicted by a resolving reference is still accepted (or quietly removed).
+    """
+    space = fixtures.copy_fixture("exempt-ok", tmp_path)
+    payload = obligation(space)
+    summary = payload["summary"]
+    assert verdict_of(payload, DOC) == ("recorded-exemption", "exempt-chronological"), (
+        "an exempted document is exempted — not satisfied, and not missing"
+    )
+    assert summary["exempted"] == 1, f"the exemption is counted in its own bucket, got {summary['exempted']}"
+    assert summary["clean"] is False, "an exempted space is not a zero-finding space (FR-004: not a pass)"
+    assert summary["satisfied"] == 0, "an exemption MUST NOT be counted as a pass"
+
+    converged = fixtures.copy_fixture("exempt-ok", tmp_path / "converged")
+    converged_payload = obligation(converged, "--record", str(produce_diagram(converged, exempt=DOC)))
+    assert converged_payload["summary"]["converged"] is True, "the exemption does not block convergence"
+    assert converged_payload["summary"]["exempted"] == 1, "and it stays visible after convergence"
+
+    overturned = fixtures.copy_fixture("exempt-superseded", tmp_path / "overturned")
+    record = record_arg(overturned)
+    assert verdict_of(obligation(overturned, "--record", record), DOC) == (
+        "not-evaluated", "exemption-invalid"), "a resolving reference overturns the exemption's own justification"
+    assert obligation(overturned, "--record", record)["summary"]["exemption_superseded"] == 1, (
+        "the overturn is counted, so a report can say why an exemption stopped applying"
+    )
+    exemption = overturned / "docs" / ".speckit" / "exemptions" / "concepts" / "widget-overview.md"
+    assert exemption.is_file(), "the record is retained as evidence — reported, never silently deleted"
+
+
+# ---------------------------------------------------------------------------
+# C-005 / C-006 — the mechanism half of the two flow clauses (`plan.md` table B assigns both here)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.integration
+def test_c005_shared_diagram_single_source(tmp_path: Path):
+    """Two documents may reference one diagram, and the record keeps ONE entry and ONE source for it.
+
+    Sharing is a property of the record, so it is asserted on the record: the second document's reference resolves
+    to the same rendered face, and `diagrams[]` still holds a single entry naming that face. A producing run that
+    forked the diagram per document would show two entries pointing at two different renders.
+
+    red-when: a shared diagram acquires a second record entry (a per-document fork), or the second document's
+    reference no longer resolves to the shared face.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    record_path = produce_diagram(space)
+    other = space / "docs" / "concepts" / "widget-adjacent.md"
+    other.write_text(
+        "# Widget adjacent\n\nThe same pipeline is drawn in "
+        "[the shared diagram](../assets/widget.svg).\n", encoding="utf-8")
+
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    shared = [entry for entry in record["diagrams"] if entry["source"].endswith("widget.mmd")]
+    assert len(shared) == 1, f"a shared diagram keeps exactly one source entry, got {len(shared)}"
+    rendered_paths = [face["path"] for face in shared[0]["rendered"]]
+    assert len(rendered_paths) == len(set(rendered_paths)), f"rendered faces must not fork: {rendered_paths}"
+
+    payload = obligation(space, "--record", str(record_path), "--only", "docs/concepts/widget-adjacent.md")
+    assert payload["summary"]["satisfied"] == 1, (
+        "the second document resolves to the same face and is judged satisfied by the same entry"
+    )
+    assert space.joinpath("docs/assets/widget.mmd").is_file(), "one source file, not one per document"
+
+
+@pytest.mark.integration
+def test_c006_engine_sticky_on_update(tmp_path: Path):
+    """An update to an existing diagram keeps the engine its record names; only a NEW diagram is routed.
+
+    The record is the evidence, so the reading is a before/after comparison of `engine` across an update: the
+    same diagram re-produced keeps `mermaid`, while a diagram the record has never seen carries whatever the
+    producing run routed for it. A flow that re-routed on update would change the first one's engine.
+
+    red-when: re-rendering an existing diagram changes the engine its record names.
+    """
+    space = fixtures.copy_fixture("clean", tmp_path)
+    before = trace_entry(space, DOC)["engine"]
+    record_path = produce_diagram(space)
+    after = json.loads(record_path.read_text(encoding="utf-8"))["diagrams"]
+    kept = [entry for entry in after if entry["document"] == DOC]
+    assert len(kept) == 1, "the existing diagram keeps exactly one record entry after the update"
+    assert kept[0]["engine"] == before, (
+        f"an update must re-use the recorded engine ({before}), not re-route it (got {kept[0]['engine']})"
+    )
+    fresh = [entry for entry in after if entry["document"] != DOC]
+    assert fresh and all(entry["engine"] for entry in fresh), (
+        "a new diagram is the only one that is routed, and it carries the engine it was routed to"
+    )

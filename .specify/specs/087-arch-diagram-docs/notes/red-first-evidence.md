@@ -208,3 +208,105 @@ separate readings. That rewrite is a correction, recorded here rather than silen
 | T030 | `test_c011_*`, `test_c012_*`, `test_c016_deleted_rendered_first` | end-to-end scenarios had no engine | all of the above |
 | T031 | `test_sc005_no_second_engine` (green), `test_sc005_surfaces_reach_by_reference` (declared red) | the pointer text is T037–T044's delivery | — (see § 3) |
 | T032 | `test_record_carries_the_four_faces` (×4), `test_engine_sticky_on_update` | red on the record reader, green without engine change | Part 1's reader |
+
+---
+
+## T033–T048 — Part 3 (US4 boundary → US2 baseline/reconcile → US1 authoring)
+
+Interpreter for every reading below: `/usr/bin/python3` — CPython 3.11.13 / pytest 9.2.0 / typer 0.27.3.
+
+### 1. The delivery under test is text plus two scenario families
+
+Part 3's subject is the *flow text* (`skills/external/create-docs/SKILL.md`,
+`skills/external/improve-docs/SKILL.md`, `templates/commands/docs.md`) and the checker that text calls
+(`docs-utils.py --action obligation`, landed in Part 2). Red-first therefore has two distinguishable reds, and
+both were taken before their implementation landed:
+
+- the **assertions** asserting a pointer/section/row that does not exist yet
+  (`F::*` in `tests/integration/test_docs_command_scenarios.py`), and
+- the **premise** assertions that guard the measurement itself (an anchored heading, a five-row classification
+  table, a parameterised assertion actually being parametrised).
+
+### 2. Red, first moment — the flow assertions before T037–T048 (T035/T036/T045/T046/T047)
+
+```text
+$ /usr/bin/python3 -m pytest tests/integration/test_docs_command_scenarios.py \
+    tests/integration/test_docs_obligation_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+FAILED tests/integration/test_docs_command_scenarios.py::test_c002_assets_subsection_present
+FAILED tests/integration/test_docs_command_scenarios.py::test_c007_baseline_single_owner
+FAILED tests/integration/test_docs_command_scenarios.py::test_c008_authoring_r2_plans_and_r6_checks
+FAILED tests/integration/test_docs_command_scenarios.py::test_c010_authoring_flow_produces
+FAILED tests/integration/test_docs_command_scenarios.py::test_c013_improve_verify_includes_obligation
+FAILED tests/integration/test_docs_command_scenarios.py::test_c014_improve_report
+FAILED tests/integration/test_docs_command_scenarios.py::test_c018_improve_docs_literal_kept
+FAILED tests/integration/test_docs_command_scenarios.py::test_c020_reader_projection_bounded
+FAILED tests/integration/test_docs_command_scenarios.py::test_c021_path_unchanged
+FAILED tests/integration/test_docs_command_scenarios.py::test_c022_no_destructive_reclassification
+FAILED tests/integration/test_docs_command_scenarios.py::test_sc005_surfaces_reach_by_reference
+11 failed, 61 passed
+exit status = 1
+```
+
+The eleven reds are the delivery named task by task: `test_c002_assets_subsection_present` (T038's `#### Assets`),
+`test_c007_baseline_single_owner` (T037's fifth baseline item), `test_c008_authoring_r2_plans_and_r6_checks`
+(T039/T040/T041/T042/T043 + T045's authoring wiring), `test_c010_authoring_flow_produces` and
+`test_c015_authoring_r2` / `test_c016_authoring_r5_render` / `test_c017_authoring_r6` (T045/T048),
+`test_c013_improve_verify_includes_obligation` / `test_c014_improve_report` (T052/T053), and the three
+repository-level readings whose subject is a **later** Part (`test_c018_improve_docs_literal_kept` needs the
+Diagram-sync row of T050, `test_c020_reader_projection_bounded` is T064's reader section, `test_c021_path_unchanged`
+reads that same file's diff line).
+
+### 3. Red, second moment — the premise assertions before their fixtures text existed
+
+Three assertions in this Part are **premises**, not claims: they must be able to say "the thing I am about to
+check is present" out loud instead of failing on an empty read (the same defect Part 2 corrected in
+`test_sc005_engine_domain_is_single_owner`).
+
+| Premise | Was red because | Fixed by |
+|---------|-----------------|----------|
+| `F::test_c004_refusal_carried_through` | the three refusal points are `draw-diagram`'s; the assertion has to read them from the owner by path, so it must first assert the owner carries three Step markers | reads `skills/external/draw-diagram/SKILL.md`; red if the owner stops naming Step 2 / 2.5 / 4 |
+| `F::test_c012_improve_minimal_edit` | the assertion compares the classification table's row count before/after, so the "before" reading has to be the table's own rows (a five-row table, not an empty parse) | pins the pre-existing five rows by name, then the sixth (`Diagram-sync`) |
+| `F::test_c020_reader_projection_bounded` | an absent section and a section of zero lines are different states; the assertion must distinguish them | requires the heading to exist, then bounds it to ≤ 12 lines |
+
+### 4. What actually turned green, measured at the end of Part 3
+
+The four rows above are the expected readings; these are the measured ones (`tests/integration/test_docs_command_scenarios.py`
+plus `tests/integration/test_docs_obligation_scenarios.py`):
+
+```text
+$ /usr/bin/python3 -m pytest tests/integration/test_docs_obligation_scenarios.py     tests/integration/test_docs_command_scenarios.py -q --no-header -p no:cacheprovider --tb=no -rf
+9 failed, 39 passed
+```
+
+The nine reds are all owned by later rows, one line each:
+
+| Red | Owner |
+|-----|-------|
+| `test_c002_by_reference_only` (its `improve-docs` leg) | T058 / T049 |
+| `test_c011_improve_pointer` … `test_c015_named_staleness_keeps_source` (5) | T049–T053 |
+| `test_c016_dispatch_names_both_paths`, `test_c017_residual_five_counts` | T063 |
+| `test_c020_reader_projection_bounded` | T064 |
+
+`test_c021_path_unchanged` is **green**: it measures that the reader document was not renamed, deleted or
+dropped from the area map — which is exactly true in Part 3, where `docs/` is deliberately untouched.
+
+### 5. The one cross-Part red that stays red until its own Part
+
+`tests/unit/test_docs_obligation_reuse.py::test_sc005_surfaces_reach_by_reference` (authored by T031 in Part 2)
+asserts that all three diagram-producing surfaces name `skills/external/draw-diagram`. After T037–T048 two of the
+three do (`create-docs/SKILL.md`, `templates/commands/docs.md`); the third, `improve-docs/SKILL.md`, is delivered
+by **T058** (Part 4, on T049's evidence step). The assertion therefore stays red at the end of Part 3 **by
+construction**, and is declared as remaining work rather than patched: writing the `improve-docs` pointer here
+would execute T049/T058 out of order.
+
+### 6. Two authoring-test repairs the measured readings forced
+
+Both are in the test helper layer, never in the owner text, and both were found by a *false green* rather than by
+a red — which is why they are recorded here:
+
+- `section()` cuts a heading's body at the next heading of any level, so a `####` child of a `###` section was
+  invisible to `subsection()`. The child-must-sit-inside-parent claim could therefore never fail. Fixed by
+  measuring the child's scope inside a parent scope that runs to the next heading at the parent's own level.
+- `bullet_after()` matched the step marker anywhere in a line, so R4's sentence cross-referencing "R6" resolved
+  to R6's bullet, and R4's own cross-reference to "R3"/"R5" made the label ambiguous. Fixed by anchoring on the
+  bullet's label token (`R5`, `R5 写作收敛`), which also keeps an indented `R6` sub-bullet from matching `R4`.
