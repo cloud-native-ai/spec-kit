@@ -81,6 +81,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | speckit-clarify-wrapup | command-wrapup | /speckit.clarify | wrap-up |
 | speckit-derive-wrapup | command-wrapup | /speckit.derive | wrap-up |
 | speckit-measure-wrapup | command-wrapup | /speckit.measure | wrap-up |
+| speckit-status-wrapup | command-wrapup | /speckit.status | wrap-up |
 | speckit-docs-wrapup | command-wrapup | /speckit.docs | wrap-up |
 | speckit-goal-wrapup | command-wrapup | /speckit.goal | wrap-up |
 | speckit-history-wrapup | command-wrapup | /speckit.history | wrap-up |
@@ -282,6 +283,8 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | h-docs-sync-eval | @point:wrap-up | speckit-requirements-wrapup | /speckit.requirements 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-research-wrapup | /speckit.research 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-review-wrapup | /speckit.review 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-measure-wrapup | /speckit.measure 的 Documentation 面 |
+| h-docs-sync-eval | @point:wrap-up | speckit-status-wrapup | /speckit.status 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-sanitize-wrapup | /speckit.sanitize 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-session-wrapup | /speckit.session 的 Documentation 面 |
 | h-docs-sync-eval | @point:wrap-up | speckit-skills-wrapup | /speckit.skills 的 Documentation 面 |
