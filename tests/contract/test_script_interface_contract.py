@@ -4030,6 +4030,7 @@ C32_MEASURED_BEYOND_DECLARATION = (
     ".specify/scripts/python/workspace-guard.py",
     "scripts/python/workspace-guard.py",
     "tests/contract/test_help_body_preservation.py",
+    "tests/contract/test_reanchoring_contract.py",
     "tests/contract/test_sdd_loop_driver_reanchor.py",
     "tests/unit/test_create_new_requirements_separator.py",
     "tests/unit/test_script_interface_cli.py",
