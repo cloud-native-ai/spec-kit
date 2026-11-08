@@ -1,0 +1,39 @@
+# account-clause-coverage.py — analyze-repair run (final; UNCOVERED name list elided, verdict lines kept), 2026-11-08T23:40:30Z
+$ /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/090-re-anchoring
+spec-dir: .specify/specs/090-re-anchoring
+corpus:   .specify/specs/*/contracts/*
+owner forms (shared/definitions/contract-clause-definitions.md): md-bold-closed, md-bold-paren, md-heading, yaml-openapi, yaml-assertions; md-none named
+scanned 288 files: parsed 181 + named-unparseable 107 == 288  [relational sentinel OK]
+  per form (counts owned by notes/clause-form-census.md, re-derive, never restate): md-bold-closed 120 files/1502 clauses; md-bold-paren 4 files/45 clauses; md-heading 47 files/340 clauses; yaml-openapi 9 files/39 clauses; yaml-assertions 1 files/6 clauses; md-none 107 files/0 clauses
+  zero-clause-but-parseable (parse doubt): 0
+  .yaml: parsed 10 / total 10 / named 0
+named-unparseable: 107 (use --list-named to expand)
+clause universe: 1908 distinct names over 181 parsed files (1932 ids extracted)
+  collapsed: 24 extracted ids share a name with another in the same file, so the distinct-name denominator is smaller than the id count — the owner's yaml-openapi form names a clause by its HTTP method key, which one file may declare under several paths. Reported, never absorbed; qualifying those ids is research.md A-8, not this run's call.
+
+== clause coverage (universe: contract files per the owner's forms; claimed: tasks.md [green:] declarations) ==
+claimed clauses (this feature): 31
+baseline: .specify/specs/090-re-anchoring/coverage-baseline.txt (598 names)
+baseline-internal existing uncovered: 598
+UNCOVERED: 003-speckit-agents-command/contracts/agents-command.openapi.yaml#post
+UNCOVERED: 003-speckit-agents-command/contracts/agents-command.openapi.yaml#put
+  UNCOVERED: <598 names, all baseline-internal, elided here; one per line in the pre-repair capture shape>
+
+companion (must be non-empty on a green run): claimed clauses 31, scanned files 288, clause universe 1908, FR universe 10
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 10 of 10 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+exit=0
+
+$ ... --json
+status: ok
+fr: {"universe": 10, "claimed": 10, "uncovered": []}
+clause.claimed: 31 | clause.uncovered: 598 | uncovered_beyond_baseline: 0
+clause-uncovered         pass  598 uncovered, 0 beyond the frozen baseline
+fr-uncovered             pass  10 of 10 FRs cited from citation groups
+clause-unparsable        warn  107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt 
+coverage-baseline-delta  pass  baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+errors: 0 | warnings: 0

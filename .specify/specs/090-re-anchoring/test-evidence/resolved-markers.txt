@@ -1,0 +1,16 @@
+# resolved-marker evidence (F-05 / research.md R9 / feature-ref.md F-1, F-2) — 2026-11-08T23:39:18Z
+$ /usr/bin/python3 .specify/scripts/python/validate-requirements.py .specify/specs/090-re-anchoring/requirements.md
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 97 lines, 14 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+exit=0
+
+$ /usr/bin/python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/090-re-anchoring --json | python3 -c '<label:status list>'
+status: ok
+['dtr-anchor:pass', 'dtr-section-missing:pass', 'dtr-record-incomplete:pass', 'dtr-tension-id:pass', 'dtr-rejected-form:pass', 'expected-sacrifice-unmapped:pass']
+
+$ grep -n 'RESOLVED' .specify/specs/090-re-anchoring/research.md .specify/specs/090-re-anchoring/feature-ref.md
+.specify/specs/090-re-anchoring/research.md:92:## R9 — The requirements artifact has two validator defects, carried to the requirements ow
+.specify/specs/090-re-anchoring/feature-ref.md:98:| F-1 | **RESOLVED 2026-11-09** — `validate-requirements.py` reported `path-marker: SC-0
+.specify/specs/090-re-anchoring/feature-ref.md:99:| F-2 | **RESOLVED 2026-11-09** — `requirements.md` carried no `### Measurement Sources 

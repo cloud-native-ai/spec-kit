@@ -89,7 +89,9 @@ read files and assert; none spawns a subprocess or touches the network, which is
 pytest (`No module named pytest`), so every command in `quickstart.md` pins `/usr/bin/python3`. That trap is recorded
 here rather than discovered at implement time.
 
-## R9 — The requirements artifact has two validator defects, carried to the requirements owner
+## R9 — The requirements artifact has two validator defects, carried to the requirements owner (RESOLVED 2026-11-09)
+
+**Resolved** — both defects were repaired at their owner (`requirements.md`) by commit `ce108516`: SC-001…SC-004 now end with an inline `**Path**: final` marker, and the `### Measurement Sources & Collection Methods` section exists (its four `**SC-00N Source**` lines are what the two decision-tension records resolve against). Evidence: `/usr/bin/python3 .specify/scripts/python/validate-requirements.py .specify/specs/090-re-anchoring/requirements.md` → 0 errors, and `validate-decision-tensions.py` no longer reports `expected-sacrifice-unmapped`. The original finding is preserved below as the dated record; its present-tense wording is read as the state at plan time, not as a live claim.
 
 `validate-requirements.py .specify/specs/090-re-anchoring/requirements.md` reports four `path-marker` errors: `SC-001`
 …`SC-004` carry no `**Path**` marker (`final` / `supporting`), which the owner (`shared/workflow/acceptance-hardening.md`
