@@ -289,14 +289,16 @@ def bash_version_guard(version_body):
         ``__SCRIPT_INTERFACE_VERSION_BODY__`` -- the library and the emitted guard are one
         text, never two copies that can drift. The function is DEFINED in the block, so a
         consumer that cannot find the library can still call it;
-      * the help body is the guard's own four-label surface, stated here because this block may
-        be answering before the script's own usage function has even been parsed.
+      * only ``--version`` is answered here. ``-h`` / ``--help`` belong to the script's own
+        guard, which knows the declared usage and option set; a generic body emitted here
+        would answer help first and hide them (measured on ``check-prerequisites.sh``, whose
+        review flags disappeared from the mirror's help).
 
-    It answers ``--version`` / ``-h`` / ``--help`` before the script's own parsing, honours the
-    bare ``--`` terminator and exits 0 when it answers. An undeclared option is NOT rejected
-    here -- that rejection belongs to the script's own parser, and pre-empting it would change
-    an existing interface. ``version_body`` empty means the source no longer defines the
-    function, which ``project_source`` refuses rather than emitting a broken block.
+    It answers ``--version`` before the script's own parsing, honours the bare ``--``
+    terminator and exits 0 when it answers. An undeclared option is NOT rejected here -- that
+    rejection belongs to the script's own parser, and pre-empting it would change an existing
+    interface. ``version_body`` empty means the source no longer defines the function, which
+    ``project_source`` refuses rather than emitting a broken block.
     """
     lines = [
         "# " + _marker("bash-version-guard"),
@@ -318,20 +320,10 @@ def bash_version_guard(version_body):
         '        [ "$_stop" -eq 1 ] && continue',
         '        case "$_arg" in',
         "            --) _stop=1 ;;",
-        '            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;',
         '            --version) [ -n "$_wanted" ] || _wanted=version ;;',
         "        esac",
         "    done",
         '    case "$_wanted" in',
-        "        help)",
-        '            printf "usage: %s [options]\\n" "${0##*/}"',
-        "            printf 'options:\\n'",
-        "            printf '  -h, --help   print this help and exit\\n'",
-        "            printf '  --version    print the script name and the framework version, "
-        "then exit\\n'",
-        "            printf 'side-effects: none; the flags write nothing\\n'",
-        "            printf 'exit-codes: 0 the flag was answered; 2 an unrecognized option\\n'",
-        "            exit 0 ;;",
         "        version)",
         '            script_interface_version_text "$0" "$(dirname -- "$0")"',
         "            exit 0 ;;",

@@ -581,7 +581,9 @@ def preparse_version_guard(argv: Optional[Iterable[str]] = None,
             continue                       # the module's own parser answers help
         # `--opt=value` is the same declared option as `--opt`; judge the name, not the pair.
         head = token.split("=", 1)[0] if token.startswith("--") and "=" in token else token
-        if (token.startswith("-") and token != "-" and token not in known
+        looks_like_option = (token.startswith("-") and token != "-"
+                             and not any(ch.isspace() for ch in token))
+        if (looks_like_option and token not in known
                     and head not in known
                     and not (len(token) > 1 and token[1].isdigit())):
             print("error: unrecognized option: %s" % token, file=err)

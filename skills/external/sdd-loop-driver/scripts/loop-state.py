@@ -3077,7 +3077,7 @@ def do_self_test(args):
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(
+    parser = _sig_configure(argparse.ArgumentParser(
         prog="loop-state.py",
         description="Read-only loop state snapshot engine (Feature 065 / slice "
                     "065a): one call aggregates spine, Registry, four-piece "
@@ -3085,7 +3085,7 @@ def build_parser():
                     "verdict into a single JSON envelope.",
         epilog=HELP_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
+    ))
     parser.add_argument("--action", choices=["snapshot", "recover", "check-spine"],
                         default="snapshot")
     parser.add_argument("--self-test", action="store_true", dest="self_test",
@@ -3241,11 +3241,18 @@ def _sig_guard(argv):
         # it, so the reader sees the vocabulary and not only the refusal.
         _sig_sys.stderr.write(_SIG_HELP)
         raise _sig_sys.exit(answered.code)
-    stop = line.index('--') if '--' in line else len(line)
-    if '-h' in line[:stop] or '--help' in line[:stop]:
-        _sig_sys.stdout.write(_SIG_HELP)
-        raise _sig_sys.exit(0)
+    # `--help` is NOT answered here: the argparse body owns the authoritative help (it names
+    # the --action choices). The guard's body is the rejection vocabulary.
     return line
+
+
+def _sig_configure(parser):
+    # Add the two help labels the parser cannot give itself (owner: script_interface_cli).
+    try:
+        import script_interface_cli as _sig  # noqa: E402 -- deferred: a copied script may lack it
+    except ImportError:
+        return parser
+    return _sig.configure_parser(parser)
 
 if __name__ == "__main__":
     _sig_sys.argv = [_sig_sys.argv[0]] + _sig_guard(_sig_sys.argv[1:])

@@ -88,7 +88,12 @@ _sig_usage() {
 _sig_answers() {
     _sig_want=""
     _sig_stop=0
+    # Every declared option here takes a VALUE, and that value is an operand: `--cli-args
+    # "--mode no-stream"` is legal, so the token after a declared option is never judged as
+    # an option of this script's own (C-9 judges the option, not its value).
+    _sig_skip=0
     for _sig_tok in "$@"; do
+        if [ "$_sig_skip" -eq 1 ]; then _sig_skip=0; continue; fi
         if [ "$_sig_stop" -eq 1 ]; then continue; fi
         case "$_sig_tok" in
             --) _sig_stop=1 ;;
@@ -96,7 +101,7 @@ _sig_answers() {
             --version) [ -n "$_sig_want" ] || _sig_want=version ;;
             -*)
                 case " --cli --cli-args --detached --line --mode --project-dir --prompt-file --sentinel --stage --state-dir " in
-                    *" $_sig_tok "*) ;;
+                    *" $_sig_tok "*) _sig_skip=1 ;;
                     *)
                         if [ -z "" ]; then
                             printf 'error: unrecognized option: %s\n' "$_sig_tok" >&2

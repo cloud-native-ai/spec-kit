@@ -42,19 +42,10 @@ _script_interface_guard() {
         [ "$_stop" -eq 1 ] && continue
         case "$_arg" in
             --) _stop=1 ;;
-            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
             --version) [ -n "$_wanted" ] || _wanted=version ;;
         esac
     done
     case "$_wanted" in
-        help)
-            printf "usage: %s [options]\n" "${0##*/}"
-            printf 'options:\n'
-            printf '  -h, --help   print this help and exit\n'
-            printf '  --version    print the script name and the framework version, then exit\n'
-            printf 'side-effects: none; the flags write nothing\n'
-            printf 'exit-codes: 0 the flag was answered; 2 an unrecognized option\n'
-            exit 0 ;;
         version)
             script_interface_version_text "$0" "$(dirname -- "$0")"
             exit 0 ;;

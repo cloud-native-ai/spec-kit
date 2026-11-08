@@ -72,6 +72,10 @@ RUNTIME_CACHE_PREFIXES = (
     # capture would destroy the baseline reading the feature's whole comparison
     # rests on.
     ".specify/specs/086-efficient-test-execution/test-evidence/baseline.txt",
+    # 2026-11-09 Feature 089: the same rule, the same lane kind. The 089 line's full-suite
+    # baseline and closure captures quote this guard's own failure text, so the needle is
+    # present by construction; they are generated evidence, not live surfaces.
+    ".specify/specs/089-script-interface-contract/test-evidence/",
 )
 
 #: Migration guards must *name* the old path in order to assert its absence, so they
