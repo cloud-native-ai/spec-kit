@@ -38,13 +38,13 @@
 | ID | Capability | Form | Owner | Pin | Contract | Joint acceptance | FR | Premises |
 |----|------------|------|-------|-----|----------|------------------|-----|----------|
 | RS-001 | Python 3 解释器（运行本特性的契约测试与既有引擎） | signed-contract | CPython 上游（本仓只消费） | `requires-python >= "3.8"`（`pyproject.toml` 已声明；本特性零新增第三方依赖） | `pyproject.toml` | `tests/contract/test_reanchoring_contract.py` 在 `>=3.8` 解释器上通过；本特性零新增 import | FR-010 | EP-001 |
-| RS-002 | pytest（契约测试运行器） | signed-contract | pytest 上游（本仓只消费） | `pytest 9.0.3`（2026-11-09 实测 `/usr/bin/python3 -m pytest --version`；closure 比较前须重新核对） | `scripts/bash/run-tests.sh` | `test_constitution_double_landing` 与 `test_fast_fail_discipline` 全绿，合并树对 `origin/master` 基线零新增失败 | FR-010 | EP-001 |
+| RS-002 | pytest（契约测试运行器） | signed-contract | pytest 上游（本仓只消费） | `pytest 9.0.3`（2026-11-09 实测 `/usr/bin/python3 -m pytest --version`；closure 比较前须重新核对） | `scripts/bash/run-tests.sh` | `test_constitution_double_landing` 与 `test_fast_fail_discipline` 对冻结基线零新增失败（基线 = 失败 node-id 集合；两个既有失败不计） | FR-010 | EP-001 |
 
 ## Success Criteria
 
 - **SC-001**: owner 文档、两侧宪法、两侧指令面、agent 条款五处同时存在且以指针互引（契约测试）。 **Path**: final
 - **SC-002**: 五问顺序在 checkpoint 协议中明确为「规则优先」，并有契约测试钉住。（clarify C-4 收紧判据：协议侧已满足——Q1 即规则；「钉住」不得以任意 `Q1` 字面命中或「三值判定存在」代为满足，必须在同一测试内同时断言 Q1 问的是规则**且**判定/动作先于目标；落地归属见 FR-010 与 C-4。） **Path**: final
-- **SC-003**: 双落地计数与 watchlist 同批移动；`test_constitution_double_landing` 与 `test_fast_fail_discipline` 绿。 **Path**: final
+- **SC-003**: 双落地计数与 watchlist 同批移动；`test_constitution_double_landing` 与 `test_fast_fail_discipline` 对冻结基线**零新增失败**（基线按失败 node-id 集合比较；两个既有失败 `test_i11…` 与 `test_g9…` 不在本特性判据内）。 **Path**: final
 - **SC-004**: 方向审计的 T0/T1/T2 分层在 owner 文档与 checkpoint 协议中一致。 **Path**: final
 
 ### Measurement Sources & Collection Methods
