@@ -507,7 +507,8 @@ PROBE_RESERVE_MARKERS = ("# __sig-probe-reserve:begin", "# __sig-probe-reserve:e
 
 def guard_argv(argv: Optional[Sequence[str]] = None,
                declared: Optional[Iterable[str]] = None,
-               text: Optional[str] = None) -> None:
+               text: Optional[str] = None,
+               unknown_exit: int = UNKNOWN_OPTION_EXIT) -> None:
     """The one-call pre-parse guard a hand-rolled or late-parsing script puts at its top.
 
     Every script T060 backfilled calls it as the first statement of `main()`, in one of two
@@ -528,7 +529,7 @@ def guard_argv(argv: Optional[Sequence[str]] = None,
     vocabulary: a hand-rolled script states its own in `declared`, and guessing one from
     source text would judge a token by a spelling nobody made a contract about.
     """
-    preparse_version_guard(argv, declared=declared, text=text)
+    preparse_version_guard(argv, declared=declared, text=text, unknown_exit=unknown_exit)
 
 
 # --------------------------------------------------------------------------------------
@@ -540,7 +541,8 @@ def preparse_version_guard(argv: Optional[Iterable[str]] = None,
                            script_name: Optional[str] = None,
                            stream=None,
                            declared: Optional[Iterable[str]] = None,
-                           text: Optional[str] = None) -> None:
+                           text: Optional[str] = None,
+                           unknown_exit: int = UNKNOWN_OPTION_EXIT) -> None:
     """Answer `--version` (and reject an unknown option) BEFORE any parser reads `argv`.
 
     Two situations need this: a script that reads `sys.argv` by hand (no argparse at all),
@@ -580,7 +582,7 @@ def preparse_version_guard(argv: Optional[Iterable[str]] = None,
         if (token.startswith("-") and token != "-" and token not in known
                     and not (len(token) > 1 and token[1].isdigit())):
             print("error: unrecognized option: %s" % token, file=err)
-            raise SystemExit(UNKNOWN_OPTION_EXIT)
+            raise SystemExit(unknown_exit)
     if source is not None:
         # Judged before answered, never inside the scan: the fill runs exactly when the guard
         # returns to the caller, i.e. on the path where the module's own help body will print.

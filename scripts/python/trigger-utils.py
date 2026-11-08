@@ -1556,7 +1556,7 @@ except ImportError:  # a sandbox/handler copy carries the engine but not the hel
         return None
 
 def main(argv=None) -> int:
-    _sig_guard(argv, declared=['--action', '--format', '--workspace', '--session', '--turn-id', '--stage', '--signal', '--probe', '--compliance-done', '--rule', '--response', '--flow', '--threshold', '--enabled', '--window', '--probe-budget', '--proposal', '--reason', '--all', '--min-sample'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--action', '--format', '--workspace', '--session', '--turn-id', '--stage', '--signal', '--probe', '--compliance-done', '--rule', '--response', '--flow', '--threshold', '--enabled', '--window', '--probe-budget', '--proposal', '--reason', '--all', '--min-sample'], unknown_exit=EXIT_USAGE)  # answer --version / reject an undeclared option at this engine's documented usage exit
     parser = build_parser()
     try:
         args = parser.parse_args(argv)

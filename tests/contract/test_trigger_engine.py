@@ -195,7 +195,10 @@ def test_c1_stdlib_only():
     if stdlib is None:  # Python 3.8/3.9
         import distutils.sysconfig  # noqa
         stdlib = None
-    first_party_siblings = {"declaration_reader"}  # shipped beside the engine by the same mirror
+    # Shipped beside the engine by the same `scripts/` mirror: `declaration_reader` is the
+    # engine's own reader; `script_interface_cli` is the script-interface helper the engine's
+    # guard imports (with an ImportError fallback so a skill-local copy still runs).
+    first_party_siblings = {"declaration_reader", "script_interface_cli"}
     non_std = []
     for m in sorted(mods):
         top = m.split(".")[0]
