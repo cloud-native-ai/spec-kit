@@ -947,7 +947,8 @@ del _bridge_main
 import sys as _sig_sys
 import pathlib as _sig_pathlib
 
-_SIG_OWNER = _sig_pathlib.Path(__file__).resolve().parent
+_SIG_FILE = globals().get('__file__')
+_SIG_OWNER = _sig_pathlib.Path(_SIG_FILE).resolve().parent if _SIG_FILE else _sig_pathlib.Path('.')
 while not ((_SIG_OWNER / 'pyproject.toml').is_file()
            and (_SIG_OWNER / '.git').exists()) and _SIG_OWNER.parent != _SIG_OWNER:
     _SIG_OWNER = _SIG_OWNER.parent
@@ -956,11 +957,12 @@ if _SIG_OWNER not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_OWNER)
 
 _SIG_SCRIPT = 'skills/external/create-docs/scripts/docs-utils.py'
-_SIG_DECLARED = ('--action', '--allow-special', '--apply', '--items-file', '--moves', '--root', '--scope', '--summary', '--yes')
+_SIG_DECLARED = ('--action', '--allow-special', '--apply', '--items-file', '--json',
+                 '--moves', '--only', '--record', '--root', '--scope', '--summary', '--yes')
 _SIG_HELP = (
     'usage: docs-utils.py [options]\n'
     'options:\n'
-    '  --action\n  --allow-special\n  --apply\n  --items-file\n  --moves\n  --root\n  --scope\n  --summary\n  --yes\n'
+    '  --action\n  --allow-special\n  --apply\n  --items-file\n  --json\n  --moves\n  --only\n  --record\n  --root\n  --scope\n  --summary\n  --yes\n'
     '  -h, --help    print this help and exit\n'
     '  --version     print the script name and the framework version, then exit\n'
     +
