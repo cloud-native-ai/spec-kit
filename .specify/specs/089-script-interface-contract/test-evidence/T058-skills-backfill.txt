@@ -1,0 +1,267 @@
+# T058 skills backfill — per-file record (PKG-4b2a, T061)
+date: 2026-11-07T20:53:57+08:00
+
+Scope: every tracked `.sh` / `.py` under `skills/` (16 bash + 71 python = 87), measured with
+`git ls-files 'skills/**/*.sh' 'skills/**/*.py'`. `scripts/` is untouched by this package
+(last commit `c5c9ccc2` already carried T055-T060).
+
+## Mechanism per language
+
+- bash -> Declared mechanism `bash-version-guard`, inserted right after the shebang by
+  `scripts/python/sync-mirrors.py` (`project_source`), plus one C-7/C-9 adapter block
+  `script-interface:86:begin` .. `script-interface:86:end` that prints the four closed-set
+  labels and judges every token before the bare `--`. 16/16 carry both.
+- python -> Declared mechanism `python-version-bridge` (the same block the engine emits),
+  plus the adapter block. The adapter asks the owner (`script_interface_cli.guard_argv`)
+  for the judgement instead of restating the rule; only the help BODY is local, because
+  its operand sentence is each script's own. 71/71 carry both.
+
+No second version literal was introduced: the version line is re-derived at run time
+from `pyproject.toml` by the bridge, and the only version string in the tree stays the
+one in `pyproject.toml` (0.0.22).
+
+## Disposition summary
+
+| disposition | files | basis |
+|---|---|---|
+| backfilled in place | 87 | every file is reachable as an entry point per C-3/C-4 |
+| pure-library exempt | 0 | measured, not assumed: none of the 87 is sourced/imported-only |
+| declared exception | 0 | see 'Third-party judgement' below |
+
+## Third-party judgement (FR-020 / FR-027)
+
+Sixteen skills under `skills/external/` declare `classification: external` in their
+`SKILL.md`; their scripts are nonetheless framework-quality (they share the repo's
+conventions, imports and test surface), so the applicable ones were backfilled in place
+and NONE was registered in `## Declared Exceptions`. `skills/internal/` (5 skills,
+14 scripts) is framework source and was backfilled in place as required.
+
+Skill counts: skills/external/create-docs=1, skills/external/create-pages=2, skills/external/database-utils=3, skills/external/document-utils=28, skills/external/draw-diagram=7, skills/external/git-utils=4, skills/external/improve-skills=2, skills/external/merge-skills=2, skills/external/sdd-house-keeping=3, skills/external/sdd-loop-driver=18, skills/external/sdd-project-setup=2, skills/external/ssh-utils=1, skills/internal/archive-session=1, skills/internal/code-review=1, skills/internal/create-team=5, skills/internal/manage-agents=1, skills/internal/summarize-project=6
+
+## Per-file list
+
+Columns: path, language, mechanism kind, applicability, disposition, mechanisms present, declared options.
+
+- `skills/external/create-docs/scripts/docs-utils.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--action', '--allow-special', '--apply', '--items-file', '--moves', '--root', '--scope', '--summary', '--yes'
+- `skills/external/create-pages/scripts/scaffold-ci.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --branch,--docs-dir,--force,--image,--platform,--root,--site-name
+- `skills/external/create-pages/scripts/scaffold-hugo.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--action', '--base-url', '--collapse-threshold', '--description', '--docs-dir', '--fetch', '--force', '--hugo-image', '--root', '--runner', '--site-title', '--theme', '--theme-ref', '--theme-url'
+- `skills/external/database-utils/scripts/query.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--config', '--db', '--limit', '--list', '--query', '--schema', '--tables', '-c', '-d', '-l', '-q', '-s', '-t'
+- `skills/external/database-utils/scripts/query_mysql.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--config', '--db', '--limit', '--list', '--query', '--schema', '--tables', '-c', '-d', '-l', '-q', '-s', '-t'
+- `skills/external/database-utils/scripts/query_postgres.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--config', '--db', '--limit', '--list', '--query', '--schema', '--tables', '-c', '-d', '-l', '-q', '-s', '-t'
+- `skills/external/document-utils/scripts/docx/__init__.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/docx/accept_changes.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/docx/comment.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--author', '--initials', '--parent'
+- `skills/external/document-utils/scripts/office/helpers/__init__.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/helpers/merge_runs.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/helpers/simplify_redlines.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/pack.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--original', '--validate'
+- `skills/external/document-utils/scripts/office/soffice.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/unpack.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--merge-runs', '--simplify-redlines'
+- `skills/external/document-utils/scripts/office/validate.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--author', '--auto-repair', '--original', '--verbose', '-v'
+- `skills/external/document-utils/scripts/office/validators/__init__.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/validators/base.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/validators/docx.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/validators/pptx.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/office/validators/redlining.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/check_bounding_boxes.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/check_fillable_fields.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/convert_pdf_to_images.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/create_validation_image.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/extract_form_field_info.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/extract_form_structure.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/fill_fillable_fields.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pdf/fill_pdf_form_with_annotations.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pptx/__init__.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pptx/add_slide.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pptx/clean.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/document-utils/scripts/pptx/thumbnail.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--cols',
+- `skills/external/document-utils/scripts/xlsx/recalc.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/draw-diagram/references/types/echarts/scripts/vendor-echarts.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/draw-diagram/references/types/excalidraw/scripts/render-excalidraw.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/draw-diagram/references/types/mermaid/scripts/measure-svg-layout.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--compare', '--display-width', '--min-font-px'
+- `skills/external/draw-diagram/references/types/mermaid/scripts/render-mermaid.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/draw-diagram/references/types/mermaid/server/docker-run.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/draw-diagram/references/types/plantuml/scripts/measure-svg-layout.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--compare', '--display-width', '--min-font-px'
+- `skills/external/draw-diagram/references/types/plantuml/scripts/render-plantuml.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/git-utils/scripts/git_fleet.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--apply', '--cross-reference', '--diff', '--docs', '--envs', '--inventory', '--jobs', '--no-backup', '--out', '--repo', '--snapshot', '--state-dir', '--timeout'
+- `skills/external/git-utils/scripts/provision-git-server.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --check,--dry-run,--git-home,--git-user,--host,--initial-branch,--pubkey,--repo
+- `skills/external/git-utils/scripts/record-bump.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --status
+- `skills/external/git-utils/scripts/ssh_config_insert.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--alias', '--check', '--comment', '--config', '--dry-run', '--hostname', '--identities-only', '--identity-file', '--indent', '--option', '--port', '--update', '--user', '--verify'
+- `skills/external/improve-skills/scripts/redline-check.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--file-only', '--json', '--quiet', '--scan-all'
+- `skills/external/improve-skills/scripts/skill-shape.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--budget-tokens', '--json', '--quiet'
+- `skills/external/merge-skills/scripts/coverage_probe.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/merge-skills/scripts/provenance_check.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/external/sdd-house-keeping/scripts/hook-health.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--fix', '--json', '--max-sync-timeout', '--project', '--settings'
+- `skills/external/sdd-house-keeping/scripts/logical-framework.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json', '--project', '--strict'
+- `skills/external/sdd-house-keeping/scripts/mechanism-inventory.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json', '--project'
+- `skills/external/sdd-loop-driver/scripts/admission-check.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--base-ref', '--checklists', '--entry-evidence', '--expected-branch', '--json-out', '--lines-manifest', '--project', '--requirements', '--tasks'
+- `skills/external/sdd-loop-driver/scripts/audit-plan-changes.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--base', '--declarations', '--head', '--plan-owned', '--repo'
+- `skills/external/sdd-loop-driver/scripts/audit-test-budget.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--logs-dir', '--spec-dir', '--spine', '--stage-check'
+- `skills/external/sdd-loop-driver/scripts/check-063-overlap.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--branch', '--repo', '--strict-premerge'
+- `skills/external/sdd-loop-driver/scripts/decomposition-check.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json-out', '--mode', '--requirements', '--tasks'
+- `skills/external/sdd-loop-driver/scripts/derive-live-log.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--events', '--finish', '--out'
+- `skills/external/sdd-loop-driver/scripts/hook-stop.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/sdd-loop-driver/scripts/integrate-lines.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--archive', '--gate-cmd', '--lines', '--mirror-cmd', '--registry', '--repo', '--trunk'
+- `skills/external/sdd-loop-driver/scripts/line-registry.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--action', '--active', '--all', '--at', '--base-sha', '--block-size', '--branch', '--cap', '--clarified', '--cli', '--cli-pid', '--cli-start-token', '--commit', '--dest', '--driver-session', '--evidence-ref', '--format', '--heartbeat-path', '--holder-line-id', '--host', '--label', '--last-event', '--line-id', '--line-role', '--log-path', '--manifest', '--mark', '--merge-ready', '--message', '--meta-json', '--override', '--owned-paths', '--parent-line-id', '--pid', '--port-range-start', '--probe-json', '--project-dir', '--prompt-path', '--queued-at', '--ready-for-merge-at', '--reason', '--remote', '--repo-root', '--resources', '--result', '--run-id', '--runner-pid', '--runner-start-token', '--session', '--spine', '--stage', '--start-token', '--state', '--status-path', '--ttl', '--waiting-reason', '--worktree', '--worktree-path', '--worktree-retained', '--write-line'
+- `skills/external/sdd-loop-driver/scripts/loop-state.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--action', '--deadline-grace', '--heartbeat-max-age', '--line-id', '--out', '--probe', '--repo', '--retry-limit', '--self-test', '--spec-dir', '--spine', '--stage', '--start-grace', '--state-dir', '--watch-script'
+- `skills/external/sdd-loop-driver/scripts/overlap-check.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json-out', '--repo', '--spec-dir', '--specs-root'
+- `skills/external/sdd-loop-driver/scripts/pre-analyze-check.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json-out', '--repo', '--spec-dir', '--stage', '--strict', '--triple-structure', '--waive'
+- `skills/external/sdd-loop-driver/scripts/run-stage.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --cli-pid,--command,--deadline-epoch,--engine,--engine-python,--heartbeat,--heartbeat-interval,--heartbeat-path,--last-event,--line-id,--log,--pid-file,--prompt,--registry,--run-id,--runner-pid,--sentinel,--stage,--status-file,--status-path,--worktree
+- `skills/external/sdd-loop-driver/scripts/stage-runner.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --cli,--cli-args,--detached,--line,--mode,--project-dir,--prompt-file,--sentinel,--stage,--state-dir
+- `skills/external/sdd-loop-driver/scripts/watch-hook.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/external/sdd-loop-driver/scripts/watch-target.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --deadline-epoch,--deadline-grace,--finish,--heartbeat,--heartbeat-max-age,--hook-done,--hook-fifo,--interval,--iter,--label,--lease-renew-cmd,--lease-renew-interval,--lease-ttl,--line-id,--log,--manifest,--meta,--once,--out,--pid-file,--raw-stream,--registry,--run-id,--self-test,--sentinel,--stage,--start-grace,--status-file,--timeout,--verbose,--window
+- `skills/external/sdd-loop-driver/scripts/wp-gate.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--check', '--json-out', '--manifest', '--plan-json', '--repo', '--slot-cap-ceiling', '--spine', '--stage', '--stage-attempt', '--wp-attempt', '--wp-id'
+- `skills/external/sdd-loop-driver/scripts/wp-report.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--manual-interventions', '--out-dir', '--sessions', '--spine', '--stage', '--stage-attempt', '--stage-u4-at'
+- `skills/external/sdd-project-setup/scripts/logical-framework.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json', '--project', '--strict'
+- `skills/external/sdd-project-setup/scripts/mechanism-inventory.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json', '--project'
+- `skills/external/ssh-utils/scripts/ssh-exec.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--allow-password', '--check', '--cmd', '--config', '--connect-timeout', '--cwd', '--download', '--dry-run', '--host', '--identity', '--json', '--local', '--mode', '--port', '--remote', '--script', '--script-arg', '--script-interpreter', '--ssh-option', '--stdin-file', '--timeout', '--tty', '--upload', '--user'
+- `skills/internal/archive-session/scripts/export.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--name', '--output', '--project', '--session', '--tool', '--verify'
+- `skills/internal/code-review/scripts/git-delta-review.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: --cat,--code-paths,--comment,--file,--files,--focus,--format,--head,--json,--latest,--line,--list,--no-tests-first,--reason,--renderer,--review,--review-file,--severity,--side-by-side,--since,--skip-with-reason,--spec,--stat,--summary,--triage,--trunk,--unit,--unit-id,--worktree,--yes,-s
+- `skills/internal/create-team/scripts/build-summary-input.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--baseline', '--goal', '--json', '--out', '--repo-root', '--team'
+- `skills/internal/create-team/scripts/dispatch.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/internal/create-team/scripts/match-team-preset.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--goal', '--goal-file', '--presets-dir', '--top'
+- `skills/internal/create-team/scripts/stream-filter.py` | python | python-version-bridge | applicable | backfilled | both | declared: -
+- `skills/internal/create-team/scripts/verify-territory-disjoint.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--input', '--json', '--repo-root'
+- `skills/internal/manage-agents/scripts/config-agent.sh` | bash | bash-version-guard | applicable | backfilled | both | declared: -
+- `skills/internal/summarize-project/scripts/check-coherence.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--json', '--strict'
+- `skills/internal/summarize-project/scripts/detect-project-sources.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--target',
+- `skills/internal/summarize-project/scripts/progress-engine.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--baseline', '--count-deferred', '--db', '--input', '--out', '--print-schema', '--quiet-json', '--strict', '--summary'
+- `skills/internal/summarize-project/scripts/project-db.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--baseline', '--check', '--db', '--export-json', '--init', '--json', '--list-queries', '--load', '--print-ddl', '--query', '--sql', '--update'
+- `skills/internal/summarize-project/scripts/validate-project-input.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--blank-form', '--db', '--emit-json', '--form-skeleton', '--input', '--json', '--print-required'
+- `skills/internal/summarize-project/scripts/verify-chart-data.py` | python | python-version-bridge | applicable | backfilled | both | declared: '--expect', '--json', '--kind', '--svg'
+
+## Verification
+
+### 1. Flag sweep, all 87 files
+For each file: `--help` rc 0, `-h` rc 0 and body identical to `--help`, four closed-set
+labels present (usage / options / side-effects / exit-codes), `--version` exactly one
+line with rc 0, an unknown `--zz-...` token non-zero. Result: 87/87 green, and the
+work-tree status was byte-identical before and after the whole sweep.
+
+### 2. Sample readings (4 bash + 4 python)
+```
+### bash
+-- skills/external/git-utils/scripts/record-bump.sh
+usage: record-bump.sh [arguments]
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+side-effects: appends or annotates one row in the parent ledger; a flag-only invocation writes nothing
+exit-codes: 0 success; 1 a documented check failed; 2 argument or environment error
+   version: record-bump.sh 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/external/create-pages/scripts/scaffold-ci.sh
+usage: scaffold-ci.sh [arguments]
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+side-effects: writes a CI workflow under the docs root when --action apply; a flag-only invocation writes nothing
+exit-codes: 0 success; 1 a documented check failed; 2 argument or environment error
+   version: scaffold-ci.sh 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/internal/create-team/scripts/dispatch.sh
+usage: dispatch.sh <label> <workdir> <prompt-file> [-- <extra cli args>]
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+side-effects: writes the dispatched run's JSONL and live log under the workdir; a flag-only invocation writes nothing
+exit-codes: 0 success; 1 a documented check failed; 2 argument or environment error
+   version: dispatch.sh 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/external/sdd-loop-driver/scripts/watch-target.sh
+usage: watch-target.sh — bounded long-poll watcher (read-only)
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+side-effects: read-only; a flag-only invocation writes nothing
+exit-codes: 0 success; 1 a documented check failed; 2 argument or environment error
+   version: watch-target.sh 0.0.22
+   unknown rc=2
+   help rc=0
+### python
+-- skills/external/database-utils/scripts/query_mysql.py
+usage: query_mysql.py [options]
+options:
+  --config
+  --db
+  --limit
+   version: query_mysql.py 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/external/sdd-loop-driver/scripts/wp-gate.py
+usage: wp-gate.py [options]
+options:
+  --check
+  --json-out
+  --manifest
+   version: wp-gate.py 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/internal/summarize-project/scripts/progress-engine.py
+usage: progress-engine.py [options]
+options:
+  --baseline
+  --count-deferred
+  --db
+   version: progress-engine.py 0.0.22
+   unknown rc=2
+   help rc=0
+-- skills/external/document-utils/scripts/office/pack.py
+usage: pack.py [options]
+options:
+  --original
+  --validate
+  -h, --help    print this help and exit
+   version: pack.py 0.0.22
+   unknown rc=2
+   help rc=0
+```
+
+### 3. Mirror projection
+`python3 scripts/python/sync-mirrors.py --write` then `--check` exits 0.
+
+### 4. Contract + unit suites
+`pytest -q tests/contract/test_script_interface_contract.py tests/unit/test_script_interface_cli.py`
+= 94 passed.
+
+## Findings for T064 (SC-007 zero regression)
+
+Captured against the HEAD copies of the same files (`git archive HEAD skills`), so the
+'before' side is the pre-backfill tree and not a reconstruction:
+```
+bash|git-utils/record-bump.sh|--help|head|rc=2|error: '--help' is not a submodule
+bash|git-utils/record-bump.sh|--help|work|rc=0|usage: record-bump.sh [arguments]~options:~  -h, --help   print this help and exit~  --version    print the script name and the framework version, then exit~side-effects: appends or annotates one row 
+bash|create-pages/scaffold-ci.sh|--help|head|rc=0|scaffold-ci.sh — Stage 3 (pages service): render a hosting platform's CI pipeline.~~Stages 1 and 2 own the content and the rendering: the docs directory is the~content source, and scaffold-hugo.py t
+bash|create-pages/scaffold-ci.sh|--help|work|rc=0|usage: scaffold-ci.sh [arguments]~options:~  -h, --help   print this help and exit~  --version    print the script name and the framework version, then exit~side-effects: writes a CI workflow under th
+bash|sdd-loop-driver/watch-target.sh|--help|head|rc=0|watch-target.sh — bounded long-poll watcher (read-only)~~Single target:~  watch-target.sh --label L --pid-file P --status-file S --log G \~                  [--sentinel STAGE-DONE] [--heartbeat H] [
+bash|sdd-loop-driver/watch-target.sh|--help|work|rc=0|usage: watch-target.sh — bounded long-poll watcher (read-only)~options:~  -h, --help   print this help and exit~  --version    print the script name and the framework version, then exit~side-effects
+bash|create-team/dispatch.sh|--zz-undeclared|head|rc=2|usage: dispatch.sh <label> <workdir> <prompt-file> [-- <extra cli args>]
+bash|create-team/dispatch.sh|--zz-undeclared|work|rc=2|error: unrecognized option: --zz-undeclared~usage: dispatch.sh <label> <workdir> <prompt-file> [-- <extra cli args>]~options:~  -h, --help   print this help and exit~  --version    print the script na
+py|database-utils/query_mysql.py|--help|head|rc=0|usage: query_mysql.py [-h] [--config CONFIG] [--db DB] [--query QUERY]~                      [--limit LIMIT] [--list] [--schema] [--tables]~~Execute read-only MySQL queries~~options:~  -h, --help     
+py|database-utils/query_mysql.py|--help|work|rc=0|usage: query_mysql.py [options]~options:~  --config~  --db~  --limit~  --list~  --query~  --schema~  --tables~  -c~  -d~  -l~  -q~  -s~  -t~  -h, --help    print this help and exit~  --version     pri
+py|summarize-project/progress-engine.py|--version|head|rc=2|usage: progress-engine.py [-h] [--db DB] [--input INPUT] [--baseline BASELINE]~                          [--out OUT] [--summary] [--quiet-json]~                          [--count-deferred] [--strict] 
+py|summarize-project/progress-engine.py|--version|work|rc=0|progress-engine.py 0.0.22
+MISSING|document-utils/office/pack.py|head
+MISSING|document-utils/office/pack.py|work
+py|sdd-loop-driver/wp-gate.py|--zz-undeclared|head|rc=2|usage: wp-gate.py [-h] [--spine SPINE] --stage STAGE --check~                  {plan,preflight,retry} [--plan-json PLAN_JSON]~                  [--manifest MANIFEST] [--repo REPO]~                  [-
+py|sdd-loop-driver/wp-gate.py|--zz-undeclared|work|rc=2|error: unrecognized option: --zz-undeclared~usage: wp-gate.py [options]~options:~  --check~  --json-out~  --manifest~  --plan-json~  --repo~  --slot-cap-ceiling~  --spine~  --stage~  --stage-attempt~
+```
+
+Reading: every previously-documented invocation keeps its exit code; what changes is the
+help body (now the four labelled lines) and the addition of `--version` / `-h`.
+
+## Anomalies found while measuring
+
+1. `record-bump.sh --help` was rc 2 at HEAD (`error: '--help' is not a submodule`) because the
+   script forwarded `"$@"` into `git -C ... submodule` before parsing anything. That is
+   exactly the SC-002 incident shape; the guard now answers `--help` first.
+2. `progress-engine.py --version` was rc 2 at HEAD (argparse rejected the token); it is now
+   one line, rc 0.
+3. `hook-stop.sh` writes a loop-hook event file when run without flags; probing it with an
+   unknown flag created `/home/agent/tmp/sdd-loop-hook` in this session (removed afterwards).
+   The script's own docs say it records an event on invocation, so the file was a probe
+   artifact, not a contract violation; no script was run with a valid action.
+

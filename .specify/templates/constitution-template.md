@@ -354,6 +354,38 @@ run, and the two fail independently — an idle suite keeps its coverage number 
 protection while every report stays green. Naming execution cost as a quality attribute keeps
 the cheaper-to-run suite from becoming a suite nobody runs.
 
+### XX. Script Interface Contract (Declared, Zero-Side-Effect)
+Every functional, non-read-only script in this project — and in every project generated from this
+template — MUST answer three questions before it does anything else:
+- A flag present anywhere on the command line MUST win: `-h` and `--help` MAY change nothing,
+  `--version` MUST print one machine-readable identity line, and every question they answer
+  MUST be answered before any action, write, backup or confirmation prompt.
+- An undeclared option MUST be rejected with a non-zero exit and a recognizable error, never
+  silently ignored and never allowed to reach the main action, including after a bare `--`.
+- Any file that acts when run directly MUST satisfy the same contract whether another file
+  also sources or imports it; a script is a script for that reason alone.
+- A pytest module, a pure library, and a read-only script MUST be treated as
+  outside the REQUIRED set
+  (`--help`/`--version` are recommended for a read-only script and optional elsewhere); the
+  owner document owns the mechanical bases (`pytest-module`, `optional-read-only`, `out-of-scope`,
+  `historical-record`).
+- The rule MUST be pointer, not copy: this principle names its owner document and MUST NOT
+  restate that document's label set or classification steps, and neither MUST any other
+  surface that carries the rule.
+- The rule MUST NOT justify a second checker, an extra command, or a new mandatory workflow
+  step: it is enforced on the surfaces that already exist.
+
+Rationale: a script that writes something as a side effect of being asked what it does
+destroys the one safe move a reader has. The standalone points above are the non-delegable
+core, the full definition (candidate derivation, classification, flag content, the
+zero-side-effect boundary, unrecognized-option rejection, exemptions) lives at
+`.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not
+restated, here; the framework's own source copy of that owner stays at
+`shared/definitions/script-interface-definitions.md` and MUST NOT be the path a downstream
+project is told to open. The rule binds framework scripts, scripts of downstream projects and
+third-party scripts alike, and it does not expire because a script was distributed rather than
+authored here.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 

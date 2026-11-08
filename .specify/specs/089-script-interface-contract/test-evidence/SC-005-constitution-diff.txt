@@ -1,0 +1,60 @@
+# SC-005 — one amendment commit carries the version bump, the Sync Impact Report and Last Amended
+# Host: 499e05d41efc   Date: 2026-11-06T18:29:11+08:00
+# Scope: T028. Path marker: supporting (requirements.md SC-005).
+
+## The amendment commit
+$ git log --oneline -1
+efa3a270 feat(086): land the five governance landings and move their pins (T020-T029)
+
+$ git show --stat HEAD
+commit efa3a270113d1dcc0ff95c3527dcb590e2853468
+Author: Qiming Liu (John) <john.liuqiming@linux.alibaba.com>
+Date:   Fri Nov 6 18:29:00 2026 +0800
+
+    feat(086): land the five governance landings and move their pins (T020-T029)
+    
+    The rule now reaches every surface it is supposed to reach, each by pointer to
+    the one owner page and none restating that page's labels:
+    
+    - templates/constitution-template.md: new XIX. Script Interface Contract
+      (Declared, Zero-Side-Effect). Claim sentence ending in a colon, five MUST
+      bullets, a Rationale: paragraph, lines under 100 chars, and the rule's own
+      scope written into the rule (framework, downstream and third-party scripts
+      alike). It points at .specify/shared/definitions/script-interface-definitions.md
+      and reproduces none of that page's label forms or classification steps.
+    - skills/internal/manage-constitution/SKILL.md: the `- **MUST include**` entry
+      (11 -> 12), naming the owner path and carrying referenced-not-restated.
+    - templates/instructions-template.md: the ambient `## Script Interface
+      Contract` section — two summary sentences plus the owner path, no
+      engine-invocation form, the same scope wording.
+
+## Limb 1 — version line 1.16.0 -> 1.17.0, as the commit diff shows it
+$ git show HEAD -- .specify/memory/constitution.md | grep -E "^[-+]\*\*Version\*\*"
+-**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05
++**Version**: 1.17.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-06
+
+## Limb 2 — the Sync Impact Report block prepended in the same diff
+$ git show HEAD -- .specify/memory/constitution.md | grep -E "^\+(Sync Impact Report|<!--|- Version change)" | head -6
++<!--
++Sync Impact Report
++- Version change: 1.16.0 → 1.17.0 (MINOR; new Principle XX added, 2026-11-06)
+
+## Limb 3 — Last Amended date, and the exit condition of all three in ONE commit
+$ git show HEAD -- .specify/memory/constitution.md | grep -E "^[-+]\*\*Version\*\*"
+-**Version**: 1.16.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-05
++**Version**: 1.17.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-06
+
+## All three limbs are in the same commit object
+  commit: efa3a270113d1dcc0ff95c3527dcb590e2853468
+  (the version line, the Sync Impact Report block and the Last Amended date all live in
+   .specify/memory/constitution.md, so one commit contains all three by construction;
+   the diffs above are that file's own diff in that commit)
+
+## Principle block added by the same commit, with the surface's own numeral
+$ git show HEAD -- .specify/memory/constitution.md | grep -E "^\+### "
++### XX. Script Interface Contract (Declared, Zero-Side-Effect)
+
+## Verdict
+SC-005 = PASS (supporting): the MINOR bump 1.16.0 -> 1.17.0, a new Sync Impact Report block
+naming this amendment's principle, and Last Amended 2026-11-06 are all present in the single
+amendment commit efa3a270.

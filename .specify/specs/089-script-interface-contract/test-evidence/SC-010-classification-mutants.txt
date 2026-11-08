@@ -1,0 +1,60 @@
+# SC-010 — each side of the exemption judgement fails to one mutation
+
+Criterion: SC-010 of `requirements.md` — three copy-tree mutations, each proved by
+reading the classification (`applicable` and the basis that decided it) before and
+after through the checker's `--json`.
+Task: `tasks.md` T071.
+Capture: `/var/tmp/086-5a-sc.py sc010`.
+
+## Method
+
+Each mutant is a `git init` tree under /var/tmp holding ONE ordered history: the file
+is committed in its `before` shape, judged, then mutated and judged again. Only the
+mutation separates the two readings.
+
+## Readings
+
+### (a) bash: a guarded library gains an action after its guard
+
+    lib/a.sh (before)                                  lib/a.sh (after)
+    #!/usr/bin/env bash                                #!/usr/bin/env bash
+    if ! command -v grep ...; then                     if ! command -v grep ...; then
+      echo "dependency missing" >&2                     echo "dependency missing" >&2
+      exit 1                                             exit 1
+    fi                                                 fi
+    library_helper() { ...; }                          library_helper() { ...; }
+                                                       +
+                                                       + case "${1:-}" in
+                                                       +   --help|-h) ... ;;
+                                                       + esac
+                                                       + library_helper run > "$(mktemp)"
+
+    before: applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+    after : applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+
+**SC-010(a)**: MUST HOLD — it did not: applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran" -> applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+
+### (b) python: the literal `if __name__ == "__main__":` block is DELETED
+
+    lib/b.py (before)                    lib/b.py (after)
+    ... def report(): ...                ... def report(): ...
+    if __name__ == "__main__":           (deleted)
+        sys.exit(report())
+
+    with block   : applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+    block deleted: applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+
+**SC-010(b)**: The class did NOT move when the literal block was deleted — C-4's forbidden criterion is inert: the presence of the text `__main__` is not what decides.
+
+### (c) python: the same module gains a `__main__` block that really ACTS
+
+    lib/b.py (before)                    lib/b.py (after)
+    ... def report(): ...                ... def report(): ...
+    (no block)                           if __name__ == "__main__":
+                                             with open(__file__ + ".ran", "w") ...
+
+    before (no block)  : applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+    after  (block acts): applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+
+**SC-010(c)**: MUST HOLD — it did not: applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran" -> applicable=true basis=marker-fired decided_by=run-semantics observed=marker-fired probe="ran"
+

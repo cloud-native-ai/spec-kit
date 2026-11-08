@@ -159,9 +159,12 @@ def test_scripts_present_and_read_only():
 
 
 def _strip_provenance(text: str) -> str:
+    # `_SIG_SCRIPT` is the emitted guard's self-identification: a copied script names its own
+    # path, so the pair differs there by construction, exactly like the three header lines.
     return "\n".join(line for line in text.splitlines()
                      if not line.startswith("# Provenance:")
                      and not line.startswith("# so this external skill")
+                     and not line.startswith("_SIG_SCRIPT = ")
                      and not line.startswith("# tests/contract/test_sdd_house_keeping_skill.py"))
 
 
@@ -170,7 +173,7 @@ def test_inventory_script_parity_with_setup_copy():
         setup = (ROOT / "skills" / "external" / "sdd-project-setup" / "scripts" / name
                  ).read_text(encoding="utf-8")
         house = (SKILL_DIR / "scripts" / name).read_text(encoding="utf-8")
-        assert _strip_provenance(house).rstrip("\n") == setup.rstrip("\n"), (
+        assert _strip_provenance(house).rstrip("\n") == _strip_provenance(setup).rstrip("\n"), (
             f"copied script drifted: {name}")
 
 

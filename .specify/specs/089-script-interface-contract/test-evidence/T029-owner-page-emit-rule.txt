@@ -1,0 +1,102 @@
+# T029 — C-21 owner-page / --emit-rule agreement: the Phase 3 half
+# Host: 499e05d41efc   Date: 2026-11-06T18:29:46+08:00
+# Scope: T029 [blockedBy: T007,T025]. This row records the half the OWNER PAGE owns.
+#   The other half (comparing the emitted JSON against a full run) belongs to T082,
+#   Phase 9, blockedBy T046/T066 — the checker (T032/T045/T048) does not exist yet, so
+#   --emit-rule cannot be run in this package. Recorded, not simulated.
+
+## What C-21 requires of this side
+`contracts/contract-checker-cli.contract.md#C-21`: `--emit-rule` MUST print a JSON object with
+the eight keys labels, flag_forms, separator, version_line, version_source, exempt_basis,
+findings, exceptions; and the guard MUST read the LABEL SET and the CLASS VOCABULARY out of
+the owner page and assert SET EQUALITY with the emitted rule in BOTH directions. The page,
+never a hand-written list, is the compared surface.
+
+## Direction 1 — the label set, as the owner page publishes it
+$ sed -n "/必备内容标签的闭集是/,/唯一书写处/p" shared/definitions/script-interface-definitions.md
+必备内容标签的闭集是:调用形态 (`usage`)、可识别选项 (`options`)、副作用声明 (`side-effects`)、
+退出码含义 (`exit-codes`)。检查器的 `--emit-rule` 输出的 `labels` 键 MUST 与这四条逐项相等;本文档是该闭集的
+唯一书写处,其他落点 MUST 只写摘要加路径。
+
+  Extracted mechanically, exactly as the guard extracts it:
+  label set (page-owned, closed): ['usage', 'options', 'side-effects', 'exit-codes']
+  cardinality: 4 (the page says 四条 = four)
+  the token 'labels' is excluded BY NAME: the same paragraph uses it for the --emit-rule KEY,
+  and the guard states that exclusion explicitly rather than silently taking the first four.
+
+## Direction 1b — the matching unit the page fixes for a restatement scan
+$ sed -n "/复述的匹配单位/,/不自行另写一份/p" shared/definitions/script-interface-definitions.md
+**复述的匹配单位是完整标签,不是单词**。判定某个落点是否复述了本文档,只看它是否写出了完整的标签形态
+`` `{0}` 标签 ``(四个标签各填一次,如 `` `usage` 标签 ``),MUST NOT 以裸普通单词命中判定:这些词在别处承载
+别的 事实(「不完整或错误的选项」讲的是决策质量,「token 使用效率」讲的是效率纪律),拿单词去判会把无关散文判成复述。
+本文档是这条匹配单位的唯一书写处;守护测试从本节读回该形态,不自行另写一份。
+
+## Direction 2 — the class vocabulary, as the owner page publishes it
+C-21 says --emit-rule carries "exempt_basis"; the values that key may take are the reasons a
+candidate is judged exempt. The page's classification (1.4 step 4) states the two class
+outcomes as one sentence; measured by exact substring, not by an approximate probe:
+
+  1.4 step 4, verbatim:
+    4. **运行并观察**:带一个**已声明**的选项运行该副本;标记/效应出现即判适用,不出现即判豁免。
+
+  class outcome nouns the page fixes, and the proof each is present:
+    '判为适用'         present: True
+    '不出现即判豁免'     present: True   (the exempt arm of the SAME sentence; the bare
+                                       '判为豁免' does not occur because the page writes the
+                                       two arms as "即判适用, 不出现即判豁免" — measured, not assumed)
+    '豁免依据'         present: True
+  the page's own nouns for the two sets (opening block): '适用集' and '豁免集'
+  the third class the page names for candidates (the two-hats criterion, 1.5):
+    '判为「第三方/上游脚本」' present: True
+  and the prohibition on a fourth, undeclared state (1.4 step 7):
+    '静默排除禁止' present: True
+
+## Direction 2b — the exemption bases, from the register
+$ sed -n "/^\*\*复算判据\*\*/,/^\*\*处置列取值/p" shared/definitions/script-interface-definitions.md
+**复算判据**(检查器逐条复算,不成立即报 `exception-unverifiable` 并以退出码 1 结束,不是默认放行):
+
+- `path` 指向的文件存在;
+- `path` 位于 `skills/external/<skill>/` 之下;
+- 该技能的 `SKILL.md` 声明 `classification: external`;
+- 四列齐备,任一列为空即复算不成立。
+
+**处置列取值**:保留在入口层 · 停止分发该脚本 · 待上游修复。三者之外 MUST NOT 自造第四种。
+
+  the page's recomputation limbs, numbered by the page's own order:
+    limb 1: `path` 指向的文件存在;
+    limb 2: `path` 位于 `skills/external/<skill>/` 之下;
+    limb 3: 该技能的 `SKILL.md` 声明 `classification: external`;
+    limb 4: 四列齐备,任一列为空即复算不成立。
+
+  the handling column's closed set (its own sentence):
+    保留在入口层 · 停止分发该脚本 · 待上游修复。三者之外 MUST NOT 自造第四种。
+
+## Direction 2c — the eight --emit-rule keys and where each is owned
+The page points at the shape; it does not restate the enumeration (pointer discipline):
+$ grep -n "八键" shared/definitions/script-interface-definitions.md
+190:| `scripts/python/script-interface-check.py` | 全部五节;`--emit-rule` 输出本节第 2 节所列八键,`--check-projection` 输出末节的投射判定 |
+
+  C-21's eight keys, from the contract that owns the enumeration:
+`--emit-rule` MUST print a JSON object whose keys are `labels`, `flag_forms`, `separator`, `version_line`,
+`version_source`, `exempt_basis`, `findings`, `exceptions`. The engine's own classification code MUST read its
+
+## Both directions, as the set equality T082 will execute
+  page -> emitted: every label the page publishes MUST appear in the emitted 'labels' set;
+                   every exemption base the page declares MUST be an 'exempt_basis' value
+                   the rule can emit.
+  emitted -> page: every label the emitted set carries MUST appear on the page; every
+                   'exempt_basis' value the rule emits MUST be a base the page declares.
+  Neither direction is satisfiable from a hand-typed list: the page is the compared surface.
+
+## Verdict for this package's half
+T029 (Phase 3 half) = RECORDED. What the page publishes, in a form a guard can read back:
+  (a) the four-label closed set, in exactly one paragraph, with the --emit-rule KEY name
+      excluded by an explicit stated rule;
+  (b) the matching unit for a restatement scan (the complete label form, not the bare word),
+      which is what makes the label set comparable rather than a bag of ordinary words;
+  (c) the class outcomes (适用 / 豁免 / third-party) and the register's four recomputation
+      limbs plus the handling column's three-valued closed set, which are what an
+      'exempt_basis' value must map onto.
+The emitted-rule side of the equality is T082's, in Phase 9, once the checker exists. This
+record is the input that guard compares against — not a substitute for it, and not a claim
+that the equality already holds.

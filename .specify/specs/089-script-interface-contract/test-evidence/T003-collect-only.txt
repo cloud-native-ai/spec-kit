@@ -1,0 +1,19 @@
+# T003 supplementary — collection proves the suite is collectable
+# date: 2026-11-06T18:16:26+08:00  HEAD: 121b605e
+# Purpose: prove the full suite COLLECTS while the 592 s full run was in flight. The node-id
+#          listing itself is not evidence (the raw full-suite capture holds the real verdict),
+#          so this file records the two counts and the exit codes only.
+
+$ /usr/bin/python3 -m pytest -q --collect-only   (full capture: 7543 lines, discarded)
+7527 tests collected in 1.93s    [exit=0]
+
+$ /usr/bin/python3 -m pytest -m contract -q --collect-only   (tail)
+4305/7527 tests collected (3222 deselected) in 1.90s    [exit=0]
+
+## Note against tasks.md § Environment Prerequisites
+The tasks stage measured `contract`-marked collection at 4303/7501. Measured here: 4305/7527.
+The delta is +2 contract tests and +26 total tests, i.e. this package added ONE unit test file
+(`tests/unit/test_script_interface_cli.py`, 24 tests, none contract-marked) plus in-flight rows;
+the tasks-stage reading was itself taken at 23c7a83b, before several later commits. The premise
+being proved — "contract-marked collection is available" — holds; the exact count is a reading,
+not a pin. No row in this feature pins 4303/7501.

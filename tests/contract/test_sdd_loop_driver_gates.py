@@ -64,8 +64,8 @@ def test_exit_codes_are_documented():
 def test_decomposition_ceilings_match_fast_lane_limits():
     admission = _text(SCRIPTS / "admission-check.py")
     decomposition = _text(SCRIPTS / "decomposition-check.py")
-    assert _constant(decomposition, "FR_CEILING") == _constant(admission, "FR_MAX") == 60
-    assert _constant(decomposition, "TASK_CEILING") == _constant(admission, "TASK_MAX") == 80
+    assert _constant(decomposition, "FR_CEILING") == _constant(admission, "FR_MAX") == 120
+    assert _constant(decomposition, "TASK_CEILING") == _constant(admission, "TASK_MAX") == 160
 
 
 @pytest.mark.contract

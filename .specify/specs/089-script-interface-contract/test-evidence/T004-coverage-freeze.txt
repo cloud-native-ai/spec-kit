@@ -1,0 +1,50 @@
+# T004 — contract-clause coverage baseline freeze
+
+Run 2026-11-06 in /cws_data/cloud-native-ai/spec-kit on branch `089-script-interface-contract`
+(repair commit parent `5c2bb98f`). Engine: `scripts/python/account-clause-coverage.py`.
+
+## Command
+
+    python3 scripts/python/account-clause-coverage.py .specify/specs/089-script-interface-contract --freeze \
+      > .specify/specs/089-script-interface-contract/coverage-baseline.txt
+    echo "exit=$?"                 # exit=0
+    wc -l .specify/specs/089-script-interface-contract/coverage-baseline.txt
+                                   # 575 = 2 header lines + 573 frozen names
+
+`--freeze` prints the baseline document and writes nothing; the redirect is the write.
+
+## Readings of the freeze run (as required by T004)
+
+    python3 scripts/python/account-clause-coverage.py .specify/specs/089-script-interface-contract
+
+    companion (must be non-empty on a green run): claimed clauses 38, scanned files 270,
+      clause universe 1714, FR universe 31
+      [clause-uncovered]        pass (573) — 573 uncovered, 0 beyond the frozen baseline
+      [fr-uncovered]            fail (31)  — 0 of 31 FRs cited from citation groups
+      [clause-unparsable]       warn (107) — 107 files yield no clause id under the owner's forms
+      [coverage-baseline-delta] pass (0)   — baseline holds 573 names; 573 uncovered items are
+                                             baseline-internal and do not block
+    status: uncovered
+
+| Quantity | Reading |
+|---|---|
+| FR universe | 31 |
+| claimed clauses (this spec) | 38 |
+| clause universe (whole corpus) | 1714 (1738 ids, 24 collapsed duplicates) |
+| frozen names in the baseline | 573 |
+| uncovered clause names beyond the baseline | 0 |
+| scanned files | 270 (163 parsed + 107 named-unparseable) |
+
+## What the two failing/limb-free verdicts mean
+
+- `clause-uncovered` **passes**: every clause name this spec leaves uncovered is already in the
+  frozen corpus baseline, so this spec introduces no new uncovered clause name. Sibling specs'
+  unclaimed YAML/`C-0NN` names are baseline-internal by construction (the freeze excludes this
+  spec directory from the corpus).
+- `fr-uncovered` **fails with 31**: the engine reads FR claims out of a parenthetical *citation
+  group inside each clause block*, and these contracts declare their FR coverage on one
+  `**FR coverage**:` header line instead. The 38 clauses are all claimed; the **citation form**
+  is what the engine does not find. Recorded here rather than papered over: the clause side is
+  clean, the FR-citation side is a pre-existing shape of this contract set.
+- The exit status of the account run is `uncovered`, i.e. **not** `baseline-missing`. That is the
+  gate this evidence closes: an absent baseline is never read as an empty exemption list.

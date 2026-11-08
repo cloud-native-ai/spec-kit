@@ -111,6 +111,10 @@ Before creating or changing a machine-managed store, ask: **if two branches run 
 
 Agent-created scratch MUST use a sanctioned temp root already matched by `.gitignore`; bare system temp and ad-hoc directories are forbidden. Roots, cleanup and exceptions: `.specify/shared/guidelines/temp-directory-discipline.md`. Every other directory follows `.specify/shared/guidelines/directory-governance.md` — a directory with no documented meaning MUST NOT be created.
 
+## Script Interface Contract
+
+Every functional, non-read-only script answers `-h` / `--help` and `--version` without acting and rejects an undeclared option; pytest modules, pure libraries and read-only scripts are outside the required set (read-only: recommended, optional). The rule binds framework, downstream and third-party functional scripts alike; its full definition is owned by `.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not restated.
+
 ## Task Complexity Rubric
 
 Right-size thinking: under-thinking complex or high-stakes work causes defects and rework (a **quality** cost); over-thinking trivial work wastes time and adds noise (an **efficiency** cost). Classify by scope, uncertainty, blast radius, cross-cutting impact and requirements clarity, then take the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier**; treat unclassifiable work as **Standard** (the default), and unclear requirements as themselves a High-stakes signal — clarify first.

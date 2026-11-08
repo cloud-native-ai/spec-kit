@@ -1,0 +1,492 @@
+# RED evidence — Feature 089, package 2a (T012–T019, US4 contract tests)
+# Run: 2026-11-06T10:20:35Z  tree: /cws_data/cloud-native-ai/spec-kit  branch: 089-script-interface-contract
+# Commit: 5068bf7c (uncommitted package-2a work tree)
+# Command: /usr/bin/python3 -m pytest -q tests/contract/test_script_interface_contract.py tests/contract/test_constitution_double_landing.py
+
+.FFFFFFFF.FF.FF......F..F....FFFF..                                      [100%]
+=================================== FAILURES ===================================
+_________ test_c24_template_carries_the_principle_with_the_house_shape _________
+
+    def test_c24_template_carries_the_principle_with_the_house_shape():
+        assert TEMPLATE.is_file(), f"missing: {TEMPLATE.relative_to(ROOT)}"
+        text = _text(TEMPLATE)
+        titles = _principle_titles(text)
+>       assert PRINCIPLE_TITLE in titles, (
+            f"`templates/constitution-template.md` carries no principle titled {PRINCIPLE_TITLE!r}; "
+            f"titles present: {titles[-3:]}"
+        )
+E       AssertionError: `templates/constitution-template.md` carries no principle titled 'Script Interface Contract (Declared, Zero-Side-Effect)'; titles present: ['Directory Governance (Named, Documented, Ignored When Temporary)', 'Grounded Naming', 'Self-Explanatory Structure (不言自明)']
+E       assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in ['Library-First Design', 'CLI & Text I/O Interface', 'Documentation-First', 'Test-First Development', 'Integration & Contract Testing', 'Observability, Versioning & Simplicity', ...]
+
+tests/contract/test_script_interface_contract.py:222: AssertionError
+_ test_c24_template_principle_points_at_the_owner_and_does_not_copy_its_steps __
+
+    def test_c24_template_principle_points_at_the_owner_and_does_not_copy_its_steps():
+        text = _text(TEMPLATE)
+>       block = _principle_block(text, PRINCIPLE_TITLE)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_script_interface_contract.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# [PROJECT_NAME] Constitution\n<!--\nThis is a PRESET template containing a set of generic project principles\nand wo...t Amended**: [LAST_AMENDED_DATE]\n<!-- Example: Version: 1.0.0 | Ratified: 2025-01-01 | Last Amended: 2025-01-01 -->\n'
+title = 'Script Interface Contract (Declared, Zero-Side-Effect)'
+
+    def _principle_block(text: str, title: str) -> str:
+        """One principle's block: its heading line plus body up to the next `### ` or `## `."""
+        m = re.search(
+            rf"^### [IVXLC0-9]+\. {re.escape(title)}\s*$(.*?)(?=^### |^## |\Z)",
+            text, re.M | re.S,
+        )
+>       assert m, f"principle {title!r} not found on this surface"
+E       AssertionError: principle 'Script Interface Contract (Declared, Zero-Side-Effect)' not found on this surface
+E       assert None
+
+tests/contract/test_script_interface_contract.py:98: AssertionError
+_______________ test_c25_live_constitution_carries_the_principle _______________
+
+    def test_c25_live_constitution_carries_the_principle():
+        assert LIVE.is_file(), f"missing: {LIVE.relative_to(ROOT)}"
+        text = _text(LIVE)
+        titles = _principle_titles(text)
+>       assert PRINCIPLE_TITLE in titles, (
+            f".specify/memory/constitution.md carries no principle titled {PRINCIPLE_TITLE!r}; "
+            f"titles present: {titles[-3:]}"
+        )
+E       AssertionError: .specify/memory/constitution.md carries no principle titled 'Script Interface Contract (Declared, Zero-Side-Effect)'; titles present: ['Directory Governance (Named, Documented, Ignored When Temporary)', 'Grounded Naming', 'Self-Explanatory Structure (不言自明)']
+E       assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in ['Specification-Driven Development (SDD) as Foundation', 'Feature-Centric Development', 'Intent-Driven Development', 'Test-First & Contract-Driven Implementation', 'AI Agent Integration Standards', 'Continuous Quality & Observability', ...]
+
+tests/contract/test_script_interface_contract.py:270: AssertionError
+______ test_c25_amendment_carries_sync_report_minor_bump_and_last_amended ______
+
+    def test_c25_amendment_carries_sync_report_minor_bump_and_last_amended():
+        text = _text(LIVE)
+        head = "\n".join(text.splitlines()[:40])
+        assert "Sync Impact Report" in head, (
+            "the amendment must prepend a Sync Impact Report block at the top of the file"
+        )
+        assert re.search(r"Version change:\s*\d+\.\d+\.\d+\s*(?:→|->)\s*\d+\.\d+\.\d+", head), (
+            "the Sync Impact Report must state the version change"
+        )
+        # The report must name THIS amendment's principle; a fixed older title alone would let any
+        # later amendment pass without naming its own subject.
+>       assert AMBIENT_HEADING in head, (
+            f"the Sync Impact Report must name the principle THIS amendment added "
+            f"({PRINCIPLE_TITLE!r}); the head names none of it"
+        )
+E       AssertionError: the Sync Impact Report must name the principle THIS amendment added ('Script Interface Contract (Declared, Zero-Side-Effect)'); the head names none of it
+E       assert 'Script Interface Contract' in '<!--\nSync Impact Report\n- Version change: 1.15.0 → 1.16.0 (MINOR; new Principle XIX added, 2026-11-05)\n- Added pri...tignore` before its first write\n- Modified principles: None\n- Removed sections: None\n- Templates requiring updates:'
+
+tests/contract/test_script_interface_contract.py:300: AssertionError
+______________ test_c26_generator_skill_carries_the_mandate_entry ______________
+
+    def test_c26_generator_skill_carries_the_mandate_entry():
+        assert SKILL.is_file(), f"missing: {SKILL.relative_to(ROOT)}"
+        block = _must_include_block(_text(SKILL))
+        names = [m.group(1).strip() for m in SKILL_ENTRY_RE.finditer(block)]
+>       assert PRINCIPLE_TITLE in names, (
+            f"the `- **MUST include**` block carries no {PRINCIPLE_TITLE!r} sub-entry; entries: "
+            f"{names[-3:]}"
+        )
+E       AssertionError: the `- **MUST include**` block carries no 'Script Interface Contract (Declared, Zero-Side-Effect)' sub-entry; entries: ['Directory Governance (Named, Documented, Ignored When Temporary)', 'Grounded Naming', 'Self-Explanatory Structure (不言自明)']
+E       assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in ['Documentation-First', 'Feature-centric development', 'Code as the Single Source of Truth', 'Documentation Naming & Location Conventions', 'Better-Harness Orientation', 'One Source of Truth (Authority & Reference Discipline)', ...]
+
+tests/contract/test_script_interface_contract.py:348: AssertionError
+___________________ test_c27_ambient_section_shape[template] ___________________
+
+path = PosixPath('/cws_data/cloud-native-ai/spec-kit/templates/instructions-template.md')
+
+    @pytest.mark.parametrize(
+        "path", [INSTRUCTIONS_TEMPLATE, INSTRUCTIONS_LIVE], ids=["template", "live"]
+    )
+    def test_c27_ambient_section_shape(path):
+        assert path.is_file(), f"missing: {path.relative_to(ROOT)}"
+        text = _text(path)
+        headings = _sections_h2(text)
+>       assert headings.count(AMBIENT_HEADING) == 1, (
+            f"{path.relative_to(ROOT)} carries the `## {AMBIENT_HEADING}` heading "
+            f"{headings.count(AMBIENT_HEADING)} times; expected exactly one"
+        )
+E       AssertionError: templates/instructions-template.md carries the `## Script Interface Contract` heading 0 times; expected exactly one
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7efc25040fc0>('Script Interface Contract')
+E        +    where <built-in method count of list object at 0x7efc25040fc0> = ['Project Overview', 'Documentation Map', 'Proactive Flow Trigger', 'Fact, Correctness & Logic Checks (Input Sanity)', 'SDD Routing Decision (SDD 分流裁决)', 'One Source Of Truth', ...].count
+
+tests/contract/test_script_interface_contract.py:401: AssertionError
+_____________________ test_c27_ambient_section_shape[live] _____________________
+
+path = PosixPath('/cws_data/cloud-native-ai/spec-kit/.specify/instructions.md')
+
+    @pytest.mark.parametrize(
+        "path", [INSTRUCTIONS_TEMPLATE, INSTRUCTIONS_LIVE], ids=["template", "live"]
+    )
+    def test_c27_ambient_section_shape(path):
+        assert path.is_file(), f"missing: {path.relative_to(ROOT)}"
+        text = _text(path)
+        headings = _sections_h2(text)
+>       assert headings.count(AMBIENT_HEADING) == 1, (
+            f"{path.relative_to(ROOT)} carries the `## {AMBIENT_HEADING}` heading "
+            f"{headings.count(AMBIENT_HEADING)} times; expected exactly one"
+        )
+E       AssertionError: .specify/instructions.md carries the `## Script Interface Contract` heading 0 times; expected exactly one
+E       assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7efc2505a2c0>('Script Interface Contract')
+E        +    where <built-in method count of list object at 0x7efc2505a2c0> = ['Project Overview', 'Documentation Map', 'Proactive Flow Trigger', 'Fact, Correctness & Logic Checks (Input Sanity)', 'SDD Routing Decision (SDD 分流裁决)', 'One Source Of Truth', ...].count
+
+tests/contract/test_script_interface_contract.py:401: AssertionError
+_______________ test_c27_template_and_live_ambient_bodies_agree ________________
+
+    def test_c27_template_and_live_ambient_bodies_agree():
+        """C-27's second sentence: the live file carries "the same body, produced by the
+        reconcile". Whitespace is normalised, because the reconcile may re-wrap."""
+>       tpl = _flat(_section(_text(INSTRUCTIONS_TEMPLATE), AMBIENT_HEADING)).strip()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_script_interface_contract.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = '# Project Instructions for AI Agents\n\n## Project Overview\n[Brief summary of what the LLM need to know, key informa...g (`.specify/shared/workflow/tool-reuse-gate.md`); create/improve via the `create-tools` / `improve-tools` skills.\n\n'
+heading = 'Script Interface Contract'
+
+    def _section(text: str, heading: str) -> str:
+        """One `## ` section's body: everything up to the next `## ` (or EOF)."""
+        m = re.search(
+            rf"^## {re.escape(heading)}\s*$(.*?)(?=^## |\Z)", text, re.M | re.S
+        )
+>       assert m, f"section {heading!r} not found on this surface"
+E       AssertionError: section 'Script Interface Contract' not found on this surface
+E       assert None
+
+tests/contract/test_script_interface_contract.py:111: AssertionError
+___________ test_c29_no_landing_surface_carries_the_banned_literals ____________
+
+    def test_c29_no_landing_surface_carries_the_banned_literals():
+        literals = _owner_banned_literals()
+        leaks = []
+        for path in LANDING_SURFACES:
+            assert path.is_file(), f"landing surface missing: {path.relative_to(ROOT)}"
+            text = _text(path)
+            hits = [lit for lit in literals if lit in text]
+            if hits:
+                leaks.append((path.relative_to(ROOT).as_posix(), hits))
+>       assert not leaks, (
+            "C-29: these landings restate the owner page's own list instead of pointing at it: "
+            + "; ".join(f"{p} -> {h}" for p, h in leaks)
+        )
+E       AssertionError: C-29: these landings restate the owner page's own list instead of pointing at it: templates/constitution-template.md -> ['options']; templates/instructions-template.md -> ['usage']; .specify/instructions.md -> ['usage']
+E       assert not [('templates/constitution-template.md', ['options']), ('templates/instructions-template.md', ['usage']), ('.specify/instructions.md', ['usage'])]
+
+tests/contract/test_script_interface_contract.py:494: AssertionError
+______ test_c29_the_four_labels_appear_on_the_owner_page_and_nowhere_else ______
+
+    def test_c29_the_four_labels_appear_on_the_owner_page_and_nowhere_else():
+        """The four labels are the page's closed set; a landing that loses its pointer while
+        keeping a label would pass the scan above trivially, so the pointer is asserted too."""
+        labels = _owner_banned_literals()[:4]
+        owner = _text(OWNER)
+        assert all(lit in owner for lit in labels), "the owner page lost one of its own labels"
+        flat_refs = [
+            p for p in LANDING_SURFACES
+            if ".specify/shared/definitions/script-interface-definitions.md" in _flat(_text(p))
+        ]
+        # The two constitution surfaces reach the owner through the constitution's own pointer
+        # discipline; the instructions surfaces and the generator skill name the path directly.
+>       assert len(flat_refs) >= 4, (
+            "C-29: a landing that carries neither a label nor the owner path is not a pointer — "
+            f"only {len(flat_refs)} of {len(LANDING_SURFACES)} landings name the owner path"
+        )
+E       AssertionError: C-29: a landing that carries neither a label nor the owner path is not a pointer — only 0 of 5 landings name the owner path
+E       assert 0 >= 4
+E        +  where 0 = len([])
+
+tests/contract/test_script_interface_contract.py:512: AssertionError
+__________ test_c30_owner_table_and_checker_payload_agree_row_for_row __________
+
+    def test_c30_owner_table_and_checker_payload_agree_row_for_row():
+        owner_rows = _owner_exception_rows()
+>       payload = _checker_exceptions_payload()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_script_interface_contract.py:596: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _checker_exceptions_payload() -> list[dict]:
+        """Run the checker with `--json --emit-rule` and read the `exceptions` payload.
+    
+        `--emit-rule` is the one mode that answers without probing 700+ candidates, and C-21 fixes
+        its `exceptions` key; the register itself is the owner page's, so this is the checker's
+        recomputation of it rather than a second copy.
+        """
+        import json
+        import subprocess
+        import sys
+    
+>       assert CHECKER.is_file(), (
+            f"the checker is missing: {CHECKER.relative_to(ROOT)} — T032/T045 have not landed yet"
+        )
+E       AssertionError: the checker is missing: scripts/python/script-interface-check.py — T032/T045 have not landed yet
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/cws_data/cloud-native-ai/spec-kit/scripts/python/script-interface-check.py').is_file
+
+tests/contract/test_script_interface_contract.py:556: AssertionError
+_________________ test_c1_template_carries_both_new_principles _________________
+
+    def test_c1_template_carries_both_new_principles():
+        text = _text(TEMPLATE)
+        titles = _template_titles(text)
+        missing = [t for t in NEW_TEMPLATE_TITLES if t not in titles]
+        assert not missing, f"template is missing principle titles: {missing}"
+        numerals = _template_numerals(text)
+>       assert len(numerals) == TEMPLATE_COUNT, (
+            f"template has {len(numerals)} principles, expected {TEMPLATE_COUNT}"
+        )
+E       AssertionError: template has 18 principles, expected 19
+E       assert 18 == 19
+E        +  where 18 = len(['I', 'II', 'III', 'IV', 'V', 'VI', ...])
+
+tests/contract/test_constitution_double_landing.py:242: AssertionError
+______________ test_c5_command_must_include_list_has_both_entries ______________
+
+    def test_c5_command_must_include_list_has_both_entries():
+        text = _text(SKILL)
+        names = _skill_entry_names(text)
+        missing = [t for t in NEW_TEMPLATE_TITLES if t not in names]
+        assert not missing, f"generator MUST-include list is missing: {missing}"
+>       assert len(names) == COMMAND_COUNT, (
+            f"generator MUST-include list has {len(names)} entries, expected {COMMAND_COUNT}: "
+            f"{sorted(names)}"
+        )
+E       AssertionError: generator MUST-include list has 11 entries, expected 12: ['Better-Harness Orientation', 'Code as the Single Source of Truth', 'Directory Governance (Named, Documented, Ignored When Temporary)', 'Documentation Naming & Location Conventions', 'Documentation-First', 'Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)', 'Feature-centric development', 'Grounded Naming', 'One Source of Truth (Authority & Reference Discipline)', 'Self-Explanatory Structure (不言自明)', 'User-Facing Comprehension (No Jargon, With Context)']
+E       assert 11 == 12
+E        +  where 11 = len({'Better-Harness Orientation', 'Code as the Single Source of Truth', 'Directory Governance (Named, Documented, Ignored...ing & Location Conventions', 'Documentation-First', 'Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)', ...})
+
+tests/contract/test_constitution_double_landing.py:292: AssertionError
+_______________ test_c7_watchlist_principles_land_on_both_sides ________________
+
+    def test_c7_watchlist_principles_land_on_both_sides():
+        template_titles = _template_titles(_text(TEMPLATE))
+        generator_names = _skill_entry_names(_text(SKILL))
+        for title in DOUBLE_LANDING_WATCHLIST:
+>           assert title in template_titles, (
+                f"watchlist principle {title!r} is absent from templates/constitution-template.md — "
+                "a single-sided landing: the live constitution may carry it, but no downstream "
+                "project generated from the template ever will"
+            )
+E           AssertionError: watchlist principle 'Script Interface Contract (Declared, Zero-Side-Effect)' is absent from templates/constitution-template.md — a single-sided landing: the live constitution may carry it, but no downstream project generated from the template ever will
+E           assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in {'Better-Harness Orientation', 'CLI & Text I/O Interface', 'Complete & Correct Options, or None', 'Continuous Integration & Quality Gates', 'Directory Governance (Named, Documented, Ignored When Temporary)', 'Documentation-First', ...}
+
+tests/contract/test_constitution_double_landing.py:337: AssertionError
+__ test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe[template] ___
+
+side = 'template'
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-111/test_c10_newest_watchlist_entr0')
+
+    @pytest.mark.parametrize("side", ["template", "command"])
+    def test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe(side, tmp_path):
+        """086 T017: the probe above is pinned to `DOUBLE_LANDING_WATCHLIST[0]`, which is the 051
+        entry and has been there since this file was written. Extending the watchlist therefore
+        widened the set C-7 asserts WITHOUT widening the set C-10 proves it can catch — a guard
+        that grew and a probe that did not. The newest entry is the one each amendment appends,
+        so it is the one that must be proven catchable, on both sides, for every amendment.
+    
+        The mechanism is the same removal C-10 performs; only the victim differs.
+        """
+        victim = DOUBLE_LANDING_WATCHLIST[-1]
+        text = _text(TEMPLATE if side == "template" else SKILL)
+        if side == "template":
+            mutant_text = re.sub(
+                rf"^### [IVXLC0-9]+\. {re.escape(victim)}\s*$.*?(?=^### |^## |\Z)",
+                "", text, flags=re.M | re.S,
+            )
+            reader = _template_titles
+        else:
+            mutant_text = re.sub(
+                rf"^  - \*\*{re.escape(victim)}\*\* —.*?(?=^  - \*\*|^- |\Z)",
+                "", text, flags=re.M | re.S,
+            )
+            reader = _skill_entry_names
+        mutant = tmp_path / "mutant.md"
+        mutant.write_text(mutant_text, encoding="utf-8")
+>       assert victim in reader(text), (
+            f"anti-vacuity: the real {side} surface must carry the newest watchlist entry {victim!r} "
+            "before the mutation can prove anything"
+        )
+E       AssertionError: anti-vacuity: the real template surface must carry the newest watchlist entry 'Script Interface Contract (Declared, Zero-Side-Effect)' before the mutation can prove anything
+E       assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in {'Better-Harness Orientation', 'CLI & Text I/O Interface', 'Complete & Correct Options, or None', 'Continuous Integration & Quality Gates', 'Directory Governance (Named, Documented, Ignored When Temporary)', 'Documentation-First', ...}
+E        +  where {'Better-Harness Orientation', 'CLI & Text I/O Interface', 'Complete & Correct Options, or None', 'Continuous Integration & Quality Gates', 'Directory Governance (Named, Documented, Ignored When Temporary)', 'Documentation-First', ...} = <function _template_titles at 0x7efc25132980>('# [PROJECT_NAME] Constitution\n<!--\nThis is a PRESET template containing a set of generic project principles\nand wo...t Amended**: [LAST_AMENDED_DATE]\n<!-- Example: Version: 1.0.0 | Ratified: 2025-01-01 | Last Amended: 2025-01-01 -->\n')
+
+tests/contract/test_constitution_double_landing.py:467: AssertionError
+___ test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe[command] ___
+
+side = 'command'
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-111/test_c10_newest_watchlist_entr1')
+
+    @pytest.mark.parametrize("side", ["template", "command"])
+    def test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe(side, tmp_path):
+        """086 T017: the probe above is pinned to `DOUBLE_LANDING_WATCHLIST[0]`, which is the 051
+        entry and has been there since this file was written. Extending the watchlist therefore
+        widened the set C-7 asserts WITHOUT widening the set C-10 proves it can catch — a guard
+        that grew and a probe that did not. The newest entry is the one each amendment appends,
+        so it is the one that must be proven catchable, on both sides, for every amendment.
+    
+        The mechanism is the same removal C-10 performs; only the victim differs.
+        """
+        victim = DOUBLE_LANDING_WATCHLIST[-1]
+        text = _text(TEMPLATE if side == "template" else SKILL)
+        if side == "template":
+            mutant_text = re.sub(
+                rf"^### [IVXLC0-9]+\. {re.escape(victim)}\s*$.*?(?=^### |^## |\Z)",
+                "", text, flags=re.M | re.S,
+            )
+            reader = _template_titles
+        else:
+            mutant_text = re.sub(
+                rf"^  - \*\*{re.escape(victim)}\*\* —.*?(?=^  - \*\*|^- |\Z)",
+                "", text, flags=re.M | re.S,
+            )
+            reader = _skill_entry_names
+        mutant = tmp_path / "mutant.md"
+        mutant.write_text(mutant_text, encoding="utf-8")
+>       assert victim in reader(text), (
+            f"anti-vacuity: the real {side} surface must carry the newest watchlist entry {victim!r} "
+            "before the mutation can prove anything"
+        )
+E       AssertionError: anti-vacuity: the real command surface must carry the newest watchlist entry 'Script Interface Contract (Declared, Zero-Side-Effect)' before the mutation can prove anything
+E       assert 'Script Interface Contract (Declared, Zero-Side-Effect)' in {'Better-Harness Orientation', 'Code as the Single Source of Truth', 'Directory Governance (Named, Documented, Ignored...ing & Location Conventions', 'Documentation-First', 'Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)', ...}
+E        +  where {'Better-Harness Orientation', 'Code as the Single Source of Truth', 'Directory Governance (Named, Documented, Ignored...ing & Location Conventions', 'Documentation-First', 'Fast Fail (Surface Load-Bearing Anomalies, Repair the Rest)', ...} = <function _skill_entry_names at 0x7efc25132b60>('---\nname: manage-constitution\ndescription: Create or update the project constitution at `/.specify/memory/constitut...en Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"\n')
+
+tests/contract/test_constitution_double_landing.py:467: AssertionError
+________ test_c11_live_constitution_carries_the_comprehension_principle ________
+
+    def test_c11_live_constitution_carries_the_comprehension_principle():
+        text = _text(LIVE)
+        titles = {m.group(2).strip() for m in LIVE_TITLE_RE.finditer(text)}
+        assert STR003_TITLE in titles, (
+            f".specify/memory/constitution.md carries no principle titled {STR003_TITLE!r}"
+        )
+        numerals = [m.group(1) for m in LIVE_TITLE_RE.finditer(text)]
+>       assert len(numerals) == LIVE_COUNT, (
+            f"live constitution has {len(numerals)} principles, expected {LIVE_COUNT}"
+        )
+E       AssertionError: live constitution has 19 principles, expected 20
+E       assert 19 == 20
+E        +  where 19 = len(['I', 'II', 'III', 'IV', 'V', 'VI', ...])
+
+tests/contract/test_constitution_double_landing.py:488: AssertionError
+__________ test_c12_live_constitution_version_and_sync_impact_report ___________
+
+    def test_c12_live_constitution_version_and_sync_impact_report():
+        text = _text(LIVE)
+        m = re.search(r"^\*\*Version\*\*:\s*(\d+)\.(\d+)", text, re.M)
+        assert m, "no `**Version**:` line found"
+        got = (int(m.group(1)), int(m.group(2)))
+        assert got >= MIN_VERSION, (
+            f"constitution version {got} is below the floor {MIN_VERSION} — adding a principle is a "
+            "MINOR bump per the constitution command's versioning policy"
+        )
+        head = "\n".join(text.splitlines()[:40])
+        assert "Sync Impact Report" in head, (
+            "the Sync Impact Report must be prepended as an HTML comment at the top of the file"
+        )
+        assert re.search(r"Version change:.*→", head), "the report must state the version change"
+        # The report history is append-only, so the 051 block now sits below the 40-line
+        # window; its presence is checked against the whole file, while the head-based
+        # check below stays pointed at the CURRENT amendment.
+        assert STR003_TITLE.split(" (")[0] in text, (
+            "the 051 Sync Impact Report must stay in the file's report history"
+        )
+        # The assertion above is pinned to Feature 051's title, so on its own it stays green for any
+        # later amendment that never names its own principle -- a check whose output is not about the
+        # proposition it was written to judge. Derive the newest watchlist entry so the report has to
+        # name the principle the CURRENT amendment added. Adding an entry to the watchlist is what
+        # keeps this assertion pointed at the latest landing.
+        newest = DOUBLE_LANDING_WATCHLIST[-1]
+>       assert newest.split(" (")[0] in head, (
+            f"the Sync Impact Report must name the principle THIS amendment added ({newest!r}); "
+            "a fixed older title alone would let any later amendment pass without naming its own"
+        )
+E       AssertionError: the Sync Impact Report must name the principle THIS amendment added ('Script Interface Contract (Declared, Zero-Side-Effect)'); a fixed older title alone would let any later amendment pass without naming its own
+E       assert 'Script Interface Contract' in '<!--\nSync Impact Report\n- Version change: 1.15.0 → 1.16.0 (MINOR; new Principle XIX added, 2026-11-05)\n- Added pri...tignore` before its first write\n- Modified principles: None\n- Removed sections: None\n- Templates requiring updates:'
+
+tests/contract/test_constitution_double_landing.py:524: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_script_interface_contract.py::test_c24_template_carries_the_principle_with_the_house_shape
+FAILED tests/contract/test_script_interface_contract.py::test_c24_template_principle_points_at_the_owner_and_does_not_copy_its_steps
+FAILED tests/contract/test_script_interface_contract.py::test_c25_live_constitution_carries_the_principle
+FAILED tests/contract/test_script_interface_contract.py::test_c25_amendment_carries_sync_report_minor_bump_and_last_amended
+FAILED tests/contract/test_script_interface_contract.py::test_c26_generator_skill_carries_the_mandate_entry
+FAILED tests/contract/test_script_interface_contract.py::test_c27_ambient_section_shape[template]
+FAILED tests/contract/test_script_interface_contract.py::test_c27_ambient_section_shape[live]
+FAILED tests/contract/test_script_interface_contract.py::test_c27_template_and_live_ambient_bodies_agree
+FAILED tests/contract/test_script_interface_contract.py::test_c29_no_landing_surface_carries_the_banned_literals
+FAILED tests/contract/test_script_interface_contract.py::test_c29_the_four_labels_appear_on_the_owner_page_and_nowhere_else
+FAILED tests/contract/test_script_interface_contract.py::test_c30_owner_table_and_checker_payload_agree_row_for_row
+FAILED tests/contract/test_constitution_double_landing.py::test_c1_template_carries_both_new_principles
+FAILED tests/contract/test_constitution_double_landing.py::test_c5_command_must_include_list_has_both_entries
+FAILED tests/contract/test_constitution_double_landing.py::test_c7_watchlist_principles_land_on_both_sides
+FAILED tests/contract/test_constitution_double_landing.py::test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe[template]
+FAILED tests/contract/test_constitution_double_landing.py::test_c10_newest_watchlist_entry_is_caught_by_the_mutation_probe[command]
+FAILED tests/contract/test_constitution_double_landing.py::test_c11_live_constitution_carries_the_comprehension_principle
+FAILED tests/contract/test_constitution_double_landing.py::test_c12_live_constitution_version_and_sync_impact_report
+18 failed, 17 passed in 0.28s
+
+EXIT=1
+
+# ---------------------------------------------------------------------------
+# Failure -> missing landing map (each failure is "the landing has not happened yet")
+# ---------------------------------------------------------------------------
+# test_script_interface_contract.py (new file, 12 failures / 3 passes):
+#   c24_template_carries_the_principle_with_the_house_shape
+#       -> templates/constitution-template.md has 18 numbered principles and none titled
+#          'Script Interface Contract (Declared, Zero-Side-Effect)'.  Landing owner: T020.
+#   c24_template_principle_points_at_the_owner_and_does_not_copy_its_steps
+#       -> same missing principle, so its pointer/copy limbs cannot be judged.  T020.
+#   c25_live_constitution_carries_the_principle
+#       -> .specify/memory/constitution.md has 19 principles, none titled that.  T023.
+#   c25_amendment_carries_sync_report_minor_bump_and_last_amended
+#       -> the current head Sync Impact Report names Self-Explanatory Structure (1.15.0 ->
+#          1.16.0); no 1.17.0 amendment block.  Landing owner: T023.
+#   c26_generator_skill_carries_the_mandate_entry
+#       -> skills/internal/manage-constitution/SKILL.md `- **MUST include**` block holds 11
+#          entries; expected 12.  Landing owner: T021.
+#   c27_ambient_section_shape[template] / [live]
+#       -> `## Script Interface Contract` heading count is 0 on both templates/instructions-
+#          template.md and .specify/instructions.md.  Landing owners: T022 (template),
+#          T024 (live reconcile).
+#   c27_template_and_live_ambient_bodies_agree
+#       -> same missing heading; the bodies cannot be compared.  T022 + T024.
+#   c29_no_landing_surface_carries_the_banned_literals
+#       -> PRE-EXISTING collisions, not missing 086 landings: the four help-content label
+#          names read out of the owner page ('usage', 'options', 'side-effects',
+#          'exit-codes') already occur as ordinary English in scanned prose --
+#          templates/constitution-template.md:142,149 ('options' inside Principle XI) and
+#          templates/instructions-template.md:110,178 / .specify/instructions.md:122,190
+#          ('usage' inside Token Efficiency and Dogfooding).  The assertion is red BECAUSE
+#          the implementation has not yet supplied a discriminating reading (e.g. matching
+#          the labels as the owner page's closed-set form rather than as bare words); it is
+#          the one failure here whose subject is a guard design question, not a landing.
+#   c29_the_four_labels_appear_on_the_owner_page_and_nowhere_else
+#       -> 0 of 5 landing surfaces name the owner path yet.  Landing owners: T020/T021/
+#          T022/T023/T024.
+#   c30_owner_table_and_checker_payload_agree_row_for_row
+#       -> scripts/python/script-interface-check.py does not exist yet.  Owner: T032/T045
+#          (engine + --json payload).  Declared in T019's own [blockedBy: T018,T065].
+#   PASSING today (3): c23 (the owner page already declares itself and lists its five owned
+#       items -- landed in package 1, this is the assertion T012 adds), c29_banned_literal_
+#       list_is_read_out_of_the_owner_page (the list IS derived from the page: 4 labels),
+#       c30_exception_table_shape_and_empty_state (the register table already has the four
+#       columns and the literal `none`).
+#
+# test_constitution_double_landing.py (extended by T017, 7 failures / 14 passes):
+#   c1_template_carries_both_new_principles       -> template has 18 principles, expected 19.  T020.
+#   c5_command_must_include_list_has_both_entries -> mandate list has 11 entries, expected 12.  T021.
+#   c7_watchlist_principles_land_on_both_sides    -> the new watchlist entry is on neither side.  T020+T021.
+#   c10_newest_watchlist_entry_is_caught_by_the_mutation_probe[template|command]
+#       -> anti-vacuity limb: the real surfaces do not carry the newest entry yet.  T020+T021.
+#   c11_live_constitution_carries_the_comprehension_principle -> live has 19, expected 20.  T023.
+#   c12_live_constitution_version_and_sync_impact_report      -> head report names 1.16.0, not this
+#                                                               amendment.  T023.
+#
+# No failure is a collection error, an import error, or a typo in a matcher: every one names
+# an artifact and the count/title it was measured to hold.

@@ -1,0 +1,20 @@
+        stripped_left = {k: v for k, v in left.items() if k != ELAPSED_FIELD}
+        stripped_right = {k: v for k, v in right.items() if k != ELAPSED_FIELD}
+        assert stripped_left == stripped_right, (
+            "C-20: two runs over the same tree differ outside "
+            f"`{ELAPSED_FIELD}` — the payload is not deterministic.\n"
+            + "\n".join(
+                f"  {key}: {json.dumps(stripped_left.get(key), ensure_ascii=False)[:300]} != "
+                f"{json.dumps(stripped_right.get(key), ensure_ascii=False)[:300]}"
+                for key in sorted(set(stripped_left) | set(stripped_right))
+                if stripped_left.get(key) != stripped_right.get(key)
+            )
+        )
+>       paths = [row["path"] for row in left["candidates"]]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'int' object is not iterable
+
+tests/contract/test_script_interface_contract.py:1861: TypeError
+=========================== short test summary info ============================
+FAILED tests/contract/test_script_interface_contract.py::test_c20_two_runs_differ_only_in_elapsed_ms
+1 failed, 1 passed, 41 deselected in 1.87s

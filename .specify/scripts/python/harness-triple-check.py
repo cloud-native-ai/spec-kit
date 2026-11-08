@@ -549,14 +549,41 @@ def render_text(payload):
     return "\n".join(lines)
 
 
+# --version, wired through the one version source (C-8)
+#
+# `guard_argv()` answers `--version` (and rejects an undeclared option) BEFORE any parser
+# reads the line, so it works for a flat argparse parser, for one whose subcommands are
+# required, and for the two modules that read sys.argv by hand. It writes nothing and
+# resolves `<script-name> <framework-version>` from the nearest pyproject.toml at run
+# time — this file carries no version literal. `--help` is left to the module's own body.
+import sys as _sig_sys  # noqa: E402
+import pathlib as _sig_pathlib
+
+_SIG_DIR = str(_sig_pathlib.Path(__file__).resolve().parent)
+if _SIG_DIR not in _sig_sys.path:
+    _sig_sys.path.insert(0, _SIG_DIR)
+try:  # the helper owns the rule; an engine copied WITHOUT it still runs its actions
+    from script_interface_cli import configure_parser as _sig_configure  # noqa: E402
+    from script_interface_cli import guard_argv as _sig_guard  # noqa: E402
+except ImportError:  # a sandbox/handler copy carries the engine but not the helper
+    def _sig_configure(parser, **_kwargs):
+        return parser
+
+    def _sig_guard(_argv=None, declared=None, **_kwargs):
+        return None
+
 def main(argv=None):
+    _sig_guard(argv, declared=['--action', '--repo', '--format', '--json-out', '--unit-id', '--fact'])  # answer --version / reject an undeclared option
     parser = argparse.ArgumentParser(
         description="Judge the declaration layer (read-only; three actions, three exit codes).")
+    _sig_configure(parser)
+
     parser.add_argument("--action", required=True, choices=("coverage", "verify", "lookup"))
     parser.add_argument("--repo", default=None,
                         help="repository root (default: the directory holding scripts/python/)")
     parser.add_argument("--format", choices=("text", "json"), default="text")
-    parser.add_argument("--json-out", default=None, help="write one JSON report to this path")
+    parser.add_argument("--json-out", default=None,
+                        help="write JSON report here (triggers the write)")
     parser.add_argument("--unit-id", default=None, help="lookup: a carrier path")
     parser.add_argument("--fact", default=None, help="lookup: a fact slug")
     args = parser.parse_args(argv)

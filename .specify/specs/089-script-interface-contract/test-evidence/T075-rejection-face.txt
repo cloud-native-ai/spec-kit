@@ -1,0 +1,90 @@
+# T077 — the rejection limb on the LIVE face (not the checker's probe)
+
+Task: `tasks.md` T077 (blockedBy T065, T075). Clauses: C-9 (an undeclared `-*` token exits
+non-zero before the main action) and C-11 (a flag anywhere on the line beats the write).
+T074's rejection test (`test_t077_the_live_rejection_face_on_a_sandbox_copy`) pins the same
+claim inside pytest; this file is the same claim read from a shell on a copy of this tree.
+
+## Where this was run
+
+`/var/tmp/pkg5b/close/t077/tree` — a `git clone` of this repository (`--no-hardlinks`), i.e. a
+COPY. The measured tree is never the tree these runs happen in (C-10, and the 2026-11-07
+incident). The live scripts are the ones already in the clone.
+
+Environment of every run: the checker's own minimal probe environment — `HOME` into a
+sandbox, `LC_ALL=C`, `GIT_CEILING_DIRECTORIES` at the sandbox root, and
+`EDITOR`/`VISUAL`/`GIT_EDITOR` pinned to `true` so no run can take the terminal.
+
+## The four faces, three invocations each
+
+`--no-such-flag` is C-9's token; `--help --output-dir would-write` and
+`--output-dir would-write --help` are C-11 in both argument orders, with the write option's
+value naming a path that must never appear.
+
+| script | invocation | exit | stdout | stderr |
+|---|---|---|---|---|
+| `scripts/bash/generate-instructions.sh` | `--no-such-flag` | **2** | 0 lines | 7 lines |
+| | `--help --output-dir would-write` | 2 | 0 | 7 (`--output-dir` is not one of its options) |
+| | `--output-dir would-write --help` | 2 | 0 | 7 |
+| `scripts/bash/create-new-skill.sh` | `--no-such-flag` | **2** | 0 lines | 15 lines |
+| | `--help --output-dir would-write` | **0** | 14 lines, `usage:` first | 0 |
+| | `--output-dir would-write --help` | **0** | 14 lines, `usage:` first | 0 |
+| `scripts/bash/script-interface.sh` (the library's own face) | `--no-such-flag` | **2** | 0 lines | 7 lines |
+| `.specify/scripts/bash/generate-instructions.sh` (the projection) | `--no-such-flag` | **2** | 0 lines | 7 lines |
+
+`generate-instructions.sh` is the incident script: it rewrites `.specify/instructions.md`,
+backs it up beside itself, appends to `.gitignore` and writes `.specify/tools/*.json` when it
+runs. Rejecting an unknown token BEFORE any of that is what the 2026-11-07 incident cost.
+
+Full stderr of the rejection (the shape C-9 asks for: error first, then the usage body with
+all four labels):
+
+```
+error: unrecognized option: --no-such-flag
+usage: create-new-skill.sh [--json] [--refresh-only] [--name <name>] [--description <desc>] [--output-dir <dir>]
+options:
+  -h, --help   print this help and exit
+  --version    print the script name and the framework version, then exit
+  --json
+  --refresh-only
+  --name
+  --description
+  --desc
+  -d
+  --output-dir (triggers the write)
+  -o
+side-effects: writes skills/<name>/ (and its .specify/skills mirror); the flags write nothing
+exit-codes: 0 created or answered; 1 a prerequisite is missing; 2 an unrecognized option
+```
+
+## The writing script's target does not change
+
+`create-new-skill.sh` is the writing script on this face (its declared write option is
+`--output-dir`, `writes=--output-dir` on its guard call). After the six invocations above:
+
+    would-write/                        does not exist
+    git status --porcelain (the copy)   no entry for any invocation
+    tree snapshot pair (git status,     IDENTICAL before and after every run
+      sha256 of every *.sh/*.py,
+      the .specify/ manifest)
+
+The pair is the T074 pair (`_tree_snapshot`), read by the same copy of the function the test
+uses. `pair_identical: true`.
+
+## The rejection is not vacuous
+
+`--output-dir` IS accepted by `create-new-skill.sh` (it is its declared write option) and is
+refused by `generate-instructions.sh` and by the library, which is the point: the refusal above
+is a judgement on the DECLARED surface, not a blanket "unknown token" script. And on
+`create-new-skill.sh`, the two help-wins orders exit 0 with `usage:` on stdout and create no
+`would-write/`, i.e. the flag beats the write in both argument orders (C-11).
+
+## Verdict
+
+* **C-9 on the live face: green.** An undeclared `-*` token exits **2**, prints its error and
+  its full usage body **on stderr**, and writes nothing to stdout, before the main action.
+* **C-11 on the live face: green.** `--help` beats the declared write option in both orders.
+* **C-10 for the rejected run: green.** The sandbox copy's snapshot pair is identical.
+
+`tests/contract/test_script_interface_contract.py::test_t077_the_live_rejection_face_on_a_sandbox_copy`
+asserts the same three limbs inside the suite (green, `118 passed`).

@@ -1,0 +1,78 @@
+# T078 — wiring discipline (C-32)
+
+Row: T078 [Phase 9]. Green claim: `contracts/governance-landing.contract.md#C-32`.
+Marker: `pytest -m contract` (category quadruple `flow_class=execution; source=declaration; marker=contract; error=-`).
+
+## 1. C-32 clause correction (the only change to the contract)
+
+The clause previously named four artifacts. The set actually added by this feature (measured, see §2)
+also carries `scripts/python/workspace-guard.py` (introduced by the post-C direction audit's P1 fix)
+and the bash library's own mirror. The clause now reads:
+
+- `scripts/python/script-interface-check.py` (plus its mirror)
+- `scripts/python/script_interface_cli.py` (plus its mirror)
+- `scripts/bash/script-interface.sh` (plus its mirror)
+- `tests/contract/test_script_interface_contract.py`
+
+`workspace-guard.py` is deliberately NOT adopted into the clause: whether a pre-existing-feature
+guard belongs to this feature's executable surface is a decision, not a correction. It is recorded
+instead as a measured-but-undeclared path in the test
+(`C32_MEASURED_BEYOND_DECLARATION`), so the discrepancy is visible and pinned rather than silently
+absorbed. Reported to the orchestrator as an `ANOMALY:` line.
+
+## 2. Declared set vs measured set
+
+Base revision — computed, not hardcoded:
+`git merge-base HEAD origin/master` = `24cb4edcc53db3cfc86f574e5e6d627c78b2ca08`.
+(Commit `e75e10a4`, the previous HEAD, is unusable as a base: the 086 branch absorbed an ancestor
+line whose commit dates are out of order, so artifact creation predates it. `27b8080d` is an
+ancestor of HEAD.)
+
+Measurement: `git diff --name-status <base>...HEAD`, `A` rows only, filtered to
+`scripts/[.sh|.py]`, `.specify/scripts/[.sh|.py]`, `tests/[.sh|.py]`, `.specify/tests/[.sh|.py]`.
+
+Declared (from the clause, read at test time — never hand-typed) + mirrors:
+
+| path | role |
+|---|---|
+| `scripts/python/script-interface-check.py` | engine |
+| `.specify/scripts/python/script-interface-check.py` | mirror |
+| `scripts/python/script_interface_cli.py` | shared CLI library |
+| `.specify/scripts/python/script_interface_cli.py` | mirror |
+| `scripts/bash/script-interface.sh` | bash library |
+| `.specify/scripts/bash/script-interface.sh` | mirror |
+| `tests/contract/test_script_interface_contract.py` | contract test |
+
+Measured − declared (recorded difference, asserted exactly equal to this tuple):
+
+| path | disposition |
+|---|---|
+| `scripts/python/workspace-guard.py` | outside C-32 scope — adjudicated by the orchestrator |
+| `.specify/scripts/python/workspace-guard.py` | mirror of the above |
+| `tests/contract/test_help_body_preservation.py` | regression test over 086's help restore |
+| `tests/contract/test_sdd_loop_driver_reanchor.py` | regression test over the driver reanchor |
+| `tests/unit/test_create_new_requirements_separator.py` | regression test |
+| `tests/unit/test_script_interface_cli.py` | unit test for the shared CLI library |
+| `tests/unit/test_workspace_guard.py` | unit test for the out-of-scope guard |
+
+`declared_with_mirrors <= measured` holds; every declared path exists on disk.
+
+## 3. The four readings
+
+| reading | command | result |
+|---|---|---|
+| marker selection (source) | regex `^pytestmark = pytest\.mark\.contract\s*$` over the test source | 1 match |
+| marker selection (behaviour) | `pytest --collect-only -m contract -q tests/contract/test_script_interface_contract.py` | 93 tests collected, exit 0 |
+| no new `/speckit.*` command | `git diff --name-status base...HEAD -- templates/commands` | no `A` row |
+| no new driver stage gate | added paths under `scripts/python/gate-check.py` | none; source equal to base after masking the 086 `--version` flag block (`_without_flag_block`) |
+| no confirmation gate | `.specify/shared/guidelines/confirmation-gates.md`, `.specify/gate.yaml` byte-identical to base | 2/2 identical |
+| no second checker | `scripts/python/*interface*.py` glob | exactly `{script-interface-check.py, script_interface_cli.py}` |
+
+The fifth test in the T078 group covers the mirror projection: every consumer's
+`bash-version-guard` projection carries the library's own statements, and the 086 flag block is the
+first executable line of the projection.
+
+## Verdict
+
+Green. Nine T078/T079/T082/T084 tests pass inside the 93-test file run
+(`pytest -q tests/contract/test_script_interface_contract.py` → 93 passed in 25.78s).

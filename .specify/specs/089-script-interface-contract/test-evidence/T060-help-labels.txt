@@ -1,0 +1,85 @@
+T060 — the four help labels on every applicable python script (2026-11-07)
+==========================================================================
+
+Owner of the rule: shared/definitions/script-interface-definitions.md section 2 (the four
+labels are a closed set). Criterion: `--help` and `-h` exit 0 and the body carries
+`usage:`, `options:`, `side-effects:`, `exit-codes:` (criteria contract C-7).
+
+MECHANISM (one helper owns the text; scripts only name their parser)
+--------------------------------------------------------------------
+`scripts/python/script_interface_cli.py` gained two public entry points:
+
+* `configure_parser(parser, *, effects=None, codes=None)` — for an argparse script. Writes
+  the two label LINES argparse cannot produce into `parser.epilog`, appends after an existing
+  epilog rather than replacing it, and switches the formatter to
+  `RawDescriptionHelpFormatter` only when the caller left argparse's default. `usage:` and
+  `options:` come from argparse itself.
+* `fill_help_labels(help_text, *, effects=None, codes=None, update=None)` — for a hand-rolled
+  help body (`_HELP = """..."""`), which no parser owns. Additive and idempotent; a body that
+  already states a label keeps its own text.
+
+Honest generic defaults (used when a script does not say otherwise):
+
+  side-effects: writes only through the options it documents; a flag-only invocation writes nothing
+  exit-codes: 0 success; 1 a documented check failed; 2 argument or environment error
+
+GENERATOR (one-time, applied once, not kept in the tree)
+-------------------------------------------------------
+`/var/tmp/086-pkg4b1/gen_help_labels.py` (217 lines, AST-based, run with `--apply`):
+
+  * found every module-level `argparse.ArgumentParser(...)` assignment;
+  * inserted `configure_parser(<name>)` right after the CONSTRUCTION, at the construction's
+    own indent, using the assignment's `end_lineno`;
+  * skipped fragments (`parents=[...]` without a `prog`/`description` of their own), parsers
+    built with `add_help=False`, and `add_parser(...)` results spent on a subcommand;
+  * inserted `from script_interface_cli import configure_parser  # noqa: E402` after each
+    module's `_SIG_DIR` sys.path setup (a header import fails: the helper is not on the path
+    until then), shifting downstream lines by one when the import landed above them;
+  * was re-run only on files it had not already patched; the three files whose call had
+    landed on a fragment (`history-utils.py`, `record-retention.py`, `run-determination.py`)
+    were corrected by hand onto the parser each script actually prints.
+
+PER-FILE LIST (39 `scripts/python/*.py`, all measured green — see the reading at the end)
+----------------------------------------------------------------------------------------
+configure_parser (34):
+  account-clause-coverage.py            bilingual-expression-check.py
+  closure-acceptance-check.py           declaration_reader.py
+  derive-utils.py                       doc-consistency-check.py
+  evidence-utils.py                     exec-quant.py
+  execution-config.py                   feedback-utils.py
+  flow-class-check.py                   glossary-utils.py
+  goal-utils.py                         harness-triple-check.py
+  history-utils.py                      interview-utils.py
+  memory-utils.py                       probe-utils.py
+  record-retention.py                   regen-command-copies.py
+  renumber-utils.py                     run-determination.py
+  sanitize-utils.py                     scan-confirmation-gates.py
+  scan-temp-usage.py                    sdd-route.py
+  search-todo.py                        skills-utils.py
+  sync-mirrors.py                       tools-utils.py
+  trigger-utils.py                      validate-decision-tensions.py
+  validate-falsification-quartet.py     validate-requirements.py
+  validate-tasks.py
+  (35 files — `grep -l "^from script_interface_cli import configure_parser"
+  scripts/python/*.py | wc -l` = 35, matching the list above)
+
+fill_help_labels (3, hand-rolled or self-printing bodies):
+  clause_extract.py     gate-check.py     script_interface_cli.py
+
+own epilog (1, states its own specific side effects and exit codes):
+  script-interface-check.py
+
+SELF-DECLARED WRITE OPTIONS (C-11's declaration site, added so the clause is exercised)
+---------------------------------------------------------------------------------------
+  sync-mirrors.py            --write     (triggers the write)
+  closure-acceptance-check.py --json-out (triggers the write)
+  doc-consistency-check.py   --json-out (triggers the write)
+  harness-triple-check.py    --json-out (triggers the write)
+
+READING (measured 2026-11-07, `/usr/bin/python3 <script> --help`, one line per script)
+-------------------------------------------------------------------------------------
+All 39 `scripts/python/*.py` report `rc=0` with all four labels present. The three scripts
+outside `configure_parser` were checked twice: once through the module (the fill path) and
+once as a program (the printed body). `script-interface-check.py` prints its own two labels
+and takes none from the helper, which is deliberate: its side effects (a sandbox copy under
+`--sandbox`) and its exit codes (four verdicts) are specific, not generic.

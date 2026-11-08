@@ -49,6 +49,8 @@ TREE = ast.parse(SOURCE)
 ALLOWED_IMPORT_ROOTS = {
     "__future__", "argparse", "json", "os", "re", "sys", "unicodedata",
     "urllib", "socket", "datetime", "pathlib", "subprocess",
+    # shipped beside the engine by the same `scripts/` mirror (script-interface guard)
+    "script_interface_cli",
 }
 
 #: C-14 envelope top-level keys, exactly.

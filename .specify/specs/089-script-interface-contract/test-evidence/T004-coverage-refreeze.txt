@@ -1,0 +1,44 @@
+# T004 — re-freeze the contract-clause coverage baseline at implement entry, and compare it with the
+#       tasks-stage baseline committed at `.specify/specs/089-script-interface-contract/coverage-baseline.txt`.
+# date: 2026-11-06T18:01:51+08:00  HEAD: 9add95eb
+
+$ /usr/bin/python3 scripts/python/account-clause-coverage.py .specify/specs/089-script-interface-contract --freeze > /tmp/cov-refreeze.txt
+[exit=0]
+wc -l /tmp/cov-refreeze.txt -> 575
+
+# the NAME SETS must be identical: a difference is a changed clause corpus, not a silent pass
+committed baseline names: 573
+re-frozen names:          573
+$ diff /tmp/base.names /tmp/new.names
+[diff exit=0 - 0 means the name sets are identical]
+
+$ LC_ALL=C comm -3 /tmp/base.names /tmp/new.names   # both directions; no lines = identical
+[comm exit=0; no lines above = identical]
+
+# header line 1 identical; header line 2 differs ONLY in base-sha
+header_line_1=identical
+header_line_2 committed: base-sha: 5c2bb98f047d
+header_line_2 re-frozen: base-sha: 9add95eba6a7
+re-frozen files line:    files: 266 (parsed 159 + named 107)
+$ diff of header line 2 with the base-sha field masked out
+header_line_2_minus_sha=identical
+
+$ live reading (no --freeze): companion counts and the four limbs
+
+== FR coverage (universe: requirements.md definition rows outside code spans; claimed: clause citation groups, never task rows) ==
+FR universe: 31
+FR claimed: 31
+FR uncovered: 0
+
+companion (must be non-empty on a green run): claimed clauses 38, scanned files 270, clause universe 1714, FR universe 31
+  [clause-uncovered] pass (573) — 573 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 31 of 31 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 573 names; 573 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+status: ok
+
+## Verdict
+PASS: the re-frozen name set is identical to the tasks-stage baseline (573 names). The only
+header change is base-sha, which records WHICH commit the freeze was taken at; it is not a
+clause-corpus change, and the clause corpus itself (266 files, parsed 159 + named 107) is unchanged.

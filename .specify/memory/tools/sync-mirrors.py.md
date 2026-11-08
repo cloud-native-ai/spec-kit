@@ -35,7 +35,7 @@ Single-source mirror sync engine (adopted from ai-website-cloner-template's sync
 
 | Name | Required | Description |
 |------|----------|-------------|
-| `--check` | no | Report drift only; exit 2 if any drift detected (CI gate); never writes |
+| `--check` | no | Report drift only; exit 2 if any drift detected (CI gate); never writes. A declared projected mirror is compared as `mirror == project(source)`, every other file as byte equality, and each projected pair's line names its kind (`projected[<kind>] <mirror> <- <source>: ok`). |
 | `--write` | no | Sync all mirrors from canonical sources (default when no flag given) |
 
 ## Returns
@@ -62,6 +62,7 @@ Single-source mirror sync engine (adopted from ai-website-cloner-template's sync
 
 - Direction is one-way: canonical source → mirror. Never edit the mirror expecting it to flow back.
 - `skills/` at repo root may be a placeholder (only `.gitkeep`); the script detects this and skips, since `.specify/skills/` is then canonical.
+- `PROJECTED_FILES` is the ONE declaration of which mirrors carry a projection (`python-version-bridge` before the `__main__` anchor, `bash-version-guard` after the shebang). Its authority is `contracts/mirror-projection.contract.md` C-33…C-38 and the owner page `shared/definitions/script-interface-definitions.md` § 投影声明形态与消费方 — this record does not restate the rule. A mirror under `.specify/scripts/` or `.specify/skills/` is generated, never hand-edited.
 - Extra files that exist only in a mirror are reported (`note`) but never deleted — archive-not-delete discipline.
 - Junk entries (`__pycache__`, `node_modules`, `.DS_Store`) are ignored and never copied.
 

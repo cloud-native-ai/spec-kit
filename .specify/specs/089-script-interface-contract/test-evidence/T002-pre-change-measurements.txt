@@ -1,0 +1,119 @@
+# T002 — pre-change measurements (raw capture)
+# date: 2026-11-06T18:00:52+08:00  tree: /cws_data/cloud-native-ai/spec-kit  branch: 089-script-interface-contract  HEAD: 9add95eb
+
+$ wc -c .specify/instructions.md
+33357 .specify/instructions.md
+[exit=0]
+
+$ wc -c templates/instructions-template.md
+28930 templates/instructions-template.md
+[exit=0]
+
+$ grep -n 'INSTRUCTIONS_BUDGET_BYTES' scripts/bash/generate-instructions.sh
+53:INSTRUCTIONS_BUDGET_BYTES=34816
+83:# Report the generated file's size against INSTRUCTIONS_BUDGET_BYTES, plus a
+106:  budget_out="$(python3 - "$target" "$rendered" "$INSTRUCTIONS_BUDGET_BYTES" <<'PYEOF'
+[exit=0]
+
+$ grep -c '^## ' templates/instructions-template.md
+32
+[exit=0]
+
+$ grep -c '^## ' .specify/instructions.md
+33
+[exit=0]
+
+$ grep -lE '\-\-help\|-h|-h\|--help' scripts/bash/*.sh
+scripts/bash/check-prerequisites.sh
+scripts/bash/create-new-plan.sh
+scripts/bash/create-new-requirements.sh
+scripts/bash/create-new-skill.sh
+scripts/bash/create-new-tools.sh
+scripts/bash/implement-plan.sh
+scripts/bash/research-project.sh
+[exit=0]
+
+$ grep -lE '\-\-help\|-h|-h\|--help' scripts/bash/*.sh | wc -l
+7
+[exit=0]
+
+$ git ls-files '*.sh' '*.py' | wc -l
+737
+[exit=0]
+
+$ git ls-files '*.sh' | wc -l
+71
+[exit=0]
+
+$ git ls-files '*.py' | wc -l
+666
+[exit=0]
+
+$ git ls-files '*.sh' '*.py' | while read -r f; do git check-ignore -q "$f" && echo "$f"; done | wc -l
+0
+
+$ find . -path ./.git -prune -o \( -name '*.sh' -o -name '*.py' \) -print | wc -l
+737
+[exit=0]
+
+$ git ls-files '*.sh' '*.py' | awk -F/ '{print $1"/"}' | sort | uniq -c
+    146 .specify/
+      1 install.sh/
+     51 scripts/
+     87 skills/
+      3 src/
+    449 tests/
+[exit=0]
+
+$ git ls-files 'scripts/bash/*.sh' | wc -l
+14
+[exit=0]
+
+$ git ls-files 'scripts/python/*.py' | wc -l
+37
+[exit=0]
+
+$ git ls-files 'skills/*' | grep -cE '\.py$'
+71
+[exit=0]
+
+$ git ls-files 'skills/*' | grep -cE '\.sh$'
+16
+[exit=0]
+
+$ git ls-files 'skills/external/*' | grep -cE '\.(sh|py)$'
+73
+[exit=0]
+
+$ per-file __main__ scan over tests/*.py
+tests/contract/test_migration_distribution.py
+tests/fixtures/cli_observation.py
+tests/fixtures/client_project.py
+tests/fixtures/humanize/diff_protected.py
+tests/fixtures/review_git_repo.py
+tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py
+
+$ grep -rh -m1 '^classification:' skills/external/*/SKILL.md | sort | uniq -c
+     16 classification: external
+[exit=0]
+
+$ grep -rh -m1 '^classification:' skills/internal/*/SKILL.md | sort | uniq -c
+     38 classification: internal
+[exit=0]
+
+$ grep -n '^version' pyproject.toml
+3:version = "0.0.22"
+[exit=0]
+
+$ grep -n '^requires-python' pyproject.toml
+5:requires-python = ">=3.8"
+[exit=0]
+
+$ /usr/bin/python3 -m pytest --version
+pytest 9.0.3
+[exit=0]
+
+$ /usr/bin/python3 --version
+Python 3.11.0rc1
+[exit=0]
+

@@ -1,0 +1,166 @@
+# SC-007 — zero regression in declared options, JSON shapes and exit codes
+
+Criterion: SC-007 of `requirements.md` — "已声明选项、JSON 输出形态与退出码语义零回归：补齐前后
+对同一组既有调用的输出差异为 0（仅新增标志路径允许出现新输出）".
+Task: `tasks.md` T064.
+Capture: `/var/tmp/pkg4b2b/t064_t065.py regress` (the raw record is
+`/var/tmp/pkg4b2b/regress.json`); this file is its rendering.
+
+## Method
+
+Two trees, one call each, same command line:
+
+* **PRE** — `git archive efa3a270` (the last commit before the `scripts/bash` backfill T055–T058),
+  with the PRE `common.sh` from that same commit. `.specify/` is the same on both sides: the
+  pre-backfill tree legitimately carries a post-backfill mirror, and the PRE tree's scripts do not
+  source it (`check-prerequisites.sh` reaches the library only through `common.sh`).
+* **POST** — `git archive 516cb8f2` (PKG-4b2a head) with the current working-tree `scripts/`,
+  `skills/`, `tests/`, `templates/`, `shared/`, `src/` copied over, so the tree IS the state this
+  package measures.
+
+Each call is captured as `(exit code, stdout, stderr, tree snapshot before, tree snapshot after)`.
+The tree snapshot is a sha256 per file for every file outside `.git`/`__pycache__`, so "the call
+wrote nothing" is decided by comparing digests, not by reading the script. Call lines are
+cwd-relative (`bash <relpath>`), so the recorded stdout carries no tree identity.
+
+Environment baseline: the two bash families are run with `env -u CWS_LIB_BASH_HOME`,
+`--noprofile --norc`. The host shell library declares the three `git_*` helpers these scripts
+reach, so an inherited baseline would let the measurement see the operator's login shell instead
+of the tree. Item (2) below reports what changes when the library is present.
+
+## Families and their representative declared call
+
+| family | script | argv (options the script declares itself) |
+|---|---|---|
+| shell-cli (`scripts/bash` command) | `scripts/bash/check-prerequisites.sh` | `--paths-only --include-spec` |
+| shell-lib (`scripts/bash` library) | `scripts/bash/common.sh` | `--help` |
+| py-engine (`scripts/python`) | `scripts/python/script_interface_cli.py` | `--emit-rule` |
+| skill-shell (`skills/`) | `skills/external/create-pages/scripts/scaffold-ci.sh` | `--root . --platform nosuchplatform` |
+| skill-py (`skills/`) | `skills/external/sdd-loop-driver/scripts/wp-gate.py` | `--stage x --check` |
+
+## Readings
+
+| family | PRE rc | POST rc | stdout | stderr | tree written by the call |
+|---|---|---|---|---|---|
+| shell-cli | 0 | 0 | **DIFFERS — see below** | DIFFERS — see below | none (both sides) |
+| shell-lib | 0 | 0 | **DIFFERS — the added flag path only** | identical (empty) | none (both sides) |
+| py-engine | 0 | 0 | identical (729 B) | identical (empty) | none (both sides) |
+| skill-shell | 2 | 2 | identical (empty) | identical (44 B) | none (both sides) |
+| skill-py | 2 | 2 | identical (empty) | identical (427 B) | none (both sides) |
+
+Every `tree_changed` / `tree_added` / `tree_removed` list is empty on both sides of all five
+families: no declared call of any family writes anything, before or after the backfill.
+
+The `py-engine` pair is the JSON-shape limb: the engine's own `--emit-rule` payload is
+**byte-identical** (729 B, same keys, same order) across the two trees — the JSON shape SC-007
+names is unchanged, not merely "compatible".
+
+The `skill-shell` and `skill-py` pairs are the exit-code limb: both leave with the same non-zero
+status (2) and the same message for an argument the script itself refuses, before and after.
+
+## The two differences, judged
+
+**(1) shell-lib — the added flag path, which SC-007 explicitly permits.**
+
+    PRE  stdout: (empty, 0 B)
+    POST stdout: usage: common.sh (no options; sourceable helper library)
+                 options:
+                   -h, --help   print this help and exit
+                   --version    print the script name and the framework version, then exit
+                 side-effects: defines helper functions only; sourcing it writes nothing
+                 exit-codes: 0 the library was sourced; 1 a host dependency is missing; 2 an unrecognized option
+
+`--help` did not exist on `common.sh` before the backfill; it answers now. Exit code is 0 on both
+sides, stderr is empty on both sides, and the call writes nothing on both sides. This is new
+OUTPUT on a new FLAG PATH — the one difference SC-007 allows.
+
+**(2) shell-cli — NOT an added flag path. A behavioural change introduced by the backfill, traced
+to its causes and handed up as defect D-1 (see `pkg4b2b-stage-status.md` § Defect D-1). SC-007's
+"diff is zero except added flag paths" does NOT hold for this family.**
+
+    PRE  stdout: REPO_ROOT: /  BRANCH: main  REQUIREMENTS_DIR: //.specify/specs/main
+                 ... 9 path lines, every field populated
+    POST stdout: REPO_ROOT: (empty) / BRANCH: (empty) / ... every field empty, only the
+                 literal suffixes left (`/.specify/specs/`), rc=0
+    POST stderr: <ROOT>/scripts/bash/script-interface.sh: line 360: git_repo_root: command not found
+                 <ROOT>/scripts/bash/script-interface.sh: line 361: git_current_branch: command not found
+                 <ROOT>/scripts/bash/script-interface.sh: line 363: is_git_repo: command not found
+                 [specify] Warning: Git repository not detected; skipped branch validation
+
+Both sides exit 0, so a check that watched exit codes alone would call this pair clean. It is not
+clean. The cause was found by bisection, not by reading intent, and it has two independent limbs:
+
+**Limb A — `common.sh` no longer defines what it used to define.**
+The backfilled `common.sh` moved its whole body into `_script_interface_library_body()` and kept a
+hand-written publish list at its tail (`_script_interface_library_link check_feature_branch …
+get_feature_paths … check_dependency`). The three `git_*` helpers are not in that list, so sourcing
+the POST `common.sh` publishes `get_feature_paths` without the three functions it calls. Measured
+both sides after a bare `source`, with no flags and no host library:
+
+    PRE  git_repo_root: function   git_current_branch: function   is_git_repo: function
+    POST git_repo_root: undefined  git_current_branch: undefined  is_git_repo: undefined
+
+`get_feature_paths` therefore runs `local repo_root=$(git_repo_root)` against a name that does not
+exist: "command not found", `repo_root` empty, and every path derived from it empty — silently, with
+the script's own exit code intact. The PRE file had the same `get_feature_paths` and did not define
+the three names either; they reached the caller because PRE `common.sh` executed its host-library
+load at file scope, and POST `common.sh` executes the same load inside
+`_script_interface_library_body()`, whose definitions the hand-written list does not carry out
+(`declare -f git_repo_root` after the PRE source prints a `git rev-parse --show-toplevel` body;
+after the POST source it prints nothing).
+
+**Limb B — a second entry-point hazard in the same chain, found but NOT the cause of limb A.
+Recorded so whoever repairs D-1 does not miss it.**
+
+`script-interface.sh` line 74 is `_SCRIPT_INTERFACE_ENTRY="${_SCRIPT_INTERFACE_ENTRY:-}"` and line
+310 decides "run the body" vs "publish the helpers" by comparing `BASH_SOURCE[0]` with it. In this
+shell (`GNU bash, 5.1.16(1)-release`) a script-level self-referential assignment of that exact
+variable comes back SET and EMPTY where two files are needed to observe it:
+
+    $ printf 'echo "after=[\${DBG_V-<unset>}]"\n' > p.sh
+    $ printf '_SCRIPT_INTERFACE_ENTRY="${_SCRIPT_INTERFACE_ENTRY:-}"\n' > c.sh
+    $ bash --noprofile --norc -c '. ./c.sh; . ./p.sh'
+    after=[]
+    $ printf '_SCRIPT_INTERFACE_ENTRY="${_SCRIPT_INTERFACE_ENTRY:-}"\necho "[${_SCRIPT_INTERFACE_ENTRY-<unset>}]"\n' > onefile.sh
+    $ bash --noprofile --norc onefile.sh
+    [<unset>]
+
+Whatever the shell's reason, the guard then compares against a value nobody recorded, and where the
+sourcing shell's `$0` is also empty that comparison can say "the entry" or "not the entry" by
+accident. Limb A above is independent of this: it is fixed by the publish list, and no ENTRY value
+makes the three `git_*` names appear in the POST caller.
+
+**Not repaired here, and why.** Both limbs sit inside `scripts/bash/common.sh` and
+`scripts/bash/script-interface.sh` — the deliverables every one of the 13 backfilled commands
+imports. Repairing either is a semantic change to already-landed implementation, which this
+package's brief excludes; the second has more than one defensible reading (publish the host
+helpers by listing them, or stop inheriting them at all, or re-decide the entry test). It is
+halted and handed up (fast-fail: judgement), not folded into green.
+
+## Verdict
+
+* Exit-code semantics: **zero regression** on all five families (identical status on every pair;
+  the two non-zero statuses are the same 2 on both sides).
+* JSON output shape: **zero regression** — the one family emitting JSON is byte-identical.
+* Declared-option output: **4 of 5 families zero-difference**; the fifth (`shell-lib`) differs only
+  by the newly added `--help` path, which SC-007 permits.
+* `shell-cli` shows a non-zero difference that is **not** an added flag path. SC-007 does not hold
+  for that family: the same declared call that printed nine populated path lines before the
+  backfill now prints empty fields and three "command not found" lines on stderr, with the same
+  exit code 0.
+
+## Reproduce
+
+    /usr/bin/python3 /var/tmp/pkg4b2b/t064_t065.py regress > /var/tmp/pkg4b2b/regress.json
+    # the helper builds PRE = `git archive efa3a270` and POST = `git archive 516cb8f2`
+    # + the working-tree sources, runs the five calls on both, and records
+    # exit/stdout/stderr plus a sha256 tree snapshot before and after each call.
+
+    # limb A (helper publication):
+    cd <tree> && bash --noprofile --norc -c '. scripts/bash/common.sh 2>/dev/null
+      for f in git_repo_root git_current_branch is_git_repo; do
+        declare -f "$f" >/dev/null && echo "$f: function" || echo "$f: undefined"; done'
+    # limb B (entry variable):
+    cd /var/tmp/pkg4b2b/bis/alt2 && bash --noprofile --norc -c '. ./c2.sh; . ./p2.sh'
+    #   c2.sh: _SCRIPT_INTERFACE_ENTRYDASH="${_SCRIPT_INTERFACE_ENTRYDASH:-}"
+    #   p2.sh: echo E=[${_SCRIPT_INTERFACE_ENTRYDASH-<unset>}]
