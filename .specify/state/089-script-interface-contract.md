@@ -1,23 +1,23 @@
 # Line State — 089-script-interface-contract
 
 <!-- loop-state:begin -->
-spine_state: stalled
+spine_state: completed
 run_id: r20261106T090000Z-086a
-slice: 086
+slice: 089
 stage: implement
 stage_started_at: 1793959000
 stage_deadline_epoch: 1793976400
 stage_base_commit: ea2f3f0d
 attempt: 1
 retry_limit: 3
-last_verdict: SC-003 green (751 candidates / 0 violations / 737 exemptions); T080/T083 done; closure suite re-running after removing the nested main entry from 8 command scripts; T081/T086 and local closure remain
+last_verdict: merged to master (2026-11-09) as 089-script-interface; SC-003 green (751 candidates / 0 violations / 737 exemptions); the merged-tree suite matches the origin/master failure set except environment-only cases; the feature was renumbered from 086 to 089 to avoid the remote 086
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR4 — write this spine BEFORE U2, at U3/U4/U5; reentry reads only this, never conversation memory.
   HR5 — a subagent turn limit is a bounded stall: split the package or finish driver-side; write stalled/reentry-required only at the retry limit.
   Reporting — a progress report is a statement, not an approval request.
   Workspace — run workspace-guard --check before accepting any package; drift rejects the package.
-next_action: T086 compare (zero new failures) -> T081 registry (Implemented) -> closure-acceptance-check -> local merge to master (no push) -> Completed
+next_action: 089 closed and pushed; start the 090 Re-Anchoring SDD chain (clarify -> plan -> tasks -> review) on top of this trunk
 direction_contract: |
   goal_verbatim: "为了避免后续再出现『执行 generate-instructions.sh --help 想看接口，该脚本没有 --help 处理，直接把一次 reconcile 跑了起来』这样的问题，需要在 constitution 中增加所有的 *.sh/*.py 脚本都需要默认添加 --help/--version 参数"（补充裁定：通用规则，落点含 templates/constitution-template.md 与 templates/instructions-template.md，不只服务本仓库）。
   non_goals: [纯库加 help, 脚本内部重构或统一 CLI 库, 改 src/specify_cli 的 Typer CLI, 每脚本独立版本系统, 新增命令或门禁, 追溯改写历史记录]
