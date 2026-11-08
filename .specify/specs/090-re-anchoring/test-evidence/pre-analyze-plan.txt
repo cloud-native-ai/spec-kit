@@ -1,0 +1,8 @@
+# pre-analyze-check --stage plan — Feature 090-re-anchoring
+# run at 2026-11-08T22:38:27Z by the plan stage (SDD Plan Coordinator)
+# command: python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/090-re-anchoring --stage plan --repo .
+
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=2 waived=0
+{"stage": "plan", "decision": "pass", "findings": [{"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 72, "message": "path does not exist under the repo: skills/external/..."}, {"check": "missing-path", "severity": "advisory", "path": "requirements.md", "line": 72, "message": "path does not exist under the repo: .specify/skills/..."}], "summary": {"errors": 0, "advisories": 2, "waived": 0, "fr": 10, "sc": 4, "tasks": 0, "clauses": 0, "files": 10}, "checked_at": "2026-11-08T22:38:27Z"}
+
+exit=0

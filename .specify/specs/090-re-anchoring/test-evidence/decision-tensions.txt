@@ -1,0 +1,69 @@
+# validate-decision-tensions.py — Feature 090-re-anchoring
+# run at 2026-11-08T22:37:34Z by the plan stage
+/usr/bin/python3 scripts/python/validate-decision-tensions.py --spec .specify/specs/090-re-anchoring --json
+{
+  "spec": ".specify/specs/090-re-anchoring",
+  "status": "error",
+  "checks": [
+    {
+      "label": "dtr-anchor",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-section-missing",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-record-incomplete",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-tension-id",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "dtr-rejected-form",
+      "status": "pass",
+      "count": 0,
+      "severity": 0
+    },
+    {
+      "label": "expected-sacrifice-unmapped",
+      "status": "fail",
+      "count": 2,
+      "severity": "HIGH"
+    }
+  ],
+  "errors": 2,
+  "warnings": 0,
+  "scanned": {
+    "lines": 290,
+    "records": 2
+  },
+  "channel": {
+    "value_domain": "HIGH-or-0",
+    "high": 2
+  },
+  "findings": [
+    {
+      "line": 101,
+      "label": "expected-sacrifice-unmapped",
+      "severity": "HIGH",
+      "text": "`expected_sacrifice` names SC-002, which has no `**SC-002 Source**` entry under `### Measurement Sources & Collection Methods` in requirements.md"
+    },
+    {
+      "line": 112,
+      "label": "expected-sacrifice-unmapped",
+      "severity": "HIGH",
+      "text": "`expected_sacrifice` names SC-004, which has no `**SC-004 Source**` entry under `### Measurement Sources & Collection Methods` in requirements.md"
+    }
+  ]
+}

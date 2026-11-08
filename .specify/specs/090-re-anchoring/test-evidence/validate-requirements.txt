@@ -1,0 +1,16 @@
+# validate-requirements.py — Feature 090-re-anchoring (requirements.md, untouched by this stage)
+# run at 2026-11-08T22:37:34Z by the plan stage
+file: .specify/specs/090-re-anchoring/requirements.md
+status: error
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] fail (4)
+scanned: 90 lines, 14 definition rows, 0 shared strings
+45: path-marker: SC-001 in requirements.md carries no `**Path**` marker — every success criterion states whether it proves the feature's main user journey (`**Path**: final`) or is supporting evidence (`**Path**: supporting`), written as the last token of its line
+46: path-marker: SC-002 in requirements.md carries no `**Path**` marker — every success criterion states whether it proves the feature's main user journey (`**Path**: final`) or is supporting evidence (`**Path**: supporting`), written as the last token of its line
+47: path-marker: SC-003 in requirements.md carries no `**Path**` marker — every success criterion states whether it proves the feature's main user journey (`**Path**: final`) or is supporting evidence (`**Path**: supporting`), written as the last token of its line
+48: path-marker: SC-004 in requirements.md carries no `**Path**` marker — every success criterion states whether it proves the feature's main user journey (`**Path**: final`) or is supporting evidence (`**Path**: supporting`), written as the last token of its line
+4 error(s), 0 warning(s)
