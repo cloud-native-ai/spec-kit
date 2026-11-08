@@ -45,7 +45,7 @@
   boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
 - Answer five binary questions, each with a path or a reading as evidence:
   1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next
-     stage / spine written before acting / `workspace-guard --check` / fast-fail / confirmation gates / budget)?
+     stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?
   2. Was the last action completed under those rules — no report substituting for execution, no subagent
      turn-limit treated as a reason to hand back?
   3. Is the next action the one the plan or assignment names? (The goal is implicit in it; do not ask the goal
