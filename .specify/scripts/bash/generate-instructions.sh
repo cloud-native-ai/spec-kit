@@ -42,10 +42,19 @@ _script_interface_guard() {
         [ "$_stop" -eq 1 ] && continue
         case "$_arg" in
             --) _stop=1 ;;
+            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
             --version) [ -n "$_wanted" ] || _wanted=version ;;
         esac
     done
     case "$_wanted" in
+        help)
+            printf 'usage: %s %s\n' "${0##*/}" '(no options)'
+            printf 'options:\n'
+            printf '  -h, --help   print this help and exit\n'
+            printf '  --version    print the script name and the framework version, then exit\n'
+            printf 'side-effects: %s\n' 'rewrites .specify/instructions.md, backs it up beside itself, appends patterns to .gitignore and writes .specify/tools/*.json; the flags write nothing'
+            printf 'exit-codes: %s\n' '0 generated or answered; 1 the template or a prerequisite is missing; 2 an unrecognized option'
+            exit 0 ;;
         version)
             script_interface_version_text "$0" "$(dirname -- "$0")"
             exit 0 ;;

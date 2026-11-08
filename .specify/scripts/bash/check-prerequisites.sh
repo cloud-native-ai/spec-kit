@@ -42,10 +42,26 @@ _script_interface_guard() {
         [ "$_stop" -eq 1 ] && continue
         case "$_arg" in
             --) _stop=1 ;;
+            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
             --version) [ -n "$_wanted" ] || _wanted=version ;;
         esac
     done
     case "$_wanted" in
+        help)
+            printf 'usage: %s %s\n' "${0##*/}" '[--json] [--require-tasks] [--include-tasks] [--require-spec] [--include-spec] [--include-plan] [--paths-only]'
+            printf 'options:\n'
+            printf '  -h, --help   print this help and exit\n'
+            printf '  --version    print the script name and the framework version, then exit\n'
+            printf '  %s\n' '--json'
+            printf '  %s\n' '--require-tasks'
+            printf '  %s\n' '--include-tasks'
+            printf '  %s\n' '--require-spec'
+            printf '  %s\n' '--include-spec'
+            printf '  %s\n' '--include-plan'
+            printf '  %s\n' '--paths-only'
+            printf 'side-effects: %s\n' 'reads the feature tree and prints a prerequisite report; writes nothing'
+            printf 'exit-codes: %s\n' '0 prerequisites satisfied; 1 a prerequisite is missing; 2 an unrecognized option'
+            exit 0 ;;
         version)
             script_interface_version_text "$0" "$(dirname -- "$0")"
             exit 0 ;;

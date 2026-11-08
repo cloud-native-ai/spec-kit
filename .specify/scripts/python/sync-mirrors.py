@@ -279,7 +279,42 @@ def python_version_bridge():
     return "\n".join(header) + _VERSION_SEARCH_BLOCK + "\n" + _PYTHON_BRIDGE_BODY
 
 
-def bash_version_guard(version_body):
+def _bash_declaration(source_text):
+    """The consumer's declared surface, read from its own `script_interface_guard define` call.
+
+    The mirror answers `--help` before the consumer's guard runs, so the body it prints has to
+    be the source's own declaration. A source with no define call yields empty fields and the
+    body falls back to its generic wording.
+    """
+    import re
+
+    out = {"usage": "", "effects": "", "codes": "", "options": ""}
+    if not isinstance(source_text, str):
+        return out
+    match = re.search(
+        r"script_interface_guard\s+define\b(?P<body>.*?)"
+        r"(?:\n\s*script_interface_guard\s+guard\b|\Z)", source_text, re.S)
+    if not match:
+        return out
+    body = match.group("body")
+    for key in ("usage", "effects", "codes"):
+        found = re.search(r'%s="([^"]*)"' % key, body)
+        if found:
+            out[key] = found.group(1)
+    after = re.search(r"^\s*--\s+(.+)$", body, re.M)
+    if after:
+        tokens = [tok for tok in after.group(1).split()
+                  if tok not in ("-h", "--help", "--version")]
+        out["options"] = " ".join(tokens)
+    return out
+
+
+def _sq(text):
+    """The text as one single-quoted bash word."""
+    return "'" + str(text).replace("'", "'\\''") + "'"
+
+
+def bash_version_guard(version_body, declaration=None):
     """The block a ``bash-version-guard`` mirror carries immediately after its shebang.
 
     Deliberately self-contained (C-36): it sources nothing. Two things make that possible, and
@@ -289,17 +324,23 @@ def bash_version_guard(version_body):
         ``__SCRIPT_INTERFACE_VERSION_BODY__`` -- the library and the emitted guard are one
         text, never two copies that can drift. The function is DEFINED in the block, so a
         consumer that cannot find the library can still call it;
-      * only ``--version`` is answered here. ``-h`` / ``--help`` belong to the script's own
-        guard, which knows the declared usage and option set; a generic body emitted here
-        would answer help first and hide them (measured on ``check-prerequisites.sh``, whose
-        review flags disappeared from the mirror's help).
+      * the help body is the SOURCE's own declaration, extracted at projection time
+        (``declaration``): usage, declared options, side-effects and exit codes. The mirror
+        answers ``--help`` before the consumer's guard runs, so a generic body here would hide
+        the real usage (measured on ``check-prerequisites.sh``, whose review flags had
+        disappeared). A downstream copy without the library is the case this body exists for.
 
-    It answers ``--version`` before the script's own parsing, honours the bare ``--``
-    terminator and exits 0 when it answers. An undeclared option is NOT rejected here -- that
-    rejection belongs to the script's own parser, and pre-empting it would change an existing
-    interface. ``version_body`` empty means the source no longer defines the function, which
-    ``project_source`` refuses rather than emitting a broken block.
+    It answers ``--version`` / ``-h`` / ``--help`` before the script's own parsing, honours the
+    bare ``--`` terminator and exits 0 when it answers. An undeclared option is NOT rejected
+    here -- that rejection belongs to the script's own parser, and pre-empting it would change
+    an existing interface. ``version_body`` empty means the source no longer defines the
+    function, which ``project_source`` refuses rather than emitting a broken block.
     """
+    declaration = declaration or {}
+    usage = declaration.get("usage") or "[options]"
+    effects = declaration.get("effects") or "none; the flags write nothing"
+    codes = declaration.get("codes") or "0 the flag was answered; 2 an unrecognized option"
+    options = [opt for opt in (declaration.get("options") or "").split()]
     lines = [
         "# " + _marker("bash-version-guard"),
         "#",
@@ -320,10 +361,23 @@ def bash_version_guard(version_body):
         '        [ "$_stop" -eq 1 ] && continue',
         '        case "$_arg" in',
         "            --) _stop=1 ;;",
+        '            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;',
         '            --version) [ -n "$_wanted" ] || _wanted=version ;;',
         "        esac",
         "    done",
         '    case "$_wanted" in',
+        "        help)",
+        "            printf 'usage: %s %s\\n' \"${0##*/}\" " + _sq(usage),
+        "            printf 'options:\\n'",
+        "            printf '  -h, --help   print this help and exit\\n'",
+        "            printf '  --version    print the script name and the framework version, then exit\\n'",
+    ]
+    for opt in options:
+        lines.append("            printf '  %s\\n' " + _sq(opt))
+    lines += [
+        "            printf 'side-effects: %s\\n' " + _sq(effects),
+        "            printf 'exit-codes: %s\\n' " + _sq(codes),
+        "            exit 0 ;;",
         "        version)",
         '            script_interface_version_text "$0" "$(dirname -- "$0")"',
         "            exit 0 ;;",
@@ -334,7 +388,6 @@ def bash_version_guard(version_body):
     ]
     block = "\n".join(lines) + "\n"
     return block.replace("    " + PROJECTION_SENTINEL, version_body)
-
 
 def project_source(source_text, kind):
     """Return ``(mirror_text, applied)`` -- the declared projection of ``source_text`` (C-34).
@@ -377,7 +430,7 @@ def project_source(source_text, kind):
         if not version_body:
             return ("the projection sentinel has no body: %s does not define "
                     "script_interface_version_text()" % GUARD_LIBRARY_SOURCE, False)
-        block = bash_version_guard(version_body)
+        block = bash_version_guard(version_body, _bash_declaration(source_text))
         if _carries_projection_block(source_text, block):
             return source_text, True
         shebang = lines[0] if lines[0].endswith("\n") else lines[0] + "\n"
@@ -499,9 +552,12 @@ def project_for(mirror_rel_path):
         marker = _marker(kind)
         block_lines = dry.splitlines(keepends=True)
         start = next((i for i, line in enumerate(block_lines) if marker in line), 1)
-        block = "".join(block_lines[start:start + (
-            len(bash_version_guard("").splitlines()) if kind == "bash-version-guard"
-            else len(python_version_bridge().splitlines()))])
+        if kind == "bash-version-guard":
+            stop = next(i for i in range(start, len(block_lines))
+                        if block_lines[i].strip() == '_script_interface_guard "$@"') + 1
+        else:
+            stop = start + len(python_version_bridge().splitlines())
+        block = "".join(block_lines[start:stop])
     else:
         block = python_version_bridge() if kind == "python-version-bridge" else ""
     expected, applied = project_source(_strip_projection_block(source_text, block), kind)

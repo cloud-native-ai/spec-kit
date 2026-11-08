@@ -42,10 +42,20 @@ _script_interface_guard() {
         [ "$_stop" -eq 1 ] && continue
         case "$_arg" in
             --) _stop=1 ;;
+            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
             --version) [ -n "$_wanted" ] || _wanted=version ;;
         esac
     done
     case "$_wanted" in
+        help)
+            printf 'usage: %s %s\n' "${0##*/}" '[--names-out <file>] [pytest arguments...]'
+            printf 'options:\n'
+            printf '  -h, --help   print this help and exit\n'
+            printf '  --version    print the script name and the framework version, then exit\n'
+            printf '  %s\n' '--names-out'
+            printf 'side-effects: %s\n' 'runs pytest in the caller'\''s tree; with --names-out also writes the sorted FAILED test-id list to that file; the flags write nothing'
+            printf 'exit-codes: %s\n' '0 pytest passed; pytest'\''s own exit code otherwise; 2 an unrecognized option'
+            exit 0 ;;
         version)
             script_interface_version_text "$0" "$(dirname -- "$0")"
             exit 0 ;;
