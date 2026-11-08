@@ -1,0 +1,23 @@
+# mirror parity — 2026-11-08T23:10:23Z
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (416 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (121 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (98 files, byte-identical)
+exit=0
+
+## the six pairs plan.md names
+IDENTICAL shared/definitions/re-anchoring-definitions.md
+IDENTICAL shared/definitions/agent-definitions.md
+IDENTICAL templates/constitution-template.md
+IDENTICAL templates/instructions-template.md
+IDENTICAL skills/internal/manage-constitution/SKILL.md
+IDENTICAL skills/external/sdd-loop-driver/references/checkpoint-protocol.md

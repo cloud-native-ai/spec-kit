@@ -1,0 +1,25 @@
+# premises re-measured at tasks generation — 2026-11-09
+
+## FR definitions
+18
+## clauses per contract page (heading form)
+direction-audit.contract.md 9
+governance-landing.contract.md 6
+guard-tests.contract.md 8
+re-anchoring-faces.contract.md 8
+## constitution principles
+21
+22
+## pins
+75:TEMPLATE_COUNT = 21     # stale-pin update (2026-11-09, 090): 20 -> 21
+80:LIVE_COUNT = 22         # stale-pin update (2026-11-09, 090): 21 -> 22
+84:COMMAND_COUNT = 14      # stale-pin update (2026-11-09, 090): 13 -> 14
+## instructions bytes / budget
+35790 .specify/instructions.md
+100:INSTRUCTIONS_BUDGET_BYTES=37888
+## owner page lines
+63 shared/definitions/re-anchoring-definitions.md
+## sibling baselines
+26
+## tasks rows
+38
