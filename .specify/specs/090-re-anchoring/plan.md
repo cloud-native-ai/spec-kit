@@ -1,6 +1,6 @@
 # Implementation Plan: Re-Anchoring（不忘初心 · 温故而知新）
 
-**Branch**: `090-re-anchoring` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
+**Branch**: `master` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
 **Requirement → Feature**: `090-re-anchoring` → Feature 090 Re-Anchoring（不忘初心 · 温故而知新）
 **Input**: Specification from `.specify/specs/090-re-anchoring/requirements.md` (10 FR / 4 SC / 2 runtime rows, clarify settled 2026-11-09)
 
