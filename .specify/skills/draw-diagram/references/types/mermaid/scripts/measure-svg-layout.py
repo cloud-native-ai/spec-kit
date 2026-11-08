@@ -361,7 +361,10 @@ def _sig_guard(argv):
     # the declared vocabulary and the flag forms are its, and C-9 (a recognized option
     # never rescues an unrecognized one) is its judgement. What stays local is the help
     # BODY, because its operand sentence is this script's own.
-    import script_interface_cli as _sig  # noqa: E402 -- deferred: top-level imports stay stdlib-only
+    try:
+        import script_interface_cli as _sig  # noqa: E402 -- deferred: a copied script may lack it
+    except ImportError:  # skill-local or sandbox copy: the module's own parser still runs
+        return list(argv)
     line = list(argv)
     try:
         _sig.guard_argv(line, declared=_SIG_DECLARED)

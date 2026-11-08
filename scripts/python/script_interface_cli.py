@@ -579,7 +579,10 @@ def preparse_version_guard(argv: Optional[Iterable[str]] = None,
     for token in unjudged:
         if token in ("-h", "--help", VERSION_FLAG):
             continue                       # the module's own parser answers help
+        # `--opt=value` is the same declared option as `--opt`; judge the name, not the pair.
+        head = token.split("=", 1)[0] if token.startswith("--") and "=" in token else token
         if (token.startswith("-") and token != "-" and token not in known
+                    and head not in known
                     and not (len(token) > 1 and token[1].isdigit())):
             print("error: unrecognized option: %s" % token, file=err)
             raise SystemExit(unknown_exit)

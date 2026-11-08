@@ -222,24 +222,24 @@ from pathlib import Path
 
 text = Path(sys.argv[1]).read_text(encoding="utf-8")
 try:
-json.loads(text)
+    json.loads(text)
 except json.JSONDecodeError as exc:
-start = max(exc.pos - 120, 0)
-end = min(exc.pos + 120, len(text))
-excerpt = text[start:end].replace("\n", "\\n")
-print(
-    json.dumps(
-        {
-            "message": exc.msg,
-            "line": exc.lineno,
-            "column": exc.colno,
-            "position": exc.pos,
-            "excerpt": excerpt,
-        },
-        ensure_ascii=False,
+    start = max(exc.pos - 120, 0)
+    end = min(exc.pos + 120, len(text))
+    excerpt = text[start:end].replace("\n", "\\n")
+    print(
+        json.dumps(
+            {
+                "message": exc.msg,
+                "line": exc.lineno,
+                "column": exc.colno,
+                "position": exc.pos,
+                "excerpt": excerpt,
+            },
+            ensure_ascii=False,
+        )
     )
-)
-sys.exit(1)
+    sys.exit(1)
 PYEOF
     }
 
@@ -314,89 +314,89 @@ debug_mode = sys.argv[3] == "true"
 json_data = json_path.read_text(encoding="utf-8")
 
 try:
-data = json.loads(json_data)
+    data = json.loads(json_data)
 except json.JSONDecodeError as exc:
-if debug_mode:
-    start = max(exc.pos - 120, 0)
-    end = min(exc.pos + 120, len(json_data))
-    excerpt = json_data[start:end].replace("\n", "\\n")
-    print(
-        f"[create-new-tools][debug] JSON parse failed at line {exc.lineno}, column {exc.colno}: {exc.msg}",
-        file=sys.stderr,
-    )
-    print(f"[create-new-tools][debug] Raw excerpt: {excerpt}", file=sys.stderr)
-sys.exit(1)
+    if debug_mode:
+        start = max(exc.pos - 120, 0)
+        end = min(exc.pos + 120, len(json_data))
+        excerpt = json_data[start:end].replace("\n", "\\n")
+        print(
+            f"[create-new-tools][debug] JSON parse failed at line {exc.lineno}, column {exc.colno}: {exc.msg}",
+            file=sys.stderr,
+        )
+        print(f"[create-new-tools][debug] Raw excerpt: {excerpt}", file=sys.stderr)
+    sys.exit(1)
 
 # Flatten all tool sources into a single list
 all_tools = []
 
 # Handle different JSON structures from refresh-tools.sh
 if isinstance(data, dict):
-if isinstance(data.get('tools'), list):
-    all_tools.extend(tool for tool in data.get('tools', []) if isinstance(tool, dict))
+    if isinstance(data.get('tools'), list):
+        all_tools.extend(tool for tool in data.get('tools', []) if isinstance(tool, dict))
 
-# Check for system tools structure (with binaries array)
-if 'binaries' in data:
-    for binary in data.get('binaries', []):
-        if isinstance(binary, dict):
-            binary['source_type'] = 'system-binary'
-            all_tools.append(binary)
+    # Check for system tools structure (with binaries array)
+    if 'binaries' in data:
+        for binary in data.get('binaries', []):
+            if isinstance(binary, dict):
+                binary['source_type'] = 'system-binary'
+                all_tools.append(binary)
 
-# Check for shell functions (list at top level)
-if 'functions' in data:
-    for func in data.get('functions', []):
-        if isinstance(func, dict):
-            func['source_type'] = 'shell-function'
-            all_tools.append(func)
+    # Check for shell functions (list at top level)
+    if 'functions' in data:
+        for func in data.get('functions', []):
+            if isinstance(func, dict):
+                func['source_type'] = 'shell-function'
+                all_tools.append(func)
 
-# Check for project scripts (list at top level)
-if 'scripts' in data:
-    for script in data.get('scripts', []):
-        if isinstance(script, dict):
-            script['source_type'] = 'project-script'
-            all_tools.append(script)
+    # Check for project scripts (list at top level)
+    if 'scripts' in data:
+        for script in data.get('scripts', []):
+            if isinstance(script, dict):
+                script['source_type'] = 'project-script'
+                all_tools.append(script)
 
-# Also check simple keys: system, shell, project
-for source_type in ['system', 'shell', 'project']:
-    tools = data.get(source_type, [])
-    if isinstance(tools, list):
-        for tool in tools:
-            if isinstance(tool, dict):
-                tool['source_type'] = source_type
-                all_tools.append(tool)
+    # Also check simple keys: system, shell, project
+    for source_type in ['system', 'shell', 'project']:
+        tools = data.get(source_type, [])
+        if isinstance(tools, list):
+            for tool in tools:
+                if isinstance(tool, dict):
+                    tool['source_type'] = source_type
+                    all_tools.append(tool)
 
 elif isinstance(data, list):
-# If data is already a list, use it directly
-all_tools = data
+    # If data is already a list, use it directly
+    all_tools = data
 
 # Search for tool by name (exact match first, then partial)
 found_tools = []
 for tool in all_tools:
-name = tool.get('name', '')
-if name == tool_name:
-    found_tools.insert(0, tool)  # Exact match at front
-elif tool_name.lower() in name.lower():
-    found_tools.append(tool)
+    name = tool.get('name', '')
+    if name == tool_name:
+        found_tools.insert(0, tool)  # Exact match at front
+    elif tool_name.lower() in name.lower():
+        found_tools.append(tool)
 
 if not found_tools:
-result = {
-    "status": "not_found",
-    "tool_name": tool_name,
-    "message": f"No tool found matching '{tool_name}'"
-}
+    result = {
+        "status": "not_found",
+        "tool_name": tool_name,
+        "message": f"No tool found matching '{tool_name}'"
+    }
 elif len(found_tools) == 1:
-result = {
-    "status": "found",
-    "tool": found_tools[0],
-    "message": f"Found tool: {found_tools[0].get('name')}"
-}
+    result = {
+        "status": "found",
+        "tool": found_tools[0],
+        "message": f"Found tool: {found_tools[0].get('name')}"
+    }
 else:
-# Multiple matches - return all with source info
-result = {
-    "status": "multiple_matches",
-    "tools": found_tools,
-    "message": f"Found {len(found_tools)} tools matching '{tool_name}'. Please specify source type."
-}
+    # Multiple matches - return all with source info
+    result = {
+        "status": "multiple_matches",
+        "tools": found_tools,
+        "message": f"Found {len(found_tools)} tools matching '{tool_name}'. Please specify source type."
+    }
 
 print(json.dumps(result, indent=2))
 PYTHON_SCRIPT
@@ -538,51 +538,51 @@ import json
 json_data = sys.stdin.read()
 
 try:
-data = json.loads(json_data)
+    data = json.loads(json_data)
 except json.JSONDecodeError:
-print(json.dumps({"error": "Invalid JSON from refresh-tools.sh"}))
-sys.exit(1)
+    print(json.dumps({"error": "Invalid JSON from refresh-tools.sh"}))
+    sys.exit(1)
 
 # Flatten all tool sources
 all_tools = []
 
 # Handle different JSON structures from refresh-tools.sh
 if isinstance(data, dict) and isinstance(data.get('tools'), list):
-all_tools.extend(tool for tool in data.get('tools', []) if isinstance(tool, dict))
+    all_tools.extend(tool for tool in data.get('tools', []) if isinstance(tool, dict))
 elif isinstance(data, dict):
-# Check for system tools structure (with binaries array)
-if 'binaries' in data:
-    for binary in data.get('binaries', []):
-        if isinstance(binary, dict):
-            binary['source_type'] = 'system-binary'
-            all_tools.append(binary)
-
-# Check for shell functions (list at top level)
-if 'functions' in data:
-    for func in data.get('functions', []):
-        if isinstance(func, dict):
-            func['source_type'] = 'shell-function'
-            all_tools.append(func)
-
-# Check for project scripts (list at top level)
-if 'scripts' in data:
-    for script in data.get('scripts', []):
-        if isinstance(script, dict):
-            script['source_type'] = 'project-script'
-            all_tools.append(script)
+    # Check for system tools structure (with binaries array)
+    if 'binaries' in data:
+        for binary in data.get('binaries', []):
+            if isinstance(binary, dict):
+                binary['source_type'] = 'system-binary'
+                all_tools.append(binary)
+    
+    # Check for shell functions (list at top level)
+    if 'functions' in data:
+        for func in data.get('functions', []):
+            if isinstance(func, dict):
+                func['source_type'] = 'shell-function'
+                all_tools.append(func)
+    
+    # Check for project scripts (list at top level)
+    if 'scripts' in data:
+        for script in data.get('scripts', []):
+            if isinstance(script, dict):
+                script['source_type'] = 'project-script'
+                all_tools.append(script)
 
 # Format output
 if len(all_tools) == 0:
-print("No tools found. Make sure refresh-tools.sh is working correctly.")
+    print("No tools found. Make sure refresh-tools.sh is working correctly.")
 else:
-print(f"Found {len(all_tools)} tools:\n")
-for tool in all_tools:
-    name = tool.get('name', 'unknown')
-    source_type = tool.get('source_type', 'unknown')
-    desc = tool.get('description', 'No description')[:100]
-    print(f"  - {name} ({source_type})")
-    print(f"    {desc}")
-    print()
+    print(f"Found {len(all_tools)} tools:\n")
+    for tool in all_tools:
+        name = tool.get('name', 'unknown')
+        source_type = tool.get('source_type', 'unknown')
+        desc = tool.get('description', 'No description')[:100]
+        print(f"  - {name} ({source_type})")
+        print(f"    {desc}")
+        print()
 PYEOF
 
         # Execute Python script with JSON data

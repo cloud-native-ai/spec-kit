@@ -90,8 +90,15 @@ import pathlib as _sig_pathlib
 _SIG_DIR = str(_sig_pathlib.Path(__file__).resolve().parent)
 if _SIG_DIR not in _sig_sys.path:
     _sig_sys.path.insert(0, _SIG_DIR)
-from script_interface_cli import fill_help_labels  # noqa: E402
-from script_interface_cli import guard_argv as _sig_guard  # noqa: E402
+try:  # the helper ships beside the engine; a copied tree may lack it
+    from script_interface_cli import fill_help_labels  # noqa: E402
+    from script_interface_cli import guard_argv as _sig_guard  # noqa: E402
+except ImportError:  # a skill-local or sandbox copy still runs its action
+    def fill_help_labels(text, **_kwargs):
+        return text
+
+    def _sig_guard(_argv=None, declared=None, **_kwargs):
+        return None
 
 
 _HELP = """usage: gate-check.py <path> [...] | --stdin

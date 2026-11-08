@@ -60,6 +60,8 @@ ACTIONS = ("scaffold", "check", "mounts", "build", "theme")
 STDLIB_ALLOWED = {
     "__future__", "argparse", "json", "os", "re", "shutil", "subprocess", "sys",
     "pathlib",
+    # shipped beside the scaffolder by the same `scripts/` mirror (script-interface guard)
+    "script_interface_cli",
 }
 
 # The capability is optional: when the scaffolder is not installed, its behavioural

@@ -135,21 +135,21 @@ import sys
 skill_file = Path(sys.argv[1])
 skill_id = sys.argv[2]
 if not skill_file.exists():
-raise SystemExit(0)
+    raise SystemExit(0)
 
 content = skill_file.read_text(encoding="utf-8")
 lines = content.splitlines()
 if any(line.startswith("skill_id:") for line in lines):
-raise SystemExit(0)
+    raise SystemExit(0)
 
 if lines and lines[0].strip() == "---":
-end = 1
-while end < len(lines) and lines[end].strip() != "---":
-    end += 1
-lines.insert(end, f'skill_id: "{skill_id}"')
-skill_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    end = 1
+    while end < len(lines) and lines[end].strip() != "---":
+        end += 1
+    lines.insert(end, f'skill_id: "{skill_id}"')
+    skill_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
 else:
-skill_file.write_text(f'skill_id: "{skill_id}"\n' + content, encoding="utf-8")
+    skill_file.write_text(f'skill_id: "{skill_id}"\n' + content, encoding="utf-8")
 PYEOF
     }
 
