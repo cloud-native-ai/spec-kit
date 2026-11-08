@@ -386,6 +386,33 @@ project is told to open. The rule binds framework scripts, scripts of downstream
 third-party scripts alike, and it does not expire because a script was distributed rather than
 authored here.
 
+### XXI. Re-Anchoring (不忘初心 · 温故而知新)
+Every agent in this project — the driver and every dispatched subagent — MUST keep its original
+task and rules in view, and MUST re-confirm them after every core step:
+- **不忘初心 (Never Forget the Initial Rules and Task)**: the entry anchor MUST persist BOTH the task
+  anchor (goal verbatim, non-goals, acceptance authority, stage plan, decision gates) AND the RULE anchor
+  (the operating rules in force: unattended / no approval request / U4 -> next stage / spine before action /
+  workspace guard / fast-fail / confirmation gates / budget). A compaction, handoff or reentry MUST resume
+  from that anchor, never from memory or impression.
+- **温故而知新 (Review the Old, Know the New)**: after every core step (stage U4, package
+  boundary, checkpoint, subagent return), the agent MUST run compact -> reload -> evaluate and
+  answer the five rule-first direction questions, recording one of `on-track` / `correction-applied` /
+  `decision-needed`. The review's primary object is the RULES: the current and next action already
+  carry the goal, while a dropped rule (e.g. "unattended") leaves no trace in them. Only
+  `decision-needed` is surfaced; the audit is a statement, never an approval request.
+- The reload is tiered: T0 (the anchor digest at every core step), T1 (the rule digest at stage
+  boundaries, after a detected compaction and after a subagent turn-limit stall), T2 (the full
+  manual only when a dispatch form is unclear or a stall is handled). A full reload after every
+  tool call MUST NOT be substituted — it is ceremony that buries the anchor.
+- The full definition (the two concepts, the tiers, the agent obligation and its boundaries)
+  lives at `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated, here.
+- This principle adds a reviewing habit, not machinery: it MUST NOT justify a new scorer, a
+  ledger, a scheduler or a second checkpoint system.
+
+Rationale: a long run's most expensive failure is silent drift — the loop keeps executing while
+the original direction has been lost. Rules loaded once at the start do not survive compaction;
+a persisted anchor plus a periodic review does, and it costs one cheap reload per core step.
+
 ## [SECTION_2_NAME]
 <!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
