@@ -1,0 +1,19 @@
+# T083 — tests/** candidate disposition (2026-11-08)
+
+Every tests/** Python candidate is a pytest module: its action belongs to pytest, not to the
+file's own entry, so the run-semantics basis is `pytest-module` (exempt). The files carrying a
+real `__main__` block and every conftest.py are listed below with the same basis; none of them
+acts as a standalone script.
+
+tests/** candidates: 453; all basis=pytest-module: 453
+__main__-carrying files: 6
+
+- tests/contract/test_migration_distribution.py — pytest-module (has __main__; still a pytest test module)
+- tests/fixtures/cli_observation.py — pytest-module (has __main__; still a pytest test module)
+- tests/fixtures/client_project.py — pytest-module (has __main__; still a pytest test module)
+- tests/fixtures/humanize/diff_protected.py — pytest-module (has __main__; still a pytest test module)
+- tests/fixtures/review_git_repo.py — pytest-module (has __main__; still a pytest test module)
+- tests/fixtures/sdd_loop_efficiency/driver-stall-fixture.py — pytest-module (has __main__; still a pytest test module)
+
+conftest.py files: 1
+- tests/conftest.py — pytest-module (collection hook; no standalone action)

@@ -171,3 +171,13 @@
 | REC-086-W1 | 在 `shared/workflow/acceptance-hardening.md` § Inherited Blockers 写明「`inherited` 行按载体是否可解析来判」,并镜像进 `closure-acceptance-check.py --help` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W1(F9、F6) | open |
 | REC-086-W2 | `templates/feature-details-template.md` § Canonical Status State Machine 禁止任何形式的预测性状态写入(哪怕瞬时),预期值改落 checkpoint 的 `observations:` | `.specify/specs/086-efficient-test-execution/review.md` § 5.4 REC-W2(F6) | open |
 | REC-086-D1 | owner 指南指针每面一种路径形态:出厂文本取运行时形态、在声明规格里重钉 `STR-003`、owner 文件自身头部一致 | `.specify/specs/086-efficient-test-execution/review.md` § 5.5 REC-D1(F10、F11) | open |
+| F-1 (089) | Feature 089 的 `scripts/python/` 文件数争议（requirements 曾记 38，树实测 37） | `.specify/specs/089-script-interface-contract/feature-ref.md` § 7 F-1 | closed 2026-11-06（requirements 已改为 37，`argparse` 计数 36→35） |
+| F-2 (089) | Feature 089 的 `__main__` 携带 `.py` 数争议（曾读数 208 / requirements 207） | 同上 § 7 F-2 | closed 2026-11-06（逐文件复测 207 携带 / 459 不携带） |
+| F-3 (089) | Feature 089 的 `--version` 在 `pyproject.toml` 不可达时的退出码表述冲突 | 同上 § 7 F-3 | closed 2026-11-06（A4 与 C-8 / C-18 统一为 `unknown` + exit 0） |
+| F-4 (089) | Feature 089 的镜像一致性表述冲突（旧 FR-030「逐字节相同」vs 声明式投射） | 同上 § 7 F-4 | closed 2026-11-06（FR-030 改为两类判定，与 C-33…C-38 一致） |
+| F-5 (089) | Feature 089 的 `coaching-skills` / `create-skills` 的 `classification` 事实读数冲突 | 同上 § 7 F-5 | closed 2026-11-06（A6/Q6 已按实测更正；两者名下无脚本，本特性不修改） |
+| F-6 (089) | `manage-constitution` 未描述「由特性而非专门宪法运行落原则」的程序缺口 | 同上 § 7 F-6 | open（治理程序缺口，非脚本接口缺口） |
+| F-7 (089) | 规划主机的 `/tmp` 为 `noexec`，scratch 树一律落 `/var/tmp` | 同上 § 7 F-7 | open（环境事实，非仓库属性） |
+| T-001 (089) | Feature 089 的承重决策：按运行语义而非源码字面分类 | `.specify/specs/089-script-interface-contract/plan.md` § Decision Tensions T-001 | active（重开条件见记录；与本册目标编号 T-001…T-003 同名不同域，如需消除歧义走 `/speckit.sanitize --lane renumber`） |
+| T-002 (089) | Feature 089 的承重决策：以声明式镜像投射取代被测文件的逐字节相等 | 同上 § Decision Tensions T-002 | active（同上同名说明） |
+| T-003 (089) | Feature 089 的承重决策：本仓宪法随本特性以 MINOR 增量落地 | 同上 § Decision Tensions T-003 | active（同上同名说明） |

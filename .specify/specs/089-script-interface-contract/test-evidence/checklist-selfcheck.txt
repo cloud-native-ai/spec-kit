@@ -1,0 +1,10 @@
+file: .specify/specs/089-script-interface-contract/checklists/contract-integrity-2026-11-06.md
+item_count: 60
+id_dense: True
+traceable: 60
+traceability_ratio: 1.00
+prohibited_openers: []
+categories: {'Ambiguity': 5, 'Clarity': 2, 'Completeness': 8, 'Conflict': 7, 'Consistency': 4, 'Coverage': 5, 'Edge Case': 6, 'Measurability': 12, 'Non-functional': 5, 'Traceability': 6}
+notes_claims_coverage: ('60', '60')
+notes_claims_item_count: 60
+sections: ['Measured Baseline *(every count below was re-derived on 2026-11-06, not carried forward)*', 'Requirement Completeness *(are the deciding facts all written down?)*', "Requirement Clarity *(is every criterion decidable without reconstructing the author's intent?)*", 'Requirement Consistency *(do the original requirements and their implementation still agree?)*', 'Measurability *(is each pass/fail obtainable without interpretation?)*', 'Coverage *(are the scenario classes complete?)*', 'Edge Cases *(are boundary conditions specified, not merely observed?)*', 'Traceability *(can each decision be followed to its requirement and back?)*', 'Non-Functional *(performance, safety, compatibility)*', 'Notes']

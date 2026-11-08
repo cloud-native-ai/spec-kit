@@ -1,0 +1,47 @@
+# T024 — live instructions reconcile on a CLONED SCRATCH TREE (never the live tree)
+# Host: 499e05d41efc   Date: 2026-11-06T18:25:43+08:00
+# Clone: /var/tmp/086-t024/clone (cp -a of the repository working tree, git work tree present)
+# Reason: scripts/bash/generate-instructions.sh carries no argument guard until T057,
+#   so invoking it on the live tree would really reconcile and write
+#   .specify/instructions.md. The generator run is therefore confined to the clone;
+#   the live file receives only the single new '## Script Interface Contract' section.
+
+## Step 1 — clone state BEFORE the generator run
+$ git -C "$CLONE" status --short | head -20
+ M .specify/instructions.md
+ M .specify/memory/constitution.md
+ M .specify/shared/definitions/script-interface-definitions.md
+ M .specify/skills/internal/manage-constitution/SKILL.md
+ M .specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt
+ M .specify/templates/constitution-template.md
+ M .specify/templates/instructions-template.md
+ M shared/definitions/script-interface-definitions.md
+ M skills/internal/manage-constitution/SKILL.md
+ M templates/constitution-template.md
+ M templates/instructions-template.md
+ M tests/contract/test_fast_fail_discipline.py
+ M tests/contract/test_script_interface_contract.py
+clone instructions.md bytes: 33766
+clone heading count: 34
+Script Interface Contract present: 1
+
+
+## Step 8 correction — the single `.specify/instructions.md-*` entry is PRE-EXISTING, not produced by T024
+$ ls -la /cws_data/cloud-native-ai/spec-kit/.specify/instructions.md*
+-rw-rw-r-- 1 agent agent 33766 Nov  6 18:25 .specify/instructions.md
+-rw-r--r-- 1 agent agent 12586 Aug  6 20:53 .specify/instructions.md-2026-07-11
+The backup is dated 2026-07-11 (long before this package) and is gitignored, so it is a leftover
+from an earlier session. The T024 run wrote its backup inside the CLONE only:
+instructions.md-2026-07-11
+instructions.md-2026-11-06-182550
+
+## Verdict
+- The generator run happened exactly once, on the cloned scratch tree /var/tmp/086-t024/clone, exit 0.
+- It injected exactly ONE section into that clone: "Script Interface Contract".
+- The live .specify/instructions.md carries the same heading and a body byte-identical to the clone's
+  (compared after whitespace normalisation; both are one paragraph, so the comparison is exact in
+  substance), and the two files have the same size (33766 B) and the same heading count (34).
+- The live tree was never reconciled: no backup dated today exists in the live .specify/, and
+  .gitignore is unmodified.
+- Budget: 33766 B against INSTRUCTIONS_BUDGET_BYTES=34816 -> 1050 B headroom, "within". No budget
+  raise was needed by this package (that decision belongs to T062 for the backfill).

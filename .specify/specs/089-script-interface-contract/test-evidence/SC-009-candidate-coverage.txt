@@ -1,0 +1,64 @@
+# SC-009 — the candidate surface is falsifiable by placing a file outside it
+
+Criterion: SC-009 of `requirements.md` — place a `probe.sh` in a copy tree that
+`.gitignore` does not cover, run the checker (it exits 1 and names the file), then
+declare the file in `.gitignore` and run again (exit 0, the file not named).
+Task: `tasks.md` T070.
+Capture: `/var/tmp/086-5a-sc.py sc009`.
+
+## Method
+
+The measured tree is a `git init` tree under /var/tmp. It holds one tracked and
+compliant bash candidate (`scripts/compliant/ok.sh`, built on the repository's own
+`scripts/bash/script-interface.sh`), and the file under test
+(`scripts/probe.sh`, created in the copy and never committed, so it is untracked).
+The checker
+lives in a sibling directory and is pointed at the tree with `--root`; the walk,
+the `git check-ignore` filter, the `candidate-not-collected` finding and the probes
+are the ones a whole-repository run uses. The capture script's docstring records
+why a full run over this repository's 748-candidate surface is not the instrument
+for this criterion.
+
+## Readings
+
+### Reading 1 — `probe.sh` present and NOT declared in `.gitignore`
+
+    $ git status --porcelain --untracked-files=all
+    ?? measured/scripts/probe.sh
+    $ script-interface-check.py --root measured --json
+    exit 1
+
+the file named as a defect: candidate-not-collected (resolved=false)
+
+the findings that name it:
+
+    [{"kind": "candidate-not-collected", "message": "scripts/probe.sh is neither a tracked candidate nor ignored", "paths": ["scripts/probe.sh"], "resolved": false}]
+
+candidates the checker judged: ["scripts/compliant/ok.sh", "scripts/script-interface.sh"]
+
+**SC-009(a)**: RED — exit 1 and the file named. A script inside the tree but outside the candidate set is reported under its own name, never silently dropped (C-12).
+
+### Reading 2 — the same file declared in `.gitignore`
+
+    $ printf 'measured/scripts/probe.sh\n' >> .gitignore
+    $ script-interface-check.py --root measured --json
+    exit 0
+
+the file named as a defect: (not named as a defect)
+the file mentioned as: ignored-not-probed
+
+the findings that mention it:
+
+    [{"kind": "ignored-not-probed", "message": "ignored by .gitignore, so not a candidate", "paths": ["scripts/probe.sh"], "resolved": true}]
+
+candidates the checker judged: ["scripts/compliant/ok.sh", "scripts/script-interface.sh"]
+
+The only difference between the two readings is the `.gitignore` line. In reading
+1 the file is named as a DEFECT (`candidate-not-collected`, `resolved: false`); in
+reading 2 it is named as a checked DECLARATION (`ignored-not-probed`,
+`resolved: true`). The checker does not stay silent in either reading, which is
+the distinction SC-009 exists to fix: a file leaves the candidate surface by
+declaration, never by disappearance.
+
+**SC-009(b)**: GREEN — exit 0 and the file not named as a defect. The `.gitignore` line is reported as `ignored-not-probed` with `resolved: true`.
+

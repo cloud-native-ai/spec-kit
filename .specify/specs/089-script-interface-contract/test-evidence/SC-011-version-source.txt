@@ -1,0 +1,105 @@
+# SC-011 — `--version` is read from `pyproject.toml` at run time, mutating the file moves every line
+
+Criterion: SC-011 of `requirements.md` — "仅修改 `pyproject.toml` 的 `version` 字段后重跑全部适用脚本的
+`--version`，100% 的输出行随之改变且仍为 `<script-name> <version>` 单行；仓库内 `grep` 字面版本号在脚本中
+的命中数为 0".
+Task: `tasks.md` T065.
+Capture: `/var/tmp/pkg4b2b/t064_t065.py version` (raw record `/var/tmp/pkg4b2b/version.json`).
+
+## Method
+
+Copy tree `/var/tmp/pkg4b2b/version`, built as `git archive 516cb8f2` + the working-tree
+`scripts/ skills/ tests/ templates/ shared/ src/`, then `git init` + one seed commit so the
+bounded upward search (`pyproject.toml` AND `.git`) has a root to find. One edit only:
+
+    $ grep -n '^version' pyproject.toml        # before
+    3:version = "0.0.22"
+    $ sed -i 's/^version = "\(.*\)"$/version = "0.0.99"/' pyproject.toml
+    $ grep -n '^version' pyproject.toml        # after
+    3:version = "0.0.99"
+
+`--version` is then run on **the engine's own candidate set** — read out of the checker
+(`script-interface-check.py --skip-probe --json`) rather than re-derived here, so this record and
+the engine cannot disagree about what "every applicable script" is: **745 candidates** =
+`tests 451, .specify 149, skills 87 (71 py + 16 sh), scripts 54 (39 py + 15 sh), src 3,
+install.sh 1`. Each run is cwd-relative (`python3 <relpath> --version` from the tree root) so the
+recorded stdout carries no tree identity.
+
+## Result, by family
+
+| family | subjects | every line changed, one line, `<script-name> <version>` |
+|---|---|---|
+| `scripts/python` (framework engines) | 39 | **39 / 39** |
+| `scripts/bash` (framework commands) | 15 | **15 / 15** |
+| `skills/` python (backfilled corpus) | 71 | **71 / 71** |
+| `skills/` bash (backfilled corpus) | 16 | **16 / 16** |
+| `.specify/scripts` (the projected mirrors of the 6 declared pairs + their siblings) | 149 | 140 / 149 — see (a) |
+| `tests/`, `src/`, `install.sh` | 455 | 6 / 455 — see (b) |
+
+**141 of 141 framework and skill scripts** (39 + 15 + 71 + 16) answer the mutated version:
+every line changed from `<name> 0.0.22` to `<name> 0.0.99`, every line is a single line, every
+line still has the `<script-name> <version>` shape, and no line retains the old value. Sample,
+run outside the capture helper (`/var/tmp/pkg4b2b/repro-mut.py`):
+
+    scripts/python/sync-mirrors.py                    -> sync-mirrors.py 0.0.99
+    skills/external/git-utils/scripts/record-bump.sh  -> record-bump.sh 0.0.99
+    .specify/scripts/bash/generate-instructions.sh    -> generate-instructions.sh 0.0.99
+
+### (a) The 9 non-conforming `.specify/` mirrors
+
+`.specify/scripts/python/regen-command-copies.py` is a mirror that refuses to run from the mirror
+(`it: use the canonical copy instead`, exit 2) — by its own design, before and after the mutation,
+so it contributes no version line at all. The other 8 are
+`.specify/specs/075-.../notes/stall-evidence*/**/stub-runner.sh`: evidence fixtures for another
+feature that are shell scripts with no flag surface yet (a later row owns them). **They are not
+part of SC-011's subject set**, which is the family of framework/skill scripts, and their stubs
+exit non-zero before reaching any flag on both sides of the mutation.
+
+### (b) The 449 `tests/` + 3 `src/` + 1 root candidates
+
+These are test modules and fixtures, not scripts a user invokes: they carry no `--version` path
+today, so there is no line to change. SC-011 is stated over applicable scripts, and the applicable
+set is decided by the checker's classification (C-3/C-4/C-5), not by the `*.py` extension. The
+`examples` in this record's raw JSON therefore record `exit_after` 0/1/2 with empty stdout for
+those rows; they are listed, not counted.
+
+## Literal scan
+
+Repository-wide scan for a version-shaped literal **inside a script** — the object C-8 forbids:
+
+    pattern: ^\s*version\s*=\s*["']\d+\.\d+\.\d+["']\s*$   (plus VERSION= and __version__ forms)
+    hits: 2, both excluded with reason
+      tests/contract/test_script_interface_contract.py:1227  version = "4.5.6"
+      tests/contract/test_script_interface_contract.py:1324  version = "4.5.6"
+
+Both are the *fixture* `version` field of a scenario `pyproject.toml` that the test writes
+(`_probe_tree` / `_compliant_tree`: `'[project]\nname = "scenario"\nversion = "%s"\n' % version`).
+They are the test's own version SOURCE, not a script carrying a literal — a fixture that could
+not write a version field could not test a version source. Excluded with that reason, not silently
+dropped.
+
+A wider pattern that also matched the keyword-argument spelling (`version="1.2.3"`) produced five
+more rows in `tests/unit/test_script_interface_cli.py` (`_make_repo(tmp_path, version="1.1.1")`).
+Those are fixture helper calls — the same exclusion class — and the narrower, clause-shaped
+pattern is what this record reports.
+
+**Script bodies: zero hits.** No `scripts/`, `skills/`, `src/` or `.specify/scripts/` candidate
+carries a version literal.
+
+## Verdict
+
+* The single-source limb **holds for every framework and skill script**: one edit to
+  `pyproject.toml` moves 141/141 `--version` lines, and each line stays `<script-name> <version>`.
+* The zero-literal limb **holds for script bodies**: 0 hits outside the fixture `pyproject.toml`
+  writers, which are the tests' own version sources.
+* Recorded, not folded: 9 `.specify/` mirrors and all `tests/`/`src/` candidates answer no version
+  line. Neither group changes SC-011's subject set — the first by its own refusal design and by
+  belonging to an evidence fixture of another feature, the second because a test module is not an
+  applicable script.
+
+## Reproduce
+
+    /usr/bin/python3 /var/tmp/pkg4b2b/t064_t065.py version > /var/tmp/pkg4b2b/version.json
+    # or, one tree at a time:
+    sed -i 's/^version = "\(.*\)"$/version = "0.0.99"/' /var/tmp/pkg4b2b/repro/pyproject.toml
+    cd /var/tmp/pkg4b2b/repro && /usr/bin/python3 scripts/python/sync-mirrors.py --version

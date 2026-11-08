@@ -1,0 +1,57 @@
+# T079 / SC-008 — mutation M-1: deleting a compliant script's `--help` arm
+
+Task: `tasks.md` T079 (blockedBy T077). Clauses: C-7 (the flag surface is four separate
+assertions), C-9 (an undeclared token is refused), SC-008 (deleting a help arm goes red and
+names the script; zero false greens).
+Guard: `tests/contract/test_script_interface_contract.py::test_t079_a_deleted_help_arm_goes_red_and_names_the_script`.
+
+## The pair
+
+Both trees are built under `tmp_path`, one script each, `pyproject.toml` version `4.5.6`,
+each its own git root with one commit.
+
+- **conforming** — `_strict_bash("keepme.sh", "4.5.6")`, the suite's C-9-strict compliant
+  fixture. It validates the WHOLE line before answering a flag, so its baseline is green.
+  (`good_bash` was tried first and rejected as the control: it answers an undeclared token by
+  falling through the loop, so it is red for a reason unrelated to this mutation — a red
+  control makes the mutant's red say nothing.)
+- **mutant** — the same text with the ONE arm `      -h|--help) usage; exit 0 ;;` deleted.
+  Asserted at build time: the arm occurs exactly once in the conforming text, and the mutant
+  differs from it.
+
+## Mutation point, verbatim
+
+    main() {
+      for arg in "$@"; do
+        case "$arg" in
+    -      -h|--help) usage; exit 0 ;;      <-- the arm M-1 deletes
+          --version) echo "keepme.sh 4.5.6"; exit 0 ;;
+          --) break ;;
+          -*) unknown="$arg" ;;
+        esac
+      done
+
+## Readings — two exit codes and the paths the report names
+
+| tree | invocation | exit | violations | violation path | missing limbs |
+|---|---|---|---|---|---|
+| control | `--json --files scripts/keepme.sh --budget-seconds 120` | **0** | 0 | — (none) | — |
+| mutant | `--json --files scripts/keepme.sh --budget-seconds 120` | **1** | 1 | `scripts/keepme.sh` | `help` |
+
+- control: `violations == 0` AND `findings == []` (a green with a structural finding would not
+  be a control).
+- mutant: `violation_rows == [{"path": "scripts/keepme.sh", "missing": ["help"]}]` — the row
+  names the mutated path and the missing limb is the flag surface itself.
+- human face (no `--json`) on the mutant: exit 1, and a line naming both the script and `help`
+  is printed (`T079/C-19`). The finding is therefore not JSON-only.
+
+## Attributability (inverting the pair)
+
+The two trees differ in exactly one thing — the one arm — so the red is attributable to the
+mutation: the same input, the same checker, the same budget, opposite verdicts. A finding the
+pair missed would show as control red + mutant red, or as mutant green; neither occurred.
+
+## Verdict
+
+**SC-008 M-1: green.** Deleting one help arm turns the check red at exit 1, names the script
+and the missing limb, and the unmutated control stays green. No false green was observed.

@@ -1,0 +1,97 @@
+# T050-T054 readings — mirror declarative projection (PKG-4a)
+date: 2026-11-07T01:55:23+08:00
+
+## 1. contract suite
+.............................................................            [100%]
+61 passed in 13.80s
+
+## 2. sync-mirrors.py --check
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (415 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (138 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (16 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (117 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (95 files, byte-identical)
+exit=0
+
+## 3. --write idempotence (two consecutive runs; second must print no sync/DIFF)
+run1: no changes
+run2: no changes
+
+## 4. script-interface-check.py --check-projection
+candidates=0 applicable=0 exempt=0 violations=0
+exit=0
+projection rows: 6
+  ok python-version-bridge .specify/scripts/python/script_interface_cli.py idempotent=True
+  ok python-version-bridge .specify/scripts/python/sync-mirrors.py idempotent=True
+  ok python-version-bridge .specify/scripts/python/script-interface-check.py idempotent=True
+  ok bash-version-guard .specify/scripts/bash/check-prerequisites.sh idempotent=True
+  ok bash-version-guard .specify/scripts/bash/generate-instructions.sh idempotent=True
+  ok bash-version-guard .specify/scripts/bash/run-tests.sh idempotent=True
+findings: []
+
+## 5. flag surfaces from the MIRRORS (self-sufficiency C-36)
+.specify/scripts/python/script_interface_cli.py --version -> script_interface_cli.py 0.0.22
+.specify/scripts/python/sync-mirrors.py --version -> sync-mirrors.py 0.0.22
+.specify/scripts/python/script-interface-check.py --version -> script-interface-check.py 0.0.22
+.specify/scripts/bash/check-prerequisites.sh --version -> check-prerequisites.sh 0.0.22
+.specify/scripts/bash/generate-instructions.sh --version -> generate-instructions.sh 0.0.22
+.specify/scripts/bash/run-tests.sh --version -> run-tests.sh 0.0.22
+
+## 6. downstream self-sufficiency probe (copy in a foreign project, no source sibling, then orphan)
+--- 6a. foreign project: pyproject.toml + .git beside the copy, no scripts/python source
+h.py --version -> h.py 7.7.7
+exit=0
+h.py --help    -> exit 0
+--- 6b. orphan copy: no pyproject.toml anywhere
+h.py --version -> h.py 0.0.22
+exit=0
+--- 6c. bash mirror in a foreign project
+check-prerequisites.sh --version -> check-prerequisites.sh 3.3.3
+exit=0
+--- 6b (redone). orphan copy OUTSIDE the repository (/var/tmp), no pyproject.toml reachable
+h.py --version -> h.py unknown
+exit=0
+h.py --help    -> exit 0
+h.py --bogus   -> exit 2
+
+## 7. mutation proof on a COPY of the tree (/var/tmp/pkg4a-mutant/tree)
+--- 7a. tamper one projected python mirror (insert a hand-written line)
+sync-mirrors.py --check -> exit=2
+DIFF[projected] .specify/scripts/python/sync-mirrors.py
+check-projection -> exit=1
+projection-mismatch: .specify/scripts/python/sync-mirrors.py is not `scripts/python/sync-mirrors.py + python-version-bridge`: the mirror is not `source + declared projection`
+candidates=0 applicable=0 exempt=0 violations=0
+--- 7b. tamper one projected bash mirror (drop the guard block)
+sync-mirrors.py --check -> exit=2
+DIFF[projected] .specify/scripts/bash/check-prerequisites.sh
+DIFF[projected] .specify/scripts/python/sync-mirrors.py
+check-projection -> exit=1
+projection-mismatch: .specify/scripts/python/sync-mirrors.py is not `scripts/python/sync-mirrors.py + python-version-bridge`: the mirror is not `source + declared projection`
+projection-mismatch: .specify/scripts/bash/check-prerequisites.sh is not `scripts/bash/check-prerequisites.sh + bash-version-guard`: the mirror is not `source + declared projection`
+--- 7e. --write repairs the copy, and --check turns green again
+write exit=0
+check exit=0 (0 = repaired)
+check-projection exit=0 (0 = repaired)
+
+## 8. final verification pass
+--- 8a. contract suite (61 = 55 prior + 6 new)
+61 passed in 13.84s
+--- 8b. mirror parity suite, extended to consult PROJECTED_FILES (C-35)
+815 passed in 1.30s
+--- 8c. sync-mirrors.py --check (exit 0, six pairs ok, six projected lines)
+12
+exit=0
+--- 8d. --write idempotence
+0
+0
+--- 8e. --check-projection
+exit=0
+projection rows = 6 | all ok = True | findings = []

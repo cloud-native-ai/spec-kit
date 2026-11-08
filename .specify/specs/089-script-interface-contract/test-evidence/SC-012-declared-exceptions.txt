@@ -1,0 +1,22 @@
+# SC-012 — the exception register is recomputed, never trusted
+
+Criterion: SC-012 of `requirements.md` — a forged row and an injected-but-unrecomputable row are
+both errors with a visible `exceptions[]` entry; an empty register is legal. Task: `tasks.md` T072.
+
+Scenario tree: `/var/tmp/086-sc12/tree` (git repo, `pyproject.toml`, one external skill
+`demo` with `skills/external/demo/scripts/x.sh`). Command under test:
+`python3 scripts/python/script-interface-check.py --root <tree> --json --skip-probe`
+(`--skip-probe` isolates the register recomputation from the flag probes; exit code and
+`exceptions[]` are the readings).
+
+| Mutant | Register row | Exit | `exceptions[]` | Findings |
+|---|---|---|---|---|
+| valid | `skills/external/demo/scripts/x.sh` / `demo` / `C-7` / `minimal entry layer`, `SKILL.md` = `classification: external` | **0** | `(path, recomputed=True)` | none |
+| forged (missing path) | `skills/external/demo/scripts/missing.sh` / `demo` / `C-7` / `minimal entry layer` | **1** | `(missing path, recomputed=False)` | `exception-unverifiable` |
+| injected (skill not external) | `skills/external/demo/scripts/x.sh` / `demo` / `C-7` / `minimal entry layer`, `SKILL.md` = `classification: internal` | **1** | `(path, recomputed=False)` | `exception-unverifiable` |
+| empty register | `none / none / none / none` | **0** | `[]` | none |
+
+Reading: the register is recomputed from the page's own limbs (path exists, under
+`skills/external/<skill>/`, that `SKILL.md` declares `classification: external`, all four
+columns present); a failing limb is `exception-unverifiable` at exit 1 and the row is visible
+with `recomputed=false`. An empty register is legal and carries the literal `none`.

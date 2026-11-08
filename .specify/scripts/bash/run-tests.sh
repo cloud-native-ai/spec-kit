@@ -1,4 +1,67 @@
 #!/usr/bin/env bash
+# projected mirror: source + bash-version-guard; regenerate it, never hand-edit it
+#
+# Emitted by `scripts/python/sync-mirrors.py`; the authority for this block is
+# `contracts/mirror-projection.contract.md` C-34 / C-36. It depends on nothing
+# that exists only in the source tree: it re-derives its own version line (C-36).
+#
+# The guard block is the FIRST executable block of the script that carries it: above
+# every `source`, every `mkdir`, every `git` write and every manifest generation.
+# The insertion rule is owned by `shared/definitions/script-interface-definitions.md`.
+script_interface_version_text() {
+    local _name _dir _level _ver
+    local _source="${_SCRIPT_INTERFACE_VERSION_SOURCE:-pyproject.toml}"
+    local _max="${_SCRIPT_INTERFACE_MAX_LEVELS:-12}"
+    # The printed name is the BASENAME of what the caller passed, exactly as the Python half
+    # prints `Path(argv[0]).name`: a caller that forwards `$0` gets the same word the other
+    # side of the tree writes, and a downstream copy's path never leaks into the line.
+    _name="${1:-$0}"
+    _name="${_name##*/}"
+    _dir="${2:-$(dirname -- "$0")}"
+    case "$_dir" in /*) ;; *) _dir="./$_dir" ;; esac
+    _ver="unknown"
+    _level=0
+    while [ -d "$_dir" ] && [ "$_level" -le "$_max" ]; do
+    if [ -f "$_dir/$_source" ] && [ -e "$_dir/.git" ]; then
+    _ver="$(sed -n 's/^version[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+    "$_dir/$_source" 2>/dev/null | head -n 1)"
+    break
+    fi
+    [ "$_dir" = "/" ] && break
+    _dir="$(dirname -- "$_dir")"
+    _level=$((_level + 1))
+    done
+    [ -n "$_ver" ] || _ver="unknown"
+    printf '%s %s\n' "$_name" "$_ver"
+    return 0
+}
+_script_interface_guard() {
+    local _arg _wanted=
+    local _stop=0
+    for _arg in "$@"; do
+        [ "$_stop" -eq 1 ] && continue
+        case "$_arg" in
+            --) _stop=1 ;;
+            -h|--help) [ -n "$_wanted" ] || _wanted=help ;;
+            --version) [ -n "$_wanted" ] || _wanted=version ;;
+        esac
+    done
+    case "$_wanted" in
+        help)
+            printf "usage: %s [options]\n" "${0##*/}"
+            printf 'options:\n'
+            printf '  -h, --help   print this help and exit\n'
+            printf '  --version    print the script name and the framework version, then exit\n'
+            printf 'side-effects: none; the flags write nothing\n'
+            printf 'exit-codes: 0 the flag was answered; 2 an unrecognized option\n'
+            exit 0 ;;
+        version)
+            script_interface_version_text "$0" "$(dirname -- "$0")"
+            exit 0 ;;
+    esac
+    return 0
+}
+_script_interface_guard "$@"
 # Canonical test runner for spec-kit SDD baseline/regression tasks.
 # Resolves the pytest interpreter once and fails loudly — pipe-safe, alias-proof.
 #
@@ -26,6 +89,29 @@
 # single-pass one. Exit code still reflects the passes' own results.
 set -euo pipefail
 
+
+# script-interface: the sourceable guard block (086) lives in script-interface.sh.
+# It sits above `source common.sh` and above every write, which is what keeps `--help` free.
+# Authority: shared/definitions/script-interface-definitions.md section 4.
+#
+# `--pass-through` is this script's honest declaration: every argument that is not
+# `--names-out` / a flag is forwarded to pytest, so a token like `-q` is an OPERAND of this
+# script rather than a flag of its own. The guard therefore answers `-h`, `--help` and
+# `--version` and leaves the rest of the line — including any unknown pytest flag — to
+# pytest's own parser, exactly as before (FR-018: the forwarding interface is unchanged).
+SCRIPT_INTERFACE_LIB="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/script-interface.sh"
+if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
+    # shellcheck source=/dev/null
+    . "$SCRIPT_INTERFACE_LIB"
+    script_interface_guard define name="$0" passthrough \
+        usage="[--names-out <file>] [pytest arguments...]" \
+        effects="runs pytest in the caller's tree; with --names-out also writes the sorted FAILED test-id list to that file; the flags write nothing" \
+        codes="0 pytest passed; pytest's own exit code otherwise; 2 an unrecognized option" \
+        writes=--names-out \
+        -- --names-out
+    script_interface_guard guard "$@"
+fi
+
 resolve_python() {
     for candidate in "${SPECKIT_PYTHON:-}" ".venv/bin/python" "python3" "python"; do
         [ -n "$candidate" ] || continue
@@ -40,8 +126,9 @@ resolve_python() {
     return 1
 }
 
-# Both carriers of this script must stay byte-identical (C-016); only
-# `scripts/python/sync-mirrors.py --write --only scripts/bash` writes the mirror.
+# This script is a projected mirror pair (C-34/C-016): the mirror equals this source plus
+# the declared projection. Re-project with `sync-mirrors.py --write --only scripts`; never
+# hand-edit the mirror.
 
 PY="$(resolve_python)"
 

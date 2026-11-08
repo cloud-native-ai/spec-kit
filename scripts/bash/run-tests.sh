@@ -26,6 +26,29 @@
 # single-pass one. Exit code still reflects the passes' own results.
 set -euo pipefail
 
+
+# script-interface: the sourceable guard block (086) lives in script-interface.sh.
+# It sits above `source common.sh` and above every write, which is what keeps `--help` free.
+# Authority: shared/definitions/script-interface-definitions.md section 4.
+#
+# `--pass-through` is this script's honest declaration: every argument that is not
+# `--names-out` / a flag is forwarded to pytest, so a token like `-q` is an OPERAND of this
+# script rather than a flag of its own. The guard therefore answers `-h`, `--help` and
+# `--version` and leaves the rest of the line — including any unknown pytest flag — to
+# pytest's own parser, exactly as before (FR-018: the forwarding interface is unchanged).
+SCRIPT_INTERFACE_LIB="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/script-interface.sh"
+if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
+    # shellcheck source=/dev/null
+    . "$SCRIPT_INTERFACE_LIB"
+    script_interface_guard define name="$0" passthrough \
+        usage="[--names-out <file>] [pytest arguments...]" \
+        effects="runs pytest in the caller's tree; with --names-out also writes the sorted FAILED test-id list to that file; the flags write nothing" \
+        codes="0 pytest passed; pytest's own exit code otherwise; 2 an unrecognized option" \
+        writes=--names-out \
+        -- --names-out
+    script_interface_guard guard "$@"
+fi
+
 resolve_python() {
     for candidate in "${SPECKIT_PYTHON:-}" ".venv/bin/python" "python3" "python"; do
         [ -n "$candidate" ] || continue
@@ -40,8 +63,9 @@ resolve_python() {
     return 1
 }
 
-# Both carriers of this script must stay byte-identical (C-016); only
-# `scripts/python/sync-mirrors.py --write --only scripts/bash` writes the mirror.
+# This script is a projected mirror pair (C-34/C-016): the mirror equals this source plus
+# the declared projection. Re-project with `sync-mirrors.py --write --only scripts`; never
+# hand-edit the mirror.
 
 PY="$(resolve_python)"
 

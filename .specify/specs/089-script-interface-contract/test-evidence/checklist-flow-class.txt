@@ -1,0 +1,8 @@
+unit_id: spec:089-script-interface-contract
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+exit=0

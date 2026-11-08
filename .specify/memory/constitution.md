@@ -1,5 +1,22 @@
 <!--
 Sync Impact Report
+- Version change: 1.17.0 → 1.18.0 (MINOR; new Principle XXI added, 2026-11-09)
+- Added principles: XXI. Script Interface Contract (Declared, Zero-Side-Effect) — every functional, non-read-only script MUST answer `-h`/`--help` and `--version` before doing anything, and MUST reject an undeclared option non-zero; a file that acts when run directly is in scope whatever else also sources or imports it; pytest modules, pure libraries and read-only scripts are outside the REQUIRED set; the rule binds framework, downstream and third-party functional scripts alike and is pointer-only to `shared/definitions/script-interface-definitions.md`
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XX. Script Interface Contract; principles 19 → 20 (Feature 089 T020)
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 12 → 13 entries (Feature 089 T021)
+  ✅ templates/instructions-template.md + .specify/instructions.md — one ambient `## Script Interface Contract` section (Feature 089 T022/T024)
+  ✅ .specify/templates/constitution-template.md + .specify/skills/internal/manage-constitution/SKILL.md — mirrors re-projected (Feature 089 T025)
+  ✅ tests/contract/test_constitution_double_landing.py — template 20 / live 21 / skill 13; watchlist 7 → 8 (Feature 089 T017)
+  ✅ tests/contract/test_fast_fail_discipline.py — instruction section-count pins shifted by one for the new ambient section (Feature 089 T026)
+- Follow-up TODOs: none
+- Preserved by design: the template roster carries this principle as XX while this live roster carries it as XXI — per-surface numbering is the shape `contracts/governance-landing.contract.md#C-25` already states as normal; the rule's detail is owned by `shared/definitions/script-interface-definitions.md` (+ its `.specify` mirror), so no new guideline file is introduced; the gate scanner's patterns are NOT widened
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.16.0 → 1.17.0 (MINOR; new Principle XX added, 2026-11-06)
 - Added principles: XX. Efficient Test Execution (Concurrent by Default) — test coverage is necessary and never sufficient, so the cost of running a suite is a quality attribute at the same tier as coverage; the criterion that decides whether efficiency is releasable, the choice between process-level parallelism, asynchronous concurrency and neither, the isolation preconditions that make parallel execution legitimate, and the ways of being faster that are never admissible are all owned by `shared/guidelines/test-execution-efficiency.md` and referenced, not restated; the principle governs what tests cost to execute while the pre-existing test-quality principles govern what test exists and when it is written
 - Modified principles: None
@@ -419,6 +436,38 @@ run, and the two fail independently — an idle suite keeps its coverage number 
 protection while every report stays green. Naming execution cost as a quality attribute keeps
 the cheaper-to-run suite from becoming a suite nobody runs.
 
+### XXI. Script Interface Contract (Declared, Zero-Side-Effect)
+Every functional, non-read-only script in this project — and in every project initialised from this
+framework — MUST answer three questions before it does anything else:
+- A flag present anywhere on the command line MUST win: `-h` and `--help` MAY change nothing,
+  `--version` MUST print one machine-readable identity line, and every question they answer
+  MUST be answered before any action, write, backup or confirmation prompt.
+- An undeclared option MUST be rejected with a non-zero exit and a recognizable error, never
+  silently ignored and never allowed to reach the main action, including after a bare `--`.
+- Any file that acts when run directly MUST satisfy the same contract whether another file
+  also sources or imports it; a script is a script for that reason alone.
+- A pytest module, a pure library, and a read-only script MUST be treated as
+  outside the REQUIRED set
+  (`--help`/`--version` are recommended for a read-only script and optional elsewhere); the
+  owner document owns the mechanical bases (`pytest-module`, `optional-read-only`, `out-of-scope`,
+  `historical-record`).
+- The rule MUST be pointer, not copy: this principle names its owner document and MUST NOT
+  restate that document's label set or classification steps, and neither MUST any other
+  surface that carries the rule.
+- The rule MUST NOT justify a second checker, an extra command, or a new mandatory workflow
+  step: it is enforced on the surfaces that already exist.
+
+Rationale: a script that writes something as a side effect of being asked what it does
+destroys the one safe move a reader has. The standalone points above are the non-delegable
+core, the full definition (candidate derivation, classification, flag content, the
+zero-side-effect boundary, unrecognized-option rejection, exemptions) lives at
+`.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not
+restated, here; the framework's own source copy of that owner stays at
+`shared/definitions/script-interface-definitions.md` and MUST NOT be the path a downstream
+project is told to open. The rule binds framework scripts, scripts of downstream projects and
+third-party scripts alike, and it does not expire because a script was distributed rather than
+authored here.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -469,4 +518,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.17.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-06
+**Version**: 1.18.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-09

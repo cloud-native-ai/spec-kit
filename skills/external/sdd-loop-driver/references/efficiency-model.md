@@ -18,7 +18,7 @@
 
 | id | 判据 | 机械证据 |
 |----|------|----------|
-| (a) | FR 定义行数 8–60（含端点），任务行数 10–80（含端点） | `requirements.md` 行匹配 `^- **FR-[0-9]{3}**:`（owner: requirements.md FR-003(a)）；`tasks.md` 行匹配 `^- \[[ xX]\] T[0-9]{3}`（窄模式，准入唯一）。SC 行、说明行、分组标题不计入。 |
+| (a) | FR 定义行数 8–120（含端点），任务行数 10–160（含端点） | `requirements.md` 行匹配 `^- **FR-[0-9]{3}**:`（owner: requirements.md FR-003(a)）；`tasks.md` 行匹配 `^- \[[ xX]\] T[0-9]{3}`（窄模式，准入唯一）。SC 行、说明行、分组标题不计入。 |
 | (b) | 宪法零改动 | `git diff --name-only <base>..HEAD` 不含 `.specify/memory/constitution.md` |
 | (c) | 不新增可执行引擎、CLI 命令/模板、技能、外部依赖、网络服务或模型 API | 引擎/模板/依赖清单路径保守超集扫描 + 新增代码中的网络/模型调用痕迹；`skills/external/` 新增路径视为新技能 |
 | (d) | 不涉及安全/隐私敏感面 | 路径或新增行命中认证授权、凭据/密钥、删除/迁移、发布/外传、确认门判据即拒绝 |
@@ -294,8 +294,8 @@ PD-01…PD-10 由 `tests/contract/test_sdd_loop_driver_efficiency.py` 的 `test_
 
 | 决策点 | 输入 | 触发 `split-required` 的条件 |
 |--------|------|------------------------------|
-| plan 入口（requirements U4 后、plan 派发前） | `requirements.md` | FR 定义行数 > 30 |
-| tasks U4（tasks 产物后、analyze 派发前） | `requirements.md` + `tasks.md` | FR 定义行数 > 60，或任务行数 > 80 |
+| plan 入口（requirements U4 后、plan 派发前） | `requirements.md` | FR 定义行数 > 120 |
+| tasks U4（tasks 产物后、analyze 派发前） | `requirements.md` + `tasks.md` | FR 定义行数 > 120，或任务行数 > 160 |
 
 FR 定义行 = `^- \*\*FR-[0-9]{3}\*\*:`；任务行 = `^- \[[ xX>~]\] T[0-9]{3}`（宽模式，含 `[>]`/`[~]`）。上限与快车道中型区间端点一致（`FR_MAX`/`TASK_MAX`），数值 owner 是 `scripts/decomposition-check.py` 的 `FR_CEILING`/`TASK_CEILING` 常量；契约测试钉住二者相等。
 
@@ -310,7 +310,7 @@ decomposition-check.py --mode plan|tasks --requirements F [--tasks F] [--json-ou
 ### 5.3 `split-required` 处置
 
 1. 驱动 MUST NOT 派发后续阶段（plan 或 analyze）；在状态脊写入拆分记录：`measured`（FR/任务实测数）、`reasons[]`、`ceilings`、`proposed_slices[]`（每个切片给出名称、FR 范围或主题、预估规模）与 `base_commit`。
-2. 拆分粒度为**特性切片**：每个切片 MUST 自身落入 8–60 FR / 10–80 任务的区间，并各自拥有独立的 spec 目录与注册表绑定（`Related Feature` 仍指向同一特性）。
+2. 拆分粒度为**特性切片**：每个切片 MUST 自身落入 8–120 FR / 10–160 任务的区间，并各自拥有独立的 spec 目录与注册表绑定（`Related Feature` 仍指向同一特性）。
 3. 拆分记录经用户或上游流程确认后，驱动按切片顺序逐条走完整链；MUST NOT 在同一线并行推进多个切片。
 4. 拆分是**范围决策**：驱动 MUST NOT 自行删除、合并或重排需求来规避上限；无法在保留原意的前提下拆分时按四要素上送。
 

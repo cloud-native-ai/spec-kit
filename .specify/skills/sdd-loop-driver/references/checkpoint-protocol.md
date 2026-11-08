@@ -4,7 +4,7 @@
 
 **Where**: `.specify/specs/<NNN-slug>/checkpoints/<NN>-<stage>.md`; a final `closure.md` records the terminal goal degree table and the archived team state.
 
-## The four parts (all mandatory)
+## The five parts (all mandatory)
 
 ### 1. Artifact verification
 
@@ -33,14 +33,35 @@
 - Record the verifier reserve and the reason for any downgrade.
 - The decision is written before the next dispatch; a later change requires another checkpoint.
 
+### 5. Direction audit
+
+- Reload the loop anchor before answering: **T0** the state spine's `driver_contract` + `direction_contract` +
+  `next_action` at every checkpoint; **T1** the driver `SKILL.md` Hard Requirements block plus this protocol at
+  every stage boundary, after any subagent turn-limit stall, and after a detected context compaction; **T2** the
+  full manual plus a reference only when a dispatch form is unclear or a stall is being handled. A full reload of
+  every reference at every step is forbidden: it is ceremony and it buries the anchor in noise.
+- Answer five binary questions, each with a path or a reading as evidence:
+  1. Does `next_action` still serve `goal_verbatim` and stay inside `non_goals`?
+  2. Is the current stage the planned next stage in `stage_plan`?
+  3. Was the last action completed without an approval request (HR1)?
+  4. Is the state spine fresher than the last checkpoint/commit (HR4)?
+  5. Did the last package stay inside its territory and leave `workspace-guard --check` clean?
+- The verdict is exactly one of `on-track`, `correction-applied`, `decision-needed`. Only `decision-needed` is
+  surfaced (fast-fail); the other two are recorded and the loop continues.
+- The audit is a statement, never an approval request: it MUST NOT end with a question to the user.
+- Two consecutive audits flagging the same drift escalate as a recurring anomaly (fast-fail growth rule).
+
 ## Rules
 
-- All four parts are present. An inapplicable part carries `n/a` and a reason; omission is a defect.
+- All five parts are present. An inapplicable part carries `n/a` and a reason; omission is a defect.
 - At most one configuration/concurrency/roster change per checkpoint. An explicit human goal edit does not count toward this cap.
 - A checkpoint file is committed by the driver immediately after U4 as a driver record, not as a stage deliverable.
 - **Rollback**: at the next checkpoint, revert the prior change when U4 fails, new test failures appear versus the stage baseline, `retries_package` increases by at least two, or `parallelism_efficiency` drops by at least 30 percent. A rolled-back change is not re-proposed immediately.
 - `coordinate` remains territory-overlap only; with one temporary team it is a recorded no-op.
 - The checkpoint carries paths and verdicts, never raw transcripts or fabricated metrics.
+- **Direction audit is mandatory**: every checkpoint carries part 5; a checkpoint without it is a defect. Its reload tier and verdict are recorded in the checkpoint, not only in the conversation.
+- **No approval request**: a checkpoint's outcome is a statement; asking the user to continue violates HR1 and is itself a drift signal.
+- **Workspace signature (2026-11-08 RCA)**: a stage that runs probes, tests or subagents MUST record the measured repository's signature before them and compare it after: `python3 scripts/python/workspace-guard.py --snapshot <spec-dir>/test-evidence/workspace-<stage>.json --repo <repo>` then `--check`. A difference in branch, refs or `.specify/specs` fails the checkpoint — it means a probe or agent resolved its repository root outside its sandbox (the 2026-11-07 incident created 40 branches and spec dirs).
 
 ## Minimal shape
 
@@ -69,4 +90,13 @@
 - requested: <n>; effective: <n>; reason: <reason>
 - stage max_parallel: <n>; verifier reserve: <n>
 - roster: <seats>
+
+## 5. Direction audit
+- reload tier: <T0 | T0+T1 | T2>
+- Q1 goal: <on-track | correction-applied | decision-needed> — <evidence>
+- Q2 stage: <verdict> — <evidence>
+- Q3 HR1: <verdict> — <evidence>
+- Q4 spine freshness: <verdict> — <evidence>
+- Q5 territory/workspace: <verdict> — <evidence>
+- verdict: <on-track | correction-applied | decision-needed>
 ```

@@ -122,6 +122,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 12. **嵌套运行是一条写线、且不主张合并权**：被团队席位调用时（§ Invoked-from-Team Entry），本次运行作为**一条写线**注册到既有 line registry 与 worktree-per-write-line（`scripts/line-registry.py`）；领域重叠由该机制串行化或拒绝，MUST NOT 新建第二套 registry / ownership 模型 / integration queue。运行止于 review 并交回 handoff：MUST NOT merge、MUST NOT push——集成归外层按其确认门处置。
 13. **类别感知（只换算子与槽位内容）**：阶段派发载荷 MUST 携带类别**四元组**（`flow_class=` / `source=` / `marker=` / `error=`；值域、缺键处置与派发纪律归 `references/stage-prompts.md` § 类别四元组的派发纪律），本地原生子代理与远端 CLI 同规；缺任一键即**派发构造缺陷**，U4 不放行。U4 对表达类 MUST 校验门禁证据——算子结果齐备、证据文件存在且非空、载荷与当场解析一致、`stage-status` 在行（校验程序归 `references/stage-prompts.md` § Independent Verification）；载荷 `error` 位非 `-`（即 `owner-unavailable`）时 MUST 走 `owner-unavailable` 分支——记降级观测、保持既有门禁集，MUST NOT 按表达类校验。预算槽位装什么归 `references/efficiency-model.md` §2.8（`selection_basis=docs-gate-full`），时点与槽位数不变。驱动 MUST NOT 因类别改变阶段序列、哨兵字面量、watcher 判定与退出码、卡死处置、快车道判据或 analyze / review 调用率（两者保持 100%）；任何以「本线属表达类」为由跳过或缩短阶段的请求被拒。类别只改变两件事：用哪套算子证明同一不变量、预算槽位里装什么。
 
+14. **方向审计（Direction audit）**：每个检查点 MUST 包含五问方向审计（owner：`references/checkpoint-protocol.md` § Direction audit）；驱动 MUST 按 T0/T1/T2 分层重载方向契约与 Hard Requirements（T0 每检查点、T1 每阶段边界/轮次上限/压缩后、T2 仅在派发形态不清或处置卡死时），审计判定只有 `on-track` / `correction-applied` / `decision-needed` 三值，结论是陈述、MUST NOT 以征求用户「继续」收尾（HR1）。
 ## Discipline Defaults
 
 阶段提示词骨架第二段把默认纪律写进每次派发（全文见 references/stage-prompts.md）：直接执行不要确认、访谈式问题自行裁决并记录假设、只提交本特性产物、既有脏文件不提交不还原、不要 push（除非明确授权）。
@@ -134,7 +135,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 2. **两槽位测试预算**：每线仅 implement 起点与 review 后两次全量，其余用定向集留证。
 3. **Plan 只小修**：`PLAN-EDIT:` 声明；实质改动按两分支处置。
 4. **进度与脱离**：runner 默认 stream-json + live log；本地与远端均脱离，`--once` 只核验不重派。
-5. **大特性拆分门**：plan 入口 >60 FR 或 tasks U4 >80 任务判 `split-required`。
+5. **大特性拆分门**：plan 入口 >120 FR 或 tasks U4 >160 任务判 `split-required`。
 6. **确定性预检**：requirements/plan/tasks 的 U4 先跑 `pre-analyze-check.py`。
 7. **跨特性重叠预检**：clarify U4 跑 `overlap-check.py`，先裁决归属再派发 plan。
 

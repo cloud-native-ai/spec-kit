@@ -1,0 +1,39 @@
+# SC-001 — zero side effect at closure scale (contained re-measure)
+
+Method: one git clone per family under /var/tmp; one snapshot pair (git status + refs + every .sh/.py sha256 + .specify/shared/templates/skills/scripts manifest) around all of that family's flag runs; only `-h`, `--help`, `--version`, `--no-such-flag` are passed; cwd is the clone; GIT_CEILING_DIRECTORIES is the clone.
+
+## family .specify/scripts — 55 candidates
+- snapshot pair: IDENTICAL
+## family .specify/skills — 87 candidates
+- snapshot pair: IDENTICAL
+## family .specify/specs — 8 candidates
+- snapshot pair: IDENTICAL
+## family root — 1 candidates
+- snapshot pair: IDENTICAL
+## family scripts/bash — 15 candidates
+- snapshot pair: IDENTICAL
+## family scripts/python — 40 candidates
+- snapshot pair: IDENTICAL
+## family skills — 87 candidates
+- snapshot pair: IDENTICAL
+## family src — 3 candidates
+- snapshot pair: IDENTICAL
+## family tests/conftest.py — 1 candidates
+- snapshot pair: IDENTICAL
+## family tests/contract — 288 candidates
+- snapshot pair: IDENTICAL
+## family tests/derive_fixtures.py — 1 candidates
+- snapshot pair: IDENTICAL
+## family tests/fixtures — 22 candidates
+- snapshot pair: IDENTICAL
+## family tests/integration — 80 candidates
+- snapshot pair: IDENTICAL
+## family tests/js — 1 candidates
+- snapshot pair: IDENTICAL
+## family tests/script_api.py — 1 candidates
+- snapshot pair: IDENTICAL
+## family tests/unit — 59 candidates
+- snapshot pair: IDENTICAL
+
+TOTAL candidates: 749 over 16 families; families with a moved snapshot: 0
+VERDICT: PASS

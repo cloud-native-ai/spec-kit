@@ -1,0 +1,60 @@
+PKG-4b1 — stopped at a decision, not a correction
+==================================================
+
+What works (last measured state of this package)
+------------------------------------------------
+* 61/61: `/usr/bin/python3 -m pytest -q tests/contract/test_script_interface_contract.py` -> 61 passed.
+* `python3 scripts/python/sync-mirrors.py --check` -> exit 0.
+* `bash -n` clean on all 15 `scripts/bash/*.sh`.
+* Zero regression on the bash family: 17 representative declared calls captured against a
+  pre-wrap copy of `scripts/bash/` in two identical /var/tmp trees; every call byte-identical
+  after normalising absolute paths and timestamps (prereq-json, prereq-paths, prereq-text,
+  prereq-require, history-json, history-tool, plan-json, plan-help, req-json, skill-json,
+  tools-system, tools-shell, research-json, implement-json, detect-feature, todo-json,
+  run-tests-names). `generate-instructions.sh` also writes the same bytes: identical
+  `.specify/instructions.md` and `.gitignore` sha256, identical 47-line log modulo timestamps.
+* Checker probe on the whole `scripts/bash` family: 15 candidates, every one now measured
+  with a real `help-wins` conclusion (before this package most were `hw=None` because the
+  probe had no write option to ride along with), and the two that were previously
+  `no-entry-point` (`generate-instructions.sh`, and the twelve body-less consumers) now
+  classify by `entry-point-marker`.
+
+The blocking decision
+---------------------
+`scripts/python/script-interface-check.py` now classifies `scripts/bash/common.sh` as
+APPLICABLE (basis `entry-point-marker`, positions 2/3 of 6), so classing it "exempt by
+measurement" is gone and it reads as a violation.
+
+Why it flipped: T059 wrapped each consumer's body in `main()` so the file's entry point is
+explicit. `common.sh` was never touched by that change. Its marker now fires at candidate
+positions 2 and 3, which are
+
+    5: [ -f "${CWS_LIB_BASH_HOME}/bin/cws_bash_env" ] && source ...   <- the host's shell lib
+   26: if ! check_dependency; then ... ; fi
+
+i.e. the marker fires because the host environment `/cws_data/cws-lib-bash` exists, not
+because `common.sh` has an entry point of its own. My local analysis reproduces exactly this:
+positions 1 and 2 yield marker=False, positions 3..6 yield marker=True, all six exits are 0.
+
+The conflict, stated as two readings I cannot choose between:
+
+  A. The checker is right and `common.sh` must be made compliant. But that contradicts the
+     rule the rest of this package was built on and the owner page's own words: the guard
+     MUST NOT sit after `source` "because a shared library has top-level dependency checks of
+     its own, which turn `--help` into a non-zero exit" (definitions section 4). If
+     `common.sh`'s top-level checks are the very thing that makes `--help` unsafe, calling
+     them `common.sh`'s entry point makes it applicable, and the guard rule has nothing left
+     to protect. Fixing it means adding `-h/--help/--version` to the shared library all 13
+     consumers source, i.e. changing the interface of a file this package was told to leave
+     exempt by measurement.
+
+  B. The probe is over-approximating: firing on a line the candidate shares with its host
+     environment is not evidence of an entry point (it is the "top-level statements are not
+     the criterion" trap the owner page warns about, section 1.3). Then the finding is
+     explainable and the exemption stands. But choosing this means editing the checker's
+     classification rule, which is outside this package and would also move 61 passing tests.
+
+This is a decision (two readings, each with downstream consequences), not a correction, so
+the package stops here. Everything above is committed-state-safe: the tree is green on the
+three checks the package was asked to keep green, and the open finding is itemised in the
+return rather than papered over.

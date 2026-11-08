@@ -241,6 +241,21 @@ Before processing the template, scan the project to understand its actual contex
     concrete runner stay the runner's own. This principle adds a criterion, not machinery: it
     MUST NOT justify a duration registry, a slow-test ranking, a coverage-versus-time report,
     or any other standing measurement surface.
+  - **Script Interface Contract (Declared, Zero-Side-Effect)** — every functional,
+    non-read-only script MUST answer three questions without doing anything else: a flag
+    present anywhere on the command line wins (`-h` / `--help` change nothing, `--version`
+    prints one machine-readable identity line) and is judged before any action, write, backup
+    or confirmation prompt; an undeclared option is rejected with a non-zero exit rather than
+    silently ignored; and a file that acts when run directly satisfies the contract whatever
+    else also sources or imports it. Pytest modules, pure libraries and read-only scripts are
+    outside the REQUIRED set. The full definition (candidate derivation, classification,
+    mandatory help content, the zero-side-effect boundary, unrecognized-option rejection,
+    exemptions and the declared-exception register) lives at
+    `.specify/shared/definitions/script-interface-definitions.md` and MUST be referenced, not
+    restated, inside the constitution. The rule's scope is written into the rule: it binds
+    framework scripts, downstream-project scripts and third-party scripts alike. This principle
+    adds a way of writing scripts, not machinery: it MUST NOT justify a second checker, an
+    extra command, or a new mandatory workflow step.
 - Ensure the Governance section lists amendment procedure, versioning policy, and compliance
   review expectations.
 

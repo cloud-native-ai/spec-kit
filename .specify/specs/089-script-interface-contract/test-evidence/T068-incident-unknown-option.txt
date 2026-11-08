@@ -1,0 +1,83 @@
+# T066 — the incident script rejects an undeclared option, both snapshot files untouched
+
+Clause: C-9 (an undeclared `-*` token exits non-zero before the main action) on the
+incident script `scripts/bash/generate-instructions.sh`, plus SC-002's zero-side-effect
+limb (`.specify/instructions.md` and `.gitignore` byte-unchanged).
+Task: `tasks.md` T066.
+
+## Where this was run, and why
+
+`/var/tmp/pkg4b2b/T066/tree` — a `git archive HEAD` extraction of this repository
+(commit `516cb8f2`) with the CURRENT working-tree `scripts/bash/generate-instructions.sh`
+copied in. The measured tree is never the tree a probe runs in (C-10, and the incident
+this feature remembers is exactly what happens when it is). `/tmp` is `noexec` on this
+host; `/var/tmp` is not, and it is one of the sanctioned sandbox roots.
+
+The tree was run twice on purpose:
+
+* **run A — as archived** (no `.git`): `--version` answers `unknown`, which is C-8's
+  first-class answer when the bounded upward search finds no repository root. It is
+  recorded because it is *also* the case that proves the answer is derived, never a
+  literal.
+* **run B — the same tree with an empty `git init`** so the bounded search has a root:
+  `--version` then answers `generate-instructions.sh 0.0.22`, the value read at run time
+  from `pyproject.toml`.
+
+## Snapshot pair (both runs)
+
+    .specify/instructions.md  d971fe829d145247c45fbbf4cc1cb98f6619db379e5195f46644fef84cd38361
+    .gitignore                fcf24bb7ef77bab4e365e2a507e677560b72148c0e03c1ed1949f44689cfa029
+    backups (.specify/instructions.md-*) before=1 after=1 new=[]
+
+Both digests and the backup count are identical BEFORE and AFTER all five invocations of
+each run. The pair is the same pair SC-002 uses (`test-evidence/SC-002-incident-script.txt`),
+so the two records judge the same observable.
+
+## Run A — archived tree, no repository root
+
+    arg=-h                 rc=0  stdout 6 lines / 440 B  first='usage: generate-instructions.sh (no options)'
+    arg=--help             rc=0  stdout 6 lines / 440 B  first='usage: generate-instructions.sh (no options)'
+    arg=--version          rc=0  stdout 1 line  /  33 B  first='generate-instructions.sh unknown'
+    arg=--no-such-flag     rc=2  stdout 0 lines /   0 B  stderr 7 lines
+    arg=--zz-undeclared    rc=2  stdout 0 lines /   0 B  stderr 7 lines
+
+## Run B — the same tree with an empty `git init`
+
+    $ bash scripts/bash/generate-instructions.sh --version
+    generate-instructions.sh 0.0.22
+    $ bash scripts/bash/generate-instructions.sh --no-such-flag
+    error: unrecognized option: --no-such-flag
+    usage: generate-instructions.sh (no options)
+    options:
+      -h, --help   print this help and exit
+      --version    print the script name and the framework version, then exit
+    side-effects: rewrites .specify/instructions.md, backs it up beside itself, appends patterns to .gitignore and writes .specify/tools/*.json; the flags write nothing
+    exit-codes: 0 generated or answered; 1 the template or a prerequisite is missing; 2 an unrecognized option
+    exit status: 2
+
+## Verdict
+
+* The rejected-unknown-option limb holds: an undeclared `-*` token exits **2**, prints its
+  error on stderr, prints the full usage on stderr, and produces **zero bytes on stdout** —
+  it never reaches the reconcile. A recognized flag in the same line does not rescue it
+  (`guard` judges every token before answering any flag; asserted by the engine's own
+  clause C-9 and by `tests/contract/test_script_interface_contract.py`).
+* `-h` and `--help` print the same 440-byte body; `--version` prints exactly one line.
+* Neither `.specify/instructions.md` nor `.gitignore` moves, and no backup file is created:
+  absence of a write is shown by the digest pair AND by the backup count, not by the
+  digests alone (the damaged-copy control in SC-002 records why: two stable digests are
+  not sufficient evidence on a file already in steady state).
+* Run A's `unknown` is the C-8 no-root answer, not a failure: the exit code stays 0.
+
+## Reproduce
+
+    cd /var/tmp/pkg4b2b/T066
+    rm -rf tree && mkdir tree
+    git -C /cws_data/cloud-native-ai/spec-kit archive HEAD | tar -x -C tree
+    cp /cws_data/cloud-native-ai/spec-kit/scripts/bash/generate-instructions.sh tree/scripts/bash/
+    sha256sum tree/.specify/instructions.md tree/.gitignore
+    for a in -h --help --version --no-such-flag --zz-undeclared; do
+      ( cd tree && bash scripts/bash/generate-instructions.sh "$a" >/dev/null 2>&1; echo "$a rc=$?" )
+    done
+    sha256sum tree/.specify/instructions.md tree/.gitignore
+    ls tree/.specify/instructions.md-* | wc -l
