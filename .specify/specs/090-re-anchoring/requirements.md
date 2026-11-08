@@ -42,10 +42,17 @@
 
 ## Success Criteria
 
-- **SC-001**: owner 文档、两侧宪法、两侧指令面、agent 条款五处同时存在且以指针互引（契约测试）。
-- **SC-002**: 五问顺序在 checkpoint 协议中明确为「规则优先」，并有契约测试钉住。（clarify C-4 收紧判据：协议侧已满足——Q1 即规则；「钉住」不得以任意 `Q1` 字面命中或「三值判定存在」代为满足，必须在同一测试内同时断言 Q1 问的是规则**且**判定/动作先于目标；落地归属见 FR-010 与 C-4。）
-- **SC-003**: 双落地计数与 watchlist 同批移动；`test_constitution_double_landing` 与 `test_fast_fail_discipline` 绿。
-- **SC-004**: 方向审计的 T0/T1/T2 分层在 owner 文档与 checkpoint 协议中一致。
+- **SC-001**: owner 文档、两侧宪法、两侧指令面、agent 条款五处同时存在且以指针互引（契约测试）。 **Path**: final
+- **SC-002**: 五问顺序在 checkpoint 协议中明确为「规则优先」，并有契约测试钉住。（clarify C-4 收紧判据：协议侧已满足——Q1 即规则；「钉住」不得以任意 `Q1` 字面命中或「三值判定存在」代为满足，必须在同一测试内同时断言 Q1 问的是规则**且**判定/动作先于目标；落地归属见 FR-010 与 C-4。） **Path**: final
+- **SC-003**: 双落地计数与 watchlist 同批移动；`test_constitution_double_landing` 与 `test_fast_fail_discipline` 绿。 **Path**: final
+- **SC-004**: 方向审计的 T0/T1/T2 分层在 owner 文档与 checkpoint 协议中一致。 **Path**: final
+
+### Measurement Sources & Collection Methods
+
+- **SC-001 Source**: 契约测试 `tests/contract/test_reanchoring_contract.py`（五面存在性 + 指针）与 `tests/contract/test_sdd_loop_driver_reanchor.py`（协议第 5 部分），逐面记录命令、退出码与命中行到 `test-evidence/`。
+- **SC-002 Source**: 同一契约测试模块内对 checkpoint 协议的新增顺序断言：断言 Q1 问的是规则且判定/动作先于目标（被改回目标优先时转红）；命令、退出码与失败复现记录进 `test-evidence/`。
+- **SC-003 Source**: `test_constitution_double_landing.py` 的 `TEMPLATE_COUNT` / `LIVE_COUNT` / `COMMAND_COUNT` / `DOUBLE_LANDING_WATCHLIST` 与 `test_fast_fail_discipline.py::test_x15` 的 `len(entries)` 读数，按名与 `origin/master` 基线比较。
+- **SC-004 Source**: owner 文档 §2 的 T0/T1/T2 表与 `checkpoint-protocol.md` §5 的 reload tier 行逐项比对，记录两侧路径与行号。
 
 ## Clarifications
 
