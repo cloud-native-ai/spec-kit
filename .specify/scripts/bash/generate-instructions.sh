@@ -142,7 +142,17 @@ main() {
     #     under the generator's `over` verdict, which fires at `size >= budget` —
     #     i.e. the smallest N*1024 with (N*1024 - 1) - 33357 >= 1024. 33792 fails
     #     (-566 B, still over); 34816 leaves 1458 B and is the first that passes.
-INSTRUCTIONS_BUDGET_BYTES=34816
+    #
+    # Raise record (Feature 089 — Script Interface Contract ambient section):
+    #   old value: 34816
+    #   new value: 36864
+    #   measured live size after injection: 35173 B (this repository, 2026-11-09)
+    #   reason: the new `## Script Interface Contract` ambient section. The trunk had
+    #     accumulated other sections since the 082 raise, so the 089 section crossed
+    #     the old budget; no existing section was trimmed.
+    #   rule: the same rule as above — the smallest N*1024 with (N*1024 - 1) - 35173
+    #     >= 1024. 35840 fails (666 B); 36864 leaves 1690 B and is the first that passes.
+INSTRUCTIONS_BUDGET_BYTES=36864
 
     mkdir -p "$TARGET_DIR"
 
