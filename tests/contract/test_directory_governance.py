@@ -196,6 +196,25 @@ def test_loop_driver_state_spine_stays_in_the_state_archive():
     )
 
 
+def test_loop_driver_local_brief_stays_under_the_runtime_root():
+    text = _text(ROOT / "skills" / "external" / "sdd-loop-driver"
+                 / "references" / "dispatch-recipes.md")
+    assert "<repo>/.specify/.tmp/sdd-loop/tmp/<line_id>/brief-<topic>.md" in text, (
+        "the local-native brief must live under the loop-driver's declared runtime root")
+    assert "~/tmp/<project>/<topic>-sdd-brief.md" not in text, (
+        "the loop-driver must not route its brief outside .specify/")
+
+
+def test_framework_map_registers_the_housekeeping_report_store():
+    for path in (
+        ROOT / "shared" / "definitions" / "framework-map.md",
+        ROOT / ".specify" / "shared" / "definitions" / "framework-map.md",
+    ):
+        body = _text(path)
+        assert "`housekeeping/`" in body, (
+            f"{path} does not register .specify/memory/housekeeping/")
+
+
 def test_framework_map_registers_the_runtime_roots():
     for path in (
         ROOT / "shared" / "definitions" / "framework-map.md",

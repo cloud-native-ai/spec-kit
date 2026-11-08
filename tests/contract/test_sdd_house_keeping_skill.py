@@ -174,6 +174,14 @@ def test_inventory_script_parity_with_setup_copy():
             f"copied script drifted: {name}")
 
 
+def test_run_report_archives_under_the_target_specify_store():
+    text = _skill() + _recipes()
+    assert ".specify/memory/housekeeping/" in text, (
+        "the H5 run report must archive under the target project's .specify store")
+    assert "宿主工作目录" not in text, (
+        "the run report must not land in the host working directory")
+
+
 def test_docs_page_and_registries():
     assert DOCS.is_file(), "docs page must exist"
     text = DOCS.read_text(encoding="utf-8")

@@ -35,7 +35,7 @@ H3 STRENGTHEN 按依赖次序、按需：
              /speckit.history → /speckit.docs 深化 → /speckit.research
              → /speckit.feature 生成
 H4 VERIFY    五族前置检查（本地仅④⑤）+ 双矩阵复扫 + 符号链接 + hook health
-H5 REPORT    候选工作清单 + 运行报告（写入宿主工作目录）
+H5 REPORT    候选工作清单 + 运行报告（归档到 .specify/memory/housekeeping/）
 ```
 
 ### H0 — Entry
@@ -94,9 +94,9 @@ constitution 缺失不在本步 bootstrap；交回 `sdd-project-setup`。
 产出两件东西：
 
 1. **候选工作清单**（建议而非强制）：未完成 feature、大规模反馈改进、SPECKIT TODO 事项。它是本 skill 的**唯一候选清单所有者**；setup 不再产出 `sdd-candidates-*.yaml`。
-2. **运行报告**：写到宿主工作目录 `sdd-housekeeping-<project-slug>-<UTC-ts>.yaml`。字段、`check|cleanup` 的可空字段与 `sanitize_retention` 计数口径见 `./references/maintenance-recipes.md` § H5；本文件不复写 schema。
+2. **运行报告**：归档到目标项目的 `.specify/memory/housekeeping/<UTC-ts>-<mode>.yaml`（一次运行一个文件；远端拓扑在目标侧写入）。字段、`check|cleanup` 的可空字段与 `sanitize_retention` 计数口径见 `./references/maintenance-recipes.md` § H5；本文件不复写 schema。
 
-不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告只落宿主工作目录。
+不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`；运行报告只落 `.specify/memory/housekeeping/`。
 
 ## Hard Requirements
 

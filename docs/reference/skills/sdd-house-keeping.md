@@ -33,7 +33,7 @@ H2 RECONCILE 执行 H1 缺口 OR owner 自检漂移：
              sanitize（materials + retention）→ feature → instructions → docs
 H3 STRENGTHEN history → docs 深化 → research → feature 生成
 H4 VERIFY    五族前置检查（本地仅④⑤）+ 双矩阵复扫 + 符号链接 + hook health
-H5 REPORT    候选工作清单 + 运行报告（宿主工作目录 YAML）
+H5 REPORT    候选工作清单 + 运行报告（`.specify/memory/housekeeping/` YAML）
 ```
 
 **触发口径**：H1 只回答“资产在不在”；sanitize 残留、feature 注册表漂移、instructions 预算/过期、docs 漂移由各自 owner 判定。H2 执行 **H1 缺口 OR owner 自检报告的漂移**，每项登记 `executed / existing / skipped + reason`，未处理项进入 H5 清单。
@@ -69,4 +69,4 @@ H5 REPORT    候选工作清单 + 运行报告（宿主工作目录 YAML）
 - 不新增调度器/守护进程；周期由用户或宿主循环触发。
 - 不自动上送数据；不评估用户源码/产品脚本/测试。
 - 不在目标项目创建 ad-hoc 目录；不借用 `.specify/state/`。
-- 运行报告只落宿主工作目录 `sdd-housekeeping-<project-slug>-<UTC-ts>.yaml`。
+- 运行报告归档到目标项目 `.specify/memory/housekeeping/<UTC-ts>-<mode>.yaml`（一次运行一个文件）。

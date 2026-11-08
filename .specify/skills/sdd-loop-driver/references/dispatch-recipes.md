@@ -184,7 +184,7 @@ ssh -o BatchMode=yes <alias> \
 
 > **SDD local default**：本地拓扑的缺省承载是**宿主原生子代理 / 编排者直执**（见本文件 `## 本地原生拓扑`）。下面的 runner/脱离形态用于**远端**；本地 MUST NOT 以 `qodercli` 作为 SDD 缺省子代理。只有入口显式要求“本地外部派发”时才允许本地 runner，并须记录该例外。（analyze 验证波例外见 `## 本地原生拓扑` 边界条。）
 
-- **本地原生缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`~/tmp/<project>/<topic>-sdd-brief.md`），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」；一阶段一次原生调用，不写 runner、不建 FIFO/hook。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听不适用窗口模型（`watch-model.md` §6）。
+- **本地原生缺省**：项目在本机时省略 ssh/su；需求上下文先写简报文件（`<repo>/.specify/.tmp/sdd-loop/tmp/<line_id>/brief-<topic>.md`，HR11 唯一落点；shared Recipe 5 的 `~/tmp` 示例不适用于本技能），子代理提示词只指示「先完整阅读简报，再执行对应阶段命令」；一阶段一次原生调用，不写 runner、不建 FIFO/hook。命令形态见 `.specify/shared/workflow/external-dispatch-recipes.md` § Recipe 5（本配方坍缩为引用）。监听不适用窗口模型（`watch-model.md` §6）。
 - **远端 runner（缺省形态，与远端同构）**：`setsid` 可用时优先，本机 macOS 无 `setsid` 时用 `nohup + disown`；stdin 接 `/dev/null`，stdout/stderr 重定向到 runner-log：
 
   ```bash
