@@ -350,10 +350,10 @@ def test_c26_generator_skill_carries_the_mandate_entry():
         f"the `- **MUST include**` block carries no {PRINCIPLE_TITLE!r} sub-entry; entries: "
         f"{names[-3:]}"
     )
-    assert len(names) == 13, (
-        f"the mandate list holds {len(names)} entries after the landing; expected 13 "
-        "(11 pre-existing + 086's Efficient Test Execution + this one). A count that stays "
-        "behind is how the guard goes red on nothing"
+    assert len(names) == 14, (
+        f"the mandate list holds {len(names)} entries after the landing; expected 14 "
+        "(13 after 089 + 090's Re-Anchoring entry). A count that stays behind is how the "
+        "guard goes red on nothing"
     )
     # The uniform sub-entry form C-26 fixes, plus its two content obligations.
     m = re.search(

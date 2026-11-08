@@ -22,7 +22,7 @@ def test_five_parts_and_direction_audit():
     proto = PROTOCOL.read_text(encoding="utf-8")
     assert "## The five parts (all mandatory)" in proto
     assert "### 5. Direction audit" in proto
-    for marker in ("goal_verbatim", "non_goals", "stage_plan", "approval request",
+    for marker in ("RULES", "unattended", "approval request",
                    "spine fresher", "workspace-guard --check"):
         assert marker in proto, marker
     for verdict in ("on-track", "correction-applied", "decision-needed"):

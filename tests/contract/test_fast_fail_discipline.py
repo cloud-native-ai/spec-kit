@@ -748,8 +748,8 @@ def test_a7_section_counts_20_to_21_and_21_to_22():
     adds or removes a `##` section MUST raise or lower `TPL_EXPECTED` /
     `LIVE_EXPECTED` in the same commit.
     """
-    TPL_EXPECTED = 34  # .specify/specs/089-script-interface-contract: +1 at T022 (on top of 086's 33)
-    LIVE_EXPECTED = 35  # the reconcile at T024 carries that same section into the live file
+    TPL_EXPECTED = 35  # .specify/specs/090-re-anchoring: +1 ambient section (on top of 089's 34)
+    LIVE_EXPECTED = 36  # the reconcile carries that same section into the live file
     tpl = sum(1 for line in _lines(INSTR) if line.startswith("## "))
     live = sum(1 for line in _lines(INSTR_LIVE) if line.startswith("## "))
     assert tpl == TPL_EXPECTED, (
@@ -1072,11 +1072,12 @@ def test_x5_live_version_minor_bump():
     by the Grounded Naming amendment; raised to 1.16.0 on 2026-11-05 by Feature 082's
     Self-Explanatory Structure amendment; raised to 1.17.0 on 2026-11-06 by Feature 086's
     Efficient Test Execution amendment; raised to 1.18.0 on 2026-11-09 by Feature 089's
-    Script Interface Contract amendment)."""
+    Script Interface Contract amendment; raised to 1.19.0 on 2026-11-09 by Feature 090's
+    Re-Anchoring amendment)."""
     text = _text(CONST_LIVE)
     m = re.search(r"^\*\*Version\*\*:\s*([0-9.]+)", text, re.M)
     assert m, "C-5: no anchored `**Version**:` line found"
-    assert m.group(1) == "1.18.0", f"C-5: live version is {m.group(1)}; expected 1.18.0"
+    assert m.group(1) == "1.19.0", f"C-5: live version is {m.group(1)}; expected 1.19.0"
     # anchored on purpose: an unanchored scan matches the Sync Impact Report's
     # "Version change: 1.11.0 ->" line and reports a stale value.
 
@@ -1254,7 +1255,8 @@ def test_x15_watchlist_gains_principle_title():
     Governance and Grounded Naming amendments extended it to 5; Feature 082's
     Self-Explanatory Structure entry (2026-11-05, T016) extended it to 6; Feature 086's
     Efficient Test Execution entry (2026-11-06, T028) extended it to 7; Feature 089's
-    Script Interface Contract entry (2026-11-09, T017) extends it to 8."""
+    Script Interface Contract entry (2026-11-09, T017) extended it to 8; Feature 090's
+    Re-Anchoring entry (2026-11-09) extends it to 9."""
     src = _text(DOUBLE_LANDING_TEST)
     m = re.search(r"DOUBLE_LANDING_WATCHLIST = \((.*?)\n\)", src, re.S)
     assert m, "C-15: DOUBLE_LANDING_WATCHLIST not found"
@@ -1264,7 +1266,7 @@ def test_x15_watchlist_gains_principle_title():
     # derived from the owner -- the last watchlist entry, which every amendment appends to.
     newest = entries[-1]
     assert newest not in ("", None), "C-15: the watchlist's last entry is empty"
-    assert len(entries) == 8, f"C-15: the watchlist holds {len(entries)} entries; expected 8"
+    assert len(entries) == 9, f"C-15: the watchlist holds {len(entries)} entries; expected 9"
     assert newest in _text(CONST_TPL), (
         f"C-15: the newest watchlist entry {newest!r} is not a template title -- the append "
         "did not land on the surface it is supposed to guard"
@@ -1308,10 +1310,11 @@ def test_x18_downstream_gate_rows_15_to_16():
     amendment added one row (18 / 17). Stale-pin update (2026-11-06, Feature 086):
     the Efficient Test Execution amendment added one row (20 / 19). Stale-pin update
     (2026-11-09, Feature 089): the Script Interface Contract amendment added one row
-    (21 / 20)."""
+    (21 / 20). Stale-pin update (2026-11-09, Feature 090): the Re-Anchoring amendment
+    added one row (22 / 21)."""
     live = _text(CONST_LIVE)
     rows = PRINCIPLE_RE.findall(live)
-    assert len(rows) == 21, f"C-18: the enumeration yields {len(rows)} gate rows; expected 21"
+    assert len(rows) == 22, f"C-18: the enumeration yields {len(rows)} gate rows; expected 22"
     # the 15 side is measured, not asserted from memory: drop this principle's block.
     # The boundary is the next principle OR the next H2 -- keying on H2 alone would
     # swallow any principle appended after this one (Directory Governance, 2026-10-27).
@@ -1321,7 +1324,7 @@ def test_x18_downstream_gate_rows_15_to_16():
              if lines[k].startswith("### ") or lines[k].startswith("## "))
     sample = "\n".join(lines[:i] + lines[j:])
     before = PRINCIPLE_RE.findall(sample)
-    assert len(before) == 20, f"C-18: without this principle the enumeration yields {len(before)}; expected 20"
+    assert len(before) == 21, f"C-18: without this principle the enumeration yields {len(before)}; expected 21"
     # sentinel: the enumeration is not returning 16 for a trivial reason
     assert any(title == PRINCIPLE_TITLE for _n, title in rows), "C-18 sentinel: this principle is not among the rows"
     assert not any(title == PRINCIPLE_TITLE for _n, title in before), (

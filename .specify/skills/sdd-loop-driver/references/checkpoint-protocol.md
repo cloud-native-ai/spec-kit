@@ -40,10 +40,16 @@
   every stage boundary, after any subagent turn-limit stall, and after a detected context compaction; **T2** the
   full manual plus a reference only when a dispatch form is unclear or a stall is being handled. A full reload of
   every reference at every step is forbidden: it is ceremony and it buries the anchor in noise.
+- **The audit's primary object is the RULES, not the goal.** The current action and the next one already carry
+  the goal; a dropped rule leaves no trace in them (the canonical failure: "unattended" was ignored — package
+  boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
 - Answer five binary questions, each with a path or a reading as evidence:
-  1. Does `next_action` still serve `goal_verbatim` and stay inside `non_goals`?
-  2. Is the current stage the planned next stage in `stage_plan`?
-  3. Was the last action completed without an approval request (HR1)?
+  1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next
+     stage / spine written before acting / `workspace-guard --check` / fast-fail / confirmation gates / budget)?
+  2. Was the last action completed under those rules — no report substituting for execution, no subagent
+     turn-limit treated as a reason to hand back?
+  3. Is the next action the one the plan or assignment names? (The goal is implicit in it; do not ask the goal
+     as a separate question.)
   4. Is the state spine fresher than the last checkpoint/commit (HR4)?
   5. Did the last package stay inside its territory and leave `workspace-guard --check` clean?
 - The verdict is exactly one of `on-track`, `correction-applied`, `decision-needed`. Only `decision-needed` is
@@ -93,9 +99,9 @@
 
 ## 5. Direction audit
 - reload tier: <T0 | T0+T1 | T2>
-- Q1 goal: <on-track | correction-applied | decision-needed> — <evidence>
-- Q2 stage: <verdict> — <evidence>
-- Q3 HR1: <verdict> — <evidence>
+- Q1 rules: <which rules, each in force?> — <evidence>
+- Q2 process: <verdict> — <evidence>
+- Q3 next action: <verdict> — <evidence>
 - Q4 spine freshness: <verdict> — <evidence>
 - Q5 territory/workspace: <verdict> — <evidence>
 - verdict: <on-track | correction-applied | decision-needed>

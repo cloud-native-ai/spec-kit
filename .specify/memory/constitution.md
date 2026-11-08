@@ -1,5 +1,24 @@
 <!--
 Sync Impact Report
+- Version change: 1.18.0 → 1.19.0 (MINOR; new Principle XXII added, 2026-11-09)
+- Added principles: XXII. Re-Anchoring (不忘初心 · 温故而知新) — every agent persists a task ANCHOR and a RULE anchor, and after every core step runs compact -> reload -> evaluate at T0/T1/T2, with the five direction questions asking the RULES first and yielding `on-track` / `correction-applied` / `decision-needed`; only `decision-needed` is surfaced, never an approval request
+- Modified principles: None
+- Removed sections: None
+- Templates requiring updates:
+  ✅ templates/constitution-template.md — new XXI. Re-Anchoring; principles 20 → 21 (Feature 090)
+  ✅ skills/internal/manage-constitution/SKILL.md — `MUST include` list 13 → 14 entries (Feature 090)
+  ✅ templates/instructions-template.md + .specify/instructions.md — one ambient `## Re-Anchoring (不忘初心 · 温故而知新)` section (Feature 090)
+  ✅ shared/definitions/re-anchoring-definitions.md (+ .specify mirror) — NEW owner: the two concepts, T0/T1/T2 tiers, the agent obligation and its boundaries (Feature 090)
+  ✅ shared/definitions/agent-definitions.md — `## Re-Anchoring Obligation` section (Feature 090)
+  ✅ skills/external/sdd-loop-driver/references/checkpoint-protocol.md — § Direction audit rewritten rule-first (Feature 090)
+  ✅ tests/contract/test_constitution_double_landing.py — template 21 / live 22 / skill 14; watchlist 8 → 9 (Feature 090)
+  ✅ tests/contract/test_fast_fail_discipline.py — version pin, three count pins, watchlist length, section-count pins (Feature 090)
+- Follow-up TODOs: (a) Feature 090's SDD chain (clarify / plan / tasks / review) is still to be run on top of this pre-landed implementation; (b) the template roster carries this principle as XXI while this live roster carries it as XXII — per-surface numbering is normal per `contracts/governance-landing.contract.md#C-25`
+- Preserved by design: the owner is `shared/definitions/`, so no new guideline implementation surface is introduced; this principle adds a reviewing habit, not machinery
+-->
+
+<!--
+Sync Impact Report
 - Version change: 1.17.0 → 1.18.0 (MINOR; new Principle XXI added, 2026-11-09)
 - Added principles: XXI. Script Interface Contract (Declared, Zero-Side-Effect) — every functional, non-read-only script MUST answer `-h`/`--help` and `--version` before doing anything, and MUST reject an undeclared option non-zero; a file that acts when run directly is in scope whatever else also sources or imports it; pytest modules, pure libraries and read-only scripts are outside the REQUIRED set; the rule binds framework, downstream and third-party functional scripts alike and is pointer-only to `shared/definitions/script-interface-definitions.md`
 - Modified principles: None
@@ -468,6 +487,33 @@ project is told to open. The rule binds framework scripts, scripts of downstream
 third-party scripts alike, and it does not expire because a script was distributed rather than
 authored here.
 
+### XXII. Re-Anchoring (不忘初心 · 温故而知新)
+Every agent in this project — the driver and every dispatched subagent — MUST keep its original
+task and rules in view, and MUST re-confirm them after every core step:
+- **不忘初心 (Never Forget the Initial Rules and Task)**: the entry anchor MUST persist BOTH the task
+  anchor (goal verbatim, non-goals, acceptance authority, stage plan, decision gates) AND the RULE anchor
+  (the operating rules in force: unattended / no approval request / U4 -> next stage / spine before action /
+  workspace guard / fast-fail / confirmation gates / budget). A compaction, handoff or reentry MUST resume
+  from that anchor, never from memory or impression.
+- **温故而知新 (Review the Old, Know the New)**: after every core step (stage U4, package
+  boundary, checkpoint, subagent return), the agent MUST run compact -> reload -> evaluate and
+  answer the five rule-first direction questions, recording one of `on-track` / `correction-applied` /
+  `decision-needed`. The review's primary object is the RULES: the current and next action already
+  carry the goal, while a dropped rule (e.g. "unattended") leaves no trace in them. Only
+  `decision-needed` is surfaced; the audit is a statement, never an approval request.
+- The reload is tiered: T0 (the anchor digest at every core step), T1 (the rule digest at stage
+  boundaries, after a detected compaction and after a subagent turn-limit stall), T2 (the full
+  manual only when a dispatch form is unclear or a stall is handled). A full reload after every
+  tool call MUST NOT be substituted — it is ceremony that buries the anchor.
+- The full definition (the two concepts, the tiers, the agent obligation and its boundaries)
+  lives at `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated, here.
+- This principle adds a reviewing habit, not machinery: it MUST NOT justify a new scorer, a
+  ledger, a scheduler or a second checkpoint system.
+
+Rationale: a long run's most expensive failure is silent drift — the loop keeps executing while
+the original direction has been lost. Rules loaded once at the start do not survive compaction;
+a persisted anchor plus a periodic review does, and it costs one cheap reload per core step.
+
 ## Spec-Driven Development Workflow
 
 ### Research & Context Gathering
@@ -518,4 +564,4 @@ This Constitution supersedes all other guidelines and documentation. All develop
 - Feature changes MUST be validated against the Feature Index
 - Specification quality MUST be verified before implementation begins
 
-**Version**: 1.18.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-09
+**Version**: 1.19.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-11-09

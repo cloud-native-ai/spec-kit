@@ -100,3 +100,13 @@ The taxonomy renames nothing — it gives canonical layer names to distinctions 
 The **Host Registration Surface** of a render-mode tool is the directory that tool actually reads agent definitions from — the render pipeline's target surface. One surface per render-mode tool (qoder, claude, copilot, opencode; codex/hermes are annotated-mode and carry no surface); its path comes from the CLI's tool-metadata mapping (`_AGENT_METADATA_MAPPING[tool]["target_dir"]` in `src/specify_cli/__init__.py` — e.g. qoder's project-level `.qoder/agents/`), and its contents are **renderer-produced real files** — never symlinks, never hand-written copies. The render manifest (`.specify/agents/.render-manifest.json`) distinguishes rendered products from user-owned files sharing the directory; user assets are never pruned. Verified 2026-10-08 against official docs (the CLI/IDE shared-path statement lives in `shared/workflow/symlink-model.md`): Qoder CLI and Qoder IDE read the SAME project-level `.qoder/agents/`, and a filename does not define the agent name — the frontmatter `name` field does.
 
 **Seat Instance** — an Agent Instance produced by the create-team flow's seat-instantiation step (`skills/internal/create-team/references/create-mode.md` step 4): instantiated from a stage frame via create-agent delegation with ALL frame placeholders resolved, carrying the framework-only `team-scope: <team-slug>` frontmatter key as its team provenance (key semantics owned by the CLI's neutral key set; never rendered to any tool). Seat instances share the Agent Instance layer's store (`.specify/agents/instances/`) and validation; a `team-scope` pointing at a nonexistent team marks the instance **orphaned** — machine-detectable by that key alone.
+
+## Re-Anchoring Obligation (不忘初心 · 温故而知新)
+
+Every agent instance — including a dispatched subagent — MUST carry the re-anchoring obligation defined in
+`shared/definitions/re-anchoring-definitions.md`: restate its assignment anchor at entry, and after every core
+step (stage U4, package boundary, checkpoint, or return) re-read the RULES in force first and record the
+five-question verdict (`on-track` / `correction-applied` / `decision-needed`). The dispatcher carries the anchor summary
+(goal, non-goals, acceptance authority, decision gates) in every subagent brief; the driver's checkpoint
+protocol (§ Direction audit) owns the executable procedure. The obligation adds no new machinery: the state
+spine, checkpoints, assignment brief and the fast-fail channel are its only carriers.

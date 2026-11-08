@@ -57,6 +57,7 @@ DOUBLE_LANDING_WATCHLIST = (
     "Self-Explanatory Structure (不言自明)",
     "Efficient Test Execution (Concurrent by Default)",
     "Script Interface Contract (Declared, Zero-Side-Effect)",  # 089 T017: 7 -> 8
+    "Re-Anchoring (不忘初心 · 温故而知新)",  # 090: 8 -> 9
 )
 
 # C-8: numeral-agnostic matchers. `[IVXLC0-9]+` accepts roman or arabic; nothing pins a value.
@@ -71,16 +72,16 @@ LIVE_TITLE_RE = TEMPLATE_TITLE_RE
 # C-9: the pre-existing command-side entry that shares a substring with STR-006.
 CODE_SSOT_NAME = "Code as the Single Source of Truth"
 
-TEMPLATE_COUNT = 20     # stale-pin update (2026-11-09, 089 T017): 19 -> 20
+TEMPLATE_COUNT = 21     # stale-pin update (2026-11-09, 090): 20 -> 21
                         # (XIX Efficient Test Execution; XX Script Interface Contract)
                         # previously 17 -> 18 (XVIII Self-Explanatory Structure (不言自明),
                         # 082 T016, 2026-11-05); 16 -> 17 (XVII Grounded Naming, 2026-10-27);
                         # 15 -> 16 (XVI Directory Governance, 067 T025)
-LIVE_COUNT = 21         # stale-pin update (2026-11-09, 089 T017): 20 -> 21
+LIVE_COUNT = 22         # stale-pin update (2026-11-09, 090): 21 -> 22
                         # (XX Efficient Test Execution; the live roster's numeral is its own)
                         # previously 18 -> 19 (XIX Self-Explanatory Structure, 082 T016)
                         # 17 -> 18 (XVIII Grounded Naming, 2026-10-27)
-COMMAND_COUNT = 13      # stale-pin update (2026-11-09, 089 T017): 12 -> 13
+COMMAND_COUNT = 14      # stale-pin update (2026-11-09, 090): 13 -> 14
                         # (Efficient Test Execution entry in the generator's MUST-include list)
                         # previously 10 -> 11 (Self-Explanatory Structure entry, 082 T016)
                         # 9 -> 10 (Grounded Naming entry, 2026-10-27)
