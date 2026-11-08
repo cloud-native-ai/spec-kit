@@ -152,7 +152,15 @@ main() {
     #     the old budget; no existing section was trimmed.
     #   rule: the same rule as above — the smallest N*1024 with (N*1024 - 1) - 35173
     #     >= 1024. 35840 fails (666 B); 36864 leaves 1690 B and is the first that passes.
-INSTRUCTIONS_BUDGET_BYTES=36864
+    #
+    # Raise record (Feature 090 — Re-Anchoring ambient section):
+    #   old value: 36864
+    #   new value: 37888
+    #   measured live size after injection: 35790 B (this repository, 2026-11-09)
+    #   reason: the new `## Re-Anchoring (不忘初心 · 温故而知新)` ambient section.
+    #   rule: the same rule — the smallest N*1024 with (N*1024 - 1) - 35790 >= 1024.
+    #     36864 fails (73 B); 37888 leaves 2097 B and is the first that passes.
+INSTRUCTIONS_BUDGET_BYTES=37888
 
     mkdir -p "$TARGET_DIR"
 
