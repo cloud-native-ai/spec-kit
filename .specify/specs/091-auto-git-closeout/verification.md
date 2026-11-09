@@ -21,6 +21,86 @@ implement entry of slice 1).
 
 `[final]`-path criteria in `blocked` / `deferred` / `fail`: **none**. `deferred_tasks=` (empty) — no row was deferred.
 
+## Machine-readable record
+
+The table above is the **human view**. This block is the **machine view**: it is the only part of this file
+the closure judgement reads, so the two must be edited together and MUST NOT disagree. Key grammar, the closed
+status set and the ladder/smoke field sets are owned by `shared/workflow/acceptance-hardening.md`
+§ Verification Vocabulary; the `SC-NNN_status` key form is owned by `templates/verification-log-template.md`.
+Gate verdicts in rows marked `gate verdict` are **copied** from the gate's own record, never restated as a
+judgement of this file.
+
+```text
+# -- Baseline (implement-entry, slice 1) --
+
+baseline_commit_implement_entry=9d5acb7a
+baseline_date=2026-11-09
+baseline_branch=091-auto-git-closeout
+baseline_failed_ids=36 (.specify/specs/091-auto-git-closeout/test-evidence/baseline-failed.txt)
+
+# -- Smoke test record (exactly one per feature — the only copy of these three keys in this file) --
+
+smoke_command=pytest tests/contract/test_git_closeout_contract.py -q
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/091-auto-git-closeout/test-evidence/T062-smoke.txt
+
+# -- Success Criteria evaluation (one status row per requirements.md SC; SC-006 / SC-007 are the `supporting`
+#    path, SC-001…SC-005 and SC-008 are `final` — requirements.md § Success Criteria) --
+
+SC-001_status=pass
+SC-001_value=4/4 workflow models reach the declared end state in a fixture repo with a local bare remote
+SC-001_note=see § Success criteria row SC-001 — T030-forks.txt + the four model tests
+
+SC-002_status=pass
+SC-002_value=2/2 declaration rows, closed four-value set, `ask` default, pinned on both surfaces plus mutation arms
+SC-002_note=see § Success criteria row SC-002
+
+SC-003_status=pass
+SC-003_value=2/2 failure fixtures green; the retry mutation reds through the `retries` axis (R-21b)
+SC-003_note=see § Success criteria row SC-003 + § Rulings R-21b
+
+SC-004_status=pass
+SC-004_value=gate set compared by name: 27 (destructive 20 / governance_kept 7), violations 0, reproduced after the change
+SC-004_note=see § Success criteria row SC-004
+
+SC-005_status=pass
+SC-005_value=3/3 unattended mechanisms reach the one close-out owner by pointer; negative search finds no second owner
+SC-005_note=see § Success criteria row SC-005
+
+SC-006_status=pass
+SC-006_value=derived sequence printed for this repo's declared model; remote reference listing byte-identical before/after
+SC-006_note=supporting path — see § Success criteria row SC-006
+
+SC-007_status=pass
+SC-007_value=read-only fork skips with one line and no commit; artifacts-without-records fork still merges, pushes and says so
+SC-007_note=supporting path — see § Success criteria row SC-007
+
+SC-008_status=pass
+SC-008_value=baseline object, comparison unit and allowed-delta source all named inside the test; drop/copy mutations red
+SC-008_note=see § Success criteria row SC-008
+
+# -- Joint acceptance (one row per runtime-stack row of requirements.md § Runtime Stack & Dependency Ownership) --
+
+RS-001_joint_acceptance=pass
+RS-002_joint_acceptance=pass
+RS-003_joint_acceptance=pass
+
+# -- Deferred tasks (mirrors `[~]` rows in tasks.md) --
+
+deferred_tasks=
+deferred_reason_summary=no task row was deferred; all 62 rows are [X]
+
+# -- Gate verdicts (copied from the gate's own record, never a judgement of this file) --
+
+gate_verdict_gate_1=pass
+gate_verdict_gate_2=pass
+gate_verdict_gate_3=pass
+gate_verdict_gate_4=pass
+gate_verdict_gate_5=pass
+gate_verdict_gate_6=pass
+notes=see § Gates for each gate's own evidence pointer; the closure judgement reads this block only
+```
+
 ## Gates
 
 | Gate | Result | Evidence |
@@ -46,11 +126,10 @@ implement entry of slice 1).
 
 ## Smoke record
 
-```
-smoke_command=SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_git_closeout_contract.py -q
-smoke_exit_code=0
-smoke_evidence_path=.specify/specs/091-auto-git-closeout/test-evidence/T062-smoke.txt
-```
+Exactly one smoke record per feature, and it is carried once: the three fields live in the machine block above
+(`§ Machine-readable record`) because the closure judgement parses them and two copies would be a defect. This
+section is the human reading of that one record — `pytest tests/contract/test_git_closeout_contract.py -q`,
+exit `0`, evidence `.specify/specs/091-auto-git-closeout/test-evidence/T062-smoke.txt`.
 
 End-to-end over the feature's main flow: the module derives a sequence from a declaration, executes it
 against a throwaway repository with a local bare remote, and asserts the end state — the close-out itself,
@@ -195,6 +274,59 @@ Comparison command (GATE-1's own form):
 | R-19 | LOW | driver-skill parser reads the format legend as a dependency token | NOT-OURS, surfaced in `framework_observations` |
 | R-20 / R-21 / R-22 | LOW | requirements-text thinness (see § Rulings) | recorded readings, no text edit |
 | R-37 | MEDIUM | the fixture **executor** stops at stage `commit` (exit 1) for a strategy value whose derived sequence contains no merge step (`commit+merge` / `commit-only` on a single-branch fixture), so a behavioural read of those two values is not available — only their transition and terminal state are | **carried, surfaced** — the transition is guarded per value and the shipped reference is unaffected; whoever next extends the fixture driver should either make the merge cursor a no-op when the sequence has no merge or narrow the probe's claim. Recorded, not silently absorbed |
+
+## Fix-loop amendment — F-ACCEPTANCE / A-02 / F1 (2026-11-09, package P2)
+
+The first review refused this feature's claimed status because the record it wrote was **unreadable to its
+own judgement**: the success-criterion statuses existed only as Markdown table rows, while the closure
+judgement parses `SC-NNN_status=` key-value rows, so all six `final`-path criteria read `unknown` and
+`final_path` stood at `pass 0 / total 6`. This amendment closes that read/write mismatch at the root and
+adds nothing to the feature's claims — every status value below is the one § Success criteria already
+recorded; what changes is that the machine now reads it.
+
+- **The record is the key-value block; the table is its view.** § Machine-readable record now carries the
+  `SC-001…SC-008` status rows, the three `RS-NNN_joint_acceptance` rows, the single smoke record and
+  `deferred_tasks=`. The human table stays for readers, and the two MUST agree. The smoke record is now
+  written **once** (it had been duplicated between § Smoke record and the machine block; a second
+  `smoke_command=` is a defect the judgement refuses, so § Smoke record is now a reading of the one record).
+- **`RS-002_joint_acceptance` closes the one remaining reason.** `runtime-dependency-not-owned: RS-002` was
+  not a disagreement with RS-002's duties — the row's five cited FRs each already have a task row — but the
+  missing third duty: an `in-scope` runtime-stack row is refused until `verification.md` names it with a
+  verdict. Its joint acceptance, `/speckit.implement` 收口阶段在宿主 `git` 上跑通四个模型夹具仓库 for
+  RS-001 and `tests/contract/` 下的收口契约测试在 `>=3.8` 解释器上通过 for RS-002/RS-003, is exactly the
+  measurement this stage ran; the rows record that verdict, they do not invent a new one.
+- **The status claim became a gate product (F1).** `templates/commands/implement.md` § Feature Integration
+  now rules the registry row and the detail status **read-only to the stage** until
+  `closure-acceptance-check.py` returns `accept` for the tree being claimed, and
+  `templates/verification-log-template.md` states that a recorded status is a verdict the run must have
+  measured, never a self-assessment written to satisfy the checker. The 091 run itself is the counter-example
+  that earned the rule: its `verification.md` declined the claim in prose while its commit made the claim in
+  the registry.
+- **Measured on this worktree, with the checker's own invocation**
+  (`python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/091-auto-git-closeout --repo .`):
+
+  ```
+  verdict: accept
+  final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+  reason: none
+  ```
+
+  before the amendment the same command returned `block` with `pass=0 / unknown=6` and three reasons
+  (`zero-final-path-pass`, `runtime-dependency-not-owned: RS-002`,
+  `status-claims-implemented-but-blocked`). The judgement's own key-value parse is the only thing that
+  changed on the reading side: no criterion's verdict moved.
+- **The carrier cannot regress silently — mutation-read, not asserted.** Commenting out the status rows of a
+  copy of this spec directory (the table untouched) sends the same command back to `final_path pass=0 /
+  unknown=6`, `zero-final-path-pass` and `status-claims-implemented-but-blocked`, exit 1. A `pass` that exists
+  only in a table is therefore `unknown`, exactly as the review read it. Evidence: `test-evidence/fix-p2-evidence.txt`.
+- **Scope and residuals.** This amendment edits three artifacts of this run and one existing pin:
+  `verification.md` (this section plus § Machine-readable record), `templates/commands/implement.md` and
+  `templates/verification-log-template.md` (the gate-product rule; the `.specify/templates/` pair copy is kept
+  byte-identical because the mirror's `templates/` pair is byte-identical by contract), and
+  `tests/contract/test_stage_class_wiring.py`'s `implement` row of `BASELINE_SHA256` — re-measured from the
+  module's own `strip_wiring`, because the authored § Feature Integration block moved outside the 077 card.
+  None of the findings this package does not own (F4 / F5 / the doc-vs-implementation scope delta) is repaired
+  here; they remain open for their own fix packages.
 
 ## Not verified here (belongs to the review stage)
 
