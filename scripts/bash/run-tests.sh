@@ -50,7 +50,11 @@ if [ -f "$SCRIPT_INTERFACE_LIB" ]; then
 fi
 
 resolve_python() {
-    for candidate in "${SPECKIT_PYTHON:-}" ".venv/bin/python" "python3" "python"; do
+    # The repo's declared dev environment is resolved from THIS script's location, not from
+    # the caller's cwd: a test case running in a temp dir must still find it.
+    local repo_venv
+    repo_venv="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)/.venv/bin/python"
+    for candidate in "${SPECKIT_PYTHON:-}" "$repo_venv" ".venv/bin/python" "python3" "python"; do
         [ -n "$candidate" ] || continue
         if command -v "$candidate" >/dev/null 2>&1 || [ -x "$candidate" ]; then
             if "$candidate" -m pytest --version >/dev/null 2>&1; then

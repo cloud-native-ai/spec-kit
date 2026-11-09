@@ -83,7 +83,16 @@ ensure_dev_toolchain() {
   if ! "${DEV_PY}" -m pip install --quiet -e "${REPO_ROOT}[dev]"; then
     die 5 "declared dev extra could not be installed: ${REPO_ROOT}[dev]"
   fi
-  if ! "${DEV_PY}" -c "import pytest, xdist" >/dev/null 2>&1; then
+  # A host PYTHONPATH can make pip believe the test deps are satisfied while this interpreter
+  # cannot import them. Verify in an isolated environment; on failure, install the declared dev
+  # set into the venv explicitly and re-verify before failing.
+  if ! env -u PYTHONPATH "${DEV_PY}" -c "import pytest, xdist" >/dev/null 2>&1; then
+    log_warn "dev deps not importable in ${DEV_PY}; installing the declared set explicitly"
+    env -u PYTHONPATH "${DEV_PY}" -m pip install --quiet --ignore-installed --no-deps \
+      pytest pytest-xdist pluggy iniconfig packaging pygments execnet \
+      || die 5 "declared dev set could not be installed into ${DEV_PY}"
+  fi
+  if ! env -u PYTHONPATH "${DEV_PY}" -c "import pytest, xdist" >/dev/null 2>&1; then
     die 5 "dev toolchain incomplete in ${DEV_PY}: pytest-xdist is not importable on this interpreter"
   fi
   log_info "Dev toolchain ready: ${DEV_PY} ($( ${DEV_PY} -c 'import pytest, xdist; print("pytest", pytest.__version__, "+ xdist", xdist.__version__)' ))"

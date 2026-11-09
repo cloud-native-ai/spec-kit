@@ -47,7 +47,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 PY=""
-for candidate in "${SPECKIT_PYTHON:-}" ".venv/bin/python" "/usr/bin/python3" "/usr/local/bin/python3" "python3" "python"; do
+REPO_VENV="$(CDPATH="" cd "$SCRIPT_DIR/../.." 2>/dev/null && pwd)/.venv/bin/python"
+for candidate in "${SPECKIT_PYTHON:-}" "$REPO_VENV" ".venv/bin/python" "/usr/bin/python3" "/usr/local/bin/python3" "python3" "python"; do
     [ -n "$candidate" ] || continue
     if "$candidate" -c "import pytest" >/dev/null 2>&1; then
         PY="$candidate"
