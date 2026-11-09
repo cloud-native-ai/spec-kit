@@ -66,7 +66,12 @@ The comparison surface is therefore stale for GATE-1; this is disclosed as an an
 
 ## Commits
 
-(recorded below after the commit)
+- `a8965b03` — `feat(094-wp01): binding model + scope engine + contract tests (T001–T015)`
+  (parent `5278d4d1`; the branch advanced by one spine-note commit after this package was
+  dispatched at `124759e3` — no conflicting paths). No push.
+- `HEAD~` post-commit reading: `test-evidence/wp01-postcommit.txt` — binding model 12 passed;
+  script-interface C-20 resolved once the module became tracked, C-33/C-35 remain red only on
+  the pending mirror projection; the run-checks roster pin remains red as disclosed.
 
 ## Residual risks and disclosed boundaries
 
