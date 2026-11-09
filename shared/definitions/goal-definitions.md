@@ -160,6 +160,10 @@ Four defining properties:
 
 **Run assignment.** A team run MAY name one Target under the team's **bound** Goal. The reference is validated — a dangling or terminal Target is reported, never silently accepted — and a run that names no Target runs against the Goal broadly, exactly the pre-Target behavior. Work items attribute to the Target through the ledger's `target_ref`.
 
+### Target concurrency (目标并发 — the only concurrency paragraph this file adds)
+
+Independent **Targets** are advanced **concurrently by default**: when two or more Targets are independent — their work's write domains (file-level path sets) do not intersect and none of FR-005's other conditions binds them — they MUST be advanced concurrently; a serial advancement MUST name a reason code from the closed vocabulary owned by `shared/declarations/facts/serial-reason.yaml`, with that code's declared evidence form, and the run records the `requested` / `effective` / `effective_reason` reading (fields owned by `shared/declarations/facts/effective-concurrency.yaml`; `not_evaluated` where intervals are absent). Goal completion stays "all Targets reached" — concurrency never relaxes it — and a failed Target leaves unrelated sibling Targets uncancelled while dependents stay blocked with a recorded reason. Goal slices belong to the `partition-required` class, whose obligation text and condition set are owned by `shared/declarations/facts/concurrency-class.yaml` and FR-005/FR-006; this section restates neither, and it changes no part of the Goal/Target model above (Targets still carry no dependency edges between them).
+
 ## Storage & Anchoring Archive
 
 Anchoring (project-level, global scope):
