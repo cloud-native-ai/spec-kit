@@ -1,0 +1,39 @@
+# WP2 red-first + green — T030–T033 (classify: C-023…C-025, C-026 measured)
+- date: 2026-11-09T11:36:25Z
+
+## RED — classify was a stub (before T030)
+- command: `python3 scripts/python/concurrency-check.py classify --repo . --json-out <tmp>`
+decision = fail
+findings = [('not-implemented', 'classify')]
+- exit status: 1
+
+## GREEN — C-023/C-024 on the live tree: the five roots enumerate; no uncovered, no ambiguous
+- command: `python3 scripts/python/concurrency-check.py classify --repo . --json-out .specify/.tmp/wp2/classify.json`
+- exit status: 1 (fail is the aggregate decision; see the per-code split below)
+measured.roots = {'agents': {'pattern': 'agents/*.agent.md', 'members': 17, 'by_base': {'agents': 17}}, 'anchoring': {'pattern': '.specify/anchoring/<slug>/', 'members': 6, 'by_base': {'.specify/anchoring': 6}}, 'commands': {'pattern': 'templates/commands/<stem>.md', 'members': 29, 'by_base': {'templates/commands': 29}}, 'skills': {'pattern': 'skills/{internal,external}/<name>/', 'members': 54, 'by_base': {'skills/external': 16, 'skills/internal': 38}}, 'teams': {'pattern': '.specify/teams/<slug>/', 'members': 12, 'by_base': {'.specify/teams': 12}}}
+measured.total_bodies = 118
+finding codes = {'obligation-missing': 107}
+uncovered/ambiguous/class-disagreement = []
+decision = fail
+- reading: the live tree yields 0 uncovered / 0 ambiguous / 0 class-disagreement; the 107 obligation-missing findings are C-025's pending half (WP3 T034–T036 author the anchors, T040 places the pointer) — recorded, not fabricated
+
+## GREEN — C-024 both directions, on fixtures under .specify/.tmp/wp2/fixtures/
+- fixture `classify-ok` (all obligation sources reachable):
+  exit status: 0
+  decision = pass | findings = []
+  obligation sources = [('skills/internal/demo-a', 'both'), ('skills/internal/demo-b', 'both'), ('templates/commands/demo.md', 'owner-anchor'), ('agents/demo.agent.md', 'owner-anchor'), ('.specify/teams/demo-team', 'owner-anchor'), ('.specify/anchoring/demo-goal', 'owner-anchor')]
+- fixture `classify-missing` (anchor sections removed, bodies plain):
+  exit status: 1
+  decision = fail | codes = ['obligation-missing']
+- fixture `classify-uncovered` (a root with members and no decision-rule row):
+  exit status: 1
+  findings = [('uncovered', 'extra/extra/x', "no decision-rule row for root 'extra'")]
+- fixture `classify-ambiguous` (two same-shape rule rows, two different classes):
+  exit status: 1
+  findings = [('ambiguous', 'skills/skills/internal/demo-a', "produced shape 'work-package' matches 2 class members: ['concurrent-by-default', 'serial-only']"), ('uncovered', 'skills/skills/internal/demo-b', "2 decision-rule rows for root 'skills' and no readable produced-shape")]
+
+## GREEN — C-025 obligation sources reported distinctly (live tree sample)
+sources = {'body-text': 11, 'none': 107}
+  skills/external/coaching-skills -> body-text | anchor section #class-concurrent-by-default not found in shared/definitions/subagent-definitions.md
+  skills/external/create-docs -> none | anchor section #class-concurrent-by-default not found in shared/definitions/subagent-definitions.md
+  skills/external/create-pages -> none | anchor section #class-concurrent-by-default not found in shared/definitions/subagent-definitions.md

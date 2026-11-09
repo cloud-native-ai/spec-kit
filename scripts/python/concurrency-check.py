@@ -272,8 +272,257 @@ def _not_implemented(action):
         {})
 
 
+# --------------------------------------------------------------------------- #
+# enumeration and body reading (classify)
+# --------------------------------------------------------------------------- #
+def expand_braces(pattern):
+    """Expand ``{a,b}`` alternatives in a declaration pattern (one level, nested-safe)."""
+    match = re.search(r"\{([^{}]+)\}", pattern)
+    if not match:
+        return [pattern]
+    expanded = []
+    for option in match.group(1).split(","):
+        expanded.extend(
+            expand_braces(pattern[:match.start()] + option.strip() + pattern[match.end():]))
+    return expanded
+
+
+def expand_root_pattern(pattern):
+    """``[(base, selector)]`` for one declaration pattern.
+
+    The roots fact declares PATH PATTERNS, never counts (V-4). Two placeholder forms
+    occur: ``<name>/`` (a directory child) and ``<stem>.md`` (a file-glob child); a
+    literal ``*`` segment is a glob as written. The engine expands whatever the fact
+    says and hard-codes no root path.
+    """
+    selectors = []
+    for alternative in expand_braces(str(pattern).strip()):
+        alternative = alternative.rstrip("/")
+        placeholder = re.search(r"<[^>]+>", alternative)
+        if placeholder:
+            head = alternative[:placeholder.start()].rstrip("/")
+            rest = alternative[placeholder.end():]
+            if not rest:
+                selectors.append((head or ".", "dir"))
+            else:
+                selectors.append((head or ".", "*" + rest))
+            continue
+        base, _, last = alternative.rpartition("/")
+        selectors.append((base or ".", last))
+    return selectors
+
+
+def enumerate_root(repo, root):
+    """Enumerate one root's members: ``[(relative-path, is_dir, base)]``, sorted."""
+    members = []
+    exclusions = [str(layer).strip().rstrip("/")
+                  for layer in (root.get("excluded_layers") or [])]
+    for base, selector in expand_root_pattern(root.get("pattern", "")):
+        base_path = repo / base
+        if not base_path.is_dir():
+            continue
+        if selector == "dir":
+            candidates = sorted(p for p in base_path.iterdir() if p.is_dir())
+        else:
+            candidates = sorted(p for p in base_path.glob(selector) if p.is_file())
+        for path in candidates:
+            if path.name.startswith(".") or path.name == "__pycache__":
+                continue
+            rel = path.relative_to(repo).as_posix()
+            if any(rel == layer or rel.startswith(layer + "/") for layer in exclusions):
+                continue
+            members.append((rel, path.is_dir(), base))
+    return sorted(members)
+
+
+def read_body_text(repo, rel, is_dir):
+    """The body's own text: the file itself, or every markdown file of a directory member."""
+    path = repo / rel
+    try:
+        if not is_dir:
+            return path.read_text(encoding="utf-8")
+        chunks = []
+        for markdown in sorted(path.rglob("*.md")):
+            chunks.append(markdown.read_text(encoding="utf-8"))
+        return "\n".join(chunks)
+    except (OSError, UnicodeDecodeError) as error:
+        raise EngineInputError(
+            "body-unreadable", "cannot read body %s (%s)" % (rel, error))
+
+
+def frontmatter_value(text, key):
+    """One scalar from the leading ``---`` frontmatter block, or ``None``."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        head, sep, value = line.partition(":")
+        if sep and head.strip() == key:
+            return value.strip().strip("\"'")
+    return None
+
+
+def resolve_anchor(repo, anchor):
+    """``(path, fragment, resolved, detail)`` for a class ``owner_anchor`` value.
+
+    A file path or a ``path#fragment`` pair. Resolution: the file exists (framework
+    source form first, then its ``.specify/`` projection) and, when a fragment is
+    given, a heading line carries it (``# class-<fragment>``-style section) or an
+    explicit ``{#<fragment>}`` / ``id="<fragment>"`` marker does. An unresolvable
+    anchor is reported, never assumed to hold the obligation.
+    """
+    text = str(anchor or "").strip()
+    if not text:
+        return "", "", False, "no owner_anchor declared"
+    path_text, _, fragment = text.partition("#")
+    candidates = [repo / path_text]
+    if path_text.startswith(".specify/"):
+        candidates.append(repo / path_text[len(".specify/"):])
+    else:
+        candidates.append(repo / ".specify" / path_text)
+    target = next((c for c in candidates if c.is_file()), None)
+    if target is None:
+        return path_text, fragment, False, "anchor file does not resolve: %s" % path_text
+    if not fragment:
+        return path_text, fragment, True, "anchor file resolves"
+    try:
+        anchor_text = target.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return path_text, fragment, False, "anchor file unreadable: %s" % path_text
+    heading = re.compile(r"^#{1,6}\s+.*%s.*$" % re.escape(fragment), re.MULTILINE)
+    marker = re.compile(r"(\{#%s\}|id=[\"']%s[\"'])" % (re.escape(fragment), re.escape(fragment)))
+    if heading.search(anchor_text):
+        return path_text, fragment, True, "anchor heading resolves: #%s" % fragment
+    if marker.search(anchor_text):
+        return path_text, fragment, True, "anchor marker resolves: #%s" % fragment
+    return path_text, fragment, False, "anchor section #%s not found in %s" % (fragment, path_text)
+
+
+def resolve_body_class(root_id, body_text, rule_rows, class_names):
+    """SM-3's class resolution for one body under one root.
+
+    Returns ``(class_name, finding_code, detail)``. A single decision-rule row for the
+    root assigns its class. Multiple rows require the body's declared produced shape
+    (frontmatter ``produced-shape``); the shape must select exactly one row, else the
+    body is ``uncovered`` (undecidable) or ``ambiguous`` (two class members). No rule
+    row is ``uncovered``. Nothing falls into a catch-all member (C-024).
+    """
+    rows = [row for row in rule_rows if str(row.get("root_id", "")).strip() == root_id]
+    if not rows:
+        return None, "uncovered", "no decision-rule row for root %r" % root_id
+    if len(rows) == 1:
+        name = str(rows[0].get("class", "")).strip()
+        if name not in class_names:
+            return None, "class-unknown", "rule names class %r absent from the class table" % name
+        return name, None, "single decision-rule row"
+    shape = frontmatter_value(body_text, "produced-shape") or frontmatter_value(
+        body_text, "produced_shape")
+    if not shape:
+        return None, "uncovered", (
+            "%d decision-rule rows for root %r and no readable produced-shape" % (len(rows), root_id))
+    matching = [row for row in rows
+                if str(row.get("produced_shape", "")).strip() == shape]
+    if len(matching) == 1:
+        name = str(matching[0].get("class", "")).strip()
+        if name not in class_names:
+            return None, "class-unknown", "rule names class %r absent from the class table" % name
+        return name, None, "produced shape %r selects one row" % shape
+    if len(matching) > 1:
+        names = [str(row.get("class", "")).strip() for row in matching]
+        return None, "ambiguous", (
+            "produced shape %r matches %d class members: %s" % (shape, len(matching), names))
+    return None, "uncovered", "produced shape %r matches no decision-rule row" % shape
+
+
 def action_classify(repo, args):
-    return _not_implemented("classify")
+    """C-023…C-026: enumerate the five roots and judge every body's class and obligation."""
+    roots_statement = fact_statement(load_fact(repo, "executor-enumeration-roots"),
+                                     "executor-enumeration-roots")
+    class_statement = fact_statement(load_fact(repo, "concurrency-class"),
+                                     "concurrency-class")
+    classes = class_statement.get("classes") or []
+    class_names = {str(c.get("name", "")).strip() for c in classes if isinstance(c, dict)}
+    class_table = {str(c.get("name", "")).strip(): c for c in classes if isinstance(c, dict)}
+    rule_rows = class_statement.get("decision_rule") or []
+    roots = roots_statement.get("roots") or []
+
+    findings = []
+    measured_roots = {}
+    measured_bodies = []
+    for root in roots:
+        if not isinstance(root, dict):
+            continue
+        root_id = str(root.get("root_id", "")).strip()
+        members = enumerate_root(repo, root)
+        by_base = {}
+        for rel, _is_dir, base in members:
+            by_base[base] = by_base.get(base, 0) + 1
+        measured_roots[root_id] = {
+            "pattern": str(root.get("pattern", "")),
+            "member_count": len(members),
+            "by_base": by_base,
+            "member_ids": [rel for rel, _d, _b in members],
+        }
+        applies = [str(c.get("name", "")).strip() for c in classes
+                   if isinstance(c, dict) and root_id in (c.get("applies_to") or [])]
+        for rel, is_dir, _base in members:
+            body_text = read_body_text(repo, rel, is_dir)
+            name, problem, detail = resolve_body_class(
+                root_id, body_text, rule_rows, class_names)
+            body_id = "%s/%s" % (root_id, rel)
+            record = {"unit": body_id, "path": rel, "root": root_id,
+                      "class": name, "resolution": detail}
+            if problem:
+                findings.append(finding(
+                    problem, body_id, detail, rel,
+                    compared=[applies, [str(r.get("class", "")) for r in rule_rows
+                                        if str(r.get("root_id", "")) == root_id]]))
+                measured_bodies.append(record)
+                continue
+            if applies and name not in applies:
+                findings.append(finding(
+                    "class-disagreement", body_id,
+                    "applies_to %s and the decision rule %r disagree" % (applies, name),
+                    rel, compared=[applies, name]))
+            # obligation presence (C-025): the body's own text or the class's owner anchor
+            entry = class_table.get(name, {})
+            anchor = str(entry.get("owner_anchor", ""))
+            anchor_path, fragment, anchor_ok, anchor_detail = resolve_anchor(repo, anchor)
+            tokens = [name, anchor, anchor_path,
+                      fragment and "#" + fragment, fragment]
+            in_body = any(token and token in body_text for token in tokens)
+            source = ("both" if (in_body and anchor_ok) else
+                      "body-text" if in_body else
+                      "owner-anchor" if anchor_ok else "none")
+            record.update({
+                "obligation": {
+                    "class_obligation": str(entry.get("obligation", "")),
+                    "in_body": in_body,
+                    "anchor_resolves": anchor_ok,
+                    "anchor": anchor,
+                    "anchor_detail": anchor_detail,
+                    "source": source,
+                }
+            })
+            if source == "none":
+                findings.append(finding(
+                    "obligation-missing", body_id,
+                    "class %r obligation is readable neither in the body nor at %r (%s)"
+                    % (name, anchor, anchor_detail), rel,
+                    compared=[name, anchor]))
+            measured_bodies.append(record)
+
+    if not roots:
+        findings.append(finding("uncovered", "roots", "the roots fact declares no roots"))
+    decision = "fail" if findings else "pass"
+    measured = {
+        "roots": measured_roots,
+        "total_bodies": sum(r["member_count"] for r in measured_roots.values()),
+        "bodies": measured_bodies,
+    }
+    return envelope("classify", decision, findings, measured)
 
 
 def action_serial_reason(repo, args):
