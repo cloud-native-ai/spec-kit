@@ -1,0 +1,5 @@
+# WP1 fact-set internal coherence (read-only cross-checks between the eight facts) — 2026-11-09T10:56:32Z
+note: the declaration reader returns every scalar as a string; numeric facts are coerced at read time.
+roots=5 classes=concurrent-by-default,partition-required,serial-only codes=6 condition_bound=4 factual=2 stages=8
+COHERENCE: PASS
+exit=0

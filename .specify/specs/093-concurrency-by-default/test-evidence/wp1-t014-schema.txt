@@ -1,4 +1,4 @@
-# T014 — fact-vs-schema validation (required keys, kind membership, slug==stem, reader resolution) — 2026-11-09T10:54:38Z
+# T014 — fact-vs-schema validation (required keys, kind membership, slug==stem, reader resolution) — 2026-11-09T10:56:07Z
 $ python3 - ... (read-only: loads contract.yaml and the eight facts through declaration_reader)
 PASS concurrency-class                kind=mapping                missing=none unknown=none stem==fact==slug=True
 PASS serial-reason                    kind=ordered-operator-table missing=none unknown=none stem==fact==slug=True
@@ -11,3 +11,7 @@ PASS coordinator-dispatch-verdict     kind=mapping                missing=none u
 
 all eight valid: True
 exit=0
+
+## Registration (the same run reads the list; facts 32 = 24 pre-existing + these 8; contract 17 = 9 domain keys + the 8 registered slugs)
+$ python3 .specify/scripts/python/declaration_reader.py --action list --repo . | python3 -c "..." (counts only)
+contract_entries=17 facts_entries=32

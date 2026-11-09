@@ -24,7 +24,7 @@ statement:
   interval_fields:
     - dispatched_at
     - settled_at
-  interval_form: half-open [dispatched_at, settled_at)
+  interval_form: half-open, dispatched_at inclusive and settled_at exclusive
   tie_break: at equal epoch seconds a settle is applied before a dispatch, so touching intervals do not overlap
   missing_interval_rule: any dispatched unit without an interval makes effective the literal not_evaluated
   triple_rule: requested, effective and effective_reason are recorded together, never one or two alone
