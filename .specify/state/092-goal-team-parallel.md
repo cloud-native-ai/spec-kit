@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794221025
 stage_base_commit: ab8fa2de
 attempt: 0
 retry_limit: 3
-last_verdict: "U4 pass — TASKS-DONE; 80 rows / 7 dispatchable packages (6 write packages concurrent at worktree); decomposition proceed; pre-analyze pass (0 errors / 86 advisories); validate-tasks 0 errors / 1 warning (disclosed forward edge); commit 00c36d9c; checkpoint 04; next = checklist"
+last_verdict: "U4 pass — CHECKLIST-DONE; 40-item requirements-quality checklist at checklists/2026-11-09-requirements-quality.md (100% traceable, 26 pass / 8 fail / 6 observe); both blocking gates pass (G-checklist-reader reader=pass with red-first mutation probe, G-checklist-duplicate pass); 8 fail rows on requirements defects (duplicated + self-contradictory Assumptions block, stale FR-005->FR-032 pointer, 5 empty FR subsections B-F, stale A6 enumeration); next = analyze"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch checklist (092 line) in parallel with the 093 line clarify
+next_action: dispatch analyze (092 line); the 8 checklist fail rows are requirements defects to surface there, not checklist-stage repairs
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
   non_goals: [新增 /speckit.* 命令, 第二个 goal/team 引擎, 破坏性迁移旧数据（archive-not-delete）, 改变 SDD 阶段链与哨兵]
@@ -43,7 +43,7 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages recomputed per stage; implement packages ~10 tasks, up to 6 concurrent
   verifier_reserve: 1
-  breakpoint_verdict: "requirements + clarify + plan + tasks complete; next stage = checklist"
+  breakpoint_verdict: "requirements + clarify + plan + tasks + checklist complete; next stage = analyze"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 35 FR / 10 SC; commit af1fcae3
@@ -51,5 +51,6 @@ gates: |
   plan U4: pass — 111 clauses; 7 tensions; pre-analyze pass 0/37; decomposition proceed; overlap adjudicated; commits 58516812 + 679a3f51; team created
   tasks U4: pass — 80 rows / 7 packages; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors/1 warning; commit 00c36d9c
   tasks U4: pass — 80 rows / 7 packages / 111 clause attributions; decomposition proceed; pre-analyze pass 0/86; validate-tasks 0 errors / 1 disclosed warning
-wrapup: requirements records committed in af1fcae3; spec-local goal created; tasks stage records in test-evidence/ (+ coverage-baseline.txt); run-determination + exec-quant recorded
+  checklist U4: pass — 40 items (100% traceable, soft cap 40 met); G-checklist-reader pass (mutation probe -> fail, exit 1); G-checklist-duplicate pass; validate-requirements ok 0/0; 8 fail rows are requirements findings for analyze
+wrapup: requirements records committed in af1fcae3; spec-local goal created; tasks stage records in test-evidence/ (+ coverage-baseline.txt); run-determination + exec-quant recorded; checklist stage: test-evidence/checklist-readings-2026-11-09.txt + checklist-gates-2026-11-09.txt + run-determination-checklist.txt; run-determination + exec-quant + feedback recorded for /speckit.checklist
 framework_observations: []

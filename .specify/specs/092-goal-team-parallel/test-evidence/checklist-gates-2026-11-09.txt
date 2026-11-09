@@ -1,0 +1,64 @@
+=== G-checklist-reader: doc-consistency-check.py --faces reader --spec-dir .specify/specs/092-goal-team-parallel ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:47:30Z
+faces: reader=not-applicable
+files_scanned: 12
+findings: 0
+EXIT=0
+
+=== G-checklist-duplicate: doc-consistency-check.py --faces duplicate --spec-dir .specify/specs/092-goal-team-parallel ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:47:30Z
+faces: duplicate=pass
+files_scanned: 12
+findings: 0
+EXIT=0
+
+=== POST-GENERATION gate run 2026-11-09T07:50:57Z (checklist present) ===
+--- G-checklist-reader ---
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:50:57Z
+faces: reader=not-applicable
+files_scanned: 13
+findings: 0
+EXIT=0
+--- G-checklist-duplicate ---
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:50:57Z
+faces: duplicate=pass
+files_scanned: 13
+findings: 0
+EXIT=0
+
+=== G-checklist-reader against the NEW checklist file (--path) 2026-11-09T07:51:05Z ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:51:05Z
+faces: reader=pass
+files_scanned: 13
+findings: 0
+EXIT=0
+
+=== duplicate face against the NEW checklist file ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:51:09Z
+faces: duplicate=pass
+files_scanned: 13
+findings: 0
+EXIT=0
+
+=== red-first mutation probe: reader face on a copy with Readers line removed ===
+doc-consistency-check: verify
+checked_at: 2026-11-09T07:51:09Z
+faces: reader=fail
+files_scanned: 14
+.specify/.tmp/sdd-loop/tmp/goal-team-parallel/reader-mutation.md:1: reader-declaration-missing: missing or empty reader declaration: readers
+    fix: 补齐标注（前 40 非空行内 **Readers** / **Reading scenario** 两行且值非空）
+findings: 1
+EXIT=1
+
+=== green-check discipline (a green that cannot go red proves nothing) ===
+mutation probe executed: removed the **Readers** line from a copy of the checklist, re-ran G-checklist-reader
+result: reader=fail, exit 1, finding `reader-declaration-missing` at line 1  -> the gate DOES go red when its subject breaks.
+conclusion: the `reader=pass` on the real file is evidence, not a blind green.
+Note on `not-applicable`: `--spec-dir` alone yields reader=not-applicable (the reader face applies only to explicit `--path`
+subjects, doc-consistency-check.py L879-885). Both `--path` and `--spec-dir` were therefore passed for the real gate run.
