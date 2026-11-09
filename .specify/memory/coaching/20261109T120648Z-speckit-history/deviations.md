@@ -26,3 +26,8 @@
   history*; the Trainee instead executed the four-stage history *seam* over the live tree, using the work
   text as the review's focus and answering the verification question directly. Both readings are
   template-consistent; the divergence is recorded, not penalised.
+
+## Post-return decision (dated)
+- 2026-11-09T12:14Z — the user answered the Step B gate with **`none-of`**: no disposition executes now;
+  all 861 entries stay `open`; zero writes. Revisit after the 093/094 in-flight waves and the next push.
+  A later `/speckit.history` run reaching the same finding set inherits this decision (do not re-ask).
