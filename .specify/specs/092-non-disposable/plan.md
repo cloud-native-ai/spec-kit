@@ -64,7 +64,7 @@ Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/memor
 | VIII | Code as the Single Source of Truth | ✅ Pass | The status check consumes `closure-acceptance-check.py`'s verdict, not a document's claim (FR-026/FR-028); the ceilings question in R9 is settled by reading the engine constants, not the specs that quote them. |
 | IX | Framework Scope Discipline (No Over-Engineering) | ✅ Pass | Three new files, zero new directory, zero new daemon/scheduler/registry/scorer; the engine is a single stdlib script beside `sanitize-utils.py`. `T-001` records the rejected alternative of a hosted review service. |
 | X | Documentation Naming & Location Conventions | ✅ Pass | `shared/definitions/non-disposable-definitions.md`, `shared/declarations/facts/non-disposable-review-surface.yaml`, `scripts/python/non-disposable-check.py` — lowercase kebab, path-is-semantic, no reserved ALL-CAPS name, no nested README. |
-| XI | Dogfooding (Self-Application) | ✅ Pass | This feature is a *mechanism* fix (its own subject); instance-side patches are banned by FR-058/FR-054. Two hats named: the engine and owner page land in the framework sources (`shared/`, `scripts/`), the runtime copies are produced by `sync-mirrors.py` and never hand-edited. |
+| XI | Dogfooding (Self-Application) | ✅ Pass | This feature is a *mechanism* fix (its own subject); instance-side patches are banned by the tier criterion of FR-056 together with FR-045's prohibition on batch-rewriting another line's delivered bodies. Two hats named: the engine and owner page land in the framework sources (`shared/`, `scripts/`), the runtime copies are produced by `sync-mirrors.py` and never hand-edited. |
 | XII | Tool Reuse Over Ad-Hoc Generation | ✅ Pass | No `.specify/memory/tools/` record covers "find stale carriers"; a new engine is the expected outcome, and it reuses `declaration_reader` / `renumber-utils` / `closure-acceptance-check` instead of re-deriving their judgements (R5, R8, R3). |
 | XIII | Better-Harness Orientation (Improvement North Star) | ✅ Pass | The review surface strengthens *Learning Capture* and *Change Validation* by naming the harness file that fails them today; the evidence discipline is kept (`configured ≠ used`), and no new scoring system is introduced. |
 | XIV | One Source of Truth (Authority & Reference Discipline) | ✅ Pass | This feature *is* the discipline's enforcement: FR-001 names the owner page, FR-018…FR-021 detect multi-owner, and the plan's own § Fact Owners names one owner per fact; nothing in the delivery restates the disposition tables. |
@@ -79,7 +79,7 @@ Rendered by enumerating every `### <numeral>. <name>` heading of `.specify/memor
 
 **Gates Status**: ⚠ One Partial row (IV) with a matching Complexity Tracking entry; no ❌ Fail.
 
-**Re-check after Phase 1** (2026-11-09, after `data-model.md` / `contracts/` (7 files, 54 clauses) / `quickstart.md` (10 scenarios) / `feature-ref.md` landed, and after all three gate readings were taken — `test-evidence/plan-gates.txt`): the table was re-read against the Phase 1 artifacts and no row moved. Principle IV stays ⚠ Partial for the same single reason — the guards are implement-side deliverables (`SC-005`…`SC-019`), and a plan cannot claim a guard it has not landed. Row XIV was re-read against `data-model.md` § Fact Owners and stays ✅: every fact the plan names has exactly one owner row and no second statement.
+**Re-check after Phase 1** (2026-11-09, after `data-model.md` / `contracts/` (8 files, 62 clauses) / `quickstart.md` (10 scenarios) / `feature-ref.md` landed, and after all three gate readings were taken — `test-evidence/plan-gates.txt`): the table was re-read against the Phase 1 artifacts and no row moved. Principle IV stays ⚠ Partial for the same single reason — the guards are implement-side deliverables (`SC-005`…`SC-019`), and a plan cannot claim a guard it has not landed. Row XIV was re-read against `data-model.md` § Fact Owners and stays ✅: every fact the plan names has exactly one owner row and no second statement.
 
 ## Decision Tensions
 
@@ -202,6 +202,21 @@ templates/instructions-template.md  # EDIT — ONE pointer line into the existin
 .specify/memory/features/092.md     # NEW — the feature detail (Overview / Key Changes / Notes / Related Files)
 .specify/memory/register.md         # EDIT — the D-1…D-8 decision registration rows (see § ID Register Duty)
 tests/contract/                     # + test_non_disposable_contract.py — the seven-face guard with mutation legs
+                                    # EDIT test_expression_compatibility.py — the one ALLOWED_POST_BASELINE_CHANGES entry
+                                    # EDIT test_sdd_loop_driver_reanchor.py — G1/G2/G3's repair legs live beside the
+                                    #   existing cases (same file, no new module: FR-062 forbids a new gate step)
+```
+
+**Record and evidence surfaces DoD-1 reads** (a surface DoD-1 names but this list omitted is a DoD-1 that cannot be
+evaluated). These are **not** source-code rows and carry no mirror obligation; they are listed so the "every artifact
+exists and is non-empty" reading has a complete subject:
+
+```text
+.specify/specs/092-non-disposable/verification.md        # NEW — the SC status rows + smoke record
+.specify/specs/092-non-disposable/coverage-baseline.txt  # NEW — the frozen clause-lane baseline (T037)
+.specify/specs/092-non-disposable/notes/                 # NEW — pre-change measurements, the measurement corpus,
+                                                         #   the quickstart run log
+.specify/specs/092-non-disposable/test-evidence/         # NEW — the gate readings and the shift/repair readings
 ```
 
 **Structure Decision**: the feature extends the existing **engine-beside-engine** shape (`scripts/python/` holds one
@@ -239,13 +254,13 @@ Owner of this table's shape, its `Status` and `Decision` value domains and its i
 | ID | Premise | Evidence | Status | Decision |
 |----|---------|----------|--------|----------|
 | EP-001 | A CPython ≥3.8 interpreter is available and the new engine needs no third-party import, so it runs on the same interpreter as its siblings. | `/usr/bin/python3 --version` → `Python 3.11.0rc1`; `pyproject.toml:5` → `requires-python = ">=3.8"`; the new engine's import list is stdlib + two sibling modules whose own heads declare "stdlib-only" | verified | — |
-| EP-002 | `pytest` is available and the pre-existing contract-suite red set is stable enough to serve as a comparison baseline, so "no NEW failure" is decidable. | `090` recorded `pytest 9.0.3`; the frozen baseline is the failed node-id set, not a count (SC-013's own criterion) | verified | — |
+| EP-002 | `pytest` is available and the pre-existing contract-suite red set is stable enough to serve as a comparison baseline, so "no NEW failure" is decidable. | `090` recorded `pytest 9.0.3`; the frozen baseline is the **failed node-id set**, not a count (SC-013's own criterion). The counts quoted around this tree's history (4345 / 4352 / 4357 / 4389 tests) are readings of *different* runs at different tree states, none of them designated — the designation is a **name list frozen before the first edit** — this feature lands its own `notes/baseline-failed-tests.txt`, the same file name and shape earlier specs used (`062`, `063`, `075` each carry one beside their `notes/`), and a count read at some other moment is never evidence against that list, and a later count is never evidence against it | verified | — |
 | EP-003 | The declaration layer is readable through `declaration_reader.py` and a new `closed-set` fact needs no new kind and no new required key. | `shared/declarations/contract.yaml` → `fact_kinds` contains `closed-set`, `required_fact_keys` = the five keys the sibling `flow-class-classes.yaml` carries; today's `declaration_reader.py --action list` loads all 23 facts | verified | — |
 | EP-004 | The review surface is enumerable and its size is measurable without reading file contents, so the coverage declaration can be checked against an independent enumeration. | `find` over the ten roots on `62f95298` → 4,357 files (per-root readings in § Execution Premises evidence and in `quickstart.md`) | verified | — |
 | EP-005 | The semantic face can be carried by the existing 085 spec-local team at the spine's declared concurrency (24), so no second scheduler is needed. | `.specify/state/092-non-disposable.md` → `agent_concurrency_requested: 24` / `agent_concurrency_effective: 24`; `085` contract C-002…C-005 fix the effective-value formula and the named-downgrade rule | verified | — |
 | EP-006 | `closure-acceptance-check.py` can be invoked as a subprocess and its `--json` payload is stable enough to consume, so the status check reuses the verdict instead of re-deriving it. | `closure-acceptance-check.py --json` emits `verdict` + `reasons`; `tests/contract/test_closure_acceptance_check.py` pins the payload shape | verified | — |
 | EP-007 | The A–H corpus is consumable as a fixture set: at least two of its entries reproduce on this tree today, so a quickstart scenario can run against reality rather than against a synthetic tree. | `harness-triple-check.py --action verify` → 3 `unclassified-candidate`, exit 1 (`084/verification.md:70` claims 0); `generate-instructions.sh:100` → `INSTRUCTIONS_BUDGET_BYTES=38400` under a reason block deriving `37888` | verified | — |
-| EP-008 | `git` is available in the working tree, because the zero-write proof and the `archive` disposition are both defined in git terms. | `git rev-parse --short HEAD` → `62f95298`; `git status --porcelain` → 7 pre-existing entries (2 modified-or-untracked in this line's own writes) | verified | — |
+| EP-008 | `git` is available in the working tree, and the two scratch paths the zero-write legs depend on are genuinely ignored — otherwise a legal temporary write would show up as a tracked change and the leg would go red for the wrong reason. | `git rev-parse --short HEAD` → `62f95298`; `git status --porcelain` → 7 pre-existing entries (2 modified-or-untracked in this line's own writes); **ignore legs verified** with `git check-ignore -v --no-index`: `.specify/.tmp/x.tmp` ← `.specify/.gitignore:30:.tmp/`, `.specify/history/.work/a.txt` ← `.specify/.gitignore:6:history/.work/`. Scope note: `history/.work/` is anchored **relative to `.specify/`**, so a bare `history/.work/…` at the repo root does not match (check-ignore prints nothing); a scratch write under the wrong prefix would be tracked | verified | — |
 
 ## Inherited Blockers
 
@@ -270,7 +285,7 @@ parses the *first table* under the heading as the blocker table; a second table 
 |----------|------|---------------|
 | Research | [`research.md`](research.md) | 13 findings (R1–R13), each with the command/measurement behind it |
 | Data model | [`data-model.md`](data-model.md) | 9 entities (E-1…E-9) + 2 state machines + the expiry model + § Human-Facing Output Shape |
-| Contracts | `contracts/` | 7 files, 54 clauses: `detection-categories` C-101…C-108, `status-and-verification` C-201…C-207, `disposition` C-301…C-308, `four-stage-command` C-401…C-409, `renumber-and-supersede` C-501…C-507, `detection-engine-cli` C-601…C-608, `report-schema` C-701…C-707 |
+| Contracts | `contracts/` | 8 files, 62 clauses: `detection-categories` C-101…C-108, `status-and-verification` C-201…C-207, `disposition` C-301…C-308, `four-stage-command` C-401…C-410, `renumber-and-supersede` C-501…C-507, `detection-engine-cli` C-601…C-608, `report-schema` C-701…C-707, `acceptance-readability` C-801…C-807 (the status × verdict contradiction table, the readable objects behind a status claim, the 档 II marker, and the process-grade FR disposition) |
 | Quickstart | [`quickstart.md`](quickstart.md) | 10 scenarios — § 1/§ 2 reproduce on the tree as it stands (corpus A2 / F2), § 3…§ 7 one per remaining detection class, § 8 the four-stage seam, § 9 the concurrency slice, § 10 the post-repair zero reading |
 | Feature reference | [`feature-ref.md`](feature-ref.md) | binding table + 15-row delivery surface + § 4 corpus map (pointer to the 35 rows) + § 3 FR→SC→contract index (all 65 FR and all 20 SC cited) + § 5 shift list + § 6 open items |
 
@@ -278,16 +293,22 @@ parses the *first table* under the heading as the blocker table; a second table 
 rather than smoothed over — (i) the anti-goal lens produced **seven** decision tensions instead of the four the
 requirements named, because OI-2, OI-4 and the certainty/semantics boundary each carry two independently-adoptable
 poles rather than one (T-002…T-005), and the mechanism/landing/corpus/concurrency choices are load-bearing on their
-own terms (T-001, T-006, T-007); (ii) the contracts are **seven** files, not the five names § 3 of the assignment
+own terms (T-001, T-006, T-007); (ii) the contracts are **eight** files, not the five names § 3 of the assignment
 listed, because the report schema and the engine CLI surface are the two faces a guard can address mechanically and
-folding them into another file would have put two owners in one document.
+folding them into another file would have put two owners in one document; the eighth, `acceptance-readability`, was
+added by the analyze stage because the status × verdict contradiction table has no owner among the other seven — without
+it the check could not read `Planned × accept` and corpus A3 could only be described, never judged.
 
 ## Implement Package Proposal *(input for `/speckit.tasks`; not a gate input — see R12)*
 
 `decomposition-check.py --mode plan` measures **the requirements artifact only** (65 FR ≤ 120 → `proceed`); it
 knows nothing about packages. This partition is therefore a **design proposal** for the tasks stage, sized under the
-existing `decompose-implement-v1` rule (task groups ≤ 8 tasks per group, `070` data-model E13) and the spine's
-`decomposition_slot_cap: 2`.
+spine's `decomposition_slot_cap: 2` — and under **no task-count claim of its own**. A package is sized by the territory
+it owns and by the rows that write it, not by a row budget: the tasks stage writes as many rows as a package's
+obligations need, and P1 and P5 each write more than the old "eight per group" rule allowed. That rule's owner is
+`070` data-model E13, and it binds the **plan's own grouping**, never this feature's task list; quoting it here as a
+budget would turn a design-time guess into a constraint. This section therefore states no number of tasks, and the
+authoritative count is `tasks.md` itself.
 
 | # | Package | Owns (territory) | Depends on | Read-only? |
 |---|---------|------------------|-----------|-----------|
@@ -322,9 +343,26 @@ rows, and no room to split this feature into two slices without inventing a boun
 
 ## Shift List *(档 II handoff — the deliverable, not a deferral)*
 
-Every row below MUST reach a receiving feature line. This feature lands **one marker line** in each receiving body
-(a one-line `<!-- 092 handoff: <corpus id> → <receiving feature> -->` style marker, placed where the defect is) and
-**nothing else**; the repair itself stays with that line (FR-056).
+Every row below MUST reach a receiving feature line. This feature lands **one marker line** in each receiving body,
+placed where the defect is, and **nothing else**; the repair itself stays with that line (FR-056). The marker's literal
+form, its guard carrier and the count it is counted under are owned by
+`contracts/acceptance-readability.contract.md` C-805 — this list is the **owner of the rows**, not of the marker
+syntax, so the two never drift apart.
+
+**The three counts, and why they differ.** A reader meeting `12`, `15` and `19` in this feature's prose will assume one
+of them is a typo. None is; they count three different objects, and C-805 fixes all three once so that a later editor
+does not "tidy" one into another:
+
+| Count | Counts what | Where it comes from |
+|---|---|---|
+| **19** | 档 I corpus **entries** | § A–H Corpus Mapping: A1–A6, B1–B5, C1–C4, G1–G3. Closed in place by this feature; **no marker** is landed for any of them (DoD-4 names them) |
+| **15** | 档 II corpus **entries** | § A–H Corpus Mapping: D1–D6, E1–E6, F1–F5, H1–H2. Every one of them must reach a receiving line |
+| **12** | **Shift List rows** = distinct **receiving bodies** = markers landed | the table below. It is smaller than 15 because the mapping is many-to-one: one row can carry two entries (`081` carries D1 + D2, `084` carries D3 + E5, `090` carries D5 + F2, the dated-bodies row carries F1 + F3, `083` carries E1 + E2 + E3 + F5) |
+
+So the deliverable count is **12 markers**, and a run that lands 15 markers has landed three duplicates — one per
+receiving body is the rule, not one per corpus entry. The rows are the unit of the handoff; the entries are the unit
+of the corpus. § A–H Corpus Mapping's two-way check reads the second number, DoD-4 reads both, and only this table's
+row count is a marker count.
 
 | Receiving line | Corpus ids | What it must change |
 |----------------|-----------|---------------------|
@@ -392,7 +430,7 @@ changes / who receives it) · `SC` (the success criterion whose reading covers i
 | F4 | MEDIUM | `multi-owner` | II | feature-total arithmetic stale (76→77 vs 85) and 080's spec dir registered under ID 062 — the registry's own body | SC-006 |
 | F5 | MEDIUM | `stale-constant` | II | 083's skill counts disagree (15+38 vs 54 vs 16+38) — 083's body | SC-006 |
 | G1 | HIGH | `superseded-live` (guard side) | I | 090's ordering guard lost its only positional comparison: `tests/contract/test_sdd_loop_driver_reanchor.py` gains the additive goal-first mutation leg (asserts red) — a first-round repair | SC-005 |
-| G2 | MEDIUM | `deferral-marker` (guard side) | I | the `first_no = "1"` / `assert first_no == "1"` tautology is replaced by an assertion that reads the actual first item | SC-005 |
+| G2 | MEDIUM | `superseded-live` (guard side) | I | the `first_no = "1"` / `assert first_no == "1"` tautology is replaced by an assertion that reads the actual first item; the class is `superseded-live`, not `deferral-marker` — a guard that asserts a constant against itself cannot red when the subject moves, which is the superseded-body-asserted-by-a-live-guard shape C-104 defines. `deferral-marker` stays reserved for retention wording with no expiry condition (C-105 / C-106) and is proven by construction only | SC-005 |
 | G3 | MEDIUM | `superseded-live` (guard side) | I | `RULE_SET` omits ⑧ and splits ①, so deleting "report discipline" cannot red — the set is completed against the owner's rule anchor | SC-005 |
 | H1 | HIGH | `orphan-path` | II | 086 writes the mirror as `.specify/skills/external/...` (a directory that never existed) — 086's body | SC-005, SC-007 |
 | H2 | MEDIUM | `orphan-path` | II | 082's nonexistent session file; 085 GATE-1's nonexistent `test-evidence/final-failed.txt` — those bodies | SC-005, SC-007 |
@@ -449,7 +487,7 @@ landing change — this is a **decision-free** deferral, not a silent one).
 
 | # | Face | Artifact | Guard reading |
 |---|------|----------|---------------|
-| 1 | Owner page (NEW) | `shared/definitions/non-disposable-definitions.md` | exists, non-empty, declares what it owns, carries the two mapping tables and the adjudication rule |
+| 1 | Owner page (NEW) | `shared/definitions/non-disposable-definitions.md` | exists, non-empty, declares what it owns, carries the two mapping tables, the adjudication rule, the `## Status Readability` section (closed status × verdict table) and the `## Relation to the Constitution` section FR-064(iv) requires — the last one is an obligation with no other home, and its absence reads as an omission to the next reader |
 | 2 | Declaration fact (NEW) | `shared/declarations/facts/non-disposable-review-surface.yaml` | loads through `declaration_reader.py`, `kind: closed-set`, the five required keys present, ten roots in the declared order |
 | 3 | Glossary (4 terms) | `.specify/memory/glossary.md` | `Non-Disposable` / `Disposition（处置）` / `Review Surface（回顾面）` / `Exemption（豁免）` each point at the owner page and restate none of its criteria |
 | 4 | Registry row + detail | `.specify/memory/features.md`, `.specify/memory/features/092.md` | row present, status `Planned`, detail carries the XI 边界 line |

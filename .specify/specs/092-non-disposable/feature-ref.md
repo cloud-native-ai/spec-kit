@@ -10,7 +10,7 @@
 | Requirements | [`requirements.md`](requirements.md) — 65 FR / 20 SC |
 | Plan | [`plan.md`](plan.md) |
 | Research / data model | [`research.md`](research.md) (R1–R13) · [`data-model.md`](data-model.md) (E-1…E-9) |
-| Contracts | [`contracts/`](contracts/) — 7 files, clauses C-101…C-108 · C-201…C-207 · C-301…C-308 · C-401…C-409 · C-501…C-507 · C-601…C-608 · C-701…C-707 |
+| Contracts | [`contracts/`](contracts/) — 8 files, 62 clauses: C-101…C-108 · C-201…C-207 · C-301…C-308 · C-401…C-410 · C-501…C-507 · C-601…C-608 · C-701…C-707 · C-801…C-807 (`acceptance-readability` — the status × verdict contradiction table, the readable objects behind a status claim, the 档 II handoff marker, the process-grade FR disposition) |
 | Quickstart | [`quickstart.md`](quickstart.md) — 10 scenarios (§ 1…§ 10; the plan summary counts 9 because § 10 is the post-repair zero reading) |
 | Feature detail | `.specify/memory/features/092.md` (created by the implement stage, package P1) |
 | Feature index row | `.specify/memory/features.md` (Draft → Planned) |
@@ -60,7 +60,7 @@ roster of `templates/constitution-template.md` and `.specify/memory/constitution
 | Supersede protocol | FR-015, FR-016, FR-017 | owner page § Supersede Protocol | `renumber-and-supersede` C-501, C-502, C-503 |
 | One source of truth / multi-owner | FR-018…FR-021 | owner page + `renumber-utils.py` predicates | `detection-categories` C-104 |
 | Renumber: live binding vs history record | FR-022, FR-023, FR-024 | owner page § Renumber Face (quotes `renumber-utils.py`) | `renumber-and-supersede` C-504, C-505, C-506 |
-| Status and verification readability | FR-025, FR-026, FR-027, FR-028 | `shared/workflow/acceptance-hardening.md` + `closure-acceptance-check.py` | `status-and-verification` C-201…C-207; `report-schema` C-707 |
+| Status and verification readability | FR-025, FR-026, FR-027, FR-028, FR-030 | `shared/workflow/acceptance-hardening.md` + `closure-acceptance-check.py` | `status-and-verification` C-201…C-207; `acceptance-readability` C-801…C-807; `report-schema` C-707 |
 | The four-stage seam | FR-029, FR-030, FR-031, FR-032, FR-033 | `skills/internal/manage-history/SKILL.md` + `templates/commands/history.md` | `four-stage-command` C-401…C-405 |
 | Execute segment and evidence | FR-034, FR-035 | same two faces + `.specify/specs/<spec-dir>/test-evidence/` | `four-stage-command` C-406, C-407; `renumber-and-supersede` C-507 |
 | Declared review surface | FR-036…FR-041 | `shared/declarations/facts/non-disposable-review-surface.yaml` + `declaration_reader.py` | `detection-engine-cli` C-605; `report-schema` C-702 |

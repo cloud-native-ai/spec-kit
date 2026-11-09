@@ -228,13 +228,15 @@ exist in the repository is `owner-path-missing`; an empty anchor is `owner-ancho
 
 | 事实 | owner 路径 | 章节锚 |
 |------|------------|--------|
-| 理念定义、封闭处置集、豁免形态、检测类别封闭集、回顾面定义、取代协议、重编号判据面、报告 schema、与 sanitize/history 的边界 | `shared/definitions/non-disposable-definitions.md` | `## Disposition Set` |
+| 理念定义、封闭处置集、豁免形态、检测类别封闭集、回顾面定义、取代协议、重编号判据面、报告 schema、与 sanitize/history 的边界 | `shared/definitions/non-disposable-definitions.md` | `## Non-Disposable`（owner 页总述）· `## Disposition Set` · `## Exemption` · `## Disposal Pathways` · `## Detection Categories` · `## Detection Subject` · `## Review Surface` · `## Supersede Protocol` · `## Renumber-Face` · `## Report Entry` · `## Report Envelope` · `## Engine Contract` · `## Boundary with Sanitize and History` · `## Relation to the Constitution` · `## Status Readability` · `## Handoff Rows` |
+| 状态可读性三对象与「registry 状态 × closure 裁决」矛盾表 | `shared/definitions/non-disposable-definitions.md` | `## Status Readability` |
 | 十个回顾面根目录（成员与顺序） | `shared/declarations/facts/non-disposable-review-surface.yaml` | `/statement` |
 | 材料卫生的类别 / 处置 / 状态 / 判定主体四个封闭集 | 既有 owner `sanitize-utils.py` 的 `CATEGORIES` / `DISPOSITIONS` / `STATES` / `DETECTIONS`（契约 `045-sanitize-command`） | 模块常量 |
 | 闭环裁决、reason code 词表、验证词表与 smoke 记录 | `shared/workflow/acceptance-hardening.md` | `## Closure Verdict` / `## Verification Vocabulary` |
 | 活绑定 / 历史记录的判据面 | 本特性 owner 页引用既有 `scripts/python/renumber-utils.py` 的谓词（`EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE`） | 模块常量 |
-| 检查入口的判定（退出码 0/1/2 与三个动作） | `scripts/python/non-disposable-check.py`（本特性交付的引擎常量） | 模块头部 |
+| 检查入口的判定（退出码 0/1/2、两个动作 `--roots` / `--emit-categories`、八个参数） | `scripts/python/non-disposable-check.py`（本特性交付的引擎常量；`contracts/detection-engine-cli.contract.md` C-603 / C-604） | 模块头部 |
 | 条目状态集（`open` / `unevaluated` / `unconfirmed` / `disposed` / `exempt`） | **本文件** § Entry State Machine | `## Entry State Machine` |
 | `exempt` 四字段与到期三值 | 本文件 § E-3（字段与组合规则）+ owner 页 § Exemption（每个取值的重开语义） | `## E-3 Exemption` |
 | 执行段证据的落点与四段 | `requirements.md` FR-035 | `#### 命令执行形态：回顾 → 设计 → 确认 → 执行` |
 | `detection` 两值在本特性侧的拼写 | owner 页 § Detection Subject | `## Detection Subject` |
+| 档 II 移交标记的形态与计数口径（12 行 = 12 receiving body = 12 markers） | `plan.md` § Shift List（行与计数表）+ `contracts/acceptance-readability.contract.md` C-805（义务） | `## Shift List` / `## C-805` |

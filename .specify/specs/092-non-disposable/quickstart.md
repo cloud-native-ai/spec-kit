@@ -24,9 +24,11 @@ python3 scripts/python/harness-triple-check.py --action verify; echo "exit=$?"
 ```
 
 Use the **source** copy. The `.specify/scripts/python/` copy resolves its root to `.specify/`
-(C-028) and ends `input-error: .../no-harness-asset.yaml: carrier 'skills/external/database-utils/
-scripts/query.py' does not resolve`, exit `2` — a mirror-side root artefact recorded in
-`test-evidence/plan-gates.txt`, not a reading of the corpus entry.
+(`scripts/python/harness-triple-check.py` `resolve_repo`: "the root is the directory that contains
+`scripts/python/`, never a `.specify` match") and ends `input-error: shared/declarations/exclusions/
+no-harness-asset.yaml: carrier 'skills/external/database-utils/scripts/query.py' does not resolve`,
+exit `2` — a mirror-side root artefact recorded in `test-evidence/plan-gates.txt`, not a reading of the corpus
+entry.
 
 Today (measured 2026-11-09, `62f95298`):
 
@@ -80,8 +82,11 @@ by a fixture that is visible in the guard's own data.
 ## § 3 — `superseded-live` (corpus B1/B2/B3, 档 I)
 
 Mutation on a copy tree: take a contract whose old text is still asserted byte-identically by its guard (B1's shape:
-`086/contracts/runner-contract-086.contract.md` § C-016 against `test_run_tests_runner_contract.py`'s `…_byte_identical`),
-and do **not** add the supersede marker.
+`.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md` clause **C-016** — the last
+clause of that file, `scripts/bash/run-tests.sh` and its mirror MUST be byte-identical — against
+`tests/contract/test_run_tests_runner_contract.py`'s `…_byte_identical` case), and do **not** add the supersede marker.
+The superseding carrier is `.specify/specs/089-script-interface-contract/contracts/mirror-projection.contract.md`
+§ C-35 (the check asserts the projection, not raw equality).
 
 | Reading | Expected |
 |---------|----------|
@@ -170,7 +175,12 @@ Scenario, run against a copy tree with at least one open entry:
    Expected: a report (coverage declaration first, then entries), no working-tree change.
 2. **Design** — ask for the design segment. Expected: per entry, a proposed disposition, the touched paths, and
    reversibility; the segment ends with one confirmation request. If a plan file is needed it is under
-   `.specify/.tmp/` and nothing tracked changed.
+   `.specify/.tmp/` and nothing tracked changed. The premise this step rests on is measurable first:
+   `git check-ignore -v --no-index .specify/.tmp/probe` MUST print a match from `.specify/.gitignore` (`.tmp/`);
+   if it prints nothing, the scratch write would be **tracked** and this step's green would be false. A second
+   scratch path is ignored only through `.specify/`: `git check-ignore -v --no-index .specify/history/.work/probe`
+   matches `history/.work/`, while a bare `history/.work/probe` at the repo root does not — so the prefix is part
+   of the rule, not a cosmetic detail.
    ```bash
    git status --porcelain=v1 > /tmp/snap-after-design.txt
    diff /tmp/snap-before.txt /tmp/snap-after-design.txt   # MUST be empty

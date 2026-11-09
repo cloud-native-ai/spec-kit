@@ -46,13 +46,37 @@ territory:
     # 092 owns no global team or goal definition; the spec-local goal is engine-rendered only
     - .specify/teams/**
     - .specify/goal/**
-    # other features' bodies are read-only here; 档 II handoffs are recorded, never rewritten (FR-056 / D-8)
+    # other features' bodies are NOT rewritten wholesale here; two narrow write faces are carved out below
+    # (FR-056 / D-8): P6's 档 I record-completion repairs, and P7's one handoff marker per receiving body.
+    # Everything not named in the carve-out stays forbidden, including 档 II bodies' own prose.
+    - .specify/specs/081-*/**
+    - .specify/specs/082-*/**
+    - .specify/specs/083-*/**
+    - .specify/specs/084-*/**
     - .specify/specs/085-sdd-temporary-goal-team/**
     - .specify/specs/086-efficient-test-execution/**
     - .specify/specs/087-arch-diagram-docs/**
     - .specify/specs/088-speckit-visualization/**
     - .specify/specs/089-script-interface-contract/**
     - .specify/specs/090-re-anchoring/**
+    - .specify/specs/067-*/**
+    - .specify/specs/069*/**   # the dated bodies F1/F3 name
+    - .specify/specs/077-*/**
+    - .specify/specs/079-*/**
+    - .specify/specs/080-*/**
+  # Handoff boundary (C-805): the two write faces carved out of `forbidden` above. P6 (档 I repair) may
+  # complete a RECORD in a foreign body — add a missing machine-block field, a `**Path**:` marker, a tier
+  # column — never redesign the body and never rewrite a 档 II body's prose. P7 (档 II detection) may land
+  # exactly ONE marker line per receiving body, in the form C-805 fixes, at the defect's location. Which
+  # surface lands the marker (P7 cross-line write or the receiving body's own line) is a recorded decision,
+  # not a correction.
+  write_carve_outs:
+    - pkg: P6
+      paths: [.specify/specs/080-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/memory/features.md]
+      scope: record completion only (missing field, marker, pointer) — no redesign, no prose rewrite
+    - pkg: P7
+      paths: [.specify/specs/081-*/, .specify/specs/082-*/, .specify/specs/083-*/, .specify/specs/084-*/, .specify/specs/085-*/, .specify/specs/086-*/, .specify/specs/087-*/, .specify/specs/088-*/, .specify/specs/089-*/, .specify/specs/090-*/, .specify/memory/features.md]
+      scope: one handoff marker line per receiving body (C-805) — nothing else
   non_path:
     - { type: runtime, target: "host agent concurrency and the rendered agent registration surface (specify render-agents output)" }
 pattern: serial

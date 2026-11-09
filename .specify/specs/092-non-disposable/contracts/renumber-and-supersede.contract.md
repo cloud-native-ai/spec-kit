@@ -46,11 +46,24 @@ corpus (C1–C4, 档 I, repaired here).
 
 ## C-505 — History records are never rewritten to suit a new number, and rewriting them is detected
 
-History records (`test-evidence/`, dated review reports, prior text inside `## Clarifications`, prior entries in
-`.specify/state/`) MUST NOT be rewritten to follow a renumber. The check MUST report red for a history record that
-**was** rewritten: the predicate face is the closed enumeration the owner names (by path and by section position) and
-it MUST be taken from `renumber-utils.py`'s existing predicates, not from a new "looks like history" heuristic. The
-corpus has no row for this leg (`plan.md` § A–H two-way check); the guard carries it as a fixture.
+History records MUST NOT be rewritten to follow a renumber. The check MUST report red for a history record that
+**was** rewritten, and the predicate face splits into two **named** legs because its members are addressed two
+different ways:
+
+**Leg 1 — path-addressed records.** Taken from `renumber-utils.py`'s existing predicates, never a new "looks like
+history" heuristic: `EXCLUDED_PREFIXES` (`.specify/history/`, `.specify/archive/`, `.specify/specs/.archive/`),
+`MACHINE_PREFIXES` (`.specify/memory/sanitize/`, `.specify/memory/retention/`, `.specify/memory/renumber/`),
+`EVIDENCE_SEGMENTS` (`test-evidence`) and `DATED_RE` (date-named files). These four cover **paths only**.
+
+**Leg 2 — section-addressed records, which no path predicate can cover.** A `## Clarifications` block is a *section
+inside a live spec body*, and the spec body itself is a file a renumber legitimately edits — so `renumber-utils.py`'s
+path predicates are structurally blind to it, and C-505 MUST NOT claim otherwise. The predicate for this leg is the
+**section position** the owner page states (`## Clarifications` and every heading beneath it, to the next sibling
+`##`), read by a Markdown section scanner; a removal of that section's text, or an edit inside it that carries a
+renumber, is red. This is the one leg for which this feature owns a predicate of its own, and it is stated here rather
+than left to implement time because its absence would make the clause silently weaker than its own wording.
+
+The corpus has no row for either leg (`plan.md` § A–H two-way check); the guard carries both as fixtures.
 
 (FR-023, FR-024, SC-007)
 
