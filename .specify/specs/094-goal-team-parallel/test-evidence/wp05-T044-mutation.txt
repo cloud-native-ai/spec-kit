@@ -1,3 +1,20 @@
+# T044 injected-precondition mutation — 094-goal-team-parallel wp05
+# date: 2026-11-09
+# producing command line: python3 .specify/.tmp/s094/wp05-t044-drill.py | tee .specify/specs/094-goal-team-parallel/test-evidence/wp05-T044-mutation.txt
+# provenance: the drill script was written by heredoc to .specify/.tmp/s094/wp05-t044-drill.py, run once,
+#   then removed by `rm -f` in the same command. The exact tool_use input that produced this file — the
+#   heredoc script plus the invocation — is preserved verbatim in the wp05 fork log,
+#   .specify/.tmp/sdd-loop/forks/094-wp05/raw-094-wp05-implement.jsonl line 530; the fork log is the
+#   surviving carrier, not a reconstruction.
+# fixture identity: scratch root .specify/.tmp/s094/t044-drill/fixture — goal `.specify/anchoring/alpha/goal.md`
+#   (binding: owner command-run, owner_id r20261109T064500Z-094a, origin null) and team `.specify/teams/crew/team.md`
+#   (name crew, slug crew, goal_slug alpha, binding: owner sdd-run, owner_id r20261110T010203Z-094b, origin null);
+#   the fixture carries no `.specify/specs/` path.
+# mutation: a copy of scripts/python/goal-utils.py with the precondition
+#   `if not (repo_root / '.specify/specs').exists(): raise GoalError('injected-requires-spec-line')`
+#   inserted before the `team_md = root / "team.md"` anchor in run_checks.
+# commands under comparison (both: --repo-root <fixture> --json): `goal-utils.py run-checks crew` on the clean
+#   engine copy (clean exit 0) and on the mutant copy (mutated exit 2).
 clean exit: 0 | verdict: ok
 mutated exit: 2 | error: injected-requires-spec-line
 MUTATION TURNS THE PEER-B PATH RED: yes

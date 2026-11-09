@@ -78,22 +78,25 @@ clause's citation group changes — which is exactly when a reader needs to see 
 
 | SC | Measurement surface | Primary test module (red first) |
 |---|---|---|
-| SC-001 | a write to any `.specify/specs/*/goal` or `team` path is refused by the engine | `tests/contract/test_command_run_goal_team.py` |
-| SC-002 | every engine write path reports its binding record | `tests/contract/test_no_spec_local_writes.py` |
-| SC-003 | after migration the residual count is 0 while every source tree stays readable under `trees/` | `tests/integration/test_archive_migration_real_data.py` |
-| SC-004 | a second migration run performs no write and never overwrites on conflict | `tests/contract/test_archive_migration.py` |
-| SC-005 | the writability function returns an explicit verdict; neither line requires the other | `tests/integration/test_parallel_lines.py` |
-| SC-006 | the three-way keys resolve in both directions across `handoff.md` and the definitions | `tests/contract/test_handoff_contract.py` |
-| SC-007 | a crew write onto a spec artifact is refused; a writeback record is accepted | `tests/contract/test_handoff_territory.py` |
-| SC-008 | the command family is a closed set and an unregistered carrier is refused | `tests/contract/test_criterion_vocabulary_scan.py` |
-| SC-009 | a rebind changes ownership only; the file-minus-binding hash is unchanged | `tests/contract/test_binding_model.py` |
-| SC-010 | the 085 temporary hierarchy and vocabulary are gone; the disposal table is measured | `tests/contract/test_085_disposal_table.py` |
-| SC-011 | an interrupted migration resumes; no new failing id appears against the serial baseline | `tests/contract/test_migration_interruption.py` |
-| SC-012 | every `.specify/anchoring/*/goal.md` and `.specify/teams/*/team.md` resident carries a complete `binding` record after `backfill-bindings`, and a second run writes nothing | `tests/contract/test_resident_backfill.py` |
+| SC-001 | a fixture with no SDD spec directory: a command run's goal and team land under `.specify/anchoring/` and `.specify/teams/`, `.specify/specs/` gains zero new paths, and the check turns red when a write path is reverted to a spec subdirectory. R2 (2026-11-09): the criterion is `supporting` — its named module is absent and acceptance delegates to SC-004 / SC-005 | `tests/contract/test_command_run_goal_team.py` (absent on this tree; no new guard under R2 — see `requirements.md` § Clarifications) |
+| SC-002 | zero code paths write a goal or team tree under `.specify/specs/<spec>/`, asserted surface-by-surface over the engine's writing actions, `create-team`'s persistence step and the driver instructions; the assertion turns red when any write is reverted to the old path | `tests/contract/test_no_spec_local_writes.py` |
+| SC-003 | on this repo's real data: the dry-run readings are decidable, every migrated slug exists in the unified archive, the residual probe balance is zero, and no source data is deleted (per-definition existence assertions) | `tests/integration/test_archive_migration_real_data.py` |
+| SC-004 | two consecutive migrations of one tree: the second writes nothing with a decidable exit code; an existing target slug with non-equivalent content is refused, naming both candidates; both fixtures turn green | `tests/contract/test_archive_migration.py` |
+| SC-005 | two peer fixtures — SDD-only with no goal/team (a below-threshold handoff decision) and goal+team-only with no spec — each complete one delivery; injecting a "requires the other line" precondition turns the test red; the fixture proves "does not need the other" by decision, never by skipping creation | `tests/integration/test_parallel_lines.py` |
+| SC-006 | a spec above the complexity threshold produces a `handoff.md` whose `goal_slug` and `team_slug` resolve three ways against `.specify/anchoring/<slug>/goal.md` and `.specify/teams/<slug>/team.md` (bidirectional key pairs); a spec below the threshold is not required to produce one; an illegal or deleted threshold declaration turns the test red | `tests/contract/test_handoff_contract.py` |
+| SC-007 | after construction every task status arrives on the spec side through writeback and is verifiable; a crew attempt to write `tasks.md` / `requirements.md` / `verification.md` directly is refused by the `territory.forbidden` surface, evidenced by exit code and refusal text | `tests/contract/test_handoff_territory.py` |
+| SC-008 | no classification use of the retired 临时/全局 vocabulary on the runtime surfaces (`.specify/shared/`, `.specify/skills/`, `.specify/scripts/`, `templates/`, `skills/`, `scripts/`); hits are allowed only in dated records, migration receipts and this spec; a re-injected phrase turns the scan red (synthetic mutation, no tree edit) | `tests/contract/test_criterion_vocabulary_scan.py` |
+| SC-009 | the same goal definition keeps its bytes and path when its binding changes (owner from a command run to a team of an SDD run); ownership is answered only by the binding record; a position-inferred ownership mutant turns the test red | `tests/contract/test_binding_model.py` |
+| SC-010 | every existing case pinning a spec-local landing point carries a disposal record (rewrite / remove / mark historical; removal only where the asserted fact was deleted), and the whole contract suite is green on `>=3.8` after disposal; an undisposed item turns the test red | `tests/contract/test_085_disposal_table.py` |
+| SC-011 | an interrupted migration at "source moved into the archive, target not yet written" reports that step on the second call and completes it, with source data and receipts enumerable and no second move; making the second call re-move or silently succeed turns the test red | `tests/contract/test_migration_interruption.py` |
+| SC-012 | after `backfill-bindings`, every `.specify/anchoring/*/goal.md` and `.specify/teams/*/team.md` definition carries a complete `binding` record (`owner` / `owner_id` / `origin`), and a second run writes nothing; restricting the backfill to this feature's new definitions, or deleting one resident's binding line, turns the test red | `tests/contract/test_resident_backfill.py` |
 
-Count: 12 map rows, 12 distinct SC ids. Each module is added by `/speckit.implement` in red-first order; the module names
-above are the plan's allocation and are pinned by `contracts/owner-rewrites-and-tests.md` C-109; the plan does not
-restate them a second time.
+Count: 12 map rows, 12 distinct SC ids. The description cells are projections of `requirements.md` § Success
+Criteria — the criteria own the text, this table restates no rule of its own. SC-001's named module does not
+exist on this tree: ruling R2 (`requirements.md` § Clarifications, 2026-11-09) records the delegation to
+SC-004 / SC-005 and the criterion is `supporting` with status `partial`. Each remaining module is added by
+`/speckit.implement` in red-first order and is pinned by `contracts/owner-rewrites-and-tests.md` C-109; the
+plan does not restate the names a second time.
 
 ## 085 disposal
 

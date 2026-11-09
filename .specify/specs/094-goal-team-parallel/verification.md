@@ -61,7 +61,7 @@ SC-005_value=tests/contract/test_parallel_lines.py and tests/integration/test_pa
 SC-005_note=both peer fixtures deliver; neither line asks for the other; the mutation proves the test turns red when the preconditions are injected.
 
 SC-006_status=pass
-SC-006_value=tests/contract/test_handoff_contract.py 0 failed ids (three-way key resolution in both directions, the eight sections, citing-not-copying); the threshold-illegal/absent red reading is test-evidence/wp03-T051-red.txt
+SC-006_value=tests/contract/test_handoff_contract.py 0 failed ids (three-way key resolution in both directions, the eight sections, citing-not-copying); the threshold-declaration mutation arms are tests/contract/test_declaration_facts.py::test_handoff_decision_refuses_when_the_fact_is_unavailable (declaration absent -> exit 2 owner-unavailable, never a built-in threshold) and tests/contract/test_declaration_facts.py::test_a_fact_in_another_grammar_is_refused_at_load (a declaration outside the subset grammar is refused at load, exit 2)
 SC-006_note=the handoff contract resolves goal_slug / team_slug / handoff_ref three ways and the threshold fact is the only decider.
 
 SC-007_status=pass
@@ -76,9 +76,14 @@ SC-009_status=pass
 SC-009_value=tests/contract/test_binding_model.py 0 failed ids, including test_rebind_changes_only_the_binding_block (file-minus-binding hash unchanged)
 SC-009_note=ownership is answered by the binding record; the rebind byte rule holds.
 
-SC-010_status=pass
+SC-010_status=partial
 SC-010_value=tests/contract/test_085_disposal_table.py green: the 12-row table is complete, one disposition per module; the re-measurement finds no module outside the table and FEATURE_MODULES (wp06's test_framework_map_archive_row.py and test_goal_command_template.py admitted by the repair wave); the disposal wave rewrote rows 1/2/3/6/9/11 to the archive/binding vocabulary (test_scope_resolution, test_temp_goal_contract, test_temp_team_schema, test_checkpoint_protocol, test_goal_scope_engine, test_checkpoint_rollback) and all 17 disposal-family ids plus the guard id are green in the targeted run
-SC-010_note=the criterion's "contract suite all green" limb is decided by its own implementation (T065's guard): the post-disposal contract reading adds zero new failing ids against the frozen serial baseline for the disposal surface, and the disposal's own modules add none — see test_the_post_disposal_reading_is_baseline_internal_for_the_disposal_surface (green). Pre-existing reds outside this feature's 085 disposal families (compile/gate-count/loop-state etc.) stay on the recorded baseline and are not claimed as this criterion's pass surface; the full-suite diff is recorded in notes/repairwave.md.
+SC-010_note=ARC reading (notes/review-arc.md § 3, 2026-11-09): the criterion's own implementation reading test-evidence/wp05-contract-post-disposal.txt records exit status 1 with 86 failing ids, so the literal "contract suite all green on >=3.8" limb is not met as written; the disposal guard's zero-new-failing-ids property on the disposal surface is measured green (test_the_post_disposal_reading_is_baseline_internal_for_the_disposal_surface), and pre-existing reds outside this feature's disposal families stay on the recorded baseline (notes/repairwave.md § 5.3). The status is therefore partial, not pass; SC-010 is a supporting-path criterion, so the final-path verdict is unchanged.
+SC-010_blocked_at=2026-11-09: the post-disposal contract reading (test-evidence/wp05-contract-post-disposal.txt) exits 1 with 86 failing ids; the all-green limb of SC-010 as written is unmet (notes/review-arc.md § 3)
+SC-010_reduced_measurement=the disposal guard measures zero new failing ids on the disposal surface: the guard plus the six rewritten modules are green in one targeted run (44 passed, exit 0; notes/review-arc.md § 3), and every table-module failure is attributed by name (test-evidence/wp05-disposal-attribution.txt)
+SC-010_reduced_measurement_run=yes
+SC-010_why_reduced_insufficient=the covering reading asserts the disposal surface's own zero-new-failing-ids property, not the criterion's literal whole-contract-suite-all-green requirement; the measured contract suite still exits 1 with 86 failing ids of pre-existing families, so the criterion cannot claim pass as written
+SC-010_unblock=an explicit user ruling narrowing SC-010 to the disposal-surface property (the R2 pattern), or a tree whose whole contract suite is green on the recorded baseline
 
 SC-011_status=pass
 SC-011_value=tests/contract/test_migration_interruption.py 0 failed ids (interrupted run reports its step, resumes without a second move)
@@ -115,9 +120,9 @@ notes=The closure judgement was run over this file (see notes/closure-readings.m
 | SC-007 | final | pass | test_handoff_territory.py green |
 | SC-008 | final | pass | test_criterion_vocabulary_scan.py green |
 | SC-009 | supporting | pass | test_binding_model.py green |
-| SC-010 | supporting | pass | disposal wave landed; guard green; zero new ids on the disposal surface |
+| SC-010 | supporting | partial | disposal wave landed; guard's zero-new-ids property green, but the post-disposal contract reading is exit 1 with 86 failing ids (ARC reading, notes/review-arc.md § 3) |
 | SC-011 | supporting | pass | test_migration_interruption.py green |
-| SC-012 | supporting | pass | test_resident_backfill.py green + T083 readings |
+| SC-012 | final | pass | test_resident_backfill.py green + T083 readings |
 
 ## Evidence pointers (repo-relative)
 
