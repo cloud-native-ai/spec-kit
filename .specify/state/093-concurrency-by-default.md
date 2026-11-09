@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794224585
 stage_base_commit: 215c3dcb
 attempt: 1
 retry_limit: 3
-last_verdict: "Analyze-repair round 2 = PART A CLOSED (complete-correction manifest: 20/20 surfaces covered — 15 previously missing now carried by tasks T144–T152 and the plan's manifest table; FR-035 now states the ban on host-internal in-process subagent fan-out plus the two carriers — fork (same-family qodercli child processes through stage-runner.sh) and subprocess (heterogeneous agents); C-094 aligned; FR numbering unchanged); PART B CLOSED (V3-F1/F3/F4 MEDIUM + V3-F2/F5/F6/F7/F9 LOW closed by dated corrections — quickstart S-6 and CHK043 reason now mechanism-not-yet-landed; checkpoint headings/CHK001/CHK027/R-10/T135/ledger counts annotated, not rewritten); all gates green — requirements 0/0 (337 lines / 47 definition rows), FR lane 35/35 with the clause lane baseline-missing expected, tasks 0/0 over 152 rows, decision-tensions 5 records ok, pre-analyze 0 errors / 112 advisories x3, decomposition proceed 35 FR / 152 tasks <= 120/160; no framework source edited."
+last_verdict: "Analyze-repair round 2 = PART A CLOSED: complete-correction manifest 20/20 surfaces (15 added via T144–T152 + the plan manifest table), FR-035 now states the ban + fork/subprocess carriers; PART B V3 fixes closed (V3-F1/F3/F4 + LOWs); gates: validate-requirements 0/0, validate-tasks 0/0 over 152 rows, tensions 5 records 0/0, pre-analyze x3 pass 0 errors (112 advisories), decomposition proceed 35 FR / 152 tasks; commits 86b9e43c + 8c5198d7."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze round 3 (verification of the manifest enrichment)"
+next_action: "dispatch analyze round 3 verification as 3 fork verifiers (manifest coverage 20/20; V3 fixes + gates; counts/consistency)"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
