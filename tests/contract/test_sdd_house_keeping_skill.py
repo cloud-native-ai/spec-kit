@@ -109,7 +109,11 @@ def test_target_resolution_traps():
     assert "git rev-parse --show-toplevel" in owner
     assert "basename 为 `.specify`" in text or "basename 为 `.specify`" in owner
     assert "框架源仓" in text
-    assert "MUST NOT 启动 `qodercli`" in text
+    # 2026-11-09 Feature 093 (FR-035 / C-094) disposes "MUST NOT 启动 `qodercli`":
+    # the local default is the fork carrier (same-family qodercli children through
+    # stage-runner.sh) or the subprocess carrier, with the in-process path BANNED.
+    assert "fork 承载" in text and "subprocess 承载" in text
+    assert "stage-runner.sh" in text and "in-process" in text and "BANNED" in text
     assert "向上搜索" in text
     assert "拒绝执行" in text
     assert "sdd-project-setup" in text

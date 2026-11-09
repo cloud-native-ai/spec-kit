@@ -149,14 +149,18 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **何时拆解**：`auto` 仅在门返回 `admit`、至少两个包且 WG-13 收益测试成立时拆解；否则 `single-package`（`reason=not-beneficial`）。不可表示、门在唯一一次修复后仍拒绝、或拆解层不可用（exit 2）→ `fallback`，具名原因，且绝不运行部分包集。
 - **门**：`scripts/wp-gate.py --check plan|preflight|retry`——确定性、stdlib-only、不派发、不写脊；拒绝码与退出码以 §12 和 `contracts/wp-gate.md` 为准。
 - **调度**：§13——依赖验证后才就绪、写包独占、只读并发受 `slot_cap` 限制、失败隔离、重入不重派。
+- **先划分后派发（C-073）**：协调者 MUST 先产出包集再派发——每个包命名其范围、输入与输出路径；派发临时包（ad hoc packages）即 `unpartitioned`。协调者自身工具集缺派发能力时，该包集仍是可用的交付物（后到的可派发执行者无需重新推导）。
+- **真实执行形态（C-074）**：协调者 MUST 报告实际达成的执行形态，即使它是串行——「划分就绪、执行串行」是具名披露（附理由码），MUST NOT 沉默；不得把串行运行呈现为并发。
+- **能力裁决与槽位上限逐次下传（C-071）**：每次派发 MUST 携带当次读出的能力裁决与槽位上限；一次派发 MUST NOT 继承上一次派发的读数；本规则只加派发载荷，不改任何步骤顺序。
+- **逐阶段覆盖与逐单元读数（C-069/C-070）**：每个循环阶段 MUST 声明自己的拆解覆盖，MUST NOT 继承上一阶段的覆盖；读数按**推进单元**记录——driver 按阶段/包、`sdd-house-keeping` 按条目、`sdd-project-setup` 按步骤，MUST NOT 写成「每轮」。
 - **独立校验**：§15——每包一个全新上下文 verifier；verdict 缺失/不可读/歧义即 fail；包 verdict 永远不替代阶段 U4。
 - **集成与收尾**：§16——按声明顺序确定性集成，冲突或缺失输出即停，单一 closing commit，阶段哨兵由 integrator 发出；U4 在集成后原样运行。
 - **团队形状**：`templates/stage-team-preset.md` + 运行域 adapter（§17）；每 stage / attempt / run 都不持久化 `team.md`，`create-team` / `run-team` 不变。
 - **Checkpoint 协议（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；owner `references/checkpoint-protocol.md`，本节只给指针。
 - **报表**：`scripts/wp-report.py`（§18）；缺失来源一律 `not_evaluated`，绝不以 0 或估计替代。
-- **退出开关**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`（缺省 6）；阶段 attempt 可带 `decomposition_override`。优先级：feature `off`（硬退出）> 阶段 override > 阶段表 > `shared/declarations/facts/decomposition-coverage.yaml`（[[STR-007]]，内置缺省的唯一 owner——本手册不复述各阶段取值；状态脊三键是它的运行期投影）。
+- **退出开关**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`（缺省值读 `shared/declarations/facts/concurrency-slot-and-reserve.yaml` 的 `slot_cap_default`——本手册不写数字；状态脊三键是该 fact 的运行期投影）；阶段 attempt 可带 `decomposition_override`。优先级：feature `off`（硬退出）> 阶段 override > 阶段表 > `shared/declarations/facts/decomposition-coverage.yaml`（[[STR-007]]，内置缺省的唯一 owner——本手册不复述各阶段取值）。
 - **analyze 缺省并发（FR-034）**：`analyze` 阶段按 `decomposition-coverage.yaml` 的 `analyze: on` 默认以 **N 个并发 SDD Analysis Worker**（`agents/sdd-analysis-worker.agent.md`）执行，N 取自阶段团队配置 / 状态脊 `agent_concurrency_requested`，本手册不固化数字；串行 analyze（N=1）只在 `serial-reason.yaml` 的封闭词表给出具名理由码时成立。三件事与并发同时成立，缺任一项判红：(a) 每个 Worker 的**读域**在派发前声明为**文件级**路径集，同一路径出现在两个并发 Worker 的读域里（读域相交）即**派发前判红**；(b) N 份 findings 按确定性规则归并——先按声明的读域次序分节，节内按 finding id 字典序，跨 Worker 重复 id 按「先声明先得」破平并保留指向被抑制副本的指针，MUST NOT 依赖返回时刻；(c) 记录 `requested` / `effective` / `effective_reason` 三元组（effective 取逐 Worker 派发/返回区间最大重叠数）＋ 每 Worker 的 `executor_id` 与其 verdict 的 `verifier_id`。承载形态见 `references/dispatch-recipes.md` § 本地原生拓扑（fork / subprocess 两类进程承载，in-process 路径 BANNED）。
-- **implement 并发切包**：implement 阶段 MUST 按 **~10 任务/包（每包 ≤16）** 切分，最多 **6 个执行子代理并发**（依赖与写域由 decomposition §13 调度）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成按 §16 交给既有 integration queue 串行合入。禁止把 60+ 任务压在一个执行子代理里。
+- **implement 并发切包**：implement 阶段 MUST 按 **~10 任务/包（每包 ≤16）** 切分，并发上限 = 运行期槽位上限（读 `concurrency-slot-and-reserve.yaml` 的 `slot_cap_default` 并与天花板取 min；本手册不写数字；依赖与写域由 decomposition §13 调度）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成按 §16 交给既有 integration queue 串行合入。禁止把 60+ 任务压在一个执行子代理里。
 - **边界**：只新增 U4 之前的步骤；不改阶段命令内部、哨兵字面量、U4、阶段链、watcher 判定/退出码、卡死处置、快车道、两槽位测试预算、plan 小修约束，以及 064 的 registry/ownership/worktree/integration 语义、067 的 part brief/test economics、068 的反馈通道。包执行者绝不派发、绝不写脊、绝不加载本手册；不新增服务/守护进程或第二个 registry、ownership 模型、integration queue、ledger。
 
 ## References
@@ -189,7 +193,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **实例创建 → create-agent**（`skills/internal/create-agent/SKILL.md`）：从 `agents/sdd-<stage>-<role>.agent.md` 角色族（如 `sdd-requirement-analyzer`、`sdd-plan-coordinator`、`sdd-plan-executor`）按职责实例化阶段执行实例（一实例一职责）；产出=`.specify/agents/instances/<slug>.agent.md`。
 - **阶段派发 → run-agent**（`skills/internal/run-agent/SKILL.md`）：本地拓扑的阶段派发用 **fork 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`）或 **subprocess 承载**（异构 agent 自身 CLI 的独立子进程），宿主内建 in-process subagent 路径 **BANNED**、不作为并发承载；远端拓扑用外部 CLI；远端进入形态为 `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，CLI 缺省取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖；以拓扑声明 + 实例引用发起执行；前置检查与失败处置见其 `references/dispatch-preflight.md`。
 - **编排本体在本手册**：阶段序列（U0–U6）、状态脊、哨兵与独立校验、卡死处置、收尾合并不由承接技能承担（职责切分见 agent-definitions § Driving Subagents via the Three Layers）。
-- **阶段子代理预算**：统一 `run-turn-budget` 500（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-11-06 统一）；大 implement 阶段按 **~10 任务/包（每包 ≤16）** 切分、**最多 6 包并发**；多个写包用 `write_isolation=worktree`（child line + 独立 worktree），集成队列串行合入；细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
+- **阶段子代理预算**：统一 `run-turn-budget` 500（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-11-06 统一）；大 implement 阶段按 **~10 任务/包（每包 ≤16）** 切分、并发上限取运行期槽位上限（读 slot fact，本手册不写数字）；多个写包用 `write_isolation=worktree`（child line + 独立 worktree），集成队列串行合入；细则见 `references/dispatch-recipes.md` § 阶段子代理预算与分段。
 
 ## Feedback & Probe Points（反馈与探针采集点）
 

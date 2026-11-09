@@ -181,7 +181,7 @@ def _queued_write_plan() -> dict:
     write_c = wp_fixtures.make_write_package(
         "plan-wp03",
         depends_on=["plan-wp01"],
-        owned_paths=["src/generated/"],
+        owned_paths=["src/generated/c.md"],
         outputs=["src/generated/c.md"],
         max_turns=120,
     )
@@ -459,7 +459,16 @@ def test_sd_07_local_native_topology_and_serial_fallback():
     ordered = sorted(intervals)
     for left, right in zip(ordered, ordered[1:]):
         assert not _overlaps(intervals[left], intervals[right])
-    assert "qodercli" not in _model_text().lower()
+    # 2026-11-09 Feature 093 (FR-035 / C-094) disposes the old "local MUST NOT launch
+    # qodercli" rule: the model now declares the fork carrier (same-family `qodercli`
+    # children through `stage-runner.sh`) and the subprocess carrier, with the
+    # host-internal in-process path BANNED. The simulator's 070 vocabulary above is
+    # retained; this assertion now pins the replacement rule instead of its absence.
+    model = _model_text().lower()
+    assert "stage-runner.sh" in model and "qodercli" in model, (
+        "the model must declare the fork carrier (qodercli children via stage-runner.sh)")
+    assert "subprocess" in model and "in-process" in model and "banned" in model, (
+        "the model must name the subprocess carrier and ban the in-process path")
 
 
 def test_sd_08_detached_topology_uses_unique_runners_and_sentinels():

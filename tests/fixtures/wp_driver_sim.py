@@ -94,6 +94,7 @@ def sim_packages() -> list:
     write = wp_fixtures.make_write_package(
         SIM_WRITE,
         depends_on=[SIM_READ_A],
+        owned_paths=["src/generated/sim.md"],
         outputs=["src/generated/sim.md"],
         bounded_by={"unit": "tasks", "count": 1},
     )

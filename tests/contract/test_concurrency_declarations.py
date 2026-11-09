@@ -1,6 +1,7 @@
 """Declaration-layer contract for Feature 093 (contracts/declaration-facts.contract.md).
 
 Rows pinned here (WP4): T016, T018, T020, T092, T094, T129.
+Rows added at release (WP5): T017 (C-011), T019 (C-013).
 
 The surface under test is the existing read entry, never a second parser:
 
@@ -20,6 +21,13 @@ The surface under test is the existing read entry, never a second parser:
   landing discipline both live under is reachable by path.
 - **C-087 / T129** — each fact file carries its registration line in ``contract.yaml``
   in the same change that adds the file; a file without a line is red.
+- **C-011 / T017** — an unregistered slug is ``owner-unavailable``: the reader exits 1,
+  and the judgement engine translates that into its own verdict with exit 2 — no
+  consumer defaults the value when the read fails.
+- **C-013 / T019** — removing a fact from the read surface (broken ``fact:`` key,
+  deleted file, unparsable body) makes the dependent judgement report
+  ``owner-unavailable`` with a named message and a non-zero exit; it never falls back
+  to a default. The mutation asserts the read behaviour, not the act of unregistering.
 
 Every assertion here reads the live tree through ``scripts/python/declaration_reader.py``
 or a copy of it inside ``tmp_path``; nothing writes into the repository.
@@ -39,6 +47,7 @@ pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 READER = REPO_ROOT / "scripts" / "python" / "declaration_reader.py"
+ENGINE = REPO_ROOT / "scripts" / "python" / "concurrency-check.py"
 
 EIGHT_FACTS = (
     "concurrency-class",
@@ -306,3 +315,103 @@ def test_unregistered_fact_file_turns_the_judgement_red(tmp_path):
         code == "unregistered" and path.endswith("concurrency-class.yaml")
         for code, path, _ in findings
     ), findings
+
+
+# --------------------------------------------------------------------------- #
+# T017 (WP5) — the unregistered shape is owner-unavailable, never a default
+# --------------------------------------------------------------------------- #
+def _engine(*args):
+    assert ENGINE.is_file(), "the judgement engine must exist for the translation reading"
+    return subprocess.run(
+        [sys.executable, str(ENGINE), *[str(arg) for arg in args]],
+        capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=120,
+    )
+
+
+def _fixture_agent(repo: Path) -> None:
+    agents = repo / "agents"
+    agents.mkdir(exist_ok=True)
+    (agents / "fixture.agent.md").write_text(
+        "---\nname: fixture\ndescription: \"fixture agent\"\ncapability-tools: []\n---\n"
+        "# Fixture\n\nNever dispatch another agent.\n", encoding="utf-8")
+
+
+def test_unregistered_slug_reads_owner_unavailable_with_a_named_message(tmp_path):
+    """C-011 — reader exits 1 naming the fact; the engine translates to exit 2, no default."""
+    repo = _copy_layer(tmp_path)
+    _fixture_agent(repo)
+    (repo / "shared" / "declarations" / "facts" / "concurrency-class.yaml").unlink()
+
+    reader_got = _cli("--action", "get", "--fact", "concurrency-class", repo=repo)
+    assert reader_got.returncode == 1, (
+        "the reader's observed unregistered shape is exit 1: %s"
+        % (reader_got.stdout + reader_got.stderr))
+    assert "no declaration for fact 'concurrency-class'" in (
+        reader_got.stdout + reader_got.stderr)
+
+    out = tmp_path / "classify.json"
+    proc = _engine("classify", "--repo", repo, "--json-out", out)
+    assert proc.returncode == 2, "the engine must translate to exit 2: %s" % (
+        proc.stdout + proc.stderr)
+    envelope = json.loads(out.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "owner-unavailable"
+    assert any(
+        finding["code"] == "owner-unavailable"
+        and "concurrency-class" in (finding.get("message") or "")
+        for finding in envelope["findings"]
+    ), envelope["findings"]
+    assert "classes" not in json.dumps(envelope.get("measured") or {}), (
+        "no default class table may be produced when the owner is unavailable")
+
+
+# --------------------------------------------------------------------------- #
+# T019 (WP5) — the removal direction: no fallback to a default
+# --------------------------------------------------------------------------- #
+def test_removed_fact_never_falls_back_to_a_default(tmp_path):
+    """C-013 — a fact hidden from the read surface refuses, in every removal form."""
+    repo = _copy_layer(tmp_path)
+    _fixture_agent(repo)
+
+    # form 1: the `fact:` key no longer names the slug (the file is present)
+    serial = repo / "shared" / "declarations" / "facts" / "serial-reason.yaml"
+    serial.write_text(
+        serial.read_text(encoding="utf-8").replace(
+            "fact: serial-reason", "fact: serial-reason-broken", 1),
+        encoding="utf-8")
+    record = repo / "serial.yaml"
+    record.write_text(
+        "pattern: serial\ncodes:\n  - single-unit\nevidence:\n  single-unit:\n"
+        "    units:\n      - only-unit\n", encoding="utf-8")
+    out = tmp_path / "serial.json"
+    proc = _engine("serial-reason", "--repo", repo, "--record", record, "--json-out", out)
+    assert proc.returncode == 2, "a removed fact must refuse: %s" % (proc.stdout + proc.stderr)
+    envelope = json.loads(out.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "owner-unavailable"
+    assert any(
+        finding["code"] == "owner-unavailable"
+        and "serial-reason" in (finding.get("message") or "")
+        for finding in envelope["findings"]
+    ), envelope["findings"]
+
+    # form 2: the body is unparsable (a flow collection outside block-subset/v1)
+    repo2 = _copy_layer(tmp_path / "second")
+    _fixture_agent(repo2)
+    serial = repo2 / "shared" / "declarations" / "facts" / "serial-reason.yaml"
+    text = serial.read_text(encoding="utf-8")
+    mutated = text.replace(
+        "  groups:\n    - condition-bound\n    - factual\n",
+        "  groups: [condition-bound, factual]\n", 1)
+    assert mutated != text, "fixture premise: the groups block must be present"
+    serial.write_text(mutated, encoding="utf-8")
+    out2 = tmp_path / "serial2.json"
+    proc = _engine("serial-reason", "--repo", repo2, "--record", record,
+                   "--json-out", out2)
+    assert proc.returncode == 2, "an unparsable fact must refuse: %s" % (
+        proc.stdout + proc.stderr)
+    envelope = json.loads(out2.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "owner-unavailable"
+    assert any(
+        finding["code"] == "owner-unavailable"
+        and "subset" in (finding.get("message") or "")
+        for finding in envelope["findings"]
+    ), envelope["findings"]

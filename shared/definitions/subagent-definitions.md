@@ -37,6 +37,8 @@ The grain decides what a "unit" is; the obligation is the same statement at ever
 
 The obligation at authoring time knows none of the tuning values — the slot cap, the ceiling, the per-unit budget and the effective bound are read at execution time through the facts named above (C-043). The reading triple and its `not_evaluated` literal are the only concurrency metric; a dispatched count, a configured value or a neighbouring run's number is not a reading.
 
+**The declaration is falsifiable against its run record (C-057)**: a body that declares concurrency MUST emit at least the dispatched unit ids and their intervals; a body that cannot emit them MUST declare serial and say why. The unit record is the evidence — a declaration without a record is unproven, and a record showing one executor in sequence is `declaration-execution-mismatch`, never concurrency evidence.
+
 ### class-concurrent-by-default — concurrent-by-default (`work-package`)
 
 **Obligation**: `must-concurrent` (value owner: `shared/declarations/facts/concurrency-class.yaml`; the decision rule that assigns a body to this class is owned there too). A skill or command body partitions its own duty into work packages and runs them concurrently whenever the FR-005 conditions hold. A serial result is never a free choice: it carries a reason code from the closed vocabulary plus that code's form-matching evidence — a non-empty string such as `.` is not a basis — and the run records the reading triple. Membership is decided by the fact's `(root_id, produced_shape)` rule, never by this section.
@@ -85,6 +87,21 @@ Choose per dispatch, per member, by scenario — not by habit:
 When in doubt: a **single** delegation may use native; **any multi-unit duty defaults to the external process form** — fork for same-family agents, subprocess for heterogeneous ones — with virtual as the sequential fallback for subagent-less tools. The host-internal in-process path is never a concurrency carrier, and a body that cannot obtain a process carrier records serial with a named reason code rather than claiming parallelism.
 
 **Session-creation APIs are not a carrier.** Creating a host chat session/conversation — `create_chat_session`, `fork_chat_session`, or any equivalent — is NOT one of the three modes above. It materializes a user-visible conversation that inherits the orchestrator's model and permission mode, has no bounded task scope and no result contract, and leaves a permanent entry in the user's session list. Internal dispatch (detection/validation waves, team members, stage executors) MUST use one of the three modes and MUST NOT use a session-creation API; when the orchestrator cannot nest natively, the correct carrier is **External**, not a new session.
+
+## Dispatch Capability (派发能力 — `"dispatch-capability"`, STR-004)
+
+**Owner**: this section owns the definition behind the shared string `"dispatch-capability"` (STR-004 of Feature 093's shared-string table) — what *can create a sibling executor* means for a body's definition. The judgement that reads it is `scripts/python/concurrency-check.py`'s `capability` action, whose dispatch-tool spelling set is that engine's single executable form; the value read is the **existing** frontmatter key `capability-tools` — no new key is introduced (FR-022, C-038).
+
+A body **can create a sibling executor** when its own definition satisfies one of the three forms FR-021 admits, judged from the definition alone (never a runtime probe):
+
+| Form | Verdict | Reading |
+|------|---------|---------|
+| a dispatch-class tool is present in the definition's `capability-tools` list | `dispatch-capable` | the list itself |
+| the body text explicitly hands dispatch to a capable superior (driver / main agent) and names the handoff's form | `handoff-declared` | the handoff sentence |
+| the body declares one of § Three Execution Modes' two process carriers (fork for same-family `qodercli` children through `stage-runner.sh`, subprocess for heterogeneous agents) | `external-process` | the carrier declaration |
+| none of the above | `incapable` | — a body declaring `N >= 2` units while `incapable` is `declaration-execution-mismatch`, judged red and never repaired silently (C-040) |
+
+The three execution modes are § Three Execution Modes above (native / virtual / external); only the **external** mode's two process carriers are a concurrency mechanism (C-094). Gaining dispatch capability never changes the anti-nesting rule: the permitted chain stays **depth 2** with the three prohibitions stated in § Dispatch-Time Governance Obligation — a stage executor remains a leaf and never hosts or starts an SDD run (FR-025). This section adds no fourth form, no second predicate and no new frontmatter key.
 
 ## Execution Topology Declaration (执行拓扑声明)
 
@@ -143,6 +160,8 @@ Every dispatch MUST carry the fast-fail injection clause, because a subagent's p
 Every dispatch that serves an in-scope flow MUST also carry the **reporting duty** — the same payload channel, a different obligation, defined once in [`reporting-obligations.md`](../guidelines/reporting-obligations.md).
 
 **Anti-nesting obligation (反嵌套)**: the dispatching prompt MUST NOT reference any driver/loop skill (e.g. `sdd-loop-driver`), MUST NOT instruct the subagent to load any skill, and MUST NOT contain loop logic — the loader of a driver manual is the driver; a subagent that receives the manual becomes a second driver and the hierarchy escapes.
+
+**Concurrency obligations travel with the dispatch (C-076/C-077)**: every dispatched sub-agent's brief MUST carry the concurrency obligation as brief content — the three parts of § The Concurrency Obligation, or an explicit pointer to that section — injected at dispatch rather than inherited from an ambient layer. Every sub-agent **return** MUST carry its own `requested` / `effective` / `effective_reason` triple; a return without it is `report-incomplete` and MUST be reported by the coordinator, never filled in by the coordinator. A coordinator that plans parallel packages MUST emit the packages (each naming its scope, inputs and output path) before dispatching and MUST state the execution shape actually achieved — including a serial shape: "partition ready, execution serial" is a named disclosure with its reason code, never a silence (C-059, C-073, C-074).
 
 **The narrowed predicate（收窄后的可判定谓词）**: a dispatch prompt may name or assign an SDD driver **only** when all three of the following conditions hold: (1) the recipient resolves to an Agent definition declaring the capability key `sdd-invocation` ([[STR-001]]) as `allowed` ([[STR-002]]); (2) the recipient's seat policy declares the same key as `allowed`, resolved by `(team, seat)` from the roster; (3) the assigned task is an **SDD assignment** — a member duty whose routing decision has been recorded with the `sdd` verdict ([[STR-004]]). The verdict vocabulary and the recorded-decision requirement behind condition (3) are owned by [`sdd-routing-definitions.md`](sdd-routing-definitions.md), which also registers the `[[STR-NNN]]` literals cited here; a duty whose decision is absent, `direct` ([[STR-005]]), or `adjudicate` ([[STR-006]]) is not an SDD assignment.
 

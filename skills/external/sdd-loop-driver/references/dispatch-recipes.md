@@ -42,7 +42,7 @@
 
 - **测试入口（FR-036）**：任何测试执行 MUST 经 `scripts/bash/run-tests.sh`（缺省 xdist 形态；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
 - **默认预算**：阶段执行子代理的 `run-turn-budget` 统一为 **500**（owner：阶段执行角色族 `agents/sdd-<stage>-<role>.agent.md`；2026-10-22 由 40 上调至 120，2026-11-05 在 1M-context 运行档下由 120 上调至 400，2026-11-06 统一为 500）。预算变更属 source change，必须同步 agent 模板、`.specify/agents/templates/` 镜像与各工具 render。
-- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并由 **最多 6 个执行子代理并发**推进；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
+- **有界分段**：大阶段（implement >40 任务，或契约 >80 条）MUST 拆成 **~10 任务/包（每包 ≤16）**，并发上限取运行期槽位上限（读 `shared/declarations/facts/concurrency-slot-and-reserve.yaml` 的 `slot_cap_default` 并与天花板取 min；本文件不写数字）；多个写包时声明 `write_isolation=worktree`，写 agent 各占 child line + 独立 worktree，集成交给既有 integration queue 串行合入；每包在状态脊写 `part_scope` 与 checkpoint，子代理回传 `PARTn-DONE` 或 `ANOMALY`；每包独立校验通过后才计入 U4。禁止把整个大阶段压在一次派发里。
 - **输出纪律**：子派发 brief MUST 要求执行者用工具**分段写文件**（每次 Write/Edit 一部分），禁止在一个回复里输出整段实现或整份测试；每段回传改动清单、测试计数、提交哈希。这样同时规避 output-token 上限。
 - **状态字段**：状态脊记录 `turn_budget`、`sub_dispatch`、`part_scope`、`checkpoint`；预算耗尽/输出上限属 U5 预算触顶，按卡死处置上报，不得伪完成。
 
