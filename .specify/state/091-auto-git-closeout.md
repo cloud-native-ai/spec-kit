@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
-stage: implement done (commit 9d5acb7a); next = analyze round 2
+stage: implement
 stage_started_at: 1794195130
 stage_deadline_epoch: 1794205930
 stage_base_commit: 9d5acb7a
 attempt: 1
 retry_limit: 3
-last_verdict: "analyze-repair slice returned ANALYZE-REPAIR-DONE — C-01 resolved (FR-020/021/022/027 now have owned clauses; FR coverage 24/28 -> 28/28 per account-clause-coverage.py) + H-01/H-02/H-03/H-04 all resolved + 11 of 13 MEDIUM resolved (M-01..M-07, M-08, M-09, M-10, M-11) + all 4 LOW resolved; contract clauses 26 -> 32 (lifecycle C-8/C-9/C-10, executor C-8, verification C-6/C-7); tasks 60 -> 62 rows (T061/T062); green partition re-cut to 32 claims; five required gates all green before and after (validate-requirements ok 0/0 twice; pre-analyze requirements pass 0 errors/47 advisories; pre-analyze plan pass 0 errors/47 advisories; validate-decision-tensions 5 records 0/0; decomposition proceed fr=28)"
+last_verdict: "Implement slice 1 hit the 500-turn limit; WIP commit 18d9c3bc (267 files: close-out step, git-utils closeout operation, contract tests + fixtures, baseline/mutations/dry-run evidence); tasks 0/62 marked; next = completion slice (audit+mark, finish remaining tasks, full-suite zero-new-failures, gates, final commit)"
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: run analyze round 2 over the repaired spec set — the C/H validation wave that round 1 could not dispatch (cap-of-record) MUST be dispatched this time; verify in particular that (a) the 32 clauses really discharge all 28 FR by citation group (`account-clause-coverage.py --spec-dir` -> FR uncovered 0) and every clause is claimed exactly once in the 32-claim green partition; (b) the two disclosed `green-cross-phase` warnings are accepted on their stated reasons rather than silenced; (c) H-02's settlement is behaviour-level (executor C-8 transition, driven per value) and not a restated sentence; (d) H-03's invariant is 'all commit values in one receipt are equal' (V-15) and not a field-arity assertion; (e) H-04's model axis and remote axis stay separate (declaration C-4 vs C-5) and `ask` is named as a third axis; then dispatch tasks/implement if round 2 clears. Residual owned by implement: `account-clause-coverage.py` is still `baseline-missing` (its `coverage-baseline.txt` freeze belongs to T056).
+next_action: dispatch implement completion slice — audit the WIP against tasks.md and mark completed rows, finish remaining tasks, run the full suite against baseline-failed.txt, run sync-mirrors/compile-embeds checks and the closeout contract tests, then commit
 direction_contract: |
   goal_verbatim: "我每次在作为修改执行都会要求执行:提交,合并,推送, 这应该是一套固定流程,不需要每次都手动触发,在框架中需要找到一个合适的切入点. 需要注意的是:不同的项目存在不同的git workflow, 这个动作需要和git workflow相结合"
   non_goals: [新增 /speckit.* 命令, 守护进程/调度器, 第二套分支 registry, 自动强推, 托管平台 PR/MR 自动化]
