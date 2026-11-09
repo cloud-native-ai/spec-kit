@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze-repair"
+next_action: "dispatch analyze-repair (CRITICAL 1 / HIGH 3; repair brief notes/analyze-findings.md § 6)"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
@@ -43,7 +43,7 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages recomputed per stage; implement ~10 tasks/package up to 6
   verifier_reserve: 1
-  breakpoint_verdict: "checklist CHECKLIST-DONE; next stage = analyze (same worktree)"
+  breakpoint_verdict: "analyze ANALYZE-DONE NOT-READY; next stage = analyze-repair (same worktree)"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 36 FR / 12 SC; commit a6b571f4
