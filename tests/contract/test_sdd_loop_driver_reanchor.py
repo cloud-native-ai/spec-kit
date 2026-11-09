@@ -135,16 +135,18 @@ def _assert_rule_first(proto: str) -> None:
         "leg 3: the minimal shape asks the goal as question 1"
     )
 
-    # The ordering claim itself: the verdict and the action it licenses are stated inside
-    # part 5, and the goal is implicit in question 3 rather than asked separately.
-    verdicts = "The verdict is exactly one of "
-    assert _flatten(verdicts) in _flatten(audit), (
-        "ordering: the verdict statement is no longer part of part 5"
+    # The ordering claim itself: the protocol states that the rule verdict and the action it
+    # licenses are stated BEFORE any goal statement, and that the goal is implicit in Q3 rather
+    # than asked separately. These are the propositions SC-002 pins; a rewrite that drops the
+    # sentence, flips Q1 to the goal, or asks the goal as a question reds.
+    flat = _flatten(audit)
+    assert re.search(
+        r"the rule verdict and the action it licenses are stated\s+\**before\**\s+any goal statement",
+        flat), (
+        "ordering: the rules-before-goal verdict sentence is gone from part 5"
     )
-    verdict_at = audit.index(verdicts)
-    q3_at = audit.index("3. Is the next action")
-    assert verdict_at < q3_at or "implicit in it" in audit, (
-        "ordering: neither the verdict block nor Q3 states that the goal is implicit in the next action"
+    assert "implicit in it" in flat, (
+        "ordering: Q3 no longer states that the goal is implicit in the named next action"
     )
     assert "do not ask the goal as a separate question" in _flatten(audit), (
         "ordering: the protocol no longer forbids asking the goal as a separate question"

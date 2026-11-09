@@ -1,0 +1,181 @@
+# review-stage gate sweep — 2026-11-09T00:29:48Z
+# repo: /cws_data/cloud-native-ai/spec-kit | branch: master | head: fef46f4305cebaee64700499b59ee6bc76b1f428
+# python: Python 3.11.0rc1 | pytest: pytest 9.0.3
+# PATH python3 lacks pytest: ModuleNotFoundError: No module named 'pytest'
+
+## ARC input — closure-acceptance-check.py --json
+$ /usr/bin/python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/090-re-anchoring --json
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/cws_data/cloud-native-ai/spec-kit/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": false,
+    "no_open_rows": true,
+    "smoke_record_pass": false,
+    "status_row_per_criterion": false
+  },
+  "final_path": {
+    "blocked": 0,
+    "deferred": 0,
+    "fail": 0,
+    "partial": 0,
+    "pass": 0,
+    "total": 4,
+    "unknown": 4
+  },
+  "flow_class": "execution",
+  "reasons": [
+    {
+      "code": "zero-final-path-pass",
+      "target": ""
+    }
+  ],
+  "smoke": {
+    "command": "SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py -q --tb=no -rA",
+    "evidence_exists": false,
+    "evidence_path": ".specify/specs/090-re-anchoring/test-evidence/closure-guards.txt",
+    "exit_code": "1",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/cws_data/cloud-native-ai/spec-kit/.specify/specs/090-re-anchoring",
+  "tasks": {
+    "closed": 39,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 0
+  },
+  "verdict": "block",
+  "waived": []
+}
+exit=1
+
+## GATE-1 — the four named guard modules, no NEW failure
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest <four modules> -q --tb=no -rA
+PASSED tests/contract/test_fast_fail_discipline.py::test_g15_cost_not_only_in_spec_mutation_drill
+PASSED tests/contract/test_fast_fail_discipline.py::test_g16_six_engines_zero_change
+PASSED tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by_engines_only
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+2 failed, 130 passed in 1.84s
+
+$ ... | grep ^FAILED | LC_ALL=C sort > test-evidence/review-now-failed.txt
+tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+
+$ LC_ALL=C comm -13 test-evidence/tasks-baseline-failed.txt test-evidence/review-now-failed.txt
+(empty output above = no NEW failure)
+
+## Six-module smoke (the four guards + the budget guard + the goal-migration guard the implement stage touched via 9df034a3)
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest <six modules> -q --tb=line -rA
+PASSED tests/contract/test_goal_migration.py::TestMigrationTargetShape::test_pre_existing_project_artifacts_are_preserved
+FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+3 failed, 160 passed in 16.17s
+(exit 1 = the three pre-existing reds: the baseline pair + the historical-face guard)
+
+## Mirrors
+$ /usr/bin/python3 scripts/python/sync-mirrors.py --check
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (98 files, byte-identical)
+exit=0
+
+## Structure + clause accounting
+$ /usr/bin/python3 .specify/scripts/python/validate-tasks.py .specify/specs/090-re-anchoring/tasks.md
+PASS: .specify/specs/090-re-anchoring/tasks.md — 0 error(s), 0 warning(s)
+$ /usr/bin/python3 .specify/scripts/python/account-clause-coverage.py --spec-dir .specify/specs/090-re-anchoring
+UNCOVERED: 088-speckit-visualization/contracts/status-digest.contract.md#C-72
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-23
+UNCOVERED: 088-speckit-visualization/contracts/status-report.contract.md#C-30
+  [clause-uncovered] pass (598) — 598 uncovered, 0 beyond the frozen baseline
+  [fr-uncovered] pass (0) — 10 of 10 FRs cited from citation groups
+  [clause-unparsable] warn (107) — 107 files yield no clause id under the owner's forms; 0 of them declare a positive form, which is parse doubt and is never read as zero-and-covered
+  [coverage-baseline-delta] pass (0) — baseline holds 598 names; 598 uncovered items are baseline-internal and do not block
+0 error(s), 0 warning(s)
+
+## Base resolution (code segment)
+$ .specify/skills/internal/code-review/scripts/git-delta-review.sh base --spec .specify/specs/090-re-anchoring --json
+{"base":"25d5fe1334420c7f22cc67fdae8cddccd7e58f7b","head":"fef46f4305cebaee64700499b59ee6bc76b1f428","base_source":"feature-first-commit"}
+$ .specify/skills/internal/code-review/scripts/git-delta-review.sh triage --spec .specify/specs/090-re-anchoring --code-paths ...
+base=25d5fe1334420c7f22cc67fdae8cddccd7e58f7b
+head=fef46f4305cebaee64700499b59ee6bc76b1f428
+base_source=feature-first-commit
+changed_files=114
+triage=run
+basis=code path in the committed delta: .specify/instructions.md .specify/memory/constitution.md .specify/memory/exec-quant/records/20261108T221115198240Z-8d5bdf8d.json .specify/memory/exec-quant/records/20261108T224015657741Z-79e76b5b.json .specify/memory/exec-quant/records/20261108T231315881946Z-3e0c7320.json .specify/memory/exec-quant/records/20261108T232415326714Z-bed3b938.json .specify/memory/exec-quant/records/20261108T232815284458Z-26eaf6c1.json .specify/memory/features.md .specify/memory/features/090.md .specify/memory/feedback/20261108T221115Z-speckit-clarify.md .specify/memory/feedback/20261108T224015Z-speckit-plan.md .specify/memory/feedback/20261108T224115Z-speckit-plan.md .specify/memory/feedback/20261108T231315Z-speckit-tasks.md .specify/memory/feedback/20261108T232415Z-speckit-checklist.md .specify/memory/feedback/20261108T232818Z-speckit-analyze.md .specify/memory/register.md .specify/memory/session/20261108T224015Z-run-determination-speckit-plan-r20261108t220214z-8647.md .specify/memory/session/20261108T231315Z-run-determination-speckit-tasks-r20261108t220214z-8647.md .specify/scripts/bash/generate-instructions.sh .specify/shared/definitions/agent-definitions.md .specify/shared/definitions/re-anchoring-definitions.md .specify/skills/internal/manage-constitution/SKILL.md .specify/skills/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/checklists/2026-11-09-requirements-quality.md .specify/specs/090-re-anchoring/checkpoints/01-clarify.md .specify/specs/090-re-anchoring/checkpoints/02-plan.md .specify/specs/090-re-anchoring/checkpoints/03-tasks.md .specify/specs/090-re-anchoring/checkpoints/04-checklist.md .specify/specs/090-re-anchoring/checkpoints/05-analyze-repair.md .specify/specs/090-re-anchoring/checkpoints/06-implement.md .specify/specs/090-re-anchoring/contracts/direction-audit.contract.md .specify/specs/090-re-anchoring/contracts/governance-landing.contract.md .specify/specs/090-re-anchoring/contracts/guard-tests.contract.md .specify/specs/090-re-anchoring/contracts/re-anchoring-faces.contract.md .specify/specs/090-re-anchoring/coverage-baseline.txt .specify/specs/090-re-anchoring/data-model.md .specify/specs/090-re-anchoring/feature-ref.md .specify/specs/090-re-anchoring/goal/090-re-anchoring/goal.md .specify/specs/090-re-anchoring/plan.md .specify/specs/090-re-anchoring/quickstart.md .specify/specs/090-re-anchoring/requirements.md .specify/specs/090-re-anchoring/research.md .specify/specs/090-re-anchoring/tasks.md .specify/specs/090-re-anchoring/team/090-re-anchoring/team.md .specify/specs/090-re-anchoring/test-evidence/account-clause-coverage-analyze-repair.txt .specify/specs/090-re-anchoring/test-evidence/account-clause-coverage.txt .specify/specs/090-re-anchoring/test-evidence/checklist-gates-2026-11-09.txt .specify/specs/090-re-anchoring/test-evidence/checklist-readings-2026-11-09.txt .specify/specs/090-re-anchoring/test-evidence/checklist-self-check.txt .specify/specs/090-re-anchoring/test-evidence/checklist-validate-requirements.txt .specify/specs/090-re-anchoring/test-evidence/closure-guards.txt .specify/specs/090-re-anchoring/test-evidence/contract-baseline-comparison.txt .specify/specs/090-re-anchoring/test-evidence/decision-tensions.txt .specify/specs/090-re-anchoring/test-evidence/decomposition-plan.txt .specify/specs/090-re-anchoring/test-evidence/decomposition-tasks-analyze-repair.txt .specify/specs/090-re-anchoring/test-evidence/decomposition-tasks.txt .specify/specs/090-re-anchoring/test-evidence/fr-lane-check.txt .specify/specs/090-re-anchoring/test-evidence/green-partition-check.txt .specify/specs/090-re-anchoring/test-evidence/guard-red-controls.txt .specify/specs/090-re-anchoring/test-evidence/implement-contract-full-raw.txt .specify/specs/090-re-anchoring/test-evidence/implement-gates.txt .specify/specs/090-re-anchoring/test-evidence/mirrors-tasks.txt .specify/specs/090-re-anchoring/test-evidence/ordering-feasibility-probe.txt .specify/specs/090-re-anchoring/test-evidence/ordering-red-control.txt .specify/specs/090-re-anchoring/test-evidence/owner-divergence.txt .specify/specs/090-re-anchoring/test-evidence/plan-contract-baseline-raw.txt .specify/specs/090-re-anchoring/test-evidence/plan-guards.txt .specify/specs/090-re-anchoring/test-evidence/pre-analyze-plan.txt .specify/specs/090-re-anchoring/test-evidence/red-first-090-c7.txt .specify/specs/090-re-anchoring/test-evidence/resolved-markers.txt .specify/specs/090-re-anchoring/test-evidence/sc001-faces.txt .specify/specs/090-re-anchoring/test-evidence/sc002-ordering.txt .specify/specs/090-re-anchoring/test-evidence/sc003-counts.txt .specify/specs/090-re-anchoring/test-evidence/sc004-tiers.txt .specify/specs/090-re-anchoring/test-evidence/tasks-baseline-failed.txt .specify/specs/090-re-anchoring/test-evidence/tasks-collect.txt .specify/specs/090-re-anchoring/test-evidence/tasks-guards.txt .specify/specs/090-re-anchoring/test-evidence/tasks-premises.md .specify/specs/090-re-anchoring/test-evidence/tasks-premises.txt .specify/specs/090-re-anchoring/test-evidence/team-create.txt .specify/specs/090-re-anchoring/test-evidence/tmp/.gitkeep .specify/specs/090-re-anchoring/test-evidence/tmp/full-base-failed.txt .specify/specs/090-re-anchoring/test-evidence/tmp/full-now-failed.txt .specify/specs/090-re-anchoring/test-evidence/tmp/m1-goal-first-q1/skills/external/sdd-loop-driver/SKILL.md .specify/specs/090-re-anchoring/test-evidence/tmp/m1-goal-first-q1/skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/m2-goal-first-shape/skills/external/sdd-loop-driver/SKILL.md .specify/specs/090-re-anchoring/test-evidence/tmp/m2-goal-first-shape/skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/m3-primary-object-goal/skills/external/sdd-loop-driver/SKILL.md .specify/specs/090-re-anchoring/test-evidence/tmp/m3-primary-object-goal/skills/external/sdd-loop-driver/references/checkpoint-protocol.md .specify/specs/090-re-anchoring/test-evidence/tmp/tasks-base-failed.txt .specify/specs/090-re-anchoring/test-evidence/validate-requirements.txt .specify/specs/090-re-anchoring/test-evidence/validate-tasks-analyze-repair.txt .specify/specs/090-re-anchoring/test-evidence/validate-tasks.txt .specify/specs/090-re-anchoring/test-evidence/workspace-implement.json .specify/specs/090-re-anchoring/test-evidence/workspace-plan-post.txt .specify/specs/090-re-anchoring/test-evidence/workspace-plan-pre.json .specify/specs/090-re-anchoring/verification.md .specify/state/089-script-interface-contract.md .specify/state/090-re-anchoring.md .specify/templates/constitution-template.md .specify/templates/instructions-template.md scripts/bash/generate-instructions.sh shared/definitions/agent-definitions.md shared/definitions/re-anchoring-definitions.md skills/external/sdd-loop-driver/references/checkpoint-protocol.md skills/internal/manage-constitution/SKILL.md templates/constitution-template.md templates/instructions-template.md tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py tests/contract/test_goal_migration.py tests/contract/test_reanchoring_contract.py tests/contract/test_script_interface_contract.py tests/contract/test_sdd_loop_driver_reanchor.py
+
+## Live document sizes (code reviews F-1)
+$ wc -c .specify/instructions.md
+35821 .specify/instructions.md
+$ grep -n INSTRUCTIONS_BUDGET_BYTES scripts/bash/generate-instructions.sh .specify/scripts/bash/generate-instructions.sh
+scripts/bash/generate-instructions.sh:100:INSTRUCTIONS_BUDGET_BYTES=38400
+.specify/scripts/bash/generate-instructions.sh:163:INSTRUCTIONS_BUDGET_BYTES=38400
+$ wc -c shared/definitions/re-anchoring-definitions.md
+5465 shared/definitions/re-anchoring-definitions.md
+
+## Rule-anchor member set (code review F-1) — one line per face
+owner page § 3 (closed eight, 'budget and report discipline' as one bullet):
+56:- **规则锚的成员是封闭集合，owner 是本文件 §1.1**：八项——无人值守（不征求继续）、U4 通过即派发下一阶段、
+57-  状态脊先写后动（含 workspace guard）、fast-fail 的纠正/裁定二分、确认门、**预算纪律**（token 与时间预算）、
+58-  **报告纪律**（进度报告与回传形态）。消费面（两侧宪法、两侧指令面、生成器条目）以**指针**接入并与本集合一致，
+59-  MUST NOT 各自增减成员；新增或删减成员只经本文件修订。
+constitution (both surfaces) — the enumeration line:
+templates/constitution-template.md:395:  workspace guard / fast-fail / the gate discipline / budget and report discipline). A compaction, handoff or reentry MUST resume
+.specify/memory/constitution.md:496:  workspace guard / fast-fail / the gate discipline / budget and report discipline). A compaction, handoff or reentry MUST resume
+instructions (both surfaces):
+templates/instructions-template.md:108:Every agent keeps its entry anchor — the task ANCHOR and the RULES in force (unattended / no approval request / U4 -> next / spine before action / workspace guard / fast-fail / gates / budget and report discipline) — across compactions, and after every core step re-reads the RULES first, recording `on-track` / `correction-applied` / `decision-needed`; the loop is compact -> reload -> evaluate at T0/T1/T2 tiers. The rule's full definition is owned by `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated; it adds a reviewing habit, not machinery.
+.specify/instructions.md:120:Every agent keeps its entry anchor — the task ANCHOR and the RULES in force (unattended / no approval request / U4 -> next / spine before action / workspace guard / fast-fail / gates / budget and report discipline) — across compactions, and after every core step re-reads the RULES first, recording `on-track` / `correction-applied` / `decision-needed`; the loop is compact -> reload -> evaluate at T0/T1/T2 tiers. The rule's full definition is owned by `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated; it adds a reviewing habit, not machinery.
+checkpoint protocol Q1:
+  1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next
+     stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?
+  2. Was the last action completed under those rules — no report substituting for execution, no subagent
+
+## Where the five questions' rule set is owned (code review F-2)
+skills/external/sdd-loop-driver/references/checkpoint-protocol.md:51:     stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?
+owner page §1.1 rule anchor (Q1 of the same five questions, owner side):
+- 五问（**规则优先**）：
+  1. 本核心步骤受哪些规则约束？逐条是否仍然生效（无人值守 / 不征求继续 / U4→下一阶段 / 先写脊后行动 /
+     workspace guard / fast-fail / 确认门 / 预算纪律）？
+
+## Dangling clause pointer in the live governance file (code review F-3)
+16:- Follow-up TODOs: (a) Feature 090's SDD chain (clarify / plan / tasks / review) is still to be run on top of this pre-landed implementation; (b) the template roster carries this principle as XXI while this live roster carries it as XXII — per-surface numbering is normal per `contracts/governance-landing.contract.md#C-25`
+34:- Preserved by design: the template roster carries this principle as XX while this live roster carries it as XXI — per-surface numbering is the shape `contracts/governance-landing.contract.md#C-25` already states as normal; the rule's detail is owned by `shared/definitions/script-interface-definitions.md` (+ its `.specify` mirror), so no new guideline file is introduced; the gate scanner's patterns are NOT widened
+labels that page actually carries:
+C-1
+C-2
+C-3
+C-4
+C-5
+C-6
+
+## Code-segment finding probe: does the ordering test bind the 'verdict precedes the goal' leg?
+Probe design: a scratch mutant of the protocol adds a goal statement immediately BEFORE the verdict
+sentence and keeps Q1 and the primary-object sentence byte-identical, so ONLY the order changes.
+Expected under 'the verdict and the action it licenses precede any goal statement': RED.
+$ SPECKIT_CONTRACT_ROOT=<scratch mutant> /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line
+5 passed in 0.05s   <-- the guard stays GREEN; the leg is not bound
+Scratch mutant deleted after the probe (runtime scratch, not a shipped artifact).
+Root cause (tests/contract/test_sdd_loop_driver_reanchor.py:142-145):
+    verdicts = "The verdict is exactly one of "
+    assert _flatten(verdicts) in _flatten(audit), (
+        "ordering: the verdict statement is no longer part of part 5"
+    )
+    verdict_at = audit.index(verdicts)
+    q3_at = audit.index("3. Is the next action")
+    assert verdict_at < q3_at or "implicit in it" in audit, (
+
+Two further notes on the same test, both read off the source:
+(a) tests/contract/test_sdd_loop_driver_reanchor.py:115-118 — the first assertion is a tautology:
+    assert not re.search(r"^\s*\d+\. ", audit[:first.start()], flags=re.M), (
+        "leg 2: a numbered item precedes question 1, so question 1 is not the first question"
+    )
+    first_no = "1"
+(b) tests/contract/test_sdd_loop_driver_reanchor.py:142-144 — only 'implicit in it' live-checks the OR, and
+    'verdict_at < q3_at' is already true on the landed text; see F-2's ordering-partner text below.
+        "ordering: the verdict statement is no longer part of part 5"
+    )
+    verdict_at = audit.index(verdicts)
+    q3_at = audit.index("3. Is the next action")
+    assert verdict_at < q3_at or "implicit in it" in audit, (

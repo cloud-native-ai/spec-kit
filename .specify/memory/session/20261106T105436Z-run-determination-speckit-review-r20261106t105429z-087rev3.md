@@ -6,10 +6,10 @@ feature: "087-arch-diagram-docs"
 tags: ["run-determination", "r20261106t105429z-087rev3"]
 title: "run-determination /speckit.review r20261106T105429Z-087rev3"
 created: "2026-11-06T10:54:36Z"
-summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated"
+summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted"
 ---
 
-/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=not_evaluated
+/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elapsed=not_evaluated artifact=ok satisfaction=accepted
 
 ```json
 {
@@ -21,7 +21,7 @@ summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elap
   "feature": "087-arch-diagram-docs",
   "feature_id": "087",
   "determined_at": "2026-11-06T10:54:36Z",
-  "settled_at": null,
+  "settled_at": "2026-11-09T00:33:38Z",
   "complexity": "complex",
   "qualification": "qualified",
   "axes": {
@@ -87,9 +87,9 @@ summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elap
       ]
     },
     "satisfaction": {
-      "verdict": "not_evaluated",
-      "reason": "pending_next_turn",
-      "user_turn_class": "no_user_input",
+      "verdict": "accepted",
+      "reason": null,
+      "user_turn_class": "continuation_non_negative",
       "unresolved_red": {
         "present": "false",
         "source": "none"
@@ -162,18 +162,6 @@ summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elap
         },
         "evidence_refs": [],
         "status": "observed"
-      },
-      {
-        "axis": "satisfaction",
-        "verdict": "not_evaluated",
-        "reason": "pending_next_turn",
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
-        "signal": {
-          "key": "satisfaction",
-          "direction": "improve"
-        },
-        "evidence_refs": [],
-        "status": "observed"
       }
     ]
   },
@@ -188,11 +176,6 @@ summary: "/speckit.review run=r20261106T105429Z-087rev3 token=not_evaluated elap
       },
       {
         "observation": "elapsed not_evaluated via source=unavailable: current=None baseline=None reason=source_unavailable",
-        "parked_via": "none",
-        "ref": null
-      },
-      {
-        "observation": "satisfaction not_evaluated: user_turn_class=no_user_input unresolved_red=false adjacent=False reason=pending_next_turn",
         "parked_via": "none",
         "ref": null
       }

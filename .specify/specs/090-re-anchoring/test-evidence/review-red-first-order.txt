@@ -1,0 +1,48 @@
+# ORDERING RED-FIRST CONTROL — re-run by the review stage — 2026-11-09T00:30:54Z
+# guard-tests.contract.md C-7 asks: with Q1 reworded to ask the goal the new assertion MUST fail; on the
+# landed text it MUST pass. Review re-executes the four arms instead of trusting the implement capture.
+# Mutant copies: .specify/specs/090-re-anchoring/test-evidence/tmp/<arm>/ (tracked as shipped evidence).
+
+## arm 0 — landed tree (SPECKIT_CONTRACT_ROOT unset)
+$ /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+5 passed in 0.05s
+
+## arm m1-goal-first-q1 — mutated copy
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m1-goal-first-q1 /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+1 failed, 4 passed in 0.05s
+
+## arm m2-goal-first-shape — mutated copy
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m2-goal-first-shape /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+1 failed, 4 passed in 0.05s
+
+## arm m3-primary-object-goal — mutated copy
+$ SPECKIT_CONTRACT_ROOT=$PWD/.specify/specs/090-re-anchoring/test-evidence/tmp/m3-primary-object-goal /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=line -rA
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+FAILED tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal
+2 failed, 3 passed in 0.05s

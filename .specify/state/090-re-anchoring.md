@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794194654
 stage_base_commit: 9af8418e
 attempt: 1
 retry_limit: 3
-last_verdict: implement U4 pass (95b7d071 + 9df034a3; ordering test red-first, member closure, zero new vs the 49-name baseline; checkpoint 06 on-track)
+last_verdict: review U4 pass (review.md four segments + ARC; process pass / artifact pass / implementation fail / code pass with one important open; ARC refused; four blocking items recorded at file:line; checkpoint 07 on-track)
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch review (four segments + ARC); then closure-acceptance-check and the local merge
+next_action: review closed with blocking items -> driver decides repair-vs-close; ARC refused, feature stays Planned; closure-acceptance-check and the local merge remain gated on F-1
 direction_contract: |
   goal_verbatim: "将『开局加载一次』的动作，变成『每执行完一个核心步骤就再加载一次』，使用 session compact + reload + evaluation 来明确和最开始的方向是否存在偏差；在核心概念中针对 agent 加入『不忘初心：一直记得最开始的任务和规则』和『温故而知新：通过不断复习来强化记忆和回顾目标』"（后续纠正：回顾的重点是规则而不是目标——目标由当前/下一步隐含，被丢弃的是规则）。
   non_goals: [每工具调用重载全文, 新增评分器/日志服务/调度器, 第二个 checkpoint 系统, 改写历史记录, 改动 sdd-loop-driver 的阶段序列与哨兵]
@@ -48,6 +48,7 @@ project_config:
 gates: |
   requirements U4: pre-analyze --stage requirements decision=pass (errors=0); decomposition-check --mode plan proceed (fr=10)
   clarify U4: overlap-check decision=clear; checkpoint 01 written
+  review U4: four segments + ARC written (review.md 348 lines); ARC verdict=block, final_path pass=0/unknown=4; checkpoint 07 written
 wrapup: pending
 framework_observations:
   - "The 090 line's implementation was pre-landed while the spec chain had not run; the driver must verify the chain against an already-written tree, so every stage's U4 compares the artifact to the landed state rather than creating it."
