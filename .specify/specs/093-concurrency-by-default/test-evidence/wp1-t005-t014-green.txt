@@ -1,0 +1,58 @@
+# WP1 green readings after the eight facts landed — 2026-11-09T10:51:29Z
+
+## T005 — registration surface
+$ python3 .specify/scripts/python/declaration_reader.py --action list --repo . | python3 -c "import json,sys; d=json.load(sys.stdin); print(\"contract keys:\", len(d[\"contract\"])); print(\"facts:\", len(d[\"facts\"])); print(\"slugs:\", sorted(f[\"body\"].get(\"fact\") for f in d[\"facts\"]))"
+contract keys: 17
+facts: 32
+slugs: ['arc-verdict-mapping', 'concurrency-class', 'concurrency-contract', 'concurrency-slot-and-reserve', 'coordinator-dispatch-verdict', 'decomposition-coverage', 'driver-completion-sentinels', 'driver-gate-roster', 'driver-stage-artifacts', 'driver-stage-sequence', 'effective-concurrency', 'evidence-lanes', 'evidence-seven-states', 'executor-enumeration-roots', 'expression-gate-faces', 'expression-stage-operator-table', 'feedback-prompt-threshold', 'flow-class-basis', 'flow-class-classes', 'flow-class-document-types', 'flow-class-ledger-columns', 'flow-class-neutral-categories', 'history-manifest-schema', 'memory-retention-thresholds', 'memory-types', 'non-disposable-review-surface', 'probe-class-values', 'probe-object-binding-map', 'quant-record-schema', 'serial-reason', 'success-criterion-path-values', 'trigger-state-schema']
+exit=0
+
+## T014 — all eight resolve through the read entry
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-class --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+concurrency-class | mapping
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact serial-reason --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+serial-reason | ordered-operator-table
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact effective-concurrency --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+effective-concurrency | record-schema
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-slot-and-reserve --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+concurrency-slot-and-reserve | threshold
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact decomposition-coverage --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+decomposition-coverage | mapping
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact executor-enumeration-roots --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+executor-enumeration-roots | mapping
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-contract --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+concurrency-contract | mapping
+exit=0
+$ python3 .specify/scripts/python/declaration_reader.py --action get --fact coordinator-dispatch-verdict --repo . | python3 -c "import json,sys; b=json.load(sys.stdin)['body']; print(b['fact'], '|', b['kind'])"
+coordinator-dispatch-verdict | mapping
+exit=0
+
+## T014 — schema judgement over the whole layer (exit 0 or 1 is a disposition reading; 2 would mean the layer is unreadable)
+$ python3 scripts/python/harness-triple-check.py --action coverage --repo .
+# harness-triple-check — coverage
+candidates: 86
+pending: 0
+unclassified: 0
+findings: 0
+unit: shared/workflow/acceptance-hardening.md
+disposition: in-scope
+state: complete
+fact: success-criterion-path-values
+unit: shared/workflow/evidence-step.md
+disposition: in-scope
+state: complete
+fact: evidence-lanes
+unit: shared/workflow/expression-gates.md
+disposition: in-scope
+state: complete
+fact: expression-gate-faces
+fact: expression-stage-operator-table
+unit: shared/workflow/external-dispatch-recipes.md
+disposition: excluded
+exit=0

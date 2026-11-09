@@ -1,0 +1,13 @@
+# T006 — contract coverage baseline freeze — 2026-11-09T10:54:07Z
+$ python3 scripts/python/account-clause-coverage.py .specify/specs/093-concurrency-by-default --freeze > .specify/specs/093-concurrency-by-default/coverage-baseline.txt
+exit=0
+
+$ grep -c "^- \*\*C-[0-9][0-9][0-9]\*\*" <the five clause-bearing contract files>
+declaration-facts=18 judgement-engine=22 executor-obligations=22 high-order-executors=18 existing-semantics-disposal=14  total=94
+
+$ wc -l .specify/specs/093-concurrency-by-default/coverage-baseline.txt
+601
+
+first two lines of the frozen document:
+# coverage-baseline: frozen UNCOVERED clause names, codepoint-sorted, one per line; compare with `LC_ALL=C comm -13 <this file> <live uncovered>` — the LC_ALL=C is load-bearing: glibc collation ignores # / and . at the first level, so under a UTF-8 locale these header lines sort AFTER the names, comm reports 'file 1 is not in sorted order' and then echoes all of file 2 as the delta
+# frozen-from: .specify/specs/*/contracts/* excluding 093-concurrency-by-default | owner-forms: md-bold-closed,md-bold-paren,md-heading,yaml-openapi,yaml-assertions,md-none (md-none named, never silently covered) | clause-rules: shared/definitions/contract-clause-definitions.md | per-form counts: notes/clause-form-census.md | base-sha: 16561f2ad654 | files: 313 (parsed 198 + named 115)

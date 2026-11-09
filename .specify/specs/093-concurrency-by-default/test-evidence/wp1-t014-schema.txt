@@ -1,0 +1,13 @@
+# T014 — fact-vs-schema validation (required keys, kind membership, slug==stem, reader resolution) — 2026-11-09T10:54:38Z
+$ python3 - ... (read-only: loads contract.yaml and the eight facts through declaration_reader)
+PASS concurrency-class                kind=mapping                missing=none unknown=none stem==fact==slug=True
+PASS serial-reason                    kind=ordered-operator-table missing=none unknown=none stem==fact==slug=True
+PASS effective-concurrency            kind=record-schema          missing=none unknown=none stem==fact==slug=True
+PASS concurrency-slot-and-reserve     kind=threshold              missing=none unknown=none stem==fact==slug=True
+PASS decomposition-coverage           kind=mapping                missing=none unknown=none stem==fact==slug=True
+PASS executor-enumeration-roots       kind=mapping                missing=none unknown=none stem==fact==slug=True
+PASS concurrency-contract             kind=mapping                missing=none unknown=none stem==fact==slug=True
+PASS coordinator-dispatch-verdict     kind=mapping                missing=none unknown=none stem==fact==slug=True
+
+all eight valid: True
+exit=0
