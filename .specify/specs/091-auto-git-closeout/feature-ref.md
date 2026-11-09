@@ -2,14 +2,14 @@
 
 **Feature ID**: 091 | **Feature Name**: Automatic git Close-out（自动收口）
 **Requirement key**: `091-auto-git-closeout` | **Branch**: `091-auto-git-closeout`
-**Status at this stage**: `Draft → Clarified` | **Date**: 2026-11-09
+**Status at this stage**: `Draft → Clarified → Planned` | **Date**: 2026-11-09
 
 ## Binding
 
 | Item | Value |
 |------|-------|
 | Spec directory | the spec directory of requirement key 091-auto-git-closeout |
-| Stage status so far | requirements done (27 FR / 7 SC) → clarify done (28 FR / 8 SC; this file added) |
+| Stage status so far | requirements done (27 FR / 7 SC) → clarify done (28 FR / 8 SC) → plan done (this file refined) |
 | Flow class | `execution` (`**Flow Class**` line in the requirements file) |
 | Policy owner | the workflow state file's managed block (git-utils scope A) |
 | Lifecycle owner | the canonical artifact-commit step |
@@ -28,6 +28,11 @@ reads, cites or preserves is not a deliverable. Paths are written as bare backti
 because that is what the checker reads — so a read-only document is named without a path-shaped
 token, and does not turn into a phantom collision.
 
+**Plan refinement (2026-11-09).** The inventory below is the plan's version of the same list. Two
+rows moved: the git skill's command surface is now a **new sibling reference** rather than an
+addition to the existing three-tier reference (`research.md` R4), and the instructions template
+row is **contingent** on implement finding the existing line insufficient (`research.md` R10).
+
 ## Delivered paths (inventory, refined at plan)
 
 | # | Path | Kind | FR |
@@ -35,13 +40,13 @@ token, and does not turn into a phantom collision.
 | 1 | `.specify/workflow/git.md` | edit — two declaration rows inside the managed block (this project's own runtime state: it carries an instance, not the shipped template) | FR-001, FR-002 |
 | 2 | `skills/external/git-utils/assets/git-workflow-block.md` | edit — the shipped block template gains both rows in placeholder form | FR-004 |
 | 3 | `skills/external/git-utils/SKILL.md` | edit — scope A gains the named `closeout` operation and its three-input positioning | FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016 |
-| 4 | `skills/external/git-utils/references/execute-commands.md` | edit — the close-out command surface's home; whether it extends this reference or adds a sibling is a plan decision | FR-010, FR-011 |
+| 4 | the new sibling close-out reference under `skills/external/git-utils/references/` | **NEW sibling reference** — the close-out command surface's home (plan decision, `research.md` R4); the existing three-tier reference only gains a one-line pointer | FR-010, FR-011 |
 | 5 | `shared/workflow/artifact-commit-step.md` | edit — the close-out step, its records-commit semantics, three forks, and the revised push boundary | FR-005, FR-006, FR-007, FR-008 |
 | 6 | `shared/definitions/probe-definitions.md` | edit — one wrap-up handler row (or one handler plus bindings) expressing the close-out step; the faces are then compiled, never hand-written | FR-021 |
-| 7 | `shared/workflow/external-dispatch-recipes.md` | edit, **contingent** — only if the dispatcher's wrap-up copy restates a step order the new step makes stale (measured at plan) | FR-020 |
-| 8 | `templates/instructions-template.md` | edit — at most one pointer line in the Git Workflow section, and only if plan finds the existing line insufficient | FR-022 |
-| 9 | `tests/contract/` | NEW contract tests: the two declarations and their value domain, the four model sequences, the pointer existence, the absence of a second branch table, and the closed-set claim of SC-004 | FR-023, FR-024, FR-027, SC-008 |
-| 10 | the git-closeout fixture root (a directory under the tests fixtures tree, named at plan) | NEW — one fixture repo plus a fake remote per workflow model (the fixture root is a plan decision) | FR-024, FR-025 |
+| 7 | `shared/workflow/external-dispatch-recipes.md` | edit, **contingent** — measured at plan: the dispatcher copies the *wording* of three discipline defaults (see its stage-prompt skeleton), not a numbered wrap-up sequence, so no edit is expected; implement edits it only if the new step makes the copied default stale | FR-020 |
+| 8 | `templates/instructions-template.md` | edit, **contingent — default is no edit** — measured at plan: its Git Workflow section already names close-out and is byte-identical to the live instructions section, so at most one pointer line is added, and only if implement finds a reader cannot reach the step from it | FR-022 |
+| 9 | the contract test tree's `test_git_closeout_contract.py` (a new module in the repository's existing contract test suite) | **NEW** guard module: the two declarations and their value domain, the four model sequences, the pointer duties, the absence of a second branch table, and the SC-004 / SC-008 closed-set claims | FR-023, FR-024, FR-027, SC-008 |
+| 10 | the `git-closeout` fixture directory (a new sibling under the repository's existing test-fixture tree, mirroring how sibling features keep one fixture directory each) | **NEW** — one fixture repo + one local bare remote per workflow model, built under a sanctioned temp root and torn down per test | FR-024, FR-025 |
 | 11 | the compiled wrap-up faces of every artifact-producing command and skill | **generated**, not authored — the probe engine's `compile-embeds` output, reached through row 6 | FR-021 |
 
 Every path above reaches the runtime tree through the framework's own sync entries (mirror and
@@ -79,6 +84,72 @@ not by a path token, so the checker sees no claim:
 | consumes | the record-retention engine reached through the sanitize skill | the record-consumption lifecycle the close-out receipt feeds (C-10a) |
 | preserves | the fast-fail owner (dispatch-time injection clause) | referenced only |
 
+## Plan refinement — FR → contract map
+
+Every functional requirement is discharged by a named clause; a clause column empty for an FR would mean an
+unplanned requirement.
+
+| FR | Discharging clause(s) |
+|----|-----------------------|
+| FR-001 | `closeout-declaration.contract.md` C-1, C-3 |
+| FR-002 | C-1, C-4, C-7; `closeout-executor.contract.md` C-7 |
+| FR-003 | `closeout-declaration.contract.md` C-2, C-6 |
+| FR-004 | C-1 (both surfaces: the shipped asset and this project's instance) |
+| FR-005 | `closeout-lifecycle.contract.md` C-1 |
+| FR-006 | C-2, C-3 |
+| FR-007 | C-4, C-5 |
+| FR-008 | C-7 |
+| FR-009 | `closeout-executor.contract.md` C-1, C-2 |
+| FR-010 | C-3 |
+| FR-011 | C-5 |
+| FR-012 | C-4, C-5; `closeout-lifecycle.contract.md` C-6 |
+| FR-013 | `closeout-declaration.contract.md` C-4; `closeout-executor.contract.md` C-7 |
+| FR-014 | `closeout-lifecycle.contract.md` C-5; `closeout-executor.contract.md` C-6 |
+| FR-015 | `closeout-executor.contract.md` C-4 |
+| FR-016 | C-2; `closeout-declaration.contract.md` C-5 |
+| FR-017 | `closeout-declaration.contract.md` C-7; `closeout-lifecycle.contract.md` C-6 |
+| FR-018 | `closeout-declaration.contract.md` C-7; `closeout-lifecycle.contract.md` C-6 (both reference the owner, neither restates it) |
+| FR-019 | `closeout-declaration.contract.md` C-3 |
+| FR-020 | `closeout-lifecycle.contract.md` C-1, C-6 (the shared step the unattended mechanisms call); delivery row 7 carries the contingent pointer fix |
+| FR-021 | `closeout-lifecycle.contract.md` C-1 + delivery row 6 (registry row) and row 11 (compiled faces, generated) |
+| FR-022 | delivery row 8 (contingent pointer, default no edit) |
+| FR-023 | `closeout-verification.contract.md` C-1, C-2 |
+| FR-024 | C-2, C-3 |
+| FR-025 | C-5 |
+| FR-026 | C-4 |
+| FR-027 | `closeout-executor.contract.md` C-1 (no second skill/engine) + the SC-004 negative structural assertion in C-4 |
+| FR-028 | `closeout-lifecycle.contract.md` C-3 |
+
+## Plan refinement — SC → measurement map
+
+| SC | Measurement | Carrier |
+|----|-------------|---------|
+| SC-001 | four fixture repositories, end-state assertions (branches, HEAD, remote contents) | `closeout-verification.contract.md` C-2 |
+| SC-002 | declaration rows + value domain read from both surfaces; illegal value / deleted row mutations | `closeout-declaration.contract.md` C-1, C-3; verification C-1 |
+| SC-003 | two failure fixtures (push rejected, merge conflict) + an injected-retry mutation | verification C-3 |
+| SC-004 | confirmation-gate scan compared against a same-run baseline **by name**, plus "no surface copies the list" | verification C-4 |
+| SC-005 | pointer existence from each unattended mechanism, plus a negative search for a second close-out implementation | `closeout-lifecycle.contract.md` C-1; verification C-1 |
+| SC-006 | the dry-run record on this repository (no push, no remote change) | verification C-5; `quickstart.md` S-7 |
+| SC-007 | the two wrap-up forks asserted separately (skip-with-one-line; records-free merge+push tells the truth) | `closeout-lifecycle.contract.md` C-5 |
+| SC-008 | the three named elements inside the SC-004 test, plus two mutation arms | verification C-4 |
+
+## Plan refinement — disclosed rulings
+
+Three rulings were made while planning and are recorded so a later stage does not re-derive them.
+
+- **Ruling P-1 — the command surface gets a sibling reference, not a taller one.** The close-out sequences do not
+  belong to the page about three-tier operations. `research.md` R4 records the measurement that makes the split the
+  mechanism fix rather than a stylistic choice. Delivery row 4 changed shape accordingly.
+- **Ruling P-2 — the instructions template defaults to no edit.** The `## Git Workflow` section already names
+  close-out and is byte-identical between the shipped template and this project's live instructions (`research.md`
+  R10). Row 8 stays contingent.
+- **Ruling P-3 — an existing equality pin on the confirmation-gate total is not re-asserted.** Measured:
+  `tests/contract/test_wrap_up_wording_gate_safe.py` asserts the total equals a literal and calls it the owner fact.
+  This feature's guards compare **sets by name** against a same-run baseline and introduce no second constant; if a
+  later change moves the total, that pin's owner re-rules first (`research.md` R7 / plan finding F-2).
+
+  This is a `tasks`-visible constraint, not a licence: the guard module MUST NOT be written as `assert total == 27`.
+
 ## Adjacency
 
 - **Within the framework's hot trees**: rows 2–4 land in the git skill; 089 touched that skill
@@ -103,11 +174,15 @@ not by a path token, so the checker sees no claim:
   only, no ownership conflict.
 - **Re-measure before the first write**: implement must re-run the overlap check rather than
   inherit this reading, because four declared trees are the framework's hot spots.
+- **Plan-stage re-measure (2026-11-09)**: the check was re-run after this file's refinement and returned the same
+  reading (`checked=82`, `overlaps=36`, all against completed lines, zero active); evidence
+  `test-evidence/overlap-check-plan.json` and `test-evidence/plan-gates.txt` § 3.
 
 ## Stage status
 
 | Stage | State | Artifact |
 |-------|-------|----------|
 | requirements | done | requirements file |
-| clarify | **this stage** — 16 adjudications (C-1…C-16), FR 28 / SC 8, 3 edge cases, 9 assumptions added; the overlap check run before **and** after this file | requirements Clarifications, this file |
-| plan / tasks / checklist / analyze / implement / review | not started | — |
+| clarify | done — 16 adjudications (C-1…C-16), FR 28 / SC 8, 3 edge cases, 9 assumptions added; the overlap check run before **and** after this file | requirements Clarifications, this file |
+| plan | **this stage** — research (R1…R12), data model (6 entities / 14 rules), 4 contract pages (26 clauses), 8 quickstart scenarios, 5 decision-tension records, 7 execution premises; delivery surface refined (rows 4, 8, 9, 10) | plan.md, research.md, data-model.md, contracts/, quickstart.md, this file |
+| tasks / checklist / analyze / implement / review | not started | — |

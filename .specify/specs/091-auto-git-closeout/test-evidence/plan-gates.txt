@@ -1,0 +1,99 @@
+# Plan-stage gate readings — 091-auto-git-closeout
+# captured: 2026-11-09T02:40Z (UTC)
+
+## 0. Environment
+
+$ git --version
+git version 2.43.5
+$ python -m pytest --version
+pytest 8.4.2
+$ python -V
+Python 3.11.0rc1
+$ grep -n requires-python pyproject.toml
+5:requires-python = ">=3.8"
+
+## 1. Inputs re-measured before writing (pre-plan baseline)
+
+$ python .specify/scripts/python/validate-requirements.py .specify/specs/091-auto-git-closeout/requirements.md
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 306 lines, 36 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --spec-dir .specify/specs/091-auto-git-closeout --stage requirements --repo .
+pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+{"stage": "requirements", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 28, "sc": 8, "tasks": 0, "clauses": 0, "files": 2}, "checked_at": "2026-11-09T02:40:17Z"}
+
+$ git --version
+git version 2.43.5
+$ python -m pytest --version
+pytest 8.4.2
+$ grep -n requires-python pyproject.toml
+5:requires-python = ">=3.8"
+
+
+baseline scan-confirmation-gates:
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+
+## 2. Decomposition gate (plan mode)
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/091-auto-git-closeout/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T02:40:20Z"}
+
+## 3. Overlap re-measure (contracts/ read as words, not path tokens)
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py --spec-dir .specify/specs/091-auto-git-closeout --repo .
+
+
+readout: decision=overlap checked=82 overlaps=36 — identical to the clarify-stage reading (C-16): 7 declared paths, all against completed lines, 0 against an active line.
+
+## 4. Targeted-set-v1 baseline for the modules this plan's test clauses touch
+
+$ python -m pytest tests/contract/test_git_workflow_instructions_block.py tests/contract/test_wrap_up_wording_gate_safe.py tests/contract/test_mirror_parity_suite.py -q
+...........................................                              [100%]
+835 passed in 1.23s
+
+## 5. Final gate pass (after feature-ref refinement, feature index registration, Phase 1 artifacts frozen)
+
+captured: 2026-11-09T02:46Z–02:47Z
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py --stage plan --spec-dir .specify/specs/091-auto-git-closeout --repo .
+pre-analyze-check: stage=plan decision=pass errors=0 advisories=0 waived=0
+{"stage": "plan", "decision": "pass", "findings": [], "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 28, "sc": 8, "tasks": 0, "clauses": 0, "files": 10}, "checked_at": "2026-11-09T02:46:52Z"}
+
+$ python3 .specify/scripts/python/validate-decision-tensions.py --spec .specify/specs/091-auto-git-closeout
+scanned: 321 lines, 5 record(s)
+channel: value_domain=HIGH-or-0, high=0
+0 error(s), 0 warning(s)
+(json retained at test-evidence/decision-tensions-plan.json)
+
+$ python3 .specify/scripts/python/validate-requirements.py .specify/specs/091-auto-git-closeout/requirements.md
+scanned: 306 lines, 36 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/decomposition-check.py --mode plan --requirements .specify/specs/091-auto-git-closeout/requirements.md
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 28, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T02:47:12Z"}
+
+$ python3 .specify/skills/sdd-loop-driver/scripts/overlap-check.py --repo . --spec-dir .specify/specs/091-auto-git-closeout --json-out .specify/specs/091-auto-git-closeout/test-evidence/overlap-check-plan.json
+overlap-check: current=091-auto-git-closeout checked=82 overlaps=36 decision=overlap
+readout: unchanged from § 3 — 36 overlaps all land on completed spec lines; zero land on an active line.
+         Note: the run reports `templates/instructions-template.md` among the current paths because the delivery
+         row is declared contingent; if implement finds no edit is needed, that row produces no diff.
+
+## 6. Plan integrity checks (structural)
+
+$ grep -c '^# Implementation Plan:' .specify/specs/091-auto-git-closeout/plan.md
+1
+$ grep -c '\*\*Requirement → Feature\*\*' .specify/specs/091-auto-git-closeout/plan.md
+1
+$ grep -cE '\[[A-Z][A-Z0-9_]{2,}\]' .specify/specs/091-auto-git-closeout/plan.md .specify/specs/091-auto-git-closeout/{research.md,data-model.md,quickstart.md,feature-ref.md} .specify/specs/091-auto-git-closeout/contracts/*.md
+(0 residual UPPER_SNAKE_CASE placeholder tokens — empty output)
