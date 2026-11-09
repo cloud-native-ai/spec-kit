@@ -37,4 +37,4 @@ Non-blocking review findings (review P1/P2 and code P1/P2) are recorded as dated
 - `.specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md` lifecycle_state archived; the spec-local temporary team is run-scoped.
 
 ## 7. Published refs
-- Post-merge verification pending: `gitlab/master`, `github/master`, `gitee/master` must equal local `master` after the push; `origin` remains read-only.
+- Verified (2026-11-09): local `master` at **4420076c**; `gitlab/master`, `github/master` and `gitee/master` all equal **4420076c**; `origin` untouched (read-only); the `091-auto-git-closeout` feature branch deleted after the fast-forward merge. The later 092 commits are a separate local line on the same trunk, not part of 091.
