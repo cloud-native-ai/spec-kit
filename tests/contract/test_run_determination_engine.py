@@ -310,7 +310,7 @@ class TestEngineSurface:
 
     @pytest.mark.parametrize("unit_id,expected", [
         ("/speckit.plan", "command"),
-        ("skill:study-project", "skill"),
+        ("skill:study-code", "skill"),
         ("custom:team/reviewer", "custom-unit"),
     ])
     def test_unit_type_derived_from_unit_id(self, eng, unit_id, expected):
@@ -996,7 +996,7 @@ class TestSettlement:
 
     def test_settle_without_run_id_picks_the_latest_unsettled(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, unit_id="/speckit.plan", run_id="run-a"), capsys)
-        run_cli(eng, determine_args(ws, unit_id="skill:study-project", run_id="run-b"), capsys)
+        run_cli(eng, determine_args(ws, unit_id="skill:study-code", run_id="run-b"), capsys)
         rc, _, _ = run_cli(eng, settle_args(ws, turn_class="session_end"), capsys)
         assert rc == 0
         assert record_of(ws, "run-a")["settled_at"] is not None
@@ -1563,7 +1563,7 @@ class TestLaneProjections:
 
     def test_history_ignores_other_units(self, eng, ws, capsys):
         run_cli(eng, determine_args(ws, unit_id="/speckit.plan", run_id="run-a"), capsys)
-        run_cli(eng, determine_args(ws, unit_id="skill:study-project", run_id="run-b"), capsys)
+        run_cli(eng, determine_args(ws, unit_id="skill:study-code", run_id="run-b"), capsys)
         rc, payload, _ = run_cli(eng, history_args(ws), capsys)
         assert rc == 0
         assert [r["run_id"] for r in payload["records"]] == ["run-a"]

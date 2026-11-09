@@ -139,7 +139,7 @@ def test_internal_roster_is_populated_and_scoped():
         "create-team",
         "memory-record",
         "self-improvement",
-        "study-project",
+        "manage-agents",
     ):
         assert name in _FRAMEWORK_INTERNAL_SKILLS
     # External framework names and user-authored names must NEVER be listed

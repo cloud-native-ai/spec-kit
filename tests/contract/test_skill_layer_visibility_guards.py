@@ -49,11 +49,14 @@ RUNTIME_SKILLS = ROOT / ".specify" / "skills"
 # census that stopped tracking them would let the guard go green over an empty subtree.
 # 2026-11-05 (improve-skills ssh-utils): +1 external unit — `ssh-utils`, the SSH transport
 # owner extracted from `sdd-project-setup`; the external roster and flat count 15 -> 16 move.
+# 2026-11-09 (user rename): the `humanize` unit is renamed in place to
+# `humanize-conclusion`; the census stays 17 external / 37 internal and only the
+# literal moves (the flat count assertion is unchanged for the same reason).
 EXTERNAL_SKILLS = {
     "create-docs", "improve-docs", "create-skills", "improve-skills", "create-pages",
     "database-utils", "document-utils", "draw-diagram", "merge-skills",
     "coaching-skills", "git-utils", "sdd-house-keeping", "sdd-loop-driver",
-    "sdd-project-setup", "ssh-utils", "humanize",
+    "sdd-project-setup", "ssh-utils", "humanize-conclusion", "study-code",
 }
 INTERNAL_SKILLS = {
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -65,7 +68,7 @@ INTERNAL_SKILLS = {
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
     "sanitize-materials",
-    "self-improvement", "study-project", "summarize-project",
+    "self-improvement", "summarize-project",
 }
 
 
@@ -102,16 +105,16 @@ def internal_resolution_gaps(
 def test_flat_discovery_surfaces_external_layer_only():
     seen, offenders = flat_discovery_offenders(RUNTIME_SKILLS, EXTERNAL_SKILLS)
     # Sentinels: the face is non-empty and the exclusion is meaningful.
-    assert len(seen) == 16, (
-        f"flat discovery saw {len(seen)} skills, expected exactly the 16 external "
+    assert len(seen) == 17, (
+        f"flat discovery saw {len(seen)} skills, expected exactly the 17 external "
         f"ones — a count both proves non-vacuity and pins the split: {seen}"
     )
     internal_dir = RUNTIME_SKILLS / "internal"
     assert internal_dir.is_dir(), "internal/ subtree missing — guard 1's exclusion is vacuous"
     internal_nested = [d for d in internal_dir.iterdir() if (d / "SKILL.md").is_file()]
-    # 35 既有 + 057 run-skills/run-team = 37，+ 081c review-feature-quality = 38（同任务更新计数契约）
-    assert len(internal_nested) == 38, (
-        f"internal subtree carries {len(internal_nested)} skills, expected 38 — "
+    # 2026-11-09：study-project 重构为 external 的 study-code，内部 38 -> 37（同任务更新计数契约）
+    assert len(internal_nested) == 37, (
+        f"internal subtree carries {len(internal_nested)} skills, expected 37 — "
         f"guard 1 only proves something when internal skills actually exist"
     )
     assert offenders == [], f"flat discovery leaked non-external skills: {offenders}"

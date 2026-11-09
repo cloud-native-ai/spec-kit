@@ -64,7 +64,7 @@
 - 需求清晰度、事实一致性、评审三面 MUST 各至少一个 `blocking` 算子。
 - 读者声明缺失 MUST 阻断：`reader-declaration-missing` 是 blocking，不是 warning。
 - 不得把既有 P0/P1 判定降为 advisory；不得把表达类读作更宽松的通道。本门禁集只决定「用哪套算子证明同一不变量」，不新增、不放宽判定阈值。
-- `skill:humanize` 调用点只执行 062 域最小算子集（见 § 调用点表），它不继承六面的阻断底线；那是另一条调用点行，六面表的行集合不适用于该行，也不因该行降低六面的阻断级别。
+- `skill:humanize-conclusion` 调用点只执行 062 域最小算子集（见 § 调用点表），它不继承六面的阻断底线；那是另一条调用点行，六面表的行集合不适用于该行，也不因该行降低六面的阻断级别。
 
 ## 读者声明
 
@@ -146,7 +146,7 @@
 | `/speckit.docs`（W1） | `## Outline` 内、目标声明协调与分派之前 | `flow-class-check.py --action lookup --unit-id "/speckit.docs"` | 六面全集：`requirements-clarity`（需求清晰度）· `reader-purpose`（读者/目的/边界）· `evidence-asof`（证据分级与 as-of）· `structure-links-build`（结构/链接/构建）· `fact-consistency`（事实一致性）· `review`（评审）；其中读者、证据与事实三面由 `doc-consistency-check.py --action verify` 执行，计数面委派 `pre-analyze-check.py` | 每面 ≥ 1 blocking |
 | `skill:create-docs`（W3） | Reconcile Loop 的 R6 verify 与 Authoring Flow 的 R6 验证（两处） | 沿用调用方已解析结果；无调用方（standalone）时不新读 | 读者/目的 + 证据/as-of + 事实一致性 → `doc-consistency-check.py --action verify`（对受触文档）；结构/链接/构建 → `docs-utils.py --action validate` | blocking：发现即报告并阻止「收敛完成」结论 |
 | `/speckit.humanize`（W2） | `## Outline` 内、委派技能之前 | 不读取（只给 owner 指针） | 无（模板不执行算子） | 不适用（本行只声明指针与归口） |
-| `skill:humanize`（W4） | Stage 6 保真自检之前（读取一次）→ Stage 6 + Stage 7 | `flow-class-check.py --action lookup --unit-id "/speckit.humanize"`（该流程唯一的类别读取） | 062 域最小集，不按六面登记：`062-stage6-fidelity` · `062-stage6-entailment` · `062-stage5-audience-report` · `062-reviewer-report` | `062-stage6-fidelity` 与 `062-stage6-entailment` blocking；其余为 062 既有报告义务 |
+| `skill:humanize-conclusion`（W4） | Stage 6 保真自检之前（读取一次）→ Stage 6 + Stage 7 | `flow-class-check.py --action lookup --unit-id "/speckit.humanize"`（该流程唯一的类别读取） | 062 域最小集，不按六面登记：`062-stage6-fidelity` · `062-stage6-entailment` · `062-stage5-audience-report` · `062-reviewer-report` | `062-stage6-fidelity` 与 `062-stage6-entailment` blocking；其余为 062 既有报告义务 |
 
 ### 特性线阶段命令（`spec:` 键）
 

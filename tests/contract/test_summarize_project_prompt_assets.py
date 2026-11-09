@@ -34,10 +34,10 @@ visual charts — "summarize" is the accurate name. Covers:
 - Canonical ## Feedback block with unit-id skill:summarize-project
 
 Also absorbs the former test_study_project_uml_assets.py (same spec 030,
-Feature 013): the study-project UML-enhancement prompt assets share the
+Feature 013): the study-code UML-enhancement prompt assets share the
 mirror-parity / frontmatter / draw-diagram-delegation propositions with
 summarize-project, so both skills' prompt assets are pinned in one file. The
-study-project section is delimited below.
+study-code section is delimited below.
 """
 import json
 
@@ -62,12 +62,12 @@ VALIDATE_SCRIPT = SKILL_DIR / "scripts" / "validate-project-input.py"
 FORM_TEMPLATE = SKILL_DIR / "templates" / "project-input.template.yaml"
 MIRROR_DIR = ROOT / ".specify" / "skills" / "internal" / "summarize-project"
 
-# --- study-project UML enhancement (spec 030, Feature 013) -------------------
-STUDY_SKILL_DIR = ROOT / "skills" / "internal" / "study-project"
+# --- study-code UML enhancement (spec 030, Feature 013) -------------------
+STUDY_SKILL_DIR = ROOT / "skills" / "external" / "study-code"
 STUDY_SKILL_FILE = STUDY_SKILL_DIR / "SKILL.md"
 STUDY_GUIDE_FILE = STUDY_SKILL_DIR / "references" / "uml-visualization-guide.md"
-STUDY_MIRROR_DIR = ROOT / ".specify" / "skills" / "internal" / "study-project"
-BASELINE_FILE = ROOT / "tests" / "fixtures" / "study_project_baseline.json"
+STUDY_MIRROR_DIR = ROOT / ".specify" / "skills" / "study-code"
+BASELINE_FILE = ROOT / "tests" / "fixtures" / "study_code_baseline.json"
 
 UML_TRIGGERS = ["UML", "component diagram", "deployment diagram", "sequence diagram"]
 
@@ -164,7 +164,7 @@ def test_manage_project_in_obsolete_cleanup_manifest():
 @pytest.mark.parametrize(
     "canonical,mirror",
     [(SKILL_DIR, MIRROR_DIR), (STUDY_SKILL_DIR, STUDY_MIRROR_DIR)],
-    ids=["summarize-project", "study-project"],
+    ids=["summarize-project", "study-code"],
 )
 def test_mirror_is_byte_equivalent(canonical, mirror):
     # Tree file-set equality is the assertion beyond per-file byte identity (the
@@ -558,7 +558,7 @@ def test_canonical_feedback_block():
 
 
 # ===========================================================================
-# study-project UML enhancement prompt assets (spec 030, Feature 013)
+# study-code UML enhancement prompt assets (spec 030, Feature 013)
 #
 # Contracts C-14…C-20 from contracts/visual-reporting-skills.openapi.yaml.
 # Mirror parity is pinned by the parametrized test_mirror_is_byte_equivalent
@@ -587,7 +587,7 @@ def _section(text: str, heading: str) -> str:
 
 def test_study_frontmatter_name_preserved():
     fm = read_frontmatter(STUDY_SKILL_FILE)
-    assert fm.get("name") == "study-project", f"got name={fm.get('name')}"
+    assert fm.get("name") == "study-code", f"got name={fm.get('name')}"
 
 
 def test_study_frontmatter_description_has_uml_triggers():
@@ -598,7 +598,7 @@ def test_study_frontmatter_description_has_uml_triggers():
 
 
 def test_study_phase5_plans_uml_figures_for_primary_views():
-    body = _section(text_of(STUDY_SKILL_FILE), "### Phase 5: Dynamic Report Structure Design")
+    body = _section(text_of(STUDY_SKILL_FILE), "## Step 5 — report（可索引报告）")
     assert "UML" in body, "Phase 5 must plan UML figures"
     assert "primary" in body.lower() or "主视图" in body, "Phase 5 must reference primary views"
 
@@ -606,7 +606,7 @@ def test_study_phase5_plans_uml_figures_for_primary_views():
 def test_study_phase8_embeds_rendered_figures():
     body = _section(
         text_of(STUDY_SKILL_FILE),
-        "### Phase 8: Multi-Source Fusion & Final Report (Main Agent)",
+        "## Output Requirements",
     )
     assert "UML" in body or "figure" in body.lower(), "Phase 8 must assemble UML figures"
     assert "png" in body.lower(), "Phase 8 must state PNG embedding"

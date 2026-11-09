@@ -52,8 +52,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 TEMPLATE = REPO_ROOT / "templates" / "commands" / "humanize.md"
-SKILL_SRC = REPO_ROOT / "skills" / "external" / "humanize" / "SKILL.md"
-SKILL_RUNTIME = REPO_ROOT / ".specify" / "skills" / "humanize" / "SKILL.md"
+SKILL_SRC = REPO_ROOT / "skills" / "external" / "humanize-conclusion" / "SKILL.md"
+SKILL_RUNTIME = REPO_ROOT / ".specify" / "skills" / "humanize-conclusion" / "SKILL.md"
 DOCS_PAGE = REPO_ROOT / "docs" / "reference" / "commands" / "humanize.md"
 COPIES = [
     REPO_ROOT / ".claude" / "commands" / "speckit.humanize.md",
@@ -79,7 +79,7 @@ STR_002_VALUES = ("professional", "humorous", "empathetic", "colloquial")
 STR_003_EXTS = (".md", ".markdown", ".txt")
 STR_004_FLAGS = ("--tone", "--audience", "--file", "--inline", "--output", "--force")
 
-DELEGATION_PATH = ".specify/skills/humanize/SKILL.md"
+DELEGATION_PATH = ".specify/skills/humanize-conclusion/SKILL.md"
 SKILL_ID_LITERAL = f'skill_id: "<SKILL:{DELEGATION_PATH}>"'
 
 # Thinness: behavioral-detail keywords a thin entry must never restate
@@ -160,7 +160,7 @@ def test_c03_skill_frontmatter_and_self_sufficient():
     assert SKILL_SRC.is_file(), f"external skill missing: {SKILL_SRC}"
     text = _read(SKILL_SRC)
     fm = _frontmatter(text)
-    assert "name: humanize" in fm, "skill frontmatter lacks name: humanize"
+    assert "name: humanize-conclusion" in fm, "skill frontmatter lacks name: humanize-conclusion"
     assert "classification: external" in fm, "skill frontmatter lacks classification: external"
     assert SKILL_ID_LITERAL in fm, f"skill frontmatter lacks {SKILL_ID_LITERAL}"
     assert "description:" in fm, "skill frontmatter lacks description with trigger words"
@@ -238,8 +238,8 @@ def test_c07_skill_probe_unit_and_compiled_wrapup():
     unit_row = [ln for ln in defs.splitlines()
                 if ln.startswith("| skill-humanize-wrapup ")]
     assert unit_row, "probe-definitions lacks the skill-humanize-wrapup unit row"
-    assert any("skill:humanize" in ln and "wrap-up" in ln for ln in unit_row), (
-        "skill-humanize-wrapup unit row does not bind skill:humanize at wrap-up"
+    assert any("skill:humanize-conclusion" in ln and "wrap-up" in ln for ln in unit_row), (
+        "skill-humanize-wrapup unit row does not bind skill:humanize-conclusion at wrap-up"
     )
     assert any("h-docs-sync-eval" in ln and "skill-humanize-wrapup" in ln
                for ln in defs.splitlines()), (
@@ -316,8 +316,8 @@ def test_c09_baseline_no_new_failures():
         "test_feedback_command_classification must derive humanize as Simple"
     )
     guards_mod = _import_test_module("test_skill_layer_visibility_guards.py")
-    assert "humanize" in guards_mod.EXTERNAL_SKILLS, (
-        "test_skill_layer_visibility_guards EXTERNAL_SKILLS must include humanize"
+    assert "humanize-conclusion" in guards_mod.EXTERNAL_SKILLS, (
+        "test_skill_layer_visibility_guards EXTERNAL_SKILLS must include humanize-conclusion"
     )
 
 
@@ -691,7 +691,7 @@ def test_rp02_metadata_block():
 
 def test_rp03_main_session_writes_report():
     text = _read(REPORT_SHAPE_DOC)
-    for anchor in ("报告由 humanize 主会话撰写", "执行体 MUST NOT 写最终报告", "以执行体身份的自述"):
+    for anchor in ("报告由 humanize-conclusion 主会话撰写", "执行体 MUST NOT 写最终报告", "以执行体身份的自述"):
         assert anchor in text, f"report-shape lacks the authorship anchor {anchor!r} (RP-03)"
 
 
@@ -1145,7 +1145,7 @@ def test_ex20_reservation_released_all_paths():
 
 def test_ex21_dispatch_record_line():
     body = _run_mode_section("## Reservation & Nesting")
-    for anchor in ("`report-shape.md` § Evidence", "只计 humanize 发起的顶层派发"):
+    for anchor in ("`report-shape.md` § Evidence", "只计 humanize-conclusion 发起的顶层派发"):
         assert anchor in body, (
             f"§ Reservation & Nesting lacks the dispatch-count pointer {anchor!r} (EX-21)"
         )
@@ -1165,7 +1165,7 @@ def test_ex21_dispatch_record_line():
 def test_ip11_active_run_rejected():
     body = _run_mode_section("## Reservation & Nesting")
     for anchor in (
-        "`.specify/.tmp/humanize/<run_id>.run`",
+        "`.specify/.tmp/humanize-conclusion/<run_id>.run`",
         "`active-run`",
         "冲突 `run_id`",
         "起始时间",
@@ -1174,7 +1174,7 @@ def test_ip11_active_run_rejected():
         assert anchor in body, (
             f"§ Reservation & Nesting lacks the active-run anchor {anchor!r} (IP-11)"
         )
-    assert _reservation("run-a")["path"].startswith(".specify/.tmp/humanize/"), (
+    assert _reservation("run-a")["path"].startswith(".specify/.tmp/humanize-conclusion/"), (
         "reservation fixture path must model the sanctioned temp root (E4)"
     )
 
@@ -1691,7 +1691,7 @@ def test_wc05_copies_regenerated():
 
 def test_wc06_mirror_in_sync():
     src_root = SKILL_SRC.parent
-    mirror_root = REPO_ROOT / ".specify" / "skills" / "humanize"
+    mirror_root = REPO_ROOT / ".specify" / "skills" / "humanize-conclusion"
     src, mirror = _mirror_tree(src_root), _mirror_tree(mirror_root)
     assert src, f"skill source tree is empty: {src_root}"
     assert set(src) == set(mirror), (
@@ -1938,11 +1938,11 @@ def test_wc19_ledgers_unchanged():
     assert not changed, f"a class/probe registry moved (WC-19): {changed}"
     ledger = _read(REPO_ROOT / "shared" / "definitions" / "flow-class-definitions.md")
     rows = [ln for ln in ledger.splitlines()
-            if ln.startswith("|") and "skill:humanize" in ln]
-    assert rows, "the flow-class ledger lost its skill:humanize row (WC-19)"
+            if ln.startswith("|") and "skill:humanize-conclusion" in ln]
+    assert rows, "the flow-class ledger lost its skill:humanize-conclusion row (WC-19)"
     for row in rows:
         assert "expression" in row and "reader-oracle" in row, (
-            f"skill:humanize left expression/reader-oracle (WC-19): {row}"
+            f"skill:humanize-conclusion left expression/reader-oracle (WC-19): {row}"
         )
     assert not any(ln.startswith("| /speckit.humanize ") for ln in
                    _read(PROBE_DEFS).splitlines()), (

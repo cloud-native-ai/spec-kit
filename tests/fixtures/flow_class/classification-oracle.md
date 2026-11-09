@@ -24,7 +24,7 @@
 | /speckit.analyze | 跨产物一致性分析结论 | 机器面——结论可重跑复算，并作为门禁裁决被消费 | § 判定步骤 · 机器面 | execution | behavior-oracle |  |
 | /speckit.implement | 代码与规格回填 | 两面签字——代码须运行通过（机器面）、规格回填须读者核（读者面）；按边界例「两面都必须签字」取 execution | § 判定步骤 · mixed-oracle | execution | mixed-oracle |  |
 | skill:create-docs | 文档空间结构（`/speckit.docs` 的执行体） | 读者面——同 `/speckit.docs`，结构检查仅必要条件 | § 两个取值 · expression | expression | reader-oracle |  |
-| skill:humanize | 改写后的文本（`/speckit.humanize` 的执行体） | 读者面——同 `/speckit.humanize` | § 两个取值 · expression | expression | reader-oracle |  |
+| skill:humanize-conclusion | 改写后的文本（`/speckit.humanize` 的执行体） | 读者面——同 `/speckit.humanize` | § 两个取值 · expression | expression | reader-oracle |  |
 | skill:git-utils | 平台对象与分支状态 | 机器面——以平台行为与仓库状态判定 | § 判定步骤 · 机器面 | execution | behavior-oracle |  |
 | skill:memory-record | 调用方流程的记忆记录 | 机器面——记录被下游流程消费，本身无独立读者验收面；`category = memory` | § 判定依据 · behavior-oracle；类中立不豁免门禁 | execution | behavior-oracle | yes |
 

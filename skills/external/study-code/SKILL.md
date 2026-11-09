@@ -1,237 +1,86 @@
 ---
-name: study-project
-description: Deep study of the current project as it exists today — what is implemented and why — producing professional architecture reports illustrated with standard UML diagrams (component diagram, deployment diagram, sequence diagram) rendered via draw-diagram. Use when the user mentions "study this project", "explain this project", "analyze project", "analyze repository", "source code analysis", "architecture analysis", "code analysis", "UML图", "UML diagram", "架构图", "component diagram", "deployment diagram", "sequence diagram"
-skill_id: "<SKILL:.specify/skills/internal/study-project/SKILL.md>"
-classification: internal
+name: study-code
+description: 对任意 git 仓库做"减法式"源码研读——先浅拷贝并剥离工程配置、脚手架与测试用例（删除清单保留为技术栈证据），再产出代码清单与文档清单，然后深入核心概念、基本架构、组件构成与核心实现，最后生成一份**可索引**的报告（索引表 + 稳定锚点 + 证据路径），供后续追问时快速反查。Use when the user mentions "study this repo", "study-code", "深读源码", "源码研读", "strip repo", "代码清单", "文档清单", "architecture analysis", "code analysis", "UML", "UML diagram", "component diagram", "deployment diagram", "sequence diagram", "架构分析", "组件构成", "核心实现".
+skill_id: "<SKILL:.specify/skills/study-code/SKILL.md>"
+classification: external
 ---
 
-# Project Deep Analysis Skill
+# study-code — 减法式源码研读
 
-Deep analysis of current project to produce professional architecture reports. Reports are technical research with deep insights — after reading, the audience understands business problems, masters architecture design, and forms their own thinking.
+五步固定流程，逐步落盘，最终交付一份可索引报告。每一步的产物都写到 `$STUDY_DIR`（见 § Workspace），报告写到 `$WORK_DIR/docs/overview.md`。
 
-## Core Principles
+## Workspace & inputs
 
-### First Principle: Business Problem Before Code
+- **目标**：`owner/repo`、GitHub/GitLab/Gitee URL 或本地路径；缺省 = 当前工作区仓库。
+- **`$WORK_DIR`**：原始仓库根（本地路径时即它本身）；**绝不修改原仓库**。
+- **`$STUDY_DIR`**：研读工作区，默认 `$WORK_DIR/../study-code/<repo>-study/`（落盘前确认它在目标项目治理允许的临时根下；目标项目有临时目录纪律时以它为准）。所有剥离与清单都在这里，不碰原仓库。
 
-**Every analysis must start from the business problem the project solves, never from what functions or classes exist in the codebase.** This is the single most important rule that separates an architecture analysis from a code walkthrough.
+## Step 1 — strip-repo（减法）
 
-**The mindset shift**: Before reading any line of code, you must be able to answer:
-- Who has this problem? (the target audience, their role, context)
-- What situation creates this pain point? (workflow breakdown, bottleneck, cost)
-- Why do existing solutions fail? (gap analysis, trade-offs that don't fit)
-- Why does this project need to exist as a standalone solution? (unique positioning)
+1. 浅拷贝：远端用 `git clone --depth 1 <url> "$STUDY_DIR/stripped"`；本地用 `git clone --depth 1 "file://$WORK_DIR" "$STUDY_DIR/stripped"`（保留一份 `.git` 供追溯）。
+2. 在拷贝内删除三类干扰项（**只删拷贝，不删原件**）：
+   - **工程类配置**：`package.json` 及 lockfile、`pyproject.toml`/`setup.*`、`tsconfig*.json`、`*.config.{js,ts,mjs,cjs}`、`Makefile`、`Dockerfile`、`docker-compose*`、CI 目录（`.github/`、`.gitlab-ci.yml` 等）、`.gitignore`/`.editorconfig`。
+   - **脚手架/生成物**：`dist/`、`build/`、`out/`、`generated/`、`vendor/`（纯第三方 vendor）、`node_modules/`、`__pycache__/`。
+   - **测试用例**：`tests/`、`test/`、`spec/`、`__tests__/`、`*.spec.*`、`*_test.*`、`test_*.py`、`fixtures/`。
+3. 产出 `$STUDY_DIR/strip-manifest.md`：按类别的删除文件数，**并为每个被删的配置文件写一行用途**（如 `package.json — 声明运行时依赖与脚本入口`）。这份清单是 Step 4 技术栈判断的证据来源——删除的是噪音，不是事实。
+4. 报告删除总量与保留文件数；若某删除命中"疑似核心目录"（如名为 `build/` 但内容是源码），保留并记录例外。
 
-Only after these questions are answered should you look at the code — and even then, read code to understand *how* the business problem is solved, not *what* the code does.
+## Step 2 — outline-code（代码清单）
 
-**Concrete comparison**:
+- 对 `stripped/` 产出**简单**清单：目录树（两三层）、语言与文件数、每文件的 LOC、入口点候选（main/index/cli/server/app 等）、模块边界初判。
+- 写入 `$STUDY_DIR/outline-code.md`（表格 + 一段话总述）。不做深度评价——那是 Step 4。
 
-| Code Walkthrough (DON'T) | Business-Driven Analysis (DO) |
-|------|-----|
-| `handleRequest(ctx)` receives a Context parameter and calls `authMiddleware.Check()` before routing | The system treats every incoming request as untrusted by default, enforcing a "deny unless explicitly allowed" policy. Authentication is the first gate in a three-layer defense (auth, rate-limit, routing) — this ordering prevents wasted compute on unauthorized requests |
-| `interface MessageQueue { push(); pop() }` defines Producer/Consumer pattern | Modules communicate through an asynchronous message bus. Producers don't know who consumes their messages, and consumers don't know who produced them. This decoupling allows independent scaling and failure isolation — if the consumer is down, messages queue up rather than errors propagating back to the producer |
-| The `Router` class has a `RadixTree` field | The routing layer chose a radix tree over a hash table because parameter routes (`/users/:id`) and wildcard matching (`/static/*`) require prefix-based lookups, which hash tables cannot support natively. This is a deliberate performance investment for an API gateway's hottest path |
+## Step 3 — outline-docs（文档清单）
 
-**Red flag during analysis**: If any section of your report reads like it could apply to a different project by simply changing names and function references, it lacks business grounding. Every module's description should be unmistakably about *this* project solving *this* problem — no other project has the same combination of problem, constraints, and design choices.
+- 清点 `README*`、`docs/`、`doc/`、`ADR/RFC`、`CONTRIBUTING`、设计笔记；每个条目一行主题摘要 + 可信度标记（官方/历史/过期）。
+- 写入 `$STUDY_DIR/outline-docs.md`。标注与代码可能冲突的文档（供 Step 4 交叉验证）。
 
-### Abstraction Level: Explain Design, Not Code
+## Step 4 — deep-study（核心研读）
 
-Describe at the design pattern and architecture level by default. **Do not paste raw code unless necessary**. Only show code when the design is particularly elegant, the project introduces unique concepts, or implementation is its core selling point — and always explain in natural language first.
+四个必答维度，顺序固定：**核心概念 → 基本架构 → 组件构成 → 核心实现**。
 
-### Deep Insight: Why > What (Mandatory)
+- **核心概念**：项目用自己的词汇解决什么问题；术语表（概念 → 一句话定义 → 代码落点）。
+- **基本架构**：系统边界、分层/分区、依赖方向、运行拓扑；主视图用 draw-diagram 渲染标准 UML（组件/部署/时序），次视图可用 Mermaid。
+- **组件构成**：核心 vs 次要组件（按业务功能划分），每个组件的职责、对外接口、依赖与被依赖。
+- **核心实现**：关键路径的机制拆解（为什么这样设计、替代方案的代价），以 `文件:行` 为证据。
 
-Every design decision must explain motivation, trade-offs, and alternative costs:
-- **Why this design?** Not just "what pattern was used", but "why it fits this scenario"
-- **What if not?** The cost of alternatives
-- **How does it compare to industry best practices?** Where it leads and where it lags
-- **If you were to redesign it?** Demonstrates deeper understanding
+方法论与深度标准见 references：`architect-analysis-guide` / `tech-stack-analysis-guide`（读 Step 1 的删除清单）/ `module-analysis-guide` / `git-analysis-guide` / `deployment-analysis-guide` / `uml-visualization-guide`。核心原则保留：**Why > What**、设计级叙述而非贴代码、结论必须有 `路径[:行]` 证据、每个局部结论要连回整体设计。
 
-See [architect-analysis-guide.md](references/architect-analysis-guide.md), [tech-stack-analysis-guide.md](references/tech-stack-analysis-guide.md), and [git-analysis-guide.md](references/git-analysis-guide.md) for depth standards, technical interpretation, and evolution-based validation.
+产出 `$STUDY_DIR/deep-study.md`（四节 + 证据指针）。规模大时可按组件并行子代理，但主代理不得重复读子代理的领地，且必须等全部返回后统一校验。
 
-### Inspiring Writing
+## Step 5 — report（可索引报告）
 
-The goal is to help readers **learn something and think**, not to produce a code manual. Like a senior engineer explaining at a whiteboard — with opinions, reasoning, and comparisons. See [architect-analysis-guide.md](references/architect-analysis-guide.md).
+写 `$WORK_DIR/docs/overview.md`，**必须可索引**，供用户后续追问时快速反查：
 
-### Global Connection
+1. **索引表（必备，置于报告开头）**：`概念/组件 → 章节锚点（相对链接） → 证据路径（file:line）`，一行一条，覆盖全部核心概念与组件。
+2. **稳定锚点**：每个章节与组件小节使用固定、可预测的标题（锚点由标题派生），不得中途改名；跨引用使用相对锚点链接。
+3. **查表指南（Lookup guide）**：给常见追问形态配"去哪找"（如"某行为在哪实现" → 核心实现节 + 证据路径；"依赖谁" → 组件构成节）。
+4. **证据密度**：每个结论携带 `路径[:行]`；没有证据的推断标注 `推断`。
+5. 图表：主视图的 UML 图文件放 `$WORK_DIR/docs/figures/`（PNG + `.puml` 源），图中要点回链索引表。
+6. 交付前自检：索引表的每个锚点可跳转、每个证据路径存在、章节标题与索引一致。
 
-Every local analysis must connect to the project's overall design philosophy — this is what distinguishes a "code manual" from an "architecture analysis". Use [architect-analysis-guide.md](references/architect-analysis-guide.md) for macro narrative and [module-analysis-guide.md](references/module-analysis-guide.md) for module-level connection rules.
-
-## Recommended Analysis Order
-
-Use the following order unless the project characteristics strongly suggest otherwise:
-
-1. **Architecture first** — establish business framing, system boundary, and subsystem map with [architect-analysis-guide.md](references/architect-analysis-guide.md)
-2. **Tech stack second** — explain why the implementation stack fits the architecture with [tech-stack-analysis-guide.md](references/tech-stack-analysis-guide.md)
-3. **Module deep dive third** — analyze core and secondary modules with [module-analysis-guide.md](references/module-analysis-guide.md)
-4. **Git history fourth** — validate evolution, release rhythm, and architectural change signals with [git-analysis-guide.md](references/git-analysis-guide.md)
-5. **Deployment last** — explain runtime topology and delivery model with [deployment-analysis-guide.md](references/deployment-analysis-guide.md)
-
-This order keeps the report moving from macro intent, to implementation means, to internal structure, to historical evolution, and finally to operational reality.
-
-## Analysis Workflow
-
-> **Flexibility principle**: The phases below are advisory guidelines. The agent should dynamically decide based on project characteristics — skip or simplify any phase that has no meaning for the current project. Final report quality is the standard.
-
-### Execution Contract
-
-Use this contract to avoid workflow drift during real executions:
-
-- **Local workspace mode**: If the user asks to analyze the current workspace or provides a local path, use that repository root as `$WORK_DIR`. Do **not** create `${HOME}/repo-analyses/...` unless analyzing a remote repository that must be cloned.
-- **Final deliverable location**: Always write the final report to `$WORK_DIR/docs/overview.md`. This is the user-facing deliverable. If `$WORK_DIR` is the current workspace, the file must be `docs/overview.md` in the workspace root.
-- **Analysis mode default**: If no interactive question tool is available, or asking would interrupt an otherwise clear request, choose **Standard** mode and state that choice briefly in the report. Ask the user only when the requested depth is materially ambiguous.
-- **Draft files are optional execution aids**: Create `drafts/` files when they help large or remote analyses. For smaller local repositories, it is acceptable to keep intermediate notes in the agent context and write only the final report, provided the final report still includes evidence-backed conclusions.
-- **Subagent output handling**: When subagents cannot write files directly, capture their returned summaries as module drafts in the main agent context and proceed with cross-validation. Do not fail the analysis solely because the subagent did not create `06-module-*.md` files.
-- **Completion discipline**: Before ending, verify that the final report exists, check for obvious editor/diagnostic errors when tools are available, and mark all planning todos completed.
-
-### Phase 1: Project Acquisition & Initialization
-
-1. Parse user input (supports `owner/repo`, GitHub/GitLab/Gitee URL, local path)
-2. Set `$WORK_DIR` according to the Execution Contract: current/local repo root for local analysis; `${HOME}/repo-analyses/${REPO_NAME}-{YYYYMMDD}` only for remote clones
-3. Clone with `git clone --depth=1` if remote; skip if local path provided
-4. Gather basic metadata (Stars, Forks, contributors, code statistics)
-5. **Business context discovery**: before diving into code, answer the four business questions from the First Principle (Who? What situation? Why existing solutions fail? Why standalone?). Write initial hypotheses to `drafts/01-business-context.md` — these will be validated and refined through subsequent phases.
-
-### Phase 2: Project Scale, Hypothesis Validation, and Mode Selection
-
-1. **Count effective code lines** (exclude tests, build configs, auto-generated code, examples/docs)
-2. **Validate business hypotheses from Phase 1**: does the code scale and organization match your initial business understanding? A project solving a complex distributed systems problem should have substantial architectural code, not just utility functions. If the ratio doesn't match expectations, investigate — either your business hypothesis was wrong, or the project's architecture is misaligned with its stated goals.
-3. **Choose analysis mode**: let the user choose when an interactive question tool is available and the depth is unclear; otherwise default to **Standard** and record that decision in the report.
-
-| Mode | Core Modules≥ | Secondary Modules≥ | Use Case |
-|------|--------------|--------------------|----------|
-| Quick | 30% | 10% | Quick overview |
-| Standard (recommended) | 60% | 30% | Regular architecture analysis |
-| Deep | 90% | 60% | Deep dive into every design decision |
-
-4. Write stats and chosen mode to `drafts/03-plan.md` when using draft files; otherwise include the scale/mode summary in the final report.
-
-### Phase 3: External Research + Project Documentation (Search First, Read Later)
-
-1. WebSearch for project reviews, comparisons, architecture discussions (3-5 searches)
-2. Crawl project website (homepage, Features, Use Cases, Comparison, etc.)
-3. Read project documentation (architecture/, docs/, CONTRIBUTING.md, RFC/ADR, etc.)
-4. Write research findings to `drafts/03-research.md`. **This is the most critical phase for answering "what problem does this project solve"** — external sources often state the problem more clearly than code does. Must include:
-   - **Core problem** (who, what scenario, what pain point, why existing solutions fall short)
-   - **Competitor comparison** (3-5 similar projects with positioning differences)
-   - **Unique value proposition** (why this project needs to exist separately)
-   - **Business validation**: cross-reference Phase 1 business hypotheses against external research — what was confirmed, what was wrong, what new dimension was discovered?
-   - **Initial architecture and deployment clues**: use docs, repo structure, and packaging files to prepare for [architect-analysis-guide.md](references/architect-analysis-guide.md) and [deployment-analysis-guide.md](references/deployment-analysis-guide.md)
-5. Write analysis plan to `drafts/03-plan.md`
-
-### Phase 4: Project Feature Identification + Adaptive Questioning
-
-From project features (entry files, directory structure, dependencies, docs), identify:
-- Project type and positioning (library/framework/application/tool)
-- Scale, maturity, design style signals, tech stack characteristics
-- Delivery and runtime signals (CLI-only, package distribution, service deployment, containerization, CI/CD automation)
-- **Extract questions from features**: each observation may suggest a question worth asking the user
-  - Unusual tech stack combination → ask about motivation
-  - Complex plugin system → ask about priorities
-  - Simplicity vs flexibility → ask about trade-offs
-
-Ask user questions (≤3 per round), one of which should confirm the **level of detail for the report introduction** (well-known projects may not need lengthy introductions). See questioning strategy in [module-analysis-guide.md](references/module-analysis-guide.md).
-
-If the request is clear and asking would only slow execution, do not pause for confirmation. Instead, state a minimal assumption in the report (for example, “Standard mode was used because no depth preference was provided”).
-
-**Business-problem-driven questions**: at least one question should validate your evolving understanding of the problem. Examples: "This project seems to solve [X problem] for [Y audience] — is that the right framing?", "I noticed [design choice Z] — does this suggest the primary use case is [A] or [B]?", "The README mentions [claim], but the code seems optimized for [different concern] — which direction should I prioritize in the analysis?"
-
-### Phase 5: Dynamic Report Structure Design
-
-1. Synthesize Phase 3 research, Phase 4 features, and user responses
-2. **Design chapter structure** (no fixed template), must satisfy:
-   - Scenario-based problem introduction (material from Phase 3)
-   - Competitive positioning (differences in design philosophy and tech approach)
-   - Project overview, architecture chapter, tech stack chapter, module deep analysis, git evolution chapter, deployment chapter, evaluation & insights
-   - Architecture visualization: plan standard **UML figures for the report's primary views** (architecture structure, key behavior flows, deployment topology) per [uml-visualization-guide.md](references/uml-visualization-guide.md), choosing the diagram type that matches each view's semantics; Mermaid sketches remain for secondary, quick-glance content; code evidence
-3. **Identify modules**: categorize core vs secondary by business function
-4. **Design narrative line**: determine module presentation order and transition logic (data flow / layered / problem-driven)
-5. Output report outline for user confirmation, then write to `drafts/05-modules-plan.md`
-
-For local workspace analyses where the user asked for direct execution, outline confirmation is optional. Proceed directly when the structure follows the required chapters and no high-risk scope decision is pending.
-
-### Phase 6: Parallel Deep Analysis (Subagent Team)
-
-Must use Agent tools to launch subagents in parallel:
-- Each core module → one independent subagent
-- All secondary modules → one combined subagent for batch processing
-- All subagents launched in the same message
-
-Each subagent prompt must include:
-- Overall project design philosophy and global perspective
-- Narrative context (previous module conclusion → this module's questions → next module setup)
-- Coverage requirements and write strategy
-
-Detailed prompt templates at [module-analysis-guide.md](references/module-analysis-guide.md).
-
-**Main agent discipline**:
-- After subagent launch, main agent must NOT read source files assigned to subagents
-- **No early merging**: must wait for ALL subagents to complete before starting Phases 7-8
-- While waiting, focus on: reading project docs, external research, designing report skeleton
-
-### Phase 7: Cross-Validation + Quality Control (Main Agent)
-
-1. **Coverage gating**: read coverage tables from draft tails; auto-supplement or report reasons for non-compliant modules
-2. **Spot-check validation**: pick 2-3 key conclusions per core module, verify against source code
-3. **Cross-validation**: verify cross-module conclusions and global connection
-4. Check all high-priority defect claims with a deterministic search or file read before including them in the final report
-5. Write to `drafts/07-cross-validation.md` when using draft files; otherwise fold the validation evidence into the final report
-
-### Phase 8: Multi-Source Fusion & Final Report (Main Agent)
-
-1. Distill architecture insights and systematic design philosophy
-2. Deepen competitor comparison (supplement search if Phase 3 was insufficient)
-3. **Multi-source fusion**: use Phase 5 structure as skeleton, extract content from drafts
-   - Take the most detailed version when a concept appears in multiple drafts
-   - Eliminate "see draft X" navigation references
-   - Narrative coherence: organize by narrative line, use natural transitions
-   - Preserve the recommended chapter order: architecture → tech stack → modules → git evolution → deployment, unless the project clearly demands a different narrative
-4. **Segmented writing**: final report typically exceeds 500 lines; Write first 2-3 chapters (200-300 lines), then Edit to append
-5. **UML figure rendering & embedding**: render the UML figures planned in Phase 5 by delegating to the draw-diagram skill (PNG default + SVG available, `.puml` sources kept); store figure files under `$WORK_DIR/docs/figures/`; embed each figure with a brief caption using relative paths; never embed raw diagram source in the report
-6. Coverage summary to `drafts/08-coverage.md` (not included in final report)
-7. Output single markdown file: `$WORK_DIR/docs/overview.md`
-
-### Intermediate File Manifest
-
-| Phase | Files |
-|-------|-------|
-| 3 | `03-research.md`, `03-plan.md` |
-| 5 | `05-modules-plan.md` |
-| 6 | `06-module-{name}.md` (generated by subagent) |
-| 7 | `07-cross-validation.md` |
-| 8 | `08-insights.md`, `08-coverage.md` |
+默认中文（跟随用户语言）；直接写结论，不要"见上文/见草稿"式导航。
 
 ## Output Requirements
 
-- **UML figures as the standard for primary views**: architecture structure, key behavior flows, and deployment topology MUST be expressed as standard UML diagrams rendered via the draw-diagram skill — see [uml-visualization-guide.md](references/uml-visualization-guide.md) for the view-to-diagram-type mapping
-- **Mermaid diagrams remain for secondary content only**: quick-glance sketches, minor flows, small data illustrations
-- **Figure conventions**: figure files stored under `$WORK_DIR/docs/figures/` (PNG + SVG + `.puml` sources), embedded with brief captions via relative paths; no raw diagram source in the reader-facing report
-- **Degradation**: if draw-diagram rendering is unavailable during the run, primary views fall back to Mermaid sketches and the report carries a visible degradation note per affected view
-- Default output in **Chinese** (follow user's language if different)
-- Critical thinking: compare with industry practice, point out real issues, don't dodge defects
-- Code as evidence: all conclusions backed by code, cite `file path` or `file path:line range`
-
-## Special Scenarios
-
-- **Extra-large projects (>50k lines)**: prioritize core modules, use Agent parallelism
-- **Comparison mode**: complete Phases 1-4 for both projects, design comparison-style report structure in Phase 5
-
-## Reference Documents
-
-| Document | Content |
-|----------|---------|
-| [architect-analysis-guide.md](references/architect-analysis-guide.md) | Macro architecture framing, business-first analysis, narrative standards |
-| [tech-stack-analysis-guide.md](references/tech-stack-analysis-guide.md) | Language, framework, build, pattern, and ecosystem-fit analysis |
-| [module-analysis-guide.md](references/module-analysis-guide.md) | Module analysis methods, completeness standard, subagent prompt templates |
-| [git-analysis-guide.md](references/git-analysis-guide.md) | Commit/tag/branch history analysis and architectural evolution signals |
-| [deployment-analysis-guide.md](references/deployment-analysis-guide.md) | Runtime topology, packaging, delivery pipeline, and operability analysis |
-| [uml-visualization-guide.md](references/uml-visualization-guide.md) | View-to-UML-diagram-type mapping, figure conventions (docs/figures/), rendering delegation, degradation rule |
+- **UML 主视图**：架构结构、关键行为流、部署拓扑等主视图用标准 UML（经 draw-diagram 渲染；PNG + `.puml` 源放 `$WORK_DIR/docs/figures/`，报告内以相对路径 + 简短图注嵌入）；**Mermaid 仅限次要内容**（速览草图、小流程、小组件）。
+- **证据密度**：每个结论带 `路径[:行]`；没有证据的推断显式标注 `推断`。
+- 默认中文（跟随用户语言）；交付前完成 Step 5 自检（索引锚点可跳转、证据路径存在、标题与索引一致）。
 
 ## Report Output Location
 
-After completing all analysis phases, the final analysis report must be written to `docs/overview.md` in `$WORK_DIR`. For current-workspace analysis, `$WORK_DIR` is the workspace root. This is the deliverable file that users will consume.
+`$WORK_DIR/docs/overview.md` — the single deliverable file the user consumes.
 
-```
-$WORK_DIR/docs/overview.md
-```
+## References
+
+| 文档 | 内容 |
+|------|------|
+| [architect-analysis-guide.md](references/architect-analysis-guide.md) | 宏观架构框架、业务优先分析法、叙述标准 |
+| [tech-stack-analysis-guide.md](references/tech-stack-analysis-guide.md) | 语言/框架/构建/生态适配分析（配置证据读 Step 1 清单） |
+| [module-analysis-guide.md](references/module-analysis-guide.md) | 模块分析法、完备度标准、子代理提示模板 |
+| [git-analysis-guide.md](references/git-analysis-guide.md) | 提交/标签/分支历史与架构演进信号 |
+| [deployment-analysis-guide.md](references/deployment-analysis-guide.md) | 运行拓扑、打包、交付管道与可运维性 |
+| [uml-visualization-guide.md](references/uml-visualization-guide.md) | 视图→UML 图型映射、图件约定、渲染委派与降级规则 |
 
 ## Wrap-up
 
@@ -239,10 +88,10 @@ $WORK_DIR/docs/overview.md
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:study-project" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:study-code" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
    尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:study-project" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:study-project" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:study-code" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:study-code" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
 6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"

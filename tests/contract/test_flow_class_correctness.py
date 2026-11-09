@@ -76,7 +76,7 @@ FIXTURE_ROWS = [
         "notes": "parent 069 §Edge Cases (mixed oracle resolves to execution in 069b)",
     },
     {"unit_id": "skill:create-docs", STR_003: STR_002, "basis": "reader-oracle", "neutral": ""},
-    {"unit_id": "skill:humanize", STR_003: STR_002, "basis": "reader-oracle", "neutral": ""},
+    {"unit_id": "skill:humanize-conclusion", STR_003: STR_002, "basis": "reader-oracle", "neutral": ""},
     {"unit_id": "skill:git-utils", STR_003: STR_001, "basis": "behavior-oracle", "neutral": ""},
     {"unit_id": "skill:memory-record", STR_003: STR_001, "basis": "behavior-oracle", "neutral": "yes"},
 ]

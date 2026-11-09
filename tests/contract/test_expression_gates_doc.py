@@ -33,7 +33,7 @@ that ``tasks.md`` T013 names:
 * C-13 the document is orthogonal to the complexity axis and only points at
        ``shared/workflow/feedback-step.md``;
 * C-14 the call-site table registers W1…W4, the docs row runs the checker, the
-       ``/speckit.humanize`` row declares "no class read", the ``skill:humanize``
+       ``/speckit.humanize`` row declares "no class read", the ``skill:humanize-conclusion``
        row is the flow's only ``--action lookup`` and is never the six-face set.
 
 Red-first discipline (Constitution IV): the owner document does not exist yet.
@@ -555,7 +555,7 @@ def test_c14_call_site_table_covers_w1_to_w4():
         "the call-site table must register exactly four entries (W1…W4), got %d" % len(data)
     )
     entries = [row[0] for row in data]
-    for needle in ("/speckit.docs", "skill:create-docs", "/speckit.humanize", "skill:humanize"):
+    for needle in ("/speckit.docs", "skill:create-docs", "/speckit.humanize", "skill:humanize-conclusion"):
         assert any(needle in entry for entry in entries), (
             "call-site table lacks the %r entry; entries: %r" % (needle, entries)
         )
@@ -579,7 +579,7 @@ def test_c14_humanize_rows_are_a_separate_row_set():
     header, rows = _call_site_table()
     data = [row for row in rows if row and row[0]]
     w2 = next(row for row in data if "/speckit.humanize" in row[0])
-    w4 = next(row for row in data if "skill:humanize" in row[0])
+    w4 = next(row for row in data if "skill:humanize-conclusion" in row[0])
     w2_join = " ".join(w2)
     assert "不读取" in w2_join, "the /speckit.humanize row must declare that it never reads the class"
     for forbidden in ("flow-class-check.py", "--action lookup", "--unit-id",
@@ -589,14 +589,14 @@ def test_c14_humanize_rows_are_a_separate_row_set():
         )
     humanize_rows = "\n".join(" ".join(row) for row in (w2, w4))
     assert humanize_rows.count("--action lookup") == 1, (
-        "only the skill:humanize row may carry the flow's single --action lookup"
+        "only the skill:humanize-conclusion row may carry the flow's single --action lookup"
     )
     w4_join = " ".join(w4)
     assert "flow-class-check.py --action lookup" in w4_join, (
-        "the skill:humanize row must carry the flow's lookup call"
+        "the skill:humanize-conclusion row must carry the flow's lookup call"
     )
     assert "/speckit.humanize" in w4_join, (
-        "the skill:humanize row must name the unit id it looks up"
+        "the skill:humanize-conclusion row must name the unit id it looks up"
     )
     assert "structure-links-build" not in w4_join, (
         "the humanize operator row must not absorb the structure face"
@@ -604,7 +604,7 @@ def test_c14_humanize_rows_are_a_separate_row_set():
     assert "requirements-clarity" not in w4_join and "需求清晰度" not in w4_join, (
         "the humanize operator row must not absorb the requirements-clarity face"
     )
-    assert "062-" in w4_join, "the skill:humanize row must register the 062-* minimal operator set"
+    assert "062-" in w4_join, "the skill:humanize-conclusion row must register the 062-* minimal operator set"
     text = _read_owner()
     for line in text.splitlines():
         if "humanize" not in line:

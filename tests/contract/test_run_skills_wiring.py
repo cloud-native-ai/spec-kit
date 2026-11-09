@@ -32,11 +32,13 @@ PROBE_DEFS_MIRROR = REPO_ROOT / ".specify" / "shared" / "definitions" / "probe-d
 # here (A10's closed surface allows it exactly once — the CLI upgrade registry).
 # Updated 2026-11-05 (improve-skills ssh-utils): the external `ssh-utils` transport
 # unit joins the roster (15 -> 16).
+# Updated 2026-11-09 (user rename): `humanize` is renamed in place to
+# `humanize-conclusion`; the external count stays 17 and only the literal moves.
 BASELINE_EXTERNAL = [
     "coaching-skills", "create-docs", "create-pages", "create-skills", "database-utils",
-    "document-utils", "draw-diagram", "git-utils", "humanize", "improve-docs",
+    "document-utils", "draw-diagram", "git-utils", "humanize-conclusion", "improve-docs",
     "improve-skills", "merge-skills", "sdd-house-keeping", "sdd-loop-driver",
-    "sdd-project-setup", "ssh-utils",
+    "sdd-project-setup", "ssh-utils", "study-code",
 ]
 BASELINE_INTERNAL = [
     "analyze-artifacts", "archive-session", "clarify-artifact", "code-review",
@@ -47,7 +49,7 @@ BASELINE_INTERNAL = [
     "manage-feedback", "manage-goal", "manage-history", "manage-instructions",
     "manage-todo", "memory-recall", "memory-record", "research-feature",
     "review-feature-quality", "review-sdd-process", "run-agent", "run-interview",
-    "sanitize-materials", "self-improvement", "study-project", "summarize-project",
+    "sanitize-materials", "self-improvement", "summarize-project",
 ]
 # 2026-11-03 (Feature 081c, df9bbe0e): `review-feature-quality` joins the internal
 # layer as the dogfooding review carrier (37 -> 38 internal dirs); the roster pin

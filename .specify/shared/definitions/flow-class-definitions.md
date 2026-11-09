@@ -178,7 +178,7 @@ legend（三面含义只在此声明一次，24 格不重复）：**结构 = 实
 | skill:document-utils | execution | behavior-oracle |  | 交付读写后的文档文件；以产物可打开与可渲染判定 |
 | skill:draw-diagram | execution | behavior-oracle |  | 交付图源与渲染产物；以渲染结果与结构判定 |
 | skill:git-utils | execution | behavior-oracle |  | 交付平台对象与分支状态；以平台行为判定 |
-| skill:humanize | expression | reader-oracle |  | 首批成员执行体；保真与自然度由读者判定（W4 承载唯一读取） |
+| skill:humanize-conclusion | expression | reader-oracle |  | 首批成员执行体；保真与自然度由读者判定（W4 承载唯一读取） |
 | skill:improve-docs | expression | reader-oracle |  | 改进后的文档；读者面判定，与 /speckit.docs 同类 |
 | skill:improve-skills | execution | behavior-oracle |  | 交付改进后的技能；以再运行判定 |
 | skill:merge-skills | execution | behavior-oracle |  | 交付合并后的技能实体；覆盖与再运行可核验 |

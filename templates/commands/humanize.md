@@ -41,7 +41,7 @@ Consult the project glossary (`.specify/memory/glossary.md`) and apply the proto
 
 ### 委派（强制）
 
-**Delegation (mandatory)**: load `.specify/skills/humanize/SKILL.md` and execute the branch its mode routing selects. 两模式的行为细则、派发载荷与回传信封、报告五节、语言与保真、注入防护，全部以该技能（含 `references/`）为单一事实源；本模板不复述其 Stage 表、字段表或小节标题。
+**Delegation (mandatory)**: load `.specify/skills/humanize-conclusion/SKILL.md` and execute the branch its mode routing selects. 两模式的行为细则、派发载荷与回传信封、报告五节、语言与保真、注入防护，全部以该技能（含 `references/`）为单一事实源；本模板不复述其 Stage 表、字段表或小节标题。
 
 ### 本命令只做三件事
 

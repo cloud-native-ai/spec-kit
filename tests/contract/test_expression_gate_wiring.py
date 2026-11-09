@@ -14,7 +14,7 @@ C-15 and ``contracts/expression-gate-operators.md`` C-12/C-14/C-15 that
   lines);
 * **A3** W3 ``skills/external/create-docs/SKILL.md`` — gate-owner pointer plus the
   checker on the R6 verify path;
-* **A4** W4 ``skills/external/humanize/SKILL.md`` — the flow's only lookup
+* **A4** W4 ``skills/external/humanize-conclusion/SKILL.md`` — the flow's only lookup
   (``--unit-id "/speckit.humanize"``) placed in Stage 6, with the gate-owner
   pointer, the 062 fidelity section, and ``diff_protected.py`` kept;
 * **A5** wiring text hygiene — after removing the owner paths no independent
@@ -53,7 +53,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DOCS_TEMPLATE = REPO_ROOT / "templates" / "commands" / "docs.md"
 HUMANIZE_TEMPLATE = REPO_ROOT / "templates" / "commands" / "humanize.md"
 CREATE_DOCS_SKILL = REPO_ROOT / "skills" / "external" / "create-docs" / "SKILL.md"
-HUMANIZE_SKILL = REPO_ROOT / "skills" / "external" / "humanize" / "SKILL.md"
+HUMANIZE_SKILL = REPO_ROOT / "skills" / "external" / "humanize-conclusion" / "SKILL.md"
 COMMANDS_DIR = REPO_ROOT / "templates" / "commands"
 SKILLS_DIR = REPO_ROOT / "skills"
 

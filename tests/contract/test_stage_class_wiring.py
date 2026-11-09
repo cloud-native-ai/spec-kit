@@ -180,9 +180,16 @@ BASELINE_SHA256 = {
 # untouched: `docs.md` still carries no wiring card and no authored line moved —
 # restoring the pre-recompile banner and dropping the one compiled list line
 # reproduces the previous pin byte for byte.  Re-pinned to the live bytes.
+#
+# 2026-11-09 the `humanize` row re-measured for an authored reason (skill rename):
+# the W2 command template's single delegation path moved with its skill from
+# `.specify/skills/humanize/SKILL.md` to
+# `.specify/skills/humanize-conclusion/SKILL.md`.  No compiled banner lives in this
+# file, so the delta is exactly that one path literal; everything else the pin
+# protects (Simple shape, no wiring card, the 079 migration block) is untouched.
 UNCHANGED_SHA256 = {
     "docs": "75cfc0db9b3806af2f7dec8a1c4716715619e39e85e7a0a2d084d502f5f9307c",
-    "humanize": "39c6d42e8a25245a4f6a693a17bc38bccd88021d4703693b47377ffcbe1cb498",
+    "humanize": "1de8b4c3fe97d138178517d17e6586c4efaa738be80d1f3dbab7365c9cc6189a",
 }
 
 

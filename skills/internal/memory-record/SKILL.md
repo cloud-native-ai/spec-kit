@@ -40,7 +40,7 @@ For a user emphasis, use `session` with tags `user-emphasis,key:<ascii-slug>` so
 ## Workflow
 1. Confirm the trigger is a Spec Kit command or skill. Determine the correct `--source`:
    - `/speckit.<command>` for command-driven work (e.g. `/speckit.plan`).
-   - `skill:<skill-name>` for skill-driven work (e.g. `skill:study-project`).
+   - `skill:<skill-name>` for skill-driven work (e.g. `skill:study-code`).
    The engine rejects any other source, so this is a hard boundary — never fabricate a source to force a write.
 2. Distill the takeaway into a concise title and a few lines of content.
 3. Pick the scope — one member of the set `shared/declarations/facts/memory-types.yaml#/statement`

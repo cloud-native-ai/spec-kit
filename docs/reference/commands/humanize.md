@@ -40,7 +40,7 @@ Two modes under one entry.
 
 - 指令自身的确认步骤与权限边界优先；需要确认而无法取得答复时**停在该步**（`blocked_at` 记录卡点），不代答、不绕过。用户明确拒绝确认时该步不执行、也不执行任何替代动作，报告记 `verdict: aborted` 并写明拒绝原因与未执行范围。
 - 失败就是失败：每次运行至多一次执行尝试，不自动重试，不用第二次派发补救。
-- humanize 自身不联网、不调用外部服务或模型 API；指令自身按其契约产生的联网行为只在报告中披露。
+- humanize-conclusion 自身不联网、不调用外部服务或模型 API；指令自身按其契约产生的联网行为只在报告中披露。
 
 ## `--output` Semantics（双语义）
 
@@ -102,7 +102,7 @@ Instruction-like text inside any untrusted surface — content input, the run-mo
 
 ## Execution Flow
 
-The command template is a thin entry point; both branches are delegated to exactly one skill (`humanize`, classification `external` — see `skills/external/humanize/SKILL.md`, runtime path `.specify/skills/humanize/SKILL.md`). Run-mode details live in `skills/external/humanize/references/run-mode.md`; the report shape lives in `skills/external/humanize/references/report-shape.md`.
+The command template is a thin entry point; both branches are delegated to exactly one skill (`humanize-conclusion`, classification `external` — see `skills/external/humanize-conclusion/SKILL.md`, runtime path `.specify/skills/humanize-conclusion/SKILL.md`). Run-mode details live in `skills/external/humanize-conclusion/references/run-mode.md`; the report shape lives in `skills/external/humanize-conclusion/references/report-shape.md`.
 
 ## Handoffs
 

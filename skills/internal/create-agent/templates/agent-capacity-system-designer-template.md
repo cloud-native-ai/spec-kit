@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: system-designer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Write, Edit]
-skills: [draw-diagram, study-project, memory-recall, memory-record, coaching-skills]
+skills: [draw-diagram, study-code, memory-recall, memory-record, coaching-skills]
 run-turn-budget: 500
 display-color: purple
 ---
@@ -112,7 +112,7 @@ Framework skills and agent definitions install together, so every skill I declar
 | Skill | When to use |
 |-------|-------------|
 | draw-diagram | Draw diagrams (UML / architecture / flow / sequence / data visualization / hand-drawn / whiteboard) via the unified front door, which routes to the best-fit internal engine layer |
-| study-project | Analyze the existing architecture and codebase before proposing a design |
+| study-code | Analyze the existing architecture and codebase before proposing a design |
 | memory-recall | Recall prior design decisions and constraints relevant to the change |
 | memory-record | Record architectural rationale and interface contracts |
 | coaching-skills | Coach one skill through a real work item: state the expectation first, observe the real execution, then hand back the micro-adjustment plan |

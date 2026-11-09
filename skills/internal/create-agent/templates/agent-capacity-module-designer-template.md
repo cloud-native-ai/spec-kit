@@ -7,7 +7,7 @@ supervisor: true
 capacity-scope: module-designer
 model-tier: auto
 capability-tools: [Read, Grep, Glob, Bash, Write, Edit]
-skills: [study-project, git-utils, memory-record, coaching-skills]
+skills: [study-code, git-utils, memory-record, coaching-skills]
 run-turn-budget: 500
 display-color: green
 ---
@@ -113,7 +113,7 @@ Framework skills and agent definitions install together, so every skill I declar
 
 | Skill | When to use |
 |-------|-------------|
-| study-project | Analyze project structure and module boundaries before implementing a change |
+| study-code | Analyze project structure and module boundaries before implementing a change |
 | git-workflow | Synchronize branches (rebase/merge/push) under the three-tier workflow |
 | git-utils | Git workspace governance: three-tier branch workflow, multi-environment coordination, disciplined submodule editing, git server provisioning |
 | memory-record | Record module-level decisions and implementation notes |

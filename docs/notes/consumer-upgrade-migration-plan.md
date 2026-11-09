@@ -61,7 +61,7 @@ tags: [skill-layering, consumer-upgrade, migration, release]
 
 ```bash
 # 升级后自检:应输出 OK(平铺内部名应为 0;nested 应为 15)
-INT="collect-evidence create-agent create-team create-tools improve-agent improve-team improve-tools memory-recall memory-record self-improvement summarize-project archive-session code-review manage-agents study-project"
+INT="collect-evidence create-agent create-team create-tools improve-agent improve-team improve-tools memory-recall memory-record self-improvement summarize-project archive-session code-review manage-agents study-code"
 bad=0; for n in $INT; do [ -e ".specify/skills/$n" ] && { echo "STALE-FLAT: $n"; bad=1; }; [ -f ".specify/skills/internal/$n/SKILL.md" ] || { echo "MISSING-NESTED: $n"; bad=1; }; done
 [ "$bad" = 0 ] && echo OK || echo "NEEDS-ATTENTION"
 ```

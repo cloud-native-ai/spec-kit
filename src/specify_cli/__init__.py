@@ -1002,7 +1002,6 @@ _FRAMEWORK_INTERNAL_SKILLS = (
     "memory-recall",
     "memory-record",
     "self-improvement",
-    "study-project",
     "summarize-project",
 )
 

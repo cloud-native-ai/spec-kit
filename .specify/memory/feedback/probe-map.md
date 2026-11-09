@@ -5,6 +5,14 @@
 
 ## internal(内部 — 目标为 Spec Kit 框架)
 
+### closeout-step  [slice: skills]
+
+- **收集内容**: 收口步骤的可观察结局(签名面一次编译即得:Close-out 节的存在性与顺序;规则真源 owner 为 artifact-commit-step.md)
+- **处理流程**: compile→embed
+- **适用插入位置**: wrap-up
+- **Objects** (1):
+  - `closeout-step-observe` — skill:git-utils @ wrap-up
+
 ### command-gate  [slice: commands]
 
 - **收集内容**: 保留确认点触发后的用户决定观察事实(门控必要性证据)
@@ -28,7 +36,7 @@
 - **收集内容**: 命令单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (23):
+- **Objects** (25):
   - `speckit-analyze-wrapup` — /speckit.analyze @ wrap-up
   - `speckit-checklist-wrapup` — /speckit.checklist @ wrap-up
   - `speckit-clarify-wrapup` — /speckit.clarify @ wrap-up
@@ -41,6 +49,7 @@
   - `speckit-improve-wrapup` — /speckit.improve @ wrap-up
   - `speckit-instructions-wrapup` — /speckit.instructions @ wrap-up
   - `speckit-interview-wrapup` — /speckit.interview @ wrap-up
+  - `speckit-measure-wrapup` — /speckit.measure @ wrap-up
   - `speckit-plan-wrapup` — /speckit.plan @ wrap-up
   - `speckit-requirements-wrapup` — /speckit.requirements @ wrap-up
   - `speckit-research-wrapup` — /speckit.research @ wrap-up
@@ -48,6 +57,7 @@
   - `speckit-sanitize-wrapup` — /speckit.sanitize @ wrap-up
   - `speckit-session-wrapup` — /speckit.session @ wrap-up
   - `speckit-skills-wrapup` — /speckit.skills @ wrap-up
+  - `speckit-status-wrapup` — /speckit.status @ wrap-up
   - `speckit-tasks-wrapup` — /speckit.tasks @ wrap-up
   - `speckit-team-wrapup` — /speckit.team @ wrap-up
   - `speckit-todo-wrapup` — /speckit.todo @ wrap-up
@@ -119,7 +129,7 @@
 - **收集内容**: 技能单次运行的回顾与 ≥1 条单元级优化点
 - **处理流程**: record→threshold→package→manual→mark-submitted
 - **适用插入位置**: wrap-up
-- **Objects** (52):
+- **Objects** (54):
   - `skill-analyze-artifacts-wrapup` — skill:analyze-artifacts @ wrap-up
   - `skill-archive-session-wrapup` — skill:archive-session @ wrap-up
   - `skill-clarify-artifact-wrapup` — skill:clarify-artifact @ wrap-up
@@ -141,7 +151,7 @@
   - `skill-document-utils-wrapup` — skill:document-utils @ wrap-up
   - `skill-draw-diagram-wrapup` — skill:draw-diagram @ wrap-up
   - `skill-git-utils-wrapup` — skill:git-utils @ wrap-up
-  - `skill-humanize-wrapup` — skill:humanize @ wrap-up
+  - `skill-humanize-wrapup` — skill:humanize-conclusion @ wrap-up
   - `skill-implement-feature-wrapup` — skill:implement-feature @ wrap-up
   - `skill-improve-agent-wrapup` — skill:improve-agent @ wrap-up
   - `skill-improve-docs-wrapup` — skill:improve-docs @ wrap-up
@@ -160,6 +170,7 @@
   - `skill-memory-record-wrapup` — skill:memory-record @ wrap-up
   - `skill-merge-skills-wrapup` — skill:merge-skills @ wrap-up
   - `skill-research-feature-wrapup` — skill:research-feature @ wrap-up
+  - `skill-review-feature-quality-wrapup` — skill:review-feature-quality @ wrap-up
   - `skill-review-sdd-process-wrapup` — skill:review-sdd-process @ wrap-up
   - `skill-run-agent-wrapup` — skill:run-agent @ wrap-up
   - `skill-run-interview-wrapup` — skill:run-interview @ wrap-up
@@ -170,7 +181,8 @@
   - `skill-sdd-loop-driver-cli-profile` — skill:sdd-loop-driver @ wrap-up
   - `skill-sdd-project-setup-wrapup` — skill:sdd-project-setup @ wrap-up
   - `skill-self-improvement-wrapup` — skill:self-improvement @ wrap-up
-  - `skill-study-project-wrapup` — skill:study-project @ wrap-up
+  - `skill-ssh-utils-wrapup` — skill:ssh-utils @ wrap-up
+  - `skill-study-code-wrapup` — skill:study-code @ wrap-up
   - `skill-summarize-project-wrapup` — skill:summarize-project @ wrap-up
 
 ### trigger-escalation  [slice: scripts]
@@ -200,6 +212,8 @@
 graph TD
   root[Feedback Probe]
   root --> kind_internal[internal]
+  kind_internal --> class_closeout_step[closeout-step]
+  class_closeout_step --> obj_closeout_step_observe[closeout-step-observe]
   kind_internal --> class_command_gate[command-gate]
   class_command_gate --> obj_gate_feature_status_regression[gate-feature-status-regression]
   class_command_gate --> obj_gate_glossary_user_entry_overwrite[gate-glossary-user-entry-overwrite]
@@ -225,6 +239,7 @@ graph TD
   class_command_wrapup --> obj_speckit_improve_wrapup[speckit-improve-wrapup]
   class_command_wrapup --> obj_speckit_instructions_wrapup[speckit-instructions-wrapup]
   class_command_wrapup --> obj_speckit_interview_wrapup[speckit-interview-wrapup]
+  class_command_wrapup --> obj_speckit_measure_wrapup[speckit-measure-wrapup]
   class_command_wrapup --> obj_speckit_plan_wrapup[speckit-plan-wrapup]
   class_command_wrapup --> obj_speckit_requirements_wrapup[speckit-requirements-wrapup]
   class_command_wrapup --> obj_speckit_research_wrapup[speckit-research-wrapup]
@@ -232,6 +247,7 @@ graph TD
   class_command_wrapup --> obj_speckit_sanitize_wrapup[speckit-sanitize-wrapup]
   class_command_wrapup --> obj_speckit_session_wrapup[speckit-session-wrapup]
   class_command_wrapup --> obj_speckit_skills_wrapup[speckit-skills-wrapup]
+  class_command_wrapup --> obj_speckit_status_wrapup[speckit-status-wrapup]
   class_command_wrapup --> obj_speckit_tasks_wrapup[speckit-tasks-wrapup]
   class_command_wrapup --> obj_speckit_team_wrapup[speckit-team-wrapup]
   class_command_wrapup --> obj_speckit_todo_wrapup[speckit-todo-wrapup]
@@ -308,6 +324,7 @@ graph TD
   class_skill_wrapup --> obj_skill_memory_record_wrapup[skill-memory-record-wrapup]
   class_skill_wrapup --> obj_skill_merge_skills_wrapup[skill-merge-skills-wrapup]
   class_skill_wrapup --> obj_skill_research_feature_wrapup[skill-research-feature-wrapup]
+  class_skill_wrapup --> obj_skill_review_feature_quality_wrapup[skill-review-feature-quality-wrapup]
   class_skill_wrapup --> obj_skill_review_sdd_process_wrapup[skill-review-sdd-process-wrapup]
   class_skill_wrapup --> obj_skill_run_agent_wrapup[skill-run-agent-wrapup]
   class_skill_wrapup --> obj_skill_run_interview_wrapup[skill-run-interview-wrapup]
@@ -318,7 +335,8 @@ graph TD
   class_skill_wrapup --> obj_skill_sdd_loop_driver_cli_profile[skill-sdd-loop-driver-cli-profile]
   class_skill_wrapup --> obj_skill_sdd_project_setup_wrapup[skill-sdd-project-setup-wrapup]
   class_skill_wrapup --> obj_skill_self_improvement_wrapup[skill-self-improvement-wrapup]
-  class_skill_wrapup --> obj_skill_study_project_wrapup[skill-study-project-wrapup]
+  class_skill_wrapup --> obj_skill_ssh_utils_wrapup[skill-ssh-utils-wrapup]
+  class_skill_wrapup --> obj_skill_study_code_wrapup[skill-study-code-wrapup]
   class_skill_wrapup --> obj_skill_summarize_project_wrapup[skill-summarize-project-wrapup]
   kind_internal --> class_trigger_escalation[trigger-escalation]
   class_trigger_escalation --> obj_trigger_p1_feature_dir[trigger-p1-feature-dir]
@@ -334,6 +352,7 @@ graph TD
 
 | Object | Class | Kind | 插入位置(unit @ lifecycle) | 收集内容 | 处理流程 |
 |--------|-------|------|------------------------------|----------|----------|
+| `closeout-step-observe` | closeout-step | internal | skill:git-utils @ wrap-up | 收口步骤的可观察结局(签名面一次编译即得:Close-out 节的存在性与顺序;规则真源 owner 为 artifact-commit-step.md) | compile→embed |
 | `gate-feature-status-regression` | command-gate | internal | /speckit.feature @ gate-feature-status-regression | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-glossary-user-entry-overwrite` | command-gate | internal | /speckit.instructions @ gate-glossary-user-entry-overwrite | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
 | `gate-implement-checklist-waiver` | command-gate | internal | /speckit.implement @ gate-implement-checklist-waiver | 保留确认点触发后的用户决定观察事实(门控必要性证据) | record→threshold→package→manual→mark-submitted |
@@ -357,6 +376,7 @@ graph TD
 | `speckit-improve-wrapup` | command-wrapup | internal | /speckit.improve @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-instructions-wrapup` | command-wrapup | internal | /speckit.instructions @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-interview-wrapup` | command-wrapup | internal | /speckit.interview @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `speckit-measure-wrapup` | command-wrapup | internal | /speckit.measure @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-plan-wrapup` | command-wrapup | internal | /speckit.plan @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-requirements-wrapup` | command-wrapup | internal | /speckit.requirements @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-research-wrapup` | command-wrapup | internal | /speckit.research @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -364,6 +384,7 @@ graph TD
 | `speckit-sanitize-wrapup` | command-wrapup | internal | /speckit.sanitize @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-session-wrapup` | command-wrapup | internal | /speckit.session @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-skills-wrapup` | command-wrapup | internal | /speckit.skills @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `speckit-status-wrapup` | command-wrapup | internal | /speckit.status @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-tasks-wrapup` | command-wrapup | internal | /speckit.tasks @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-team-wrapup` | command-wrapup | internal | /speckit.team @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `speckit-todo-wrapup` | command-wrapup | internal | /speckit.todo @ wrap-up | 命令单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -415,7 +436,7 @@ graph TD
 | `skill-document-utils-wrapup` | skill-wrapup | internal | skill:document-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-draw-diagram-wrapup` | skill-wrapup | internal | skill:draw-diagram @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-git-utils-wrapup` | skill-wrapup | internal | skill:git-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-humanize-wrapup` | skill-wrapup | internal | skill:humanize @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-humanize-wrapup` | skill-wrapup | internal | skill:humanize-conclusion @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-implement-feature-wrapup` | skill-wrapup | internal | skill:implement-feature @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-agent-wrapup` | skill-wrapup | internal | skill:improve-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-improve-docs-wrapup` | skill-wrapup | internal | skill:improve-docs @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -434,6 +455,7 @@ graph TD
 | `skill-memory-record-wrapup` | skill-wrapup | internal | skill:memory-record @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-merge-skills-wrapup` | skill-wrapup | internal | skill:merge-skills @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-research-feature-wrapup` | skill-wrapup | internal | skill:research-feature @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-review-feature-quality-wrapup` | skill-wrapup | internal | skill:review-feature-quality @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-review-sdd-process-wrapup` | skill-wrapup | internal | skill:review-sdd-process @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-run-agent-wrapup` | skill-wrapup | internal | skill:run-agent @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-run-interview-wrapup` | skill-wrapup | internal | skill:run-interview @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
@@ -444,7 +466,8 @@ graph TD
 | `skill-sdd-loop-driver-cli-profile` | skill-wrapup | internal | skill:sdd-loop-driver @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-sdd-project-setup-wrapup` | skill-wrapup | internal | skill:sdd-project-setup @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-self-improvement-wrapup` | skill-wrapup | internal | skill:self-improvement @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
-| `skill-study-project-wrapup` | skill-wrapup | internal | skill:study-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-ssh-utils-wrapup` | skill-wrapup | internal | skill:ssh-utils @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
+| `skill-study-code-wrapup` | skill-wrapup | internal | skill:study-code @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `skill-summarize-project-wrapup` | skill-wrapup | internal | skill:summarize-project @ wrap-up | 技能单次运行的回顾与 ≥1 条单元级优化点 | record→threshold→package→manual→mark-submitted |
 | `trigger-p1-feature-dir` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |
 | `trigger-p2-clarification-markers` | trigger-escalation | internal | scripts/python/trigger-utils.py @ situation | 050 主动流程触发的 P1–P5 升级探测(确定性存在性/计数/差集,永不读制品正文) | assess→suggest(非阻塞建议行) |

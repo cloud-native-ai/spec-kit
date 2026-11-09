@@ -35,7 +35,7 @@ VALID_REGISTRY = """# Feedback Probe Definitions
 | object_id | class_id | unit | lifecycle_point |
 |-----------|----------|------|-----------------|
 | speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |
-| skill-study-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| skill-study-wrapup | skill-wrapup | skill:study-code | wrap-up |
 """
 
 
@@ -59,7 +59,7 @@ def _embed_workspace(tmp_path: Path) -> Path:
     cmds = tmp_path / "templates" / "commands"
     cmds.mkdir(parents=True, exist_ok=True)
     (cmds / "plan.md").write_text("# plan\n\n## Wrap-up\n\nstep\n", encoding="utf-8")
-    skill = tmp_path / "skills" / "study-project"
+    skill = tmp_path / "skills" / "study-code"
     skill.mkdir(parents=True, exist_ok=True)
     (skill / "SKILL.md").write_text("# study\n\n## Wrap-up\n\nstep\n", encoding="utf-8")
     return tmp_path
@@ -275,7 +275,7 @@ GATE_REGISTRY = """# Feedback Probe Definitions
 | object_id | class_id | unit | lifecycle_point |
 |-----------|----------|------|-----------------|
 | speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |
-| skill-study-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| skill-study-wrapup | skill-wrapup | skill:study-code | wrap-up |
 | gate-plan-sample | command-gate | /speckit.plan | gate-plan-sample |
 """
 

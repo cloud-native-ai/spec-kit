@@ -93,7 +93,7 @@ POST_077_WIRING_TEMPLATES = (
 )
 WIRING_SKILLS = (
     "skills/external/create-docs/SKILL.md",
-    "skills/external/humanize/SKILL.md",
+    "skills/external/humanize-conclusion/SKILL.md",
 )
 
 # C-1 frozen denominator: the command-template set (stem == `/speckit.<stem>`).
@@ -166,7 +166,7 @@ FROZEN_SKILLS = (
     "external/document-utils",
     "external/draw-diagram",
     "external/git-utils",
-    "external/humanize",
+    "external/humanize-conclusion",
     "external/improve-docs",
     "external/improve-skills",
     "external/merge-skills",
@@ -210,7 +210,7 @@ FROZEN_SKILLS = (
     "internal/run-team",
     "internal/sanitize-materials",
     "internal/self-improvement",
-    "internal/study-project",
+    "external/study-code",
     "internal/summarize-project",
 )
 
@@ -248,8 +248,8 @@ MIRROR_PAIRS = {
         ".specify/scripts/python/doc-consistency-check.py",
     "skills/external/create-docs/SKILL.md":
         ".specify/skills/create-docs/SKILL.md",
-    "skills/external/humanize/SKILL.md":
-        ".specify/skills/humanize/SKILL.md",
+    "skills/external/humanize-conclusion/SKILL.md":
+        ".specify/skills/humanize-conclusion/SKILL.md",
 }
 
 # The four new payloads whose mirrors land in T033 (Polish). Absence is allowed
@@ -889,7 +889,7 @@ _FEATURE_087_BANNER_ONLY = (
     "skills/internal/research-feature/SKILL.md",
     "skills/internal/run-interview/SKILL.md",
     "skills/internal/run-team/SKILL.md",
-    "skills/internal/study-project/SKILL.md",
+    "skills/external/study-code/SKILL.md",
     "skills/internal/summarize-project/SKILL.md",
     "templates/commands/derive.md",
     "templates/commands/instructions.md",
@@ -1114,9 +1114,16 @@ def test_c4_unrefreshed_form_has_no_call_sites():
         "templates/commands/docs.md",
         "templates/commands/humanize.md",
     ) + WIRING_SKILLS
+    # The pre-change HEAD predates the 2026-11-09 skill rename, so the humanize
+    # skill is read at its historical path there; the current-path skip logic
+    # above still uses WIRING_SKILLS.
+    pre_change_paths = {
+        "skills/external/humanize-conclusion/SKILL.md":
+            "skills/external/humanize/SKILL.md",
+    }
     tokens = ENGINE_OR_OWNER_TOKENS + ("--action lookup",)
     for rel in targets:
-        old = _git_show("%s:%s" % (PRE_CHANGE_HEAD, rel))
+        old = _git_show("%s:%s" % (PRE_CHANGE_HEAD, pre_change_paths.get(rel, rel)))
         hits = [token for token in tokens if token in old]
         assert not hits, (
             "%s already carried %r at the pre-change HEAD — an unrefreshed "
@@ -1126,7 +1133,7 @@ def test_c4_unrefreshed_form_has_no_call_sites():
     # Positive control: the same files DO carry the wiring now, so the check
     # above is measuring the slice's own addition rather than a constant.
     assert "flow-class-check.py" in _read(COMMANDS_DIR / "docs.md")
-    assert "flow-class-check.py" in _read(SKILLS_DIR / "external" / "humanize" / "SKILL.md")
+    assert "flow-class-check.py" in _read(SKILLS_DIR / "external" / "humanize-conclusion" / "SKILL.md")
 
 
 # --------------------------------------------------------------------------- #

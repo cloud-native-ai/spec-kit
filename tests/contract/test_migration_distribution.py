@@ -107,7 +107,7 @@ COMMAND_BASELINE = frozenset(
 SKILL_BASELINE = frozenset(
     {
         "create-docs", "create-pages", "create-skills", "database-utils",
-        "document-utils", "draw-diagram", "git-utils", "humanize",
+        "document-utils", "draw-diagram", "git-utils", "humanize-conclusion",
         "improve-docs", "improve-skills", "merge-skills", "sdd-house-keeping",
         "sdd-loop-driver", "sdd-project-setup", "ssh-utils", "coaching-skills", "analyze-artifacts",
         "archive-session", "clarify-artifact", "code-review",
@@ -120,7 +120,7 @@ SKILL_BASELINE = frozenset(
         "memory-recall", "memory-record", "research-feature",
         "review-feature-quality",
         "review-sdd-process", "run-agent", "run-interview", "run-skills",
-        "run-team", "sanitize-materials", "self-improvement", "study-project",
+        "run-team", "sanitize-materials", "self-improvement", "study-code",
         "summarize-project",
     }
 )

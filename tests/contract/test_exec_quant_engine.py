@@ -460,7 +460,7 @@ class TestIdentityForms:
         assert "usage:" in result.stderr
 
     def test_skill_form_infers_skill_type(self, ws, fake_home):
-        result = run_engine(collect_args(ws, unit_id="skill:study-project"),
+        result = run_engine(collect_args(ws, unit_id="skill:study-code"),
                             env_home=fake_home)
         assert result.returncode == 0, result.stderr
         assert load_single_record(ws)["unit_type"] == "skill"
@@ -618,7 +618,7 @@ class TestAgentCollection:
 
 def _collect_two_units(ws: Path, fake_home: Path):
     run_engine(collect_args(ws), env_home=fake_home)
-    run_engine(collect_args(ws, unit_id="skill:study-project"), env_home=fake_home)
+    run_engine(collect_args(ws, unit_id="skill:study-code"), env_home=fake_home)
 
 
 class TestListRecords:
@@ -650,10 +650,10 @@ class TestListRecords:
     def test_filter_by_unit_id(self, ws, fake_home):
         _collect_two_units(ws, fake_home)
         result = run_engine(["--action", "list-records", "--workspace-root", str(ws),
-                             "--unit-id", "skill:study-project", "--format", "json"],
+                             "--unit-id", "skill:study-code", "--format", "json"],
                             env_home=fake_home)
         entries = json.loads(result.stdout)
-        assert [e["unit_id"] for e in entries] == ["skill:study-project"]
+        assert [e["unit_id"] for e in entries] == ["skill:study-code"]
 
     def test_filter_by_unit_type(self, ws, fake_home):
         _collect_two_units(ws, fake_home)
@@ -798,7 +798,7 @@ class TestAppendOnly:
 
     def test_actions_never_rewrite_existing_entries(self, ws, fake_home):
         run_engine(collect_args(ws, run_id="v4-a"), env_home=fake_home)
-        run_engine(collect_args(ws, unit_id="skill:study-project", run_id="v4-b"),
+        run_engine(collect_args(ws, unit_id="skill:study-code", run_id="v4-b"),
                    env_home=fake_home)
         records_before = records_snapshot(ws)
         scores_before = scores_snapshot(ws)

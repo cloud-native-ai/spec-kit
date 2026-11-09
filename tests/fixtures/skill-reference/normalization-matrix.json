@@ -124,14 +124,14 @@
     {
       "segment": "normalize",
       "id": "R08",
-      "raw": "humanize",
+      "raw": "humanize-conclusion",
       "form": "bare name",
       "operation": "invocation",
       "repo_root": "live",
       "exercises": "bare name; the live tree carries the same Skill at both the source and its installed mirror, and § Disambiguation rules (c) makes those two paths ONE hit (the layer, not the path literal) — so this settles as a skill",
       "expect": {
         "outcome": "skill",
-        "normalized": "humanize",
+        "normalized": "humanize-conclusion",
         "layer": "dev-canonical"
       }
     },
@@ -253,14 +253,14 @@
     {
       "segment": "normalize",
       "id": "R17",
-      "raw": ".specify/skills/humanize",
+      "raw": ".specify/skills/humanize-conclusion",
       "form": "directory path",
       "operation": "invocation",
       "repo_root": "live",
       "exercises": "the installed layer named explicitly: the same Skill as R08, reached through the mirror path, still one hit",
       "expect": {
         "outcome": "skill",
-        "normalized": ".specify/skills/humanize",
+        "normalized": ".specify/skills/humanize-conclusion",
         "layer": "installed",
         "case_pass": "exact"
       }

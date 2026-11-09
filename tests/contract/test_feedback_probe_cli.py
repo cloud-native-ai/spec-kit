@@ -29,7 +29,7 @@ VALID_REGISTRY = """# Feedback Probe Definitions
 | object_id | class_id | unit | lifecycle_point |
 |-----------|----------|------|-----------------|
 | speckit-plan-wrapup | command-wrapup | /speckit.plan | wrap-up |
-| skill-study-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| skill-study-wrapup | skill-wrapup | skill:study-code | wrap-up |
 """
 
 
@@ -79,7 +79,7 @@ class TestMapAction:
                 / "probe-map.md").read_text(encoding="utf-8")
         for needle in ("command-wrapup", "skill-wrapup", "external-custom",
                        "speckit-plan-wrapup", "skill-study-wrapup",
-                       "/speckit.plan", "skill:study-project",
+                       "/speckit.plan", "skill:study-code",
                        "internal", "record→package"):
             assert needle in text, f"map missing: {needle}"
 
@@ -124,7 +124,7 @@ class TestListFiltersAndDispose:
             "lifecycle_point: wrap-up\n---\n", encoding="utf-8")
         assert _record_entry(probe_workspace, "/speckit.plan", "command", "r1") == 0
         assert _record_entry(
-            probe_workspace, "skill:study-project", "skill", "r2") == 0
+            probe_workspace, "skill:study-code", "skill", "r2") == 0
         assert _record_entry(
             probe_workspace, "custom:myteam/deploy-skill", "custom-unit", "r3") == 0
         return probe_workspace

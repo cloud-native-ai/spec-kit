@@ -91,9 +91,9 @@
 # skill ships no `scripts/` directory, so the measured carrier is the deterministic program its
 # workflow does call — the fidelity comparer under `tests/fixtures/humanize/`
 # (`SKILL.md` § Evaluation hooks, `--input` / `--output`, exit 0 = 通过).
-- unit: skills/external/humanize/SKILL.md
+- unit: skills/external/humanize-conclusion/SKILL.md
   carrier: tests/fixtures/humanize/diff_protected.py
-  anchor: skills/external/humanize/SKILL.md#Overview
+  anchor: skills/external/humanize-conclusion/SKILL.md#Overview
 
 # --- T032 rows (tasks.md T032), appended 2026-11-05 (implement, part 6): the screen's remaining
 # candidates whose D1 holds and whose D2 does not, 28 rows. The 10 rows above are untouched (E-2: a

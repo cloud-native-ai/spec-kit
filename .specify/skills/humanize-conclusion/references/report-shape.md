@@ -26,7 +26,7 @@
 
 **缺任一小节即不合格**；五节之外 MUST NOT 再加第六个 H2 小节（会话回显的 `--output` 摘要同样不是第六节）。标题字面量的 owner 是 requirements § Shared Strings——本清单是消费方，不是所有者；改标题 MUST 改所有者，再回到这里。
 
-- **报告由 humanize 主会话撰写**；执行体 MUST NOT 写最终报告——执行体只回传结果信封（`references/run-mode.md` § Envelope）。撰写者与执行者是两个角色：报告里 MUST NOT 出现**以执行体身份的自述**（「我执行了…」「我跑了…」），执行结果一律以第三人称的证据指针表述。
+- **报告由 humanize-conclusion 主会话撰写**；执行体 MUST NOT 写最终报告——执行体只回传结果信封（`references/run-mode.md` § Envelope）。撰写者与执行者是两个角色：报告里 MUST NOT 出现**以执行体身份的自述**（「我执行了…」「我跑了…」），执行结果一律以第三人称的证据指针表述。
 - **默认零写入**：无 `--output` 时报告只在会话内呈现，MUST NOT 写隐式副本、MUST NOT 写到默认位置、MUST NOT 创建报告文件。只有显式 `--output` 才写入该路径；会话另回显一份摘要，摘要不替代报告。
 - 五节内部的义务逐节定义在 `## Conclusion` … `## Next Steps`；本节的职责只是固定「有几节、叫什么、什么顺序」。
 
@@ -46,7 +46,7 @@
 
 - 排序依据是 requirements FR-019 的**封闭影响尺**（owner 是该 FR；本文件不复述档位）；同一档并列时 MUST 按文件路径**字典序**——MUST NOT 引入其他排序依据（「我最先做的」「改动行数最多」「执行顺序」都不合格）。
 - **无变化时也必须占位**：没有关键变化时 MUST 明写「无变化」，MUST NOT 留空、MUST NOT 省略该节。
-- **指令造成的写入在此可见**：回传信封的 `products` 逐项落进本节（humanize 自身除显式 `--output` 外不写文件）；写入归入哪一档按影响尺判定，不按文件数量或行数判定。
+- **指令造成的写入在此可见**：回传信封的 `products` 逐项落进本节（humanize-conclusion 自身除显式 `--output` 外不写文件）；写入归入哪一档按影响尺判定，不按文件数量或行数判定。
 - 每条变化 = 一句结论 + 一个指针（指针形态与义务见 `## Evidence`）；MUST NOT 只写形容词、「若干文件已更新」或「多处调整」。
 
 ## Evidence
@@ -56,7 +56,7 @@
 - **每条关键结论配可定位指针**：`产物路径`（存在且可打开）、`命令与退出码`（命令原文 + 实际退出码）、`测试读数`（通过/失败计数及其来源）、或可定位引用（文件 + 小节或行号）。MUST NOT 只写形容词，也 MUST NOT 用「已验证」「测试通过」「一切正常」这类没有坐标的断言充数。
 - **指令造成的写入逐项列出**：回传信封 `products` 的每一项都在本节出现一次，标明 created / modified；它与 `## Key Changes` 的条目对应，但比那里更细（路径逐条，不合并成「若干文件」）。
 - **无可报告输出时写 `none`**：执行体 `status=completed` 且无输出无产物时，本节正文写成 `none`（literal owner 是 requirements § Shared Strings）；`none` 只替代证据指针与产物清单，MUST NOT 替代派发记录行——该行仍须出现。
-- **一行派发记录**：本节 MUST 含一行 `dispatches:` 元数据（键名 owner 是 requirements § Shared Strings），值是 humanize 发起的**顶层派发**次数。计数口径的唯一 owner 是 `contracts/execution-dispatch.contract.md` EX-21：原生通道**成功路径恒为 1**，降级为 `0`；指令自身再发起的派发归属该指令单元，MUST NOT 重复计数。该行是派发与重试计数的唯一来源，散文叙述不作数。
+- **一行派发记录**：本节 MUST 含一行 `dispatches:` 元数据（键名 owner 是 requirements § Shared Strings），值是 humanize-conclusion 发起的**顶层派发**次数。计数口径的唯一 owner 是 `contracts/execution-dispatch.contract.md` EX-21：原生通道**成功路径恒为 1**，降级为 `0`；指令自身再发起的派发归属该指令单元，MUST NOT 重复计数。该行是派发与重试计数的唯一来源，散文叙述不作数。
 - **核对不上的证据不进本节**：证据逐项核对可定位性（`references/run-mode.md` § Failure & No Retry 的对应条款）；核对不上的项 MUST NOT 作为证据出现，改记「未能核实」到 `## Risks & Limits`。
 
 ## Risks & Limits

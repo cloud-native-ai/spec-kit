@@ -115,7 +115,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-draw-diagram-wrapup | skill-wrapup | skill:draw-diagram | wrap-up |
 | skill-git-utils-wrapup | skill-wrapup | skill:git-utils | wrap-up |
 | skill-ssh-utils-wrapup | skill-wrapup | skill:ssh-utils | wrap-up |
-| skill-humanize-wrapup | skill-wrapup | skill:humanize | wrap-up |
+| skill-humanize-wrapup | skill-wrapup | skill:humanize-conclusion | wrap-up |
 | skill-sdd-loop-driver-cli-profile | skill-wrapup | skill:sdd-loop-driver | wrap-up |
 | gate-git-workflow-tiered-mode | skill-gate | skill:git-utils | gate-git-workflow-tiered-mode |
 | skill-improve-agent-wrapup | skill-wrapup | skill:improve-agent | wrap-up |
@@ -130,7 +130,7 @@ MUST 由本文件重建」这条判据。表头与目录章的形态是解析面
 | skill-self-improvement-wrapup | skill-wrapup | skill:self-improvement | wrap-up |
 | skill-sdd-project-setup-wrapup | skill-wrapup | skill:sdd-project-setup | wrap-up |
 | skill-sdd-house-keeping-wrapup | skill-wrapup | skill:sdd-house-keeping | wrap-up |
-| skill-study-project-wrapup | skill-wrapup | skill:study-project | wrap-up |
+| skill-study-code-wrapup | skill-wrapup | skill:study-code | wrap-up |
 | skill-summarize-project-wrapup | skill-wrapup | skill:summarize-project | wrap-up |
 | skill-coaching-skills-wrapup | skill-wrapup | skill:coaching-skills | wrap-up |
 | speckit-feedback-wrapup | command-wrapup | /speckit.feedback | wrap-up |

@@ -2,7 +2,7 @@
 
 Used by test_summarize_project_prompt_assets.py, which pins the prompt assets
 of both spec 030-summarize-project (Feature 013) skills — summarize-project and
-study-project (the latter absorbed from the former test_study_project_uml_assets.py).
+study-code (the latter absorbed from the former test_study_project_uml_assets.py).
 """
 import importlib.util
 from pathlib import Path

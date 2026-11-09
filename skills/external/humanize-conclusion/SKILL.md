@@ -1,5 +1,5 @@
 ---
-name: humanize
+name: humanize-conclusion
 description: |
   Two modes under one entry. Run mode (default) is the new positioning: 跑一条指令 → 五节报告 —
   hand the command one instruction, exactly one temporary executor runs it, and the main session writes
@@ -20,19 +20,19 @@ description: |
   "humorous rewrite", "empathetic rewrite", "口语化改写", "tone this down", "rewrite for executives",
   "跑这条指令并给我报告", "执行这条指令", "动作输出报告", "五节报告", "run this and report back",
   "instruction to report", "humanize run", "--file 改写", "--inline 改写"].
-skill_id: "<SKILL:.specify/skills/humanize/SKILL.md>"
+skill_id: "<SKILL:.specify/skills/humanize-conclusion/SKILL.md>"
 classification: external
 ---
 
-# humanize
+# humanize-conclusion
 
 ## Overview
 
 本技能有两个分支：**运行模式（缺省）**——交给它一条指令，它派发恰好一个会话级临时执行体跑完，再结合动作输出/证据、项目治理与会话上下文，写出**一份五节的人读报告**；**内容模式（显式 `--file` / `--inline`）**——把给定内容、结论或外部文档改写到**读起来像有经验的真人作者所写**，而事实层一个不动。命令侧（`/speckit.humanize`）只做薄入口与输入接线。
 
 - **行为权威**: 本文件自足——两模式的分支边界与不可协商项以下文 Non-negotiables 与 Modes 为准；运行模式的行为细则在 `references/run-mode.md` 与 `references/report-shape.md`，本正文不复述；内容模式的四维度、保真底线、语气与受众、文件行为与注入防线以下文 Workflow 各 Stage 为准。FR/SC 编号是框架仓规格（requirements FR-001..FR-030 / SC-001..SC-010、契约 IP/EX/RP/CM/WC）的出处标注，宿主项目无需解析。
-- **评估资产**: 框架仓 `tests/fixtures/humanize/`（语料 + 量规 + 确定性差异脚本 `diff_protected.py`）——仅评估时使用，宿主运行不依赖。
-- **分类**: external —— 不依赖任何 spec-kit 内部制品，任何宿主项目仅读本文件即可完成一次调用。
+- **评估资产**: 框架仓 `tests/fixtures/humanize/`（语料 + 量规 + 确定性差异脚本 `diff_protected.py`）。
+- **分类**: external —— 零 spec-kit 内部依赖，单文件自足。
 
 ## Modes
 
@@ -62,8 +62,8 @@ classification: external
 4. **默认零写入（FR-020）**: 未显式给出 `--output` 时不创建、不修改任何文件；不写隐式副本、不原地覆盖输入。
 5. **最小改动（FR-009）**: 已自然的文本至多轻微润色并明说无需实质修改；不得为显示工作量而降低原文质量。
 6. **检测器诚实（FR-006/FR-027）**: 本技能不承诺、不暗示、也不专门优化通过任何 AI 内容检测器；降低机器感只以词汇多样性、句式变化与去除公式化模式衡量；一切声称可骗过检测、保证检测结果或让内容不可检出的措辞都在禁用之列（对文档与命令输出同样生效）。
-7. **零写入范围收窄为 humanize 自身（A9）**: 未显式给出 `--output` 时，本技能不写报告、不写副本、不写默认位置；指令自身按其契约产生的文件写入是执行结果的一部分，不视为违反本条，但 MUST 在报告的 `## Key Changes` / `## Evidence` 中逐项披露。运行期并发占位落在受制裁临时根 `.specify/.tmp/humanize/`，运行结束即移除，MUST NOT 出现在 `git status`。
-8. **执行体负责动作，humanize 只负责执行后的报告（A6）**: 运行模式下先由会话级临时执行体执行指令，再由 humanize 主会话撰写最终报告；执行体只回传结果信封，MUST NOT 撰写最终报告，报告也不得以执行体身份自述。指令自身的确认步骤与权限边界优先，本技能不代答、不绕过、不自动确认。
+7. **零写入范围收窄为 humanize-conclusion 自身（A9）**: 未显式给出 `--output` 时，本技能不写报告、不写副本、不写默认位置；指令自身按其契约产生的文件写入是执行结果的一部分，不视为违反本条，但 MUST 在报告的 `## Key Changes` / `## Evidence` 中逐项披露。运行期并发占位落在受制裁临时根 `.specify/.tmp/humanize-conclusion/`，运行结束即移除，MUST NOT 出现在 `git status`。
+8. **执行体负责动作，humanize-conclusion 只负责执行后的报告（A6）**: 运行模式下先由会话级临时执行体执行指令，再由 humanize-conclusion 主会话撰写最终报告；执行体只回传结果信封，MUST NOT 撰写最终报告，报告也不得以执行体身份自述。指令自身的确认步骤与权限边界优先，本技能不代答、不绕过、不自动确认。
 
 ## Workflow
 
@@ -141,10 +141,10 @@ classification: external
 
 **Runtime-mode gate.** If `${SKILL_WORKDIR}/.specify/` does not exist, this skill is running in standalone mode (a non–Spec Kit deployment, e.g. a global agent skills directory) — skip this entire Wrap-up step: no engine call, no feedback entry.
 
-1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:humanize" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
+1. Run Determination — `python3 .specify/scripts/python/run-determination.py --action determine --unit-id "skill:humanize-conclusion" --unit-type skill --run-id <RUN_ID> --complexity <COMPLEXITY>`；source args when available: `--session-file <SESSION_FILE> --session-rows <SESSION_ROWS> --tool <TOOL> --proxy-paths <PROXY_PATHS> --token-note <TOKEN_NOTE> --elapsed-ms <ELAPSED_MS> --elapsed-note <ELAPSED_NOTE> --names-current <NAMES_CURRENT> --names-baseline <NAMES_BASELINE> --declared-check <DECLARED_CHECK> --green-check <GREEN_CHECK> --red-first-refs <RED_FIRST_REFS> --collected <COLLECTED> --prev-user-turn-class <PREV_USER_TURN_CLASS> --unresolved-red <UNRESOLVED_RED> --red-source <RED_SOURCE>`
    尖括号为本轮运行时值——代入后照抄执行(占位 = 参数名去 --、转下划线、全大写;渲染集 = 引擎 manifest required + source,身份对已带实值)
-2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:humanize" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
-3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:humanize" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
+2. Exec Quant — `python3 .specify/scripts/python/exec-quant.py --action collect --unit-id "skill:humanize-conclusion" --unit-type skill`；source args when available: `--run-id <RUN_ID>`
+3. Feedback Record — `python3 .specify/scripts/python/feedback-utils.py --action record --unit-id "skill:humanize-conclusion" --unit-type skill --run-id <RUN_ID> --review <REVIEW> --points <POINTS>`
 4. Threshold Notice — `.specify/shared/workflow/feedback-step.md` § "Threshold prompt protocol (canonical semantics for step 6)"
 5. Token Reflection — `.specify/shared/workflow/feedback-step.md` § "Reflection procedure (the embedded step points here)"
 6. Docs Sync Eval — `.specify/shared/workflow/docs-step.md` § "Evaluation procedure (the embedded step points here)"
