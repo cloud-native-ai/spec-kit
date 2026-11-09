@@ -1636,9 +1636,9 @@ TREES_DIRNAME = "trees"
 DELETE_POLICY = "archive-not-delete"
 
 #: C-33 / C-34 — the two receipt shapes. A migration receipt carries one of the four
-#: migration outcomes; an archive receipt carries `archived` and is never a read surface.
+#: migration outcomes below; an archive receipt (`result: archived`, written when a
+#: definition retires in place) shares the directory family and is never a read surface.
 MIGRATION_RESULTS = ("migrated", "noop", "conflict", "interrupted")
-ARCHIVE_RESULT = "archived"
 
 #: C-43 — the spec-local forms the residual probe enumerates. These are migration
 #: SOURCES, never write targets; `.specify/.tmp/` is outside `.specify/specs/` entirely.
