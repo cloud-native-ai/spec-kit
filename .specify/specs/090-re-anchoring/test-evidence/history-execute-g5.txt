@@ -1,0 +1,307 @@
+# History execute — Wave 2, G5 (status-unreadable → correct) — 2026-11-10
+
+Run: /speckit.history four-stage seam, execute segment (Step 6), wave 2 group G5.
+Executor: bounded repair executor, main tree; no commit, no push, no subagents.
+Inputs: fresh engine reading `.specify/specs/090-re-anchoring/test-evidence/history-w2-before.json`
+(exit 1; `status-unreadable` 52, `not_closed.open` 908), `.specify/.tmp/history-execute-plan.md`
+(group `correct`), owner page `shared/definitions/non-disposable-definitions.md` § Status
+Readability / § Disposition Set / § Disposal Pathways / § Capture Rule,
+`.specify/archive/specs/092-non-disposable/data-model.md` E-1 / E-4 / E-7, and the engine's own
+predicate `class_status_unreadable` (`scripts/python/non-disposable-check.py:676-745`).
+
+RESULT: G5 is **BLOCKED**. 0 of 52 entries closed (measured: `not_closed.open` 908 → 908; the
+`status-unreadable` entry-id set is identical before/after, 52 → 52; `surface_digest` identical,
+`e4e9acc8…`). No status vocabulary was invented and no guard was weakened. The blocker is one
+mechanism: the class's O1 reading is the *pair* (registry status × closure verdict), and for 51
+of the 52 spec dirs the closure checker cannot produce a verdict — its input contract postdates
+them; for the 52nd (090) the verdict is a genuine `block` that no in-place status edit can make
+consistent with the closed status×verdict table. Closing these entries by `correct` would require
+a schema migration of 51 dated specs, and for 17 of them measurement-ladder records the original
+runs never took — i.e. a falsified reading, which the wave's own instruction forbids.
+
+## readings
+
+### Capture Rule (four readings, before / after, same ruler)
+
+| # | reading | command | before (wave start) | after (wave end) | attribution |
+|---|---|---|---|---|---|
+| 1 | mirror baseline | `python3 scripts/python/sync-mirrors.py --check` | exit 0 · `ok shared/ == .specify/shared/ (110 files, byte-identical)` | identical | no source/mirror edit this wave |
+| 2 | instructions bytes | `wc -c .specify/instructions.md` | 36804 | 36804 | unchanged |
+| 3 | constitution pins | `grep -c '^### ' .specify/memory/constitution.md` / `.specify/templates/constitution-template.md` | 27 / 21 | 27 / 21 | unchanged (no principle added) |
+| 4 | worktree form | `git status --porcelain` | clean (0 entries) | 2 `??` at measurement time — this wave's two JSON readings (`history-w2-before.json`, `history-w2-after.json`); this evidence file (`.txt`) is the third and last untracked path, written after the reading | the readings are the wave's only new paths; no tracked path changed |
+
+### Engine readings (command + exit + raw artifact)
+
+- before: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w2-before.json`
+  — exit **1**; `status-unreadable` **52** all `state: open`; `not_closed.open` **908**; `candidates` 1989;
+  909 entries in total; `surface_digest = e4e9acc82b79b92e931370144bd4fc97a91af6207b0d365aba353ff2ce13dc91`.
+- after: `python3 scripts/python/non-disposable-check.py --json > .specify/specs/090-re-anchoring/test-evidence/history-w2-after.json`
+  — exit **1**; `status-unreadable` **52**; `not_closed.open` **908**; same 909-entry set
+  (`entry_id` set equality checked programmatically: identical); same `surface_digest`.
+- Class counts before = after, every class: deferral-marker 15, false-closed-set 0, multi-owner 1,
+  orphan-path 736, renumber-live-binding 105, stale-constant 0, status-unreadable 52, superseded-live 0.
+  **State delta: closed 0; open 908 → 908.** The drop equals the number of entries actually closed (0).
+
+### Why `correct` cannot land — the class's own predicate (measured, not asserted)
+
+`class_status_unreadable` (`:676-745`) reads O1 as the pair *registry row status* × *closure
+verdict* produced by `closure-acceptance-check.py --json`. It emits an entry when (a) the
+checker produces no verdict (`verdict is None`, 51 entries) or (b) the pair contradicts C-802's
+table (1 entry). An entry closes only when a verdict exists and agrees with the status. Measured
+first-error distribution over the 52 (each reproduced by running the checker per spec dir):
+
+| cause | entries | first reading (reproduced per entry) |
+|---|---:|---|
+| requirements.md SC line lacks its `**Path**:` marker (AS-01) | 43 | `requirements.md:<line> SC-001 carries 0 **Path** markers; exactly one is required (AS-01)` |
+| required closure input absent from the spec dir | 7 | `required input not found: <spec-dir>/{tasks,verification,plan}.md` |
+| claimed status unresolvable for the spec dir key | 1 | `cannot determine the claimed feature status for .specify/specs/080-humanize-run-output …` |
+| genuine contradiction, no table fixpoint | 1 | `verdict=block reasons=['status-claims-implemented-but-blocked']` |
+
+Distance to a readable pair, by what the spec dir would still need (classification of all 52;
+measured structure: only 090 carries § Runtime Stack and § Execution Premises (51 of 52 lack
+them), only 080 and 090 carry `**Path**:` markers (50 lack them), only 080 and 090 carry smoke
+fields (50 lack them)):
+
+| bucket | specs | what closing would require |
+|---|---:|---|
+| all-pass (every SC `pass`, all status rows present, 0 open tasks) | 20 | `**Path**` markers on every SC line (semantic per-SC judgment: final vs supporting) + § Runtime Stack with data rows + § Execution Premises / § Inherited Blockers + a smoke record (command, exit, evidence) — a **new dated measurement**, plus O2's smoke fields |
+| non-pass rows without the five-field measurement ladder | 17 | the above, **plus** `blocked_at / reduced_measurement / reduced_measurement_run / why_reduced_insufficient / unblock` for every `deferred`/`partial` row — measurements the dated record never took. Filling them = a falsified reading (forbidden by this wave's instruction and by § Capture Rule) |
+| missing closure input files | 7 | `tasks.md` / `verification.md` / `plan.md` that never existed in those dirs (001, 006, 009, 055, 065, 069, 073). 069's slices are archived under `069a`/`069b`; writing the files into 069 = fabricating whole records |
+| missing per-SC status rows | 6 | status rows for SCs the dated verification never recorded (037, 040, 044, 060, 064, 070) |
+| open task rows | 1 | 074 has 57 `[ ]` rows |
+| contradiction | 1 | 090 below |
+
+**Probe 1 — a full structural retrofit still blocks (spec 016, scratch copy
+`.specify/.tmp/histw2-scratch/016-probe/`, zero tracked writes).** Chain of readings:
+
+1. original spec dir → `input error: requirements.md:131 SC-001 carries 0 **Path** markers (AS-01)`;
+2. markers added (all `supporting`) → `input error: requirements.md carries no § Runtime Stack & Dependency Ownership`;
+3. + Runtime Stack (two truthful `signed-contract` rows derived from `plan.md` § Technical Context: Python, pytest) → `input error: plan.md § Inherited Blockers carries a dependency set but no **Dependency artifacts** block`;
+4. + `**Dependency artifacts (declared, never implied)**: none` + premises/inherited tables → **verdict block**, reasons `zero-final-path-pass`, `blocked-without-measurement-ladder: SC-005`, `status-claims-implemented-but-blocked`;
+5. markers corrected (`final` on the four passing SCs, `supporting` on the deferred SC-005) → **verdict block**, reasons `blocked-without-measurement-ladder: SC-005`, `status-claims-implemented-but-blocked`; `final_path` 4/4 `pass`; conditions `smoke_record_pass: false`, `no_open_rows: true`.
+
+So even the most favorable retrofit leaves 016 at `Implemented × block` — a **CRITICAL
+contradiction**, i.e. the entry would move from "unreadable" to "worse", unless the repair also
+(a) wrote SC-005's ladder fields (a measurement the 2026-06 run never took) and (b) recorded a
+smoke run. The marker values themselves are semantic judgments (owner page § Detection Subject:
+`final` vs `supporting` is decided by what the criterion proves, not by a mechanical reading).
+
+**Probe 2 — 090 has no status fixpoint (simulated with `--feature-registry` on scratch copies of
+`features.md`; the real registry was not edited).**
+
+| status written (simulated) | checker verdict | table cell | reading |
+|---|---|---|---|
+| `Implemented` (today) | `block` (`status-claims-implemented-but-blocked`; `no_open_rows: false` — 116 `[ ]` rows) | ✗ | the entry that exists now (CRITICAL) |
+| `Blocked` | `accept` (no reasons; open rows cannot force a block under a non-claiming status — `parse_tasks` docstring, V-12) | ✗ | registry records a blocker the checker does not see |
+| `Planned` | `accept` | ✗ | corpus A3's original contradiction |
+| `Draft` | `accept` | ✗ | same class |
+| `Completed` | `accept` | ✓ | but false: 116 open tasks, SDD chain unfinished |
+| `Relocated` | excluded by name | "excluded" | but false: the spec dir is live |
+
+The verifier's block exists partly *because* the registry claims `Implemented`; removing the
+claim flips the verdict to `accept` while the underlying incompleteness (open rows) remains. The
+closed table therefore has no cell for "work in progress with open rows and no other blocker".
+090's status was `Planned` at `6c42174fd` and became `Implemented` at `8edd955d1`; the same
+commit merged 092's task graph (0 → 116 open rows), so the claim and its counter-evidence
+arrived together. Only finishing (or formally deferring) the 116 task rows closes this entry —
+a scope this bounded wave does not carry.
+
+### The owner-side readings that make this a mechanism decision, not an executor repair
+
+- **C-804 (owner contract, `nd-acceptance-readability.contract.md`)**: a `requirements.md` SC row
+  carrying no `**Path**:` marker "MUST be reported by … `validate-requirements.py`'s `path-marker`
+  check — and **not** by `status-unreadable`", and the engine "MUST carry the requirements-side
+  reading as an evidence ref". The 43 AS-01-fed entries are exactly that shape: a requirements-side
+  defect reported by the status class because the closure checker refuses a verdict. The engine
+  currently neither carries that evidence ref nor yields these to the requirements-side reading.
+  Implementing C-804 is an engine change, and every wave-1/2 precedent (G1: "Fixing this is a
+  framework decision") keeps engine changes out of a bounded repair wave.
+- **Pre-Status-Flip Gate (`shared/workflow/feature-integration.md`)**: exit `2` "is an input defect
+  in the artifacts: repair and re-run, and never read it as `accept`". The gate mandates repairing
+  the inputs — it does not authorize changing the status or waiving the verdict. For 51 historical
+  dirs the "repair" is the schema migration measured above.
+- **The status×verdict table (C-802, closed)**: no row admits "in progress, open tasks, otherwise
+  clean" (Probe 2). A new status value is explicitly forbidden by this wave ("do not invent a new
+  status vocabulary") and by C-205 (no second vocabulary).
+
+### Per-entry readings (before = after; no tracked edit was made)
+
+Engine line/quote = the registry row the entry names (`file:line` of `.specify/memory/features.md`);
+"engine reading" = the checker's first answer for that spec dir (reproduced 2026-11-10); edited
+text = none, because the entry was blocked before any edit (a `correct` with no before/after body
+diff is precisely what § Disposal Pathways forbids recording as a repair).
+
+| # | entry_id | reg line | registry row (ID · Status · Spec Path) | engine reading (checker first answer) | edited text | blocker |
+|---:|---|---:|---|---|---|---|
+| 1 | `status-unreadable/specs/001-unify-command-handoffs:10` | 10 | 001 · Completed · .specify/specs/001-unify-command-handoffs/requirements.md | required input not found: .specify/specs/001-unify-command-handoffs/tasks.md | — (none: blocked before edit) | missing input: tasks.md, verification.md |
+| 2 | `status-unreadable/specs/006-add-qoder-support:29` | 29 | 020 · Implemented · .specify/specs/006-add-qoder-support/requirements.md | required input not found: .specify/specs/006-add-qoder-support/verification.md | — (none: blocked before edit) | missing input: verification.md |
+| 3 | `status-unreadable/specs/009-claude-code-support:30` | 30 | 021 · Implemented · .specify/specs/009-claude-code-support/requirements.md | required input not found: .specify/specs/009-claude-code-support/verification.md | — (none: blocked before edit) | missing input: verification.md |
+| 4 | `status-unreadable/specs/016-refactor-tools-command:25` | 25 | 016 · Implemented · .specify/specs/016-refactor-tools-command/requirements.md | .specify/specs/016-refactor-tools-command/requirements.md:131 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 5 | `status-unreadable/specs/020-speckit-todo-command:34` | 34 | 025 · Implemented · .specify/specs/020-speckit-todo-command/requirements.md | .specify/specs/020-speckit-todo-command/requirements.md:115 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 6 | `status-unreadable/specs/021-agent-specific-config:31` | 31 | 022 · Implemented · .specify/specs/021-agent-specific-config/requirements.md | .specify/specs/021-agent-specific-config/requirements.md:95 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 7 | `status-unreadable/specs/023-agent-framework-redesign:28` | 28 | 019 · Implemented · .specify/specs/023-agent-framework-redesign/requirements.md | .specify/specs/023-agent-framework-redesign/requirements.md:159 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 8 | `status-unreadable/specs/025-agent-skill-enablement:35` | 35 | 026 · Implemented · .specify/specs/025-agent-skill-enablement/requirements.md | .specify/specs/025-agent-skill-enablement/requirements.md:95 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 9 | `status-unreadable/specs/027-feedback-mechanism:37` | 37 | 028 · Implemented · .specify/specs/027-feedback-mechanism/requirements.md | .specify/specs/027-feedback-mechanism/requirements.md:108 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 10 | `status-unreadable/specs/028-sdd-workflow-refactor:38` | 38 | 029 · Implemented · .specify/specs/028-sdd-workflow-refactor/requirements.md | .specify/specs/028-sdd-workflow-refactor/requirements.md:121 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 11 | `status-unreadable/specs/029-glossary-mechanism:40` | 40 | 031 · Implemented · .specify/specs/029-glossary-mechanism/requirements.md | .specify/specs/029-glossary-mechanism/requirements.md:121 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 12 | `status-unreadable/specs/030-summarize-project:22` | 22 | 013 · Implemented · .specify/specs/030-summarize-project/requirements.md | .specify/specs/030-summarize-project/requirements.md:142 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 13 | `status-unreadable/specs/031-task-complexity-rubric:41` | 41 | 032 · Implemented · .specify/specs/031-task-complexity-rubric/requirements.md | .specify/specs/031-task-complexity-rubric/requirements.md:105 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 14 | `status-unreadable/specs/032-dogfooding-practice:45` | 45 | 036 · Ready for Review · .specify/specs/032-dogfooding-practice/requirements.md | .specify/specs/032-dogfooding-practice/requirements.md:98 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 15 | `status-unreadable/specs/033-docs-command:46` | 46 | 037 · Implemented · .specify/specs/033-docs-command/requirements.md | .specify/specs/033-docs-command/requirements.md:156 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 16 | `status-unreadable/specs/034-evidence-infra:47` | 47 | 038 · Implemented · .specify/specs/034-evidence-infra/requirements.md | .specify/specs/034-evidence-infra/requirements.md:186 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 17 | `status-unreadable/specs/035-token-efficiency:49` | 49 | 040 · Implemented · .specify/specs/035-token-efficiency/requirements.md | .specify/specs/035-token-efficiency/requirements.md:114 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 18 | `status-unreadable/specs/036-team-summary:36` | 36 | 027 · Implemented · .specify/specs/036-team-summary/requirements.md | .specify/specs/036-team-summary/requirements.md:231 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 19 | `status-unreadable/specs/037-goal-registry:50` | 50 | 041 · Implemented · .specify/specs/037-goal-registry/requirements.md | .specify/specs/037-goal-registry/requirements.md:233 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 20 | `status-unreadable/specs/039-session-export:52` | 52 | 043 · Implemented · .specify/specs/039-session-export/requirements.md | .specify/specs/039-session-export/requirements.md:140 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 21 | `status-unreadable/specs/040-agent-metadata-portability:53` | 53 | 044 · Implemented · .specify/specs/040-agent-metadata-portability/requirements.md | .specify/specs/040-agent-metadata-portability/requirements.md:198 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 22 | `status-unreadable/specs/043-init-commit-stamp:54` | 54 | 045 · Implemented · .specify/specs/043-init-commit-stamp/requirements.md | .specify/specs/043-init-commit-stamp/requirements.md:118 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 23 | `status-unreadable/specs/044-reduce-confirmation-flows:55` | 55 | 046 · Implemented · .specify/specs/044-reduce-confirmation-flows/requirements.md | .specify/specs/044-reduce-confirmation-flows/requirements.md:120 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 24 | `status-unreadable/specs/045-sanitize-command:56` | 56 | 047 · Implemented · .specify/specs/045-sanitize-command/requirements.md | .specify/specs/045-sanitize-command/requirements.md:106 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 25 | `status-unreadable/specs/048-derive-command:58` | 58 | 049 · Implemented · .specify/specs/048-derive-command/requirements.md | .specify/specs/048-derive-command/requirements.md:176 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 26 | `status-unreadable/specs/050-proactive-flow-trigger:59` | 59 | 050 · Implemented · .specify/specs/050-proactive-flow-trigger/requirements.md | .specify/specs/050-proactive-flow-trigger/requirements.md:212 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 27 | `status-unreadable/specs/051-user-facing-comprehension:60` | 60 | 051 · Implemented · .specify/specs/051-user-facing-comprehension/requirements.md | .specify/specs/051-user-facing-comprehension/requirements.md:278 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 28 | `status-unreadable/specs/052-fast-fail-principle:61` | 61 | 052 · Implemented · .specify/specs/052-fast-fail-principle/requirements.md | .specify/specs/052-fast-fail-principle/requirements.md:429 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 29 | `status-unreadable/specs/053-machine-decidable-artifacts:62` | 62 | 053 · Implemented · .specify/specs/053-machine-decidable-artifacts/requirements.md | .specify/specs/053-machine-decidable-artifacts/requirements.md:248 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 30 | `status-unreadable/specs/055-conflict-free-stores:63` | 63 | 055 · Implemented · .specify/specs/055-conflict-free-stores/requirements.md | required input not found: .specify/specs/055-conflict-free-stores/plan.md | — (none: blocked before edit) | missing input: plan.md, tasks.md, verification.md; requirements.md defines 0 SC rows |
+| 31 | `status-unreadable/specs/056-probe-handler-system:64` | 64 | 056 · Implemented · .specify/specs/056-probe-handler-system/requirements.md | .specify/specs/056-probe-handler-system/requirements.md:191 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 32 | `status-unreadable/specs/057-decompose-command-skills:65` | 65 | 057 · Implemented · .specify/specs/057-decompose-command-skills/requirements.md | .specify/specs/057-decompose-command-skills/requirements.md:137 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 33 | `status-unreadable/specs/058-sdd-loop-driver:66` | 66 | 058 · Implemented · .specify/specs/058-sdd-loop-driver/requirements.md | .specify/specs/058-sdd-loop-driver/requirements.md:251 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 34 | `status-unreadable/specs/059-exec-quant-recording:67` | 67 | 059 · Implemented · .specify/specs/059-exec-quant-recording/requirements.md | .specify/specs/059-exec-quant-recording/requirements.md:149 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 35 | `status-unreadable/specs/060-decompose-subagent-dispatch:68` | 68 | 060 · Implemented · .specify/specs/060-decompose-subagent-dispatch/requirements.md | .specify/specs/060-decompose-subagent-dispatch/requirements.md:161 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 36 | `status-unreadable/specs/061-subagent-cli-config:69` | 69 | 061 · Implemented · .specify/specs/061-subagent-cli-config/requirements.md | .specify/specs/061-subagent-cli-config/requirements.md:193 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 37 | `status-unreadable/specs/063-review-p1-governance:71` | 71 | 063 · Implemented · .specify/specs/063-review-p1-governance/requirements.md | .specify/specs/063-review-p1-governance/requirements.md:253 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 38 | `status-unreadable/specs/064-subagent-concurrency:73` | 73 | 064 · Implemented · .specify/specs/064-subagent-concurrency/requirements.md | .specify/specs/064-subagent-concurrency/requirements.md:300 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 39 | `status-unreadable/specs/065-loop-interruption-recovery:74` | 74 | 065 · Planned · .specify/specs/065-loop-interruption-recovery/requirements.md | required input not found: .specify/specs/065-loop-interruption-recovery/tasks.md | — (none: blocked before edit) | missing input: tasks.md, verification.md |
+| 40 | `status-unreadable/specs/068-exec-quant-feedback-channel:75` | 75 | 068 · Ready for Review · .specify/specs/068-exec-quant-feedback-channel/requirements.md | .specify/specs/068-exec-quant-feedback-channel/requirements.md:229 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 41 | `status-unreadable/specs/069-execution-expression-sdd:78` | 78 | 069 · Implemented · .specify/specs/069-execution-expression-sdd/requirements.md | required input not found: .specify/specs/069-execution-expression-sdd/plan.md | — (none: blocked before edit) | missing input: plan.md, tasks.md, verification.md (slices archived as 069a/069b) |
+| 42 | `status-unreadable/specs/070-subagent-task-teams:76` | 76 | 070 · Implemented · .specify/specs/070-subagent-task-teams/requirements.md | .specify/specs/070-subagent-task-teams/requirements.md:269 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | missing status rows |
+| 43 | `status-unreadable/specs/071-review-code-integration:80` | 80 | 071 · Ready for Review · .specify/specs/071-review-code-integration/requirements.md | .specify/specs/071-review-code-integration/requirements.md:208 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 44 | `status-unreadable/specs/072-client-self-improvement:82` | 82 | 072 · Ready for Review · .specify/specs/072-client-self-improvement/requirements.md | .specify/specs/072-client-self-improvement/requirements.md:227 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 45 | `status-unreadable/specs/073-record-retention-and-housekeeping:83` | 83 | 073 · Implemented · .specify/specs/073-record-retention-and-housekeeping/requirements.md | required input not found: .specify/specs/073-record-retention-and-housekeeping/plan.md | — (none: blocked before edit) | missing input: plan.md, tasks.md, verification.md |
+| 46 | `status-unreadable/specs/074-goal-team-sdd-unification:84` | 84 | 074 · Ready for Review · .specify/specs/074-goal-team-sdd-unification/requirements.md | .specify/specs/074-goal-team-sdd-unification/requirements.md:392 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass statuses but 57 open task rows |
+| 47 | `status-unreadable/specs/076-decision-tension-contract:85` | 85 | 076 · Ready for Review · .specify/specs/076-decision-tension-contract/requirements.md | .specify/specs/076-decision-tension-contract/requirements.md:233 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke) |
+| 48 | `status-unreadable/specs/077-doc-sdd-integration:86` | 86 | 077 · Ready for Review · .specify/specs/077-doc-sdd-integration/requirements.md | .specify/specs/077-doc-sdd-integration/requirements.md:208 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 49 | `status-unreadable/specs/078-coaching-skills:87` | 87 | 078 · Implemented · .specify/specs/078-coaching-skills/requirements.md | .specify/specs/078-coaching-skills/requirements.md:190 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | non-pass rows lack ladder |
+| 50 | `status-unreadable/specs/079-bilingual-expression:88` | 88 | 079 · Ready for Review · .specify/specs/079-bilingual-expression/requirements.md | .specify/specs/079-bilingual-expression/requirements.md:194 SC-001 carries 0 `**Path**` markers; exactly one is required (AS-01) | — (none: blocked before edit) | all-pass (needs schema retrofit + smoke); `**Flow Class**: expression` |
+| 51 | `status-unreadable/specs/080-humanize-run-output:70` | 70 | 062 · Implemented · .specify/specs/080-humanize-run-output/requirements.md | cannot determine the claimed feature status for .specify/specs/080-humanize-run-output: no --feature-detail / --feature-registry was given, the spec dir carries no feature-detail.md or feature-registry.md, and .specify/memory/features.md has no row for '080-humanize-run-output' | — (none: blocked before edit) | status unresolvable (owning row is 062) + runtime/premises absent + non-pass rows lack ladder |
+| 52 | `status-unreadable/specs/090-re-anchoring:98` | 98 | 090 · Implemented · .specify/specs/090-re-anchoring/requirements.md | verdict=block reasons=['status-claims-implemented-but-blocked'] | — (none: blocked before edit) | contradiction; no status fixpoint (Probe 2); 116 open task rows |
+
+### Cascades (named, each measured)
+
+1. **None.** No tracked path was edited, so no line anchor moved and no entry was added or removed:
+   the 909-entry set and the 52-entry `status-unreadable` subset are identical across
+   `history-w2-before.json` and `history-w2-after.json`.
+2. **090's history (named cause, not this wave's edit):** status was `Planned` at `6c42174fd`
+   and became `Implemented` at `8edd955d1` — the same commit that merged 092's task graph
+   (116 `[ ]` rows; `tasks.md` at `6c42174fd` had 0 open rows, `8edd955d1` has 116). The claim
+   and its counter-evidence arrived together. The CRITICAL entry is the visible reading of that
+   sequence.
+3. **Probe artifacts** live under `.specify/.tmp/histw2-scratch/` (git-ignored, retained per the
+   wave's no-delete rule) and are outside the declared review surface; they produced no engine
+   entries.
+
+## paths
+
+Tracked paths changed by G5: **none** (`git diff --name-only` empty; `git status --porcelain`
+shows only the new evidence files below).
+
+New untracked evidence paths (the wave's only writes):
+
+1. `.specify/specs/090-re-anchoring/test-evidence/history-w2-before.json`
+2. `.specify/specs/090-re-anchoring/test-evidence/history-w2-after.json`
+3. `.specify/specs/090-re-anchoring/test-evidence/history-execute-g5.txt` (this file)
+
+Scratch (git-ignored, retained): `.specify/.tmp/histw2-scratch/**`, `.specify/.tmp/histw2-*.txt`,
+`.specify/.tmp/histw2-*.err`, `.specify/.tmp/histw2-entry-table.md`.
+
+Reversal per entry: `git checkout -- <path>` is **not applicable** — no tracked path was edited, so
+there is nothing to revert. The two JSON readings are new evidence artifacts; removing them is a
+delete of this wave's own output, not a revert.
+
+## corpus
+
+Empty: none of the 52 entries carries a `source_entry`. Shape correspondence only (recorded, not
+claimed as an id):
+
+- 43 entries reproduce corpus shape **A6** (`requirements.md` without `**Path**:` markers) — but
+  per C-804, A6's home is `validate-requirements.py`'s `path-marker` reading, not this class;
+- 1 entry (090) reproduces corpus shape **A1 family** (`Implemented` × `block`);
+- 1 entry (065) carries corpus shape **A3 variant** (`Planned` × unreadable verdict).
+- The remaining 7 (missing inputs) and 080 (unresolvable claim) have no A–H corpus row.
+
+## dispositions
+
+**No E-4 record is emitted for any entry.** The confirmed disposition for the group is `correct`
+(§ Disposal Pathways: in-place edit + before/after readings); an E-4 row with
+`disposition: correct` and no body diff would claim a closure that does not exist — the same
+"nothing written is not a disposition" rule that makes `null`/`keep` a finding, applied in the
+other direction. The table records what the group *confirmed* (`correct`), what this wave
+*applied* (none), and the measured blocker per entry.
+
+| # | entry_id | disposition (confirmed) | applied | reverted_by | blocker |
+|---:|---|---|---|---|---|
+| 1 | `status-unreadable/specs/001-unify-command-handoffs:10` | correct | none | n/a (no edit) | missing closure inputs (tasks.md, verification.md) |
+| 2 | `status-unreadable/specs/006-add-qoder-support:29` | correct | none | n/a (no edit) | missing closure input (verification.md) |
+| 3 | `status-unreadable/specs/009-claude-code-support:30` | correct | none | n/a (no edit) | missing closure input (verification.md) |
+| 4 | `status-unreadable/specs/016-refactor-tools-command:25` | correct | none | n/a (no edit) | retrofit lands block (Probe 1): ladder + smoke would be fabricated |
+| 5 | `status-unreadable/specs/020-speckit-todo-command:34` | correct | none | n/a (no edit) | same class as 016 (deferred row without ladder) |
+| 6 | `status-unreadable/specs/021-agent-specific-config:31` | correct | none | n/a (no edit) | same class as 016 |
+| 7 | `status-unreadable/specs/023-agent-framework-redesign:28` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 8 | `status-unreadable/specs/025-agent-skill-enablement:35` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 9 | `status-unreadable/specs/027-feedback-mechanism:37` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 10 | `status-unreadable/specs/028-sdd-workflow-refactor:38` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 11 | `status-unreadable/specs/029-glossary-mechanism:40` | correct | none | n/a (no edit) | deferred row without ladder |
+| 12 | `status-unreadable/specs/030-summarize-project:22` | correct | none | n/a (no edit) | 3 non-pass rows without ladder |
+| 13 | `status-unreadable/specs/031-task-complexity-rubric:41` | correct | none | n/a (no edit) | 2 deferred rows without ladder |
+| 14 | `status-unreadable/specs/032-dogfooding-practice:45` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 15 | `status-unreadable/specs/033-docs-command:46` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 16 | `status-unreadable/specs/034-evidence-infra:47` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 17 | `status-unreadable/specs/035-token-efficiency:49` | correct | none | n/a (no edit) | partial row without ladder |
+| 18 | `status-unreadable/specs/036-team-summary:36` | correct | none | n/a (no edit) | 2 partial rows without ladder |
+| 19 | `status-unreadable/specs/037-goal-registry:50` | correct | none | n/a (no edit) | 18 SCs without status rows |
+| 20 | `status-unreadable/specs/039-session-export:52` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 21 | `status-unreadable/specs/040-agent-metadata-portability:53` | correct | none | n/a (no edit) | 8 SCs without status rows |
+| 22 | `status-unreadable/specs/043-init-commit-stamp:54` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 23 | `status-unreadable/specs/044-reduce-confirmation-flows:55` | correct | none | n/a (no edit) | 3 SCs without status rows |
+| 24 | `status-unreadable/specs/045-sanitize-command:56` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 25 | `status-unreadable/specs/048-derive-command:58` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 26 | `status-unreadable/specs/050-proactive-flow-trigger:59` | correct | none | n/a (no edit) | 2 deferred rows without ladder |
+| 27 | `status-unreadable/specs/051-user-facing-comprehension:60` | correct | none | n/a (no edit) | 6 non-pass rows without ladder |
+| 28 | `status-unreadable/specs/052-fast-fail-principle:61` | correct | none | n/a (no edit) | 5 non-pass rows without ladder |
+| 29 | `status-unreadable/specs/053-machine-decidable-artifacts:62` | correct | none | n/a (no edit) | partial row without ladder |
+| 30 | `status-unreadable/specs/055-conflict-free-stores:63` | correct | none | n/a (no edit) | requirements-only skeleton (0 SC rows; plan/tasks/verification absent) |
+| 31 | `status-unreadable/specs/056-probe-handler-system:64` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 32 | `status-unreadable/specs/057-decompose-command-skills:65` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 33 | `status-unreadable/specs/058-sdd-loop-driver:66` | correct | none | n/a (no edit) | 8 partial rows without ladder |
+| 34 | `status-unreadable/specs/059-exec-quant-recording:67` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 35 | `status-unreadable/specs/060-decompose-subagent-dispatch:68` | correct | none | n/a (no edit) | 6 SCs without status rows |
+| 36 | `status-unreadable/specs/061-subagent-cli-config:69` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 37 | `status-unreadable/specs/063-review-p1-governance:71` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 38 | `status-unreadable/specs/064-subagent-concurrency:73` | correct | none | n/a (no edit) | 10 SCs without status rows |
+| 39 | `status-unreadable/specs/065-loop-interruption-recovery:74` | correct | none | n/a (no edit) | missing closure inputs (tasks.md, verification.md) |
+| 40 | `status-unreadable/specs/068-exec-quant-feedback-channel:75` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 41 | `status-unreadable/specs/069-execution-expression-sdd:78` | correct | none | n/a (no edit) | missing closure inputs; slices archived as 069a/069b |
+| 42 | `status-unreadable/specs/070-subagent-task-teams:76` | correct | none | n/a (no edit) | 8 SCs without status rows |
+| 43 | `status-unreadable/specs/071-review-code-integration:80` | correct | none | n/a (no edit) | 2 partial rows without ladder |
+| 44 | `status-unreadable/specs/072-client-self-improvement:82` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 45 | `status-unreadable/specs/073-record-retention-and-housekeeping:83` | correct | none | n/a (no edit) | missing closure inputs (plan.md, tasks.md, verification.md) |
+| 46 | `status-unreadable/specs/074-goal-team-sdd-unification:84` | correct | none | n/a (no edit) | 57 open task rows |
+| 47 | `status-unreadable/specs/076-decision-tension-contract:85` | correct | none | n/a (no edit) | full schema retrofit + new smoke measurement required |
+| 48 | `status-unreadable/specs/077-doc-sdd-integration:86` | correct | none | n/a (no edit) | 3 partial rows without ladder |
+| 49 | `status-unreadable/specs/078-coaching-skills:87` | correct | none | n/a (no edit) | 2 partial rows without ladder |
+| 50 | `status-unreadable/specs/079-bilingual-expression:88` | correct | none | n/a (no edit) | expression-class: markers + a new smoke measurement required |
+| 51 | `status-unreadable/specs/080-humanize-run-output:70` | correct | none | n/a (no edit) | claim unresolvable for spec key 080 (owning row 062); plus runtime/premises and ladder absent |
+| 52 | `status-unreadable/specs/090-re-anchoring:98` | correct | none | n/a (no edit) | genuine contradiction, no status fixpoint; 116 open task rows |
+
+### What would close them (for the framework decision, not executed here)
+
+1. **Implement C-804 on the engine** — an engine change (framework decision by precedent), which
+   would route the 43 AS-01-fed entries to the requirements-side `path-marker` reading and carry
+   that reading as an evidence ref, instead of the status class absorbing them.
+2. **Or migrate the 51 historical spec dirs to the post-080/081 closure-input schema** —
+   `**Path**` markers (a semantic per-SC judgment under the framework's own Detection Subject
+   rule; subagents are forbidden in this wave), Runtime Stack / premises / inherited tables, smoke
+   records (new dated measurements), and for 17 specs ladder records the original runs never took.
+   This is a schema migration of dated records, not a bounded in-place correction.
+3. **090 specifically** — finish or formally defer its 116 open task rows; only then does a status
+   (Implemented or Blocked) acquire a consistent partner in the closed table.
