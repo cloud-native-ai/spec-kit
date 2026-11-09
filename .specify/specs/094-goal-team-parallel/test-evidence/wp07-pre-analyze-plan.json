@@ -1,0 +1,297 @@
+{
+  "stage": "plan",
+  "decision": "pass",
+  "findings": [
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 19,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 257,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 299,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "requirements.md",
+      "line": 304,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 79,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 134,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 141,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 230,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 248,
+      "message": "path does not exist under the repo: .specify/templates/commands/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "plan.md",
+      "line": 318,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 37,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/trees/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 47,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 63,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 79,
+      "message": "path does not exist under the repo: .specify/templates/commands/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 143,
+      "message": "path does not exist under the repo: .specify/.tmp/s094/probe/.specify/specs/900-fixture/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 180,
+      "message": "path does not exist under the repo: tests/contract/test_command_run_goal_team.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 181,
+      "message": "path does not exist under the repo: tests/contract/test_command_run_goal_team.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 205,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/trees/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 323,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 330,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "tasks.md",
+      "line": 493,
+      "message": "path does not exist under the repo: .specify/.tmp/s094/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 10,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 42,
+      "message": "path does not exist under the repo: .specify/anchoring/demo-command-goal/goal.md"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 53,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "quickstart.md",
+      "line": 128,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 19,
+      "message": "path does not exist under the repo: .specify/goal"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 35,
+      "message": "path does not exist under the repo: .specify/goal/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 40,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 109,
+      "message": "path does not exist under the repo: .specify/.tmp"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "research.md",
+      "line": 132,
+      "message": "path does not exist under the repo: .specify/goal"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 81,
+      "message": "path does not exist under the repo: tests/contract/test_command_run_goal_team.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "feature-ref.md",
+      "line": 114,
+      "message": "path does not exist under the repo: .specify/templates/commands/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/owner-rewrites-and-tests.md",
+      "line": 58,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/owner-rewrites-and-tests.md",
+      "line": 128,
+      "message": "path does not exist under the repo: tests/contract/test_command_run_goal_team.py"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/unified-archive-and-migration.md",
+      "line": 15,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/unified-archive-and-migration.md",
+      "line": 28,
+      "message": "path does not exist under the repo: .specify/archive/goal-team/receipts/"
+    },
+    {
+      "check": "missing-path",
+      "severity": "advisory",
+      "path": "contracts/unified-archive-and-migration.md",
+      "line": 103,
+      "message": "path does not exist under the repo: .specify/.tmp/"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "advisories": 40,
+    "waived": 0,
+    "fr": 43,
+    "sc": 12,
+    "tasks": 85,
+    "clauses": 0,
+    "files": 13
+  },
+  "checked_at": "2026-11-09T13:00:11Z"
+}

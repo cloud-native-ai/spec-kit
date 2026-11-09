@@ -1,0 +1,8 @@
+# command: python3 scripts/python/goal-utils.py --help; exit
+# --help exit_code: 0
+# command: python3 scripts/python/goal-utils.py --version
+goal-utils.py 0.0.22
+# --version exit_code: 0
+# command: python3 scripts/python/goal-utils.py migrate-archive --bogus-option
+error: unrecognized option: --bogus-option
+# bogus-option exit_code: 2

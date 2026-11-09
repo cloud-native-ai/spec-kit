@@ -1,0 +1,15 @@
+# T079 baseline comparison — requirements-baseline-probe.txt vs probe-residual before
+# baseline captured earlier in the run (085–091); compared programmatically, not against a restated constant
+## goal: baseline=7 current=8
+added_since_baseline: [".specify/specs/094-goal-team-parallel/goal/094-goal-team-parallel/goal.md"]
+removed_since_baseline: []
+baseline_internal_to_current: 7
+## team: baseline=7 current=8
+added_since_baseline: [".specify/specs/088-speckit-visualization/team/088-reporting-dogfood/team.md", ".specify/specs/089-script-interface-contract/team/089-script-interface-contract/team.md", ".specify/specs/094-goal-team-parallel/team/094-goal-team-parallel/team.md"]
+removed_since_baseline: [".specify/specs/088-speckit-visualization/team/087-reporting-dogfood/team.md", ".specify/specs/089-script-interface-contract/team/086-script-interface-contract/team.md"]
+baseline_internal_to_current: 5
+
+# adjudication: the 085–091 baseline set is unchanged except:
+#  - 088 team slug renamed 087-reporting-dogfood -> 088-reporting-dogfood (commit 76b4ec60e, 092 repair wave); same definition, baseline recorded the pre-rename path
+#  - 089 team slug renamed 086-script-interface-contract -> 089-script-interface-contract (commit 76b4ec60e, 092 repair wave); same definition, baseline recorded the pre-rename path
+#  - 094-goal-team-parallel goal+team are this run's own spec-local definitions (tasks.md N-4 / A8: part of the migration subject)

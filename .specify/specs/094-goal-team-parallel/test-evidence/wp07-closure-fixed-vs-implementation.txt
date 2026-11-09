@@ -1,0 +1,3 @@
+tests/contract/test_checkpoint_protocol.py::test_protocol_has_the_four_parts
+tests/contract/test_compile_embeds.py::test_compiled_form_contract - j...
+tests/contract/test_isomorphism_map.py::test_no_second_document_claims_map_ownership

@@ -1,0 +1,72 @@
+# command: python3 -m pytest -q -n0 tests/contract/test_trigger_engine.py tests/integration/test_trigger_promotion.py tests/integration/test_trigger_tuning.py tests/contract/test_measurement_instruments.py tests/contract/test_summary_trigger.py tests/integration/test_trigger_telemetry.py
+# started_at: 2026-11-09T13:03:56Z
+........F..FFF...........F.FF..FFFF.FFFFFF.FFF..F.......FFFF............ [ 29%]
+........................................................................ [ 59%]
+.FFFFFFFFF.FFFFF..FFFFFF.FF.F..F..FF...FFFFFF...F.FF.................... [ 88%]
+......FF.......F............                                             [100%]
+=========================== short test summary info ============================
+FAILED tests/contract/test_trigger_engine.py::test_c6_no_partial_file_left_behind
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[missing]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[corrupt]
+FAILED tests/contract/test_trigger_engine.py::test_c8_state_unreadable_degrades_to_suggest_only[incompatible]
+FAILED tests/contract/test_trigger_engine.py::test_c12_assess_resolves_a_unique_situation
+FAILED tests/contract/test_trigger_engine.py::test_c12_v1_6_most_specific_wins
+FAILED tests/contract/test_trigger_engine.py::test_c12_no_match_is_reported_not_invented
+FAILED tests/contract/test_trigger_engine.py::test_c14_assess_appends_exactly_one_row
+FAILED tests/contract/test_trigger_engine.py::test_c14_silent_turn_has_no_visible_output
+FAILED tests/contract/test_trigger_engine.py::test_c14_ordering_violation_reported_but_row_still_written
+FAILED tests/contract/test_trigger_engine.py::test_c14_compliance_done_clears_the_violation
+FAILED tests/contract/test_trigger_engine.py::test_c15_suggestion_key_set_exact
+FAILED tests/contract/test_trigger_engine.py::test_c16_accepted_increments_and_declined_resets
+FAILED tests/contract/test_trigger_engine.py::test_c16_reaching_the_threshold_promotes
+FAILED tests/contract/test_trigger_engine.py::test_c17_destructive_never_promotes_over_ten_acceptances
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_priority_chain
+FAILED tests/contract/test_trigger_engine.py::test_c18_threshold_floor_rejected
+FAILED tests/contract/test_trigger_engine.py::test_c19_no_write_outside_workspace_root
+FAILED tests/contract/test_trigger_engine.py::test_c20_repeat_in_same_session_is_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c20_new_session_is_not_suppressed
+FAILED tests/contract/test_trigger_engine.py::test_c21_auto_execute_is_only_a_flag
+FAILED tests/contract/test_trigger_engine.py::test_init_is_idempotent - FileN...
+FAILED tests/contract/test_trigger_engine.py::test_init_writes_the_e6_shape
+FAILED tests/contract/test_trigger_engine.py::test_init_maintains_the_telemetry_ignore_entry
+FAILED tests/contract/test_trigger_engine.py::test_init_does_not_revert_local_tuning
+FAILED tests/integration/test_trigger_promotion.py::test_three_acceptances_promote_a_reversible_rule
+FAILED tests/integration/test_trigger_promotion.py::test_single_decline_resets_the_count
+FAILED tests/integration/test_trigger_promotion.py::test_decline_after_promotion_demotes
+FAILED tests/integration/test_trigger_promotion.py::test_ignored_resets_but_is_counted_separately
+FAILED tests/integration/test_trigger_promotion.py::test_reset_by_points_at_a_real_event
+FAILED tests/integration/test_trigger_promotion.py::test_destructive_rule_never_promotes_over_ten_acceptances
+FAILED tests/integration/test_trigger_promotion.py::test_destructive_class_is_never_recomputed
+FAILED tests/integration/test_trigger_promotion.py::test_reset_single_rule_records_user_reset_at
+FAILED tests/integration/test_trigger_promotion.py::test_reset_all_clears_every_rule_and_session_suppression
+FAILED tests/integration/test_trigger_promotion.py::test_disabled_produces_no_suggestion_and_no_auto_execution
+FAILED tests/integration/test_trigger_promotion.py::test_disabled_state_survives_instructions_regeneration
+FAILED tests/integration/test_trigger_promotion.py::test_reenabling_clears_session_suppression
+FAILED tests/integration/test_trigger_promotion.py::test_threshold_below_floor_is_rejected
+FAILED tests/integration/test_trigger_promotion.py::test_threshold_floor_of_two_is_accepted
+FAILED tests/integration/test_trigger_promotion.py::test_raising_the_threshold_demotes_existing_promotions
+FAILED tests/integration/test_trigger_promotion.py::test_record_without_a_prior_assess_is_refused
+FAILED tests/integration/test_trigger_promotion.py::test_event_ids_follow_the_grammar
+FAILED tests/integration/test_trigger_promotion.py::test_snapshot_over_200_chars_is_rejected
+FAILED tests/integration/test_trigger_tuning.py::test_small_sample_rules_are_not_proposed_and_are_named
+FAILED tests/integration/test_trigger_tuning.py::test_min_sample_is_configurable
+FAILED tests/integration/test_trigger_tuning.py::test_high_ignore_rate_yields_a_tighten_proposal
+FAILED tests/integration/test_trigger_tuning.py::test_acceptance_yields_no_proposal
+FAILED tests/integration/test_trigger_tuning.py::test_a_single_missed_flow_is_below_the_add_rule_bar
+FAILED tests/integration/test_trigger_tuning.py::test_tune_apply_moves_the_state_machine_and_leaves_a_trail
+FAILED tests/integration/test_trigger_tuning.py::test_applied_suppression_takes_effect
+FAILED tests/integration/test_trigger_tuning.py::test_judgement_items_are_handed_back_not_decided
+FAILED tests/contract/test_measurement_instruments.py::test_every_row_carries_the_seven_fields
+FAILED tests/contract/test_measurement_instruments.py::test_three_quantities_are_frozen_and_confirmations_is_split
+FAILED tests/contract/test_measurement_instruments.py::test_all_quantities_share_one_freeze_point
+FAILED tests/contract/test_measurement_instruments.py::test_verdicts_stay_inside_the_two_value_set
+FAILED tests/contract/test_measurement_instruments.py::test_gate_call_filter_set_is_the_closed_six_unit_ids
+FAILED tests/contract/test_measurement_instruments.py::test_unmeasurable_part_is_declared_instead_of_counted_as_zero
+FAILED tests/contract/test_measurement_instruments.py::test_git_start_channel_is_the_first_commit_not_the_last_touch
+FAILED tests/contract/test_measurement_instruments.py::test_no_second_baseline_store_under_the_slice_notes
+FAILED tests/contract/test_measurement_instruments.py::test_record_cites_only_existing_scripts
+FAILED tests/contract/test_summary_trigger.py::test_gate_discloses_goal_identity_and_target_directory[SKILL.md0]
+FAILED tests/contract/test_summary_trigger.py::test_gate_discloses_goal_identity_and_target_directory[SKILL.md1]
+FAILED tests/integration/test_trigger_telemetry.py::test_cli_subprocess_smoke_pins_payload_and_exit_semantics
+63 failed, 181 passed in 20.58s
+# exit_code: 1

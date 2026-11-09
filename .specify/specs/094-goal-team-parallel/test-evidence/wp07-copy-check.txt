@@ -1,0 +1,3 @@
+# command: python3 scripts/python/regen-command-copies.py --check
+OK: all per-tool command copies match the source templates.
+# exit_code: 0

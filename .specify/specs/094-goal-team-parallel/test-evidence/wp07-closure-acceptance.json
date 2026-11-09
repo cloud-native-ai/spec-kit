@@ -1,0 +1,51 @@
+{
+  "claimed_status": "Planned",
+  "claimed_status_source": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp07/.specify/memory/features.md",
+  "completion_conditions": {
+    "every_final_path_pass": false,
+    "no_open_rows": false,
+    "smoke_record_pass": true,
+    "status_row_per_criterion": true
+  },
+  "final_path": {
+    "blocked": 1,
+    "deferred": 0,
+    "fail": 1,
+    "partial": 1,
+    "pass": 6,
+    "total": 9,
+    "unknown": 0
+  },
+  "flow_class": "execution",
+  "reasons": [
+    {
+      "code": "final-path-not-pass",
+      "target": "SC-001"
+    },
+    {
+      "code": "final-path-not-pass",
+      "target": "SC-002"
+    },
+    {
+      "code": "final-path-not-pass",
+      "target": "SC-003"
+    }
+  ],
+  "smoke": {
+    "command": "python3 -m pytest tests/contract/test_archive_migration.py tests/contract/test_handoff_contract.py tests/contract/test_handoff_territory.py tests/contract/test_parallel_lines.py tests/integration/test_parallel_lines.py tests/contract/test_criterion_vocabulary_scan.py tests/contract/test_binding_model.py tests/contract/test_resident_backfill.py tests/contract/test_migration_interruption.py tests/contract/test_declaration_facts.py -q",
+    "evidence_exists": true,
+    "evidence_path": ".specify/specs/094-goal-team-parallel/test-evidence/wp07-smoke.out",
+    "exit_code": "0",
+    "present": true,
+    "records": 1
+  },
+  "spec_dir": "/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp07/.specify/specs/094-goal-team-parallel",
+  "tasks": {
+    "closed": 0,
+    "deferred": 0,
+    "in_progress": 0,
+    "open": 85
+  },
+  "verdict": "block",
+  "waived": []
+}

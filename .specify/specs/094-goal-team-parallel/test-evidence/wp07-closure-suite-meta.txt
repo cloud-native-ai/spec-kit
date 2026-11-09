@@ -1,0 +1,7 @@
+# command: bash scripts/bash/run-tests.sh --names-out .specify/specs/094-goal-team-parallel/test-evidence/closure-failed.txt -q
+# started_at: 2026-11-09T13:00:35Z
+# finished_at: 2026-11-09T13:01:51Z
+# exit_code: 1
+# failed_name_list: .specify/specs/094-goal-team-parallel/test-evidence/closure-failed.txt
+# full_stdout: .specify/specs/094-goal-team-parallel/test-evidence/wp07-closure-suite.out
+# full_stderr: .specify/specs/094-goal-team-parallel/test-evidence/wp07-closure-suite.err
