@@ -86,6 +86,12 @@ class Scope:
         return self.goal_root / slug / DEFINITION_FILENAME
 
     def team_definition(self, slug: str) -> Path:
+        # The single default team of a spec lives at `<team-root>/team.md`; only an
+        # ADDITIONAL named team nests under `<team-root>/<team-slug>/`. Nesting the default
+        # team under its own spec slug duplicates the slug in the path.
+        default = self.team_root / "team.md"
+        if default.is_file():
+            return default
         return self.team_root / slug / "team.md"
 
     def as_dict(self, slug: str | None = None) -> dict:
@@ -111,6 +117,8 @@ def _has_any_definition(root: Path) -> bool:
 def _has_team(root: Path, slug: str | None) -> bool:
     if not root.is_dir():
         return False
+    if (root / "team.md").is_file():
+        return True
     if slug:
         return (root / slug / "team.md").is_file()
     return any(child.is_dir() and (child / "team.md").is_file()
@@ -879,7 +887,10 @@ def resolve_team_goal_identity(repo_root: Path, team_slug: str) -> tuple[str | N
     """Two-level goal identity resolution (036 §10.1) — explicit `goal_slug`
     wins, else the team slug when it names an archived definition. No third
     level (038 contract §2.1)."""
-    team_md = team_root(repo_root) / team_slug / "team.md"
+    root = team_root(repo_root)
+    team_md = root / "team.md"
+    if not team_md.is_file():
+        team_md = root / team_slug / "team.md"
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
     meta, _ = _split_frontmatter(team_md.read_text(encoding="utf-8"))
@@ -1103,7 +1114,10 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
     is the `input-error` verdict, which maps to exit 2 for either cause alike.
     """
     repo_root = Path(repo_root)
-    team_md = team_root(repo_root) / team_slug / "team.md"
+    root = team_root(repo_root)
+    team_md = root / "team.md"
+    if not team_md.is_file():
+        team_md = root / team_slug / "team.md"
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
 

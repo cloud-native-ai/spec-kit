@@ -470,3 +470,5 @@ the package territory in `plan.md` § Implement Package Proposal is the partitio
    every repair to a record field or a marker, and discloses the tension rather than resolving it here.
 10. **`D-1`…`D-8` vs. the corpus rows.** The eight clarify decisions are decisions, not findings; they carry no
     `F-`/`OI-` id and are registered in the shape the table's `D-…` rows already use.
+
+- [ ] T157 Migrate the sibling spec-local teams that still nest the default team under its own spec slug (`085/086/087/089`) to `team/team.md`, keeping named extra teams under `team/<team-slug>/team.md`; re-run `goal-utils.py run-checks` per spec and record the before/after paths in `test-evidence/team-path-migration.txt` (the engine now resolves the default file first, so the migration is a rename, not a behavioural change).

@@ -8,7 +8,7 @@ Owners: `shared/definitions/goal-definitions.md` (Goal concept), `skills/interna
 - **C-004**: Its criteria MUST be degree-measured and MUST NOT duplicate any `SC-` row in the same spec.
 - **C-005**: It MUST use the `active`/`achieved`/`abandoned` lifecycle; terminal goals are retained.
 - **C-006**: One spec MUST have at most one temporary goal by default; identity defaults to the spec basename and is unique in the spec scope.
-- **C-007**: A Temporary Team MUST be a spec-attached persisted roster stored at `.specify/specs/<NNN-slug>/team/<slug>/team.md`; the `<slug>` directory collapses to `team/team.md` only when the team slug equals the spec basename.
+- **C-007**: A Temporary Team MUST be a spec-attached persisted roster stored at `.specify/specs/<NNN-slug>/team/team.md` for the spec's single default team; an ADDITIONAL named team nests as `.specify/specs/<NNN-slug>/team/<team-slug>/team.md` (the default team never nests under its own spec slug — that duplicates the slug in the path); the `<slug>` directory collapses to `team/team.md` only when the team slug equals the spec basename.
   <!-- superseded by: skills/internal/create-team/references/create-mode.md (team root layout) -->
   <!-- prior text, retained (2026-11-09): "stored at `.specify/specs/<NNN-slug>/team/team.md`." -->
 - **C-008**: It MUST be created only after both `clarify` and `plan` pass U4, and MUST bind `goal_slug` to the temporary goal.

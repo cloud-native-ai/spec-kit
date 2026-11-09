@@ -35,3 +35,10 @@
 - Q4 spine freshness: updated with the concurrency change
 - Q5 territory/workspace: 76 files integrated; no other feature's body beyond the declared carve-outs
 - verdict: correction-applied
+
+## 6. Path-assembly correction (2026-11-09, user-reported)
+
+- Symptom: `.specify/specs/092-non-disposable/team/092-non-disposable/team.md` — the spec slug appears twice.
+- Root cause: `goal-utils.py` assembled every team as `<team-root>/<slug>/team.md` with no default-single-team case, so a slug equal to the spec slug doubled the path segment.
+- Fix: the default team now lives at `<team-root>/team.md` and is resolved first (`Scope.team_definition`, `_has_team`, `resolve_team_goal_identity`, `run_checks`); only an additional named team nests under `<team-slug>/`. 092's own team moved to `team/team.md`; 085 C-007 states the rule; T157 migrates the siblings.
+- Verified: `goal-utils.py run-checks 092-non-disposable --scope spec` resolves the default file.
