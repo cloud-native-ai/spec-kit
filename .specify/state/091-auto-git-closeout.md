@@ -4,9 +4,9 @@
 spine_state: running
 run_id: r20261109T023000Z-auto-closeout
 slice: 091
-stage: plan (U4 candidate written; awaiting independent verification)
-stage_started_at: 1794191292
-stage_deadline_epoch: 1794202092
+stage: tasks (U4 candidate written; awaiting independent verification)
+stage_started_at: 1794192617
+stage_deadline_epoch: 1794203417
 stage_base_commit: 7cf87dad
 attempt: 0
 retry_limit: 3
@@ -43,11 +43,12 @@ project_config:
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; ready packages will be recomputed per stage
   verifier_reserve: 1
-  breakpoint_verdict: "requirements + clarify complete; next stage = plan"
+  breakpoint_verdict: "requirements + clarify + plan complete; next stage = tasks"
   flow_class_quartet: "flow_class=execution; source=declaration; marker=; error=-"
 gates: |
   requirements U4: pass — validate ok 0/0; pre-analyze pass 0/0; 27 FR / 7 SC; evidence .specify/specs/091-auto-git-closeout/test-evidence/requirements-gates.txt
   clarify U4: pass with corrections — validate ok 0/0; pre-analyze pass 0/0 after RS-001 cell + feature-ref count fixes; overlap adjudicated (completed-only, 0 active); decomposition-check plan proceed (28 FR < 120); workspace-guard clean
+  plan U4: pass — pre-analyze plan 0/0; 26 clauses across 4 contracts; 5 decision tensions 0/0; 22/22 Constitution; checkpoint 03 accepted; Temporary Team created (validate-roster conforming)
   clarify U4 (pending verifier):
     overlap_check: decision=overlap — before the declaration artifact the gate was clear with
       checked=1 and note "no declaration artifact" (vacuous); after it: checked=82, overlaps=36
@@ -110,3 +111,5 @@ framework_observations:
   - "validate-decision-tensions.py enforces dense T-NNN order across the whole document, so inserting a record mid-document forces renumbering every later record; a T-NNN is positional rather than stable, and the renumbering is invisible to anything that cited the old number."
   - "Gate CLIs disagree on how to name the same concept: pre-analyze-check/overlap-check take --spec-dir, decomposition-check takes --requirements, validate-requirements takes a positional path, validate-decision-tensions takes --spec. Four scripts, four forms, no shared invocation contract."
 temp_goal_slug: 091-auto-git-closeout
+temp_team_slug: 091-auto-git-closeout
+temp_team_path: .specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md

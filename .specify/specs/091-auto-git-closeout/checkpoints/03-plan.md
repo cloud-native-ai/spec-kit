@@ -23,7 +23,7 @@
 All four criteria now have a named, testable carrier; none is yet demonstrated.
 
 ## 3. Team configuration review
-- evidence: none (no temporary team configured; 085 defers team creation to a stage that decomposes)
+- evidence: none at plan U4 — the temporary team is created immediately after plan U4 per 085; created at `.specify/specs/091-auto-git-closeout/team/091-auto-git-closeout/team.md`, `validate-roster.py` conforming (exactly one reporter seat)
 - symptom: none
 - proposal: none
 - ratification: n/a
