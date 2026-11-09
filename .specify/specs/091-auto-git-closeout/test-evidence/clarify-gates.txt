@@ -1,0 +1,160 @@
+# 091 clarify — gate readings (2026-11-09T02:3xZ, unattended run)
+
+Working directory: /storage/project/cloud-native-ai/spec-kit
+All commands below were run by this stage; outputs are verbatim apart from the
+machine paths trimmed to repo-relative form.
+
+## 1. Baseline facts (measured BEFORE any clarify write)
+
+$ git --version
+git version 2.43.5
+
+$ python -m pytest --version
+pytest 8.4.2
+
+$ grep -n 'requires-python' pyproject.toml
+5:requires-python = ">=3.8"
+
+$ python .specify/scripts/python/scan-confirmation-gates.py
+blocking confirmation gates: 27
+  destructive: 20
+  governance_kept: 7
+violations (reversible gates still blocking): 0
+
+$ git ls-files .specify/memory/exec-quant/records | wc -l
+242
+$ git ls-files .specify/memory/feedback | wc -l
+376
+
+Facts this established for the clarify adjudications:
+- C-5: tests/contract/test_git_workflow_instructions_block.py:test_state_file_carries_the_managed_block
+  asserts the literal "None yet." in the managed block -> that is the placeholder predicate.
+- C-8: grep -rln "does not push" tests/ -> only tests/contract/test_sdd_loop_driver_wp_coordination.py
+  (VI-14, a simulation-result assertion), so no existing test anchors the
+  artifact-commit-step "does not push" sentence.
+- C-11a: tests/contract/test_wrap_up_wording_gate_safe.py::test_confirmation_gate_budget_unchanged
+  pins the gate total with `== 27` ("owner fact = live scan total").
+- C-14: references/decomposition-model.md:244 "does not push, force-merge, or auto-merge";
+  references/stage-prompts.md:455 U6 runs after integration_result (merged|failed).
+- C-10a: records are one-file-per-entry AND tracked in git (242 + 376 files), and are
+  deleted by the sanitize skill's record-retention lane (record-retention.py --action scan|distill,
+  "consume -> receipt -> retire; no receipt means no deletion; 30-day grace").
+
+## 2. validate-requirements.py — before clarify
+
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)   [doc-order] pass (0)      [ref-resolvable] pass (0)
+  [marker-count] pass (0)    [dup-id] pass (0)         [path-marker] pass (0)
+scanned: 237 lines, 34 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+
+## 3. overlap-check.py — BEFORE feature-ref.md (the vacuous green, C-1)
+
+$ python .specify/skills/sdd-loop-driver/scripts/overlap-check.py \
+    --spec-dir .specify/specs/091-auto-git-closeout --repo . --json-out /tmp/oc-before.json
+{"decision": "clear", "current_spec": "091-auto-git-closeout",
+ "checked_specs": ["091-auto-git-closeout"], "overlaps": [], 
+ "note": "current feature has no declaration artifact",
+ "checked_at": "2026-11-09T02:31:19Z"}
+overlap-check: current=091-auto-git-closeout checked=1 overlaps=0 decision=clear
+EXIT=0
+
+Interpretation: the gate returned green while comparing NOTHING (checked = the current
+spec alone). This is the finding recorded as C-1.
+
+## 4. overlap-check.py — AFTER feature-ref.md (declaration corrected, C-16)
+
+$ python .specify/skills/sdd-loop-driver/scripts/overlap-check.py \
+    --spec-dir .specify/specs/091-auto-git-closeout --repo . \
+    --json-out .specify/specs/091-auto-git-closeout/test-evidence/overlap-check-clarify.json
+overlap-check: current=091-auto-git-closeout checked=82 overlaps=36 decision=overlap
+EXIT=1
+
+36 overlaps over 5 declared paths (all against COMPLETED feature lines):
+
+  templates/instructions-template.md           18 same-path
+  shared/definitions/probe-definitions.md      12 same-path + 2 nested-path (089, 090 declare shared/definitions)
+  skills/external/git-utils/SKILL.md            3 same-path (059, 062, 063 — all closed)
+  shared/workflow/external-dispatch-recipes.md  1 same-path (088)
+  shared/workflow/artifact-commit-step.md       0
+
+$ python .specify/skills/sdd-loop-driver/scripts/line-registry.py --action list --active --format json
+[]
+-> no active line: every overlap is historical layering on shared registries, not a
+   concurrent co-write. Adjudication recorded in requirements.md C-16 + feature-ref.md.
+
+Declaration-correction trail (measured, kept so the fix is auditable):
+- draft 1 declared 17 paths -> 146 overlaps, including 64 nested-path rows against
+  090 through the `skills/external/sdd-loop-driver` DIRECTORY token. Cause: the declaration
+  table claimed read-only documents as deliverables.
+- draft 2 renamed the read-only table (removed path tokens) -> still 143: the free-text
+  "Deliberate non-deliverables" bullets wrote a bare backticked path that the collector reads.
+- draft 3 (final): only the delivery inventory carries backticked paths; non-deliverables
+  are named by role -> 36. This is the documented rule ("a cited input is never a deliverable").
+
+## 5. validate-requirements.py — after clarify writes
+
+file: .specify/specs/091-auto-git-closeout/requirements.md
+status: ok
+  [id-contiguous] pass (0)   [doc-order] pass (0)      [ref-resolvable] pass (0)
+  [marker-count] pass (0)    [dup-id] pass (0)         [path-marker] pass (0)
+scanned: 304 lines, 36 definition rows, 6 shared strings
+0 error(s), 0 warning(s)
+
+Delta vs § 2: +67 lines, +2 definition rows (FR-028, SC-008), 6 shared strings unchanged.
+
+## 6. pre-analyze-check.py — re-run at clarify (stage=requirements) -> BLOCKED (exit 2)
+
+$ python .specify/skills/sdd-loop-driver/scripts/pre-analyze-check.py \
+    --spec-dir .specify/specs/091-auto-git-closeout --stage requirements --repo .
+pre-analyze-check: input error: requirements.md:177 § Runtime Stack row RS-001 names a
+`Contract` path that does not resolve under the repo:
+pyproject.toml`（本仓 Python 包的依赖面；`git` 按宿主提供，不列为 Python 依赖）
+EXIT=2
+
+Same command with --strict: identical message, EXIT=2. The tool's own contract says stdout
+is empty on an input error and the WARN/ERROR summary is replaced, so no decision was emitted.
+
+### Is this clarify's fault? Measured, and NO.
+
+(a) The same error reproduces on a copy of the file in an unrelated spec dir with an
+    unrelated repo root (/tmp), so it does not depend on anything clarify wrote:
+    $ sed 's|...annotated Contract cell...|`pyproject.toml`|' requirements.md > /tmp/.../requirements.md
+    $ pre-analyze-check.py --spec-dir /tmp/req091/.specify/specs/091-x --stage requirements --repo .
+    pre-analyze-check: stage=requirements decision=pass errors=0 advisories=0 waived=0
+    {"...", "summary": {"errors": 0, "advisories": 0, "waived": 0, "fr": 28, "sc": 8, ...}}
+    EXIT=0
+    Replacing the ONE annotated cell with a bare path makes the identical post-clarify
+    artifact pass. Every clarify addition (FR-028, SC-008, 3 edge cases, 9 assumptions) is
+    present in that passing copy.
+
+(b) The requirements stage recorded decision=pass on this row at 02:26:40Z
+    (requirements-gates.txt § pre-analyze-check). The text of that cell did not change in
+    clarify; what changed is the newline the table row sits on (236 -> 177). The gate is
+    therefore not reproducible across a byte-identical cell, which is itself the defect.
+
+### Root cause (mechanism read from pre-analyze-check.py:559-565, 791-800)
+
+    def clean_cell(value):
+        return (value or "").strip().strip("`").strip()
+
+`str.strip("`")` removes an UNPAIRED backtick at either end. The RS-001 Contract cell is
+    `pyproject.toml`（本仓 Python 包的依赖面；`git` 按宿主提供，不列为 Python 依赖）
+Three backticks: leading ` is stripped, trailing char is '）' so the right side is untouched,
+leaving `pyproject.toml`（...）` with a stray inner backtick. The `os.path.exists` check on
+that string fails and the checker raises InputError (= exit 2, "cell that cannot be parsed").
+
+DEFECT (framework): a PAIRED inline code span followed by prose in a Runtime Stack cell is
+parsed as a path. The cell's *path* is the paired span, not the strip()-residue. Impact
+extends past this feature: any spec that annotates its `Contract` cell the same way gets a
+false input error, and exit 2 reads as "argument or environment error" rather than as a
+findings verdict.
+
+### Disposition (fast-fail)
+
+The defect is in the GATE, not in the artifact; its repair is a change to the driver skill
+(the owner of pre-analyze-check.py), which this stage is forbidden to touch and which the
+assignment scoped as "requirements.md + evidence + wrap-up + one commit". Recorded here as
+evidence plus a framework observation on return; the cell text is left exactly as the
+requirements stage produced it (no silent rewrite to make a gate green).
