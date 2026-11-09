@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_handoff_contract.py::test_the_contract_cites_and_never_copies_task_rows -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 6.60s
