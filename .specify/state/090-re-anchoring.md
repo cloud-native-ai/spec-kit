@@ -1,16 +1,16 @@
 # Line State — 090-re-anchoring
 
 <!-- loop-state:begin -->
-spine_state: running
+spine_state: completed
 run_id: r20261108T220214Z-8647
 slice: 090
-stage: review
+stage: closure
 stage_started_at: 1794183854
 stage_deadline_epoch: 1794194654
 stage_base_commit: 9af8418e
 attempt: 1
 retry_limit: 3
-last_verdict: review U4 pass (review.md four segments + ARC; process pass / artifact pass / implementation fail / code pass with one important open; ARC refused; four blocking items recorded at file:line; checkpoint 07 on-track)
+last_verdict: review fix round closed (e0f4ce4d); closure-acceptance-check verdict=accept (4/4 final-path pass, 39/39 tasks closed); checkpoint suite 01-07 + closure written
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: review closed with blocking items -> driver decides repair-vs-close; ARC refused, feature stays Planned; closure-acceptance-check and the local merge remain gated on F-1
+next_action: none — 090 accepted; push the stage commits
 direction_contract: |
   goal_verbatim: "将『开局加载一次』的动作，变成『每执行完一个核心步骤就再加载一次』，使用 session compact + reload + evaluation 来明确和最开始的方向是否存在偏差；在核心概念中针对 agent 加入『不忘初心：一直记得最开始的任务和规则』和『温故而知新：通过不断复习来强化记忆和回顾目标』"（后续纠正：回顾的重点是规则而不是目标——目标由当前/下一步隐含，被丢弃的是规则）。
   non_goals: [每工具调用重载全文, 新增评分器/日志服务/调度器, 第二个 checkpoint 系统, 改写历史记录, 改动 sdd-loop-driver 的阶段序列与哨兵]

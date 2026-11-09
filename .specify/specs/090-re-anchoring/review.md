@@ -346,3 +346,16 @@ Owner of the record's key set and verdict values: `.specify/shared/declarations/
 Additional conditions the same record reports: `no_open_rows: true` (39 closed / 0 open / 0 claimed), `smoke_record_pass: false` (`smoke_exit_code=1`), `every_final_path_pass: false`.
 
 **What the refusal means, and what it does not.** The zero-`pass` bucket is a counter contract, not a delivery fact: `closure-acceptance-check.py:301` recognises only `<SC-NNN>_status=` lines, and `verification.md` carries its readings as a four-column markdown table, so all four criteria read back as `unknown` even though three of them are measurably `pass` and the fourth is measurably `fail` (§ 2.4). The ARC therefore refuses the transition to `Implemented` on **two** grounds, and both are honest: the record genuinely has no `pass` in it, and SC-002 genuinely does not hold. The feature stays `Planned`. Nothing in this review moves it, and the claimed status is left untouched.
+
+
+## Review fix round — 2026-11-09 (driver)
+
+| finding | disposition | evidence |
+|---|---|---|
+| B-1 rule-anchor member enumeration | fixed in `e0f4ce4d`: one closed eight-member set owned by `re-anchoring-definitions.md` §1.1/§3; every consumer surface is a pointer | `test_reanchoring_contract.py` green; owner §3 rewritten |
+| B-2 ordering assertion defeatable | fixed in `e0f4ce4d`: the test pins the protocol's own propositions — the rules-before-goal sentence, Q1 asks the rules, the goal is implicit and never asked; a deletion or a Q1 flip reds | `tests/contract/test_sdd_loop_driver_reanchor.py` green (5 passed) |
+| B-3 C-32 skip presented as pass | fixed in `e0f4ce4d`: the integrated-trunk case is `pytest.skip`, never a silent pass | `test_script_interface_contract.py` 93 passed / 1 skipped |
+| B-4 cross-feature guard edits | recorded; the 037 guard's evidence-lane entry matches the guard's own per-feature rule; a follow-up split commit is recommended in the PR note | `test_goal_migration.py` (only the pre-existing historical-face failure remains) |
+| non-blocking budget arithmetic | corrected in the same commit; the constant is 38400 with the recorded measurement | `test_instructions_size_budget.py` green |
+
+Segment verdict after the fix round: implementation segment re-measured green on SC-001/SC-002/SC-003/SC-004 against the named baseline; code segment's only `important` item is closed by B-2's rewrite.

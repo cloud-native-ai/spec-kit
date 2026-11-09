@@ -113,3 +113,26 @@ smoke_evidence_path=.specify/specs/090-re-anchoring/test-evidence/closure-guards
 ## Deferrals
 
 `deferred_tasks=` — none. All 39 rows are `[X]`.
+
+smoke_command=SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py -q --tb=no --deselect tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies --deselect tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/090-re-anchoring/test-evidence/closure-guards.txt
+
+# -- Success criteria (machine-readable; the tables above are the reader face) --
+
+SC-001_status=pass
+SC-001_value=5/5 surfaces present and cross-referencing; 130 guard tests green
+SC-001_note=owner page, both constitutions, both instruction surfaces and the agent obligation; test_reanchoring_contract.py proves presence and pointers.
+
+SC-002_status=pass
+SC-002_value=1 ordering assertion, 3 mutants red
+SC-002_note=test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal pins the protocol's rules-before-goal sentence, Q1-asks-rules, implicit-goal and no-goal-question propositions; ordering-red-control.txt records the three red mutants.
+
+SC-003_status=pass
+SC-003_value=zero new failures vs the 49-name baseline
+SC-003_note=baseline = test-evidence/plan-contract-baseline-raw.txt; the two pre-existing failures (test_i11, test_g9) are excluded by node id in the smoke record.
+
+SC-004_status=pass
+SC-004_value=T0/T1/T2 agree on both surfaces
+SC-004_note=owner §2 and checkpoint-protocol §5 read the same tier table; test_reanchoring_contract.py asserts the tier tokens.
+
