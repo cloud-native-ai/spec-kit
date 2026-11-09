@@ -23,6 +23,15 @@ The **goal** concept is defined authoritatively in `references/goal.md`. When a 
 
 Whether the invoking command run may own a goal/team is decided by the declared class axis, never by a per-command list kept here (contract C-74): ask the engine with `python3 scripts/python/goal-utils.py command-family --command <stem> --json` and read `in_family` from its answer. The action resolves the class through `flow-class-check.py --action lookup --unit-id /speckit.<stem>` and reports `source: ledger` = in family, `source: default` = not in family; a degraded lookup exits 2 and is never read as a family membership. This skill carries no second whitelist.
 
+## Handoff Contract (designer → construction crew, 094)
+
+Complex work is handed to a crew through `<spec-dir>/handoff.md`, whose shape and rules are authored once in [`references/handoff-contract-template.md`](references/handoff-contract-template.md) — cite it, never restate it.
+
+- **Production** — the `tasks` stage produces the contract only after `python3 scripts/python/goal-utils.py handoff-decision --tasks <spec-dir>/tasks.md --json` returns `handoff`; `plan` never produces one and `implement` consumes it (C-68).
+- **Key discipline** — `goal_slug` and `team_slug` are validated against `.specify/anchoring/<goal_slug>/goal.md` and `.specify/teams/<team_slug>/team.md` through the engine; an unresolvable key is refused at creation with `handoff-dangling-key` (exit 2) naming the key, and the reverse `handoff_ref` on both definitions is written by the engine's binding action — never by the contract file alone (C-58/C-59).
+- **Territory** — on activation the contract's `## Territory` expands into the `territory.write` of every team bound to that `goal_slug` as an explicit `improve-team` modification, one record per team; `requirements.md`, `tasks.md`, `verification.md` and `handoff.md` stay in `territory.forbidden`, and the refusal is mechanical via [`scripts/territory-check.py`](scripts/territory-check.py) (C-61/C-62).
+- **Writeback** — the crew delivers one record per completed task under `<spec-dir>/writeback/<T-NNN>.yaml`; the task table stays spec-side (C-65/C-67).
+
 ## Team Definition & Persistence (create mode)
 
 Produce a team from a user **goal** and persist it as `.specify/teams/<slug>/team.md`. Establish the goal first, then derive both structures from it. Full procedure, schema, and persistence rules: [`references/create-mode.md`](references/create-mode.md).
@@ -191,10 +200,11 @@ All patterns share file-path-only handoffs, progress tracking, structured result
 
 | Path | Contents |
 |------|----------|
-| `${SKILL_HOME}/references/` | `conceptual-model.md`, `capacity-vs-responsibility.md`, `goal.md`, `optimization-goals.md`, `operating-loops.md`, `team-presets.md`, `summary-mapping.md`, `create-mode.md`, `patterns.md`, `execution-guide.md` |
+| `${SKILL_HOME}/references/` | `conceptual-model.md`, `capacity-vs-responsibility.md`, `goal.md`, `optimization-goals.md`, `operating-loops.md`, `team-presets.md`, `summary-mapping.md`, `create-mode.md`, `patterns.md`, `execution-guide.md`, `handoff-contract-template.md` |
 | `${SKILL_HOME}/templates/` | team-supervisor role template, the three EEI stage templates, the parallel/serial/triad orchestration templates, `agent-workflow-schema.md` |
 | `${SKILL_HOME}/templates/teams/` | Predefined team shapes: `capability-arena.md` (skill/command/subagent 竞技场), `project-cluster.md` (跨项目协作集群) |
 | `${SKILL_HOME}/scripts/match-team-preset.py` | Deterministic preset matcher — returns ranked JSON with a `confidence` verdict |
+| `${SKILL_HOME}/scripts/territory-check.py` | Territory refusal surface — may a crew seat write this path? (094 handoff contract) |
 
 ## Agent-Specific Configuration
 
