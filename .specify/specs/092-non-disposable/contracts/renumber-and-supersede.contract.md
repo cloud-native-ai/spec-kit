@@ -1,0 +1,73 @@
+# Contract: Renumber and Supersede
+
+**Feature**: 092-non-disposable | **Contract file**: `contracts/renumber-and-supersede.contract.md`
+**Guard carrier**: `tests/contract/test_non_disposable_contract.py` (C-505 / C-506 carry mutation legs; the renumber
+legs additionally read `scripts/python/renumber-utils.py`)
+**Owner**: the supersede protocol and the renumber predicate face are owned by
+`shared/definitions/non-disposable-definitions.md` § Supersede Protocol / § Renumber-Face. The predicates themselves
+are **reused** from `scripts/python/renumber-utils.py` (`EXCLUDED_PREFIXES`, `MACHINE_PREFIXES`, `EVIDENCE_SEGMENTS`,
+`DATED_RE`) — this contract MUST NOT restate them; it fixes what a guard may assert about their use.
+**FR coverage**: each clause carries its own trailing citation group.
+
+## C-501 — Supersede recovers three landing faces
+
+When one feature supersedes another feature's body, guard or evidence path, the superseding side MUST recover all
+three: (i) the body — old text retained **and** marked superseded with a pointer to the new carrier; (ii) the guard —
+the old behaviour's assertion replaced or removed; (iii) the evidence path — the old spelling keeps a pointer, never a
+second copy of the truth. Recovering two of three is the defect this contract detects.
+
+(FR-015, SC-005)
+
+## C-502 — Incomplete recovery is mechanically detectable
+
+A body marked superseded whose guard still demands the old behaviour, or whose evidence path exists in a second
+spelling, or which lacks the pointer, MUST be reported red naming path and line. The guard MUST carry one mutation leg
+per landing face (body / guard / evidence path), each asserting red on a copy tree and green after synchronised
+recovery.
+
+(FR-016, FR-062, SC-005)
+
+## C-503 — The supersede registry is a readable record, not a session note
+
+A supersede MUST be recorded in the owner page's registry form (superseded item → superseding item → disposition →
+evidence path) readable by the engine. A supersede that exists only in a commit message or a session record does not
+satisfy this clause and the guard MUST fail when it is the only trace.
+
+(FR-017, SC-005)
+
+## C-504 — Live bindings follow the directory's actual number
+
+A live binding (feature id in an authority file, requirement/feature ids in a task header, the team directory name and
+slug, the feature id in a contract header, the lines of a feature reference file, a registry row) that disagrees with
+the directory's number MUST be reported red naming file and line. All four live-binding shapes reproduce from the
+corpus (C1–C4, 档 I, repaired here).
+
+(FR-022, SC-007)
+
+## C-505 — History records are never rewritten to suit a new number, and rewriting them is detected
+
+History records (`test-evidence/`, dated review reports, prior text inside `## Clarifications`, prior entries in
+`.specify/state/`) MUST NOT be rewritten to follow a renumber. The check MUST report red for a history record that
+**was** rewritten: the predicate face is the closed enumeration the owner names (by path and by section position) and
+it MUST be taken from `renumber-utils.py`'s existing predicates, not from a new "looks like history" heuristic. The
+corpus has no row for this leg (`plan.md` § A–H two-way check); the guard carries it as a fixture.
+
+(FR-023, FR-024, SC-007)
+
+## C-506 — One predicate implementation, quoted by both sides
+
+The engine MUST consume the renumber predicates from `renumber-utils.py` (import or documented subprocess), and MUST
+NOT carry a second copy of `EXCLUDED_PREFIXES` / `MACHINE_PREFIXES` / `EVIDENCE_SEGMENTS` / `DATED_RE`. The guard
+asserts the engine module contains no duplicate of those literals — a mutation leg edits the predicate module and
+expects the engine's classification to move with it.
+
+(FR-024, FR-060, SC-012)
+
+## C-507 — Archive is a move and keeps the old text
+
+`archive` dispositions move the carrier and keep the superseded text intact; deletion is not a disposition. The
+disposition record MUST carry the source → archive path mapping so the move is reversible by a single `git` operation
+(§ `contracts/disposition.contract.md` C-308). `git status --porcelain` after a repair run MUST show a rename pair for
+an archived path, never a deletion.
+
+(FR-034, FR-058, FR-017)

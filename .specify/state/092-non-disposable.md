@@ -4,13 +4,13 @@
 spine_state: running
 run_id: r20261109T024154Z-3301
 slice: 092
-stage: plan
-stage_started_at: 1794193024
-stage_deadline_epoch: 1794203824
+stage: tasks
+stage_started_at: 1794193879
+stage_deadline_epoch: 1794204679
 stage_base_commit: 1a7fed0e
 attempt: 1
 retry_limit: 3
-last_verdict: clarify U4 pass (cbf8c05c; 65 FR / 20 SC; overlap clear); checkpoint 02 on-track
+last_verdict: plan U4 pass (7 contracts / 54 clauses; 3 gates pass); checkpoint 03 raised concurrency to slot_cap 8 for the user's team requirement
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch plan; after plan U4 create the spec-local team at high concurrency, then tasks
+next_action: create the spec-local team at max_parallel 8, then dispatch tasks
 direction_contract: |
   goal_verbatim: "在 speckit 框架中引入『Non-Disposable』理念：任何过程和文档都不应该是『用过即丢』(Use and throw)，需要时常回顾和修正，同时过去的历史也是重要的参考和借鉴。这就要求设计一系列机制，杜绝『这个没用了但是留在这里』或『这个过时了但是我现在不想删除』等一系列将问题推到将来的行为。以上面分析 A~H 的结论作为这个新特性的输入和验证用例。新特性的落点可以放到 /speckit.history 命令中：speckit.history 命令执行时先回顾历史，然后进行设计给出方案，向用户确定是否执行。回顾历史需要回顾当前 git head 指向的 workdir 中的 .specify 目录中记录的历史文件，而不是 git history。需要将所有的 .specify/{archive,derive,goal,history,memory,project,review,specs,state,teams}/* 这些带『历史』属性的目录和文件都纳入其中。这是一个浩大的工程，因此需要使用一个 team 通过大并发的 subagent 来完成。"
   non_goals:
@@ -43,7 +43,7 @@ project_config:
   write_isolation: shared-tree
   decomposition: auto
   decomposition_stages: [plan, implement, review]
-  decomposition_slot_cap: 2
+  decomposition_slot_cap: 8
   agent_concurrency_requested: 24
   agent_concurrency_effective: 24
   agent_concurrency_reason: local native subagents; the user requires a team with large-concurrency subagents (085 cadence: team created after clarify + plan U4)
