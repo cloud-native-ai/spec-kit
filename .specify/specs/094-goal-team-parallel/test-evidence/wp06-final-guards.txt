@@ -1,0 +1,7 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_framework_map_archive_row.py tests/contract/test_goal_command_template.py tests/contract/test_no_spec_local_writes.py tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area tests/contract/test_directory_governance.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+................................                                         [100%]
+32 passed in 7.06s

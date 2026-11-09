@@ -1,0 +1,54 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_mirror_parity_suite.py -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 25%]
+........................................................................ [ 34%]
+........................................................................ [ 43%]
+........................................................................ [ 51%]
+........................................................................ [ 60%]
+......F..............F.................................................. [ 68%]
+........................................................................ [ 77%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+_ test_mirror_file_byte_identical[skills/internal/create-team/references/handoff-contract-template.md->.specify/skills/internal/create-team/references/handoff-contract-template.md] _
+[gw187] linux -- Python 3.11.11 /usr/local/bin/python3
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/skills/internal'), Pos...d-loop/worktrees/094-wp06/.specify/skills/internal'), PosixPath('create-team/references/handoff-contract-template.md'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/skills/internal/create-team/references/handoff-contract-template.md (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/skills/internal/create-team/references/handoff-contract-template.md').is_file
+
+tests/contract/test_mirror_parity_suite.py:95: AssertionError
+_ test_mirror_file_byte_identical[skills/internal/create-team/scripts/territory-check.py->.specify/skills/internal/create-team/scripts/territory-check.py] _
+[gw164] linux -- Python 3.11.11 /usr/local/bin/python3
+
+file_pair = (PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/skills/internal'), Pos...ecify/.tmp/sdd-loop/worktrees/094-wp06/.specify/skills/internal'), PosixPath('create-team/scripts/territory-check.py'))
+
+    @pytest.mark.parametrize("file_pair", _file_pair_params())
+    def test_mirror_file_byte_identical(file_pair):
+        src, dst, rel = file_pair
+        mirror = dst / rel
+>       assert mirror.is_file(), f"mirror file missing: {mirror} (engine compare_pair MISS)"
+E       AssertionError: mirror file missing: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/skills/internal/create-team/scripts/territory-check.py (engine compare_pair MISS)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/skills/internal/create-team/scripts/territory-check.py').is_file
+
+tests/contract/test_mirror_parity_suite.py:95: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-team/references/handoff-contract-template.md->.specify/skills/internal/create-team/references/handoff-contract-template.md]
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[skills/internal/create-team/scripts/territory-check.py->.specify/skills/internal/create-team/scripts/territory-check.py]
+2 failed, 834 passed in 6.59s

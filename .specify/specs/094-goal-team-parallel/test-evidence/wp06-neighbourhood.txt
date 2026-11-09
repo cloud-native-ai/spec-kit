@@ -1,0 +1,119 @@
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_binding_model.py tests/contract/test_criterion_vocabulary_scan.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_checkpoint_protocol.py tests/contract/test_archive_migration.py tests/contract/test_goal_targets_engine.py tests/contract/test_run_skills_wiring.py tests/contract/test_directory_governance.py tests/contract/test_migration_distribution.py tests/contract/test_skill_layer_visibility_guards.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 46%]
+...............................F...........FF..............F..F......... [ 92%]
+............                                                             [100%]
+=================================== FAILURES ===================================
+________________ test_framework_map_registers_the_runtime_roots ________________
+[gw124] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_framework_map_registers_the_runtime_roots():
+        for path in (
+            ROOT / "shared" / "definitions" / "framework-map.md",
+            ROOT / ".specify" / "shared" / "definitions" / "framework-map.md",
+        ):
+            body = _text(path)
+            assert "`.specify/state/`" in body, f"{path} does not register .specify/state/"
+            assert "`.specify/.tmp/`" in body, f"{path} does not register .specify/.tmp/"
+>           assert "`.specify/goal/<slug>/`" in body, f"{path} does not register .specify/goal/"
+E           AssertionError: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/shared/definitions/framework-map.md does not register .specify/goal/
+E           assert '`.specify/goal/<slug>/`' in '# Spec Kit Framework Map\n\nSingle source of truth for the `.specify/` layout map. Referenced from the `## Spec Kit F...policy, reusable structure, and execution order live respectively under `guidelines/`, `patterns/`, and `workflow/`.\n'
+
+tests/contract/test_directory_governance.py:226: AssertionError
+_________ test_quickstart_records_the_payload_smoke_for_every_snapshot _________
+[gw151] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_quickstart_records_the_payload_smoke_for_every_snapshot() -> None:
+>       text = _read(QUICKSTART, "notes/quickstart-run.md")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_migration_distribution.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md')
+label = 'notes/quickstart-run.md'
+
+    def _read(path: Path, label: str) -> str:
+>       assert path.is_file(), f"{label} missing: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: notes/quickstart-run.md missing: .specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md').is_file
+
+tests/contract/test_migration_distribution.py:163: AssertionError
+_____________ test_quickstart_records_name_level_snapshot_outcomes _____________
+[gw149] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_quickstart_records_name_level_snapshot_outcomes() -> None:
+>       text = _read(QUICKSTART, "notes/quickstart-run.md")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_migration_distribution.py:487: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md')
+label = 'notes/quickstart-run.md'
+
+    def _read(path: Path, label: str) -> str:
+>       assert path.is_file(), f"{label} missing: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: notes/quickstart-run.md missing: .specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/quickstart-run.md').is_file
+
+tests/contract/test_migration_distribution.py:163: AssertionError
+_______________ test_migration_samples_record_the_payload_smoke ________________
+[gw150] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_migration_samples_record_the_payload_smoke() -> None:
+>       text = _read(SAMPLES, "notes/migration-samples.md")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_migration_distribution.py:526: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md')
+label = 'notes/migration-samples.md'
+
+    def _read(path: Path, label: str) -> str:
+>       assert path.is_file(), f"{label} missing: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: notes/migration-samples.md missing: .specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md').is_file
+
+tests/contract/test_migration_distribution.py:163: AssertionError
+______________ test_migration_samples_freeze_three_complete_rows _______________
+[gw148] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_migration_samples_freeze_three_complete_rows() -> None:
+>       text = _read(SAMPLES, "notes/migration-samples.md")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_migration_distribution.py:448: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md')
+label = 'notes/migration-samples.md'
+
+    def _read(path: Path, label: str) -> str:
+>       assert path.is_file(), f"{label} missing: {path.relative_to(REPO_ROOT)}"
+E       AssertionError: notes/migration-samples.md missing: .specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-wp06/.specify/specs/069b-isomorphism-migration-metrics/notes/migration-samples.md').is_file
+
+tests/contract/test_migration_distribution.py:163: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_directory_governance.py::test_framework_map_registers_the_runtime_roots
+FAILED tests/contract/test_migration_distribution.py::test_quickstart_records_the_payload_smoke_for_every_snapshot
+FAILED tests/contract/test_migration_distribution.py::test_quickstart_records_name_level_snapshot_outcomes
+FAILED tests/contract/test_migration_distribution.py::test_migration_samples_record_the_payload_smoke
+FAILED tests/contract/test_migration_distribution.py::test_migration_samples_freeze_three_complete_rows
+5 failed, 151 passed in 7.09s
+.                                                                        [100%]
+1 passed, 156 deselected in 15.31s

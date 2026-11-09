@@ -223,7 +223,8 @@ def test_framework_map_registers_the_runtime_roots():
         body = _text(path)
         assert "`.specify/state/`" in body, f"{path} does not register .specify/state/"
         assert "`.specify/.tmp/`" in body, f"{path} does not register .specify/.tmp/"
-        assert "`.specify/goal/<slug>/`" in body, f"{path} does not register .specify/goal/"
+        assert "`.specify/anchoring/<slug>/`" in body, (
+            f"{path} does not register .specify/anchoring/")
 
 
 def test_skill_state_and_scratch_defaults_live_under_declared_roots():

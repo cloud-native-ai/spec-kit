@@ -1,0 +1,124 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_framework_map_archive_row.py tests/contract/test_goal_command_template.py tests/contract/test_no_spec_local_writes.py tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.FFFFFF.                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_the_framework_map_names_the_unified_archive_and_drops_spec_local_goal_team _
+[gw0] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_framework_map_names_the_unified_archive_and_drops_spec_local_goal_team():
+        text = FRAMEWORK_MAP.read_text(encoding="utf-8")
+    
+        goals = _row(text, "Goals")
+>       assert ".specify/anchoring/<slug>/" in goals, (
+            "the Goals row must name the goal archive layer `.specify/anchoring/<slug>/`")
+E       AssertionError: the Goals row must name the goal archive layer `.specify/anchoring/<slug>/`
+E       assert '.specify/anchoring/<slug>/' in '| Goals | `.specify/goal/<slug>/` | goal definitions plus per-goal `summary/`; owner: `/speckit.goal` + `goal-utils.py` |'
+
+tests/contract/test_framework_map_archive_row.py:39: AssertionError
+__ test_the_goal_template_exposes_migrate_archive_and_cites_the_scope_domain ___
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_goal_template_exposes_migrate_archive_and_cites_the_scope_domain():
+        text = _read(GOAL_TEMPLATE)
+    
+>       assert "migrate-archive" in text, (
+            "the goal template must expose the `migrate-archive` mode")
+E       AssertionError: the goal template must expose the `migrate-archive` mode
+E       assert 'migrate-archive' in '---\ndescription: Author and manage goal definitions in both scopes — the project-level anchoring (锚点) and a spec-sco...md` (see `/speckit.team`). Once two or more teams share a goal, run `coordinate` to keep their territories disjoint.\n'
+
+tests/contract/test_goal_command_template.py:41: AssertionError
+____ test_the_team_template_drops_the_spec_hint_and_gains_no_migration_mode ____
+[gw2] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_team_template_drops_the_spec_hint_and_gains_no_migration_mode():
+        text = _read(TEAM_TEMPLATE)
+    
+        assert "migrate-archive" not in text, (
+            "team migration runs inside the goal entry; the team template must not gain a "
+            "migration mode of its own")
+>       assert "<spec-dir>/team" not in text and "<spec-dir>/goal" not in text, (
+            "the team template still points at a spec-local goal/team directory")
+E       AssertionError: the team template still points at a spec-local goal/team directory
+E       assert ('<spec-dir>/team' not in '---\ndescri...am skills.\n'
+E         
+E         '<spec-dir>/team' is contained here:
+E           obal) or `<spec-dir>/team/` (spec) → report **"team not found"** and offer to `create` it.
+E         ?           +++++++++++++++
+E           
+E           ### Default Behavior (No Arguments)
+E           ...
+E         
+E         ...Full output truncated (59 lines hidden), use '-vv' to show)
+
+tests/contract/test_goal_command_template.py:73: AssertionError
+____ test_the_three_management_skills_cite_owners_and_restate_no_arguments _____
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_three_management_skills_cite_owners_and_restate_no_arguments():
+        manage = _owner_text(MANAGE_GOAL)
+        run = _owner_text(RUN_TEAM)
+        improve = _owner_text(IMPROVE_TEAM)
+    
+        # Every procedure follows the new paths and model: the retired goal directory and
+        # the spec-local definition store survive in none of the three.
+        for label, text in (("manage-goal", manage), ("run-team", run),
+                            ("improve-team", improve)):
+>           assert ".specify/goal/" not in text, (
+                f"{label} still names the retired `.specify/goal/` directory")
+E           AssertionError: manage-goal still names the retired `.specify/goal/` directory
+E           assert '.specify/goal/' not in '---\nname: ...out` step"\n'
+E             
+E             '.specify/goal/' is contained here:
+E               nition | `.specify/goal/<goal-slug>/goal.md` |
+E             ?           ++++++++++++++
+E               | `view` | list the archive, or show one goal | nothing |
+E               | `modify` | change objective, criteria, lifecycle state, or Targets | the same definition file |
+E               | `targets` | add / list / transition the goal's Targets (run-assignable scope slices) | the same definition file |...
+E             
+E             ...Full output truncated (157 lines hidden), use '-vv' to show
+
+tests/contract/test_binding_model.py:545: AssertionError
+________ test_the_sanitize_template_renders_the_probe_without_migrating ________
+[gw6] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_sanitize_template_renders_the_probe_without_migrating():
+        text = _read(SANITIZE_TEMPLATE)
+>       assert "probe-residual" in text, (
+            "the sanitize template must name the read-only residual probe action")
+E       AssertionError: the sanitize template must name the read-only residual probe action
+E       assert 'probe-residual' in '---\ndescription: 框架资料卫生治理——对框架自有资料(parked ideas/草稿/索引/镜像/兼容链接/docs 树)做过期残留与冗余检测及正确性检查(死引用/索引一致/链接/镜像漂移),发现持久化携带 pend...kit.instructions` / sync-mirrors;台账 pending 项可留待下次运行收敛;renumber 的分支改名项以 `git branch -m` 命令形式移交给用户执行(命令从不改动 git ref)。\n'
+
+tests/contract/test_no_spec_local_writes.py:280: AssertionError
+__________ test_no_writing_surface_targets_a_spec_local_goal_or_team ___________
+[gw3] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_no_writing_surface_targets_a_spec_local_goal_or_team():
+        surfaces = _surface_texts()
+    
+        # 1. The engine's action table covers every parser action, and its write set is the
+        #    pinned one; every writing function stays clear of the spec-local tree.
+        table = _table_actions(surfaces["engine"])
+        help_table = _help_actions()
+>       assert set(table) == set(help_table), (
+            "the docstring action table and the parser disagree — the table is the one "
+            f"enumerable place a writing surface may live; docstring-only={sorted(set(table) - set(help_table))} "
+            f"parser-only={sorted(set(help_table) - set(table))}")
+E       AssertionError: the docstring action table and the parser disagree — the table is the one enumerable place a writing surface may live; docstring-only=[] parser-only=['resolve-scope']
+E       assert {'backfill-bi...'create', ...} == {'backfill-bi...'create', ...}
+E         
+E         Extra items in the right set:
+E         'resolve-scope'
+E         Use -v to get more diff
+
+tests/contract/test_no_spec_local_writes.py:187: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_framework_map_archive_row.py::test_the_framework_map_names_the_unified_archive_and_drops_spec_local_goal_team
+FAILED tests/contract/test_goal_command_template.py::test_the_goal_template_exposes_migrate_archive_and_cites_the_scope_domain
+FAILED tests/contract/test_goal_command_template.py::test_the_team_template_drops_the_spec_hint_and_gains_no_migration_mode
+FAILED tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments
+FAILED tests/contract/test_no_spec_local_writes.py::test_the_sanitize_template_renders_the_probe_without_migrating
+FAILED tests/contract/test_no_spec_local_writes.py::test_no_writing_surface_targets_a_spec_local_goal_or_team
+6 failed, 2 passed in 6.63s

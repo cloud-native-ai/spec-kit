@@ -1,0 +1,3 @@
+scope --only: shared/definitions/framework-map.md, skills/internal/manage-goal/SKILL.md, skills/internal/run-team/SKILL.md
+ok    skills/internal/ == .specify/skills/internal/ (2 files, byte-identical)
+ok    shared/ == .specify/shared/ (1 files, byte-identical)

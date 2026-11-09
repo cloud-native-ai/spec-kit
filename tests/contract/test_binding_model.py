@@ -522,3 +522,61 @@ def test_the_two_owners_cite_each_other_and_restate_no_value_domain():
     # The goal owner does not restate the team lifecycle pair.
     assert "active` / `archived" not in goal_text and "`archived`" not in goal_text, (
         "the goal owner must cite the team lifecycle, not enumerate it")
+
+
+# ---------------------------------------------------------------------------
+# T075 / C-101 — the three management skills cite their owners, not the arguments
+# ---------------------------------------------------------------------------
+
+MANAGE_GOAL = REPO_ROOT / "skills/internal/manage-goal/SKILL.md"
+RUN_TEAM = REPO_ROOT / "skills/internal/run-team/SKILL.md"
+IMPROVE_TEAM = REPO_ROOT / "skills/internal/improve-team/SKILL.md"
+
+
+def test_the_three_management_skills_cite_owners_and_restate_no_arguments():
+    manage = _owner_text(MANAGE_GOAL)
+    run = _owner_text(RUN_TEAM)
+    improve = _owner_text(IMPROVE_TEAM)
+
+    # Every procedure follows the new paths and model: the retired goal directory and
+    # the spec-local definition store survive in none of the three.
+    for label, text in (("manage-goal", manage), ("run-team", run),
+                        ("improve-team", improve)):
+        assert ".specify/goal/" not in text, (
+            f"{label} still names the retired `.specify/goal/` directory")
+        spec_local = re.findall(
+            r"(?:\.specify/specs/[^\s`'\"]+|<spec-dir>)/(?:goal|team)\b", text)
+        assert not spec_local, (
+            f"{label} names a spec-local goal/team store: {spec_local}")
+        assert ".specify/teams/<slug>" in text, (
+            f"{label} must state the team archive landing point")
+
+    # manage-goal owns the goal-side procedure: it cites the concept owner, the archive
+    # layer section and the engine's help as the argument owner, and it carries the
+    # `migrate-archive` mode the command template delegates to it.
+    assert "shared/definitions/goal-definitions.md" in manage
+    assert "§ Archive Layers" in manage
+    assert "goal-utils.py" in manage and "--help" in manage, (
+        "manage-goal must cite the engine's help as the action-argument owner")
+    assert ".specify/anchoring/<slug>/goal.md" in manage or ".specify/anchoring/" in manage
+    assert "migrate-archive" in manage, (
+        "the goal skill must carry the `migrate-archive` mode the template exposes")
+
+    # run-team cites the action and concept owners and documents the additive
+    # `binding` key of the run-checks payload (T048's documentation half).
+    assert "goal-utils.py" in run
+    assert "skills/internal/create-team/references/conceptual-model.md" in run
+    assert "`binding`" in run or "binding 键" in run, (
+        "run-team must document the additive binding key of the run-checks payload")
+
+    # improve-team cites the concept and the create-mode procedure owners.
+    assert "create-team/references/conceptual-model.md" in improve
+    assert "create-mode.md" in improve
+
+    # None of the three restates the retired scope values or the engine's flag domain.
+    for label, text in (("manage-goal", manage), ("run-team", run),
+                        ("improve-team", improve)):
+        for restated in ("--scope spec", "--scope global", "global|spec|auto",
+                         "goal|teams|auto"):
+            assert restated not in text, (
+                f"{label} restates the scope domain: {restated!r}")

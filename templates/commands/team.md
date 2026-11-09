@@ -42,7 +42,7 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 4. **run** → `run-team`: the run flow (load → five-check preview via the goal-utils engine → goal restatement → structure render → present & execute → report) is the skill's procedure — `skills/internal/run-team/SKILL.md`; inputs are the team slug and the optional `--target`, outputs are the run report and ledger entries.
 5. **Empty arguments** → execute **Default Behavior (No Arguments)** below.
 6. **Non-empty but ambiguous / unsupported** → report capabilities and request the missing intent (see "Ambiguous or Unsupported Intent" below).
-7. **modify / run targeting a team that does not exist** under `.specify/teams/` (global) or `<spec-dir>/team/` (spec) → report **"team not found"** and offer to `create` it.
+7. **modify / run targeting a team that does not exist** under `.specify/teams/` → report **"team not found"** and offer to `create` it.
 
 ### Default Behavior (No Arguments)
 

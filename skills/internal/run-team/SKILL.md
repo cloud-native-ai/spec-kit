@@ -32,7 +32,7 @@ skill_id: "<SKILL:.specify/skills/internal/run-team/SKILL.md>"
 python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <T-<nnn>>] --json
 ```
 
-一次调用返回 `team_slug` / `goal_slug` / `identity_kind` / `{effective, source, declared_focus}` / 五条 `checks`(1..5,各含 `id`/`name`/`verdict`/`message`)/ `verdict` / `blocked`(内部经 `parse_goal` / `preview_target_check` / `resolve_effective_target`);无前提可评的 check 记 `not-evaluated`——**从不**记 `ok`。`blocked` 是"本次必须停止"的字段。退出码:`0` 通过 / `2` 输入非法 / `3` 团队不存在 / `4` goal 不可解析 / `5` blocked。五查覆盖:绑定 goal 解析(带 `--target` 时缺 goal 定义即停并指向 `/speckit.goal migrate`)、悬空 `T-<nnn>` 引用(停;补救 `/speckit.goal targets --add`)、终态 Target 引用(停;重开经 `/speckit.goal targets --set open --id <T-nnn>`,无执行旁路)、跨 goal 引用(拒)、goal 自身终态(拒)。
+一次调用返回 `team_slug` / `goal_slug` / `identity_kind` / `{effective, source, declared_focus}` / 五条 `checks`(1..5,各含 `id`/`name`/`verdict`/`message`)/ `verdict` / `blocked`,自 094 起另带**加性** `binding` 键(`{owner, owner_id, origin}`;predates-model 的 team 为 `null`,既有 `resolution` 子键与取值不变)(内部经 `parse_goal` / `preview_target_check` / `resolve_effective_target`);无前提可评的 check 记 `not-evaluated`——**从不**记 `ok`。`blocked` 是"本次必须停止"的字段。退出码:`0` 通过 / `2` 输入非法 / `3` 团队不存在 / `4` goal 不可解析 / `5` blocked——旗标、载荷与退出码归引擎的动作表(`python3 .specify/scripts/python/goal-utils.py --help`),本技能不复述。五查覆盖:绑定 goal 解析(带 `--target` 时缺 goal 定义即停并指向 `/speckit.goal migrate`)、悬空 `T-<nnn>` 引用(停;补救 `/speckit.goal targets --add`)、终态 Target 引用(停;重开经 `/speckit.goal targets --set open --id <T-nnn>`,无执行旁路)、跨 goal 引用(拒)、goal 自身终态(拒)。
 
 ### 3. Restate
 
@@ -44,7 +44,7 @@ python3 .specify/scripts/python/goal-utils.py run-checks <team-slug> [--target <
 
 ### 5. Present & Execute
 
-呈现 **goal** 与两个结构后**直接执行**——呈现是披露,不是阻断门禁(事后修改途径:`/speckit.team` modify / improve-team;判据:`.specify/shared/guidelines/confirmation-gates.md`)。同时披露 summary 判定(refresh 或 suppressed;周期总结落 goal 索引 `.specify/goal/<goal-slug>/summary/`,**从不**落团队目录)与 Target 指派行,逐字形态:
+呈现 **goal** 与两个结构后**直接执行**——呈现是披露,不是阻断门禁(事后修改途径:`/speckit.team` modify / improve-team;判据:`.specify/shared/guidelines/confirmation-gates.md`)。同时披露 summary 判定(refresh 或 suppressed;周期总结落 goal 档案的 `.specify/anchoring/<goal-slug>/summary/`,**从不**落团队目录;档案层归 `.specify/shared/definitions/goal-definitions.md` § Archive Layers)与 Target 指派行,逐字形态:
 
 - `本次 Target: T-<nnn> — <statement>(open)`
 - `本次 Target: 无(对 goal 整体运行)`

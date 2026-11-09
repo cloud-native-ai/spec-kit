@@ -1,0 +1,34 @@
+# test runner: python3 -m pytest -n auto --dist load tests/contract/test_framework_map_archive_row.py tests/contract/test_goal_command_template.py tests/contract/test_no_spec_local_writes.py tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area -q
+# test runner: mode=parallel workers=auto dist=load passes=1
+bringing up nodes...
+bringing up nodes...
+
+.....F...                                                                [100%]
+=================================== FAILURES ===================================
+____ test_the_three_management_skills_cite_owners_and_restate_no_arguments _____
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_three_management_skills_cite_owners_and_restate_no_arguments():
+        manage = _owner_text(MANAGE_GOAL)
+        run = _owner_text(RUN_TEAM)
+        improve = _owner_text(IMPROVE_TEAM)
+    
+        # Every procedure follows the new paths and model: the retired goal directory and
+        # the spec-local definition store survive in none of the three.
+        for label, text in (("manage-goal", manage), ("run-team", run),
+                            ("improve-team", improve)):
+            assert ".specify/goal/" not in text, (
+                f"{label} still names the retired `.specify/goal/` directory")
+            spec_local = re.findall(
+                r"(?:\.specify/specs/[^\s`'\"]+|<spec-dir>)/(?:goal|team)\b", text)
+            assert not spec_local, (
+                f"{label} names a spec-local goal/team store: {spec_local}")
+>           assert ".specify/teams/<slug>" in text, (
+                f"{label} must state the team archive landing point")
+E           AssertionError: manage-goal must state the team archive landing point
+E           assert '.specify/teams/<slug>' in '---\nname: manage-goal\ndescription: Author and manage goal definitions in the goal archive — the executable core of ...ded step points here)"\n6. Closeout — `.specify/shared/workflow/artifact-commit-step.md` § "The `## Close-out` step"\n'
+
+tests/contract/test_binding_model.py:551: AssertionError
+=========================== short test summary info ============================
+FAILED tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments
+1 failed, 8 passed in 6.64s

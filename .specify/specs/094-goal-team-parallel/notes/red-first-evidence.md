@@ -147,3 +147,32 @@ MUTATION TURNS THE PEER-B PATH RED: yes
 3 passed in 6.70s
 ```
 - red reading (29 classification hits across seven surfaces) is reproduced in the module docstring and was re-measured at fork entry; the surfaces reworded are the wp05-owned ones plus `skills/internal/create-team/references/create-mode.md` (the sweep disclosed in `notes/implement-wp03.md` §5).
+
+### T073 — framework-map rows (red → green)
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_framework_map_archive_row.py -q`
+- exit status (red): 1 — the Goals row still named `.specify/goal/<slug>/` and no archive row named `.specify/archive/goal-team/`; reading: `test-evidence/wp06-red-guards-2.txt`
+- exit status (green): 0 — 1 passed (in the 9-guard run `test-evidence/wp06-green-guards-3.txt`)
+
+### T074 — goal/team command templates (red → green)
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_goal_command_template.py -q`
+- exit status (red): 1 — the goal template exposed no `migrate-archive` mode and kept the spec-scoped positioning; the team template still named `<spec-dir>/team/`; reading: `test-evidence/wp06-red-guards-2.txt`
+- exit status (green): 0 — 2 passed (same 9-guard reading)
+
+### T075 — the three management skills (red → green)
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh "tests/contract/test_binding_model.py::test_the_three_management_skills_cite_owners_and_restate_no_arguments" -q`
+- exit status (red): 1 — manage-goal and run-team still named `.specify/goal/`; manage-goal carried no `migrate-archive` mode and no archive-layer citation; reading: `test-evidence/wp06-red-guards-2.txt`
+- exit status (green): 0 — 1 passed (same 9-guard reading)
+
+### T076 / T077 — the write-path invariant and its mutation arms (red → green)
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh tests/contract/test_no_spec_local_writes.py -q`
+- exit status (red): 1 — the sanitize template lacked the read-only residual reading; the two mutation arms already passed, proving the checkers catch a reverted surface; reading: `test-evidence/wp06-red-guards-2.txt`
+- exit status (green): 0 — 4 passed (same 9-guard reading). Mutation arms: engine root reverted in memory → `ARCHIVE_DIRNAME` violation; create-mode persistence target reverted in memory → prose hit; re-injected `temporary goal` phrase → C-107 pattern hit.
+
+### T078 — residual probe and the sanitize reading surface
+- date: 2026-11-09
+- command: `bash scripts/bash/run-tests.sh "tests/contract/test_archive_migration.py::test_the_residual_probe_is_read_only_and_ignores_the_run_scratch_area" -q`
+- exit status: 0 — 1 passed (the engine half landed in wp02; the wp06 half is the sanitize template's read-only rendering, guarded by `test_no_spec_local_writes.py::test_the_sanitize_template_renders_the_probe_without_migrating`)
