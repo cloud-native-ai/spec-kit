@@ -22,6 +22,8 @@ Read group (zero writes):
   targets         <slug> --list | --check STATEMENT
   run-checks      <team-slug> [--target T-nnn | <goal-slug>.T-nnn]
   binding         <goal|teams> <slug>
+  command-family  --command <name>      (094: family verdict from the declared class)
+  handoff-decision --tasks <path>       (094: direct | handoff from the declared threshold)
   probe-residual  (094: enumerate the spec-local goal/team residuals)
 
 Write group (mutates one definition file):
@@ -48,6 +50,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -1470,6 +1473,21 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
     if not team_md.is_file():
         raise GoalNotFound(f"team not found: {team_slug}")
 
+    # C-18 / T046: the team lifecycle is its own closed two-value set; a definition
+    # outside it is refused instead of being run under a state nobody defined.
+    lifecycle_state = _lifecycle_for_kind(team_md, "teams")
+    if lifecycle_state not in ("", "active", "archived"):
+        raise GoalError(
+            f"team-lifecycle: team {team_slug!r} declares lifecycle_state "
+            f"{lifecycle_state!r}, outside the closed set active / archived")
+
+    # C-30 / T048: carry the loaded team's binding record additively. A team that
+    # predates the binding model keeps working — the key reports the absence (null)
+    # rather than turning the run preview into a new refusal.
+    binding = None
+    if _binding_block_lines(team_md.read_text(encoding="utf-8"))[0] is not None:
+        binding = read_binding(team_md)
+
     resolution = resolve_effective_target(team_md, explicit_target)
     reference = resolution["effective"]
 
@@ -1549,6 +1567,7 @@ def run_checks(repo_root: Path, team_slug: str, explicit_target: str | None = No
         "team_slug": team_slug,
         "goal_slug": goal_slug,
         "identity_kind": identity_kind,
+        "binding": binding,
         "resolution": {k: resolution.get(k) for k in ("effective", "source", "declared_focus")},
         "checks": checks,
         "verdict": verdict,
@@ -2165,6 +2184,207 @@ def backfill_bindings(repo_root: Path, *, apply: bool) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 094 — declaration-driven read actions (command family, handoff decision)
+#
+# Both actions read their values through the declaration layer's one parser and
+# delegate the class predicate to `flow-class-check.py`'s lookup; neither keeps a
+# second copy of any table. Authority: contracts/command-family-and-declarations.md
+# C-71…C-87 in `.specify/specs/094-goal-team-parallel/`.
+# --------------------------------------------------------------------------
+
+FAMILY_FACT_SLUG = "goal-team-command-family"
+HANDOFF_FACT_SLUG = "goal-team-handoff-threshold"
+UNIT_ID_PREFIX = "/speckit."
+FLOW_CLASS_ENGINE = "flow-class-check.py"
+DECLARED_SUBSET = "declaration-subset/v1"
+DEGRADED_OWNER = "owner-unavailable"
+DECLARATION_INVALID = "declaration-invalid"
+TASK_ROW_LINE = re.compile(r"^- \[[ xX>~]\]\s+\S+")
+
+
+def _declaration_reader():
+    """The declaration layer's one read entry, importable beside this engine."""
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    try:
+        import declaration_reader
+    except ImportError:
+        return None
+    return declaration_reader
+
+
+def _load_registered_fact(repo_root: Path, slug: str):
+    """(body, registration, None, None) or (None, None, label, detail).
+
+    C-83 — an absent layer, an absent fact and a fact the contract does not
+    register are the same refusal at the consumer: `owner-unavailable`, never a
+    default. The registration row is returned so the action validates against the
+    declared domain instead of a private copy (C-84/C-85).
+    """
+    reader = _declaration_reader()
+    if reader is None:
+        return None, None, DEGRADED_OWNER, \
+            "declaration_reader.py is not importable beside this engine"
+    try:
+        contract = reader.load_contract(str(repo_root))
+    except (reader.DeclarationError, OSError) as exc:
+        return None, None, DEGRADED_OWNER, str(exc)
+    registration = None
+    declared = contract.get("registered_facts")
+    for row in declared if isinstance(declared, list) else []:
+        if isinstance(row, dict) and str(row.get("fact", "")).strip() == slug:
+            registration = row
+            break
+    if registration is None:
+        return None, None, DEGRADED_OWNER, \
+            f"fact {slug!r} is not registered in shared/declarations/contract.yaml"
+    try:
+        body = reader.load_fact(str(repo_root), slug)["body"]
+    except (reader.DeclarationError, OSError) as exc:
+        return None, None, DEGRADED_OWNER, str(exc)
+    if not isinstance(body, dict):
+        return None, None, DEGRADED_OWNER, f"fact {slug!r} does not parse as a mapping"
+    return body, registration, None, None
+
+
+def _registration_problem(registration: dict, expected_domain: str):
+    """C-84/C-85 — a fact is read only under the grammar and domain it registers."""
+    subset = str(registration.get("subset_id", "")).strip()
+    if subset != DECLARED_SUBSET:
+        return (f"fact registers grammar {subset!r}, but the shared reader implements "
+                f"{DECLARED_SUBSET!r}")
+    domain = str(registration.get("value_domain", "")).strip()
+    if domain != expected_domain:
+        return (f"fact registers value domain {domain!r}, but this consumer validates "
+                f"{expected_domain!r}")
+    return None
+
+
+def _flow_class_lookup(repo_root: Path, unit_id: str):
+    """(record, label, detail, exit) — the class engine's lookup, never a second table."""
+    engine = Path(__file__).resolve().parent / FLOW_CLASS_ENGINE
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(engine), "--action", "lookup", "--unit-id", unit_id,
+             "--repo", str(repo_root), "--format", "json"],
+            capture_output=True, text=True)
+    except OSError as exc:
+        return None, "lookup-unavailable", str(exc), EXIT_INPUT_ERROR
+    record = None
+    if proc.stdout.strip():
+        try:
+            record = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            record = None
+    if proc.returncode != 0 or not isinstance(record, dict):
+        error = (record or {}).get("error") or {}
+        label = str(error.get("label") or "lookup-unavailable")
+        detail = str(error.get("detail") or proc.stderr.strip()
+                     or "the class lookup produced no JSON record")
+        return record, label, detail, EXIT_INPUT_ERROR
+    return record, None, None, EXIT_OK
+
+
+def command_family(repo_root: Path, command: str):
+    """(payload, exit) for `command-family --command <name>` (C-71…C-77).
+
+    The verdict is `source: ledger` and nothing else — `flow_class` and the exit
+    code are not criteria (C-71). The declared addition list can only add a name
+    whose carrier exists (C-77); an absent carrier keeps a command out of the
+    family without failing the read (C-72/C-75), and a degraded lookup refuses
+    with exit 2 rather than guessing.
+    """
+    repo_root = Path(repo_root)
+    unit_id = f"{UNIT_ID_PREFIX}{command}"
+    body, registration, label, detail = _load_registered_fact(repo_root, FAMILY_FACT_SLUG)
+    additions: list[str] = []
+    if body is not None:
+        problem = _registration_problem(registration, "closed-set")
+        statement = body.get("statement")
+        if problem is None and not isinstance(statement, list):
+            problem = "the family statement is not a sequence (the addition list)"
+        if problem is None:
+            orphans = [str(name) for name in statement
+                       if "/" in str(name)
+                       or not (repo_root / "templates" / "commands" / f"{name}.md").is_file()]
+            if orphans:
+                problem = ("declared addition(s) without a carrier under "
+                           f"templates/commands/: {', '.join(orphans)}")
+        if problem is not None:
+            body, label, detail = None, DECLARATION_INVALID, problem
+        else:
+            additions = [str(name) for name in statement]
+    record, lookup_label, lookup_detail, lookup_exit = _flow_class_lookup(repo_root, unit_id)
+    carrier = (repo_root / "templates" / "commands" / f"{command}.md").is_file()
+    payload = {
+        "command": command,
+        "unit_id": unit_id,
+        "in_family": False,
+        "source": (record or {}).get("source"),
+        "flow_class": (record or {}).get("flow_class"),
+        "marker": (record or {}).get("marker"),
+    }
+    if body is None:
+        payload["error"] = {"label": label, "detail": detail}
+        return payload, EXIT_INPUT_ERROR
+    if lookup_exit != EXIT_OK:
+        payload["error"] = {"label": lookup_label, "detail": lookup_detail}
+        return payload, EXIT_INPUT_ERROR
+    payload["in_family"] = bool(carrier and (payload["source"] == "ledger"
+                                             or command in additions))
+    return payload, EXIT_OK
+
+
+def handoff_decision(repo_root: Path, tasks_path: Path):
+    """(payload, exit) for `handoff-decision --tasks <path>` (C-79…C-82).
+
+    One declared statement answers both questions: `task_count > threshold` is
+    `handoff` (equality stays `direct`), and the creation-timing pair is carried
+    through untouched. An absent or unregistered fact exits 2 as
+    `owner-unavailable` and never falls back to a built-in number (C-81/C-83).
+    """
+    payload = {"decision": None, "task_count": None, "threshold": None,
+               "creation": {"on_direct": None, "on_handoff": None}}
+    try:
+        text = Path(tasks_path).read_text(encoding="utf-8")
+    except OSError as exc:
+        payload["error"] = {"label": "tasks-unreadable", "detail": str(exc)}
+        return payload, EXIT_INPUT_ERROR
+    payload["task_count"] = sum(1 for line in text.splitlines()
+                                if TASK_ROW_LINE.match(line))
+    body, registration, label, detail = _load_registered_fact(repo_root, HANDOFF_FACT_SLUG)
+    if body is None:
+        payload["error"] = {"label": label, "detail": detail}
+        return payload, EXIT_INPUT_ERROR
+    problem = _registration_problem(registration, "threshold+timing-map")
+    statement = body.get("statement")
+    if problem is None and not isinstance(statement, dict):
+        problem = "the threshold statement is not a mapping"
+    if problem is None:
+        metric = statement.get("metric")
+        raw_threshold = statement.get("threshold")
+        boundary = statement.get("boundary")
+        if metric != "task-count":
+            problem = f"metric {metric!r} is not the implemented 'task-count'"
+        elif not re.fullmatch(r"[0-9]+", str(raw_threshold)):
+            problem = f"threshold {raw_threshold!r} is not an integer literal"
+        elif boundary != "exclusive":
+            problem = f"boundary {boundary!r} is not the implemented 'exclusive'"
+        elif statement.get("on_direct") is None or statement.get("on_handoff") is None:
+            problem = "the creation-timing pair is incomplete"
+    if problem is not None:
+        payload["error"] = {"label": DECLARATION_INVALID, "detail": problem}
+        return payload, EXIT_INPUT_ERROR
+    threshold = int(str(raw_threshold))
+    payload["threshold"] = threshold
+    payload["decision"] = "handoff" if payload["task_count"] > threshold else "direct"
+    payload["creation"] = {"on_direct": statement.get("on_direct"),
+                           "on_handoff": statement.get("on_handoff")}
+    return payload, EXIT_OK
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -2226,8 +2446,18 @@ def _run_archive_action(args, repo_root: Path) -> int:
     return EXIT_OK
 
 
+def _run_declaration_action(args, repo_root: Path) -> int:
+    """Dispatch the 094 declaration read actions; they touch no archive layer."""
+    if args.action == "command-family":
+        payload, code = command_family(repo_root, args.command_name)
+    else:
+        payload, code = handoff_decision(repo_root, Path(args.tasks_path))
+    _emit(payload, args.json)
+    return code
+
+
 def main(argv: list[str] | None = None) -> int:
-    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply'])  # answer --version / reject an undeclared option
+    _sig_guard(argv, declared=['--repo-root', '--json', '--scope', '--spec-dir', '--team', '--objective', '--title', '--criterion', '--boundary', '--set', '--clear', '--drop-inline', '--add', '--check', '--list', '--id', '--target', '--owner', '--owner-id', '--origin', '--dry-run', '--apply', '--command', '--tasks'])  # answer --version / reject an undeclared option
     # Shared flags are attached to BOTH the top-level parser and every subparser. That does
     # NOT make them position-independent, and the comment here used to claim it did: argparse
     # lets a subparser overwrite a namespace attribute the top level already set, so
@@ -2314,7 +2544,7 @@ def main(argv: list[str] | None = None) -> int:
     p_bind = sub.add_parser("bind", parents=[common],
                             help="write: rewrite one definition's binding record "
                                  "(owner / owner_id / origin); every other byte is preserved")
-    p_bind.add_argument("kind", choices=("goal", "teams"),
+    p_bind.add_argument("kind", choices=("goal", "team", "teams"),
                         help="the archive layer the definition lives in")
     p_bind.add_argument("slug")
     p_bind.add_argument("--owner", required=True,
@@ -2327,7 +2557,7 @@ def main(argv: list[str] | None = None) -> int:
     p_binding = sub.add_parser("binding", parents=[common],
                                help="read: answer who owns one definition, from its "
                                     "binding record (zero writes)")
-    p_binding.add_argument("kind", choices=("goal", "teams"),
+    p_binding.add_argument("kind", choices=("goal", "team", "teams"),
                            help="the archive layer the definition lives in")
     p_binding.add_argument("slug")
 
@@ -2362,6 +2592,21 @@ def main(argv: list[str] | None = None) -> int:
         "probe-residual", parents=[common],
         help="read: enumerate the spec-local goal/team residuals (zero writes; 094)")
 
+    p_family = sub.add_parser(
+        "command-family", parents=[common],
+        help="read: is a /speckit.<command> run in the goal/team command family? "
+             "(zero writes; 094)")
+    p_family.add_argument("--command", dest="command_name", required=True,
+                          metavar="NAME",
+                          help="the command stem to judge, e.g. feedback")
+
+    p_handoff = sub.add_parser(
+        "handoff-decision", parents=[common],
+        help="read: direct | handoff from the declared task-count threshold "
+             "(zero writes; 094)")
+    p_handoff.add_argument("--tasks", dest="tasks_path", required=True, metavar="PATH",
+                           help="path to the tasks file whose task rows are counted")
+
     p_migrate_archive = sub.add_parser(
         "migrate-archive", parents=[common],
         help="write: move spec-local definitions into the unified archive "
@@ -2385,9 +2630,15 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root or ".").resolve()
+    if getattr(args, "kind", None) == "team":
+        # `team` is the singular spelling the 094 peer-lines fixture addresses the
+        # team row with; the closed layer value stays `teams` everywhere downstream.
+        args.kind = "teams"
 
     if args.action in ("probe-residual", "migrate-archive", "backfill-bindings"):
         return _run_archive_action(args, repo_root)
+    if args.action in ("command-family", "handoff-decision"):
+        return _run_declaration_action(args, repo_root)
 
     global _ACTIVE_SCOPE
     _ACTIVE_SCOPE = None
