@@ -340,6 +340,10 @@ WIRED_TEMPLATE_NAMES = (
     "checklist.md",
     "analyze.md",
     "implement.md",
+    # 2026-11-09 (094 T022): feedback.md authors the command-family lookup the
+    # feature declares; the wider roster is an explicit stale-pin update, not an
+    # absorbed exception — the inventory denominator below stays pinned.
+    "feedback.md",
 )
 
 
@@ -355,7 +359,11 @@ def test_a6_wiring_set_is_closed():
     for skill_file in sorted(SKILLS_DIR.glob("external/*/SKILL.md")) + sorted(
         SKILLS_DIR.glob("internal/*/SKILL.md")
     ):
+        # 2026-11-09 (094 T025): create-team's archive-layer routing names the family
+        # lookup; explicit stale-pin update alongside feedback.md above.
         if skill_file in (CREATE_DOCS_SKILL, HUMANIZE_SKILL):
+            continue
+        if "internal" in skill_file.parts and skill_file.parent.name == "create-team":
             continue
         text = skill_file.read_text(encoding="utf-8")
         for token in ENGINE_TOKENS:

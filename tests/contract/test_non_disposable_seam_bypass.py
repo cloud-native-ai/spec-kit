@@ -62,7 +62,7 @@ import pytest
 pytestmark = pytest.mark.contract
 
 ROOT = Path(__file__).resolve().parents[2]
-CONTRACT = ROOT / ".specify" / "specs" / "092-non-disposable" / "contracts" / \
+CONTRACT = ROOT / ".specify" / "archive" / "specs" / "092-non-disposable" / "contracts" / \
     "four-stage-command.contract.md"
 SKILL = ROOT / "skills" / "internal" / "manage-history" / "SKILL.md"
 OWNER_SOURCE = ROOT / "shared" / "definitions" / "non-disposable-definitions.md"

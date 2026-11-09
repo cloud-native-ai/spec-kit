@@ -46,7 +46,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SEAM = ROOT / "skills" / "internal" / "manage-history" / "SKILL.md"
 SEAM_MIRROR = ROOT / ".specify" / "skills" / "internal" / "manage-history" / "SKILL.md"
 SEAM_FACE = ROOT / "templates" / "commands" / "history.md"
-CONTRACT = ROOT / ".specify" / "specs" / "092-non-disposable" / "contracts" / "four-stage-command.contract.md"
+CONTRACT = ROOT / ".specify" / "archive" / "specs" / "092-non-disposable" / "contracts" / "four-stage-command.contract.md"
 
 #: C-401's four names, in the order the ladder fixes. The spellings are the owner's (§ 四段形态);
 #: this tuple is the guard's reading order, not a second statement of the ladder.

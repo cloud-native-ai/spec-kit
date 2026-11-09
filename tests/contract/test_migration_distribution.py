@@ -65,7 +65,7 @@ PYPROJECT = REPO_ROOT / "pyproject.toml"
 INIT_PY = REPO_ROOT / "src" / "specify_cli" / "__init__.py"
 HATCH_BUILD = REPO_ROOT / "src" / "hatch_build.py"
 MEMORY_DIR = REPO_ROOT / ".specify" / "memory"
-SPEC_DIR = REPO_ROOT / ".specify" / "specs" / "069b-isomorphism-migration-metrics"
+SPEC_DIR = REPO_ROOT / ".specify" / "archive" / "specs" / "069b-isomorphism-migration-metrics"
 SAMPLES = SPEC_DIR / "notes" / "migration-samples.md"
 QUICKSTART = SPEC_DIR / "notes" / "quickstart-run.md"
 
