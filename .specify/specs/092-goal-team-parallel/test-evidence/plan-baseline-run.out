@@ -1,0 +1,1713 @@
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+...............................................F........................ [  5%]
+........................................................................ [  6%]
+.....F......FF.......................................................... [  7%]
+..........................F............................................. [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+.........................................................F.............. [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+.F...................................................................... [ 17%]
+........................................................................ [ 18%]
+......................................................F................. [ 19%]
+........................................................................ [ 20%]
+......F........................................F........................ [ 21%]
+...............................F........................................ [ 22%]
+........F..............................F................................ [ 23%]
+...................................................F.................... [ 23%]
+..............................................F......................... [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................F............... [ 31%]
+........................................................................ [ 31%]
+.......................F................................................ [ 32%]
+........................................................s............... [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+.............................F.......................................... [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+......................................................F................. [ 48%]
+........................................................................ [ 49%]
+...F..................................................................F. [ 50%]
+........................F...................................F........... [ 51%]
+........................................................................ [ 52%]
+.........................F.........s.................................... [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 55%]
+.............................................................F.......... [ 56%]
+.........................F.............................................. [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+...................................................F...................F [ 63%]
+........................................F............................... [ 64%]
+........................................................................ [ 65%]
+................................F....................................... [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........F............................................................... [ 72%]
+.......................................................F................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................F............... [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+..............................................................F......... [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+................................................F....F.................. [ 89%]
+...............F........................................................ [ 90%]
+....................................................................F... [ 91%]
+...................F.........................................F.......... [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+...............................................................F......F. [ 95%]
+...........F....................................................F....... [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+...........................................F...F........................ [ 99%]
+.............................................                            [100%]
+=================================== FAILURES ===================================
+________________________ test_clean_tree_check_is_green ________________________
+[gw70] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw70/test_clean_tree_check_is_green0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fc9d232df10>
+
+    @pytest.mark.contract
+    def test_clean_tree_check_is_green(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:202: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fc9d8761790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_______________________ test_compile_embeds_determinism ________________________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw68/test_compile_embeds_determinis0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f69fbbfef10>
+
+    @pytest.mark.contract
+    def test_compile_embeds_determinism(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc1, p1 = _run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f6a0187d690>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________________ test_compile_embeds_check_clean_and_drift ___________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_compile_embeds_check_clea0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0f676450>
+
+    @pytest.mark.contract
+    def test_compile_embeds_check_clean_and_drift(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________________ test_compiled_form_contract __________________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_compiled_form_contract0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0e9c0810>
+
+    @pytest.mark.contract
+    def test_compiled_form_contract(tmp_path, capsys):
+        ws = _build_workspace(tmp_path, _REGISTRY.read_text(encoding="utf-8"))
+>       rc, _ = _run(ws, capsys)
+                ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________ test_the_four_md_forms_never_co_occur_in_one_file _______________
+[gw37] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_the_four_md_forms_never_co_occur_in_one_file():
+        md = [p for p in _corpus() if p.suffix == ".md"]
+        assert md, "corpus empty — wrong cwd?"
+        co_occurring = [p for p in md if len(ce.md_forms_hit(p)) > 1]
+>       assert co_occurring == []
+E       AssertionError: assert [PosixPath('/...ncements.md')] == []
+E         
+E         Left contains 2 more items, first extra item: PosixPath('/storage/project/cloud-native-ai/spec-kit/.specify/specs/060-decompose-subagent-dispatch/contracts/delegation-parity.md')
+E         Use -v to get more diff
+
+tests/contract/test_clause_forms.py:87: AssertionError
+______________ test_c5_non_wiring_files_keep_their_frozen_hashes _______________
+[gw151] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c5_non_wiring_files_keep_their_frozen_hashes():
+        manifest = _hash_manifest()
+        templates = [rel for rel in manifest if rel.startswith("templates/commands/")]
+        skills = [rel for rel in manifest if rel.startswith("skills/")]
+        assert len(manifest) == 74, "hash manifest must cover 74 sources, found %d" % len(manifest)
+        assert len(templates) == 25, "hash manifest must cover 25 templates, found %d" % len(templates)
+        assert len(skills) == 49, "hash manifest must cover 49 skills, found %d" % len(skills)
+        assert not any(rel.endswith(tuple(WIRING_TEMPLATES)) for rel in templates), (
+            "the manifest is the NON-wiring complement; it still lists a wiring template"
+        )
+        assert not any(rel in WIRING_SKILLS for rel in skills), (
+            "the manifest is the NON-wiring complement; it still lists a wiring skill"
+        )
+    
+        # 2026-10-30 (Feature 078): the one renamed skill source is resolved through
+        # the register above, then re-asserted on content at its new path — the
+        # manifest entry itself stays untouched as 069a's dated record.
+        retired = _retired_skill_register(manifest)
+    
+        drifted: list[str] = []
+        missing: list[str] = []
+        for rel, expected in sorted(manifest.items()):
+            if rel in retired:
+                continue
+            path = REPO_ROOT / rel
+            if not path.is_file():
+                missing.append(rel)
+                continue
+            if _sha256(path) != expected:
+                if rel in ALLOWED_POST_BASELINE_CHANGES:
+                    continue
+                drifted.append(rel)
+        assert not missing, (
+            "non-wiring source disappeared (C-5, zero new commands/skills): %r" % missing
+        )
+        assert not drifted, (
+            "non-wiring source changed (C-5: the slice may only touch W1-W4 and the "
+            "feedback-step pointer). drifted: %r" % drifted
+        )
+        for retired_rel, replacement_rel in retired.items():
+            assert not (REPO_ROOT / retired_rel).exists(), (
+                "the retired source came back at its manifest path: %s" % retired_rel
+            )
+            replacement = _read(REPO_ROOT / replacement_rel)
+            # 2026-11-05 (Feature 083): the replacement is also a rewritten consumer — FR-026 /
+            # SR-06 lands the reference wiring only, so the register re-asserts that one added
+            # literal here. This IS coaching-skills' registration point: the path is not in the
+            # 069a manifest, so an ALLOWED_POST_BASELINE_CHANGES key for it would be vacuous.
+            for marker in ("name: coaching-skills", "classification: external",
+                           "shared/definitions/skill-reference-definitions.md"):
+                assert marker in replacement, (
+                    "the replacement of %s must carry its own content: %r "
+                    "missing from %s (2026-10-30 Feature 078 rename; 2026-11-05 Feature 083 "
+                    "FR-026 wiring)"
+                    % (retired_rel, marker, replacement_rel)
+                )
+    
+        for rel, allowance in ALLOWED_POST_BASELINE_CHANGES.items():
+            text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+            banner_only = allowance["markers"] == ("COMPILED_BANNER_ONLY",)
+            added = allowance.get("added_markers", False)
+            for marker in allowance["markers"]:
+                if banner_only:
+                    # The machine-owned banner sentinel is not a needle in the file: it states
+                    # that the file equals its 069a bytes once the compiled banner is swapped for
+                    # the registry's current projection. That is the assertion, so it is made.
+>                   assert _banner_only_drift(rel, manifest[rel]), (
+                        "declared compiled-banner-only drift does not hold for %s: the file "
+                        "differs from its 069a bytes by something other than the compiled "
+                        "Wrap-up banner (%s)" % (rel, allowance["reason"])
+                    )
+E                   AssertionError: declared compiled-banner-only drift does not hold for skills/external/create-pages/SKILL.md: the file differs from its 069a bytes by something other than the compiled Wrap-up banner (2026-11-06 Feature 087 (d41d0ced) recompiled the Wrap-up banner after the speckit-status-wrapup Object and the status/measure h-docs-sync-eval bindings moved the registry fingerprint 7877db82c58c -> 8cb5a238739a; the compiled line is machine-owned and no authored text changed)
+E                   assert False
+E                    +  where False = _banner_only_drift('skills/external/create-pages/SKILL.md', '4d0d54da94a87b69b78cd0705c4edb99392151d716d05560b957010d873476ce')
+
+tests/contract/test_expression_compatibility.py:945: AssertionError
+_________________ test_c2_no_project_side_classification_store _________________
+[gw151] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c2_no_project_side_classification_store():
+        offenders: list[str] = []
+        for path in sorted(MEMORY_DIR.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            if CLASS_FILE_NAME_RE.search(path.name):
+                offenders.append("%s — classification-named file" % rel)
+                continue
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                continue
+            for number, line in enumerate(text.splitlines(), 1):
+                if LEDGER_ROW_RE.match(line):
+                    offenders.append("%s:%d — ledger-style unit/class row" % (rel, number))
+                elif CLASS_ASSIGN_RE.search(line):
+                    offenders.append("%s:%d — flow_class assignment" % (rel, number))
+>       assert not offenders, (
+            "C-2: no classification data may be stored project-side (the ledger is "
+            "the owner document, delivered with shared/). found:\n- "
+            + "\n- ".join(offenders)
+        )
+E       AssertionError: C-2: no classification data may be stored project-side (the ledger is the owner document, delivered with shared/). found:
+E         - .specify/memory/features/088.md:62 — flow_class assignment
+E         - .specify/memory/features.md:96 — flow_class assignment
+E       assert not ['.specify/memory/features/088.md:62 — flow_class assignment', '.specify/memory/features.md:96 — flow_class assignment']
+
+tests/contract/test_expression_compatibility.py:1023: AssertionError
+_ TestCF13FeedbackPackageExclusion.test_package_zip_contains_no_evidence_paths _
+[gw122] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_evidence_findings_schema.TestCF13FeedbackPackageExclusion object at 0x7f829ccff990>
+artifacts = {'findings': {'evidence': [{'evidenceRefs': ['.specify/teams/demo-team/runs/20260101T000000Z-report.md'], 'evidenceSta...('/tmp/pytest-of-agent/pytest-4522/popen-gw122/evidence0/ws/.specify/memory/evidence/ev-20261109-071126-project'), ...}
+
+    def test_package_zip_contains_no_evidence_paths(self, artifacts):
+        workspace = artifacts["workspace"]
+        feedback_utils = REPO_ROOT / ".specify" / "scripts" / "python" / "feedback-utils.py"
+        subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "reindex",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        result = subprocess.run(
+            [sys.executable, str(feedback_utils), "--action", "package", "--all",
+             "--workspace-root", str(workspace)],
+            capture_output=True, text=True, cwd=str(workspace), timeout=120,
+        )
+        assert result.returncode == 0, result.stderr
+        packages_dir = workspace / ".specify" / "memory" / "feedback" / "packages"
+        zips = sorted(packages_dir.glob("feedback-*.zip"))
+>       assert zips, "package produced no zip in the isolated workspace"
+E       AssertionError: package produced no zip in the isolated workspace
+E       assert []
+
+tests/contract/test_evidence_findings_schema.py:223: AssertionError
+____________ test_c20_face_renders_required_and_source_placeholders ____________
+[gw117] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw117/test_c20_face_renders_required0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f19b4869d10>
+
+    @pytest.mark.contract
+    def test_c20_face_renders_required_and_source_placeholders(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f19bd70d810>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________ test_compile_embeds_zero_handler_no_section __________________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw68/test_compile_embeds_zero_handl0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f69f8aede90>
+
+    @pytest.mark.contract
+    def test_compile_embeds_zero_handler_no_section(tmp_path, capsys):
+        # Re-scope the four all-rows to an object no sandbox unit owns: sandbox
+        # units get zero effective handlers at the wrap-up point.
+        registry = _REGISTRY.read_text(encoding="utf-8").replace(
+            "| @point:wrap-up | all |", "| @point:wrap-up | speckit-analyze-wrapup |")
+        ws = _build_workspace(tmp_path, registry)
+>       rc, payload = _run(ws, capsys)
+                      ^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_embeds.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f6a0187d690>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_______________ test_c20_convention_line_rendered_once_verbatim ________________
+[gw117] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw117/test_c20_convention_line_rende0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f19b4a09710>
+
+    @pytest.mark.contract
+    def test_c20_convention_line_rendered_once_verbatim(tmp_path, capsys):
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f19bd70d810>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________ test_c20_no_placeholder_free_section_carries_no_convention __________
+[gw117] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw117/test_c20_no_placeholder_free_s0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f19b472bb10>
+
+    @pytest.mark.contract
+    def test_c20_no_placeholder_free_section_carries_no_convention(tmp_path, capsys):
+        # Agent-only wrap-up projection: no engine line, no placeholder, no convention.
+        registry = "\n".join(
+            line for line in REGISTRY.read_text(encoding="utf-8").splitlines()
+            if not re.match(r"^\|\s*h-(run-determination|exec-quant|feedback-record)\s*\|",
+                            line))
+        assert "h-run-determination | engine" not in registry
+>       face = _sandbox_face(tmp_path, capsys, registry)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f19bd70d810>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_____________________ test_g9_total_equals_frozen_baseline _____________________
+[gw169] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_g9_total_equals_frozen_baseline():
+        """G-9: the live total EQUALS the frozen value (not <=), and violations is empty."""
+        import json
+        frozen = json.loads(_text(GATE_BASELINE))["confirmationGates"]
+        payload = _scan_json()
+>       assert payload["total"] == frozen["total"], (
+            f"G-9: gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: G-9: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_fast_fail_discipline.py:1990: AssertionError
+_____________ test_c21_rendered_flags_are_exactly_the_manifest_set _____________
+[gw117] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw117/test_c21_rendered_flags_are_ex0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f19b49b6ad0>
+
+    @pytest.mark.contract
+    def test_c21_rendered_flags_are_exactly_the_manifest_set(tmp_path, capsys):
+        """Bidirectional C-21 pin: per (engine, action) the rendered flag set is
+        exactly the manifest's required ∪ source (minus the identity pair the base
+        call line already carries with real values) — nothing extra (a non-accepted
+        argument never renders), nothing missing."""
+>       face = _sandbox_face(tmp_path, capsys)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_engine_face_contract.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_engine_face_contract.py:164: in _sandbox_face
+    rc, payload = CE._run(ws, capsys)
+                  ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f19bd70d810>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+___________________ test_residual_total_within_sc002_target ____________________
+[gw70] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_residual_total_within_sc002_target() -> None:
+        if not BASELINE.is_file():
+            pytest.skip("baseline.json not present (pre-implementation checkout)")
+        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+        payload = run_scanner()
+        cap = baseline["total"] * 0.25
+>       assert payload["total"] <= cap, (
+            f"SC-002 target missed: residual {payload['total']} > 25% of baseline {baseline['total']}"
+        )
+E       AssertionError: SC-002 target missed: residual 27 > 25% of baseline 93
+E       assert 27 <= 23.25
+
+tests/contract/test_confirmation_gates_sweep.py:167: AssertionError
+______________ test_c22_missing_manifest_fails_the_compile_loudly ______________
+[gw117] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw117/test_c22_missing_manifest_fail0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7f19b47185d0>
+
+    @pytest.mark.contract
+    def test_c22_missing_manifest_fails_the_compile_loudly(tmp_path, capsys):
+        registry = REGISTRY.read_text(encoding="utf-8")
+        ws = CE._build_workspace(tmp_path, registry)
+        engine = ws / "scripts" / "python" / "run-determination.py"
+        stripped = engine.read_text(encoding="utf-8").replace(
+            '"args-manifest"', '"args-manifest-disabled"')
+        assert stripped != engine.read_text(encoding="utf-8"), (
+            "mutation must actually strip the manifest action"
+        )
+        engine.write_text(stripped, encoding="utf-8")
+        rc = probe_utils.main(["--action", "compile-embeds",
+                               "--workspace-root", str(ws), "--format", "json"])
+        assert rc == 2, (
+            f"an engine/action pair without a manifest MUST fail the compile loudly "
+            f"(rc=2), got rc={rc}"
+        )
+        err = capsys.readouterr().err
+>       assert "h-run-determination" in err, (
+            f"the refusal MUST name the handler: {err[:400]}"
+        )
+E       AssertionError: the refusal MUST name the handler: error: compile-embeds refused:
+E         - handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md
+E         
+E       assert 'h-run-determination' in "error: compile-embeds refused:\n- handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md\n"
+
+tests/contract/test_engine_face_contract.py:317: AssertionError
+_ TestHistoricalFacesArePreserved.test_the_user_directive_quoting_the_old_path_survives_verbatim _
+[gw40] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_goal_migration.TestHistoricalFacesArePreserved object at 0x7f914fa53510>
+
+    def test_the_user_directive_quoting_the_old_path_survives_verbatim(self):
+        spec = REPO_ROOT / ".specify/specs/037-goal-registry/requirements.md"
+        text = spec.read_text(encoding="utf-8")
+>       assert "使用.specify/goal/收编.specify/project/goal/" in text, (
+            "the 2026-08-04 user directive quoting the old path must remain verbatim "
+            "in the Clarifications record; rewriting it falsifies history"
+        )
+E       AssertionError: the 2026-08-04 user directive quoting the old path must remain verbatim in the Clarifications record; rewriting it falsifies history
+E       assert '使用.specify/goal/收编.specify/project/goal/' in '# Requirements Specification: Goal 作为项目级一等概念(goal 定义归档 + 团队引用 + 单一撰写入口 + 多团队协调)\n\n**Requirement Branch**: `037-goal-... `tasks.md` 后将自动恢复通过。该测试同时验证了 `Related Feature` 绑定可被机器读取(输出含 `"FEATURE_ID":"041"`、`"FEATURE_NAME":"Goal Registry"`)。\n'
+
+tests/contract/test_goal_migration.py:192: AssertionError
+__________________ test_c3_features_header_count_matches_rows __________________
+[gw148] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_c3_features_header_count_matches_rows():
+        text = (REPO_ROOT / ".specify/memory/features.md").read_text(encoding="utf-8")
+        m = re.search(r"\*?\*?Total Features\*?\*?:\s*(\d+)", text)
+        assert m, "features.md header lacks Total Features count"
+        rows = len(re.findall(r"^\| \d{3} \|", text, re.M))
+>       assert int(m.group(1)) == rows, \
+            f"header says {m.group(1)} but {rows} feature rows exist"
+E       AssertionError: header says 86 but 87 feature rows exist
+E       assert 86 == 87
+E        +  where 86 = int('86')
+E        +    where '86' = <built-in method group of re.Match object at 0x7f8e5e33be20>(1)
+E        +      where <built-in method group of re.Match object at 0x7f8e5e33be20> = <re.Match object; span=(57, 79), match='**Total Features**: 86'>.group
+
+tests/contract/test_registry_completeness.py:53: AssertionError
+________________ test_orphan_handler_line_is_structural_exit_2 _________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_orphan_handler_line_is_st0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf15be79d0>
+
+    @pytest.mark.contract
+    def test_orphan_handler_line_is_structural_exit_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+________________ test_missing_handler_line_is_structural_exit_2 ________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_missing_handler_line_is_s0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0e9b4d10>
+
+    @pytest.mark.contract
+    def test_missing_handler_line_is_structural_exit_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+______________ test_stale_render_after_registry_change_is_exit_1 _______________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_stale_render_after_regist0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0ea324d0>
+
+    @pytest.mark.contract
+    def test_stale_render_after_registry_change_is_exit_1(tmp_path, capsys):
+        """The lifecycle's exit-1 leg: a registry edit makes the artifact a stale render —
+        regenerable, recompile fixes it; it must NOT be classified structural."""
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+__________________ test_illegal_action_exits_2_naming_handler __________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_illegal_action_exits_2_na0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0ebc99d0>
+
+    @pytest.mark.contract
+    def test_illegal_action_exits_2_naming_handler(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_________________________ test_order_conflict_exits_2 __________________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_order_conflict_exits_20')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0e9e86d0>
+
+    @pytest.mark.contract
+    def test_order_conflict_exits_2(tmp_path, capsys):
+>       ws = _compile(tmp_path, capsys)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_compile_reconcile_guards.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/contract/test_compile_reconcile_guards.py:43: in _compile
+    rc, _ = CE._run(ws, capsys)
+            ^^^^^^^^^^^^^^^^^^^
+tests/contract/test_compile_embeds.py:157: in _run
+    return rc, json.loads(out)
+               ^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib64/python3.11/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7fcf178a1790>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib64/python3.11/json/decoder.py:355: JSONDecodeError
+_____ test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it ______
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it():
+        """The pin is valid only while re-reading it reproduces it — and a mismatch is exit-2 class."""
+        for tool, reading in _live_readings().items():
+            assert reading, "%s produced no reading; a pin comparison on nothing proves nothing" % tool
+>           assert _assert_pin(tool, reading)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/contract/test_acceptance_premises.py:638: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tool = 'pytest', reading = 'pytest 8.4.2'
+
+    def _assert_pin(tool, reading):
+        """Compare one reading against its recorded pin; a difference is an input error."""
+        pins = _pins()
+        if tool not in pins:
+            raise PinMismatch("no recorded pin for %r in %s" % (tool, PINS))
+        if reading.strip() != pins[tool].strip():
+>           raise PinMismatch(
+                "%s reads %r but %s records %r — the comparison is invalid (input error, exit 2), "
+                "which is not a new failure" % (tool, reading.strip(), PINS.name, pins[tool].strip())
+            )
+E           contract.test_acceptance_premises.PinMismatch: pytest reads 'pytest 8.4.2' but plan-runner-pins.txt records 'pytest 9.2.0' — the comparison is invalid (input error, exit 2), which is not a new failure
+
+tests/contract/test_acceptance_premises.py:627: PinMismatch
+______________________ test_wording_hit_refuses_the_write ______________________
+[gw69] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw69/test_wording_hit_refuses_the_w0')
+capsys = <_pytest.capture.CaptureFixture object at 0x7fcf0e9d5750>
+
+    @pytest.mark.contract
+    def test_wording_hit_refuses_the_write(tmp_path, capsys):
+        # A registry whose rendered line would carry blocking wording: the sandbox owner
+        # gains a lowercase blocking heading, an agent handler anchors on it.
+        registry = REGISTRY_TEXT.replace(
+            "| h-run-determination | engine | determine | non-blocking | 10 | "
+            "scripts/python/run-determination.py |",
+            "| h-run-determination | engine | determine | non-blocking | 10 | "
+            "scripts/python/run-determination.py |\n"
+            "| h-stop-and-confirm | agent | stop and confirm the draft | non-blocking "
+            "| 25 | shared/workflow/feedback-step.md |")
+        # Anchor at the table header separator: inserting mid-row (substring inside a
+        # row carrying a 覆盖说明 cell) would corrupt the row's cells.
+        registry = registry.replace(
+            "| handler_id | selector | scope | 覆盖说明 |\n"
+            "|------------|----------|-------|----------|",
+            "| handler_id | selector | scope | 覆盖说明 |\n"
+            "|------------|----------|-------|----------|\n"
+            "| h-stop-and-confirm | @point:wrap-up | all | wording-gate drill row |")
+        ws = CE._build_workspace(tmp_path, registry)
+        owner = ws / "shared" / "workflow" / "feedback-step.md"
+        owner.write_text(
+            owner.read_text(encoding="utf-8")
+            + "\n## stop and confirm the draft\n\nDrill heading.\n",
+            encoding="utf-8")
+        rc = probe_utils.main(["--action", "compile-embeds",
+                               "--workspace-root", str(ws)])
+        assert rc == 2, "generated wording hitting BLOCKING_PATTERNS must refuse (exit 2)"
+        err = capsys.readouterr().err
+>       assert "wording gate" in err, f"the refusal must name the wording gate: {err}"
+E       AssertionError: the refusal must name the wording gate: error: compile-embeds refused:
+E         - handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md
+E         
+E       assert 'wording gate' in "error: compile-embeds refused:\n- handler 'h-closeout': behavior_owner unreachable: shared/workflow/artifact-commit-step.md\n"
+
+tests/contract/test_compile_reconcile_guards.py:182: AssertionError
+_________________ test_c5_the_cap_leaves_zero_integer_headroom _________________
+[gw45] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c5_the_cap_leaves_zero_integer_headroom():
+        baseline = json.loads(
+            (ROOT / ".specify" / "specs" / "044-reduce-confirmation-flows" / "baseline.json")
+            .read_text(encoding="utf-8"))
+        assert baseline["total"] == CAP_BASELINE_TOTAL, (
+            f"the cap's frozen baseline moved; the derived cap and every pin keyed on it must be "
+            f"re-derived together, not adjusted to fit: {baseline['total']}"
+        )
+        cap = baseline["total"] * CAP_FACTOR
+        assert cap == 23.25, cap
+        total, _violations, _out = _summary()
+>       assert total <= cap, f"over cap: {total} > {cap}"
+E       AssertionError: over cap: 27 > 23.25
+E       assert 27 <= 23.25
+
+tests/contract/test_neutrality_budget.py:193: AssertionError
+_________________ test_c2_active_spec_feature_bindings_resolve _________________
+[gw182] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    @pytest.mark.contract
+    def test_c2_active_spec_feature_bindings_resolve():
+        feature_ids = {row["id"] for row in _feature_rows()}
+        bad = []
+        for spec_dir in sorted(SPECS_DIR.iterdir()):
+            if spec_dir.name.startswith(".") or not spec_dir.is_dir():
+                continue
+            req = spec_dir / "requirements.md"
+            if not req.exists():
+                continue
+            m = re.search(r"\*\*Feature ID\*\*:\s*(\d{3})",
+                          req.read_text(encoding="utf-8"))
+            if m and m.group(1) not in feature_ids:
+                bad.append(f"{spec_dir.name}: Feature {m.group(1)} has no row")
+>       assert not bad, f"active specs bind unregistered Features: {bad}"
+E       AssertionError: active specs bind unregistered Features: ['086-efficient-test-execution: Feature 086 has no row', '088-speckit-visualization: Feature 088 has no row', '089-script-interface-contract: Feature 086 has no row', '090-re-anchoring: Feature 090 has no row']
+E       assert not ['086-efficient-test-execution: Feature 086 has no row', '088-speckit-visualization: Feature 088 has no row', '089-script-interface-contract: Feature 086 has no row', '090-re-anchoring: Feature 090 has no row']
+
+tests/contract/test_spec_feature_binding_integrity.py:69: AssertionError
+________________ test_skills_use_installed_absolute_shared_form ________________
+[gw68] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_skills_use_installed_absolute_shared_form():
+        """Sibling skills reference shared docs via the installed-absolute shared path.
+    
+        Scans every markdown file in a skill, not just SKILL.md: the references/ files ship
+        into `.specify/skills/<name>/` too, and a bare `shared/<type>/` path there is just as
+        unresolvable in a client project. Scanning only the top-level file left three of them
+        undetected while the test was red for an unrelated reason.
+        """
+        import re
+    
+        offenders = []
+        scanned = 0
+        bare = re.compile(r"(?<![\w./])shared/(" + "|".join(SHARED_TYPES) + r")/")
+        for f in _iter_files("skills/**/*.md"):
+            scanned += 1
+            text = f.read_text(encoding="utf-8")
+            if bare.search(text):
+                offenders.append(str(f.relative_to(ROOT)))
+        assert scanned > 100, (
+            f"only {scanned} skill markdown files scanned — the glob looks truncated, which "
+            f"would let an empty offender list pass without proving anything"
+        )
+>       assert not offenders, f"skills must use .specify/shared/<type>/ form: {offenders}"
+E       AssertionError: skills must use .specify/shared/<type>/ form: ['skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/SKILL.md', 'skills/internal/review-feature-quality/references/artifact-and-implementation-review.md', 'skills/internal/run-skills/SKILL.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', 'skills/internal/create-team/references/create-mode.md', 'skills/internal/manage-feedback/SKILL.md', 'skills/internal/manage-feedback/references/path-a-digest.md', 'skills/internal/review-sdd-process/SKILL.md', 'skills/internal/memory-record/SKILL.md', 'skills/internal/implement-feature/SKILL.md', 'skills/external/create-docs/SKILL.md', 'skills/external/create-docs/references/diagram-obligation.md', 'skills/external/merge-skills/SKILL.md', 'skills/external/merge-skills/references/provenance-record.md', 'skills/external/sdd-loop-driver/references/dispatch-recipes.md', 'skills/external/sdd-loop-driver/references/stage-prompts.md', 'skills/external/sdd-loop-driver/references/nested-invocation.md', 'skills/external/humanize/SKILL.md', 'skills/external/humanize/references/report-shape.md', 'skills/external/humanize/references/run-mode.md', 'skills/external/git-utils/references/closeout-commands.md', 'skills/external/create-skills/SKILL.md', 'skills/external/create-skills/references/mechanism-policy-check.md', 'skills/external/sdd-house-keeping/references/maintenance-recipes.md', 'skills/external/coaching-skills/SKILL.md', 'skills/external/improve-skills/SKILL.md']
+E       assert not ['skills/internal/analyze-artifacts/references/detection-and-severity.md', 'skills/internal/review-feature-quality/SKI...s/internal/run-skills/SKILL.md', 'skills/internal/memory-recall/SKILL.md', 'skills/internal/code-review/SKILL.md', ...]
+
+tests/contract/test_shared_reference_rewrite.py:105: AssertionError
+______ test_write_whitelist_is_the_goal_directory_not_the_team_directory _______
+[gw107] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_write_whitelist_is_the_goal_directory_not_the_team_directory() -> None:
+        """FR-017 / FR-020: the goal side owns the summary; the team side is read-only.
+    
+        This reads requirement 036's frozen contract, which states the pre-migration
+        path. That document is history and MUST NOT be rewritten (037 FR-022), so the
+        assertion keeps 036's wording — its subject is goal-indexed vs team-indexed,
+        which the historical path satisfies just as well. The *live* write-set truth is
+        pinned separately by tests/contract/test_goal_writeset.py against
+        skills/internal/create-team/references/summary-mapping.md.
+        """
+        text = WRITESET_CONTRACT.read_text(encoding="utf-8")
+        whitelist = text.split("## Write whitelist", 1)[1].split("## Byte-invariance", 1)[0]
+>       assert "project/goal/" in whitelist
+E       AssertionError: assert 'project/goal/' in '\n\nDuring the summary step, writes are permitted ONLY to:\n\n| # | Path | Contents |\n|---|------|----------|\n| W-1...k entries recorded by the invoked skill |\n\nAny write outside W-1 and W-2 during the summary step is a violation.\n\n'
+
+tests/contract/test_summary_writeset.py:163: AssertionError
+___________________ test_cd5_headings_only_in_discipline_doc ___________________
+[gw183] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_cd5_headings_only_in_discipline_doc():
+        offenders = []
+        for base in (ROOT / "shared", ROOT / "templates"):
+            for md in base.rglob("*.md"):
+                if md == DOC:
+                    continue
+                text = md.read_text(encoding="utf-8", errors="replace")
+                for heading in SECTION_HEADINGS:
+                    if heading in text:
+                        offenders.append(f"{md}:{heading}")
+>       assert not offenders, f"discipline sections copied outside single source: {offenders}"
+E       AssertionError: discipline sections copied outside single source: ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/reporting-obligations.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/progress-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+E       assert not ['/storage/project/cloud-native-ai/spec-kit/shared/guidelines/reporting-obligations.md:## 判定边界', '/storage/project/clo...ss-reporting.md:## 判定边界', '/storage/project/cloud-native-ai/spec-kit/shared/guidelines/single-run-evidence.md:## 判定边界']
+
+tests/contract/test_token_efficiency_discipline.py:94: AssertionError
+_______________________ test_scanner_real_tree_is_clean ________________________
+[gw1] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_scanner_real_tree_is_clean():
+        result = subprocess.run(
+            [sys.executable, str(SCANNER), "--summary"],
+            cwd=str(ROOT), capture_output=True, text=True,
+        )
+>       assert result.returncode == 0, result.stdout + result.stderr
+E       AssertionError: temp-directory violations: 2
+E         scanned files: 458
+E         allowlisted: 74
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/scan-temp-u...', '--summary'], returncode=2, stdout='temp-directory violations: 2\nscanned files: 458\nallowlisted: 74\n', stderr='').returncode
+
+tests/contract/test_temp_directory_discipline.py:154: AssertionError
+_____________________ test_lc_07_identity_ok_mismatch_dead _____________________
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw30/test_lc_07_identity_ok_mismatc0')
+
+    def test_lc_07_identity_ok_mismatch_dead(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        entry = _register(reg, project)
+        four = four_piece(tmp_path / "rt", entry["line_id"], entry["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", entry["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        ok = engine_json("verify-identity", "--line-id", entry["line_id"], reg=reg)
+>       assert ok["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:241: AssertionError
+_____ test_c11_no_dangling_guideline_pointer_on_either_instruction_surface _____
+[gw7] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c11_no_dangling_guideline_pointer_on_either_instruction_surface():
+        surfaces = (("template", TEMPLATE), ("live", LIVE))
+        pointed: set[str] = set()
+        for label, path in surfaces:
+            names = set(GUIDELINE_POINTER_RE.findall(_text(path)))
+            assert names, f"the {label} instruction surface carries no guideline pointer at all"
+            pointed |= names
+    
+        # A pointer's whole job is to let a reader open the file, so the target that must exist
+        # is the one the reader actually resolves: `.specify/shared/guidelines/<name>.md`.
+        # Checking only the framework source leaves the downstream failure mode invisible —
+        # proven by drill: with the runtime copy moved aside and the source intact, a
+        # source-only version of this clause still passed. Both halves are asserted, because
+        # the source is what regenerates the runtime copy.
+        runtime_dir = ROOT / ".specify" / "shared" / "guidelines"
+        dangling_runtime = sorted(n for n in pointed if not (runtime_dir / n).is_file())
+        assert not dangling_runtime, (
+            "instruction surfaces point at guidelines with no runtime copy under "
+            ".specify/shared/guidelines/ — a reader following the pointer finds nothing, which "
+            "is the delivery window FR-038 / SC-017 exists to close "
+            f"(run scripts/python/sync-mirrors.py --write shared): {dangling_runtime}"
+        )
+        dangling_source = sorted(n for n in pointed if not (GUIDELINES / n).is_file())
+        assert not dangling_source, (
+            "instruction surfaces point at guidelines with no framework source under "
+            f"shared/guidelines/ — the runtime copy cannot be regenerated: {dangling_source}"
+        )
+    
+        # C-11(b): the remainder must not grow past the three structurally unpointed files.
+        # Anti-vacuity: name the three and require them to exist, so an empty guidelines
+        # directory cannot make the subset assertion pass on nothing.
+        for name in UNPOINTED_BY_STRUCTURE:
+            assert (GUIDELINES / name).is_file(), (
+                f"C-11(b) names {name} as unpointed-by-structure but it is not in shared/guidelines/"
+            )
+        full = {p.name for p in GUIDELINES.glob("*.md")}
+        remainder = full - pointed
+        unexpected = sorted(remainder - set(UNPOINTED_BY_STRUCTURE))
+>       assert not unexpected, (
+            "a guideline lost its instruction-surface pointer, so it can no longer dangle "
+            "loudly — coverage shrank silently. Either restore the pointer or amend "
+            f"ambient-section.md C-11(b) with a recorded reason: {unexpected}"
+        )
+E       AssertionError: a guideline lost its instruction-surface pointer, so it can no longer dangle loudly — coverage shrank silently. Either restore the pointer or amend ambient-section.md C-11(b) with a recorded reason: ['reporting-obligations.md', 'self-explanatory.md']
+E       assert not ['reporting-obligations.md', 'self-explanatory.md']
+
+tests/contract/test_user_facing_comprehension_section.py:283: AssertionError
+______________________ test_lc_10_11_12_snapshot_branches ______________________
+[gw30] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw30/test_lc_10_11_12_snapshot_bran0')
+
+    def test_lc_10_11_12_snapshot_branches(tmp_path):
+        project = make_project(tmp_path)
+        reg = tmp_path / "reg"
+        line = _register(reg, project)
+        four = four_piece(tmp_path / "rt", line["line_id"], line["run_id"], stage="plan", sentinel=True)
+        engine_json(
+            "update", "--line-id", line["line_id"], "--stage", "plan",
+            "--runner-pid", "999999", "--runner-start-token", "0",
+            "--cli-pid", "999999", "--cli-start-token", "0",
+            "--prompt-path", str(four["prompt_meta"]), "--status-path", str(four["status"]),
+            "--log-path", str(four["log"]), "--heartbeat-path", str(four["heartbeat"]), reg=reg,
+        )
+        done = engine_json("verify-identity", "--line-id", line["line_id"], reg=reg)
+        assert done["branch_hint"] == "done"
+    
+        running_line = _register(reg, project)
+        four2 = four_piece(tmp_path / "rt2", running_line["line_id"], running_line["run_id"], stage="plan")
+        engine_json(
+            "update", "--line-id", running_line["line_id"], "--stage", "plan",
+            "--runner-pid", str(os.getpid()), "--runner-start-token", _token(os.getpid()),
+            "--cli-pid", str(os.getpid()), "--cli-start-token", _token(os.getpid()),
+            "--prompt-path", str(four2["prompt_meta"]), "--status-path", str(four2["status"]),
+            "--log-path", str(four2["log"]), "--heartbeat-path", str(four2["heartbeat"]), reg=reg,
+        )
+        running = engine_json("verify-identity", "--line-id", running_line["line_id"], reg=reg)
+>       assert running["identity"] == "ok"
+E       AssertionError: assert 'mismatch' == 'ok'
+E         
+E         - ok
+E         + mismatch
+
+tests/contract/test_lifecycle_detach_reattach.py:315: AssertionError
+_________ test_state_dir_falls_back_to_home_when_runtime_env_is_absent _________
+[gw12] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw12/test_state_dir_falls_back_to_h0')
+
+    def test_state_dir_falls_back_to_home_when_runtime_env_is_absent(tmp_path):
+        """R-02 level 4: with no --state-dir, no Registry and no
+        `SPECIFY_LINE_RUNTIME_DIR`, `$HOME` is the last resort. The fixture points
+        HOME at a temp dir, so the real home is neither read nor written."""
+        ws = Workspace(tmp_path)  # no registry entry
+        ws.write_spine(state="running")
+        home_pid = ws.home / ("pid-%s-%s" % (ws.line, ws.stage))
+        home_pid.write_text(
+            "pid=%d start=424242 at=%d line=%s stage=%s event=pid\n"
+            % (os.getpid(), NOW, ws.line, ws.stage), encoding="utf-8")
+        (ws.home / ("heartbeat-%s-%s.log" % (ws.line, ws.stage))).write_text(
+            "at=%d line=%s stage=%s event=heartbeat\n" % (NOW, ws.line, ws.stage),
+            encoding="utf-8")
+    
+        env = _snap_json(ws, state_dir=False, unset=["SPECIFY_LINE_RUNTIME_DIR"])
+    
+        assert env["paths"]["state_dir"] == str(ws.home)
+        assert env["paths"]["state_dir"] != str(Path.home()), "real home must stay out"
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(home_pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:431: AssertionError
+__________________ test_missing_registry_continues_evaluation __________________
+[gw36] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw36/test_missing_registry_continue0')
+
+    def test_missing_registry_continues_evaluation(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine(state="running")
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["registry"]["stage"] is None
+        assert env["spine"]["status"] == "present"
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:445: AssertionError
+____________ test_unwatched_detector_positive_expired_and_negative _____________
+[gw89] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw89/test_unwatched_detector_positi0')
+
+    def test_unwatched_detector_positive_expired_and_negative(tmp_path):
+        """C-40: watchbeat missing/expired reports unwatched; fresh or sentinel does not."""
+        # Test-local isolation fix (T027 triage, 2026-10-22): the fresh/expired boundary
+        # cases anchor to call time instead of module-import NOW. NOW binds at
+        # collection; in a full suite the unit tier runs >300 s later, so an at=NOW
+        # marker already sits past its own 300 s window and the "fresh" branch becomes
+        # unreachable. Assertions and branch coverage are unchanged.
+        now = int(time.time())
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=now - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1114: AssertionError
+_________________ test_sentinel_must_be_the_last_nonempty_line _________________
+[gw151] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw151/test_sentinel_must_be_the_last0')
+
+    def test_sentinel_must_be_the_last_nonempty_line(tmp_path):
+        ws = Workspace(tmp_path)
+        ws.write_spine()
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "", "still working"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:632: AssertionError
+_______ test_derived_deadline_overrun_with_live_process_is_timeout_watch _______
+[gw92] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw92/test_derived_deadline_overrun_0')
+
+    def test_derived_deadline_overrun_with_live_process_is_timeout_watch(tmp_path):
+        """FR-004 rule (5) + IA-17: a live TIMEOUT is watched, never killed."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 900, deadline=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws)
+    
+>       assert env["loop_state"] == "TIMEOUT"
+E       AssertionError: assert 'DEAD' == 'TIMEOUT'
+E         
+E         - TIMEOUT
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1086: AssertionError
+_________________ test_state_dir_falls_back_to_runtime_dir_env _________________
+[gw61] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw61/test_state_dir_falls_back_to_r0')
+
+    def test_state_dir_falls_back_to_runtime_dir_env(tmp_path):
+        """R-02 level 3: with no --state-dir and no Registry `status_path`, the
+        `SPECIFY_LINE_RUNTIME_DIR` convention the runner writes to is used, so the
+        four-piece evidence is still found instead of leaving `state_dir` null."""
+        ws = Workspace(tmp_path)  # no registry entry -> level 2 cannot fire
+        ws.write_spine(state="running")
+        pid = ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+    
+        env = _snap_json(ws, state_dir=False)  # --spine stays explicit
+    
+        assert env["registry"]["status"] == "missing"
+        assert env["paths"]["state_dir"] == str(ws.state_dir)
+        assert env["evidence"]["pid"]["status"] == "present"
+        assert env["evidence"]["pid"]["path"] == str(pid)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:408: AssertionError
+________ test_trailing_anomaly_line_with_live_process_is_watch_not_done ________
+[gw29] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw29/test_trailing_anomaly_line_wit0')
+
+    def test_trailing_anomaly_line_with_live_process_is_watch_not_done(tmp_path):
+        """FR-004 sentinel rule: an earlier sentinel followed by ANOMALY: is not DONE."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        ws.write_log(["TASKS-DONE", "ANOMALY: subagent returned malformed tasks"])
+    
+        env = _snap_json(ws)
+    
+        assert env["evidence"]["log"]["sentinel_present"] is False
+        assert env["evidence"]["log"]["anomaly"] is True
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'ANOMALY' == 'RUNNING'
+E         
+E         - RUNNING
+E         + ANOMALY
+
+tests/unit/test_loop_state_engine.py:1445: AssertionError
+____________________ test_dead_no_exit_record_is_never_done ____________________
+[gw26] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw26/test_dead_no_exit_record_is_ne0')
+
+    def test_dead_no_exit_record_is_never_done(tmp_path):
+        """C-41: dead pid without an exit record is never DONE; live adds no stop."""
+        ws = Workspace(tmp_path)
+        ws.write_artifact("tasks.md")
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert _find(env, "dead-no-exit-record")
+        assert env["recovery_action"] != "verify"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert _find(env, "dead-no-exit-record") == [], (
+            "a live process must not be reported as dead-no-exit-record"
+        )
+E       AssertionError: a live process must not be reported as dead-no-exit-record
+E       assert [{'detail': '...exit-record'}] == []
+E         
+E         Left contains one more item: {'detail': 'pid record exists, the process is gone and no exit record was written', 'detector': '065a', 'evidence': [{...ead_no_exit_record_is_ne0/state/demo-line/status-demo-line-tasks', 'signal': 'status'}], 'form': 'dead-no-exit-record'}
+E         Use -v to get more diff
+
+tests/unit/test_loop_state_engine.py:1146: AssertionError
+___________________ test_derived_dead_no_signal_and_running ____________________
+[gw82] linux -- Python 3.11.11 /usr/local/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw82/test_derived_dead_no_signal_an0')
+
+    def test_derived_dead_no_signal_and_running(tmp_path):
+        """FR-004 rules (4), (6), (7)."""
+        ws = Workspace(tmp_path)
+        ws.write_spine(started_at=NOW - 100)
+        ws.write_pid(pid=_dead_pid())
+    
+        env = _snap_json(ws)
+        assert env["loop_state"] == "DEAD"
+        assert env["loop_state_reason"] == "dead-no-exit-record"
+        assert env["recovery_action"] == "retry"
+    
+        (ws.state_dir / ("pid-%s-%s" % (ws.line, ws.stage))).unlink()
+        env = _snap_json(ws)
+        assert env["loop_state"] == "NO_SIGNAL"
+        assert env["loop_state_reason"] == "no-signal"
+    
+        ws.write_pid(pid=os.getpid())
+        ws.write_heartbeat()
+        env = _snap_json(ws)
+>       assert env["loop_state"] == "RUNNING"
+E       AssertionError: assert 'DEAD' == 'RUNNING'
+E         
+E         - RUNNING
+E         + DEAD
+
+tests/unit/test_loop_state_engine.py:1073: AssertionError
+________ TestErrorsAndWarnings.test_warning_surface_is_json_and_stderr _________
+[gw147] linux -- Python 3.11.11 /usr/local/bin/python3
+
+self = <contract.test_execution_config_engine.TestErrorsAndWarnings object at 0x7fc811011310>
+tmp_path = PosixPath('/tmp/pytest-of-agent/pytest-4522/popen-gw147/test_warning_surface_is_json_a0')
+
+    def test_warning_surface_is_json_and_stderr(self, tmp_path):
+        ws = make_ws(tmp_path, defaults_extra="mode: external\n",
+                     agent_yaml="cli: claude\n")
+        result = run_engine(ws)
+>       data = payload(result)
+               ^^^^^^^^^^^^^^^
+
+tests/contract/test_execution_config_engine.py:680: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/execution-c...guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n")
+
+    def payload(result: subprocess.CompletedProcess) -> dict:
+>       assert result.returncode == 0, f"engine failed: {result.stderr}\n{result.stdout}"
+E       AssertionError: engine failed: usage: execution-config.py --action {resolve,validate,list-configs} --agent SLUG [--mode MODE] [--cli CLI] [--model MODEL] [--reasoning-effort EFFORT] [--context-window N] [--extra-flags FLAGS] [--log-dir DIR] [--quantification-method METHOD] [--host-cli CLI] [--workspace-root PATH] [--format text|json]
+E         execution-config: configuration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)
+E         
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/usr/local/bin/python3', '/storage/project/cloud-native-ai/spec-kit/scripts/python/execution-c...guration error: quantification method 'qoder-settings' is not supported by cli 'claude' (supported: declared, none)\n").returncode
+
+tests/contract/test_execution_config_engine.py:76: AssertionError
+______________________ test_c11_gate_scan_total_unchanged ______________________
+[gw123] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c11_gate_scan_total_unchanged():
+        assert BASELINE_GATES.is_file(), (
+            f"missing frozen baseline: {BASELINE_GATES} (T002 must run first)"
+        )
+        frozen = json.loads(read(BASELINE_GATES))["confirmationGates"]
+        proc = subprocess.run(
+            [
+                "python3", str(SCANNER), "--root", str(ROOT), "--json",
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode == 0, proc.stderr
+        payload = json.loads(proc.stdout)
+>       assert payload["total"] == frozen["total"], (
+            f"gate total moved from the frozen {frozen['total']} to {payload['total']}; "
+            "the integer headroom on the budget is 0"
+        )
+E       AssertionError: gate total moved from the frozen 23 to 27; the integer headroom on the budget is 0
+E       assert 27 == 23
+
+tests/contract/test_proactive_trigger_section.py:365: AssertionError
+___ test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus ___
+[gw34] linux -- Python 3.11.11 /usr/local/bin/python3
+
+    def test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus():
+        src = ACCOUNTANT.read_text(encoding="utf-8")
+        hits = re.findall(
+            r"\.(?:write_text|write_bytes|mkdir|unlink|rmtree)\(|open\([^)]*['\"][wax]", src
+        )
+        freeze_hits = [h for h in hits]
+        assert freeze_hits == [] or "--freeze" in src, (
+            f"write points must belong to the explicit --freeze action only: {freeze_hits}"
+        )
+    
+        spec_root = ROOT / ".specify" / "specs"
+        files = sorted(p for p in spec_root.rglob("*") if p.is_file())
+        assert files, "sentinel: the corpus is empty, so the checksum proves nothing"
+        before = hashlib.md5(b"".join(p.read_bytes() for p in files)).hexdigest()
+        _run(["--spec-dir", str(SPEC_053), "--corpus-root", str(spec_root),
+              "--baseline", str(SPEC_053 / "coverage-baseline.txt")])
+        after = hashlib.md5(b"".join(p.read_bytes() for p in files)).hexdigest()
+>       assert before == after, "an accounting run modified the corpus it was reading"
+E       AssertionError: an accounting run modified the corpus it was reading
+E       assert '9e3e7950637d...cfb10472dc4e2' == '014762870c01...13eeb691ad80e'
+E         
+E         - 014762870c016ed4fb713eeb691ad80e
+E         + 9e3e7950637d0a25e27cfb10472dc4e2
+
+tests/contract/test_clause_coverage.py:710: AssertionError
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20: 192 warnings
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/contract/test_compile_reconcile_guards.py::test_clean_tree_check_is_green
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_determinism
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_check_clean_and_drift
+FAILED tests/contract/test_compile_embeds.py::test_compiled_form_contract - j...
+FAILED tests/contract/test_clause_forms.py::test_the_four_md_forms_never_co_occur_in_one_file
+FAILED tests/contract/test_expression_compatibility.py::test_c5_non_wiring_files_keep_their_frozen_hashes
+FAILED tests/contract/test_expression_compatibility.py::test_c2_no_project_side_classification_store
+FAILED tests/contract/test_evidence_findings_schema.py::TestCF13FeedbackPackageExclusion::test_package_zip_contains_no_evidence_paths
+FAILED tests/contract/test_engine_face_contract.py::test_c20_face_renders_required_and_source_placeholders
+FAILED tests/contract/test_compile_embeds.py::test_compile_embeds_zero_handler_no_section
+FAILED tests/contract/test_engine_face_contract.py::test_c20_convention_line_rendered_once_verbatim
+FAILED tests/contract/test_engine_face_contract.py::test_c20_no_placeholder_free_section_carries_no_convention
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+FAILED tests/contract/test_engine_face_contract.py::test_c21_rendered_flags_are_exactly_the_manifest_set
+FAILED tests/contract/test_confirmation_gates_sweep.py::test_residual_total_within_sc002_target
+FAILED tests/contract/test_engine_face_contract.py::test_c22_missing_manifest_fails_the_compile_loudly
+FAILED tests/contract/test_goal_migration.py::TestHistoricalFacesArePreserved::test_the_user_directive_quoting_the_old_path_survives_verbatim
+FAILED tests/contract/test_registry_completeness.py::test_c3_features_header_count_matches_rows
+FAILED tests/contract/test_compile_reconcile_guards.py::test_orphan_handler_line_is_structural_exit_2
+FAILED tests/contract/test_compile_reconcile_guards.py::test_missing_handler_line_is_structural_exit_2
+FAILED tests/contract/test_compile_reconcile_guards.py::test_stale_render_after_registry_change_is_exit_1
+FAILED tests/contract/test_compile_reconcile_guards.py::test_illegal_action_exits_2_naming_handler
+FAILED tests/contract/test_compile_reconcile_guards.py::test_order_conflict_exits_2
+FAILED tests/contract/test_acceptance_premises.py::test_e_a_stale_pin_invalidates_the_comparison_instead_of_failing_it
+FAILED tests/contract/test_compile_reconcile_guards.py::test_wording_hit_refuses_the_write
+FAILED tests/contract/test_neutrality_budget.py::test_c5_the_cap_leaves_zero_integer_headroom
+FAILED tests/contract/test_spec_feature_binding_integrity.py::test_c2_active_spec_feature_bindings_resolve
+FAILED tests/contract/test_shared_reference_rewrite.py::test_skills_use_installed_absolute_shared_form
+FAILED tests/contract/test_summary_writeset.py::test_write_whitelist_is_the_goal_directory_not_the_team_directory
+FAILED tests/contract/test_token_efficiency_discipline.py::test_cd5_headings_only_in_discipline_doc
+FAILED tests/contract/test_temp_directory_discipline.py::test_scanner_real_tree_is_clean
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_07_identity_ok_mismatch_dead
+FAILED tests/contract/test_user_facing_comprehension_section.py::test_c11_no_dangling_guideline_pointer_on_either_instruction_surface
+FAILED tests/contract/test_lifecycle_detach_reattach.py::test_lc_10_11_12_snapshot_branches
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_home_when_runtime_env_is_absent
+FAILED tests/unit/test_loop_state_engine.py::test_missing_registry_continues_evaluation
+FAILED tests/unit/test_loop_state_engine.py::test_unwatched_detector_positive_expired_and_negative
+FAILED tests/unit/test_loop_state_engine.py::test_sentinel_must_be_the_last_nonempty_line
+FAILED tests/unit/test_loop_state_engine.py::test_derived_deadline_overrun_with_live_process_is_timeout_watch
+FAILED tests/unit/test_loop_state_engine.py::test_state_dir_falls_back_to_runtime_dir_env
+FAILED tests/unit/test_loop_state_engine.py::test_trailing_anomaly_line_with_live_process_is_watch_not_done
+FAILED tests/unit/test_loop_state_engine.py::test_dead_no_exit_record_is_never_done
+FAILED tests/unit/test_loop_state_engine.py::test_derived_dead_no_signal_and_running
+FAILED tests/contract/test_execution_config_engine.py::TestErrorsAndWarnings::test_warning_surface_is_json_and_stderr
+FAILED tests/contract/test_proactive_trigger_section.py::test_c11_gate_scan_total_unchanged
+FAILED tests/contract/test_clause_coverage.py::test_c20_the_accountant_writes_nothing_and_changes_no_byte_of_the_corpus
+46 failed, 8061 passed, 2 skipped, 576 warnings in 31.43s
+.                                                                        [100%]
+=============================== warnings summary ===============================
+tests/unit/test_derive_moves.py:44
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_moves.py:44: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_derive_validate.py:79
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_derive_validate.py:79: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+tests/unit/test_sync_mirrors_resilience.py:20
+  /storage/project/cloud-native-ai/spec-kit/tests/unit/test_sync_mirrors_resilience.py:20: PytestUnknownMarkWarning: Unknown pytest.mark.unit - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    pytestmark = pytest.mark.unit
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 8109 deselected, 3 warnings in 16.71s
+# failed-name list written: .specify/specs/092-goal-team-parallel/test-evidence/plan-baseline-names.txt (46 entries) passes=2

@@ -1,0 +1,8 @@
+run1(2026-11-09) vs run2(2026-11-09), serial, 23 test files: diff lines=0 entries=46 each
+
+parallel-mode reading (run-tests.sh default, -n auto) vs serial reading: 46 ids each; the symmetric difference is ONE
+pair (see baseline-parallel-vs-serial.txt): test_clause_coverage.py::test_c20_... appears in the parallel reading only,
+test_goal_migration.py::TestLiveSurfacesAreMigrated::test_no_live_face_file_retains_the_old_path in the serial reading
+only. Same module family, opposite direction, one occurrence each. Both share the failing surface this feature rewrites
+(the live-face scan of the old goal path), so the GATE-1 comparison must be name-level against the serial list with this
+pair carried as a known unstable edge, never a count-level comparison.
