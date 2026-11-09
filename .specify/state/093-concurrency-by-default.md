@@ -7,7 +7,7 @@ slice: 093
 stage: analyze
 stage_started_at: 1794213785
 stage_deadline_epoch: 1794224585
-stage_base_commit: dbe172a4
+stage_base_commit: 95e44f3a
 attempt: 1
 retry_limit: 3
 last_verdict: "Analyze NOT-READY: CRITICAL 1 (F-093-009 - requirements.md FR-031 text is a literal JS concatenation inside a backtick pair, invisible to validate-requirements.py; it is the [[STR-006]] landing-discipline owner) / HIGH 3 (F-093-005 FR lane red 25/33 with 8 uncited because the delivery map clauses carry no resolvable citation group; F-093-006 CHK002 projection trees not excluded in FR-001; F-093-007 CHK008 FR-006 bijection contradicted by STR-009/STR-010 with the exemption only in a Clarification) / MEDIUM 8 / LOW 2. F-093-004 RULED: templates/tasks-template.md line 110 is the owner and the READ-AS-MARKER reading wins (glossary 绿点归属 names it as 真源); the partition invariant survives scoped to claimed clauses, so validate-tasks.py is behaviourally right and its rule text drifts - recorded as implement row T138, not edited in-stage. F-093-003 ADJUDICATED: the work (fact + reader + routing) is implement-stage and already T096/T098/T101/T105, and C-072 makes the open window fail-closed, so it does NOT block implement; the VALUE is an owner decision no tool of this stage can supply - surfaced, not ruled. SC-006 stays not_evaluated. Gates: validate-requirements 0/0; account-clause-coverage baseline-missing EXIT 2 with the FR lane reported honestly and NO --freeze used; validate-tasks 0/0; decision-tensions EXIT 0; pre-analyze requirements/plan/tasks all pass; decomposition proceed; evidence test-evidence/analyze-gates-2026-11-09.txt; report notes/analyze-findings.md; next = dispatch analyze-repair"
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "dispatch analyze-repair (CRITICAL 1 / HIGH 3; repair brief notes/analyze-findings.md § 6)"
+next_action: "dispatch analyze-repair: close C1/H3 from notes/analyze-findings.md § 6; encode the user directive that the analysis stage defaults to multiple concurrent SDD Analysis Workers; repair F-093-012's false 'no dispatch tool' premise in the stage records; reconcile 093 artifacts with the merged trunk 95e44f3a (090 anchoring rename, temp goal/team reduced to a scope property, duplicate-092 numbering)"
 direction_contract: |
   goal_verbatim: "在当前speckit框架中的所有技能,命令和更高阶的goal,team,loop等都需要将subagent并发作为基本属性, 在能用并发的情况下默认都应该是并发的"
   non_goals: [新增 /speckit.* 命令, 第二个派发引擎/registry, 无条件并行（依赖/写冲突/宿主限制时必须串行）, 改变 SDD 阶段链与哨兵]
