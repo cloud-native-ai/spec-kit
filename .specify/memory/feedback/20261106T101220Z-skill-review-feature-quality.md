@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:12:20Z"
 summary: "Artifact segment blocked: expected set 10/11 with verification.md missing (P0 F1), two normative contradictions (F2 docs/ Out of Scope vs FR-001, F3 fixture invariant vs DoD-4), plus assertion-name/po"
+introspection_ref: "introspection-20261108T192504Z#F-05"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-05"
 ---
 
 ## Review

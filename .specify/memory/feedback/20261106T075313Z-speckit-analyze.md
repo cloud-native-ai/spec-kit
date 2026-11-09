@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T07:53:13Z"
 summary: "analyze stage (round 1, read-only): 16 findings (2 HIGH / 8 MEDIUM / 6 LOW). HIGH-01: the plan Test Plan table B clause labels and the tasks [green:] tags do not track contracts/flow-obligations.contr"
+introspection_ref: "introspection-20261108T192504Z#F-11"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-11"
 ---
 
 ## Review

@@ -9,9 +9,12 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T06:25:11Z"
 summary: "Bounded repair of the requirements stage (attempt 2): the pre-analyze gate failed at exit 2 because this execution-class spec carried no Runtime Stack & Dependency Ownership section. Added that sectio"
+introspection_ref: "introspection-20261108T192504Z#F-06"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-06"
 ---
 
 ## Review

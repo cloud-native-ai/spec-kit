@@ -9,9 +9,11 @@ kind: "internal"
 slice: "skills"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:54:55Z"
 summary: "Code segment round 3: gate allow, blocking=0 important=0 suggestion=0. Round-2 suggestions F26/F27 closed in 4fb0f1aa; no engine change; the only code-side delta is the strengthened guard test test_do"
+disposition_reason: "introspection-20261108T191359Z: excluded (clean review; lesson applied)"
 ---
 
 ## Review

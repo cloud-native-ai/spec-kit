@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T09:06:34Z"
 summary: "Round-5 revision analyze: GATE GREEN (C0/H0/M0, 17 LOW). New slice FR-023..FR-029 <-> C-53..C-72 <-> T055-T078 <-> 40 delivered paths <-> scenarios I-M <-> SC-011..SC-014 verified consistent; five val"
+introspection_ref: "introspection-20261108T192504Z#F-12"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-12"
 ---
 
 ## Review

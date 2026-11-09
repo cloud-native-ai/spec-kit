@@ -90,12 +90,12 @@ prompt MUST NOT recommend it.
    not a destination of its own):
 
    ```bash
-   python3 .specify/scripts/python/feedback-utils.py --action probes
-   python3 .specify/scripts/python/feedback-utils.py --action probes --validate     # schema check
-   python3 .specify/scripts/python/feedback-utils.py --action probes --reconcile   # embed audit
-   python3 .specify/scripts/python/feedback-utils.py --action map                  # OPTIONAL (writes): rebuild probe-map.md
+   python3 .specify/scripts/python/probe-utils.py --action probes
+   python3 .specify/scripts/python/probe-utils.py --action probes --validate     # schema check
+   python3 .specify/scripts/python/probe-utils.py --action probes --reconcile   # embed audit
+   python3 .specify/scripts/python/probe-utils.py --action map                  # OPTIONAL (writes): rebuild probe-map.md
    python3 .specify/scripts/python/feedback-utils.py --action status
-   python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --format json
+   python3 .specify/scripts/python/feedback-utils.py --action list --disposition open --limit 0 --format json
    ls feedback/feedback-*.zip 2>/dev/null                                          # framework hat only
    ```
 

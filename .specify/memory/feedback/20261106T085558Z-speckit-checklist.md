@@ -8,9 +8,12 @@ probe: "speckit-checklist-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-speckit-visualization"
+disposition: "processed"
 partial: false
 created: "2026-11-06T08:55:58Z"
 summary: "Second-slice checklist produced 94 items with 100% traceability; the declared prerequisite script check-prerequisites.sh is broken (SyntaxError at line 49) and the stage row was recorded as not-run-do"
+introspection_ref: "introspection-20261108T192504Z#F-13"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-13"
 ---
 
 ## Review

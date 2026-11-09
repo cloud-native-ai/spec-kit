@@ -8,9 +8,12 @@ probe: "speckit-requirements-wrapup"
 kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
+disposition: "processed"
 partial: false
 created: "2026-11-06T06:21:27Z"
 summary: "Token reflection for the requirements run."
+introspection_ref: "introspection-20261108T192504Z#F-07"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-07"
 ---
 
 ## Review

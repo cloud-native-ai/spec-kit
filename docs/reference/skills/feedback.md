@@ -27,7 +27,7 @@ Feedback attaches only to long-running, qualifying flows — never to trivial on
 - **Complex commands only** carry the step. A command is *complex* iff it (a) invokes
   scripts/CLI tools, (b) produces an artifact consumed by another flow, or (c) consumes
   another flow's artifact. The current set of embed points is not restated here — read it
-  from the probe registry (`feedback-utils.py --action probes`, which also reconciles the
+  from the probe registry (`probe-utils.py --action probes`, which also reconciles the
   registry against the live templates and skills).
 - **Simple commands** — `agents`, `constitution`, `feature`, `team` — carry **no** step
   (they delegate authoring to skills, which already carry feedback).

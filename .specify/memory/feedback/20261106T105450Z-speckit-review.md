@@ -9,9 +9,12 @@ kind: "internal"
 slice: "commands"
 feature: "087-arch-diagram-docs"
 feature_id: "087"
+disposition: "processed"
 partial: false
 created: "2026-11-06T10:54:50Z"
 summary: "Review round 3 (final focused): F2/F13/F26/F27/F28 closed after 4fb0f1aa; F17 one P2 residual (S3 step-3 printed recipe returns satisfied, not stale). Four segment verdicts: process pass, artifact pas"
+introspection_ref: "introspection-20261108T192504Z#F-03"
+disposition_reason: "introspection:introspection-20261108T192504Z#F-03"
 ---
 
 ## Review

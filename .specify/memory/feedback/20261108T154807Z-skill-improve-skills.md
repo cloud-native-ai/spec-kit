@@ -7,9 +7,12 @@ scope: "local"
 probe: "skill-improve-skills-wrapup"
 kind: "internal"
 slice: "skills"
+disposition: "processed"
 partial: false
 created: "2026-11-08T15:48:07Z"
 summary: "Batch improvement of sdd-* skills: run artifacts now archive under the target project's .specify/ (housekeeping reports -> .specify/memory/housekeeping/; loop-driver local brief -> .specify/.tmp/sdd-l"
+introspection_ref: "introspection-20261108T191359Z#F-03"
+disposition_reason: "introspection:introspection-20261108T191359Z#F-03"
 ---
 
 ## Review
