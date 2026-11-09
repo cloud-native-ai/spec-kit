@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794231364
 stage_base_commit: e8d716e3
 attempt: 0
 retry_limit: 3
-last_verdict: "Enginefix integrated (merge 6a87db2b6): the 8 wp03 engine tests green; master now carries exactly TWO known reds — the criterion-vocabulary scan pair assigned to wp05 (T064/T065); T084/T085 registered in wp05 (package 16→18, total 83→85); gates green (requirements 0/0, tasks 0 err/1 disclosed warn). All work pushed to the three mirrors at master 4fd3e4199 (pre-enginefix); the enginefix commit will ride the next push."
+last_verdict: "Wave 3 update: wp04 integrated (merge; 3 commits: handoff template + territory-check.py + skill discipline; 5/8 rows closed; T055/T057/T058 BLOCKED by a dispatch-domain mismatch — the rows need test_declaration_facts.py / contract.yaml / goal-utils.py, owned by wp03/wp05; sentinel=0 recorded as partial). Master now carries THREE known reds, all named: the 2 criterion-vocabulary tests (wp05 T064/T065) + test_a_dangling_handoff_key_is_refused_at_creation (the T055/T057/T058 block). wp05 still running."
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: "launch wave 3: wp04-handoff (8 rows) + wp05-peers-and-vocabulary (18 rows, incl. T084/T085 + the 2 vocabulary greens) in per-package worktrees; then wp06; wp07 closure; push after the wave"
+next_action: "wp05 (running) greens the 2 vocabulary tests; then a follow-up repair closes the wp04-blocked rows (assign T055/T057/T058 to the package owning the needed files, likely wp05/wp06); then wp06, wp07 closure, final push"
 
 direction_contract: |
   goal_verbatim: "需要将085扩展到 /speckit.feedback 这类命令, 临时goal和临时team不仅仅是作用于SDD流程,也作用于speckit*命令, 在这点上需要将临时goal和临时team的归档目录挪到原本的.specify/goal和.specify/teams中,而不是.specify/specs/091-auto-git-closeout/goal和.specify/specs/091-auto-git-closeout/team这类spec子目录,  spec的SDD和goal+team应该是平行关系而不是从属关系. '临时'和'全局'也不是一个标准概念, 需要进行重定义. spec和goal+team的关系应该类似于 '设计师'和'施工队'..."
