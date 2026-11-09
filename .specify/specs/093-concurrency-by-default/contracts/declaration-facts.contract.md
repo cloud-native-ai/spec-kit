@@ -35,7 +35,11 @@ obligations**; it never restates a member list.
 - **C-005** — `executor-enumeration-roots.yaml` MUST carry exactly five roots and MUST express each as a **pattern**,
   never as a member count. Each root MUST name its `class` and its `excluded_layers`. The spec-local
   `<spec-dir>/goal/` and `<spec-dir>/team/` layers MUST be listed under `excluded_layers` (they are 085
-  projections, not roots). ([[STR-008]], FR-001, FR-032)
+  projections, not roots). The three derived projection trees MUST be listed under `excluded_layers` as well: the
+  per-tool command copies (`.claude/commands/`, `.qoder/commands/`, `.opencode/command/`, …) are projections of
+  `templates/commands/`, the flat `.specify/skills/` layer is a projection of `skills/{internal,external}/`, and
+  `.specify/agents/templates/` is a projection of `agents/` — a projection tree MUST NOT be enumerated as an extra
+  root or counted twice. ([[STR-008]], FR-001, FR-032)
 - **C-006** — `serial-reason.yaml` MUST group each member into exactly one of `condition-bound` or `factual`, MUST
   give each `condition-bound` member its FR-005 clause id, and MUST record declaration order as part of the value.
   `single-unit` ([[STR-009]]) and `mechanism-not-yet-landed` ([[STR-010]]) MUST be `factual` members — they
@@ -82,4 +86,4 @@ obligations**; it never restates a member list.
   text but no repository-specific path fact. ([[STR-006]], FR-031, FR-032)
 - **C-018** — The same fact MUST be reachable from the framework source (`shared/`) and its runtime projection
   (`.specify/shared/`) by identical content; a hand edit to the projection is a defect, and the mirror check must
-  report drift if the two ever differ. (R-11, Constitution XI)
+  report drift if the two ever differ. (R-11, Constitution XI, FR-031)

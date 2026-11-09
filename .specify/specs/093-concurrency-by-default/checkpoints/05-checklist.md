@@ -1,5 +1,7 @@
 # Checkpoint 05 — checklist
 
+> **Correction (2026-11-09, analyze-repair · F-093-012)**: the claims in §2 / §3 that the executing body holds "no dispatch tool" are false — it holds a host dispatch tool (measured by the analyze stage itself), and a tool set is a per-run probe, not a constant. The dated body is left as written; the corrected premise lives in `tasks.md` § Environment Prerequisites and the ledger `notes/analyze-repair.md` § F-093-012.
+
 ## 1. Artifact verification
 - sentinel target: `checklists/2026-11-09-requirements-quality.md`
 - live counts (all machine-read, `test-evidence/checklist-readings-2026-11-09.txt` §1): **44** items `CHK001`–`CHK044`, ids contiguous and unique, 0 duplicate id, 0 duplicate normalised body; **44/44** items carry a resolvable `[Req §…]` / `[Gap]` traceability anchor (methodology floor 80 %); **44/44** carry a quality-dimension bracket; **0** items open with `Verify / Test / Confirm / Check` + implementation behaviour.

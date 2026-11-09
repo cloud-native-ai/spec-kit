@@ -10,11 +10,11 @@ pointer, text removed, or text kept with a dated record. There is no fifth dispo
 
 - **C-079** — Each pre-existing concurrency statement MUST be assigned exactly one disposition from {`owner-moved`,
   `pointer`, `removed`, `dated-record`} and MUST carry its evidence path. An unassigned statement is
-  `disposition-missing`. (FR-018, T-001)
+  `disposition-missing`. (FR-018, FR-032, T-001)
 - **C-080** — A `pointer` disposition MUST leave a sentence that reaches the owner by path; deleting the statement
-  without a pointer is `dangling-reference`. (Constitution XIV)
+  without a pointer is `dangling-reference`. (FR-032, Constitution XIV)
 - **C-081** — A `dated-record` disposition MUST carry the date and the reason it is a record rather than a live
-  statement; a dated record without a date is `record-undated`. (Constitution XIV duplicate conditions)
+  statement; a dated record without a date is `record-undated`. (FR-032, Constitution XIV duplicate conditions)
 
 ## B. The four slot-cap restatements
 
@@ -28,27 +28,28 @@ pointer, text removed, or text kept with a dated record. There is no fifth dispo
 ## C. Declaration-layer statements
 
 - **C-085** — Every fact this feature registers MUST declare its `kind` from the existing five-member set; a sixth
-  kind is a contract revision and MUST NOT be introduced silently. (R-2, C-003)
+  kind is a contract revision and MUST NOT be introduced silently. (FR-033, R-2, C-003)
 - **C-086** — Existing declaration keys MUST NOT be renamed; where this feature needs a new reading of an existing
   key, it earns a new fact and the old key stays. A rename is `breaking-change` and requires the revision path.
+  (FR-033, Constitution XIV)
 - **C-087** — Each new fact file MUST be registered in `shared/declarations/contract.yaml` in the same change that
   creates it, so `declaration_reader.py --action list` reports it. An unregistered file is invisible and is
-  `unregistered`. (C-011)
+  `unregistered`. (FR-033, C-011)
 
 ## D. Templates and generated copies
 
 - **C-088** — A template that must change MUST change in `templates/` and be mirrored; editing `.specify/templates/`
-  alone is `mirror-only` and will be overwritten on refresh. (R-11, Constitution XI)
+  alone is `mirror-only` and will be overwritten on refresh. (FR-033, R-11, Constitution XI)
 - **C-089** — The per-agent command copies MUST be regenerated, not hand-edited; a hand edit to `.claude/commands/` or
-  `.qoder/commands/` is `hand-edited-copy`. (C-062)
+  `.qoder/commands/` is `hand-edited-copy`. (FR-033, C-062)
 - **C-090** — Retiring `.specify/templates/commands/` (already retired) MUST NOT be reversed by this feature; a
-  reintroduced copy is `retired-path-revived`. (R-11)
+  reintroduced copy is `retired-path-revived`. (FR-033, R-11)
 
 ## E. Adjacent semantics left untouched
 
 - **C-091** — Feature 064's write lines, worktree and integration queue; Feature 070's work-package gate; Feature
   086's test-execution efficiency; Feature 092's goal/team parallelism MUST NOT be redefined. Where this feature
-  needs their numbers it MUST reference their owners. (FR-019, feature-ref.md adjudication, F-093-001)
+  needs their numbers it MUST reference their owners. (FR-019, FR-033, feature-ref.md adjudication, F-093-001)
 - **C-092** — Where an adjacent feature's file-level delivery surface and this feature's surface would collide, the
   collision MUST be recorded in `feature-ref.md` with the two file paths and the resolution, and MUST NOT be
-  resolved by silent overwrite. (F-093-001, F-093-002)
+  resolved by silent overwrite. (FR-033, F-093-001, F-093-002)

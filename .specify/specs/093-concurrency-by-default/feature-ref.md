@@ -4,7 +4,7 @@
 **Spec directory**: `.specify/specs/093-concurrency-by-default/`
 **Binding**: `spec:093-concurrency-by-default`; `flow_class=execution; source=declaration; marker=; error=-`
 **Requirement → Feature**: `093-concurrency-by-default` → **Feature 093** (`.specify/memory/features/093.md`)
-**Authority**: `requirements.md` (33 FR, 12 SC, 15 clarify rulings) owns intent; `contracts/*` own conformance;
+**Authority**: `requirements.md` (35 FR, 12 SC, 15 clarify rulings + 2 dated user rulings of 2026-11-09) owns intent; `contracts/*` own conformance;
 `plan.md` owns design. This page restates no rule — it maps.
 
 ---
@@ -29,10 +29,12 @@
 | FR-014 | declaration-facts C-008; judgement-engine C-034 | FR-031 | declaration-facts C-001…C-003, C-010…C-013 |
 | FR-015 | declaration-facts C-008; high-order-executors C-065 | FR-032 | existing-semantics-disposal C-079…C-081; plan Fact Owners |
 | FR-016 | judgement-engine C-040; declaration-facts C-008 | FR-033 | existing-semantics-disposal C-085…C-092 |
-| FR-017 | high-order-executors C-069; declaration-facts C-004 | | |
+| FR-017 | high-order-executors C-069; declaration-facts C-004 | FR-034 | high-order-executors C-093 |
+| FR-035 | high-order-executors C-094 | | |
 
-Count: 33 map rows, 33 distinct FR ids — every requirement reaches at least one clause. The range
-`FR-001…FR-033` is contiguous with no gap and no alias.
+Count: 35 map rows, 35 distinct FR ids. Whether every requirement reaches at least one clause is decided by the
+machine reading, not by this table: `account-clause-coverage.py` reports the FR lane as claimed / uncovered names
+(from clause citation groups), and this map is the human index over that reading — it asserts no totality of its own.
 
 ## Measurement map — SC → red-first module
 
@@ -79,6 +81,7 @@ recorded at implement/review.
 | | `skills/internal/create-team/references/conceptual-model.md` | edit — seat territory judgement |
 | | `skills/external/sdd-loop-driver/references/decomposition-model.md` | edit — slot owner projection, coverage, integration order |
 | Driver surface | `skills/external/sdd-loop-driver/SKILL.md` | edit — loop concurrency obligation |
+| | `skills/external/sdd-loop-driver/references/dispatch-recipes.md` | edit — analyze-wave default and the fork dispatch mechanism (FR-034 / FR-035) |
 | | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | edit — slot cap projection |
 | | `skills/external/sdd-loop-driver/scripts/wp-gate.py` | edit only if the ceiling moves — it stays the ceiling owner (C-083) |
 | Skill bodies | `skills/internal/create-plan/SKILL.md` | edit — plan stage default-concurrent |
@@ -112,6 +115,7 @@ of the touched paths; it resolves the collision per path and records what each s
 | `skills/external/sdd-loop-driver/templates/stage-team-preset.md` | 070 (seat preset), 092 (team preset) | seat list, slot line | 093 replaces the slot line with a projection | **Real collision on one line.** Resolution: 093 edits the slot sentence only; the seat structure stays 070's/092's. |
 | `skills/external/sdd-loop-driver/scripts/wp-gate.py` | 070 (owns `--slot-cap-ceiling`, `WG-16`) | ceiling default + validation | 093 reads the ceiling; it edits the script only if `WG-15` must become file-level (T-003) | **Real same-path overlap, dispositioned.** Default: read-only, C-083 forbids copying the number. If T-003's file-level write-domain judgement lands, 093 changes `WG-15` and nothing else in that file; 070 keeps ownership of the WP gate and every other check. |
 | `skills/external/sdd-loop-driver/SKILL.md` | 064 and 070 (both edited it) | the driver loop's execution modes | 093 adds the loop concurrency obligation | **Real collision on the file, resolved by section.** The stage chain, sentinels and WP gate calls stay as they are; 093 adds one obligation paragraph and changes no step order (FR-028 (c)). |
+| `skills/external/sdd-loop-driver/references/dispatch-recipes.md` | earlier driver lines (081d / 085 / 091 authored the recipe bodies) | stage prompt, runner, watch, worktree and integration recipes | 093 rewrites § 本地原生拓扑's dispatch default and adds the analyze wave + fork mechanism to § Recipe 2's usage note (FR-034 / FR-035) | **Real collision, resolved by section.** Every other recipe (watch, worktree, integration, line registry) stays as it is; 093 owns only the local-topology default and the analyze-wave paragraph it adds. |
 | `shared/definitions/subagent-definitions.md` | 064 (execution modes, write lines) | mode taxonomy | 093 adds the dispatch-capability section | **Adjacent, not overlapping.** 064's execute-section modes are referenced, not redefined; 093 adds a new section. |
 | `shared/definitions/goal-definitions.md` | 092 (goal/target binding) | binding, target model | 093 adds the target-concurrency rule | **Adjacent.** 093 edits the concurrency paragraph inside the existing target section; the binding model stays 092's. |
 | `skills/internal/create-team/references/conceptual-model.md` | 092 (seat model) | team/seat/target decomposition | 093 adds the binding-time territory-intersection judgement | **Adjacent.** The territory owner stays the same file; 093 adds the judgement, it does not move ownership. |

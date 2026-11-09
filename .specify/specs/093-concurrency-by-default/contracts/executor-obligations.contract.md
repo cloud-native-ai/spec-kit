@@ -78,4 +78,4 @@ table; they do not bind any single program.
 - **C-061** — The obligation MUST be present in the templates used to author new execution bodies, so a body
   authored after this feature inherits it without the author remembering. (FR-026)
 - **C-062** — The obligation MUST NOT be duplicated into each of the per-agent command copies by hand; a copy is a
-  projection and MUST be regenerated from its source. (R-11, Constitution XIV)
+  projection and MUST be regenerated from its source. (R-11, Constitution XIV, FR-032)

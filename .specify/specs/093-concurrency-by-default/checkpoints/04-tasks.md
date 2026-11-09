@@ -1,5 +1,7 @@
 # Checkpoint 04 — tasks
 
+> **Correction (2026-11-09, analyze-repair · F-093-012)**: the claims in §2 / §3 that "this stage's executor has no dispatch tool" are false — the executing body holds a host dispatch tool (measured by the analyze stage itself), and a tool set is a per-run probe, not a constant. The dated body is left as written; the corrected premise lives in `tasks.md` § Environment Prerequisites and the ledger `notes/analyze-repair.md` § F-093-012.
+
 ## 1. Artifact verification
 - sentinel target: `tasks.md`
 - live counts: **137** task rows `T001`–`T137` (`grep -c '^- \[ \] T'`), contiguous and unique; **8** phases (Setup 7 / Foundational 19 / US1 15 / US2 24 / US3 20 / US4 20 / US5 6 / Polish 26); **5** work packages covering every row exactly once (checked by set union = `{1..137}`, no duplicate membership); **34** `[green: <contract>#<clause>]` red-first markers.

@@ -54,7 +54,8 @@ will disagree with itself. One engine, one exit taxonomy, one JSON envelope.
   `dependency-edge` record needs a resolvable predecessor id plus a completion verdict pointer; a `write-conflict`
   record needs a resolvable intersecting path set; a `host-no-parallel` record needs a probe reading and its landing
   point; a `budget-reserve` record needs the before/after slot and budget readings; a factual code needs the
-  enumerated unit set of size 0 or 1. A free-form non-empty string MUST NOT satisfy any of these. (FR-007)
+  enumerated unit set of size 0 or 1. A free-form non-empty string MUST NOT satisfy any of these.
+  (FR-007, FR-011, FR-013)
 - **C-030** — The engine MUST report `form-reason-inconsistent` when `pattern=concurrent` carries a non-empty code
   list or `pattern=serial` carries an empty one, and MUST NOT accept the record. (FR-007, SC-003)
 
@@ -95,4 +96,4 @@ will disagree with itself. One engine, one exit taxonomy, one JSON envelope.
 - **C-040** — `capability` MUST report the statement-by-statement inconsistency shape as a finding rather than
   resolving it: a body declaring `N >= 2` units while its `capability-tools` lacks a dispatch tool and no handoff is
   declared is `declaration-execution-mismatch`, and a run record showing all units with the same `executor_id` and
-  zero interval overlap is `declaration-execution-mismatch` as well. Both are `fail`. (FR-023, SC-005, R-14)
+  zero interval overlap is `declaration-execution-mismatch` as well. Both are `fail`. (FR-016, FR-023, SC-005, R-14)

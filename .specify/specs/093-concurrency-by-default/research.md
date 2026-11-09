@@ -97,7 +97,7 @@ Constitution VI).
 | `templates/commands/<stem>.md` | 29 | fan out to per-tool copies (29 in `.claude/commands`, 29 in `.qoder/commands`) |
 | `agents/*.md` | 17 | `.specify/agents/templates/` holds 17, name-identical |
 | `.specify/teams/<slug>/` | 12 | 10 carry `territory`, 2 do not (EP-007) |
-| `.specify/goal/<slug>/` | 6 | archived goals; the spec-local `/.specify/specs/<id>/goal/<slug>/` layer is an 085 projection and is **not** a root |
+| `.specify/anchoring/<slug>/` | 6 | anchoring entries (the former `.specify/goal/` tree, renamed by 090 and merged 2026-11-09); the spec-local `/.specify/specs/<id>/goal/<slug>/` layer is a 085 projection and is **not** a root |
 
 **Ruling**: the class mapping is a function of root + produced shape; the counts are recorded here as a dated
 measurement and MUST NOT be frozen into a fact as constants (a fact carrying `38` would go stale on the next skill

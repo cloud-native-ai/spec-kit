@@ -3,7 +3,7 @@
 **Purpose**: 检验 Feature 093「subagent 并发作为框架基本属性」**需求文本的写作质量**——范围封闭集是否真由文件系统枚举派生、默认并发与封闭串行理由词表是否对齐、并发单元七件事是否逐项可判、派发能力的「声明即执行」是否没有免检缺口、高阶执行体与声明层是否共用一套判据，以及计数、词表成员与 `Consumed by` 自引用是否自洽。每一条都是对需求文本（或它点名的 owner 行）的提问，**不是**对实现行为的检验：凡只有跑一遍产品才能回答的条目，本身就是本清单的缺陷。
 **Created**: 2026-11-09
 **Feature (Requirement Scope)**: `.specify/specs/093-concurrency-by-default/feature-ref.md`（Feature 093 Concurrency by Default；Feature 记录 `.specify/memory/features/093.md`）
-**Requirements (What)**: [../requirements.md](../requirements.md) — 33 FR（FR-001…FR-033）/ 12 SC（SC-001…SC-012）/ 5 RS（RS-001…RS-005）/ 11 Shared Strings（STR-001…STR-011）/ 2 个 Clarifications 会话 / Assumptions A1–A6 / 9 条 Edge Cases
+**Requirements (What)**: [../requirements.md](../requirements.md) — 33 FR（FR-001…FR-033；本清单创建时的读数，其后经 2026-11-09 analyze-repair 的用户裁定变更为 35 FR，见 `notes/analyze-repair.md`）/ 12 SC（SC-001…SC-012）/ 5 RS（RS-001…RS-005）/ 11 Shared Strings（STR-001…STR-011）/ 2 个 Clarifications 会话 / Assumptions A1–A6 / 9 条 Edge Cases
 **Specifications (How, context only)**: [../plan.md](../plan.md)、[../tasks.md](../tasks.md)（137 行 T001–T137）、[../contracts/](../contracts/)（5 页 / 92 条款 C-001…C-092）、[../research.md](../research.md)、[../data-model.md](../data-model.md)、[../quickstart.md](../quickstart.md)、[../feature-ref.md](../feature-ref.md) —— 只用于暴露需求的缺口、歧义与冲突，**从不**为它们自身打分。
 **Readers**: 需要判定「本特性的需求是否已足以从 checklist 放行进 analyze / implement」的复核者——`/speckit.analyze` 的检测者、`/speckit.implement` 的协调者，以及后续接手本线的编写者；他们**不会**重读 owner 文档或测试源码，只依据本清单、被引用的需求行与 `test-evidence/` 的机读读数取结论。
 **Reading scenario**: 复核者打开本文件，要决定三件事：(1) 哪几条需求缺陷必须在 analyze / implement 之前修掉；(2) 哪些 `fail` 可以登记为「已裁定、由下游行承载」而放行；(3) 哪些行属 `blocked-by F-093-004` 或 `not_evaluated`，因而不构成本阶段的放行阻碍。他们按条目末尾的判定位取结论，并沿 `[Req §…]` 锚回到需求正文逐字核对。

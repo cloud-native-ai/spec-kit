@@ -2,7 +2,7 @@
 
 **Branch**: `093-concurrency-by-default` | **Date**: 2026-11-09 | **Spec**: [requirements.md](requirements.md)
 **Requirement → Feature**: `093-concurrency-by-default` → Feature 093 Concurrency by Default（subagent 并发作为框架基本属性）
-**Input**: Specification from `.specify/specs/093-concurrency-by-default/requirements.md` (33 FR / 12 SC / 11 shared strings; requirements + clarify validated 2026-11-09, commits `11d49f18` + `6b291bb7`)
+**Input**: Specification from `.specify/specs/093-concurrency-by-default/requirements.md` (35 FR / 12 SC / 11 shared strings; requirements + clarify validated 2026-11-09, commits `11d49f18` + `6b291bb7`; FR-034/FR-035 added by the analyze-repair 2026-11-09 rulings)
 
 ## Summary
 
@@ -49,7 +49,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 **Project Type**: SDD framework — declaration facts, one Python engine, concept-owner documents, agent definitions, command templates, skills, contract tests. No runtime platform, no scheduler, no daemon.
 **Performance Goals**: no wall-clock promise is the release criterion. The measurable target is **execution shape**: every enumeration-root member mapped to exactly one declaration class, every serial record carrying a resolvable reason code, and at least one real run (not a fixture) reporting an effective concurrency `>= 2` measured as maximum interval overlap (SC-006).
 **Constraints**: no new `/speckit.*` command; no second dispatch engine or registry; no unconditional parallelism; the SDD stage chain and its sentinels byte-unchanged; no push; `templates/` stays project-neutral (no repo-specific path facts); the new engine satisfies the script interface contract (Constitution XXI).
-**Scale/Scope**: 33 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept/owner documents rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 10 new contract test modules; 8 existing test modules dispositioned; 6 contract files carrying 92 clauses.
+**Scale/Scope**: 35 FR / 12 SC; 1 new engine (~5 read-only actions); 8 declaration facts plus their registration probe; 11 concept/owner documents rewritten; 17 agent definitions judged (rewritten only where the coordinator verdict requires it); 29 command templates + 54 skills judged; 10 new contract test modules; 8 existing test modules dispositioned; 6 contract files carrying 94 clauses.
 
 ## Constitution Check
 
@@ -59,7 +59,7 @@ concurrency and runs serially records `mechanism-not-yet-landed`; it never prese
 
 | # | Principle | Compliance | Evidence |
 |---|-----------|------------|----------|
-| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling here cites FR ids; `feature-ref.md` § 1 maps 33/33 FR to contract clauses. |
+| I | Specification-Driven Development (SDD) as Foundation | ✅ Pass | Every design ruling here cites FR ids; `feature-ref.md` § 1 maps 35/35 FR to contract clauses. |
 | II | Feature-Centric Development | ✅ Pass | Feature 093 row and `.specify/memory/features/093.md` advance `Draft → Planned` in this stage; no new Feature invented; the four related Features (064/070/086/092) are dispositioned, never renumbered. |
 | III | Intent-Driven Development | ✅ Pass | The five load-bearing choices carry named antitheses and reopening conditions in § Decision Tensions T-001…T-005, each traced to the user's verbatim brief. |
 | IV | Test-First & Contract-Driven Implementation | ✅ Pass | Tests Mode ON; every SC and every FR group names a red-first module in `contracts/executor-obligations.contract.md` C-060; the 092-shaped fixture must be red before the fix and green after (SC-005). |
@@ -311,17 +311,17 @@ memory.
 |----------|------|---------------|
 | Research | [`research.md`](research.md) | 14 sections (R-1…R-14), each with a measured reading |
 | Data model | [`data-model.md`](data-model.md) | 11 entities (E-1…E-11), 26 validation rules (V-1…V-26), 5 state machines (SM-1…SM-5) |
-| Contracts | [`contracts/`](contracts/) | 6 files: `declaration-facts.contract.md` (C-001…C-018), `judgement-engine.contract.md` (C-019…C-040), `executor-obligations.contract.md` (C-041…C-062), `high-order-executors.contract.md` (C-063…C-078), `existing-semantics-disposal.contract.md` (C-079…C-092), `concurrency-contracts.md` (index only, no clause bodies) |
-| Contract clauses | `contracts/*.contract.md` | 92 clauses (C-001…C-092), counted by `grep -c '^- \*\*C-[0-9][0-9][0-9]\*\*'` over the five clause-bearing files — the pattern matches only a clause definition line anchored at column 0 |
+| Contracts | [`contracts/`](contracts/) | 6 files: `declaration-facts.contract.md` (C-001…C-018), `judgement-engine.contract.md` (C-019…C-040), `executor-obligations.contract.md` (C-041…C-062), `high-order-executors.contract.md` (C-063…C-078, C-093…C-094), `existing-semantics-disposal.contract.md` (C-079…C-092), `concurrency-contracts.md` (index only, no clause bodies) |
+| Contract clauses | `contracts/*.contract.md` | 94 clauses (C-001…C-094), counted by `grep -c '^- \*\*C-[0-9][0-9][0-9]\*\*'` over the five clause-bearing files — the pattern matches only a clause definition line anchored at column 0 (the plan stage shipped 92; C-093/C-094 were added by the analyze-repair 2026-11-09 rulings on FR-034/FR-035) |
 | Quickstart | [`quickstart.md`](quickstart.md) | 7 scenarios (S-0…S-6): S-0 executed against the live tree; S-1…S-6 are **not executable yet** (the engine and facts land at implement) and each names the clause that pins it and the premises it assumes |
-| Feature ref | [`feature-ref.md`](feature-ref.md) | 33 FR map rows, 12 SC map rows, one delivery-surface table, and the 064/070/086/092 overlap adjudication (F-093-001) |
+| Feature ref | [`feature-ref.md`](feature-ref.md) | 35 FR map rows, 12 SC map rows, one delivery-surface table, and the 064/070/086/092 overlap adjudication (F-093-001) |
 | Execution premises | this file | 10 rows, all `verified` |
-| Gates run at this stage | [`test-evidence/`](test-evidence/) | `pre-analyze-check --stage plan` pass (0 error / 44 missing-path advisories, every one a path this feature creates), `validate-decision-tensions` pass (5 records), `decomposition-check --mode plan` proceed (33 FR), `overlap-check` reading retained with the file-level adjudication above |
+| Gates run at this stage | [`test-evidence/`](test-evidence/) | `pre-analyze-check --stage plan` pass (0 error / 44 missing-path advisories, every one a path this feature creates), `validate-decision-tensions` pass (5 records), `decomposition-check --mode plan` proceed (33 FR was the count at that reading; 35 after the analyze-repair added FR-034/FR-035), `overlap-check` reading retained with the file-level adjudication above |
 
 Drift from the Phase 0 expectation: the expectation was "five facts, one engine, about ten contract files"; the
 actual is eight fact entries (the extra three are `concurrency-slot-and-reserve.yaml`, `concurrency-contract.yaml`
 and `coordinator-dispatch-verdict.yaml` — FR-014's slot owner, FR-031's landing discipline, and T-004's refused
-self-adjudication) and 92 clauses against an expected ~70; the extra clauses are the per-stage obligations of
+self-adjudication) and 92 clauses against an expected ~70 (94 after the analyze-repair rulings added C-093/C-094); the extra clauses are the per-stage obligations of
 FR-028 (three loop executors with three advancing grains) and the FR-033 disposal table, both of which are
 assertion surfaces rather than prose.
 
@@ -333,13 +333,43 @@ This feature's own stage must not repeat the defect it fixes. Measured facts, re
   definitions, `P4` contracts and tests, `P5` evidence and overlap adjudication — with `P1 → P2` and
   `P1/P2 → P4` as the only dependency edges; five ready at entry under a permissive reading, three after the
   dependency edges are honoured.
-- **Execution shape actually used**: **serial, one agent, no sibling dispatch**. The executing agent's tool set is
-  `Read, Grep, Glob, Bash, Write, Edit` — it has no Agent/Task tool, so it cannot dispatch siblings. This is
-  precisely the F-093-003 / 092 defect. The honest record is `mechanism-not-yet-landed` ([[STR-010]]),
-  `effective_concurrency = 1`, and **no claim of concurrency**.
+- **Execution shape actually used**: **serial, one agent, no sibling dispatch**. The earlier recording premise —
+  "the executing body holds `Read, Grep, Glob, Bash, Write, Edit` and therefore no dispatch tool" — was **measured
+  false at analyze 2026-11-09 (F-093-012)**: the same host body holds a dispatch tool (the analyze stage itself held
+  it), and a tool set is a per-run probe (RS-005), never a constant. What is genuinely absent is the feature's own
+  mechanism — the declaration facts, the engine, and the fork runner path of FR-035 — so the honest record stays
+  `mechanism-not-yet-landed` ([[STR-010]]), `effective_concurrency = 1`, and **no claim of concurrency**.
 - **What that costs**: SC-006's real-run evidence is deferred to a later run and written as `not_evaluated` here.
   Spec Assumption A4 permits exactly this and forbids substituting fixture data; FR-030/F-093-003 forbid calling
   the serial run a concurrent one.
+
+### The analyze wave and its fork mechanism (user rulings 2026-11-09)
+
+Two dated user rulings landed as FR-034 / FR-035 and C-093 / C-094; this plan is their design-of-record, and the
+conflicts they create are named here instead of being absorbed silently.
+
+- **FR-034 — analyze defaults to N concurrent SDD Analysis Workers.** N comes from the stage's team configuration /
+  the spine's `agent_concurrency_requested`, never from a number in this file. The wave reuses the existing clause
+  forms rather than inventing a third criterion family: file-level read domains per Worker (FR-012) with a
+  pre-dispatch intersection red, deterministic consolidation (declared read-domain order → finding id order;
+  duplicate ids broken by first declaration with a pointer to the suppressed copy), and the
+  `requested / effective / effective_reason` triple plus `executor_id` / `verifier_id` per Worker (FR-008,
+  FR-016). Owners: `skills/external/sdd-loop-driver/SKILL.md` + `references/dispatch-recipes.md` (behaviour),
+  `references/decomposition-model.md` + `decomposition-coverage.yaml` (seats and the default override,
+  [[STR-007]]), `agents/sdd-analysis-worker.agent.md` (the Worker definition). Rows T139–T141.
+- **FR-035 — the concurrency mechanism is the fork model.** Each concurrent unit is a separate `qodercli` child
+  process launched through `skills/external/sdd-loop-driver/scripts/stage-runner.sh` (prompt through stdin,
+  `--output-format stream-json`, completion by stage sentinel); the process pool is bounded by the host's `nproc`
+  **read at dispatch**, never a frozen constant. In-process host-agent fan-out (one process, one CPU core) is not
+  the concurrency mechanism and does not satisfy FR-005(d); FR-005(d)'s external-process branch is the form this
+  ruling fixes. Rows T142–T143.
+- **Recorded conflicts, converged at implement, not mediated here.** (1) `decomposition-model.md` § 20.1 currently
+  sets `analyze` to `off`; FR-034 requires the default to be N-way concurrent — one explicit revision of the
+  [[STR-007]] entry and that section converges them. (2) `references/dispatch-recipes.md` § 本地原生拓扑 and
+  `SKILL.md`'s topology line currently say local stage dispatch MUST NOT launch `qodercli` and MUST use host-native
+  subagents; FR-035 reverses that default for the concurrency mechanism — the same explicit revision (FR-033
+  disposal list) converges them. Editing either rule in this stage would have decided the user's ruling by
+  paraphrase; the ledger in `notes/analyze-repair.md` records both conflicts and the refused in-place edits.
 
 ## Complexity Tracking
 
@@ -352,7 +382,7 @@ none is invented.
 |---|------|-----------|--------|-----------|
 | R-1 | The fact entries restate values that existing owners already hold and drift on the next edit. | Medium | High | T-001 and FR-033: every existing restatement becomes a projection in the same change; `test_concurrency_declarations.py` asserts there is no second assignable value per face. |
 | R-2 | "Every enumerated executor maps to exactly one class" turns red for executors nobody has classified. | High | Medium | The class table's decision rule is mechanical (layer plus produced shape); an unsatisfiable input reports `uncovered` and goes red by design — that is SC-001's requirement, and the red list is P3's task list. |
-| R-3 | The 092 reproduction fixture cannot go green because the host still has no dispatch tool. | Medium | High | The fixture asserts the *static* side (declaration without capability and without handoff ⇒ red) and the *record* side (all units by one executor with no overlap ⇒ inconsistency); neither needs a live dispatch. |
+| R-3 | The 092 reproduction fixture is read as needing a live dispatch capability. | Medium | High | The fixture asserts the *static* side (declaration without capability and without handoff ⇒ red) and the *record* side (all units by one executor with no overlap ⇒ inconsistency); neither needs a live dispatch. The earlier premise "the host still has no dispatch tool" was measured false at analyze (F-093-012) — the host holds one, and the fixture rests on neither. |
 | R-4 | `concurrency-check.py` becomes a fifth gate engine whose exit taxonomy drifts from `wp-gate.py`. | Medium | Medium | C-019 reuses the 0/1/2 taxonomy and the script interface contract; the engine is read-only except `--json-out` and never writes the spine. |
 | R-5 | SC-006's real-run evidence cannot be produced inside this feature's implement stage. | High | Medium | Declared `not_evaluated` with the carrier named (A4); stated in § Concurrency plan rather than filled with fixtures. |
 | R-6 | Downstream projects inherit facts their `shared/declarations/` cannot read. | Low | Medium | Facts use only the allowed YAML subset (`contract.yaml` `yaml_subset: block-subset/v1`); `declaration_reader.py` is the same file downstream receives. |

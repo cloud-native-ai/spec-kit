@@ -37,7 +37,8 @@ python3 -c "import json;d=json.load(open('/tmp/classify.json'));print(d['decisio
 **A passer sees**: `decision: pass`, zero `uncovered` and zero `ambiguous` findings, and `measured` listing the
 member counts per root **as enumerated** (measured 2026-11-09 in this worktree: 38 `skills/internal` dirs /
 16 `skills/external` dirs / 29 `templates/commands` stems / 17 `agents/*.agent.md` files / 12 `.specify/teams` slugs /
-6 `.specify/goal` slugs — the counts move, the *patterns* are the assertion, R-6).
+6 `.specify/anchoring` slugs — the counts move, the *patterns* are the assertion, R-6; the anchoring tree was
+`.specify/goal` before the 090 rename merged on 2026-11-09).
 
 **Failure means**: a body was added without a class (add the root, not a whitelist entry, C-005/C-024).
 

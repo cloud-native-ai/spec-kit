@@ -1,5 +1,7 @@
 # Checkpoint 03 — plan
 
+> **Correction (2026-11-09, analyze-repair · F-093-012)**: the claim in §3 that "the executing agent has no dispatch tool" is false — the executing body holds a host dispatch tool (measured by the analyze stage itself), and a tool set is a per-run probe, not a constant. The body of this dated checkpoint is left as written; the corrected premise lives in `plan.md` § Concurrency plan and the ledger `notes/analyze-repair.md` § F-093-012.
+
 ## 1. Artifact verification
 - sentinel target: `plan.md` + the Phase 1 set (`research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `feature-ref.md`)
 - live counts, taken from each file: `plan.md` 385 lines and exactly **one** `# Implementation Plan:` heading (no residual placeholder); `research.md` **14** sections (R-1…R-14); `data-model.md` **11** entities / **26** validation rules / **5** state machines; `contracts/` **6** files carrying **92** clauses (C-001…C-092, counted by `grep -c '^- \*\*C-[0-9][0-9][0-9]\*\*'` over the five clause-bearing files); `quickstart.md` **7** scenarios (S-0…S-6); `feature-ref.md` **33** FR map rows + **12** SC map rows, verified against the requirement ids by a set differ (no gap, no alias)
