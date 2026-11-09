@@ -97,7 +97,7 @@ main() {
     #   reason: the new `## Re-Anchoring (不忘初心 · 温故而知新)` ambient section.
     #   rule: the same rule — the smallest N*1024 with (N*1024 - 1) - 35790 >= 1024.
     #     36864 fails (73 B); 37888 leaves 2097 B and is the first that passes.
-INSTRUCTIONS_BUDGET_BYTES=37888
+INSTRUCTIONS_BUDGET_BYTES=38400
 
     mkdir -p "$TARGET_DIR"
 

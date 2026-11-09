@@ -43,6 +43,9 @@
 - **The audit's primary object is the RULES, not the goal.** The current action and the next one already carry
   the goal; a dropped rule leaves no trace in them (the canonical failure: "unattended" was ignored — package
   boundaries asked for permission and the spine lagged — while the work itself kept advancing step by step).
+  So the rule verdict and the action it licenses are stated **before** any goal statement: the first question
+  asks the rules, the last two ask the process and the territory, and the goal is asked by no question of its
+  own.
 - Answer five binary questions, each with a path or a reading as evidence:
   1. Which rules govern this step, and is each still in force (`unattended` / no approval request / U4 -> next
      stage / spine written before acting / `workspace-guard --check` / fast-fail / the gate discipline / budget)?

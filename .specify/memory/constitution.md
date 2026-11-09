@@ -493,7 +493,7 @@ task and rules in view, and MUST re-confirm them after every core step:
 - **不忘初心 (Never Forget the Initial Rules and Task)**: the entry anchor MUST persist BOTH the task
   anchor (goal verbatim, non-goals, acceptance authority, stage plan, decision gates) AND the RULE anchor
   (the operating rules in force: unattended / no approval request / U4 -> next stage / spine before action /
-  workspace guard / fast-fail / the gate discipline / budget). A compaction, handoff or reentry MUST resume
+  workspace guard / fast-fail / the gate discipline / budget and report discipline). A compaction, handoff or reentry MUST resume
   from that anchor, never from memory or impression.
 - **温故而知新 (Review the Old, Know the New)**: after every core step (stage U4, package
   boundary, checkpoint, subagent return), the agent MUST run compact -> reload -> evaluate and

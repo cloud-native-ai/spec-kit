@@ -1,3 +1,6 @@
-# four-module node census — 2026-11-08T23:10:14Z
+# contract-suite collection on the implement tree — 2026-11-08T23:47:47Z
+$ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest -m contract -q --collect-only
 
-131 tests collected in 0.14s
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4715/8063 tests collected (3348 deselected) in 2.04s
+exit=0

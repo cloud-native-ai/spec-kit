@@ -1,0 +1,30 @@
+# T013 — red-first capture, before any ordering assertion exists — 2026-11-08T23:48:14Z
+# purpose: prove the tree carries NO ordering assertion today, so the row that adds one is red-first.
+
+$ grep -nE "def test_" tests/contract/test_sdd_loop_driver_reanchor.py
+21:def test_five_parts_and_direction_audit():
+32:def test_reload_tiers_are_bounded():
+40:def test_skill_carries_the_rule_and_the_owner_pointer():
+47:def test_minimal_shape_has_part_five():
+
+$ grep -cE "def test_" tests/contract/test_sdd_loop_driver_reanchor.py
+4
+
+$ grep -rnE "primary object is the RULES|Q1 rules" tests/ --include=*.py
+exit=1  (1 = no hit: no assertion reads the rules-first ordering)
+
+$ /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q --tb=no -rA  # pre-change reading
+....                                                                     [100%]
+=========================== short test summary info ============================
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_five_parts_and_direction_audit
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_reload_tiers_are_bounded
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_skill_carries_the_rule_and_the_owner_pointer
+PASSED tests/contract/test_sdd_loop_driver_reanchor.py::test_minimal_shape_has_part_five
+4 passed in 0.05s
+
+$ /usr/bin/python3 -m pytest <the four modules> -q --tb=no   # pre-change reading, whole guard surface
+FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
+2 failed, 129 passed in 1.85s
+
+# reading: 4 tests in the modal module, none asserting order; 129 passed / 2 failed over the four modules.
+# the two failures are the pre-existing pair in tasks-baseline-failed.txt.

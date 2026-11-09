@@ -117,7 +117,7 @@ Every functional, non-read-only script answers `-h` / `--help` and `--version` w
 
 ## Re-Anchoring (不忘初心 · 温故而知新)
 
-Every agent keeps its entry anchor — the task ANCHOR and the RULES in force (unattended / no approval request / U4 -> next / spine before action / workspace guard / fast-fail / gates) — across compactions, and after every core step re-reads the RULES first, recording `on-track` / `correction-applied` / `decision-needed`; the loop is compact -> reload -> evaluate at T0/T1/T2 tiers. The rule's full definition is owned by `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated; it adds a reviewing habit, not machinery.
+Every agent keeps its entry anchor — the task ANCHOR and the RULES in force (unattended / no approval request / U4 -> next / spine before action / workspace guard / fast-fail / gates / budget and report discipline) — across compactions, and after every core step re-reads the RULES first, recording `on-track` / `correction-applied` / `decision-needed`; the loop is compact -> reload -> evaluate at T0/T1/T2 tiers. The rule's full definition is owned by `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated; it adds a reviewing habit, not machinery.
 
 ## Task Complexity Rubric
 

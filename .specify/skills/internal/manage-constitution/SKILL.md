@@ -258,7 +258,8 @@ Before processing the template, scan the project to understand its actual contex
     extra command, or a new mandatory workflow step.
   - **Re-Anchoring (不忘初心 · 温故而知新)** — every agent (including a dispatched subagent) keeps
     its entry anchor — the task anchor AND the RULE anchor (unattended / no approval request /
-    U4 -> next stage / spine before action / workspace guard / fast-fail / gates) — across
+    U4 -> next stage / spine before action / workspace guard / fast-fail / gates / budget and
+    report discipline) — across
     compactions and, after every core step, re-reads the RULES first via compact -> reload ->
     evaluate at T0/T1/T2, yielding `on-track` / `correction-applied` / `decision-needed`. The full
     definition lives at `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be

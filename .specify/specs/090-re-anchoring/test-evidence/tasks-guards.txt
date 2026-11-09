@@ -1,5 +1,8 @@
-# tasks-stage guard run — 2026-11-08T23:09:51Z
+# implement-stage guard baseline — 2026-11-08T23:47:41Z
 $ SPECKIT_PYTHON=/usr/bin/python3 /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py tests/contract/test_sdd_loop_driver_reanchor.py tests/contract/test_constitution_double_landing.py tests/contract/test_fast_fail_discipline.py -q --tb=no -rA
+........................................................................ [ 54%]
+............................F.....................F........              [100%]
+=========================== short test summary info ============================
 PASSED tests/contract/test_reanchoring_contract.py::test_owner_document_carries_both_concepts_and_the_tiers
 PASSED tests/contract/test_reanchoring_contract.py::test_both_constitution_surfaces_carry_the_principle
 PASSED tests/contract/test_reanchoring_contract.py::test_both_instruction_surfaces_carry_the_ambient_section
@@ -132,3 +135,4 @@ PASSED tests/contract/test_fast_fail_discipline.py::test_g17_mirrors_produced_by
 FAILED tests/contract/test_fast_fail_discipline.py::test_i11_channel_two_mirrors_and_per_tool_copies
 FAILED tests/contract/test_fast_fail_discipline.py::test_g9_total_equals_frozen_baseline
 2 failed, 129 passed in 1.83s
+exit=1

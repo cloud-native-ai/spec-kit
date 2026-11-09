@@ -1,0 +1,12 @@
+# T038 — does any row measure a divergence from the owner page's own contract? — 2026-11-08T23:59:45Z
+$ /usr/bin/python3 -m pytest tests/contract/test_reanchoring_contract.py -q
+....                                                                     [100%]
+4 passed in 0.05s
+
+# the four owner-page clauses (re-anchoring-faces C-1, C-2, C-8 and C-7 as a consumer judgment)
+# were re-read in sc001-faces.txt on this tree and all hold; the only owner-page edit this stage
+# made was the rule-anchor member set (F-08), which ADDS the closed-set sentence the instruction
+# asked for and changes no clause the contract asserts.
+# Divergences measured: none.
+# Conclusion: T038 closes as a NO-OP — no re-authoring, no mirror re-projection beyond the
+# sync-mirrors.py --write pass already recorded in mirrors-tasks.txt.

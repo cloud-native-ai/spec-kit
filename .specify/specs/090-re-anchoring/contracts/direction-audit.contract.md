@@ -40,9 +40,12 @@ The protocol MUST order the audit so that the rule verdict and the action it lic
 statement, and MUST NOT ask the goal as a separate question (the goal is implicit in Q3: "is the next action the one
 the plan or assignment names?").
 
-**Status**: this ordering is *stated* in the protocol and is **not yet asserted by any test** (recorded gap,
-`guard-tests.contract.md` C-7). Until C-7 lands, C-6 is a documentation proposition only, and no green check may be
-cited as its evidence.
+**Status (implement stage, 2026-11-09)**: **asserted**. The ordering sentence lives at
+`skills/external/sdd-loop-driver/references/checkpoint-protocol.md` § 5 ("So the rule verdict and the action it
+licenses are stated **before** any goal statement ..."), and
+`tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal`
+is the guard that reds when it stops holding, with three mutant arms in `test-evidence/ordering-red-control.txt`.
+The former "documentation proposition only" reading is kept here as the record of what changed, never rewritten away.
 
 (FR-005)
 

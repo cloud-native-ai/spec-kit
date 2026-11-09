@@ -54,8 +54,13 @@ rules first. Acceptance form:
 - **Same test**: the rule-order assertion and the "verdict/action precedes the goal restatement" assertion live in one
   test function, per the clarify C-4 tightening of `SC-002`.
 
-**Status**: OPEN. This is the single compliance gap this plan carries (`plan.md` § Complexity Tracking row IV). It is
-task work with a red-first obligation, never a plan-time claim.
+**Status (implement stage, 2026-11-09)**: **CLOSED**. The guard is
+`tests/contract/test_sdd_loop_driver_reanchor.py::test_direction_audit_asks_the_rules_first_and_states_the_verdict_before_any_goal`
+- one test function asserting the rules-first statement, Q1 asking the rules with the eight-rule set inline, the
+minimal shape printing the rules line first, and the verdict/action preceding any goal statement. Red control: one
+landed-pass arm and three mutant-fail arms in `test-evidence/ordering-red-control.txt`. The row that closed it is
+`tasks.md` T014, red-first captured by T013. The gap was the single compliance gap this plan carried (`plan.md`
+§ Complexity Tracking row IV); the paragraph below is that plan-time reading, kept as the record of what changed.
 
 **C-8** — The baseline is measured, never assumed green
 
