@@ -955,8 +955,296 @@ def action_reading(repo, args):
     return envelope("reading", "fail" if findings else "pass", findings, measured)
 
 
+# --------------------------------------------------------------------------- #
+# decomposition coverage and goal-target partition (C-035/C-036, T113, T119)
+# --------------------------------------------------------------------------- #
+#: The document surfaces where a competing "which stages decompose" rule could live.
+#: Tests and fixtures are assertions over the rule, not sources of it, and are excluded.
+FOURTH_SOURCE_SURFACES = (
+    "shared", "skills", "templates", "agents", "docs/reference",
+    ".specify/skills", ".specify/shared", ".specify/templates", ".specify/memory",
+)
+FOURTH_SOURCE_EXTRA = (".specify/instructions.md",)
+
+
+def tracked_files(repo):
+    """Tracked files when ``repo`` is itself the git root; a walk otherwise.
+
+    A fixture under a parent checkout must not inherit the parent's index: when
+    ``rev-parse --show-toplevel`` is not the given root, the walk is the honest source.
+    """
+    try:
+        top = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"], cwd=str(repo), check=True,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        top_path = Path(top.stdout.decode("utf-8", "replace").strip()).resolve()
+        if top_path != Path(repo).resolve():
+            return None
+        result = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=str(repo), check=True,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        names = [name for name in result.stdout.decode("utf-8", "replace").split("\0") if name]
+        return names
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def read_spine_project_config(repo, keys):
+    """``[(spine path, {key: raw value})]`` for every state spine carrying one of ``keys``."""
+    spines = []
+    state_dir = repo / ".specify" / "state"
+    if not state_dir.is_dir():
+        return spines
+    for path in sorted(state_dir.glob("*.md")):
+        values = {}
+        in_config = False
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for line in lines:
+            if re.match(r"^project_config:\s*$", line):
+                in_config = True
+                continue
+            if in_config:
+                if line and not line.startswith((" ", "\t")):
+                    break
+                match = re.match(r"^  ([A-Za-z0-9_]+):\s*(.*)$", line)
+                if match:
+                    values[match.group(1)] = match.group(2).strip()
+        if any(key in values for key in keys):
+            spines.append((path.relative_to(repo).as_posix(), values))
+    return spines
+
+
+def parse_spine_list(value):
+    """A spine value ``[plan, implement]`` or ``a=auto`` form as a list, or ``None``."""
+    text = str(value or "").strip()
+    if text.startswith("[") and text.endswith("]"):
+        return [item.strip().strip("\"'") for item in text[1:-1].split(",") if item.strip()]
+    return [text] if text else []
+
+
+def find_fourth_sources(repo, keys, allowed):
+    """Files that assign one of the spine keys outside the fact and the spines (C-036)."""
+    assignment = re.compile(
+        r"^\s*[-*]?\s*(%s)\s*:" % "|".join(re.escape(key) for key in keys))
+    hits = []
+    names = tracked_files(repo)
+    if names is None:
+        names = []
+        for surface in FOURTH_SOURCE_SURFACES:
+            base = repo / surface
+            if base.is_dir():
+                names.extend(p.relative_to(repo).as_posix() for p in base.rglob("*")
+                             if p.is_file())
+        names.extend(FOURTH_SOURCE_EXTRA)
+    for name in names:
+        if name in allowed:
+            continue
+        if not (name.endswith((".md", ".yaml", ".yml", ".py", ".sh", ".txt"))):
+            continue
+        in_surface = any(name == surface or name.startswith(surface + "/")
+                         for surface in FOURTH_SOURCE_SURFACES) or \
+            name in FOURTH_SOURCE_EXTRA or name.startswith(".specify/state/")
+        if not in_surface:
+            continue
+        path = repo / name
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for line_number, line in enumerate(text.splitlines(), 1):
+            match = assignment.match(line)
+            if match:
+                hits.append({"file": name, "line": line_number, "key": match.group(1)})
+    return hits
+
+
+def read_goal_targets(repo):
+    """``[(goal slug, [(target id, status)])]`` from the anchoring goal definitions."""
+    goals = []
+    anchoring = repo / ".specify" / "anchoring"
+    if not anchoring.is_dir():
+        return goals
+    for goal_dir in sorted(p for p in anchoring.iterdir() if p.is_dir()):
+        goal_file = goal_dir / "goal.md"
+        if not goal_file.is_file():
+            continue
+        targets = []
+        in_targets = False
+        try:
+            lines = goal_file.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for line in lines:
+            if re.match(r"^##\s+Targets\s*$", line):
+                in_targets = True
+                continue
+            if in_targets and line.startswith("## "):
+                break
+            if not in_targets:
+                continue
+            match = re.match(r"^\|\s*(T-[0-9]+)\s*\|\s*(.*?)\s*\|\s*([A-Za-z]+)\s*\|", line)
+            if match:
+                targets.append((match.group(1), match.group(3).lower()))
+        goals.append((goal_dir.name, targets))
+    return goals
+
+
 def action_coverage(repo, args):
-    return _not_implemented("coverage")
+    """C-035/C-036: per-stage coverage, the spine relation and goal-target partitions."""
+    statement = fact_statement(
+        load_fact(repo, "decomposition-coverage"), "decomposition-coverage")
+    slot_statement = fact_statement(
+        load_fact(repo, "concurrency-slot-and-reserve"), "concurrency-slot-and-reserve")
+    stages = [entry for entry in (statement.get("stages") or []) if isinstance(entry, dict)]
+    coverage_values = [str(value).strip() for value in (statement.get("coverage_values") or [])]
+    spine_relation = statement.get("spine_relation") or {}
+    spine_keys = list(spine_relation.keys())
+    fourth_source_rule = str(statement.get("fourth_source_of_stage_coverage", "defect"))
+
+    findings = []
+    by_stage = {str(entry.get("stage", "")).strip(): entry for entry in stages}
+    selected = stages
+    if args.stage:
+        if args.stage not in by_stage:
+            findings.append(finding(
+                "coverage-undeclared", args.stage,
+                "stage %r is not declared in decomposition-coverage.yaml" % args.stage,
+                "shared/declarations/facts/decomposition-coverage.yaml"))
+        selected = [by_stage[args.stage]] if args.stage in by_stage else []
+
+    max_turns_budget = (slot_statement.get("unit_budget") or {})
+    cell_statement = {}
+    for entry in selected:
+        stage = str(entry.get("stage", "")).strip()
+        coverage = str(entry.get("coverage", "")).strip()
+        cell = {"coverage": coverage}
+        if coverage_values and coverage not in coverage_values:
+            cell["decision"] = "invalid-coverage-value"
+            findings.append(finding(
+                "coverage-undeclared", stage,
+                "coverage %r is outside the closed values %s" % (coverage, coverage_values),
+                "shared/declarations/facts/decomposition-coverage.yaml"))
+        elif coverage == "off":
+            decision = entry.get("decision") or entry.get("decision_reason")
+            if decision:
+                cell["decision"] = "disabled"
+                cell["decision_record"] = str(decision)
+            else:
+                cell["decision"] = "coverage-undeclared"
+                findings.append(finding(
+                    "coverage-undeclared", stage,
+                    "stage %r stays serial (coverage=off) with no named decision record"
+                    % stage, "shared/declarations/facts/decomposition-coverage.yaml"))
+        elif coverage == "on":
+            cell["decision"] = "covered"
+            if entry.get("concurrency_source"):
+                cell["concurrency_source"] = entry.get("concurrency_source")
+        else:
+            cell["decision"] = "covered-by-default"
+            if statement.get("single_package_decision_required"):
+                cell["single_package_decision_required"] = True
+        cell_statement[stage] = cell
+
+    allowed = {"shared/declarations/facts/decomposition-coverage.yaml",
+               ".specify/shared/declarations/facts/decomposition-coverage.yaml",
+               "shared/declarations/facts/concurrency-slot-and-reserve.yaml"}
+    spines = read_spine_project_config(repo, spine_keys)
+    # Every state spine IS the projection surface (one per feature line, each a run-scoped
+    # projection), so a key inside `.specify/state/**` is never a "fourth place"; a fourth
+    # place is an authored document outside the fact and the spines.
+    state_dir = repo / ".specify" / "state"
+    if state_dir.is_dir():
+        allowed.update(p.relative_to(repo).as_posix() for p in state_dir.glob("*.md"))
+    allowed.update(path for path, _values in spines)
+    fourth = find_fourth_sources(
+        repo, spine_keys + ["decomposition_stages", "decomposition_slot_cap"], allowed)
+    for hit in fourth:
+        findings.append(finding(
+            "fourth-source", hit["file"],
+            "a fourth source of 'which stages decompose' is readable at %s:%d (%s); the "
+            "fact is the owner and the spine keys are its projections (%s)"
+            % (hit["file"], hit["line"], hit["key"], fourth_source_rule),
+            "%s:%d" % (hit["file"], hit["line"]), compared=[spine_keys, hit["key"]]))
+
+    feature_opt_out = False
+    spine_report = []
+    slot_cap = numeric_reading(slot_statement.get("slot_cap_default"))
+    for path, values in spines:
+        relation = {"spine": path, "keys": {}, "relation": "projection"}
+        for key in spine_keys:
+            if key not in values:
+                continue
+            relation["keys"][key] = values[key]
+        decomposition = str(values.get(spine_keys[0], "")).strip().strip("\"'") \
+            if spine_keys else ""
+        if decomposition == "off":
+            feature_opt_out = True
+        stages_key = spine_keys[1] if len(spine_keys) > 1 else None
+        if stages_key and stages_key in values:
+            projected = parse_spine_list(values[stages_key])
+            if projected:
+                missing = [stage for stage in by_stage if stage not in projected]
+                relation["stages_not_projected"] = missing
+        slot_key = spine_keys[2] if len(spine_keys) > 2 else None
+        if slot_key and numeric_reading(values.get(slot_key)) is not None and slot_cap:
+            relation["slot_cap_matches_fact"] = (
+                numeric_reading(values.get(slot_key)) == slot_cap)
+        spine_report.append(relation)
+    if feature_opt_out:
+        for cell in cell_statement.values():
+            cell["feature_opt_out"] = "disabled"
+
+    ceiling, ceiling_source = read_gate_ceiling(repo, args.ceiling)
+    reserve = numeric_reading(slot_statement.get("verifier_reserve")) or 0
+    operands = [value for value in (slot_cap, ceiling) if value is not None]
+    bound = min(operands) if operands else None
+    available = (bound - reserve) if bound is not None else None
+    degradation = str(slot_statement.get("degradation_rule", ""))
+    reason_match = re.search(r"([a-z][a-z-]+) code", degradation)
+    degrade_code = reason_match.group(1) if reason_match else "budget-reserve"
+
+    goals_report = []
+    for goal, targets in read_goal_targets(repo):
+        if args.goal and goal != args.goal:
+            continue
+        open_targets = [target for target, status in targets if status == "open"]
+        record = {
+            "goal": goal,
+            "targets": len(targets),
+            "open_targets": open_targets,
+            "stage_coverage": {stage: cell["decision"]
+                               for stage, cell in cell_statement.items()},
+        }
+        if len(open_targets) >= 2 and available is not None:
+            if available < 2:
+                record["packages"] = []
+                record["serial_reason"] = degrade_code
+                record["effective_available"] = available
+            else:
+                record["effective_available"] = available
+                record["packages"] = [open_targets[i:i + available]
+                                      for i in range(0, len(open_targets), available)]
+        else:
+            record["packages"] = [open_targets] if open_targets else []
+        goals_report.append(record)
+
+    measured = {
+        "stages": cell_statement,
+        "spine_relation": spine_report,
+        "bound": {
+            "slot_cap": slot_cap,
+            "ceiling": ceiling,
+            "ceiling_source": ceiling_source,
+            "verifier_reserve": reserve,
+            "effective_available": available,
+        },
+        "goals": goals_report,
+        "unit_budget": max_turns_budget,
+    }
+    return envelope("coverage", "fail" if findings else "pass", findings, measured)
 
 
 # --------------------------------------------------------------------------- #
