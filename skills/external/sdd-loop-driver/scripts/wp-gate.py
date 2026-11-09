@@ -1057,6 +1057,51 @@ def _read_territory(package, repo_root):
     return _path_set(package.get("read_only_paths"), repo_root)
 
 
+def _is_directory_level_entry(raw, repo_root):
+    """A write-domain entry is directory-level when it names a region, not a file.
+
+    FR-012 requires a file-level path set: an entry that contains a glob
+    metacharacter, or that resolves to an existing directory under the repo,
+    declares a directory region and is red. A entry that does not resolve to an
+    existing directory is treated as a declared (future) file path.
+    """
+    if any(character in raw for character in "*?["):
+        return True
+    return os.path.isdir(_normalize_repo_path(raw, repo_root))
+
+
+def _write_domain_findings(packages, repo_root):
+    """WG-15 unit-level form: a non-read-only unit needs a non-empty file-level domain."""
+    findings = []
+    for package in packages:
+        if package.get("kind") != "write":
+            continue
+        wp_id = package["wp_id"]
+        raw_paths = [
+            raw for raw in (package.get("owned_paths") or []) if _is_text(raw)
+        ]
+        if not raw_paths:
+            findings.append(
+                _finding(
+                    "write-domain-empty",
+                    wp_id,
+                    "non-read-only unit declares no write domain",
+                )
+            )
+            continue
+        for raw in raw_paths:
+            if _is_directory_level_entry(raw, repo_root):
+                findings.append(
+                    _finding(
+                        "write-domain-directory",
+                        wp_id,
+                        "write domain entry is a directory-level region, not a "
+                        "file-level path: %s" % raw,
+                    )
+                )
+    return findings
+
+
 def _concurrent_candidates(packages, graph, slot_cap):
     """Read-only packages that can overlap an independent peer under the slot cap."""
     if not (_is_int(slot_cap) and slot_cap >= 2):
@@ -1093,6 +1138,7 @@ def _append_unique(findings, finding):
 def _preflight_findings(plan, packages, graph, manifest, slot_ceiling, repo_root):
     """WG-14 manifest coverage/forbidden, WG-15 territories, WG-16 slot cap/isolation."""
     findings = []
+    findings.extend(_write_domain_findings(packages, repo_root))
     for package in packages:
         wp_id = package["wp_id"]
         owned = _write_territory(package, repo_root)
