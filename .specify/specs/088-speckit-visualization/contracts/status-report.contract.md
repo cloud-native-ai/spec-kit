@@ -1,6 +1,6 @@
 # Contract: Status Report (content, attribution, carrier, cadence profile)
 
-**Feature**: 087 | **Covers**: FR-003, FR-004, FR-007, FR-014, FR-015, FR-020
+**Feature**: 088 | **Covers**: FR-003, FR-004, FR-007, FR-014, FR-015, FR-020
 **Contract object**: the shape of one emitted status line and the rules that decide *when* and *where* it lands.
 This contract is consumed by `data-model.md` E2 and E6 and judged by `status-digest.py --action guard` plus the
 contract test.

@@ -1,6 +1,6 @@
 ---
-name: 087 Reporting Dogfood
-slug: 087-reporting-dogfood
+name: 088 Reporting Dogfood
+slug: 088-reporting-dogfood
 description: Spec-local dogfood team proving the reporting obligation end to end — a real >90 s verification run with a reporter seat emitting attributed status lines on cadence.
 scope: spec
 spec_dir: .specify/specs/088-speckit-visualization

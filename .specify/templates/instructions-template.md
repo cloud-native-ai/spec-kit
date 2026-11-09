@@ -224,6 +224,7 @@ Full philosophy, the load-bearing criteria and where each kind of answer belongs
 ## Knowledge Recording & Promotion
 
 Every non-derivable takeaway from a run MUST be recorded before wrap-up; normative rules belong in their owner document. A point the user keeps emphasizing MUST be promoted into the main flow (owner, ambient surface, guard), not merely recorded. Scope, threshold, evidence: `.specify/shared/guidelines/knowledge-promotion.md`.
+**Non-Disposable (不可一次性处置)**: history is a required input, not a use-and-throw store — a carrier that no longer holds MUST be reviewed and then disposed, never silently retained; the definition, the closed sets and the disposal criteria are owned by `.specify/shared/definitions/non-disposable-definitions.md`.
 
 ## ID Register (编号登记)
 

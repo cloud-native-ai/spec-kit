@@ -1,5 +1,5 @@
 ---
-name: SDD Temporary Team 086
+name: SDD Temporary Team 089
 slug: 089-script-interface-contract
 description: Run-scoped SDD team for Feature 089 — script interface contract, governance landings, checker engine, and backfill.
 scope: spec

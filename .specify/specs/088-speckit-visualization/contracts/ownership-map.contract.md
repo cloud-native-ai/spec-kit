@@ -1,6 +1,6 @@
 # Contract: Ownership Map and Zero-New-Machinery Audit
 
-**Feature**: 087 | **Covers**: FR-018, FR-024, FR-025, FR-028, FR-029, SC-006, SC-008, SC-010, SC-012, SC-014
+**Feature**: 088 | **Covers**: FR-018, FR-024, FR-025, FR-028, FR-029, SC-006, SC-008, SC-010, SC-012, SC-014
 **Contract object**: the ownership relations this feature creates, and the mechanically decidable audit that it
 introduced nothing it prohibits. Every clause is judged over the delivered changed-file set (`base..head` plus the
 working tree at implementation time).

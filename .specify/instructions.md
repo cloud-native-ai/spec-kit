@@ -119,6 +119,8 @@ Every functional, non-read-only script answers `-h` / `--help` and `--version` w
 
 Every agent keeps its entry anchor — the task ANCHOR and the RULES in force (unattended / no approval request / U4 -> next / spine before action / workspace guard / fast-fail / gates / budget and report discipline) — across compactions, and after every core step re-reads the RULES first, recording `on-track` / `correction-applied` / `decision-needed`; the loop is compact -> reload -> evaluate at T0/T1/T2 tiers. The rule's full definition is owned by `.specify/shared/definitions/re-anchoring-definitions.md` and MUST be referenced, not restated; it adds a reviewing habit, not machinery.
 
+**Non-Disposable (不可一次性处置)**: history is a required input, not a use-and-throw store — a carrier that no longer holds MUST be reviewed and then disposed, never silently retained; the definition, the closed sets and the disposal criteria are owned by `.specify/shared/definitions/non-disposable-definitions.md`.
+
 ## Task Complexity Rubric
 
 Right-size thinking: under-thinking complex or high-stakes work causes defects and rework (a **quality** cost); over-thinking trivial work wastes time and adds noise (an **efficiency** cost). Classify by scope, uncertainty, blast radius, cross-cutting impact and requirements clarity, then take the matching depth — **Trivial → Minimal**, **Standard → Moderate**, **Complex → Deep**, **High-stakes/Ambiguous → Exhaustive**. Tie-break to the **higher tier**; treat unclassifiable work as **Standard** (the default), and unclear requirements as themselves a High-stakes signal — clarify first.

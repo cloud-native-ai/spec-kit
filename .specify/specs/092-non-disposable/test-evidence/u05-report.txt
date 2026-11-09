@@ -1,0 +1,11 @@
+u05 — 090 ordering guard repaired (092 G1 additive leg + G2 tautology); one file touched, not committed
+file: tests/contract/test_sdd_loop_driver_reanchor.py (+86/-11); refactor to _rule_first_verdict(text) -> (bool, reason), all prior legs kept
+G2: `first_no = "1"; assert first_no == "1"` removed; the first numbered item's number and the next item's number are now read from the text (== 1, == 2)
+G1: new leg 4 — inside part 5 no goal-verdict heading (`goal verdict` / `goal first`) may precede the "rule verdict ... before any goal statement" sentence
+G1 mutant: temp copy of skills/external/sdd-loop-driver/references/checkpoint-protocol.md with exactly one inserted line
+  `  Goal verdict: on-track — goal first` placed immediately before "So the rule verdict and the action it licenses are stated" (ndiff: one '+' line, no other change)
+  unmutated copy -> (True, 'the rule verdict is stated before any goal statement')
+  mutated copy   -> (False, "ordering: a goal verdict is stated before the rule verdict ('Goal verdict' appears ahead of the rules-first sentence)")
+  position control: the same line inserted after that sentence keeps the verdict green (the leg compares positions, it is not a text ban)
+command: pytest tests/contract/test_sdd_loop_driver_reanchor.py -q -> 6 passed
+U05-DONE

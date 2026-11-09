@@ -508,15 +508,17 @@ def test_c015_exit_code_is_non_zero_iff_a_pass_failed(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
-# C-016 — byte-identical carriers
+# C-016 — carriers under the declared projection (superseded clause)
 # --------------------------------------------------------------------------- #
 @MARK_CONTRACT
-def test_c016_runner_carriers_are_byte_identical():
+def test_c016_runner_carriers_follow_the_declared_projection():
     """C-016 under the declared projection: the mirror equals source + bash-version-guard.
 
-    Byte identity was the pre-089 form. `run-tests.sh` now carries the projected version
-    answer, so the pair is judged by the projection the sync engine declares (C-34/C-35),
-    not by raw equality — the mirror is still generated, never hand-edited.
+    086's C-016 asked for byte identity. That carriage clause is **superseded by
+    `.specify/specs/089-script-interface-contract/contracts/mirror-projection.contract.md`**
+    (source + declared projection, C-34/C-35): `run-tests.sh` now carries the projected
+    version answer, so the pair is judged by the projection the sync engine declares, not
+    by raw equality — the mirror is still generated, never hand-edited (089 C-33).
     """
     import importlib.util
 

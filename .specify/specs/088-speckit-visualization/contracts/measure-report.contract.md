@@ -1,6 +1,6 @@
 # Contract: `/speckit.measure` — the read-only measurement report
 
-**Feature**: 087 | **Covers**: FR-026, FR-027, FR-028, FR-029, SC-013, SC-014
+**Feature**: 088 | **Covers**: FR-026, FR-027, FR-028, FR-029, SC-013, SC-014
 **Contract object**: (a) the thin command `templates/commands/measure.md` (entry `/speckit.measure`) and the
 per-tool copies the existing generator produces; (b) the deterministic script `scripts/python/measure.py` with its
 declared actions, window, selection, cap, aggregation and closed exit-status set; (c) the one reading it shares

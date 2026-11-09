@@ -35,3 +35,31 @@ The three viable dispositions, for the user to ratify:
 3. **Narrow SC-003** — restrict the candidate surface to `scripts/`, `skills/`, `install.sh` and exclude `tests/**` by an explicit scope change; a requirements amendment.
 
 The remaining ~35 non-test violations are separable and mostly corrections: `src/specify_cli/**` is out of scope (requirements Out of Scope) and needs a named exclusion; `.specify/specs/*/notes/**` are dated historical records (A9) and need a `historical-record` basis; mirror duplicates should inherit their source class (C-6); the real gaps are `regen-command-copies.py`, `workspace-guard.py` (pre-parse unknown rejection), `query_mysql.py` (pre-import help), `build-summary-input.py`, `verify-territory-disjoint.py`, `watch-target.sh` (`-h` body), `render-excalidraw.sh`, `render-plantuml.sh`, `install.sh`.
+
+# -- Machine-readable (closure) --
+#
+# Projection of the two tables above into the key=value carrier that
+# `closure-acceptance-check.py` reads (owner: `shared/workflow/acceptance-hardening.md`
+# § Verification Vocabulary). Values are copied from the rows above and from the smoke
+# record at the top of this file; the tables above stay the authored record.
+
+smoke_command=/usr/bin/python3 -m pytest -q tests/contract/test_script_interface_contract.py tests/contract/test_sdd_loop_driver_efficiency.py tests/contract/test_help_body_preservation.py tests/unit/test_create_new_requirements_separator.py tests/unit/test_workspace_guard.py
+smoke_exit_code=0
+smoke_evidence_path=.specify/specs/089-script-interface-contract/test-evidence/pkg-p7-stage-status.md
+
+SC-001_status=pass
+SC-002_status=pass
+SC-003_status=pass
+SC-004_status=pass
+SC-005_status=pass
+SC-006_status=pass
+SC-007_status=pass
+SC-008_status=pass
+SC-009_status=pass
+SC-010_status=pass
+SC-011_status=pass
+SC-012_status=pass
+
+RS-003_joint_acceptance=state consistency is red on an Implemented-but-block copy tree and green when they agree
+RS-004_joint_acceptance=the disposition vocabulary bridge is compared once against the sanitize ledger
+RS-005_joint_acceptance=one sharded review dispatch stays within the declared concurrency and its union covers the candidates

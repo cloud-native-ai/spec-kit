@@ -67,9 +67,11 @@ The design is deliberately additive: 074's global hierarchy, 070's `shared-tree`
 
 - **decision**: Add a spec-local Temporary Goal/Team hierarchy inside the SDD run; keep the global Goal→Team→SDD hierarchy unchanged.
 - **antithesis**: Let the SDD driver create a Global Goal/Team at U0, making the SDD run the top-level author.
-- **binding_constraints**: `pole_a`: global hierarchy remains authoritative (074 FR-001, `sdd-routing-definitions.md` § Hierarchy); `pole_b`: the user wants goal/team attached to the SDD flow, created after requirements/plan.
+- **binding_constraints**:
+  - pole_a: global hierarchy remains authoritative (074 FR-001, `sdd-routing-definitions.md` § Hierarchy).
+  - pole_b: the user wants goal/team attached to the SDD flow, created after requirements/plan.
 - **discriminating_evidence**: The user explicitly said the temporary artifacts are attached to the spec and only become known after requirements/plan; 074 forbids a run creating global Goal/Team.
-- **expected_sacrifice**: Two hierarchies and a scope resolver instead of one hierarchy.
+- **expected_sacrifice**: SC-001 Source ↑ Two hierarchies and a scope resolver instead of one hierarchy, so every global/spec/auto fixture case must also be resolved against a temporary overlay and the scope-contract surface grows by one axis.
 - **revision_trigger**: A future user decision to promote temporary artifacts to global, or a requirement that global Goal/Team must be created by the SDD run.
 - **tension_id**: T-001
 
@@ -77,9 +79,11 @@ The design is deliberately additive: 074's global hierarchy, 070's `shared-tree`
 
 - **decision**: Writing agents run in independent worktrees and integrate through the existing line registry/integration queue.
 - **antithesis**: Keep 070's shared-tree write serialization and use concurrency only for read-only work.
-- **binding_constraints**: `pole_a`: safe concurrent writes; `pole_b`: minimal change and no new isolation machinery.
+- **binding_constraints**:
+  - pole_a: safe concurrent writes.
+  - pole_b: minimal change and no new isolation machinery.
 - **discriminating_evidence**: The user chose per-agent worktrees + integration queue; existing 064 already provides the queue and worktree primitives.
-- **expected_sacrifice**: Higher disk usage and integration overhead; more line-registry fields.
+- **expected_sacrifice**: SC-005 Source ↑ Higher disk usage and integration overhead: every writing agent adds a child worktree, a branch and a registry entry, so the integration report must enumerate and verify one more item per agent.
 - **revision_trigger**: A host or repo where worktree cost outweighs concurrency gain, or 064's queue cannot support child lines.
 - **tension_id**: T-002
 
@@ -87,9 +91,11 @@ The design is deliberately additive: 074's global hierarchy, 070's `shared-tree`
 
 - **decision**: Define a role grammar (coordinator/worker/verifier/integrator) and let each stage decide its count and type from the benefit test and effective concurrency.
 - **antithesis**: Ship a fixed roster with a fixed number of agents per stage.
-- **binding_constraints**: `pole_a`: the user's core goal is efficiency through concurrency; `pole_b`: agents need stable definitions and testable roles.
+- **binding_constraints**:
+  - pole_a: the user's core goal is efficiency through concurrency.
+  - pole_b: agents need stable definitions and testable roles.
 - **discriminating_evidence**: The user said agent count/type are implementation details and should vary by stage; requirements starts with 1 while tasks/implement may use many.
-- **expected_sacrifice**: Less predictable per-stage behavior; the checkpoint must record and validate the decision.
+- **expected_sacrifice**: SC-006 Source ↑ Less predictable per-stage behavior: the checkpoint must record and validate each stage's roster decision, so every stage pays one more recorded and reviewable decision than a fixed roster would.
 - **revision_trigger**: Dogfood shows that a fixed roster is safer or that dynamic roles cause coordination overhead.
 - **tension_id**: T-003
 

@@ -13,6 +13,15 @@ the SC-010 dependency boundary.
   scope decision adopts parallel args in the fixed command, the same command minus the
   parallel arguments MUST remain a runnable complete run, with an availability proof
   charged per FR-017(c); a degradation serial run is never budget evidence.
+  > **SUPERSEDED (2026-11-09)** — the "Serial is the default" proposition only. That future
+  > scope decision was recorded: the canonical runner defaults to **parallel** per
+  > **C-001** of
+  > `.specify/specs/086-efficient-test-execution/contracts/runner-contract-086.contract.md`
+  > (owner of the execution model), with `--serial` as the escape hatch (C-004). The rest of
+  > RC-03 — the same command minus parallel arguments remains a complete runnable run, and a
+  > degradation serial run is never budget evidence — is **not** superseded and stays in
+  > force; 086 § inheritance cites it verbatim. The text above is retained unmodified as the
+  > dated record.
 - **RC-04**: Contingency for the budget: if the closure-slot serial measurement exceeds
   600 s after all planned interventions, the recorded path is the requirements Edge Case
   procedure — dated evidence of measures taken plus an explicit scope revision or

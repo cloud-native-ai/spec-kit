@@ -4,13 +4,13 @@
 
 | Field | Value |
 |-------|-------|
-| Feature ID | 086 |
+| Feature ID | 089 |
 | Feature name | 脚本接口契约（Script Interface Contract） |
 | Requirement branch | `089-script-interface-contract` |
 | Requirements | [`requirements.md`](requirements.md) |
 | Plan | [`plan.md`](plan.md) |
-| Feature detail | `.specify/memory/features/086.md` |
-| Feature index row | `.specify/memory/features.md` (Planned) |
+| Feature detail | `.specify/memory/features/089.md` |
+| Feature index row | `.specify/memory/features.md` (Implemented) |
 | Flow class | execution |
 | FR / SC | 31 / 12 |
 | Structure | single package (`shared/definitions/` + `scripts/python/` + `scripts/bash/` + `templates/` + `tests/contract/`) |
@@ -75,9 +75,9 @@ declared projection, column 4) and is never hand-edited.
 
 | Check | Result |
 |-------|--------|
-| Row exists in `.specify/memory/features.md` | yes — 086, status `Planned` |
-| Detail file `.specify/memory/features/086.md` | yes — goal, scope, FR/SC summary |
-| Status transition this stage | none needed: the row already reads `Planned`; only the stage note / `Last Updated` moves |
+| Row exists in `.specify/memory/features.md` | yes — 089, status `Implemented` |
+| Detail file `.specify/memory/features/089.md` | yes — goal, scope, FR/SC summary |
+| Status transition this stage | none needed: the row already reads `Implemented`; only the stage note / `Last Updated` moves |
 | Upstream dependencies recorded | 082 (mirror + double-landing guard), 085 (plan form), 081, 064, 069 (driver/loop context) |
 | Creates a new top-level concept? | no — the rule is a framework-shipped general rule, owned by an existing `shared/definitions/` page |
 

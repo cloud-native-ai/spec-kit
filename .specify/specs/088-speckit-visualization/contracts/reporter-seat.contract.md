@@ -1,6 +1,6 @@
 # Contract: Reporter Seat and Roster Guard
 
-**Feature**: 087 | **Covers**: FR-005, FR-006, FR-021
+**Feature**: 088 | **Covers**: FR-005, FR-006, FR-021
 **Contract object**: (a) the Agent Template `agents/reporter.agent.md` and its mirror
 `.specify/agents/templates/reporter.agent.md`; (b) the roster obligation stated in
 `skills/internal/create-team/SKILL.md` + `references/create-mode.md`; (c) the deterministic guard
