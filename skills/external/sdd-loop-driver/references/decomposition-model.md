@@ -150,7 +150,7 @@ The gate is `skills/external/sdd-loop-driver/scripts/wp-gate.py`: deterministic,
 - JSON envelope, including `dispatch_layers` and `integration_order`: WG-04 plus WP-04.
 - Exit taxonomy (`0` admit/single-package, `1` reject, `2` input/parse/I/O or unavailable layer): WG-05.
 - Plan checks: WG-06 (schema), WG-07 (graph), WG-08 (output coverage), WG-09 (boundedness), WG-10 (kind), WG-11 (pattern), WG-12 (hash), WG-13 (benefit).
-- Preflight checks: WG-14 (manifest coverage and forbidden paths), WG-15 (unordered write/read and write/write territories), WG-16 (slot cap and resource isolation). Preflight re-runs the plan checks first, so one invocation can report a cycle, an orphan output, and a path overlap together; a schema failure suppresses the checks that need an incomplete record (WG-06 ordering).
+- Preflight checks: WG-14 (manifest coverage and forbidden paths), WG-15 (unordered write/read and write/write territories, plus the unit-level write-domain form: a non-read-only package with an empty or directory-level write domain is red, a read-only package keeps its empty domain), WG-16 (slot cap and resource isolation). Preflight re-runs the plan checks first, so one invocation can report a cycle, an orphan output, and a path overlap together; a schema failure suppresses the checks that need an incomplete record (WG-06 ordering).
 - Retry checks: WG-17 (ledger-derived dispatch counts, attempt-1 admission, a material delta for attempt 2, strictly-greater budget with dispatch-level evidence, split-child attempt inheritance, split depth one, `retry-unchanged`/`retry-delta-invalid`/`retry-exhausted`). The counter source is OR-14; there is no counter file.
 - One repair is allowed (split, serialize, or reduce to one package), recorded as an amendment. A second reject falls back to `single-package` with `decision=fallback`, `reason=gate-reject`, and the finding list as evidence. Exit 2 falls back with `reason=decomposition-unavailable`. The fallback verdict mapping is owned by FN-08 and WG-18.
 - The gate's verdict is appended to the ledger's `plan` event before the first dispatch. The plan fence itself is never edited by the gate and remains the canonical decision record.
@@ -158,6 +158,8 @@ The gate is `skills/external/sdd-loop-driver/scripts/wp-gate.py`: deterministic,
 ## 13. Scheduler and dispatch (SD-01…SD-16)
 
 The scheduler is **driver prompt logic**, not a runtime engine. The driver is the sole coordinator: it selects the ready set, enforces the slot cap, dispatches packages, collects results, reads verifiers, records the ledger, and decides the stage gate. Package executors never dispatch other packages, never spawn a driver, and never edit the plan (SD-01, FR-015).
+
+**The default is concurrent; serial carries a named reason.** Whenever the ready units are independent, their write domains (file-level) are disjoint or a write-isolation form is declared, a legal process carrier is available (section 13.4) and the budget allows, the driver dispatches them concurrently. A stage that stays serial MUST record a reason code from the closed vocabulary owned by `shared/declarations/facts/serial-reason.yaml`, with that code's declared evidence form, plus the `requested` / `effective` / `effective_reason` reading (fields owned by `shared/declarations/facts/effective-concurrency.yaml`; `not_evaluated` where intervals are absent). This file restates neither vocabulary — the facts are the values' single owners.
 
 ### 13.1 Readiness and the write-alone rule (SD-02, SD-03, SD-06)
 
@@ -169,7 +171,7 @@ Under `write_isolation=worktree`, readiness and verification are unchanged, but 
 
 ### 13.2 Read-only concurrency and the slot cap (SD-04, SD-05)
 
-Up to `slot_cap` read-only packages run concurrently; under `write_isolation=worktree`, up to `slot_cap` write packages also run concurrently (each on a child line); the default is 6 and the ceiling is owned by SD-04 and enforced by WG-16. When the local host cannot issue parallel native calls, the driver records `parallel_requested=yes`, `effective=serial`, `reason=host-no-parallel-native` and dispatches serially (SD-07); the effective concurrency is recorded on every dispatch event (V-LED.10).
+Up to `slot_cap` read-only packages run concurrently; under `write_isolation=worktree`, up to `slot_cap` write packages also run concurrently (each on a child line); the default is 6 and the ceiling is owned by SD-04 and enforced by WG-16. When no legal process carrier is available for the ready units (the FR-005(d) condition), the driver records `parallel_requested=yes`, `effective=serial`, the reason code named by `shared/declarations/facts/serial-reason.yaml` (`host-no-parallel`, with that run's probe reading as its evidence) and dispatches serially (SD-07); the effective concurrency is recorded on every dispatch event (V-LED.10). Dated record (2026-11-09): the pre-093 literal `host-no-parallel-native` is superseded by the closed-vocabulary code `host-no-parallel` — the old literal survives only in this dated record and is `code-unknown` if a record still uses it.
 
 The ready set is ordered by topological layer and then `wp_id` lexicographic, the declared tie-break (WP-04). The ledger records the actual `dispatch_order` counter separately; integration uses the declared order, never the dispatch timing order (SD-05).
 
@@ -181,7 +183,7 @@ After a complete result, the driver dispatches one independent verifier and wait
 
 ### 13.4 Dispatch topologies (SD-07, SD-08, SD-15)
 
-Local: one native host subagent per package through the existing `run-agent` dispatch path. No external CLI is launched locally; when the host cannot issue parallel native calls, the serial fallback above applies. Remote: one detached `stage-runner.sh` per package with the unique label `<stage>-<wp_id>` and the package sentinel; each package keeps its own pid/status/log/heartbeat set, and no runner or sentinel is shared.
+Local: each package is dispatched through one of the **two legal process carriers** — the **fork carrier** (same-family default: a separate `qodercli` child process launched through `scripts/stage-runner.sh`, prompt through stdin, `--output-format stream-json`, completion judged by the package sentinel) or the **subprocess carrier** (a heterogeneous agent's own CLI, as an independent child process). The **host-internal in-process subagent path is BANNED as a concurrency carrier** (neither a default nor a degradation option): in-process subagents share one process and one CPU core, so such a fan-out MUST NOT be recorded as the concurrency mechanism and MUST NOT be counted as satisfying FR-005(d). A local stage that cannot obtain a process carrier records serial with the named reason code from `shared/declarations/facts/serial-reason.yaml` (section 13's rule) rather than claiming parallelism. Remote: one detached `stage-runner.sh` per package with the unique label `<stage>-<wp_id>` and the package sentinel; each package keeps its own pid/status/log/heartbeat set, and no runner or sentinel is shared.
 
 SD-15 owns the closed list of mechanisms this layer does not add; the runtime rule here is simply **no dispatcher** — the scheduler loop is the driver's prompt logic, and both dispatch forms are the existing ones.
 
@@ -258,7 +260,7 @@ The roster has exactly four seats, each derived from the existing Role × Stage 
 | Seat | Filled by | Lifetime |
 |------|-----------|----------|
 | `stage-planner` | the driver itself (decomposition, gate invocation, scheduling, spine writes); it never dispatches another coordinator | stage |
-| `stage-worker` | one execution per Work Package: a fresh native subagent locally, one detached `stage-runner.sh` remotely | one package |
+| `stage-worker` | one execution per Work Package: a fork-carrier execution locally (a separate `qodercli` child process through `scripts/stage-runner.sh`) or the subprocess carrier for a heterogeneous agent; one detached `stage-runner.sh` remotely | one package |
 | `stage-verifier` | one fresh-context read-only execution per verdict, never the package executor | one verdict |
 | `stage-integrator` | one execution per decomposed stage attempt, after every package verifies | one stage attempt |
 
@@ -320,7 +322,7 @@ The opt-out and fallback semantics are owned by `contracts/fallback-and-nonregre
 
 The U0 entry declaration carries `decomposition: auto|off`, `decomposition_stages` (one `auto|on|off` per stage, with the built-in defaults recorded), and `decomposition_slot_cap` (default 6). A stage attempt may carry `decomposition_override: auto|on|off`. All of these are spine fields, not new command arguments.
 
-Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable it in the same run; otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults. Built-in defaults: `plan`, `implement`, and `review` are `auto`; `analyze` and `clarify` are `off`; `requirements`, `tasks`, and `checklist` are `off`.
+Resolution order: feature-level `off` is a **hard opt-out** and no stage override can re-enable it in the same run; otherwise the stage-attempt override wins over the per-stage map, which wins over the built-in defaults. The built-in defaults are **no longer enumerated here** — they are owned by `shared/declarations/facts/decomposition-coverage.yaml` ([[STR-007]]), through which every stage resolves; the spine's `decomposition`, `decomposition_stages` and `decomposition_slot_cap` keys are its run-scoped projections, and a fourth source that assigns "which stages decompose" is a defect. In that entry **`analyze` no longer defaults to `off`**: it decomposes by default (`coverage: on`) at N-way concurrency — N concurrent SDD Analysis Workers (`agents/sdd-analysis-worker.agent.md`), N read from the stage's team configuration / the spine's `agent_concurrency_requested` and never frozen here — and a serial analyze (`N = 1`) is admissible only with a reason code from `shared/declarations/facts/serial-reason.yaml`. Feature-level `off` remains the hard opt-out; the precedence rule above is unchanged for every stage.
 
 ### 20.2 Auto, benefit, and the single-package path (FN-04, FN-05)
 

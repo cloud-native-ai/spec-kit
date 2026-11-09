@@ -1,0 +1,20 @@
+# WP3 evidence — T139 / T142 (analyze wave + fork mechanism, driver surfaces)
+# date: 2026-11-09
+
+$ grep -n "analyze 缺省并发" skills/external/sdd-loop-driver/SKILL.md | cut -c1-120
+158:- **analyze 缺省并发（FR-034）**：`analyze` 阶段按 `decomposition-coverage.yaml` 的 `analyze: on` 默认以 **N 个并发 SDD Analysis Work
+$ grep -n "analyze 波（FR-034）" skills/external/sdd-loop-driver/references/dispatch-recipes.md | cut -c1-120
+27:**analyze 波（FR-034）**：`analyze` 阶段默认 **N 个并发 SDD Analysis Worker**（`agents/sdd-analysis-worker.agent.md`），N 取自阶段团队配置 
+$ grep -c "读域互斥（文件级）\|确定性归并\|executor_id" skills/external/sdd-loop-driver/references/dispatch-recipes.md
+3
+$ grep -n "FORK 承载" skills/external/sdd-loop-driver/references/dispatch-recipes.md | cut -c1-100
+23:- **FORK 承载（同族缺省）**：每个并发单元/阶段是一个**独立的 `qodercli` 子进程**，经 `scripts/stage-runner.sh` 启动——prompt 经 s
+24:- **SUBPROCESS 承载（异构 agent）**：当并发单元由与 `qodercli` 不同族的 agent CLI 执行时，由**该 agent 自身 CLI 的独立子进程**承载，
+57:> **使用面（FR-035 / C-094）**：`stage-runner.sh` 不只是远端机制——**本地缺省阶段派发同样以它作为 FORK 承载**（同族 `qodercli` 子进程
+202:> **SDD local default**：本地拓扑的缺省承载是 **FORK 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`，见本文件
+$ grep -n "使用面（FR-035 / C-094）" skills/external/sdd-loop-driver/references/dispatch-recipes.md | cut -c1-100
+57:> **使用面（FR-035 / C-094）**：`stage-runner.sh` 不只是远端机制——**本地缺省阶段派发同样以它作为 FORK 承载**（同族 `qodercli` 子进程
+$ grep -n "fork 承载" skills/external/sdd-loop-driver/SKILL.md | wc -l
+5
+# reading: SKILL.md U0 topology row, U2/U3, HR5, HR6, HR13, delegation bullet carry the fork/subprocess carriers; U0.5 and stage order unchanged
+# exit: 0

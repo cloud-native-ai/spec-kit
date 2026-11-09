@@ -242,6 +242,7 @@ Every durable identifier — decision (D-…), open item (OI-…), stage (S…),
 - **Languages**: [e.g. Python 3.11+]
 - **Package Manager**: [e.g. uv]
 - **Frameworks**: [e.g. FastAPI, React]
+- **Testing**: every test execution goes through `scripts/bash/run-tests.sh` — its default is the parallel form (`-n <effective> --dist load`) and test paths/arguments are forwarded to the framework (single-test debugging included); direct interpreter-level test commands (the bare test CLI or its `-m` module entry) are never the entry.
 - **Key Directories**:
   - `src/`: Source code
   - `tests/`: Test suite

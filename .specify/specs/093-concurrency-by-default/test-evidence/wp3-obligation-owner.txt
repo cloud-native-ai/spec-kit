@@ -1,0 +1,23 @@
+# WP3 evidence — T037 / T060 / T132 / T155 (obligation owner + carrier rules in subagent-definitions.md)
+# date: 2026-11-09
+# method: content diff + targeted greps (document rows; reviewed by diff, not tests)
+
+$ grep -n "The Concurrency Obligation" shared/definitions/subagent-definitions.md
+19:## The Concurrency Obligation (并发义务 — 所有执行体的单一声明位点)
+
+$ grep -n "Consider concurrency first\|Dispatch concurrently when allowed\|name the reason and record the reading" shared/definitions/subagent-definitions.md
+25:1. **Consider concurrency first (先想并发)** — partition the duty into the units 
+26:2. **Dispatch concurrently when allowed (能并发则并发)** — the **default is concurr
+27:3. **…and otherwise name the reason and record the reading (串行须具名理由并记读数)** — 
+# reading: 3 parts present, each separately checkable; grain table has 4 grains (skill/command, goal slice, team, loop stage)
+
+$ grep -c "concurrency-class.yaml\|serial-reason.yaml\|effective-concurrency.yaml\|concurrency-slot-and-reserve.yaml" shared/definitions/subagent-definitions.md
+3
+# reading: facts reached by path (C-043 / T132); no tuning value restated
+
+$ grep -n "BANNED as a concurrency carrier" shared/definitions/subagent-definitions.md
+52:- **Native is a single-delegation convenience, never a concurrency mechanism.** The **h
+$ grep -n "fork carrier\|subprocess carrier" shared/definitions/subagent-definitions.md | wc -l
+2
+# reading: mode-selection row + when-in-doubt sentence + mode notes all name the two carriers; native restriction present
+# exit: 0

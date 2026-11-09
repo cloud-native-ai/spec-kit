@@ -71,7 +71,7 @@ Run exactly one SDD stage as bounded Work Packages: the driver derives and gates
 | `stage-verifier` | evaluator | Worker | temporary | one fresh-context execution per verdict |
 | `stage-integrator` | executor | Worker | temporary | one execution per decomposed stage attempt |
 
-The roster defines exactly these four seats. `stage-planner` is the driver itself: it decomposes, invokes the gate, schedules, and writes the spine, and it never dispatches another coordinator. `stage-worker` is filled by one execution per Work Package (a native subagent locally, one detached runner remotely). `stage-verifier` is filled by one fresh-context read-only execution per verdict and never the package executor. `stage-integrator` is filled by one execution per decomposed stage attempt.
+The roster defines exactly these four seats. `stage-planner` is the driver itself: it decomposes, invokes the gate, schedules, and writes the spine, and it never dispatches another coordinator. `stage-worker` is filled by one execution per Work Package: the local form is the **fork carrier** (same-family `qodercli` child processes through `scripts/stage-runner.sh` — prompt via stdin, stream-json output, sentinel-judged completion) and heterogeneous agents use the **subprocess carrier** (an independent child process of the agent's own CLI); remotely it is one detached runner. The **host-internal in-process subagent path is BANNED as a carrier**. `stage-verifier` is filled by one fresh-context read-only execution per verdict and never the package executor. `stage-integrator` is filled by one execution per decomposed stage attempt.
 
 ## Dynamic Structure
 

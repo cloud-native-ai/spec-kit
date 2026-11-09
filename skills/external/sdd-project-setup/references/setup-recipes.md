@@ -106,10 +106,13 @@ house-keeping H5 的**未处理清单**。**不执行** sanitize、history、res
 | 4 | `/speckit.goal` | goals 缺 | 定义 3–5 个项目目标 |
 | 5 | `/speckit.agents` / `/speckit.team` | **按需**：用户明确需要 | 代理/团队定义；未使用则保持 `not-configured` |
 
-**Carrier**：本地由编排者/宿主原生子代理在**当前项目**执行；远端每个命令经 run-agent 在
+**Carrier**：本地每个命令的派发 MUST 缺省用 **fork 承载**（同族 `qodercli` 子进程经
+`skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 用 **subprocess 承载**
+（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现
+为一个选项。远端每个命令经 run-agent 在
 `<project-dir>` 下执行——`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`；subagent CLI 缺省
-取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。MUST NOT 在本地启动
-`qodercli` 作为子代理。底层 SSH 传输一律经 `ssh-utils`，见下节。
+取 execution-config defaults（`cli: qodercli`），可按 agent/inline 覆盖。底层 SSH 传输一律经
+`ssh-utils`，见下节。
 
 S2.5 完成后，**首次 goal/agents/team 不得悬空**：目标项目若仍缺 goal 且用户未明确要求跳过，
 setup 必须在 handoff 前完成或把 `bootstrap-gap: goal` 写入 handoff 凭证，由 house-keeping H3

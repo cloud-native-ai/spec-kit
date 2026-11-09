@@ -1,0 +1,23 @@
+# WP3 evidence — T100 / T114 / T115 / T120 / T121 / T122 / T135 (executor grains and templates)
+# date: 2026-11-09
+
+$ grep -n "Multi-unit duties route to a capable body" skills/internal/run-agent/SKILL.md | cut -c1-100
+149:**Multi-unit duties route to a capable body (FR-024)**: a duty whose honest partition is `N >= 2
+$ grep -n "Member class and stated concurrency capability" skills/internal/create-team/SKILL.md | cut -c1-100
+37:**Member class and stated concurrency capability (成员类别与并发能力声明)**: every `members[]` row MUST carr
+$ grep -n "Seat territories judged at binding time" skills/internal/create-team/references/conceptual-model.md | cut -c1-100
+67:## Seat territories judged at binding time (席位写领地,绑定期判定)
+$ grep -n "Concurrency of this stage" skills/internal/create-plan/SKILL.md | cut -c1-100
+129:### Step 4.5 — Concurrency of this stage (default-concurrent)
+$ grep -n "默认并发（team 执行体" skills/internal/run-team/SKILL.md | cut -c1-100
+57:- **默认并发（team 执行体，席位即单元）**:只要席位之间无依赖、写领地（文件级路径集）互不相交、存在合法进程承载（fork / subprocess，定义 owner：`.specif
+$ grep -n "Target concurrency" shared/definitions/goal-definitions.md | cut -c1-100
+163:### Target concurrency (目标并发 — the only concurrency paragraph this file adds)
+
+--- T122: one authored pointer text on 29 command surfaces + plan-template ---
+$ grep -l "Concurrency obligation（执行义务" templates/commands/*.md | wc -l
+29
+$ grep -c "Concurrency obligation" templates/plan-template.md
+1
+# reading: 29/29 command templates carry the identical pointer block; plan-template carries it once; no repo-specific fact inside (framework paths only)
+# exit: 0

@@ -4,7 +4,7 @@
 
 ## Stage Prompt Skeleton（三段骨架，每阶段一次）
 
-每阶段把以下三段完整指令交给阶段子代理：远端外部派发写入提示词文件（`prompt-<line>-<stage>.md`）；本地原生派发直接作为 Agent/Task 提示词（无需落盘）。阶段名替换 `<STAGE>`。
+每阶段把以下三段完整指令交给阶段子代理：远端外部派发写入提示词文件（`prompt-<line>-<stage>.md`）；本地 **fork 承载**经 `scripts/stage-runner.sh` 以 stdio/提示词文件传入（形态见 `dispatch-recipes.md`；同族 `qodercli` 子进程），异构 agent 走 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）。阶段名替换 `<STAGE>`。
 
 **红线（反嵌套拓扑）**：提示词是子代理的**全部输入**，三段骨架之外不得夹带驱动机制本身——反嵌套义务真源已上收 run-agent 派发治理（不引用驱动/循环技能、不指示加载技能、不含循环逻辑；派发前拦截），本行保留提醒并引用、不复述义务全文（analyze C-28）。
 
@@ -24,7 +24,7 @@
 
 **类别四元组的派发纪律**（owner：`contracts/driver-integration.md` C-001…C-003；本段只规定派发什么，不复制类别判据）：
 
-- **唯一载体**：提示词是类别的唯一载体（环境变量不被远端子代理继承）；本地原生子代理与远端 CLI 两种拓扑**同规**——四元组一律写在第①段，两种拓扑逐字相同。
+- **唯一载体**：提示词是类别的唯一载体（环境变量不被远端子代理继承）；**fork 承载**（本地同族 `qodercli` 子进程经 `stage-runner.sh`）与 **subprocess 承载**（异构 agent 自身 CLI 的独立子进程）两种拓扑**同规**——四元组一律写在第①段，两种拓扑逐字相同；宿主内建 in-process subagent 路径 **BANNED**，不作为派发承载。
 - **取值来源**：唯一来源是该线 `requirements.md` 的**声明行**，经同一解析入口在**每次阶段派发前**解析一次；状态脊中的类别行只是带日期的观测，MUST NOT 充当**取值来源**；重入时重新解析并与观测比对，不一致记 `re-baseline` 事件并更新观测。
 - **缺键即缺陷**：缺任一元组键（`flow_class=` / `source=` / `marker=` / `error=`）即判**派发构造缺陷**，U4 不放行。阶段**子代理** MUST NOT 自行**推断**、补默认或按介质猜测类别——它既没有声明面，也没有解析入口。
 - **`error` 位值域**：`error` 的值域恰为 `owner-unavailable` / `-` 两项——`-` = 无错误位，`owner-unavailable` = 降级。**降级有三种原因，标签只有一个**：owner 不可解析、调用方无法执行引擎、解析以退出码 2 报输入缺失（spec 目录或其 `requirements.md` 不存在 / 不可读；`flow-class-check.py` 对该路径同样打 `owner-unavailable`，原因写 `detail`）。**不要**把 `invalid-unit-id` 写进载荷——它只属于「键不属于任何已登记键族」的调用方缺陷，阶段永远不会用它构造键。`declaration-absent` 是 advisory 发现码，MUST NOT 进入**载荷**（否则「作者未声明」会被读成一种错误）。
@@ -38,6 +38,7 @@
 - 仓库既有脏文件不提交不还原。
 - 不要 push（除非明确授权）——远程推送属破坏性操作。
 - 只推进当前阶段；下一阶段由主代理派发，不要自行越阶段。
+- 测试执行唯一入口是 `scripts/bash/run-tests.sh`（缺省 xdist 形态 `-n <effective> --dist load`；测试路径与其余参数原样转交，单测调试同样走 runner）；派发 brief MUST NOT 包含直接调用解释器级测试命令（裸测试 CLI 或 `-m` 模块入口）。
 ```
 
 > 上列前四条为 G5 默认纪律的**逐字纪律行**（对齐框架 fast-fail 与 confirmation-gates 两份判据文件的英文真源；执行侧以本文件的行文为准，不解析框架文档）。
@@ -62,7 +63,7 @@ analyze 等声明只读的阶段沿用同一三段骨架，但第①/②段 MUST
 
 ## U3 统一监听与驱动者生命周期（Watch Protocol）
 
-监听规则本体见 `watch-model.md`；本段只规定驱动者的行为。**本地原生调用是一次同步阻塞调用，返回即终止判定；下列窗口/轮询/重入规则仅用于外部 CLI 派发。**
+监听规则本体见 `watch-model.md`；本段只规定驱动者的行为。**进程承载（fork / subprocess）的派发按下列窗口/轮询/重入规则监听——fork 子进程与远端 runner 同规；宿主内建 in-process 路径不是派发承载。**
 
 - **合法等待**：在有界长轮询窗口内等待（一次工具调用跑 `watch-target.sh --window N`），终止判定或窗口到期即返回；`RUNNING` → 立即重入下一窗口，**不在 agent 侧 sleep、不按固定 cadence 空转**。每个窗口携带字面量 `--iter <run_id>-w<NN>`（`NN` 递增），避免宿主把同参数连续调用判成重复/卡死（owner：`watch-model.md` §3.2）。
 - **非法等待**：独立 `sleep N` 回合；挂起监视器后结束驱动者会话「等待通知/恢复」——在会话式宿主（subagent 结束即停摆）中这意味着循环静默死亡，直接违反 Hard Requirement 1 与 5。唯一例外：宿主已被探针证明通知会自动恢复**同一运行**（`watch-model.md` §6）；此时原生通知只能作唤醒补充，每次唤醒仍做一次快照判定。

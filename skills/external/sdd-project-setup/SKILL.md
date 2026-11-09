@@ -54,9 +54,9 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
              不冒充 ready；候选清单由 house-keeping H5 产出
 ```
 
-**Dispatch carrier**：未给远程三元组 → **本地**，目标=当前项目，由编排者或宿主**原生子代理**执行，MUST NOT 启动 `qodercli`；远程三元组给全 → `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，经 run-agent 驱动 subagent CLI；CLI 缺省取 execution-config defaults（`cli: qodercli`）。完整判据见 `.specify/shared/workflow/execution-topology.md` § Carrier decision。**SSH 传输 owner 是 `ssh-utils`**：选项、引号、stdin 推送与退出码由其 `scripts/ssh-exec.py` 承载（固定 `-o RemoteCommand=none`），本技能只声明拓扑形态。
+**Dispatch carrier**：未给远程三元组 → **本地**，目标=当前项目，派发 MUST 缺省使用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）；异构 agent MUST 使用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**、MUST NOT 被呈现为一个选项。远程三元组给全 → `ssh <alias>` → `su - <run-user>` → `cd <project-dir>`，经 run-agent 驱动 subagent CLI；CLI 缺省取 execution-config defaults（`cli: qodercli`）。完整判据见 `.specify/shared/workflow/execution-topology.md` § Carrier decision。**SSH 传输 owner 是 `ssh-utils`**：选项、引号、stdin 推送与退出码由其 `scripts/ssh-exec.py` 承载（固定 `-o RemoteCommand=none`），本技能只声明拓扑形态。
 
-**S2.5 carrier**：本地由编排者在当前项目执行，或交给宿主的原生子代理；远端每个 S2.5 命令经 run-agent 在 `<project-dir>` 下执行（`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`），CLI 缺省 qodercli；SSH 传输细则见 `ssh-utils`。
+**S2.5 carrier**：本地每个 S2.5 命令按 fork / subprocess 两类进程承载派发（in-process 路径 BANNED）；远端每个 S2.5 命令经 run-agent 在 `<project-dir>` 下执行（`ssh <alias>` → `su - <run-user>` → `cd <project-dir>`），CLI 缺省 qodercli；SSH 传输细则见 `ssh-utils`。
 
 **Instruction-chain budget gate**: S2 的 `/speckit.instructions` 刷新若报告 `BUDGET ... over`，本 skill 不实现 R3；把超预算章节与生成器报告交给 `sdd-house-keeping` H2 的 Budget convergence（owner 细节见其 `maintenance-recipes.md` § Budget）。
 
@@ -70,7 +70,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 6. **幂等收敛**：S2/S2.5 的每一动作 MUST 幂等——同一稳定态上重复执行不产生新的写动作；每项动作执行前 MUST 以本次 S1 盘点结果为缺口凭据，禁止凭上次执行的记忆跳过或重做。
 7. **运行时与 CLI 就绪先于 init**：S2 执行 specify init 前 MUST 完成 CLI 层——python 解析阶梯三级全缺 → **报错退出，绝不自动安装 Python**；CLI 安装链三源全败 → 报告缺口并停止；两者都不得静默跳过 init 或手工伪造 `.specify/`。
 8. **预算超限交给 house-keeping**：S2 刷新报告的 `BUDGET ... over` 不由 setup 实现 R3；原样交给 house-keeping H2，不得静默转述告警或删除项目内容。
-9. **本地拓扑原生承载**：入口未给环境信息时，目标解析与执行都按本地拓扑；治理命令由编排者亲自执行，或交给当前宿主 agent 的**原生子代理**——MUST NOT 以 `qodercli` / `claude -p` 等外部 agent CLI 启动本地子代理。
+9. **本地 fork 承载**：入口未给环境信息时，目标解析与执行都按本地拓扑；治理命令的派发 MUST 缺省使用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`），异构 agent MUST 使用 **subprocess 承载**（该 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
 10. **目标项目治理优先（本地与远端同规）**：bootstrap 任何目标项目之前，MUST 先读取目标项目既有的宪法（`.specify/memory/constitution.md`）与指令（`.specify/instructions.md` 及其兼容符号链接），并在全部动作中遵守其原则、目录规范、命名规则与临时目录纪律；MUST NOT 覆盖、绕过或删改这些治理内容。目标项目尚无治理文档时，按框架模板生成（constitution / instructions），MUST NOT 凭空自造规则。
 11. **目录创建限于规范落点**：bootstrap 的目录创建 MUST 限于框架既有落点（`specify init` 产物、`.specify/.tmp/`、目标项目治理文档声明的目录）；MUST NOT 在目标仓库内创建 ad-hoc 目录或临时根；临时数据按目标项目纪律（无则框架 `temp-directory-discipline`）落位，并在首次写入前确认 `.gitignore` 覆盖。
 12. **Bootstrap 后 handoff**：S2.5 完成后，周期性调协、强化、验证、记录回收与候选清单 MUST handoff 给 `sdd-house-keeping`；本 skill MUST NOT 复制其 H1–H5 执行细则。目标项目已初始化且本次只需维护时，直接加载 `sdd-house-keeping`，不重跑 `specify init`。
@@ -101,7 +101,7 @@ HANDOFF      调用 sdd-house-keeping H0–H4（同一目标/模式）完成首�
 本手册是**编排者**：bootstrap 动作的执行主体按**执行拓扑**选择承载形态（承接技能可选——本技能独立运行时不强制）：
 
 - **盘点**：`scripts/mechanism-inventory.py` 与 `scripts/logical-framework.py` 由编排者直接运行（只读脚本，无需子代理）；远端盘点经 `ssh + su` 形态执行。
-- **本地拓扑（默认）**：`specify init` / bootstrap 内容命令由编排者**亲自执行**，或交给**当前宿主 agent 的原生子代理**——MUST NOT 启动 `qodercli` / `claude -p` 等外部 agent CLI 作为本地子代理。
+- **本地拓扑（默认）**：盘点脚本由编排者直接运行（只读，无需子代理）；`specify init` / bootstrap 内容命令的派发 MUST 用 **fork 承载**（同族 `qodercli` 子进程经 `skills/external/sdd-loop-driver/scripts/stage-runner.sh`）或 **subprocess 承载**（异构 agent 自身 CLI 的独立子进程）；宿主内建 in-process subagent 路径 **BANNED**，MUST NOT 被呈现为一个选项。
 - **远端拓扑**：bootstrap 命令经 **run-agent**（`skills/internal/run-agent/SKILL.md`）以拓扑声明派发外部子代理，`ssh + su` 进入执行侧。
 - **职责切分线**：bootstrap（install/refresh + 首批内容 + handoff）= 本技能；周期性维护（reconcile/strengthen/verify/report）= `sdd-house-keeping`；SDD 阶段循环 = `sdd-loop-driver`；创建/派发/修正 = create-agent / run-agent / improve-agent。
 
