@@ -1,0 +1,7 @@
+W3-M5 owner pages: re-anchoring §1.1 distinction + §5 `## Anchoring archive` (entity owner = goal-definitions.md, 3 edges) ; non-disposable header `Merged into 090-re-anchoring` + 2 undeclared duplicate blocks removed (54 lines)
+mirrors: `sync-mirrors.py --write --only shared` -> DIFF 2 files, then `--check --only shared` = ok, 100 files byte-identical
+guards: pytest test_reanchoring_contract + test_non_disposable_contract + test_non_disposable_seam_bypass = 74 passed, 2 failed
+baseline (not mine): T089 `the engine changed the working tree` = dirty 085-sdd-temporary-goal-team/contracts/* (pre-existing, untouched); T092 mirror drift = `goal-utils.py` only (W1 scope)
+falsification leg: reading = (has §5, distinction, no on-track->achieved, explicit-action only) = (T,T,T,T) on real page, (F,F,F,F) on a copy with §5 + the distinction bullet removed
+negatives: adjudication rule count 1; Detection Categories / Detection Subject blocks 1 each; forbidden-word `keep` sweep clean
+M5-DONE

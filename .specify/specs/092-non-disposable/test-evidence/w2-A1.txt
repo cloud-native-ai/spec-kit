@@ -1,0 +1,14 @@
+W2/A1 — global concept goal -> anchoring (scripts/python/goal-utils.py + tests/unit/test_goal_*.py)
+Changed: docstring (`anchoring enumeration`), ARCHIVE_DIRNAME comment, Scope / resolve_scope /
+archive_root docstrings, `archived`->`anchored` wording, CLI `--scope` help, parser description,
+resolve-scope / create / list subcommand help, `(anchoring archive is empty)` output.
+Unchanged by ruling: spec-local path stays `<spec>/goal/<slug>/goal.md` (SPEC_GOAL_DIRNAME="goal"),
+definition file stays `goal.md` (DEFINITION_FILENAME), attribute/function names
+(`goal_root`, `archive_root`, `definition_path`) untouched — API-compatible.
+Tests: tests/unit/test_goal_utils.py (2 path literals + 1 test name), test_goal_scope_engine.py (3 assertions).
+Command: .venv/bin/python -m pytest tests/unit -k goal -q  ->  94 passed, 1060 deselected (baseline was 4 failed / 90 passed).
+Mirror .specify/scripts/python/goal-utils.py generated, not hand-edited. No commit, no push.
+Note: tests/contract/* still assumes `.specify/goal/` for the global archive (7 red on goal paths,
+pre-existing baseline is 2 red) — outside my write domain, left to its owner seat.
+ANOMALY: contract tests (test_goal_definition.py, test_run_checks.py fixture) still seed `.specify/goal/`; concurrent writes in tests/contract/* observed mid-run.
+A1-DONE

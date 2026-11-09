@@ -40,9 +40,9 @@ classification: external
 | 断点 | U1 自动探测，禁止猜测 |
 | 特性切片 | 入口描述；未给则按权威文档推导，不自动选题 |
 | 并发度 | 缺省 **24**；U0 在状态脊写 `agent_concurrency_requested` / `agent_concurrency_effective` / `agent_concurrency_reason` / `verifier_reserve`；每阶段按 effective 与 ready packages 重算，降级必须具名 |
-| 写隔离 | 缺省 `write_isolation=shared-tree`；temporary-team 运行可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
+| 写隔离 | 缺省 `write_isolation=shared-tree`；团队运行（team，scope = spec）可声明 `worktree`，写 agent 各占 child line + 独立 worktree |
 
-**Temporary Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `temp_goal_slug`；clarify + plan U4 通过后，经 `/speckit.team create --scope spec --spec-dir <spec>` 创建并写入 `temp_team_slug`。两者都只写 spec-local `goal/` 与 `team/`，全局 `.specify/goal/**`、`.specify/teams/**` 是 forbidden paths。
+**Goal/Team（085）**：requirements U4 通过后，经 `/speckit.goal create --scope spec --spec-dir <spec>` 撰写并写入 `goal_slug`；clarify + plan U4 通过后，经 `/speckit.team create --scope spec --spec-dir <spec>` 创建并写入 `team_slug`（状态脊字段名 `goal_slug` / `team_slug`；历史状态脊里的 `temp_goal_slug` / `temp_team_slug` 作为历史记录原样保留，读方须两者都认）。两者都只写 spec-local `goal/` 与 `team/`，全局 `.specify/goal/**`、`.specify/teams/**` 是 forbidden paths。
 
 **U0.5 自检（进入 U2 前必须通过）**：
 
@@ -152,7 +152,7 @@ Hook 只是提前完成信号（`--settings` 注入、写 done/FIFO、`hook=obse
 - **独立校验**：§15——每包一个全新上下文 verifier；verdict 缺失/不可读/歧义即 fail；包 verdict 永远不替代阶段 U4。
 - **集成与收尾**：§16——按声明顺序确定性集成，冲突或缺失输出即停，单一 closing commit，阶段哨兵由 integrator 发出；U4 在集成后原样运行。
 - **团队形状**：`templates/stage-team-preset.md` + 运行域 adapter（§17）；每 stage / attempt / run 都不持久化 `team.md`，`create-team` / `run-team` 不变。
-- **Checkpoint 协议（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / 临时 Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；owner `references/checkpoint-protocol.md`，本节只给指针。
+- **Checkpoint 协议（085）**：每阶段 U4 后、下一阶段派发前执行四步 checkpoint（产物核验 / Goal 进度 / 至多一条 team 配置提案 / 下一阶段并发与 roster），写 `<spec-dir>/checkpoints/<NN>-<stage>.md`；owner `references/checkpoint-protocol.md`，本节只给指针。
 - **报表**：`scripts/wp-report.py`（§18）；缺失来源一律 `not_evaluated`，绝不以 0 或估计替代。
 - **退出开关**：U0 声明 `decomposition: auto|off`、`decomposition_stages`、`decomposition_slot_cap`（缺省 2）；阶段 attempt 可带 `decomposition_override`。优先级：feature `off`（硬退出）> 阶段 override > 阶段表 > 内置缺省（`plan`/`implement`/`review`=auto，其余 off）。
 - **边界**：只新增 U4 之前的步骤；不改阶段命令内部、哨兵字面量、U4、阶段链、watcher 判定/退出码、卡死处置、快车道、两槽位测试预算、plan 小修约束，以及 064 的 registry/ownership/worktree/integration 语义、067 的 part brief/test economics、068 的反馈通道。包执行者绝不派发、绝不写脊、绝不加载本手册；不新增服务/守护进程或第二个 registry、ownership 模型、integration queue、ledger。

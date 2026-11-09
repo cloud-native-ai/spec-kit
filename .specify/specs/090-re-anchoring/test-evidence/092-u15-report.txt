@@ -1,0 +1,8 @@
+u15 / 092 P4 — engine: templates/instructions-template.md only (no commit, no push)
+Section chosen: existing `## Knowledge Recording & Promotion` (no new top-level `##`; count 35 -> 35)
+Diff: 1 insertion, 0 deletions; inserted line 227
+Line verbatim: **Non-Disposable (不可一次性处置)**: history is a required input, not a use-and-throw store — a carrier that no longer holds MUST be reviewed and then disposed, never silently retained; the definition, the closed sets and the disposal criteria are owned by `.specify/shared/definitions/non-disposable-definitions.md`.
+Why this section: recording/promotion fixes where durable knowledge goes; Non-Disposable is the other half of that same lifecycle — review and disposal when a carrier no longer holds — so the pointer reads as a continuation, not a topic switch.
+Shape check: summary + owner path only; no disposition member, detection class, state definition or threshold restated.
+Not run: `scripts/bash/generate-instructions.sh` (T084, driver).
+U15-DONE

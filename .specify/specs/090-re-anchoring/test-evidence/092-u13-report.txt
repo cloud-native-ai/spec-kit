@@ -1,0 +1,10 @@
+U13 (P6-B4/B5) report — 2026-11-09
+Owner §2.1 now declares the single evidence spelling <spec-dir>/baseline-failed.txt and <spec-dir>/final-failed.txt; 085's test-evidence/full-suite-final-failed.txt and 086's test-evidence/{baseline,final}-failed.txt are marked historical pointers, read-as-record only.
+Owner §2.1 adds the closure-naming rule (the round-suffixed, latest-round file is the closure reading; a stale round-less final-failed.txt MUST be marked as an old reading and point at the round file) with the 088 instance: closure = .specify/specs/088-speckit-visualization/final-failed-r6.txt (27 names; state spine .specify/state/088-speckit-visualization.md slot=closure seq=2), while final-failed.txt holds the r1 old reading (58 names).
+085 and 086 verification.md each gained exactly one line "evidence-path note: historical spelling, owner = efficiency-model.md" (no new section); no 088 file was touched.
+Disclosure (in-passing correction): the queue territory named only the .specify/skills mirror, but plan DoD-1 / Two Hats require mirrors to be generated and never hand-edited, so the edit landed in skills/external/sdd-loop-driver/references/efficiency-model.md and .specify/skills/... was regenerated via sync-mirrors.py --write — 4 changed paths, not 3; the pair is byte-identical.
+Checks: sync-mirrors.py --check reports no drift; 211 tests pass (test_sdd_loop_driver_efficiency, _gates, docs_gate_driver, non_regression_070, harness_triple_structure, closure_acceptance_check, evidence_binding_contract).
+Checks: 111 further tests pass (test_non_disposable_check, test_validate_tasks_parallel_safety, test_doc_consistency_rules); closure-acceptance-check still verdict=accept for both 085 and 086.
+Note: work-queue rows for u13 read T126/T127, but P6-B4/B5 are tasks T129/T130 — bookkeeping mismatch outside this unit's territory, flagged only.
+No commit, no push. No anomaly found; the one deviation is the disclosed source+mirror generation above.
+U13-DONE

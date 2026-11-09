@@ -1,0 +1,93 @@
+# P2 evidence — the detection engine (T043–T071)
+
+**Feature**: 092-non-disposable | **Package**: P2 | **Date**: 2026-11-09 | **Engine**: `scripts/python/non-disposable-check.py`
+
+Four segments, the order the capture rule uses (`notes/pre-change-measurements.md` § 1 records the same shape for P1).
+
+## 1 — Readings (measured on this tree, HEAD at package start)
+
+```text
+$ python3 scripts/python/non-disposable-check.py --json   # exit 1 (findings exist)
+coverage.candidates      = 2032
+coverage.declaration     = shared/declarations/facts/non-disposable-review-surface.yaml (ok)
+coverage.excluded        = 2365 (all reason=dated-record)
+coverage.missing_roots   = 0
+coverage.undeclared_sib. = 7
+surface_digest           = 9784792a95ab44f1f66eb78b76c1e6812cd018c8cbf6c8ab02e2af98ded0e786
+class superseded-live          = 177
+class multi-owner              = 13
+class orphan-path              = 631
+class renumber-live-binding    = 139
+class status-unreadable        = 55
+class false-closed-set         = 1
+class stale-constant           = 0
+class deferral-marker          = 14
+not_closed               = open=311 unevaluated=719 unconfirmed=0 shards=0
+closed                   = false
+relocated                = count=1
+```
+
+Per-root presence and count, in declaration order (`--roots`, exit 0, no candidate judged):
+
+```text
+.specify/archive       present=true count=66
+.specify/derive        present=true count=2
+.specify/goal          present=true count=55
+.specify/history       present=true count=7
+.specify/memory        present=true count=1225
+.specify/project       present=true count=10
+.specify/review        present=true count=1
+.specify/specs         present=true count=2930
+.specify/state         present=true count=27
+.specify/teams         present=true count=74
+```
+
+## 2 — Corpus reproduction (the readings `quickstart.md` names)
+
+| Row | Class | Reading on this tree |
+|-----|-------|----------------------|
+| C1 | `renumber-live-binding` | 8 entries in 089: .specify/specs/089-script-interface-contract/team/086-script-interface-contract//:0, feature-ref.md:7, feature-ref.md:12, feature-ref.md:79, requirements.md:12, tasks.md:3, tasks.md:5, team.md:2 |
+| C4 | `renumber-live-binding` | 13 entries in 088 (8 contract headers at line 3, 3 team rows) |
+| A1 | `status-unreadable` | verification.md → claimed `Implemented`, verdict `None`, reasons None, missing ['SC-NNN_status=']; 089-script-interface-contract → claimed `Implemented`, verdict `block`, reasons ['status-claims-implemented-but-blocked'], missing None |
+| A3 | `status-unreadable` | registry `Planned` × closure `accept` (line 98) |
+| E4 | `false-closed-set` | notes:117 addends [367, 737] ≠ quoted total 751 (holds=True) |
+| F2 / § 2 | `stale-constant` | **0 entries, by design** — `38400` in `scripts/bash/generate-instructions.sh` is a chosen ceiling, not a copied measurement (`quickstart.md` § 2). The class reads a constant's *owner* (a `scripts/` declarer) and fires only when a second site disagrees; a restated ceiling with no owner declaring it is `multi-owner`'s territory, and `multi-owner` here reports 0 for that name |
+| § 5 history leg | `renumber-live-binding` | green — `.specify/specs/072-client-self-improvement/` carries no live `requirements.md` (archived under an older number), so FR-020's third legitimate duplicate is not a binding |
+
+## 3 — CLI contract readings
+
+```text
+$ non-disposable-check.py --help                                     → exit 0
+$ non-disposable-check.py --version                                  → exit 2
+$ non-disposable-check.py --roots                                    → exit 0
+$ non-disposable-check.py --emit-categories                          → exit 0
+$ non-disposable-check.py --nope                                     → exit 2
+$ non-disposable-check.py --scope s000-of-004 --scope-count 4        → exit 1
+$ non-disposable-check.py --scope s000-of-9999 --scope-count 9999    → exit 2
+
+# shard union / disjointness (C-606)
+$ for i in 0 1 2 3; do --scope s00${i}-of-004 --scope-count 4; done  → pairwise disjoint 0-entry overlap, union 1027 == full-run 1030
+
+# determinism (C-607): two consecutive --json runs
+$ cmp run1.json run2.json → byte-identical
+
+# zero-write (C-602): git status --porcelain around a full judging run
+$ cmp before.txt after.txt → byte-identical
+```
+
+## 4 — Disposition classes
+
+| Artifact | Disposition | Before reading | After reading |
+|----------|-------------|----------------|---------------|
+| `scripts/python/non-disposable-check.py` | `correct` (new artifact, authored) | absent | 1249 lines; answers `-h`/`--help`/`--version`, rejects an undeclared option with exit 2 |
+| `.specify/scripts/python/non-disposable-check.py` | generated (`sync-mirrors.py --write`) | absent | projected copy, `--check` ok |
+| `shared/definitions/non-disposable-definitions.md` | `correct` | smoke field row named a non-owner field (`smoke_comparison`) | row now names the owner's three fields (`smoke_command` / `smoke_exit_code` / `smoke_evidence_path`) |
+| `.specify/shared/definitions/non-disposable-definitions.md` | generated | drift | regenerated, `--check` ok |
+
+## 5 — The four reader questions, answered from the report alone
+
+- **what was looked at** — `coverage.roots` (ten, declaration order, presence + count), `coverage.candidates`, the excluded set with reasons, the missing roots, the undeclared siblings.
+- **what was found** — `entries[]`: `path`, `line`, `category`, `detection`, `severity`, `evidence_refs`.
+- **what is proposed** — `suggested_disposition` per entry; `vocabulary.dispositions` is the closed set read from the owner page.
+- **what is not done** — `not_closed` (open / unevaluated / unconfirmed / shards) and `closed`.
+

@@ -1,0 +1,12 @@
+u06 — 085 decision-tension record repair (092 A5)
+1. before: validate-decision-tensions.py --spec .specify/specs/085-sdd-temporary-goal-team --json -> status error,
+   dtr-rejected-form 3 HIGH at record lines 66/76/86 ("binding_constraints misses a non-empty pole_a/pole_b"), 3 errors.
+2. root cause read from engine: poles must be two 2-space-indented child lines `- pole_a: ...` / `- pole_b: ...`
+   under the `- **binding_constraints**:` label; the inline `pole_a: ...; pole_b: ...` form is not parsed.
+3. edit plan.md T-001: 70 -> 70-72 (label + two pole child lines); 72 -> 74 expected_sacrifice now `SC-001 Source ↑`.
+4. edit plan.md T-002: 80 -> 82-84; 82 -> 86 expected_sacrifice now `SC-005 Source ↑`.
+5. edit plan.md T-003: 90 -> 94-96; 92 -> 98 expected_sacrifice now `SC-006 Source ↑` (was unbound prose, would have
+   raised expected-sacrifice-unmapped once the pole defect cleared).
+6. after: status ok, 0 error / 0 warning, all six labels pass, channel high=0, scanned 213 lines / 3 records, exit 0.
+7. only .specify/specs/085-sdd-temporary-goal-team/plan.md touched; nothing committed, nothing pushed.
+U06-DONE

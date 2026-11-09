@@ -8,7 +8,7 @@ it rather than letting the two derivations drift apart silently.
 
 The defect this closes is visible in this repository's own history: the one real
 enumeration-style criterion was rewritten from "六个绘图技能" to "七个绘图技能" and back as
-the member set changed (``.specify/goal/draw-two-layer-structure/goal.md`` History), because a
+the member set changed (``.specify/anchoring/draw-two-layer-structure/goal.md`` History), because a
 member list retyped into prose has to be edited every time the directory changes. A derived
 set cannot go stale — but only if the derivation is honest about what it cannot see, which is
 what C-10's documented limitation and C-5/C-6's two distinguishable failure states are for.
@@ -36,7 +36,7 @@ CONTRACT = (
     ROOT / ".specify" / "specs" / "053-machine-decidable-artifacts" / "contracts"
     / "criterion-subject.md"
 )
-REAL_GOAL = ROOT / ".specify" / "goal" / "draw-two-layer-structure" / "goal.md"
+REAL_GOAL = ROOT / ".specify" / "anchoring" / "draw-two-layer-structure" / "goal.md"
 
 # --- C-17: the reference form and its two failure tiers, as a constant table ---
 
@@ -122,12 +122,12 @@ def _repo(tmp_path: Path, criteria: str, *, dirs=("skills/draw-a", "skills/draw-
           slug: str = "g1") -> Path:
     """A throwaway repo with a goal whose criteria block is `criteria`."""
     root = tmp_path / "repo"
-    (root / ".specify" / "goal" / slug).mkdir(parents=True, exist_ok=True)
+    (root / ".specify" / "anchoring" / slug).mkdir(parents=True, exist_ok=True)
     for d in dirs:
         (root / d).mkdir(parents=True, exist_ok=True)
         (root / d / "SKILL.md").write_text("# skill\n", encoding="utf-8")
     body = "\n".join(f"{i}. {c}" for i, c in enumerate(criteria.splitlines(), 1) if c.strip())
-    (root / ".specify" / "goal" / slug / "goal.md").write_text(
+    (root / ".specify" / "anchoring" / slug / "goal.md").write_text(
         GOAL_TMPL.format(slug=slug, criteria=body), encoding="utf-8"
     )
     return root
@@ -286,12 +286,12 @@ def test_c7_both_tiers_have_counter_samples_and_a_positive_control(tmp_path):
         "Nothing under [subjects: absent/*] renders.",
         "Nothing under [subjects: skills/zzz-*] renders either.",
     ]))
-    data = mod.parse_goal(root / ".specify" / "goal" / "g1" / "goal.md")
+    data = mod.parse_goal(root / ".specify" / "anchoring" / "g1" / "goal.md")
     states = [s["state"] for s in data["subjects"]]
     assert states == ["ok", "missing", "empty"], (
         f"one parse must derive all three states side by side: {states}"
     )
-    ok, problems = mod.validate_goal(root / ".specify" / "goal" / "g1" / "goal.md", root)
+    ok, problems = mod.validate_goal(root / ".specify" / "anchoring" / "g1" / "goal.md", root)
     assert not ok
     joined = "\n".join(problems)
     assert PROBLEM_PREFIXES["missing"] in joined and PROBLEM_PREFIXES["empty"] in joined
@@ -357,7 +357,7 @@ def test_c10_the_undetectable_case_is_documented_and_not_claimed(tmp_path):
 def _parse_names(root: Path, mod):
     """The name-level parse fingerprint of every goal definition under `root`."""
     out = []
-    for path in sorted((root / ".specify" / "goal").glob("*/goal.md")):
+    for path in sorted((root / ".specify" / "anchoring").glob("*/goal.md")):
         try:
             data = mod.parse_goal(path)
         except Exception as exc:                      # a parse failure is a name too
@@ -402,19 +402,19 @@ def test_c13_the_reference_form_moves_and_the_enumeration_does_not(tmp_path):
     root = _repo(tmp_path, f"{reference}\n{enumeration}",
                  dirs=("skills/draw-a", "skills/draw-b", "skills/draw-c"))
     before = [s["paths"] for s in mod.parse_goal(
-        root / ".specify" / "goal" / "g1" / "goal.md")["subjects"]]
-    criteria_before = mod.parse_goal(root / ".specify" / "goal" / "g1" / "goal.md")["criteria"]
+        root / ".specify" / "anchoring" / "g1" / "goal.md")["subjects"]]
+    criteria_before = mod.parse_goal(root / ".specify" / "anchoring" / "g1" / "goal.md")["criteria"]
 
     # remove one member, then add one back — in the copy only
     (root / "skills" / "draw-c" / "SKILL.md").unlink()
     (root / "skills" / "draw-c").rmdir()
     after_remove = [s["paths"] for s in mod.parse_goal(
-        root / ".specify" / "goal" / "g1" / "goal.md")["subjects"]]
+        root / ".specify" / "anchoring" / "g1" / "goal.md")["subjects"]]
 
     (root / "skills" / "draw-d").mkdir()
     (root / "skills" / "draw-d" / "SKILL.md").write_text("# skill\n", encoding="utf-8")
     after_add = [s["paths"] for s in mod.parse_goal(
-        root / ".specify" / "goal" / "g1" / "goal.md")["subjects"]]
+        root / ".specify" / "anchoring" / "g1" / "goal.md")["subjects"]]
 
     assert sorted(before[0]) == ["skills/draw-a", "skills/draw-b", "skills/draw-c"]
     assert sorted(after_remove[0]) == ["skills/draw-a", "skills/draw-b"], (
@@ -422,7 +422,7 @@ def test_c13_the_reference_form_moves_and_the_enumeration_does_not(tmp_path):
     )
     assert sorted(after_add[0]) == ["skills/draw-a", "skills/draw-b", "skills/draw-d"]
 
-    criteria_after = mod.parse_goal(root / ".specify" / "goal" / "g1" / "goal.md")["criteria"]
+    criteria_after = mod.parse_goal(root / ".specify" / "anchoring" / "g1" / "goal.md")["criteria"]
     enum_before = next(c for c in criteria_before if "Seven skills" in c)
     enum_after = next(c for c in criteria_after if "Seven skills" in c)
     assert enum_before == enum_after, (

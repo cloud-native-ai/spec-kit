@@ -1,0 +1,106 @@
+# 092 implement evidence — package P1 (owner page + declaration + registration)
+
+run: 20261109T121343 · package: P1 · host stage: implement
+
+## (i) readings before/after
+
+### declaration-reader
+
+```text
+$ python3 scripts/python/declaration_reader.py --action get --fact non-disposable-review-surface --repo .
+{
+  "body": {
+    "consumers": [
+      "scripts/python/non-disposable-check.py"
+    ],
+    "fact": "non-disposable-review-surface",
+    "former_carriers": [
+      "shared/definitions/non-disposable-definitions.md"
+    ],
+    "kind": "closed-set",
+    "note": "Order is part of the value: the coverage declaration renders these roots in this order and the ten are a closed set, so a directory outside it is an undeclared sibling (a hint, never a candidate) and a member that is absent is reported with its reason instead of being counted as zero.",
+    "statement": [
+      ".specify/archive",
+      ".specify/derive",
+      ".specify/goal",
+      ".specify/history",
+      ".specify/memory",
+      ".specify/project",
+      ".specify/review",
+      ".specify/specs",
+      ".specify/state",
+      ".specify/teams"
+    ]
+  },
+  "path": "shared/declarations/facts/non-disposable-review-surface.yaml",
+  "stem": "non-disposable-review-surface"
+}
+exit=0
+```
+
+### declaration-list
+
+```text
+$ python3 scripts/python/declaration_reader.py --action list --repo . | grep -n non-disposable
+1150:          "scripts/python/non-disposable-check.py"
+1152:        "fact": "non-disposable-review-surface",
+1154:          "shared/definitions/non-disposable-definitions.md"
+1171:      "path": "shared/declarations/facts/non-disposable-review-surface.yaml",
+1172:      "stem": "non-disposable-review-surface"
+exit=0
+```
+
+### glossary-validate
+
+```text
+$ python3 scripts/python/glossary-utils.py --action validate
+{
+  "valid": true,
+  "path": "/cws_data/cloud-native-ai/spec-kit/.specify/memory/glossary.md"
+}
+exit=0
+```
+
+### framework-map-row
+
+```text
+$ grep -c 'non-disposable-definitions.md' shared/definitions/framework-map.md
+1
+exit=0
+```
+
+### worktree after P1
+
+```text
+ M .specify/memory/glossary.md
+ M .specify/specs/081-acceptance-hardening/test-evidence/smoke-081.txt
+ M .specify/specs/092-non-disposable/team/092-non-disposable/team.md
+ M shared/definitions/framework-map.md
+?? .specify/specs/092-non-disposable/notes/measurement-corpus.md
+?? .specify/specs/092-non-disposable/notes/pre-change-measurements.md
+?? shared/declarations/facts/non-disposable-review-surface.yaml
+?? shared/definitions/non-disposable-definitions.md
+```
+
+## (ii) changed paths
+
+```text
+ M .specify/memory/glossary.md
+ M .specify/specs/092-non-disposable/team/092-non-disposable/team.md
+ M shared/definitions/framework-map.md
+?? .specify/specs/092-non-disposable/notes/measurement-corpus.md
+?? .specify/specs/092-non-disposable/notes/pre-change-measurements.md
+?? shared/declarations/facts/non-disposable-review-surface.yaml
+?? shared/definitions/non-disposable-definitions.md
+```
+
+## (iii) corpus entry ids
+
+None repaired in P1. The owner page names the 19 档 I entries (A1–A6, B1–B5, C1–C4, G1–G3) as its closure
+target and the 15 档 II entries (D1–D6, E1–E6, F1–F5, H1–H2) as the handoff target; both are read from
+`notes/measurement-corpus.md`, created in this package.
+
+## (iv) disposition classes
+
+`correct` — the owner page, the fact and the registration are new or completed text, not a supersede or an
+archive; nothing was deleted and nothing moved. No exemption was taken in this package.

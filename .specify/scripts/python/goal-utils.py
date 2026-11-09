@@ -3,7 +3,7 @@
 
 The command owns the interaction; this engine owns the deterministic parts —
 identity grammar, the three-part structure, the lifecycle table, change history,
-and archive enumeration. Fixed rules belong in a program, not in a model
+and anchoring enumeration. Fixed rules belong in a program, not in a model
 (Constitution Principle XII / token-efficiency Program-First).
 
 A Goal is composed of exactly three parts: objective narrative, zero-or-more
@@ -53,7 +53,10 @@ EXIT_INVALID = 4
 #: keep working unchanged.
 EXIT_BLOCKED = 5
 
-ARCHIVE_DIRNAME = ".specify/goal"
+#: Global archive of definitions: the "anchoring" concept (renamed from goal, 092).
+#: SPEC_GOAL_DIRNAME is deliberately still `goal`, and DEFINITION_FILENAME is still
+#: `goal.md` — the per-spec location and the file name are unchanged this round.
+ARCHIVE_DIRNAME = ".specify/anchoring"
 TEAM_DIRNAME = ".specify/teams"
 SPEC_GOAL_DIRNAME = "goal"
 SPEC_TEAM_DIRNAME = "team"
@@ -70,7 +73,11 @@ class ScopeError(Exception):
 
 
 class Scope:
-    """The resolved goal/team roots for one CLI invocation."""
+    """The resolved anchoring/team roots for one CLI invocation.
+
+    `goal_root` keeps its attribute name (the stored definition is still a `goal.md`);
+    only the wording and the global directory (`ARCHIVE_DIRNAME`) say "anchoring".
+    """
 
     __slots__ = ("scope", "repo_root", "spec_dir", "goal_root", "team_root")
 
@@ -128,7 +135,11 @@ def _has_team(root: Path, slug: str | None) -> bool:
 def resolve_scope(repo_root: Path, scope: str = "global",
                   spec_dir: str | os.PathLike | None = None,
                   team_slug: str | None = None) -> Scope:
-    """Resolve the goal/team roots. The path rule has exactly one owner: this function."""
+    """Resolve the anchoring/team roots. The path rule has exactly one owner: this function.
+
+    Global scope stores definitions under the anchoring archive (`.specify/anchoring/`);
+    spec scope keeps them inside the spec (`<spec>/goal/<slug>/goal.md`, 092 ruling).
+    """
     repo_root = Path(repo_root)
     global_goal = repo_root / ARCHIVE_DIRNAME
     global_team = repo_root / TEAM_DIRNAME
@@ -289,6 +300,8 @@ def is_valid_identity(slug: str) -> bool:
 
 
 def archive_root(repo_root: Path) -> Path:
+    """The global anchoring archive root (`.specify/anchoring/`), or the active spec's
+    `goal/` subtree when a spec scope is resolved."""
     if _ACTIVE_SCOPE is not None:
         return _ACTIVE_SCOPE.goal_root
     return Path(repo_root) / ARCHIVE_DIRNAME
@@ -885,7 +898,7 @@ def set_target_status(path: Path, tid: str, new_status: str) -> Path:
 
 def resolve_team_goal_identity(repo_root: Path, team_slug: str) -> tuple[str | None, str]:
     """Two-level goal identity resolution (036 §10.1) — explicit `goal_slug`
-    wins, else the team slug when it names an archived definition. No third
+    wins, else the team slug when it names an anchored definition. No third
     level (038 contract §2.1)."""
     root = team_root(repo_root)
     team_md = root / "team.md"
@@ -1324,23 +1337,26 @@ def main(argv: list[str] | None = None) -> int:
     common.add_argument("--repo-root", default=None, help="repository root (default: cwd)")
     common.add_argument("--json", action="store_true", help="machine-readable output")
     common.add_argument("--scope", choices=("global", "spec", "auto"), default=None,
-                        help="goal/team scope: global, spec (requires --spec-dir), or auto")
+                        help="anchoring/team scope: global (the .specify/anchoring archive), "
+                             "spec (requires --spec-dir; <spec>/goal/), or auto")
     common.add_argument("--spec-dir", default=None,
                         help="the spec directory for --scope spec/auto (repo-relative or absolute)")
 
     parser = argparse.ArgumentParser(
-        description="Goal definition engine for /speckit.goal.",
+        description="Anchoring (goal) definition engine — stores goal.md definitions "
+                    "in the .specify/anchoring archive or a spec's goal/ subtree.",
         parents=[common],
     )
     _sig_configure(parser)
     sub = parser.add_subparsers(dest="action", required=True)
 
     p_scope = sub.add_parser("resolve-scope", parents=[common],
-                             help="read: resolve the global/spec/auto goal and team roots")
+                             help="read: resolve the global/spec/auto anchoring and team roots")
     p_scope.add_argument("--team", default=None, help="optional team slug for identity-aware auto")
 
     p_create = sub.add_parser("create", parents=[common],
-                              help="write: archive a new goal definition")
+                              help="write: add a new definition to the anchoring archive "
+                                   "(or the spec's goal/ subtree)")
     p_create.add_argument("slug")
     p_create.add_argument("--objective", required=True)
     p_create.add_argument("--title", default=None, metavar="TEXT",
@@ -1359,7 +1375,8 @@ def main(argv: list[str] | None = None) -> int:
              "(GD-2/GD-3); requires NO goal — usable before `create`")
     p_check_stmt.add_argument("statement", help="candidate Target statement")
 
-    sub.add_parser("list", parents=[common], help="read: enumerate the archive")
+    sub.add_parser("list", parents=[common],
+                   help="read: enumerate the anchoring archive")
 
     p_status = sub.add_parser("status", parents=[common],
                               help="write: change lifecycle state")
@@ -1599,7 +1616,7 @@ def _emit(payload: dict, as_json: bool) -> None:
         return
     if "goals" in payload:
         if not payload["goals"]:
-            print("(archive is empty)")
+            print("(anchoring archive is empty)")
         for row in payload["goals"]:
             print(f"{row['slug']:<32} {row['status']:<10} "
                   f"criteria={row['criteria_count']:<3} updated={row['updated']}")

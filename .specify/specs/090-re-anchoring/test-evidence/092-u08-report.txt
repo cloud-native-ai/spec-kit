@@ -1,0 +1,12 @@
+U08 / 092 A6 — 080 post-081 schema completion (no commit, no push; 080 两个文件 + 本报告)
+files: .specify/specs/080-humanize-run-output/requirements.md, .../verification.md
+path-markers: SC-001 final, SC-002 final (US1/US2, both P1 = 定义性主旅程); SC-003..SC-010 supporting (US3/US4 P2、接线/卫生/安全/边界)
+validate-requirements .specify/specs/080-humanize-run-output/requirements.md: before 10 error (path-marker fail 10) / after 0 error 0 warning, 6/6 labels pass, rc=0
+smoke: /usr/bin/python3 -m pytest -q tests/contract/test_humanize_command_surface.py -> 101 passed, rc=0 (2026-11-09)
+smoke block written into verification.md canonical header (lines after post_change_commit): smoke_command / smoke_exit_code=0 / smoke_evidence_path=this file (only artifact this pass may write)
+SC statuses: unchanged, verification.md already carried 10 SC-NNN_status rows (SC-001 partial, SC-004 partial, SC-002/003/005../010 pass) — no row added
+closure (mandated form, --spec-dir only): before rc=2 / after rc=2, same input error — features.md has no row for '080-humanize-run-output' (row 062 owns this spec dir)
+closure (+--feature-registry .specify/memory/features.md --feature-detail .specify/memory/features/062.md): before rc=2 'SC-001 carries 0 **Path** markers (AS-01)' / after rc=2 'requirements.md carries no § Runtime Stack & Dependency Ownership'
+residual gaps, pre-existing and outside A6's declared scope (files untouched): requirements § Runtime Stack & Dependency Ownership; plan § Execution Premises / Inherited Blockers / D10; SC-001+SC-004 partial rows lack the 5 measurement-ladder fields
+no anomaly: no in-passing repair, no third file touched, working tree only carries the two 080 edits + this report
+U08-DONE

@@ -26,7 +26,7 @@ What a **team** is — the **goal** (north star, not a task list; concrete, veri
 | **modify** | "修改团队", "调整团队", "优化 team", "improve/adjust team" | `improve-team` |
 | **run** | "运行团队", "执行团队", "run/execute team", "跑一遍"(可选 `--target T-<nnn>` 指定目标切片) | `run-team` |
 
-**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. Global is `.specify/teams/`; spec is `<spec-dir>/team/`. Writes MUST use an explicit `global` or `spec` scope; reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`). The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
+**Scope**: pass `--scope global|spec|auto` and `--spec-dir <path>` through to the team operations. `global` is `.specify/teams/`; `spec` is `<spec-dir>/team/`. A team's scope is a **scope**, never a lifetime property — a spec-scoped team is an ordinary team stored under its spec, and `/speckit.team` carries no "temporary team" kind (concept owner: `.specify/shared/definitions/goal-definitions.md` § Scope Is Not Lifetime). Writes MUST use an explicit `global` or `spec` scope; reads MAY use `auto` (one candidate only; both candidates exit 2 `scope-ambiguous`). The path rule is owned by `goal-utils.py resolve-scope`; this template cites it and defines none of it.
 
 **Routing flow**:
 
@@ -62,7 +62,11 @@ When intent cannot be resolved from non-empty arguments, the command MUST report
 
 ### Goal-Based Create — deterministic entry (create path)
 
-When a token in `$ARGUMENTS` exactly matches an archived `<goal-slug>` under `.specify/goal/`, the create path enters the **goal-based branch** directly. The entry is deterministic and engine-driven — recognition runs `python3 .specify/scripts/python/goal-utils.py list --json` and exact-matches the token (or a path to its `goal.md`); it MUST NOT be asserted from memory or semantics, and the branch decision is disclosed in the run output rather than gated on confirmation. Two rejections stop without writing: a **dangling reference** (user-named but absent from `list`) errors with the verbatim prefix `goal 未定义:` and points to `/speckit.goal create`; a **terminal goal** (`achieved`/`abandoned`) is reported and refused. Everything after entry — loading via `parse_goal` (objective, criteria incl. the `None provided.` missing state, status, targets, history), the four-element analysis, the decomposition proposal with batch approval, territory discipline, and team derivation/落盘 — is the skill's branch procedure: `.specify/skills/internal/create-team/references/create-mode.md` → *Goal-based create branch*.
+When a token in `$ARGUMENTS` exactly matches an archived `<slug>` in the project-level anchoring archive `.specify/anchoring/`, the create path enters the **goal-based branch** directly. The entry is deterministic and engine-driven — recognition runs `python3 .specify/scripts/python/goal-utils.py list --json` (add `--scope spec --spec-dir <path>` to recognize the spec's own goal instead) and exact-matches the token (or a path to its `goal.md`); it MUST NOT be asserted from memory or semantics, and the branch decision is disclosed in the run output rather than gated on confirmation. Two rejections stop without writing: a **dangling reference** (user-named but absent from `list`) errors with the verbatim prefix `goal 未定义:` and points to `/speckit.goal create`; a **terminal goal** (`achieved`/`abandoned`) is reported and refused. Everything after entry — loading via `parse_goal` (objective, criteria incl. the `None provided.` missing state, status, targets, history), the four-element analysis, the decomposition proposal with batch approval, territory discipline, and team derivation/落盘 — is the skill's branch procedure: `.specify/skills/internal/create-team/references/create-mode.md` → *Goal-based create branch*.
+
+### `goal` key — the bound goal's identity
+
+Inside a `team.md`, `goal` is the **`goal_slug` of the goal this team serves** — for `scope: spec`, the slug of the spec-scoped goal at `<spec-dir>/goal/<slug>/goal.md`; for `scope: global`, the slug of an anchoring entry. It is an identity reference, never a copy of the goal's content (concept and binding rule: `.specify/shared/definitions/goal-definitions.md`).
 
 ### Run Mode
 

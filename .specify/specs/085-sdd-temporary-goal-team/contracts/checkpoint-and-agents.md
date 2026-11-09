@@ -5,8 +5,11 @@ Owners: `skills/internal/improve-team/SKILL.md` (targeted team edits), `skills/i
 - **C-001**: After every stage U4 and before the next dispatch, the driver MUST run the five-part checkpoint defined in `skills/external/sdd-loop-driver/references/checkpoint-protocol.md` — parts 1–4 carried by C-002…C-006 below, plus part 5, the Direction audit, which is mandatory (C-014).
   <!-- superseded by: skills/external/sdd-loop-driver/references/checkpoint-protocol.md (five-part checkpoint; part 5 Direction audit is mandatory) -->
   <!-- prior text, retained (2026-11-09): C-001 "the driver MUST run a four-part checkpoint"; C-008 "All four parts MUST be present" -->
+  <!-- 092 reviewed this retention and added no marker: the retained sentence names no "temporary" attribute, and the four-part→five-part gap is already carried by the owner pointer on the line above. -->
 - **C-002**: Part 1 MUST consume the U4 verdict and a `loop-state.py` snapshot; it MUST NOT infer completion from self-report.
-- **C-003**: Part 2 MUST record `criterion / degree / evidence_ptr` for the temporary goal; goal content changes only through the goal engine.
+- **C-003**: Part 2 MUST record `criterion / degree / evidence_ptr` for the spec-scoped goal; goal content changes only through the goal engine.
+  <!-- superseded (092: scope-not-temporary) -->
+  <!-- prior text, retained (2026-11-09): "Part 2 MUST record `criterion / degree / evidence_ptr` for the temporary goal; …" -->
 - **C-004**: Part 3 MUST produce at most one team-configuration proposal, with its evidence and exact delta.
 - **C-005**: The proposal MUST be ratified according to `checkpoint_policy.ratification` before it is applied.
 - **C-006**: Part 4 MUST record the next stage's requested/effective concurrency and roster decision.

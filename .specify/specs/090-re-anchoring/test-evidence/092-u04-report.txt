@@ -1,0 +1,15 @@
+u04 — 092 A2 (084 core invariant): harness-triple-check coverage/verify now return unclassified 0
+Choice = one exclusion row per candidate, not a fact declaration. All three fail D1 (deliverable is a printed report / digest / remote-exec result, not one of the four asset kinds). A declaration would also fail: no engine of the three reads declaration_reader, so it would stay permanently pending (STR-009); adding a read point means editing measure.py / status-digest.py / ssh-exec.py, outside "084 spec files + its exclusion declarations". Reason = no-harness-asset (no-machine-fact is reserved for a unit whose migrated roster fact left; none of these ever held one).
+Rows appended at the end of shared/declarations/exclusions/no-harness-asset.yaml (E-2: append, never reorder), 32 -> 35 rows:
+  templates/commands/measure.md -> carrier scripts/python/measure.py, anchor templates/commands/measure.md#Delegation
+  templates/commands/status.md -> scripts/python/status-digest.py, templates/commands/status.md#Delegation
+  skills/external/ssh-utils/SKILL.md -> skills/external/ssh-utils/scripts/ssh-exec.py, skills/external/ssh-utils/SKILL.md#Boundary
+Mirror: sync-mirrors.py --write --only shared/declarations/exclusions/ -> both copies byte-identical; --check --only ... exit 0 (no unrelated drift pulled in).
+Before: coverage candidates 86 / in-scope 13 / excluded 70 / unclassified 3 (measure, status, ssh-utils), exit 1; verify declarations 24, consistency 32/32 & 16/16, findings 3, exit 1.
+After: coverage candidates 86 / in-scope 13 / excluded 73 / unclassified 0 / pending 0, exit 0; verify declarations 24, 32/32 & 16/16, findings 0, exit 0; two runs byte-identical sha256 1b45a860...49e6 (68/65 ms).
+084/verification.md: SC-001_value / SC-002_value / SC-004_value updated, each with a dated SC-00x_recheck line recording before -> after. requirements.md:219 unchanged — it is the SC-001 criterion ("unclassified 0"), still satisfied; the line carries no reading.
+Not committed, not pushed; files touched = 084/verification.md, the exclusion declaration (source + mirror), this report.
+Observation (pre-existing, untouched): .specify/scripts/python/harness-triple-check.py resolves repo=.specify and exits 2 on the old carrier skills/external/database-utils/scripts/query.py; the required scripts/python/... invocation is green.
+Concurrent drift (not mine): verify's backward consistency now reads 16/17 because another 092 writer added a pointer to non-disposable-review-surface in skills/internal/manage-history/SKILL.md without registering it in consumers/former_carriers; the 084 invariant (unclassified 0) holds.
+Fast-fail: no anomaly; no in-passing repair.
+U04-DONE

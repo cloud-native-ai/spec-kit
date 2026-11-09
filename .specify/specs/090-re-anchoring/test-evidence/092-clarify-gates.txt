@@ -1,0 +1,81 @@
+=== clarify gates (092-non-disposable) ===
+date: 2026-11-09
+artifact: .specify/specs/092-non-disposable/requirements.md
+stage: clarify (Mode A, unattended)
+
+--- gate 1: validate-requirements.py (require 0 error) ---
+file: .specify/specs/092-non-disposable/requirements.md
+status: ok
+  [id-contiguous] pass (0)
+  [doc-order] pass (0)
+  [ref-resolvable] pass (0)
+  [marker-count] pass (0)
+  [dup-id] pass (0)
+  [path-marker] pass (0)
+scanned: 466 lines, 85 definition rows, 0 shared strings
+0 error(s), 0 warning(s)
+EXIT=0
+
+--- gate 2: flow-class-check.py --action lookup --unit-id spec:092-non-disposable ---
+unit_id: spec:092-non-disposable
+flow_class: execution
+flow_type: -
+source: declaration
+marker: null
+basis: null
+neutral: false
+EXIT=0
+
+--- gate 3: verify-decision-tensions.py --spec .specify/specs/092-non-disposable ---
+status: unreadable
+  [dtr-anchor] pass (0)
+  [dtr-section-missing] pass (0)
+  [dtr-record-incomplete] pass (0)
+  [dtr-tension-id] pass (0)
+  [dtr-rejected-form] pass (0)
+  [expected-sacrifice-unmapped] pass (0)
+errors: 0 / warnings: 0 / records scanned: 0 / HIGH: 0 / findings: []
+note: plan.md does not exist yet (Mode A), so there is no plan tension set to validate;
+      "unreadable" here means "no plan artifact", not a failing tension record.
+EXIT=0
+
+--- gate 4: decomposition-check.py --mode plan --requirements <spec>/requirements.md ---
+{"mode": "plan", "decision": "proceed", "measured": {"fr_count": 65, "task_count": null, "fr_ceiling": 120, "task_ceiling": 160}, "reasons": [], "checked_at": "2026-11-09T02:56:05Z"}
+EXIT=0
+
+--- appendix: FR/SC counts (deterministic) ---
+FR count: 65
+SC count: 20
+SC path=final: 17
+SC path=supporting: 3
+SC Measurement Source rows: 20
+
+--- appendix: numbering map (requirements ids -> clarify ids) ---
+This map is the audit trail for the renumbering that the integration caused; the live ids
+above are contiguous and in document order (validator gate 1 proves both).
+FR-001 -> FR-001, FR-002 -> FR-002, FR-003 -> FR-008, FR-004 -> FR-007, FR-005 -> FR-009,
+FR-006 -> FR-010, FR-007 -> FR-011, FR-008 -> FR-015, FR-009 -> FR-016, FR-010 -> FR-017,
+FR-011 -> FR-018, FR-012 -> FR-019, FR-013 -> FR-020, FR-014 -> FR-021, FR-015 -> FR-022,
+FR-016 -> FR-023, FR-017 -> FR-024, FR-018 -> FR-025, FR-019 -> FR-026, FR-020 -> FR-027,
+FR-021 -> FR-028, FR-022 -> FR-029, FR-023 -> FR-030, FR-024 -> FR-036, FR-025 -> FR-042,
+FR-026 -> FR-043, FR-027 -> FR-044, FR-028 -> FR-045, FR-029 -> FR-046, FR-030 -> FR-047,
+FR-031 -> FR-048, FR-032 -> FR-049, FR-033 -> FR-052, FR-034 -> FR-053, FR-035 -> FR-054,
+FR-036 -> FR-055, FR-037 -> FR-058, FR-038 -> FR-059, FR-039 -> FR-061, FR-040 -> FR-062,
+FR-041 -> FR-063 (rewritten by D-2; the "constitution principle" clause is replaced by the
+        seven-face landing clause, and the two follow-up clauses became FR-064 / FR-065)
+new ids (no requirements-stage predecessor): FR-003, FR-004, FR-005, FR-006, FR-012, FR-013,
+  FR-014, FR-031, FR-032, FR-033, FR-034, FR-035, FR-037, FR-038, FR-039, FR-040, FR-041,
+  FR-050, FR-051, FR-056, FR-057, FR-060, FR-064, FR-065
+new SC ids: SC-015 (disposition bridge), SC-016 (detection subject / degradation),
+  SC-017 (exemption expiry), SC-018 (declared review surface), SC-019 (four-stage confirm
+  semantics), SC-020 (concurrency within the existing mechanism + A-H handoff boundary)
+rewritten SC: SC-011 (five landing points -> seven-face landing)
+
+--- appendix: review-surface re-measure (SC-014 baseline) ---
+archive 66 / derive 2 / goal 55 / history 7 / memory 1213 / project 10 / review 1 /
+specs 2897 / state 27 / teams 74 = 4352 files (requirements stage measured 4345 on the
+same ten roots; the delta is one run's landed records, baseline is a reference not a threshold)
+
+verdict: validate-requirements 0 error / 0 warning; flow_class=execution (source=declaration);
+decision-tensions has no plan artifact to judge (Mode A); decomposition proceed
+(fr=65 <= 120, no task rows yet so TASK_CEILING not evaluated).

@@ -1,0 +1,9 @@
+G1 = 092 档 II D5 (multi-owner) — 090's rule anchor: one enumeration, three pointers + RULE_SET one-to-one
+File 1: shared/definitions/re-anchoring-definitions.md (+ mirror .specify/shared/… copied byte-identical; sync-mirrors --check pair ok) — 1 marker landed at §1.1 `<!-- 092 handoff: D5 → 090-re-anchoring -->`. §1.1 now holds the sole enumeration (①-⑧ as a numbered list, report discipline ⑧ included); §1.2 Q1 and §3 bullet reworded to pointers to §1.1, member list deleted there (old text not retained: the entry's defect is the duplication); §2/§4 untouched.
+File 2: tests/contract/test_sdd_loop_driver_reanchor.py (RULE_SET + its comment only) — marker added, entries renumbered ①-⑧ in the owner's order; ⑥ confirmation gate added (was absent), ⑧ `\breport discipline\b` added (was absent); ②-⑦ patterns unchanged; ① kept as two entries because the protocol names that member twice.
+Run: /usr/bin/python3 -m pytest tests/contract/test_sdd_loop_driver_reanchor.py -q -> exit 0, "6 passed" (baseline before both edits: also 6 passed); + test_reanchoring_contract.py -> 10 passed.
+Red control (mutants on a copy via SPECKIT_CONTRACT_ROOT, repo untouched, clone restored to 6 passed): deleting "report discipline" from Q1 -> 2 failed; replacing "gate discipline" -> 2 failed.
+Not written: 090-re-anchoring's own body (this feature is 档 II here), skills/external/…/checkpoint-protocol.md, no commit, no push.
+Out of my write domain, left untouched: shared/{definitions/harness-triple-definitions, definitions/self-explanatory-definitions,workflow/acceptance-hardening}.md are modified in the worktree by another seat (sync-mirrors reports their mirror pairs as DIFF).
+ANOMALY: brief's path `test-evidence/seatG1-report.txt` is not repo-root-relative; written to .specify/specs/092-non-disposable/test-evidence/seatG1-report.txt per the owner's test-evidence definition (file landed 2026-11-09).
+SEAT-G1-DONE

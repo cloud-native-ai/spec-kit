@@ -102,7 +102,7 @@ def test_transition_table(frm, to, ok):
 
 
 # --------------------------------------------------------------------------
-# create / validate / list against a temp archive
+# create / validate / list against a temp anchoring archive
 # --------------------------------------------------------------------------
 
 def test_create_writes_the_three_part_structure(tmp_path):
@@ -110,7 +110,7 @@ def test_create_writes_the_three_part_structure(tmp_path):
         tmp_path, "demo-goal", "Reach a stable release.", ["All suites green.", "Docs current."]
     )
     text = path.read_text(encoding="utf-8")
-    assert path == tmp_path / ".specify/goal/demo-goal/goal.md"
+    assert path == tmp_path / ".specify/anchoring/demo-goal/goal.md"
     assert "status: active" in text
     assert "## Objective" in text
     assert "## Success Criteria" in text
@@ -166,7 +166,7 @@ def test_composite_objective_is_rejected_with_a_split_instruction(tmp_path):
     assert "split" in message.lower()
 
 
-def test_list_enumerates_the_archive_without_reading_team_files(tmp_path):
+def test_list_enumerates_the_anchoring_archive_without_reading_team_files(tmp_path):
     goal_utils.create_goal(tmp_path, "alpha", "First outcome.", ["c1"])
     goal_utils.create_goal(tmp_path, "beta", "Second outcome.", ["c1", "c2"])
     rows = goal_utils.list_goals(tmp_path)
@@ -193,7 +193,7 @@ def test_criteria_change_preserves_the_prior_value(tmp_path):
 
 
 def test_validate_flags_a_missing_criteria_section(tmp_path):
-    path = tmp_path / ".specify/goal/broken/goal.md"
+    path = tmp_path / ".specify/anchoring/broken/goal.md"
     path.parent.mkdir(parents=True)
     path.write_text(
         "---\nstatus: active\ncreated: 2026-08-05\nupdated: 2026-08-05\n---\n\n"

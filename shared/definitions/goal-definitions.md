@@ -1,14 +1,14 @@
 # Goal Definitions Reference
 
-Canonical definition of the **Goal** concept in Spec Kit, its boundary against **Requirement**, the criteria authority rule, the singularity rule, the **Target** decomposition, and the Goal–Team binding. This file is the single source of truth for the Goal concept; other documents (`/speckit.team`, `skills/internal/create-team`, the glossary) link here rather than re-defining it. It sits alongside the other concept anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
+Canonical definition of the **Goal** concept in Spec Kit and of the two **scopes** it is authored in — **Anchoring (锚点)** and **spec-scoped goal** — its boundary against **Requirement**, the criteria authority rule, the singularity rule, the **Target** decomposition, and the Goal–Team binding. This file is the single source of truth for the Goal concept and its scopes; other documents (`/speckit.team`, `skills/internal/create-team`, the glossary) link here rather than re-defining it. It sits alongside the other concept anchors: `tool-definitions.md`, `agent-definitions.md`, `subagent-definitions.md`.
 
 ## What a Goal Is
 
-A **Goal** is a **project-level, first-class concept**: an **authored fact source** (never a derived artifact) that states a desired end state and how to tell it has been reached. Its **object is unrestricted**: a Goal may describe any desired outcome in any dimension — it is not limited to what the project's code implements (see Goal Dimensions below). It is persisted under `.specify/goal/<goal-slug>/` and is composed of exactly three parts:
+A **Goal** is a **first-class concept**: an **authored fact source** (never a derived artifact) that states a desired end state and how to tell it has been reached. Its **object is unrestricted**: a Goal may describe any desired outcome in any dimension — it is not limited to what the project's code implements (see Goal Dimensions below). It is persisted under one of the two scopes below and is composed of exactly three parts:
 
 1. **Goal narrative** — the desired end **outcome** (north star). Outcome, not steps: a Goal MUST NOT be written as a task list, an implementation plan, or a sequence of phases.
 2. **Verifiable success criteria** — thresholds / satisfaction conditions that an evaluator (a program or a scoring agent) can measure progress against.
-3. **Lifecycle state** — `active` / `achieved` / `abandoned`. Terminal Goals are retained, never deleted (see Goal Archive).
+3. **Lifecycle state** — `active` / `achieved` / `abandoned`. Terminal Goals are retained, never deleted (see Storage & Anchoring Archive).
 
 A Goal MAY additionally carry a **Target decomposition** (see Target Decomposition below). Like timestamps, Targets are an **annex** around the concept — never a fourth composition part.
 
@@ -21,6 +21,27 @@ Two operating properties follow:
 
 - **Measured by degree**: a Goal is *pursued*; its verification is progress-shaped (percentage, threshold attainment, evaluator scores) — not a per-clause pass/fail.
 - **Modified deliberately**: changing a Goal is a strategic act — the change is recorded and history is preserved; silent drift is prohibited.
+
+### Scope: Anchoring vs Spec-Scoped Goal
+
+Scopes differ **only** in storage location and lifecycle container. Composition (the three parts above, plus annexes), identity grammar, lifecycle states, change-history discipline, criteria authority and the engine are **identical** in both scopes.
+
+| Scope | Concept name | Storage | What it is |
+|-------|--------------|---------|------------|
+| Global | **Anchoring** (锚点) | `.specify/anchoring/<slug>/goal.md` | The project-level anchor: an end state pursued across Features, registered in the Anchoring Archive below |
+| Spec | **Goal** (spec-scoped) | `.specify/specs/<NNN-slug>/goal/<goal-slug>/goal.md` | An ordinary Goal attached to one spec, used when the SDD flow is the outer container |
+
+- **No "temporary" property.** A scope is not a lifetime: a spec-scoped goal is an ordinary Goal that happens to live under a spec, and an anchoring is an ordinary Goal that happens to live in the project archive. Neither expires, and no either-scope Goal is ever created with a temporary character — see Scope Is Not Lifetime below.
+- **Hard boundary**: a spec-scoped goal is not an anchoring and does not rebind an anchoring team; it does not write `.specify/anchoring/**`. Promoting one to an anchoring is a deliberate `/speckit.goal` action, never an automatic side effect of an SDD run.
+- **Creation timing (spec scope)**: authored only after the `requirements` stage passes U4 — the requirement set is what makes the desired end state nameable. It MUST NOT exist before requirements; a resumed run validates and reuses an existing spec-scoped goal instead of recreating it.
+- **Authored, not derived**: the orchestrator writes the objective and degree criteria; it MUST NOT mechanically copy the requirements specification's `SC-` rows into the goal. The Goal-vs-Requirement boundary and the criteria-disjointness rule apply unchanged.
+- **Identity (spec scope)**: defaults to the spec directory basename; one goal per spec by default. A deliberate re-scope may use a suffixed identity, but the engine refuses duplicates.
+- **Lifecycle (spec scope)**: `active` / `achieved` / `abandoned`; a terminal Goal stays under the spec and is never deleted. It is not registered in the Anchoring Archive.
+- **Targets**: optional, unordered scope slices in either scope; they never encode SDD stage order or dependencies.
+
+### Scope Is Not Lifetime
+
+A Goal or Team carries exactly one **scope**, never a *temporary* property, and the retired "temporary goal / temporary team" naming is mapped forward under Scope Is Not Lifetime. Composition, identity grammar, lifecycle states and the engine are the same in either scope.
 
 ### Goal Dimensions (illustrative, not a closed taxonomy)
 
@@ -43,7 +64,7 @@ Boundary note: when a dimension-2-style desire is frozen into a **binding rule**
 | Object (作用对象) | Unrestricted — framework/harness, codebase conventions, delivered-capability outcomes, … (any dimension) | The project's source code / configuration — what feature they must implement |
 | Essence | Desired end state + attainment criteria | Binding clauses on a deliverable |
 | Question answered | *why / whither* — toward what, to what degree | *what / how-correct* — what MUST hold, what counts as done right |
-| Home | `.specify/goal/<goal-slug>/` (authored fact source) | `.specify/specs/<ID>-<slug>/requirements.md` (bound to one Feature) |
+| Home | Anchoring: `.specify/anchoring/<slug>/goal.md`; spec-scoped goal: `.specify/specs/<NNN-slug>/goal/<goal-slug>/goal.md` (authored fact source) | `.specify/specs/<ID>-<slug>/requirements.md` (bound to one Feature) |
 | Shape | Singular narrative + criteria per Goal | Enumerated clauses (FR-xxx / SC-xxx) |
 | Verification | By degree — progress, thresholds, evaluator scoring | Binary — per-clause pass/fail against tests and acceptance scenarios |
 | Change discipline | Deliberate modification with recorded history (no silent drift) | Clarification/revision flow (Clarifications sessions, re-gated spec) |
@@ -70,7 +91,7 @@ Success-shaped statements exist in both worlds; their authority is disjoint (dec
 
 ## 判据主体指代形 (Criterion Subject Reference)
 
-一条 goal 成功判据常常是对**一组同类制品**的断言(「每个绘图技能都……」)。把成员逐个打进判据文本,判据就会随目录增删而失真:本仓唯一真实的枚举型判据正是这样被反复改写的——`.specify/goal/draw-two-layer-structure/goal.md` 的 `## History` 里留着「六个绘图技能」与「七个绘图技能」两个前值,改的都是同一条判据。故判据 MAY 改用**指代形**,让主体集合在**解析那一刻**由仓库现状导出,而不是取自判据文本里的成员枚举:
+一条 goal 成功判据常常是对**一组同类制品**的断言(「每个绘图技能都……」)。把成员逐个打进判据文本,判据就会随目录增删而失真:本仓唯一真实的枚举型判据正是这样被反复改写的——anchoring `draw-two-layer-structure` 的 `goal.md` 的 `## History` 里留着「六个绘图技能」与「七个绘图技能」两个前值,改的都是同一条判据。故判据 MAY 改用**指代形**,让主体集合在**解析那一刻**由仓库现状导出,而不是取自判据文本里的成员枚举:
 
 `[subjects: <glob>]`
 
@@ -139,31 +160,33 @@ Four defining properties:
 
 **Run assignment.** A team run MAY name one Target under the team's **bound** Goal. The reference is validated — a dangling or terminal Target is reported, never silently accepted — and a run that names no Target runs against the Goal broadly, exactly the pre-Target behavior. Work items attribute to the Target through the ledger's `target_ref`.
 
-## Storage & Goal Archive
+## Storage & Anchoring Archive
+
+Anchoring (project-level, global scope):
 
 ```
-.specify/goal/
-└── <goal-slug>/     # one Goal definition — narrative + criteria + lifecycle state
+.specify/anchoring/
+└── <slug>/goal.md     # one Anchoring — narrative + criteria + lifecycle state
 ```
 
-- **Goal Archive** = the whole `.specify/goal/` tree: the materialized "current & historical goal list" of the project. Terminal (`achieved` / `abandoned`) Goals stay archived — never deleted.
-- This document fixes only the **location and semantics**; the file layout inside `<goal-slug>/` is owned by the feature that implements Goal management.
-
-## Temporary (Run-Scoped) Goal
-
-A **Temporary Goal** is a spec-attached, run-scoped authored end-state definition used when the SDD flow is the outer container (run-scoped SDD flow). It uses the same three-part composition, identity grammar, lifecycle table, change-history discipline, and engine as a Global Goal; only its **storage and lifecycle scope** differ.
+Spec-scoped goal:
 
 ```
 .specify/specs/<NNN-slug>/goal/
-└── <goal-slug>/goal.md     # one temporary goal for this spec
+└── <goal-slug>/goal.md     # one spec-scoped goal
 ```
 
-- **Creation timing**: authored only after the `requirements` stage passes U4 — the requirement set is what makes the desired end state nameable. It MUST NOT exist before requirements; a resumed run validates and reuses an existing temporary goal instead of recreating it.
-- **Authored, not derived**: the orchestrator writes the objective and degree criteria; it MUST NOT mechanically copy the requirements specification's `SC-` rows into the goal. The Goal-vs-Requirement boundary and the criteria-disjointness rule apply unchanged.
-- **Identity**: defaults to the spec directory basename; one temporary goal per spec by default. A deliberate re-scope may use a suffixed identity, but the engine refuses duplicates.
-- **Lifecycle**: `active` / `achieved` / `abandoned`; a terminal temporary goal stays under the spec and is never deleted. It is not registered in the global Goal Archive.
-- **Targets**: optional, unordered scope slices; they never encode SDD stage order or dependencies.
-- **Global boundary**: a temporary goal is not a Global Goal, does not rebind a Global Team, and does not write `.specify/goal/**`. Promotion to a Global Goal is a deliberate `/speckit.goal` action, never an automatic side effect of an SDD run.
+- **Anchoring Archive** = the whole `.specify/anchoring/` tree: the materialized "current & historical anchoring list" of the project. Terminal (`achieved` / `abandoned`) Anchoring entries stay archived — never deleted.
+- The directory rename `.specify/goal/` → `.specify/anchoring/` is the path side of this concept rename; it is **not** recorded as history here, and neither are prior wordings of this document — the change record lives outside this file.
+- This document fixes only the **location and semantics**; the file layout inside `<slug>/` is owned by the feature that implements Goal management.
+
+## Scope Is Not Lifetime
+
+See the Scope section above for the two scopes and their storage. The retired wording is listed here so a reader who meets it in an older artifact can map it forward, not so it can be reused:
+
+- "Temporary Goal" / "临时 goal" → **spec-scoped Goal** (earlier spellings: "temporary goal", "run-scoped goal"). The Goal's scope is *spec*, and its lifetime is the ordinary Goal lifetime.
+- "Global Goal" → **Anchoring (锚点)**.
+- "Temporary Team" → **team** (Scope Is Not Lifetime applies to teams identically: scope = spec, no lifetime property).
 
 ## Goal–Team Binding
 
@@ -176,15 +199,15 @@ A **Temporary Goal** is a spec-attached, run-scoped authored end-state definitio
 
 | Term | Meaning | Where defined |
 |------|---------|---------------|
-| **Goal** (this document) | Project-level authored end-state definition (narrative + criteria + lifecycle) | here; store `.specify/goal/<goal-slug>/` |
-| **Temporary Goal** (this document) | Spec-attached, run-scoped authored end-state definition; same composition/engine, stored under the spec | here; store `.specify/specs/<NNN-slug>/goal/<goal-slug>/goal.md` |
-| **Goal Archive** | The `.specify/goal/` tree — current & historical Goals, terminal ones retained | here |
+| **Anchoring** (锚点, this document) | Project-level (global-scope) authored end-state definition — narrative + criteria + lifecycle; the former "Global Goal" | here; store `.specify/anchoring/<slug>/goal.md` |
+| **Goal · spec-scoped** (this document) | Ordinary Goal attached to one spec; same composition/engine as an Anchoring, scope = spec (the retired "Temporary Goal") | here; store `.specify/specs/<NNN-slug>/goal/<goal-slug>/goal.md` |
+| **Anchoring Archive** | The `.specify/anchoring/` tree — current & historical Anchoring entries, terminal ones retained | here |
 | **Goal–Team Binding** | One-way `goal_slug` reference, N teams : 1 Goal, identity-only | here |
 | **Team Goal** | A team's reference to the project-level Goal it serves | here; declared in `.specify/teams/<slug>/team.md` |
 | **Requirement** | Feature-bound spec of testable clauses (FR/SC) driving plan → tasks → implement → verification | `.specify/specs/<ID>-<slug>/requirements.md`; `/speckit.requirements` |
 | **Feature** | Long-lived capability entry in the feature index | `.specify/memory/features.md` |
 | **Success Criteria (SC-xxx)** | Per-feature measurable outcomes — authority limited to their Feature | requirements spec of that Feature |
 | **Team** | Multi-agent structure organized around (exactly one) Goal | `/speckit.team`, `skills/internal/create-team` |
-| **Target** (this document) | Run-assignable sub-outcome (scope slice) under exactly one Goal — an annex to the definition, unordered, authored via `/speckit.goal` | here; persisted in `.specify/goal/<goal-slug>/goal.md` (`## Targets`) |
+| **Target** (this document) | Run-assignable sub-outcome (scope slice) under exactly one Goal — an annex to the definition, unordered, authored via `/speckit.goal` | here; persisted in that Goal's `goal.md` (`## Targets`), whichever scope holds it |
 | **`target_ref`** | A ledger work item's attribution to a Target (`T-<nnn>`) | `items.jsonl` contract (`skills/internal/create-team`, summary mapping) |
 | **"target" elsewhere** | `optimization_target` / `co_targets` (the artifact an iteration loop mutates), a territory entry's `target` field, the `--target` flags of the evidence/interview engines — all **unrelated** to Goal Targets | their owning docs; glossary disambiguation |

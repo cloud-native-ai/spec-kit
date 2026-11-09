@@ -1,0 +1,11 @@
+u12 — 088 team numbering residue repair (092 C4b)
+Scope: .specify/specs/088-speckit-visualization only; no commit, no push.
+team/team.md: name "SDD Temporary Team 087" -> "SDD Temporary Team 088"; slug 088-speckit-visualization and spec_dir unchanged.
+git mv team/087-reporting-dogfood -> team/088-reporting-dogfood (2 files: team.md, runs/20261106T100000Z-report.md).
+dogfood team.md: name "087 Reporting Dogfood" -> "088 Reporting Dogfood"; slug "087-reporting-dogfood" -> "088-reporting-dogfood"; spec_dir already .specify/specs/088-speckit-visualization.
+Path refs updated: checkpoints/12-final-closure.md L8/L9/L23; verification.md SC-001_value, SC-002_value, SC-002_evidence.
+One-line history note added (checkpoints §3 "history:", plus inline parenthetical in SC-001_value).
+Left verbatim as dated captures/records: test-evidence/dogfood-reporter-lines-r3.txt (20 lines), dogfood-reporter-run-record-r3.md, sc002-roster-validate.txt, runs/20261106T100000Z-report.md body.
+Verify: both team.md YAML parse (name/slug/spec_dir correct); validate-roster.py on dogfood roster -> "conforming ... exactly one reporter seat", exit 0; on main team.md -> absent-seat exit 1 (pre-existing expected reading, it is not a reporter team).
+Out-of-feature refs untouched: .specify/state/088-speckit-visualization.md:830, 092 notes (input-review-080-090.md, measurement-corpus.md), 090 test-evidence/team-create.txt.
+U12-DONE

@@ -27,6 +27,9 @@
     7. ⑦ 预算纪律（token 与时间预算）；
     8. ⑧ 报告纪律（进度报告与回传形态）。
 - 方向锚 MUST 落在可持久、可重读的载体上（驱动状态脊 / agent 的分配简报），MUST NOT 只存在于会话上下文。
+- **两个词不是一件事**：**方向锚**（direction anchor）是一次派发/一轮运行内部「任务锚 + 规则锚」这两部分的合称，
+  分节见上两项，它是本纪律的操作对象；**anchoring**（锚点）是项目级、跨运行留存的方向锚归档实体，见 §5。
+  二者不可互相指代：说「方向锚已归档」是错的，说「anchoring 在本轮内被重读」也是错的。
 - 会话被压缩、切换或重入时，agent MUST 从方向锚恢复，而不是从记忆或印象恢复。
 - 任何与方向锚冲突的动作 MUST 先停下：要么是纠正（唯一读法、局部可逆），要么是裁定（回到用户或上游）。
 
@@ -73,3 +76,23 @@ MUST NOT 在每个工具调用后重载整本手册：那是仪式，会把锚�
 - **Fast Fail**：本纪律负责「发现漂移」，fast-fail 负责「漂移的纠正/裁定二分」。
 - **One Source of Truth**：本文件拥有概念与重载分层；检查点的执行步骤归 checkpoint 协议；两者以路径互相引用。
 - **Token Efficiency**：T0/T1/T2 是为避免「每次全量重载」而设的分层；选择哪一层由核心步骤的位置决定。
+- **Anchoring archive**：归档的实体定义归 `shared/definitions/goal-definitions.md`（其自身改名的落地在 090→W1）；
+  本节只拥有「anchoring 与本纪律的三条边」。
+
+## 5. Anchoring archive
+
+**anchoring（锚点）是项目级、跨运行留存的方向锚归档实体**，落在 `.specify/anchoring/<slug>/`。它是 §1.1 方向锚
+在**运行之间**的持久形态，不是第二种锚。实体本身（构成、身份、生命周期、`active` / `achieved` / `abandoned`
+取值、Targets、存储树）由 `shared/definitions/goal-definitions.md` 拥有，本节 MUST NOT 复述；标识符、文件名与
+旧拼写的完整改名表同样由该页的改名裁定记录拥有，本节不列第二个副本。
+
+**它与本纪律只有三条边，本节独自拥有这三条**：
+
+| 边 | 内容 |
+|---|---|
+| 写入时机 | 一个锚点在与某次派发绑定**之前**就已存在；派发简报中的方向锚是**从 anchoring 投影出的摘要**，不是现场发明的。没有对应 anchoring 的派发，其锚来源 MUST 被点名 |
+| 生命周期判据 | 方向锚的 `on-track` / `correction-applied` 是**本轮内**判定，不写回 anchoring；`achieved` / `abandoned` 是**运行之间**的归档状态，只经 `/speckit.goal` 一类的显式动作改变。MUST NOT 从一次 `on-track` 推定锚点已达成 |
+| 读取面 | T2 层重载时 MAY 打开完整 anchoring；T0/T1 层 MUST NOT（§2 的分层成本对归档同样成立）。回顾面（`.specify/` 十个历史根）是否包含该树由 `shared/definitions/non-disposable-definitions.md` § Review Surface 拥有，本节不作断言 |
+
+**不新增机器**：anchoring 复用既有的 goal 引擎与既有历史根，不引入第二套归档目录、第二份锚点注册表或第二个
+`/speckit.goal` 入口。
