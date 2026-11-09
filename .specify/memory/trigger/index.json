@@ -1,7 +1,7 @@
 {
   "store": ".specify/memory/trigger/",
   "schemaVersion": 1,
-  "updated": "2026-11-09T12:30:05Z",
+  "updated": "2026-11-09T15:09:51Z",
   "config": {
     "enabled": true,
     "threshold": 5,
@@ -218,27 +218,32 @@
       "confirmationClass": "reversible",
       "origin": "seed",
       "priority": 30,
-      "state": "active",
+      "state": "suppressed",
       "promotion": {
-        "consecutive": 1,
+        "consecutive": 0,
         "threshold": 5,
         "promoted": false,
         "destructiveExempt": false,
-        "resetBy": null,
+        "resetBy": "20261109T150951Z-02",
         "userResetAt": null
       },
       "stats": {
-        "hits": 6,
-        "accepted": 1,
-        "declined": 0,
-        "ignored": 0,
-        "lastSeen": "2026-11-09T12:30:04Z"
+        "hits": 73,
+        "accepted": 37,
+        "declined": 68,
+        "ignored": 11,
+        "lastSeen": "2026-11-09T15:09:51Z"
       },
       "provenance": {
         "file": "templates/commands/requirements.md",
         "anchorKind": "handoffs",
         "anchor": "## Handoffs",
         "quote": "If spec has `[NEEDS CLARIFICATION]` or `Related Feature: Need clarification` → `/speckit.clarify`."
+      },
+      "tuning": {
+        "ratifiedAt": "2026-11-09T15:09:49Z",
+        "evidenceRef": "p-001#declineRate",
+        "suppressedBy": "p-001"
       }
     },
     {
@@ -356,11 +361,11 @@
         "userResetAt": null
       },
       "stats": {
-        "hits": 0,
+        "hits": 2,
         "accepted": 0,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": null
+        "lastSeen": "2026-11-09T15:09:47Z"
       },
       "provenance": {
         "file": "templates/commands/tasks.md",
@@ -380,7 +385,7 @@
       "priority": 70,
       "state": "active",
       "promotion": {
-        "consecutive": 0,
+        "consecutive": 1,
         "threshold": 5,
         "promoted": false,
         "destructiveExempt": true,
@@ -388,11 +393,11 @@
         "userResetAt": null
       },
       "stats": {
-        "hits": 3,
-        "accepted": 0,
+        "hits": 14,
+        "accepted": 1,
         "declined": 0,
         "ignored": 0,
-        "lastSeen": "2026-11-09T12:30:05Z"
+        "lastSeen": "2026-11-09T15:09:47Z"
       },
       "provenance": {
         "file": "templates/commands/checklist.md",
@@ -631,107 +636,1189 @@
   ],
   "events": [
     {
-      "eventId": "20261109T122951Z-01",
+      "eventId": "20261109T150951Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:51Z"
+    },
+    {
+      "eventId": "20261109T150951Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:51Z"
+    },
+    {
+      "eventId": "20261109T150950Z-13",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-12",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-11",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-10",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-08",
       "ruleId": "r-001",
       "situationId": "s01",
       "snapshot": "requirements-unclear|needs-clarification",
       "response": "accepted",
       "escalated": false,
-      "created": "2026-11-09T12:29:51Z"
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150950Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:50Z"
+    },
+    {
+      "eventId": "20261109T150949Z-17",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-16",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-15",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-14",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-13",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-12",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-11",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-10",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150949Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:49Z"
+    },
+    {
+      "eventId": "20261109T150948Z-20",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-19",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-18",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-17",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-16",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-15",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-14",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-13",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-12",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-11",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-10",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150948Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:48Z"
+    },
+    {
+      "eventId": "20261109T150947Z-07",
+      "ruleId": "r-006",
+      "situationId": "s06",
+      "snapshot": "tasks-ready|open-tasks",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150947Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:47Z"
+    },
+    {
+      "eventId": "20261109T150946Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:09:46Z"
+    },
+    {
+      "eventId": "20261109T150249Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:49Z"
+    },
+    {
+      "eventId": "20261109T150248Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "ignored",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150248Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:48Z"
+    },
+    {
+      "eventId": "20261109T150247Z-12",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-11",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-10",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150247Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:47Z"
+    },
+    {
+      "eventId": "20261109T150246Z-18",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-17",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-16",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-15",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-14",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-13",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-12",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-11",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-10",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150246Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:46Z"
+    },
+    {
+      "eventId": "20261109T150245Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T15:02:45Z"
+    },
+    {
+      "eventId": "20261109T143853Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:53Z"
+    },
+    {
+      "eventId": "20261109T143851Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:51Z"
+    },
+    {
+      "eventId": "20261109T143850Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:50Z"
+    },
+    {
+      "eventId": "20261109T143850Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:50Z"
+    },
+    {
+      "eventId": "20261109T143850Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:50Z"
+    },
+    {
+      "eventId": "20261109T143850Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:50Z"
+    },
+    {
+      "eventId": "20261109T143850Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:50Z"
+    },
+    {
+      "eventId": "20261109T143849Z-09",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-08",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-07",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-06",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-05",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-04",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-03",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "declined",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-02",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
+    },
+    {
+      "eventId": "20261109T143849Z-01",
+      "ruleId": "r-001",
+      "situationId": "s01",
+      "snapshot": "requirements-unclear|needs-clarification",
+      "response": "accepted",
+      "escalated": false,
+      "created": "2026-11-09T14:38:49Z"
     }
   ],
-  "lastSuggestion": {
-    "sc16p-1": {
-      "sessionId": "sc16p-1",
-      "turnId": "sc16p-1-01",
-      "situationId": "s01",
+  "lastSuggestion": {},
+  "proposals": [
+    {
+      "proposalId": "p-001",
+      "kind": "suppress",
       "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:29:50Z"
+      "evidence": {
+        "metric": "declineRate",
+        "value": 0.5625,
+        "sampleSize": 16
+      },
+      "state": "applied",
+      "createdAt": "2026-11-09T14:38:50Z",
+      "ratifiedAt": "2026-11-09T15:09:49Z",
+      "reason": "decline rate 1.00 over 6 hits",
+      "appliedAt": "2026-11-09T15:09:49Z"
     },
-    "sord2": {
-      "sessionId": "sord2",
-      "turnId": "sord2-01",
-      "situationId": "s01",
+    {
+      "proposalId": "p-002",
+      "kind": "add-rule",
+      "flow": "/speckit.history",
+      "evidence": {
+        "metric": "missedInvocations",
+        "value": 2,
+        "sampleSize": 2
+      },
+      "state": "proposed",
+      "createdAt": "2026-11-09T14:38:50Z"
+    },
+    {
+      "proposalId": "p-003",
+      "kind": "suppress",
       "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:29:50Z"
-    },
-    "sst": {
-      "sessionId": "sst",
-      "turnId": "sst-01",
-      "situationId": "s01",
-      "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:29:50Z"
-    },
-    "sb": {
-      "sessionId": "sb",
-      "turnId": "sb-01",
-      "situationId": "s01",
-      "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:29:50Z"
-    },
-    "sc16p-3": {
-      "sessionId": "sc16p-3",
-      "turnId": "sc16p-3-01",
-      "situationId": "s01",
-      "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:29:50Z"
-    },
-    "sc16-1": {
-      "sessionId": "sc16-1",
-      "turnId": "sc16-1-01",
-      "situationId": "s01",
-      "ruleId": "r-001",
-      "snapshot": "requirements-unclear|needs-clarification",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:30:04Z"
-    },
-    "srep-0": {
-      "sessionId": "srep-0",
-      "turnId": "srep-0-01",
-      "situationId": "s06",
-      "ruleId": "r-006",
-      "snapshot": "tasks-ready|open-tasks",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:30:04Z"
-    },
-    "srep-3": {
-      "sessionId": "srep-3",
-      "turnId": "srep-3-01",
-      "situationId": "s06",
-      "ruleId": "r-006",
-      "snapshot": "tasks-ready|open-tasks",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:30:04Z"
-    },
-    "srep-4": {
-      "sessionId": "srep-4",
-      "turnId": "srep-4-01",
-      "situationId": "s06",
-      "ruleId": "r-006",
-      "snapshot": "tasks-ready|open-tasks",
-      "escalated": false,
-      "suggested": true,
-      "ts": "2026-11-09T12:30:05Z"
+      "evidence": {
+        "metric": "declineRate",
+        "value": 0.726,
+        "sampleSize": 73
+      },
+      "state": "proposed",
+      "createdAt": "2026-11-09T15:09:49Z"
     }
-  },
-  "proposals": [],
-  "manualInvocations": []
+  ],
+  "manualInvocations": [
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-2",
+      "turnId": "sman-2-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T14:38:50Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": "sman-1-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T14:38:50Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": null,
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:46Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": null,
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:47Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-2",
+      "turnId": "sman-2-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:47Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-7",
+      "turnId": "sman-7-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:48Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-8",
+      "turnId": "sman-8-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:48Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-8",
+      "turnId": "sman-8-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:02:48Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": null,
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:09:48Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-1",
+      "turnId": null,
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:09:48Z"
+    },
+    {
+      "flow": "/speckit.history",
+      "sessionId": "sman-8",
+      "turnId": "sman-8-01",
+      "suggested": false,
+      "situationId": null,
+      "ts": "2026-11-09T15:09:49Z"
+    }
+  ]
 }
