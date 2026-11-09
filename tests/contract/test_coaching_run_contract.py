@@ -238,7 +238,15 @@ def test_c1b_trainee_resolution_declares_the_executor_kind_judgment():
     assert re.search(r"\*\*Skill\*\*", body), "the skill branch must be declared"
     assert "templates/commands/" in body, "the command branch must name the template location"
     assert re.search(r"decision class", body, re.IGNORECASE)
-    assert re.search(r"leading `/` never falls through", body, re.IGNORECASE)
+    assert re.search(r"scan both\s+lists", body, re.IGNORECASE), (
+        "the judgment must be a scan of both lists, not a syntax heuristic"
+    )
+    assert re.search(r"leading `/` is NOT a discriminator", body, re.IGNORECASE), (
+        "skills are surfaced as slash commands too; the slash must not decide the kind"
+    )
+    assert re.search(r"two hits of different kinds fail closed naming both candidates", body, re.IGNORECASE), (
+        "a skill/command name collision must fail closed, never pick the nearest"
+    )
 
 
 # --------------------------------------------------------------------------- #

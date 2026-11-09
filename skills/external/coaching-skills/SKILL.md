@@ -22,16 +22,15 @@ result; optimizing the Trainee is secondary.
 Invocation: `coaching-skills <trainee> [<work>]`.
 
 - **One required positional parameter**: the Trainee reference. **`<work>` is
-  OPTIONAL** and may be empty — many skills and commands execute without arguments
-  (for example `/speckit.status` renders the digest). An empty `<work>` dispatches
-  the Trainee with no argument and MUST NOT be treated as a missing parameter.
-- **`Trainee`**: the Trainee reference — a Skill or a slash-command. Skill-reference
+  OPTIONAL** — many skills and commands run without arguments (e.g. `/speckit.status`);
+  an empty value dispatches the no-argument form and is never a missing parameter.
+- **`Trainee`**: the Trainee reference — a Skill or a command surface. Skill-reference
   forms, normalization order, disambiguation rules and failure semantics are owned by
   `shared/definitions/skill-reference-definitions.md` — reach them there, and report
-  the raw and the normalized identifier plus the decision class. A leading `/` names
-  the Trainee's **command surface**; it is **never** an instruction to invoke that
-  command directly instead of running this loop. The executor-kind judgment itself is
-  § Trainee Resolution.
+  the raw and the normalized identifier plus the decision class. A leading `/` is only
+  the surface form (both kinds carry it) and is **never** an instruction to invoke the
+  Trainee directly instead of running this loop; the kind is decided by scanning both
+  lists in § Trainee Resolution.
 - **Meta-skill Trainees are in scope.** When the Trainee itself operates on other
   skills (`improve-skills`, `merge-skills`, `create-skills`, `run-skills`), `<work>` is
   normally a skill-engineering request ("optimize skill X", "merge A into B"); its
@@ -47,20 +46,26 @@ Invocation: `coaching-skills <trainee> [<work>]`.
 
 ## Trainee Resolution
 
-**First decide what kind of executor the Trainee names — every later step branches on
-this judgment:**
+**First decide what kind of executor the Trainee names — resolve it by scanning both
+lists, never by syntax.** A leading `/` is NOT a discriminator: skills
+(`/improve-skills`, `/coaching-skills`) and command surfaces (`/speckit.status`) both
+carry it.
 
-| Executor kind | How it resolves | Decision class |
-|---|---|---|
-| **Command** — the reference carries a leading `/` (`/speckit.status`) | normalize to the command slug (`speckit-status`); resolve to the canonical command template `templates/commands/<name>.md` (per-tool copies are aliases of it); the template body is the execution contract | `command` |
-| **Skill** — any other reference | the skill position ladder below, unchanged | `skill` (internal / external / installed) |
+- **Scan both lists** with the leading `/` stripped: (a) the **Skill** set through the
+  position ladder below (directory name or frontmatter `name`); (b) the **Command** set
+  through the canonical templates `templates/commands/<name>.md` (a `speckit.` prefix
+  also maps to `<name>.md`), then their generated per-tool copies as aliases.
+- Exactly one hit decides the executor kind: a **Skill** (decision class `skill`
+  internal/external/installed) or a **Command** (decision class `command`; the template
+  body is its execution contract).
+- **Two hits of different kinds fail closed naming both candidates** — a skill and a
+  command sharing the normalized name are ambiguous and the user disambiguates; two hits
+  inside the skill ladder fail closed the same way; zero hits name the raw form and the
+  searched coordinates of both lists. Never pick the nearest.
+- The recursion guard (§ below) applies to whichever branch resolved.
 
-- A leading `/` never falls through to the skill ladder; a bare name never resolves as
-  a command. A command reference with no readable template fails closed naming the raw
-  form and the searched path; a skill reference resolving to two layers fails closed
-  naming both candidate paths — never pick the nearest.
-- The recursion guard (§ below) applies to the skill branch; a command template that
-  somehow names this skill fails closed the same way.
+Scan coordinates, aliases and the full failure table:
+[`references/trainee-resolution.md`](./references/trainee-resolution.md).
 
 Reuse the `run-skills` position ladder, with no second resolution rule: canonical
 internal → canonical external → installed internal → installed external.
@@ -137,9 +142,8 @@ Exactly four files, in this order:
 ## Execution First
 
 - The primary success condition is: the Trainee's real work completed and its primary
-  artifact exists — an artifact path or checkable conclusion for a skill, and the
-  command's own output or invocation record for a command (a no-argument run's primary
-  artifact is that same output/record).
+  artifact exists — an artifact path or checkable conclusion for a skill; the command's
+  output or invocation record for a command.
 - Optimization MUST NOT be a precondition of execution and MUST NOT shorten, redirect,
   or simplify the execution to collect optimization material.
 - The coach MUST NOT run any Trainee step in parallel with the subagent.

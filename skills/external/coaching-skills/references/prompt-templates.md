@@ -21,7 +21,7 @@ ordering evidence.
 ## Trainee
 - identifier (verbatim):
 - resolved-path:
-- executor-kind: skill | command   (a leading `/` names a command template)
+- executor-kind: skill | command   (decided by scanning both lists; `/` is not a discriminator)
 - layer: external | internal   (skill Trainees; `n/a` for a command)
 - subject-resolution: self (Trainee is the subject) | delegated to the Trainee (meta-skill)
 - failure-semantics: <extracted from the Trainee's own text or the command template>
