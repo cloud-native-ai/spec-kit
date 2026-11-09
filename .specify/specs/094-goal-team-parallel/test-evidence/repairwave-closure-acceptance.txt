@@ -1,0 +1,6 @@
+verdict: accept
+spec_dir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/094-repairwave/.specify/specs/094-goal-team-parallel
+flow_class: execution
+claimed_status: Planned
+final_path: pass=8 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=8
+reason: none

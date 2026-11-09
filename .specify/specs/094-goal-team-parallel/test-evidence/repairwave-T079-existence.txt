@@ -1,0 +1,19 @@
+# existence assertions — one line per migrated definition (T079 applied reading)
+# decisions: 16  counts: {'migrated': 16, 'noop': 0, 'conflict': 0, 'interrupted': 0}
+PASS  goal/085-sdd-temporary-goal-team  target=.specify/anchoring/085-sdd-temporary-goal-team/goal.md  archived=.specify/archive/goal-team/trees/085-sdd-temporary-goal-team/goal/085-sdd-temporary-goal-team
+PASS  goal/086-efficient-test-execution  target=.specify/anchoring/086-efficient-test-execution/goal.md  archived=.specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution
+PASS  goal/087-arch-diagram-docs  target=.specify/anchoring/087-arch-diagram-docs/goal.md  archived=.specify/archive/goal-team/trees/087-arch-diagram-docs/goal/087-arch-diagram-docs
+PASS  goal/088-speckit-visualization  target=.specify/anchoring/088-speckit-visualization/goal.md  archived=.specify/archive/goal-team/trees/088-speckit-visualization/goal/088-speckit-visualization
+PASS  goal/090-re-anchoring  target=.specify/anchoring/090-re-anchoring/goal.md  archived=.specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring
+PASS  goal/091-auto-git-closeout  target=.specify/anchoring/091-auto-git-closeout/goal.md  archived=.specify/archive/goal-team/trees/091-auto-git-closeout/goal/091-auto-git-closeout
+PASS  goal/094-goal-team-parallel  target=.specify/anchoring/094-goal-team-parallel/goal.md  archived=.specify/archive/goal-team/trees/094-goal-team-parallel/goal/094-goal-team-parallel
+PASS  goal/script-interface-contract  target=.specify/anchoring/script-interface-contract/goal.md  archived=.specify/archive/goal-team/trees/089-script-interface-contract/goal/script-interface-contract
+PASS  teams/085-sdd-temporary-goal-team  target=.specify/teams/085-sdd-temporary-goal-team/team.md  archived=.specify/archive/goal-team/trees/085-sdd-temporary-goal-team/teams/085-sdd-temporary-goal-team
+PASS  teams/086-efficient-test-execution  target=.specify/teams/086-efficient-test-execution/team.md  archived=.specify/archive/goal-team/trees/086-efficient-test-execution/teams/086-efficient-test-execution
+PASS  teams/087-arch-diagram-docs  target=.specify/teams/087-arch-diagram-docs/team.md  archived=.specify/archive/goal-team/trees/087-arch-diagram-docs/teams/087-arch-diagram-docs
+PASS  teams/088-reporting-dogfood  target=.specify/teams/088-reporting-dogfood/team.md  archived=.specify/archive/goal-team/trees/088-speckit-visualization/teams/088-reporting-dogfood
+PASS  teams/089-script-interface-contract  target=.specify/teams/089-script-interface-contract/team.md  archived=.specify/archive/goal-team/trees/089-script-interface-contract/teams/089-script-interface-contract
+PASS  teams/090-re-anchoring  target=.specify/teams/090-re-anchoring/team.md  archived=.specify/archive/goal-team/trees/090-re-anchoring/teams/090-re-anchoring
+PASS  teams/091-auto-git-closeout  target=.specify/teams/091-auto-git-closeout/team.md  archived=.specify/archive/goal-team/trees/091-auto-git-closeout/teams/091-auto-git-closeout
+PASS  teams/094-goal-team-parallel  target=.specify/teams/094-goal-team-parallel/team.md  archived=.specify/archive/goal-team/trees/094-goal-team-parallel/teams/094-goal-team-parallel
+# summary: pass=16 fail=0 total=16

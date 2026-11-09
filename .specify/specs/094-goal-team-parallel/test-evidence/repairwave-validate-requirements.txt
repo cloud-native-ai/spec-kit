@@ -1,0 +1,46 @@
+# command: python3 .specify/scripts/python/validate-requirements.py .specify/specs/094-goal-team-parallel/requirements.md --json
+{
+  "file": ".specify/specs/094-goal-team-parallel/requirements.md",
+  "status": "ok",
+  "checks": [
+    {
+      "label": "id-contiguous",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "doc-order",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "ref-resolvable",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "marker-count",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "dup-id",
+      "status": "pass",
+      "count": 0
+    },
+    {
+      "label": "path-marker",
+      "status": "pass",
+      "count": 0
+    }
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "scanned": {
+    "lines": 331,
+    "definition_rows": 55,
+    "shared_strings": 6
+  }
+}
+
+# exit=0
