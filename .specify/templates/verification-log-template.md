@@ -22,6 +22,17 @@
   Conventions:
   - One key=value per line. Values are free text unless schema below says otherwise.
   - Lines starting with `#` are comments.
+  - THE KEY=VALUE BLOCK IS THE RECORD; A TABLE IS A VIEW OF IT. The closure judgement
+    (`scripts/python/closure-acceptance-check.py`) parses `SC-NNN_status=` lines and nothing else, so a
+    `pass` written only into a Markdown table row is read as NO ROW AT ALL (`unknown`, never `pass`). A
+    run that also renders a human table MUST emit this block as well, and the two MUST agree — where they
+    disagree, the block is what downstream reads and the table is stale.
+  - `smoke_command` carries ONE simple command and no leading environment assignment: the parser reads
+    `key=value`, so `VAR=x pytest …` would be parsed as the key `VAR`. Put the interpreter/probe switch in
+    the recorded command's argument position, or record the wrapper's own script path instead.
+  - A key=value line ANYWHERE in this file is a record line — including inside a section written for humans.
+    Do not paste a second copy of the smoke record or of an SC row into a prose section: a second
+    `smoke_command=` is a defect (see below), and it is the defect a copy silently creates.
   - SC rows MUST follow `SC-NNN_<field>=<value>` with fields {status, value, note}.
   - `status` is one of: pass | fail | partial | blocked | deferred | unknown. THIS FILE OWNS THAT VOCABULARY:
     the set is CLOSED — no DoD row, gate or task row may narrow it to a subset, because a narrower set silently
@@ -59,7 +70,9 @@
   it, it is the same defect the ladder was introduced to stop.
 
   THE SMOKE RECORD — exactly one per feature, three fields:
-    smoke_command        one shell command, verbatim; end-to-end over the feature's main flow, not the whole suite
+    smoke_command        one shell command, verbatim, with no leading `VAR=value` assignment (the parser
+                         reads `key=value`, so a leading assignment becomes the key); end-to-end over the
+                         feature's main flow, not the whole suite
     smoke_exit_code      0 for a feature claiming `Implemented`
     smoke_evidence_path  repo-relative path to a file that MUST exist and be non-empty
     smoke_comparison     optional: a repo-relative comparison transcript (e.g. the second run's evidence)
@@ -68,6 +81,15 @@
   A second `smoke_command=` line is a defect, not a choice. A feature that cannot run its smoke is `Blocked`:
   "needs a real cluster" or "needs real network" is not an exemption — either the command is made deterministic
   on a local fixture, or the feature is blocked.
+
+  THE STATUS IS A GATE PRODUCT, NEVER A SELF-ASSESSMENT. This file records a verdict; it does not produce
+  one. Before ANY `SC-NNN_status=pass` is written here, the run MUST have executed the closure judgement
+  (`scripts/python/closure-acceptance-check.py --spec-dir <spec-dir>`) over the tree it is about to record,
+  and the recorded statuses MUST be the ones that verdict justifies; a status the checker would refuse MUST
+  NOT be written as `pass` here as a way of making the check pass. The judgement, its reason set and its
+  counts are owned by `shared/workflow/acceptance-hardening.md` § Closure Verdict — this file cites it and
+  never restates it. A gate item, gate row or gate verdict belongs to the gate's own record (the stage's gate
+  section), never here.
 -->
 
 # -- Baseline (recorded once, BEFORE any /speckit.implement work changes the tree) --
@@ -127,6 +149,8 @@ verdict=[pass|fail|partial|blocked|deferred|unknown]
 # One block per SC from requirements.md. Status values: pass | fail | partial | blocked | deferred | unknown
 # (the closed set declared at the top of this file — never a subset of it).
 # Every blocked / deferred / partial row ALSO carries the five ladder fields.
+# THIS IS THE RECORD. A human-readable table elsewhere in the file is a view rendered FROM these rows;
+# a status that exists only in the table is `unknown` to every downstream program.
 
 SC-001_status=[pass|fail|partial|blocked|deferred|unknown]
 SC-001_value=[NUMERIC_OR_EVIDENCE_STRING]

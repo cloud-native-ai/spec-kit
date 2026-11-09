@@ -1,0 +1,93 @@
+# fix-p2-evidence.txt — 091 fix loop, package P2 (acceptance / verification), 2026-11-09
+# worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/091-fix-p2   branch: 091-fix-p2   base: 05b6c4e3
+
+## 1. closure-acceptance-check on the landed tree
+$ python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/091-auto-git-closeout --repo .
+verdict: accept
+spec_dir: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/091-fix-p2/.specify/specs/091-auto-git-closeout
+flow_class: execution
+claimed_status: Implemented
+final_path: pass=6 blocked=0 deferred=0 partial=0 fail=0 unknown=0 total=6
+reason: none
+EXIT=0
+
+## 2. the same command on the json payload (keys this package moved)
+{
+ "verdict": "accept",
+ "reasons": [],
+ "final_path": {
+  "blocked": 0,
+  "deferred": 0,
+  "fail": 0,
+  "partial": 0,
+  "pass": 6,
+  "total": 6,
+  "unknown": 0
+ },
+ "completion_conditions": {
+  "every_final_path_pass": true,
+  "no_open_rows": true,
+  "smoke_record_pass": true,
+  "status_row_per_criterion": true
+ },
+ "smoke": {
+  "command": "pytest tests/contract/test_git_closeout_contract.py -q",
+  "evidence_exists": true,
+  "evidence_path": ".specify/specs/091-auto-git-closeout/test-evidence/T062-smoke.txt",
+  "exit_code": "0",
+  "present": true,
+  "records": 1
+ }
+}
+
+## 3. pre-amendment reading (measured at package start, same tree, before the edits)
+verdict: block
+final_path: pass=0 blocked=0 deferred=0 partial=0 fail=0 unknown=6 total=6
+reason: zero-final-path-pass
+reason: runtime-dependency-not-owned: RS-002
+reason: status-claims-implemented-but-blocked
+EXIT=1
+
+## 4. mutation-read — status rows commented out, human table left intact (sibling spec dir, removed after the run)
+$ python3 .specify/scripts/python/closure-acceptance-check.py --spec-dir .specify/specs/091-auto-git-closeout-mut09 --repo .
+verdict: block
+final_path: pass=0 blocked=0 deferred=0 partial=0 fail=0 unknown=6 total=6
+reason: zero-final-path-pass
+reason: runtime-dependency-not-owned: RS-002
+reason: status-claims-implemented-but-blocked
+EXIT=1
+# reading: a `pass` that exists only in a Markdown table is `unknown`, never `pass`
+
+## 5. contract suites touching this package's surfaces
+$ python3 -m pytest tests/contract/test_acceptance_schema_ownership.py -q
+9 passed in 0.07s
+$ python3 -m pytest tests/contract/test_measurement_instruments.py -q
+13 passed in 0.31s
+$ python3 -m pytest tests/contract/test_evidence_binding_contract.py -q
+19 passed in 0.06s
+$ python3 -m pytest tests/contract/test_acceptance_state_machine.py -q
+17 passed in 0.05s
+$ python3 -m pytest tests/contract/test_gate_wiring_081.py -q
+22 passed in 2.87s
+$ python3 -m pytest tests/contract/test_baseline_preflight_contract.py -q
+9 passed in 0.04s
+$ python3 -m pytest tests/contract/test_stage_class_wiring.py -q
+71 passed in 0.16s
+$ python3 -m pytest tests/contract/test_acceptance_review_composition.py -q
+32 passed in 1.32s
+$ python3 -m pytest tests/contract/test_closure_acceptance_check.py -q
+23 passed in 1.29s
+
+$ python3 -m pytest tests/contract -q -k 'verification or closure'
+=========================== short test summary info ============================
+FAILED tests/contract/test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green
+FAILED tests/contract/test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/closure-acceptance-check.py->.specify/scripts/python/closure-acceptance-check.py]
+2 failed, 64 passed, 6397 deselected in 7.94s
+
+## 6. pre-existing reds in this worktree, measured A/B (NOT introduced by this package)
+- test_coaching_wiring_contract.py::test_c8_the_verification_surface_runs_green — red at HEAD with the package changes stashed (worktree condition)
+- test_mirror_parity_suite.py::test_mirror_file_byte_identical[scripts/python/closure-acceptance-check.py->...] — red at HEAD with the package changes stashed
+- tests/contract/test_fast_fail_discipline.py::{test_i11,total_equals_frozen_baseline,g17} — 3 red with the package changes stashed and 3 red with them applied
+- tests/contract/test_humanize_command_surface.py::test_wc06_mirror_in_sync — humanize skill mirror, red with the package changes stashed
+- test_wc13_stage_class_pin_remeasured WAS red because of this package's implement.md edit; its implement row of BASELINE_SHA256 is re-measured from the module's own strip_wiring (old a43d824a… -> new 87fa5cd4…), and the module now passes.
+- sync-mirrors.py --check and regen-command-copies.py --check report drift at HEAD before any edit (475 lines / 75 generated copies); the generated .qoder / .github / .opencode command copies are OUTSIDE this package's territory and were not regenerated.

@@ -133,6 +133,14 @@ BASELINE_COMMIT = "c1cd4600"
 # Removing only the compiled `7. Closeout` line and restoring only the banner
 # fingerprint reproduces each previous pin byte for byte — which is what makes
 # these two deltas machine-owned rather than an authored edit riding along.
+#
+# 2026-11-09 the `implement` row alone re-measured (091 fix loop, finding F1): the
+# authored § Feature Integration block gained the "status claim is a gate product"
+# bullet, which states the boundary the 081 closure gate pins but no stage carried —
+# the registry row is read-only to the stage until the checker returns `accept`, and a
+# document that declines the claim MUST NOT coexist with a registry row that makes it.
+# The six other rows are untouched (their templates did not move). The assertion keeps
+# its shape: *stripping the card restores the pinned bytes*.
 BASELINE_SHA256 = {
     "requirements": "604b9f464ab593ab32bdb7088f779ef48cd77da8b801d1edd06f80fb298d37f6",
     "clarify": "0d0596e04b9acb2973b870a9231673b7b14fc12d9cd089aec66e1ec9a6d3faf6",
@@ -140,7 +148,7 @@ BASELINE_SHA256 = {
     "tasks": "1c8998141ebf3ffe55af4e5f6fbed167a992f4103a2af30dd2946d424a3d3e0c",
     "checklist": "08fb8048e55f038b01e27347deb13c7362334060ff71d88dcac42f314f355d20",
     "analyze": "0dbb094a6ce0aeacee81531197924734a4cf8535ede49939cc68607b4ab7bde7",
-    "implement": "a43d824a36c58d13bd3a38f918bf57256ba536332028ab3bf0aef4ef37be4f93",
+    "implement": "87fa5cd45ebd353426727038bcd97107e9dfb476589a59733fee83158096c2a0",
 }
 
 # The two pre-077 wiring entry points keep their bytes in this feature.
