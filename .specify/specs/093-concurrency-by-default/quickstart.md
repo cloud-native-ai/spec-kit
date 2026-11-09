@@ -107,7 +107,7 @@ python3 scripts/python/concurrency-check.py reading --repo . --record <the-real-
 ```
 
 **A passer sees**: `effective >= 2` measured on a **non-fixture** run, with per-unit verdicts, the deterministic
-integration order and the duration, compared against the serial baseline (091: 62 tasks, one agent, 116 minutes).
+integration order and the duration, compared against the serial baseline recorded in `notes/serial-baseline.md` (091's own run record; its task count, agent count and duration are read from that record and are not restated here).
 Any quantity the run did not produce is written `not_evaluated`; writing `0` or an estimate is a failure
 (SC-006, FR-030).
 

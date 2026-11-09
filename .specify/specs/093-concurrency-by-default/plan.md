@@ -278,7 +278,7 @@ the carrier's eligibility rule: `shared/workflow/acceptance-hardening.md` § Inh
 
 | # | Source row | Disposition | Carrier | Carrier slice | Evidence / note |
 |---|-----------|-------------|---------|---------------|-----------------|
-| 1 | `086:SC-010_status` | inherited | `gate:GATE-093` | this-slice | 086 left SC-010 `partial` with its gap carried by GATE-086; 093 neither closes nor inherits that gap — it only guarantees 086's criterion keeps its owner (FR-033, SC-010). |
+| 1 | `086:SC-010_status` | inherited | `gate:GATE-7` | this-slice | 086 left SC-010 `partial` with its gap carried by 086's own gate; 093 neither closes nor inherits that gap — it only guarantees 086's criterion keeps its owner (FR-033, SC-010), which `GATE-7` in `tasks.md` asserts. |
 | 2 | `092:deferred:plan-parallelism-not-delivered` | resolved | `contracts/executor-obligations.contract.md` | this-slice | FR-021/FR-023 make "declare N packages, run them serially inside one coordinator" a red defect; the 092 shape becomes the reproduction fixture `test_concurrency_reproduction_092.py` (SC-005). The 092 deferral is therefore closed **in this slice** — the `resolved` disposition records that the carrier is inside Feature 093's own contract set, not a later slice. |
 | 3 | `064:SC-006_status` | not-applicable | — | — | 064's SC-006 measures line-registry ownership envelopes, not a concurrency default; 093 reuses that mechanism read-only and changes none of its assertions. |
 | 4 | `070:SC-006_status` | not-applicable | — | — | 070's SC-006 measures Work-Package gate outcomes; 093 changes the ceiling *owner* (T-001) and the write-domain granularity (T-003), both dispositioned through FR-033 and SC-010 rather than by rewriting 070's criterion. |
