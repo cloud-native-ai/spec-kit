@@ -10,7 +10,7 @@ stage_deadline_epoch: 1794205670
 stage_base_commit: 1a7fed0e
 attempt: 1
 retry_limit: 3
-last_verdict: tasks U4 pass (150 rows, 54/54 clauses, validate-tasks PASS, decomposition proceed); FR lane 57/65 surfaced; checkpoint 04 on-track
+last_verdict: checklist U4 pass — `.specify/specs/092-non-disposable/checklists/2026-11-09-requirements-quality.md` (40 CHK items, contiguous, 40/40 Req-anchored, 40/40 question form, 8 sections covering faces ①–⑦ + reuse boundaries); doc-consistency-check reader=pass on the checklist, duplicate=0 findings vs requirements.md and vs the two owner pages, spec-dir duplicate baseline still 0/22 files; spec-dir reader face reads 21 pre-existing reader-declaration-missing findings (085 reads 23 under the same predicate; the checklist is not among them); readings: test-evidence/checklist-gates.txt; commit 9d0db325
 driver_contract: |
   HR1 — U4 pass => dispatch the next stage/package in the same turn; never ask "continue".
   HR2 — completion is judged by an independent verifier, never by the executor's own claim.
@@ -21,7 +21,7 @@ driver_contract: |
   HR10 — target governance (constitution + instructions) is read and obeyed before any write.
   HR11 — runtime directories live only under .specify/ (.tmp/sdd-loop/, state/).
   HR14 — every checkpoint carries the rule-first direction audit (T0/T1/T2).
-next_action: dispatch checklist, then analyze (both mandatory before implement)
+next_action: dispatch analyze (mandatory before implement); checklist stage closed at 9d0db325
 direction_contract: |
   goal_verbatim: "在 speckit 框架中引入『Non-Disposable』理念：任何过程和文档都不应该是『用过即丢』(Use and throw)，需要时常回顾和修正，同时过去的历史也是重要的参考和借鉴。这就要求设计一系列机制，杜绝『这个没用了但是留在这里』或『这个过时了但是我现在不想删除』等一系列将问题推到将来的行为。以上面分析 A~H 的结论作为这个新特性的输入和验证用例。新特性的落点可以放到 /speckit.history 命令中：speckit.history 命令执行时先回顾历史，然后进行设计给出方案，向用户确定是否执行。回顾历史需要回顾当前 git head 指向的 workdir 中的 .specify 目录中记录的历史文件，而不是 git history。需要将所有的 .specify/{archive,derive,goal,history,memory,project,review,specs,state,teams}/* 这些带『历史』属性的目录和文件都纳入其中。这是一个浩大的工程，因此需要使用一个 team 通过大并发的 subagent 来完成。"
   non_goals:
@@ -57,6 +57,10 @@ gates: |
   flow-class-check execution (source=declaration); validate-decision-tensions unreadable (no plan.md yet,
   0 findings); decomposition-check --mode plan proceed (fr=65 <= 120).
   readings: .specify/specs/092-non-disposable/test-evidence/clarify-gates.txt
+  checklist — doc-consistency-check --faces reader|duplicate over the checklist (reader 0, duplicate 0 vs
+  requirements.md and vs one-source-of-truth.md / checklist-methodology.md); spec-dir duplicate 0/22 files;
+  spec-dir reader 21 pre-existing reader-declaration-missing findings, checklist not among them, 085 reads 23
+  under the same predicate. readings: .specify/specs/092-non-disposable/test-evidence/checklist-gates.txt
 wrapup: pending
 framework_observations:
   - "The A–H review is itself evidence that history review must be semantic (claims/owners/constants), not a file-by-file listing."
