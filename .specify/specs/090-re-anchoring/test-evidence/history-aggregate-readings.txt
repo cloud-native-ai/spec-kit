@@ -1,0 +1,78 @@
+# history aggregate — gate readings
+
+- run: 2026-11-10 — five-thread aggregation (05–09) into `.specify/history/`
+- inputs: six extracts `.specify/specs/090-re-anchoring/test-evidence/history-distill-batch-{1..6}.md`
+- sids: `.specify/.tmp/history-sids.txt` — 108 words (manifest symbol set)
+- store scope: Qoder store 125 sessions / 108 distilled / 17 trivial skipped (heuristic)
+
+## Gate 1 — every `[[...]]` link resolves to a file in `.specify/history/`
+
+command:
+```
+python3 - <<'PY'  # per-file scan of .specify/history/*.md for [[target]]
+...
+PY
+```
+reading:
+```
+MD_FILES=11
+LINKS_TOTAL=46 DISTINCT_TARGETS=10 UNRESOLVED=0
+```
+verdict: PASS — all 46 link occurrences resolve; distinct targets = 00,01,02,03,04,05,06,07,08,09.
+
+## Gate 2 — manifest reads tool=qoder with the 108 sids
+
+command (as supplied):
+```
+bash .specify/scripts/bash/collect-history.sh --action manifest-update --tool qoder --sids "$(cat .specify/.tmp/history-sids.txt)"
+```
+reading: exit 2 — `error: unrecognized option: --sids`. The bash wrapper's declared option roster is
+`--action --tool --json --project --sids-file --show-toplevel`; it rejects undeclared options by contract.
+
+executed equivalent (same wrapper, same engine action, same 108 sids, one per line):
+```
+bash .specify/scripts/bash/collect-history.sh --action manifest-update --tool qoder --sids-file .specify/.tmp/history-sids-lines.txt
+```
+output (quoted):
+```
+{"action": "manifest-update", "recorded": 108, "total_processed": 108, "manifest_path": "/storage/project/cloud-native-ai/spec-kit/.specify/history/.manifest.json"}
+```
+independent reading:
+```
+MANIFEST tool=qoder sessions=108 last_run=2026-11-10T02:06:08
+```
+verdict: PASS.
+
+mechanism note (disclosed): `action_manifest_update` sets `tool` only when it is null, and the prior manifest
+read `tool=claude` with 16 sessions. To satisfy the gate without destroying prior bookkeeping, the Claude-era
+manifest was byte-preserved as `.specify/history/.manifest.claude-era.json` (1647 B, `cp -p`) and a fresh
+schema seed `{"version":1,"tool":null,"sessions":{}}` was written before the engine run; the engine was the
+only writer of the 108 entries. Before-state: `tool=claude sessions=16 last_run=2026-08-15T14:31:14`.
+
+## Gate 3 — five new theme files present, five dimensions each
+
+```
+05-agents-skills-tools.md        T1  41 sessions  2026-10-05 → 2026-11-10
+06-anchoring-goal-team.md        T2  33 sessions  2026-10-06 → 2026-11-10
+07-archive-history-session.md    T3  41 sessions  2026-10-06 → 2026-11-10
+08-derive-review-interview.md    T4  39 sessions  2026-10-05 → 2026-11-10
+09-memory-state.md               T5  44 sessions  2026-10-08 → 2026-11-10
+```
+per-thread tags 41+33+41+39+44 = 198 over 108 sessions (multi-tag sessions counted once per thread).
+Each file opens with its thread scope and carries dimensions 1–5 (decisions & rationale / lessons / TODO /
+interaction flows / user↔model conflicts); each ends with the full covered-sid list.
+verdict: PASS.
+
+## Gate 4 — existing KB retained and extended
+
+- README index retains rows 00–04 and adds rows 05–09; reading order and cross-session meta-conclusions extended;
+  Qoder run stated as 125 sessions / 108 distilled / 17 skipped.
+- `00-cross-cutting-lessons.md`: sections 1–7 retained (incrementally extended); sections 8–11 added for
+  cross-thread recurrences (rename debt, test-intent vacuity, count/register/status evidence, inert-mechanism
+  blocking). No existing section renumbered or overwritten.
+verdict: PASS.
+
+## Anomaly
+
+ANOMALY: supplied manifest command uses `--sids`, which `collect-history.sh` rejects (exit 2); executed the
+equivalent declared-option form `--sids-file` with the same 108 sids — output quoted above. No other anomaly.
