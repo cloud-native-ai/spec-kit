@@ -67,6 +67,8 @@ FEATURE_MODULES = {
     "tests/contract/test_command_family.py",
     "tests/contract/test_declaration_facts.py",
     "tests/contract/test_sdd_loop_driver_skill.py",
+    "tests/contract/test_framework_map_archive_row.py",
+    "tests/contract/test_goal_command_template.py",
 }
 
 ROW = re.compile(r"^\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|\s*(\d+)\s*\|\s*([a-z]+)\s*\|\s*(.+?)\s*\|$")

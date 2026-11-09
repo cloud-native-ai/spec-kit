@@ -40,7 +40,7 @@ SANCTIONED_ROOTS = {
 #: action cannot appear without this module re-reading it.
 EXPECTED_WRITE_ACTIONS = {
     "create", "status", "objective", "criteria", "targets", "migrate", "bind",
-    "migrate-archive", "backfill-bindings",
+    "migrate-archive", "backfill-bindings", "handoff-ref",
 }
 
 WRITE_PRIMITIVES = {

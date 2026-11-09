@@ -1,6 +1,6 @@
 ---
 description: Author and manage goal definitions in the goal archive: create, view, modify, manage Targets (scope slices), migrate a team's inline goal, migrate spec-local trees into the unified archive, and coordinate teams that share one goal.
-short-description: 创建、查看、修改目标档案中的定义，管理 Targets、团队协同，并含 migrate-archive 档案迁移
+short-description: 创建、查看、修改目标档案，管理 Targets、团队协同与 migrate-archive 迁移
 argument-hint: "[create|view|modify|targets|migrate|migrate-archive|coordinate] [goal-slug|team-slug] [--scope <layer>] [--spec-dir <path>]"
 ---
 

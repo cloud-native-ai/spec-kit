@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 086-efficient-test-execution
+source_slug: 086-efficient-test-execution
+target_slug: 086-efficient-test-execution
+target_path: .specify/anchoring/086-efficient-test-execution/goal.md
+archived_path: .specify/archive/goal-team/trees/086-efficient-test-execution/goal/086-efficient-test-execution
+concept_digest: sha256:b7e34ef3c8d738c411d3960c87417eb17a384952e08f64718495d935268eccf2
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

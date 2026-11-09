@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 088-speckit-visualization
+source_slug: 088-reporting-dogfood
+target_slug: 088-reporting-dogfood
+target_path: .specify/teams/088-reporting-dogfood/team.md
+archived_path: .specify/archive/goal-team/trees/088-speckit-visualization/teams/088-reporting-dogfood
+concept_digest: sha256:ceee3a8cc4e544cf2032a59e4915672060b8420839b8bdd355500dd4d9a0f3c2
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

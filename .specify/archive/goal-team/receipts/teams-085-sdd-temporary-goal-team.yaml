@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 085-sdd-temporary-goal-team
+source_slug: 085-sdd-temporary-goal-team
+target_slug: 085-sdd-temporary-goal-team
+target_path: .specify/teams/085-sdd-temporary-goal-team/team.md
+archived_path: .specify/archive/goal-team/trees/085-sdd-temporary-goal-team/teams/085-sdd-temporary-goal-team
+concept_digest: sha256:714379754592cd2a1af84836bb9ee4a68555f4fb98a4f98d97e7144ed2073cf1
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

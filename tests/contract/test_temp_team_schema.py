@@ -1,8 +1,9 @@
-"""Contract tests for the spec-scoped team schema (Feature 085, T030/T032).
+"""Contract tests for the migrated team schema (Feature 085, T030/T032).
 
-A team has a scope, never a "temporary" property: this suite pins the spec-scoped
-team — a definition under `<spec-dir>/team/<slug>/team.md` — and its declared
-isolation and concurrency keys.
+Rewritten by Feature 094 (FR-041 / SC-010, disposal row 3): the team definition now
+lives in the unified archive and its ownership is answered by the `binding` block. The
+schema survives — stage seats, concurrency bounds and `lifecycle_state` unchanged; the
+retired spec-scoped resolution is refused by the parser.
 """
 
 from __future__ import annotations
@@ -17,8 +18,8 @@ import pytest
 pytestmark = pytest.mark.contract
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SPEC_DIR = REPO_ROOT / ".specify/specs/085-sdd-temporary-goal-team"
-TEAM_MD = SPEC_DIR / "team/085-sdd-temporary-goal-team/team.md"
+SLUG = "085-sdd-temporary-goal-team"
+TEAM_MD = REPO_ROOT / f".specify/teams/{SLUG}/team.md"
 GOAL_UTILS = REPO_ROOT / "scripts/python/goal-utils.py"
 SDD_ROUTE = REPO_ROOT / "scripts/python/sdd-route.py"
 CANONICAL_STAGES = {
@@ -28,7 +29,7 @@ CANONICAL_STAGES = {
 
 
 def _text() -> str:
-    assert TEAM_MD.is_file(), f"spec-scoped team missing: {TEAM_MD}"
+    assert TEAM_MD.is_file(), f"archive team missing: {TEAM_MD}"
     return TEAM_MD.read_text(encoding="utf-8")
 
 
@@ -75,10 +76,11 @@ def _members(fm: list[str]) -> list[str]:
     return out
 
 
-def test_scope_and_lifecycle_fields():
+def test_binding_and_lifecycle_fields():
     fm = "\n".join(_frontmatter(_text()))
-    assert "scope: spec" in fm
-    assert "spec_dir: .specify/specs/085-sdd-temporary-goal-team" in fm
+    assert "binding:" in fm, "the archive definition carries its binding block"
+    assert "owner: human" in fm
+    assert "origin: 085-sdd-temporary-goal-team" in fm
     assert "goal_slug: 085-sdd-temporary-goal-team" in fm
     assert "lifecycle_state: active" in fm
     assert "isolation: worktree" in fm
@@ -122,26 +124,38 @@ def test_seats_map_is_block_style():
             assert "{" not in line and "}" not in line, "seats must be a block map, not flow style"
 
 
-def test_spec_scoped_run_checks_resolves_the_team():
+def test_run_checks_resolves_the_team_from_the_archive():
     proc = subprocess.run(
-        [sys.executable, str(GOAL_UTILS), "run-checks", "085-sdd-temporary-goal-team",
-         "--scope", "spec", "--spec-dir", str(SPEC_DIR), "--json"],
+        [sys.executable, str(GOAL_UTILS), "run-checks", SLUG,
+         "--scope", "teams", "--json"],
         capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
     assert payload["verdict"] == "ok"
-    assert payload["goal_slug"] == "085-sdd-temporary-goal-team"
+    assert payload["goal_slug"] == SLUG
 
 
-def test_spec_scoped_authorize_resolves_the_team():
+def test_authorize_resolves_the_team_from_the_archive():
     proc = subprocess.run(
         [sys.executable, str(SDD_ROUTE), "--action", "authorize",
          "--agent", "agents/sdd-plan-coordinator.agent.md",
-         "--team", "085-sdd-temporary-goal-team", "--seat", "sdd-plan-coordinator",
-         "--scope", "spec", "--spec-dir", str(SPEC_DIR), "--format", "json"],
+         "--team", SLUG, "--seat", "sdd-plan-coordinator",
+         "--scope", "teams", "--format", "json"],
         capture_output=True, text=True, cwd=REPO_ROOT)
     assert proc.returncode == 0, proc.stderr
     payload = json.loads(proc.stdout)
-    assert payload["scope"] == "spec"
-    assert payload["team_slug"] == "085-sdd-temporary-goal-team"
+    assert payload["archive_layer"] == "teams"
+    assert payload["team_slug"] == SLUG
     assert payload["seat_slug"] == "sdd-plan-coordinator"
+
+
+@pytest.mark.parametrize("retired", ["spec", "global"])
+def test_retired_team_scopes_are_refused(retired: str):
+    proc = subprocess.run(
+        [sys.executable, str(SDD_ROUTE), "--action", "authorize",
+         "--agent", "agents/sdd-plan-coordinator.agent.md",
+         "--team", SLUG, "--seat", "sdd-plan-coordinator",
+         "--scope", retired, "--format", "json"],
+        capture_output=True, text=True, cwd=REPO_ROOT)
+    assert proc.returncode == 2
+    assert "invalid choice" in (proc.stderr + proc.stdout)

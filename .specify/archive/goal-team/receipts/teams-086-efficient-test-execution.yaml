@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 086-efficient-test-execution
+source_slug: 086-efficient-test-execution
+target_slug: 086-efficient-test-execution
+target_path: .specify/teams/086-efficient-test-execution/team.md
+archived_path: .specify/archive/goal-team/trees/086-efficient-test-execution/teams/086-efficient-test-execution
+concept_digest: sha256:e0e73f3f35fcc59e1f4b46c2f1e092f6267844736e21e9c4c2f138c25e8e5b33
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

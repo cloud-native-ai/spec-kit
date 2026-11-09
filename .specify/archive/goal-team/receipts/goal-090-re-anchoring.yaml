@@ -1,0 +1,10 @@
+kind: goal
+source_spec: 090-re-anchoring
+source_slug: 090-re-anchoring
+target_slug: 090-re-anchoring
+target_path: .specify/anchoring/090-re-anchoring/goal.md
+archived_path: .specify/archive/goal-team/trees/090-re-anchoring/goal/090-re-anchoring
+concept_digest: sha256:6af03dd62f66dafa710dbc38d3403d1838e3faa44fc1f62a0c911bad08fc9a8d
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete

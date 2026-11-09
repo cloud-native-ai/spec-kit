@@ -1,0 +1,10 @@
+kind: teams
+source_spec: 087-arch-diagram-docs
+source_slug: 087-arch-diagram-docs
+target_slug: 087-arch-diagram-docs
+target_path: .specify/teams/087-arch-diagram-docs/team.md
+archived_path: .specify/archive/goal-team/trees/087-arch-diagram-docs/teams/087-arch-diagram-docs
+concept_digest: sha256:51e3c438bea68ab44e4e95cecfd0ad6f62b91dd5647f84f4d3c7ebcbe8b98cb4
+result: migrated
+at: 2026-11-09T13:18:35Z
+delete_policy: archive-not-delete
