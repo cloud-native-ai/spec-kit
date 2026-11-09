@@ -1,0 +1,48 @@
+# 093-concurrency-by-default — review repair R1 readings (code / docs / guards)
+- date: 2026-11-09T16:16:27Z
+- worktree: /storage/project/cloud-native-ai/spec-kit/.specify/.tmp/sdd-loop/worktrees/093-review
+- branch: 093-review @ 46bcb8716
+
+## GATE G1 — six-module test gate
+command: bash scripts/bash/run-tests.sh tests/unit/test_concurrency_check_engine.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_project_setup_skill.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_real_run_evidence.py -q
+exit: 0
+duration: 26s
+--- output (verbatim) ---
+# test runner exceptions: 1 declared serial test(s)
+# test runner: python3 -m pytest -n auto --dist load tests/unit/test_concurrency_check_engine.py tests/contract/test_concurrency_serial_reason.py tests/contract/test_sdd_loop_driver_skill.py tests/contract/test_sdd_project_setup_skill.py tests/contract/test_concurrency_disposal.py tests/contract/test_concurrency_real_run_evidence.py -q
+# test runner: mode=parallel workers=auto dist=load passes=2
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 79%]
+...................                                                      [100%]
+91 passed in 7.04s
+.                                                                        [100%]
+1 passed, 91 deselected in 17.26s
+
+## GATE G2 — mirror sync check
+command: python3 .specify/scripts/python/sync-mirrors.py --check
+exit: 0
+duration: 0s
+--- output (verbatim) ---
+OK: all per-tool command copies match the source templates.
+ok    templates/ == .specify/templates/ (22 files, byte-identical)
+ok    skills/external/ == .specify/skills/ (419 files, byte-identical)
+ok    skills/internal/ == .specify/skills/internal/ (139 files, byte-identical)
+ok    agents/ == .specify/agents/templates/ (17 files, byte-identical)
+ok    scripts/ == .specify/scripts/ (124 files, byte-identical)
+projected[bash-version-guard] .specify/scripts/bash/check-prerequisites.sh <- scripts/bash/check-prerequisites.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/generate-instructions.sh <- scripts/bash/generate-instructions.sh: ok
+projected[bash-version-guard] .specify/scripts/bash/run-tests.sh <- scripts/bash/run-tests.sh: ok
+projected[python-version-bridge] .specify/scripts/python/script-interface-check.py <- scripts/python/script-interface-check.py: ok
+projected[python-version-bridge] .specify/scripts/python/script_interface_cli.py <- scripts/python/script_interface_cli.py: ok
+projected[python-version-bridge] .specify/scripts/python/sync-mirrors.py <- scripts/python/sync-mirrors.py: ok
+ok    shared/ == .specify/shared/ (110 files, byte-identical)
+
+## GATE G3 — probe embeds check
+command: python3 .specify/scripts/python/probe-utils.py --action compile-embeds --check
+exit: 0
+duration: 1s
+--- output (verbatim) ---
+compile-embeds --check: 79 units, zero drift
+

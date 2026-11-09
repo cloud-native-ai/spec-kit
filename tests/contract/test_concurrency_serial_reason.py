@@ -124,7 +124,7 @@ def _valid_record(repo: Path, code: str) -> Path:
             "  mechanism-not-yet-landed:",
             "    units:",
             "      - unit-a",
-            "    mechanism: fork-carrier-not-landed",
+            "    missing_mechanism: fork-carrier-not-landed",
         ],
     }
     return _record(repo, "%s.yaml" % code, [
@@ -305,6 +305,35 @@ def test_condition_bound_evidence_form_is_accepted_when_complete(tmp_path, code)
     assert envelope is not None, proc.stdout + proc.stderr
     assert proc.returncode == 0, (code, envelope.get("findings"))
     assert envelope["decision"] == "pass"
+
+
+@pytest.mark.parametrize("code", FACTUAL)
+def test_factual_evidence_form_is_accepted_when_complete(tmp_path, code):
+    """D-I1: a factual code's valid record is accepted, including its declared extra field."""
+    repo = _repo(tmp_path)
+    proc, envelope = _judge(repo, _valid_record(repo, code), tmp_path / "valid.json")
+    assert envelope is not None, proc.stdout + proc.stderr
+    assert proc.returncode == 0, (code, envelope.get("findings"))
+    assert envelope["decision"] == "pass"
+
+
+def test_mechanism_code_requires_the_fact_declared_extra_field(tmp_path):
+    """The extra evidence field is a fact declaration, not an engine code literal (D-I1)."""
+    statement = _vocabulary()
+    entry = next(item for item in statement["codes"]
+                 if item["code"] == "mechanism-not-yet-landed")
+    extra = entry.get("evidence_extra_field")
+    assert extra, "serial-reason.yaml must declare the code's extra evidence field"
+    repo = _repo(tmp_path)
+    wrong_key = _record(repo, "mechanism-wrong-key.yaml", [
+        "pattern: serial", "codes:", "  - mechanism-not-yet-landed", "evidence:",
+        "  mechanism-not-yet-landed:", "    units:", "      - unit-a",
+        "    mechanism: fork-carrier-not-landed",
+    ])
+    proc, envelope = _judge(repo, wrong_key, tmp_path / "wrong-key.json")
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    assert "evidence-form-mismatch" in _codes(envelope), envelope.get("findings")
+    assert _mentions(envelope, extra), "the declared field name must be named in the finding"
 
 
 # --------------------------------------------------------------------------- #

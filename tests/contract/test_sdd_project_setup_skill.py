@@ -247,3 +247,18 @@ def test_local_default_and_native_subagent():
             "the disposed old rule returned: %r" % phrase)
     recipes = _recipes()
     assert "本地拓扑" in recipes and "n/a" in recipes
+    # The docs page is re-pinned, never left unpinned (093 review D-B1): the deleted
+    # assertion read "原生子代理" in the docs; the carriers + ban shape replaces it.
+    docs = DOCS.read_text(encoding="utf-8")
+    assert "当前项目" in docs, "the docs page must carry the local default"
+    assert "qodercli" in docs and "stage-runner.sh" in docs, (
+        "the docs page must name the fork carrier")
+    assert re.search(r"subprocess|独立子进程|异构", docs), (
+        "the docs page must name the subprocess carrier")
+    assert re.search(
+        r"in-process[\s\S]{0,240}(BANNED|禁止|MUST NOT)"
+        r"|(BANNED|禁止|MUST NOT)[\s\S]{0,240}in-process", docs), (
+        "the docs page must carry the in-process ban beside the banned path")
+    for phrase in ("原生子代理", "不启动 `qodercli`", "MUST NOT 启动 qodercli"):
+        assert phrase not in docs, (
+            "the docs page must not restate the disposed native-carrier rule: %r" % phrase)

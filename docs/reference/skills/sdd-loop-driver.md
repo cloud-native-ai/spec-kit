@@ -1,6 +1,6 @@
 # sdd-loop-driver（无人值守 SDD 循环驱动）
 
-**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 本地用宿主原生子代理 / 远端用 qodercli 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 五份手册（含效率 owner `efficiency-model.md`、状态感知 owner `state-awareness.md`）+ `scripts/`）。
+**机制一句话**：以一条一遍性提示词驱动宿主 agent 完成「登录环境 → 本地用 fork 承载（同族 qodercli 子进程经 scripts/stage-runner.sh）/ 远端用外部 CLI 为子代理 → 按阶段推进 SDD 全流程 → 合并 main」的循环闭环，全程自推进、零用户提醒。真源：`skills/external/sdd-loop-driver/SKILL.md`（+ references/ 五份手册（含效率 owner `efficiency-model.md`、状态感知 owner `state-awareness.md`）+ `scripts/`）。
 
 ## 加载与投递
 
@@ -10,21 +10,21 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 | 参数 | 远端拓扑 | 本地拓扑 |
 |------|----------|----------|
-| 登录别名 | `ssh <alias>`（如 root 登录后 `su <run-user>`） | 无（本机原生子代理） |
+| 登录别名 | `ssh <alias>`（如 root 登录后 `su <run-user>`） | 无（本机进程承载） |
 | 执行身份 | `su <run-user>`（如 develop） | 当前用户 |
 | 项目路径 | `/cws_work/<project>` 等入口声明 | 本地路径；缺省当前项目 |
-| 子代理承载 | qodercli（`DISPATCH_CLI` 可覆盖） | 宿主原生子代理（不启动 qodercli） |
+| 子代理承载 | qodercli（`DISPATCH_CLI` 可覆盖） | fork 承载（同族 qodercli 子进程经 `scripts/stage-runner.sh`）/ subprocess 承载（异构 agent 自身 CLI 的独立子进程）；宿主 in-process subagent 路径 BANNED |
 | 断点阶段 | 可不声明（自动探测） | 同左 |
 | 终态权威文档 | 入口声明路径 | 同左 |
 
-**本地缺省**：未给 host+path → 当前项目；子代理用宿主原生形态，MUST NOT 启动 qodercli。远端才使用 qodercli 等外部 CLI 与 runner/统一监听模型。
+**本地缺省**：未给 host+path → 当前项目；阶段派发用 **fork 承载**（同族 `qodercli` 子进程经 `scripts/stage-runner.sh`）或 **subprocess 承载**（异构 agent 自身 CLI 的独立子进程），宿主内建 in-process subagent 路径 **BANNED**、不作为并发承载、MUST NOT 被呈现为一个选项。远端使用 qodercli 等外部 CLI 与 runner/统一监听模型。
 
 入口话术示例见 skill 手册 `## When to Load`；典型形态：「使用SDD开发模式推动 <项目>……需要使用一个循环来完成这项工作，而不是每次由我提醒你『重试』或者『继续』。」
 
 ## 执行侧可移植性
 
 - 宿主环境**无需** `.specify/` 目录、无需安装 spec-kit——skill 全部操作要点内联自包含。
-- 投递后宿主按手册驱动循环：断点探测 → 阶段派发（远端脱离后台自跑；本地原生直接调用）→ 统一监听（仅外部 CLI：长轮询窗口，事件优先）→ 哨兵与独立校验 → 续环 → git 状态判定合并收尾。
+- 投递后宿主按手册驱动循环：断点探测 → 阶段派发（远端脱离后台自跑；本地经 fork / subprocess 进程承载）→ 统一监听（fork 子进程与远端 runner 同规：长轮询窗口，事件优先）→ 哨兵与独立校验 → 续环 → git 状态判定合并收尾。
 - **目标项目侧依赖**：仅当子代理要在目标项目执行 `/speckit.*` 阶段命令时，目标项目才需要具备 `.specify/` 结构；目标项目无 `.specify/` 时机制报告停线、不自动初始化。
 - **与 setup / house-keeping 的交接**：目标解析共享 `shared/workflow/target-resolution.md`；本技能强依赖 `.specify/`，从显式路径/会话 cwd 向上搜索最近的合法 `.specify/` 根，找不到就拒绝执行并 handoff `sdd-project-setup` / 提示 `specify init`。preflight ⑤ fail → `sdd-project-setup` 做 bootstrap；setup 返回 `bootstrap-complete / maintenance-pending` → `sdd-house-keeping` H1–H4 做首次维护，H4 三条件成立才是 `ready`；house-keeping 不可用时，只有 preflight ⑤ 通过才可继续并记 `maintenance=not_evaluated`。目标项目已初始化、仅需维护 → 直接 `sdd-house-keeping`；本技能不执行初始化或周期维护，只推进 SDD 阶段。
 
@@ -39,7 +39,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 ## 统一监听模型
 
-等待/监控/轮询/wait/monitor 的语义统一收敛到 `references/watch-model.md`，参考实现为 `scripts/watch-target.sh`。**适用范围**：仅外部 CLI 派发（远端拓扑）；本地原生调用是同步阻塞调用，返回即判定，不进入本模型。
+等待/监控/轮询/wait/monitor 的语义统一收敛到 `references/watch-model.md`，参考实现为 `scripts/watch-target.sh`。**适用范围**：远端外部 CLI 派发与本地 fork 承载（同族 qodercli 子进程）同规进入本模型；subprocess 承载（异构 agent 自身 CLI）按其 CLI 的返回判定；宿主内建 in-process subagent 路径不是承载，BANNED。
 
 - **信号**：退出记录、完成哨兵、PID（含 start ticks/PID 复用校验）、心跳、日志尾行；完成必须有正证据——进程消失、日志静默、`pgrep` 零匹配都不是完成。
 - **机制阶梯**：长轮询窗口（一次调用内等待，事件发生即返回）→ 宿主原生通知（仅作补充，不得结束驱动者会话）→ 间隔轮询回退；禁止独立 `sleep` 回合空等。
@@ -115,7 +115,7 @@ skill 本体是**自包含手册**（SKILL.md + references/ + scripts/），三�
 
 - 以 `/sdd-loop-driver` 给出功能/改进描述 = SDD 目标；目标项目可为当前仓库，**包括 sdd-loop-driver 自身**。
 - 改进对象是技能本身时仍走阶段链；只有入口显式声明「只做技能维护、不走 SDD」才允许 improve-skills/create-skills 等维护路径。
-- 入口参数缺失时按缺省解析（当前项目 / 本地原生子代理 / 入口描述为权威 / U1 自动探测），不得因参数不全切换流程。
+- 入口参数缺失时按缺省解析（当前项目 / 本地 fork 或 subprocess 进程承载 / 入口描述为权威 / U1 自动探测），不得因参数不全切换流程。
 - 进入 U2 前执行 U0.5 自检：未写出入口声明与阶段计划，不得直接编辑目标仓库。规则真源见 `skills/external/sdd-loop-driver/SKILL.md`。
 
 ## 边界

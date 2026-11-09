@@ -14,8 +14,10 @@ quantity written `not_evaluated` and never a fabricated number.
 | `effective_reason` | `mechanism-not-yet-landed` — the FR-035 fork carrier was authored *during* this run (WP3 T142) and the implement fold dispatched one package at a time in declared order; the run has no pair of overlapping unit intervals to measure |
 | missing mechanism | the fold's package dispatches were serialized by the driver (WP1 → WP2 → WP3 → WP4 → enginefix → WP5); no two units were in flight together, so `effective` is not evaluated from interval overlap — it is **not** `0` and **not** an estimate |
 
-There were six real dispatch units, each a separate fork worker in its own worktree/branch, each
-resolving to its own record:
+There were six real dispatch units, each a separate fork worker, each resolving to its own record.
+Five ran in their own per-package worktree/branch; **WP1 ran in the line worktree**
+`.specify/.tmp/sdd-loop/worktrees/093-clarify` on branch `093-concurrency-by-default` — not a
+per-package `093-wp1` worktree (`notes/implement-wp1.md`), corrected here per PF-3:
 
 | Unit | Verdict | Evidence |
 |------|---------|----------|
@@ -36,6 +38,14 @@ report does not reconstruct them from commit timestamps (that would be an infere
 
 `notes/serial-baseline.md` records the 091 comparison row: 62 tasks, 1 agent, 116 minutes, cited
 from 091's recorded run — never re-measured here.
+
+## Task-state and registry state at report time (measured)
+
+`tasks.md` holds 159 `- [ ]` rows and the closure reading records `tasks: {closed: 0, open: 159}`;
+`features.md` row 093 read `Planned` when this report was written. Flipping the sigils and landing the
+status transition (`Planned → Blocked` on the closure verdict `block`) are the integration owner's
+close-out acts, not this report's — this report makes no all-done claim. **T098 is open by design**
+(F-093-003 — the coordinator-dispatch verdict value awaits its owner), not an unflipped done row.
 
 ## Why this is the honest reading
 

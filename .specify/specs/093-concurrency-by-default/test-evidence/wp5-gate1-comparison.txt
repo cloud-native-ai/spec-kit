@@ -3,8 +3,14 @@
 # Baseline: notes/test-baseline.txt (161 serial failed ids, WP1 T002); form: sed 's/^FAILED //;s/ - .*//' | sort -u
 
 ## Final suite reading
-211 failed, 8252 passed, 2 skipped, 576 warnings in 49.96s
+# Source run: test-evidence/wp5-suite-final.txt (line 7207) — the final tree at 46bcb8716
+207 failed, 8256 passed, 2 skipped, 576 warnings in 49.90s
 1 passed, 8465 deselected, 3 warnings in 17.85s
+
+## Superseded reading (dated record — not the headline)
+# 2026-11-09, an earlier WP5 run on the pre-final tree: 211 failed, 8252 passed, 2 skipped, 576 warnings in 49.96s.
+# Superseded by the final run above (AF-2, review of 2026-11-09); the 4-test delta between the two runs is
+# recorded here as unexplained, never attributed. The 46-name NEW set below is the final run's list.
 
 ## NEW names vs the frozen baseline (46 names)
 tests/contract/test_coaching_wiring_contract.py::test_c1_eight_identity_coordinates_all_hold

@@ -3,27 +3,31 @@
 **Owner of this page**: routing, not rules. Each scenario names what to run, what a passer sees, and what a
 failure means; the normative statements live in `contracts/*` and are reached by clause id.
 
-**Measured premise (2026-11-09, this worktree)**: `declaration_reader.py --action get --fact concurrency-class`
-exits **1** with `no declaration for fact 'concurrency-class'`. Everything below that assumes the fact exists is
-therefore *red today by construction* — that is the point of S-0 and S-1.
+**Measured premise (2026-11-09, this worktree, before the facts landed)**: `declaration_reader.py --action get --fact concurrency-class`
+exits **1** with `no declaration for fact 'concurrency-class'`. Everything below that assumes the fact exists was
+therefore *red at that moment by construction* — that is the point of S-0 and S-1. **Updated 2026-11-09 (WP5
+release)**: the fact is now registered — the same live `get` exits **0** with the fact body; the exit-1 reading
+above is kept as the dated record of the pre-registration premise.
 
 ---
 
-## S-0 — Verify the premise before touching anything (run today, passed)
+## S-0 — Verify the premise before touching anything (run at plan time, passed; premise since registered)
 
 ```bash
 cd <repo-root>
 python3 .specify/scripts/python/declaration_reader.py --action list   # exit 0, JSON with `contract` + `exclusions`
 python3 .specify/scripts/python/declaration_reader.py --action get --fact concurrency-class
-# → "no declaration for fact 'concurrency-class'", exit 1  ← the unregistered shape (FR-031, C-039)
+# plan-time reading: "no declaration for fact 'concurrency-class'", exit 1  ← the unregistered shape (FR-031, C-039)
+# current reading (2026-11-09, post-WP5): the slug is registered — the same command exits 0 with the fact body
 python3 .specify/scripts/python/sync-mirrors.py --check               # exit 0, zero drift (baseline captured)
 ```
 
-**Executed**: yes — the `--action list` / `--action get` reading above is the live output of this check in this
-worktree, and the mirror baseline is `test-evidence/mirror-baseline-plan.txt`. `--help` on both scripts exits 0
+**Executed**: yes — the `--action list` / `--action get` reading above is the live output of this check at plan
+time in this worktree, and the mirror baseline is `test-evidence/mirror-baseline-plan.txt`. `--help` on both scripts exits 0
 without acting (Constitution XXI).
 
-**A passer sees**: list exit 0; get exit 1 with that exact message; mirrors exit 0 with an empty drift list.
+**A passer sees**: list exit 0; get exit **1** with that exact message before the facts land and exit **0** with the
+fact body once they have (the live post-WP5 reading); mirrors exit 0 with an empty drift list.
 
 ---
 
@@ -88,7 +92,7 @@ fails on a fourth source (C-036).
 ## S-5 — Dispatch capability, and the 092 reproduction
 
 ```bash
-python3 -m pytest tests/contract/test_concurrency_reproduction_092.py -q   # red before the repair
+bash scripts/bash/run-tests.sh tests/contract/test_concurrency_reproduction_092.py -q   # red before the repair
 python3 scripts/python/concurrency-check.py capability --repo . --record <run-record>.yaml --json-out /tmp/capability.json
 ```
 
@@ -112,7 +116,7 @@ integration order and the duration, compared against the serial baseline recorde
 Any quantity the run did not produce is written `not_evaluated`; writing `0` or an estimate is a failure
 (SC-006, FR-030).
 
-**This feature's own run does not satisfy S-6** — see `plan.md` § Concurrency plan for this run: the feature's own concurrency mechanism has not landed yet (the declaration facts, the engine, and the FR-035 runner path), so the run declares serial with `mechanism-not-yet-landed` and records SC-006 as `not_evaluated`. A tool set is a per-run probe (RS-005), never a constant; the earlier "no dispatch tool" reason was measured false at analyze 2026-11-09 (F-093-012).
+**This feature's own run does not satisfy S-6** — see `plan.md` § Concurrency plan for this run: the concurrency mechanism **has landed** by WP5 (the eight declaration facts, the engine, and the FR-035 fork runner path), but the implement run itself was executed as the driver's **declared-order serial fold** (`WP1 → WP2 → WP3 → WP4 → enginefix → WP5`, `notes/coordination-report.md` § Reading), so the run declares serial with `mechanism-not-yet-landed` for the dispatch window and records SC-006 as `not_evaluated` — no two units were ever in flight together, so there is no interval pair to measure. `mechanism-not-yet-landed` is defensible only for the WP2–WP4 dispatches that predate T142. A tool set is a per-run probe (RS-005), never a constant; the earlier "no dispatch tool" reason was measured false at analyze 2026-11-09 (F-093-012).
 
 ---
 

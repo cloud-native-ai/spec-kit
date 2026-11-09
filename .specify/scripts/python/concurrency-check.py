@@ -668,10 +668,11 @@ def judge_evidence(repo, code_entry, evidence):
         if not isinstance(units, list) or len(units) > 1:
             return "evidence-form-mismatch", (
                 "a factual code needs the enumerated representable unit set (size 0 or 1)")
-        if str(code_entry.get("code")) == "mechanism-not-yet-landed" and not str(
-                evidence.get("missing_mechanism", "")).strip():
+        extra = str(code_entry.get("evidence_extra_field", "")).strip()
+        if extra and not str(evidence.get(extra, "")).strip():
             return "evidence-form-mismatch", (
-                "mechanism-not-yet-landed needs the named missing mechanism")
+                "%s needs the declared extra evidence field %r"
+                % (code_entry.get("code"), extra))
         return None
     return "evidence-form-mismatch", "no judgeable evidence form %r" % form
 
@@ -901,7 +902,17 @@ def action_reading(repo, args):
     findings = []
 
     units = record.get("units")
-    unit_list = units if isinstance(units, list) else []
+    if units is not None and not isinstance(units, list):
+        # A present-but-non-list units field is a malformed record, never "no units":
+        # treating it as empty let a concurrency claim hide its units and pass at
+        # effective=0 (C-032's claim rule bypassed).
+        findings.append(finding(
+            "record-malformed", record_ref,
+            "units must be a list (got %r)" % type(units).__name__,
+            record_ref + "#units"))
+        unit_list = []
+    else:
+        unit_list = units if isinstance(units, list) else []
     intervals = []
     missing = []
     for position, unit in enumerate(unit_list):

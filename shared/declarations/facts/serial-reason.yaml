@@ -54,6 +54,7 @@ statement:
       meaning: the concurrency mechanism itself is not yet available in this run
       evidence_form: unit-set
       evidence_requirement: the enumerated unit set plus the named missing mechanism
+      evidence_extra_field: missing_mechanism
 consumers:
   - scripts/python/concurrency-check.py
   - tests/contract/test_concurrency_serial_reason.py

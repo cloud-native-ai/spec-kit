@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -184,6 +185,101 @@ def test_five_actions_each_produce_one_envelope(tmp_path):
         envelope = json.loads(out.read_text(encoding="utf-8"))
         assert envelope["action"] == action
         assert envelope["decision"] in ("pass", "fail", "owner-unavailable", "not-applicable")
+
+
+# --------------------------------------------------------------------------- #
+# D-I2 — a malformed units field is never "no units"
+# --------------------------------------------------------------------------- #
+def test_present_non_list_units_is_record_malformed(tmp_path):
+    """A present-but-non-list units field is record-malformed, never effective=0 pass."""
+    record = _write_subset(tmp_path / "bad-units.yaml", [
+        "requested: 2",
+        "pattern: concurrent",
+        "units: not-a-list",
+        "effective_reason: pretend",
+    ])
+    out = tmp_path / "bad-units.json"
+    proc = _run_engine("reading", "--repo", REPO_ROOT, "--record", record, "--json-out", out)
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    envelope = json.loads(out.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "fail"
+    assert "record-malformed" in [item["code"] for item in envelope["findings"]], (
+        "a concurrency claim must not hide its units behind a non-list value")
+
+
+# --------------------------------------------------------------------------- #
+# D-I3 / C-2 — the coverage action's red arms (SC-008 evidence)
+# --------------------------------------------------------------------------- #
+def _declaration_repo(tmp_path: Path) -> Path:
+    shutil.copytree(REPO_ROOT / "shared" / "declarations",
+                    tmp_path / "shared" / "declarations")
+    return tmp_path
+
+
+def _goal_fixture(repo: Path, slug: str, targets) -> Path:
+    goal_dir = repo / ".specify" / "anchoring" / slug
+    goal_dir.mkdir(parents=True)
+    rows = ["## Targets", "", "| Target | Description | Status |", "|---|---|---|"]
+    rows.extend("| %s | unit %s | open |" % (target, target) for target in targets)
+    (goal_dir / "goal.md").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    return goal_dir
+
+
+def test_coverage_undeclared_stage_turns_red(tmp_path):
+    """C-035/SC-008 red arm: a stage outside the fact is coverage-undeclared (exit 1)."""
+    out = tmp_path / "undeclared.json"
+    proc = _run_engine("coverage", "--repo", REPO_ROOT, "--stage", "frobnicate",
+                       "--json-out", out)
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    envelope = json.loads(out.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "fail"
+    assert "coverage-undeclared" in [item["code"] for item in envelope["findings"]]
+
+
+def test_coverage_off_without_decision_turns_red(tmp_path):
+    """C-035/SC-008 red arm: a stage kept serial with no named decision record (exit 1)."""
+    repo = _declaration_repo(tmp_path)
+    fact = repo / "shared" / "declarations" / "facts" / "decomposition-coverage.yaml"
+    text = fact.read_text(encoding="utf-8")
+    mutated = text.replace(
+        "    - stage: clarify\n      coverage: auto\n",
+        "    - stage: clarify\n      coverage: off\n", 1)
+    assert mutated != text, "fixture premise: the fact must declare clarify as auto"
+    fact.write_text(mutated, encoding="utf-8")
+    out = tmp_path / "off.json"
+    proc = _run_engine("coverage", "--repo", repo, "--stage", "clarify",
+                       "--ceiling", "4", "--json-out", out)
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    envelope = json.loads(out.read_text(encoding="utf-8"))
+    assert envelope["decision"] == "fail"
+    assert "coverage-undeclared" in [item["code"] for item in envelope["findings"]]
+
+
+def test_coverage_partition_under_ceiling_turns_red(tmp_path):
+    """C-063/C-065 red arm: the goal partition is bounded by --ceiling; when the
+    remaining slots drop under two it must not claim packages and must name its
+    serial reason code. A regression that ignores the ceiling turns this red."""
+    repo = _declaration_repo(tmp_path)
+    _goal_fixture(repo, "five", ["T-001", "T-002", "T-003", "T-004", "T-005"])
+
+    out = tmp_path / "ceiling4.json"
+    proc = _run_engine("coverage", "--repo", repo, "--goal", "five",
+                       "--ceiling", "4", "--json-out", out)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    goal = json.loads(out.read_text(encoding="utf-8"))["measured"]["goals"][0]
+    assert goal["effective_available"] == 3
+    assert [len(package) for package in goal["packages"]] == [3, 2], (
+        "packages are bounded by ceiling minus reserve, not by the slot cap: %r" % goal)
+
+    out = tmp_path / "ceiling2.json"
+    proc = _run_engine("coverage", "--repo", repo, "--goal", "five",
+                       "--ceiling", "2", "--json-out", out)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    goal = json.loads(out.read_text(encoding="utf-8"))["measured"]["goals"][0]
+    assert goal["effective_available"] == 1
+    assert goal["packages"] == [], "under the ceiling no concurrent partition is claimed"
+    assert goal["serial_reason"] == "budget-reserve", (
+        "a serial fallback carries its named reason code: %r" % goal)
 
 
 # --------------------------------------------------------------------------- #

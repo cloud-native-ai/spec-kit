@@ -592,3 +592,17 @@ def test_c23_local_carriers_and_the_in_process_ban():
     assert "qodercli" in watch and re.search(r"fork|stage-runner\.sh", watch), (
         "the watch model extends to the local fork carrier")
     assert BAN_WINDOW.search(watch), "the in-process path is BANNED in the watch model"
+    # The docs page is re-pinned, never left unpinned: the old C-23 assertion here read
+    # "原生子代理" in the docs; it is replaced by the carriers + ban shape below so the
+    # user-facing page cannot drift back to the disposed rule beside the skill sources.
+    docs = DOCS_PAGE.read_text(encoding="utf-8")
+    assert "当前项目" in docs, "the docs page must carry the local default"
+    assert "qodercli" in docs and "stage-runner.sh" in docs, (
+        "the docs page must name the fork carrier")
+    assert re.search(r"subprocess|独立子进程|异构", docs), (
+        "the docs page must name the subprocess carrier")
+    assert BAN_WINDOW.search(docs), (
+        "the docs page must carry the in-process ban beside the banned path")
+    for phrase in ("宿主原生子代理", "不启动 qodercli", "MUST NOT 启动 qodercli"):
+        assert phrase not in docs, (
+            "the docs page must not restate the disposed native-carrier rule: %r" % phrase)

@@ -15,8 +15,8 @@ A coordination report is accepted only when it carries, for a **non-fixture** ru
 The engine half reuses the ``reading`` action: a report claiming concurrency without
 intervals is red, and a missing interval reads ``not_evaluated``. Engine cases are
 red-first (``scripts/python/concurrency-check.py`` lands in WP2); this feature's own
-coordination report lands with T110 (WP5), so its live read records ``not_evaluated`` with
-that reason instead of a silent skip.
+coordination report landed with T110 (WP5), and its live read is a hard assertion, so a
+missing report fails instead of skipping.
 """
 from __future__ import annotations
 
@@ -244,9 +244,8 @@ def test_this_features_coordination_report_is_decidable_or_not_evaluated():
         path for path in SPEC_DIR.rglob("*.md")
         if "coordination" in path.name.lower()
     ]
-    if not candidates:
-        pytest.skip("not_evaluated: this feature's own coordination report lands with "
-                    "T110 (WP5); the report-shape judge is exercised on fixtures above")
+    assert candidates, ("this feature's coordination report must exist (T110 landed); "
+                        "a missing report is a regression, not a skip")
     for path in candidates:
         text = path.read_text(encoding="utf-8")
         assert ("effective: 2" in text or "effective: 3" in text

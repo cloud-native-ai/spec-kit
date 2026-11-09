@@ -15,8 +15,8 @@ Rows pinned here (WP4): T107, T123, T125.
   carries no numeric slot ceiling of its own.
 
 Engine cases are red-first (``scripts/python/concurrency-check.py`` lands in WP2). The live
-disposal ledger lands with T134 (WP5); until it exists, its live read records
-``not_evaluated`` with that reason instead of a silent skip.
+disposal ledger landed with T134 (WP5); its live read is a hard assertion, so a missing or
+emptied ledger fails instead of skipping.
 """
 from __future__ import annotations
 
@@ -167,9 +167,8 @@ def _live_disposition_rows():
 
 def test_every_pre_existing_statement_has_a_readable_disposition():
     rows = _live_disposition_rows()
-    if not rows:
-        pytest.skip("not_evaluated: the live disposal ledger lands with T134 (WP5); "
-                    "the domain judge is exercised on fixtures above")
+    assert rows, ("the live disposal ledger must carry disposition rows; a missing "
+                  "ledger is a regression, not a skip")
     for row in rows:
         matches = [cell for cell in row["cells"] if cell in DISPOSITIONS]
         assert len(matches) == 1, ("a row must carry exactly one disposition: %s" % row["cells"])
